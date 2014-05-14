@@ -1,10 +1,10 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       14 April 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2012-08-03 16:24:04 +0100 (Fri, 03 Aug 2012) $
+# Id:            $Id: types.pm 15943 2012-08-03 15:24:04Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/types.pm $
 #
 
 package npg_qc::autoqc::types;
@@ -15,7 +15,7 @@ use Moose::Util::TypeConstraints;
 use English qw(-no_match_vars);
 use Readonly;
 
-our $VERSION    = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION    = do { my ($r) = q$Revision: 15943 $ =~ /(\d+)/smx; $r; };
 ## no critic (Documentation::RequirePodAtEnd)
 
 
@@ -25,7 +25,7 @@ npg_qc::autoqc::types
 
 =head1 VERSION
 
-$Revision$
+$Revision: 15943 $
 
 =head1 SYNOPSIS
 

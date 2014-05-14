@@ -1,10 +1,10 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       29 October 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2010-04-23 11:58:24 +0100 (Fri, 23 Apr 2010) $
+# Id:            $Id: qX_yield.pm 9099 2010-04-23 10:58:24Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/qX_yield.pm $
 #
 
 package npg_qc::autoqc::role::qX_yield;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 with qw( npg_qc::autoqc::role::result );
 
 
-our $VERSION    = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION    = do { my ($r) = q$Revision: 9099 $ =~ /(\d+)/smx; $r; };
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -28,7 +28,7 @@ npg_qc::autoqc::role::qX_yield
 
 =head1 VERSION
 
-$Revision$
+$Revision: 9099 $
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,11 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2012-03-22 12:35:20 +0000 (Thu, 22 Mar 2012) $
+# Id:            $Id: signal_mean.pm 15373 2012-03-22 12:35:20Z mg8 $
 # Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL$
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/signal_mean.pm $
 #
 
 package npg_qc::view::signal_mean;
@@ -19,7 +19,7 @@ use npg_qc::model::image_store;
 use npg::util::image::merge;
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 15373 $ =~ /(\d+)/mxs; $r; };
 
 Readonly our $STD_HEIGHT   => 600;
 Readonly our $STD_WIDTH    => 500;
@@ -191,7 +191,7 @@ npg_qc::view::signal_mean
 
 =head1 VERSION
 
-$Revision$
+$Revision: 15373 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 #############
-# $Id$
+# $Id: loader.pm 18421 2014-05-14 10:19:54Z mg8 $
 # Created By: ajb
-# Mast Maintained By: $Author$
+# Mast Maintained By: $Author: mg8 $
 # Created On: 2009-11-24
-# Last Changed On: $Date$
-# $HeadURL$
+# Last Changed On: $Date: 2014-05-14 11:19:54 +0100 (Wed, 14 May 2014) $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader.pm $
 
 package npg_qc::illumina::loader;
 
@@ -15,7 +15,7 @@ use Module::Pluggable::Object;
 with qw{MooseX::AttributeCloner MooseX::Getopt};
 extends qw{npg_qc::illumina::loader::base};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18421 $ =~ /(\d+)/mxs; $r; };
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
@@ -24,7 +24,7 @@ npg_qc::illumina::loader
 
 =head1 VERSION
 
-$Revision$
+$Revision: 18421 $
 
 =head1 SYNOPSIS
 
@@ -212,7 +212,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author$
+$Author: mg8 $
 
 =head1 LICENSE AND COPYRIGHT
 

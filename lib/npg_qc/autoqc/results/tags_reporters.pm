@@ -1,10 +1,10 @@
 #sh########
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       12 August 2013
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-11-29 10:36:23 +0000 (Fri, 29 Nov 2013) $
+# Id:            $Id: tags_reporters.pm 17820 2013-11-29 10:36:23Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/tags_reporters.pm $
 #
 
 package npg_qc::autoqc::results::tags_reporters;
@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::tags_reporters);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17820 $ =~ /(\d+)/smx; $r; };
 
 has [ qw/ tag_list
           amp_rows
@@ -45,7 +45,7 @@ __END__
 
 =head1 VERSION
 
- $Revision$
+ $Revision: 17820 $
 
 =head1 SYNOPSIS
 

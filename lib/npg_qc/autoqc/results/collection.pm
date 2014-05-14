@@ -1,10 +1,10 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       03 September 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-01-28 11:56:56 +0000 (Mon, 28 Jan 2013) $
+# Id:            $Id: collection.pm 16569 2013-01-28 11:56:56Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/collection.pm $
 #
 
 package npg_qc::autoqc::results::collection;
@@ -28,7 +28,7 @@ use npg_tracking::illumina::run::folder;
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
 
-our $VERSION    = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION    = do { my ($r) = q$Revision: 16569 $ =~ /(\d+)/smx; $r; };
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
@@ -37,7 +37,7 @@ npg_qc::autoqc::results::collection
 
 =head1 VERSION
 
-$Revision$
+$Revision: 16569 $
 
 =head1 SYNOPSIS
 

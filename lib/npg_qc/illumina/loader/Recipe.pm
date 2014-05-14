@@ -1,10 +1,10 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2010-02-19
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-09-26 12:37:25 +0100 (Thu, 26 Sep 2013) $
+# Id:            $Id: Recipe.pm 17529 2013-09-26 11:37:25Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader/Recipe.pm $
 #
 package npg_qc::illumina::loader::Recipe;
 
@@ -18,7 +18,7 @@ use Digest::MD5 qw(md5 md5_hex);
 
 extends qw{npg_qc::illumina::loader::base};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17529 $ =~ /(\d+)/mxs; $r; };
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -28,7 +28,7 @@ npg_qc::illumina::loader::Recipe
 
 =head1 VERSION
 
-$Revision$
+$Revision: 17529 $
 
 =head1 SYNOPSIS
 
@@ -219,7 +219,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author$
+$Author: mg8 $
 
 =head1 LICENSE AND COPYRIGHT
 

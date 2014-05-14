@@ -1,11 +1,11 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-09-26
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2013-05-13 10:26:41 +0100 (Mon, 13 May 2013) $
+# Id:            $Id: cache_query.pm 17140 2013-05-13 09:26:41Z mg8 $
 # Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL$
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/cache_query.pm $
 #
 
 package npg_qc::view::cache_query;
@@ -19,7 +19,7 @@ use npg_qc::model::cache_query;
 use npg_qc::model::run_graph;
 use npg_qc::model::instrument_statistics;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 17140 $ =~ /(\d+)/mxs; $r; };
 
 sub posted_content_type {
   my ($self) = @_;
@@ -442,7 +442,7 @@ npg_qc::view::cache_query
 
 =head1 VERSION
 
-$Revision$
+$Revision: 17140 $
 
 =head1 SYNOPSIS
 

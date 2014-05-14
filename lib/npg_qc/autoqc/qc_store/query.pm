@@ -1,10 +1,10 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       28 September 2011
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-01-10 14:09:35 +0000 (Thu, 10 Jan 2013) $
+# Id:            $Id: query.pm 16446 2013-01-10 14:09:35Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/qc_store/query.pm $
 #
 
 package npg_qc::autoqc::qc_store::query;
@@ -18,7 +18,7 @@ use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_tracking::util::types;
 with qw/npg_tracking::glossary::run/;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 16446 $ =~ /(\d+)/smx; $r; };
 
 has 'option'    =>   (isa       => 'Int',
                       is        => 'ro',
@@ -81,7 +81,7 @@ npg_qc::autoqc::qc_store::query
 
 =head1 VERSION
 
-$Revision$
+$Revision: 16446 $
 
 =head1 SYNOPSIS
 

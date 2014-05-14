@@ -158,7 +158,7 @@ __PACKAGE__->add_unique_constraint(
 # Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zBMjbr/i+qItqmA5qzfwpg
 
-our $VERSION   = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION   = do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
 
 __PACKAGE__->meta->make_immutable;
 
@@ -167,7 +167,7 @@ __END__
 
 =head1 VERSION
 
-$Revision$
+$Revision: 18173 $
 
 =head1 SYNOPSIS
 

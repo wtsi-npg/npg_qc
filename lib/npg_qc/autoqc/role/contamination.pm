@@ -1,10 +1,10 @@
 #########
 # Author:        John O'Brien
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       14 April 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-03-20 09:55:43 +0000 (Wed, 20 Mar 2013) $
+# Id:            $Id: contamination.pm 16861 2013-03-20 09:55:43Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/contamination.pm $
 #
 
 package npg_qc::autoqc::role::contamination;
@@ -16,7 +16,7 @@ use Readonly;
 
 with qw(npg_qc::autoqc::role::result);
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 16861 $ =~ /(\d+)/smx; $r; };
 
 
 Readonly::Scalar my $PERCENT => 100;
@@ -72,7 +72,7 @@ __END__
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 16861 $
 
 =head1 SYNOPSIS
 

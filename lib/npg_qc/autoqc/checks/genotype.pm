@@ -1,9 +1,9 @@
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
+# Maintainer:    $Author: js10 $
 # Created:       2011-09-29
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2014-04-09 15:18:13 +0100 (Wed, 09 Apr 2014) $
+# Id:            $Id: genotype.pm 18315 2014-04-09 14:18:13Z js10 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/genotype.pm $
 #
 #
 
@@ -29,7 +29,7 @@ with qw(npg_tracking::data::reference::find
         npg_common::roles::software_location
        );
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 18315 $ =~ /(\d+)/mxs; $r; };
 
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
@@ -577,7 +577,7 @@ npg_qc::autoqc::checks::genotype - compare genotype from bam with Sequenom QC re
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 18315 $
 
 =head1 SYNOPSIS
 

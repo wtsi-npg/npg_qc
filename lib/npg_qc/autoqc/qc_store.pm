@@ -1,10 +1,10 @@
 #########
 # Author:        Andy Brown ajb@sanger.ac.uk and Marina Gourtovaia mg8@sanger.ac.uk 
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       Summer 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2014-03-24 10:15:15 +0000 (Mon, 24 Mar 2014) $
+# Id:            $Id: qc_store.pm 18256 2014-03-24 10:15:15Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/qc_store.pm $
 #
 
 package npg_qc::autoqc::qc_store;
@@ -19,7 +19,7 @@ use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
 use npg_qc::autoqc::results::collection;
 
-our $VERSION   = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION   = do { my ($r) = q$Revision: 18256 $ =~ /(\d+)/mxs; $r; };
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitManyArgs)
 
 =head1 NAME
@@ -28,7 +28,7 @@ npg_qc::autoqc::qc_store
 
 =head1 VERSION
 
-$Revision$
+$Revision: 18256 $
 
 =head1 SYNOPSIS
 

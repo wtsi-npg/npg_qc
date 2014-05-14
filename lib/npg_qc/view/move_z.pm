@@ -1,10 +1,10 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2012-04-02 10:00:34 +0100 (Mon, 02 Apr 2012) $
+# Id:            $Id: move_z.pm 15413 2012-04-02 09:00:34Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/move_z.pm $
 #
 
 package npg_qc::view::move_z;
@@ -20,7 +20,7 @@ use npg::util::image::image_map;
 use npg::util::image::graph;
 use npg::util::image::scale;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
 
 Readonly our $WIDTH                => 800;
 Readonly our $HEIGHT               => 460;
@@ -234,7 +234,7 @@ npg_qc::view::move_z
 
 =head1 VERSION
 
-$Revision$
+$Revision: 15413 $
 
 =head1 SYNOPSIS
 

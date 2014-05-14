@@ -1,10 +1,10 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
+# Maintainer:    $Author: jo3 $
 # Created:       2008-10-06
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2010-03-30 16:40:28 +0100 (Tue, 30 Mar 2010) $
+# Id:            $Id: analysis_lane.pm 8943 2010-03-30 15:40:28Z jo3 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/analysis_lane.pm $
 #
 
 package npg_qc::model::analysis_lane;
@@ -14,7 +14,7 @@ use English qw{-no_match_vars};
 use Carp;
 use base qw(npg_qc::model);
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 __PACKAGE__->has_a('npg_qc::model::analysis');
@@ -69,7 +69,7 @@ npg_qc::model::analysis_lane
 
 =head1 VERSION
 
-$Revision$
+$Revision: 8943 $
 
 =head1 SYNOPSIS
 

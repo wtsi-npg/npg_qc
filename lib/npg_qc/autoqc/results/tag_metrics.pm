@@ -1,10 +1,10 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       26 October 2011
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2011-11-14 10:42:46 +0000 (Mon, 14 Nov 2011) $
+# Id:            $Id: tag_metrics.pm 14617 2011-11-14 10:42:46Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/tag_metrics.pm $
 #
 
 package npg_qc::autoqc::results::tag_metrics;
@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::tag_metrics);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 14617 $ =~ /(\d+)/smx; $r; };
 
 has [ qw/ tags
           reads_count
@@ -56,7 +56,7 @@ __END__
 
 =head1 VERSION
 
- $Revision$
+ $Revision: 14617 $
 
 =head1 SYNOPSIS
 

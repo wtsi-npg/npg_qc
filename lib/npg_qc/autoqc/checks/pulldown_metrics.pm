@@ -1,9 +1,9 @@
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       10 May 2012
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-04-26 16:20:40 +0100 (Fri, 26 Apr 2013) $
+# Id:            $Id: pulldown_metrics.pm 17098 2013-04-26 15:20:40Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/pulldown_metrics.pm $
 #
 #
 
@@ -20,7 +20,7 @@ with qw(npg_tracking::data::bait::find
         npg_common::roles::software_location
        );
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 17098 $ =~ /(\d+)/mxs; $r; };
 
 Readonly::Scalar my $PICARD_JAR_NAME    => q[CalculateHsMetrics.jar];
 Readonly::Scalar my $MAX_JAVA_HEAP_SIZE => q[3000m];
@@ -235,7 +235,7 @@ npg_qc::autoqc::checks::pulldown_metrics - a QC check to determine whether the p
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 17098 $
 
 =head1 SYNOPSIS
 

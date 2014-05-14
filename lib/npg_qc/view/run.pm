@@ -1,10 +1,10 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
+# Maintainer:    $Author: jo3 $
 # Created:       2008-11-06
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2010-03-30 16:40:28 +0100 (Tue, 30 Mar 2010) $
+# Id:            $Id: run.pm 8943 2010-03-30 15:40:28Z jo3 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/run.pm $
 #
 
 package npg_qc::view::run;
@@ -13,7 +13,7 @@ use warnings;
 use base qw(npg_qc::view::summary);
 
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
 
 1;
 __END__
@@ -23,7 +23,7 @@ npg_qc::view::run
 
 =head1 VERSION
 
-$Revision$
+$Revision: 8943 $
 
 =head1 SYNOPSIS
 

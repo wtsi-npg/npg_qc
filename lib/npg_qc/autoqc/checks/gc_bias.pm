@@ -1,10 +1,10 @@
 #########
 # Author:        Aylwyn Scally
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       2008-11-26
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-04-03 16:10:56 +0100 (Wed, 03 Apr 2013) $
+# Id:            $Id: gc_bias.pm 16957 2013-04-03 15:10:56Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/gc_bias.pm $
 #
 #
 
@@ -25,7 +25,7 @@ use POSIX qw(WIFEXITED);
 
 use npg_tracking::util::types;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 16957 $ =~ /(\d+)/mxs; $r; };
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find
@@ -325,7 +325,7 @@ npg_qc::autoqc::checks::gc_bias - assess the degree of gc_bias in reads
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 16957 $
 
 =head1 SYNOPSIS
 

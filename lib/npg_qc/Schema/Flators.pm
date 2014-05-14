@@ -13,7 +13,7 @@ use MIME::Base64;
 use JSON;
 use Moose::Role;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 18173 $ =~ /(\d+)/mxs; $r; };
 
 sub set_flators4non_scalar {
   my ($package_name, @columns) = @_;
@@ -111,7 +111,7 @@ npg_qc::Schema::Flators
 
 =head1 VERSION
 
-$LastChangedRevision$
+$LastChangedRevision: 18173 $
 
 =head1 SYNOPSIS
 

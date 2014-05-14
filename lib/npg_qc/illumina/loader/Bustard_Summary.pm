@@ -1,10 +1,10 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2010-02-05
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2014-03-12 09:06:00 +0000 (Wed, 12 Mar 2014) $
+# Id:            $Id: Bustard_Summary.pm 18173 2014-03-12 09:06:00Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader/Bustard_Summary.pm $
 #
 package npg_qc::illumina::loader::Bustard_Summary;
 
@@ -15,7 +15,7 @@ use Readonly;
 
 extends qw{npg_qc::illumina::loader::base};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
 
 #field names used in xml and database for chip summary
 Readonly::Scalar our $CHIP_SUMMARY_FIELDS_TO_LOAD => {clusterCountPF    => 'clusters_pf',
@@ -59,7 +59,7 @@ npg_qc::illumina::loader::Bustard_Summary
 
 =head1 VERSION
 
-$Revision$
+$Revision: 18173 $
 
 =head1 SYNOPSIS
 
@@ -395,7 +395,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author$
+$Author: mg8 $
 
 =head1 LICENSE AND COPYRIGHT
 

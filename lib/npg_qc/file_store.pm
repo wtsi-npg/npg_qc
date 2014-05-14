@@ -1,10 +1,10 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       9 August 2010
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2014-03-12 09:06:00 +0000 (Wed, 12 Mar 2014) $
+# Id:            $Id: file_store.pm 18173 2014-03-12 09:06:00Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/file_store.pm $
 #
 
 package npg_qc::file_store;
@@ -24,7 +24,7 @@ use npg_common::fastqcheck;
 
 with 'MooseX::Getopt';
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
 
 Readonly::Scalar my $DEFAULT_EXTENSION   => q[.fastqcheck];
 Readonly::Scalar our $TABLE_NAME         => q[Fastqcheck];
@@ -156,7 +156,7 @@ npg_qc::file_store
 
 =head1 VERSION
 
-$Revision$
+$Revision: 18173 $
 
 =head1 SYNOPSIS
 

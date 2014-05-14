@@ -1,10 +1,10 @@
 #########
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       19 November 2013
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-11-29 10:36:23 +0000 (Fri, 29 Nov 2013) $
+# Id:            $Id: tags_reporters.pm 17820 2013-11-29 10:36:23Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/tags_reporters.pm $
 #
 
 package npg_qc::autoqc::role::tags_reporters;
@@ -16,7 +16,7 @@ use Readonly;
 
 with qw(npg_qc::autoqc::role::result);
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 17820 $ =~ /(\d+)/smx; $r; };
 
 sub criterion {
 	my $self = shift;
@@ -37,7 +37,7 @@ __END__
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 17820 $
 
 =head1 SYNOPSIS
 

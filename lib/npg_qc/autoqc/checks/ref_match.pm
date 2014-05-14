@@ -1,10 +1,10 @@
 #########
 # Author:        John O'Brien
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       24 September 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-11-08 09:21:39 +0000 (Fri, 08 Nov 2013) $
+# Id:            $Id: ref_match.pm 17722 2013-11-08 09:21:39Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/ref_match.pm $
 
 package npg_qc::autoqc::checks::ref_match;
 
@@ -25,7 +25,7 @@ with    qw/npg_tracking::data::reference::list
            npg_common::roles::software_location
           /;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17722 $ =~ /(\d+)/smx; $r; };
 ### no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar my $UNMAPPED_FLAG      =>      4;
@@ -367,7 +367,7 @@ based on a sample of the sequence reads rather than the reference genomes.
 
 =head1 VERSION
 
-$Revision$
+$Revision: 17722 $
 
 =head1 SYNOPSIS
 

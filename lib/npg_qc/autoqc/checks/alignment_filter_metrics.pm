@@ -1,9 +1,9 @@
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2012-04-25
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2012-11-15 12:01:21 +0000 (Thu, 15 Nov 2012) $
+# Id:            $Id: alignment_filter_metrics.pm 16223 2012-11-15 12:01:21Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm $
 #
 #
 
@@ -17,7 +17,7 @@ use Readonly;
 
 extends qw(npg_qc::autoqc::checks::check);
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 16223 $ =~ /(\d+)/mxs; $r; };
 
 has '+input_file_ext' => (default => 'bam_alignment_filter_metrics.json',);
 
@@ -64,7 +64,7 @@ npg_qc::autoqc::checks::alignment_filter_metrics - stats for splitting files by 
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 16223 $
 
 =head1 SYNOPSIS
 

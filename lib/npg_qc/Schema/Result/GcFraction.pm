@@ -226,7 +226,7 @@ __PACKAGE__->set_flators4non_scalar(qw( info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 
 
-our $VERSION   = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION   = do { my ($r) = q$Revision: 18256 $ =~ /(\d+)/mxs; $r; };
 
 __PACKAGE__->meta->make_immutable;
 
@@ -235,7 +235,7 @@ __END__
 
 =head1 VERSION
 
-$Revision$
+$Revision: 18256 $
 
 =head1 SYNOPSIS
 

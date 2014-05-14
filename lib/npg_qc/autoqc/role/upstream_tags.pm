@@ -1,10 +1,10 @@
 #########
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       30 August 2013
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-09-06 17:03:56 +0100 (Fri, 06 Sep 2013) $
+# Id:            $Id: upstream_tags.pm 17453 2013-09-06 16:03:56Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/upstream_tags.pm $
 #
 
 package npg_qc::autoqc::role::upstream_tags;
@@ -16,7 +16,7 @@ use Readonly;
 
 with qw(npg_qc::autoqc::role::result);
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 17453 $ =~ /(\d+)/smx; $r; };
 
 sub criterion {
 	my $self = shift;
@@ -37,7 +37,7 @@ __END__
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 17453 $
 
 =head1 SYNOPSIS
 

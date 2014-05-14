@@ -1,10 +1,10 @@
 #########
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       12 August 2013
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-09-26 14:42:58 +0100 (Thu, 26 Sep 2013) $
+# Id:            $Id: upstream_tags.pm 17535 2013-09-26 13:42:58Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/upstream_tags.pm $
 #
 
 package npg_qc::autoqc::results::upstream_tags;
@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::upstream_tags);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17535 $ =~ /(\d+)/smx; $r; };
 
 has [ qw/ unexpected_tags
           prev_runs /    ] =>  (isa => 'ArrayRef',
@@ -51,7 +51,7 @@ __END__
 
 =head1 VERSION
 
- $Revision$
+ $Revision: 17535 $
 
 =head1 SYNOPSIS
 

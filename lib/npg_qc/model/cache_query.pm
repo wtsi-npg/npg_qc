@@ -1,10 +1,10 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-09-23
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-09-26 17:18:42 +0100 (Thu, 26 Sep 2013) $
+# Id:            $Id: cache_query.pm 17546 2013-09-26 16:18:42Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/cache_query.pm $
 #
 
 package npg_qc::model::cache_query;
@@ -18,7 +18,7 @@ use Digest::SHA1;
 use MIME::Base64;
 use Data::Dumper;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 17546 $ =~ /(\d+)/mxs; $r; };
 
 
 Readonly our $PERCENTAGE => 100;
@@ -784,7 +784,7 @@ npg_qc::model::cache_query
 
 =head1 VERSION
 
-$Revision$
+$Revision: 17546 $
 
 =head1 SYNOPSIS
 

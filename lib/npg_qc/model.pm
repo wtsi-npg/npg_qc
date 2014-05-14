@@ -1,10 +1,10 @@
 #########
 # Author:        rmp
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-09-26 17:18:42 +0100 (Thu, 26 Sep 2013) $
+# Id:            $Id: model.pm 17546 2013-09-26 16:18:42Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model.pm $
 #
 package npg_qc::model;
 use strict;
@@ -19,7 +19,7 @@ use npg::api::run;
 use npg_qc::model::run_and_pair;
 use npg_qc::model::cache_query;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 17546 $ =~ /(\d+)/mxs; $r; };
 
 sub uid {
   my $self  = shift;
@@ -584,7 +584,7 @@ npg_qc::model - a base class for the npg_qc family, derived from ClearPress::mod
 
 =head1 VERSION
 
-$Revision$
+$Revision: 17546 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       29 October 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2014-03-24 10:15:15 +0000 (Mon, 24 Mar 2014) $
+# Id:            $Id: result.pm 18256 2014-03-24 10:15:15Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/result.pm $
 #
 
 package npg_qc::autoqc::role::result;
@@ -19,7 +19,7 @@ with Storage( 'traits' => ['OnlyWhenBuilt'],
               'format' => 'JSON',
               'io'     => 'File' ), 'npg_qc::autoqc::role::rpt_key';
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18256 $ =~ /(\d+)/smx; $r; };
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
@@ -28,7 +28,7 @@ npg_qc::autoqc::role::result
 
 =head1 VERSION
 
-$Revision$
+$Revision: 18256 $
 
 =head1 SYNOPSIS
 

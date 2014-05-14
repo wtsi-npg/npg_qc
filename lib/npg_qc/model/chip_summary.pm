@@ -1,11 +1,11 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-06-25
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2012-08-09 12:31:39 +0100 (Thu, 09 Aug 2012) $
+# Id:            $Id: chip_summary.pm 15982 2012-08-09 11:31:39Z mg8 $
 # Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL$
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/chip_summary.pm $
 #
 
 package npg_qc::model::chip_summary;
@@ -16,7 +16,7 @@ use English qw{-no_match_vars};
 use Carp;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 15982 $ =~ /(\d+)/mxs; $r; };
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 
@@ -133,7 +133,7 @@ npg_qc::model::chip_summary
 
 =head1 VERSION
 
-$Revision$
+$Revision: 15982 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       27 April 2012
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-04-23 10:24:42 +0100 (Tue, 23 Apr 2013) $
+# Id:            $Id: pulldown_metrics.pm 17067 2013-04-23 09:24:42Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/pulldown_metrics.pm $
 #
 
 package npg_qc::autoqc::results::pulldown_metrics;
@@ -14,7 +14,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::pulldown_metrics);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17067 $ =~ /(\d+)/smx; $r; };
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
@@ -23,7 +23,7 @@ use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\
 
 =head1 VERSION
 
-  $Revision$
+  $Revision: 17067 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 #########
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
+# Maintainer:    $Author: kl2 $
 # Created:       27 April 2011
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-04-11 16:31:25 +0100 (Thu, 11 Apr 2013) $
+# Id:            $Id: genotype.pm 17015 2013-04-11 15:31:25Z kl2 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/genotype.pm $
 #
 
 package npg_qc::autoqc::results::genotype;
@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::genotype);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17015 $ =~ /(\d+)/smx; $r; };
 
 has '+id_run' => (isa => 'Maybe[NpgTrackingRunId]', required => 0);
 has '+position' => (isa => 'Maybe[NpgTrackingLaneNumber]', required => 0);
@@ -55,7 +55,7 @@ __END__
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 17015 $
 
 =head1 SYNOPSIS
 

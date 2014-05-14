@@ -1,10 +1,10 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2012-04-02 10:00:34 +0100 (Mon, 02 Apr 2012) $
+# Id:            $Id: run_tile.pm 15413 2012-04-02 09:00:34Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/run_tile.pm $
 #
 
 package npg_qc::view::run_tile;
@@ -13,7 +13,7 @@ use warnings;
 use base qw(npg_qc::view);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
 
 sub decor {
   my ($self, @args) = @_;
@@ -82,7 +82,7 @@ npg_qc::view::run_tile
 
 =head1 VERSION
 
-$Revision$
+$Revision: 15413 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-09-02 10:40:54 +0100 (Mon, 02 Sep 2013) $
+# Id:            $Id: errors_by_cycle.pm 17429 2013-09-02 09:40:54Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/errors_by_cycle.pm $
 #
 
 package npg_qc::model::errors_by_cycle;
@@ -17,7 +17,7 @@ use Carp;
 use npg::util::image::heatmap;
 use npg::util::image::image_map;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 17429 $ =~ /(\d+)/mxs; $r; };
 
 Readonly our $MAX_ERROR_PERCENTAGE => 20; # max error percentage set to 20
 Readonly our $HEATMAP_VALUE_GT_20  => 100;
@@ -567,7 +567,7 @@ npg_qc::model::errors_by_cycle
 
 =head1 VERSION
 
-$Revision$
+$Revision: 17429 $
 
 =head1 SYNOPSIS
 

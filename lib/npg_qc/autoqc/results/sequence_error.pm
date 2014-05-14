@@ -1,10 +1,10 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       16 November 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Last Modified: $Date: 2013-03-25 13:55:06 +0000 (Mon, 25 Mar 2013) $
+# Id:            $Id: sequence_error.pm 16882 2013-03-25 13:55:06Z mg8 $
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/sequence_error.pm $
 #
 
 package npg_qc::autoqc::results::sequence_error;
@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::sequence_error);
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/smx; $r; };
 
 has sequence_type                   => ( isa      => 'Maybe[Str]',
                                          is       => 'rw',
@@ -111,7 +111,7 @@ __END__
 
 =head1 VERSION
 
-    $Revision$
+    $Revision: 16882 $
 
 =head1 SYNOPSIS
 

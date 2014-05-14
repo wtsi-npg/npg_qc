@@ -1,11 +1,11 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
+# Maintainer:    $Author: mg8 $
 # Created:       2008-06-16
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2013-08-22 14:28:15 +0100 (Thu, 22 Aug 2013) $
+# Id:            $Id: error.pm 17408 2013-08-22 13:28:15Z mg8 $
 # Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL$
+# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/error.pm $
 #
 
 package npg_qc::view::error;
@@ -16,7 +16,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Template;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = do { my ($r) = q$Revision: 17408 $ =~ /(\d+)/mxs; $r; };
 
 __PACKAGE__->mk_accessors('access');
 
@@ -54,7 +54,7 @@ npg_qc::view::error
 
 =head1 VERSION
 
-$Revision$
+$Revision: 17408 $
 
 =head1 SYNOPSIS
 
