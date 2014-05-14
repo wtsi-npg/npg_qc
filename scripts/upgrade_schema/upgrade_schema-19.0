@@ -1,0 +1,35 @@
+--
+-- extra fields for autoqc result
+--
+
+ALTER TABLE `adapter`
+    ADD COLUMN `info` text
+        AFTER `comments`;
+
+ALTER TABLE `contamination`
+    ADD COLUMN `info` text
+        AFTER `comments`;
+        
+ALTER TABLE `insert_size`
+    ADD COLUMN `info` text
+        AFTER `comments`;
+
+ALTER TABLE `sequence_error`
+    ADD COLUMN `info` text
+        AFTER `comments`;
+
+ALTER TABLE `split_stats`
+    ADD COLUMN `comments` text
+        AFTER `pass`;
+       
+ALTER TABLE `split_stats`
+    ADD COLUMN `info` text
+        AFTER `comments`;
+
+ALTER TABLE `qx_yield`
+    ADD COLUMN `comments` text
+        AFTER `pass`;
+       
+ALTER TABLE `qx_yield`
+    ADD COLUMN `info` text
+        AFTER `comments`;

@@ -1,0 +1,21 @@
+---
+ - id_split_stats_coverage: 1
+   id_split_stats: 1
+   fastq: 1
+   chromosome: 'x'
+   coverage: 0.1234
+ - id_split_stats_coverage: 2
+   id_split_stats: 1
+   fastq: 2
+   chromosome: 'x'
+   coverage: 0.1235
+ - id_split_stats_coverage: 3
+   id_split_stats: 1
+   fastq: 1
+   chromosome: 'y'
+   coverage: 0.1236
+ - id_split_stats_coverage: 4
+   id_split_stats: 1
+   fastq: 2
+   chromosome: 'y'
+   coverage: 0.1237

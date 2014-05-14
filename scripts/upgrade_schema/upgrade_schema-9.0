@@ -1,0 +1,27 @@
+--
+-- change x, y field length
+--
+
+ALTER TABLE `offset` MODIFY COLUMN `x` FLOAT(8,2)  NOT NULL, MODIFY COLUMN `y` FLOAT(8,2)  NOT NULL;
+
+
+--
+-- create a new table run_recipe to store cycle, tile, lane and column number
+-- read from recipe and tile layout xml file from run_folder
+--
+CREATE TABLE `run_recipe` (
+  `id_run_recipe` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `cycle` tinyint(2) unsigned NOT NULL,
+  `lane` tinyint(1) unsigned NOT NULL,
+  `tile` smallint(3) unsigned NOT NULL,
+  `col` tinyint(1) unsigned NOT NULL,
+  PRIMARY KEY  (`id_run_recipe`),
+  UNIQUE KEY `unq_idx_run` (`id_run`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- remove duplicate index from table signal_mean
+--
+
+ ALTER TABLE `signal_mean` DROP INDEX `id_run`;

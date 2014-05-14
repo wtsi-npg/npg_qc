@@ -1,0 +1,64 @@
+<!-- start: $Id$ -->
+<h2>Rescore Error Rates for Run [% model.run_tile.id_run %] Position [% model.run_tile.position %] Tile [% model.run_tile.tile %]</h2>
+<br />
+<fieldset>
+<legend>Choose a table</legend>
+<ul class="inline">
+  <li><a href="javascript:show_table('errib');">[Error rate reference including blanks]</a></li>
+  <li><a href="javascript:show_table('errnb');">[Error rate reference no blanks]</a></li>
+  <li><a href="javascript:show_table('errsb');">[Error rate relative sequence base]</a></li>
+  <li><a href="javascript:show_table('ebn');">[Errors by nucleotide]</a></li>
+  <li><a href="javascript:show_table('ebcan');">[Errors by cycle and nucleotide]</a></li>
+  <li><a href="javascript:show_table('errrcn');">[Error rate relative reference cycle nucleotide]</a></li>
+</ul>
+<div class="clearfloats"></div>
+</fieldset>
+<br />
+[% IF model.run_tile.other_end_tile %][% SET other_end_tile = model.run_tile.other_end_tile %][% END %]
+[% SET end = 1 %]
+<div style="float:left;">
+[% SET tile = model.run_tile %]
+<div id="errib_1" class="table" style="display:show;">[% PROCESS error_rate_reference_including_blanks.tt2 %]</div>
+<div id="errnb_1" class="table" style="display:none;">[% PROCESS error_rate_reference_no_blanks.tt2 %]</div>
+<div id="errsb_1" class="table" style="display:none;">[% PROCESS error_rate_relative_sequence_base.tt2 %]</div>
+<div id="ebn_1" class="table" style="display:none;">[% PROCESS errors_by_nucleotide.tt2 %]</div>
+<div id="ebcan_1" class="table" style="display:none;">[% PROCESS errors_by_cycle_and_nucleotide.tt2 %]</div>
+<div id="errrcn_1" class="table" style="display:none;">[% PROCESS error_rate_relative_reference_cycle_nucleotide.tt2 %]</div>
+</div>
+[% IF other_end_tile %]
+<div style="float:left;">
+[% SET tile = other_end_tile %]
+[% SET end = 2 %]
+<div id="errib_2" class="table" style="display:show;">[% PROCESS error_rate_reference_including_blanks.tt2 %]</div>
+<div id="errnb_2" class="table" style="display:none;">[% PROCESS error_rate_reference_no_blanks.tt2 %]</div>
+<div id="errsb_2" class="table" style="display:none;">[% PROCESS error_rate_relative_sequence_base.tt2 %]</div>
+<div id="ebn_2" class="table" style="display:none;">[% PROCESS errors_by_nucleotide.tt2 %]</div>
+<div id="ebcan_2" class="table" style="display:none;">[% PROCESS errors_by_cycle_and_nucleotide.tt2 %]</div>
+<div id="errrcn_2" class="table" style="display:none;">[% PROCESS error_rate_relative_reference_cycle_nucleotide.tt2 %]</div>
+</div>
+[% END %]
+<div class="clearfloats"></div>
+
+<script type="text/javascript">
+document.title='Tile [% model.run_tile.id_run %] [% model.run_tile.position %] [% model.run_tile.tile %] Error Rates';
+Event.observe(window,'load',things_to_do_on_load());
+
+function things_to_do_on_load() {
+  back();
+  $A(document.getElementsByClassName('table')).each (function(el) { Element.hide(el); });
+  Element.show('errib_1');
+  [% IF other_end_tile %]Element.show('errib_2');[% END %]
+}
+
+function show_table(table) {
+  $A(document.getElementsByClassName('table')).each (function(el) { Element.hide(el); });
+  var end_one = table+'_1';
+  Element.show(end_one);
+  [% IF other_end_tile %]var end_two = table+'_2';Element.show(end_two);[% END %]
+}
+
+[% PROCESS tile_score_back_function.tt2 %]
+
+</script>
+
+<!-- end: $Id$ -->

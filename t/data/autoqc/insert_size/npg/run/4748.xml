@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="4748" batch_id="6637" id_instrument="31" expected_cycle_count="161" actual_cycle_count="161" priority="1" id_run_pair="0" is_paired="0" is_dev="0" id_instrument_format="4" name="IL28_4748" loader="se3" loading_date="2010-05-22" run_folder="100522_IL28_4748">
+ <instrument id_instrument="31" name="IL28" id_instrument_format="4" external_name="EAS267" serial="" iscurrent="0" />
+ <run_lanes><run_lane id_run_lane="37560" id_run="4748" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="1" />
+<run_lane id_run_lane="37561" id_run="4748" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="2" />
+<run_lane id_run_lane="37562" id_run="4748" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="3" />
+<run_lane id_run_lane="37563" id_run="4748" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="4" />
+<run_lane id_run_lane="37564" id_run="4748" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="5" />
+<run_lane id_run_lane="37565" id_run="4748" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="6" />
+<run_lane id_run_lane="37566" id_run="4748" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="7" />
+<run_lane id_run_lane="37567" id_run="4748" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="65675" id_run="4748" date="2010-06-28 10:35:11" id_run_status_dict="20" id_user="54" username="svvd" iscurrent="1" description="qc complete" />
+ <run_statuses>
+ <run_status id_run_status="65675" id_run="4748" date="2010-06-28 10:35:11" id_run_status_dict="20" id_user="54" username="svvd" iscurrent="1" description="qc complete" />
+ <run_status id_run_status="65674" id_run="4748" date="2010-06-28 10:34:45" id_run_status_dict="12" id_user="54" username="svvd" iscurrent="0" description="run archived" />
+ <run_status id_run_status="65463" id_run="4748" date="2010-06-24 20:39:38" id_run_status_dict="18" id_user="7" username="svvd" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="65461" id_run="4748" date="2010-06-24 18:25:40" id_run_status_dict="17" id_user="54" username="svvd" iscurrent="0" description="archival pending" />
+ <run_status id_run_status="65280" id_run="4748" date="2010-06-18 17:39:01" id_run_status_dict="19" id_user="62" username="svvd" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="65161" id_run="4748" date="2010-06-16 19:41:17" id_run_status_dict="9" id_user="7" username="svvd" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="65093" id_run="4748" date="2010-06-15 14:33:52" id_run_status_dict="7" id_user="7" username="svvd" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="64917" id_run="4748" date="2010-06-10 19:40:34" id_run_status_dict="19" id_user="7" username="svvd" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="64873" id_run="4748" date="2010-06-10 01:57:53" id_run_status_dict="9" id_user="7" username="svvd" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="64804" id_run="4748" date="2010-06-08 16:32:12" id_run_status_dict="7" id_user="7" username="svvd" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="64376" id_run="4748" date="2010-05-31 11:39:03" id_run_status_dict="6" id_user="7" username="svvd" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="64375" id_run="4748" date="2010-05-31 11:38:50" id_run_status_dict="11" id_user="7" username="svvd" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="64365" id_run="4748" date="2010-05-31 05:34:01" id_run_status_dict="4" id_user="7" username="svvd" iscurrent="0" description="run complete" />
+ <run_status id_run_status="63929" id_run="4748" date="2010-05-22 11:02:48" id_run_status_dict="2" id_user="7" username="svvd" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="63928" id_run="4748" date="2010-05-22 10:56:33" id_run_status_dict="1" id_user="66" username="svvd" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="8475" id_run="4748" id_annotation="8836" date="2010-05-27 15:31:07" id_user="54" username="svvd" comment="Run was created as First-end of paired run - fixed it in the database." attachment_name="" run_current_ok="" current_cycle="86" />
+ <annotation id_run_annotation="8743" id_run="4748" id_annotation="9109" date="2010-06-24 18:23:56" id_user="54" username="svvd" comment="76 cyc PE run: Lane 5 - FAIL; Rest - PASS. Yield of 20.9 Gbases. %Error rates of 1.14 (R1) and 1.44 (R2). R2 of lane 5 seems to be of poor quality. Low intensities on many lanes, but looks like they have recovered. High adapter-based contamination in R1 on all lanes expect lanes 3 &#x26; 4. Odd IVC plots, but they seem to be sample/library related. Lane 8 is on the  denser side - poor %PF, but sufficient yield. Lanes 6 &#x26; 7 seem to be on the sparser side and just fell short of required Q20 yield, hence passing these." attachment_name="" run_current_ok="" current_cycle="" />
+ </annotations>
+ <tags>
+   <tag id_tag="17" description="paired_read" />
+   <tag id_tag="16" description="rta" />
+   <tag id_tag="19" description="staging" />
+ </tags>
+</run>

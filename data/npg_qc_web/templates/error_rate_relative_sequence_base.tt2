@@ -1,0 +1,21 @@
+<table id="[% end %]_errsb" name="[% end %]_errsb" class="zebra">
+  <thead>
+    <caption>Error Rate Relative to Sequence Base End [% end %]</caption>
+    <tr>
+      <th>Read As</th>
+      <th>Really A</th>
+      <th>Really C</th>
+      <th>Really G</th>
+      <th>Really T</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH row = tile.error_rate_relative_to_sequence_bases %]<tr>
+      <td>[% row.read_as %]</td>
+      <td>[% row.really_a %]</td>
+      <td>[% row.really_c %]</td>
+      <td>[% row.really_g %]</td>
+      <td>[% row.really_t %]</td>
+    </tr>
+  [% END %]</tbody>
+</table>

@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+
+#########
+# Author:        Marina Gourtovaia mg8@sanger.ac.uk 
+# Maintainer:    $Author$
+# Created:       22 November 2010
+# Last Modified: $Date$
+# Id:            $Id$
+# $HeadURL$
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
+use Carp;
+use Getopt::Long;
+use Pod::Usage;
+use npg_qc::autoqc::autoqc;
+use npg_qc::autoqc::role::result;
+use npg_qc::Schema;
+
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+
+my $id_run;
+my $lanes;
+my $help;
+my $checks;
+
+GetOptions ('help' => \$help,
+            'id_run=i' => \$id_run,
+            'lane=i@' => \$lanes,
+            'check=s@' => \$checks,);
+
+if ($help) { pod2usage(0); }
+if (!$id_run) {
+  croak q[--id_run option should be set];
+}
+if (!$lanes || !@{$lanes}) {
+  croak q[--lane should be given explicitly];
+}
+
+my @list = qw/fastqcheck/;
+push @list, @{npg_qc::autoqc::autoqc->checks_list()};
+@list = $checks ? @{$checks} : @list;
+
+warn qq[Running qc_db_delete_autoqc with the following options:\n\tid_run:\t$id_run\n\tlane:\t] .
+        join(q[, ], @{$lanes}) . qq[\n\tcheck:\t] . ($checks ? join(q[, ], @list) : 'all').
+        qq[\n];
+##no critic (ProhibitComplexMappings)
+my @table_names = map {my @a=npg_qc::autoqc::role::result->class_names($_); $a[1]} @list;
+##use critic
+
+my $schema = npg_qc::Schema->connect();
+my $transaction = sub {
+  foreach my $table (@table_names) {
+    my $rs = $schema->resultset($table)->search({id_run => $id_run, position => $lanes,});
+    my $num_records = 0;
+    while (my $row = $rs->next) {
+      $row->delete;
+      $num_records++;
+    }
+    warn qq[$num_records records will be deleted from $table\n];
+  }
+};
+$schema->txn_do($transaction);
+
+1;
+
+__END__
+
+
+=head1 NAME
+
+qc_db_delete_autoqc
+
+=head1 VERSION
+
+$LastChangedRevision$
+
+=head1 USAGE
+
+  qc_db_delete_autoqc --id_run 123 --lanes 2 --lanes 3
+
+  Script to delete autoqc results and fastqcheck files for particular lanes of the run.
+  If --check option is not specified, all autoqc data and fastqcheck files will be deleted
+  for the specified set of criteria.
+
+=head1 CONFIGURATION
+
+=head1 DESCRIPTION
+
+=head1 REQUIRED ARGUMENTS
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+  Print a brief help message and exits.
+
+=item B<--id_run>
+
+  Run id, needed
+
+=item B<--lane>
+
+  List of lane numpers (position), needed
+
+=item B<--check>
+
+  List of checks, optional
+
+=back
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=over
+
+=item strict
+
+=item warnings
+
+=item FindBin
+
+=item lib
+
+=item npg_qc::autoqc::autoqc
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+=head1 EXIT STATUS
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 GRL, by Marina Gourtovaia
+
+This file is part of NPG.
+
+NPG is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+

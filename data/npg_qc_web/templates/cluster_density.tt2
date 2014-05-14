@@ -1,0 +1,25 @@
+[% cluster_density = model.cluster_density;
+   IF cluster_density.size -%]
+<table id="id_cluster_density" class="zebra sortable" width="50%">
+  <caption>Cluster Density by Lane (clusters/mm^2)</caption>
+  <thead>
+   <tr>
+    <th>Lane</th>
+    <th>Is PF</th>
+    <th>Min</th>
+    <th>Max</th>
+    <th>P50</th>
+   </tr>
+  </thead>
+  <tbody>
+    [%- FOREACH lane = cluster_density -%]
+    <tr>
+      [%- FOREACH field = lane -%]
+         <td>[% field %]</td>
+      [%- END -%]
+    </tr>
+    [%- END %]
+  </tbody>
+</table>
+<hr class="main_menu_footer" />
+[%- END %]

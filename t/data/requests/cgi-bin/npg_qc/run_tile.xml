@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run_tiles>
+  <run_tile id_run_tile="1" id_run="1" position="1" tile="1" end="1" row="" col="" />
+  <run_tile id_run_tile="2" id_run="2" position="1" tile="2" end="1" row="0" col="0" />
+  <run_tile id_run_tile="3" id_run="3" position="1" tile="3" end="1" row="1" col="1" />
+  <run_tile id_run_tile="4" id_run="4" position="1" tile="4" end="1" row="2" col="2" />
+  <run_tile id_run_tile="5" id_run="1" position="1" tile="5" end="1" row="" col="" />
+  <run_tile id_run_tile="6" id_run="1" position="1" tile="6" end="1" row="" col="" />
+  <run_tile id_run_tile="7" id_run="1" position="1" tile="7" end="1" row="" col="" />
+  <run_tile id_run_tile="8" id_run="1" position="1" tile="8" end="1" row="" col="" />
+  <run_tile id_run_tile="9" id_run="1" position="1" tile="9" end="1" row="" col="" />
+  <run_tile id_run_tile="10" id_run="1" position="1" tile="10" end="2" row="" col="" />
+</run_tiles>

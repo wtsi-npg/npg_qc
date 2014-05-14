@@ -1,0 +1,40 @@
+CREATE TABLE `qx_yield` (
+  `id_qx_yield` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `path` varchar(256) default NULL,
+  `filename1` varchar(256) NOT NULL,
+  `filename2` varchar(256) NOT NULL,
+  `threshold_quality` int(10) unsigned NOT NULL,
+  `threshold_yield1` int(10) unsigned default NULL,
+  `threshold_yield2` int(10) unsigned default NULL,
+  `yield1` int(10) unsigned default NULL,
+  `yield2` int(10) unsigned default NULL,
+  `pass` tinyint(1) default NULL,
+  PRIMARY KEY  (`id_qx_yield`),
+  UNIQUE KEY `unq_run_lane_qx_yield` (`id_run`,`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `insert_size` (
+  `id_insert_size` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `path` varchar(256) default NULL,
+  `filenames` varchar(256) default NULL,
+  `bins` text default NULL,
+  `bin_width` int(10) unsigned default NULL,
+  `min_isize` int(10) unsigned default NULL,
+  `expected_mean` int(10) unsigned default NULL,
+  `mean` int(10) unsigned default NULL,
+  `std` int(10) unsigned default NULL,
+  `sample_size` int(10) unsigned default NULL,
+  `num_well_aligned_reads` int(10) unsigned default NULL,
+  `quartile1` int(10) unsigned default NULL,
+  `median` int(10) unsigned default NULL,
+  `quartile3` int(10) unsigned default NULL,
+  `pass` tinyint(1) default NULL,
+  `comments` text default NULL,  
+  PRIMARY KEY  (`id_insert_size`),
+  UNIQUE KEY `unq_run_lane_isize` (`id_run`,`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

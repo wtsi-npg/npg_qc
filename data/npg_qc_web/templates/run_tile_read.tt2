@@ -1,0 +1,170 @@
+<!-- start: $Id$ -->
+[% tile_groups = model.get_end_descriptions %]
+[% end_one = tile_groups.end_one_tile %]
+[% end_two = tile_groups.end_two_tile %]
+[% run_log_end_one = tile_groups.run_log_tile_end_one %]
+[% run_log_end_two = tile_groups.run_log_tile_end_two %]
+
+<div id="tileViewerContainer">
+<p><a href="#" onClick="open_tile_viewer('[% SCRIPT_NAME %]/run_tile/[% end_one.id_run_tile %]/;read_tile_viewer?cycle=1');return false;">Run Tile Viewer For [% end_one.id_run %]</a>
+[% IF model.id_run_pair %]<a href="#" onClick="open_tile_viewer('[% SCRIPT_NAME %]/run_tile/[% end_two.id_run_tile %]/;read_tile_viewer?cycle=1');return false;">Run Tile Viewer For [% run_log_end_two.id_run %]</a>[% END %]
+</p>
+</div>
+
+
+<div id="runTilePositionContainer">
+<table id="run_tile" class="zebra">
+ <caption>Run Tile Position Information</caption>
+ <thead>
+   <tr><th>End</th><th>Id Run</th><th>Position</th><th>Tile</th><th>Column</th><th>Row</th><th>Average New Z value</th></tr>
+ </thead>
+ <tbody>
+ <tr>
+   <th>1</th>
+   <td>[% end_one.id_run %]</td>
+   <td>[% end_one.position %]</td>
+   <td>[% end_one.tile %]</td>
+   <td>[% end_one.col %]</td>
+   <td>[% end_one.row %]</td>
+   <td>[% end_one.avg_newz %]</td>
+ </tr>[% IF model.id_run_pair %]<tr>
+   <th>2</th>
+   <td>[% run_log_end_two.id_run %]</td>
+   <td>[% run_log_end_two.position %]</td>
+   <td>[% run_log_end_two.tile %]</td>
+   <td>[% run_log_end_two.col %]</td>
+   <td>[% run_log_end_two.row %]</td>
+   <td>[% run_log_end_two.avg_newz %]</td>
+ </tr>[% END %]
+ </tbody>
+</table>
+</div>
+
+<hr />
+
+<div id="laneQcSummaryContainer">
+<table id="lane_qc_summary" class="zebra">
+ <caption>Tile QC data</caption>
+  <thead>
+    <tr><th>End</th><th>Raw Clusters</th><th>PF Clusters</th><th>% PF Clusters</th><th>PF Average First Cycle Intensity</th><th>PF Average % Intensity After 20 Cycles</th><th>% PF Align</th><th>Average PF Alignment Score</th><th>% PF Error Rate</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+   <th>1</th>
+      <td>[% end_one.lane_qcs.0.clusters_raw %]</td>
+      <td>[% end_one.lane_qcs.0.tile_pf_cluster_count %]</td>
+      <td>[% end_one.lane_qcs.0.perc_pf_clusters %]</td>
+      <td>[% end_one.lane_qcs.0.av_1st_cycle_int_pf %]</td>
+      <td>[% end_one.lane_qcs.0.av_perc_intensity_after_20_cycles_pf %]</td>
+      <td>[% end_one.lane_qcs.0.perc_align_pf %]</td>
+      <td>[% end_one.lane_qcs.0.av_alignment_score_pf %]</td>
+      <td>[% end_one.lane_qcs.0.perc_error_rate_pf %]</td>
+    </tr>[% IF model.id_run_pair %]<tr>    
+   <th>2</th>
+      <td>[% end_two.lane_qcs.0.clusters_raw %]</td>
+      <td>[% end_two.lane_qcs.0.tile_pf_cluster_count %]</td>
+      <td>[% end_two.lane_qcs.0.perc_pf_clusters %]</td>
+      <td>[% end_two.lane_qcs.0.av_1st_cycle_int_pf %]</td>
+      <td>[% end_two.lane_qcs.0.av_perc_intensity_after_20_cycles_pf %]</td>
+      <td>[% end_two.lane_qcs.0.perc_align_pf %]</td>
+      <td>[% end_two.lane_qcs.0.av_alignment_score_pf %]</td>
+      <td>[% end_two.lane_qcs.0.perc_error_rate_pf %]</td>
+    </tr>[% END %]
+  </tbody>
+</table>
+</div>
+
+<hr />
+
+<div id="cycleErrorsContainer">
+<h4>Errors By Cycle</h4>
+[% IF end_one.errors_by_cycles.0.cycle %]
+<p><a id="hidecycleErrors" style="display:none;" href="#" onClick="hideTables('cycleErrors',1);return false;">View Errors by Cycle Image</a>
+<a id="showcycleErrors" style="display:none;" href="#" onClick="showTables('cycleErrors',1);return false;">View Errors by Cycle Table[% IF model.id_run_pair %]s[% END %]</a></p>
+<div id="imgcycleErrors">
+<img src="[% SCRIPT_NAME %]/errors_by_cycle/;list_png?tile_ref=[% end_one.id_run %]_[% end_one.position %]_[% end_one.tile %]&pre_chastity=1" />
+</div>
+<div id="cycleErrors">
+ <div style="float:left;">
+ [% end = 1 %][% tile = end_one %][% PROCESS run_tile_errors_by_cycle_table.tt2 %]
+ </div>[% IF model.id_run_pair %]
+ <div style="float:left;">
+ [% end = 2 %][% tile = end_two %][% PROCESS run_tile_errors_by_cycle_table.tt2 %]
+ </div>[% END %]
+ <div class="clearfloats"></div>
+</div>
+
+<hr />
+
+<div id="further_info">
+<h4>Further Post Chastity Information</h4>
+<ul class="inline">
+  <li><a href="[% SCRIPT_NAME %]/tile_score/;list_rescore_info?tile_ref=[% end_one.id_run %]_[% end_one.position %]_[% end_one.tile %]">[Rescore Info]</a></li>
+  <li><a href="[% SCRIPT_NAME %]/tile_score/;list_error_rates?tile_ref=[% end_one.id_run %]_[% end_one.position %]_[% end_one.tile %]">[Error Rates]</a></li>
+  <li><a href="[% SCRIPT_NAME %]/tile_score/;list_likelihood?tile_ref=[% end_one.id_run %]_[% end_one.position %]_[% end_one.tile %]">[Log Likelihood]</a></li>
+  <li><a href="[% SCRIPT_NAME %]/tile_score/;list_words?tile_ref=[% end_one.id_run %]_[% end_one.position %]_[% end_one.tile %]">[Most Common Words]</a></li>
+  <li><a href="[% SCRIPT_NAME %]/tile_score/;list_blanks?tile_ref=[% end_one.id_run %]_[% end_one.position %]_[% end_one.tile %]">[Most Common Blank Patterns]</a></li>
+</ul>
+<div class="clearfloats"></div>
+</div>
+[% ELSE %]
+<p>No Cycle Errors, or Post Chastity Information, this is probably not a control lane.</p>
+[% END %]
+</div>
+
+<hr />
+
+<div id="moveZContainer">
+<h4>Run Log Move Z Information</h4>
+[% IF end_one.move_zes.0.cycle %]
+<p><a id="hidemoveZ" style="display:none;" href="#" onClick="hideTables('moveZ');return false;">Hide MoveZ by Cycle Table[% IF model.id_run_pair %]s[% END %]</a>
+<a id="showmoveZ" style="display:none;" href="#" onClick="showTables('moveZ');return false;">View MoveZ by Cycle Table[% IF model.id_run_pair %]s[% END %]</a></p>
+<div id="moveZ">
+ <div style="float:left;">
+ [% end = 1 %][% tile = end_one %][% PROCESS run_tile_move_z_table.tt2 %]
+ </div>[% IF model.id_run_pair %]
+ <div style="float:left;">
+ [% end = 2 %][% tile = run_log_end_two %][% PROCESS run_tile_move_z_table.tt2 %]
+ </div>[% END %]
+ <div class="clearfloats"></div>
+</div>
+[% ELSE %]
+<p>No Move Z values, this may be because the run is too old.</p>
+[% END %]
+</div>
+
+<script type="text/javascript">
+document.title='Run Tile [% end_one.id_run %][% IF model.id_run_pair %]/[% run_log_end_two.id_run %][% END %]:[% end_one.position %]:[% end_one.tile %]';
+
+Event.observe(window,'load',things_to_do_on_load);
+
+function things_to_do_on_load() {
+[% IF end_one.errors_by_cycles.0.cycle %]
+  Element.hide('cycleErrors');
+  Element.show('showcycleErrors');
+[% END %]
+[% IF end_one.move_zes.0.cycle %]
+  Element.hide('moveZ');
+  Element.show('showmoveZ');
+[% END %]
+}
+
+function showTables(table_id, has_img) {
+  Element.show(table_id);
+  Element.hide('show'+table_id);
+  if (has_img === 1){
+    Element.hide('img'+table_id);
+  };
+  Element.show('hide'+table_id);
+}
+function hideTables(table_id, has_img) {
+  Element.hide(table_id);
+  Element.show('show'+table_id);
+  if (has_img === 1){ 
+    Element.show('img'+table_id);
+  };
+  Element.hide('hide'+table_id);
+}
+
+</script>
+<!-- end: $Id$ -->

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="3612" batch_id="4361" id_instrument="14" expected_cycle_count="37" actual_cycle_count="37" priority="1" id_run_pair="0" is_paired="0" is_dev="0" id_instrument_format="4" name="IL11_3612" loader="jb2" loading_date="2009-08-26" run_folder="090826_IL11_3612">
+ <instrument id_instrument="14" name="IL11" id_instrument_format="4" external_name="EAS124" serial="" iscurrent="0" />
+ <run_lanes><run_lane id_run_lane="28448" id_run="3612" tile_count="100" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="1" />
+<run_lane id_run_lane="28449" id_run="3612" tile_count="100" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="2" />
+<run_lane id_run_lane="28450" id_run="3612" tile_count="100" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="3" />
+<run_lane id_run_lane="28451" id_run="3612" tile_count="100" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="4" />
+<run_lane id_run_lane="28452" id_run="3612" tile_count="100" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="5" />
+<run_lane id_run_lane="28453" id_run="3612" tile_count="100" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="6" />
+<run_lane id_run_lane="28454" id_run="3612" tile_count="100" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="7" />
+<run_lane id_run_lane="28455" id_run="3612" tile_count="100" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="52718" id_run="3612" date="2009-09-21 20:27:52" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_statuses>
+ <run_status id_run_status="52718" id_run="3612" date="2009-09-21 20:27:52" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_status id_run_status="52717" id_run="3612" date="2009-09-21 20:27:40" id_run_status_dict="12" id_user="7" username="pipeline" iscurrent="0" description="run archived" />
+ <run_status id_run_status="52715" id_run="3612" date="2009-09-21 19:09:04" id_run_status_dict="18" id_user="7" username="pipeline" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="52654" id_run="3612" date="2009-09-21 12:27:00" id_run_status_dict="19" id_user="7" username="pipeline" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="52650" id_run="3612" date="2009-09-21 12:06:45" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52649" id_run="3612" date="2009-09-21 12:04:56" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52644" id_run="3612" date="2009-09-21 10:02:25" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52643" id_run="3612" date="2009-09-21 09:56:56" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52624" id_run="3612" date="2009-09-20 23:00:28" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52623" id_run="3612" date="2009-09-20 22:56:23" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52622" id_run="3612" date="2009-09-20 22:54:01" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52621" id_run="3612" date="2009-09-20 22:40:18" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52620" id_run="3612" date="2009-09-20 21:53:46" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52619" id_run="3612" date="2009-09-20 21:03:19" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52358" id_run="3612" date="2009-09-17 07:55:13" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52356" id_run="3612" date="2009-09-17 07:54:11" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="52048" id_run="3612" date="2009-09-14 15:26:22" id_run_status_dict="8" id_user="20" username="pipeline" iscurrent="0" description="analysis on hold" />
+ <run_status id_run_status="51333" id_run="3612" date="2009-09-07 14:15:33" id_run_status_dict="18" id_user="7" username="pipeline" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="51331" id_run="3612" date="2009-09-07 14:00:36" id_run_status_dict="17" id_user="54" username="pipeline" iscurrent="0" description="archival pending" />
+ <run_status id_run_status="50972" id_run="3612" date="2009-09-03 06:22:07" id_run_status_dict="19" id_user="7" username="pipeline" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="50950" id_run="3612" date="2009-09-02 23:34:44" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="50813" id_run="3612" date="2009-09-01 21:23:53" id_run_status_dict="7" id_user="7" username="pipeline" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="50812" id_run="3612" date="2009-09-01 21:07:57" id_run_status_dict="6" id_user="62" username="pipeline" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="50341" id_run="3612" date="2009-08-28 14:41:52" id_run_status_dict="15" id_user="7" username="pipeline" iscurrent="0" description="analysis prelim complete" />
+ <run_status id_run_status="50300" id_run="3612" date="2009-08-28 09:57:46" id_run_status_dict="14" id_user="7" username="pipeline" iscurrent="0" description="analysis prelim" />
+ <run_status id_run_status="50296" id_run="3612" date="2009-08-28 09:41:31" id_run_status_dict="6" id_user="7" username="pipeline" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="50295" id_run="3612" date="2009-08-28 09:41:29" id_run_status_dict="11" id_user="7" username="pipeline" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="50294" id_run="3612" date="2009-08-28 09:34:35" id_run_status_dict="4" id_user="7" username="pipeline" iscurrent="0" description="run complete" />
+ <run_status id_run_status="50156" id_run="3612" date="2009-08-26 15:07:26" id_run_status_dict="2" id_user="7" username="pipeline" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="50149" id_run="3612" date="2009-08-26 14:11:07" id_run_status_dict="1" id_user="52" username="pipeline" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="5476" id_run="3612" id_annotation="5769" date="2009-08-26 13:41:38" id_user="52" username="jb2" comment="flowcell was lin /hyb&#x27;d then held as ran out of seq mixes. Was re hyb&#x27;d and now loaded. 
+  Lane 4 intensities on low side, only single end 37 cycle though." attachment_name="" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="5539" id_run="3612" id_annotation="5836" date="2009-09-01 20:09:15" id_user="62" username="dj3" comment="Run had been created as first of a pair - fix to single read and reset status so analysis will run." attachment_name="" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="5591" id_run="3612" id_annotation="5888" date="2009-09-07 12:59:52" id_user="54" username="svvd" comment="37 cyc SE run: Lane 5 - FAIL; Rest - PASS (Control failure). Yield of 3.3 Gbases. %Error rate of 5.3 - poor starting intensities and only 2% PF on control. Lane 5 is too sparse. Lane 6 has only 51 %PF, but looks okay. I was hoping to re-analyse this with lane&#x27;s own data, but noticed that Q-scores are good enough to pass as it is. " attachment_name="" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="5598" id_run="3612" id_annotation="5895" date="2009-09-07 14:18:20" id_user="54" username="svvd" comment="Stopped archival while the job is still pending on farm. Started re-analysis to see whether anything improves - &#x27;A&#x27; is missing in column 1, 2 &#x26; 4 of IVC plots although it&#x27;s present on %basecall IVC plot. " attachment_name="" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="5668" id_run="3612" id_annotation="5966" date="2009-09-14 14:26:57" id_user="20" username="ajb" comment="needs manual guidance though re-analysis - see dj3/svvd" attachment_name="" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="5742" id_run="3612" id_annotation="6042" date="2009-09-21 12:58:33" id_user="54" username="svvd" comment="Re-analysis improved the IVC plots, so the QC decision remains the same. Data will be archived soon. " attachment_name="" run_current_ok="" current_cycle="" />
+ </annotations>
+ <tags>
+   <tag id_tag="18" description="single_read" />
+ </tags>
+</run>

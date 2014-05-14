@@ -1,0 +1,25 @@
+<!-- start: $Id$ -->
+<h2>Create Manual Cache</h2>
+
+[% IF model.used_id_run_r1 %]
+<p>Read one was run: [% model.used_id_run_r1 %]<br />
+Read two was run: [% model.used_id_run_r2 %]</p>
+[% ELSE %]All possible runs looked at[% END %]
+
+<h6>Results:</h6>
+
+[% IF model.all_runs_response %]<p>[% model.all_runs_response %]</p>[% END %]
+
+[% IF model.number_of_run_graph_datasets_cached %]
+<p>
+[% model.number_of_run_graph_datasets_cached %]
+</p>
+[% END %]
+
+[% IF model.number_of_instrument_datasets_cached %]
+<p>
+[% model.number_of_instrument_datasets_cached %]
+</p>
+[% END %]
+
+<!-- end: $Id$ -->

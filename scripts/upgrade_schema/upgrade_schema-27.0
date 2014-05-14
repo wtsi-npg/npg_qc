@@ -1,0 +1,82 @@
+--
+-- alter cycle column data type to increase the range of the cycle number
+-- 
+
+ALTER TABLE `cumulative_errors_by_cycle` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `error_rate_relative_reference_cycle_nucleotide` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `errors_by_cycle` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `errors_by_cycle_and_nucleotide` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `frequency_response_matrix` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `information_content_by_cycle` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `log_likelihood` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `move_z` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `offset` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `run_graph` MODIFY COLUMN `cycle` smallint unsigned default NULL;
+
+ALTER TABLE `run_recipe` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+ALTER TABLE `signal_mean` MODIFY COLUMN `cycle` smallint unsigned NOT NULL;
+
+
+--
+-- add tag_index column to autoqc tables
+--
+
+ALTER TABLE `adapter` ADD  COLUMN `tag_index` bigint(20) NOT NULL default -1;
+ALTER TABLE `adapter` DROP INDEX `unq_run_lane_adapter`;
+ALTER TABLE `adapter` ADD  CONSTRAINT UNIQUE KEY `unq_run_lane_adapter` (`id_run`,`position`,`tag_index`);
+
+ALTER TABLE `contamination` ADD  COLUMN `tag_index` bigint(20) NOT NULL default -1;
+ALTER TABLE `contamination` DROP INDEX `uniq_run_lane_contamination`;
+ALTER TABLE `contamination` ADD  CONSTRAINT UNIQUE KEY `unq_run_lane_contamination` (`id_run`,`position`,`tag_index`);
+
+ALTER TABLE `gc_fraction` ADD  COLUMN `tag_index` bigint(20) NOT NULL default -1;
+ALTER TABLE `gc_fraction` DROP INDEX `unq_run_lane_gc_fraction`;
+ALTER TABLE `gc_fraction` ADD  CONSTRAINT UNIQUE KEY `unq_run_lane_gc_fraction` (`id_run`,`position`,`tag_index`);
+
+ALTER TABLE `insert_size` ADD  COLUMN `tag_index` bigint(20) NOT NULL default -1;
+ALTER TABLE `insert_size` DROP INDEX `unq_run_lane_isize`;
+ALTER TABLE `insert_size` ADD  CONSTRAINT UNIQUE KEY `unq_run_lane_insert_size` (`id_run`,`position`,`tag_index`);
+
+ALTER TABLE `qx_yield` ADD  COLUMN `tag_index` bigint(20) NOT NULL default -1;
+ALTER TABLE `qx_yield` DROP INDEX `unq_run_lane_qx_yield`;
+ALTER TABLE `qx_yield` ADD  CONSTRAINT UNIQUE KEY `unq_run_lane_qx_yield` (`id_run`,`position`,`tag_index`);
+
+ALTER TABLE `sequence_error` ADD  COLUMN `tag_index` bigint(20) NOT NULL default -1;
+ALTER TABLE `sequence_error` DROP INDEX `unq_run_lane_error`;
+ALTER TABLE `sequence_error` ADD  CONSTRAINT UNIQUE KEY `unq_run_lane_sequence_error` (`id_run`,`position`,`tag_index`);
+
+ALTER TABLE `split_stats` ADD  COLUMN `tag_index` bigint(20) NOT NULL default -1;
+ALTER TABLE `split_stats` DROP INDEX `unq_run_lane_split_stats`;
+ALTER TABLE `split_stats` ADD  CONSTRAINT UNIQUE KEY `unq_run_lane_split_stats` (`id_run`,`position`,`tag_index`);
+
+-- 
+-- new table to store tag decoding stats
+--
+
+CREATE TABLE `tag_decode_stats` (
+  `id_tag_decode_stats` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `tag_index` bigint(20) NOT NULL default -1,
+  `path` varchar(256) default NULL,
+  `tag_code` text,
+  `distribution_all` text,
+  `distribution_good` text,
+  `errors_all` text,
+  `errors_good` text,
+  `pass` tinyint(1) default NULL,
+  `comments` text,
+  `info` text,
+  PRIMARY KEY  (`id_tag_decode_stats`),
+  UNIQUE KEY `unq_run_lane_index_decoding` (`id_run`,`position`,`tag_index`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

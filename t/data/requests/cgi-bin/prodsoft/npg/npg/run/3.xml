@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<run id_run="3" batch_id="0" id_instrument="3" expected_cycle_count="0" actual_cycle_count="2" priority="1" id_run_pair="0" is_paired="0" is_dev="1" id_instrument_format="1" name="IL1_0003" loader="" loading_date="">
+ <instrument id_instrument="3" name="IL1" id_instrument_format="1" external_name="eas15" serial="" iscurrent="0"/>
+ <run_lanes>
+<run_lane id_run_lane="17" id_run="3" tile_count="0" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/3" auto_analyse="1" position="1" auto_qc=""/>
+
+<run_lane id_run_lane="18" id_run="3" tile_count="0" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/3" auto_analyse="1" position="2" auto_qc=""/>
+
+<run_lane id_run_lane="19" id_run="3" tile_count="0" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/3" auto_analyse="1" position="3" auto_qc=""/>
+
+<run_lane id_run_lane="20" id_run="3" tile_count="0" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/3" auto_analyse="1" position="4" auto_qc=""/>
+
+<run_lane id_run_lane="21" id_run="3" tile_count="0" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/3" auto_analyse="1" position="5" auto_qc=""/>
+
+<run_lane id_run_lane="22" id_run="3" tile_count="0" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/3" auto_analyse="1" position="6" auto_qc=""/>
+
+<run_lane id_run_lane="23" id_run="3" tile_count="0" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/3" auto_analyse="1" position="7" auto_qc=""/>
+
+<run_lane id_run_lane="24" id_run="3" tile_count="0" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/3" auto_analyse="1" position="8" auto_qc=""/>
+</run_lanes>
+ <current_run_status id_run_status="19567" id_run="3" date="2008-09-08 11:37:45" id_run_status_dict="21" id_user="6" username="ts6" iscurrent="1" description="data discarded"/>
+ <run_statuses>
+ <run_status id_run_status="19567" id_run="3" date="2008-09-08 11:37:45" id_run_status_dict="21" id_user="6" username="ts6" iscurrent="1" description="data discarded"/>
+ <run_status id_run_status="19517" id_run="3" date="2008-09-07 13:52:52" id_run_status_dict="6" id_user="7" username="ts6" iscurrent="0" description="analysis pending"/>
+ <run_status id_run_status="19516" id_run="3" date="2008-09-07 13:52:51" id_run_status_dict="11" id_user="7" username="ts6" iscurrent="0" description="run mirrored"/>
+ <run_status id_run_status="19515" id_run="3" date="2008-09-07 13:52:51" id_run_status_dict="4" id_user="7" username="ts6" iscurrent="0" description="run complete"/>
+ <run_status id_run_status="17315" id_run="3" date="2008-08-10 14:53:06" id_run_status_dict="21" id_user="6" username="ts6" iscurrent="0" description="data discarded"/>
+ <run_status id_run_status="16617" id_run="3" date="2008-08-01 14:58:55" id_run_status_dict="11" id_user="7" username="ts6" iscurrent="0" description="run mirrored"/>
+ <run_status id_run_status="16618" id_run="3" date="2008-08-01 14:58:55" id_run_status_dict="6" id_user="7" username="ts6" iscurrent="0" description="analysis pending"/>
+ <run_status id_run_status="16616" id_run="3" date="2008-08-01 14:58:30" id_run_status_dict="4" id_user="7" username="ts6" iscurrent="0" description="run complete"/>
+ <run_status id_run_status="14524" id_run="3" date="2008-07-04 17:28:47" id_run_status_dict="21" id_user="6" username="ts6" iscurrent="0" description="data discarded"/>
+ <run_status id_run_status="14491" id_run="3" date="2008-07-04 15:21:03" id_run_status_dict="6" id_user="7" username="ts6" iscurrent="0" description="analysis pending"/>
+ <run_status id_run_status="14490" id_run="3" date="2008-07-04 15:21:02" id_run_status_dict="11" id_user="7" username="ts6" iscurrent="0" description="run mirrored"/>
+ <run_status id_run_status="14489" id_run="3" date="2008-07-04 15:21:01" id_run_status_dict="4" id_user="7" username="ts6" iscurrent="0" description="run complete"/>
+ <run_status id_run_status="9346" id_run="3" date="2008-04-23 15:59:01" id_run_status_dict="21" id_user="6" username="ts6" iscurrent="0" description="data discarded"/>
+ <run_status id_run_status="9291" id_run="3" date="2008-04-22 17:41:20" id_run_status_dict="6" id_user="7" username="ts6" iscurrent="0" description="analysis pending"/>
+ <run_status id_run_status="9290" id_run="3" date="2008-04-22 17:41:15" id_run_status_dict="11" id_user="7" username="ts6" iscurrent="0" description="run mirrored"/>
+ <run_status id_run_status="9289" id_run="3" date="2008-04-22 17:41:10" id_run_status_dict="4" id_user="7" username="ts6" iscurrent="0" description="run complete"/>
+ <run_status id_run_status="8569" id_run="3" date="2008-04-15 18:06:28" id_run_status_dict="6" id_user="7" username="ts6" iscurrent="0" description="analysis pending"/>
+ <run_status id_run_status="8568" id_run="3" date="2008-04-15 18:06:22" id_run_status_dict="11" id_user="7" username="ts6" iscurrent="0" description="run mirrored"/>
+ <run_status id_run_status="8567" id_run="3" date="2008-04-15 18:06:16" id_run_status_dict="4" id_user="7" username="ts6" iscurrent="0" description="run complete"/>
+ <run_status id_run_status="6591" id_run="3" date="2008-03-19 10:25:46" id_run_status_dict="21" id_user="1" username="ts6" iscurrent="0" description="data discarded"/>
+ <run_status id_run_status="5879" id_run="3" date="2007-06-06 00:00:00" id_run_status_dict="11" id_user="20" username="ts6" iscurrent="0" description="run mirrored"/>
+ <run_status id_run_status="7" id_run="3" date="2007-06-05 12:24:23" id_run_status_dict="4" id_user="1" username="ts6" iscurrent="0" description="run complete"/>
+ <run_status id_run_status="5" id_run="3" date="2007-06-05 12:21:25" id_run_status_dict="1" id_user="1" username="ts6" iscurrent="0" description="run pending"/>
+ </run_statuses>
+ <annotations>
+ </annotations>
+ <tags>
+   <tag id_tag="18" description="single_read"/>
+ </tags>
+</run>

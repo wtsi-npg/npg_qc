@@ -1,0 +1,23 @@
+
+-- 
+-- extra table gc_fraction
+--
+
+CREATE TABLE `gc_fraction` (
+  `id_gc_fraction` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `path` varchar(256) default NULL,
+  `forward_read_filename` varchar(256) NOT NULL,
+  `reverse_read_filename` varchar(256) NOT NULL,
+  `forward_read_gc_percent` float unsigned default NULL,
+  `reverse_read_gc_percent` float unsigned default NULL,
+  `ref_gc_percent`  float unsigned default NULL,
+  `threshold_difference` tinyint unsigned default NULL,
+  `ref_count_path`  varchar(256) default NULL,
+  `pass` tinyint(1) default NULL,
+  `comments` text,
+  `info` text,
+  PRIMARY KEY  (`id_gc_fraction`),
+  UNIQUE KEY `unq_run_lane_gc_fraction` (`id_run`,`position`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

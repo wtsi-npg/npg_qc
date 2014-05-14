@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+  <id>5428</id>
+  <status>released</status>
+  <lanes>
+    <lane position="1" id="1424793" priority="0">
+      <library id="85932" name="DFTDcell3 85932" request_id="2913180" qc_state="fail">
+        <sample sample_id="10046" library_id="85932" library_name="DFTDcell3 85932" library_type="No PCR" study_id="220" project_id="220" consent_withdrawn="false">
+          <insert_size from="400" to="500"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="2" id="89193" priority="0">
+      <library id="85933" name="DFTDcell4 85933" request_id="45315" qc_state="pass">
+        <sample sample_id="10047" library_id="85933" library_name="DFTDcell4 85933" library_type="No PCR" study_id="220" project_id="220" consent_withdrawn="false">
+          <insert_size from="400" to="500"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="3" id="89194" priority="0">
+      <library id="85934" name="DFTDcell2 85934" request_id="45317" qc_state="pass">
+        <sample sample_id="10045" library_id="85934" library_name="DFTDcell2 85934" library_type="No PCR" study_id="400" project_id="400" consent_withdrawn="false">
+          <insert_size from="400" to="500"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="4" id="" priority="0">
+      <control id="79577" name="phiX CT1462-2 1" request_id="47364">
+        <sample sample_id="9836" library_id="79577" library_name="phiX CT1462-2 1" library_type="" study_id="" project_id="" consent_withdrawn="false">
+        </sample>
+      </control>
+    </lane>
+    <lane position="5" id="89191" priority="0">
+      <library id="85942" name="LB996-EBV 85942" request_id="45063" qc_state="pass">
+        <sample sample_id="9855" library_id="85942" library_name="LB996-EBV 85942" library_type="No PCR" study_id="395" project_id="395" consent_withdrawn="false">
+          <insert_size from="3" to="4"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="6" id="1424857" priority="0">
+      <library id="87623" name="PD4064a 87623" request_id="2913244" qc_state="fail">
+        <sample sample_id="10311" library_id="87623" library_name="PD4064a 87623" library_type="Double size selected" study_id="332" project_id="332" consent_withdrawn="false">
+          <insert_size from="400" to="500"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="7" id="89196" priority="0">
+      <library id="87624" name="PD4065a 87624" request_id="45904" qc_state="pass">
+        <sample sample_id="10312" library_id="87624" library_name="PD4065a 87624" library_type="Double size selected" study_id="332" project_id="332" consent_withdrawn="false">
+          <insert_size from="400" to="500"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="8" id="89197" priority="0">
+      <library id="87627" name="PD4068a 87627" request_id="45910" qc_state="pass">
+        <sample sample_id="10315" library_id="87627" library_name="PD4068a 87627" library_type="Standard" study_id="332" project_id="332" consent_withdrawn="false">
+          <insert_size from="400" to="500"/>
+        </sample>
+      </library>
+    </lane>
+  </lanes>
+</batch>

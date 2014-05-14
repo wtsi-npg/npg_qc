@@ -1,0 +1,1543 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<dataset>tile_score</dataset>
+<run_tiles>
+<run_tile id_run="1829" tile="1" position="4" end="1">
+<tile_score base_count="3576235" error_count="19915" blank_count="106" unique_alignments="96655" ua_total_score="14211035" cycles="37" rescore="1" score_version="" score_date_run="" phagealign_version="" phagealign_date_run="" max_blanks="" seq_length="" genome_file="" bases_used="" qualityfilter_version="" qualityfilter_date_run="" filter_criterion="" />
+<cumulative_errors_by_cycle>
+  <row cycle="1" one="96351" two="96649" three="96649" four="96649" five="96649" rescore="1" />
+  <row cycle="2" one="96079" two="96650" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="3" one="95785" two="96645" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="4" one="95472" two="96639" three="96652" four="96652" five="96652" rescore="1" />
+  <row cycle="5" one="95215" two="96640" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="6" one="94944" two="96629" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="7" one="94649" two="96619" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="8" one="94367" two="96612" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="9" one="94102" two="96602" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="10" one="93821" two="96588" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="11" one="93531" two="96578" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="12" one="93236" two="96568" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="13" one="92952" two="96555" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="14" one="92672" two="96538" three="96654" four="96654" five="96654" rescore="1" />
+  <row cycle="15" one="92414" two="96525" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="16" one="92148" two="96510" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="17" one="91900" two="96497" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="18" one="91632" two="96483" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="19" one="91389" two="96458" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="20" one="91113" two="96416" three="96648" four="96648" five="96648" rescore="1" />
+  <row cycle="21" one="90859" two="96398" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="22" one="90608" two="96369" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="23" one="90315" two="96343" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="24" one="89980" two="96318" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="25" one="89673" two="96296" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="26" one="89113" two="96207" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="27" one="88746" two="96123" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="28" one="87941" two="95955" three="96629" four="96629" five="96629" rescore="1" />
+  <row cycle="29" one="87494" two="95869" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="30" one="87133" two="95758" three="96653" four="96653" five="96653" rescore="1" />
+  <row cycle="31" one="86332" two="95504" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="32" one="85848" two="95335" three="96655" four="96655" five="96655" rescore="1" />
+  <row cycle="33" one="85342" two="95153" three="96576" four="96645" five="96645" rescore="1" />
+  <row cycle="34" one="84476" two="94816" three="96440" four="96597" five="96603" rescore="1" />
+  <row cycle="35" one="83508" two="94467" three="96330" four="96574" five="96615" rescore="1" />
+  <row cycle="36" one="82959" two="94201" three="96182" four="96510" five="96571" rescore="1" />
+  <row cycle="37" one="80473" two="93554" three="95985" four="96438" five="96541" rescore="1" />
+</cumulative_errors_by_cycle>
+<log_likelihood>
+  <row cycle="1" read_as="N" really_a="30" really_c="-69" really_g="-69" really_t="-47" rescore="1" />
+  <row cycle="1" read_as="A" really_a="219" really_c="-240" really_g="-263" really_t="-383" rescore="1" />
+  <row cycle="1" read_as="C" really_a="-404" really_c="289" really_g="-386" really_t="-297" rescore="1" />
+  <row cycle="1" read_as="G" really_a="-297" really_c="-364" really_g="267" really_t="-308" rescore="1" />
+  <row cycle="1" read_as="T" really_a="-410" really_c="-285" really_g="-332" really_t="271" rescore="1" />
+  <row cycle="2" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="2" read_as="A" really_a="246" really_c="-280" really_g="-278" really_t="-368" rescore="1" />
+  <row cycle="2" read_as="C" really_a="-382" really_c="266" really_g="-360" really_t="-275" rescore="1" />
+  <row cycle="2" read_as="G" really_a="-318" really_c="-47" really_g="254" really_t="-266" rescore="1" />
+  <row cycle="2" read_as="T" really_a="-369" really_c="-286" really_g="-281" really_t="250" rescore="1" />
+  <row cycle="3" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="3" read_as="A" really_a="237" really_c="-260" really_g="-288" really_t="-335" rescore="1" />
+  <row cycle="3" read_as="C" really_a="-405" really_c="272" really_g="-331" really_t="-287" rescore="1" />
+  <row cycle="3" read_as="G" really_a="-304" really_c="-372" really_g="240" really_t="-254" rescore="1" />
+  <row cycle="3" read_as="T" really_a="-410" really_c="-279" really_g="-320" really_t="263" rescore="1" />
+  <row cycle="4" read_as="N" really_a="-47" really_c="-30" really_g="-47" really_t="30" rescore="1" />
+  <row cycle="4" read_as="A" really_a="232" really_c="-252" really_g="-284" really_t="-352" rescore="1" />
+  <row cycle="4" read_as="C" really_a="-47" really_c="272" really_g="-386" really_t="-275" rescore="1" />
+  <row cycle="4" read_as="G" really_a="-302" really_c="-366" really_g="244" really_t="-262" rescore="1" />
+  <row cycle="4" read_as="T" really_a="-368" really_c="-267" really_g="-354" really_t="258" rescore="1" />
+  <row cycle="5" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="5" read_as="A" really_a="239" really_c="-275" really_g="-269" really_t="-360" rescore="1" />
+  <row cycle="5" read_as="C" really_a="-47" really_c="295" really_g="-383" really_t="-301" rescore="1" />
+  <row cycle="5" read_as="G" really_a="-305" really_c="-47" really_g="250" really_t="-265" rescore="1" />
+  <row cycle="5" read_as="T" really_a="-379" really_c="-273" really_g="-379" really_t="266" rescore="1" />
+  <row cycle="6" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="6" read_as="A" really_a="231" really_c="-259" really_g="-274" really_t="-331" rescore="1" />
+  <row cycle="6" read_as="C" really_a="-435" really_c="264" really_g="-365" really_t="-270" rescore="1" />
+  <row cycle="6" read_as="G" really_a="-305" really_c="-405" really_g="256" really_t="-276" rescore="1" />
+  <row cycle="6" read_as="T" really_a="-438" really_c="-282" really_g="-408" really_t="279" rescore="1" />
+  <row cycle="7" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="7" read_as="A" really_a="241" really_c="-267" really_g="-284" really_t="-359" rescore="1" />
+  <row cycle="7" read_as="C" really_a="-372" really_c="258" really_g="-385" really_t="-264" rescore="1" />
+  <row cycle="7" read_as="G" really_a="-308" really_c="-404" really_g="240" really_t="-252" rescore="1" />
+  <row cycle="7" read_as="T" really_a="-441" really_c="-267" really_g="-381" really_t="263" rescore="1" />
+  <row cycle="8" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="8" read_as="A" really_a="229" really_c="-250" really_g="-277" really_t="-373" rescore="1" />
+  <row cycle="8" read_as="C" really_a="-433" really_c="281" really_g="-373" really_t="-288" rescore="1" />
+  <row cycle="8" read_as="G" really_a="-325" really_c="-373" really_g="251" really_t="-263" rescore="1" />
+  <row cycle="8" read_as="T" really_a="-371" really_c="-279" really_g="-363" really_t="268" rescore="1" />
+  <row cycle="9" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="9" read_as="A" really_a="237" really_c="-255" really_g="-298" really_t="-339" rescore="1" />
+  <row cycle="9" read_as="C" really_a="-364" really_c="277" really_g="-373" really_t="-289" rescore="1" />
+  <row cycle="9" read_as="G" really_a="-307" really_c="-403" really_g="249" really_t="-264" rescore="1" />
+  <row cycle="9" read_as="T" really_a="-441" really_c="-272" really_g="-381" really_t="268" rescore="1" />
+  <row cycle="10" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="10" read_as="A" really_a="228" really_c="-248" really_g="-279" really_t="-354" rescore="1" />
+  <row cycle="10" read_as="C" really_a="-47" really_c="273" really_g="-433" really_t="-274" rescore="1" />
+  <row cycle="10" read_as="G" really_a="-307" really_c="-385" really_g="258" really_t="-278" rescore="1" />
+  <row cycle="10" read_as="T" really_a="-392" really_c="-272" really_g="-370" really_t="265" rescore="1" />
+  <row cycle="11" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="11" read_as="A" really_a="230" really_c="-261" really_g="-267" really_t="-348" rescore="1" />
+  <row cycle="11" read_as="C" really_a="-385" really_c="268" really_g="-363" really_t="-276" rescore="1" />
+  <row cycle="11" read_as="G" really_a="-322" really_c="-403" really_g="267" really_t="-284" rescore="1" />
+  <row cycle="11" read_as="T" really_a="-392" really_c="-259" really_g="-370" really_t="254" rescore="1" />
+  <row cycle="12" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="12" read_as="A" really_a="227" really_c="-243" really_g="-283" really_t="-383" rescore="1" />
+  <row cycle="12" read_as="C" really_a="-385" really_c="277" really_g="-385" really_t="-285" rescore="1" />
+  <row cycle="12" read_as="G" really_a="-325" really_c="-385" really_g="272" really_t="-293" rescore="1" />
+  <row cycle="12" read_as="T" really_a="-381" really_c="-262" really_g="-314" really_t="248" rescore="1" />
+  <row cycle="13" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="13" read_as="A" really_a="242" really_c="-270" really_g="-288" really_t="-336" rescore="1" />
+  <row cycle="13" read_as="C" really_a="-333" really_c="252" really_g="-355" really_t="-265" rescore="1" />
+  <row cycle="13" read_as="G" really_a="-291" really_c="-403" really_g="245" really_t="-265" rescore="1" />
+  <row cycle="13" read_as="T" really_a="-393" really_c="-272" really_g="-411" really_t="267" rescore="1" />
+  <row cycle="14" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="14" read_as="A" really_a="235" really_c="-257" really_g="-286" really_t="-344" rescore="1" />
+  <row cycle="14" read_as="C" really_a="-403" really_c="270" really_g="-342" really_t="-282" rescore="1" />
+  <row cycle="14" read_as="G" really_a="-309" really_c="-402" really_g="262" really_t="-283" rescore="1" />
+  <row cycle="14" read_as="T" really_a="-363" really_c="-262" really_g="-329" really_t="250" rescore="1" />
+  <row cycle="15" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="15" read_as="A" really_a="238" really_c="-266" really_g="-276" really_t="-373" rescore="1" />
+  <row cycle="15" read_as="C" really_a="-343" really_c="259" really_g="-338" really_t="-275" rescore="1" />
+  <row cycle="15" read_as="G" really_a="-311" really_c="-402" really_g="268" really_t="-292" rescore="1" />
+  <row cycle="15" read_as="T" really_a="-412" really_c="-277" really_g="-319" really_t="262" rescore="1" />
+  <row cycle="16" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="16" read_as="A" really_a="244" really_c="-271" really_g="-283" really_t="-374" rescore="1" />
+  <row cycle="16" read_as="C" really_a="-385" really_c="269" really_g="-373" really_t="-277" rescore="1" />
+  <row cycle="16" read_as="G" really_a="-315" really_c="-385" really_g="258" really_t="-276" rescore="1" />
+  <row cycle="16" read_as="T" really_a="-346" really_c="-260" really_g="-337" really_t="248" rescore="1" />
+  <row cycle="17" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="17" read_as="A" really_a="244" really_c="-283" really_g="-278" really_t="-336" rescore="1" />
+  <row cycle="17" read_as="C" really_a="-363" really_c="266" really_g="-373" really_t="-275" rescore="1" />
+  <row cycle="17" read_as="G" really_a="-315" really_c="-385" really_g="261" really_t="-279" rescore="1" />
+  <row cycle="17" read_as="T" really_a="-393" really_c="-272" really_g="-337" really_t="261" rescore="1" />
+  <row cycle="18" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="18" read_as="A" really_a="242" really_c="-268" really_g="-282" really_t="-365" rescore="1" />
+  <row cycle="18" read_as="C" really_a="-364" really_c="267" really_g="-356" really_t="-278" rescore="1" />
+  <row cycle="18" read_as="G" really_a="-298" really_c="-372" really_g="248" really_t="-269" rescore="1" />
+  <row cycle="18" read_as="T" really_a="-372" really_c="-272" really_g="-338" really_t="260" rescore="1" />
+  <row cycle="19" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="19" read_as="A" really_a="240" really_c="-267" really_g="-281" really_t="-359" rescore="1" />
+  <row cycle="19" read_as="C" really_a="-363" really_c="264" really_g="-385" really_t="-272" rescore="1" />
+  <row cycle="19" read_as="G" really_a="-300" really_c="-432" really_g="267" really_t="-296" rescore="1" />
+  <row cycle="19" read_as="T" really_a="-351" really_c="-281" really_g="-314" really_t="259" rescore="1" />
+  <row cycle="20" read_as="N" really_a="-77" really_c="-77" really_g="-39" really_t="-12" rescore="1" />
+  <row cycle="20" read_as="A" really_a="229" really_c="-252" really_g="-278" really_t="-336" rescore="1" />
+  <row cycle="20" read_as="C" really_a="-355" really_c="270" really_g="-338" really_t="-288" rescore="1" />
+  <row cycle="20" read_as="G" really_a="-294" really_c="-384" really_g="251" really_t="-275" rescore="1" />
+  <row cycle="20" read_as="T" really_a="-364" really_c="-285" really_g="-324" really_t="265" rescore="1" />
+  <row cycle="21" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="21" read_as="A" really_a="231" really_c="-259" really_g="-270" really_t="-352" rescore="1" />
+  <row cycle="21" read_as="C" really_a="-373" really_c="280" really_g="-386" really_t="-291" rescore="1" />
+  <row cycle="21" read_as="G" really_a="-317" really_c="-401" really_g="263" really_t="-281" rescore="1" />
+  <row cycle="21" read_as="T" really_a="-383" really_c="-269" really_g="-317" really_t="254" rescore="1" />
+  <row cycle="22" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="22" read_as="A" really_a="245" really_c="-274" really_g="-293" really_t="-328" rescore="1" />
+  <row cycle="22" read_as="C" really_a="-316" really_c="245" really_g="-334" really_t="-262" rescore="1" />
+  <row cycle="22" read_as="G" really_a="-300" really_c="-433" really_g="249" really_t="-266" rescore="1" />
+  <row cycle="22" read_as="T" really_a="-381" really_c="-287" really_g="-411" really_t="280" rescore="1" />
+  <row cycle="23" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="23" read_as="A" really_a="236" really_c="-258" really_g="-284" really_t="-348" rescore="1" />
+  <row cycle="23" read_as="C" really_a="-355" really_c="265" really_g="-321" really_t="-288" rescore="1" />
+  <row cycle="23" read_as="G" really_a="-292" really_c="-402" really_g="251" really_t="-275" rescore="1" />
+  <row cycle="23" read_as="T" really_a="-372" really_c="-273" really_g="-286" really_t="247" rescore="1" />
+  <row cycle="24" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="24" read_as="A" really_a="230" really_c="-260" really_g="-263" really_t="-373" rescore="1" />
+  <row cycle="24" read_as="C" really_a="-386" really_c="272" really_g="-356" really_t="-283" rescore="1" />
+  <row cycle="24" read_as="G" really_a="-314" really_c="-383" really_g="269" really_t="-293" rescore="1" />
+  <row cycle="24" read_as="T" really_a="-358" really_c="-275" really_g="-248" really_t="227" rescore="1" />
+  <row cycle="25" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="25" read_as="A" really_a="233" really_c="-258" really_g="-273" really_t="-365" rescore="1" />
+  <row cycle="25" read_as="C" really_a="-348" really_c="260" really_g="-322" really_t="-280" rescore="1" />
+  <row cycle="25" read_as="G" really_a="-304" really_c="-372" really_g="262" really_t="-289" rescore="1" />
+  <row cycle="25" read_as="T" really_a="-382" really_c="-275" really_g="-274" really_t="243" rescore="1" />
+  <row cycle="26" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="26" read_as="A" really_a="217" really_c="-234" really_g="-270" really_t="-359" rescore="1" />
+  <row cycle="26" read_as="C" really_a="-348" really_c="255" really_g="-321" really_t="-273" rescore="1" />
+  <row cycle="26" read_as="G" really_a="-292" really_c="-354" really_g="248" really_t="-273" rescore="1" />
+  <row cycle="26" read_as="T" really_a="-293" really_c="-265" really_g="-202" really_t="189" rescore="1" />
+  <row cycle="27" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="27" read_as="A" really_a="231" really_c="-258" really_g="-276" really_t="-328" rescore="1" />
+  <row cycle="27" read_as="C" really_a="-316" really_c="245" really_g="-343" really_t="-260" rescore="1" />
+  <row cycle="27" read_as="G" really_a="-291" really_c="-385" really_g="237" really_t="-255" rescore="1" />
+  <row cycle="27" read_as="T" really_a="-334" really_c="-258" really_g="-255" really_t="222" rescore="1" />
+  <row cycle="28" read_as="N" really_a="-74" really_c="-35" really_g="-52" really_t="-35" rescore="1" />
+  <row cycle="28" read_as="A" really_a="209" really_c="-226" really_g="-266" really_t="-339" rescore="1" />
+  <row cycle="28" read_as="C" really_a="-333" really_c="260" really_g="-337" really_t="-278" rescore="1" />
+  <row cycle="28" read_as="G" really_a="-315" really_c="-309" really_g="248" really_t="-274" rescore="1" />
+  <row cycle="28" read_as="T" really_a="-289" really_c="-242" really_g="-176" really_t="164" rescore="1" />
+  <row cycle="29" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="29" read_as="A" really_a="224" really_c="-244" really_g="-273" really_t="-365" rescore="1" />
+  <row cycle="29" read_as="C" really_a="-315" really_c="252" really_g="-315" really_t="-280" rescore="1" />
+  <row cycle="29" read_as="G" really_a="-307" really_c="-343" really_g="248" really_t="-269" rescore="1" />
+  <row cycle="29" read_as="T" really_a="-324" really_c="-259" really_g="-208" really_t="194" rescore="1" />
+  <row cycle="30" read_as="N" really_a="-47" really_c="0" really_g="-47" really_t="0" rescore="1" />
+  <row cycle="30" read_as="A" really_a="231" really_c="-261" really_g="-271" really_t="-328" rescore="1" />
+  <row cycle="30" read_as="C" really_a="-322" really_c="245" really_g="-338" really_t="-260" rescore="1" />
+  <row cycle="30" read_as="G" really_a="-307" really_c="-354" really_g="245" really_t="-261" rescore="1" />
+  <row cycle="30" read_as="T" really_a="-319" really_c="-258" really_g="-241" really_t="214" rescore="1" />
+  <row cycle="31" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="31" read_as="A" really_a="220" really_c="-234" really_g="-286" really_t="-343" rescore="1" />
+  <row cycle="31" read_as="C" really_a="-349" really_c="265" really_g="-322" really_t="-288" rescore="1" />
+  <row cycle="31" read_as="G" really_a="-297" really_c="-309" really_g="240" really_t="-267" rescore="1" />
+  <row cycle="31" read_as="T" really_a="-288" really_c="-225" really_g="-166" really_t="153" rescore="1" />
+  <row cycle="32" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="32" read_as="A" really_a="224" really_c="-250" really_g="-273" really_t="-313" rescore="1" />
+  <row cycle="32" read_as="C" really_a="-305" really_c="241" really_g="-318" really_t="-264" rescore="1" />
+  <row cycle="32" read_as="G" really_a="-298" really_c="-332" really_g="241" really_t="-263" rescore="1" />
+  <row cycle="32" read_as="T" really_a="-300" really_c="-258" really_g="-203" really_t="189" rescore="1" />
+  <row cycle="33" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="33" read_as="A" really_a="212" really_c="-236" really_g="-270" really_t="-297" rescore="1" />
+  <row cycle="33" read_as="C" really_a="-299" really_c="232" really_g="-294" really_t="-259" rescore="1" />
+  <row cycle="33" read_as="G" really_a="-294" really_c="-315" really_g="234" really_t="-256" rescore="1" />
+  <row cycle="33" read_as="T" really_a="-294" really_c="-242" really_g="-209" really_t="188" rescore="1" />
+  <row cycle="34" read_as="N" really_a="-72" really_c="-50" really_g="-41" really_t="-32" rescore="1" />
+  <row cycle="34" read_as="A" really_a="207" really_c="-230" really_g="-260" really_t="-306" rescore="1" />
+  <row cycle="34" read_as="C" really_a="-277" really_c="223" really_g="-279" really_t="-260" rescore="1" />
+  <row cycle="34" read_as="G" really_a="-280" really_c="-300" really_g="231" really_t="-263" rescore="1" />
+  <row cycle="34" read_as="T" really_a="-282" really_c="-220" really_g="-166" really_t="152" rescore="1" />
+  <row cycle="35" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="35" read_as="A" really_a="207" really_c="-228" really_g="-264" really_t="-297" rescore="1" />
+  <row cycle="35" read_as="C" really_a="-294" really_c="229" really_g="-289" really_t="-257" rescore="1" />
+  <row cycle="35" read_as="G" really_a="-279" really_c="-296" really_g="224" really_t="-253" rescore="1" />
+  <row cycle="35" read_as="T" really_a="-258" really_c="-219" really_g="-150" really_t="139" rescore="1" />
+  <row cycle="36" read_as="N" really_a="-27" really_c="-45" really_g="-67" really_t="-55" rescore="1" />
+  <row cycle="36" read_as="A" really_a="202" really_c="-226" really_g="-262" really_t="-277" rescore="1" />
+  <row cycle="36" read_as="C" really_a="-286" really_c="228" really_g="-305" really_t="-252" rescore="1" />
+  <row cycle="36" read_as="G" really_a="-272" really_c="-302" really_g="216" really_t="-239" rescore="1" />
+  <row cycle="36" read_as="T" really_a="-288" really_c="-239" really_g="-201" really_t="181" rescore="1" />
+  <row cycle="37" read_as="N" really_a="-35" really_c="-52" really_g="-74" really_t="-35" rescore="1" />
+  <row cycle="37" read_as="A" really_a="190" really_c="-226" really_g="-252" really_t="-239" rescore="1" />
+  <row cycle="37" read_as="C" really_a="-166" really_c="150" really_g="-245" really_t="-225" rescore="1" />
+  <row cycle="37" read_as="G" really_a="-198" really_c="-231" really_g="160" really_t="-203" rescore="1" />
+  <row cycle="37" read_as="T" really_a="-170" really_c="-183" really_g="-143" really_t="112" rescore="1" />
+</log_likelihood>
+<information_content_by_cycle>
+  <row cycle="1" equiv_info="95072.43" align="96649" total="98805" rescore="1" />
+  <row cycle="2" equiv_info="95107.34" align="96655" total="98814" rescore="1" />
+  <row cycle="3" equiv_info="95033.25" align="96655" total="98814" rescore="1" />
+  <row cycle="4" equiv_info="94987.08" align="96652" total="98810" rescore="1" />
+  <row cycle="5" equiv_info="95235.60" align="96655" total="98814" rescore="1" />
+  <row cycle="6" equiv_info="95136.13" align="96655" total="98814" rescore="1" />
+  <row cycle="7" equiv_info="95037.35" align="96655" total="98814" rescore="1" />
+  <row cycle="8" equiv_info="95109.40" align="96655" total="98814" rescore="1" />
+  <row cycle="9" equiv_info="95169.02" align="96655" total="98814" rescore="1" />
+  <row cycle="10" equiv_info="95088.20" align="96655" total="98814" rescore="1" />
+  <row cycle="11" equiv_info="95050.63" align="96655" total="98814" rescore="1" />
+  <row cycle="12" equiv_info="95035.34" align="96655" total="98814" rescore="1" />
+  <row cycle="13" equiv_info="95046.73" align="96655" total="98814" rescore="1" />
+  <row cycle="14" equiv_info="95053.03" align="96654" total="98813" rescore="1" />
+  <row cycle="15" equiv_info="95151.53" align="96655" total="98814" rescore="1" />
+  <row cycle="16" equiv_info="95121.55" align="96655" total="98814" rescore="1" />
+  <row cycle="17" equiv_info="95207.08" align="96655" total="98814" rescore="1" />
+  <row cycle="18" equiv_info="95108.23" align="96655" total="98814" rescore="1" />
+  <row cycle="19" equiv_info="95172.90" align="96655" total="98814" rescore="1" />
+  <row cycle="20" equiv_info="94991.09" align="96648" total="98807" rescore="1" />
+  <row cycle="21" equiv_info="95101.03" align="96655" total="98814" rescore="1" />
+  <row cycle="22" equiv_info="95119.16" align="96655" total="98814" rescore="1" />
+  <row cycle="23" equiv_info="94919.04" align="96655" total="98814" rescore="1" />
+  <row cycle="24" equiv_info="94758.90" align="96655" total="98814" rescore="1" />
+  <row cycle="25" equiv_info="94875.32" align="96655" total="98814" rescore="1" />
+  <row cycle="26" equiv_info="93561.57" align="96655" total="98813" rescore="1" />
+  <row cycle="27" equiv_info="94307.73" align="96655" total="98795" rescore="1" />
+  <row cycle="28" equiv_info="92602.91" align="96629" total="98747" rescore="1" />
+  <row cycle="29" equiv_info="93815.62" align="96655" total="98773" rescore="1" />
+  <row cycle="30" equiv_info="94222.90" align="96653" total="98769" rescore="1" />
+  <row cycle="31" equiv_info="92236.69" align="96655" total="98814" rescore="1" />
+  <row cycle="32" equiv_info="93496.36" align="96655" total="98812" rescore="1" />
+  <row cycle="33" equiv_info="93084.85" align="96645" total="98797" rescore="1" />
+  <row cycle="34" equiv_info="91398.37" align="96603" total="98747" rescore="1" />
+  <row cycle="35" equiv_info="90609.77" align="96617" total="98795" rescore="1" />
+  <row cycle="36" equiv_info="92303.34" align="96584" total="98749" rescore="1" />
+  <row cycle="37" equiv_info="84010.10" align="96577" total="98758" rescore="1" />
+</information_content_by_cycle>
+<error_rate_relative_reference_cycle_nucleotide>
+  <row cycle="1" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="1" read_as="A" really_a="0.999" really_c="0.005" really_g="0.003" really_t="0.000" rescore="1" />
+  <row cycle="1" read_as="C" really_a="0.000" really_c="0.993" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="1" read_as="G" really_a="0.001" really_c="0.000" really_g="0.996" really_t="0.001" rescore="1" />
+  <row cycle="1" read_as="T" really_a="0.000" really_c="0.002" really_g="0.001" really_t="0.998" rescore="1" />
+  <row cycle="2" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="2" read_as="A" really_a="0.999" really_c="0.002" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="2" read_as="C" really_a="0.000" really_c="0.996" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="2" read_as="G" really_a="0.001" really_c="0.000" really_g="0.996" really_t="0.002" rescore="1" />
+  <row cycle="2" read_as="T" really_a="0.000" really_c="0.002" really_g="0.002" really_t="0.996" rescore="1" />
+  <row cycle="3" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="3" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="3" read_as="C" really_a="0.000" really_c="0.995" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="3" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.002" rescore="1" />
+  <row cycle="3" read_as="T" really_a="0.000" really_c="0.002" really_g="0.001" really_t="0.996" rescore="1" />
+  <row cycle="4" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="4" read_as="A" really_a="0.999" really_c="0.004" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="4" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="4" read_as="G" really_a="0.001" really_c="0.000" really_g="0.998" really_t="0.002" rescore="1" />
+  <row cycle="4" read_as="T" really_a="0.000" really_c="0.002" really_g="0.000" really_t="0.996" rescore="1" />
+  <row cycle="5" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="5" read_as="A" really_a="0.999" really_c="0.002" really_g="0.003" really_t="0.000" rescore="1" />
+  <row cycle="5" read_as="C" really_a="0.000" really_c="0.995" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="5" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.002" rescore="1" />
+  <row cycle="5" read_as="T" really_a="0.000" really_c="0.002" really_g="0.000" really_t="0.997" rescore="1" />
+  <row cycle="6" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="6" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="6" read_as="C" really_a="0.000" really_c="0.995" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="6" read_as="G" really_a="0.001" really_c="0.000" really_g="0.998" really_t="0.002" rescore="1" />
+  <row cycle="6" read_as="T" really_a="0.000" really_c="0.002" really_g="0.000" really_t="0.996" rescore="1" />
+  <row cycle="7" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="7" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="7" read_as="C" really_a="0.000" really_c="0.995" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="7" read_as="G" really_a="0.001" really_c="0.000" really_g="0.998" really_t="0.003" rescore="1" />
+  <row cycle="7" read_as="T" really_a="0.000" really_c="0.003" really_g="0.000" really_t="0.995" rescore="1" />
+  <row cycle="8" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="8" read_as="A" really_a="0.999" really_c="0.004" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="8" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="8" read_as="G" really_a="0.000" really_c="0.000" really_g="0.997" really_t="0.002" rescore="1" />
+  <row cycle="8" read_as="T" really_a="0.000" really_c="0.002" really_g="0.000" really_t="0.997" rescore="1" />
+  <row cycle="9" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="9" read_as="A" really_a="0.999" really_c="0.003" really_g="0.001" really_t="0.000" rescore="1" />
+  <row cycle="9" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="9" read_as="G" really_a="0.001" really_c="0.000" really_g="0.998" really_t="0.002" rescore="1" />
+  <row cycle="9" read_as="T" really_a="0.000" really_c="0.002" really_g="0.000" really_t="0.997" rescore="1" />
+  <row cycle="10" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="10" read_as="A" really_a="0.999" really_c="0.004" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="10" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="10" read_as="G" really_a="0.001" really_c="0.000" really_g="0.998" really_t="0.001" rescore="1" />
+  <row cycle="10" read_as="T" really_a="0.000" really_c="0.002" really_g="0.000" really_t="0.997" rescore="1" />
+  <row cycle="11" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="11" read_as="A" really_a="0.999" really_c="0.003" really_g="0.003" really_t="0.000" rescore="1" />
+  <row cycle="11" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="11" read_as="G" really_a="0.000" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="11" read_as="T" really_a="0.000" really_c="0.003" really_g="0.000" really_t="0.997" rescore="1" />
+  <row cycle="12" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="12" read_as="A" really_a="0.999" really_c="0.005" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="12" read_as="C" really_a="0.000" really_c="0.992" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="12" read_as="G" really_a="0.000" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="12" read_as="T" really_a="0.000" really_c="0.003" really_g="0.001" really_t="0.998" rescore="1" />
+  <row cycle="13" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="13" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="13" read_as="C" really_a="0.000" really_c="0.995" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="13" read_as="G" really_a="0.001" really_c="0.000" really_g="0.998" really_t="0.002" rescore="1" />
+  <row cycle="13" read_as="T" really_a="0.000" really_c="0.002" really_g="0.000" really_t="0.996" rescore="1" />
+  <row cycle="14" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="14" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="14" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="14" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="14" read_as="T" really_a="0.000" really_c="0.003" really_g="0.001" really_t="0.997" rescore="1" />
+  <row cycle="15" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="15" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="15" read_as="C" really_a="0.000" really_c="0.995" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="15" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="15" read_as="T" really_a="0.000" really_c="0.002" really_g="0.001" really_t="0.997" rescore="1" />
+  <row cycle="16" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="16" read_as="A" really_a="0.999" really_c="0.002" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="16" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="16" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="16" read_as="T" really_a="0.000" really_c="0.003" really_g="0.001" really_t="0.997" rescore="1" />
+  <row cycle="17" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="17" read_as="A" really_a="0.999" really_c="0.002" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="17" read_as="C" really_a="0.000" really_c="0.996" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="17" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="17" read_as="T" really_a="0.000" really_c="0.002" really_g="0.001" really_t="0.997" rescore="1" />
+  <row cycle="18" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="18" read_as="A" really_a="0.999" really_c="0.002" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="18" read_as="C" really_a="0.000" really_c="0.995" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="18" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.002" rescore="1" />
+  <row cycle="18" read_as="T" really_a="0.000" really_c="0.002" really_g="0.001" really_t="0.997" rescore="1" />
+  <row cycle="19" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="19" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="19" read_as="C" really_a="0.000" really_c="0.995" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="19" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="19" read_as="T" really_a="0.000" really_c="0.002" really_g="0.001" really_t="0.997" rescore="1" />
+  <row cycle="20" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="20" read_as="A" really_a="0.999" really_c="0.004" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="20" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="20" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="20" read_as="T" really_a="0.000" really_c="0.002" really_g="0.001" really_t="0.997" rescore="1" />
+  <row cycle="21" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="21" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="21" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="21" read_as="G" really_a="0.001" really_c="0.000" really_g="0.997" really_t="0.001" rescore="1" />
+  <row cycle="21" read_as="T" really_a="0.000" really_c="0.002" really_g="0.001" really_t="0.998" rescore="1" />
+  <row cycle="22" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="22" read_as="A" really_a="0.999" really_c="0.002" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="22" read_as="C" really_a="0.001" really_c="0.996" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="22" read_as="G" really_a="0.001" really_c="0.000" really_g="0.998" really_t="0.002" rescore="1" />
+  <row cycle="22" read_as="T" really_a="0.000" really_c="0.002" really_g="0.000" really_t="0.996" rescore="1" />
+  <row cycle="23" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="23" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="23" read_as="C" really_a="0.000" really_c="0.994" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="23" read_as="G" really_a="0.001" really_c="0.000" really_g="0.996" really_t="0.001" rescore="1" />
+  <row cycle="23" read_as="T" really_a="0.000" really_c="0.002" really_g="0.002" really_t="0.997" rescore="1" />
+  <row cycle="24" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="24" read_as="A" really_a="0.999" really_c="0.003" really_g="0.003" really_t="0.000" rescore="1" />
+  <row cycle="24" read_as="C" really_a="0.000" really_c="0.995" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="24" read_as="G" really_a="0.001" really_c="0.000" really_g="0.992" really_t="0.001" rescore="1" />
+  <row cycle="24" read_as="T" really_a="0.000" really_c="0.002" really_g="0.004" really_t="0.998" rescore="1" />
+  <row cycle="25" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="25" read_as="A" really_a="0.999" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="25" read_as="C" really_a="0.000" really_c="0.994" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="25" read_as="G" really_a="0.001" really_c="0.000" really_g="0.995" really_t="0.001" rescore="1" />
+  <row cycle="25" read_as="T" really_a="0.000" really_c="0.002" really_g="0.002" really_t="0.997" rescore="1" />
+  <row cycle="26" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="26" read_as="A" really_a="0.998" really_c="0.006" really_g="0.003" really_t="0.000" rescore="1" />
+  <row cycle="26" read_as="C" really_a="0.000" really_c="0.991" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="26" read_as="G" really_a="0.001" really_c="0.000" really_g="0.985" really_t="0.001" rescore="1" />
+  <row cycle="26" read_as="T" really_a="0.001" really_c="0.003" really_g="0.011" really_t="0.997" rescore="1" />
+  <row cycle="27" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="27" read_as="A" really_a="0.998" really_c="0.003" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="27" read_as="C" really_a="0.001" really_c="0.994" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="27" read_as="G" really_a="0.001" really_c="0.000" really_g="0.994" really_t="0.002" rescore="1" />
+  <row cycle="27" read_as="T" really_a="0.000" really_c="0.003" really_g="0.003" really_t="0.995" rescore="1" />
+  <row cycle="28" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="28" read_as="A" really_a="0.998" really_c="0.007" really_g="0.003" really_t="0.000" rescore="1" />
+  <row cycle="28" read_as="C" really_a="0.000" really_c="0.988" really_g="0.000" really_t="0.001" rescore="1" />
+  <row cycle="28" read_as="G" really_a="0.001" really_c="0.001" really_g="0.976" really_t="0.001" rescore="1" />
+  <row cycle="28" read_as="T" really_a="0.001" really_c="0.005" really_g="0.021" really_t="0.996" rescore="1" />
+  <row cycle="29" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="29" read_as="A" really_a="0.998" really_c="0.005" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="29" read_as="C" really_a="0.001" really_c="0.992" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="29" read_as="G" really_a="0.001" really_c="0.000" really_g="0.987" really_t="0.002" rescore="1" />
+  <row cycle="29" read_as="T" really_a="0.001" really_c="0.003" really_g="0.010" really_t="0.997" rescore="1" />
+  <row cycle="30" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="30" read_as="A" really_a="0.998" really_c="0.003" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="30" read_as="C" really_a="0.000" really_c="0.994" really_g="0.000" really_t="0.002" rescore="1" />
+  <row cycle="30" read_as="G" really_a="0.001" really_c="0.000" really_g="0.992" really_t="0.002" rescore="1" />
+  <row cycle="30" read_as="T" really_a="0.001" really_c="0.003" really_g="0.005" really_t="0.995" rescore="1" />
+  <row cycle="31" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="31" read_as="A" really_a="0.998" really_c="0.006" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="31" read_as="C" really_a="0.000" really_c="0.987" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="31" read_as="G" really_a="0.001" really_c="0.001" really_g="0.971" really_t="0.002" rescore="1" />
+  <row cycle="31" read_as="T" really_a="0.001" really_c="0.007" really_g="0.027" really_t="0.997" rescore="1" />
+  <row cycle="32" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="32" read_as="A" really_a="0.998" really_c="0.004" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="32" read_as="C" really_a="0.001" really_c="0.992" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="32" read_as="G" really_a="0.001" really_c="0.000" really_g="0.986" really_t="0.002" rescore="1" />
+  <row cycle="32" read_as="T" really_a="0.001" really_c="0.003" really_g="0.011" really_t="0.996" rescore="1" />
+  <row cycle="33" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="33" read_as="A" really_a="0.997" really_c="0.005" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="33" read_as="C" really_a="0.001" really_c="0.990" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="33" read_as="G" really_a="0.001" really_c="0.001" really_g="0.987" really_t="0.002" rescore="1" />
+  <row cycle="33" read_as="T" really_a="0.001" really_c="0.004" really_g="0.010" really_t="0.995" rescore="1" />
+  <row cycle="34" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="34" read_as="A" really_a="0.996" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="34" read_as="C" really_a="0.001" really_c="0.985" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="34" read_as="G" really_a="0.001" really_c="0.001" really_g="0.969" really_t="0.002" rescore="1" />
+  <row cycle="34" read_as="T" really_a="0.001" really_c="0.008" really_g="0.026" really_t="0.995" rescore="1" />
+  <row cycle="35" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="35" read_as="A" really_a="0.995" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="35" read_as="C" really_a="0.001" really_c="0.985" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="35" read_as="G" really_a="0.001" really_c="0.001" really_g="0.959" really_t="0.002" rescore="1" />
+  <row cycle="35" read_as="T" really_a="0.003" really_c="0.008" really_g="0.037" really_t="0.994" rescore="1" />
+  <row cycle="36" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="36" read_as="A" really_a="0.996" really_c="0.007" really_g="0.003" really_t="0.002" rescore="1" />
+  <row cycle="36" read_as="C" really_a="0.001" really_c="0.987" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="36" read_as="G" really_a="0.001" really_c="0.001" really_g="0.984" really_t="0.003" rescore="1" />
+  <row cycle="36" read_as="T" really_a="0.001" really_c="0.005" really_g="0.012" really_t="0.993" rescore="1" />
+  <row cycle="37" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="37" read_as="A" really_a="0.956" really_c="0.007" really_g="0.004" really_t="0.004" rescore="1" />
+  <row cycle="37" read_as="C" really_a="0.017" really_c="0.970" really_g="0.003" really_t="0.004" rescore="1" />
+  <row cycle="37" read_as="G" really_a="0.008" really_c="0.005" really_g="0.947" really_t="0.007" rescore="1" />
+  <row cycle="37" read_as="T" really_a="0.020" really_c="0.019" really_g="0.046" really_t="0.984" rescore="1" />
+</error_rate_relative_reference_cycle_nucleotide>
+<errors_by_cycle>
+  <row cycle="1" error_percentage="0.31" blank_percentage="0.01" rescore="1" />
+  <row cycle="2" error_percentage="0.29" blank_percentage="0.00" rescore="1" />
+  <row cycle="3" error_percentage="0.31" blank_percentage="0.00" rescore="1" />
+  <row cycle="4" error_percentage="0.32" blank_percentage="0.00" rescore="1" />
+  <row cycle="5" error_percentage="0.27" blank_percentage="0.00" rescore="1" />
+  <row cycle="6" error_percentage="0.29" blank_percentage="0.00" rescore="1" />
+  <row cycle="7" error_percentage="0.32" blank_percentage="0.00" rescore="1" />
+  <row cycle="8" error_percentage="0.30" blank_percentage="0.00" rescore="1" />
+  <row cycle="9" error_percentage="0.28" blank_percentage="0.00" rescore="1" />
+  <row cycle="10" error_percentage="0.31" blank_percentage="0.00" rescore="1" />
+  <row cycle="11" error_percentage="0.31" blank_percentage="0.00" rescore="1" />
+  <row cycle="12" error_percentage="0.32" blank_percentage="0.00" rescore="1" />
+  <row cycle="13" error_percentage="0.31" blank_percentage="0.00" rescore="1" />
+  <row cycle="14" error_percentage="0.31" blank_percentage="0.00" rescore="1" />
+  <row cycle="15" error_percentage="0.28" blank_percentage="0.00" rescore="1" />
+  <row cycle="16" error_percentage="0.29" blank_percentage="0.00" rescore="1" />
+  <row cycle="17" error_percentage="0.27" blank_percentage="0.00" rescore="1" />
+  <row cycle="18" error_percentage="0.29" blank_percentage="0.00" rescore="1" />
+  <row cycle="19" error_percentage="0.28" blank_percentage="0.00" rescore="1" />
+  <row cycle="20" error_percentage="0.31" blank_percentage="0.01" rescore="1" />
+  <row cycle="21" error_percentage="0.30" blank_percentage="0.00" rescore="1" />
+  <row cycle="22" error_percentage="0.29" blank_percentage="0.00" rescore="1" />
+  <row cycle="23" error_percentage="0.33" blank_percentage="0.00" rescore="1" />
+  <row cycle="24" error_percentage="0.37" blank_percentage="0.00" rescore="1" />
+  <row cycle="25" error_percentage="0.34" blank_percentage="0.00" rescore="1" />
+  <row cycle="26" error_percentage="0.67" blank_percentage="0.00" rescore="1" />
+  <row cycle="27" error_percentage="0.47" blank_percentage="0.00" rescore="1" />
+  <row cycle="28" error_percentage="0.96" blank_percentage="0.03" rescore="1" />
+  <row cycle="29" error_percentage="0.60" blank_percentage="0.00" rescore="1" />
+  <row cycle="30" error_percentage="0.49" blank_percentage="0.00" rescore="1" />
+  <row cycle="31" error_percentage="1.09" blank_percentage="0.00" rescore="1" />
+  <row cycle="32" error_percentage="0.68" blank_percentage="0.00" rescore="1" />
+  <row cycle="33" error_percentage="0.76" blank_percentage="0.00" rescore="1" />
+  <row cycle="34" error_percentage="1.27" blank_percentage="0.03" rescore="1" />
+  <row cycle="35" error_percentage="1.56" blank_percentage="0.00" rescore="1" />
+  <row cycle="36" error_percentage="0.95" blank_percentage="0.02" rescore="1" />
+  <row cycle="37" error_percentage="3.52" blank_percentage="0.01" rescore="1" />
+</errors_by_cycle>
+<error_rate_reference_including_blanks>
+  <row really="A" read_as_blank="0.00" read_as_a="99.73" read_as_c="0.07" read_as_g="0.09" read_as_t="0.10" rescore="1" />
+  <row really="C" read_as_blank="0.00" read_as_a="0.38" read_as_c="99.24" read_as_g="0.04" read_as_t="0.34" rescore="1" />
+  <row really="G" read_as_blank="0.00" read_as_a="0.22" read_as_c="0.05" read_as_g="99.08" read_as_t="0.65" rescore="1" />
+  <row really="T" read_as_blank="0.00" read_as_a="0.05" read_as_c="0.16" read_as_g="0.18" read_as_t="99.60" rescore="1" />
+</error_rate_reference_including_blanks>
+<error_rate_reference_no_blanks>
+  <row really="A" read_as_a="99.73" read_as_c="0.07" read_as_g="0.09" read_as_t="0.10" rescore="1" />
+  <row really="C" read_as_a="0.38" read_as_c="99.24" read_as_g="0.04" read_as_t="0.34" rescore="1" />
+  <row really="G" read_as_a="0.22" read_as_c="0.05" read_as_g="99.08" read_as_t="0.65" rescore="1" />
+  <row really="T" read_as_a="0.05" read_as_c="0.16" read_as_g="0.18" read_as_t="99.61" rescore="1" />
+</error_rate_reference_no_blanks>
+<error_rate_relative_sequence_base>
+  <row read_as="N" really_a="23.58" really_c="25.47" really_g="20.75" really_t="30.19" rescore="1" />
+  <row read_as="A" really_a="99.47" really_c="0.30" really_g="0.18" really_t="0.05" rescore="1" />
+  <row read_as="C" really_a="0.09" really_c="99.67" really_g="0.05" really_t="0.19" rescore="1" />
+  <row read_as="G" really_a="0.12" really_c="0.04" really_g="99.62" really_t="0.22" rescore="1" />
+  <row read_as="T" really_a="0.10" really_c="0.28" really_g="0.53" really_t="99.09" rescore="1" />
+</error_rate_relative_sequence_base>
+<errors_by_nucleotide>
+  <row read_as="A" really_a="1004539" really_c="3076" really_g="1784" really_t="518" rescore="1" />
+  <row read_as="C" really_a="750" really_c="799691" really_g="406" really_t="1515" rescore="1" />
+  <row read_as="G" really_a="952" really_c="311" really_g="792112" really_t="1742" rescore="1" />
+  <row read_as="T" really_a="985" really_c="2715" really_g="5161" really_t="959684" rescore="1" />
+</errors_by_nucleotide>
+<errors_by_cycle_and_nucleotide>
+  <row cycle="1" read_as="N" really_a="4" really_c="1" really_g="1" really_t="0" rescore="1" />
+  <row cycle="1" read_as="A" really_a="27298" really_c="108" really_g="63" really_t="4" rescore="1" />
+  <row cycle="1" read_as="C" really_a="2" really_c="21953" really_g="3" really_t="23" rescore="1" />
+  <row cycle="1" read_as="G" really_a="23" really_c="5" really_g="21869" really_t="18" rescore="1" />
+  <row cycle="1" read_as="T" really_a="2" really_c="35" really_g="12" really_t="25231" rescore="1" />
+  <row cycle="2" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="2" read_as="A" really_a="28664" really_c="45" really_g="47" really_t="6" rescore="1" />
+  <row cycle="2" read_as="C" really_a="3" really_c="20059" really_g="5" really_t="35" rescore="1" />
+  <row cycle="2" read_as="G" really_a="15" really_c="0" really_g="22969" really_t="50" rescore="1" />
+  <row cycle="2" read_as="T" really_a="5" really_c="34" really_g="38" really_t="24680" rescore="1" />
+  <row cycle="3" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="3" read_as="A" really_a="27037" really_c="67" really_g="35" really_t="12" rescore="1" />
+  <row cycle="3" read_as="C" really_a="2" really_c="22647" really_g="11" really_t="30" rescore="1" />
+  <row cycle="3" read_as="G" really_a="19" really_c="4" really_g="20996" really_t="60" rescore="1" />
+  <row cycle="3" read_as="T" really_a="2" really_c="41" really_g="16" really_t="25676" rescore="1" />
+  <row cycle="4" read_as="N" really_a="0" really_c="1" really_g="0" really_t="2" rescore="1" />
+  <row cycle="4" read_as="A" really_a="26698" really_c="80" really_g="38" really_t="8" rescore="1" />
+  <row cycle="4" read_as="C" really_a="0" really_c="22194" really_g="3" really_t="39" rescore="1" />
+  <row cycle="4" read_as="G" really_a="22" really_c="5" really_g="23087" really_t="55" rescore="1" />
+  <row cycle="4" read_as="T" really_a="5" really_c="51" really_g="7" really_t="24360" rescore="1" />
+  <row cycle="5" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="5" read_as="A" really_a="28360" really_c="50" really_g="58" really_t="7" rescore="1" />
+  <row cycle="5" read_as="C" really_a="0" really_c="20515" really_g="3" really_t="20" rescore="1" />
+  <row cycle="5" read_as="G" really_a="20" really_c="0" really_g="22869" really_t="51" rescore="1" />
+  <row cycle="5" read_as="T" really_a="4" really_c="45" really_g="4" really_t="24649" rescore="1" />
+  <row cycle="6" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="6" read_as="A" really_a="27004" really_c="69" really_g="49" really_t="13" rescore="1" />
+  <row cycle="6" read_as="C" really_a="1" really_c="22707" really_g="5" really_t="45" rescore="1" />
+  <row cycle="6" read_as="G" really_a="20" really_c="2" really_g="22570" really_t="39" rescore="1" />
+  <row cycle="6" read_as="T" really_a="1" really_c="36" really_g="2" really_t="24092" rescore="1" />
+  <row cycle="7" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="7" read_as="A" really_a="27301" really_c="58" really_g="39" really_t="7" rescore="1" />
+  <row cycle="7" read_as="C" really_a="4" really_c="21394" really_g="3" really_t="48" rescore="1" />
+  <row cycle="7" read_as="G" really_a="18" really_c="2" really_g="21873" really_t="66" rescore="1" />
+  <row cycle="7" read_as="T" really_a="1" really_c="55" really_g="4" really_t="25782" rescore="1" />
+  <row cycle="8" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="8" read_as="A" really_a="27217" really_c="86" really_g="46" really_t="5" rescore="1" />
+  <row cycle="8" read_as="C" really_a="1" really_c="21485" really_g="4" really_t="28" rescore="1" />
+  <row cycle="8" read_as="G" really_a="12" really_c="4" really_g="21761" really_t="50" rescore="1" />
+  <row cycle="8" read_as="T" really_a="5" really_c="42" really_g="6" really_t="25903" rescore="1" />
+  <row cycle="9" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="9" read_as="A" really_a="27078" really_c="76" really_g="28" really_t="11" rescore="1" />
+  <row cycle="9" read_as="C" really_a="5" really_c="21828" really_g="4" really_t="28" rescore="1" />
+  <row cycle="9" read_as="G" really_a="18" really_c="2" really_g="21484" really_t="49" rescore="1" />
+  <row cycle="9" read_as="T" really_a="1" really_c="49" really_g="4" really_t="25990" rescore="1" />
+  <row cycle="10" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="10" read_as="A" really_a="27987" really_c="91" really_g="45" really_t="8" rescore="1" />
+  <row cycle="10" read_as="C" really_a="0" really_c="21757" really_g="1" really_t="39" rescore="1" />
+  <row cycle="10" read_as="G" really_a="18" really_c="3" really_g="21500" really_t="35" rescore="1" />
+  <row cycle="10" read_as="T" really_a="3" really_c="47" really_g="5" really_t="25116" rescore="1" />
+  <row cycle="11" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="11" read_as="A" really_a="27637" really_c="68" really_g="59" really_t="9" rescore="1" />
+  <row cycle="11" read_as="C" really_a="3" really_c="21653" really_g="5" really_t="37" rescore="1" />
+  <row cycle="11" read_as="G" really_a="13" really_c="2" really_g="21738" really_t="31" rescore="1" />
+  <row cycle="11" read_as="T" really_a="3" really_c="65" really_g="5" really_t="25327" rescore="1" />
+  <row cycle="12" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="12" read_as="A" really_a="26967" really_c="99" really_g="40" really_t="4" rescore="1" />
+  <row cycle="12" read_as="C" really_a="3" really_c="21616" really_g="3" really_t="30" rescore="1" />
+  <row cycle="12" read_as="G" really_a="12" really_c="3" really_g="21480" really_t="25" rescore="1" />
+  <row cycle="12" read_as="T" really_a="4" really_c="63" really_g="19" really_t="26287" rescore="1" />
+  <row cycle="13" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="13" read_as="A" really_a="27606" really_c="55" really_g="36" really_t="12" rescore="1" />
+  <row cycle="13" read_as="C" really_a="10" really_c="21484" really_g="6" really_t="48" rescore="1" />
+  <row cycle="13" read_as="G" really_a="26" really_c="2" really_g="21426" really_t="48" rescore="1" />
+  <row cycle="13" read_as="T" really_a="3" really_c="49" really_g="2" really_t="25842" rescore="1" />
+  <row cycle="14" read_as="N" really_a="0" really_c="0" really_g="0" really_t="1" rescore="1" />
+  <row cycle="14" read_as="A" really_a="27944" really_c="75" really_g="38" really_t="10" rescore="1" />
+  <row cycle="14" read_as="C" really_a="2" really_c="21489" really_g="8" really_t="32" rescore="1" />
+  <row cycle="14" read_as="G" really_a="17" really_c="2" really_g="21150" really_t="31" rescore="1" />
+  <row cycle="14" read_as="T" really_a="6" really_c="61" really_g="13" really_t="25776" rescore="1" />
+  <row cycle="15" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="15" read_as="A" really_a="27056" really_c="59" really_g="47" really_t="5" rescore="1" />
+  <row cycle="15" read_as="C" really_a="8" really_c="21667" really_g="9" really_t="38" rescore="1" />
+  <row cycle="15" read_as="G" really_a="16" really_c="2" really_g="20907" really_t="25" rescore="1" />
+  <row cycle="15" read_as="T" really_a="2" really_c="45" really_g="17" really_t="26752" rescore="1" />
+  <row cycle="16" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="16" read_as="A" really_a="27469" really_c="53" really_g="40" really_t="5" rescore="1" />
+  <row cycle="16" read_as="C" really_a="3" really_c="21464" really_g="4" really_t="36" rescore="1" />
+  <row cycle="16" read_as="G" really_a="15" really_c="3" really_g="21276" really_t="37" rescore="1" />
+  <row cycle="16" read_as="T" really_a="9" really_c="65" really_g="11" really_t="26165" rescore="1" />
+  <row cycle="17" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="17" read_as="A" really_a="27772" really_c="41" really_g="46" really_t="12" rescore="1" />
+  <row cycle="17" read_as="C" really_a="5" really_c="21547" really_g="4" really_t="38" rescore="1" />
+  <row cycle="17" read_as="G" really_a="15" really_c="3" really_g="21214" really_t="34" rescore="1" />
+  <row cycle="17" read_as="T" really_a="3" really_c="49" really_g="11" really_t="25861" rescore="1" />
+  <row cycle="18" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="18" read_as="A" really_a="26849" really_c="55" really_g="40" really_t="6" rescore="1" />
+  <row cycle="18" read_as="C" really_a="5" really_c="22172" really_g="6" really_t="36" rescore="1" />
+  <row cycle="18" read_as="G" really_a="22" really_c="4" really_g="21014" really_t="42" rescore="1" />
+  <row cycle="18" read_as="T" really_a="5" really_c="50" really_g="11" really_t="26338" rescore="1" />
+  <row cycle="19" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="19" read_as="A" really_a="27293" really_c="58" really_g="42" really_t="7" rescore="1" />
+  <row cycle="19" read_as="C" really_a="5" really_c="21645" really_g="3" really_t="41" rescore="1" />
+  <row cycle="19" read_as="G" really_a="21" really_c="1" really_g="21173" really_t="23" rescore="1" />
+  <row cycle="19" read_as="T" really_a="8" really_c="40" really_g="19" really_t="26276" rescore="1" />
+  <row cycle="20" read_as="N" really_a="1" really_c="1" really_g="2" really_t="3" rescore="1" />
+  <row cycle="20" read_as="A" really_a="27381" really_c="82" really_g="45" really_t="12" rescore="1" />
+  <row cycle="20" read_as="C" really_a="6" really_c="21645" really_g="9" really_t="28" rescore="1" />
+  <row cycle="20" read_as="G" really_a="24" really_c="3" really_g="21100" really_t="37" rescore="1" />
+  <row cycle="20" read_as="T" really_a="6" really_c="37" really_g="15" really_t="26218" rescore="1" />
+  <row cycle="21" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="21" read_as="A" really_a="26521" really_c="67" really_g="52" really_t="8" rescore="1" />
+  <row cycle="21" read_as="C" really_a="4" really_c="21947" really_g="3" really_t="27" rescore="1" />
+  <row cycle="21" read_as="G" really_a="14" really_c="2" really_g="20885" really_t="32" rescore="1" />
+  <row cycle="21" read_as="T" really_a="4" really_c="55" really_g="18" really_t="27016" rescore="1" />
+  <row cycle="22" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="22" read_as="A" really_a="26904" really_c="49" really_g="31" really_t="14" rescore="1" />
+  <row cycle="22" read_as="C" really_a="15" really_c="21854" really_g="10" really_t="52" rescore="1" />
+  <row cycle="22" read_as="G" really_a="21" really_c="1" really_g="21366" really_t="46" rescore="1" />
+  <row cycle="22" read_as="T" really_a="4" really_c="35" really_g="2" really_t="26251" rescore="1" />
+  <row cycle="23" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="23" read_as="A" really_a="27433" really_c="71" really_g="39" really_t="9" rescore="1" />
+  <row cycle="23" read_as="C" really_a="6" really_c="21482" really_g="13" really_t="28" rescore="1" />
+  <row cycle="23" read_as="G" really_a="25" really_c="2" really_g="21142" really_t="37" rescore="1" />
+  <row cycle="23" read_as="T" really_a="5" really_c="48" really_g="36" really_t="26279" rescore="1" />
+  <row cycle="24" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="24" read_as="A" really_a="26770" really_c="66" really_g="62" really_t="5" rescore="1" />
+  <row cycle="24" read_as="C" really_a="3" really_c="21840" really_g="6" really_t="32" rescore="1" />
+  <row cycle="24" read_as="G" really_a="15" really_c="3" really_g="20685" really_t="24" rescore="1" />
+  <row cycle="24" read_as="T" really_a="7" really_c="48" really_g="89" really_t="27000" rescore="1" />
+  <row cycle="25" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="25" read_as="A" really_a="27185" really_c="71" really_g="50" really_t="6" rescore="1" />
+  <row cycle="25" read_as="C" really_a="7" really_c="21584" really_g="13" really_t="34" rescore="1" />
+  <row cycle="25" read_as="G" really_a="19" really_c="4" really_g="21141" really_t="27" rescore="1" />
+  <row cycle="25" read_as="T" really_a="4" really_c="46" really_g="48" really_t="26416" rescore="1" />
+  <row cycle="26" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="26" read_as="A" really_a="27214" really_c="122" really_g="54" really_t="7" rescore="1" />
+  <row cycle="26" read_as="C" really_a="7" really_c="21474" really_g="13" really_t="40" rescore="1" />
+  <row cycle="26" read_as="G" really_a="25" really_c="6" really_g="21224" really_t="39" rescore="1" />
+  <row cycle="26" read_as="T" really_a="31" really_c="59" really_g="246" really_t="26094" rescore="1" />
+  <row cycle="27" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="27" read_as="A" really_a="26765" really_c="70" really_g="46" really_t="14" rescore="1" />
+  <row cycle="27" read_as="C" really_a="15" really_c="21805" really_g="8" really_t="54" rescore="1" />
+  <row cycle="27" read_as="G" really_a="26" really_c="3" really_g="21348" really_t="60" rescore="1" />
+  <row cycle="27" read_as="T" really_a="12" really_c="69" really_g="74" really_t="26286" rescore="1" />
+  <row cycle="28" read_as="N" really_a="4" really_c="8" really_g="6" really_t="8" rescore="1" />
+  <row cycle="28" read_as="A" really_a="26905" really_c="145" really_g="58" really_t="11" rescore="1" />
+  <row cycle="28" read_as="C" really_a="10" really_c="21538" really_g="9" really_t="35" rescore="1" />
+  <row cycle="28" read_as="G" really_a="15" really_c="17" really_g="21233" really_t="38" rescore="1" />
+  <row cycle="28" read_as="T" really_a="34" really_c="99" really_g="452" really_t="26030" rescore="1" />
+  <row cycle="29" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="29" read_as="A" really_a="27018" really_c="98" really_g="50" really_t="6" rescore="1" />
+  <row cycle="29" read_as="C" really_a="15" really_c="21513" really_g="15" really_t="34" rescore="1" />
+  <row cycle="29" read_as="G" really_a="18" really_c="8" really_g="21559" really_t="44" rescore="1" />
+  <row cycle="29" read_as="T" really_a="15" really_c="67" really_g="213" really_t="25982" rescore="1" />
+  <row cycle="30" read_as="N" really_a="0" really_c="1" really_g="0" really_t="1" rescore="1" />
+  <row cycle="30" read_as="A" really_a="26562" really_c="64" really_g="51" really_t="14" rescore="1" />
+  <row cycle="30" read_as="C" really_a="13" really_c="21968" really_g="9" really_t="55" rescore="1" />
+  <row cycle="30" read_as="G" really_a="18" really_c="6" really_g="21186" really_t="51" rescore="1" />
+  <row cycle="30" read_as="T" really_a="17" really_c="69" really_g="103" really_t="26467" rescore="1" />
+  <row cycle="31" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="31" read_as="A" really_a="26791" really_c="121" really_g="37" really_t="10" rescore="1" />
+  <row cycle="31" read_as="C" really_a="7" really_c="21650" really_g="13" really_t="28" rescore="1" />
+  <row cycle="31" read_as="G" really_a="22" really_c="17" really_g="20877" really_t="44" rescore="1" />
+  <row cycle="31" read_as="T" really_a="35" really_c="150" really_g="573" really_t="26280" rescore="1" />
+  <row cycle="32" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="32" read_as="A" really_a="27138" really_c="85" really_g="50" really_t="20" rescore="1" />
+  <row cycle="32" read_as="C" really_a="19" really_c="21474" really_g="14" really_t="49" rescore="1" />
+  <row cycle="32" read_as="G" really_a="22" really_c="10" really_g="21236" really_t="49" rescore="1" />
+  <row cycle="32" read_as="T" really_a="26" really_c="68" really_g="241" really_t="26154" rescore="1" />
+  <row cycle="33" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="33" read_as="A" really_a="26534" really_c="116" really_g="53" really_t="28" rescore="1" />
+  <row cycle="33" read_as="C" really_a="22" really_c="21796" really_g="25" really_t="56" rescore="1" />
+  <row cycle="33" read_as="G" really_a="24" really_c="15" really_g="21261" really_t="58" rescore="1" />
+  <row cycle="33" read_as="T" really_a="30" really_c="99" really_g="211" really_t="26317" rescore="1" />
+  <row cycle="34" read_as="N" really_a="4" really_c="6" really_g="7" really_t="8" rescore="1" />
+  <row cycle="34" read_as="A" really_a="26656" really_c="132" really_g="67" really_t="23" rescore="1" />
+  <row cycle="34" read_as="C" really_a="36" really_c="21543" really_g="35" really_t="54" rescore="1" />
+  <row cycle="34" read_as="G" really_a="33" really_c="21" really_g="21033" really_t="49" rescore="1" />
+  <row cycle="34" read_as="T" really_a="40" really_c="165" really_g="571" really_t="26145" rescore="1" />
+  <row cycle="35" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="35" read_as="A" really_a="26992" really_c="139" really_g="61" really_t="29" rescore="1" />
+  <row cycle="35" read_as="C" really_a="24" really_c="21167" really_g="27" really_t="57" rescore="1" />
+  <row cycle="35" read_as="G" really_a="34" really_c="23" really_g="21000" really_t="62" rescore="1" />
+  <row cycle="35" read_as="T" really_a="70" really_c="170" really_g="811" really_t="25951" rescore="1" />
+  <row cycle="36" read_as="N" really_a="8" really_c="6" really_g="4" really_t="5" rescore="1" />
+  <row cycle="36" read_as="A" really_a="26575" really_c="144" really_g="64" really_t="45" rescore="1" />
+  <row cycle="36" read_as="C" really_a="29" really_c="21379" really_g="19" really_t="64" rescore="1" />
+  <row cycle="36" read_as="G" really_a="40" really_c="20" really_g="21054" really_t="85" rescore="1" />
+  <row cycle="36" read_as="T" really_a="35" really_c="109" really_g="260" really_t="26662" rescore="1" />
+  <row cycle="37" read_as="N" really_a="4" really_c="3" really_g="2" really_t="4" rescore="1" />
+  <row cycle="37" read_as="A" really_a="25958" really_c="141" really_g="78" really_t="106" rescore="1" />
+  <row cycle="37" read_as="C" really_a="450" really_c="20756" really_g="75" really_t="117" rescore="1" />
+  <row cycle="37" read_as="G" really_a="215" really_c="101" really_g="20426" really_t="191" rescore="1" />
+  <row cycle="37" read_as="T" really_a="538" really_c="400" really_g="992" really_t="26033" rescore="1" />
+</errors_by_cycle_and_nucleotide>
+<most_common_word>
+  <row rank="1" occurrence="34" word="GTACGGGGAAGGACGTCAATAGTCACACAGTCCTTGA" number_of_sequences="1" rescore="1" />
+  <row rank="2" occurrence="31" word="GCCACCAGCAAGAGCAGAAGCAATACCGCCAGCAATA" number_of_sequences="1" rescore="1" />
+  <row rank="3" occurrence="28" word="GCTGACAACCGTCCTTTACTTGTCATGCGCTCTAATC" number_of_sequences="2" rescore="1" />
+  <row rank="3" occurrence="28" word="GTCCGGTTAAAGCCGCTGAATTGTTCGCGTTTACCTT" number_of_sequences="2" rescore="1" />
+  <row rank="4" occurrence="27" word="AGTCGGCGTGTGAATCATTAGCCTTGCGACCCTCGGC" number_of_sequences="6" rescore="1" />
+  <row rank="4" occurrence="27" word="CGCCAGTTAAATAGCTTGCAAAATACGTGGCCTTATG" number_of_sequences="6" rescore="1" />
+  <row rank="4" occurrence="27" word="GAACGTCAGAAGCAGCCTTATGGCCGTCAACATACAT" number_of_sequences="6" rescore="1" />
+  <row rank="4" occurrence="27" word="GCCGTGGATGCCTGACCGTACCGAGGCTAACCCTAAT" number_of_sequences="6" rescore="1" />
+  <row rank="4" occurrence="27" word="GGCATCAAAAGCAATATCAGCACCAACAGAAACAACC" number_of_sequences="6" rescore="1" />
+  <row rank="4" occurrence="27" word="GGTCAAAAAGCCGCCTCCGGTGGCATTCAAGGTGATG" number_of_sequences="6" rescore="1" />
+  <row rank="5" occurrence="26" word="ACCGCTTCGGCGTTATAACCTCACACTCAATCTTTTA" number_of_sequences="6" rescore="1" />
+  <row rank="5" occurrence="26" word="ATCAAAAGCAATATCAGCACCAACAGAAACAACCTGA" number_of_sequences="6" rescore="1" />
+  <row rank="5" occurrence="26" word="CGTGGATGCCTGACCGTACCGAGGCTAACCCTAATGA" number_of_sequences="6" rescore="1" />
+  <row rank="5" occurrence="26" word="GAGAAGCTCTTACTTTGCGACCTTTCGCCATCAACTA" number_of_sequences="6" rescore="1" />
+  <row rank="5" occurrence="26" word="GTTGGATGAGGAGAAGTGGCTTAATATGCTTGGCACG" number_of_sequences="6" rescore="1" />
+  <row rank="5" occurrence="26" word="TGTTGAACACGACCAGAAAACTGGCCTAACGACGTTT" number_of_sequences="6" rescore="1" />
+  <row rank="6" occurrence="25" word="AGACTTGCCACCAAGTCCAACCAAATCAAGCAACTTA" number_of_sequences="2" rescore="1" />
+  <row rank="6" occurrence="25" word="GGCGATTGCGTACCCGACGACCAAAATTAGGGTCAAC" number_of_sequences="2" rescore="1" />
+  <row rank="7" occurrence="24" word="AAGAGCAGAAGCAATACCGCCAGCAATAGCACCAAAC" number_of_sequences="5" rescore="1" />
+  <row rank="7" occurrence="24" word="AAGCTGCTTATGCTAATTTGCATACTGACCAAGAACG" number_of_sequences="5" rescore="1" />
+  <row rank="7" occurrence="24" word="GAACGTGCCAAGCATATTAAGCCACTTCTCCTCATCC" number_of_sequences="5" rescore="1" />
+  <row rank="7" occurrence="24" word="GAAGTTGCGGCTCATTCTGATTCTGAACAGCTTCTTG" number_of_sequences="5" rescore="1" />
+  <row rank="7" occurrence="24" word="GGTGGCATTCAAGGTGATGTGCTTGCTACCGATAACA" number_of_sequences="5" rescore="1" />
+  <row rank="8" occurrence="23" word="" number_of_sequences="21" rescore="1" />
+  <row rank="9" occurrence="22" word="" number_of_sequences="20" rescore="1" />
+  <row rank="10" occurrence="21" word="" number_of_sequences="15" rescore="1" />
+  <row rank="11" occurrence="20" word="" number_of_sequences="30" rescore="1" />
+  <row rank="12" occurrence="19" word="" number_of_sequences="54" rescore="1" />
+  <row rank="13" occurrence="18" word="" number_of_sequences="63" rescore="1" />
+  <row rank="14" occurrence="17" word="" number_of_sequences="107" rescore="1" />
+  <row rank="15" occurrence="16" word="" number_of_sequences="115" rescore="1" />
+  <row rank="16" occurrence="15" word="" number_of_sequences="190" rescore="1" />
+  <row rank="17" occurrence="14" word="" number_of_sequences="260" rescore="1" />
+  <row rank="18" occurrence="13" word="" number_of_sequences="360" rescore="1" />
+  <row rank="19" occurrence="12" word="" number_of_sequences="436" rescore="1" />
+  <row rank="20" occurrence="11" word="" number_of_sequences="606" rescore="1" />
+  <row rank="21" occurrence="10" word="" number_of_sequences="803" rescore="1" />
+  <row rank="22" occurrence="9" word="" number_of_sequences="912" rescore="1" />
+  <row rank="23" occurrence="8" word="" number_of_sequences="1082" rescore="1" />
+  <row rank="24" occurrence="7" word="" number_of_sequences="1204" rescore="1" />
+  <row rank="25" occurrence="6" word="" number_of_sequences="1215" rescore="1" />
+  <row rank="26" occurrence="5" word="" number_of_sequences="1086" rescore="1" />
+  <row rank="27" occurrence="4" word="" number_of_sequences="967" rescore="1" />
+  <row rank="28" occurrence="3" word="" number_of_sequences="797" rescore="1" />
+  <row rank="29" occurrence="2" word="" number_of_sequences="1023" rescore="1" />
+  <row rank="30" occurrence="1" word="" number_of_sequences="13069" rescore="1" />
+</most_common_word>
+<most_common_blank_pattern>
+  <row rank="1" occurrence="98720" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" number_of_sequences="1" rescore="1" />
+  <row rank="2" occurrence="22" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNN.N.." number_of_sequences="1" rescore="1" />
+  <row rank="3" occurrence="14" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNN....NN....." number_of_sequences="1" rescore="1" />
+  <row rank="4" occurrence="13" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNN.NNNNN.N.." number_of_sequences="1" rescore="1" />
+  <row rank="5" occurrence="10" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNN.NNNNN.N.N" number_of_sequences="1" rescore="1" />
+  <row rank="6" occurrence="7" pattern="NNNNNNNNNNNNNNNNNNN.NNNNNNNNNNNNNNNNN" number_of_sequences="1" rescore="1" />
+  <row rank="7" occurrence="5" pattern=".NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" number_of_sequences="1" rescore="1" />
+  <row rank="8" occurrence="4" pattern=".NNNNNNNNNNNNNNNNNNNNNNNNNNNN.NNNNNNN" number_of_sequences="3" rescore="1" />
+  <row rank="8" occurrence="4" pattern="NNN.NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" number_of_sequences="3" rescore="1" />
+  <row rank="8" occurrence="4" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNN....NNN...." number_of_sequences="3" rescore="1" />
+  <row rank="9" occurrence="2" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNN.NNNNN.NNN" number_of_sequences="1" rescore="1" />
+  <row rank="10" occurrence="1" pattern="" number_of_sequences="9" rescore="1" />
+</most_common_blank_pattern>
+</run_tile>
+<run_tile id_run="1829" tile="1" position="4" end="2">
+<tile_score base_count="2707216" error_count="58095" blank_count="120" unique_alignments="73168" ua_total_score="10026198" cycles="37" rescore="1" score_version="" score_date_run="" phagealign_version="" phagealign_date_run="" max_blanks="" seq_length="" genome_file="" bases_used="" qualityfilter_version="" qualityfilter_date_run="" filter_criterion="" />
+<cumulative_errors_by_cycle>
+  <row cycle="1" one="72666" two="73168" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="2" one="72091" two="73164" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="3" one="71137" two="73148" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="4" one="70617" two="73137" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="5" one="68385" two="73020" three="73137" four="73137" five="73137" rescore="1" />
+  <row cycle="6" one="67677" two="72988" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="7" one="66925" two="72922" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="8" one="66471" two="72854" three="73167" four="73167" five="73167" rescore="1" />
+  <row cycle="9" one="65693" two="72768" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="10" one="65238" two="72703" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="11" one="64437" two="72588" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="12" one="63797" two="72475" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="13" one="62597" two="72266" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="14" one="61504" two="72039" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="15" one="60625" two="71813" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="16" one="60215" two="71699" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="17" one="59806" two="71586" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="18" one="59465" two="71509" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="19" one="57818" two="71127" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="20" one="56781" two="70821" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="21" one="55615" two="70454" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="22" one="55150" two="70286" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="23" one="54824" two="70143" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="24" one="54193" two="69925" three="73164" four="73164" five="73164" rescore="1" />
+  <row cycle="25" one="53346" two="69565" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="26" one="50255" two="68511" three="73164" four="73164" five="73164" rescore="1" />
+  <row cycle="27" one="47764" two="67286" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="28" one="46016" two="66123" three="73167" four="73167" five="73167" rescore="1" />
+  <row cycle="29" one="44399" two="64941" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="30" one="43447" two="64099" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="31" one="43135" two="63777" three="73157" four="73157" five="73157" rescore="1" />
+  <row cycle="32" one="40089" two="61239" three="73168" four="73168" five="73168" rescore="1" />
+  <row cycle="33" one="39614" two="60652" three="72582" four="73156" five="73156" rescore="1" />
+  <row cycle="34" one="39294" two="60260" three="72166" four="73095" five="73143" rescore="1" />
+  <row cycle="35" one="38044" two="58745" three="70882" four="72936" five="73108" rescore="1" />
+  <row cycle="36" one="37033" two="57543" three="69729" four="72658" five="73082" rescore="1" />
+  <row cycle="37" one="36377" two="56761" three="68964" four="72300" five="72968" rescore="1" />
+</cumulative_errors_by_cycle>
+<log_likelihood>
+  <row cycle="1" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="1" read_as="A" really_a="217" really_c="-239" really_g="-266" really_t="-336" rescore="1" />
+  <row cycle="1" read_as="C" really_a="-337" really_c="233" really_g="-271" really_t="-264" rescore="1" />
+  <row cycle="1" read_as="G" really_a="-288" really_c="-292" really_g="197" really_t="-210" rescore="1" />
+  <row cycle="1" read_as="T" really_a="-290" really_c="-263" really_g="-260" really_t="221" rescore="1" />
+  <row cycle="2" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="2" read_as="A" really_a="216" really_c="-237" really_g="-273" really_t="-313" rescore="1" />
+  <row cycle="2" read_as="C" really_a="-289" really_c="226" really_g="-267" really_t="-269" rescore="1" />
+  <row cycle="2" read_as="G" really_a="-273" really_c="-271" really_g="189" really_t="-204" rescore="1" />
+  <row cycle="2" read_as="T" really_a="-336" really_c="-274" really_g="-230" really_t="214" rescore="1" />
+  <row cycle="3" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="3" read_as="A" really_a="201" really_c="-220" really_g="-264" really_t="-297" rescore="1" />
+  <row cycle="3" read_as="C" really_a="-268" really_c="205" really_g="-254" really_t="-242" rescore="1" />
+  <row cycle="3" read_as="G" really_a="-249" really_c="-229" really_g="157" really_t="-174" rescore="1" />
+  <row cycle="3" read_as="T" really_a="-310" really_c="-259" really_g="-212" really_t="196" rescore="1" />
+  <row cycle="4" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="4" read_as="A" really_a="216" really_c="-233" really_g="-275" really_t="-334" rescore="1" />
+  <row cycle="4" read_as="C" really_a="-314" really_c="230" really_g="-272" really_t="-262" rescore="1" />
+  <row cycle="4" read_as="G" really_a="-334" really_c="-277" really_g="190" really_t="-198" rescore="1" />
+  <row cycle="4" read_as="T" really_a="-348" really_c="-278" really_g="-252" really_t="230" rescore="1" />
+  <row cycle="5" read_as="N" really_a="-71" really_c="-53" really_g="-38" really_t="-32" rescore="1" />
+  <row cycle="5" read_as="A" really_a="182" really_c="-207" really_g="-241" really_t="-259" rescore="1" />
+  <row cycle="5" read_as="C" really_a="-240" really_c="175" really_g="-217" really_t="-216" rescore="1" />
+  <row cycle="5" read_as="G" really_a="-212" really_c="-193" really_g="125" really_t="-146" rescore="1" />
+  <row cycle="5" read_as="T" really_a="-284" really_c="-254" really_g="-140" really_t="135" rescore="1" />
+  <row cycle="6" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="6" read_as="A" really_a="212" really_c="-235" really_g="-267" really_t="-306" rescore="1" />
+  <row cycle="6" read_as="C" really_a="-274" really_c="213" really_g="-265" really_t="-248" rescore="1" />
+  <row cycle="6" read_as="G" really_a="-279" really_c="-243" really_g="168" really_t="-182" rescore="1" />
+  <row cycle="6" read_as="T" really_a="-343" really_c="-274" really_g="-211" really_t="200" rescore="1" />
+  <row cycle="7" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="7" read_as="A" really_a="220" really_c="-240" really_g="-275" really_t="-323" rescore="1" />
+  <row cycle="7" read_as="C" really_a="-277" really_c="210" really_g="-264" really_t="-241" rescore="1" />
+  <row cycle="7" read_as="G" really_a="-258" really_c="-242" really_g="166" really_t="-181" rescore="1" />
+  <row cycle="7" read_as="T" really_a="-325" really_c="-272" really_g="-207" really_t="196" rescore="1" />
+  <row cycle="8" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="8" read_as="A" really_a="235" really_c="-258" really_g="-289" really_t="-328" rescore="1" />
+  <row cycle="8" read_as="C" really_a="-324" really_c="225" really_g="-269" really_t="-251" rescore="1" />
+  <row cycle="8" read_as="G" really_a="-269" really_c="-267" really_g="185" really_t="-201" rescore="1" />
+  <row cycle="8" read_as="T" really_a="-360" really_c="-304" really_g="-233" really_t="223" rescore="1" />
+  <row cycle="9" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="9" read_as="A" really_a="208" really_c="-230" really_g="-259" really_t="-316" rescore="1" />
+  <row cycle="9" read_as="C" really_a="-269" really_c="209" really_g="-256" really_t="-248" rescore="1" />
+  <row cycle="9" read_as="G" really_a="-274" really_c="-253" really_g="173" really_t="-187" rescore="1" />
+  <row cycle="9" read_as="T" really_a="-315" really_c="-278" really_g="-193" really_t="184" rescore="1" />
+  <row cycle="10" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="10" read_as="A" really_a="229" really_c="-260" really_g="-275" really_t="-307" rescore="1" />
+  <row cycle="10" read_as="C" really_a="-303" really_c="223" really_g="-276" really_t="-249" rescore="1" />
+  <row cycle="10" read_as="G" really_a="-292" really_c="-299" really_g="201" really_t="-212" rescore="1" />
+  <row cycle="10" read_as="T" really_a="-329" really_c="-268" really_g="-223" really_t="207" rescore="1" />
+  <row cycle="11" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="11" read_as="A" really_a="210" really_c="-230" really_g="-266" really_t="-320" rescore="1" />
+  <row cycle="11" read_as="C" really_a="-270" really_c="209" really_g="-245" really_t="-260" rescore="1" />
+  <row cycle="11" read_as="G" really_a="-271" really_c="-249" really_g="178" really_t="-194" rescore="1" />
+  <row cycle="11" read_as="T" really_a="-315" really_c="-255" really_g="-182" really_t="172" rescore="1" />
+  <row cycle="12" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="12" read_as="A" really_a="210" really_c="-232" really_g="-265" really_t="-310" rescore="1" />
+  <row cycle="12" read_as="C" really_a="-292" really_c="222" really_g="-274" really_t="-253" rescore="1" />
+  <row cycle="12" read_as="G" really_a="-269" really_c="-253" really_g="179" really_t="-195" rescore="1" />
+  <row cycle="12" read_as="T" really_a="-346" really_c="-265" really_g="-202" really_t="192" rescore="1" />
+  <row cycle="13" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="13" read_as="A" really_a="207" really_c="-231" really_g="-258" really_t="-297" rescore="1" />
+  <row cycle="13" read_as="C" really_a="-250" really_c="192" really_g="-228" really_t="-245" rescore="1" />
+  <row cycle="13" read_as="G" really_a="-232" really_c="-229" really_g="159" really_t="-181" rescore="1" />
+  <row cycle="13" read_as="T" really_a="-303" really_c="-264" really_g="-152" really_t="147" rescore="1" />
+  <row cycle="14" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="14" read_as="A" really_a="208" really_c="-232" really_g="-260" really_t="-304" rescore="1" />
+  <row cycle="14" read_as="C" really_a="-253" really_c="201" really_g="-246" really_t="-249" rescore="1" />
+  <row cycle="14" read_as="G" really_a="-245" really_c="-214" really_g="158" really_t="-182" rescore="1" />
+  <row cycle="14" read_as="T" really_a="-305" really_c="-255" really_g="-157" really_t="151" rescore="1" />
+  <row cycle="15" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="15" read_as="A" really_a="220" really_c="-243" really_g="-270" really_t="-319" rescore="1" />
+  <row cycle="15" read_as="C" really_a="-257" really_c="203" really_g="-246" really_t="-250" rescore="1" />
+  <row cycle="15" read_as="G" really_a="-265" really_c="-232" really_g="174" really_t="-196" rescore="1" />
+  <row cycle="15" read_as="T" really_a="-303" really_c="-251" really_g="-163" really_t="156" rescore="1" />
+  <row cycle="16" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="16" read_as="A" really_a="230" really_c="-255" really_g="-275" really_t="-347" rescore="1" />
+  <row cycle="16" read_as="C" really_a="-306" really_c="236" really_g="-275" really_t="-278" rescore="1" />
+  <row cycle="16" read_as="G" really_a="-286" really_c="-282" really_g="200" really_t="-215" rescore="1" />
+  <row cycle="16" read_as="T" really_a="-370" really_c="-275" really_g="-210" really_t="200" rescore="1" />
+  <row cycle="17" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="17" read_as="A" really_a="226" really_c="-250" really_g="-273" really_t="-336" rescore="1" />
+  <row cycle="17" read_as="C" really_a="-325" really_c="237" really_g="-286" really_t="-263" rescore="1" />
+  <row cycle="17" read_as="G" really_a="-294" really_c="-292" really_g="206" really_t="-220" rescore="1" />
+  <row cycle="17" read_as="T" really_a="-370" really_c="-273" really_g="-208" really_t="198" rescore="1" />
+  <row cycle="18" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="18" read_as="A" really_a="238" really_c="-261" really_g="-289" really_t="-340" rescore="1" />
+  <row cycle="18" read_as="C" really_a="-307" really_c="250" really_g="-326" really_t="-275" rescore="1" />
+  <row cycle="18" read_as="G" really_a="-296" really_c="-296" really_g="208" really_t="-221" rescore="1" />
+  <row cycle="18" read_as="T" really_a="-361" really_c="-270" really_g="-226" really_t="211" rescore="1" />
+  <row cycle="19" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="19" read_as="A" really_a="204" really_c="-220" really_g="-273" really_t="-297" rescore="1" />
+  <row cycle="19" read_as="C" really_a="-237" really_c="195" really_g="-254" really_t="-241" rescore="1" />
+  <row cycle="19" read_as="G" really_a="-229" really_c="-216" really_g="156" really_t="-182" rescore="1" />
+  <row cycle="19" read_as="T" really_a="-273" really_c="-240" really_g="-124" really_t="119" rescore="1" />
+  <row cycle="20" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="20" read_as="A" really_a="209" really_c="-225" really_g="-272" really_t="-324" rescore="1" />
+  <row cycle="20" read_as="C" really_a="-260" really_c="217" really_g="-264" really_t="-270" rescore="1" />
+  <row cycle="20" read_as="G" really_a="-255" really_c="-228" really_g="173" really_t="-198" rescore="1" />
+  <row cycle="20" read_as="T" really_a="-313" really_c="-243" really_g="-145" really_t="139" rescore="1" />
+  <row cycle="21" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="21" read_as="A" really_a="208" really_c="-227" really_g="-264" really_t="-322" rescore="1" />
+  <row cycle="21" read_as="C" really_a="-240" really_c="206" really_g="-274" really_t="-254" rescore="1" />
+  <row cycle="21" read_as="G" really_a="-248" really_c="-222" really_g="165" really_t="-189" rescore="1" />
+  <row cycle="21" read_as="T" really_a="-294" really_c="-252" really_g="-139" really_t="134" rescore="1" />
+  <row cycle="22" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="22" read_as="A" really_a="227" really_c="-254" really_g="-272" really_t="-327" rescore="1" />
+  <row cycle="22" read_as="C" really_a="-310" really_c="238" really_g="-310" really_t="-258" rescore="1" />
+  <row cycle="22" read_as="G" really_a="-283" really_c="-276" really_g="199" really_t="-216" rescore="1" />
+  <row cycle="22" read_as="T" really_a="-340" really_c="-270" really_g="-190" really_t="182" rescore="1" />
+  <row cycle="23" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="23" read_as="A" really_a="239" really_c="-265" really_g="-280" really_t="-361" rescore="1" />
+  <row cycle="23" read_as="C" really_a="-313" really_c="235" really_g="-291" really_t="-262" rescore="1" />
+  <row cycle="23" read_as="G" really_a="-282" really_c="-313" really_g="213" really_t="-229" rescore="1" />
+  <row cycle="23" read_as="T" really_a="-345" really_c="-273" really_g="-211" really_t="199" rescore="1" />
+  <row cycle="24" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="24" read_as="A" really_a="233" really_c="-259" really_g="-280" really_t="-330" rescore="1" />
+  <row cycle="24" read_as="C" really_a="-296" really_c="241" really_g="-294" really_t="-278" rescore="1" />
+  <row cycle="24" read_as="G" really_a="-282" really_c="-268" really_g="201" really_t="-221" rescore="1" />
+  <row cycle="24" read_as="T" really_a="-311" really_c="-259" really_g="-163" really_t="157" rescore="1" />
+  <row cycle="25" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="25" read_as="A" really_a="211" really_c="-225" really_g="-273" really_t="-347" rescore="1" />
+  <row cycle="25" read_as="C" really_a="-259" really_c="215" really_g="-261" really_t="-268" rescore="1" />
+  <row cycle="25" read_as="G" really_a="-270" really_c="-239" really_g="184" really_t="-208" rescore="1" />
+  <row cycle="25" read_as="T" really_a="-285" really_c="-245" really_g="-151" really_t="144" rescore="1" />
+  <row cycle="26" read_as="N" really_a="0" really_c="-47" really_g="0" really_t="-47" rescore="1" />
+  <row cycle="26" read_as="A" really_a="185" really_c="-200" really_g="-252" really_t="-299" rescore="1" />
+  <row cycle="26" read_as="C" really_a="-224" really_c="183" really_g="-239" really_t="-233" rescore="1" />
+  <row cycle="26" read_as="G" really_a="-208" really_c="-171" really_g="128" really_t="-164" rescore="1" />
+  <row cycle="26" read_as="T" really_a="-248" really_c="-201" really_g="-87" really_t="82" rescore="1" />
+  <row cycle="27" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="27" read_as="A" really_a="188" really_c="-207" really_g="-252" really_t="-283" rescore="1" />
+  <row cycle="27" read_as="C" really_a="-214" really_c="172" really_g="-218" really_t="-228" rescore="1" />
+  <row cycle="27" read_as="G" really_a="-208" really_c="-185" really_g="131" really_t="-161" rescore="1" />
+  <row cycle="27" read_as="T" really_a="-241" really_c="-208" really_g="-95" really_t="89" rescore="1" />
+  <row cycle="28" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="28" read_as="A" really_a="195" really_c="-210" really_g="-274" really_t="-286" rescore="1" />
+  <row cycle="28" read_as="C" really_a="-224" really_c="187" really_g="-248" really_t="-238" rescore="1" />
+  <row cycle="28" read_as="G" really_a="-218" really_c="-199" really_g="142" really_t="-170" rescore="1" />
+  <row cycle="28" read_as="T" really_a="-255" really_c="-221" really_g="-105" really_t="100" rescore="1" />
+  <row cycle="29" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="29" read_as="A" really_a="194" really_c="-207" really_g="-269" really_t="-301" rescore="1" />
+  <row cycle="29" read_as="C" really_a="-235" really_c="195" really_g="-252" really_t="-246" rescore="1" />
+  <row cycle="29" read_as="G" really_a="-223" really_c="-188" really_g="146" really_t="-183" rescore="1" />
+  <row cycle="29" read_as="T" really_a="-243" really_c="-200" really_g="-109" really_t="101" rescore="1" />
+  <row cycle="30" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="30" read_as="A" really_a="211" really_c="-231" really_g="-265" really_t="-326" rescore="1" />
+  <row cycle="30" read_as="C" really_a="-246" really_c="207" really_g="-257" really_t="-264" rescore="1" />
+  <row cycle="30" read_as="G" really_a="-251" really_c="-220" really_g="171" really_t="-201" rescore="1" />
+  <row cycle="30" read_as="T" really_a="-265" really_c="-226" really_g="-128" really_t="121" rescore="1" />
+  <row cycle="31" read_as="N" really_a="-42" really_c="-65" really_g="7" really_t="-47" rescore="1" />
+  <row cycle="31" read_as="A" really_a="233" really_c="-261" really_g="-276" really_t="-335" rescore="1" />
+  <row cycle="31" read_as="C" really_a="-291" really_c="236" really_g="-295" really_t="-269" rescore="1" />
+  <row cycle="31" read_as="G" really_a="-302" really_c="-280" really_g="201" really_t="-214" rescore="1" />
+  <row cycle="31" read_as="T" really_a="-294" really_c="-251" really_g="-197" really_t="182" rescore="1" />
+  <row cycle="32" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="32" read_as="A" really_a="186" really_c="-205" really_g="-242" really_t="-298" rescore="1" />
+  <row cycle="32" read_as="C" really_a="-198" really_c="170" really_g="-230" really_t="-236" rescore="1" />
+  <row cycle="32" read_as="G" really_a="-182" really_c="-165" really_g="115" really_t="-152" rescore="1" />
+  <row cycle="32" read_as="T" really_a="-204" really_c="-182" really_g="-75" really_t="67" rescore="1" />
+  <row cycle="33" read_as="N" really_a="30" really_c="-47" really_g="-47" really_t="-30" rescore="1" />
+  <row cycle="33" read_as="A" really_a="203" really_c="-225" really_g="-256" really_t="-304" rescore="1" />
+  <row cycle="33" read_as="C" really_a="-258" really_c="210" really_g="-277" really_t="-244" rescore="1" />
+  <row cycle="33" read_as="G" really_a="-252" really_c="-217" really_g="170" really_t="-201" rescore="1" />
+  <row cycle="33" read_as="T" really_a="-270" really_c="-212" really_g="-140" really_t="130" rescore="1" />
+  <row cycle="34" read_as="N" really_a="-30" really_c="-30" really_g="-30" really_t="-47" rescore="1" />
+  <row cycle="34" read_as="A" really_a="215" really_c="-236" really_g="-273" really_t="-307" rescore="1" />
+  <row cycle="34" read_as="C" really_a="-263" really_c="214" really_g="-280" really_t="-248" rescore="1" />
+  <row cycle="34" read_as="G" really_a="-263" really_c="-236" really_g="181" really_t="-206" rescore="1" />
+  <row cycle="34" read_as="T" really_a="-265" really_c="-218" really_g="-163" really_t="149" rescore="1" />
+  <row cycle="35" read_as="N" really_a="-30" really_c="-54" really_g="-54" really_t="-54" rescore="1" />
+  <row cycle="35" read_as="A" really_a="184" really_c="-202" really_g="-249" really_t="-287" rescore="1" />
+  <row cycle="35" read_as="C" really_a="-209" really_c="172" really_g="-225" really_t="-229" rescore="1" />
+  <row cycle="35" read_as="G" really_a="-209" really_c="-182" really_g="139" really_t="-178" rescore="1" />
+  <row cycle="35" read_as="T" really_a="-211" really_c="-186" really_g="-90" really_t="81" rescore="1" />
+  <row cycle="36" read_as="N" really_a="-47" really_c="-47" really_g="-47" really_t="-47" rescore="1" />
+  <row cycle="36" read_as="A" really_a="181" really_c="-197" really_g="-245" really_t="-293" rescore="1" />
+  <row cycle="36" read_as="C" really_a="-217" really_c="183" really_g="-248" really_t="-232" rescore="1" />
+  <row cycle="36" read_as="G" really_a="-216" really_c="-186" really_g="143" really_t="-181" rescore="1" />
+  <row cycle="36" read_as="T" really_a="-213" really_c="-189" really_g="-96" really_t="87" rescore="1" />
+  <row cycle="37" read_as="N" really_a="-33" really_c="-72" really_g="-53" really_t="-37" rescore="1" />
+  <row cycle="37" read_as="A" really_a="201" really_c="-222" really_g="-262" really_t="-294" rescore="1" />
+  <row cycle="37" read_as="C" really_a="-246" really_c="197" really_g="-256" really_t="-235" rescore="1" />
+  <row cycle="37" read_as="G" really_a="-230" really_c="-204" really_g="160" really_t="-197" rescore="1" />
+  <row cycle="37" read_as="T" really_a="-214" really_c="-179" really_g="-121" really_t="105" rescore="1" />
+</log_likelihood>
+<information_content_by_cycle>
+  <row cycle="1" equiv_info="70705.09" align="73168" total="98784" rescore="1" />
+  <row cycle="2" equiv_info="70391.84" align="73168" total="98742" rescore="1" />
+  <row cycle="3" equiv_info="68921.07" align="73168" total="98736" rescore="1" />
+  <row cycle="4" equiv_info="70648.09" align="73168" total="98798" rescore="1" />
+  <row cycle="5" equiv_info="64790.98" align="73137" total="98621" rescore="1" />
+  <row cycle="6" equiv_info="69581.70" align="73168" total="98747" rescore="1" />
+  <row cycle="7" equiv_info="69519.01" align="73168" total="98664" rescore="1" />
+  <row cycle="8" equiv_info="70675.38" align="73167" total="98678" rescore="1" />
+  <row cycle="9" equiv_info="69337.89" align="73168" total="98722" rescore="1" />
+  <row cycle="10" equiv_info="70636.69" align="73168" total="98650" rescore="1" />
+  <row cycle="11" equiv_info="69160.62" align="73168" total="98670" rescore="1" />
+  <row cycle="12" equiv_info="69745.35" align="73168" total="98654" rescore="1" />
+  <row cycle="13" equiv_info="67577.71" align="73168" total="98622" rescore="1" />
+  <row cycle="14" equiv_info="67847.76" align="73168" total="98665" rescore="1" />
+  <row cycle="15" equiv_info="68575.24" align="73168" total="98656" rescore="1" />
+  <row cycle="16" equiv_info="70661.96" align="73168" total="98702" rescore="1" />
+  <row cycle="17" equiv_info="70673.73" align="73168" total="98653" rescore="1" />
+  <row cycle="18" equiv_info="71091.91" align="73168" total="98656" rescore="1" />
+  <row cycle="19" equiv_info="66026.34" align="73168" total="98627" rescore="1" />
+  <row cycle="20" equiv_info="67971.51" align="73168" total="98671" rescore="1" />
+  <row cycle="21" equiv_info="67397.29" align="73168" total="98724" rescore="1" />
+  <row cycle="22" equiv_info="70275.17" align="73168" total="98690" rescore="1" />
+  <row cycle="23" equiv_info="70886.37" align="73168" total="98660" rescore="1" />
+  <row cycle="24" equiv_info="69649.93" align="73164" total="98628" rescore="1" />
+  <row cycle="25" equiv_info="68336.72" align="73168" total="98628" rescore="1" />
+  <row cycle="26" equiv_info="61300.23" align="73164" total="98668" rescore="1" />
+  <row cycle="27" equiv_info="61906.49" align="73168" total="98620" rescore="1" />
+  <row cycle="28" equiv_info="63897.68" align="73167" total="98713" rescore="1" />
+  <row cycle="29" equiv_info="64009.11" align="73168" total="98707" rescore="1" />
+  <row cycle="30" equiv_info="66737.72" align="73168" total="98641" rescore="1" />
+  <row cycle="31" equiv_info="70275.70" align="73157" total="98608" rescore="1" />
+  <row cycle="32" equiv_info="58261.33" align="73168" total="98611" rescore="1" />
+  <row cycle="33" equiv_info="67013.53" align="73156" total="98612" rescore="1" />
+  <row cycle="34" equiv_info="68364.87" align="73143" total="98632" rescore="1" />
+  <row cycle="35" equiv_info="60891.62" align="73119" total="98599" rescore="1" />
+  <row cycle="36" equiv_info="61756.35" align="73131" total="98633" rescore="1" />
+  <row cycle="37" equiv_info="64500.79" align="73079" total="98559" rescore="1" />
+</information_content_by_cycle>
+<error_rate_relative_reference_cycle_nucleotide>
+  <row cycle="1" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="1" read_as="A" really_a="0.997" really_c="0.005" really_g="0.003" really_t="0.000" rescore="1" />
+  <row cycle="1" read_as="C" really_a="0.000" really_c="0.991" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="1" read_as="G" really_a="0.001" really_c="0.001" really_g="0.993" really_t="0.007" rescore="1" />
+  <row cycle="1" read_as="T" really_a="0.001" really_c="0.003" really_g="0.003" really_t="0.991" rescore="1" />
+  <row cycle="2" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="2" read_as="A" really_a="0.997" really_c="0.006" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="2" read_as="C" really_a="0.001" really_c="0.990" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="2" read_as="G" really_a="0.001" really_c="0.002" really_g="0.990" really_t="0.008" rescore="1" />
+  <row cycle="2" read_as="T" really_a="0.000" really_c="0.002" really_g="0.005" really_t="0.989" rescore="1" />
+  <row cycle="3" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="3" read_as="A" really_a="0.995" really_c="0.007" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="3" read_as="C" really_a="0.002" really_c="0.985" really_g="0.003" really_t="0.003" rescore="1" />
+  <row cycle="3" read_as="G" really_a="0.002" really_c="0.005" really_g="0.985" really_t="0.015" rescore="1" />
+  <row cycle="3" read_as="T" really_a="0.001" really_c="0.003" really_g="0.009" really_t="0.981" rescore="1" />
+  <row cycle="4" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="4" read_as="A" really_a="0.999" really_c="0.005" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="4" read_as="C" really_a="0.001" really_c="0.991" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="4" read_as="G" really_a="0.000" really_c="0.002" really_g="0.993" really_t="0.010" rescore="1" />
+  <row cycle="4" read_as="T" really_a="0.000" really_c="0.002" really_g="0.003" really_t="0.988" rescore="1" />
+  <row cycle="5" read_as="N" really_a="0.000" really_c="0.000" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="5" read_as="A" really_a="0.990" really_c="0.011" really_g="0.005" really_t="0.003" rescore="1" />
+  <row cycle="5" read_as="C" really_a="0.003" really_c="0.972" really_g="0.006" really_t="0.005" rescore="1" />
+  <row cycle="5" read_as="G" really_a="0.006" really_c="0.012" really_g="0.944" really_t="0.029" rescore="1" />
+  <row cycle="5" read_as="T" really_a="0.001" really_c="0.004" really_g="0.044" really_t="0.962" rescore="1" />
+  <row cycle="6" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="6" read_as="A" really_a="0.997" really_c="0.005" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="6" read_as="C" really_a="0.001" really_c="0.989" really_g="0.002" really_t="0.003" rescore="1" />
+  <row cycle="6" read_as="G" really_a="0.001" really_c="0.004" really_g="0.987" really_t="0.013" rescore="1" />
+  <row cycle="6" read_as="T" really_a="0.000" really_c="0.002" really_g="0.009" really_t="0.983" rescore="1" />
+  <row cycle="7" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="7" read_as="A" really_a="0.996" really_c="0.005" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="7" read_as="C" really_a="0.001" really_c="0.989" really_g="0.002" really_t="0.003" rescore="1" />
+  <row cycle="7" read_as="G" really_a="0.002" really_c="0.004" really_g="0.985" really_t="0.012" rescore="1" />
+  <row cycle="7" read_as="T" really_a="0.001" really_c="0.002" really_g="0.010" really_t="0.984" rescore="1" />
+  <row cycle="8" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="8" read_as="A" really_a="0.998" really_c="0.003" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="8" read_as="C" really_a="0.000" really_c="0.993" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="8" read_as="G" really_a="0.002" really_c="0.002" really_g="0.991" really_t="0.008" rescore="1" />
+  <row cycle="8" read_as="T" really_a="0.000" really_c="0.001" really_g="0.006" really_t="0.989" rescore="1" />
+  <row cycle="9" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="9" read_as="A" really_a="0.996" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="9" read_as="C" really_a="0.002" really_c="0.989" really_g="0.003" really_t="0.003" rescore="1" />
+  <row cycle="9" read_as="G" really_a="0.001" really_c="0.003" really_g="0.979" really_t="0.011" rescore="1" />
+  <row cycle="9" read_as="T" really_a="0.001" really_c="0.002" really_g="0.015" really_t="0.986" rescore="1" />
+  <row cycle="10" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="10" read_as="A" really_a="0.998" really_c="0.003" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="10" read_as="C" really_a="0.001" really_c="0.993" really_g="0.002" really_t="0.003" rescore="1" />
+  <row cycle="10" read_as="G" really_a="0.001" really_c="0.001" really_g="0.989" really_t="0.006" rescore="1" />
+  <row cycle="10" read_as="T" really_a="0.000" really_c="0.002" really_g="0.007" really_t="0.990" rescore="1" />
+  <row cycle="11" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="11" read_as="A" really_a="0.996" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="11" read_as="C" really_a="0.002" really_c="0.987" really_g="0.004" really_t="0.002" rescore="1" />
+  <row cycle="11" read_as="G" really_a="0.001" really_c="0.003" really_g="0.976" really_t="0.009" rescore="1" />
+  <row cycle="11" read_as="T" really_a="0.001" really_c="0.003" really_g="0.018" really_t="0.988" rescore="1" />
+  <row cycle="12" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="12" read_as="A" really_a="0.997" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="12" read_as="C" really_a="0.001" really_c="0.988" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="12" read_as="G" really_a="0.002" really_c="0.003" really_g="0.984" really_t="0.009" rescore="1" />
+  <row cycle="12" read_as="T" really_a="0.000" really_c="0.003" really_g="0.012" really_t="0.988" rescore="1" />
+  <row cycle="13" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="13" read_as="A" really_a="0.993" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="13" read_as="C" really_a="0.002" really_c="0.986" really_g="0.005" really_t="0.003" rescore="1" />
+  <row cycle="13" read_as="G" really_a="0.003" really_c="0.005" really_g="0.953" really_t="0.011" rescore="1" />
+  <row cycle="13" read_as="T" really_a="0.001" really_c="0.003" really_g="0.038" really_t="0.985" rescore="1" />
+  <row cycle="14" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="14" read_as="A" really_a="0.994" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="14" read_as="C" really_a="0.002" really_c="0.984" really_g="0.003" really_t="0.003" rescore="1" />
+  <row cycle="14" read_as="G" really_a="0.003" really_c="0.007" really_g="0.960" really_t="0.011" rescore="1" />
+  <row cycle="14" read_as="T" really_a="0.001" really_c="0.003" really_g="0.033" really_t="0.985" rescore="1" />
+  <row cycle="15" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="15" read_as="A" really_a="0.995" really_c="0.005" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="15" read_as="C" really_a="0.002" really_c="0.987" really_g="0.004" really_t="0.002" rescore="1" />
+  <row cycle="15" read_as="G" really_a="0.002" really_c="0.004" really_g="0.964" really_t="0.008" rescore="1" />
+  <row cycle="15" read_as="T" really_a="0.001" really_c="0.004" really_g="0.030" really_t="0.989" rescore="1" />
+  <row cycle="16" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="16" read_as="A" really_a="0.998" really_c="0.004" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="16" read_as="C" really_a="0.001" really_c="0.993" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="16" read_as="G" really_a="0.001" really_c="0.001" really_g="0.986" really_t="0.005" rescore="1" />
+  <row cycle="16" read_as="T" really_a="0.000" really_c="0.002" really_g="0.010" really_t="0.993" rescore="1" />
+  <row cycle="17" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="17" read_as="A" really_a="0.999" really_c="0.004" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="17" read_as="C" really_a="0.000" really_c="0.992" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="17" read_as="G" really_a="0.001" really_c="0.001" really_g="0.986" really_t="0.005" rescore="1" />
+  <row cycle="17" read_as="T" really_a="0.000" really_c="0.002" really_g="0.010" really_t="0.993" rescore="1" />
+  <row cycle="18" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="18" read_as="A" really_a="0.998" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="18" read_as="C" really_a="0.001" really_c="0.994" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="18" read_as="G" really_a="0.001" really_c="0.001" really_g="0.991" really_t="0.005" rescore="1" />
+  <row cycle="18" read_as="T" really_a="0.000" really_c="0.002" really_g="0.007" really_t="0.994" rescore="1" />
+  <row cycle="19" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="19" read_as="A" really_a="0.991" really_c="0.008" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="19" read_as="C" really_a="0.003" really_c="0.981" really_g="0.003" really_t="0.003" rescore="1" />
+  <row cycle="19" read_as="G" really_a="0.004" really_c="0.006" really_g="0.923" really_t="0.011" rescore="1" />
+  <row cycle="19" read_as="T" really_a="0.002" really_c="0.005" really_g="0.072" really_t="0.985" rescore="1" />
+  <row cycle="20" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="20" read_as="A" really_a="0.995" really_c="0.007" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="20" read_as="C" really_a="0.002" really_c="0.984" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="20" read_as="G" really_a="0.002" really_c="0.005" really_g="0.952" really_t="0.008" rescore="1" />
+  <row cycle="20" read_as="T" really_a="0.001" really_c="0.005" really_g="0.044" really_t="0.990" rescore="1" />
+  <row cycle="21" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="21" read_as="A" really_a="0.993" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="21" read_as="C" really_a="0.003" really_c="0.985" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="21" read_as="G" really_a="0.002" really_c="0.005" really_g="0.943" really_t="0.009" rescore="1" />
+  <row cycle="21" read_as="T" really_a="0.001" really_c="0.004" really_g="0.052" really_t="0.988" rescore="1" />
+  <row cycle="22" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="22" read_as="A" really_a="0.998" really_c="0.004" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="22" read_as="C" really_a="0.001" really_c="0.992" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="22" read_as="G" really_a="0.001" really_c="0.002" really_g="0.981" really_t="0.005" rescore="1" />
+  <row cycle="22" read_as="T" really_a="0.000" really_c="0.002" really_g="0.016" really_t="0.992" rescore="1" />
+  <row cycle="23" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="23" read_as="A" really_a="0.998" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="23" read_as="C" really_a="0.001" really_c="0.994" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="23" read_as="G" really_a="0.001" really_c="0.001" really_g="0.987" really_t="0.004" rescore="1" />
+  <row cycle="23" read_as="T" really_a="0.000" really_c="0.002" really_g="0.009" really_t="0.994" rescore="1" />
+  <row cycle="24" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="24" read_as="A" really_a="0.997" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="24" read_as="C" really_a="0.001" really_c="0.992" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="24" read_as="G" really_a="0.001" really_c="0.002" really_g="0.967" really_t="0.005" rescore="1" />
+  <row cycle="24" read_as="T" really_a="0.001" really_c="0.003" really_g="0.029" really_t="0.993" rescore="1" />
+  <row cycle="25" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="25" read_as="A" really_a="0.995" really_c="0.007" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="25" read_as="C" really_a="0.002" really_c="0.985" really_g="0.002" really_t="0.002" rescore="1" />
+  <row cycle="25" read_as="G" really_a="0.001" really_c="0.004" really_g="0.956" really_t="0.006" rescore="1" />
+  <row cycle="25" read_as="T" really_a="0.001" really_c="0.004" really_g="0.039" really_t="0.992" rescore="1" />
+  <row cycle="26" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="26" read_as="A" really_a="0.987" really_c="0.012" really_g="0.004" really_t="0.001" rescore="1" />
+  <row cycle="26" read_as="C" really_a="0.004" really_c="0.958" really_g="0.004" really_t="0.004" rescore="1" />
+  <row cycle="26" read_as="G" really_a="0.005" really_c="0.016" really_g="0.825" really_t="0.015" rescore="1" />
+  <row cycle="26" read_as="T" really_a="0.004" really_c="0.013" really_g="0.167" really_t="0.980" rescore="1" />
+  <row cycle="27" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="27" read_as="A" really_a="0.985" really_c="0.010" really_g="0.004" really_t="0.001" rescore="1" />
+  <row cycle="27" read_as="C" really_a="0.006" really_c="0.967" really_g="0.007" really_t="0.004" rescore="1" />
+  <row cycle="27" read_as="G" really_a="0.006" really_c="0.012" really_g="0.847" really_t="0.016" rescore="1" />
+  <row cycle="27" read_as="T" really_a="0.004" really_c="0.011" really_g="0.143" really_t="0.978" rescore="1" />
+  <row cycle="28" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="28" read_as="A" really_a="0.988" really_c="0.010" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="28" read_as="C" really_a="0.005" really_c="0.974" really_g="0.003" really_t="0.003" rescore="1" />
+  <row cycle="28" read_as="G" really_a="0.005" really_c="0.009" really_g="0.884" really_t="0.014" rescore="1" />
+  <row cycle="28" read_as="T" really_a="0.003" really_c="0.008" really_g="0.110" really_t="0.981" rescore="1" />
+  <row cycle="29" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="29" read_as="A" really_a="0.988" really_c="0.010" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="29" read_as="C" really_a="0.003" really_c="0.965" really_g="0.003" really_t="0.003" rescore="1" />
+  <row cycle="29" read_as="G" really_a="0.004" really_c="0.012" really_g="0.895" really_t="0.011" rescore="1" />
+  <row cycle="29" read_as="T" really_a="0.004" really_c="0.013" really_g="0.099" really_t="0.985" rescore="1" />
+  <row cycle="30" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="30" read_as="A" really_a="0.993" really_c="0.006" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="30" read_as="C" really_a="0.003" really_c="0.982" really_g="0.003" really_t="0.002" rescore="1" />
+  <row cycle="30" read_as="G" really_a="0.002" really_c="0.005" really_g="0.927" really_t="0.007" rescore="1" />
+  <row cycle="30" read_as="T" really_a="0.002" really_c="0.007" really_g="0.067" really_t="0.990" rescore="1" />
+  <row cycle="31" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="31" read_as="A" really_a="0.997" really_c="0.003" really_g="0.002" really_t="0.000" rescore="1" />
+  <row cycle="31" read_as="C" really_a="0.001" really_c="0.992" really_g="0.001" really_t="0.002" rescore="1" />
+  <row cycle="31" read_as="G" really_a="0.001" really_c="0.002" really_g="0.983" really_t="0.006" rescore="1" />
+  <row cycle="31" read_as="T" really_a="0.001" really_c="0.004" really_g="0.013" really_t="0.992" rescore="1" />
+  <row cycle="32" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="32" read_as="A" really_a="0.973" really_c="0.011" really_g="0.005" really_t="0.001" rescore="1" />
+  <row cycle="32" read_as="C" really_a="0.008" really_c="0.950" really_g="0.005" really_t="0.003" rescore="1" />
+  <row cycle="32" read_as="G" really_a="0.009" really_c="0.017" really_g="0.765" really_t="0.019" rescore="1" />
+  <row cycle="32" read_as="T" really_a="0.010" really_c="0.021" really_g="0.225" really_t="0.977" rescore="1" />
+  <row cycle="33" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="33" read_as="A" really_a="0.993" really_c="0.007" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="33" read_as="C" really_a="0.002" really_c="0.977" really_g="0.002" really_t="0.003" rescore="1" />
+  <row cycle="33" read_as="G" really_a="0.002" really_c="0.006" really_g="0.945" really_t="0.007" rescore="1" />
+  <row cycle="33" read_as="T" really_a="0.002" really_c="0.009" really_g="0.050" really_t="0.989" rescore="1" />
+  <row cycle="34" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="34" read_as="A" really_a="0.994" really_c="0.005" really_g="0.002" really_t="0.001" rescore="1" />
+  <row cycle="34" read_as="C" really_a="0.002" really_c="0.983" really_g="0.002" really_t="0.003" rescore="1" />
+  <row cycle="34" read_as="G" really_a="0.002" really_c="0.004" really_g="0.968" really_t="0.007" rescore="1" />
+  <row cycle="34" read_as="T" really_a="0.002" really_c="0.008" really_g="0.028" really_t="0.990" rescore="1" />
+  <row cycle="35" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="35" read_as="A" really_a="0.979" really_c="0.012" really_g="0.004" really_t="0.001" rescore="1" />
+  <row cycle="35" read_as="C" really_a="0.006" really_c="0.957" really_g="0.005" really_t="0.004" rescore="1" />
+  <row cycle="35" read_as="G" really_a="0.006" really_c="0.013" really_g="0.836" really_t="0.012" rescore="1" />
+  <row cycle="35" read_as="T" really_a="0.009" really_c="0.019" really_g="0.154" really_t="0.983" rescore="1" />
+  <row cycle="36" read_as="N" really_a="0.000" really_c="0.000" really_g="0.000" really_t="0.000" rescore="1" />
+  <row cycle="36" read_as="A" really_a="0.981" really_c="0.013" really_g="0.004" really_t="0.001" rescore="1" />
+  <row cycle="36" read_as="C" really_a="0.005" really_c="0.958" really_g="0.003" really_t="0.004" rescore="1" />
+  <row cycle="36" read_as="G" really_a="0.005" really_c="0.012" really_g="0.856" really_t="0.011" rescore="1" />
+  <row cycle="36" read_as="T" really_a="0.008" really_c="0.017" really_g="0.136" really_t="0.984" rescore="1" />
+  <row cycle="37" read_as="N" really_a="0.001" really_c="0.000" really_g="0.001" really_t="0.001" rescore="1" />
+  <row cycle="37" read_as="A" really_a="0.985" really_c="0.007" really_g="0.003" really_t="0.001" rescore="1" />
+  <row cycle="37" read_as="C" really_a="0.003" really_c="0.963" really_g="0.003" really_t="0.004" rescore="1" />
+  <row cycle="37" read_as="G" really_a="0.004" really_c="0.008" really_g="0.918" really_t="0.008" rescore="1" />
+  <row cycle="37" read_as="T" really_a="0.008" really_c="0.021" really_g="0.075" really_t="0.987" rescore="1" />
+</error_rate_relative_reference_cycle_nucleotide>
+<errors_by_cycle>
+  <row cycle="1" error_percentage="0.69" blank_percentage="0.00" rescore="1" />
+  <row cycle="2" error_percentage="0.79" blank_percentage="0.00" rescore="1" />
+  <row cycle="3" error_percentage="1.33" blank_percentage="0.00" rescore="1" />
+  <row cycle="4" error_percentage="0.73" blank_percentage="0.00" rescore="1" />
+  <row cycle="5" error_percentage="3.13" blank_percentage="0.04" rescore="1" />
+  <row cycle="6" error_percentage="1.09" blank_percentage="0.00" rescore="1" />
+  <row cycle="7" error_percentage="1.12" blank_percentage="0.00" rescore="1" />
+  <row cycle="8" error_percentage="0.71" blank_percentage="0.00" rescore="1" />
+  <row cycle="9" error_percentage="1.18" blank_percentage="0.00" rescore="1" />
+  <row cycle="10" error_percentage="0.71" blank_percentage="0.00" rescore="1" />
+  <row cycle="11" error_percentage="1.25" blank_percentage="0.00" rescore="1" />
+  <row cycle="12" error_percentage="1.03" blank_percentage="0.00" rescore="1" />
+  <row cycle="13" error_percentage="1.93" blank_percentage="0.00" rescore="1" />
+  <row cycle="14" error_percentage="1.80" blank_percentage="0.00" rescore="1" />
+  <row cycle="15" error_percentage="1.51" blank_percentage="0.00" rescore="1" />
+  <row cycle="16" error_percentage="0.72" blank_percentage="0.00" rescore="1" />
+  <row cycle="17" error_percentage="0.71" blank_percentage="0.00" rescore="1" />
+  <row cycle="18" error_percentage="0.57" blank_percentage="0.00" rescore="1" />
+  <row cycle="19" error_percentage="2.77" blank_percentage="0.00" rescore="1" />
+  <row cycle="20" error_percentage="1.84" blank_percentage="0.00" rescore="1" />
+  <row cycle="21" error_percentage="2.10" blank_percentage="0.00" rescore="1" />
+  <row cycle="22" error_percentage="0.87" blank_percentage="0.00" rescore="1" />
+  <row cycle="23" error_percentage="0.64" blank_percentage="0.00" rescore="1" />
+  <row cycle="24" error_percentage="1.15" blank_percentage="0.01" rescore="1" />
+  <row cycle="25" error_percentage="1.66" blank_percentage="0.00" rescore="1" />
+  <row cycle="26" error_percentage="5.65" blank_percentage="0.01" rescore="1" />
+  <row cycle="27" error_percentage="5.09" blank_percentage="0.00" rescore="1" />
+  <row cycle="28" error_percentage="3.98" blank_percentage="0.00" rescore="1" />
+  <row cycle="29" error_percentage="3.83" blank_percentage="0.00" rescore="1" />
+  <row cycle="30" error_percentage="2.45" blank_percentage="0.00" rescore="1" />
+  <row cycle="31" error_percentage="0.85" blank_percentage="0.02" rescore="1" />
+  <row cycle="32" error_percentage="7.65" blank_percentage="0.00" rescore="1" />
+  <row cycle="33" error_percentage="2.21" blank_percentage="0.00" rescore="1" />
+  <row cycle="34" error_percentage="1.56" blank_percentage="0.00" rescore="1" />
+  <row cycle="35" error_percentage="5.66" blank_percentage="0.02" rescore="1" />
+  <row cycle="36" error_percentage="5.09" blank_percentage="0.00" rescore="1" />
+  <row cycle="37" error_percentage="3.37" blank_percentage="0.06" rescore="1" />
+</errors_by_cycle>
+<error_rate_reference_including_blanks>
+  <row really="A" read_as_blank="0.00" read_as_a="99.31" read_as_c="0.22" read_as_g="0.26" read_as_t="0.20" rescore="1" />
+  <row really="C" read_as_blank="0.00" read_as_a="0.65" read_as_c="98.20" read_as_g="0.55" read_as_t="0.60" rescore="1" />
+  <row really="G" read_as_blank="0.01" read_as_a="0.28" read_as_c="0.27" read_as_g="94.61" read_as_t="4.83" rescore="1" />
+  <row really="T" read_as_blank="0.00" read_as_a="0.08" read_as_c="0.26" read_as_g="0.98" read_as_t="98.67" rescore="1" />
+</error_rate_reference_including_blanks>
+<error_rate_reference_no_blanks>
+  <row really="A" read_as_a="99.32" read_as_c="0.22" read_as_g="0.26" read_as_t="0.20" rescore="1" />
+  <row really="C" read_as_a="0.65" read_as_c="98.20" read_as_g="0.55" read_as_t="0.60" rescore="1" />
+  <row really="G" read_as_a="0.28" read_as_c="0.27" read_as_g="94.61" read_as_t="4.83" rescore="1" />
+  <row really="T" read_as_a="0.08" read_as_c="0.26" read_as_g="0.98" read_as_t="98.68" rescore="1" />
+</error_rate_reference_no_blanks>
+<error_rate_relative_sequence_base>
+  <row read_as="N" really_a="28.33" really_c="19.17" really_g="28.33" really_t="24.17" rescore="1" />
+  <row read_as="A" really_a="99.18" really_c="0.52" really_g="0.22" really_t="0.08" rescore="1" />
+  <row read_as="C" really_a="0.28" really_c="99.13" really_g="0.27" really_t="0.32" rescore="1" />
+  <row read_as="G" really_a="0.34" really_c="0.57" really_g="97.83" really_t="1.25" rescore="1" />
+  <row read_as="T" really_a="0.20" really_c="0.48" really_g="3.78" really_t="95.54" rescore="1" />
+</error_rate_relative_sequence_base>
+<errors_by_nucleotide>
+  <row read_as="A" really_a="757094" really_c="3969" really_g="1678" really_t="617" rescore="1" />
+  <row read_as="C" really_a="1712" really_c="597835" really_g="1622" really_t="1930" rescore="1" />
+  <row read_as="G" really_a="1969" really_c="3320" really_g="565191" really_t="7225" rescore="1" />
+  <row read_as="T" really_a="1515" really_c="3668" really_g="28870" really_t="728737" rescore="1" />
+</errors_by_nucleotide>
+<errors_by_cycle_and_nucleotide>
+  <row cycle="1" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="1" read_as="A" really_a="20599" really_c="83" really_g="45" really_t="9" rescore="1" />
+  <row cycle="1" read_as="C" really_a="7" really_c="16440" really_g="32" really_t="37" rescore="1" />
+  <row cycle="1" read_as="G" really_a="22" really_c="20" really_g="16609" really_t="132" rescore="1" />
+  <row cycle="1" read_as="T" really_a="24" really_c="44" really_g="47" really_t="19018" rescore="1" />
+  <row cycle="2" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="2" read_as="A" really_a="21857" really_c="92" really_g="40" really_t="16" rescore="1" />
+  <row cycle="2" read_as="C" really_a="20" really_c="15638" really_g="33" really_t="32" rescore="1" />
+  <row cycle="2" read_as="G" really_a="31" really_c="33" really_g="16766" really_t="150" rescore="1" />
+  <row cycle="2" read_as="T" really_a="8" really_c="33" really_g="91" really_t="18328" rescore="1" />
+  <row cycle="3" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="3" read_as="A" really_a="20518" really_c="127" really_g="47" really_t="22" rescore="1" />
+  <row cycle="3" read_as="C" really_a="35" really_c="16914" really_g="49" really_t="64" rescore="1" />
+  <row cycle="3" read_as="G" really_a="51" really_c="82" really_g="15754" really_t="287" rescore="1" />
+  <row cycle="3" read_as="T" really_a="15" really_c="49" really_g="142" really_t="19012" rescore="1" />
+  <row cycle="4" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="4" read_as="A" really_a="19816" really_c="92" really_g="35" really_t="9" rescore="1" />
+  <row cycle="4" read_as="C" really_a="12" really_c="16794" really_g="32" really_t="40" rescore="1" />
+  <row cycle="4" read_as="G" really_a="8" really_c="30" really_g="17642" really_t="182" rescore="1" />
+  <row cycle="4" read_as="T" really_a="6" really_c="30" really_g="55" really_t="18385" rescore="1" />
+  <row cycle="5" read_as="N" really_a="5" really_c="7" really_g="9" really_t="10" rescore="1" />
+  <row cycle="5" read_as="A" really_a="21036" really_c="178" really_g="82" really_t="54" rescore="1" />
+  <row cycle="5" read_as="C" really_a="61" really_c="15285" really_g="104" really_t="105" rescore="1" />
+  <row cycle="5" read_as="G" really_a="125" really_c="194" really_g="15843" really_t="559" rescore="1" />
+  <row cycle="5" read_as="T" really_a="28" really_c="56" really_g="742" really_t="18685" rescore="1" />
+  <row cycle="6" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="6" read_as="A" really_a="20550" really_c="92" really_g="44" really_t="18" rescore="1" />
+  <row cycle="6" read_as="C" really_a="30" really_c="16606" really_g="37" really_t="55" rescore="1" />
+  <row cycle="6" read_as="G" really_a="27" really_c="62" really_g="16529" really_t="251" rescore="1" />
+  <row cycle="6" read_as="T" really_a="7" really_c="34" really_g="144" really_t="18682" rescore="1" />
+  <row cycle="7" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="7" read_as="A" really_a="20516" really_c="81" really_g="36" really_t="12" rescore="1" />
+  <row cycle="7" read_as="C" really_a="27" really_c="16133" really_g="37" really_t="62" rescore="1" />
+  <row cycle="7" read_as="G" really_a="43" really_c="62" really_g="16047" really_t="246" rescore="1" />
+  <row cycle="7" read_as="T" really_a="11" really_c="37" really_g="164" really_t="19654" rescore="1" />
+  <row cycle="8" read_as="N" really_a="0" really_c="1" really_g="0" really_t="0" rescore="1" />
+  <row cycle="8" read_as="A" really_a="20945" really_c="55" really_g="27" really_t="11" rescore="1" />
+  <row cycle="8" read_as="C" really_a="9" really_c="15835" really_g="32" really_t="48" rescore="1" />
+  <row cycle="8" read_as="G" really_a="33" really_c="34" really_g="16050" really_t="156" rescore="1" />
+  <row cycle="8" read_as="T" really_a="5" really_c="18" really_g="92" really_t="19817" rescore="1" />
+  <row cycle="9" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="9" read_as="A" really_a="20516" really_c="101" really_g="52" really_t="14" rescore="1" />
+  <row cycle="9" read_as="C" really_a="33" really_c="16216" really_g="44" really_t="53" rescore="1" />
+  <row cycle="9" read_as="G" really_a="29" really_c="47" really_g="15685" really_t="212" rescore="1" />
+  <row cycle="9" read_as="T" really_a="14" really_c="33" really_g="234" really_t="19885" rescore="1" />
+  <row cycle="10" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="10" read_as="A" really_a="21301" really_c="53" really_g="38" really_t="18" rescore="1" />
+  <row cycle="10" read_as="C" really_a="15" really_c="16149" really_g="28" really_t="52" rescore="1" />
+  <row cycle="10" read_as="G" really_a="19" really_c="16" really_g="15754" really_t="118" rescore="1" />
+  <row cycle="10" read_as="T" really_a="10" really_c="40" really_g="113" really_t="19444" rescore="1" />
+  <row cycle="11" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="11" read_as="A" really_a="20814" really_c="104" really_g="45" really_t="13" rescore="1" />
+  <row cycle="11" read_as="C" really_a="32" really_c="16116" really_g="57" really_t="40" rescore="1" />
+  <row cycle="11" read_as="G" really_a="31" really_c="51" really_g="15811" really_t="179" rescore="1" />
+  <row cycle="11" read_as="T" really_a="14" really_c="55" really_g="295" really_t="19511" rescore="1" />
+  <row cycle="12" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="12" read_as="A" really_a="20278" really_c="97" really_g="45" really_t="16" rescore="1" />
+  <row cycle="12" read_as="C" really_a="19" really_c="16046" really_g="29" really_t="47" rescore="1" />
+  <row cycle="12" read_as="G" really_a="33" really_c="47" really_g="15947" really_t="178" rescore="1" />
+  <row cycle="12" read_as="T" really_a="7" really_c="45" really_g="190" really_t="20144" rescore="1" />
+  <row cycle="13" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="13" read_as="A" really_a="20797" really_c="100" really_g="54" really_t="22" rescore="1" />
+  <row cycle="13" read_as="C" really_a="51" really_c="16094" really_g="84" really_t="57" rescore="1" />
+  <row cycle="13" read_as="G" really_a="73" really_c="78" really_g="14960" really_t="229" rescore="1" />
+  <row cycle="13" read_as="T" really_a="19" really_c="47" really_g="595" really_t="19908" rescore="1" />
+  <row cycle="14" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="14" read_as="A" really_a="21011" really_c="100" really_g="53" really_t="19" rescore="1" />
+  <row cycle="14" read_as="C" really_a="47" really_c="16028" really_g="55" really_t="52" rescore="1" />
+  <row cycle="14" read_as="G" really_a="54" really_c="110" really_g="15084" really_t="230" rescore="1" />
+  <row cycle="14" read_as="T" really_a="18" really_c="57" really_g="525" really_t="19725" rescore="1" />
+  <row cycle="15" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="15" read_as="A" really_a="20341" really_c="75" really_g="40" really_t="13" rescore="1" />
+  <row cycle="15" read_as="C" really_a="44" really_c="16259" really_g="56" really_t="51" rescore="1" />
+  <row cycle="15" read_as="G" really_a="34" really_c="73" really_g="15216" really_t="165" rescore="1" />
+  <row cycle="15" read_as="T" really_a="19" really_c="63" really_g="472" really_t="20247" rescore="1" />
+  <row cycle="16" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="16" read_as="A" really_a="20594" really_c="58" really_g="36" really_t="7" rescore="1" />
+  <row cycle="16" read_as="C" really_a="14" really_c="16281" really_g="29" really_t="27" rescore="1" />
+  <row cycle="16" read_as="G" really_a="22" really_c="24" really_g="15818" really_t="110" rescore="1" />
+  <row cycle="16" read_as="T" really_a="4" really_c="35" really_g="158" really_t="19951" rescore="1" />
+  <row cycle="17" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="17" read_as="A" really_a="20887" really_c="66" really_g="39" really_t="9" rescore="1" />
+  <row cycle="17" read_as="C" really_a="9" really_c="16059" really_g="22" really_t="37" rescore="1" />
+  <row cycle="17" read_as="G" really_a="18" really_c="19" really_g="15792" really_t="99" rescore="1" />
+  <row cycle="17" read_as="T" really_a="4" really_c="37" really_g="163" really_t="19908" rescore="1" />
+  <row cycle="18" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="18" read_as="A" really_a="20359" really_c="49" really_g="26" really_t="8" rescore="1" />
+  <row cycle="18" read_as="C" really_a="14" really_c="16574" really_g="9" really_t="29" rescore="1" />
+  <row cycle="18" read_as="G" really_a="17" really_c="17" really_g="15494" really_t="94" rescore="1" />
+  <row cycle="18" read_as="T" really_a="5" really_c="40" really_g="110" really_t="20323" rescore="1" />
+  <row cycle="19" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="19" read_as="A" really_a="20517" really_c="127" really_g="38" really_t="22" rescore="1" />
+  <row cycle="19" read_as="C" really_a="69" really_c="16153" really_g="46" really_t="63" rescore="1" />
+  <row cycle="19" read_as="G" really_a="76" really_c="103" really_g="14613" really_t="220" rescore="1" />
+  <row cycle="19" read_as="T" really_a="39" really_c="83" really_g="1143" really_t="19856" rescore="1" />
+  <row cycle="20" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="20" read_as="A" really_a="20790" really_c="115" really_g="39" really_t="12" rescore="1" />
+  <row cycle="20" read_as="C" really_a="40" really_c="16173" really_g="37" really_t="32" rescore="1" />
+  <row cycle="20" read_as="G" really_a="43" really_c="80" really_g="15211" really_t="159" rescore="1" />
+  <row cycle="20" read_as="T" really_a="15" really_c="74" really_g="697" really_t="19651" rescore="1" />
+  <row cycle="21" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="21" read_as="A" really_a="20198" really_c="107" really_g="46" really_t="12" rescore="1" />
+  <row cycle="21" read_as="C" really_a="65" really_c="16548" really_g="30" really_t="47" rescore="1" />
+  <row cycle="21" read_as="G" really_a="49" really_c="89" really_g="14810" really_t="190" rescore="1" />
+  <row cycle="21" read_as="T" really_a="24" really_c="62" really_g="812" really_t="20079" rescore="1" />
+  <row cycle="22" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="22" read_as="A" really_a="20480" really_c="59" really_g="39" really_t="11" rescore="1" />
+  <row cycle="22" read_as="C" really_a="13" really_c="16616" really_g="13" really_t="43" rescore="1" />
+  <row cycle="22" read_as="G" really_a="23" really_c="27" really_g="15623" really_t="108" rescore="1" />
+  <row cycle="22" read_as="T" really_a="8" really_c="40" really_g="249" really_t="19816" rescore="1" />
+  <row cycle="23" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="23" read_as="A" really_a="20533" really_c="46" really_g="32" really_t="5" rescore="1" />
+  <row cycle="23" read_as="C" really_a="12" really_c="16251" really_g="20" really_t="39" rescore="1" />
+  <row cycle="23" read_as="G" really_a="24" really_c="12" really_g="16117" really_t="81" rescore="1" />
+  <row cycle="23" read_as="T" really_a="7" really_c="37" really_g="154" really_t="19798" rescore="1" />
+  <row cycle="24" read_as="N" really_a="1" really_c="1" really_g="1" really_t="1" rescore="1" />
+  <row cycle="24" read_as="A" really_a="20261" really_c="52" really_g="32" really_t="10" rescore="1" />
+  <row cycle="24" read_as="C" really_a="18" really_c="16558" really_g="19" really_t="27" rescore="1" />
+  <row cycle="24" read_as="G" really_a="23" really_c="32" really_g="15393" really_t="94" rescore="1" />
+  <row cycle="24" read_as="T" really_a="16" really_c="52" really_g="466" really_t="20111" rescore="1" />
+  <row cycle="25" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="25" read_as="A" really_a="20617" really_c="114" really_g="38" really_t="7" rescore="1" />
+  <row cycle="25" read_as="C" really_a="41" really_c="16004" really_g="39" really_t="33" rescore="1" />
+  <row cycle="25" read_as="G" really_a="30" really_c="62" really_g="15188" really_t="125" rescore="1" />
+  <row cycle="25" read_as="T" really_a="29" really_c="73" really_g="624" really_t="20144" rescore="1" />
+  <row cycle="26" read_as="N" really_a="2" really_c="0" really_g="2" really_t="0" rescore="1" />
+  <row cycle="26" read_as="A" really_a="20432" really_c="201" really_g="61" really_t="21" rescore="1" />
+  <row cycle="26" read_as="C" really_a="89" really_c="15626" really_g="64" really_t="73" rescore="1" />
+  <row cycle="26" read_as="G" really_a="112" really_c="263" really_g="13140" really_t="303" rescore="1" />
+  <row cycle="26" read_as="T" really_a="74" really_c="220" really_g="2656" really_t="19829" rescore="1" />
+  <row cycle="27" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="27" read_as="A" really_a="20184" really_c="171" really_g="61" really_t="30" rescore="1" />
+  <row cycle="27" read_as="C" really_a="115" really_c="16006" really_g="105" really_t="84" rescore="1" />
+  <row cycle="27" read_as="G" really_a="114" really_c="193" really_g="13337" really_t="332" rescore="1" />
+  <row cycle="27" read_as="T" really_a="85" really_c="182" really_g="2252" really_t="19917" rescore="1" />
+  <row cycle="28" read_as="N" really_a="0" really_c="0" really_g="1" really_t="0" rescore="1" />
+  <row cycle="28" read_as="A" really_a="20347" really_c="159" really_g="37" really_t="28" rescore="1" />
+  <row cycle="28" read_as="C" really_a="93" really_c="16279" really_g="54" really_t="68" rescore="1" />
+  <row cycle="28" read_as="G" really_a="96" really_c="148" really_g="14099" really_t="284" rescore="1" />
+  <row cycle="28" read_as="T" really_a="59" really_c="129" really_g="1756" really_t="19531" rescore="1" />
+  <row cycle="29" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="29" read_as="A" really_a="20324" really_c="171" really_g="41" really_t="20" rescore="1" />
+  <row cycle="29" read_as="C" really_a="71" really_c="15838" really_g="48" really_t="55" rescore="1" />
+  <row cycle="29" read_as="G" really_a="86" really_c="193" really_g="14490" really_t="218" rescore="1" />
+  <row cycle="29" read_as="T" really_a="80" really_c="212" really_g="1604" really_t="19717" rescore="1" />
+  <row cycle="30" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="30" read_as="A" really_a="20199" really_c="99" really_g="45" really_t="11" rescore="1" />
+  <row cycle="30" read_as="C" really_a="57" really_c="16505" really_g="44" really_t="38" rescore="1" />
+  <row cycle="30" read_as="G" really_a="45" really_c="92" really_g="14599" really_t="144" rescore="1" />
+  <row cycle="30" read_as="T" really_a="47" really_c="115" really_g="1057" really_t="20071" rescore="1" />
+  <row cycle="31" read_as="N" really_a="3" really_c="2" really_g="6" really_t="0" rescore="1" />
+  <row cycle="31" read_as="A" really_a="20212" really_c="49" really_g="35" really_t="9" rescore="1" />
+  <row cycle="31" read_as="C" really_a="20" really_c="16330" really_g="18" really_t="33" rescore="1" />
+  <row cycle="31" read_as="G" really_a="15" really_c="25" really_g="15804" really_t="113" rescore="1" />
+  <row cycle="31" read_as="T" really_a="23" really_c="63" really_g="216" really_t="20192" rescore="1" />
+  <row cycle="32" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="32" read_as="A" really_a="20100" really_c="179" really_g="77" really_t="21" rescore="1" />
+  <row cycle="32" read_as="C" really_a="161" really_c="15536" really_g="79" really_t="68" rescore="1" />
+  <row cycle="32" read_as="G" really_a="193" really_c="286" really_g="12205" really_t="379" rescore="1" />
+  <row cycle="32" read_as="T" really_a="212" really_c="350" really_g="3594" really_t="19728" rescore="1" />
+  <row cycle="33" read_as="N" really_a="2" really_c="0" really_g="0" really_t="1" rescore="1" />
+  <row cycle="33" read_as="A" really_a="19930" really_c="112" really_g="54" really_t="18" rescore="1" />
+  <row cycle="33" read_as="C" really_a="42" really_c="16159" really_g="27" really_t="58" rescore="1" />
+  <row cycle="33" read_as="G" really_a="46" really_c="104" really_g="15258" really_t="150" rescore="1" />
+  <row cycle="33" read_as="T" really_a="42" really_c="156" really_g="807" really_t="20193" rescore="1" />
+  <row cycle="34" read_as="N" really_a="1" really_c="1" really_g="1" really_t="0" rescore="1" />
+  <row cycle="34" read_as="A" really_a="19983" really_c="87" really_g="37" really_t="17" rescore="1" />
+  <row cycle="34" read_as="C" really_a="38" really_c="16338" really_g="26" really_t="54" rescore="1" />
+  <row cycle="34" read_as="G" really_a="37" really_c="69" really_g="15783" really_t="137" rescore="1" />
+  <row cycle="34" read_as="T" really_a="45" really_c="134" really_g="463" really_t="19895" rescore="1" />
+  <row cycle="35" read_as="N" really_a="6" really_c="4" really_g="4" really_t="4" rescore="1" />
+  <row cycle="35" read_as="A" really_a="19817" really_c="190" really_g="64" really_t="27" rescore="1" />
+  <row cycle="35" read_as="C" really_a="127" really_c="15706" really_g="88" really_t="81" rescore="1" />
+  <row cycle="35" read_as="G" really_a="113" really_c="209" really_g="13689" really_t="232" rescore="1" />
+  <row cycle="35" read_as="T" really_a="172" really_c="307" really_g="2528" really_t="19769" rescore="1" />
+  <row cycle="36" read_as="N" really_a="0" really_c="0" really_g="0" really_t="0" rescore="1" />
+  <row cycle="36" read_as="A" really_a="19530" really_c="208" really_g="70" really_t="23" rescore="1" />
+  <row cycle="36" read_as="C" really_a="107" really_c="15856" really_g="52" really_t="75" rescore="1" />
+  <row cycle="36" read_as="G" really_a="98" really_c="196" really_g="13973" really_t="219" rescore="1" />
+  <row cycle="36" read_as="T" really_a="167" really_c="285" really_g="2223" really_t="20049" rescore="1" />
+  <row cycle="37" read_as="N" really_a="14" really_c="7" really_g="10" really_t="13" rescore="1" />
+  <row cycle="37" read_as="A" really_a="19905" really_c="120" really_g="48" really_t="23" rescore="1" />
+  <row cycle="37" read_as="C" really_a="55" really_c="15886" really_g="44" really_t="71" rescore="1" />
+  <row cycle="37" read_as="G" really_a="76" really_c="138" really_g="15058" really_t="160" rescore="1" />
+  <row cycle="37" read_as="T" really_a="153" really_c="341" really_g="1237" really_t="19764" rescore="1" />
+</errors_by_cycle_and_nucleotide>
+<most_common_word>
+  <row rank="1" occurrence="21" word="GACGACCAAAATTAGGGTCAACGCTACCTGTAGGAAG" number_of_sequences="1" rescore="1" />
+  <row rank="2" occurrence="20" word="GAGAGTGTCAAAAACGATAAACCAACCATCAGCATGA" number_of_sequences="2" rescore="1" />
+  <row rank="2" occurrence="20" word="GGCGTTATAACCTCACACTCAATCTTTTATCACGAAG" number_of_sequences="2" rescore="1" />
+  <row rank="3" occurrence="18" word="GGCATCAAAAGCAATATCAGCACCAACAGAAACAACC" number_of_sequences="1" rescore="1" />
+  <row rank="4" occurrence="17" word="GGAAAATGAGAAAATTCGACCTATCCTTGCGCAGCTC" number_of_sequences="1" rescore="1" />
+  <row rank="5" occurrence="16" word="CAAATGACGACTTCTACCACATCTATTGACATTATGG" number_of_sequences="2" rescore="1" />
+  <row rank="5" occurrence="16" word="GTGGATGCCTGACCGTACCGAGGCTAACCCTAATGAG" number_of_sequences="2" rescore="1" />
+  <row rank="6" occurrence="15" word="AAGCTCTTACTTTGCGACCTTTCGCCATCAACTAACG" number_of_sequences="6" rescore="1" />
+  <row rank="6" occurrence="15" word="ACTTAAGTGGCTGGAGACAAATAATCTCTTTAATAAC" number_of_sequences="6" rescore="1" />
+  <row rank="6" occurrence="15" word="CAATTCATCCATTAACTTCTCAGTAACAGATACAAAC" number_of_sequences="6" rescore="1" />
+  <row rank="6" occurrence="15" word="GACGAGCACGAGAGCGGTCAGTAGCAATCCAAACTTT" number_of_sequences="6" rescore="1" />
+  <row rank="6" occurrence="15" word="GAGGGTATCCTACAAAGTCCAGCGTACCATAAACGCA" number_of_sequences="6" rescore="1" />
+  <row rank="6" occurrence="15" word="GATGGGCATACTGTAACCATAAGGCCACGTATTTTGC" number_of_sequences="6" rescore="1" />
+  <row rank="7" occurrence="14" word="" number_of_sequences="10" rescore="1" />
+  <row rank="8" occurrence="13" word="" number_of_sequences="10" rescore="1" />
+  <row rank="9" occurrence="12" word="" number_of_sequences="40" rescore="1" />
+  <row rank="10" occurrence="11" word="" number_of_sequences="58" rescore="1" />
+  <row rank="11" occurrence="10" word="" number_of_sequences="122" rescore="1" />
+  <row rank="12" occurrence="9" word="" number_of_sequences="185" rescore="1" />
+  <row rank="13" occurrence="8" word="" number_of_sequences="328" rescore="1" />
+  <row rank="14" occurrence="7" word="" number_of_sequences="503" rescore="1" />
+  <row rank="15" occurrence="6" word="" number_of_sequences="772" rescore="1" />
+  <row rank="16" occurrence="5" word="" number_of_sequences="1196" rescore="1" />
+  <row rank="17" occurrence="4" word="" number_of_sequences="1598" rescore="1" />
+  <row rank="18" occurrence="3" word="" number_of_sequences="2196" rescore="1" />
+  <row rank="19" occurrence="2" word="" number_of_sequences="3706" rescore="1" />
+  <row rank="20" occurrence="1" word="" number_of_sequences="56905" rescore="1" />
+</most_common_word>
+<most_common_blank_pattern>
+  <row rank="1" occurrence="98417" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" number_of_sequences="1" rescore="1" />
+  <row rank="2" occurrence="43" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN." number_of_sequences="1" rescore="1" />
+  <row rank="3" occurrence="30" pattern="N..N................................." number_of_sequences="2" rescore="1" />
+  <row rank="3" occurrence="30" pattern="NNNN.NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" number_of_sequences="2" rescore="1" />
+  <row rank="4" occurrence="19" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNN.NNNNNNNNN" number_of_sequences="1" rescore="1" />
+  <row rank="5" occurrence="18" pattern="NNNN.N..N...........N....N.NN........" number_of_sequences="2" rescore="1" />
+  <row rank="5" occurrence="18" pattern="NNNNNNNNN.N..N.N...NNN...N.NN........" number_of_sequences="2" rescore="1" />
+  <row rank="6" occurrence="16" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN.NNN.N." number_of_sequences="1" rescore="1" />
+  <row rank="7" occurrence="12" pattern="N...................................." number_of_sequences="2" rescore="1" />
+  <row rank="7" occurrence="12" pattern="NNNNNNNNNNNNNNNNNNNNNNN..NNNNN.N....." number_of_sequences="2" rescore="1" />
+  <row rank="8" occurrence="11" pattern="N.NN.N.....................N........." number_of_sequences="1" rescore="1" />
+  <row rank="9" occurrence="10" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN.N." number_of_sequences="1" rescore="1" />
+  <row rank="10" occurrence="9" pattern=".N.N.N.NNNNN..NNNN..NNNNN....NN.NNNNN" number_of_sequences="3" rescore="1" />
+  <row rank="10" occurrence="9" pattern="NNNN.NN.NNNNNNNNNNNNNNNNN.NNN.N..NNNN" number_of_sequences="3" rescore="1" />
+  <row rank="10" occurrence="9" pattern="NNNNNN..N...........N....N.NN........" number_of_sequences="3" rescore="1" />
+  <row rank="11" occurrence="8" pattern="N..N.......................N........." number_of_sequences="3" rescore="1" />
+  <row rank="11" occurrence="8" pattern="NNNN.N.....................N........." number_of_sequences="3" rescore="1" />
+  <row rank="11" occurrence="8" pattern="NNNNNN.NN......N...NN....N.NN........" number_of_sequences="3" rescore="1" />
+  <row rank="12" occurrence="7" pattern="NNNN.N..............N......N........." number_of_sequences="2" rescore="1" />
+  <row rank="12" occurrence="7" pattern="NNNNNNNNN....N.N...NNN...N.NN........" number_of_sequences="2" rescore="1" />
+  <row rank="13" occurrence="6" pattern="NNNN.NN.NNNNNNNNNNNNNNNNN.NNN.NN.NNNN" number_of_sequences="2" rescore="1" />
+  <row rank="13" occurrence="6" pattern="NNNN.NNNNNNNNNNNNNNNNNNNN...NNN.NNNNN" number_of_sequences="2" rescore="1" />
+  <row rank="14" occurrence="5" pattern="...N...N.......NNN...NNN.....NN.NNNNN" number_of_sequences="4" rescore="1" />
+  <row rank="14" occurrence="5" pattern=".N.N.N.NNN.N..NNNN...NNNN....NN.NNNNN" number_of_sequences="4" rescore="1" />
+  <row rank="14" occurrence="5" pattern="NNNN.NNNNNNNNNNNNNNNNNNNN.NNNNNNNNNNN" number_of_sequences="4" rescore="1" />
+  <row rank="14" occurrence="5" pattern="NNNNNNNNNNNNNNNNNNNNNNN.NNNNNN.N...N." number_of_sequences="4" rescore="1" />
+  <row rank="15" occurrence="4" pattern="NNNN.NN.NNNNNNNNNNNNNNNNN.NNNNNNNNNNN" number_of_sequences="3" rescore="1" />
+  <row rank="15" occurrence="4" pattern="NNNNNNNNNNNN.NNN...NNNN..NNNNN.N....." number_of_sequences="3" rescore="1" />
+  <row rank="15" occurrence="4" pattern="NNNNNNNNNNNNNNNNNNNNNNNNNN..NNN.NNNNN" number_of_sequences="3" rescore="1" />
+  <row rank="16" occurrence="3" pattern="" number_of_sequences="7" rescore="1" />
+  <row rank="17" occurrence="2" pattern="" number_of_sequences="9" rescore="1" />
+  <row rank="18" occurrence="1" pattern="" number_of_sequences="30" rescore="1" />
+</most_common_blank_pattern>
+</run_tile>
+</run_tiles>
+</root>

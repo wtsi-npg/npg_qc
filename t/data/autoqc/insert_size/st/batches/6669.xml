@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+  <id>6669</id>
+  <status>started</status>
+  <lanes>
+    <lane position="1" priority="0" id="236653">
+      <library name="O157_Input 236583" request_id="550377" id="236583" qc_state="pass">
+        <sample library_id="236583" library_type="Custom" study_id="576" sample_id="112662" project_id="576" library_name="O157_Input 236583">
+          <insert_size from="0" to="0"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="2" priority="0" id="236654">
+      <library name="O157_Output 236584" request_id="550379" id="236584" qc_state="pass">
+        <sample library_id="236584" library_type="Custom" study_id="576" sample_id="112663" project_id="576" library_name="O157_Output 236584">
+          <insert_size from="0" to="0"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="3" priority="0" id="236652">
+      <pool name="26May2010" request_id="550354" id="236519" qc_state="pass">
+        <sample library_id="236515" library_type="Custom" study_id="590" sample_id="112635" project_id="46" library_name="U266 236515">
+          <tag tag_id="451">
+            <index>1</index>
+            <expected_sequence>CGCAA</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="390"/>
+        </sample>
+        <sample library_id="236516" library_type="Custom" study_id="590" sample_id="112636" project_id="46" library_name="10E-4NPM1_U266 236516">
+          <tag tag_id="453">
+            <index>2</index>
+            <expected_sequence>AGGCT</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236517" library_type="Custom" study_id="590" sample_id="112637" project_id="46" library_name="10E-3NPM1_U266 236517">
+          <tag tag_id="454">
+            <index>3</index>
+            <expected_sequence>TACTC</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size />
+        </sample>
+        <sample library_id="236518" library_type="Custom" study_id="590" sample_id="112638" project_id="46" library_name="10E-2NPM1_U266 236518">
+          <tag tag_id="455">
+            <index>4</index>
+            <expected_sequence>TCACG</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="380"/>
+        </sample>
+      </pool>
+    </lane>
+    <lane position="4" priority="0" id="">
+      <control name="phiX_SI_SPRI 1" request_id="550403" id="79572">
+        <sample library_id="79572" library_type="" study_id="" sample_id="9831" project_id="" library_name="phiX_SI_SPRI 1">
+        </sample>
+      </control>
+    </lane>
+    <lane position="5" priority="0" id="236655">
+      <pool name="26May2010" request_id="550399" id="236519" qc_state="pass">
+        <sample library_id="236515" library_type="Custom" study_id="590" sample_id="112635" project_id="46" library_name="U266 236515">
+          <tag tag_id="451">
+            <index>1</index>
+            <expected_sequence>CGCAA</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236516" library_type="Custom" study_id="590" sample_id="112636" project_id="46" library_name="10E-4NPM1_U266 236516">
+          <tag tag_id="453">
+            <index>2</index>
+            <expected_sequence>AGGCT</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236517" library_type="Custom" study_id="590" sample_id="112637" project_id="46" library_name="10E-3NPM1_U266 236517">
+          <tag tag_id="454">
+            <index>3</index>
+            <expected_sequence>TACTC</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236518" library_type="Custom" study_id="590" sample_id="112638" project_id="46" library_name="10E-2NPM1_U266 236518">
+          <tag tag_id="455">
+            <index>4</index>
+            <expected_sequence>TCACG</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+      </pool>
+    </lane>
+    <lane position="6" priority="0" id="236656">
+      <pool name="26May2010" request_id="550400" id="236519" qc_state="pass">
+        <sample library_id="236515" library_type="Custom" study_id="590" sample_id="112635" project_id="46" library_name="U266 236515">
+          <tag tag_id="451">
+            <index>1</index>
+            <expected_sequence>CGCAA</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236516" library_type="Custom" study_id="590" sample_id="112636" project_id="46" library_name="10E-4NPM1_U266 236516">
+          <tag tag_id="453">
+            <index>2</index>
+            <expected_sequence>AGGCT</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236517" library_type="Custom" study_id="590" sample_id="112637" project_id="46" library_name="10E-3NPM1_U266 236517">
+          <tag tag_id="454">
+            <index>3</index>
+            <expected_sequence>TACTC</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236518" library_type="Custom" study_id="590" sample_id="112638" project_id="46" library_name="10E-2NPM1_U266 236518">
+          <tag tag_id="455">
+            <index>4</index>
+            <expected_sequence>TCACG</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+      </pool>
+    </lane>
+    <lane position="7" priority="0" id="236657">
+      <pool name="26May2010" request_id="550401" id="236519" qc_state="pass">
+        <sample library_id="236515" library_type="Custom" study_id="590" sample_id="112635" project_id="46" library_name="U266 236515">
+          <tag tag_id="451">
+            <index>1</index>
+            <expected_sequence>CGCAA</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236516" library_type="Custom" study_id="590" sample_id="112636" project_id="46" library_name="10E-4NPM1_U266 236516">
+          <tag tag_id="453">
+            <index>2</index>
+            <expected_sequence>AGGCT</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236517" library_type="Custom" study_id="590" sample_id="112637" project_id="46" library_name="10E-3NPM1_U266 236517">
+          <tag tag_id="454">
+            <index>3</index>
+            <expected_sequence>TACTC</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236518" library_type="Custom" study_id="590" sample_id="112638" project_id="46" library_name="10E-2NPM1_U266 236518">
+          <tag tag_id="455">
+            <index>4</index>
+            <expected_sequence>TCACG</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+      </pool>
+    </lane>
+    <lane position="8" priority="0" id="236658">
+      <pool name="26May2010" request_id="550402" id="236519" qc_state="pass">
+        <sample library_id="236515" library_type="Custom" study_id="590" sample_id="112635" project_id="46" library_name="U266 236515">
+          <tag tag_id="451">
+            <index>1</index>
+            <expected_sequence>CGCAA</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236516" library_type="Custom" study_id="590" sample_id="112636" project_id="46" library_name="10E-4NPM1_U266 236516">
+          <tag tag_id="453">
+            <index>2</index>
+            <expected_sequence>AGGCT</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236517" library_type="Custom" study_id="590" sample_id="112637" project_id="46" library_name="10E-3NPM1_U266 236517">
+          <tag tag_id="454">
+            <index>3</index>
+            <expected_sequence>TACTC</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+        <sample library_id="236518" library_type="Custom" study_id="590" sample_id="112638" project_id="46" library_name="10E-2NPM1_U266 236518">
+          <tag tag_id="455">
+            <index>4</index>
+            <expected_sequence>TCACG</expected_sequence>
+            <tag_group_id>13</tag_group_id>
+          </tag>
+          <insert_size from="300" to="300"/>
+        </sample>
+      </pool>
+    </lane>
+  </lanes>
+</batch>

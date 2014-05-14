@@ -1,0 +1,25 @@
+--
+-- alter column end data type to allow to use t as end number for indexing read
+-- 
+
+ALTER TABLE `run_tile` MODIFY COLUMN `end` CHAR(1) NOT NULL;
+
+ALTER TABLE `lane_qc` MODIFY COLUMN `end` CHAR(1) NOT NULL;
+
+ALTER TABLE `analysis` MODIFY COLUMN `end` CHAR(1) NOT NULL;
+
+ALTER TABLE `analysis_lane` MODIFY COLUMN `end` CHAR(1) NOT NULL;
+
+--
+-- add unique key for analysis table
+--
+
+ALTER TABLE `analysis_lane` ADD UNIQUE KEY `unq_al_lane`(`id_analysis`, `position`);
+
+
+--
+-- remove unsigned to allow negative value to be inserted
+--
+ALTER TABLE `analysis_lane`
+ MODIFY COLUMN `cycle_10_20_av_perc_loss_pf` FLOAT  NOT NULL DEFAULT 0,
+ MODIFY COLUMN `cycle_2_10_av_perc_loss_pf` FLOAT  NOT NULL DEFAULT 0;

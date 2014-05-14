@@ -1,0 +1,19 @@
+[% real = model.get_from_id_run(model.id_run_config) %]
+
+<h2>Illumina Pipeline Configuration for [% real.id_run %][% IF real.id_run_pair %]/[% real.id_run_pair %][% END %] </h2>
+
+<pre>[% real.config_text %]</pre>
+
+
+<script type="text/javascript">
+document.title='Run [% real.id_run %] Illumina Pipeline Configuration';
+Event.observe(window,'load',back());
+
+function back() {
+  var actions = document.getElementById('actions');
+  var NewLI = document.createElement('LI');
+  NewLI.innerHTML = ' <a href="[% SCRIPT_NAME %]/summary/[% real.id_run %]">[Back]</a>';
+  actions.appendChild(NewLI);
+}
+</script>
+ 

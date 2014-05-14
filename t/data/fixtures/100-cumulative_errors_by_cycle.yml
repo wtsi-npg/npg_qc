@@ -1,0 +1,55 @@
+---
+ - id_cumulative_errors_by_cycle: 1
+   id_run_tile: 1
+   cycle: 1
+   one: 1
+   two: 5
+   three: 5
+   four: 5
+   five: 5
+   rescore: 1
+ - id_cumulative_errors_by_cycle: 2
+   id_run_tile: 1
+   cycle: 2
+   one: 1
+   two: 2
+   three: 5
+   four: 5
+   five: 5
+   rescore: 1
+ - id_cumulative_errors_by_cycle: 3
+   id_run_tile: 1
+   cycle: 3
+   one: 1
+   two: 2
+   three: 3
+   four: 5
+   five: 5
+   rescore: 1
+ - id_cumulative_errors_by_cycle: 4
+   id_run_tile: 1
+   cycle: 4
+   one: 1
+   two: 2
+   three: 3
+   four: 4
+   five: 5
+   rescore: 1
+ - id_cumulative_errors_by_cycle: 5
+   id_run_tile: 2
+   cycle: 4
+   one: 1
+   two: 2
+   three: 3
+   four: 4
+   five: 5
+   rescore: 1
+ - id_cumulative_errors_by_cycle: 6
+   id_run_tile: 5
+   cycle: 4
+   one: 1
+   two: 2
+   three: 3
+   four: 4
+   five: 5
+   rescore: 1

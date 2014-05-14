@@ -1,0 +1,5 @@
+--
+-- add one more column for run_recipe table
+--
+
+ALTER TABLE `run_recipe` ADD COLUMN `first_indexing_cycle` TINYINT(2) UNSIGNED DEFAULT NULL AFTER `col`;

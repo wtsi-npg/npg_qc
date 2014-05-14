@@ -1,0 +1,12 @@
+<most_common_word>
+  <row rank="1" occurrence="15" word="GGTTCAGCAGGAATGCCGAGATCGGAAGAGCGGTTC" number_of_sequences="1" rescore="0" />
+  <row rank="2" occurrence="9" word="GAAAACTGGCCTAACGACGTTTGGTCAGTTCCATCA" number_of_sequences="1" rescore="0" />
+  <row rank="3" occurrence="8" word="" number_of_sequences="17" rescore="0" />
+  <row rank="4" occurrence="7" word="" number_of_sequences="32" rescore="0" />
+  <row rank="5" occurrence="6" word="" number_of_sequences="124" rescore="0" />
+  <row rank="6" occurrence="5" word="" number_of_sequences="353" rescore="0" />
+  <row rank="7" occurrence="4" word="" number_of_sequences="818" rescore="0" />
+  <row rank="8" occurrence="3" word="" number_of_sequences="1581" rescore="0" />
+  <row rank="9" occurrence="2" word="" number_of_sequences="2674" rescore="0" />
+  <row rank="10" occurrence="1" word="" number_of_sequences="23144" rescore="0" />
+</most_common_word>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+  <id>3432</id>
+  <status>released</status>
+  <lanes>
+    <lane position="1" priority="0" id="73257">
+      <library name="AB0010-C 1" request_id="17591" id="54757" qc_state="pass">
+        <sample library_id="54757" library_type="Standard" study_id="544" sample_id="3056" project_id="25" library_name="AB0010-C 1">
+          <insert_size from="300" to="300"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="2" priority="0" id="73258">
+      <library name="AD0019-C 1" request_id="17592" id="54759" qc_state="pass">
+        <sample library_id="54759" library_type="Standard" study_id="544" sample_id="3057" project_id="25" library_name="AD0019-C 1">
+          <insert_size from="300" to="300"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="3" priority="0" id="73608">
+      <library name="Rainger_500_HC_1" request_id="21687" id="53654" qc_state="pass">
+        <sample library_id="53654" library_type="High complexity" study_id="456" sample_id="2461" project_id="81" library_name="Rainger_500_HC_1">
+          <insert_size from="500" to="500"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="4" priority="0" id="81624">
+      <control name="Illumina phiX" request_id="42845" id="79573">
+        <sample library_id="79573" library_type="" study_id="" sample_id="9832" project_id="" library_name="Illumina phiX">
+        </sample>
+      </control>
+    </lane>
+    <lane position="5" priority="0" id="73259">
+      <library name="Pooled_AD0001_3_8 1" request_id="17593" id="54761" qc_state="pass">
+        <sample library_id="54761" library_type="Standard" study_id="544" sample_id="3058" project_id="25" library_name="Pooled_AD0001_3_8 1">
+          <insert_size from="300" to="300"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="6" priority="0" id="73260">
+      <library name="AK0001-C 1" request_id="17594" id="54763" qc_state="pass">
+        <sample library_id="54763" library_type="Standard" study_id="544" sample_id="3050" project_id="25" library_name="AK0001-C 1">
+          <insert_size from="300" to="300"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="7" priority="0" id="73261">
+      <library name="AK0005-C 1" request_id="17595" id="54765" qc_state="pass">
+        <sample library_id="54765" library_type="Standard" study_id="544" sample_id="3051" project_id="25" library_name="AK0005-C 1">
+          <insert_size from="300" to="300"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="8" priority="0" id="73234">
+      <library name="NA20537-TOS 1" request_id="17542" id="54727" qc_state="pass">
+        <sample library_id="54727" library_type="High complexity" study_id="186" sample_id="1898" project_id="186" library_name="NA20537-TOS 1">
+          <insert_size from="150" to="200"/>
+        </sample>
+      </library>
+    </lane>
+  </lanes>
+</batch>

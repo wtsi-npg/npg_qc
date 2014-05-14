@@ -1,0 +1,11 @@
+
+<h2>Run Log Information for Run [% model.id_run %]</h2>
+
+[% PROCESS move_z_list_alerts_add_ajax.tt2 %]
+
+<fieldset id="display">
+<legend>Select Run Log Metric to view</legend>
+<ul>[% FOREACH metric = model.metrics %]
+<li><a href="[% SCRIPT_NAME %]/[% metric.module %]/[% model.id_run %]">[% metric.title %]</a></li>[% END %]
+</ul>
+</fieldset>

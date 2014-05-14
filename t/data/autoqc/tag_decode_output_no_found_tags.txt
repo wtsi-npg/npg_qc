@@ -1,0 +1,10 @@
+Tag decoding statistics:
+
+                           All reads            Good reads
+                           ===================  ====================
+No match                :       7512  (  2.4%)        2078  (  0.7%)
+Matched with   0 errors :     304354  ( 95.6%)      275562  ( 98.7%)
+Matched with   1 error  :       6627  (  2.1%)        1505  (  0.5%)
+
+No Tags Found
+

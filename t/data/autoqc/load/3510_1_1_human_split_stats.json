@@ -1,0 +1,18 @@
+ {"id_run": 3510,
+  "position":2,
+  "__CLASS__":"npg_qc::autoqc::results::insert_size-5467",
+  "path": "/tmp",
+  "filenames": ["3510_1_1.fastq","3510_1_2.fastq"],
+  "bins":[1, 3, 5],
+  "bin_width":5,
+  "min_isize": 400,
+  "expected_mean":10000,
+  "mean":1000,
+  "std":50,
+  "sample_size": 22000,
+  "num_well_aligned_reads": 20000,
+  "quartile1": 3000,
+  "median":3000,
+  "quartile3": 40000,
+  "pass":1
+ }

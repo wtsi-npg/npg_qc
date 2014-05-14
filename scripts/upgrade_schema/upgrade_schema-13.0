@@ -1,0 +1,64 @@
+--change column end datatype to allow other value as end, not just digit 1 and 2
+
+ALTER TABLE `qcal` MODIFY COLUMN `end` char(1) NOT NULL;
+
+--create a new table to store fastq and splitting statistics
+--this is for a sample within a lane of a run against one reference
+
+CREATE TABLE `splitting_stats` (
+  `id_splitting_stats` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `lane` tinyint(1) unsigned NOT NULL,
+  `index_sample` tinyint(1) unsigned NOT NULL,
+  `reference` varchar(255) NOT NULL,
+  `num_total_reads` bigint(20) unsigned default NULL,
+  `num_aligned` bigint(20) unsigned default NULL,
+  `num_not_aligned` bigint(20) unsigned default NULL,
+  PRIMARY KEY  (`id_splitting_stats`),
+  UNIQUE KEY `uniq_idx_sample_ref` (`id_run`,`lane`,`index_sample`,`reference`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- each splitting based on one or two fastq alignment
+
+CREATE TABLE `splitting_alignment` (
+  `id_splitting_alignment` bigint(20) unsigned NOT NULL auto_increment,
+  `id_splitting_stats` bigint(20) unsigned NOT NULL,
+  `read_filename` varchar(255) NOT NULL,
+  `num_total_reads` bigint(20) unsigned NOT NULL,
+  `num_aligned` bigint(20) unsigned NOT NULL,
+  `num_not_aligned` bigint(20) unsigned NOT NULL,
+  `google_chart_coverage_chromosome` TEXT  DEFAULT NULL,
+  PRIMARY KEY  (`id_splitting_alignment`),
+  UNIQUE KEY `uniq_alignment_splitting` (`id_splitting_stats`,`read_filename`),
+  CONSTRAINT `split_align_fk_constraint` FOREIGN KEY (`id_splitting_stats`) REFERENCES `splitting_stats` (`id_splitting_stats`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- each alignment has one or more chromosomes, here is for one chromosome alignment coverage
+
+CREATE TABLE `splitting_coverage` (
+  `id_splitting_coverage` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_splitting_alignment` BIGINT(20) UNSIGNED NOT NULL,
+  `sequence` varchar(255)  NOT NULL,
+  `coverage` FLOAT(7,4) UNSIGNED NOT NULL,
+  `google_chart_depth` TEXT  DEFAULT NULL,
+  PRIMARY KEY (`id_splitting_coverage`),
+  UNIQUE INDEX `unq_align_sequence`(`id_splitting_alignment`, `sequence`),
+  CONSTRAINT `new_fk_constraint` FOREIGN KEY `new_fk_constraint` (`id_splitting_alignment`)
+    REFERENCES `splitting_alignment` (`id_splitting_alignment`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
+)
+ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+-- each coverage has one or more alignment depth values with number of bases
+
+CREATE TABLE `splitting_alignment_depth` (
+  `id_splitting_alignment_depth` bigint(20) unsigned NOT NULL auto_increment,
+  `id_splitting_coverage` bigint(20) unsigned NOT NULL,
+  `depth` int(10) unsigned NOT NULL,
+  `num_positions` int(10) unsigned NOT NULL,
+  PRIMARY KEY  (`id_splitting_alignment_depth`),
+  UNIQUE KEY `uniq_coverage_depth` (`id_splitting_coverage`,`depth`),
+  CONSTRAINT `coverage_depth_fk_constraint` FOREIGN KEY (`id_splitting_coverage`) REFERENCES `splitting_coverage` (`id_splitting_coverage`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

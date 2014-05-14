@@ -1,0 +1,12 @@
+--
+-- drop all swift tables, they are never being used
+-- 
+
+DROP TABLE swift_all_intensities_per_cycle_per_base, swift_called_intensities_per_cycle_per_base, swift_npf_errors_per_cycle, swift_pf_errors_per_cycle, swift_report;
+
+--
+-- drop table tile_all, which is used to produce tile-based IVC plot, not used any more
+-- 
+
+DROP TABLE tile_all;
+

@@ -1,0 +1,98 @@
+DATA CLEAN_UP ON THE LIVE NPN QC DATABASE
+-----------------------------------------
+-----------------------------------------
+
+Problem: two records for a forward read
+---------------------------------------
+
+Output of 
+
+perl -Ilib -I/software/solexa/lib/perl5 one-offs/db_fastqchecks_find_identical.pl
+
+4827_5.fastqcheck 4827_5_1.fastqcheck SAME
+7236_2.fastqcheck 7236_2_1.fastqcheck DIFFERENT
+7236_1.fastqcheck 7236_1_1.fastqcheck DIFFERENT
+7236_3.fastqcheck 7236_3_1.fastqcheck DIFFERENT
+4827_3.fastqcheck 4827_3_1.fastqcheck SAME
+4827_1.fastqcheck 4827_1_1.fastqcheck SAME
+7236_6.fastqcheck 7236_6_1.fastqcheck DIFFERENT
+4827_2.fastqcheck 4827_2_1.fastqcheck SAME
+4827_7.fastqcheck 4827_7_1.fastqcheck SAME
+4827_8.fastqcheck 4827_8_1.fastqcheck SAME
+7236_7.fastqcheck 7236_7_1.fastqcheck DIFFERENT
+7236_8.fastqcheck 7236_8_1.fastqcheck DIFFERENT
+4827_4.fastqcheck 4827_4_1.fastqcheck SAME
+7236_4.fastqcheck 7236_4_1.fastqcheck DIFFERENT
+7236_5.fastqcheck 7236_5_1.fastqcheck DIFFERENT
+4827_6.fastqcheck 4827_6_1.fastqcheck SAME
+
+1. Run 4827 (one runfolder, single read): delete 4827_X_1.fastqcheck
+
+ delete from fastqcheck where file_name like '4827\__\_1.fastqcheck';
+
+2. Run 7236 (one runfolder, single read): files 7236_X.fastq are for zero read count - not true; delete 7236_X.fastq, rename 7236_X_1.fastq to 7236_X.fastq
+
+ delete from fastqcheck where file_name like '7236\__.fastqcheck';
+ update fastqcheck set file_name=concat_ws('.',substr(file_name,1,6),'fastqcheck') where file_name like '7236\__\_1.fastqcheck';
+
+Problem: file name parsing failure while migrating data from fastqcheck to fastqcheck_new database
+--------------------------------------------------------------------------------------------------
+
+perl -Ilib -I/software/solexa/lib/perl5 one-offs/db_copy_fastqchecks.pl 
+
+Cannot infer id_run from filename 5605_2_1_pf0.fastqcheck for 5605_2_1_pf0.fastqcheck, skipping...
+Cannot infer id_run from filename 5605_2_t_pf0.fastqcheck for 5605_2_t_pf0.fastqcheck, skipping...
+Cannot infer id_run from filename 5605_3_1_pf0.fastqcheck for 5605_3_1_pf0.fastqcheck, skipping...
+Cannot infer id_run from filename 5605_3_t_pf0.fastqcheck  for 5605_3_t_pf0.fastqcheck, skipping...
+
+Problem: missing file content
+-----------------------------
+
+File empty for 5155_4_1.fastqcheck - record is copied with no content
+
+update fastqcheck set twenty=(select yield1*1000  from qx_yield where id_run=5155 and position=4) where id_run=5155 and position=4 and section='forward';
+update fastqcheck set thirty=(select thirty  from qcal where id_run=5155 and position=4 and end = '1') where id_run=5155 and position=4 and section='forward';
+update fastqcheck set twentyfive=(select twentyfive  from qcal where id_run=5155 and position=4 and end = '1') where id_run=5155 and position=4 and section='forward';
+
+Problem:
+---------
+
+run 6719 files for index read show zero reads - wrong
+
+update fastqcheck set thirty=(select thirty  from qcal where id_run=6719 and position=2 and end = 't') where id_run=6719 and position=2 and section='index' and split='none';
+
+For lane 1-8 do (replace lane number as necessary)
+update fastqcheck set twenty=(select twenty  from qcal where id_run=6719 and position=2 and end = 't') where id_run=6719 and position=2 and section='index' and split='none';
+update fastqcheck set thirty=(select thirty  from qcal where id_run=6719 and position=2 and end = 't') where id_run=6719 and position=2 and section='index' and split='none';
+update fastqcheck set twentyfive=(select twentyfive  from qcal where id_run=6719 and position=2 and end = 't') where id_run=6719 and position=2 and section='index' and split='none';
+
+OUTCOME:
+--------
+
+mysql> select count(*) from fastqcheck_new;
++----------+
+| count(*) |
++----------+
+|   399635 | 
++----------+
+1 row in set (0.44 sec)
+
+mysql> select count(*) from fastqcheck;
++----------+
+| count(*) |
++----------+
+|   399639 | 
++----------+
+1 row in set (8 min 12.12 sec)
+
+
+mysql> select distinct id_run, position from fastqcheck_new where tag_index=-1 and split='none';
+40114 rows in set
+
+mysql> select distinct id_run, position from fastqcheck_new where tag_index=-1;
+40114 rows in set
+
+
+
+
+

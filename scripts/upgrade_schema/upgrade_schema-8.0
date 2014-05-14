@@ -1,0 +1,43 @@
+
+--
+-- create a new table `frequency_response_matrix`
+--
+
+CREATE TABLE `frequency_response_matrix` (
+  `id_frequency_response_matrix` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_run` BIGINT(20) UNSIGNED NOT NULL,
+  `cycle` smallint(3) unsigned default NULL,
+  `lane` TINYINT(1) UNSIGNED NOT NULL,
+  `base` CHAR(1)  NOT NULL,
+  `red1` FLOAT(5,2)  NOT NULL,
+  `red2` float(5,2)  NOT NULL,
+  `green1` float(5,2)  NOT NULL,
+  `green2` float(5,2)  NOT NULL,
+  PRIMARY KEY (`id_frequency_response_matrix`),
+  UNIQUE KEY `unq_idx_run_lane_base`(`id_run`,`cycle`, `lane`, `base`)
+)
+ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+
+--
+-- create a new table `offset`
+--
+
+CREATE TABLE `offset` (
+  `id_offset` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `lane` tinyint(1) unsigned NOT NULL,
+  `tile` smallint(3) unsigned NOT NULL,
+  `cycle` smallint(3) unsigned default NULL,
+  `image` tinyint(1) unsigned NOT NULL,
+  `x` float(5,2) NOT NULL,
+  `y` float(5,2) NOT NULL,
+  PRIMARY KEY  (`id_offset`),
+  UNIQUE KEY `unq_idx_run_lane_tile_cycle_image` (`id_run`,`lane`,`tile`,`cycle`,`image`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- add one column to run_graph table
+--
+
+ALTER TABLE `run_graph` ADD COLUMN `cycle` SMALLINT(3) UNSIGNED DEFAULT NULL AFTER `avg_cluster_per_tile_raw_control`;

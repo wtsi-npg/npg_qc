@@ -1,0 +1,18 @@
+DROP TABLE IF EXISTS instrument_statistics;
+CREATE TABLE `instrument_statistics` (
+  `id_instrument_statistics` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_run` BIGINT(20) UNSIGNED NOT NULL,
+  `end` TINYINT(1) UNSIGNED NOT NULL,
+  `id_run_actual` BIGINT(20) UNSIGNED NOT NULL,
+  `instrument` TINYTEXT  NOT NULL,
+  `num_tile_low_cluster` SMALLINT(5) UNSIGNED DEFAULT NULL,
+  `num_tile_high_cluster` SMALLINT(5) UNSIGNED DEFAULT NULL,
+  `num_tile_high_intensity` SMALLINT(5) UNSIGNED DEFAULT NULL,
+  `num_tile_low_intensity` SMALLINT(5) UNSIGNED DEFAULT NULL,
+  `num_tile_high_error` SMALLINT(5) UNSIGNED DEFAULT NULL,
+  `num_tile_movez_out` SMALLINT(5) UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id_instrument_statistics`),
+  INDEX `instrument_idx`(`instrument`(5))
+)
+ENGINE = InnoDB
+CHARACTER SET utf8;

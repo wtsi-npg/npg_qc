@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+[% id_runs_complete = model.get_runs_complete_data %]
+
+<complete_run_summaries>
+  [% FOREACH complete_run = model.get_paired_runs_complete_data %]
+  [% id_run = complete_run.key %]
+  [% id_run_pair = complete_run.value %]
+  <run id_run="[% id_run %]" run_complete="[% id_runs_complete.$id_run %]"  [% IF id_run_pair %] id_run_pair="[% id_run_pair %]" pair_complete="[% id_runs_complete.$id_run_pair %]" [% END %] />  
+  [% END %]
+</complete_run_summaries>

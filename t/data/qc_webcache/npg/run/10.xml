@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="10" batch_id="0" id_instrument="3" expected_cycle_count="35" actual_cycle_count="0" priority="1" id_run_pair="0" is_paired="0" is_dev="1" id_instrument_format="1" name="IL1_0010" loader="rmp" loading_date="2007-06-06" run_folder="070606_IL1_0010">
+ <instrument id_instrument="3" name="IL1" id_instrument_format="1" external_name="eas15" serial="" iscurrent="0" />
+ <run_lanes><run_lane id_run_lane="73" id_run="10" tile_count="200" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="1" />
+<run_lane id_run_lane="74" id_run="10" tile_count="200" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="2" />
+<run_lane id_run_lane="75" id_run="10" tile_count="200" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="3" />
+<run_lane id_run_lane="76" id_run="10" tile_count="200" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="4" />
+<run_lane id_run_lane="77" id_run="10" tile_count="200" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="5" />
+<run_lane id_run_lane="78" id_run="10" tile_count="200" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="6" />
+<run_lane id_run_lane="79" id_run="10" tile_count="200" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="7" />
+<run_lane id_run_lane="80" id_run="10" tile_count="200" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="6595" id_run="10" date="2008-03-19 10:27:40" id_run_status_dict="21" id_user="1" username="rmp" iscurrent="1" description="data discarded" />
+ <run_statuses>
+ <run_status id_run_status="6595" id_run="10" date="2008-03-19 10:27:40" id_run_status_dict="21" id_user="1" username="rmp" iscurrent="1" description="data discarded" />
+ <run_status id_run_status="5885" id_run="10" date="2007-06-07 00:00:00" id_run_status_dict="11" id_user="20" username="rmp" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="19" id_run="10" date="2007-06-06 09:37:33" id_run_status_dict="4" id_user="1" username="rmp" iscurrent="0" description="run complete" />
+ <run_status id_run_status="18" id_run="10" date="2007-06-06 09:36:56" id_run_status_dict="1" id_user="1" username="rmp" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ </annotations>
+ <tags>
+   <tag id_tag="18" description="single_read" />
+ </tags>
+</run>

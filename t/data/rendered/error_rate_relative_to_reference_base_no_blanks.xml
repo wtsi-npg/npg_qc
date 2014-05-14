@@ -1,0 +1,6 @@
+<error_rate_reference_no_blanks>
+  <row really="A" read_as_a="94.14" read_as_c="1.79" read_as_g="1.53" read_as_t="2.54" rescore="0" />
+  <row really="C" read_as_a="5.43" read_as_c="89.20" read_as_g="1.91" read_as_t="3.45" rescore="0" />
+  <row really="G" read_as_a="2.84" read_as_c="2.24" read_as_g="92.19" read_as_t="2.73" rescore="0" />
+  <row really="T" read_as_a="2.47" read_as_c="2.18" read_as_g="2.87" read_as_t="92.47" rescore="0" />
+</error_rate_reference_no_blanks>

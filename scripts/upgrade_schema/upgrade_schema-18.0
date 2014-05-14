@@ -1,0 +1,54 @@
+--
+-- Missing field in contamination check table.
+--
+
+ALTER TABLE `contamination`
+    ADD COLUMN `read_count` BIGINT(20) UNSIGNED NOT NULL
+        AFTER `contaminant_count`;
+
+--
+-- extra field for rta runs
+--
+ALTER TABLE `analysis`
+    ADD COLUMN `end` tinyint(1) unsigned NOT NULL default '1'
+        AFTER `id_run`;
+
+ALTER TABLE `analysis_lane`
+    ADD COLUMN `end` tinyint(1) unsigned NOT NULL default '1'
+        AFTER `id_run`;
+
+--
+-- extra end field for run_graph
+--        
+ALTER TABLE `run_graph`
+    ADD COLUMN `end` tinyint(1) unsigned NOT NULL default '1'
+        AFTER `id_run`;
+
+ALTER TABLE `run_graph`
+    DROP INDEX `unq_idx_rungraph_idrun`;
+       
+ALTER TABLE `run_graph` 
+    ADD UNIQUE KEY `unq_idx_rungraph_idrun_end` (`id_run`, `end`);
+
+--
+-- extra table for auto qc error check
+--
+
+CREATE TABLE `sequence_error` (
+  `id_sequence_error` bigint(20) unsigned NOT NULL auto_increment, 
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `path` varchar(256) default NULL,
+  `forward_read_filename` varchar(256) default NULL,
+  `reverse_read_filename` varchar(256) default NULL,
+  `forward_aligned_read_count` int(10) unsigned default NULL,
+  `forward_errors` text,
+  `reverse_aligned_read_count` int(10) unsigned default NULL,
+  `reverse_errors` text,
+  `sample_size` int(10) unsigned default NULL,
+  `reference` varchar(256) default NULL,
+  `pass` tinyint(1) default NULL,
+  `comments` text,
+  PRIMARY KEY  (`id_sequence_error`),
+  UNIQUE KEY `unq_run_lane_error` (`id_run`,`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

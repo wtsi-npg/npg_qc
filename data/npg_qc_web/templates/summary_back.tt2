@@ -1,0 +1,8 @@
+<!-- start: $Id$ -->
+function back() {
+  var actions = document.getElementById('actions');
+  var NewLI = document.createElement('LI');
+  NewLI.innerHTML = '<a href="[% SCRIPT_NAME %]/summary/[% model.id_run %]">[Back]</a>';
+  actions.appendChild(NewLI);
+}
+<!-- end: $Id$ -->

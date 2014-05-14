@@ -1,0 +1,864 @@
+LIST OF CHANGES FOR NPG-QC PACKAGE
+
+release 56.0
+ - use test data that are publicly available
+ - getting autoqc module versions made to work with non-numeric versions
+ - redundant Gerald summary loader code removed
+ - unused test data removed
+ - in test runfolders that are used GERALD directories renamed to PB_cal
+     since gerald_path is going to be removed from npg_tracking::illumina::run::folder
+
+release 55.10
+ - remove default for verify_bam_id.pass
+
+release 55.9
+ - minor bug fix for verify_bam_id
+
+release 55.8
+ - remove Fey modules from npg_qc::autoqc::db namespace, t/60-autoqc-db*.t tests 
+   and test data not used elsewhere
+ - qc_db_delete_autoqc script:
+     updated help message
+     fix for a bug that resulted in no data deleted unless a list of checks to
+       delete was given explicitly 
+
+release 55.7
+ - tag sniff usage message
+ - minor code changes to a couple of checks
+ - test/test data for verify_bam_id
+ - preserve case when generating DBIx binding since verify_bam_id
+   has mixed case column names
+
+release 55.6
+ - exclude verify_bam_id (not run by the pipeline yet) from checking a set
+   of archived autoqc results for completeness
+
+release 55.5
+ - patch for bin/call_gtck_composite_rpt.pl
+
+release 55.4
+ - patch for npg_qc::autoqc::checks::upstream_tags - extra imports required
+
+release 55.3
+ - 'check' option for the script deleting autoqc results from a database
+ - unused Fey-based autoqc loader module removed
+ - contamination autoqc check table: drop not-null constrain for fields with
+   serialized data and replace empty strings there with nulls -
+   InflateColumn::Serializer DBIx plugin gived error trying to convert
+   empty string to JSON
+ - DBIx binding generation extension - DBIx result classes for tables
+     with autoqc results consume autoqc roles
+ - autoqc data retrieval via the DBIx db binding
+
+release 55.2
+ - run upstream_tags check on whole bam file, not just forward read, otherwise check fails if there is an inline index in read 2
+
+release 55.1
+ - bug fix in using roles for finding runfolder path
+
+release 55.00
+ - schema and bindings re-generated from an copy of a live database
+   with db updates applied
+ - verify_bam_id autoqc check added
+ - changes to database schema, code, tests and test data to enable a database
+   switch to sql strict mode, in particular,
+     bam_flagstats check to treat library size -1 as undefined,
+     bustard summary loader to use zeros where N/A value is in the summary file
+ - DBIx Result class for the fastqcheck table and a loader for fastqcheck files changed
+   to accommodate a switch to the InflateColumn plugin, which is used for
+   other classes
+ - DBIx schema loader:
+     removed dependency on the soon to be discontinued npg_common::config module;
+     custom post-generation filter to make generated classes comply with perlcritic
+     binding generated as Moose classes
+ - in/de-flators are set for all relevant columns for autoqc results tables
+ - swich from Fey to DBIx ORM in a database loader for autoqc data
+ - call_gtck_composite_rpt.pl script moved from lib/* to bin directory; its
+   dependency on srpipe::runfolder removed
+ - standard way to run perl critic tests - on all perl modules and scripts in bin
+
+release 54.11
+ - changes to allow use of multiple SNP sets with the genotype check
+ - changes to role for pulldown_metrics check to format percentage values correctly and consistently
+
+release 54.10
+ - use mocked jar file
+ - podcoverage test runs for all files
+ - during build, change shebang line of cgi script to perl interpreter
+   used similar to Build.PL default for scripts
+ - a reg expr fix in the tags_reporters autoqc check
+
+release 54.9
+ - add tags_reporters to IGNORE_AUTO_QC_CHECK list in DB.pm to allow runs to be deletable without results for that check.
+
+release 54.8
+ - add new tags_reporters check
+
+release 54.7
+ - upstream_tags check: correct determination of archive_qc_path, use position when fetching qc_store results, use db_lookup attribute with qc_store
+
+release 54.6
+ - randomise order in which references are used by ref match (to work around Lustre client caching bug)
+ - upstream_tags check uses qc_store to fetch tag information for upstream runs instead of st::api::lims
+
+release 54.5
+ - corrections to upstream_tags check 1) fix can_run condition, and 2) use CLASSPATH correctly (remove hard-coded path)
+
+release 54.4
+ - correct upstream_tags check to use the tag indexes from the decode tag set when counting perfect_matches in previous runs
+
+release 54.3
+ - correct path determination from path attribute to work correctly with value supplied by pipeline
+
+release 54.2
+ - changes to upstream_tags check
+    added 5 base tag set (probably should be removed when TraDIS detection is added)
+    added a java_xmx_flag attribute  for BamIndexDecoder invocation (default: -Xmx1000m)
+    use path attribute (set from qc_in in the pipeline) to locate both tag#0 bam file and for location of BamIndexDecoder metrics file output
+    added min_percent_match attribute to allow this cutoff to be set at runtime if needed
+    added recal_path attribute, use it to construct paths to tag0_bam_file and metrics_output_file
+    changed can_run to detect !lims->is_pool (only run when lane is plexed)
+
+release 54.1
+ - changes to upstream_tags check
+     unset NPG_WEBSERVICE_CACHE_DIR to avoid relying on cached data for lims lookup of tag set information
+     changed parameters of BamIndexDecoder run to allow one mismatch (and added attributes to allow this and the MAX_MISMATCHES parameter to be reset by the caller as required)
+
+release 54.0
+ - cache_list_query_movez_tiles removed
+    reason - last run loded to move_z table is  5302
+ - npg_qc::api::loader::Qcal_Report removed;
+    reason - table qcal last run loaded 6918
+ - npg_qc::api::loader::Run_Config removed;
+    reason - table run_config last run loaded 6927
+ - npg_qc::api::loader::Tile_Score removed;
+    lots of tables error_.., errors_.., most_.. last run loaded 6927
+
+ - new namesopace for illumina-data related modules - npg_qc::illumina
+ - npg_qc::api namespace removed, modules that are in use moved to npg_qc::illumina
+ - where DBI connection is used, both AutoCommit and mysql_auto_reconnect are switched on
+ - bin/npg_qc_api_monitoring.pl removed, its functionality  merged into npg_qc_illumina_analysis_loader
+ - runfolder checking removed for run loader since it's called from the pipeline,
+   for loading all runs the globs of runfolders come from the tracking database
+ - to avoid post requests from 'run_is_deletable' script, npg_qc::illumina::loader module
+     implements npg-qc-related functionality needed for this script (lane_summary_saved method)
+
+release 53.5
+ - add functional upstream_tags check
+
+release 53.4
+ - patch release to add upstream_tags check to IGNORE_AUTO_QC_CHECK list of DB.pm to run to be deletable without this checks results.
+
+release 53.3
+ - added new upstream_tags check. Check itself currently non-functional, but results should be displayed in Seq-QC pages
+
+release 53.2
+ - changes to remove most regular warnings when rendering the pages
+
+release 53.1
+ - changes needed to move NPG QC web server from intweb to webteam's VMs
+ - lightbox for IVC plots dropped
+
+release 53.0
+ - notification of perlcritic test failure: include policy name
+ - to eliminate a separate db configuration file for the code running
+   on the farm, autoqc & api db interface gets db credentials from a dbix connection
+ - autoqc & api db-related tests deploy and populate db through dbix binding, take
+   db credentials from ~/.npg directory
+ - unused code removed from test util module, test api util module removed
+
+release 52.7
+ - pulldown_metrics: error message fix and criterion description addition 
+
+release 52.6
+ - dbix binding updated
+
+release 52.5
+ - ref match check - cache abs path of the default strain/version to avoid being cought out when
+   the link is switched to a different strain/version
+ - pulldown metrics check: check now fails when result->on_bait_bases_percent < 20 and when bait_path is found but interval files are not found. Otherwise pass remains undefined.
+
+release 52.4
+ - removed from Build.PL dependency that installs as a part of other package
+ - ensure 'use Readonly';  and 'Readonly::Scalar our $VERSION' are on one line to help
+   with inferring the version
+ - amend pulldown_metrics check
+    - "can_run" allows missing baits intervals files
+    - "execute" fails the check when the baits intervals files are missing
+    - if the intervals files (bait and target regions) are identical, this is flagged in the result. Seq-QC will be amended to detect this.
+    - added "pass" and "interval_files_identical" columns to pulldown_metrics table in npg_qc database
+
+release 52.3
+ - extended the build file to deploy qc bias R script
+ - made id_run and position attributes optional in genotype check
+ - added flag to allow specification of reference and position to SNP name mapping file
+
+release 52.2
+ - genotype check alternative match bug fix
+ - gc bias check command string bug fix
+
+release 52.1
+ - pulldown metrics check bug fix - use correct function name for getting picard jar version
+
+release 52.0
+ - explicit dependency on /software amd /software/solexa removed
+ - autoqc checks use software_location role to access third party tools
+ - following loading failure under perl 5.14.2 on precise,
+   illumina analysis loader code uses standard DBIx transaction
+ - illumina analysis loader and monitor use standard way of getting DBIx connection
+ - unused npg_qc::api::run namespace removed
+ - unused scripts and one-off code removed
+ - some tests improved, made more robust
+ - package is build with Build.PL
+ - all scripts that have to be deployed are moved from scripts to bin
+
+release 51.9
+ - mysql client does not read configuration in default places to avoid readign wrong configuration
+ - use password for the root user on a local test database
+ - removed old unused scripts and modules
+ - moved window_depth.d source file from bin to src
+ - removed the specification of the samtools_path from call_gtck_composite_rpt.pl (default should be OK), and changed the name of the requested samtools executable to "samtools_irods".
+
+release 51.8
+ - tweak spatial filter to deal with output when reads removed rather than marked with fail bit
+
+release 51.7
+ - Fey2DBIxRedesign document added
+ - changes to allow genotype check to be run on more than one bam file
+ - temporary exclusion of Chlorocebus aethiops reference from ref_match check
+
+release 51.6
+- bug fix - cope with spatial_filter classes (without tag_index) cat run deletion check time
+
+release 51.5
+ - bug fix - custom type name update
+
+release 51.4
+ - reflect that a number of npg_common mudules has been moved to the npg_tracking namespace
+ - some compatibility changes for perl 5.14.2 on precise
+ - insert size check can_run method relies only on npg::api::run when
+   determining whether the run has paired reads
+
+release 51.3
+ - add spatial_filter to test to ignore when checking for deletion
+
+release 51.2
+ - autoqc spatial_filter can run as QC check (reading stderr of PB_cal spatial_filter on stdin)
+
+release 51.1
+ - bug fix for attribute custom type mismatch
+
+release 51.0
+ - add auto qc for recording spatial filter application
+ - serializing to file moved from the autoqc check object to the autoqc result role
+ - use npg-tracking custom Moose types
+ - reflect the fact that db_connect and run, lane and tag definition roles moved to npg-tracking
+ - remove live and dev db configuration from svn copy of the db config file
+   set test db configuration to localhost
+   make tests run against a localhost when the socket is defined
+
+release 50.7
+ - amended database connection details for the QC database npgqcp (in data/config.ini)
+
+release 50.6
+ - tileviz removed; it now lives in pbcal
+ - a script for generating DBIx bindings changed to include explicit names
+   for some autoqc tables in order to provide an easy mapping between autoqc
+   and DBIx class names
+ - a script for deleting lanes from autoqc and fastqcheck tables of the qc database
+ - unused scripts for a dev npg-qc server, bin/npg_qc, removed
+
+release 50.5
+ - use QC fail counts in bam flagstat QC (so numbers add up for spatial filtered BAM files)
+
+release 50.4
+ - patch for pulldown metrics to treat ? as null in the picard output RT#282664
+ - patch for divide by zero bug in the alignment_filter_metrics role when total number of reads is zero RT#282703
+
+release 50.3
+ - patch to the web server  post callback - exclude a check for data presence in qcal table that is not loaded any more
+
+release 50.2
+ - displaying q values in npg qc web app refactored to use the fastqcheck table
+ - qcal values are not rendered in xml
+ - remove loading qcal table from illumina loader
+
+release 50.1
+ - patch to allow larger lane numbers
+
+release 50.0
+ - fastqcheck table extended with columns fully describing the file id (id_run, position, tag_index, section, split)
+ - script loading fastqcheck files to the database amended to fill in new columns along with old ones
+ - old fastqcheck data supplied with data for new columns, see RT#277477 for details
+ - pulldown_metrics npgqc db table: drop the fold_80_base_penalty column RT#268666
+ - removed scripts/database_dump since it looks at live db only
+
+release 49.4
+ - DBIx schema for npg_qc::api::loader is created in non-standard way with autocommit off. Therefore, a commit is restored in npg_qc::api::loader::Fastqcheck
+
+release 49.3
+ - sequence error fields are too long in total for a 250 long reads to load to a database  "DBD::mysql::st execute failed: Got error 139 from storage engine", see #RT277981; introduced client-side compression on most of text type fields
+
+release 49.2
+ - tileviz: filtering by quality; reads and displays old qualities if available; uses a different executable - 'spatial_filter -d'
+ - npg_qc::api::loader::Fastqcheck refactored: uses npg_common::fastqcheck module to get qX values from the fastqcheck files instead of its own calculation; file name filtering simplified since files that previously had to be skipped do not exist any more; tests improved
+ - pulldown_metrics and tag_decode_stats roles, cv coeff calculation - return explicitly a number, not a pdl onject
+ - removed scripts/get_qcal.pl which seems to ba a predecessor of pg_qc::api::loader::Fastqcheck and is currently not used
+ - removed unused scripts scripts/get_run_tiles.pl and scripts/get_signal_means.pl
+
+release 49.1
+ - convert "#' to its HTML code in the tileviz html page image links
+ - in cigar string chart - create arrays of zeros if a data series is null and is going to be added to the chart. RT 274105
+ - pulldown metrics check - problem with picard exiting with an error code when stderr is not redirected to a file is fixed
+
+release 49.0
+ - tile visualization tool
+ 
+release 48.9
+ - get paired_read information from runfolder before using npg api in insert_size check
+
+release 48.8
+ - reduce size of cigar chart urls by removing H,N,P series, and change colours to something less gaudy.
+
+release 48.7
+ - alignment filter metrics check: store one reference fragment per reference since some of our references have too many fragments.both  RT #267938
+ - alignment filter metrics role: correct handling of unaligned output. RT #267938
+ - sequence error check: use BAM bitfield rather than interpret cigar * as no alignment
+
+release 48.6
+ - alignment filter metrics: stored number of alignments does not have to correspond to the number of references.
+
+release 48.5
+ - added cigar charts
+ - FOLD_80_BASE_PENALTY in the HS metrics Picard output is sometimes '?', which causes problems when creating a result object (RT #268429). The users do not want this value anyway, hence this field is removed from teh result object. The db column stays for time being.
+
+release 48.4
+ - matrix qc data loading copes with dual indexing run
+ - bugfix - don't die in sequence_error check when no successful alignments
+
+release 48.3
+ - report criteria for sequence error check: fail on insertion or deletion in most common cigar
+
+release 48.2
+ - add pass to sequence error check: fail on insertion or deletion in most common cigar
+
+release 48.1
+ - a patch to alignment filter metrics role to fix a typo
+ - a patch to the code that checks that all autoqc results loaded - should disregard alignment filter metrics check
+
+release 48.0
+ - enhance sequence_error (mismatch) test to record most common cigar strings and cigar char counts per cycle
+ - a new autoqc check - alignment_filter_metrics - to capture statistics about split by reference of bam files (spiked phix - unconsented human - target sequence split)
+
+release 47.1
+ - a patch to pulldown metrics check to specify the max java vm heap size (min was specified by mistake)
+ - a patch to the code that checks that all autoqc results loaded - should disregard pulldown metrics check
+
+release 47.0
+ - some optimisation of the genotype check
+ - a new autoqc check - pulldown metrics
+ - dbix binding updated - a table for the new check added
+
+release 46.1
+ - record read_pairs_examined and picard metrics header infomation in bam_flag_stats
+
+release 46.0
+ - SangerPath and SangerWeb dependencies removed from npg-qc ClearPress web application and all supplimentary scripts
+ - top-level changes to controller, view and util modules to allow for running stand-alone
+ - hardcoded server urls removed from heatmap generation
+ - can run as mod-perl
+ - json feeds removed
+ - page header to match npg-tracking
+
+release 45.0
+ - SangerPath dependency removed from tests
+ - use of bound to disappear npg_common::graph::* and similar modules replaced by npg::util::image::* modules
+ - new dev database - a full copy of live database taken on 21/03/2012; unfortunately, the name is the same as live db, see RT#258559 for explanation and a way to do it in future
+
+release 44.1
+ - DBIx interface regenerated with inflated date columns; they will return DateTime object
+ - npg_qc::api::run_timeline
+     replaced use of npg xml interface that is not available any more by a direct access to the tracking db to get a list of existing runs RT#257047
+     rewrote loading to npgqc database; uses DBIx now
+ - unused script npg_qc_api_run_timeline.pl removed
+
+release 44.0
+ - genotype check - sample names containing spaces are now handled correctly
+ - npg-qc web app - unused dependency on old st::api calls removed
+ - source code for the C executable generating fastq and fastqcheck files from bam files added to the package
+
+release 43.4
+ - fixed two bugs in genotype check
+
+release 43.3
+ - genotype check changes:
+     check now copes when illegal allele for SNP is called in genotype from bam 
+     locations of data and executables adjusted to standard location
+     calling of genotypes moved from stand-alone script to bam_genotypes module which is used by the check
+     attributes added to check to allow adjustment of parameters for finding genotype matches
+     check now saves bam_file name, bam_file_md5, genotype_data_set and snp_call_set to allow later replication of check results
+ - tag_metrics: changed the way the error is calculated in tag_metrics role to allow for non complete data
+
+release 43.2
+ - based on staging tag to find runs to load recipe, runinfo and cluster density data and stop looking for runlog data to load
+
+release 43.1
+ - ignore spiked phix plex nonhuman bam flagstats in runfolder deletion
+
+release 43.0
+ - provisions for finding human/non-human bam files removed from autoqc; naming convention changes in the pipeline
+ - gc bias check - dependency on fastq files removed
+
+release 42.5
+- runfolder deletion: cope with the results from new bam-based pipeline
+
+release 42.4
+ - cope with empty lane summary for Miseq run
+ - adapter check: use symbolic constant instead of octal for user rw only mode
+
+release 42.3
+ - tests that went live to npg server fixed
+ - t/data/autoqc st and npg caches updated to use xml files that they need; lots of xml files purged
+ - evaluation to pass/fail added to tag_metrics check
+ - the autoqc adapter check to work with bam input
+ - minor fix for the genotype autoqc check
+
+release 42.2
+ - fixed a bug in the sorting procedure for tag_metrics result
+
+release 42.1
+ - ignore tag_metrics if missing in archive
+
+release 42.0
+ - SangerPath dependency is added to npg_qc::util so that it can be removed in autoqc db-related tests
+ - SangerPath import removed from autoqc db-related tests
+ - explicit setting of PERL5LIB through 'use lib' removed from autoqc db-related tests
+ - error checking in autoqc db-related consistently via Test::Exception
+ - autoqc::check::check object to use a new simpler function from npg_common for generating file names
+ - tag_metrics check added; it parses the output of the picard tag decoder
+ - dbix binding ipdared
+ - to_string function added to autoqc result objects
+ - better options to the blat command in the adapter check
+
+release 41.0
+ - autoqc check loading from staging: enable using stored globs
+ - autoqc collection object - remove depricated code
+ - autoqc qc loader object - remove definition of max id run on staging area since
+   this is difficult to maintain; also globbing is now reduced since most old runs have
+   autoqc data
+
+release 40.2
+ - Add required properties to genotype check and result modules, added basic tests for genotype
+
+release 40.1
+ - ignore genotype qc result checking when deleting runfolder
+
+release 40.0
+ - add genotype check
+ 
+release 39.6
+ - cope with miseq qc data loading
+
+release 39.5
+ - bugfix in producing single ended run sequence error plots
+
+release 39.4
+ - percent_split method on split_stats to return undef rather than empty string on no reads
+
+release 39.3
+ - add percent_split method to split_stats
+ - coefficient of variance calculation (tag decode stats autoqc check): disregard spiked phix; unfortunately, spiked phix tag hardcoded
+
+release 39.2
+ - bam flagstats role percent methods to return percentages not fractions
+
+release 39.1
+ - coefficient of varaince calculation (in autoqc/role/tag_decode_stats.pm) changed to use root mean square instead of mean absolute deviation
+
+release 39.0
+ - autoqc modules refactored to use the new single point lims interface
+
+release 38.1
+ - bugfix - N's should only be counted when the base they represent aligns, but is a mismatch or softclip, not when it is an insertion/deletion 
+
+release 38.0
+ - the concept of the tmp_path for autoqc checks simplifies: just a temp dir by default
+ - module for calculating isizes moved to the new parse subpackage
+ - insert size check not to use own module for alignment
+ - functionality reshuffle between the insert size module and the parsing module to live parsing module to parse and generate bins
+ - insert size check uses both usual and reverse complemented fastq files, the latter in order to get insert size for outward looking long range libraries
+ - reference and adapter repository can be set through the autoqc option
+ - autoqc check tests prevented from looking for the live location of the reference repository
+ - ref match and contamination percents - display 1 decimal digit only
+ - sequence error now calculates number of bases of <15, <30 and >30, and displays these bins
+
+release 37.2
+ - cope with bam flagstat out from new version of samtools
+
+release 37.1
+ - n counts shown as on top of sequence errors, rather than be included, so that the curve is smoother
+
+release 37.0
+ - test staging path renamed, lote of tests fixed following this
+ - coeff of variance computation for tag decode stats
+
+release 36.4
+ - ignore lane bam flagstats for mulitplexed run for archived autoqc result checking
+
+release 36.3
+ - remove study and library name table from run summary page because sequencescape time out problem
+ - stop loading offset data because file format changed
+
+release 36.2
+ - added check for HiSeq, amended threshold calculation parameters
+
+release 36.1
+ - bug fix to get positon number from fastqcheck file name for single-end run
+
+release 36.0
+ - changed the name of the file that lists adapters
+ - test for file_store module uses sqlite instead of msql db
+
+release 35.2
+ - qc checks can be loaded from multiple paths
+
+release 35.1
+ - insert size check filters out reads that are not properly mapped and does not cut off the top 1% of the insert sizes
+
+release 35.0
+ - adapter check takes the location of the adapter fasta directly from the reference finder role
+
+release 34.4
+ - adapter check not to write tmp files
+ - adapter check takes the location of the adapter fasta from the reference finder role
+
+release 34.3
+ - add sf32-45 into the npgqc data monitor list and use path_info for runfolder glob_pattern
+ - bugfix in q20/25/30 saving for coping for phix runs
+ - check autoqc data fully archived in the database
+ - ref_match not to fail if the read length is too short
+
+release  34.2
+ - make aligner_version of the check object work for bowtie - sometimes hands
+ - refactore ref_match and contamination checks to pipe the output of aligners directly
+   to the consuming code - no saving to temp files
+
+release  34.1
+ - add number of total reads in bam flag stats result and table 
+
+release 34.0
+ - tests for ref_match
+ - generic aligner_version method in npg_qc::autoqc::checks:check
+ - autoqc loader - an option to glob only for recent runs from staging
+ - ref_match: if error in trimming the reads, try trimming to 1bp less
+ - check and result objects to have sequence_type attribute (optional for result objects)
+ - sequence_error check for spiked phix
+
+release 33.0
+ - new 'contamination' check - ref_match
+ - adapter check: produce counts for the match start
+ - upgrade schema scripts moved to a subdirectory of scripts
+ - one-off scripts moved to one-offs subdirectory
+ - split stats extended to cope with PhiX split
+ - image for split stats
+ - add ref_name into unique key of split_stats table
+ - autoqc loader script to check completeness only if no records for a run existed prior to loading
+ - autoqc insert size and sequence error checks: updated deprecated methods to get 10000 reads
+ - collection adding from staging: load only files whose name starts with a requested run number
+
+release 32.0
+ - rpt key code moved from result role to a separate role
+ - replace project with study in model summary for study name
+ - allow insert size and sequence mismatch checks on files with a small number of reads
+ - generate_filename method of the base check class is now inherited from a stand-alone role
+ - get_input_files method of the check class is bam-file aware for a specofic case of human/nonhuman split
+ - gc_bias check refactored to use common methods for retrieving bam and fastq files (to fix a problem with plexes)
+ - additional options for the qc script so the the reference can be preset and the type of reference search set
+ - using role long_info to get cycle, lane, tile numbers for npg_qc data loading and cope with missing recipe file for hiseq runs
+ - cope with hiseq run for run info xml and cluster denstiy data loading, and ignore missing runlog and run recipe files
+ - cope with hiseq matrix file name and content format change, missing gerald config file and get run date from run_folder name
+ - added a directory for one off scripts and placed there scripts for running and archiving autoqc checks for old runs
+
+release 31.0
+ - added a table to store fastqcheck files for plexes, a module and a script to load files to this table
+ - dbix binding regenerated
+ - a script for generating the dbix binding updated to force plurals in names of Result classes for some tables
+ - added a script for fixing expected insert sizes in the db where there was an overflow
+ - added a script for backfilling tag decodin info
+
+release 30.1
+ - do not sort collection before returning it from qc_store
+ - gc bias check - do not croak if problems with read length
+ - do not check sequence error using first reference when multiple references available
+ - contamination result object and role changes to work around an empty string for hashes in the npg-qc database
+
+release 30.0
+ - autoqc result and check objects and the autoqc object take tag_index definition from a tag role from npg_common
+ - insert size autoqc check uses tag-specific expected insert size
+ - the autoqc collection object looses id_run attribute, its add_from_staging method should be used with id_run attribute
+ - a collection object method to return a list and a map of actually present check names
+ - no croaking if multiple references are found by autoqc checks
+ - options for qc results retrieval: particular lanes and either plexes or lanes or all
+ - collection's sort and search methods can take tag_index into account
+
+release 29.3
+ - npg_qc::autoqc::qc_store can retrieve db configuration from a config file
+ - add bam_flagstats into auto qc check list
+
+release 29.2
+ - DBIx schema can read config files
+ - one extra field for bam_flagstats to distinguish whether bam file is human, nonhuman, or not split
+
+release 29.1
+ - add bam_flagstats result class and database table to record stats from Picard MarkDuplicate and Samtools flagstats
+
+release 29.0
+ - FEY binding for the default value for tag_index column for autoqc tables made to work for sqlite
+ - a script generating a dbix binding reconfigured to avoid pluralisating certain class names for tables ; the binding regenerated
+ - check names for the qX_yield and sequence error result objects changed to 'qX yield' and 'sequence mismatch' respectively since check names are now displayed in the QSea interface instead of class names
+ - a method in the autoqc collection object to return mapping of result class names to check names
+ - add run_folder validation against NPG when loading illumina qc data
+ - bug fix about run recipe file name should be stored without any path
+ - don't save anything when no id_run_pair information returned from NPG
+ - excluding insertion from mismatch rate calculation, and add two extra fileds in sequence_error result and database table to store the total number of match and mismatch bases for each cycle
+
+release 28.0
+ - add basic check for gc bias
+
+release 27.0
+ - sequence_error role: a new method, google_charts, returning two equally scaled error plots
+ - sequence_error role: the width of the image for the plot is not hard-coded, it is proportional to the number of cycles
+ - bug fix, the cycle number in the matrix file name not necessary 2 digits now
+ - remove the display options in the main page of npgqc, now only display illumina analysis qc result
+ - send two movez_tiles caching request if paired-end run
+ - change cycle column data type from tinyint to smallint for table signal_mean, errors_by_cycle etc
+ - contamination test check: stopped from looking in the live reference repository
+ - autoqc::db::DB object test: objects in the fetched collection are ordered alphabetically so the order of fetching, which differs from test to test, does not affect the outcome
+ - backported from trunk a change to cope with a new format of the bowtie output
+ - sort check names as returned by npg_qc::autoqc::autoqc->checks_list
+ - introduction of multiplexing
+ - tag decoding stats autoqc result and database module
+
+release 26.0
+ - bug fix for tile-based error tables and image viewer
+ - remove swift related tables and moduels
+ - remove tile_all table and modules, which are related tile-based IVC plots
+ - remove separate lane_summary and qcalreport loader script
+ - remove other obsolete modules and testing file and data, tidy up api modules
+ - directly retrieve data from QC files to save into the database, skip the step transfering the data into xml
+ - stop sending any xml to the webserver to save data into database, only send the request to do caching now
+ - new data loader modules using dbix class: tile_score, signal_mean, fastqcheck, run_config, matrix and offset
+ - new staging monitoring role and modules for loading recipe, runlog, runinfo and cluster_density files
+
+release 25.0
+ - addition to the expected_size_range of the insert_size role to cope with multiple expected insert sizes im multiplexed lanes, ie return the minimun value of min sizes and the max value of max sizes
+ - when the expected inser size is a single value or the from and to range boundaries ar eequal, the evaluation is performed against the simmetrical range of 25% either side of the supplied value
+ - a new attribute, tmp_path, is added to the check oject in autoqc; it sets the directory for writing temporary files to
+ - the adapter check refactored to write  the temporary files to the directory given by tmp_path and to use a different location of the repository for adapters fasta file
+ - the contamination check refactored to (1) write  the temporary files to the directory given by tmp_path, (2) use reference finder role to query the reference repository, and (3) use extractor::fastq module to count the number of reads in a fastq file
+ - dbix shcema class added
+ - load lane summary data and tile-based data from both bustard and gerald summary xml files instead of just gerald summary html file using dbix class
+ - load qcalreport text files separately from lane summary data loading, use dbix class now
+ - change end column data type from tinyint to char to allow use 't' as end value for multiplex run
+ - add unique key for analysis_lane table
+ - remove unsigned for column cycle_10_20_av_perc_loss_pf and cycle_2_10_av_perc_loss_pf to allow negative value inserted
+ - be able to load multiplex run qc data
+
+release 24.0
+ - display cluster density per lane data in the run qc summary table
+ - added a new gc_fraction autoqc check
+ - refactored qX_yield autoqc check to rely on npg_common::fastqcheck module in all operations with fasqcheck files
+
+release 23.0
+ - cluster density report data by lane are stored in the database now
+ - statistics for move_z values for rta runs are now read based
+
+release 22.0
+ - npg_qc::autoqc::autoqc object; default for check name removed, 'check' and 'position' field become compulsory
+ - listing of checks in npg_qc::autoqc::autoqc is done though a plugin look-up
+ - code for detecting expected insert size is moved from npg_qc::autoqc::checks::insert_size to st::api::asset
+ - 00-distribution.t test is made TEST_AUTHOR dependent since some versions of the test suit cannot make a distinction between own and inhereted fields/methods in Moose objects
+ - contamination check - a dodgy fastq read count fixed
+
+release 21.0
+ - reference interface moved to npg_common namespace
+ - insert_size and seqience_error check object refactored following changes in the reference role and its new namespace
+
+release 20.0
+ - store and display RunInfo xml
+ - bug fix to display project and sample names for each lane
+ - bug fix to improve loading speed of the front page because no need to try npg api to get the paired id_run for a RTA piared read run.
+ - bug fix about extra <hr> tag (not <hr/>) in summary.htm file for qc data loading
+ - not use libxml to parse offset xml anywhere
+ - set end value for single read run as 1 in qcal table
+ - ignore error rate data missing when a run no control lanes
+
+release 19.0
+ - load offset values for a run from a merged offset file, and stop using libxml to parse offset xml because of megered file too big
+ - be able to get id_run and position from json filename and add them to json object if missing there
+ - split_stats_coverages for table split_stats is not dependent on the relationship of the two tables. Fey::ORM no need to get foreign key info from the database currently, this can be disabled in order to improve database schema loading speed.
+ - New illumina analysis loader module which makes use of some of the common roles, and should gel better, and be faster, than the current npg_qc_api.pl loader with the pipeline
+ - using npg::api::run_lane to get organism of lane instead of run
+ - bug fix to add eval_error to sequence_error check comments
+ - count soft clipped bases as error when calculting sequence_error
+ - add extra attribute info for each autoqc result, along with comments they are in result superclass or role
+ - the module name and version number for autoqc check modules are stored in their result info hash
+ - aligner name, version and options for contamination, insert_size, sequence_error and split_stats are stored in their result info hash
+
+release 18.0
+ - data-servise module is incorporated into a more generic qc_store model
+ - the npg_qc::autoqc::results::collection class has ability to load qc results from teh staging area without specifying a path explicitly
+ - run_graph table with extra columna end and most statistical graphs are read based
+ - analysis and analysis_lane with extra column end
+ - autoqc sequence_eror check added
+
+release 17.0
+ - command line options processing for the bin/qc script is done by MooseX::Getopt
+ - the collection object for autoqc is backed by an array class from MooseX
+ - the display features in the autoqc result objects are removed
+ - the result objects are refactored into a combination of roles and classes to allow for a smooth object creation directly from a BD
+ - insert size check now fails if there are problems in extracting reads from fasq files due to unmatched reads
+
+release 16.0
+ - added the adaptor check
+ - added a field to record a path to a reference in the insert size check
+ - store expected insert size range instead of expected mean; evaluate against the lower range boundary
+ - refactored the autoqc part that performs the check so that it uses Moose roles from npg_common to deal with runfolder information
+ - autoqc result roles added
+ - Fey schema and table classes only load database schema and table when you call the loading method, and database parameters can be passed in when loading
+ - autoqc database table classes now share the same role with result class, not directly inherit from result class
+ - be able to read split_stats data back from database
+
+
+release 15.0
+ - given an id_run, return a collection of autoqc data objects from database or json files in runfolder
+ - fastq split_stats class is added to autoqc result package
+ - add two tables split_stats and split_stats_coverage to store fastq splitting statistics
+
+release 14.0
+ - autoqc: output is encapsulated in result classes and saved to json only. XML support discontinued
+ - autoqc insert size stats and histogram calculations is performed with the help of PDL
+ - generic serialization of Moose classes to a database
+ - serialization of autoqc result objects from a json string to a database
+ - npg_qc_api.pl - now has option to only load a single id_run
+ - Fey::ORM schema and autoqc result table classes are added, which can save JSON data into database and get data back as objects
+
+release 13.0
+ - created a namespace for autoqc libraries, added code for q20 and insert size check there
+ - add npg home page link in the top menu
+ - show average values in the statistical graphs
+ - display statistical data by run with cycle numbers for each graph
+ - using read length of each read of a run to calculate the lane yield instead of using the cycle number of the whole run
+ - add average yield per lane per read by week graph
+ - allow end value of a run to be a non-digit
+
+release 12.0
+ - add view for recipe file and the link in the summary page
+ - display cycle or read length details in the chip summary page
+ - remove swift link in the summary page
+
+release 11.0
+ - add recipe_file table to store the recipe file name, contents and md5 value
+ - store the first and last indexing cycle number if any
+ - store cycle number for read 1 and read 2 if there are two reads in one run
+
+release 10.0x
+ - update the database if the data already in the database, or delete the old data before inserting the new data
+ - add unique index to qcal table and set end value as 0 if the qcal value is for single run or merged paired runs
+ - modules to load qc data from other directories, especially for fastqcheck files from the repository
+ - handle different cycle numbers of the paired runs for cache_query table
+ - IVC base call plot all in the same scale 100%
+ - stop read Q value from qcalreport file if fastqcheck files created for all lanes
+ - store first indexing cycle number into database for multiplex run
+ - query run recipe table for cycle count of a run
+ - display cycle count for both ends of a pair of runs, which may be different
+ - display qcal value for each lane
+
+release 9.0
+ - add api to delete qc data for one run
+ - add graph view of cluster number against tile number as an alternative of heatmap
+ - add view to show error rates of the latest runs per instrument
+ - bugfix about getting the control lane data from lane_qc table to populate run_graph table
+ - increase the x, y field length of table offset in database schema
+ - display statistical data by week with the graph
+ - store cycle number, tile number per lane in database from recipe and tile layout xml files
+ - back populate run_recipe table by counting current QC or runlog data
+ - display phasing information on summary page
+ - retrieve project name and library name for each lane from sequence scape and display in the run summary page
+ - QC data complete, check number of cycles, tiles and lanes in table lane_qc, signal_mean, errors_by_cycle and qcal against values in table run_recipe, not just check lane_qc table with startard number of tiles, lanes
+ - only cache lane_summary data into cache_query table if data complete
+ - get a list of runs from cahce_query table with lane_summary infomation to cache run_graph and instrument_statistics tables, and for npg_qc data loader and main page runlist
+ - check whether lane summary cached in cache_query table to report data completely loaded for XML web API
+ - check runlog data fully loaded against the actual number of tiles and lanes from run_recipe
+
+release 8.0
+ - analysis and analysis_lane api modules, initially set for ability to obtain data for analysis_report script, which is under npg-tracking
+ - store frequency response matrix and offset data into database and simple web interface
+ - add avgerage error per run by instrument statistics graph
+ - get cycle number from move_z table if can't get it from errors_by_cycle table
+ - store cycle number for a run into run_graph table
+ - add cycle length filter to the statistics graphs
+ - bug fix about getting the run end number from a single run qcalreport file name
+ - bug fix to get correct lane number from fastqcheck file name of single end run
+ - cope with relocation of score, rescore files of the pipeline software 1.3rc1
+ - add caching scripts to the runlog loading script, to add them in the cron job list
+ - get different levels of run folder directly from Latest Summary symbolic link if not given
+
+release 7.0
+ - api direct loading now gets database credentials from config.ini
+ - heatmaps for pf_perc_error_rate now scales upt to 10+ (anything 10+ is considered to high, and is therefore all very hot)
+ - all thumbnails for error plot view
+ - store the run start, complete and end time in the database
+ - add run statistics by time graph
+
+release 6.0
+ - Change to json output format for run_tile list for a run (default - single run, data structure streamlined)
+ - IVC thumbnail plots now horizontal, merged image with a area map using DHTML.
+ - IVC large plots now loaded using a lightbox to sit over the rotated IVC thumbnails
+ - image_store table to store png that are regularly acessed for speed improvement
+ - lane_qc table - change to column definitions for control lane only columns - from text to float (unknown stored as NULL)
+ - indexes added to many tables, in order to improve speed efficiency.
+ - Uniqueness checked for rows where applicable.
+
+release 5.0
+ - API modules to obtain summary, run list, run_tile and signal mean data
+ - bugfix to ensure only single loading of rows into database
+ - yield per run per instrument graph
+ - blank base error rate per tile by cycle
+ - bugfix to ensure most common words to be loaded into database
+ - graph image now uses gray lines instead of black for clarity
+ - first cycle intensities heatmap now scaled rather than linear
+
+release 4.0
+ - JSON service - run_tiles obtained but now in order, and with qc data already packaged in for the tile
+ - JSON list of run ids that have data
+ - caching for instrument statistical graphs
+ - Error graph scale to 5% on Y-axis
+ - XML feed to query if run is loaded /run/<id_run>.xml
+
+release 3.0
+ - Link to NPG run pages from the id_run/id_run_pair in the chip summary
+ - Y Scale max for IVC plots set to default to 1500 if 100 tiles per lane (i.e. GA2)
+ - JSON services - summary for run, obtain tiles, some stats for tile
+ - different graph views possible on statistical graphs
+ - run tile view - linked to when you select a tile on a heatmap or run alert
+ - statistical graphs for instruments - tile count of errors by run
+
+release 2.0
+ - api to process Runlogs for move z data
+ - display for move z data
+ - hoverable heatmaps with clicking to run tile viewer
+ - move to own database instance
+ - improvements to Bustard processing
+ - caching of big queries to improve performance
+ - statistical graph by run
+
+release 1.0
+ - api to process Bustard files into xml, and post them to webservice
+ - webservice to process bustard xml and save to database
+ - set-up of database schema
+ - tests
+ - views showing graphs and tables
+ - swift summary processed
+ - heatmaps of tile data
+ - alerts for out of scope metrics

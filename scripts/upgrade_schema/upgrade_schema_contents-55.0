@@ -1,0 +1,143 @@
+-- DML statements
+SET AUTOCOMMIT=0;
+START TRANSACTION;
+SELECT now();
+
+-- genotype
+
+select count(*) from genotype where search_parameters='';
+select count(*) from genotype where search_parameters is NULL;
+UPDATE genotype SET search_parameters=NULL WHERE search_parameters='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from genotype where sample_name_match='';
+select count(*) from genotype where sample_name_match is NULL;
+UPDATE genotype SET sample_name_match=NULL WHERE sample_name_match='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from genotype where sample_name_relaxed_match='';
+select count(*) from genotype where sample_name_relaxed_match is NULL;
+UPDATE genotype SET sample_name_relaxed_match=NULL WHERE sample_name_relaxed_match='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from genotype where alternate_matches='';
+select count(*) from genotype where alternate_matches is NULL;
+UPDATE genotype SET alternate_matches=NULL WHERE alternate_matches='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from genotype where alternate_relaxed_matches='';
+select count(*) from genotype where alternate_relaxed_matches is NULL;
+UPDATE genotype SET alternate_relaxed_matches=NULL WHERE alternate_relaxed_matches='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+-- adapter
+
+select count(*) from adapter where reverse_read_filename='';
+select count(*) from adapter where reverse_read_filename is NULL;
+UPDATE adapter SET reverse_read_filename=NULL WHERE reverse_read_filename='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from adapter where forward_read_filename='';
+select count(*) from adapter where forward_read_filename is NULL;
+UPDATE adapter SET forward_read_filename=NULL WHERE forward_read_filename='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from adapter where forward_fasta_read_count='';
+select count(*) from adapter where forward_fasta_read_count is NULL;
+UPDATE adapter SET forward_fasta_read_count=NULL WHERE forward_fasta_read_count='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from adapter where forward_contaminated_read_count='';
+select count(*) from adapter where forward_contaminated_read_count is NULL;
+UPDATE adapter SET forward_contaminated_read_count=NULL WHERE forward_contaminated_read_count='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from adapter where forward_blat_hash='';
+select count(*) from adapter where forward_blat_hash is NULL;
+UPDATE adapter SET forward_blat_hash=NULL WHERE forward_blat_hash='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+-- ref_match
+
+select count(*) from ref_match where reference_version='';
+select count(*) from ref_match where reference_version is NULL;
+UPDATE ref_match SET reference_version=NULL WHERE reference_version='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from ref_match where aligned_read_count='';
+select count(*) from ref_match where aligned_read_count is NULL;
+UPDATE ref_match SET aligned_read_count=NULL WHERE aligned_read_count='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from ref_match where sample_read_count='';
+select count(*) from ref_match where sample_read_count is NULL;
+UPDATE ref_match SET sample_read_count=NULL WHERE sample_read_count='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from ref_match where sample_read_length='';
+select count(*) from ref_match where sample_read_length is NULL;
+UPDATE ref_match SET sample_read_length=NULL WHERE sample_read_length='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+-- gc_fraction
+
+select count(*) from gc_fraction where reverse_read_filename='';
+select count(*) from gc_fraction where reverse_read_filename is NULL;
+UPDATE gc_fraction SET reverse_read_filename=NULL WHERE reverse_read_filename='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from gc_fraction where forward_read_filename='';
+select count(*) from gc_fraction where forward_read_filename is NULL;
+UPDATE gc_fraction SET forward_read_filename=NULL WHERE forward_read_filename='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+-- qx_yield
+
+select count(*) from qx_yield where filename1='';
+select count(*) from qx_yield where filename1 is NULL;
+UPDATE qx_yield SET filename1=NULL WHERE filename1='';
+
+SHOW WARNINGS;
+SHOW ERRORS;
+
+select count(*) from qx_yield where filename2='';
+select count(*) from qx_yield where filename2 is NULL;
+UPDATE qx_yield SET filename2=NULL WHERE filename2='';
+
+SELECT now();
+SHOW WARNINGS;
+SHOW ERRORS;
+-- no commit (leave this for the operator)
+-- end of script

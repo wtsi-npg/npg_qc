@@ -1,0 +1,6 @@
+@HD	VN:1.4	SO:coordinate
+@SQ	SN:Schisto_mansoni.Chr_1	LN:65476681	UR:http://www.ebi.ac.uk/ena/data/view/HE601612,HE601624-HE601631&display=fasta	AS:ASM23792v1	M5:1fcb5bd8201ade2b8a6ed348748f0b4a	SP:Schistosoma mansoni strain Puerto Rico
+@SQ	SN:Schisto_mansoni.Chr_1.unplaced.SC_0010	LN:4176476	UR:http://www.ebi.ac.uk/ena/data/view/HE601612,HE601624-HE601631&display=fasta	AS:ASM23792v1	M5:2927a07523553c713936aeefc81e650c	SP:Schistosoma mansoni strain Puerto Rico
+@SQ	SN:Schisto_mansoni.Chr_1.unplaced.SC_0034	LN:2405493	UR:http://www.ebi.ac.uk/ena/data/view/HE601612,HE601624-HE601631&display=fasta	AS:ASM23792v1	M5:7736147bfd6e21b9a50121a2583bceaf	SP:Schistosoma mansoni strain Puerto Rico
+@SQ	SN:Schisto_mansoni.Chr_1.unplaced.SC_0071	LN:1722453	UR:http://www.ebi.ac.uk/ena/data/view/HE601612,HE601624-HE601631&display=fasta	AS:ASM23792v1	M5:2367b41fcb2d95997254e99d1e8792b1	SP:Schistosoma mansoni strain Puerto Rico
+@SQ	SN:Schisto_mansoni.Chr_1.unplaced.SC_0076	LN:1607214	UR:http://www.ebi.ac.uk/ena/data/view/HE601612,HE601624-HE601631&display=fasta	AS:ASM23792v1	M5:f762ddbde0b35de84d9250166a956a02	SP:Schistosoma mansoni strain Puerto Rico

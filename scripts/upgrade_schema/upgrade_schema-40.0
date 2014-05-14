@@ -1,0 +1,21 @@
+CREATE TABLE `genotype` (
+  `id_genotype` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `path` varchar(256) DEFAULT NULL,
+  `expected_sample_name` varchar(64) DEFAULT NULL,
+  `search_parameters` text NOT NULL,
+  `sample_name_match` text NOT NULL,
+  `sample_name_relaxed_match` text NOT NULL,
+  `alternate_matches` text NOT NULL,
+  `alternate_match_count` int(11) NOT NULL DEFAULT '0',
+  `alternate_relaxed_matches` text NOT NULL,
+  `alternate_relaxed_match_count` int(11) NOT NULL DEFAULT '0',
+  `pass` tinyint(1) DEFAULT NULL,
+  `comments` text,
+  `info` text,
+  `tag_index` bigint(20) NOT NULL DEFAULT '-1',
+  PRIMARY KEY (`id_genotype`),
+  UNIQUE KEY `unq_run_lane_genotype` (`id_run`,`position`,`tag_index`)
+) ENGINE=InnoDB AUTO_INCREMENT=396 DEFAULT CHARSET=utf8;
+

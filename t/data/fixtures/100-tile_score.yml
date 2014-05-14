@@ -1,0 +1,21 @@
+---
+ - id_tile_score: 1
+   id_run_tile: 1
+   base_count: 25000
+   error_count: 200
+   blank_count: 21
+   unique_alignments: 10
+   ua_total_score: 10
+   cycles: 35
+   rescore: 1
+   score_version: 1
+   score_date_run: 2008-01-01 09:00:00
+   phagealign_version: 1
+   phagealign_date_run: 2008-01-01 10:10:10
+   max_blanks: 35
+   seq_length: 35
+   genome_file: 
+   bases_used: Y
+   qualityfilter_version: 
+   qualityfilter_date_run: 
+   filter_criterion: 

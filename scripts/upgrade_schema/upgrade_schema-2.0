@@ -1,0 +1,125 @@
+CREATE TABLE `cache_query` (
+  `id_cache_query` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `cache_time` TIMESTAMP  NOT NULL,
+  `ssha_sql` CHAR(28)  NOT NULL,
+  `id_run` BIGINT(20) UNSIGNED NOT NULL,
+  `end` TINYINT(1) UNSIGNED NOT NULL,
+  `type` VARCHAR(20)  NOT NULL,
+  `results` MEDIUMTEXT  NOT NULL,
+  `is_current` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,  
+  PRIMARY KEY (`id_cache_query`),
+  INDEX `id_run_index` (`id_run`),
+  INDEX `type_index` (`type`),
+  INDEX `is_current_index` (`is_current`),
+  INDEX `end_index` (`end`)
+)
+ENGINE=InnoDB DEFAULT CHARSET utf8;
+
+CREATE TABLE `run_graph` (
+  `id_run_graph` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_run` BIGINT(20) UNSIGNED NOT NULL,
+  `yield_gb` BIGINT(20) UNSIGNED,
+  `avg_error` FLOAT(5,2) ,
+  `avg_cluster_per_tile` BIGINT(20) UNSIGNED,
+  `avg_cluster_per_tile_raw` BIGINT(20) UNSIGNED,
+  `avg_cluster_per_tile_control` BIGINT(20) UNSIGNED,
+  `avg_cluster_per_tile_raw_control` BIGINT(20) UNSIGNED,
+  PRIMARY KEY (`id_run_graph`),
+  INDEX `id_run_index`(`id_run`)
+)
+ENGINE = InnoDB DEFAULT CHARSET utf8;
+
+
+ALTER TABLE run_tile ADD INDEX(id_run);
+ALTER TABLE run_tile ADD INDEX(position);
+ALTER TABLE run_tile ADD INDEX(tile);
+ALTER TABLE run_tile ADD INDEX(end);
+
+
+--
+-- Table structure for table `analysis`
+--
+
+CREATE TABLE `analysis` (
+  `id_analysis` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL default '0',
+  `date` datetime NOT NULL default '0000-00-00 00:00:00',
+  `folder` varchar(255) NOT NULL default '',
+  `iscurrent` tinyint(1) NOT NULL default '0',
+  PRIMARY KEY  (`id_analysis`),
+  INDEX id_run(`id_run`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `analysis_lane`
+--
+
+CREATE TABLE `analysis_lane` (
+  `id_analysis_lane` bigint(20) unsigned NOT NULL auto_increment,
+  `id_analysis` bigint(20) unsigned NOT NULL default '0',
+  `id_run` bigint(20) unsigned NOT NULL default '0',
+  `position` tinyint(1) unsigned NOT NULL default '0',
+  `tile_count` bigint(20) unsigned NOT NULL default '0',
+  `align_score_pf` float unsigned NOT NULL default '0',
+  `align_score_pf_err` float unsigned NOT NULL default '0',
+  `clusters_pf` float unsigned NOT NULL default '0',
+  `clusters_pf_err` float unsigned NOT NULL default '0',
+  `clusters_raw` float unsigned NOT NULL default '0',
+  `clusters_raw_err` float unsigned NOT NULL default '0',
+  `clusters_tilemean_raw` float unsigned NOT NULL default '0',
+  `cycle1_int_pf` float unsigned NOT NULL default '0',
+  `cycle1_int_pf_err` float unsigned NOT NULL default '0',
+  `cycle20_perc_int` float unsigned NOT NULL default '0',
+  `cycle20_perc_int_err` float unsigned NOT NULL default '0',
+  `cycle_10_20_av_perc_loss_pf` float unsigned NOT NULL default '0',
+  `cycle_10_20_av_perc_loss_pf_err` float unsigned NOT NULL default '0',
+  `cycle_2_10_av_perc_loss_pf` float unsigned NOT NULL default '0',
+  `cycle_2_10_av_perc_loss_pf_err` float unsigned NOT NULL default '0',
+  `cycle_2_4_av_int_pf` float unsigned NOT NULL default '0',
+  `cycle_2_4_av_int_pf_err` float unsigned NOT NULL default '0',
+  `equiv_perfect_clusters_pf` float unsigned NOT NULL default '0',
+  `equiv_perfect_clusters_raw` float unsigned NOT NULL default '0',
+  `error_rate_pf` float unsigned NOT NULL default '0',
+  `error_rate_pf_err` float unsigned NOT NULL default '0',
+  `lane_yield` float unsigned NOT NULL default '0',
+  `perc_align_pf` float unsigned NOT NULL default '0',
+  `perc_align_pf2` float unsigned NOT NULL default '0',
+  `perc_align_pf_err` float unsigned NOT NULL default '0',
+  `perc_clusters_pf` float unsigned NOT NULL default '0',
+  `perc_clusters_pf_err` float unsigned NOT NULL default '0',
+  `perc_error_rate_pf` float unsigned NOT NULL default '0',
+  `perc_error_rate_raw` float unsigned NOT NULL default '0',
+  `perc_phasing` float unsigned NOT NULL default '0',
+  `perc_prephasing` float unsigned NOT NULL default '0',
+  `perc_retained` float unsigned NOT NULL default '0',
+  PRIMARY KEY  (`id_analysis_lane`),
+  KEY `al_id_analysis` (`id_analysis`),
+  INDEX id_run(`id_run`),
+  CONSTRAINT `al_id_analysis` FOREIGN KEY (`id_analysis`) REFERENCES `analysis` (`id_analysis`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE analysis_lane ADD INDEX(position);
+
+--
+-- Table structure for table `analysis_lane_qcal`
+--
+
+CREATE TABLE `analysis_lane_qcal` (
+  `id_analysis_lane_qcal` bigint(20) unsigned NOT NULL auto_increment,
+  `id_analysis_lane` bigint(20) unsigned NOT NULL default '0',
+  `chastity` float default NULL,
+  `qv` int(11) NOT NULL default '0',
+  `cum_error` bigint(20) unsigned NOT NULL default '0' COMMENT 'cumulative error >= qv',
+  `cum_bases` bigint(20) unsigned NOT NULL default '0' COMMENT 'cumulative bases >= qv',
+  `cum_perc_error` float unsigned NOT NULL default '0' COMMENT 'cumulative percentage error >=qv',
+  `cum_perc_total` float unsigned NOT NULL default '0' COMMENT 'cumulative percentage total >= qv',
+  `error` bigint(20) unsigned NOT NULL default '0',
+  `bases` bigint(20) unsigned NOT NULL default '0',
+  `perc_error` float unsigned NOT NULL default '0',
+  `perc_total` float unsigned NOT NULL default '0',
+  `exp_perc_error` float unsigned NOT NULL default '0' COMMENT 'expected percentage error',
+  PRIMARY KEY  (`id_analysis_lane_qcal`),
+  KEY `alq_id_analysis_lane` (`id_analysis_lane`),
+  CONSTRAINT `alq_id_analysis_lane` FOREIGN KEY (`id_analysis_lane`) REFERENCES `analysis_lane` (`id_analysis_lane`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

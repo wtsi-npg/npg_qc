@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<item api_version="0.3">
+  <id>1743</id>
+  <name>phiX_SI_SPRI 1</name>
+  <count>0</count>
+  <closed>false</closed>
+  <workflow_sample_id>1641</workflow_sample_id>
+  <workflow_sample_name>phiX_SI_SPRI</workflow_sample_name>
+  <user>as8</user>
+  <project_id>198</project_id>
+  <project_name>Illumina Controls</project_name>
+  <descriptors>
+    <!-- This is information from the first request. It will be removed -->
+    <descriptor>
+      <name>Platform</name>
+      <value>Illumina</value>
+    </descriptor>
+    <descriptor>
+      <name>Collaborators</name>
+      <value/>
+    </descriptor>
+    <descriptor>
+      <name>Sequencing platform</name>
+      <value>Illumina</value>
+    </descriptor>
+    <descriptor>
+      <name>External funding source</name>
+      <value/>
+    </descriptor>
+    <descriptor>
+      <name>Project description</name>
+      <value>None</value>
+    </descriptor>
+    <descriptor>
+      <name>Funding source</name>
+      <value>Internal</value>
+    </descriptor>
+    <descriptor>
+      <name>Status</name>
+      <value>Pending</value>
+    </descriptor>
+    <descriptor>
+      <name>Sequencing budget division</name>
+      <value>Unallocated infrastructure (including development)</value>
+    </descriptor>
+    <descriptor>
+      <name>Sequencing Project Manager</name>
+      <value>Dan Turner</value>
+    </descriptor>
+    <descriptor>
+      <name>Sequencing budget cost centre</name>
+      <value/>
+    </descriptor>
+    <descriptor>
+      <name>SAC sponsor</name>
+      <value>None</value>
+    </descriptor>
+    <descriptor>
+      <name>Funding approved</name>
+      <value>Yes</value>
+    </descriptor>
+    <descriptor>
+      <name>Project cost code</name>
+      <value>None</value>
+    </descriptor>
+    <descriptor>
+      <name>Priority</name>
+      <value>Low</value>
+    </descriptor>
+    <descriptor>
+      <name>Funding comments</name>
+      <value/>
+    </descriptor>
+    <descriptor>
+      <name>Fragment size required (from)</name>
+      <value/>
+    </descriptor>
+    <descriptor>
+      <name>Fragment size required (to)</name>
+      <value/>
+    </descriptor>
+    <descriptor>
+      <name>Library type</name>
+      <value>Standard</value>
+    </descriptor>
+  </descriptors>
+  <requests>
+    <request href="http://psd-dev.internal.sanger.ac.uk:6600/requests/12822" state="pending" id="12822"/>
+    <request href="http://psd-dev.internal.sanger.ac.uk:6600/requests/19159" state="pending" id="19159"/>
+  </requests>
+</item>

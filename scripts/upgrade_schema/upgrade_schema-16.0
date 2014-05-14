@@ -1,0 +1,34 @@
+--
+-- add one field for adapter
+--
+
+ALTER TABLE `adapter` 
+ ADD COLUMN   `comments` text default NULL AFTER `pass`;
+
+--
+-- add two more fields for insert_size
+--
+
+ALTER TABLE `insert_size` 
+ ADD COLUMN   `expected_size` varchar(256) default NULL AFTER`quartile3`,
+ ADD COLUMN  `reference` varchar(256) default NULL AFTER `expected_size`;
+ 
+--
+-- extra auto qc table
+--
+
+CREATE TABLE `adapter` (
+    `id_adapter` bigint(20) unsigned NOT NULL auto_increment,
+    `id_run` bigint(20) unsigned NOT NULL,
+    `position` tinyint(1) unsigned NOT NULL,
+    `path` varchar(256) default NULL,
+    `forward_fasta_read_count` int(10) unsigned NOT NULL,
+    `forward_contaminated_read_count` int(10) unsigned NOT NULL,
+    `forward_blat_hash` TEXT NOT NULL,
+    `reverse_fasta_read_count` int(10) unsigned NULL,
+    `reverse_contaminated_read_count` int(10) unsigned NULL,
+    `reverse_blat_hash` TEXT NULL,
+    `pass` tinyint(1) default NULL, 
+  PRIMARY KEY  (`id_adapter`),
+  UNIQUE KEY `unq_run_lane_adapter` (`id_run`,`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

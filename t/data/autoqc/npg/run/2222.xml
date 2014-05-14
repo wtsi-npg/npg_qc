@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="2222" batch_id="3075" id_instrument="42" expected_cycle_count="54" actual_cycle_count="54" priority="1" id_run_pair="2199" is_paired="1" is_dev="0" id_instrument_format="4" name="IL37_2222" loader="tkb" loading_date="2009-02-08" run_folder="090208_IL37_2222">
+ <instrument id_instrument="42" name="IL37" id_instrument_format="4" external_name="" serial="" iscurrent="0" />
+ <run_lanes><run_lane id_run_lane="17329" id_run="2222" tile_count="100" tracks="2" id_project="1587" projectname="FUSE" auto_analyse="1" position="1" />
+<run_lane id_run_lane="17330" id_run="2222" tile_count="100" tracks="2" id_project="1587" projectname="FUSE" auto_analyse="1" position="2" />
+<run_lane id_run_lane="17331" id_run="2222" tile_count="100" tracks="2" id_project="1587" projectname="FUSE" auto_analyse="1" position="3" />
+<run_lane id_run_lane="17332" id_run="2222" tile_count="100" tracks="2" id_project="1485" projectname="FUSE" auto_analyse="1" position="4" />
+<run_lane id_run_lane="17333" id_run="2222" tile_count="100" tracks="2" id_project="1587" projectname="FUSE" auto_analyse="1" position="5" />
+<run_lane id_run_lane="17334" id_run="2222" tile_count="100" tracks="2" id_project="1587" projectname="FUSE" auto_analyse="1" position="6" />
+<run_lane id_run_lane="17335" id_run="2222" tile_count="100" tracks="2" id_project="1587" projectname="FUSE" auto_analyse="1" position="7" />
+<run_lane id_run_lane="17336" id_run="2222" tile_count="100" tracks="2" id_project="1587" projectname="FUSE" auto_analyse="1" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="33232" id_run="2222" date="2009-02-21 22:18:15" id_run_status_dict="20" id_user="54" username="svvd" iscurrent="1" description="qc complete" />
+ <run_statuses>
+ <run_status id_run_status="33232" id_run="2222" date="2009-02-21 22:18:15" id_run_status_dict="20" id_user="54" username="svvd" iscurrent="1" description="qc complete" />
+ <run_status id_run_status="32272" id_run="2222" date="2009-02-13 14:03:57" id_run_status_dict="19" id_user="7" username="svvd" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="32270" id_run="2222" date="2009-02-13 14:03:49" id_run_status_dict="12" id_user="7" username="svvd" iscurrent="0" description="run archived" />
+ <run_status id_run_status="32248" id_run="2222" date="2009-02-13 13:39:46" id_run_status_dict="18" id_user="7" username="svvd" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="32241" id_run="2222" date="2009-02-13 12:38:59" id_run_status_dict="17" id_user="7" username="svvd" iscurrent="0" description="archival pending" />
+ <run_status id_run_status="32239" id_run="2222" date="2009-02-13 12:38:49" id_run_status_dict="9" id_user="7" username="svvd" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="32175" id_run="2222" date="2009-02-12 15:14:53" id_run_status_dict="7" id_user="7" username="svvd" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="32159" id_run="2222" date="2009-02-12 14:54:00" id_run_status_dict="6" id_user="6" username="svvd" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="32126" id_run="2222" date="2009-02-12 14:01:24" id_run_status_dict="7" id_user="7" username="svvd" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="32110" id_run="2222" date="2009-02-12 13:43:06" id_run_status_dict="6" id_user="6" username="svvd" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="32063" id_run="2222" date="2009-02-11 15:03:42" id_run_status_dict="7" id_user="7" username="svvd" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="32061" id_run="2222" date="2009-02-11 14:47:24" id_run_status_dict="6" id_user="7" username="svvd" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="32060" id_run="2222" date="2009-02-11 14:47:19" id_run_status_dict="11" id_user="7" username="svvd" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="32057" id_run="2222" date="2009-02-11 14:38:37" id_run_status_dict="4" id_user="7" username="svvd" iscurrent="0" description="run complete" />
+ <run_status id_run_status="31841" id_run="2222" date="2009-02-08 15:05:29" id_run_status_dict="2" id_user="7" username="svvd" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="31820" id_run="2222" date="2009-02-08 09:03:24" id_run_status_dict="1" id_user="11" username="svvd" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="4254" id_run="2222" id_annotation="4533" date="2009-04-02 08:22:20" id_user="7" username="pipeline" comment="Test annotation - ignore." attachment_name="attachment" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="4255" id_run="2222" id_annotation="4534" date="2009-04-02 08:23:53" id_user="59" username="jo3" comment="Another test annotation - ignore." attachment_name="attachment" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="4256" id_run="2222" id_annotation="4535" date="2009-04-02 08:37:32" id_user="20" username="ajb" comment="Ok, I&#x27;ll stop now." attachment_name="attachment" run_current_ok="" current_cycle="" />
+ </annotations>
+ <tags>
+   <tag id_tag="17" description="paired_read" />
+ </tags>
+</run>

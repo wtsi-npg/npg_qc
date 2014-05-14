@@ -1,0 +1,22 @@
+---
+ - id_bam_flagstats: 1
+   id_run: 4500
+   position: 1
+   tag_index: -1
+   path:
+   library: 'unknown library'
+   unpaired_mapped_reads: 100
+   paired_mapped_reads: 200
+   unmapped_reads: 50
+   unpaired_read_duplicates: 20
+   paired_read_duplicates: 15
+   read_pair_optical_duplicates: 5
+   percent_duplicate: 0.16
+   library_size: 500
+   histogram: '{"1":"1505","2":"275562","3":"2078"}'
+   proper_mapped_pair: 25
+   mate_mapped_defferent_chr: 35
+   mate_mapped_defferent_chr_5: 30
+   pass: 1
+   comments: 'some comments'
+   info: '{"Picard-tools":"1.24","samtools":"1.71"}'

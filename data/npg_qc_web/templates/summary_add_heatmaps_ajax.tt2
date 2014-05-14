@@ -1,0 +1,52 @@
+<!-- start $Id$ -->
+
+<h5>[% IF model.datatype == 'raw_clusters' %]Cluster Counts
+[% ELSIF model.datatype == 'pf_perc_clusters' %]Percentage PF Clusters
+[% ELSIF model.datatype == 'first_cycle_intensities' %]First Cycle Intensities
+[% ELSIF model.datatype == 'perc_twentieth_cycles_intensities' %]Ave Intensities of First 20 Cycles
+[% ELSIF model.datatype == 'pf_perc_align' %]PF Percentage Aligned to Reference
+[% ELSIF model.datatype == 'pf_alignment_scores' %]PF Alignment Scores
+[% ELSIF model.datatype == 'pf_perc_error_rates' %]PF Percentage Error Rates
+[% END %]</h5>
+
+[% IF model.datatype == 'raw_clusters' %]
+<a href="#" onClick="get_summary_heatmap('[% SCRIPT_NAME %]/summary/;add_plot_ajax','[% model.id_run %]','raw_clusters'); return false;">
+(Switch to Graph View)
+</a>
+[% END %]
+
+[% IF model.gradient_style %]
+<div id="scale_box">
+Scale:<img src="[% SCRIPT_NAME %]/summary/[% model.id_run %];read_[% model.gradient_style %]_scale_png" />
+</div>
+[% END %]
+
+[% IF model.datatype == 'raw_clusters' %]
+<div id="heatmap_raw_clusters">
+Raw Clusters<br />
+[% model.heatmap_with_map(model.id_run, 1, model.datatype, "$SCRIPT_NAME/summary/;list_heatmap_png?id_run=$model.id_run&end=1&dataset=$model.datatype") %]
+</div>
+<div id="heatmap_pf_clusters">
+PF Clusters<br />
+[% model.heatmap_with_map(model.id_run, 1, 'pf_clusters', "$SCRIPT_NAME/summary/;list_heatmap_png?id_run=$model.id_run&end=1&dataset=pf_clusters") %]
+</div>
+[% ELSIF model.datatype == 'pf_perc_clusters' %]
+<div id="heatmap_pf_perc_clusters">
+Percentage PF Clusters<br />
+[% model.heatmap_with_map(model.id_run, 1, model.datatype, "$SCRIPT_NAME/summary/;list_heatmap_png?id_run=$model.id_run&end=1&dataset=$model.datatype") %]
+</div>
+[% ELSE %]
+<div id="heatmap_[% model.id_run %]">
+Run [% model.id_run %]<br />
+[% model.heatmap_with_map(model.id_run, 1, model.datatype, "$SCRIPT_NAME/summary/;list_heatmap_png?id_run=$model.id_run&end=1&dataset=$model.datatype") %]
+</div>
+[% IF model.id_run_pair %]
+<div id="heatmap_[% model.id_run_pair %]">
+Run [% model.id_run_pair %]<br />
+[% model.heatmap_with_map(model.id_run, 2, model.datatype, "$SCRIPT_NAME/summary/;list_heatmap_png?id_run=$model.id_run&end=2&dataset=$model.datatype") %]
+</div>
+[% END %]
+[% END %]
+
+
+<!-- end $Id$ -->

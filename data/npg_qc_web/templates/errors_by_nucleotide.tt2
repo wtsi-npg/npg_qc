@@ -1,0 +1,21 @@
+<table id="[% end %]_ebn" name="[% end %]_ebn" class="zebra">
+  <thead>
+    <caption>Errors By Nucleotide (Total) End [% end %]</caption>
+    <tr>
+      <th>Read As</th>
+      <th>Really A</th>
+      <th>Really C</th>
+      <th>Really G</th>
+      <th>Really T</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH row = tile.errors_by_nucleotide %]<tr>
+      <td>[% row.read_as %]</td>
+      <td>[% row.really_a %]</td>
+      <td>[% row.really_c %]</td>
+      <td>[% row.really_g %]</td>
+      <td>[% row.really_t %]</td>
+    </tr>
+  [% END %]</tbody>
+</table>

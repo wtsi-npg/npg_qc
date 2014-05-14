@@ -1,0 +1,7 @@
+
+--
+-- add one extra column for bam_flagstats table
+--
+
+ALTER TABLE `bam_flagstats` ADD COLUMN `num_total_reads` bigint(20) unsigned DEFAULT NULL;
+

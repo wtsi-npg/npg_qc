@@ -1,0 +1,10 @@
+<h5>Cluster Counts Plot</h5>
+<div id="plot_raw_clusters">
+Raw Clusters<br/>
+<img src="[% SCRIPT_NAME %]/summary/;list_plot_png?id_run=[% model.id_run %]&datatype=raw_clusters"/>
+</div>
+<br/>
+<div id="plot_pf_clusters">
+PF Clusters<br/>
+<img src="[% SCRIPT_NAME %]/summary/;list_plot_png?id_run=[% model.id_run %]&datatype=pf_clusters"/>
+</div>

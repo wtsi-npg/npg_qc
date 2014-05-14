@@ -1,0 +1,6 @@
+--
+-- alter table sequence_error to add two column
+-- 
+
+ALTER TABLE `sequence_error` ADD COLUMN `reverse_n_count` text AFTER `reverse_count`;
+ALTER TABLE `sequence_error` ADD COLUMN `forward_n_count` text AFTER `forward_count`;

@@ -1,0 +1,20 @@
+<!-- start: $Id$ -->
+[% SET run = model.id_run %]
+<h2>Run [% run %][% IF model.id_run_pair(run) %]/[% model.id_run_pair(run) %][% END %] [% model.title %]</h2>
+
+[% IF model.display %][% model.display %][% ELSE %]
+<p align="left">
+Loading [% model.title %] for Run [% model.id_run %].<br />
+If this doesn't not load within a few seconds, please click <a href="[% SCRIPT_NAME %]/[% model.display_type %]/[% run %]">here</a>.
+</p>
+<script type="text/javascript">
+  Element.show('spinner');
+  document.location.href="[% SCRIPT_NAME %]/[% model.display_type %]/[% run %]";
+</script>
+[% END %]
+
+<script type="text/javascript">
+document.title='Run [% model.id_run %] [% model.display_type %]';
+
+</script>
+<!-- end: $Id$ -->

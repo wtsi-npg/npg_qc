@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<RunInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Run Id="100925_HS8_05330_B_205NNABXX" Number="67">
+    <Instrument>SN331</Instrument>
+    <Cycles Incorporation="200" Cleavage="0" ReadPrep="0" />
+    <Tiles>
+      <Lane Index="1" Incorporation="68" ReadPrep="0" Align="0" />
+      <Lane Index="2" Incorporation="68" ReadPrep="0" Align="0" />
+      <Lane Index="3" Incorporation="68" ReadPrep="0" Align="0" />
+      <Lane Index="4" Incorporation="68" ReadPrep="0" Align="0" />
+      <Lane Index="5" Incorporation="68" ReadPrep="0" Align="0" />
+      <Lane Index="6" Incorporation="68" ReadPrep="0" Align="0" />
+      <Lane Index="7" Incorporation="68" ReadPrep="0" Align="0" />
+      <Lane Index="8" Incorporation="68" ReadPrep="0" Align="0" />
+    </Tiles>
+    <Reads>
+      <Read FirstCycle="1" LastCycle="100" />
+      <Read FirstCycle="101" LastCycle="200" />
+    </Reads>
+    <SecondRead FirstCycle="101" />
+  </Run>
+</RunInfo>

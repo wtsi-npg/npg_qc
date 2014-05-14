@@ -1,0 +1,805 @@
+<?xml version="1.0" ?>
+<RecipeFile>
+
+	<!-- GA2-PEM2X_MP_54+8+54Cycle_v8.3px.xml -->
+	<!-- Use ONLY with a PEMIIx (Rev G) containing a 250uL Priming Pump-->
+	<!-- For use with ImageCyclePump (AF5 protocol) config file -->
+	<!-- For use with v4 Cluster kits -->
+	<!-- For SBS Kit Version: 5 -->
+	<!-- NOT COMPATIBLE with Standard v4 SBS kits (using IMX36) -->
+	<!-- Last updated 15jun10 - TWBO -->
+
+	<!-- Single Folder Paired End Recipe Including Indexing Read -->
+	<!-- Read 1 SBS (including FirstBase and EndDeblock), Index Read Prep and SBS, Read 2 PEMIIx Prime and Prep, Read 2 SBS (including FirstBase) -->
+
+	<!-- Optimisation of wash buffer steps in CompleteCycle -->
+	<!-- IMR delivery of 60 and 10 volumes -->
+	<!-- Incorporation time increased from 240 s to 291 s -->
+	<!-- Deblock increased from 180 s to 240 s -->
+	<!-- Inclusion of a User Event during CompleteCycle to pause SCS if RTA is lagging in early cycles -->
+
+	<!-- 60 ul/min SMX pump flowrate -->
+	<!-- Exposure Time: 1225ms (A=500, C=350, G=200, T=175) -->
+	<!-- No. Tiles Per Column: 60 -->
+	<!-- No. Cycles: 54 + 8 + 54 -->
+
+
+  <TileSelection>
+
+    <Incorporation>
+	<Lane Index="1"><RowRange Min="1" Max="60"/></Lane>
+	<Lane Index="2"><RowRange Min="1" Max="60"/></Lane>
+	<Lane Index="3"><RowRange Min="1" Max="60"/></Lane>
+	<Lane Index="4"><RowRange Min="1" Max="60"/></Lane>
+	<Lane Index="5"><RowRange Min="1" Max="60"/></Lane>
+	<Lane Index="6"><RowRange Min="1" Max="60"/></Lane>
+	<Lane Index="7"><RowRange Min="1" Max="60"/></Lane>
+	<Lane Index="8"><RowRange Min="1" Max="60"/></Lane>
+    </Incorporation>
+
+    <ReadPrep>
+  	<Row Index="5" /> 
+  	<Row Index="26" /> 
+  	<Row Index="45" /> 
+    </ReadPrep>
+
+  </TileSelection>
+
+  <ChemistryDefinitions>
+
+	<!-- DEFINITIONS: GENOME ANALYZER SBS -->
+
+    <Chemistry Name="FirstBase">
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="80" />
+	<Temp Temperature="55" />
+  	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="60" />
+  	<Wait Duration="80000" />
+  	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="10" />
+  	<Wait Duration="211000" />
+  	<Temp Temperature="22" />
+	<TempOff />
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="60" />
+	<PumpToFlowcell Solution="3" AspirationRate="60" DispenseRate="2500" Volume="75" />
+    </Chemistry>
+
+    <Chemistry Name="CompleteCycle">
+	<PumpToFlowcell Solution="7" AspirationRate="250" DispenseRate="2500" Volume="55" />
+	<Temp Temperature="55" />
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="75" />
+	<Wait Duration="80000" />
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="25" />
+	<Wait Duration="80000" />
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="25" />
+	<Wait Duration="80000" />
+	<PumpToFlowcell Solution="7" AspirationRate="250" DispenseRate="2500" Volume="85" />
+	<PumpToFlowcell Solution="4" AspirationRate="250" DispenseRate="2500" Volume="145" />
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="80" />
+  	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="60" />
+  	<Wait Duration="80000" />
+  	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="10" />
+  	<Wait Duration="211000" />
+  	<Temp Temperature="22" />
+	<TempOff />
+  	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="60" />
+	<UserProgram Path="..\..\..\EventScripts\Check_RTA_Lag.cmd" Minimized="false" Shell="true" Wait="true"/>
+	<PumpToFlowcell Solution="3" AspirationRate="60" DispenseRate="2500" Volume="75" />
+    </Chemistry>
+
+    <Chemistry Name="EndDeblock">
+    	<TempOff />
+	<PumpToFlowcell Solution="7" AspirationRate="250" DispenseRate="2500" Volume="125" />
+	<Temp Temperature="55" />
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="75" />
+	<Wait Duration="80000" />
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="25" />
+	<Wait Duration="80000" />
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="25" />
+	<Wait Duration="80000" />
+	<Temp Temperature="22" />
+	<TempOff />
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="60" />
+    </Chemistry>
+
+    <Chemistry Name="PR2Flush">
+  	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="100" /> 
+    </Chemistry>
+
+    <Chemistry Name="SMXFlush">
+  	<PumpToFlowcell Solution="3" AspirationRate="60" DispenseRate="2500" Volume="75" /> 
+    </Chemistry>
+    
+    <Chemistry Name="End">
+    	<TempOff />
+  	<PumpToFlowcell Solution="2" AspirationRate="250" DispenseRate="2500" Volume="500" /> 
+    </Chemistry>
+
+
+	<!-- DEFINITIONS: PAIRED END MODULE PEMIIx (PRIME) -->
+
+    <Chemistry Name="Prime10x3">
+      <Prime Reagent="10" /><Prime Reagent="10" /><Prime Reagent="10" />
+    </Chemistry>
+
+    <Chemistry Name="Prime10x1">
+      <Prime Reagent="10" />
+    </Chemistry>
+
+    <Chemistry Name="Prime11x3">
+      <Prime Reagent="11" /><Prime Reagent="11" /><Prime Reagent="11" />
+    </Chemistry>
+
+    <Chemistry Name="Prime11x1">
+      <Prime Reagent="11" />
+    </Chemistry>
+
+    <Chemistry Name="Prime12x3">
+      <Prime Reagent="12" /><Prime Reagent="12" /><Prime Reagent="12" />
+    </Chemistry>
+
+    <Chemistry Name="Prime12x1">
+      <Prime Reagent="12" />
+    </Chemistry>
+
+    <Chemistry Name="Prime13x3">
+      <Prime Reagent="13" /><Prime Reagent="13" /><Prime Reagent="13" />
+    </Chemistry>
+
+    <Chemistry Name="Prime13x1">
+      <Prime Reagent="13" />
+    </Chemistry>
+
+    <Chemistry Name="Prime14x3">
+      <Prime Reagent="14" /><Prime Reagent="14" /><Prime Reagent="14" />
+    </Chemistry>
+
+    <Chemistry Name="Prime14x1">
+      <Prime Reagent="14" />
+    </Chemistry>
+
+    <Chemistry Name="Prime15x3">
+      <Prime Reagent="15" /><Prime Reagent="15" /><Prime Reagent="15" />
+    </Chemistry>
+
+    <Chemistry Name="Prime15x1">
+      <Prime Reagent="15" />
+    </Chemistry>
+
+    <Chemistry Name="Prime16x3">
+      <Prime Reagent="16" /><Prime Reagent="16" /><Prime Reagent="16" />
+    </Chemistry>
+
+    <Chemistry Name="Prime16x1">
+      <Prime Reagent="16" />
+    </Chemistry>
+
+   <Chemistry Name="Prime19x3">
+      <Prime Reagent="19" /><Prime Reagent="19" /><Prime Reagent="19" />
+    </Chemistry>
+
+    <Chemistry Name="Prime19x1">
+      <Prime Reagent="19" />
+    </Chemistry>
+
+    <Chemistry Name="Prime21x4">
+      <Prime Reagent="21" /><Prime Reagent="21" /><Prime Reagent="21" /><Prime Reagent="21" />
+    </Chemistry>
+
+    <Chemistry Name="Prime21x1">
+      <Prime Reagent="21" />
+    </Chemistry>
+
+    <Chemistry Name="Prime22x4">
+      <Prime Reagent="22" /><Prime Reagent="22" /><Prime Reagent="22" /><Prime Reagent="22" />
+    </Chemistry>
+
+    <Chemistry Name="Prime22x1">
+      <Prime Reagent="22" />
+    </Chemistry>
+
+	<!-- DEFINITIONS: PAIRED END MODULE PEMIIx (READ 2 PREPARATION / RESYNTHESIS) -->
+
+    <Chemistry Name="Flow_test">
+      <PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2000" Volume="250" />
+    </Chemistry>
+
+     <Chemistry Name="Denaturation">
+      <Temp Temperature="20" Duration="120000"/>
+      <PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <PumpToFlowcell Solution="19" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" />
+    </Chemistry>
+
+    <Chemistry Name="Deprotection">
+      <PumpToFlowcell Solution="10" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <Temp Temperature="38" Duration="120000"/>
+      <Wait Duration="1800000"/>
+      <Temp Temperature="20" Duration="120000"/>
+      <PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" />
+    </Chemistry>
+
+    <Chemistry Name="Pre-resynthesis_wash">
+      <PumpToFlowcell Solution="14" AspirationRate="60" DispenseRate="2500" Volume="150" />
+      <Temp Temperature="60" Duration="120000"/>
+    </Chemistry>    
+
+    <Chemistry Name="Resynthesis">
+      <PumpToFlowcell Solution="15" AspirationRate="30" DispenseRate="2500" Volume="28" />
+      <PumpToFlowcell Solution="14" AspirationRate="30" DispenseRate="2500" Volume="28" />
+      <PumpToFlowcell Solution="13" AspirationRate="30" DispenseRate="2500" Volume="36" />
+    </Chemistry>
+
+    <Chemistry Name="Post-resynthesis_wash">
+      <PumpToFlowcell Solution="21" AspirationRate="30" DispenseRate="2500" Volume="245" />
+      <Temp Temperature="20" Duration="120000"/>
+    </Chemistry>
+
+    <Chemistry Name="Linearisation 2">
+      <PumpToFlowcell Solution="11" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <Temp Temperature="38" Duration="120000"/>
+      <Wait Duration="1800000"/>
+      <Temp Temperature="20" Duration="120000"/>
+      <PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <TempOff />
+    </Chemistry>
+
+    <Chemistry Name="Combined_blocking_1_2_new">
+      <Temp Temperature="20" Duration="120000"/>
+      <PumpToFlowcell Solution="12" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <Temp Temperature="38" Duration="120000"/>
+      <Wait Duration="540000"/>
+      <PumpToFlowcell Solution="12" AspirationRate="60" DispenseRate="2500" Volume="20" />
+      <Wait Duration="540000"/>
+      <PumpToFlowcell Solution="12" AspirationRate="60" DispenseRate="2500" Volume="20" />
+      <Wait Duration="540000"/>    
+      <PumpToFlowcell Solution="12" AspirationRate="60" DispenseRate="2500" Volume="25" />
+      <Temp Temperature="60" Duration="120000"/>
+      <Wait Duration="900000"/>
+      <Temp Temperature="20" Duration="120000"/>
+      <PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" />
+    </Chemistry>
+
+    <Chemistry Name="Rehybridisation">
+      <PumpToFlowcell Solution="19" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <PumpToFlowcell Solution="16" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <Temp Temperature="60" Duration="120000"/>
+      <Wait Duration="900000"/>
+      <Temp Temperature="40" Duration="120000"/>
+      <PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" />
+      <Temp Temperature="20" Duration="120000"/>
+      <TempOff />
+    </Chemistry>
+
+	 <!--  DEFINITIONS: PAIRED END MODULE PEMIIx (INDEXING PREPARATION) --> 
+
+    <Chemistry Name="IndexingPreparation">
+  	<Temp Temperature="20" Duration="120000" /> 
+  	<PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" /> 
+  	<PumpToFlowcell Solution="19" AspirationRate="60" DispenseRate="2500" Volume="75" /> 
+  	<PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" /> 
+  	<PumpToFlowcell Solution="22" AspirationRate="60" DispenseRate="2500" Volume="75" /> 
+  	<Temp Temperature="60" Duration="120000" /> 
+  	<Wait Duration="900000" /> 
+  	<Temp Temperature="40" Duration="120000" /> 
+  	<PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2500" Volume="75" /> 
+  	<Temp Temperature="20" Duration="120000" /> 
+  	<TempOff /> 
+    </Chemistry>
+
+  </ChemistryDefinitions>
+
+
+  <Protocol>
+
+    <UserWait Message="This recipe will perform an indexed paired end sequencing run (including read 2 resynthesis) and place the data into a single run folder." /> 
+
+        <!-- INDEXING preparation -->
+
+    <UserWait Message="Indexing reagents must be loaded onto the PEM prior to the start of Read 1 sequencing. First, to check correct operation of the PEM, please load water onto positions #19, #21 and #22. Place PEM waste tube into a 15 ml falcon tube." />
+
+	<!-- PEM water prewash -->
+  
+    <ChemistryRef Name="Prime19x3" />  
+    <ChemistryRef Name="Prime21x4" />
+    <ChemistryRef Name="Prime22x4" />
+
+    <UserWait Message="Priming complete. Check the waste tube. Click OK if the volume dispensed is 2.6 ml's and proceed to the next step. Otherwise, click Cancel and seek assistance before proceeding further" />
+
+    <UserWait Message="Please load indexing reagents onto positions #19, #21 and #22. Place PEM waste tube into a 15 ml falcon tube." />
+
+	<!-- Indexing reagent prime -->
+  
+    <ChemistryRef Name="Prime19x3" />  
+    <ChemistryRef Name="Prime21x4" />
+    <ChemistryRef Name="Prime22x4" />
+
+    <UserWait Message="Priming complete. Check the waste tube. Click OK if the volume dispensed is 2.6 ml's and proceed to the next step. Otherwise, click Cancel and seek assistance before proceeding further" />
+
+	<!-- READ 1 SBS -->
+
+    <UserWait Message="Please verify that you have correctly specified the number of cycles, configured RTA, and ensured you have adequate storage space in the run folder for a run of that length.   Click OK to continue, or CANCEL to stop." />
+
+    <ChemistryRef Name="FirstBase" />
+
+    <UserWait Message="Read 1 First Base Incorporation Chemistry Complete.    Click OK to continue, or CANCEL to Stop." />
+    
+    <Calibrate />
+
+    <Findedge />
+    
+    <ReadPrep ExposureA="400" ExposureC="400" ExposureG="400" ExposureT="400" />
+    <ChemistryRef Name="PR2Flush" /> 
+    
+    <UserWait Message="Please Evaluate the First Base Report Data For Read 1.    Click OK to Proceed to First Cycle Imaging, or CANCEL to Stop." />
+
+		<!--      Read 1 - Cycle 1       -->
+    <Incorporation ChemistryName="SMXFlush" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+ 
+		<!--      Read 1 - Cycle 2       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+    		<!--      Read 1 - Cycle 3       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 4       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 5       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 6       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 7       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 8       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 9       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 10       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 11       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 12       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 13       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 14       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 15       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 16       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 17       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 18       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 19       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 20       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 21       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 22       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 23       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 24       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 25       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 26       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 27       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 28       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 29       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 30       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 31       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 32       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 33       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 34       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 35       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 36       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 37       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 38       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 39       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 40       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 41       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 42       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 43       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 44       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 45       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 46       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 47       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 48       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 49       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 50       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 51       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 52       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 53       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 1 - Cycle 54       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+	<!-- MULTIPLEXING CHEMISTRY (INDEX) -->
+
+    <NewRead/>
+
+    <OpenIndex Name="Index" />
+
+    <ChemistryRef Name="EndDeblock" />
+
+    	  <!-- INDEX READ - PREPARATION (PEMIIx) -->
+
+    <ChemistryRef Name="IndexingPreparation" />
+
+    	  <!-- INDEX READ - SBS (includes FirstBase) -->
+
+    <ChemistryRef Name="FirstBase" />
+
+    		<!--      Read Index - Cycle 1       -->
+    <Incorporation ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+    		<!--      Read Index - Cycle 2       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+    		<!--      Read Index - Cycle 3       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+    		<!--      Read Index - Cycle 4       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+    		<!--      Read Index - Cycle 5       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+    		<!--      Read Index - Cycle 6       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+  
+    		<!--      Read Index - Cycle 7       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+    		<!--      Read Index - Cycle 8       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+	<CloseIndex/>
+   
+    <ChemistryRef Name="EndDeblock" />   
+
+    <UserWait Message="Read 1 SBS Complete." />    
+
+    <UserWait Message="To check correct operation of the PEM priming pump, place PEM waste tube into a 15 ml falcon tube. Load water onto the Paired End Module (Positions #10, #11, #12, #13, #14, #15, #16, #19, #21. Click OK to Continue." />
+
+	<!-- PEM water prewash -->
+
+    <ChemistryRef Name="Prime10x3" />
+    <ChemistryRef Name="Prime11x3" />
+    <ChemistryRef Name="Prime12x3" />
+    <ChemistryRef Name="Prime13x3" />
+    <ChemistryRef Name="Prime14x3" />  
+    <ChemistryRef Name="Prime15x3" />
+    <ChemistryRef Name="Prime16x3" />  
+    <ChemistryRef Name="Prime19x3" />  
+    <ChemistryRef Name="Prime21x4" />
+    <ChemistryRef Name="Prime22x4" />
+
+    <UserWait Message="Priming complete. Check the waste tube. Click OK if the volume dispensed is 8 ml's and proceed to the next step. Otherwise, click Cancel and seek assistance before proceeding further" />    
+
+    <UserWait Message="Load Read 2 Resynthesis Reagents onto the Paired End Module (RMX-#10, LMX2-#11, BMX-#12, AMX2-#13, APM2-#14, AT2-#15, HP2-#16, Dil HP3-#19, HT2-#21. Click OK to Continue." />
+
+	<!-- READ 2 PRIMING OF PAIRED END MODULE (PEM) -->
+
+    <ChemistryRef Name="Prime10x3" />
+    <ChemistryRef Name="Prime11x3" />
+    <ChemistryRef Name="Prime12x3" />
+    <ChemistryRef Name="Prime13x3" />
+    <ChemistryRef Name="Prime14x3" />  
+    <ChemistryRef Name="Prime15x3" />
+    <ChemistryRef Name="Prime16x3" />  
+    <ChemistryRef Name="Prime19x3" />  
+    <ChemistryRef Name="Prime21x4" />
+
+    <UserWait Message="Priming complete. Check the waste tube. Click OK if the volume dispensed is 7 ml's and proceed to the next step. Otherwise, click Cancel and seek assistance before proceeding further" />
+
+    <UserWait Message="You are about to run a pump test to check correct flow from PEM to GA by flowing wash buffer across the flowcell. Place GA waste tubes in a 15 ml falcon tube. Press OK to continue" />
+
+    <ChemistryRef Name="Flow_test" />
+
+    <UserWait Message="Check the waste tube. Click OK if the volume dispensed is 2 ml. Otherwise, click Cancel and seek assistance before proceeding further" />
+
+    <UserWait Message="Place all waste lines back in waste bottle and click OK to Start PE Read 2 Preparation on the PE Module" />
+
+
+	<!-- READ 2 PREPARATION / RESYNTHESIS (PEMIIx) -->
+
+    <ChemistryRef Name="Denaturation" />
+    <ChemistryRef Name="Deprotection" />
+    <ChemistryRef Name="Pre-resynthesis_wash" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Resynthesis" />
+    <ChemistryRef Name="Post-resynthesis_wash" />
+    <ChemistryRef Name="Linearisation 2" />
+    <ChemistryRef Name="Combined_blocking_1_2_new" />
+    <ChemistryRef Name="Rehybridisation" />
+
+    <UserWait Message="Resynthesis complete.    Load water onto the Paired End Module (Positions #10, #11, #12, #13, #14, #15, #16, #19, #21 and #22. Click OK to Continue." />
+
+	<!-- PEM water postwash -->
+
+    <ChemistryRef Name="Prime10x1" />
+    <ChemistryRef Name="Prime11x1" />
+    <ChemistryRef Name="Prime12x1" />
+    <ChemistryRef Name="Prime13x1" />
+    <ChemistryRef Name="Prime14x1" />  
+    <ChemistryRef Name="Prime15x1" />
+    <ChemistryRef Name="Prime16x1" />  
+    <ChemistryRef Name="Prime19x1" />  
+    <ChemistryRef Name="Prime21x1" />
+    <ChemistryRef Name="Prime22x1" />
+
+    <UserWait Message="Load Read 2 SBS reagents onto the GA. Click OK to Continue." />
+
+	<!-- READ 2 SBS (includes FirstBase) -->
+
+    <ChemistryRef Name="FirstBase" />
+
+    <Calibrate />
+
+    <ReadPrep ExposureA="400" ExposureC="400" ExposureG="400" ExposureT="400" /> 
+
+    <ChemistryRef Name="PR2Flush" /> 
+
+    <UserWait Message="Please Evaluate the First Base Report Data For Read 2. Re-weigh reagent tubes to calculate reagent delivery volume on the Lab Tracking Form then load the Paired End Module with fresh tubes of water.   Click OK to Proceed to PEM water wash and Imaging, or CANCEL to Stop." />
+	
+   		<!--      Read 2 - Cycle 1       -->
+    <Incorporation ChemistryName="SMXFlush" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+ 
+   		<!--      Read 2 - Cycle 2       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+ 	  	<!--      Read 2 - Cycle 3       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+	   	<!--      Read 2 - Cycle 4       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 5       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 6       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+ 	  	<!--      Read 2 - Cycle 7       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+	   	<!--      Read 2 - Cycle 8       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 9       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 10       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 11       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 12       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 13       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 14       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 15       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+ 	  	<!--      Read 2 - Cycle 16       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+	   	<!--      Read 2 - Cycle 17       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 18       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 19       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 20       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 21       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 22       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 23       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 24       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 25       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 26       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 27       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+ 	  	<!--      Read 2 - Cycle 28       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+	   	<!--      Read 2 - Cycle 29       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 30       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 31       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 32       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 33       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 34       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 35       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 36       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+ 	  	<!--      Read 2 - Cycle 37       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+	   	<!--      Read 2 - Cycle 38       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 39       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 40       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 41       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 42       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 43       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 44       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 45       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+ 	  	<!--      Read 2 - Cycle 46       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+	   	<!--      Read 2 - Cycle 47       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 48       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 49       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 50       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 51       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 52       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 53       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+		<!--      Read 2 - Cycle 54       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175" />
+
+    <ChemistryRef Name="End" />
+
+  </Protocol>
+
+</RecipeFile>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

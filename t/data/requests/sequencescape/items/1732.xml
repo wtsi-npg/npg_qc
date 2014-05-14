@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<item api_version="0.3">
+  <id>1732</id>
+  <name>WTCCC T1D Pool 56 1</name>
+  <count>0</count>
+  <closed>false</closed>
+  <workflow_sample_id>1407</workflow_sample_id>
+  <workflow_sample_name>WTCCC T1D Pool 56</workflow_sample_name>
+  <user>mm8</user>
+  <project_id>156</project_id>
+  <project_name>WTCCC T1D Resequencing</project_name>
+  <descriptors>
+    <!-- This is information from the first request. It will be removed -->
+    <descriptor>
+      <name>Titan Name</name>
+      <value>NCBI36.fa</value>
+    </descriptor>
+    <descriptor>
+      <name>Titan ID</name>
+      <value>9</value>
+    </descriptor>
+    <descriptor>
+      <name>Project description</name>
+      <value>WTCCC T1D Resequencing</value>
+    </descriptor>
+    <descriptor>
+      <name>Funding source</name>
+      <value>Internal</value>
+    </descriptor>
+    <descriptor>
+      <name>Sequencing budget division</name>
+      <value>WTCCC</value>
+    </descriptor>
+    <descriptor>
+      <name>Sequencing budget cost centre</name>
+      <value/>
+    </descriptor>
+    <descriptor>
+      <name>Priority</name>
+      <value>Urgent</value>
+    </descriptor>
+    <descriptor>
+      <name>Status</name>
+      <value>Pending</value>
+    </descriptor>
+    <descriptor>
+      <name>SAC sponsor</name>
+      <value>Panos Deloukas</value>
+    </descriptor>
+    <descriptor>
+      <name>Funding comments</name>
+      <value>Panos Deloukas</value>
+    </descriptor>
+    <descriptor>
+      <name>Collaborators</name>
+      <value>WTCCC2 Consortium</value>
+    </descriptor>
+    <descriptor>
+      <name>Funding approved</name>
+      <value>Yes</value>
+    </descriptor>
+    <descriptor>
+      <name>Sequencing Project Manager</name>
+      <value>Chris Clee</value>
+    </descriptor>
+    <descriptor>
+      <name>Project cost code</name>
+      <value>067/0567</value>
+    </descriptor>
+    <descriptor>
+      <name>Platform</name>
+      <value>Illumina</value>
+    </descriptor>
+    <descriptor>
+      <name>Sequencing platform</name>
+      <value>Illumina</value>
+    </descriptor>
+    <descriptor>
+      <name>External funding source</name>
+      <value/>
+    </descriptor>
+    <descriptor>
+      <name>Fragment size required (from)</name>
+      <value>100</value>
+    </descriptor>
+    <descriptor>
+      <name>Fragment size required (to)</name>
+      <value>200</value>
+    </descriptor>
+    <descriptor>
+      <name>Library type</name>
+      <value>Standard</value>
+    </descriptor>
+  </descriptors>
+  <requests>
+    <request href="http://psd-dev.internal.sanger.ac.uk:6600/requests/12802" state="passed" id="12802"/>
+    <request href="http://psd-dev.internal.sanger.ac.uk:6600/requests/12939" state="passed" id="12939"/>
+    <request href="http://psd-dev.internal.sanger.ac.uk:6600/requests/19148" state="passed" id="19148"/>
+  </requests>
+</item>

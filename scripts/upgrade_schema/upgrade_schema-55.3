@@ -1,0 +1,17 @@
+select count(*) from contamination;
+
+ALTER TABLE `contamination` MODIFY COLUMN `contaminant_count` text,
+                            MODIFY COLUMN `genome_factor` text;
+SHOW ERRORS;
+SHOW WARNINGS;
+
+select count(*) from contamination where contaminant_count='';
+select count(*) from contamination where genome_factor='';
+
+UPDATE contamination SET contaminant_count=NULL WHERE contaminant_count='';
+UPDATE contamination SET genome_factor=NULL WHERE genome_factor='';
+SHOW ERRORS;
+SHOW WARNINGS;
+
+select count(*) from contamination where contaminant_count='';
+select count(*) from contamination where genome_factor='';

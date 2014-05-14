@@ -1,0 +1,13 @@
+SET character_set_client = utf8;
+CREATE TABLE `spatial_filter` (
+  `id_spatial_filter` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `path` varchar(256) DEFAULT NULL,
+  `info` text,
+  `num_spatial_filter_fail_reads` bigint(20) unsigned,
+  `num_total_reads` bigint(20) unsigned,
+  PRIMARY KEY (`id_spatial_filter`),
+  UNIQUE KEY `unq_run_lane_spatial_filter` (`id_run`,`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="1937" batch_id="2797" id_instrument="41" expected_cycle_count="37" actual_cycle_count="37" priority="1" id_run_pair="1958" is_paired="1" is_dev="0" id_instrument_format="4" name="IL36_1937" loader="mgibbs@illumina.com" loading_date="2008-12-09" run_folder="081209_IL36_1937">
+ <instrument id_instrument="41" name="IL36" id_instrument_format="4" external_name="" serial="" iscurrent="0" />
+ <run_lanes><run_lane id_run_lane="15056" id_run="1937" tile_count="100" tracks="2" id_project="1450" projectname="FUSE" auto_analyse="1" position="1" />
+<run_lane id_run_lane="15057" id_run="1937" tile_count="100" tracks="2" id_project="1450" projectname="FUSE" auto_analyse="1" position="2" />
+<run_lane id_run_lane="15058" id_run="1937" tile_count="100" tracks="2" id_project="1450" projectname="FUSE" auto_analyse="1" position="3" />
+<run_lane id_run_lane="15059" id_run="1937" tile_count="100" tracks="2" id_project="1485" projectname="FUSE" auto_analyse="1" position="4" />
+<run_lane id_run_lane="15060" id_run="1937" tile_count="100" tracks="2" id_project="1450" projectname="FUSE" auto_analyse="1" position="5" />
+<run_lane id_run_lane="15061" id_run="1937" tile_count="100" tracks="2" id_project="1450" projectname="FUSE" auto_analyse="1" position="6" />
+<run_lane id_run_lane="15062" id_run="1937" tile_count="100" tracks="2" id_project="1450" projectname="FUSE" auto_analyse="1" position="7" />
+<run_lane id_run_lane="15063" id_run="1937" tile_count="100" tracks="2" id_project="1485" projectname="FUSE" auto_analyse="1" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="28436" id_run="1937" date="2008-12-19 15:13:29" id_run_status_dict="20" id_user="8" username="jb1" iscurrent="1" description="qc complete" />
+ <run_statuses>
+ <run_status id_run_status="28436" id_run="1937" date="2008-12-19 15:13:29" id_run_status_dict="20" id_user="8" username="jb1" iscurrent="1" description="qc complete" />
+ <run_status id_run_status="28169" id_run="1937" date="2008-12-16 04:03:35" id_run_status_dict="19" id_user="7" username="jb1" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="28167" id_run="1937" date="2008-12-16 04:03:32" id_run_status_dict="12" id_user="7" username="jb1" iscurrent="0" description="run archived" />
+ <run_status id_run_status="28165" id_run="1937" date="2008-12-16 03:56:49" id_run_status_dict="18" id_user="7" username="jb1" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="28163" id_run="1937" date="2008-12-16 03:20:48" id_run_status_dict="17" id_user="7" username="jb1" iscurrent="0" description="archival pending" />
+ <run_status id_run_status="28161" id_run="1937" date="2008-12-16 03:20:46" id_run_status_dict="9" id_user="7" username="jb1" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="28089" id_run="1937" date="2008-12-15 10:28:43" id_run_status_dict="7" id_user="7" username="jb1" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="27933" id_run="1937" date="2008-12-12 14:45:27" id_run_status_dict="15" id_user="7" username="jb1" iscurrent="0" description="analysis prelim complete" />
+ <run_status id_run_status="27919" id_run="1937" date="2008-12-12 13:40:56" id_run_status_dict="14" id_user="7" username="jb1" iscurrent="0" description="analysis prelim" />
+ <run_status id_run_status="27912" id_run="1937" date="2008-12-12 13:09:19" id_run_status_dict="6" id_user="7" username="jb1" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="27911" id_run="1937" date="2008-12-12 13:09:18" id_run_status_dict="11" id_user="7" username="jb1" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="27910" id_run="1937" date="2008-12-12 13:04:26" id_run_status_dict="4" id_user="7" username="jb1" iscurrent="0" description="run complete" />
+ <run_status id_run_status="27708" id_run="1937" date="2008-12-10 12:03:46" id_run_status_dict="2" id_user="54" username="jb1" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="27694" id_run="1937" date="2008-12-09 17:10:24" id_run_status_dict="1" id_user="37" username="jb1" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="2983" id_run="1937" id_annotation="3231" date="2008-12-10 12:30:43" id_user="54" username="svvd" comment="This run corresponds to the directory 081209_IL36_B2797." attachment_name="" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="3061" id_run="1937" id_annotation="3316" date="2008-12-19 15:14:06" id_user="8" username="jb1" comment="pass low yield 2.2G, 2,3&#x26;6 failed on yield" attachment_name="" run_current_ok="" current_cycle="" />
+ </annotations>
+ <tags>
+   <tag id_tag="17" description="paired_read" />
+ </tags>
+</run>

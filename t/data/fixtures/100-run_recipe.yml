@@ -1,0 +1,43 @@
+---
+ - id_run_recipe: 1
+   id_run: 10
+   cycle: 37
+   lane: 8
+   tile: 1
+   col: 1
+   first_indexing_cycle:
+   last_indexing_cycle:
+   cycle_read1: 37
+   cycle_read2:  
+ - id_run_recipe: 2
+   id_run: 11
+   cycle: 2
+   lane: 2
+   tile: 1
+   col: 1
+   cycle_read1: 2
+ - id_run_recipe: 3
+   id_run: 3
+   cycle: 3
+   lane: 1
+   tile: 2
+   col: 1
+   cycle_read1: 3
+ - id_run_recipe: 4
+   id_run: 4298
+   cycle: 108
+   lane: 8
+   tile: 120
+   col: 2
+   cycle_read1: 54
+   cycle_read2: 54
+ - id_run_recipe: 5
+   id_run: 4275
+   cycle: 121
+   lane: 8
+   tile: 120
+   col: 2
+   first_indexing_cycle: 55
+   last_indexing_cycle: 67
+   cycle_read1: 54
+   cycle_read2: 54   

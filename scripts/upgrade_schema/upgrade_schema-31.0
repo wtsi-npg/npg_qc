@@ -1,0 +1,6 @@
+
+CREATE TABLE `fastqcheck` (
+  `file_name` varchar(255) NOT NULL,
+  `file_content` mediumtext default NULL,
+  PRIMARY KEY  (`file_name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

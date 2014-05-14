@@ -1,0 +1,34 @@
+#!/usr/local/bin/perl -T
+#########
+# Author:        ajb
+# Maintainer:    $Author$
+# Created:       2008-06-10
+# Last Modified: $Date$
+# Id:            $Id$
+# $HeadURL$
+#
+
+my @npg_libs;
+BEGIN {
+  my $libs_string = $ENV{'NPG_PERL5LIB'};
+  if ($libs_string) {
+    my @libs = split /:/smx, $libs_string;
+    foreach my $l (@libs) {
+      my ($dtl) = $l =~ /([a-z0-9\/\._\-]+)/i;
+      if ($dtl) {push @npg_libs, $dtl;}
+    }
+  }
+}
+
+use strict;
+use lib @npg_libs;
+use warnings;
+use npg_qc::controller;
+use npg_qc::util;
+
+our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
+
+
+npg_qc::controller->handler(npg_qc::util->new());
+
+0;

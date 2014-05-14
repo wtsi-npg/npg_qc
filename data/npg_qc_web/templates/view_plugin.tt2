@@ -1,0 +1,10 @@
+<div id="[% model.display_type %]_id"></div>
+<script type="text/javascript">
+Event.observe(window,'load',things_to_do_on_load());
+document.location.href="[% SCRIPT_NAME %]/[% model.display_type %]/[% model.id_run %]";
+
+function things_to_do_on_load() {
+ Element.show('spinner');
+}
+
+</script>

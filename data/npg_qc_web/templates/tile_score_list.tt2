@@ -1,0 +1,43 @@
+<!-- start: $Id$ -->
+<h2>Rescore data for Run [% model.id_run %][% IF model.id_run_pair(model.id_run) %]/[% model.id_run_pair(model.id_run) %][% END %] By Tile</h2>
+<p>This is all the data which does not get graphed. Click on the table group name for the tile you wish to view.</p>
+<div style="float:left;">
+<table border="1">
+  <thead>
+  <tr>
+    <th>Tile</th>
+    <th>Error Rates</th>
+    <th>Log Likelihood</th>
+    <th>Most Common Words</th>
+    <th>Most Common Blank Patterns</th>
+    <th>Rescore Info</th>
+  </tr>
+  </thead>
+  <tbody>
+  [% FOREACH name = model.run_tiles_uniq_names %][% IF model.has_rescore(name) %]<tr>
+    <td>[% name %]</td>
+    <td><a href="[% SCRIPT_NAME %]/tile_score/;list_error_rates?tile_ref=[% name %]">Error Rates</a></td>
+    <td><a href="[% SCRIPT_NAME %]/tile_score/;list_likelihood?tile_ref=[% name %]">Log Likelihood</a></td>
+    <td><a href="[% SCRIPT_NAME %]/tile_score/;list_words?tile_ref=[% name %]">Most Common Words</a></td>
+    <td><a href="[% SCRIPT_NAME %]/tile_score/;list_blanks?tile_ref=[% name %]">Most Common Blank Patterns</a></td>
+    <td><a href="[% SCRIPT_NAME %]/tile_score/;list_rescore_info?tile_ref=[% name %]">Rescore Info</a></td>
+  </tr>[% END %]
+  [% END %]</tbody>
+</table>
+</div>
+<div id="graph_view" style="float:left;">
+<img id="graph" style="display:none;" />
+</div>
+<div class="clearfloats"></div>
+
+<script type="text/javascript">
+document.title='Run [% model.id_run %] Rescore data';
+Event.observe(window,'load',things_to_do_on_load());
+
+function things_to_do_on_load() {
+  back();
+}
+[% PROCESS summary_back.tt2 %]
+</script>
+
+<!-- end: $Id$ -->

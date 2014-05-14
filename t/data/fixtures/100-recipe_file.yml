@@ -1,0 +1,5 @@
+---
+ - id_recipe_file: 1
+   file_name: 'Recipe_GA2-PEM_MP_2x37Cycle+7_v6.2.xml'
+   md5: '7fa263be928de4b10bb95647e69611d3'
+   xml: '<?xml version="1.0" ?> <RecipeFile></RecipeFile>'

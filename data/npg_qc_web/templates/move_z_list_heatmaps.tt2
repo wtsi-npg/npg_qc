@@ -1,0 +1,49 @@
+[% PROCESS move_z_list_alerts_add_ajax.tt2 %]
+
+<h6>Heatmaps showing z value difference for each tile against the average value of this tile across all cycles for Run [% model.id_run %]
+</h6>
+Click the thumbnail for each cycle to see the actual heatmap in the bottom
+<br/>
+
+
+<br/>
+<div id="legend">
+Colour Code <img align="middle" src="[% SCRIPT_NAME %]/move_z/;list_legend_png" />
+</div>
+<table border="1" cellpadding ="3" cellspacing="10">
+  <tbody>
+  <tr>
+    [% SET count = 1 %]
+    [% FOREACH cycle = model.cycles_for_run %]
+    <td>
+    Cycle [% cycle %]<br />
+    <a href="#" onClick="get_hover_heatmap_movez('[% model.id_run %]_[% cycle %]', '[% cycle %]'); return false;">
+    <img src="[% SCRIPT_NAME %]/move_z/;list_heatmap_png?id_run=[% model.id_run %]&cycle=[% cycle %]&thumb=true" />
+    </a>
+    </td>
+    [% IF count == 10 %]</tr><tr>[% count = 1 %][% ELSE %][% count = count + 1 %][% END %]
+    [% END %]
+  </tr>
+  </tbody>
+</table>
+
+<br/>
+
+<div id="heatmap_view" style="float:left;">
+<img id="graph" style="display:none;" />
+</div>
+<br/>
+
+<div class="clearfloats"></div>
+<script type="text/javascript">
+function get_hover_heatmap_movez(cycle_ref, cycle) {
+  Element.show('spinner');
+  var el = 'heatmap_view';
+  new Ajax.Updater(el,'[% SCRIPT_NAME %]/move_z/;list_heatmap_with_hover_ajax',
+   {method:'get',
+    parameters:{cycle_ref:cycle_ref, url:'[% SCRIPT_NAME %]/move_z/;list_heatmap_png?id_run=[% model.id_run %]&cycle='+ cycle +'&thumb=false'},
+    onComplete:function(){
+     Element.hide('spinner');
+   }});
+}
+</script>

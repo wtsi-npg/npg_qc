@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecipeFile>
+
+	<!-- GA2_MP_54+7Cycle_v4.xml -->
+	<!-- For use with AF4a ImageCyclePump config file -->
+	<!-- DO NOT USE with the GA1 Sequencer -->
+	<!-- Last Updated 02Apr09 - TWBO -->
+
+	<!-- Indexing (7 cycle) - Paired End Recipe -->
+	<!-- Exposure Time: 1225ms (A=500, C=350, G=200, T=175) -->
+	<!-- No. Tiles Per Column: 50 -->
+	<!-- No. SBS Cycles: 54 -->
+	<!-- No. Indexing Cycles: 7 -->
+
+
+  <TileSelection>
+
+    <Incorporation>
+	<Lane Index="1"><RowRange Min="1" Max="50"/></Lane>
+	<Lane Index="2"><RowRange Min="1" Max="50"/></Lane>
+	<Lane Index="3"><RowRange Min="1" Max="50"/></Lane>
+	<Lane Index="4"><RowRange Min="1" Max="50"/></Lane>
+	<Lane Index="5"><RowRange Min="1" Max="50"/></Lane>
+	<Lane Index="6"><RowRange Min="1" Max="50"/></Lane>
+	<Lane Index="7"><RowRange Min="1" Max="50"/></Lane>
+	<Lane Index="8"><RowRange Min="1" Max="50"/></Lane>
+    </Incorporation>
+
+  </TileSelection>
+
+  <ChemistryDefinitions>
+
+    <Chemistry Name="CompleteCycle">
+	<PumpToFlowcell Solution="7" AspirationRate="250" DispenseRate="2500" Volume="125"/>
+	<Temp Temperature="55"/>
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+	<Wait Duration="180000"/>
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="25"/>
+	<Wait Duration="180000"/>
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="25"/>
+	<Wait Duration="180000"/>
+	<Temp Temperature="22"/>
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+	<PumpToFlowcell Solution="4" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="125"/>
+  	<Temp Temperature="55"/>
+  	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+  	<Wait Duration="180000"/>
+  	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="25"/>
+  	<Wait Duration="180000"/>
+  	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="25"/>
+  	<Wait Duration="180000"/>
+  	<Temp Temperature="22"/>
+  	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+  	<PumpToFlowcell Solution="4" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+  	<PumpToFlowcell Solution="3" AspirationRate="60" DispenseRate="2500" Volume="75"/>
+  	<TempOff/>
+    </Chemistry>
+
+   <Chemistry Name="EndDeblock">
+	<PumpToFlowcell Solution="7" AspirationRate="250" DispenseRate="2500" Volume="125"/> 
+	<Temp Temperature="55"/> 
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="75"/> 
+	<Wait Duration="180000"/> 
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="25"/>
+	<Wait Duration="180000"/> 
+	<PumpToFlowcell Solution="6" AspirationRate="250" DispenseRate="2500" Volume="25"/> 
+	<Wait Duration="180000"/> 
+	<Temp Temperature="22"/> 
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="75"/> 
+	<PumpToFlowcell Solution="4" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+  	<TempOff/>
+    </Chemistry>
+
+    <Chemistry Name="IndexingPreparation">
+	<Temp Temperature="20" Duration="120000"/>
+	<PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2000" Volume="75"/>
+	<PumpToFlowcell Solution="19" AspirationRate="60" DispenseRate="2000" Volume="75"/>
+	<PumpToFlowcell Solution="20" AspirationRate="60" DispenseRate="2000" Volume="75"/>
+	<PumpToFlowcell Solution="22" AspirationRate="60" DispenseRate="2000" Volume="75"/>
+	<Temp Temperature="60" Duration="120000"/>
+	<Wait Duration="900000"/>
+	<Temp Temperature="40" Duration="120000"/>
+	<PumpToFlowcell Solution="21" AspirationRate="60" DispenseRate="2000" Volume="75"/>
+	<Temp Temperature="21" Duration="120000"/>
+    </Chemistry>
+
+    <Chemistry Name="IndexingFirstBase">
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="125"/>
+	<Temp Temperature="55"/>
+	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+	<Wait Duration="180000"/>
+	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="25"/>
+	<Wait Duration="180000"/>
+	<PumpToFlowcell Solution="1" AspirationRate="250" DispenseRate="2500" Volume="25"/>
+	<Wait Duration="180000"/>
+	<Temp Temperature="22"/>
+	<PumpToFlowcell Solution="5" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+	<PumpToFlowcell Solution="4" AspirationRate="250" DispenseRate="2500" Volume="75"/>
+  	<PumpToFlowcell Solution="3" AspirationRate="60" DispenseRate="2500" Volume="75"/>
+  	<TempOff/>
+    </Chemistry>
+
+  </ChemistryDefinitions>
+
+  <Protocol>
+
+    <UserWait Message="This is a 61 Cycle Recipe (54 + 7 for Indexing).  You Will Need to Top-up the Scan Mix During the Run."/> 
+
+    <UserWait Message="Please Ensure that You have Previously Run the GA2_FirstBase Recipe.    Click OK to Continue, or CANCEL to Stop."/> 
+
+   		<!--      Cycle 1       -->
+    <Incorporation ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+ 
+   		<!--      Cycle 2       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+ 	  	<!--      Cycle 3       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+	   	<!--      Cycle 4       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 5       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 6       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+ 	  	<!--      Cycle 7       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+	   	<!--      Cycle 8       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 9       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 10       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 11       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 12       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 13       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 14       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 15       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+ 	  	<!--      Cycle 16       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+	   	<!--      Cycle 17       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 18       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 19       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 20       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 21       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 22       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 23       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 24       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 25       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 26       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 27       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+ 	  	<!--      Cycle 28       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+	   	<!--      Cycle 29       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 30       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 31       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 32       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 33       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 34       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 35       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 36       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 37       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 38       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 39       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 40       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 41       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 42       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 43       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 44       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 45       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+ 	  	<!--      Cycle 46       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+	   	<!--      Cycle 47       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 48       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 49       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 50       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 51       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 52       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 53       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 54       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+    <ChemistryRef Name="EndDeblock"/>
+
+    <ChemistryRef Name="IndexingPreparation"/>
+
+    <ChemistryRef Name="IndexingFirstBase"/>
+
+   		<!--      Cycle 55       -->
+    <Incorporation ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+ 
+   		<!--      Cycle 56       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+	   	<!--      Cycle 57       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 58       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 59       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+ 	  	<!--      Cycle 60       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+		<!--      Cycle 61       -->
+    <Incorporation ChemistryName="CompleteCycle" ExposureA="500" ExposureC="350" ExposureG="200" ExposureT="175"/>
+
+    <ChemistryRef Name="EndDeblock"/>
+
+  </Protocol>
+
+</RecipeFile>

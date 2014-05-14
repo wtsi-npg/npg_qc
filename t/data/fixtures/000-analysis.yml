@@ -1,0 +1,13 @@
+---
+- date: 2007-11-05 00:00:00
+  folder: /staging/IL2/outgoing/071105_IL2_0095/Data/C1-43_Firecrest1.9.1_20-12-2007_auto/Bustard1.9.1_20-12-2007_auto/GERALD_20-12-2007_auto
+  id_analysis: 1
+  id_run: 95
+  end: 1
+  iscurrent: 1
+- date: 2007-11-05 00:00:00
+  folder: /staging/IL2/outgoing/071105_IL2_0095/Data/C1-43_Firecrest1.9.1_20-12-2007_auto/Bustard1.9.1_20-12-2007_auto/GERALD_20-12-2007_auto
+  id_analysis: 2
+  id_run: 96
+  end: 1
+  iscurrent: 1

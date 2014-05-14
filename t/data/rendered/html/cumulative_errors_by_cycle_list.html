@@ -1,0 +1,53 @@
+<h2>Cumulative Error By Cycle Plots for Run 1 By Tile</h2>
+<div style="float:left;">
+<table border="1">
+  <thead>
+  <tr>
+    <th>Tile</th>
+    <th>Score</th>
+    <th>Rescore</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>1_1_1</td>
+    <td><a href="#" onClick="get_graph('1_1_1','score'); return false;">Score</a></td>
+    <td><a href="#" onClick="get_graph('1_1_1','rescore'); return false;">Rescore</a></td>
+  </tr>
+  </tbody>
+</table>
+</div>
+<div id="graph_view" style="float:left;">
+<img id="graph" style="display:none;" />
+</div>
+<div class="clearfloats"></div>
+
+<script type="text/javascript">
+document.title='Run 1 Cumulative Errors by cycle';
+Event.observe(window,'load',things_to_do_on_load());
+
+function things_to_do_on_load() {
+  back();
+}
+
+function back() {
+  var actions = document.getElementById('actions');
+  var NewLI = document.createElement('LI');
+  NewLI.innerHTML = '<a href="/cgi-bin/npg_qc/main/;list_display?display=summary&id_run=1">[Back]</a>';
+  actions.appendChild(NewLI);
+}
+
+function get_graph(tile_id,score) {
+  Element.show('spinner');
+  var graph_view = document.getElementById("graph_view");
+  var remove = graph_view.getElementsByTagName("img");
+  while (graph_view.firstChild) {
+    graph_view.removeChild(graph_view.firstChild);
+  }
+  img = document.createElement("img");
+  img.src = '/cgi-bin/npg_qc/cumulative_errors_by_cycle/;read_png?tile_ref='+tile_id+'&score='+score;
+  graph_view.appendChild(img);
+  Element.hide('spinner');
+}
+
+</script>

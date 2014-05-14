@@ -1,0 +1,48 @@
+--
+--modify unknown for three fields of lane_qc table to NULL
+--
+update lane_qc set perc_align_pf = null where perc_align_pf = 'unknown';
+update lane_qc set av_alignment_score_pf  = null where av_alignment_score_pf = 'unknown';
+update lane_qc set  perc_error_rate_pf  = null where  perc_error_rate_pf = 'unknown';
+
+--
+--change three fildss of lane_qc data type from text to float
+--
+alter table lane_qc modify perc_error_rate_pf float(5,2);
+alter table lane_qc modify av_alignment_score_pf float(5,2);
+alter table lane_qc modify perc_align_pf float(5,2)
+
+--
+-- set lane_summary caching in cache_query table to not current
+-- which needs to be re-cached because of for some values from 0 to null for non-control lanes
+--
+update cache_query set is_current = 0 where type= 'lane_summary';
+
+
+--
+--delete rows with id_run as 0 from table run_and_pair
+--
+
+DELETE FROM run_and_pair WHERE id_run = 0;
+
+--
+--create unique constraint fro table run_and_pair
+--
+
+ALTER TABLE run_and_pair ADD UNIQUE INDEX `unq_idx_runpair_idrun` (`id_run`);
+
+--
+-- create a new table `image_store`
+--
+
+CREATE TABLE `image_store` (
+  `id_image_store` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `type` varchar(20) NOT NULL,
+  `thumbnail` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `image` blob NOT NULL,
+  `image_name` varchar(50) NOT NULL,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `suffix` varchar(5) NOT NULL,
+  PRIMARY KEY (`id_image_store`),
+  UNIQUE KEY `unq_idx_rt_type_thbnl_in` (`id_run`,`type`,`thumbnail`,`image_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

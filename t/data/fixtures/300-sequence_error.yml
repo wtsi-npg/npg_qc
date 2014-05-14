@@ -1,0 +1,34 @@
+---
+ - id_sequence_error: 1
+   id_run: 3500
+   position: 1
+   path: '/staging/IL27/analysis/091031_IL27_3500/Data/Intensities/Bustard1.5.1_13-11-2009_RTA/GERALD_13-11-2009_RTA/archive'
+   forward_read_filename: '3500_1_1.fastq'
+   reverse_read_filename: '3500_1_2.fastq'
+   forward_aligned_read_count: 7000
+   forward_errors: '[0,36,32,38,38,41,54,30,40,49,52,60,57,70,60,59,74,85,14,226,249,259,293,349,369,375,469,456,471,629]'
+   reverse_aligned_read_count: 2800
+   reverse_errors: '[9,4,6,5,3,5,1,165,200,234,219,260,268,246,330,332,365,378,386,450,443,515,573,636,631,690,741]'
+   sample_size: 10000
+   reference: '/nfs/repository/d0031/references/PhiX/Illumina/all/bwa/phix-illumina.fa'
+   pass: 1
+   comments: 'some comments'
+   sequence_type: 'phix'
+ - id_sequence_error: 2
+   id_run: 3500
+   position: 1
+   path: '/staging/IL27/analysis/091031_IL27_3500/Data/Intensities/Bustard1.5.1_13-11-2009_RTA/GERALD_13-11-2009_RTA/archive'
+   forward_read_filename: '3500_1_1.fastq'
+   reverse_read_filename: '3500_1_2.fastq'
+   forward_aligned_read_count: 7000
+   forward_errors: '[0,36,32,38,38,41,54,30,40,49,52,60,57,70,60,59,74,85,14,226,249,259,293,349,369,375,469,456,471,629]'
+   reverse_aligned_read_count: 2800
+   reverse_errors: '[9,4,6,5,3,5,1,165,200,234,219,260,268,246,330,332,365,378,386,450,443,515,573,636,631,690,741]'
+   sample_size: 10000
+   reference: '/nfs/repository/d0031/references/PhiX/Illumina/all/bwa/phix-illumina.fa'
+   pass: 1
+   comments: 'some comments'
+   sequence_type: 'default'
+
+
+

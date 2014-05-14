@@ -1,0 +1,10 @@
+---
+ - id_frequency_response_matrix: 1
+   id_run: 1873
+   cycle: 39
+   lane: 8
+   base: A
+   red1: 0
+   red2: 0
+   green1: 0
+   green2: 0

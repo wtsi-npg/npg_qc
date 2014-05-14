@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<run id_run="1829" batch_id="2771" id_instrument="7" expected_cycle_count="37" actual_cycle_count="37" priority="1" id_run_pair="1846" is_paired="1" is_dev="0" id_instrument_format="4" name="IL4_1829" loader="" loading_date="">
+ <instrument id_instrument="7" name="IL4" id_instrument_format="4" external_name="EAS117" serial="" iscurrent="1"/>
+ <run_lanes>
+<run_lane id_run_lane="14192" id_run="1829" tile_count="100" tracks="2" id_project="1491" projectname="FUSE" repository="/fuse/mpsafs/runs/1829" auto_analyse="1" position="1" auto_qc="true" stlibrary_id="1339" stlibrary_name=" PM0007-C 300 1" stproject_id="23" stproject_name="Malaria CP6 - Parasite genome diversity" sac_sponsor="Matt Berriman"/>
+
+<run_lane id_run_lane="14193" id_run="1829" tile_count="100" tracks="2" id_project="1491" projectname="FUSE" repository="/fuse/mpsafs/runs/1829" auto_analyse="1" position="2" auto_qc="true" stlibrary_id="1339" stlibrary_name=" PM0007-C 300 1" stproject_id="23" stproject_name="Malaria CP6 - Parasite genome diversity" sac_sponsor="Matt Berriman"/>
+
+<run_lane id_run_lane="14194" id_run="1829" tile_count="100" tracks="2" id_project="1491" projectname="FUSE" repository="/fuse/mpsafs/runs/1829" auto_analyse="1" position="3" auto_qc="true" stlibrary_id="1339" stlibrary_name=" PM0007-C 300 1" stproject_id="23" stproject_name="Malaria CP6 - Parasite genome diversity" sac_sponsor="Matt Berriman"/>
+
+<run_lane id_run_lane="14195" id_run="1829" tile_count="100" tracks="2" id_project="1485" projectname="FUSE" repository="/fuse/mpsafs/runs/1829" auto_analyse="1" position="4" auto_qc="" stcontrol_id="1743" stcontrol_name="phiX_SI_SPRI 1"/>
+
+<run_lane id_run_lane="14196" id_run="1829" tile_count="100" tracks="2" id_project="1491" projectname="FUSE" repository="/fuse/mpsafs/runs/1829" auto_analyse="1" position="5" auto_qc="true" stlibrary_id="1339" stlibrary_name=" PM0007-C 300 1" stproject_id="23" stproject_name="Malaria CP6 - Parasite genome diversity" sac_sponsor="Matt Berriman"/>
+
+<run_lane id_run_lane="14197" id_run="1829" tile_count="100" tracks="2" id_project="1418" projectname="FUSE" repository="/fuse/mpsafs/runs/1829" auto_analyse="1" position="6" auto_qc="true" stlibrary_id="1469" stlibrary_name="WTCCC T1D Pool 18 1" stproject_id="156" stproject_name="WTCCC T1D Resequencing" sac_sponsor="Panos Deloukas"/>
+
+<run_lane id_run_lane="14198" id_run="1829" tile_count="100" tracks="2" id_project="1419" projectname="FUSE" repository="/fuse/mpsafs/runs/1829" auto_analyse="1" position="7" auto_qc="true" stlibrary_id="1470" stlibrary_name="WTCCC T1D Pool 7 1" stproject_id="156" stproject_name="WTCCC T1D Resequencing" sac_sponsor="Panos Deloukas"/>
+
+<run_lane id_run_lane="14199" id_run="1829" tile_count="100" tracks="2" id_project="1380" projectname="FUSE" repository="/fuse/mpsafs/runs/1829" auto_analyse="1" position="8" auto_qc="true" stlibrary_id="1533" stlibrary_name="NA20589-TOS 1" stproject_id="186" stproject_name="1000Genomes-B1-TOS" sac_sponsor="Richard Durbin"/>
+</run_lanes>
+ <current_run_status id_run_status="26888" id_run="1829" date="2008-12-04 14:52:05" id_run_status_dict="20" id_user="27" username="mdf" iscurrent="1" description="qc complete"/>
+ <run_statuses>
+ <run_status id_run_status="26888" id_run="1829" date="2008-12-04 14:52:05" id_run_status_dict="20" id_user="27" username="mdf" iscurrent="1" description="qc complete"/>
+ <run_status id_run_status="26882" id_run="1829" date="2008-11-28 15:01:51" id_run_status_dict="19" id_user="27" username="mdf" iscurrent="0" description="qc review pending"/>
+ <run_status id_run_status="26811" id_run="1829" date="2008-11-27 14:32:35" id_run_status_dict="12" id_user="7" username="mdf" iscurrent="0" description="run archived"/>
+ <run_status id_run_status="26803" id_run="1829" date="2008-11-27 13:58:39" id_run_status_dict="18" id_user="7" username="mdf" iscurrent="0" description="archival in progress"/>
+ <run_status id_run_status="26800" id_run="1829" date="2008-11-27 13:30:43" id_run_status_dict="17" id_user="6" username="mdf" iscurrent="0" description="archival pending"/>
+ <run_status id_run_status="26794" id_run="1829" date="2008-11-27 12:12:26" id_run_status_dict="18" id_user="7" username="mdf" iscurrent="0" description="archival in progress"/>
+ <run_status id_run_status="26790" id_run="1829" date="2008-11-27 10:39:38" id_run_status_dict="17" id_user="7" username="mdf" iscurrent="0" description="archival pending"/>
+ <run_status id_run_status="26788" id_run="1829" date="2008-11-27 10:39:26" id_run_status_dict="9" id_user="7" username="mdf" iscurrent="0" description="analysis complete"/>
+ <run_status id_run_status="26761" id_run="1829" date="2008-11-26 18:40:45" id_run_status_dict="7" id_user="7" username="mdf" iscurrent="0" description="analysis in progress"/>
+ <run_status id_run_status="26353" id_run="1829" date="2008-11-23 18:55:59" id_run_status_dict="15" id_user="7" username="mdf" iscurrent="0" description="analysis prelim complete"/>
+ <run_status id_run_status="26346" id_run="1829" date="2008-11-23 17:34:40" id_run_status_dict="14" id_user="7" username="mdf" iscurrent="0" description="analysis prelim"/>
+ <run_status id_run_status="26340" id_run="1829" date="2008-11-23 17:04:46" id_run_status_dict="6" id_user="7" username="mdf" iscurrent="0" description="analysis pending"/>
+ <run_status id_run_status="26339" id_run="1829" date="2008-11-23 17:04:45" id_run_status_dict="11" id_user="7" username="mdf" iscurrent="0" description="run mirrored"/>
+ <run_status id_run_status="26336" id_run="1829" date="2008-11-23 16:59:13" id_run_status_dict="4" id_user="7" username="mdf" iscurrent="0" description="run complete"/>
+ <run_status id_run_status="26244" id_run="1829" date="2008-11-21 14:44:48" id_run_status_dict="2" id_user="7" username="mdf" iscurrent="0" description="run in progress"/>
+ <run_status id_run_status="26242" id_run="1829" date="2008-11-21 14:29:09" id_run_status_dict="1" id_user="55" username="mdf" iscurrent="0" description="run pending"/>
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="2748" id_run="1829" id_annotation="2968" date="2008-11-25 09:30:24" id_user="38" username="twost@illumina.com" comment="Out of focus stripe down LHS of col 1 images, ALL lanes." attachment_name=""/>
+ <annotation id_run_annotation="2798" id_run="1829" id_annotation="3030" date="2008-11-27 13:30:24" id_user="6" username="ts6" comment="Did make_unmade_repositories and requeued." attachment_name=""/>
+ <annotation id_run_annotation="2816" id_run="1829" id_annotation="3048" date="2008-11-28 15:16:35" id_user="27" username="mdf" comment="Pass 4.4g, slightly elevated error towards end of R2" attachment_name=""/>
+ <annotation id_run_annotation="2833" id_run="1829" id_annotation="3065" date="2008-11-29 17:16:48" id_user="6" username="ts6" comment="Latest Analysis points to pipeline 1.3 output, done at Tobias' request. Matrix and phasing were done with lane data rather than control lane -- which we believe mkaes no difference. Pipeline 1.0 data is also available in the &quot;auto&quot; data folder." attachment_name=""/>
+ <annotation id_run_annotation="2834" id_run="1829" id_annotation="3066" date="2008-11-29 17:22:52" id_user="6" username="ts6" comment="After further reflection, I've switched the Latest Analysis link back to the 1.0 data, since that is what was archived." attachment_name=""/>
+ </annotations>
+ <tags>
+   <tag id_tag="17" description="paired_read"/>
+ </tags>
+</run>

@@ -1,0 +1,117 @@
+<h4>Statistical Data by Week </h4>
+<p><a href="[% SCRIPT_NAME %]/run_graph/">Statistics by Run</a> | Statistics by Week | <a href="[% SCRIPT_NAME %]/run_graph/;list_instrument_statistics">Instrument Statistics</a>| <a href="[% SCRIPT_NAME %]/run_graph/;list_latest_runs_by_instrument">Error Rate for Latest Runs</a>
+</p>
+
+<div id="mpsa_stats" style="min-height: 500px;">
+   <ul>
+     <li id="t_yield" class="active">
+       <a href="#mpsa_yield" onclick="srtab('yield')">Yield</a>
+     </li>
+     <li id="t_cum_yield" class="">
+       <a href="#mpsa_cum_yield" onclick="srtab('cum_yield')">Cum. Yield</a>
+     </li>
+     <li id="t_error" class="">
+       <a href="#mpsa_error" onclick="srtab('error')">Error</a>
+     </li>
+     <li id="t_avg_yield_lane" class="">
+       <a href="#mpsa_avg_yield_lane" onclick="srtab('avg_yield_lane')">Avg. Yield per Read Lane</a>
+     </li>
+   </ul>
+  
+   <div id="yield" class="srtab active" >
+     <img alt="Yield by Week"
+     src="[% SCRIPT_NAME %]/run_graph/;list_yield_by_week_png"/>
+     <br/>
+     <div id="yield_data" >
+
+     <table id="yield_data_tb" class="zebra sortable">
+     <caption>PF Yield by Week</caption>
+     <thead>
+     <tr><th>Year-Week</th><th>PF Yield(GBases)</th></tr> 
+     </thead>    
+     [% FOREACH week_yield IN model.get_yield_by_week.reverse %]
+        <tr>
+        [% FOREACH col IN week_yield %]
+          <td align="center">[% col %]</td>
+        [% END %]
+        </tr>
+     [% END %]
+     </table>
+     </div>
+   </div>
+   <div id="cum_yield" class="srtab">
+     <img alt="Cumulative Yield by Week"
+     src="[% SCRIPT_NAME %]/run_graph/;list_cum_yield_by_week_png "/>
+     <div id="cum_yield_data" >
+     
+     <table id="cum_yield_tb" class="zebra sortable">
+     <caption>Cumulative PF Yield by Week</caption>
+     <thead>
+     <tr><th>Year-Week</th><th>Cumulative PF Yield(GBases)</th></tr>
+     </thead>    
+     [% FOREACH week_cum_yield IN model.get_cum_yield_by_week.reverse %]
+        <tr>
+        [% FOREACH col IN week_cum_yield %]
+          <td align="center">[% col %]</td>
+        [% END %]
+        </tr>
+     [% END %]
+     </table>
+     </div>
+   </div>
+   <div id="error" class="srtab">
+     <img alt="error by week" 
+     src="[% SCRIPT_NAME %]/run_graph/;list_error_by_week_png"/>
+          <div id="cum_yield_data" >
+  
+     <table id="error_tb" class="zebra sortable">
+      <caption>Error Rate by Week</caption>
+     <thead>
+     <tr><th>Year-Week</th><th>% Error (PF)</th></tr> 
+     </thead>    
+     [% FOREACH week_error IN model.get_error_by_week.reverse %]
+        <tr>
+        [% FOREACH col IN week_error %]
+          <td align="center">[% col %]</td>
+        [% END %]
+        </tr>
+     [% END %]
+     </table>
+     </div>
+   </div>
+   <div id="avg_yield_lane" class="srtab">
+     <img alt="Average yield per read lane by Week"
+     src="[% SCRIPT_NAME %]/run_graph/;list_avg_yield_per_read_lane_by_week_png "/>
+     <div id="avg_yield_lane_data" >     
+     <table id="avg_yield_lane_tb" class="zebra sortable">
+     <caption>Average Yield (GBases) per Read Lane by Week</caption>
+     <thead>
+     <tr><th>Year-Week</th><th>All Cycles</th><th>Cycle 37</th><th>Cycle 54</th><th>Cycle 76</th><th>Cycle 108</th></tr>
+     </thead>
+     [% SET avg_yields = model.get_avg_yield_per_read_lane_by_week %]
+     [% FOREACH week IN avg_yields.0.reverse %]
+        <tr>
+        [% SET row = loop.index %]
+        <td align="center">[% week %]</td>
+        <td align="center">[% avg_yields.1.reverse.$row %]</td>
+        <td align="center">[% avg_yields.2.reverse.$row %]</td>
+        <td align="center">[% avg_yields.3.reverse.$row %]</td>
+        <td align="center">[% avg_yields.4.reverse.$row %]</td>
+        <td align="center">[% avg_yields.5.reverse.$row %]</td>
+        </tr>
+     [% END %]
+     </table>
+     </div>
+   </div>
+</div>
+<script type="text/javascript">
+function srtab(id){
+ var tabs=$A($$('.srtab'));
+ for(var i=0;i<tabs.length;i++){
+   tabs[i].removeClassName('active');
+   $('t_'+tabs[i].id).removeClassName('active');
+ }
+ $(id).addClassName('active');
+ $('t_'+id).addClassName('active');
+}
+</script>

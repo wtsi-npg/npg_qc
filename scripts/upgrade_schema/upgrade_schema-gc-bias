@@ -1,0 +1,29 @@
+--
+-- Create gc_bias test
+--
+
+DROP TABLE IF EXISTS `gc_bias`;
+CREATE TABLE `gc_bias` (
+  `id_gc_bias`            BIGINT(20)   UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_run`                BIGINT(20)   UNSIGNED NOT NULL,
+  `position`              TINYINT(1)   UNSIGNED NOT NULL,
+  `path`                  VARCHAR(256) DEFAULT NULL,
+  `pass`                  TINYINT(1)   DEFAULT NULL,
+  `comments`              TEXT,
+  `info`                  TEXT,
+  `max_y`                 FLOAT        UNSIGNED,
+  `window_count`          BIGINT(20)   UNSIGNED,
+  `window_size`           BIGINT(20)   UNSIGNED,
+  `bin_count`             BIGINT(20)   UNSIGNED,
+  `actual_quantile_x`     TEXT,
+  `actual_quantile_y`     TEXT,
+  `gc_lines`              TEXT,
+  `plot_x`                TEXT,
+  `plot_y`                TEXT,
+  `ideal_lower_quantile`  TEXT,
+  `ideal_upper_quantile`  TEXT,
+  `cached_plot`           TEXT,
+  `tag_index`             BIGINT(20)   NOT NULL DEFAULT -1,
+  PRIMARY KEY  (`id_gc_bias`),
+  UNIQUE KEY `unq_run_lane_gc_bias` (`id_run`,`position`,`tag_index`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

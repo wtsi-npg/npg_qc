@@ -1,0 +1,11 @@
+32737230 + 0 in total
+4835559 + 0 duplicates
+30992462 + 0  mapped (94.67%)
+32737230 + 0 paired in sequencing
+16368615  + 0 read1
+16368615  + 0 read2
+29372808  + 0 properly paired (89.72%)
+30034764  + 0 with itself and mate mapped
+957698  + 0 singletons (2.93%)
+425671  + 0 with mate mapped to a different chr
+216450  + 0 with mate mapped to a different chr (mapQ>=5)

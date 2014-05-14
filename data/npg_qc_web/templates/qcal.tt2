@@ -1,0 +1,69 @@
+<!-- start: $Id: qcal.tt2 5043 2009-04-27 11:45:38Z gq1 $ -->
+[% SET qcal_by_lanes = model.chip_summary.qcal_by_lane;
+   SET paired = model.chip_summary.paired; %]
+
+[% IF qcal_by_lanes && qcal_by_lanes.size %]
+<div id="div_qcal_by_lanes" style="float:left;">
+<table id="id_qcal_by_lanes" %]" name="qcal_by_lanes%]" class="zebra">
+  <caption>Q Values by Lanes </caption>
+  <thead>
+   <tr>
+    <th>Lane</th>
+    [% IF paired %]
+    <th>Q20 End 1</th>
+    <th>Q20 End 2</th>
+    <th>Q25 End 1</th>
+    <th>Q25 End 2</th>
+    <th>Q30 End 1</th>
+    <th>Q30 End 2</th>
+    [% ELSE %]
+    <th>Q20</th>
+    <th>Q25</th>
+    <th>Q30</th>
+    [% END %]
+   </tr>
+  </thead>
+  <tbody>
+    [% FOREACH lane = qcal_by_lanes.keys.nsort %]
+    <tr>
+      <td>[% lane %]</td>
+
+      [% SET q20 = qcal_by_lanes.$lane.q20 %]
+      [% SET num_q20 = q20.size %]
+      [% IF !paired || paired && num_q20 == 2 %]      
+        [% FOREACH end = q20.keys.nsort %]
+           <td> [% q20.$end %] </td>
+        [% END %]
+      [% ELSE %]
+         <td colspan="2" align="center">[% q20.0 %]</td>
+      [% END %]
+        
+      [% SET q25 = qcal_by_lanes.$lane.q25 %]
+      [% SET num_q25 = q25.size %]
+      [% IF !paired || paired && num_q25 == 2 %]      
+        [% FOREACH end = q25.keys.nsort %]
+           <td>[% q25.$end %]</td>
+        [% END %]
+      [% ELSE %]
+         <td colspan="2" align="center">[% q25.0 %]</td>
+      [% END %]
+
+      [% SET q30 = qcal_by_lanes.$lane.q30 %]
+      [% SET num_q30 = q30.size %]
+      [% IF !paired || paired && num_q30 == 2 %]      
+        [% FOREACH end = q30.keys.nsort %]
+           <td>[% q30.$end %]</td>
+        [% END %]
+      [% ELSE %]
+         <td colspan="2" align="center" >[% q30.0 %]</td>
+      [% END %]      
+      
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+</div>
+[% ELSE %]
+Q Values are not available for this run.<br/><hr/>
+[% END %]
+<!-- end: $Id: qcal.tt2 5043 2009-04-27 11:45:38Z gq1 $ -->

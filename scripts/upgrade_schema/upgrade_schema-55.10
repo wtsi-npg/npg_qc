@@ -1,0 +1,6 @@
+SHOW ERRORS;
+SHOW WARNINGS;
+alter table verify_bam_id change pass pass tinyint(1) default null;
+update verify_bam_id set pass = null;
+update verify_bam_id set pass=0 where freemix >= 0.05 and number_of_snps > 10000 and avg_depth >= 4;
+update verify_bam_id set pass=1 where freemix < 0.05 and number_of_snps > 10000 and avg_depth >= 4;

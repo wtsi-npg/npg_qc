@@ -1,0 +1,5 @@
+Application npg_qc
+
+This application is to be used to store and retrieve qc data (both Bustard and Swift) for the Illumina NST run information.
+Also to show, via web interface, graphs based on this data.
+

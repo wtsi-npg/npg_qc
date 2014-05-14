@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="5349" batch_id="7848" id_instrument="17" expected_cycle_count="116" actual_cycle_count="116" priority="1" id_run_pair="0" is_paired="0" is_dev="0" id_instrument_format="4" flowcell_id="" name="IL14_05349" loader="melanie" loading_date="2010-09-30" run_folder="100930_IL14_05349">
+ <instrument id_instrument="17" name="IL14" id_instrument_format="4" external_name="" serial="" iscurrent="1" />
+ <run_lanes><run_lane id_run_lane="42394" id_run="5349" tile_count="120" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/5349" auto_analyse="1" position="1" />
+<run_lane id_run_lane="42395" id_run="5349" tile_count="120" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/5349" auto_analyse="1" position="2" />
+<run_lane id_run_lane="42396" id_run="5349" tile_count="120" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/5349" auto_analyse="1" position="3" />
+<run_lane id_run_lane="42397" id_run="5349" tile_count="120" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/5349" auto_analyse="1" position="4" />
+<run_lane id_run_lane="42398" id_run="5349" tile_count="120" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/5349" auto_analyse="1" position="5" />
+<run_lane id_run_lane="42399" id_run="5349" tile_count="120" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/5349" auto_analyse="1" position="6" />
+<run_lane id_run_lane="42400" id_run="5349" tile_count="120" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/5349" auto_analyse="1" position="7" />
+<run_lane id_run_lane="42401" id_run="5349" tile_count="120" tracks="2" id_project="1" projectname="FUSE" repository="/fuse/mpsafs/runs/5349" auto_analyse="1" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="71585" id_run="5349" date="2010-10-11 20:00:26" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_statuses>
+ <run_status id_run_status="71585" id_run="5349" date="2010-10-11 20:00:26" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_status id_run_status="71584" id_run="5349" date="2010-10-11 20:00:01" id_run_status_dict="12" id_user="7" username="pipeline" iscurrent="0" description="run archived" />
+ <run_status id_run_status="71570" id_run="5349" date="2010-10-11 12:35:24" id_run_status_dict="18" id_user="7" username="pipeline" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="71569" id_run="5349" date="2010-10-11 12:32:26" id_run_status_dict="17" id_user="54" username="pipeline" iscurrent="0" description="archival pending" />
+ <run_status id_run_status="71520" id_run="5349" date="2010-10-09 16:22:46" id_run_status_dict="19" id_user="7" username="pipeline" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="71519" id_run="5349" date="2010-10-09 16:22:38" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="71460" id_run="5349" date="2010-10-08 12:20:34" id_run_status_dict="24" id_user="7" username="pipeline" iscurrent="0" description="secondary analysis in progress" />
+ <run_status id_run_status="71424" id_run="5349" date="2010-10-07 08:31:31" id_run_status_dict="7" id_user="7" username="pipeline" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="71364" id_run="5349" date="2010-10-06 03:39:38" id_run_status_dict="11" id_user="7" username="pipeline" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="71365" id_run="5349" date="2010-10-06 03:39:38" id_run_status_dict="6" id_user="7" username="pipeline" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="71363" id_run="5349" date="2010-10-06 02:25:48" id_run_status_dict="4" id_user="7" username="pipeline" iscurrent="0" description="run complete" />
+ <run_status id_run_status="71079" id_run="5349" date="2010-09-30 11:34:19" id_run_status_dict="1" id_user="50" username="pipeline" iscurrent="0" description="run pending" />
+ <run_status id_run_status="71082" id_run="5349" date="2010-09-30 11:25:43" id_run_status_dict="2" id_user="7" username="pipeline" iscurrent="0" description="run in progress" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="10099" id_run="5349" id_annotation="10507" date="2010-10-01 10:49:17" id_user="9" username="ah1" comment="Early in run so not much to see but looks okay from here." attachment_name="" run_current_ok="1" current_cycle="21" />
+ <annotation id_run_annotation="10127" id_run="5349" id_annotation="10538" date="2010-10-02 09:21:55" id_user="9" username="ah1" comment="" attachment_name="" run_current_ok="1" current_cycle="42" />
+ <annotation id_run_annotation="10136" id_run="5349" id_annotation="10548" date="2010-10-03 13:53:53" id_user="9" username="ah1" comment="Multiplex 8 cycle indexing tag drops out on intensities, same as runs 05301 and 05347." attachment_name="" run_current_ok="1" current_cycle="62" />
+ <annotation id_run_annotation="10145" id_run="5349" id_annotation="10557" date="2010-10-04 09:27:14" id_user="9" username="ah1" comment="R2 intensities poor. Re hyb done with very slight inprovement to A/C and 150-200 improvement on T/G but this is still a drop from R1." attachment_name="" run_current_ok="1" current_cycle="77" />
+ <annotation id_run_annotation="10150" id_run="5349" id_annotation="10562" date="2010-10-04 13:18:37" id_user="52" username="jb2" comment="note for analysis.. Priority run" attachment_name="" run_current_ok="" current_cycle="81" />
+ <annotation id_run_annotation="10211" id_run="5349" id_annotation="10627" date="2010-10-11 12:29:55" id_user="54" username="svvd" comment="54 cyc PE multiplexed run: FAIL. Yield of 29.9 Gbases. %Error rate of 0.15 (R1) and 0.52 (R2). Poor intensities in both tag region and read 2, but tag region is very poor." attachment_name="" run_current_ok="" current_cycle="" />
+ </annotations>
+ <tags>
+   <tag id_tag="20" description="multiplex" />
+   <tag id_tag="17" description="paired_read" />
+   <tag id_tag="16" description="rta" />
+   <tag id_tag="19" description="staging" />
+ </tags>
+</run>

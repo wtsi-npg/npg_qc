@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+[%-
+    dev = view.is_prod ? '' : ' DEV';
+    npg_title = 'NPG QC' _ dev _ ' v' _  view.app_version _ ' [' _ view.time_rendered _ ']';
+%]
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>[% npg_title %]</title>
+  <script type="text/javascript">function addEvent(e,t,fn,c){if(e.addEventListener){e.addEventListener(t,fn,c);return true;}else if(e.attachEvent){var r=e.attachEvent("on"+t,fn);return r;}} var SCRIPT_NAME="[% SCRIPT_NAME  %]";</script>
+  <link rel="icon" type="image/png" href="/prodsoft/npg/icons/sanger-ico.png" />
+  <link rel="stylesheet" type="text/css" href="/prodsoft/npg/css/wtsi.css" />
+  <link rel="stylesheet" type="text/css" href="/prodsoft/npg/css/npg.css" />
+  <link rel="stylesheet" type="text/css" href="/prodsoft/npg/css/npg_qc.css" />
+  <script type="text/javascript" src="/prodsoft/npg/js/wtsi/zebra.js" ></script>
+  <script type="text/javascript" src="/prodsoft/npg/js/wtsi/prototype-1.6.0.3.js" ></script>
+  <script type="text/javascript" src="/prodsoft/npg/js/scriptaculous/scriptaculous.js" ></script>
+  <script type="text/javascript" src="/prodsoft/npg/js/wtsi/sorttable.js" ></script>
+  <script type="text/javascript" src="/prodsoft/npg/js/wtsi/jsr_class.js" ></script>
+  <script type="text/javascript" src="/prodsoft/npg/js/npg_qc.js" ></script>
+</head>
+<body><div id="main" class="expanded" >
+
+<div id="banner">
+  <div class="lfloat"><img src="/prodsoft/npg/icons/sanger-logo.png" alt="WTSI logo" /></div>
+  <div class="rfloat">
+    <div class="npg_title [% dev ? 'dev_highlight' : '' %]">[% npg_title %]</div>
+  </div>
+</div>
+<div class="clearfloats"></div>
+<hr class="main_menu_footer" />
+[%- 
+  IF !model.tile_viewer;
+    id_run = model.id_run;
+    IF id_run;
+      pair = model.id_run_pair(id_run);
+      IF pair && pair < id_run;
+        temp = pair;
+        pair = id_run;
+        id_run = temp;
+      END;
+    END;
+-%]
+<ul id="actions" class="inline">
+  <li><a href="[% SCRIPT_NAME %]">[NPG-QC Home]</a></li>
+  [%- npg_url = SCRIPT_NAME.replace('_qc', '') %]
+  <li><a href="[% npg_url %]">[NPG Home]</a></li>
+  <li><a href="[% SCRIPT_NAME %]/run_graph">[Statistical Graphs]</a></li>
+  <li><a href="[% SCRIPT_NAME %]/main/;list_run_log">[Run Log Main]</a></li>
+  [%- IF id_run %]
+  <li>[% IF model.run_has_illumina(id_run) %]<a href="[% SCRIPT_NAME %]/summary/[% id_run %]">[% END %][Illumina Pipeline QC][% IF model.run_has_illumina(id_run) %]</a>[% END %]</li>
+  <li>[% IF model.run_has_illumina(id_run) %]<a href="[% SCRIPT_NAME %]/run_config/[% id_run %]">[% END %][Illumina Pipeline Configuration][% IF model.run_has_illumina(id_run) %]</a>[% END %]</li>
+  <li>[% IF model.run_has_log_metrics(id_run) %]<a href="[% SCRIPT_NAME %]/run_log/[% id_run %]">[% END %][Run Log [% id_run %]][% IF model.run_has_log_metrics(id_run) %]</a>[% END %] </li>
+    [%- IF pair %]
+  <li>[% IF model.run_has_log_metrics(pair) %]<a href="[% SCRIPT_NAME %]/run_log/[% pair %]">[% END %][Run Log [% pair %]][% IF model.run_has_log_metrics(pair) %]</a>[% END %] </li>
+    [%- END %]
+  <li><a href="[% SCRIPT_NAME %]/run_recipe/[% id_run %].xml">[Recipe [% id_run %]]</a></li>
+    [%- IF pair %]
+  <li><a href="[% SCRIPT_NAME %]/run_recipe/[% pair %].xml">[Recipe [% pair %]]</a> </li>
+    [%- END %]
+   <li><a href="[% SCRIPT_NAME %]/run_info/[% id_run %].xml">[RunInfo [% id_run %]]</a></li>
+    [%- IF pair %]
+  <li><a href="[% SCRIPT_NAME %]/run_info/[% pair %].xml">[RunInfo [% pair %]]</a> </li>
+    [%- END %]  
+  [%- END %]
+</ul>
+ <div class="clearfloats"></div>
+<div id="spinner" style="display:none;">
+ <img src="/prodsoft/npg/gfx/spinner.gif" alt="spinner" />
+</div>
+  [%- IF id_run %]
+<div id="selector_switch">
+<ul id="selector" class="inline">
+<li>
+<a href="javascript:show_new_run_selector();">[Select a New Run]</a>
+</li>
+</ul>
+<hr class="main_menu_footer" />
+</div>
+<div id="select_a_new_run_summary"></div>
+<h2>QC Metrics for [% id_run %][% IF model.id_run_pair(id_run) %]/[% model.id_run_pair(id_run) %][% END %]</h2>
+
+<script type="text/javascript">
+
+function show_new_run_selector() {
+  Element.show('spinner');
+  var el      = 'select_a_new_run_summary';
+  Element.hide('selector_switch');
+  new Ajax.Updater(el,'[% SCRIPT_NAME %]/main/;list_form_add_ajax',
+  {method:'get',
+   onComplete:function(){
+    Element.show(el);
+    Element.hide('spinner');
+    new Effect.Highlight(el);
+  }});
+}
+
+</script>
+  [%- ELSE %]
+<hr class="main_menu_footer" />
+<p>This application and database contains Quality metrics for Illumina Runs.<br />
+You can find out various quality metrics from the analysis pipeline.<br />
+Selecting a run below will take you to a summary page for that run.</p>
+  [%- END %]
+[%- END %]
+

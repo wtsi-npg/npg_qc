@@ -1,0 +1,104 @@
+DROP TABLE fastqcheck_old;
+
+DROP TABLE qcal;
+
+/* The three statements following belowhave  been executed separately on
+   the live db, before the main release */
+
+ALTER TABLE `genotype` MODIFY COLUMN `snp_call_set` varchar(32) NOT NULL DEFAULT 'UNSPECIFIED';
+
+ALTER TABLE `genotype`
+    DROP INDEX `unq_run_lane_genotype`;
+       
+SELECT now();
+
+ALTER TABLE `genotype` 
+    ADD UNIQUE KEY `unq_run_lane_genotype` (`id_run`,`position`,`tag_index`, `snp_call_set`);
+
+ALTER TABLE `genotype` MODIFY COLUMN `search_parameters` text,
+  MODIFY COLUMN `sample_name_match` text,
+  MODIFY COLUMN `sample_name_relaxed_match` text,
+  MODIFY COLUMN `alternate_matches` text,
+  MODIFY COLUMN `alternate_relaxed_matches` text;
+SHOW ERRORS;
+SHOW WARNINGS;
+
+SELECT now();
+
+DROP TABLE IF EXISTS `verify_bam_id`;
+CREATE TABLE `verify_bam_id` (
+  `id_verify` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `path` varchar(256) DEFAULT NULL,
+  `number_of_snps` int(11) DEFAULT NULL,
+  `number_of_reads` int(11) DEFAULT NULL,
+  `avg_depth` decimal(11,2) NOT NULL DEFAULT '0.00',
+  `freemix` decimal(11,5) NOT NULL DEFAULT '0.00000',
+  `freeLK0` decimal(11,2) NOT NULL DEFAULT '0.00',
+  `freeLK1` decimal(11,2) NOT NULL DEFAULT '0.00',
+  `pass` tinyint(1) DEFAULT '1',
+  `comments` text,
+  `info` text,
+  `tag_index` bigint(20) NOT NULL DEFAULT '-1',
+  PRIMARY KEY (`id_verify`),
+  UNIQUE KEY `unq_run_lane_verify` (`id_run`,`position`,`tag_index`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+SELECT now();
+
+ALTER TABLE `signal_mean` MODIFY COLUMN `all_a` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `all_c` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `all_g` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `all_t` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `call_a` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `call_c` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `call_g` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `call_t` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `base_a` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `base_c` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `base_g` float(10,2) signed NOT NULL DEFAULT '0.00',
+  MODIFY COLUMN `base_t` float(10,2) signed NOT NULL DEFAULT '0.00';
+SHOW ERRORS;
+SHOW WARNINGS;
+
+ALTER TABLE `adapter` MODIFY COLUMN `forward_read_filename` varchar(256),
+  MODIFY COLUMN `reverse_read_filename` varchar(256),
+  MODIFY COLUMN `forward_fasta_read_count` int(10) unsigned,
+  MODIFY COLUMN `forward_contaminated_read_count` int(10) unsigned,
+  MODIFY COLUMN `forward_blat_hash` text;
+SHOW ERRORS;
+SHOW WARNINGS;
+
+ALTER TABLE `ref_match` MODIFY COLUMN `reference_version` text,
+  MODIFY COLUMN `aligned_read_count` text ,
+  MODIFY COLUMN `sample_read_count` int(10) unsigned,
+  MODIFY COLUMN `sample_read_length` int(5) unsigned;
+SHOW ERRORS;
+SHOW WARNINGS;
+
+ALTER TABLE `gc_fraction` MODIFY COLUMN `forward_read_filename` varchar(256),
+  MODIFY COLUMN `reverse_read_filename` varchar(256);
+SHOW ERRORS;
+SHOW WARNINGS;
+
+ALTER TABLE `qx_yield` MODIFY COLUMN `filename1` varchar(256),
+  MODIFY COLUMN `filename2` varchar(256);
+SHOW ERRORS;
+SHOW WARNINGS;
+
+ALTER TABLE `run_recipe` MODIFY COLUMN `cycle` smallint unsigned NOT NULL,
+  MODIFY COLUMN `lane` tinyint unsigned NOT NULL,
+  MODIFY COLUMN `tile` smallint unsigned NOT NULL,
+  MODIFY COLUMN `col` tinyint unsigned NOT NULL,
+  MODIFY COLUMN `first_indexing_cycle` smallint unsigned DEFAULT NULL,
+  MODIFY COLUMN `last_indexing_cycle` smallint unsigned DEFAULT NULL,
+  MODIFY COLUMN `cycle_read1` smallint unsigned DEFAULT NULL,
+  MODIFY COLUMN `cycle_read2` smallint unsigned DEFAULT NULL;
+
+SHOW ERRORS;
+SHOW WARNINGS;
+
+SELECT now();
+
+-- end of script

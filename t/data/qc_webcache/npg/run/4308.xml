@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="4308" batch_id="5428" id_instrument="9" expected_cycle_count="74" actual_cycle_count="74" priority="1" id_run_pair="0" is_paired="0" is_dev="0" id_instrument_format="4" name="IL6_4308" loader="melanie" loading_date="2010-01-25" run_folder="100125_IL6_4308">
+ <instrument id_instrument="9" name="IL6" id_instrument_format="4" external_name="EAS119" serial="" iscurrent="0" />
+ <run_lanes><run_lane id_run_lane="34032" id_run="4308" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="1" />
+<run_lane id_run_lane="34033" id_run="4308" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="2" />
+<run_lane id_run_lane="34034" id_run="4308" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="3" />
+<run_lane id_run_lane="34035" id_run="4308" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="4" />
+<run_lane id_run_lane="34036" id_run="4308" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="5" />
+<run_lane id_run_lane="34037" id_run="4308" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="6" />
+<run_lane id_run_lane="34038" id_run="4308" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="7" />
+<run_lane id_run_lane="34039" id_run="4308" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="59278" id_run="4308" date="2010-02-02 13:06:00" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_statuses>
+ <run_status id_run_status="59278" id_run="4308" date="2010-02-02 13:06:00" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_status id_run_status="59277" id_run="4308" date="2010-02-02 13:05:58" id_run_status_dict="12" id_user="7" username="pipeline" iscurrent="0" description="run archived" />
+ <run_status id_run_status="59274" id_run="4308" date="2010-02-02 11:23:46" id_run_status_dict="18" id_user="7" username="pipeline" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="59270" id_run="4308" date="2010-02-02 11:10:04" id_run_status_dict="17" id_user="54" username="pipeline" iscurrent="0" description="archival pending" />
+ <run_status id_run_status="59262" id_run="4308" date="2010-02-02 09:52:23" id_run_status_dict="19" id_user="7" username="pipeline" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="59169" id_run="4308" date="2010-01-30 00:39:32" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="59164" id_run="4308" date="2010-01-29 13:30:38" id_run_status_dict="7" id_user="7" username="pipeline" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="59163" id_run="4308" date="2010-01-29 13:25:30" id_run_status_dict="6" id_user="7" username="pipeline" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="59162" id_run="4308" date="2010-01-29 13:25:29" id_run_status_dict="11" id_user="7" username="pipeline" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="59145" id_run="4308" date="2010-01-29 09:55:24" id_run_status_dict="4" id_user="7" username="pipeline" iscurrent="0" description="run complete" />
+ <run_status id_run_status="59045" id_run="4308" date="2010-01-25 14:05:50" id_run_status_dict="2" id_user="7" username="pipeline" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="59042" id_run="4308" date="2010-01-25 13:58:46" id_run_status_dict="1" id_user="50" username="pipeline" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="7017" id_run="4308" id_annotation="7358" date="2010-01-28 10:39:39" id_user="9" username="ah1" comment="Lane 1 sparse as per Sybr Green. L6 R2 Quality Score starts at 15 &#x26; RTA flagging up intensities for G from C38 in this lane. Looking at images it is a bit dense in there. Focus Quality for C and T is under 80 dropping to 70. Now on C55/74." attachment_name="" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="7060" id_run="4308" id_annotation="7402" date="2010-02-02 11:08:26" id_user="54" username="svvd" comment="37 cyc PE run: Lanes 1 &#x26; 6 - FAIL; Rest - PASS. Yield of 13.1 Gbases. %Error rate of 0.1 (R1 &#x26; R2). Lane 1 is way too dense, but reporting as being sparse - probably because only few clusters were detected by the cluster detection algorithm (due to being too dense). Lane 1 has negligible %PF and yield. Lane 6 is denser than what is being reported - low %PF (65%) - poor %basecall plots during the start of R2 - there is some useful data, but R2 will be of poor qulaity. Lane 7 is also on the denser side, but coped well. " attachment_name="" run_current_ok="" current_cycle="" />
+ </annotations>
+ <tags>
+   <tag id_tag="17" description="paired_read" />
+   <tag id_tag="16" description="rta" />
+ </tags>
+</run>

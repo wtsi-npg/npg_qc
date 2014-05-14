@@ -1,0 +1,26 @@
+--
+-- add two fields for adapter
+--
+ 
+ALTER TABLE `adapter` 
+ ADD COLUMN `forward_read_filename` varchar(256) NOT NULL AFTER `path`,
+ ADD COLUMN `reverse_read_filename` varchar(256) NOT NULL AFTER `forward_read_filename`;
+
+--
+-- Create a table for cross-species contamination check.
+--
+
+CREATE TABLE `contamination` (
+    `id_contamination`  BIGINT(20)   UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id_run`            BIGINT(20)   UNSIGNED NOT NULL,
+    `position`          TINYINT(1)   UNSIGNED NOT NULL,
+    `path`              VARCHAR(256) DEFAULT      NULL,
+    `aligner_version`   VARCHAR(50)               NULL,
+    `reference_version` VARCHAR(50)               NULL,
+    `genome_factor`     TEXT                  NOT NULL,
+    `contaminant_count` TEXT                  NOT NULL,
+    `pass`              TINYINT(1)   DEFAULT      NULL,
+    `comments`          TEXT         DEFAULT      NULL,
+  PRIMARY KEY  (`id_contamination`),
+  UNIQUE KEY `uniq_run_lane_contamination` (`id_run`,`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -1,0 +1,9 @@
+--
+-- alter table sequence_error to sequence_type column
+-- 
+
+ALTER TABLE `sequence_error` ADD COLUMN `sequence_type` varchar(25) DEFAULT 'default' NOT NULL;
+update sequence_error set sequence_type='default';
+ALTER TABLE `sequence_error` DROP INDEX `unq_run_lane_sequence_error`;
+ALTER TABLE `sequence_error` ADD UNIQUE INDEX `unq_rlts_sequence_error` (`id_run`,`position`,`tag_index`,`sequence_type`);
+

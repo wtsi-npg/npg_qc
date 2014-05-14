@@ -1,0 +1,7 @@
+<errors_by_nucleotide>
+  <row read_as="." really_a="1693" really_c="1426" really_g="1417" really_t="1837" rescore="0" />
+  <row read_as="A" really_a="366501" really_c="17036" really_g="8924" really_t="9533" rescore="0" />
+  <row read_as="C" really_a="6967" really_c="279725" really_g="7055" really_t="8437" rescore="0" />
+  <row read_as="G" really_a="5968" really_c="5995" really_g="290193" really_t="11099" rescore="0" />
+  <row read_as="T" really_a="9873" really_c="10830" really_g="8592" really_t="357163" rescore="0" />
+</errors_by_nucleotide>

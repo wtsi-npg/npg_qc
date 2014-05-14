@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run_tiles>[% FOREACH run_tile = model.run_tiles %]
+  <run_tile id_run_tile="[% run_tile.id_run_tile %]" id_run="[% run_tile.id_run %]" position="[% run_tile.position %]" tile="[% run_tile.tile %]" end="[% run_tile.end %]" row="[% run_tile.row %]" col="[% run_tile.col %]" avg_newz="[% run_tile.avg_newz %]"/>[% END %]
+</run_tiles>

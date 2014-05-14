@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<runs>
+<run id_run="1896" batch_id="2834" id_instrument="14" priority="1" actual_cycle_count="37" expected_cycle_count="37" is_paired="1" id_run_pair="1913" is_dev="0" name="IL11_1896" id_run_status="27453" date="2008-12-05 19:15:48" id_run_status_dict="15" id_user="7" username="pipeline" description="analysis prelim complete" loader="ajw" loading_date="2008-12-03"/>
+<run id_run="1895" batch_id="2836" id_instrument="34" priority="1" actual_cycle_count="37" expected_cycle_count="37" is_paired="1" id_run_pair="" is_dev="0" name="IL29_1895" id_run_status="27452" date="2008-12-05 18:04:47" id_run_status_dict="15" id_user="7" username="pipeline" description="analysis prelim complete" loader="jb2" loading_date="2008-12-03"/>
+<run id_run="1881" batch_id="2828" id_instrument="16" priority="1" actual_cycle_count="37" expected_cycle_count="37" is_paired="1" id_run_pair="1866" is_dev="0" name="IL13_1881" id_run_status="27463" date="2008-12-06 02:42:17" id_run_status_dict="19" id_user="7" username="pipeline" description="qc review pending" loader="pnc" loading_date="2008-12-03"/>
+</runs>

@@ -1,0 +1,1 @@
+[% PROCESS summary_add_ajax.tt2 %]

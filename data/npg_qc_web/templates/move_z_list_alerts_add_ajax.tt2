@@ -1,0 +1,46 @@
+<!-- Start: $Id: movez_alert.tt2 3007 2008-09-11 10:23:37Z gq1 $ -->
+
+[% run_alerts = model.run_alerts_from_caching %]
+
+[% IF run_alerts %]
+
+<hr/>
+<h5>ALERT - possible problem runs</h5>
+
+Alerted are list of runs with tiles which Z values out of normal range. Click below to see the the run ids followed by read number and the number of tiles with problems.
+
+<div id="alert">
+<div class="alertmenu clearfix">
+
+   <ul>   
+    <li>
+    <a href="#">Move Z Values Alert</a>
+    <ul>    
+
+    [% sorted_run_ids = run_alerts.nsort %]
+    
+    [% FOREACH run_id_key IN sorted_run_ids %]
+      [% ends = run_alerts.$run_id_key %]
+      [% FOREACH end IN ends.nsort %]
+        <li>
+          <a href="[% SCRIPT_NAME %]/move_z/[% run_id_key %]">
+            [% run_id_key %]:[% end %]:[% ends.$end %]
+          </a>
+        </li>
+      [% END %] 
+    [% END %]   
+    </ul>
+    </li>
+   </ul>
+
+</div>
+</div>
+
+<div class="clearfloats"></div>
+
+[% ELSE %]
+There are no alerts!
+[% END %]
+<br />
+<hr />
+<!-- End: $Id: movez_alert.tt2 3007 2008-09-11 10:23:37Z gq1 $ -->

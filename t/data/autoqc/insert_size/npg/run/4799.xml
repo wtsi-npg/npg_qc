@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="4799" batch_id="6669" id_instrument="31" expected_cycle_count="46" actual_cycle_count="46" priority="1" id_run_pair="0" is_paired="0" is_dev="1" id_instrument_format="4" name="IL28_4799" loader="djt" loading_date="2010-06-02" run_folder="100602_IL28_4799">
+ <instrument id_instrument="31" name="IL28" id_instrument_format="4" external_name="EAS267" serial="" iscurrent="0" />
+ <run_lanes><run_lane id_run_lane="37968" id_run="4799" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="1" />
+<run_lane id_run_lane="37969" id_run="4799" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="2" />
+<run_lane id_run_lane="37970" id_run="4799" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="3" />
+<run_lane id_run_lane="37971" id_run="4799" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="4" />
+<run_lane id_run_lane="37972" id_run="4799" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="5" />
+<run_lane id_run_lane="37973" id_run="4799" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="6" />
+<run_lane id_run_lane="37974" id_run="4799" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="7" />
+<run_lane id_run_lane="37975" id_run="4799" tile_count="120" tracks="2" id_project="1" projectname="FUSE" auto_analyse="1" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="65020" id_run="4799" date="2010-06-14 11:57:31" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_statuses>
+ <run_status id_run_status="65020" id_run="4799" date="2010-06-14 11:57:31" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_status id_run_status="64841" id_run="4799" date="2010-06-09 11:21:01" id_run_status_dict="12" id_user="7" username="pipeline" iscurrent="0" description="run archived" />
+ <run_status id_run_status="64833" id_run="4799" date="2010-06-09 09:48:34" id_run_status_dict="18" id_user="7" username="pipeline" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="64832" id_run="4799" date="2010-06-09 09:46:01" id_run_status_dict="17" id_user="27" username="pipeline" iscurrent="0" description="archival pending" />
+ <run_status id_run_status="64763" id_run="4799" date="2010-06-07 21:46:23" id_run_status_dict="19" id_user="7" username="pipeline" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="64749" id_run="4799" date="2010-06-07 15:41:30" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="64733" id_run="4799" date="2010-06-07 11:27:04" id_run_status_dict="7" id_user="7" username="pipeline" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="64732" id_run="4799" date="2010-06-07 11:05:57" id_run_status_dict="8" id_user="62" username="pipeline" iscurrent="0" description="analysis on hold" />
+ <run_status id_run_status="64679" id_run="4799" date="2010-06-05 12:10:45" id_run_status_dict="19" id_user="7" username="pipeline" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="64650" id_run="4799" date="2010-06-05 02:27:36" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="64640" id_run="4799" date="2010-06-04 20:50:54" id_run_status_dict="7" id_user="7" username="pipeline" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="64639" id_run="4799" date="2010-06-04 20:44:07" id_run_status_dict="6" id_user="7" username="pipeline" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="64638" id_run="4799" date="2010-06-04 20:44:03" id_run_status_dict="11" id_user="7" username="pipeline" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="64629" id_run="4799" date="2010-06-04 17:14:31" id_run_status_dict="4" id_user="7" username="pipeline" iscurrent="0" description="run complete" />
+ <run_status id_run_status="64466" id_run="4799" date="2010-06-02 11:51:24" id_run_status_dict="2" id_user="7" username="pipeline" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="64464" id_run="4799" date="2010-06-02 11:15:42" id_run_status_dict="1" id_user="5" username="pipeline" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="8533" id_run="4799" id_annotation="8894" date="2010-06-03 09:45:13" id_user="5" username="djt" comment="Expect a lot of low complexity templates. 
+Lanes 3 and 5-8 are indexed, using non-standard 5-mers. Please see the attached file. Thanks a lot ." attachment_name="C:\Documents and Settings\djt\Desktop\4799.txt" run_current_ok="1" current_cycle="19" />
+ <annotation id_run_annotation="8584" id_run="4799" id_annotation="8945" date="2010-06-07 11:28:14" id_user="62" username="dj3" comment="Kick off fresh analysis with annotated tags above." attachment_name="" run_current_ok="" current_cycle="" />
+ </annotations>
+ <tags>
+   <tag id_tag="20" description="multiplex" />
+   <tag id_tag="16" description="rta" />
+   <tag id_tag="18" description="single_read" />
+ </tags>
+</run>

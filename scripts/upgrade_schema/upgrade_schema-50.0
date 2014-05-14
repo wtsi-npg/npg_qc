@@ -1,0 +1,50 @@
+# These changes has to be applied to dev db only
+# They are already in live db
+
+ALTER TABLE `genotype` MODIFY COLUMN `bam_gt_likelihood_string` varchar(512) DEFAULT NULL;
+
+CREATE TABLE `ref_snp_info` (
+   `id_ref_snp_info` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+   `reference` varchar(128) DEFAULT NULL,
+   `snp_name` varchar(32) CHARACTER SET latin1 NOT NULL,
+   `chr` varchar(16) CHARACTER SET latin1 NOT NULL,
+   `pos` int(11) NOT NULL,
+   `ref_allele` varchar(64) CHARACTER SET latin1 NOT NULL,
+   `alt_allele` varchar(64) CHARACTER SET latin1 NOT NULL,
+   `sequenom_plex_name` varchar(32) NOT NULL,
+   PRIMARY KEY (`id_ref_snp_info`),
+   UNIQUE KEY `unq_ref_chr_pos` (`reference`,`chr`,`pos`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+
+# The rest of the changes
+
+# RT 268666
+ALTER TABLE `pulldown_metrics` drop column `fold_80_base_penalty`;
+
+CREATE TABLE `fastqcheck_new` (
+  `id_fastqcheck` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_run`  mediumint unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `tag_index` mediumint NOT NULL DEFAULT '-1',
+  `section` varchar(10) NOT NULL,
+  `split` varchar(10) NOT NULL default 'none',
+  `file_name` varchar(255) NOT NULL,
+  `file_content` mediumtext DEFAULT NULL,
+  `file_content_compressed` blob DEFAULT NULL,
+  `twenty` bigint(20) unsigned DEFAULT NULL,
+  `twentyfive` bigint(20) unsigned DEFAULT NULL,
+  `thirty` bigint(20) unsigned DEFAULT NULL,
+  `thirtyfive` bigint(20) unsigned DEFAULT NULL,
+  `forty` bigint(20) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id_fastqcheck`),
+  UNIQUE KEY `unique_ind_file_ids_fastqcheck` (`id_run`, `position`, `tag_index`, `section`, `split`),
+  UNIQUE KEY `unique_ind_file_name_fastqcheck` (`file_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+rename table  fastqcheck to fastqcheck_old, fastqcheck_new to fastqcheck;
+
+
+
+
+

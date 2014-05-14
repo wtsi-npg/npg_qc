@@ -1,0 +1,25 @@
+--
+-- add a new table to store run_recipe file
+--
+CREATE TABLE `recipe_file` (
+  `id_recipe_file` BIGINT(20) unsigned NOT NULL AUTO_INCREMENT,
+  `file_name` VARCHAR(255)  NOT NULL,
+  `md5` char(32)  NOT NULL,
+  `xml` MEDIUMTEXT  NOT NULL,
+  PRIMARY KEY (`id_recipe_file`),
+  UNIQUE INDEX `unq_idx_name_md5`(`file_name`, `md5`)
+)
+ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- add one more column for run_recipe table
+--
+
+ALTER TABLE `run_recipe`
+ ADD COLUMN `last_indexing_cycle` TINYINT(2) UNSIGNED DEFAULT NULL AFTER `first_indexing_cycle`,
+ ADD COLUMN `cycle_read1` TINYINT(2) UNSIGNED DEFAULT NULL AFTER `last_indexing_cycle`,
+ ADD COLUMN `cycle_read2` TINYINT(2) UNSIGNED DEFAULT NULL AFTER `cycle_read1`,
+ ADD COLUMN `id_recipe_file` BIGINT(20) UNSIGNED DEFAULT NULL AFTER `cycle_read2`; 
+
+ALTER TABLE `run_recipe` ADD CONSTRAINT `runrecipe_recipefile_fk` FOREIGN KEY (`id_recipe_file`) REFERENCES `recipe_file` (`id_recipe_file`);
+

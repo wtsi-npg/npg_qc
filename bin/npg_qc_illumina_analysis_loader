@@ -1,0 +1,119 @@
+#!/usr/bin/env perl
+
+# $Id$
+# Created By: ajb
+# Mast Maintained By: $Author$
+# Created On: 2009-11-30
+# Last Changed On: $Date$
+# $HeadURL$
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
+use List::MoreUtils qw/any/;
+use npg_qc::illumina::loader;
+
+use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+
+if (scalar @ARGV == 0) {
+  warn "Illumina qc data loader for all runs\n";
+  npg_qc::illumina::loader->new()->run_all();
+} elsif (any { $_ =~ / id_run|runfolder /smx } @ARGV) {
+  warn "Illumina qc data loader for one run\n";
+  npg_qc::illumina::loader->new_with_options()->run();
+} else {
+  warn 'To load one run:
+ npg_qc_illumina_analysis_loader --id_run <id_run>
+ npg_qc_illumina_analysis_loader --run_folder <runfolder>
+ npg_qc_illumina_analysis_loader --runfolder_path <runfolder_path>
+
+To load all runs:
+ npg_qc_illumina_analysis_loader' . "\n\n";
+}
+
+exit;
+
+__END__
+
+=head1 NAME
+
+npg_qc_illumina_analysis_loader
+
+=head1 VERSION
+
+$Revision$
+
+=head1 SYNOPSIS
+
+To load one run:
+ npg_qc_illumina_analysis_loader --id_run <id_run>
+ npg_qc_illumina_analysis_loader --run_folder <runfolder>
+ npg_qc_illumina_analysis_loader --runfolder_path <runfolder_path>
+
+To load all runs:
+ npg_qc_illumina_analysis_loader
+
+=head1 DESCRIPTION
+
+Looading of illumina analysis qc data into a database.
+To load a single run, it needs an id_run or run_folder as an argument.
+
+=head1 USAGE
+
+=head1 REQUIRED ARGUMENTS
+
+=head1 OPTIONS
+
+=head1 EXIT STATUS
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION
+
+=head1 DEPENDENCIES
+
+=over
+
+=item strict
+
+=item warnings
+
+=item Readonly
+
+=item npg_qc::illumina::loader
+
+=item FindBin
+
+=item lib
+
+=item List::MoreUtils
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+$Author$
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Andy Brown (ajb@sanger.ac.uk)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

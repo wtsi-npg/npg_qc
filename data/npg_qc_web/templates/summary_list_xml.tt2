@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<complete_run_summaries>[% FOREACH complete_run = model.complete_runs %]
+  <run id_run="[% complete_run.id_run %]" end="[% complete_run.end %]" paired="[% complete_run.paired %]" />[% END %]
+</complete_run_summaries>

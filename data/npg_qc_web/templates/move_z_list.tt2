@@ -1,0 +1,10 @@
+
+<table>
+[% FOREACH move = model.newz_by_cycle %]
+  <tr>
+  [% FOREACH move_field IN move %]  
+   <td>[% move_field %]</td>  
+  [% END %]
+  </tr>
+[% END %]
+</table>

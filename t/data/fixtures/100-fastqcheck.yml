@@ -1,0 +1,32 @@
+---
+ - id_fastqcheck: 1
+   id_run: 1
+   position: 1
+   file_name: '11_1.fastqcheck'
+   section: 'forward'
+   twenty: 1735548
+   twentyfive: 1267812
+   thirty: 1033943
+ - id_fastqcheck: 2
+   id_run: 1
+   position: 2
+   file_name: '11_2_1.fastqcheck'
+   twenty: 0
+   section: 'forward'
+ - id_fastqcheck: 3
+   id_run: 1
+   position: 2
+   file_name: '11_2_2.fastqcheck'
+   section: 'reverse'
+   twenty: 13773542
+   twentyfive: 9287663
+   thirty: 6634045
+ - id_fastqcheck: 4
+   id_run: 1
+   position: 2
+   file_name: '11_2_t.fastqcheck'
+   section: 'index'
+   twenty: 13773
+   twentyfive: 928
+   thirty: 66
+   

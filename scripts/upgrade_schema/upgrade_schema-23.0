@@ -1,0 +1,15 @@
+
+-- 
+-- extra table cluster_density
+--
+CREATE TABLE `cluster_density` (
+  `id_cluster_density` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(1) unsigned NOT NULL,
+  `is_pf` tinyint(1) NOT NULL,
+  `min` double(12,3) unsigned default NULL,
+  `max` double(12,3) unsigned default NULL,
+  `p50` double(12,3) unsigned default NULL,
+  PRIMARY KEY  (`id_cluster_density`),
+  UNIQUE KEY `unq_idx_cluster_density` (`id_run`,`position`, `is_pf`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

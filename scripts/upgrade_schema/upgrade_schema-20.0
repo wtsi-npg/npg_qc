@@ -1,0 +1,11 @@
+--
+-- extra table run_info
+--
+
+CREATE TABLE `run_info` (
+  `id_run_info` bigint(20) unsigned NOT NULL auto_increment,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `run_info_xml` text NOT NULL,
+  PRIMARY KEY  (`id_run_info`),
+  UNIQUE KEY `unq_idx_run_info` (`id_run`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
