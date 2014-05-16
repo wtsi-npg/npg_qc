@@ -16,8 +16,6 @@ use File::Temp qw/ tempdir /;
 use Perl6::Slurp;
 use JSON;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok ('npg_qc::autoqc::results::bam_flagstats');
 {
     my $tempdir = tempdir( CLEANUP => 1);

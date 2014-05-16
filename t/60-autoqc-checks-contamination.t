@@ -15,8 +15,6 @@ use Test::More tests => 17;
 use Test::Deep;
 use Test::Exception;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
-
 use_ok('npg_qc::autoqc::checks::contamination');
 
 my $ref_repos = cwd . '/t/data/autoqc';

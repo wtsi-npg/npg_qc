@@ -13,8 +13,6 @@ use Test::More tests => 11;
 use Test::Exception;
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok ('npg_qc::autoqc::results::gc_fraction');
 
 {

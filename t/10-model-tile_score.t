@@ -15,8 +15,6 @@ use IO::Scalar;
 use t::util;
 use npg_qc::model::tile_score;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok('npg_qc::model::tile_score');
 
 my $util = t::util->new({fixtures =>1});

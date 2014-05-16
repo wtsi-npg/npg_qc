@@ -19,8 +19,6 @@ use File::Spec::Functions qw(catfile);
 use Cwd;
 use File::Temp qw/tempdir/;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok ('npg_qc::autoqc::autoqc');
 
 $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc];

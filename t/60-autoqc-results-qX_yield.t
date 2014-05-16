@@ -15,8 +15,6 @@ use Test::Exception;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok ('npg_qc::autoqc::results::qX_yield');
 
 {

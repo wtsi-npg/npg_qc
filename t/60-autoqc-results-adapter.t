@@ -14,8 +14,6 @@ use Test::Deep;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
-
 use_ok('npg_qc::autoqc::results::adapter');
 
 {

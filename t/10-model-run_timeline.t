@@ -15,8 +15,6 @@ use IO::Scalar;
 use t::util;
 
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok('npg_qc::model::run_timeline');
 
 my $util = t::util->new({fixtures =>1});

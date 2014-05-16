@@ -15,8 +15,6 @@ use Test::Deep;
 use Test::Exception;
 
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
-
 my %blat_hash = (     'PE-sequencingPrimer1'        =>   0,
                       'smallRNA-3\'adapter'         =>   0,
                       'NlaIII-Gex-PCR-Primer1'      =>   0,
