@@ -25,10 +25,6 @@ __END__
 
 qc
 
-=head1 VERSION
-
-$Revision$
-
 =head1 USAGE
 
 qc --check=insert_size --position=2 --archive_path=/path/to/fastq/files --qc_path=/path/to/where/to/write/results

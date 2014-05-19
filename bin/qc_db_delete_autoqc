@@ -74,10 +74,6 @@ __END__
 
 qc_db_delete_autoqc
 
-=head1 VERSION
-
-$LastChangedRevision$
-
 =head1 USAGE
 
   qc_db_delete_autoqc --id_run 123 --lanes 2 --lanes 3

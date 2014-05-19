@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       2010-02-05
-# Last Modified: $Date: 2014-03-12 09:06:00 +0000 (Wed, 12 Mar 2014) $
-# Id:            $Id: Bustard_Summary.pm 18173 2014-03-12 09:06:00Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader/Bustard_Summary.pm $
 #
 package npg_qc::illumina::loader::Bustard_Summary;
 
@@ -57,14 +53,9 @@ Readonly::Scalar our $LANE_EXPANDED_SUMMARY_FIELDS_WITH_ERROR_TO_LOAD
 
 npg_qc::illumina::loader::Bustard_Summary
 
-=head1 VERSION
-
-$Revision: 18173 $
-
 =head1 SYNOPSIS
 
   my $oBustardSummary = npg_qc::illumina::loader::Bustard_Summary->new(
-    id_run => $iIdRun,
     run_folder => $sRunFolder,
   );
 

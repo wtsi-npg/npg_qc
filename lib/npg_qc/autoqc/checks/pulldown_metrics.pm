@@ -1,9 +1,5 @@
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: kl2 $
 # Created:       10 May 2012
-# Last Modified: $Date: 2013-04-26 16:20:40 +0100 (Fri, 26 Apr 2013) $
-# Id:            $Id: pulldown_metrics.pm 17098 2013-04-26 15:20:40Z kl2 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/pulldown_metrics.pm $
 #
 #
 
@@ -232,10 +228,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::pulldown_metrics - a QC check to determine whether the pulldown bait works correctly
-
-=head1 VERSION
-
-    $Revision: 17098 $
 
 =head1 SYNOPSIS
 

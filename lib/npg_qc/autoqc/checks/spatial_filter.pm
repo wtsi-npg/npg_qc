@@ -1,9 +1,5 @@
 # Author:        david.jackson@sanger.ac.uk
-# Maintainer:    $Author: mg8 $
 # Created:       2011-09-29
-# Last Modified: $Date: 2013-01-11 10:12:47 +0000 (Fri, 11 Jan 2013) $
-# Id:            $Id: genotype.pm 16458 2013-01-11 10:12:47Z mg8 $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-52.0/lib/npg_qc/autoqc/checks/genotype.pm $
 #
 #
 
@@ -39,10 +35,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::spatial_filter - parse err stream from spatial_filter -a to record number of read filtered
-
-=head1 VERSION
-
-    $Revision: 16458 $
 
 =head1 SYNOPSIS
 

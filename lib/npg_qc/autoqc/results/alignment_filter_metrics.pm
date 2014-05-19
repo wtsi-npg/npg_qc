@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       10 May 2012
-# Last Modified: $Date: 2012-05-15 09:52:42 +0100 (Tue, 15 May 2012) $
-# Id:            $Id: alignment_filter_metrics.pm 15586 2012-05-15 08:52:42Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/alignment_filter_metrics.pm $
 #
 
 package npg_qc::autoqc::results::alignment_filter_metrics;
@@ -31,10 +27,6 @@ __END__
 =head1 NAME
 
   npg_qc::autoqc::results::alignment_filter_metrics
-
-=head1 VERSION
-
-  $Revision: 15586 $
 
 =head1 SYNOPSIS
 

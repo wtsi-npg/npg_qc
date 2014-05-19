@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
 # Created:       2008-06-12
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 package t::util;
 use strict;

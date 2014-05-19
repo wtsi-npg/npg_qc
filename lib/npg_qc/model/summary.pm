@@ -1,11 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: mg8 $
 # Created:       2008-06-27
-# Last Modified: $Date: 2013-08-22 14:28:15 +0100 (Thu, 22 Aug 2013) $
-# Id:            $Id: summary.pm 17408 2013-08-22 13:28:15Z mg8 $
-# Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/summary.pm $
 #
 
 package npg_qc::model::summary;
@@ -667,10 +662,6 @@ __END__
 =head1 NAME
 
 npg_qc::model::summary
-
-=head1 VERSION
-
-$Revision: 17408 $
 
 =head1 SYNOPSIS
 

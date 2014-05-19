@@ -28,10 +28,6 @@ __END__
 
     npg_qc_autoqc_data.pl
 
-=head1 VERSION
-
-$Revision$
-
 =head1 USAGE
 
     npg_qc_autoqc_data.pl --path path1 [--path path2]

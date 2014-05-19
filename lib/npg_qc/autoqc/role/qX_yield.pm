@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       29 October 2009
-# Last Modified: $Date: 2010-04-23 11:58:24 +0100 (Fri, 23 Apr 2010) $
-# Id:            $Id: qX_yield.pm 9099 2010-04-23 10:58:24Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/qX_yield.pm $
 #
 
 package npg_qc::autoqc::role::qX_yield;
@@ -25,10 +21,6 @@ our $VERSION = '0';
 =head1 NAME
 
 npg_qc::autoqc::role::qX_yield
-
-=head1 VERSION
-
-$Revision: 9099 $
 
 =head1 SYNOPSIS
 

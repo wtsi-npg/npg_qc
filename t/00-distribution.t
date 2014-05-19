@@ -1,9 +1,5 @@
 #########
 # Author:        rmp
-# Last Modified: $Date$ $Author$
-# Id:            $Id$
-# Source:        $Source: /cvsroot/Bio-DasLite/Bio-DasLite/t/00-distribution.t,v $
-# $HeadURL$
 #
 
 use strict;

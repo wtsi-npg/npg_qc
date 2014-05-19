@@ -1,10 +1,6 @@
 #########
 # Author:        rmp
-# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date: 2013-09-26 17:18:42 +0100 (Thu, 26 Sep 2013) $
-# Id:            $Id: model.pm 17546 2013-09-26 16:18:42Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model.pm $
 #
 package npg_qc::model;
 use strict;
@@ -581,10 +577,6 @@ __END__
 =head1 NAME
 
 npg_qc::model - a base class for the npg_qc family, derived from ClearPress::model
-
-=head1 VERSION
-
-$Revision: 17546 $
 
 =head1 SYNOPSIS
 

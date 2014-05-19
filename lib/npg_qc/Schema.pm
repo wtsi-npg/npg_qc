@@ -27,10 +27,6 @@ __END__
 
 npg_qc::Schema
 
-=head1 VERSION
-
-$LastChangedRevision: 18173 $
-
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION

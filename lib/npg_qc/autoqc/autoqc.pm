@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Maintainer:    $Author: mg8 $
 # Created:       29 July 2009
-# Last Modified: $Date: 2014-03-12 09:06:00 +0000 (Wed, 12 Mar 2014) $
-# Id:            $Id: autoqc.pm 18173 2014-03-12 09:06:00Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/autoqc.pm $
 #
 
 package npg_qc::autoqc::autoqc;
@@ -34,10 +30,6 @@ our $VERSION = '0';
 =head1 NAME
 
 npg_qc::autoqc::autoqc
-
-=head1 VERSION
-
-$Revision: 18173 $
 
 =head1 SYNOPSIS
 

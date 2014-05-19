@@ -1,9 +1,5 @@
 # Author:        Kevin Lewis
-# Maintainer:    $Author: mg8 $
 # Created:       2011-12-07
-# Last Modified: $Date: 2014-03-12 09:06:00 +0000 (Wed, 12 Mar 2014) $
-# Id:            $Id: bam_genotype.pm 18173 2014-03-12 09:06:00Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/utils/bam_genotype.pm $
 #
 #
 
@@ -331,10 +327,6 @@ __END__
 =head1 NAME
 
 npg_qc::utils::bam_genotype - check for adapter sequences in fastq files.
-
-=head1 VERSION
-
-    $Revision: 18173 $
 
 =head1 SYNOPSIS
 

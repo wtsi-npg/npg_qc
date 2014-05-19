@@ -41,10 +41,6 @@ __END__
 
 npg_qc_illumina_analysis_loader
 
-=head1 VERSION
-
-$Revision$
-
 =head1 SYNOPSIS
 
 To load one run:

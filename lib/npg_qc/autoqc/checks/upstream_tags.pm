@@ -1,9 +1,5 @@
 # Author:        Kevin Lewis
-# Maintainer:    $Author: mg8 $
 # Created:       2013-09-02
-# Last Modified: $Date: 2014-03-24 13:03:40 +0000 (Mon, 24 Mar 2014) $
-# Id:            $Id: upstream_tags.pm 18264 2014-03-24 13:03:40Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/upstream_tags.pm $
 #
 #
 
@@ -859,10 +855,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::upstream_tags 
-
-=head1 VERSION
-
-    $Revision: 18264 $
 
 =head1 SYNOPSIS
 

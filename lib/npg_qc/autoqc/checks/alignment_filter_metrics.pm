@@ -1,9 +1,5 @@
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       2012-04-25
-# Last Modified: $Date: 2012-11-15 12:01:21 +0000 (Thu, 15 Nov 2012) $
-# Id:            $Id: alignment_filter_metrics.pm 16223 2012-11-15 12:01:21Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm $
 #
 #
 
@@ -61,10 +57,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::alignment_filter_metrics - stats for splitting files by alignment
-
-=head1 VERSION
-
-    $Revision: 16223 $
 
 =head1 SYNOPSIS
 

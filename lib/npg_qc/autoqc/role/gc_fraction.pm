@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: gq1 $
 # Created:       03 February 2010
-# Last Modified: $Date: 2009-12-14 15:21:01 +0000 (Mon, 14 Dec 2009) $
-# Id:            $Id: sequence_error.pm 7671 2009-12-14 15:21:01Z gq1 $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-24.0/lib/npg_qc/autoqc/role/sequence_error.pm $
 #
 
 package npg_qc::autoqc::role::gc_fraction;
@@ -38,10 +34,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::role::gc_fraction
-
-=head1 VERSION
-
-    $Revision: 7671 $
 
 =head1 SYNOPSIS
 

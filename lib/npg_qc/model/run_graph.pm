@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       2008-09-29
-# Last Modified: $Date: 2013-09-26 17:18:42 +0100 (Thu, 26 Sep 2013) $
-# Id:            $Id: run_graph.pm 17546 2013-09-26 16:18:42Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/run_graph.pm $
 #
 
 package npg_qc::model::run_graph;
@@ -927,10 +923,6 @@ __END__
 =head1 NAME
 
 npg_qc::model::run_graph
-
-=head1 VERSION
-
-$Revision: 17546 $
 
 =head1 SYNOPSIS
 

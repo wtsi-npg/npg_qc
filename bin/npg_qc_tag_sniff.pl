@@ -166,10 +166,6 @@ __END__
 
 tag_sniff.pl
 
-=head1 VERSION
-
-$LastChangedRevision$
-
 =head1 USAGE
   
   samtools view 5008_1#2.bam | npg_qc_tag_sniff.pl [opts]

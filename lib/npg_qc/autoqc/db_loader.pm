@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       February 2014
-# Last Modified: $Date: 2013-04-12 17:56:49 +0100 (Fri, 12 Apr 2013) $
-# Id:            $Id: db_loader.pm 17019 2013-04-12 16:56:49Z mg8 $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/remove_fey/lib/npg_qc/autoqc/db_loader.pm $
 #
 
 package npg_qc::autoqc::db_loader;
@@ -185,10 +181,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::db_loader
-
-=head1 VERSION
-
-$Revision: 17019 $
 
 =head1 SYNOPSIS
 

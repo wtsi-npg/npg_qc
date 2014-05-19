@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: gq1 $
 # Created:       2010-02-19
-# Last Modified: $Date: 2010-02-23 13:40:36 +0000 (Tue, 23 Feb 2010) $
-# Id:            $Id: Fastqcheck.pm 8357 2010-02-23 13:40:36Z gq1 $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-26.0/lib/npg_qc/api/loader/Fastqcheck.pm $
 #
 package npg_qc::illumina::loader::Offset;
 
@@ -23,10 +19,6 @@ our $VERSION = '0';
 =head1 NAME
 
 npg_qc::illumina::loader::Offset
-
-=head1 VERSION
-
-$Revision: 8357 $
 
 =head1 SYNOPSIS
 
