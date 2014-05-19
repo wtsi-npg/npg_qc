@@ -14,12 +14,11 @@ use warnings;
 use Moose;
 use Carp;
 use English qw(-no_match_vars);
-use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::split_stats);
 
-our $VERSION    = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has '+id_run'     =>  (
                        required   => 0,

@@ -10,7 +10,7 @@
 use strict;
 use warnings;
 use File::Temp qw/ tempdir /;
-use Test::More tests => 24;
+use Test::More tests => 23;
 use Test::Deep;
 use Test::Exception;
 
@@ -53,7 +53,6 @@ my %blat_hash = (     'PE-sequencingPrimer1'        =>   0,
     );
 
 use_ok('npg_qc::autoqc::checks::adapter');
-like (npg_qc::autoqc::checks::adapter->VERSION, qr/^\d+$/, q[adapter has version number defined]);
 # if this test fails, probably Readonly::Scalar::XS is not installed
 
 my $test_parent = 't/data/autoqc';

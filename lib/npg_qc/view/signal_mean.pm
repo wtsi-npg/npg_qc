@@ -19,7 +19,7 @@ use npg_qc::model::image_store;
 use npg::util::image::merge;
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 15373 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $STD_HEIGHT   => 600;
 Readonly our $STD_WIDTH    => 500;

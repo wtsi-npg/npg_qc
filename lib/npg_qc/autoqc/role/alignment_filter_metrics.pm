@@ -15,7 +15,7 @@ use Carp;
 
 with qw( npg_qc::autoqc::role::result );
 
-our $VERSION    = do { my ($r) = q$Revision: 16035 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar our $HUNDRED   => 100;

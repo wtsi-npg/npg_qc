@@ -15,7 +15,8 @@ use Moose::Role;
 
 with qw(npg_qc::autoqc::role::result);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 16861 $ =~ /(\d+)/smx; $r; };
+use Readonly;
+our $VERSION = '0';
 
 Readonly::Scalar my $PERCENT => 100;
 

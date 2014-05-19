@@ -18,7 +18,7 @@ use Readonly;
 use npg::api::run_status;
 use npg::api::util;
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 

@@ -12,11 +12,12 @@ package npg_qc::autoqc::results::upstream_tags;
 use strict;
 use warnings;
 use Moose;
+use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::upstream_tags);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17535 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has [ qw/ unexpected_tags
           prev_runs /    ] =>  (isa => 'ArrayRef',

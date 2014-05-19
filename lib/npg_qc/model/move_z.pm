@@ -18,7 +18,7 @@ use Readonly;
 use npg::util::image::heatmap;
 use npg::util::image::image_map;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $MOVE_Z_NORMAL    => 5000;
 Readonly our $NUMBER_LANES     => 8;

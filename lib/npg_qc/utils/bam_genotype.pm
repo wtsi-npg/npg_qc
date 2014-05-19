@@ -21,7 +21,7 @@ use Readonly;
 
 use npg_common::roles::software_location;
 
-our $VERSION = do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 ##no critic
 Readonly::Scalar my $SAMTOOLS_NAME => 'samtools';

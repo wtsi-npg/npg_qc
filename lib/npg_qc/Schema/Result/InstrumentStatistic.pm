@@ -172,7 +172,7 @@ __PACKAGE__->add_unique_constraint('idx_id_run_end', ['id_run', 'end']);
 # Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KQYC841TNC5Qok4lcgoVRw
 
-our $VERSION   = do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
 

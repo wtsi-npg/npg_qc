@@ -16,7 +16,7 @@ use Carp;
 use npg_qc::model::run_log;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 1;
 __END__

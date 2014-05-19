@@ -20,7 +20,7 @@ use npg::util::image::image_map;
 use npg::util::image::graph;
 use npg::util::image::scale;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $WIDTH                => 800;
 Readonly our $HEIGHT               => 460;

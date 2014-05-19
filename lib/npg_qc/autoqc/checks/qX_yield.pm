@@ -23,7 +23,7 @@ use npg::api::run;
 extends qw(npg_qc::autoqc::checks::check);
 
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins)
-our $VERSION   = do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 =head1 NAME
 

@@ -16,7 +16,7 @@ use Carp qw(confess cluck carp croak);
 use npg_qc::model::analysis;
 use npg_qc::model::chip_summary;
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub decor {
   my $self   = shift;

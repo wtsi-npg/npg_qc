@@ -29,6 +29,7 @@ my $repos = q[t/data/autoqc];
                                                       path      => 't/data/autoqc/090721_IL29_2549/data',
                                                       id_run    =>  2549,
                                                  );
+    delete $check->result->{info}->{Check_version};
     my $r =  npg_qc::autoqc::results::result->new (
                               position  => 3,
                               path      => 't/data/autoqc/090721_IL29_2549/data',
@@ -36,7 +37,6 @@ my $repos = q[t/data/autoqc];
                               tag_index => undef,
                                                   );
     $r->set_info('Check', 'npg_qc::autoqc::checks::check');
-    $r->set_info('Check_version', npg_qc::autoqc::checks::check->VERSION);
                                   
     cmp_deeply($check->result, $r, 'result object created, default tag index');
 }
@@ -49,6 +49,7 @@ my $repos = q[t/data/autoqc];
                                                       id_run    =>  2549,
                                                       tag_index => 5,
                                                  );
+    delete $check->result->{info}->{Check_version};
     my $r =  npg_qc::autoqc::results::result->new (
                               position  => 3,
                               path      => 't/data/autoqc/090721_IL29_2549/data',
@@ -56,7 +57,6 @@ my $repos = q[t/data/autoqc];
                               tag_index => 5,
                                                   );
     $r->set_info('Check', 'npg_qc::autoqc::checks::check');
-    $r->set_info('Check_version', npg_qc::autoqc::checks::check->VERSION);
                                   
     cmp_deeply($check->result, $r, 'result object created, tag index set');
 }

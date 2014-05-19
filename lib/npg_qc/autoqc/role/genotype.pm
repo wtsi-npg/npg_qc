@@ -16,7 +16,7 @@ use Readonly;
 
 with qw(npg_qc::autoqc::role::result);
 
-our $VERSION = do { my ($r) = q$Revision: $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head2 criterion

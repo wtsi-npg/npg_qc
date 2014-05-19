@@ -13,7 +13,7 @@ use warnings;
 use XML::LibXML;
 use base qw(npg::util);
 
-our $VERSION     = do { my ($r) = q$Revision: 17408 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub data_path {
   my $self = shift;

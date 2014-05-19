@@ -23,7 +23,7 @@ use npg_tracking::util::types;
 extends qw( npg_qc::autoqc::results::result );
 with    qw( npg_qc::autoqc::role::insert_size );
 
-our $VERSION    = do { my ($r) = q$Revision: 16446 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 

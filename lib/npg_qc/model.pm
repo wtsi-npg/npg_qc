@@ -19,7 +19,7 @@ use npg::api::run;
 use npg_qc::model::run_and_pair;
 use npg_qc::model::cache_query;
 
-our $VERSION = do { my ($r) = q$Revision: 17546 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub uid {
   my $self  = shift;

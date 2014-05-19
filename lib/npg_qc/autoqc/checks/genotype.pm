@@ -29,7 +29,7 @@ with qw(npg_tracking::data::reference::find
         npg_common::roles::software_location
        );
 
-our $VERSION = do { my ($r) = q$Revision: 18315 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';

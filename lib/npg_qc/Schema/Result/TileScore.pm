@@ -345,7 +345,7 @@ __PACKAGE__->belongs_to(
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
-our $VERSION   = do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
 

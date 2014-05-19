@@ -15,7 +15,7 @@ use Carp;
 use base qw(npg_qc::model);
 use npg_qc::model::analysis_lane;
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 __PACKAGE__->has_many('analysis_lane');
 

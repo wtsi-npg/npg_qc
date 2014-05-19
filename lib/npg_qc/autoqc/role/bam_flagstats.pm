@@ -16,7 +16,8 @@ use Carp;
 
 with qw(npg_qc::autoqc::role::result);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18256 $ =~ /(\d+)/mxs; $r; };
+use Readonly;
+our $VERSION = '0';
 Readonly::Scalar our $PERCENTAGE   =>100;
 
 sub total_reads {

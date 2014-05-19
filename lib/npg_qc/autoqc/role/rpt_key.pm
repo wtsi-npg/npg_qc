@@ -14,8 +14,9 @@ use warnings;
 use Moose::Role;
 use Carp;
 use English qw(-no_match_vars);
+use Readonly;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 12560 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar our $RPT_KEY_DELIM => q[:];

@@ -23,7 +23,7 @@ extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_common::roles::software_location
         npg_tracking::data::snv::find);
 
-our $VERSION = do { my ($r) = q$Revision: 17015 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar my $VERIFY_NAME => q[verifyBamID];
 Readonly::Scalar our $EXT => q[bam];

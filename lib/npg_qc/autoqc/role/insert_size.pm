@@ -21,7 +21,7 @@ use npg_common::diagram::visio_histo_google;
 
 with qw( npg_qc::autoqc::role::result );
 
-our $VERSION    = do { my ($r) = q$Revision: 16446 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 

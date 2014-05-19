@@ -17,7 +17,7 @@ use Carp;
 use English qw{-no_match_vars};
 
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $LAST_OF_ARRAY => -1;
 Readonly our $PERCENTAGE => 100;

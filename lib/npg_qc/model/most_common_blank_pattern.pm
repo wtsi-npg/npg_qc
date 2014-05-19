@@ -16,7 +16,7 @@ use English qw{-no_match_vars};
 use Carp;
 
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 

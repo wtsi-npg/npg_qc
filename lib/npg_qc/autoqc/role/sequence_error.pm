@@ -20,7 +20,7 @@ use npg_common::diagram::visio_histo_google;
 
 with qw(npg_qc::autoqc::role::result);
 
-our $VERSION = do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $IMAGE_WIDTH_EXTRA     => 45;
 Readonly::Scalar our $BAR_WIDTH             => 4;

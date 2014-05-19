@@ -21,6 +21,7 @@ use File::Temp qw( tempdir );
 use POSIX qw(mkfifo);
 use Fcntl qw(:mode);
 use IPC::SysV qw(IPC_STAT IPC_PRIVATE);
+use Readonly;
 
 use npg_common::extractor::fastq qw/read_count/;
 use npg_tracking::data::reference::list;
@@ -29,7 +30,7 @@ use npg_tracking::util::types;
 extends qw(npg_qc::autoqc::checks::check);
 with    qw(npg_common::roles::software_location);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $LINES_PER_FASTQ_RECORD => 4;
 Readonly::Scalar my $ADAPTER_FASTA => q[adapters.fasta];

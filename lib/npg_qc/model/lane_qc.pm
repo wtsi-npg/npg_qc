@@ -16,7 +16,7 @@ use Readonly;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $PERCENTAGE               => 100;
 Readonly our $CLUSTER_GA1_RAW_MINIMUM  => 15_000;

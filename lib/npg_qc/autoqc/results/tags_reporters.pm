@@ -12,11 +12,12 @@ package npg_qc::autoqc::results::tags_reporters;
 use strict;
 use warnings;
 use Moose;
+use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::tags_reporters);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17820 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has [ qw/ tag_list
           amp_rows

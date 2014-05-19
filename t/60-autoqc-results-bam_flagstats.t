@@ -38,9 +38,11 @@ use_ok ('npg_qc::autoqc::results::bam_flagstats');
       $r->store(qq{$tempdir/4783_5_bam_flagstats.json});
     } 'no error when save data into json';
 
-    $result_json =~ s/"__CLASS__"\:"npg_qc::autoqc::results::bam_flagstats\-\d+"\,//;
-    is_deeply(from_json($result_json), from_json(slurp 't/data/autoqc/4783_5_bam_flagstats.json', {chomp=>1}), 'correct json output');
  
+     my $from_json_hash = from_json($result_json);
+     delete $from_json_hash->{__CLASS__};
+     is_deeply($from_json_hash, from_json(slurp q{t/data/autoqc/4783_5_bam_flagstats.json}, {chomp=>1}), 'correct json output');
+
     is($r->total_reads(), 32737230 , 'total reads');
     is($r->total_mapped_reads(), '30992462', 'total mapped reads');
     is($r->percent_mapped_reads, 94.6703859795102, 'percent mapped reads');

@@ -18,6 +18,7 @@ use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
 use Perl6::Slurp;
+use Readonly;
 
 use npg_tracking::util::types;
 
@@ -25,7 +26,7 @@ with qw/ npg_tracking::glossary::tag
          npg_common::roles::run::lane::file_names
        /;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18421 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit)
 
 =head1 NAME

@@ -30,7 +30,7 @@ with qw(
 );
 
 
-our $VERSION   = do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit RequireNumberSeparators)
 
 Readonly::Scalar our $DEFAULT_NUM_READS   => 10000;

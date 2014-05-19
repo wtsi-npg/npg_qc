@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use base qw(npg::controller);
 
-our $VERSION = do { my ($r) = q$Revision: 17408 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 use npg_qc::model::analysis;
 use npg_qc::model::analysis_lane;

@@ -29,7 +29,7 @@ use npg_qc::model::most_common_word;
 use npg_qc::model::lane_qc;
 use npg_qc::model::move_z;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 

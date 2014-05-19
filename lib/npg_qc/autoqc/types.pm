@@ -15,7 +15,7 @@ use Moose::Util::TypeConstraints;
 use English qw(-no_match_vars);
 use Readonly;
 
-our $VERSION    = do { my ($r) = q$Revision: 15943 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 

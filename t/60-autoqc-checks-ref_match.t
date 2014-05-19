@@ -17,9 +17,6 @@ use Test::More tests => 44;
 use Test::Deep;
 use Test::Exception;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
-
-
 use_ok('npg_qc::autoqc::checks::ref_match');
 
 my $fastq_path = 't/data/autoqc';

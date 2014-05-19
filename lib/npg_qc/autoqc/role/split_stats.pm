@@ -19,7 +19,7 @@ use File::Basename;
 
 with qw(npg_qc::autoqc::role::result);
 
-our $VERSION    = do { my ($r) = q$Revision: 14059 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $LOG_BASE_NUMBER_POSITION  => 10;
 Readonly::Scalar our $GOOGLE_BAR_CHART => q{http://chart.apis.google.com/chart?cht=bvs&amp;chxt=x,y&amp;chs=800x250};

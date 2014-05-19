@@ -22,7 +22,7 @@ use npg_qc::autoqc::role::result;
 
 with qw/MooseX::Getopt/;
 
-our $VERSION = do { my ($r) = q$Revision: 17019 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 has 'path'   =>  ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',

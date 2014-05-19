@@ -10,11 +10,12 @@
 package npg_qc::autoqc::results::pulldown_metrics;
 
 use Moose;
+use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::pulldown_metrics);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17067 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME

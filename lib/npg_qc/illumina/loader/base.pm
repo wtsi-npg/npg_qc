@@ -22,7 +22,7 @@ with qw{npg_tracking::illumina::run::short_info
         npg_tracking::illumina::run::folder};
 with qw{npg_tracking::illumina::run::long_info};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17529 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME

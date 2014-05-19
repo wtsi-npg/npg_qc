@@ -22,10 +22,11 @@ use List::Util qw(max);
 use MIME::Base64::Perl;
 use Perl6::Slurp;
 use POSIX qw(WIFEXITED);
+use Readonly;
 
 use npg_tracking::util::types;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 16957 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find

@@ -13,11 +13,12 @@ use base qw(ClearPress::view);
 use Carp;
 use POSIX qw(strftime);
 use English qw(-no_match_vars);
+use Readonly;
 
 use npg::util::image::scale;
 use npg_qc::model::run_tile;
 
-use Readonly; Readonly::Scalar our $VERSION  => do { my ($r) = q$Revision: 17408 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $GA2_MAX_TILE_COUNT => 100;
 

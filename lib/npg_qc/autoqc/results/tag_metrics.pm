@@ -12,11 +12,12 @@ package npg_qc::autoqc::results::tag_metrics;
 use strict;
 use warnings;
 use Moose;
+use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::tag_metrics);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 14617 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has [ qw/ tags
           reads_count

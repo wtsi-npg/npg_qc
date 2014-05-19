@@ -17,7 +17,7 @@ use Getopt::Long;
 
 use npg_qc::file_store;
 
-our $VERSION = do { my ($r) = q$Reision: 16882 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 my $num_files = npg_qc::file_store->new_with_options()->save_files;
 warn qq[$num_files fastqcheck files saved\n];

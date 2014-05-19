@@ -15,7 +15,7 @@ use Module::Pluggable::Object;
 with qw{MooseX::AttributeCloner MooseX::Getopt};
 extends qw{npg_qc::illumina::loader::base};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18421 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME

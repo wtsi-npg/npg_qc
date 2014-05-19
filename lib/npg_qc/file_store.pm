@@ -18,13 +18,14 @@ use File::Spec;
 use Perl6::Slurp;
 use File::Basename;
 use Compress::Zlib;
+use Readonly;
 
 use npg_qc::Schema;
 use npg_common::fastqcheck;
 
 with 'MooseX::Getopt';
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar my $DEFAULT_EXTENSION   => q[.fastqcheck];
 Readonly::Scalar our $TABLE_NAME         => q[Fastqcheck];

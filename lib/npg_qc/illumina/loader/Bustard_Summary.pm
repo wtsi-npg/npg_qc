@@ -15,7 +15,7 @@ use Readonly;
 
 extends qw{npg_qc::illumina::loader::base};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 #field names used in xml and database for chip summary
 Readonly::Scalar our $CHIP_SUMMARY_FIELDS_TO_LOAD => {clusterCountPF    => 'clusters_pf',

@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::genotype);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17015 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has '+id_run' => (isa => 'Maybe[NpgTrackingRunId]', required => 0);
 has '+position' => (isa => 'Maybe[NpgTrackingLaneNumber]', required => 0);

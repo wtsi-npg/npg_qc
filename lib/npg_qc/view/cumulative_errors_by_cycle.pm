@@ -15,7 +15,7 @@ use base qw(npg_qc::view);
 use Readonly;
 use npg::util::image::graph;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $WIDTH                => 800;
 Readonly our $HEIGHT               => 460;

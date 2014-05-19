@@ -18,7 +18,7 @@ use Digest::MD5 qw(md5 md5_hex);
 
 extends qw{npg_qc::illumina::loader::base};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17529 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 ## no critic (Documentation::RequirePodAtEnd)
 

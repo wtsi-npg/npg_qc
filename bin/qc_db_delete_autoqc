@@ -15,11 +15,12 @@ use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 use Carp;
 use Getopt::Long;
 use Pod::Usage;
+use Readonly;
 use npg_qc::autoqc::autoqc;
 use npg_qc::autoqc::role::result;
 use npg_qc::Schema;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 my $id_run;
 my $lanes;

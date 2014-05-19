@@ -13,13 +13,12 @@ use strict;
 use warnings;
 use English qw(-no_match_vars);
 use Carp;
-use Readonly;
 use npg_qc::model::move_z;
 use npg_qc::model::run_tile;
 
 use base qw(XML::SAX::Base);
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 my $in_tile = 0;
 my $run_tile;

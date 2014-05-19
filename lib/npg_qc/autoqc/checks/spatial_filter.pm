@@ -13,11 +13,10 @@ use strict;
 use warnings;
 use Moose;
 use Carp;
-use Readonly;
 
 extends qw(npg_qc::autoqc::checks::check);
 
-our $VERSION = do { my ($r) = q$Revision: 16458 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 override 'execute' => sub {
 	my ($self) = @_;

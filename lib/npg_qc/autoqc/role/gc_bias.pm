@@ -18,7 +18,7 @@ use POSIX qw(WIFEXITED);
 
 with qw(npg_qc::autoqc::role::result);
 
-our $VERSION = do { my ($r) = q$Revision: 8942 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 
 no Moose;
