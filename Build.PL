@@ -33,7 +33,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   }
 
   sub process_htdocs_files {
-    `find htdocs -type f | grep -v .git | cpio -pdv --quiet blib`;
+    `find htdocs -type f | cpio -pdv --quiet blib`;
     return;
   }
 
@@ -50,7 +50,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   }
 
   sub process_data_files {
-    `find data/npg_qc_web/templates -type f | grep -v .git | cpio -pdv --quiet blib`;
+    `find data/npg_qc_web/templates -type f | cpio -pdv --quiet blib`;
     return;
   }
 EOF
