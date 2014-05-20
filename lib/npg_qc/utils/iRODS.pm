@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-vips::iRODS 
+npg_qc::utils::iRODS 
 
 =head1 SYNOPSIS
 
@@ -26,6 +26,8 @@ package npg_qc::utils::iRODS;
 
 use strict;
 use warnings;
+
+our $VERSION = '0';
 
 # you need to install your .irodsEnv + .irodsA file on the server side in a
 # given path <path1>.  then in your code, you can set up the env variables
