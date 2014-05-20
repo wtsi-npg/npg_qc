@@ -1,11 +1,5 @@
-#########
-# Maintainer:    kt6 
-# Last Modified: 16 May 2014
-#
-
 use strict;
 use warnings;
-
 use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOF');
@@ -195,22 +189,17 @@ if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
   } 
 }
 
-if ($^X =~ /^\/software\/perl-5\.8\.8/smx) {
-  delete $requires->{'DBIx::Class::Schema::Loader'};
-}
-
 my $builder = $class->new(
 
-                'module_name'         => 'npg-qc',
-                'dist_author'         => q(wtsi-npg <npg@sanger.ac.uk>),
-                'dist_version'   => $class->git_tag(),
+                'module_name'         => 'npg_qc',
+                'dist_author'         => q(npg <npg@sanger.ac.uk>),
+                'dist_version'        => $class->git_tag(),
                 'dist_abstract'       => 'Illumina and WTSI quality control for NGS data',
                 'license'             => 'gpl',
 
           'configure_requires' => {
                 'ExtUtils::CBuilder'              => 0,
-                'Readonly'                        => 0,
-                'Readonly::XS'                    => 0,
+                'npg_tracking::util::build'       => 0,
           },
 
           'build_requires' => $build_requires,
