@@ -53,7 +53,6 @@ my %blat_hash = (     'PE-sequencingPrimer1'        =>   0,
     );
 
 use_ok('npg_qc::autoqc::checks::adapter');
-# if this test fails, probably Readonly::Scalar::XS is not installed
 
 my $test_parent = 't/data/autoqc';
 my $dir = tempdir(CLEANUP => 1);
