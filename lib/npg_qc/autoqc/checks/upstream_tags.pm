@@ -28,7 +28,7 @@ with qw(npg_tracking::data::reference::find
         npg_common::roles::software_location
        );
 
-our $VERSION = do { my ($r) = q$Revision: 18264 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
 Readonly::Scalar our $EXT => q[bam];

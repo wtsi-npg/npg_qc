@@ -18,7 +18,7 @@ use Digest::SHA1;
 use MIME::Base64;
 use Data::Dumper;
 
-our $VERSION = do { my ($r) = q$Revision: 17546 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 
 Readonly our $PERCENTAGE => 100;

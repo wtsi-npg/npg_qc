@@ -18,7 +18,7 @@ use Perl6::Slurp;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::result);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 16199 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 has '+path'               =>  (
                                required   => 0,

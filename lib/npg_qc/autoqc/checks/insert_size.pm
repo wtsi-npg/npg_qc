@@ -38,7 +38,7 @@ use npg_qc::autoqc::results::insert_size;
 use npg_common::Alignment;
 use npg_common::extractor::fastq qw(generate_equally_spaced_reads);
 
-our $VERSION = do { my ($r) = q$Revision: 18421 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 ## no critic (Documentation::RequirePodAtEnd RequireCheckingReturnValueOfEval ProhibitParensWithBuiltins RequireNumberSeparators)
 =head1 NAME

@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::gc_fraction);
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has 'ref_count_path'   => ( isa      => 'Maybe[Str]',
                             required =>  0,

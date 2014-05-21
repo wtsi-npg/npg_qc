@@ -18,7 +18,7 @@ use base qw(npg_qc::model);
 use npg_qc::model::run_tile;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $ALL_CALL_Y_GA1 => 15_000;
 Readonly our $ALL_CALL_Y_GA2 => 1_500;

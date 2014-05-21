@@ -20,7 +20,7 @@ use npg::util::image::heatmap;
 use npg::util::image::graph;
 use npg::util::image::merge;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $WIDTH                => 600;
 Readonly our $HEIGHT               => 350;

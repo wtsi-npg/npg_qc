@@ -12,8 +12,9 @@ package npg_qc::autoqc::qc_store::options;
 use strict;
 use warnings;
 use base 'Exporter';
+use Readonly;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 9053 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 our @EXPORT_OK = qw/$ALL $PLEXES $LANES/;
 

@@ -17,7 +17,7 @@ use npg_qc::model::cache_query;
 
 extends 'npg_qc::illumina::loader::base';
 
-our $VERSION = do { my ($r) = q$Revision: 17529 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 has 'npg_qc_util' =>  (isa => q{npg_qc::util},
                        is => q{ro},

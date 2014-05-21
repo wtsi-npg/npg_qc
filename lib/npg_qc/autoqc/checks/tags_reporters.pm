@@ -29,7 +29,7 @@ with qw(npg_tracking::data::reference::find
         npg_common::roles::software_location
        );
 
-our $VERSION = do { my ($r) = q$Revision: 17995 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 # Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
 Readonly::Scalar my $SAMTOOLS_NAME => q[/software/solexa/npg/bin/samtools_irods];
@@ -266,7 +266,7 @@ override 'can_run' => sub {
 
 override 'execute' => sub {
 	my ($self) = @_;
-	my ($r, $n, %c, %tc, %rc);
+	my ($n, %c, %tc, %rc);
 	my ($fwd, $rev);
 	my ($tag_seq, $tag_index, $tag_id, $reporters_id);
 

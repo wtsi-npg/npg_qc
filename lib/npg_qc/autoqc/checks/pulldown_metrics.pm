@@ -20,7 +20,7 @@ with qw(npg_tracking::data::bait::find
         npg_common::roles::software_location
        );
 
-our $VERSION = do { my ($r) = q$Revision: 17098 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar my $PICARD_JAR_NAME    => q[CalculateHsMetrics.jar];
 Readonly::Scalar my $MAX_JAVA_HEAP_SIZE => q[3000m];

@@ -17,8 +17,6 @@ use JSON;
 use Carp;
 use Cwd;
 
-our $VERSION = do { my ($r) = q$Revision: 14027 $ =~ /(\d+)/mx; $r; };
-
 use_ok ('npg_qc::autoqc::results::spatial_filter');
 
 my $tempdir = tempdir( CLEANUP => 0);

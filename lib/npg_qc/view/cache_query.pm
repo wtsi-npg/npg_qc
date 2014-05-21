@@ -14,12 +14,11 @@ use warnings;
 use base qw(npg_qc::view);
 use English qw{-no_match_vars};
 use Carp qw(confess cluck carp croak);
-use Readonly;
 use npg_qc::model::cache_query;
 use npg_qc::model::run_graph;
 use npg_qc::model::instrument_statistics;
 
-our $VERSION = do { my ($r) = q$Revision: 17140 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub posted_content_type {
   my ($self) = @_;

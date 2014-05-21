@@ -16,7 +16,7 @@ use English qw{-no_match_vars};
 use Carp;
 use npg_qc::model::main;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub decor {
   my $self   = shift;

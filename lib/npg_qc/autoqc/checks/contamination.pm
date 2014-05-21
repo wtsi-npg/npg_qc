@@ -27,7 +27,7 @@ with qw/npg_tracking::data::reference::find
        /;
 
 
-our $VERSION = do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar my $COMPOUND_ORGANISM_NAME => q[NPD_Chimera];
 Readonly::Scalar my $PERCENT => 100;

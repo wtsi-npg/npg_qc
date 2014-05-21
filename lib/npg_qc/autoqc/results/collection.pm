@@ -28,7 +28,7 @@ use npg_tracking::illumina::run::folder;
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
 
-our $VERSION    = do { my ($r) = q$Revision: 16569 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME

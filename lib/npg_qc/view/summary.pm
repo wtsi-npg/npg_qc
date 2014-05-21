@@ -20,7 +20,7 @@ use npg::util::image::heatmap;
 use Readonly;
 use npg::util::image::graph;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $PERCENTAGE           => 100;
 Readonly our $PERCENTAGE_ERROR     => '10+';

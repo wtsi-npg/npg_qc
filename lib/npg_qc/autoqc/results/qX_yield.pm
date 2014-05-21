@@ -17,7 +17,7 @@ extends qw(npg_qc::autoqc::results::result);
 
 with qw ( npg_qc::autoqc::role::qX_yield );
 
-our $VERSION    = do { my ($r) = q$Revision: 16446 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 

@@ -13,7 +13,7 @@ use MIME::Base64;
 use JSON;
 use Moose::Role;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub set_flators4non_scalar {
   my ($package_name, @columns) = @_;

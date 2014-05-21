@@ -165,7 +165,7 @@ __PACKAGE__->add_unique_constraint('unq_idx_rungraph_idrun_end', ['id_run', 'end
 # Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:xToqgaxuOfuxTNeGcuXxmQ
 
-our $VERSION   = do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
 

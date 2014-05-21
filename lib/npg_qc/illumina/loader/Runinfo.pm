@@ -16,7 +16,7 @@ use Perl6::Slurp;
 
 extends qw{npg_qc::illumina::loader::base};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17529 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 ## no critic (Documentation::RequirePodAtEnd)
 

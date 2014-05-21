@@ -205,7 +205,7 @@ __PACKAGE__->set_flators4non_scalar(qw( aligned_read_count reference_version inf
 __PACKAGE__->set_inflator4scalar('tag_index');
 
 
-our $VERSION   = do { my ($r) = q$Revision: 18256 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
 

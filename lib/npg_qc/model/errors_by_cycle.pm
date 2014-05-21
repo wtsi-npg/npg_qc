@@ -17,7 +17,7 @@ use Carp;
 use npg::util::image::heatmap;
 use npg::util::image::image_map;
 
-our $VERSION = do { my ($r) = q$Revision: 17429 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $MAX_ERROR_PERCENTAGE => 20; # max error percentage set to 20
 Readonly our $HEATMAP_VALUE_GT_20  => 100;

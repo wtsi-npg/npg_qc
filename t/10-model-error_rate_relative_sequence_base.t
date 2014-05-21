@@ -15,8 +15,6 @@ use IO::Scalar;
 use t::util;
 use npg_qc::model::run_tile;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok('npg_qc::model::error_rate_relative_sequence_base');
 my $util = t::util->new({fixtures =>1});
 {

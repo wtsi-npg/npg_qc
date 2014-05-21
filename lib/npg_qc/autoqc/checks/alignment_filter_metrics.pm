@@ -17,7 +17,7 @@ use Readonly;
 
 extends qw(npg_qc::autoqc::checks::check);
 
-our $VERSION = do { my ($r) = q$Revision: 16223 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 has '+input_file_ext' => (default => 'bam_alignment_filter_metrics.json',);
 

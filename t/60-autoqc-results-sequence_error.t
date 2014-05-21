@@ -13,8 +13,6 @@ use Test::More tests => 65;
 use Test::Deep;
 use Test::Exception;
 
-our $VERSION = do { my ($r) = q$Revision: 7140 $ =~ /(\d+)/mx; $r; };
-
 use_ok ('npg_qc::autoqc::results::sequence_error');
 
 {

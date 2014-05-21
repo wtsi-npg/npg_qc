@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use base qw(npg_qc::model::summary);
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 
 1;

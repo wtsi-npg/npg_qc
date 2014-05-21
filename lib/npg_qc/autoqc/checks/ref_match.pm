@@ -18,6 +18,7 @@ use Cwd 'abs_path';
 use DateTime;
 use Moose;
 use List::Util qw(shuffle);
+use Readonly;
 
 use npg_common::extractor::fastq qw/generate_equally_spaced_reads split_reads/;
 extends 'npg_qc::autoqc::checks::check';
@@ -25,7 +26,7 @@ with    qw/npg_tracking::data::reference::list
            npg_common::roles::software_location
           /;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17722 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ### no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar my $UNMAPPED_FLAG      =>      4;

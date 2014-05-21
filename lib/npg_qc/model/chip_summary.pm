@@ -14,9 +14,8 @@ use warnings;
 use base qw(npg_qc::model);
 use English qw{-no_match_vars};
 use Carp;
-use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 15982 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 

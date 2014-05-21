@@ -10,11 +10,12 @@
 package npg_qc::autoqc::results::alignment_filter_metrics;
 
 use Moose;
+use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::alignment_filter_metrics);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 15586 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has 'all_metrics'  =>  (isa       => 'HashRef',
                         is        => 'rw',

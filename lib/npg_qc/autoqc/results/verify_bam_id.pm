@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::verify_bam_id);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17015 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has bam_file    => ( is => 'rw', isa => 'Str', );
 has number_of_snps    => ( is => 'rw', isa => 'Int', );

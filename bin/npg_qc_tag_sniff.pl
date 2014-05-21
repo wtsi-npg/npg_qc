@@ -18,7 +18,7 @@ use warnings;
 use Carp;
 use Getopt::Long;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 ## no critic (NamingConventions::Capitalization)
 

@@ -13,8 +13,6 @@ use Test::More tests => 7;
 use Test::Exception;
 use t::util;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok('npg_qc::model::chip_summary');
 
 my $util = t::util->new({fixtures =>1});

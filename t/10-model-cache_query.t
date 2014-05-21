@@ -16,8 +16,6 @@ use IO::Scalar;
 use t::util;
 use npg_qc::model::cache_query;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok('npg_qc::model::cache_query');
 
 $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/qc_webcache];

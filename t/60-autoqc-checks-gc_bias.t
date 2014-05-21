@@ -16,8 +16,6 @@ use File::Temp qw/tempdir/;
 
 use t::autoqc_util qw/write_samtools_script/;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
-
 my $repos = getcwd . '/t/data/autoqc';
 
 use_ok('npg_qc::autoqc::checks::gc_bias');

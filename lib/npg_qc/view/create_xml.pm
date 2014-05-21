@@ -39,7 +39,7 @@ use npg_qc::model::move_z;
 use npg_qc::model::runlog_sax_handler_simple;
 use XML::SAX::ParserFactory;
 
-our $VERSION = do { my ($r) = q$Revision: 15978 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $THREE => 3;
 

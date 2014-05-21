@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 use npg_qc::autoqc::db_loader;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 npg_qc::autoqc::db_loader->new_with_options()->load;
 

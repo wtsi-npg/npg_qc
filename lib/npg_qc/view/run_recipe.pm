@@ -11,11 +11,10 @@ package npg_qc::view::run_recipe;
 use strict;
 use warnings;
 use base qw(npg_qc::view);
-use Readonly;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub read_xml{
   my ($self) = @_;

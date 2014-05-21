@@ -15,8 +15,6 @@ use Test::Exception;
 use English qw(-no_match_vars);
 use Carp;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
-
 use_ok('npg_qc::autoqc::results::ref_match');
 
 my $r = npg_qc::autoqc::results::ref_match->new(

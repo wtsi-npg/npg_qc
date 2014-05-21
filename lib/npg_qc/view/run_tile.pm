@@ -13,7 +13,7 @@ use warnings;
 use base qw(npg_qc::view);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub decor {
   my ($self, @args) = @_;

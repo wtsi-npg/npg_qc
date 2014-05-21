@@ -17,7 +17,7 @@ extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::gc_bias);
 
 
-our $VERSION = do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has 'max_y'                => ( is  => 'rw',
                                 isa => 'Num',

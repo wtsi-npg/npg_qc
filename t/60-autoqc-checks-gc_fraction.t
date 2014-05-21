@@ -17,8 +17,6 @@ use File::Spec::Functions qw(catfile);
 
 use npg_qc::autoqc::results::gc_fraction;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc];
 my $repos = cwd . '/t/data/autoqc';
 

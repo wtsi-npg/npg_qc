@@ -15,8 +15,6 @@ use Test::Exception;
 use Test::Deep;
 use File::Temp qw/ tempdir /;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(d+)/mx; $r; };
-
 my $repos = q[t/data/autoqc];
 my $test_reference = q[t/data/autoqc/references/Homo_sapiens/default/all/bwa/someref.fa];
 

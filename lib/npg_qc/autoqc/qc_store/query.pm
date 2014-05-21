@@ -13,12 +13,13 @@ use strict;
 use warnings;
 use Carp;
 use Moose;
+use Readonly;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_tracking::util::types;
 with qw/npg_tracking::glossary::run/;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 16446 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has 'option'    =>   (isa       => 'Int',
                       is        => 'ro',

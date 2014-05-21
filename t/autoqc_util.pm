@@ -17,7 +17,7 @@ use Test::More;
 use XML::Simple qw(XMLin);
 use Exporter;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
+our $VERSION = '0';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(

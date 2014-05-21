@@ -17,7 +17,7 @@ use Readonly;
 use npg_qc::model::cache_query;
 use npg_qc::model::instrument_statistics;
 
-our $VERSION = do { my ($r) = q$Revision: 17546 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 
 Readonly our $PERCENTAGE      => 100;

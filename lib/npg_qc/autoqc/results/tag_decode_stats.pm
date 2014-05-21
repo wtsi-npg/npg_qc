@@ -16,7 +16,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::tag_decode_stats);
 
-our $VERSION = do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 has '+path'               =>  (
                                required   => 0,

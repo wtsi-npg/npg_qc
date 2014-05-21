@@ -15,10 +15,11 @@ use Carp;
 use Moose::Role;
 use PDL::Lite;
 use PDL::Core qw(pdl);
+use Readonly;
 
 with qw(npg_qc::autoqc::role::result);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 15913 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar  my $ONE_TENTH => 0.1;
 Readonly::Scalar  my $HUNDRED   => 100;

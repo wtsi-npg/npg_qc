@@ -32,7 +32,7 @@ extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find);
 
 
-our $VERSION = do { my ($r) = q$Revision: 16569 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd RequireCheckingReturnValueOfEval ProhibitParensWithBuiltins)
 
 =head1 NAME

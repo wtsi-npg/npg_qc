@@ -19,7 +19,7 @@ use PDL::Core qw(pdl);
 
 with qw(npg_qc::autoqc::role::result);
 
-our $VERSION = do { my ($r) = q$Revision: 15913 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $PERCENT => 100;
 Readonly::Scalar our $DECODING_PASS_PERCENT => 80;

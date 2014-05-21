@@ -16,7 +16,7 @@ use Readonly;
 use npg_tracking::Schema;
 use npg_qc::Schema;
 
-our $VERSION = do { my ($r) = q$Revision: 18421 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $MINIMUM_ID_RUN => 9000;
 

@@ -20,7 +20,7 @@ use Math::Round qw(round);
 
 use npg_tracking::util::types;
 
-our $VERSION = do { my ($r) = q$Revision: 16446 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd RequireNumberSeparators)
 
 =head1 NAME

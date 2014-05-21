@@ -19,7 +19,7 @@ use npg_qc::model::run_graph;
 use npg::util::image::graph;
 use npg_qc::model::instrument_statistics;
 
-our $VERSION = do { my ($r) = q$Revision: 17546 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $WIDTH                => 800;
 Readonly our $HEIGHT               => 460;

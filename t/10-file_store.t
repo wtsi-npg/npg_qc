@@ -19,8 +19,6 @@ use Compress::Zlib;
 
 use npg_testing::db;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok('npg_qc::file_store');
 
 isa_ok(npg_qc::file_store->new(path => ['t']), 'npg_qc::file_store');

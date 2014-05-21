@@ -16,8 +16,6 @@ use t::util;
 use Carp;
 use npg_qc::model::cumulative_errors_by_cycle;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok('npg_qc::view::cumulative_errors_by_cycle');
 
 $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/qc_webcache];

@@ -23,7 +23,7 @@ use npg::api::run;
 use Statistics::Lite qw(:all);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 17408 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $CYCLE_COUNT_GA1 => 36;
 Readonly our $CYCLE_COUNT_GA2 => 50;

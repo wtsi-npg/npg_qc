@@ -14,8 +14,6 @@ use English qw(-no_match_vars);
 use Carp;
 use File::Temp qw/ tempdir /;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok ('npg_qc::autoqc::results::split_stats');
 
 {

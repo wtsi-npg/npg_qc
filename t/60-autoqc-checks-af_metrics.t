@@ -12,8 +12,6 @@ use warnings;
 use Test::More tests => 11;
 use Test::Exception;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 use_ok ('npg_qc::autoqc::checks::alignment_filter_metrics');
 
 {

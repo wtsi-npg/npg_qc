@@ -14,8 +14,9 @@ use warnings;
 use Moose;
 use MooseX::ClassAttribute;
 use Carp;
+use Readonly;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 14685 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 extends qw(npg_qc::autoqc::checks::check);
 

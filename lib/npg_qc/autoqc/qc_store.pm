@@ -19,7 +19,7 @@ use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
 use npg_qc::autoqc::results::collection;
 
-our $VERSION   = do { my ($r) = q$Revision: 18256 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitManyArgs)
 
 =head1 NAME

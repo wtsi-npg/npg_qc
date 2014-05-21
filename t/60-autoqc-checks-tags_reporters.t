@@ -14,8 +14,6 @@ use File::Temp qw/ tempdir /;
 use Test::More tests => 3;
 use Test::Exception;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
 my $ref_repos = cwd . '/t/data/autoqc';
 
 use_ok ('npg_qc::autoqc::checks::tags_reporters');

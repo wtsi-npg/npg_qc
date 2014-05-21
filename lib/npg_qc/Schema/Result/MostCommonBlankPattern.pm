@@ -168,7 +168,7 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:RFYEg52LxU5P3F511k7h8A
 
-our $VERSION   = do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
 

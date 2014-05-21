@@ -16,7 +16,7 @@ use Carp;
 use Readonly;
 
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $CLUSTER_GA1_RAW_MINIMUM  => 15_000;
 Readonly our $CLUSTER_GA1_RAW_MAX      => 50_000;

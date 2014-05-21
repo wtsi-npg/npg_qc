@@ -28,7 +28,7 @@ with  qw / npg_tracking::illumina::run::short_info
            MooseX::Getopt
         /;
 
-our $VERSION = do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME

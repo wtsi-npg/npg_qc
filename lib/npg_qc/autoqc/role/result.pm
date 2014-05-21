@@ -19,7 +19,7 @@ with Storage( 'traits' => ['OnlyWhenBuilt'],
               'format' => 'JSON',
               'io'     => 'File' ), 'npg_qc::autoqc::role::rpt_key';
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18256 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
