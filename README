@@ -1,5 +1,45 @@
-Application npg_qc
+QC Checks and Metrics for Illumina Next Generation Sequencing Data
+==================================================================
 
-This application is to be used to store and retrieve qc data (both Bustard and Swift) for the Illumina NST run information.
-Also to show, via web interface, graphs based on this data.
+lib directory:
+---------------
+ npg_qc::Schema namespace - DBIx db binding
+ npg_qc::view, npg_qc::model and npg_qc::util namespaces -
+     a web application rendering Illumina QC metrics
+ npg_qc::illumina - db loaders for Illumina QC metrics
+ npg_qc::autoqc namespace - WTSI core sequencing pipeline inhouse
+     QC checks and storage of QC results
+
+bin directory:
+--------------
+ perl scripts
+
+cgi-bin directory:
+------------------
+ cgi script for the web app
+
+scripts directory:
+------------------
+ supplimentary scripts
+
+src directory:
+--------------
+ source code for C utilities
+
+htdocs directory:
+-----------------
+ client-side scripts for the web app
+
+data directory:
+---------------
+ templates for the web app
+ db config file for the web app
+ db schema dump
+
+t directory:
+------------
+ tests
+ test data
+ supplimentary scripts and modules for testing
+
 
