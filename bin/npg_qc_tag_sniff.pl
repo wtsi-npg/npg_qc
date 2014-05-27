@@ -1,11 +1,7 @@
 #!/usr/bin/env perl
 #########
 # Author:        nf2
-# Maintainer:    $Author$
 # Created:       18 Nov 2011
-# Last Modified: $Date: 2011-11-18 11:19:31 +0100$
-# Id:            $Id$
-# $HeadURL$
 #
 
 #########################

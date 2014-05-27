@@ -1,13 +1,5 @@
 #!/usr/bin/env perl
 
-#########
-# Author:        Marina Gourtovaia mg8@sanger.ac.uk 
-# Maintainer:    $Author$
-# Created:       22 November 2010
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
-
 use strict;
 use warnings;
 use FindBin qw($Bin);

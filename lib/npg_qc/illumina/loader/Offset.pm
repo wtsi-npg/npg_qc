@@ -120,7 +120,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author: gq1 $
+Guoying Qi
 
 =head1 LICENSE AND COPYRIGHT
 
