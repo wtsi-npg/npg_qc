@@ -364,7 +364,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author: mg8 $
+Andy Brown
 
 =head1 LICENSE AND COPYRIGHT
 

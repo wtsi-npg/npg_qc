@@ -1,12 +1,4 @@
 #!/usr/local/bin/perl -T
-#########
-# Author:        ajb
-# Maintainer:    $Author$
-# Created:       2008-06-10
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
-#
 
 my @npg_libs;
 BEGIN {
@@ -26,8 +18,7 @@ use warnings;
 use npg_qc::controller;
 use npg_qc::util;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
-
+our $VERSION = '0';
 
 npg_qc::controller->handler(npg_qc::util->new());
 

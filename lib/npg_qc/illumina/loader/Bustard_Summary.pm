@@ -386,7 +386,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author: mg8 $
+Guoying Qi
 
 =head1 LICENSE AND COPYRIGHT
 

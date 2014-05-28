@@ -526,11 +526,6 @@ sub modify_match_by_cigar{
   my ($self, $cigar, $match_array, $md) = @_;
   my $count = [];
 
-  if ( $cigar =~ /[NPHS]/mxsi ){
-
-    carp "extended CIGAR string included: $cigar, $md";
-  }
-
   if ( $cigar !~ /[IHS]/mxs ){
     $count = [ map {1} @{$match_array} ];
     return ($match_array, $count);

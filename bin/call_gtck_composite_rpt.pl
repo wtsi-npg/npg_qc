@@ -1,12 +1,7 @@
 #!/usr/bin/env perl
 
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
 # Created:       2013-02-15
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
-#
 #
 
 #
