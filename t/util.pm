@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
 # Created:       2008-06-12
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 package t::util;
 use strict;
@@ -22,8 +18,6 @@ use Data::Dumper;
 
 use base qw(npg_qc::util);
 use t::dbh;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 $ENV{HTTP_HOST}     = 'test.npg.com';
 $ENV{DOCUMENT_ROOT} = './htdocs';

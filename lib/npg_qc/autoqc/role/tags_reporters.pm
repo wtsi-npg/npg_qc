@@ -1,10 +1,6 @@
 #########
 # Author:        Kevin Lewis
-# Maintainer:    $Author: kl2 $
 # Created:       19 November 2013
-# Last Modified: $Date: 2013-11-29 10:36:23 +0000 (Fri, 29 Nov 2013) $
-# Id:            $Id: tags_reporters.pm 17820 2013-11-29 10:36:23Z kl2 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/tags_reporters.pm $
 #
 
 package npg_qc::autoqc::role::tags_reporters;
@@ -34,10 +30,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::role::tags_reporters
-
-=head1 VERSION
-
-    $Revision: 17820 $
 
 =head1 SYNOPSIS
 

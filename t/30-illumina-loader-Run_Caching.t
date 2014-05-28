@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
 # Created:       2008-09-30
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;

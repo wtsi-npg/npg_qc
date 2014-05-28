@@ -1,10 +1,6 @@
 #########
 # Author:        rmp
-# Maintainer:    $Author$
 # Created:       2007-03-28
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 package t::dbh;
 use strict;

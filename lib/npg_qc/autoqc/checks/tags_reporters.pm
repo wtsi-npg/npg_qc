@@ -1,9 +1,5 @@
 # Author:        Kevin Lewis
-# Maintainer:    $Author: mg8 $
 # Created:       2013-11-14
-# Last Modified: $Date: 2014-01-10 10:57:02 +0000 (Fri, 10 Jan 2014) $
-# Id:            $Id: tags_reporters.pm 17995 2014-01-10 10:57:02Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/tags_reporters.pm $
 #
 #
 
@@ -401,10 +397,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::tags_reporters 
-
-=head1 VERSION
-
-    $Revision: 17995 $
 
 =head1 SYNOPSIS
 

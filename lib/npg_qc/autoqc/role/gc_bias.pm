@@ -1,10 +1,6 @@
 #########
 # Author:        John O'Brien
-# Maintainer:    $Author: jo3 $
 # Created:       14 April 2009
-# Last Modified: $Date: 2010-03-30 16:27:48 +0100 (Tue, 30 Mar 2010) $
-# Id:            $Id: gc_bias.pm 8942 2010-03-30 15:27:48Z jo3 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/gc_bias.pm $
 #
 
 package npg_qc::autoqc::role::gc_bias;
@@ -30,10 +26,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::role::gc_bias
-
-=head1 VERSION
-
-    $Revision: 8942 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       26 October 2011
-# Last Modified: $Date: 2011-11-28 14:07:58 +0000 (Mon, 28 Nov 2011) $
-# Id:            $Id: tag_metrics.pm 14685 2011-11-28 14:07:58Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/tag_metrics.pm $
 #
 
 package npg_qc::autoqc::checks::tag_metrics;
@@ -25,10 +21,6 @@ extends qw(npg_qc::autoqc::checks::check);
 =head1 NAME
 
 npg_qc::autoqc::checks::tag_metrics
-
-=head1 VERSION
-
-$Revision: 14685 $
 
 =head1 SYNOPSIS
 

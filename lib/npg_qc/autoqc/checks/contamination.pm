@@ -1,10 +1,6 @@
 #########
 # Author:        Original copied from /software/pathogen/projects/protocols/lib/perl5/Protocols/QC/SlxQC.pm
-# Maintainer:    $Author: mg8 $
 # Created:       24 September 2009
-# Last Modified: $Date: 2009-10-27 09:19:10 +0000 (Tue, 27 Oct 2009) $
-# Id:            $Id: contamination.pm 16882 2013-03-25 13:55:06Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/contamination.pm $
 
 package npg_qc::autoqc::checks::contamination;
 
@@ -214,10 +210,6 @@ __END__
 
 npg_qc::autoqc::checks::contamination - check fastq reads against various
 genomes
-
-=head1 VERSION
-
-    $Revision: 16882 $
 
 =head1 SYNOPSIS
 

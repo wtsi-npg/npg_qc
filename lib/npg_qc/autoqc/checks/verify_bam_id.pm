@@ -1,9 +1,5 @@
 # Author:        Jennifer Liddle
-# Maintainer:    $Author: kl2 $
 # Created:       2014-02-06
-# Last Modified: $Date: 2013-04-11 16:31:25 +0100 (Thu, 11 Apr 2013) $
-# Id:            $Id: genotype.pm 17015 2013-04-11 15:31:25Z kl2 $
-# $HeadURL: svn+ssh://intcvs1/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-55.0/lib/npg_qc/autoqc/checks/genotype.pm $
 #
 #
 
@@ -113,10 +109,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::verify_bam_id - compare genotype from bam with Sequenom QC results
-
-=head1 VERSION
-
-    $Revision: 17015 $
 
 =head1 SYNOPSIS
 

@@ -1,14 +1,5 @@
 #!/usr/bin/env perl
 
-#########
-# Author:        gq1
-# Maintainer:    $Author$
-# Created:       2009-09-07
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
-#
-
 use strict;
 use warnings;
 use FindBin qw($Bin);
@@ -23,23 +14,18 @@ npg_qc::autoqc::db_loader->new_with_options()->load;
 
 __END__
 
-
 =head1 NAME
 
     npg_qc_autoqc_data.pl
 
-=head1 VERSION
-
-$Revision$
-
 =head1 USAGE
 
     npg_qc_autoqc_data.pl --path path1 [--path path2]
-    npg_qc_autoqc_data.pl --json_file file1 [--jason_file file2]
+    npg_qc_autoqc_data.pl --json_file file1 [--json_file file2]
 
 =head1 DESCRIPTION
 
-   Loads autoqc ata to the database.
+   Loads autoqc data to the database.
 
 =head1 REQUIRED ARGUMENTS
 

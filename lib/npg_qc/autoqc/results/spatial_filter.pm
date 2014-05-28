@@ -1,10 +1,6 @@
 #########
 # Author:        dj3
-# Maintainer:    $Author: dj3 $
 # Created:       21 June 2009
-# Last Modified: $Date: 2012-11-07 10:31:12 +0000 (Wed, 07 Nov 2012) $
-# Id:            $Id: bam_flagstats.pm 16199 2012-11-07 10:31:12Z dj3 $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-51.0/lib/npg_qc/autoqc/results/bam_flagstats.pm $
 #
 
 package npg_qc::autoqc::results::spatial_filter;
@@ -63,10 +59,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::results::spatial_filter
-
-=head1 VERSION
-
-    $Revision: 16199 $
 
 =head1 SYNOPSIS
 

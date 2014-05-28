@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       21 June 2010
-# Last Modified: $Date: 2014-03-24 10:15:15 +0000 (Mon, 24 Mar 2014) $
-# Id:            $Id: bam_flagstats.pm 18256 2014-03-24 10:15:15Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/bam_flagstats.pm $
 #
 
 package npg_qc::autoqc::role::bam_flagstats;
@@ -98,10 +94,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::role::bam_flagstats
-
-=head1 VERSION
-
-    $Revision: 18256 $
 
 =head1 SYNOPSIS
 

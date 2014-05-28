@@ -1,10 +1,6 @@
 #########
 # Author:        John O'Brien
-# Maintainer:    $Author: mg8 $
 # Created:       14 April 2009
-# Last Modified: $Date: 2013-03-25 13:55:06 +0000 (Mon, 25 Mar 2013) $
-# Id:            $Id: ref_match.pm 16882 2013-03-25 13:55:06Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/ref_match.pm $
 #
 
 package npg_qc::autoqc::results::ref_match;
@@ -35,10 +31,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::results::ref_match
-
-=head1 VERSION
-
-    $Revision: 16882 $
 
 =head1 SYNOPSIS
 

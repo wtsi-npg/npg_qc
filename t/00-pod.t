@@ -1,10 +1,6 @@
 #########
 # Author:        rmp
-# Maintainer:    $Author$
 # Created:       2007-10
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 use strict;
 use warnings;

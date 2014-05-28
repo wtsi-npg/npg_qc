@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       16 November 2009
-# Last Modified: $Date: 2014-03-12 09:06:00 +0000 (Wed, 12 Mar 2014) $
-# Id:            $Id: sequence_error.pm 18173 2014-03-12 09:06:00Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/sequence_error.pm $
 #
 
 package npg_qc::autoqc::role::sequence_error;
@@ -420,10 +416,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::role::sequence_error
-
-=head1 VERSION
-
-    $Revision: 18173 $
 
 =head1 SYNOPSIS
 

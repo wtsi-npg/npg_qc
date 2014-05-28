@@ -112,10 +112,6 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head1 VERSION
-
-$Revision: 18173 $
-
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION

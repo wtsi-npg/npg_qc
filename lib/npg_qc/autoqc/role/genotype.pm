@@ -1,10 +1,6 @@
 #########
 # Author:        Kevin Lewis
-# Maintainer:    $Author: kl2 $
 # Created:       25 August 2011
-# Last Modified: $Date: $
-# Id:            $Id: $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-24.0/lib/npg_qc/autoqc/role/genotype.pm $
 #
 
 package npg_qc::autoqc::role::genotype;
@@ -63,10 +59,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::role::genotype
-
-=head1 VERSION
-
-    $Revision: $
 
 =head1 SYNOPSIS
 
