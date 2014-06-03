@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       14 April 2009
-# Last Modified: $Date: 2013-01-10 14:09:35 +0000 (Thu, 10 Jan 2013) $
-# Id:            $Id: qX_yield.pm 16446 2013-01-10 14:09:35Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/qX_yield.pm $
 #
 
 package npg_qc::autoqc::results::qX_yield;
@@ -17,17 +13,13 @@ extends qw(npg_qc::autoqc::results::result);
 
 with qw ( npg_qc::autoqc::role::qX_yield );
 
-our $VERSION    = do { my ($r) = q$Revision: 16446 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 
 =head1 NAME
 
 npg_qc::autoqc::results::qX_yield
-
-=head1 VERSION
-
-$Revision: 16446 $
 
 =head1 SYNOPSIS
 

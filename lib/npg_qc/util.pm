@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       March 2012
-# Last Modified: $Date: 2013-08-22 14:28:15 +0100 (Thu, 22 Aug 2013) $
-# Id:            $Id: util.pm 17408 2013-08-22 13:28:15Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/util.pm $
 #
 package npg_qc::util;
 
@@ -13,7 +9,7 @@ use warnings;
 use XML::LibXML;
 use base qw(npg::util);
 
-our $VERSION     = do { my ($r) = q$Revision: 17408 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub data_path {
   my $self = shift;
@@ -38,10 +34,6 @@ __END__
 =head1 NAME
 
 npg_qc::util - A database handle and utility object
-
-=head1 VERSION
-
-$Revision: 17408 $
 
 =head1 SYNOPSIS
 

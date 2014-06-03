@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       29 July 2009
-# Last Modified: $Date: 2013-03-25 13:55:06 +0000 (Mon, 25 Mar 2013) $
-# Id:            $Id: qX_yield.pm 16882 2013-03-25 13:55:06Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/qX_yield.pm $
 #
 
 package npg_qc::autoqc::checks::qX_yield;
@@ -23,15 +19,11 @@ use npg::api::run;
 extends qw(npg_qc::autoqc::checks::check);
 
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins)
-our $VERSION   = do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 =head1 NAME
 
 npg_qc::autoqc::checks::qX_yield
-
-=head1 VERSION
-
-$Revision: 16882 $
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,4 @@
 #!/usr/bin/env perl
-#########
-# Author:        Marina Gourtovaia
-# Maintainer:    $Author$
-# Created:       29 July 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
-#
 
 use strict;
 use warnings;
@@ -14,7 +6,7 @@ use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 use npg_qc::autoqc::autoqc;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 npg_qc::autoqc::autoqc->new_with_options()->run();
 
@@ -24,10 +16,6 @@ __END__
 =head1 NAME
 
 qc
-
-=head1 VERSION
-
-$Revision$
 
 =head1 USAGE
 

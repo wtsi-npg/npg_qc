@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       2008-07-16
-# Last Modified: $Date: 2012-04-02 10:00:34 +0100 (Mon, 02 Apr 2012) $
-# Id:            $Id: move_z.pm 15413 2012-04-02 09:00:34Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/move_z.pm $
 #
 
 package npg_qc::model::move_z;
@@ -18,7 +14,7 @@ use Readonly;
 use npg::util::image::heatmap;
 use npg::util::image::image_map;
 
-our $VERSION = do { my ($r) = q$Revision: 15413 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $MOVE_Z_NORMAL    => 5000;
 Readonly our $NUMBER_LANES     => 8;
@@ -509,10 +505,6 @@ __END__
 =head1 NAME
 
 npg_qc::model::move_z
-
-=head1 VERSION
-
-$Revision: 15413 $
 
 =head1 SYNOPSIS
 

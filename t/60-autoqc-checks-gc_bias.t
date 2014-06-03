@@ -1,10 +1,6 @@
 #########
 # Author:        jo3
-# Maintainer:    $Author$
 # Created:       30 July 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -15,8 +11,6 @@ use Cwd qw/getcwd/;
 use File::Temp qw/tempdir/;
 
 use t::autoqc_util qw/write_samtools_script/;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
 
 my $repos = getcwd . '/t/data/autoqc';
 

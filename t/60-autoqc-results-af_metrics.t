@@ -1,18 +1,12 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       11 May 2012
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
 use warnings;
 use Test::More tests => 20;
 use Test::Exception;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok ('npg_qc::autoqc::results::alignment_filter_metrics');
 

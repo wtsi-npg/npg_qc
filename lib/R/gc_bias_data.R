@@ -1,11 +1,6 @@
 #########
 # Author:        Aylwyn Scally
-# Maintainer:    $Author: mg8 $
 # Created:       2008-11-26
-# Last Modified: $Date: 2010-04-29 16:52:26 +0100 (Thu, 29 Apr 2010) $
-# Id:            $Id: gc_bias_data.R 9175 2010-04-29 15:52:26Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/R/gc_bias_data.R $
-# Original code by: Aylwyn Scally 2008
 
 library(Biostrings)
 

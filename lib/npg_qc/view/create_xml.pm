@@ -1,11 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: mg8 $
 # Created:       2008-06-16
-# Last Modified: $Date: 2012-08-09 09:56:09 +0100 (Thu, 09 Aug 2012) $
-# Id:            $Id: create_xml.pm 15978 2012-08-09 08:56:09Z mg8 $
-# Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/create_xml.pm $
 #
 
 package npg_qc::view::create_xml;
@@ -39,7 +34,7 @@ use npg_qc::model::move_z;
 use npg_qc::model::runlog_sax_handler_simple;
 use XML::SAX::ParserFactory;
 
-our $VERSION = do { my ($r) = q$Revision: 15978 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $THREE => 3;
 
@@ -1153,10 +1148,6 @@ __END__
 =head1 NAME
 
 npg_qc::view::create_xml
-
-=head1 VERSION
-
-$Revision: 15978 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,6 @@
 #########
 # Author:        Original copied from /software/pathogen/projects/protocols/lib/perl5/Protocols/QC/SlxQC.pm
-# Maintainer:    $Author: mg8 $
 # Created:       24 September 2009
-# Last Modified: $Date: 2013-03-25 13:55:06 +0000 (Mon, 25 Mar 2013) $
-# Id:            $Id: adapter.pm 16882 2013-03-25 13:55:06Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/adapter.pm $
 
 package npg_qc::autoqc::checks::adapter;
 
@@ -21,6 +17,7 @@ use File::Temp qw( tempdir );
 use POSIX qw(mkfifo);
 use Fcntl qw(:mode);
 use IPC::SysV qw(IPC_STAT IPC_PRIVATE);
+use Readonly;
 
 use npg_common::extractor::fastq qw/read_count/;
 use npg_tracking::data::reference::list;
@@ -29,7 +26,7 @@ use npg_tracking::util::types;
 extends qw(npg_qc::autoqc::checks::check);
 with    qw(npg_common::roles::software_location);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $LINES_PER_FASTQ_RECORD => 4;
 Readonly::Scalar my $ADAPTER_FASTA => q[adapters.fasta];
@@ -311,10 +308,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
-
-=head1 VERSION
-
-    $Revision: 16882 $
 
 =head1 SYNOPSIS
 

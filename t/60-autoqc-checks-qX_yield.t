@@ -1,10 +1,6 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       30 July 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -16,8 +12,6 @@ use Carp;
 use English qw(-no_match_vars);
 
 use npg_qc::autoqc::results::qX_yield;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc];
 

@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       10 May 2012
-# Last Modified: $Date: 2012-08-31 15:09:36 +0100 (Fri, 31 Aug 2012) $
-# Id:            $Id: alignment_filter_metrics.pm 16035 2012-08-31 14:09:36Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/alignment_filter_metrics.pm $
 #
 
 package npg_qc::autoqc::role::alignment_filter_metrics;
@@ -15,7 +11,7 @@ use Carp;
 
 with qw( npg_qc::autoqc::role::result );
 
-our $VERSION    = do { my ($r) = q$Revision: 16035 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar our $HUNDRED   => 100;
@@ -25,10 +21,6 @@ Readonly::Scalar our $UNKNOWN   => 'Unknown';
 =head1 NAME
 
 npg_qc::autoqc::role::alignment_filter_metrics
-
-=head1 VERSION
-
-$Revision: 16035 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
 # Created:       2008-06-16
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -13,8 +9,6 @@ use Test::More tests => 33;
 use English qw(-no_match_vars);
 use t::util;
 use npg_qc::model::run_graph;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 ###
 use_ok('npg_qc::view::run_graph');

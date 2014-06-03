@@ -1,10 +1,5 @@
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
 # Created:       2012-04-16
-# Revision: $Revision$
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 CC = cc

@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       10 November 2009
-# Last Modified: $Date: 2013-03-25 13:55:06 +0000 (Mon, 25 Mar 2013) $
-# Id:            $Id: sequence_error.pm 16882 2013-03-25 13:55:06Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/sequence_error.pm $
 #
 
 package npg_qc::autoqc::checks::sequence_error;
@@ -30,7 +26,7 @@ with qw(
 );
 
 
-our $VERSION   = do { my ($r) = q$Revision: 16882 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit RequireNumberSeparators)
 
 Readonly::Scalar our $DEFAULT_NUM_READS   => 10000;
@@ -530,11 +526,6 @@ sub modify_match_by_cigar{
   my ($self, $cigar, $match_array, $md) = @_;
   my $count = [];
 
-  if ( $cigar =~ /[NPHS]/mxsi ){
-
-    carp "extended CIGAR string included: $cigar, $md";
-  }
-
   if ( $cigar !~ /[IHS]/mxs ){
     $count = [ map {1} @{$match_array} ];
     return ($match_array, $count);
@@ -671,10 +662,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::sequence_error
-
-=head1 VERSION
-
-$Revision: 16882 $
 
 =head1 SYNOPSIS
 

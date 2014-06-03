@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: jo3 $
 # Created:       2008-07-29
-# Last Modified: $Date: 2010-03-30 16:40:28 +0100 (Tue, 30 Mar 2010) $
-# Id:            $Id: runlog_sax_handler_simple.pm 8943 2010-03-30 15:40:28Z jo3 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/runlog_sax_handler_simple.pm $
 #
 
 package npg_qc::model::runlog_sax_handler_simple;
@@ -13,13 +9,12 @@ use strict;
 use warnings;
 use English qw(-no_match_vars);
 use Carp;
-use Readonly;
 use npg_qc::model::move_z;
 use npg_qc::model::run_tile;
 
 use base qw(XML::SAX::Base);
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 my $in_tile = 0;
 my $run_tile;
@@ -130,10 +125,6 @@ __END__
 =head1 NAME
 
 npg_qc::model::runlog_sax_handler_simple
-
-=head1 VERSION
-
-$Revision: 8943 $
 
 =head1 SYNOPSIS
 

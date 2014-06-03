@@ -1,9 +1,4 @@
-// $Id$
 // Author: ajb
-// Maintainer: $Author$
-// Date:       $Date$
-// HeadURL:    $HeadURL$
-// Revision:   $Revision$
 
 function get_summary_heatmap(url, id_run, datatype) {
   Element.show('spinner');

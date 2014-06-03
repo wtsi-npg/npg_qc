@@ -9,7 +9,7 @@ use lib qw/lib/;
 use npg_qc::autoqc::autoqc;
 use npg_qc::autoqc::role::result;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 my $path = join q[/], $ENV{'HOME'}, q[.npg], q[npg_qc-Schema];
 my $config = Config::Auto::parse($path);

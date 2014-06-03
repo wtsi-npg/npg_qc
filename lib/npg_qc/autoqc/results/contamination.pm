@@ -1,10 +1,6 @@
 #########
 # Author:        John O'Brien
-# Maintainer:    $Author: mg8 $
 # Created:       14 April 2009
-# Last Modified: $Date: 2013-03-20 09:55:43 +0000 (Wed, 20 Mar 2013) $
-# Id:            $Id: contamination.pm 16861 2013-03-20 09:55:43Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/contamination.pm $
 #
 
 package npg_qc::autoqc::results::contamination;
@@ -16,7 +12,7 @@ use Moose;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::contamination);
 
-our $VERSION = do { my ($r) = q$Revision: 16861 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 
 has reference_version => ( is  => 'rw',
@@ -48,10 +44,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::results::contamination
-
-=head1 VERSION
-
-    $Revision: 16861 $
 
 =head1 SYNOPSIS
 

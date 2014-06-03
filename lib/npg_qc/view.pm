@@ -1,10 +1,6 @@
 #########
 # Author:        rmp
-# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date: 2013-08-22 14:28:15 +0100 (Thu, 22 Aug 2013) $
-# Id:            $Id: view.pm 17408 2013-08-22 13:28:15Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view.pm $
 #
 package npg_qc::view;
 use strict;
@@ -13,11 +9,12 @@ use base qw(ClearPress::view);
 use Carp;
 use POSIX qw(strftime);
 use English qw(-no_match_vars);
+use Readonly;
 
 use npg::util::image::scale;
 use npg_qc::model::run_tile;
 
-use Readonly; Readonly::Scalar our $VERSION  => do { my ($r) = q$Revision: 17408 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $GA2_MAX_TILE_COUNT => 100;
 
@@ -99,10 +96,6 @@ __END__
 =head1 NAME
 
 npg_qc::view - npg-qc MVC view superclass, derived from ClearPress::View
-
-=head1 VERSION
-
-$Revision: 17408 $
 
 =head1 SYNOPSIS
 

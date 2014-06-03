@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date: 2013-08-22 14:28:15 +0100 (Thu, 22 Aug 2013) $
-# Id:            $Id: controller.pm 17408 2013-08-22 13:28:15Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/controller.pm $
 #
 
 package npg_qc::controller;
@@ -13,7 +9,7 @@ use strict;
 use warnings;
 use base qw(npg::controller);
 
-our $VERSION = do { my ($r) = q$Revision: 17408 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 use npg_qc::model::analysis;
 use npg_qc::model::analysis_lane;
@@ -80,10 +76,6 @@ __END__
 =head1 NAME
 
 npg_qc::controller - npg_qc controller
-
-=head1 VERSION
-
-$Revision: 17408 $
 
 =head1 SYNOPSIS
 

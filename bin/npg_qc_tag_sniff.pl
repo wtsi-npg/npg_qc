@@ -1,11 +1,7 @@
 #!/usr/bin/env perl
 #########
 # Author:        nf2
-# Maintainer:    $Author$
 # Created:       18 Nov 2011
-# Last Modified: $Date: 2011-11-18 11:19:31 +0100$
-# Id:            $Id$
-# $HeadURL$
 #
 
 #########################
@@ -18,7 +14,7 @@ use warnings;
 use Carp;
 use Getopt::Long;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 ## no critic (NamingConventions::Capitalization)
 
@@ -165,10 +161,6 @@ __END__
 =head1 NAME
 
 tag_sniff.pl
-
-=head1 VERSION
-
-$LastChangedRevision$
 
 =head1 USAGE
   

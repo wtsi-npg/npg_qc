@@ -1,9 +1,5 @@
 # Author:        Kevin Lewis
-# Maintainer:    $Author: mg8 $
 # Created:       2013-11-14
-# Last Modified: $Date: 2014-01-10 10:57:02 +0000 (Fri, 10 Jan 2014) $
-# Id:            $Id: tags_reporters.pm 17995 2014-01-10 10:57:02Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/tags_reporters.pm $
 #
 #
 
@@ -29,7 +25,7 @@ with qw(npg_tracking::data::reference::find
         npg_common::roles::software_location
        );
 
-our $VERSION = do { my ($r) = q$Revision: 17995 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 # Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
 Readonly::Scalar my $SAMTOOLS_NAME => q[/software/solexa/npg/bin/samtools_irods];
@@ -266,7 +262,7 @@ override 'can_run' => sub {
 
 override 'execute' => sub {
 	my ($self) = @_;
-	my ($r, $n, %c, %tc, %rc);
+	my ($n, %c, %tc, %rc);
 	my ($fwd, $rev);
 	my ($tag_seq, $tag_index, $tag_id, $reporters_id);
 
@@ -401,10 +397,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::tags_reporters 
-
-=head1 VERSION
-
-    $Revision: 17995 $
 
 =head1 SYNOPSIS
 

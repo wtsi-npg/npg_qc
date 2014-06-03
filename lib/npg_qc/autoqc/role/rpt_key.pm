@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       25 August 2010
-# Last Modified: $Date: 2011-02-08 18:09:10 +0000 (Tue, 08 Feb 2011) $
-# Id:            $Id: rpt_key.pm 12560 2011-02-08 18:09:10Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/rpt_key.pm $
 #
 
 package npg_qc::autoqc::role::rpt_key;
@@ -14,8 +10,9 @@ use warnings;
 use Moose::Role;
 use Carp;
 use English qw(-no_match_vars);
+use Readonly;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 12560 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar our $RPT_KEY_DELIM => q[:];
@@ -25,10 +22,6 @@ Readonly::Scalar our $RPT_KEY_MAX_LENGTH => 3;
 =head1 NAME
 
 npg_qc::autoqc::role::rpt_key
-
-=head1 VERSION
-
-$Revision: 12560 $
 
 =head1 SYNOPSIS
 

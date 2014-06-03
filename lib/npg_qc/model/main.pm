@@ -1,11 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: jo3 $
 # Created:       2008-06-26
-# Last Modified: $Date: 2010-03-30 16:40:28 +0100 (Tue, 30 Mar 2010) $
-# Id:            $Id: main.pm 8943 2010-03-30 15:40:28Z jo3 $
-# Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/main.pm $
 #
 
 package npg_qc::model::main;
@@ -18,7 +13,7 @@ use npg_qc::model::run_log;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 sub run_configs {
   my ($self) = @_;
@@ -92,10 +87,6 @@ __END__
 
 npg_qc::model::main
 
-=head1 VERSION
-
-$Revision: 8943 $
-
 =head1 SYNOPSIS
 
   my $oMain = npg_qc::model::main->new({util => $util});
@@ -110,7 +101,6 @@ $Revision: 8943 $
 
 =head2 id_runs - returns an arrayref of id_runs from the run_tile table
 
-  my $aIdRuns = $oMain->id_runs();
 
 =head2 displays - returns an array of the displays that we can show
 

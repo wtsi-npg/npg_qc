@@ -1,10 +1,6 @@
 #########
 # Author:        dj3
-# Maintainer:    $Author: gq1 $
 # Created:       3 December 2009
-# Last Modified: $Date: 2009-11-11 15:03:38 +0000 (Wed, 11 Nov 2009) $
-# Id:            $Id: 60-autoqc-results-qX_yield.t 7140 2009-11-11 15:03:38Z gq1 $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-19.0/t/60-autoqc-results-qX_yield.t $
 #
 
 use strict;
@@ -12,8 +8,6 @@ use warnings;
 use Test::More tests => 65;
 use Test::Deep;
 use Test::Exception;
-
-our $VERSION = do { my ($r) = q$Revision: 7140 $ =~ /(\d+)/mx; $r; };
 
 use_ok ('npg_qc::autoqc::results::sequence_error');
 

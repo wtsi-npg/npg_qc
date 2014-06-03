@@ -1,10 +1,6 @@
 #############
-# $Id: base.pm 17529 2013-09-26 11:37:25Z mg8 $
 # Created By: ajb
-# Mast Maintained By: $Author: mg8 $
 # Created On: 2009-12-03
-# Last Changed On: $Date: 2013-09-26 12:37:25 +0100 (Thu, 26 Sep 2013) $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader/base.pm $
 
 package npg_qc::illumina::loader::base;
 
@@ -22,21 +18,16 @@ with qw{npg_tracking::illumina::run::short_info
         npg_tracking::illumina::run::folder};
 with qw{npg_tracking::illumina::run::long_info};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17529 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
 
 npg_qc::illumina::loader::base
 
-=head1 VERSION
-
-$Revision: 17529 $
-
 =head1 SYNOPSIS
 
   my $oDerived = npg_qc::illumina::loader::<derived_class>->new({
-    id_run => $iIdRun,
     verbose => 1,
     run_folder => $sRunFolder,
   });
@@ -373,7 +364,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author: mg8 $
+Andy Brown
 
 =head1 LICENSE AND COPYRIGHT
 

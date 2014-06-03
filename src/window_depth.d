@@ -1,9 +1,5 @@
 // Author:        John O'Brien jo3@sanger.ac.uk
-// Maintainer:    $Author$
 // Created:       2008-11-26
-// Last Modified: $Date$
-// Id:            $Id$
-// $HeadURL$
 // Original code by: Aylwyn Scally 2009
 
 // Compile with:

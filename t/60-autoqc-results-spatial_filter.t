@@ -1,10 +1,6 @@
 #########
 # Author:        dj3
-# Maintainer:    $Author: mg8 $
 # Created:       2009-09-21
-# Last Modified: $Date: 2011-08-23 17:46:49 +0100 (Tue, 23 Aug 2011) $
-# Id:            $Id: 60-autoqc-results-tag_decode_stats.t 14027 2011-08-23 16:46:49Z mg8 $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-51.0/t/60-autoqc-results-tag_decode_stats.t $
 #
 
 use strict;
@@ -16,8 +12,6 @@ use Perl6::Slurp;
 use JSON;
 use Carp;
 use Cwd;
-
-our $VERSION = do { my ($r) = q$Revision: 14027 $ =~ /(\d+)/mx; $r; };
 
 use_ok ('npg_qc::autoqc::results::spatial_filter');
 

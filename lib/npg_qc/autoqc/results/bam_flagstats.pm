@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       21 June 2009
-# Last Modified: $Date: 2014-03-12 09:06:00 +0000 (Wed, 12 Mar 2014) $
-# Id:            $Id: bam_flagstats.pm 18173 2014-03-12 09:06:00Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/bam_flagstats.pm $
 #
 
 package npg_qc::autoqc::results::bam_flagstats;
@@ -15,11 +11,12 @@ use Moose;
 use Carp;
 use Perl6::Slurp;
 use List::Util qw(sum);
+use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::bam_flagstats);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 18173 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $METRICS_FIELD_LIST => [qw(library unpaired_mapped_reads paired_mapped_reads unmapped_reads  unpaired_read_duplicates paired_read_duplicates read_pair_optical_duplicates percent_duplicate library_size)];
 Readonly::Scalar our $LIBRARY_SIZE_NOT_AVAILABLE => -1; # picard and biobambam mark duplicates assign this
@@ -197,10 +194,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::results::bam_flagstats
-
-=head1 VERSION
-
-    $Revision: 18173 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,6 @@
 #########
 # Author:        kl2
-# Maintainer:    $Author$
 # Created:       6 September 2013
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -13,8 +9,6 @@ use Cwd;
 use File::Temp qw/ tempdir /;
 use Test::More tests => 3;
 use Test::Exception;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 my $ref_repos = cwd . '/t/data/autoqc';
 

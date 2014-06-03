@@ -1,18 +1,12 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       26 October 2011
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
 use warnings;
 use Test::More tests => 43;
 use Test::Exception;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok('npg_qc::autoqc::checks::tag_metrics');
 

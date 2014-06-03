@@ -327,16 +327,12 @@ __PACKAGE__->set_inflator4scalar('sequence_type', 'is_string');
 __PACKAGE__->set_flators_wcompression4non_scalar( qw(forward_cigar_char_count_by_cycle forward_count forward_errors forward_n_count forward_quality_bins reverse_cigar_char_count_by_cycle reverse_count reverse_errors reverse_n_count reverse_quality_bins) );
 
 
-our $VERSION   = do { my ($r) = q$Revision: 18256 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 VERSION
-
-$Revision: 18256 $
 
 =head1 SYNOPSIS
 

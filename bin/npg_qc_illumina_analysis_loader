@@ -1,20 +1,14 @@
 #!/usr/bin/env perl
 
-# $Id$
-# Created By: ajb
-# Mast Maintained By: $Author$
-# Created On: 2009-11-30
-# Last Changed On: $Date$
-# $HeadURL$
-
 use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 use List::MoreUtils qw/any/;
+use Readonly;
 use npg_qc::illumina::loader;
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 if (scalar @ARGV == 0) {
   warn "Illumina qc data loader for all runs\n";
@@ -39,10 +33,6 @@ __END__
 =head1 NAME
 
 npg_qc_illumina_analysis_loader
-
-=head1 VERSION
-
-$Revision$
 
 =head1 SYNOPSIS
 
@@ -99,7 +89,7 @@ To load a single run, it needs an id_run or run_folder as an argument.
 
 =head1 AUTHOR
 
-$Author$
+Andy Brown
 
 =head1 LICENSE AND COPYRIGHT
 

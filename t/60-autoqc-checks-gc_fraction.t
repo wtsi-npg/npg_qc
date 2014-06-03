@@ -1,10 +1,6 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       04 January 2010
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -16,8 +12,6 @@ use Cwd;
 use File::Spec::Functions qw(catfile);
 
 use npg_qc::autoqc::results::gc_fraction;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc];
 my $repos = cwd . '/t/data/autoqc';

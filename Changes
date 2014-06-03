@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.1
+ - git-based module and script versions
+ - RSC keywords removed
+
 release 56.0
  - use test data that are publicly available
  - getting autoqc module versions made to work with non-numeric versions

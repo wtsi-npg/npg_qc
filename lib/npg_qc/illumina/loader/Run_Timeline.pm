@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       2008-12-05
-# Last Modified: $Date: 2014-05-14 11:19:54 +0100 (Wed, 14 May 2014) $
-# Id:            $Id: Run_Timeline.pm 18421 2014-05-14 10:19:54Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader/Run_Timeline.pm $
 #
 package npg_qc::illumina::loader::Run_Timeline;
 
@@ -16,7 +12,7 @@ use Readonly;
 use npg_tracking::Schema;
 use npg_qc::Schema;
 
-our $VERSION = do { my ($r) = q$Revision: 18421 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $MINIMUM_ID_RUN => 9000;
 
@@ -151,10 +147,6 @@ __END__
 =head1 NAME
 
 npg_qc::illumina::loader::Run_Timeline
-
-=head1 VERSION
-
-$Revision: 18421 $
 
 =head1 SYNOPSIS
 

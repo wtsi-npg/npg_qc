@@ -14,7 +14,8 @@ __PACKAGE__->load_namespaces;
 # Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-24 09:37:40
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iHP1VU0U0dqzLPd7RT3OCw
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$LastChangedRevision: 18173 $ =~ /(\d+)/mxs; $r; };
+use Readonly;
+our $VERSION = '0';
 with qw/npg_tracking::util::db_connect/;
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
@@ -25,10 +26,6 @@ __END__
 =head1 NAME
 
 npg_qc::Schema
-
-=head1 VERSION
-
-$LastChangedRevision: 18173 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,6 @@
 #########
 # Author:        jo3
-# Maintainer:    $Author$
 # Created:       30 July 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -14,8 +10,6 @@ use File::Temp qw/ tempdir /;
 use Test::More tests => 17;
 use Test::Deep;
 use Test::Exception;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
 
 use_ok('npg_qc::autoqc::checks::contamination');
 
