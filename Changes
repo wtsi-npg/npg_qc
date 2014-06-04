@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.2
+  - relax regexp for class name in result role to allow git or svn version numbering
+
 release 56.1
  - git-based module and script versions
  - RSC keywords removed

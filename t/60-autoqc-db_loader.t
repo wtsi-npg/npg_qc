@@ -54,10 +54,6 @@ my $schema = Moose::Meta::Class->create_anon_class(
        path   => ['t/data/autoqc/insert_size/6062_8#1.insert_size.json'],
   );
 
- # is($db_loader->_json2db, 1, 'one json file successfully read');
-
-#exit;
-
   my $count_loaded;
   warnings_exist {$count_loaded = $db_loader->load()}
    [qr/not a directory, skipping/, qr/0 json files have been loaded/],
