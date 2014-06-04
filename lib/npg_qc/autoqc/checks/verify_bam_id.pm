@@ -29,6 +29,17 @@ Readonly::Scalar my $MIN_FREEMIX => 0.05;
 
 has '+input_file_ext' => (default => $EXT,);
 
+has 'alignments_in_bam'  => (
+	is => 'ro',
+	isa => 'Maybe[Bool]',
+	lazy_build => 1,
+);
+sub _build_alignments_in_bam {
+	my ($self) = @_;
+
+	return $self->lims->alignments_in_bam;
+}
+
 has 'bam_file' => (
   is => 'ro',
   isa => 'Str',
@@ -43,10 +54,25 @@ sub _build_bam_file {
 override 'can_run' => sub {
   my $self = shift;
 
+  # make sure that the bam file is aligned and a reference genome is defined
+
+  if(!$self->alignments_in_bam) {
+    $self->_cant_run_ms('alignments_in_bam is false');
+    return 0;
+  }
+
+  if(!defined($self->lims->reference_genome)) {
+		$self->_cant_run_ms('No reference genome specified');
+    return 0;
+  }
+
   # we want to run iff there is a VCF file for this organism/strain/bait
-  if ($self->snv_file) { return 1; }
-  $self->_cant_run_ms(q(Can't find VCF file));
-  return 0;
+  if (!$self->snv_file) {
+    $self->_cant_run_ms(q(Can't find VCF file));
+    return 0;
+  }
+
+  return 1;
 };
 
 override 'execute' => sub {
