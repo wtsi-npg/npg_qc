@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 52;
+use Test::More tests => 54;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -18,10 +18,13 @@ use_ok('npg_qc::autoqc::db_loader');
       verbose => 0,
   );
   is(scalar @{$db_loader->json_file}, 1, 'one json file found');
-  is($db_loader->json_file->[0], 't/data/autoqc/tag_decode_stats/6624_3_tag_decode_stats.json',
-    'correct json file found');
-  my $values = decode_json(slurp('t/data/autoqc/tag_decode_stats/6624_3_tag_decode_stats.json'));
+  my $json_file = 't/data/autoqc/tag_decode_stats/6624_3_tag_decode_stats.json';
+  is($db_loader->json_file->[0], $json_file, 'correct json file found');
+  my $values = decode_json(slurp($json_file));
   ok($db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test positive');
+  is($db_loader->_json2db($json_file), 1, 'Loaded one json file with git style version nn.n');
+  my $old_json_file = 't/data/autoqc/insert_size/6062_8#1.insert_size.json';
+  is($db_loader->_json2db($json_file), 1, 'Loaded one json file with svn style version nnnn');
 
   $db_loader = npg_qc::autoqc::db_loader->new(id_run=>[3, 2, 6624]);
   ok($db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test positive');
@@ -50,6 +53,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
        schema => $schema,
        path   => ['t/data/autoqc/insert_size/6062_8#1.insert_size.json'],
   );
+
   my $count_loaded;
   warnings_exist {$count_loaded = $db_loader->load()}
    [qr/not a directory, skipping/, qr/0 json files have been loaded/],
