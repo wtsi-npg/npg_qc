@@ -1,18 +1,12 @@
 #########
 # Author:        kl2
-# Maintainer:    $Author$
 # Created:       6 September 2013
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
 use warnings;
 use Test::More tests => 4;
 use Test::Exception;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok ('npg_qc::autoqc::results::upstream_tags');
 use_ok ('npg_qc::autoqc::results::collection');

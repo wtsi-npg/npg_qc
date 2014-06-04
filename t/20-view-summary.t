@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
 # Created:       2008-07-22
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -14,8 +10,6 @@ use English qw(-no_match_vars);
 use IO::Scalar;
 use t::util;
 use npg_qc::model::summary;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok('npg_qc::view::summary');
 

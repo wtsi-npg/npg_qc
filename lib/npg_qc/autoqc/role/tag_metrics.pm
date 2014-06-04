@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       26 October 2011
-# Last Modified: $Date: 2012-07-23 11:22:17 +0100 (Mon, 23 Jul 2012) $
-# Id:            $Id: tag_metrics.pm 15913 2012-07-23 10:22:17Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/tag_metrics.pm $
 #
 
 package npg_qc::autoqc::role::tag_metrics;
@@ -15,10 +11,11 @@ use Carp;
 use Moose::Role;
 use PDL::Lite;
 use PDL::Core qw(pdl);
+use Readonly;
 
 with qw(npg_qc::autoqc::role::result);
 
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 15913 $ =~ /(\d+)/smx; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar  my $ONE_TENTH => 0.1;
 Readonly::Scalar  my $HUNDRED   => 100;
@@ -168,10 +165,6 @@ __END__
 =head1 NAME
 
  npg_qc::autoqc::role::tag_metrics
-
-=head1 VERSION
-
- $Revision: 15913 $
 
 =head1 SYNOPSIS
 

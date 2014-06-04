@@ -1,10 +1,6 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       05 August 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 
 use strict;
 use warnings;

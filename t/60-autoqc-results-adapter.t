@@ -1,10 +1,6 @@
 #########
 # Author:        jo3
-# Maintainer:    $Author$
 # Created:       30 July 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -13,8 +9,6 @@ use Test::More tests => 10;
 use Test::Deep;
 use English qw(-no_match_vars);
 use Carp;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
 
 use_ok('npg_qc::autoqc::results::adapter');
 

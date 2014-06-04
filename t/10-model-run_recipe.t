@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
 # Created:       2009-05-21
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -15,8 +11,6 @@ use IO::Scalar;
 use t::util;
 use npg_qc::model::run_recipe;
 ;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok('npg_qc::model::run_recipe');
 

@@ -1,9 +1,5 @@
 /* Author:        Kevin Lewis
- * Maintainer:    $Author$
  * Created:       2012-04-16
- * Last Modified: $Date$
- * Id:            $Id$
- * $HeadURL$
  */
 
 #include <stdio.h>

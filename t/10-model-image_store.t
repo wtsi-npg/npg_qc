@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
 # Created:       2008-11-23
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -13,8 +9,6 @@ use Test::More 'no_plan';#tests => 4;
 use English qw(-no_match_vars);
 use IO::Scalar;
 use t::util;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok('npg_qc::model::image_store');
 my $util = t::util->new({fixtures => 1});

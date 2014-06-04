@@ -1,12 +1,7 @@
 #!/usr/bin/env perl
 
 # Author:        Kevin Lewis
-# Maintainer:    $Author$
 # Created:       2013-02-15
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
-#
 #
 
 #
@@ -40,7 +35,7 @@ use npg_tracking::illumina::run::long_info;
 use npg_qc::autoqc::checks::genotype;
 
 ##no critic
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 my %opts;
 getopts('hr:s:p:jo:g:m:a:x:', \%opts);

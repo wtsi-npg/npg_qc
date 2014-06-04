@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       2010-01-27
-# Last Modified: $Date: 2013-09-26 12:37:25 +0100 (Thu, 26 Sep 2013) $
-# Id:            $Id: Cluster_Density.pm 17529 2013-09-26 11:37:25Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader/Cluster_Density.pm $
 #
 
 package npg_qc::illumina::loader::Cluster_Density;
@@ -16,17 +12,13 @@ use Readonly;
 
 extends 'npg_qc::illumina::loader::base';
 
-our $VERSION = do { my ($r) = q$Revision: 17529 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
 
 npg_qc::illumina::loader::Cluster_Density
-
-=head1 VERSION
-
-$Revision: 17529 $
 
 =head1 SYNOPSIS
 

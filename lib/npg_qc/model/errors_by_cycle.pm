@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date: 2013-09-02 10:40:54 +0100 (Mon, 02 Sep 2013) $
-# Id:            $Id: errors_by_cycle.pm 17429 2013-09-02 09:40:54Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/errors_by_cycle.pm $
 #
 
 package npg_qc::model::errors_by_cycle;
@@ -17,7 +13,7 @@ use Carp;
 use npg::util::image::heatmap;
 use npg::util::image::image_map;
 
-our $VERSION = do { my ($r) = q$Revision: 17429 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $MAX_ERROR_PERCENTAGE => 20; # max error percentage set to 20
 Readonly our $HEATMAP_VALUE_GT_20  => 100;
@@ -565,10 +561,6 @@ __END__
 
 npg_qc::model::errors_by_cycle
 
-=head1 VERSION
-
-$Revision: 17429 $
-
 =head1 SYNOPSIS
 
   my $oErrorsByCycle = npg_qc::model::errors_by_cycle->new({util => $util});
@@ -583,7 +575,6 @@ $Revision: 17429 $
 
 =head2 id_run - accessor for id_run
 
-  my $iIdRun = $oErrorsByCycle->id_run($iIdRun);
 
 =head2 fields - return array of fields, first of which is the primary key
 

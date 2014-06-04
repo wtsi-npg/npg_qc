@@ -1,10 +1,6 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       30 July 2009
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 
@@ -18,8 +14,6 @@ use File::Spec;
 use File::Spec::Functions qw(catfile);
 use Cwd;
 use File::Temp qw/tempdir/;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok ('npg_qc::autoqc::autoqc');
 

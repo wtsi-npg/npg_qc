@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
 # Created:       2008-09-23
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -15,8 +11,6 @@ use Test::Deep;
 use IO::Scalar;
 use t::util;
 use npg_qc::model::cache_query;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok('npg_qc::model::cache_query');
 

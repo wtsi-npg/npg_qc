@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
 # Created:       2008-07-21
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -12,8 +8,6 @@ use warnings;
 use Test::More tests => 7;
 use Test::Exception;
 use t::util;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok('npg_qc::model::chip_summary');
 

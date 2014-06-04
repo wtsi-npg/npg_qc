@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: jo3 $
 # Created:       2008-10-23
-# Last Modified: $Date: 2010-03-30 16:40:28 +0100 (Tue, 30 Mar 2010) $
-# Id:            $Id: instrument_statistics.pm 8943 2010-03-30 15:40:28Z jo3 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/instrument_statistics.pm $
 #
 
 package npg_qc::model::instrument_statistics;
@@ -16,7 +12,7 @@ use Carp;
 use Readonly;
 
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly our $CLUSTER_GA1_RAW_MINIMUM  => 15_000;
 Readonly our $CLUSTER_GA1_RAW_MAX      => 50_000;
@@ -625,10 +621,6 @@ __END__
 =head1 NAME
 
 npg_qc::model::instrument_statistics
-
-=head1 VERSION
-
-$Revision: 8943 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Maintainer:    $Author$
 # Created:       2008-06-12
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 package t::autoqc_util;
@@ -17,7 +13,7 @@ use Test::More;
 use XML::Simple qw(XMLin);
 use Exporter;
 
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
+our $VERSION = '0';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(

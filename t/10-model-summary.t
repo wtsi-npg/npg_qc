@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author$
 # Created:       2008-07-21
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -13,8 +9,6 @@ use Test::More tests => 18;
 use English qw(-no_match_vars);
 use IO::Scalar;
 use t::util;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
 
 use_ok('npg_qc::model::summary');
 my $util = t::util->new({fixtures =>1});

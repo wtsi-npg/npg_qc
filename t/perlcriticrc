@@ -8,4 +8,5 @@ stop_words = API Accessors Cwd DBI GRL Gourtovaia Guoying IVC Illumina JSON KBs 
 max_mccabe = 30
 [ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
 max_chain_length=4
-
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | BUGS AND LIMITATIONS | DEPENDENCIES | CONFIGURATION AND ENVIRONMENT | INCOMPATIBILITIES | AUTHOR | LICENSE AND COPYRIGHT

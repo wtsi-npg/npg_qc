@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       2010-02-19
-# Last Modified: $Date: 2013-09-26 12:37:25 +0100 (Thu, 26 Sep 2013) $
-# Id:            $Id: Signal_Mean.pm 17529 2013-09-26 11:37:25Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader/Signal_Mean.pm $
 #
 package npg_qc::illumina::loader::Signal_Mean;
 
@@ -16,7 +12,7 @@ use Perl6::Slurp;
 
 extends qw{npg_qc::illumina::loader::base};
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$Revision: 17529 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 Readonly::Scalar our $VALUE_FOR_DATA_MINING_EFFICIENCY => -1;
 
@@ -25,10 +21,6 @@ Readonly::Scalar our $VALUE_FOR_DATA_MINING_EFFICIENCY => -1;
 =head1 NAME
 
 npg_qc::illumina::loader::Signal_Mean
-
-=head1 VERSION
-
-$Revision: 17529 $
 
 =head1 SYNOPSIS
 
@@ -119,7 +111,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author: mg8 $
+Guoying Qi
 
 =head1 LICENSE AND COPYRIGHT
 

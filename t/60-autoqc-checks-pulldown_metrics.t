@@ -1,10 +1,6 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       27 April 2012
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -12,8 +8,6 @@ use warnings;
 use Test::More tests => 14;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok ('npg_qc::autoqc::checks::pulldown_metrics');
 

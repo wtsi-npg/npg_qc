@@ -1,18 +1,8 @@
-#########
-# Maintainer:    $Author: ejz $
-# Last Modified: $Date: 2012-04-02 15:17:16 +0100 (Mon, 02 Apr 2012) $ $Author: mg8 $
-# Id:            $Id: Makefile.PL 15422 2012-04-02 14:17:16Z mg8 $
-# Source:        $Source: /cvsroot/Bio-DasLite/Bio-DasLite/Makefile.PL,v $
-# Revision:      $Revision: $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-52.0/Build.PL $
-#
-
 use strict;
 use warnings;
-use Module::Build;
+use npg_tracking::util::build;
 
-
-my $class = Module::Build->subclass(code => <<'EOF');
+my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
   my $blibr = q[blib/lib/R];
 
@@ -43,7 +33,7 @@ my $class = Module::Build->subclass(code => <<'EOF');
   }
 
   sub process_htdocs_files {
-    `find htdocs -type f | grep -v .svn | cpio -pdv --quiet blib`;
+    `find htdocs -type f | cpio -pdv --quiet blib`;
     return;
   }
 
@@ -60,7 +50,7 @@ my $class = Module::Build->subclass(code => <<'EOF');
   }
 
   sub process_data_files {
-    `find data/npg_qc_web/templates -type f | grep -v .svn | cpio -pdv --quiet blib`;
+    `find data/npg_qc_web/templates -type f | cpio -pdv --quiet blib`;
     return;
   }
 EOF
@@ -199,22 +189,17 @@ if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
   } 
 }
 
-if ($^X =~ /^\/software\/perl-5\.8\.8/smx) {
-  delete $requires->{'DBIx::Class::Schema::Loader'};
-}
-
 my $builder = $class->new(
 
-                'module_name'         => 'npg-qc',
-                'dist_author'         => q(wtsi-npg <npg@sanger.ac.uk>),
-                'dist_version_from'   => 'lib/npg_qc/util.pm',
+                'module_name'         => 'npg_qc',
+                'dist_author'         => q(npg <npg@sanger.ac.uk>),
+                'dist_version'        => $class->git_tag(),
                 'dist_abstract'       => 'Illumina and WTSI quality control for NGS data',
                 'license'             => 'gpl',
 
           'configure_requires' => {
                 'ExtUtils::CBuilder'              => 0,
-                'Readonly'                        => 0,
-                'Readonly::XS'                    => 0,
+                'npg_tracking::util::build'       => 0,
           },
 
           'build_requires' => $build_requires,

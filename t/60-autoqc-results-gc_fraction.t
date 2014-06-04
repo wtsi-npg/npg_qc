@@ -1,10 +1,6 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       04 January 2010
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -12,8 +8,6 @@ use warnings;
 use Test::More tests => 11;
 use Test::Exception;
 use Carp;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok ('npg_qc::autoqc::results::gc_fraction');
 

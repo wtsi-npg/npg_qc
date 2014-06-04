@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: jo3 $
 # Created:       2008-06-10
-# Last Modified: $Date: 2010-03-30 16:40:28 +0100 (Tue, 30 Mar 2010) $
-# Id:            $Id: run_config.pm 8943 2010-03-30 15:40:28Z jo3 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/run_config.pm $
 #
 
 package npg_qc::view::run_config;
@@ -15,17 +11,13 @@ use English qw{-no_match_vars};
 use Carp;
 use npg_qc::model::run_config;
 
-our $VERSION = do { my ($r) = q$Revision: 8943 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = '0';
 
 1;
 __END__
 =head1 NAME
 
 npg_qc::view::run_config
-
-=head1 VERSION
-
-$Revision: 8943 $
 
 =head1 SYNOPSIS
 

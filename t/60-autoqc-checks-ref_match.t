@@ -1,10 +1,6 @@
 #########
 # Author:        jo3
-# Maintainer:    $Author$
 # Created:       Autumn 2010
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 use strict;
 use warnings;
@@ -16,9 +12,6 @@ use Cwd;
 use Test::More tests => 44;
 use Test::Deep;
 use Test::Exception;
-
-use Readonly; Readonly::Scalar our $VERSION => do { my ($r) = q$Revision$ =~ /(\d+)/msx; $r; };
-
 
 use_ok('npg_qc::autoqc::checks::ref_match');
 

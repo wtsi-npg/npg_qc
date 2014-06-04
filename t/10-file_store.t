@@ -1,10 +1,6 @@
 #########
 # Author:        mg8
-# Maintainer:    $Author$
 # Created:       9 August 2010
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
@@ -18,8 +14,6 @@ use Moose::Meta::Class;
 use Compress::Zlib;
 
 use npg_testing::db;
-
-our $VERSION = do { my ($r) = q$Revision$ =~ /(\d+)/mx; $r; };
 
 use_ok('npg_qc::file_store');
 
