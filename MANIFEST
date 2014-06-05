@@ -697,6 +697,7 @@ t/data/autoqc/sequence_error/6376_7.sequence_error.json
 t/data/autoqc/sequence_error/6376_8.sequence_error.json
 t/data/autoqc/sequence_error/6467_2.sequence_error.json
 t/data/autoqc/st/batches/3432.xml
+t/data/autoqc/st/samples/3057.xml
 t/data/autoqc/st/studies/544.xml
 t/data/autoqc/tag_decode_output_no_found_tags.txt
 t/data/autoqc/tag_decode_output.txt
