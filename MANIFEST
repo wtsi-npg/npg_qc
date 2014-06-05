@@ -434,6 +434,7 @@ t/60-autoqc-checks-tag_metrics.t
 t/60-autoqc-checks-tags_reporters.t
 t/60-autoqc-checks-upstream_tags.t
 t/60-autoqc-results-upstream_tags.t
+t/60-autoqc-checks-verify_bam_id.t
 t/60-autoqc-db_loader.t
 t/60-autoqc-parse-alignment.t
 t/60-autoqc-qc_store-query.t
@@ -705,6 +706,9 @@ t/data/autoqc/tag_metrics/6551_1.tag_metrics.json
 t/data/autoqc/tag_metrics/6954_1.tag_metrics.json
 t/data/autoqc/dbix_loader/is/12187_2.insert_size.json
 t/data/autoqc/7908_1#3.sequence_error.json
+t/data/autoqc/population_snv_with_vcf/Anopheles_gambiae/default/Standard/PEST/test.vcf.gz
+t/data/autoqc/st/samples/3056.xml
+t/data/autoqc/st/samples/9832.xml
 t/data/fastqcheck/4308/4308_1_2.fastqcheck
 t/data/fastqcheck/4308/4308_4_2#5.fastqcheck
 t/data/fastqcheck/4308/4308_4#5.fastqcheck
@@ -914,4 +918,3 @@ t/data/requests/sequencescape/items/1743.xml
 t/dbh.pm
 t/perlcriticrc
 t/util.pm
-

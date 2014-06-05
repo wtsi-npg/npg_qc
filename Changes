@@ -1,7 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
 release 56.3 
- - added check for alignments and reference to can_run() 
+ - added check for alignments, reference and library_type to can_run() 
 
 release 56.2
  - relax regexp for class name in result role to allow git or svn version numbering
