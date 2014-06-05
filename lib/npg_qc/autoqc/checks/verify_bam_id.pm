@@ -54,6 +54,11 @@ sub _build_bam_file {
 override 'can_run' => sub {
   my $self = shift;
 
+  if ($self->lims->library_type && $self->lims->library_type =~ /(?:cD|R)NA/sxm) {
+    $self->_cant_run_ms("library_type is $self->lims->library_type");
+    return 0;
+  }
+
   # make sure that the bam file is aligned and a reference genome is defined
 
   if(!$self->alignments_in_bam) {
@@ -67,6 +72,7 @@ override 'can_run' => sub {
   }
 
   # we want to run iff there is a VCF file for this organism/strain/bait
+
   if (!$self->snv_file) {
     $self->_cant_run_ms(q(Can't find VCF file));
     return 0;
