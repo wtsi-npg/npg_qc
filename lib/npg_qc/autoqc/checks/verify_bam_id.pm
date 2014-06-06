@@ -55,7 +55,7 @@ override 'can_run' => sub {
   my $self = shift;
 
   if ($self->lims->library_type && $self->lims->library_type =~ /(?:cD|R)NA/sxm) {
-    $self->_cant_run_ms("library_type is $self->lims->library_type");
+    $self->result->add_comment("library_type is $self->lims->library_type");
     return 0;
   }
 
