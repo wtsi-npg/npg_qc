@@ -12,7 +12,7 @@
     </lane>
     <lane position="2" priority="0" id="73258">
       <library name="AD0019-C 1" request_id="17592" id="54759" qc_state="pass">
-        <sample library_id="54759" library_type="Standard" study_id="544" sample_id="3057" project_id="25" library_name="AD0019-C 1">
+        <sample library_id="54759" library_type="cRNA" study_id="544" sample_id="3057" project_id="25" library_name="AD0019-C 1">
           <insert_size from="300" to="300"/>
         </sample>
       </library>

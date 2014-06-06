@@ -37,7 +37,7 @@ sub usage {
   print STDERR "        --relative_max_drop <int>\n";
   print STDERR "          stop reporting when the drop in tag count relative to the previous tag exceeds this factor, default 10\n";
   print STDERR "\n";
-  print STDERR "        --absolue_max_drop <int>\n";
+  print STDERR "        --absolute_max_drop <int>\n";
   print STDERR "          stop reporting when the drop in tag count relative to the most common tag exceeds this factor, default 10\n";
   print STDERR "\n";
   print STDERR "        --degenerate_toleration\n";
