@@ -1,0 +1,139 @@
+---
+- attachment: ~
+  attachment_name: ~
+  comment: 'Lack of clusters - run cancelled'
+  date: 2007-08-21 16:03:38
+  id_annotation: 1
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: 'Solexa test flowcell - New paired end module'
+  date: 2007-08-21 17:25:32
+  id_annotation: 2
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: '200ms exposure test - hence 50 cycles.'
+  date: 2007-08-22 17:44:24
+  id_annotation: 3
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: New PE module Test Flowcell (Read 2)
+  date: 2007-08-29 11:33:53
+  id_annotation: 4
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: 'WTSI / Solexa New Paired End Module - Test flowcell'
+  date: 2007-08-29 11:38:25
+  id_annotation: 5
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: Training Flowcell
+  date: 2007-09-03 13:28:59
+  id_annotation: 6
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: Training Flowcell
+  date: 2007-09-03 13:31:30
+  id_annotation: 7
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: Sequencing primer DID have a 3' T
+  date: 2007-09-03 17:21:14
+  id_annotation: 8
+  id_user: 5
+- attachment: ~
+  attachment_name: ~
+  comment: Sequencing primer did NOT have a 3' T
+  date: 2007-09-03 17:22:10
+  id_annotation: 9
+  id_user: 5
+- attachment: ~
+  attachment_name: ~
+  comment: Training Flowcell
+  date: 2007-09-04 17:10:34
+  id_annotation: 10
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: 'Lack of clusters - run cancelled'
+  date: 2007-08-21 16:03:38
+  id_annotation: 11
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: 'Solexa test flowcell - New paired end module'
+  date: 2007-08-21 17:25:32
+  id_annotation: 12
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: 'dropouts at cycle 35 and 55.'
+  date: 2007-08-22 17:44:24
+  id_annotation: 13
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: New PE module Test Flowcell (Read 2)
+  date: 2007-08-29 11:33:53
+  id_annotation: 14
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: 'WTSI / Solexa New Paired End Module - Test flowcell'
+  date: 2007-08-29 11:38:25
+  id_annotation: 15
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: Training Flowcell
+  date: 2007-09-03 13:28:59
+  id_annotation: 16
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: Training Flowcell
+  date: 2007-09-03 13:31:30
+  id_annotation: 17
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: Sequencing primer DID have a 3' T
+  date: 2007-09-03 17:21:14
+  id_annotation: 18
+  id_user: 5
+- attachment: ~
+  attachment_name: ~
+  comment: Sequencing primer did NOT have a 3' T
+  date: 2007-09-03 17:22:10
+  id_annotation: 19
+  id_user: 5
+- attachment: ~
+  attachment_name: ~
+  comment: Training Flowcell
+  date: 2007-09-04 17:10:34
+  id_annotation: 20
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: Sequencing primer did NOT have a 3' T
+  date: 2007-09-03 17:22:10
+  id_annotation: 21
+  id_user: 5
+- attachment: ~
+  attachment_name: ~
+  comment: Training Flowcell
+  date: 2007-09-04 17:10:34
+  id_annotation: 22
+  id_user: 3
+- attachment: ~
+  attachment_name: ~
+  comment: Annotation with no foreign constraints
+  date: 2007-09-04 17:10:34
+  id_annotation: 23
+  id_user: 3
