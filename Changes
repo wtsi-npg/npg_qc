@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.4 
+ - get cluster densities from InterOp/TileMetricsOut.bin
+ - added test data for tracking database
+
 release 56.3 
  - added check for alignments, reference and library_type to can_run() 
 

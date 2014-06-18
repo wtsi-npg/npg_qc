@@ -1,0 +1,25 @@
+---
+- description: status change
+  id_entity_type: 6
+  id_event_type: 1
+- description: annotation
+  id_entity_type: 1
+  id_event_type: 2
+- description: status change
+  id_entity_type: 9
+  id_event_type: 7
+- description: annotation
+  id_entity_type: 10
+  id_event_type: 8
+- description: annotation
+  id_entity_type: 2
+  id_event_type: 9
+- description: annotation
+  id_entity_type: 13
+  id_event_type: 10
+- description: annotation
+  id_entity_type: 14
+  id_event_type: 11
+- description: annotation
+  id_entity_type: 15
+  id_event_type: 12
