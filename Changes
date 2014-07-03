@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.5
+ - phix bam_flagstat to have default serialisation name including phix
+
 release 56.4 
  - get cluster densities from InterOp/TileMetricsOut.bin
  - added test data for tracking database

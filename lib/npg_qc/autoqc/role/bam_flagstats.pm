@@ -84,6 +84,13 @@ sub check_name {
   }
   return $ref;
 }
+sub sequence_type {
+  my $self = shift;
+  if ($self->human_split() && $self->human_split() ne 'all') {
+    return $self->human_split();
+  }
+  return q();
+}
 no Moose;
 
 1;
@@ -117,6 +124,8 @@ __END__
 =head2 total_reads
 
 =head2 check_name
+
+=head2 sequence_type
 
 =head1 DIAGNOSTICS
 
