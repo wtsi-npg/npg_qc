@@ -31,6 +31,7 @@ Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $BARCODE_FILENAME => q[sanger168.tags];
 Readonly::Scalar my $BARCODE_5BASES_FILENAME => q[sanger168_5.tags];
 Readonly::Scalar my $BARCODE_6BASES_FILENAME => q[sanger168_6.tags];
+Readonly::Scalar my $BARCODE_7BASES_FILENAME => q[sanger168_7.tags];
 Readonly::Scalar my $BID_JAR_NAME    => q[BamIndexDecoder.jar];
 Readonly::Scalar my $NUM_BACK_RUNS => 5;
 Readonly::Scalar my $MAX_MISMATCHES_DEFAULT => 1;
@@ -344,7 +345,10 @@ sub _build_barcode_filename {
 
 
 	## no critic (ProhibitMagicNumbers)
-	if($min_tag_len == 6) {
+    if($min_tag_len == 7) {
+        return File::Spec->catfile($repos, $BARCODE_7BASES_FILENAME);
+    }
+	elsif($min_tag_len == 6) {
 		return File::Spec->catfile($repos, $BARCODE_6BASES_FILENAME);
 	}
 	elsif($min_tag_len == 5) {
