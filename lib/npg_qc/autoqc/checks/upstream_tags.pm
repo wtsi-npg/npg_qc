@@ -7,6 +7,8 @@ package npg_qc::autoqc::checks::upstream_tags;
 
 use Moose;
 use Carp;
+use English qw(-no_match_vars);
+use Fatal qw(open close);
 use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
 use List::MoreUtils qw { any };
@@ -29,9 +31,6 @@ our $VERSION = '0';
 Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $BARCODE_FILENAME => q[sanger168.tags];
-Readonly::Scalar my $BARCODE_5BASES_FILENAME => q[sanger168_5.tags];
-Readonly::Scalar my $BARCODE_6BASES_FILENAME => q[sanger168_6.tags];
-Readonly::Scalar my $BARCODE_7BASES_FILENAME => q[sanger168_7.tags];
 Readonly::Scalar my $BID_JAR_NAME    => q[BamIndexDecoder.jar];
 Readonly::Scalar my $NUM_BACK_RUNS => 5;
 Readonly::Scalar my $MAX_MISMATCHES_DEFAULT => 1;
@@ -41,6 +40,8 @@ Readonly::Scalar my $VERBOSITY_LEVEL_3 => 3;
 Readonly::Scalar my $DB_LOOKUP_DEFAULT => 1;
 Readonly::Scalar my $MAX_RUNS  => 10;
 Readonly::Scalar my $MIN_MATCH_PERCENT  => 0.00001;
+Readonly::Scalar my $SHIFT_EIGHT                => 8;
+Readonly::Scalar my $SIG_PIPE_FATAL_ERROR       => 141;
 
 Readonly::Scalar my $ID_RUN_POS  => 0;
 Readonly::Scalar my $STATUS_DATE_POS  => 1;
@@ -149,6 +150,23 @@ sub _build_archive_qc_path {
 
 	my $rp = $self->in_dir;
 	$rp .= q[/qc];
+
+	return $rp;
+}
+
+#########################################################################################
+# tag_sets_repository
+#  directory containing tag_sets
+#########################################################################################
+has 'tag_sets_repository'  => ( isa        => 'Str',
+                              is         => 'ro',
+                              lazy_build  => 1,
+                            );
+sub _build_tag_sets_repository {
+	my $self = shift;
+
+    my $rp = Moose::Meta::Class->create_anon_class(
+        roles => [qw/npg_tracking::data::reference::list/])->new_object()->tag_sets_repository;
 
 	return $rp;
 }
@@ -326,8 +344,42 @@ sub _build_total_lane_reads {
 }
 
 ###################################################################################################
+# tag0_index_length: the length of the BC or T tag in the tag0 bam file
+#  we only read the first 10 reads of the bam file, this is will always be enough if the
+#  file is sorted/collated by read name, but it may fail the file is if most of the reads with a BC tag
+#  are unmapped and at the end of the bam file
+###################################################################################################
+has 'tag0_index_length'    => (is         => 'ro',
+                              isa        => 'Maybe[Int]',
+                              lazy_build => 1,
+			);
+
+sub _build_tag0_index_length {
+    my $self = shift;
+
+    ## no critic (ProhibitTwoArgOpen ErrorHandling::RequireCheckingReturnValueOfEval
+    my $index_length = 0;
+    my $bfile = $self->tag0_bam_file;
+    my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools . qq[ view $bfile" | ];
+    open my $ph, $command or croak qq[Cannot fork '$command', error $ERRNO];
+    while (my $line = <$ph>) {
+        if($line =~ /\t(BC|RT):Z:(\S+)/smx) {
+            $index_length = length $2;
+            last;
+        }
+    }
+    eval { close $ph; };
+    #The exit status of the pipe is always 141 since the head command exits before samtools
+    my $child_error = $CHILD_ERROR >> $SHIFT_EIGHT;
+    if ($child_error != 0 && $child_error != $SIG_PIPE_FATAL_ERROR) {
+        croak qq[Error in pipe "$command": $child_error];
+    }
+    return $index_length;
+}
+
+###################################################################################################
 # barcode_file (default: sanger168.tags, in the NPG repository under tag_sets)
-#  This currently detects the 6base or 5base tag set situation and chooses the more appropriate
+#  This currently detects the 5base .. 7base tag set situation and chooses the more appropriate
 #   default, but the assumption that everything else will work with the 8base tag set may be overly
 #   optimistic.
 ###################################################################################################
@@ -338,28 +390,17 @@ has 'barcode_filename'  => ( isa        => 'NpgTrackingReadableFile',
                         );
 sub _build_barcode_filename {
     my $self = shift;
-    my $repos = Moose::Meta::Class->create_anon_class(
-        roles => [qw/npg_tracking::data::reference::list/])->new_object()->tag_sets_repository;
+    my $filename = $BARCODE_FILENAME;
 
-	my $min_tag_len = (sort { $a <=> $b } map { length } (values %{$self->_tag_metrics_results->results->[0]->tags}))[0];
+	my $tag0_index_length = $self->tag0_index_length;
 
-
-	## no critic (ProhibitMagicNumbers)
-    if($min_tag_len == 7) {
-        return File::Spec->catfile($repos, $BARCODE_7BASES_FILENAME);
+    ## no critic (ProhibitMagicNumbers)
+    if ( $tag0_index_length && $tag0_index_length =~ /^\d$/smx && $tag0_index_length >=5 && $tag0_index_length <=7) {
+      $filename = sprintf 'sanger168_%i.tags', $tag0_index_length;
     }
-	elsif($min_tag_len == 6) {
-		return File::Spec->catfile($repos, $BARCODE_6BASES_FILENAME);
-	}
-	elsif($min_tag_len == 5) {
-		return File::Spec->catfile($repos, $BARCODE_5BASES_FILENAME);
-	}
-	else {
-		return File::Spec->catfile($repos, $BARCODE_FILENAME);
-	}
-	## use critic
+    ## use critic
 
-    return File::Spec->catfile($repos, $BARCODE_FILENAME);
+    return File::Spec->catfile($self->tag_sets_repository, $filename);
 }
 
 ####################################################################
