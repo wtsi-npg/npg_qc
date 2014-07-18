@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.6
+  - use length of index read from tag0 bam file rather than length of tag in
+    decode metrics file to derive barcode file, added new tests and test data
+
 release 56.5
  - phix bam_flagstat to have default serialisation name including phix
 
