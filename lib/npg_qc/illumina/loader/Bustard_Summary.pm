@@ -91,7 +91,8 @@ sub run {
   my ($self) = @_;
   my $xml_file_name = $self->xml_file();
   if(! -e $xml_file_name){
-     croak qq{Bustard Summary XML not exist!!!\n$xml_file_name};
+     $self->mlog("Bustard Summary XML not exist!\n$xml_file_name");
+     return 1;
   }
   my $transaction = sub { $self->_parsing_xml($xml_file_name) };
   $self->schema->txn_do($transaction);

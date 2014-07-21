@@ -41,9 +41,9 @@ my $schema_tracking = npg_testing::db::deploy_test_db(q[npg_tracking::Schema],q[
   is($loader->tile_metrics_interop_file(), q{t/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX/InterOp/TileMetricsOut.bin}, 'correct tile metrics file name');
 
   my $cluster_density_by_lane = $loader->parsing_interop($loader->tile_metrics_interop_file());
-  is($cluster_density_by_lane->{0}->{1}->{min}, '787647.75', 'correct value for lane 1 min');
-  is($cluster_density_by_lane->{0}->{2}->{max}, '1091274.75', 'correct value for lane 2 max');
-  is($cluster_density_by_lane->{1}->{1}->{p50}, '845403.09375', 'correct value for pf lane 1 p50');
+  is($cluster_density_by_lane->{1}->{'cluster density'}->{min}, '787647.75', 'correct value for lane 1 min');
+  is($cluster_density_by_lane->{2}->{'cluster density'}->{max}, '1091274.75', 'correct value for lane 2 max');
+  is($cluster_density_by_lane->{1}->{'cluster density pf'}->{p50}, '845403.09375', 'correct value for pf lane 1 p50');
 
   lives_ok {
     $loader->save_to_db({lane=>1, is_pf=>0, min=>9667.00, max=>97777.00, p50=>88888.00});

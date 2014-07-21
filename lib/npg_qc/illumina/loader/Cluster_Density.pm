@@ -14,6 +14,13 @@ extends 'npg_qc::illumina::loader::base';
 
 our $VERSION = '0';
 
+#keys used in hash and corresponding codes in tile metrics interop file
+Readonly::Scalar our $TILE_METRICS_INTEROP_CODES => {'cluster density'    => 100,
+                                                     'cluster density pf' => 101,
+                                                     'cluster count'      => 102,
+                                                     'cluster count pf'   => 103,
+                                                     };
+
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
@@ -81,49 +88,39 @@ sub run {
 given one tile metrics interop file, return a hashref
 
 =cut
-
 sub parsing_interop {
   my ($self, $interop) = @_;
 
   my $cluster_density_by_lane = {};
 
-  # operational variables
-  my $file_version;
-  my $record_size;
-  my $buffer;
-  my $typedef = 'v v v f'; # three two-byte integers and one 4-byte float
+  my $version;
+  my $length;
+  my $data;
 
-  # output variables
-  my $lane;
-  my $tile;
-  my $code;
-  my $value;
+  my $template = 'v3f'; # three two-byte integers and one 4-byte float
 
   ## no critic (InputOutput::RequireBriefOpen)
-  open my $fh, q{<}, $interop or croak qq{Couldn't open tile metrics file $interop, error $ERRNO};
+  open my $fh, q{<}, $interop or croak qq{Couldn't open interop file $interop, error $ERRNO};
   binmode $fh, ':raw';
 
-  $fh->read($buffer, 1) or croak qq{Couldn't read the first byte of file $interop, error $ERRNO};
-  $file_version = unpack 'C', $buffer;
+  $fh->read($data, 1) or croak qq{Couldn't read file version in interop file $interop, error $ERRNO};
+  $version = unpack 'C', $data;
 
-  $fh->read($buffer, 1) or croak qq{Couldn't read the second byte of file $interop, error $ERRNO};
-  $record_size = unpack 'C', $buffer;
+  $fh->read($data, 1) or croak qq{Couldn't read record length in interop file $interop, error $ERRNO};
+  $length = unpack 'C', $data;
 
   my $tile_metrics = {};
 
-  while ($fh->read($buffer, $record_size)) { # read will return 0 at EOF
-    ($lane,$tile,$code,$value) = unpack $typedef, $buffer;
-    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
-    if( $code == 100 ){
-      # cluster density (k/mm2)
-      push @{$tile_metrics->{0}->{$lane}}, $value;
-    }elsif( $code == 101 ){
-      # cluster density passing filters (k/mm2)
-      push @{$tile_metrics->{1}->{$lane}}, $value;
+  while ($fh->read($data, $length)) {
+    my ($lane,$tile,$code,$value) = unpack $template, $data;
+    if( $code == $TILE_METRICS_INTEROP_CODES->{'cluster density'} ){
+      push @{$tile_metrics->{$lane}->{'cluster density'}}, $value;
+    }elsif( $code == $TILE_METRICS_INTEROP_CODES->{'cluster density pf'} ){
+      push @{$tile_metrics->{$lane}->{'cluster density pf'}}, $value;
     }
   }
 
-  $fh->close() or croak qq{Couldn't close tile metrics file $interop, error $ERRNO};
+  $fh->close() or croak qq{Couldn't close interop file $interop, error $ERRNO};
 
   my $lanes = scalar keys %{$tile_metrics};
   if( $lanes == 0){
@@ -131,17 +128,18 @@ sub parsing_interop {
     return $cluster_density_by_lane;
   }
 
-  for my $is_pf (0, 1) {
-    foreach my $lane (keys %{$tile_metrics->{$is_pf}}){
-      my @values = sort {$a<=>$b} @{$tile_metrics->{$is_pf}->{$lane}};
+  # calc lane stats
+  foreach my $lane (keys %{$tile_metrics}){
+    for my $code (keys %{$tile_metrics->{$lane}}) {
+      my @values = sort {$a<=>$b} @{$tile_metrics->{$lane}->{$code}};
       my $nvalues = scalar @values;
       my $n50 = int $nvalues / 2;
       my $min = $values[0];
       my $max = $values[$nvalues-1];
       my $p50 = ($nvalues % 2 ? $values[$n50] : ($values[$n50-1]+$values[$n50]) / 2);
-      $cluster_density_by_lane->{$is_pf}->{$lane}->{min} = $min;
-      $cluster_density_by_lane->{$is_pf}->{$lane}->{max} = $max;
-      $cluster_density_by_lane->{$is_pf}->{$lane}->{p50} = $p50;
+      $cluster_density_by_lane->{$lane}->{$code}->{min} = $min;
+      $cluster_density_by_lane->{$lane}->{$code}->{max} = $max;
+      $cluster_density_by_lane->{$lane}->{$code}->{p50} = $p50;
     }
   }
 
@@ -155,9 +153,9 @@ given a hash list of cluster densities, save them to database
 =cut
 sub save_to_db_list{
   my ($self, $cluster_density_by_lane) = @_;
-  for my $is_pf (0, 1) {
-    foreach my $lane (keys %{$cluster_density_by_lane->{$is_pf}}){
-      my $lane_values = $cluster_density_by_lane->{$is_pf}->{$lane};
+  foreach my $lane (keys %{$cluster_density_by_lane}){
+    for my $is_pf (0, 1) {
+      my $lane_values = $cluster_density_by_lane->{$lane}->{$is_pf};
       $self->save_to_db({lane => $lane,
                          is_pf=> $is_pf,
                          min  => $lane_values->{min},
