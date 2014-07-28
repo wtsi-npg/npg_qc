@@ -154,8 +154,9 @@ given a hash list of cluster densities, save them to database
 sub save_to_db_list{
   my ($self, $cluster_density_by_lane) = @_;
   foreach my $lane (keys %{$cluster_density_by_lane}){
-    for my $is_pf (0, 1) {
-      my $lane_values = $cluster_density_by_lane->{$lane}->{$is_pf};
+    for my $code (keys %{$cluster_density_by_lane->{$lane}}) {
+      my $is_pf = ($code =~ /[ ]pf$/smx ? 1 : 0);
+      my $lane_values = $cluster_density_by_lane->{$lane}->{$code};
       $self->save_to_db({lane => $lane,
                          is_pf=> $is_pf,
                          min  => $lane_values->{min},
