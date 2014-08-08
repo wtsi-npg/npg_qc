@@ -629,7 +629,7 @@ CREATE TABLE `genotype` (
   `reference` varchar(128) DEFAULT NULL,
   `bam_call_count` int(11) NOT NULL DEFAULT '0',
   `bam_call_string` varchar(256) DEFAULT NULL,
-  `bam_gt_depths_string` varchar(256) DEFAULT NULL,
+  `bam_gt_depths_string` varchar(512) DEFAULT NULL,
   `bam_gt_likelihood_string` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id_genotype`),
   UNIQUE KEY `unq_run_lane_genotype` (`id_run`,`position`,`tag_index`,`snp_call_set`)
@@ -1476,4 +1476,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-08 11:46:33
+-- Dump completed on 2014-08-08 15:18:09
