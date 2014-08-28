@@ -313,6 +313,8 @@ override 'execute'            => sub {
               # all other lines are assumed to contain amplitude, mean and std for each mode
               chomp($line);
               my @mode = split qq[ ], $line;
+              # if no std set the std to -1.0
+              push @mode, -1.0 if $#mode == 1;
               push @modes, \@mode;
           }
       }
