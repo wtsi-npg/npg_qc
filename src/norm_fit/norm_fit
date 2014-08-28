@@ -1,9 +1,0 @@
-#! /bin/bash -f
-
-echo "nmode=2"
-echo "confidence=0.5"
-echo "pass=1"
-echo "1.0,500.0,0.1"
-echo "0.01,50.0,0.1"
-
-
