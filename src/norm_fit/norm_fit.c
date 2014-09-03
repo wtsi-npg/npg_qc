@@ -25,21 +25,27 @@ usage:./mode_detect inp.txt pass_info
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <math.h>
 #include <string.h>
+#include <getopt.h>
 
 // ******** predefined user constants,
 
-#define Ncol 1      // Nunber of variant ids=fields  mainly histogram from NPG
-#define NPAR 3      // Number of PARameters and arguments
+#define NPAR 2      // Number of arguments
+
+#define MIN_DISTANCE  5     // minimum peak separation in bin widths
+#define MIN_AMPLITUDE   0.05  // minimum relative peak amplitide
 
 
 // ******** declarations of  functions
+void usage(int code);
+
 float GetMax (float hist[], int nbins);
 
 int FindMainMode (float hist[],int bins[],int nbins, float height);// mu for Norm fit
-float EstimateStd (float hist[],int bins[],int nbins, float height);// returns sd
+float EstimateStd (float hist[],int bins[],int nbins, int mu, float height);// returns sd
 float FitNormal(int mu, float sd,int bin);// returns one value from Norm pdf
 float Differ2Normal(float hist[],float histN[],int bins[],int nbins);// returns confidence
 
@@ -49,16 +55,24 @@ int CountPeaks(float hist[], int bins[], int nbins);// returns k=num_peaks
 int FilterDistance(int pos[], float amp[], int dist, int npos);//returns num_clus=#modes
 //============================================================MAIN
 
-int main    (int argc, char *argcv[])
+int main(int argc, char **argv)
 {
+    float min_distance = MIN_DISTANCE;
+    float min_amplitude = MIN_AMPLITUDE;
+    char *hist_file;
+    char *pass_file;
+    
+    int line_size = 1024;
+    char line[1024];
+    int count_lines;// lines in input file
 
-    FILE *distriFile, *passFile; //file handles
+    FILE *fp; //file handle
 
-    int count_lines;// lines in a inp file distri.txt
-    int val;// what is in the distriFile
-    int n;
+    float hist[100];
+    int bins[100];
+    int pos[100];//peak positions and their amplitudes after smoothing
+    float amp[100];//peak positions and their amplitudes after smoothing
 
-    int dist;
     int i,k;
 
     //to compute
@@ -69,53 +83,60 @@ int main    (int argc, char *argcv[])
     int pass;
     int diff;//difference in peak numbers while iterative smoothing
 
-    float sd;
     int mu;
-    float confidence;
-    float maxN,scale;
-    float ModeRatio,Ratio;
-
-    float hist[100];
-    int bins[100];
-    int pos[100];//peak positions and their amplitudes after smoothing
-    float amp[100];//peak positions and their amplitudes after smoothing
-
+    float sd;
+    float maxN, scale, confidence;
     float histN[100];
 
-    if(argc < NPAR)//two input_output files are submitted
+	static struct option long_options[] =
+        { {"min_distance", 1, 0, 'd'},
+          {"min_amplitude", 1, 0, 'a'},
+          {"help", 0, 0, 'h'},
+          {0, 0, 0, 0}
+        };
+
+    char c;
+	while ( (c = getopt_long(argc, argv, "d:a:h?", long_options, 0)) != -1) {
+		switch (c) {
+			case 'd':	min_distance = atof(optarg); break;
+			case 'a':	min_amplitude = atof(optarg); break;
+			case 'h':
+			case '?':	usage(0);					break;
+            default:	fprintf(stderr, "ERROR: Unknown option %c\n", c);
+						usage(1);
+						break;
+		}
+	}
+
+    if((argc-optind) < NPAR)//two input/output files are required
     {
-        fprintf(stderr, "not enough of parms |input_output files\n");
-        fprintf(stderr, "usage:./mode_detect inp.txt pass.txt\n");
+        usage(-1);
+    }
+    else
+    {
+        hist_file = argv[optind+0];
+        pass_file = argv[optind+1];
+    }
+    
+
+    // open input file
+    fp = fopen(hist_file,"r");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "cannot open hist file %s\n", hist_file);
         return -1;
     }
 
-    distriFile = fopen(argcv[1],"r");
-    if (distriFile == NULL)
-    {
-        fprintf(stderr, "cannot open first input distri.txt file %s\n", argcv[1]);
-        return -1;
-    }
-
-    // output1
-    passFile = fopen(argcv[2],"w");
-    if (passFile == NULL)
-    {
-        fprintf(stderr, "cannot open  output file pass.txt %s\n", argcv[2]);
-        return -1;
-    }
-
-    printf("mode_detection started\n");
-
-    //0.1   grab the histogram and params from the input: one field of input file
+    // read input file
     count_lines = 0;
-    while( (n = fscanf(distriFile,"%d", &val)) >= 0)
+    while (fgets(line, line_size, fp) != NULL)
     {
-        if (n != Ncol)     // incorrect format
+        int val;
+        if (1 != sscanf(line,"%d", &val))
         {
-            printf ("invalid input format\n");
+            printf ("invalid input format %s\n", line);
             return -1;
         }
-
         count_lines++;
         if (count_lines == 1)
             min_isize = val;
@@ -134,12 +155,15 @@ int main    (int argc, char *argcv[])
             bins[nbins] = min_isize + nbins * width;
             nbins++;
         }
-    } //END of  while loop for all distri file
+    }
 
-    //0.2  Hard-coded params
+    // use specified minimum peak separation is in bin widths
+    min_distance *= width;
 
-    dist = 5*width;
-    ModeRatio = 0.05;
+    // close input file
+    fclose(fp);
+
+    printf("mode_detection started\n");
 
     //1============================count peaks first time
     num_peI = CountPeaks(hist,bins,nbins);
@@ -188,12 +212,12 @@ int main    (int argc, char *argcv[])
 
     height = GetMax(amp,num_peS);//find max function for peaks after stabilizing
 
-    // ModeRatio filter
+    //1 ====================  filter for relative peak amplitude
     k = 0;
     for (i=0; i<num_peS; i++)
     {
-        Ratio = amp[i] / height;
-        if (Ratio > ModeRatio)
+        float amplitude = amp[i] / height;
+        if (amplitude > min_amplitude)
         {
             amp[k] = amp[i];
             pos[k] = pos[i];
@@ -203,19 +227,19 @@ int main    (int argc, char *argcv[])
     num_peR=k;
 
     //2 ====================  filter for distance b/w peaks
-    num_peD = FilterDistance(pos,amp,dist,num_peR);
+    num_peD = FilterDistance(pos,amp,min_distance,num_peR);
 
     //2 number of modes is the number of remaining peaks
     num_modes = num_peD;
 
     //3 -----------compute params of main mode
-    sd = EstimateStd(hist,bins,nbins,height);//for smoothed hist
     mu = FindMainMode(hist,bins,nbins,height);// mu for Norm fit
+    sd = EstimateStd(hist,bins,nbins,mu,height);//for smoothed hist
 
     //4 ---------------------Norm fit toMain Mode
     for (i=0; i<nbins; i++)
     {
-        histN[i] = FitNormal(mu, sd, bins[i]);// value from Norm pdf at bin
+        histN[i] = FitNormal(mu,sd,bins[i]);// value from Norm pdf at bin
     }
 
     // 4.2 scale histN to get same main peak height, smoothed
@@ -234,23 +258,28 @@ int main    (int argc, char *argcv[])
 
     printf("num peaks initially %d\n", num_peI);
     printf("num peaks after stabilizing %d\n", num_peS);
-    printf("num peaks after filtering on amplitude (threshold=%4.2f) %d\n", ModeRatio, num_peR);
-    printf("num peaks after filtering on distance (threshold=%d) %d\n", dist, num_peD);
+    printf("num peaks after filtering on amplitude (threshold=%.2f) %d\n", min_amplitude, num_peR);
+    printf("num peaks after filtering on distance (threshold=%.2f) %d\n", min_distance, num_peD);
     printf("confidence of normal fit %.2f\n", confidence);
     printf("pass %d\n", pass);
 
-    // OUTPUT=============================================fill in the output file hist
-
-    fprintf(passFile,"pass=%d\nconfidence=%.2f\nnmode=%d\n#amplitude,mu,std of main mode\n%.2f %d %.2f\n#amplitude,mu filtered modes\n",
-            pass,confidence,num_modes,height,mu,sd);
-
+    // open output file
+    fp = fopen(pass_file,"w");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "cannot open pass file %s\n", pass_file);
+        return -1;
+    }
+    fprintf(fp,"pass=%d\n", pass);
+    fprintf(fp,"confidence=%.2f\n", confidence);
+    fprintf(fp,"nmode=%d\n", num_modes);
+    fprintf(fp,"#amplitude,mu,std of main mode\n%.2f %d %.2f\n", height, mu, sd);
+    fprintf(fp,"#amplitude,mu filtered modes\n");
     for (k=0; k<num_modes; k++)
     {
-        fprintf(passFile,"%.2f %d\n",amp[k],pos[k]);
+        fprintf(fp,"%.2f %d\n",amp[k],pos[k]);
     }
-
-    fclose(distriFile);
-    fclose(passFile);
+    fclose(fp);
 
     printf("mode_detection finished\n");
     return 0;
@@ -259,6 +288,41 @@ int main    (int argc, char *argcv[])
 //=========================================================================================================================
 //=============================== FUNCTIONS
 //=========================================================================================================================
+
+//// ------------------------------usage
+void usage(int code)
+{
+	FILE *usagefp = stderr;
+
+	fprintf(usagefp, "norm_fit\n\n");
+	fprintf(usagefp,
+		"Usage: norm_fit [options] hist_file pass_file\n"
+		"\n" "  fit a normal distribution to a histogram of insert sizes\n" "\n");
+	fprintf(usagefp, "\n");
+	fprintf(usagefp, "  options:\n");
+	fprintf(usagefp, "\n");
+	fprintf(usagefp, "    -d  minimum distance between peaks in bin widths\n");
+	fprintf(usagefp, "        peaks closer than this will be clustered\n");
+	fprintf(usagefp, "        default 5\n");
+	fprintf(usagefp, "\n");
+	fprintf(usagefp, "    -a  minimum relative peak amplitude\n");
+	fprintf(usagefp, "        peaks smaller than this will be ignored\n");
+	fprintf(usagefp, "        default 0.05\n");
+	fprintf(usagefp, "\n");
+	fprintf(usagefp, "  hist file format:\n");
+	fprintf(usagefp, "\n");
+	fprintf(usagefp, "    one integer value per line\n");
+	fprintf(usagefp, "\n");
+	fprintf(usagefp, "    minimum insert size\n");
+	fprintf(usagefp, "    insert size bin width\n");
+	fprintf(usagefp, "    number of bins\n");
+	fprintf(usagefp, "    bin count 1\n");
+	fprintf(usagefp, "    bin count 2\n");
+	fprintf(usagefp, "      .\n");
+	fprintf(usagefp, "      .\n");
+
+	exit(code);
+}
 
 //// ------------------------------maximum value
 float GetMax (float hist[], int nbins)
@@ -278,7 +342,7 @@ float GetMax (float hist[], int nbins)
 }
 
 //// ------------------------------estimate std of main mode
-float EstimateStd (float hist[],int bins[],int nbins, float height)
+float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
 {
     int n;
     int ma_bin = -1;
@@ -289,13 +353,34 @@ float EstimateStd (float hist[],int bins[],int nbins, float height)
 
     for (n=0; n<nbins; n++)
     {
-        if (hist[n] > threshold)
+        if (bins[n] >= mu)
         {
-            if (mi_bin < 0 )
-                mi_bin = bins[n];
-            ma_bin = bins[n];
+            if (hist[n] > threshold)
+            {
+                ma_bin = bins[n];
+            }
+            else
+            {
+                break;
+            }
         }
     }
+
+    for (n=nbins-1; n>=0; n--)
+    {
+        if (bins[n] <= mu)
+        {
+            if (hist[n] > threshold)
+            {
+                mi_bin = bins[n];
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
     sd = 0.5 * (ma_bin - mi_bin);
 
     return sd;
