@@ -310,11 +310,9 @@ override 'execute'            => sub {
                   $self->result->norm_fit_pass($value);
               }
           } else {
-              # all other lines are assumed to contain amplitude, mean and std for each mode
+              # all other lines are assumed to contain amplitude, mean and optionally std for each mode
               chomp($line);
               my @mode = split qq[ ], $line;
-              # if no std set the std to -1.0
-              push @mode, -1.0 if $#mode == 1;
               push @modes, \@mode;
           }
       }
