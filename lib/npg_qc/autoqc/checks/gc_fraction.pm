@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Maintainer:    $Author: mg8 $
 # Created:       3 February 2010
-# Last Modified: $Date: 2013-01-28 11:56:56 +0000 (Mon, 28 Jan 2013) $
-# Id:            $Id: gc_fraction.pm 16569 2013-01-28 11:56:56Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/gc_fraction.pm $
 #
 #
 
@@ -38,10 +34,6 @@ our $VERSION = '0';
 =head1 NAME
 
 npg_qc::autoqc::checks::gc_fraction
-
-=head1 VERSION
-
-$Revision: 16569 $
 
 =head1 SYNOPSIS
 

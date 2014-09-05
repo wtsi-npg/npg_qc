@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 5.5.34, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.38, for debian-linux-gnu (x86_64)
 --
 -- Host: mcs11    Database: npgqct
 -- ------------------------------------------------------
@@ -620,9 +620,9 @@ CREATE TABLE `genotype` (
   `bam_file_md5` varchar(64) DEFAULT NULL,
   `reference` varchar(128) DEFAULT NULL,
   `bam_call_count` int(11) NOT NULL DEFAULT '0',
-  `bam_call_string` varchar(128) DEFAULT NULL,
-  `bam_gt_depths_string` varchar(128) DEFAULT NULL,
-  `bam_gt_likelihood_string` varchar(512) DEFAULT NULL,
+  `bam_call_string` varchar(256) DEFAULT NULL,
+  `bam_gt_depths_string` varchar(512) DEFAULT NULL,
+  `bam_gt_likelihood_string` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id_genotype`),
   UNIQUE KEY `unq_run_lane_genotype` (`id_run`,`position`,`tag_index`,`snp_call_set`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -1468,4 +1468,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-30 12:08:01
+-- Dump completed on 2014-08-14 10:03:21

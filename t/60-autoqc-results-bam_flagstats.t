@@ -1,15 +1,11 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author$
 # Created:       2010-06-23
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;
 use warnings;
-use Test::More tests => 21;
+use Test::More tests => 23;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw/ tempdir /;
@@ -50,11 +46,12 @@ use_ok ('npg_qc::autoqc::results::bam_flagstats');
     is($r->percent_properly_paired ,89.7229484595978, 'percent properly paired');
     is($r->percent_singletons, 2.92540938863795, 'percent singletons');
     is($r->check_name(), 'bam flagstats', 'correct check name');
+    is($r->filename4serialization(), '4783_5.bam_flagstats.json', 'default filename');
     $r->human_split('human');
     is($r->check_name(), 'bam flagstats human', 'correct check name');
     is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
-    
-        
+    is($r->filename4serialization(), '4783_5_human.bam_flagstats.json', 'default filename');
+
     open my $flagstats_fh2, '<', 't/data/autoqc/6440_1#0.bamflagstats';
     $r->parsing_flagstats($flagstats_fh2);
     close $flagstats_fh2; 

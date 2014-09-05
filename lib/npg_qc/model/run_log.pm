@@ -1,10 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: jo3 $
 # Created:       2008-09-25
-# Last Modified: $Date: 2010-03-30 16:40:28 +0100 (Tue, 30 Mar 2010) $
-# Id:            $Id: run_log.pm 8943 2010-03-30 15:40:28Z jo3 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/run_log.pm $
 #
 
 package npg_qc::model::run_log;
@@ -68,10 +64,6 @@ __END__
 =head1 NAME
 
 npg_qc::model::run_log
-
-=head1 VERSION
-
-$Revision: 8943 $
 
 =head1 SYNOPSIS
 

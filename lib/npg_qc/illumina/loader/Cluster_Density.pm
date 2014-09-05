@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       2010-01-27
-# Last Modified: $Date: 2013-09-26 12:37:25 +0100 (Thu, 26 Sep 2013) $
-# Id:            $Id: Cluster_Density.pm 17529 2013-09-26 11:37:25Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader/Cluster_Density.pm $
 #
 
 package npg_qc::illumina::loader::Cluster_Density;
@@ -18,15 +14,18 @@ extends 'npg_qc::illumina::loader::base';
 
 our $VERSION = '0';
 
+#keys used in hash and corresponding codes in tile metrics interop file
+Readonly::Scalar our $TILE_METRICS_INTEROP_CODES => {'cluster density'    => 100,
+                                                     'cluster density pf' => 101,
+                                                     'cluster count'      => 102,
+                                                     'cluster count pf'   => 103,
+                                                     };
+
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
 
 npg_qc::illumina::loader::Cluster_Density
-
-=head1 VERSION
-
-$Revision: 17529 $
 
 =head1 SYNOPSIS
 
@@ -45,41 +44,31 @@ id_run list already in the database
 sub _build_runlist_db {
    my $self = shift;
    my $runlist_db = {};
-   my $query = q{SELECT id_run, count(*) AS c FROM cluster_density GROUP BY id_run HAVING c = 16};
+   my $query = q{SELECT id_run, count(*) AS c FROM cluster_density GROUP BY id_run};
    my $rows_ref = $self->dbh->selectall_arrayref($query);
    if($rows_ref) {
      foreach my $row_ref (@{$rows_ref}){
-       $runlist_db->{$row_ref->[0]} = 1;
+       my $run_lane = $self->schema_npg_tracking->resultset( q(RunLane) )->search( { id_run => $row_ref->[0] } );
+       my $expected = 2 * $run_lane->count;
+       if ($expected == $row_ref->[1]) {
+         $runlist_db->{$row_ref->[0]} = 1;
+       }
      }
    }
    return $runlist_db;
 }
 
-=head2 raw_xml_file
+=head2 tile_metrics_interop_file
 
-  raw cluster density by lane xml file name
+  tile metrics interop file name
 =cut
-has 'raw_xml_file' => (isa => q{Str},
+has 'tile_metrics_interop_file' => (isa => q{Str},
                        is => q{rw},
                        lazy_build => 1,
                       );
-sub _build_raw_xml_file {
+sub _build_tile_metrics_interop_file {
   my $self = shift;
-  return $self->reports_path().q{/NumClusters By Lane.xml};
-}
-
-=head2 pf_xml_file
-
-  pf cluster density by lane xml file name
-
-=cut
-has 'pf_xml_file' => (isa => q{Str},
-                      is => q{rw},
-                      lazy_build => 1,
-                     );
-sub _build_pf_xml_file {
-  my $self = shift;
-  return $self->reports_path().q{/NumClusters By Lane PF.xml};
+  return $self->runfolder_path().q{/InterOp/TileMetricsOut.bin};
 }
 
 =head2 run
@@ -90,50 +79,91 @@ loads one run cluster density data
 sub run {
   my ($self) = @_;
   $self->mlog(q{Loading Illumina cluster density data for Run } . $self->id_run() . q{ into QC database});
-  $self->save_to_db_list($self->parsing_xml($self->raw_xml_file()), 0);
-  $self->save_to_db_list($self->parsing_xml($self->pf_xml_file()), 1);
+  $self->save_to_db_list($self->parsing_interop($self->tile_metrics_interop_file));
   return;
 }
 
-=head2 parsing_xml
+=head2 parsing_interop
 
-given one cluster dessity xml file, return a hashref
+given one tile metrics interop file, return a hashref
 
 =cut
-
-sub parsing_xml {
-  my ($self, $xml) = @_;
+sub parsing_interop {
+  my ($self, $interop) = @_;
 
   my $cluster_density_by_lane = {};
-  my $xml_dom = $self->parser->parse_file( $xml );
-  my @lane_list = $xml_dom->getElementsByTagName('Lane');
-  foreach my $lane (@lane_list){
-    my $key = $lane->getAttribute('key');
-    my $min = $lane->getAttribute('min');
-    my $max = $lane->getAttribute('max');
-    my $p50 = $lane->getAttribute('p50');
-    $cluster_density_by_lane->{$key}->{min} = $min;
-    $cluster_density_by_lane->{$key}->{max} = $max;
-    $cluster_density_by_lane->{$key}->{p50} = $p50;
+
+  my $version;
+  my $length;
+  my $data;
+
+  my $template = 'v3f'; # three two-byte integers and one 4-byte float
+
+  ## no critic (InputOutput::RequireBriefOpen)
+  open my $fh, q{<}, $interop or croak qq{Couldn't open interop file $interop, error $ERRNO};
+  binmode $fh, ':raw';
+
+  $fh->read($data, 1) or croak qq{Couldn't read file version in interop file $interop, error $ERRNO};
+  $version = unpack 'C', $data;
+
+  $fh->read($data, 1) or croak qq{Couldn't read record length in interop file $interop, error $ERRNO};
+  $length = unpack 'C', $data;
+
+  my $tile_metrics = {};
+
+  while ($fh->read($data, $length)) {
+    my ($lane,$tile,$code,$value) = unpack $template, $data;
+    if( $code == $TILE_METRICS_INTEROP_CODES->{'cluster density'} ){
+      push @{$tile_metrics->{$lane}->{'cluster density'}}, $value;
+    }elsif( $code == $TILE_METRICS_INTEROP_CODES->{'cluster density pf'} ){
+      push @{$tile_metrics->{$lane}->{'cluster density pf'}}, $value;
+    }
   }
+
+  $fh->close() or croak qq{Couldn't close interop file $interop, error $ERRNO};
+
+  my $lanes = scalar keys %{$tile_metrics};
+  if( $lanes == 0){
+    $self->mlog( 'No cluster density data' );
+    return $cluster_density_by_lane;
+  }
+
+  # calc lane stats
+  foreach my $lane (keys %{$tile_metrics}){
+    for my $code (keys %{$tile_metrics->{$lane}}) {
+      my @values = sort {$a<=>$b} @{$tile_metrics->{$lane}->{$code}};
+      my $nvalues = scalar @values;
+      my $n50 = int $nvalues / 2;
+      my $min = $values[0];
+      my $max = $values[$nvalues-1];
+      my $p50 = ($nvalues % 2 ? $values[$n50] : ($values[$n50-1]+$values[$n50]) / 2);
+      $cluster_density_by_lane->{$lane}->{$code}->{min} = $min;
+      $cluster_density_by_lane->{$lane}->{$code}->{max} = $max;
+      $cluster_density_by_lane->{$lane}->{$code}->{p50} = $p50;
+    }
+  }
+
   return $cluster_density_by_lane;
 }
 
 =head2 save_to_db_list
 
-given a hash list and whether this list is for pf cluster, save them to database
+given a hash list of cluster densities, save them to database
 
 =cut
 sub save_to_db_list{
-  my ($self, $cluster_density_by_lane, $is_pf) = @_;
+  my ($self, $cluster_density_by_lane) = @_;
   foreach my $lane (keys %{$cluster_density_by_lane}){
-    my $lane_values = $cluster_density_by_lane->{$lane};
-    $self->save_to_db({lane => $lane,
-                       is_pf=> $is_pf,
-                       min  => $lane_values->{min},
-                       max  => $lane_values->{max},
-                       p50  => $lane_values->{p50},
-                      });
+    for my $code (keys %{$cluster_density_by_lane->{$lane}}) {
+      my $is_pf = ($code =~ /[ ]pf$/smx ? 1 : 0);
+      my $lane_values = $cluster_density_by_lane->{$lane}->{$code};
+      $self->save_to_db({lane => $lane,
+                         is_pf=> $is_pf,
+                         min  => $lane_values->{min},
+                         max  => $lane_values->{max},
+                         p50  => $lane_values->{p50},
+                        });
+    }
   }
   return;
 }

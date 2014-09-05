@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: dj3 $
 # Created:       2009-09-21
-# Last Modified: $Date: 2011-08-26 09:04:04 +0100 (Fri, 26 Aug 2011) $
-# Id:            $Id: split_stats.pm 14059 2011-08-26 08:04:04Z dj3 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/split_stats.pm $
 #
 
 package npg_qc::autoqc::role::split_stats;
@@ -336,10 +332,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::role::split_stats
-
-=head1 VERSION
-
-$Revision: 14059 $
 
 =head1 SYNOPSIS
 

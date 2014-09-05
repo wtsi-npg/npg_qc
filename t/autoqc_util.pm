@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Maintainer:    $Author$
 # Created:       2008-06-12
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 package t::autoqc_util;

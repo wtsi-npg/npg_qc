@@ -2,11 +2,7 @@
 
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author$
 # Created:       9 August 2010
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 
 use strict;

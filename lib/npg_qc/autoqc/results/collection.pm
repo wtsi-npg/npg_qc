@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       03 September 2009
-# Last Modified: $Date: 2013-01-28 11:56:56 +0000 (Mon, 28 Jan 2013) $
-# Id:            $Id: collection.pm 16569 2013-01-28 11:56:56Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/collection.pm $
 #
 
 package npg_qc::autoqc::results::collection;
@@ -34,10 +30,6 @@ our $VERSION = '0';
 =head1 NAME
 
 npg_qc::autoqc::results::collection
-
-=head1 VERSION
-
-$Revision: 16569 $
 
 =head1 SYNOPSIS
 

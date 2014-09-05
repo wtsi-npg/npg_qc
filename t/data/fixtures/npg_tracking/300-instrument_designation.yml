@@ -1,0 +1,13 @@
+---
+- id_instrument_designation: 1
+  id_instrument:             4
+  id_designation:            2
+- id_instrument_designation: 2
+  id_instrument:             31
+  id_designation:            2
+- id_instrument_designation: 3
+  id_instrument:             34
+  id_designation:            3
+- id_instrument_designation: 4
+  id_instrument:             34
+  id_designation:            2

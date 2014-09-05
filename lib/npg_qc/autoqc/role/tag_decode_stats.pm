@@ -1,10 +1,6 @@
 #########
 # Author:        gq1
-# Maintainer:    $Author: mg8 $
 # Created:       23 March 2010
-# Last Modified: $Date: 2012-07-23 11:22:17 +0100 (Mon, 23 Jul 2012) $
-# Id:            $Id: tag_decode_stats.pm 15913 2012-07-23 10:22:17Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/role/tag_decode_stats.pm $
 #
 
 package npg_qc::autoqc::role::tag_decode_stats;
@@ -217,10 +213,6 @@ __END__
 =head1 NAME
 
     npg_qc::autoqc::role::tag_decode_stats
-
-=head1 VERSION
-
-    $Revision: 15913 $
 
 =head1 SYNOPSIS
 

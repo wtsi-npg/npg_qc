@@ -1,0 +1,34 @@
+---
+- description: PE module
+  id_instrument_mod_dict: 1
+  revision: A
+- description: PE module
+  id_instrument_mod_dict: 2
+  revision: B
+- description: PE module
+  id_instrument_mod_dict: 3
+  revision: C
+- description: PE module
+  id_instrument_mod_dict: 4
+  revision: D
+- description: PE module
+  id_instrument_mod_dict: 5
+  revision: E
+- description: PE module
+  id_instrument_mod_dict: 6
+  revision: F
+- description: Prism
+  id_instrument_mod_dict: 7
+  revision: 67deg
+- description: Objective
+  id_instrument_mod_dict: 8
+  revision: Custom
+- description: Objective
+  id_instrument_mod_dict: 9
+  revision: Lead Free
+- description: Mode Scrambler
+  id_instrument_mod_dict: 10
+  revision: MKIV
+- description: SCS
+  id_instrument_mod_dict: 11
+  revision: 2.8

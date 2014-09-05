@@ -1,10 +1,6 @@
 #############
-# $Id: loader.pm 18421 2014-05-14 10:19:54Z mg8 $
 # Created By: ajb
-# Mast Maintained By: $Author: mg8 $
 # Created On: 2009-11-24
-# Last Changed On: $Date: 2014-05-14 11:19:54 +0100 (Wed, 14 May 2014) $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/illumina/loader.pm $
 
 package npg_qc::illumina::loader;
 
@@ -21,10 +17,6 @@ our $VERSION = '0';
 =head1 NAME
 
 npg_qc::illumina::loader
-
-=head1 VERSION
-
-$Revision: 18421 $
 
 =head1 SYNOPSIS
 
@@ -212,7 +204,7 @@ __END__
 
 =head1 AUTHOR
 
-$Author: mg8 $
+Andy Brown
 
 =head1 LICENSE AND COPYRIGHT
 

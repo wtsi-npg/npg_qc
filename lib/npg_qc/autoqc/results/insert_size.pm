@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       14 April 2009
-# Last Modified: $Date: 2013-01-10 14:09:35 +0000 (Thu, 10 Jan 2013) $
-# Id:            $Id: insert_size.pm 16446 2013-01-10 14:09:35Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/results/insert_size.pm $
 #
 
 package npg_qc::autoqc::results::insert_size;
@@ -30,10 +26,6 @@ our $VERSION = '0';
 =head1 NAME
 
 npg_qc::autoqc::results::insert_size
-
-=head1 VERSION
-
-$Revision: 16446 $
 
 =head1 SYNOPSIS
 
@@ -214,6 +206,47 @@ has 'reference' => (isa      => 'Maybe[Str]',
                     is       => 'rw',
                     required => 0,
 		   );
+
+=head2 norm_fit_nmode
+
+Number of normal modes
+
+=cut
+has 'norm_fit_nmode'    => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
+                       is              => 'rw',
+                       required        => 0,
+                      );
+
+=head2 norm_confidence
+
+Confidence of normal fit
+
+=cut
+has 'norm_fit_confidence'    => (isa             => 'Maybe[Num]',
+                            is              => 'rw',
+                            required        => 0,
+                           );
+
+=head2 norm_fit_pass
+
+Normal fit pass/fail
+
+=cut
+has 'norm_fit_pass'     => (isa      => 'Maybe[Bool]',
+                       is       => 'rw',
+                       required => 0,
+                      );
+
+=head2 norm_fit_modes
+
+Normal fit modes (amp, mean and stdev for each mode)
+
+=cut
+has 'norm_fit_modes'     => (isa      => 'Maybe[ArrayRef]',
+                       is       => 'rw',
+                       required => 0,
+                      );
+
 
 no Moose;
 

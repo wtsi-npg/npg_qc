@@ -1,9 +1,5 @@
 # Author:        Jennifer Liddle
-# Maintainer:    $Author: kl2 $
 # Created:       2014-02-06
-# Last Modified: $Date: 2013-04-11 16:31:25 +0100 (Thu, 11 Apr 2013) $
-# Id:            $Id: genotype.pm 17015 2013-04-11 15:31:25Z kl2 $
-# $HeadURL: svn+ssh://intcvs1/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-55.0/lib/npg_qc/autoqc/checks/genotype.pm $
 #
 #
 
@@ -33,6 +29,17 @@ Readonly::Scalar my $MIN_FREEMIX => 0.05;
 
 has '+input_file_ext' => (default => $EXT,);
 
+has 'alignments_in_bam'  => (
+	is => 'ro',
+	isa => 'Maybe[Bool]',
+	lazy_build => 1,
+);
+sub _build_alignments_in_bam {
+	my ($self) = @_;
+
+	return $self->lims->alignments_in_bam;
+}
+
 has 'bam_file' => (
   is => 'ro',
   isa => 'Str',
@@ -47,10 +54,31 @@ sub _build_bam_file {
 override 'can_run' => sub {
   my $self = shift;
 
+  if ($self->lims->library_type && $self->lims->library_type =~ /(?:cD|R)NA/sxm) {
+    $self->result->add_comment("library_type is $self->lims->library_type");
+    return 0;
+  }
+
+  # make sure that the bam file is aligned and a reference genome is defined
+
+  if(!$self->alignments_in_bam) {
+    $self->result->add_comment('alignments_in_bam is false');
+    return 0;
+  }
+
+  if(!defined($self->lims->reference_genome)) {
+		$self->result->add_comment('No reference genome specified');
+    return 0;
+  }
+
   # we want to run iff there is a VCF file for this organism/strain/bait
-  if ($self->snv_file) { return 1; }
-  $self->_cant_run_ms(q(Can't find VCF file));
-  return 0;
+
+  if (!$self->snv_file) {
+    $self->result->add_comment(q(Can't find VCF file));
+    return 0;
+  }
+
+  return 1;
 };
 
 override 'execute' => sub {
@@ -113,10 +141,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::checks::verify_bam_id - compare genotype from bam with Sequenom QC results
-
-=head1 VERSION
-
-    $Revision: 17015 $
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,6 @@
 #########
 # Author:        Aylwyn Scally
-# Maintainer:    $Author: kl2 $
 # Created:       2008-11-26
-# Last Modified: $Date: 2013-04-03 16:10:56 +0100 (Wed, 03 Apr 2013) $
-# Id:            $Id: gc_bias.pm 16957 2013-04-03 15:10:56Z kl2 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/gc_bias.pm $
 #
 #
 
@@ -323,10 +319,6 @@ __END__
 
 npg_qc::autoqc::checks::gc_bias - assess the degree of gc_bias in reads
     aligned to the reference.
-
-=head1 VERSION
-
-    $Revision: 16957 $
 
 =head1 SYNOPSIS
 

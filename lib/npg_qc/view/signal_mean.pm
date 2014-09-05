@@ -1,11 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date: 2012-03-22 12:35:20 +0000 (Thu, 22 Mar 2012) $
-# Id:            $Id: signal_mean.pm 15373 2012-03-22 12:35:20Z mg8 $
-# Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/signal_mean.pm $
 #
 
 package npg_qc::view::signal_mean;
@@ -188,10 +183,6 @@ __END__
 =head1 NAME
 
 npg_qc::view::signal_mean
-
-=head1 VERSION
-
-$Revision: 15373 $
 
 =head1 SYNOPSIS
 

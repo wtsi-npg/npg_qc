@@ -1,10 +1,6 @@
 #########
 # Author:        John O'Brien
-# Maintainer:    $Author: kl2 $
 # Created:       24 September 2009
-# Last Modified: $Date: 2013-11-08 09:21:39 +0000 (Fri, 08 Nov 2013) $
-# Id:            $Id: ref_match.pm 17722 2013-11-08 09:21:39Z kl2 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/checks/ref_match.pm $
 
 package npg_qc::autoqc::checks::ref_match;
 
@@ -365,10 +361,6 @@ __END__
 
 npg_qc::autoqc::checks::ref_match - do a contamination check
 based on a sample of the sequence reads rather than the reference genomes.
-
-=head1 VERSION
-
-$Revision: 17722 $
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: mg8 $
 # Created:       2008-06-10
-# Last Modified: $Date: 2012-04-02 10:00:34 +0100 (Mon, 02 Apr 2012) $
-# Id:            $Id: cumulative_errors_by_cycle.pm 15413 2012-04-02 09:00:34Z mg8 $
-# Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/view/cumulative_errors_by_cycle.pm $
 #
 
 package npg_qc::view::cumulative_errors_by_cycle;
@@ -54,10 +49,6 @@ __END__
 =head1 NAME
 
 npg_qc::view::cumulative_errors_by_cycle
-
-=head1 VERSION
-
-$Revision: 15413 $
 
 =head1 SYNOPSIS
 

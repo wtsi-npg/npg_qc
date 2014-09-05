@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Maintainer:    $Author: mg8 $
 # Created:       2008-11-26
-# Last Modified: $Date: 2013-01-10 14:09:35 +0000 (Thu, 10 Jan 2013) $
-# Id:            $Id: alignment.pm 16446 2013-01-10 14:09:35Z mg8 $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/autoqc/parse/alignment.pm $
 #
 #
 
@@ -26,10 +22,6 @@ our $VERSION = '0';
 =head1 NAME
 
 npg_qc::autoqc::parse::alignment
-
-=head1 VERSION
-
-$Revision: 16446 $
 
 =head1 SYNOPSIS
 

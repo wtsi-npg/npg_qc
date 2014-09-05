@@ -109,10 +109,6 @@ __END__
 
 npg_qc::Schema::Flators
 
-=head1 VERSION
-
-$LastChangedRevision: 18173 $
-
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION

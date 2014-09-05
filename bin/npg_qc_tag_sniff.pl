@@ -1,11 +1,7 @@
 #!/usr/bin/env perl
 #########
 # Author:        nf2
-# Maintainer:    $Author$
 # Created:       18 Nov 2011
-# Last Modified: $Date: 2011-11-18 11:19:31 +0100$
-# Id:            $Id$
-# $HeadURL$
 #
 
 #########################
@@ -41,7 +37,7 @@ sub usage {
   print STDERR "        --relative_max_drop <int>\n";
   print STDERR "          stop reporting when the drop in tag count relative to the previous tag exceeds this factor, default 10\n";
   print STDERR "\n";
-  print STDERR "        --absolue_max_drop <int>\n";
+  print STDERR "        --absolute_max_drop <int>\n";
   print STDERR "          stop reporting when the drop in tag count relative to the most common tag exceeds this factor, default 10\n";
   print STDERR "\n";
   print STDERR "        --degenerate_toleration\n";
@@ -165,10 +161,6 @@ __END__
 =head1 NAME
 
 tag_sniff.pl
-
-=head1 VERSION
-
-$LastChangedRevision$
 
 =head1 USAGE
   

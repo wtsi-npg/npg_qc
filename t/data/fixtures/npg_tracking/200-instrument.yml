@@ -1,0 +1,203 @@
+---
+- external_name: ''
+  id_instrument: 48
+  id_instrument_format: 7
+  serial: ''
+  name: cBot1
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host:
+  staging_dir:
+  latest_contact: '2010-05-11 13:34:04'
+  percent_complete: 40
+- external_name: eas15
+  id_instrument: 3
+  id_instrument_format: 4
+  ipaddr: 192.168.255.3
+  iscurrent: 0
+  name: IL1
+  serial: ''
+  instrument_comp:
+  mirroring_host:
+  staging_dir:
+  latest_contact:
+- external_name: eas37
+  id_instrument: 4
+  id_instrument_format: 4
+  ipaddr: 192.168.255.4
+  iscurrent: 1
+  name: IL2
+  serial: ''
+  latest_contact:
+- external_name: eas92
+  id_instrument: 6
+  id_instrument_format: 4
+  ipaddr: 192.168.255.6
+  iscurrent: 1
+  name: IL3
+  serial: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 7
+  id_instrument_format: 4
+  ipaddr: 192.168.255.9
+  iscurrent: 1
+  name: IL4
+  serial: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 8
+  id_instrument_format: 4
+  ipaddr: 192.168.255.10
+  iscurrent: 1
+  name: IL5
+  serial: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 9
+  id_instrument_format: 4
+  ipaddr: 192.168.255.11
+  iscurrent: 1
+  name: IL6
+  serial: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 10
+  id_instrument_format: 4
+  ipaddr: 192.168.255.12
+  iscurrent: 1
+  name: IL7
+  serial: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 11
+  id_instrument_format: 4
+  ipaddr: 192.168.255.13
+  iscurrent: 1
+  name: IL8
+  serial: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 12
+  id_instrument_format: 4
+  ipaddr: 192.168.255.14
+  iscurrent: 1
+  name: IL9
+  serial: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 13
+  id_instrument_format: 4
+  ipaddr: 192.168.255.15
+  iscurrent: 1
+  name: IL10
+  serial: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 14
+  id_instrument_format: 4
+  ipaddr: 192.168.255.16
+  iscurrent: 1
+  name: IL11
+  serial: ''
+  latest_contact:
+- external_name: EAS267
+  id_instrument: 31
+  id_instrument_format: 4
+  name: IL28
+  serial: ''
+  iscurrent: 1
+  ipaddr: 192.168.255.33
+  instrument_comp: il28win
+  mirroring_host: sf-1-1-08
+  staging_dir: /staging/IL28/incoming
+  latest_contact:
+- external_name: ''
+  id_instrument: 34
+  id_instrument_format: 4
+  serial: ''
+  name: IL29
+  iscurrent: 1
+  ipaddr: 192.168.255.34
+  instrument_comp: il29win
+  mirroring_host: sf-1-1-01
+  staging_dir: /staging/IL29/incoming
+  latest_contact:
+- external_name: ''
+  id_instrument: 35
+  id_instrument_format: 10
+  serial: ''
+  name: HS1
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host: ''
+  staging_dir: ''
+  latest_contact:
+- external_name: ''
+  id_instrument: 36
+  id_instrument_format: 10
+  serial: ''
+  name: HS2
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host: ''
+  staging_dir: ''
+  latest_contact:
+- id_instrument: 64
+  name: HS3
+  id_instrument_format: 10
+  external_name: ''
+  serial: ''
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host: ''
+  staging_dir: ''
+  latest_contact:
+- id_instrument: 90
+  name: MS1
+  id_instrument_format: 11
+  external_name: ''
+  serial: ''
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host: ''
+  staging_dir: ''
+  latest_contact:
+- id_instrument: 91
+  name: HX1
+  id_instrument_format: 12
+  external_name: ''
+  serial: ''
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host: ''
+  staging_dir: ''
+  latest_contact:
+- id_instrument: 92
+  name: HX2
+  id_instrument_format: 12
+  external_name: ''
+  serial: ''
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host: ''
+  staging_dir: ''
+  latest_contact:
+- id_instrument: 66
+  name: HS6
+  id_instrument_format: 10
+  external_name: ''
+  serial: ''
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host: ''
+  staging_dir: ''
+  latest_contact:

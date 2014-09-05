@@ -1,11 +1,6 @@
 #########
 # Author:        ajb
-# Maintainer:    $Author: jo3 $
 # Created:       2008-06-10
-# Last Modified: $Date: 2010-03-30 16:40:28 +0100 (Tue, 30 Mar 2010) $
-# Id:            $Id: most_common_word.pm 8943 2010-03-30 15:40:28Z jo3 $
-# Source:        $Source: /repos/cvs/webcore/SHARED_docs/cgi-bin/docrep,v $
-# $HeadURL: svn+ssh://intcvs1.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/trunk/lib/npg_qc/model/most_common_word.pm $
 #
 
 package npg_qc::model::most_common_word;
@@ -84,10 +79,6 @@ __END__
 =head1 NAME
 
 npg_qc::model::most_common_word
-
-=head1 VERSION
-
-$Revision: 8943 $
 
 =head1 SYNOPSIS
 

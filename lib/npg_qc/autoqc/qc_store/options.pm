@@ -1,10 +1,6 @@
 #########
 # Author:        Marina Gourtovaia
-# Maintainer:    $Author: mg8 $
 # Created:       13 July 2010
-# Last Modified: $Date: 2010-04-16 11:24:16 +0100 (Fri, 16 Apr 2010) $
-# Id:            $Id: types.pm 9053 2010-04-16 10:24:16Z mg8 $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-qc/branches/prerelease-30.0/lib/npg_qc/autoqc/types.pm $
 #
 
 package npg_qc::autoqc::qc_store::options;
@@ -29,10 +25,6 @@ __END__
 =head1 NAME
 
 npg_qc::autoqc::qc_store::options
-
-=head1 VERSION
-
-$Revision: 9053 $
 
 =head1 SYNOPSIS
 

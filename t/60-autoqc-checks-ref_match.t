@@ -1,10 +1,6 @@
 #########
 # Author:        jo3
-# Maintainer:    $Author$
 # Created:       Autumn 2010
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
 #
 use strict;
 use warnings;
