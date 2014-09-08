@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - support for search for autoqc objects without tag_index attrubute
+ - Build.PL extended to compile and deploy norm_fit executable
+
 release 56.9
  - database name-agnostic database dump file
 
