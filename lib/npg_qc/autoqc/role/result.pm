@@ -109,7 +109,7 @@ Supports comparison on the following attributes:
 sub equals_byvalue {
     my ($self, $h) = @_;
     if (!$h) {
-        croak q[Parameters hash shoudl be given];
+        croak q[Parameters hash should be given];
     }
     my @keys =keys %{$h};
     if (!@keys) {

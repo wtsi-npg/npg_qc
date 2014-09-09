@@ -15,7 +15,7 @@ use t::autoqc_util;
 use_ok('npg_qc::autoqc::checks::insert_size');
 
 my $current_dir = cwd();
-local $ENV{'PATH'} = join q[:], qq[$current_dir/blib/scrips] , $ENV{'PATH'};
+local $ENV{'PATH'} = join q[:], qq[$current_dir/blib/script] , $ENV{'PATH'};
 my $repos = catfile($current_dir, q[t/data/autoqc]);
 my $ref = catfile($repos, q[references]);
 my $format = q[sam];
