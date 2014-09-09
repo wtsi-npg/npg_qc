@@ -318,6 +318,7 @@ my $test_bam = 0;
   $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], t::autoqc_util::insert_size_additional_modules));
+  $eqc->result->comments('Not enough properly paired reads for normal fitting');
   #### Construct expected  object: END ####
 
   cmp_deeply ($qc->result, $eqc->result, 'result object after the execution');
@@ -355,7 +356,7 @@ my $test_bam = 0;
 
   is($qc->result->expected_size, undef, 
     'expected size result array undefined for a sample where no expected size is specified');
-  like($qc->result->comments, qr/Expected insert size is not defined/, 'comment for a sample where no expected size is specified');
+  like($qc->result->comments, qr/Not enough properly paired reads for normal fitting/, 'comment for a sample where no expected size is specified');
   is($qc->result->pass, undef, 'pass value undefined for a sample where no expected size is specified');
 }
 
@@ -482,6 +483,7 @@ my $test_bam = 0;
   $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], t::autoqc_util::insert_size_additional_modules));
+  $eqc->result->comments('Not enough properly paired reads for normal fitting');
   #### Construct expected  object: END ####
 
   cmp_deeply ($qc->result, $eqc->result, 'result object after the execution for one result');
