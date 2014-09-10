@@ -1,8 +1,3 @@
-#########
-# Author:        gq1
-# Created:       29 October 2009
-#
-
 package npg_qc::autoqc::role::result;
 
 use Moose::Role;
@@ -10,12 +5,17 @@ use Carp;
 use File::Spec::Functions qw(catfile);
 use JSON;
 use MooseX::Storage;
+use Readonly;
+use List::MoreUtils qw/none/;
 
 with Storage( 'traits' => ['OnlyWhenBuilt'],
               'format' => 'JSON',
               'io'     => 'File' ), 'npg_qc::autoqc::role::rpt_key';
 
 our $VERSION = '0';
+
+Readonly::Array my @SEARCH_PARAMETERS => qw/ position class_name check_name id_run tag_index /;
+
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
@@ -97,7 +97,8 @@ sub check_name {
 Determines whether the values of the attributes in the object are as listed in the argument hash. 
 Takes a reference to a hash where keys are the names of the attributes and values are expected values. 
 Returns true if all values are as expected, otherwise returns false.
-Supports comparison on the following attributes: position, check_name, class_name, id_run.
+Supports comparison on the following attributes:
+  id_run, position, tag_index, check_name, class_name.
 
  my $r = npg_qc::autoqc::results::result->new({id_run => 222, position => 2, path => q[my_path]});
  $r->equals_byvalue({id_run => 222, position => 2,}); #returns 1
@@ -107,15 +108,24 @@ Supports comparison on the following attributes: position, check_name, class_nam
 =cut
 sub equals_byvalue {
     my ($self, $h) = @_;
+    if (!$h) {
+        croak q[Parameters hash should be given];
+    }
     my @keys =keys %{$h};
-    if (@keys == 0) {croak q[No parameters for comparison];}
+    if (!@keys) {
+        croak q[No parameters for comparison];
+    }
+
     foreach my $key (@keys) {
-        if ($key !~ /position|class_name|check_name|id_run|tag_index/smx) {
-            croak qq[Value of the $key attribute cannot be compared. Comparable attributes: position, check_name, class_name, id_run, tag_index];
+        if (none { $_ eq $key } @SEARCH_PARAMETERS) {
+            croak qq[Value of the $key attribute cannot be compared. Valid attributes: ] . join q[, ], @SEARCH_PARAMETERS;
 	}
         if ($key eq q[tag_index]) {
+            if ( !$self->can($key) || (!defined $h->{$key} && defined $self->$key) ||
+                    (defined $h->{$key} && !defined $self->$key) ) {
+                return 0;
+            }
             if (!defined $h->{$key} && !defined $self->$key) { next; }
-            if (!defined $h->{$key} && defined $self->$key || defined $h->{$key} && !defined $self->$key) {return 0;}
 	}
         if ($self->$key ne $h->{$key}) {return 0;}
     }
@@ -147,7 +157,7 @@ sub to_string {
     my ($self) = @_;
     my $s = ref $self;
     $s .= q[ object for id_run ] . $self->id_run . q[ position ] . $self->position;
-    if (defined $self->tag_index) {
+    if ($self->can('tag_index') and defined $self->tag_index) {
         $s .= q[ tag index ] . $self->tag_index;
     }
     return $s;
@@ -237,6 +247,10 @@ __END__
 
 =item JSON
 
+=item List::MoreUtils
+
+=item Readonly
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -245,11 +259,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2014 Genome Research Limited
 
 This file is part of NPG.
 

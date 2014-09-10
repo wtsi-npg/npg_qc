@@ -284,7 +284,7 @@ override 'execute'            => sub {
       $fh->print( $self->result->bin_width . qq[\n]);
       $fh->print( scalar(@{$self->result->bins}) . qq[\n]);
       $fh->print( (join qq[\n], @{$self->result->bins}) . qq[\n]);
-      close $fh or croak qq[Cannot close file $input. $?];
+      close $fh or croak qq[Cannot close file $input. $ERRNO];
 
       my $command = $self->norm_fit_cmd;
       $command .= qq[ $input $output];
@@ -298,9 +298,9 @@ override 'execute'            => sub {
 
       my @modes = ();
       foreach my $line (@lines) {
-          if ($line =~ /^#/) {
+          if ($line =~ /^#/xms) {
               # ignore comments
-          } elsif (my ($name,$value) = ($line =~ /^(\S+)=(\S+)$/)) {
+          } elsif (my ($name,$value) = ($line =~ /^(\S+)=(\S+)$/xms)) {
               # lines containing name=value pairs
               if ($name eq q[nmode]) {
                   $self->result->norm_fit_nmode($value);
@@ -312,13 +312,13 @@ override 'execute'            => sub {
           } else {
               # all other lines are assumed to contain amplitude, mean and optionally std for each mode
               chomp($line);
-              my @mode = split qq[ ], $line;
+              my @mode = split q[ ], $line;
               push @modes, \@mode;
           }
       }
       $self->result->norm_fit_modes(\@modes);
   } else {
-    $self->result->comments('Not enough properly paired reads for normal fitting');
+    $self->result->add_comment('Not enough properly paired reads for normal fitting');
   }
 
   return 1;
