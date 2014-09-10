@@ -1,4 +1,4 @@
 ALTER TABLE `insert_size` ADD COLUMN  `norm_fit_nmode` integer unsigned;
 ALTER TABLE `insert_size` ADD COLUMN  `norm_fit_confidence` integer unsigned;
 ALTER TABLE `insert_size` ADD COLUMN  `norm_fit_pass` tinyint(1);
-ALTER TABLE `insert_size` ADD COLUMN  `norm_fit_modes` varchar(256);
+ALTER TABLE `insert_size` ADD COLUMN  `norm_fit_modes` text;
