@@ -18,6 +18,8 @@ use File::Temp qw/tempdir/;
 use_ok ('npg_qc::autoqc::autoqc');
 
 $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc];
+my $cdir = cwd();
+local $ENV{'PATH'} = join q[:], qq[$cdir/blib/script] , $ENV{'PATH'};
 
 my $simple_check = q[qX_yield];
 my $ref = q[t/data/autoqc];

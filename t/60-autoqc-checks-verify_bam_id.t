@@ -33,7 +33,7 @@ my $dir = tempdir(CLEANUP => 1);
     lives_ok { $r->result; } 'No error creating result object';
     ok( defined $r->ref_repository(), 'A default reference repository is set' );
     is($r->lims->library_type, undef, 'Library type returned OK');
-    is($r->alignments_in_bam, undef, 'Alignments in bam undefined');
+    ok((not $r->alignments_in_bam), 'Alignments in bam false');
     is($r->lims->reference_genome, undef, 'No reference genome');    
     is($r->can_run, 0, 'Not done if library_type is undef');
     is($r->snv_path, undef, 'snv path is not set');

@@ -1,11 +1,23 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - support for search for autoqc objects without tag_index attrubute
+ - Build.PL extended to compile and deploy norm_fit executable
+
+release 56.9
+ - database name-agnostic database dump file
+
+release 56.8
+ - increase DB field sizes for genotype qc check results
+
 release 56.7
-  - only insert cluster densities which exist
+ - only insert cluster densities which exist
 
 release 56.6
-  - use length of index read from tag0 bam file rather than length of tag in
-    decode metrics file to derive barcode file, added new tests and test data
+ - use length of index read from tag0 bam file rather than length of tag in
+     decode metrics file to derive barcode file, added new tests and test data
+ - do not croak if a Bustard_Summary file does not exist (as is the case
+     for HX instruments)
+ - made interop parsing code more generic
 
 release 56.5
  - phix bam_flagstat to have default serialisation name including phix

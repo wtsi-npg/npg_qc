@@ -172,19 +172,19 @@ __PACKAGE__->table('genotype');
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 128
+  size: 256
 
 =head2 bam_gt_depths_string
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 128
+  size: 512
 
 =head2 bam_gt_likelihood_string
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 512
+  size: 2048
 
 =cut
 
@@ -244,11 +244,11 @@ __PACKAGE__->add_columns(
   'bam_call_count',
   { data_type => 'integer', default_value => 0, is_nullable => 0 },
   'bam_call_string',
-  { data_type => 'varchar', is_nullable => 1, size => 128 },
+  { data_type => 'varchar', is_nullable => 1, size => 256 },
   'bam_gt_depths_string',
-  { data_type => 'varchar', is_nullable => 1, size => 128 },
-  'bam_gt_likelihood_string',
   { data_type => 'varchar', is_nullable => 1, size => 512 },
+  'bam_gt_likelihood_string',
+  { data_type => 'varchar', is_nullable => 1, size => 2048 },
 );
 
 =head1 PRIMARY KEY
@@ -302,8 +302,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::genotype';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:54:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8YD3g+dZ/5fZ9sipjHmjyw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-08-08 15:18:30
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zDgvmH0ZORxV9WYjzBzhIQ
 
 __PACKAGE__->set_flators4non_scalar(qw( alternate_matches alternate_relaxed_matches sample_name_match sample_name_relaxed_match search_parameters info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

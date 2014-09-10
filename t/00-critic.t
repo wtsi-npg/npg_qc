@@ -1,6 +1,3 @@
-#########
-# Author:        rmp
-#
 package critic;
 use strict;
 use warnings;
@@ -28,6 +25,7 @@ if($EVAL_ERROR) {
                              'Subroutines::ProhibitUnusedPrivateSubroutines',
                              'ProhibitEscapedMetacharacters',
                              'ProhibitUnrestrictedNoCritic',
+                             'Documentation::RequirePodSections'
                             ],
                -profile  => 't/perlcriticrc',
                -verbose => "%m at %f line %l, policy %p\n",
