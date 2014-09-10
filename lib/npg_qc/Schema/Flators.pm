@@ -74,7 +74,7 @@ sub deflate_unique_key_components {
     croak q[Values hash should be defined];
   }
   if (ref $values ne q[HASH]) {
-    croak q[Values shoudl be a hash];
+    croak q[Values should be a hash];
   }
   my $source = $package_name->result_source_instance();
   my %constraints = $source->unique_constraints();
