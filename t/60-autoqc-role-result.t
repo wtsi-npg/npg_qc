@@ -19,7 +19,7 @@ package main;
   is(join(q[ ], npg_test::autoqc_result->class_names()), 'autoqc_result AutoqcResult',
     'class names for this package returned');
   throws_ok {npg_test::autoqc_result::class_names()} qr/No arguments/,
-    'errow in no arguments found';
+    'error in no arguments found';
 
   is(join(q[ ], $r->class_names('npg_qc::autoqc::upstream_tags')), 'upstream_tags UpstreamTags',
     'class names for the given argument returned');

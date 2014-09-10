@@ -1,8 +1,3 @@
-#########
-# Author:        mg8
-# Created:       30 July 2009
-#
-
 use strict;
 use warnings;
 use Test::More tests => 52;
@@ -20,6 +15,7 @@ use t::autoqc_util;
 use_ok('npg_qc::autoqc::checks::insert_size');
 
 my $current_dir = cwd();
+local $ENV{'PATH'} = join q[:], qq[$current_dir/blib/script] , $ENV{'PATH'};
 my $repos = catfile($current_dir, q[t/data/autoqc]);
 my $ref = catfile($repos, q[references]);
 my $format = q[sam];
@@ -318,7 +314,7 @@ my $test_bam = 0;
   $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], t::autoqc_util::insert_size_additional_modules));
-  $eqc->result->comments('Not enough properly paired reads for normal fitting');
+  $eqc->result->add_comment('Not enough properly paired reads for normal fitting');
   #### Construct expected  object: END ####
 
   cmp_deeply ($qc->result, $eqc->result, 'result object after the execution');
@@ -483,9 +479,8 @@ my $test_bam = 0;
   $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], t::autoqc_util::insert_size_additional_modules));
-  $eqc->result->comments('Not enough properly paired reads for normal fitting');
+  $eqc->result->add_comment('Not enough properly paired reads for normal fitting');
   #### Construct expected  object: END ####
-
   cmp_deeply ($qc->result, $eqc->result, 'result object after the execution for one result');
 }
 
