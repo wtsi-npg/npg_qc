@@ -5,11 +5,29 @@ use npg_tracking::util::build;
 my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
   my $blibr = q[blib/lib/R];
+  my $norm_fit_dir = join(q[/], 'src', 'norm_fit');
+  sub ACTION_build {
+    my $self = shift;
+    $self->SUPER::ACTION_build;
+    chdir $norm_fit_dir;
+    `make`;
+    $self->copy_if_modified(from => 'norm_fit',
+                            to_dir => join(q[/], $self->base_dir, 'blib', 'script'),
+                            flatten => 1);
+    chdir $self->base_dir;
+  }
+
+  sub ACTION_clean {
+    my $self = shift;
+    $self->SUPER::ACTION_clean;
+    chdir $norm_fit_dir;
+    `make clean`;
+    chdir $self->base_dir;
+  }
 
   sub ACTION_install {
     my $self = shift;
     if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
-      my $blibr = q[blib/lib/R];
       `mkdir -p $blibr`;
       `cp -vu lib/R/gc_bias_data.R $blibr`;
     }
