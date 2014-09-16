@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 5.5.38, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.34, for debian-linux-gnu (x86_64)
 --
 -- Host: mcs11    Database: npgqct
 -- ------------------------------------------------------
@@ -702,6 +702,10 @@ CREATE TABLE `insert_size` (
   `comments` text,
   `info` text,
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
+  `norm_fit_nmode` int(10) unsigned DEFAULT NULL,
+  `norm_fit_confidence` int(10) unsigned DEFAULT NULL,
+  `norm_fit_pass` tinyint(1) DEFAULT NULL,
+  `norm_fit_modes` text,
   PRIMARY KEY (`id_insert_size`),
   UNIQUE KEY `unq_run_lane_insert_size` (`id_run`,`position`,`tag_index`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -1468,4 +1472,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-14 10:03:21
+-- Dump completed on 2014-09-10 10:22:52
