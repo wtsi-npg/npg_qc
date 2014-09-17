@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 57;
+use Test::More tests => 60;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -78,6 +78,9 @@ my $schema = Moose::Meta::Class->create_anon_class(
   is($row->norm_fit_nmode, 22, 'norm_fit_nmode');
   is($row->norm_fit_confidence, 5, 'norm_fit_confidence');
   is($row->norm_fit_pass, 1, 'norm_fit_pass');
+  is(scalar(@{$row->norm_fit_modes}), 15, 'norm_fit_modes');
+  is($row->norm_fit_modes->[0], 1, 'norm_fit_modes[0]');
+  is($row->norm_fit_modes->[14], 15, 'norm_fit_modes[14]');
 
   $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
