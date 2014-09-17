@@ -78,6 +78,11 @@ override 'can_run' => sub {
     return 0;
   }
 
+  if (!$self->lims->sample_name) { # sample_name() only returns non empty value iff there is a single sample_name
+    $self->result->add_comment(q(Can only run on single sample));
+    return 0;
+  }
+
   return 1;
 };
 
