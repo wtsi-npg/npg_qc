@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Cwd;
 use File::Temp qw/ tempdir /;
-use Test::More tests => 24;
+use Test::More tests => 40;
 use Test::Exception;
 
 my $repos = cwd . '/t/data/autoqc';
@@ -18,7 +18,46 @@ $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc];
 
 use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 
+
 my $dir = tempdir(CLEANUP => 1);
+{
+    my $r = npg_qc::autoqc::checks::verify_bam_id->new( 
+      id_run => 13940, 
+      position => 8, 
+      path => 't/data/autoqc/', 
+      repository => $repos,
+      snv_repository => $snv_repository_with_vcf,
+    ); 
+    isa_ok ($r, 'npg_qc::autoqc::checks::verify_bam_id');
+    lives_ok { $r->result; } 'No error creating result object';
+    ok( defined $r->ref_repository(), 'A default reference repository is set' );
+    is($r->lims->library_type, undef, 'Library type returned OK');
+    ok($r->alignments_in_bam, 'Alignments in bam true');
+    is($r->lims->reference_genome, 'Homo_sapiens (1000Genomes_hs37d5)', 'reference genome');    
+    ok($r->can_run, 'Can run at lane level for single plex in pool') or diag $r->result->comments;
+    my $snv_path = join '/', cwd, 't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5';
+    is($r->snv_path, $snv_path, 'snv path is set');
+}
+
+{
+    my $r = npg_qc::autoqc::checks::verify_bam_id->new( 
+      id_run => 13886, 
+      position => 8, 
+      path => 't/data/autoqc/', 
+      repository => $repos,
+      snv_repository => $snv_repository_with_vcf,
+    ); 
+    isa_ok ($r, 'npg_qc::autoqc::checks::verify_bam_id');
+    lives_ok { $r->result; } 'No error creating result object';
+    ok( defined $r->ref_repository(), 'A default reference repository is set' );
+    is($r->lims->library_type, undef, 'Library type returned OK');
+    ok($r->alignments_in_bam, 'Alignments in bam true');
+    is($r->lims->reference_genome, 'Homo_sapiens (1000Genomes_hs37d5)', 'reference genome');    
+    ok((not $r->can_run), 'Can not run at lane level for multi plex in pool') or diag $r->result->comments;
+    my $snv_path = join '/', cwd, 't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5';
+    is($r->snv_path, $snv_path, 'snv path is set');
+}
+
 {
     my $r = npg_qc::autoqc::checks::verify_bam_id->new( 
       id_run => 2549, 
