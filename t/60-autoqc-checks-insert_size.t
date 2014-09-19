@@ -352,7 +352,7 @@ my $test_bam = 0;
 
   is($qc->result->expected_size, undef, 
     'expected size result array undefined for a sample where no expected size is specified');
-  like($qc->result->comments, qr/Expected insert size is not defined/, 'comment for a sample where no expected size is specified');
+  like($qc->result->comments, qr/Not enough properly paired reads for normal fitting/, 'comment for a sample with not enough paired reads');
   is($qc->result->pass, undef, 'pass value undefined for a sample where no expected size is specified');
 }
 
