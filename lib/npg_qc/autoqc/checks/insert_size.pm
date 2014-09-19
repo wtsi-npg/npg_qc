@@ -36,6 +36,9 @@ use npg_common::extractor::fastq qw(generate_equally_spaced_reads);
 
 our $VERSION = '0';
 
+Readonly::Scalar my $NORM_FIT_EXE                           => q[norm_fit];
+Readonly::Scalar my $NORM_FIT_MIN_PROPERLY_ALIGNED_PAIRS    => 5000;
+
 ## no critic (Documentation::RequirePodAtEnd RequireCheckingReturnValueOfEval ProhibitParensWithBuiltins RequireNumberSeparators)
 =head1 NAME
 
@@ -193,6 +196,19 @@ has 'format'          => (isa             => 'Str',
                           default         => q[sam],
                          );
 
+=head2 format
+
+format for paired alignment
+ 
+=cut
+
+has 'norm_fit_cmd' => (
+        is      => 'ro',
+        isa     => 'NpgCommonResolvedPathExecutable',
+        coerce  => 1,
+        default => $NORM_FIT_EXE,
+);
+
 override 'can_run'            => sub {
   my $self = shift;
   return npg::api::run->new({id_run => $self->id_run})->is_paired_read();
@@ -255,6 +271,54 @@ override 'execute'            => sub {
       # From a meeting with Mike Quail on 04.09.2009
       my $pass = ($self->expected_size->[0] < $self->result->quartile3) || 0;
       $self->result->pass($pass);
+  }
+
+  if ($self->result->num_well_aligned_reads >= $NORM_FIT_MIN_PROPERLY_ALIGNED_PAIRS) {
+      my $input = catfile($self->tmp_path, q[norm_fit.input]);
+      my $output = catfile($self->tmp_path, q[norm_fit.output]);
+
+      ## no critic (ProhibitTwoArgOpen Variables::ProhibitPunctuationVars)
+      open my $fh, ">$input" or croak qq[Cannot open file $input. $?];
+      ## use critic
+      $fh->print( $self->result->min_isize . qq[\n]);
+      $fh->print( $self->result->bin_width . qq[\n]);
+      $fh->print( scalar(@{$self->result->bins}) . qq[\n]);
+      $fh->print( (join qq[\n], @{$self->result->bins}) . qq[\n]);
+      close $fh or croak qq[Cannot close file $input. $ERRNO];
+
+      my $command = $self->norm_fit_cmd;
+      $command .= qq[ $input $output];
+
+      if (system($command) ){
+          my $error =  printf "Child %s exited with value %d\n", $command, $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
+          croak $error;
+      }
+
+      my @lines = slurp $output;
+
+      my @modes = ();
+      foreach my $line (@lines) {
+          if ($line =~ /^#/xms) {
+              # ignore comments
+          } elsif (my ($name,$value) = ($line =~ /^(\S+)=(\S+)$/xms)) {
+              # lines containing name=value pairs
+              if ($name eq q[nmode]) {
+                  $self->result->norm_fit_nmode($value);
+              } elsif ($name eq q[confidence]) {
+                  $self->result->norm_fit_confidence($value);
+              } elsif ($name eq q[pass]) {
+                  $self->result->norm_fit_pass($value);
+              }
+          } else {
+              # all other lines are assumed to contain amplitude, mean and optionally std for each mode
+              chomp($line);
+              my @mode = split q[ ], $line;
+              push @modes, \@mode;
+          }
+      }
+      $self->result->norm_fit_modes(\@modes);
+  } else {
+    $self->result->add_comment('Not enough properly paired reads for normal fitting');
   }
 
   return 1;
@@ -448,6 +512,13 @@ sub _align {
     $al->bwa_align_pe({ref_root => $self->reference, fastq1 => $sample_reads->[0], fastq2 => $sample_reads->[1], sam_out => $output_sam, fork_align => 0,});
     return $output_sam;
 }
+
+has 'norm_fit_cmd' => (
+        is      => 'ro',
+        isa     => 'NpgCommonResolvedPathExecutable',
+        coerce  => 1,
+        default => $NORM_FIT_EXE,
+);
 
 no Moose;
 __PACKAGE__->meta->make_immutable();

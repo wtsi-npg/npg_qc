@@ -207,6 +207,47 @@ has 'reference' => (isa      => 'Maybe[Str]',
                     required => 0,
 		   );
 
+=head2 norm_fit_nmode
+
+Number of normal modes
+
+=cut
+has 'norm_fit_nmode'    => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
+                       is              => 'rw',
+                       required        => 0,
+                      );
+
+=head2 norm_confidence
+
+Confidence of normal fit
+
+=cut
+has 'norm_fit_confidence'    => (isa             => 'Maybe[Num]',
+                            is              => 'rw',
+                            required        => 0,
+                           );
+
+=head2 norm_fit_pass
+
+Normal fit pass/fail
+
+=cut
+has 'norm_fit_pass'     => (isa      => 'Maybe[Bool]',
+                       is       => 'rw',
+                       required => 0,
+                      );
+
+=head2 norm_fit_modes
+
+Normal fit modes (amp, mean and stdev for each mode)
+
+=cut
+has 'norm_fit_modes'     => (isa      => 'Maybe[ArrayRef]',
+                       is       => 'rw',
+                       required => 0,
+                      );
+
+
 no Moose;
 
 1;
