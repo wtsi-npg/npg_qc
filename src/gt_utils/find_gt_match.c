@@ -271,11 +271,6 @@ fetch sample name and label
 		lfd = sfd;	/* sample labels not required */
 	}
 
-/* Print header information */
-	/* Print parameters */
-	print_start(output_format);
-	print_params(output_format, gt_hdr.data_id, gt_hdr.refresh_date, gt_hdr.hdr_base.callcount, min_common, min_sample_callrate, high_concord_level, posdup_level, print_only_posdups, only_check_same_names, only_check_diff_names, lh1, l1, l2, base_gt->base_gt);
-
 /* Column headers */
 	readSampleName(lfd, 0, l2, NAMESIZE);
 
@@ -327,6 +322,10 @@ open file of compressed genotype records for comparison
                 exit(-6);
         }
 
+/* Print header information */
+	/* Print parameters */
+	print_start(output_format);
+	print_params(output_format, hdr.data_id, gt_hdr.refresh_date, hdr.hdr_base.callcount, min_common, min_sample_callrate, high_concord_level, posdup_level, print_only_posdups, only_check_same_names, only_check_diff_names, lh1, l1, l2, base_gt->base_gt);
 	print_comp_result_start(output_format);
 
 	/* return to first record position */

@@ -67,6 +67,7 @@ int main(int ac, char **av)
 	char *sample_id_field_list = "1";
 	char *sample_label_field_list = NULL;
 	char *ignore_field_list = NULL;
+	static char *data_id = "SQNMGTDATA";
 
 	PAL preload_alleles_list = { PAL_EMPTY, NULL, NULL, NULL, NULL };
 	int sample_id_idx = 0;
@@ -246,6 +247,26 @@ int main(int ac, char **av)
 				exit(-99);
 			}
 		}
+		else if(!strcmp(av[i], "-H")) {	/* specify data set label for header */
+                        char *p;
+
+			if(*(av[i]+2)) {
+				p = av[i]+2;
+				i++;
+			}
+			else {
+				if((ac-i) <= 0) {
+					fprintf(stderr, "Flag -H specified without argument\n");
+					usage(0);
+					exit(-99);
+				}
+
+				p = av[i+1];
+				i+=2;
+			}
+
+			data_id = p;
+		}
 		else {
 			break;
 		}
@@ -306,7 +327,7 @@ int main(int ac, char **av)
 		fprintf(stderr, "Error reading header line\n");
 		exit(-95);
 	}
-	init_hdr(&hdr, fld_desc->genotype_fld_count, 2,  global_env.read_depth_bits, "SQNMGTDATA");
+	init_hdr(&hdr, fld_desc->genotype_fld_count, 2,  global_env.read_depth_bits, data_id);
 	if(!strcmp(write_mode, "w")) {	/* default - create new output files from scratch */
 		if(fwrite(&hdr, sizeof(hdr), 1, outfd) != 1) {
 			fprintf(stderr, "Failed to write header\n");
@@ -726,7 +747,7 @@ static int usage(int full) {
 	if(full) {
 		fprintf(stderr, "gt_pack: pack a tab-delimited text file containing genotype data into a binary format\n\n");
 	}
-	fprintf(stderr, "Usage: gt_pack -o <outfile_base> [-s <sample_id_fields>] [-l <sample_label_fields>] [-i <ignore_fields>] [-p <preload_assays_spec>] [-P <preload_assays_file>] [-d <high_read_depth_threshold>] [-w <call_width>][-f <format>] [-a] [-n] [-h] [<input_file>]\n");
+	fprintf(stderr, "Usage: gt_pack -o <outfile_base> [-s <sample_id_fields>] [-l <sample_label_fields>] [-i <ignore_fields>] [-p <preload_assays_spec>] [-P <preload_assays_file>] [-d <high_read_depth_threshold>] [-w <call_width>][-f <format>] [-a] [-n] [-H <data_set_label>] [-h] [<input_file>]\n");
 	if(full) {
 		fprintf(stderr, "\toutfile_base: base for file name(s) to which relevant extension is added. If this is '-', stdout is used for the compressed calls (.bin) file and no auxiliary files are produced\n");
 		fprintf(stderr, "\tsample_id_fields: fields which provide a unique ID for the sample\n");
@@ -739,6 +760,7 @@ static int usage(int full) {
 		fprintf(stderr, "\tformat: format of genotype calls - 0: biallelic call only (e.g. AG), 1: read depth also specified (e.g. AG:7); (default: 0)\n");
 		fprintf(stderr, "\t-a: append data to existing file (default: create new file(s)\n");
 		fprintf(stderr, "\t-n: no auxiliary files; only create the compressed calls (.bin) file\n");
+		fprintf(stderr, "\t-H: specify data set label for header\n");
 		fprintf(stderr, "\t-h: this message\n");
 	}
 
