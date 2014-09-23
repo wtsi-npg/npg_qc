@@ -1,16 +1,9 @@
 /*  File: mode_detect.c // detects modes from NPG insert size distribution
- * Authors: designed by Irina Abnizova (ia1)
+ * Authors: designed and written by Irina Abnizova (ia1) and Steven Leonard (srl)
  *
   Last edited:
-  26 output possible modes after stabilizing
-  26 Aug make floats hist
-  20 Aug see how it smoothes
-  20 August put un-printed version on a github
-  18 Aug:  ModeRatio filter
-  13 August addd distance filter
-  6 August   sd estimated
-  7 August Norm fit, confidence of pass, count peaks; count until stable
-  8 August main outputs
+  10 Sept SpuriousPeaks filter is added
+  3 September 2014-Steve added other estimation of std (if there are other peaks >height/2)
 
   *-------------------------------------------------------------------
  * Description: detects modes from NPG insert size distribution, suggestsif to pass, its confidence
@@ -41,6 +34,9 @@ usage:./mode_detect inp.txt pass_info
 
 // ******** declarations of  functions
 void usage(int code);
+int SpuriousPeaks(float hist[], int bins[], int nbins, float amp[], int pos[], int dist, int npos);//removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2)
+
+
 
 float GetMax (float hist[], int nbins);
 
@@ -61,7 +57,7 @@ int main(int argc, char **argv)
     float min_amplitude = MIN_AMPLITUDE;
     char *hist_file;
     char *pass_file;
-    
+
     int line_size = 1024;
     char line[1024];
     int count_lines;// lines in input file
@@ -117,7 +113,7 @@ int main(int argc, char **argv)
         hist_file = argv[optind+0];
         pass_file = argv[optind+1];
     }
-    
+
 
     // open input file
     fp = fopen(hist_file,"r");
@@ -226,10 +222,12 @@ int main(int argc, char **argv)
     }
     num_peR=k;
 
-    //2 ====================  filter for distance b/w peaks
+    //2.1 ====================  filter for distance b/w peaks
     num_peD = FilterDistance(pos,amp,min_distance,num_peR);
+    //2.2=====================removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2
+    num_peD = SpuriousPeaks(hist, bins, nbins, amp, pos, min_distance, num_peD);
 
-    //2 number of modes is the number of remaining peaks
+    //2 number of modes is the number of remaining peaks after distance and spurious peak (if needed)
     num_modes = num_peD;
 
     //3 -----------compute params of main mode
@@ -259,7 +257,7 @@ int main(int argc, char **argv)
     printf("num peaks initially %d\n", num_peI);
     printf("num peaks after stabilizing %d\n", num_peS);
     printf("num peaks after filtering on amplitude (threshold=%.2f) %d\n", min_amplitude, num_peR);
-    printf("num peaks after filtering on distance (threshold=%.2f) %d\n", min_distance, num_peD);
+    printf("num peaks after filtering on distance and spuriousity (threshold=%.2f) %d\n", min_distance, num_peD);
     printf("confidence of normal fit %.2f\n", confidence);
     printf("pass %d\n", pass);
 
@@ -273,7 +271,7 @@ int main(int argc, char **argv)
     fprintf(fp,"pass=%d\n", pass);
     fprintf(fp,"confidence=%.2f\n", confidence);
     fprintf(fp,"nmode=%d\n", num_modes);
-    fprintf(fp,"#amplitude,mu,std of main mode\n%.2f %d %.2f\n", height, mu, sd);
+    fprintf(fp,"#amplitude,mu,std of main mode after smoothing\n%.2f %d %.2f\n", height, mu, sd);
     fprintf(fp,"#amplitude,mu filtered modes\n");
     for (k=0; k<num_modes; k++)
     {
@@ -348,7 +346,7 @@ float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
     int ma_bin = -1;
     int mi_bin = -1;
     float threshold = 0.5*height;
-    
+
     float sd;
 
     for (n=0; n<nbins; n++)
@@ -460,7 +458,7 @@ int CountPeaks(float hist[], int bins[], int nbins)
     int k,i;
 
     // find peak_amps
-    k=0;
+    k = 0;
     for (i=1; i<nbins-1; i++)
     {
         if ( ((hist[i]-hist[i-1]) > 0 ) && ((hist[i+1]-hist[i]) <= 0))
@@ -477,11 +475,11 @@ int FilterDistance(int *pos, float *amp, int dist, int npos)
 {
     //updates pos and amp
     int num_clus = 0;
-    
+
     if (npos > 1)
     {
         int i;
-        int clus_pos; 
+        int clus_pos;
         float clus_amp;
 
         clus_pos = pos[0];
@@ -495,7 +493,7 @@ int FilterDistance(int *pos, float *amp, int dist, int npos)
                 if (amp[i+1] > clus_amp)
                 {
                     clus_pos = pos[i+1];
-                    clus_amp = amp[i+i];
+                    clus_amp = amp[i+1];
                 }
             }
             else
@@ -512,12 +510,61 @@ int FilterDistance(int *pos, float *amp, int dist, int npos)
         // save the current cluster
         pos[num_clus] = clus_pos;
         amp[num_clus] = clus_amp;
-        
+        num_clus++;
+    }
+    else
+    {
+        num_clus = npos;
     }// if npos>1
 
-    num_clus++;
 
     printf("num_clusters= %d\n", num_clus);
 
     return num_clus;//# of modes
 }
+
+//-------------------------filer out spurious peaks
+// if peaks are still peaks for half of distance threshold, they are genuine; otherwise - spurious
+int SpuriousPeaks(float hist[], int bins[], int nbins, float amp[], int pos[], int dist, int npos)//removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2)
+{
+    int k;
+
+    if (npos > 1)
+    {
+        int i, j, c;
+
+        k = 0;
+        for (i=0; i<npos; i++)//positions/peaks
+        {
+            int p1 = pos[i] - 0.5 * dist;
+            int p2 = pos[i] + 0.5 * dist;
+            c = 0;
+            for (j=0; j<nbins; j++)//bins
+            {
+                if (bins[j] >= p1 && bins[j] <= p2)
+                {
+                    if (pos[i] != bins[j] && amp[i] < hist[j])
+                    {
+                        c++;
+                    }
+                }
+            }
+            if (c == 0)
+            {
+                amp[k] = amp[i];
+                pos[k] = pos[i];
+                k++;
+            }
+        }
+    }
+    else
+    {
+        k = npos;
+    }
+    
+
+    return k;
+}
+
+
+
