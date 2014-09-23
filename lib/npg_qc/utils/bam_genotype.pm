@@ -219,7 +219,6 @@ sub _build_json_genotype {
 #	close($f) or croak 'Error calling genotype from bam file';
 	close($f);
 
-	$json_genotype->{snp_set} = $self->plex;
 	$json_genotype->{bam} = $self->bam_file_list->[0];
 	$json_genotype->{reference} = $self->reference;
 	$json_genotype->{number_of_calls} = grep { $_->{call} ne 'NN'; } (values %calls);
