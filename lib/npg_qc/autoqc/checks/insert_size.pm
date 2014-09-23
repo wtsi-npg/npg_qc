@@ -298,7 +298,7 @@ override 'execute'            => sub {
 
       my @modes = ();
       foreach my $line (@lines) {
-          if ($line =~ /^#/xms) {
+          if ($line =~ /^\#/xms) {
               # ignore comments
           } elsif (my ($name,$value) = ($line =~ /^(\S+)=(\S+)$/xms)) {
               # lines containing name=value pairs
