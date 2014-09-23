@@ -3,7 +3,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 56.11
  - changes to genoype check and utils to use combined Sequenom
     and Fluidigm results for the 26 QC SNPS (W30467)
- - norm_fit fixes
+-  fixed RE when parsing norm_fit output
+-  fixed a bug and cleaned up norm_fit code
 
 56.10
  - support for search for autoqc objects without tag_index attrubute
