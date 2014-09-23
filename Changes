@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+56.11
+ - changes to genoype check and utils to use combined Sequenom
+    and Fluidigm results for the 26 QC SNPS (W30467)
+ - norm_fit fixes
+
+56.10
  - support for search for autoqc objects without tag_index attrubute
  - Build.PL extended to compile and deploy norm_fit executable
  - only run verify_bam_id if single sample expected (helps cope with 
