@@ -191,8 +191,7 @@ __PACKAGE__->table('insert_size');
 
 =head2 norm_fit_confidence
 
-  data_type: 'integer'
-  extra: {unsigned => 1}
+  data_type: 'float'
   is_nullable: 1
 
 =head2 norm_fit_pass
@@ -264,7 +263,7 @@ __PACKAGE__->add_columns(
   'norm_fit_nmode',
   { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
   'norm_fit_confidence',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', is_nullable => 1 },
   'norm_fit_pass',
   { data_type => 'tinyint', is_nullable => 1 },
   'norm_fit_modes',
@@ -320,8 +319,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::insert_size';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-09-10 10:26:37
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:idDGxYcJWdoNdD+scWBOhA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-09-24 16:53:43
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:tRyHEBtonqAuzc/mxQ36OQ
 
 __PACKAGE__->set_flators4non_scalar(qw( bins expected_size filenames info norm_fit_modes ));
 __PACKAGE__->set_inflator4scalar('tag_index');

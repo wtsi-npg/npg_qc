@@ -76,7 +76,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
   is(join(q[ ],@{$row->expected_size}), '50 200', 'insert size');
   is($row->num_well_aligned_reads, 50, 'number well-aligned reads');
   is($row->norm_fit_nmode, 22, 'norm_fit_nmode');
-  is($row->norm_fit_confidence, 5, 'norm_fit_confidence');
+  is($row->norm_fit_confidence, .55, 'norm_fit_confidence');
   is($row->norm_fit_pass, 1, 'norm_fit_pass');
   is(scalar(@{$row->norm_fit_modes}), 15, 'norm_fit_modes');
   is($row->norm_fit_modes->[0], 1, 'norm_fit_modes[0]');
