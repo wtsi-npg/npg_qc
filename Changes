@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.12
+ - insert_size.norm_fit_confidence from integer to float
+
 release 56.11
  - changes to genoype check and utils to use combined Sequenom
     and Fluidigm results for the 26 QC SNPS (W30467)
