@@ -201,9 +201,8 @@ __PACKAGE__->table('insert_size');
 
 =head2 norm_fit_modes
 
-  data_type: 'varchar'
+  data_type: 'text'
   is_nullable: 1
-  size: 256
 
 =cut
 
@@ -268,7 +267,7 @@ __PACKAGE__->add_columns(
   'norm_fit_pass',
   { data_type => 'tinyint', is_nullable => 1 },
   'norm_fit_modes',
-  { data_type => 'varchar', is_nullable => 1, size => 256 },
+  { data_type => 'text', is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -320,8 +319,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::insert_size';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-09-24 16:41:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Hl1JMsxct/OD+dopN7Jsaw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-09-24 16:53:43
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:tRyHEBtonqAuzc/mxQ36OQ
 
 __PACKAGE__->set_flators4non_scalar(qw( bins expected_size filenames info norm_fit_modes ));
 __PACKAGE__->set_inflator4scalar('tag_index');

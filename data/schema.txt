@@ -705,7 +705,7 @@ CREATE TABLE `insert_size` (
   `norm_fit_nmode` int(10) unsigned DEFAULT NULL,
   `norm_fit_confidence` float DEFAULT NULL,
   `norm_fit_pass` tinyint(1) DEFAULT NULL,
-  `norm_fit_modes` varchar(256) DEFAULT NULL,
+  `norm_fit_modes` text,
   PRIMARY KEY (`id_insert_size`),
   UNIQUE KEY `unq_run_lane_insert_size` (`id_run`,`position`,`tag_index`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -1472,4 +1472,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-09-24 16:44:52
+-- Dump completed on 2014-09-24 16:53:10
