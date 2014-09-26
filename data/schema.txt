@@ -615,7 +615,7 @@ CREATE TABLE `genotype` (
   `info` text,
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   `snp_call_set` varchar(32) NOT NULL DEFAULT 'UNSPECIFIED',
-  `genotype_data_set` varchar(32) DEFAULT NULL,
+  `genotype_data_set` varchar(64) DEFAULT NULL,
   `bam_file` varchar(64) DEFAULT NULL,
   `bam_file_md5` varchar(64) DEFAULT NULL,
   `reference` varchar(128) DEFAULT NULL,
@@ -1472,4 +1472,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-09-24 16:53:10
+-- Dump completed on 2014-09-26 11:42:17
