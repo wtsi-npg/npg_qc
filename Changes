@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.13
+ - correct size of genotype_data_set column of genotype table
+
 release 56.12
  - insert_size.norm_fit_confidence from integer to float
 
