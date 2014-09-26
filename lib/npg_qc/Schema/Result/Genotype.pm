@@ -142,7 +142,7 @@ __PACKAGE__->table('genotype');
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 32
+  size: 64
 
 =head2 bam_file
 
@@ -234,7 +234,7 @@ __PACKAGE__->add_columns(
     size => 32,
   },
   'genotype_data_set',
-  { data_type => 'varchar', is_nullable => 1, size => 32 },
+  { data_type => 'varchar', is_nullable => 1, size => 64 },
   'bam_file',
   { data_type => 'varchar', is_nullable => 1, size => 64 },
   'bam_file_md5',
@@ -302,8 +302,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::genotype';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-08-08 15:18:30
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zDgvmH0ZORxV9WYjzBzhIQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-09-26 11:45:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ya2ycfHCPfAyA15TqUIF6A
 
 __PACKAGE__->set_flators4non_scalar(qw( alternate_matches alternate_relaxed_matches sample_name_match sample_name_relaxed_match search_parameters info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
