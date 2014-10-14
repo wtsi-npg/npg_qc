@@ -165,7 +165,7 @@ int main(int argc, char **argv)
     num_peI = CountPeaks(hist,bins,nbins);
     if (0 == num_peI)
     {
-        printf("No peaks initially\n");
+        printf("No peaks initially - aborting mode_detection\n");
         return 0;
     }
     
@@ -212,7 +212,7 @@ int main(int argc, char **argv)
     num_peS = k;
     if (0 == num_peS)
     {
-        printf("No peaks after stabilizing\n");
+        printf("No peaks after stabilizing - aborting mode_detection\n");
         return 0;
     }
 
