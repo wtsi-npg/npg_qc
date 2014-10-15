@@ -38,6 +38,7 @@ our $VERSION = '0';
 
 Readonly::Scalar my $NORM_FIT_EXE                           => q[norm_fit];
 Readonly::Scalar my $NORM_FIT_MIN_PROPERLY_ALIGNED_PAIRS    => 5000;
+Readonly::Scalar my $NORM_FIT_MAX_BIN_THRESHOLD             => 0.9;
 
 ## no critic (Documentation::RequirePodAtEnd RequireCheckingReturnValueOfEval ProhibitParensWithBuiltins RequireNumberSeparators)
 =head1 NAME
@@ -273,53 +274,60 @@ override 'execute'            => sub {
       $self->result->pass($pass);
   }
 
-  if ($self->result->num_well_aligned_reads >= $NORM_FIT_MIN_PROPERLY_ALIGNED_PAIRS) {
-      my $input = catfile($self->tmp_path, q[norm_fit.input]);
-      my $output = catfile($self->tmp_path, q[norm_fit.output]);
-
-      ## no critic (ProhibitTwoArgOpen Variables::ProhibitPunctuationVars)
-      open my $fh, ">$input" or croak qq[Cannot open file $input. $?];
-      ## use critic
-      $fh->print( $self->result->min_isize . qq[\n]);
-      $fh->print( $self->result->bin_width . qq[\n]);
-      $fh->print( scalar(@{$self->result->bins}) . qq[\n]);
-      $fh->print( (join qq[\n], @{$self->result->bins}) . qq[\n]);
-      close $fh or croak qq[Cannot close file $input. $ERRNO];
-
-      my $command = $self->norm_fit_cmd;
-      $command .= qq[ $input $output];
-
-      if (system($command) ){
-          my $error =  printf "Child %s exited with value %d\n", $command, $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
-          croak $error;
-      }
-
-      my @lines = slurp $output;
-
-      my @modes = ();
-      foreach my $line (@lines) {
-          if ($line =~ /^\#/xms) {
-              # ignore comments
-          } elsif (my ($name,$value) = ($line =~ /^(\S+)=(\S+)$/xms)) {
-              # lines containing name=value pairs
-              if ($name eq q[nmode]) {
-                  $self->result->norm_fit_nmode($value);
-              } elsif ($name eq q[confidence]) {
-                  $self->result->norm_fit_confidence($value);
-              } elsif ($name eq q[pass]) {
-                  $self->result->norm_fit_pass($value);
-              }
-          } else {
-              # all other lines are assumed to contain amplitude, mean and optionally std for each mode
-              chomp($line);
-              my @mode = split q[ ], $line;
-              push @modes, \@mode;
-          }
-      }
-      $self->result->norm_fit_modes(\@modes);
-  } else {
-    $self->result->add_comment('Not enough properly paired reads for normal fitting');
+  if ($self->result->num_well_aligned_reads < $NORM_FIT_MIN_PROPERLY_ALIGNED_PAIRS) {
+      $self->result->add_comment('Not enough properly paired reads for normal fitting');
+      return 1;
   }
+
+  my $max_bin = List::Util::max @{$self->result->bins};
+  if ($max_bin > $NORM_FIT_MAX_BIN_THRESHOLD * $self->result->num_well_aligned_reads) {
+      $self->result->add_comment('Not enough variation for normal fitting');
+      return 1;
+  }
+
+  my $input = catfile($self->tmp_path, q[norm_fit.input]);
+  my $output = catfile($self->tmp_path, q[norm_fit.output]);
+
+  ## no critic (ProhibitTwoArgOpen Variables::ProhibitPunctuationVars)
+  open my $fh, ">$input" or croak qq[Cannot open file $input. $?];
+  ## use critic
+  $fh->print( $self->result->min_isize . qq[\n]);
+  $fh->print( $self->result->bin_width . qq[\n]);
+  $fh->print( scalar(@{$self->result->bins}) . qq[\n]);
+  $fh->print( (join qq[\n], @{$self->result->bins}) . qq[\n]);
+  close $fh or croak qq[Cannot close file $input. $ERRNO];
+
+  my $command = $self->norm_fit_cmd;
+  $command .= qq[ $input $output];
+
+  if (system($command) ){
+      my $error =  printf "Child %s exited with value %d\n", $command, $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
+      croak $error;
+  }
+
+  my @lines = slurp $output;
+
+  my @modes = ();
+  foreach my $line (@lines) {
+      if ($line =~ /^\#/xms) {
+          # ignore comments
+      } elsif (my ($name,$value) = ($line =~ /^(\S+)=(\S+)$/xms)) {
+          # lines containing name=value pairs
+          if ($name eq q[nmode]) {
+              $self->result->norm_fit_nmode($value);
+          } elsif ($name eq q[confidence]) {
+              $self->result->norm_fit_confidence($value);
+          } elsif ($name eq q[pass]) {
+              $self->result->norm_fit_pass($value);
+          }
+      } else {
+          # all other lines are assumed to contain amplitude, mean and optionally std for each mode
+          chomp($line);
+          my @mode = split q[ ], $line;
+          push @modes, \@mode;
+      }
+  }
+  $self->result->norm_fit_modes(\@modes);
 
   return 1;
 };
