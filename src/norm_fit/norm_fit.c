@@ -163,7 +163,12 @@ int main(int argc, char **argv)
 
     //1============================count peaks first time
     num_peI = CountPeaks(hist,bins,nbins);
-
+    if (0 == num_peI)
+    {
+        printf("No peaks initially - aborting mode_detection\n");
+        return 0;
+    }
+    
     //1.2 ========================= smooth until stable
     num_peS = num_peI;
     diff = 1;
@@ -205,6 +210,11 @@ int main(int argc, char **argv)
         }
     }
     num_peS = k;
+    if (0 == num_peS)
+    {
+        printf("No peaks after stabilizing - aborting mode_detection\n");
+        return 0;
+    }
 
     height = GetMax(amp,num_peS);//find max function for peaks after stabilizing
 
