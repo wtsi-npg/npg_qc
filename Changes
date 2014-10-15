@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.14
+ - updates to norm_fit code
+     more informative log messages 
+     added checks for zero peaks 
+     do not run norm_fit test if there is not enough variation in the insert size
+
 release 56.13
  - correct size of genotype_data_set column of genotype table
 
