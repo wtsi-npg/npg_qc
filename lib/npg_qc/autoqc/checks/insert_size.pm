@@ -305,6 +305,11 @@ override 'execute'            => sub {
       croak $error;
   }
 
+  if (! -e $output) {
+      $self->result->add_comment('No output from normal fitting');
+      return 1;
+  }
+
   my @lines = slurp $output;
 
   my @modes = ();
