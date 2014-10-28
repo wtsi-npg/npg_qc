@@ -64,12 +64,9 @@ my $pos_snpname_map_filename = $opts{m};
 my $gt_exec_path = $opts{x};
 
 $sample_name ||= 'NO_SN';
-$plex_name ||= 'W30467';	# standard Sequenom QC plex
+$plex_name ||= q[sequenom_fluidigm_combo];	# standard Sequenom+Fluidigm QC plex
 $reference_genome ||= q[/lustre/scratch109/srpipe/references/Homo_sapiens/1000Genomes/all/fasta/human_g1k_v37.fasta];
-# $pos_snpname_map_filename ||= q[/nfs/srpipe_references/genotypes/W30467_chrpos_snpname_map_1000Genomes.tsv];
-# $pos_snpname_map_filename ||= q[/nfs/srpipe_references/genotypes/] . $plex_name . q[_chrpos_snpname_map_1000Genomes.tsv];
 my $chr_name_set = ($reference_genome =~ m{/GRCh37}? q[GRCh37]: q[1000Genomes]);
-$pos_snpname_map_filename ||= q[/nfs/srpipe_references/genotypes/] . $plex_name . q[_chrpos_snpname_map_] . $chr_name_set . q[.tsv];
 
 die "Usage: call_gtck_composite_rpt.pl [-h] -r <rpt_list> -s <sample_name> -p <poss_dup_level> -j\n" unless(@bam_file_list and $sample_name and $reference_genome and !$opts{h});
 
@@ -82,16 +79,21 @@ else {
 }
 
 my %attribs = (
-#	sequenom_plex => q[W30467],
-	sequenom_plex => $plex_name,
 	sample_name => $sample_name,
 	alignments_in_bam => 1,
 	reference_fasta => $reference_genome,
-	pos_snpname_map_fn => $pos_snpname_map_filename,
 	samtools_name => q[samtools_irods],
 	input_files => [ (@bam_file_list) ],
 	path => q[.],
 );
+if(defined $plex_name) {
+	$attribs{sequenom_plex} = $plex_name;
+
+	$pos_snpname_map_filename ||= q[/nfs/srpipe_references/genotypes/] . $plex_name . q[_chrpos_snpname_map_] . $chr_name_set . q[.tsv];
+}
+if(defined $pos_snpname_map_filename) {
+	$attribs{pos_snpname_map_fn} = $pos_snpname_map_filename;
+}
 if(defined $poss_dup_level) {
 	$attribs{poss_dup_level} = $poss_dup_level;
 }
