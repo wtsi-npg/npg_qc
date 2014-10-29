@@ -38,10 +38,6 @@ use npg_qc::autoqc::checks::genotype;
 ##no critic
 our $VERSION = '0';
 
-Readonly::Scalar my $REPOS => q[/lustre/scratch109/srpipe];
-Readonly::Scalar my $HUMAN_REFERENCES_REPOS => $REPOS . q[/references/Homo_sapiens];
-Readonly::Scalar my $GTDATA_REPOS => $REPOS . q[/genotypes];
-
 my %opts;
 getopts('hr:s:p:jo:g:m:a:x:', \%opts);
 
@@ -58,6 +54,13 @@ if($opts{r}) {
 	carp qq[bam_file_list:\n\t], join("\n\t", @bam_file_list), "\n";
 }
 
+#######################################################
+# find locations of repositories with npg_tracking role
+#######################################################
+my $ref_repos = Moose::Meta::Class->create_anon_class(roles => [qw/npg_tracking::data::reference::list/])->new_object()->ref_repository;
+my $gt_repos = Moose::Meta::Class->create_anon_class(roles => [qw/npg_tracking::data::reference::list/])->new_object()->genotypes_repository;
+
+
 my $sample_name = $opts{s};
 my $plex_name = $opts{a};	# "a" for assays
 my $poss_dup_level = $opts{p};
@@ -70,7 +73,7 @@ my $gt_exec_path = $opts{x};
 
 $sample_name ||= 'NO_SN';
 $plex_name ||= q[sequenom_fluidigm_combo];	# standard Sequenom+Fluidigm QC plex
-$reference_genome ||= $HUMAN_REFERENCES_REPOS . q[/1000Genomes/all/fasta/human_g1k_v37.fasta];
+$reference_genome ||= $ref_repos . q[/Homo_sapiens/1000Genomes/all/fasta/human_g1k_v37.fasta];
 my $chr_name_set = ($reference_genome =~ m{/GRCh37}? q[GRCh37]: q[1000Genomes]);
 
 die "Usage: call_gtck_composite_rpt.pl [-h] -r <rpt_list> -s <sample_name> -p <poss_dup_level> -j\n" unless(@bam_file_list and $sample_name and $reference_genome and !$opts{h});
@@ -94,7 +97,7 @@ my %attribs = (
 if(defined $plex_name) {
 	$attribs{sequenom_plex} = $plex_name;
 
-	$pos_snpname_map_filename ||= $GTDATA_REPOS . q[/] . $plex_name . q[_chrpos_snpname_map_] . $chr_name_set . q[.tsv];
+	$pos_snpname_map_filename ||= $gt_repos . q[/] . $plex_name . q[_chrpos_snpname_map_] . $chr_name_set . q[.tsv];
 }
 if(defined $pos_snpname_map_filename) {
 	$attribs{pos_snpname_map_fn} = $pos_snpname_map_filename;
