@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 56.16
+ - changed default data source for call_gtck_composite_rpt.pl to combined Sequenom/Fluidigm results
+
 release 56.15
  - if norm_fit test produces no output, e.g. if no peaks after filtering, simply add a comment
 
