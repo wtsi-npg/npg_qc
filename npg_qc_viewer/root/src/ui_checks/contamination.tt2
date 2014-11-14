@@ -1,0 +1,52 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+<div class="data_table">
+<table summary="contamination check meta data">
+  <tr>
+    <th class="laligned">reference version</th>
+    <td>[% IF check.reference_version.defined %][% check.reference_version %][% END %]</td>
+  </tr>
+
+  <tr>
+    <th class="laligned">aligner</th>
+    <td>[% IF check.aligner_version.defined %][% check.aligner_version %][% END %]</td>
+  </tr>
+
+  <tr>
+    <th class="laligned">read count</th>
+    <td>[% IF check.read_count.defined %][% check.read_count | format_number %][% END %]</td>
+  </tr>
+
+  [% IF check.comments.defined && check.comments -%]
+    <tr>
+      <th>comments</th><td>[% check.comments %]</td>
+    </tr>
+  [% END -%]
+</table>
+</div>
+
+[% IF check.contaminant_count.defined -%]
+<div class="data_table">
+<table summary="contamination for each checked organism">
+  <tr>
+    <th>organism</th>
+    <th>count</th>
+    <th>correction factor</th>
+    <th>normalized value</th>
+  </tr>
+
+  [% FOREACH organism IN check.ranked_organisms -%]
+    [%- ncount = check.normalised_contamination.item(organism);
+        IF ncount != '0.0';
+    -%]
+    <tr>
+      <td><span class="dark_blue">[% organism | replace('_', ' ') %]</span></td>
+      <td class="raligned">[% check.contaminant_count.item(organism) | format_number %]</td>
+      <td class="raligned">[% check.genome_factor.item(organism) %]</td>
+      <td class="raligned">[% ncount %]</td>
+    </tr>
+    [%- END -%]
+  [% END -%]
+</table>
+</div>
+ [% END -%]

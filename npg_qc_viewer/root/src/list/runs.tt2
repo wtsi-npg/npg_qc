@@ -1,0 +1,31 @@
+[% WRAPPER qsea_wrapper.tt2;
+   USE format;
+   day_format = format('%02s');  -%]
+
+<div id="content">
+
+<div id="menu">
+  <div id="links">
+    <ul>
+      <li><a href="#page_top">Page Top</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="first_section"  class="text_section">
+
+  <table summary="Runs and NPG tracking status">
+<tr><th rowspan="2">Run ID</th><th colspan="2">NPG Tracking Status</th></tr>
+<tr><th>Description</th><th>Last Modified</th></tr>
+[% FOREACH run IN runs -%]
+  [% id_run = run.id_run; date = run.date %]
+  <tr>
+    <td><a href="[% c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run) %]">[% id_run %]</a></td>
+    <td>[% run.run_status_dict.description %]</td><td>[% day_format(date.day) _ ' ' _ date.month_name _ ' ' _ date.year %]</td>
+  </tr>
+[% END -%]
+</table>
+
+</div>
+</div>
+[%- END -%]

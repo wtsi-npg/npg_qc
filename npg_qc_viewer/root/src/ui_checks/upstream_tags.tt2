@@ -1,0 +1,136 @@
+[%- USE Number.Format(THOUSANDS_SEP=',') -%]
+
+[% uri_base = c.request.base %]
+[% check = c.model('UpstreamTagsCheck').sort_unexpected_tags(check); %]
+
+<div class="lfloat">
+
+<div class="data_table">
+Tag#0 decoding against Sanger168 tag set
+<table summary="Upstream Tag Decoding">
+<tr>
+  <th>&nbsp;</th>
+  <th>Count</th>
+  <th>Percent of lane reads</th>
+</tr>
+<tr>
+  <th class="laligned">Reads examined (tag#0)</th>
+  <td class="raligned">[% check.total_tag0_reads | format_number %]</td>
+[% INCLUDE reads_examined_row tt0r=check.total_tag0_reads tlr=check.total_lane_reads %]
+</tr>
+<tr>
+  <th class="laligned">Perfect matches</th>
+  <td class="raligned">[% check.tag0_perfect_match_reads | format_number %]</td>
+[% INCLUDE perfect_matches_row t0pmr=check.tag0_perfect_match_reads tlr=check.total_lane_reads %]
+</tr>
+</table>
+</div>
+
+<div class="data_table">
+Tags in upstream runs (same instrument/slot)
+<table summary="Upstream Runs">
+<tr>
+  <th>Run</th>
+  <th title="Run in progress date">Date started</th>
+  <th>Lane tag count</th>
+  <th title="New tag count: number of tags which first appear in this run, not in any downstream runs">New tag count</th>
+  <th>Perfect matches</th>
+  <th>Percent of lane reads</th>
+</tr>
+[% FOREACH prev_run IN check.prev_runs %]
+<tr>
+[% INCLUDE upstream_runs_row pr=prev_run lane=check.position uri_base=uri_base %]
+</tr>
+[% END %]
+</table>
+
+</div>
+</div>
+
+<div class="rfloat">
+
+<div class="data_table">
+High-scoring tags (perfect match >= 0.01% for Sanger168 tag set)
+<table summary="tags">
+<tr>
+  <th>Tag</th>
+  <th>Run</th>
+  <th title="Tag index is for run where available, else index from initial decode tag set">Tag Idx</th>
+  <th title="Count of perfect match reads for the tag">Reads (pm)</th>
+  <th title="Count of one-mismatch reads for the tag">Reads (1mm)</th>
+  <th title="percentage of tag#0 reads for the tag that were a perfect match">Reads (pm), % (tag#0)</th>
+  <th title="percentage of tag#0 reads for the tag that had one mismatch">Reads (pm), % (lane)</th>
+</tr>
+[% FOREACH ut IN check.unexpected_tags %]
+[% IF !ut.id_run; ut.id_run = '-'; END %]
+[% IF ut.perfect_match_count / check.total_tag0_reads >= 0.0001 %]
+<tr>
+  <td class="sequence_string">[% ut.tag_sequence %]</td>
+  <td>[% ut.id_run %]</td>
+  <td>[% ut.tag_index %]</td>
+  <td title="Count of perfect match reads for tag [% ut.tag_sequence %]" class="raligned">[% ut.perfect_match_count %]</td>
+  <td title="Count of one-mismatch reads for tag [% ut.tag_sequence %]" class="raligned">[% ut.one_mismatch_matches %]</td>
+  <td title="percentage of tag#0 reads that were a perfect match reads for tag [% ut.tag_sequence %]" class="raligned">[% FILTER format('%2.3f'); ut.perfect_match_count * 100 / check.total_tag0_reads; END %]</td>
+  <td title="percentage of lane reads that were a perfect match reads for tag [% ut.tag_sequence %]" class="raligned">[% FILTER format('%2.3f'); ut.perfect_match_count * 100 / check.total_lane_reads; END %]</td>
+</tr>
+[% END %]
+[% END %]
+</table>
+</div>
+
+</div>
+
+<div class="clear"></div>
+[% IF check.comments %]Comments: [% check.comments; END %]
+
+[% BLOCK upstream_runs_row %]
+
+[% IF pr.is_a_pool.defined && pr.is_a_pool == 'N' -%]
+ [% na_title_attr = 'title="This lane is not a pool"' %]
+ [% lane_tag_count = 'NA' %]
+ [% new_tag_count = 'NA' %]
+ [% perfect_match_reads = 'NA' %]
+ [% pct_of_lane_reads = 'NA' %]
+[% ELSE %]
+ [% na_title_attr = 'title="' _ iap _ '"' %]
+ [% lane_tag_count = pr.new_tag_count + pr.downstream_tag_count %]
+ [% new_tag_count = pr.new_tag_count %]
+ [% perfect_match_reads = pr.perfect_match_reads %]
+[% IF check.total_lane_reads > 0 %]
+ [% pct_of_lane_reads = pr.perfect_match_reads * 100 / check.total_lane_reads %]
+[% ELSE %]
+ [% pct_of_lane_reads = 0 %]
+[% END %]
+[% END %]
+
+  [% tmc_title = 'Tag metrics results for ' _  pr.id_run _ '_' _ lane %]
+  [% tmc_link = uri_base _ "checks/runs/" _  pr.id_run _ "#tmc_" _ pr.id_run _ ":" _ lane %]
+  <td class="raligned"><a title="[% tmc_title %]" href="[% tmc_link %]">[% pr.id_run %]</a></td>
+  <td class="raligned">[% pr.run_in_progress_date %]</td>
+
+  <td class="raligned" [% na_title_attr %]>[% lane_tag_count %]</td>
+  <td class="raligned" [% na_title_attr %]>[% new_tag_count %]</td>
+  <td class="raligned" [% na_title_attr %]>[% perfect_match_reads %]</td>
+[% IF pr.is_a_pool.defined && pr.is_a_pool == 'N' -%]
+  <td class="raligned" [% na_title_attr %]>[% pct_of_lane_reads %]</td>
+[% ELSE %]
+  <td class="raligned" [% na_title_attr %]>[% FILTER format('%2.3f'); pct_of_lane_reads; END %]</td>
+[% END %]
+
+[% END %]
+
+[% BLOCK reads_examined_row %]
+[% IF tlr > 0 %]
+  <td class="raligned">[% FILTER format('%2.3f'); tt0r * 100 / tlr; END %]</td>
+[% ELSE %]
+  <td class="raligned">0</td>
+[% END %]
+[% END %]
+
+[% BLOCK perfect_matches_row %]
+[% IF check.total_lane_reads > 0 %]
+  <td class="raligned">[% FILTER format('%2.3f'); t0pmr * 100 / tlr; END %]</td>
+[% ELSE %]
+  <td class="raligned">0</td>
+[% END %]
+[% END %]

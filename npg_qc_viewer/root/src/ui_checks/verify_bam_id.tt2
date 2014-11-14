@@ -1,0 +1,18 @@
+
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+[% has_reverse = check.reverse_read_gc_percent.defined -%]
+
+<div class="data_table">
+
+<table summary="verify_bam_id">
+<tr>
+  <th class="laligned">Number of SNPs</th> <td>[% check.number_of_snps %]</td>
+  <th class="laligned">Average Depth</th> <td>[% check.avg_depth %]</td>
+  <th class="laligned">Freemix</th> <td>[% check.freemix %]</td>
+  <th class="laligned">FreeLK0</th> <td>[% check.freeLK0 %]</td>
+  <th class="laligned">FreeLK1</th> <td>[% check.freeLK1 %]</td>
+</tr>
+</table>
+
+

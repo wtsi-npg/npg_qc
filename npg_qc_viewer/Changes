@@ -1,0 +1,375 @@
+Changes for NPG SeqQC
+
+release 20.6
+ - added norm_fit information
+ - fixed typos in check verify_bam_id template
+ - removed erroneous entry for SNP rs532841 from the Fluidigm_QC plexes
+     layout data in the template which was causing incorrect display of
+     Fluidigm results
+
+release 20.5
+ - manual qc lane status change:
+    refactor following recent changes to npg_tracking
+    make callable directly from teh controller
+    get run id from referrer url - prepare for multilims
+ - LIMs server url update
+
+release 20.4
+ - added data for new Fluidigm SNP sets, updated supplementary information tooltip for SNPs
+ - updated qc directory stucture under t/data/nfs/sf44/ for tests.
+
+release 20.3
+ - make verify bam id display nicer
+
+release 20.1
+ - accommodate dbix-based qc data retriever
+
+release 18.7
+ - remove old farm nodes as hosts for production daemon monitor
+
+release 18.6
+ - daemon monitor to start segqc server on both login nodes of the new farm
+ - test update following changes to ping procedure for npg daemons
+ - changes to allow display for multiple SNP sets in the genotype check
+ - changes to pulldown metrics display for extra fields which will be available with the SI version of CalculateHsMetrics
+
+release 18.5
+ - add display for tags_reporters check results
+ - add "on bait base, %" values to summary section for pulldown metrics check
+ - add links from upstream tags "Tags in upstream runs" section to tag metrics results for upstream runs
+ - add link from tag metrics summary header to details section
+
+release 18.4
+ - make daemon definition work on hosts where the code is deployed
+   differently; relies on CATALYST_HOME env variable being set up
+
+release 18.3
+ - upstream tags: correct divide by zero error
+
+release 18.2
+ - add utility function in model for upstream tags to sort unexpected tag results into perfect_match_count order (desc)
+
+release 18.1
+ - add filter for upstreeam tags checks results (high-scoring tags, perfect matches >= .01%)
+
+release 18.0
+ - production environment is now set in login shell - no need to set npg
+   and npg cpan lib location through PERL5LIB;
+   hardcoded Catalyst-specific cpan dependencies for lenny
+
+release 17.4
+ - update live URL for getting/posting lims data as requested in RT#336085
+
+release 17.3
+ - updated links to NPG QC to point to a url relative to NPG tracking url
+
+release 17.2
+ - added display for upstream_tags check
+
+release 17.1
+ - use html-specific XML validation in tests to avoid spurious errors
+ - remove validation with html tidy in tests since it does not work well on precise; xml validation should be enough
+ - database-specific formating of dates in queries to avoid warnings under perl 5.16.3 on precise
+ - tests/code tidied up to remove most of the warnings in testing
+ - enable manual qc widget if run status is 'qc on hold' RT#348314
+
+release 17.0
+ - the app's sceleton updated by running the latest catalist.pl sctipt
+ - Build.PL script capable of installing dependencies added
+ - list of dependencies udated
+ - demon definition moved inside the main application
+
+release 16.7
+ - bug: in a callback for logging manual qc run_lane stats was updated for wrong
+   id_run, resulting in already qc_complete run moved back to archival_pending;
+   fix: do not cache run_id in the model (DBIC schema) attribute
+
+release 16.6
+ - upgraded (including the daemon) to run under perl 5.14.2 with the latest Catalyst
+ - use updated DBIC npg_warehouse binding
+ - POD spelling typos fixed
+ - sequence error template: do not display cigars with undefined cigar string
+
+release 16.5
+ - use new npg url
+ - use dev urls for npg and psd if running in dev environment
+ - define npg and psd urls once
+
+release 16.4
+ - daemon definition: run from a different location with fewer components of PERL5LIB
+
+release 16.3
+ - local daemon definition for the server (built separately from the server app)
+
+release 16.2
+ - display spatial filter results
+ - pullown metrics : mask "on target" results when bait and targets regions were identical; add links from header
+
+release 16.1
+ - only display composite genotype check results when multiple bam files were used
+
+release 16.0
+ - changes to display composite genotype check results, both in model and templates
+
+release 15.4
+ - test data updated following npg tracking schema and DBIx binding changes
+ - enable utf8 encoding in a safe way, see RT#291191: utf8 encoding suppurt in SeqQC - failure to get batch xml
+     the problem goes if the response from psd server is not compressed
+     this might be a bug in the Unicode::Encoding plugin we are using to display correctly utf8 encoded strings
+     the current solution is a hack - the ajax proxy removes teh 'Accept-Encoding' for a request that goes to psd
+
+release 15.3
+ - warehouse query for sample id in the genotype template uses Cyrrent Sample table instead of Sample table
+ - test data updated following renaming of DBIx classes for npg-qc database
+
+release 15.2
+ - revert back change done in 15.1 since xml files coming from ajax proxy are encoded incorrectly - browser cannot parse them
+
+release 15.1
+ - Catalyst made to respect utf8 characters - see #RT#291015: SeqQC pages empty if contain utf8 chars
+   example: run 8016, lane 2, tag_index 39
+
+release 15.0
+ - release compatible with data-handling release 33.0 - switch to warehouse3
+
+release 14.2
+ - fixed divide by zero error in genotype check summary
+
+release 14.1
+ - summary table header prettified
+ - alignment filter metrics display lists all outputs in the same way, no distinction between target and split; correct handling of unmapped output
+
+release 14.0
+ - genotype: results display amended; documentation added; Sequenom genotype displayed; mean depth displayed in summary
+ - sequence_error: added cigar charts
+
+release 13.2
+ - display common cigars
+
+release 13.1
+ - display for alignment filter metrics
+ - bam flag stats for human and phix removed from the summary table
+
+release 13.0
+ - display for pulldown metrics
+
+release 12.6
+ - improved display of genotype check results (calls, depths, likelihoods)
+
+release 12.5
+ - colour scheme for the summary table changed to account for colour blind users  RT#260339
+
+release 12.4
+ - Catalyst::Controller::AjaxProxy module moved to this svn project
+
+release 12.3
+ - dbix db fixtures for npg tracking updated pending schema changes in npg-tracking release 68.2
+ - SangerSSOnpg module to use common code from npg::authopriation name space; the decription key stored in the app cong file
+
+release 12.2
+ - logging level set to warn, fatal and error
+ - manual qc widgets are displayed only to a person to set the qc in progress status #RT252344
+ - authentication/athorization is done in templates rather than in Checks controller
+ - Login controller removed, its functionality moved to teh authorise method of the Root controller, the code that use forwards to the Login controller refactored
+ - Calls to run dbix class depricated method current_run_status replaced by current_run_status_description
+
+release 12.1
+ - manual qc js fixes for IE and Safari #RT252364
+ - resolved CGI/Catalyst conflict in new authentication code - resulted in indefinite wait #RT252347
+
+release 12.0
+ - qc pass/fail marking options only on "qc in progress" runs instead of "qc review pending", also show this new status in run list
+ - changed authentication credential module
+
+release 11.5
+ - changes in display of new genotype check data, and changes in the tag_metrics display
+
+release 11.4
+ - tag sequence for tag zero should not be shown
+
+release 11.3
+ - help page updated
+ - qc checks help page created
+ - tag metrics help written
+ - tag metrics template edited to improve usability
+
+release 11.2
+ - bug fix in the tag_metrics full view
+
+release 11.1
+ - a view for tag_metrics check
+ - additional collapsible features
+ - eliminated remains of the long gone wh asset_type column from the code, tests and test data
+
+release 11.0
+ - enable npg-tracking db glob lookup when retrieving autoqc results
+
+release 10.0
+ - additions/amendments for genotype check
+
+release 9.0 RT#230877
+ - sample -> study and study ->sample links from npg wh tables RT#211170
+ - text links to sscape and npg pages, navigation within the application via icons
+ - droped 'outcome cannot be evaluated' string in the individual check header
+ - renamed the heatmap 'check'
+ - run view: links to staging runfolders fixed
+ - collanable check and lane full details
+
+  Description of new-style navigation:
+Changes in the summary page:
+ Text links will now generally take you out of the SeqQC pages
+ - text links representing library and sample names now point to Sequencescape,
+ - text link representing the run id points to the NPG run page,
+
+Links within the SeqQC pages are shown as blue arrows
+ - beside a pool name is an arrow forking down to take you to a view of the plexes.  This replaces the small 'p' beside the lane number.
+
+ - beside a library name is an arrow taking you 'Up' to the sample page
+ - beside the sample name is an arrow taking you 'Up' to the study page
+
+ - the focus icon (4 outward arrows) to the left of the pool/library name takes you to the page of all lanes/plexes of this library
+ - the focus icon to the left of the run number takes you to the main run page
+
+New  ± icon on the headers for lane results and an individual result:
+ - collapse/expand relevant part of the page. 
+
+release 8.4
+  templates edits to produce more readable HTML at the beginning of a page
+  unused styles deleted from the stylesheet
+  style for links changed, underline removed
+  R&D watermark in the library lane space RT #228971
+  do not create an image tag for sequence error legend if legend url is empty
+
+release 8.3
+  cope with bam flagstats percent methods now returning percentages rather than fractions
+
+release 8.2
+  legend for mismatch plots
+  bug fix for lanes with spiked phix - error in template resulting in two unbalanced </div> tags
+
+release 8.1
+  insert size check: display two sets of percent of aligned pairs
+  all checks: do not display file names
+  contamination, ref match and adapter check: do not diaplay rows with zero hits
+
+release 8.0
+  test data set for t/80-app.t (HTML and XML validation test) extende to include all possible autoqc check objects RT #220394
+  fix lane annotation display when the same annotation refers to a number of lanes RT #220276
+  create methods for retrieving annotations on NpgDB model; call these methods directly from a template, rather than from a controller
+  as above, but for determining whether the run is still on staging
+  split annotations over multiple lines if carridge return is present in the annotation
+  group lane annotation by lane, apply stripes to visually group lines together on display
+  insert size summary display: warn about low alignment level
+  current run status displayed on run pages
+
+release 7.0
+  bam flag stats : coefficient of variance added
+  display of tag split stats improved, fivex a bug in displaying stats for all reads
+  full view for all checks: data columns aligned
+  some other improvements in visual appearence as requested by Nadeem
+
+release 6.0
+  load fastqcheck files either from staging or from a specified path or from npg qc database; no support for /fuse
+  support for viewing results from multiple paths
+  in runs-from-staging view the links to plex files will display plex files from staging
+  tests improved: no calls out to external databases
+
+release 5.0
+  move to wh2
+
+release 4.0
+  more info when reporting an error in manual qc reporting
+
+release 3.2
+  handle PulldownMultiplexedLibraryTube asset type as a pool
+
+release 3.1
+  no manual qc for libraries and no re-qcing
+  ajax error messages display
+  full results for bam_flagstats
+
+release 3.0
+  bug fix for summary table not showing for with-plex set of results in lib, sample and study view
+  library creator views
+  ref match check added
+  dynamic loading of own javascript libraries to allow for plug-in libraries
+  fixes to javascript to make it work in IE7 and IE8
+
+release 2.0
+  interface for manual qc
+  Sanger SSO authorisation and authentication
+  QUnit tests for JavaScript
+  Adapter match start plots
+
+release 1.0
+  parallel queries to the NPG warehouse table and NPG QC (or staging area) for all views
+  many template toolkit warnings fixed
+  extended set of tests
+
+release 0.9.3
+  TODO tests fixed
+  code for retrieving sample and study info moved to Result classes of the warehouse db DBIx binding
+  explicit joins from npg tables to other wh tables (samples, studies, ...) are not used any more
+  date rendering from npg-tracking db fixed (date is a DateTime object now)
+  content division expands according to the summary table width
+
+release 0.9.2
+  fixed order of full checks view (were unordered)
+  added a DBIx model for NPG QC database
+  Model::Visuals model renamed to Model::Visuals::Fastqcheck
+  .fastqcheck files can be retrieved from the NPG QC database
+  qX_yield template fixed - does not display threshold when it is undefined (plexes)
+  summary table overflow fixed
+
+release 0.9.1
+  rendering for mplexed lanes is added
+  a flow through templates is simplified, all lanes are rendered through one template, run-specific template discontinued
+  most of sequencescape information it retrieved from npg_information and npg_plex_information tables in the warehouse
+  studies instead of projects
+  flexible views
+
+release 0.9
+  SeqCache model is not reliable for access from multiple threads; caching of the underlying finder object for a run is commented out
+  a special view for rendering imaged removed; response body set directly in the controller
+  a proxy controller for chanelling Ajax requests to 3rd party servers
+  a separate controller for login
+  the main config file does not contain details of databases, and code changes for this to work
+  the summary table displays columns for actually present result objects
+  get the right request id in DBIX queries
+  templates for a new check  - bam_flagstats
+
+release 0.8
+  controllers, views and models converted to Moose classes
+  AutoCRUD plugin used to generate interface to npg tracking database
+  role based realm specific authentication for autocrud admin pages
+
+release 0.7
+  application renamed to NPG SeqQC
+  separate model for finding files, the code for finding is delegated to a new module in npg_common namespace
+  a separate template for fastqcheck visuals
+  a fastqcheck visuall for _t file added
+  fastqcheck visuals rendered in the main loop for the checks in lane
+  sequence mismatch images aligned with fastqcheck images
+  by default the application does not have the debug mode on
+  copyright notices changed as requested
+  catalyst scripts upgraded by running catalyst.pl -force -scripts npg_qc_viewer
+
+release 0.6
+  Display sample&project name in the header in a full view of the result
+  Display the number of cycles
+  Error plots for for a forward and reverse run: scale in the same way in Y direction and set the width of teh image proportionally to teh number of cycles
+  Visualization for fastqcheck files
+  Test for XML validation
+  Input validation in Controller actions (only where positive ints are expected)
+  Fixes to conform to XHTML 1.0 Strict
+  gc_bias test templates added
+  tag_decode_stats templates added
+  works with dbix schemas located in relevant projects
+  added total qX yield to the summary table
+  gc_bias column removed from the summary table
+  sequence error check renamed to sequence mismatch
+
+release 0.5
+
+0.01  2009-08-20 16:10:05
+        - initial revision, generated by Catalyst

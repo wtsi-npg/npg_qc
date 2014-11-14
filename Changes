@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 57.0
+ - incorporated SeqQC viewer
+
 release 56.16
  - changed default data source for call_gtck_composite_rpt.pl to combined Sequenom/Fluidigm results
 

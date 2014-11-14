@@ -1,0 +1,95 @@
+[%- USE Number.Format(THOUSANDS_SEP=',') -%]
+
+[%- IF check.interval_files_identical; na_disp='<span class="pdmc_na" title="Baits and targets identical">NA</span>'; END; -%]
+
+[% IF check.bait_path || check.comments -%]
+<div class="data_table">
+<table summary="pulldown summary info">
+<tr><th class="laligned">Pass criterion </th><td>[% check.criterion %]</td></tr>
+[% IF check.bait_path -%]
+<tr><th class="laligned">Interval files directory</th><td>[% check.bait_path %]</td></tr>
+[%- END %]
+[% IF check.bait_territory -%]
+<tr><th class="laligned">Bait : Target territory</th><td class="raligned">[% check.bait_territory | format_number %] : [%- IF check.interval_files_identical -%][% na_disp %][%- ELSE -%][% check.target_territory | format_number %][%- END -%]</td></tr>
+[%- END %]
+[% IF check.comments -%]
+<tr><th class="laligned">Comments</th><td>[% check.comments %]</td></tr>
+[%- END %]
+</table>
+</div>
+[% END %]
+
+[% IF check.bait_territory -%]
+<div class="data_table">
+<table summary="pulldown summary check results">
+<tr><th class="laligned">Total reads count</th><td class="raligned">[% check.total_reads_num | format_number %]</td></tr>
+[% IF check.total_reads_num -%]
+<tr><th class="laligned">Unique reads, %</th><td class="raligned">[% FILTER format('%2.2f');check.unique_reads_percent;END %]</td></tr>
+<tr><th class="laligned">Unique aligned reads, %</th><td class="raligned">[% FILTER format('%2.2f');check.unique_reads_aligned_percent;END %]</td></tr>
+<tr><th class="laligned">Unique aligned bases count</th><td class="raligned">[% check.unique_bases_aligned_num | format_number %]</td></tr>
+<tr><th class="laligned">On bait bases, %</th><td class="raligned">[% FILTER format('%2.2f');check.on_bait_bases_percent;END %]</td></tr>
+<tr><th class="laligned">Near bait bases, %</th><td class="raligned">[% FILTER format('%2.2f');check.near_bait_bases_percent;END %]</td></tr>
+<tr><th class="laligned">On target bases, %</th><td class="raligned">[%- IF check.interval_files_identical -%][% na_disp %][%- ELSE -%] [% FILTER format('%2.2f');check.on_target_bases_percent; END %][%-END -%]</td></tr>
+[% IF check.on_bait_reads_percent %] <tr><th class="laligned">On bait reads, %</th><td class="raligned">[% FILTER format('%2.2f');check.on_bait_reads_percent;END %]</td></tr>[% END %]
+[% IF check.near_bait_reads_percent %] <tr><th class="laligned">Near bait reads, %</th><td class="raligned">[% FILTER format ('%2.2f');check.near_bait_reads_percent;END %]</td></tr>[% END %]
+[% IF check.on_target_reads_percent %] <tr><th class="laligned">On target reads, %</th><td class="raligned">[% FILTER format ('%2.2f');check.on_target_reads_percent;END %]</td></tr>[% END %]      
+<tr><th class="laligned">Fold enrichment</th><td class="raligned">[% FILTER format('%3.2f');check.fold_enrichment;END %]</td></tr>
+<tr><th class="laligned">Mean bait coverage</th><td class="raligned">[% FILTER format('%3.2f');check.mean_bait_coverage;END %]</td></tr>
+<tr><th class="laligned">Mean target coverage</th><td class="raligned">[%- IF check.interval_files_identical -%][%- na_disp -%][%- ELSE -%][% FILTER format('%3.2f');check.mean_target_coverage;END %][%-END -%]</td></tr>
+[% IF check.unique_bases_aligned_num.defined && check.unique_bases_aligned_num != 0; %]
+<tr><th class="laligned">Mean target coverage per mapped Gb</th><td class="raligned">[%- IF check.interval_files_identical -%][%- na_disp -%][%- ELSE -%] [% FILTER format('%3.2f');check.mean_target_coverage / (check.unique_bases_aligned_num / 1000000000);END  %][%-END -%]</td></tr>
+[% END %]
+<tr><th class="laligned">Zero target coverage, %</th><td class="raligned">[%- IF check.interval_files_identical -%][%- na_disp -%][%- ELSE -%] [% FILTER format('%2.2f');check.zero_coverage_targets_percent;END %][%-END -%]</td></tr>
+[%- END %]
+</table>
+</div>
+[%- END %]
+
+
+[%- bait_coverage = check.bait_bases_coverage_percent;
+    bait_coverage_keys = bait_coverage.keys.nsort;
+-%]
+
+[%- coverage = check.target_bases_coverage_percent;
+    coverage_keys = coverage.keys.nsort;
+    IF coverage_keys.size;
+-%]
+<div class="data_table">
+<table summary="target bases coverage">
+<tr><th>Coverage at and above</th>
+[% FOREACH ckey IN coverage_keys %]
+<td class="raligned">[% ckey %]X</td>
+[%- END %]</tr>
+<tr><th>Target bases, %</th>
+[% FOREACH ckey IN coverage_keys %]
+<td class="raligned">[%- IF check.interval_files_identical -%][%- na_disp -%][%- ELSE -%][% FILTER format('%2.2f');coverage.$ckey ? coverage.$ckey : 0 ;END %][%-END -%]</td>
+[%- END %]</tr>
+           [% # Only print this heading if there are bait bases fields available %] 
+[% IF bait_coverage_keys.size %]
+<tr><th>Bait bases, %</th>
+[% FOREACH ckey IN bait_coverage_keys %]
+           [% # restricting to coverage depths seen on target bases coverage %] 
+     [% IF coverage.$ckey %]  
+<td class="raligned">[% FILTER format('%2.2f');bait_coverage.$ckey ? bait_coverage.$ckey : 0 ;END %]</td>
+     [% END %]
+[%- END %]</tr>
+[% END %]
+</table></div>
+[%- END %]
+
+[%- penalty = check.hs_penalty;
+    penalty_keys = penalty.keys.nsort;
+    IF penalty_keys.size;
+-%]
+<div class="data_table">
+<table summary="penalty vs coverage">
+<tr><th>Coverage</th>
+[% FOREACH pkey IN penalty_keys %]
+<td class="raligned">[% pkey %]X</td>
+[%- END %]</tr>
+<tr><th>HS penalty</th>
+[% FOREACH pkey IN penalty_keys %]
+<td class="raligned">[%- IF check.interval_files_identical -%][%- na_disp -%][%- ELSE -%][% FILTER format('%2.2f');penalty.$pkey;END %][%-END -%]</td>
+[%- END %]</tr>
+</table></div>
+[%- END %]

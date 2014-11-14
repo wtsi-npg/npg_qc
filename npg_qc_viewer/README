@@ -1,0 +1,33 @@
+Running your own development server:
+------------------------------------
+
+unset CATALYST_HOME
+export PATH=/software/perl-5.16.3/bin:$PATH
+export PERL5LIB=lib:/software/npg/lib/perl5:/software/npg/cpan/lib/perl5
+# in the npg_qc_viewer directory
+perl bin/npg_qc_viewer_server.pl -p YOUR_PORT
+
+CATALYST_DEBUG=1 to enable debugging
+
+CATALYST_AUTOCRUD=1 to enable the autocrud plugin
+
+autocrud pages - npg tracking:
+read-only: autocrud/npgdb
+admin:     autocrud/site/admin/schema/npgdb
+
+
+
+Building and testing:
+---------------------
+
+unset CATALYST_HOME
+export PATH=/software/perl-5.16.3/bin:$PATH
+export PERL5LIB=/software/npg/lib/perl5:/software/npg/cpan/lib/perl5
+# in the npg_qc_viewer directory
+perl Build.PL
+CATALYST_DEBUG=0 TEST_AUTHOR=1 ./Build test
+or
+CATALYST_DEBUG=0  TEST_AUTHOR=1 prove -vl t
+
+
+

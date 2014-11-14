@@ -1,0 +1,61 @@
+[%- USE Number.Format(THOUSANDS_SEP=',') -%]
+
+<div class="data_table">
+<table summary="insert size check results">
+<tr><th class="laligned">pass criterion</th><td>[% check.criterion %]</td></tr>
+
+[%- IF check.reference.defined -%]
+<tr><th class="laligned">binary reference path</th><td>[% check.reference %]</td></tr>
+[%- END -%]
+
+[%- quartiles = check.quartiles -%]
+[%- IF quartiles -%]
+<tr><th class="laligned">quartiles</th><td>[% quartiles %]</td></tr>
+[%- END -%]
+
+[%- size_range = check.expected_size_range -%]
+[%- IF size_range -%]
+<tr><th class="laligned">expected size</th><td>[% size_range %]</td></tr>
+[%- END -%]
+
+[%- percent = check.percent_well_aligned_reads; 
+    IF percent.defined && percent != '';
+      opercent = check.percent_well_aligned_reads(1);
+      value = "$percent" _ '%';
+      IF opercent.defined && opercent != '';
+         value = "$percent" _ '% (inward) : ' _ "$opercent" _ '% (outward)';
+         IF !check.paired_reads_direction_in;
+            value = "$opercent" _ '% (inward) : ' _ "$percent" _ '% (outward)';
+         END;
+      END; -%]
+<tr><th class="laligned">properly aligned pairs</th><td>[% value %]</td></tr>
+[%- END -%]
+
+[%- IF check.sample_size.defined -%]
+<tr><th class="laligned">sample size</th><td>[% check.sample_size | format_number %]</td></tr>
+[%- END -%]
+
+[%- IF check.norm_fit_nmode.defined -%]
+<tr><th class="laligned">number of modes</th><td>[% check.norm_fit_nmode | format_number %]</td></tr>
+[%- END -%]
+
+[%- IF check.norm_fit_confidence.defined -%]
+[%- IF check.norm_fit_confidence < 0; check.norm_fit_confidence = 0; END; -%]
+<tr><th class="laligned">confidence of normal fit</th><td>[% check.norm_fit_confidence | format_number %]</td></tr>
+[%- END -%]
+
+[%- IF check.comments.defined -%]
+<tr><th class="laligned">comments</th><td>[% check.comments %]</td></tr>
+[%- END -%]
+
+[%- IF check.comments.defined -%]
+<tr><th class="laligned">comments</th><td>[% check.comments %]</td></tr>
+[%- END -%]
+
+</table>
+</div>
+
+[%- url = check.image_url -%]
+[%- IF url -%]
+<img class="insert_size_histogram" src="[% url | url | html %]" alt="insert size histogram" />
+[%- END -%]

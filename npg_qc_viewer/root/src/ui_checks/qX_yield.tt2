@@ -1,0 +1,32 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+[% has_reverse = check.yield2.defined -%]
+
+<div class="data_table">
+<table summary="qX_yield check results">
+<tr>
+  <th class="laligned">read</th>
+  <td>forward</td>
+  [% IF has_reverse %]<td>reverse</td>[% END %]
+</tr>
+<tr>
+  <th class="laligned">yield, KB</th>
+  <td>[% IF check.yield1.defined; check.yield1 | format_number; END %]</td>
+  [% IF has_reverse %]<td>[% IF check.yield2.defined; check.yield2 | format_number; END %]</td>[% END %]
+</tr>
+<tr>
+  <th class="laligned">threshold, KB</th>
+  <td>[% IF check.threshold_yield1.defined; check.threshold_yield1 | format_number; END %]</td>
+  [% IF has_reverse %]<td>[% IF check.threshold_yield2.defined; check.threshold_yield2 | format_number; END %]</td>[% END %]
+</tr>
+<tr>
+  <th class="laligned">pass criterion</th>
+  <td>[% check.criterion %]</td>
+</tr>
+[% IF check.comments.defined && check.comments -%]
+<tr>
+  <th class="laligned">comments</th><td [%IF has_reverse%]colspan="2"[%END%]>[% check.comments %]</td>
+</tr>
+[% END -%]
+</table>
+</div>
+

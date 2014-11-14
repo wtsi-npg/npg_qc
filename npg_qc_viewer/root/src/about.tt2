@@ -1,0 +1,147 @@
+[% WRAPPER qsea_wrapper.tt2 -%]
+
+<div id="menu">
+  <div id="links">
+    <ul>
+      <li><a href="#page_top">Page Top</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="content">
+
+<div id="first_section"  class="text_section">
+<h2>Currently implemented checks<a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]"><img src="/static/images/information.png" alt="Link to information about qc checks"/></a></h2>
+<ul>
+  <li>qX yield (threshold quality 20)</li>
+  <li>insert size</li>
+  <li>adapter</li>
+  <li>contamination</li>
+  <li>ref_match</li>
+  <li>split statistics</li>
+  <li>sequence mismatch</li>
+  <li>gc fraction</li>
+  <li>qc bias</li>
+  <li>tag metrics (formely tag decode stats)</li>
+  <li>bam flag stats</li>
+  <li>fastqcheck files rendering as heatmaps</li>
+  <li>genotype - sample ID check (Sequenom genotypes)</li>
+  <li>upstream tags - check for contamination of tag#0 BAM file</li>
+  <li>verify BAM ID - check for sample contamination</li>
+</ul>
+</div>
+
+<div class="text_section">
+<h2>Main menu description</h2>
+<table summary="Main menu description">
+<tr><th>Menu button label </th><th>Action</th></tr>
+<tr><th>Last Week</th>
+<td>Checks for all libraries that were created within the last week</td></tr>
+<tr><th>Last Fortnight</th>
+<td>Checks for all libraries that were created within the last two weeks</td></tr>
+<tr><th>Runs</th>
+<td>A list of all runs with links to qc data for individual runs</td></tr>
+<tr><th>Libraries</th>
+<td>A list of all libraries with links to qc data for individual libraries</td></tr>
+<tr><th>Samples</th>
+<td>A list of all samples with links to qc data for individual samples</td></tr>
+<tr><th>Studies</th>
+<td>A list of all studies with links to qc data for individual studies</td></tr>
+<tr><th>Help</th>
+<td>Displays this page</td></tr>
+<tr><th>NPG Tracking</th>
+<td>A link to NPG tracking web interface</td></tr>
+<tr><th>NPG QC</th>
+<td>A link to NPG QC web interface</td></tr>
+</table>
+</div>
+
+<div class="text_section">
+<h2>Additional queries</h2>
+<table summary="Additional queries">
+  <tr><th class="url_column" >URL</th><th>Action</th><th>URL Example</th></tr>
+  <tr>
+    <td class="url_column">/checks/runs/XXX,<br /> where XXX is the ID of the run</td>
+    <td>Displays QC results for this run - main run page</td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), '4114') %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/runs?run=XXX,<br /> where XXX is the ID of the run</td>
+    <td>Displays QC results for all lanes in the run</td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), {run => 4114}) %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/runs?run=4950&amp;lane=1&amp;lane=2&amp;show=lanes</td>
+    <td>Displays lane QC results for lanes 1 and 2, run 4950</td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), {run =>4950, lane=>[1,2], show=>'lanes'}) %]
+    <td><a href="[% url | html %]">[% url | html %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/runs?run=4950&amp;lane=1&amp;lane=2&amp;show=plexes</td>
+    <td>Displays plex QC results for lanes 1 and 2, run 4950</td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), {run =>4950, lane=>[1,2], show=>'plexes'}) %]
+    <td><a href="[% url | html %]">[% url | html %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/runs?run=4950&amp;lane=1&amp;lane=2&amp;show=all</td>
+    <td>Displays all QC results for lanes 1 and 2, run 4950</td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), {run =>4950, lane=>[1,2], show=>'all'}) %]
+    <td><a href="[% url | html %]">[% url | html %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/runs-from-staging/XXX,<br /> where XXX is the ID of the run</td>
+    <td>As /checks/runs?run=XXX, but the QC dababase lookup is dropped. Use this option
+        if you want to see the results from the staging area for a run which
+        already has been archived. Please note that the content of the staging area is constantly changing, so the run that is used in the example is not in the staging area.
+    </td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run_from_staging'), {run=>4114}) %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/runs-from-staging?run=XXX,<br /> where XXX is the ID of the run</td>
+    <td>As /checks/runs/XXX, but the QC dababase lookup is dropped. Use this option
+        if you want to see the results from the staging area for a run which
+        already has been archived. Please note that the content of the staging area is constantly changing, so the run that is used in the example is not in the staging area.
+    </td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run_from_staging'), '4114') %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+   <tr>
+     <td class="url_column">/checks/path?path=my_path</td>
+     <td>Displays QC results from serialized to JSON result objects. Path my_path should
+         be a valid absolute path, readable from the location where the web server is running
+         . The path should point to the directory with JSON files.
+     </td>
+     <td></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/libraries?name=XXX,<br /> where XXX is the name of the library</td>
+    <td>qc checks for all lanes for a library</td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('libraries'), {name=>'129P2_SLX_500_DSS_2'}); %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/samples/XXX,<br /> where XXX is a valid sample ID</td>
+    <td>qc checks for all lanes for a sample</td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('samples'), '2166') %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/studies/XXX,<br /> where XXX is a valid study ID</td>
+    <td>qc checks for all lanes for in a study</td>
+     [% url = c.uri_for_action(c.controller('Checks').action_for('studies'), '171') %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/weeks/X,<br /> where X is a positive integer</td>
+    <td>Checks for all libraries that were created within the last X weeks</td>
+     [% url = c.uri_for_action(c.controller('Checks').action_for('weeks'), '3') %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+</table>
+</div>
+
+</div>
+[% END -%]

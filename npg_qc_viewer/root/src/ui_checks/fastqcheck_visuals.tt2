@@ -1,0 +1,15 @@
+[%-
+  fnames = c.model('SeqStore').files(util.inflate_rpt_key(lane_key), db_lookup, path_list);
+  IF fnames.size;
+    use_db = fnames.db_lookup;
+    FOREACH key IN fnames.keys.sort;
+      IF key != 'db_lookup';
+        fname =  fnames.item("$key");
+-%]
+
+<img class="fastqcheck_plot" src="[%  c.uri_for_action(c.controller('Visuals').action_for('fastqcheck'), {path => "$fname", read => "$key", 'db_lookup' => "$use_db"}) | html %]"  alt="visualization for [% fname %]" />
+[%- END -%]
+[%- END -%]
+
+<img class="fastqcheck_legend" src="[%  c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend')) %]"  alt="legend for the fastqcheck file visualization" />
+[%- END -%]

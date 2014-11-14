@@ -1,0 +1,121 @@
+[%- USE Number.Format(THOUSANDS_SEP=',');
+   has_reverse = check.reverse_average_percent_error.defined;
+-%]
+
+<div class="data_table">
+<table summary="sequence mismatch check results">
+<tr><th class="laligned">read</th><td>forward</td>[% IF has_reverse %]<td>reverse</td>[% END %]</tr>
+
+[%- IF check.criterion.defined && check.criterion -%]
+<tr><th class="laligned">pass criterion</th><td [% IF has_reverse %]colspan="2"[% END %]>[% check.criterion %]</td></tr>
+[%- END -%]
+
+[%- forward_average_percent_error = check.forward_average_percent_error -%]
+[%- IF forward_average_percent_error.defined -%]
+<tr>
+  <th class="laligned">average mismatch, %</th><td>[% forward_average_percent_error %]</td>
+  [% IF has_reverse %]<td>[%check.reverse_average_percent_error%]</td>[% END %]
+</tr>
+[% END -%]
+
+[%- forward_well_aligned_reads = check.forward_aligned_read_count -%]
+[%- IF forward_well_aligned_reads.defined -%]
+<tr>
+  <th class="laligned">well aligned reads</th><td>[% forward_well_aligned_reads %]</td>
+[%- IF has_reverse -%]
+<td>[%check.reverse_aligned_read_count%]</td>
+ [%- END -%]
+</tr>
+[%- END -%]
+
+[%- IF check.sample_size.defined -%]
+<tr><th class="laligned">sample size</th><td [% IF has_reverse %]colspan="2"[% END %]>[% check.sample_size | format_number %]</td></tr>
+[%- END -%]
+
+[%- IF check.filenames.defined -%]
+<tr><th class="laligned">file names</th><td [% IF has_reverse %]colspan="2"[% END %]>[% check.filenames.join %]</td></tr>
+[%- END -%]
+
+[%- IF check.reference.defined -%]
+<tr><th class="laligned">binary reference path</th><td [% IF has_reverse %]colspan="2"[% END %]>[% check.reference %]</td></tr>
+[%- END -%]
+
+[%- IF check.comments.defined && check.comments -%]
+<tr><th class="laligned">comments</th><td [% IF has_reverse %]colspan="2"[% END %]>[% check.comments %]</td></tr>
+[%- END -%]
+
+</table>
+</div>
+
+[% IF check.forward_common_cigars.defined && check.forward_common_cigars.size %]
+<table style='border-top: 0px;' summary="cigar tables">
+<tr>
+<td>
+<div class='data_table'>
+<table summary = "forward common cigars">
+<tr><th>forward common cigars</th><th>Count</th><th>Percentage</th></tr>
+[% FOREACH cig IN check.forward_common_cigars %]
+   [%- IF cig.0 %]
+   <tr>
+   [% percent=0;
+      IF check.sample_size;
+        percent = (cig.1 / check.sample_size) * 100;
+      END;
+   -%]
+   <td>[% cig.0 %]</td><td class="raligned">[% cig.1 %]</td><td class="raligned">[% FILTER format('%03.2f'); percent; END %]%</td>
+   </tr>
+   [%- END %]
+[% END %]
+</table>
+</div>
+</td>
+
+<td>&nbsp;&nbsp;</td>
+
+<td>
+<div class='data_table'>
+<table summary="reverse common cigars">
+<tr><th>reverse common cigars</th><th>Count</th><th>Percentage</th></tr>
+[% FOREACH cig IN check.reverse_common_cigars %]
+   [%- IF cig.0 %]
+   <tr>
+   [% percent=0;
+      IF check.sample_size;
+        percent = (cig.1 / check.sample_size) * 100;
+      END;
+   -%]
+   <td>[% cig.0 %]</td><td class="raligned">[% cig.1 %]</td><td class="raligned">[% FILTER format('%03.2f');percent; END %]%</td>
+   </tr>
+   [%- END %]
+[% END %]
+</table>
+</div>
+</td>
+</tr>
+</table>
+
+
+[%- reads = ['forward', 'reverse']; count = 0 -%]
+[%- FOREACH myurl IN check.google_charts_cigars -%]
+[% IF myurl %]<img class="seq_error_plot" src="[% myurl | url | html %]" alt="[% reads.$count %] cigars" />[% END %]
+[%- count = count + 1 -%]
+[%- END %]
+[%- legend_url = check.chart_legend_cigar; IF legend_url %]
+<img class="seq_error_plot" src="[% legend_url | url | html %]" alt="chart legend" />
+[%- END -%]
+
+<br />
+[% ELSE %]
+<p>No CIGAR Data</p>
+[% END %]
+
+[%- reads = ['forward', 'reverse']; count = 0 -%]
+[%- FOREACH myurl IN check.google_charts -%]
+[% IF myurl %]<img class="seq_error_plot" src="[% myurl | url | html %]" alt="[% reads.$count %] read errors" />[% END %]
+[%- count = count + 1 -%]
+[%- END %]
+[%- legend_url = check.chart_legend; IF legend_url %]
+<img class="seq_error_plot" src="[% legend_url | url | html %]" alt="chart legend" />
+[%- END -%]
+
+
