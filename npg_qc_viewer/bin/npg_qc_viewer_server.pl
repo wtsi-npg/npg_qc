@@ -4,6 +4,8 @@ BEGIN {
     $ENV{CATALYST_SCRIPT_GEN} = 40;
 }
 
+our $VERSION = '0';
+
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../../lib" );
 use Catalyst::ScriptRunner;
@@ -13,7 +15,7 @@ Catalyst::ScriptRunner->run('npg_qc_viewer', 'Server');
 
 =head1 NAME
 
-npg_qc_viewer_server.pl - Catalyst Test Server
+npg_qc_viewer_server.pl - Catalyst Server
 
 =head1 SYNOPSIS
 
