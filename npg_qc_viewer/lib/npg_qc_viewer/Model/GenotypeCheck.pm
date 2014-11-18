@@ -2,13 +2,10 @@ package npg_qc_viewer::Model::GenotypeCheck;
 
 use Carp;
 use Moose;
-use File::Slurp;
 use JSON;
-use Cwd 'abs_path';
 
 use npg_qc::autoqc::qc_store;
-use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
-use srpipe::runfolder;
+use npg_qc::autoqc::qc_store::options qw/$PLEXES/;
 
 BEGIN { extends 'Catalyst::Model' }
 
@@ -33,18 +30,14 @@ Returns a JSON string containing genotype check data
 
 =cut
 sub fetch_genotype_json { ## no critic (ProhibitManyArgs)
-        my ($self, $id_run, $position, $tag_index, $sequenom_plex, $db_lookup, $runck) = @_;
+  my ($self, $id_run, $position, $tag_index, $sequenom_plex, $db_lookup) = @_;
 
-	if($runck) {
-		my $h = _fetch_run_folders([$id_run]);
-	}
-
-        my %init = ();
-        if(defined $db_lookup) {
-                $init{'use_db'} = $db_lookup;
-        }
-        my $qcs=npg_qc::autoqc::qc_store->new(%init);
-        my $c=$qcs->load_run($id_run, $db_lookup, [ $position ], $PLEXES);
+  my %init = ();
+  if(defined $db_lookup) {
+    $init{'use_db'} = $db_lookup;
+  }
+  my $qcs=npg_qc::autoqc::qc_store->new(%init);
+  my $c=$qcs->load_run($id_run, $db_lookup, [ $position ], $PLEXES);
 
 	my $trr;
 	if(defined $tag_index) {
@@ -54,7 +47,7 @@ sub fetch_genotype_json { ## no critic (ProhibitManyArgs)
 		$trr=$c->slice(q[class_name], q[genotype]);
 	}
 
-        return $trr;
+  return $trr;
 }
 
 =head2 fetch_composite_genotype_data
@@ -122,33 +115,6 @@ sub fetch_cgd_for_plex {
 	return $cgd;
 }
 
-=head2 _fetch_run_folders
-
-Returns a hash ref mapping id_runs to a corresponding run folder (if it exists)
-
-=cut
-sub _fetch_run_folders {
-	my ($id_runs) = @_;
-	my %h = ();
-
-	for my $id_run (@{$id_runs}) {
-		my $runfolder = srpipe::runfolder->new(id_run => $id_run);
-		my ($rf, $ls);
-		$h{$id_run} = q[];
-		eval {
-			$rf = $runfolder->runfolder_path;
-
-			$ls = join q[/], ($rf, q[Latest_Summary]);
-
-			if(-l $ls) {
-				$ls = abs_path($ls) ;
-			}
-		} and ($h{$id_run} = $rf);
-	}
-
-	return \%h;
-}
-
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
@@ -169,7 +135,11 @@ __END__
 
 =item Catalyst::Model
 
-=item npg_common::run::file_finder
+=item JSON
+
+=item npg_qc::autoqc::qc_store
+
+=item npg_qc::autoqc::qc_store::options
 
 =back
 
