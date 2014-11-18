@@ -1,0 +1,9 @@
+[% npg_url = 'http://npg.';
+   lims_api_url = 'http://psd-support.internal.sanger.ac.uk:6600';
+   IF env_dev == 'dev';
+     lims_api_url = 'http://dev.psd.sanger.ac.uk:6610';
+     npg_url = npg_url _ 'dev.';
+   END;
+   lims_url = lims_api_url;
+   npg_url = npg_url _ 'sanger.ac.uk/perl/npg';
+%]

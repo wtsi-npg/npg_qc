@@ -1,0 +1,96 @@
+[%- USE Number.Format(THOUSANDS_SEP=',') -%]
+
+<div class="lfloat">
+<div class="data_table">
+[%- errors_all = check.errors_all -%]
+[%- errors_good = check.errors_good -%]
+[%- errors_perc_all = check.errors_perc_all -%]
+[%- errors_perc_good = check.errors_perc_good -%]
+
+[%- IF errors_all.size -%]
+Tag decoding statistics
+<table summary="Tag Decoding Stats">
+<tr>
+  <th rowspan="2">Errors</th>
+  <th colspan="2">All Reads</th>
+  <th colspan="2">PF Filtered Reads</th>
+</tr>
+<tr>
+  <th>count</th><th>percent</th>
+  <th>count</th><th>percent</th>
+</tr>
+
+[%- FOREACH num_errors = errors_all.keys.sort -%]
+  [% userfriendly_num_errors = 'no errors';
+     IF num_errors == '1';
+       userfriendly_num_errors = 'one error';
+     ELSIF num_errors == 'no_match';
+       userfriendly_num_errors = 'no match';
+     END %]
+  <tr>
+    <th>[% userfriendly_num_errors %]</th>
+    <td class="raligned">[% errors_all.$num_errors | format_number %]</td><td class="raligned">[% errors_perc_all.$num_errors %]</td>
+    <td class="raligned">[% errors_good.$num_errors | format_number %]</td><td class="raligned">[% errors_perc_good.$num_errors %]</td>
+  </tr>
+[%- END -%]
+
+</table>
+
+[%- END -%]
+</div>
+
+<div class="data_table">
+Coefficient of Variance (st.dev./mean), %
+<table summary="Coefficient of Variance">
+<tr>
+  <th>All Reads</th>
+  <th>PF Filtered Reads</th>
+</tr>
+<tr>
+  <td class="raligned">[% FILTER format('%2.2f'); check.variance_coeff('all'); END %]</td>
+  <td class="raligned">[% FILTER format('%2.2f'); check.variance_coeff('good'); END %]</td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<div class="rfloat">
+<div class="data_table">
+[%- dist_all = check.distribution_all -%]
+[%- dist_good = check.distribution_good -%]
+[%- tag_code = check.tag_code -%]
+[%- dist_perc_all = check.distribution_perc_all -%]
+[%- dist_perc_good = check.distribution_perc_good -%]
+
+[%- IF dist_good.size -%]
+Tag distribution
+<table summary="Tag Decoding Stats">
+<tr>
+  <th rowspan="2">Code</th>
+  <th rowspan="2">Tag</th>
+  <th colspan="2">All Reads</th>
+  <th colspan="2">PF Filtered Reads</th>
+</tr>
+<tr>
+  <th>count</th><th>percent</th>
+  <th>count</th><th>percent</th>  
+</tr>
+
+[%- FOREACH code = dist_good.keys.nsort -%]
+  <tr>
+    <td>[% code %]</td>
+    <td class="sequence_string">[% tag_code.$code %]</td>
+    <td class="raligned">[% IF dist_all.exists("$code") %] [% dist_all.$code | format_number %] [% END %]</td>
+    <td class="raligned">[% IF dist_all.exists("$code"); dist_perc_all.$code; END %]</td>
+    <td class="raligned">[% dist_good.$code | format_number %]</td>
+    <td class="raligned">[% dist_perc_good.$code %]</td>
+  </tr>
+[%- END -%]
+
+</table>
+
+[%- END -%]
+</div>
+</div>
+<div class="clear"></div>

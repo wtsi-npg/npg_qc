@@ -1,0 +1,14 @@
+[% WRAPPER qsea_wrapper.tt2 -%]
+
+<div id="error">
+<ul>
+<li>ERROR:</li>
+[%- IF  error_message -%]
+<li>[% error_message %]</li>
+[%- ELSE -%]
+<li>unknown error</li>
+[%- END -%]
+</ul>
+</div>
+
+[% END -%]

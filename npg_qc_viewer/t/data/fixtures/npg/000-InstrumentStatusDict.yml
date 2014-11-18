@@ -1,0 +1,31 @@
+---
+- description: up
+  id_instrument_status_dict: 1
+  iscurrent: 1
+- description: down
+  id_instrument_status_dict: 2
+  iscurrent: 0
+- description: wash required
+  id_instrument_status_dict: 3
+  iscurrent: 1
+- description: wash performed
+  id_instrument_status_dict: 4
+  iscurrent: 1
+- description: request approval
+  id_instrument_status_dict: 5
+  iscurrent: 1
+- description: planned maintenance
+  id_instrument_status_dict: 6
+  iscurrent: 0
+- description: planned repair
+  id_instrument_status_dict: 7
+  iscurrent: 1
+- description: down for repair
+  id_instrument_status_dict: 8
+  iscurrent: 1
+- description: planned service
+  id_instrument_status_dict: 9
+  iscurrent: 1
+- description: down for service
+  id_instrument_status_dict: 10
+  iscurrent: 1

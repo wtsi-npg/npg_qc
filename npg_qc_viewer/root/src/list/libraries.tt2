@@ -1,0 +1,33 @@
+[% title = 'List of libraries'; WRAPPER qsea_wrapper.tt2 -%]
+
+<div id="content">
+
+<div id="menu">
+  <div id="links">
+    <ul>
+      <li><a href="#page_top">Page Top</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="first_section"  class="text_section">
+<ul>
+[% FOREACH row IN c.model('WarehouseDB').libraries_list() -%]
+[%- lib_name = row.asset_name;
+    IF !lib_name;
+      lib_name = row.asset_id;
+    END;
+    lane_type = '';
+    IF row.result_source.has_column('lane_type');
+      lane_type = row.lane_type;
+    END;
+    url = c.uri_for_action(c.controller('Checks').action_for('libraries'), {name=>lib_name});
+-%]
+<li> <a href="[% url %]">[% lib_name | html %]</a>
+[%- IF lane_type && lane_type == 'pool' %] (is a pool)[% END -%]
+</li>
+[% END -%]
+</ul>
+</div>
+</div>
+[% END -%]

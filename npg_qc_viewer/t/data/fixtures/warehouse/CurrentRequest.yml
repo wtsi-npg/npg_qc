@@ -1,0 +1,1489 @@
+---
+- checked_at: 2012-06-26 12:26:25
+  created: 2009-10-16 13:32:47
+  current_from: 2012-05-23 14:52:14
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 100
+  fragment_size_to: 400
+  inserted_at: 2012-06-26 12:26:25
+  internal_id: 39143
+  is_current: 1
+  last_updated: 2012-05-23 14:52:14
+  library_type: qPCR only
+  priority: 0
+  project_internal_id: 377
+  project_name: ICR Exome Resequencing
+  project_uuid: "\x0føÂÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 39142
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 59156
+  source_asset_name: B1267_Exp4 1
+  source_asset_sample_internal_id: 9272
+  source_asset_sample_uuid: "\x06Ýç²¹Ã\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18þ±®Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 377
+  study_name: ICR Exome Resequencing
+  study_uuid: ",3sr¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 4266
+  submission_uuid: "?ìç)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 28560
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 59157
+  target_asset_name: B1267_Exp4 1
+  target_asset_sample_internal_id: 9272
+  target_asset_sample_uuid: "\x06Ýç²¹Ã\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "§ YâÆ1\x11ß\0\x14O b°"
+  user: cdt
+  uuid: "é\x01­²Æ0\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 12:26:25
+  created: 2009-10-16 13:32:47
+  current_from: 2012-05-23 14:52:14
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 100
+  fragment_size_to: 400
+  inserted_at: 2012-06-26 12:26:25
+  internal_id: 39146
+  is_current: 1
+  last_updated: 2012-05-23 14:52:14
+  library_type: qPCR only
+  priority: 0
+  project_internal_id: 377
+  project_name: ICR Exome Resequencing
+  project_uuid: "\x0føÂÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 39145
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 59158
+  source_asset_name: B3009_Exp4 1
+  source_asset_sample_internal_id: 9286
+  source_asset_sample_uuid: "\x08\x14ð¹Ã\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18þ¹°Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 377
+  study_name: ICR Exome Resequencing
+  study_uuid: ",3sr¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 4266
+  submission_uuid: "?ìç)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 28561
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 59159
+  target_asset_name: B3009_Exp4 1
+  target_asset_sample_internal_id: 9286
+  target_asset_sample_uuid: "\x08\x14ð¹Ã\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "§ büÆ1\x11ß\0\x14O b°"
+  user: cdt
+  uuid: "é\x01ÆÆ0\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 12:26:25
+  created: 2009-10-16 13:32:48
+  current_from: 2012-05-23 14:52:14
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 100
+  fragment_size_to: 400
+  inserted_at: 2012-06-26 12:26:25
+  internal_id: 39149
+  is_current: 1
+  last_updated: 2012-05-23 14:52:14
+  library_type: qPCR only
+  priority: 0
+  project_internal_id: 377
+  project_name: ICR Exome Resequencing
+  project_uuid: "\x0føÂÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 39148
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 59160
+  source_asset_name: B3006_Exp4 1
+  source_asset_sample_internal_id: 9285
+  source_asset_sample_uuid: "\x08\nÿî¹Ã\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18þÁÆÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 377
+  study_name: ICR Exome Resequencing
+  study_uuid: ",3sr¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 4266
+  submission_uuid: "?ìç)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 28562
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 59161
+  target_asset_name: B3006_Exp4 1
+  target_asset_sample_internal_id: 9285
+  target_asset_sample_uuid: "\x08\nÿî¹Ã\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "§ l\\Æ1\x11ß\0\x14O b°"
+  user: cdt
+  uuid: "é\x01ß:Æ0\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 12:26:35
+  created: 2009-10-20 09:43:36
+  current_from: 2012-05-23 14:52:14
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2012-06-26 12:26:35
+  internal_id: 39448
+  is_current: 1
+  last_updated: 2012-05-23 14:52:14
+  library_type: qPCR only
+  priority: 0
+  project_internal_id: 188
+  project_name: HumanEvolution2
+  project_uuid: "\x0fó\t\x16Æ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Pulldown library creation
+  source_asset_barcode: 39447
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 59254
+  source_asset_name: NA18623pd2a 1
+  source_asset_sample_internal_id: 9386
+  source_asset_sample_uuid: "\v\t$æ¹Ã\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x19\0;´Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 188
+  study_name: HumanEvolution2
+  study_uuid: "*\f¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 4278
+  submission_uuid: "?í\x08°)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 28637
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 59255
+  target_asset_name: NA18623pd2a 1
+  target_asset_sample_internal_id: 9386
+  target_asset_sample_uuid: "\v\t$æ¹Ã\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "§\"\x1cÜÆ1\x11ß\0\x14O b°"
+  user: ylx
+  uuid: "ëµÀÀÆ0\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 12:26:35
+  created: 2009-10-20 09:43:37
+  current_from: 2012-05-23 14:52:14
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2012-06-26 12:26:35
+  internal_id: 39451
+  is_current: 1
+  last_updated: 2012-05-23 14:52:14
+  library_type: qPCR only
+  priority: 0
+  project_internal_id: 188
+  project_name: HumanEvolution2
+  project_uuid: "\x0fó\t\x16Æ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Pulldown library creation
+  source_asset_barcode: 39450
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 59256
+  source_asset_name: NA18633pda 1
+  source_asset_sample_internal_id: 9387
+  source_asset_sample_uuid: "\v\x12Øt¹Ã\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x19\0CÀÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 188
+  study_name: HumanEvolution2
+  study_uuid: "*\f¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 4278
+  submission_uuid: "?í\x08°)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 28638
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 59257
+  target_asset_name: NA18633pda 1
+  target_asset_sample_internal_id: 9387
+  target_asset_sample_uuid: "\v\x12Øt¹Ã\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "§\"&\nÆ1\x11ß\0\x14O b°"
+  user: ylx
+  uuid: "ëµÚÎÆ0\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 12:26:35
+  created: 2009-10-20 09:43:37
+  current_from: 2012-05-23 14:52:14
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2012-06-26 12:26:35
+  internal_id: 39454
+  is_current: 1
+  last_updated: 2012-05-23 14:52:14
+  library_type: qPCR only
+  priority: 0
+  project_internal_id: 188
+  project_name: HumanEvolution2
+  project_uuid: "\x0fó\t\x16Æ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Pulldown library creation
+  source_asset_barcode: 39453
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 59258
+  source_asset_name: NA18563pd2a 1
+  source_asset_sample_internal_id: 9388
+  source_asset_sample_uuid: "\v\x1c¤Ð¹Ã\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x19\0KÌÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 188
+  study_name: HumanEvolution2
+  study_uuid: "*\f¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 4278
+  submission_uuid: "?í\x08°)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 28639
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 59259
+  target_asset_name: NA18563pd2a 1
+  target_asset_sample_internal_id: 9388
+  target_asset_sample_uuid: "\v\x1c¤Ð¹Ã\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "§\"/.Æ1\x11ß\0\x14O b°"
+  user: ylx
+  uuid: "ëµþ\0Æ0\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 12:26:35
+  created: 2009-10-20 09:43:37
+  current_from: 2012-05-23 14:52:14
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2012-06-26 12:26:35
+  internal_id: 39457
+  is_current: 1
+  last_updated: 2012-05-23 14:52:14
+  library_type: qPCR only
+  priority: 0
+  project_internal_id: 188
+  project_name: HumanEvolution2
+  project_uuid: "\x0fó\t\x16Æ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Pulldown library creation
+  source_asset_barcode: 39456
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 59260
+  source_asset_name: NA18545pd2a 1
+  source_asset_sample_internal_id: 9389
+  source_asset_sample_uuid: "\v'\x03v¹Ã\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x19\0T\0Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 188
+  study_name: HumanEvolution2
+  study_uuid: "*\f¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 4278
+  submission_uuid: "?í\x08°)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 28640
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 59261
+  target_asset_name: NA18545pd2a 1
+  target_asset_sample_internal_id: 9389
+  target_asset_sample_uuid: "\v'\x03v¹Ã\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "§\"7îÆ1\x11ß\0\x14O b°"
+  user: ylx
+  uuid: "ë¶\x1cúÆ0\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:15
+  current_from: 2011-08-05 17:55:55
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552895
+  is_current: 1
+  last_updated: 2011-08-05 17:55:55
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246405
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246405
+  source_asset_name: HG00367-B
+  source_asset_sample_internal_id: 118118
+  source_asset_sample_uuid: "[cÈNÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ß\x1a&Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207825
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400398
+  target_asset_name: HG00367-B 400398
+  target_asset_sample_internal_id: 118118
+  target_asset_sample_uuid: "[cÈNÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S\x17þÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\0ì Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:16
+  current_from: 2011-08-05 17:55:56
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552896
+  is_current: 1
+  last_updated: 2011-08-05 17:55:56
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246406
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246406
+  source_asset_name: HG00173-B
+  source_asset_sample_internal_id: 118119
+  source_asset_sample_uuid: "[cÐ Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ß\"ZÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207826
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400399
+  target_asset_name: HG00173-B 400399
+  target_asset_sample_internal_id: 118119
+  target_asset_sample_uuid: "[cÐ Æ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S \x14Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\0ô@Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:16
+  current_from: 2011-08-05 17:55:56
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552897
+  is_current: 1
+  last_updated: 2011-08-05 17:55:56
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246407
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246407
+  source_asset_name: HG00361-B
+  source_asset_sample_internal_id: 118120
+  source_asset_sample_uuid: "[cØÀÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ß*pÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207827
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400400
+  target_asset_name: HG00361-B 400400
+  target_asset_sample_internal_id: 118120
+  target_asset_sample_uuid: "[cØÀÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S(HÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\0ü`Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:16
+  current_from: 2011-08-05 17:55:56
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552898
+  is_current: 1
+  last_updated: 2011-08-05 17:55:56
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246408
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246408
+  source_asset_name: HG00179-B
+  source_asset_sample_internal_id: 118121
+  source_asset_sample_uuid: "[cá\x1cÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ß2Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207828
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400401
+  target_asset_name: HG00179-B 400401
+  target_asset_sample_internal_id: 118121
+  target_asset_sample_uuid: "[cá\x1cÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S0^Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01\x04Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:16
+  current_from: 2011-08-05 17:55:56
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552899
+  is_current: 1
+  last_updated: 2011-08-05 17:55:56
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246409
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246409
+  source_asset_name: HG00380-B
+  source_asset_sample_internal_id: 118122
+  source_asset_sample_uuid: "[céxÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ß:Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207829
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400402
+  target_asset_name: HG00380-B 400402
+  target_asset_sample_internal_id: 118122
+  target_asset_sample_uuid: "[céxÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S8~Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01\f¾Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:16
+  current_from: 2011-08-05 17:55:56
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552900
+  is_current: 1
+  last_updated: 2011-08-05 17:55:56
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246410
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246410
+  source_asset_name: HG00312-B
+  source_asset_sample_internal_id: 118123
+  source_asset_sample_uuid: "[cñÔÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßBÆÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207830
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400403
+  target_asset_name: HG00312-B 400403
+  target_asset_sample_internal_id: 118123
+  target_asset_sample_uuid: "[cñÔÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S@ÆÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01\x14ÞÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:16
+  current_from: 2011-08-05 17:55:56
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552901
+  is_current: 1
+  last_updated: 2011-08-05 17:55:56
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246411
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246411
+  source_asset_name: HG00311-B
+  source_asset_sample_internal_id: 118124
+  source_asset_sample_uuid: "[cú\x1cÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßK\x0eÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207831
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400404
+  target_asset_name: HG00311-B 400404
+  target_asset_sample_internal_id: 118124
+  target_asset_sample_uuid: "[cú\x1cÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SHªÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01\x1d\x08Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:17
+  current_from: 2011-08-05 17:55:56
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552902
+  is_current: 1
+  last_updated: 2011-08-05 17:55:56
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246412
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246412
+  source_asset_name: HG00366-B
+  source_asset_sample_internal_id: 118125
+  source_asset_sample_uuid: "[d\x02FÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßS8Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207832
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400405
+  target_asset_name: HG00366-B 400405
+  target_asset_sample_internal_id: 118125
+  target_asset_sample_uuid: "[d\x02FÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SP¬Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01%(Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:17
+  current_from: 2011-08-05 17:55:56
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552903
+  is_current: 1
+  last_updated: 2011-08-05 17:55:56
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246413
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246413
+  source_asset_name: HG00185-B
+  source_asset_sample_internal_id: 118126
+  source_asset_sample_uuid: "[d\nÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ß[bÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207833
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400406
+  target_asset_name: HG00185-B 400406
+  target_asset_sample_internal_id: 118126
+  target_asset_sample_uuid: "[d\nÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SX¤Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01-RÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:17
+  current_from: 2011-08-05 17:55:57
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552904
+  is_current: 1
+  last_updated: 2011-08-05 17:55:57
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246414
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246414
+  source_asset_name: HG00308-B
+  source_asset_sample_internal_id: 118127
+  source_asset_sample_uuid: "[d\x12þÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßcÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207834
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400407
+  target_asset_name: HG00308-B 400407
+  target_asset_sample_internal_id: 118127
+  target_asset_sample_uuid: "[d\x12þÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S`Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x015rÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:17
+  current_from: 2011-08-05 17:55:57
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552905
+  is_current: 1
+  last_updated: 2011-08-05 17:55:57
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246415
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246415
+  source_asset_name: HG00177-B
+  source_asset_sample_internal_id: 118128
+  source_asset_sample_uuid: "[d\eFÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßkÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207835
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400408
+  target_asset_name: HG00177-B 400408
+  target_asset_sample_internal_id: 118128
+  target_asset_sample_uuid: "[d\eFÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®ShÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01=°Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:17
+  current_from: 2011-08-05 17:55:57
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552906
+  is_current: 1
+  last_updated: 2011-08-05 17:55:57
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246416
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246416
+  source_asset_name: HG00269-B
+  source_asset_sample_internal_id: 118129
+  source_asset_sample_uuid: "[d#zÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßs®Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207836
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400409
+  target_asset_name: HG00269-B 400409
+  target_asset_sample_internal_id: 118129
+  target_asset_sample_uuid: "[d#zÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SpÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01EäÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:17
+  current_from: 2011-08-05 17:55:58
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552907
+  is_current: 1
+  last_updated: 2011-08-05 17:55:58
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246543
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246543
+  source_asset_name: HG00186-B
+  source_asset_sample_internal_id: 118138
+  source_asset_sample_uuid: "[dm&Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ß¼¦Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207837
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400410
+  target_asset_name: HG00186-B 400410
+  target_asset_sample_internal_id: 118138
+  target_asset_sample_uuid: "[dm&Æ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SxÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01N\x0eÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:18
+  current_from: 2011-08-05 17:55:58
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552908
+  is_current: 1
+  last_updated: 2011-08-05 17:55:58
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246544
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246544
+  source_asset_name: HG00267-B
+  source_asset_sample_internal_id: 118139
+  source_asset_sample_uuid: "[dunÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßÄÆÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207838
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400411
+  target_asset_name: HG00267-B 400411
+  target_asset_sample_internal_id: 118139
+  target_asset_sample_uuid: "[dunÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SrÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01V$Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:18
+  current_from: 2011-08-05 17:55:58
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552909
+  is_current: 1
+  last_updated: 2011-08-05 17:55:58
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246545
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246545
+  source_asset_name: HG00187-B
+  source_asset_sample_internal_id: 118140
+  source_asset_sample_uuid: "[d}ÞÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßÌÜÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207839
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400412
+  target_asset_name: HG00187-B 400412
+  target_asset_sample_internal_id: 118140
+  target_asset_sample_uuid: "[d}ÞÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S`Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01^vÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:18
+  current_from: 2011-08-05 17:55:58
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552910
+  is_current: 1
+  last_updated: 2011-08-05 17:55:58
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246546
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246546
+  source_asset_name: HG00377-B
+  source_asset_sample_internal_id: 118141
+  source_asset_sample_uuid: "[dôÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßÔòÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207840
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400413
+  target_asset_name: HG00377-B 400413
+  target_asset_sample_internal_id: 118141
+  target_asset_sample_uuid: "[dôÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SbÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01fÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:18
+  current_from: 2011-08-05 17:55:59
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552911
+  is_current: 1
+  last_updated: 2011-08-05 17:55:59
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246547
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246547
+  source_asset_name: HG00372-B
+  source_asset_sample_internal_id: 118142
+  source_asset_sample_uuid: "[d<Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßÝ\x1cÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207841
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400414
+  target_asset_name: HG00372-B 400414
+  target_asset_sample_internal_id: 118142
+  target_asset_sample_uuid: "[d<Æ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SdÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01n¶Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:18
+  current_from: 2011-08-05 17:55:59
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552912
+  is_current: 1
+  last_updated: 2011-08-05 17:55:59
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246548
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246548
+  source_asset_name: HG00266-B
+  source_asset_sample_internal_id: 118143
+  source_asset_sample_uuid: "[d\\Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßåZÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207842
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400415
+  target_asset_name: HG00266-B 400415
+  target_asset_sample_internal_id: 118143
+  target_asset_sample_uuid: "[d\\Æ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S RÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01vàÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:19
+  current_from: 2011-08-05 17:55:59
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552913
+  is_current: 1
+  last_updated: 2011-08-05 17:55:59
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246549
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246549
+  source_asset_name: HG00180-B
+  source_asset_sample_internal_id: 118144
+  source_asset_sample_uuid: "[dÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßípÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207843
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400416
+  target_asset_name: HG00180-B 400416
+  target_asset_sample_internal_id: 118144
+  target_asset_sample_uuid: "[dÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S¨TÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01\0Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:19
+  current_from: 2011-08-05 17:55:59
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552914
+  is_current: 1
+  last_updated: 2011-08-05 17:55:59
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246550
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246550
+  source_asset_name: HG00357-B
+  source_asset_sample_internal_id: 118145
+  source_asset_sample_uuid: "[d¦ÎÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßõÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207844
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400417
+  target_asset_name: HG00357-B 400417
+  target_asset_sample_internal_id: 118145
+  target_asset_sample_uuid: "[d¦ÎÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S°LÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01*Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:19
+  current_from: 2011-08-05 17:56:00
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552915
+  is_current: 1
+  last_updated: 2011-08-05 17:56:00
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246551
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246551
+  source_asset_name: HG00183-B
+  source_asset_sample_internal_id: 118146
+  source_asset_sample_uuid: "[d®îÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ßýÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207845
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400418
+  target_asset_name: HG00183-B 400418
+  target_asset_sample_internal_id: 118146
+  target_asset_sample_uuid: "[d®îÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®S¸0Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01TÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:19
+  current_from: 2011-08-05 17:56:00
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552916
+  is_current: 1
+  last_updated: 2011-08-05 17:56:00
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246552
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246552
+  source_asset_name: HG00368-B
+  source_asset_sample_internal_id: 118147
+  source_asset_sample_uuid: "[d·6Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " à\x05Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207846
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400419
+  target_asset_name: HG00368-B 400419
+  target_asset_sample_internal_id: 118147
+  target_asset_sample_uuid: "[d·6Æ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SÀ(Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01tÆ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:19
+  current_from: 2011-08-05 17:56:00
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552917
+  is_current: 1
+  last_updated: 2011-08-05 17:56:00
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246553
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246553
+  source_asset_name: HG00306-B
+  source_asset_sample_internal_id: 118148
+  source_asset_sample_uuid: "[d¿jÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " à\r´Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207847
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400420
+  target_asset_name: HG00306-B 400420
+  target_asset_sample_internal_id: 118148
+  target_asset_sample_uuid: "[d¿jÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SÈ>Æ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-26 14:13:40
+  created: 2010-06-08 09:10:19
+  current_from: 2011-08-05 17:56:01
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 400
+  fragment_size_to: 500
+  inserted_at: 2012-06-26 14:13:40
+  internal_id: 552918
+  is_current: 1
+  last_updated: 2011-08-05 17:56:01
+  library_type: Standard
+  priority: 0
+  project_internal_id: 383
+  project_name: 1000Genomes-B1-FIN
+  project_uuid: "\x0føòrÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 246554
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246554
+  source_asset_name: HG00373-B
+  source_asset_sample_internal_id: 118149
+  source_asset_sample_uuid: "[dÇÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " à\x15ÊÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 383
+  study_name: 1000Genomes-B1-FIN
+  study_uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 6553
+  submission_uuid: "Fçèº)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 207848
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 400421
+  target_asset_name: HG00373-B 400421
+  target_asset_sample_internal_id: 118149
+  target_asset_sample_uuid: "[dÇÆ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®SÐJÆ1\x11ß\0\x14O b°"
+  user: kb1
+  uuid: "V\x01§´Æ1\x11ß\0\x14O b°"

@@ -1,0 +1,117 @@
+[% studies = {}; FOREACH lane_key IN sorted_rl_map_keys -%]
+  [%
+     lane_collection = rl_map.$lane_key;
+     NEXT IF (!lane_collection || lane_collection.size == 0);
+     temp = lane_collection.sort;
+     checks = lane_collection.results;
+     provenance = '';
+     checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'}) 
+  -%]
+
+  <div class="results_full_lane">
+  <h3 class="collapser">[% util.expand_rpt_key(lane_key) %]<a name="[% lane_key %]"></a></h3>
+
+  [%- 
+    library = libs_info.$lane_key.lib_name;
+    sample  = libs_info.$lane_key.sample_name;
+    sample_id = libs_info.$lane_key.sample_id;
+    library_id = libs_info.$lane_key.library_id;
+    study_id = libs_info.$lane_key.study_id;
+    study_name = '';
+    IF study_id;
+      study_name = studies_info.$study_id;
+    END;
+           
+    IF library; 
+      provenance = ' | ' _ library;
+      IF sample; 
+        provenance = provenance _ ' << ' _ sample;
+        IF studies; 
+          provenance = provenance _ ' << ' _ study_name;
+        END;
+      END;
+    END;
+  -%]
+
+  <div class="results_full_lane_contents">
+    [% gt_results_cached=0 %]
+    [% FOREACH check IN checks; IF check.check_name != 'split stats phix' && check.check_name != 'spatial filter'; -%]
+      [%- rf_id_attr = '' -%]
+      [%- rf_info_attr = '' -%]
+
+      [%- IF check.class_name == 'genotype' -%]	[%# cache any genotype results to allow sorted output %]
+        [% ssn=check.snp_call_set %]
+        [% gt_checks.$ssn = check %]
+
+        [% gt_results_cached=1 %]
+      [% ELSE %] [%# not genotype %]
+
+        [% IF gt_results_cached==1 %]  [%# flush any cached genotype results to display %]
+          [% INCLUDE display_cached_genotype_results %]
+          [% gt_results_cached=0 %]
+        [% END %]  [%# of flushing any cached genotype results to display %]
+
+        [%- IF check.check_name == 'pulldown metrics' -%]
+          [%- rf_id_attr = 'id="pdmc_' _ check.id_run _ ':' _ check.position _ ':' _ check.tag_index _ '"' -%]
+          [%- rf_info_attr = '<a onclick="alert(\'No info here\'); return false;"><img src="/static/images/information.png" alt="Link to information about pulldown metrics check"/></a>'; -%]
+        [%- END -%]
+        [%- IF check.check_name == 'upstream tags' -%]
+          [%- rf_id_attr = 'id="utc_' _ check.id_run _ ':' _ check.position _ '"' -%]
+          [%- rf_info_attr = '<a onclick="alert(\'No info here\'); return false;"><img src="/static/images/information.png" alt="Link to information about upstream tags comparison"/></a>'; -%]
+        [%- END -%]
+        [%- IF check.check_name == 'tag metrics' -%]
+          [%- rf_id_attr = 'id="tmc_' _ check.id_run _ ':' _ check.position _ '"' -%]
+          [%- rf_info_attr = '<a onclick="alert(\'No info here\'); return false;"><img src="/static/images/information.png" alt="Link to information about tag metrics check results"/></a>'; -%]
+        [%- END -%]
+        [%- IF check.check_name == 'tags reporters' -%]
+          [%- rf_id_attr = 'id="trc_' _ check.id_run _ ':' _ check.position _ '"' -%]
+          [%- rf_info_attr = '<a onclick="alert(\'No info here\'); return false;"><img src="/static/images/information.png" alt="Link to information about tags reporters check"/></a>'; -%]
+        [%- END -%]
+
+        [% INCLUDE display_full_check_content check=check %]
+      [%- END -%]
+
+    [%- END; END -%] [%# of FOREACH and IF %]
+  </div>
+
+  </div>
+[%- END -%] [%# of FOREACH lane_key %]
+
+[% BLOCK display_full_check_content %]
+	<div [% rf_id_attr %] class="result_full">
+
+        <h2 class="collapser [% check.check_name %]">[% util.expand_rpt_key(lane_key) %], [% check.check_name -%] 
+
+	[%- IF check.defined('pass') -%]:
+		[% check.pass ? 'passed' : '<span class="result_fail">failed</span>' -%]
+	[%- END -%]
+	[% IF provenance.defined %] [% provenance | html %]  [% END -%]
+	</h2>
+  
+	<div class="result_full_content">
+	[% TRY -%]
+		[% PROCESS "ui_checks/${check.class_name}.tt2" -%]
+	[% CATCH -%]
+	[% CLEAR %]
+		[% error.info %]
+	[% END; -%]
+	</div>
+	</div>
+[% END %]
+
+[% BLOCK display_cached_genotype_results %]
+    [% IF gt_checks.exists('W30467') %]
+      [% gck=gt_checks.W30467 %]
+      [%- rf_id_attr = 'id="gtrc_' _ gck.snp_call_set _ '_'  _ gck.id_run _ ':' _ gck.position _ ':' _ gck.tag_index _ '"' -%]
+      [%- rf_info_attr = '<a onclick="alert(\'No info here\'); return false;"><img src="/static/images/information.png" alt="Link to information about genotype comparison"/></a>'; -%]
+      [% INCLUDE display_full_check_content check=gck %]
+
+      [% gt_checks.delete('W30467') %]
+    [% END %]
+    [% FOREACH plexname IN gt_checks.keys.sort %]	[%# display other results in sorted order %]
+      [% gck=gt_checks.$plexname %]
+      [%- rf_id_attr = 'id="gtrc_' _ gck.snp_call_set _ '_'  _ gck.id_run _ ':' _ gck.position _ ':' _ gck.tag_index _ '"' -%]
+      [%- rf_info_attr = '<a onclick="alert(\'No info here\'); return false;"><img src="/static/images/information.png" alt="Link to information about genotype comparison"/></a>'; -%]
+      [%- INCLUDE display_full_check_content check=gck %]
+    [% END %]
+[% END %]

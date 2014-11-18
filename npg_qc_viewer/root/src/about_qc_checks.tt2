@@ -1,0 +1,206 @@
+[% WRAPPER qsea_wrapper.tt2 -%]
+
+<div id="menu">
+  <div id="links">
+    <ul>
+      <li><a href="#page_top">Page Top</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="content">
+
+ <a name="tag_metrics"></a>
+ <h3>Tag metrics</h3>
+ Coefficient of variance calculation:<br/>
+  <a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">mean</a> = &Sigma;(x<sub>i</sub>) &frasl; N<br/>
+  <a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">rms</a> = &radic;( &Sigma;(x<sub>i</sub>-mean)&sup2; &frasl; (N-1))<br/>
+  coef_of_var = rms&#47;mean * 100
+
+<a name="upstream tags_check"></a>
+ <h3>Upstream Tags Check</h3>
+ <h4>Description</h4>
+Check for contamination of tag#0 BAM file by reads from upstream runs
+<br/><br/>
+
+ <a name="genotype_check"></a>
+ <h3>Genotype check</h3>
+
+<br/>
+
+<h4>Description</h4>
+This check uses samtools to call genotypes for a set of loci. These loci correspond to SNPs assayed on the standard Sequenom plex used to provide a "fingerprint" of samples before they are sent for sequencing.
+<br/><br/>
+
+
+<h4>Summary Area</h4>
+This displays the number of calls matched out of the number of loci called in both the Sequenom assay and from the BAM file from sequencing. If any of the coverage depths for the BAM genotype is at or below the threshold of 5, a ~ is displayed before this information, otherwise an = is displayed. The second line displays indicates how good the depth of coverage for the BAM genotypes. If there were alternative samples with a good match, 'alts' will be displayed here, preceded by a '~' if they are loose matches to low depth genotypes (see below for an explanation of strict and loose matches).
+<br/>
+There is a tooltip for the match value which reports a "Match score". This is computed by assigning subscore of 1 to exact matches, 0 to weaker matches (hom BAM call against het Sequenom call) and -1 to serious mismatches (either a het BAM call against a hom Sequenom call, or a mismatch between hom calls), then summing all the subscores. The ratio of this score to the number of common calls is also displayed - this will range from -1 (complete mismatch) to 1 (perfect match).
+<br/><br/>
+
+
+<h4>Strict and loose matches</h4>
+Strict matches are a straight-forward comparison of the calls - if they are identical (apart from allele order) it's a match, otherwise a mismatch.
+<br/>
+Loose matches are an attempt to compensate for the fact that at low depths of coverage, the chances of seeing both alleles in a heterozygous sample are reduced. So if a homozygous call is made from the BAM file at low depth (&le; 5), it is allowed to match a heterozygous Sequenom call.
+<br/><br/>
+Some examples:
+<br/><br/>
+
+<table summary="Mismatch examples" border="1">
+<tr><th>Sequenom call</th><th>BAM call</th><th>Depth</th><th>Strict</th><th>Loose</th></tr>
+<tr align="center"><td>AT</td><td>AA</td><td>4</td><td style="color:red">Mismatch</td><td style="color:green">Match</td></tr>
+<tr align="center"><td>AT</td><td>TT</td><td>4</td><td style="color:red">Mismatch</td><td style="color:green">Match</td></tr>
+<tr align="center"><td>AT</td><td>AA</td><td>12</td><td style="color:red">Mismatch</td><td style="color:red">Mismatch</td></tr>
+<tr align="center"><td>AA</td><td>AT</td><td>any</td><td style="color:red">Mismatch</td><td style="color:red">Mismatch</td></tr>
+<tr align="center"><td>AA</td><td>TT</td><td>any</td><td style="color:red">Mismatch</td><td style="color:red">Mismatch</td></tr>
+</table>
+
+<br/><br/>
+
+<h4>The list of SNPs used on the Sequenom QC plex</h4>
+<br/>
+<table summary="QC plex SNPs"  border="1">
+<tr><th>SNP name</th><th>Chr</th><th>Pos</th><th>Ref Allele</th><th>Alt allele</th></tr>
+<tr><td>rs11096957</td><td>4</td><td>38776491</td><td align="center">T</td><td align="center">G</td></tr>
+<tr><td>rs1131498</td><td>1</td><td>169676486</td><td align="center">A</td><td align="center">G</td></tr>
+<tr><td>rs12828016</td><td>12</td><td>998365</td><td align="center">G</td><td align="center">T</td></tr>
+<tr><td>rs156697</td><td>10</td><td>106039185</td><td align="center">A</td><td align="center">G</td></tr>
+<tr><td>rs1801262</td><td>2</td><td>182543455</td><td align="center">T</td><td align="center">C</td></tr>
+<tr><td>rs1805034</td><td>18</td><td>60027241</td><td align="center">C</td><td align="center">T</td></tr>
+<tr><td>rs1805087</td><td>1</td><td>237048500</td><td align="center">A</td><td align="center">G</td></tr>
+<tr><td>rs2241714</td><td>19</td><td>41869392</td><td align="center">T</td><td align="center">C</td></tr>
+<tr><td>rs2247870</td><td>5</td><td>90151589</td><td align="center">G</td><td align="center">A</td></tr>
+<tr><td>rs2286963</td><td>2</td><td>211060050</td><td align="center">T</td><td align="center">G</td></tr>
+<tr><td>rs3742207</td><td>13</td><td>110818598</td><td align="center">T</td><td align="center">G</td></tr>
+<tr><td>rs3795677</td><td>1</td><td>240492734</td><td align="center">G</td><td align="center">A</td></tr>
+<tr><td>rs4075254</td><td>15</td><td>86123988</td><td align="center">G</td><td align="center">A</td></tr>
+<tr><td>rs4619</td><td>7</td><td>45932669</td><td align="center">A</td><td align="center">G</td></tr>
+<tr><td>rs4843075</td><td>15</td><td>86124555</td><td align="center">G</td><td align="center">A</td></tr>
+<tr><td>rs4925</td><td>10</td><td>106022789</td><td align="center">C</td><td align="center">A</td></tr>
+<tr><td>rs5215</td><td>11</td><td>17408630</td><td align="center">C</td><td align="center">T</td></tr>
+<tr><td>rs532841</td><td>8</td><td>12957475</td><td align="center">C</td><td align="center">T</td></tr>
+<tr><td>rs6166</td><td>2</td><td>49189921</td><td align="center">C</td><td align="center">T</td></tr>
+<tr><td>rs649058</td><td>1</td><td>74941293</td><td align="center">G</td><td align="center">A</td></tr>
+<tr><td>rs6557634</td><td>8</td><td>23060256</td><td align="center">T</td><td align="center">C</td></tr>
+<tr><td>rs6759892</td><td>2</td><td>234601669</td><td align="center">T</td><td align="center">G</td></tr>
+<tr><td>rs7298565</td><td>12</td><td>109937534</td><td align="center">G</td><td align="center">A</td></tr>
+<tr><td>rs753381</td><td>20</td><td>39797465</td><td align="center">T</td><td align="center">C</td></tr>
+<tr><td>rs7627615</td><td>3</td><td>183818416</td><td align="center">G</td><td align="center">A</td></tr>
+<tr><td>rs8065080</td><td>17</td><td>3480447</td><td align="center">T</td><td align="center">C</td></tr>
+</table>
+<br/><br/>
+
+The results displayed for calls, depths and likelihoods follow this order (SNP name alphabetically sorted).
+<br/><br/>
+
+<h4>Likelihoods</h4>
+Each item in the "Likelihoods" row is a list of numbers indicating the likelihood of the possible calls. From the <a href="http://samtools.sourceforge.net/mpileup.shtml">samtools mpileup documentation</a>, under "SAMtools/BCFtools specific information": <em>"SAMtools/BCFtools writes genotype likelihoods in the PL format which is a [...] list of phred-scaled data likelihoods of each possible genotype. For example, suppose REF=C and ALT=A,G, PL=7,0,37,13,40,49 means for the sample we are looking at, P(D|CC)=10^{-0.7}, P(D|CA)=1, P(D|AA)=10^{-3.7}, P(D|CG)=10^{-1.3}, P(D|AG)=1e-4 and P(D|GG)=10^{-4.9}. "</em>
+<br/>
+Because all of the SNPs we are using are biallelic, we just have three possible (non-NN) values for a call - RefRef, RefAlt, or AltAlt - so all likelihoods should be 3 numbers except when homozygous reference is called, when you'll just see "0". 
+<br/>
+Note: Bcftools has a tendency to favour the reference allele when calling genotypes. This is particularly noticeable at low depths of coverage - you may see a heterozygous call at a locus which has only one supporting read for the non-reference allele.
+<a href="http://bioinformatics.oxfordjournals.org/content/early/2011/09/08/bioinformatics.btr509.full.pdf">A more detailed explanation of the likelihoods</a>
+<br/><br/>
+<h4>Sequenom calls</h4>
+This row shows the results of the Sequenom assay on this sample to allow easy comparison with the genotypes called from the BAM file produced by sequencing. For each call a tooltip is available which reports the SNP rsname and ref/alt alleles. This is to allow easier interpretation of the likelihood values, where you need to know which allele is reference and alternate.
+<br/><br/>
+
+<h4>BAM calls</h4>
+This row shows the genotype called from the BAM file produced by sequencing. Call are colour-coded:
+<br/>
+<table summary="BAM genotype" cellspacing="30">
+<tr><th>Colour</th><th>Meaning</th><th>Comment</th></tr>
+<tr><td class="gtcall_match">blue</td><td>close match</td><td></td></tr>
+<tr><td class="gtcall_severe_mismatch">red</td><td>serious mismatch</td><td></td></tr>
+<tr><td class="gtcall_unrecognised_code">black</td><td>mild mismatch or unknown</td><td>italics indicate mismatch, no italics indicate no information<br/>&nbsp;probably sue to no sample match found</td></tr>
+</table>
+<br/>
+
+<h4>Call depths</h4>
+The number of reads supporting the call. Low depth (&le;5) is indicated with italics.
+<br/><br/>
+
+<h4>Closest alternative match</h4>
+Any close genotype matches found under a different sample name.
+<br/><br/>
+
+<h4>Loose alternative match</h4>
+Any close genotype matches found under a different sample name, allowing homozygous calls at low depth from BAM to match heterozygous Sequenom calls (e.g. AA(BAM) == AT(Sqnm))
+<br/><br/>
+
+<br/>
+
+<a name="verifyBamId"></a>
+<h3>VerifyBamID contamination check</h3>
+<br/><br/>
+<h4>Description</h4>
+VerifyBamID provides metrics which can be be informative in helping to 
+determine whether a sample has possibly been subject to within-species 
+DNA contamination from an unrelated individual.
+<br/>
+
+The method of operation used is the sequence-only method, which doesn't 
+require or utilise previous genotype information for a sample and 
+therefore attempts to detect possible sample mixture from population 
+minor allele frequency information only. Currently this is only 
+implemented for human samples, but this could be extended in future if 
+relevant information was collected/available.
+
+<br/><br/>
+<h4>Output Fields</h4>
+<br/>
+<table style="margin-left: 5%; margin-right: 50%;">
+<tr><th>Field</th><th>Description</th></tr>
+<tr>
+  <td># SNPs</td>
+  <td style="padding: 0 0 5px 10px;">Number of SNPs passing the criteria to be used in the estimate 
+from the input VCF file. Note smaller numbers of sites tend to result in 
+less accurate estimates of contamination, particularly at lower levels 
+of contamination.
+  </td>
+</tr>
+<tr>
+  <td>AVG_DP</td>
+  <td style="padding: 0 0 5px 10px;">Average sequencing depth at the used sites in the VCF file.</td>
+</tr>
+<tr>
+  <td>FREEMIX</td>
+  <td style="padding: 0 0 5px 10px;">Sequence-only estimate of contamination (0-1 scale). A FREEMIX 
+score of 0.02, means 2% or more of non-reference bases are observed in 
+reference sites. Note contamination estimates tend to be overestimated, 
+particularly for estimates below 1%.
+  </td>
+</tr>
+<tr>
+  <td>FREELK1</td>
+  <td style="padding: 0 0 5px 10px;">Maximum log-likelihood of the sequence reads given estimated 
+contamination under sequence-only method.</td>
+</tr>
+<tr>
+  <td>FREELK0</td>
+  <td style="padding: 0 0 5px 10px;">Log-likelihood of the sequence reads given no contamination 
+under sequence-only method.</td>
+</tr>
+</table>
+
+<br/><br/>
+<h4>Interpretation Guidelines</h4>
+As a guide when the allele-frequency based estimates of FREEMIX are 
+greater than or equal to 0.03, FREELK1-FREELK0 is large, depth is 
+reasonable (minimum of 2x, and ideally greater than 4x) and a 
+significant number of sites (ideally greater than 10,000) has been 
+included in the estimate, then further investigation into the 
+possibility of contamination is recommended.
+<br/>
+
+Results will be coloured red where the estimates of FREEMIX are greater 
+than or equal to 0.05, average depth is greater than or equal to 4 and 
+the number of sites is greater than or equal to 10,000.
+
+<br/><br/>
+
+</div>
+
+[% END -%]

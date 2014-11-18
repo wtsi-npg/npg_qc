@@ -1,0 +1,45 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+<div class="data_table">
+<table summary="contamination check meta data">
+  <tr>
+    <th class="laligned">aligner version</th>
+    <td>[% IF check.aligner_version.defined %][% check.aligner_version %][% END %]</td>
+  </tr>
+
+  <tr>
+    <th class="laligned">sample read count and length</th>
+    <td>[% IF check.sample_read_count.defined %][% check.sample_read_count | format_number %][% END %] : [% IF check.sample_read_length.defined %][% check.sample_read_length | format_number %][% END %]</td>
+  </tr>
+
+  [% IF check.comments.defined && check.comments -%]
+    <tr>
+      <th class="laligned">comments</th><td>[% check.comments %]</td>
+    </tr>
+  [% END -%]
+</table>
+</div>
+
+[% IF check.aligned_read_count.defined -%]
+<div class="data_table">
+<table summary="contamination for each checked organism">
+  <tr>
+    <th>organism (version/strain)</th>
+    <th>count</th>
+    <th>percent</th>
+  </tr>
+
+  [% FOREACH organism IN check.ranked_organisms -%]
+    [%- pcount = check.percent_count.item(organism);
+       IF pcount != '0.0' && pcount != '0.1';
+    - %]
+    <tr>
+      <td><span class="dark_blue">[% organism | replace('_', ' ') %]</span> [% check.reference_version.item(organism) %]</td>
+      <td class="raligned">[% check.aligned_read_count.item(organism) | format_number %]</td>
+      <td class="raligned">[% pcount %]</td>
+    </tr>
+    [%- END -%]
+  [% END -%]
+</table>
+</div>
+ [% END -%]
