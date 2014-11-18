@@ -52,10 +52,9 @@ sub genotype :Chained('base') :PathPath('genotype') :Args(0) {
 		my $position = $c->request->query_parameters->{lane};
 		my $tag_index = $c->request->query_parameters->{tag};
 		my $db_lookup = $c->request->query_parameters->{db_lookup};
-		my $runck = $c->request->query_parameters->{runck};
 		my $sequenom_plex = $c->request->query_parameters->{plex};
 
-		my $j = $c->model(q[GenotypeCheck])->fetch_genotype_json($id_run, $position, $tag_index, $sequenom_plex, $db_lookup, $runck);
+		my $j = $c->model(q[GenotypeCheck])->fetch_genotype_json($id_run, $position, $tag_index, $sequenom_plex, $db_lookup);
 
 		my @processed_results = ();   # TBD: store all processed results here, then apply to_json() at the end
 		$results_json = q{};
