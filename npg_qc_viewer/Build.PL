@@ -33,6 +33,7 @@ my $builder = npg_tracking::util::build->new(
         'DateTime'                                     => '0',
         'DateTime::Duration'                           => '0',
         'English'                                      => '0',
+        'File::Slurp'                                  => '0',
         'FindBin'                                      => '0',
         'GD::Image'                                    => '0',
         'HTTP::Request'                                => '0',
