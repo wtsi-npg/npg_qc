@@ -3,6 +3,7 @@ package npg_qc_viewer::Model::GenotypeCheck;
 use Carp;
 use Moose;
 use JSON;
+use File::Slurp;
 
 use npg_qc::autoqc::qc_store;
 use npg_qc::autoqc::qc_store::options qw/$PLEXES/;
@@ -136,6 +137,8 @@ __END__
 =item Catalyst::Model
 
 =item JSON
+
+=item File::Slurp
 
 =item npg_qc::autoqc::qc_store
 
