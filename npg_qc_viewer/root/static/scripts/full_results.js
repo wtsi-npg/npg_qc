@@ -26,7 +26,8 @@
 *
 ************************************************************************************/
 
-function display_contamination_check_results() {
+define(['jquery'], function(jQuery) {
+return function() {
 
   // display check name above the tables?
 
@@ -78,4 +79,5 @@ function display_contamination_check_results() {
       result_div.css('height', new_height);
     }
  });
-}
+};
+});

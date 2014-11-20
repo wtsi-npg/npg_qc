@@ -33,7 +33,9 @@
 * Loading is performed by an AJAX call, so 'same origin' policy applies.
 */
 
-function make_collapsible_sections() {
+define(['jquery'],function(jQuery) {
+return {
+init: function() {
     // Register all collapsers as closed ones 
     jQuery(".collapser").addClass("collapser_open");
 
@@ -83,33 +85,49 @@ function make_collapsible_sections() {
 	    return false;
 	});
 
+	// collapse h2
+	jQuery('.collapse_h2').click(function(){
+		jQuery("h2.collapser_open:contains(" + $(this).data('section') + ")").click();
+		return false;
+	});
+
+	// expand h2
+	jQuery('.expand_h2').click(function(){
+		jQuery("h2.collapser_closed:contains(" + $(this).data('section') + ")").click();
+		return false;
+	});
+
+	// collapse h3
+	jQuery('.collapse_h3').click(function(){
+		jQuery("h3.collapser_open:contains(" + $(this).data('section') + ")").click();
+		return false;
+	});
+
+	// expand h3
+	jQuery('.expand_h3').click(function(){
+		jQuery("h3.collapser_closed:contains(" + $(this).data('section') + ")").click();
+		return false;
+	});
+
+	// collapse phix
+	jQuery('#collapse_phix').click(function(){
+		jQuery("h3.collapser_open:contains('#168')").click();
+		jQuery("h2.collapser_open:contains('phix')").click();
+		return false;
+	});
+
+	// expand phix
+	jQuery('#expand_phix').click(function(){
+		jQuery("h3.collapser_closed:contains('#168')").click();
+		jQuery("h2.collapser_closed:contains('phix')").click();
+		return false;
+	});
+
     // Since javascript is active we can collapse sections and reveal the menu
     jQuery("#collapse_menu").show();
-}
+},
 
-// manipulate Specific Test appearance
-//expand all instances of a test
-function collapse_h2_section(queryText) {
-    jQuery("h2.collapser_open:contains(" + queryText + ")").click();
-    return false;
 }
+});
 
-//expand all instances of a test
-function expand_h2_section(queryText) {
-    jQuery("h2.collapser_closed:contains(" + queryText + ")").click();
-    return false;
-}
-
-// manipulate Specific Test appearance
-//expand all instances of a test
-function collapse_h3_section(queryText) {
-    jQuery("h3.collapser_open:contains(" + queryText + ")").click();
-    return false;
-}
-
-//expand all instances of a test
-function expand_h3_section(queryText) {
-    jQuery("h3.collapser_closed:contains(" + queryText + ")").click();
-    return false;
-}
 
