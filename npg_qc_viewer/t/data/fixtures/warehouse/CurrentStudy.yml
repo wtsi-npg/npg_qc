@@ -1,0 +1,307 @@
+---
+- abbreviation: 188STDY
+  abstract: 'The project aims to investigate evolutionarily-interesting regions of the human genome. These often show signals of positive natural selection. Resequencing the same region of DNA in multiple humans provides a complete catalogue of the variants it contains and their distribution in the sample, and is the best basis for characterising positive selection. We have chosen a number of regions of the genome that are either of known evolutionary interest, or that show a possible signal of selection that we want to investigate further, along with some controls, and are resequencing them in a population sample of 30. Our analyses will extract information on neutral and selective aspects of the evolutionary history of these regions.'
+  accession_number: ERP000202
+  array_express_accession_number: ~
+  checked_at: 2012-08-03 09:57:55
+  contains_human_dna: Yes
+  contaminated_human_dna: No
+  created: 2008-10-20 15:20:43
+  current_from: 2012-08-03 10:10:57
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: open
+  data_release_timing: standard
+  deleted_at: ~
+  description: 'About 3Mb of sequence from 57 regions (20-500kb each) of the human genome were enriched by NimbleGen custom oligo-tilling array pulldown and/or solution pulldown technology. The regions were then sequenced using paired-end reads (35bp, 54bp or 76bp) on the Illumina sequencing platform. SNPs were called by the Sanger variation informatics pipeline (SAM/BAM) and population genetic analyses are being carried out on these data.. This data is part of a pre-publication release. For information on the proper use of pre-publication data shared by the Wellcome Trust Sanger Institute (including details of any publication moratoria), please see http://www.sanger.ac.uk/datasharing/'
+  ega_dac_accession_number: ~
+  ega_policy_accession_number: ~
+  ena_project_id: 0
+  ethically_approved: 1
+  faculty_sponsor: Chris Tyler-Smith
+  inserted_at: 2012-08-03 09:57:55
+  internal_id: 188
+  is_current: 1
+  last_updated: 2012-08-03 10:10:57
+  name: HumanEvolution2
+  reference_genome: ' '
+  remove_x_and_autosomes: 0
+  state: inactive
+  study_title: Sequencing of candidate positively-selected regions in the human genome
+  study_type: Population Genomics
+  study_visibility: Hold
+  uuid: "*\f¥W\x11ß\0\x14O\x01¤\x14"
+- abbreviation: 248STDY
+  abstract: ' Illumina sequencing of P. ovale  (classical type) genome Nigeria 1/CDC strain was undertaken to top-up of what was already obtained by the capillary sequencing method (at 8X genome coverage) of the Nigeria 1/CDC strain. Illumina sequencing will be performed to obtain the reference genome of the P. ovale variant strain once the DNA material with sufficient quantity and purities will be available.'
+  accession_number: ERP000315
+  array_express_accession_number: ~
+  checked_at: 2012-08-03 09:58:04
+  contains_human_dna: No
+  contaminated_human_dna: No
+  created: 2009-02-19 14:05:35
+  current_from: 2012-08-03 10:10:57
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: open
+  data_release_timing: standard
+  deleted_at: ~
+  description: 'The Wellcome Trust Sanger Institute Pathogen Genomics group is sequencing a number of malaria parasite strains/isolates. As part of this project, the human malaria parasite P. ovale is being sequenced to a high coverage using the Illumina sequencing technology platform. Recently, P. ovale has been described to exist as two separate non-recombining species that are sympatric in both Africa and Asia (Sutherland et al. JID, 2010). P. ovale parasites are therefore identified as ‘classic’ or ‘variant’ based upon genetic dimorphism. We aim to generate annotated reference genomes both the classical (Plasmodium ovale curtisi) and the variant type (Plasmodium ovale wallikeri) species.. This data is part of a pre-publication release. For information on the proper use of pre-publication data shared by the Wellcome Trust Sanger Institute (including details of any publication moratoria), please see http://www.sanger.ac.uk/datasharing/'
+  ega_dac_accession_number: ~
+  ega_policy_accession_number: ~
+  ena_project_id: ''
+  ethically_approved: ~
+  faculty_sponsor: Matt Berriman
+  inserted_at: 2012-08-03 09:58:04
+  internal_id: 248
+  is_current: 1
+  last_updated: 2012-08-03 10:10:57
+  name: Plasmodium ovale genome sequencing
+  reference_genome: ' '
+  remove_x_and_autosomes: 0
+  state: inactive
+  study_title: Whole genome sequencing of P. ovale reference genomes (classical and the variant type).
+  study_type: Whole Genome Sequencing
+  study_visibility: Hold
+  uuid: "++\x08ª¥W\x11ß\0\x14O\x01¤\x14"
+- abbreviation: 334STDY
+  abstract: ~
+  accession_number: SRP000546
+  array_express_accession_number: ~
+  checked_at: 2012-08-03 09:58:07
+  contains_human_dna: Yes
+  contaminated_human_dna: No
+  created: 2009-06-24 20:45:53
+  current_from: 2012-08-03 10:10:57
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: open
+  data_release_timing: never
+  deleted_at: ~
+  description: Full production for the 1000 genomes Han Chinese  sequencing
+  ega_dac_accession_number: ~
+  ega_policy_accession_number: ~
+  ena_project_id: 33851
+  ethically_approved: 1
+  faculty_sponsor: Richard Durbin
+  inserted_at: 2012-08-03 09:58:07
+  internal_id: 334
+  is_current: 1
+  last_updated: 2012-08-03 10:10:57
+  name: 1000Genomes-B1-CHB
+  reference_genome: ' '
+  remove_x_and_autosomes: 0
+  state: active
+  study_title: Low coverage of the Han Chinese individuals
+  study_type: Whole Genome Sequencing
+  study_visibility: public
+  uuid: "+®\x08¸¥W\x11ß\0\x14O\x01¤\x14"
+- abbreviation: 335STDY
+  abstract: ~
+  accession_number: SRP000543
+  array_express_accession_number: ~
+  checked_at: 2012-08-03 09:58:07
+  contains_human_dna: Yes
+  contaminated_human_dna: No
+  created: 2009-06-24 20:46:54
+  current_from: 2012-08-03 10:10:57
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: open
+  data_release_timing: never
+  deleted_at: ~
+  description: '1000 Genomes WGS sequencing of the Luhya (Webuye, Kenya) HapMap population.'
+  ega_dac_accession_number: ~
+  ega_policy_accession_number: ~
+  ena_project_id: 33835
+  ethically_approved: 1
+  faculty_sponsor: Richard Durbin
+  inserted_at: 2012-08-03 09:58:07
+  internal_id: 335
+  is_current: 1
+  last_updated: 2012-08-03 10:10:57
+  name: 1000Genomes-B1-LWK
+  reference_genome: ' '
+  remove_x_and_autosomes: 0
+  state: active
+  study_title: Low coverage of the Luhya individuals
+  study_type: Whole Genome Sequencing
+  study_visibility: public
+  uuid: "+¯Ì¥W\x11ß\0\x14O\x01¤\x14"
+- abbreviation: 377STDY
+  abstract: "Cancer is driven by mutation. Illumina GA massively parallel sequencing technology will be applied to Agilent exome hybridisation capture libraries and total genomic paired-end libraries from a range of cancer samples. Bespoke algorithms are being developed to identify the somatically acquired structural variants, point mutations, insertions and deletions in these samples. This project will give unprecedented insights into mutational processes, cellular repair pathways and gene networks associated with  cancer development.\r\n"
+  accession_number: EGAS00001000207
+  array_express_accession_number: ~
+  checked_at: 2012-08-03 09:58:10
+  contains_human_dna: Yes
+  contaminated_human_dna: No
+  created: 2009-10-06 14:11:20
+  current_from: 2012-08-03 10:10:57
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: managed
+  data_release_timing: standard
+  deleted_at: ~
+  description: Agilent whole exome hybridisation capture was performed on genomic DNA derived from Chondrosarcoma cancer and matched normal DNA from the same patients. Next Generation sequencing performed on the resulting exome libraries and mapped to build 37 of the human reference genome to facilitate the identification of novel cancer genes. Now we aim to re find and validate the findings of those exome libraries using bespoke pulldown methods and sequencing the products.
+  ega_dac_accession_number: EGAC00001000012
+  ega_policy_accession_number: EGAP00001000001
+  ena_project_id: PRJEB9
+  ethically_approved: 1
+  faculty_sponsor: Michael Stratton
+  inserted_at: 2012-08-03 09:58:10
+  internal_id: 377
+  is_current: 1
+  last_updated: 2012-08-03 10:10:57
+  name: ICR Exome Resequencing
+  reference_genome: Homo_sapiens (CGP_GRCh37.NCBI.allchr_MT)
+  remove_x_and_autosomes: 0
+  state: active
+  study_title: Breast Cancer Exome Resequencing
+  study_type: Cancer Genomics
+  study_visibility: Hold
+  uuid: ",3sr¥W\x11ß\0\x14O\x01¤\x14"
+- abbreviation: 378STDY
+  abstract: "Cancer is driven by mutation. Illumina GA massively parallel sequencing technology will be applied to Agilent exome hybridisation capture libraries and total genomic paired-end libraries from a range of cancer samples. Bespoke algorithms are being developed to identify the somatically acquired structural variants, point mutations, insertions and deletions in these samples. This project will give unprecedented insights into mutational processes, cellular repair pathways and gene networks associated with  cancer development.\r\n"
+  accession_number: EGAS00001000206
+  array_express_accession_number: ~
+  checked_at: 2012-08-03 09:58:10
+  contains_human_dna: Yes
+  contaminated_human_dna: No
+  created: 2009-10-06 14:18:16
+  current_from: 2012-08-03 10:10:57
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: managed
+  data_release_timing: standard
+  deleted_at: ~
+  description: Agilent whole exome hybridisation capture was performed on genomic DNA derived from cancer and matched normal DNA from the same patients. Next Generation sequencing performed on the resulting exome libraries and mapped to build 37 of the human reference genome to facilitate the identification of novel cancer genes. Now we aim to re find and validate the findings of those exome libraries using bespoke pulldown methods and sequencing the products.
+  ega_dac_accession_number: EGAC00001000012
+  ega_policy_accession_number: EGAP00001000001
+  ena_project_id: PRJEB9
+  ethically_approved: 1
+  faculty_sponsor: Michael Stratton
+  inserted_at: 2012-08-03 09:58:10
+  internal_id: 378
+  is_current: 1
+  last_updated: 2012-08-03 10:10:57
+  name: CGP Exome Resequencing
+  reference_genome: Homo_sapiens (CGP_GRCh37.NCBI.allchr_MT)
+  remove_x_and_autosomes: 0
+  state: active
+  study_title: Cancer Exome Resequencing
+  study_type: Cancer Genomics
+  study_visibility: Hold
+  uuid: ",5\x17\x04¥W\x11ß\0\x14O\x01¤\x14"
+- abbreviation: 383STDY
+  abstract: 'The purpose of the project is to support the discovery and understanding of genetic variants that influence human disease. Specifically defined goals are (a) the discovery of single nucleotide variants at frequencies of 1% or higher in diverse populations, (b) even more comprehensive discovery (variants down to frequencies of 0.1 - 0.5%) in functional gene regions, and (c) discovery of structural variants, such as copy number variants, other insertions and deletions, and inversions, including sequence-level understanding of breakpoints.'
+  accession_number: SRP000808
+  array_express_accession_number: ~
+  checked_at: 2012-08-03 09:58:11
+  contains_human_dna: Yes
+  contaminated_human_dna: No
+  created: 2009-10-26 09:28:43
+  current_from: 2012-08-03 10:10:57
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: open
+  data_release_timing: never
+  deleted_at: ~
+  description: 4X coverage for the Finnish HapMap individuals
+  ega_dac_accession_number: ~
+  ega_policy_accession_number: ~
+  ena_project_id: 38449
+  ethically_approved: 1
+  faculty_sponsor: Richard Durbin
+  inserted_at: 2012-08-03 09:58:11
+  internal_id: 383
+  is_current: 1
+  last_updated: 2012-08-03 10:10:57
+  name: 1000Genomes-B1-FIN
+  reference_genome: ' '
+  remove_x_and_autosomes: 0
+  state: active
+  study_title: Low coverage of the HapMap Finnish individuals from Finland
+  study_type: Whole Genome Sequencing
+  study_visibility: public
+  uuid: ",=ýì¥W\x11ß\0\x14O\x01¤\x14"
+- abbreviation: 490STDY
+  abstract: "Cancer is driven by mutation. Using Agilent exome hybridisation capture and Illumina GA massively parallel sequencing technology, we aim to sequence ~1600 microRNAs plus the protein coding genome of 25 matched human renal cancer samples. Bespoke algorithms are being developed to identify the somatically acquired point mutations, insertions and deletions in these samples. This project will give unprecedented insights into mutational processes, cellular repair pathways and gene networks associated with renal cancer development.\r\n"
+  accession_number: EGAS00001000006
+  array_express_accession_number: ~
+  checked_at: 2012-06-26 12:07:51
+  contains_human_dna: Yes
+  contaminated_human_dna: No
+  created: 2010-03-11 17:04:57
+  current_from: 2011-04-20 15:15:51
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: managed
+  data_release_timing: standard
+  deleted_at: ~
+  description: "Agilent whole exome hybridisation capture will be performed on genomic DNA derived from 25 renal cancers and matched normal DNA from the same patients. Three lanes of Illumina GA sequencing will be performed on the resulting 50 exome libraries and mapped to build 37 of the human reference genome to facilitate the identification of novel cancer genes.\r\n"
+  ega_dac_accession_number: EGAC00001000012
+  ega_policy_accession_number: EGAP00001000001
+  ena_project_id: PRJEB9
+  ethically_approved: 1
+  faculty_sponsor: Andy Futreal
+  inserted_at: 2012-06-26 12:07:51
+  internal_id: 490
+  is_current: 1
+  last_updated: 2011-04-20 15:15:51
+  name: Renal Cancer Exome
+  reference_genome: Homo_sapiens (CGP_GRCh37.NCBI.allchr_MT)
+  remove_x_and_autosomes: 0
+  state: active
+  study_title: Renal Cancer Exome Sequencing
+  study_type: Cancer Genomics
+  study_visibility: Hold
+  uuid: "-1\x0fF¥W\x11ß\0\x14O\x01¤\x14"
+- abbreviation: 544STDY
+  abstract: "Field isolates of Anopheles are being sequenced to provide contributing investigators with genetic data to support locally-driven studies, while also contributing to the development of a global map of A. gambiae genome variation. This global dataset will provide a resource for genome-wide association studies and other genomic studies aimed at identifying genetic loci responsible for such phenotypes as insecticide resistance. For information on this project, contributing investigators and studies, sample details, and data sharing policies please visit http://www.malariagen.net/node/287\r\n"
+  accession_number: ERP000195
+  array_express_accession_number: ~
+  checked_at: 2012-06-26 12:07:53
+  contains_human_dna: No
+  contaminated_human_dna: No
+  created: 2010-04-25 13:32:08
+  current_from: 2011-09-08 15:09:07
+  current_to: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: genomic sequencing
+  data_release_strategy: open
+  data_release_timing: standard
+  deleted_at: ~
+  description: 'Genome sequencing of field samples of Anopheles gambiae. This data is part of a pre-publication release. For information on the proper use of pre-publication data shared by the Wellcome Trust Sanger Institute (including details of any publication moratoria), please see http://www.sanger.ac.uk/datasharing/'
+  ega_dac_accession_number: ~
+  ega_policy_accession_number: ~
+  ena_project_id: 0
+  ethically_approved: ~
+  faculty_sponsor: Dominic Kwiatkowski
+  inserted_at: 2012-06-26 12:07:53
+  internal_id: 544
+  is_current: 1
+  last_updated: 2011-09-08 15:09:07
+  name: Anopheles gambiae genome variation 1
+  reference_genome: Anopheles_gambiae (PEST)
+  remove_x_and_autosomes: 0
+  state: active
+  study_title: Anopheles gambiae natural genome variation
+  study_type: Whole Genome Sequencing
+  study_visibility: Hold
+  uuid: "-2¥W\x11ß\0\x14O\x01¤\x14"

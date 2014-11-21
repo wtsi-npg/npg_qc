@@ -1,0 +1,539 @@
+[%#
+Embedding Sequenom assay data here in the template
+%]
+
+[%
+plexes = {
+	'W30467' = { 
+		desc    = 'StandardQC'
+		snps =
+			[
+				{ snp_name => 'rs11096957', ref_allele => 'T', alt_allele => 'G', chr => '4', pos => '38776491', allele_swap => 0 },
+				{ snp_name => 'rs1131498', ref_allele => 'A', alt_allele => 'G', chr => '1', pos => '169676486', allele_swap => 0 },
+				{ snp_name => 'rs12828016', ref_allele => 'G', alt_allele => 'T', chr => '12', pos => '998365', allele_swap => 1 },
+				{ snp_name => 'rs156697', ref_allele => 'A', alt_allele => 'G', chr => '10', pos => '106039185', allele_swap => 1 },
+				{ snp_name => 'rs1801262', ref_allele => 'T', alt_allele => 'C', chr => '2', pos => '182543455', allele_swap => 1 },
+				{ snp_name => 'rs1805034', ref_allele => 'C', alt_allele => 'T', chr => '18', pos => '60027241', allele_swap => 0 },
+				{ snp_name => 'rs1805087', ref_allele => 'A', alt_allele => 'G', chr => '1', pos => '237048500', allele_swap => 0 },
+				{ snp_name => 'rs2241714', ref_allele => 'T', alt_allele => 'C', chr => '19', pos => '41869392', allele_swap => 0 },
+				{ snp_name => 'rs2247870', ref_allele => 'G', alt_allele => 'A', chr => '5', pos => '90151589', allele_swap => 0 },
+				{ snp_name => 'rs2286963', ref_allele => 'T', alt_allele => 'G', chr => '2', pos => '211060050', allele_swap => 1 },
+				{ snp_name => 'rs3742207', ref_allele => 'T', alt_allele => 'G', chr => '13', pos => '110818598', allele_swap => 1 },
+				{ snp_name => 'rs3795677', ref_allele => 'G', alt_allele => 'A', chr => '1', pos => '240492734', allele_swap => 1 },
+				{ snp_name => 'rs4075254', ref_allele => 'G', alt_allele => 'A', chr => '15', pos => '86123988', allele_swap => 0 },
+				{ snp_name => 'rs4619', ref_allele => 'A', alt_allele => 'G', chr => '7', pos => '45932669', allele_swap => 0 },
+				{ snp_name => 'rs4843075', ref_allele => 'G', alt_allele => 'A', chr => '15', pos => '86124555', allele_swap => 1 },
+				{ snp_name => 'rs4925', ref_allele => 'C', alt_allele => 'A', chr => '10', pos => '106022789', allele_swap => 1 },
+				{ snp_name => 'rs5215', ref_allele => 'C', alt_allele => 'T', chr => '11', pos => '17408630', allele_swap => 1 },
+				{ snp_name => 'rs532841', ref_allele => 'C', alt_allele => 'T', chr => '8', pos => '12957475', allele_swap => 0 },
+				{ snp_name => 'rs6166', ref_allele => 'C', alt_allele => 'T', chr => '2', pos => '49189921', allele_swap => 0 },
+				{ snp_name => 'rs649058', ref_allele => 'G', alt_allele => 'A', chr => '1', pos => '74941293', allele_swap => 1 },
+				{ snp_name => 'rs6557634', ref_allele => 'T', alt_allele => 'C', chr => '8', pos => '23060256', allele_swap => 1 },
+				{ snp_name => 'rs6759892', ref_allele => 'T', alt_allele => 'G', chr => '2', pos => '234601669', allele_swap => 0 },
+				{ snp_name => 'rs7298565', ref_allele => 'G', alt_allele => 'A', chr => '12', pos => '109937534', allele_swap => 0 },
+				{ snp_name => 'rs753381', ref_allele => 'T', alt_allele => 'C', chr => '20', pos => '39797465', allele_swap => 0 },
+				{ snp_name => 'rs7627615', ref_allele => 'G', alt_allele => 'A', chr => '3', pos => '183818416', allele_swap => 1 },
+				{ snp_name => 'rs8065080', ref_allele => 'T', alt_allele => 'C', chr => '17', pos => '3480447', allele_swap => 0 },
+			]
+	},
+	'W30569' = { 
+		desc    = 'CGP1'
+		snps =
+			[
+				{ snp_name => 'rs1032807', ref_allele => 'G', alt_allele => 'A', chr => '2', pos => '68166080', allele_swap => 1 },
+				{ snp_name => 'rs1074042', ref_allele => 'C', alt_allele => 'T', chr => '16', pos => '9654056', allele_swap => 1 },
+				{ snp_name => 'rs1074553', ref_allele => 'G', alt_allele => 'A', chr => '8', pos => '75822851', allele_swap => 1 },
+				{ snp_name => 'rs1079820', ref_allele => 'C', alt_allele => 'T', chr => '1', pos => '171794908', allele_swap => 0 },
+				{ snp_name => 'rs1105176', ref_allele => 'T', alt_allele => 'G', chr => '9', pos => '137828650', allele_swap => 1 },
+				{ snp_name => 'rs1426003', ref_allele => 'G', alt_allele => 'C', chr => '4', pos => '138313566', allele_swap => 0 },
+				{ snp_name => 'rs1515002', ref_allele => 'G', alt_allele => 'A', chr => '3', pos => '80549257', allele_swap => 0 },
+				{ snp_name => 'rs1541290', ref_allele => 'G', alt_allele => 'A', chr => '21', pos => '43718483', allele_swap => 1 },
+				{ snp_name => 'rs156318', ref_allele => 'C', alt_allele => 'T', chr => '7', pos => '24213356', allele_swap => 1 },
+				{ snp_name => 'rs1585676', ref_allele => 'C', alt_allele => 'A', chr => '18', pos => '23877175', allele_swap => 0 },
+				{ snp_name => 'rs1843026', ref_allele => 'G', alt_allele => 'A', chr => '8', pos => '77819857', allele_swap => 0 },
+				{ snp_name => 'rs1952161', ref_allele => 'C', alt_allele => 'G', chr => '14', pos => '34195326', allele_swap => 0 },
+				{ snp_name => 'rs2077774', ref_allele => 'A', alt_allele => 'C', chr => '3', pos => '59736584', allele_swap => 0 },
+				{ snp_name => 'rs210310', ref_allele => 'C', alt_allele => 'T', chr => '14', pos => '54123959', allele_swap => 0 },
+				{ snp_name => 'rs2207782', ref_allele => 'G', alt_allele => 'A', chr => '10', pos => '83757199', allele_swap => 0 },
+				{ snp_name => 'rs2361128', ref_allele => 'A', alt_allele => 'G', chr => '19', pos => '57739247', allele_swap => 1 },
+				{ snp_name => 'rs2374061', ref_allele => 'G', alt_allele => 'A', chr => '12', pos => '103772777', allele_swap => 1 },
+				{ snp_name => 'rs2887851', ref_allele => 'A', alt_allele => 'G', chr => '11', pos => '122713810', allele_swap => 0 },
+				{ snp_name => 'rs310929', ref_allele => 'C', alt_allele => 'T', chr => '13', pos => '63071787', allele_swap => 1 },
+				{ snp_name => 'rs621277', ref_allele => 'G', alt_allele => 'A', chr => '9', pos => '32516864', allele_swap => 1 },
+				{ snp_name => 'rs718757', ref_allele => 'G', alt_allele => 'A', chr => '3', pos => '160534225', allele_swap => 1 },
+				{ snp_name => 'rs725029', ref_allele => 'G', alt_allele => 'A', chr => '12', pos => '54466095', allele_swap => 0 },
+				{ snp_name => 'rs727081', ref_allele => 'C', alt_allele => 'T', chr => '13', pos => '23732199', allele_swap => 1 },
+				{ snp_name => 'rs727336', ref_allele => 'T', alt_allele => 'C', chr => '20', pos => '40884676', allele_swap => 1 },
+				{ snp_name => 'rs754257', ref_allele => 'A', alt_allele => 'C', chr => '9', pos => '26531692', allele_swap => 1 },
+				{ snp_name => 'rs756497', ref_allele => 'G', alt_allele => 'A', chr => '10', pos => '117612248', allele_swap => 0 },
+				{ snp_name => 'rs803172', ref_allele => 'T', alt_allele => 'C', chr => '7', pos => '90773196', allele_swap => 1 },
+				{ snp_name => 'rs890910', ref_allele => 'A', alt_allele => 'T', chr => '5', pos => '16784873', allele_swap => 1 },
+				{ snp_name => 'rs951629', ref_allele => 'G', alt_allele => 'A', chr => '2', pos => '9796791', allele_swap => 1 },
+				{ snp_name => 'rs952503', ref_allele => 'A', alt_allele => 'G', chr => '9', pos => '78831415', allele_swap => 1 },
+				{ snp_name => 'rs965323', ref_allele => 'G', alt_allele => 'A', chr => '6', pos => '47708431', allele_swap => 0 },
+				{ snp_name => 'rs967344', ref_allele => 'C', alt_allele => 'T', chr => '4', pos => '53219120', allele_swap => 1 },
+				{ snp_name => 'rs978422', ref_allele => 'T', alt_allele => 'C', chr => '21', pos => '19842577', allele_swap => 1 },
+				{ snp_name => 'rs995553', ref_allele => 'G', alt_allele => 'C', chr => '5', pos => '8828383', allele_swap => 0 },
+				{ snp_name => 'rs999072', ref_allele => 'C', alt_allele => 'T', chr => '20', pos => '23347553', allele_swap => 1 },
+			]
+	},
+	'W30572' = { 
+		desc    = 'CGP2'
+		snps =
+			[
+				{ snp_name => 'rs1030687', ref_allele => 'A', alt_allele => 'G', chr => '19', pos => '31078219', allele_swap => 1 },
+				{ snp_name => 'rs1293153', ref_allele => 'G', alt_allele => 'A', chr => '20', pos => '52951047', allele_swap => 1 },
+				{ snp_name => 'rs1327118', ref_allele => 'G', alt_allele => 'C', chr => '1', pos => '65885569', allele_swap => 1 },
+				{ snp_name => 'rs1363333', ref_allele => 'A', alt_allele => 'G', chr => '5', pos => '112364945', allele_swap => 1 },
+				{ snp_name => 'rs1368136', ref_allele => 'T', alt_allele => 'C', chr => '8', pos => '130459412', allele_swap => 1 },
+				{ snp_name => 'rs1392265', ref_allele => 'T', alt_allele => 'G', chr => '3', pos => '117800545', allele_swap => 1 },
+				{ snp_name => 'rs1395936', ref_allele => 'C', alt_allele => 'T', chr => '15', pos => '79696701', allele_swap => 1 },
+				{ snp_name => 'rs1402695', ref_allele => 'C', alt_allele => 'A', chr => '1', pos => '84722670', allele_swap => 1 },
+				{ snp_name => 'rs1414904', ref_allele => 'G', alt_allele => 'T', chr => '1', pos => '95633977', allele_swap => 1 },
+				{ snp_name => 'rs1529992', ref_allele => 'G', alt_allele => 'T', chr => '6', pos => '74608903', allele_swap => 0 },
+				{ snp_name => 'rs1541836', ref_allele => 'T', alt_allele => 'C', chr => '18', pos => '21495483', allele_swap => 1 },
+				{ snp_name => 'rs171953', ref_allele => 'A', alt_allele => 'G', chr => '19', pos => '51315824', allele_swap => 0 },
+				{ snp_name => 'rs1807921', ref_allele => 'T', alt_allele => 'C', chr => '2', pos => '159694749', allele_swap => 1 },
+				{ snp_name => 'rs1812642', ref_allele => 'A', alt_allele => 'T', chr => '19', pos => '20741589', allele_swap => 0 },
+				{ snp_name => 'rs1862456', ref_allele => 'A', alt_allele => 'C', chr => '19', pos => '8968549', allele_swap => 1 },
+				{ snp_name => 'rs1928045', ref_allele => 'T', alt_allele => 'C', chr => '13', pos => '47505170', allele_swap => 0 },
+				{ snp_name => 'rs1961416', ref_allele => 'A', alt_allele => 'G', chr => '2', pos => '179871172', allele_swap => 0 },
+				{ snp_name => 'rs2007743', ref_allele => 'A', alt_allele => 'G', chr => '20', pos => '23039041', allele_swap => 0 },
+				{ snp_name => 'rs2016588', ref_allele => 'C', alt_allele => 'T', chr => '6', pos => '159425707', allele_swap => 0 },
+				{ snp_name => 'rs2060983', ref_allele => 'C', alt_allele => 'T', chr => '8', pos => '131025034', allele_swap => 1 },
+				{ snp_name => 'rs2077743', ref_allele => 'C', alt_allele => 'A', chr => '15', pos => '52027777', allele_swap => 1 },
+				{ snp_name => 'rs2216629', ref_allele => 'A', alt_allele => 'G', chr => '4', pos => '78270033', allele_swap => 0 },
+				{ snp_name => 'rs2369898', ref_allele => 'T', alt_allele => 'C', chr => '14', pos => '97239216', allele_swap => 1 },
+				{ snp_name => 'rs349235', ref_allele => 'G', alt_allele => 'A', chr => '4', pos => '60833758', allele_swap => 1 },
+				{ snp_name => 'rs3904872', ref_allele => 'A', alt_allele => 'G', chr => '20', pos => '4312153', allele_swap => 0 },
+				{ snp_name => 'rs502843', ref_allele => 'A', alt_allele => 'C', chr => '18', pos => '8080357', allele_swap => 0 },
+				{ snp_name => 'rs522073', ref_allele => 'C', alt_allele => 'T', chr => '11', pos => '60878662', allele_swap => 0 },
+				{ snp_name => 'rs719601', ref_allele => 'G', alt_allele => 'A', chr => '17', pos => '28731415', allele_swap => 1 },
+				{ snp_name => 'rs722952', ref_allele => 'A', alt_allele => 'G', chr => '13', pos => '86230913', allele_swap => 1 },
+				{ snp_name => 'rs726957', ref_allele => 'G', alt_allele => 'A', chr => '14', pos => '85125287', allele_swap => 1 },
+				{ snp_name => 'rs728189', ref_allele => 'C', alt_allele => 'A', chr => '12', pos => '12161541', allele_swap => 0 },
+				{ snp_name => 'rs763553', ref_allele => 'G', alt_allele => 'A', chr => '8', pos => '31445496', allele_swap => 0 },
+				{ snp_name => 'rs894240', ref_allele => 'A', alt_allele => 'G', chr => '6', pos => '165557550', allele_swap => 1 },
+				{ snp_name => 'rs952725', ref_allele => 'G', alt_allele => 'C', chr => '12', pos => '132022224', allele_swap => 0 },
+				{ snp_name => 'rs952768', ref_allele => 'G', alt_allele => 'C', chr => '3', pos => '68434603', allele_swap => 0 },
+				{ snp_name => 'rs958388', ref_allele => 'G', alt_allele => 'A', chr => '5', pos => '129194264', allele_swap => 1 },
+			]
+	},
+	'W1180' = { 
+		desc    = 'DDD'
+		snps =
+			[
+				{ snp_name => 'rs10808906', ref_allele => 'A', alt_allele => 'G', chr => '8', pos => '57779443', allele_swap => 0 },
+				{ snp_name => 'rs11563564', ref_allele => 'A', alt_allele => 'G', chr => '7', pos => '89816701', allele_swap => 0 },
+				{ snp_name => 'rs12713552', ref_allele => 'G', alt_allele => 'A', chr => '2', pos => '66103504', allele_swap => 1 },
+				{ snp_name => 'rs12806313', ref_allele => 'G', alt_allele => 'A', chr => '11', pos => '99491356', allele_swap => 1 },
+				{ snp_name => 'rs12969439', ref_allele => 'A', alt_allele => 'C', chr => '18', pos => '70601638', allele_swap => 0 },
+				{ snp_name => 'rs1436904', ref_allele => 'T', alt_allele => 'G', chr => '18', pos => '24570667', allele_swap => 1 },
+				{ snp_name => 'rs1475524', ref_allele => 'C', alt_allele => 'T', chr => '9', pos => '90132563', allele_swap => 1 },
+				{ snp_name => 'rs1867197', ref_allele => 'G', alt_allele => 'A', chr => '15', pos => '76910031', allele_swap => 1 },
+				{ snp_name => 'rs1972680', ref_allele => 'T', alt_allele => 'C', chr => '12', pos => '27788786', allele_swap => 1 },
+				{ snp_name => 'rs2114165', ref_allele => 'A', alt_allele => 'G', chr => '3', pos => '139700274', allele_swap => 1 },
+				{ snp_name => 'rs2410629', ref_allele => 'T', alt_allele => 'C', chr => '8', pos => '19871637', allele_swap => 1 },
+				{ snp_name => 'rs2647598', ref_allele => 'T', alt_allele => 'C', chr => '11', pos => '5376276', allele_swap => 1 },
+				{ snp_name => 'rs2723520', ref_allele => 'C', alt_allele => 'T', chr => '7', pos => '17813677', allele_swap => 1 },
+				{ snp_name => 'rs35177483', ref_allele => 'T', alt_allele => 'C', chr => '10', pos => '26350495', allele_swap => 1 },
+				{ snp_name => 'rs3910279', ref_allele => 'C', alt_allele => 'A', chr => '2', pos => '34533131', allele_swap => 1 },
+				{ snp_name => 'rs4259160', ref_allele => 'G', alt_allele => 'A', chr => '5', pos => '147557190', allele_swap => 1 },
+				{ snp_name => 'rs4636294', ref_allele => 'A', alt_allele => 'G', chr => '9', pos => '21747803', allele_swap => 0 },
+				{ snp_name => 'rs4859591', ref_allele => 'G', alt_allele => 'A', chr => '4', pos => '76948578', allele_swap => 1 },
+				{ snp_name => 'rs4975139', ref_allele => 'C', alt_allele => 'T', chr => '4', pos => '79455733', allele_swap => 0 },
+				{ snp_name => 'rs5004318', ref_allele => 'T', alt_allele => 'G', chr => '7', pos => '47799473', allele_swap => 1 },
+				{ snp_name => 'rs533040', ref_allele => 'A', alt_allele => 'G', chr => '6', pos => '165732635', allele_swap => 1 },
+				{ snp_name => 'rs6771079', ref_allele => 'T', alt_allele => 'G', chr => '3', pos => '125946844', allele_swap => 1 },
+				{ snp_name => 'rs7106139', ref_allele => 'T', alt_allele => 'C', chr => '11', pos => '6113332', allele_swap => 1 },
+				{ snp_name => 'rs747561', ref_allele => 'G', alt_allele => 'A', chr => '7', pos => '154406965', allele_swap => 1 },
+				{ snp_name => 'rs7584287', ref_allele => 'T', alt_allele => 'G', chr => '2', pos => '106693142', allele_swap => 1 },
+				{ snp_name => 'rs7760412', ref_allele => 'A', alt_allele => 'G', chr => '6', pos => '7443145', allele_swap => 0 },
+				{ snp_name => 'rs9293853', ref_allele => 'G', alt_allele => 'A', chr => '6', pos => '72560565', allele_swap => 1 },
+				{ snp_name => 'rs9568139', ref_allele => 'A', alt_allele => 'G', chr => '13', pos => '49536705', allele_swap => 0 },
+				{ snp_name => 'rs997765', ref_allele => 'G', alt_allele => 'A', chr => '6', pos => '74506914', allele_swap => 1 },
+				{ snp_name => 'rs9998695', ref_allele => 'C', alt_allele => 'T', chr => '4', pos => '115172667', allele_swap => 0 },
+			]
+	},
+	'Fluidigm_QC' = { 
+		desc    = 'Standard Fluidigm QC set of 22 SNPS'
+		snps =
+			[
+				{ snp_name => 'rs11096957', ref_allele => 'T', alt_allele => 'G', chr => '4', pos => '38776491', allele_swap => 0 },
+				{ snp_name => 'rs12828016', ref_allele => 'G', alt_allele => 'T', chr => '12', pos => '998365', allele_swap => 1 },
+				{ snp_name => 'rs156697', ref_allele => 'A', alt_allele => 'G', chr => '10', pos => '106039185', allele_swap => 1 },
+				{ snp_name => 'rs1801262', ref_allele => 'T', alt_allele => 'C', chr => '2', pos => '182543455', allele_swap => 1 },
+				{ snp_name => 'rs1805034', ref_allele => 'C', alt_allele => 'T', chr => '18', pos => '60027241', allele_swap => 0 },
+				{ snp_name => 'rs1805087', ref_allele => 'A', alt_allele => 'G', chr => '1', pos => '237048500', allele_swap => 0 },
+				{ snp_name => 'rs2247870', ref_allele => 'G', alt_allele => 'A', chr => '5', pos => '90151589', allele_swap => 0 },
+				{ snp_name => 'rs2286963', ref_allele => 'T', alt_allele => 'G', chr => '2', pos => '211060050', allele_swap => 1 },
+				{ snp_name => 'rs3742207', ref_allele => 'T', alt_allele => 'G', chr => '13', pos => '110818598', allele_swap => 1 },
+				{ snp_name => 'rs3795677', ref_allele => 'G', alt_allele => 'A', chr => '1', pos => '240492734', allele_swap => 1 },
+				{ snp_name => 'rs4075254', ref_allele => 'G', alt_allele => 'A', chr => '15', pos => '86123988', allele_swap => 0 },
+				{ snp_name => 'rs4619', ref_allele => 'A', alt_allele => 'G', chr => '7', pos => '45932669', allele_swap => 0 },
+				{ snp_name => 'rs4843075', ref_allele => 'G', alt_allele => 'A', chr => '15', pos => '86124555', allele_swap => 1 },
+				{ snp_name => 'rs5215', ref_allele => 'C', alt_allele => 'T', chr => '11', pos => '17408630', allele_swap => 1 },
+				{ snp_name => 'rs6166', ref_allele => 'C', alt_allele => 'T', chr => '2', pos => '49189921', allele_swap => 0 },
+				{ snp_name => 'rs649058', ref_allele => 'G', alt_allele => 'A', chr => '1', pos => '74941293', allele_swap => 1 },
+				{ snp_name => 'rs6557634', ref_allele => 'T', alt_allele => 'C', chr => '8', pos => '23060256', allele_swap => 1 },
+				{ snp_name => 'rs6759892', ref_allele => 'T', alt_allele => 'G', chr => '2', pos => '234601669', allele_swap => 0 },
+				{ snp_name => 'rs7298565', ref_allele => 'G', alt_allele => 'A', chr => '12', pos => '109937534', allele_swap => 0 },
+				{ snp_name => 'rs753381', ref_allele => 'T', alt_allele => 'C', chr => '20', pos => '39797465', allele_swap => 0 },
+				{ snp_name => 'rs7627615', ref_allele => 'G', alt_allele => 'A', chr => '3', pos => '183818416', allele_swap => 1 },
+				{ snp_name => 'rs8065080', ref_allele => 'T', alt_allele => 'C', chr => '17', pos => '3480447', allele_swap => 0 },
+			]
+	},
+	'Fluidigm_CGP_QC' = { 
+		desc    = '92 SNPs, inc. 22 standard QC'
+		snps =
+			[
+				{ snp_name => 'rs1030687', ref_allele => 'A', alt_allele => 'G', chr => '19', pos => '31078219', allele_swap => 1 },
+				{ snp_name => 'rs1032807', ref_allele => 'G', alt_allele => 'A', chr => '2', pos => '68166080', allele_swap => 1 },
+				{ snp_name => 'rs1074042', ref_allele => 'C', alt_allele => 'T', chr => '16', pos => '9654056', allele_swap => 1 },
+				{ snp_name => 'rs1074553', ref_allele => 'G', alt_allele => 'A', chr => '8', pos => '75822851', allele_swap => 1 },
+				{ snp_name => 'rs1079820', ref_allele => 'C', alt_allele => 'T', chr => '1', pos => '171794908', allele_swap => 0 },
+				{ snp_name => 'rs1105176', ref_allele => 'T', alt_allele => 'G', chr => '9', pos => '137828650', allele_swap => 1 },
+				{ snp_name => 'rs11096957', ref_allele => 'T', alt_allele => 'G', chr => '4', pos => '38776491', allele_swap => 0 },
+				{ snp_name => 'rs1131498', ref_allele => 'A', alt_allele => 'G', chr => '1', pos => '169676486', allele_swap => 0 },
+				{ snp_name => 'rs12828016', ref_allele => 'G', alt_allele => 'T', chr => '12', pos => '998365', allele_swap => 1 },
+				{ snp_name => 'rs1293153', ref_allele => 'G', alt_allele => 'A', chr => '20', pos => '52951047', allele_swap => 1 },
+				{ snp_name => 'rs1327118', ref_allele => 'G', alt_allele => 'C', chr => '1', pos => '65885569', allele_swap => 1 },
+				{ snp_name => 'rs1363333', ref_allele => 'A', alt_allele => 'G', chr => '5', pos => '112364945', allele_swap => 1 },
+				{ snp_name => 'rs1368136', ref_allele => 'T', alt_allele => 'C', chr => '8', pos => '130459412', allele_swap => 1 },
+				{ snp_name => 'rs1392265', ref_allele => 'T', alt_allele => 'G', chr => '3', pos => '117800545', allele_swap => 1 },
+				{ snp_name => 'rs1395936', ref_allele => 'C', alt_allele => 'T', chr => '15', pos => '79696701', allele_swap => 1 },
+				{ snp_name => 'rs1402695', ref_allele => 'C', alt_allele => 'A', chr => '1', pos => '84722670', allele_swap => 1 },
+				{ snp_name => 'rs1414904', ref_allele => 'G', alt_allele => 'T', chr => '1', pos => '95633977', allele_swap => 1 },
+				{ snp_name => 'rs1426003', ref_allele => 'G', alt_allele => 'C', chr => '4', pos => '138313566', allele_swap => 0 },
+				{ snp_name => 'rs1515002', ref_allele => 'G', alt_allele => 'A', chr => '3', pos => '80549257', allele_swap => 0 },
+				{ snp_name => 'rs1541290', ref_allele => 'G', alt_allele => 'A', chr => '21', pos => '43718483', allele_swap => 1 },
+				{ snp_name => 'rs1541836', ref_allele => 'T', alt_allele => 'C', chr => '18', pos => '21495483', allele_swap => 1 },
+				{ snp_name => 'rs156318', ref_allele => 'C', alt_allele => 'T', chr => '7', pos => '24213356', allele_swap => 1 },
+				{ snp_name => 'rs156697', ref_allele => 'A', alt_allele => 'G', chr => '10', pos => '106039185', allele_swap => 1 },
+				{ snp_name => 'rs1585676', ref_allele => 'C', alt_allele => 'A', chr => '18', pos => '23877175', allele_swap => 0 },
+				{ snp_name => 'rs171953', ref_allele => 'A', alt_allele => 'G', chr => '19', pos => '51315824', allele_swap => 0 },
+				{ snp_name => 'rs1801262', ref_allele => 'T', alt_allele => 'C', chr => '2', pos => '182543455', allele_swap => 1 },
+				{ snp_name => 'rs1805034', ref_allele => 'C', alt_allele => 'T', chr => '18', pos => '60027241', allele_swap => 0 },
+				{ snp_name => 'rs1805087', ref_allele => 'A', alt_allele => 'G', chr => '1', pos => '237048500', allele_swap => 0 },
+				{ snp_name => 'rs1812642', ref_allele => 'A', alt_allele => 'T', chr => '19', pos => '20741589', allele_swap => 0 },
+				{ snp_name => 'rs1843026', ref_allele => 'G', alt_allele => 'A', chr => '8', pos => '77819857', allele_swap => 0 },
+				{ snp_name => 'rs1862456', ref_allele => 'A', alt_allele => 'C', chr => '19', pos => '8968549', allele_swap => 1 },
+				{ snp_name => 'rs1928045', ref_allele => 'T', alt_allele => 'C', chr => '13', pos => '47505170', allele_swap => 0 },
+				{ snp_name => 'rs1952161', ref_allele => 'C', alt_allele => 'G', chr => '14', pos => '34195326', allele_swap => 0 },
+				{ snp_name => 'rs1961416', ref_allele => 'A', alt_allele => 'G', chr => '2', pos => '179871172', allele_swap => 0 },
+				{ snp_name => 'rs2016588', ref_allele => 'C', alt_allele => 'T', chr => '6', pos => '159425707', allele_swap => 0 },
+				{ snp_name => 'rs2077743', ref_allele => 'C', alt_allele => 'A', chr => '15', pos => '52027777', allele_swap => 1 },
+				{ snp_name => 'rs2077774', ref_allele => 'A', alt_allele => 'C', chr => '3', pos => '59736584', allele_swap => 0 },
+				{ snp_name => 'rs210310', ref_allele => 'C', alt_allele => 'T', chr => '14', pos => '54123959', allele_swap => 0 },
+				{ snp_name => 'rs2207782', ref_allele => 'G', alt_allele => 'A', chr => '10', pos => '83757199', allele_swap => 0 },
+				{ snp_name => 'rs2216629', ref_allele => 'A', alt_allele => 'G', chr => '4', pos => '78270033', allele_swap => 0 },
+				{ snp_name => 'rs2241714', ref_allele => 'T', alt_allele => 'C', chr => '19', pos => '41869392', allele_swap => 0 },
+				{ snp_name => 'rs2247870', ref_allele => 'G', alt_allele => 'A', chr => '5', pos => '90151589', allele_swap => 0 },
+				{ snp_name => 'rs2286963', ref_allele => 'T', alt_allele => 'G', chr => '2', pos => '211060050', allele_swap => 1 },
+				{ snp_name => 'rs2361128', ref_allele => 'A', alt_allele => 'G', chr => '19', pos => '57739247', allele_swap => 1 },
+				{ snp_name => 'rs2369898', ref_allele => 'T', alt_allele => 'C', chr => '14', pos => '97239216', allele_swap => 1 },
+				{ snp_name => 'rs2374061', ref_allele => 'G', alt_allele => 'A', chr => '12', pos => '103772777', allele_swap => 1 },
+				{ snp_name => 'rs2887851', ref_allele => 'A', alt_allele => 'G', chr => '11', pos => '122713810', allele_swap => 0 },
+				{ snp_name => 'rs310929', ref_allele => 'C', alt_allele => 'T', chr => '13', pos => '63071787', allele_swap => 1 },
+				{ snp_name => 'rs349235', ref_allele => 'G', alt_allele => 'A', chr => '4', pos => '60833758', allele_swap => 1 },
+				{ snp_name => 'rs3742207', ref_allele => 'T', alt_allele => 'G', chr => '13', pos => '110818598', allele_swap => 1 },
+				{ snp_name => 'rs3795677', ref_allele => 'G', alt_allele => 'A', chr => '1', pos => '240492734', allele_swap => 1 },
+				{ snp_name => 'rs3904872', ref_allele => 'A', alt_allele => 'G', chr => '20', pos => '4312153', allele_swap => 0 },
+				{ snp_name => 'rs4075254', ref_allele => 'G', alt_allele => 'A', chr => '15', pos => '86123988', allele_swap => 0 },
+				{ snp_name => 'rs4619', ref_allele => 'A', alt_allele => 'G', chr => '7', pos => '45932669', allele_swap => 0 },
+				{ snp_name => 'rs4843075', ref_allele => 'G', alt_allele => 'A', chr => '15', pos => '86124555', allele_swap => 1 },
+				{ snp_name => 'rs4925', ref_allele => 'C', alt_allele => 'A', chr => '10', pos => '106022789', allele_swap => 1 },
+				{ snp_name => 'rs502843', ref_allele => 'A', alt_allele => 'C', chr => '18', pos => '8080357', allele_swap => 0 },
+				{ snp_name => 'rs5215', ref_allele => 'C', alt_allele => 'T', chr => '11', pos => '17408630', allele_swap => 1 },
+				{ snp_name => 'rs522073', ref_allele => 'C', alt_allele => 'T', chr => '11', pos => '60878662', allele_swap => 0 },
+				{ snp_name => 'rs532841', ref_allele => 'C', alt_allele => 'T', chr => '8', pos => '12957475', allele_swap => 0 },
+				{ snp_name => 'rs6166', ref_allele => 'C', alt_allele => 'T', chr => '2', pos => '49189921', allele_swap => 0 },
+				{ snp_name => 'rs621277', ref_allele => 'G', alt_allele => 'A', chr => '9', pos => '32516864', allele_swap => 1 },
+				{ snp_name => 'rs649058', ref_allele => 'G', alt_allele => 'A', chr => '1', pos => '74941293', allele_swap => 1 },
+				{ snp_name => 'rs6557634', ref_allele => 'T', alt_allele => 'C', chr => '8', pos => '23060256', allele_swap => 1 },
+				{ snp_name => 'rs6759892', ref_allele => 'T', alt_allele => 'G', chr => '2', pos => '234601669', allele_swap => 0 },
+				{ snp_name => 'rs718757', ref_allele => 'G', alt_allele => 'A', chr => '3', pos => '160534225', allele_swap => 1 },
+				{ snp_name => 'rs719601', ref_allele => 'G', alt_allele => 'A', chr => '17', pos => '28731415', allele_swap => 1 },
+				{ snp_name => 'rs722952', ref_allele => 'A', alt_allele => 'G', chr => '13', pos => '86230913', allele_swap => 1 },
+				{ snp_name => 'rs725029', ref_allele => 'G', alt_allele => 'A', chr => '12', pos => '54466095', allele_swap => 0 },
+				{ snp_name => 'rs726957', ref_allele => 'G', alt_allele => 'A', chr => '14', pos => '85125287', allele_swap => 1 },
+				{ snp_name => 'rs727081', ref_allele => 'C', alt_allele => 'T', chr => '13', pos => '23732199', allele_swap => 1 },
+				{ snp_name => 'rs727336', ref_allele => 'T', alt_allele => 'C', chr => '20', pos => '40884676', allele_swap => 1 },
+				{ snp_name => 'rs728189', ref_allele => 'C', alt_allele => 'A', chr => '12', pos => '12161541', allele_swap => 0 },
+				{ snp_name => 'rs7298565', ref_allele => 'G', alt_allele => 'A', chr => '12', pos => '109937534', allele_swap => 0 },
+				{ snp_name => 'rs753381', ref_allele => 'T', alt_allele => 'C', chr => '20', pos => '39797465', allele_swap => 0 },
+				{ snp_name => 'rs754257', ref_allele => 'A', alt_allele => 'C', chr => '9', pos => '26531692', allele_swap => 1 },
+				{ snp_name => 'rs756497', ref_allele => 'G', alt_allele => 'A', chr => '10', pos => '117612248', allele_swap => 1 },
+				{ snp_name => 'rs7627615', ref_allele => 'G', alt_allele => 'A', chr => '3', pos => '183818416', allele_swap => 1 },
+				{ snp_name => 'rs763553', ref_allele => 'G', alt_allele => 'A', chr => '8', pos => '31445496', allele_swap => 0 },
+				{ snp_name => 'rs803172', ref_allele => 'T', alt_allele => 'C', chr => '7', pos => '90773196', allele_swap => 0 },
+				{ snp_name => 'rs8065080', ref_allele => 'T', alt_allele => 'C', chr => '17', pos => '3480447', allele_swap => 0 },
+				{ snp_name => 'rs890910', ref_allele => 'A', alt_allele => 'T', chr => '5', pos => '16784873', allele_swap => 1 },
+				{ snp_name => 'rs894240', ref_allele => 'A', alt_allele => 'G', chr => '6', pos => '165557550', allele_swap => 1 },
+				{ snp_name => 'rs951629', ref_allele => 'G', alt_allele => 'A', chr => '2', pos => '9796791', allele_swap => 1 },
+				{ snp_name => 'rs952503', ref_allele => 'A', alt_allele => 'G', chr => '9', pos => '78831415', allele_swap => 1 },
+				{ snp_name => 'rs952768', ref_allele => 'G', alt_allele => 'C', chr => '3', pos => '68434603', allele_swap => 0 },
+				{ snp_name => 'rs958388', ref_allele => 'G', alt_allele => 'A', chr => '5', pos => '129194264', allele_swap => 1 },
+				{ snp_name => 'rs965323', ref_allele => 'G', alt_allele => 'A', chr => '6', pos => '47708431', allele_swap => 0 },
+				{ snp_name => 'rs967344', ref_allele => 'C', alt_allele => 'T', chr => '4', pos => '53219120', allele_swap => 1 },
+				{ snp_name => 'rs978422', ref_allele => 'T', alt_allele => 'C', chr => '21', pos => '19842577', allele_swap => 1 },
+				{ snp_name => 'rs995553', ref_allele => 'G', alt_allele => 'C', chr => '5', pos => '8828383', allele_swap => 0 },
+				{ snp_name => 'rs999072', ref_allele => 'C', alt_allele => 'T', chr => '20', pos => '23347553', allele_swap => 1 },
+			]
+	},
+}
+%]
+
+[%#
+End of Sequenom assay data
+%]
+
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+[% has_reverse = check.reverse_read_gc_percent.defined -%]
+
+<div class="data_table">
+
+<table summary="genotype check section one">
+
+[% ssn = check.snp_call_set; %]
+<!--
+<tr>
+  <th class="laligned">SNP Set</th>
+  <td>[% plexes.$ssn.desc %]</td>
+</tr>
+-->
+
+<tr>
+  <th class="laligned">pass criterion <a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]#genotype_check"><img src="/static/images/information.png" alt="Link to information about genotype check"/></a></th>
+  <td>[% check.criterion %]</td>
+</tr>
+
+<tr>
+  <th class="laligned">SNP call set</th>
+  <td>[% check.snp_call_set %] ([% plexes.$ssn.desc %])</td>
+</tr>
+
+[% cgc = c.model('GenotypeCheck').fetch_cgd_for_plex(library_id, ssn); %]
+
+[% display_cgc = 0 %]
+[% IF cgc.defined && cgc.bam_file.defined %]
+	[% score_list=cgc.bam_file.split(';') %]
+	[% IF score_list.size > 1 %]
+		[% display_cgc = 1 %]
+	[% END %]
+[% END %]
+
+[% IF display_cgc %]
+[% snm_lbl_supp = ' (simple : <span class="gt_composite">composite</span>)' %]
+[% snm_style = 'class="gt_composite"' %]
+[% ELSE %]
+[% snm_lbl_supp = '' %]
+[% snm_style = '' %]
+[% END %]
+
+<tr>
+  <th class="laligned">Sample name match[% snm_lbl_supp %]</th>
+[% IF check.sample_name_match.defined -%]
+[% IF display_cgc %]
+  <td>Matched [% check.sample_name_match.match_count | format_number %] of [% check.sample_name_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); check.sample_name_match.match_pct * 100; END %]%) : <span [% snm_style %]>[% cgc.sample_name_match.match_count | format_number %] of [% cgc.sample_name_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); cgc.sample_name_match.match_pct * 100; END %]%)</span> </td>
+[% ELSE %]
+  <td>Matched [% check.sample_name_match.match_count | format_number %] of [% check.sample_name_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); check.sample_name_match.match_pct * 100; END %]%) </td>
+[% END %]
+[% ELSE -%]
+  <td>NONE</td>
+[% END -%]
+</tr>
+
+<tr>
+  <th class="laligned">Sample name loose match[% snm_lbl_supp %]</th>
+[% IF check.sample_name_relaxed_match.defined -%]
+[% IF display_cgc %]
+  <td>Matched [% check.sample_name_relaxed_match.match_count | format_number %] of [% check.sample_name_relaxed_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); check.sample_name_relaxed_match.match_pct * 100; END %]%) : <span [% snm_style %]>[% cgc.sample_name_relaxed_match.match_count | format_number %] of [% cgc.sample_name_relaxed_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); cgc.sample_name_relaxed_match.match_pct * 100; END %]%)</span></td>
+[% ELSE %]
+  <td>Matched [% check.sample_name_relaxed_match.match_count | format_number %] of [% check.sample_name_relaxed_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); check.sample_name_relaxed_match.match_pct * 100; END %]%) </td>
+[% END %]
+[% ELSE -%]
+  <td>NONE</td>
+[% END -%]
+</tr>
+
+[% IF display_cgc %]
+<tr [% snm_style %]>
+<th class="laligned">BAM  files</th>
+<td>[% cgc.bam_file.replace(';', ' ') %]</td>
+</tr>
+[% END %]
+</table>
+
+[% IF display_cgc %]
+[% gt_data_caption = 'Genotypes (simple and composite)' %]
+[% ELSE %]
+[% gt_data_caption = 'Genotype' %]
+[% END %]
+
+<table summary="genotype check data rows">
+<caption>[% gt_data_caption %]</caption>
+
+<tr class="gt_callstring [% gt_class %]">
+  <th class="laligned">Sample Reception calls</th>
+[% IF check.sample_name_match.defined && check.sample_name_match.matched_gt.defined -%]
+	[% elem_index=0 %]
+	[% FOREACH call_code IN check.sample_name_match.matched_gt.chunk(1) %]
+		[% snp_info=plexes.$ssn.snps.$elem_index %]
+		[% IF snp_info.allele_swap == 0 %]
+			[% ref_allele=snp_info.ref_allele %]
+			[% alt_allele=snp_info.alt_allele %]
+		[% ELSE %]
+			[% ref_allele=snp_info.alt_allele %]
+			[% alt_allele=snp_info.ref_allele %]
+		[% END %]
+		[% SWITCH call_code %]
+			[% CASE 0 %]
+				[% matched_gt_call = '--' %]
+			[% CASE 1 %]
+				[% matched_gt_call = ref_allele _ ref_allele %]
+			[% CASE 2 %]
+				[% matched_gt_call = alt_allele _ alt_allele %]
+			[% CASE 3 %]
+				[% matched_gt_call = ref_allele _ alt_allele %]
+			[% CASE %]
+				[% matched_gt_call = 'QQ' %]
+		[% END %]
+		[% snp_info_title='Name: ' _ snp_info.snp_name _ '; Alleles: ' _ snp_info.ref_allele _ '/' _ snp_info.alt_allele _ '; Chr: ' _ snp_info.chr _ '; pos: ' _ snp_info.pos %]
+		<td><span title="[% snp_info_title %]">[% matched_gt_call %]</span></td>
+		[% elem_index=elem_index+1 %]
+	[% END %]
+[% ELSE -%]
+  [% sz=plexes.$ssn.snps.size - 1 %]
+  [% FOREACH elem_index IN [0 .. sz] %]
+    [% snp_info=plexes.$ssn.snps.$elem_index %]
+    [% snp_info_title='Name: ' _ snp_info.snp_name _ '; Alleles: ' _ snp_info.ref_allele _ '/' _ snp_info.alt_allele _ '; Chr: ' _ snp_info.chr _ '; pos: ' _ snp_info.pos %]
+    <td><span title="[% snp_info_title %]">--</span></td>
+    [% elem_index=elem_index+1 %]
+  [% END %]
+[% END -%]
+</tr>
+
+[% INCLUDE genotype_rows gt_result=check gt_class="gt_simple" %]
+[% IF display_cgc %]
+[% INCLUDE genotype_rows gt_result=cgc gt_class="gt_composite" %]
+[% END %]
+</table>
+
+[% IF check.alternate_matches.first.defined -%]
+<table summary="genotype check alternate matches">
+	[% FOREACH alt_match IN check.alternate_matches -%]
+	<tr>
+	  <th class="laligned">Closest alternative match</th>
+              [%
+              alt_sample_name=alt_match.matched_sample_name;
+		row = c.model('WarehouseDB').resultset('CurrentSample').search({ 'sanger_sample_id' => "$alt_sample_name"}, ).first;
+		alt_sample_id = 0;
+		IF row;
+			alt_sample_id = row.internal_id;
+		END;
+              IF alt_sample_id;
+              	alt_sample_name='<a href="' _ c.uri_for_action(c.controller('Checks').action_for('samples'), alt_sample_id) _ '"><span class="lib nbsp">' _ alt_sample_name _ '</span></a>';
+              END;
+              %]
+          <td>Matched [% alt_match.match_count | format_number %] of [% alt_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); alt_match.match_pct * 100; END %]%) with sample [% alt_sample_name %]</td>
+	</tr>
+	[%- END -%]
+</table>
+[% END -%]
+
+[% IF check.alternate_relaxed_matches.first.defined -%]
+<table summary="genotype check alternate loose matches">
+	[% FOREACH alt_relaxed_match IN check.alternate_relaxed_matches -%]
+	<tr>
+	  <th class="laligned">Loose alternative match</th>
+	  <td>Matched [% alt_relaxed_match.match_count | format_number %] of [% alt_relaxed_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); alt_relaxed_match.match_pct * 100; END %]%) with sample [% alt_relaxed_match.matched_sample_name %]</td>
+	</tr>
+	[%- END -%]
+</table>
+[% END -%]
+
+[% IF check.comments.defined && check.comments -%]
+<table summary="genotype check comments">
+<tr>
+  <th class="laligned">comments</th><td>[% check.comments %]</td>
+</tr>->
+</table>
+[% END -%]
+
+</div>
+
+[% BLOCK genotype_rows %]
+
+<tr class="gt_bamcallstring [% gt_class %]">
+  <th class="laligned">BAM calls</th>
+[% IF gt_result.bam_call_string.defined -%]
+	[% score_list=gt_result.sample_name_match.match_score.split(';') %]
+	[% emattr_open='' %]
+	[% emattr_close='' %]
+	[% FOREACH call IN gt_result.bam_call_string.chunk(2) %]
+		[%
+		 IF call == 'NN';
+			call = '--';
+		END;
+		%]
+		[% score_value=score_list.shift %]
+		[% SWITCH score_value %]
+			[% CASE 0 %]
+				[% gtcall_match_type = 'gtcall_mild_mismatch' %]
+				[% title_str='MildMismatch (' _ score_value _ ')' %]
+			[% CASE 1 %]
+				[% gtcall_match_type = 'gtcall_match' %]
+				[% title_str='Match (' _ score_value _ ')' %]
+			[% CASE [ -1, -2, -3 ] %]
+				[% gtcall_match_type = 'gtcall_severe_mismatch' %]
+				[% title_str='SeriousMismatch (' _ score_value _ ')' %]
+			[% CASE '' %]
+				[% gtcall_match_type = 'gtcall_unrecognised_code' %]
+				[% title_str='NoSampleNameMatch' %]
+			[% CASE %]
+				[% gtcall_match_type = 'gtcall_unrecognised_code' %]
+				[% title_str='UnknownMatchType (' _ score_value _ ')' %]
+		[% END %]
+		<td><span class="[% gtcall_match_type %]" title="[% title_str %]">[% call %]</span></td>
+	[% END %]
+[% ELSE -%]
+  <td>NONE</td>
+[% END -%]
+</tr>
+
+<tr class="gt_depthstring [% gt_class %]">
+  <th class="laligned">Call depths</th>
+[% IF gt_result.bam_gt_depths_string.defined -%]
+  [% FOREACH depth IN gt_result.bam_gt_depths_string.split(';') %]
+    [% IF depth > 5 %]
+      [% gt_depth_class='gtcall_depth_above_threshold' %]
+      [% title_str='Depth above threshold' %]
+    [% ELSE %]
+      [% gt_depth_class='gtcall_depth_below_threshold' %]
+      [% title_str='Low Depth' %]
+    [% END %]
+    <td><span class="[% gt_depth_class %]" title="[% title_str %]">[% depth %]</span></td>
+  [% END %]
+[% ELSE -%]
+  <td>N/A</td>
+[% END -%]
+</tr>
+
+<tr class="[% gt_class %]">
+  <th class="laligned">Likelihoods</th>
+[% IF gt_result.bam_gt_likelihood_string.defined -%]
+  [% FOREACH lh IN gt_result.bam_gt_likelihood_string.split(';') %]
+    <td class="gtcall_likelihood">
+        [% lhf=lh.split(',').join('<br />') %]
+	<span class="gtcall_likelihood" title="[% lh %]">[% lhf %]</span>
+    </td>
+  [% END %]
+[% ELSE -%]
+  <td>N/A</td>
+[% END -%]
+</tr>
+
+[% END %]
+

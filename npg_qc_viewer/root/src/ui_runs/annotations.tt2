@@ -1,0 +1,53 @@
+<div id="annotations" class="results_full_lane">
+
+  <h2 class="result_full">Lane annotations</h2>
+  <div class="annotations_frame">
+  [% runlane_annotations=c.model('NpgDB').runlane_annotations(id_run).all; IF runlane_annotations -%]
+    <table width="100%" summary="lane annotations">
+    [% previous_position=0; stripe_class=''; FOREACH rs IN runlane_annotations -%]
+      <tr>[% position=rs.run_lane.position;
+             IF position != previous_position;
+               IF stripe_class; stripe_class=''; ELSE; stripe_class='zebra_stripe'; END;
+             END %]
+        <td [% IF stripe_class %]class="[% stripe_class %]"[% END %]>[% IF position != previous_position; previous_position=position; %]L[% position; END %]</td>
+        <td class="annot_time nbsp [% stripe_class %]">[% PROCESS timestamp date=rs.annotation.date %]</td>
+        <td class="annot_author [% stripe_class %]">[% rs.annotation.user.username %]</td>
+        <td [% IF stripe_class %]class="[% stripe_class %]"[% END %]>[% PROCESS annot comment=rs.annotation.comment -%] 
+            [% IF rs.annotation.attachment.defined -%]
+              <a href="[% npg_url %]/run_annotation/attachment/[% rs.id_annotation %]">[% rs.annotation.attachment_name | html %]</a>
+            [% END -%]
+        </td>
+      </tr>
+    [% END -%]
+    </table>
+  [% END -%]
+  </div>
+
+  <h2 class="result_full">Run annotations</h2>
+  <div class="annotations_frame">
+  [% run_annotations=c.model('NpgDB').run_annotations(id_run).all; IF run_annotations -%]
+    <table summary="run annotations">
+    [% FOREACH rs IN run_annotations -%]
+      <tr>
+        <td class="annot_time nbsp">[% PROCESS timestamp date=rs.annotation.date %]</td>
+        <td class="annot_author">[% rs.annotation.user.username %]</td>
+        <td>[% PROCESS annot comment=rs.annotation.comment -%] 
+            [% IF rs.annotation.attachment.defined -%]
+              <a href="[% npg_url %]/run_annotation/attachment/[% rs.annotation.id_annotation %]">[% rs.annotation.attachment_name | html %]</a>
+            [% END -%]
+        </td>
+      </tr>
+    [% END -%]
+    </table>
+  [% END -%]
+  </div>
+
+</div>
+
+[%- BLOCK timestamp -%]
+[%- date.ymd('/') %] [% date.hour %]:[% date.minute -%]
+[%- END -%]
+
+[%- BLOCK annot -%]
+[%- FILTER html_line_break; comment | html; END -%]
+[%- END -%]

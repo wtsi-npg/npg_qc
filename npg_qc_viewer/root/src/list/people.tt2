@@ -1,0 +1,27 @@
+[% title = 'Library creators and libraries sequenced within ' _ num_weeks _ ' week';
+   IF num_weeks > 1; title = title _ 's'; END; 
+   WRAPPER qsea_wrapper.tt2 ;-%]
+
+<div id="content">
+
+<div id="menu">
+  <div id="links">
+    <ul>
+      <li><a href="#page_top">Page Top</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="first_section"  class="text_section">
+<ul>
+[% FOREACH rs IN lib_creators_list;
+     person = rs.user_login;
+     url = c.uri_for_action(c.controller('Checks').action_for('library_creators'), {name=>person});
+-%]
+<li> <a href="[% url %]">[% person %]</a> ([% rs.get_column('num_libs') %])</li>
+[% END -%]
+</ul>
+</div>
+
+</div>
+[% END -%]

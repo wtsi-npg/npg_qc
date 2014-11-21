@@ -1,0 +1,392 @@
+[%-
+    USE Number.Format(THOUSANDS_SEP=',');
+
+    lane_class = 'lane';
+    IF pass == 1; lane_class = lane_class _ ' passed'; ELSIF pass == 0; lane_class = lane_class _ ' failed'; END;
+-%]
+
+<td class="[% lane_class %] nbsp">
+[%- IF run_view %]<div class="mqc nbsp" id="mqc_lane_[% position %]"></div>[% END -%]
+
+[% have_link = 0;
+   IF tag_index == '' && lane_collection && lane_collection.size;
+   have_link = 1 %]<a href="#[% lane_key %]">[% END -%]
+[%- position -%]
+[%- IF have_link %]</a>[% END -%]
+</td>
+
+[%- IF has_plexes -%]
+<td class="tag_info">
+[%- IF tag_index.defined; lane_link = c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'lane', 'db_lookup'=>"$db_lookup"}); -%]
+[%- have_link = 0; IF lane_collection && lane_collection.size; have_link = 1; -%]
+<a href="#[% lane_key %]">[% END -%]
+[%- tag_index -%]
+[%- IF have_link %]</a>[% END -%]
+[%- IF tag_sequence.defined && tag_sequence %]<br />[% tag_sequence %][% END %][% END %]</td>
+[%- END -%]
+
+[%- FOREACH check_name IN checks_list -%]
+  [% IF check_name.match('genotype') && !check_name.match('W30467') %]
+        [% NEXT %]
+  [% END %]
+[%-
+    result = '';
+    td_class = 'check_summary';
+    IF lane_collection && lane_collection.size;
+      result_collection = lane_collection.slice('check_name', check_name);
+      IF result_collection.defined && result_collection.size;
+         result = result_collection.get(0);
+         IF result.pass == 1;
+           td_class = td_class _ ' passed';
+         ELSIF result.pass == 0;
+           td_class = td_class _ ' failed';
+         ELSE;
+           td_class = td_class _ ' outcome_unknown';
+         END;
+    END;
+-%]
+ <td class="[% td_class %]">
+[%-
+           IF result;
+             TRY;
+             class_name = map.$check_name;
+             PROCESS "$class_name" result;
+             CATCH;
+             CLEAR;
+             error.info;
+             END;
+           END;
+-%]
+ </td>
+[%-   ELSE -%]
+<td></td>
+[%-   END -%]
+[%- END -%]
+
+[%  BLOCK qX_yield -%]
+[%  result.yield1 | format_number -%]
+[%-   IF result.yield2.defined -%]
+<br />[% result.yield2 | format_number -%]
+[%-   END -%]
+[%- END -%]
+
+[%  BLOCK insert_size -%]
+[%- equartiles = result.expected_size_range -%]
+[%- IF equartiles.defined && equartiles -%]
+<span class="expected_value">[% equartiles %]</span><br />
+[%- END -%]
+[%- quartiles = result.quartiles -%]
+[%- IF quartiles.defined && quartiles -%]
+[%- bracket = 0;
+    percent = result.percent_well_aligned_reads;
+    IF percent.defined && percent < 50;
+      bracket = 1;
+    END;
+-%]
+<span class="nbsp">[% IF bracket %]<span class="result_fail">{</span>[% END %][% quartiles %][% IF bracket %]<span class="result_fail">}</span>[% END %]</span>
+[%- END -%]
+[%- END -%]
+
+[%  BLOCK adapter -%]
+[%- IF result.forward_fasta_read_count.defined -%]
+[%    result.forward_percent_contam_reads %]
+[%- END -%]
+[%- IF result.reverse_fasta_read_count.defined -%]
+<br />[% result.reverse_percent_contam_reads -%]
+[%- END -%]
+[%- END -%]
+
+[%  BLOCK split_stats -%]
+[%- IF result.num_aligned_merge.defined && result.num_total_merge.defined && result.num_total_merge != 0 -%]
+[%-   contam = (result.num_aligned_merge * 100) / result.num_total_merge -%]
+[%-   FILTER format('%2.2f'); contam; END -%]
+[%- END -%]
+[%- END -%]
+
+[%  BLOCK contamination -%]
+[%- IF result.contaminant_count.defined; ranked_orgs = result.ranked_organisms -%]
+[%-   IF ranked_orgs.0.defined;
+        contam = result.normalised_contamination.item(ranked_orgs.0);
+        padding = ' ';
+        IF contam < 10; padding = '  '; END;
+-%]
+<span class="nbsp">[% ranked_orgs.0 | replace('_', ' ') %]:[% padding %][% contam %]</span>
+[%-   END -%]
+[%-   IF ranked_orgs.1.defined;
+        contam = result.normalised_contamination.item(ranked_orgs.1);
+        padding = ' ';
+        IF contam < 10; padding = '  '; END;
+ -%]
+ <br /><span class="nbsp dark_blue">[% ranked_orgs.1 | replace('_', ' ') %]:[% padding %][% contam %]</span>
+[%-   END -%]
+[%- END -%]
+[%- END -%]
+
+[% BLOCK ref_match -%]
+[%- IF result.aligned_read_count.defined; ranked_orgs = result.ranked_organisms -%]
+
+
+[%-   IF ranked_orgs.0.defined;
+        match = result.percent_count.item(ranked_orgs.0);
+        padding = ' ';
+        IF match < 10; padding = '  '; END;
+-%]
+<span class="nbsp">[% ranked_orgs.0 | replace('_', ' ') %]:[% padding %][% match %]</span>
+[%-   END -%]
+
+[%-   IF ranked_orgs.1.defined;
+        match = result.percent_count.item(ranked_orgs.1);
+        padding = ' ';
+        IF match < 10; padding = '  '; END;
+-%]
+<br /><span class="nbsp dark_blue">[% ranked_orgs.1 | replace('_', ' ') %]:[% padding %][% match %]</span>
+[%-   END -%]
+
+
+
+[%- END -%]
+[%- END -%]
+
+[% BLOCK sequence_error -%]
+[%- forward_average_percent_error = result.forward_average_percent_error -%]
+[%- reverse_average_percent_error = result.reverse_average_percent_error -%]
+[%- IF forward_average_percent_error.defined -%]
+[%  FILTER format('%2.2f'); forward_average_percent_error; END -%]
+[%- END -%]
+[%- IF reverse_average_percent_error.defined -%]
+<br />[%  FILTER format('%2.2f'); reverse_average_percent_error; END -%]
+[%- END -%]
+[%- END -%]
+
+[% BLOCK tag_decode_stats -%]
+[%- decoding_rate_good = result.decoding_perc_good -%]
+[%- IF decoding_rate_good.defined -%]
+[% FILTER format('%2.2f'); decoding_rate_good; END %]<br />
+<span class="dark_blue">[% FILTER format('%4.2f'); result.variance_coeff; END %]</span>
+[%- END -%]
+[%- END -%]
+
+[% BLOCK tag_metrics -%]
+[% href='#tmc_' _ result.id_run _ ':' _ result.position %]
+[%- IF result.matches_pf_percent.defined -%]
+<a href="[% href %]">[% FILTER format('%2.2f'); 100-result.errors_percent; END %]</a><br />
+<span class="dark_blue"><a href="[% href %]">[% FILTER format('%4.2f'); result.variance_coeff(1); END %]</a></span>
+[%- END -%]
+[%- END -%]
+
+[% BLOCK upstream_tags -%]
+[% href='#utc_' _ result.id_run _ ':' _ result.position %]
+[%- IF result.total_tag0_reads.defined -%]
+ [% IF result.total_lane_reads > 0 %]
+  [% pctage_total_tag0_reads = result.total_tag0_reads * 100 / result.total_lane_reads %]
+  [% pctage_tag0_perfect_match_reads = result.tag0_perfect_match_reads * 100 / result.total_lane_reads %]
+ [% ELSE %]
+  [% pctage_total_tag0_reads = 0 %]
+  [% pctage_tag0_perfect_match_reads = 0 %]
+ [% END %]
+<span title="Number of reads in tag#0 BAM file (%age of total reads for the lane)"><a href="[% href %]">[% result.total_tag0_reads | format_number -%] ([% FILTER format('%4.2f'); pctage_total_tag0_reads; END %])</a></span>
+<br/>
+<span title="Number of reads in tag#0 BAM file which perfectly match a Sanger168 tag (%age of total reads for the lane)"><a href="[% href %]">[% result.tag0_perfect_match_reads | format_number -%] ([% FILTER format('%4.2f'); pctage_tag0_perfect_match_reads; END %])</a></span>
+[%- END -%]
+[%- END -%]
+
+[%  BLOCK gc_fraction -%]
+[%- IF result.ref_gc_percent.defined -%]
+<span class="expected_value">[%  FILTER format('%2.1f'); result.ref_gc_percent;  END -%]</span><br />
+[%- END -%]
+<span class="nbsp">[%- FILTER format('%2.1f'); result.forward_read_gc_percent; END %]
+[%- IF result.reverse_read_gc_percent.defined %]
+[% FILTER format('%2.1f'); result.reverse_read_gc_percent ; END -%]
+[%- END %]</span>
+[%- END -%]
+
+[% BLOCK gc_bias -%]
+[%- IF result.cached_plot.defined -%]Yes[%- ELSE -%]No[%- END -%]
+[%- END -%]
+
+[% BLOCK bam_flagstats -%]
+[%- mapped_rate = result.percent_mapped_reads -%]
+[%- IF mapped_rate.defined && mapped_rate != '' -%]
+[% FILTER format('%2.2f'); mapped_rate; END %]
+[%- ELSE -%]
+-
+[%- END -%]<br />
+[%- duplicate_rate = result.percent_duplicate_reads -%]
+[%- IF duplicate_rate.defined && duplicate_rate -%]
+  <span class="dark_blue">[% FILTER format('%2.2f'); duplicate_rate; END %]</span>
+[%- END -%]
+[%- END -%]
+
+[% BLOCK tags_reporters -%]
+[% href='#trc_' _ result.id_run _ ':' _ result.position %]
+<span title="Results for tags reporters check"><a href="[% href %]">Details</a></span>
+[%- END -%]
+
+[% BLOCK genotype %]
+
+[% IF result.snp_call_set != 'W30467' %]
+	[% RETURN %]
+[% END %]
+
+[% href='#gtrc_' _ result.snp_call_set _ '_' _ result.id_run _ ':' _ result.position _ ':' _ result.tag_index %]
+
+[%
+  alt_matches = '';
+  alt_relaxed_matches = '';
+%]
+
+[%
+IF result.alternate_match_count;
+  alt_matches = '<a title="Alternate matches exist"><em>&nbsp;a</em></a>';
+END;
+%]
+
+[%
+IF result.alternate_relaxed_match_count;
+  IF alt_matches == '';
+    alt_matches = '<a title="Loose alternate matches exist"><em>&nbsp;~a</em></a>';
+  END;
+END;
+%]
+
+[% depth_sum=0 %]
+[% depth_count=0 %]
+[% depth_min=99 %]
+[% depth_max=-1 %]
+[%
+FOREACH depth IN result.bam_gt_depths_string.split(';');
+  depth_sum=depth_sum + depth;
+  depth_count=depth_count + 1;
+  IF depth < depth_min;
+    depth_min=depth;
+  END;
+  IF depth > depth_max;
+    depth_max=depth;
+  END;
+END
+%]
+[%
+IF depth_count > 0;
+  avg_depth=depth_sum / depth_count;
+ELSE;
+  avg_depth=0;
+END
+%]
+[% avg_depth = avg_depth FILTER format('%2.1f') %]
+[%
+IF avg_depth > 5;
+     depth_attrib='gtcall_depth_above_threshold';
+ELSE;
+     depth_attrib='gtcall_depth_below_threshold';
+END;
+mean_depth = '<a title="Mean depth=' _ avg_depth _ '" class="' _ depth_attrib _ '">' _ avg_depth _ 'X</a>';
+%]
+
+[% match_score=0 %]
+[% csc=result.sample_name_match.common_snp_count %]
+[%
+IF result.sample_name_match.match_score.defined;
+  FOREACH depth IN result.sample_name_match.match_score.split(';');
+    IF depth < 0;
+      depth = -1;
+    END;
+    match_score=match_score+depth;
+  END;
+  IF csc != 0;
+    match_score_ratio=match_score / csc;
+    match_score_ratio = match_score_ratio FILTER format('%2.1f');
+  ELSE;
+    match_score_ratio=0;
+  END;
+END
+%]
+[% score_rep = '<a title="Match Score"><em>&nbsp;(' _ match_score_ratio _ ')</em></a>' %]
+
+[% match_type = '' %]
+[% IF result.sample_name_match.defined %]
+  [%
+  IF depth_min > 5;
+	match_type = '';
+	match_type_title = 'All depths &gt; 5';
+	match_type_attrib='gtcall_summary_depth_above_threshold';
+	padding = ' ';
+	fs = ' / ';
+	sn = result.sample_name_match.matched_sample_name;
+	csc = result.sample_name_match.common_snp_count;
+	mc = result.sample_name_match.match_count;
+	mp = result.sample_name_match.match_pct;
+  ELSE;
+	match_type = '~';
+	match_type_title = 'Some depths &le; 5';
+	match_type_attrib='gtcall_summary_depth_below_threshold';
+	padding = ' ';
+	fs = ' / ';
+	sn = result.sample_name_relaxed_match.matched_sample_name;
+	csc = result.sample_name_relaxed_match.common_snp_count;
+	mc = result.sample_name_relaxed_match.match_count;
+	mp = result.sample_name_relaxed_match.match_pct;
+  END
+  %]
+[% score_title = 'Match: ' _ mc _ ' / ' _ csc _ '; Match Score/Ratio (' _ match_score _ '/' _ match_score_ratio _ ')' %]
+  <span class="nbsp" title="[% score_title %]"><a href="[% href %]" class="[% match_type_attrib %]"><span title="[% match_type_title %]">[% match_type %]</span>[% padding %][% mc %] / [% csc %]</a></span>
+  <br/>
+  <span class="nbsp">[% mean_depth %][% alt_matches %]</span>
+[% ELSE %]
+  <span class="nbsp" title="[% score_title %]"><a href="[% href %]">no s/n match</a></span>
+  <br/>
+  <span class="nbsp">[% mean_depth %][% alt_matches %]</span>
+[% END %]
+<br/>
+[% END %]
+[%# End of genotype block %]
+
+[% BLOCK pulldown_metrics -%]
+
+[% href='#pdmc_' _ result.id_run _ ':' _ result.position _ ':' _ result.tag_index %]
+
+[%- 
+    mcoverage = 0;
+    IF result.unique_bases_aligned_num.defined && result.unique_bases_aligned_num != 0;
+      mcoverage = result.mean_target_coverage / (result.unique_bases_aligned_num / 1000000000);
+    END;
+    on_bait = '';
+    IF result.on_bait_bases_percent.defined;
+      on_bait = result.on_bait_bases_percent;
+    END;
+    on_target = '';
+    IF result.on_target_bases_percent.defined;
+      on_target = result.on_target_bases_percent;
+    END;
+    coverage = result.target_bases_coverage_percent.20 ? result.target_bases_coverage_percent.20 : 0; 
+-%]
+[% IF result.interval_files_identical.defined && result.interval_files_identical == 1 %]
+<span class="pdmc_na" title="Bait and target intervals identical"><a href="[% href %]">NA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NA<br/></a></span>
+<span class="dark_blue" title="On-bait bases %age"><a href="[% href %]">[% FILTER format('%2.2f');on_bait;END %]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></span>
+<span class="pdmc_na" title="Bait and target intervals identical" class="dark_blue"><a href="[% href %]">NA</a></span>
+[% ELSE %]
+<a href="[% href %]" title="%age coverage at 20X">[% FILTER format('%3.2f');coverage;END -%]</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="pdmc_pass" href="[% href %]" title="Mean depth per Gb">[% FILTER format('%3.0f');mcoverage; END; %]X</a><br/>
+<span class="dark_blue" title="On-bait bases %age"><a href="[% href %]">[% FILTER format('%2.2f');on_bait;END %]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></span>
+<span class="dark_blue" title="On-target bases %age"><a href="[% href %]">[% FILTER format('%2.2f');on_target;END %]</a></span>
+[% END %]
+[%-   END -%]
+
+[% BLOCK alignment_filter_metrics -%]
+[%-
+    ref = result.refs.last;
+    stats = result.stats_per_ref;
+    ref_stats = stats.$ref;
+    FILTER format('%3.2f');ref_stats.percent;END;
+-%]
+[%-   END -%]
+
+[%  BLOCK spatial_filter -%]
+[% result.num_spatial_filter_fail_reads | format_number -%]
+<br/>
+[% result.num_total_reads | format_number -%]
+[%-   END -%]
+
+[%  BLOCK verify_bam_id -%]
+[% result.freemix %]<br/>
+[%-   END -%]
+
+

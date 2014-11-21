@@ -1,0 +1,67 @@
+
+<div class="data_table" id="tags_reporters_div">
+<TABLE border=1 style="table-layout:fixed;height:30%;width:20%;">
+
+[% tl = check.tag_list %]
+[% FOREACH amp_row IN check.amp_rows %]
+	[% INCLUDE amp_row_tr prow=amp_row ptl=tl %]
+[% END %]
+
+[% tags_totals = check.tag_totals %]
+[% tags_totals_pct = check.tag_totals_pct %]
+[% INCLUDE tag_totals_rows_tr ptl=tl ptt=tags_totals pttp=tags_totals_pct %]
+
+</TABLE>
+</div>
+
+
+[% BLOCK amp_row_tr %]
+<tr>
+[% reporter_id = prow.reporter_id %]
+[% counts = prow.counts %]
+[% amp_total = prow.amp_total %]
+[% amp_percentage = prow.amp_percentage %]
+
+[% top = counts.size - 1 %]
+[% FOREACH j IN [ 0 .. top ] %]
+
+	[% tag_label = ptl.$j %]
+	[% count = counts.$j %]
+	[% count_pct = count / amp_total %]
+	[% td_title = 'R:' _ reporter_id _ 'T:' _  tag_label _ ':' _ count %]
+	[% IF count_pct > 0.001 %]
+		[% style_val = 'background-color:red' %]
+	[% ELSIF count_pct > 0.0001 %]
+		[% style_val = 'background-color:yellow' %]
+	[% ELSE %]
+		[% style_val = 'background-color:green' %]
+	[% END %]
+
+	<td title="[% td_title %]" style="[% style_val %];"></td>
+
+[% END %]
+<td title="RepTot for [% reporter_id %]: [% amp_total %]" style="background-color:white"></td>
+<td title="RepPct [% reporter_id %]: [% amp_percentage %]" style="background-color:white"></td>
+</tr>
+[% END %]
+
+
+[% BLOCK tag_totals_rows_tr %]
+<tr>
+[% top = ptl.size - 1 %]
+[% FOREACH j IN [ 0 .. top ] %]
+	[% tag_id = ptl.$j %]
+	[% tag_total = ptt.$j %]
+	<td title="TagTot for [% tag_id %]: [% tag_total %]" style="background-color:white"></td>
+[% END %]
+</tr>
+
+<tr>
+[% FOREACH j IN [ 0 .. top ] %]
+	[% tag_id = ptl.$j %]
+	[% tag_total_pct = pttp.$j %]
+	<td title="TagTotPct for [% tag_id %]: [% FILTER format('%2.3f'); tag_total_pct; END %]" style="background-color:white"></td>
+[% END %]
+</tr>
+[% END %]
+

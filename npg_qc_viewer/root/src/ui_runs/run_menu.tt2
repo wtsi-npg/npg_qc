@@ -1,0 +1,19 @@
+<ul>
+  <li><a href="[% npg_url %]/run/[% id_run %]">NPG</a></li>
+[% IF c.model('NpgDB').run_on_staging(id_run);
+     base = 'http://sfweb.internal.sanger.ac.uk:9000/cgi-bin/locate_runfolder';
+     run_folder_glob = id_run;
+     npg_run_row = c.model('NpgDB').resultset('Run').find(id_run);
+     IF npg_run_row;
+       rfglob = npg_run_row.folder_path_glob;
+       rfname = npg_run_row.folder_name;
+       IF rfglob && rfname;
+         run_folder_glob = rfglob _ rfname;
+       END;
+     END;
+-%] 
+  <li><a href="[% base %]/[% run_folder_glob %]/latest?redir">Latest Analysis</a></li>
+  <li><a href="[% base %]/[% run_folder_glob %]/ivc?redir">Latest IVC</a></li>
+[% END -%]
+  <li><a href="[% npg_url %]_qc/summary/[% id_run %]">NPG QC</a></li>
+</ul>
