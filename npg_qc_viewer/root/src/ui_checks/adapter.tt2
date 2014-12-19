@@ -2,15 +2,6 @@
 
 [% has_reverse = check.reverse_fasta_read_count.defined -%]
 
-<!--
-[%- FOREACH read IN ['forward', 'reverse'] -%]
-[%- myurl = check.image_url(read);
-    IF myurl -%]
-<img class="seq_error_plot" src="[% myurl | url | html %]" alt="[% read %] read adapter match start position" />
-[%- END -%]
-[%- END %]
--->
-
 <div style='float:left;' class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]' data-direction='forward' data-height=200></div>
 <div style='float:right;margin-right:20px;' class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]' data-direction='reverse' data-height=200></div>
 
