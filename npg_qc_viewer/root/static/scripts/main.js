@@ -19,10 +19,9 @@ require.onError = function (err) {
     throw err;
 };
 
-require(['collapse','full_results','bcviz/insertSizeHistogram', 'bcviz/adapter', 'bcviz/mismatch'], 
-function( collapse,  full_results,  insert_size,                 adapter,         mismatch) {
+require(['collapse', 'bcviz/insertSizeHistogram', 'bcviz/adapter', 'bcviz/mismatch'], 
+function( collapse, insert_size, adapter, mismatch) {
 
-	full_results();
 	collapse.init();
 
 	jQuery('.bcviz_insert_size').each(function(i) { insert_size(this); });
