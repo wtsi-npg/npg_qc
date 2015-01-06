@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+  <id>30804</id>
+  <status>released</status>
+  <lanes>
+    <lane position="1" id="11633589" priority="0">
+      <pool id="11318089" name="DN355857R C3:C3" request_id="7015934" qc_state="">
+        <sample sample_id="2054136" library_id="11405261" library_name="" library_type="Manual Standard WGS (Plate)" study_id="3149" project_id="1422" consent_withdrawn="false">
+          <tag tag_id="218">
+            <index>19</index>
+            <expected_sequence>TCTGCTGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="350" to="350"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="10765559">
+        <sample sample_id="1255141" library_id="6759268" library_name="PhiX520_20130220" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="264">
+            <index>168</index>
+            <expected_sequence>ACAACGCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="2" id="11633590" priority="0">
+      <pool id="11318091" name="DN355857R E3:E3" request_id="7015938" qc_state="">
+        <sample sample_id="2054138" library_id="11405285" library_name="" library_type="Manual Standard WGS (Plate)" study_id="3149" project_id="1422" consent_withdrawn="false">
+          <tag tag_id="237">
+            <index>21</index>
+            <expected_sequence>TCGAGCGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="350" to="350"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="10765559">
+        <sample sample_id="1255141" library_id="6759268" library_name="PhiX520_20130220" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="264">
+            <index>168</index>
+            <expected_sequence>ACAACGCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="3" id="11633591" priority="0">
+      <pool id="11318092" name="DN355857R F3:F3" request_id="7015940" qc_state="">
+        <sample sample_id="2054139" library_id="11405297" library_name="" library_type="Manual Standard WGS (Plate)" study_id="3149" project_id="1422" consent_withdrawn="false">
+          <tag tag_id="242">
+            <index>22</index>
+            <expected_sequence>TGATACGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="350" to="350"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="10765559">
+        <sample sample_id="1255141" library_id="6759268" library_name="PhiX520_20130220" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="264">
+            <index>168</index>
+            <expected_sequence>ACAACGCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="4" id="11633592" priority="0">
+      <pool id="11318093" name="DN355857R G3:G3" request_id="7015942" qc_state="">
+        <sample sample_id="2054140" library_id="11405309" library_name="" library_type="Manual Standard WGS (Plate)" study_id="3149" project_id="1422" consent_withdrawn="false">
+          <tag tag_id="250">
+            <index>23</index>
+            <expected_sequence>TGCATAGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="350" to="350"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="10765559">
+        <sample sample_id="1255141" library_id="6759268" library_name="PhiX520_20130220" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="264">
+            <index>168</index>
+            <expected_sequence>ACAACGCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="5" id="11633593" priority="0">
+      <pool id="11318097" name="DN355857R C4:C4" request_id="7015950" qc_state="">
+        <sample sample_id="1248216" library_id="11405262" library_name="" library_type="Manual Standard WGS (Plate)" study_id="3257" project_id="1688" consent_withdrawn="false">
+          <tag tag_id="100">
+            <index>27</index>
+            <expected_sequence>TAGTGACT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="350" to="350"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="10765559">
+        <sample sample_id="1255141" library_id="6759268" library_name="PhiX520_20130220" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="264">
+            <index>168</index>
+            <expected_sequence>ACAACGCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="6" id="11633594" priority="0">
+      <pool id="11318098" name="DN355857R D4:D4" request_id="7015952" qc_state="">
+        <sample sample_id="1248144" library_id="11405274" library_name="" library_type="Manual Standard WGS (Plate)" study_id="3257" project_id="1688" consent_withdrawn="false">
+          <tag tag_id="104">
+            <index>28</index>
+            <expected_sequence>TACAGGAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="350" to="350"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="10765559">
+        <sample sample_id="1255141" library_id="6759268" library_name="PhiX520_20130220" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="264">
+            <index>168</index>
+            <expected_sequence>ACAACGCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="7" id="11633595" priority="0">
+      <pool id="11318099" name="DN355857R E4:E4" request_id="7015954" qc_state="">
+        <sample sample_id="1248309" library_id="11405286" library_name="" library_type="Manual Standard WGS (Plate)" study_id="3257" project_id="1688" consent_withdrawn="false">
+          <tag tag_id="109">
+            <index>29</index>
+            <expected_sequence>TCCTCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="350" to="350"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="10765559">
+        <sample sample_id="1255141" library_id="6759268" library_name="PhiX520_20130220" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="264">
+            <index>168</index>
+            <expected_sequence>ACAACGCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="8" id="11633596" priority="0">
+      <pool id="11318100" name="DN355857R F4:F4" request_id="7015956" qc_state="">
+        <sample sample_id="1992248" library_id="11405298" library_name="" library_type="Manual Standard WGS (Plate)" study_id="3257" project_id="1688" consent_withdrawn="false">
+          <tag tag_id="113">
+            <index>30</index>
+            <expected_sequence>TGTGGTTG</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="350" to="350"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="10765559">
+        <sample sample_id="1255141" library_id="6759268" library_name="PhiX520_20130220" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="264">
+            <index>168</index>
+            <expected_sequence>ACAACGCAAT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+  </lanes>
+</batch>

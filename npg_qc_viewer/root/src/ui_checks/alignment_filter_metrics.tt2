@@ -1,0 +1,17 @@
+[% USE Number.Format(THOUSANDS_SEP=',');
+   refs = check.refs;
+   stats = check.stats_per_ref;
+   ambig = check.ambiguous_reads;
+   chimeras = check.chimeric_reads;
+-%]
+<div class="data_table">
+<table summary="alignment filter metrics">
+<tr><th>Reads description</th><th>Reads, count</th><th>Reads, %</th></tr>
+[% FOREACH organism IN refs; org_hash = stats.$organism; %]
+<tr><th class="laligned">[% organism %]</th><td class="raligned">[% org_hash.count | format_number %]</td><td class="raligned">[% FILTER format('%3.2f'); org_hash.percent; END %]</td></tr>
+[% IF org_hash.count_unmapped.defined %]<tr><th class="raligned">.&nbsp;.&nbsp;.&nbsp;including unmapped</th><td class="raligned">[% org_hash.count_unmapped | format_number %]</td><td class="raligned">[% FILTER format('%3.2f'); org_hash.percent_unmapped; END %]</td></tr>[% END %]
+[% END %]
+[% IF ambig.size %]<tr><th class="laligned">Ambiguous</th><td class="raligned">[% ambig.count | format_number %]</td><td class="raligned">[% FILTER format('%3.2f'); ambig.percent; END %]</td></tr>[% END %]
+[% IF chimeras.size %]<tr><th class="laligned">Chimeric</th><td class="raligned">[% chimeras.count | format_number %]</td><td class="raligned">[% FILTER format('%3.2f'); chimeras.percent; END %]</td></tr>[% END %]
+</table>
+</div>

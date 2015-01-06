@@ -1,0 +1,538 @@
+/*
+* Author: Marina Gourtovaia
+*
+* Copyright (C) 2014 Genome Research Ltd.
+*
+* This file is part of NPG software.
+*
+* NPG is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/************************************************************************************
+*
+* CSS stylesheet for NPG SeqQC
+*
+************************************************************************************/
+
+/* universal */
+* {
+  margin: 0px;
+  padding: 0px;
+  font-family: 'Lucida Grande', helvetica, arial, sans-serif;
+  font-size: 12px;
+  
+}
+
+/* to make white space non-braking */
+.nbsp {
+  white-space: nowrap;
+}
+
+/* defaults for pre-defined HTML tags */
+body {
+  background: #f3fbfd; /*  light blue */
+}
+
+h1  { font-weight: bold; }
+h2  { 
+  font-weight: bold;
+  background: #aad4f4;
+  color: #476080;
+  padding: 3px 6px 3px 8px;
+}
+
+h3  { 
+  font-size: 150%;
+  background-color: #aad4f4; /* medium blue */
+  color: #31353d;  /* dark font */ 
+  padding: 3px 3px 3px 8px;
+}
+
+img { border: 0px; }
+
+table {
+  border-collapse: collapse;
+  border: none;
+}
+th {
+  font-weight: bold;
+}
+
+a, a:link, a:visited, a:hover {
+  text-decoration: none;
+}
+
+.lfloat {
+  float: left;
+}
+.rfloat {
+  float: right;
+}
+.clear {
+  clear: both;
+}
+
+.rel_pos_container {position: relative;} 
+
+/***************  header  *****************/
+#header {
+  background: #3e87b3; /* dark blue */
+  color: #efefef;      /* light grey */
+  margin: 0 0 12px;
+}
+
+/* page title */
+#header h1 {
+  padding: 7px 11px 7px 16px;
+}
+
+#header ul {
+  padding: 0px;
+  margin: 0px;
+  list-style: none;
+}
+
+#header li, #tabs li {
+  display: inline;
+}
+
+/* main menu strip */
+#tab_bar {
+  background: #aad4f4; /* medium blue */
+  border-bottom: 1px solid #bbb;
+  min-height: 20px;
+}
+
+/* tabs */
+#tabs {
+  color: #31353d;  /* dark font */
+  float: left;
+  padding: 3px 0px 3px 0px;
+}
+
+#tabs a, div#tabs a:link, div#tabs a:visited {
+  color: #31353d;
+  padding: 1px 15px 3px 15px;
+  font-weight: bold;
+}
+
+#tabs a:hover {
+  background: #3e87b3;
+  color: #fff;
+}
+
+#tabs ul {
+  padding-top: 1px;
+}
+
+/*************** page-specific menu ******/
+
+#menu {
+  position: fixed;
+  right: 10px;
+  top  : 62px;
+  width: 155px;
+  height: 100%;
+  margin-bottom: 10px;
+  overflow: auto;
+  z-index: 1;
+}
+
+#menu ul {
+  padding: 5px;
+  margin: 0px;
+  list-style: none;
+  line-height: 20px;
+  border-top: 1px solid #aad4f4;
+  background: #cce5f8;
+  color: #222931;
+}
+
+.collapse_icon {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/*************** main content ************/
+
+#content {
+  background: #fff;
+  margin: 0px 170px 10px 0px;
+  min-width: 800px;
+  padding: 10px 10px 0px 10px;
+  border: 1px solid #ccc;
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+}
+
+/*************** summary results  ************/
+
+#results_summary td, th {
+  padding: 3px 5px 3px 5px;
+}
+
+#results_summary td {
+  border-bottom: 2px solid #fff;
+  border-right:  2px solid #fff;
+}
+
+#results_summary th {
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+
+#total td {
+  border-top: 3px solid #ccc;
+  font-weight: bold;
+}
+
+.id_run {
+  text-align:  right;
+}
+
+.id_run img {
+  position: absolute;
+  left: 0px;
+  top:  7px;
+}
+
+.tag_info {
+  text-align:  center;
+}
+
+.check_labels {
+  font-weight: normal;  
+}
+
+.lane {
+  text-align:  center;
+  font-weight: bold;
+}
+
+.gtcall_match {
+  font-weight: bold;
+/*  color: #b5daff; */
+  color: blue;
+}
+
+.gtcall_mild_mismatch {
+/*  font-weight: bold; */
+  font-style: italic;
+  color: black;
+}
+
+.gtcall_severe_mismatch {
+  font-weight: bold;
+  font-style: italic;
+/*  color: #f99389; */
+  color: red;
+}
+
+.gtcall_unrecognised_code {
+  color: black;
+/*  font-weight: bold; */
+}
+
+.gt_summary_depth_above_threshold {
+  color: black;
+  font-weight: bold;
+}
+
+.gt_summary_depth_below_threshold {
+  color:black;
+  font-style: italic;
+}
+
+.gtcall_depth_above_threshold {
+  color: black;
+  font-weight: bold;
+}
+
+.gtcall_depth_below_threshold {
+  color:gray;
+  font-style: italic;
+}
+
+.gtcall_likelihood {
+  font-size: 8px;
+  line-height: 1em;
+}
+
+.gt_bamcallstring {
+  line-height: .6em;
+}
+
+.gt_composite {
+  background: Lavender;
+}
+
+.gt_depthstring {
+  line-height: .6em;
+}
+
+.pdmc_na {
+  color:gray;
+  font-style: italic;
+}
+
+.pdmc_pass {
+  color: inherit;
+}
+
+.failed {
+ background-color: #f99389;
+}
+
+.passed {
+ background-color: #b5daff;
+}
+
+.outcome_unknown {
+  background-color: #ECECEC;
+}
+
+.check_summary {
+  text-align: right;
+}
+
+.lib {
+  font-size: 11px;
+}
+
+.watermark {
+  position: absolute;
+  right: 0px;
+  top: -5px;
+  font-weight: bold;
+  font-size: 20px;
+  color: #EFC9BC;
+  z-index: -1;
+}
+
+.expected_value {
+  font-style: italic;
+}
+
+.white {
+  color: #FFFFFF; 
+}
+
+/*************** full results ************/
+
+.results_full_lane {
+  margin:  10px 0 0 0;
+  padding: 0;
+  border-top-style:    groove;
+  border-right-style:  none;
+  border-bottom-style: none;
+  border-left-style:   none;
+  border-color:        #ccc;
+}
+
+.result_full {
+  margin:  8px 0 0 0;
+}
+
+.result_full h2 {
+  -moz-border-radius-topright: 3px;
+  -webkit-border-top-right-radius: 3px;
+  -moz-border-radius-topleft: 25px;
+  -webkit-border-top-left-radius: 25px;
+  padding-left: 28px;
+}
+
+.collapser {
+  padding-right: 70px;
+}
+
+.collapser_open {
+  background: #aad4f4 url("/static/images/blue_collapse.png") no-repeat right center;
+}
+
+.collapser_closed {
+  background: #afcfff url("/static/images/blue_expand.png") no-repeat right center;
+}
+
+.result_full_content {
+  color: #333;
+  padding: 10px 10px 0 10px;
+  background: #fafcfc;
+  border: 1px solid #aad4f4;
+}
+
+.result_full_content table {
+  border-top: 1px solid #476080;
+}
+
+.result_full_content th {
+  font-size: 11px;
+}
+
+.result_full_content td, th {
+  border-bottom:  1px solid #ededed;
+  padding-top:   3px;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.raligned {
+  text-align: right;
+}
+
+.laligned {
+  text-align: left;
+}
+
+.data_table {
+  margin: 0 0 10px 0;
+}
+
+/* result fail text */
+.result_fail {
+  color: red;
+}
+
+.sequence_string {
+  font-family: monospace;
+}
+
+.dark_blue {
+  color: #476080; 
+}
+
+.insert_size_histogram {
+  padding-left: 10px;
+}
+
+.seq_error_plot {
+  padding-left: 20px;
+
+}
+
+.fastqcheck_plot {
+  vertical-align: text-top;
+}
+
+
+.fastqcheck_legend {
+  vertical-align: text-top;
+  padding-left: 10px;
+}
+
+
+/******************* annotation section **************/
+#annotations_frame {
+  height: 100px;
+  overflow: auto;
+}
+
+.annotations_frame td {
+  padding: 3px 5px 3px 5px;
+  border-bottom: 1px solid #ededed;
+  border-top: 1px solid #ededed;
+  vertical-align: top;
+}
+
+.annotations_frame a {
+  font-size: 10px;
+}
+
+.annot_time {
+  width: 40px;
+  font-size: 10px;
+}
+
+.annot_author {
+  font-style: italic;
+}
+
+.zebra_stripe {
+  background-color: #e7edf3;
+}
+
+/******************* manual qc widgets **************/
+.mqc {
+  display: inline;
+  padding-right: 5px;
+  padding-top: 5px;
+}
+
+.button {
+  margin: 1px;
+  border-style: outset;
+  border-width: 2px;
+  width: 16px;
+  height: 16px;
+  visibility: inherit;
+}
+
+.button_fail {
+  border-color: rgb(255,86,89);
+}
+
+.button_pass {
+  border-color: rgb(134,204,124);
+}
+
+/******************* pages that do not display results **************/
+.text_section {
+  margin: 0 20px 30px 20px;
+}
+
+#first_section {
+  margin: 15px 20px 30px 20px;
+}
+
+.text_section h2 {
+  margin: 0 0 10px 0;
+}
+
+.text_section ul {
+  padding: 5px;
+  margin: 10px 0px 0px 10px;
+  list-style: none;
+}
+
+.text_section table {
+  border: 1px solid #ededed;
+}
+
+.text_section td, th {
+  border-bottom: 1px solid #ededed;
+  border-right: 1px solid #ededed;
+  padding:   3px 10px 3px 10px;
+}
+
+.text_section td {
+  vertical-align: top;
+  text-align: left;
+}
+
+
+/******************** help page ***************************************/
+.url_column {
+  width: 200px;
+}
+
+
+/******************** error page **************************************/
+#error ul {
+  list-style: none;
+  margin: 0px 0px 0px 30px;
+}
+
+#error li {
+  padding: 5px;
+}

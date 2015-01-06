@@ -1,0 +1,81 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+[% has_reverse = check.reverse_fasta_read_count.defined -%]
+
+[%- FOREACH read IN ['forward', 'reverse'] -%]
+[%- myurl = check.image_url(read);
+    IF myurl -%]
+<img class="seq_error_plot" src="[% myurl | url | html %]" alt="[% read %] read adapter match start position" />
+[%- END -%]
+[%- END %]
+
+<div class="data_table">
+<table summary="adapter check results">
+
+<tr>
+  <th class="laligned">read</th>
+  <td>forward</td>
+  [% IF  has_reverse %]<td>reverse</td>[% END %]
+</tr>
+
+[% IF check.forward_fasta_read_count.defined -%]
+<tr>
+  <th class="laligned">fasta read count</th>
+  <td>[% check.forward_fasta_read_count | format_number %]</td>
+  [% IF  has_reverse %]<td>[% check.reverse_fasta_read_count | format_number %]</td>[% END %]
+</tr>
+
+[% IF check.forward_contaminated_read_count.defined -%]
+<tr>
+  <th class="laligned">contaminated read count</th>
+  <td>[% check.forward_contaminated_read_count | format_number%]</td>
+  [% IF has_reverse %]<td>[% check.reverse_contaminated_read_count | format_number %]</td>[% END %]
+</tr>
+<tr>
+  <th class="laligned">contam reads, %</th>
+  <td>[% check.forward_percent_contam_reads %]</td>
+  [% IF has_reverse %]<td>[% check.reverse_percent_contam_reads %]</td>[% END %]
+</tr>
+[% END -%]
+[% END -%]
+
+[% IF check.comments.defined && checks.comments -%]
+<tr>
+  <th>comments</th>
+  <td[% IF has_reverse %]colspan="2"[% END %]>[% check.comments %]</td>
+</tr>
+[%- END -%]
+
+</table>
+</div>
+
+[% IF check.forward_blat_hash.defined -%]
+<div class="data_table">
+<table summary="Contamination for each adapter">
+  <tr> 
+    <th rowspan="2">adapter name</th>
+    <th [% IF has_reverse %]colspan="2"[% END %]>hits count</th>
+  </tr>
+  <tr>
+    <td>forward</td>
+    [% IF has_reverse %]<td>reverse</td>[% END %]
+  </tr>
+  
+  [% hash_keys =  check.forward_blat_hash.keys.sort -%]
+  [% FOREACH adapter IN hash_keys %]
+  [%   fnumber = check.forward_blat_hash.item(adapter);
+       rnumber = 1;
+       IF  has_reverse; rnumber = check.reverse_blat_hash.item(adapter); END;
+       IF ((has_reverse && (fnumber || rnumber)) || (!has_reverse && fnumber));
+  %]
+  <tr>
+    <td>[% adapter %]</td>
+    <td class="raligned">[% fnumber %]</td>
+    [% IF  has_reverse %]<td class="raligned">[% rnumber %]</td>[% END %]
+  </tr>   
+  [%- END -%]
+  [% END -%] 
+</table>
+</div>
+[% END -%]
+

@@ -14,6 +14,8 @@ my $ref_repos = cwd . '/t/data/autoqc';
 my $archive_qc_path = cwd . '/t/data/autoqc/tag_metrics';
 my $tag_sets_repository = cwd . '/t/data/autoqc/tag_sets';
 
+SKIP: { skip 'require bammaskflags', 6, unless `which bammaskflags`;
+
 use_ok ('npg_qc::autoqc::checks::upstream_tags');
 
 my $EXIST_EXECUTABLES = `which icd`;
@@ -44,6 +46,9 @@ SKIP: {
   unless ($EXIST_EXECUTABLES) {
     skip 'unable to access iRODS executables', 3;
   }
+  elsif (!`which samtools_irods`) {
+    skip 'require samtools_irods', 3;
+  }
   elsif (!$have_irods) {
     skip 'unable to create iRODS test dir (try kinit to log in to iRODS)', 3;
   }
@@ -66,5 +71,6 @@ SKIP: {
       is($r->barcode_filename, $expected, 'correct barcode filename');
   }
 
+}
   `irm -r test`;
 }

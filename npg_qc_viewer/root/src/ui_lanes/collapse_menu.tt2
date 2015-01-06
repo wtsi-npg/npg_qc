@@ -1,0 +1,23 @@
+<div id="collapse_menu">
+<ul>
+<li><b>Collapse</b></li>
+<li><a id="collapse_all_results" href="#page_top" class="collapse_icon">-</a>
+    <a id="expand_all_results" href="#page_top" class="collapse_icon">+</a>
+    <b>all results</b></li>
+<li><a id="collapse_all_phix" href="#page_top" onclick="collapse_h3_section('#168');collapse_h2_section('phix');return false;" class="collapse_icon">-</a>
+    <a id="expand_all_phix" href="#page_top" onclick="expand_h3_section('#168');expand_h2_section('phix');return false;" class="collapse_icon">+</a>
+    <i>phiX</i></li>
+
+[%- FOREACH check_name IN checks_list -%]
+  [%- IF (check_name != "contamination" && check_name != "sequence mismatch phix" && check_name != "bam flagstats phix" && check_name != "spatial filter") %]
+    [%- label_name = check_name; IF check_name == "sequence mismatch"; label_name='seq. mismatch'; ELSIF check_name == "alignment filter metrics"; label_name='alignment filter'; END;%]
+    <li><a href="#page_top" onclick="collapse_h2_section('[% check_name %]');return false;" class="collapse_icon">-</a>
+        <a href="#page_top" onclick="expand_h2_section('[% check_name %]');return false;" class="collapse_icon">+</a>
+        [% label_name %]</li>
+  [%- END -%]
+[%- END -%]
+<li><a href="#page_top" onclick="collapse_h2_section('[% heatmap_check_name %]');return false;" class="collapse_icon">-</a>
+    <a href="#page_top" onclick="expand_h2_section('[% heatmap_check_name %]');return false;" class="collapse_icon">+</a>
+    heatmap</li>
+</ul>
+</div>

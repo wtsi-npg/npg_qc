@@ -1,7 +1,37 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 57.0
+ - incorporated SeqQC viewer
+
+release 56.16
+ - changed default data source for call_gtck_composite_rpt.pl to combined Sequenom/Fluidigm results
+
+release 56.15
+ - if norm_fit test produces no output, e.g. if no peaks after filtering, simply add a comment
+
+release 56.14
+ - updates to norm_fit code
+     more informative log messages 
+     added checks for zero peaks 
+     do not run norm_fit test if there is not enough variation in the insert size
+
+release 56.13
+ - correct size of genotype_data_set column of genotype table
+
+release 56.12
+ - insert_size.norm_fit_confidence from integer to float
+
+release 56.11
+ - changes to genoype check and utils to use combined Sequenom
+    and Fluidigm results for the 26 QC SNPS (W30467)
+-  fixed RE when parsing norm_fit output
+-  fixed a bug and cleaned up norm_fit code
+
+release 56.10
  - support for search for autoqc objects without tag_index attrubute
  - Build.PL extended to compile and deploy norm_fit executable
+ - only run verify_bam_id if single sample expected (helps cope with 
+   single plex in pool)
 
 release 56.9
  - database name-agnostic database dump file

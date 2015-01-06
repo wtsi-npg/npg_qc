@@ -1,0 +1,1 @@
+ALTER TABLE `genotype` MODIFY COLUMN  `genotype_data_set` varchar(64);

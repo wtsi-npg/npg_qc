@@ -33,6 +33,8 @@ Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
 Readonly::Scalar my $BCFTOOLS_NAME => q[bcftools];
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $SEQUENOM_QC_PLEX => q[W30467];
+Readonly::Scalar my $DEFAULT_QC_PLEX => q[sequenom_fluidigm_combo];
+Readonly::Scalar my $DEFAULT_SNP_CALL_SET => q[W30467];
 Readonly::Scalar my $DEFAULT_MIN_COMMON_SNPS => 21;
 Readonly::Scalar my $DEFAULT_RELIABLE_READ_DEPTH => 5;
 Readonly::Scalar my $DEFAULT_POSS_DUP_LEVEL => 95;
@@ -99,10 +101,20 @@ has 'genotype_executables_path' => (
 	default => sub { return $Bin },
 );
 
+# sequenom_plex - this specifies the source of the genotype data
 has 'sequenom_plex' => (
 	is => 'ro',
 	isa => 'Str',
-	default => $SEQUENOM_QC_PLEX,
+	default => $DEFAULT_QC_PLEX,
+);
+
+# snp_call_set - this specifies the set of loci to be called. This may be
+#  the same for different sequenom_plex data sets. It is used to construct
+#  the name of some information files (positions, alleles, etc)
+has 'snp_call_set' => (
+	is => 'ro',
+	isa => 'Str',
+	default => $DEFAULT_SNP_CALL_SET,
 );
 
 has 'aix_file' => (
@@ -348,7 +360,7 @@ sub _build_pos_snpname_map_fn {
 		return;
 	}
 
-	my $fn = sprintf '%s_chrpos_snpname_map_%s.tsv', $self->sequenom_plex, $chrconv_suffix;
+	my $fn = sprintf '%s_chrpos_snpname_map_%s.tsv', $self->snp_call_set, $chrconv_suffix;
 	my $pos_snpname_map_fn = catfile($genotypes_repository, $fn);
 
 	return $pos_snpname_map_fn;
@@ -447,7 +459,7 @@ override 'execute' => sub {
 
 	$self->result->genotype_data_set($result->{genotype_data_set});
 
-	$self->result->snp_call_set($self->json_genotype->{snp_set});
+	$self->result->snp_call_set($self->snp_call_set);
 
 	my $bam_file_leaves = join q[;], (map { basename($_); } @{$self->input_files});
 	$self->result->bam_file($bam_file_leaves);    # name of result attribute should probably be changed to reflect the possibility of more than one bam file; check qc db

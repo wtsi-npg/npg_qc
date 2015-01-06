@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+                    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Manual QC client side JavaScript tests</title>
+  <link rel="stylesheet" href="scripts/qunit/qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="../../root/static/scripts/jquery-1.4.2.min.js" ></script>
+  <script type="text/javascript" src="scripts/qunit/qunit.js" ></script>
+  <script type="text/javascript" src="scripts/10-manual_qc_test.js" ></script>
+
+  <script type="text/javascript">
+    // global variables that are set at the page generation time
+    var env_dev = "dev";
+    var load_mqc_widgets = 0;
+  </script>
+
+  <script type="text/javascript" src="../../root/static/scripts/npg_common.js" ></script>
+  <script type="text/javascript" src="../../root/static/scripts/manual_qc.js" ></script>
+  
+</head>
+<body>
+ <h1 id="qunit-header">Manual QC client side JavaScript tests</h1>
+ <h2 id="qunit-banner"></h2>
+ <h2 id="qunit-userAgent"></h2>
+ <ol id="qunit-tests"></ol>
+ <div id="qunit-fixture">
+   <table><tr>
+   <td class="failed lib">
+     <div id="mqc_lib_2" class="mqc"/>
+     <a href="http://dodo.com?name=some_ref">
+     <span id="test_lib2_name" class="lib nbsp">HCC1187_v2</span>
+     </a>
+   </td>
+   <td class="failed lib">
+     <div id="mqc_lib_1" class="mqc"/>
+     <a href="http://dodo.com?name=some_ref">
+     <span id="test_lib1_name" class="lib nbsp">HCC1187_v2</span>
+     </a>
+   </td>
+   </table></tr>
+ </div>
+</body>
+</html>

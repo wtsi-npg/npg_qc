@@ -1,0 +1,1 @@
+ALTER TABLE `insert_size` MODIFY COLUMN  `norm_fit_confidence` float;

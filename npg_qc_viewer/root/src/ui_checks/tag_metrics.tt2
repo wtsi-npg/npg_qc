@@ -1,0 +1,73 @@
+[%- USE Number.Format(THOUSANDS_SEP=',') -%]
+
+[%- tag_indices = check.sorted_tag_indices; IF tag_indices.size -%]
+<div class="lfloat">
+
+<div class="data_table">
+Tag decoding overview
+<table summary="Tag Decoding">
+<tr>
+  <th>&nbsp;</th>
+  <th>Count</th>
+  <th>Percent</th>
+</tr>
+<tr><th class="laligned">Perfect matches</th>
+  <td class="raligned">[% check.perfect_matches | format_number %]</td>
+  <td class="raligned">[% FILTER format('%2.2f'); check.perfect_matches_percent; END %]</td>
+</tr>
+<tr><th class="laligned">One mismatch</th>
+  <td class="raligned">[% check.one_mismatch | format_number %]</td>
+  <td class="raligned">[% FILTER format('%2.2f'); check.one_mismatch_percent; END %]</td>
+</tr>
+<tr><th class="laligned">No matches</th>
+  <td class="raligned">[% check.errors | format_number %]</td>
+  <td class="raligned">[% FILTER format('%2.2f'); check.errors_percent; END %]</td>
+</tr>
+
+</table>
+</div>
+
+<div class="data_table">
+Coefficient of Variance <a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]#tag_metrics"><img src="/static/images/information.png" alt="Link to information about coefficient of variance"/></a>
+<table summary="Coefficient of Variance">
+<tr>
+  <th>All matches</th>
+  <th>Perfect matches</th>
+</tr>
+<tr>
+  <td class="raligned">[% FILTER format('%2.2f'); check.variance_coeff(1); END %]</td>
+  <td class="raligned">[% FILTER format('%2.2f'); check.variance_coeff(); END %]</td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<div class="rfloat">
+
+<div class="data_table">
+[%- underrepresented = check.underrepresented_tags -%]
+Individual tags
+<table summary="Metrics for individual tags">
+<tr>
+  <th>Tag Index</th>
+  <th>Tag</th>
+  <th>Reads, count</th>
+  <th>Reads, %</th>
+</tr>
+[%- FOREACH code = tag_indices -%]
+  <tr[% IF underrepresented.$code %] class="result_fail"[% END %]>
+    <td>[% code %]</td>
+    <td class="sequence_string">[% code ? check.tags.$code : '&nbsp;' %]</td>
+    <td class="raligned">[% check.reads_pf_count.$code | format_number %]</td>
+    <td class="raligned">[% FILTER format('%2.2f'); check.matches_pf_percent.$code * 100; END %]</td>
+  </tr>
+[%- END -%]
+</table>
+</div>
+
+</div>
+
+<div class="clear"></div>
+[% IF check.comments %]Comments: [% check.comments; END %]
+[%- END -%]

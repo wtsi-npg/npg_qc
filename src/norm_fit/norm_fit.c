@@ -35,7 +35,7 @@ usage:./mode_detect inp.txt pass_info
 
 // ******** declarations of  functions
 void usage(int code);
-int SpuriousPeaks(float hist[], int bins[], int nbins, float amp[], int pos[], int dist, int bin_width,int num_pe);//removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2)
+int SpuriousPeaks(float hist[], int bins[], int nbins, float amp[], int pos[], int dist, int npos);//removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2)
 
 
 
@@ -163,9 +163,15 @@ int main(int argc, char **argv)
     printf("mode_detection started\n");
 
     //1============================count peaks first time
-    num_peI = CountPeaksNew(hist,bins,nbins);
 
-    //1.1 ========================= smooth until stable
+    num_peI = CountPeaksNew(hist,bins,nbins);
+    if (0 == num_peI)
+    {
+        printf("No peaks initially - aborting mode_detection\n");
+        return 0;
+    }
+
+    //1.2 ========================= smooth until stable
     num_peS = num_peI;
     diff = 1;
     while (diff>0)
@@ -212,6 +218,11 @@ int main(int argc, char **argv)
         }
     }
     num_peS = k;
+    if (0 == num_peS)
+    {
+        printf("No peaks after stabilizing - aborting mode_detection\n");
+        return 0;
+    }
 
     height = GetMax(amp,num_peS);//find max function for peaks after stabilizing
 
@@ -232,7 +243,7 @@ int main(int argc, char **argv)
     //2.1 ====================  filter for distance b/w peaks
     num_peD = FilterDistance(pos,amp,min_distance,num_peR);
     //2.2=====================removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2
-    num_peD=SpuriousPeaks(hist, bins,nbins, amp, pos, min_distance,width, num_peD);
+    num_peD = SpuriousPeaks(hist, bins, nbins, amp, pos, min_distance, num_peD);
 
     //3 number of modes is the number of remaining peaks after distance and spurious peak (if needed)
     num_modes = num_peD;
@@ -470,7 +481,6 @@ int CountPeaksNew(float hist[], int bins[], int nbins)
     {
 			k++;
     }
-
     for (i=1; i<nbins-1; i++)
     {
         if ( ((hist[i]-hist[i-1]) > 0 ) && ((hist[i+1]-hist[i]) <= 0))
@@ -505,7 +515,7 @@ int FilterDistance(int *pos, float *amp, int dist, int npos)
                 if (amp[i+1] > clus_amp)
                 {
                     clus_pos = pos[i+1];
-                    clus_amp = amp[i+i];
+                    clus_amp = amp[i+1];
                 }
             }
             else
@@ -522,72 +532,61 @@ int FilterDistance(int *pos, float *amp, int dist, int npos)
         // save the current cluster
         pos[num_clus] = clus_pos;
         amp[num_clus] = clus_amp;
-
+        num_clus++;
+    }
+    else
+    {
+        num_clus = npos;
     }// if npos>1
 
-    num_clus++;
 
     printf("num_clusters= %d\n", num_clus);
 
     return num_clus;//# of modes
 }
+
 //-------------------------filer out spurious peaks
 // if peaks are still peaks for half of distance threshold, they are genuine; otherwise - spurious
-int SpuriousPeaks(float hist[], int bins[], int nbins, float amp[], int pos[], int dist, int bin_width,int num_pe)//removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2)
+int SpuriousPeaks(float hist[], int bins[], int nbins, float amp[], int pos[], int dist, int npos)//removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2)
 {
+    int k;
 
-        int i,j,k,f;
-        int num_bins;
-        int S,SS,ind;
-        int indexes[100];// ind of amp and pos
-        int SSS[100];
-        // find indexes of pos vector
-        k=0;
-        for (j=0;j<num_pe;j++)
+    if (npos > 1)
+    {
+        int i, j, c;
+
+        k = 0;
+        for (i=0; i<npos; i++)//positions/peaks
         {
-			for (i=0;i<nbins-1;i++)
-			{
-			if (bins[i]==pos[j])
-			{
-			   indexes[k]=i;
-			   k++;
-		    }
-		    }
-	    }//i
-        num_bins=(int) (0.5*dist/bin_width+0.5);//number of bins for spurious peak detection
+            int p1 = pos[i] - 0.5 * dist;
+            int p2 = pos[i] + 0.5 * dist;
+            c = 0;
+            for (j=0; j<nbins; j++)//bins
+            {
+                if (bins[j] >= p1 && bins[j] <= p2)
+                {
+                    if (pos[i] != bins[j] && amp[i] < hist[j])
+                    {
+                        c++;
+                    }
+                }
+            }
+            if (c == 0)
+            {
+                amp[k] = amp[i];
+                pos[k] = pos[i];
+                k++;
+            }
+        }
+    }
+    else
+    {
+        k = npos;
+    }
 
-        for (i=0;i<k;i++)//across indexes
-	    {
-			SS=0;
-			ind=indexes[i];
-			for (j=1;j<num_bins+1;j++)//across hist around num_bins around peak
-			{
-				//if still peaks untill num_bins=dist(in bins)/2
-                S=0;
-				if ((hist[ind-j] < hist[ind]) && (hist[ind+j] < hist[ind]))
-				{
-					S=1;
-				}
-				SS=SS+S;
-			 }//j
-			 SSS[i]=SS;
-		}//i
 
-		//---------if there are spurios peaks (SSS[i]<num_bins), then remove them
-         f=0;
-		 for (i=0;i<k;i++)//across indexes or SSS
-		 {
-			 if (SSS[i] == num_bins)
-			 {
-				 amp[f]=hist[indexes[i]];
-				 pos[f]=bins[indexes[i]];
-
-				 f++;
-			 }
-		 }//i
-
-  return f;
- }
+    return k;
+}
 
 
 

@@ -1,0 +1,38 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+[% has_reverse = check.reverse_read_gc_percent.defined -%]
+
+<div class="data_table">
+<table summary="gc_fraction check results">
+<tr>
+  <th class="laligned">pass criterion</th>
+  <td>[% check.criterion %]</td>
+</tr>
+<tr>
+  <th class="laligned">GC fraction, %</th>
+  <td>[% IF check.forward_read_gc_percent.defined; check.forward_read_gc_percent | format_number; END %] (forward)
+  [% IF (has_reverse and check.reverse_read_gc_percent.defined); check.reverse_read_gc_percent | format_number; %] (reverse)[% END %]</td>
+</tr>
+
+[% IF check.ref_gc_percent.defined -%]
+<tr>
+  <th class="laligned">reference genome GC fraction, % </th>
+  <td>[% check.ref_gc_percent | format_number %]</td>
+</tr>
+[% END -%]
+
+[% IF check.ref_count_path.defined -%]
+<tr>
+  <th class="laligned">reference base count path </th>
+  <td>[% check.ref_count_path %]</td>
+</tr>
+[% END -%]
+
+[% IF check.comments.defined && check.comments -%]
+<tr>
+  <th class="laligned">comments</th><td>[% check.comments %]</td>
+</tr>
+[% END -%]
+</table>
+</div>
+

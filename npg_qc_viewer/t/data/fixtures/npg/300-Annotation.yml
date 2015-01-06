@@ -1,0 +1,121 @@
+---
+- attachment: ~
+  attachment_name: ~
+  comment: "Lots of fluorescent blobs in lane 1, some in L2 & a few in L3. Except for Lanes 1, 2 & 3, who's G intensities are very low, all other intensities are good to very good. Lane 1, 2 & 3 are very sparse. Lanes 5 & 6 are on the sparse side. Run looks nice with no problems seen. FC42GJDAAXX. Now on R1 C24/76."
+  date: 2009-07-13 14:07:26
+  id_annotation: 5392
+  id_user: 9
+- attachment: ~
+  attachment_name: ~
+  comment: '76 cyc PE runs: Lanes 5 & 6 - PASS; Rest - FAIL. Yield of 10.7 Gbases. %Error rates of 0.9 (R1) and 0.8 (R2). Lanes 1, 2 & 3 are of good quality, but too sparse and have insufficient yield. Lanes 7 & 8 have poor first cyc intensities in R2 and have poor looking %basecall IVCs. Lane 5 has some contaminants.  '
+  date: 2009-07-31 10:39:44
+  id_annotation: 5571
+  id_user: 54
+- attachment: ~
+  attachment_name: ~
+  comment: "76 cycle PE runs. Lane 7 FAIL. 18 Gbase yield.\r\nLane 3 and 7 raw clusters sparse (86K 53K).\r\n1st cycle all lanes low intensity (read1 <94, read2 <62).\r\nIVC: lanes 1,2,3 and 5 look like adapter contaminated.\r\nLane 7 Q20 yield too low."
+  date: 2009-08-19 08:51:33
+  id_annotation: 5688
+  id_user: 62
+- attachment: ~
+  attachment_name: ~
+  comment: Across all lanes missing the bottom of T's 1 & 100. Either lack of oil or footprint issue. Will chase it next week. Now on C3/152.
+  date: 2009-10-25 14:04:03
+  id_annotation: 6351
+  id_user: 9
+- attachment: ~
+  attachment_name: ~
+  comment: V.4 Seq Kits
+  date: 2009-11-06 13:27:06
+  id_annotation: 6502
+  id_user: 33
+- attachment: ~
+  attachment_name: ~
+  comment: Dark patches on edge of lane 8 not oil related. Toby said ok to run as it is.
+  date: 2009-11-06 14:15:41
+  id_annotation: 6504
+  id_user: 33
+- attachment: ~
+  attachment_name: ~
+  comment: '76 cycle PE run. Lanes 1, 2 & 3 FAIL. Rest Pass. Yield of 23 Gbases. %Error rates of 0.6 (R1) and 0.7 (R2). Lanes 1 to 3 are too dense & have lower %PF (60-71). Also intensities dropped during late cycles & %basecall plots are not pretty. '
+  date: 2009-11-18 09:57:47
+  id_annotation: 6606
+  id_user: 9
+- attachment: ~
+  attachment_name: ~
+  comment: '76 PE, Yield 20.7Gb Lane 8 FAIL, sparse clusters and low yield, rest all look good. R2 error rate slightly high %Error 1.87(R1)  4.21(R2)'
+  date: 2009-11-27 09:53:57
+  id_annotation: 6713
+  id_user: 27
+- attachment: ~
+  attachment_name: ~
+  comment: 'Lanes 1-5 ran at maximum they can be, to get 5 lanes worth of yield should be about 10G a lane. Lanes 6-8 are very sparse'
+  date: 2011-06-11 15:02:04
+  id_annotation: 15114
+  id_user: 33
+- attachment: ~
+  attachment_name: ~
+  comment: Moved from HS10A. Reagents checked by lc2 flowcell chechecked by gkh
+  date: 2011-06-11 17:43:34
+  id_annotation: 15141
+  id_user: 33
+- attachment: ~
+  attachment_name: ~
+  comment: ''
+  date: 2011-06-12 16:26:41
+  id_annotation: 15157
+  id_user: 33
+- attachment: ~
+  attachment_name: ~
+  comment: lane 6 intesities a bit bouncy from cycle 13 Q30% score a bit wide but then recovers.
+  date: 2011-06-13 15:36:06
+  id_annotation: 15195
+  id_user: 33
+- attachment: ~
+  attachment_name: ~
+  comment: ''
+  date: 2011-06-14 15:11:20
+  id_annotation: 15261
+  id_user: 56
+- attachment: ~
+  attachment_name: ~
+  comment: 'Lanes 6, 7 and 8 <100k and Prephasing of 0.6-0.7.'
+  date: 2011-06-14 16:07:18
+  id_annotation: 15284
+  id_user: 9
+- attachment: ~
+  attachment_name: ~
+  comment: ''
+  date: 2011-06-16 15:06:29
+  id_annotation: 15409
+  id_user: 28
+- attachment: ~
+  attachment_name: ~
+  comment: 'Lane 3 around cycle 154 on Q30, starts dropping  top left swathe, but picks up later.'
+  date: 2011-06-17 16:33:22
+  id_annotation: 15471
+  id_user: 28
+- attachment: ~
+  attachment_name: ~
+  comment: we will re run lanes 6-8 due to unexpected low yield
+  date: 2011-06-20 15:39:08
+  id_annotation: 15591
+  id_user: 52
+- attachment: ~
+  attachment_name: ~
+  comment: 'very low density - low yield - already reordered'
+  date: 2011-06-22 12:28:31
+  id_annotation: 15671
+  id_user: 73
+- attachment: ~
+  attachment_name: ~
+  comment: 'FAIL Lost 1 swath at during reverse read - Illumina NAN bug underestimates qualities for those swaths for whole reverse read'
+  date: 2011-06-22 12:29:42
+  id_annotation: 15672
+  id_user: 73
+- attachment: ~
+  attachment_name: ~
+  comment: "100 cycle unplexed PE HiSeq: part-passed \r\n80 Gbase yield.  No control.\r\nPrephasing slightly high ~0.4 in good lanes on both reads"
+  date: 2011-06-22 12:33:18
+  id_annotation: 15673
+  id_user: 73
