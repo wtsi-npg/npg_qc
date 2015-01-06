@@ -186,6 +186,7 @@ int main(int argc, char **argv)
             histS[i] = SmoothWin3(hist[i-1],hist[i],hist[i+1]);
         }
         histS[nbins-1] = SmoothWin2(hist[nbins-2],hist[nbins-1]);
+        //histS[nbins] = SmoothWin2(hist[nbins-1],hist[nbins]);
 
         //-------------- count peaks for smoothed histS
         num_peaks = CountPeaksNew(histS,bins,nbins);
@@ -216,6 +217,13 @@ int main(int argc, char **argv)
             pos[k] = bins[i];
             k++;
         }
+    }
+    // Last bin peak
+    if ((hist[nbins-1]-hist[nbins-2]) >= 0)
+    {
+				amp[k] = hist[nbins-1];
+	            pos[k] = bins[nbins-1];
+					k++;
     }
     num_peS = k;
     if (0 == num_peS)
@@ -488,6 +496,10 @@ int CountPeaksNew(float hist[], int bins[], int nbins)
             k++;
         }
 
+    }
+    if ((hist[nbins-1]-hist[nbins-2]) >= 0)
+	{
+					k++;
     }
     return k;
 }
