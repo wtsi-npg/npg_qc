@@ -34,6 +34,7 @@ function service_uri(service_owner) {
   if (service_owner == "npg") {
     return npg_url;
   }
+  if (typeof(lims_api_url) == 'undefined') { return null; }
   return lims_api_url;
 }
 
