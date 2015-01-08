@@ -27,12 +27,9 @@ use Cwd 'abs_path';
   sub ACTION_install {
     my $self = shift;
 
-    my $bcviz_path = $self->args('linkable_bcviz_path');
-    if ($bcviz_path) {
-      if (!-d $bcviz_path) {
-        die "linkable_bcviz_path $bcviz_path does not exist or is not a directory, aborting install\n";
-      }
-      $bcviz_path = abs_path $bcviz_path;
+    my $bcviz_path = $self->args('linkable-bcviz-path');
+    if ($bcviz_path && !-d $bcviz_path) {
+      die "linkable-bcviz-path $bcviz_path does not exist or is not a directory, aborting install\n";
     }
 
     $self->SUPER::ACTION_install;
@@ -43,6 +40,7 @@ use Cwd 'abs_path';
         unlink $link;
       }
       if (!-e $link) {
+        $bcviz_path = abs_path $bcviz_path;
         warn "Creating symlink $link to $bcviz_path\n";
         my $result = symlink $bcviz_path, $link;
         if (!$result) {
@@ -67,7 +65,7 @@ my $builder = $class->new(
    'dist'              => { COMPRESS => 'gzip', SUFFIX => 'gz', },
 
    'get_options'       => {
-         'linkable_bcviz_path' => { type  => '=s' },     
+         'linkable-bcviz-path' => { type  => '=s' },     
                           },
 
    'requires'          => {
@@ -148,7 +146,7 @@ if ($builder->install_base()) {
   $builder->install_path('seqqc' => join q[/], $builder->install_base(), 'seqqc');
   $builder->add_build_element('seqqc');
 } else {
-  warn qq[WARNING: '--install_base' option is not given, 'seqqc' element will not be installed,\n];
+  warn qq[WARNING: '--install_base' option is not given, 'seqqc' element will not be installed\n];
 }
 
 $builder->create_build_script();
