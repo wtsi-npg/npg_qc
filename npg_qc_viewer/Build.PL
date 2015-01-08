@@ -3,14 +3,72 @@ use warnings;
 use lib '../lib';
 use npg_tracking::util::build;
 
-my $builder = npg_tracking::util::build->new(
+my $class = npg_tracking::util::build->subclass(code => <<'EOC');
 
-   'module_name'       => 'npg_qc_viewer',
+use Cwd 'abs_path';
+
+  sub process_seqqc_files {
+    my $self = shift;
+
+    my $dest = 'blib/seqqc';
+    if (!-e $dest) {
+      mkdir $dest;
+    }
+    foreach my $file ( @{$self->rscan_dir('root')} ) {
+      if (-f $file) {
+        $self->copy_if_modified('from' => $file, 'to_dir' => $dest);
+      }
+    }
+    $self->copy_if_modified('from' => 'npg_qc_viewer.conf', 'to_dir' => $dest);
+    $self->copy_if_modified('from' => 'npg_qc_viewer.psgi', 'to_dir' => $dest);
+    return;
+  }
+
+  sub ACTION_install {
+    my $self = shift;
+
+    my $bcviz_path = $self->args('linkable_bcviz_path');
+    if ($bcviz_path) {
+      if (!-d $bcviz_path) {
+        die "linkable_bcviz_path $bcviz_path does not exist or is not a directory, aborting install\n";
+      }
+      $bcviz_path = abs_path $bcviz_path;
+    }
+
+    $self->SUPER::ACTION_install;
+
+    if ($self->install_base() && $bcviz_path) {
+      my $link = join q[/], $self->install_destination('seqqc'), 'root/static/scripts/bcviz';
+      if (-l $link) {
+        unlink $link;
+      }
+      if (!-e $link) {
+        warn "Creating symlink $link to $bcviz_path\n";
+        my $result = symlink $bcviz_path, $link;
+        if (!$result) {
+          warn "Failed to create $link symlink to $bcviz_path\n";
+        }
+      } else {
+        warn "Existing file or directory at $link, have not created symlink to $bcviz_path\n";
+      }
+    }
+    return;
+  }
+
+EOC
+
+my $builder = $class->new(
+
+   'module_name'       => 'SeqQC',
    'dist_author'       => q(wtsi-npg <npg@sanger.ac.uk>),
    'dist_version'      => npg_tracking::util::build->git_tag(),
    'dist_abstract'     => q(SeqQC - viewer for autoqc analysis results),
    'license'           => 'gpl',
    'dist'              => { COMPRESS => 'gzip', SUFFIX => 'gz', },
+
+   'get_options'       => {
+         'linkable_bcviz_path' => { type  => '=s' },     
+                          },
 
    'requires'          => {
         'Carp'                                         => '0',
@@ -85,6 +143,14 @@ my $builder = npg_tracking::util::build->new(
         'XML::LibXML'                                   => '1.70',
    },
 );
+
+if ($builder->install_base()) {
+  $builder->install_path('seqqc' => join q[/], $builder->install_base(), 'seqqc');
+  $builder->add_build_element('seqqc');
+} else {
+  warn qq[WARNING: '--install_base' option is not given, 'seqqc' element will not be installed,\n];
+}
+
 $builder->create_build_script();
 
 1;
