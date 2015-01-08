@@ -48,14 +48,8 @@
 <tr><th class="laligned">comments</th><td>[% check.comments %]</td></tr>
 [%- END -%]
 
-[%- IF check.comments.defined -%]
-<tr><th class="laligned">comments</th><td>[% check.comments %]</td></tr>
-[%- END -%]
-
 </table>
 </div>
 
-[%- url = check.image_url -%]
-[%- IF url -%]
-<img class="insert_size_histogram" src="[% url | url | html %]" alt="insert size histogram" />
-[%- END -%]
+<div class='bcviz_insert_size' data-check='[% check.json %]' data-width=650 data-height=300></div>
+
