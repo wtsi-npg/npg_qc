@@ -80,9 +80,9 @@ sub expected_size_range {
     my $max = max @{$self->expected_size};
     if ($min == $max) {
       $expected_size = $min;
-	  } else {
+    } else {
       $expected_size = join q[:], $min, $max;
-	  }
+    }
   }
   return $expected_size;
 }
