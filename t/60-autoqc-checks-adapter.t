@@ -1,12 +1,7 @@
-#########
-# Author:        jo3
-# Created:       30 July 2009
-#
-
 use strict;
 use warnings;
 use File::Temp qw/ tempdir /;
-use Test::More tests => 23;
+use Test::More tests => 21;
 use Test::Deep;
 use Test::Exception;
 
@@ -163,9 +158,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
   is( $test->result->forward_fasta_read_count, 10_000,'read count' );
   is( $test->result->forward_contaminated_read_count, 467, 'contaminated read count' );
   is_deeply( $test->result->forward_blat_hash, \%blat_hash, 'adapter report'  );
-
-  is($test->result->image_url('forward'), q[http://chart.apis.google.com/chart?chbh=4,1,1&chco=4D89F9&chd=t:0,0,0,0&chds=0,1&chs=260x200&cht=bvg&chtt=Adapter+start+count+(log10+scale)+vs|cycle+for+9999_1.fastq&chxr=0,0,4,0|1,0,1,0&chxt=x,y], 'image url');
-  is($test->result->image_url('reverse'), q[], 'empty image url');
 }
 
 {

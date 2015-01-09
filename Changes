@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - removed generation of google chart api urls
+
 release 57.0
  - incorporated SeqQC viewer
 
