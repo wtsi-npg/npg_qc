@@ -4,6 +4,13 @@ Running your own development server:
 unset CATALYST_HOME
 export PATH=/software/perl-5.16.3/bin:$PATH
 export PERL5LIB=lib:/software/npg/lib/perl5:/software/npg/cpan/lib/perl5
+
+make sure you have a link from npg_qc_viewer/root/static/scripts to bcviz
+for example
+ln -s /nfs/users/nfs_j/js10/npg/bcviz/js/src npg_qc_viewer/root/static/scripts/bcviz
+
+If needed, edit the decryption_key value in npg_qc_viewer.conf
+
 # in the npg_qc_viewer directory
 perl bin/npg_qc_viewer_server.pl -p YOUR_PORT
 
@@ -28,6 +35,3 @@ perl Build.PL
 CATALYST_DEBUG=0 TEST_AUTHOR=1 ./Build test
 or
 CATALYST_DEBUG=0  TEST_AUTHOR=1 prove -vl t
-
-
-

@@ -12,8 +12,7 @@
 <head>
   <title>[% title | html %]</title>
   <link href="/static/stylesheets/npg_seqqc.css" media="all" rel="stylesheet" type="text/css" />
-  <script type="text/javascript" src="/static/scripts/jquery-1.4.2.min.js" ></script>
-  <script type="text/javascript" src="/static/scripts/init.js" ></script>
+  <script type="text/javascript" data-main="/static/scripts/main" src="/static/scripts/require.js" ></script>
 </head>
 
 <body>

@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - d3 bcviz rendering of adapter, insert size and sequence mismatch plots
+ - page rearrangement to display ref match and old contamination results side-by-side removed
  - removed generation of google chart api urls
 
 release 57.0
