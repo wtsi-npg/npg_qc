@@ -134,11 +134,11 @@ my $extended_requires = {
                 'Parallel::ForkManager'           => 0,
                 'PDL::Core'                       => 0,
                 'PDL::Lite'                       => 0,
+                'PDL::Primitive'                  => 0,
                 'Perl6::Slurp'                    => '0.03',
                 'Try::Tiny'                       => 0,
 
                 'npg_common::Alignment'                    => 0,
-                'npg_common::diagram::visio_histo_google'  => 0,
                 'npg_common::extractor::fastq'             => 0,
                 'npg_common::fastqcheck'                   => 0,
                 'npg_common::roles::run::lane::file_names' => 0,
