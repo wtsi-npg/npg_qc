@@ -2,6 +2,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - d3 bcviz rendering of adapter, insert size and sequence mismatch plots
  - page rearrangement to display ref match and old contamination results side-by-side removed
+ - SeqQC templates, client-side scripts and config files installed to a directory
+   under the install_base path; if a bcviz path is given, a link to it is created,
+   old bcviz link is overwitten in this case
 
 release 57.0
  - incorporated SeqQC viewer
