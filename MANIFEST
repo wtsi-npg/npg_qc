@@ -574,10 +574,6 @@ t/data/autoqc/4921_3_bam_flagstats.json
 t/data/autoqc/5374_2_1-5374_2_2_human_split_stats.json
 t/data/autoqc/5428_2.ref_match.json
 t/data/autoqc/6440_1#0.bamflagstats
-t/data/autoqc/6476_3.sequence_error.json
-t/data/autoqc/6699_se_phix/6699_1_phix.sequence_error.json
-t/data/autoqc/6699_se_phix/6699_1.sequence_error.json
-t/data/autoqc/9998_2.sequence_error.json
 t/data/autoqc/9999_1.blat
 t/data/autoqc/9999_1.fastq
 t/data/autoqc/9999_1.sequence_error.json
@@ -687,15 +683,6 @@ t/data/autoqc/rendered/json_single_run/3612_7.qX_yield.json
 t/data/autoqc/rendered/json_single_run/3612_8.insert_size.json
 t/data/autoqc/rendered/json_single_run/3612_8.qX_yield.json
 t/data/autoqc/sequence_error/6376_1_1.fastq.10000
-t/data/autoqc/sequence_error/6376_1.sequence_error.json
-t/data/autoqc/sequence_error/6376_2.sequence_error.json
-t/data/autoqc/sequence_error/6376_3.sequence_error.json
-t/data/autoqc/sequence_error/6376_4.sequence_error.json
-t/data/autoqc/sequence_error/6376_5.sequence_error.json
-t/data/autoqc/sequence_error/6376_6.sequence_error.json
-t/data/autoqc/sequence_error/6376_7.sequence_error.json
-t/data/autoqc/sequence_error/6376_8.sequence_error.json
-t/data/autoqc/sequence_error/6467_2.sequence_error.json
 t/data/autoqc/st/batches/3432.xml
 t/data/autoqc/st/samples/3057.xml
 t/data/autoqc/st/studies/544.xml
@@ -706,7 +693,6 @@ t/data/autoqc/tag_metrics/6551_1.bam.tag_decode.metrics
 t/data/autoqc/tag_metrics/6551_1.tag_metrics.json
 t/data/autoqc/tag_metrics/6954_1.tag_metrics.json
 t/data/autoqc/dbix_loader/is/12187_2.insert_size.json
-t/data/autoqc/7908_1#3.sequence_error.json
 t/data/autoqc/population_snv_with_vcf/Anopheles_gambiae/default/Standard/PEST/test.vcf.gz
 t/data/autoqc/st/samples/3056.xml
 t/data/autoqc/st/samples/9832.xml

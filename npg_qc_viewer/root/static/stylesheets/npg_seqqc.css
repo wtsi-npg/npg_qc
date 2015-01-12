@@ -536,3 +536,33 @@ a, a:link, a:visited, a:hover {
 #error li {
   padding: 5px;
 }
+
+/************************ styling for d3 graphs ************************/
+svg {
+  font-size: 10px;
+  font-family: Helvetica, sans-serif;
+}
+.axis path,
+.axis line1,
+.axis line2{
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.x.axis path {
+  display: none;
+}
+.line1,
+.line2 {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+.grid .tick {
+  stroke: lightgrey;
+  opacity: 0.7;
+}
+.grid path {
+  stroke-width: 0;
+}
+

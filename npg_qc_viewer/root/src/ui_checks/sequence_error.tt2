@@ -1,5 +1,5 @@
 [%- USE Number.Format(THOUSANDS_SEP=',');
-   has_reverse = check.reverse_average_percent_error.defined;
+   has_reverse = check.reverse_aligned_read_count;
 -%]
 
 <div class="data_table">
@@ -94,28 +94,24 @@
 </tr>
 </table>
 
-
-[%- reads = ['forward', 'reverse']; count = 0 -%]
-[%- FOREACH myurl IN check.google_charts_cigars -%]
-[% IF myurl %]<img class="seq_error_plot" src="[% myurl | url | html %]" alt="[% reads.$count %] cigars" />[% END %]
-[%- count = count + 1 -%]
-[%- END %]
-[%- legend_url = check.chart_legend_cigar; IF legend_url %]
-<img class="seq_error_plot" src="[% legend_url | url | html %]" alt="chart legend" />
-[%- END -%]
-
-<br />
 [% ELSE %]
-<p>No CIGAR Data</p>
+	<p>No CIGAR Data</p>
 [% END %]
 
-[%- reads = ['forward', 'reverse']; count = 0 -%]
-[%- FOREACH myurl IN check.google_charts -%]
-[% IF myurl %]<img class="seq_error_plot" src="[% myurl | url | html %]" alt="[% reads.$count %] read errors" />[% END %]
-[%- count = count + 1 -%]
-[%- END %]
-[%- legend_url = check.chart_legend; IF legend_url %]
-<img class="seq_error_plot" src="[% legend_url | url | html %]" alt="chart legend" />
-[%- END -%]
-
+<div style='float:left;' 
+     class='bcviz_mismatch' 
+     [% IF has_reverse %]data-legend=0[% ELSE %]data-legend=1[% END %]
+     data-check='[% check.json | replace("'", "%27") %]' 
+     data-direction='forward' 
+     data-height=350>
+</div>
+[% IF has_reverse %]
+<div style='float:right;margin-right:20px;'- 
+     class='bcviz_mismatch' 
+     data-check='[% check.json | replace("'", "%27") %]' 
+     data-direction='reverse' 
+     data-height=350 
+     data-legend=1></div>
+[% END %]
+<div style='clear:both;'></div>
 

@@ -78,9 +78,10 @@ root/static/images/to_children.png
 root/static/images/to_parent.png
 root/static/images/waiting.gif
 root/static/scripts/collapse.js
-root/static/scripts/full_results.js
-root/static/scripts/init.js
-root/static/scripts/jquery-1.4.2.min.js
+root/static/scripts/main.js
+root/static/scripts/jquery-2.0.3.js
+root/static/scripts/require.js
+root/static/scripts/d3.js
 root/static/scripts/manual_qc.js
 root/static/scripts/npg_common.js
 root/static/stylesheets/npg_seqqc.css
