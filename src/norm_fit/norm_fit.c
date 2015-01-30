@@ -1,8 +1,10 @@
-/*  File: mode_detect.c // detects modes from NPG insert size distribution
+/*  File: norm_fit.c // detects modes from NPG insert size distribution
  * Authors: designed and written by Irina Abnizova (ia1) and Steven Leonard (srl)
  *
   Last edited:
-  5 jan2014--added first bin as possible peak option, after bug in run 14975
+  30 Jan -sds, monotonuity, separate treating of first and last bin peaks: twice larger std
+  Jan 2015--added first and last bins as possible peaks(after bug in run 14975)
+        -- added estimation of standard deviation for all modes filtered in
   10 Sept SpuriousPeaks filter is added
   3 September 2014-Steve added other estimation of std (if there are other peaks >height/2)
 
@@ -14,7 +16,7 @@ input: inp.txt containing one column for sample: min_isize,...hist
 
 output1:pass_info.txt : pass, confidence, num_modes; mode info:amplitude, mu,sd
 
-usage:./mode_detect inp.txt pass_info
+usage:./norm_fit inp.txt pass_info
 */
 
 
@@ -84,6 +86,7 @@ int main(int argc, char **argv)
     float sd;
     float maxN, scale, confidence;
     float histN[100];
+    float sds[100];// standard deviations of other modes if any
 
 	static struct option long_options[] =
         { {"min_distance", 1, 0, 'd'},
@@ -186,9 +189,7 @@ int main(int argc, char **argv)
             histS[i] = SmoothWin3(hist[i-1],hist[i],hist[i+1]);
         }
         histS[nbins-1] = SmoothWin2(hist[nbins-2],hist[nbins-1]);
-        //histS[nbins] = SmoothWin2(hist[nbins-1],hist[nbins]);
 
-        //-------------- count peaks for smoothed histS
         num_peaks = CountPeaksNew(histS,bins,nbins);
         diff = (num_peS - num_peaks);
         num_peS = num_peaks;
@@ -253,8 +254,15 @@ int main(int argc, char **argv)
     //2.2=====================removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2
     num_peD = SpuriousPeaks(hist, bins, nbins, amp, pos, min_distance, num_peD);
 
-    //3 number of modes is the number of remaining peaks after distance and spurious peak (if needed)
+    //3 ----number of modes is the number of remaining peaks after distance and spurious peak (if needed)
     num_modes = num_peD;
+    //3.1  ----estimate stds of filtered in remaining peaks=modes
+
+      for (k=0; k<num_modes; k++)
+      {
+		  sds[k]=EstimateStd(hist,bins,nbins,pos[k],amp[k]);// std of a filtered mode
+          //printf("st dev of a mode %.2f\n", sds[k]);
+	  }
 
     //4 -----------compute params of main mode
     mu = FindMainMode(hist,bins,nbins,height);// mu for Norm fit
@@ -298,10 +306,10 @@ int main(int argc, char **argv)
     fprintf(fp,"confidence=%.2f\n", confidence);
     fprintf(fp,"nmode=%d\n", num_modes);
     fprintf(fp,"#amplitude,mu,std of main mode after smoothing\n%.2f %d %.2f\n", height, mu, sd);
-    fprintf(fp,"#amplitude,mu filtered modes\n");
+    fprintf(fp,"#amplitude,mu,std of all filtered modes\n");
     for (k=0; k<num_modes; k++)
     {
-        fprintf(fp,"%.2f %d\n",amp[k],pos[k]);
+        fprintf(fp,"%.2f %d %.2f\n",amp[k],pos[k],sds[k]);
     }
     fclose(fp);
 
@@ -365,7 +373,7 @@ float GetMax (float hist[], int nbins)
     return Hmax;
 }
 
-//// ------------------------------estimate std of main mode
+//// ------------------------------estimate std of a mode
 float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
 {
     int n;
@@ -377,9 +385,9 @@ float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
 
     for (n=0; n<nbins; n++)
     {
-        if (bins[n] >= mu)
+        if (bins[n] >= mu)// to the Right of mode
         {
-            if (hist[n] > threshold)
+            if ((hist[n] > threshold) & (hist[n] >= hist[n+1]))// added monotonity condition 29 Jan
             {
                 ma_bin = bins[n];
             }
@@ -392,9 +400,9 @@ float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
 
     for (n=nbins-1; n>=0; n--)
     {
-        if (bins[n] <= mu)
+        if (bins[n] <= mu)// to the Left of mode
         {
-            if (hist[n] > threshold)
+            if ((hist[n] > threshold) & (hist[n-1] <= hist[n]))// added monotonity condition 29 Jan
             {
                 mi_bin = bins[n];
             }
@@ -406,6 +414,12 @@ float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
     }
 
     sd = 0.5 * (ma_bin - mi_bin);
+
+    if (mu==bins[0])
+    sd = (ma_bin - mi_bin);
+    if (mu==bins[nbins-1])
+    sd = (ma_bin - mi_bin);
+
 
     return sd;
 }
