@@ -500,6 +500,7 @@ sub _set_additional_modules_info {
     if ($self->use_reverse_complemented) {
         push @packages_info, q[FASTX Toolkit fastx_reverse_complement ] . $self->_fastx_version;
     }
+    push @packages_info, join q[ ], $self->norm_fit_cmd, $VERSION;
     $self->result->set_info('Additional_Modules', ( join q[;], @packages_info ) );
     return;
 }
@@ -520,7 +521,7 @@ sub _align {
     my ($self, $sample_reads, $prefix) = @_;
 
     $_alignment_count++;
-    my $output_sam = catfile($self->tmp_path, $_alignment_count . q[isize.sam]);
+    my $output_sam = catfile(q[/nfs/users/nfs_m/mg8/working/npg_qc/jobs], $_alignment_count . q[isize.sam]);
     my $al = npg_common::Alignment->new($self->resolved_paths());
     $al->bwa_align_pe({ref_root => $self->reference, fastq1 => $sample_reads->[0], fastq2 => $sample_reads->[1], sam_out => $output_sam, fork_align => 0,});
     return $output_sam;
