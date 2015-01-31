@@ -1,9 +1,3 @@
-#########
-# Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Created:       2008-11-26
-#
-#
-
 package npg_qc::autoqc::checks::insert_size;
 
 use Moose;
@@ -23,8 +17,9 @@ use Perl6::Slurp;
 # role are defined there; there is a bug in Moose::Role
 #########################################################
 extends qw(npg_qc::autoqc::checks::check);
-with qw(npg_tracking::data::reference::find
-        npg_common::roles::software_location
+with qw(
+  npg_tracking::data::reference::find
+  npg_common::roles::software_location
        );
 
 use npg::api::run;
@@ -119,7 +114,7 @@ has 'use_reverse_complemented' => (isa             => 'Bool',
 
 =head2 expected_size
 
-Expected size range as a reference to an array that contains pairs of I<from> and I<to> values. Undefined if the field has not been set by the user and the sutobuild procedure has failed. In the simplest case the $is->extected_size->[0] contains a I<from> value and $is->extected_size->[1] contains a I<to> value. In case of a multiplexed lane, further values might be present in teh array.
+Expected size range as a reference to an array that contains pairs of I<from> and I<to> values. Undefined if the field has not been set by the user and the sutobuild procedure has failed. In the simplest case the $is->extected_size->[0] contains a I<from> value and $is->extected_size->[1] contains a I<to> value. In case of a multiplexed lane, further values might be present in the array.
 
 =cut
 has 'expected_size'   => (isa         => 'Maybe[ArrayRef]',
@@ -500,6 +495,7 @@ sub _set_additional_modules_info {
     if ($self->use_reverse_complemented) {
         push @packages_info, q[FASTX Toolkit fastx_reverse_complement ] . $self->_fastx_version;
     }
+    push @packages_info, join q[ ], $self->norm_fit_cmd, $VERSION;
     $self->result->set_info('Additional_Modules', ( join q[;], @packages_info ) );
     return;
 }
@@ -525,13 +521,6 @@ sub _align {
     $al->bwa_align_pe({ref_root => $self->reference, fastq1 => $sample_reads->[0], fastq2 => $sample_reads->[1], sam_out => $output_sam, fork_align => 0,});
     return $output_sam;
 }
-
-has 'norm_fit_cmd' => (
-        is      => 'ro',
-        isa     => 'NpgCommonResolvedPathExecutable',
-        coerce  => 1,
-        default => $NORM_FIT_EXE,
-);
 
 no Moose;
 __PACKAGE__->meta->make_immutable();
@@ -580,11 +569,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL, by Marina Gourtovaia
 
 This file is part of NPG.
 
