@@ -302,7 +302,7 @@ __PACKAGE__->has_many(
   { 'foreign.id_run_tile' => 'self.id_run_tile' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
-
+sum:pHwNQWaGuCo9
 =head2 log_likelihoods
 
 Type: has_many
@@ -363,6 +363,36 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 mqc_outcome_ents
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcOutcomeEnt>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_outcome_ents',
+  'npg_qc::Schema::Result::MqcOutcomeEnt',
+  { 'foreign.id_run' => 'self.id_run' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 mqc_outcome_hists
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcOutcomeHist>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_outcome_hists',
+  'npg_qc::Schema::Result::MqcOutcomeHist',
+  { 'foreign.id_run' => 'self.id_run' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 tile_scores
 
 Type: has_many
@@ -379,8 +409,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JJHBhhGUhGWnHMtk2suwhA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-03 12:30:34
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oEK+YnPWJykt2ITlduzP0g
 
 our $VERSION = '0';
 
