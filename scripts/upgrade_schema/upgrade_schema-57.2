@@ -1,0 +1,54 @@
+CREATE  TABLE IF NOT EXISTS `npgtest_jmtc`.`mqc_outcome_dict` (
+  `id_mqc_outcome` SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `short_desc` VARCHAR(15) NOT NULL ,
+  `long_desc` VARCHAR(100) NULL DEFAULT NULL ,
+  `iscurrent` TINYINT(1) NULL DEFAULT NULL COMMENT 'Catalog value still in use.' ,
+  `isvisible` TINYINT(1) NULL DEFAULT NULL COMMENT 'Is it visible in UI' ,
+  PRIMARY KEY (`id_mqc_outcome`) )
+ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS `npgtest_jmtc`.`mqc_outcome_ent` (
+  `id_mqc_outcome_ent` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `id_run` BIGINT(20) UNSIGNED NOT NULL ,
+  `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane' ,
+  `id_mqc_outcome` SMALLINT(5) UNSIGNED NOT NULL ,
+  `username` CHAR(128) NULL DEFAULT NULL ,
+  `last_modified` TIMESTAMP NOT NULL ,
+  `reported` TIMESTAMP NULL DEFAULT NULL COMMENT 'When was reporte to LIMS' ,
+  PRIMARY KEY (`id_mqc_outcome_ent`) ,
+  INDEX `fk_mqc_outcome_ent_run_tile2_idx` (`id_run` ASC) ,
+  INDEX `fk_mqc_outcome_ent_mqc_outcome_dict1_idx` (`id_mqc_outcome` ASC) ,
+  UNIQUE INDEX `id_run_UNIQUE` (`id_run` ASC, `position` ASC) ,
+  CONSTRAINT `fk_mqc_outcome_ent_run_tile2`
+    FOREIGN KEY (`id_run` )
+    REFERENCES `npgtest_jmtc`.`run_tile` (`id_run` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_mqc_outcome_ent_mqc_outcome_dict1`
+    FOREIGN KEY (`id_mqc_outcome` )
+    REFERENCES `npgtest_jmtc`.`mqc_outcome_dict` (`id_mqc_outcome` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS `npgtest_jmtc`.`mqc_outcome_hist` (
+  `id_mqc_outcome_hist` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `id_run` BIGINT(20) UNSIGNED NOT NULL ,
+  `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane' ,
+  `id_outcome` SMALLINT(5) UNSIGNED NOT NULL ,
+  `username` CHAR(128) NULL DEFAULT NULL ,
+  `last_modified` TIMESTAMP NOT NULL ,
+  PRIMARY KEY (`id_mqc_outcome_hist`) ,
+  INDEX `fk_mqc_outcome_hist_run_tile2_idx` (`id_run` ASC) ,
+  INDEX `fk_mqc_outcome_hist_mqc_outcome_dict1_idx` (`id_outcome` ASC) ,
+  CONSTRAINT `fk_mqc_outcome_ent_run_tile20`
+    FOREIGN KEY (`id_run` )
+    REFERENCES `npgtest_jmtc`.`run_tile` (`id_run` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_mqc_outcome_ent_mqc_outcome_dict10`
+    FOREIGN KEY (`id_outcome` )
+    REFERENCES `npgtest_jmtc`.`mqc_outcome_dict` (`id_mqc_outcome` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
