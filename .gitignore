@@ -3,5 +3,6 @@ Build*
 MYMETA*
 _build/
 blib/
+src/*/build/*
 *~
 

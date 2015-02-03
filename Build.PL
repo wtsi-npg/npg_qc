@@ -4,25 +4,29 @@ use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
-  my $blibr = q[blib/lib/R];
-  my $norm_fit_dir = join(q[/], 'src', 'norm_fit');
+  use File::Path qw(make_path remove_tree);
+
+  my $blibr              = q[blib/lib/R];
+  my $norm_fit_dir       = join(q[/], 'src', 'norm_fit');
+  my $norm_fit_build_dir = join(q[/], $norm_fit_dir, 'build');
+
   sub ACTION_build {
     my $self = shift;
     $self->SUPER::ACTION_build;
-    chdir $norm_fit_dir;
-    `make`;
-    $self->copy_if_modified(from => 'norm_fit',
-                            to_dir => join(q[/], $self->base_dir, 'blib', 'script'),
+
+    make_path $norm_fit_build_dir;
+    `make --directory $norm_fit_dir`;
+    $self->copy_if_modified(from    => "$norm_fit_build_dir/norm_fit",
+                            to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
                             flatten => 1);
-    chdir $self->base_dir;
   }
 
   sub ACTION_clean {
     my $self = shift;
     $self->SUPER::ACTION_clean;
-    chdir $norm_fit_dir;
-    `make clean`;
-    chdir $self->base_dir;
+
+    `make clean --directory $norm_fit_dir`;
+    remove_tree $norm_fit_build_dir;
   }
 
   sub ACTION_install {
@@ -158,6 +162,7 @@ my $build_requires = {
                 'ExtUtils::CBuilder'              => 0,
                 'Test::Exception'                 => '0.27',
                 'Test::More'                      => '0.86',
+                'File::Path'                      => 0,
                 'HTML::PullParser'                => '3.57',
                 'YAML'                            => '0.68',
                 'IO::Scalar'                      => 0,
