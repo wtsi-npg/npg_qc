@@ -53,7 +53,6 @@ __PACKAGE__->table('mqc_outcome_hist');
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_foreign_key: 1
   is_nullable: 0
 
 =head2 position
@@ -95,12 +94,7 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   'id_run',
-  {
-    data_type => 'bigint',
-    extra => { unsigned => 1 },
-    is_foreign_key => 1,
-    is_nullable => 0,
-  },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
   'id_outcome',
@@ -150,24 +144,9 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
-=head2 id_run
 
-Type: belongs_to
-
-Related object: L<npg_qc::Schema::Result::RunTile>
-
-=cut
-
-__PACKAGE__->belongs_to(
-  'id_run',
-  'npg_qc::Schema::Result::RunTile',
-  { id_run => 'id_run' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-03 12:30:34
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Vn39/xTaVSDZqc5rXJJjMA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:09:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ls46jY85410mI3Df+mVxAQ
 
 our $VERSION = '0';
 

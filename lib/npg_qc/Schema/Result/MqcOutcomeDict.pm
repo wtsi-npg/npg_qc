@@ -53,13 +53,13 @@ __PACKAGE__->table('mqc_outcome_dict');
 
   data_type: 'varchar'
   is_nullable: 0
-  size: 15
+  size: 50
 
 =head2 long_desc
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 100
+  size: 150
 
 =head2 iscurrent
 
@@ -86,9 +86,9 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   'short_desc',
-  { data_type => 'varchar', is_nullable => 0, size => 15 },
+  { data_type => 'varchar', is_nullable => 0, size => 50 },
   'long_desc',
-  { data_type => 'varchar', is_nullable => 1, size => 100 },
+  { data_type => 'varchar', is_nullable => 1, size => 150 },
   'iscurrent',
   { data_type => 'tinyint', is_nullable => 1 },
   'isvisible',
@@ -140,8 +140,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-03 12:30:33
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:pHwNQWaGuCo9wdI4x4tvDw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:51:41
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:P1kHb+vBeXBPUzkTjVgoxQ
 
 our $VERSION = '0';
 

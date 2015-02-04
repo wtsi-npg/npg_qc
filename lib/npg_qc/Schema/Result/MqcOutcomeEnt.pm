@@ -53,7 +53,6 @@ __PACKAGE__->table('mqc_outcome_ent');
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_foreign_key: 1
   is_nullable: 0
 
 =head2 position
@@ -90,7 +89,7 @@ Lane
   datetime_undef_if_invalid: 1
   is_nullable: 1
 
-When was reporte to LIMS
+When was reported to LIMS
 
 =cut
 
@@ -103,12 +102,7 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   'id_run',
-  {
-    data_type => 'bigint',
-    extra => { unsigned => 1 },
-    is_foreign_key => 1,
-    is_nullable => 0,
-  },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
   'id_mqc_outcome',
@@ -180,24 +174,9 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
-=head2 id_run
 
-Type: belongs_to
-
-Related object: L<npg_qc::Schema::Result::RunTile>
-
-=cut
-
-__PACKAGE__->belongs_to(
-  'id_run',
-  'npg_qc::Schema::Result::RunTile',
-  { id_run => 'id_run' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-03 12:30:34
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:H4k19T/biu9u0q4Hhsh5qg
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:09:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:I+5g0awK/0u5Xh5FhMcL5w
 
 our $VERSION = '0';
 
