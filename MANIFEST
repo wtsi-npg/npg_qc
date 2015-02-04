@@ -237,6 +237,9 @@ lib/npg_qc/Schema/Result/LogLikelihood.pm
 lib/npg_qc/Schema/Result/MostCommonBlankPattern.pm
 lib/npg_qc/Schema/Result/MostCommonWord.pm
 lib/npg_qc/Schema/Result/MoveZ.pm
+lib/npg_qc/Schema/Result/MqcOutcomeDict.pm
+lib/npg_qc/Schema/Result/MqcOutcomeEnt.pm
+lib/npg_qc/Schema/Result/MqcOutcomeHist.pm
 lib/npg_qc/Schema/Result/Offset.pm
 lib/npg_qc/Schema/Result/PulldownMetrics.pm
 lib/npg_qc/Schema/Result/QXYield.pm
