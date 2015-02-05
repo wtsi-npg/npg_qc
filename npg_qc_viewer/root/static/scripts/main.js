@@ -31,18 +31,18 @@ function( npg_common,  manual_qc,  collapse,  insert_size,                 adapt
 		jQuery(".mqc").empty();
 	}
 
-	jQuery('.bcviz_insert_size').each(function(i) { insert_size(this); });
+	jQuery('.bcviz_insert_size').each(function(i) { insert_size.drawChart(this); });
 	
 	jQuery('.bcviz_adapter').each(function(i) { 
 		// override width to ensure two graphs can fit side by side
 		var width = jQuery(this).parent().width() / 2 - 40;
-		adapter(this,width); 
+		adapter.drawChart(this,width); 
 	});
 
 	jQuery('.bcviz_mismatch').each(function(i) { 
 		// override width to ensure two graphs can fit side by side
 		var width = jQuery(this).parent().width() / 2 - 90;
-		mismatch(this,width); 
+		mismatch.drawChart(this,width); 
 	});
 
 });
