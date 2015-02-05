@@ -901,12 +901,12 @@ CREATE TABLE `mqc_outcome_hist` (
   `id_mqc_outcome_hist` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `id_run` bigint(20) unsigned NOT NULL,
   `position` tinyint(3) unsigned NOT NULL COMMENT 'Lane',
-  `id_outcome` smallint(5) unsigned NOT NULL,
+  `id_mqc_outcome` smallint(5) unsigned NOT NULL,
   `username` char(128) DEFAULT NULL,
   `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_mqc_outcome_hist`),
-  KEY `fk_mqc_outcome_hist_mqc_outcome_dict1_idx` (`id_outcome`),
-  CONSTRAINT `fk_mqc_outcome_ent_mqc_outcome_dict10` FOREIGN KEY (`id_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `fk_mqc_outcome_hist_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
+  CONSTRAINT `fk_mqc_outcome_ent_mqc_outcome_dict10` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

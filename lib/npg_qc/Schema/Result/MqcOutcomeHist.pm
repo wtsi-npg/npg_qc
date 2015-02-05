@@ -63,7 +63,7 @@ __PACKAGE__->table('mqc_outcome_hist');
 
 Lane
 
-=head2 id_outcome
+=head2 id_mqc_outcome
 
   data_type: 'smallint'
   extra: {unsigned => 1}
@@ -97,7 +97,7 @@ __PACKAGE__->add_columns(
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'id_outcome',
+  'id_mqc_outcome',
   {
     data_type => 'smallint',
     extra => { unsigned => 1 },
@@ -129,7 +129,7 @@ __PACKAGE__->set_primary_key('id_mqc_outcome_hist');
 
 =head1 RELATIONS
 
-=head2 id_outcome
+=head2 id_mqc_outcome
 
 Type: belongs_to
 
@@ -138,15 +138,15 @@ Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_outcome',
+  'id_mqc_outcome',
   'npg_qc::Schema::Result::MqcOutcomeDict',
-  { id_mqc_outcome => 'id_outcome' },
+  { id_mqc_outcome => 'id_mqc_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:09:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ls46jY85410mI3Df+mVxAQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-05 17:00:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:I9Gu8De4VX2ymmayamdGuA
 
 our $VERSION = '0';
 

@@ -135,13 +135,13 @@ Related object: L<npg_qc::Schema::Result::MqcOutcomeHist>
 __PACKAGE__->has_many(
   'mqc_outcome_hists',
   'npg_qc::Schema::Result::MqcOutcomeHist',
-  { 'foreign.id_outcome' => 'self.id_mqc_outcome' },
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:51:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:P1kHb+vBeXBPUzkTjVgoxQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-05 17:00:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:sEw0vDs0wFvwtoByLd4huA
 
 our $VERSION = '0';
 
