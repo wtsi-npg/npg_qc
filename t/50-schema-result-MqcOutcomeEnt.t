@@ -12,6 +12,7 @@ use Moose::Meta::Class;
 use npg_testing::db;
 use DateTime;
 
+#Test model mapping
 use_ok('npg_qc::Schema::Result::MqcOutcomeEnt', "Model check");
 
 my $schema = Moose::Meta::Class->create_anon_class(

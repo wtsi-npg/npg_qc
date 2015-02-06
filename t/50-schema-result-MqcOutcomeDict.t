@@ -11,6 +11,7 @@ use JSON;
 use Moose::Meta::Class;
 use npg_testing::db;
 
+#Test model mapping
 use_ok('npg_qc::Schema::Result::MqcOutcomeDict', "Model check");
 
 my $schema = Moose::Meta::Class->create_anon_class(
