@@ -1,25 +1,15 @@
-#########
-# Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Created:       2008-06-12
-#
-
 package t::autoqc_util;
 
 use strict;
 use warnings;
 use Carp;
 use English qw(-no_match_vars);
-use Test::More;
-use XML::Simple qw(XMLin);
 use Exporter;
-
-our $VERSION = '0';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
                       write_bwa_script
                       write_samtools_script
-                      insert_size_additional_modules
                    );
 
 sub write_samtools_script {
@@ -110,23 +100,6 @@ sub write_bwa_script {
     
   chmod 0775, $script_path;
   return 1;
-}
-
-sub insert_size_additional_modules {
-  my $use_fastx = shift;
-  my @expected = ();
-  require npg_qc::autoqc::parse::alignment;
-  push @expected, join(q[ ], 'npg_qc::autoqc::parse::alignment', $npg_qc::autoqc::parse::alignment::VERSION);
-  require npg_common::extractor::fastq;
-  push @expected, join(q[ ], q[npg_common::extractor::fastq], $npg_common::extractor::fastq::VERSION);
-  require npg_common::Alignment;
-  push @expected, join(q[ ], q[npg_common::Alignment], $npg_common::Alignment::VERSION);
-
-
-  if ($use_fastx) {
-    push @expected, q[FASTX Toolkit fastx_reverse_complement 0.0.12];
-  }
-  return @expected;
 }
 
 1;

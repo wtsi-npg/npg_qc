@@ -379,8 +379,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JJHBhhGUhGWnHMtk2suwhA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:09:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gJR1Kc/WAxi/AKs0u5n0hg
 
 our $VERSION = '0';
 
