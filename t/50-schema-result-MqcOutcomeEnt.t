@@ -1,7 +1,3 @@
-#########
-# Author:        jmtc
-#
-
 use strict;
 use warnings;
 use Test::More tests => 6;
@@ -70,4 +66,7 @@ $table = 'MqcOutcomeEnt';
 
 #Test status workflow validation
 #TODO 
+
+__PACKAGE__->meta->make_immutable;
+
 1;

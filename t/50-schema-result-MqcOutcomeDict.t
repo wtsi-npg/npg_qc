@@ -1,7 +1,3 @@
-#########
-# Author:        jmtc
-#
-
 use strict;
 use warnings;
 use Test::More tests => 1;
@@ -19,5 +15,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
 
 my $table = 'MqcOutcomeDict';
+
+__PACKAGE__->meta->make_immutable;
 
 1;

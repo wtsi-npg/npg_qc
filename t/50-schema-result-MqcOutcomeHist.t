@@ -1,7 +1,3 @@
-#########
-# Author:        jmtc
-#
-
 use strict;
 use warnings;
 use Test::More tests => 6;
@@ -67,5 +63,7 @@ $table = 'MqcOutcomeHist';
   $rs = $schema->resultset($table)->search({'id_run'=>1, 'position'=>3, 'id_mqc_outcome'=>2}); #Search the new outcome
   is ($rs->count, 1, q[one row matches in the table after update]);  
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
