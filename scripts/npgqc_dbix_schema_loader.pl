@@ -43,6 +43,7 @@ make_schema_at(
         debug               => 0,
         dump_directory      => q[lib],
         naming              => q[current],
+        rel_name_map        => sub {my%h=%{shift@_};my$name=$h{name}; $name=~s/^id_//; return $name; }, #Rename the id relationship so we can access flat versions of the objects and not only the whole trees from ORM.
         skip_load_external  => 1,
         use_moose           => 1,
         preserve_case       => 1,

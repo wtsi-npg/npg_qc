@@ -175,7 +175,7 @@ __PACKAGE__->add_unique_constraint('unq_idx_run', ['id_run']);
 
 =head1 RELATIONS
 
-=head2 id_recipe_file
+=head2 recipe_file
 
 Type: belongs_to
 
@@ -184,7 +184,7 @@ Related object: L<npg_qc::Schema::Result::RecipeFile>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_recipe_file',
+  'recipe_file',
   'npg_qc::Schema::Result::RecipeFile',
   { id_recipe_file => 'id_recipe_file' },
   {
@@ -196,8 +196,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-07 09:29:53
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2t85oMx7z0bhqvGV/bEU4Q
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:DdKnjKqzvneOar4J12NwiA
 
 our $VERSION = '0';
 

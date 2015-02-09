@@ -196,7 +196,7 @@ __PACKAGE__->add_unique_constraint(
 
 =head1 RELATIONS
 
-=head2 id_run_tile
+=head2 run_tile
 
 Type: belongs_to
 
@@ -205,15 +205,15 @@ Related object: L<npg_qc::Schema::Result::RunTile>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_run_tile',
+  'run_tile',
   'npg_qc::Schema::Result::RunTile',
   { id_run_tile => 'id_run_tile' },
   { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:wvE4vOdkYN2gRLNoh2AuIg
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:w7yP61cumNqpO9Y6PJqVWg
 
 our $VERSION = '0';
 

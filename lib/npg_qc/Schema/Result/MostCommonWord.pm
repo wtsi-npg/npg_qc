@@ -149,7 +149,7 @@ __PACKAGE__->set_primary_key('id_most_common_word');
 
 =head1 RELATIONS
 
-=head2 id_run_tile
+=head2 run_tile
 
 Type: belongs_to
 
@@ -158,15 +158,15 @@ Related object: L<npg_qc::Schema::Result::RunTile>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_run_tile',
+  'run_tile',
   'npg_qc::Schema::Result::RunTile',
   { id_run_tile => 'id_run_tile' },
   { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:V7AoBJEAMRY+McjHkxsqcA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Bgfgv0KYU6zFk+e6X1Qdmw
 
 our $VERSION = '0';
 

@@ -140,7 +140,7 @@ __PACKAGE__->add_unique_constraint(
 
 =head1 RELATIONS
 
-=head2 id_split_stat
+=head2 split_stat
 
 Type: belongs_to
 
@@ -149,15 +149,15 @@ Related object: L<npg_qc::Schema::Result::SplitStats>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_split_stat',
+  'split_stat',
   'npg_qc::Schema::Result::SplitStats',
   { id_split_stats => 'id_split_stats' },
   { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:b4LalZUFLHnom9jvJsA9Vw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Pd4TZB4puvefCY+rihymvQ
 
 our $VERSION = '0';
 

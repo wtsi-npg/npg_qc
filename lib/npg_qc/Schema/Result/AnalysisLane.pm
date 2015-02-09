@@ -593,6 +593,21 @@ __PACKAGE__->add_unique_constraint('unq_al_lane', ['id_analysis', 'position']);
 
 =head1 RELATIONS
 
+=head2 analysis
+
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::Analysis>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'analysis',
+  'npg_qc::Schema::Result::Analysis',
+  { id_analysis => 'id_analysis' },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+);
+
 =head2 analysis_lane_qcals
 
 Type: has_many
@@ -608,24 +623,9 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 id_analysis
 
-Type: belongs_to
-
-Related object: L<npg_qc::Schema::Result::Analysis>
-
-=cut
-
-__PACKAGE__->belongs_to(
-  'id_analysis',
-  'npg_qc::Schema::Result::Analysis',
-  { id_analysis => 'id_analysis' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BMuQ5XTU4egj80Hwjz6H5w
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:41
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v0xOks7zB5Lz8TIoGUBBQg
 
 our $VERSION = '0';
 
