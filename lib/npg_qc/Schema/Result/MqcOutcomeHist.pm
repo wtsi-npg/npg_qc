@@ -129,7 +129,7 @@ __PACKAGE__->set_primary_key('id_mqc_outcome_hist');
 
 =head1 RELATIONS
 
-=head2 id_mqc_outcome
+=head2 mqc_outcome
 
 Type: belongs_to
 
@@ -138,15 +138,15 @@ Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_mqc_outcome',
+  'mqc_outcome',
   'npg_qc::Schema::Result::MqcOutcomeDict',
   { id_mqc_outcome => 'id_mqc_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-05 17:00:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:I9Gu8De4VX2ymmayamdGuA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:m3tyV7hw2HF/xRZIIxpmGg
 
 our $VERSION = '0';
 

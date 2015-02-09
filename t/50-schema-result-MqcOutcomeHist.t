@@ -64,6 +64,4 @@ $table = 'MqcOutcomeHist';
   is ($rs->count, 1, q[one row matches in the table after update]);  
 }
 
-__PACKAGE__->meta->make_immutable;
-
 1;

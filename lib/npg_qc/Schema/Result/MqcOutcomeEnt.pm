@@ -159,7 +159,7 @@ __PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position']);
 
 =head1 RELATIONS
 
-=head2 id_mqc_outcome
+=head2 mqc_outcome
 
 Type: belongs_to
 
@@ -168,17 +168,53 @@ Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_mqc_outcome',
+  'mqc_outcome',
   'npg_qc::Schema::Result::MqcOutcomeDict',
   { id_mqc_outcome => 'id_mqc_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:09:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:I+5g0awK/0u5Xh5FhMcL5w
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:7UWlCHPyTLNXd2cG6VlR0w
 
 our $VERSION = '0';
+
+sub create_historic {
+  my $self = shift;
+  
+  my $rs = $self->result_source->schema->resultset('MqcOutcomeHist');
+  
+  my $historic = $rs->create({id_run => $self->id_run, 
+    position => $self->position,
+    id_mqc_outcome => $self->id_mqc_outcome,
+    username => $self->username,
+    last_modified => $self->last_modified});
+}
+
+#Add business rules for update.
+around 'update' => sub {
+  my $orig = shift;
+  my $self = shift;
+ 
+  my $return_super = $self->$orig(@_);
+  
+  $self->create_historic();
+    
+  return $return_super;
+};
+
+#Inserting historic
+around 'insert' => sub {
+  my $orig = shift;
+  my $self = shift;
+ 
+  my $return_super = $self->$orig(@_);
+  
+  $self->create_historic();
+    
+  return $return_super;
+};
 
 __PACKAGE__->meta->make_immutable;
 1;

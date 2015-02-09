@@ -10,12 +10,10 @@ use npg_testing::db;
 #Test model mapping
 use_ok('npg_qc::Schema::Result::MqcOutcomeDict', "Model check");
 
-my $schema = Moose::Meta::Class->create_anon_class(
-          roles => [qw/npg_testing::db/])
-          ->new_object({})->create_test_db(q[npg_qc::Schema]);
+#my $schema = Moose::Meta::Class->create_anon_class(
+#          roles => [qw/npg_testing::db/])
+#          ->new_object({})->create_test_db(q[npg_qc::Schema]);
 
-my $table = 'MqcOutcomeDict';
-
-__PACKAGE__->meta->make_immutable;
+#my $table = 'MqcOutcomeDict';
 
 1;
