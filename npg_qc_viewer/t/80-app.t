@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 68;
+use Test::More tests => 48;
 use Test::Exception;
 use HTTP::Headers;
 use HTTP::Request::Common;
@@ -51,16 +51,10 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 
   push @urls, q[http://localhost/checks];
   push @urls, q[http://localhost/checks/about];
-  push @urls, q[http://localhost/checks/studies];
   my $project_id = 378;
   push @urls, qq[http://localhost/checks/studies/$project_id];
-  push @urls, q[http://localhost/checks/libraries];
   my $lib = q[Exp2_PD2126a_WGA+1];
   push @urls, qq[http://localhost/checks/libraries?name=$lib];
-  # unfortunately, nothing in test data for this period and the next one
-  push @urls, q[http://localhost/checks/week];
-  push @urls, q[http://localhost/checks/weeks/3];
-  push @urls, q[http://localhost/checks/samples];
   my $sample_id = 9184;
   push @urls, qq[http://localhost/checks/samples/$sample_id];
   $sample_id = 9286;

@@ -403,7 +403,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         $c->stash->{'title'} = q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$lib_names};
         $self->_display_libs($c, { 'me.asset_name' => $lib_names,});
     } else {
-        $c->stash->{'template'} = q{list/libraries.tt2};
+#        $c->stash->{'template'} = q{list/libraries.tt2};
     }
     return;
 
@@ -417,7 +417,7 @@ Fetches a list of all known samples
 =cut
 sub samples :Chained('base') :PathPart('samples') :Args(0) {
     my ( $self, $c) = @_;
-    $c->stash->{'template'} = q{list/samples.tt2};
+#    $c->stash->{'template'} = q{list/samples.tt2};
     return;
 }
 
@@ -457,7 +457,7 @@ Display a list of all known studies
 =cut
 sub studies :Chained('base') :PathPart('studies') :Args(0) {
     my ( $self, $c) = @_;
-    $c->stash->{'template'} = q{list/studies.tt2};
+#    $c->stash->{'template'} = q{list/studies.tt2};
     return;
 }
 
