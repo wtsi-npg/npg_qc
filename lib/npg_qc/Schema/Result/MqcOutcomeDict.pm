@@ -145,6 +145,15 @@ __PACKAGE__->has_many(
 
 our $VERSION = '0';
 
+sub is_final_outcome {
+  my $self = shift;
+  if($self->short_desc =~ m{final}ism) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
@@ -211,4 +220,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
