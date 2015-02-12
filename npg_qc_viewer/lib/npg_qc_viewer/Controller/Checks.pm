@@ -398,7 +398,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         my $lib_names = $c->request->query_parameters->{name};
         if (!ref $lib_names) {
             $lib_names = [$lib_names];
-	      }
+        }
         $c->stash->{'title'} = q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$lib_names};
         $self->_display_libs($c, { 'me.asset_name' => $lib_names,});
     } else {
