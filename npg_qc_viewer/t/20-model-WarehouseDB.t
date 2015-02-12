@@ -1,11 +1,8 @@
 use strict;
 use warnings;
-use Carp;
 use Test::More tests => 7;
 use Test::Exception;
-#use Test::Deep;
 use File::Temp qw(tempfile);
-#use DateTime;
 
 use t::util;
 
