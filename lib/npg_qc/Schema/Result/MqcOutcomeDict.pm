@@ -145,6 +145,12 @@ __PACKAGE__->has_many(
 
 our $VERSION = '0';
 
+=head1 Methods
+
+=head2 is_final_outcome Utility method to check if the outcome is considered final.
+
+=cut
+
 sub is_final_outcome {
   my $self = shift;
   if($self->short_desc =~ m{final}ism) { #The short description includes the word final.

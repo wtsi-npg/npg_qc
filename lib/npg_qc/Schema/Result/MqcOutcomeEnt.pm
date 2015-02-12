@@ -184,6 +184,10 @@ our $VERSION = '0';
 use MooseX::Params::Validate;
 use Carp;
 
+=head1 Methods
+
+=cut
+
 #Create and saver historic from the entity current data.
 sub _create_historic {
   my $self = shift;
@@ -196,6 +200,7 @@ sub _create_historic {
 
   return 1;
 }
+
 
 #Updates and inserts an historic
 around 'update' => sub {
@@ -216,6 +221,10 @@ around 'insert' => sub {
   $self->_create_historic();
   return $return_super;
 };
+
+=head2 update_outcome ($outcome, $username) Updates the outcome of the entity with values provided.
+
+=cut
 
 sub update_outcome {
   my @parameters = @_;
@@ -247,7 +256,9 @@ sub update_outcome {
   return 1;
 }
 
-#As a proxy to the dictionary method
+=head2 has_final_outcome Utility method as a proxy to the dictionary method.
+
+=cut
 sub has_final_outcome {
   my $self = shift;
 
