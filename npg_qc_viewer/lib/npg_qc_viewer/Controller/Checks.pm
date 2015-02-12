@@ -14,7 +14,6 @@ BEGIN { extends 'Catalyst::Controller' }
 our $VERSION   = '0';
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitBuiltinHomonyms ProhibitLongChainsOfMethodCalls )
 
-Readonly::Scalar our $LOOKBACK_NUM_WEEKS => 2;
 Readonly::Scalar our $DEFAULT_RESULTS_RETRIEVE_OPTION => q[lanes];
 Readonly::Hash   our %RESULTS_RETRIEVE_OPTIONS => ('all'    => $ALL,
                                                    'lane'   => $LANES,
@@ -389,7 +388,7 @@ sub checks_from_path :Chained('base') :PathPart('path') :Args(0) {
 
 =head2 libraries
 
-Library page and a list of libraries
+Library page.
 
 =cut
 sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
@@ -399,17 +398,19 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         my $lib_names = $c->request->query_parameters->{name};
         if (!ref $lib_names) {
             $lib_names = [$lib_names];
-	}
+        }
         $c->stash->{'title'} = q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$lib_names};
         $self->_display_libs($c, { 'me.asset_name' => $lib_names,});
+    } else {
+        $c->stash->{error_message} = q[This is an invalid URL];
+        $c->detach(q[Root], q[error_page]);
     }
     return;
-
 }
 
 =head2 samples
 
-Samples page
+Samples page - retained in order not to change dispatch type for a sample
 
 =cut
 sub samples :Chained('base') :PathPart('samples') :Args(0) {
@@ -448,7 +449,7 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
 
 =head2 studies
 
-Studies page
+Studies page - retained in order not to change dispatch type for a study
 
 =cut
 sub studies :Chained('base') :PathPart('studies') :Args(0) {

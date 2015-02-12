@@ -15,6 +15,7 @@ lib/npg_qc_viewer/Model/GenotypeCheck.pm
 lib/npg_qc_viewer/Model/NpgDB.pm
 lib/npg_qc_viewer/Model/NpgQcDB.pm
 lib/npg_qc_viewer/Model/SeqStore.pm
+lib/npg_qc_viewer/Model/WarehouseDB.pm
 lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
 lib/npg_qc_viewer.pm
 lib/npg_qc_viewer/View/TT.pm
@@ -98,6 +99,7 @@ t/20-model-NpgDB-annotations.t
 t/20-model-NpgDB-manual_qc.t
 t/20-model-NpgQcDB.t
 t/20-model-SeqStore.t
+t/20-model-WarehouseDB.t
 t/20-model-visuals-Fastqcheck.t
 t/30-model-visuals-Fastqcheck.t
 t/40-controller-AjaxProxy_no_conf.t
