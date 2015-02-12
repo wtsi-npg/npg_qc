@@ -159,6 +159,7 @@ __PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position']);
 
 =head1 RELATIONS
 
+
 =head2 mqc_outcome
 
 Type: belongs_to
@@ -180,41 +181,94 @@ __PACKAGE__->belongs_to(
 
 our $VERSION = '0';
 
-sub create_historic {
+use MooseX::Params::Validate;
+use Carp;
+
+#Create and saver historic from the entity current data.
+sub _create_historic {
   my $self = shift;
-  
   my $rs = $self->result_source->schema->resultset('MqcOutcomeHist');
-  
-  my $historic = $rs->create({id_run => $self->id_run, 
+  my $historic = $rs->create({id_run => $self->id_run,
     position => $self->position,
     id_mqc_outcome => $self->id_mqc_outcome,
     username => $self->username,
     last_modified => $self->last_modified});
+
+  return 1;
 }
 
-#Add business rules for update.
+#Updates and inserts an historic
 around 'update' => sub {
   my $orig = shift;
   my $self = shift;
- 
   my $return_super = $self->$orig(@_);
-  
-  $self->create_historic();
-    
+
+  $self->_create_historic();
   return $return_super;
 };
 
-#Inserting historic
+#Inserts and inserts an historic
 around 'insert' => sub {
   my $orig = shift;
   my $self = shift;
- 
   my $return_super = $self->$orig(@_);
-  
-  $self->create_historic();
-    
+
+  $self->_create_historic();
   return $return_super;
 };
+
+sub update_outcome {
+  my @parameters = @_;
+
+  my ( $self, %params ) = validated_hash(
+    \@parameters,
+    'outcome'  => {is_a => 'Int'},
+    'username' => {is_a => 'Str'}
+  );
+
+  if($self->_is_valid_outcome('outcome' => $params{'outcome'})) { # The new outcome is a valid one
+    #There is a row that matches the id_run and position
+    if ($self->in_storage) {
+      #Check if previous outcome is not final
+      if($self->mqc_outcome->is_final_outcome) {
+        #Trying an invalid transition, throw exception
+        croak('Error while trying to update a final outcome.');
+      } else { #Update
+        $self->update({'id_mqc_outcome' => $params{'outcome'}, 'username' => $params{'username'}});
+      }
+    } else { #Is a new row just insert.      
+      $self->id_mqc_outcome($params{outcome});
+      $self->user($params{username});
+      $self->insert();
+    }
+  } else {
+    croak('Error while trying to transit to a non-existing outcome.');
+  }
+  return 1;
+}
+
+#As a proxy to the dictionary method
+sub has_final_outcome {
+  my $self = shift;
+
+  if(!$self->mqc_outcome->is_final_outcome) {
+    return 0;
+  }
+  return 1;
+}
+
+#Check if an outcome actually exists in the database.
+sub _is_valid_outcome {
+  my @parameters = @_;
+
+  my ( $self, %params ) = validated_hash(
+    \@parameters,
+    'outcome'  => {is_a => 'Int'}
+  );
+
+  my $outcome_dict = $self->result_source->schema->resultset('MqcOutcomeDict')->find($params{outcome});
+  return defined $outcome_dict;
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
