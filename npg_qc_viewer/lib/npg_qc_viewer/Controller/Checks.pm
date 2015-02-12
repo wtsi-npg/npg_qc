@@ -402,25 +402,22 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
 	}
         $c->stash->{'title'} = q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$lib_names};
         $self->_display_libs($c, { 'me.asset_name' => $lib_names,});
-    } else {
-#        $c->stash->{'template'} = q{list/libraries.tt2};
     }
     return;
 
 }
 
-
 =head2 samples
 
-Fetches a list of all known samples
+Samples page
 
 =cut
 sub samples :Chained('base') :PathPart('samples') :Args(0) {
-    my ( $self, $c) = @_;
-#    $c->stash->{'template'} = q{list/samples.tt2};
+    my ($self, $c) = @_;
+    $c->stash->{error_message} = q[This is an invalid URL];
+    $c->detach(q[Root], q[error_page]);
     return;
 }
-
 
 =head2 sample
 
@@ -449,18 +446,17 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
     return;
 }
 
-
 =head2 studies
 
-Display a list of all known studies
+Studies page
 
 =cut
 sub studies :Chained('base') :PathPart('studies') :Args(0) {
-    my ( $self, $c) = @_;
-#    $c->stash->{'template'} = q{list/studies.tt2};
+    my ($self, $c) = @_;
+    $c->stash->{error_message} = q[This is an invalid URL];
+    $c->detach(q[Root], q[error_page]);
     return;
 }
-
 
 =head2 study
 
@@ -488,108 +484,6 @@ sub study :Chained('base') :PathPart('studies') :Args(1) {
     $self->_display_libs($c, { 'me.study_id' => $study_id,});
     return;
 }
-
-=head2 week
-
-All checks for the last week
-
-=cut
-sub week :Chained('base') :PathPart('week') :Args(0) {
-    my ( $self, $c) = @_;
-    return $self->weeks($c, 1);
-}
-
-=head2 weeks
-
-All checks for the last X weeks
-
-=cut
-sub weeks :Chained('base') :PathPart('weeks') :Args(1) {
-    my ( $self, $c, $num_weeks) = @_;
-
-    $self->_test_positive_int($c, $num_weeks);
-
-    my $then = DateTime->now() - DateTime::Duration->new(weeks => $num_weeks);
-    my $no_plexes = 1;
-    my $dtf = $c->model('WarehouseDB')->storage->datetime_parser;
-    $self->_display_libs($c, {cancelled => 0, run_complete => {'>',  $dtf->format_datetime($then)},}, $no_plexes);
-    $c->stash->{'sample_link'} = 0;
-    $c->stash->{'title'}       = qq[Completed runs for a $num_weeks week period];
-    return;
-}
-
-=head2 library_creators
-
-Library creators for recently sequenced libraries
-
-=cut
-sub library_creators :Chained('base') :PathPart('people') :Args(0) {
-    my ( $self, $c) = @_;
-
-    my $num_weeks = $LOOKBACK_NUM_WEEKS;
-    if (defined $c->request->query_parameters->{weeks}) {
-        $num_weeks = $c->request->query_parameters->{weeks};
-        $self->_test_positive_int($c, $num_weeks);
-    }
-
-    my $then = DateTime->now(time_zone => 'floating');
-    $then->subtract(weeks => $num_weeks);
-    my $time = $then->strftime(q[%F]);
-    my $times = [$time, $time];
-
-    if (defined $c->request->query_parameters->{name}) {
-        my $names = $c->request->query_parameters->{name};
-        if (!ref $names) {
-            $names = [$names];
-	}
-        my $people = join q[, ], @{$names};
-        my $dtf = $c->model('WarehouseDB')->storage->datetime_parser;
-        my $rs = $c->model('WarehouseDB')->resultset('NpgInformation')
-                 ->search(
-                     { 'cancelled' => 0, 'run_complete' => {'>', $dtf->format_datetime($then)},},
-                     {
-                      columns => [qw/id_run/],
-                      distinct => 1,
-	             },
-                 );
-        my @runs = ();
-        while (my $row = $rs->next) {
-	    push  @runs, $row->id_run;
-        }
-
-        $rs = $c->model('WarehouseDB')->resultset(q[RecentlySequencedLibraries])
-              ->search({'me.user_login' => $names,}, {bind => $times,});
-        my @lib_asset_ids = ();
-        while (my $row = $rs->next) {
-            push  @lib_asset_ids, $row->target_asset_id;
-	}
-
-        my $title = qq[Libraries by $people, sequenced within the last ];
-        if ($num_weeks > 1) {
-            $title .= qq[$num_weeks weeks];
-	} else {
-            $title .= q[week];
-	}
-        $c->stash->{'title'} = $title;
-        my $no_plexes = 0;
-        $self->_display_libs($c, {asset_id => \@lib_asset_ids, id_run => \@runs, }, $no_plexes);
-    } else {
-        my @all = $c->model('WarehouseDB')->resultset(q[RecentlySequencedLibraries])
-                  ->search({},
-                           {
-                  select   => [ 'user_login', { count => 'target_asset_id' } ],
-                  as       => [qw/ user_login num_libs /],
-                  group_by => [qw/ user_login /],
-                  bind     => $times,
-                           })->all;
-
-        $c->stash->{'lib_creators_list'} = \@all;
-        $c->stash->{'template'} = q{list/people.tt2};
-        $c->stash->{'num_weeks'} = $num_weeks;
-    }
-    return;
-}
-
 
 1;
 __END__
