@@ -147,7 +147,7 @@ our $VERSION = '0';
 
 sub is_final_outcome {
   my $self = shift;
-  if($self->short_desc =~ m{final}ism) {
+  if($self->short_desc =~ m{final}ism) { #The short description includes the word final.
     return 1;
   } else {
     return 0;
