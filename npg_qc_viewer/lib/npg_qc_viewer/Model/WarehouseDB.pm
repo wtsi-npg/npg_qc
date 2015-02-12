@@ -1,18 +1,12 @@
 package npg_qc_viewer::Model::WarehouseDB;
 
 use Moose;
-use Carp;
-use Readonly;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
-## no critic (Documentation::RequirePodAtEnd ProhibitNoisyQuotes)
 
-Readonly::Scalar our $LESS => -1;
-Readonly::Scalar our $MORE =>  1;
-Readonly::Scalar our $SAME =>  0;
-Readonly::Scalar our $SAMPLE_TUBE_ASSET_TYPE => q[SampleTube];
+## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
 
@@ -47,8 +41,6 @@ __END__
 =over
 
 =item Moose
-
-=item Readonly
 
 =item Catalyst::Model::DBIC::Schema
 

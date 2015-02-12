@@ -3,9 +3,9 @@ use warnings;
 use Carp;
 use Test::More tests => 7;
 use Test::Exception;
-use Test::Deep;
+#use Test::Deep;
 use File::Temp qw(tempfile);
-use DateTime;
+#use DateTime;
 
 use t::util;
 
@@ -33,13 +33,11 @@ lives_ok {
 
 isa_ok($m, 'npg_qc_viewer::Model::WarehouseDB');
 
-{
-    my $rs=$m->resultset(q(NpgInformation));
-    ok (defined $rs, "NpgInformation resultset");
-    ok ($rs->count, "NpgInformation resultset has data");
-    $rs = $rs->search({id_run=>3500});
-    cmp_ok($rs->count,'==',8, "lane count for run 3500");
-}
+my $rs=$m->resultset(q(NpgInformation));
+ok (defined $rs, "NpgInformation resultset");
+ok ($rs->count, "NpgInformation resultset has data");
+$rs = $rs->search({id_run=>3500});
+cmp_ok($rs->count,'==',8, "lane count for run 3500");
 
 1;
 
