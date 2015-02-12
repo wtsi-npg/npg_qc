@@ -35,18 +35,8 @@
 <h2>Main menu description</h2>
 <table summary="Main menu description">
 <tr><th>Menu button label </th><th>Action</th></tr>
-<tr><th>Last Week</th>
-<td>Checks for all libraries that were created within the last week</td></tr>
-<tr><th>Last Fortnight</th>
-<td>Checks for all libraries that were created within the last two weeks</td></tr>
 <tr><th>Runs</th>
 <td>A list of all runs with links to qc data for individual runs</td></tr>
-<tr><th>Libraries</th>
-<td>A list of all libraries with links to qc data for individual libraries</td></tr>
-<tr><th>Samples</th>
-<td>A list of all samples with links to qc data for individual samples</td></tr>
-<tr><th>Studies</th>
-<td>A list of all studies with links to qc data for individual studies</td></tr>
 <tr><th>Help</th>
 <td>Displays this page</td></tr>
 <tr><th>NPG Tracking</th>
@@ -132,12 +122,6 @@
     <td class="url_column">/checks/studies/XXX,<br /> where XXX is a valid study ID</td>
     <td>qc checks for all lanes for in a study</td>
      [% url = c.uri_for_action(c.controller('Checks').action_for('studies'), '171') %]
-    <td><a href="[% url %]">[% url %]</a></td>
-  </tr>
-  <tr>
-    <td class="url_column">/checks/weeks/X,<br /> where X is a positive integer</td>
-    <td>Checks for all libraries that were created within the last X weeks</td>
-     [% url = c.uri_for_action(c.controller('Checks').action_for('weeks'), '3') %]
     <td><a href="[% url %]">[% url %]</a></td>
   </tr>
 </table>
