@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 8;
 use Test::Exception;
 use Carp;
 
@@ -26,12 +26,7 @@ my $mech;
   $mech->get_ok($url);
   $mech->title_is(q[NPG SeqQC - visualization and datamining for sequence quality control]);
 
-  my @menu = ('Last Week', 
-              'Last Fortnight', 
-              'Runs', 'Libraries', 
-              'Samples', 
-              'Studies', 
-              'Help');
+  my @menu = ( 'Runs', 'Help');
   foreach my $menu_item (@menu) {
     $mech->follow_link_ok({text => $menu_item}, qq[follow '$menu_item' menu item]);  
   }

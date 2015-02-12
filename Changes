@@ -1,7 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-release 57.2
+release 57.3
+ - SeqQC: removed pages that are not used any more (studies, samples, libraries,
+   people, weekly reports)
 
+release 57.2
+ - updated the way bcviz functions are called from SeqQC
  - Added tables for manual qc.
 
 release 57.1
