@@ -234,8 +234,8 @@ __PACKAGE__->add_unique_constraint('unq_run_lane_verify', ['id_run', 'position',
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::verify_bam_id';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-04-30 11:56:44
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oz2pF6o2flRVq7PufYNmow
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AqOkJZFkV3LvyDSgZLez2g
 
 __PACKAGE__->set_flators4non_scalar(qw( info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

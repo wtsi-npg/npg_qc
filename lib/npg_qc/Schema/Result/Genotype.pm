@@ -302,8 +302,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::genotype';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-09-26 11:45:16
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ya2ycfHCPfAyA15TqUIF6A
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:rnjxqXkxeljiQ5vROUgQhQ
 
 __PACKAGE__->set_flators4non_scalar(qw( alternate_matches alternate_relaxed_matches sample_name_match sample_name_relaxed_match search_parameters info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

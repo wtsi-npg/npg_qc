@@ -248,8 +248,8 @@ __PACKAGE__->add_unique_constraint('unq_run_lane_gc_bias', ['id_run', 'position'
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::gc_bias';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:54:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Vv3NYR+vR/azYKrDECEq0A
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:VHPfu2sk73vf+4SWuLu7OA
 
 __PACKAGE__->set_flators4non_scalar(qw( actual_quantile_x actual_quantile_y gc_lines plot_x plot_y ideal_lower_quantile ideal_upper_quantile info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

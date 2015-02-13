@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<tile_score>
 
@@ -339,8 +337,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:R8jqAUk0/1xr4u1AMHtrcQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:xGA2zPc6pcqFjvGJox1PVg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

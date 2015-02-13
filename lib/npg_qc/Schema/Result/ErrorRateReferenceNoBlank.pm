@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<error_rate_reference_no_blanks>
 
@@ -206,8 +204,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:o8WwPLgb+bP3wiAX4EXE9Q
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:osiEhKR5+AjBZwbGC82RCQ
 
 our $VERSION = '0';
 
