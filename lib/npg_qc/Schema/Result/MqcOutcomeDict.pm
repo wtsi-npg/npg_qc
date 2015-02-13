@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<mqc_outcome_dict>
 
@@ -140,8 +138,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-05 17:00:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:sEw0vDs0wFvwtoByLd4huA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:53:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AnE0fpm6ByqDGqlRS6/1nA
 
 our $VERSION = '0';
 

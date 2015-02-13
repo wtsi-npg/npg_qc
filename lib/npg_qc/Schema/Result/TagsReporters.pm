@@ -207,8 +207,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::tags_reporters';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:54:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2+uV9mE9oDhwryJ2NFw7wA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:q2f7BBiAQ7LUIP82QanKuw
 
 __PACKAGE__->set_flators4non_scalar(qw( tag_list amp_rows tag_totals tag_totals_pct info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

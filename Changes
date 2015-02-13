@@ -3,6 +3,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - in order to be able to retrieve values of foreigh keys without
      fetching the row in the parent table, DBIx classes generated with
      an option to drop id_ at the start of the relation name
+ - InflateColumn::Serializer component added selectively to autoqc classes
+     rather than to all classes
  - mqc models (DBIx) functionality extended to create a method for
    updating/creating outcomes
  - column name fixed in the mqc_outcome_hist table
