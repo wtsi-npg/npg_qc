@@ -198,8 +198,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::tag_decode_stats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:54:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oBuAtRaMJHLVT1FK3yM8Fg
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:3nGR+f0aOsgqMIAQME/dpw
 
 __PACKAGE__->set_flators4non_scalar(qw( tag_code distribution_all distribution_good errors_good errors_all info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

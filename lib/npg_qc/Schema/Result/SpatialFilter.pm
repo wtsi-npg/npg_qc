@@ -152,8 +152,8 @@ __PACKAGE__->add_unique_constraint('unq_run_lane_spatial_filter', ['id_run', 'po
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-20 12:40:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KsGPW/51IgqeKieTje0D0w
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:QWNOWQUuqZv+hV5mcy48DA
 
 __PACKAGE__->set_flators4non_scalar(qw( info ));
 

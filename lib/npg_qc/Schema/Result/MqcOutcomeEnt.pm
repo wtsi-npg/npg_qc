@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<mqc_outcome_ent>
 
@@ -159,7 +157,6 @@ __PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position']);
 
 =head1 RELATIONS
 
-
 =head2 mqc_outcome
 
 Type: belongs_to
@@ -176,8 +173,11 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-09 11:21:42
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:7UWlCHPyTLNXd2cG6VlR0w
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Xd2+0GqCgzB6Ds2Eusep6Q
+
+
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 
 our $VERSION = '0';
 
@@ -279,6 +279,7 @@ sub _valid_outcome {
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
+
 
 =head1 SYNOPSIS
 
