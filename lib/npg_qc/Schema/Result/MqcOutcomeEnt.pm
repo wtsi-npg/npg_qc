@@ -183,10 +183,14 @@ our $VERSION = '0';
 
 use MooseX::Params::Validate;
 use Carp;
+use DateTime;
+use DateTime::TimeZone;
+
 
 around 'update' => sub {
   my $orig = shift;
   my $self = shift;
+  $self->last_modified($self->_get_time_now);
   my $return_super = $self->$orig(@_);
 
   $self->_create_historic();
@@ -196,6 +200,7 @@ around 'update' => sub {
 around 'insert' => sub {
   my $orig = shift;
   my $self = shift;
+  $self->last_modified($self->_get_time_now);
   my $return_super = $self->$orig(@_);
 
   $self->_create_historic();
