@@ -145,19 +145,9 @@ __PACKAGE__->has_many(
 
 our $VERSION = '0';
 
-=head1 Methods
-
-=head2 is_final_outcome Utility method to check if the outcome is considered final.
-
-=cut
-
 sub is_final_outcome {
   my $self = shift;
-  if($self->short_desc =~ m{final}ism) { #The short description includes the word final.
-    return 1;
-  } else {
-    return 0;
-  }
+  return $self->short_desc =~ m{final}ism; #The short description includes the word final.
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -175,6 +165,12 @@ Catalog for manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 is_final_outcome
+
+Utility method to check if the outcome is considered final.
+
+=cut
 
 =head1 DEPENDENCIES
 
@@ -208,7 +204,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Jaime Tovar
+Copyright (C) 2015 GRL Genome Research Limited
 
 This file is part of NPG.
 

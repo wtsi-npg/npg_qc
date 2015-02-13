@@ -1,19 +1,24 @@
 use strict;
 use warnings;
-use Test::More tests => 1;
-use Test::Exception;
-use Test::Deep;
-use JSON;
+use Test::More tests => 7;
 use Moose::Meta::Class;
 use npg_testing::db;
 
-#Test model mapping
-use_ok('npg_qc::Schema::Result::MqcOutcomeDict', "Model check");
+use_ok('npg_qc::Schema::Result::MqcOutcomeDict');
 
-#my $schema = Moose::Meta::Class->create_anon_class(
-#          roles => [qw/npg_testing::db/])
-#          ->new_object({})->create_test_db(q[npg_qc::Schema]);
+my $schema = Moose::Meta::Class->create_anon_class(
+          roles => [qw/npg_testing::db/])
+          ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures', ':memory:');
 
-#my $table = 'MqcOutcomeDict';
+my $table = 'MqcOutcomeDict';
+my $final = ['Accepted final', 'Rejected final'];
+my @rows = $schema->resultset($table)->search({short_desc => {'-in', $final}})->all();
+is (scalar @rows, 2, 'two final outcomes');
+ok ($rows[0]->is_final_outcome, 'final outcome check returns true');
+ok ($rows[1]->is_final_outcome, 'final outcome check returns true');
+@rows = $schema->resultset($table)->search({short_desc => {'-not_in', $final}})->all();
+is (scalar @rows, 2, 'two non-final outcomes');
+ok (!$rows[0]->is_final_outcome, 'final outcome check returns false');
+ok (!$rows[1]->is_final_outcome, 'final outcome check returns false');
 
 1;

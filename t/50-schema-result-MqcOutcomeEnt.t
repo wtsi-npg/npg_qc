@@ -1,19 +1,17 @@
 use strict;
 use warnings;
-use Test::More tests => 31;
+use Test::More tests => 35;
 use Test::Exception;
-use Test::Deep;
-use JSON;
 use Moose::Meta::Class;
 use npg_testing::db;
 use DateTime;
 
 #Test model mapping
-use_ok('npg_qc::Schema::Result::MqcOutcomeEnt', "Model check");
+use_ok('npg_qc::Schema::Result::MqcOutcomeEnt');
 
 my $schema = Moose::Meta::Class->create_anon_class(
            roles => [qw/npg_testing::db/])
-           ->new_object({})->create_test_db(q[npg_qc::Schema], "t/data/fixtures");
+           ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures', ':memory:');
 
 my $table = 'MqcOutcomeEnt';
 my $hist_table = 'MqcOutcomeHist';
@@ -162,7 +160,7 @@ my $dict_table = 'MqcOutcomeDict';
   ##### Running the test
   my $id_run = 210;
   my $position = 1;
-  my $status = 2;
+  my $status = 'Rejected preliminary';
   my $username = 'randomuser';
   
   $values = {'id_run' => $id_run, 'position' => $position};
@@ -172,6 +170,20 @@ my $dict_table = 'MqcOutcomeDict';
   
   $rs = $schema->resultset($table)->search({'id_run'=>210, 'position'=>1, 'id_mqc_outcome'=>2});
   is ($rs->count, 1, q[One row matches in the entity table after outcome update]);
+
+  throws_ok {$object->update_outcome({'outcome' => 'some invalid', 'username' => $username})}
+    qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"some invalid\"/,
+    'error updating to invalid string status';
+  throws_ok {$object->update_outcome({'outcome' => 123, 'username' => $username})}
+    qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"123\"/,
+    'error updating to invalid integer status';
+  throws_ok {$object->update_outcome({'outcome' => $status, 'username' => 789})}
+    qr/Have a number 789 instead as username/, 'username can be an integer';
+  #  lives_ok {$object->update_outcome({'outcome' => $status, 'username' => [1,2]})}
+  #    qr/gjhgdhg/, 'username canno tbe an array';
+  throws_ok {$object->update_outcome({'outcome' => $status})}
+    qr/Mandatory parameter 'username' missing in call/,
+    'username shoudl be given';
 }
 
 #Test update existing status of entity and store
@@ -203,8 +215,6 @@ my $dict_table = 'MqcOutcomeDict';
   my $status = 4;
   my $username = 'randomuser';
   
-#  npg_qc::Schema::Result::MqcOutcomeEnt->is_valid_transition();
-  
   $values = {'id_run' => $id_run, 'position' => $position};
   
   $object = $schema->resultset($table)->find_or_new($values);
@@ -214,9 +224,5 @@ my $dict_table = 'MqcOutcomeDict';
   $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
 }
-
-#Test trying invalid outcome change.
-
-#__PACKAGE__->meta->make_immutable;
 
 1;

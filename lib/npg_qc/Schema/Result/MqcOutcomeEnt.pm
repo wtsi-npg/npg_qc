@@ -184,25 +184,6 @@ our $VERSION = '0';
 use MooseX::Params::Validate;
 use Carp;
 
-=head1 Methods
-
-=cut
-
-#Create and saver historic from the entity current data.
-sub _create_historic {
-  my $self = shift;
-  my $rs = $self->result_source->schema->resultset('MqcOutcomeHist');
-  my $historic = $rs->create({id_run => $self->id_run,
-    position => $self->position,
-    id_mqc_outcome => $self->id_mqc_outcome,
-    username => $self->username,
-    last_modified => $self->last_modified});
-
-  return 1;
-}
-
-
-#Updates and inserts an historic
 around 'update' => sub {
   my $orig = shift;
   my $self = shift;
@@ -212,7 +193,6 @@ around 'update' => sub {
   return $return_super;
 };
 
-#Inserts and inserts an historic
 around 'insert' => sub {
   my $orig = shift;
   my $self = shift;
@@ -222,63 +202,78 @@ around 'insert' => sub {
   return $return_super;
 };
 
-=head2 update_outcome ($outcome, $username) Updates the outcome of the entity with values provided.
-
-=cut
 
 sub update_outcome {
   my @parameters = @_;
 
   my ( $self, %params ) = validated_hash(
     \@parameters,
-    'outcome'  => {is_a => 'Int'},
+    'outcome'  => {is_a => 'Int|Str'},
     'username' => {is_a => 'Str'}
   );
-
-  if($self->_is_valid_outcome('outcome' => $params{'outcome'})) { # The new outcome is a valid one
+  my $username = $params{username};
+  if ($username =~ /^\d+$/smx) {
+    croak "Have a number $username instead as username";
+  }
+  my $outcome = $params{'outcome'};
+  my $outcome_dict_obj = $self->_valid_outcome($outcome);
+  if($outcome_dict_obj) { # The new outcome is a valid one
+    my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
     #There is a row that matches the id_run and position
     if ($self->in_storage) {
       #Check if previous outcome is not final
       if($self->mqc_outcome->is_final_outcome) {
-        #Trying an invalid transition, throw exception
-        croak('Error while trying to update a final outcome.');
+        croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i',
+              $self->id_run, $self->position);
       } else { #Update
-        $self->update({'id_mqc_outcome' => $params{'outcome'}, 'username' => $params{'username'}});
+        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $params{'username'}});
       }
     } else { #Is a new row just insert.      
-      $self->id_mqc_outcome($params{outcome});
+      $self->id_mqc_outcome($outcome_id);
       $self->user($params{username});
       $self->insert();
     }
   } else {
-    croak('Error while trying to transit to a non-existing outcome.');
+    croak(sprintf 'Error while trying to transit id_run %i position %i to a non-existing outcome "%s".',
+          $self->id_run, $self->position, $outcome);
   }
   return 1;
 }
 
-=head2 has_final_outcome Utility method as a proxy to the dictionary method.
-
-=cut
 sub has_final_outcome {
   my $self = shift;
+  return $self->mqc_outcome->is_final_outcome;
+}
 
-  if(!$self->mqc_outcome->is_final_outcome) {
-    return 0;
-  }
+#Create and save historic from the entity current data.
+sub _create_historic {
+  my $self = shift;
+  my $rs = $self->result_source->schema->resultset('MqcOutcomeHist');
+  my $historic = $rs->create({
+    id_run         => $self->id_run,
+    position       => $self->position,
+    id_mqc_outcome => $self->id_mqc_outcome,
+    username       => $self->username,
+    last_modified  => $self->last_modified});
+
   return 1;
 }
 
-#Check if an outcome actually exists in the database.
-sub _is_valid_outcome {
-  my @parameters = @_;
+#Fetches valid outcome object from the database.
+sub _valid_outcome {
+  my ($self, $outcome) = @_;
 
-  my ( $self, %params ) = validated_hash(
-    \@parameters,
-    'outcome'  => {is_a => 'Int'}
-  );
-
-  my $outcome_dict = $self->result_source->schema->resultset('MqcOutcomeDict')->find($params{outcome});
-  return defined $outcome_dict;
+  my $rs = $self->result_source->schema->resultset('MqcOutcomeDict');
+  my $outcome_dict;
+  if ($outcome =~ /\d+/xms) {
+    $outcome_dict = $rs->find($outcome);
+  } else {
+    $outcome_dict = $rs->search({short_desc => $outcome})->next;
+  }
+  if ((defined $outcome_dict) && $outcome_dict->iscurrent) {
+    return $outcome_dict;
+  }
+  return;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -296,6 +291,26 @@ Catalog for manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 update_outcome
+
+  Updates the outcome of the entity with values provided.
+
+  $obj->($outcome, $username)
+
+=head2 has_final_outcome
+
+  Returns true id this entry corresponds to a final outcome, otherwise returns false.
+
+=head2 update
+
+  Default DBIx update method extended to create an entry in the table corresponding to 
+  the MqcOutcomeHist class
+
+=head2 insert
+
+  Default DBIx insert method extended to create an entry in the table corresponding to 
+  the MqcOutcomeHist class
 
 =head1 DEPENDENCIES
 
@@ -329,7 +344,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Jaime Tovar
+Copyright (C) 2015 GRL Genome Research Limited
 
 This file is part of NPG.
 
