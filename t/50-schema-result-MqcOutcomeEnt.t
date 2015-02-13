@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 35;
+use Test::More tests => 36;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -116,7 +116,6 @@ my $dict_table = 'MqcOutcomeDict';
   my $values = {'id_run' => $id_run, 'position' => $position};
   
   my $object = $schema->resultset($table)->find_or_new($values);
-  #TODO validate new status exists.
   $object->last_modified(DateTime->now());
   my $in = $object->in_storage; #Row status from database
   if($in) { #Entity exists
@@ -222,6 +221,10 @@ my $dict_table = 'MqcOutcomeDict';
   throws_ok { $object->update_outcome({'outcome' => $status, 'username' => $username}) } qr/update a final outcome/, 'Invalid outcome transition croak';
   
   $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
+  is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
+  
+  $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
+  $rs = $rs->search({'has_final_outcome' => 1});
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
 }
 
