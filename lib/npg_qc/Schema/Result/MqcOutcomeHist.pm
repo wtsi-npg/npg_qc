@@ -198,7 +198,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Jaime Tovar
+Copyright (C) 2015 GRL Genoem Research Limited
 
 This file is part of NPG.
 
