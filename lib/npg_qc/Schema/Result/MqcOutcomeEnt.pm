@@ -180,11 +180,13 @@ __PACKAGE__->belongs_to(
 
 our $VERSION = '0';
 
-use MooseX::Params::Validate;
 use Carp;
 use DateTime;
 use DateTime::TimeZone;
 
+sub _get_time_now {
+  return DateTime->now(time_zone=> DateTime::TimeZone->new(name => q[local]));
+}
 
 around 'update' => sub {
   my $orig = shift;
@@ -206,20 +208,19 @@ around 'insert' => sub {
   return $return_super;
 };
 
-
 sub update_outcome {
-  my @parameters = @_;
-
-  my ( $self, %params ) = validated_hash(
-    \@parameters,
-    'outcome'  => {is_a => 'Int|Str'},
-    'username' => {is_a => 'Str'}
-  );
-  my $username = $params{username};
+  my $self = shift;
+  my $outcome = shift;
+  my $username = shift;
+  if(!defined $outcome){
+    croak "Mandatory parameter 'outcome' missing in call";
+  }
+  if(!defined $username){
+    croak "Mandatory parameter 'username' missing in call";
+  }
   if ($username =~ /^\d+$/smx) {
     croak "Have a number $username instead as username";
   }
-  my $outcome = $params{'outcome'};
   my $outcome_dict_obj = $self->_valid_outcome($outcome);
   if($outcome_dict_obj) { # The new outcome is a valid one
     my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
@@ -230,11 +231,11 @@ sub update_outcome {
         croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i',
               $self->id_run, $self->position);
       } else { #Update
-        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $params{'username'}});
+        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username});
       }
     } else { #Is a new row just insert.      
       $self->id_mqc_outcome($outcome_id);
-      $self->user($params{username});
+      $self->user($username);
       $self->insert();
     }
   } else {
@@ -278,6 +279,11 @@ sub _valid_outcome {
     return $outcome_dict;
   }
   return;
+}
+
+sub update_reported {
+  my $self = shift;
+  return $self->update({'reported' => $self->_get_time_now});
 }
 
 __PACKAGE__->meta->make_immutable;

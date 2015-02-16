@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 36;
+use Test::More tests => 37;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -36,22 +36,28 @@ my $dict_table = 'MqcOutcomeDict';
 {
   my $values = {'id_run'=>10, 
     'position'=>1,
-    'id_mqc_outcome'=>0, 
+    'id_mqc_outcome'=>1, 
     'username'=>'user', 
     'last_modified'=>DateTime->now()};
 
-  my $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>0}); #Search historic that matches latest change
+  my $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>1}); #Search historic that matches latest change
   is ($hist_object_rs->count, 0, q[no row matches in the historic table before insert in entity]);
 
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
 
-  my $rs = $schema->resultset($table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>0});
+  my $rs = $schema->resultset($table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>1});
   is ($rs->count, 1, q[one row created in the entity table]);
   
-  $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>0}); #Search historic that matches latest change
+  $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>1}); #Search historic that matches latest change
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after insert in entity]);
 }
+
+#{
+#  $obj = npg_qc::Schema::Result::MqcOutcome->new();
+#  my $all = $obj->get_ready_to_report();
+#  is($all->count, 0, q[There are no entities ready to report]);
+#}
 
 #Test select
 {
@@ -165,24 +171,25 @@ my $dict_table = 'MqcOutcomeDict';
   $values = {'id_run' => $id_run, 'position' => $position};
   
   $object = $schema->resultset($table)->find_or_new($values);
-  $object->update_outcome({'outcome' => $status, 'username' => $username});
+  $object->update_outcome($status, $username);
   
   $rs = $schema->resultset($table)->search({'id_run'=>210, 'position'=>1, 'id_mqc_outcome'=>2});
   is ($rs->count, 1, q[One row matches in the entity table after outcome update]);
 
-  throws_ok {$object->update_outcome({'outcome' => 'some invalid', 'username' => $username})}
+  throws_ok {$object->update_outcome('some invalid', $username)}
     qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"some invalid\"/,
     'error updating to invalid string status';
-  throws_ok {$object->update_outcome({'outcome' => 123, 'username' => $username})}
+  throws_ok {$object->update_outcome(123, $username)}
     qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"123\"/,
     'error updating to invalid integer status';
-  throws_ok {$object->update_outcome({'outcome' => $status, 'username' => 789})}
+  throws_ok {$object->update_outcome($status, 789)}
     qr/Have a number 789 instead as username/, 'username can be an integer';
-  #  lives_ok {$object->update_outcome({'outcome' => $status, 'username' => [1,2]})}
-  #    qr/gjhgdhg/, 'username canno tbe an array';
-  throws_ok {$object->update_outcome({'outcome' => $status})}
+  throws_ok {$object->update_outcome($status)}
     qr/Mandatory parameter 'username' missing in call/,
-    'username shoudl be given';
+    'username should be given';
+  throws_ok {$object->update_outcome()}
+    qr/Mandatory parameter 'outcome' missing in call/,
+    'outcome should be given';
 }
 
 #Test update existing status of entity and store
@@ -218,13 +225,12 @@ my $dict_table = 'MqcOutcomeDict';
   
   $object = $schema->resultset($table)->find_or_new($values);
   my $in = $object->in_storage; #Row status from database
-  throws_ok { $object->update_outcome({'outcome' => $status, 'username' => $username}) } qr/update a final outcome/, 'Invalid outcome transition croak';
+  throws_ok { $object->update_outcome($status, $username) } qr/update a final outcome/, 'Invalid outcome transition croak';
   
   $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
   
   $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
-  $rs = $rs->search({'has_final_outcome' => 1});
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
 }
 
