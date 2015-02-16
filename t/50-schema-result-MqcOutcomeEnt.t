@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 37;
+use Test::More tests => 39;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -24,7 +24,7 @@ my $dict_table = 'MqcOutcomeDict';
     'id_mqc_outcome'=>0, 
     'username'=>'user', 
     'last_modified'=>DateTime->now()};
-
+    
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
 
@@ -53,11 +53,10 @@ my $dict_table = 'MqcOutcomeDict';
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after insert in entity]);
 }
 
-#{
-#  $obj = npg_qc::Schema::Result::MqcOutcome->new();
-#  my $all = $obj->get_ready_to_report();
-#  is($all->count, 0, q[There are no entities ready to report]);
-#}
+{ 
+  my $all = $schema->resultset($table)->get_ready_to_report();
+  is($all->count, 0, q[There are no entities ready to report]);
+}
 
 #Test select
 {
@@ -110,6 +109,10 @@ my $dict_table = 'MqcOutcomeDict';
   #The historic should be generated automatically and saved
   $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3}); #Search historic that matches latest change
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after update in entity]);
+  
+  #Test there is one record ready to be reported (final outcome and null reported)
+  my $all = $schema->resultset($table)->get_ready_to_report();
+  is($all->count, 1, q[There is one entity ready to be reported]);
 }
 
 #Test update (create) status of new entity and store
@@ -165,7 +168,7 @@ my $dict_table = 'MqcOutcomeDict';
   ##### Running the test
   my $id_run = 210;
   my $position = 1;
-  my $status = 'Rejected preliminary';
+  my $status = 'Rejected final';
   my $username = 'randomuser';
   
   $values = {'id_run' => $id_run, 'position' => $position};
@@ -173,7 +176,7 @@ my $dict_table = 'MqcOutcomeDict';
   $object = $schema->resultset($table)->find_or_new($values);
   $object->update_outcome($status, $username);
   
-  $rs = $schema->resultset($table)->search({'id_run'=>210, 'position'=>1, 'id_mqc_outcome'=>2});
+  $rs = $schema->resultset($table)->search({'id_run'=>210, 'position'=>1, 'id_mqc_outcome'=>4});
   is ($rs->count, 1, q[One row matches in the entity table after outcome update]);
 
   throws_ok {$object->update_outcome('some invalid', $username)}
@@ -208,7 +211,7 @@ my $dict_table = 'MqcOutcomeDict';
   my $outcome_dict = $schema->resultset($dict_table)->find(3);
   ok(defined $outcome_dict, q[The dictionary is defined for outcome]);
   is($outcome_dict->id_mqc_outcome, 3, q[The dictionary object has correct value for key]);
-
+  
   my $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
   is ($rs->count, 1, q[one row created in the table]);
   $object = $rs->next();

@@ -312,6 +312,10 @@ Catalog for manual MQC statuses.
 
   Returns true id this entry corresponds to a final outcome, otherwise returns false.
 
+=head2 update_reported
+
+  Updates the value of reported to the current timestamp.
+
 =head2 update
 
   Default DBIx update method extended to create an entry in the table corresponding to 
@@ -350,7 +354,7 @@ Catalog for manual MQC statuses.
 
 =head1 AUTHOR
 
-Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
+Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
