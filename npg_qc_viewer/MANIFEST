@@ -15,8 +15,8 @@ lib/npg_qc_viewer/Model/GenotypeCheck.pm
 lib/npg_qc_viewer/Model/NpgDB.pm
 lib/npg_qc_viewer/Model/NpgQcDB.pm
 lib/npg_qc_viewer/Model/SeqStore.pm
-lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
 lib/npg_qc_viewer/Model/WarehouseDB.pm
+lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
 lib/npg_qc_viewer.pm
 lib/npg_qc_viewer/View/TT.pm
 MANIFEST
@@ -28,11 +28,7 @@ root/src/about_qc_checks.tt2
 root/src/about.tt2
 root/src/error_page.tt2
 root/src/urls.tt2
-root/src/list/libraries.tt2
-root/src/list/people.tt2
 root/src/list/runs.tt2
-root/src/list/samples.tt2
-root/src/list/studies.tt2
 root/src/qsea_wrapper.tt2
 root/src/ui_checks/adapter.tt2
 root/src/ui_checks/alignment_filter_metrics.tt2
@@ -103,8 +99,8 @@ t/20-model-NpgDB-annotations.t
 t/20-model-NpgDB-manual_qc.t
 t/20-model-NpgQcDB.t
 t/20-model-SeqStore.t
-t/20-model-visuals-Fastqcheck.t
 t/20-model-WarehouseDB.t
+t/20-model-visuals-Fastqcheck.t
 t/30-model-visuals-Fastqcheck.t
 t/40-controller-AjaxProxy_no_conf.t
 t/40-controller-AjaxProxy.t
@@ -129,15 +125,11 @@ t/50-template-ui_lanes-library_lanes.t
 t/70-view_TT.t
 t/80-app-fastqcheck.t
 t/80-app-help.t
-t/80-app-libraries.t
 t/80-app-library.t
-t/80-app-people.t
 t/80-app-runs.t
 t/80-app-run-stash.t
 t/80-app-run.t
-t/80-app-samples.t
 t/80-app-sample.t
-t/80-app-studies.t
 t/80-app-study.t
 t/80-app.t
 t/data/fixtures/npg/000-EntityType.yml

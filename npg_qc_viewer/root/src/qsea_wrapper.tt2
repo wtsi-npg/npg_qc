@@ -25,13 +25,7 @@
   <div id="tab_bar">
     <div id="tabs">
       <ul>
-        <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('week')) %]">Last Week</a></li>
-        <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('weeks'), 2) %]">Last Fortnight</a></li>
         <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs')) %]">Runs</a></li>
-        <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries')) %]">Libraries</a></li>
-        <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('samples')) %]">Samples</a></li>
-        <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('studies')) %]">Studies</a></li>
-        <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('library_creators')) %]">People</a></li>
         <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('index')) %]">Help</a></li>
         <li><a href="[% npg_url %]">NPG Tracking</a></li>
         <li><a href="[%  npg_url %]_qc">NPG QC</a></li>
