@@ -45,6 +45,10 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 BUILDARGS
+
+  Calling parent constructor.
+
 =head2 get_not_reported
 
   Returns a list of entities with a null reported timestamp.
