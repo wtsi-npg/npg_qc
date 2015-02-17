@@ -343,6 +343,28 @@ Catalog for manual MQC statuses.
 
 =item DBIx::Class::Core
 
+=item Carp
+
+=item DateTime
+
+=item DateTime::TimeZone
+
+=back
+
+=over
+
+=item strict
+
+=item warnings
+
+=item Moose
+
+=item MooseX::NonMoose
+
+=item MooseX::MarkAsMethods
+
+=item DBIx::Class::Core
+
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
