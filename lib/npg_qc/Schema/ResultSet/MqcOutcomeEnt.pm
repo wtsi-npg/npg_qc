@@ -7,21 +7,25 @@ extends 'DBIx::Class::ResultSet';
 
 our $VERSION = '0';
 
-sub BUILDARGS { $_[2] } # ::RS::new() expects my ($class, $rsrc, $args) = @_
+sub BUILDARGS {
+  my ($class, $rsrc, $args) = @_;
+  return $args;
+} # ::RS::new() expects my ($class, $rsrc, $args) = @_
 
 sub get_not_reported {
   my $self = shift;
-  $self->search({$self->current_source_alias . '.reported' => undef});
+  return $self->search({$self->current_source_alias . '.reported' => undef});
 }
 
 sub get_rows_with_final_outcome {
   my $self = shift;
-  $self->search({$self->current_source_alias . '.id_mqc_outcome' => [3,4]}); #TODO change final outcome
+  #Final outcome comes from the short_desc of the relationship with the dictionary
+  return $self->search_related('mqc_outcome', {short_desc => {like => '%final'}});
 }
 
 sub get_ready_to_report{
   my $self = shift;
-  $self->get_not_reported->get_rows_with_final_outcome;  
+  return $self->get_not_reported->get_rows_with_final_outcome;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -40,6 +44,14 @@ Extended ResultSet with specific functionality for for manual MQC.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 get_not_reported
+
+  Returns a list of entities with a null reported timestamp.
+
+=head2 get_rows_with_final_outcome
+
+  Returns a list of entities with final outcomes acording to business rules. Currently it looks into the relationship with the dictionary to find those outcomes with a short description ending in 'final'.
 
 =head2 get_ready_to_report
 

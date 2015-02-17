@@ -213,10 +213,10 @@ sub update_outcome {
   my $outcome = shift;
   my $username = shift;
   if(!defined $outcome){
-    croak "Mandatory parameter 'outcome' missing in call";
+    croak q[Mandatory parameter 'outcome' missing in call];
   }
   if(!defined $username){
-    croak "Mandatory parameter 'username' missing in call";
+    croak q[Mandatory parameter 'username' missing in call];
   }
   if ($username =~ /^\d+$/smx) {
     croak "Have a number $username instead as username";
