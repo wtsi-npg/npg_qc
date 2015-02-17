@@ -351,26 +351,6 @@ Catalog for manual MQC statuses.
 
 =back
 
-=over
-
-=item strict
-
-=item warnings
-
-=item Moose
-
-=item MooseX::NonMoose
-
-=item MooseX::MarkAsMethods
-
-=item DBIx::Class::Core
-
-=item DBIx::Class::InflateColumn::DateTime
-
-=item DBIx::Class::InflateColumn::Serializer
-
-=back
-
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
