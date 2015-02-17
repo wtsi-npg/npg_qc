@@ -264,6 +264,7 @@ lib/npg_qc/Schema/Result/TagsReporters.pm
 lib/npg_qc/Schema/Result/TileScore.pm
 lib/npg_qc/Schema/Result/UpstreamTags.pm
 lib/npg_qc/Schema/Result/VerifyBamId.pm
+lib/npg_qc/Schema/ResultSet/MqcOutcomeEnt.pm
 lib/npg_qc/util.pm
 lib/npg_qc/utils/bam_genotype.pm
 lib/npg_qc/utils/iRODS.pm
