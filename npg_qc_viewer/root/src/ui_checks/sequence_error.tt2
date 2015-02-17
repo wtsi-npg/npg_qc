@@ -106,7 +106,7 @@
      data-height=350>
 </div>
 [% IF has_reverse %]
-<div style='float:right;margin-right:20px;'- 
+<div style='float:right;margin-right:20px;'
      class='bcviz_mismatch' 
      data-check='[% check.json | replace("'", "%27") %]' 
      data-direction='reverse' 
