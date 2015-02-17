@@ -98,6 +98,7 @@ my $extended_requires = {
                 'DBI'                             => '1.608',
                 'DBIx::Class'                     => 0,
                 'DBIx::Class::InflateColumn::Serializer' => 0,
+                'DBIx::Class::ResultSet'          => 0,
                 'Digest::MD5'                     => 0,
                 'Exporter'                        => '5.63',
                 'Fatal'                           => 0,

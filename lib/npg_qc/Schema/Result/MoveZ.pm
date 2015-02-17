@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<move_z>
 
@@ -156,7 +154,7 @@ __PACKAGE__->add_unique_constraint('unq_idx_movez_rt_cycle', ['id_run_tile', 'cy
 
 =head1 RELATIONS
 
-=head2 id_run_tile
+=head2 run_tile
 
 Type: belongs_to
 
@@ -165,15 +163,15 @@ Related object: L<npg_qc::Schema::Result::RunTile>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_run_tile',
+  'run_tile',
   'npg_qc::Schema::Result::RunTile',
   { id_run_tile => 'id_run_tile' },
   { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2e6Xe0zE85AhWF3a9yadXQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ryXBRqr0Fhb3f2oAGrJicg
 
 our $VERSION = '0';
 

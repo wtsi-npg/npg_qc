@@ -219,8 +219,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::gc_fraction';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:54:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:wbDwlebLNRlH9OypM0iKcw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:B0wwVHyJMI+3G3+2Z/nu7Q
 
 __PACKAGE__->set_flators4non_scalar(qw( info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

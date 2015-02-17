@@ -273,8 +273,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::tag_metrics';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:54:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:xyUHkxwNSWD8mnLk1zYWXQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BMeMuUfvD2O0Co1X8Dte0Q
 
 __PACKAGE__->set_flators4non_scalar(qw( tags reads_count reads_pf_count perfect_matches_count perfect_matches_pf_count one_mismatch_matches_count one_mismatch_matches_pf_count matches_percent matches_pf_percent info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
