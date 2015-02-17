@@ -283,7 +283,8 @@ sub _valid_outcome {
 
 sub update_reported {
   my $self = shift;
-  return $self->update({'reported' => $self->_get_time_now});
+  my $username = $ENV{'USER'} || 'mqc_reporter'; #Cron username or default username for the application.
+  return $self->update({'reported' => $self->_get_time_now, 'username'=>$username});
 }
 
 __PACKAGE__->meta->make_immutable;
