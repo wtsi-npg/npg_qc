@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 39;
+use Test::More tests => 40;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -232,9 +232,18 @@ my $dict_table = 'MqcOutcomeDict';
   
   $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
+}
+
+{
+  my $rs = $schema->resultset($table)->get_ready_to_report();
+  is ($rs->count, 3, q[3 entities ready to be reported]);
   
-  $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
-  is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
+  while (my $obj = $rs->next) {
+    $obj->update_reported();
+  }
+  
+  my $rs2 = $schema->resultset($table)->get_ready_to_report();
+  is ($rs2->count, 0, q[No entities to be reported]);
 }
 
 1;

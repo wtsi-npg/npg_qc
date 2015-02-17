@@ -20,7 +20,7 @@ sub get_not_reported {
 sub get_rows_with_final_outcome {
   my $self = shift;
   #Final outcome comes from the short_desc of the relationship with the dictionary
-  return $self->search_related('mqc_outcome', {short_desc => {like => '%final'}});
+  return $self->search({'mqc_outcome.short_desc' => {like => '%final'}}, {'join'=>'mqc_outcome'});
 }
 
 sub get_ready_to_report{
