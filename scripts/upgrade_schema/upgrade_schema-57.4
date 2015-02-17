@@ -1,0 +1,36 @@
+--
+-- Table structure for table `mqc_outcome_ent`
+--
+
+DROP TABLE IF EXISTS `mqc_outcome_ent`;
+CREATE TABLE `mqc_outcome_ent` (
+  `id_mqc_outcome_ent` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(3) unsigned NOT NULL COMMENT 'Lane',
+  `id_mqc_outcome` smallint(5) unsigned NOT NULL,
+  `username` char(128) DEFAULT NULL,
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `reported` timestamp NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
+  PRIMARY KEY (`id_mqc_outcome_ent`),
+  UNIQUE KEY `id_run_UNIQUE` (`id_run`,`position`),
+  KEY `fk_mqc_outcome_ent_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
+  CONSTRAINT `fk_mqc_outcome_ent_mqc_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB;
+
+--
+-- Table structure for table `mqc_outcome_hist`
+--
+
+DROP TABLE IF EXISTS `mqc_outcome_hist`;
+CREATE TABLE `mqc_outcome_hist` (
+  `id_mqc_outcome_hist` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(3) unsigned NOT NULL COMMENT 'Lane',
+  `id_mqc_outcome` smallint(5) unsigned NOT NULL,
+  `username` char(128) DEFAULT NULL,
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_mqc_outcome_hist`),
+  KEY `fk_mqc_outcome_hist_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
+  CONSTRAINT `fk_mqc_outcome_ent_mqc_outcome_dict10` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB;
+
