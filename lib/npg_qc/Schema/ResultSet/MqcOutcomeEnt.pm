@@ -54,7 +54,7 @@ Extended ResultSet with specific functionality for for manual MQC.
 
   Returns a list of entities with a null reported timestamp.
 
-=head2 get_rows_with_final_outcome
+=head2 get_rows_with_final_current_outcome
 
   Returns a list of entities with final outcomes acording to business rules. Currently it looks into the relationship with the dictionary to find those outcomes with a short description ending in 'final'.
 
