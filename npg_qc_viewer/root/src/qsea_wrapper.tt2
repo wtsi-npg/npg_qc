@@ -3,12 +3,6 @@
         PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-[% npg_url = 'http://npg.';
-   IF env_dev == 'dev';
-     npg_url = npg_url _ 'dev.';
-   END;
-   npg_url = npg_url _ 'sanger.ac.uk/perl/npg';
-%]
 <head>
   <title>[% title | html %]</title>
   <link href="/static/stylesheets/npg_seqqc.css" media="all" rel="stylesheet" type="text/css" />
@@ -22,16 +16,6 @@
     <span class="lfloat">[%- title | html -%]</span>
     <span class="rfloat">[% user = c.user; IF !user; user = c.authenticate({}); END; IF user; %]Logged in as [% user.username; ELSE %] Not logged in[% END %]</span>
   </h1>
-  <div id="tab_bar">
-    <div id="tabs">
-      <ul>
-        <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs')) %]">Runs</a></li>
-        <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('index')) %]">Help</a></li>
-        <li><a href="[% npg_url %]">NPG Tracking</a></li>
-        <li><a href="[%  npg_url %]_qc">NPG QC</a></li>
-      </ul>
-    </div>
-  </div>
 </div>
 [% content %]
 </body>

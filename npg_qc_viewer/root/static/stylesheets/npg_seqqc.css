@@ -107,41 +107,12 @@ a, a:link, a:visited, a:hover {
   display: inline;
 }
 
-/* main menu strip */
-#tab_bar {
-  background: #aad4f4; /* medium blue */
-  border-bottom: 1px solid #bbb;
-  min-height: 20px;
-}
-
-/* tabs */
-#tabs {
-  color: #31353d;  /* dark font */
-  float: left;
-  padding: 3px 0px 3px 0px;
-}
-
-#tabs a, div#tabs a:link, div#tabs a:visited {
-  color: #31353d;
-  padding: 1px 15px 3px 15px;
-  font-weight: bold;
-}
-
-#tabs a:hover {
-  background: #3e87b3;
-  color: #fff;
-}
-
-#tabs ul {
-  padding-top: 1px;
-}
-
 /*************** page-specific menu ******/
 
 #menu {
   position: fixed;
   right: 10px;
-  top  : 62px;
+  top  : 41px;
   width: 155px;
   height: 100%;
   margin-bottom: 10px;
