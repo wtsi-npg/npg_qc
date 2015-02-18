@@ -148,6 +148,16 @@ sub is_final_outcome {
   return $self->short_desc =~ m{final}ism; #The short description includes the word final.
 }
 
+sub is_accepted {
+  my $self = shift;
+  return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
+}
+
+sub is_final_accepted {
+  my $self = shift;
+  return $self->is_final_outcome && $self->is_accepted;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
@@ -166,7 +176,17 @@ Catalog for manual MQC statuses.
 
 =head2 is_final_outcome
 
-Utility method to check if the outcome is considered final.
+  Utility method to check if the outcome is considered final.
+
+=head2 is_accepted
+
+  Utility method which checks the short description to decide if the outcome can 
+  be considered accepted.
+  
+=head2 is_final_accepted
+
+  Utility method which checks the short description to decide if the outcome can 
+  be considered final and accepted.
 
 =cut
 
