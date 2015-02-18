@@ -322,6 +322,16 @@ Catalog for manual MQC statuses.
 =head2 has_final_outcome
 
   Returns true id this entry corresponds to a final outcome, otherwise returns false.
+  
+=head2 is_accepted
+
+  Returns the result of checking if the outcome is considered accepted. Delegates the 
+  check to L<npg_qc::Schema::Result::MqcOutcomeDict>
+  
+=head2 is_final_accepted
+
+  Returns the result of checking if the outcome is considered final and accepted. 
+  Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
 
 =head2 update_reported
 

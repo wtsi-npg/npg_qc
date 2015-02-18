@@ -177,7 +177,17 @@ Catalog for manual MQC statuses.
 
 =head2 is_final_outcome
 
-Utility method to check if the outcome is considered final.
+  Utility method to check if the outcome is considered final.
+
+=head2 is_accepted
+
+  Utility method which checks the short description to decide if the outcome can 
+  be considered accepted.
+  
+=head2 is_final_accepted
+
+  Utility method which checks the short description to decide if the outcome can 
+  be considered final and accepted.
 
 =cut
 
