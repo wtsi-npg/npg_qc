@@ -17,15 +17,16 @@ sub get_not_reported {
   return $self->search({$self->current_source_alias . '.reported' => undef});
 }
 
-sub get_rows_with_final_outcome {
+use Data::Dumper;
+sub get_rows_with_final_current_outcome {
   my $self = shift;
-  #Final outcome comes from the short_desc of the relationship with the dictionary
-  return $self->search({'mqc_outcome.short_desc' => {like => '%final'}}, {'join'=>'mqc_outcome'});
+  #Final outcome comes from the short_desc of the relationship with the dictionary, only those with current status
+  return $self->search({'mqc_outcome.short_desc' => {like => '%final'}, 'mqc_outcome.iscurrent' => 1}, {'join'=>'mqc_outcome'});
 }
 
 sub get_ready_to_report{
   my $self = shift;
-  return $self->get_not_reported->get_rows_with_final_outcome;
+  return $self->get_not_reported->get_rows_with_final_current_outcome;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -59,7 +60,7 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =head2 get_ready_to_report
 
-  Returns a list of MqcOutcomeEnt rows which are ready to be reported (have a final status but haven't been reported yet).
+  Returns a list of MqcOutcomeEnt rows which are ready to be reported (have a final status but haven't been reported yet and which have an outcome marked as current in the dictionary).
 
 =head1 DEPENDENCIES
 

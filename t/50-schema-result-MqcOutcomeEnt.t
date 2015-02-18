@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 40;
+use Test::More tests => 42;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -113,6 +113,9 @@ my $dict_table = 'MqcOutcomeDict';
   #Test there is one record ready to be reported (final outcome and null reported)
   my $all = $schema->resultset($table)->get_ready_to_report();
   is($all->count, 1, q[There is one entity ready to be reported]);
+  
+  #Test the entity has accepted outcome
+  ok($rs->next->is_accepted, q[The outcome is considered accepted.]);
 }
 
 #Test update (create) status of new entity and store
@@ -145,9 +148,9 @@ my $dict_table = 'MqcOutcomeDict';
 #Test update (existing) status of entity and store
 {
   ##### Setting up the entity and checking fk with dictionary
-  my $values = {'id_run'=>210, 
+  my $values = {'id_run'=>210,
     'position'       => 1,
-    'id_mqc_outcome' => 1, 
+    'id_mqc_outcome' => 1,
     'username'       => 'user', 
     'last_modified'  => DateTime->now()};
 
@@ -178,6 +181,9 @@ my $dict_table = 'MqcOutcomeDict';
   
   $rs = $schema->resultset($table)->search({'id_run'=>210, 'position'=>1, 'id_mqc_outcome'=>4});
   is ($rs->count, 1, q[One row matches in the entity table after outcome update]);
+  
+  #Test the entity has a non accepted outcome
+  ok(!$rs->next->is_accepted, q[The outcome is not considered accepted.]);
 
   throws_ok {$object->update_outcome('some invalid', $username)}
     qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"some invalid\"/,
