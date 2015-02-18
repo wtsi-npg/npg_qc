@@ -1,9 +1,5 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-release 57.5
- - mqc models (DBIx) functionality extended to encapsulate business logic
-     for mqc outcomes.
-
 release 57.4
  - in order to be able to retrieve values of foreign keys without
      fetching the row in the parent table, DBIx classes generated with
