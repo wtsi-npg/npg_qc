@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<signal_mean>
 
@@ -284,8 +282,8 @@ __PACKAGE__->set_primary_key('id_signal_mean');
 __PACKAGE__->add_unique_constraint('unq_idx', ['id_run', 'position', 'cycle']);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-03 10:59:16
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ukirkc2fKQWQgAyMfujJjw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8ZGUQ6UFDOaUVh+F8jTETQ
 
 our $VERSION = '0';
 

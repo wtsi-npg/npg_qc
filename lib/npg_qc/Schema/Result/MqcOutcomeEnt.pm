@@ -159,7 +159,7 @@ __PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position']);
 
 =head1 RELATIONS
 
-=head2 id_mqc_outcome
+=head2 mqc_outcome
 
 Type: belongs_to
 
@@ -168,17 +168,124 @@ Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_mqc_outcome',
+  'mqc_outcome',
   'npg_qc::Schema::Result::MqcOutcomeDict',
   { id_mqc_outcome => 'id_mqc_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:09:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:I+5g0awK/0u5Xh5FhMcL5w
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:54:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:IeVPqo19e5AiSNHxD0cTTQ
 
 our $VERSION = '0';
+
+use Carp;
+use DateTime;
+use DateTime::TimeZone;
+
+sub _get_time_now {
+  return DateTime->now(time_zone=> DateTime::TimeZone->new(name => q[local]));
+}
+
+around 'update' => sub {
+  my $orig = shift;
+  my $self = shift;
+  $self->last_modified($self->_get_time_now);
+  my $return_super = $self->$orig(@_);
+
+  $self->_create_historic();
+  return $return_super;
+};
+
+around 'insert' => sub {
+  my $orig = shift;
+  my $self = shift;
+  $self->last_modified($self->_get_time_now);
+  my $return_super = $self->$orig(@_);
+
+  $self->_create_historic();
+  return $return_super;
+};
+
+sub update_outcome {
+  my $self = shift;
+  my $outcome = shift;
+  my $username = shift;
+  if(!defined $outcome){
+    croak q[Mandatory parameter 'outcome' missing in call];
+  }
+  if(!defined $username){
+    croak q[Mandatory parameter 'username' missing in call];
+  }
+  if ($username =~ /^\d+$/smx) {
+    croak "Have a number $username instead as username";
+  }
+  my $outcome_dict_obj = $self->_valid_outcome($outcome);
+  if($outcome_dict_obj) { # The new outcome is a valid one
+    my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
+    #There is a row that matches the id_run and position
+    if ($self->in_storage) {
+      #Check if previous outcome is not final
+      if($self->mqc_outcome->is_final_outcome) {
+        croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i',
+              $self->id_run, $self->position);
+      } else { #Update
+        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username});
+      }
+    } else { #Is a new row just insert.      
+      $self->id_mqc_outcome($outcome_id);
+      $self->user($username);
+      $self->insert();
+    }
+  } else {
+    croak(sprintf 'Error while trying to transit id_run %i position %i to a non-existing outcome "%s".',
+          $self->id_run, $self->position, $outcome);
+  }
+  return 1;
+}
+
+sub has_final_outcome {
+  my $self = shift;
+  return $self->mqc_outcome->is_final_outcome;
+}
+
+#Create and save historic from the entity current data.
+sub _create_historic {
+  my $self = shift;
+  my $rs = $self->result_source->schema->resultset('MqcOutcomeHist');
+  my $historic = $rs->create({
+    id_run         => $self->id_run,
+    position       => $self->position,
+    id_mqc_outcome => $self->id_mqc_outcome,
+    username       => $self->username,
+    last_modified  => $self->last_modified});
+
+  return 1;
+}
+
+#Fetches valid outcome object from the database.
+sub _valid_outcome {
+  my ($self, $outcome) = @_;
+
+  my $rs = $self->result_source->schema->resultset('MqcOutcomeDict');
+  my $outcome_dict;
+  if ($outcome =~ /\d+/xms) {
+    $outcome_dict = $rs->find($outcome);
+  } else {
+    $outcome_dict = $rs->search({short_desc => $outcome})->next;
+  }
+  if ((defined $outcome_dict) && $outcome_dict->iscurrent) {
+    return $outcome_dict;
+  }
+  return;
+}
+
+sub update_reported {
+  my $self = shift;
+  my $username = $ENV{'USER'} || 'mqc_reporter'; #Cron username or default username for the application.
+  return $self->update({'reported' => $self->_get_time_now, 'username'=>$username});
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -196,6 +303,30 @@ Catalog for manual MQC statuses.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 update_outcome
+
+  Updates the outcome of the entity with values provided.
+
+  $obj->($outcome, $username)
+
+=head2 has_final_outcome
+
+  Returns true id this entry corresponds to a final outcome, otherwise returns false.
+
+=head2 update_reported
+
+  Updates the value of reported to the current timestamp.
+
+=head2 update
+
+  Default DBIx update method extended to create an entry in the table corresponding to 
+  the MqcOutcomeHist class
+
+=head2 insert
+
+  Default DBIx insert method extended to create an entry in the table corresponding to 
+  the MqcOutcomeHist class
+
 =head1 DEPENDENCIES
 
 =over
@@ -212,9 +343,11 @@ Catalog for manual MQC statuses.
 
 =item DBIx::Class::Core
 
-=item DBIx::Class::InflateColumn::DateTime
+=item Carp
 
-=item DBIx::Class::InflateColumn::Serializer
+=item DateTime
+
+=item DateTime::TimeZone
 
 =back
 
@@ -224,11 +357,11 @@ Catalog for manual MQC statuses.
 
 =head1 AUTHOR
 
-Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
+Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Jaime Tovar
+Copyright (C) 2015 GRL Genome Research Limited
 
 This file is part of NPG.
 

@@ -318,8 +318,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::sequence_error';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:54:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:tKYmqCXnIZGC9MB22/Ve0w
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:UTlIl4xuYHY3JEVabdx1Vg
 
 __PACKAGE__->set_flators4non_scalar(qw( forward_common_cigars quality_bin_values reverse_common_cigars info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

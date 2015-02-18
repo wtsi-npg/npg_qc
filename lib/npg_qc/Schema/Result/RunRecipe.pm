@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<run_recipe>
 
@@ -175,7 +173,7 @@ __PACKAGE__->add_unique_constraint('unq_idx_run', ['id_run']);
 
 =head1 RELATIONS
 
-=head2 id_recipe_file
+=head2 recipe_file
 
 Type: belongs_to
 
@@ -184,7 +182,7 @@ Related object: L<npg_qc::Schema::Result::RecipeFile>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_recipe_file',
+  'recipe_file',
   'npg_qc::Schema::Result::RecipeFile',
   { id_recipe_file => 'id_recipe_file' },
   {
@@ -196,8 +194,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-07 09:29:53
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2t85oMx7z0bhqvGV/bEU4Q
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:RntTGmd2qbbdXbsDpqRwgw
 
 our $VERSION = '0';
 

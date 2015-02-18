@@ -319,8 +319,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::insert_size';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-09-24 16:53:43
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:tRyHEBtonqAuzc/mxQ36OQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8jX4SQ0HB7Uq1SwrdIOn3w
 
 __PACKAGE__->set_flators4non_scalar(qw( bins expected_size filenames info norm_fit_modes ));
 __PACKAGE__->set_inflator4scalar('tag_index');

@@ -276,8 +276,8 @@ __PACKAGE__->has_many(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::split_stats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:54:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:S8JTQCkPV9XJPuoFqB2SGw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0saQDO+m+B+LfhK+9FiLrw
 
 __PACKAGE__->set_flators4non_scalar(qw( alignment_depth1 alignment_depth2 info ));
 __PACKAGE__->set_inflator4scalar('tag_index');

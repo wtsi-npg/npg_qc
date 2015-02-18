@@ -201,8 +201,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::contamination';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-21 10:03:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:S5wwfnhT1YmNn+O9Y6VMZg
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:/iF6AGem+cTIp5KDC0iCgA
 
 __PACKAGE__->set_flators4non_scalar(qw( genome_factor contaminant_count info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
