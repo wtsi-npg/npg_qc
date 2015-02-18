@@ -250,6 +250,16 @@ sub has_final_outcome {
   return $self->mqc_outcome->is_final_outcome;
 }
 
+sub is_accepted {
+  my $self = shift;
+  return $self->mqc_outcome->is_accepted;
+}
+
+sub is_final_accepted {
+  my $self = shift;
+  return $self->mqc_outcome->is_final_accepted;
+}
+
 #Create and save historic from the entity current data.
 sub _create_historic {
   my $self = shift;

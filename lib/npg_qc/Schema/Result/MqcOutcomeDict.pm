@@ -148,6 +148,17 @@ sub is_final_outcome {
   return $self->short_desc =~ m{final}ism; #The short description includes the word final.
 }
 
+sub is_accepted {
+  my $self = shift;
+  #TODO how to decide???
+  return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
+}
+
+sub is_final_accepted {
+  my $self = shift;
+  return $self->is_final_outcome && $self->is_accepted;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
