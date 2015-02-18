@@ -150,7 +150,6 @@ sub is_final_outcome {
 
 sub is_accepted {
   my $self = shift;
-  #TODO how to decide???
   return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
 }
 
