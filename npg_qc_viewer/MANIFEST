@@ -28,7 +28,6 @@ root/src/about_qc_checks.tt2
 root/src/about.tt2
 root/src/error_page.tt2
 root/src/urls.tt2
-root/src/list/runs.tt2
 root/src/qsea_wrapper.tt2
 root/src/ui_checks/adapter.tt2
 root/src/ui_checks/alignment_filter_metrics.tt2
@@ -52,7 +51,6 @@ root/src/ui_lanes/collapse_menu.tt2
 root/src/ui_lanes/lanes_total.tt2
 root/src/ui_lanes/lane.tt2
 root/src/ui_lanes/library_lanes.tt2
-root/src/ui_lanes/run_lane_menu.tt2
 root/src/ui_runs/annotations.tt2
 root/src/ui_runs/run_menu.tt2
 root/static/images/blue_collapse.png
@@ -126,7 +124,6 @@ t/70-view_TT.t
 t/80-app-fastqcheck.t
 t/80-app-help.t
 t/80-app-library.t
-t/80-app-runs.t
 t/80-app-run-stash.t
 t/80-app-run.t
 t/80-app-sample.t

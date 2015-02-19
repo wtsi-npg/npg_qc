@@ -30,7 +30,7 @@
 /*
 * Global variables
 */
-var st_uri = service_uri("st");
+var st_uri = service_uri();
 var base = "../..";
 var ajax_base = base + "/ajaxproxy?url=";
 var lib_ids;

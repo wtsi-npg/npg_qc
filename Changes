@@ -9,6 +9,13 @@ release 57.4
  - mqc models (DBIx) functionality extended to create a method for
    updating/creating outcomes
  - column name fixed in the mqc_outcome_hist table
+ - SeqQC viewer: top horizontal menu removed, Help link added to the menu on the right
+ - SeqQC viewer: NPG links point to correct production/dev servers
+ - SeqQC viewer: superfluous javascript code removed
+ - SeqQC viewer: checks/runs page removed
+ - SeqQC viewer: links to individual entities on the right removed
+ - SeqQC viewer: if results for one run only are displayed and the request was not explicitly
+     from staging or path, a link back to the run SeqQC page is displayed on the right
 
 release 57.3
  - SeqQC: removed pages that are not used any more (studies, samples, libraries,

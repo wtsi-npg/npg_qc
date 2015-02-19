@@ -38,45 +38,6 @@ __PACKAGE__->config(
     connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
-=head2 runs_list
-
-Result set with runs that should have qc checks available
-
-=cut
-sub runs_list {
-    my $self = shift;
-
-    my $QC_REVIEW_PENDING    = q{qc review pending};
-    my $QC_IN_PROGRESS       = q{qc in progress};
-    my $ARCHIVAL_PENDING     = q{archival pending};
-    my $ARCHIVAL_IN_PROGRESS = q{archival in progress};
-    my $ARCHIVAL_COMPLETE    = q{run archived};
-    my $QC_COMPLETE          = q{qc complete};
-
-    my @runs = ();
-
-    foreach my $status ($QC_REVIEW_PENDING, $QC_IN_PROGRESS, $ARCHIVAL_PENDING,
-                      $ARCHIVAL_IN_PROGRESS, $ARCHIVAL_COMPLETE,
-                      $QC_COMPLETE) {
-        my $temp =  $self->resultset('RunStatusDict')->search({description => $status});
-        push @runs, $self->resultset('RunStatus')->search(
-		     {
-                        'iscurrent' => 1,
-                        'id_run_status_dict' => {'IN', $temp->get_column('id_run_status_dict')->as_query},
-                     },
-		     {
-
-                        join => 'run',
-                        prefetch => 'run',
-                        order_by => { -desc => 'run.id_run' },
-		     },
-							 )->all();
-    }
-
-    return \@runs;
-}
-
-
 =head2 log_manual_qc_action
 
 Logs a new manual qc status to the database, flags the previous statuses for the same
