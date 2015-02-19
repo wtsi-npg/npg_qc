@@ -1,7 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Test::Exception;
+use Test::Deep;
 
 use npg_qc::autoqc::results::collection;
 
@@ -23,6 +24,12 @@ use_ok 'npg_qc_viewer::api::util';
   my $api_util = npg_qc_viewer::api::util->new();
   my $reconstructed = $api_util->rl_map2collection($rl_map);
   is ($reconstructed->size, $total, qq[$total results in the reconstructed collection]);
+
+  my @runs = $api_util->runs_from_rpt_keys([keys %{$rl_map}]);
+  is_deeply(\@runs, [4025], 'list of one run id');
+ 
+  @runs = $api_util->runs_from_rpt_keys(['5:1', '2:3:456', '4:6', '5:8', '2:4:89']);
+  is_deeply(\@runs, [2, 4, 5], 'sorted list of three run ids');
 }
 
 1;

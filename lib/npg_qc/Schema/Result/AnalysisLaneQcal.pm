@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<analysis_lane_qcal>
 
@@ -242,7 +240,7 @@ __PACKAGE__->set_primary_key('id_analysis_lane_qcal');
 
 =head1 RELATIONS
 
-=head2 id_analysis_lane
+=head2 analysis_lane
 
 Type: belongs_to
 
@@ -251,15 +249,15 @@ Related object: L<npg_qc::Schema::Result::AnalysisLane>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_analysis_lane',
+  'analysis_lane',
   'npg_qc::Schema::Result::AnalysisLane',
   { id_analysis_lane => 'id_analysis_lane' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9o+fRMKYiTq6L9wt7zUlHA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1BL90W7Qk4Fm//WLyWB/QQ
 
 our $VERSION = '0';
 

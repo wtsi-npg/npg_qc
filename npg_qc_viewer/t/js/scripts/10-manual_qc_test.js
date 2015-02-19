@@ -2,12 +2,9 @@
 
 module("npg_common.js");
 
-test("npg and st service URIs", function() {
-  expect(3);
-  npg_url = "http://npg.dev.sanger.ac.uk/perl/npg";
-  lims_api_url = "http://psd-dev.internal.sanger.ac.uk:6800";
-  equals( service_uri("npg"), npg_url, "npg uri" );
-  equals( service_uri("st"), lims_api_url, "psd uri" );
+test("st service URIs", function() {
+  expect(1);
+  lims_api_url = "http://psd.dev.sanger.ac.uk:6610";
   equals( service_uri(), lims_api_url, "psd uri, no arg" );
 });
 
@@ -15,7 +12,6 @@ test("base uri", function() {
   expect(1);
   equals(base_uri(), location.protocol + "//" + location.host, "base uri is correct");
 });
-
 
 module("manual_qc.js: updating library names from live service");
 

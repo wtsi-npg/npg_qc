@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<run_and_pair>
 
@@ -104,8 +102,8 @@ __PACKAGE__->set_primary_key('id_run_and_pair');
 __PACKAGE__->add_unique_constraint('unq_idx_runpair_idrun', ['id_run']);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-23 17:42:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cxBcdOaPr0n8L3hh+arvpg
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:IvaMcXq/dCoRgZpjIaa4lw
 
 our $VERSION = '0';
 

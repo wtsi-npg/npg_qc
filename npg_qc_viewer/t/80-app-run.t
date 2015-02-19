@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 67;
+use Test::More tests => 60;
 use Test::Exception;
 
 use Test::WWW::Mechanize::Catalyst;
@@ -23,6 +23,7 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   my $url = q[http://localhost/checks/runs/4025];
   $mech->get_ok($url);
   $mech->title_is(q[Results for run 4025 (current run status: qc complete)]);
+  $mech->content_contains('Back to Run 4025');
   $mech->content_contains(152);  # num cycles
   $mech->content_contains('B1267_Exp4 1'); #library name
   $mech->content_contains('run 4025 lane 1'); #side menu link
@@ -71,9 +72,6 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   $mech->content_contains('24plex_1000Genomes-B1-FIN-6.6.10'); #library name
   $mech->content_contains('run 4950 lane 1'); #side menu link
   $mech->content_lacks('run 4950 lane 2'); #side menu link
-  my @menu = ('Page Top', 
-              'run 4950 lane 1', 
-              '1');
 }
 
 {
@@ -81,40 +79,28 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   $mech->get_ok($url);
   $mech->title_is(q[Results (plexes) for runs 4950 lanes 1]);
   $mech->content_contains(224);  # num cycles
-  $mech->content_contains('run 4950 lane 1#0'); #side menu link
-  $mech->content_contains('run 4950 lane 1#1'); #side menu link
-  $mech->content_contains('run 4950 lane 1#20'); #side menu link
+  $mech->content_contains('Help'); #side menu link
   $mech->content_contains('HG00367-B 400398'); #library name
   $mech->content_contains('ATCACGTT'); #tag sequence
   $mech->content_contains('Tag'); #column name
   $mech->content_lacks('24plex_1000Genomes-B1-FIN-6.6.10'); #library name
   $mech->content_unlike(qr/run\ 4950\ lane\ 1$/);
-
-  my @menu = ('Page Top',
-              'run 4950 lane 1#0',  
-              'run 4950 lane 1#2', 
-             );
-  foreach my $menu_item (@menu) {
-    $mech->follow_link_ok({text => $menu_item}, qq[follow '$menu_item' menu item]);  
-  }
 }
 
 {
   my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=all];
   $mech->get_ok($url);
   $mech->title_is(q[Results (all) for runs 4950 lanes 1]);
+  $mech->content_contains('Page Top');
+  $mech->content_contains('Back to Run 4950');
   $mech->content_contains(224);  # num cycles
-  $mech->content_contains('run 4950 lane 1#0'); #side menu link
-  $mech->content_contains('run 4950 lane 1#1'); #side menu link
-  $mech->content_contains('run 4950 lane 1#20'); #side menu link
   $mech->content_contains('HG00367-B 400398'); #library name
   $mech->content_contains('ATCACGTT'); #tag sequence
   $mech->content_contains('Tag'); #column name
   $mech->content_contains('24plex_1000Genomes-B1-FIN-6.6.10'); #library name
 
-  my @menu = ('run 4950 lane 1',
-              'run 4950 lane 1#0',  
-              'run 4950 lane 1#2',
+  my @menu = (
+              'Page Top',
               '20',
               '0'
              );

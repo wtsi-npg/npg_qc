@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<mqc_outcome_dict>
 
@@ -135,15 +133,30 @@ Related object: L<npg_qc::Schema::Result::MqcOutcomeHist>
 __PACKAGE__->has_many(
   'mqc_outcome_hists',
   'npg_qc::Schema::Result::MqcOutcomeHist',
-  { 'foreign.id_outcome' => 'self.id_mqc_outcome' },
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:51:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:P1kHb+vBeXBPUzkTjVgoxQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:53:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AnE0fpm6ByqDGqlRS6/1nA
 
 our $VERSION = '0';
+
+sub is_final_outcome {
+  my $self = shift;
+  return $self->short_desc =~ m{final}ism; #The short description includes the word final.
+}
+
+sub is_accepted {
+  my $self = shift;
+  return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
+}
+
+sub is_final_accepted {
+  my $self = shift;
+  return $self->is_final_outcome && $self->is_accepted;
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -160,6 +173,22 @@ Catalog for manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 is_final_outcome
+
+  Utility method to check if the outcome is considered final.
+
+=head2 is_accepted
+
+  Utility method which checks the short description to decide if the outcome can 
+  be considered accepted.
+  
+=head2 is_final_accepted
+
+  Utility method which checks the short description to decide if the outcome can 
+  be considered final and accepted.
+
+=cut
 
 =head1 DEPENDENCIES
 
@@ -193,7 +222,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Jaime Tovar
+Copyright (C) 2015 GRL Genome Research Limited
 
 This file is part of NPG.
 
@@ -211,4 +240,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-

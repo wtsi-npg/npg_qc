@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<mqc_outcome_hist>
 
@@ -63,7 +61,7 @@ __PACKAGE__->table('mqc_outcome_hist');
 
 Lane
 
-=head2 id_outcome
+=head2 id_mqc_outcome
 
   data_type: 'smallint'
   extra: {unsigned => 1}
@@ -97,7 +95,7 @@ __PACKAGE__->add_columns(
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'id_outcome',
+  'id_mqc_outcome',
   {
     data_type => 'smallint',
     extra => { unsigned => 1 },
@@ -129,7 +127,7 @@ __PACKAGE__->set_primary_key('id_mqc_outcome_hist');
 
 =head1 RELATIONS
 
-=head2 id_outcome
+=head2 mqc_outcome
 
 Type: belongs_to
 
@@ -138,15 +136,15 @@ Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
 =cut
 
 __PACKAGE__->belongs_to(
-  'id_outcome',
+  'mqc_outcome',
   'npg_qc::Schema::Result::MqcOutcomeDict',
-  { id_mqc_outcome => 'id_outcome' },
+  { id_mqc_outcome => 'id_mqc_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-04 11:09:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ls46jY85410mI3Df+mVxAQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:53:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+3U2ufYH9i641bY8aErdcw
 
 our $VERSION = '0';
 
@@ -198,7 +196,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Jaime Tovar
+Copyright (C) 2015 GRL Genoem Research Limited
 
 This file is part of NPG.
 

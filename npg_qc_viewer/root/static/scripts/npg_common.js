@@ -26,14 +26,11 @@
 ************************************************************************************/
 
 /*
-* Returns the base URI for NPG and Sequencescape web requests
+* Returns the base URI for Sequencescape web requests
 * The first attribute is the service owner string(npg or st),
 * the default is st. The second attribute is live or dev, the default is live.
 */
-function service_uri(service_owner) {
-  if (service_owner == "npg") {
-    return npg_url;
-  }
+function service_uri() {
   if (typeof(lims_api_url) == 'undefined') { return null; }
   return lims_api_url;
 }

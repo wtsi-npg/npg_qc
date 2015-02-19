@@ -232,8 +232,8 @@ __PACKAGE__->add_unique_constraint('unique_ind_file_name_fastqcheck', ['file_nam
 with 'npg_qc::Schema::Flators';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-03-17 09:44:51
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KVViSLyO3aqQg+uUZatunQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:RchRFXa+CuMCbeDNrjaA8g
 
 __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('split', 'is_string');
