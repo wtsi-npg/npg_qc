@@ -1,0 +1,4273 @@
+---
+- checked_at: 2013-01-11 15:59:10
+  created: 2009-07-09 12:27:26
+  current_from: 2012-11-29 12:03:43
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 15:59:10
+  internal_id: 666
+  is_current: 1
+  last_updated: 2012-11-29 12:03:43
+  library_type: Standard
+  priority: 0
+  project_internal_id: 227
+  project_name: Screening for human epigenetic variation at CpG islands
+  project_uuid: "\x0fô4ÐÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 31999
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 57607
+  source_asset_name: D9_2 1
+  source_asset_sample_internal_id: 7356
+  source_asset_sample_uuid: "ºiT¹Â\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18å\x11àÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 227
+  study_name: Screening for human epigenetic variation at CpG islands
+  study_uuid: "+\v\x16\x12¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 3850
+  submission_uuid: "?èt)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 23436
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 57608
+  target_asset_name: D9_2 1
+  target_asset_sample_internal_id: 7356
+  target_asset_sample_uuid: "ºiT¹Â\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "¦§<ÄÆ1\x11ß\0\x14O b°"
+  user: sm2
+  uuid: "å.FÈÆ0\x11ß\0\x14O b°"
+- checked_at: 2013-01-11 15:59:10
+  created: 2009-07-09 12:28:00
+  current_from: 2012-11-29 12:03:43
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 15:59:10
+  internal_id: 32033
+  is_current: 1
+  last_updated: 2012-11-29 12:03:43
+  library_type: Standard
+  priority: 0
+  project_internal_id: 227
+  project_name: Screening for human epigenetic variation at CpG islands
+  project_uuid: "\x0fô4ÐÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 32032
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 57623
+  source_asset_name: E8_2 1
+  source_asset_sample_internal_id: 7375
+  source_asset_sample_uuid: "»\x13i\x10¹Â\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18åR\"Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 227
+  study_name: Screening for human epigenetic variation at CpG islands
+  study_uuid: "+\v\x16\x12¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 3850
+  submission_uuid: "?èt)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 23455
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 57624
+  target_asset_name: E8_2 1
+  target_asset_sample_internal_id: 7375
+  target_asset_sample_uuid: "»\x13i\x10¹Â\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "¦§TÆ1\x11ß\0\x14O b°"
+  user: sm2
+  uuid: "å/P6Æ0\x11ß\0\x14O b°"
+- checked_at: 2013-01-11 15:59:10
+  created: 2009-07-09 12:28:12
+  current_from: 2012-11-29 12:03:43
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 15:59:10
+  internal_id: 32045
+  is_current: 1
+  last_updated: 2012-11-29 12:03:43
+  library_type: Standard
+  priority: 0
+  project_internal_id: 227
+  project_name: Screening for human epigenetic variation at CpG islands
+  project_uuid: "\x0fô4ÐÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 32044
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 57631
+  source_asset_name: E6_2 1
+  source_asset_sample_internal_id: 7371
+  source_asset_sample_uuid: "ºö®ì¹Â\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18år\\Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 227
+  study_name: Screening for human epigenetic variation at CpG islands
+  study_uuid: "+\v\x16\x12¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 3850
+  submission_uuid: "?èt)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 23459
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 57632
+  target_asset_name: E6_2 1
+  target_asset_sample_internal_id: 7371
+  target_asset_sample_uuid: "ºö®ì¹Â\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "¦§ ÎÆ1\x11ß\0\x14O b°"
+  user: sm2
+  uuid: "å/±\x02Æ0\x11ß\0\x14O b°"
+- checked_at: 2013-01-11 15:59:10
+  created: 2009-07-09 12:28:16
+  current_from: 2012-11-29 12:03:43
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 15:59:10
+  internal_id: 32048
+  is_current: 1
+  last_updated: 2012-11-29 12:03:43
+  library_type: Standard
+  priority: 0
+  project_internal_id: 227
+  project_name: Screening for human epigenetic variation at CpG islands
+  project_uuid: "\x0fô4ÐÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 32047
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 57633
+  source_asset_name: E6_1 1
+  source_asset_sample_internal_id: 7370
+  source_asset_sample_uuid: "ºï(¹Â\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18åzÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 227
+  study_name: Screening for human epigenetic variation at CpG islands
+  study_uuid: "+\v\x16\x12¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 3850
+  submission_uuid: "?èt)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 23460
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 57634
+  target_asset_name: E6_1 1
+  target_asset_sample_internal_id: 7370
+  target_asset_sample_uuid: "ºï(¹Â\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "¦§¨äÆ1\x11ß\0\x14O b°"
+  user: sm2
+  uuid: "å/É&Æ0\x11ß\0\x14O b°"
+- checked_at: 2013-01-11 15:59:10
+  created: 2009-07-09 12:28:19
+  current_from: 2012-11-29 12:03:43
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 15:59:10
+  internal_id: 32051
+  is_current: 1
+  last_updated: 2012-11-29 12:03:43
+  library_type: Standard
+  priority: 0
+  project_internal_id: 227
+  project_name: Screening for human epigenetic variation at CpG islands
+  project_uuid: "\x0fô4ÐÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 32050
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 57635
+  source_asset_name: E5_2 1
+  source_asset_sample_internal_id: 7369
+  source_asset_sample_uuid: "ºèÔ¹Â\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18å¦Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 227
+  study_name: Screening for human epigenetic variation at CpG islands
+  study_uuid: "+\v\x16\x12¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 3850
+  submission_uuid: "?èt)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 23461
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 57636
+  target_asset_name: E5_2 1
+  target_asset_sample_internal_id: 7369
+  target_asset_sample_uuid: "ºèÔ¹Â\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "¦§±\x0eÆ1\x11ß\0\x14O b°"
+  user: sm2
+  uuid: "å/áJÆ0\x11ß\0\x14O b°"
+- checked_at: 2013-01-11 15:59:10
+  created: 2009-07-09 12:28:22
+  current_from: 2012-11-29 12:03:43
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 15:59:10
+  internal_id: 32054
+  is_current: 1
+  last_updated: 2012-11-29 12:03:43
+  library_type: Standard
+  priority: 0
+  project_internal_id: 227
+  project_name: Screening for human epigenetic variation at CpG islands
+  project_uuid: "\x0fô4ÐÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 32053
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 57637
+  source_asset_name: D4_1 1
+  source_asset_sample_internal_id: 7353
+  source_asset_sample_uuid: "ºy¡à¹Â\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18å¨Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 227
+  study_name: Screening for human epigenetic variation at CpG islands
+  study_uuid: "+\v\x16\x12¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 3850
+  submission_uuid: "?èt)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 23462
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 57638
+  target_asset_name: D4_1 1
+  target_asset_sample_internal_id: 7353
+  target_asset_sample_uuid: "ºy¡à¹Â\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "¦§¹LÆ1\x11ß\0\x14O b°"
+  user: sm2
+  uuid: "å/ùZÆ0\x11ß\0\x14O b°"
+- checked_at: 2013-01-11 16:00:43
+  created: 2009-07-29 15:14:44
+  current_from: 2012-11-29 12:03:43
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 0
+  fragment_size_to: 0
+  inserted_at: 2013-01-11 16:00:43
+  internal_id: 32972
+  is_current: 1
+  last_updated: 2012-11-29 12:03:43
+  library_type: Standard
+  priority: 0
+  project_internal_id: 227
+  project_name: Screening for human epigenetic variation at CpG islands
+  project_uuid: "\x0fô4ÐÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Library creation
+  source_asset_barcode: 32971
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 57932
+  source_asset_name: hES2_RNAPII 1
+  source_asset_sample_internal_id: 7597
+  source_asset_sample_uuid: "Â0à¦¹Â\x11ßf\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x18ê¦æÆ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 502
+  study_name: characterisation of CpG islands in human tissues
+  study_uuid: "-G+ð¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 7559
+  submission_uuid: "weð¶z\x11à°º\0\x14O\x01¤\x14"
+  target_asset_barcode: 24331
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 57933
+  target_asset_name: hES2_RNAPII 1
+  target_asset_sample_internal_id: 7597
+  target_asset_sample_uuid: "Â0à¦¹Â\x11ßf\0\x14O\x01¤\x14"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "¦«üÈÆ1\x11ß\0\x14O b°"
+  user: sm2
+  uuid: "åL  Æ0\x11ß\0\x14O b°"
+- checked_at: 2013-01-11 17:59:26
+  created: 2010-05-10 12:25:12
+  current_from: 2012-11-26 14:15:16
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 95
+  fragment_size_to: 105
+  inserted_at: 2013-01-11 17:59:26
+  internal_id: 519466
+  is_current: 1
+  last_updated: 2012-11-26 14:15:16
+  library_type: Standard
+  priority: 0
+  project_internal_id: 307
+  project_name: ZF_MrSol4000
+  project_uuid: "\x0fö¢ÎÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 140924
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 1
+  source_asset_internal_id: 140924
+  source_asset_name: 93_3_1-11
+  source_asset_sample_internal_id: 43036
+  source_asset_sample_uuid: "(»Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ± Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 307
+  study_name: ZF_MrSol4000
+  study_uuid: "+ýê¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 5399
+  submission_uuid: "D×È)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 206305
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 246303
+  target_asset_name: 93_3_1-11 246303
+  target_asset_sample_internal_id: 43036
+  target_asset_sample_uuid: "(»Æ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®'\x0eÆ1\x11ß\0\x14O b°"
+  user: rnk
+  uuid: "<Ñ<Æ1\x11ß\0\x14O b°"
+- checked_at: 2013-01-11 17:59:26
+  created: 2010-05-10 12:25:12
+  current_from: 2012-11-26 14:15:16
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 95
+  fragment_size_to: 105
+  inserted_at: 2013-01-11 17:59:26
+  internal_id: 519467
+  is_current: 1
+  last_updated: 2012-11-26 14:15:16
+  library_type: Standard
+  priority: 0
+  project_internal_id: 307
+  project_name: ZF_MrSol4000
+  project_uuid: "\x0fö¢ÎÆ;\x11ß\0\x14O b°"
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 140925
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 140925
+  source_asset_name: 93_4_1-11
+  source_asset_sample_internal_id: 43037
+  source_asset_sample_uuid: "(Ã~Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: sample_tubes
+  source_asset_uuid: " ±@Æ;\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: 307
+  study_name: ZF_MrSol4000
+  study_uuid: "+ýê¥W\x11ß\0\x14O\x01¤\x14"
+  submission_internal_id: 5399
+  submission_uuid: "D×È)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 206306
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 246304
+  target_asset_name: 93_4_1-11 246304
+  target_asset_sample_internal_id: 43037
+  target_asset_sample_uuid: "(Ã~Æ(\x11ß\0\x14O b°"
+  target_asset_state: pending
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "®'üÆ1\x11ß\0\x14O b°"
+  user: rnk
+  uuid: "<Ñ>Æ1\x11ß\0\x14O b°"
+- checked_at: 2012-06-27 11:39:33
+  created: 2011-08-05 16:34:47
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:39:33
+  internal_id: 3490915
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 206305
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246303
+  source_asset_name: 93_3_1-11 246303
+  source_asset_sample_internal_id: 43036
+  source_asset_sample_uuid: "(»Æ(\x11ß\0\x14O b°"
+  source_asset_state: pending
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "®'\x0eÆ1\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 213517
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 449196
+  target_asset_name: MrSol4000Pool39
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "¶©*Æ1\x11ß\0\x14O b°"
+  user: ~
+  uuid: "Ôð`Æ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:39:33
+  created: 2011-08-05 16:34:47
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:39:33
+  internal_id: 3490916
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 206306
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 246304
+  source_asset_name: 93_4_1-11 246304
+  source_asset_sample_internal_id: 43037
+  source_asset_sample_uuid: "(Ã~Æ(\x11ß\0\x14O b°"
+  source_asset_state: pending
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "®'üÆ1\x11ß\0\x14O b°"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 213517
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 449196
+  target_asset_name: MrSol4000Pool39
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "¶©*Æ1\x11ß\0\x14O b°"
+  user: ~
+  uuid: "Ô÷¬2¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2013-01-11 19:04:09
+  created: 2010-10-01 14:20:16
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:09
+  internal_id: 578555
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217454
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351633
+  source_asset_name: M27_FLU_T146
+  source_asset_sample_internal_id: 985968
+  source_asset_sample_uuid: " ,Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\x1e°Ï\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219981
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381772
+  target_asset_name: M27_FLU_T146 1381772
+  target_asset_sample_internal_id: 985968
+  target_asset_sample_uuid: " ,Ï\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "òÍD²ç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü'xüÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:09
+  created: 2010-10-01 14:20:16
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:09
+  internal_id: 578556
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217455
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351634
+  source_asset_name: M28_FLU_T146
+  source_asset_sample_internal_id: 985969
+  source_asset_sample_uuid: "$-¨Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "\"Ø,Ï\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219982
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381773
+  target_asset_name: M28_FLU_T146 1381773
+  target_asset_sample_internal_id: 985969
+  target_asset_sample_uuid: "$-¨Ï\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "òÆØ*ç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü+\x11jÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:09
+  created: 2010-10-01 14:20:16
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:09
+  internal_id: 578557
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217456
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351635
+  source_asset_name: M29_FLU_T146
+  source_asset_sample_internal_id: 985970
+  source_asset_sample_uuid: "Aà<Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "@UZÏ\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219983
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381774
+  target_asset_name: M29_FLU_T146 1381774
+  target_asset_sample_internal_id: 985970
+  target_asset_sample_uuid: "Aà<Ï\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "òÃ*Jç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü.vÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:10
+  created: 2010-10-01 14:20:16
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:10
+  internal_id: 578558
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217457
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351636
+  source_asset_name: M30_FLU_T146
+  source_asset_sample_internal_id: 985971
+  source_asset_sample_uuid: "'ïÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "&lÏ\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219984
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381775
+  target_asset_name: M30_FLU_T146 1381775
+  target_asset_sample_internal_id: 985971
+  target_asset_sample_uuid: "'ïÏ\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "ò¿Êç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü2\aÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:10
+  created: 2010-10-01 14:20:17
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:10
+  internal_id: 578559
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217458
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351637
+  source_asset_name: M31_FLU_T146
+  source_asset_sample_internal_id: 985972
+  source_asset_sample_uuid: "+¡Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "*[\x06Ï\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219985
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381776
+  target_asset_name: M31_FLU_T146 1381776
+  target_asset_sample_internal_id: 985972
+  target_asset_sample_uuid: "+¡Ï\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "ò¼\t@ç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü\t`ÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:10
+  created: 2010-10-01 14:20:17
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:10
+  internal_id: 578560
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217459
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351638
+  source_asset_name: M32_FLU_T146
+  source_asset_sample_internal_id: 985973
+  source_asset_sample_uuid: "/bôÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: ".\x17PÏ\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219986
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381777
+  target_asset_name: M32_FLU_T146 1381777
+  target_asset_sample_internal_id: 985973
+  target_asset_sample_uuid: "/bôÏ\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "ò¸xzç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü\x0f%ÖÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:10
+  created: 2010-10-01 14:20:17
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:10
+  internal_id: 578561
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217460
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351639
+  source_asset_name: M33_FLU_T146
+  source_asset_sample_internal_id: 985974
+  source_asset_sample_uuid: "3\x15pÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "1ÓôÏ\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219987
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381778
+  target_asset_name: M33_FLU_T146 1381778
+  target_asset_sample_internal_id: 985974
+  target_asset_sample_uuid: "3\x15pÏ\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "ò´Êþç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü\x12Ê`ÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:10
+  created: 2010-10-01 14:20:17
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:10
+  internal_id: 578562
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217461
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351640
+  source_asset_name: M34_FLU_T146
+  source_asset_sample_internal_id: 985975
+  source_asset_sample_uuid: "6¹ðÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "5wèÏ\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219988
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381779
+  target_asset_name: M34_FLU_T146 1381779
+  target_asset_sample_internal_id: 985975
+  target_asset_sample_uuid: "6¹ðÏ\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "ò£m,ç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü\x16H\\ÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:10
+  created: 2010-10-01 14:20:17
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:10
+  internal_id: 578563
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217462
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351641
+  source_asset_name: M36_FLU_T146
+  source_asset_sample_internal_id: 985976
+  source_asset_sample_uuid: ":X²Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "9\x17\x04Ï\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219989
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381780
+  target_asset_name: M36_FLU_T146 1381780
+  target_asset_sample_internal_id: 985976
+  target_asset_sample_uuid: ":X²Ï\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "òá\\ç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü\x19Ü°ÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2013-01-11 19:04:10
+  created: 2010-10-01 14:20:17
+  current_from: 2012-11-26 14:15:35
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: 200
+  fragment_size_to: 400
+  inserted_at: 2013-01-11 19:04:10
+  internal_id: 578564
+  is_current: 1
+  last_updated: 2012-11-26 14:15:35
+  library_type: No PCR
+  priority: 1
+  project_internal_id: 676
+  project_name: Influenza MOSAIC
+  project_uuid: "WËÈFÏ\x11ß­\x02\0\x14O n."
+  read_length: ~
+  request_type: Multiplexed library creation
+  source_asset_barcode: 217463
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1351642
+  source_asset_name: M37_FLU_T146
+  source_asset_sample_internal_id: 985977
+  source_asset_sample_uuid: ">\vÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ''
+  source_asset_type: sample_tubes
+  source_asset_uuid: "<À\fÏ\x11ß¢\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: 699
+  study_name: Virus genome Influenza MOSAIC
+  study_uuid: "yøWþÏ\x11ß³¢\0\x14O n."
+  submission_internal_id: 7466
+  submission_uuid: "I{K&)s\x11à¾c\0\x14O\x01¤\x14"
+  target_asset_barcode: 219990
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381781
+  target_asset_name: M37_FLU_T146 1381781
+  target_asset_sample_internal_id: 985977
+  target_asset_sample_uuid: ">\vÏ\x11ß¢\0\x14O\x01¤\x14"
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: library_tubes
+  target_asset_uuid: "òD®ç/\x11ß»²\0\x14O\x01¤\x14"
+  user: chc
+  uuid: "ü\x1dY²ÝÙ\x11ß°L\0\x14O n."
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494233
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219981
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381772
+  source_asset_name: M27_FLU_T146 1381772
+  source_asset_sample_internal_id: 985968
+  source_asset_sample_uuid: " ,Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "òÍD²ç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "T\x14 ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494234
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219982
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381773
+  source_asset_name: M28_FLU_T146 1381773
+  source_asset_sample_internal_id: 985969
+  source_asset_sample_uuid: "$-¨Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "òÆØ*ç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "T¾Ï\x04¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494235
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219983
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381774
+  source_asset_name: M29_FLU_T146 1381774
+  source_asset_sample_internal_id: 985970
+  source_asset_sample_uuid: "Aà<Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "òÃ*Jç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "TÁó\x1e¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494236
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219984
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381775
+  source_asset_name: M30_FLU_T146 1381775
+  source_asset_sample_internal_id: 985971
+  source_asset_sample_uuid: "'ïÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ò¿Êç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "TÄÄ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494237
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219985
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381776
+  source_asset_name: M31_FLU_T146 1381776
+  source_asset_sample_internal_id: 985972
+  source_asset_sample_uuid: "+¡Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ò¼\t@ç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "TÇ¥Ô¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494238
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219986
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381777
+  source_asset_name: M32_FLU_T146 1381777
+  source_asset_sample_internal_id: 985973
+  source_asset_sample_uuid: "/bôÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ò¸xzç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "TÊc¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494239
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219987
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381778
+  source_asset_name: M33_FLU_T146 1381778
+  source_asset_sample_internal_id: 985974
+  source_asset_sample_uuid: "3\x15pÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ò´Êþç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "TÑ`¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494240
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219988
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381779
+  source_asset_name: M34_FLU_T146 1381779
+  source_asset_sample_internal_id: 985975
+  source_asset_sample_uuid: "6¹ðÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ò£m,ç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "TÔB¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494241
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219989
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381780
+  source_asset_name: M36_FLU_T146 1381780
+  source_asset_sample_internal_id: 985976
+  source_asset_sample_uuid: ":X²Ï\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "òá\\ç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "TÖÆ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:52
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:52
+  internal_id: 3494242
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 219990
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1381781
+  source_asset_name: M37_FLU_T146 1381781
+  source_asset_sample_internal_id: 985977
+  source_asset_sample_uuid: ">\vÏ\x11ß¢\0\x14O\x01¤\x14"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "òD®ç/\x11ß»²\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 219991
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1381782
+  target_asset_name: 699_pool2_011010
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "íþµ`ç/\x11ß¢Q\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "TÙm\0¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:48
+  created: 2011-08-05 16:38:11
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:48
+  internal_id: 3494063
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220258
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394841
+  source_asset_name: B0935_rpt 1394841
+  source_asset_sample_internal_id: 274902
+  source_asset_sample_uuid: "Ç·\x13èÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|¨ªÆë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\npÂ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:49
+  created: 2011-08-05 16:38:11
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:49
+  internal_id: 3494064
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220259
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394842
+  source_asset_name: B0908_rpt 1394842
+  source_asset_sample_internal_id: 274903
+  source_asset_sample_uuid: "Ç·\eÖÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|¤°të.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\r<ø¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:49
+  created: 2011-08-05 16:38:11
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:49
+  internal_id: 3494065
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220260
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394843
+  source_asset_name: B0934_rpt 1394843
+  source_asset_sample_internal_id: 274904
+  source_asset_sample_uuid: "Ç·#ÄÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "| të.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\x10\x19 ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:49
+  created: 2011-08-05 16:38:11
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:49
+  internal_id: 3494066
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220261
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394844
+  source_asset_name: B1173_rpt 1394844
+  source_asset_sample_internal_id: 274905
+  source_asset_sample_uuid: "Ç·+²Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|£zë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\x12¹Ú¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:49
+  created: 2011-08-05 16:38:11
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:49
+  internal_id: 3494067
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220262
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394845
+  source_asset_name: B0922_rpt 1394845
+  source_asset_sample_internal_id: 274906
+  source_asset_sample_uuid: "Ç·3ªÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|Á\x10ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\x15e\x18¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:49
+  created: 2011-08-05 16:38:11
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:49
+  internal_id: 3494068
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220263
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394846
+  source_asset_name: B0907_rpt 1394846
+  source_asset_sample_internal_id: 274907
+  source_asset_sample_uuid: "Ç·;ÞÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|¢Lë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\x18\x05ü¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:11
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494069
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220264
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394847
+  source_asset_name: B1178_rpt 1394847
+  source_asset_sample_internal_id: 274908
+  source_asset_sample_uuid: "Ç·CêÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|më.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\x1a:¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494070
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220265
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394848
+  source_asset_name: B0930_rpt 1394848
+  source_asset_sample_internal_id: 274909
+  source_asset_sample_uuid: "Ç·KØÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|U\x1aë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\x1dH<¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494071
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220266
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394849
+  source_asset_name: B1141_rpt 1394849
+  source_asset_sample_internal_id: 274910
+  source_asset_sample_uuid: "Ç·SÆÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|Þ\0ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\x1féÔ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494072
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220267
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394850
+  source_asset_name: B1134_rpt 1394850
+  source_asset_sample_internal_id: 274911
+  source_asset_sample_uuid: "Ç·[´Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|}Ñèë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O\"|v¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494073
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220268
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394851
+  source_asset_name: B1153_rpt 1394851
+  source_asset_sample_internal_id: 274912
+  source_asset_sample_uuid: "Ç·c¢Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|y0ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "OUt¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494074
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220269
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394852
+  source_asset_name: B0919_rpt 1394852
+  source_asset_sample_internal_id: 274913
+  source_asset_sample_uuid: "Ç·kÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|u+`ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220270
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394853
+  target_asset_name: Bordetella pool 1_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¨ë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "OXg¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494075
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220273
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394871
+  source_asset_name: B1161_rpt 1394871
+  source_asset_sample_internal_id: 282704
+  source_asset_sample_uuid: "Î®T@Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|p\x1e|ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O]\x16¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494076
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220274
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394872
+  source_asset_name: B0917_rpt 1394872
+  source_asset_sample_internal_id: 282705
+  source_asset_sample_uuid: "Î®\\Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|kÃë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O`^º¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494077
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220275
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394873
+  source_asset_name: B1137_rpt 1394873
+  source_asset_sample_internal_id: 282706
+  source_asset_sample_uuid: "Î®e\x02Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|g\x03(ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "Oc!¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494078
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220276
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394874
+  source_asset_name: B0913_rpt 1394874
+  source_asset_sample_internal_id: 282707
+  source_asset_sample_uuid: "Î®mTÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "|^~\x1aë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "OeÑL¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494079
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220277
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394875
+  source_asset_name: BP70_rpt 1394875
+  source_asset_sample_internal_id: 282708
+  source_asset_sample_uuid: "Î®uLÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{þ\x0fÐë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "Ohwb¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494080
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220278
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394876
+  source_asset_name: BP22_rpt 1394876
+  source_asset_sample_internal_id: 282709
+  source_asset_sample_uuid: "Î®}vÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{ú+6ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "Ok\x1dÒ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:49
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:49
+  internal_id: 3494081
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220279
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394877
+  source_asset_name: BP182_rpt 1394877
+  source_asset_sample_internal_id: 282710
+  source_asset_sample_uuid: "Î®ÒÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{öZ.ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "Om«¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:49
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:49
+  internal_id: 3494082
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220280
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394878
+  source_asset_name: BP120_rpt 1394878
+  source_asset_sample_internal_id: 282711
+  source_asset_sample_uuid: "Î®\x1aÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{ñf¤ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "Op9\\¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494083
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220281
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394879
+  source_asset_name: BP128_rpt 1394879
+  source_asset_sample_internal_id: 282712
+  source_asset_sample_uuid: "Î®XÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{ìa¸ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O£\\¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494084
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220282
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394880
+  source_asset_name: BP121_rpt 1394880
+  source_asset_sample_internal_id: 282713
+  source_asset_sample_uuid: "Î®Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{æÒÀë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O¦i\x1e¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:49
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:49
+  internal_id: 3494085
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220283
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394881
+  source_asset_name: BP31_rpt 1394881
+  source_asset_sample_internal_id: 282714
+  source_asset_sample_uuid: "Î®§\x06Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{â\\ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O©\\¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494086
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220284
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394882
+  source_asset_name: BP56_rpt 1394882
+  source_asset_sample_internal_id: 282715
+  source_asset_sample_uuid: "Î®¯Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{Þië.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220285
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394887
+  target_asset_name: Bordetella pool 2_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w¦q\fë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O¯Ö¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:12
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494087
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220296
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394911
+  source_asset_name: BP119_rpt 1394911
+  source_asset_sample_internal_id: 282716
+  source_asset_sample_uuid: "Î®¸6Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{ºfë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O´iö¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494088
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220297
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394912
+  source_asset_name: BP143_rpt 1394912
+  source_asset_sample_internal_id: 282717
+  source_asset_sample_uuid: "Î®À°Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{µ=ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O·\vR¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494089
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220298
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394913
+  source_asset_name: BP227_rpt 1394913
+  source_asset_sample_internal_id: 282718
+  source_asset_sample_uuid: "Î®É*Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{¯1bë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O¹\x08¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494090
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220299
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394914
+  source_asset_name: BP230_rpt 1394914
+  source_asset_sample_internal_id: 282719
+  source_asset_sample_uuid: "Î®ÑÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{«\x1dÔë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O¼\x13\x18¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494091
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220300
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394915
+  source_asset_name: BP279_rpt 1394915
+  source_asset_sample_internal_id: 282720
+  source_asset_sample_uuid: "Î®ÙâÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{§)Âë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O¿\x1fÂ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494092
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220301
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394916
+  source_asset_name: BP310_rpt 1394916
+  source_asset_sample_internal_id: 282721
+  source_asset_sample_uuid: "Î®â Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{¢Àë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "OÁ©\x04¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494093
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220302
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394917
+  source_asset_name: BP317_rpt 1394917
+  source_asset_sample_internal_id: 282722
+  source_asset_sample_uuid: "Î®êhÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{WÞë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "Oõ\x06¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494094
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220303
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394918
+  source_asset_name: BP6_rpt 1394918
+  source_asset_sample_internal_id: 282724
+  source_asset_sample_uuid: "Î®úîÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{\eüë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "O÷ÝX¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494095
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220304
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394919
+  source_asset_name: BP2_rpt 1394919
+  source_asset_sample_internal_id: 282725
+  source_asset_sample_uuid: "Î¯\x03,Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{4ë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "OúÂÊ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494096
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220305
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394920
+  source_asset_name: BP7_rpt 1394920
+  source_asset_sample_internal_id: 282726
+  source_asset_sample_uuid: "Î¯\vtÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{ÿdë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "Oý\x0e¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494097
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220306
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394921
+  source_asset_name: BP101_rpt 1394921
+  source_asset_sample_internal_id: 282727
+  source_asset_sample_uuid: "Î¯\x13ÚÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "{}$Lë.\x11ß¦Á\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220307
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394922
+  target_asset_name: Bordetella pool 3_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "w Ètë.\x11ß}\0\x14O n."
+  user: ~
+  uuid: "P\0~\x18¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494098
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220332
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394968
+  source_asset_name: PRCB637_rpt 1394968
+  source_asset_sample_internal_id: 282728
+  source_asset_sample_uuid: "Î¯\eúÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ïvXfë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "P\x05K¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494099
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220333
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394969
+  source_asset_name: PRCB649_rpt 1394969
+  source_asset_sample_internal_id: 282729
+  source_asset_sample_uuid: "Î¯$BÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ïq4¼ë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "P\x08\x05\x16¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494100
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220334
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394970
+  source_asset_name: PRCB521_rpt 1394970
+  source_asset_sample_internal_id: 282730
+  source_asset_sample_uuid: "Î¯,Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ï`?rë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "P\nïÎ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494101
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220335
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394971
+  source_asset_name: PRCB450_rpt 1394971
+  source_asset_sample_internal_id: 282731
+  source_asset_sample_uuid: "Î¯4´Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ï[ÊÜë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "P\rË¸¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494102
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220336
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394972
+  source_asset_name: PRCB640_rpt 1394972
+  source_asset_sample_internal_id: 282732
+  source_asset_sample_uuid: "Î¯=\x06Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ïOHë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "P\x10hF¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494103
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220337
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394973
+  source_asset_name: DK6_rpt 1394973
+  source_asset_sample_internal_id: 282733
+  source_asset_sample_uuid: "Î¯ENÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ïKCë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "PC­¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494104
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220338
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394974
+  source_asset_name: DK7_rpt 1394974
+  source_asset_sample_internal_id: 282734
+  source_asset_sample_uuid: "Î¯MÒÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ïFi0ë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "PF´ª¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494105
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220339
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394975
+  source_asset_name: DK8_rpt 1394975
+  source_asset_sample_internal_id: 282735
+  source_asset_sample_uuid: "Î¯V8Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ïB°ë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "PIX¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:13
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494106
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220340
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394976
+  source_asset_name: DK10_rpt 1394976
+  source_asset_sample_internal_id: 282736
+  source_asset_sample_uuid: "Î¯^bÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ï:eÂë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "PLA\x18¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:14
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494107
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220341
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394977
+  source_asset_name: DK11_rpt 1394977
+  source_asset_sample_internal_id: 282737
+  source_asset_sample_uuid: "Î¯fÈÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ï,Ã\x04ë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "POZÄ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:14
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494108
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220342
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394978
+  source_asset_name: DK12_rpt 1394978
+  source_asset_sample_internal_id: 282738
+  source_asset_sample_uuid: "Î¯o.Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ï(Zvë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "PR\x0f¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:50
+  created: 2011-08-05 16:38:14
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:50
+  internal_id: 3494109
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220343
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1394979
+  source_asset_name: DK13_rpt 1394979
+  source_asset_sample_internal_id: 282739
+  source_asset_sample_uuid: "Î¯wÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ï\x1fÿfë6\x11ßÍ\0\x14O n."
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220344
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1394980
+  target_asset_name: Bordetella pool 6_rpt
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ë'îúë6\x11ßP\0\x14O\x01¤\x14"
+  user: ~
+  uuid: "PT|¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494222
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220594
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432716
+  source_asset_name: OX0050858 1432716
+  source_asset_sample_internal_id: 231190
+  source_asset_sample_uuid: "¨¾bHÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "Únsâíx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "T,nü¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494223
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220595
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432717
+  source_asset_name: OX0050901 1432717
+  source_asset_sample_internal_id: 231191
+  source_asset_sample_uuid: "¨¾jJÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ÚjöÌíx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "T/2T¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494224
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220596
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432718
+  source_asset_name: OX0050902 1432718
+  source_asset_sample_internal_id: 231192
+  source_asset_sample_uuid: "¨¾rLÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "Úgpíx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "Tc\0f¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494225
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220597
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432719
+  source_asset_name: OX0050946 1432719
+  source_asset_sample_internal_id: 231193
+  source_asset_sample_uuid: "¨¾zNÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "Úcé^íx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "TeÖÎ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494226
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220598
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432720
+  source_asset_name: OX0050965 1432720
+  source_asset_sample_internal_id: 231194
+  source_asset_sample_uuid: "¨¾xÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "Ú`zîíx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "ThÖ¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494227
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220599
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432721
+  source_asset_name: OX0050971 1432721
+  source_asset_sample_internal_id: 231195
+  source_asset_sample_uuid: "¨¾pÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "Ú]\x11jíx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "TkEn¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494228
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220600
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432722
+  source_asset_name: OX0051080 1432722
+  source_asset_sample_internal_id: 231196
+  source_asset_sample_uuid: "¨¾ Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ÚYTíx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "Tn\aê¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494229
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220601
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432723
+  source_asset_name: OX0051091 1432723
+  source_asset_sample_internal_id: 231197
+  source_asset_sample_uuid: "¨¾\x06Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ÚV! íx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "Tp(¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494230
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220602
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432724
+  source_asset_name: OX0051099 1432724
+  source_asset_sample_internal_id: 231198
+  source_asset_sample_uuid: "¨¾§\x08Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ÚR¨âíx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "Ts1À¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:20
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 44584
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220603
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432725
+  source_asset_name: OX0051106 1432725
+  source_asset_sample_internal_id: 231199
+  source_asset_sample_uuid: "¨¾¯\nÆ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ÚL\x16íx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "TuÄ¼¿\x11à\n\0\x14O\x01¤\x14"
+- checked_at: 2012-06-27 11:41:51
+  created: 2011-08-05 16:38:21
+  current_from: 2012-05-16 14:40:09
+  current_to: ~
+  deleted_at: ~
+  fragment_size_from: ~
+  fragment_size_to: ~
+  inserted_at: 2012-06-27 11:41:51
+  internal_id: 3494232
+  is_current: 1
+  last_updated: 2012-05-16 14:40:09
+  library_type: ~
+  priority: 0
+  project_internal_id: ~
+  project_name: ~
+  project_uuid: ~
+  read_length: ~
+  request_type: Transfer
+  source_asset_barcode: 220604
+  source_asset_barcode_prefix: NT
+  source_asset_closed: 0
+  source_asset_internal_id: 1432726
+  source_asset_name: OX0051114 1432726
+  source_asset_sample_internal_id: 231200
+  source_asset_sample_uuid: "¨¾·\x02Æ(\x11ß\0\x14O b°"
+  source_asset_state: ~
+  source_asset_two_dimensional_barcode: ~
+  source_asset_type: library_tubes
+  source_asset_uuid: "ÚHÞíx\x11ß³G\0\x14O\x01¤\x14"
+  state: passed
+  study_internal_id: ~
+  study_name: ~
+  study_uuid: ~
+  submission_internal_id: ~
+  submission_uuid: ~
+  target_asset_barcode: 220605
+  target_asset_barcode_prefix: NT
+  target_asset_closed: 0
+  target_asset_internal_id: 1433500
+  target_asset_name: 287p14_cleaned
+  target_asset_sample_internal_id: ~
+  target_asset_sample_uuid: ~
+  target_asset_state: ~
+  target_asset_two_dimensional_barcode: ~
+  target_asset_type: multiplexed_library_tubes
+  target_asset_uuid: "ØÚpíx\x11ßÆ\0\x14O n."
+  user: ~
+  uuid: "T}Ù@¿\x11à\n\0\x14O\x01¤\x14"
