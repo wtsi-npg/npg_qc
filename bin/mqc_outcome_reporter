@@ -4,22 +4,22 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
-use npg_qc::qc2ss;
+use npg_qc::mqc::reporter;
 
 our $VERSION = '0';
 
-npg_qc::qc2ss->new_with_options()->load();
+npg_qc::mqc::reporter->new()->load();
 
 exit 0;
 __END__
 
 =head1 NAME
 
-qc
+mqc_outcome_reporter
 
 =head1 USAGE
 
-qc2ss
+mqc_outcome_reporter
 
 =head1 CONFIGURATION
 
@@ -52,7 +52,7 @@ to be reported to Sequencescape, and sends them.
 
 =item lib
 
-=item npg_qc::qc2ss
+=item npg_qc::mqc_reporter
 
 =back
 

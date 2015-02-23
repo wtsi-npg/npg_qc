@@ -1,5 +1,6 @@
 bin/qc
 bin/qc_db_delete_autoqc
+bin/mqc_outcome_reporter
 bin/npg_qc_autoqc_data.pl
 bin/npg_qc_illumina_analysis_loader
 bin/npg_qc_save_files.pl
@@ -164,6 +165,7 @@ lib/npg_qc/autoqc/role/verify_bam_id.pm
 lib/npg_qc/autoqc/types.pm
 lib/npg_qc/controller.pm
 lib/npg_qc/file_store.pm
+lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/model/analysis_lane.pm
 lib/npg_qc/model/analysis_lane_qcal.pm
 lib/npg_qc/model/analysis.pm
@@ -364,6 +366,7 @@ t/30-illumina-loader-Runinfo.t
 t/30-illumina-loader-Run_Timeline.t
 t/30-illumina-loader-Signal_Mean.t
 t/30-illumina-loader.t
+t/40-mqc-reporter.t
 t/50-npg_qc-Schema.t
 t/50-schema-result-Contamination.t
 t/50-schema-result-Fastqcheck.t
@@ -842,6 +845,8 @@ t/data/rendered/tile_score_rc1_3.xml
 t/data/rendered/tile_score_rescore.xml
 t/data/rendered/tile_score.xml
 t/data/rendered/tile_score_xml.xml
+t/data/reporter/npg_qc/mqc_outcome_dict.yml
+t/data/reporter/npg_qc/mqc_outcome_ent.yml
 t/data/requests/cgi-bin/prodsoft/npg/npg/run/1829.xml
 t/data/requests/cgi-bin/prodsoft/npg/npg/run/1873.xml
 t/data/requests/cgi-bin/prodsoft/npg/npg/run/1881.xml

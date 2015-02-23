@@ -3,7 +3,7 @@
 # Created:       Friday 13th February 2015
 #
 
-package npg_qc::qc2ss;
+package npg_qc::mqc::reporter;
 
 use strict;
 use warnings;
@@ -11,12 +11,11 @@ use Moose;
 use Carp;
 use English qw{-no_match_vars};
 use Readonly;
+use POSIX qw(strftime);
 
 use st::api::base;
+use st::api::lims;
 use npg_qc::Schema;
-use npg::api::request;
-
-with 'MooseX::Getopt';
 
 our $VERSION = '0';
 
@@ -29,17 +28,6 @@ has 'qc_schema' => ( isa        => 'npg_qc::Schema',
 sub _build_qc_schema {
   my $self = shift;
   return npg_qc::Schema->connect();
-}
-
-has 'wh_schema' => ( isa        => 'npg_warehouse::Schema',
-                     is         => 'ro',
-                     required   => 0,
-                     lazy_build => 1,
-                   );
-
-sub _build_wh_schema {
-  my $self = shift;
-  return npg_warehouse::Schema->connect();
 }
 
 has 'lims_url' => ( isa => 'Str',
@@ -60,12 +48,18 @@ has 'nError' => ( isa => 'Int', is => 'rw', default => 0, );
 sub load {
   my $self = shift;
 
+  $self->nPass(0);
+  $self->nFail(0);
+  $self->nError(0);
+
   my $rs = $self->qc_schema->resultset('MqcOutcomeEnt')->get_ready_to_report();
   while (my $outcome = $rs->next()) {
-    my @wrs = $self->wh_schema->resultset('NpgInformation')->search({'id_run' => $outcome->id_run, 'position' => $outcome->position});
-    if ((scalar @wrs) == 0) { croak q(Can't find any NpgInformation for run ).$outcome->id_run .' position '. $outcome->position; }
-    my @rrs = $self->wh_schema->resultset('CurrentRequest')->search({'internal_id'=>$wrs[0]->request_id});
-    if ((scalar @rrs) == 0) { croak q(Can't find CurrentRequest ID ) . $wrs[0]->request_id . ' for mqc_outcome_ent ' . $outcome->id_mqc_outcome_ent; }
+    my $lane_id = st::api::lims->new(id_run => $outcome->id_run, position => $outcome->position)->lane_id;
+    if (!$lane_id) {
+        $self->nError($self->nError+1);
+        _log(q(Can't find lane_id for run ) . $outcome->id_run . ' position ' . $outcome->position);
+        next;
+    }
 
     my $result;
     if ($outcome->is_accepted()) {
@@ -75,18 +69,34 @@ sub load {
       $result = 'fail_qc_state';
       $self->nFail($self->nFail+1);
     }
-    my $ok = eval {
-      npg::api::request->new()->make($self->lims_url.q[/npg_actions/assets/].$rrs[0]->target_asset_internal_id.q(/).$result, q[POST]);
-      1;
-    };
-    if (!$ok) {
-      carp "Error updating LIMS: $EVAL_ERROR";
+    my $error_txt = $self->_report($lane_id, $result);
+    if ($error_txt) {
+      _log($error_txt);
       $self->nError($self->nError+1);
     } else {
       $outcome->update_reported();
     }
   }
   return;
+}
+
+
+sub _report {
+  my ($self, $lane_id, $result) = @_;
+  eval {
+    npg::api::request->new()->make($self->lims_url.q[/npg_actions/assets/].$lane_id.q(/).$result, q[POST]);
+    1;
+  } or do {
+    return "Error updating LIMS: $EVAL_ERROR";
+  };
+  return q( );
+}
+
+sub _log {
+    my $txt = shift;
+    my $time = strftime '%Y-%m-%dT%H:%M:%S', localtime;
+    warn "$time: $txt\n";
+    return;
 }
 
 no Moose;
@@ -97,11 +107,11 @@ __END__
 
 =head1 NAME
 
-npg_qc::qc2ss
+npg_qc::mqc::reporter
 
 =head1 SYNOPSIS
 
- npg_qc::qc2ss->new()->load();
+ npg_qc::mqc::reporter->new()->load();
 
 =head1 DESCRIPTION
 
@@ -110,8 +120,6 @@ Reads all the QC records which need to have a pass or fail sent to LIMS, and sen
 =head1 SUBROUTINES/METHODS
 
 =head2 qc_schema - an attribute; the schema to use for the qc database. Defaults to npg_qc::Schema
-
-=head2 wh_schema - an attribute; the schema to use for the warehouse database. Defaults to npg_warehouse::Schema
 
 =head2 lims_url - an attribute; the URL to use to update the LIMS. Defaults to st::api::base->live_url
 
@@ -129,13 +137,23 @@ Reads all the QC records which need to have a pass or fail sent to LIMS, and sen
 
 =head1 DEPENDENCIES
 
-Moose
-MooseX::Getopt
-Carp
-English qw{-no_match_vars}
-st::api::base;
-npg_qc::Schema;
-npg::api::request;
+=over
+
+=item Moose
+
+=item Carp
+
+=item English qw{-no_match_vars}
+
+=item st::api::base;
+
+=item npg_qc::Schema;
+
+=item npg::api::request;
+
+=item POSIX qw(strftime);
+
+=back
 
 =head1 INCOMPATIBILITIES
 
