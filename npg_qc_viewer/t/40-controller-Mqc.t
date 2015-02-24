@@ -26,6 +26,14 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) } 'update run_id + position lives';
 }
 
+{#Current outcome
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_current_outcome')) } 'get current outcome run_id + position lives';
+}
+
+{#Test true
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_dummy_value_true')) } 'test true lives';
+}
+
 {
   my $response;
   lives_ok { $response = request(POST '/mqc/log' ) } 'post request lives';
