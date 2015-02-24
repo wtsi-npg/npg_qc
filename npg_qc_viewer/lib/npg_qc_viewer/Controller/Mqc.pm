@@ -29,10 +29,11 @@ Readonly::Scalar our $MQC_ROLE            => q[manual_qc];
 sub _validate_req_method {
   my ($self, $c, $allowed) = @_;
   my $result = 0;
+  print('==============>' . $allowed . "\n");
   my $request = $c->request; 
   if ($request->method ne $allowed) {
     $c->response->headers->header('ALLOW' => $allowed);
-    _error($c, $allowed, qq[Manual QC action logging error: only $allowed requests are allowed.]);
+    _error($c, $METHOD_NOT_ALLOWED, qq[Manual QC action logging error: only $allowed requests are allowed.]);
   }
   return $result;
 }
@@ -41,12 +42,7 @@ sub log : Path('log') {
     my ( $self, $c ) = @_;
     use Test::More;
     my $request = $c->request;
-    if ($request->method ne $ALLOW_METHOD_POST) {
-        $c->response->headers->header( 'ALLOW' => $ALLOW_METHOD_POST );
-        _error($c, $METHOD_NOT_ALLOWED,
-             qq[Manual QC action logging error: only $ALLOW_METHOD_POST requests are allowed.]);
-    }
-    #$self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    $self->_validate_req_method($c, $ALLOW_METHOD_POST);
     
     $c->controller('Root')->authorise($c, ($MQC_ROLE));
 
