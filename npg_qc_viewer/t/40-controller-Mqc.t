@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 45;
+use Test::More tests => 49;
 use Test::Exception;
 use HTTP::Request::Common;
 use t::util;
@@ -23,15 +23,21 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
 }
 
 {#Update
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) } 'update run_id + position lives';
+  my $response;
+  lives_ok { $response = request(HTTP::Request->new('POST', '/mqc/update_outcome' )) } 'update run_id + position lives';
 }
 
 {#Current outcome
+  my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_current_outcome')) } 'get current outcome run_id + position lives';
 }
 
 {#Test true
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_dummy_value_true')) } 'test true lives';
+  my $response;
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/dummy_true')) } 'test true lives';
+  ok($response->is_error, qq[response is an error] );
+  #is( $response->code, 500, 'error code is 500' );
+  #is( $response->header('Allow'), 'GET', 'Allow response header is set to GET');
 }
 
 {
@@ -40,7 +46,6 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   ok( $response->is_error, qq[response is an error] );
   is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
-  
 
   lives_ok { $response = request(POST '/mqc/log?user=frog' ) } 'post request lives';
   is( $response->code, 401, 'error code is 401' );

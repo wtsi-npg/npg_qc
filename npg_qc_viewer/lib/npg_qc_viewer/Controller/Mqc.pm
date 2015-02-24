@@ -1,5 +1,7 @@
 package npg_qc_viewer::Controller::Mqc;
 
+#TODO jaime modify
+
 use Moose;
 use namespace::autoclean;
 use Readonly;
@@ -11,7 +13,7 @@ our $VERSION  = '0';
 ## no critic (ProhibitBuiltinHomonyms)
 
 Readonly::Array our @PARAMS  => qw/status 
-                                   batch_id
+                                   batch_id 
                                    position
                                    lims_object_id
                                    lims_object_type
@@ -20,18 +22,32 @@ Readonly::Array our @PARAMS  => qw/status
 Readonly::Scalar our $BAD_REQUEST_CODE    => 400;
 Readonly::Scalar our $INTERNAL_ERROR_CODE => 500;
 Readonly::Scalar our $METHOD_NOT_ALLOWED  => 405;
-Readonly::Scalar our $ALLOW_METHOD  => q[POST];
-Readonly::Scalar our $MQC_ROLE  => q[manual_qc];
+Readonly::Scalar our $ALLOW_METHOD_POST   => q[POST];
+Readonly::Scalar our $ALLOW_METHOD_GET    => q[GET];
+Readonly::Scalar our $MQC_ROLE            => q[manual_qc];
+
+sub _validate_req_method {
+  my ($self, $c, $allowed) = @_;
+  my $result = 0;
+  my $request = $c->request; 
+  if ($request->method ne $allowed) {
+    $c->response->headers->header('ALLOW' => $allowed);
+    _error($c, $allowed, qq[Manual QC action logging error: only $allowed requests are allowed.]);
+  }
+  return $result;
+}
 
 sub log : Path('log') {
     my ( $self, $c ) = @_;
     use Test::More;
     my $request = $c->request;
-    if ($request->method ne $ALLOW_METHOD) {
-        $c->response->headers->header( 'ALLOW' => $ALLOW_METHOD );
+    if ($request->method ne $ALLOW_METHOD_POST) {
+        $c->response->headers->header( 'ALLOW' => $ALLOW_METHOD_POST );
         _error($c, $METHOD_NOT_ALLOWED,
-             qq[Manual QC action logging error: only $ALLOW_METHOD requests are allowed.]);
+             qq[Manual QC action logging error: only $ALLOW_METHOD_POST requests are allowed.]);
     }
+    #$self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    
     $c->controller('Root')->authorise($c, ($MQC_ROLE));
 
     my $referrer_url = $request->referer;
@@ -73,8 +89,8 @@ sub log : Path('log') {
 	}
     }
     eval {
-        $c->model('NpgDB')->log_manual_qc_action($values);
-        $c->model('NpgDB')->update_lane_manual_qc_complete(
+        $c->model('NpgDB')->log_manual_qc_action($values); #TODO This can go.
+        $c->model('NpgDB')->update_lane_manual_qc_complete( #TODO This needs to stay
 	  $id_run, $values->{'position'}, $values->{'status'}, $c->user->username);
         1;
     } or do {
@@ -91,6 +107,58 @@ sub _error {
   my ($c, $code, $message) = @_;
   return $c->controller('Root')->detach2error($c, $code, $message);
 }
+
+#### Jaime
+
+sub _create_lane() {
+  return;
+}
+
+#sub 
+
+sub update_outcome :Chained('base') :PathPart('update_outcome') :Args(2) {
+  my ($self, $c) = @_;
+  my $row = $c->model('npg_qc::McqOutcomeEnt')->search({})->next;
+    if (!$row) {
+        $c->stash->{error_message} = qq[Impossible to update outcome.];
+        $c->detach(q[Root], q[error_page]);
+        return;
+    }
+  
+  return;
+}
+
+sub get_current_outcome :Chained('base') :PathPart('get_current_outcome'): Args(2) {
+  my ($self, $c) = @_;
+  my $run_id = 1;
+  my $position = 1;
+  
+  my $row = $c->model('npg_qc::McqOutcomeEnt')->search({})->next;
+  if (!$row) {
+    $c->stash->{error_message} = qq[Impossible to retrieve outcome.];
+    $c->detach(q[Root], q[error_page]);
+    return;
+  } else { 
+    
+  }
+  return;
+}
+
+sub get_dummy_value_true : Path('dummy_true'){
+  my ($self, $c) = @_;
+  return 1;
+}
+
+sub get_dummy_value_false : Path('dummy_false'){
+  my ($self, $c) = @_;
+  return 0;
+}
+
+sub get_all_outcomes :Chained('base') :PathPart('') Args(1) {
+  my ($self, $c) = @_;
+  return;
+}
+
 
 1;
 __END__
