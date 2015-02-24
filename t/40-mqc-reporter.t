@@ -8,6 +8,8 @@ use warnings;
 use Test::More tests => 17;
 use Test::Exception;
 
+use_ok('npg_qc::mqc::reporter');
+
 #
 # subclass to always return success on posting to LIMS
 #
@@ -30,10 +32,7 @@ package test_reporter_fail;
 
 package main;
 
-use_ok('npg_qc::mqc::reporter');
-
 my $url = 'http://dev.psd.sanger.ac.uk:6600';
-
 
 #
 # Test that the actual class loads

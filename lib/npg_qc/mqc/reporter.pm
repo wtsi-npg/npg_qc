@@ -41,16 +41,16 @@ sub _build_lims_url {
   return st::api::base->live_url();
 }
 
-has 'nPass' => ( isa => 'Int', is => 'rw', default => 0, );
-has 'nFail' => ( isa => 'Int', is => 'rw', default => 0, );
-has 'nError' => ( isa => 'Int', is => 'rw', default => 0, );
+has 'nPass' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nPass', );
+has 'nFail' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nFail',);
+has 'nError' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nError', );
 
 sub load {
   my $self = shift;
 
-  $self->nPass(0);
-  $self->nFail(0);
-  $self->nError(0);
+  $self->_set_nPass(0);
+  $self->_set_nFail(0);
+  $self->_set_nError(0);
 
   my $rs = $self->qc_schema->resultset('MqcOutcomeEnt')->get_ready_to_report();
   while (my $outcome = $rs->next()) {
@@ -64,15 +64,15 @@ sub load {
     my $result;
     if ($outcome->is_accepted()) {
       $result = 'pass_qc_state';
-      $self->nPass($self->nPass + 1);
+      $self->_set_nPass($self->nPass + 1);
     } else {
       $result = 'fail_qc_state';
-      $self->nFail($self->nFail+1);
+      $self->_set_nFail($self->nFail+1);
     }
     my $error_txt = $self->_report($lane_id, $result);
     if ($error_txt) {
       _log($error_txt);
-      $self->nError($self->nError+1);
+      $self->_set_nError($self->nError+1);
     } else {
       $outcome->update_reported();
     }
