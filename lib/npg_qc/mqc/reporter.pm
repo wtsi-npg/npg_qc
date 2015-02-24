@@ -17,12 +17,15 @@ use st::api::base;
 use st::api::lims;
 use npg_qc::Schema;
 
+with 'MooseX::Getopt';
+
 our $VERSION = '0';
 
 has 'qc_schema' => ( isa        => 'npg_qc::Schema',
                      is         => 'ro',
                      required   => 0,
                      lazy_build => 1,
+                     metaclass => 'NoGetopt',
                    );
 
 sub _build_qc_schema {
@@ -34,6 +37,7 @@ has 'lims_url' => ( isa => 'Str',
                     is => 'ro',
                     required => 0,
                     lazy_build => 1,
+                    metaclass => 'NoGetopt',
                   );
 
 sub _build_lims_url {
@@ -41,9 +45,11 @@ sub _build_lims_url {
   return st::api::base->live_url();
 }
 
-has 'nPass' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nPass', );
-has 'nFail' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nFail',);
-has 'nError' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nError', );
+has 'nPass' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nPass', metaclass => 'NoGetopt',);
+has 'nFail' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nFail', metaclass => 'NoGetopt',);
+has 'nError' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nError', metaclass => 'NoGetopt',);
+
+has 'verbose' => ( isa => 'Bool', is => 'rw', default => 0, documentation => 'print verbose messages');
 
 sub load {
   my $self = shift;
@@ -69,6 +75,11 @@ sub load {
       $result = 'fail_qc_state';
       $self->_set_nFail($self->nFail+1);
     }
+
+    if ($self->verbose) {
+        _log('Sending outcome for run '.$outcome->id_run.' position '.$outcome->position.' to url '.$self->_create_url($lane_id,$result)); 
+    }
+
     my $error_txt = $self->_report($lane_id, $result);
     if ($error_txt) {
       _log($error_txt);
@@ -80,11 +91,15 @@ sub load {
   return;
 }
 
+sub _create_url {
+  my ($self, $lane_id, $result) = @_;
+  return $self->lims_url.q[/npg_actions/assets/].$lane_id.q(/).$result;
+}
 
 sub _report {
   my ($self, $lane_id, $result) = @_;
   eval {
-    npg::api::request->new()->make($self->lims_url.q[/npg_actions/assets/].$lane_id.q(/).$result, q[POST]);
+    npg::api::request->new()->make($self->_create_url($lane_id,$result), q[POST]);
     1;
   } or do {
     return "Error updating LIMS: $EVAL_ERROR";

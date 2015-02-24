@@ -8,7 +8,7 @@ use npg_qc::mqc::reporter;
 
 our $VERSION = '0';
 
-npg_qc::mqc::reporter->new()->load();
+npg_qc::mqc::reporter->new_with_options()->load();
 
 exit 0;
 __END__

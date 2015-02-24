@@ -48,7 +48,7 @@ my $url = 'http://dev.psd.sanger.ac.uk:6600';
 #
 {
   my $npg_qc_schema = Moose::Meta::Class->create_anon_class(roles => [qw/npg_testing::db/])->new_object()->create_test_db(q[npg_qc::Schema], q[t/data/reporter/npg_qc]);
-  my $reporter = test_reporter_pass->new( lims_url => $url, qc_schema => $npg_qc_schema);
+  my $reporter = test_reporter_pass->new( lims_url => $url, qc_schema => $npg_qc_schema, verbose => 1);
   is($reporter->lims_url, $url, 'passed URL ok');
   $reporter->load();
   is($reporter->nPass, 2, 'correct number of passes');
