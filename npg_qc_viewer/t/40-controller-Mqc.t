@@ -22,6 +22,10 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   like ($response->content, qr/only POST requests are allowed/, 'correct error message');
 }
 
+{#Update
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) } 'update run_id + position lives';
+}
+
 {
   my $response;
   lives_ok { $response = request(POST '/mqc/log' ) } 'post request lives';
