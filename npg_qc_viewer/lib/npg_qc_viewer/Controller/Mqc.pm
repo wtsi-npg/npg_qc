@@ -53,6 +53,17 @@ sub _validate_referer {
   return 1;
 }
 
+sub _validate_id_run {
+  my ($self, $c) = @_;
+  my $referrer_url = $c->request->referer;
+  my ($id_run) = $referrer_url =~ m{(\d+)\z}xms;
+  if (!$id_run) {
+    _error($c, $INTERNAL_ERROR_CODE,
+    qq{Manual QC action logging error: failed to get id_run from referrer url $referrer_url});
+  }
+  return $id_run;
+}
+
 sub log : Path('log') {
     my ( $self, $c ) = @_;
     use Test::More;
@@ -60,46 +71,39 @@ sub log : Path('log') {
     $self->_validate_req_method($c, $ALLOW_METHOD_POST);
     $self->_validate_role($c);
     $self->_validate_referer($c);
-    
+    my $id_run = $self->_validate_id_run($c);
     my $referrer_url = $c->request->referer;
-    my ( $id_run ) = $referrer_url =~ m{(\d+)\z}xms;
-    if (!$id_run) {
-      _error($c, $INTERNAL_ERROR_CODE,
-	qq{Manual QC action logging error: failed to get id_run from referrer url $referrer_url});
-    }
-
     my $values = {};
     $values->{'referer'} = $referrer_url;
     $values->{'user'} = $c->user->id;
 
     my $params = $request->body_parameters;
     foreach my $param (@PARAMS) {
-        if ($param =~ /^batch_id|position$/smx ) {
-            if($params->{$param}) {
-                $values->{$param} = $params->{$param};
-	    }
-	} else {
-            if(!$params->{$param}) {
-                _error($c, $BAD_REQUEST_CODE,
-                      qq[Manual QC action logging error: $param should be defined.]);
-	    }
-            if ($param eq q[status]) {
-                my $status = $params->{$param};
-                if ($status !~ /^fail|pass/smx) {
-		  _error($c, $BAD_REQUEST_CODE,
-                    qq[Manual QC action logging error: invalid status $status.]);
-		}
-                $values->{$param} = $status =~ /^pass/smx ? 1 : 0;
+      if ($param =~ /^batch_id|position$/smx ) {
+        if($params->{$param}) {
+          $values->{$param} = $params->{$param};
+	      }
 	    } else {
+	      if(!$params->{$param}) {
+	        _error($c, $BAD_REQUEST_CODE, qq[Manual QC action logging error: $param should be defined.]);
+	      }
+        if ($param eq q[status]) {
+          my $status = $params->{$param};
+          if ($status !~ /^fail|pass/smx) {
+  		      _error($c, $BAD_REQUEST_CODE,
+		        qq[Manual QC action logging error: invalid status $status.]);
+		      }
+          $values->{$param} = $status =~ /^pass/smx ? 1 : 0;
+	      } else {
                 $values->{$param} = $params->{$param};
-	    }
-	}
+	      }
+      }
     }
     eval {
-        $c->model('NpgDB')->log_manual_qc_action($values); #TODO This can go.
-        $c->model('NpgDB')->update_lane_manual_qc_complete( #TODO This needs to stay
-	  $id_run, $values->{'position'}, $values->{'status'}, $c->user->username);
-        1;
+      $c->model('NpgDB')->log_manual_qc_action($values); #TODO This can go.
+      $c->model('NpgDB')->update_lane_manual_qc_complete( #TODO This needs to stay
+	    $id_run, $values->{'position'}, $values->{'status'}, $c->user->username);
+      1;
     } or do {
         my $error = $EVAL_ERROR;
         _error($c, $INTERNAL_ERROR_CODE,
@@ -120,8 +124,6 @@ sub _error {
 sub _create_lane() {
   return;
 }
-
-#sub 
 
 sub update_outcome :Chained('base') :PathPart('update_outcome') :Args(2) {
   my ($self, $c) = @_;
