@@ -29,7 +29,6 @@ Readonly::Scalar our $MQC_ROLE            => q[manual_qc];
 sub _validate_req_method {
   my ($self, $c, $allowed) = @_;
   my $result = 0;
-  print('==============>' . $allowed . "\n");
   my $request = $c->request; 
   if ($request->method ne $allowed) {
     $c->response->headers->header('ALLOW' => $allowed);
@@ -38,19 +37,31 @@ sub _validate_req_method {
   return $result;
 }
 
+sub _validate_role {
+  my ($self, $c) = @_;
+  $c->controller('Root')->authorise($c, ($MQC_ROLE));
+  return 1;
+}
+
+sub _validate_referer {
+  my ($self, $c) = @_;
+  my $referrer_url = $c->request->referer;
+  if (!$referrer_url) {
+    _error($c, $BAD_REQUEST_CODE,
+    q[Manual QC action logging error: referrer header should be set.]);
+  }
+  return 1;
+}
+
 sub log : Path('log') {
     my ( $self, $c ) = @_;
     use Test::More;
     my $request = $c->request;
     $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    $self->_validate_role($c);
+    $self->_validate_referer($c);
     
-    $c->controller('Root')->authorise($c, ($MQC_ROLE));
-
-    my $referrer_url = $request->referer;
-    if (!$referrer_url) {
-      _error($c, $BAD_REQUEST_CODE,
-        q[Manual QC action logging error: referrer header should be set.]);
-    }
+    my $referrer_url = $c->request->referer;
     my ( $id_run ) = $referrer_url =~ m{(\d+)\z}xms;
     if (!$id_run) {
       _error($c, $INTERNAL_ERROR_CODE,
