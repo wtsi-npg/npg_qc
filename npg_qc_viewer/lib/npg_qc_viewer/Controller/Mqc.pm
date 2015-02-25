@@ -6,6 +6,7 @@ use Moose;
 use namespace::autoclean;
 use Readonly;
 use English qw(-no_match_vars);
+use Try::Tiny;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -101,7 +102,6 @@ sub _get_values {
 
 sub log : Path('log') {
     my ( $self, $c ) = @_;
-    use Test::More;
     my $request = $c->request;
     my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_POST);
     $self->_validate_role($c);
@@ -110,17 +110,12 @@ sub log : Path('log') {
     my $values = $self->_get_values($c, $referrer_url);    
     my $params = $self->_get_params($c, $values);
     
-    eval {
-      $c->model('NpgDB')->log_manual_qc_action($values); #TODO This can go.
-      #TODO This needs to stay
+    try {
       $c->model('NpgDB')->update_lane_manual_qc_complete( 
 	      $id_run, $values->{'position'}, $values->{'status'}, $c->user->username
 	    );
-      1;
-    } or do {
-        my $error = $EVAL_ERROR;
-        _error($c, $INTERNAL_ERROR_CODE,
-             qq[Error when logging manual qc action: $error]);
+    } catch {
+        _error($c, $INTERNAL_ERROR_CODE, qq[Error when logging manual qc action: $_]);
     };
 
     $c->response->body(q[Manual QC ] . $values->{status} . q[ for ] . $values->{lims_object_type} . q[ ] . $values->{lims_object_id} . q[ logged by NPG.]);
