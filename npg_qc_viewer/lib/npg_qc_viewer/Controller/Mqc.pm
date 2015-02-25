@@ -34,7 +34,7 @@ sub _validate_req_method {
     $c->response->headers->header('ALLOW' => $allowed);
     _error($c, $METHOD_NOT_ALLOWED, qq[Manual QC action logging error: only $allowed requests are allowed.]);
   }
-  return $result;
+  return $request->method;
 }
 
 sub _validate_role {
@@ -50,7 +50,7 @@ sub _validate_referer {
     _error($c, $BAD_REQUEST_CODE,
     q[Manual QC action logging error: referrer header should be set.]);
   }
-  return 1;
+  return $referrer_url;
 }
 
 sub _validate_id_run {
@@ -68,11 +68,10 @@ sub log : Path('log') {
     my ( $self, $c ) = @_;
     use Test::More;
     my $request = $c->request;
-    $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_POST);
     $self->_validate_role($c);
-    $self->_validate_referer($c);
+    my $referrer_url = $self->_validate_referer($c);
     my $id_run = $self->_validate_id_run($c);
-    my $referrer_url = $c->request->referer;
     my $values = {};
     $values->{'referer'} = $referrer_url;
     $values->{'user'} = $c->user->id;
