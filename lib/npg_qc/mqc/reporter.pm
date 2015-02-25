@@ -77,7 +77,7 @@ sub load {
     }
 
     if ($self->verbose) {
-        _log('Sending outcome for run '.$outcome->id_run.' position '.$outcome->position.' to url '.$self->_create_url($lane_id,$result)); 
+        _log('Sending outcome for run '.$outcome->id_run.' position '.$outcome->position.' to url '.$self->_create_url($lane_id,$result));
     }
 
     my $error_txt = $self->_report($lane_id, $result);
