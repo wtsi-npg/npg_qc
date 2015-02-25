@@ -64,6 +64,41 @@ sub _validate_id_run {
   return $id_run;
 }
 
+sub _get_params{
+  my ($self, $c, $values) = @_;
+  my $params = $c->request->body_parameters;
+  foreach my $param (@PARAMS) {
+    if ($param =~ /^batch_id|position$/smx ) {
+      if($params->{$param}) {
+          $values->{$param} = $params->{$param};
+      }
+    } else {
+      if(!$params->{$param}) {
+        _error($c, $BAD_REQUEST_CODE, qq[Manual QC action logging error: $param should be defined.]);
+      }
+      if ($param eq q[status]) {
+        my $status = $params->{$param};
+        if ($status !~ /^fail|pass/smx) {
+          _error($c, $BAD_REQUEST_CODE,
+          qq[Manual QC action logging error: invalid status $status.]);
+        }
+        $values->{$param} = $status =~ /^pass/smx ? 1 : 0;
+      } else {
+              $values->{$param} = $params->{$param};
+      }
+    }
+  }
+  return $params;
+}
+
+sub _get_values {
+  my ($self, $c, $referrer_url) = @_;
+  my $values = {};
+  $values->{'referer'} = $referrer_url;
+  $values->{'user'} = $c->user->id;
+  return $values;
+}
+
 sub log : Path('log') {
     my ( $self, $c ) = @_;
     use Test::More;
@@ -72,36 +107,15 @@ sub log : Path('log') {
     $self->_validate_role($c);
     my $referrer_url = $self->_validate_referer($c);
     my $id_run = $self->_validate_id_run($c);
-    my $values = {};
-    $values->{'referer'} = $referrer_url;
-    $values->{'user'} = $c->user->id;
-
-    my $params = $request->body_parameters;
-    foreach my $param (@PARAMS) {
-      if ($param =~ /^batch_id|position$/smx ) {
-        if($params->{$param}) {
-          $values->{$param} = $params->{$param};
-	      }
-	    } else {
-	      if(!$params->{$param}) {
-	        _error($c, $BAD_REQUEST_CODE, qq[Manual QC action logging error: $param should be defined.]);
-	      }
-        if ($param eq q[status]) {
-          my $status = $params->{$param};
-          if ($status !~ /^fail|pass/smx) {
-  		      _error($c, $BAD_REQUEST_CODE,
-		        qq[Manual QC action logging error: invalid status $status.]);
-		      }
-          $values->{$param} = $status =~ /^pass/smx ? 1 : 0;
-	      } else {
-                $values->{$param} = $params->{$param};
-	      }
-      }
-    }
+    my $values = $self->_get_values($c, $referrer_url);    
+    my $params = $self->_get_params($c, $values);
+    
     eval {
       $c->model('NpgDB')->log_manual_qc_action($values); #TODO This can go.
-      $c->model('NpgDB')->update_lane_manual_qc_complete( #TODO This needs to stay
-	    $id_run, $values->{'position'}, $values->{'status'}, $c->user->username);
+      #TODO This needs to stay
+      $c->model('NpgDB')->update_lane_manual_qc_complete( 
+	      $id_run, $values->{'position'}, $values->{'status'}, $c->user->username
+	    );
       1;
     } or do {
         my $error = $EVAL_ERROR;
