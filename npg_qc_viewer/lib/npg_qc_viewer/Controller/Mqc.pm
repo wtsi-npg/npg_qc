@@ -111,6 +111,8 @@ sub _error {
   return $c->controller('Root')->detach2error($c, $code, $message);
 }
 
+####Public
+
 sub log : Path('log') {
     my ( $self, $c ) = @_;
     my $request = $c->request;
@@ -136,14 +138,19 @@ sub log : Path('log') {
 #### Jaime
 
 sub _create_lane() {
+  #Do not create lanes in mqc table until they are being modified by the user.
   return;
 }
 
 sub update_outcome : Path('update_outcome') {
   my ($self, $c) = @_;
-  my $id_run = 1;
-  my $position = 1;
-  my $new_outcome = 'Rejected preliminary';
+  ####Validation
+  my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+  ####Loading state
+  my $params = $self->_get_parameters($c);
+  my $id_run = $params->{'id_run'};
+  my $position = $params->{'position'};
+  my $new_outcome = $params->{'new_oc'};
   my $username = 'jmtc';
   
   my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position})->next;
@@ -160,8 +167,12 @@ sub update_outcome : Path('update_outcome') {
 
 sub get_current_outcome : Path('get_current_outcome') {
   my ($self, $c) = @_;
-  my $id_run = 1;
-  my $position = 1;
+  ####Validation
+  my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+  ####Loading state
+  my $params = $self->_get_parameters($c);
+  my $id_run = $params->{'id_run'};
+  my $position = $params->{'position'};
   
   my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position});
   if (!$res) {
@@ -177,11 +188,10 @@ sub get_current_outcome : Path('get_current_outcome') {
 
 sub get_dummy_value_true : Path('dummy_true'){
   my ($self, $c) = @_;
-  my $params = _get_parameters($self, $c);
-  use Data::Dumper; 
-  
-  $c->response->body(Dumper($params));
-  #$c->response->body(q[{"value":true}]);
+  my $params = $self->_get_parameters($c);
+  #use Data::Dumper; 
+  #$c->response->body(Dumper($params));
+  $c->response->body(q[{"value":true}]);
   return;
 }
 
@@ -191,15 +201,23 @@ sub get_dummy_value_false : Path('dummy_false'){
   return;
 }
 
-sub get_all_outcomes : Path('all_outcomes') {
+sub get_all_outcomes : Path('get_all_outcomes') {
   my ($self, $c) = @_;
-  my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeDict')->search({});
+  ####Validation
+  my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+  ####Loading state
+  my $params = $self->_get_parameters($c);
+  my $id_run = $params->{'id_run'};
+  
+  my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run},);
   
   my $json = q/{"outcomes" : [/;
-  while(my $dict = $res->next) {
-    $json = $json . q/{"id_mqc_outcome":$dict->id_mqc_outcome,"description":$dict->short_desc},/;
+  while(my $ent = $res->next) {
+    my $position = $ent->position;
+    my $short_desc = $ent->mqc_outcome->short_desc;
+    $json = $json . qq/{"position":$position,"outcome":$short_desc},/;
   }
-  $json = $json . ']';
+  $json = $json . ']}';
   $c->response->body($json);
   return;
 }
