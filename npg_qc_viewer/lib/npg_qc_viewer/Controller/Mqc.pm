@@ -1,7 +1,5 @@
 package npg_qc_viewer::Controller::Mqc;
 
-#TODO jaime modify
-
 use Moose;
 use namespace::autoclean;
 use Readonly;
@@ -146,9 +144,9 @@ sub update_outcome : Path('update_outcome') {
   my ($self, $c) = @_;
   ####Validation
   my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+  my $id_run = $self->_validate_id_run($c);
   ####Loading state
   my $params = $self->_get_parameters($c);
-  my $id_run = $params->{'id_run'};
   my $position = $params->{'position'};
   my $new_outcome = $params->{'new_oc'};
   my $username = 'jmtc';
@@ -171,9 +169,9 @@ sub get_current_outcome : Path('get_current_outcome') {
   my ($self, $c) = @_;
   ####Validation
   my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+  my $id_run = $self->_validate_id_run($c);
   ####Loading state
   my $params = $self->_get_parameters($c);
-  my $id_run = $params->{'id_run'};
   my $position = $params->{'position'};
   
   my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position});
@@ -208,9 +206,9 @@ sub get_all_outcomes : Path('get_all_outcomes') {
   my ($self, $c) = @_;
   ####Validation
   my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+  my $id_run = $self->_validate_id_run($c);
   ####Loading state
   my $params = $self->_get_parameters($c);
-  my $id_run = $params->{'id_run'};
   
   my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run},);
   my @all = ();
@@ -223,7 +221,6 @@ sub get_all_outcomes : Path('get_all_outcomes') {
   $c->response->body(encode_json \%result);
   return;
 }
-
 
 1;
 __END__
