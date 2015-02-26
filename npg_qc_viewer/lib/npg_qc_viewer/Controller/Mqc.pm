@@ -65,6 +65,12 @@ sub _validate_id_run {
   return $id_run;
 }
 
+sub _get_parameters {
+  my ($self, $c) = @_;
+  my $params = $c->request->parameters;
+  return $params;
+}
+
 sub _get_params{
   my ($self, $c, $values) = @_;
   my $params = $c->request->body_parameters;
@@ -100,6 +106,11 @@ sub _get_values {
   return $values;
 }
 
+sub _error {
+  my ($c, $code, $message) = @_;
+  return $c->controller('Root')->detach2error($c, $code, $message);
+}
+
 sub log : Path('log') {
     my ( $self, $c ) = @_;
     my $request = $c->request;
@@ -110,21 +121,16 @@ sub log : Path('log') {
     my $values = $self->_get_values($c, $referrer_url);    
     my $params = $self->_get_params($c, $values);
     
-    try {
-      $c->model('NpgDB')->update_lane_manual_qc_complete( 
-	      $id_run, $values->{'position'}, $values->{'status'}, $c->user->username
-	    );
-    } catch {
-        _error($c, $INTERNAL_ERROR_CODE, qq[Error when logging manual qc action: $_]);
-    };
+#    try {
+#      $c->model('NpgDB')->update_lane_manual_qc_complete( 
+#	      $id_run, $values->{'position'}, $values->{'status'}, $c->user->username
+#	    );
+#    } catch {
+#        _error($c, $INTERNAL_ERROR_CODE, qq[Error when logging manual qc action: $_]);
+#    };
 
     $c->response->body(q[Manual QC ] . $values->{status} . q[ for ] . $values->{lims_object_type} . q[ ] . $values->{lims_object_id} . q[ logged by NPG.]);
     return;
-}
-
-sub _error {
-  my ($c, $code, $message) = @_;
-  return $c->controller('Root')->detach2error($c, $code, $message);
 }
 
 #### Jaime
@@ -133,46 +139,68 @@ sub _create_lane() {
   return;
 }
 
-sub update_outcome :Chained('base') :PathPart('update_outcome') :Args(2) {
+sub update_outcome : Path('update_outcome') {
   my ($self, $c) = @_;
-  my $row = $c->model('npg_qc::McqOutcomeEnt')->search({})->next;
-    if (!$row) {
-        $c->stash->{error_message} = qq[Impossible to update outcome.];
-        $c->detach(q[Root], q[error_page]);
-        return;
-    }
+  my $id_run = 1;
+  my $position = 1;
+  my $new_outcome = 'Rejected preliminary';
+  my $username = 'jmtc';
   
+  my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position})->next;
+  if (!$ent) {
+    $c->stash->{error_message} = qq[Impossible to update outcome.];
+    $c->detach(q[Root], q[error_page]);
+    return;
+  } else {
+    $ent->update_outcome($new_outcome, $username);
+    $c->response->body($ent->id_mqc_outcome);
+  }
   return;
 }
 
-sub get_current_outcome :Chained('base') :PathPart('get_current_outcome'): Args(2) {
+sub get_current_outcome : Path('get_current_outcome') {
   my ($self, $c) = @_;
-  my $run_id = 1;
+  my $id_run = 1;
   my $position = 1;
   
-  my $row = $c->model('npg_qc::McqOutcomeEnt')->search({})->next;
-  if (!$row) {
+  my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position});
+  if (!$res) {
     $c->stash->{error_message} = qq[Impossible to retrieve outcome.];
     $c->detach(q[Root], q[error_page]);
     return;
   } else { 
-    
+    my $ent = $res->next;
+    $c->response->body($ent->mqc_outcome->short_desc);
   }
   return;
 }
 
 sub get_dummy_value_true : Path('dummy_true'){
   my ($self, $c) = @_;
-  return 1;
+  my $params = _get_parameters($self, $c);
+  use Data::Dumper; 
+  
+  $c->response->body(Dumper($params));
+  #$c->response->body(q[{"value":true}]);
+  return;
 }
 
 sub get_dummy_value_false : Path('dummy_false'){
   my ($self, $c) = @_;
-  return 0;
+  $c->response->body(q[{"value":false}]);
+  return;
 }
 
-sub get_all_outcomes :Chained('base') :PathPart('') Args(1) {
+sub get_all_outcomes : Path('all_outcomes') {
   my ($self, $c) = @_;
+  my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeDict')->search({});
+  
+  my $json = q/{"outcomes" : [/;
+  while(my $dict = $res->next) {
+    $json = $json . q/{"id_mqc_outcome":$dict->id_mqc_outcome,"description":$dict->short_desc},/;
+  }
+  $json = $json . ']';
+  $c->response->body($json);
   return;
 }
 
