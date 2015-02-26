@@ -12,6 +12,8 @@ use Carp;
 use English qw{-no_match_vars};
 use Readonly;
 use POSIX qw(strftime);
+use LWP::UserAgent;
+use HTTP::Request;
 
 use st::api::base;
 use st::api::lims;
@@ -42,7 +44,8 @@ has 'lims_url' => ( isa => 'Str',
 
 sub _build_lims_url {
   my $self = shift;
-  return st::api::base->live_url();
+  $ENV{dev} ||= '';
+  return $ENV{dev} eq 'dev' ? st::api::base->dev_url(): st::api::base->live_url();
 }
 
 has 'nPass' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nPass', metaclass => 'NoGetopt',);
@@ -60,19 +63,20 @@ sub load {
 
   my $rs = $self->qc_schema->resultset('MqcOutcomeEnt')->get_ready_to_report();
   while (my $outcome = $rs->next()) {
-    my $lane_id = st::api::lims->new(id_run => $outcome->id_run, position => $outcome->position)->lane_id;
+    my $lane_id;
+    eval { $lane_id = st::api::lims->new(id_run => $outcome->id_run, position => $outcome->position)->lane_id; } or do { $lane_id = 0; };
     if (!$lane_id) {
-        $self->nError($self->nError+1);
+        $self->_set_nError($self->nError+1);
         _log(q(Can't find lane_id for run ) . $outcome->id_run . ' position ' . $outcome->position);
         next;
     }
 
     my $result;
     if ($outcome->is_accepted()) {
-      $result = 'pass_qc_state';
+      $result = 'pass';
       $self->_set_nPass($self->nPass + 1);
     } else {
-      $result = 'fail_qc_state';
+      $result = 'fail';
       $self->_set_nFail($self->nFail+1);
     }
 
@@ -93,18 +97,26 @@ sub load {
 
 sub _create_url {
   my ($self, $lane_id, $result) = @_;
-  return $self->lims_url.q[/npg_actions/assets/].$lane_id.q(/).$result;
+  return $self->lims_url.q[/npg_actions/assets/].$lane_id.q(/).$result.'_qc_state';
 }
 
 sub _report {
   my ($self, $lane_id, $result) = @_;
+  my $ua = LWP::UserAgent->new;
+  my $req = HTTP::Request->new(POST => $self->_create_url($lane_id,$result));
+  $req->header('content-type' => 'text/xml');
+  $req->content(qq(<?xml version="1.0" encoding="UTF-8"?><qc_information><message>Asset $lane_id  ${result}ed manual qc</message></qc_information>));
+  my $resp;
   eval {
-    npg::api::request->new()->make($self->_create_url($lane_id,$result), q[POST]);
+    $resp = $ua->request($req);
     1;
   } or do {
     return "Error updating LIMS: $EVAL_ERROR";
   };
-  return q( );
+  if (!$resp->is_success) {
+    return $resp->code . ' : ' . $resp->message;
+  }
+  return q();
 }
 
 sub _log {
