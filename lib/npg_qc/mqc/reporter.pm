@@ -114,7 +114,7 @@ sub _report {
     return "Error updating LIMS: $EVAL_ERROR";
   };
   if (!$resp->is_success) {
-    return $resp->code . ' : ' . $resp->message;
+    return $resp->code . ' : ' . $resp->message . ' : ' . $resp->content;
   }
   return q();
 }
