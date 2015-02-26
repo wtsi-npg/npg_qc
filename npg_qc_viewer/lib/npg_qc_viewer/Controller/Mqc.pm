@@ -201,6 +201,8 @@ sub get_dummy_value_false : Path('dummy_false'){
   return;
 }
 
+use JSON;
+
 sub get_all_outcomes : Path('get_all_outcomes') {
   my ($self, $c) = @_;
   ####Validation
@@ -210,15 +212,14 @@ sub get_all_outcomes : Path('get_all_outcomes') {
   my $id_run = $params->{'id_run'};
   
   my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run},);
-  
-  my $json = q/{"outcomes" : [/;
+  my @all = ();
   while(my $ent = $res->next) {
     my $position = $ent->position;
     my $short_desc = $ent->mqc_outcome->short_desc;
-    $json = $json . qq/{"position":$position,"outcome":$short_desc},/;
+    push(@all, {'position'=>$position, 'outcome'=>$short_desc});    
   }
-  $json = $json . ']}';
-  $c->response->body($json);
+  my %result = ('run_id'=>$id_run, 'positions'=>\@all);
+  $c->response->body(encode_json \%result);
   return;
 }
 
