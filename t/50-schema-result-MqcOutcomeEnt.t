@@ -23,7 +23,8 @@ my $dict_table = 'MqcOutcomeDict';
     'position'=>1,
     'id_mqc_outcome'=>0, 
     'username'=>'user', 
-    'last_modified'=>DateTime->now()};
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user'};
     
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
@@ -38,7 +39,8 @@ my $dict_table = 'MqcOutcomeDict';
     'position'=>1,
     'id_mqc_outcome'=>1, 
     'username'=>'user', 
-    'last_modified'=>DateTime->now()};
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user'};
 
   my $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>1}); #Search historic that matches latest change
   is ($hist_object_rs->count, 0, q[no row matches in the historic table before insert in entity]);
@@ -64,7 +66,8 @@ my $dict_table = 'MqcOutcomeDict';
       'position'=>2,
       'id_mqc_outcome'=>0, 
       'username'=>'user', 
-      'last_modified'=>DateTime->now()};
+      'last_modified'=>DateTime->now(),
+      'modified_by'=>'user'};
 
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
@@ -79,7 +82,8 @@ my $dict_table = 'MqcOutcomeDict';
     'position'=>3,
     'id_mqc_outcome'=>0, 
     'username'=>'user', 
-    'last_modified'=>DateTime->now()};
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user'};
 
   my $object = $schema->resultset($table)->create($values); #Insert new entity
   my $rs = $schema->resultset($table);
@@ -94,7 +98,8 @@ my $dict_table = 'MqcOutcomeDict';
     'position'=>4,
     'id_mqc_outcome'=>0, 
     'username'=>'user', 
-    'last_modified'=>DateTime->now()};
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user'};
 
   #There should not be a previous historic
   my $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3}); #Search historic that matches latest change
@@ -135,7 +140,7 @@ my $dict_table = 'MqcOutcomeDict';
     if($outcome_dict->is_final_outcome) {
       print("Problem trying to update final outcome");
     } else {
-      $object->update({'id_mqc_outcome' => $status});      
+      $object->update({'id_mqc_outcome' => $status, 'username'=>$username});      
     }
   } else {
     $object->id_mqc_outcome($status);
@@ -152,7 +157,8 @@ my $dict_table = 'MqcOutcomeDict';
     'position'       => 1,
     'id_mqc_outcome' => 1,
     'username'       => 'user', 
-    'last_modified'  => DateTime->now()};
+    'last_modified'  => DateTime->now(),
+    'modified_by'=>'user'};
 
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
@@ -208,7 +214,8 @@ my $dict_table = 'MqcOutcomeDict';
     'position'       => 1,
     'id_mqc_outcome' => 3, 
     'username'       => 'user', 
-    'last_modified'  => DateTime->now()};
+    'last_modified'  => DateTime->now(),
+    'modified_by'    => 'user'};
 
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
