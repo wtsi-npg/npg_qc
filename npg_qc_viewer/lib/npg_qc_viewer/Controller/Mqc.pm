@@ -165,6 +165,8 @@ sub update_outcome : Path('update_outcome') {
   return;
 }
 
+use JSON;
+
 sub get_current_outcome : Path('get_current_outcome') {
   my ($self, $c) = @_;
   ####Validation
@@ -181,7 +183,8 @@ sub get_current_outcome : Path('get_current_outcome') {
     return;
   } else { 
     my $ent = $res->next;
-    $c->response->body($ent->mqc_outcome->short_desc);
+    my %data = ('outcome'=>$ent->mqc_outcome->short_desc);
+    $c->response->body(encode_json \%data);
   }
   return;
 }
@@ -189,19 +192,17 @@ sub get_current_outcome : Path('get_current_outcome') {
 sub get_dummy_value_true : Path('dummy_true'){
   my ($self, $c) = @_;
   my $params = $self->_get_parameters($c);
-  #use Data::Dumper; 
-  #$c->response->body(Dumper($params));
-  $c->response->body(q[{"value":true}]);
+  my %data = ('value'=>'true');
+  $c->response->body(encode_json \%data);
   return;
 }
 
 sub get_dummy_value_false : Path('dummy_false'){
   my ($self, $c) = @_;
-  $c->response->body(q[{"value":false}]);
+  my %data = ('value'=>'false');
+  $c->response->body(encode_json \%data);
   return;
 }
-
-use JSON;
 
 sub get_all_outcomes : Path('get_all_outcomes') {
   my ($self, $c) = @_;
