@@ -74,12 +74,22 @@ Lane
   is_nullable: 1
   size: 128
 
+Web interface username
+
 =head2 last_modified
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
   default_value: current_timestamp
   is_nullable: 0
+
+=head2 modified_by
+
+  data_type: 'char'
+  is_nullable: 1
+  size: 128
+
+Last user to modify the row
 
 =cut
 
@@ -111,6 +121,8 @@ __PACKAGE__->add_columns(
     default_value => \'current_timestamp',
     is_nullable => 0,
   },
+  'modified_by',
+  { data_type => 'char', is_nullable => 1, size => 128 },
 );
 
 =head1 PRIMARY KEY
@@ -143,8 +155,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:53:16
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+3U2ufYH9i641bY8aErdcw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-26 20:31:11
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iRzNm9k6vm+7NGg6Sthc8Q
 
 our $VERSION = '0';
 
