@@ -242,7 +242,7 @@ sub update_outcome {
         croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i',
               $self->id_run, $self->position);
       } else { #Update
-        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username});
+        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username, 'modified_by' => $username});
       }
     } else { #Is a new row just insert.      
       $self->id_mqc_outcome($outcome_id);
@@ -307,6 +307,11 @@ sub _valid_outcome {
 sub update_reported {
   my $self = shift;
   my $username = $ENV{'USER'} || 'mqc_reporter'; #Cron username or default username for the application.
+  if(!$self->has_final_outcome) {
+    croak(sprintf 'Error while trying to update_reported non-final outcome id_run %i position %i".',
+          $self->id_run, $self->position);
+  }
+  #It does not check if the reported is null just in case we need to update a reported one.
   return $self->update({'reported' => $self->_get_time_now, 'modified_by' => $username}); #Only update the modified_by field.
 }
 
@@ -348,7 +353,8 @@ Catalog for manual MQC statuses.
 
 =head2 update_reported
 
-  Updates the value of reported to the current timestamp.
+  Updates the value of reported to the current timestamp. Thorws exception if the
+  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
 
 =head2 update
 
