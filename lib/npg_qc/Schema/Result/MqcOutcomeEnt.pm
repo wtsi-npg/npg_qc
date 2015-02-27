@@ -242,7 +242,7 @@ sub update_outcome {
         croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i',
               $self->id_run, $self->position);
       } else { #Update
-        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username});
+        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username, 'modified_by' => $username});
       }
     } else { #Is a new row just insert.      
       $self->id_mqc_outcome($outcome_id);
