@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 42;
+use Test::More tests => 44;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -90,6 +90,8 @@ my $dict_table = 'MqcOutcomeDict';
   $rs->find({'id_run'=>1, 'position'=>3})->update({'id_mqc_outcome'=>2}); #Find and update the outcome in the new outcome
   $rs = $schema->resultset($table)->search({'id_run'=>1, 'position'=>3, 'id_mqc_outcome'=>2}); #Search the new outcome
   is ($rs->count, 1, q[one row matches in the entity table after update]);
+  my $ent = $rs->next;
+  cmp_ok($ent->username, 'eq', $ent->modified_by, 'Username equals modified_by after manual update.');
 }
 
 #Test update with historic
@@ -245,6 +247,19 @@ my $dict_table = 'MqcOutcomeDict';
   
   $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
+}
+
+{#Test I can't update non-final outcome
+  ##### Setting up the entity
+  my $values = {'id_run'=>310,
+    'position'       => 1,
+    'id_mqc_outcome' => 1,
+    'username'       => 'user', 
+    'last_modified'  => DateTime->now(),
+    'modified_by'    => 'user'};
+
+  my $object = $schema->resultset($table)->create($values);
+  throws_ok { $object->update_reported() } qr/Error while trying to update_reported non-final outcome/, 'Invalid update_reported transition croak';
 }
 
 {
