@@ -353,7 +353,8 @@ Catalog for manual MQC statuses.
 
 =head2 update_reported
 
-  Updates the value of reported to the current timestamp.
+  Updates the value of reported to the current timestamp. Thorws exception if the
+  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
 
 =head2 update
 
