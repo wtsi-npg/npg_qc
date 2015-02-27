@@ -2,7 +2,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
 release 57.5
  - Added a new column to the mqc entity and historic table to keep separate track of who
-    updates the record through the web page and who was the last user to modify the row. 
+    updates the record through the web page and who was the last user to modify the row.
+    Updates to tests to deal with the new schema. 
 
 release 57.4
  - in order to be able to retrieve values of foreign keys without
