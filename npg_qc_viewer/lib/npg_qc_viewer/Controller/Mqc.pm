@@ -55,6 +55,10 @@ sub _validate_referer {
 sub _validate_id_run {
   my ($self, $c) = @_;
   my $referrer_url = $c->request->referer;
+  if(!$referrer_url) {
+    _error($c, $INTERNAL_ERROR_CODE,
+    qq{Manual QC action logging error: failed to get valid referrer url});
+  }
   my ($id_run) = $referrer_url =~ m{(\d+)\z}xms;
   if (!$id_run) {
     _error($c, $INTERNAL_ERROR_CODE,
