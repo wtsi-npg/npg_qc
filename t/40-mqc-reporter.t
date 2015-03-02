@@ -5,8 +5,12 @@
 
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 14;
 use Test::Exception;
+
+BEGIN {
+    $ENV{dev} = 'dev';
+}
 
 use_ok('npg_qc::mqc::reporter');
 
@@ -32,15 +36,12 @@ package test_reporter_fail;
 
 package main;
 
-my $url = 'http://dev.psd.sanger.ac.uk:6600';
-
 #
 # Test that the actual class loads
 #
 {
   my $reporter = npg_qc::mqc::reporter->new();
   isa_ok($reporter, 'npg_qc::mqc::reporter');
-  is($reporter->lims_url, 'http://psd-support.internal.sanger.ac.uk:6600', 'Picked up correct URL');
 }
 
 #
@@ -48,8 +49,7 @@ my $url = 'http://dev.psd.sanger.ac.uk:6600';
 #
 {
   my $npg_qc_schema = Moose::Meta::Class->create_anon_class(roles => [qw/npg_testing::db/])->new_object()->create_test_db(q[npg_qc::Schema], q[t/data/reporter/npg_qc]);
-  my $reporter = test_reporter_pass->new( lims_url => $url, qc_schema => $npg_qc_schema, verbose => 1);
-  is($reporter->lims_url, $url, 'passed URL ok');
+  my $reporter = test_reporter_pass->new(qc_schema => $npg_qc_schema, verbose => 1);
   $reporter->load();
   is($reporter->nPass, 2, 'correct number of passes');
   is($reporter->nFail, 1, 'correct number of fails');
@@ -66,8 +66,7 @@ my $url = 'http://dev.psd.sanger.ac.uk:6600';
 #
 {
   my $npg_qc_schema = Moose::Meta::Class->create_anon_class(roles => [qw/npg_testing::db/])->new_object()->create_test_db(q[npg_qc::Schema], q[t/data/reporter/npg_qc]);
-  my $reporter = test_reporter_fail->new( lims_url => $url, qc_schema => $npg_qc_schema);
-  is($reporter->lims_url, $url, 'passed URL ok');
+  my $reporter = test_reporter_fail->new(qc_schema => $npg_qc_schema);
   $reporter->load();
   is($reporter->nPass, 2, 'correct number of passes');
   is($reporter->nFail, 1, 'correct number of fails');

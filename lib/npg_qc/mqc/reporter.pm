@@ -35,19 +35,6 @@ sub _build_qc_schema {
   return npg_qc::Schema->connect();
 }
 
-has 'lims_url' => ( isa => 'Str',
-                    is => 'ro',
-                    required => 0,
-                    lazy_build => 1,
-                    metaclass => 'NoGetopt',
-                  );
-
-sub _build_lims_url {
-  my $self = shift;
-  $ENV{dev} ||= '';
-  return $ENV{dev} eq 'dev' ? st::api::base->dev_url(): st::api::base->live_url();
-}
-
 has 'nPass' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nPass', metaclass => 'NoGetopt',);
 has 'nFail' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nFail', metaclass => 'NoGetopt',);
 has 'nError' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nError', metaclass => 'NoGetopt',);
@@ -97,7 +84,7 @@ sub load {
 
 sub _create_url {
   my ($self, $lane_id, $result) = @_;
-  return $self->lims_url.q[/npg_actions/assets/].$lane_id.q(/).$result.'_qc_state';
+  return st::api::base->lims_url() . q[/npg_actions/assets/].$lane_id.q(/).$result.'_qc_state';
 }
 
 sub _report {
@@ -106,13 +93,7 @@ sub _report {
   my $req = HTTP::Request->new(POST => $self->_create_url($lane_id,$result));
   $req->header('content-type' => 'text/xml');
   $req->content(qq(<?xml version="1.0" encoding="UTF-8"?><qc_information><message>Asset $lane_id  ${result}ed manual qc</message></qc_information>));
-  my $resp;
-  eval {
-    $resp = $ua->request($req);
-    1;
-  } or do {
-    return "Error updating LIMS: $EVAL_ERROR";
-  };
+  my $resp = $ua->request($req);
   if (!$resp->is_success) {
     return $resp->code . ' : ' . $resp->message . ' : ' . $resp->content;
   }
