@@ -162,6 +162,7 @@ sub update_outcome : Path('update_outcome') {
     return;
   } else {
     $ent->update_outcome($new_outcome, $username);
+    $c->response->headers->content_type('application/json');
     $c->response->body($ent->id_mqc_outcome);
   }
   return;
@@ -185,6 +186,7 @@ sub get_current_outcome : Path('get_current_outcome') {
     return;
   } else { 
     my $ent = $res->next;
+    $c->response->headers->content_type('application/json');
     my %data = ('outcome'=>$ent->mqc_outcome->short_desc);
     $c->response->body(encode_json \%data);
   }
@@ -195,6 +197,7 @@ sub get_dummy_value_true : Path('dummy_true'){
   my ($self, $c) = @_;
   my $params = $self->_get_parameters($c);
   my %data = ('value'=>'true');
+  $c->response->headers->content_type('application/json');
   $c->response->body(encode_json \%data);
   return;
 }
@@ -202,6 +205,7 @@ sub get_dummy_value_true : Path('dummy_true'){
 sub get_dummy_value_false : Path('dummy_false'){
   my ($self, $c) = @_;
   my %data = ('value'=>'false');
+  $c->response->headers->content_type('application/json');
   $c->response->body(encode_json \%data);
   return;
 }
@@ -222,6 +226,7 @@ sub get_all_outcomes : Path('get_all_outcomes') {
     push(@all, {'position'=>$position, 'outcome'=>$short_desc});    
   }
   my %result = ('run_id'=>$id_run, 'positions'=>\@all);
+  $c->response->headers->content_type('application/json');
   $c->response->body(encode_json \%result);
   return;
 }
