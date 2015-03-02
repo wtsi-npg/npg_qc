@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 48;
+use Test::More tests => 47;
 use Test::Exception;
 use t::util;
 
@@ -16,7 +16,6 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   my @urls = ();
   push @urls,  '/checks';
   push @urls,  '/checks/about';
-  push @urls,  '/checks/runs';
   push @urls,  '/checks/runs/4025';
   push @urls,  '/checks/runs?run=4025';
   push @urls,  '/checks/runs?run=4025&lane=1&lane=4';

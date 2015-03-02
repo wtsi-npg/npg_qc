@@ -1,9 +1,0 @@
-[%- IF sorted_rl_map_keys.size; have_list_item = 0; -%]
-[%- FOREACH key IN sorted_rl_map_keys -%]
-  [%- IF rl_map.$key && rl_map.$key.size;-%]
-    [%- IF !have_list_item; have_list_item = 1; %]  <ul>[% END %]
-    <li><a href="#[% key %]">[% util.expand_rpt_key(key) %]</a></li>
-  [%- END -%]
-[%- END %]
-[%  IF have_list_item %]  </ul>[% END %]
-[%- END %]

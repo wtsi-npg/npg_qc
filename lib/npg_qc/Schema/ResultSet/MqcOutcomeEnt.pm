@@ -17,7 +17,6 @@ sub get_not_reported {
   return $self->search({$self->current_source_alias . '.reported' => undef});
 }
 
-use Data::Dumper;
 sub get_rows_with_final_current_outcome {
   my $self = shift;
   #Final outcome comes from the short_desc of the relationship with the dictionary, only those with current status
@@ -54,7 +53,7 @@ Extended ResultSet with specific functionality for for manual MQC.
 
   Returns a list of entities with a null reported timestamp.
 
-=head2 get_rows_with_final_outcome
+=head2 get_rows_with_final_current_outcome
 
   Returns a list of entities with final outcomes acording to business rules. Currently it looks into the relationship with the dictionary to find those outcomes with a short description ending in 'final'.
 

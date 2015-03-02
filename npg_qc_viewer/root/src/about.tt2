@@ -16,7 +16,6 @@
   <li>qX yield (threshold quality 20)</li>
   <li>insert size</li>
   <li>adapter</li>
-  <li>contamination</li>
   <li>ref_match</li>
   <li>split statistics</li>
   <li>sequence mismatch</li>
@@ -32,23 +31,8 @@
 </div>
 
 <div class="text_section">
-<h2>Main menu description</h2>
-<table summary="Main menu description">
-<tr><th>Menu button label </th><th>Action</th></tr>
-<tr><th>Runs</th>
-<td>A list of all runs with links to qc data for individual runs</td></tr>
-<tr><th>Help</th>
-<td>Displays this page</td></tr>
-<tr><th>NPG Tracking</th>
-<td>A link to NPG tracking web interface</td></tr>
-<tr><th>NPG QC</th>
-<td>A link to NPG QC web interface</td></tr>
-</table>
-</div>
-
-<div class="text_section">
-<h2>Additional queries</h2>
-<table summary="Additional queries">
+<h2>Examples of Queries</h2>
+<table summary="Examples of queries">
   <tr><th class="url_column" >URL</th><th>Action</th><th>URL Example</th></tr>
   <tr>
     <td class="url_column">/checks/runs/XXX,<br /> where XXX is the ID of the run</td>
