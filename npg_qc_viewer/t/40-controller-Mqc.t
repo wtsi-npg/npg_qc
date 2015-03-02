@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 5;
 use Test::Exception;
 use HTTP::Request::Common;
 use t::util;
@@ -9,9 +9,46 @@ my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
 
-use_ok 'npg_qc_viewer::Controller::Mqc';
-lives_ok { $util->test_env_setup()}  'test db created and populated';
-use_ok 'Catalyst::Test', 'npg_qc_viewer';
+subtest 'Class tests' => sub {
+  use_ok 'npg_qc_viewer::Controller::Mqc';
+  lives_ok { $util->test_env_setup()}  'test db created and populated';
+  use_ok 'Catalyst::Test', 'npg_qc_viewer';
+};
+
+subtest 'Test true' => sub {
+  plan tests => 2;
+  my $response;
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/dummy_true')) } 'test true lives';
+  is( $response->code, 200, 'dummy_true uccesful request' );
+};
+
+subtest 'Update general' => sub {
+  plan tests => 2;
+  my $response;
+  #TODO move to POST
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) } 'update run_id + position + outcome + user lives';
+  ok($response->is_error, q[update response is error]);
+#  is( $response->code, 401, 'error code is 401' );
+#  like ($response->content, qr/Login failed/, 'correct error message');
+};
+
+subtest 'Current outcome general' => sub {
+  plan tests => 2;
+  my $response;
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_current_outcome')) } 'get current outcome run_id + position lives';
+  ok($response->is_error, q[get_current_outcome response is error]);
+# is( $response->code, 401, 'error code is 401' );
+#  like ($response->content, qr/Login failed/, 'correct error message');
+};
+
+subtest 'All outcomes general' => sub {
+  plan tests => 2;
+  my $response;
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_all_outcomes')) } 'get all outcomes run_id';
+  ok($response->is_error, q[get_all_outcomes response is error]);
+#  is( $response->code, 401, 'error code is 401' );
+#  like ($response->content, qr/Login failed/, 'correct error message');
+};
 
 #{
 #  my $response;
@@ -21,37 +58,6 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
 #  is( $response->header('Allow'), 'POST', 'Allow response header is set to POST');
 #  like ($response->content, qr/only POST requests are allowed/, 'correct error message');
 #}
-
-{#Update
-  my $response;
-  #TODO move to POST
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) } 'update run_id + position + outcome + user lives';
-  ok($response->is_error, q[update response is error]);
-#  is( $response->code, 401, 'error code is 401' );
-#  like ($response->content, qr/Login failed/, 'correct error message');
-}
-
-{#Current outcome
-  my $response;
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_current_outcome')) } 'get current outcome run_id + position lives';
-  ok($response->is_error, q[get_current_outcome response is error]);
-# is( $response->code, 401, 'error code is 401' );
-#  like ($response->content, qr/Login failed/, 'correct error message');
-}
-
-{#All outcomes for id_run
-  my $response;
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_all_outcomes')) } 'get all outcomes run_id';
-  ok($response->is_error, q[get_all_outcomes response is error]);
-#  is( $response->code, 401, 'error code is 401' );
-#  like ($response->content, qr/Login failed/, 'correct error message');
-}
-
-{#Test true
-  my $response;
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/dummy_true')) } 'test true lives';
-  is( $response->code, 200, 'dummy_true uccesful request' );
-}
 
 #{
 #  my $response;
