@@ -39,7 +39,6 @@ NPG SeqQC Controller for URLs of pages displaying autoqc results
 
 =cut
 
-
 sub _test_positive_int {
     my ($self, $c, $input) = @_;
     if ($input !~ /^\d+$/smx || $input == 0) {
@@ -86,7 +85,6 @@ sub _wh_rows2run_lane_pairs {
     }
     return $map;
 }
-
 
 sub _rl_map_append {
     my ($self, $c, $rl_map) = @_;
@@ -161,7 +159,6 @@ sub _display_libs {
 
     return;
 }
-
 
 sub _display_run_lanes {
     my ($self, $c, $params) = @_;
@@ -250,7 +247,6 @@ sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
     return;
 }
 
-
 =head2 index 
 
 index page
@@ -277,7 +273,7 @@ sub about :Path('about') :Args(0) {
 
 =head2 list_runs
 
-Fetch all runs which are post archival and qc creation, and pass to runs/list.tt2 in stash to be displayed
+More complex URLs for runs
 
 =cut
 sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
@@ -287,9 +283,8 @@ sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
         $c->stash->{'db_lookup'} = 1;
         $self->_display_run_lanes($c);
     } else {
-        $c->stash->{runs} = [@{$c->model('NpgDB')->runs_list}];
-        $c->stash->{title} = q{List of runs};
-        $c->stash->{template} = q{list/runs.tt2};
+        $c->stash->{error_message} = q[This is an invalid URL];
+        $c->detach(q[Root], q[error_page]);
     }
     return;
 }
@@ -353,7 +348,6 @@ sub checks_in_run_from_staging :Chained('base') :PathPart('runs-from-staging') :
   return;
 }
 
-
 =head2 checks_from_path
 
 Fetches the checks collection from a given path
@@ -384,7 +378,6 @@ sub checks_from_path :Chained('base') :PathPart('path') :Args(0) {
   }
   return;
 }
-
 
 =head2 libraries
 
