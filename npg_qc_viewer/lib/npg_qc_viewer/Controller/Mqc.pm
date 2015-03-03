@@ -5,6 +5,7 @@ use namespace::autoclean;
 use Readonly;
 use English qw(-no_match_vars);
 use Try::Tiny;
+use JSON;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -137,22 +138,16 @@ sub log : Path('log') {
     return;
 }
 
-#### Jaime
-
-sub _create_lane() {
-  #Do not create lanes in mqc table until they are being modified by the user.
-  return;
-}
-
 sub update_outcome : Path('update_outcome') {
   my ($self, $c) = @_;
   ####Validation
-  my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_GET);
-  my $id_run = $self->_validate_id_run($c);
+  my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+  #my $id_run = $self->_validate_id_run($c); 
   ####Loading state
   my $params = $self->_get_parameters($c);
   my $position = $params->{'position'};
   my $new_outcome = $params->{'new_oc'};
+  my $id_run = $params->{'id_run'}; #TODO back to validate.
   my $username = 'jmtc';
   
   my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position})->next;
@@ -167,8 +162,6 @@ sub update_outcome : Path('update_outcome') {
   }
   return;
 }
-
-use JSON;
 
 sub get_current_outcome : Path('get_current_outcome') {
   my ($self, $c) = @_;
@@ -250,6 +243,14 @@ A Catalyst Controller for logging manual qc actions,
 
 =head2 log - logging action ~/mqc/log
 
+=head2 update_outcome - Update the mqc outcome using parameters from request (id_run, position, new_oc).
+
+=head2 get_current_outcome - Return JSON with current outcome for the paramaters from request (id_run, position).
+
+=head2 get_all_outcomes - Return JSON with all current outcomes for the parameter from request (id_run).
+
+=head2 
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -267,6 +268,10 @@ A Catalyst Controller for logging manual qc actions,
 =item Moose
 
 =item Catalyst::Controller
+
+=item Try::Tiny
+
+=item JSON
 
 =back
 
