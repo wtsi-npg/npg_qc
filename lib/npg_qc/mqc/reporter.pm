@@ -92,7 +92,6 @@ sub _report {
   my $ua = LWP::UserAgent->new;
   $ua->agent(join q[/], __PACKAGE__, $VERSION);
   $ua->timeout(60);     # set a one minute timeout
-  $ua->env_proxy();     # do not use a proxy
   my $req = HTTP::Request->new(POST => $self->_create_url($lane_id,$result));
   $req->header('content-type' => 'text/xml');
   $req->content(qq(<?xml version="1.0" encoding="UTF-8"?><qc_information><message>Asset $lane_id  ${result}ed manual qc</message></qc_information>));
