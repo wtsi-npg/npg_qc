@@ -67,7 +67,7 @@
       id_run   = attrs.id_run;
       time_comp = '';
       num_cycles = '';
-      position  = attrs.position;
+      position  = " <div id=mqc_" _ id_run _ " data-id_run='" _ id_run _ "' data-position='" _ attrs.position _ "' class='lane_mqc_control'>" _ attrs.position _ "</div>";
       is_dev = 0;
       tag_index = '';
       tag_sequence = '';
