@@ -152,9 +152,15 @@ sub update_outcome : Path('update_outcome') {
   
   my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position})->next;
   if (!$ent) {
-    $c->stash->{error_message} = qq[Impossible to update outcome.];
-    $c->detach(q[Root], q[error_page]);
-    return;
+    $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
+      id_run         => $id_run,
+      position       => $position,
+      username       => $username,
+      modified_by    => $username});
+
+    $ent->update_outcome($new_outcome, $username);
+    $c->response->headers->content_type('application/json');
+    $c->response->body($ent->id_mqc_outcome);
   } else {
     $ent->update_outcome($new_outcome, $username);
     $c->response->headers->content_type('application/json');
