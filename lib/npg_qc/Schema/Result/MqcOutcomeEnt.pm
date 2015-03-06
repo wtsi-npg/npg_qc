@@ -246,7 +246,7 @@ sub update_outcome {
       }
     } else { #Is a new row just insert.      
       $self->id_mqc_outcome($outcome_id);
-      $self->user($username);
+      $self->username($username);
       $self->modified_by($username);
       $self->insert();
     }
