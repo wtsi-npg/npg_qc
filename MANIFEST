@@ -847,6 +847,10 @@ t/data/rendered/tile_score.xml
 t/data/rendered/tile_score_xml.xml
 t/data/reporter/npg_qc/mqc_outcome_dict.yml
 t/data/reporter/npg_qc/mqc_outcome_ent.yml
+t/data/reporter/npg/run/5515.xml
+t/data/reporter/npg/run/6600.xml
+t/data/reporter/st/batches/12288.xml
+t/data/reporter/st/batches/8249.xml
 t/data/requests/cgi-bin/prodsoft/npg/npg/run/1829.xml
 t/data/requests/cgi-bin/prodsoft/npg/npg/run/1873.xml
 t/data/requests/cgi-bin/prodsoft/npg/npg/run/1881.xml
