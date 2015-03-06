@@ -31,18 +31,39 @@ function( npg_common,  manual_qc,  collapse,  insert_size,                 adapt
 		jQuery(".mqc").empty();
 	}
 
-	jQuery('.bcviz_insert_size').each(function(i) { insert_size.drawChart(this); });
+	jQuery('.bcviz_insert_size').each(function(i) { 
+        d = jQuery(this).data('check');
+        w = jQuery(this).data('width');
+        h = jQuery(this).data('height');
+        k = jQuery(this).data('key');
+        t = jQuery(this).data('title');
+        chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
+        jQuery('#bcviz_insert_size_'+k).append( function() { return chart.svg.node(); } );
+    });
 	
 	jQuery('.bcviz_adapter').each(function(i) { 
+        d = jQuery(this).data('check');
+        h = jQuery(this).data('height');
+        k = jQuery(this).data('key');
+        t = jQuery(this).data('title');
 		// override width to ensure two graphs can fit side by side
-		var width = jQuery(this).parent().width() / 2 - 40;
-		adapter.drawChart(this,width); 
+		w = jQuery(this).parent().width() / 2 - 40;
+		chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
+        jQuery('#bcviz_adapter_fwd_'+k).append( function() { return chart.svg_fwd.node(); } );
+        jQuery('#bcviz_adapter_rev_'+k).append( function() { return chart.svg_rev.node(); } );
 	});
 
 	jQuery('.bcviz_mismatch').each(function(i) { 
+        d = jQuery(this).data('check');
+        h = jQuery(this).data('height');
+        k = jQuery(this).data('key');
+        t = jQuery(this).data('title');
 		// override width to ensure two graphs can fit side by side
-		var width = jQuery(this).parent().width() / 2 - 90;
-		mismatch.drawChart(this,width); 
+		w = jQuery(this).parent().width() / 2 - 90;
+		chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
+        jQuery('#bcviz_mismatch_fwd_'+k).append( function() { return chart.svg_fwd.node(); } );
+        jQuery('#bcviz_mismatch_rev_'+k).append( function() { return chart.svg_rev.node(); } );
+        jQuery('#bcviz_mismatch_legend_'+k).append( function() { return chart.svg_legend.node(); } );
 	});
 
 });

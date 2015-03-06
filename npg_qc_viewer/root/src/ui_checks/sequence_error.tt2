@@ -98,20 +98,22 @@
 	<p>No CIGAR Data</p>
 [% END %]
 
+[% key = check.id_run _ '_' _ check.position _ '_' _ check.tag_index %]
+[% title = 'Mismatch : ' %]
+[% IF check.id_run.defined; title = title _ 'run ' _ check.id_run; END -%]
+[% IF check.position.defined; title = title _ ', lane ' _ check.position; END -%]
+[% IF check.tag_index.defined; title = title _ ', tag ' _ check.tag_index; END -%]
+
 <div style='float:left;' 
      class='bcviz_mismatch' 
-     [% IF has_reverse %]data-legend=0[% ELSE %]data-legend=1[% END %]
      data-check='[% check.json | replace("'", "%27") %]' 
-     data-direction='forward' 
+     data-key='[% key %]'
+     data-title='[% title %]'
      data-height=350>
 </div>
-[% IF has_reverse %]
-<div style='float:right;margin-right:20px;'
-     class='bcviz_mismatch' 
-     data-check='[% check.json | replace("'", "%27") %]' 
-     data-direction='reverse' 
-     data-height=350 
-     data-legend=1></div>
-[% END %]
+
+<div style='float:left;' id='bcviz_mismatch_fwd_[% key %]'></div>
+<div style='float:right;' id='bcviz_mismatch_legend_[% key %]'></div>
+<div style='float:right;' id='bcviz_mismatch_rev_[% key %]'></div>
 <div style='clear:both;'></div>
 
