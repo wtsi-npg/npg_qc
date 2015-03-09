@@ -1,7 +1,7 @@
 ---
 - id_mqc_outcome_ent: 1 
   id_run: 6600
-  position: 0
+  position: 6
   id_mqc_outcome: 1
   username: cat
 - id_mqc_outcome_ent: 2 

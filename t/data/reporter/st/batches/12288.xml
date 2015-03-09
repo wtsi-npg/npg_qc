@@ -243,7 +243,7 @@
         </sample>
       </pool>
     </lane>
-    <lane position="5" id="3169994" priority="0">
+    <lane position="5" id="" priority="0">
       <pool id="3066191" name="247923" request_id="3253291" qc_state="pass">
         <sample sample_id="1027852" library_id="3066063" library_name="" library_type="" study_id="1706" project_id="645" consent_withdrawn="false">
           <tag tag_id="626">
@@ -298,52 +298,6 @@
           <tag tag_id="625">
             <index>8</index>
             <expected_sequence>ACTTGATG</expected_sequence>
-            <tag_group_id>19</tag_group_id>
-          </tag>
-        </sample>
-      </pool>
-    </lane>
-    <lane position="6" id="3169995" priority="0">
-      <pool id="3066193" name="247924" request_id="3253310" qc_state="pass">
-        <sample sample_id="1088321" library_id="3066072" library_name="" library_type="" study_id="1706" project_id="645" consent_withdrawn="false">
-          <tag tag_id="626">
-            <index>1</index>
-            <expected_sequence>ATCACGTT</expected_sequence>
-            <tag_group_id>19</tag_group_id>
-          </tag>
-        </sample>
-        <sample sample_id="1088322" library_id="3066074" library_name="" library_type="" study_id="1706" project_id="645" consent_withdrawn="false">
-          <tag tag_id="627">
-            <index>2</index>
-            <expected_sequence>CGATGTTT</expected_sequence>
-            <tag_group_id>19</tag_group_id>
-          </tag>
-        </sample>
-        <sample sample_id="1088317" library_id="3066065" library_name="" library_type="" study_id="1706" project_id="645" consent_withdrawn="false">
-          <tag tag_id="628">
-            <index>3</index>
-            <expected_sequence>TTAGGCAT</expected_sequence>
-            <tag_group_id>19</tag_group_id>
-          </tag>
-        </sample>
-        <sample sample_id="1088318" library_id="3066066" library_name="" library_type="" study_id="1706" project_id="645" consent_withdrawn="false">
-          <tag tag_id="629">
-            <index>4</index>
-            <expected_sequence>TGACCACT</expected_sequence>
-            <tag_group_id>19</tag_group_id>
-          </tag>
-        </sample>
-        <sample sample_id="1088319" library_id="3066068" library_name="" library_type="" study_id="1706" project_id="645" consent_withdrawn="false">
-          <tag tag_id="630">
-            <index>5</index>
-            <expected_sequence>ACAGTGGT</expected_sequence>
-            <tag_group_id>19</tag_group_id>
-          </tag>
-        </sample>
-        <sample sample_id="1088320" library_id="3066070" library_name="" library_type="" study_id="1706" project_id="645" consent_withdrawn="false">
-          <tag tag_id="631">
-            <index>6</index>
-            <expected_sequence>GCCAATGT</expected_sequence>
             <tag_group_id>19</tag_group_id>
           </tag>
         </sample>

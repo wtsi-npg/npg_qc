@@ -50,13 +50,14 @@ sub load {
 
   my $rs = $self->qc_schema->resultset('MqcOutcomeEnt')->get_ready_to_report();
   while (my $outcome = $rs->next()) {
-    my $lane_id;
 
+    my $lane_id;
+    my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
     try {
       $lane_id = st::api::lims->new(id_run => $outcome->id_run, position => $outcome->position)->lane_id;
     } catch {
       $self->_set_nError($self->nError+1);
-      _log(q(Can't find lane_id for run ) . $outcome->id_run . ' position ' . $outcome->position . q(: ) . $_);
+      _log(qq(Error retrieving lane id for $details: $_));
     };
 
     if ($lane_id) {
@@ -71,7 +72,7 @@ sub load {
 
       my $url = $self->_create_url($lane_id,$result);
       if ($self->verbose) {
-        _log('Sending outcome for run '.$outcome->id_run.' position '.$outcome->position.' to url '.$url);
+        _log(qq(Sending outcome for $details to $url));
       }
 
       my $error_txt = $self->_report($lane_id, $result, $url);
@@ -81,6 +82,8 @@ sub load {
       } else {
         $outcome->update_reported();
       }
+    } else {
+      _log(qq(Lane id is not set for $details));
     }
   }
   return;
@@ -102,7 +105,11 @@ sub _report {
   $req->content(qq(<?xml version="1.0" encoding="UTF-8"?><qc_information><message>Asset $lane_id  ${result}ed manual qc</message></qc_information>));
   my $resp = $ua->request($req);
   if (!$resp->is_success) {
-    return $resp->code . ' : ' . $resp->message . ' : ' . $resp->content;
+    my $m = sprintf 'Response code %i : %s : %s',
+      $resp->code,
+      $resp->message || q(),
+      $resp->content || q();
+    return $m;
   }
   return q();
 }
