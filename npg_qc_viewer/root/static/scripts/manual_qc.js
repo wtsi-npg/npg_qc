@@ -43,6 +43,155 @@ function getOppositeStatus(status) {
   return status == "failed" ? "passed" : "failed";
 }
 
+/*
+ * Controller for individual lanes GUI.
+ */
+var LaneMQCControl = function (index) {
+  this.lane_control = null;  // Container linked to this controller
+  this.outcome      = null;  // Current outcome (Is updated when linked to an object in the view)
+  this.index        = index; // Index of control in the page.
+  
+  this.CONFIG_UPDATE_SERVICE      = "http://sf2-farm-srv1.internal.sanger.ac.uk:35000/mqc/update_outcome";
+  this.CONFIG_ACCEPTED_PRELIMINAR = 'Accepted preliminary';
+  this.CONFIG_REJECTED_PRELIMINAR = 'Rejected preliminary';
+  this.CONFIG_ACCEPTED_FINAL      = 'Accepted final';
+  this.CONFIG_REJECTED_FINAL      = 'Rejected final';
+  this.CONFIG_INITIAL             = 'initial';
+  
+  this.MESSAGE_ERROR_UPDATING = "Error while updating, please try again.";
+  
+  this.updateOutcome = function(outcome) {
+    var id_run = this.lane_control.data('id_run'); 
+    var position = this.lane_control.data('position');
+    var control = this;
+    if(outcome != control.outcome) {
+      //Show progress icon
+      control.lane_control.find('.lane_mqc_working').html("<img src='/static/images/waiting.gif' title='Processing request.'>");
+      $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome})
+      .done(function() {
+        switch (outcome) {
+          case control.CONFIG_ACCEPTED_PRELIMINAR : control.setAcceptedPre(); break; 
+          case control.CONFIG_REJECTED_PRELIMINAR : control.setRejectedPre(); break;
+          case control.CONFIG_ACCEPTED_FINAL : control.setAcceptedFinal(); break;
+          case control.CONFIG_REJECTED_FINAL : control.setRejectedFinal(); break;
+        }
+        //Clear progress icon
+        control.lane_control.find('.lane_mqc_working').html(position);
+      })
+      .fail(function() {
+        alert(control.MESSAGE_ERROR_UPDATING);
+        //Clear progress icon
+        control.lane_control.find('.lane_mqc_working').html(position);
+      });  
+    } else {
+      console.log("Noting to do!");
+    }
+  };
+  
+  /* 
+   * Builds the gui controls necessary for the mqc operation and passes them to the view. 
+   */ 
+  this.generateActiveControls = function() {
+    var lane_control = this.lane_control;
+    lane_control.empty();
+    //this.lane_control.html("<img class='lane_mqc_control_accept' src='tick.png' title='Accept'> <img class='lane_mqc_control_reject' src='cross.png' title='Reject'> <img class='lane_mqc_control_save' src='save.png' title='Save as final'> <div class='lane_mqc_working'></div>");
+    this.lane_control.html("<img class='lane_mqc_control_accept' src='/static/images/tick.png' title='Accept'> <img class='lane_mqc_control_reject' src='/static/images/cross.png' title='Reject'> <div class='lane_mqc_working'></div>");    
+    
+    this.lane_control.find('.lane_mqc_control_accept').bind({click: function() {
+      lane_control.extra_handler.updateOutcome(lane_control.extra_handler.CONFIG_ACCEPTED_FINAL);
+    }});
+    
+    this.lane_control.find('.lane_mqc_control_reject').bind({click: function() {
+      lane_control.extra_handler.updateOutcome(lane_control.extra_handler.CONFIG_REJECTED_FINAL);
+    }});
+    
+    this.lane_control.find('.lane_mqc_control_save').bind({click: function() {
+      lane_control.extra_handler.saveAsFinalOutcome();
+    }});
+  };
+  
+  /* 
+   * Checks the current outcome associated with this controller. If it is not final it will make it final
+   * will update the value in the model with an async call and update the view. 
+   */
+  this.saveAsFinalOutcome = function() {
+    var control = this;
+    
+    if(this.outcome === this.CONFIG_ACCEPTED_PRELIMINAR) {
+      this.updateOutcome(this.CONFIG_ACCEPTED_FINAL);
+    }
+    if(this.outcome === this.CONFIG_REJECTED_PRELIMINAR) {
+      this.updateOutcome(this.CONFIG_REJECTED_FINAL);
+    } 
+  };
+  
+  /* 
+   * Methods to deal with background colours. 
+   */
+  this.setAcceptedBG = function() {
+    this.lane_control.css("background-color", "#B5DAFF");
+  }
+  
+  this.setRejectedBG = function () {
+    this.lane_control.css("background-color", "#FFDDDD");
+  }
+  
+  this.setAcceptedPre = function() {
+    this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;    
+    this.setAcceptedBG();
+  };
+  
+  this.setRejectedPre = function() {
+    this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
+    this.setRejectedBG();
+  };
+  
+  this.setAcceptedFinal = function() {
+    this.replaceForLink();
+    this.outcome = this.CONFIG_ACCEPTED_FINAL;
+    this.updateOutcome(this.CONFIG_ACCEPTED_FINAL); //Remove if pre allowed
+    this.setAcceptedBG();
+  };
+  
+  this.setRejectedFinal = function() {
+    this.replaceForLink();
+    this.outcome = this.CONFIG_REJECTED_FINAL;
+    this.updateOutcome(this.CONFIG_REJECTED_FINAL); //Remove if pre allowed
+    this.setRejectedBG();
+  };
+  
+  this.replaceForLink = function() {
+    var id_run = this.lane_control.data('id_run'); 
+    var position = this.lane_control.data('position');
+    this.lane_control.empty();
+    this.lane_control.html("<a href='#" + id_run + ":" + position + "'>" + position + "</a>");
+  };
+  
+  /* 
+   * Links the individual object with an mqc controller so it can allow mqc of a lane.
+   */
+  this.linkControl = function(lane_control) {
+    lane_control.extra_handler = this;
+    this.lane_control = lane_control;
+    if ( typeof lane_control.data(this.CONFIG_INITIAL) == 'undefined') {
+      //If it does not have initial outcome
+      this.generateActiveControls();
+    } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINAR 
+        || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINAR) {
+      //If previous outcome is preliminar.
+      this.generateActiveControls();
+      switch (lane_control.data(this.CONFIG_INITIAL)){
+        case this.CONFIG_ACCEPTED_PRELIMINAR : this.setAcceptedPre(); break;
+        case this.CONFIG_REJECTED_PRELIMINAR : this.setRejectedPre(); break;
+      }
+    } else {
+      switch (lane_control.data(this.CONFIG_INITIAL)){
+        case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
+        case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
+      }
+    }
+  };
+}
 
 /*
 * Extract asset qc state from an XML document
@@ -117,16 +266,15 @@ function updateLibs(lib_names, position, no_recurse) {
         var anchor_el = lib_name_el_span.parentNode;
         var old_ref = anchor_el.getAttribute("href");
         if (old_ref) {
-	  var i = old_ref.lastIndexOf("=");
-	  anchor_el.setAttribute("href", old_ref.substr(0, i+1) + encodeURIComponent(new_lib_name));
-	}
-        
+          var i = old_ref.lastIndexOf("=");
+          anchor_el.setAttribute("href", old_ref.substr(0, i+1) + encodeURIComponent(new_lib_name));
+        }
         if (!no_recurse) {
           var recurse = 1;
           for (var j = 0; j < alength; j++) {
             var name = lib_names[j];
             if (name && position != j+1 && new_lib_name == name) {
-	      updateLibs(lib_names, j+1, recurse);
+              updateLibs(lib_names, j+1, recurse);
             }
           }
         }
@@ -280,64 +428,16 @@ function onMqcButtonClick(position, change_to, asset_id, qc_type) {
 */
 function getQcState() {
   
-  var divs = jQuery(".mqc");
-  divs.empty();
-  divs.append('<img src="/static/images/waiting.gif" />');
+  console.log("Flag :" + load_mqc_widgets);
 
-  var batch_url = ajax_base + st_uri + "/batches/" + batch_id + ".xml";
-
-  lib_ids = [10];
-  var lib_names = [10];
-
-  var request = jQuery.ajax({
-    url: batch_url,
-    success: function () {
-
-      jQuery(request.responseXML).find("lane").each(function() {
-
-        var position = jQuery(this).attr('position');
-
-        var libEl = jQuery(this).find("library").get(0);
-        if (!libEl) {
-          libEl = jQuery(this).find("pool").get(0); 
-        }
-        
-        if (libEl) {
-          lib_ids[position-1] = jQuery(libEl).attr('id');
-          lib_names[position-1] = jQuery(libEl).attr('name');
-          var request_id  = jQuery(libEl).attr('request_id');
-          if (request_id) {
-            getRequest(request_id, position);
-          }
-        } else {
-            var div = jQuery("#mqc_lane_" + position);
-            if (div) {
-              div.empty();
-            }
-	}
-      });
-
-      var alength = lib_ids.length;
-      for (var i = 0; i < alength; i++) {
-	var lib_asset_id = lib_ids[i];
-        if (lib_asset_id) {
-	  var repeate = 0;
-          for (var j = 0; j < i; j++) {
-	    if (lib_ids[j] && lib_ids[j] == lib_asset_id) {
-	      repeate = 1;
-              break;
-	    }
-	  }
-          if (!repeate) {
-	    var pos = i + 1;
-	    updateLibs(lib_names, pos);
-	  }
-	}
-      }
-    },
-    error: function () {
-      jQuery("#ajax_status").append("<li>Failed to get " + batch_url + "</li>");
-      jQuery(".mqc").empty();
-    }
+  //To keep all individual lane controls.
+  MQC.all_controls = []
+  
+  //Set up mqc controlers and link them to the individual lanes.
+  $('.lane_mqc_control').each(function (i, obj) {
+    obj = $(obj);
+    var c = new LaneMQCControl(i);
+    MQC.all_controls.push(c);
+    c.linkControl(obj);
   });
 }
