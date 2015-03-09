@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="5515" batch_id="8249" id_instrument="27" expected_cycle_count="116" actual_cycle_count="116" priority="1" id_run_pair="0" is_paired="0" team="joint" id_instrument_format="4" flowcell_id="62AD2AAXX" name="IL24_05515" loader="melanie" loading_date="2010-11-17" run_folder="101117_IL24_05515">
+ <instrument id_instrument="27" name="IL24" id_instrument_format="4" external_name="" serial="" iscurrent="0" />
+ <run_lanes><run_lane id_run_lane="43738" id_run="5515" tile_count="120" tracks="2" position="1" />
+<run_lane id_run_lane="43739" id_run="5515" tile_count="120" tracks="2" position="2" />
+<run_lane id_run_lane="43740" id_run="5515" tile_count="120" tracks="2" position="3" />
+<run_lane id_run_lane="43741" id_run="5515" tile_count="120" tracks="2" position="4" />
+<run_lane id_run_lane="43742" id_run="5515" tile_count="120" tracks="2" position="5" />
+<run_lane id_run_lane="43743" id_run="5515" tile_count="120" tracks="2" position="6" />
+<run_lane id_run_lane="43744" id_run="5515" tile_count="120" tracks="2" position="7" />
+<run_lane id_run_lane="43745" id_run="5515" tile_count="120" tracks="2" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="73430" id_run="5515" date="2010-12-03 21:21:36" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_statuses>
+ <run_status id_run_status="73430" id_run="5515" date="2010-12-03 21:21:36" id_run_status_dict="20" id_user="7" username="pipeline" iscurrent="1" description="qc complete" />
+ <run_status id_run_status="73429" id_run="5515" date="2010-12-03 21:21:11" id_run_status_dict="12" id_user="7" username="pipeline" iscurrent="0" description="run archived" />
+ <run_status id_run_status="73408" id_run="5515" date="2010-12-03 14:28:39" id_run_status_dict="18" id_user="7" username="pipeline" iscurrent="0" description="archival in progress" />
+ <run_status id_run_status="73407" id_run="5515" date="2010-12-03 14:27:52" id_run_status_dict="17" id_user="54" username="pipeline" iscurrent="0" description="archival pending" />
+ <run_status id_run_status="73217" id_run="5515" date="2010-11-29 09:12:07" id_run_status_dict="19" id_user="7" username="pipeline" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="73216" id_run="5515" date="2010-11-29 09:11:59" id_run_status_dict="9" id_user="7" username="pipeline" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="73189" id_run="5515" date="2010-11-27 20:36:12" id_run_status_dict="24" id_user="7" username="pipeline" iscurrent="0" description="secondary analysis in progress" />
+ <run_status id_run_status="73136" id_run="5515" date="2010-11-26 17:45:21" id_run_status_dict="7" id_user="7" username="pipeline" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="73101" id_run="5515" date="2010-11-25 16:24:19" id_run_status_dict="11" id_user="7" username="pipeline" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="73102" id_run="5515" date="2010-11-25 16:24:19" id_run_status_dict="6" id_user="7" username="pipeline" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="73056" id_run="5515" date="2010-11-24 02:14:00" id_run_status_dict="4" id_user="7" username="pipeline" iscurrent="0" description="run complete" />
+ <run_status id_run_status="72833" id_run="5515" date="2010-11-17 13:45:49" id_run_status_dict="2" id_user="7" username="pipeline" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="72825" id_run="5515" date="2010-11-17 12:58:16" id_run_status_dict="1" id_user="50" username="pipeline" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="10634" id_run="5515" id_annotation="11055" date="2010-11-19 10:33:49" id_user="9" username="ah1" comment="Lane 3 %PF down to 55%, but intensities and Quality Scores fine at the mo. Looks a little dense." attachment_name="" run_current_ok="1" current_cycle="41" />
+ <annotation id_run_annotation="10930" id_run="5515" id_annotation="11358" date="2010-12-14 15:21:57" id_user="54" username="svvd" comment="Forgot the annotation earlier: 54 cyc multiplexed run: PASS. Yield of 31.5 Gbases. %Error rate of 0.15 (R1) and 0.17 (R2). Base 2 in tag region of lane 2 is poor, hence only 92% tag decoding, but there is plenty of yield. Lane 1 has up to 17% adapter-based contamination. 
+" attachment_name="" run_current_ok="" current_cycle="" />
+ <annotation id_run_annotation="11062" id_run="5515" id_annotation="11491" date="2010-12-23 16:15:39" id_user="54" username="svvd" comment="Lane 3 - FAIL. Wrong library on lane 3." attachment_name="" run_current_ok="" current_cycle="" />
+ </annotations>
+ <tags>
+   <tag id_tag="20" description="multiplex" />
+   <tag id_tag="17" description="paired_read" />
+   <tag id_tag="16" description="rta" />
+ </tags>
+</run>
