@@ -113,11 +113,11 @@ var LaneMQCControl = function (index) {
    * Methods to deal with background colours. 
    */
   this.setAcceptedBG = function() {
-    this.lane_control.css("background-color", "#B5DAFF");
+    this.lane_control.parent().css("background-color", "#B5DAFF");
   }
   
   this.setRejectedBG = function () {
-    this.lane_control.css("background-color", "#FFDDDD");
+    this.lane_control.parent().css("background-color", "#FFDDDD");
   }
   
   this.setAcceptedPre = function() {
@@ -148,7 +148,6 @@ var LaneMQCControl = function (index) {
     var id_run = this.lane_control.data('id_run'); 
     var position = this.lane_control.data('position');
     this.lane_control.empty();
-    this.lane_control.html("<a href='#" + id_run + ":" + position + "'>" + position + "</a>");
   };
   
   /* 
