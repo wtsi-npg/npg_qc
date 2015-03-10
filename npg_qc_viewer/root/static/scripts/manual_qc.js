@@ -195,31 +195,6 @@ var LaneMQCControl = function (index) {
 
 
 /*
-* Log new manual qc status
-*/
-function logMqcStatus (asset_id, qc_type, status, position) {
-
-  jQuery.ajax({
-     type: "POST",
-     data: {'lims_object_id'   : asset_id, 
-            'lims_object_type' : qc_type, 
-            'status'   : status, 
-            'referer'  : decodeURI(location.href),
-            'position' : position,
-            'batch_id' : batch_id
-           },
-     url: base + "/mqc/log",
-     error: function() {
-      var target = "Batch: " + batch_id + ", lane " + position + ",  asset " + asset_id;
-      var msg = "Error storing manual_qc result and updating status: " + status + " for " + target +  ".";
-      jQuery("#ajax_status").append("<li>" + msg + "</li>");
-      //jQuery("#mqc_lane_" + position).empty();
-     }    
-  });
-}
-
-
-/*
 * Set the lib names to the values received from the live service
 */
 function updateLibs(lib_names, position, no_recurse) {
