@@ -320,53 +320,6 @@ function getRequest(request_id, position) {
 
 
 /*
-* Callback for a manual qc button click
-*/
-function onMqcButtonClick(position, change_to, asset_id, qc_type) {
-
-  var div_filter       = "mqc_" + qc_type + "_" + position;
-  var div = jQuery("#" + div_filter);
-  div.empty();
-  div.append('<img src="/static/images/waiting.gif" />');
-
-  var event_url = ajax_base + st_uri + "/npg_actions/assets/" + asset_id + "/" + change_to + "_qc_state";
-  var xml_data = '<?xml version="1.0" encoding="UTF-8"?><qc_information><message>Asset ' + asset_id + " " + change_to + "ed manual qc</message></qc_information>";
-
-  var request = jQuery.ajax({
-    type: "POST",
-    contentType: "text/xml",
-    processData: false,
-    data: xml_data,
-    url: event_url,
-    beforeSend: function(xhr) {
-      xhr.setRequestHeader("Accept", "application/xml");
-      xhr.setRequestHeader("Content-Type", "application/xml");
-      xhr.setRequestHeader("Content-Length", xml_data.length);
-    },
-    success: function() {
-      var doc = request.responseXML;
-      var root_name = doc.documentElement.tagName;
-      var repeate = 0;
-
-      if (root_name == "asset") {
-        logMqcStatus(asset_id, qc_type, change_to, position);
-        getAssetQcState(repeate, position, asset_id, qc_type, doc);
-      } else {
-        jQuery("#ajax_status").text("Some Sequencescape error when sending manual qc status");
-        updateMqcWidget(qc_type, position, getOppositeStatus(change_to), asset_id);
-      }
-    },
-    error: function() {
-      var target = "batch " + batch_id + ", lane " + position + ",  asset " + asset_id;
-      var msg = "Error reporting " + change_to + " for " + target +  ".";
-      jQuery("#ajax_status").append("<li>" + msg + " <a href='mailto:seq-help@sanger.ac.uk?subject=Manual QC reporting error: " + target + "&body=" + msg + "'>Mail USG</a></li>");
-      jQuery("#mqc_lane_" + position).empty();
-    }    
-  });
-}
-
-
-/*
 * Get current QC state of lanes and libraries for all position via ajax calls
 */
 function getQcState() {
