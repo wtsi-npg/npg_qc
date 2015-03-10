@@ -36,13 +36,6 @@ var ajax_base = base + "/ajaxproxy?url=";
 var lib_ids;
 
 
-function getOppositeStatus(status) {
-  if (status != "failed" && status != "passed") {
-    throw "MQC_ERROR: invalid status " + status;
-  }
-  return status == "failed" ? "passed" : "failed";
-}
-
 /*
  * Controller for individual lanes GUI.
  */
