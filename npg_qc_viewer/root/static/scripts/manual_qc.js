@@ -195,55 +195,6 @@ var LaneMQCControl = function (index) {
 
 
 /*
-* Set the lib names to the values received from the live service
-*/
-function updateLibs(lib_names, position, no_recurse) {
-
-  var alength = lib_names.length;
-  if (alength < 1) {
-    throw "MQC_ERROR: lib names array empty";
-  }
-  if (position < 1 || position > alength) {
-    throw "MQC_ERROR: invalid position";
-  }
-  var new_lib_name = lib_names[position - 1];
-  if (!new_lib_name) {
-    throw "MQC_ERROR: undefined lib name for position " + position;
-  }
-  var div = jQuery("#mqc_lib_" + position);
-  if (div) {
-    var lib_name_el_span = div.parent().find(".lib");
-    if (lib_name_el_span) {
-      lib_name_el_span = lib_name_el_span[0];
-    }
-    if (lib_name_el_span) {
-      var lib_name_el = lib_name_el_span.firstChild;
-      if (lib_name_el) {
-        lib_name_el.nodeValue = new_lib_name;
-        var anchor_el = lib_name_el_span.parentNode;
-        var old_ref = anchor_el.getAttribute("href");
-        if (old_ref) {
-          var i = old_ref.lastIndexOf("=");
-          anchor_el.setAttribute("href", old_ref.substr(0, i+1) + encodeURIComponent(new_lib_name));
-        }
-        if (!no_recurse) {
-          var recurse = 1;
-          for (var j = 0; j < alength; j++) {
-            var name = lib_names[j];
-            if (name && position != j+1 && new_lib_name == name) {
-              updateLibs(lib_names, j+1, recurse);
-            }
-          }
-        }
-        return 1;
-      }
-    }
-  }
-  return 0;
-}
-
-
-/*
 * Get request xml and from it lane asset id and its state
 */
 function getRequest(request_id, position) {
