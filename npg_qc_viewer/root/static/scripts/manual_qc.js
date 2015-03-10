@@ -182,17 +182,18 @@ var LaneMQCControl = function (index) {
 * Get current QC state of lanes and libraries for all position via ajax calls
 */
 function getQcState() {
-  
   console.log("Flag :" + load_mqc_widgets);
-
-  //To keep all individual lane controls.
-  MQC.all_controls = []
   
-  //Set up mqc controlers and link them to the individual lanes.
-  $('.lane_mqc_control').each(function (i, obj) {
-    obj = $(obj);
-    var c = new LaneMQCControl(i);
-    MQC.all_controls.push(c);
-    c.linkControl(obj);
-  });
+  if(load_mqc_widgets != 'undefined') {
+    //To keep all individual lane controls.
+    MQC.all_controls = []
+    
+    //Set up mqc controlers and link them to the individual lanes.
+    $('.lane_mqc_control').each(function (i, obj) {
+      obj = $(obj);
+      var c = new LaneMQCControl(i);
+      MQC.all_controls.push(c);
+      c.linkControl(obj);
+    });
+  }
 }
