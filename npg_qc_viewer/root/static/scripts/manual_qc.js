@@ -287,35 +287,6 @@ function updateLibs(lib_names, position, no_recurse) {
 
 
 /*
-* Get qc state of an asset and produce an appropriate visual feedback
-*/
-function getAssetQcState(repeate, position, asset_id, qc_type, doc) {
-
-  if (doc && jQuery.isXMLDoc(doc)) {
-    updateMqcWidget(qc_type, position, extractAssetQcState(doc, asset_id), asset_id);
-  } else {
-    var asset_url = ajax_base + st_uri + "/assets/" + asset_id + ".xml";
-    var asset_request = jQuery.ajax({
-      url: asset_url,
-      success: function() {
-        var qcEl = asset_request.responseXML.getElementsByTagName("qc_state").item(0);
-        if (qcEl) {
-          var qc_value = "";
-	  var qcElText = qcEl.firstChild;
-	  if (qcElText) {
-            qc_value = qcElText.nodeValue;
-          }
-          updateMqcWidget(qc_type, position, qc_value, asset_id, repeate);
-        } else {
-          throw "MQC_ERROR: qc_state element is not found for asset " + asset_id;
-        } 
-      }
-    });
-  }
-}
-
-
-/*
 * Get request xml and from it lane asset id and its state
 */
 function getRequest(request_id, position) {
