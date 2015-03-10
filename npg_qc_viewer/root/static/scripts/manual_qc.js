@@ -287,34 +287,6 @@ function updateLibs(lib_names, position, no_recurse) {
 
 
 /*
-* Draw widgets and update visually for qc status
-*/
-function updateMqcWidget(qc_type, position, qc_state, asset_id, repeate) {
-
-  var div_filter = "mqc_" + qc_type + '_' + position;
-  var div = jQuery("#" + div_filter);
-
-  if (div) {
-    div.empty();
-
-    var args = [position, "'pass'", asset_id, "'"+qc_type+"'"];
-    if (!qc_state || qc_state == "pending") {
-      div.append('<a href="javascript:void(0)" onclick="onMqcButtonClick(' + args.join(",") + ');"><img id="mqc_' + qc_type + '_pass_' + position + '" src="/static/images/tick.png" class="button button_pass" /></a>');
-      args[1] = "'fail'";
-      div.append('<a href="javascript:void(0)" onclick="onMqcButtonClick(' + args.join(",") + ');"><img id="mqc_' + qc_type + '_fail_' + position + '" src="/static/images/cross.png" class="button button_fail" /></a>');
-
-    } 
-
-    var class_names = qc_type;
-    if (qc_state == "failed" || qc_state == "passed") {
-      class_names = qc_state + " " + class_names;
-    }
-    div.parent().attr("class", class_names);
-  }
-}
-
-
-/*
 * Get qc state of an asset and produce an appropriate visual feedback
 */
 function getAssetQcState(repeate, position, asset_id, qc_type, doc) {
