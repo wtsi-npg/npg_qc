@@ -195,39 +195,6 @@ var LaneMQCControl = function (index) {
 
 
 /*
-* Get request xml and from it lane asset id and its state
-*/
-function getRequest(request_id, position) {
-
-  var request_url = ajax_base + st_uri + "/requests/" + request_id + ".xml";
-  var requestRequest = jQuery.ajax({
-    url: request_url,
-    success: function() {
-      var reqTagIdEl = requestRequest.responseXML.getElementsByTagName("target_asset_id").item(0);
-      if (reqTagIdEl) {
-	var reqTagIdElText = reqTagIdEl.firstChild;
-	var lane_asset_id = "";
-	if (reqTagIdElText) {
-	  lane_asset_id = reqTagIdElText.nodeValue;
-	}
-	if(lane_asset_id) {
-	  getAssetQcState(0, position, lane_asset_id, "lane");
-	} else {
-	  throw "MQC_ERROR: target_asset_id not defined for request " + request_id;
-	}
-      } else {
-	throw "MQC_ERROR: target_asset_id element not found for request " + request_id;
-      }
-    },
-    error: function() {
-      jQuery("#ajax_status").append("<li>Failed to get " + request_url + "for lane " + position + "</li>");
-      jQuery("#mqc_lane_" + position).empty();
-    }
-  });
-}
-
-
-/*
 * Get current QC state of lanes and libraries for all position via ajax calls
 */
 function getQcState() {
