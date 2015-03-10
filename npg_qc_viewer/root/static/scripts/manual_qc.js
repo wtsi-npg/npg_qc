@@ -28,15 +28,6 @@
 ************************************************************************************/
 
 /*
-* Global variables
-*/
-var st_uri = service_uri();
-var base = "../..";
-var ajax_base = base + "/ajaxproxy?url=";
-var lib_ids;
-
-
-/*
  * Controller for individual lanes GUI.
  */
 var LaneMQCControl = function (index) {
