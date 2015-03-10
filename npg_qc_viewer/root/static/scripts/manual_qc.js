@@ -193,24 +193,6 @@ var LaneMQCControl = function (index) {
   };
 }
 
-/*
-* Extract asset qc state from an XML document
-*/
-function extractAssetQcState(doc, asset_id) {
-
-  var qcEl = doc.getElementsByTagName("qc_state").item(0);
-  var qc_value = "";
-  if (qcEl) {
-    var qcElText = qcEl.firstChild;
-    if (qcElText) {
-      qc_value = qcElText.nodeValue;
-    }
-  } else {
-    throw "MQC_ERROR: qc_state element is not found for asset " + asset_id;
-  }
-  return qc_value;
-}
-
 
 /*
 * Log new manual qc status
