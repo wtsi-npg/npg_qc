@@ -1,5 +1,12 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 57.6
+ - Added mqc_outcome_reporter
+ - Added a new column to the mqc entity and historic table to keep separate track of who
+    updates the record through the web page and who was the last user to modify the row.
+    Updates to tests to deal with the new schema.
+ - MqcOutcomeEnt validates outcomes are final before updating them as reported.
+
 release 57.5
  - amend location of composite genotype data (composite_results_loc) in npg_qc_viewer.conf
 

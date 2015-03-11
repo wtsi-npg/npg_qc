@@ -17,7 +17,6 @@ sub get_not_reported {
   return $self->search({$self->current_source_alias . '.reported' => undef});
 }
 
-use Data::Dumper;
 sub get_rows_with_final_current_outcome {
   my $self = shift;
   #Final outcome comes from the short_desc of the relationship with the dictionary, only those with current status

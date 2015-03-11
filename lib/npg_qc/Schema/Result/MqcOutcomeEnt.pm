@@ -26,13 +26,11 @@ extends 'DBIx::Class::Core';
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
-=item * L<DBIx::Class::InflateColumn::Serializer>
-
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 =head1 TABLE: C<mqc_outcome_ent>
 
@@ -76,12 +74,22 @@ Lane
   is_nullable: 1
   size: 128
 
+Web interface username
+
 =head2 last_modified
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
   default_value: current_timestamp
   is_nullable: 0
+
+=head2 modified_by
+
+  data_type: 'char'
+  is_nullable: 1
+  size: 128
+
+Last user to modify the row
 
 =head2 reported
 
@@ -121,6 +129,8 @@ __PACKAGE__->add_columns(
     default_value => \'current_timestamp',
     is_nullable => 0,
   },
+  'modified_by',
+  { data_type => 'char', is_nullable => 1, size => 128 },
   'reported',
   {
     data_type => 'timestamp',
@@ -175,8 +185,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:54:50
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:IeVPqo19e5AiSNHxD0cTTQ
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-26 20:31:11
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bg5+7gTLsHhOnjh81ZO69A
 
 our $VERSION = '0';
 
@@ -212,6 +222,7 @@ sub update_outcome {
   my $self = shift;
   my $outcome = shift;
   my $username = shift;
+  #Validation
   if(!defined $outcome){
     croak q[Mandatory parameter 'outcome' missing in call];
   }
@@ -231,11 +242,12 @@ sub update_outcome {
         croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i',
               $self->id_run, $self->position);
       } else { #Update
-        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username});
+        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username, 'modified_by' => $username});
       }
     } else { #Is a new row just insert.      
       $self->id_mqc_outcome($outcome_id);
       $self->user($username);
+      $self->modified_by($username);
       $self->insert();
     }
   } else {
@@ -269,7 +281,8 @@ sub _create_historic {
     position       => $self->position,
     id_mqc_outcome => $self->id_mqc_outcome,
     username       => $self->username,
-    last_modified  => $self->last_modified});
+    last_modified  => $self->last_modified,
+    modified_by    => $self->modified_by});
 
   return 1;
 }
@@ -294,7 +307,12 @@ sub _valid_outcome {
 sub update_reported {
   my $self = shift;
   my $username = $ENV{'USER'} || 'mqc_reporter'; #Cron username or default username for the application.
-  return $self->update({'reported' => $self->_get_time_now, 'username'=>$username});
+  if(!$self->has_final_outcome) {
+    croak(sprintf 'Error while trying to update_reported non-final outcome id_run %i position %i".',
+          $self->id_run, $self->position);
+  }
+  #It does not check if the reported is null just in case we need to update a reported one.
+  return $self->update({'reported' => $self->_get_time_now, 'modified_by' => $username}); #Only update the modified_by field.
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -335,7 +353,8 @@ Catalog for manual MQC statuses.
 
 =head2 update_reported
 
-  Updates the value of reported to the current timestamp.
+  Updates the value of reported to the current timestamp. Thorws exception if the
+  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
 
 =head2 update
 
