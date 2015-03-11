@@ -128,8 +128,8 @@ sub log : Path('log') {
 
 #    try {
 #      $c->model('NpgDB')->update_lane_manual_qc_complete( 
-#	      $id_run, $values->{'position'}, $values->{'status'}, $c->user->username
-#	    );
+#	       $id_run, $values->{'position'}, $values->{'status'}, $c->user->username
+#	     );
 #    } catch {
 #        _error($c, $INTERNAL_ERROR_CODE, qq[Error when logging manual qc action: $_]);
 #    };
@@ -175,6 +175,7 @@ sub update_outcome : Path('update_outcome') {
   return;
 }
 
+#For future use.
 sub get_current_outcome : Path('get_current_outcome') {
   my ($self, $c) = @_;
   ####Validation
@@ -198,6 +199,7 @@ sub get_current_outcome : Path('get_current_outcome') {
   return;
 }
 
+#TODO clean before release.
 sub get_dummy_value_true : Path('dummy_true'){
   my ($self, $c) = @_;
   my $params = $self->_get_parameters($c);
@@ -207,6 +209,7 @@ sub get_dummy_value_true : Path('dummy_true'){
   return;
 }
 
+#TODO clean before release.
 sub get_dummy_value_false : Path('dummy_false'){
   my ($self, $c) = @_;
   my %data = ('value'=>'false');
@@ -215,6 +218,7 @@ sub get_dummy_value_false : Path('dummy_false'){
   return;
 }
 
+#For future use
 sub get_all_outcomes : Path('get_all_outcomes') {
   my ($self, $c) = @_;
   ####Validation
