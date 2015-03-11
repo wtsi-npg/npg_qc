@@ -75,12 +75,12 @@ sub _wh_rows2run_lane_pairs {
                 ## no critic (ProhibitBooleanGrep)
                 if (!grep {/$position/smx} @{$map->{$id_run}}) {
                     push  @{$map->{$id_run}}, $position;
-	        }
-                ## use critic
-	    } else {
+	              }
+            ## use critic
+	          } else {
                 $map->{$id_run} = [$position];
-	    }
-	}
+	          }
+	      }
         $rset->reset;
     }
     return $map;
@@ -97,9 +97,9 @@ sub _rl_map_append {
         while (my $row = $rs->next) {
             my $rpt_key = $row->rpt_key;
             $wh_rl_map->{$rpt_key} = 1;
-	    if (!exists  $rl_map->{$rpt_key}) {
+            if (!exists  $rl_map->{$rpt_key}) {
                 $rl_map->{$rpt_key} = undef;
-	    }
+            }
         }
         $rs->reset;
     }
@@ -175,7 +175,7 @@ sub _display_run_lanes {
         $id_runs = $c->request->query_parameters->{'run'};
         if (!ref $id_runs) {
             $id_runs = [$id_runs];
-	}
+	      }
     }
 
     if (exists $c->request->query_parameters->{'lane'}) {
@@ -192,6 +192,17 @@ sub _display_run_lanes {
     my $run_lanes = {};
     foreach my $id_run (@{$id_runs}) {
         $run_lanes->{$id_run} = $lanes;
+
+        #Load previuos status qc for tracking and mqc.
+        #TODO move to private method
+        my $npg_qc_db_rs = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt');
+        my $previous_mqc = {};
+        my $previous_rs = $npg_qc_db_rs->search({'id_run'=>$id_run});
+        while (my $obj = $previous_rs->next) {
+            print($obj->mqc_outcome->short_desc . "\n"); 
+            $previous_mqc->{$obj->position} = $obj->mqc_outcome->short_desc;
+        }
+        $c->stash->{'previous_mqc'} = $previous_mqc; 
     }
 
     my $what = $self->_show_option($c);
@@ -213,7 +224,7 @@ sub _display_run_lanes {
         my $title = q[Results ];
         if (!$c->stash->{'db_lookup'}) {
             $title .= q[(staging) ];
-	}
+	      }
         if (@{$id_runs}) {
             $title .= qq[($what) for runs ] . (join q[ ], @{$id_runs});
         }
