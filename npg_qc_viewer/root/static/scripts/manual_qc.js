@@ -35,7 +35,7 @@ var LaneMQCControl = function (index) {
   this.outcome      = null;  // Current outcome (Is updated when linked to an object in the view)
   this.index        = index; // Index of control in the page.
   
-  this.CONFIG_UPDATE_SERVICE      = "http://sf2-farm-srv1.internal.sanger.ac.uk:35000/mqc/update_outcome";
+  this.CONFIG_UPDATE_SERVICE      = "/mqc/update_outcome";
   this.CONFIG_ACCEPTED_PRELIMINAR = 'Accepted preliminary';
   this.CONFIG_REJECTED_PRELIMINAR = 'Rejected preliminary';
   this.CONFIG_ACCEPTED_FINAL      = 'Accepted final';
