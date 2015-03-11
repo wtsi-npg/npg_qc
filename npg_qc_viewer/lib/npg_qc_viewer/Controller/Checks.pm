@@ -192,17 +192,6 @@ sub _display_run_lanes {
     my $run_lanes = {};
     foreach my $id_run (@{$id_runs}) {
         $run_lanes->{$id_run} = $lanes;
-
-        #Load previuos status qc for tracking and mqc.
-        #TODO move to private method
-        my $npg_qc_db_rs = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt');
-        my $previous_mqc = {};
-        my $previous_rs = $npg_qc_db_rs->search({'id_run'=>$id_run});
-        while (my $obj = $previous_rs->next) {
-            print($obj->mqc_outcome->short_desc . "\n"); 
-            $previous_mqc->{$obj->position} = $obj->mqc_outcome->short_desc;
-        }
-        $c->stash->{'previous_mqc'} = $previous_mqc; 
     }
 
     my $what = $self->_show_option($c);

@@ -28,6 +28,18 @@ sub get_ready_to_report{
   return $self->get_not_reported->get_rows_with_final_current_outcome;
 }
 
+sub get_outcomes_as_hash{
+  my ($self, $id_run) = @_;
+  
+  #Loading previuos status qc for tracking and mqc.
+  my $previous_mqc = {};
+  my $previous_rs = $self->search({'id_run'=>$id_run});
+  while (my $obj = $previous_rs->next) { 
+    $previous_mqc->{$obj->position} = $obj->mqc_outcome->short_desc;
+  }
+  return $previous_mqc;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -60,6 +72,10 @@ Extended ResultSet with specific functionality for for manual MQC.
 =head2 get_ready_to_report
 
   Returns a list of MqcOutcomeEnt rows which are ready to be reported (have a final status but haven't been reported yet and which have an outcome marked as current in the dictionary).
+
+=head2 get_outcomes_as_hash
+
+  Returns a hash of lane=>outcome for those lanes in the database for the id_run specified.
 
 =head1 DEPENDENCIES
 
