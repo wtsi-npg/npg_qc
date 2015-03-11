@@ -181,9 +181,9 @@ var LaneMQCControl = function (index) {
 * Get current QC state of lanes and libraries for all position via ajax calls
 */
 function getQcState() {
-  console.log("Flag :" + load_mqc_widgets);
-  
   if(load_mqc_widgets != 'undefined') {
+    console.log("Flag :" + load_mqc_widgets);
+    
     //To keep all individual lane controls.
     MQC.all_controls = []
     
