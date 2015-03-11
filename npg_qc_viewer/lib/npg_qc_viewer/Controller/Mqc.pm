@@ -125,7 +125,7 @@ sub log : Path('log') {
     my $id_run = $self->_validate_id_run($c);
     my $values = $self->_get_values($c, $referrer_url);    
     my $params = $self->_get_params($c, $values);
-    
+
 #    try {
 #      $c->model('NpgDB')->update_lane_manual_qc_complete( 
 #	      $id_run, $values->{'position'}, $values->{'status'}, $c->user->username
@@ -140,33 +140,39 @@ sub log : Path('log') {
 
 sub update_outcome : Path('update_outcome') {
   my ($self, $c) = @_;
-  ####Validation
-  my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_POST);
-  #my $id_run = $self->_validate_id_run($c); 
-  ####Loading state
-  my $params = $self->_get_parameters($c);
-  my $position = $params->{'position'};
-  my $new_outcome = $params->{'new_oc'};
-  my $id_run = $params->{'id_run'}; #TODO back to validate.
-  #my $username = 'jmtc'; #TODO remove
-  my $username = $c->user->username;
+  try {
+    ####Validation
+    my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    my $validate_role = $self->_validate_role($c);
+    #my $id_run = $self->_validate_id_run($c); 
+    ####Loading state
+    my $params = $self->_get_parameters($c);
+    my $position = $params->{'position'};
+    my $new_outcome = $params->{'new_oc'};
+    my $id_run = $params->{'id_run'}; #TODO back to validate.
+    my $username = $c->user->username;
   
-  my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position})->next;
-  if (!$ent) {
-    $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
-      id_run         => $id_run,
-      position       => $position,
-      username       => $username,
-      modified_by    => $username});
-
-    $ent->update_outcome($new_outcome, $username);
+    my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position})->next;
+    if (!$ent) {
+      $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
+        id_run         => $id_run,
+        position       => $position,
+        username       => $username,
+        modified_by    => $username});
+  
+      $ent->update_outcome($new_outcome, $username);
+      $c->response->headers->content_type('application/json');
+      $c->response->body($ent->id_mqc_outcome);
+    } else {
+      $ent->update_outcome($new_outcome, $username);
+      $c->response->headers->content_type('application/json');
+      $c->response->body($ent->id_mqc_outcome);
+    }
+  } catch {
     $c->response->headers->content_type('application/json');
-    $c->response->body($ent->id_mqc_outcome);
-  } else {
-    $ent->update_outcome($new_outcome, $username);
-    $c->response->headers->content_type('application/json');
-    $c->response->body($ent->id_mqc_outcome);
-  }
+    my %data = ('message'=>qq[Error when logging manual qc action: $_]);
+    $c->response->body(encode_json \%data);
+  };  
   return;
 }
 
