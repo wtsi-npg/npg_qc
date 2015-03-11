@@ -148,7 +148,8 @@ sub update_outcome : Path('update_outcome') {
   my $position = $params->{'position'};
   my $new_outcome = $params->{'new_oc'};
   my $id_run = $params->{'id_run'}; #TODO back to validate.
-  my $username = 'jmtc';
+  #my $username = 'jmtc'; #TODO remove
+  my $username = $c->user->username;
   
   my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({"id_run" => $id_run, "position" => $position})->next;
   if (!$ent) {
