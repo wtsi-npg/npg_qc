@@ -42,7 +42,7 @@ var LaneMQCControl = function (index) {
   this.CONFIG_REJECTED_FINAL      = 'Rejected final';
   this.CONFIG_INITIAL             = 'initial';
   
-  this.MESSAGE_ERROR_UPDATING = "Error while updating, please try again.";
+  this.MESSAGE_ERROR_UPDATING = "Error while connecting to the server.";
   
   this.updateOutcome = function(outcome) {
     var id_run = this.lane_control.data('id_run'); 
@@ -51,7 +51,12 @@ var LaneMQCControl = function (index) {
     if(outcome != control.outcome) {
       //Show progress icon
       control.lane_control.find('.lane_mqc_working').html("<img src='/static/images/waiting.gif' title='Processing request.'>");
-      $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome})
+      $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
+        console.log(data);
+        var response = $.parseJSON(data);
+        console.log(response);
+        control.lane_control.find('.lane_mqc_working').empty();
+      })
       .done(function() {
         switch (outcome) {
           case control.CONFIG_ACCEPTED_PRELIMINAR : control.setAcceptedPre(); break; 
@@ -60,12 +65,12 @@ var LaneMQCControl = function (index) {
           case control.CONFIG_REJECTED_FINAL : control.setRejectedFinal(); break;
         }
         //Clear progress icon
-        control.lane_control.find('.lane_mqc_working').html(position);
+        control.lane_control.find('.lane_mqc_working').empty();
       })
       .fail(function() {
         alert(control.MESSAGE_ERROR_UPDATING);
         //Clear progress icon
-        control.lane_control.find('.lane_mqc_working').html(position);
+        control.lane_control.find('.lane_mqc_working').empty();
       });  
     } else {
       console.log("Noting to do!");
@@ -77,8 +82,6 @@ var LaneMQCControl = function (index) {
    */ 
   this.generateActiveControls = function() {
     var lane_control = this.lane_control;
-    lane_control.empty();
-    //this.lane_control.html("<img class='lane_mqc_control_accept' src='tick.png' title='Accept'> <img class='lane_mqc_control_reject' src='cross.png' title='Reject'> <img class='lane_mqc_control_save' src='save.png' title='Save as final'> <div class='lane_mqc_working'></div>");
     this.lane_control.html("<img class='lane_mqc_control_accept' src='/static/images/tick.png' title='Accept'> <img class='lane_mqc_control_reject' src='/static/images/cross.png' title='Reject'> <div class='lane_mqc_working'></div>");    
     
     this.lane_control.find('.lane_mqc_control_accept').bind({click: function() {
@@ -92,6 +95,7 @@ var LaneMQCControl = function (index) {
     this.lane_control.find('.lane_mqc_control_save').bind({click: function() {
       lane_control.extra_handler.saveAsFinalOutcome();
     }});
+    
   };
   
   /* 
@@ -181,18 +185,18 @@ var LaneMQCControl = function (index) {
 * Get current QC state of lanes and libraries for all position via ajax calls
 */
 function getQcState() {
-  if(load_mqc_widgets != 'undefined') {
-    console.log("Flag :" + load_mqc_widgets);
-    
-    //To keep all individual lane controls.
-    MQC.all_controls = []
-    
-    //Set up mqc controlers and link them to the individual lanes.
-    $('.lane_mqc_control').each(function (i, obj) {
-      obj = $(obj);
-      var c = new LaneMQCControl(i);
-      MQC.all_controls.push(c);
-      c.linkControl(obj);
-    });
-  }
+  //To keep all individual lane controls.
+  MQC.all_controls = []
+
+  //Preload images
+  $('<img/>')[0].src = "/static/images/tick.png";
+  $('<img/>')[0].src = "/static/images/cross.png";
+  
+  //Set up mqc controlers and link them to the individual lanes.
+  $('.lane_mqc_control').each(function (i, obj) {
+    obj = $(obj);
+    var c = new LaneMQCControl(i);
+    MQC.all_controls.push(c);
+    c.linkControl(obj);
+  });
 }
