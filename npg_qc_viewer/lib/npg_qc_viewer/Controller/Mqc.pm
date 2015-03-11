@@ -144,7 +144,6 @@ sub update_outcome : Path('update_outcome') {
     ####Validation
     my $req_method = $self->_validate_req_method($c, $ALLOW_METHOD_POST);
     my $validate_role = $self->_validate_role($c);
-    #my $id_run = $self->_validate_id_run($c); 
     ####Loading state
     my $params = $self->_get_parameters($c);
     my $position = $params->{'position'};
@@ -170,7 +169,7 @@ sub update_outcome : Path('update_outcome') {
     }
   } catch {
     $c->response->headers->content_type('application/json');
-    my %data = ('message'=>qq[Error when logging manual qc action: $_]);
+    my %data = ('message'=>qq[$_]);
     $c->response->body(encode_json \%data);
   };  
   return;
