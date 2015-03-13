@@ -3,8 +3,6 @@ package npg_qc_viewer::Controller::Checks;
 use Moose;
 use Carp;
 use English qw(-no_match_vars);
-use DateTime;
-use DateTime::Duration;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc_viewer::api::util;
@@ -199,10 +197,9 @@ sub _display_run_lanes {
         my $previous_mqc = {};
         my $previous_rs = $npg_qc_db_rs->search({'id_run'=>$id_run});
         while (my $obj = $previous_rs->next) {
-            print($obj->mqc_outcome->short_desc . "\n"); 
             $previous_mqc->{$obj->position} = $obj->mqc_outcome->short_desc;
         }
-        $c->stash->{'previous_mqc'} = $previous_mqc; 
+        $c->stash->{'previous_mqc'} = $previous_mqc;
     }
 
     my $what = $self->_show_option($c);
@@ -432,8 +429,6 @@ Sample page
 sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $sample_id) = @_;
 
-    ## no critic (ProhibitLongChainsOfMethodCalls)
-
     $self->_test_positive_int($c, $sample_id);
 
     my $row = $c->model('WarehouseDB')->resultset('CurrentSample')->search(
@@ -473,7 +468,6 @@ sub study :Chained('base') :PathPart('studies') :Args(1) {
 
     $self->_test_positive_int($c, $study_id);
 
-    ## no critic (ProhibitLongChainsOfMethodCalls)
     my $row = $c->model('WarehouseDB')->resultset('CurrentStudy')->search(
       { internal_id => $study_id, },
       { columns => [qw/internal_id name/], distinct => 1, },
@@ -509,10 +503,6 @@ __END__
 
 =item Carp
 
-=item DateTime
-
-=item DateTime::Duration
-
 =item npg_qc::autoqc::qc_store::options
 
 =item npg_qc_viewer::api::util
@@ -531,7 +521,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd
+Copyright (C) 2015 Genome Research Ltd
 
 This file is part of NPG software.
 

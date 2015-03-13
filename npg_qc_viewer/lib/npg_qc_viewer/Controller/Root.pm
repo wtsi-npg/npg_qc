@@ -2,7 +2,8 @@ package npg_qc_viewer::Controller::Root;
 
 use Moose;
 use Readonly;
-use English qw(-no_match_vars);
+use Try::Tiny;
+use Carp;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -92,7 +93,11 @@ sub auto :Private {
     #Pre-compile a reg exp?
 
     if ( $c->req->path =~ /^autocrud\/site\/admin /smx) {
-       $self->authorise($c, $ADMIN_GROUP_NAME);
+       try {
+           $self->authorise($c, $ADMIN_GROUP_NAME);
+       } catch {
+           $self->detach2error($c, $UNAUTHORISED_CODE, $_);
+       };
        $c->stash->{'template'} = q[about.tt2];
     }
     return 1; # essential to return 1, see Catalyst despatch schema
@@ -109,14 +114,14 @@ sub end : ActionClass('RenderView') {}
 
 =head2 authorise
 
-User authorisation with a detach to an error page
+User authorisation
 
 =cut
 
 sub authorise {
     my ($self, $c, @roles) = @_;
-    my $user  = $c->req->params->{user};
-    my $realm = $c->req->params->{realm};
+    my $user  = $c->req->params->{'user'};
+    my $realm = $c->req->params->{'realm'};
     my $h = {};
 
     if (defined $user or defined $realm) {
@@ -129,21 +134,20 @@ sub authorise {
         }
     }
     my $auth_ok;
-    eval {
+    try {
         $auth_ok = $c->authenticate( $h, $realm);
-        1;
-    } or do {
+    } catch {
         # non-existing realm gives an error
-        $self->detach2error($c, $UNAUTHORISED_CODE, qq[Login failed: $EVAL_ERROR] . q[.]);
+        croak qq[Login failed: $_];
     };
 
     if ( !$auth_ok ) {
-        $self->detach2error($c, $UNAUTHORISED_CODE, q[Login failed.]);
+        croak q[Login failed];
     }
     $c->log->debug('succeeded to authenticate');
 
     if (!$c->user_exists()) {
-        $self->detach2error($c, $UNAUTHORISED_CODE, q[User is not logged in.]);
+        croak q[User is not logged in];
     }
 
     if (@roles) {
@@ -151,9 +155,10 @@ sub authorise {
         $c->log->debug(qq[asked to authorised against $all_roles]);
         my $logged_user = $c->user->id;
         if ( !$c->check_user_roles(@roles) ) {
-            $self->detach2error($c, $UNAUTHORISED_CODE, qq[User $logged_user is not a member of $all_roles.]);
+            croak qq[User $logged_user is not a member of $all_roles];
         }
     }
+
     return;
 }
 
@@ -186,7 +191,9 @@ __END__
 
 =item Readonly
 
-=item English
+=item Carp
+
+=item Try::Tiny
 
 =item Moose
 
@@ -204,7 +211,7 @@ Andy Brown E<lt>ajb@sanger.ac.ukE<gt> and Marina Gourtovaia E<lt>mg8@sanger.ac.u
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2015 Genome Research Ltd.
 
 This file is part of NPG software.
 

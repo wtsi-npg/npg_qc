@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - removed redundant methods from NpgDB model
+
 release 57.5
  - Added a new column to the mqc entity and historic table to keep separate track of who
     updates the record through the web page and who was the last user to modify the row.
