@@ -19,8 +19,8 @@ require.onError = function (err) {
     throw err;
 };
 
-require(['npg_common','manual_qc','collapse','bcviz/insertSizeHistogram', 'bcviz/adapter', 'bcviz/mismatch'], 
-function( npg_common,  manual_qc,  collapse,  insert_size,                 adapter,         mismatch) {
+require(['manual_qc','collapse','bcviz/insertSizeHistogram', 'bcviz/adapter', 'bcviz/mismatch'], 
+function( manual_qc,  collapse,  insert_size,                 adapter,         mismatch) {
 
 	collapse.init();
 

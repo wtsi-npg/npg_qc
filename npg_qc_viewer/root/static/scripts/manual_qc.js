@@ -23,7 +23,6 @@
 *
 * Interface for manual QC.
 * Dependencies: jQuery library
-*               npg_common.js
 *
 ************************************************************************************/
 

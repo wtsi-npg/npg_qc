@@ -79,7 +79,6 @@ root/static/scripts/jquery-2.0.3.js
 root/static/scripts/require.js
 root/static/scripts/d3.js
 root/static/scripts/manual_qc.js
-root/static/scripts/npg_common.js
 root/static/stylesheets/npg_seqqc.css
 script/npg_qc_viewer_cgi.pl
 script/npg_qc_viewer_create.pl
@@ -260,10 +259,6 @@ t/data/sources4visuals/empty.fastqcheck
 t/data/test_app.conf
 t/data/test_app_no_db.conf
 t/data/test_app_no_proxy_conf.conf
-t/js/10-manual_qc.html
-t/js/scripts/10-manual_qc_test.js
-t/js/scripts/qunit/qunit.css
-t/js/scripts/qunit/qunit.js
 t/perlcriticrc
 t/README
 t/scripts/npg_fixtures.pl
