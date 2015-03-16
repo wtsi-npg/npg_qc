@@ -11,9 +11,9 @@ use npg_qc::autoqc::results::collection;
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitMagicNumbers RequireCheckingReturnValueOfEval)
 
-Readonly::Scalar  my $LESS    => -1;
-Readonly::Scalar  my $MORE    =>  1;
-Readonly::Scalar  my $EQUAL   =>  0;
+Readonly::Scalar my $LESS    => -1;
+Readonly::Scalar my $MORE    =>  1;
+Readonly::Scalar my $EQUAL   =>  0;
 
 =head1 NAME
 
@@ -82,8 +82,7 @@ sub _compare_rpt_keys {
     my $b_map = inflate_rpt_key($self, $b);
 
     return $a_map->{id_run} <=> $b_map->{id_run} ||
-           $a_map->{position} <=> $b_map->{position} ||
-           ( (!exists $a_map->{tag_index} && !exists $b_map->{tag_index}) ? $EQUAL : (
+           $a_map->{position} <=> $b_map->{position} ||           ( (!exists $a_map->{tag_index} && !exists $b_map->{tag_index}) ? $EQUAL : (
                (exists $a_map->{tag_index}  && exists $b_map->{tag_index}) ? ($a_map->{tag_index} <=> $b_map->{tag_index}) : (
                    !exists $a_map->{tag_index} ? $LESS : $MORE
                )
