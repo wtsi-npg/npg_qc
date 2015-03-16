@@ -94,8 +94,7 @@ t/10-authentication-SangerSSOnpg.t
 t/10-controller-AjaxProxy.t
 t/10-npg_tracking-daemon-seqqc.t
 t/20-model-Check.t
-t/20-model-NpgDB-annotations.t
-t/20-model-NpgDB-manual_qc.t
+t/20-model-NpgDB.t
 t/20-model-NpgQcDB.t
 t/20-model-SeqStore.t
 t/20-model-WarehouseDB.t
