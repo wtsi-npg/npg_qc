@@ -120,6 +120,7 @@ my $builder = $class->new(
         'Catalyst::Test'                                => '0',
         'Catalyst::Authentication::Credential::Testing' => '0',
         'Cwd'                                           => '0',
+        'DateTime'                                      => '0',
         'File::Temp'                                    => '0',
         'File::Spec'                                    => '0',
         'File::Spec::Functions'                         => '0',

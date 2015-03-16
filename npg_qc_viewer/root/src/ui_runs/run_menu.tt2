@@ -1,6 +1,6 @@
 <ul>
   <li><a href="[% npg_url %]/run/[% id_run %]">NPG</a></li>
-[% IF c.model('NpgDB').run_on_staging(id_run);
+[% IF c.model('NpgDB').resultset('Run').find(id_run).is_tag_set('staging');
      base = 'http://sfweb.internal.sanger.ac.uk:9000/cgi-bin/locate_runfolder';
      run_folder_glob = id_run;
      npg_run_row = c.model('NpgDB').resultset('Run').find(id_run);
