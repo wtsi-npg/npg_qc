@@ -3,9 +3,10 @@ package npg_qc_viewer::Controller::Root;
 use Moose;
 use Readonly;
 use Try::Tiny;
-use Carp;
 
 BEGIN { extends 'Catalyst::Controller' }
+
+with 'npg_qc_viewer::api::error';
 
 our $VERSION  = '0';
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitBuiltinHomonyms)
@@ -96,7 +97,8 @@ sub auto :Private {
        try {
            $self->authorise($c, $ADMIN_GROUP_NAME);
        } catch {
-           $self->detach2error($c, $UNAUTHORISED_CODE, $_);
+           my ($error, $error_code) = $self->parse_error($_);
+           $self->detach2error($c, $error_code, $error);
        };
        $c->stash->{'template'} = q[about.tt2];
     }
@@ -138,16 +140,16 @@ sub authorise {
         $auth_ok = $c->authenticate( $h, $realm);
     } catch {
         # non-existing realm gives an error
-        croak qq[Login failed: $_];
+        $self->raise_error(qq[Login failed: $_], $UNAUTHORISED_CODE);
     };
 
     if ( !$auth_ok ) {
-        croak q[Login failed];
+        $self->raise_error(q[Login failed], $UNAUTHORISED_CODE);
     }
     $c->log->debug('succeeded to authenticate');
 
     if (!$c->user_exists()) {
-        croak q[User is not logged in];
+        $self->raise_error(q[User is not logged in], $UNAUTHORISED_CODE);
     }
 
     if (@roles) {
@@ -155,7 +157,8 @@ sub authorise {
         $c->log->debug(qq[asked to authorised against $all_roles]);
         my $logged_user = $c->user->id;
         if ( !$c->check_user_roles(@roles) ) {
-            croak qq[User $logged_user is not a member of $all_roles];
+            $self->raise_error(
+              qq[User $logged_user is not a member of $all_roles], $UNAUTHORISED_CODE);
         }
     }
 
@@ -190,8 +193,6 @@ __END__
 =over
 
 =item Readonly
-
-=item Carp
 
 =item Try::Tiny
 

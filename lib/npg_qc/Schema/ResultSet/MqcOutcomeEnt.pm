@@ -30,11 +30,11 @@ sub get_ready_to_report{
 
 sub get_outcomes_as_hash{
   my ($self, $id_run) = @_;
-  
+
   #Loading previuos status qc for tracking and mqc.
   my $previous_mqc = {};
   my $previous_rs = $self->search({'id_run'=>$id_run});
-  while (my $obj = $previous_rs->next) { 
+  while (my $obj = $previous_rs->next) {
     $previous_mqc->{$obj->position} = $obj->mqc_outcome->short_desc;
   }
   return $previous_mqc;

@@ -3,26 +3,28 @@ package npg_qc_viewer::Controller::Mqc;
 use Moose;
 use namespace::autoclean;
 use Readonly;
-use Carp;
 use Try::Tiny;
 use JSON;
+use Carp;
 
 BEGIN { extends 'Catalyst::Controller' }
 
+with 'npg_qc_viewer::api::error';
+
 our $VERSION  = '0';
 
-Readonly::Scalar our $BAD_REQUEST_CODE    => 400;
-Readonly::Scalar our $INTERNAL_ERROR_CODE => 500;
-Readonly::Scalar our $OK_CODE             => 200;
-Readonly::Scalar our $METHOD_NOT_ALLOWED  => 405;
-Readonly::Scalar our $ALLOW_METHOD_POST   => q[POST];
-Readonly::Scalar our $ALLOW_METHOD_GET    => q[GET];
-Readonly::Scalar our $MQC_ROLE            => q[manual_qc];
+Readonly::Scalar my $BAD_REQUEST_CODE    => 400;
+Readonly::Scalar my $OK_CODE             => 200;
+Readonly::Scalar my $METHOD_NOT_ALLOWED  => 405;
+Readonly::Scalar my $ALLOW_METHOD_POST   => q[POST];
+Readonly::Scalar my $ALLOW_METHOD_GET    => q[GET];
+Readonly::Scalar my $MQC_ROLE            => q[manual_qc];
 
 sub _validate_req_method {
-  my ($c, $allowed) = @_;
+  my ($self, $c, $allowed) = @_;
   if ($c->request->method ne $allowed) {
-    croak qq[Only $allowed requests are allowed.]
+    $self->raise_error(
+      qq[Only $allowed requests are allowed.], $METHOD_NOT_ALLOWED);
   }
   return;
 }
@@ -53,7 +55,7 @@ sub update_outcome : Path('update_outcome') {
 
   try {
     ####Validation
-    _validate_req_method($c, $ALLOW_METHOD_POST);
+    $self->_validate_req_method($c, $ALLOW_METHOD_POST);
     $c->controller('Root')->authorise($c, ($MQC_ROLE));
 
     ####Loading state
@@ -64,16 +66,16 @@ sub update_outcome : Path('update_outcome') {
     $username    = $c->user->username || $c->user->id;
 
     if (!$id_run) {
-      croak 'Run id should be defined';
+      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
     }
     if (!$position) {
-      croak 'Position should be defined';
+      $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
     }
     if (!$new_outcome) {
-      croak 'Mqc outcome should be defined';
+      $self->raise_error(q[Mqc outcome should be defined], $BAD_REQUEST_CODE)
     }
     if (!$username) {
-      croak 'Username should be defined';
+      $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
     }
 
     my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
@@ -91,8 +93,12 @@ sub update_outcome : Path('update_outcome') {
     $error = $_;
   };
 
+  my $error_code = $OK_CODE;
   my $lane_update_error;
-  if (!$error) {
+
+  if ($error) {
+    ($error, $error_code) = $self->parse_error($error);
+  } else {
     try {
       $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
     } catch {
@@ -104,9 +110,8 @@ sub update_outcome : Path('update_outcome') {
   if ($lane_update_error) {
     $message .= $lane_update_error;
   }
-  my $code = $error ? $INTERNAL_ERROR_CODE : $OK_CODE;
 
-  _set_response($c, {'message' => $message}, $code);
+  _set_response($c, {'message' => $message}, $error_code);
 
   return;
 }
@@ -117,25 +122,26 @@ sub get_current_outcome : Path('get_current_outcome') {
   my $desc;
   my $error;
   try {
-    _validate_req_method($c, $ALLOW_METHOD_GET);
+    $self->_validate_req_method($c, $ALLOW_METHOD_GET);
 
     my $params = $c->request->parameters;
     my $position = $params->{'position'};
     my $id_run   = $params->{'id_run'};
 
     if (!$id_run) {
-      croak 'Run id should be defined';
+      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
     }
     if (!$position) {
-      croak 'Position should be defined';
+      $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
     }
 
     my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
       {id_run => $id_run, position => $position})->next;
     $desc = $ent ? $ent->mqc_outcome->short_desc : q[];
   }  catch {
-    $error = $_;
-     _set_response($c, {message => qq[Error: $error] }, $INTERNAL_ERROR_CODE);
+    my $error_code;
+    ($error, $error_code) = $self->parse_error($_);
+    _set_response($c, {message => qq[Error: $error] }, $error_code);
   };
 
   if (!$error) {
@@ -154,12 +160,12 @@ sub get_all_outcomes : Path('get_all_outcomes') {
   my $positions = {};
 
   try {
-    _validate_req_method($c, $ALLOW_METHOD_GET);
+    $self->_validate_req_method($c, $ALLOW_METHOD_GET);
 
     my $params = $c->request->parameters;
     $id_run   = $params->{'id_run'};
     if (!$id_run) {
-      croak 'Run id should be defined';
+      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
     }
 
     my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({id_run => $id_run},);
@@ -169,8 +175,9 @@ sub get_all_outcomes : Path('get_all_outcomes') {
       $positions->{$position} = $short_desc;
     }
   } catch {
-    $error = $_;
-     _set_response($c, {message => qq[Error: $error] }, $INTERNAL_ERROR_CODE);
+    my $error_code;
+    ($error, $error_code) = $self->parse_error($_);
+     _set_response($c, {message => qq[Error: $error] }, $error_code);
   };
 
   if (!$error) {
@@ -220,8 +227,6 @@ A Catalyst Controller for logging manual qc actions.
 
 =item Readonly
 
-=item Carp
-
 =item namespace::autoclean
 
 =item Moose
@@ -231,6 +236,8 @@ A Catalyst Controller for logging manual qc actions.
 =item Try::Tiny
 
 =item JSON
+
+=item Carp
 
 =back
 

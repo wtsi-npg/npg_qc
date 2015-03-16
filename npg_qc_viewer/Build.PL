@@ -97,6 +97,7 @@ my $builder = $class->new(
         'LWP::UserAgent'                               => '0',
         'Math::Gradient'                               => '0',
         'Moose'                                        => '0',
+        'Moose::Role'                                  => '0',
         'namespace::autoclean'                         => '0',
         'Readonly'                                     => '0',
         'strict'                                       => '0',

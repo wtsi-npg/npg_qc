@@ -3,6 +3,7 @@ Changes
 lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
 lib/Catalyst/Controller/AjaxProxy.pm
 lib/npg_tracking/daemon/seqqc.pm
+lib/npg_qc_viewer/api/error.pm
 lib/npg_qc_viewer/api/util.pm
 lib/npg_qc_viewer/Controller/AjaxProxy.pm
 lib/npg_qc_viewer/Controller/Checks.pm
@@ -88,6 +89,7 @@ t/00-critic.t
 t/00-distribution.t
 t/00-podcoverage.t
 t/00-pod.t
+t/10-api-error.t
 t/10-api-util.t
 t/10-authentication-SangerSSOnpg.t
 t/10-controller-AjaxProxy.t

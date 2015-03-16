@@ -220,7 +220,7 @@ around 'insert' => sub {
 
 sub update_outcome {
   my ($self, $outcome, $username) = @_;
- 
+
   #Validation
   if(!defined $outcome){
     croak q[Mandatory parameter 'outcome' missing in call];
