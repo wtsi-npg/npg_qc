@@ -23,6 +23,7 @@ if($EVAL_ERROR) {
                              'ValuesAndExpressions::RequireConstantVersion',
                             ],
                -profile  => 't/perlcriticrc',
+               -verbose  => "%m at %f line %l, policy %p\n",
 			    );
   all_critic_ok('lib/npg_qc_viewer', 'lib/Catalyst');
 }

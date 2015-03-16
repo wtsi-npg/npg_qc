@@ -18,8 +18,7 @@ my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) }
     'update get request lives';
   ok($response->is_error, q[update response is error]);
-  is( $response->code, 500, 'error code is 500' );
-  diag $response->content;
+  is( $response->code, 405, 'error code is 405' );
   like ($response->content, qr/Only POST requests are allowed/, 'correct error message');
 }
 
@@ -27,19 +26,19 @@ my $response;
   my $response;
   lives_ok { $response = request(POST '/mqc/update_outcome' ) } 'post request lives';
   ok( $response->is_error, qq[response is an error] );
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
 
   lives_ok { $response = request(POST '/mqc/update_outcome?user=frog' ) } 'post request lives';
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
 
   lives_ok { $response = request(POST '/mqc/update_outcome?user=tiger&password=secret' ) } 'post request lives';
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/User tiger is not a member of manual_qc/, 'correct error message');
 
   lives_ok { $response = request(POST '/mqc/update_outcome?user=cat' ) } 'post request lives';
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
 }
 
@@ -49,17 +48,17 @@ my $response;
 
   lives_ok { $response = request(POST $url)}
     'post request without params lives';
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 400, 'error code is 400' );
   like ($response->content, qr/Run id should be defined/, 'correct error message');
 
   lives_ok { $response = request(POST $url, ['id_run' => '1234']) }
     'post request lives with body param';
-  is( $response->code, 500, 'code is 500' );
+  is( $response->code, 400, 'code is 400' );
   like ($response->content, qr/Position should be defined/, 'correct error message');
  
   lives_ok { $response = request(POST $url, ['id_run' => '1234', 'position' => '4'])  }
     'post request lives with body param';
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 400, 'error code is 400' );
   like ($response->content, qr/Mqc outcome should be defined/,
    'correct error message');
 
@@ -102,19 +101,19 @@ my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_current_outcome')) }
     'get current outcome lives';
   ok($response->is_error, q[get_current_outcome response is error]);
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 400, 'error code is 400' );
   like ($response->content, qr/Run id should be defined/, 'correct error message');
 
   lives_ok { $response = request(HTTP::Request->new(
    'GET', '/mqc/get_current_outcome?id_run=1234')) } 'get current outcome lives';
   ok($response->is_error, q[get_current_outcome response is error]);
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 400, 'error code is 400' );
   like ($response->content, qr/Position should be defined/, 'correct error message');
 
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_all_outcomes')) }
    'get all outcomes lives';
   ok($response->is_error, q[get_all_outcomes response is error]);
-  is( $response->code, 500, 'error code is 500' );
+  is( $response->code, 400, 'error code is 400' );
   like ($response->content, qr/Run id should be defined/, 'correct error message');
 
   lives_ok { $response = request(HTTP::Request->new(
