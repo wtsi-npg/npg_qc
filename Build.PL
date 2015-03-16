@@ -113,6 +113,7 @@ my $extended_requires = {
                 'Getopt::Long'                    => '2.37',
                 'Getopt::Std'                     => 0,
                 'HTTP::Request::Common'           => '5.822',
+                'HTTP::Request'                   => 0,
                 'HTTP::Response'                  => 0,
                 'IPC::SysV'                       => 0,
                 'JSON'                            => '2.12',
@@ -133,7 +134,8 @@ my $extended_requires = {
                 'MooseX::AttributeCloner'         => 0,
                 'MooseX::AttributeHelpers'        => 0,
                 'MooseX::ClassAttribute'          => 0,
-                'MooseX::NonMoose'                => '0',
+                'MooseX::Getopt'                  => 0,
+                'MooseX::NonMoose'                => 0,
                 'MooseX::Storage'                 => 0,
                 'MooseX::StrictConstructor'       => '0.08',
                 'Parallel::ForkManager'           => 0,
@@ -156,6 +158,7 @@ my $extended_requires = {
                 'npg_tracking::illumina::run::short_info'  => 0,
                 'npg_tracking::illumina::run::long_info'   => 0,
                 'npg_tracking::util::types'                => 0,
+                'st::api::base'                            => 0,
                 'st::api::lims'                            => 0,
 };
 
