@@ -41,8 +41,6 @@ var LaneMQCControl = function (index) {
   this.CONFIG_REJECTED_FINAL      = 'Rejected final';
   this.CONFIG_INITIAL             = 'initial';
   
-  this.MESSAGE_ERROR_UPDATING = "Error while connecting to the server.";
-  
   this.updateOutcome = function(outcome) {
     var id_run = this.lane_control.data('id_run'); 
     var position = this.lane_control.data('position');
@@ -52,7 +50,7 @@ var LaneMQCControl = function (index) {
       control.lane_control.find('.lane_mqc_working').html("<img src='/static/images/waiting.gif' title='Processing request.'>");
       $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
         var response = data;
-        console.log(response.message);
+        window.console && console.log(response.message);
         control.lane_control.find('.lane_mqc_working').empty();
       }, "json")
       .done(function() {
@@ -66,7 +64,7 @@ var LaneMQCControl = function (index) {
         control.lane_control.find('.lane_mqc_working').empty();
       })
       .fail(function(data) {
-        console.log(data.responseJSON.message);
+        window.console && console.log(data.responseJSON.message);
         jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
         //Clear progress icon
         control.lane_control.find('.lane_mqc_working').empty();
