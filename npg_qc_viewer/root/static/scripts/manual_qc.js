@@ -71,7 +71,7 @@ var LaneMQCControl = function (index) {
         control.lane_control.find('.lane_mqc_working').empty();
       });  
     } else {
-      console.log("Noting to do!");
+      window.console && console.log("Noting to do.");
     }
   };
   
