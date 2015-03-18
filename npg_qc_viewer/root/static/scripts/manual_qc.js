@@ -48,6 +48,7 @@ var LaneMQCControl = function (index) {
     if(outcome != control.outcome) {
       //Show progress icon
       control.lane_control.find('.lane_mqc_working').html("<img src='/static/images/waiting.gif' title='Processing request.'>");
+      //AJAX call.
       $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
         var response = data;
         window.console && console.log(response.message);
@@ -134,14 +135,12 @@ var LaneMQCControl = function (index) {
   this.setAcceptedFinal = function() {
     this.replaceForLink();
     this.outcome = this.CONFIG_ACCEPTED_FINAL;
-    this.updateOutcome(this.CONFIG_ACCEPTED_FINAL); //Remove if pre allowed
     this.setAcceptedBG();
   };
   
   this.setRejectedFinal = function() {
     this.replaceForLink();
     this.outcome = this.CONFIG_REJECTED_FINAL;
-    this.updateOutcome(this.CONFIG_REJECTED_FINAL); //Remove if pre allowed
     this.setRejectedBG();
   };
   
