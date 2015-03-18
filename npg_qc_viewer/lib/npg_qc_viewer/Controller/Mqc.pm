@@ -33,13 +33,13 @@ sub _set_response {
   my ($c, $message_data, $code) = @_;
 
   if (!$message_data) {
-    croak 'Message hash shoudl be supplied';
+    croak 'Message hash should be supplied';
   }
   $c->response->headers->content_type('application/json');
   if ($code) {
     $c->response->status($code);
   }
-  $c->response->body(encode_json $message_data);
+  $c->response->body(to_json $message_data);
 
   return;
 }
