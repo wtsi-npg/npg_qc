@@ -6,12 +6,12 @@
 -%]
 
 <td class="[% lane_class %] nbsp">
-[%- IF run_view %]
-  [%- IF c.stash.previous_mqc.defined && c.stash.previous_mqc.$position.defined %]
-      <div id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' data-initial='[% c.stash.previous_mqc.$position %]' class='lane_mqc_control'><div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div></div>
-  [% ELSE %]
-      <div id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'><div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div></div>
-  [% END -%]
+[%- IF run_view;  
+    data_initial = '';
+    IF c.stash.previous_mqc.defined && c.stash.previous_mqc.$position.defined;
+        data_initial = ' data-initial="' _ c.stash.previous_mqc.$position _ '"';
+    END %] 
+    <div id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]'[% data_initial %] class='lane_mqc_control'></div>
 [% END -%]
 
 [% have_link = 0;

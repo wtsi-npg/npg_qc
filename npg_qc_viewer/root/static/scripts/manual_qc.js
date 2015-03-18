@@ -62,7 +62,7 @@ var LaneMQCControl = function (index) {
           case control.CONFIG_REJECTED_FINAL : control.setRejectedFinal(); break;
         }
         //Clear progress icon
-        control.lane_control.find('.lane_mqc_working').empty();
+        control.lane_control.empty();
       })
       .fail(function(data) {
         window.console && console.log(data.responseJSON.message);
@@ -170,6 +170,7 @@ var LaneMQCControl = function (index) {
         case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
         case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
       }
+      lane_control.find('.lane_mqc_working').empty();
     }
   };
 }
@@ -182,9 +183,15 @@ function getQcState() {
   //Preload images
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
+  $('<img/>')[0].src = "/static/images/waiting.gif";
+
+  $('.lane_mqc_control').each(function (i, obj) {
+    obj = $(obj);
+    obj.html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
+  });
   
   //Required to show error messages from the mqc process.
-  jQuery("#results_summary").before('<ul id="ajax_status"></ul>'); 
+  $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
   //Set up mqc controlers and link them to the individual lanes.
   $('.lane_mqc_control').each(function (i, obj) {
