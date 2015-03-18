@@ -51,11 +51,10 @@ var LaneMQCControl = function (index) {
       //Show progress icon
       control.lane_control.find('.lane_mqc_working').html("<img src='/static/images/waiting.gif' title='Processing request.'>");
       $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
-        console.log(data);
-        var response = $.parseJSON(data);
-        console.log(response);
+        var response = data;
+        console.log(response.message);
         control.lane_control.find('.lane_mqc_working').empty();
-      })
+      }, "json")
       .done(function() {
         switch (outcome) {
           case control.CONFIG_ACCEPTED_PRELIMINAR : control.setAcceptedPre(); break; 
@@ -66,8 +65,9 @@ var LaneMQCControl = function (index) {
         //Clear progress icon
         control.lane_control.find('.lane_mqc_working').empty();
       })
-      .fail(function() {
-        alert(control.MESSAGE_ERROR_UPDATING);
+      .fail(function(data) {
+        console.log(data.responseJSON.message);
+        jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
         //Clear progress icon
         control.lane_control.find('.lane_mqc_working').empty();
       });  
@@ -184,18 +184,16 @@ var LaneMQCControl = function (index) {
 * Get current QC state of lanes and libraries for all position via ajax calls
 */
 function getQcState() {
-  //To keep all individual lane controls.
-  MQC.all_controls = []
-
   //Preload images
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
+  
+  jQuery("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
   //Set up mqc controlers and link them to the individual lanes.
   $('.lane_mqc_control').each(function (i, obj) {
     obj = $(obj);
     var c = new LaneMQCControl(i);
-    MQC.all_controls.push(c);
     c.linkControl(obj);
   });
 }

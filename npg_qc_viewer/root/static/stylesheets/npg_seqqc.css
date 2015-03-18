@@ -266,6 +266,12 @@ a, a:link, a:visited, a:hover {
  background-color: #f99389;
 }
 
+.failed_mqc {
+ background-color: #FFFFFF;
+ color: #DB1400;
+ font-weight: bold;
+}
+
 .passed {
  background-color: #b5daff;
 }
