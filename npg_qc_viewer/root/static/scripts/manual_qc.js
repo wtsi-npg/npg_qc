@@ -183,11 +183,12 @@ function getQcState() {
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
   
+  //Required to show error messages from the mqc process.
   jQuery("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
   //Set up mqc controlers and link them to the individual lanes.
   $('.lane_mqc_control').each(function (i, obj) {
-    obj = $(obj);
+    obj = $(obj); //Wrap as an jQuery object.
     var c = new LaneMQCControl(i);
     c.linkControl(obj);
   });
