@@ -266,6 +266,7 @@ a, a:link, a:visited, a:hover {
  background-color: #f99389;
 }
 
+/* Used to format error messages from mqc. */
 .failed_mqc {
  background-color: #FFFFFF;
  color: #DB1400;
