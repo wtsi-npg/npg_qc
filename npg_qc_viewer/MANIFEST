@@ -3,6 +3,7 @@ Changes
 lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
 lib/Catalyst/Controller/AjaxProxy.pm
 lib/npg_tracking/daemon/seqqc.pm
+lib/npg_qc_viewer/api/error.pm
 lib/npg_qc_viewer/api/util.pm
 lib/npg_qc_viewer/Controller/AjaxProxy.pm
 lib/npg_qc_viewer/Controller/Checks.pm
@@ -67,6 +68,7 @@ root/static/images/catalyst_logo.png
 root/static/images/cross.png
 root/static/images/focus_on.png
 root/static/images/information.png
+root/static/images/save.png
 root/static/images/tick.png
 root/static/images/to_children.png
 root/static/images/to_parent.png
@@ -77,7 +79,6 @@ root/static/scripts/jquery-2.0.3.js
 root/static/scripts/require.js
 root/static/scripts/d3.js
 root/static/scripts/manual_qc.js
-root/static/scripts/npg_common.js
 root/static/stylesheets/npg_seqqc.css
 script/npg_qc_viewer_cgi.pl
 script/npg_qc_viewer_create.pl
@@ -88,13 +89,13 @@ t/00-critic.t
 t/00-distribution.t
 t/00-podcoverage.t
 t/00-pod.t
+t/10-api-error.t
 t/10-api-util.t
 t/10-authentication-SangerSSOnpg.t
 t/10-controller-AjaxProxy.t
 t/10-npg_tracking-daemon-seqqc.t
 t/20-model-Check.t
-t/20-model-NpgDB-annotations.t
-t/20-model-NpgDB-manual_qc.t
+t/20-model-NpgDB.t
 t/20-model-NpgQcDB.t
 t/20-model-SeqStore.t
 t/20-model-WarehouseDB.t
@@ -148,6 +149,8 @@ t/data/fixtures/npg/400-RunLaneStatus.yml
 t/data/fixtures/npg/400-RunLane.yml
 t/data/fixtures/npg/400-RunStatus.yml
 t/data/fixtures/npg/400-TagRun.yml
+t/data/fixtures/npgqc/000-mqc_outcome_dict.yml
+t/data/fixtures/npgqc/010-mqc_outcome_ent.yml
 t/data/fixtures/npgqc/Adapter.yml
 t/data/fixtures/npgqc/Contamination.yml
 t/data/fixtures/npgqc/InsertSize.yml
@@ -256,10 +259,6 @@ t/data/sources4visuals/empty.fastqcheck
 t/data/test_app.conf
 t/data/test_app_no_db.conf
 t/data/test_app_no_proxy_conf.conf
-t/js/10-manual_qc.html
-t/js/scripts/10-manual_qc_test.js
-t/js/scripts/qunit/qunit.css
-t/js/scripts/qunit/qunit.js
 t/perlcriticrc
 t/README
 t/scripts/npg_fixtures.pl
