@@ -133,13 +133,11 @@ var LaneMQCControl = function (index) {
   };
   
   this.setAcceptedFinal = function() {
-    this.replaceForLink();
     this.outcome = this.CONFIG_ACCEPTED_FINAL;
     this.setAcceptedBG();
   };
   
   this.setRejectedFinal = function() {
-    this.replaceForLink();
     this.outcome = this.CONFIG_REJECTED_FINAL;
     this.setRejectedBG();
   };
