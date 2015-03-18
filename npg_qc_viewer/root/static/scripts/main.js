@@ -14,8 +14,8 @@ require.config({
 });
 
 require.onError = function (err) {
-    console.log(err.requireType);
-    console.log('modules: ' + err.requireModules);
+    window.console && console.log(err.requireType);
+    window.console && console.log('modules: ' + err.requireModules);
     throw err;
 };
 
