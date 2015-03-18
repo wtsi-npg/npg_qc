@@ -14,24 +14,25 @@ require.config({
 });
 
 require.onError = function (err) {
-    console.log(err.requireType);
-    console.log('modules: ' + err.requireModules);
+    window.console && console.log(err.requireType);
+    window.console && console.log('modules: ' + err.requireModules);
     throw err;
 };
 
-require(['npg_common','manual_qc','collapse','bcviz/insertSizeHistogram', 'bcviz/adapter', 'bcviz/mismatch'], 
-function( npg_common,  manual_qc,  collapse,  insert_size,                 adapter,         mismatch) {
+require(['manual_qc','collapse','bcviz/insertSizeHistogram', 'bcviz/adapter', 'bcviz/mismatch'], 
+function( manual_qc,  collapse,  insert_size,                 adapter,         mismatch) {
 
 	collapse.init();
 
-	try {
+	if(typeof(load_mqc_widgets) != "undefined" && load_mqc_widgets == 1 ) {
 		getQcState();
-	} catch (e) {
-		jQuery("#ajax_status").text(e);
-		jQuery(".mqc").empty();
+	} else {
+	  jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
 	}
 
-	jQuery('.bcviz_insert_size').each(function(i) { insert_size.drawChart(this); });
+	jQuery('.bcviz_insert_size').each(function(i) { 
+	  insert_size.drawChart(this); 
+	});
 	
 	jQuery('.bcviz_adapter').each(function(i) { 
 		// override width to ensure two graphs can fit side by side

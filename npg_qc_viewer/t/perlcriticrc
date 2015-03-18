@@ -2,6 +2,8 @@
 packages = :no_restriction
 [RegularExpressions::ProhibitComplexRegexes]
 max_characters = 80
+[ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+max_chain_length = 4
 [Documentation::PodSpelling]
 stop_words = NPG Gourtovaia SeqQC autoqc qc Readonly DateTime JSON fastqcheck DBIx PNG plex TT
 [Documentation::RequirePodSections]

@@ -3,8 +3,6 @@ package npg_qc_viewer::Controller::Checks;
 use Moose;
 use Carp;
 use English qw(-no_match_vars);
-use DateTime;
-use DateTime::Duration;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc_viewer::api::util;
@@ -75,12 +73,12 @@ sub _wh_rows2run_lane_pairs {
                 ## no critic (ProhibitBooleanGrep)
                 if (!grep {/$position/smx} @{$map->{$id_run}}) {
                     push  @{$map->{$id_run}}, $position;
-	        }
-                ## use critic
-	    } else {
+	              }
+            ## use critic
+	          } else {
                 $map->{$id_run} = [$position];
-	    }
-	}
+	          }
+	      }
         $rset->reset;
     }
     return $map;
@@ -97,9 +95,9 @@ sub _rl_map_append {
         while (my $row = $rs->next) {
             my $rpt_key = $row->rpt_key;
             $wh_rl_map->{$rpt_key} = 1;
-	    if (!exists  $rl_map->{$rpt_key}) {
+            if (!exists  $rl_map->{$rpt_key}) {
                 $rl_map->{$rpt_key} = undef;
-	    }
+            }
         }
         $rs->reset;
     }
@@ -175,7 +173,7 @@ sub _display_run_lanes {
         $id_runs = $c->request->query_parameters->{'run'};
         if (!ref $id_runs) {
             $id_runs = [$id_runs];
-	}
+	      }
     }
 
     if (exists $c->request->query_parameters->{'lane'}) {
@@ -213,7 +211,7 @@ sub _display_run_lanes {
         my $title = q[Results ];
         if (!$c->stash->{'db_lookup'}) {
             $title .= q[(staging) ];
-	}
+	      }
         if (@{$id_runs}) {
             $title .= qq[($what) for runs ] . (join q[ ], @{$id_runs});
         }
@@ -421,8 +419,6 @@ Sample page
 sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $sample_id) = @_;
 
-    ## no critic (ProhibitLongChainsOfMethodCalls)
-
     $self->_test_positive_int($c, $sample_id);
 
     my $row = $c->model('WarehouseDB')->resultset('CurrentSample')->search(
@@ -462,7 +458,6 @@ sub study :Chained('base') :PathPart('studies') :Args(1) {
 
     $self->_test_positive_int($c, $study_id);
 
-    ## no critic (ProhibitLongChainsOfMethodCalls)
     my $row = $c->model('WarehouseDB')->resultset('CurrentStudy')->search(
       { internal_id => $study_id, },
       { columns => [qw/internal_id name/], distinct => 1, },
@@ -498,10 +493,6 @@ __END__
 
 =item Carp
 
-=item DateTime
-
-=item DateTime::Duration
-
 =item npg_qc::autoqc::qc_store::options
 
 =item npg_qc_viewer::api::util
@@ -520,7 +511,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd
+Copyright (C) 2015 Genome Research Ltd
 
 This file is part of NPG software.
 
