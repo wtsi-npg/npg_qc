@@ -151,6 +151,10 @@
 <a href="[% rurl = [npg_url, 'run', id_run]; rurl.join('/'); %]" title="date completed [% time_comp.truncate(10) %]">[% id_run %]</a>
 [%- IF num_cycles %]<br />[% num_cycles %][% END -%]
 </div></td>
+[%-
+    c.stash.previous_mqc = c.model('NpgQcDB').resultset('MqcOutcomeEnt').get_outcomes_as_hash("$id_run");
+-%]
+
 [% PROCESS "ui_lanes/lane.tt2" %]
 </tr>
 [%- END -%]
@@ -171,7 +175,7 @@
 </table>
 
 [%- 
-  IF run_view; 
+  IF run_view;
     PROCESS ui_runs/annotations.tt2;
 
     current_run_status = '';
@@ -183,7 +187,7 @@
          IF !run_from_staging && (current_run_status == 'qc in progress' || current_run_status == 'qc on hold');
            title = title _ ', taken by ' _ cs.user.username;
             IF c.authenticate({}) &&  c.check_user_roles(('manual_qc')) && c.user.id == cs.id_user; -%]
-<script type="text/javascript"> var load_mqc_widgets = 1; var batch_id = [% batch_id %]; var lims_api_url="[% lims_url %]";</script>
+<script type="text/javascript"> var load_mqc_widgets = 1;</script>
             [%- END;
          END;
          title = title _ ')';

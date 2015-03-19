@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More tests => 6;
 use Test::Exception;
-use Test::Deep;
 
 use npg_qc::autoqc::results::collection;
 

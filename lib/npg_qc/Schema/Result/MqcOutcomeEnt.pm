@@ -219,9 +219,8 @@ around 'insert' => sub {
 };
 
 sub update_outcome {
-  my $self = shift;
-  my $outcome = shift;
-  my $username = shift;
+  my ($self, $outcome, $username) = @_;
+
   #Validation
   if(!defined $outcome){
     croak q[Mandatory parameter 'outcome' missing in call];
@@ -246,7 +245,7 @@ sub update_outcome {
       }
     } else { #Is a new row just insert.      
       $self->id_mqc_outcome($outcome_id);
-      $self->user($username);
+      $self->username($username);
       $self->modified_by($username);
       $self->insert();
     }
