@@ -3,7 +3,7 @@
   "dependencies": {
     "jquery": "2.0.3",
     "requirejs": "2.1.8",
-    "bcviz": "git://github.com/jmtcsngr/bcviz.git#725ce7999ec394844b5276693e29a4c13a8a6a7c"
+    "bcviz": "git://github.com/wtsi-npg/bcviz.git#1.1.0"
   },
   "devDependencies": {
     "qunit": "1.17.1"
@@ -15,8 +15,5 @@
     "bower_components",
     "test",
     "tests"
-  ],
-  "resolutions": {
-    "bcviz": "0ff1aa50db955b7e66ac16d3e97e7e8dcb66a54a"
-  }
+  ]
 }
