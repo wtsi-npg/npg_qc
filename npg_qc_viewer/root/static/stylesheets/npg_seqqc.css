@@ -566,3 +566,18 @@ svg {
   stroke-width: 0;
 }
 
+.chart_left {
+  float: left;
+}
+
+.chart_right {
+  float: right;
+  margin-right: 20px;
+}
+
+.chart_legend {
+  margin-left: auto;
+  margin-right: auto;
+  width: 50px;
+}
+

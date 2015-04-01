@@ -51,13 +51,6 @@
 </table>
 </div>
 
-[% key = check.id_run _ '_' _ check.position _ '_' _ check.tag_index %]
-[% title = 'Insert Sizes: ' %]
-[% IF check.id_run.defined; title = title _ 'run ' _ check.id_run; END -%]
-[% IF check.position.defined ; title = title _ ', lane ' _ check.position; END -%]
-[% IF check.tag_index.defined; title = title _ ', tag ' _ check.tag_index; END -%]
-
-<div class='bcviz_insert_size' data-check='[% check.json %]' data-width=650 data-height=300 data-key=[% key %] data-title = '[% title %]'></div>
-<div id='bcviz_insert_size_[% key %]'></div>
+<div class='bcviz_insert_size' data-check='[% check.json %]'></div>
 
 

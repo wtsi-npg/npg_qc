@@ -104,16 +104,6 @@
 [% IF check.position.defined; title = title _ ', lane ' _ check.position; END -%]
 [% IF check.tag_index.defined; title = title _ ', tag ' _ check.tag_index; END -%]
 
-<div style='float:left;' 
-     class='bcviz_mismatch' 
-     data-check='[% check.json | replace("'", "%27") %]' 
-     data-key='[% key %]'
-     data-title='[% title %]'
-     data-height=350>
-</div>
-
-<div style='float:left;' id='bcviz_mismatch_fwd_[% key %]'></div>
-<div style='float:right;' id='bcviz_mismatch_legend_[% key %]'></div>
-<div style='float:right;' id='bcviz_mismatch_rev_[% key %]'></div>
+<div class='bcviz_mismatch' data-check='[% check.json | replace("'", "%27") %]'></div>
 <div style='clear:both;'></div>
 

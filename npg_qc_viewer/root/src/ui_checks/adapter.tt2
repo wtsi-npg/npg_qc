@@ -2,15 +2,7 @@
 
 [% has_reverse = check.reverse_fasta_read_count.defined -%]
 
-[% key = check.id_run _ '_' _ check.position _ '_' _ check.tag_index %]
-[% title = 'Adapter Start Count : ' %]
-[% IF check.id_run.defined; title = title _ 'run ' _ check.id_run; END -%]
-[% IF check.position.defined; title = title _ ', lane ' _ check.position; END -%]
-[% IF check.tag_index.defined; title = title _ ', tag ' _ check.tag_index; END -%]
-
-<div class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]' data-key='[% key %]' data-height=200 data-title='[% title %]'></div>
-<div style='float:left;' id='bcviz_adapter_fwd_[% key %]'></div>
-<div style='float:right;margin-right:20px;' id='bcviz_adapter_rev_[% key %]'></div>
+<div class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]'></div>
 
 <div style='clear:both;' class="data_table">
 <table summary="adapter check results">
