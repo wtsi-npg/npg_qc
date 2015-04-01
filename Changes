@@ -1,12 +1,16 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-release 57.8
  - Using bower to manage javascript component dependencies.
  - Using bcviz v1.1.0 which is now supports bower.
+ - use Biobambam bamtofastq in place of Picard utility in adapter qc check
 
 release 57.7
  - removed redundant methods from NpgDB model
- - New javascript functionality to process mqc.
+ - New javascript functionality to process mqc. MQC outcomes are changed using AJAX 
+   calls to the controller directly.
+ - mqc controller now provides with the functionality for mqc through asynchronous calls.
+ - mqc controller does not saves a log in the tracking database when mqc outcomes are
+   updated.
 
 release 57.6
  - Added mqc_outcome_reporter
