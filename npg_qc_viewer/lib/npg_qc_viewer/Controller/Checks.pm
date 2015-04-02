@@ -3,8 +3,6 @@ package npg_qc_viewer::Controller::Checks;
 use Moose;
 use Carp;
 use English qw(-no_match_vars);
-use DateTime;
-use DateTime::Duration;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc_viewer::api::util;
@@ -38,7 +36,6 @@ NPG SeqQC Controller for URLs of pages displaying autoqc results
 =head1 SUBROUTINES/METHODS
 
 =cut
-
 
 sub _test_positive_int {
     my ($self, $c, $input) = @_;
@@ -76,17 +73,16 @@ sub _wh_rows2run_lane_pairs {
                 ## no critic (ProhibitBooleanGrep)
                 if (!grep {/$position/smx} @{$map->{$id_run}}) {
                     push  @{$map->{$id_run}}, $position;
-	        }
-                ## use critic
-	    } else {
+	              }
+            ## use critic
+	          } else {
                 $map->{$id_run} = [$position];
-	    }
-	}
+	          }
+	      }
         $rset->reset;
     }
     return $map;
 }
-
 
 sub _rl_map_append {
     my ($self, $c, $rl_map) = @_;
@@ -99,9 +95,9 @@ sub _rl_map_append {
         while (my $row = $rs->next) {
             my $rpt_key = $row->rpt_key;
             $wh_rl_map->{$rpt_key} = 1;
-	    if (!exists  $rl_map->{$rpt_key}) {
+            if (!exists  $rl_map->{$rpt_key}) {
                 $rl_map->{$rpt_key} = undef;
-	    }
+            }
         }
         $rs->reset;
     }
@@ -162,7 +158,6 @@ sub _display_libs {
     return;
 }
 
-
 sub _display_run_lanes {
     my ($self, $c, $params) = @_;
 
@@ -178,7 +173,7 @@ sub _display_run_lanes {
         $id_runs = $c->request->query_parameters->{'run'};
         if (!ref $id_runs) {
             $id_runs = [$id_runs];
-	}
+	      }
     }
 
     if (exists $c->request->query_parameters->{'lane'}) {
@@ -216,7 +211,7 @@ sub _display_run_lanes {
         my $title = q[Results ];
         if (!$c->stash->{'db_lookup'}) {
             $title .= q[(staging) ];
-	}
+	      }
         if (@{$id_runs}) {
             $title .= qq[($what) for runs ] . (join q[ ], @{$id_runs});
         }
@@ -250,7 +245,6 @@ sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
     return;
 }
 
-
 =head2 index 
 
 index page
@@ -277,7 +271,7 @@ sub about :Path('about') :Args(0) {
 
 =head2 list_runs
 
-Fetch all runs which are post archival and qc creation, and pass to runs/list.tt2 in stash to be displayed
+More complex URLs for runs
 
 =cut
 sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
@@ -287,9 +281,8 @@ sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
         $c->stash->{'db_lookup'} = 1;
         $self->_display_run_lanes($c);
     } else {
-        $c->stash->{runs} = [@{$c->model('NpgDB')->runs_list}];
-        $c->stash->{title} = q{List of runs};
-        $c->stash->{template} = q{list/runs.tt2};
+        $c->stash->{error_message} = q[This is an invalid URL];
+        $c->detach(q[Root], q[error_page]);
     }
     return;
 }
@@ -353,7 +346,6 @@ sub checks_in_run_from_staging :Chained('base') :PathPart('runs-from-staging') :
   return;
 }
 
-
 =head2 checks_from_path
 
 Fetches the checks collection from a given path
@@ -384,7 +376,6 @@ sub checks_from_path :Chained('base') :PathPart('path') :Args(0) {
   }
   return;
 }
-
 
 =head2 libraries
 
@@ -428,8 +419,6 @@ Sample page
 sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $sample_id) = @_;
 
-    ## no critic (ProhibitLongChainsOfMethodCalls)
-
     $self->_test_positive_int($c, $sample_id);
 
     my $row = $c->model('WarehouseDB')->resultset('CurrentSample')->search(
@@ -469,7 +458,6 @@ sub study :Chained('base') :PathPart('studies') :Args(1) {
 
     $self->_test_positive_int($c, $study_id);
 
-    ## no critic (ProhibitLongChainsOfMethodCalls)
     my $row = $c->model('WarehouseDB')->resultset('CurrentStudy')->search(
       { internal_id => $study_id, },
       { columns => [qw/internal_id name/], distinct => 1, },
@@ -505,10 +493,6 @@ __END__
 
 =item Carp
 
-=item DateTime
-
-=item DateTime::Duration
-
 =item npg_qc::autoqc::qc_store::options
 
 =item npg_qc_viewer::api::util
@@ -527,7 +511,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd
+Copyright (C) 2015 Genome Research Ltd
 
 This file is part of NPG software.
 

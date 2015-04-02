@@ -5,9 +5,10 @@ unset CATALYST_HOME
 export PATH=/software/perl-5.16.3/bin:$PATH
 export PERL5LIB=lib:/software/npg/lib/perl5:/software/npg/cpan/lib/perl5
 
-make sure you have a link from npg_qc_viewer/root/static/scripts to bcviz
-for example
-ln -s /nfs/users/nfs_j/js10/npg/bcviz/js/src npg_qc_viewer/root/static/scripts/bcviz
+make sure you have installed dependencies with bower
+
+# in the npg_qc_viewer directory
+pushd root/static && bower install && popd
 
 If needed, edit the decryption_key value in npg_qc_viewer.conf
 
@@ -21,8 +22,6 @@ CATALYST_AUTOCRUD=1 to enable the autocrud plugin
 autocrud pages - npg tracking:
 read-only: autocrud/npgdb
 admin:     autocrud/site/admin/schema/npgdb
-
-
 
 Building and testing:
 ---------------------

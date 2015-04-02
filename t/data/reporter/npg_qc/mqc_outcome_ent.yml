@@ -1,49 +1,49 @@
 ---
 - id_mqc_outcome_ent: 1 
   id_run: 6600
-  position: 0
+  position: 6
   id_mqc_outcome: 1
-  username: js10
+  username: cat
 - id_mqc_outcome_ent: 2 
   id_run: 6600
   position: 1
   id_mqc_outcome: 2
-  username: js10
+  username: cat
 - id_mqc_outcome_ent: 3 
   id_run: 6600
   position: 2
   id_mqc_outcome: 3
-  username: js10
+  username: cat
   reported: 2009-07-12 13:04:51
 - id_mqc_outcome_ent: 4 
   id_run: 6600
   position: 3
   id_mqc_outcome: 4
-  username: js10
+  username: cat
   reported: 2009-07-12 13:04:51
 - id_mqc_outcome_ent: 5 
   id_run: 6600
   position: 4
   id_mqc_outcome: 5
-  username: js10
+  username: cat
 - id_mqc_outcome_ent: 6 
   id_run: 6600
   position: 5
   id_mqc_outcome: 6
-  username: js10
+  username: cat
 - id_mqc_outcome_ent: 7 
   id_run: 6600
   position: 7
   id_mqc_outcome: 3
-  username: js10
+  username: cat
 - id_mqc_outcome_ent: 8 
   id_run: 6600
   position: 8
   id_mqc_outcome: 4
-  username: js10
+  username: cat
 - id_mqc_outcome_ent: 9 
   id_run: 5515
   position: 8
   id_mqc_outcome: 3
-  username: js10
+  username: cat
 

@@ -1,9 +1,12 @@
 require.config({
-    baseUrl: '/static/scripts',
+    baseUrl: '/static',
 	catchError: true,
     paths: {
-        jquery: 'jquery-2.0.3',
-        d3: 'd3'
+        jquery: 'bower_components/jquery/jquery',
+        d3: 'bower_components/d3/d3.min',
+        insert_size_lib: 'bower_components/bcviz/js/src/insertSizeHistogram',
+        adapter_lib: 'bower_components/bcviz/js/src/adapter',
+        mismatch_lib: 'bower_components/bcviz/js/src/mismatch',
     },
     shim: {
         d3: {
@@ -14,8 +17,8 @@ require.config({
 });
 
 require.onError = function (err) {
-    console.log(err.requireType);
-    console.log('modules: ' + err.requireModules);
+    window.console && console.log(err.requireType);
+    window.console && console.log('modules: ' + err.requireModules);
     throw err;
 };
 
@@ -27,16 +30,16 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['npg_common','manual_qc','collapse','bcviz/insertSizeHistogram', 'bcviz/adapter', 'bcviz/mismatch'], 
-function( npg_common,  manual_qc,  collapse,  insert_size,                 adapter,         mismatch) {
+
+require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib'], 
+function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 
 	collapse.init();
 
-	try {
+	if(typeof(load_mqc_widgets) != "undefined" && load_mqc_widgets == 1 ) {
 		getQcState();
-	} catch (e) {
-		jQuery("#ajax_status").text(e);
-		jQuery(".mqc").empty();
+	} else {
+	  jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
 	}
 
 	jQuery('.bcviz_insert_size').each(function(i) { 
@@ -55,7 +58,7 @@ function( npg_common,  manual_qc,  collapse,  insert_size,                 adapt
         }
     });
 	
-	jQuery('.bcviz_adapter').each(function(i) { 
+        jQuery('.bcviz_adapter').each(function(i) { 
         d = jQuery(this).data('check');
         h = jQuery(this).data('height') || 200;
         t = jQuery(this).data('title') || _getTitle('Adapter Start Count : ', d);

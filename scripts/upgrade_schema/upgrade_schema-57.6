@@ -1,0 +1,7 @@
+ALTER TABLE `mqc_outcome_ent` ADD COLUMN `modified_by` CHAR(128) NULL DEFAULT NULL AFTER `last_modified`;
+
+ALTER TABLE `mqc_outcome_hist` ADD COLUMN `modified_by` CHAR(128) NULL DEFAULT NULL AFTER `last_modified`;
+
+ALTER TABLE `mqc_outcome_ent` CHANGE COLUMN `username` `username` CHAR(128) NULL DEFAULT NULL COMMENT 'Web interface username', CHANGE COLUMN `modified_by` `modified_by` CHAR(128) NULL DEFAULT NULL COMMENT 'Last user to modify the row';
+
+ALTER TABLE `mqc_outcome_hist` CHANGE COLUMN `username` `username` CHAR(128) NULL DEFAULT NULL COMMENT 'Web interface username', CHANGE COLUMN `modified_by` `modified_by` CHAR(128) NULL DEFAULT NULL COMMENT 'Last user to modify the row';

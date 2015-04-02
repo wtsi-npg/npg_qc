@@ -20,7 +20,13 @@
   IF rl_map.defined;
     rl_keys = rl_map.keys;
     IF rl_keys.size;
-      sorted_rl_map_keys = util.sort_rpt_keys(rl_map.keys);
+      sorted_rl_map_keys = util.sort_rpt_keys(rl_keys);
+      IF (!run_from_staging && !path_list.defined);
+        run_ids            = util.runs_from_rpt_keys(rl_keys);
+        IF run_ids.size == 1;
+          run_id_to_link = run_ids.first;
+        END;
+      END;
     END;
   END;
   heatmap_check_name = 'percent of bases at and above quality threshold';
@@ -31,9 +37,16 @@
   <ul>
     <li><a href="#page_top">Page Top</a></li>
   </ul>
+  <ul>
+    <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('index')) %]">Help</a></li>
+  </ul>
+[%- IF run_id_to_link.defined  %]
+  <ul>
+    <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), run_id_to_link) %]">Back to Run [% run_id_to_link %]</a></li>
+  </ul>
+[%- END %]
 [%- IF run_view.defined && run_view %][% PROCESS ui_runs/run_menu.tt2 -%][% END %]
 [% PROCESS ui_lanes/collapse_menu.tt2 -%]
-[% PROCESS ui_lanes/run_lane_menu.tt2 -%]
 </div>
 </div>
 
@@ -138,6 +151,10 @@
 <a href="[% rurl = [npg_url, 'run', id_run]; rurl.join('/'); %]" title="date completed [% time_comp.truncate(10) %]">[% id_run %]</a>
 [%- IF num_cycles %]<br />[% num_cycles %][% END -%]
 </div></td>
+[%-
+    c.stash.previous_mqc = c.model('NpgQcDB').resultset('MqcOutcomeEnt').get_outcomes_as_hash("$id_run");
+-%]
+
 [% PROCESS "ui_lanes/lane.tt2" %]
 </tr>
 [%- END -%]
@@ -158,7 +175,7 @@
 </table>
 
 [%- 
-  IF run_view; 
+  IF run_view;
     PROCESS ui_runs/annotations.tt2;
 
     current_run_status = '';
@@ -170,7 +187,7 @@
          IF !run_from_staging && (current_run_status == 'qc in progress' || current_run_status == 'qc on hold');
            title = title _ ', taken by ' _ cs.user.username;
             IF c.authenticate({}) &&  c.check_user_roles(('manual_qc')) && c.user.id == cs.id_user; -%]
-<script type="text/javascript"> var load_mqc_widgets = 1; var batch_id = [% batch_id %]; var lims_api_url="[% lims_api_url %]";</script>
+<script type="text/javascript"> var load_mqc_widgets = 1;</script>
             [%- END;
          END;
          title = title _ ')';
