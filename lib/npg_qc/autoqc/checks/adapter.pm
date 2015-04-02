@@ -185,7 +185,7 @@ sub _search_adapters_from_bam {
     if (! $pid) { #fork to convert BAM to fastq then into fasta whilst count forward and reverse reads
       my ($fieldi, $fcount, $rcount) = (0,0,0);
       my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->bamtofastq_path .
-                        qq[ filename=$bam ] . q[" |] ;
+                        qq[ T=$tmpdir/bamtofastq filename=$bam ] . q[" |] ;
       open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
       open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
       while (my $line = <$ifh>){
