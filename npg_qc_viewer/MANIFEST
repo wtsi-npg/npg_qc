@@ -54,6 +54,8 @@ root/src/ui_lanes/lane.tt2
 root/src/ui_lanes/library_lanes.tt2
 root/src/ui_runs/annotations.tt2
 root/src/ui_runs/run_menu.tt2
+root/static/bower.json
+root/static/.bowerrc
 root/static/images/blue_collapse.png
 root/static/images/blue_expand.png
 root/static/images/btn_120x50_built.png
@@ -75,9 +77,6 @@ root/static/images/to_parent.png
 root/static/images/waiting.gif
 root/static/scripts/collapse.js
 root/static/scripts/main.js
-root/static/scripts/jquery-2.0.3.js
-root/static/scripts/require.js
-root/static/scripts/d3.js
 root/static/scripts/manual_qc.js
 root/static/stylesheets/npg_seqqc.css
 script/npg_qc_viewer_cgi.pl

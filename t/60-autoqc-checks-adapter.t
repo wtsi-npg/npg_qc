@@ -57,10 +57,10 @@ my $f2f = join q[/], $dir, q[npg_fastq2fasta];
 open $fh,  q[>], $f2f;
 print $fh qq[cat $test_parent/9999_1.blat\n];
 close $fh;
-`chmod +x $f2f $bt`;
 
-my $jar = join q[/], $dir, 'SamToFastq.jar';
-`touch $jar`;
+my $bamtofastq = join q[/], $dir, q[bamtofastq];
+`touch $bamtofastq`;
+`chmod +x $f2f $bt $bamtofastq`;
 
 local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
 
@@ -70,7 +70,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
                     position => 3,
                     path     => 't/data/autoqc/090721_IL29_2549/data',
                     id_run   => 2549,
-                    sam2fastq_jar => $jar,
                     adapter_fasta => '/no/such/file',
                   )
   } qr{Attribute \(adapter_fasta\) does not pass the type constraint}ms,
@@ -80,7 +79,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
   lives_ok {
     $test = npg_qc::autoqc::checks::adapter->new( position => 3,
                     path     => 't/data/autoqc/090721_IL29_2549/data',
-                    sam2fastq_jar => $jar,
                     id_run   => 2549,
                   )
   } 'Create the check object';
@@ -95,7 +93,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
              ->new( position => 3,
                     path     => 't/data/autoqc/090721_IL29_2549/data',
                     id_run   => 2549,
-                    sam2fastq_jar => $jar,
                     adapter_fasta => 't/data/autoqc/adapter.fasta',
                   )
   } 'Create the check object';
@@ -128,7 +125,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
              ->new( position => 2,
                     path     => $dir,
                     id_run   => 9999,
-                    sam2fastq_jar => $jar,
                     adapter_fasta => 't/data/autoqc/adapter.fasta',
                   );
   
@@ -145,7 +141,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
                  path          => $test_parent,
                  id_run        => 9999,
                  adapter_fasta => 't/data/autoqc/adapter.fasta',
-                 sam2fastq_jar => $jar,
                  aligner_path   => $bt,
                       );
   lives_ok { $test->execute() } 'No failures in mocked run';
@@ -171,7 +166,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
                     path     => $dir,
                     id_run   => 9999,
                     aligner_path   => $bt,
-                    sam2fastq_jar => $jar,
                     adapter_fasta => 't/data/autoqc/adapter.fasta',
                   );  
   lives_ok {$test->execute()} 'execute lives';
@@ -192,7 +186,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
                  path          => $test_parent,
                  id_run        => 9999,
                  adapter_fasta => 't/data/autoqc/adapter.fasta',
-                 sam2fastq_jar => $jar,
                  aligner_path   => $bt,
                       );
   throws_ok { $test->execute() } qr/Error in pipe/, 'Failure of the aligner';
@@ -213,11 +206,9 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
                  path          => $test_parent,
                  id_run        => 9999,
                  adapter_fasta => 't/data/autoqc/adapter.fasta',
-                 sam2fastq_jar => $jar,
                  aligner_path   => $bt,
                       );
   throws_ok { $test->execute() } qr/Error in pipe/, 'Failure of the aligner';
 }
-
 
 1;

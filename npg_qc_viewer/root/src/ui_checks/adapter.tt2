@@ -2,8 +2,7 @@
 
 [% has_reverse = check.reverse_fasta_read_count.defined -%]
 
-<div style='float:left;' class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]' data-direction='forward' data-height=200></div>
-<div style='float:right;margin-right:20px;' class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]' data-direction='reverse' data-height=200></div>
+<div class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]'></div>
 
 <div style='clear:both;' class="data_table">
 <table summary="adapter check results">

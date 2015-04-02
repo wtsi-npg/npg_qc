@@ -51,5 +51,6 @@
 </table>
 </div>
 
-<div class='bcviz_insert_size' data-check='[% check.json %]' data-width=650 data-height=300></div>
+<div class='bcviz_insert_size' data-check='[% check.json %]'></div>
+
 
