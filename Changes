@@ -1,6 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-release 57.8
+ - add temporary file name option to bamtofastq command
+
+ release 57.8
  - Using bower to manage javascript component dependencies.
  - Using bcviz v1.1.0 which now supports bower.
  - use Biobambam bamtofastq in place of Picard utility in adapter qc check
