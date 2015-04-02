@@ -10,6 +10,16 @@ make sure you have installed dependencies with bower
 # in the npg_qc_viewer directory
 pushd root/static && bower install && popd
 
+# If you are including a working copy of bcviz (not yet official release) use bower to configure the linking
+
+  - In bcviz
+
+    $ bower link
+
+  - In npg_qc
+
+    $ pushd root/static && bower link bcviz && popd
+
 If needed, edit the decryption_key value in npg_qc_viewer.conf
 
 # in the npg_qc_viewer directory
