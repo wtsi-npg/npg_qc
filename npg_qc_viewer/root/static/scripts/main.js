@@ -1,9 +1,12 @@
 require.config({
-    baseUrl: '/static/scripts',
+    baseUrl: '/static',
 	catchError: true,
     paths: {
-        jquery: 'jquery-2.0.3',
-        d3: 'd3'
+        jquery: 'bower_components/jquery/jquery',
+        d3: 'bower_components/d3/d3.min',
+        insert_size_lib: 'bower_components/bcviz/js/src/insertSizeHistogram',
+        adapter_lib: 'bower_components/bcviz/js/src/adapter',
+        mismatch_lib: 'bower_components/bcviz/js/src/mismatch',
     },
     shim: {
         d3: {
@@ -19,8 +22,8 @@ require.onError = function (err) {
     throw err;
 };
 
-require(['manual_qc','collapse','bcviz/insertSizeHistogram', 'bcviz/adapter', 'bcviz/mismatch'], 
-function( manual_qc,  collapse,  insert_size,                 adapter,         mismatch) {
+require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib'], 
+function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 
 	collapse.init();
 

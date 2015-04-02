@@ -98,7 +98,7 @@
 	<p>No CIGAR Data</p>
 [% END %]
 
-<div style='float:left;' 
+<div style='float:left; width: 45%;' 
      class='bcviz_mismatch' 
      [% IF has_reverse %]data-legend=0[% ELSE %]data-legend=1[% END %]
      data-check='[% check.json | replace("'", "%27") %]' 
@@ -106,7 +106,7 @@
      data-height=350>
 </div>
 [% IF has_reverse %]
-<div style='float:right;margin-right:20px;'
+<div style='float:right; margin-right: 10px; width: 50%;'
      class='bcviz_mismatch' 
      data-check='[% check.json | replace("'", "%27") %]' 
      data-direction='reverse' 
