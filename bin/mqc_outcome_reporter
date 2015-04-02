@@ -19,14 +19,14 @@ mqc_outcome_reporter
 
 =head1 USAGE
 
-mqc_outcome_reporter
+  mqc_outcome_reporter
+  mqc_outcome_reporter --verbose
 
 =head1 CONFIGURATION
 
 =head1 SYNOPSIS
 
-This script checks the QC database to see if there are any manual QC operations that need
-to be reported to Sequencescape, and sends them.
+This script reports any outstanding final manual QC outcomes that to LIMS.
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ to be reported to Sequencescape, and sends them.
 
 =head1 OPTIONS
 
-=head1 SUBROUTINES/METHODS
+ verbose - a boolean option
 
 =head1 DIAGNOSTICS
 

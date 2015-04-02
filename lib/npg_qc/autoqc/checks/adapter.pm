@@ -60,11 +60,11 @@ has 'aligner_path'  =>  ( is         => 'ro',
                           default    => q[blat],
                         );
 
-has 'sam2fastq_jar' => ( is         => 'ro',
-                         isa        => 'NpgCommonResolvedPathJarFile',
+has 'bamtofastq_path' => ( is         => 'ro',
+                         isa        => 'NpgCommonResolvedPathExecutable',
                          required   => 0,
                          coerce     => 1,
-                         default    => q[SamToFastq.jar],
+                         default    => q[bamtofastq],
                        );
 
 has 'adapter_list'  => (  is          => 'ro',
@@ -184,10 +184,8 @@ sub _search_adapters_from_bam {
     ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
     if (! $pid) { #fork to convert BAM to fastq then into fasta whilst count forward and reverse reads
       my ($fieldi, $fcount, $rcount) = (0,0,0);
-      my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->java_cmd . q[ -Xmx200M -jar ] .
-                        $self->sam2fastq_jar .
-                        q[ VALIDATION_STRINGENCY=SILENT FASTQ=/dev/stdout ] .
-                        q[ SECOND_END_FASTQ=/dev/stdout ] . qq[ INPUT=$bam ] . q[" |] ;
+      my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->bamtofastq_path .
+                        qq[ T=$tmpdir/bamtofastq filename=$bam ] . q[" |] ;
       open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
       open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
       while (my $line = <$ifh>){

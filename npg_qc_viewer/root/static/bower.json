@@ -1,0 +1,19 @@
+{
+  "name": "npg_qc_viewer",
+  "dependencies": {
+    "jquery": "2.0.3",
+    "requirejs": "2.1.8",
+    "bcviz": "git://github.com/wtsi-npg/bcviz.git#1.1.0"
+  },
+  "devDependencies": {
+    "qunit": "1.17.1"
+  },
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

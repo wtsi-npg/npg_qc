@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 48;
+use Test::More tests => 44;
 use Test::Exception;
 use HTTP::Headers;
 use HTTP::Request::Common;
@@ -35,7 +35,7 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 {
   $XML::LibXML::Error::WARNINGS=2;
 
-  my $parser_options =          {recover => 0, 
+  my $parser_options =        {recover => 0, 
                                no_network => 0, 
                                supress_errors => 0,
                                supress_warnings => 0,
@@ -59,7 +59,6 @@ local $ENV{TEST_DIR}        = $util->staging_path;
   push @urls, qq[http://localhost/checks/samples/$sample_id];
   $sample_id = 9286;
   push @urls, qq[http://localhost/checks/samples/$sample_id];
-  push @urls, qq[http://localhost/checks/runs];
   my $run_id = 3965;
   push @urls, qq[http://localhost/checks/runs/$run_id];
   $run_id = 4025;

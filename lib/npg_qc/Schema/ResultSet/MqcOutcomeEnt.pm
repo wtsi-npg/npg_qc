@@ -17,7 +17,6 @@ sub get_not_reported {
   return $self->search({$self->current_source_alias . '.reported' => undef});
 }
 
-use Data::Dumper;
 sub get_rows_with_final_current_outcome {
   my $self = shift;
   #Final outcome comes from the short_desc of the relationship with the dictionary, only those with current status
@@ -27,6 +26,18 @@ sub get_rows_with_final_current_outcome {
 sub get_ready_to_report{
   my $self = shift;
   return $self->get_not_reported->get_rows_with_final_current_outcome;
+}
+
+sub get_outcomes_as_hash{
+  my ($self, $id_run) = @_;
+
+  #Loading previuos status qc for tracking and mqc.
+  my $previous_mqc = {};
+  my $previous_rs = $self->search({'id_run'=>$id_run});
+  while (my $obj = $previous_rs->next) {
+    $previous_mqc->{$obj->position} = $obj->mqc_outcome->short_desc;
+  }
+  return $previous_mqc;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -54,13 +65,17 @@ Extended ResultSet with specific functionality for for manual MQC.
 
   Returns a list of entities with a null reported timestamp.
 
-=head2 get_rows_with_final_outcome
+=head2 get_rows_with_final_current_outcome
 
   Returns a list of entities with final outcomes acording to business rules. Currently it looks into the relationship with the dictionary to find those outcomes with a short description ending in 'final'.
 
 =head2 get_ready_to_report
 
   Returns a list of MqcOutcomeEnt rows which are ready to be reported (have a final status but haven't been reported yet and which have an outcome marked as current in the dictionary).
+
+=head2 get_outcomes_as_hash
+
+  Returns a hash of lane=>outcome for those lanes in the database for the id_run specified.
 
 =head1 DEPENDENCIES
 

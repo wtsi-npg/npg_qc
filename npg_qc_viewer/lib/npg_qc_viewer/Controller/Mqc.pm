@@ -3,93 +3,188 @@ package npg_qc_viewer::Controller::Mqc;
 use Moose;
 use namespace::autoclean;
 use Readonly;
-use English qw(-no_match_vars);
+use Try::Tiny;
+use JSON;
+use Carp;
 
 BEGIN { extends 'Catalyst::Controller' }
 
+with 'npg_qc_viewer::api::error';
+
 our $VERSION  = '0';
-## no critic (ProhibitBuiltinHomonyms)
 
-Readonly::Array our @PARAMS  => qw/status 
-                                   batch_id
-                                   position
-                                   lims_object_id
-                                   lims_object_type
-                                  /;
+Readonly::Scalar my $BAD_REQUEST_CODE    => 400;
+Readonly::Scalar my $OK_CODE             => 200;
+Readonly::Scalar my $METHOD_NOT_ALLOWED  => 405;
+Readonly::Scalar my $ALLOW_METHOD_POST   => q[POST];
+Readonly::Scalar my $ALLOW_METHOD_GET    => q[GET];
+Readonly::Scalar my $MQC_ROLE            => q[manual_qc];
 
-Readonly::Scalar our $BAD_REQUEST_CODE    => 400;
-Readonly::Scalar our $INTERNAL_ERROR_CODE => 500;
-Readonly::Scalar our $METHOD_NOT_ALLOWED  => 405;
-Readonly::Scalar our $ALLOW_METHOD  => q[POST];
-Readonly::Scalar our $MQC_ROLE  => q[manual_qc];
-
-sub log : Path('log') {
-    my ( $self, $c ) = @_;
-    use Test::More;
-    my $request = $c->request;
-    if ($request->method ne $ALLOW_METHOD) {
-        $c->response->headers->header( 'ALLOW' => $ALLOW_METHOD );
-        _error($c, $METHOD_NOT_ALLOWED,
-             qq[Manual QC action logging error: only $ALLOW_METHOD requests are allowed.]);
-    }
-    $c->controller('Root')->authorise($c, ($MQC_ROLE));
-
-    my $referrer_url = $request->referer;
-    if (!$referrer_url) {
-      _error($c, $BAD_REQUEST_CODE,
-        q[Manual QC action logging error: referrer header should be set.]);
-    }
-    my ( $id_run ) = $referrer_url =~ m{(\d+)\z}xms;
-    if (!$id_run) {
-      _error($c, $INTERNAL_ERROR_CODE,
-	qq{Manual QC action logging error: failed to get id_run from referrer url $referrer_url});
-    }
-
-    my $values = {};
-    $values->{'referer'} = $referrer_url;
-    $values->{'user'} = $c->user->id;
-
-    my $params = $request->body_parameters;
-    foreach my $param (@PARAMS) {
-        if ($param =~ /^batch_id|position$/smx ) {
-            if($params->{$param}) {
-                $values->{$param} = $params->{$param};
-	    }
-	} else {
-            if(!$params->{$param}) {
-                _error($c, $BAD_REQUEST_CODE,
-                      qq[Manual QC action logging error: $param should be defined.]);
-	    }
-            if ($param eq q[status]) {
-                my $status = $params->{$param};
-                if ($status !~ /^fail|pass/smx) {
-		  _error($c, $BAD_REQUEST_CODE,
-                    qq[Manual QC action logging error: invalid status $status.]);
-		}
-                $values->{$param} = $status =~ /^pass/smx ? 1 : 0;
-	    } else {
-                $values->{$param} = $params->{$param};
-	    }
-	}
-    }
-    eval {
-        $c->model('NpgDB')->log_manual_qc_action($values);
-        $c->model('NpgDB')->update_lane_manual_qc_complete(
-	  $id_run, $values->{'position'}, $values->{'status'}, $c->user->username);
-        1;
-    } or do {
-        my $error = $EVAL_ERROR;
-        _error($c, $INTERNAL_ERROR_CODE,
-             qq[Error when logging manual qc action: $error]);
-    };
-
-    $c->response->body(q[Manual QC ] . $values->{status} . q[ for ] . $values->{lims_object_type} . q[ ] . $values->{lims_object_id} . q[ logged by NPG.]);
-    return;
+sub _validate_req_method {
+  my ($self, $c, $allowed) = @_;
+  if ($c->request->method ne $allowed) {
+    $self->raise_error(
+      qq[Only $allowed requests are allowed.], $METHOD_NOT_ALLOWED);
+  }
+  return;
 }
 
-sub _error {
-  my ($c, $code, $message) = @_;
-  return $c->controller('Root')->detach2error($c, $code, $message);
+sub _set_response {
+  my ($c, $message_data, $code) = @_;
+
+  if (!$message_data) {
+    croak 'Message hash should be supplied';
+  }
+  $c->response->headers->content_type('application/json');
+  if ($code) {
+    $c->response->status($code);
+  }
+  $c->response->body(to_json $message_data);
+
+  return;
+}
+
+sub update_outcome : Path('update_outcome') {
+  my ($self, $c) = @_;
+
+  my $id_run;
+  my $position;
+  my $username;
+  my $new_outcome;
+  my $error;
+
+  try {
+    ####Validation
+    $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    $c->controller('Root')->authorise($c, ($MQC_ROLE));
+
+    ####Loading state
+    my $params = $c->request->parameters;
+    $position    = $params->{'position'};
+    $new_outcome = $params->{'new_oc'};
+    $id_run      = $params->{'id_run'};
+    $username    = $c->user->username || $c->user->id;
+
+    if (!$id_run) {
+      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
+    }
+    if (!$position) {
+      $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
+    }
+    if (!$new_outcome) {
+      $self->raise_error(q[Mqc outcome should be defined], $BAD_REQUEST_CODE)
+    }
+    if (!$username) {
+      $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
+    }
+
+    my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
+      {'id_run' => $id_run, 'position' => $position})->next;
+    if (!$ent) {
+      $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
+        id_run         => $id_run,
+        position       => $position,
+        username       => $username,
+        modified_by    => $username});
+    }
+    $ent->update_outcome($new_outcome, $username);
+
+  } catch {
+    $error = $_;
+  };
+
+  my $error_code = $OK_CODE;
+  my $lane_update_error;
+
+  if ($error) {
+    ($error, $error_code) = $self->parse_error($error);
+  } else {
+    try {
+      $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
+    } catch {
+      $lane_update_error = qq[ Error updating lane status: $_];
+    };
+  }
+
+  my $message = $error || qq[Manual QC $new_outcome for run $id_run, position $position saved.];
+  if ($lane_update_error) {
+    $message .= $lane_update_error;
+  }
+
+  _set_response($c, {'message' => $message}, $error_code);
+
+  return;
+}
+
+sub get_current_outcome : Path('get_current_outcome') {
+  my ($self, $c) = @_;
+
+  my $desc;
+  my $error;
+  try {
+    $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+
+    my $params = $c->request->parameters;
+    my $position = $params->{'position'};
+    my $id_run   = $params->{'id_run'};
+
+    if (!$id_run) {
+      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
+    }
+    if (!$position) {
+      $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
+    }
+
+    my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
+      {id_run => $id_run, position => $position})->next;
+    $desc = $ent ? $ent->mqc_outcome->short_desc : q[];
+  }  catch {
+    my $error_code;
+    ($error, $error_code) = $self->parse_error($_);
+    _set_response($c, {message => qq[Error: $error] }, $error_code);
+  };
+
+  if (!$error) {
+    _set_response($c, {'outcome'=> $desc });
+  }
+
+  return;
+}
+
+#For future use
+sub get_all_outcomes : Path('get_all_outcomes') {
+  my ($self, $c) = @_;
+
+  my $error;
+  my $id_run;
+  my $positions = {};
+
+  try {
+    $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+
+    my $params = $c->request->parameters;
+    $id_run   = $params->{'id_run'};
+    if (!$id_run) {
+      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
+    }
+
+    my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({id_run => $id_run},);
+    while(my $ent = $res->next) {
+      my $position = $ent->position;
+      my $short_desc = $ent->mqc_outcome->short_desc;
+      $positions->{$position} = $short_desc;
+    }
+  } catch {
+    my $error_code;
+    ($error, $error_code) = $self->parse_error($_);
+     _set_response($c, {message => qq[Error: $error] }, $error_code);
+  };
+
+  if (!$error) {
+    _set_response($c, {$id_run => $positions});
+  }
+
+  return;
 }
 
 1;
@@ -103,13 +198,24 @@ npg_qc_viewer::Controller::Mqc
 
 =head1 DESCRIPTION
 
-A Catalyst Controller for logging manual qc actions,
+A Catalyst Controller for logging manual qc actions.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 index - action for an index page ~/mqc
 
-=head2 log - logging action ~/mqc/log
+=head2 update_outcome
+
+  Updates the mqc outcome using parameters from request (id_run, position, new_oc).
+
+=head2 get_current_outcome
+
+  Return JSON with current outcome for the paramaters from request (id_run, position).
+
+=head2 get_all_outcomes
+
+  Return JSON with all current outcomes for the parameter from request (id_run).
+
+=head2 
 
 =head1 DIAGNOSTICS
 
@@ -121,13 +227,17 @@ A Catalyst Controller for logging manual qc actions,
 
 =item Readonly
 
-=item English
-
 =item namespace::autoclean
 
 =item Moose
 
 =item Catalyst::Controller
+
+=item Try::Tiny
+
+=item JSON
+
+=item Carp
 
 =back
 
@@ -141,7 +251,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2015 Genome Research Ltd.
 
 This file is part of NPG software.
 

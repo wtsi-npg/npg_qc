@@ -2,16 +2,18 @@ package npg_qc_viewer::api::util;
 
 use Moose;
 use Carp;
+use Readonly;
+use List::MoreUtils qw/ uniq /;
+
 use npg_qc::autoqc::role::rpt_key;
 use npg_qc::autoqc::results::collection;
-use Readonly;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitMagicNumbers RequireCheckingReturnValueOfEval)
 
-Readonly::Scalar  my $LESS    => -1;
-Readonly::Scalar  my $MORE    =>  1;
-Readonly::Scalar  my $EQUAL   =>  0;
+Readonly::Scalar my $LESS    => -1;
+Readonly::Scalar my $MORE    =>  1;
+Readonly::Scalar my $EQUAL   =>  0;
 
 =head1 NAME
 
@@ -80,8 +82,7 @@ sub _compare_rpt_keys {
     my $b_map = inflate_rpt_key($self, $b);
 
     return $a_map->{id_run} <=> $b_map->{id_run} ||
-           $a_map->{position} <=> $b_map->{position} ||
-           ( (!exists $a_map->{tag_index} && !exists $b_map->{tag_index}) ? $EQUAL : (
+           $a_map->{position} <=> $b_map->{position} ||           ( (!exists $a_map->{tag_index} && !exists $b_map->{tag_index}) ? $EQUAL : (
                (exists $a_map->{tag_index}  && exists $b_map->{tag_index}) ? ($a_map->{tag_index} <=> $b_map->{tag_index}) : (
                    !exists $a_map->{tag_index} ? $LESS : $MORE
                )
@@ -100,9 +101,25 @@ sub sort_rpt_keys {
     return @a;
 }
 
+=head2 runs_from_rpt_keys
+
+List of run ids
+
+=cut
+sub runs_from_rpt_keys {
+    my ($self, $keys) = @_;
+    my @ar = ();
+    foreach my $key (@{$keys}) {
+      my $m = $self->inflate_rpt_key($key);
+      push @ar, $m->{'id_run'};
+    }
+    @ar = sort { $a <=> $b } uniq @ar;
+    return @ar;
+}
+
 =head2 has_plexes
 
-Returns 1 if at least one key is for a plex, otherwise returns 0;
+Returns 1 if at least one key is for a plex, otherwise returns 0
 
 =cut
 sub has_plexes {
@@ -149,6 +166,10 @@ __END__
 
 =item Readonly
 
+=item List::MoreUtils
+
+=item npg_qc::autoqc::role::rpt_key
+
 =item npg_qc::autoqc::results::collection
 
 =back
@@ -163,7 +184,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2015 Genome Research Ltd.
 
 This file is part of NPG software.
 

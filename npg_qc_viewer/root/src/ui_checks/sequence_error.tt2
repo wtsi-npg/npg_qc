@@ -98,12 +98,7 @@
 	<p>No CIGAR Data</p>
 [% END %]
 
-[% key = check.id_run _ '_' _ check.position _ '_' _ check.tag_index %]
-[% title = 'Mismatch : ' %]
-[% IF check.id_run.defined; title = title _ 'run ' _ check.id_run; END -%]
-[% IF check.position.defined; title = title _ ', lane ' _ check.position; END -%]
-[% IF check.tag_index.defined; title = title _ ', tag ' _ check.tag_index; END -%]
-
 <div class='bcviz_mismatch' data-check='[% check.json | replace("'", "%27") %]'></div>
+
 <div style='clear:both;'></div>
 
