@@ -39,7 +39,7 @@ use npg_qc::autoqc::checks::genotype;
 our $VERSION = '0';
 
 my %opts;
-getopts('hr:s:p:jo:g:m:a:x:', \%opts);
+getopts('hr:s:p:jo:g:m:a:x:c', \%opts);
 
 ##########
 # rpt key list should be in the format <id_run>:<lane>[:tag];... These values are then used to construct the bam file names:
@@ -48,8 +48,9 @@ getopts('hr:s:p:jo:g:m:a:x:', \%opts);
 #  otherwise, look in iRODS archive: 9213:6:40;8213:1:4 yields ("irods:/seq/9213/9213_6#40.bam", "irods:/seq/8213/8213_1#4.bam")
 ##########
 my @bam_file_list;
+my $ext = $opts{c}? q[cram]: q[bam];
 if($opts{r}) {
-	@bam_file_list = map { my ($r, $p, $t) = (split ":", $_); find_runlanefolder($r, $p, $t) or sprintf "irods:/seq/%d/%d_%d%s.bam", $r, $r, $p, $t? "#$t": ""; } (split ";", $opts{r});
+	@bam_file_list = map { my ($r, $p, $t) = (split ":", $_); find_runlanefolder($r, $p, $t, $ext) or sprintf "irods:/seq/%d/%d_%d%s.%s", $r, $r, $p, $t? "#$t": "", $ext; } (split ";", $opts{r});
 
 	carp qq[bam_file_list:\n\t], join("\n\t", @bam_file_list), "\n";
 }
@@ -74,9 +75,10 @@ my $gt_exec_path = $opts{x};
 $sample_name ||= 'NO_SN';
 $plex_name ||= q[sequenom_fluidigm_combo];	# standard Sequenom+Fluidigm QC plex
 $reference_genome ||= $ref_repos . q[/Homo_sapiens/1000Genomes/all/fasta/human_g1k_v37.fasta];
-my $chr_name_set = ($reference_genome =~ m{/GRCh37}? q[GRCh37]: q[1000Genomes]);
+# my $chr_name_set = ($reference_genome =~ m{/GRCh37}? q[GRCh37]: q[1000Genomes]);
+my $chr_name_set = ($reference_genome =~ m{/GRCh38}? q[GRCh38]: ($reference_genome =~ m{/GRCh37}? q[GRCh37]: q[1000Genomes]));
 
-die "Usage: call_gtck_composite_rpt.pl [-h] -r <rpt_list> -s <sample_name> -p <poss_dup_level> -j\n" unless(@bam_file_list and $sample_name and $reference_genome and !$opts{h});
+die "Usage: call_gtck_composite_rpt.pl [-h] -r <rpt_list> -s <sample_name> -p <poss_dup_level> -j -o <output_file> -g <fasta_reference> -m <pos_snpname_map_file> -a <plex_name> -c\n" unless(@bam_file_list and $sample_name and $reference_genome and !$opts{h});
 
 my $of;
 if($output_file) {
@@ -90,7 +92,6 @@ my %attribs = (
 	sample_name => $sample_name,
 	alignments_in_bam => 1,
 	reference_fasta => $reference_genome,
-	samtools_name => q[samtools_irods],
 	input_files => [ (@bam_file_list) ],
 	path => q[.],
 );
@@ -126,7 +127,7 @@ else {
 print $of $result_string;
 
 sub find_runlanefolder {
-	my ($id_run, $lane, $tag_index) = @_;
+	my ($id_run, $lane, $tag_index, $ext) = @_;
 
 	# the methods hash ref passed to create_anon_class looks peculiar, but seems to be necessary to create a new object
 	#  from an anonymous class in this way
@@ -149,10 +150,10 @@ sub find_runlanefolder {
 
 		my $full_path =  sprintf "%s/archive/", $ls;
 		if($tag_index) {
-			$full_path .= sprintf "lane%d/%d_%d#%d.bam", $lane, $id_run, $lane, $tag_index;
+			$full_path .= sprintf "lane%d/%d_%d#%d.%s", $lane, $id_run, $lane, $tag_index, $ext;
 		}
 		else {
-			$full_path .= sprintf "%d_%d.bam", $id_run, $lane;
+			$full_path .= sprintf "%d_%d.%s", $id_run, $lane, $ext;
 		}
 
 		return $full_path;

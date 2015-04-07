@@ -12,6 +12,7 @@ use Carp;
 use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
 use List::MoreUtils qw { any };
+use File::Slurp;
 use JSON;
 use Data::Dumper;
 use npg_qc::utils::bam_genotype;
@@ -30,6 +31,10 @@ our $VERSION = '0';
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
 Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
+# Readonly::Scalar my $SAMTOOLS_NAME => q[samtools1];
+Readonly::Scalar my $SAMTOOLS_EXTRACT_REGIONS_NAME => q[samtools1];
+Readonly::Scalar my $SAMTOOLS_MERGE_NAME => q[samtools1]; # ??
+Readonly::Scalar my $SAMTOOLS_MPILEUP_NAME => q[samtools];
 Readonly::Scalar my $BCFTOOLS_NAME => q[bcftools];
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $SEQUENOM_QC_PLEX => q[W30467];
@@ -75,6 +80,39 @@ has 'samtools' => (
 sub _build_samtools {
 	my ($self) = @_;
 	return $self->samtools_name;
+}
+
+has 'samtools_extract_regions' => (
+        is => 'ro',
+        isa => 'NpgCommonResolvedPathExecutable',
+        lazy_build => 1,
+        coerce => 1,
+);
+sub _build_samtools_extract_regions {
+	my ($self) = @_;
+	return $SAMTOOLS_EXTRACT_REGIONS_NAME;
+}
+
+has 'samtools_merge' => (
+        is => 'ro',
+        isa => 'NpgCommonResolvedPathExecutable',
+        lazy_build => 1,
+        coerce => 1,
+);
+sub _build_samtools_merge {
+	my ($self) = @_;
+	return $SAMTOOLS_MERGE_NAME;
+}
+
+has 'samtools_mpileup' => (
+        is => 'ro',
+        isa => 'NpgCommonResolvedPathExecutable',
+        lazy_build => 1,
+        coerce => 1,
+);
+sub _build_samtools_mpileup {
+	my ($self) = @_;
+	return $SAMTOOLS_MPILEUP_NAME;
 }
 
 # you can override the executable name. May be useful for variants like "samtools_irods"
@@ -366,6 +404,26 @@ sub _build_pos_snpname_map_fn {
 	return $pos_snpname_map_fn;
 }
 
+##################################################################################################################
+# chrname_conv_fn - JSON file which maps reference genome names to chromosome naming convention; as a side effect,
+#  keys provide a list of reference genomes considered to be human. Should be either specified at instantiation or
+#  implied by the Sequenom plex and reference genome.
+##################################################################################################################
+has 'chrname_conv_fn' => (
+        is => 'ro',
+#        isa => 'NpgTrackingReadableFile',
+        isa => 'Str',
+	lazy_build => 1,
+);
+sub _build_chrname_conv_fn {
+	my ($self) = @_;
+	my $genotypes_repository = $self->genotypes_repository;
+
+	my $fn = $genotypes_repository . q[/chrconv_map.json];
+
+	return $fn;
+}
+
 ##############################################################################################
 # report_aux_data tells bam_genotype to include read depth and genotype likelihood information
 ##############################################################################################
@@ -384,7 +442,7 @@ has 'bam_genotype' => (
 sub _build_bam_genotype {
 	my ($self) = @_;
 
-	my %bg_params = (sample_name => $self->sample_name, plex => $self->sequenom_plex, reference => $self->reference_fasta, pos_snpname_map_filename => $self->pos_snpname_map_fn, report_aux_data => $self->report_aux_data, samtools => $self->samtools, samtools_name => $self->samtools_name, bcftools => $self->bcftools, bcftools_name => $self->bcftools_name, );
+	my %bg_params = (sample_name => $self->sample_name, plex => $self->sequenom_plex, reference => $self->reference_fasta, pos_snpname_map_filename => $self->pos_snpname_map_fn, report_aux_data => $self->report_aux_data, samtools_extract_regions => $self->samtools_extract_regions, samtools_merge => $self->samtools_merge, samtools_mpileup => $self->samtools_mpileup, samtools_name => $self->samtools_name, bcftools => $self->bcftools, bcftools_name => $self->bcftools_name, );
 
 	$bg_params{bam_file_list} = $self->input_files;
 
@@ -546,7 +604,8 @@ sub _cap_range {
 
 ###############################################################################################################
 # For each recognised human reference, _ref_to_snppos_suffix hashref indicates the chromosome naming convention
-# with a value of either 'GRCh37' (meaning chr1, chr2, ...) or '1000Genomes' (meaning 1, 2, 3)
+#  with a value of either 'GRCh37' (meaning Chr1, Chr2, ...), '1000Genomes' (meaning 1, 2, 3)
+#  or 'GRCh38' (meaning chr1, chr2, ...)
 ###############################################################################################################
 has '_ref_to_snppos_suffix_map' => (
 	isa => 'HashRef',
@@ -556,18 +615,41 @@ has '_ref_to_snppos_suffix_map' => (
 sub _build__ref_to_snppos_suffix_map {
 	my ($self) = @_;
 	my $human_references_repository = $self->human_references_repository;
-	Readonly::Scalar my $NO_CHR_SUFFIX => '1000Genomes';
-	Readonly::Scalar my $USE_CHR_SUFFIX => 'GRCh37';
 
-	my $ref_to_snppos_suffix_map = {
-		"$human_references_repository/1000Genomes/all/fasta/human_g1k_v37.fasta" => $NO_CHR_SUFFIX,
-		"$human_references_repository/1000Genomes_hs37d5/all/fasta/hs37d5.fa" => $NO_CHR_SUFFIX,
-		"$human_references_repository/CGP_GRCh37.NCBI.allchr_MT/all/fasta/Homo_sapiens.GRCh37.NCBI.allchr_MT.fa" => $NO_CHR_SUFFIX,
-		"$human_references_repository/GRCh37_53/all/fasta/Homo_sapiens.GRCh37.dna.all.fa" => $USE_CHR_SUFFIX,
-		"$human_references_repository/NCBI36/all/fasta/Homo_sapiens.NCBI36.48.dna.all.fa" => $NO_CHR_SUFFIX,
-	};
+	my $chrconv_fn = $self->chrname_conv_fn;
+	if($chrconv_fn and -f $chrconv_fn) { # if a map file is available, use it
+		my $chrconv_map = {};
+                my $s = read_file($chrconv_fn);
+                if($s) {
+                        my $json = from_json($s);
+			$chrconv_map = $json->{ref_chrconv_map};
+                }
+		my %ret = ();
+		$chrconv_map ||= {};
+		# prepend current base for reference repository 
+		@ret{(map { $human_references_repository . q[/] . $_; } keys %$chrconv_map)} = values %$chrconv_map;
 
-	return $ref_to_snppos_suffix_map;
+		return \%ret;
+        }
+	else { # default to these values when map file is unavailable
+		Readonly::Scalar my $NO_CHR_SUFFIX => '1000Genomes';
+		Readonly::Scalar my $USE_CHR_SUFFIX => 'GRCh37';
+		Readonly::Scalar my $USE_GRCh38_CHR_SUFFIX => 'GRCh38';
+
+		my $ref_to_snppos_suffix_map = {
+			"$human_references_repository/1000Genomes/all/fasta/human_g1k_v37.fasta" => $NO_CHR_SUFFIX,
+			"$human_references_repository/1000Genomes_hs37d5/all/fasta/hs37d5.fa" => $NO_CHR_SUFFIX,
+			"$human_references_repository/CGP_GRCh37.NCBI.allchr_MT/all/fasta/Homo_sapiens.GRCh37.NCBI.allchr_MT.fa" => $NO_CHR_SUFFIX,
+			"$human_references_repository/GRCh37_53/all/fasta/Homo_sapiens.GRCh37.dna.all.fa" => $USE_CHR_SUFFIX,
+			"$human_references_repository/NCBI36/all/fasta/Homo_sapiens.NCBI36.48.dna.all.fa" => $NO_CHR_SUFFIX,
+			"$human_references_repository/GRCh38_15/all/fasta/Homo_sapiens.GRCh38_15.fa" => $USE_GRCh38_CHR_SUFFIX,
+			"$human_references_repository/GRCh38_15_noEBV/all/fasta/Homo_sapiens.GRCh38_15_noEBV.fa" => $USE_GRCh38_CHR_SUFFIX,
+			"$human_references_repository/GRCh38_15_plus_hs38d1/all/fasta/Homo_sapiens.GRCh38_15_plus_hs38d1.fa" => $USE_GRCh38_CHR_SUFFIX,
+			"$human_references_repository/GRCh38_full_analysis_set_plus_decoy_hla/all/fasta/Homo_sapiens.GRCh38_full_analysis_set_plus_decoy_hla.fa" => $USE_GRCh38_CHR_SUFFIX,
+		};
+
+		return $ref_to_snppos_suffix_map;
+	}
 }
 
 no Moose;
