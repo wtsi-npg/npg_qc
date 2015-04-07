@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - changes to allow genotype checks to be run on cram files
+
 release 57.8.1
  - add temporary file name option to bamtofastq command
 
