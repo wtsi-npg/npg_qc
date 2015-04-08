@@ -4,9 +4,9 @@ require.config({
     paths: {
         jquery: 'bower_components/jquery/jquery',
         d3: 'bower_components/d3/d3.min',
-        insert_size_lib: 'bower_components/bcviz/js/src/insertSizeHistogram',
-        adapter_lib: 'bower_components/bcviz/js/src/adapter',
-        mismatch_lib: 'bower_components/bcviz/js/src/mismatch',
+        insert_size_lib: 'bower_components/bcviz/src/qcjson/insertSizeHistogram',
+        adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
+        mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
     },
     shim: {
         d3: {
