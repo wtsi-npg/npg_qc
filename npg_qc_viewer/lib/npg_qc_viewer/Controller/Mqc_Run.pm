@@ -10,7 +10,23 @@ with 'npg_qc_viewer::api::error';
 
 our $VERSION  = '0';
 
-sub mqc_run : Local : ActionClass('REST') { }
+sub mqc_runs :Path('/mqc/mqc_runs') :ActionClass('REST') { }
+
+sub mqc_runs_GET {
+
+  my ( $self, $c ) = @_;
+
+  # Return a 200 OK, with the data in entity
+  # serialized in the body
+  $self->status_ok(
+    $c,
+    entity => {
+      some => 'data',
+      foo  => 'is real bar-y',
+    },
+  );
+}
+
 
 1;
 
