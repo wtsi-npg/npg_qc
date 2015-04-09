@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC build: remove --linkable-bcviz-path option since dependency on bcviz
+   is now managed by bower
+
 release 57.8.1
  - add temporary file name option to bamtofastq command
 
