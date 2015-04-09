@@ -20,14 +20,16 @@ sub mqc_runs_GET {
 
   my ( $self, $c, $id_run) = @_;
 
+  #Get from DB
+  my $ent = $c->model('NpgDB')->resultset('Run')->find($id_run);
+
   # Return a 200 OK, with the data in entity
   # serialized in the body
   $self->status_ok(
     $c,
     entity => {
-      some => 'data',
-      foo  => 'is real bar-y',
       id_run => $id_run,
+      current_status_description => $ent->current_run_status_description,
     },
   );
 }
