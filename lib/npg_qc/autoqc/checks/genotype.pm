@@ -627,14 +627,14 @@ sub _build__ref_to_snppos_suffix_map {
 		my %ret = ();
 		$chrconv_map ||= {};
 		# prepend current base for reference repository 
-		@ret{(map { $human_references_repository . q[/] . $_; } keys %$chrconv_map)} = values %$chrconv_map;
+		@ret{(map { $human_references_repository . q[/] . $_; } keys %{$chrconv_map})} = values %{$chrconv_map};
 
 		return \%ret;
         }
 	else { # default to these values when map file is unavailable
 		Readonly::Scalar my $NO_CHR_SUFFIX => '1000Genomes';
 		Readonly::Scalar my $USE_CHR_SUFFIX => 'GRCh37';
-		Readonly::Scalar my $USE_GRCh38_CHR_SUFFIX => 'GRCh38';
+		Readonly::Scalar my $USE_GRCH38_CHR_SUFFIX => 'GRCh38';
 
 		my $ref_to_snppos_suffix_map = {
 			"$human_references_repository/1000Genomes/all/fasta/human_g1k_v37.fasta" => $NO_CHR_SUFFIX,
@@ -642,10 +642,10 @@ sub _build__ref_to_snppos_suffix_map {
 			"$human_references_repository/CGP_GRCh37.NCBI.allchr_MT/all/fasta/Homo_sapiens.GRCh37.NCBI.allchr_MT.fa" => $NO_CHR_SUFFIX,
 			"$human_references_repository/GRCh37_53/all/fasta/Homo_sapiens.GRCh37.dna.all.fa" => $USE_CHR_SUFFIX,
 			"$human_references_repository/NCBI36/all/fasta/Homo_sapiens.NCBI36.48.dna.all.fa" => $NO_CHR_SUFFIX,
-			"$human_references_repository/GRCh38_15/all/fasta/Homo_sapiens.GRCh38_15.fa" => $USE_GRCh38_CHR_SUFFIX,
-			"$human_references_repository/GRCh38_15_noEBV/all/fasta/Homo_sapiens.GRCh38_15_noEBV.fa" => $USE_GRCh38_CHR_SUFFIX,
-			"$human_references_repository/GRCh38_15_plus_hs38d1/all/fasta/Homo_sapiens.GRCh38_15_plus_hs38d1.fa" => $USE_GRCh38_CHR_SUFFIX,
-			"$human_references_repository/GRCh38_full_analysis_set_plus_decoy_hla/all/fasta/Homo_sapiens.GRCh38_full_analysis_set_plus_decoy_hla.fa" => $USE_GRCh38_CHR_SUFFIX,
+			"$human_references_repository/GRCh38_15/all/fasta/Homo_sapiens.GRCh38_15.fa" => $USE_GRCH38_CHR_SUFFIX,
+			"$human_references_repository/GRCh38_15_noEBV/all/fasta/Homo_sapiens.GRCh38_15_noEBV.fa" => $USE_GRCH38_CHR_SUFFIX,
+			"$human_references_repository/GRCh38_15_plus_hs38d1/all/fasta/Homo_sapiens.GRCh38_15_plus_hs38d1.fa" => $USE_GRCH38_CHR_SUFFIX,
+			"$human_references_repository/GRCh38_full_analysis_set_plus_decoy_hla/all/fasta/Homo_sapiens.GRCh38_full_analysis_set_plus_decoy_hla.fa" => $USE_GRCH38_CHR_SUFFIX,
 		};
 
 		return $ref_to_snppos_suffix_map;
