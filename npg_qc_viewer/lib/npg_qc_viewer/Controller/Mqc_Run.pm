@@ -13,6 +13,7 @@ __PACKAGE__->config(default => 'application/json');
 with 'npg_qc_viewer::api::error';
 
 our $VERSION  = '0';
+## no critic (NamingConventions::Capitalization)
 
 sub mqc_runs :Path('/mqc/mqc_runs') :ActionClass('REST') { }
 
@@ -32,11 +33,13 @@ sub mqc_runs_GET {
       current_status_description => $ent->current_run_status_description,
     },
   );
+
+  return;
 }
 
 __PACKAGE__->meta->make_immutable;
-
 1;
+__END__
 
 =head1 NAME
 
@@ -71,6 +74,10 @@ Controller to expose runs through REST
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Jaime Tovar E<lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
