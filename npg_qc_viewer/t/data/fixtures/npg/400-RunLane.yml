@@ -1,240 +1,200 @@
 ---
-- good_bad: ~
-  id_run: 3323
+- id_run: 3323
   id_run_lane: 26136
   position: 1
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3323
+- id_run: 3323
   id_run_lane: 26137
   position: 2
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3323
+- id_run: 3323
   id_run_lane: 26138
   position: 3
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3323
+- id_run: 3323
   id_run_lane: 26139
   position: 4
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3323
+- id_run: 3323
   id_run_lane: 26140
   position: 5
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3323
+- id_run: 3323
   id_run_lane: 26141
   position: 6
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3323
+- id_run: 3323
   id_run_lane: 26142
   position: 7
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3323
+- id_run: 3323
   id_run_lane: 26143
   position: 8
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3500
+- id_run: 3500
   id_run_lane: 27552
   position: 1
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3500
+- id_run: 3500
   id_run_lane: 27553
   position: 2
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3500
+- id_run: 3500
   id_run_lane: 27554
   position: 3
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3500
+- id_run: 3500
   id_run_lane: 27555
   position: 4
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3500
+- id_run: 3500
   id_run_lane: 27556
   position: 5
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3500
+- id_run: 3500
   id_run_lane: 27557
   position: 6
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3500
+- id_run: 3500
   id_run_lane: 27558
   position: 7
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3500
+- id_run: 3500
   id_run_lane: 27559
   position: 8
   tile_count: 100
   tracks: 2
-- good_bad: ~
-  id_run: 3965
+- id_run: 3965
   id_run_lane: 31272
   position: 1
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 3965
+- id_run: 3965
   id_run_lane: 31273
   position: 2
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 3965
+- id_run: 3965
   id_run_lane: 31274
   position: 3
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 3965
+- id_run: 3965
   id_run_lane: 31275
   position: 4
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 3965
+- id_run: 3965
   id_run_lane: 31276
   position: 5
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 3965
+- id_run: 3965
   id_run_lane: 31277
   position: 6
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 3965
+- id_run: 3965
   id_run_lane: 31278
   position: 7
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 3965
+- id_run: 3965
   id_run_lane: 31279
   position: 8
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 4025
+- id_run: 4025
   id_run_lane: 31752
   position: 1
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 4025
+- id_run: 4025
   id_run_lane: 31753
   position: 2
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 4025
+- id_run: 4025
   id_run_lane: 31754
   position: 3
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 4025
+- id_run: 4025
   id_run_lane: 31755
   position: 4
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 4025
+- id_run: 4025
   id_run_lane: 31756
   position: 5
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 4025
+- id_run: 4025
   id_run_lane: 31757
   position: 6
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 4025
+- id_run: 4025
   id_run_lane: 31758
   position: 7
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 4025
+- id_run: 4025
   id_run_lane: 31759
   position: 8
   tile_count: 120
   tracks: 2
-- good_bad: ~
-  id_run: 6400
+- id_run: 6400
   id_run_lane: 50834
   position: 1
   tile_count: 32
   tracks: 4
-- good_bad: ~
-  id_run: 6400
+- id_run: 6400
   id_run_lane: 50835
   position: 2
   tile_count: 32
   tracks: 4
-- good_bad: ~
-  id_run: 6400
+- id_run: 6400
   id_run_lane: 50836
   position: 3
   tile_count: 32
   tracks: 4
-- good_bad: ~
-  id_run: 6400
+- id_run: 6400
   id_run_lane: 50837
   position: 4
   tile_count: 32
   tracks: 4
-- good_bad: ~
-  id_run: 6400
+- id_run: 6400
   id_run_lane: 50838
   position: 5
   tile_count: 32
   tracks: 4
-- good_bad: ~
-  id_run: 6400
+- id_run: 6400
   id_run_lane: 50839
   position: 6
   tile_count: 32
   tracks: 4
-- good_bad: ~
-  id_run: 6400
+- id_run: 6400
   id_run_lane: 50840
   position: 7
   tile_count: 32
   tracks: 4
-- good_bad: ~
-  id_run: 6400
+- id_run: 6400
   id_run_lane: 50841
   position: 8
   tile_count: 32
