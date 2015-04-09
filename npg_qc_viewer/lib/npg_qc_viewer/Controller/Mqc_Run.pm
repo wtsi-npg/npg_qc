@@ -6,6 +6,10 @@ use Readonly;
 
 BEGIN { extends 'Catalyst::Controller::REST' }
 
+#Just to declare a default. But seems the content type should come from client
+#anyway
+__PACKAGE__->config(default => 'application/json');
+
 with 'npg_qc_viewer::api::error';
 
 our $VERSION  = '0';
@@ -14,7 +18,7 @@ sub mqc_runs :Path('/mqc/mqc_runs') :ActionClass('REST') { }
 
 sub mqc_runs_GET {
 
-  my ( $self, $c ) = @_;
+  my ( $self, $c, $id_run) = @_;
 
   # Return a 200 OK, with the data in entity
   # serialized in the body
@@ -23,10 +27,12 @@ sub mqc_runs_GET {
     entity => {
       some => 'data',
       foo  => 'is real bar-y',
+      id_run => $id_run,
     },
   );
 }
 
+__PACKAGE__->meta->make_immutable;
 
 1;
 
