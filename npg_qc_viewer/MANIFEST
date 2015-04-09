@@ -5,7 +5,6 @@ lib/Catalyst/Controller/AjaxProxy.pm
 lib/npg_tracking/daemon/seqqc.pm
 lib/npg_qc_viewer/api/error.pm
 lib/npg_qc_viewer/api/util.pm
-lib/npg_qc_viewer/Controller/AjaxProxy.pm
 lib/npg_qc_viewer/Controller/Checks.pm
 lib/npg_qc_viewer/Controller/Mqc.pm
 lib/npg_qc_viewer/Controller/Root.pm
@@ -100,8 +99,6 @@ t/20-model-SeqStore.t
 t/20-model-WarehouseDB.t
 t/20-model-visuals-Fastqcheck.t
 t/30-model-visuals-Fastqcheck.t
-t/40-controller-AjaxProxy_no_conf.t
-t/40-controller-AjaxProxy.t
 t/40-controller-Checks.t
 t/40-controller-Mqc.t
 t/40-controller-Root.t
@@ -257,7 +254,6 @@ t/data/sources4visuals/4360_1_1.fastqcheck
 t/data/sources4visuals/empty.fastqcheck
 t/data/test_app.conf
 t/data/test_app_no_db.conf
-t/data/test_app_no_proxy_conf.conf
 t/perlcriticrc
 t/README
 t/scripts/npg_fixtures.pl
