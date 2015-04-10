@@ -40,10 +40,6 @@ my $fname = 'new.fastqcheck';
   is( $responce->code, 500, q[error code is 500] );
 }
 
-1;
-
-
-
 {
   my $url  = q[/visuals/fastqcheck?path=] . $fname . q[&db_lookup=1];
   my $responce;
@@ -51,3 +47,5 @@ my $fname = 'new.fastqcheck';
   ok( $responce->is_success, qq[$url request succeeds] );
   is( $responce->content_type, q[image/png], 'image/png content type');
 }
+
+1;
