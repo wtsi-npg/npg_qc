@@ -11,7 +11,7 @@ use Moose;
 use MooseX::AttributeHelpers;
 use Carp;
 use English qw(-no_match_vars);
-use List::MoreUtils qw(none);
+use List::MoreUtils qw(any none);
 use Module::Pluggable::Object;
 use Readonly;
 use File::Basename;
@@ -23,6 +23,7 @@ use npg_tracking::illumina::run::folder;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
+use npg_qc::autoqc::role::rpt_key;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
@@ -455,6 +456,20 @@ sub run_lane_collections {
         }
     }
     return $map;
+}
+
+sub run_lane_plex_flags {
+    my $self = shift;
+    my $map = $self->run_lane_collections;
+    my $flags = {};
+    foreach my $rpt_key (keys @{%map}) {
+        my $rpt_h = npg_qc::autoqc::role::rpt_key->inflate_rpt_key($rpt_key);
+        if (!defined $rpt_h) { #it's a lane
+            my $has_plexes = any { $_ eq 'tag metrics' } @{$map->{$rpt_key}->check_names()};
+            $flags->{$rpt_h->{'id_run'}}->{$rpt_h->{'position'}} = $has_plexes ? 1 : 0;
+        }
+    }
+    return $flags;
 }
 
 =head2 check_names_map
