@@ -458,6 +458,12 @@ sub run_lane_collections {
     return $map;
 }
 
+=head2 run_lane_plex_flags
+
+Returns a hash map where keys are rpt keys for lanes and values are booleans indicating
+whether this lane has plex-level results.
+
+=cut
 sub run_lane_plex_flags {
     my $self = shift;
     my $map = $self->run_lane_collections;
@@ -466,7 +472,7 @@ sub run_lane_plex_flags {
         my $rpt_h = npg_qc::autoqc::role::rpt_key->inflate_rpt_key($rpt_key);
         if (!defined $rpt_h) { #it's a lane
             my $has_plexes = any { $_ eq 'tag metrics' } @{$map->{$rpt_key}->check_names()};
-            $flags->{$rpt_h->{'id_run'}}->{$rpt_h->{'position'}} = $has_plexes ? 1 : 0;
+            $flags->{$rpt_key} = $has_plexes ? 1 : 0;
         }
     }
     return $flags;
