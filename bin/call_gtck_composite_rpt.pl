@@ -75,7 +75,6 @@ my $gt_exec_path = $opts{x};
 $sample_name ||= 'NO_SN';
 $plex_name ||= q[sequenom_fluidigm_combo];	# standard Sequenom+Fluidigm QC plex
 $reference_genome ||= $ref_repos . q[/Homo_sapiens/1000Genomes/all/fasta/human_g1k_v37.fasta];
-# my $chr_name_set = ($reference_genome =~ m{/GRCh37}? q[GRCh37]: q[1000Genomes]);
 my $chr_name_set = ($reference_genome =~ m{/GRCh38}? q[GRCh38]: ($reference_genome =~ m{/GRCh37}? q[GRCh37]: q[1000Genomes]));
 
 die "Usage: call_gtck_composite_rpt.pl [-h] -r <rpt_list> -s <sample_name> -p <poss_dup_level> -j -o <output_file> -g <fasta_reference> -m <pos_snpname_map_file> -a <plex_name> -c\n" unless(@bam_file_list and $sample_name and $reference_genome and !$opts{h});
@@ -145,8 +144,6 @@ sub find_runlanefolder {
 	if($rf) {
 		my $ls = $rf . q[/Latest_Summary];
 		die qq[Latest_summary link $ls not found] unless(-l $ls);
-
-#		my $full_path = sprintf "%s/archive/lane%d/%d_%d%s.bam", $ls, $lane, $id_run, $lane, $tag_index? "#$tag_index": "";
 
 		my $full_path =  sprintf "%s/archive/", $ls;
 		if($tag_index) {
