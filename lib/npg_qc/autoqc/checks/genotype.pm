@@ -410,7 +410,6 @@ sub _build_pos_snpname_map_fn {
 ##################################################################################################################
 has 'chrname_conv_fn' => (
         is => 'ro',
-#        isa => 'NpgTrackingReadableFile',
         isa => 'Str',
 	lazy_build => 1,
 );
