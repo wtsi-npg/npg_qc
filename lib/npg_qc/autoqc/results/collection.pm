@@ -99,12 +99,11 @@ sub _build__result_classes {
     my $self = shift;
 
     my @classes = Module::Pluggable::Object->new(
-                               require     => 1,
-			       search_path => $RESULTS_NAMESPACE,
-                               except      => [$RESULTS_NAMESPACE . q[::result],
-                                               $RESULTS_NAMESPACE . q[::collection]
-                                              ],
-                                                )->plugins;
+        require     => 1,
+        search_path => $RESULTS_NAMESPACE,
+        except      => [$RESULTS_NAMESPACE . q[::result],
+                        $RESULTS_NAMESPACE . q[::collection]],
+    )->plugins;
     my @class_names = ();
     foreach my $class (@classes) {
         my ($class_name) = $class =~ /(\w+)$/smx;
@@ -133,7 +132,7 @@ sub add {
             $self->push($el);
         }
     } else {
-         $self->push($r);
+        $self->push($r);
     }
     return 1;
 }
@@ -171,11 +170,11 @@ sub add_from_dir {
                 my $position = $result->position;
                 if (!defined $lanes || !@{$lanes} || grep {/^$position$/smx} @{$lanes} ) {
                     $self->add($result);
-	        }
+                }
                 $loaded = 1;
                 last;
-	    }
-	}
+            }
+        }
         if (!$loaded) {
             carp qq[Cannot identify class for $file];
         }
@@ -261,15 +260,15 @@ sub load_from_staging {
                 my $path = $finder->lane_qc_path($lane);
                 if (-e $path) {
                     push @dirs, $path;
-	        }
+                }
             }
         } else {
             @dirs = @{$finder->lane_qc_paths};
-	}
+        }
 
         foreach my $dir (@dirs) {
             $self->add_from_dir($dir, undef, $query->id_run);
-	}
+        }
     }
 
     return 1;
@@ -362,7 +361,9 @@ sub slice {
     my $c = npg_qc::autoqc::results::collection->new();
 
     foreach my $r (@{$self->results}) {
-        if ($r->$criterion && $r->$criterion eq $value) { $c->add($r); }
+        if ($r->$criterion && $r->$criterion eq $value) {
+            c->add($r);
+        }
     }
     return $c;
 }
@@ -383,7 +384,9 @@ sub search {
 
     my $c = npg_qc::autoqc::results::collection->new();
     foreach my $r (@{$self->results}) {
-        if ($r->equals_byvalue($h)) { $c->add($r); }
+        if ($r->equals_byvalue($h)) {
+            $c->add($r);
+        }
     }
     return $c;
 }
@@ -406,7 +409,7 @@ sub filter_by_positions {
         $position = $self->get($i)->position;
         if (none {/$position/smx} @{$lanes}) {
             $self->delete($i);
-	}
+        }
         $i--;
     }
 
@@ -449,7 +452,7 @@ sub run_lane_collections {
             $map->{$key} = $c;
         } else {
             $map->{$key}->add($result);
-	}
+        }
     }
     return $map;
 }
@@ -474,11 +477,11 @@ sub check_names_map {
         my $check_name = $result->check_name;
         if (!exists $classes->{$class_name}) {
             croak qq[Unknown class name $class_name];
-	}
+        }
         if (!exists $seen->{$check_name}) {
             push @{$classes->{$class_name}}, $check_name;
             $seen->{$check_name} = 1;
-	}
+        }
     }
     return $classes;
 }
@@ -500,7 +503,7 @@ sub check_names {
         push @check_names, @{$classes->{$check}};
         foreach my $name (@{$classes->{$check}}) {
             $map->{$name} = $check;
-	}
+        }
     }
     return {list => \@check_names, map => $map,};
 }
@@ -567,7 +570,7 @@ Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL, by Marina Gourtovaia
 
 This file is part of NPG.
 
