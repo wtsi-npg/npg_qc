@@ -10,6 +10,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   my $norm_fit_dir       = join(q[/], 'src', 'norm_fit');
   my $norm_fit_build_dir = join(q[/], $norm_fit_dir, 'build');
   my $gt_utils_dir       = join(q[/], 'src', 'gt_utils');
+  my $gt_utils_build_dir = join(q[/], $gt_utils_dir, 'build');
 
   sub ACTION_build {
     my $self = shift;
@@ -21,11 +22,12 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
                             to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
                             flatten => 1);
 
+    make_path $gt_utils_build_dir;
     `make --directory $gt_utils_dir`;
-    $self->copy_if_modified(from    => "$gt_utils_dir/gt_pack",
+    $self->copy_if_modified(from    => "$gt_utils_build_dir/gt_pack",
                             to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
                             flatten => 1);
-    $self->copy_if_modified(from    => "$gt_utils_dir/find_gt_match",
+    $self->copy_if_modified(from    => "$gt_utils_build_dir/find_gt_match",
                             to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
                             flatten => 1);
   }
@@ -38,6 +40,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     remove_tree $norm_fit_build_dir;
 
     `make clean --directory $gt_utils_dir`;
+    remove_tree $gt_utils_build_dir;
   }
 
   sub ACTION_install {
