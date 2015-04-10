@@ -1,6 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - changes to allow genotype checks to be run on cram files
+ - list of human references (with chr.naming convention) used by genotype check
+     moved to file in the genotype repository
+ - GRCh38 human references added to the list
+ - gt_utils (gt_pack and find_gt_match C programs) added to Build install
 
 release 57.8.1
  - add temporary file name option to bamtofastq command
