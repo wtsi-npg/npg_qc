@@ -8,7 +8,11 @@
 
   lib_names = [];
   temp = [];
-  FOREACH check_name IN checks_info.list; IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix'; temp.push(check_name); END; END;
+  FOREACH check_name IN checks_info.list;
+    IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
+      temp.push(check_name);
+    END;
+  END;
   checks_list=temp;
   map=checks_info.map;
 
@@ -61,8 +65,8 @@
 </tr>
 
 [%- libs_info = {}; studies_info = {}; run_info = {}; 
-    FOREACH lane_key IN sorted_rl_map_keys; -%]  
-[%-   lane_collection = rl_map.$lane_key;
+    FOREACH lane_key IN sorted_rl_map_keys;
+      lane_collection = rl_map.$lane_key;
       attrs = util.inflate_rpt_key(lane_key);
       id_run   = attrs.id_run;
       time_comp = '';
@@ -131,14 +135,14 @@
 [%- IF lane_collection.run_lane_plex_flags.$lane_key -%]
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
-[%- IF sample_id %]<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), sample_id) %]"><img src="/static/images/to_parent.png" alt="link to a sample" /></a>[% END; -%]
+[%- IF sample_id %]<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), sample_id) %]"><img src="/static/images/to_parent.png" alt="link to a sample" /></a>
+[%- END; -%]
 [%- IF lib; lurl = [lims_url, 'assets', library_id]; -%]
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'name' => lib}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
 <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>
 [%- END -%]
 [% IF is_dev %]<span class="watermark">R&amp;D</span>[% END %]
 </div>
-[%- END -%]
 </td>
 [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run); %]
 <td class="id_run"><div class="rel_pos_container">
