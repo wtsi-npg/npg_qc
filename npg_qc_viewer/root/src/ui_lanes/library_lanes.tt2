@@ -8,7 +8,11 @@
 
   lib_names = [];
   temp = [];
-  FOREACH check_name IN checks_info.list; IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix'; temp.push(check_name); END; END;
+  FOREACH check_name IN checks_info.list;
+    IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
+      temp.push(check_name);
+    END;
+  END;
   checks_list=temp;
   map=checks_info.map;
 
@@ -60,9 +64,9 @@
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
 
-[%- libs_info = {}; studies_info = {}; run_info = {}; batch_id = ''; 
-    FOREACH lane_key IN sorted_rl_map_keys; -%]  
-[%-   lane_collection = rl_map.$lane_key;
+[%- libs_info = {}; studies_info = {}; run_info = {}; 
+    FOREACH lane_key IN sorted_rl_map_keys;
+      lane_collection = rl_map.$lane_key;
       attrs = util.inflate_rpt_key(lane_key);
       id_run   = attrs.id_run;
       time_comp = '';
@@ -71,7 +75,6 @@
       is_dev = 0;
       tag_index = '';
       tag_sequence = '';
-      lane_type = '';
       pass = '';
       lib = '';
       library_id = '';
@@ -95,10 +98,8 @@
         IF table_row;
           t            = table_row.run_complete;
           num_cycles   = table_row.cycles;
-          lane_type = table_row.lane_type;
           pass = table_row.manual_qc;
           is_dev = table_row.is_dev;
-          IF run_view && !batch_id; batch_id = table_row.batch_id; END;
         END;
       END;
       IF table_row;
@@ -129,21 +130,19 @@
 </td>
 [%- END -%]
 
-<td class="lib nbsp"><!-- library  -->
-[%- IF lib;
-      lurl = [lims_url, 'assets', library_id];
-      plex_link = '';
-      IF lane_type == 'pool';
-        plex_link = c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"});
-      END;
- -%]
+<td class="lib nbsp">
 <div class="rel_pos_container">
-[%- IF plex_link %]<a href="[% plex_link | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>[% END -%]
-[%- IF sample_id %]<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), sample_id) %]"><img src="/static/images/to_parent.png" alt="link to a sample" /></a>[% END; -%]
-<a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'name' => lib}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
-<a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>[% IF is_dev %]<span class="watermark">R&amp;D</span>[% END %]
-</div>
+[%- IF lane_collection.run_lane_plex_flags.$lane_key -%]
+<a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
+[%- IF sample_id %]<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), sample_id) %]"><img src="/static/images/to_parent.png" alt="link to a sample" /></a>
+[%- END; -%]
+[%- IF lib; lurl = [lims_url, 'assets', library_id]; -%]
+<a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'name' => lib}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
+<a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>
+[%- END -%]
+[% IF is_dev %]<span class="watermark">R&amp;D</span>[% END %]
+</div>
 </td>
 [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run); %]
 <td class="id_run"><div class="rel_pos_container">
@@ -167,9 +166,9 @@
     IF sample_link;
       column_counter = column_counter + 1;
     END;
- -%]
+-%]
 
-[% PROCESS "ui_lanes/lanes_total.tt2" -%]
+[%- PROCESS "ui_lanes/lanes_total.tt2" -%]
 [%- END -%]
 
 </table>

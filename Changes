@@ -1,5 +1,19 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 57.9
+ - autoqc results collection class - add a method for inferring whether
+     a lane has plexes from results themselves
+ - SeqQC - steps towards making display of autoqc results and manual qc process
+   independent of availability of warehouse data:
+    - use the new collection method to decide whether to display a link to
+       plex results (previously warehouse data were used for this)
+    - if plex results are available, always display a link to them
+ - SeqQC - remove vestigial code for batch id retrieval 
+ - SeqQC build: remove --linkable-bcviz-path option since dependency on bcviz
+   is now managed by bower
+ - SeqQC: Ajax controller removed (was used as a proxy for now discontinued
+   requests to LIMs web server)
+ - following restructuring of bcviz, amend statements for import of bcviz libraries
  - changes to allow genotype checks to be run on cram files
  - list of human references (with chr.naming convention) used by genotype check
      moved to file in the genotype repository
