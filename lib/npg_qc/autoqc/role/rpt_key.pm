@@ -38,7 +38,7 @@ A string concatenating id_run, position and tag index (where present)
 
 =cut
 sub rpt_key {
-    my ($obj, $other) = @_;
+    my ($obj) = @_;
 
     my $key = join $RPT_KEY_DELIM, $obj->id_run, $obj->position;
     if ($obj->can('tag_index') && defined $obj->tag_index) {
@@ -47,6 +47,16 @@ sub rpt_key {
     return $key;
 }
 
+=head2 lane_rpt_key_from_key
+
+Given an rpt key, retuens an rpt key for corresponding lane
+
+=cut
+sub lane_rpt_key_from_key {
+    my ($self, $rpt_key) = @_;
+    my $h = $self->inflate_rpt_key($rpt_key);
+    return join $RPT_KEY_DELIM, $h->{'id_run'}, $h->{'position'};
+}
 
 =head2 inflate_rpt_key
 

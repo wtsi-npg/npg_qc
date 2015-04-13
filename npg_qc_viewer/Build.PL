@@ -24,35 +24,6 @@ use Cwd 'abs_path';
     return;
   }
 
-  sub ACTION_install {
-    my $self = shift;
-
-    my $bcviz_path = $self->args('linkable-bcviz-path');
-    if ($bcviz_path && !-d $bcviz_path) {
-      die "linkable-bcviz-path $bcviz_path does not exist or is not a directory, aborting install\n";
-    }
-
-    $self->SUPER::ACTION_install;
-
-    if ($self->install_base() && $bcviz_path) {
-      my $link = join q[/], $self->install_destination('seqqc'), 'root/static/scripts/bcviz';
-      if (-l $link) {
-        unlink $link;
-      }
-      if (!-e $link) {
-        $bcviz_path = abs_path $bcviz_path;
-        warn "Creating symlink $link to $bcviz_path\n";
-        my $result = symlink $bcviz_path, $link;
-        if (!$result) {
-          warn "Failed to create $link symlink to $bcviz_path\n";
-        }
-      } else {
-        warn "Existing file or directory at $link, have not created symlink to $bcviz_path\n";
-      }
-    }
-    return;
-  }
-
 EOC
 
 my $builder = $class->new(
@@ -63,10 +34,6 @@ my $builder = $class->new(
    'dist_abstract'     => q(SeqQC - viewer for autoqc analysis results),
    'license'           => 'gpl',
    'dist'              => { COMPRESS => 'gzip', SUFFIX => 'gz', },
-
-   'get_options'       => {
-         'linkable-bcviz-path' => { type  => '=s' },     
-                          },
 
    'requires'          => {
         'Carp'                                         => '0',
@@ -144,12 +111,8 @@ my $builder = $class->new(
    },
 );
 
-if ($builder->install_base()) {
-  $builder->install_path('seqqc' => join q[/], $builder->install_base(), 'seqqc');
-  $builder->add_build_element('seqqc');
-} else {
-  warn qq[WARNING: '--install_base' option is not given, 'seqqc' element will not be installed\n];
-}
+$builder->install_path('seqqc' => join q[/], $builder->install_base(), 'seqqc');
+$builder->add_build_element('seqqc');
 
 $builder->create_build_script();
 

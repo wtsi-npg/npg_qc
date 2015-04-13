@@ -5,35 +5,31 @@
 CC = cc
 CFLAGS = -g -Wall
 
-builddir = .
-installdir = /software/solexa/bin
+BUILDDIR=build
 
-.SUFFIXES:
-.SUFFIXES: .c .o
-
-.c.o:
-	$(CC) -c $(CFLAGS) $< -o $@
+$(BUILDDIR)/%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 .PHONY: clean
 
-all: gt_pack find_gt_match
+all: $(BUILDDIR)/gt_pack $(BUILDDIR)/find_gt_match
 
 install: gt_pack find_gt_match
 	-cp -uv $(builddir)/gt_pack $(installdir)/gt_pack
 	-cp -uv $(builddir)/find_gt_match $(installdir)/find_gt_match
 
 clean:
-	rm -f gt_pack find_gt_match gt_pack.o fld_desc.o intvec.o find_gt_match.o
+	rm -f $(BUILDDIR)/gt_pack $(BUILDDIR)/find_gt_match $(BUILDDIR)/gt_pack.o $(BUILDDIR)/fld_desc.o $(BUILDDIR)/intvec.o $(BUILDDIR)/find_gt_match.o
 
-gt_pack: gt_pack.o fld_desc.o intvec.o
+$(BUILDDIR)/gt_pack: $(BUILDDIR)/gt_pack.o $(BUILDDIR)/fld_desc.o $(BUILDDIR)/intvec.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-find_gt_match: find_gt_match.o
+$(BUILDDIR)/find_gt_match: $(BUILDDIR)/find_gt_match.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-gt_pack.o: gt_pack.c gt_pack.h
+$(BUILDDIR)/gt_pack.o: gt_pack.c gt_pack.h
 
-fld_desc.o: fld_desc.c fld_desc.h
+$(BUILDDIR)/fld_desc.o: fld_desc.c fld_desc.h
 
-intvec.o: intvec.c intvec.h
+$(BUILDDIR)/intvec.o: intvec.c intvec.h
 
