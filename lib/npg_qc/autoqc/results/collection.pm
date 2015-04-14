@@ -11,7 +11,7 @@ use Moose;
 use MooseX::AttributeHelpers;
 use Carp;
 use English qw(-no_match_vars);
-use List::MoreUtils qw(none);
+use List::MoreUtils qw(any none);
 use Module::Pluggable::Object;
 use Readonly;
 use File::Basename;
@@ -23,6 +23,7 @@ use npg_tracking::illumina::run::folder;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
+use npg_qc::autoqc::role::rpt_key;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
@@ -99,12 +100,11 @@ sub _build__result_classes {
     my $self = shift;
 
     my @classes = Module::Pluggable::Object->new(
-                               require     => 1,
-			       search_path => $RESULTS_NAMESPACE,
-                               except      => [$RESULTS_NAMESPACE . q[::result],
-                                               $RESULTS_NAMESPACE . q[::collection]
-                                              ],
-                                                )->plugins;
+        require     => 1,
+        search_path => $RESULTS_NAMESPACE,
+        except      => [$RESULTS_NAMESPACE . q[::result],
+                        $RESULTS_NAMESPACE . q[::collection]],
+    )->plugins;
     my @class_names = ();
     foreach my $class (@classes) {
         my ($class_name) = $class =~ /(\w+)$/smx;
@@ -133,7 +133,7 @@ sub add {
             $self->push($el);
         }
     } else {
-         $self->push($r);
+        $self->push($r);
     }
     return 1;
 }
@@ -171,11 +171,11 @@ sub add_from_dir {
                 my $position = $result->position;
                 if (!defined $lanes || !@{$lanes} || grep {/^$position$/smx} @{$lanes} ) {
                     $self->add($result);
-	        }
+                }
                 $loaded = 1;
                 last;
-	    }
-	}
+            }
+        }
         if (!$loaded) {
             carp qq[Cannot identify class for $file];
         }
@@ -234,8 +234,9 @@ How to define a query is described in documentation for npg_qc::autoqc::qc_store
 sub load_from_staging {
     my ($self, $query) = @_;
 
-    if (!defined $query) { croak q[Query object should be defined]; }
-    #carp 'QUERY ' . $query->to_string;
+    if (!defined $query) {
+      croak q[Query object should be defined];
+    }
 
     my $finder_hash = {id_run => $query->id_run,};
     if ($query->propagate_npg_tracking_schema) {
@@ -261,15 +262,15 @@ sub load_from_staging {
                 my $path = $finder->lane_qc_path($lane);
                 if (-e $path) {
                     push @dirs, $path;
-	        }
+                }
             }
         } else {
             @dirs = @{$finder->lane_qc_paths};
-	}
+        }
 
         foreach my $dir (@dirs) {
             $self->add_from_dir($dir, undef, $query->id_run);
-	}
+        }
     }
 
     return 1;
@@ -362,7 +363,9 @@ sub slice {
     my $c = npg_qc::autoqc::results::collection->new();
 
     foreach my $r (@{$self->results}) {
-        if ($r->$criterion && $r->$criterion eq $value) { $c->add($r); }
+        if ($r->$criterion && $r->$criterion eq $value) {
+            $c->add($r);
+        }
     }
     return $c;
 }
@@ -383,7 +386,9 @@ sub search {
 
     my $c = npg_qc::autoqc::results::collection->new();
     foreach my $r (@{$self->results}) {
-        if ($r->equals_byvalue($h)) { $c->add($r); }
+        if ($r->equals_byvalue($h)) {
+            $c->add($r);
+        }
     }
     return $c;
 }
@@ -406,7 +411,7 @@ sub filter_by_positions {
         $position = $self->get($i)->position;
         if (none {/$position/smx} @{$lanes}) {
             $self->delete($i);
-	}
+        }
         $i--;
     }
 
@@ -449,9 +454,35 @@ sub run_lane_collections {
             $map->{$key} = $c;
         } else {
             $map->{$key}->add($result);
-	}
+        }
     }
     return $map;
+}
+
+=head2 run_lane_plex_flags
+
+Returns a hash map where keys are rpt keys for lanes and values are booleans indicating
+whether this lane has plex-level results.
+
+=cut
+sub run_lane_plex_flags {
+    my $self = shift;
+    my $map = $self->run_lane_collections;
+
+    my $flags = {};
+    foreach my $rpt_key (keys %{$map}) {
+        my $rpt_h = npg_qc::autoqc::role::rpt_key->inflate_rpt_key($rpt_key);
+        if (!defined $rpt_h->{'tag_index'}) { # it's a lane-level entry
+            if (!exists $flags->{$rpt_key}) {
+                my $has_plexes = any { $_ eq 'tag metrics' } @{$map->{$rpt_key}->check_names()->{'list'}};
+                $flags->{$rpt_key} = $has_plexes ? 1 : 0;
+            }
+        } else { # it's a plex-level entry
+            my $lane_key = npg_qc::autoqc::role::rpt_key->lane_rpt_key_from_key($rpt_key);
+            $flags->{$lane_key} = 1;
+        }
+    }
+    return $flags;
 }
 
 =head2 check_names_map
@@ -474,11 +505,11 @@ sub check_names_map {
         my $check_name = $result->check_name;
         if (!exists $classes->{$class_name}) {
             croak qq[Unknown class name $class_name];
-	}
+        }
         if (!exists $seen->{$check_name}) {
             push @{$classes->{$class_name}}, $check_name;
             $seen->{$check_name} = 1;
-	}
+        }
     }
     return $classes;
 }
@@ -500,9 +531,9 @@ sub check_names {
         push @check_names, @{$classes->{$check}};
         foreach my $name (@{$classes->{$check}}) {
             $map->{$name} = $check;
-	}
+        }
     }
-    return {list => \@check_names, map => $map,};
+    return {'list' => \@check_names, 'map' => $map,};
 }
 
 
@@ -567,7 +598,7 @@ Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL, by Marina Gourtovaia
 
 This file is part of NPG.
 

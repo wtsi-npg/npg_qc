@@ -109,6 +109,39 @@ sub _build_samtools {
 	return $self->samtools_name;
 }
 
+has 'samtools_extract_regions' => (
+        is => 'ro',
+        isa => 'NpgCommonResolvedPathExecutable',
+        lazy_build => 1,
+        coerce => 1,
+);
+sub _build_samtools_extract_regions {
+	my ($self) = @_;
+	return $self->samtools_name;
+}
+
+has 'samtools_mpileup' => (
+        is => 'ro',
+        isa => 'NpgCommonResolvedPathExecutable',
+        lazy_build => 1,
+        coerce => 1,
+);
+sub _build_samtools_mpileup {
+	my ($self) = @_;
+	return $self->samtools_name;
+}
+
+has 'samtools_merge' => (
+        is => 'ro',
+        isa => 'NpgCommonResolvedPathExecutable',
+        lazy_build => 1,
+        coerce => 1,
+);
+sub _build_samtools_merge {
+	my ($self) = @_;
+	return $self->samtools_name;
+}
+
 # you can override the executable name. May be useful for variants like "samtools_irods"
 has 'bcftools_name' => (
 	is => 'ro',
@@ -301,14 +334,14 @@ sub _build__call_gt_cmd {
 	my $bam_file_list = $self->bam_file_list;
 
 	if(@{$bam_file_list} == 1) {
-		$cmd = sprintf q{bash -c 'set -o pipefail && %s view -b %s %s 2>/dev/null | %s mpileup -f %s -g - 2>/dev/null | %s view -l %s -g - 2>/dev/null'}, $self->samtools, $bam_file_list->[0], $self->_regions_string, $self->samtools, $self->reference, $self->bcftools, $self->pos_snpname_map_filename;
+		$cmd = sprintf q{bash -c 'set -o pipefail && %s view -b %s %s 2>/dev/null | %s mpileup -f %s -g - 2>/dev/null | %s view -l %s -g - 2>/dev/null'}, $self->samtools_extract_regions, $bam_file_list->[0], $self->_regions_string, $self->samtools_mpileup, $self->reference, $self->bcftools, $self->pos_snpname_map_filename;
 	}
 	else {
-		$cmd = sprintf q{bash -c 'set -o pipefail && %s merge -- - }, $self->samtools;
+		$cmd = sprintf q{bash -c 'set -o pipefail && %s merge -- - }, $self->samtools_merge;
 		for my $bam_file (@{$bam_file_list}) {
-			$cmd .= sprintf q{<(%s view -b %s %s) }, $self->samtools, $bam_file, $self->_regions_string;
+			$cmd .= sprintf q{<(%s view -b %s %s) }, $self->samtools_extract_regions, $bam_file, $self->_regions_string;
 		}
-		$cmd .= sprintf q{ | %s mpileup -f %s -g - 2>/dev/null | %s view -l %s -g - 2>/dev/null'}, $self->samtools, $self->reference, $self->bcftools, $self->pos_snpname_map_filename;
+		$cmd .= sprintf q{ | %s mpileup -f %s -g - 2>/dev/null | %s view -l %s -g - 2>/dev/null'}, $self->samtools_mpileup, $self->reference, $self->bcftools, $self->pos_snpname_map_filename;
 	}
 
 	return $cmd;
