@@ -6,6 +6,6 @@ before_install:
 before_script:
  - npm install -g bower
  - bower install
- - npm install -g qunit-phantomjs-runner@2.1.0
-script: phantomjs /home/travis/.nvm/versions/node/v0.12.2/lib/node_modules/qunit-phantomjs-runner/runner.js test/test.html
+ - npm install -g node-qunit-phantomjs
+script: node-qunit-phantomjs test/test.html --verbose
 
