@@ -1,4 +1,4 @@
-package npg_qc_viewer::Controller::Mqc_Run;
+package npg_qc_viewer::Controller::MqcRun;
 
 use Moose;
 use namespace::autoclean;
@@ -74,7 +74,7 @@ __END__
 
 =head1 NAME
 
-npg_qc_viewer::Controller::Mqc_Run
+npg_qc_viewer::Controller::MqcRun
 
 =head1 SYNOPSIS
 

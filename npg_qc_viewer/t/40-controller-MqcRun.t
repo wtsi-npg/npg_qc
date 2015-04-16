@@ -15,7 +15,7 @@ my $test;
 my $test_id_run = 3500;
 
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
-use_ok 'npg_qc_viewer::Controller::Mqc_Run';
+use_ok 'npg_qc_viewer::Controller::MqcRun';
 lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
 
 { #Testing POST
@@ -45,10 +45,8 @@ lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
 {
   #Testing GET with credentials
   my $response;
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/mqc_runs/3500' )) }
-    'has a response for GET request';
-  #ok($response->is_error, q[update response is error]);
-  #is( $response->code, 405, 'error code is 405' );
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/mqc_runs/3500?user=cat&password=secret' )) }
+    'has a response for GET request when passing credentials';
 }
 
 1;
