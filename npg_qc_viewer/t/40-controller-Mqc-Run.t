@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 13;
 use Test::Exception;
 use Cwd;
 use File::Spec;
@@ -38,8 +38,8 @@ lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
   my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/mqc_runs/3500' )) }
     'has a response for GET request';
-  #ok($response->is_error, q[update response is error]);
-  #is( $response->code, 405, 'error code is 405' );
+  ok($response->is_error, q[get response is error without credentials]);
+  is( $response->code, 401, 'error code is 401' );
 }
 
 {

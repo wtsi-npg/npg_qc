@@ -13,6 +13,7 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 __PACKAGE__->config( default => 'application/json' );
 
 with 'npg_qc_viewer::api::error';
+with 'npg_qc_viewer::api::rest_controller';
 
 our $VERSION = '0';
 
@@ -50,7 +51,16 @@ sub mqc_runs_GET {
   my $error_code = $OK_CODE;
 
   if ($error) {
+    print (qq[Found error $error]);
     ( $error, $error_code ) = $self->parse_error($error);
+    if ($error_code == 401) {
+        $self->status_unauthorized(
+          $c,
+          message => $error,
+        );
+    } elsif (1) {
+      print("Fu");
+    } 
   }
   
   return;
