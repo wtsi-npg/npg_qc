@@ -4,6 +4,7 @@ lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
 lib/Catalyst/Controller/AjaxProxy.pm
 lib/npg_tracking/daemon/seqqc.pm
 lib/npg_qc_viewer/api/error.pm
+lib/npg_qc_viewer/api/rest_controller.pm
 lib/npg_qc_viewer/api/util.pm
 lib/npg_qc_viewer/Controller/Checks.pm
 lib/npg_qc_viewer/Controller/Mqc.pm
