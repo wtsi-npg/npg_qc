@@ -54,8 +54,9 @@ sub update_outcome : Path('update_outcome') {
   my $error;
 
   try {
-    ####Validation
+    ####Validating request method
     $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    ####Authorisation
     $c->controller('Root')->authorise($c, ($MQC_ROLE));
 
     ####Loading state
