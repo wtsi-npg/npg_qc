@@ -36,7 +36,8 @@ sub _set_response {
     croak 'Message hash should be supplied';
   }
   $c->response->headers->content_type('application/json');
-  if ($code) {
+  
+  if ($code) { #There was an error
     $c->response->status($code);
   }
   $c->response->body(to_json $message_data);
