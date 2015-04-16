@@ -3,41 +3,60 @@ package npg_qc_viewer::Controller::Mqc_Run;
 use Moose;
 use namespace::autoclean;
 use Readonly;
+use Try::Tiny;
+use Carp;
 
 BEGIN { extends 'Catalyst::Controller::REST' }
 
 #Just to declare a default. But seems the content type should come from client
 #anyway
-__PACKAGE__->config(default => 'application/json');
+__PACKAGE__->config( default => 'application/json' );
 
 with 'npg_qc_viewer::api::error';
 
-our $VERSION  = '0';
-## no critic (NamingConventions::Capitalization)
+our $VERSION = '0';
 
-sub mqc_runs :Path('/mqc/mqc_runs') :ActionClass('REST') { }
+Readonly::Scalar my $MQC_ROLE            => q[manual_qc];
+Readonly::Scalar my $OK_CODE             => 200;
+
+## no critic (NamingConventions::Capitalization)
+sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
 
 sub mqc_runs_GET {
+  my ( $self, $c, $id_run ) = @_;
+  my $username;
+  my $error;
 
-  my ( $self, $c, $id_run) = @_;
+  try {
+    ####Authorisation
+    $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
 
-  #Get from DB
-  my $ent = $c->model('NpgDB')->resultset('Run')->find($id_run);
+    #Get from DB
+    my $ent = $c->model('NpgDB')->resultset('Run')->find($id_run);
 
-  # Return a 200 OK, with the data in entity
-  # serialized in the body
-  $self->status_ok(
-    $c,
-    entity => {
-      id_run => $id_run,
-      current_status_description => $ent->current_run_status_description,
-    },
-  );
+    # Return a 200 OK, with the data in entity
+    # serialized in the body
+    $self->status_ok(
+      $c,
+      entity => {
+        id_run                     => $id_run,
+        current_status_description => $ent->current_run_status_description,
+      },
+    );
+  } catch {
+    $error = $_;
+  };
+  
+  my $error_code = $OK_CODE;
 
+  if ($error) {
+    ( $error, $error_code ) = $self->parse_error($error);
+  }
+  
   return;
 }
 
-__PACKAGE__->meta->make_immutable;
+#__PACKAGE__->meta->make_immutable;
 1;
 __END__
 
@@ -50,6 +69,14 @@ npg_qc_viewer::Controller::Mqc_Run
 =head1 DESCRIPTION
 
 Controller to expose runs through REST
+
+=head2 mqc_runs
+
+  Placeholder for the REST path for runs.
+
+=head2 mqc_runs_GET
+
+  Returns general information about the status of the run specified as part of the URL.
 
 =head1 SUBROUTINES/METHODS 
 
