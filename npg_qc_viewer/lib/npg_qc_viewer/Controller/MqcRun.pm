@@ -13,12 +13,16 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 __PACKAGE__->config( default => 'application/json' );
 
 with 'npg_qc_viewer::api::error';
-with 'npg_qc_viewer::Util::Rest_controller';
+with 'npg_qc_viewer::Util::RestController';
 
 our $VERSION = '0';
 
-Readonly::Scalar my $MQC_ROLE            => q[manual_qc];
-Readonly::Scalar my $OK_CODE             => 200;
+Readonly::Scalar my $MQC_ROLE                     => q[manual_qc];
+Readonly::Scalar my $RESPONSE_OK_CODE             => 200;
+Readonly::Scalar my $RESPONSE_BAD_REQUEST_CODE    => 400;
+Readonly::Scalar my $RESPONSE_UNAUTHORIZED        => 401;
+Readonly::Scalar my $RESPONSE_METHOD_NOT_ALLOWED  => 405;
+Readonly::Scalar my $RESPONSE_INTERNAL_ERROR_CODE => 500;
 
 ## no critic (NamingConventions::Capitalization)
 sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
@@ -35,7 +39,7 @@ sub mqc_runs_GET {
     #Get from DB
     my $ent = $c->model('NpgDB')->resultset('Run')->find($id_run);
     use Data::Dumper;
-    print($ent->dump(4));
+    print($ent->dump(1));
 
     # Return a 200 OK, with the data in entity
     # serialized in the body
@@ -50,17 +54,17 @@ sub mqc_runs_GET {
     $error = $_;
   };
   
-  my $error_code = $OK_CODE;
+  my $error_code = $RESPONSE_OK_CODE;
 
   if ($error) {
     print (qq[Found error $error]);
     ( $error, $error_code ) = $self->parse_error($error);
-    if ($error_code == 401) {
+    if ($error_code == $RESPONSE_UNAUTHORIZED) {
         $self->status_unauthorized(
           $c,
           message => $error,
         );
-    } elsif (1) {
+    } elsif ( $error_code == 1) {
       print("Fu");
     } 
   }
