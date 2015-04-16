@@ -19,17 +19,16 @@ npg_qc_viewer::api::error
 
 =head1 DESCRIPTION
 
-Moose role for creating, raising and parsing errors for this application.
+Moose role for extending functionality of REST controller by adding
+subs for extra response codes.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 status_unauthorized
 
- Uses compose_error method to create an error message,
- then uses croak to raise the error.
-
- $obj->raise_error('some error', 401);
- $obj->raise_error('some error'); # error code 500 will be used
+ Returns a "401 Unauthorized" response. Takes a "message" argument
+ as a scalar, which will become the value of "error" in the serialized
+ response.
 
 =cut
 
