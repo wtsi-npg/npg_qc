@@ -1,4 +1,4 @@
-package npg_qc_viewer::Util::Rest_controller;
+package npg_qc_viewer::Util::RestController;
 
 use Moose::Role;
 use Carp;
@@ -9,11 +9,10 @@ our $version = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar my $ERROR_CODE_STRING   => q[SeqQC error code ];
-Readonly::Scalar my $INTERNAL_ERROR_CODE => 500;
 
 =head1 NAME
 
-npg_qc_viewer::Util::Rest_controller
+npg_qc_viewer::Util::RestController
 
 =head1 SYNOPSIS
 
@@ -59,6 +58,8 @@ __END__
 =item Carp
 
 =item Readonly
+
+=item Params::Validate
 
 =back
 
