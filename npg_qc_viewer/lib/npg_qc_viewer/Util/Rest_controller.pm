@@ -1,4 +1,4 @@
-package npg_qc_viewer::api::rest_controller;
+package npg_qc_viewer::Util::Rest_controller;
 
 use Moose::Role;
 use Carp;
@@ -13,7 +13,7 @@ Readonly::Scalar my $INTERNAL_ERROR_CODE => 500;
 
 =head1 NAME
 
-npg_qc_viewer::api::error
+npg_qc_viewer::Util::Rest_controller
 
 =head1 SYNOPSIS
 

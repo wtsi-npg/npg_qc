@@ -13,7 +13,7 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 __PACKAGE__->config( default => 'application/json' );
 
 with 'npg_qc_viewer::api::error';
-with 'npg_qc_viewer::api::rest_controller';
+with 'npg_qc_viewer::Util::Rest_controller';
 
 our $VERSION = '0';
 
@@ -34,6 +34,8 @@ sub mqc_runs_GET {
 
     #Get from DB
     my $ent = $c->model('NpgDB')->resultset('Run')->find($id_run);
+    use Data::Dumper;
+    print($ent->dump(4));
 
     # Return a 200 OK, with the data in entity
     # serialized in the body
