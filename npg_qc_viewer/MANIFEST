@@ -3,8 +3,6 @@ Changes
 lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
 lib/Catalyst/Controller/AjaxProxy.pm
 lib/npg_tracking/daemon/seqqc.pm
-lib/npg_qc_viewer/api/error.pm
-lib/npg_qc_viewer/api/util.pm
 lib/npg_qc_viewer/Controller/Checks.pm
 lib/npg_qc_viewer/Controller/Mqc.pm
 lib/npg_qc_viewer/Controller/Root.pm
@@ -17,6 +15,7 @@ lib/npg_qc_viewer/Model/NpgQcDB.pm
 lib/npg_qc_viewer/Model/SeqStore.pm
 lib/npg_qc_viewer/Model/WarehouseDB.pm
 lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
+lib/npg_qc_viewer/Util/Error.pm
 lib/npg_qc_viewer.pm
 lib/npg_qc_viewer/View/TT.pm
 MANIFEST
@@ -87,8 +86,7 @@ t/00-critic.t
 t/00-distribution.t
 t/00-podcoverage.t
 t/00-pod.t
-t/10-api-error.t
-t/10-api-util.t
+t/10-util-Error.t
 t/10-authentication-SangerSSOnpg.t
 t/10-controller-AjaxProxy.t
 t/10-npg_tracking-daemon-seqqc.t

@@ -6,7 +6,6 @@ use Test::More tests => 2;
 
 use npg_qc::autoqc::results::collection;
 use npg_qc::autoqc::results::split_stats;
-use npg_qc_viewer::api::util;
 
 {
   my $tt = Template->new();
@@ -17,7 +16,6 @@ use npg_qc_viewer::api::util;
   $c->add_from_dir(q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/qc]);
   $c->add(npg_qc::autoqc::results::split_stats->new(id_run=>1,position=>1));
   $tt->process($template, {
-               util => npg_qc_viewer::api::util->new(),
                column_counter => 2, 
                checks_list => ['qX yield', 'split stats'], 
                collection_all => $c,

@@ -1,11 +1,12 @@
 package npg_qc_viewer::Controller::Checks;
 
 use Moose;
+use Moose::Meta::Class;
 use Carp;
 use English qw(-no_match_vars);
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
-use npg_qc_viewer::api::util;
+use npg_qc::autoqc::role::rpt_key;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -108,21 +109,21 @@ sub _data2stash {
     my ($self, $c, $collection) = @_;
 
     my $rl_map = $collection->run_lane_collections;
-    $collection->clear(); # result objects have been remapped to lane collections
     my @rl_map_keys = keys %{$rl_map};
-    my $has_plexes = $c->stash->{'util'}->has_plexes(\@rl_map_keys);
+    my $has_plexes = npg_qc::autoqc::role::rpt_key->has_plexes(\@rl_map_keys);
     my $wh_rl_map = $self->_rl_map_append($c, $rl_map);
 
     if ($c->stash->{'sample_link'} && $has_plexes && scalar keys %{$wh_rl_map}) {
         foreach my $key (keys %{$rl_map}) {
             if (!exists $wh_rl_map->{$key}) {
                 delete $rl_map->{$key};
-	    }
+            }
         }
     }
-    $c->stash->{'rl_map'} = $rl_map;
-    $c->stash->{'has_plexes'} = $has_plexes;
-    $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
+    $c->stash->{'rl_map'}         = $rl_map;
+    $c->stash->{'has_plexes'}     = $has_plexes;
+    $c->stash->{'collection_all'} = $collection;
+    $c->stash->{'template'}       = q[ui_lanes/library_lanes.tt2];
     return;
 }
 
@@ -236,7 +237,8 @@ Action for the base controller path
 sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
 {
     my ($self, $c) = @_;
-    $c->stash->{'util'}             = npg_qc_viewer::api::util->new();
+    $c->stash->{'util'}             = Moose::Meta::Class->create_anon_class(
+                      roles => ['npg_qc::autoqc::role::rpt_key'])->new_object();
     $c->stash->{'rl_map'}           = {};
     $c->stash->{'db_lookup'}        = 1;
     $c->stash->{'env_dev'}          = $ENV{dev};
@@ -295,14 +297,14 @@ template through the stash
 
 =cut
 sub checks_in_run :Chained('base') :PathPart('runs') :Args(1) {
-  my ($self, $c, $id_run) = @_;
-  $self->_test_positive_int($c, $id_run);
-  #if config is needed, it's available through $c->config
-  $c->stash->{'title'}     = qq[Results for run $id_run];
-  $c->stash->{'run_view'}  = 1;
-  $c->stash->{'id_run'}    = $id_run;
-  $self->_display_run_lanes($c, {run => [$id_run],} );
-  return;
+    my ($self, $c, $id_run) = @_;
+    $self->_test_positive_int($c, $id_run);
+    #if config is needed, it's available through $c->config
+    $c->stash->{'title'}     = qq[Results for run $id_run];
+    $c->stash->{'run_view'}  = 1;
+    $c->stash->{'id_run'}    = $id_run;
+    $self->_display_run_lanes($c, {run => [$id_run],} );
+    return;
 }
 
 
@@ -313,17 +315,17 @@ and passes it to the relevant template through the stash
 
 =cut
 sub runs_from_staging :Chained('base') :PathPart('runs-from-staging') :Args(0) {
-  my ($self, $c) = @_;
+    my ($self, $c) = @_;
 
-  if (exists $c->request->query_parameters->{run}) {
-    $c->stash->{'db_lookup'} = 0;
-    $self->_display_run_lanes($c);
-  } else {
-    $c->stash->{error_message} =
+    if (exists $c->request->query_parameters->{run}) {
+        $c->stash->{'db_lookup'} = 0;
+        $self->_display_run_lanes($c);
+    } else {
+        $c->stash->{error_message} =
              q[Run to load is not given. Append ?run=some_run to URL];
-    $c->detach(q[Root], q[error_page]);
-  }
-  return;
+        $c->detach(q[Root], q[error_page]);
+    }
+    return;
 }
 
 
@@ -334,16 +336,16 @@ and passes it to the relevant template through the stash
 
 =cut
 sub checks_in_run_from_staging :Chained('base') :PathPart('runs-from-staging') :Args(1) {
-  my ($self, $c, $id_run) = @_;
+    my ($self, $c, $id_run) = @_;
 
-  $self->_test_positive_int($c, $id_run);
-  $c->stash->{'db_lookup'}        = 0;
-  $c->stash->{'title'}            = qq[Staging results for run $id_run];
-  $c->stash->{'run_from_staging'} = 1;
-  $c->stash->{'run_view'}         = 1;
-  $c->stash->{'id_run'}           = $id_run;
-  $self->_display_run_lanes($c, {run => [$id_run],} );
-  return;
+    $self->_test_positive_int($c, $id_run);
+    $c->stash->{'db_lookup'}        = 0;
+    $c->stash->{'title'}            = qq[Staging results for run $id_run];
+    $c->stash->{'run_from_staging'} = 1;
+    $c->stash->{'run_view'}         = 1;
+    $c->stash->{'id_run'}           = $id_run;
+    $self->_display_run_lanes($c, {run => [$id_run],} );
+    return;
 }
 
 =head2 checks_from_path
@@ -464,9 +466,9 @@ sub study :Chained('base') :PathPart('studies') :Args(1) {
     )->next;
 
     if (!$row) {
-      $c->stash->{error_message} = qq[Unknown study id $study_id];
-      $c->detach(q[Root], q[error_page]);
-      return;
+        $c->stash->{error_message} = qq[Unknown study id $study_id];
+        $c->detach(q[Root], q[error_page]);
+        return;
     }
 
     $c->stash->{'title'}  = q[Study '] . $row->study_name  . q['];
@@ -487,6 +489,8 @@ __END__
 
 =item Moose
 
+=item Moose::Meta::Class
+
 =item Readonly
 
 =item English
@@ -495,7 +499,7 @@ __END__
 
 =item npg_qc::autoqc::qc_store::options
 
-=item npg_qc_viewer::api::util
+=item npg_qc::autoqc::role::rpt_key
 
 =item Catalyst::Controller
 
