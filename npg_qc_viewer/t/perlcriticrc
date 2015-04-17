@@ -5,7 +5,7 @@ max_characters = 80
 [ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
 max_chain_length = 4
 [Documentation::PodSpelling]
-stop_words = NPG Gourtovaia SeqQC autoqc qc Readonly DateTime JSON fastqcheck DBIx PNG plex Tovar TT
+stop_words = NPG Gourtovaia SeqQC autoqc qc Readonly DateTime JSON fastqcheck DBIx PNG plex TT
 [Documentation::RequirePodSections]
 lib_sections    = NAME | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | BUGS AND LIMITATIONS | DEPENDENCIES | CONFIGURATION AND ENVIRONMENT | INCOMPATIBILITIES | AUTHOR | LICENSE AND COPYRIGHT
 
