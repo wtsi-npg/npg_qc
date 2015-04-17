@@ -111,8 +111,11 @@ my $builder = $class->new(
    },
 );
 
-$builder->install_path('seqqc' => join q[/], $builder->install_base(), 'seqqc');
+
 $builder->add_build_element('seqqc');
+if ($builder->install_base()) {
+  $builder->install_path('seqqc' => join q[/], $builder->install_base(), 'seqqc');
+}
 
 $builder->create_build_script();
 

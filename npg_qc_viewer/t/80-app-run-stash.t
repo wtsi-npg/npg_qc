@@ -5,7 +5,6 @@ use Test::Exception;
 use HTTP::Headers;
 use HTTP::Request::Common;
 
-use npg_qc_viewer::api::util;
 use t::util;
 
 my $util = t::util->new();
