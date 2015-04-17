@@ -44,3 +44,21 @@ perl Build.PL
 CATALYST_DEBUG=0 TEST_AUTHOR=1 ./Build test
 or
 CATALYST_DEBUG=0  TEST_AUTHOR=1 prove -vl t
+
+Testing Javascript for npg_qc_viewer
+------------------------------------
+
+Headless testing:
+
+# in the npg_qc_viewer directory
+Install node package dependencies if they are not available.
+ - npm install -g bower
+ - npm install -g node-qunit-phantomjs
+
+Install bower dependencies following the steps described in the first section.
+
+pushd root/static && node-qunit-phantomjs test/test.html --verbose && popd
+
+Testing in browser:
+
+Open file npg_qc_viewer/root/static/test/test.html in a browser window.

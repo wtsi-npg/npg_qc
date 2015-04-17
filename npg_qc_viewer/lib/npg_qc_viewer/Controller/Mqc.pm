@@ -9,7 +9,7 @@ use Carp;
 
 BEGIN { extends 'Catalyst::Controller' }
 
-with 'npg_qc_viewer::api::error';
+with 'npg_qc_viewer::Util::Error';
 
 our $VERSION  = '0';
 

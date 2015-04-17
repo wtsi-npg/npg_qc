@@ -413,6 +413,7 @@ t/60-autoqc-parse-alignment.t
 t/60-autoqc-qc_store-query.t
 t/60-autoqc-qc_store.t
 t/60-autoqc-role-result.t
+t/60-autoqc-role-rpt_key.t
 t/60-autoqc-results-adapter.t
 t/60-autoqc-results-af_metrics.t
 t/60-autoqc-results-bam_flagstats.t

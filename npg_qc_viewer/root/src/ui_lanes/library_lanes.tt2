@@ -3,7 +3,6 @@
 
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
-  collection_all = util.rl_map2collection(rl_map);
   checks_info = collection_all.check_names;
 
   lib_names = [];

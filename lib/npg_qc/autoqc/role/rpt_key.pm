@@ -5,11 +5,10 @@
 
 package npg_qc::autoqc::role::rpt_key;
 
-use strict;
-use warnings;
 use Moose::Role;
 use Carp;
-use English qw(-no_match_vars);
+use List::MoreUtils qw/ uniq /;
+use Try::Tiny;
 use Readonly;
 
 our $VERSION = '0';
@@ -18,6 +17,10 @@ our $VERSION = '0';
 Readonly::Scalar our $RPT_KEY_DELIM => q[:];
 Readonly::Scalar our $RPT_KEY_MIN_LENGTH => 2;
 Readonly::Scalar our $RPT_KEY_MAX_LENGTH => 3;
+
+Readonly::Scalar my $LESS    => -1;
+Readonly::Scalar my $MORE    =>  1;
+Readonly::Scalar my $EQUAL   =>  0;
 
 =head1 NAME
 
@@ -28,9 +31,6 @@ npg_qc::autoqc::role::rpt_key
 =head1 DESCRIPTION
 
 =head1 SUBROUTINES/METHODS
-
-=cut
-
 
 =head2 rpt_key
 
@@ -71,14 +71,94 @@ sub inflate_rpt_key {
         croak qq[Invalid rpt key $key];
     }
     my $map = {};
-    $map->{id_run} = $values[0];
-    $map->{position} = $values[1];
+    $map->{'id_run'} = $values[0];
+    $map->{'position'} = $values[1];
     if (@values == $RPT_KEY_MAX_LENGTH) {
-        $map->{tag_index} = $values[2];
+        $map->{'tag_index'} = $values[2];
     }
     return $map;
 }
 
+=head2 expand_rpt_key
+
+Extract id_run, position and tag_index from run-position-tag key and return as a readable string
+
+=cut
+sub expand_rpt_key {
+    my ($self, $key) = @_;
+
+    my $mapping = {id_run=>'run',position=>'lane',tag_index=>'tag',};
+
+    my $map;
+    my $s = q[];
+    try {
+        $map = $self->inflate_rpt_key($key);
+    };
+    if (defined $map && scalar keys %{$map} >= 2 ) {
+        $s = q[run ] . $map->{'id_run'} . q[ lane ] . $map->{'position'};
+        if (exists $map->{'tag_index'}) {
+            $s .= q[#] . $map->{'tag_index'};
+	      }
+    }
+    return $s;
+}
+
+sub _compare_rpt_keys {
+
+    my $a_map = __PACKAGE__->inflate_rpt_key($a);
+    my $b_map = __PACKAGE__->inflate_rpt_key($b);
+
+    return $a_map->{'id_run'} <=> $b_map->{'id_run'} ||
+           $a_map->{'position'} <=> $b_map->{'position'} ||
+           ( (!exists $a_map->{'tag_index'} && !exists $b_map->{'tag_index'})  ? $EQUAL :
+             ( (exists $a_map->{'tag_index'}  && exists $b_map->{'tag_index'}) ?
+               ($a_map->{'tag_index'} <=> $b_map->{'tag_index'}) :
+               (!exists $a_map->{'tag_index'} ? $LESS : $MORE)
+             )
+	         );
+}
+
+=head2 sort_rpt_keys
+
+Sorts the argument list and returns a sorted list
+
+=cut
+sub sort_rpt_keys {
+    my ($self, $keys) = @_;
+    my @a = sort _compare_rpt_keys @{$keys};
+    return @a;
+}
+
+=head2 runs_from_rpt_keys
+
+List of run ids
+
+=cut
+sub runs_from_rpt_keys {
+    my ($self, $keys) = @_;
+    my @ar = ();
+    foreach my $key (@{$keys}) {
+      my $m = $self->inflate_rpt_key($key);
+      push @ar, $m->{'id_run'};
+    }
+    @ar = sort { $a <=> $b } uniq @ar;
+    return @ar;
+}
+
+=head2 has_plexes
+
+Returns 1 if at least one key is for a plex, otherwise returns 0
+
+=cut
+sub has_plexes {
+    my ($self, $rl_map_keys) = @_;
+    foreach my $key (@{$rl_map_keys}) {
+        if (exists $self->inflate_rpt_key($key)->{'tag_index'}) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 =head2 rpt_key_delim
 
@@ -104,9 +184,13 @@ __END__
 
 =item Moose::Role
 
+=item Try::Tiny
+
 =item Carp
 
-=item English
+=item Readonly
+
+=item List::MoreUtils
 
 =back
 
@@ -120,7 +204,7 @@ Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL, by Marina Gourtovaia
 
 This file is part of NPG.
 
