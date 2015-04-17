@@ -4,6 +4,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - functionality of the util package in SeqQC merged into the rpt_key autoqc role,
      the package removed
  - api::error package moved to Util::Error
+ - using node-qunit-phantomjs to run headless tests
+ - tests for basic functionality for mqc Javascript code
+ - adding configuration for blanket
+ - updating readme for changes in testing procedure
 
 release 57.9
  - autoqc results collection class - add a method for inferring whether
