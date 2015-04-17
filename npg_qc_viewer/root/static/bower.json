@@ -6,7 +6,8 @@
     "bcviz": "git://github.com/wtsi-npg/bcviz.git#1.2.0"
   },
   "devDependencies": {
-    "qunit": "1.17.1"
+    "qunit": "1.17.1",
+    "blanket":"1.1.5"
   },
   "private": true,
   "ignore": [
