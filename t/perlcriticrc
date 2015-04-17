@@ -3,7 +3,8 @@ packages = :no_restriction
 [RegularExpressions::ProhibitComplexRegexes]
 max_characters = 80
 [Documentation::PodSpelling]
-stop_words = API Accessors Cwd DBI GRL Gourtovaia Guoying IVC Illumina JSON KBs LoggingDBI MVC NPG POSIX Pettett Qi Readonly RunTile SVV SangerPaths SangerWeb UI URIs accessor accessors ajax api args arrayref authorised autoqc bwa bwt cgi config configpath configs dataset datetime dbh dbhost dbname dbpass dbport dbsection dbuser de dev fastq fastqcal fastqcheck fcyield filename filenames flowcell google hasa hashref hasmany heatmap heatmaps hovermap href html ini init initialiser iscurrent ivc json libxml md movez newz npf npg ok perl png pre qX qc qcal qcalreport refactor refactored rescore rescores runfolders runlist runlog runpair serializable sql ssha superclass swiftreport txt uid undef ungraphed uri url useragent util xml 
+stop_words = API Accessors Cwd DBI GRL Gourtovaia Guoying IVC Illumina JSON KBs LoggingDBI MVC NPG POSIX Pettett Qi Readonly RunTile SVV SangerPaths SangerWeb UI URIs accessor accessors ajax api args arrayref authorised autoqc bwa bwt cgi config configpath configs dataset datetime dbh dbhost dbname dbpass dbport dbsection dbuser de dev fastq fastqcal fastqcheck fcyield filename filenames flowcell google hasa hashref hasmany heatmap heatmaps hovermap href html ini init initialiser
+iscurrent ivc json libxml md movez newz npf npg ok perl png pre qX qc qcal qcalreport refactor refactored rescore rescores runfolders runlist runlog runpair serializable sql ssha superclass swiftreport Tovar txt uid undef ungraphed uri url useragent util xml 
 [Modules::ProhibitExcessMainComplexity]
 max_mccabe = 30
 [ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
