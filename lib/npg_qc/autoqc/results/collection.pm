@@ -46,7 +46,7 @@ npg_qc::autoqc::results::collection
 =head1 DESCRIPTION
 
  A wrapper around a list of objects, which are derived from the npg_qc::autoqc::results::result object.
- Has methods for sorting, slicing and searching teh collection.
+ Has methods for sorting, slicing and searching the collection.
 
 =head1 SUBROUTINES/METHODS
 
@@ -360,7 +360,7 @@ sub slice {
         croak q[Can only slice based on either position or check_name or class_name];
     }
 
-    my $c = npg_qc::autoqc::results::collection->new();
+    my $c = __PACKAGE__->new();
 
     foreach my $r (@{$self->results}) {
         if ($r->$criterion && $r->$criterion eq $value) {
@@ -384,7 +384,7 @@ used in comparing the objects in the collection to the criteria.
 sub search {
     my ($self, $h) = @_;
 
-    my $c = npg_qc::autoqc::results::collection->new();
+    my $c = __PACKAGE__->new();
     foreach my $r (@{$self->results}) {
         if ($r->equals_byvalue($h)) {
             $c->add($r);
@@ -449,7 +449,7 @@ sub run_lane_collections {
     foreach my $result (@{$self->results}) {
         my $key = $result->rpt_key;
         if (!defined $map->{$key}) {
-            my $c = npg_qc::autoqc::results::collection->new();
+            my $c = __PACKAGE__->new();
             $c->add($result);
             $map->{$key} = $c;
         } else {
