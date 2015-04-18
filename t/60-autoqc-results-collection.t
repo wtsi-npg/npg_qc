@@ -6,6 +6,7 @@ use Test::Warn;
 use Test::Deep;
 use File::Temp qw/tempdir/;
 
+local $ENV{'HOME'} = q[t/data];
 use npg_qc::autoqc::results::qX_yield;
 use npg_qc::autoqc::results::insert_size;
 use npg_qc::autoqc::results::split_stats;
