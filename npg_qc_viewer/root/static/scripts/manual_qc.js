@@ -41,13 +41,17 @@ var LaneMQCControl = function (index) {
   this.CONFIG_REJECTED_FINAL      = 'Rejected final';
   this.CONFIG_INITIAL             = 'initial';
   
+  this.getRoot = function() {
+    return '/static';
+  };
+  
   this.updateOutcome = function(outcome) {
     var id_run = this.lane_control.data('id_run'); 
     var position = this.lane_control.data('position');
     var control = this;
     if(outcome != control.outcome) {
       //Show progress icon
-      control.lane_control.find('.lane_mqc_working').html("<img src='/static/images/waiting.gif' title='Processing request.'>");
+      control.lane_control.find('.lane_mqc_working').html("<img src='"+control.getRoot()+"/images/waiting.gif' title='Processing request.'>");
       //AJAX call.
       $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
         var response = data;
@@ -80,7 +84,9 @@ var LaneMQCControl = function (index) {
    */ 
   this.generateActiveControls = function() {
     var lane_control = this.lane_control;
-    this.lane_control.html("<img class='lane_mqc_control_accept' src='/static/images/tick.png' title='Accept'> <img class='lane_mqc_control_reject' src='/static/images/cross.png' title='Reject'> <div class='lane_mqc_working'></div>");    
+    this.lane_control.html("<img class='lane_mqc_control_accept' src='"+this.getRoot()+"/images/tick.png' title='Accept'>" + 
+        "<img class='lane_mqc_control_reject' src='"+this.getRoot()+"/images/cross.png' title='Reject'>" + 
+        "<div class='lane_mqc_working'></div>");    
     
     this.lane_control.find('.lane_mqc_control_accept').bind({click: function() {
       lane_control.extra_handler.updateOutcome(lane_control.extra_handler.CONFIG_ACCEPTED_FINAL);
