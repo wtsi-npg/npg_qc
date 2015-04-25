@@ -5,6 +5,7 @@ use Test::Exception;
 
 use Test::WWW::Mechanize::Catalyst;
 
+local $ENV{'HOME'}='t/data';
 use t::util;
 
 my $util = t::util->new();

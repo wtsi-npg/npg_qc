@@ -7,6 +7,7 @@ use HTTP::Request::Common;
 
 use t::util;
 
+local $ENV{'HOME'}='t/data';
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
