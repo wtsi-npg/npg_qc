@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - total_reads now returns 0 when num_total_reads is 0 rather than undef
+ - add support for metrics files produced by bamstreamingmarkduplicates
  - npg_qc build for web server does not compile executables
  - functionality of the util package in SeqQC merged into the rpt_key autoqc role,
      the package removed
