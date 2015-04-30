@@ -40,7 +40,14 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	  url: "/mqc/mqc_runs/16074"
 	}) .done(function() {
 	  alert( "success" );
-	  alert( jqxhr.responseJSON );
+	  jresp = jqxhr.responseJSON;
+	  if(typeof(jresp.current_status_description) != undefined 
+	      && jresp.current_status_description == 'qc in progress') {
+	    window.load_mqc_widgets == 1;
+	    getQcState();
+	  } else {
+	    jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
+	  }
 	})
 	.fail(function() {
 	alert( "error" );
@@ -48,13 +55,6 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	.always(function() {
 	alert( "complete" );
 	});
-
-	if(typeof(load_mqc_widgets) != "undefined" && load_mqc_widgets == 1 ) {
-	  
-		getQcState();
-	} else {
-	  jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
-	}
 
 	jQuery('.bcviz_insert_size').each(function(i) { 
         d = jQuery(this).data('check');
