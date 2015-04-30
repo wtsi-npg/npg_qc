@@ -36,26 +36,41 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 
 	collapse.init();
 	
-	var jqxhr = $.ajax({
-	  url: "/mqc/mqc_runs/16074"
-	}) .done(function() {
-	  alert( "success" );
-	  jresp = jqxhr.responseJSON;
-	  if(typeof(jresp.current_status_description) != undefined 
-	      && jresp.current_status_description == 'qc in progress') {
-	    window.load_mqc_widgets == 1;
-	    getQcState();
-	  } else {
-	    jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
+	var NPG = NPG || {};
+	NPG.QC = NPG.QC || {};
+	
+	var RunMQCControl = (function () {
+	  function RunMQCControl(run_id) {
+	    this.run_id = run_id;
 	  }
-	})
-	.fail(function() {
-	alert( "error" );
-	})
-	.always(function() {
-	alert( "complete" );
+	  
+	  RunMQCControl.prototype.initQC = function (mqc_run_data) {
+	    if(typeof(mqc_run_data) != undefined 
+	        && mqc_run_data.current_status_description == 'qc in progress') {
+	      window.load_mqc_widgets == 1;
+	      getQcState();
+	    } else {
+	      jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
+	    }
+	  };
+	  
+	  return RunMQCControl;
+	}) ();
+	NPG.QC.RunMQCControl = RunMQCControl;
+	
+	var jqxhr = $.ajax({
+	  url: "/mqc/mqc_runs/16074",
+	  cache: false
+	}).done(function() {
+	  alert( "success" );
+	  var control = new NPG.QC.RunMQCControl('16074');
+	  control.initQC(jqxhr.responseJSON);
+	}).fail(function() {
+	  alert( "error" );
+	}).always(function() {
+	  alert( "complete" );
 	});
-
+	
 	jQuery('.bcviz_insert_size').each(function(i) { 
         d = jQuery(this).data('check');
         w = jQuery(this).data('width') || 650;
