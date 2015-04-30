@@ -46,7 +46,8 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	  
 	  RunMQCControl.prototype.initQC = function (mqc_run_data) {
 	    if(typeof(mqc_run_data) != undefined 
-	        && mqc_run_data.current_status_description == 'qc in progress') {
+	        && (mqc_run_data.current_status_description == 'qc in progress' ||
+	            mqc_run_data.current_status_description == 'qc on hold') {
 	      window.load_mqc_widgets == 1;
 	      getQcState();
 	    } else {
