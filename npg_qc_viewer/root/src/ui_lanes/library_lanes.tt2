@@ -184,9 +184,6 @@
          title = title _ ' (current run status: ' _ current_run_status;
          IF !run_from_staging && (current_run_status == 'qc in progress' || current_run_status == 'qc on hold');
            title = title _ ', taken by ' _ cs.user.username;
-            IF c.authenticate({}) &&  c.check_user_roles(('manual_qc')) && c.user.id == cs.id_user; -%]
-<script type="text/javascript"> window.console.log("removed");</script>
-            [%- END;
          END;
          title = title _ ')';
       END;
