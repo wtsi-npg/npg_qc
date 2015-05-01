@@ -54,6 +54,22 @@
     var title = parser.parse('Results for run 16074 (current run status: qc in progress, taken by user)');
     assert.equal(title, '16074', 'Correctly parses run_id from correctly formed title');
   });
+  QUnit.test("NPG.QC.RunMQCControl", function(assert){
+    var data1 = null; 
+    var control = new NPG.QC.RunMQCControl('1');
+    var result1 = control.initQC(data1, function () {return true}, function(){return false});
+    assert.equal(result1, false, 'Control can deal with null data object.');
+    data1 = new Object();
+    var result2 = control.initQC(data1, function () {return true}, function(){return false});
+    assert.equal(result2, false, 'Control can deal with empty data object');
+    //TODO check every needed variable with a test
+    data1.taken_by = 'me';
+    data1.current_user = 'me';
+    data1.has_manual_qc_role = 1;
+    data1.current_status_description = 'qc in progress';
+    var result3 = control.initQC(data1, function () {return true}, function(){return false});
+    assert.equal(result3, true, 'Completes with correct data');
+  }); 
 </SCRIPT>
 </head>
 <body>

@@ -46,7 +46,10 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   	}).done(function() {
   	  window.console && console.log( "success" );
   	  var control = new NPG.QC.RunMQCControl(run_id);
-  	  control.initQC(jqxhr.responseJSON);
+  	  control.initQC(jqxhr.responseJSON, 
+  	      function () { getQcState(); }, 
+  	      function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
+  	      );
   	}).fail(function() {
   	  window.console && console.log( "error" );
   	  //TODO deal with 401 and 500 in different way

@@ -189,16 +189,28 @@ var RunMQCControl = (function () {
     this.run_id = run_id;
   }
   
-  RunMQCControl.prototype.initQC = function (mqc_run_data) {
-    if(typeof(mqc_run_data) != undefined
-        && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
-        && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
-        && (mqc_run_data.current_status_description == 'qc in progress' 
-          || mqc_run_data.current_status_description == 'qc on hold')) {
-      getQcState();
+  RunMQCControl.prototype.initQC = function (mqc_run_data, targetFunction, mopFunction) {
+    var result = null;
+    if(typeof(mqc_run_data) != undefined && mqc_run_data != null) { //There is a data object
+      if(typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
+          && typeof(mqc_run_data.current_user)!= undefined
+          && typeof(mqc_run_data.has_manual_qc_role)!= undefined
+          && typeof(mqc_run_data.current_status_description)!= undefined) {
+        if(mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
+            && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
+            && (mqc_run_data.current_status_description == 'qc in progress' 
+              || mqc_run_data.current_status_description == 'qc on hold')) {
+          result = targetFunction();
+        } else {
+          result = mopFunction();
+        }
+      } else {
+        result = mopFunction();
+      }
     } else {
-      $('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
+      result = mopFunction();
     }
+    return result;
   };
   
   return RunMQCControl;
