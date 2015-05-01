@@ -45,9 +45,11 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	  }
 	  
 	  RunMQCControl.prototype.initQC = function (mqc_run_data) {
-	    if(typeof(mqc_run_data) != undefined 
-	        && (mqc_run_data.current_status_description == 'qc in progress' ||
-	            mqc_run_data.current_status_description == 'qc on hold')) {
+	    if(typeof(mqc_run_data) != undefined
+	        && mqc_run_data.taken_by == mqc_run_data.current_user // Session & qc users are the same
+	        && mqc_run_data.has_manual_qc_role == 1 //Returns '' if not
+	        && (mqc_run_data.current_status_description == 'qc in progress' 
+	          || mqc_run_data.current_status_description == 'qc on hold')) {
 	      getQcState();
 	    } else {
 	      jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.

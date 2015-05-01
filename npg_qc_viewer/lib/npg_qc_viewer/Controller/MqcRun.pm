@@ -37,19 +37,27 @@ sub mqc_runs_GET {
     $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
 
     #Get from DB
-    my $ent = $c->model('NpgDB')->resultset('Run')->find($id_run);
-    use Data::Dumper;
-    print($ent->dump(1));
+    my $ent = $c->model('NpgDB')->resultset('RunStatus')->find({'id_run' => $id_run, 'iscurrent' => 1},);
+    my $qc_outcomes = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->get_outcomes_as_hash($id_run);
 
     # Return a 200 OK, with the data in entity
     # serialized in the body
-    $self->status_ok(
+    if($ent) {
+      $self->status_ok(
       $c,
       entity => {
         id_run                     => $id_run,
-        current_status_description => $ent->current_run_status_description,
+        current_status_description => $ent->run_status_dict->description,
+        taken_by                   => $ent->user->username,
+        current_user               => $c->user->username,
+        has_manual_qc_role         => $c->check_user_roles(('manual_qc')),
+        ##### Check if there are mqc values and add.
+        qc_lane_status             => $qc_outcomes,
       },
     );
+    }
+    
+    
   } catch {
     $error = $_;
   };
