@@ -29,7 +29,6 @@ sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
 
 sub mqc_runs_GET {
   my ( $self, $c, $id_run ) = @_;
-  my $username;
   my $error;
 
   try {
@@ -48,7 +47,9 @@ sub mqc_runs_GET {
         entity => {
           id_run                     => $id_run,
           current_status_description => $ent->run_status_dict->description,
+          #username from status
           taken_by                   => $ent->user->username,
+          #username from cookie  
           current_user               => $c->user->username,
           has_manual_qc_role         => $c->check_user_roles(('manual_qc')),
           ##### Check if there are mqc values and add.
@@ -56,12 +57,10 @@ sub mqc_runs_GET {
         },
       );
     }
-    
-    
   } catch {
     $error = $_;
   };
-  
+
   my $error_code = $RESPONSE_OK_CODE;
 
   if ($error) {
@@ -76,7 +75,7 @@ sub mqc_runs_GET {
       print("Fu");
     } 
   }
-  
+
   return;
 }
 
