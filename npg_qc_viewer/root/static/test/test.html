@@ -41,7 +41,7 @@
     control.linkControl(lane);
     assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
   });
-  QUnit.test("Title parsing", function(assert){
+  QUnit.test("NPG.QC.RunTitleParser", function(assert){
     var parser = new NPG.QC.RunTitleParser();
     var title1 = parser.parse('');
     assert.equal(title1, null, 'Can deal with empty string.');
