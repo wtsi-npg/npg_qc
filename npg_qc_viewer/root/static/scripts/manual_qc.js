@@ -181,6 +181,43 @@ var LaneMQCControl = function (index) {
   };
 }
 
+var NPG = NPG || {};
+NPG.QC = NPG.QC || {};
+
+var RunMQCControl = (function () {
+  function RunMQCControl(run_id) {
+    this.run_id = run_id;
+  }
+  
+  RunMQCControl.prototype.initQC = function (mqc_run_data) {
+    if(typeof(mqc_run_data) != undefined
+        && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
+        && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
+        && (mqc_run_data.current_status_description == 'qc in progress' 
+          || mqc_run_data.current_status_description == 'qc on hold')) {
+      getQcState();
+    } else {
+      $('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
+    }
+  };
+  
+  return RunMQCControl;
+}) ();
+NPG.QC.RunMQCControl = RunMQCControl;
+
+var RunTitleParser = (function () {
+  function RunTitleParser() {
+    this.reId = /^Results for run ([0-9]+)/;
+  }
+  
+  RunTitleParser.prototype.parse = function (element) {
+    var match = this.reId.exec(element);
+    return match[1];
+  };
+  
+  return RunTitleParser;
+}) ();
+NPG.QC.RunTitleParser = RunTitleParser;
 
 /*
 * Get current QC state of lanes and libraries for all position via ajax calls
