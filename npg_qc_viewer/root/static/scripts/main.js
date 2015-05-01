@@ -110,5 +110,4 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 
         jQuery(this).append(fwd_div,rev_div,leg_div);
 	});
-
 });

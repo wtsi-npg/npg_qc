@@ -212,7 +212,13 @@ var RunTitleParser = (function () {
   
   RunTitleParser.prototype.parse = function (element) {
     var match = this.reId.exec(element);
-    return match[1];
+    var result = null;
+    if (match != null) {
+      if(match.constructor === Array && match.length >= 2) {
+        result = match[1];
+      }
+    }
+    return result;
   };
   
   return RunTitleParser;
