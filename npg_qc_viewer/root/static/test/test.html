@@ -67,8 +67,11 @@
     data1.current_user = 'me';
     data1.has_manual_qc_role = 1;
     data1.current_status_description = 'qc in progress';
-    var result3 = control.initQC(data1, function () {return true}, function(){return false});
+    var result3 = control.initQC(data1, function () {return true}, function() {return false});
     assert.equal(result3, true, 'Completes with correct data');
+    data1.taken_by = 'other';
+    var result4 = control.initQC(data1, function () {return true}, function() {return false});
+    assert.equal(result4, false, 'Does not run if current user and taken by are different');
   }); 
 </SCRIPT>
 </head>
