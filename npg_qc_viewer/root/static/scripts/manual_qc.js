@@ -207,13 +207,16 @@ NPG.QC.RunMQCControl = RunMQCControl;
 
 var RunTitleParser = (function () {
   function RunTitleParser() {
-    this.reId = /^Results for run ([0-9]+)/;
+    this.reId = /^Results for run ([0-9]+) /;
   }
   
   RunTitleParser.prototype.parse = function (element) {
     var match = this.reId.exec(element);
     var result = null;
+    //There is a result from parsing
     if (match != null) {
+      //The result of parse looks like a parse 
+      // and has correct number of elements
       if(match.constructor === Array && match.length >= 2) {
         result = match[1];
       }
