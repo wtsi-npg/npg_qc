@@ -47,8 +47,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	  RunMQCControl.prototype.initQC = function (mqc_run_data) {
 	    if(typeof(mqc_run_data) != undefined 
 	        && (mqc_run_data.current_status_description == 'qc in progress' ||
-	            mqc_run_data.current_status_description == 'qc on hold') {
-	      window.load_mqc_widgets == 1;
+	            mqc_run_data.current_status_description == 'qc on hold')) {
 	      getQcState();
 	    } else {
 	      jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
@@ -63,13 +62,13 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	  url: "/mqc/mqc_runs/16074",
 	  cache: false
 	}).done(function() {
-	  alert( "success" );
+	  window.console && console.log( "success" );
 	  var control = new NPG.QC.RunMQCControl('16074');
 	  control.initQC(jqxhr.responseJSON);
 	}).fail(function() {
-	  alert( "error" );
+	  window.console && console.log( "error" );
 	}).always(function() {
-	  alert( "complete" );
+	  window.console && console.log( "complete" );
 	});
 	
 	jQuery('.bcviz_insert_size').each(function(i) { 
