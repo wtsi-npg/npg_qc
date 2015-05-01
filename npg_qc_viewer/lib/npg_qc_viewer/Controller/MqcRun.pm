@@ -44,17 +44,17 @@ sub mqc_runs_GET {
     # serialized in the body
     if($ent) {
       $self->status_ok(
-      $c,
-      entity => {
-        id_run                     => $id_run,
-        current_status_description => $ent->run_status_dict->description,
-        taken_by                   => $ent->user->username,
-        current_user               => $c->user->username,
-        has_manual_qc_role         => $c->check_user_roles(('manual_qc')),
-        ##### Check if there are mqc values and add.
-        qc_lane_status             => $qc_outcomes,
-      },
-    );
+        $c,
+        entity => {
+          id_run                     => $id_run,
+          current_status_description => $ent->run_status_dict->description,
+          taken_by                   => $ent->user->username,
+          current_user               => $c->user->username,
+          has_manual_qc_role         => $c->check_user_roles(('manual_qc')),
+          ##### Check if there are mqc values and add.
+          qc_lane_status             => $qc_outcomes,
+        },
+      );
     }
     
     

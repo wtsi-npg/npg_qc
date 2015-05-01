@@ -46,13 +46,13 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	  
 	  RunMQCControl.prototype.initQC = function (mqc_run_data) {
 	    if(typeof(mqc_run_data) != undefined
-	        && mqc_run_data.taken_by == mqc_run_data.current_user // Session & qc users are the same
-	        && mqc_run_data.has_manual_qc_role == 1 //Returns '' if not
+	        && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
+	        && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
 	        && (mqc_run_data.current_status_description == 'qc in progress' 
 	          || mqc_run_data.current_status_description == 'qc on hold')) {
 	      getQcState();
 	    } else {
-	      jQuery('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
+	      $('.lane_mqc_working').empty(); //There is no mqc so I just remove the working image.
 	    }
 	  };
 	  
@@ -60,18 +60,38 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	}) ();
 	NPG.QC.RunMQCControl = RunMQCControl;
 	
-	var jqxhr = $.ajax({
-	  url: "/mqc/mqc_runs/16074",
-	  cache: false
-	}).done(function() {
-	  window.console && console.log( "success" );
-	  var control = new NPG.QC.RunMQCControl('16074');
-	  control.initQC(jqxhr.responseJSON);
-	}).fail(function() {
-	  window.console && console.log( "error" );
-	}).always(function() {
-	  window.console && console.log( "complete" );
-	});
+	var RunTitleParser = (function () {
+	  function RunTitleParser() {
+	    this.reId = /^Results for run ([0-9]+)/;
+	  }
+	  
+	  RunTitleParser.prototype.parse = function (element) {
+	    var match = this.reId.exec(element);
+	    return match[1];
+	  };
+	  
+	  return RunTitleParser;
+	}) ();
+	NPG.QC.RunTitleParser = RunTitleParser;
+	
+	//Getting the run_id from the title of the page.
+	var run_id = new NPG.QC.RunTitleParser().parse($(document).find("title").text());
+	//If the run_id is there //TODO validate number
+	if(typeof(run_id) != undefined) {
+  	var jqxhr = $.ajax({
+  	  url: "/mqc/mqc_runs/" + run_id,
+  	  cache: false
+  	}).done(function() {
+  	  window.console && console.log( "success" );
+  	  var control = new NPG.QC.RunMQCControl(run_id);
+  	  control.initQC(jqxhr.responseJSON);
+  	}).fail(function() {
+  	  window.console && console.log( "error" );
+  	  //TODO deal with 401 and 500 in different way
+  	}).always(function() {
+  	  window.console && console.log( "complete" );
+  	});
+	}
 	
 	jQuery('.bcviz_insert_size').each(function(i) { 
         d = jQuery(this).data('check');
