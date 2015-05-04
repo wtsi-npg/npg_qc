@@ -62,16 +62,35 @@
     data1 = new Object();
     var result2 = control.initQC(data1, function () {return true}, function(){return false});
     assert.equal(result2, false, 'Control can deal with empty data object');
-    //TODO check every needed variable with a test
     data1.taken_by = 'me';
     data1.current_user = 'me';
     data1.has_manual_qc_role = 1;
     data1.current_status_description = 'qc in progress';
     var result3 = control.initQC(data1, function () {return true}, function() {return false});
-    assert.equal(result3, true, 'Completes with correct data');
+    assert.equal(result3, true, 'Completes with correct data (qc in progress)');
+    data1.current_status_description = 'qc on hold';
+    var result31 = control.initQC(data1, function () {return true}, function() {return false});
+    assert.equal(result31, true, 'Completes with correct data (qc on hold)');
+    //
     data1.taken_by = 'other';
     var result4 = control.initQC(data1, function () {return true}, function() {return false});
-    assert.equal(result4, false, 'Does not run if current user and taken by are different');
+    assert.equal(result4, false, 'Does not run if taken by and current user are different');
+    data1.taken_by = 'me';
+    //
+    data1.current_user = 'other';
+    var result5 = control.initQC(data1, function () {return true}, function() {return false});
+    assert.equal(result5, false, 'Does not run if current user and taken by are different');
+    data1.current_user = 'me';
+    //
+    data1.has_manual_qc_role = '';
+    var result6 = control.initQC(data1, function () {return true}, function() {return false});
+    assert.equal(result6, false, 'Does not run if has manual qc role is not available');
+    data1.has_manual_qc_role = 1;
+    //
+    data1.current_status_description = 'blablabla';
+    var result7 = control.initQC(data1, function () {return true}, function() {return false});
+    assert.equal(result7, false, 'Does not run if current status description is a unexpected one');
+    data1.current_status_description = 'qc in progress';
   }); 
 </SCRIPT>
 </head>
