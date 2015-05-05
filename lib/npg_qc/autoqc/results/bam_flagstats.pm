@@ -124,7 +124,7 @@ sub parsing_metrics_file {
   chomp $header;
   $self->set_info('Picard_metrics_header', $header);
 
-  my ($metrics_source) = $header =~ /(MarkDuplicates | EstimateLibraryComplexity | bammarkduplicates)/mxs;
+  my ($metrics_source) = $header =~ /(MarkDuplicates | EstimateLibraryComplexity | bam\S*markduplicates)/mxs;
 
   my $metrics = $file_contents[1];
   my $histogram  = $file_contents[2];

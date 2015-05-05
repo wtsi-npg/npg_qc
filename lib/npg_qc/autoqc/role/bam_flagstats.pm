@@ -18,7 +18,7 @@ Readonly::Scalar our $PERCENTAGE   =>100;
 
 sub total_reads {
   my $self = shift;
-  if( $self->num_total_reads() ) {
+  if( defined $self->num_total_reads() ) {
       return $self->num_total_reads();
   }elsif(defined $self->unpaired_mapped_reads && defined $self->paired_mapped_reads && defined  $self->unmapped_reads) {
       return ( $self->unpaired_mapped_reads + 2 * $self->paired_mapped_reads +  $self->unmapped_reads );

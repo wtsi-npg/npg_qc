@@ -1,0 +1,10 @@
+#!/software/bin/env perl
+my $VAR1 = {
+  'staging_areas' => {
+    'indexes' => [18 .. 32, 34 .. 47, 49 .. 55],
+    'prefix' => '/nfs/sf'
+  },
+  'repository' => {
+    'root' => '/lustre/scratch109/srpipe/'
+  }
+}

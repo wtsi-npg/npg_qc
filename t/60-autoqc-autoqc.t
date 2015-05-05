@@ -14,6 +14,7 @@ use File::Spec;
 use File::Spec::Functions qw(catfile);
 use Cwd;
 use File::Temp qw/tempdir/;
+local $ENV{'HOME'} = q[t/data];
 
 use_ok ('npg_qc::autoqc::autoqc');
 
