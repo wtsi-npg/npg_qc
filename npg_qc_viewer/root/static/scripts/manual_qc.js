@@ -99,7 +99,6 @@ var LaneMQCControl = function (index) {
     this.lane_control.find('.lane_mqc_control_save').bind({click: function() {
       lane_control.extra_handler.saveAsFinalOutcome();
     }});
-    
   };
   
   /* 
@@ -187,11 +186,13 @@ NPG.QC = NPG.QC || {};
 var RunMQCControl = (function () {
   function RunMQCControl(run_id) {
     this.run_id = run_id;
+    this.mqc_run_data = null;
   }
   
   RunMQCControl.prototype.initQC = function (mqc_run_data, targetFunction, mopFunction) {
     var result = null;
     if(typeof(mqc_run_data) != undefined && mqc_run_data != null) { //There is a data object
+      this.mqc_run_data = mqc_run_data;
       if(typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
           && typeof(mqc_run_data.current_user)!= undefined
           && typeof(mqc_run_data.has_manual_qc_role)!= undefined
@@ -210,6 +211,15 @@ var RunMQCControl = (function () {
     } else {
       result = mopFunction();
     }
+    return result;
+  };
+  
+  RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
+    var result = null;
+    nLanes = lanes.length;
+    for(var i = 0; i < lLanes; i++) {
+      lane = lanes[i];
+    } 
     return result;
   };
   
