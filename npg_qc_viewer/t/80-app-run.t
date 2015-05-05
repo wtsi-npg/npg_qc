@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 60;
+use Test::More tests => 64;
 use Test::Exception;
 
 use Test::WWW::Mechanize::Catalyst;
@@ -34,6 +34,15 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)->update({ id_user => 64, id_run_status_dict => 26, });
   $mech->get_ok($url);
   $mech->title_is(q[Results for run 4025 (current run status: qc in progress, taken by mg8)]);
+}
+
+{
+  my $url = q[http://localhost/checks/runs/10107];
+  $mech->get_ok($url);
+  $mech->title_is(q[Results for run 10107 (current run status: qc in progress, taken by melanie)]);
+  $schemas->{npg}->resultset('RunStatus')->search({id_run => 10107, iscurrent => 1},)->update({ id_user => 50, id_run_status_dict => 25, });
+  $mech->get_ok($url);
+  $mech->title_is(q[Results for run 10107 (current run status: qc on hold, taken by melanie)]);
 }
 
 {
