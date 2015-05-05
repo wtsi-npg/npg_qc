@@ -36,7 +36,9 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   $mech->title_is(q[Results for run 4025 (current run status: qc in progress, taken by mg8)]);
 }
 
-{
+{ #This tests is linked with the javascript part of the application
+  #which uses the title of the page to check if manual qc GUI should
+  #be shown. 
   my $url = q[http://localhost/checks/runs/10107];
   $mech->get_ok($url);
   $mech->title_is(q[Results for run 10107 (current run status: qc in progress, taken by melanie)]);
