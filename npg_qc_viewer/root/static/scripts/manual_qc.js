@@ -219,7 +219,7 @@ NPG.QC.RunMQCControl = RunMQCControl;
 
 var RunTitleParser = (function () {
   function RunTitleParser() {
-    this.reId = /^Results for run ([0-9]+) /;
+    this.reId = /^Results for run ([0-9]+) \(current run status: (qc in progress|qc on hold), taken by ([a-zA-Z0-9])+\)$/;
   }
   
   RunTitleParser.prototype.parse = function (element) {

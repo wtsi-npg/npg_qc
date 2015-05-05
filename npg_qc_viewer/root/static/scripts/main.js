@@ -37,6 +37,9 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 	collapse.init();
 	
 	//Getting the run_id from the title of the page.
+	//It also helps by checking the title of the page
+	//matches the patterns associated with single run,
+	//and non-staging.
 	var run_id = new NPG.QC.RunTitleParser().parse($(document).find("title").text());
 	//If the run_id is there //TODO validate number
 	if(typeof(run_id) != undefined) {
