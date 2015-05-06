@@ -50,7 +50,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
       totalLanes++;
       obj = $(obj);
       var parent = obj.parent();
-      if(parent.hasClass('passed') || parent.hasClass('failed')) {
+      if(parent.hasClass('passed') || parent.hasClass('failed')) { //TODO confirm is failed
         lanesWithBG++;
       } else {
         lanes.push(parent);
@@ -66,7 +66,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
         window.console && console.log( "success" );
         var control = new NPG.QC.RunMQCControl(run_id);
         control.initQC(jqxhr.responseJSON, lanes, 
-            function () { getQcState(); },
+            function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
             function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
             );
       }).fail(function(jqXHR, textStatus, errorThrown) {

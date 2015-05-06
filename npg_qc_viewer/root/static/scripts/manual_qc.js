@@ -202,7 +202,7 @@ var RunMQCControl = (function () {
             && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
             && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
               || mqc_run_data.current_status_description == 'qc on hold')) { //TODO move to class
-          result = targetFunction(mqc_run_data, control);
+          result = targetFunction(mqc_run_data, control, lanes);
         } else {
           result = mopFunction();
         }
@@ -278,24 +278,31 @@ NPG.QC.RunTitleParser = RunTitleParser;
 * get information from the page and prepare a VO object. Update the 
 * lanes with GUI controls when necessary.
 */
-function getQcState(mqc_run_data, runMQCControl) {
+function getQcState(mqc_run_data, runMQCControl, lanes) {
   //Preload images
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
   $('<img/>')[0].src = "/static/images/waiting.gif";
 
+  for(var i = 0; i < lanes.length; i++) {
+    lanes[i].children('.lane_mqc_control').each(function(j, obj){
+      $(obj).html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
+    });
+  }
+  
   $('.lane_mqc_control').each(function (i, obj) {
     obj = $(obj);
-    obj.html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
   });
   
   //Required to show error messages from the mqc process.
   $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
   //Set up mqc controlers and link them to the individual lanes.
-  $('.lane_mqc_control').each(function (i, obj) {
-    obj = $(obj); //Wrap as an jQuery object.
-    var c = new LaneMQCControl(i);
-    c.linkControl(obj);
-  });
+  for(var i = 0; i < lanes.length; i++) {
+    lanes[i].children('.lane_mqc_control').each(function(j, obj){
+      obj = $(obj); //Wrap as an jQuery object.
+      var c = new LaneMQCControl(i);
+      c.linkControl(obj);
+    });
+  }
 }
