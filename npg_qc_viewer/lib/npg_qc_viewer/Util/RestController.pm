@@ -3,8 +3,11 @@ package npg_qc_viewer::Util::RestController;
 use Moose::Role;
 use Carp;
 use Readonly;
+use Params::Validate;
 
 our $VERSION = '0';
+
+requires '_set_entity';
 
 ## no critic (Documentation::RequirePodAtEnd)
 
