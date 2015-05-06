@@ -290,10 +290,6 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
     });
   }
   
-  $('.lane_mqc_control').each(function (i, obj) {
-    obj = $(obj);
-  });
-  
   //Required to show error messages from the mqc process.
   $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
