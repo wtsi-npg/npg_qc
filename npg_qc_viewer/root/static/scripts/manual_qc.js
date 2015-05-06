@@ -295,10 +295,16 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
   
   //Set up mqc controlers and link them to the individual lanes.
   for(var i = 0; i < lanes.length; i++) {
-    lanes[i].children('.lane_mqc_control').each(function(j, obj){
-      obj = $(obj); //Wrap as an jQuery object.
-      var c = new LaneMQCControl(i);
-      c.linkControl(obj);
-    });
+    var cells = lanes[i].children('.lane_mqc_control');
+    for(j = 0; j < cells.length; j++) {
+      obj = $(cells[j]); //Wrap as an jQuery object.
+      var position = obj.data('position');
+      if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
+        current_status = mqc_run_data.qc_lane_status[position];
+      } else {
+        var c = new LaneMQCControl(i);
+        c.linkControl(obj);
+      }
+    }
   }
 }
