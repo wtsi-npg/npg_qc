@@ -4,7 +4,7 @@ use Moose::Role;
 use Carp;
 use Readonly;
 
-our $version = '0';
+our $VERSION = '0';
 
 ## no critic (Documentation::RequirePodAtEnd)
 
