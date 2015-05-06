@@ -189,8 +189,9 @@ var RunMQCControl = (function () {
     this.mqc_run_data = null;
   }
   
-  RunMQCControl.prototype.initQC = function (mqc_run_data, targetFunction, mopFunction) {
+  RunMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
     var result = null;
+    var control = this;
     if(typeof(mqc_run_data) != undefined && mqc_run_data != null) { //There is a data object
       this.mqc_run_data = mqc_run_data;
       if(typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
@@ -201,7 +202,7 @@ var RunMQCControl = (function () {
             && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
             && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
               || mqc_run_data.current_status_description == 'qc on hold')) { //TODO move to class
-          result = targetFunction();
+          result = targetFunction(mqc_run_data, control);
         } else {
           result = mopFunction();
         }
@@ -214,11 +215,18 @@ var RunMQCControl = (function () {
     return result;
   };
   
-  RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
+  RunMQCControl.prototype.prepareLanes = function (mqc_run_data) {
     var result = null;
     nLanes = lanes.length;
     for(var i = 0; i < lLanes; i++) {
-      lane = lanes[i];
+      var lane = $(lanes[i]);
+      var current_status = null
+      position = lane.data('position');
+      var strPosition = String(position);
+      if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
+        current_status = mqc_run_data.qc_lane_status[strPosition];
+        window.console.log(str_position + ' ' + current_status);
+      }
     } 
     return result;
   };
@@ -229,11 +237,26 @@ NPG.QC.RunMQCControl = RunMQCControl;
 
 var RunTitleParser = (function () {
   function RunTitleParser() {
-    this.reId = /^Results for run ([0-9]+) \(current run status: (qc in progress|qc on hold), taken by ([a-zA-Z0-9])+\)$/;
+    this.reIdFull = /^Results for run ([0-9]+) \(current run status: (qc in progress|qc on hold), taken by ([a-zA-Z0-9])+\)$/;
+    this.reId = /^Results for run ([0-9]+) \(current run status:/;
   }
   
-  RunTitleParser.prototype.parse = function (element) {
+  RunTitleParser.prototype.parseRunId = function (element) {
     var match = this.reId.exec(element);
+    var result = null;
+    //There is a result from parsing
+    if (match != null) {
+      //The result of parse looks like a parse 
+      // and has correct number of elements
+      if(match.constructor === Array && match.length >= 2) {
+        result = match[1];
+      }
+    }
+    return result;
+  };
+  
+  RunTitleParser.prototype.parse = function (element) {
+    var match = this.reIdFull.exec(element);
     var result = null;
     //There is a result from parsing
     if (match != null) {
@@ -251,9 +274,11 @@ var RunTitleParser = (function () {
 NPG.QC.RunTitleParser = RunTitleParser;
 
 /*
-* Get current QC state of lanes and libraries for all position via ajax calls
+* Check current state of the lanes. If current state is ready for QC, 
+* get information from the page and prepare a VO object. Update the 
+* lanes with GUI controls when necessary.
 */
-function getQcState() {
+function getQcState(mqc_run_data, runMQCControl) {
   //Preload images
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
