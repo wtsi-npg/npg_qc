@@ -149,9 +149,6 @@
 <a href="[% rurl = [npg_url, 'run', id_run]; rurl.join('/'); %]" title="date completed [% time_comp.truncate(10) %]">[% id_run %]</a>
 [%- IF num_cycles %]<br />[% num_cycles %][% END -%]
 </div></td>
-[%-
-    c.stash.previous_mqc = c.model('NpgQcDB').resultset('MqcOutcomeEnt').get_outcomes_as_hash("$id_run");
--%]
 
 [% PROCESS "ui_lanes/lane.tt2" %]
 </tr>
