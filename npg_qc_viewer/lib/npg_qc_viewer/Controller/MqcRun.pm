@@ -19,10 +19,7 @@ our $VERSION = '0';
 
 Readonly::Scalar my $MQC_ROLE                     => q[manual_qc];
 Readonly::Scalar my $RESPONSE_OK_CODE             => 200;
-Readonly::Scalar my $RESPONSE_BAD_REQUEST_CODE    => 400;
 Readonly::Scalar my $RESPONSE_UNAUTHORIZED        => 401;
-Readonly::Scalar my $RESPONSE_METHOD_NOT_ALLOWED  => 405;
-Readonly::Scalar my $RESPONSE_INTERNAL_ERROR_CODE => 500;
 
 ## no critic (NamingConventions::Capitalization)
 sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
@@ -30,10 +27,17 @@ sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
 sub mqc_runs_GET {
   my ( $self, $c, $id_run ) = @_;
   my $error;
+  my $authenticated = 0;
 
   try {
-    ####Authorisation
-    $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
+    try {
+      ####Authorisation
+      $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
+      $authenticated = 1;
+    } catch {
+      $error = $_;
+      $authenticated = 0;
+    };
 
     #Get from DB
     my $ent = $c->model('NpgDB')->resultset('RunStatus')->find({'id_run' => $id_run, 'iscurrent' => 1},);
@@ -42,19 +46,26 @@ sub mqc_runs_GET {
     # Return a 200 OK, with the data in entity
     # serialized in the body
     if($ent) {
+      my $hash_entity = {};
+      $hash_entity->{'id_run'}                     = $id_run;
+      $hash_entity->{'current_status_description'} = $ent->run_status_dict->description;
+      #username from status 
+      $hash_entity->{'taken_by'}                   = $ent->user->username;
+      ##### Check if there are mqc values and add.
+      $hash_entity->{'qc_lane_status'}             = $qc_outcomes;
+      
+      if($authenticated) {
+        #username from authentication
+        $hash_entity->{'current_user'}               = $c->user->username;
+        $hash_entity->{'has_manual_qc_role'}         = $c->check_user_roles(($MQC_ROLE));
+      } else {
+        $hash_entity->{'current_user'}               = '';
+        $hash_entity->{'has_manual_qc_role'}         = '';
+      }
+      
       $self->status_ok(
         $c,
-        entity => {
-          id_run                     => $id_run,
-          current_status_description => $ent->run_status_dict->description,
-          #username from status
-          taken_by                   => $ent->user->username,
-          #username from cookie  
-          current_user               => $c->user->username,
-          has_manual_qc_role         => $c->check_user_roles(('manual_qc')),
-          ##### Check if there are mqc values and add.
-          qc_lane_status             => $qc_outcomes,
-        },
+        entity => $hash_entity,
       );
     }
   } catch {
@@ -64,16 +75,13 @@ sub mqc_runs_GET {
   my $error_code = $RESPONSE_OK_CODE;
 
   if ($error) {
-    print (qq[Found error $error]);
     ( $error, $error_code ) = $self->parse_error($error);
     if ($error_code == $RESPONSE_UNAUTHORIZED) {
         $self->status_unauthorized(
           $c,
           message => $error,
         );
-    } elsif ( $error_code == 1) {
-      print("Fu");
-    } 
+    }
   }
 
   return;
@@ -111,11 +119,15 @@ Controller to expose runs through REST
 
 =over
 
-=item Readonly
+=item Moose
 
 =item namespace::autoclean
 
-=item Moose
+=item Readonly
+
+=item Try::Tiny
+
+=item Carp
 
 =item Catalyst::Controller::REST
 
