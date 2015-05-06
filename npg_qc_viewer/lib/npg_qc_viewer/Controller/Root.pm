@@ -6,7 +6,7 @@ use Try::Tiny;
 
 BEGIN { extends 'Catalyst::Controller' }
 
-with 'npg_qc_viewer::api::error';
+with 'npg_qc_viewer::Util::Error';
 
 our $VERSION  = '0';
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitBuiltinHomonyms)

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>QUnit Test Suite</title>
+<link rel="stylesheet" href="../bower_components/qunit/qunit/qunit.css" type="text/css" media="screen">
+<script type="text/javascript" src="../bower_components/qunit/qunit/qunit.js"></script>
+<script type="text/javascript" src="../bower_components/jquery/jquery.js"></script>
+<script type="text/javascript" src="../bower_components/blanket/dist/qunit/blanket.js"></script>
+<!-- Your project file goes here -->
+<script type="text/javascript" src="../scripts/manual_qc.js" data-cover></script>
+<!-- Your tests file goes here -->
+<script type="text/javascript" src="test.js"></script>
+<script>
+
+  QUnit.test("DOM linking", function( assert ) {
+    var lane = $("#mqc_lane1");
+    assert.notEqual(lane, undefined, "mqc_lane is an instance.");
+    assert.equal(lane.data('id_run'), '2', "id_run is 2.");
+    assert.equal(lane.data('position'), '3', "position is 3.");
+    assert.equal(lane.data('initial'), undefined, "No initial value.");
+    var control = new LaneMQCControl(0);
+    assert.notEqual(control, undefined, "Control is an instance.");
+    control.linkControl(lane);
+    assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
+    assert.equal(control.lane_control, lane, "Control and lane are correctly linked.");
+    assert.equal(control.lane_control.outcome, undefined, "Outcome of lane is not defined.");
+  });
+  QUnit.test("DOM linking lane with previous status", function( assert ) {
+    var lane = $("#mqc_lane2");
+    assert.notEqual(lane, undefined, "mqc_lane is an instance.");
+    assert.equal(lane.data('id_run'), '3', "id_run is 3.");
+    assert.equal(lane.data('position'), '4', "position is 4.");
+    assert.notEqual(lane.data('initial'), undefined, "Has initial value.");
+    assert.equal(lane.data('initial'), 'Accepted final', "Initial value as expected.");
+    var control = new LaneMQCControl(1);
+    assert.notEqual(control, undefined, "Control is an instance.");
+    control.linkControl(lane);
+    assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
+  });
+</SCRIPT>
+</head>
+<body>
+<h1 id="qunit-header">QUnit Test Suite</h1>
+<h2 id="qunit-banner"></h2>
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+
+<div id="qunit-fixture">
+<div id='mqc_lane1' data-id_run='2' data-position='3' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
+<div id='mqc_lane2' data-id_run='3' data-position='4' data-initial='Accepted final' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
+</div>
+</body>
+</html>

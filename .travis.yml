@@ -1,0 +1,11 @@
+language: node_js
+node_js :
+ - "0.12"
+before_install:
+ - cd npg_qc_viewer/root/static
+before_script:
+ - npm install -g bower
+ - bower install
+ - npm install -g node-qunit-phantomjs
+script: node-qunit-phantomjs test/test.html --verbose
+
