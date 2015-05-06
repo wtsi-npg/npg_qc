@@ -40,33 +40,42 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
    * Getting the run_id from the title of the page.
    */
   var run_id = new NPG.QC.RunTitleParser().parseRunId($(document).find("title").text());
-  //If the run_id is there //TODO Probably validate number, but its kind of granted from regexp.
+  //If the run_id is there
   if(typeof(run_id) != undefined && run_id != null) {
     //Read information about lanes from page.
     var lanes = [];
+    var lanesWithBG = 0, totalLanes = 0;
+    //Select non-qced lanes.
     $('.lane_mqc_control').each(function (i, obj) {
+      totalLanes++;
       obj = $(obj);
-      lanes.push(obj.parent());
+      var parent = obj.parent();
+      if(parent.hasClass('passed') || parent.hasClass('failed')) {
+        lanesWithBG++;
+      } else {
+        lanes.push(parent);
+      }
     });
     
-    //TODO Probably validate if all lanes have bg colour
-    
-    var jqxhr = $.ajax({
-      url: "/mqc/mqc_runs/" + run_id,
-      cache: false
-    }).done(function() {
-      window.console && console.log( "success" );
-      var control = new NPG.QC.RunMQCControl(run_id);
-      control.initQC(jqxhr.responseJSON, lanes, 
-          function () { getQcState(); },
-          function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
-          );
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-      window.console && console.log( "error " + " " + textStatus + " " + errorThrown);
-      //TODO deal with 401 and 500 in different way
-    }).always(function() { //TODO remove if not needed for cleaning.
-      window.console && console.log( "complete" );
-    });
+    //Validate if all lanes have bg colour
+    if(lanesWithBG < totalLanes) {
+      var jqxhr = $.ajax({
+        url: "/mqc/mqc_runs/" + run_id,
+        cache: false
+      }).done(function() {
+        window.console && console.log( "success" );
+        var control = new NPG.QC.RunMQCControl(run_id);
+        control.initQC(jqxhr.responseJSON, lanes, 
+            function () { getQcState(); },
+            function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
+            );
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        window.console && console.log( "error " + " " + textStatus + " " + errorThrown);
+        //TODO 500
+      }).always(function() { //TODO remove if not needed for cleaning.
+        window.console && console.log( "complete" );
+      });
+    }
   }
   
   jQuery('.bcviz_insert_size').each(function(i) { 
