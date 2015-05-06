@@ -301,10 +301,10 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
       var position = obj.data('position');
       if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
         current_status = mqc_run_data.qc_lane_status[position];
-      } else {
-        var c = new LaneMQCControl(i);
-        c.linkControl(obj);
-      }
+        obj.data('initial', current_status);
+      } 
+      var c = new LaneMQCControl(i);
+      c.linkControl(obj);
     }
   }
 }
