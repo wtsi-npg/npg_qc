@@ -12,7 +12,7 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 #anyway
 __PACKAGE__->config( default => 'application/json' );
 
-with 'npg_qc_viewer::api::error';
+with 'npg_qc_viewer::Util::Error';
 with 'npg_qc_viewer::Util::RestController';
 
 our $VERSION = '0';
