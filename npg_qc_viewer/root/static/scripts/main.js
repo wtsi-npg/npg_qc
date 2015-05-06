@@ -37,22 +37,27 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   collapse.init();
   
   /* 
-   * Getting the run_id from the title of the page. 
-   * It also helps by checking the title of the page 
-   * matches the patterns associated with single run 
-   * and non-staging. 
+   * Getting the run_id from the title of the page.
    */
-  var run_id = new NPG.QC.RunTitleParser().parse($(document).find("title").text());
-  
+  var run_id = new NPG.QC.RunTitleParser().parseRunId($(document).find("title").text());
   //If the run_id is there //TODO Probably validate number, but its kind of granted from regexp.
   if(typeof(run_id) != undefined && run_id != null) {
+    //Read information about lanes from page.
+    var lanes = [];
+    $('.lane_mqc_control').each(function (i, obj) {
+      obj = $(obj);
+      lanes.push(obj.parent());
+    });
+    
+    //TODO Probably validate if all lanes have bg colour
+    
     var jqxhr = $.ajax({
       url: "/mqc/mqc_runs/" + run_id,
       cache: false
     }).done(function() {
       window.console && console.log( "success" );
       var control = new NPG.QC.RunMQCControl(run_id);
-      control.initQC(jqxhr.responseJSON, 
+      control.initQC(jqxhr.responseJSON, lanes, 
           function () { getQcState(); },
           function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
           );
