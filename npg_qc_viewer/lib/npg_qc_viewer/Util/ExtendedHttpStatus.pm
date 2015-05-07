@@ -1,4 +1,4 @@
-package npg_qc_viewer::Util::RestController;
+package npg_qc_viewer::Util::ExtendedHttpStatus;
 
 use Moose::Role;
 use Carp;
@@ -9,13 +9,15 @@ our $VERSION = '0';
 
 requires '_set_entity';
 
+Readonly::Scalar my $RESPONSE_UNAUTHORIZED        => 401;
+
 ## no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar my $ERROR_CODE_STRING   => q[SeqQC error code ];
 
 =head1 NAME
 
-npg_qc_viewer::Util::RestController
+npg_qc_viewer::Util::ExtendedHttpStatus
 
 =head1 SYNOPSIS
 
@@ -35,14 +37,16 @@ subs for extra response codes.
 =cut
 
 sub status_unauthorized {
-    my $self = shift;
-    my $c    = shift;
-    my %p    = Params::Validate::validate( @_, { message => { type => Params::Validate::SCALAR }, }, );
-
-    $c->response->status(401);
-    $c->log->debug( "Status Unauthorized: " . $p{'message'} ) if $c->debug;
-    $self->_set_entity( $c, { error => $p{'message'} } );
-    return 1;
+  my @params = @_;
+  my $self = shift @params;
+  my $c    = shift @params;
+  my %p    = Params::Validate::validate( @params, { message => { type => Params::Validate::SCALAR }, }, );
+  $c->response->status($RESPONSE_UNAUTHORIZED);
+  if $c->debug {
+    $c->log->debug(q[Status Unauthorized: ] . $p{'message'} ) ;
+  }
+  $self->_set_entity( $c, { error => $p{'message'} } );
+  return 1;
 }
 
 1;
