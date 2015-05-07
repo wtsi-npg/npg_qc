@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 17;
 use Test::Exception;
 use Cwd;
 use File::Spec;
@@ -35,14 +35,6 @@ lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
   is( $response->code, 405, 'error code is 405' );
 }
 
-{ #Testing GET without credentials
-  my $response;
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/mqc_runs/5500' )) }
-    'has a response for GET request';
-  ok($response->is_error, q[get response is error without credentials]);
-  is( $response->code, 401, 'error code is 401' );
-}
-
 {
   #Testing GET with credentials
   my $response;
@@ -56,8 +48,24 @@ lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/mqc_runs/3500?user=cat&password=secret' )) }
     'has a response for GET request when passing credentials';
   my $response_parse = from_json($response->content, {utf8 => 1});
-  use Data::Dumper;
-  print(Dumper($response_parse));
+  is($response_parse->{'taken_by'}, q[pipeline], 'Taken by pipeline');
+  is($response_parse->{'current_user'}, undef, 'Undef current user');
+  is($response_parse->{'has_manual_qc_role'}, 1, 'Has manual qc role');
+  is($response_parse->{'current_status_description'}, 'qc complete', 'Is qc complete');
+  is($response_parse->{'id_run'}, '3500', 'Correct id_run');
+  is(scalar keys $response_parse->{'qc_lane_status'}, 0, 'Empty lane qc outcomes');
+  
+  
+#  $VAR1 = {
+#          'taken_by' => 'pipeline',
+#          'current_user' => undef,
+#          '' => 1,
+#          '' => 'qc complete',
+#          '' => '3500',
+#          'qc_lane_status' => {}
+#        };
+#  use Data::Dumper;
+#  print(Dumper($response_parse));
 }
 
 1;
