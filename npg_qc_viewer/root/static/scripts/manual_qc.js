@@ -171,12 +171,18 @@ var LaneMQCControl = function (index) {
         case this.CONFIG_REJECTED_PRELIMINAR : this.setRejectedPre(); break;
       }
     } else {
-      switch (lane_control.data(this.CONFIG_INITIAL)){
-        case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
-        case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
-      }
-      lane_control.find('.lane_mqc_working').empty();
+      this.loadBGFromInitial(lane_control);
     }
+  };
+  
+  this.loadBGFromInitial = function (lane_control) {
+    lane_control.extra_handler = this;
+    this.lane_control = lane_control;
+    switch (lane_control.data(this.CONFIG_INITIAL)){
+      case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
+      case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
+    }
+    lane_control.find('.lane_mqc_working').empty();
   };
 }
 
@@ -242,19 +248,7 @@ var RunMQCControl = (function () {
         }
         //Set up mqc controlers and link them to the individual lanes.
         var c = new LaneMQCControl(i);
-        c.linkControl = function(lane_control) {
-          lane_control.extra_handler = this;
-          this.lane_control = lane_control;
-          if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_FINAL 
-              || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_FINAL) {
-            switch (lane_control.data(this.CONFIG_INITIAL)){
-              case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedPre(); break;
-              case this.CONFIG_REJECTED_FINAL : this.setRejectedPre(); break;
-            }
-          }
-          lane_control.find('.lane_mqc_working').empty();
-        };
-        c.linkControl(obj);
+        c.loadBGFromInitial(obj);
       }
     }
     return result;
@@ -300,6 +294,18 @@ var RunTitleParser = (function () {
         result = match[1];
       }
     }
+    return result;
+  };
+  
+  /*
+   * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
+   * Only checks in case there is an outcome in DWH, meaning there should be an 
+   * outcome in manual QC.
+   */
+  RunTitleParser.prototype.laneOutcomesMatch = function (lanesWithBG, lanesWithoutBG, mqc_run_data) {
+    //TOOD validate lane outcomes match
+    result = true;
+    
     return result;
   };
   
