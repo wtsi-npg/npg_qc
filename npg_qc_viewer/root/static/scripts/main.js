@@ -36,47 +36,51 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 
   collapse.init();
   
-  /* 
-   * Getting the run_id from the title of the page.
-   */
-  var run_id = new NPG.QC.RunTitleParser().parseRunId($(document).find("title").text());
-  //If the run_id is there
-  if(typeof(run_id) != undefined && run_id != null) {
-    //Read information about lanes from page.
-    var lanes = [];
-    var lanesWithBG = 0, totalLanes = 0;
-    //Select non-qced lanes.
-    $('.lane_mqc_control').each(function (i, obj) {
-      totalLanes++;
-      obj = $(obj);
-      var parent = obj.parent();
-      if(parent.hasClass('passed') || parent.hasClass('failed')) {
-        lanesWithBG++;
-      } else {
-        lanes.push(parent);
-      }
-    });
-    
-    //Validate if all lanes have bg colour
-    if(lanesWithBG < totalLanes) {
+  
+  //Read information about lanes from page.
+  var lanes = [], lanesWithBG = [];
+  var totalLanes = 0;
+  //Select non-qced lanes.
+  $('.lane_mqc_control').each(function (i, obj) {
+    totalLanes++;
+    obj = $(obj);
+    var parent = obj.parent();
+    //Not considering lanes previously marked as passes/failed
+    if(parent.hasClass('passed') || parent.hasClass('failed')) {
+      lanesWithBG.push(parent);
+    } else {
+      lanes.push(parent);
+    }
+  });
+  
+  //Validate if all lanes have bg colour
+  if(lanesWithBG.length < totalLanes) { //Work with qc data
+    // Getting the run_id from the title of the page using the qc part too.
+    var id_run_qc = new NPG.QC.RunTitleParser().parse($(document).find("title").text());
+    var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
+    //If id_run and qc 
+    if(typeof(id_run) != undefined && id_run != null) {
       var jqxhr = $.ajax({
-        url: "/mqc/mqc_runs/" + run_id,
+        url: "/mqc/mqc_runs/" + id_run,
         cache: false
       }).done(function() {
         window.console && console.log( "success" );
-        var control = new NPG.QC.RunMQCControl(run_id);
-        control.initQC(jqxhr.responseJSON, lanes, 
+        var control = new NPG.QC.RunMQCControl(id_run);
+        var mqc_run_data = jqxhr.responseJSON;
+        if(id_run_qc != null && mqc_run_data.current_user != '') { //TODO try with a different user.
+          control.initQC(jqxhr.responseJSON, lanes, 
             function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
             function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
-            );
+          );  
+        } else {
+          control.showMQCOutcomes(jqxhr.responseJSON, lanes);
+        }
       }).fail(function(jqXHR, textStatus, errorThrown) {
         window.console && console.log( "error: " + errorThrown + " " + textStatus);
         $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
         //Clear progress icon
         $('.lane_mqc_working').empty();
-      }).always(function() { //TODO remove if not needed for cleaning.
-        window.console && console.log( "complete" );
-      });
+      })
     }
   }
   

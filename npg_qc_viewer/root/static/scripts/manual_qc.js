@@ -215,6 +215,51 @@ var RunMQCControl = (function () {
     return result;
   };
   
+  RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
+    var result = null;
+    window.console && window.console.log("Here!");
+    for(var i = 0; i < lanes.length; i++) {
+      lanes[i].children('.lane_mqc_control').each(function(j, obj){
+        $(obj).html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
+      });
+    }
+    
+    //Required to show error messages from the mqc process.
+    $("#results_summary").before('<ul id="ajax_status"></ul>'); 
+    
+    for(var i = 0; i < lanes.length; i++) {
+      var cells = lanes[i].children('.lane_mqc_control');
+      for(j = 0; j < cells.length; j++) {
+        obj = $(cells[j]); //Wrap as an jQuery object.
+        //Lane from row.
+        var position = obj.data('position');
+        //Filling previous outcomes
+        if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
+          //From REST
+          current_status = mqc_run_data.qc_lane_status[position];
+          //To html element, LaneControl will render.
+          obj.data('initial', current_status);
+        }
+        //Set up mqc controlers and link them to the individual lanes.
+        var c = new LaneMQCControl(i);
+        c.linkControl = function(lane_control) {
+          lane_control.extra_handler = this;
+          this.lane_control = lane_control;
+          if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_FINAL 
+              || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_FINAL) {
+            switch (lane_control.data(this.CONFIG_INITIAL)){
+              case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedPre(); break;
+              case this.CONFIG_REJECTED_FINAL : this.setRejectedPre(); break;
+            }
+          }
+          lane_control.find('.lane_mqc_working').empty();
+        };
+        c.linkControl(obj);
+      }
+    }
+    return result;
+  };
+  
   RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
     var result = null; 
     return result;
@@ -230,7 +275,7 @@ var RunTitleParser = (function () {
     this.reId = /^Results for run ([0-9]+) \(current run status:/;
   }
   
-  RunTitleParser.prototype.parseRunId = function (element) {
+  RunTitleParser.prototype.parseIdRun = function (element) {
     var match = this.reId.exec(element);
     var result = null;
     //There is a result from parsing
@@ -282,7 +327,6 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
   //Required to show error messages from the mqc process.
   $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
-  //Set up mqc controlers and link them to the individual lanes.
   for(var i = 0; i < lanes.length; i++) {
     var cells = lanes[i].children('.lane_mqc_control');
     for(j = 0; j < cells.length; j++) {
@@ -295,7 +339,8 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
         current_status = mqc_run_data.qc_lane_status[position];
         //To html element, LaneControl will render.
         obj.data('initial', current_status);
-      } 
+      }
+      //Set up mqc controlers and link them to the individual lanes.
       var c = new LaneMQCControl(i);
       c.linkControl(obj);
     }
