@@ -13,7 +13,7 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 __PACKAGE__->config( default => 'application/json' );
 
 with 'npg_qc_viewer::Util::Error';
-with 'npg_qc_viewer::Util::RestController';
+with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 
 our $VERSION = '0';
 
@@ -53,16 +53,16 @@ sub mqc_runs_GET {
       $hash_entity->{'taken_by'}                   = $ent->user->username;
       ##### Check if there are mqc values and add.
       $hash_entity->{'qc_lane_status'}             = $qc_outcomes;
-      
+
       if($authenticated) {
         #username from authentication
         $hash_entity->{'current_user'}               = $c->user->username;
         $hash_entity->{'has_manual_qc_role'}         = $c->check_user_roles(($MQC_ROLE));
       } else {
-        $hash_entity->{'current_user'}               = '';
-        $hash_entity->{'has_manual_qc_role'}         = '';
+        $hash_entity->{'current_user'}               = q[];
+        $hash_entity->{'has_manual_qc_role'}         = q[];
       }
-      
+
       $self->status_ok(
         $c,
         entity => $hash_entity,
