@@ -34,7 +34,6 @@ sub mqc_runs_GET {
       $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
       $authenticated = 1;
     } catch {
-      $error = $_;
       $authenticated = 0;
     };
 
