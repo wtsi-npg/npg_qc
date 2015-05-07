@@ -65,7 +65,7 @@ sub update_outcome : Path('update_outcome') {
     $position    = $params->{'position'};
     $new_outcome = $params->{'new_oc'};
     $id_run      = $params->{'id_run'};
-    $username    = $c->user->username || $c->user->id;
+    $username    = $c->user->username;
 
     if (!$id_run) {
       $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);

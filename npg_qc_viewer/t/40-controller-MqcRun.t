@@ -49,7 +49,7 @@ lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
     'has a response for GET request when passing credentials';
   my $response_parse = from_json($response->content, {utf8 => 1});
   is($response_parse->{'taken_by'}, q[pipeline], 'Taken by pipeline');
-  is($response_parse->{'current_user'}, undef, 'Undef current user');
+  is($response_parse->{'current_user'}, q[cat], 'Cat is current user');
   is($response_parse->{'has_manual_qc_role'}, 1, 'Has manual qc role');
   is($response_parse->{'current_status_description'}, 'qc complete', 'Is qc complete');
   is($response_parse->{'id_run'}, '3500', 'Correct id_run');
