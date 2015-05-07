@@ -50,7 +50,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
       totalLanes++;
       obj = $(obj);
       var parent = obj.parent();
-      if(parent.hasClass('passed') || parent.hasClass('failed')) { //TODO confirm is failed
+      if(parent.hasClass('passed') || parent.hasClass('failed')) {
         lanesWithBG++;
       } else {
         lanes.push(parent);
