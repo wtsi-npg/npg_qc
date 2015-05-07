@@ -54,18 +54,6 @@ lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
   is($response_parse->{'current_status_description'}, 'qc complete', 'Is qc complete');
   is($response_parse->{'id_run'}, '3500', 'Correct id_run');
   is(scalar keys $response_parse->{'qc_lane_status'}, 0, 'Empty lane qc outcomes');
-  
-  
-#  $VAR1 = {
-#          'taken_by' => 'pipeline',
-#          'current_user' => undef,
-#          '' => 1,
-#          '' => 'qc complete',
-#          '' => '3500',
-#          'qc_lane_status' => {}
-#        };
-#  use Data::Dumper;
-#  print(Dumper($response_parse));
 }
 
 1;
