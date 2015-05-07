@@ -9,11 +9,10 @@ our $VERSION = '0';
 
 requires '_set_entity';
 
-Readonly::Scalar my $RESPONSE_UNAUTHORIZED        => 401;
+Readonly::Scalar my $RESPONSE_UNAUTHORIZED          => 401;
+Readonly::Scalar my $RESPONSE_INTERNAL_SERVER_ERROR => 500;
 
 ## no critic (Documentation::RequirePodAtEnd)
-
-Readonly::Scalar my $ERROR_CODE_STRING   => q[SeqQC error code ];
 
 =head1 NAME
 
@@ -42,8 +41,21 @@ sub status_unauthorized {
   my $c    = shift @params;
   my %p    = Params::Validate::validate( @params, { message => { type => Params::Validate::SCALAR }, }, );
   $c->response->status($RESPONSE_UNAUTHORIZED);
-  if $c->debug {
+  if ($c->debug) {
     $c->log->debug(q[Status Unauthorized: ] . $p{'message'} ) ;
+  }
+  $self->_set_entity( $c, { error => $p{'message'} } );
+  return 1;
+}
+
+sub status_internal_server_error {
+  my @params = @_;
+  my $self = shift @params;
+  my $c    = shift @params;
+  my %p    = Params::Validate::validate( @params, { message => { type => Params::Validate::SCALAR }, }, );
+  $c->response->status($RESPONSE_INTERNAL_SERVER_ERROR);
+  if ($c->debug) {
+    $c->log->debug(q[Internal Server Error: ] . $p{'message'} ) ;
   }
   $self->_set_entity( $c, { error => $p{'message'} } );
   return 1;
