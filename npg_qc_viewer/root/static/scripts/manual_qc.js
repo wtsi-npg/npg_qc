@@ -215,19 +215,8 @@ var RunMQCControl = (function () {
     return result;
   };
   
-  RunMQCControl.prototype.prepareLanes = function (mqc_run_data) {
-    var result = null;
-    nLanes = lanes.length;
-    for(var i = 0; i < lLanes; i++) {
-      var lane = $(lanes[i]);
-      var current_status = null
-      position = lane.data('position');
-      var strPosition = String(position);
-      if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
-        current_status = mqc_run_data.qc_lane_status[strPosition];
-        window.console.log(str_position + ' ' + current_status);
-      }
-    } 
+  RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
+    var result = null; 
     return result;
   };
   
@@ -298,9 +287,13 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
     var cells = lanes[i].children('.lane_mqc_control');
     for(j = 0; j < cells.length; j++) {
       obj = $(cells[j]); //Wrap as an jQuery object.
+      //Lane from row.
       var position = obj.data('position');
+      //Filling previous outcomes
       if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
+        //From REST
         current_status = mqc_run_data.qc_lane_status[position];
+        //To html element, LaneControl will render.
         obj.data('initial', current_status);
       } 
       var c = new LaneMQCControl(i);
