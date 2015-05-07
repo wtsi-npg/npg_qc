@@ -6,7 +6,7 @@
 -%]
 
 <td class="[% lane_class %] nbsp">
-[%- IF run_view;
+[%- IF run_view; -%]
     <div id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'></div>
 [% END -%]
 
