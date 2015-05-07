@@ -41,7 +41,7 @@
     control.linkControl(lane);
     assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
   });
-  QUnit.test("NPG.QC.RunTitleParser", function(assert){
+  QUnit.test("NPG.QC.RunTitleParser.parse()", function(assert){
     var parser = new NPG.QC.RunTitleParser();
     var title1 = parser.parse('');
     assert.equal(title1, null, 'Can deal with empty string.');
@@ -53,6 +53,21 @@
     assert.equal(title4, null, 'Can deal with missing run_id (lexical validation)');
     var title = parser.parse('Results for run 16074 (current run status: qc in progress, taken by user)');
     assert.equal(title, '16074', 'Correctly parses run_id from correctly formed title');
+  });
+  QUnit.test("NPG.QC.RunTitleParser.parseRunId()", function(assert){
+    var parser = new NPG.QC.RunTitleParser();
+    var title1 = parser.parseRunId('');
+    assert.equal(title1, null, 'Can deal with empty string.');
+    var title2 = parser.parseRunId('Bla bla bla');
+    assert.equal(title2, null, 'Can deal with random string');
+    var title3 = parser.parseRunId('Results for run number (current run status: qc in progress, taken by user)');
+    assert.equal(title3, null, 'Can deal with non valid run_id (lexical validation)');
+    var title4 = parser.parseRunId('Results for run (current run status: qc in progress, taken by user)');
+    assert.equal(title4, null, 'Can deal with missing run_id (lexical validation)');
+    var title5 = parser.parseRunId('Results for run 16074 (current run status: qc in progress, taken by user)');
+    assert.equal(title5, '16074', 'Correctly parses run_id from correctly formed title');
+    var title6 = parser.parseRunId('Results for run 16074 (current run status: ');
+    assert.equal(title6, '16074', 'Correctly parses run_id from non qc title');
   });
   QUnit.test("NPG.QC.RunMQCControl", function(assert){
     var data1 = null; 
