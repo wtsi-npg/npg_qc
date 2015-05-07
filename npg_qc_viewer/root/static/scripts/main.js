@@ -70,8 +70,10 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
             function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
             );
       }).fail(function(jqXHR, textStatus, errorThrown) {
-        window.console && console.log( "error " + " " + textStatus + " " + errorThrown);
-        //TODO 500
+        window.console && console.log( "error: " + errorThrown + " " + textStatus);
+        $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
+        //Clear progress icon
+        $('.lane_mqc_working').empty();
       }).always(function() { //TODO remove if not needed for cleaning.
         window.console && console.log( "complete" );
       });
