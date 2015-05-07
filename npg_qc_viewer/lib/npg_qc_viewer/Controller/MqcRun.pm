@@ -19,7 +19,6 @@ our $VERSION = '0';
 
 Readonly::Scalar my $MQC_ROLE                     => q[manual_qc];
 Readonly::Scalar my $RESPONSE_OK_CODE             => 200;
-Readonly::Scalar my $RESPONSE_UNAUTHORIZED        => 401;
 
 ## no critic (NamingConventions::Capitalization)
 sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
@@ -76,12 +75,10 @@ sub mqc_runs_GET {
 
   if ($error) {
     ( $error, $error_code ) = $self->parse_error($error);
-    if ($error_code == $RESPONSE_UNAUTHORIZED) {
-        $self->status_unauthorized(
-          $c,
-          message => $error,
-        );
-    }
+    $self->status_internal_server_error(
+      $c,
+      message => $error,
+    );
   }
 
   return;
