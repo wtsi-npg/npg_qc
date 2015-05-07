@@ -12,29 +12,6 @@ requires '_set_entity';
 Readonly::Scalar my $RESPONSE_UNAUTHORIZED          => 401;
 Readonly::Scalar my $RESPONSE_INTERNAL_SERVER_ERROR => 500;
 
-## no critic (Documentation::RequirePodAtEnd)
-
-=head1 NAME
-
-npg_qc_viewer::Util::ExtendedHttpStatus
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-Moose role for extending functionality of REST controller by adding
-subs for extra response codes.
-
-=head1 SUBROUTINES/METHODS
-
-=head2 status_unauthorized
-
- Returns a "401 Unauthorized" response. Takes a "message" argument
- as a scalar, which will become the value of "error" in the serialized
- response.
-
-=cut
-
 sub status_unauthorized {
   my @params = @_;
   my $self = shift @params;
@@ -63,6 +40,31 @@ sub status_internal_server_error {
 
 1;
 __END__
+
+=head1 NAME
+
+npg_qc_viewer::Util::ExtendedHttpStatus
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Moose role for extending functionality of REST controller by adding
+subs for extra response codes.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 status_unauthorized
+
+ Returns a "401 Unauthorized" response. Takes a "message" argument
+ as a scalar, which will become the value of "error" in the serialized
+ response.
+
+=head2 status_internal_server_error
+
+ Returns a "500 internal server error" response. Takes a "message" argument
+ as a scalar, which will become the value of "error" in the serialized
+ response.
 
 =head1 DIAGNOSTICS
 
