@@ -291,10 +291,28 @@ var RunMQCControl = (function () {
    * Only checks in case there is an outcome in DWH, meaning there should be an 
    * outcome in manual QC.
    */
-  RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, lanesWithoutBG, mqc_run_data) {
-    //TOOD validate lane outcomes match
+  RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, mqc_run_data) {
     result = true;
-    
+    for(var i = 0; i < lanesWithBG.length && result; i++) {
+      var cells = lanesWithBG[i].children('.lane_mqc_control');
+      for(j = 0; j < cells.length && result; j++) {
+        obj = $(cells[j]); //Wrap as an jQuery object.
+        //Lane from row.
+        var position = obj.data('position');
+        //Filling previous outcomes
+        if('qc_lane_status' in mqc_run_data) {
+          if (position in mqc_run_data.qc_lane_status) {
+            //From REST
+            currentStatusFromREST = mqc_run_data.qc_lane_status[position];
+            //To html element, LaneControl will render.
+            currentStatusFromView = obj.data('initial');
+            result = String(currentStatusFromREST) == String(currentStatusFromView);
+          } else {
+            result = false;
+          }
+        }
+      }
+    }
     return result;
   };
 
