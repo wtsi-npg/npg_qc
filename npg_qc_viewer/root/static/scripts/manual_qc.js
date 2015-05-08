@@ -309,20 +309,6 @@ var RunTitleParser = (function () {
     return result;
   };
   
-  RunTitleParser.prototype.parse = function (element) {
-    var match = this.reIdFull.exec(element);
-    var result = null;
-    //There is a result from parsing
-    if (match != null) {
-      //The result of parse looks like a parse 
-      // and has correct number of elements
-      if(match.constructor === Array && match.length >= 2) {
-        result = match[1];
-      }
-    }
-    return result;
-  };
-  
   /*
    * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
    * Only checks in case there is an outcome in DWH, meaning there should be an 
