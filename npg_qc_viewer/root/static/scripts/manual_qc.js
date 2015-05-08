@@ -175,6 +175,10 @@ var LaneMQCControl = function (index) {
     }
   };
   
+  /*
+   * Changes the background of the parent element depending on the initial outcome
+   * of the lane.
+   */
   this.loadBGFromInitial = function (lane_control) {
     lane_control.extra_handler = this;
     this.lane_control = lane_control;
