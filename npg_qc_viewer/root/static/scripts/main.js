@@ -66,15 +66,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
         window.console && console.log( "success" );
         var control = new NPG.QC.RunMQCControl(id_run);
         var mqc_run_data = jqxhr.responseJSON;
-        if(typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
-          && typeof(mqc_run_data.current_user)!= undefined
-          && typeof(mqc_run_data.has_manual_qc_role)!= undefined
-          && typeof(mqc_run_data.current_status_description)!= undefined
-          && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
-          && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
-          && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
-            || mqc_run_data.current_status_description == 'qc on hold')) { //TODO move to class
-          
+        if(control.isStateForMQC(mqc_run_data)) {
           control.initQC(jqxhr.responseJSON, lanes, 
             function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
             function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 

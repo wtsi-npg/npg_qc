@@ -205,21 +205,10 @@ var RunMQCControl = (function () {
    */
   RunMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
     var result = null;
-    var control = this;
     if(typeof(mqc_run_data) != undefined && mqc_run_data != null) { //There is a data object
       this.mqc_run_data = mqc_run_data;
-      if(typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
-          && typeof(mqc_run_data.current_user)!= undefined
-          && typeof(mqc_run_data.has_manual_qc_role)!= undefined
-          && typeof(mqc_run_data.current_status_description)!= undefined) {
-        if(mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
-            && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
-            && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
-              || mqc_run_data.current_status_description == 'qc on hold')) { //TODO move to class
-          result = targetFunction(mqc_run_data, control, lanes);
-        } else {
-          result = mopFunction();
-        }
+      if(this.isStateForMQC(mqc_run_data)) {
+        result = targetFunction(mqc_run_data, this, lanes);
       } else {
         result = mopFunction();
       }
@@ -228,6 +217,18 @@ var RunMQCControl = (function () {
     }
     return result;
   };
+  
+  RunMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
+    var result = typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
+      && typeof(mqc_run_data.current_user)!= undefined
+      && typeof(mqc_run_data.has_manual_qc_role)!= undefined
+      && typeof(mqc_run_data.current_status_description)!= undefined
+      && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
+      && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
+      && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
+        || mqc_run_data.current_status_description == 'qc on hold')
+    return result;
+  } 
   
   RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
     var result = null;
