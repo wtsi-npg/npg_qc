@@ -199,6 +199,10 @@ var RunMQCControl = (function () {
     this.mqc_run_data = null;
   }
   
+  /*
+   * Validates qc conditions and if everything is ready for qc it will call the 
+   * target function passing parameters. If not qc ready will call mop function.
+   */
   RunMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
     var result = null;
     var control = this;
@@ -269,7 +273,6 @@ NPG.QC.RunMQCControl = RunMQCControl;
 
 var RunTitleParser = (function () {
   function RunTitleParser() {
-    this.reIdFull = /^Results for run ([0-9]+) \(current run status: (qc in progress|qc on hold), taken by ([a-zA-Z0-9])+\)$/;
     this.reId = /^Results for run ([0-9]+) \(current run status:/;
   }
   
