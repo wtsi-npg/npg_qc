@@ -30,12 +30,13 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-
 require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib'], 
 function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 
   collapse.init();
   
+  //Required to show error messages from the mqc process.
+  $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
   //Read information about lanes from page.
   var lanes = [], lanesWithBG = [];

@@ -239,9 +239,6 @@ var RunMQCControl = (function () {
       });
     }
     
-    //Required to show error messages from the mqc process.
-    $("#results_summary").before('<ul id="ajax_status"></ul>'); 
-    
     for(var i = 0; i < lanes.length; i++) {
       var cells = lanes[i].children('.lane_mqc_control');
       for(j = 0; j < cells.length; j++) {
@@ -363,10 +360,6 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
   //Preload rest of icons
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
-  
-  //Required to show error messages from the mqc process.
-  $("#results_summary").before('<ul id="ajax_status"></ul>'); 
-  
-  //TODO Move to method in controller and call method.
+    
   runMQCControl.prepareLanes(mqc_run_data, lanes);
 }
