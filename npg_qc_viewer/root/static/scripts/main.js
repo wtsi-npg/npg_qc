@@ -91,60 +91,59 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
     }
   }
   
-  
   jQuery('.bcviz_insert_size').each(function(i) { 
-        d = jQuery(this).data('check');
-        w = jQuery(this).data('width') || 650;
-        h = jQuery(this).data('height') || 300;
-        t = jQuery(this).data('title') || _getTitle('Insert Sizes : ',d);
-        chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
-        if (chart != null) {
-            if (chart.svg != null) {
+    d = jQuery(this).data('check');
+    w = jQuery(this).data('width') || 650;
+    h = jQuery(this).data('height') || 300;
+    t = jQuery(this).data('title') || _getTitle('Insert Sizes : ',d);
+    chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
+    if (chart != null) {
+      if (chart.svg != null) {
         div = document.createElement("div");
         jQuery(div).append(function() { return chart.svg.node(); } );
         jQuery(div).addClass('chart');
         jQuery(this).append(div);
-            }
-        }
-    });
+      }
+    }
+  });
   
-        jQuery('.bcviz_adapter').each(function(i) { 
-        d = jQuery(this).data('check');
-        h = jQuery(this).data('height') || 200;
-        t = jQuery(this).data('title') || _getTitle('Adapter Start Count : ', d);
+  jQuery('.bcviz_adapter').each(function(i) { 
+    d = jQuery(this).data('check');
+    h = jQuery(this).data('height') || 200;
+    t = jQuery(this).data('title') || _getTitle('Adapter Start Count : ', d);
 
     // override width to ensure two graphs can fit side by side
     w = jQuery(this).parent().width() / 2 - 40;
     chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
-        fwd_div = document.createElement("div");
-        if (chart != null && chart.svg_fwd != null) { jQuery(fwd_div).append( function() { return chart.svg_fwd.node(); } ); }
-        jQuery(fwd_div).addClass('chart_left');
-        rev_div = document.createElement("div");
-        if (chart != null && chart.svg_rev != null) { jQuery(rev_div).append( function() { return chart.svg_rev.node(); } ); }
-        jQuery(rev_div).addClass('chart_right');
-        jQuery(this).append(fwd_div,rev_div);
+    fwd_div = document.createElement("div");
+    if (chart != null && chart.svg_fwd != null) { jQuery(fwd_div).append( function() { return chart.svg_fwd.node(); } ); }
+    jQuery(fwd_div).addClass('chart_left');
+    rev_div = document.createElement("div");
+    if (chart != null && chart.svg_rev != null) { jQuery(rev_div).append( function() { return chart.svg_rev.node(); } ); }
+    jQuery(rev_div).addClass('chart_right');
+    jQuery(this).append(fwd_div,rev_div);
   });
 
   jQuery('.bcviz_mismatch').each(function(i) { 
-        d = jQuery(this).data('check');
-        h = jQuery(this).data('height');
-        t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
+    d = jQuery(this).data('check');
+    h = jQuery(this).data('height');
+    t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
 
     // override width to ensure two graphs can fit side by side
     w = jQuery(this).parent().width() / 2 - 90;
     chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
-        fwd_div = document.createElement("div");
-        if (chart != null && chart.svg_fwd != null) { jQuery(fwd_div).append( function() { return chart.svg_fwd.node(); } ); }
-        jQuery(fwd_div).addClass('chart_left');
+    fwd_div = document.createElement("div");
+    if (chart != null && chart.svg_fwd != null) { jQuery(fwd_div).append( function() { return chart.svg_fwd.node(); } ); }
+    jQuery(fwd_div).addClass('chart_left');
 
-        rev_div = document.createElement("div");
-        if (chart != null && chart.svg_rev != null) { jQuery(rev_div).append( function() { return chart.svg_rev.node(); } ); }
-        jQuery(rev_div).addClass('chart_right');
+    rev_div = document.createElement("div");
+    if (chart != null && chart.svg_rev != null) { jQuery(rev_div).append( function() { return chart.svg_rev.node(); } ); }
+    jQuery(rev_div).addClass('chart_right');
 
-        leg_div = document.createElement("div");
-        if (chart != null && chart.svg_legend != null) { jQuery(leg_div).append( function() { return chart.svg_legend.node(); } ); }
-        jQuery(leg_div).addClass('chart_legend');
+    leg_div = document.createElement("div");
+    if (chart != null && chart.svg_legend != null) { jQuery(leg_div).append( function() { return chart.svg_legend.node(); } ); }
+    jQuery(leg_div).addClass('chart_legend');
 
-        jQuery(this).append(fwd_div,rev_div,leg_div);
+    jQuery(this).append(fwd_div,rev_div,leg_div);
   });
 });
