@@ -263,7 +263,25 @@ var RunMQCControl = (function () {
   };
   
   RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
-    var result = null; 
+    var result = null;
+    for(var i = 0; i < lanes.length; i++) {
+      var cells = lanes[i].children('.lane_mqc_control');
+      for(j = 0; j < cells.length; j++) {
+        obj = $(cells[j]); //Wrap as an jQuery object.
+        //Lane from row.
+        var position = obj.data('position');
+        //Filling previous outcomes
+        if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
+          //From REST
+          current_status = mqc_run_data.qc_lane_status[position];
+          //To html element, LaneControl will render.
+          obj.data('initial', current_status);
+        }
+        //Set up mqc controlers and link them to the individual lanes.
+        var c = new LaneMQCControl(i);
+        c.linkControl(obj);
+      }
+    }
     return result;
   };
   
@@ -326,36 +344,23 @@ NPG.QC.RunTitleParser = RunTitleParser;
 * lanes with GUI controls when necessary.
 */
 function getQcState(mqc_run_data, runMQCControl, lanes) {
-  //Preload images
-  $('<img/>')[0].src = "/static/images/tick.png";
-  $('<img/>')[0].src = "/static/images/cross.png";
+  //Preload images for working icon
   $('<img/>')[0].src = "/static/images/waiting.gif";
 
+  //Show working icons
   for(var i = 0; i < lanes.length; i++) {
     lanes[i].children('.lane_mqc_control').each(function(j, obj){
       $(obj).html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
     });
   }
   
+  //Preload rest of icons
+  $('<img/>')[0].src = "/static/images/tick.png";
+  $('<img/>')[0].src = "/static/images/cross.png";
+  
   //Required to show error messages from the mqc process.
   $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
-  for(var i = 0; i < lanes.length; i++) {
-    var cells = lanes[i].children('.lane_mqc_control');
-    for(j = 0; j < cells.length; j++) {
-      obj = $(cells[j]); //Wrap as an jQuery object.
-      //Lane from row.
-      var position = obj.data('position');
-      //Filling previous outcomes
-      if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
-        //From REST
-        current_status = mqc_run_data.qc_lane_status[position];
-        //To html element, LaneControl will render.
-        obj.data('initial', current_status);
-      }
-      //Set up mqc controlers and link them to the individual lanes.
-      var c = new LaneMQCControl(i);
-      c.linkControl(obj);
-    }
-  }
+  //TODO Move to method in controller and call method.
+  runMQCControl.prepareLanes(mqc_run_data, lanes);
 }
