@@ -286,6 +286,19 @@ var RunMQCControl = (function () {
     return result;
   };
   
+  /*
+   * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
+   * Only checks in case there is an outcome in DWH, meaning there should be an 
+   * outcome in manual QC.
+   */
+  RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, lanesWithoutBG, mqc_run_data) {
+    //TOOD validate lane outcomes match
+    result = true;
+    
+    return result;
+  };
+
+  
   return RunMQCControl;
 }) ();
 NPG.QC.RunMQCControl = RunMQCControl;
@@ -306,18 +319,6 @@ var RunTitleParser = (function () {
         result = match[1];
       }
     }
-    return result;
-  };
-  
-  /*
-   * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
-   * Only checks in case there is an outcome in DWH, meaning there should be an 
-   * outcome in manual QC.
-   */
-  RunTitleParser.prototype.laneOutcomesMatch = function (lanesWithBG, lanesWithoutBG, mqc_run_data) {
-    //TOOD validate lane outcomes match
-    result = true;
-    
     return result;
   };
   
