@@ -79,6 +79,8 @@ root/static/scripts/manual_qc.js
 root/static/stylesheets/npg_seqqc.css
 root/static/test/test.html
 root/static/test/test.js
+root/static/test/images/cross.png
+root/static/test/images/tick.png
 script/npg_qc_viewer_cgi.pl
 script/npg_qc_viewer_create.pl
 script/npg_qc_viewer_fastcgi.pl
