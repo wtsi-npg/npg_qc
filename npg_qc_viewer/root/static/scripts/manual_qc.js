@@ -258,6 +258,11 @@ var RunMQCControl = (function () {
     return result;
   };
   
+  /*
+   * Update values in lanes with values from REST. Then link the lane
+   * to a controller. The lane controller will update with widgets or
+   * with proper background.
+   */
   RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
     var result = null;
     for(var i = 0; i < lanes.length; i++) {
