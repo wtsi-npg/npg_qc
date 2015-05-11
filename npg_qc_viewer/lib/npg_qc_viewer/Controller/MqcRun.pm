@@ -18,7 +18,6 @@ with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 our $VERSION = '0';
 
 Readonly::Scalar my $MQC_ROLE                     => q[manual_qc];
-Readonly::Scalar my $RESPONSE_OK_CODE             => 200;
 
 ## no critic (NamingConventions::Capitalization)
 sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
@@ -70,7 +69,7 @@ sub mqc_runs_GET {
     $error = $_;
   };
 
-  my $error_code = $RESPONSE_OK_CODE;
+  my $error_code;
 
   if ($error) {
     ( $error, $error_code ) = $self->parse_error($error);
@@ -83,7 +82,7 @@ sub mqc_runs_GET {
   return;
 }
 
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
 
