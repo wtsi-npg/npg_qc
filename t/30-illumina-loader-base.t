@@ -2,14 +2,18 @@ use strict;
 use warnings;
 use Test::More tests => 22;
 use Test::Exception;
+use Moose::Meta::Class;
 use npg_testing::db;
 
 BEGIN {
   use_ok(q{npg_qc::illumina::loader::base});
 }
 
-$ENV{dev} = 'test';
-my $schema = npg_testing::db::deploy_test_db(q[npg_qc::Schema],q[t/data/fixtures]);
+local $ENV{'dev'} = 'test';
+my $schema = Moose::Meta::Class->create_anon_class(
+  roles => [qw/npg_testing::db/])
+  ->new_object({ config_file => q[data/npg_qc_web/config.ini],})
+  ->deploy_test_db(q[npg_qc::Schema],q[t/data/fixtures]);
 
 {
   #test for paird run

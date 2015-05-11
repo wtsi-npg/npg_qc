@@ -2,14 +2,23 @@ use strict;
 use warnings;
 use Test::More tests => 10;
 use Test::Exception;
+use Moose::Meta::Class;
 use npg_testing::db;
 
 BEGIN {
   use_ok(q{npg_qc::illumina::loader});
 }
 
-$ENV{dev} = 'test';
-my $schema = npg_testing::db::deploy_test_db(q[npg_qc::Schema],q[t/data/fixtures]);
+$ENV{'dev'} = 'test';
+my $config_file = q[data/npg_qc_web/config.ini];
+my $schema = Moose::Meta::Class->create_anon_class(
+  roles => [qw/npg_testing::db/])
+  ->new_object({ config_file => $config_file,})
+  ->deploy_test_db(q[npg_qc::Schema], q[t/data/fixtures]);
+$schema->_set_config_file($config_file); # we need to propagate the location of the db config file
+                                         # to Clearpress models, see _build_npg_qc_util
+                                         # in npg_qc::illumina::loader::Run_Caching
+
 {
   my $loader;
   lives_ok { $loader = npg_qc::illumina::loader->new(); } q{loader object creation ok};

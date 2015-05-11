@@ -309,8 +309,8 @@ var RunMQCControl = (function () {
    */
   RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, mqc_run_data) {
     result = Object;
-    result['outcome'] = true
-    result['position'] = null;
+    result['outcome'] = true; //Outcome of the validation.
+    result['position'] = null; //Which lane has the problem (if there is a problem).
     for(var i = 0; i < lanesWithBG.length && result; i++) {
       var cells = lanesWithBG[i].children('.lane_mqc_control');
       for(j = 0; j < cells.length && result; j++) {
