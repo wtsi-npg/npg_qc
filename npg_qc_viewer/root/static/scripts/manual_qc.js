@@ -217,6 +217,12 @@ var RunMQCControl = (function () {
     return result;
   };
   
+  /*
+   * Checks all conditions related with the user in session and the
+   * status of the run. Validates the user has privileges, has role,
+   * the run is in correct status and the user in session is the
+   * same as the user who took the QCing.
+   */
   RunMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
     var result = typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
       && typeof(mqc_run_data.current_user)!= undefined
