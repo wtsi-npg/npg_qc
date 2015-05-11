@@ -192,6 +192,10 @@ var LaneMQCControl = function (index) {
 var NPG = NPG || {};
 NPG.QC = NPG.QC || {};
 
+/*
+ * Object with rules for general things about QC and its
+ * user interface.
+ */
 var RunMQCControl = (function () {
   function RunMQCControl(run_id) {
     this.run_id = run_id;
