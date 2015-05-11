@@ -321,14 +321,23 @@ var RunMQCControl = (function () {
 }) ();
 NPG.QC.RunMQCControl = RunMQCControl;
 
+/*
+ * Object to deal with id_run parsing from text.
+ */
 var RunTitleParser = (function () {
   function RunTitleParser() {
     this.reId = /^Results for run ([0-9]+) \(current run status:/;
   }
   
-  RunTitleParser.prototype.parseIdRun = function (element) {
-    var match = this.reId.exec(element);
+  /*
+   * Parses the id_run from the title (or text) passed as param.
+   * It looks for first integer using a regexp.
+   * 
+   * "^Results for run ([0-9]+) \(current run status:"
+   */
+  RunTitleParser.prototype.parseIdRun = function (text) {
     var result = null;
+    var match = this.reId.exec(text);
     //There is a result from parsing
     if (match != null) {
       //The result of parse looks like a parse 
