@@ -21,6 +21,7 @@ if($EVAL_ERROR) {
 			   -exclude  => [ 'tidy',
                              'ValuesAndExpressions::ProhibitImplicitNewlines',
                              'ValuesAndExpressions::RequireConstantVersion',
+                             'Miscellanea::RequireRcsKeywords',
                             ],
                -profile  => 't/perlcriticrc',
                -verbose  => "%m at %f line %l, policy %p\n",
