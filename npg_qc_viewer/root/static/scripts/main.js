@@ -64,7 +64,6 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
         url: "/mqc/mqc_runs/" + id_run,
         cache: false
       }).done(function() {
-        window.console && console.log( "success" );
         var control = new NPG.QC.RunMQCControl(id_run);
         var mqc_run_data = jqxhr.responseJSON;
         if(control.isStateForMQC(mqc_run_data)) {

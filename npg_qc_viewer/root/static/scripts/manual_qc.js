@@ -55,7 +55,6 @@ var LaneMQCControl = function (index) {
       //AJAX call.
       $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
         var response = data;
-        window.console && console.log(response.message);
         control.lane_control.find('.lane_mqc_working').empty();
       }, "json")
       .done(function() {
@@ -232,7 +231,6 @@ var RunMQCControl = (function () {
   
   RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
     var result = null;
-    window.console && window.console.log("Here!");
     for(var i = 0; i < lanes.length; i++) {
       lanes[i].children('.lane_mqc_control').each(function(j, obj){
         $(obj).html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
