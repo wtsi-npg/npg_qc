@@ -30,14 +30,17 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-
 require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib'], 
 function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 
   collapse.init();
   
+  //Required to show error messages from the mqc process.
+  $("#results_summary").before('<ul id="ajax_status"></ul>'); 
+  
   //Read information about lanes from page.
-  var lanes = [], lanesWithBG = [];
+  var lanes = []; //Lanes without previous QC, blank BG 
+  var lanesWithBG = []; //Lanes with previous QC, BG with colour 
   var totalLanes = 0;
   //Select non-qced lanes.
   $('.lane_mqc_control').each(function (i, obj) {
@@ -51,45 +54,45 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
       lanes.push(parent);
     }
   });
-  
-  var qc = function () {
-    //do whatever here..
-    //Validate if all lanes have bg colour
-    if(lanesWithBG.length < totalLanes) { //Work with qc data
-      // Getting the run_id from the title of the page using the qc part too.
-      var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
-      //If id_run
-      if(typeof(id_run) != undefined && id_run != null) {
-        var jqxhr = $.ajax({
-          url: "/mqc/mqc_runs/" + id_run,
-          cache: false
-        }).done(function() {
-          window.console && console.log( "success" );
-          var control = new NPG.QC.RunMQCControl(id_run);
-          var mqc_run_data = jqxhr.responseJSON;
-          if(typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
-            && typeof(mqc_run_data.current_user)!= undefined
-            && typeof(mqc_run_data.has_manual_qc_role)!= undefined
-            && typeof(mqc_run_data.current_status_description)!= undefined
-            && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
-            && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
-            && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
-              || mqc_run_data.current_status_description == 'qc on hold')) { //TODO move to class
-            
+
+var qc = function () {
+  //Validate if all lanes have bg colour
+  if(lanesWithBG.length < totalLanes) { //Work with qc data
+    // Getting the run_id from the title of the page using the qc part too.
+    var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
+    //If id_run
+    if(typeof(id_run) != undefined && id_run != null) {
+      var jqxhr = $.ajax({
+        url: "/mqc/mqc_runs/" + id_run,
+        cache: false
+      }).done(function() {
+        var control = new NPG.QC.RunMQCControl(id_run);
+        var mqc_run_data = jqxhr.responseJSON;
+        if(control.isStateForMQC(mqc_run_data)) {
+          var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data); 
+          if(DWHMatch.outcome) {
             control.initQC(jqxhr.responseJSON, lanes, 
-              function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
-              function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
+                function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
+                function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
             );  
           } else {
-            control.showMQCOutcomes(jqxhr.responseJSON, lanes);
+            $("#ajax_status").append("<li class='failed_mqc'>Conflicting data when comparing Data Ware House and Manual QC databases for run: "
+                + id_run
+                + ", lane: " 
+                + DWHMatch.position 
+                + ". Displaying of QC widgets aborted.</li>");
+            //Clear progress icon
+            $('.lane_mqc_working').empty();
           }
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-          window.console && console.log( "error: " + errorThrown + " " + textStatus);
-          $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
-          //Clear progress icon
-          $('.lane_mqc_working').empty();
-        })
-      }
+        } else {
+          control.showMQCOutcomes(jqxhr.responseJSON, lanes);
+        }
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        window.console && console.log( "error: " + errorThrown + " " + textStatus);
+        $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
+        //Clear progress icon
+        $('.lane_mqc_working').empty();
+      })
     }
   };
   

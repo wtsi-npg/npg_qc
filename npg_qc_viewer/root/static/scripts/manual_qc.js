@@ -55,7 +55,6 @@ var LaneMQCControl = function (index) {
       //AJAX call.
       $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
         var response = data;
-        window.console && console.log(response.message);
         control.lane_control.find('.lane_mqc_working').empty();
       }, "json")
       .done(function() {
@@ -193,6 +192,10 @@ var LaneMQCControl = function (index) {
 var NPG = NPG || {};
 NPG.QC = NPG.QC || {};
 
+/*
+ * Object with rules for general things about QC and its
+ * user interface.
+ */
 var RunMQCControl = (function () {
   function RunMQCControl(run_id) {
     this.run_id = run_id;
@@ -205,21 +208,10 @@ var RunMQCControl = (function () {
    */
   RunMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
     var result = null;
-    var control = this;
     if(typeof(mqc_run_data) != undefined && mqc_run_data != null) { //There is a data object
       this.mqc_run_data = mqc_run_data;
-      if(typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
-          && typeof(mqc_run_data.current_user)!= undefined
-          && typeof(mqc_run_data.has_manual_qc_role)!= undefined
-          && typeof(mqc_run_data.current_status_description)!= undefined) {
-        if(mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
-            && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
-            && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
-              || mqc_run_data.current_status_description == 'qc on hold')) { //TODO move to class
-          result = targetFunction(mqc_run_data, control, lanes);
-        } else {
-          result = mopFunction();
-        }
+      if(this.isStateForMQC(mqc_run_data)) {
+        result = targetFunction(mqc_run_data, this, lanes);
       } else {
         result = mopFunction();
       }
@@ -229,17 +221,31 @@ var RunMQCControl = (function () {
     return result;
   };
   
+  /*
+   * Checks all conditions related with the user in session and the
+   * status of the run. Validates the user has privileges, has role,
+   * the run is in correct status and the user in session is the
+   * same as the user who took the QCing.
+   */
+  RunMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
+    var result = typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
+      && typeof(mqc_run_data.current_user)!= undefined
+      && typeof(mqc_run_data.has_manual_qc_role)!= undefined
+      && typeof(mqc_run_data.current_status_description)!= undefined
+      && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
+      && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
+      && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
+        || mqc_run_data.current_status_description == 'qc on hold')
+    return result;
+  } 
+  
   RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
     var result = null;
-    window.console && window.console.log("Here!");
     for(var i = 0; i < lanes.length; i++) {
       lanes[i].children('.lane_mqc_control').each(function(j, obj){
         $(obj).html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
       });
     }
-    
-    //Required to show error messages from the mqc process.
-    $("#results_summary").before('<ul id="ajax_status"></ul>'); 
     
     for(var i = 0; i < lanes.length; i++) {
       var cells = lanes[i].children('.lane_mqc_control');
@@ -262,6 +268,11 @@ var RunMQCControl = (function () {
     return result;
   };
   
+  /*
+   * Update values in lanes with values from REST. Then link the lane
+   * to a controller. The lane controller will update with widgets or
+   * with proper background.
+   */
   RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
     var result = null;
     for(var i = 0; i < lanes.length; i++) {
@@ -285,52 +296,78 @@ var RunMQCControl = (function () {
     return result;
   };
   
+  /*
+   * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
+   * Only checks in case there is an outcome in DWH, meaning there should be an 
+   * outcome in manual QC.
+   * 
+   * It returns a value object with two properties:
+   * 
+   *  outcome: true/false for the result of the match. 
+   *  position: null if matching, number of the first lane where there was a missmatch
+   *   otherwise.
+   */
+  RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, mqc_run_data) {
+    result = Object;
+    result['outcome'] = true
+    result['position'] = null;
+    for(var i = 0; i < lanesWithBG.length && result; i++) {
+      var cells = lanesWithBG[i].children('.lane_mqc_control');
+      for(j = 0; j < cells.length && result; j++) {
+        obj = $(cells[j]); //Wrap as an jQuery object.
+        //Lane from row.
+        var position = obj.data('position');
+        //Filling previous outcomes
+        if('qc_lane_status' in mqc_run_data) {
+          if (position in mqc_run_data.qc_lane_status) {
+            //From REST
+            currentStatusFromREST = mqc_run_data.qc_lane_status[position];
+            //From DOM
+            currentStatusFromView = obj.data('initial');
+            if(String(currentStatusFromREST) != String(currentStatusFromView) ) {
+              window.console && window.console.log('Warning: conflicting outcome in DWH/MQC, position ' 
+                  + position + ' DWH:' + String(currentStatusFromView) 
+                  + ' / MQC:' + String(currentStatusFromREST));
+            }
+          } else {
+            result.outcome = false;
+            result.position = position;
+          }
+        }
+      }
+    }
+    return result;
+  };
+
   return RunMQCControl;
 }) ();
 NPG.QC.RunMQCControl = RunMQCControl;
 
+/*
+ * Object to deal with id_run parsing from text.
+ */
 var RunTitleParser = (function () {
   function RunTitleParser() {
     this.reId = /^Results for run ([0-9]+) \(current run status:/;
   }
   
-  RunTitleParser.prototype.parseIdRun = function (element) {
-    var match = this.reId.exec(element);
-    var result = null;
-    //There is a result from parsing
-    if (match != null) {
-      //The result of parse looks like a parse 
-      // and has correct number of elements
-      if(match.constructor === Array && match.length >= 2) {
-        result = match[1];
-      }
-    }
-    return result;
-  };
-  
-  RunTitleParser.prototype.parse = function (element) {
-    var match = this.reIdFull.exec(element);
-    var result = null;
-    //There is a result from parsing
-    if (match != null) {
-      //The result of parse looks like a parse 
-      // and has correct number of elements
-      if(match.constructor === Array && match.length >= 2) {
-        result = match[1];
-      }
-    }
-    return result;
-  };
-  
   /*
-   * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
-   * Only checks in case there is an outcome in DWH, meaning there should be an 
-   * outcome in manual QC.
+   * Parses the id_run from the title (or text) passed as param.
+   * It looks for first integer using a regexp.
+   * 
+   * "^Results for run ([0-9]+) \(current run status:"
    */
-  RunTitleParser.prototype.laneOutcomesMatch = function (lanesWithBG, lanesWithoutBG, mqc_run_data) {
-    //TOOD validate lane outcomes match
-    result = true;
-    
+  RunTitleParser.prototype.parseIdRun = function (text) {
+    var result = null;
+    var match = this.reId.exec(text);
+    //There is a result from parsing
+    if (match != null) {
+      //The result of parse looks like a parse 
+      // and has correct number of elements
+      if(match.constructor === Array && match.length >= 2) {
+        result = match[1];
+      }
+    }
     return result;
   };
   
@@ -357,10 +394,6 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
   //Preload rest of icons
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
-  
-  //Required to show error messages from the mqc process.
-  $("#results_summary").before('<ul id="ajax_status"></ul>'); 
-  
-  //TODO Move to method in controller and call method.
+    
   runMQCControl.prepareLanes(mqc_run_data, lanes);
 }

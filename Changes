@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Removing MQC logic from templates and moving it to JS
+ - Adding a controller to provide MQC status for a run using REST
+ - Adding a role to provide functionality for 401 responses
+
 release 57.10
  - total_reads now returns 0 when num_total_reads is 0 rather than undef
  - add support for metrics files produced by bamstreamingmarkduplicates
