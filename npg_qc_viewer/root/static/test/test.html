@@ -43,6 +43,8 @@
   });
   QUnit.test("NPG.QC.RunTitleParser.parseRunId()", function(assert){
     var parser = new NPG.QC.RunTitleParser();
+    assert.throws(function() {parser.parseIdRun();}, /invalid arguments/, "Validates non-empty arguments");
+    assert.throws(function() {parser.parseIdRun(null);}, /invalid arguments/, "Validates null argument");
     var title1 = parser.parseIdRun('');
     assert.equal(title1, null, 'Can deal with empty string.');
     var title2 = parser.parseIdRun('Bla bla bla');
