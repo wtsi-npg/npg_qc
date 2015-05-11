@@ -51,19 +51,11 @@ sub mqc_runs_GET {
       ##### Check if there are mqc values and add.
       $hash_entity->{'qc_lane_status'}             = $qc_outcomes;
 
-      if($authenticated) {
-        #username from authentication
-        $hash_entity->{'current_user'}               = $c->user->username;
-        $hash_entity->{'has_manual_qc_role'}         = $c->check_user_roles(($MQC_ROLE));
-      } else {
-        $hash_entity->{'current_user'}               = q[];
-        $hash_entity->{'has_manual_qc_role'}         = q[];
-      }
+      #username from authentication
+      $hash_entity->{'current_user'}               = $authenticated ? $c->user->username                : q[];
+      $hash_entity->{'has_manual_qc_role'}         = $authenticated ? $c->check_user_roles(($MQC_ROLE)) : q[];
 
-      $self->status_ok(
-        $c,
-        entity => $hash_entity,
-      );
+      $self->status_ok($c, entity => $hash_entity,);
     }
   } catch {
     $error = $_;
