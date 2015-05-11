@@ -3,6 +3,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - Removing MQC logic from templates and moving it to JS
  - Adding a controller to provide MQC status for a run using REST
  - Adding a role to provide functionality for 401 responses
+ - take into account old-style tag metrics results when deciding
+     whether the lane has plexes
+ - be compatible with latest changes to the db_connect role
+ - ensure that tests do not access user's home directory
 
 release 57.10
  - total_reads now returns 0 when num_total_reads is 0 rather than undef
