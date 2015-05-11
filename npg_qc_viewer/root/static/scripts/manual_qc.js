@@ -358,6 +358,9 @@ var RunTitleParser = (function () {
    * "^Results for run ([0-9]+) \(current run status:"
    */
   RunTitleParser.prototype.parseIdRun = function (text) {
+    if(typeof(text) == undefined || text == null) {
+      throw new Error("invalid arguments.");
+    }
     var result = null;
     var match = this.reId.exec(text);
     //There is a result from parsing
