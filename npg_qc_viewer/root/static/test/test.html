@@ -98,9 +98,14 @@
     var data1 = null;
     var lanesWithBG = [];
     var control = new NPG.QC.RunMQCControl('1');
+    assert.raises(function () {control.laneOutcomesMatch();}, /invalid arguments/, "Throws exception with invalid number of arguments");
+    
     data1 = new Object();
     data1.qc_lane_status = new Object();
-    
+
+    assert.raises(function () {control.laneOutcomesMatch(lanesWithBG);}, /invalid arguments/, "Throws exception with invalid number of arguments");
+    assert.raises(function () {control.laneOutcomesMatch(null, data1);}, /invalid arguments/, "Throws exception with null arguments");
+    assert.raises(function () {control.laneOutcomesMatch(lanesWithBG, null);}, /invalid arguments/, "Throws exception with null arguments");
     var result = control.laneOutcomesMatch(lanesWithBG, data1);
     assert.equal(result.outcome, true, 'Works with empty lanes in both sides.');
     assert.equal(result.position, null, 'Empty position as there was no error.');
@@ -143,6 +148,11 @@
     result = control.laneOutcomesMatch(lanesWithBG, data1);
     assert.equal(result.outcome, true, 'Works with more outcomes in MQC than DWH, multiple items');
     assert.equal(result.position, null, 'Empty position as there was no error.');
+  });
+  QUnit.test("NPG.QC.RunMQCControl.prepareLanes", function(assert) {
+    var control = new NPG.QC.RunMQCControl('1');
+    assert.raises(function () {control.prepareLanes();}, /invalid arguments/, "Throws exception with invalid number of arguments");
+    
   });
 </SCRIPT>
 </head>
