@@ -100,28 +100,49 @@
     var control = new NPG.QC.RunMQCControl('1');
     data1 = new Object();
     data1.qc_lane_status = new Object();
-    assert.equal(control.laneOutcomesMatch(lanesWithBG, data1), true, 'Works with empty lanes in both sides.');
+    
+    var result = control.laneOutcomesMatch(lanesWithBG, data1);
+    assert.equal(result.outcome, true, 'Works with empty lanes in both sides.');
+    assert.equal(result.position, null, 'Empty position as there was no error.');
     data1.qc_lane_status[1] = 'Accepted final';
-    assert.equal(control.laneOutcomesMatch(lanesWithBG, data1), true, 'Works with mqc status and not matching DWH status.');
+    
+    result = control.laneOutcomesMatch(lanesWithBG, data1);
+    assert.equal(result.outcome, true, 'Works with mqc status and not matching DWH status.');
+    assert.equal(result.position, null, 'Empty position as there was no error.');
     var elements = $('.tdlanes1').each(function (i, obj) {
       lanesWithBG.push($(obj));  
     });
-    assert.equal(control.laneOutcomesMatch(lanesWithBG, data1), true, 'Works with matching in both sides.');
+    
+    result = control.laneOutcomesMatch(lanesWithBG, data1);
+    assert.equal(result.outcome, true, 'Works with matching in both sides.');
+    assert.equal(result.position, null, 'Empty position as there was no error.');
     lanesWithBG = [];
     var elements = $('.tdlanes2').each(function (i, obj) {
       lanesWithBG.push($(obj));  
     });
-    assert.equal(control.laneOutcomesMatch(lanesWithBG, data1), false, 'Correctly validates problems with more outcomesin DWH.');
+    
+    result = control.laneOutcomesMatch(lanesWithBG, data1);
+    assert.equal(result.outcome, false, 'Correctly validates problems with more outcomesin DWH.');
+    assert.equal(result.position, 2, 'Problem is in lane 2');
     data1.qc_lane_status[2] = 'Accepted final';
-    assert.equal(control.laneOutcomesMatch(lanesWithBG, data1), true, 'Works with matching in both sides, multiple items');
+    
+    result = control.laneOutcomesMatch(lanesWithBG, data1);
+    assert.equal(result.outcome, true, 'Works with matching in both sides, multiple items');
+    assert.equal(result.position, null, 'Empty position as there was no error.');
     lanesWithBG = [];
     var elements = $('.tdlanes3').each(function (i, obj) {
       lanesWithBG.push($(obj));  
     });
-    assert.equal(control.laneOutcomesMatch(lanesWithBG, data1), false, 'Correctly validates problems with unmatching outcomes DWH vs MQC.');
+    
+    result = control.laneOutcomesMatch(lanesWithBG, data1);
+    assert.equal(result.outcome, true, 'Correctly validates problems with unmatching outcomes DWH vs MQC.');
+    assert.equal(result.position, null, 'Empty position as there was no error.');
     data1.qc_lane_status[2] = 'Rejected final';
     data1.qc_lane_status[3] = 'Accepted final';
-    assert.equal(control.laneOutcomesMatch(lanesWithBG, data1), true, 'Works with more outcomes in MQC than DWH, multiple items');
+    
+    result = control.laneOutcomesMatch(lanesWithBG, data1);
+    assert.equal(result.outcome, true, 'Works with more outcomes in MQC than DWH, multiple items');
+    assert.equal(result.position, null, 'Empty position as there was no error.');
   });
 </SCRIPT>
 </head>

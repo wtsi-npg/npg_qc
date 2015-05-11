@@ -300,9 +300,17 @@ var RunMQCControl = (function () {
    * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
    * Only checks in case there is an outcome in DWH, meaning there should be an 
    * outcome in manual QC.
+   * 
+   * It returns a value object with two properties:
+   * 
+   *  outcome: true/false for the result of the match. 
+   *  position: null if matching, number of the first lane where there was a missmatch
+   *   otherwise.
    */
   RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, mqc_run_data) {
-    result = true;
+    result = Object;
+    result['outcome'] = true
+    result['position'] = null;
     for(var i = 0; i < lanesWithBG.length && result; i++) {
       var cells = lanesWithBG[i].children('.lane_mqc_control');
       for(j = 0; j < cells.length && result; j++) {
@@ -314,11 +322,16 @@ var RunMQCControl = (function () {
           if (position in mqc_run_data.qc_lane_status) {
             //From REST
             currentStatusFromREST = mqc_run_data.qc_lane_status[position];
-            //To html element, LaneControl will render.
+            //From DOM
             currentStatusFromView = obj.data('initial');
-            result = String(currentStatusFromREST) == String(currentStatusFromView);
+            if(String(currentStatusFromREST) != String(currentStatusFromView) ) {
+              window.console && window.console.log('Warning: conflicting outcome in DWH/MQC, position ' 
+                  + position + ' DWH:' + String(currentStatusFromView) 
+                  + ' / MQC:' + String(currentStatusFromREST));
+            }
           } else {
-            result = false;
+            result.outcome = false;
+            result.position = position;
           }
         }
       }
@@ -326,7 +339,6 @@ var RunMQCControl = (function () {
     return result;
   };
 
-  
   return RunMQCControl;
 }) ();
 NPG.QC.RunMQCControl = RunMQCControl;

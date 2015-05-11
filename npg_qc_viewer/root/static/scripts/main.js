@@ -39,7 +39,8 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
   //Read information about lanes from page.
-  var lanes = [], lanesWithBG = [];
+  var lanes = []; //Lanes without previous QC, blank BG 
+  var lanesWithBG = []; //Lanes with previous QC, BG with colour 
   var totalLanes = 0;
   //Select non-qced lanes.
   $('.lane_mqc_control').each(function (i, obj) {
@@ -67,10 +68,21 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
         var control = new NPG.QC.RunMQCControl(id_run);
         var mqc_run_data = jqxhr.responseJSON;
         if(control.isStateForMQC(mqc_run_data)) {
-          control.initQC(jqxhr.responseJSON, lanes, 
-            function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
-            function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
-          );  
+          var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data); 
+          if(DWHMatch.outcome) {
+            control.initQC(jqxhr.responseJSON, lanes, 
+                function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
+                function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
+            );  
+          } else {
+            $("#ajax_status").append("<li class='failed_mqc'>Conflicting data when comparing Data Ware House and Manual QC databases for run: "
+                + id_run
+                + ", lane: " 
+                + DWHMatch.position 
+                + ". Displaying of QC widgets aborted.</li>");
+            //Clear progress icon
+            $('.lane_mqc_working').empty();
+          }
         } else {
           control.showMQCOutcomes(jqxhr.responseJSON, lanes);
         }
