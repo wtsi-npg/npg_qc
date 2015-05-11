@@ -152,6 +152,9 @@
   QUnit.test("NPG.QC.RunMQCControl.prepareLanes", function(assert) {
     var control = new NPG.QC.RunMQCControl('1');
     assert.raises(function () {control.prepareLanes();}, /invalid arguments/, "Throws exception with invalid number of arguments");
+    assert.raises(function () {control.prepareLanes(null, null);}, /invalid arguments/, "Throws exception with null arguments");
+    assert.raises(function () {control.prepareLanes(null, 1);}, /invalid arguments/, "Throws exception with null arguments");
+    assert.raises(function () {control.prepareLanes(1, null);}, /invalid arguments/, "Throws exception with null arguments");
     
   });
 </SCRIPT>
