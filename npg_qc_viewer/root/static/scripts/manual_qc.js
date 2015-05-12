@@ -228,6 +228,11 @@ var RunMQCControl = (function () {
    * same as the user who took the QCing.
    */
   RunMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
+    if(typeof(mqc_run_data) == undefined 
+        || mqc_run_data == null) {
+      throw new Error("invalid arguments");
+    }
+
     var result = typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
       && typeof(mqc_run_data.current_user)!= undefined
       && typeof(mqc_run_data.has_manual_qc_role)!= undefined
@@ -240,6 +245,13 @@ var RunMQCControl = (function () {
   } 
   
   RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
+    if(typeof(mqc_run_data) == undefined 
+        || mqc_run_data == null 
+        || typeof(lanes) == undefined 
+        || lanes == null) {
+      throw new Error("invalid arguments");
+    }
+
     var result = null;
     for(var i = 0; i < lanes.length; i++) {
       lanes[i].children('.lane_mqc_control').each(function(j, obj){
