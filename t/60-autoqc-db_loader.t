@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 60;
+use Test::More tests => 58;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -9,12 +9,18 @@ use JSON;
 use npg_testing::db;
 
 use_ok('npg_qc::autoqc::db_loader');
+
+my $schema = Moose::Meta::Class->create_anon_class(
+          roles => [qw/npg_testing::db/])
+          ->new_object({})->create_test_db(q[npg_qc::Schema]);
+
 {
   my $db_loader = npg_qc::autoqc::db_loader->new();
   isa_ok($db_loader, 'npg_qc::autoqc::db_loader');
 
   $db_loader = npg_qc::autoqc::db_loader->new(
-      path=>['t/data/autoqc/tag_decode_stats'],
+      path    =>['t/data/autoqc/tag_decode_stats'],
+      schema  => $schema,
       verbose => 0,
   );
   is(scalar @{$db_loader->json_file}, 1, 'one json file found');
@@ -22,10 +28,6 @@ use_ok('npg_qc::autoqc::db_loader');
   is($db_loader->json_file->[0], $json_file, 'correct json file found');
   my $values = decode_json(slurp($json_file));
   ok($db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test positive');
-  is($db_loader->_json2db($json_file), 1, 'Loaded one json file with git style version nn.n');
-  my $old_json_file = 't/data/autoqc/insert_size/6062_8#1.insert_size.json';
-  is($db_loader->_json2db($json_file), 1, 'Loaded one json file with svn style version nnnn');
-
   $db_loader = npg_qc::autoqc::db_loader->new(id_run=>[3, 2, 6624]);
   ok($db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test positive');
   $db_loader = npg_qc::autoqc::db_loader->new(id_run=>[3, 2]);
@@ -42,9 +44,6 @@ use_ok('npg_qc::autoqc::db_loader');
   ok(!$db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test negative');
 }
 
-my $schema = Moose::Meta::Class->create_anon_class(
-          roles => [qw/npg_testing::db/])
-          ->new_object({})->create_test_db(q[npg_qc::Schema]);
 {
   my $is_rs = $schema->resultset('InsertSize');
   my $current_count = $is_rs->search({})->count;

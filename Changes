@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 57.11
+ - take into account old-style tag metrics results when deciding
+     whether the lane has plexes
+ - be compatible with latest changes to the db_connect role
+ - ensure that tests do not access user's home directory
+
 release 57.10
  - total_reads now returns 0 when num_total_reads is 0 rather than undef
  - add support for metrics files produced by bamstreamingmarkduplicates
