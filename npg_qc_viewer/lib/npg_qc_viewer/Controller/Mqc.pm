@@ -36,7 +36,8 @@ sub _set_response {
     croak 'Message hash should be supplied';
   }
   $c->response->headers->content_type('application/json');
-  if ($code) {
+
+  if ($code) { #There was an error
     $c->response->status($code);
   }
   $c->response->body(to_json $message_data);
@@ -54,8 +55,9 @@ sub update_outcome : Path('update_outcome') {
   my $error;
 
   try {
-    ####Validation
+    ####Validating request method
     $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    ####Authorisation
     $c->controller('Root')->authorise($c, ($MQC_ROLE));
 
     ####Loading state
@@ -63,7 +65,7 @@ sub update_outcome : Path('update_outcome') {
     $position    = $params->{'position'};
     $new_outcome = $params->{'new_oc'};
     $id_run      = $params->{'id_run'};
-    $username    = $c->user->username || $c->user->id;
+    $username    = $c->user->username;
 
     if (!$id_run) {
       $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
