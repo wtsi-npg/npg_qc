@@ -56,8 +56,6 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   });
 
   var qc = function () {
-    //Validate if all lanes have bg colour
-    if(lanesWithBG.length < totalLanes) { //Work with qc data
       // Getting the run_id from the title of the page using the qc part too.
       var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
       //If id_run
@@ -94,7 +92,6 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
           $('.lane_mqc_working').empty();
         })
       }
-    }
   };
   
   qc();

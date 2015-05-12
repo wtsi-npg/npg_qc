@@ -228,6 +228,11 @@ var RunMQCControl = (function () {
    * same as the user who took the QCing.
    */
   RunMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
+    if(typeof(mqc_run_data) == undefined 
+        || mqc_run_data == null) {
+      throw new Error("invalid arguments");
+    }
+
     var result = typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
       && typeof(mqc_run_data.current_user)!= undefined
       && typeof(mqc_run_data.has_manual_qc_role)!= undefined
@@ -240,6 +245,13 @@ var RunMQCControl = (function () {
   } 
   
   RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
+    if(typeof(mqc_run_data) == undefined 
+        || mqc_run_data == null 
+        || typeof(lanes) == undefined 
+        || lanes == null) {
+      throw new Error("invalid arguments");
+    }
+
     var result = null;
     for(var i = 0; i < lanes.length; i++) {
       lanes[i].children('.lane_mqc_control').each(function(j, obj){
@@ -274,6 +286,12 @@ var RunMQCControl = (function () {
    * with proper background.
    */
   RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
+    if(typeof(mqc_run_data) == undefined 
+        || mqc_run_data == null 
+        || typeof(lanes) == undefined 
+        || lanes == null) {
+      throw new Error("invalid arguments");
+    }
     var result = null;
     for(var i = 0; i < lanes.length; i++) {
       var cells = lanes[i].children('.lane_mqc_control');
@@ -308,22 +326,28 @@ var RunMQCControl = (function () {
    *   otherwise.
    */
   RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, mqc_run_data) {
-    result = Object;
+    if(typeof(lanesWithBG) == undefined 
+        || lanesWithBG == null 
+        || typeof(mqc_run_data) == undefined
+        || mqc_run_data == null) {
+      throw "Error: invalid arguments";
+    }
+    var result = Object;
     result['outcome'] = true; //Outcome of the validation.
     result['position'] = null; //Which lane has the problem (if there is a problem).
     for(var i = 0; i < lanesWithBG.length && result; i++) {
       var cells = lanesWithBG[i].children('.lane_mqc_control');
-      for(j = 0; j < cells.length && result; j++) {
-        obj = $(cells[j]); //Wrap as an jQuery object.
+      for(var j = 0; j < cells.length && result; j++) {
+        var obj = $(cells[j]); //Wrap as an jQuery object.
         //Lane from row.
         var position = obj.data('position');
         //Filling previous outcomes
         if('qc_lane_status' in mqc_run_data) {
           if (position in mqc_run_data.qc_lane_status) {
             //From REST
-            currentStatusFromREST = mqc_run_data.qc_lane_status[position];
+            var currentStatusFromREST = mqc_run_data.qc_lane_status[position];
             //From DOM
-            currentStatusFromView = obj.data('initial');
+            var currentStatusFromView = obj.data('initial');
             if(String(currentStatusFromREST) != String(currentStatusFromView) ) {
               window.console && window.console.log('Warning: conflicting outcome in DWH/MQC, position ' 
                   + position + ' DWH:' + String(currentStatusFromView) 
@@ -358,6 +382,9 @@ var RunTitleParser = (function () {
    * "^Results for run ([0-9]+) \(current run status:"
    */
   RunTitleParser.prototype.parseIdRun = function (text) {
+    if(typeof(text) == undefined || text == null) {
+      throw new Error("invalid arguments.");
+    }
     var result = null;
     var match = this.reId.exec(text);
     //There is a result from parsing

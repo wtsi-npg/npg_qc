@@ -18,7 +18,6 @@ with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 our $VERSION = '0';
 
 Readonly::Scalar my $MQC_ROLE                     => q[manual_qc];
-Readonly::Scalar my $RESPONSE_OK_CODE             => 200;
 
 ## no critic (NamingConventions::Capitalization)
 sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
@@ -52,25 +51,17 @@ sub mqc_runs_GET {
       ##### Check if there are mqc values and add.
       $hash_entity->{'qc_lane_status'}             = $qc_outcomes;
 
-      if($authenticated) {
-        #username from authentication
-        $hash_entity->{'current_user'}               = $c->user->username;
-        $hash_entity->{'has_manual_qc_role'}         = $c->check_user_roles(($MQC_ROLE));
-      } else {
-        $hash_entity->{'current_user'}               = q[];
-        $hash_entity->{'has_manual_qc_role'}         = q[];
-      }
+      #username from authentication
+      $hash_entity->{'current_user'}               = $authenticated ? $c->user->username                : q[];
+      $hash_entity->{'has_manual_qc_role'}         = $authenticated ? $c->check_user_roles(($MQC_ROLE)) : q[];
 
-      $self->status_ok(
-        $c,
-        entity => $hash_entity,
-      );
+      $self->status_ok($c, entity => $hash_entity,);
     }
   } catch {
     $error = $_;
   };
 
-  my $error_code = $RESPONSE_OK_CODE;
+  my $error_code;
 
   if ($error) {
     ( $error, $error_code ) = $self->parse_error($error);
@@ -83,7 +74,7 @@ sub mqc_runs_GET {
   return;
 }
 
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
 
