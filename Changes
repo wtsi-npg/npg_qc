@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 57.11
  - take into account old-style tag metrics results when deciding
      whether the lane has plexes
  - be compatible with latest changes to the db_connect role
