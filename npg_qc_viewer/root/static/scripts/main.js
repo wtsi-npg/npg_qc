@@ -90,7 +90,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
           $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
           //Clear progress icon
           $('.lane_mqc_working').empty();
-        })
+        });
       }
   };
   
