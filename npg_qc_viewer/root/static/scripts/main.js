@@ -38,6 +38,12 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   //Required to show error messages from the mqc process.
   $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
+  //Preload images for working icon
+  $('<img/>')[0].src = "/static/images/waiting.gif";
+  //Preload rest of icons
+  $('<img/>')[0].src = "/static/images/tick.png";
+  $('<img/>')[0].src = "/static/images/cross.png";
+  
   //Read information about lanes from page.
   var lanes = []; //Lanes without previous QC, blank BG 
   var lanesWithBG = []; //Lanes with previous QC, BG with colour 

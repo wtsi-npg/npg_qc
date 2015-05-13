@@ -12,7 +12,7 @@
 <script type="text/javascript" src="test.js"></script>
 <script>
 
-  LaneMQCControl.prototype.getRoot = function () {
+  NPG.QC.LaneMQCControl.prototype.getRoot = function () {
     return 'test/images';
   };
 
@@ -22,7 +22,7 @@
     assert.equal(lane.data('id_run'), '2', "id_run is 2.");
     assert.equal(lane.data('position'), '3', "position is 3.");
     assert.equal(lane.data('initial'), undefined, "No initial value.");
-    var control = new LaneMQCControl(0);
+    var control = new NPG.QC.LaneMQCControl(0);
     assert.notEqual(control, undefined, "Control is an instance.");
     control.linkControl(lane);
     assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
@@ -36,7 +36,7 @@
     assert.equal(lane.data('position'), '4', "position is 4.");
     assert.notEqual(lane.data('initial'), undefined, "Has initial value.");
     assert.equal(lane.data('initial'), 'Accepted final', "Initial value as expected.");
-    var control = new LaneMQCControl(1);
+    var control = new NPG.QC.LaneMQCControl(1);
     assert.notEqual(control, undefined, "Control is an instance.");
     control.linkControl(lane);
     assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
