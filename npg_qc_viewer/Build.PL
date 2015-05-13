@@ -5,10 +5,21 @@ use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOC');
 
-use Cwd 'abs_path';
+use Cwd qw/abs_path getcwd/;
 
   sub process_seqqc_files {
     my $self = shift;
+
+    if ($self->install_base()) {
+      my $current = getcwd();
+      chdir 'root/static';
+      warn "Checking/getting javascript dependencies\n";
+      my $result = system 'bower install';
+      chdir $current;
+      if ($result) {
+        die 'Fail to install bower javascript dependencies';
+      }
+    }
 
     my $dest = 'blib/seqqc';
     if (!-e $dest) {
