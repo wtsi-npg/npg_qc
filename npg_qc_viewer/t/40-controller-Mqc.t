@@ -13,8 +13,8 @@ use_ok 'npg_qc_viewer::Controller::Mqc';
 lives_ok { $util->test_env_setup()}  'test db created and populated';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
-my $response;
 {
+  my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) }
     'update get request lives';
   ok($response->is_error, q[update response is error]);
@@ -43,8 +43,8 @@ my $response;
 }
 
 {
-  my $url = '/mqc/update_outcome?user=cat&password=secret';
   my $response;
+  my $url = '/mqc/update_outcome?user=cat&password=secret';
 
   lives_ok { $response = request(POST $url)}
     'post request without params lives';
@@ -55,7 +55,7 @@ my $response;
     'post request lives with body param';
   is( $response->code, 400, 'code is 400' );
   like ($response->content, qr/Position should be defined/, 'correct error message');
- 
+
   lives_ok { $response = request(POST $url, ['id_run' => '1234', 'position' => '4'])  }
     'post request lives with body param';
   is( $response->code, 400, 'error code is 400' );
@@ -98,6 +98,7 @@ my $response;
 }
 
 {
+  my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_current_outcome')) }
     'get current outcome lives';
   ok($response->is_error, q[get_current_outcome response is error]);

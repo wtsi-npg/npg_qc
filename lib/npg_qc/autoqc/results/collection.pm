@@ -474,7 +474,8 @@ sub run_lane_plex_flags {
         my $rpt_h = npg_qc::autoqc::role::rpt_key->inflate_rpt_key($rpt_key);
         if (!defined $rpt_h->{'tag_index'}) { # it's a lane-level entry
             if (!exists $flags->{$rpt_key}) {
-                my $has_plexes = any { $_ eq 'tag metrics' } @{$map->{$rpt_key}->check_names()->{'list'}};
+                my $has_plexes = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
+                                 @{$map->{$rpt_key}->check_names()->{'list'}};
                 $flags->{$rpt_key} = $has_plexes ? 1 : 0;
             }
         } else { # it's a plex-level entry

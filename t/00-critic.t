@@ -19,6 +19,7 @@ if($EVAL_ERROR) {
   Test::Perl::Critic->import(
 			   -severity => 1,
 			   -exclude  => [ 'tidy',
+                             'Miscellanea::RequireRcsKeywords',
                              'ValuesAndExpressions::ProhibitImplicitNewlines',
                              'ValuesAndExpressions::RequireConstantVersion',
                              'Documentation::PodSpelling',
