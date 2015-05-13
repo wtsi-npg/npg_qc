@@ -1,5 +1,14 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 57.12
+
+ - Removing MQC logic from templates and moving it to JS
+ - Adding a controller to provide MQC status for a run using REST
+ - Adding a role to provide functionality for 401 responses
+ - Validation for DWH->MQC outcome integrity during mqc for logged mqc-ing user
+ - Fixing id-username data in test data to fix patches in controllers 
+     which validate username
+
 release 57.11
  - take into account old-style tag metrics results when deciding
      whether the lane has plexes
