@@ -221,11 +221,6 @@ sub BUILD {
     return;
 }
 
-sub _tag_index_is_set {
-    my $self = shift;
-    return defined $self->tag_index;
-}
-
 sub _create_test_object {
     my $self = shift;
 
