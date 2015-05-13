@@ -26,26 +26,31 @@
 *
 ************************************************************************************/
 
+var NPG = NPG || {};
+NPG.QC = NPG.QC || {};
+
 /*
  * Controller for individual lanes GUI.
  */
-var LaneMQCControl = function (index) {
-  this.lane_control = null;  // Container linked to this controller
-  this.outcome      = null;  // Current outcome (Is updated when linked to an object in the view)
-  this.index        = index; // Index of control in the page.
+var LaneMQCControl = (function () {
+  function LaneMQCControl(index) {
+    this.lane_control = null;  // Container linked to this controller
+    this.outcome      = null;  // Current outcome (Is updated when linked to an object in the view)
+    this.index        = index; // Index of control in the page.
+    
+    this.CONFIG_UPDATE_SERVICE      = "/mqc/update_outcome";
+    this.CONFIG_ACCEPTED_PRELIMINAR = 'Accepted preliminary';
+    this.CONFIG_REJECTED_PRELIMINAR = 'Rejected preliminary';
+    this.CONFIG_ACCEPTED_FINAL      = 'Accepted final';
+    this.CONFIG_REJECTED_FINAL      = 'Rejected final';
+    this.CONFIG_INITIAL             = 'initial';
+  }
   
-  this.CONFIG_UPDATE_SERVICE      = "/mqc/update_outcome";
-  this.CONFIG_ACCEPTED_PRELIMINAR = 'Accepted preliminary';
-  this.CONFIG_REJECTED_PRELIMINAR = 'Rejected preliminary';
-  this.CONFIG_ACCEPTED_FINAL      = 'Accepted final';
-  this.CONFIG_REJECTED_FINAL      = 'Rejected final';
-  this.CONFIG_INITIAL             = 'initial';
-  
-  this.getRoot = function() {
+  LaneMQCControl.prototype.getRoot = function() {
     return '/static';
   };
   
-  this.updateOutcome = function(outcome) {
+  LaneMQCControl.prototype.updateOutcome = function(outcome) {
     var id_run = this.lane_control.data('id_run'); 
     var position = this.lane_control.data('position');
     var control = this;
@@ -81,7 +86,7 @@ var LaneMQCControl = function (index) {
   /* 
    * Builds the gui controls necessary for the mqc operation and passes them to the view. 
    */ 
-  this.generateActiveControls = function() {
+  LaneMQCControl.prototype.generateActiveControls = function() {
     var lane_control = this.lane_control;
     this.lane_control.html("<img class='lane_mqc_control_accept' src='"+this.getRoot()+"/images/tick.png' title='Accept'>" + 
         "<img class='lane_mqc_control_reject' src='"+this.getRoot()+"/images/cross.png' title='Reject'>" + 
@@ -104,7 +109,7 @@ var LaneMQCControl = function (index) {
    * Checks the current outcome associated with this controller. If it is not final it will make it final
    * will update the value in the model with an async call and update the view. 
    */
-  this.saveAsFinalOutcome = function() {
+  LaneMQCControl.prototype.saveAsFinalOutcome = function() {
     var control = this;
     
     if(this.outcome === this.CONFIG_ACCEPTED_PRELIMINAR) {
@@ -118,35 +123,35 @@ var LaneMQCControl = function (index) {
   /* 
    * Methods to deal with background colours. 
    */
-  this.setAcceptedBG = function() {
+  LaneMQCControl.prototype.setAcceptedBG = function() {
     this.lane_control.parent().css("background-color", "#B5DAFF");
   }
   
-  this.setRejectedBG = function () {
+  LaneMQCControl.prototype.setRejectedBG = function () {
     this.lane_control.parent().css("background-color", "#FFDDDD");
   }
   
-  this.setAcceptedPre = function() {
+  LaneMQCControl.prototype.setAcceptedPre = function() {
     this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;    
     this.setAcceptedBG();
   };
   
-  this.setRejectedPre = function() {
+  LaneMQCControl.prototype.setRejectedPre = function() {
     this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
     this.setRejectedBG();
   };
   
-  this.setAcceptedFinal = function() {
+  LaneMQCControl.prototype.setAcceptedFinal = function() {
     this.outcome = this.CONFIG_ACCEPTED_FINAL;
     this.setAcceptedBG();
   };
   
-  this.setRejectedFinal = function() {
+  LaneMQCControl.prototype.setRejectedFinal = function() {
     this.outcome = this.CONFIG_REJECTED_FINAL;
     this.setRejectedBG();
   };
   
-  this.replaceForLink = function() {
+  LaneMQCControl.prototype.replaceForLink = function() {
     var id_run = this.lane_control.data('id_run'); 
     var position = this.lane_control.data('position');
     this.lane_control.empty();
@@ -155,7 +160,7 @@ var LaneMQCControl = function (index) {
   /* 
    * Links the individual object with an mqc controller so it can allow mqc of a lane.
    */
-  this.linkControl = function(lane_control) {
+  LaneMQCControl.prototype.linkControl = function(lane_control) {
     lane_control.extra_handler = this;
     this.lane_control = lane_control;
     if ( typeof lane_control.data(this.CONFIG_INITIAL) == 'undefined') {
@@ -178,7 +183,7 @@ var LaneMQCControl = function (index) {
    * Changes the background of the parent element depending on the initial outcome
    * of the lane.
    */
-  this.loadBGFromInitial = function (lane_control) {
+  LaneMQCControl.prototype.loadBGFromInitial = function (lane_control) {
     lane_control.extra_handler = this;
     this.lane_control = lane_control;
     switch (lane_control.data(this.CONFIG_INITIAL)){
@@ -187,10 +192,10 @@ var LaneMQCControl = function (index) {
     }
     lane_control.find('.lane_mqc_working').empty();
   };
-}
-
-var NPG = NPG || {};
-NPG.QC = NPG.QC || {};
+  
+  return LaneMQCControl;
+}) ();
+NPG.QC.LaneMQCControl = LaneMQCControl;
 
 /*
  * Object with rules for general things about QC and its
