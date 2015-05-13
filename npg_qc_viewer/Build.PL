@@ -5,10 +5,21 @@ use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOC');
 
-use Cwd 'abs_path';
+use Cwd qw/abs_path getcwd/;
 
   sub process_seqqc_files {
     my $self = shift;
+
+    if ($self->args('installjsdeps')) {
+      my $current = getcwd();
+      chdir 'root/static';
+      warn "Checking/fetching javascript dependencies\n";
+      my $result = system 'bower install';
+      chdir $current;
+      if ($result) {
+        die 'Fail to install bower javascript dependencies';
+      }
+    }
 
     my $dest = 'blib/seqqc';
     if (!-e $dest) {
@@ -34,6 +45,9 @@ my $builder = $class->new(
    'dist_abstract'     => q(SeqQC - viewer for autoqc analysis results),
    'license'           => 'gpl',
    'dist'              => { COMPRESS => 'gzip', SUFFIX => 'gz', },
+   'get_options'       => {
+     'installjsdeps' => { type => ''},
+   },
 
    'requires'          => {
         'Carp'                                         => '0',

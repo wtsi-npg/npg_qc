@@ -1,7 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-release 57.12
+ - C code clean-up to remove warnings in compilation
+ - SeqQC daemon to set CATALYST_HOME relative to bin so that
+     the production user does not have to have this definition
+ - SeqQC build optionally fetches javascript dependencies
 
+release 57.12
  - Removing MQC logic from templates and moving it to JS
  - Adding a controller to provide MQC status for a run using REST
  - Adding a role to provide functionality for 401 responses
