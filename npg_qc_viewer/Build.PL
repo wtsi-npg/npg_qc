@@ -10,10 +10,10 @@ use Cwd qw/abs_path getcwd/;
   sub process_seqqc_files {
     my $self = shift;
 
-    if ($self->install_base()) {
+    if ($self->args('installjsdeps')) {
       my $current = getcwd();
       chdir 'root/static';
-      warn "Checking/getting javascript dependencies\n";
+      warn "Checking/fetching javascript dependencies\n";
       my $result = system 'bower install';
       chdir $current;
       if ($result) {
@@ -45,6 +45,9 @@ my $builder = $class->new(
    'dist_abstract'     => q(SeqQC - viewer for autoqc analysis results),
    'license'           => 'gpl',
    'dist'              => { COMPRESS => 'gzip', SUFFIX => 'gz', },
+   'get_options'       => {
+     'installjsdeps' => { type => ''},
+   },
 
    'requires'          => {
         'Carp'                                         => '0',
