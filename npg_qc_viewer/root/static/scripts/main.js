@@ -79,7 +79,8 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
               function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
           );  
         } else {
-          $("#ajax_status").append("<li class='failed_mqc'>Conflicting data when comparing Data Ware House and Manual QC databases for run: "
+          $("#ajax_status").append("<li class='failed_mqc'>"
+              + "Conflicting data when comparing Data Ware House and Manual QC databases for run: "
               + id_run
               + ", lane: " 
               + DWHMatch.position 
