@@ -5,6 +5,9 @@ use npg_tracking::util::build;
 my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
   use File::Path qw(make_path remove_tree);
+  use File::Which qw(which);
+  use Cwd qw(abs_path);
+  use File::Basename;
 
   my $c_tools = {
     'norm_fit' => {
@@ -27,6 +30,20 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     return join(q[/], 'src', shift);
   }
 
+  sub _samtools_option {
+    my $self = shift;
+    my @found = which('samtools');
+    my $samtools = @found ? abs_path( $found[0] ) : q[];
+    if ($samtools) { 
+      $samtools = dirname $samtools;
+      if ($self->verbose) {
+        warn "Found samtools in $samtools\n";
+      }
+      $samtools = 'SAMTOOLS_LOC=' . $samtools;
+    }
+    return $samtools;
+  }
+
   sub ACTION_build {
     my $self = shift;
     $self->SUPER::ACTION_build;
@@ -41,7 +58,20 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
         my $bdir = _c_build_dir($tool);
         make_path $bdir;
         my $silent = $self->verbose ? q[] : '--silent';
-        if (system "make $silent --directory " . _c_src_dir($tool)) {
+        my $samtools = q[];
+
+        if ($c_tools->{$tool}->{'samtools'}) {
+          $samtools = $self->_samtools_option();
+          if (!$samtools) {
+            warn 'Samtools executable is not on the path, ' .
+                 "skipping $tool build\n";
+            next;
+          }
+        }
+
+        my $command = sprintf 'make %s --directory %s %s',
+                      $silent, _c_src_dir($tool), $samtools;
+        if (system $command) {
           die "Failed to compile $ename";
         }
         foreach my $ename ( @{$c_tools->{$tool}->{'copy'}} ) {
@@ -207,6 +237,9 @@ my $build_requires = {
                 'Test::Exception'                 => '0.27',
                 'Test::More'                      => '0.86',
                 'File::Path'                      => 0,
+                'File::Which'                     => 0,
+                'Cwd'                             => 0,
+                'File::Basename'                  => 0,
                 'HTML::PullParser'                => '3.57',
                 'YAML'                            => '0.68',
                 'IO::Scalar'                      => 0,
