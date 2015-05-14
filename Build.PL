@@ -26,11 +26,15 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       make_path $gt_utils_build_dir;
       `make --directory $gt_utils_dir`;
       $self->copy_if_modified(from    => "$gt_utils_build_dir/gt_pack",
-                            to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
-                            flatten => 1);
+                              to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
+                              flatten => 1);
       $self->copy_if_modified(from    => "$gt_utils_build_dir/find_gt_match",
-                            to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
-                            flatten => 1);
+                              to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
+                              flatten => 1);
+
+      $self->copy_if_modified(from    => 'lib/R/gc_bias_data.R',
+                              to_dir  => join(q[/], $self->base_dir, 'blib', 'lib/R'),
+                              flatten => 1);
     }
   }
 
@@ -45,15 +49,6 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       `make clean --directory $gt_utils_dir`;
       remove_tree $gt_utils_build_dir;
     }
-  }
-
-  sub ACTION_install {
-    my $self = shift;
-    if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
-      `mkdir -p $blibr`;
-      `cp -vu lib/R/gc_bias_data.R $blibr`;
-    }
-    $self->SUPER::ACTION_install;
   }
 
   sub ACTION_webinstall {
