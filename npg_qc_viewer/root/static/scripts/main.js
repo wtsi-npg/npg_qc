@@ -65,11 +65,12 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
   //If id_run
   if(typeof(id_run) != undefined && id_run != null) {
+    var prodConfiguration = new NPG.QC.ProdConfiguration();
     var jqxhr = $.ajax({
       url: "/mqc/mqc_runs/" + id_run,
       cache: false
     }).done(function() {
-      var control = new NPG.QC.RunMQCControl(id_run);
+      var control = new NPG.QC.RunMQCControl(prodConfiguration);
       var mqc_run_data = jqxhr.responseJSON;
       if(control.isStateForMQC(mqc_run_data)) {
         var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data); 

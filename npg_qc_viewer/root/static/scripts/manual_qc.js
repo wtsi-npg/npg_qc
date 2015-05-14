@@ -29,14 +29,28 @@
 var NPG;
 (function (NPG) {
   (function (QC) {
+    var ProdConfiguration = (function() {
+      function ProdConfiguration () {
+        
+      }
+      
+      ProdConfiguration.prototype.getRoot = function() {
+        return '/static'; 
+      };
+      
+      return ProdConfiguration;
+    }) ();
+    QC.ProdConfiguration = ProdConfiguration;
+    
     /*
      * Controller for individual lanes GUI.
      */
     var LaneMQCControl = (function () {
-      function LaneMQCControl(index) {
-        this.lane_control = null;  // Container linked to this controller
-        this.outcome      = null;  // Current outcome (Is updated when linked to an object in the view)
-        this.index        = index; // Index of control in the page.
+      function LaneMQCControl(index, abstractConfiguration) {
+        this.lane_control          = null;  // Container linked to this controller
+        this.outcome               = null;  // Current outcome (Is updated when linked to an object in the view)
+        this.index                 = index; // Index of control in the page.
+        this.abstractConfiguration = abstractConfiguration;
         
         this.CONFIG_UPDATE_SERVICE      = "/mqc/update_outcome";
         this.CONFIG_ACCEPTED_PRELIMINAR = 'Accepted preliminary';
@@ -46,17 +60,15 @@ var NPG;
         this.CONFIG_INITIAL             = 'initial';
       }
       
-      LaneMQCControl.prototype.getRoot = function() {
-        return '/static';
-      };
-      
       LaneMQCControl.prototype.updateOutcome = function(outcome) {
         var id_run = this.lane_control.data('id_run'); 
         var position = this.lane_control.data('position');
         var control = this;
         if(outcome != control.outcome) {
           //Show progress icon
-          control.lane_control.find('.lane_mqc_working').html("<img src='"+control.getRoot()+"/images/waiting.gif' title='Processing request.'>");
+          control.lane_control.find('.lane_mqc_working').html("<img src='"
+              + this.abstractConfiguration.getRoot()
+              + "/images/waiting.gif' title='Processing request.'>");
           //AJAX call.
           $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
             var response = data;
@@ -88,9 +100,14 @@ var NPG;
        */ 
       LaneMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
-        this.lane_control.html("<img class='lane_mqc_control_accept' src='"+this.getRoot()+"/images/tick.png' title='Accept'>" + 
-            "<img class='lane_mqc_control_reject' src='"+this.getRoot()+"/images/cross.png' title='Reject'>" + 
-            "<div class='lane_mqc_working'></div>");    
+        var self = this;
+        this.lane_control.html("<img class='lane_mqc_control_accept' src='"
+            + self.abstractConfiguration.getRoot()
+            + "/images/tick.png' title='Accept'>" 
+            + "<img class='lane_mqc_control_reject' src='"
+            + self.abstractConfiguration.getRoot()
+            + "/images/cross.png' title='Reject'>" 
+            + "<div class='lane_mqc_working'></div>");    
         
         this.lane_control.find('.lane_mqc_control_accept').bind({click: function() {
           lane_control.extra_handler.updateOutcome(lane_control.extra_handler.CONFIG_ACCEPTED_FINAL);
@@ -202,8 +219,8 @@ var NPG;
      * user interface.
      */
     var RunMQCControl = (function () {
-      function RunMQCControl(id_run) {
-        this.id_run = id_run; //TODO never used probably remove.
+      function RunMQCControl(abstractConfiguration) {
+        this.abstractConfiguration = abstractConfiguration;
         this.mqc_run_data = null;
       }
       
@@ -256,11 +273,14 @@ var NPG;
             || lanes == null) {
           throw new Error("invalid arguments");
         }
+        var self = this;
 
         var result = null;
         for(var i = 0; i < lanes.length; i++) {
           lanes[i].children('.lane_mqc_control').each(function(j, obj){
-            $(obj).html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
+            $(obj).html("<div class='lane_mqc_working'><img src='" 
+                + self.abstractConfiguration.getRoot() 
+                + "/images/waiting.gif' title='Processing request.'></div>");
           });
         }
         
@@ -278,7 +298,7 @@ var NPG;
               obj.data('initial', current_status);
             }
             //Set up mqc controlers and link them to the individual lanes.
-            var c = new LaneMQCControl(i);
+            var c = new NPG.QC.LaneMQCControl(i, self.abstractConfiguration);
             c.loadBGFromInitial(obj);
           }
         }
@@ -298,6 +318,7 @@ var NPG;
           throw new Error("invalid arguments");
         }
         var result = null;
+        var self = this;
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
           for(j = 0; j < cells.length; j++) {
@@ -312,7 +333,7 @@ var NPG;
               obj.data('initial', current_status);
             }
             //Set up mqc controlers and link them to the individual lanes.
-            var c = new NPG.QC.LaneMQCControl(i);
+            var c = new NPG.QC.LaneMQCControl(i, self.abstractConfiguration);
             c.linkControl(obj);
           }
         }
