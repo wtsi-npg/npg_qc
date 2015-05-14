@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - compile fastq_summ executable during the npg_qc build, skip
+     compilation if samtools is not on the path
  - C code clean-up to remove warnings in compilation
  - SeqQC daemon to set CATALYST_HOME relative to bin so that
      the production user does not have to have this definition

@@ -5,19 +5,26 @@ use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOC');
 
-use Cwd qw/abs_path getcwd/;
+  use Cwd qw/abs_path getcwd/;
+  use File::Which qw(which);
 
   sub process_seqqc_files {
     my $self = shift;
 
     if ($self->args('installjsdeps')) {
-      my $current = getcwd();
-      chdir 'root/static';
-      warn "Checking/fetching javascript dependencies\n";
-      my $result = system 'bower install';
-      chdir $current;
-      if ($result) {
-        die 'Fail to install bower javascript dependencies';
+      if (which('node') and which('bower')) {
+        my $current = getcwd();
+        chdir 'root/static';
+        warn "Checking/fetching javascript dependencies\n";
+      
+        my $result = system 'bower install';
+        chdir $current;
+        if ($result) {
+          die 'Fail to install bower javascript dependencies';
+        }
+      } else {
+        warn "To install javascript dependencies, node and bower should be on the path;\n";
+        warn "javascript dependencies not installed.\n";
       }
     }
 
@@ -108,6 +115,7 @@ my $builder = $class->new(
         'File::Temp'                                    => '0',
         'File::Spec'                                    => '0',
         'File::Spec::Functions'                         => '0',
+        'File::Which'                                   => '0',
         'GD'                                            => '0',
         'HTTP::Headers'                                 => '0',
         'HTTP::Request::Common'                         => '0',
