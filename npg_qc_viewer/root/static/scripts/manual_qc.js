@@ -125,11 +125,11 @@ var NPG;
        */
       LaneMQCControl.prototype.setAcceptedBG = function() {
         this.lane_control.parent().css("background-color", "#B5DAFF");
-      }
+      };
       
       LaneMQCControl.prototype.setRejectedBG = function () {
         this.lane_control.parent().css("background-color", "#FFDDDD");
-      }
+      };
       
       LaneMQCControl.prototype.setAcceptedPre = function() {
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;    
@@ -247,7 +247,7 @@ var NPG;
           && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
             || mqc_run_data.current_status_description == 'qc on hold')
         return result;
-      } 
+      };
       
       RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
         if(typeof(mqc_run_data) == undefined 
