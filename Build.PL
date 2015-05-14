@@ -12,6 +12,9 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
                   },
     'gt_utils' => {
       'copy'     => [qw/find_gt_match gt_pack/],
+                  },
+    'fastq_summ' => {
+      'copy'     => [qw/fastq_summ/],
       'samtools' => 1,
                   },
   };
@@ -32,12 +35,19 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
       # Build C executables
       foreach my $tool ( keys %{$c_tools} ) {
+        if ($self->verbose) {
+          warn "Building $tool\n";
+        }
         my $bdir = _c_build_dir($tool);
         make_path $bdir;
-        if (system 'make --directory ' . _c_src_dir($tool)) {
+        my $silent = $self->verbose ? q[] : '--silent';
+        if (system "make $silent --directory " . _c_src_dir($tool)) {
           die "Failed to compile $ename";
         }
         foreach my $ename ( @{$c_tools->{$tool}->{'copy'}} ) {
+          if ($self->verbose) {
+            warn "Copying $ename for $tool\n";
+          }
           $self->copy_if_modified(
             from    => join(q[/], $bdir, $ename),
             to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
@@ -57,9 +67,13 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     $self->SUPER::ACTION_clean;
 
     if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
-      foreach my $ename ( @c_executables ) {
-        system 'make clean --directory ' . _c_src_dir($ename);
-        remove_tree _c_build_dir($ename);
+      foreach my $tool ( keys %{$c_tools} ) {
+        if ($self->verbose) {
+          warn "Cleaning $tool\n";
+        }
+        my $silent = $self->verbose ? q[] : '--silent';
+        system "make clean $silent --directory " . _c_src_dir($tool);
+        remove_tree _c_build_dir($tool);
       }
     }
   }
