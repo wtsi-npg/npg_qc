@@ -1,3 +1,4 @@
+//Adjusting root for tests.
 var TestConfiguration = (function() {
   function TestConfiguration () {
   }
@@ -10,9 +11,6 @@ var TestConfiguration = (function() {
 }) ();
 
 test('Object initialisation', function() {
-  
-    
-  
   var obj = null;
   ok(obj == undefined, "Variable is initially empty.");
   obj = new NPG.QC.LaneMQCControl();
