@@ -9,5 +9,13 @@ test('Object initialisation', function() {
     ok(obj.index !== undefined, "New object has an initial index.");
     ok(obj.lane_control == undefined, "New object has empty lane_control.");
     ok(obj.outcome == undefined, "New object has empty outcome.");
-})
+    
+    obj = new NPG.QC.RunMQCControl();
+    ok(obj !== undefined, 'variable is now an instance of RunMQCControl'); 
+    obj = new NPG.QC.RunMQCControl(1);
+    ok(obj !== undefined, 'variable is now an instance of RunMQCControl');
+    
+    obj = new NPG.QC.RunTitleParser();
+    ok(obj !== undefined, 'variable is now an instance of RunTitleParser');
+});
 

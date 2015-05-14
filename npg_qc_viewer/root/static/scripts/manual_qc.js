@@ -202,8 +202,8 @@ var NPG;
      * user interface.
      */
     var RunMQCControl = (function () {
-      function RunMQCControl(run_id) {
-        this.run_id = run_id;
+      function RunMQCControl(id_run) {
+        this.id_run = id_run; //TODO never used probably remove.
         this.mqc_run_data = null;
       }
       
