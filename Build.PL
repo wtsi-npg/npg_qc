@@ -6,32 +6,46 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
   use File::Path qw(make_path remove_tree);
 
-  my $blibr              = q[blib/lib/R];
-  my $norm_fit_dir       = join(q[/], 'src', 'norm_fit');
-  my $norm_fit_build_dir = join(q[/], $norm_fit_dir, 'build');
-  my $gt_utils_dir       = join(q[/], 'src', 'gt_utils');
-  my $gt_utils_build_dir = join(q[/], $gt_utils_dir, 'build');
+  my $c_tools = {
+    'norm_fit' => {
+      'copy'     => [qw/norm_fit/],
+                  },
+    'gt_utils' => {
+      'copy'     => [qw/find_gt_match gt_pack/],
+      'samtools' => 1,
+                  },
+  };
+
+  sub _c_build_dir {
+    return join(q[/], 'src', shift, 'build');
+  }
+
+  sub _c_src_dir {
+    return join(q[/], 'src', shift);
+  }
 
   sub ACTION_build {
     my $self = shift;
     $self->SUPER::ACTION_build;
 
     if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
-      make_path $norm_fit_build_dir;
-      `make --directory $norm_fit_dir`;
-      $self->copy_if_modified(from    => "$norm_fit_build_dir/norm_fit",
-                            to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
-                            flatten => 1);
 
-      make_path $gt_utils_build_dir;
-      `make --directory $gt_utils_dir`;
-      $self->copy_if_modified(from    => "$gt_utils_build_dir/gt_pack",
-                              to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
-                              flatten => 1);
-      $self->copy_if_modified(from    => "$gt_utils_build_dir/find_gt_match",
-                              to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
-                              flatten => 1);
-
+      # Build C executables
+      foreach my $tool ( keys %{$c_tools} ) {
+        my $bdir = _c_build_dir($tool);
+        make_path $bdir;
+        if (system 'make --directory ' . _c_src_dir($tool)) {
+          die "Failed to compile $ename";
+        }
+        foreach my $ename ( @{$c_tools->{$tool}->{'copy'}} ) {
+          $self->copy_if_modified(
+            from    => join(q[/], $bdir, $ename),
+            to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
+            flatten => 1);
+        }
+      }
+      
+      # Build R script
       $self->copy_if_modified(from    => 'lib/R/gc_bias_data.R',
                               to_dir  => join(q[/], $self->base_dir, 'blib', 'lib/R'),
                               flatten => 1);
@@ -43,11 +57,10 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     $self->SUPER::ACTION_clean;
 
     if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
-      `make clean --directory $norm_fit_dir`;
-      remove_tree $norm_fit_build_dir;
-
-      `make clean --directory $gt_utils_dir`;
-      remove_tree $gt_utils_build_dir;
+      foreach my $ename ( @c_executables ) {
+        system 'make clean --directory ' . _c_src_dir($ename);
+        remove_tree _c_build_dir($ename);
+      }
     }
   }
 
