@@ -180,7 +180,7 @@ var NPG;
       LaneMQCControl.prototype.linkControl = function(lane_control) {
         lane_control.extra_handler = this;
         this.lane_control = lane_control;
-        if ( typeof lane_control.data(this.CONFIG_INITIAL) == 'undefined') {
+        if ( typeof lane_control.data(this.CONFIG_INITIAL) === undefined) {
           //If it does not have initial outcome
           this.generateActiveControls();
         } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINAR 
@@ -230,7 +230,7 @@ var NPG;
        */
       RunMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
         var result = null;
-        if(typeof(mqc_run_data) != undefined && mqc_run_data != null) { //There is a data object
+        if(typeof(mqc_run_data) !== undefined && mqc_run_data != null) { //There is a data object
           this.mqc_run_data = mqc_run_data;
           if(this.isStateForMQC(mqc_run_data)) {
             result = targetFunction(mqc_run_data, this, lanes);
@@ -250,15 +250,15 @@ var NPG;
        * same as the user who took the QCing.
        */
       RunMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
-        if(typeof(mqc_run_data) == undefined 
+        if(typeof(mqc_run_data) === undefined 
             || mqc_run_data == null) {
           throw new Error("invalid arguments");
         }
 
-        var result = typeof(mqc_run_data.taken_by) != undefined  //Data object has all values needed.
-          && typeof(mqc_run_data.current_user)!= undefined
-          && typeof(mqc_run_data.has_manual_qc_role)!= undefined
-          && typeof(mqc_run_data.current_status_description)!= undefined
+        var result = typeof(mqc_run_data.taken_by) !== undefined  //Data object has all values needed.
+          && typeof(mqc_run_data.current_user)!== undefined
+          && typeof(mqc_run_data.has_manual_qc_role)!== undefined
+          && typeof(mqc_run_data.current_status_description)!== undefined
           && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
           && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
           && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
@@ -267,9 +267,9 @@ var NPG;
       };
       
       RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
-        if(typeof(mqc_run_data) == undefined 
+        if(typeof(mqc_run_data) === undefined 
             || mqc_run_data == null 
-            || typeof(lanes) == undefined 
+            || typeof(lanes) === undefined 
             || lanes == null) {
           throw new Error("invalid arguments");
         }
@@ -311,9 +311,9 @@ var NPG;
        * with proper background.
        */
       RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
-        if(typeof(mqc_run_data) == undefined 
+        if(typeof(mqc_run_data) === undefined 
             || mqc_run_data == null 
-            || typeof(lanes) == undefined 
+            || typeof(lanes) === undefined 
             || lanes == null) {
           throw new Error("invalid arguments");
         }
@@ -352,9 +352,9 @@ var NPG;
        *   otherwise.
        */
       RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, mqc_run_data) {
-        if(typeof(lanesWithBG) == undefined 
+        if(typeof(lanesWithBG) === undefined 
             || lanesWithBG == null 
-            || typeof(mqc_run_data) == undefined
+            || typeof(mqc_run_data) === undefined
             || mqc_run_data == null) {
           throw "Error: invalid arguments";
         }
@@ -408,7 +408,7 @@ var NPG;
        * "^Results for run ([0-9]+) \(current run status:"
        */
       RunTitleParser.prototype.parseIdRun = function (text) {
-        if(typeof(text) == undefined || text == null) {
+        if(typeof(text) === undefined || text == null) {
           throw new Error("invalid arguments.");
         }
         var result = null;
