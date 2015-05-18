@@ -75,7 +75,6 @@ sub package_name {
     return (ref $self);
 }
 
-
 =head2 check_name
 
 Human readable check name
@@ -84,10 +83,6 @@ Human readable check name
 sub check_name {
     my $self = shift;
     my $name = $self->class_name;
-    $name =~ s/sequence_error/sequence mismatch/xms;
-    if ($self->can(q[sequence_type]) && $self->sequence_type) {
-        $name .= q[ ] . $self->sequence_type;
-    }
     $name =~ s/_/ /gsmx;
     return $name;
 }
@@ -171,12 +166,12 @@ Filename that should be used to write json serialization of this object to
 sub filename4serialization {
     my $self = shift;
     return sprintf q[%s_%s%s%s.%s.%s],
-                   $self->id_run,
-                   $self->position,
-                   $self->tag_label(),
-                   $self->can(q[sequence_type]) && $self->sequence_type ? q[_] . $self->sequence_type : q[],
-                   $self->class_name,
-                   q[json];
+        $self->id_run,
+        $self->position,
+        $self->tag_label(),
+        $self->can(q[subset]) && $self->subset ? q[_] . $self->subset : q[],
+        $self->class_name,
+        q[json];
 }
 
 =head2 write2file

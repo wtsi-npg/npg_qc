@@ -49,6 +49,21 @@ sub criterion {
   return;
 }
 
+sub check_name {
+  my $self = shift;
+  my $name = 'sequence mismatch';
+  if ($self->sequence_type) {
+    $name .= q[ ] . $self->sequence_type;
+  }
+  $name =~ s/_/ /gsmx;
+  return $name;
+}
+
+sub subset {
+  my $self = shift;
+  return $self->sequence_type;
+}
+
 no Moose;
 
 1;
@@ -62,13 +77,13 @@ __END__
 
 =head1 SYNOPSIS
 
-
 =head1 DESCRIPTION
-
 
 =head1 SUBROUTINES/METHODS
 
 =head2 check_name - human readable check name
+
+=head2 subset - returns the value of the sequence_type attribute
 
 =head2 forward_average_percent_error - forware average percentage of error across all cycle
 

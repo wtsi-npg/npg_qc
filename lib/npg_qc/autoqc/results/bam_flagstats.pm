@@ -5,8 +5,6 @@
 
 package npg_qc::autoqc::results::bam_flagstats;
 
-use strict;
-use warnings;
 use Moose;
 use Carp;
 use Perl6::Slurp;
@@ -18,103 +16,74 @@ with qw(npg_qc::autoqc::role::bam_flagstats);
 
 our $VERSION = '0';
 
-Readonly::Scalar our $METRICS_FIELD_LIST => [qw(library unpaired_mapped_reads paired_mapped_reads unmapped_reads  unpaired_read_duplicates paired_read_duplicates read_pair_optical_duplicates percent_duplicate library_size)];
-Readonly::Scalar our $LIBRARY_SIZE_NOT_AVAILABLE => -1; # picard and biobambam mark duplicates assign this
-                                                        # value for aligned data with no mapped paired reads
+Readonly::Scalar my $METRICS_FIELD_LIST => [qw(
+   library unpaired_mapped_reads paired_mapped_reads unmapped_reads
+   unpaired_read_duplicates paired_read_duplicates
+   read_pair_optical_duplicates percent_duplicate library_size)];
 
-has '+path'                        => (
-                                       required   => 0,
-		                                );
+# picard and biobambam mark duplicates assign this
+# value for aligned data with no mapped paired reads
+Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 
-has '+id_run'                      => (
-                                       required   => 0,
-		                                );
+Readonly::Scalar my $HUMAN_SPLIT_ATTR_DEFAULT => 'all';
 
-has '+position'                    => (
-                                       required   => 0,
-		                                );
+has [ qw/ +path +id_run +position / ] => ( required   => 0, );
+ 
+has 'human_split' => ( isa            => 'Maybe[Str]',
+                       is             => 'rw',
+                       predicate      => '_has_human_split',
+);
 
-has 'human_split'                  => (
-                                       isa            => 'Maybe[Str]',
-                                       is             => 'rw',
-                                       default        => 'all',
-		                                );
+has 'subset'      => ( isa            => 'Maybe[Str]',
+                       is             => 'rw',
+                       predicate      => '_has_subset',
+);
 
-has 'library'                      => (
-                                       isa            => 'Maybe[Str]',
-                                       is             => 'rw',
-		                                );
+has 'library' =>     ( isa  => 'Maybe[Str]',
+                       is   => 'rw',
+);
+has [ qw/ num_total_reads unpaired_mapped_reads paired_mapped_reads
+          unmapped_reads unpaired_read_duplicates paired_read_duplicates
+          read_pair_optical_duplicates library_size proper_mapped_pair
+          mate_mapped_defferent_chr mate_mapped_defferent_chr_5
+          read_pairs_examined / ] => (
+    isa => 'Maybe[Int]',
+    is  => 'rw',
+);
 
-has 'num_total_reads'              => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-		                                );
+has 'percent_duplicate' => ( isa => 'Maybe[Num]',
+                             is  => 'rw',
+);
 
-has 'unpaired_mapped_reads'        => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-		                                );
+has 'histogram'         => ( isa     => 'HashRef',
+                             is      => 'rw',
+                             default => sub { {} },
+);
 
-has 'paired_mapped_reads'          => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-		                               );
+sub BUILD {
+  my $self = shift;
 
-has 'unmapped_reads'               => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-		                                );
+  if ($self->_has_human_split && $self->_has_subset) {
+    if ($self->human_split ne $self->subset) {
+      croak sprintf 'human_split and subset attrs are different: %s and %s',
+        $self->human_split, $self->subset;
+    }
+    return;
+  }
+  
+  # Backwards compatibility
+  if ( $self->_has_human_split && !$self->_has_subset &&
+       $self->human_split ne $HUMAN_SPLIT_ATTR_DEFAULT ) {
+    $self->subset($self->human_split);
+  } elsif ( $self->_has_subset && !$self->_has_human_split ) {
+    # Do reverse as well so the human_split column, while we
+    # have it, is correctly populated
+    $self->human_split($self->subset);
+  }
+  
+  return;
+}
 
-has 'percent_duplicate'            => (
-                                       isa            => 'Maybe[Num]',
-                                       is             => 'rw',
-		                                );
-
-has 'unpaired_read_duplicates'     => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-		                                );
-
-has 'paired_read_duplicates'       => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-		                                );
-
-has 'read_pair_optical_duplicates' => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-		                                );
-
-has 'library_size'                 => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-                                      );
-
-has 'histogram'                    => (
-                                       isa            => 'Maybe[HashRef]',
-                                       is             => 'rw',
-                                       default        => sub { {} },
-                                      );
-
-has 'proper_mapped_pair'           => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-                                      );
-
-has 'mate_mapped_defferent_chr'   =>  (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-                                      );
-
-has 'mate_mapped_defferent_chr_5'  => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-                                      );
-
-has 'read_pairs_examined'          => (
-                                       isa            => 'Maybe[Int]',
-                                       is             => 'rw',
-                                      );
 sub parsing_metrics_file {
   my ($self, $matrics_file) = @_;
 
@@ -197,9 +166,7 @@ __END__
 
 =head1 SYNOPSIS
 
-
 =head1 DESCRIPTION
-
 
 =head1 SUBROUTINES/METHODS
 
@@ -217,6 +184,14 @@ __END__
 
 =item Moose
 
+=item Carp
+
+=item Perl6::Slurp
+
+=item List::Util
+
+=item  Readonly
+
 =item npg_qc::autoqc::results::result
 
 =item npg_qc::autoqc::role::bam_flagstats
@@ -233,7 +208,7 @@ Author: Guoying Qi E<lt>gq1@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Guoying Qi
+Copyright (C) 2015 GRL, by Guoying Qi
 
 This file is part of NPG.
 

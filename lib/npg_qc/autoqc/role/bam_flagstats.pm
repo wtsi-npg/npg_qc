@@ -5,30 +5,32 @@
 
 package npg_qc::autoqc::role::bam_flagstats;
 
-use strict;
-use warnings;
 use Moose::Role;
-use Carp;
+use Readonly;
 
 with qw(npg_qc::autoqc::role::result);
 
-use Readonly;
 our $VERSION = '0';
-Readonly::Scalar our $PERCENTAGE   =>100;
+
+Readonly::Scalar my $PERCENTAGE   => 100;
+Readonly::Scalar my $SUBSET_ATTR_DEFAULT => 'target';
 
 sub total_reads {
   my $self = shift;
-  if( defined $self->num_total_reads() ) {
-      return $self->num_total_reads();
-  }elsif(defined $self->unpaired_mapped_reads && defined $self->paired_mapped_reads && defined  $self->unmapped_reads) {
-      return ( $self->unpaired_mapped_reads + 2 * $self->paired_mapped_reads +  $self->unmapped_reads );
+  if ( defined $self->num_total_reads() ) {
+    return $self->num_total_reads();
+  } elsif (defined $self->unpaired_mapped_reads &&
+           defined $self->paired_mapped_reads &&
+           defined  $self->unmapped_reads) {
+    return ( $self->unpaired_mapped_reads + 2 * $self->paired_mapped_reads +
+             $self->unmapped_reads );
   }
   return;
 }
 
 sub total_mapped_reads {
   my $self = shift;
-  if(defined $self->unpaired_mapped_reads && defined $self->paired_mapped_reads){
+  if (defined $self->unpaired_mapped_reads && defined $self->paired_mapped_reads) {
      return $self->unpaired_mapped_reads + 2 * $self->paired_mapped_reads;
   }
   return;
@@ -36,7 +38,7 @@ sub total_mapped_reads {
 
 sub total_duplicate_reads {
    my $self = shift;
-   if(defined $self->unpaired_read_duplicates && defined $self->paired_read_duplicates ){
+   if (defined $self->unpaired_read_duplicates && defined $self->paired_read_duplicates ) {
      return $self->unpaired_read_duplicates + 2 * $self->paired_read_duplicates;
    }
    return;
@@ -44,7 +46,7 @@ sub total_duplicate_reads {
 
 sub percent_mapped_reads {
   my $self = shift;
-  if($self->total_reads && defined $self->total_mapped_reads){
+  if ($self->total_reads && defined $self->total_mapped_reads) {
     return $PERCENTAGE * $self->total_mapped_reads / $self->total_reads;
   }
   return;
@@ -52,7 +54,7 @@ sub percent_mapped_reads {
 
 sub percent_duplicate_reads {
   my $self = shift;
-  if($self->total_mapped_reads && defined $self->total_duplicate_reads){
+  if ($self->total_mapped_reads && defined $self->total_duplicate_reads) {
     return $PERCENTAGE * $self->total_duplicate_reads / $self->total_mapped_reads;
   }
   return;
@@ -60,7 +62,7 @@ sub percent_duplicate_reads {
 
 sub percent_properly_paired {
    my $self = shift;
-   if($self->total_reads && defined $self->proper_mapped_pair){
+   if ($self->total_reads && defined $self->proper_mapped_pair) {
      return $PERCENTAGE * $self->proper_mapped_pair / $self->total_reads;
    }
    return;
@@ -68,7 +70,7 @@ sub percent_properly_paired {
 
 sub percent_singletons {
    my $self = shift;
-   if($self->total_reads && defined $self->unpaired_mapped_reads){
+   if ($self->total_reads && defined $self->unpaired_mapped_reads) {
      return $PERCENTAGE * $self->unpaired_mapped_reads / $self->total_reads;
    }
    return;
@@ -76,21 +78,14 @@ sub percent_singletons {
 
 sub check_name {
   my $self = shift;
+  my $name = $self->class_name;
+  $name =~ s/_/ /gsmx;
+  if ($self->subset && $self->subset ne $SUBSET_ATTR_DEFAULT) {
+    $name .= q{ } . $self->subset;
+  }
+  return $name;
+}
 
-  my $ref = $self->class_name;
-  $ref =~ s/_/ /gsmx;
-  if ($self->human_split() && $self->human_split() ne 'all') {
-    $ref .= q{ }.$self->human_split();
-  }
-  return $ref;
-}
-sub sequence_type {
-  my $self = shift;
-  if ($self->human_split() && $self->human_split() ne 'all') {
-    return $self->human_split();
-  }
-  return q();
-}
 no Moose;
 
 1;
@@ -103,7 +98,6 @@ __END__
     npg_qc::autoqc::role::bam_flagstats
 
 =head1 SYNOPSIS
-
 
 =head1 DESCRIPTION
 
@@ -125,8 +119,6 @@ __END__
 
 =head2 check_name
 
-=head2 sequence_type
-
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -147,11 +139,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
+Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Guoying Qi
+Copyright (C) 2015 GRL, by Guoying Qi
 
 This file is part of NPG.
 
