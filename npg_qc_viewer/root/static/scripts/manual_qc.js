@@ -154,7 +154,6 @@ var NPG;
         if(this.outcome === this.CONFIG_UNDECIDED) {
           throw new Error('Invalid state');
         }
-        
         if(this.outcome === this.CONFIG_ACCEPTED_PRELIMINAR) {
           this.updateOutcome(this.CONFIG_ACCEPTED_FINAL);
         }
@@ -395,7 +394,7 @@ var NPG;
             || lanesWithBG == null 
             || typeof(mqc_run_data) === undefined
             || mqc_run_data == null) {
-          throw "Error: invalid arguments";
+          throw new Error("invalid arguments");
         }
         var result = new Object();
         result['outcome'] = true; //Outcome of the validation.
