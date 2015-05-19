@@ -26,21 +26,30 @@
 *
 */
 
+
 var NPG;
+/**
+ * @module NPG
+ */
 (function (NPG) {
+  
+  /**
+   * @module NPG/QC
+   */
   (function (QC) { 
-    /**
-     * Object to keep configuration for resources.
-     */
     var ProdConfiguration = (function() {
-      /**
+      /**  
        * Object to keep configuration for resources.
        * @constructor
+       * @author jmtc
        */
-      function ProdConfiguration () {
-        
-      }
+      function ProdConfiguration () {}
       
+      /**
+       * Returns the path for the resourses so it can be used by
+       * other objects in the module.
+       * @returns {String} Path for resources.
+       */
       ProdConfiguration.prototype.getRoot = function() {
         return '/static'; 
       };
@@ -49,10 +58,13 @@ var NPG;
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
     
-    /*
-     * Controller for individual lanes GUI.
-     */
     var LaneMQCControl = (function () {
+      /**
+       * Controller for individual lanes GUI.
+       * @param index {Number} 
+       * @param abstractConfiguration {Object} 
+       * @constructor
+       */
       function LaneMQCControl(index, abstractConfiguration) {
         this.lane_control          = null;  // Container linked to this controller
         this.outcome               = null;  // Current outcome (Is updated when linked to an object in the view)
@@ -231,7 +243,6 @@ var NPG;
         this.mqc_run_data          = null;
         this.QC_IN_PROGRESS        = 'qc in progress';
         this.QC_ON_HOLD            = 'qc on hold';
-        
       }
       
       /*
@@ -271,8 +282,8 @@ var NPG;
           && typeof(mqc_run_data.current_status_description)!== undefined
           && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
           && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
-          && (mqc_run_data.current_status_description == 'qc in progress' //TODO move to class
-            || mqc_run_data.current_status_description == 'qc on hold')
+          && (mqc_run_data.current_status_description == this.QC_IN_PROGRESS
+            || mqc_run_data.current_status_description == this.QC_ON_HOLD)
         return result;
       };
       
@@ -350,13 +361,15 @@ var NPG;
         return result;
       };
       
-      /*
+      /**
        * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
        * Only checks in case there is an outcome in DWH, meaning there should be an 
        * outcome in manual QC.
        * 
-       * It returns a value object with two properties:
+       * @param lanesWithBG {array} Lanes with background.
+       * @param mqc_run_data {Object} Value object with the state data for the run.
        * 
+       *  @returns A value object with two properties
        *  outcome: true/false for the result of the match. 
        *  position: null if matching, number of the first lane where there was a missmatch
        *   otherwise.
@@ -403,10 +416,11 @@ var NPG;
     }) ();
     QC.RunMQCControl = RunMQCControl;
 
-    /*
-     * Object to deal with id_run parsing from text.
-     */
     var RunTitleParser = (function () {
+      /**
+       * Object to deal with id_run parsing from text.
+       * @constructor
+       */
       function RunTitleParser() {
         this.reId = /^Results for run ([0-9]+) \(current run status:/;
       }
@@ -416,6 +430,8 @@ var NPG;
        * It looks for first integer using a regexp.
        * 
        * "^Results for run ([0-9]+) \(current run status:"
+       * 
+       * @param text {String} Text to parse.
        * 
        * @returns the first match for the execution of the regexp, 
        * which should be the id_run for a successful execution.
@@ -440,6 +456,9 @@ var NPG;
     }) ();
     QC.RunTitleParser = RunTitleParser;
     
+    /**
+     * @module NPG/QC/UI
+     */
     (function(UI) {
       var MQCOutcomeRadio = (function() {
         /**
@@ -474,7 +493,7 @@ var NPG;
 
         /**
          * Generates the HTML code of the radio and the label for this object.
-         * @returns HTML code representation.
+         * @returns {String} HTML code representation.
          */
         MQCOutcomeRadio.prototype.asHtml = function() {
           var self = this;
@@ -490,7 +509,6 @@ var NPG;
         return MQCOutcomeRadio;
       })();
       UI.MQCOutcomeRadio = MQCOutcomeRadio;
-      
     })(NPG.QC.UI || (NPG.QC.UI = {}));
     var UI = NPG.QC.UI;
   }) (NPG.QC || (NPG.QC = {}));
