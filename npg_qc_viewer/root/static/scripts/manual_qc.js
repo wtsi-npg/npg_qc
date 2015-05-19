@@ -173,12 +173,10 @@ var NPG;
       
       LaneMQCControl.prototype.setAcceptedPre = function() {
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;    
-        this.setAcceptedBG();
       };
       
       LaneMQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
-        this.setRejectedBG();
       };
       
       LaneMQCControl.prototype.setAcceptedFinal = function() {
