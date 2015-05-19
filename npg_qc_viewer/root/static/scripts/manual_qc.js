@@ -19,21 +19,24 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/************************************************************************************
+/*
 *
 * Interface for manual QC.
 * Dependencies: jQuery library
 *
-************************************************************************************/
+*/
 
 var NPG;
 (function (NPG) {
-  (function (QC) {
-    
+  (function (QC) { 
     /**
      * Object to keep configuration for resources.
      */
     var ProdConfiguration = (function() {
+      /**
+       * Object to keep configuration for resources.
+       * @constructor
+       */
       function ProdConfiguration () {
         
       }
@@ -225,7 +228,10 @@ var NPG;
     var RunMQCControl = (function () {
       function RunMQCControl(abstractConfiguration) {
         this.abstractConfiguration = abstractConfiguration;
-        this.mqc_run_data = null;
+        this.mqc_run_data          = null;
+        this.QC_IN_PROGRESS        = 'qc in progress';
+        this.QC_ON_HOLD            = 'qc on hold';
+        
       }
       
       /*
@@ -405,11 +411,14 @@ var NPG;
         this.reId = /^Results for run ([0-9]+) \(current run status:/;
       }
       
-      /*
+      /**
        * Parses the id_run from the title (or text) passed as param.
        * It looks for first integer using a regexp.
        * 
        * "^Results for run ([0-9]+) \(current run status:"
+       * 
+       * @returns the first match for the execution of the regexp, 
+       * which should be the id_run for a successful execution.
        */
       RunTitleParser.prototype.parseIdRun = function (text) {
         if(typeof(text) === undefined || text == null) {
@@ -481,6 +490,7 @@ var NPG;
         return MQCOutcomeRadio;
       })();
       UI.MQCOutcomeRadio = MQCOutcomeRadio;
+      
     })(NPG.QC.UI || (NPG.QC.UI = {}));
     var UI = NPG.QC.UI;
   }) (NPG.QC || (NPG.QC = {}));
