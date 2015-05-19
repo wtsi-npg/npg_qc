@@ -28,18 +28,18 @@
 
 
 var NPG;
-/**
+/** 
  * @module NPG
- */
+ */ 
 (function (NPG) {
-  
   /**
    * @module NPG/QC
    */
   (function (QC) { 
     var ProdConfiguration = (function() {
-      /**  
+      /**
        * Object to keep configuration for resources.
+       * @memberof module:NPG/QC
        * @constructor
        * @author jmtc
        */
@@ -63,6 +63,7 @@ var NPG;
        * Controller for individual lanes GUI.
        * @param index {Number} 
        * @param abstractConfiguration {Object} 
+       * @memberof module:NPG/QC
        * @constructor
        */
       function LaneMQCControl(index, abstractConfiguration) {
@@ -79,6 +80,9 @@ var NPG;
         this.UNDECIDED                  = 'Undecided'; //Initial outcome for widgets
       }
       
+      /**
+       * Change the outcome.
+       */
       LaneMQCControl.prototype.updateOutcome = function(outcome) {
         var id_run = this.lane_control.data('id_run'); 
         var position = this.lane_control.data('position');
@@ -114,7 +118,7 @@ var NPG;
         }
       };
       
-      /* 
+      /** 
        * Builds the gui controls necessary for the mqc operation and passes them to the view. 
        */ 
       LaneMQCControl.prototype.generateActiveControls = function() {
@@ -141,7 +145,7 @@ var NPG;
         }});
       };
       
-      /* 
+      /** 
        * Checks the current outcome associated with this controller. If it is not final it will make it final
        * will update the value in the model with an async call and update the view. 
        */
@@ -156,7 +160,7 @@ var NPG;
         } 
       };
       
-      /* 
+      /** 
        * Methods to deal with background colours. 
        */
       LaneMQCControl.prototype.setAcceptedBG = function() {
@@ -193,7 +197,7 @@ var NPG;
         this.lane_control.empty();
       };
       
-      /* 
+      /** 
        * Links the individual object with an mqc controller so it can allow mqc of a lane.
        */
       LaneMQCControl.prototype.linkControl = function(lane_control) {
@@ -215,7 +219,7 @@ var NPG;
         }
       };
       
-      /*
+      /**
        * Changes the background of the parent element depending on the initial outcome
        * of the lane.
        */
@@ -233,9 +237,11 @@ var NPG;
     }) ();
     QC.LaneMQCControl = LaneMQCControl;
 
-    /*
+    /**
      * Object with rules for general things about QC and its
      * user interface.
+     * @memberof module:NPG/QC
+     * @constructor
      */
     var RunMQCControl = (function () {
       function RunMQCControl(abstractConfiguration) {
@@ -245,9 +251,14 @@ var NPG;
         this.QC_ON_HOLD            = 'qc on hold';
       }
       
-      /*
+      /**
        * Validates qc conditions and if everything is ready for qc it will call the 
        * target function passing parameters. If not qc ready will call mop function.
+       * @param mqc_run_data {Object} Run status data
+       * @param lanes {array} lanes
+       * @param targetFunction {function} What to run if state for MQC
+       * @param mopFunction {function} What to run if not state for MQC
+       * @returns the result of running the functions.
        */
       RunMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
         var result = null;
@@ -264,11 +275,12 @@ var NPG;
         return result;
       };
       
-      /*
+      /**
        * Checks all conditions related with the user in session and the
        * status of the run. Validates the user has privileges, has role,
        * the run is in correct status and the user in session is the
        * same as the user who took the QCing.
+       * @param mqc_run_data {Object} Run status data
        */
       RunMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
         if(typeof(mqc_run_data) === undefined 
@@ -287,6 +299,11 @@ var NPG;
         return result;
       };
       
+      /**
+       * Iterates through lanes and shows the outcomes
+       * @param mqc_run_data
+       * @param lanes
+       */
       RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
         if(typeof(mqc_run_data) === undefined 
             || mqc_run_data == null 
@@ -296,7 +313,6 @@ var NPG;
         }
         var self = this;
 
-        var result = null;
         for(var i = 0; i < lanes.length; i++) {
           lanes[i].children('.lane_mqc_control').each(function(j, obj){
             $(obj).html("<div class='lane_mqc_working'><img src='" 
@@ -323,10 +339,9 @@ var NPG;
             c.loadBGFromInitial(obj);
           }
         }
-        return result;
       };
       
-      /*
+      /**
        * Update values in lanes with values from REST. Then link the lane
        * to a controller. The lane controller will update with widgets or
        * with proper background.
@@ -419,12 +434,13 @@ var NPG;
     var RunTitleParser = (function () {
       /**
        * Object to deal with id_run parsing from text.
+       * @memberof module:NPG/QC
        * @constructor
        */
       function RunTitleParser() {
         this.reId = /^Results for run ([0-9]+) \(current run status:/;
       }
-      
+
       /**
        * Parses the id_run from the title (or text) passed as param.
        * It looks for first integer using a regexp.
@@ -460,10 +476,36 @@ var NPG;
      * @module NPG/QC/UI
      */
     (function(UI) {
+      var MQCLaneSave = (function() {
+        
+        /**
+         * Widget for the save icon.
+         * @memberof module:NPG/QC/UI
+         * @param lane {Number} Lane number.
+         * @param onClick {function} What to call on click.
+         * @constructor 
+         */
+        MQCLaneSave = function (lane, onClick) {
+          this.lane = lane;
+          this.onClick = onClick;
+        }
+        
+        /**
+         * Return the html representation of the widget.
+         * @returns {String} html of the widget.
+         */
+        MQCLaneSave.prototype.asHtml = function () {
+          return '<img />';
+        };
+        
+        return MQCLaneSave;
+      })();
+      
       var MQCOutcomeRadio = (function() {
         /**
          * Widget to select the different outcomes of a lane. Internally
          * implemented as a radio.
+         * @memberof module:NPG/QC/UI
          * @constructor
          * @param {String} id_pre - prefix for the id.
          * @param {String} outcome - outcome as string.
