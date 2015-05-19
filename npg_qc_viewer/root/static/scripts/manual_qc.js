@@ -362,7 +362,7 @@ var NPG;
             || mqc_run_data == null) {
           throw "Error: invalid arguments";
         }
-        var result = Object;
+        var result = new Object();
         result['outcome'] = true; //Outcome of the validation.
         result['position'] = null; //Which lane has the problem (if there is a problem).
         for(var i = 0; i < lanesWithBG.length && result; i++) {
@@ -426,23 +426,72 @@ var NPG;
           }
         }
         return result;
-      };
-      
+      };      
       return RunTitleParser;
     }) ();
     QC.RunTitleParser = RunTitleParser;
+    
+    (function(UI) {
+      var MQCOutcomeRadio = (function() {
+        /**
+         * Widget to select the different outcomes of a lane. Internally
+         * implemented as a radio.
+         * @constructor
+         * @param {String} id_pre - prefix for the id.
+         * @param {String} outcome - outcome as string.
+         * @param {String} label - HTML for the label of the radio (an image 
+         * for example).
+         * @param {String} name - for the radio. Using the same name for 
+         * different radios groups them together.
+         * @param {Object} checked - if checked is not undefined the radio 
+         * option will be marked as "checked" otherwise it will not be checked.
+         * @author jmtc
+         */
+        MQCOutcomeRadio = function(id_pre, outcome, label, group, checked) {
+          this.id_pre = id_pre;
+          this.outcome = outcome;
+          this.label = label;
+          if (typeof (group) === undefined) {
+            this.group = 'radios';
+          } else {
+            this.group = group;
+          }
+          if (typeof (checked) === undefined) {
+            this.checked = '';
+          } else {
+            this.checked = ' checked ';
+          }
+        }
+
+        /**
+         * Generates the HTML code of the radio and the label for this object.
+         * @returns HTML code representation.
+         */
+        MQCOutcomeRadio.prototype.asHtml = function() {
+          var self = this;
+          var internal_id = "radio_" + self.id_pre + "_" + self.outcome + "";
+          var label = "<label for='" + internal_id + "'>" + self.label
+              + "</label>";
+
+          var obj = $("<input type='radio' id='" + internal_id + "' "
+              + "name='" + self.group + "' value='" + self.outcome + "'"
+              + self.checked + ">" + label);
+          return obj;
+        };
+        return MQCOutcomeRadio;
+      })();
+      UI.MQCOutcomeRadio = MQCOutcomeRadio;
+    })(NPG.QC.UI || (NPG.QC.UI = {}));
+    var UI = NPG.QC.UI;
   }) (NPG.QC || (NPG.QC = {}));
   var QC = NPG.QC;
 }) (NPG || (NPG = {}));
 
-
-
-
 /*
-* Check current state of the lanes. If current state is ready for QC, 
-* get information from the page and prepare a VO object. Update the 
-* lanes with GUI controls when necessary.
-*/
+ * Check current state of the lanes. If current state is ready for QC, get
+ * information from the page and prepare a VO object. Update the lanes with GUI
+ * controls when necessary.
+ */
 function getQcState(mqc_run_data, runMQCControl, lanes) {
   //Show working icons
   for(var i = 0; i < lanes.length; i++) {
