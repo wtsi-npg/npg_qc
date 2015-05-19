@@ -26,7 +26,6 @@
 *
 */
 
-
 var NPG;
 /** 
  * @module NPG
@@ -124,13 +123,13 @@ var NPG;
       LaneMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
         var self = this;
-        this.lane_control.html("<img class='lane_mqc_control_accept' src='"
-            + self.abstractConfiguration.getRoot()
-            + "/images/tick.png' title='Accept'>" 
-            + "<img class='lane_mqc_control_reject' src='"
-            + self.abstractConfiguration.getRoot()
-            + "/images/cross.png' title='Reject'>" 
-            + "<div class='lane_mqc_working'></div>");    
+        this.lane_control.html("<img class='lane_mqc_control_accept' src='" + 
+            self.abstractConfiguration.getRoot() + 
+            "/images/tick.png' title='Accept'>"  + 
+            "<img class='lane_mqc_control_reject' src='" + 
+            self.abstractConfiguration.getRoot() + 
+            "/images/cross.png' title='Reject'>" + 
+            "<div class='lane_mqc_working'></div>");    
         
         this.lane_control.find('.lane_mqc_control_accept').bind({click: function() {
           lane_control.extra_handler.updateOutcome(lane_control.extra_handler.CONFIG_ACCEPTED_FINAL);
@@ -159,7 +158,7 @@ var NPG;
         }
         if(this.outcome === this.CONFIG_REJECTED_PRELIMINAR) {
           this.updateOutcome(this.CONFIG_REJECTED_FINAL);
-        } 
+        }
       };
       
       /** 
@@ -189,6 +188,10 @@ var NPG;
       LaneMQCControl.prototype.setRejectedFinal = function() {
         this.outcome = this.CONFIG_REJECTED_FINAL;
         this.setRejectedBG();
+      };
+      
+      LaneMQCControl.prototype.setUndecided = function() {
+        this.outcome = this.CONFIG_UNDECIDED;
       };
       
       LaneMQCControl.prototype.replaceForLink = function() {
