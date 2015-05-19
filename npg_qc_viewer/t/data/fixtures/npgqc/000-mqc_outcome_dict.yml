@@ -19,3 +19,9 @@
   long_desc : 'Lane has been rejected as a final decision.'
   iscurrent : 1
   isvisible : 1
+- id_mqc_outcome : 5
+  short_desc : 'Undecided'
+  long_desc : 'Lane has no current outcome.'
+  iscurrent : 1
+  isvisible : 1
+  
