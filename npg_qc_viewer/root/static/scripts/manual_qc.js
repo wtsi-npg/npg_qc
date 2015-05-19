@@ -29,6 +29,10 @@
 var NPG;
 (function (NPG) {
   (function (QC) {
+    
+    /**
+     * Object to keep configuration for resources.
+     */
     var ProdConfiguration = (function() {
       function ProdConfiguration () {
         
@@ -57,7 +61,7 @@ var NPG;
         this.CONFIG_REJECTED_PRELIMINAR = 'Rejected preliminary';
         this.CONFIG_ACCEPTED_FINAL      = 'Accepted final';
         this.CONFIG_REJECTED_FINAL      = 'Rejected final';
-        this.CONFIG_INITIAL             = 'initial';
+        this.UNDECIDED                  = 'Undecided'; //Initial outcome for widgets
       }
       
       LaneMQCControl.prototype.updateOutcome = function(outcome) {
@@ -180,14 +184,14 @@ var NPG;
       LaneMQCControl.prototype.linkControl = function(lane_control) {
         lane_control.extra_handler = this;
         this.lane_control = lane_control;
-        if ( typeof lane_control.data(this.CONFIG_INITIAL) === undefined) {
+        if ( typeof lane_control.data(this.UNDECIDED) === undefined) {
           //If it does not have initial outcome
           this.generateActiveControls();
-        } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINAR 
-            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINAR) {
+        } else if (lane_control.data(this.UNDECIDED) === this.CONFIG_ACCEPTED_PRELIMINAR 
+            || lane_control.data(this.UNDECIDED) === this.CONFIG_REJECTED_PRELIMINAR) {
           //If previous outcome is preliminar.
           this.generateActiveControls();
-          switch (lane_control.data(this.CONFIG_INITIAL)){
+          switch (lane_control.data(this.UNDECIDED)){
             case this.CONFIG_ACCEPTED_PRELIMINAR : this.setAcceptedPre(); break;
             case this.CONFIG_REJECTED_PRELIMINAR : this.setRejectedPre(); break;
           }
@@ -203,7 +207,7 @@ var NPG;
       LaneMQCControl.prototype.loadBGFromInitial = function (lane_control) {
         lane_control.extra_handler = this;
         this.lane_control = lane_control;
-        switch (lane_control.data(this.CONFIG_INITIAL)){
+        switch (lane_control.data(this.UNDECIDED)){
           case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
           case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
         }
@@ -430,6 +434,9 @@ var NPG;
   }) (NPG.QC || (NPG.QC = {}));
   var QC = NPG.QC;
 }) (NPG || (NPG = {}));
+
+
+
 
 /*
 * Check current state of the lanes. If current state is ready for QC, 
