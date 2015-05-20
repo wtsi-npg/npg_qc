@@ -135,7 +135,7 @@ var NPG;
                       "<img height='10' width='10' src='" + 
                       self.abstractConfiguration.getRoot() + 
                       "/images/cross.png' />"]; // for rejected
-        this.lane_control.empty();
+        self.lane_control.empty();
         var name = 'radios_' + position;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
@@ -145,9 +145,9 @@ var NPG;
             checked = true;
           }
           var radio = new NPG.QC.UI.MQCOutcomeRadio(position, outcome, label, name, checked);
-          this.lane_control.append(radio.asObject());
+          self.lane_control.append(radio.asObject());
         }
-        this.lane_control.append($("<div class='lane_mqc_working'></div>"));
+        self.lane_control.append($("<div class='lane_mqc_working'></div>"));
         $("input[name='" + name + "']").on("change", function () {
           self.updateOutcome(this.value);
         });
