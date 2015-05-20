@@ -105,8 +105,6 @@ var NPG;
               case control.CONFIG_REJECTED_FINAL : control.setRejectedFinal(); break;
               case control.CONFIG_UNDECIDED : control.setUndecided(); break;
             }
-            //Clear progress icon
-            control.lane_control.empty();
           })
           .fail(function(data) {
             window.console && console.log(data.responseJSON.message);
@@ -128,7 +126,7 @@ var NPG;
         var id_run = lane_control.data('id_run'); 
         var position = lane_control.data('position');
         var outcomes = [self.CONFIG_ACCEPTED_PRELIMINAR, 
-                        self.UNDECIDED, 
+                        self.CONFIG_UNDECIDED, 
                         self.CONFIG_REJECTED_PRELIMINAR];
         var labels = ["<img height='10' width='10' src='" + 
                       self.abstractConfiguration.getRoot() + 
@@ -137,34 +135,18 @@ var NPG;
                       "<img height='10' width='10' src='" + 
                       self.abstractConfiguration.getRoot() + 
                       "/images/cross.png' />"]; // for rejected
-        var controls = '';
+        this.lane_control.empty();
+        var name = 'radios_' + position;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
           var label = labels[i];
-          var radio = new NPG.QC.UI.MQCOutcomeRadio(id_run, outcome, label, 'radios', null);
-          controls += radio.asObject();
-        } 
-        this.lane_control.append(controls);
-        
-//        this.lane_control.html("<img class='lane_mqc_control_accept' src='" + 
-//            self.abstractConfiguration.getRoot() + 
-//            "/images/tick.png' title='Accept'>"  + 
-//            "<img class='lane_mqc_control_reject' src='" + 
-//            self.abstractConfiguration.getRoot() + 
-//            "/images/cross.png' title='Reject'>" + 
-//            "<div class='lane_mqc_working'></div>");    
-//        
-//        this.lane_control.find('.lane_mqc_control_accept').bind({click: function() {
-//          lane_control.extra_handler.updateOutcome(lane_control.extra_handler.CONFIG_ACCEPTED_FINAL);
-//        }});
-//        
-//        this.lane_control.find('.lane_mqc_control_reject').bind({click: function() {
-//          lane_control.extra_handler.updateOutcome(lane_control.extra_handler.CONFIG_REJECTED_FINAL);
-//        }});
-//        
-//        this.lane_control.find('.lane_mqc_control_save').bind({click: function() {
-//          lane_control.extra_handler.saveAsFinalOutcome();
-//        }}); 
+          var radio = new NPG.QC.UI.MQCOutcomeRadio(position, outcome, label, name, null);
+          this.lane_control.append(radio.asObject());
+        }
+        this.lane_control.append($("<div class='lane_mqc_working'></div>"));
+        $("input[name='" + name + "']").on("change", function () {
+          self.updateOutcome(this.value);
+        });
       };
       
       /** 
@@ -196,11 +178,13 @@ var NPG;
       };
       
       LaneMQCControl.prototype.setAcceptedPre = function() {
-        this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;    
+        this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;
+        
       };
       
       LaneMQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
+        
       };
       
       LaneMQCControl.prototype.setAcceptedFinal = function() {
@@ -217,12 +201,6 @@ var NPG;
         this.outcome = this.CONFIG_UNDECIDED;
       };
       
-      LaneMQCControl.prototype.replaceForLink = function() {
-        var id_run = this.lane_control.data('id_run'); 
-        var position = this.lane_control.data('position');
-        this.lane_control.empty();
-      };
-      
       /** 
        * Links the individual object with an mqc controller so it can allow mqc of a lane.
        */
@@ -233,12 +211,15 @@ var NPG;
           //If it does not have initial outcome
           this.generateActiveControls();
         } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINAR 
-            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINAR) {
+            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINAR
+            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_UNDECIDED) {
           //If previous outcome is preliminar.
+          this.outcome = lane_control.data(this.CONFIG_INITIAL);
           this.generateActiveControls();
-          switch (lane_control.data(this.CONFIG_INITIAL)){
+          switch (this.outcome){
             case this.CONFIG_ACCEPTED_PRELIMINAR : this.setAcceptedPre(); break;
             case this.CONFIG_REJECTED_PRELIMINAR : this.setRejectedPre(); break;
+            case this.CONFIG_UNDECIDED : this.setUndecided(); break;
           }
         } else {
           this.loadBGFromInitial(lane_control);
