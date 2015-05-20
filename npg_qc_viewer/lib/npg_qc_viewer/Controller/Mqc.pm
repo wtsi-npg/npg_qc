@@ -54,6 +54,8 @@ sub update_outcome : Path('update_outcome') {
   my $new_outcome;
   my $error;
 
+  my $ent;
+
   try {
     ####Validating request method
     $self->_validate_req_method($c, $ALLOW_METHOD_POST);
@@ -80,7 +82,7 @@ sub update_outcome : Path('update_outcome') {
       $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
     }
 
-    my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
+    $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
       {'id_run' => $id_run, 'position' => $position})->next;
     if (!$ent) {
       $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
@@ -100,12 +102,14 @@ sub update_outcome : Path('update_outcome') {
 
   if ($error) {
     ($error, $error_code) = $self->parse_error($error);
-  } else {
-    try {
-      $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
-    } catch {
-      $lane_update_error = qq[ Error updating lane status: $_];
-    };
+  } else { 
+    if($ent->has_final_outcome) { ##If final outcome update lane as qc complete
+      try {
+        $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
+      } catch {
+        $lane_update_error = qq[ Error updating lane status: $_];
+      };
+    }
   }
 
   my $message = $error || qq[Manual QC $new_outcome for run $id_run, position $position saved.];
