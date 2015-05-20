@@ -140,7 +140,11 @@ var NPG;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
           var label = labels[i];
-          var radio = new NPG.QC.UI.MQCOutcomeRadio(position, outcome, label, name, null);
+          var checked = null;
+          if (self.outcome == outcome) {
+            checked = true;
+          }
+          var radio = new NPG.QC.UI.MQCOutcomeRadio(position, outcome, label, name, checked);
           this.lane_control.append(radio.asObject());
         }
         this.lane_control.append($("<div class='lane_mqc_working'></div>"));
@@ -537,12 +541,12 @@ var NPG;
           this.id_pre = id_pre;
           this.outcome = outcome;
           this.label = label;
-          if (typeof (group) === "undefined" && group != null) {
+          if (typeof (group) === "undefined" || group == null) {
             this.group = 'radios';
           } else {
             this.group = group;
           }
-          if (typeof (checked) === "undefined" && checked != null) {
+          if (typeof (checked) === "undefined" || checked == null) {
             this.checked = '';
           } else {
             this.checked = ' checked ';
