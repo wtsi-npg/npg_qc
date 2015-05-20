@@ -31,7 +31,6 @@
   padding: 0px;
   font-family: 'Lucida Grande', helvetica, arial, sans-serif;
   font-size: 12px;
-  
 }
 
 /* to make white space non-braking */
@@ -409,7 +408,6 @@ a, a:link, a:visited, a:hover {
   padding-left: 10px;
 }
 
-
 /******************* annotation section **************/
 #annotations_frame {
   height: 100px;
@@ -441,27 +439,21 @@ a, a:link, a:visited, a:hover {
 }
 
 /******************* manual qc widgets **************/
+.padded_anchor {
+	padding-right: 15px;
+	padding-left: 5px;
+}
+
 .mqc {
   display: inline;
   padding-right: 5px;
   padding-top: 5px;
 }
 
-.button {
-  margin: 1px;
-  border-style: outset;
-  border-width: 2px;
-  width: 16px;
-  height: 16px;
-  visibility: inherit;
-}
-
-.button_fail {
-  border-color: rgb(255,86,89);
-}
-
-.button_pass {
-  border-color: rgb(134,204,124);
+.lane_mqc_save {
+	padding-left: 5px;
+	padding-right: 5px;
+	vertical-align: top;
 }
 
 input[type=radio], input[type=checkbox] {

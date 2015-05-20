@@ -147,7 +147,10 @@ var NPG;
           var radio = new NPG.QC.UI.MQCOutcomeRadio(position, outcome, label, name, checked);
           self.lane_control.append(radio.asObject());
         }
-        self.lane_control.append($("<div class='lane_mqc_working'></div>"));
+        self.lane_control.append($("<img height='16' width='16' class='lane_mqc_save' src='" + 
+            self.abstractConfiguration.getRoot() + 
+            "/images/padlock.png'>"));
+        self.lane_control.append($("<span class='lane_mqc_working'></span>"));
         $("input[name='" + name + "']").on("change", function () {
           self.updateOutcome(this.value);
         });
@@ -326,9 +329,9 @@ var NPG;
 
         for(var i = 0; i < lanes.length; i++) {
           lanes[i].children('.lane_mqc_control').each(function(j, obj){
-            $(obj).html("<div class='lane_mqc_working'><img src='" 
+            $(obj).html("<span class='lane_mqc_working'><img src='" 
                 + self.abstractConfiguration.getRoot() 
-                + "/images/waiting.gif' title='Processing request.'></div>");
+                + "/images/waiting.gif' title='Processing request.'></span>");
           });
         }
         
@@ -597,7 +600,7 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
   //Show working icons
   for(var i = 0; i < lanes.length; i++) {
     lanes[i].children('.lane_mqc_control').each(function(j, obj){
-      $(obj).html("<div class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></div>");
+      $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
     });
   }
   
