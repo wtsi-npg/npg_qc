@@ -147,9 +147,16 @@ var NPG;
           var radio = new NPG.QC.UI.MQCOutcomeRadio(position, outcome, label, name, checked);
           self.lane_control.append(radio.asObject());
         }
-        self.lane_control.append($("<img height='16' width='16' class='lane_mqc_save' src='" + 
+        self.lane_control.append($("<span class='lane_mqc_save'><img height='16' width='16' src='" + 
             self.abstractConfiguration.getRoot() + 
-            "/images/padlock.png'>"));
+            "/images/padlock.png'></span>"));
+        self.lane_control.find('.lane_mqc_save').off("click").on("click", function() {
+          alert("save as final");
+          //self.saveAsFinalOutcome();
+        });
+        if (self.outcome == self.CONFIG_UNDECIDED) {
+          self.lane_control.find('.lane_mqc_save').hide();
+        }
         self.lane_control.append($("<span class='lane_mqc_working'></span>"));
         $("input[name='" + name + "']").on("change", function () {
           self.updateOutcome(this.value);
@@ -186,26 +193,32 @@ var NPG;
       
       LaneMQCControl.prototype.setAcceptedPre = function() {
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;
-        
+        var self = this;
+        self.lane_control.find('.lane_mqc_save').show();
       };
       
       LaneMQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
-        
+        var self = this;
+        self.lane_control.find('.lane_mqc_save').show();
       };
       
       LaneMQCControl.prototype.setAcceptedFinal = function() {
         this.outcome = this.CONFIG_ACCEPTED_FINAL;
+        this.lane_control.empty();
         this.setAcceptedBG();
       };
       
       LaneMQCControl.prototype.setRejectedFinal = function() {
         this.outcome = this.CONFIG_REJECTED_FINAL;
+        this.lane_control.empty();
         this.setRejectedBG();
       };
       
       LaneMQCControl.prototype.setUndecided = function() {
         this.outcome = this.CONFIG_UNDECIDED;
+        var self = this;
+        self.lane_control.find('.lane_mqc_save').hide();
       };
       
       /** 
