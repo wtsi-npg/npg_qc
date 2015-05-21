@@ -91,7 +91,7 @@ var NPG;
           //Show progress icon
           control.lane_control.find('.lane_mqc_working').html("<img src='"
               + this.abstractConfiguration.getRoot()
-              + "/images/waiting.gif' title='Processing request.'>");
+              + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
           //AJAX call.
           $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
             var response = data;
@@ -147,7 +147,8 @@ var NPG;
           var radio = new NPG.QC.UI.MQCOutcomeRadio(position, outcome, label, name, checked);
           self.lane_control.append(radio.asObject());
         }
-        self.lane_control.append($("<span class='lane_mqc_save'><img height='16' width='16' src='" + 
+        self.addMQCFormat();
+        self.lane_control.append($("<span class='lane_mqc_save'><img height='12' width='12' src='" + 
             self.abstractConfiguration.getRoot() + 
             "/images/padlock.png'></span>"));
         self.lane_control.find('.lane_mqc_save').off("click").on("click", function() {
@@ -191,34 +192,47 @@ var NPG;
         this.lane_control.parent().css("background-color", "#FFDDDD");
       };
       
+      LaneMQCControl.prototype.removeMQCFormat = function () {
+        this.lane_control.parent().css({
+          "min-width": "",
+          "text-align": "center",
+        });
+      };
+      
+      LaneMQCControl.prototype.addMQCFormat = function () {
+        this.lane_control.parent().css({
+          "min-width": "125px",
+          "text-align": "left",
+        });
+      };
+      
       LaneMQCControl.prototype.setAcceptedPre = function() {
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;
-        var self = this;
-        self.lane_control.find('.lane_mqc_save').show();
+        this.lane_control.find('.lane_mqc_save').show();
       };
       
       LaneMQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
-        var self = this;
-        self.lane_control.find('.lane_mqc_save').show();
+        this.lane_control.find('.lane_mqc_save').show();
       };
       
       LaneMQCControl.prototype.setAcceptedFinal = function() {
         this.outcome = this.CONFIG_ACCEPTED_FINAL;
         this.lane_control.empty();
+        this.removeMQCFormat();
         this.setAcceptedBG();
       };
       
       LaneMQCControl.prototype.setRejectedFinal = function() {
         this.outcome = this.CONFIG_REJECTED_FINAL;
         this.lane_control.empty();
+        this.removeMQCFormat();
         this.setRejectedBG();
       };
       
       LaneMQCControl.prototype.setUndecided = function() {
         this.outcome = this.CONFIG_UNDECIDED;
-        var self = this;
-        self.lane_control.find('.lane_mqc_save').hide();
+        this.lane_control.find('.lane_mqc_save').hide();
       };
       
       /** 
@@ -229,6 +243,7 @@ var NPG;
         this.lane_control = lane_control;
         if ( typeof(lane_control.data(this.CONFIG_INITIAL)) === "undefined") {
           //If it does not have initial outcome
+          this.outcome = this.CONFIG_UNDECIDED;
           this.generateActiveControls();
         } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINAR 
             || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINAR
@@ -344,7 +359,7 @@ var NPG;
           lanes[i].children('.lane_mqc_control').each(function(j, obj){
             $(obj).html("<span class='lane_mqc_working'><img src='" 
                 + self.abstractConfiguration.getRoot() 
-                + "/images/waiting.gif' title='Processing request.'></span>");
+                + "/images/waiting.gif' width='10' height='10' title='Processing request.'></span>");
           });
         }
         
