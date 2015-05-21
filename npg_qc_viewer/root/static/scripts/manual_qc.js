@@ -152,8 +152,7 @@ var NPG;
             self.abstractConfiguration.getRoot() + 
             "/images/padlock.png'></span>"));
         self.lane_control.find('.lane_mqc_save').off("click").on("click", function() {
-          alert("save as final");
-          //self.saveAsFinalOutcome();
+          self.saveAsFinalOutcome();
         });
         if (self.outcome == self.CONFIG_UNDECIDED) {
           self.lane_control.find('.lane_mqc_save').hide();
@@ -193,6 +192,7 @@ var NPG;
       };
       
       LaneMQCControl.prototype.removeMQCFormat = function () {
+        this.lane_control.parent().find('.padded_anchor').removeClass( "padded_anchor");
         this.lane_control.parent().css({
           "min-width": "",
           "text-align": "center",
@@ -268,7 +268,7 @@ var NPG;
       LaneMQCControl.prototype.loadBGFromInitial = function (lane_control) {
         lane_control.extra_handler = this;
         this.lane_control = lane_control;
-        switch (lane_control.data(this.CONFIG_UNDECIDED)){
+        switch (lane_control.data(this.CONFIG_INITIAL)){
           case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
           case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
         }
