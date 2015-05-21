@@ -439,7 +439,7 @@ a, a:link, a:visited, a:hover {
 }
 
 /******************* manual qc widgets **************/
-.padded_anchor {
+.padded_anchor { /* For the anchor with the lane number */
 	padding-right: 15px;
 }
 
@@ -449,7 +449,7 @@ a, a:link, a:visited, a:hover {
   padding-top: 5px;
 }
 
-.lane_mqc_save {
+.lane_mqc_save { /* For the padlock image so it looks like a button */
 	padding-left: 5px;
 	padding-right: 5px;
 	padding-top: 2px;
@@ -468,11 +468,12 @@ a, a:link, a:visited, a:hover {
   line-height: 1;
 }
 
-input[type=radio], input[type=checkbox] {
+/* To reset the radios for mqc, it affects all radios in page */
+input[type=radio] {
   display:none;
 }
 
-input[type=radio] + label, input[type=checkbox] + label {
+input[type=radio] + label {
   background: #F4F4F4;
   border: 1px solid #A8A8A8;
   -webkit-border-radius: 5px;
@@ -492,7 +493,7 @@ input[type=radio] + label, input[type=checkbox] + label {
   padding: 2px 6px;
 }
 
-input[type=radio]:checked + label, input[type=checkbox]:checked + label{
+input[type=radio]:checked + label {
   background: #D4D4D4;
   border: 1px solid #C2C2C2;
   -webkit-border-radius: 5px;
