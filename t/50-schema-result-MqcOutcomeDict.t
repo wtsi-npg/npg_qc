@@ -21,12 +21,15 @@ ok ($rows[1]->is_final_outcome, 'final outcome check returns true');
 ok (!$rows[1]->is_accepted, 'accepted outcome check returns false');
 ok (!$rows[1]->is_final_accepted, 'accepted & final outcome check returns false');
 @rows = $schema->resultset($table)->search({short_desc => {'-not_in', $final}})->all();
-is (scalar @rows, 2, 'two non-final outcomes');
+is (scalar @rows, 3, 'three non-final outcomes');
 ok (!$rows[0]->is_final_outcome, 'final outcome check returns false');
 ok ($rows[0]->is_accepted, 'accepted outcome check returns true');
 ok (!$rows[0]->is_final_accepted, 'accepted & final outcome check returns false');
 ok (!$rows[1]->is_final_outcome, 'final outcome check returns false');
 ok (!$rows[1]->is_accepted, 'accepted outcome check returns false');
 ok (!$rows[1]->is_final_accepted, 'accepted & final outcome check returns false');
+ok (!$rows[2]->is_final_outcome, 'final outcome check returns false');
+ok (!$rows[2]->is_accepted, 'accepted outcome check returns false');
+ok (!$rows[2]->is_final_accepted, 'accepted & final outcome check returns false');
 
 1;
