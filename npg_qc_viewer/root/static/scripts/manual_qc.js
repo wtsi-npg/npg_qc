@@ -128,11 +128,11 @@ var NPG;
         var outcomes = [self.CONFIG_ACCEPTED_PRELIMINAR, 
                         self.CONFIG_UNDECIDED, 
                         self.CONFIG_REJECTED_PRELIMINAR];
-        var labels = ["<img height='10' width='10' src='" + 
+        var labels = ["<img src='" + 
                       self.abstractConfiguration.getRoot() + 
                       "/images/tick.png' />", // for accepted
                       '&nbsp;&nbsp;&nbsp;', // for undecided
-                      "<img height='10' width='10' src='" + 
+                      "<img src='" + 
                       self.abstractConfiguration.getRoot() + 
                       "/images/cross.png' />"]; // for rejected
         self.lane_control.empty();
@@ -157,7 +157,6 @@ var NPG;
         if (self.outcome == self.CONFIG_UNDECIDED) {
           self.lane_control.find('.lane_mqc_save').hide();
         }
-        self.lane_control.append($("<span class='lane_mqc_working'></span>"));
         $("input[name='" + name + "']").on("change", function () {
           self.updateOutcome(this.value);
         });
