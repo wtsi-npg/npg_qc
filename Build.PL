@@ -227,6 +227,7 @@ my $extended_requires = {
                 'npg_tracking::illumina::run::folder'      => 0,
                 'npg_tracking::illumina::run::short_info'  => 0,
                 'npg_tracking::illumina::run::long_info'   => 0,
+                'npg_tracking::util::abs_path'             => 0,
                 'npg_tracking::util::types'                => 0,
                 'st::api::base'                            => 0,
                 'st::api::lims'                            => 0,

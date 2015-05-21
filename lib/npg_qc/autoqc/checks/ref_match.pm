@@ -10,12 +10,12 @@ use Carp;
 use English qw(-no_match_vars);
 use File::Basename qw(fileparse);
 use File::Spec::Functions qw(catfile);
-use Cwd 'abs_path';
 use DateTime;
 use Moose;
 use List::Util qw(shuffle);
 use Readonly;
 
+use npg_tracking::util::abs_path qw(abs_path);
 use npg_common::extractor::fastq qw/generate_equally_spaced_reads split_reads/;
 extends 'npg_qc::autoqc::checks::check';
 with    qw/npg_tracking::data::reference::list
