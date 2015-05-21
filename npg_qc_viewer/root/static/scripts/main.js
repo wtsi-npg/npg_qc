@@ -43,6 +43,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   //Preload rest of icons
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
+  $('<img/>')[0].src = "/static/images/padlock.png";
   
   //Read information about lanes from page.
   var lanes = []; //Lanes without previous QC, blank BG 
@@ -76,7 +77,16 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
         var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data); 
         if(DWHMatch.outcome) {
           control.initQC(jqxhr.responseJSON, lanes, 
-              function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
+              function (mqc_run_data, runMQCControl, lanes) {
+                //Show working icons
+                for(var i = 0; i < lanes.length; i++) {
+                  lanes[i].children('a').addClass('padded_anchor');
+                  lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                    $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                  });
+                }
+                runMQCControl.prepareLanes(mqc_run_data, lanes); 
+              },
               function () { //There is no mqc so I just remove the working image and padding for anchor 
                 $('.lane_mqc_working').empty(); 
               }  

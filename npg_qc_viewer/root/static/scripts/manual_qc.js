@@ -585,20 +585,3 @@ var NPG;
   var QC = NPG.QC;
 }) (NPG || (NPG = {}));
 
-/*
- * Check current state of the lanes. If current state is ready for QC, get
- * information from the page and prepare a VO object. Update the lanes with GUI
- * controls when necessary.
- */
-function getQcState(mqc_run_data, runMQCControl, lanes) {
-  //Show working icons
-  for(var i = 0; i < lanes.length; i++) {
-    lanes[i].children('a').addClass('padded_anchor');
-    lanes[i].children('.lane_mqc_control').each(function(j, obj){
-      $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
-    });
-  }
-  
-  runMQCControl.prepareLanes(mqc_run_data, lanes);
-}
-
