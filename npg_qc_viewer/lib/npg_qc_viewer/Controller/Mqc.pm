@@ -102,7 +102,7 @@ sub update_outcome : Path('update_outcome') {
 
   if ($error) {
     ($error, $error_code) = $self->parse_error($error);
-  } else { 
+  } else {
     if($ent->has_final_outcome) { ##If final outcome update lane as qc complete
       try {
         $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
