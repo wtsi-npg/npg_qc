@@ -151,11 +151,11 @@ var NPG;
         self.lane_control.append($("<span class='lane_mqc_save'><img src='" + 
             self.abstractConfiguration.getRoot() + 
             "/images/padlock.png'></span>"));
-        self.lane_control.find('.lane_mqc_save').off("click").on("click", function() {
+        self.lane_control.children('.lane_mqc_save').off("click").on("click", function() {
           self.saveAsFinalOutcome();
         });
         if (self.outcome == self.CONFIG_UNDECIDED) {
-          self.lane_control.find('.lane_mqc_save').hide();
+          self.lane_control.children('.lane_mqc_save').hide();
         }
         $("input[name='" + name + "']").on("change", function () {
           self.updateOutcome(this.value);
@@ -191,7 +191,7 @@ var NPG;
       };
       
       LaneMQCControl.prototype.removeMQCFormat = function () {
-        this.lane_control.parent().find('.padded_anchor').removeClass( "padded_anchor");
+        this.lane_control.parent().children('.padded_anchor').removeClass("padded_anchor");
         this.lane_control.parent().css({
           "min-width": "",
           "text-align": "center",
@@ -207,12 +207,12 @@ var NPG;
       
       LaneMQCControl.prototype.setAcceptedPre = function() {
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;
-        this.lane_control.find('.lane_mqc_save').show();
+        this.lane_control.children('.lane_mqc_save').show();
       };
       
       LaneMQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
-        this.lane_control.find('.lane_mqc_save').show();
+        this.lane_control.children('.lane_mqc_save').show();
       };
       
       LaneMQCControl.prototype.setAcceptedFinal = function() {
@@ -231,7 +231,7 @@ var NPG;
       
       LaneMQCControl.prototype.setUndecided = function() {
         this.outcome = this.CONFIG_UNDECIDED;
-        this.lane_control.find('.lane_mqc_save').hide();
+        this.lane_control.children('.lane_mqc_save').hide();
       };
       
       /** 
@@ -378,6 +378,7 @@ var NPG;
             //Set up mqc controlers and link them to the individual lanes.
             var c = new NPG.QC.LaneMQCControl(i, self.abstractConfiguration);
             c.loadBGFromInitial(obj);
+            lanes[i].children('.padded_anchor').removeClass("padded_anchor");
           }
         }
       };

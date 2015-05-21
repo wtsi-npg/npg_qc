@@ -77,7 +77,10 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
         if(DWHMatch.outcome) {
           control.initQC(jqxhr.responseJSON, lanes, 
               function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
-              function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
+              function () { //There is no mqc so I just remove the working image and padding for anchor 
+                $('.lane_mqc_working').empty(); 
+                $('.padded_anchor').removeClass("padded_anchor");
+              }  
           );  
         } else {
           $("#ajax_status").append("<li class='failed_mqc'>"
@@ -95,6 +98,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
     }).fail(function(jqXHR, textStatus, errorThrown) {
       window.console && console.log( "error: " + errorThrown + " " + textStatus);
       $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
+      $('.padded_anchor').removeClass("padded_anchor");
       //Clear progress icon
       $('.lane_mqc_working').empty();
     });
