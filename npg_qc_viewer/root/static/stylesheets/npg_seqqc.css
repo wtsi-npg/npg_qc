@@ -443,6 +443,11 @@ a, a:link, a:visited, a:hover {
 	padding-right: 15px;
 }
 
+.td_mqc {
+	min-width: 125px;
+  text-align: "left";
+}
+
 .mqc {
   display: inline;
   padding-right: 5px;

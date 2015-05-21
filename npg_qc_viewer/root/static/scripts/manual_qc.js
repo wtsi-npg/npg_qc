@@ -136,7 +136,9 @@ var NPG;
                       "<img src='" + 
                       self.abstractConfiguration.getRoot() + 
                       "/images/cross.png' />"]; // for rejected
+        //Remove old working span
         self.lane_control.children(".lane_mqc_working").remove();
+        //Create and add radios
         var name = 'radios_' + position;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
@@ -158,9 +160,11 @@ var NPG;
         if (self.outcome == self.CONFIG_UNDECIDED) {
           self.lane_control.children('.lane_mqc_save').hide();
         }
+        //link the radio group to the update function
         $("input[name='" + name + "']").on("change", function () {
           self.updateOutcome(this.value);
         });
+        //add a new working span
         self.lane_control.append("<span class='lane_mqc_working' />");
       };
       
@@ -194,17 +198,11 @@ var NPG;
       
       LaneMQCControl.prototype.removeMQCFormat = function () {
         this.lane_control.parent().children('.padded_anchor').removeClass("padded_anchor");
-        this.lane_control.parent().css({
-          "min-width": "",
-          "text-align": "center",
-        });
+        this.lane_control.parent().removeClass('td_mqc');
       };
       
       LaneMQCControl.prototype.addMQCFormat = function () {
-        this.lane_control.parent().css({
-          "min-width": "125px",
-          "text-align": "left",
-        });
+        this.lane_control.parent().addClass('td_mqc');
       };
       
       LaneMQCControl.prototype.setAcceptedPre = function() {
@@ -520,40 +518,6 @@ var NPG;
      * @module NPG/QC/UI
      */
     (function(UI) {
-      var MQCLaneSave = (function() {
-        
-        /**
-         * Widget for the save icon.
-         * @memberof module:NPG/QC/UI
-         * @param lane {Number} Lane number.
-         * @param onClick {function} What to call on click.
-         * @constructor 
-         */UI.MQCOutcomeRadio = MQCOutcomeRadio;
-        MQCLaneSave = function (lane, onClick) {
-          this.lane = lane;
-          this.onClick = onClick;
-        }
-        
-        /**
-         * Return the html representation of the widget.
-         * @returns {String} html of the widget.
-         */
-        MQCLaneSave.prototype.asHtml = function () {
-          return '<img />';
-        };
-        
-        return MQCLaneSave;
-      })();
-      
-      //TODO remove if not used
-      var MQCOutcomeRadioLabel = (function() { 
-        MQCOutcomeRadioLabel = function() {
-          
-        } 
-        
-      }) ();
-      UI.MQCOutcomeRadioLabel = MQCOutcomeRadioLabel;
-      
       var MQCOutcomeRadio = (function() {
         /**
          * Widget to select the different outcomes of a lane. Internally
@@ -637,3 +601,4 @@ function getQcState(mqc_run_data, runMQCControl, lanes) {
   
   runMQCControl.prepareLanes(mqc_run_data, lanes);
 }
+
