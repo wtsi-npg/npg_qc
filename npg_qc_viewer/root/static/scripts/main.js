@@ -48,10 +48,8 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   //Read information about lanes from page.
   var lanes = []; //Lanes without previous QC, blank BG 
   var lanesWithBG = []; //Lanes with previous QC, BG with colour 
-  var totalLanes = 0;
   //Select non-qced lanes.
   $('.lane_mqc_control').each(function (i, obj) {
-    totalLanes++;
     obj = $(obj);
     var parent = obj.parent();
     //Not considering lanes previously marked as passes/failed
@@ -64,7 +62,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   
   // Getting the run_id from the title of the page using the qc part too.
   var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
-  //If id_run
+  //If id_run //TODO move to object.
   if(typeof(id_run) != undefined && id_run != null) {
     var prodConfiguration = new NPG.QC.ProdConfiguration();
     var jqxhr = $.ajax({
