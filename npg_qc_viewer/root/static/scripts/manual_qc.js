@@ -148,7 +148,7 @@ var NPG;
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
-        self.lane_control.append($("<span class='lane_mqc_save'><img height='12' width='12' src='" + 
+        self.lane_control.append($("<span class='lane_mqc_save'><img src='" + 
             self.abstractConfiguration.getRoot() + 
             "/images/padlock.png'></span>"));
         self.lane_control.find('.lane_mqc_save').off("click").on("click", function() {
