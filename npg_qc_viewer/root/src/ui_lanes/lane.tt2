@@ -9,7 +9,7 @@
 
 [% have_link = 0;
    IF tag_index == '' && lane_collection && lane_collection.size;
-   have_link = 1 %]<a href="#[% lane_key %]" class="padded_anchor">[% END -%]
+   have_link = 1 %]<a href="#[% lane_key %]">[% END -%]
 [%- position -%]
 [%- IF have_link %]</a>[% END -%]
 [%- IF run_view; -%]

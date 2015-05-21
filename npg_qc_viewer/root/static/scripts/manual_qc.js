@@ -627,6 +627,7 @@ var NPG;
 function getQcState(mqc_run_data, runMQCControl, lanes) {
   //Show working icons
   for(var i = 0; i < lanes.length; i++) {
+    lanes[i].children('a').addClass('padded_anchor');
     lanes[i].children('.lane_mqc_control').each(function(j, obj){
       $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
     });

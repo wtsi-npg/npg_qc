@@ -79,7 +79,6 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
               function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
               function () { //There is no mqc so I just remove the working image and padding for anchor 
                 $('.lane_mqc_working').empty(); 
-                $('.padded_anchor').removeClass("padded_anchor");
               }  
           );  
         } else {
@@ -98,7 +97,6 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
     }).fail(function(jqXHR, textStatus, errorThrown) {
       window.console && console.log( "error: " + errorThrown + " " + textStatus);
       $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
-      $('.padded_anchor').removeClass("padded_anchor");
       //Clear progress icon
       $('.lane_mqc_working').empty();
     });
