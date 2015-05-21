@@ -140,11 +140,11 @@ var NPG;
                         self.CONFIG_REJECTED_PRELIMINAR];
         var labels = ["<img src='" + 
                       self.abstractConfiguration.getRoot() + 
-                      "/images/tick.png' />", // for accepted
+                      "/images/tick.png'  title='Mark as preliminary pass'/>", // for accepted
                       '&nbsp;&nbsp;&nbsp;', // for undecided
                       "<img src='" + 
                       self.abstractConfiguration.getRoot() + 
-                      "/images/cross.png' />"]; // for rejected
+                      "/images/cross.png' title='Mark as preliminary fail'/>"]; // for rejected
         //Remove old working span
         self.lane_control.children(self.LANE_MQC_WORKING_CLASS).remove();
         //Create and add radios
@@ -160,7 +160,7 @@ var NPG;
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
-        self.lane_control.append($("<span class='lane_mqc_save'><img src='" + 
+        self.lane_control.append($("<span class='lane_mqc_save' title='Save as final (can not be changed again)'><img src='" + 
             self.abstractConfiguration.getRoot() + 
             "/images/padlock.png'></span>"));
         self.lane_control.children('.lane_mqc_save').off("click").on("click", function() {
