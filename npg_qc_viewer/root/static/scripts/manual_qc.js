@@ -78,18 +78,27 @@ var NPG;
         this.CONFIG_REJECTED_FINAL      = 'Rejected final';
         this.CONFIG_UNDECIDED           = 'Undecided'; //Initial outcome for widgets
         this.CONFIG_INITIAL             = 'initial';
+        
+        //Variable names for data from the DOM
+        this.DATA_ID_RUN                = 'id_run';
+        this.DATA_POSITION              = 'position';
+        
+        //container names
+        this.LANE_MQC_WORKING           = 'lane_mqc_working';
+        this.LANE_MQC_WORKING_CLASS     = '.' + this.LANE_MQC_WORKING;
       }
       
       /**
        * Change the outcome.
        */
       LaneMQCControl.prototype.updateOutcome = function(outcome) {
-        var id_run = this.lane_control.data('id_run'); 
-        var position = this.lane_control.data('position');
+        var id_run = this.lane_control.data(this.DATA_ID_RUN); 
+        var position = this.lane_control.data(this.DATA_POSITION);
         var control = this;
+        var self = this;
         if(outcome != control.outcome) {
           //Show progress icon
-          control.lane_control.find('.lane_mqc_working').html("<img src='"
+          control.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
           //AJAX call.
@@ -111,7 +120,7 @@ var NPG;
           })
           .always(function(data){
             //Clear progress icon            
-            control.lane_control.find('.lane_mqc_working').empty();
+            control.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });  
         } else {
           window.console && console.log("Noting to do.");
@@ -124,8 +133,8 @@ var NPG;
       LaneMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
         var self = this;
-        var id_run = lane_control.data('id_run'); 
-        var position = lane_control.data('position');
+        var id_run = lane_control.data(this.DATA_ID_RUN); 
+        var position = lane_control.data(this.DATA_POSITION);
         var outcomes = [self.CONFIG_ACCEPTED_PRELIMINAR, 
                         self.CONFIG_UNDECIDED, 
                         self.CONFIG_REJECTED_PRELIMINAR];
@@ -137,7 +146,7 @@ var NPG;
                       self.abstractConfiguration.getRoot() + 
                       "/images/cross.png' />"]; // for rejected
         //Remove old working span
-        self.lane_control.children(".lane_mqc_working").remove();
+        self.lane_control.children(self.LANE_MQC_WORKING_CLASS).remove();
         //Create and add radios
         var name = 'radios_' + position;
         for(var i = 0; i < outcomes.length; i++) {
@@ -271,7 +280,7 @@ var NPG;
           case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
           case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
         }
-        lane_control.find('.lane_mqc_working').empty();
+        lane_control.find(this.LANE_MQC_WORKING_CLASS).empty();
       };
       
       return LaneMQCControl;
@@ -584,4 +593,3 @@ var NPG;
   }) (NPG.QC || (NPG.QC = {}));
   var QC = NPG.QC;
 }) (NPG || (NPG = {}));
-
