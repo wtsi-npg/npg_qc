@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Removing global functions from manual_qc.js
+ - Logic for preliminary outcomes for MQC
+ - New undecided outcome for MQC
+
 release 57.12
 
  - Removing MQC logic from templates and moving it to JS
