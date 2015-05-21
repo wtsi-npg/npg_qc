@@ -95,7 +95,6 @@ var NPG;
           //AJAX call.
           $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
             var response = data;
-            control.lane_control.find('.lane_mqc_working').empty();
           }, "json")
           .done(function() {
             switch (outcome) {
@@ -109,7 +108,9 @@ var NPG;
           .fail(function(data) {
             window.console && console.log(data.responseJSON.message);
             jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
-            //Clear progress icon
+          })
+          .always(function(data){
+            //Clear progress icon            
             control.lane_control.find('.lane_mqc_working').empty();
           });  
         } else {
@@ -135,7 +136,7 @@ var NPG;
                       "<img src='" + 
                       self.abstractConfiguration.getRoot() + 
                       "/images/cross.png' />"]; // for rejected
-        self.lane_control.empty();
+        self.lane_control.children(".lane_mqc_working").remove();
         var name = 'radios_' + position;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
@@ -160,6 +161,7 @@ var NPG;
         $("input[name='" + name + "']").on("change", function () {
           self.updateOutcome(this.value);
         });
+        self.lane_control.append("<span class='lane_mqc_working' />");
       };
       
       /** 
