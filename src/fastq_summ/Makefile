@@ -2,18 +2,18 @@
 CC = cc
 CFLAGS = -g -Wall
 
-builddir = .
-installdir = ../../t/bin
+BUILDDIR = build
+installdir = .
 
 INCLUDES= -I.
-SAMTOOLS_LOC= /software/solexa/bin/aligners/samtools/samtools-0.1.17
+SAMTOOLS_LOC= /software/solexa/pkg/samtools/samtools-0.1.18
 LIBS= -lz -lm
 LIBPATH=
 SAMTOOLSLIB= -lbam
 SAMTOOLSLIBPATH= -L $(SAMTOOLS_LOC)
 
 ifdef FQS_BUILD_DIR
-builddir = $(FQS_BUILD_DIR)
+BUILDDIR = $(FQS_BUILD_DIR)
 endif
 
 ifdef FQS_INSTALL_DIR
@@ -26,23 +26,23 @@ endif
 
 .SUFFIXES: .c .o
 
-.c.o:
+$(BUILDDIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
 
 .PHONY: clean
 
-all: fastq_summ
+all: $(BUILDDIR)/fastq_summ
 
-install: fastq_summ
-	-cp -uv $(builddir)/fastq_summ $(installdir)/fastq_summ
+install: $(BUILDDIR)/fastq_summ
+	-cp -uv $(BUILDDIR)/fastq_summ $(installdir)/fastq_summ
 
 clean:
-	rm -f fastq_summ fastq_summ.o fastqcheck.o
+	rm -f $(BUILDDIR)/fastq_summ $(BUILDDIR)/fastq_summ.o $(BUILDDIR)/fastqcheck.o
 
-fastq_summ: fastq_summ.o fastqcheck.o
+$(BUILDDIR)/fastq_summ: $(BUILDDIR)/fastq_summ.o $(BUILDDIR)/fastqcheck.o
 	$(CC) $(CFLAGS) $^ -o $@ $(SAMTOOLSLIBPATH) $(SAMTOOLSLIB) $(LIBPATH) $(LIBS)
 
-fastq_summ.o: fastq_summ.c
+$(BUILDDIR)/fastq_summ.o: fastq_summ.c
 
-fastqcheck.o: fastqcheck.c fastqcheck.h
+$(BUILDDIR)/fastqcheck.o: fastqcheck.c fastqcheck.h
 

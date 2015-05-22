@@ -3,9 +3,15 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - Removing global functions from manual_qc.js
  - Logic for preliminary outcomes for MQC
  - New undecided outcome for MQC
+ - skip running legacy gcbias if window_depth not available
+ - compile fastq_summ executable during the npg_qc build, skip
+     compilation if samtools is not on the path
+ - C code clean-up to remove warnings in compilation
+ - SeqQC daemon to set CATALYST_HOME relative to bin so that
+     the production user does not have to have this definition
+ - SeqQC build optionally fetches javascript dependencies
 
 release 57.12
-
  - Removing MQC logic from templates and moving it to JS
  - Adding a controller to provide MQC status for a run using REST
  - Adding a role to provide functionality for 401 responses
