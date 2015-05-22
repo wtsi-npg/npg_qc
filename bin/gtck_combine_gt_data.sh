@@ -2,14 +2,14 @@
 
 if [[ ! -e latest_processed_plex_list.txt ]]
 then
-    echo "Not producing new combined genotype data file - no latest_processed_plex_list.txt"
-    exit 0
+  echo "Not producing new combined genotype data file - no latest_processed_plex_list.txt"
+  exit 0
 fi
 
 if [[ -e latest_combined_file.txt ]] && cmp -s latest_processed_plex_list.txt latest_combined_file.txt
 then
-    echo "Not producing new combined genotype data file - no new data (latest_processed_plex_list.txt and latest_combined_file.txt are the same)"
-    exit 0
+  echo "Not producing new combined genotype data file - no new data (latest_processed_plex_list.txt and latest_combined_file.txt are the same)"
+  exit 0
 fi
 
 dttag="$(cat latest_processed_plex_list.txt)"
@@ -18,25 +18,25 @@ dttag="$(cat latest_processed_plex_list.txt)"
 infile="current_sequenom_gt.tsv"
 if [ ! -e "${infile}" ]
 then
-    printf "================\nNot producing new combined genotype data file - failed to find input file %s\n===============\n" "${infile}"
+  printf "================\nNot producing new combined genotype data file - failed to find input file %s\n===============\n" "${infile}"
 fi
 if [ ! -e "hdr_snp26.tsv" ]
 then
-    printf "================\nNot producing new combined genotype data file - failed to find input file hdr_snp26.tsv\n===============\n"
+  printf "================\nNot producing new combined genotype data file - failed to find input file hdr_snp26.tsv\n===============\n"
 fi
 # Note: qc_set and zone set are specified both here and in the concatenation command below
 for zone in seq
 do
-	for qc_set in qc cgp ddd
-	do
-	    infile="fluidigm_${qc_set}_${zone}_gt_${dttag}.tsv"
+  for qc_set in qc cgp ddd
+  do
+    infile="fluidigm_${qc_set}_${zone}_gt_${dttag}.tsv"
 
-	    if [ ! -e "${infile}" ]
-	    then
-		printf "================\nNot producing new combined genotype data file - failed to find input file %s\n===============\n" "${infile}"
-		exit 1
-	    fi
-	done 
+    if [ ! -e "${infile}" ]
+    then
+    printf "================\nNot producing new combined genotype data file - failed to find input file %s\n===============\n" "${infile}"
+    exit 1
+    fi
+  done 
 done 
 
 # produce the combined file
