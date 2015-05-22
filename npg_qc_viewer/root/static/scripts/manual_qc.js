@@ -205,6 +205,14 @@ var NPG;
         this.lane_control.parent().css("background-color", "#FFDDDD");
       };
       
+      LaneMQCControl.prototype.setAcceptedPreliminarBG = function() {
+        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+      };
+      
+      LaneMQCControl.prototype.setRejectedPreliminarBG = function() {
+        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
+      };
+      
       LaneMQCControl.prototype.removeMQCFormat = function () {
         this.lane_control.parent().children('.padded_anchor').removeClass("padded_anchor");
         this.lane_control.parent().removeClass('td_mqc');
@@ -281,6 +289,14 @@ var NPG;
           case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
         }
         lane_control.find(this.LANE_MQC_WORKING_CLASS).empty();
+      };
+      
+      LaneMQCControl.prototype.loadBGFromInitialWithPreliminary = function (lane_control) {
+        this.loadBGFromInitial(lane_control);
+        switch (lane_control.data(this.CONFIG_INITIAL)) {
+          case this.CONFIG_ACCEPTED_PRELIMINAR : this.setAcceptedPreliminarBG(); break;
+          case this.CONFIG_REJECTED_PRELIMINAR : this.setRejectedPreliminarBG(); break;
+        }
       };
       
       return LaneMQCControl;
@@ -386,7 +402,7 @@ var NPG;
             }
             //Set up mqc controlers and link them to the individual lanes.
             var c = new NPG.QC.LaneMQCControl(i, self.abstractConfiguration);
-            c.loadBGFromInitial(obj);
+            c.loadBGFromInitialWithPreliminary(obj);
             lanes[i].children('.padded_anchor').removeClass("padded_anchor");
           }
         }
