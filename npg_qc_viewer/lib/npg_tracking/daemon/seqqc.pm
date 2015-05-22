@@ -2,11 +2,16 @@ package npg_tracking::daemon::seqqc;
 
 use Moose;
 use Readonly;
+use FindBin qw($Bin);
+use Cwd 'abs_path';
+
 extends 'npg_tracking::daemon';
 
 our $VERSION = '0';
 
-Readonly::Array my @HOSTS     => qw(sf2-farm-srv1 sf2-farm-srv2);
+Readonly::Array my @HOSTS            => qw(sf2-farm-srv1 sf2-farm-srv2);
+Readonly::Scalar my $DEPLOY_DIR_NAME => 'seqqc';
+Readonly::Scalar my $PORT            => 1959;
 
 # Force Catalyst to use a specific home directory:
 # in the shell environment by setting either the CATALYST_HOME
@@ -16,8 +21,16 @@ Readonly::Array my @HOSTS     => qw(sf2-farm-srv1 sf2-farm-srv2);
 # use MYAPP_WEB_HOME. If both variables are set, the MYAPP_HOME
 # one will be used.
 
-override '_build_hosts'  => sub {return \@HOSTS;};
-override 'command'       => sub { return q[npg_qc_viewer_server.pl -f -p 1959]; };
+override '_build_hosts'    => sub {return \@HOSTS;};
+override 'command'         => sub { return qq[npg_qc_viewer_server.pl -f -p $PORT]; };
+override '_build_env_vars' => sub {
+  my $h = {};
+  my $dir = "$Bin/../$DEPLOY_DIR_NAME";
+  if (-d $dir) {
+    $h->{'CATALYST_HOME'} = abs_path $dir;
+  }
+  return $h;
+};
 
 no Moose;
 
@@ -48,6 +61,10 @@ Metadata for a daemon that starts up a Catalyst server for the SeqQC application
 =item Moose
 
 =item Readonly
+
+=item FindBin
+
+=item Cwd
 
 =item npg_tracking::daemon::seqqc
 

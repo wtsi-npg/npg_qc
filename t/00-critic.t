@@ -22,11 +22,10 @@ if($EVAL_ERROR) {
                              'Miscellanea::RequireRcsKeywords',
                              'ValuesAndExpressions::ProhibitImplicitNewlines',
                              'ValuesAndExpressions::RequireConstantVersion',
-                             'Documentation::PodSpelling',
-                             'Subroutines::ProhibitUnusedPrivateSubroutines',
+                             'Documentation::PodSpelling',                             
                              'ProhibitEscapedMetacharacters',
                              'ProhibitUnrestrictedNoCritic',
-                             'Documentation::RequirePodSections'
+                             'RegularExpressions::ProhibitUselessTopic'
                             ],
                -profile  => 't/perlcriticrc',
                -verbose => "%m at %f line %l, policy %p\n",

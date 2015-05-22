@@ -30,9 +30,7 @@ Static function prototypes
 */
 static int read_hdr(FILE *infd, GT_HDR *gt_hdr);
 static FILE *open_file(char *basename, char *extname);
-static char *getSampleName(int sidx, char *basename);
 static char *readSampleName(FILE *sfd, int sidx, char *buf, int bsiz);
-static char *getSampleLabel(int sidx, char *basename);
 static int find_sample_index(FILE *sfd, char *s1);
 static int checkCallRate(char *rec, int callcount, int min_sample_callrate);
 static int print_params(int output_format, char *data_id, char *refresh_date, int callcount, int min_common, int min_sample_callrate, int high_concord_level, int posdup_level, int print_only_posdups, int only_check_same_names, int only_check_diff_names, char *lh1, char *l1, char *l2, char *base_gt);
@@ -542,96 +540,6 @@ static int read_hdr(FILE *infd, GT_HDR *gt_hdr)
 	}
 
 	return(0);
-}
-
-static char *getSampleName(int sidx, char *basename)
-{
-#define MAXREADCOUNT	256
-	static struct _namebuf {
-		int sidx;
-		char name[NAMESIZE];
-		int accessed;
-	} namebuf[2];
-	static FILE *sfd = NULL;
-	int replace;
-
-	if(sfd == NULL) {
-		if((sfd = open_file(basename, "six")) == NULL) {
-			return("SAMPLENAMEFETCHFAIL");
-		}
-
-		namebuf[0].sidx = 0;
-		readSampleName(sfd, 0, namebuf[0].name, NAMESIZE);
-		namebuf[0].accessed = 0;
-
-		namebuf[1].sidx = 1;
-		readSampleName(sfd, 1, namebuf[1].name, NAMESIZE);
-		namebuf[1].accessed = 0;
-	}
-
-	if(namebuf[0].sidx == sidx) {
-		if(namebuf[0].accessed < MAXREADCOUNT) namebuf[0].accessed++;
-		return(namebuf[0].name);
-	}
-	else if(namebuf[1].sidx == sidx) {
-		if(namebuf[1].accessed < MAXREADCOUNT) namebuf[1].accessed++;
-		return(namebuf[1].name);
-	}
-	else {
-		replace = (namebuf[0].accessed < namebuf[1].accessed)? 0: 1;
-
-		namebuf[replace].sidx = sidx;
-		readSampleName(sfd, sidx, namebuf[replace].name, NAMESIZE);
-		namebuf[replace].accessed = 1;
-
-		return(namebuf[replace].name);
-	}
-#undef MAXREADCOUNT
-}
-
-static char *getSampleLabel(int sidx, char *basename)
-{
-#define MAXREADCOUNT	256
-	static struct _namebuf {
-		int sidx;
-		char name[NAMESIZE];
-		int accessed;
-	} namebuf[2];
-	static FILE *slfd = NULL;
-	int replace;
-
-	if(slfd == NULL) {
-		if((slfd = open_file(basename, "slx")) == NULL) {
-			return(getSampleName(sidx, basename));
-		}
-
-		namebuf[0].sidx = 0;
-		readSampleName(slfd, 0, namebuf[0].name, NAMESIZE);
-		namebuf[0].accessed = 0;
-
-		namebuf[1].sidx = 1;
-		readSampleName(slfd, 1, namebuf[1].name, NAMESIZE);
-		namebuf[1].accessed = 0;
-	}
-
-	if(namebuf[0].sidx == sidx) {
-		if(namebuf[0].accessed < MAXREADCOUNT) namebuf[0].accessed++;
-		return(namebuf[0].name);
-	}
-	else if(namebuf[1].sidx == sidx) {
-		if(namebuf[1].accessed < MAXREADCOUNT) namebuf[1].accessed++;
-		return(namebuf[1].name);
-	}
-	else {
-		replace = (namebuf[0].accessed < namebuf[1].accessed)? 0: 1;
-
-		namebuf[replace].sidx = sidx;
-		readSampleName(slfd, sidx, namebuf[replace].name, NAMESIZE);
-		namebuf[replace].accessed = 1;
-
-		return(namebuf[replace].name);
-	}
-#undef MAXREADCOUNT
 }
 
 static FILE *open_file(char *basename, char *extname)

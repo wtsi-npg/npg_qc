@@ -45,6 +45,10 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
+=head1 NAME
+
+npg_qc::Schema::ResultSet::MqcOutcomeEnt
+
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION

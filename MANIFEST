@@ -1,3 +1,9 @@
+bin/gtck_combine_gt_data.sh
+bin/gtck_extract_fluidigm_data_from_irods.sh
+bin/gtck_genplexlist.sh
+bin/gtck_install_to_repos.sh
+bin/gtck_refresh_check_data.sh
+bin/reformat_fluidigm_snp26_results_irods.pl
 bin/qc
 bin/qc_db_delete_autoqc
 bin/mqc_outcome_reporter
