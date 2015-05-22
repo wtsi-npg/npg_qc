@@ -70,7 +70,6 @@ int main(int ac, char **av)
 	static char *data_id = "SQNMGTDATA";
 
 	PAL preload_alleles_list = { PAL_EMPTY, NULL, NULL, NULL, NULL };
-	int sample_id_idx = 0;
 	int offset;
 
 	/*** process flags ***/
@@ -375,7 +374,6 @@ int main(int ac, char **av)
 		}
 
 		fld_arr = parse_rec(inbuf, fld_arr);
-		sample_id_idx = 0;
 
 		if(fld_desc->sample_label_fields != NULL) {
 			fetchSampleName(fld_arr, fld_desc->sample_label_fields, sample_id_buf, NAMESIZE);

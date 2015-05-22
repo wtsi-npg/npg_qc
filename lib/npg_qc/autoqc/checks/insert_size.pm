@@ -332,43 +332,6 @@ override 'execute'            => sub {
   return 1;
 };
 
-sub _evaluate {
-
-  my ($self, $actual_sizes) = @_;
-
-  my $pass = 0;
-
-  my $mean = $self->result->mean;  my $std  = $self->result->std;
-  my $expected_mean  = $self->expected_mean;
-
-  my $MEAN_BOUNDARY = npg_qc::autoqc::criteria::insert_size->mean_boundary;
-  my $STD_COUNT = npg_qc::autoqc::criteria::insert_size ->std_count;
-  my $STD_TOLERANCE = npg_qc::autoqc::criteria::insert_size->std_tolerance;
-
-  #check actual mean is within +/- 10% of expected mean
-  if($mean > $expected_mean * (1-$MEAN_BOUNDARY) &&
-       $mean < $expected_mean * (1+$MEAN_BOUNDARY)) {
-
-    # check 95% of sizes are within +- 3sd of actual mean
-    my $sizes_within_sd_range = 0;
-    my $min = $mean - $STD_COUNT * $std;
-    my $max = $mean + $STD_COUNT * $std;
-
-    for my $insert_size (@{$actual_sizes}) {
-      if($insert_size > $min && $insert_size < $max) {
-  	$sizes_within_sd_range ++;
-      }
-    }
-
-    if ($sizes_within_sd_range >= $STD_TOLERANCE * scalar @{$actual_sizes}) {
-  	$pass = 1;
-    }
-  }
-
-  return $pass;
-}
-
-
 sub _trim {
     my ($self, $string) = @_;
     $string =~ s/^\s+//smx;

@@ -6,6 +6,7 @@ CC = cc
 CFLAGS = -g -Wall
 
 BUILDDIR=build
+installdir = .
 
 $(BUILDDIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -14,9 +15,9 @@ $(BUILDDIR)/%.o: %.c
 
 all: $(BUILDDIR)/gt_pack $(BUILDDIR)/find_gt_match
 
-install: gt_pack find_gt_match
-	-cp -uv $(builddir)/gt_pack $(installdir)/gt_pack
-	-cp -uv $(builddir)/find_gt_match $(installdir)/find_gt_match
+install: $(BUILDDIR)/gt_pack $(BUILDDIR)/find_gt_match
+	-cp -uv $(BUILDDIR)/gt_pack $(installdir)/gt_pack
+	-cp -uv $(BUILDDIR)/find_gt_match $(installdir)/find_gt_match
 
 clean:
 	rm -f $(BUILDDIR)/gt_pack $(BUILDDIR)/find_gt_match $(BUILDDIR)/gt_pack.o $(BUILDDIR)/fld_desc.o $(BUILDDIR)/intvec.o $(BUILDDIR)/find_gt_match.o

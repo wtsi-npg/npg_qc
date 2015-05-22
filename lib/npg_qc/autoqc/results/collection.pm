@@ -26,7 +26,7 @@ use npg_qc::autoqc::qc_store::query;
 use npg_qc::autoqc::role::rpt_key;
 
 our $VERSION = '0';
-## no critic (Documentation::RequirePodAtEnd)
+## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitUnusedPrivateSubroutines)
 
 =head1 NAME
 

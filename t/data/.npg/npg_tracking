@@ -5,6 +5,6 @@ my $VAR1 = {
     'prefix' => '/nfs/sf'
   },
   'repository' => {
-    'root' => '/lustre/scratch109/srpipe/'
+    'root' => 't/data'
   }
 }
