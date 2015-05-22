@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.0
  - skip running legacy gcbias if window_depth not available
  - compile fastq_summ executable during the npg_qc build, skip
      compilation if samtools is not on the path
@@ -7,6 +8,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - SeqQC daemon to set CATALYST_HOME relative to bin so that
      the production user does not have to have this definition
  - SeqQC build optionally fetches javascript dependencies
+ - added scripts to handle generation of data for autoqc genotype checks
 
 release 57.12
  - Removing MQC logic from templates and moving it to JS
