@@ -75,7 +75,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   
   my $expected = 'manual qc complete';
   my $original = 'analysis complete';
-  my $rl=$schemas->{'npg'}->resultset('RunLane')->find(id_run=>1234, position=>4);
+  my $rl=$schemas->{npg}->resultset('RunLane')->find(id_run=>1234, position=>4);
   $rl->update_status($original);
   
   #Test preliminary outcomes does not modify the status in tracking
