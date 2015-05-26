@@ -1,5 +1,7 @@
 #!/usr/local/bin/bash
 
+$VERSION = '0';
+
 if [[ ! -e latest_plex_list.txt ]]
 then
   echo "Not running extract_fluidigm_data_from_irods - no latest_plex_list.txt"

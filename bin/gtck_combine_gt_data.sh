@@ -1,5 +1,7 @@
 #!/usr/local/bin/bash
 
+$VERSION = '0';
+
 if [[ ! -e latest_processed_plex_list.txt ]]
 then
   echo "Not producing new combined genotype data file - no latest_processed_plex_list.txt"
