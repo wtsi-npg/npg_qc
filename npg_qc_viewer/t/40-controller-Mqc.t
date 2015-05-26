@@ -10,7 +10,8 @@ local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
 
 use_ok 'npg_qc_viewer::Controller::Mqc';
-lives_ok { $util->test_env_setup()}  'test db created and populated';
+my $schemas;
+lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
 {
@@ -91,7 +92,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   is( $response->code, 200, 'response code is 200' );
   
   #Test final outcome modify the status in tracking
-  is($rl->current_run_lane_status->description, $expected, 'changed lane status') 
+  is($rl->current_run_lane_status->description, $expected, 'changed lane status'); 
   
   my $content = $response->content;
   like ($content,
