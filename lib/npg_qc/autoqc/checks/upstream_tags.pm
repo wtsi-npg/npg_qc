@@ -372,7 +372,7 @@ sub _build_tag0_index_length {
     #The exit status of the child is 141 from SIGPIPE or 1 if fail to write to stdout 
     #and fail to close happens first - don't croak if we've set index_length
     my $child_error = $CHILD_ERROR >> $SHIFT_EIGHT;
-    if ($child_error != 0 && $child_error != $SIG_PIPE_FATAL_ERROR && not $index_length) {
+    if ($child_error != 0 && $child_error != $SIG_PIPE_FATAL_ERROR && ! $index_length) {
         croak qq[Error in pipe "$command": $child_error];
     }
     return $index_length;
