@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 54;
+use Test::More tests => 64;
 use Test::Exception;
 use HTTP::Request::Common;
 use t::util;
@@ -71,11 +71,28 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
     'correct error message for invalid outcome');
 
   $url = '/mqc/update_outcome?user=pipeline&password=secret';
+  
+  my $expected = 'manual qc complete';
+  my $original = 'analysis complete';
+  my $rl=$schemas->{'npg'}->resultset('RunLane')->find(id_run=>1234, position=>4);
+  $rl->update_status($original);
+  
+  #Test preliminary outcomes does not modify the status in tracking
+  foreach my $status (('Accepted preliminary', 'Rejected preliminary', 'Undecided')) {
+    lives_ok { $response = request(POST $url, ['id_run' => '1234', 'position' => '4', 'new_oc' => $status ]) } 
+      'post request lives with body param';
+    is( $response->code, 200, 'response code is 200' );
+    is($rl->current_run_lane_status->description, $original, 'lane status has not changed in tracking');
+  } 
 
   lives_ok { $response = request(POST $url,
     ['id_run' => '1234', 'position' => '4', 'new_oc' => 'Accepted final' ])  }
    'post request lives with body param';
   is( $response->code, 200, 'response code is 200' );
+  
+  #Test final outcome modify the status in tracking
+  is($rl->current_run_lane_status->description, $expected, 'changed lane status') 
+  
   my $content = $response->content;
   like ($content,
     qr/Manual QC Accepted final for run 1234, position 4 saved/,
