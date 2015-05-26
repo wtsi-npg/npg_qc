@@ -1,6 +1,6 @@
 #!/usr/local/bin/bash
 
-$VERSION = '0';
+# $VERSION = '0';
 
 # extract lists of relevant data_object names
 gtck_genplexlist.sh

@@ -1,6 +1,6 @@
 #!/usr/local/bin/bash
 
-$VERSION = '0';
+# $VERSION = '0';
 
 if [[ ! -e latest_processed_plex_list.txt ]]
 then

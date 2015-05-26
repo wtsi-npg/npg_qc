@@ -1,6 +1,6 @@
 #!/usr/local/bin/bash
 
-$VERSION = '0';
+# $VERSION = '0';
 
 dttag="$(date +%Y%m%d%H%M%S)";
 for zone in seq
