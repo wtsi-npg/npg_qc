@@ -207,10 +207,12 @@ var NPG;
       
       LaneMQCControl.prototype.setAcceptedPreliminarBG = function() {
         this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.lane_control.parent().prop('title', 'Preliminary pass in manual QC');
       };
       
       LaneMQCControl.prototype.setRejectedPreliminarBG = function() {
         this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.lane_control.parent().prop('title', 'Preliminary fail in manual QC');
       };
       
       LaneMQCControl.prototype.removeMQCFormat = function () {
