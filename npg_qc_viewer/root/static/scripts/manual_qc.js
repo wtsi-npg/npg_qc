@@ -218,9 +218,11 @@ var NPG;
       LaneMQCControl.prototype.removeMQCFormat = function () {
         this.lane_control.parent().children('.padded_anchor').removeClass("padded_anchor");
         this.lane_control.parent().removeClass('td_mqc');
+        this.lane_control.parent().css('text-align', 'center'); // For firefox
       };
       
       LaneMQCControl.prototype.addMQCFormat = function () {
+        this.lane_control.parent().css('text-align', 'left'); // For firefox
         this.lane_control.parent().addClass('td_mqc');
       };
       
