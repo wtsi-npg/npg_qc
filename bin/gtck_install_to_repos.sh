@@ -2,7 +2,7 @@
 
 # $VERSION = '0';
 
-declare -a repos_roots=('/lustre/scratch109/srpipe/genotypes' '/lustre/scratch110/srpipe/genotypes' )
+declare -a repos_roots=( '/nfs/srpipe_references/genotypes' '/lustre/scratch109/srpipe/genotypes' '/lustre/scratch110/srpipe/genotypes' )
 
 if [[ ! -e latest_combined_file.txt ]]
 then
