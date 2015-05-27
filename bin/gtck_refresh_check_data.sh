@@ -2,6 +2,12 @@
 
 # $VERSION = '0';
 
+if [[ -e latest_plex_list.txt ]] && [[ -e latest_combined_file.txt ]] && ! cmp -s latest_plex_list.txt latest_combined_file.txt
+then
+  echo "Run appears to be in progress (contents of latest_plex_list.txt and latest_combined_file.txt differ)"
+  exit 0
+fi
+
 # extract lists of relevant data_object names
 gtck_genplexlist.sh
 
