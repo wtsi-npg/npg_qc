@@ -2,7 +2,6 @@
 # Author:        Marina Gourtovaia mg8@sanger.ac.uk
 # Created:       3 February 2010
 #
-#
 
 package npg_qc::autoqc::checks::gc_fraction;
 
@@ -12,10 +11,10 @@ use Moose;
 use Carp;
 use English qw(-no_match_vars);
 use Readonly;
-use Cwd qw(cwd abs_path);
 use File::Spec::Functions qw(catfile);
 use File::Basename;
 
+use npg_tracking::util::abs_path qw(abs_path);
 use npg_common::fastqcheck;
 use npg_common::sequence::reference::base_count;
 
@@ -215,11 +214,11 @@ __END__
 
 =item Moose
 
-=item Cwd
-
 =item File::Spec::Functions
 
 =item File::Basename
+
+=item npg_tracking::util::abs_path
 
 =item npg_tracking::data::reference::find
 
