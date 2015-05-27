@@ -25,11 +25,11 @@ do
     infile="sequenom_fluidigm_combo_sgd_${dttag}.${ext}"
     archive_outfile="${repos_root}/archive/sequenom_fluidigm_combo_sgd_${dttag}.${ext}.bz2"
     printf "Archiving %s to to %s\n" "${infile}" "${archive_outfile}"
-##    bzip2 -c sequenom_fluidigm_combo_sgd_${dttag}.${ext} > "${archive_outfile}"
+    bzip2 -c sequenom_fluidigm_combo_sgd_${dttag}.${ext} > "${archive_outfile}"
 
     outfile="${repos_root}/sequenom_fluidigm_combo_sgd.${ext}"
     printf "Updating current data (source: %s, target: %s)\n\n" "${infile}" "${outfile}"
- ##   cp -uv "${infile}" "${outfile}"
+    cp -uv "${infile}" "${outfile}"
   done
 done
 
