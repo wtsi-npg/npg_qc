@@ -38,13 +38,18 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   //Required to show error messages from the mqc process.
   $("#results_summary").before('<ul id="ajax_status"></ul>'); 
   
+  //Preload images for working icon
+  $('<img/>')[0].src = "/static/images/waiting.gif";
+  //Preload rest of icons
+  $('<img/>')[0].src = "/static/images/tick.png";
+  $('<img/>')[0].src = "/static/images/cross.png";
+  $('<img/>')[0].src = "/static/images/padlock.png";
+  
   //Read information about lanes from page.
   var lanes = []; //Lanes without previous QC, blank BG 
   var lanesWithBG = []; //Lanes with previous QC, BG with colour 
-  var totalLanes = 0;
   //Select non-qced lanes.
   $('.lane_mqc_control').each(function (i, obj) {
-    totalLanes++;
     obj = $(obj);
     var parent = obj.parent();
     //Not considering lanes previously marked as passes/failed
@@ -57,23 +62,36 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
   
   // Getting the run_id from the title of the page using the qc part too.
   var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
-  //If id_run
+  //If id_run //TODO move to object.
   if(typeof(id_run) != undefined && id_run != null) {
+    var prodConfiguration = new NPG.QC.ProdConfiguration();
     var jqxhr = $.ajax({
       url: "/mqc/mqc_runs/" + id_run,
       cache: false
     }).done(function() {
-      var control = new NPG.QC.RunMQCControl(id_run);
+      var control = new NPG.QC.RunMQCControl(prodConfiguration);
       var mqc_run_data = jqxhr.responseJSON;
       if(control.isStateForMQC(mqc_run_data)) {
         var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data); 
         if(DWHMatch.outcome) {
           control.initQC(jqxhr.responseJSON, lanes, 
-              function (mqc_run_data, runMQCControl, lanes) { getQcState(mqc_run_data, runMQCControl, lanes); },
-              function () { $('.lane_mqc_working').empty(); } //There is no mqc so I just remove the working image. 
+              function (mqc_run_data, runMQCControl, lanes) {
+                //Show working icons
+                for(var i = 0; i < lanes.length; i++) {
+                  lanes[i].children('a').addClass('padded_anchor');
+                  lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                    $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                  });
+                }
+                runMQCControl.prepareLanes(mqc_run_data, lanes); 
+              },
+              function () { //There is no mqc so I just remove the working image and padding for anchor 
+                $('.lane_mqc_working').empty(); 
+              }  
           );  
         } else {
-          $("#ajax_status").append("<li class='failed_mqc'>Conflicting data when comparing Data Ware House and Manual QC databases for run: "
+          $("#ajax_status").append("<li class='failed_mqc'>"
+              + "Conflicting data when comparing Data Ware House and Manual QC databases for run: "
               + id_run
               + ", lane: " 
               + DWHMatch.position 

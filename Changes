@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Removing global functions from manual_qc.js
+ - Logic for preliminary outcomes for MQC
+ - New undecided outcome for MQC
  - update scripts for genotype check data preparation (perlcritic issues and version strings)
  - gt_pack recognises version 02 headers in append mode
 
