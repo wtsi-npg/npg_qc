@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - update scripts for genotype check data preparation (perlcritic issues and version strings)
+ - gt_pack recognises version 02 headers in append mode
+
 release 58.0
  - skip running legacy gcbias if window_depth not available
  - compile fastq_summ executable during the npg_qc build, skip
