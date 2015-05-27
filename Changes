@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - update scripts for genotype check data preparation to allow specification of iRODS zone with an environment variable
  - update scripts for genotype check data preparation (perlcritic issues and version strings)
  - gt_pack recognises version 02 headers in append mode
 
