@@ -21,8 +21,7 @@ has 'npg_qc_util' =>  (isa => q{npg_qc::util},
                       );
 sub _build_npg_qc_util {
   my $self = shift;
-  ##no critic (Subroutines::ProtectPrivateSubs)
-  return npg_qc::util->new({ configpath => $self->schema->_config_file,});
+  return npg_qc::util->new({ configpath => $self->schema->config_file,});
 }
 
 sub cache_run {

@@ -1,0 +1,5 @@
+--
+-- New outcome for MQC
+--
+
+INSERT INTO `mqc_outcome_dict` (`id_mqc_outcome`, `short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES (5, 'Undecided', 'Lane has no outcome', 1, 1);

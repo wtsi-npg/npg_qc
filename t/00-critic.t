@@ -19,13 +19,13 @@ if($EVAL_ERROR) {
   Test::Perl::Critic->import(
 			   -severity => 1,
 			   -exclude  => [ 'tidy',
+                             'Miscellanea::RequireRcsKeywords',
                              'ValuesAndExpressions::ProhibitImplicitNewlines',
                              'ValuesAndExpressions::RequireConstantVersion',
-                             'Documentation::PodSpelling',
-                             'Subroutines::ProhibitUnusedPrivateSubroutines',
+                             'Documentation::PodSpelling',                             
                              'ProhibitEscapedMetacharacters',
                              'ProhibitUnrestrictedNoCritic',
-                             'Documentation::RequirePodSections'
+                             'RegularExpressions::ProhibitUselessTopic'
                             ],
                -profile  => 't/perlcriticrc',
                -verbose => "%m at %f line %l, policy %p\n",

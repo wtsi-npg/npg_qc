@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 54;
+use Test::More tests => 63;
 use Test::Exception;
 use HTTP::Request::Common;
 use t::util;
@@ -10,11 +10,12 @@ local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
 
 use_ok 'npg_qc_viewer::Controller::Mqc';
-lives_ok { $util->test_env_setup()}  'test db created and populated';
+my $schemas;
+lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
-my $response;
 {
+  my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) }
     'update get request lives';
   ok($response->is_error, q[update response is error]);
@@ -43,8 +44,8 @@ my $response;
 }
 
 {
-  my $url = '/mqc/update_outcome?user=cat&password=secret';
   my $response;
+  my $url = '/mqc/update_outcome?user=cat&password=secret';
 
   lives_ok { $response = request(POST $url)}
     'post request without params lives';
@@ -55,7 +56,7 @@ my $response;
     'post request lives with body param';
   is( $response->code, 400, 'code is 400' );
   like ($response->content, qr/Position should be defined/, 'correct error message');
- 
+
   lives_ok { $response = request(POST $url, ['id_run' => '1234', 'position' => '4'])  }
     'post request lives with body param';
   is( $response->code, 400, 'error code is 400' );
@@ -71,18 +72,32 @@ my $response;
     'correct error message for invalid outcome');
 
   $url = '/mqc/update_outcome?user=pipeline&password=secret';
+  
+  my $expected = 'manual qc complete';
+  my $original = 'analysis complete';
+  my $rl=$schemas->{npg}->resultset('RunLane')->find({id_run=>4025, position=>4});
+  $rl->update_status($original);
+  
+  #Test preliminary outcomes does not modify the status in tracking
+  foreach my $status (('Accepted preliminary', 'Rejected preliminary', 'Undecided')) {
+    lives_ok { $response = request(POST $url, ['id_run' => '4025', 'position' => '4', 'new_oc' => $status ]) } 
+      'post request lives with body param';
+    is( $response->code, 200, 'response code is 200' );
+    is($rl->current_run_lane_status->description, $original, 'lane status has not changed in tracking');
+  } 
 
   lives_ok { $response = request(POST $url,
-    ['id_run' => '1234', 'position' => '4', 'new_oc' => 'Accepted final' ])  }
+    ['id_run' => '4025', 'position' => '4', 'new_oc' => 'Accepted final' ])  }
    'post request lives with body param';
   is( $response->code, 200, 'response code is 200' );
+  
+  #Test final outcome modify the status in tracking
+  is($rl->current_run_lane_status->description, $expected, 'changed lane status'); 
+  
   my $content = $response->content;
   like ($content,
-    qr/Manual QC Accepted final for run 1234, position 4 saved/,
+    qr/Manual QC Accepted final for run 4025, position 4 saved/,
     'correct confirmation message');
-  like ($content,
-    qr/Error updating lane status: Failed to get run_lane row for id_run 1234, position 4/,
-    'error updating lane status logged');
 
   lives_ok { $response = request(POST $url,
     ['id_run' => '4025', 'position' => '1', 'new_oc' => 'Accepted final' ])  }
@@ -98,6 +113,7 @@ my $response;
 }
 
 {
+  my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_current_outcome')) }
     'get current outcome lives';
   ok($response->is_error, q[get_current_outcome response is error]);

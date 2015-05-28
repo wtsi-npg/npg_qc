@@ -6,19 +6,15 @@
 -%]
 
 <td class="[% lane_class %] nbsp">
-[%- IF run_view;  
-    data_initial = '';
-    IF c.stash.previous_mqc.defined && c.stash.previous_mqc.$position.defined;
-        data_initial = ' data-initial="' _ c.stash.previous_mqc.$position _ '"';
-    END %] 
-    <div id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]'[% data_initial %] class='lane_mqc_control'></div>
-[% END -%]
 
 [% have_link = 0;
    IF tag_index == '' && lane_collection && lane_collection.size;
    have_link = 1 %]<a href="#[% lane_key %]">[% END -%]
 [%- position -%]
 [%- IF have_link %]</a>[% END -%]
+[%- IF run_view; -%]
+<span id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'></span>
+[% END -%]
 </td>
 
 [%- IF has_plexes -%]

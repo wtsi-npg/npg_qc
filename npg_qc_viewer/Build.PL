@@ -5,10 +5,28 @@ use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOC');
 
-use Cwd 'abs_path';
+  use Cwd qw/abs_path getcwd/;
+  use File::Which qw(which);
 
   sub process_seqqc_files {
     my $self = shift;
+
+    if ($self->args('installjsdeps')) {
+      if (which('node') and which('bower')) {
+        my $current = getcwd();
+        chdir 'root/static';
+        warn "Checking/fetching javascript dependencies\n";
+      
+        my $result = system 'bower install';
+        chdir $current;
+        if ($result) {
+          die 'Fail to install bower javascript dependencies';
+        }
+      } else {
+        warn "To install javascript dependencies, node and bower should be on the path;\n";
+        warn "javascript dependencies not installed.\n";
+      }
+    }
 
     my $dest = 'blib/seqqc';
     if (!-e $dest) {
@@ -34,6 +52,9 @@ my $builder = $class->new(
    'dist_abstract'     => q(SeqQC - viewer for autoqc analysis results),
    'license'           => 'gpl',
    'dist'              => { COMPRESS => 'gzip', SUFFIX => 'gz', },
+   'get_options'       => {
+     'installjsdeps' => { type => ''},
+   },
 
    'requires'          => {
         'Carp'                                         => '0',
@@ -46,6 +67,7 @@ my $builder = $class->new(
         'Catalyst::Action::RenderView'                 => '0',
         'Catalyst::Plugin::StackTrace'                 => '0',
         'Catalyst::Controller'                         => '0',
+        'Catalyst::Controller::REST'                   => '0',
         'Catalyst::Controller::DBIC::API::RPC'         => '0',
         'Catalyst::Model'                              => '0',
         'Catalyst::Model::Adaptor'                     => '0',
@@ -66,6 +88,7 @@ my $builder = $class->new(
         'Moose'                                        => '0',
         'Moose::Role'                                  => '0',
         'namespace::autoclean'                         => '0',
+        'Params::Validate'                             => '0',
         'Readonly'                                     => '0',
         'strict'                                       => '0',
         'warnings'                                     => '0',
@@ -92,6 +115,7 @@ my $builder = $class->new(
         'File::Temp'                                    => '0',
         'File::Spec'                                    => '0',
         'File::Spec::Functions'                         => '0',
+        'File::Which'                                   => '0',
         'GD'                                            => '0',
         'HTTP::Headers'                                 => '0',
         'HTTP::Request::Common'                         => '0',

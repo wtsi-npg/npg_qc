@@ -11,6 +11,8 @@ use npg_qc::autoqc::results::qX_yield;
 use npg_qc::autoqc::results::insert_size;
 use npg_qc::autoqc::results::split_stats;
 use npg_qc::autoqc::results::adapter;
+use npg_qc::autoqc::results::tag_metrics;
+use npg_qc::autoqc::results::tag_decode_stats;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 
@@ -514,7 +516,7 @@ my $temp = tempdir( CLEANUP => 1);
     
     $c->add(npg_qc::autoqc::results::tag_metrics->new(position => 8, id_run => 12, path => q[mypath]));
     $c->add(npg_qc::autoqc::results::tag_metrics->new(position => 2, id_run => 14, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::tag_metrics->new(position => 2, id_run => 22, path => q[mypath]));
+    $c->add(npg_qc::autoqc::results::tag_decode_stats->new(position => 2, id_run => 22, path => q[mypath]));
     $flags = $c->run_lane_plex_flags();
     is (scalar keys %{$flags}, 6, 'six run lane entries');
     foreach my $key (qw/22:2 12:8 14:2/) {

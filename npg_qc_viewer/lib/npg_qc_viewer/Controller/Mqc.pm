@@ -36,7 +36,8 @@ sub _set_response {
     croak 'Message hash should be supplied';
   }
   $c->response->headers->content_type('application/json');
-  if ($code) {
+
+  if ($code) { #There was an error
     $c->response->status($code);
   }
   $c->response->body(to_json $message_data);
@@ -53,9 +54,12 @@ sub update_outcome : Path('update_outcome') {
   my $new_outcome;
   my $error;
 
+  my $ent;
+
   try {
-    ####Validation
+    ####Validating request method
     $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+    ####Authorisation
     $c->controller('Root')->authorise($c, ($MQC_ROLE));
 
     ####Loading state
@@ -63,7 +67,7 @@ sub update_outcome : Path('update_outcome') {
     $position    = $params->{'position'};
     $new_outcome = $params->{'new_oc'};
     $id_run      = $params->{'id_run'};
-    $username    = $c->user->username || $c->user->id;
+    $username    = $c->user->username;
 
     if (!$id_run) {
       $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
@@ -78,7 +82,7 @@ sub update_outcome : Path('update_outcome') {
       $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
     }
 
-    my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
+    $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
       {'id_run' => $id_run, 'position' => $position})->next;
     if (!$ent) {
       $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
@@ -99,11 +103,13 @@ sub update_outcome : Path('update_outcome') {
   if ($error) {
     ($error, $error_code) = $self->parse_error($error);
   } else {
-    try {
-      $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
-    } catch {
-      $lane_update_error = qq[ Error updating lane status: $_];
-    };
+    if($ent->has_final_outcome) { ##If final outcome update lane as qc complete
+      try {
+        $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
+      } catch {
+        $lane_update_error = qq[ Error updating lane status: $_];
+      };
+    }
   }
 
   my $message = $error || qq[Manual QC $new_outcome for run $id_run, position $position saved.];

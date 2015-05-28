@@ -13,7 +13,6 @@ use Carp;
 use English qw(-no_match_vars);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
-use Cwd qw(cwd abs_path);
 
 use npg_common::extractor::fastq qw(generate_equally_spaced_reads);
 use npg_common::Alignment;
@@ -696,8 +695,6 @@ npg_qc::autoqc::checks::sequence_error
 =item File::Basename
 
 =item File::Spec::Functions qw(catfile)
-
-=item Cwd qw(cwd abs_path)
 
 =item PDL
 
