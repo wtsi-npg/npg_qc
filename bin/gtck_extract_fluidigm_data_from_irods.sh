@@ -28,7 +28,7 @@ do
     if [ -e "${infile}" ]
     then
       printf "================\nProcessing plex list %s, output to %s.tsv\n===============\n" "${infile}" "${outfile_base}"
-      (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-get --avu --unbuffered) < "${infile}" | reformat_fluidigm_snp26_results_irods.pl -s 2> "${outfile_base}.err" > "${outfile_base}.tsv"
+      (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-get --avu --unbuffered) < "${infile}" | grep -v '^The client/server socket connection has been renewed$' | reformat_fluidigm_snp26_results_irods.pl -s 2> "${outfile_base}.err" > "${outfile_base}.tsv"
       printf "================\nProcessed plex list %s\n===============\n" "${infile}"
     else
       printf "================\nFailed to find expected plex list %s, skipping\n===============\n" "${infile}"
