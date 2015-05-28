@@ -7,11 +7,11 @@ installdir = .
 
 SAMTOOLS_LOC= /software/solexa/pkg/samtools/samtools-1.2
 HTSLIB_LOC= /software/solexa/pkg/htslib/htslib-1.2.1
-INCLUDES= -I. -I$(SAMTOOLS_LOC) -I$(HTSLIB_LOC)/include
+INCLUDES= -I. -I$(SAMTOOLS_LOC)/include -I$(HTSLIB_LOC)/include
 LIBS= -lz -lm -Wl,-rpath=$(HTSLIB_LOC)
 LIBPATH=
 SAMTOOLSLIB= -lbam -lhts
-SAMTOOLSLIBPATH= -L $(SAMTOOLS_LOC) -L $(HTSLIB_LOC)/lib
+SAMTOOLSLIBPATH= -L $(SAMTOOLS_LOC)/lib -L $(HTSLIB_LOC)/lib
 
 ifdef FQS_BUILD_DIR
 BUILDDIR = $(FQS_BUILD_DIR)
