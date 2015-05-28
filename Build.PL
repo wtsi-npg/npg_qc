@@ -32,16 +32,29 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
   sub _samtools_option {
     my $self = shift;
-    my @found = which('samtools');
+
+    my @found = which('samtools1');
     my $samtools = @found ? abs_path( $found[0] ) : q[];
-    if ($samtools) { 
-      $samtools = dirname $samtools;
-      if ($self->verbose) {
-        warn "Found samtools in $samtools\n";
+    @found = which('htsfile');
+    my $hts = @found ? abs_path( $found[0] ) : q[];
+    my $pkgs = [];
+    if ($samtools && $hts) {
+      foreach my $p (($samtools, $hts)) {
+        $p = dirname $p;
+        if ( $p =~ m{/bin\Z}smx ) {
+          $p = dirname $p;
+        }
+        if ($self->verbose) {
+          warn "Found $p\n";
+        }
+        push @{$pkgs}, $p;
+        $samtools = 'SAMTOOLS_LOC=' . $samtools;
       }
-      $samtools = 'SAMTOOLS_LOC=' . $samtools;
+      $pkgs->[0] = 'SAMTOOLS_LOC=' . $pkgs->[0];
+      $pkgs->[1] = 'HTSLIB_LOC='   . $pkgs->[1];
     }
-    return $samtools;
+
+    return $pkgs;
   }
 
   sub ACTION_build {
@@ -58,19 +71,20 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
         my $bdir = _c_build_dir($tool);
         make_path $bdir;
         my $silent = $self->verbose ? q[] : '--silent';
-        my $samtools = q[];
-
+        my $extra_info = q[];
+        
         if ($c_tools->{$tool}->{'samtools'}) {
-          $samtools = $self->_samtools_option();
-          if (!$samtools) {
-            warn 'Samtools executable is not on the path, ' .
+          my @pkgs = @{$self->_samtools_option()};
+          if (!@pkgs) {
+            warn 'Samtools and/or hts executables are not on the path, ' .
                  "skipping $tool build\n";
             next;
           }
+          $extra_info = join q[ ], @pkgs;
         }
 
         my $command = sprintf 'make %s --directory %s %s',
-                      $silent, _c_src_dir($tool), $samtools;
+                      $silent, _c_src_dir($tool), $extra_info;
         if (system $command) {
           die "Failed to compile $ename";
         }
