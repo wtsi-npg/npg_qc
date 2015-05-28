@@ -70,6 +70,7 @@ root/static/images/catalyst_logo.png
 root/static/images/cross.png
 root/static/images/focus_on.png
 root/static/images/information.png
+root/static/images/padlock.png
 root/static/images/save.png
 root/static/images/tick.png
 root/static/images/to_children.png
@@ -83,6 +84,7 @@ root/static/test/test.html
 root/static/test/test.js
 root/static/test/images/cross.png
 root/static/test/images/tick.png
+root/static/test/images/padlock.png
 script/npg_qc_viewer_cgi.pl
 script/npg_qc_viewer_create.pl
 script/npg_qc_viewer_fastcgi.pl

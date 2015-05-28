@@ -134,7 +134,7 @@ while(<>) {
 
   my $data = $h->{data};
   for my $row (split /\n/smx, $data) {
-    my ($rsname, $sn, $call) = (split /\t/smx, $row)[$FLUIDIGM_RESULT_RSNAME_COL,$FLUIDIGM_RESULT_SAMPLE_NAME_COL,$FLUIDIGM_RESULT_CALL_COL]; # magic numbers?
+    my ($rsname, $sn, $call) = (split /\t/smx, $row)[$FLUIDIGM_RESULT_RSNAME_COL,$FLUIDIGM_RESULT_SAMPLE_NAME_COL,$FLUIDIGM_RESULT_CALL_COL];
 
     ## no critic qw(ControlStructures::ProhibitUnlessBlocks)
     unless($rsname) {
@@ -165,7 +165,9 @@ while(<>) {
 }
 
 # flush out calls for last sample
-dump_results(\%calls, $sample_name);
+  if($sample_name) {
+    dump_results(\%calls, $sample_name);
+  }
 
 sub dump_results {
   my ($calls, $sn) = @_;
