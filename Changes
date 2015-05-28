@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - compile fastq_summ with samtools-1.2 and htslib-1.2.1
  - Removing global functions from manual_qc.js
  - Logic for preliminary outcomes for MQC
  - New undecided outcome for MQC
