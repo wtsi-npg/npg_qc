@@ -4,6 +4,8 @@
 
 GTCK_IRODS_ZONE="${GTCK_IRODS_ZONE:-seq}"
 
+printf '*** gtck_extract_fluidigm_data_from_irods.sh ***\n'
+
 if [[ ! -e latest_plex_list.txt ]]
 then
   echo "Not running extract_fluidigm_data_from_irods - no latest_plex_list.txt"
@@ -28,7 +30,7 @@ do
     if [ -e "${infile}" ]
     then
       printf "================\nProcessing plex list %s, output to %s.tsv\n===============\n" "${infile}" "${outfile_base}"
-      (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-get --avu --unbuffered) < "${infile}" | reformat_fluidigm_snp26_results_irods.pl -s 2> "${outfile_base}.err" > "${outfile_base}.tsv"
+      (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-get --avu --unbuffered) < "${infile}" | grep -v '^The client/server socket connection has been renewed$' | reformat_fluidigm_snp26_results_irods.pl -s 2> "${outfile_base}.err" > "${outfile_base}.tsv"
       printf "================\nProcessed plex list %s\n===============\n" "${infile}"
     else
       printf "================\nFailed to find expected plex list %s, skipping\n===============\n" "${infile}"

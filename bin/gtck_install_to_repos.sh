@@ -2,7 +2,9 @@
 
 # $VERSION = '0';
 
-GTCK_REPOS_ROOT="${GTCK_REPOS_ROOT:-'/nfs/srpipe_references/genotypes /lustre/scratch109/srpipe/genotypes /lustre/scratch110/srpipe/genotypes'}"
+GTCK_REPOS_ROOT="${GTCK_REPOS_ROOT:-/nfs/srpipe_references/genotypes /lustre/scratch109/srpipe/genotypes /lustre/scratch110/srpipe/genotypes}"
+
+printf '*** gtck_install_to_repos.sh ***\n'
 
 if [[ ! -e latest_combined_file.txt ]]
 then

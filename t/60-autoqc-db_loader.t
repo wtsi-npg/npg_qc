@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 58;
+use Test::More tests => 66;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -116,6 +116,29 @@ my $schema = Moose::Meta::Class->create_anon_class(
   );
   lives_ok {$db_loader->load()} 'load new insert size result';
   is($is_rs->search({})->count, $current_count+1, 'a new records added');
+}
+
+{
+  my $is_rs = $schema->resultset('VerifyBamId');
+  my $current_count = $is_rs->search({})->count;
+  my $count_loaded;
+
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+       schema => $schema,
+       json_file   => ['t/data/autoqc/7321_7#8.verify_bam_id.json'],
+       verbose => 0,
+  );
+  lives_ok {$count_loaded = $db_loader->load()} 'file loaded';
+  is($count_loaded, 1, 'reported one file loaded');
+  $current_count++;
+  is ($is_rs->search({})->count, $current_count, 'one record added to the table');
+  lives_ok {$db_loader->load()} 'reload VerifyBamId result';
+  my $rs = $is_rs->search({});
+  is($rs->count, $current_count, 'no new records added');
+  my $row = $rs->next;
+  is($row->freemix, 0.00025, 'freemix');
+  is($row->freeLK0, 823213.22, 'freeLK0');
+  is($row->freeLK1, 823213.92, 'freeLK1');
 }
 
 {

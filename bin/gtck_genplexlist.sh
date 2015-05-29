@@ -5,6 +5,8 @@
 GTCK_IRODS_ZONE="${GTCK_IRODS_ZONE:-seq}"
 dttag="$(date +%Y%m%d%H%M%S)";
 
+printf '*** gtck_genplexlist.sh ***\n'
+
 for zone in ${GTCK_IRODS_ZONE} # single value or space-delimited list
 do
   for qc_set in qc cgp ddd
