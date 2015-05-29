@@ -4,6 +4,8 @@
 
 GTCK_IRODS_ZONE="${GTCK_IRODS_ZONE:-seq}"
 
+printf '*** gtck_extract_fluidigm_data_from_irods.sh ***\n'
+
 if [[ ! -e latest_plex_list.txt ]]
 then
   echo "Not running extract_fluidigm_data_from_irods - no latest_plex_list.txt"
