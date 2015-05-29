@@ -3,18 +3,18 @@
 # $VERSION = '0';
 
 GTCK_IRODS_ZONE="${GTCK_IRODS_ZONE:-seq}"
-GTCK_STATIC_DATA_DIR="${GTCK_STATIC_DATA_DIR:-/nfs/srpipe_references/genotypes}"
+GTCK_STATIC_DATA_DIR="${GTCK_STATIC_DATA_DIR:-/nfs/srpipe_references/genotypes/data_prep/static_data}"
 
 # GTCK_AIX_DATA - location of aix file, which specifies the allele order for heterozygous calls for the SNP set
-GTCK_AIX_FILE="${GTCK_AIX_FILE:-sgd.aix}"
+GTCK_AIX_FILE="${GTCK_AIX_FILE:-W30467_sgd_reference.aix}"
 GTCK_AIX_DATA="${GTCK_AIX_DATA:-${GTCK_STATIC_DATA_DIR}/${GTCK_AIX_FILE}}"
 
 # GTCK_SEQUENOM_GT_DATA - location of Sequenom genotype results in tsv format
 GTCK_SEQUENOM_GT_FILE="${GTCK_SEQUENOM_GT_FILE:-current_sequenom_gt.tsv}"
 GTCK_SEQUENOM_GT_DATA="${GTCK_SEQUENOM_DATA:-${GTCK_STATIC_DATA_DIR}/${GTCK_SEQUENOM_GT_FILE}}"
 
-# GTCK_HDR_DATA - location of Sequenom genotype results in tsv format
-GTCK_HDR_FILE="${GTCK_HDR_FILE:-hdr_snp26.tsv}"
+# GTCK_HDR_DATA - location of tsv header for combined file
+GTCK_HDR_FILE="${GTCK_HDR_FILE:-W30467_snp26_hdr_reference.tsv}"
 GTCK_HDR_DATA="${GTCK_HDR_DATA:-${GTCK_STATIC_DATA_DIR}/${GTCK_HDR_FILE}}"
 
 printf '*** gtck_combine_gt_data.sh ***\n'
