@@ -47,10 +47,16 @@ then
   printf "================\nNot producing new combined genotype data file - failed to find input file %s\n===============\n" "${infile}"
   exit 1
 fi
+infile=${GTCK_AIX_DATA}
+if [ ! -e "${infile}" ]
+then
+  printf "================\nNot producing new combined genotype data file - failed to find input file %s\n===============\n" ${infile}
+  exit 1
+fi
 infile=${GTCK_HDR_DATA}
 if [ ! -e "${infile}" ]
 then
-  printf "================\nNot producing new combined genotype data file - failed to find input file hdr_snp26.tsv\n===============\n"
+  printf "================\nNot producing new combined genotype data file - failed to find input file %s\n===============\n" ${infile}
   exit 1
 fi
 for zone in ${GTCK_IRODS_ZONE}
@@ -71,7 +77,7 @@ done
 # produce the combined file
 ###########################
 printf "Combining current_sequenom_gt.tsv "; printf "%s " "fluidigm_{qc,cgp,ddd}_{zones}_gt_${dttag}.tsv"; printf "to produce sequenom_fluidigm_combo_sgd_%s.tsv\n" "${dttag}"
-cat hdr_snp26.tsv <(tail -n +2 current_sequenom_gt.tsv | cut -f2-) > "sequenom_fluidigm_combo_sgd_${dttag}.tsv"
+cat ${GTCK_HDR_DATA} <(tail -n +2 ${GTCK_SEQUENOM_GT_DATA} | cut -f2-) > "sequenom_fluidigm_combo_sgd_${dttag}.tsv"
 for zone in ${GTCK_IRODS_ZONE}
 do
   cat fluidigm_{qc,cgp,ddd}_${zone}_gt_${dttag}.tsv >> "sequenom_fluidigm_combo_sgd_${dttag}.tsv"
