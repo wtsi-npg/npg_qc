@@ -360,8 +360,8 @@ sub _build_tag0_index_length {
     ## no critic (ProhibitTwoArgOpen ErrorHandling::RequireCheckingReturnValueOfEval
     my $index_length = 0;
     my $bfile = $self->tag0_bam_file;
-    my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools . qq[ view $bfile" | ];
-    open my $ph, $command or croak qq[Cannot fork '$command', error $ERRNO];
+    my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools . qq[ view $bfile" ];
+    open my $ph, q(-|), $command or croak qq[Cannot fork '$command', error $ERRNO];
     while (my $line = <$ph>) {
         if($line =~ /\t(BC|RT):Z:(\S+)/smx) {
             $index_length = length $2;
@@ -369,9 +369,10 @@ sub _build_tag0_index_length {
         }
     }
     eval { close $ph; };
-    #The exit status of the pipe is always 141 since the head command exits before samtools
+    #The exit status of the child is 141 from SIGPIPE or 1 if fail to write to stdout 
+    #and fail to close happens first - don't croak if we've set index_length
     my $child_error = $CHILD_ERROR >> $SHIFT_EIGHT;
-    if ($child_error != 0 && $child_error != $SIG_PIPE_FATAL_ERROR) {
+    if ($child_error != 0 && $child_error != $SIG_PIPE_FATAL_ERROR && ! $index_length) {
         croak qq[Error in pipe "$command": $child_error];
     }
     return $index_length;

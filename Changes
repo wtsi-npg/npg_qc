@@ -1,5 +1,15 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.1
+ - compile fastq_summ with samtools-1.2 and htslib-1.2.1
+ - Removing global functions from manual_qc.js
+ - Logic for preliminary outcomes for MQC
+ - New undecided outcome for MQC
+ - update scripts for genotype check data preparation
+    - to allow specification of iRODS zone with an environment variable
+    - perlcritic issues and version strings
+ - gt_pack recognises version 02 headers in append mode
+
 release 58.0
  - skip running legacy gcbias if window_depth not available
  - compile fastq_summ executable during the npg_qc build, skip
