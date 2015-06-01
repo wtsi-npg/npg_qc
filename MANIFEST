@@ -396,6 +396,7 @@ t/50-schema-result-SplitStats.t
 t/50-schema-result-MqcOutcomeDict.t
 t/50-schema-result-MqcOutcomeEnt.t
 t/50-schema-result-MqcOutcomeHist.t
+t/50-schema-result-VerifyBamId.t
 t/60-autoqc-autoqc.t
 t/60-autoqc-checks-adapter.t
 t/60-autoqc-checks-af_metrics.t
