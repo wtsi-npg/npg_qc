@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.2
+ - convert local path to nfs for linked tools when building fastq_summ
+
 release 58.1
  - compile fastq_summ with samtools-1.2 and htslib-1.2.1
  - Removing global functions from manual_qc.js
@@ -9,6 +12,7 @@ release 58.1
     - to allow specification of iRODS zone with an environment variable
     - perlcritic issues and version strings
  - gt_pack recognises version 02 headers in append mode
+ - DBIx binding generation - keep column name case when generating accessors
 
 release 58.0
  - skip running legacy gcbias if window_depth not available
