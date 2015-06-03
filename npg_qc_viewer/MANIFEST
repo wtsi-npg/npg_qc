@@ -49,7 +49,6 @@ root/src/ui_checks/tag_decode_stats.tt2
 root/src/ui_checks/tag_metrics.tt2
 root/src/ui_lanes/checks_header.tt2
 root/src/ui_lanes/collapse_menu.tt2
-root/src/ui_lanes/lanes_total.tt2
 root/src/ui_lanes/lane.tt2
 root/src/ui_lanes/library_lanes.tt2
 root/src/ui_runs/annotations.tt2
@@ -120,7 +119,6 @@ t/50-template-ui_checks-insert_size.t
 t/50-template-ui_checks-qX_yield.t
 t/50-template-ui_checks-split_stats.t
 t/50-template-ui_checks-tag_decode_stats.t
-t/50-template-ui_lanes-lanes_total.t
 t/50-template-ui_lanes-lane.t
 t/50-template-ui_lanes-library_lanes.t
 t/70-view_TT.t
