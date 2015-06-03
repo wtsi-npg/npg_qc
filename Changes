@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Fixing qXYield total for run and sample, now it calculates from actual values 
+    in the table, does not recalculate from collection.
+
 release 58.2
  - convert local path to nfs for linked tools when building fastq_summ
 
