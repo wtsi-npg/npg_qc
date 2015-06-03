@@ -165,7 +165,7 @@
       column_counter = column_counter + 1;
     END;
 -%]
-[%# Calculating totals %]
+[%# Calculating totals for qXyield %]
 [% IF collection_all.size; 
       qx_collection = collection_all.search(class_name => 'qX_yield');
       IF qx_collection.defined && qx_collection.size && qx_collection.size < 1000;
@@ -185,6 +185,7 @@
 [%-   END -%]
 [%- END -%]
 [%- END -%]
+[%# Calculating totals for qXyield end %]
 
 </table>
 
