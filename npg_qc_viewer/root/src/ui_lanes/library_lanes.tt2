@@ -1,5 +1,6 @@
 [% 
   USE String;
+  USE Number.Format(THOUSANDS_SEP=',');
 
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
@@ -64,6 +65,7 @@
 </tr>
 
 [%- libs_info = {}; studies_info = {}; run_info = {}; 
+    qxTotal = 0; #For total qxYield
     FOREACH lane_key IN sorted_rl_map_keys;
       lane_collection = rl_map.$lane_key;
       attrs = util.inflate_rpt_key(lane_key);
@@ -163,8 +165,25 @@
       column_counter = column_counter + 1;
     END;
 -%]
-
-[%- PROCESS "ui_lanes/lanes_total.tt2" -%]
+[%# Calculating totals %]
+[% IF collection_all.size; 
+      qx_collection = collection_all.search(class_name => 'qX_yield');
+      IF qx_collection.defined && qx_collection.size && qx_collection.size < 1000;
+        qX_position = 0;
+        FOREACH check_name IN checks_list;
+          column_counter = column_counter+1;
+          IF check_name == 'qX yield'; qX_position = column_counter; END;
+        END;
+%]
+<tr id="total">
+  <td colspan="[% qX_position - 1 %]" />
+  <td class="total">[% qxTotal | format_number %]</td>
+  [%- IF  column_counter - qX_position > 0 -%]
+    <td colspan="[% column_counter - qX_position %]" />
+  [%- END -%]
+</tr>
+[%-   END -%]
+[%- END -%]
 [%- END -%]
 
 </table>
