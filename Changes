@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.2.1
+ - Updating Readme in npg_qc_viewer for changes in deploy procedure.
  - Fixing qXYield total for run and sample, now it calculates from actual values 
     in the table, does not recalculate from collection.
 
