@@ -1,11 +1,6 @@
-#########
-# Author:        mg8
-# Created:       30 July 2009
-#
-
 use strict;
 use warnings;
-use Test::More tests => 51;
+use Test::More tests => 62;
 use Test::Exception;
 use Test::Deep;
 use File::Spec::Functions qw(catfile);
@@ -58,9 +53,22 @@ our $idrun = 2549;
 {
     my $check = npg_qc::autoqc::checks::check->new(position => 2, path  => 't/data/autoqc/090721_IL29_2549/data', id_run => $idrun );
     is($check->tag_index, undef, 'tag index undefined');
+    isa_ok($check->result, 'npg_qc::autoqc::results::result');
+    is($check->result->id_run, $idrun, 'run id propagated');
+    is($check->result->position, 2, 'position propagated');
+    is($check->result->path, 't/data/autoqc/090721_IL29_2549/data', 'path propagated');
+    is($check->result->tag_index, undef, 'tag index undefined');
+    ok(!$check->result->has_tag_index, 'tag index is not set');
+
     $check = npg_qc::autoqc::checks::check->new(position => 2, path  => 't/data/autoqc/090721_IL29_2549/data',
                                                 id_run => $idrun, tag_index => 5 );
     is($check->tag_index, 5, 'tag index is set by the constructor');
+    isa_ok($check->result, 'npg_qc::autoqc::results::result');
+    is($check->result->id_run, $idrun, 'run id propagated');
+    is($check->result->position, 2, 'position propagated');
+    is($check->result->tag_index, 5, 'tag index propagated');
+    ok($check->result->has_tag_index, 'tag index is set');
+
     throws_ok { npg_qc::autoqc::checks::check->new(position => 2, path  => 't/data/autoqc/090721_IL29_2549/data',
                                                 id_run => $idrun, tag_index => 1000000)}
            qr/Validation\ failed\ for/, 'error on passing to the constructor large tag index';

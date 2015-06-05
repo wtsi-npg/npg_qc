@@ -30,7 +30,6 @@ my $repos = q[t/data/autoqc];
                               position  => 3,
                               path      => 't/data/autoqc/090721_IL29_2549/data',
                               id_run    => 2549,
-                              tag_index => undef,
                                                   );
     $r->set_info('Check', 'npg_qc::autoqc::checks::check');
                                   
@@ -58,48 +57,48 @@ my $repos = q[t/data/autoqc];
 }
 
 {
-  my $check = npg_qc::autoqc::checks::sequence_error->new({
+  my $check = npg_qc::autoqc::checks::sequence_error->new(
                                                       position  => 1,
                                                       path      => 't/data/autoqc/090721_IL29_2549/data',
                                                       id_run    => 2549,
                                                       repository => $repos,
-                                                     });
+                                                     );
   is ($check->sequence_type, undef, 'sequence type unset');
   is ($check->result->sequence_type, undef, 'result sequence type unset');
 }
 
 {
-  my $check = npg_qc::autoqc::checks::sequence_error->new({
+  my $check = npg_qc::autoqc::checks::sequence_error->new(
                                                       position  => 1,
                                                       path      => 't/data/autoqc/090721_IL29_2549/data',
                                                       id_run    => 2549,
                                                       repository => $repos,
-                                                     });
+                                                     );
   $check->result->write2file($dir, q[json]);
   ok (-e join(q[/], $dir, q[2549_1.sequence_error.json]), 'result file written');
 }
 
 {
-  my $check = npg_qc::autoqc::checks::sequence_error->new({
+  my $check = npg_qc::autoqc::checks::sequence_error->new(
                                                       position  => 1,
                                                       path      => 't/data/autoqc/090721_IL29_2549/data',
                                                       id_run    => 2549,
                                                       sequence_type => 'phix',
                                                       repository => $repos,
-                                                     });
+                                                     );
   $check->result->write2file($dir);
   ok (-e join(q[/], $dir, q[2549_1_phix.sequence_error.json]), 'phix type result file created');
 }
 
 {
-  my $check = npg_qc::autoqc::checks::sequence_error->new({
+  my $check = npg_qc::autoqc::checks::sequence_error->new(
                                                       position  => 1,
                                                       path      => 't/data/autoqc/090721_IL29_2549/data',
                                                       id_run    => 2549,
                                                       tag_index => 4,
                                                       sequence_type => 'phix',
                                                       repository => $repos,
-                                                     });
+                                                     );
   $check->result->write2file($dir);
   ok (-e join(q[/], $dir, q[2549_1#4_phix.sequence_error.json]), 'phix type result file created');
 }
