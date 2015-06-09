@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - genotype check: reduce min_sample_call_rate parameter for genotype match from 95% to 75%, and
+     min_common_snps from 21 to 20. This will allow (Fluidigm) qc genotypes with 20 calls to be
+    identified as possible duplicates when using the standard set of 26 QC SNPS (W30467)
+
 release 58.3
  - default autoqc result object creation - do not set tag index to undef to
    avoid this field being set when serializing to json with newer Moose
