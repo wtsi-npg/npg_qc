@@ -158,12 +158,15 @@ sub _build_result {
     my $module = "npg_qc::autoqc::results::$ref";
     Class::MOP::load_class($module);
 
-    my $result = $module->new(
-                    id_run    => $self->id_run,
-                    position  => $self->position,
-                    path      => $self->path,
-                    tag_index => $self->tag_index
-                             );
+    my $nref = { id_run => $self->id_run, position  => $self->position, };
+    $nref->{'path'} = $self->path;
+    if (defined $self->tag_index) {
+      # In newish Moose undefined but set tag index is serialized to json,
+      # which is not good for result objects that do hot have tag_index db column
+      $nref->{'tag_index'} = $self->tag_index;
+    }
+    my $result = $module->new($nref);
+
     $result->set_info('Check', $pkg_name);
     $result->set_info('Check_version', $module_version);
     if ($result->can(q[sequence_type])) {

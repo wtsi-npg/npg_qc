@@ -1,9 +1,14 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-release 58.2.1
+
+release 58.3.1
  - Updating Readme in npg_qc_viewer for changes in deploy procedure.
  - Fixing qXYield total for run and sample, now it calculates from actual values 
     in the table, does not recalculate from collection.
+    
+release 58.3
+ - default autoqc result object creation - do not set tag index to undef to
+   avoid this field being set when serializing to json with newer Moose
 
 release 58.2
  - convert local path to nfs for linked tools when building fastq_summ
