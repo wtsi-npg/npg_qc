@@ -7,6 +7,7 @@ require.config({
         insert_size_lib: 'bower_components/bcviz/src/qcjson/insertSizeHistogram',
         adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
         mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
+        gcdepth_lib: 'bower_components/bcviz/src/qcjson/gcdepth',
     },
     shim: {
         d3: {
@@ -30,8 +31,8 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib'], 
-function( manual_qc,  collapse, insert_size, adapter, mismatch) {
+require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'gcdepth_lib'], 
+function( manual_qc,  collapse, insert_size, adapter, mismatch, gcdepth) {
 
   collapse.init();
   
@@ -165,4 +166,26 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
 
     jQuery(this).append(fwd_div,rev_div,leg_div);
   });
+
+  jQuery('.bcviz_gcdepth').each(function(i) { 
+    d = jQuery(this).data('check');
+    h = jQuery(this).data('height');
+    w = jQuery(this).data('width');
+    t = jQuery(this).data('title') || _getTitle('GC Depth : ', d);
+
+    chart = gcdepth.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
+    if (chart != null) {
+      if (chart.svg != null) {
+        div = document.createElement("div");
+        jQuery(div).append(function() { return chart.svg.node(); } );
+        jQuery(div).addClass('chart');
+        jQuery(this).append(div);
+        leg_div = document.createElement("div");
+        jQuery(leg_div).append(function() { return chart.legend.node(); } );
+        jQuery(leg_div).addClass('chart');
+        jQuery(this).append(leg_div);
+      }
+    }
+  });
+
 });

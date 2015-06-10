@@ -152,6 +152,41 @@ __PACKAGE__->table('gc_bias');
   default_value: -1
   is_nullable: 0
 
+=head2 gcpercent
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 pc_us
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 pc_10
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 pc_25
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 pc_50
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 pc_75
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 pc_90
+
+  data_type: 'text'
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -200,6 +235,20 @@ __PACKAGE__->add_columns(
   { data_type => 'text', is_nullable => 1 },
   'tag_index',
   { data_type => 'bigint', default_value => -1, is_nullable => 0 },
+  'gcpercent',
+  { data_type => 'text', is_nullable => 1 },
+  'pc_us',
+  { data_type => 'text', is_nullable => 1 },
+  'pc_10',
+  { data_type => 'text', is_nullable => 1 },
+  'pc_25',
+  { data_type => 'text', is_nullable => 1 },
+  'pc_50',
+  { data_type => 'text', is_nullable => 1 },
+  'pc_75',
+  { data_type => 'text', is_nullable => 1 },
+  'pc_90',
+  { data_type => 'text', is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -248,10 +297,10 @@ __PACKAGE__->add_unique_constraint('unq_run_lane_gc_bias', ['id_run', 'position'
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::gc_bias';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:VHPfu2sk73vf+4SWuLu7OA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-09 11:27:39
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:l//bpOrgEV7nqFxLm5VoPg
 
-__PACKAGE__->set_flators4non_scalar(qw( actual_quantile_x actual_quantile_y gc_lines plot_x plot_y ideal_lower_quantile ideal_upper_quantile info ));
+__PACKAGE__->set_flators4non_scalar(qw( actual_quantile_x actual_quantile_y gc_lines plot_x plot_y ideal_lower_quantile ideal_upper_quantile info gcpercent pc_us pc_10 pc_25 pc_50 pc_75 pc_90));
 __PACKAGE__->set_inflator4scalar('tag_index');
 
 

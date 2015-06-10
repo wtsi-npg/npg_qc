@@ -1,4 +1,6 @@
-[% IF check.cached_plot.defined %]
+[% IF check.gcpercent.defined %]
+<div class='bcviz_gcdepth' data-check='[% check.json | replace("'", "%27") %]'></div>
+[% ELSIF check.cached_plot.defined %]
 <img src="data:image/png;base64,[% check.cached_plot %]" alt="GC bias check" height="300" width="300" />
 [% ELSE %]
 Reason: [% check.comments %]

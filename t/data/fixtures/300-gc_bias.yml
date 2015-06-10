@@ -18,3 +18,4 @@
    comments: 'gc_bias test'
    info: '{"Check":"npg_qc::autoqc::checks::gc_bias","Check_version":"8853"}'
    pass: 1
+   gcpercent: '[1,2,3]'
