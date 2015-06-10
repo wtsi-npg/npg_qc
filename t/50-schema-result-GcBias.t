@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 10;
 use Test::Exception;
 use Test::Deep;
 use Moose::Meta::Class;
@@ -31,7 +31,8 @@ my $json = q {
   "tag_index":"0",
   "actual_quantile_y":["125","194","279","343.5","373","434","545.9","644","627.8","548.7","670.5","83.8","38","34","28","20","14","10","8","6","4","2.5"],
   "gc_lines":["NA","NA","NA","NA","64.18613","94.9059","99.81387","NA","NA","NA","NA"],
-  "cached_plot":"data"
+  "cached_plot":"data",
+  "gcpercent":["1","2","3"]
  } 
 };
 
@@ -53,6 +54,8 @@ isa_ok($rs->new($values), 'npg_qc::Schema::Result::GcBias');
   is(ref $row->actual_quantile_y, 'ARRAY', 'actual_quantile_y returned as an array');
   cmp_deeply($row->actual_quantile_y, $values->{'actual_quantile_y'},
     'actual_quantile_y array content is correct');  
+  is(ref $row->gcpercent, 'ARRAY', 'gcpercent returned as array');
+  cmp_deeply($row->gcpercent, $values->{'gcpercent'}, 'gcpercent content is correct');
 }
 
 1;

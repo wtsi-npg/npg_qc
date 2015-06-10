@@ -59,8 +59,32 @@ has 'ideal_upper_quantile' => ( is  => 'rw',
                                 isa => 'ArrayRef',
 );
 
-has 'cached_plot'          => ( is  => 'rw',
-                                isa => 'Str',
+has 'gcpercent'          => ( is  => 'rw',
+                              isa => 'ArrayRef',
+);
+
+has 'pc_us'          => ( is  => 'rw',
+                          isa => 'ArrayRef',
+);
+
+has 'pc_10'          => ( is  => 'rw',
+                          isa => 'ArrayRef',
+);
+
+has 'pc_25'          => ( is  => 'rw',
+                          isa => 'ArrayRef',
+);
+
+has 'pc_50'          => ( is  => 'rw',
+                          isa => 'ArrayRef',
+);
+
+has 'pc_75'          => ( is  => 'rw',
+                          isa => 'ArrayRef',
+);
+
+has 'pc_90'          => ( is  => 'rw',
+                          isa => 'ArrayRef',
 );
 
 no Moose;
