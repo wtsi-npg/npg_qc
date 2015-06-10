@@ -184,8 +184,8 @@
 </tr>
 [%-   END -%]
 [%- END -%]
-[%- END -%]
 [%# Calculating totals for qXyield end %]
+[%- END -%]
 
 </table>
 
