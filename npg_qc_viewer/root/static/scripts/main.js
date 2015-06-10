@@ -178,12 +178,11 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch, gcdepth) {
       if (chart.svg != null) {
         div = document.createElement("div");
         jQuery(div).append(function() { return chart.svg.node(); } );
-        jQuery(div).addClass('chart');
-        jQuery(this).append(div);
+        jQuery(div).addClass('chart_left');
         leg_div = document.createElement("div");
         jQuery(leg_div).append(function() { return chart.legend.node(); } );
-        jQuery(leg_div).addClass('chart');
-        jQuery(this).append(leg_div);
+        jQuery(leg_div).addClass('chart_legend');
+        jQuery(this).append(div,leg_div);
       }
     }
   });
