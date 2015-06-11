@@ -23,6 +23,7 @@ use npg_tracking::illumina::run::folder;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
+use npg_qc::autoqc::results::result_decorated_with_metadata;
 use npg_qc::autoqc::role::rpt_key;
 
 our $VERSION = '0';
@@ -127,7 +128,8 @@ one by one .
 =cut
 sub add {
     my ($self, $r) = @_;
-
+    
+    #TODO Add an option for collection
     if(ref $r eq q{ARRAY}) {
         foreach my $el (@{$r}) {
             $self->push($el);
@@ -167,7 +169,8 @@ sub add_from_dir {
         foreach my $class (@classes) {
             if ($filename =~ /$class/smx) {
                 my $module = $RESULTS_NAMESPACE . q[::] . $class;
-                my $result = $module->load($file);
+                my $metadata = {};
+                my $result = new result_decorated_with_metadata($module->load($file), $metadata);
                 my $position = $result->position;
                 if (!defined $lanes || !@{$lanes} || grep {/^$position$/smx} @{$lanes} ) {
                     $self->add($result);
@@ -450,6 +453,7 @@ sub run_lane_collections {
         my $key = $result->rpt_key;
         if (!defined $map->{$key}) {
             my $c = __PACKAGE__->new();
+            #TODO 
             $c->add($result);
             $map->{$key} = $c;
         } else {
