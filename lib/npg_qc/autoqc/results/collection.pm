@@ -170,7 +170,7 @@ sub add_from_dir {
             if ($filename =~ /$class/smx) {
                 my $module = $RESULTS_NAMESPACE . q[::] . $class;
                 my $metadata = {};
-                my $result = new result_decorated_with_metadata($module->load($file), $metadata);
+                my $result = npg_qc::autoqc::results::result_decorated_with_metadata->new($module->load($file), $metadata);
                 my $position = $result->position;
                 if (!defined $lanes || !@{$lanes} || grep {/^$position$/smx} @{$lanes} ) {
                     $self->add($result);
