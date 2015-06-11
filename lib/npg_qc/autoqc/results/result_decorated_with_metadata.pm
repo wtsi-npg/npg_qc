@@ -14,27 +14,23 @@ has 'decorated_result' => (
   is       => 'ro',
   isa      => 'npg_qc::autoqc::results::result',
   required => 1,
-  handles  => qr/^(?!get_origin)/,
+  handles  => qr/^(?!get_result_metadata)/,
 );
 
-has 'metadata'   =>  (
+has 'result_metadata' =>  (
   isa        => 'HashRef',
   is         => 'ro',
   required   => 1,
+  reader     => 'get_result_metadata',
 );
 
 sub BUILD {
   my $self = shift;
   my $decorated_result = shift;
-  my $metadata = shift;
+  my $result_metadata = shift;
   
   $self->decorated_result = $decorated_result;
-  $self->metadata = $metadata;
-}
-
-sub get_metadata {
-  my $self = shift;
-  return $self->metadata;
+  $self->result_metadata = $result_metadata;
 }
 
 no Moose;
