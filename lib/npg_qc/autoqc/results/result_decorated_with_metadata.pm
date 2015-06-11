@@ -13,14 +13,12 @@ our $VERSION = '0';
 has '_decorated_result' => (
   is       => 'ro',
   isa      => 'npg_qc::autoqc::results::result',
-  required => 1,
   handles  => qr/^(?!get_result_metadata)/,
 );
 
 has '_result_metadata' =>  (
   isa        => 'HashRef',
   is         => 'ro',
-  required   => 1,
   reader     => 'get_result_metadata',
 );
 
