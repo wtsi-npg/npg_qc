@@ -17,7 +17,7 @@ has 'decorated_result' => (
   handles  => qr/^(?!get_result_metadata)/,
 );
 
-has 'result_metadata' =>  (
+has '_result_metadata' =>  (
   isa        => 'HashRef',
   is         => 'ro',
   required   => 1,
@@ -30,7 +30,7 @@ sub BUILD {
   my $result_metadata = shift;
   
   $self->decorated_result = $decorated_result;
-  $self->result_metadata = $result_metadata;
+  $self->_result_metadata = $result_metadata;
 }
 
 no Moose;
