@@ -14,6 +14,7 @@ has '_decorated_result' => (
   is       => 'ro',
   isa      => 'npg_qc::autoqc::results::result',
   lazy     => 1,
+  default => \&build__decorated_result,
   handles  => qr/^(?!get_result_metadata)/,
 );
 
