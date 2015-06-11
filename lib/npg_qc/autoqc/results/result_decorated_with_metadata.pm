@@ -10,7 +10,7 @@ extends qw(npg_qc::autoqc::results::result);
 
 our $VERSION = '0';
 
-has 'decorated_result' => (
+has '_decorated_result' => (
   is       => 'ro',
   isa      => 'npg_qc::autoqc::results::result',
   required => 1,
@@ -29,7 +29,7 @@ sub BUILD {
   my $decorated_result = shift;
   my $result_metadata = shift;
   
-  $self->decorated_result = $decorated_result;
+  $self->_decorated_result = $decorated_result;
   $self->_result_metadata = $result_metadata;
 }
 
