@@ -44,11 +44,11 @@ sub files {
             my $files = $self->_files4one_path($rpt_key_map, $db_lookup, $path);
             foreach my $ftype (keys %{$files}) {
                 $all_files->{$ftype} = $files->{$ftype};
-	    }
-	}
+            }
+        }
         if (scalar keys %{$all_files}) {
             $all_files->{db_lookup} = 0;
-	}
+    }
         return $all_files;
     } else {
         return $self->_files4one_path($rpt_key_map, $db_lookup);
