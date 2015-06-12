@@ -16,6 +16,13 @@ our $VERSION = '0';
 
 Readonly::Array my @SEARCH_PARAMETERS => qw/ position class_name check_name id_run tag_index /;
 
+has '_result_metadata' =>  (
+  isa        => 'HashRef',
+  is         => 'rw',
+  reader     => 'get_result_metadata',
+  writer     => 'set_result_metadata',
+);
+
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME

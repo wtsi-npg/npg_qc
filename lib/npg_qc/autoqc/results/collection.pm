@@ -23,7 +23,6 @@ use npg_tracking::illumina::run::folder;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
-use npg_qc::autoqc::results::result_decorated_with_metadata;
 use npg_qc::autoqc::role::rpt_key;
 
 our $VERSION = '0';
@@ -169,11 +168,12 @@ sub add_from_dir {
         foreach my $class (@classes) {
             if ($filename =~ /$class/smx) {
                 my $module = $RESULTS_NAMESPACE . q[::] . $class;
-                my $metadata = {};
-                my $result = npg_qc::autoqc::results::result_decorated_with_metadata->new($module->load($file), $metadata);
-                my $position = $result->position;
+                my $plain_result = $module->load($file);
+                my $result_metadata = {file => $file,};
+                $plain_result->set_result_metadata($result_metadata);
+                my $position = $plain_result->position;
                 if (!defined $lanes || !@{$lanes} || grep {/^$position$/smx} @{$lanes} ) {
-                    $self->add($result);
+                    $self->add($plain_result);
                 }
                 $loaded = 1;
                 last;
