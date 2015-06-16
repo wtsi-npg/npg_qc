@@ -72,6 +72,41 @@ sub files {
   return;
 }
 
+sub _prepare_cache {
+  my ( $self, $ref ) = @_;
+  
+  my $id_run = $ref->{id_run}; 
+  
+  if ( !( exists $self->file_paths_cache->{ $id_run } 
+      && defined $self->file_paths_cache->{ $id_run } )) {
+    $self->file_paths_cache->{ $id_run } = {};
+  }
+  
+  my $with_t_file = $ref->{with_t_file};
+  
+  if ( !(exists $self->file_paths_cache->{ $id_run }->{ $with_t_file } 
+      && defined $self->file_paths_cache->{ $id_run }->{ $with_t_file } )) {
+      
+    my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
+  
+    my $globbed     = $finder->globbed;
+    my $db_lookup   = $finder->db_lookup;
+      
+    my $cache = {globbed => $globbed, db_lookup => $db_lookup};
+    
+    $self->file_paths_cache->{ $id_run }->{ $with_t_file } = $cache;
+  }
+}
+
+sub _build_file_name_helper {
+  my ( $self, $ref ) = @_;
+  return Moose::Meta::Class->create_anon_class(
+    roles => [qw/npg_common::roles::run::lane::file_names
+    npg_tracking::glossary::tag
+    npg_tracking::glossary::lane
+    npg_tracking::glossary::run/])->new_object($ref);
+}
+
 sub _files4one_path {
   my ( $self, $rpt_key_map, $db_lookup, $path ) = @_;
 
@@ -91,27 +126,9 @@ sub _files4one_path {
   
   if ($path) { $ref->{archive_path} = $path; }
 
-  if ( !( exists $self->file_paths_cache->{ $ref->{id_run} } && defined $self->file_paths_cache->{ $ref->{id_run} } )) {
-    $self->file_paths_cache->{ $ref->{id_run} } = {};
-  }
-    
-  if ( !(exists $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} } && defined $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} } )) {
-      
-    my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
+  $self->_prepare_cache($ref);
   
-    my $globbed     = $finder->globbed;
-    my $db_lookup   = $finder->db_lookup;
-      
-    my $cache = {globbed => $globbed, db_lookup => $db_lookup};
-    
-    $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} } = $cache;
-  } 
-  
-  my $file_name_helper = Moose::Meta::Class->create_anon_class(
-    roles => [qw/npg_common::roles::run::lane::file_names
-    npg_tracking::glossary::tag
-    npg_tracking::glossary::lane
-    npg_tracking::glossary::run/])->new_object($ref);
+  my $file_name_helper = $self->_build_file_name_helper($ref);
   
   my $file_cache = $self->file_paths_cache->{$ref->{id_run}}->{ $ref->{with_t_file} };
   
