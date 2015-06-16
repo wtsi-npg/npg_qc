@@ -12,5 +12,5 @@
 [%- END -%]
 [%- END -%]
 
-<img class="fastqcheck_legend" src="[%  c.uri_for_action(action_legend) %]"  alt="legend for the fastqcheck file visualization" />
+<img class="fastqcheck_legend" src="[% legend_uri_for_action %]"  alt="legend for the fastqcheck file visualization" />
 [%- END -%]
