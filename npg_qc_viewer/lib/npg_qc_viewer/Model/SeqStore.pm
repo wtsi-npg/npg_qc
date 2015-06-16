@@ -4,14 +4,28 @@ use Carp;
 use Moose;
 use Readonly;
 
-use npg_common::run::file_finder;
+use npg_qc_viewer::Util::FileFinder;
+use npg_common::roles::run::lane::file_names;
+use npg_tracking::glossary::tag;
+use npg_tracking::glossary::lane;
+use npg_tracking::glossary::run;
 
-BEGIN { extends 'Catalyst::Model' }
+extends 'Catalyst::Model::Factory::PerRequest';
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar our $FILE_EXTENSION => q[fastqcheck];
+
+__PACKAGE__->config( class => 'npg_qc_viewer::Model::SeqStore' );
+
+has 'file_paths_cache' => (
+  isa        => 'HashRef',
+  is      => 'rw',
+  default => sub { {} },
+);
+
+use Data::Dumper;
 
 =head1 NAME
 
@@ -30,54 +44,106 @@ Catalyst model for accessing both short and long-term sequence store
 A list of fastqcheck file paths for a run and position
 
 =cut
-sub files {
-    my @sargs = @_;
-    my $self        = shift @sargs;
-    my $rpt_key_map = shift @sargs;
-    my $db_lookup   = shift @sargs;
 
-    if (@sargs && (ref $sargs[0]) eq q[ARRAY]) {   # this is a list of paths
-        $db_lookup = 0;
-        my $all_files = {};
-        my $count = 0;
-        foreach my $path (@{$sargs[0]}) {
-            my $files = $self->_files4one_path($rpt_key_map, $db_lookup, $path);
-            foreach my $ftype (keys %{$files}) {
-                $all_files->{$ftype} = $files->{$ftype};
-            }
-        }
-        if (scalar keys %{$all_files}) {
-            $all_files->{db_lookup} = 0;
+sub files {
+  my @sargs       = @_;
+  my $self        = shift @sargs;
+  my $rpt_key_map = shift @sargs;    # tag_index position id_run
+  my $db_lookup   = shift @sargs;
+
+  if ( @sargs && ( ref $sargs[0] ) eq q[ARRAY] ) {    # this is a list of paths
+    $db_lookup = 0;
+    my $all_files = {};
+    my $count     = 0;
+    foreach my $path ( @{ $sargs[0] } ) {
+      my $files = $self->_files4one_path( $rpt_key_map, $db_lookup, $path );
+      foreach my $ftype ( keys %{$files} ) {
+        $all_files->{$ftype} = $files->{$ftype};
+      }
     }
-        return $all_files;
-    } else {
-        return $self->_files4one_path($rpt_key_map, $db_lookup);
+    if ( scalar keys %{$all_files} ) {
+      $all_files->{db_lookup} = 0;
     }
-    return;
+    return $all_files;
+  }
+  else {
+    return $self->_files4one_path($rpt_key_map, $db_lookup );
+  }
+  return;
 }
 
 sub _files4one_path {
-    my ($self, $rpt_key_map, $db_lookup, $path) = @_;
+  my ( $self, $rpt_key_map, $db_lookup, $path ) = @_;
 
-    my $ref = {
-            position          => $rpt_key_map->{position},
-            file_extension    => $FILE_EXTENSION,
-            with_t_file       => 1,
-            id_run            => $rpt_key_map->{id_run},
-            db_lookup         => $db_lookup,
-              };
-    if (exists $rpt_key_map->{tag_index} && defined $rpt_key_map->{tag_index}) {
-        $ref->{tag_index}                = $rpt_key_map->{tag_index};
-        $ref->{with_t_file}              = 0;
-        if ($path) { $ref->{lane_archive_lookup}  = 0; }
+  my $ref = {
+    position       => $rpt_key_map->{position},
+    file_extension => $FILE_EXTENSION,
+    with_t_file    => 1,
+    id_run         => $rpt_key_map->{id_run},
+    db_lookup      => $db_lookup,
+  };
+  
+  if ( exists $rpt_key_map->{tag_index} && defined $rpt_key_map->{tag_index} ) {
+    $ref->{tag_index}   = $rpt_key_map->{tag_index};
+    $ref->{with_t_file} = 0;
+    if ($path) { $ref->{lane_archive_lookup} = 0; }
+  }
+  
+  if ($path) { $ref->{archive_path} = $path; }
+
+  if ( !( exists $self->file_paths_cache->{ $ref->{id_run} } && defined $self->file_paths_cache->{ $ref->{id_run} } )) {
+    $self->file_paths_cache->{ $ref->{id_run} } = {};
+  }
+    
+  if ( !(exists $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} } && defined $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} } )) {
+      
+    my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
+  
+    my $globbed     = $finder->globbed;
+    my $db_lookup   = $finder->db_lookup;
+      
+    my $cache = {globbed => $globbed, db_lookup => $db_lookup};
+    
+    $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} } = $cache;
+  } 
+  
+  my $file_name_helper = Moose::Meta::Class->create_anon_class(
+    roles => [qw/npg_common::roles::run::lane::file_names
+    npg_tracking::glossary::tag
+    npg_tracking::glossary::lane
+    npg_tracking::glossary::run/])->new_object($ref);
+  
+  my $file_cache = $self->file_paths_cache->{$ref->{id_run}}->{ $ref->{with_t_file} };
+  
+  my $fnames = {};
+  my $f     = $file_name_helper->create_filename( $ref->{file_extension} );
+  if ( exists $file_cache->{globbed}->{$f} ) {
+    $fnames->{forward} = $file_cache->{globbed}->{$f};
+  }
+  
+  if ( !exists $fnames->{forward} ) {
+    my $forward = $file_name_helper->create_filename( $ref->{file_extension}, 1 );
+    if ( exists $file_cache->{globbed}->{$forward} ) {
+      $fnames->{forward} = $file_cache->{globbed}->{$forward};
     }
-    if ($path) { $ref->{archive_path} = $path; }
-    my $finder = npg_common::run::file_finder->new($ref);
-    my $files =  $finder->files();
-    if (scalar keys %{$files}) {
-        $files->{db_lookup} = $finder->db_lookup;
+    my $reverse = $file_name_helper->create_filename( $ref->{file_extension}, 2 );
+    if ( exists $file_cache->{globbed}->{$reverse} ) {
+      $fnames->{reverse} = $file_cache->{globbed}->{$reverse};
     }
-    return $files;
+  }
+  
+  if ( $ref->{with_t_file} ) {
+    my $tag = $file_name_helper->create_filename( $ref->{file_extension}, q[t] );
+    if ( exists $file_cache->{globbed}->{$tag} ) {
+      $fnames->{tags} = $file_cache->{globbed}->{$tag};
+    }
+  }
+
+  my $files = $fnames;
+  if ( scalar keys %{$files} ) {
+    $files->{db_lookup} = $file_cache->{db_lookup};
+  }
+  return $files;
 }
 
 no Moose;
