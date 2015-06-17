@@ -18,6 +18,7 @@ lib/npg_qc_viewer/Model/WarehouseDB.pm
 lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
 lib/npg_qc_viewer/Util/Error.pm
 lib/npg_qc_viewer/Util/ExtendedHttpStatus.pm
+lib/npg_qc_viewer/Util/FileFinder.pm
 lib/npg_qc_viewer.pm
 lib/npg_qc_viewer/View/TT.pm
 MANIFEST
