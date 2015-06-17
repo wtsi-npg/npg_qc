@@ -145,6 +145,12 @@ files and keeping them in an attribute of this object.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 BUILD
+
+Query DB/filesystem to find the files which match the query from
+the hash passed as constructor parameter. The files found are
+stored in the attribute globbed.
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
