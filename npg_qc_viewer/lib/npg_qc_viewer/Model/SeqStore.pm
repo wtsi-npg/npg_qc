@@ -25,8 +25,6 @@ has 'file_paths_cache' => (
   default => sub { {} },
 );
 
-use Data::Dumper;
-
 =head1 NAME
 
 npg_qc_viewer::Model::SeqStore - access to sequence store
@@ -201,9 +199,11 @@ __END__
 
 Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
+Jaime Tovar E<lt>jmtc@sanger.ac.ukE<gt>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2015 Genome Research Ltd.
 
 This file is part of NPG software.
 
