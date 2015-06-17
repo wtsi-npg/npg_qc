@@ -9,7 +9,6 @@ use npg_qc::Schema;
 
 with qw/ npg_tracking::glossary::lane
   npg_tracking::glossary::tag
-  npg_common::roles::run::lane::file_names
   npg_tracking::illumina::run::short_info
   npg_tracking::illumina::run::folder
   /;
@@ -78,8 +77,8 @@ sub _build_globbed {
     if ( $self->file_extension ) {
       $pattern .= $self->file_extension;
     }
-    my @rows = $self->qc_schema->resultset($RESULT_CLASS_NAME)->search(
-      { file_name => { 'like' => $pattern, }, },
+    my @rows = $self->qc_schema->resultset($RESULT_CLASS_NAME)->search( 
+      { id_run => $self->id_run, position => $self->position, },
       { columns   => 'file_name', },
     )->all;
     foreach my $row (@rows) {
@@ -95,14 +94,17 @@ sub _build_globbed {
       : $self->archive_path;
       
     my $glob = catfile( $path, q[*] );
+    
     if ( $self->file_extension ) {
       $glob .= $self->file_extension;
     }
+    
     my @files = glob "$glob";
     foreach my $file (@files) {
       my ( $fname, $dir, $ext ) = fileparse($file);
       $hfiles->{$fname} = $file;
     }
+    
     $self->_set_db_lookup(0);
   }
   return $hfiles;
