@@ -66,6 +66,11 @@
 
 [%- libs_info = {}; studies_info = {}; run_info = {}; 
     qxTotal = 0; #For total qxYield
+
+    #For heatmaps
+    action_plot = c.controller('Visuals').action_for('fastqcheck');
+    legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
+    
     FOREACH lane_key IN sorted_rl_map_keys;
       lane_collection = rl_map.$lane_key;
       attrs = util.inflate_rpt_key(lane_key);
