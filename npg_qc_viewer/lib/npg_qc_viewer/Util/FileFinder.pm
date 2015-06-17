@@ -149,7 +149,7 @@ files and keeping them in an attribute of this object.
 
 Query DB/file system to find the files which match the query from
 the hash passed as constructor parameter. The files found are
-stored in the attribute globbed.
+stored in the object's attributes.
 
 =head1 DIAGNOSTICS
 
