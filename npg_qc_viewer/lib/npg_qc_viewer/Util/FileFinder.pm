@@ -139,7 +139,7 @@ npg_qc_viewer::Util::FileFinder - utilities library to locate files
 =head1 DESCRIPTION
 
 Utility object to provide tools to find file using DB or file system
-The object is initialised during contruction when it receives a hash
+The object is initialised during construction when it receives a hash
 with the query parameters. This initialisation includes locating the
 files and keeping them in an attribute of this object.
 
