@@ -86,25 +86,25 @@ sub _build_globbed {
       $hfiles->{$fname} = $fname;
     }
   }
-  
+
   if ( ( scalar keys %{$hfiles} ) == 0 ) {
     my $path =
       ( defined $self->tag_index && $self->lane_archive_lookup )
       ? File::Spec->catfile( $self->archive_path, $self->lane_archive )
       : $self->archive_path;
-      
+
     my $glob = catfile( $path, q[*] );
-    
+
     if ( $self->file_extension ) {
       $glob .= $self->file_extension;
     }
-    
+
     my @files = glob "$glob";
     foreach my $file (@files) {
       my ( $fname, $dir, $ext ) = fileparse($file);
       $hfiles->{$fname} = $file;
     }
-    
+
     $self->_set_db_lookup(0);
   }
   return $hfiles;
