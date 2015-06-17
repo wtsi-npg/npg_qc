@@ -35,7 +35,9 @@ npg_qc_viewer::Model::SeqStore - access to sequence store
 
 =head1 DESCRIPTION
 
-Catalyst model for accessing both short and long-term sequence store
+Catalyst model for accessing both short and long-term sequence store. 
+It extends the Catalyst::Model::Factory::PerRequest model to allow for
+cache data to be kept when looking for files.
 
 =head1 SUBROUTINES/METHODS
 
@@ -65,8 +67,7 @@ sub files {
       $all_files->{db_lookup} = 0;
     }
     return $all_files;
-  }
-  else {
+  } else {
     return $self->_files4one_path($rpt_key_map, $db_lookup );
   }
   return;
@@ -74,26 +75,26 @@ sub files {
 
 sub _prepare_cache {
   my ( $self, $ref ) = @_;
-  
+
   my $id_run = $ref->{id_run}; 
-  
+
   if ( !( exists $self->file_paths_cache->{ $id_run } 
       && defined $self->file_paths_cache->{ $id_run } )) {
     $self->file_paths_cache->{ $id_run } = {};
   }
-  
+
   my $with_t_file = $ref->{with_t_file};
-  
+
   if ( !(exists $self->file_paths_cache->{ $id_run }->{ $with_t_file } 
       && defined $self->file_paths_cache->{ $id_run }->{ $with_t_file } )) {
-      
+
     my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
-  
+
     my $globbed     = $finder->globbed;
     my $db_lookup   = $finder->db_lookup;
-      
+
     my $cache = {globbed => $globbed, db_lookup => $db_lookup};
-    
+
     $self->file_paths_cache->{ $id_run }->{ $with_t_file } = $cache;
   }
 }
@@ -117,27 +118,27 @@ sub _files4one_path {
     id_run         => $rpt_key_map->{id_run},
     db_lookup      => $db_lookup,
   };
-  
+
   if ( exists $rpt_key_map->{tag_index} && defined $rpt_key_map->{tag_index} ) {
     $ref->{tag_index}   = $rpt_key_map->{tag_index};
     $ref->{with_t_file} = 0;
     if ($path) { $ref->{lane_archive_lookup} = 0; }
   }
-  
+
   if ($path) { $ref->{archive_path} = $path; }
 
   $self->_prepare_cache($ref);
-  
+
   my $file_name_helper = $self->_build_file_name_helper($ref);
-  
-  my $file_cache = $self->file_paths_cache->{$ref->{id_run}}->{ $ref->{with_t_file} };
-  
+
+  my $file_cache = $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} };
+
   my $fnames = {};
   my $f     = $file_name_helper->create_filename( $ref->{file_extension} );
   if ( exists $file_cache->{globbed}->{$f} ) {
     $fnames->{forward} = $file_cache->{globbed}->{$f};
   }
-  
+
   if ( !exists $fnames->{forward} ) {
     my $forward = $file_name_helper->create_filename( $ref->{file_extension}, 1 );
     if ( exists $file_cache->{globbed}->{$forward} ) {
@@ -148,7 +149,7 @@ sub _files4one_path {
       $fnames->{reverse} = $file_cache->{globbed}->{$reverse};
     }
   }
-  
+
   if ( $ref->{with_t_file} ) {
     my $tag = $file_name_helper->create_filename( $ref->{file_extension}, q[t] );
     if ( exists $file_cache->{globbed}->{$tag} ) {
