@@ -76,16 +76,16 @@ sub files {
 sub _prepare_cache {
   my ( $self, $ref ) = @_;
 
-  my $id_run = $ref->{id_run}; 
+  my $id_run = $ref->{id_run};
 
-  if ( !( exists $self->file_paths_cache->{ $id_run } 
+  if ( !( exists $self->file_paths_cache->{ $id_run }
       && defined $self->file_paths_cache->{ $id_run } )) {
     $self->file_paths_cache->{ $id_run } = {};
   }
 
   my $with_t_file = $ref->{with_t_file};
 
-  if ( !(exists $self->file_paths_cache->{ $id_run }->{ $with_t_file } 
+  if ( !(exists $self->file_paths_cache->{ $id_run }->{ $with_t_file }
       && defined $self->file_paths_cache->{ $id_run }->{ $with_t_file } )) {
 
     my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
@@ -97,6 +97,8 @@ sub _prepare_cache {
 
     $self->file_paths_cache->{ $id_run }->{ $with_t_file } = $cache;
   }
+  
+  return;
 }
 
 sub _build_file_name_helper {
@@ -161,6 +163,7 @@ sub _files4one_path {
   if ( scalar keys %{$files} ) {
     $files->{db_lookup} = $file_cache->{db_lookup};
   }
+
   return $files;
 }
 

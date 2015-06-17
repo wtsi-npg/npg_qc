@@ -14,6 +14,8 @@ with qw/ npg_tracking::glossary::lane
   /;
 
 our $VERSION = '0';
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+
 Readonly::Scalar our $FILE_EXTENSION    => q[fastq];
 Readonly::Scalar our $RESULT_CLASS_NAME => q[Fastqcheck];
 
@@ -77,7 +79,7 @@ sub _build_globbed {
     if ( $self->file_extension ) {
       $pattern .= $self->file_extension;
     }
-    my @rows = $self->qc_schema->resultset($RESULT_CLASS_NAME)->search( 
+    my @rows = $self->qc_schema->resultset($RESULT_CLASS_NAME)->search(
       { id_run => $self->id_run, position => $self->position, },
       { columns   => 'file_name', },
     )->all;
