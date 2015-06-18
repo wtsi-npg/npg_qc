@@ -117,7 +117,7 @@ sub _files4one_path {
     lane_archive_lookup => 1,
     db_lookup           => $db_lookup,
   };
-  
+
   foreach my $key ('file_extension', 'archive_path', 'lane_archive', 'lane_archive_lookup', 'id_run', 'position') {
     if (exists $rpt_key_map->{$key} && defined $rpt_key_map->{$key} ) {
       $ref->{$key} = $rpt_key_map->{$key}
@@ -131,12 +131,12 @@ sub _files4one_path {
   }
 
   if ($path) { $ref->{archive_path} = $path; }
-  
+
   #Load from file using $ref data
   $self->_prepare_cache($ref);
 
   my $file_name_helper = $self->_build_file_name_helper($ref);
-  
+
   my $file_cache = $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} };
 
   my $fnames = {};
