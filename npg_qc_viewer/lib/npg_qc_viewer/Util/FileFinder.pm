@@ -19,7 +19,7 @@ our $VERSION = '0';
 Readonly::Scalar our $FILE_EXTENSION    => q[fastq];
 Readonly::Scalar our $RESULT_CLASS_NAME => q[Fastqcheck];
 
-has 'db_lookup'                         => (
+has 'db_lookup' => (
   isa      => 'Bool',
   is       => 'ro',
   required => 0,

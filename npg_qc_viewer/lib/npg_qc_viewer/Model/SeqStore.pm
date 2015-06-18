@@ -15,7 +15,7 @@ extends 'Catalyst::Model::Factory::PerRequest';
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
-Readonly::Scalar our $FILE_EXTENSION => q[fastqcheck];
+Readonly::Scalar our $FILE_EXTENSION      => q[fastqcheck];
 
 __PACKAGE__->config( class => 'npg_qc_viewer::Model::SeqStore' );
 
@@ -112,12 +112,17 @@ sub _files4one_path {
   my ( $self, $rpt_key_map, $db_lookup, $path ) = @_;
 
   my $ref = {
-    position       => $rpt_key_map->{position},
-    file_extension => $FILE_EXTENSION,
-    with_t_file    => 1,
-    id_run         => $rpt_key_map->{id_run},
-    db_lookup      => $db_lookup,
+    file_extension      => $FILE_EXTENSION,
+    with_t_file         => 1,
+    lane_archive_lookup => 1,
+    db_lookup           => $db_lookup,
   };
+  
+  foreach my $key ('file_extension', 'archive_path', 'lane_archive', 'lane_archive_lookup', 'id_run', 'position') {
+    if (exists $rpt_key_map->{$key} && defined $rpt_key_map->{$key} ) {
+      $ref->{$key} = $rpt_key_map->{$key}
+    }
+  }
 
   if ( exists $rpt_key_map->{tag_index} && defined $rpt_key_map->{tag_index} ) {
     $ref->{tag_index}   = $rpt_key_map->{tag_index};
@@ -126,20 +131,22 @@ sub _files4one_path {
   }
 
   if ($path) { $ref->{archive_path} = $path; }
-
+  
+  #Load from file using $ref data
   $self->_prepare_cache($ref);
 
   my $file_name_helper = $self->_build_file_name_helper($ref);
-
+  
   my $file_cache = $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} };
 
   my $fnames = {};
+  #Try to get without tags
   my $f     = $file_name_helper->create_filename( $ref->{file_extension} );
   if ( exists $file_cache->{globbed}->{$f} ) {
     $fnames->{forward} = $file_cache->{globbed}->{$f};
   }
 
-  if ( !exists $fnames->{forward} ) {
+  if ( !exists $fnames->{forward} ) { # Get for forward and reverse with tag
     my $forward = $file_name_helper->create_filename( $ref->{file_extension}, 1 );
     if ( exists $file_cache->{globbed}->{$forward} ) {
       $fnames->{forward} = $file_cache->{globbed}->{$forward};
@@ -150,6 +157,7 @@ sub _files4one_path {
     }
   }
 
+  #Look for the extra heatmap for tag
   if ( $ref->{with_t_file} ) {
     my $tag = $file_name_helper->create_filename( $ref->{file_extension}, q[t] );
     if ( exists $file_cache->{globbed}->{$tag} ) {
@@ -158,7 +166,7 @@ sub _files4one_path {
   }
 
   my $files = $fnames;
-  if ( scalar keys %{$files} ) {
+  if ( scalar keys %{$files} ) { #Keep the value of db_lookup for the template
     $files->{db_lookup} = $file_cache->{db_lookup};
   }
 
