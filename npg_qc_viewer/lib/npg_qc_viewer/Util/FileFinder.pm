@@ -145,6 +145,21 @@ files and keeping them in an attribute of this object.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 file_extension - an attribute, defaults to fastq, can be empty
+
+=head2 with_t_file - a boolean attribute, defaults to false, determines whether a file for tags will be looked up.
+
+=head2 qc_schema - DBIx schema object for the NPG QC database
+
+=head2 db_lookup - a boolean attribute defining whether a lookup in the qc db should be performed.
+Is reset by the files method to show whether the file names do come from the db lookup. The
+default initial value is true.
+
+=head2 lane_archive_lookup - a boolean attribute indicating whether the files for tags (plexes) are
+expected to be in the lane archive under the archive folder; defaults to true;
+
+=head2 globbed - a lazily buils hash ref containing all actually available file names for a lane
+
 =head2 BUILD
 
 Query DB/file system to find the files which match the query from
