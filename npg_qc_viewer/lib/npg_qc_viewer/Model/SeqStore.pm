@@ -91,9 +91,15 @@ sub _prepare_cache {
     my $globbed     = $finder->globbed;
     my $db_lookup   = $finder->db_lookup;
 
-    my $cache = {globbed => $globbed, db_lookup => $db_lookup};
+    my $length = keys %{ $globbed };
+    #If results come from db or if they come from 
+    #filesystem and something has been found
+    #store in cache.
+    if ($db_lookup || $length > 0) {
+      my $cache = {globbed => $globbed, db_lookup => $db_lookup};
 
-    $self->file_paths_cache->{ $id_run }->{ $with_t_file } = $cache;
+      $self->file_paths_cache->{ $id_run }->{ $with_t_file } = $cache;
+    }
   }
 
   return;
