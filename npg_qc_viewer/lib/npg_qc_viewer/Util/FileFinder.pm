@@ -158,7 +158,9 @@ default initial value is true.
 =head2 lane_archive_lookup - a boolean attribute indicating whether the files for tags (plexes) are
 expected to be in the lane archive under the archive folder; defaults to true;
 
-=head2 globbed - a lazily buils hash ref containing all actually available file names for a lane
+=for stopwords  globbed
+
+=head2 globbed - a lazily builds hash ref containing all actually available file names for a lane
 
 =head2 BUILD
 

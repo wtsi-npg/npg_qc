@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 use Test::Deep;
 
@@ -179,6 +179,25 @@ subtest 'Single files with _1' => sub {
            db_lookup => 0 };
   $f = npg_qc_viewer::Model::SeqStore->new();
   is (scalar (keys %{$f->files($ref, $db_lookup)}), 0, 'no input files found');
+};
+
+subtest 'Multiple paths for same run' => sub {
+  plan tests => 1;
+  my $db_lookup = 0;
+  # The first path has nothing. The data is in the second path. So the model
+  # should check both paths until it finds something (in the second path).
+  my @paths = (q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/],
+               q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],);
+  
+  my $ref = { position  => 3,
+              id_run    => 1234,
+              file_extension => q[fastqcheck],
+              db_lookup => $db_lookup };
+  my $f = npg_qc_viewer::Model::SeqStore->new();
+  my $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_3_1.fastqcheck];
+  my $expected = { forward => $forward, db_lookup => $db_lookup};
+  
+  cmp_deeply ($f->files($ref, $db_lookup, \@paths), $expected,  'Found data in second path.');
 };
 
 1;
