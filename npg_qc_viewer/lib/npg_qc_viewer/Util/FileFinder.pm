@@ -1,128 +1,101 @@
 package npg_qc_viewer::Util::FileFinder;
+
 use Moose;
 use Carp;
-use English qw{-no_match_vars};
 use File::Spec::Functions qw(catfile);
 use File::Basename;
 use Readonly;
-use npg_qc::Schema;
 
-with qw/ npg_tracking::glossary::lane
-  npg_tracking::glossary::tag
-  npg_tracking::illumina::run::short_info
-  npg_tracking::illumina::run::folder
-  /;
+use npg_qc::Schema;
+use npg_qc_viewer::Model::NpgQcDB;
+
+with qw/ npg_tracking::illumina::run::short_info
+         npg_tracking::illumina::run::folder /;
 
 our $VERSION = '0';
-## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 
-Readonly::Scalar our $FILE_EXTENSION    => q[fastq];
+Readonly::Scalar our $FILE_EXTENSION    => q[fastqcheck];
 Readonly::Scalar our $RESULT_CLASS_NAME => q[Fastqcheck];
 
-has 'db_lookup' => (
+has '_db_lookup' => (
   isa      => 'Bool',
   is       => 'ro',
   required => 0,
   writer   => '_set_db_lookup',
-  default  => 1,
+  reader   => 'db_lookup',
 );
 
 has 'file_extension' => (
-  isa      => 'Maybe[Str]',
-  is       => 'rw',
+  isa      => 'Str',
+  is       => 'ro',
   required => 0,
   default  => $FILE_EXTENSION,
 );
 
-has 'with_t_file' => (
-  isa      => 'Bool',
-  is       => 'ro',
-  required => 0,
-  default  => 0,
-);
-
-has 'lane_archive_lookup' => (
-  isa      => 'Bool',
-  is       => 'ro',
-  required => 0,
-  default  => 1,
-);
-
 has 'qc_schema' => (
-  isa        => 'npg_qc::Schema',
-  is         => 'ro',
-  required   => 0,
-  lazy_build => 1,
+  isa      => 'Maybe[npg_qc::Schema | npg_qc_viewer::Model::NpgQcDB]',
+  is       => 'ro',
+  required => 0,
 );
 
-sub _build_qc_schema {
-  my $self   = shift;
-  my $schema = npg_qc::Schema->connect();
-  return $schema;
+has 'location' => (
+  isa      => 'ArrayRef',
+  is       => 'ro',
+  required => 0,
+  default  => sub { return []; },
+);
+
+sub BUILD {
+  my $self = shift;
+  if (@{$self->location} || !$self->qc_schema ||
+      $self->file_extension ne $FILE_EXTENSION) {
+    $self->_set_db_lookup(0);
+  } else {
+    $self->_set_db_lookup(1);
+  }
+  return;
 }
 
-has 'globbed' => (
+has 'files' => (
   isa        => 'HashRef',
   is         => 'ro',
   required   => 0,
   lazy_build => 1,
 );
-
-sub _build_globbed {
+sub _build_files {
   my $self   = shift;
+
   my $hfiles = {};
 
-  if ( $self->file_extension eq q[fastqcheck] && $self->db_lookup ) {
-    my $pattern = join q[_], $self->id_run, $self->position;
-    $pattern .= q[%];
-
-    if ( $self->file_extension ) {
-      $pattern .= $self->file_extension;
-    }
-    my @rows = $self->qc_schema->resultset($RESULT_CLASS_NAME)->search(
-      { id_run => $self->id_run, position => $self->position, },
-      { columns   => 'file_name', },
-    )->all;
-    foreach my $row (@rows) {
+  if ( $self->db_lookup ) {
+    my $rs = $self->qc_schema->resultset($RESULT_CLASS_NAME)->search(
+      { id_run  => $self->id_run },
+      { columns => 'file_name', },
+    );
+    while (my $row = $rs->next) {
       my $fname = $row->file_name;
       $hfiles->{$fname} = $fname;
     }
   }
 
   if ( ( scalar keys %{$hfiles} ) == 0 ) {
-    my $path =
-      ( defined $self->tag_index && $self->lane_archive_lookup )
-      ? File::Spec->catfile( $self->archive_path, $self->lane_archive )
-      : $self->archive_path;
-
-    my $glob = catfile( $path, q[*] );
-
-    if ( $self->file_extension ) {
-      $glob .= $self->file_extension;
+    if ( !@{$self->location} ) {
+      push @{$self->location}, $self->archive_path;
+      push @{$self->location}, catfile($self->archive_path, q[lane*]);
     }
-
-    my @files = glob "$glob";
+    my $ext = $self->file_extension;
+    my @globs = map { catfile($_, q[*]) . q[.] . $ext } @{$self->location};
+    my @files = glob join q[ ], @globs;
     foreach my $file (@files) {
-      my ( $fname, $dir, $ext ) = fileparse($file);
-      $hfiles->{$fname} = $file;
+      my ( $fname, $dir, $e ) = fileparse($file, ($ext));
+      $hfiles->{ $fname.$ext } = $file;
     }
-
-    $self->_set_db_lookup(0);
+    if (@files) {
+      $self->_set_db_lookup(0);
+    }
   }
+
   return $hfiles;
-}
-
-sub BUILD {
-  my $self = shift;
-  $self->_test_options_compatibility();
-  return;
-}
-
-sub _test_options_compatibility {
-  my $self = shift;
-  if ( defined $self->tag_index && $self->with_t_file ) {
-    croak 'tag_index and with_t_file attributes cannot be both set';
-  }
 }
 
 no Moose;
@@ -132,41 +105,41 @@ __END__
 
 =head1 NAME
 
-npg_qc_viewer::Util::FileFinder - utilities library to locate files
+npg_qc_viewer::Util::FileFinder
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Utility object to provide tools to find file using DB or file system
-The object is initialised during construction when it receives a hash
-with the query parameters. This initialisation includes locating the
-files and keeping them in an attribute of this object.
+Finds files if file-extension type corresponding to this objects' attributes.
+Files can be stored either in a database or on a file system or both.
+If the database connection is available (qc_schema attribute is set), the database search
+is performed first; id_run should be set for this. If the database search brings no results,
+a file system glob is performed.
+
+If the file extension differs from default, the database search is not performed.
+
+One of run folder paths can be supplied in the constructor to assist with defining the
+archival path for the run folder. Both run and all lane archives are going to be searched
+at once.
+
+Location attribute can be supplied to force a search in a number of known file system locations.
+In this case the value of the id_run attribute is disregarded.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 file_extension - an attribute, defaults to fastq, can be empty
+=head2 file_extension - an attribute, defaults to fastqcheck
 
-=head2 with_t_file - a boolean attribute, defaults to false, determines whether a file for tags will be looked up.
+=head2 qc_schema - DBIx schema object for the NPG QC database, optional
 
-=head2 qc_schema - DBIx schema object for the NPG QC database
+=head2 db_lookup - boolean flag showing whether the file names come from the database
 
-=head2 db_lookup - a boolean attribute defining whether a lookup in the qc db should be performed.
-Is reset by the files method to show whether the file names do come from the db lookup. The
-default initial value is true.
+=head2 location - an optional array ref of paths for looking up files
 
-=head2 lane_archive_lookup - a boolean attribute indicating whether the files for tags (plexes) are
-expected to be in the lane archive under the archive folder; defaults to true;
+=head2 BUILD - finalises an instance of the class.
 
-=for stopwords  globbed
-
-=head2 globbed - a lazily builds hash ref containing all actually available file names for a lane
-
-=head2 BUILD
-
-Query DB/file system to find the files which match the query from
-the hash passed as constructor parameter. The files found are
-stored in the object's attributes.
+=head2 files - lazily built hash ref containing all actually available file names
+as keys and, in case of successful file system search, file paths as values
 
 =head1 DIAGNOSTICS
 
@@ -178,17 +151,17 @@ stored in the object's attributes.
 
 =item Moose
 
-=item Carp
-
-=item English qw{-no_match_vars}
-
-=item File::Spec::Functions qw(catfile)
+=item File::Spec::Functions
 
 =item File::Basename
 
 =item Readonly
 
 =item npg_qc::Schema
+
+=item npg_tracking::illumina::run::short_info
+
+=item npg_tracking::illumina::run::folder
 
 =back
 
