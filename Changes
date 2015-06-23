@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - bam_flagstats autoqc result object - new field, subset, added; it replaces
+   human_split field in result type evaluations; human_split is retained for now
+   to be compatible with existing data and code
+
 release 58.3.1
  - Updating Readme in npg_qc_viewer for changes in deploy procedure.
  - Fixing qXYield total for run and sample, now it calculates from actual values 
