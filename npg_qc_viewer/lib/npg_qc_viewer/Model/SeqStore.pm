@@ -70,7 +70,6 @@ sub files {
 
   my $all_files = {};
   if ( @sargs && ( ref $sargs[0] ) eq q[ARRAY] ) {    # this is a list of paths
-    $db_lookup = 0;
     $all_files = $self->_get_file_paths( $rpt_key_map, $db_lookup, $sargs[0] );
   } else {
     $all_files = $self->_get_file_paths($rpt_key_map, $db_lookup );

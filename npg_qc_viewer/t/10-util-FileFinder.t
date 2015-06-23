@@ -30,13 +30,22 @@ subtest 'Checking initial values after creation' => sub {
   is ($finder->file_extension, 'other', 'other file extension');
   ok (!$finder->qc_schema, 'db schema undefined');
   is ($finder->db_lookup, 0, 'db lookup is 0 when using other extension');
+
+  $finder = npg_qc_viewer::Util::FileFinder->new(id_run         => 22, 
+                                                 position       => 2, 
+                                                 db_lookup      => 1
+                                                 location       => '\somelocation');
+  is ($finder->file_extension, 'fastqcheck', 'default');
+  ok (!$finder->qc_schema, 'db schema undefined');
+  is ($finder->db_lookup, 0, 'db_lookup from constructor when using location');
   
   $finder = npg_qc_viewer::Util::FileFinder->new(id_run         => 22, 
                                                  position       => 2, 
                                                  db_lookup      => 1);
-  is ($finder->file_extension, 'fastqcheck', 'other file extension');
+  is ($finder->file_extension, 'fastqcheck', 'default');
   ok (!$finder->qc_schema, 'db schema undefined');
   is ($finder->db_lookup, 1, 'db_lookup from constructor when default file extension');
+ 
 };
 
 subtest 'Attributes of the customised object' => sub {
