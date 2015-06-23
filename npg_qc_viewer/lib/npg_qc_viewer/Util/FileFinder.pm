@@ -127,6 +127,8 @@ In this case the value of the id_run attribute is disregarded.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 BUILD - Sets db_lookup to 0 in case a non-default extension is used.
+
 =head2 file_extension - an attribute, defaults to fastqcheck
 
 =head2 qc_schema - DBIx schema object for the NPG QC database, optional
