@@ -50,6 +50,12 @@ sub _add2cache {
   return;
 }
 
+has 'qc_schema' => (
+  isa      => 'Maybe[npg_qc::Schema | npg_qc_viewer::Model::NpgQcDB]',
+  is       => 'ro',
+  required => 0,
+);
+
 =head2 files
 
 A hash of fastqcheck file paths for a given query
@@ -82,12 +88,13 @@ sub _file_name_helper {
 }
 
 sub _get_file_paths {
-  my ( $self, $rpt_key_map, $db_connection, $paths ) = @_;
+  my ( $self, $rpt_key_map, $db_lookup, $paths ) = @_;
 
   my $id_run = $rpt_key_map->{'id_run'};
   my $ref = {};
   $ref->{'id_run'}    = $id_run;
-  $ref->{'qc_schema'} = $db_connection || undef;
+  $ref->{'qc_schema'} = $self->qc_schema;
+  $ref->{'db_lookup'} = $db_lookup;
   if ($paths) {
     $ref->{'location'}  = $paths;
   }

@@ -17,21 +17,18 @@ our $VERSION = '0';
 Readonly::Scalar our $FILE_EXTENSION    => q[fastqcheck];
 Readonly::Scalar our $RESULT_CLASS_NAME => q[Fastqcheck];
 
-has '_db_lookup' => (
+has 'db_lookup' => (
   isa        => 'Bool',
   is         => 'ro',
   required   => 0,
   writer     => '_set_db_lookup',
-  reader     => 'db_lookup',
-  lazy_build => 1,
 );
-sub _build__db_lookup {
+sub BUILD {
   my $self = shift;
-  if ($self->has_location || !$self->qc_schema ||
-      $self->file_extension ne $FILE_EXTENSION) {
-    return 0;
+  if ($self->file_extension ne $FILE_EXTENSION) {
+    $self->_set_db_lookup(0);
   }
-  return 1;
+  return;
 }
 
 has 'file_extension' => (

@@ -1,6 +1,5 @@
 [%-
-  db_connection = db_lookup ? c.model('NpgQcDB') : 0;
-  fnames = c.model('SeqStore').files(util.inflate_rpt_key(lane_key), db_connection, path_list);
+  fnames = c.model('SeqStore', {qc_schema => c.model('NpgQcDB')}).files(util.inflate_rpt_key(lane_key), db_lookup, path_list);
   IF fnames.size;
     use_db = fnames.db_lookup;
     fnames.delete('db_lookup');
@@ -9,7 +8,7 @@
       #action_plot and action_legend are defined in library_lanes
 -%]
 
-<img class="fastqcheck_plot" src="[%  c.uri_for_action(action_plot, {path => "$fname", read => "$key", 'db_lookup' => "$use_db"}) | html %]"  alt="visualization for [% fname %]" />
+<img class="fastqcheck_plot" src="[% c.uri_for_action(action_plot, {path => "$fname", read => "$key", 'db_lookup' => "$use_db"}) | html %]"  alt="visualization for [% fname %]" />
 [%- END -%]
 
 <img class="fastqcheck_legend" src="[% legend_uri_for_action %]"  alt="legend for the fastqcheck file visualization" />
