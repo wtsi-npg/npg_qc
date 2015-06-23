@@ -18,12 +18,21 @@ Readonly::Scalar our $FILE_EXTENSION    => q[fastqcheck];
 Readonly::Scalar our $RESULT_CLASS_NAME => q[Fastqcheck];
 
 has '_db_lookup' => (
-  isa      => 'Bool',
-  is       => 'ro',
-  required => 0,
-  writer   => '_set_db_lookup',
-  reader   => 'db_lookup',
+  isa        => 'Bool',
+  is         => 'ro',
+  required   => 0,
+  writer     => '_set_db_lookup',
+  reader     => 'db_lookup',
+  lazy_build => 1,
 );
+sub _build__db_lookup {
+  my $self = shift;
+  if ($self->has_location || !$self->qc_schema ||
+      $self->file_extension ne $FILE_EXTENSION) {
+    return 0;
+  }
+  return 1;
+}
 
 has 'file_extension' => (
   isa      => 'Str',
@@ -39,21 +48,18 @@ has 'qc_schema' => (
 );
 
 has 'location' => (
-  isa      => 'ArrayRef',
-  is       => 'ro',
-  required => 0,
-  default  => sub { return []; },
+  isa        => 'ArrayRef',
+  is         => 'ro',
+  required   => 0,
+  predicate  => 'has_location',
+  lazy_build => 1,
 );
-
-sub BUILD {
+sub _build_location {
   my $self = shift;
-  if (@{$self->location} || !$self->qc_schema ||
-      $self->file_extension ne $FILE_EXTENSION) {
-    $self->_set_db_lookup(0);
-  } else {
-    $self->_set_db_lookup(1);
-  }
-  return;
+  my @l = ();
+  push @l, $self->archive_path;
+  push @l, catfile($self->archive_path, q[lane*]);
+  return \@l;
 }
 
 has 'files' => (
@@ -79,10 +85,6 @@ sub _build_files {
   }
 
   if ( ( scalar keys %{$hfiles} ) == 0 ) {
-    if ( !@{$self->location} ) {
-      push @{$self->location}, $self->archive_path;
-      push @{$self->location}, catfile($self->archive_path, q[lane*]);
-    }
     my $ext = $self->file_extension;
     my @globs = map { catfile($_, q[*]) . q[.] . $ext } @{$self->location};
     my @files = glob join q[ ], @globs;
@@ -135,8 +137,6 @@ In this case the value of the id_run attribute is disregarded.
 =head2 db_lookup - boolean flag showing whether the file names come from the database
 
 =head2 location - an optional array ref of paths for looking up files
-
-=head2 BUILD - finalises an instance of the class.
 
 =head2 files - lazily built hash ref containing all actually available file names
 as keys and, in case of successful file system search, file paths as values

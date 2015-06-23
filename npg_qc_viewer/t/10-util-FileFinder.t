@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 4;
 use Test::Exception;
 use Moose::Meta::Class;
 
@@ -16,32 +16,17 @@ subtest 'Basic use' => sub {
   isa_ok($finder, q{npg_qc_viewer::Util::FileFinder});
 };
 
-subtest 'Exceptions' => sub{
-  plan tests => 3;
-  
-  throws_ok { npg_qc_viewer::Util::FileFinder->new(position => 12, id_run => 11) } 
-    qr/Validation\ failed\ for\ \'NpgTrackingLaneNumber\'/, 
-    'error on passing to the constructor invalid int as a position';
-  throws_ok { npg_qc_viewer::Util::FileFinder->new(position => 'dada', id_run => 11) } 
-    qr/Validation\ failed\ for\ \'NpgTrackingLaneNumber\'/, 
-    'error on passing to the constructor position as string';
-  throws_ok { npg_qc_viewer::Util::FileFinder->new(position => 1.2, id_run => 11) } 
-    qr/Validation\ failed\ for\ \'NpgTrackingLaneNumber\'/, 
-    'error on passing to the constructor position as a float';
-};
-
 subtest 'Checking initial values after creation' => sub {
-  plan tests => 4;
+  plan tests => 3;
   
   my $finder = npg_qc_viewer::Util::FileFinder->new(id_run => 22, position => 2);
   is ($finder->file_extension, 'fastqcheck', 'default file extension');
   ok (!$finder->qc_schema, 'db schema undefined');
-  ok (!@{$finder->location}, 'location undefined by default');
   is ($finder->db_lookup, 0, 'no db lookup');
 };
 
 subtest 'Attributes of the customised object' => sub {
-  plan tests => 6;
+  plan tests => 7;
 
   my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
@@ -53,7 +38,6 @@ subtest 'Attributes of the customised object' => sub {
     file_extension => 'bam',
     qc_schema      => $schema);
   is ($finder->file_extension, 'bam', 'custom file extension');
-  ok (!@{$finder->location}, 'location undefined by default');
   is ($finder->db_lookup, 0, 'no db lookup');
 
   $finder = npg_qc_viewer::Util::FileFinder->new(
@@ -69,6 +53,14 @@ subtest 'Attributes of the customised object' => sub {
     position       => 2,
     qc_schema      => $schema);
   is ($finder->db_lookup, 1, 'db lookup is true');
+
+  $finder = npg_qc_viewer::Util::FileFinder->new(
+    id_run         => 22,
+    position       => 2,
+    archive_path   => 't/data',
+    qc_schema      => $schema);
+  is ($finder->db_lookup, 1, 'db lookup is true');
+  is_deeply ($finder->location, ['t/data', 't/data/lane*'], 'location derived'); 
 };
 
 1;

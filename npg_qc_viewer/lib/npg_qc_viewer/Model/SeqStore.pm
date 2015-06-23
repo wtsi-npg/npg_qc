@@ -88,7 +88,9 @@ sub _get_file_paths {
   my $ref = {};
   $ref->{'id_run'}    = $id_run;
   $ref->{'qc_schema'} = $db_connection || undef;
-  $ref->{'location'}  = $paths || [];
+  if ($paths) {
+    $ref->{'location'}  = $paths;
+  }
   $self->_add2cache($ref);
 
   my $fnames = {};
