@@ -13,7 +13,6 @@ with qw(npg_qc::autoqc::role::result);
 our $VERSION = '0';
 
 Readonly::Scalar my $PERCENTAGE   => 100;
-Readonly::Scalar my $SUBSET_ATTR_DEFAULT => 'target';
 
 sub total_reads {
   my $self = shift;
@@ -80,7 +79,7 @@ sub check_name {
   my $self = shift;
   my $name = $self->class_name;
   $name =~ s/_/ /gsmx;
-  if ($self->subset && $self->subset ne $SUBSET_ATTR_DEFAULT) {
+  if ($self->subset) {
     $name .= q{ } . $self->subset;
   }
   return $name;
