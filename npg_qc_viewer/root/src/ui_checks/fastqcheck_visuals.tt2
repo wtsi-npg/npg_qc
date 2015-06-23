@@ -3,7 +3,7 @@
   fnames = c.model('SeqStore').files(util.inflate_rpt_key(lane_key), db_connection, path_list);
   IF fnames.size;
     use_db = fnames.db_lookup;
-    fnames.delete('db_lookup')
+    fnames.delete('db_lookup');
     FOREACH key IN fnames.keys.sort;
       fname =  fnames.item("$key");
       #action_plot and action_legend are defined in library_lanes
