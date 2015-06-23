@@ -1,6 +1,5 @@
 package npg_qc_viewer::Model::SeqStore;
 
-use Carp;
 use Moose;
 use Readonly;
 
@@ -11,37 +10,55 @@ use npg_tracking::glossary::lane;
 use npg_tracking::glossary::run;
 
 extends 'Catalyst::Model::Factory::PerRequest';
-
-our $VERSION = '0';
-## no critic (Documentation::RequirePodAtEnd)
-
-Readonly::Scalar our $FILE_EXTENSION      => q[fastqcheck];
-
 __PACKAGE__->config( class => 'npg_qc_viewer::Model::SeqStore' );
 
-has 'file_paths_cache' => (
-  isa        => 'HashRef',
-  is      => 'rw',
-  default => sub { {} },
-);
+our $VERSION = '0';
+##no critic (Documentation::RequirePodAtEnd)
+
+Readonly::Scalar our $FILE_EXTENSION  => q[fastqcheck];
 
 =head1 NAME
 
-npg_qc_viewer::Model::SeqStore - access to sequence store
+npg_qc_viewer::Model::SeqStore
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Catalyst model for accessing both short and long-term sequence store. 
-It extends the Catalyst::Model::Factory::PerRequest model to allow for
-cache data to be kept when looking for files.
+Catalyst model for accessing fastqcheck file storage.
+
+Extends the Catalyst::Model::Factory::PerRequest model to allow for
+cached data to be kept per request when looking for files.
 
 =head1 SUBROUTINES/METHODS
 
+=cut
+
+has '_file_cache' => (
+  isa     => 'HashRef',
+  is      => 'ro',
+  default => sub { return {}; },
+);
+sub _add2cache {
+  my ( $self, $ref ) = @_;
+  my $id_run = $ref->{'id_run'};
+  if ( !$self->_file_cache->{$id_run} ) {
+    my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
+    $self->_file_cache->{$id_run} =
+      {'files' => $finder->files, 'db_lookup' => $finder->db_lookup};
+  }
+  return;
+}
+
+has 'qc_schema' => (
+  isa      => 'Maybe[npg_qc::Schema | npg_qc_viewer::Model::NpgQcDB]',
+  is       => 'ro',
+  required => 0,
+);
+
 =head2 files
 
-A list of fastqcheck file paths for a run and position
+A hash of fastqcheck file paths for a given query
 
 =cut
 
@@ -51,132 +68,72 @@ sub files {
   my $rpt_key_map = shift @sargs;    # tag_index position id_run
   my $db_lookup   = shift @sargs;
 
+  my $all_files = {};
   if ( @sargs && ( ref $sargs[0] ) eq q[ARRAY] ) {    # this is a list of paths
     $db_lookup = 0;
-    my $all_files = {};
-    my $count     = 0;
-    foreach my $path ( @{ $sargs[0] } ) {
-      my $files = $self->_files4one_path( $rpt_key_map, $db_lookup, $path );
-      foreach my $ftype ( keys %{$files} ) {
-        $all_files->{$ftype} = $files->{$ftype};
-      }
-    }
-    if ( scalar keys %{$all_files} ) {
-      $all_files->{db_lookup} = 0;
-    }
-    return $all_files;
+    $all_files = $self->_get_file_paths( $rpt_key_map, $db_lookup, $sargs[0] );
   } else {
-    return $self->_files4one_path($rpt_key_map, $db_lookup );
+    $all_files = $self->_get_file_paths($rpt_key_map, $db_lookup );
   }
-  return;
+  return $all_files;
 }
 
-sub _prepare_cache {
-  my ( $self, $ref ) = @_;
-
-  my $id_run = $ref->{id_run};
-
-  if ( !( exists $self->file_paths_cache->{ $id_run }
-      && defined $self->file_paths_cache->{ $id_run } )) {
-    $self->file_paths_cache->{ $id_run } = {};
-  }
-
-  my $with_t_file = $ref->{with_t_file};
-
-  if ( !(exists $self->file_paths_cache->{ $id_run }->{ $with_t_file }
-      && defined $self->file_paths_cache->{ $id_run }->{ $with_t_file } )) {
-
-    my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
-
-    my $globbed     = $finder->globbed;
-    my $db_lookup   = $finder->db_lookup;
-
-    my $length = keys %{ $globbed };
-    #If results come from db or if they come from 
-    #filesystem and something has been found
-    #store in cache.
-    if ($db_lookup || $length > 0) {
-      my $cache = {globbed => $globbed, db_lookup => $db_lookup};
-
-      $self->file_paths_cache->{ $id_run }->{ $with_t_file } = $cache;
-    }
-  }
-
-  return;
-}
-
-sub _build_file_name_helper {
-  my ( $self, $ref ) = @_;
+sub _file_name_helper {
+  my $ref = shift;
   return Moose::Meta::Class->create_anon_class(
     roles => [qw/npg_common::roles::run::lane::file_names
-    npg_tracking::glossary::tag
-    npg_tracking::glossary::lane
-    npg_tracking::glossary::run/])->new_object($ref);
+                 npg_tracking::glossary::tag
+                 npg_tracking::glossary::lane
+                 npg_tracking::glossary::run/])->new_object($ref);
 }
 
-sub _files4one_path {
-  my ( $self, $rpt_key_map, $db_lookup, $path ) = @_;
+sub _get_file_paths {
+  my ( $self, $rpt_key_map, $db_lookup, $paths ) = @_;
 
-  my $ref = {
-    file_extension      => $FILE_EXTENSION,
-    with_t_file         => 1,
-    lane_archive_lookup => 1,
-    db_lookup           => $db_lookup,
-  };
-
-  foreach my $key ('file_extension', 'archive_path', 'lane_archive', 'lane_archive_lookup', 'id_run', 'position') {
-    if (exists $rpt_key_map->{$key} && defined $rpt_key_map->{$key} ) {
-      $ref->{$key} = $rpt_key_map->{$key}
-    }
+  my $id_run = $rpt_key_map->{'id_run'};
+  my $ref = {};
+  $ref->{'id_run'}    = $id_run;
+  $ref->{'qc_schema'} = $self->qc_schema;
+  $ref->{'db_lookup'} = $db_lookup;
+  if ($paths) {
+    $ref->{'location'}  = $paths;
   }
-
-  if ( exists $rpt_key_map->{tag_index} && defined $rpt_key_map->{tag_index} ) {
-    $ref->{tag_index}   = $rpt_key_map->{tag_index};
-    $ref->{with_t_file} = 0;
-    if ($path) { $ref->{lane_archive_lookup} = 0; }
-  }
-
-  if ($path) { $ref->{archive_path} = $path; }
-
-  #Load from file using $ref data
-  $self->_prepare_cache($ref);
-
-  my $file_name_helper = $self->_build_file_name_helper($ref);
-
-  my $file_cache = $self->file_paths_cache->{ $ref->{id_run} }->{ $ref->{with_t_file} };
+  $self->_add2cache($ref);
 
   my $fnames = {};
-  #Try to get without tags
-  my $f     = $file_name_helper->create_filename( $ref->{file_extension} );
-  if ( exists $file_cache->{globbed}->{$f} ) {
-    $fnames->{forward} = $file_cache->{globbed}->{$f};
+  my $helper = _file_name_helper($rpt_key_map);
+  my $file_cache = $self->_file_cache->{$id_run}->{'files'};
+  my $ext = $FILE_EXTENSION;
+
+  my $file_name = $helper->create_filename($ext);
+  if ($file_cache->{$file_name}) {
+    $fnames->{'forward'} = $file_cache->{$file_name};
   }
 
-  if ( !exists $fnames->{forward} ) { # Get for forward and reverse with tag
-    my $forward = $file_name_helper->create_filename( $ref->{file_extension}, 1 );
-    if ( exists $file_cache->{globbed}->{$forward} ) {
-      $fnames->{forward} = $file_cache->{globbed}->{$forward};
+  if ( !$fnames->{'forward'} ) { # Get for forward and reverse with end
+    $file_name = $helper->create_filename($ext, 1);
+    if ($file_cache->{$file_name}) {
+      $fnames->{'forward'} = $file_cache->{$file_name};
     }
-    my $reverse = $file_name_helper->create_filename( $ref->{file_extension}, 2 );
-    if ( exists $file_cache->{globbed}->{$reverse} ) {
-      $fnames->{reverse} = $file_cache->{globbed}->{$reverse};
+    $file_name = $helper->create_filename($ext, 2);
+    if ($file_cache->{$file_name}) {
+      $fnames->{'reverse'} = $file_cache->{$file_name};
     }
   }
 
   #Look for the extra heatmap for tag
-  if ( $ref->{with_t_file} ) {
-    my $tag = $file_name_helper->create_filename( $ref->{file_extension}, q[t] );
-    if ( exists $file_cache->{globbed}->{$tag} ) {
-      $fnames->{tags} = $file_cache->{globbed}->{$tag};
+  if ( !exists $rpt_key_map->{'tag_index'}) {
+    $file_name = $helper->create_filename($ext, q[t]);
+    if ($file_cache->{$file_name}) {
+      $fnames->{'tags'} = $file_cache->{$file_name};
     }
   }
 
-  my $files = $fnames;
-  if ( scalar keys %{$files} ) { #Keep the value of db_lookup for the template
-    $files->{db_lookup} = $file_cache->{db_lookup};
+  if ( scalar keys %{$fnames} ) { #Keep the value of db_lookup for the template
+    $fnames->{'db_lookup'} = $self->_file_cache->{$id_run}->{'db_lookup'};
   }
 
-  return $files;
+  return $fnames;
 }
 
 no Moose;
@@ -195,13 +152,17 @@ __END__
 
 =item Readonly
 
-=item Carp
-
 =item Moose
 
-=item Catalyst::Model
+=item Catalyst::Model::Factory::PerRequest
 
 =item npg_common::run::file_finder
+
+=item npg_tracking::glossary::tag
+
+=item npg_tracking::glossary::lane
+
+=item npg_tracking::glossary::run
 
 =back
 

@@ -1,203 +1,127 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 5;
 use Test::Exception;
 use Test::Deep;
+use File::Temp qw/tempdir/;
+use File::Path qw/make_path/;
 
-{ use_ok 'npg_qc_viewer::Model::SeqStore' }
+use_ok 'npg_qc_viewer::Model::SeqStore';
+isa_ok(npg_qc_viewer::Model::SeqStore->new(), 'npg_qc_viewer::Model::SeqStore');
 
-{
-  isa_ok(npg_qc_viewer::Model::SeqStore->new(), 'npg_qc_viewer::Model::SeqStore');
+my $base = tempdir(UNLINK => 1);
+my $path = $base . q[/archive];
+my $lane3 = $path . q[/lane3];
+make_path $lane3;
+
+my @files = qw/1234_1 1234_1_1 1234_1_2
+                      1234_2_1 1234_2_2
+                      1234_3_1
+                      1234_5_1 1234_5_2 1234_5_t
+               1234_6                   1234_6_t/;
+foreach my $f (@files) {
+  open my $fh, '>', $path.q[/].$f.q[.fastqcheck];
+  close $fh;
 }
 
-# Requires these data files:
-#
-# npg_qc/npg_qc_viewer/t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/
-# 1234_1_1#33.fastqcheck, 1234_1_1.fastq, 1234_1_2#33.fastqcheck, 1234_1_2.fastq, 
-# 1234_1.fastqcheck, 1234_1_t.fastq, 1234_2_1.fastqcheck, 
-# 1234_2_2.fastqcheck, 1234_3_1.fastqcheck, 1234_4.fastq, 1234_4.fastqcheck
-#
-# npg_qc/npg_qc_viewer/t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/lane3/
-# 1234_3_1#33.fastq, 1234_3_2#33.fastq
-
-subtest 'Testing create_filename' => sub {
-  plan tests => 7;
-  
-  my $ref = { id_run => 1234,position => 1 };
-  my $f = npg_qc_viewer::Model::SeqStore->new()->_build_file_name_helper($ref);
-
-  is ($f->create_filename(q[fastq]), '1234_1.fastq', 'generate filename, no args');
-
-  $ref->{ file_extension } = q[];
-  $f = npg_qc_viewer::Model::SeqStore->new()->_build_file_name_helper($ref);
-  is ($f->create_filename(), '1234_1', 'generate filename, no args, no ext');
+subtest 'Finding files on a single path' => sub {
+  plan tests => 11;
  
-  $ref->{ file_extension } = q[fastqcheck];
-  $f = npg_qc_viewer::Model::SeqStore->new()->_build_file_name_helper($ref);
-  is ($f->create_filename(q[fastqcheck], 2), '1234_1_2.fastqcheck', 'generate filename, end 2');
-  is ($f->create_filename(q[fastqcheck], 1), '1234_1_1.fastqcheck', 'generate filename, end 1');
-  is ($f->create_filename(q[fastqcheck], q[t]), '1234_1_t.fastqcheck', 'generate filename, end t');
-  is ($f->create_filename(q[fastqcheck]), '1234_1.fastqcheck', 'generate filename, single new-style');
-
-  throws_ok { $f->create_filename(q[fastqcheck], q[22]) } qr/Unrecognised end string 22/, 'error for an end that is not 1, 2 or t';
-};
-
-subtest 'Building actual paths' => sub {
-  plan tests => 4;
-  
-  my $db_lookup = 0;
-  my $ref = { position  => 1,
-              id_run    => 2549,
-              tag_index => 33,
-              db_lookup => $db_lookup };
-  my $f = npg_qc_viewer::Model::SeqStore->new()->_build_file_name_helper($ref, $db_lookup);
-  is ($f->create_filename(q[fastq]), '2549_1#33.fastq', 'generate filename, no args, tag_index');
-  is ($f->create_filename(q[fastq], 1), '2549_1_1#33.fastq', 'generate filename, end 1, tag_index');
-
-  $ref = { position  => 1,
-           id_run    => 2549,
-           tag_index => 33,
-           db_lookup => $db_lookup,
-           file_extension => q[fastqcheck] };
-  $f = npg_qc_viewer::Model::SeqStore->new()->_build_file_name_helper($ref, $db_lookup);
-  
-  is ($f->create_filename(q[fastqcheck], 2), '2549_1_2#33.fastqcheck', 'generate filename, end 2, tag_index');
-  is ($f->create_filename(q[fastqcheck]), '2549_1#33.fastqcheck', 'generate filename, no args, tag_index'); 
-};
-
-subtest 'Finding files' => sub {
-  plan tests => 3;
-  my $db_lookup = 0;
-  my @paths = (q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],); 
-  my $ref = { position  => 1,
-              id_run    => 1234,
-              file_extension => q[fastqcheck],
-              archive_path => q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],
-              db_lookup    => $db_lookup, };
+  my $ref = { position  => 1, id_run    => 1234,};
   my $f = npg_qc_viewer::Model::SeqStore->new();
-  my $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_1.fastqcheck];
-  my $expected = { forward => $forward, db_lookup => $db_lookup};
-  cmp_deeply ($f->files($ref, $db_lookup, \@paths), $expected, 'one fastqcheck input file found');
+  my $forward = $path . q[/1234_1.fastqcheck];
+  my $expected = { 'forward' => $forward, 'db_lookup' => 0};
+  cmp_deeply ($f->files($ref, 0, [$path]), $expected, 'one fastqcheck input file found');
 
-  $ref = { position  => 2,
-           id_run    => 1234,
-           file_extension => q[fastqcheck],
-           archive_path => q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],
-           db_lookup    => 0, };
+  is (scalar keys %{$f->_file_cache->{'1234'}->{'files'}}, 11,
+    'for the path all files are already cached');
+  is ($f->_file_cache->{'1234'}->{'db_lookup'}, 0, 'db lookup is false');
+
+  $ref = { position  => 2, id_run    => 1234 };
+  $forward = $path . q[/1234_2_1.fastqcheck];
+  my $reverse = $path . q[/1234_2_2.fastqcheck];
+  $expected = { 'forward' => $forward, 'reverse' => $reverse, db_lookup => 0};
+  cmp_deeply ($f->files($ref, 0, [$path]), $expected, 'two fastqcheck input files found');
+
+  $ref = { position => 5, id_run => 1234};
+  $forward = $path . q[/1234_5_1.fastqcheck];
+  $reverse = $path . q[/1234_5_2.fastqcheck];
+  my $t = $path . q[/1234_5_t.fastqcheck];
+  $expected = { 'forward' => $forward, 'reverse' => $reverse, 'tags' => $t, 'db_lookup' => 0};
+  cmp_deeply ($f->files($ref, 0, [$path]), $expected, 'three fastqcheck input files found');
+
+  $ref = { position => 6, id_run => 1234};
+  $forward = $path . q[/1234_6.fastqcheck];
+  $t = $path . q[/1234_6_t.fastqcheck];
+  $expected = { 'forward' => $forward, 'tags' => $t, 'db_lookup' => 0};
+  cmp_deeply ($f->files($ref, 0, [$path]), $expected, 'two fastqcheck input files found');
+
+  $ref = { position  => 3, id_run    => 1234,};
+  $forward = $path . q[/1234_3_1.fastqcheck];
+  $expected = { 'forward' => $forward, 'db_lookup' => 0};
+  cmp_deeply ($f->files($ref, 0, [$path]), $expected,
+    'single read fastqcheck input files found; with _1 to identify the end');
+
+  $ref = { position  => 8, id_run    => 1234 };
+  is (scalar (keys %{$f->files($ref, 0, [$path])}), 0, 'no input files found');
+
   $f = npg_qc_viewer::Model::SeqStore->new();
-  $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_2_1.fastqcheck];
-  my $reverse = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_2_2.fastqcheck];
-  $expected = { forward => $forward, reverse => $reverse, db_lookup => $db_lookup};
-  cmp_deeply ($f->files($ref, $db_lookup, \@paths), $expected, 'two fastqcheck input files found');
-
   $ref = { position  => 1,
            id_run    => 1234,
-           archive_path => q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],
-           file_extension => q[fastq],
-           db_lookup    => 0,
-           with_t_file => 1, };
-  $f = npg_qc_viewer::Model::SeqStore->new();
-  $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_1_1.fastq];
-  $reverse = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_1_2.fastq];
-  my $t = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_1_t.fastq];
-  $expected = { forward => $forward, reverse => $reverse, tags => $t, db_lookup => $db_lookup};
-  cmp_deeply ($f->files($ref, $db_lookup, \@paths), $expected, 'three fastq input files found');
+           tag_index => 33,};
+  $forward = $lane3 . q[/1234_1_1#33.fastqcheck];
+  open my $fh, '>', $forward; close $fh;
+  open $fh, '>', $forward.q[.fastqcheck]; close $fh;
+  open $fh, '>', $forward.q[.bam]; close $fh;
+  $reverse = $lane3 . q[/1234_1_2#33.fastqcheck];
+  open $fh, '>', $reverse; close $fh;
+  $expected = { 'forward' => $forward, 'reverse' => $reverse, 'db_lookup' => 0, };
+  cmp_deeply ($f->files($ref, 0, [$lane3]), $expected, 'two fastqcheck plex-level input files found');
+  is (scalar keys %{$f->_file_cache->{'1234'}->{'files'}}, 3, 'all files are cached');
+  is ($f->_file_cache->{'1234'}->{'db_lookup'}, 0, 'db lookup is false');
 };
 
-subtest 'Finding files with tax index' => sub {
-  plan tests => 1;
-  my $db_lookup = 0;
-  my @paths = (q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],); 
-  my $ref = { position  => 1,
-              id_run    => 1234,
-              tag_index => 33,
-              file_extension => q[fastqcheck],
-              lane_archive_lookup => 0,
-              db_lookup => $db_lookup };
-  my $f = npg_qc_viewer::Model::SeqStore->new();
-  my $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_1_1#33.fastqcheck];
-  my $reverse = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_1_2#33.fastqcheck];
-  my $expected = { forward => $forward, reverse => $reverse, db_lookup => $db_lookup, };
-  cmp_deeply ($f->files($ref, $db_lookup, \@paths), $expected, 'two fastqcheck input files found, tag_index');
-};
-
-subtest 'Finding files for lane archive' => sub {
-  plan tests => 2;
-  my $db_lookup = 0;
-  my $ref = { position  => 1,
-              id_run    => 1234,
-              tag_index => 33,
-              lane_archive_lookup => 1,
-              file_extension => q[fastq],
-              archive_path => q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],
-              db_lookup => $db_lookup };
-  my $f = npg_qc_viewer::Model::SeqStore->new();
-  is(scalar keys %{$f->files($ref, $db_lookup)}, 0, 'no files if they are not in the lane archive');
-  
-  $ref = { position  => 3,
-           id_run    => 1234,
-           tag_index => 33,
-           lane_archive_lookup => 1,
-           file_extension => q[fastq],
-           archive_path => q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],
-           db_lookup => $db_lookup };
-  $f = npg_qc_viewer::Model::SeqStore->new();
-  my $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/lane3/1234_3_1#33.fastq];
-  my $reverse = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/lane3/1234_3_2#33.fastq];
-  my $expected = { forward => $forward, reverse => $reverse, db_lookup => $db_lookup };
-  cmp_deeply ($f->files($ref, $db_lookup), $expected, 'two fastqcheck input files found, tag_index, lane archive');
-};
-
-subtest 'Single files with _1' => sub {
+subtest 'Finding files on multiple paths' => sub {
   plan tests => 3;
-  my $db_lookup = 0;
-  my @paths = (q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],); 
-  my $ref = { position  => 3,
-              id_run    => 1234,
-              file_extension => q[fastqcheck],
-              db_lookup => $db_lookup };
+
+  # The first path has nothing. The data is in the second path and third path.
+  my $ref = { position  => 3, id_run => 1234};
   my $f = npg_qc_viewer::Model::SeqStore->new();
-  my $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_3_1.fastqcheck];
-  my $expected = { forward => $forward, db_lookup => $db_lookup};
-  
-  cmp_deeply ($f->files($ref, $db_lookup, \@paths), $expected,  'one fastqcheck input files found; with _1 to identify the end');
-   
-  $ref = { position  => 4,
-           id_run    => 1234,
-           file_extension => q[fastq],
-           archive_path => q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],
-           db_lookup => 0 };
-  $f = npg_qc_viewer::Model::SeqStore->new();
+  my $forward = $path . q[/1234_3_1.fastqcheck];
+  my $expected = { 'forward' => $forward, 'db_lookup' => 0};
+  cmp_deeply ($f->files($ref, 0, [$base, $path, $lane3]), $expected,  'found data in second path.');
 
-  $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_4.fastq];
-  $expected = { forward => $forward, db_lookup => $db_lookup };
-  cmp_deeply ($f->files($ref, $db_lookup, \@paths), $expected,  'one fastqcheck input files found; no _1 to identify the end');   
+  ok(exists $f->_file_cache->{'1234'}->{'files'}->{'1234_1_1#33.fastqcheck'} &&
+     exists $f->_file_cache->{'1234'}->{'files'}->{'1234_1_2#33.fastqcheck'},
+    'files from the third path are already cached');
 
-  $ref = { position  => 8,
+  $ref = { position  => 1,
            id_run    => 1234,
-           archive_path => q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],
-           db_lookup => 0 };
-  $f = npg_qc_viewer::Model::SeqStore->new();
-  is (scalar (keys %{$f->files($ref, $db_lookup)}), 0, 'no input files found');
+           tag_index => 33,};
+  $forward = $lane3 . q[/1234_1_1#33.fastqcheck];
+  my $reverse = $lane3 . q[/1234_1_2#33.fastqcheck];
+  $expected = { 'forward' => $forward, 'reverse' => $reverse, 'db_lookup' => 0, };
+  cmp_deeply ($f->files($ref, 0, [$lane3]), $expected, 'found data in third path');
 };
 
-subtest 'Multiple paths for same run' => sub {
-  plan tests => 1;
-  my $db_lookup = 0;
-  # The first path has nothing. The data is in the second path. So the model
-  # should check both paths until it finds something (in the second path).
-  my @paths = (q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/],
-               q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive],);
-  
-  my $ref = { position  => 3,
-              id_run    => 1234,
-              file_extension => q[fastqcheck],
-              db_lookup => $db_lookup };
+subtest 'Finding files for two runs' => sub {
+  plan tests => 3;
+
+  my $ref = { position => 3, id_run => 1234};
   my $f = npg_qc_viewer::Model::SeqStore->new();
-  my $forward = q[t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/1234_3_1.fastqcheck];
-  my $expected = { forward => $forward, db_lookup => $db_lookup};
-  
-  cmp_deeply ($f->files($ref, $db_lookup, \@paths), $expected,  'Found data in second path.');
+  my $forward = $path . q[/1234_3_1.fastqcheck];
+  my $other_forward = $path . q[/1231_3_1.fastqcheck];
+  open my $fh, '>', $other_forward; close $fh;
+  my $expected = { 'forward' => $forward, 'db_lookup' => 0};
+  cmp_deeply ($f->files($ref, 0, [$path]), $expected,  'found for one run');
+
+  ok(exists $f->_file_cache->{'1234'}->{'files'}->{'1234_3_1.fastqcheck'} &&
+     exists $f->_file_cache->{'1234'}->{'files'}->{'1231_3_1.fastqcheck'},
+    'files for both runs are cached');
+ 
+  $ref = { position => 3, id_run => 1231};
+  $expected = { 'forward' => $other_forward, 'db_lookup' => 0, };
+  cmp_deeply ($f->files($ref, 0, [$path]), $expected, 'found data in third path');
 };
 
 1;
