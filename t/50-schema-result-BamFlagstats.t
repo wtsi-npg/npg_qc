@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 17;
 use Test::Exception;
 use Test::Deep;
 use Moose::Meta::Class;
@@ -53,6 +53,7 @@ my $rs = $schema->resultset('BamFlagstats');
   my $row = $rs1->next;
   is($row->tag_index, 0, 'tag index retrieved correctly');
   is($row->human_split, undef, 'human_split retrieved as undef');
+  is($row->subset, undef, 'subset retrieved as undef');
   is(ref $row->info, 'HASH', 'info returned as a hash ref');
   cmp_deeply($row->info, $values->{'info'},
     'info hash ref content is correct');
@@ -61,16 +62,21 @@ my $rs = $schema->resultset('BamFlagstats');
 {
   my $json = '{"histogram":{},"human_split":"phix","id_run":"12287","info":{"Picard-tools":"1.72(1230)","Picard_metrics_header":"# /software/hpag/biobambam/0.0.76/bin/bammarkduplicates I=/nfs/sf54/ILorHSany_sf54/analysis/140227_HS35_12287_A_H8M6LADXX/Data/Intensities/BAM_basecalls_20140228-082452/no_cal/archive/lane1/HJH8I0e3i9/sorted.bam O=/dev/stdout tmpfile=/nfs/sf54/ILorHSany_sf54/analysis/140227_HS35_12287_A_H8M6LADXX/Data/Intensities/BAM_basecalls_20140228-082452/no_cal/archive/lane1/HJH8I0e3i9/ M=/tmp/Kr78slLXuv level=0\n","Samtools":"0.1.18 (r982:295)"},"library":"9418068",
 "library_size":-1,
-"mate_mapped_defferent_chr":0,"mate_mapped_defferent_chr_5":0,"num_total_reads":2,"paired_mapped_reads":1,"paired_read_duplicates":0,"percent_duplicate":0,"position":"1","proper_mapped_pair":2,"read_pair_optical_duplicates":0,"read_pairs_examined":1,"tag_index":"89","unmapped_reads":0,"unpaired_mapped_reads":0,"unpaired_read_duplicates":0}';
+"mate_mapped_defferent_chr":0,"mate_mapped_defferent_chr_5":0,"num_total_reads":2,"paired_mapped_reads":1,"paired_read_duplicates":0,"percent_duplicate":0,"position":"1","proper_mapped_pair":2,"read_pair_optical_duplicates":0,"read_pairs_examined":1,"tag_index":"89","unmapped_reads":0,"unpaired_mapped_reads":0,"unpaired_read_duplicates":0,"subset":"target"}';
 
   my $v = from_json($json);
   $rs->result_class->deflate_unique_key_components($v);
-  is ($v->{library_size}, undef, 'library size converted to undef');
+  is ($v->{'library_size'}, undef, 'library size converted to undef');
   lives_ok {$rs->find_or_new($v)->set_inflated_columns($v)->update_or_insert()} 'record inserted';
   my $row = $rs->search({id_run=>12287, position=>1, tag_index=>89,})->next;
   is ($row->library_size, undef, 'library size retrieved as undef');
+  is ($row->subset, undef, 'subset retrieved as undef');
+
+  $v->{'subset'} = 'human';
+  $v->{'tag_index'} = 88;
+  lives_ok {$rs->find_or_new($v)->set_inflated_columns($v)->update_or_insert()} 'record updated';
+  $row = $rs->search({id_run=>12287, position=>1, tag_index=>88,})->next;
+  is ($row->subset, 'human', 'subset is human');
 }
 
 1;
-
-

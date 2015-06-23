@@ -1,0 +1,9 @@
+ALTER TABLE `bam_flagstats` ADD COLUMN  `subset` varchar(10) DEFAULT NULL AFTER `human_split`;
+
+UPDATE `bam_flagstats` set subset=human_split where (human_split != 'all' and human_split != 'nonhuman');
+UPDATE `bam_flagstats` set subset='target' where subset IS NULL;
+
+ALTER TABLE `bam_flagstats` MODIFY COLUMN  `subset` varchar(10) DEFAULT 'target' NOT NULL;
+
+ALTER TABLE `bam_flagstats` DROP KEY `unq_run_lane_index_sp_flag`;
+ALTER TABLE `bam_flagstats` ADD CONSTRAINT UNIQUE  `unq_run_lane_index_subset_flag` (`id_run`,`position`,`tag_index`,`human_split`,`subset`);

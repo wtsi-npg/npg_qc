@@ -80,6 +80,13 @@ __PACKAGE__->table('bam_flagstats');
   is_nullable: 1
   size: 10
 
+=head2 subset
+
+  data_type: 'varchar'
+  default_value: 'target'
+  is_nullable: 0
+  size: 10
+
 =head2 library
 
   data_type: 'varchar'
@@ -209,6 +216,13 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
     size => 10,
   },
+  'subset',
+  {
+    data_type => 'varchar',
+    default_value => 'target',
+    is_nullable => 0,
+    size => 10,
+  },
   'library',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'unpaired_mapped_reads',
@@ -261,7 +275,7 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<unq_run_lane_index_sp_flag>
+=head2 C<unq_run_lane_index_subset_flag>
 
 =over 4
 
@@ -269,17 +283,19 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 =item * L</position>
 
+=item * L</tag_index>
+
 =item * L</human_split>
 
-=item * L</tag_index>
+=item * L</subset>
 
 =back
 
 =cut
 
 __PACKAGE__->add_unique_constraint(
-  'unq_run_lane_index_sp_flag',
-  ['id_run', 'position', 'human_split', 'tag_index'],
+  'unq_run_lane_index_subset_flag',
+  ['id_run', 'position', 'tag_index', 'human_split', 'subset'],
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -298,13 +314,13 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:J4ClXt5n2NVz/umd9TN/6Q
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-23 16:41:44
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yqOj2YWv7tpkWqPSO+n8Xg
 
 __PACKAGE__->set_flators4non_scalar(qw( histogram info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('human_split', 'is_string');
-
+__PACKAGE__->set_inflator4scalar('subset', 'is_string');
 
 our $VERSION = '0';
 
