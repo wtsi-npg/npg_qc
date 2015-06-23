@@ -1,11 +1,6 @@
-#########
-# Author:        mg8
-# Created:       30 July 2009
-#
-
 use strict;
 use warnings;
-use Test::More tests => 70;
+use Test::More tests => 62;
 use Test::Exception;
 use Test::Deep;
 use File::Spec::Functions qw(catfile);
@@ -58,9 +53,22 @@ our $idrun = 2549;
 {
     my $check = npg_qc::autoqc::checks::check->new(position => 2, path  => 't/data/autoqc/090721_IL29_2549/data', id_run => $idrun );
     is($check->tag_index, undef, 'tag index undefined');
+    isa_ok($check->result, 'npg_qc::autoqc::results::result');
+    is($check->result->id_run, $idrun, 'run id propagated');
+    is($check->result->position, 2, 'position propagated');
+    is($check->result->path, 't/data/autoqc/090721_IL29_2549/data', 'path propagated');
+    is($check->result->tag_index, undef, 'tag index undefined');
+    ok(!$check->result->has_tag_index, 'tag index is not set');
+
     $check = npg_qc::autoqc::checks::check->new(position => 2, path  => 't/data/autoqc/090721_IL29_2549/data',
                                                 id_run => $idrun, tag_index => 5 );
     is($check->tag_index, 5, 'tag index is set by the constructor');
+    isa_ok($check->result, 'npg_qc::autoqc::results::result');
+    is($check->result->id_run, $idrun, 'run id propagated');
+    is($check->result->position, 2, 'position propagated');
+    is($check->result->tag_index, 5, 'tag index propagated');
+    ok($check->result->has_tag_index, 'tag index is set');
+
     throws_ok { npg_qc::autoqc::checks::check->new(position => 2, path  => 't/data/autoqc/090721_IL29_2549/data',
                                                 id_run => $idrun, tag_index => 1000000)}
            qr/Validation\ failed\ for/, 'error on passing to the constructor large tag index';
@@ -131,20 +139,12 @@ our $idrun = 2549;
                                                       id_run    => 2549,
                                                  });
 
-    is ($check->generate_filename(q[fastq])->[0], '2549_1.fastq', 'generate filename, no args');
-
     $check = npg_qc::autoqc::checks::check->new(
                                                       position  => 1,
                                                       path      => 't/data/autoqc/090721_IL29_2549/data',
                                                       id_run    => 2549,
                                                       input_file_ext => q[fastqcheck],
                                                 );
-
-    is ($check->generate_filename(q[fastqcheck], 2)->[0], '2549_1_2.fastqcheck', 'generate filename, full args, end 2');
-    is ($check->generate_filename(q[fastqcheck], 1)->[0], '2549_1_1.fastqcheck', 'generate filename, full args, end 1');
-    is ($check->generate_filename(q[fastqcheck], q[t])->[0], '2549_1_t.fastqcheck', 'generate filename, full args, end t');
-    throws_ok {$check->generate_filename(q[fastqcheck], q[a])} qr/Unrecognised end string/, 'Unrecognised end string error';
-    is ($check->generate_filename(q[fastqcheck])->[0], '2549_1.fastqcheck', 'generate filename, ext arg only');
 
     is (join( q[ ], $check->get_input_files()), 't/data/autoqc/090721_IL29_2549/data/2549_1_1.fastqcheck t/data/autoqc/090721_IL29_2549/data/2549_1_2.fastqcheck', 'two fastqcheck input files found');
 
@@ -157,60 +157,10 @@ our $idrun = 2549;
                                                       path      => 't/data/autoqc/090721_IL29_2549/data',
                                                       id_run    => 2549,
                                                       tag_index => 33,
-                                                 );
-
-    is ($check->generate_filename(q[fastq])->[0],                '2549_1#33.fastq', 'generate filename, no args');
-    is ($check->generate_filename(q[fastq], 1)->[0], '2549_1_1#33.fastq', 'generate filename, full args, end 1');
-
-    $check = npg_qc::autoqc::checks::check->new(
-                                                      position  => 1,
-                                                      path      => 't/data/autoqc/090721_IL29_2549/data',
-                                                      id_run    => 2549,
-                                                      tag_index => 33,
                                                       input_file_ext => q[fastqcheck],
                                                );
-    is ($check->generate_filename(q[fastqcheck], 2)->[0], '2549_1_2#33.fastqcheck', 'generate filename, full args, end 2');
-    is ($check->generate_filename(q[fastqcheck])->[0], '2549_1#33.fastqcheck', 'generate filename, ext arg only');
 
     is (join( q[ ], $check->get_input_files()), 't/data/autoqc/090721_IL29_2549/data/2549_1_1#33.fastqcheck t/data/autoqc/090721_IL29_2549/data/2549_1_2#33.fastqcheck', 'two fastqcheck input files found');
-}
-
-
-{
-    my $check = npg_qc::autoqc::checks::check->new({
-                                                      position  => 1,
-                                                      path      => 't/data/autoqc/090721_IL29_2549/data',
-                                                      id_run    => 2549,
-                                                      sequence_type => 'phix',
-                                                 });
-    is ($check->sequence_type, q[phix], 'sequence type is phix');
-    
-    is ($check->generate_filename(q[fastq])->[0], '2549_1_phix.fastq', 'generate filename, no args');
-    is ($check->generate_filename(q[fastq], 2)->[0], '2549_1_2_phix.fastq', 'generate filename, full args, end 2');
-    is ($check->generate_filename(q[fastq], 1)->[0], '2549_1_1_phix.fastq', 'generate filename, full args, end 1');
-    is ($check->generate_filename(q[fastq], q[t])->[0], '2549_1_t_phix.fastq', 'generate filename, full args, end t');
-    my $forward  = q[t/data/autoqc/090721_IL29_2549/data/2549_1_1_phix.fastq];
-    my $reverse  = q[t/data/autoqc/090721_IL29_2549/data/2549_1_2_phix.fastq];
-    `touch $forward`;
-    `touch $reverse`;
-    is (join( q[ ], $check->get_input_files()), 't/data/autoqc/090721_IL29_2549/data/2549_1_1_phix.fastq t/data/autoqc/090721_IL29_2549/data/2549_1_2_phix.fastq', 'two fastqcheck input files found');
-    cmp_deeply ($check->generate_filename_attr(), ['2549_1_1_phix.fastq', '2549_1_2_phix.fastq'], 'output filename structure');
-    unlink $forward;
-    unlink $reverse;
-}
-
-
-{
-    my $check = npg_qc::autoqc::checks::check->new(
-                                                      position  => 1,
-                                                      path      => 't/data/autoqc/090721_IL29_2549/data',
-                                                      id_run    => 2549,
-                                                      tag_index => 33,
-                                                      sequence_type => 'phix',
-                                                 );
-
-    is ($check->generate_filename(q[fastq])->[0], '2549_1#33_phix.fastq', 'generate filename, no args');
-    is ($check->generate_filename(q[fastq], 1)->[0], '2549_1_1#33_phix.fastq', 'generate filename, full args, end 1');
 }
 
 

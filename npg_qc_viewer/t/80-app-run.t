@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 64;
+use Test::More tests => 65;
 use Test::Exception;
 
 use Test::WWW::Mechanize::Catalyst;
@@ -30,6 +30,7 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   $mech->content_contains('Run annotations');
   $mech->content_contains('Lane annotations');
   $mech->content_contains('NPG QC');
+  $mech->content_contains('20,442,728'); #for total qxYield
 
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)->update({ id_user => 64, id_run_status_dict => 26, });
   $mech->get_ok($url);

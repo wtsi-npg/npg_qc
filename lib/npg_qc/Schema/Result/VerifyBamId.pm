@@ -93,7 +93,6 @@ __PACKAGE__->table('verify_bam_id');
 
 =head2 freeLK0
 
-  accessor: 'free_lk0'
   data_type: 'decimal'
   default_value: 0.00
   is_nullable: 0
@@ -101,7 +100,6 @@ __PACKAGE__->table('verify_bam_id');
 
 =head2 freeLK1
 
-  accessor: 'free_lk1'
   data_type: 'decimal'
   default_value: 0.00
   is_nullable: 0
@@ -164,7 +162,6 @@ __PACKAGE__->add_columns(
   },
   'freeLK0',
   {
-    accessor => 'free_lk0',
     data_type => 'decimal',
     default_value => '0.00',
     is_nullable => 0,
@@ -172,7 +169,6 @@ __PACKAGE__->add_columns(
   },
   'freeLK1',
   {
-    accessor => 'free_lk1',
     data_type => 'decimal',
     default_value => '0.00',
     is_nullable => 0,
@@ -234,8 +230,8 @@ __PACKAGE__->add_unique_constraint('unq_run_lane_verify', ['id_run', 'position',
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::verify_bam_id';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AqOkJZFkV3LvyDSgZLez2g
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-05-28 16:47:33
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FK7FU+Oo6v6VCmsi3TyjqA
 
 __PACKAGE__->set_flators4non_scalar(qw( info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
@@ -243,8 +239,8 @@ __PACKAGE__->set_inflator4scalar('tag_index');
 
 our $VERSION = '0';
 
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
-
 1;
 __END__
 

@@ -731,7 +731,7 @@ static GT_HDR *init_hdr(GT_HDR *hdr, int genotype_fld_count, int bits_per_call, 
 static int cmp_hdr(GT_HDR *new_hdr, GT_HDR *check_hdr)
 {
 	if(strncmp(check_hdr->hdr_base.magic, "GT", 2)
-		|| strncmp(check_hdr->hdr_base.ver, "01", 2)
+		|| (strncmp(check_hdr->hdr_base.ver, "01", 2) && strncmp(check_hdr->hdr_base.ver, "02", 2))
 		|| (new_hdr->hdr_base.callcount != check_hdr->hdr_base.callcount)
 		|| (new_hdr->hdr_base.gt_bits != check_hdr->hdr_base.gt_bits)
 		|| (new_hdr->hdr_base.dp_bits != check_hdr->hdr_base.dp_bits))  {

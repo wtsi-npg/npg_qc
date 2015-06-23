@@ -5,12 +5,13 @@ CFLAGS = -g -Wall
 BUILDDIR = build
 installdir = .
 
-INCLUDES= -I.
-SAMTOOLS_LOC= /software/solexa/pkg/samtools/samtools-0.1.18
-LIBS= -lz -lm
+SAMTOOLS_LOC= /software/solexa/pkg/samtools/samtools-1.2
+HTSLIB_LOC= /software/solexa/pkg/htslib/htslib-1.2.1
+INCLUDES= -I. -I$(SAMTOOLS_LOC)/include -I$(HTSLIB_LOC)/include
+LIBS= -lz -lm -Wl,-rpath=$(HTSLIB_LOC)/lib
 LIBPATH=
-SAMTOOLSLIB= -lbam
-SAMTOOLSLIBPATH= -L $(SAMTOOLS_LOC)
+SAMTOOLSLIB= -lbam -lhts
+SAMTOOLSLIBPATH= -L $(SAMTOOLS_LOC)/lib -L $(HTSLIB_LOC)/lib
 
 ifdef FQS_BUILD_DIR
 BUILDDIR = $(FQS_BUILD_DIR)
@@ -18,10 +19,6 @@ endif
 
 ifdef FQS_INSTALL_DIR
 installdir = $(FQS_INSTALL_DIR)
-endif
-
-ifdef SAMTOOLS_LOC
-INCLUDES += -I $(SAMTOOLS_LOC)
 endif
 
 .SUFFIXES: .c .o
@@ -40,7 +37,7 @@ clean:
 	rm -f $(BUILDDIR)/fastq_summ $(BUILDDIR)/fastq_summ.o $(BUILDDIR)/fastqcheck.o
 
 $(BUILDDIR)/fastq_summ: $(BUILDDIR)/fastq_summ.o $(BUILDDIR)/fastqcheck.o
-	$(CC) $(CFLAGS) $^ -o $@ $(SAMTOOLSLIBPATH) $(SAMTOOLSLIB) $(LIBPATH) $(LIBS)
+	$(CC) $(CFLAGS) $^ -o $@ -pthread $(SAMTOOLSLIBPATH) $(SAMTOOLSLIB) $(LIBPATH) $(LIBS)
 
 $(BUILDDIR)/fastq_summ.o: fastq_summ.c
 

@@ -19,6 +19,7 @@ use MIME::Base64::Perl;
 use Perl6::Slurp;
 use POSIX qw(WIFEXITED);
 use Readonly;
+use Try::Tiny;
 
 use npg_tracking::util::types;
 
@@ -45,6 +46,7 @@ has 'window_depth_cmd'  =>  ( is         => 'ro',
                               isa        => 'NpgCommonResolvedPathExecutable',
                               required   => 0,
                               coerce     => 1,
+                              lazy       => 1,
                               default    => q[window_depth],
                             );
 
@@ -148,6 +150,18 @@ sub _build_gcn_file {
     $reference_gcn .= q{.gcn} . $self->window_size();
     return $reference_gcn;
 }
+
+override 'can_run' => sub {
+    my $self = shift;
+    my $r=1;
+    try {
+      $self->window_depth_cmd;
+    } catch {
+      carp qq[On looking for window_depth command: $_];
+      $r= 0;
+    };
+    return $r;
+};
 
 override 'execute' => sub {
     my ($self) = @_;

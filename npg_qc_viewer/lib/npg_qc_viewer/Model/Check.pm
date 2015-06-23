@@ -13,7 +13,7 @@ my $connect_info;
 if (defined npg_qc_viewer->config->{'Model::Check'}) {
     if (defined npg_qc_viewer->config->{'Model::Check'}->{'use_db'} &&
             npg_qc_viewer->config->{'Model::Check'}->{'use_db'} eq 'no' ) {
-	$use_db = 0;
+        $use_db = 0;
     }
     if (defined npg_qc_viewer->config->{'Model::Check'}->{'connect_info'}) {
         $connect_info = npg_qc_viewer->config->{'Model::Check'}->{'connect_info'};

@@ -1,3 +1,9 @@
+bin/gtck_combine_gt_data.sh
+bin/gtck_extract_fluidigm_data_from_irods.sh
+bin/gtck_genplexlist.sh
+bin/gtck_install_to_repos.sh
+bin/gtck_refresh_check_data.sh
+bin/reformat_fluidigm_snp26_results_irods.pl
 bin/qc
 bin/qc_db_delete_autoqc
 bin/mqc_outcome_reporter
@@ -390,6 +396,7 @@ t/50-schema-result-SplitStats.t
 t/50-schema-result-MqcOutcomeDict.t
 t/50-schema-result-MqcOutcomeEnt.t
 t/50-schema-result-MqcOutcomeHist.t
+t/50-schema-result-VerifyBamId.t
 t/60-autoqc-autoqc.t
 t/60-autoqc-checks-adapter.t
 t/60-autoqc-checks-af_metrics.t
