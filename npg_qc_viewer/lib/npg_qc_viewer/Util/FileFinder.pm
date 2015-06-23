@@ -87,7 +87,7 @@ sub _build_files {
   if ( ( scalar keys %{$hfiles} ) == 0 ) {
     my $ext = $self->file_extension;
     my @globs = map { catfile($_, q[*]) . q[.] . $ext } @{$self->location};
-    my @files = glob join q[ ], @globs;
+    my @files = glob join q[ ], @globs; # All paths in one go
     foreach my $file (@files) {
       my ( $fname, $dir, $e ) = fileparse($file, ($ext));
       $hfiles->{ $fname.$ext } = $file;
@@ -151,6 +151,8 @@ as keys and, in case of successful file system search, file paths as values
 
 =item Moose
 
+=item Carp
+
 =item File::Spec::Functions
 
 =item File::Basename
@@ -158,6 +160,8 @@ as keys and, in case of successful file system search, file paths as values
 =item Readonly
 
 =item npg_qc::Schema
+
+=item npg_qc_viewer::Model::NpgQcDB;
 
 =item npg_tracking::illumina::run::short_info
 
