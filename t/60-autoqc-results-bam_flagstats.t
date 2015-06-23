@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 30;
+use Test::More tests => 34;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw/ tempdir /;
@@ -31,12 +31,18 @@ use_ok ('npg_qc::autoqc::results::bam_flagstats');
             id_run   => 4783,
             human_split => 'phix');
     is ($r->subset, 'phix', 'subset attr is set correctly');
+    my $json = $r->freeze();
+    like ($json, qr/\"subset\":\"phix\"/, 'subset field is serialized');
+    like ($json, qr/\"human_split\":\"phix\"/, 'human_split field is serialized');
 
     $r = npg_qc::autoqc::results::bam_flagstats->new(
             position => 5,
             id_run   => 4783,
             subset   => 'phix');
     is ($r->human_split, 'phix', 'human_split attr is set correctly');
+    $json = $r->freeze();
+    like ($json, qr/\"subset\":\"phix\"/, 'subset field is serialized');
+    like ($json, qr/\"human_split\":\"phix\"/, 'human_split field is serialized');
 
     throws_ok { npg_qc::autoqc::results::bam_flagstats->new(
             position => 5,
