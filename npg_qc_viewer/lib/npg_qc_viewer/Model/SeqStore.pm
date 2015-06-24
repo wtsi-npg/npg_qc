@@ -68,13 +68,17 @@ sub files {
   my $rpt_key_map = shift @sargs;    # tag_index position id_run
   my $db_lookup   = shift @sargs;
 
-  my $all_files = {};
-  if ( @sargs && ( ref $sargs[0] ) eq q[ARRAY] ) {    # this is a list of paths
-    $all_files = $self->_get_file_paths( $rpt_key_map, $db_lookup, $sargs[0] );
-  } else {
-    $all_files = $self->_get_file_paths($rpt_key_map, $db_lookup );
+  my $ref = {};
+  $ref->{'id_run'}    = $rpt_key_map->{'id_run'};
+  $ref->{'qc_schema'} = $self->qc_schema;
+  $ref->{'db_lookup'} = $db_lookup;
+  #Checking for locations (passed as array)
+  if (@sargs && ( ref $sargs[0] ) eq q[ARRAY] ) { 
+    $ref->{'location'}  = $sargs[0];
   }
-  return $all_files;
+  $self->_add2cache($ref);
+
+  return $self->_get_file_paths($rpt_key_map);
 }
 
 sub _file_name_helper {
@@ -87,17 +91,9 @@ sub _file_name_helper {
 }
 
 sub _get_file_paths {
-  my ( $self, $rpt_key_map, $db_lookup, $paths ) = @_;
+  my ( $self, $rpt_key_map) = @_;
 
   my $id_run = $rpt_key_map->{'id_run'};
-  my $ref = {};
-  $ref->{'id_run'}    = $id_run;
-  $ref->{'qc_schema'} = $self->qc_schema;
-  $ref->{'db_lookup'} = $db_lookup;
-  if ($paths) {
-    $ref->{'location'}  = $paths;
-  }
-  $self->_add2cache($ref);
 
   my $fnames = {};
   my $helper = _file_name_helper($rpt_key_map);
@@ -133,7 +129,7 @@ sub _get_file_paths {
   }
 
   return $fnames;
-}
+} 
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
