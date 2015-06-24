@@ -11,15 +11,17 @@ use_ok('npg_qc_viewer::Util::FileFinder');
 subtest 'Basic use' => sub {
   plan tests => 2;
   my $finder;
-  lives_ok { $finder = npg_qc_viewer::Util::FileFinder->new(id_run => 22, position => 1); }
+  lives_ok { $finder = npg_qc_viewer::Util::FileFinder->new( id_run => 22, position => 1 ); }
     q{create npg_qc_viewer::Util::FileFinder object ok};
   isa_ok($finder, q{npg_qc_viewer::Util::FileFinder});
 };
 
 subtest 'Checking initial values after creation' => sub {
-  plan tests => 8;
+  plan tests => 11;
   
-  my $finder = npg_qc_viewer::Util::FileFinder->new(id_run => 22, position => 2);
+  my $finder = npg_qc_viewer::Util::FileFinder->new(id_run    => 22, 
+                                                    position  => 2,
+                                                    db_lookup => 0);
   is ($finder->file_extension, 'fastqcheck', 'default file extension');
   ok (!$finder->qc_schema, 'db schema undefined');
   
@@ -31,10 +33,13 @@ subtest 'Checking initial values after creation' => sub {
   ok (!$finder->qc_schema, 'db schema undefined');
   is ($finder->db_lookup, 0, 'db lookup is 0 when using other extension');
 
+  my @locations = (q[\somelocation],);
+  my $locations_ref = \@locations;
+
   $finder = npg_qc_viewer::Util::FileFinder->new(id_run         => 22, 
                                                  position       => 2, 
-                                                 db_lookup      => 1
-                                                 location       => '\somelocation');
+                                                 db_lookup      => 1,
+                                                 location       => $locations_ref);
   is ($finder->file_extension, 'fastqcheck', 'default');
   ok (!$finder->qc_schema, 'db schema undefined');
   is ($finder->db_lookup, 0, 'db_lookup from constructor when using location');
