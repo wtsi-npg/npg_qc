@@ -1,6 +1,7 @@
 package npg_qc_viewer::Util::FileFinder;
 
 use Moose;
+use MooseX::StrictConstructor;
 use Carp;
 use File::Spec::Functions qw(catfile);
 use File::Basename;
@@ -8,7 +9,6 @@ use Readonly;
 use Try::Tiny;
 
 use npg_qc::Schema;
-use npg_qc_viewer::Model::NpgQcDB;
 
 with qw/ npg_tracking::illumina::run::short_info
          npg_tracking::illumina::run::folder /;
@@ -41,7 +41,7 @@ has 'file_extension' => (
 );
 
 has 'qc_schema' => (
-  isa      => 'Maybe[npg_qc::Schema | npg_qc_viewer::Model::NpgQcDB]',
+  isa      => 'Maybe[npg_qc::Schema]',
   is       => 'ro',
   required => 0,
 );
@@ -167,8 +167,6 @@ as keys and, in case of successful file system search, file paths as values
 =item Try::Tiny
 
 =item npg_qc::Schema
-
-=item npg_qc_viewer::Model::NpgQcDB
 
 =item npg_tracking::illumina::run::short_info
 

@@ -8,6 +8,7 @@ use npg_common::roles::run::lane::file_names;
 use npg_tracking::glossary::tag;
 use npg_tracking::glossary::lane;
 use npg_tracking::glossary::run;
+use npg_tracking::Schema;
 
 extends 'Catalyst::Model::Factory::PerRequest';
 __PACKAGE__->config( class => 'npg_qc_viewer::Model::SeqStore' );
@@ -32,7 +33,25 @@ cached data to be kept per request when looking for files.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 qc_schema
+
 =cut
+
+has 'qc_schema' => (
+  isa      => 'Maybe[npg_qc::Schema]',
+  is       => 'ro',
+  required => 0,
+);
+
+=head2 npg_tracking_schema
+
+=cut
+
+has 'npg_tracking_schema' => (
+  isa      => 'Maybe[npg_tracking::Schema]',
+  is       => 'ro',
+  required => 0,
+);
 
 has '_file_cache' => (
   isa     => 'HashRef',
@@ -41,6 +60,10 @@ has '_file_cache' => (
 );
 sub _add2cache {
   my ( $self, $ref ) = @_;
+
+  $ref->{'qc_schema'}           = $self->qc_schema;
+  $ref->{'npg_tracking_schema'} = $self->npg_tracking_schema;
+
   my $id_run = $ref->{'id_run'};
   if ( !$self->_file_cache->{$id_run} ) {
     my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
@@ -49,12 +72,6 @@ sub _add2cache {
   }
   return;
 }
-
-has 'qc_schema' => (
-  isa      => 'Maybe[npg_qc::Schema | npg_qc_viewer::Model::NpgQcDB]',
-  is       => 'ro',
-  required => 0,
-);
 
 =head2 files
 
@@ -70,7 +87,6 @@ sub files {
 
   my $ref = {};
   $ref->{'id_run'}    = $rpt_key_map->{'id_run'};
-  $ref->{'qc_schema'} = $self->qc_schema;
   $ref->{'db_lookup'} = $db_lookup;
   #Checking for locations (passed as array)
   if (@sargs && ( ref $sargs[0] ) eq q[ARRAY] ) {
@@ -151,13 +167,15 @@ __END__
 
 =item Catalyst::Model::Factory::PerRequest
 
-=item npg_common::run::file_finder
+=item npg_common::roles::run::lane::file_names
 
 =item npg_tracking::glossary::tag
 
 =item npg_tracking::glossary::lane
 
 =item npg_tracking::glossary::run
+
+=item npg_tracking::Schema
 
 =back
 
