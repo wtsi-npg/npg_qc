@@ -23,9 +23,10 @@ has 'db_lookup' => (
   required   => 0,
   writer     => '_set_db_lookup',
 );
+
 sub BUILD {
   my $self = shift;
-  if ($self->file_extension ne $FILE_EXTENSION || defined $self->location ) {
+  if ( $self->file_extension ne $FILE_EXTENSION || $self->has_location() ) {
     $self->_set_db_lookup(0);
   }
   return;
