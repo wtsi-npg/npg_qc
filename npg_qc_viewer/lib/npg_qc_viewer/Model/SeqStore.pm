@@ -167,6 +167,8 @@ __END__
 
 =item Catalyst::Model::Factory::PerRequest
 
+=item npg_qc_viewer::Util::FileFinder
+
 =item npg_common::roles::run::lane::file_names
 
 =item npg_tracking::glossary::tag
@@ -174,6 +176,8 @@ __END__
 =item npg_tracking::glossary::lane
 
 =item npg_tracking::glossary::run
+
+=item npg_qc::Schema
 
 =item npg_tracking::Schema
 
