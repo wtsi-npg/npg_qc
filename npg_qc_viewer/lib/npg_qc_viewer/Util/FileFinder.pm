@@ -5,6 +5,7 @@ use Carp;
 use File::Spec::Functions qw(catfile);
 use File::Basename;
 use Readonly;
+use Try::Tiny;
 
 use npg_qc::Schema;
 use npg_qc_viewer::Model::NpgQcDB;
@@ -55,8 +56,12 @@ has 'location' => (
 sub _build_location {
   my $self = shift;
   my @l = ();
-  push @l, $self->archive_path;
-  push @l, catfile($self->archive_path, q[lane*]);
+  try {
+    push @l, $self->archive_path;
+    push @l, catfile($self->archive_path, q[lane*]);
+  } catch {
+    carp q[Failed to get runfolder location ] . ($_ ? $_ : q[no params]);
+  };
   return \@l;
 }
 
@@ -159,9 +164,11 @@ as keys and, in case of successful file system search, file paths as values
 
 =item Readonly
 
+=item Try::Tiny
+
 =item npg_qc::Schema
 
-=item npg_qc_viewer::Model::NpgQcDB;
+=item npg_qc_viewer::Model::NpgQcDB
 
 =item npg_tracking::illumina::run::short_info
 
