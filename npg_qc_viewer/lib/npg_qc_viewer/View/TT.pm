@@ -27,10 +27,11 @@ npg_qc_viewer
 =cut
 
 __PACKAGE__->config(
-  TEMPLATE_EXTENSION => '.tt2',
-  INCLUDE_PATH => [
-      npg_qc_viewer->path_to( 'root', 'src' ),
-    ],
+  INCLUDE_PATH => [ npg_qc_viewer->path_to( 'root', 'src' ), ],
+  STAT_TTL     => 6000,
+  TRIM         => 1,
+  PRE_CHOMP    => 1,
+  POST_CHOMP   => 1,
 );
 
 1;
@@ -47,6 +48,8 @@ __END__
 =item Moose
 
 =item Catalyst::View::TT
+
+=item npg_qc_viewer
 
 =back
 
