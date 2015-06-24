@@ -5,7 +5,7 @@ release 58.4
     Improving query - using keys for tables.
  - Moving FileFinder functionality into SeqQC from seq_commons.
  - Cache of catalyst actions and uri in template.
- - Templates are configured to be checked for changes avery 10 hours.
+ - Templates are configured to be checked for changes every 10 hours.
  - Connections to database for fastqcheck are passed to model from 
     template. 
 
