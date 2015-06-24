@@ -38,11 +38,11 @@ sub class_name {
     my ($ref) = (ref $self) =~ /(\w*)$/smx;
     if ($ref =~ /^[[:upper:]]/xms) {
         if ($ref eq 'QXYield') {
-	    $ref = 'qX_yield';
+            $ref = 'qX_yield';
         } else {
             $ref =~ s/([[:lower:]])([[:upper:]])/$1_$2/gmxs;
             $ref = lc $ref;
-	}
+        }
     }
     return $ref;
 }

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 66;
+use Test::More tests => 69;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -275,6 +275,9 @@ my $num_plex_jsons = 44;
   is ($rs->search({human_split => 'all'})->count, 6, '6 bam flagstats records for target files');
   is ($rs->search({human_split => 'human'})->count, 2, '2 bam flagstats records for human files');
   is ($rs->search({human_split => 'phix'})->count, 1, '1 bam flagstats records for phix files');
+  is ($rs->search({subset => 'target'})->count, 6, '6 bam flagstats records for target files');
+  is ($rs->search({subset => 'human'})->count, 2, '2 bam flagstats records for human files');
+  is ($rs->search({subset => 'phix'})->count, 1, '1 bam flagstats records for phix files');
 }
 
 1;

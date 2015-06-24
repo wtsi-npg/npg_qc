@@ -15,6 +15,7 @@ use List::MoreUtils qw/none/;
 use npg_qc::Schema;
 use npg_tracking::util::types;
 use npg_qc::autoqc::role::result;
+use npg_qc::autoqc::results::bam_flagstats;
 
 with qw/MooseX::Getopt/;
 
@@ -121,6 +122,13 @@ sub _json2db{
     if ($class_name) {
       ($class_name, my $dbix_class_name) =
         npg_qc::autoqc::role::result->class_names($class_name);
+      if ($class_name eq 'bam_flagstats') { # need to get the subset/human_split field correctly
+                                            # if one of them is missing
+        my $module = 'npg_qc::autoqc::results::' . $class_name;
+        $values = decode_json($module->load($json_file)->freeze());
+        delete $values->{'__CLASS__'};
+      }
+
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
         my $rs = $self->schema->resultset($dbix_class_name);
         $rs->result_class->deflate_unique_key_components($values);
