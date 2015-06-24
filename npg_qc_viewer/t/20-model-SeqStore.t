@@ -26,7 +26,7 @@ foreach my $f (@files) {
 
 subtest 'Finding files on a single path' => sub {
   plan tests => 11;
- 
+
   my $ref = { position  => 1, id_run    => 1234,};
   my $f = npg_qc_viewer::Model::SeqStore->new();
   my $forward = $path . q[/1234_1.fastqcheck];

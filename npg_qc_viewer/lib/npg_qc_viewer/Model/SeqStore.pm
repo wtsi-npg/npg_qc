@@ -73,7 +73,7 @@ sub files {
   $ref->{'qc_schema'} = $self->qc_schema;
   $ref->{'db_lookup'} = $db_lookup;
   #Checking for locations (passed as array)
-  if (@sargs && ( ref $sargs[0] ) eq q[ARRAY] ) { 
+  if (@sargs && ( ref $sargs[0] ) eq q[ARRAY] ) {
     $ref->{'location'}  = $sargs[0];
   }
   $self->_add2cache($ref);
@@ -129,7 +129,7 @@ sub _get_file_paths {
   }
 
   return $fnames;
-} 
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
