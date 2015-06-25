@@ -3,16 +3,43 @@ use warnings;
 use Test::More tests => 47;
 use Test::Exception;
 use t::util;
+use Test::Warn;
+use File::Temp qw/tempdir/;
+use File::Path qw/make_path/;
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
 
+my $schemas;
 use_ok 'npg_qc_viewer::Controller::Checks';
-lives_ok { $util->test_env_setup()}  'test db created and populated';
+lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
 {
+  my $base = tempdir(UNLINK => 1);
+  my $path = $base . q[/archive];
+  my $run_folder = q[150621_MS6_04099_A_MS2023387-050V2];
+  make_path $path.q[/].$run_folder;
+  
+  my $npgqc = $schemas->{qc};
+  my $npg   = $schemas->{npg};
+  
+  my $values = { id_run               => 4099,
+                 actual_cycle_count   => 76,
+                 batch_id             => 4178,
+                 expected_cycle_count => 76,
+                 folder_name          => $run_folder,
+                 folder_path_glob     => $path, 
+                 id_instrument        => 30,
+                 id_instrument_format => 4,
+                 id_run_pair          => 0,
+                 is_paired            => 1,
+                 priority             => 1,
+                 team                 => '"joint"'};
+  my $row = $npg->resultset("Run")->create($values); #Insert new entity
+  $row->set_tag(7, 'staging');
+  
   my @urls = ();
   push @urls,  '/checks';
   push @urls,  '/checks/about';
