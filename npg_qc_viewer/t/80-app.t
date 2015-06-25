@@ -1,11 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests => 44;
+use Test::More tests => 54;
 use Test::Exception;
 use HTTP::Headers;
 use HTTP::Request::Common;
 use XML::LibXML;
 use Carp;
+use Test::Warn;
+use List::MoreUtils qw ( each_array );
 
 use t::util;
 
@@ -49,7 +51,7 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 
   my @urls = ();
 
-  push @urls, q[http://localhost/checks];
+  push @urls, q[http://localhost/checks]; 
   push @urls, q[http://localhost/checks/about];
   my $project_id = 378;
   push @urls, qq[http://localhost/checks/studies/$project_id];
@@ -65,12 +67,32 @@ local $ENV{TEST_DIR}        = $util->staging_path;
   push @urls, qq[http://localhost/checks/runs/$run_id];
   push @urls, qq[http://localhost/checks/runs-from-staging/$run_id];
   push @urls, q[http://localhost/checks/path?path=t/data/results];
+  
+  my $warn_id            = qr/Use of uninitialized value \$id in exists/;
+  my $warn_no_paths      = qr/No paths to run folder/; 
+  my $warn_command       = qr/Use of uninitialized value \$command in pattern match/;
+  
+  my @warnings = ();
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [$warn_command, $warn_command, $warn_command, $warn_command, $warn_id,];
 
-  foreach my $url (@urls) {
-
+  my $it = each_array( @urls, @warnings );
+  while ( my ($url, $warning_set) = $it->() ) {
     my $request = GET($url);
     my $responce;
-    ok( $responce = request($request),  qq[request to $url] );
+    warnings_like{
+      ok( $responce = request($request),  qq[request to $url] )
+    } $warning_set ,
+       'Expected warning';
+    
     ok( $responce->is_success, qq[request to $url is successful]);
     is( $responce->content_type, q[text/html], 'HTML content type');
     my $content = $responce->content();
