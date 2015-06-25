@@ -27,6 +27,7 @@ npg_qc_viewer
 =cut
 
 __PACKAGE__->config(
+  TEMPLATE_EXTENSION => '.tt2',
   INCLUDE_PATH => [ npg_qc_viewer->path_to( 'root', 'src' ), ],
   STAT_TTL     => 6000,
   TRIM         => 1,
