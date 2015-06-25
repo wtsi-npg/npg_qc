@@ -87,15 +87,15 @@ local $ENV{TEST_DIR}        = $util->staging_path;
   my $it = each_array( @urls, @warnings );
   while ( my ($url, $warning_set) = $it->() ) {
     my $request = GET($url);
-    my $responce;
+    my $response;
     warnings_like{
-      ok( $responce = request($request),  qq[request to $url] )
+      ok( $response = request($request),  qq[request to $url] )
     } $warning_set ,
        'Expected warning';
     
-    ok( $responce->is_success, qq[request to $url is successful]);
-    is( $responce->content_type, q[text/html], 'HTML content type');
-    my $content = $responce->content();
+    ok( $response->is_success, qq[request to $url is successful]);
+    is( $response->content_type, q[text/html], 'HTML content type');
+    my $content = $response->content();
     eval { $xml_parser->parse_html_string($content); };
 
     ok ( (!ref($@) || ($@->message() =~ /Content\ error\ in\ the\ external\ subset/)), 'XML parsed OK');
