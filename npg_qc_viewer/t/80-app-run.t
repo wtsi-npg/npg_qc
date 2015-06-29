@@ -32,14 +32,11 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   
   foreach my $id_run ( 4950 ) {
     my $values = { id_run               => $id_run,
-                   actual_cycle_count   => 76,
                    batch_id             => 4178,
-                   expected_cycle_count => 76,
                    folder_name          => $run_folder,
                    folder_path_glob     => $path, 
                    id_instrument        => 30,
                    id_instrument_format => 4,
-                   id_run_pair          => 0,
                    is_paired            => 1,
                    priority             => 1,
                    team                 => '"joint"' 

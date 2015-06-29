@@ -27,14 +27,11 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   my $npg   = $schemas->{npg};
   
   my $values = { id_run               => 4099,
-                 actual_cycle_count   => 76,
                  batch_id             => 4178,
-                 expected_cycle_count => 76,
                  folder_name          => $run_folder,
                  folder_path_glob     => $path, 
                  id_instrument        => 30,
                  id_instrument_format => 4,
-                 id_run_pair          => 0,
                  is_paired            => 1,
                  priority             => 1,
                  team                 => '"joint"'};

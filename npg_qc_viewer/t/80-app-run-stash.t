@@ -29,14 +29,11 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
   my $npg   = $schemas->{npg};
   
   my $values = { id_run               => 4099,
-                 actual_cycle_count   => 76,
                  batch_id             => 4178,
-                 expected_cycle_count => 76,
                  folder_name          => $run_folder,
                  folder_path_glob     => $path, 
                  id_instrument        => 30,
                  id_instrument_format => 4,
-                 id_run_pair          => 0,
                  is_paired            => 1,
                  priority             => 1,
                  team                 => '"joint"'};
