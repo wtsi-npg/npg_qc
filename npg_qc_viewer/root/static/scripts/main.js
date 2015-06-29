@@ -7,12 +7,14 @@ require.config({
         insert_size_lib: 'bower_components/bcviz/src/qcjson/insertSizeHistogram',
         adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
         mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
+        unveil: 'bower_components/jquery-unveil/jquery.unveil',
     },
     shim: {
         d3: {
             //makes d3 available automatically for all modules
             exports: 'd3'
-        }
+        },
+        unveil: ["jquery"]
     }
 });
 
@@ -30,24 +32,26 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib'], 
-function( manual_qc,  collapse, insert_size, adapter, mismatch) {
+require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil'],
+function( manual_qc,  collapse, insert_size, adapter, mismatch, unveil) {
 
   collapse.init();
-  
+
+  $("img").unveil(2000);
+
   //Required to show error messages from the mqc process.
-  $("#results_summary").before('<ul id="ajax_status"></ul>'); 
-  
+  $("#results_summary").before('<ul id="ajax_status"></ul>');
+
   //Preload images for working icon
   $('<img/>')[0].src = "/static/images/waiting.gif";
   //Preload rest of icons
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
   $('<img/>')[0].src = "/static/images/padlock.png";
-  
+
   //Read information about lanes from page.
-  var lanes = []; //Lanes without previous QC, blank BG 
-  var lanesWithBG = []; //Lanes with previous QC, BG with colour 
+  var lanes = []; //Lanes without previous QC, blank BG
+  var lanesWithBG = []; //Lanes with previous QC, BG with colour
   //Select non-qced lanes.
   $('.lane_mqc_control').each(function (i, obj) {
     obj = $(obj);
@@ -59,7 +63,7 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
       lanes.push(parent);
     }
   });
-  
+
   // Getting the run_id from the title of the page using the qc part too.
   var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
   //If id_run //TODO move to object.
@@ -72,9 +76,9 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
       var control = new NPG.QC.RunMQCControl(prodConfiguration);
       var mqc_run_data = jqxhr.responseJSON;
       if(control.isStateForMQC(mqc_run_data)) {
-        var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data); 
+        var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);
         if(DWHMatch.outcome) {
-          control.initQC(jqxhr.responseJSON, lanes, 
+          control.initQC(jqxhr.responseJSON, lanes,
               function (mqc_run_data, runMQCControl, lanes) {
                 //Show working icons
                 for(var i = 0; i < lanes.length; i++) {
@@ -83,18 +87,18 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
                     $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
                   });
                 }
-                runMQCControl.prepareLanes(mqc_run_data, lanes); 
+                runMQCControl.prepareLanes(mqc_run_data, lanes);
               },
-              function () { //There is no mqc so I just remove the working image and padding for anchor 
-                $('.lane_mqc_working').empty(); 
-              }  
-          );  
+              function () { //There is no mqc so I just remove the working image and padding for anchor
+                $('.lane_mqc_working').empty();
+              }
+          );
         } else {
           $("#ajax_status").append("<li class='failed_mqc'>"
               + "Conflicting data when comparing Data Ware House and Manual QC databases for run: "
               + id_run
-              + ", lane: " 
-              + DWHMatch.position 
+              + ", lane: "
+              + DWHMatch.position
               + ". Displaying of QC widgets aborted.</li>");
           //Clear progress icon
           $('.lane_mqc_working').empty();
@@ -109,13 +113,13 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
       $('.lane_mqc_working').empty();
     });
   }
-  
-  jQuery('.bcviz_insert_size').each(function(i) { 
+
+  jQuery('.bcviz_insert_size').each(function(i) {
     d = jQuery(this).data('check');
     w = jQuery(this).data('width') || 650;
     h = jQuery(this).data('height') || 300;
     t = jQuery(this).data('title') || _getTitle('Insert Sizes : ',d);
-    chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
+    chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
     if (chart != null) {
       if (chart.svg != null) {
         div = document.createElement("div");
@@ -125,15 +129,15 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
       }
     }
   });
-  
-  jQuery('.bcviz_adapter').each(function(i) { 
+
+  jQuery('.bcviz_adapter').each(function(i) {
     d = jQuery(this).data('check');
     h = jQuery(this).data('height') || 200;
     t = jQuery(this).data('title') || _getTitle('Adapter Start Count : ', d);
 
     // override width to ensure two graphs can fit side by side
     w = jQuery(this).parent().width() / 2 - 40;
-    chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
+    chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
     fwd_div = document.createElement("div");
     if (chart != null && chart.svg_fwd != null) { jQuery(fwd_div).append( function() { return chart.svg_fwd.node(); } ); }
     jQuery(fwd_div).addClass('chart_left');
@@ -143,14 +147,14 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch) {
     jQuery(this).append(fwd_div,rev_div);
   });
 
-  jQuery('.bcviz_mismatch').each(function(i) { 
+  jQuery('.bcviz_mismatch').each(function(i) {
     d = jQuery(this).data('check');
     h = jQuery(this).data('height');
     t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
 
     // override width to ensure two graphs can fit side by side
     w = jQuery(this).parent().width() / 2 - 90;
-    chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t}); 
+    chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
     fwd_div = document.createElement("div");
     if (chart != null && chart.svg_fwd != null) { jQuery(fwd_div).append( function() { return chart.svg_fwd.node(); } ); }
     jQuery(fwd_div).addClass('chart_left');
