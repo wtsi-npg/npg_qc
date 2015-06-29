@@ -1,11 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 47;
+use Test::More tests => 71;
 use Test::Exception;
 use t::util;
 use Test::Warn;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
+use List::MoreUtils qw ( each_array );
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
@@ -56,8 +57,32 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   push @urls,  '/checks/libraries?name=AC0001C+1';
   push @urls,  '/checks/studies/544';
 
-  foreach my $url (@urls) {
-    ok( request($url)->is_success, qq[$url request succeeds] );
+  my $warn_id            = qr/Use of uninitialized value \$id in exists/;
+  my $warn_no_paths      = qr/No paths to run folder/; 
+  my $warn_recalibrated  = qr/Could not find usable recalibrated directory/; 
+  
+  my @warnings = ();
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [{carped => $warn_no_paths},$warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, {carped => $warn_recalibrated}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+
+  my $it = each_array( @urls, @warnings );
+  while ( my ($url, $warning_set) = $it->() ) {
+    warnings_like {
+      ok( request($url)->is_success, qq[$url request succeeds] )
+    } $warning_set , 'Expected warning';
+    
   }
 }
 
@@ -72,11 +97,26 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   push @urls,  '/checks/studies/dfsfs';
   push @urls,  '/checks/runs-from-staging/dfsfs';
 
-  my $responce;
-  foreach my $url (@urls) {
-    lives_ok { $responce = request($url) } qq[$url request] ;
-    ok( $responce->is_error, qq[responce is an error] );
-    is( $responce->code, 404, 'error code is 404' );
+
+  my $warn_id            = qr/Use of uninitialized value \$id in exists/;
+  my @warnings = ();
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+
+  my $it = each_array( @urls, @warnings );
+  my $response;
+  while ( my ($url, $warning_set) = $it->() ) {
+    warnings_like {
+      lives_ok { $response = request($url) } qq[$url request] 
+    } $warning_set , 'Expected warning';
+    ok( $response->is_error, qq[responce is an error] );
+    is( $response->code, 404, 'error code is 404' );
   }
 }
 
@@ -84,11 +124,20 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   my @urls = ();
   push @urls,  '/checks/samples/1';
   push @urls,  '/checks/studies/25';
-  my $responce;
-  foreach my $url (@urls) {
-    lives_ok { $responce = request($url) } qq[$url request] ;
-    ok( $responce->is_error, qq[responce is an error] );
-    is( $responce->code, 404, 'error code is 404' );
+  
+  my $warn_id            = qr/Use of uninitialized value \$id in exists/;
+  my @warnings = ();
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  
+  my $it = each_array( @urls, @warnings );
+  my $response;
+  while ( my ($url, $warning_set) = $it->() ) {
+    warnings_like {
+      lives_ok { $response = request($url) } qq[$url request] 
+    } $warning_set , 'Expected warning';
+    ok( $response->is_error, qq[responce is an error] );
+    is( $response->code, 404, 'error code is 404' );
   }
 }
 
