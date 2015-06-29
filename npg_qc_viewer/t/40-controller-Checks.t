@@ -94,27 +94,15 @@ my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
   push @urls,  '/checks/studies/dfsfs';
   push @urls,  '/checks/runs-from-staging/dfsfs';
 
-  my $response;
-  foreach my $url (@urls) {
-    warning_like {
-      lives_ok { $response = request($url) } qq[$url request] 
-    } $warn_id , 'Expected warning';
-    ok( $response->is_error, qq[responce is an error] );
-    is( $response->code, 404, 'error code is 404' );
-  }
-}
-
-{
-  my @urls = ();
   push @urls,  '/checks/samples/1';
   push @urls,  '/checks/studies/25';
-  
+
   my $response;
   foreach my $url (@urls) {
     warning_like {
       lives_ok { $response = request($url) } qq[$url request] 
     } $warn_id , 'Expected warning';
-    ok( $response->is_error, qq[responce is an error] );
+    ok( $response->is_error, qq[response is an error] );
     is( $response->code, 404, 'error code is 404' );
   }
 }
