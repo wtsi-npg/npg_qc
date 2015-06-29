@@ -17,6 +17,10 @@ use_ok 'npg_qc_viewer::Controller::Checks';
 lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
+my $warn_id            = qr/Use of uninitialized value \$id in exists/;
+my $warn_no_paths      = qr/No paths to run folder/; 
+my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
+
 {
   my $base = tempdir(UNLINK => 1);
   my $path = $base . q[/archive];
@@ -52,11 +56,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   push @urls,  '/checks/path?path=t/data/staging/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/qc';
   push @urls,  '/checks/samples/3055';
   push @urls,  '/checks/libraries?name=AC0001C+1';
-  push @urls,  '/checks/studies/544';
-
-  my $warn_id            = qr/Use of uninitialized value \$id in exists/;
-  my $warn_no_paths      = qr/No paths to run folder/; 
-  my $warn_recalibrated  = qr/Could not find usable recalibrated directory/; 
+  push @urls,  '/checks/studies/544'; 
   
   my @warnings = ();
   push @warnings, [$warn_id,];
@@ -94,24 +94,11 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   push @urls,  '/checks/studies/dfsfs';
   push @urls,  '/checks/runs-from-staging/dfsfs';
 
-
-  my $warn_id            = qr/Use of uninitialized value \$id in exists/;
-  my @warnings = ();
-  push @warnings, [$warn_id,];
-  push @warnings, [$warn_id,];
-  push @warnings, [$warn_id,];
-  push @warnings, [$warn_id,];
-  push @warnings, [$warn_id,];
-  push @warnings, [$warn_id,];
-  push @warnings, [$warn_id,];
-  push @warnings, [$warn_id,];
-
-  my $it = each_array( @urls, @warnings );
   my $response;
-  while ( my ($url, $warning_set) = $it->() ) {
-    warnings_like {
+  foreach my $url (@urls) {
+    warning_like {
       lives_ok { $response = request($url) } qq[$url request] 
-    } $warning_set , 'Expected warning';
+    } $warn_id , 'Expected warning';
     ok( $response->is_error, qq[responce is an error] );
     is( $response->code, 404, 'error code is 404' );
   }
@@ -122,17 +109,11 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   push @urls,  '/checks/samples/1';
   push @urls,  '/checks/studies/25';
   
-  my $warn_id            = qr/Use of uninitialized value \$id in exists/;
-  my @warnings = ();
-  push @warnings, [$warn_id,];
-  push @warnings, [$warn_id,];
-  
-  my $it = each_array( @urls, @warnings );
   my $response;
-  while ( my ($url, $warning_set) = $it->() ) {
-    warnings_like {
+  foreach my $url (@urls) {
+    warning_like {
       lives_ok { $response = request($url) } qq[$url request] 
-    } $warning_set , 'Expected warning';
+    } $warn_id , 'Expected warning';
     ok( $response->is_error, qq[responce is an error] );
     is( $response->code, 404, 'error code is 404' );
   }
