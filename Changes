@@ -7,7 +7,9 @@ release 58.4
  - Cache of catalyst actions and uri in template.
  - Templates are configured to be checked for changes every 10 hours.
  - Connections to database for fastqcheck are passed to model from 
-    template. 
+    template.
+ - Test modules catch/test for warnings for unitilized ids and for 
+    cases where it was not possible to locate a folder.
 
 release 58.3.1
  - Updating Readme in npg_qc_viewer for changes in deploy procedure.
