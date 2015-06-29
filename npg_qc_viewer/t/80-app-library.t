@@ -1,11 +1,16 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Test::Exception;
 use Test::WWW::Mechanize::Catalyst;
 use Test::Warn;
 
 use t::util;
+
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
+} 
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
@@ -22,8 +27,7 @@ my $mech;
 {
   my $lib_name = 'NA18545pd2a 1';
   my $url = q[http://localhost/checks/libraries?name=] . $lib_name;
-  warnings_like{$mech->get_ok($url)} [qr/No paths to run folder found/, 
-                                      qr/Use of uninitialized value \$id in exists/], 
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/, 
                                       'Expected warning for runfolder location';
   $mech->title_is(q[Libraries: 'NA18545pd2a 1']);
   $mech->content_contains($lib_name);
