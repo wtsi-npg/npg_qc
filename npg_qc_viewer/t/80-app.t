@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 54;
+use Test::More tests => 55;
 use Test::Exception;
 use HTTP::Headers;
 use HTTP::Request::Common;
@@ -10,6 +10,11 @@ use Test::Warn;
 use List::MoreUtils qw ( each_array );
 
 use t::util;
+
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
+}
 
 # programmatically adding break points $DB::single = 1;
 # run under the debugger perl -Ilib -d t/test.t
@@ -69,19 +74,18 @@ local $ENV{TEST_DIR}        = $util->staging_path;
   push @urls, q[http://localhost/checks/path?path=t/data/results];
   
   my $warn_id            = qr/Use of uninitialized value \$id in exists/;
-  my $warn_no_paths      = qr/No paths to run folder/; 
   my $warn_command       = qr/Use of uninitialized value \$command in pattern match/;
   
   my @warnings = ();
   push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
   push @warnings, [$warn_command, $warn_command, $warn_command, $warn_command, $warn_id,];
 
   my $it = each_array( @urls, @warnings );
