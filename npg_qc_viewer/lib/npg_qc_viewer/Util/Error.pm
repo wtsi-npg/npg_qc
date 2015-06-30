@@ -1,6 +1,7 @@
 package npg_qc_viewer::Util::Error;
 
 use Moose::Role;
+use namespace::autoclean;
 use Carp;
 use Readonly;
 
@@ -85,6 +86,9 @@ sub parse_error {
   return ($message, $error_code);
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -97,6 +101,8 @@ __END__
 =over
 
 =item Moose::Role
+
+=item namespace::autoclean
 
 =item Carp
 

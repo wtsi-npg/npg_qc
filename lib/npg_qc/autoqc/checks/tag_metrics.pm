@@ -8,6 +8,7 @@ package npg_qc::autoqc::checks::tag_metrics;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use MooseX::ClassAttribute;
 use Carp;
 use Readonly;
@@ -181,6 +182,7 @@ override 'execute' => sub  {
 };
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -194,6 +196,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::ClassAttribute
 

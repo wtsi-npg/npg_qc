@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::tag_decode_stats;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::tag_decode_stats);
@@ -49,6 +50,7 @@ has 'errors_good'          =>  (isa => 'Maybe[HashRef]',
                                );
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -73,6 +75,8 @@ __END__
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 DEPENDENCIES
+
+=item namespace::autoclean
 
 =over
 

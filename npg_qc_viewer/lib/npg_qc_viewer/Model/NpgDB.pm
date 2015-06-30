@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::NpgDB;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
@@ -117,6 +118,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 

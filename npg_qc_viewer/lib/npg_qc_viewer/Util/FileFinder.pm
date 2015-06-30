@@ -1,6 +1,7 @@
 package npg_qc_viewer::Util::FileFinder;
 
 use Moose;
+use namespace::autoclean;
 use MooseX::StrictConstructor;
 use Carp;
 use File::Spec::Functions qw(catfile);
@@ -105,6 +106,7 @@ sub _build_files {
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -155,6 +157,8 @@ as keys and, in case of successful file system search, file paths as values
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::StrictConstructor
 

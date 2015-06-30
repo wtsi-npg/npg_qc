@@ -20,6 +20,18 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
+=head1 ADDITIONAL CLASSES USED
+
+=over 4
+
+=item * L<namespace::autoclean>
+
+=back
+
+=cut
+
+use namespace::autoclean;
+
 =head1 COMPONENTS LOADED
 
 =over 4
@@ -138,8 +150,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:53:16
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AnE0fpm6ByqDGqlRS6/1nA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yp0Z5RWtf5JyeRvWEJ5uGA
 
 our $VERSION = '0';
 
@@ -158,7 +170,9 @@ sub is_final_accepted {
   return $self->is_final_outcome && $self->is_accepted;
 }
 
+no Moose;
 __PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -199,6 +213,8 @@ Catalog for manual MQC statuses.
 =item warnings
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::NonMoose
 

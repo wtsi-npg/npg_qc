@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::GenotypeCheck;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 use JSON;
 use File::Slurp;
 
@@ -133,6 +134,8 @@ __END__
 =item Carp
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model
 

@@ -6,6 +6,7 @@
 package npg_qc::autoqc::db_loader;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use JSON;
 use Try::Tiny;
@@ -212,6 +213,8 @@ npg_qc::autoqc::db_loader
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::Getopt
 

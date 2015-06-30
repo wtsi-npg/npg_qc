@@ -1,6 +1,7 @@
 package npg_qc_viewer::Model::SeqStore;
 
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 use npg_qc_viewer::Util::FileFinder;
@@ -164,6 +165,8 @@ __END__
 =item Readonly
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model::Factory::PerRequest
 

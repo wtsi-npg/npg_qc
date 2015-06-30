@@ -1,6 +1,7 @@
 package npg_qc_viewer::Controller::Data;
 
 use Moose;
+use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -137,6 +138,9 @@ sub _reformat_trck_results {
 	return $out;
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -149,6 +153,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Controller
 

@@ -9,6 +9,7 @@ package npg_qc::autoqc::checks::gc_bias;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Fatal qw(open close);
@@ -364,6 +365,12 @@ npg_qc::autoqc::checks::gc_bias - assess the degree of gc_bias in reads
 =head1 BUGS AND LIMITATIONS
 
 =head1 DEPENDENCIES
+
+=over
+
+=item namespace::autoclean
+
+=back
 
 =head1 AUTHOR
 

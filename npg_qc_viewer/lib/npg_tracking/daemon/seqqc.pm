@@ -1,6 +1,7 @@
 package npg_tracking::daemon::seqqc;
 
 use Moose;
+use namespace::autoclean;
 use Readonly;
 use FindBin qw($Bin);
 use Cwd 'abs_path';
@@ -33,6 +34,7 @@ override '_build_env_vars' => sub {
 };
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -59,6 +61,8 @@ Metadata for a daemon that starts up a Catalyst server for the SeqQC application
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 

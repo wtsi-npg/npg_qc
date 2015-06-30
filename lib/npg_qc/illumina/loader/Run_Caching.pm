@@ -5,6 +5,7 @@
 package npg_qc::illumina::loader::Run_Caching;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw{-no_match_vars};
 use npg_qc::util;
@@ -125,7 +126,11 @@ sub _log {
   return;
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;
+
 __END__
 
 =head1 NAME
@@ -160,10 +165,21 @@ npg_qc::illumina::loader::Run_Caching
 
 =head1 DEPENDENCIES
 
-strict
-warnings
-Carp
-English
+=over
+
+=item Moose
+
+=item namespace::autoclean
+
+=item strict
+
+=item warnings
+
+=item Carp
+
+=item English
+
+=back
 
 =head1 INCOMPATIBILITIES
 

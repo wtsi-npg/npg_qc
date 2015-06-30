@@ -1,6 +1,7 @@
 package npg_qc_viewer::Util::ExtendedHttpStatus;
 
 use Moose::Role;
+use namespace::autoclean;
 use Carp;
 use Readonly;
 use Params::Validate;
@@ -37,6 +38,9 @@ sub status_internal_server_error {
   $self->_set_entity( $c, { error => $p{'message'} } );
   return 1;
 }
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -75,6 +79,8 @@ subs for extra response codes.
 =over
 
 =item Moose::Role
+
+=item namespace::autoclean
 
 =item Carp
 

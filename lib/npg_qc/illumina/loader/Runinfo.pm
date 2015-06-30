@@ -5,6 +5,7 @@
 package npg_qc::illumina::loader::Runinfo;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw{-no_match_vars};
 use Readonly;
@@ -110,6 +111,7 @@ sub run_all {
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -120,6 +122,8 @@ __END__
 =head1 DEPENDENCIES
 
 =over
+
+=item namespace::autoclean
 
 =item Moose
 

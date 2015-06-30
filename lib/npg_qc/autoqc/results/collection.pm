@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::collection;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use MooseX::AttributeHelpers;
 use Carp;
 use English qw(-no_match_vars);
@@ -557,6 +558,8 @@ __END__
 =item warnings
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::AttributeHelpers
 

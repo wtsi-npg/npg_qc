@@ -1,6 +1,7 @@
 package npg_qc_viewer::View::TT;
 
 use Moose;
+use namespace::autoclean;
 use npg_qc_viewer;
 
 BEGIN { extends 'Catalyst::View::TT' }
@@ -35,6 +36,9 @@ __PACKAGE__->config(
   POST_CHOMP   => 1,
 );
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -47,6 +51,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::View::TT
 

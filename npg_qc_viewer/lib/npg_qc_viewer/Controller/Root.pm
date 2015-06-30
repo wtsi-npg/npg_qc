@@ -1,6 +1,7 @@
 package npg_qc_viewer::Controller::Root;
 
 use Moose;
+use namespace::autoclean;
 use Readonly;
 use Try::Tiny;
 
@@ -180,6 +181,8 @@ sub detach2error {
     return;
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -197,6 +200,8 @@ __END__
 =item Try::Tiny
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Controller
 

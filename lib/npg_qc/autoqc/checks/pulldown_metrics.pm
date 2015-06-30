@@ -6,6 +6,7 @@
 package npg_qc::autoqc::checks::pulldown_metrics;
 
 use Moose;
+use namespace::autoclean;
 use English qw( -no_match_vars );
 use Carp;
 use File::Spec::Functions qw( catdir );
@@ -265,6 +266,8 @@ npg_qc::autoqc::checks::pulldown_metrics - a QC check to determine whether the p
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item English
 

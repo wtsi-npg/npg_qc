@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::genotype;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::genotype);
@@ -39,6 +40,7 @@ has alternate_relaxed_matches => ( is => 'rw', isa => 'ArrayRef', );
 has alternate_relaxed_match_count  => ( is => 'rw', isa => 'Int', );
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -80,6 +82,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =back
 

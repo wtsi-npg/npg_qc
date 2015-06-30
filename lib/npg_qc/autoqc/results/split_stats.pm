@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::split_stats;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 
@@ -90,6 +91,7 @@ has 'num_not_aligned_merge'=>(isa            => 'Maybe[Int]',
 		                       );
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -140,12 +142,23 @@ npg_qc::autoqc::results::split_stats
 
 =head1 DEPENDENCIES
 
-strict
-warnings
-Carp
-English
-Moose
-npg_qc::autoqc::results::result
+=over
+
+=item strict
+
+=item warnings
+
+=item Carp
+
+=item English
+
+=item Moose
+
+=item namespace::autoclean
+
+=item npg_qc::autoqc::results::result
+
+=back
 
 =head1 INCOMPATIBILITIES
 

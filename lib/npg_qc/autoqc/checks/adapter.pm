@@ -7,6 +7,7 @@ package npg_qc::autoqc::checks::adapter;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Perl6::Slurp;
@@ -365,6 +366,8 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

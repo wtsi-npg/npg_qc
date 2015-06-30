@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::upstream_tags;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
@@ -36,6 +37,7 @@ has [ qw/ instrument_name
                                          );
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -69,6 +71,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 

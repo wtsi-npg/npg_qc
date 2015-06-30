@@ -8,6 +8,7 @@ package npg_qc::autoqc::checks::tags_reporters;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use Data::Dumper;
 use File::Basename;
@@ -424,6 +425,12 @@ npg_qc::autoqc::checks::tags_reporters
 =head1 BUGS AND LIMITATIONS
 
 =head1 DEPENDENCIES
+
+=over
+
+=item namespace::autoclean
+
+=back
 
 =head1 AUTHOR
 

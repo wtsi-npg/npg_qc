@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::tags_reporters;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
@@ -30,6 +31,7 @@ has [ qw/ lane_bam_file
                                          );
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -60,6 +62,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 

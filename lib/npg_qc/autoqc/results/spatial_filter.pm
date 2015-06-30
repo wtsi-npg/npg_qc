@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::spatial_filter;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use Perl6::Slurp;
 
@@ -50,6 +51,7 @@ sub parse_output{
 
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -79,6 +81,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item npg_qc::autoqc::results::result
 

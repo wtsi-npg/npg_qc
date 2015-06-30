@@ -6,6 +6,7 @@
 package npg_qc::autoqc::checks::upstream_tags;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Fatal qw(open close);
@@ -928,6 +929,12 @@ npg_qc::autoqc::checks::upstream_tags
 =head1 BUGS AND LIMITATIONS
 
 =head1 DEPENDENCIES
+
+=over
+
+=item namespace::autoclean
+
+=back
 
 =head1 AUTHOR
 

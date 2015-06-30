@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::UpstreamTagsCheck;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Model' }
 
@@ -54,6 +55,8 @@ __END__
 =item Carp
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model
 

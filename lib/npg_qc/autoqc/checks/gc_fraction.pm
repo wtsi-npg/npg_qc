@@ -8,6 +8,7 @@ package npg_qc::autoqc::checks::gc_fraction;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Readonly;
@@ -193,6 +194,7 @@ sub _gc_percent {
 
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -213,6 +215,8 @@ __END__
 =item Readonly
 
 =item Moose
+
+=item namespace::autoclean
 
 =item File::Spec::Functions
 

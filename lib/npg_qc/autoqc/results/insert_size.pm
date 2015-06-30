@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::insert_size;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Readonly;
@@ -249,6 +250,7 @@ has 'norm_fit_modes'     => (isa      => 'Maybe[ArrayRef]',
 
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -262,6 +264,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

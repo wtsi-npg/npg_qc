@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::Visuals::Fastqcheck;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 use GD::Image;
 use Math::Gradient;
 
@@ -226,6 +227,8 @@ __END__
 =item Carp
 
 =item Moose
+
+=item namespace::autoclean
 
 =item GD::Image
 

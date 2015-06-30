@@ -8,6 +8,7 @@ package npg_qc::autoqc::checks::spatial_filter;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -62,6 +63,12 @@ npg_qc::autoqc::checks::spatial_filter - parse err stream from spatial_filter -a
 =head1 BUGS AND LIMITATIONS
 
 =head1 DEPENDENCIES
+
+=over
+
+=item namespace::autoclean
+
+=back
 
 =head1 AUTHOR
 

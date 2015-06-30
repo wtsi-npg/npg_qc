@@ -222,6 +222,7 @@ my $extended_requires = {
                 'MooseX::NonMoose'                => 0,
                 'MooseX::Storage'                 => 0,
                 'MooseX::StrictConstructor'       => '0.08',
+                'namespace::autoclean'            => 0,
                 'Parallel::ForkManager'           => 0,
                 'PDL::Core'                       => 0,
                 'PDL::Lite'                       => 0,

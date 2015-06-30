@@ -6,6 +6,7 @@
 package npg_qc::illumina::loader::Cluster_Density;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw{-no_match_vars};
 use Readonly;
@@ -243,6 +244,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

@@ -6,6 +6,7 @@
 package npg_qc::autoqc::checks::check;
 
 use Moose;
+use namespace::autoclean;
 use MooseX::ClassAttribute;
 use MooseX::Aliases;
 use Carp;
@@ -279,6 +280,7 @@ sub overall_pass {
 
 no MooseX::ClassAttribute;
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -292,6 +294,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::ClassAttribute
 

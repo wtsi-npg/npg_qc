@@ -6,6 +6,7 @@
 package npg_qc::autoqc::results::pulldown_metrics;
 
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
@@ -208,6 +209,7 @@ has 'interval_files_identical' =>      (isa        => 'Maybe[Bool]',
 		                             );
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -222,6 +224,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 

@@ -12,6 +12,7 @@ use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
 use JSON;
 use Moose;
+use namespace::autoclean;
 use Moose::Util::TypeConstraints;
 use Readonly;
 
