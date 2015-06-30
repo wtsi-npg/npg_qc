@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests => 63;
+use Test::More tests => 65;
 use Test::Exception;
 use HTTP::Request::Common;
 use t::util;
+use Test::Warn;
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
@@ -25,7 +26,10 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
 {
   my $response;
-  lives_ok { $response = request(POST '/mqc/update_outcome' ) } 'post request lives';
+  warning_like{
+    lives_ok { $response = request(POST '/mqc/update_outcome' ) } 'post request lives';
+  } qr[uninitialized value \$id in exists],
+    'Expected warning';
   ok( $response->is_error, qq[response is an error] );
   is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
@@ -131,6 +135,10 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   ok($response->is_error, q[get_all_outcomes response is error]);
   is( $response->code, 400, 'error code is 400' );
   like ($response->content, qr/Run id should be defined/, 'correct error message');
+
+  lives_ok { $response = request(HTTP::Request->new(
+    'GET', '/mqc/get_all_outcomes?id_run=1234')) }
+    'get current outcome lives';
 
   lives_ok { $response = request(HTTP::Request->new(
    'GET', '/mqc/get_all_outcomes?id_run=1234')) }

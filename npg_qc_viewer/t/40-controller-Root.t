@@ -1,12 +1,15 @@
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More tests => 27;
 use Test::Exception;
 use t::util;
+use Test::Warn;
 
 my $util = t::util->new(db_connect => 0);
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
+
+my $warning_id = qr[uninitialized value \$id in exists];
 
 {
   use_ok 'Catalyst::Test', 'npg_qc_viewer';
@@ -17,7 +20,10 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 {
   my $url = '/autocrud/site/admin';
   my $response;
-  lives_ok { $response = request($url) }  qq[$url request] ;
+  warnings_like{
+    lives_ok { $response = request($url) }  qq[$url request]
+  } [$warning_id, $warning_id],
+    'Expected warning';
   ok( $response->is_error, q[responce is an error] );
   is( $response->code, 401, q[error code is 401] );
   like ($response->content, qr/Login failed/, 'please log in error');
@@ -27,7 +33,10 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 {
   my $url = '/autocrud/site/admin?user=dog&password=known';
   my $response;
-  lives_ok { $response = request($url) }  qq[$url request] ;
+  warning_like{
+    lives_ok { $response = request($url) }  qq[$url request]
+  } $warning_id,
+    'Expected warning';
   ok( $response->is_error, q[responce is an error] );
   is( $response->code, 401, q[error code is 401] );
   like ($response->content, qr/Login failed/, 'login failed error');
@@ -47,7 +56,10 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 {
   my $url = '/autocrud/site/admin?user=dog&password=secret@realm=wrong';
   my $response;
-  lives_ok { $response = request($url) }  qq[$url request] ;
+  warning_like{
+    lives_ok { $response = request($url) }  qq[$url request]
+  } $warning_id,
+    'Expected warning';
   ok( $response->is_error, q[responce is an error] );
   is( $response->code, 401, q[error code is 401, ie authorisation was OK] );
   like ($response->content, qr/Login failed/, 'login failed error');
