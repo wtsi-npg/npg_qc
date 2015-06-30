@@ -76,11 +76,11 @@ __END__
 
 =head1 DEPENDENCIES
 
-=item namespace::autoclean
-
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item npg_qc::autoqc::results::result
 

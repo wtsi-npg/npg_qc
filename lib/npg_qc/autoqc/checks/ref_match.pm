@@ -424,7 +424,11 @@ Needs up to 2.5Gb of Memory reserved when submitted to LSF.
 
 =head1 DEPENDENCIES
 
+=over
+
 =item namespace::autoclean
+
+=back
 
 =head1 BUGS AND LIMITATIONS
 
