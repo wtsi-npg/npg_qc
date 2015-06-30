@@ -1,5 +1,5 @@
 [%-
-  fnames = c.model('SeqStore', {qc_schema => c.model('NpgQcDB')}).files(util.inflate_rpt_key(lane_key), db_lookup, path_list);
+  fnames = c.model('SeqStore', {qc_schema => c.model('NpgQcDB').schema, npg_tracking_schema => c.model('NpgDB').schema}).files(util.inflate_rpt_key(lane_key), db_lookup, path_list);
   IF fnames.size;
     use_db = fnames.db_lookup;
     fnames.delete('db_lookup');

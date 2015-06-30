@@ -1,6 +1,7 @@
 package npg_qc_viewer::Util::FileFinder;
 
 use Moose;
+use MooseX::StrictConstructor;
 use Carp;
 use File::Spec::Functions qw(catfile);
 use File::Basename;
@@ -8,7 +9,6 @@ use Readonly;
 use Try::Tiny;
 
 use npg_qc::Schema;
-use npg_qc_viewer::Model::NpgQcDB;
 
 with qw/ npg_tracking::illumina::run::short_info
          npg_tracking::illumina::run::folder /;
@@ -41,7 +41,7 @@ has 'file_extension' => (
 );
 
 has 'qc_schema' => (
-  isa      => 'Maybe[npg_qc::Schema | npg_qc_viewer::Model::NpgQcDB]',
+  isa      => 'Maybe[npg_qc::Schema]',
   is       => 'ro',
   required => 0,
 );
@@ -133,13 +133,13 @@ In this case the value of the id_run attribute is disregarded.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 db_lookup - boolean flag showing whether the file names come from the database
+
 =head2 BUILD - Sets db_lookup to 0 in case a non-default extension is used.
 
 =head2 file_extension - an attribute, defaults to fastqcheck
 
 =head2 qc_schema - DBIx schema object for the NPG QC database, optional
-
-=head2 db_lookup - boolean flag showing whether the file names come from the database
 
 =head2 location - an optional array ref of paths for looking up files
 
@@ -156,6 +156,8 @@ as keys and, in case of successful file system search, file paths as values
 
 =item Moose
 
+=item MooseX::StrictConstructor
+
 =item Carp
 
 =item File::Spec::Functions
@@ -167,8 +169,6 @@ as keys and, in case of successful file system search, file paths as values
 =item Try::Tiny
 
 =item npg_qc::Schema
-
-=item npg_qc_viewer::Model::NpgQcDB
 
 =item npg_tracking::illumina::run::short_info
 
