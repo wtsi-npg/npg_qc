@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 79;
+use Test::More tests => 80;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -9,6 +9,11 @@ use Test::Warn;
 use Test::WWW::Mechanize::Catalyst;
 
 use t::util;
+
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
+}
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
@@ -49,9 +54,8 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
 
 {
   my $url = q[http://localhost/checks/runs/4025];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ }, 
-                                                    qr/Use of uninitialized value \$id in exists/, ],
-                                        'Expected warning for run folder found';
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                      'Expected warning for run folder found';
   $mech->title_is(q[Results for run 4025 (current run status: qc complete)]);
   $mech->content_contains('Back to Run 4025');
   $mech->content_contains(152);  # num cycles
@@ -63,9 +67,8 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   $mech->content_contains('20,442,728'); #for total qxYield
 
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)->update({ id_user => 64, id_run_status_dict => 26, });
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ }, 
-                                                    qr/Use of uninitialized value \$id in exists/, ],
-                                        'Expected warning for run folder found';
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                      'Expected warning for run folder found';
   $mech->title_is(q[Results for run 4025 (current run status: qc in progress, taken by mg8)]);
 }
 
@@ -86,8 +89,7 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
 
 {
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ }, 
-                                                    qr/Use of uninitialized value \$id in exists/, ],
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
                                         'Expected warning for run folder found';
   $mech->title_is(q[Results (lanes) for runs 4025 lanes 1]);
   $mech->content_contains(152);  # num cycles
@@ -101,17 +103,15 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
 
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=all];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ }, 
-                                                    qr/Use of uninitialized value \$id in exists/, ],
-                                        'Expected warning for run folder found';
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                       'Expected warning for run folder found';
   $mech->title_is(q[Results (all) for runs 4025]);
 }
 
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=plexes];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/No paths to run folder found/ }, 
-                                                    qr/Use of uninitialized value \$id in exists/, ],
-                                        'Expected warning for run folder found';
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                       'Expected warning for run folder found';
   $mech->title_is(q[Results (plexes) for runs 4025]);
   $mech->content_lacks(152);  # num cycles
   $mech->content_lacks('B1267_Exp4 1'); #library name

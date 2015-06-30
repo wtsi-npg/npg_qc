@@ -1,12 +1,17 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 14;
 use Test::Exception;
 use Test::Warn;
 
 use Test::WWW::Mechanize::Catalyst;
 
 use t::util;
+
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
+}
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
@@ -24,9 +29,8 @@ my $mech;
 {
   my $study_id = 188;
   my $url = qq[http://localhost/checks/studies/$study_id];
-  warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/, 
-                                      qr/Use of uninitialized value \$id in exists/], 
-                                      'Expected warning for runfolder location';
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/, 
+                                       'Expected warning for runfolder location';
   $mech->title_is(q[Study 'HumanEvolution2']);
   my @samples = qw( 
                     NA18545pd2a

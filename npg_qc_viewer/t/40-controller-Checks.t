@@ -1,12 +1,17 @@
 use strict;
 use warnings;
-use Test::More tests => 71;
+use Test::More tests => 72;
 use Test::Exception;
 use t::util;
 use Test::Warn;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
 use List::MoreUtils qw ( each_array );
+
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
+} 
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
@@ -61,14 +66,14 @@ my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
   my @warnings = ();
   push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
-  push @warnings, [{carped => $warn_no_paths},$warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, {carped => $warn_recalibrated}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [{carped => $warn_recalibrated}, $warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
   push @warnings, [{carped => $warn_no_paths}, $warn_id,];
   push @warnings, [{carped => $warn_no_paths}, $warn_id,];
