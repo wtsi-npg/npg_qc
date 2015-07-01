@@ -138,7 +138,6 @@ sub _reformat_trck_results {
 	return $out;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

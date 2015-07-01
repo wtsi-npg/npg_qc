@@ -19,7 +19,6 @@ has 'all_metrics'  =>  (isa       => 'HashRef',
                         required  => 0,
 		       );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

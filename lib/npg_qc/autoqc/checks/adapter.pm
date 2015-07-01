@@ -295,7 +295,6 @@ sub _process_search_output {
     return $results;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 

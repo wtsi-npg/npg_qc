@@ -218,7 +218,6 @@ carp q[Comparing intervals files with cmd: ], $cmd;
     return 0;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 

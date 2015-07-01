@@ -117,7 +117,6 @@ sub fetch_cgd_for_plex {
 	return $cgd;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

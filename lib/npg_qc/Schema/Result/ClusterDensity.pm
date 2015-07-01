@@ -172,7 +172,6 @@ __PACKAGE__->add_unique_constraint('unq_idx_cluster_density', ['id_run', 'positi
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -41,7 +41,6 @@ sub get_outcomes_as_hash{
   return $previous_mqc;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

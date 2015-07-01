@@ -326,7 +326,6 @@ sub update_reported {
   return $self->update({'reported' => $self->_get_time_now, 'modified_by' => $username}); #Only update the modified_by field.
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

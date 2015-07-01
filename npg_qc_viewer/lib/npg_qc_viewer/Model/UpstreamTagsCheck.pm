@@ -38,7 +38,6 @@ sub sort_unexpected_tags {
 	return $upstream_tags_results;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

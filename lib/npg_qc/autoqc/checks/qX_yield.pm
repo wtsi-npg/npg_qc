@@ -143,7 +143,6 @@ sub _get_threshold {
   return round($threshold);
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

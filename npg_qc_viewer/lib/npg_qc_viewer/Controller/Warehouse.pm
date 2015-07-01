@@ -76,7 +76,6 @@ sub setup : Chained('/') PathPart('warehouse') CaptureArgs(1) {
     return;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

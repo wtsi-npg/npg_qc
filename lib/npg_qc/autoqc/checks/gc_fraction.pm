@@ -192,8 +192,6 @@ sub _gc_percent {
     return $result;
 }
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

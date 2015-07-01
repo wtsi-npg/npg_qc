@@ -651,7 +651,6 @@ sub _build__ref_to_snppos_suffix_map {
 	}
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 

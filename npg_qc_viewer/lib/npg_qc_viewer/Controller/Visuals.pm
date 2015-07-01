@@ -97,7 +97,6 @@ sub fastqcheck_legend :Chained('base') :PathPath('fastqcheck_legend') :Args(0) {
     return;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

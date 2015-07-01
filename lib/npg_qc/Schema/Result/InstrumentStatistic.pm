@@ -184,7 +184,6 @@ __PACKAGE__->add_unique_constraint('idx_id_run_end', ['id_run', 'end']);
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

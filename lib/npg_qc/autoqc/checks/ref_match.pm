@@ -351,8 +351,6 @@ sub _parse_output {
     return $match;
 }
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 1;

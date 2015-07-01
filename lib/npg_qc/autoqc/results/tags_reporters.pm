@@ -30,7 +30,6 @@ has [ qw/ lane_bam_file
                                          is =>  'rw',
                                          );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

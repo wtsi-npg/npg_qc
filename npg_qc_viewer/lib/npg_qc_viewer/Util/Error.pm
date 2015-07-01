@@ -86,8 +86,6 @@ sub parse_error {
   return ($message, $error_code);
 }
 
-no Moose;
-
 1;
 __END__
 

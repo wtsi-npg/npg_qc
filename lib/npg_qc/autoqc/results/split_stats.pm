@@ -90,7 +90,6 @@ has 'num_not_aligned_merge'=>(isa            => 'Maybe[Int]',
                               required       => 0,
 		                       );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

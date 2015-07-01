@@ -173,7 +173,6 @@ sub isizes_from_bam {
   return $actual_sizes;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

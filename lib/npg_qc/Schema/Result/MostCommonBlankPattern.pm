@@ -180,7 +180,6 @@ __PACKAGE__->belongs_to(
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

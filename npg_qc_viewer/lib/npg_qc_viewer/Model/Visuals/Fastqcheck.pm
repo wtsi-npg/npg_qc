@@ -210,7 +210,6 @@ sub fastqcheck2image { ##no critic (ProhibitExcessComplexity)
     return $im->png;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

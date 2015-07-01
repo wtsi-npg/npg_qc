@@ -148,7 +148,6 @@ sub _get_file_paths {
   return $fnames;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

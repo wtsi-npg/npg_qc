@@ -277,7 +277,6 @@ sub can_run {
     return $check->can_run;
 }
 
-no Moose;
 no MooseX::ClassAttribute;
 __PACKAGE__->meta->make_immutable;
 

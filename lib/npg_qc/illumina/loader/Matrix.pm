@@ -207,7 +207,6 @@ sub _second_cycle_number_by_read {
    return;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -177,7 +177,6 @@ __PACKAGE__->add_unique_constraint('unq_idx_rungraph_idrun_end', ['id_run', 'end
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

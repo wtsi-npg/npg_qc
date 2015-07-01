@@ -33,7 +33,6 @@ override '_build_env_vars' => sub {
   return $h;
 };
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -25,7 +25,6 @@ has freeLK1    => ( is => 'rw', isa => 'Num', );
 has warn    => ( is => 'rw', isa => 'Bool', );
 has pass    => ( is => 'rw', isa => 'Bool', );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

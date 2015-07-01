@@ -30,7 +30,6 @@ __PACKAGE__->config( class => 'npg_qc::autoqc::qc_store',
                      args  => $init,
                    );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

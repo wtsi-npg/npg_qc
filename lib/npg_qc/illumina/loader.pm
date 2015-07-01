@@ -170,7 +170,6 @@ sub lane_summary_saved {
   return $count >= scalar @ends;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

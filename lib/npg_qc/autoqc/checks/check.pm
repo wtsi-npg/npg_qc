@@ -275,7 +275,6 @@ sub overall_pass {
 }
 
 no MooseX::ClassAttribute;
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

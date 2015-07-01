@@ -341,7 +341,6 @@ __PACKAGE__->set_flators_wcompression4non_scalar( qw(forward_cigar_char_count_by
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

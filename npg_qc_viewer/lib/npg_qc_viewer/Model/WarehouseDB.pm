@@ -29,7 +29,6 @@ __PACKAGE__->config(
     connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

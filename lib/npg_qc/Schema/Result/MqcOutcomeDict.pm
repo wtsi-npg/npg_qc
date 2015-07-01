@@ -170,7 +170,6 @@ sub is_final_accepted {
   return $self->is_final_outcome && $self->is_accepted;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

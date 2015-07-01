@@ -359,7 +359,6 @@ sub _process_tile_result_by_lane_read_tile{
   return 1;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -53,7 +53,6 @@ has forward_start_counts            => ( is  => 'rw',
 has reverse_start_counts            => ( is  => 'rw',
                                          isa => 'Maybe[HashRef]', );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

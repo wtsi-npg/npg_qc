@@ -252,7 +252,6 @@ __PACKAGE__->set_inflator4scalar('tag_index');
 our $VERSION = '0';
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

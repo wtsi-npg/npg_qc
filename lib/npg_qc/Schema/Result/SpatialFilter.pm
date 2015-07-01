@@ -172,7 +172,6 @@ __PACKAGE__->set_flators4non_scalar(qw( info ));
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

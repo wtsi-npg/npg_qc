@@ -181,7 +181,6 @@ sub detach2error {
     return;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

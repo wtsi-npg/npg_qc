@@ -36,8 +36,6 @@ __PACKAGE__->config(
   POST_CHOMP   => 1,
 );
 
-no Moose;
-
 1;
 __END__
 

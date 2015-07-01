@@ -248,8 +248,6 @@ has 'norm_fit_modes'     => (isa      => 'Maybe[ArrayRef]',
                        required => 0,
                       );
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

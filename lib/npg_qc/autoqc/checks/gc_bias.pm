@@ -323,7 +323,6 @@ sub find_R_library {    ## no critic (NamingConventions::Capitalization)
     return $path_to_R_lib;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 1;

@@ -348,9 +348,7 @@ sub _build__call_gt_cmd {
 	return $cmd;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
-
 
 1;
 

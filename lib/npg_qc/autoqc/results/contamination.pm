@@ -35,7 +35,6 @@ has genome_factor     => ( is  => 'rw',
 has read_count        => ( is   => 'rw',
                            isa  => 'Int', );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

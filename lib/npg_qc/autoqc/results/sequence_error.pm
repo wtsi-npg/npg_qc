@@ -95,7 +95,6 @@ has reverse_cigar_char_count_by_cycle => ( is  => 'rw',
                                            isa => 'Maybe[HashRef]',
                                          );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

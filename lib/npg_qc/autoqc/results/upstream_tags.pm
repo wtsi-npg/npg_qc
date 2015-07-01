@@ -36,7 +36,6 @@ has [ qw/ instrument_name
                                          is =>  'rw',
                                          );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

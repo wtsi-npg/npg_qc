@@ -39,8 +39,6 @@ sub status_internal_server_error {
   return 1;
 }
 
-no Moose;
-
 1;
 __END__
 

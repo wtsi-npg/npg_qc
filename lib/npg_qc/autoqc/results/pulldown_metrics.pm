@@ -208,7 +208,6 @@ has 'interval_files_identical' =>      (isa        => 'Maybe[Bool]',
                                               required   => 0,
 		                             );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

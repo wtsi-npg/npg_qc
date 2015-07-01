@@ -66,7 +66,6 @@ sub to_string {
   return $s;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -22,7 +22,6 @@ has aligner_version    => ( is => 'rw', isa => 'Str', );
 has sample_read_count  => ( is => 'rw', isa => 'Int', );
 has sample_read_length => ( is => 'rw', isa => 'Int', );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

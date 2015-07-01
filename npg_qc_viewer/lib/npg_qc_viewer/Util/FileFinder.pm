@@ -104,7 +104,6 @@ sub _build_files {
   return $hfiles;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

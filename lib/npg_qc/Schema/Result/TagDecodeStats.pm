@@ -219,7 +219,6 @@ __PACKAGE__->set_inflator4scalar('tag_index');
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

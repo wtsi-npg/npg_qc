@@ -173,7 +173,6 @@ __PACKAGE__->add_unique_constraint('unq_idx_run_lane_base', ['id_run', 'cycle', 
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

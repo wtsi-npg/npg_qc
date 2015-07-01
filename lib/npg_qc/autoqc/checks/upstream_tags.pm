@@ -890,9 +890,7 @@ sub _generate_run_info_row {
 # private attributes
 ####################
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
-
 
 1;
 

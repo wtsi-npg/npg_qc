@@ -142,7 +142,6 @@ sub save_files {
   return $count;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

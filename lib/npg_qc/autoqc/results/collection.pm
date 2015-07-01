@@ -537,10 +537,7 @@ sub check_names {
     return {'list' => \@check_names, 'map' => $map,};
 }
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable;
-
 
 1;
 __END__

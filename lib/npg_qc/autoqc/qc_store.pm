@@ -216,7 +216,6 @@ sub run_from_db {
   return $c;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

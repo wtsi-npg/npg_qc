@@ -253,7 +253,6 @@ __PACKAGE__->set_inflator4scalar('split', 'is_string');
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

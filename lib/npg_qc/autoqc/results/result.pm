@@ -114,7 +114,6 @@ has 'comments'     => (isa => 'Maybe[Str]',
                        required => 0,
                       );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

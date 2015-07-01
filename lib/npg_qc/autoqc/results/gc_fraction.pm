@@ -55,8 +55,6 @@ has 'threshold_difference'      => ( isa      => 'Maybe[Int]',
                                      is       => 'rw',
 		                   );
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

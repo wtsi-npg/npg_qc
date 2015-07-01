@@ -477,7 +477,6 @@ sub study :Chained('base') :PathPart('studies') :Args(1) {
     return;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

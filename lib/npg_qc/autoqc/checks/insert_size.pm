@@ -486,7 +486,6 @@ sub _align {
     return $output_sam;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 1;

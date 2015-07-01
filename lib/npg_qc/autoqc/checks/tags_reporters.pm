@@ -386,9 +386,7 @@ override 'execute' => sub {
 # private attributes
 ####################
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
-
 
 1;
 

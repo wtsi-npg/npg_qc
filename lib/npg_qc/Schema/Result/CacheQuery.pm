@@ -156,7 +156,6 @@ __PACKAGE__->set_primary_key('id_cache_query');
 
 our $VERSION = '0';
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -39,7 +39,6 @@ has alternate_match_count  => ( is => 'rw', isa => 'Int', );
 has alternate_relaxed_matches => ( is => 'rw', isa => 'ArrayRef', );
 has alternate_relaxed_match_count  => ( is => 'rw', isa => 'Int', );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
