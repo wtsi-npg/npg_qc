@@ -1,14 +1,10 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       29 July 2009
-#
-
 package npg_qc::autoqc::checks::check;
 
 use Moose;
 use namespace::autoclean;
 use MooseX::ClassAttribute;
 use MooseX::Aliases;
+use Class::Load qw(load_class);
 use Carp;
 use English qw(-no_match_vars);
 use File::Basename;
@@ -157,7 +153,7 @@ sub _build_result {
     my ($ref) = ($pkg_name) =~ /(\w*)$/smx;
     if ($ref eq q[check]) { $ref =  q[result]; }
     my $module = "npg_qc::autoqc::results::$ref";
-    Class::MOP::load_class($module);
+    load_class($module);
 
     my $nref = { id_run => $self->id_run, position  => $self->position, };
     $nref->{'path'} = $self->path;
@@ -299,6 +295,10 @@ __END__
 
 =item MooseX::ClassAttribute
 
+=item MooseX::Aliases
+
+=item Class::Load
+
 =item Carp
 
 =item English -no_match_vars
@@ -327,7 +327,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL, by Marina Gourtovaia
 
 This file is part of NPG.
 
