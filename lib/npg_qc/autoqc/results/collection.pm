@@ -127,7 +127,6 @@ one by one .
 =cut
 sub add {
     my ($self, $r) = @_;
-
     if(ref $r eq q{ARRAY}) {
         foreach my $el (@{$r}) {
             $self->push($el);

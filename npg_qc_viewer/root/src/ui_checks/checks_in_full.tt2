@@ -5,7 +5,7 @@
      temp = lane_collection.sort;
      checks = lane_collection.results;
      provenance = '';
-     checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'}) 
+     checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'});
   -%]
 
   <div class="results_full_lane">
