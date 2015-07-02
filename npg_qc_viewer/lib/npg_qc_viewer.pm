@@ -61,6 +61,7 @@ if( $ENV{CATALYST_AUTOCRUD} ) {
 
 # Start the application
 __PACKAGE__->setup(@extra_plugins);
+__PACKAGE__->meta->make_immutable;
 
 1;
 

@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::Visuals::Fastqcheck;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 use GD::Image;
 use Math::Gradient;
 
@@ -209,7 +210,6 @@ sub fastqcheck2image { ##no critic (ProhibitExcessComplexity)
     return $im->png;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -226,6 +226,8 @@ __END__
 =item Carp
 
 =item Moose
+
+=item namespace::autoclean
 
 =item GD::Image
 

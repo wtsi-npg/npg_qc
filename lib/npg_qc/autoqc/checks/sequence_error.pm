@@ -8,6 +8,7 @@ package npg_qc::autoqc::checks::sequence_error;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 use Carp;
 use English qw(-no_match_vars);
@@ -653,7 +654,7 @@ sub _collate_qualities {
   return 1,
 }
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -675,6 +676,8 @@ npg_qc::autoqc::checks::sequence_error
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

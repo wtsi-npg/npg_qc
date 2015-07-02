@@ -20,6 +20,18 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
+=head1 ADDITIONAL CLASSES USED
+
+=over 4
+
+=item * L<namespace::autoclean>
+
+=back
+
+=cut
+
+use namespace::autoclean;
+
 =head1 COMPONENTS LOADED
 
 =over 4
@@ -102,8 +114,8 @@ __PACKAGE__->set_primary_key('id_run_and_pair');
 __PACKAGE__->add_unique_constraint('unq_idx_runpair_idrun', ['id_run']);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:IvaMcXq/dCoRgZpjIaa4lw
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:14pRm2NCpx2ATDGpIpyrKg
 
 our $VERSION = '0';
 
@@ -133,6 +145,8 @@ Result class definition in DBIx binding for npg-qc database.
 =item warnings
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::NonMoose
 

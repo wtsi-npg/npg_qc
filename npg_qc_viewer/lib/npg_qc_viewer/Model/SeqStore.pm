@@ -1,6 +1,7 @@
 package npg_qc_viewer::Model::SeqStore;
 
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 use npg_qc_viewer::Util::FileFinder;
@@ -147,7 +148,6 @@ sub _get_file_paths {
   return $fnames;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -164,6 +164,8 @@ __END__
 =item Readonly
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model::Factory::PerRequest
 

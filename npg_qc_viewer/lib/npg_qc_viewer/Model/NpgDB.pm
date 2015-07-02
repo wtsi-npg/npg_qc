@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::NpgDB;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
@@ -105,6 +106,8 @@ sub update_lane_manual_qc_complete {
   return;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -117,6 +120,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 

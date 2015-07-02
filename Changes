@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.5
+ - stop using depricated Class::MOP::load_class method
+ - use namespace::autoclean instead of "no Moose" in Moose objects
+ - using make_immutable in Moose objects
+
 release 58.4
  - Creating a cache in SeqStore model to reduce file system access. 
     Improving query - using keys for tables.

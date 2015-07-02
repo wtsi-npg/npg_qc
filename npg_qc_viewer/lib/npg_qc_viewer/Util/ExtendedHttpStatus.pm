@@ -1,6 +1,7 @@
 package npg_qc_viewer::Util::ExtendedHttpStatus;
 
 use Moose::Role;
+use namespace::autoclean;
 use Carp;
 use Readonly;
 use Params::Validate;
@@ -75,6 +76,8 @@ subs for extra response codes.
 =over
 
 =item Moose::Role
+
+=item namespace::autoclean
 
 =item Carp
 

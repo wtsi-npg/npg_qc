@@ -20,6 +20,18 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
+=head1 ADDITIONAL CLASSES USED
+
+=over 4
+
+=item * L<namespace::autoclean>
+
+=back
+
+=cut
+
+use namespace::autoclean;
+
 =head1 COMPONENTS LOADED
 
 =over 4
@@ -198,8 +210,8 @@ __PACKAGE__->add_unique_constraint('unq_run_lane_ref_match', ['id_run', 'positio
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::ref_match';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fMtrHIaF7Bv9RSSkGryqVA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:MiIln/VpHDVh21mfVRF98w
 
 __PACKAGE__->set_flators4non_scalar(qw( aligned_read_count reference_version info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
@@ -233,6 +245,8 @@ Result class definition in DBIx binding for npg-qc database.
 =item warnings
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::NonMoose
 

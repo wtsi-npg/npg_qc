@@ -7,6 +7,7 @@
 package npg_qc::autoqc::parse::alignment;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Readonly;
@@ -172,7 +173,7 @@ sub isizes_from_bam {
   return $actual_sizes;
 }
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -191,6 +192,8 @@ __END__
 =item Readonly
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Math::Round
 
