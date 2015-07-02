@@ -106,6 +106,8 @@ sub update_lane_manual_qc_complete {
   return;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
