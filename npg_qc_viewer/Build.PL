@@ -94,7 +94,6 @@ my $builder = $class->new(
         'warnings'                                     => '0',
 
         'npg_common::fastqcheck'                       => '0',
-        'npg_common::run::file_finder'                 => '0',
         'npg::authentication::sanger_sso'              => '0',
         'npg_tracking::Schema'                         => '0',
         'npg_tracking::daemon'                         => '0',
