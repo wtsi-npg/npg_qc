@@ -6,6 +6,7 @@ package npg_qc::illumina::loader::Run_Timeline;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 use MooseX::StrictConstructor;
 use Readonly;
 
@@ -140,6 +141,7 @@ sub save_dates {
   return 1;
 }
 
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -168,12 +170,23 @@ npg_qc::illumina::loader::Run_Timeline
 
 =head1 DEPENDENCIES
 
-Moose
-MooseX::StrictConstructor
-Carp
-Readonly
-npg_tracking::Schema
-npg_qc::Schema
+=over
+
+=item Moose
+
+=item namespace::autoclean
+
+=item MooseX::StrictConstructor
+
+=item Carp
+
+=item Readonly
+
+=item npg_tracking::Schema
+
+=item npg_qc::Schema
+
+=back
 
 =head1 INCOMPATIBILITIES
 

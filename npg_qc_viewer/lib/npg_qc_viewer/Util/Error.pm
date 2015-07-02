@@ -1,6 +1,7 @@
 package npg_qc_viewer::Util::Error;
 
 use Moose::Role;
+use namespace::autoclean;
 use Carp;
 use Readonly;
 
@@ -97,6 +98,8 @@ __END__
 =over
 
 =item Moose::Role
+
+=item namespace::autoclean
 
 =item Carp
 

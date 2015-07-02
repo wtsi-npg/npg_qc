@@ -1,6 +1,7 @@
 package npg_qc::autoqc::checks::insert_size;
 
 use Moose;
+use namespace::autoclean;
 use Moose::Meta::Class;
 use Moose::Util::TypeConstraints;
 use Carp;
@@ -485,7 +486,6 @@ sub _align {
     return $output_sam;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -507,6 +507,8 @@ __END__
 =item Readonly
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Moose::Meta::Class
 

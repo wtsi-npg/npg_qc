@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::GenotypeCheck;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 use JSON;
 use File::Slurp;
 
@@ -116,7 +117,6 @@ sub fetch_cgd_for_plex {
 	return $cgd;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -133,6 +133,8 @@ __END__
 =item Carp
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model
 

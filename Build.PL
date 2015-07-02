@@ -176,6 +176,7 @@ my $extended_build_requires = {
 
 my $extended_requires = {
                 'autodie'                         => '2.10',
+                'Class::Load'                     => '0',
                 'Class::Std'                      => '0.0.8',
                 'Compress::Zlib'                  => 0,
                 'Cwd'                             => 0,
@@ -222,6 +223,7 @@ my $extended_requires = {
                 'MooseX::NonMoose'                => 0,
                 'MooseX::Storage'                 => 0,
                 'MooseX::StrictConstructor'       => '0.08',
+                'namespace::autoclean'            => 0,
                 'Parallel::ForkManager'           => 0,
                 'PDL::Core'                       => 0,
                 'PDL::Lite'                       => 0,

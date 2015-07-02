@@ -1,11 +1,19 @@
 use strict;
 use warnings;
-use Test::More tests => 65;
+use Test::More tests => 80;
 use Test::Exception;
+use File::Temp qw/tempdir/;
+use File::Path qw/make_path/;
+use Test::Warn;
 
 use Test::WWW::Mechanize::Catalyst;
 
 use t::util;
+
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
+}
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
@@ -20,8 +28,34 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
    'is_dev column successfully updated - test prerequisite';
 
 {
+  my $base = tempdir(UNLINK => 1);
+  my $path = $base . q[/archive];
+  my $run_folder = q[150621_MS6_04099_A_MS2023387-050V2];
+  make_path $path.q[/].$run_folder;
+  
+  my $npg   = $schemas->{npg};
+  
+  foreach my $id_run ( 4950 ) {
+    my $values = { id_run               => $id_run,
+                   batch_id             => 4178,
+                   folder_name          => $run_folder,
+                   folder_path_glob     => $path, 
+                   id_instrument        => 30,
+                   id_instrument_format => 4,
+                   is_paired            => 1,
+                   priority             => 1,
+                   team                 => '"joint"' 
+    };
+    
+    my $row = $npg->resultset("Run")->create($values); #Insert new entity
+    $row->set_tag(7, 'staging');
+  }
+}
+
+{
   my $url = q[http://localhost/checks/runs/4025];
-  $mech->get_ok($url);
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                      'Expected warning for run folder found';
   $mech->title_is(q[Results for run 4025 (current run status: qc complete)]);
   $mech->content_contains('Back to Run 4025');
   $mech->content_contains(152);  # num cycles
@@ -33,7 +67,8 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   $mech->content_contains('20,442,728'); #for total qxYield
 
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)->update({ id_user => 64, id_run_status_dict => 26, });
-  $mech->get_ok($url);
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                      'Expected warning for run folder found';
   $mech->title_is(q[Results for run 4025 (current run status: qc in progress, taken by mg8)]);
 }
 
@@ -41,16 +76,21 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
   #which uses the title of the page to check if manual qc GUI should
   #be shown. 
   my $url = q[http://localhost/checks/runs/10107];
-  $mech->get_ok($url);
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/run 10107 no longer on staging/ }, 
+                                                    qr/Use of uninitialized value \$id in exists/, ],
+                                        'Expected warning for run folder found';
   $mech->title_is(q[Results for run 10107 (current run status: qc in progress, taken by melanie)]);
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 10107, iscurrent => 1},)->update({ id_user => 50, id_run_status_dict => 25, });
-  $mech->get_ok($url);
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/run 10107 no longer on staging/ }, 
+                                                    qr/Use of uninitialized value \$id in exists/, ],
+                                        'Expected warning for run folder found';
   $mech->title_is(q[Results for run 10107 (current run status: qc on hold, taken by melanie)]);
 }
 
 {
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
-  $mech->get_ok($url);
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                        'Expected warning for run folder found';
   $mech->title_is(q[Results (lanes) for runs 4025 lanes 1]);
   $mech->content_contains(152);  # num cycles
   $mech->content_contains('B1267_Exp4 1'); #library name
@@ -63,13 +103,15 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
 
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=all];
-  $mech->get_ok($url);
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                       'Expected warning for run folder found';
   $mech->title_is(q[Results (all) for runs 4025]);
 }
 
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=plexes];
-  $mech->get_ok($url);
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                       'Expected warning for run folder found';
   $mech->title_is(q[Results (plexes) for runs 4025]);
   $mech->content_lacks(152);  # num cycles
   $mech->content_lacks('B1267_Exp4 1'); #library name
@@ -78,7 +120,9 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
 
 {
   my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=lanes];
-  $mech->get_ok($url);
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ }, 
+                                                    qr/Use of uninitialized value \$id in exists/, ],
+                                        'Expected warning for run folder found';
   $mech->title_is(q[Results (lanes) for runs 4950 lanes 1]);
   $mech->content_contains(224);  # num cycles
   $mech->content_contains('24plex_1000Genomes-B1-FIN-6.6.10'); #library name
@@ -88,7 +132,9 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
 
 {
   my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=plexes];
-  $mech->get_ok($url);
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ }, 
+                                                    qr/Use of uninitialized value \$id in exists/, ],
+                                        'Expected warning for run folder found';
   $mech->title_is(q[Results (plexes) for runs 4950 lanes 1]);
   $mech->content_contains(224);  # num cycles
   $mech->content_contains('Help'); #side menu link
@@ -101,7 +147,9 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
 
 {
   my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=all];
-  $mech->get_ok($url);
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ }, 
+                                                    qr/Use of uninitialized value \$id in exists/, ],
+                                        'Expected warning for run folder found';
   $mech->title_is(q[Results (all) for runs 4950 lanes 1]);
   $mech->content_contains('Page Top');
   $mech->content_contains('Back to Run 4950');
@@ -117,13 +165,18 @@ lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, p
               '0'
              );
   foreach my $menu_item (@menu) {
-    $mech->follow_link_ok({text => $menu_item}, qq[follow '$menu_item' menu item]);  
+    warnings_like{ $mech->follow_link_ok({text => $menu_item}, qq[follow '$menu_item' menu item]) } 
+      [ { carped => qr/Failed to get runfolder location/ }, 
+                    qr/Use of uninitialized value \$id in exists/, ],
+                      'Expected warning for run folder found';  
   }
 }
 
 {
   my $url = q[http://localhost/checks/runs/3323];
-  $mech->get_ok($url);
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/No paths to run folder found/ }, 
+                                                    qr/Use of uninitialized value \$id in exists/, ],
+                                        'Expected warning for run folder found';
   $mech->content_contains('PH25-C_300 1</span></a><span class="watermark">R&amp;D</span>'); #library name with R&D watermark
   $mech->content_contains('PD71-C_300 1</span></a><span class="watermark">R&amp;D</span>'); #library name with R&D watermark
   $mech->content_lacks('Illumina phiX</span></a><span class="watermark">R&amp;D</span>');

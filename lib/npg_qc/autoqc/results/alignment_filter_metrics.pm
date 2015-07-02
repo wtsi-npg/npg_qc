@@ -6,6 +6,7 @@
 package npg_qc::autoqc::results::alignment_filter_metrics;
 
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
@@ -18,7 +19,7 @@ has 'all_metrics'  =>  (isa       => 'HashRef',
                         required  => 0,
 		       );
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -45,6 +46,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 

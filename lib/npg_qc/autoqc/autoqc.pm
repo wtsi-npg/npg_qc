@@ -1,14 +1,9 @@
-#########
-# Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Created:       29 July 2009
-#
-
 package npg_qc::autoqc::autoqc;
 
-use strict;
-use warnings;
 use Moose;
+use namespace::autoclean;
 use MooseX::ClassAttribute;
+use Class::Load qw(load_class);
 use Carp;
 use English qw(-no_match_vars);
 use Readonly;
@@ -225,7 +220,7 @@ sub _create_test_object {
     my $self = shift;
 
     my $pkg = $CHECKS_NAMESPACE . q[::] . $self->check;
-    Class::MOP::load_class($pkg);
+    load_class($pkg);
     my $init = {
                 path      => $self->qc_in,
                 position  => $self->position,
@@ -282,8 +277,8 @@ sub can_run {
     return $check->can_run;
 }
 
-no Moose;
 no MooseX::ClassAttribute;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -298,7 +293,11 @@ __END__
 
 =item Moose
 
+=item namespace::autoclean
+
 =item MooseX::ClassAttribute
+
+=item Cass::Load
 
 =item File::Spec
 
@@ -330,7 +329,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL, by Marina Gourtovaia
 
 This file is part of NPG.
 

@@ -171,6 +171,8 @@ sub index :Path :Args(0) {
     return;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 

@@ -99,6 +99,8 @@ make_schema_at(
         components => [qw(InflateColumn::DateTime)],
 
         result_components_map => $components_map,
+
+        additional_classes => (qw[namespace::autoclean],),
     },
     [$dsn, $config->{'dbuser'}, $config->{'dbpass'}]
 );

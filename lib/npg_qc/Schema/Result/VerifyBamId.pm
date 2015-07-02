@@ -20,6 +20,18 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
+=head1 ADDITIONAL CLASSES USED
+
+=over 4
+
+=item * L<namespace::autoclean>
+
+=back
+
+=cut
+
+use namespace::autoclean;
+
 =head1 COMPONENTS LOADED
 
 =over 4
@@ -230,8 +242,8 @@ __PACKAGE__->add_unique_constraint('unq_run_lane_verify', ['id_run', 'position',
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::verify_bam_id';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-05-28 16:47:33
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FK7FU+Oo6v6VCmsi3TyjqA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vExezSYCp2I9+mfsGCRZHQ
 
 __PACKAGE__->set_flators4non_scalar(qw( info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
@@ -241,6 +253,7 @@ our $VERSION = '0';
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -265,6 +278,8 @@ Result class definition in DBIx binding for npg-qc database.
 =item warnings
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::NonMoose
 

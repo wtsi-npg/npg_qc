@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::collection;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use MooseX::AttributeHelpers;
 use Carp;
 use English qw(-no_match_vars);
@@ -127,7 +128,6 @@ one by one .
 =cut
 sub add {
     my ($self, $r) = @_;
-
     if(ref $r eq q{ARRAY}) {
         foreach my $el (@{$r}) {
             $self->push($el);
@@ -537,10 +537,7 @@ sub check_names {
     return {'list' => \@check_names, 'map' => $map,};
 }
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable;
-
 
 1;
 __END__
@@ -558,6 +555,8 @@ __END__
 =item warnings
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::AttributeHelpers
 

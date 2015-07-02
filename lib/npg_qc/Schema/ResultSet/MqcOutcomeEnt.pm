@@ -1,6 +1,7 @@
 package npg_qc::Schema::ResultSet::MqcOutcomeEnt;
 
 use Moose;
+use namespace::autoclean;
 use MooseX::NonMoose;
 
 extends 'DBIx::Class::ResultSet';
@@ -90,6 +91,8 @@ Extended ResultSet with specific functionality for for manual MQC.
 =item warnings
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::NonMoose
 

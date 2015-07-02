@@ -1,6 +1,7 @@
 package npg_qc_viewer::View::TT;
 
 use Moose;
+use namespace::autoclean;
 use npg_qc_viewer;
 
 BEGIN { extends 'Catalyst::View::TT' }
@@ -28,10 +29,13 @@ npg_qc_viewer
 
 __PACKAGE__->config(
   TEMPLATE_EXTENSION => '.tt2',
-  INCLUDE_PATH => [
-      npg_qc_viewer->path_to( 'root', 'src' ),
-    ],
+  INCLUDE_PATH => [ npg_qc_viewer->path_to( 'root', 'src' ), ],
+  STAT_TTL     => 6000,
+  TRIM         => 1,
+  PRE_CHOMP    => 1,
+  POST_CHOMP   => 1,
 );
+__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 
 1;
 __END__
@@ -46,7 +50,11 @@ __END__
 
 =item Moose
 
+=item namespace::autoclean
+
 =item Catalyst::View::TT
+
+=item npg_qc_viewer
 
 =back
 

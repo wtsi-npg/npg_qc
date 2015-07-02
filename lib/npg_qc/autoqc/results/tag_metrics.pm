@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::tag_metrics;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
@@ -40,7 +41,7 @@ has [ qw/ metrics_file
                                         is =>  'rw',
                                        );
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -73,6 +74,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 
