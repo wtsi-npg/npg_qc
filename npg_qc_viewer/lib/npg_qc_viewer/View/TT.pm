@@ -35,6 +35,7 @@ __PACKAGE__->config(
   PRE_CHOMP    => 1,
   POST_CHOMP   => 1,
 );
+__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 
 1;
 __END__
