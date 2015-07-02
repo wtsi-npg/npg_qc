@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::adapter;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::adapter);
@@ -52,7 +53,7 @@ has forward_start_counts            => ( is  => 'rw',
 has reverse_start_counts            => ( is  => 'rw',
                                          isa => 'Maybe[HashRef]', );
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -94,6 +95,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =back
 

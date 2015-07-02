@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::bam_flagstats;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use Perl6::Slurp;
 use List::Util qw(sum);
@@ -184,7 +185,7 @@ sub parsing_flagstats {
   return;
 }
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -216,6 +217,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item npg_qc::autoqc::results::result
 

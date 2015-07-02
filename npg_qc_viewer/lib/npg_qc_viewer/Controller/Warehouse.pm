@@ -1,6 +1,7 @@
 package npg_qc_viewer::Controller::Warehouse;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 
 BEGIN { extends 'Catalyst::Controller::DBIC::API::RPC' }
@@ -75,6 +76,7 @@ sub setup : Chained('/') PathPart('warehouse') CaptureArgs(1) {
     return;
 }
 
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -88,6 +90,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Controller::DBIC::API::RPC
 

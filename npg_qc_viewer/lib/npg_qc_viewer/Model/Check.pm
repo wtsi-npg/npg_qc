@@ -1,6 +1,7 @@
 package npg_qc_viewer::Model::Check;
 
 use Moose;
+use namespace::autoclean;
 use npg_qc_viewer;
 extends 'Catalyst::Model::Adaptor';
 
@@ -29,6 +30,7 @@ __PACKAGE__->config( class => 'npg_qc::autoqc::qc_store',
                      args  => $init,
                    );
 
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -54,6 +56,8 @@ A model for retrieving QC checks both from the database and the file system.
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model::Adaptor
 

@@ -6,6 +6,7 @@
 package npg_qc::autoqc::results::qX_yield;
 
 use Moose;
+use namespace::autoclean;
 use npg_tracking::util::types;
 use Readonly;
 
@@ -111,10 +112,7 @@ has 'filename2'  =>   (isa        => 'Maybe[Str]',
                        required   => 0,
 		      );
 
-
-
-
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -128,6 +126,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item npg_tracking::util::types
 

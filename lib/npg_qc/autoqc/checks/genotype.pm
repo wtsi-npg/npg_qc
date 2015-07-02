@@ -8,6 +8,7 @@ package npg_qc::autoqc::checks::genotype;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
@@ -650,7 +651,6 @@ sub _build__ref_to_snppos_suffix_map {
 	}
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 
@@ -689,6 +689,12 @@ npg_qc::autoqc::checks::genotype - compare genotype from bam with Sequenom QC re
 =head1 BUGS AND LIMITATIONS
 
 =head1 DEPENDENCIES
+
+=over
+
+=item namespace::autoclean
+
+=back
 
 =head1 AUTHOR
 

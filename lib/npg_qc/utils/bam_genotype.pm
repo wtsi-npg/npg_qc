@@ -12,6 +12,7 @@ use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
 use JSON;
 use Moose;
+use namespace::autoclean;
 use Moose::Util::TypeConstraints;
 use Readonly;
 
@@ -347,9 +348,7 @@ sub _build__call_gt_cmd {
 	return $cmd;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
-
 
 1;
 

@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use Carp;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
@@ -65,7 +66,6 @@ sub to_string {
   return $s;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -127,6 +127,8 @@ Human friendly description of object.
 =item Readonly
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

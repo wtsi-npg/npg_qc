@@ -6,6 +6,7 @@
 package npg_qc::autoqc::db_loader;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use JSON;
 use Try::Tiny;
@@ -172,7 +173,6 @@ sub _log {
   return;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -212,6 +212,8 @@ npg_qc::autoqc::db_loader
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::Getopt
 

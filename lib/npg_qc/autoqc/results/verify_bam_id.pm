@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::verify_bam_id;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::verify_bam_id);
@@ -24,7 +25,7 @@ has freeLK1    => ( is => 'rw', isa => 'Num', );
 has warn    => ( is => 'rw', isa => 'Bool', );
 has pass    => ( is => 'rw', isa => 'Bool', );
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -66,6 +67,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =back
 

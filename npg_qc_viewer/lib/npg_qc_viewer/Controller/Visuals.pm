@@ -1,6 +1,7 @@
 package npg_qc_viewer::Controller::Visuals;
 
 use Moose;
+use namespace::autoclean;
 use English qw(-no_match_vars);
 
 BEGIN { extends 'Catalyst::Controller' }
@@ -96,6 +97,7 @@ sub fastqcheck_legend :Chained('base') :PathPath('fastqcheck_legend') :Args(0) {
     return;
 }
 
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -109,6 +111,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item English
 

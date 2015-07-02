@@ -6,6 +6,7 @@
 package npg_qc::mqc::reporter;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use POSIX qw(strftime);
 use LWP::UserAgent;
@@ -121,7 +122,6 @@ sub _log {
   return;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -160,6 +160,8 @@ Reads all the QC records which need to have a pass or fail sent to LIMS, and sen
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::Getopt
 
