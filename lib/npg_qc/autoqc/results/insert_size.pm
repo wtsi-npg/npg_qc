@@ -5,8 +5,6 @@
 
 package npg_qc::autoqc::results::insert_size;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 use Carp;
@@ -14,7 +12,6 @@ use English qw(-no_match_vars);
 use Readonly;
 use Math::Round qw(round);
 
-use npg_common::diagram::visio_histo_google;
 use npg_tracking::util::types;
 
 extends qw( npg_qc::autoqc::results::result );
@@ -30,14 +27,9 @@ npg_qc::autoqc::results::insert_size
 
 =head1 SYNOPSIS
 
-
 =head1 DESCRIPTION
 
-
 =head1 SUBROUTINES/METHODS
-
-=cut
-
 
 =head2 filenames
 
@@ -47,8 +39,7 @@ A list that contains names of the files that were used by the check. Read-only.
 has 'filenames'    => (isa        => 'ArrayRef',
                        is         => 'rw',
                        required   => 0,
-		      );
-
+                      );
 
 =head2 bins
 
@@ -70,7 +61,6 @@ has 'bin_width'    => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
                        required        => 0,
                       );
 
-
 =head2 min_isize
 
 The lowest insert size
@@ -80,7 +70,6 @@ has 'min_isize'    => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
                        is              => 'rw',
                        required        => 0,
                       );
-
 
 =head2 expected_mean
 
@@ -102,7 +91,6 @@ has 'expected_size'  =>  (isa             => 'Maybe[ArrayRef]',
                           required        => 0,
                          );
 
-
 =head2 mean
 
 Mean
@@ -122,7 +110,6 @@ has 'std'      =>       (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
                          is              => 'rw',
                          required        => 0,
                         );
-
 
 =head2 quartile1
 
@@ -154,7 +141,6 @@ has 'median'      =>     (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
                           required        => 0,
                          );
 
-
 =head2 sample_size
 
 Number of reads that were attempted to align
@@ -174,7 +160,7 @@ has 'paired_reads_direction_in'  => (isa             => 'Bool',
                                      is              => 'rw',
                                      required        => 0,
                                      default         => 1,
-			            );
+                                    );
 
 =head2 num_well_aligned_reads
 
@@ -184,7 +170,7 @@ Number of properly paired read pairs in the majority direction
 has 'num_well_aligned_reads'  => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
                                   is              => 'rw',
                                   required        => 0,
-			         );
+                                 );
 
 =head2 num_well_aligned_reads_opp_dir
 
@@ -194,9 +180,7 @@ Number of properly paired read pairs in opposite to the majority direction
 has 'num_well_aligned_reads_opp_dir'  => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
                                           is              => 'rw',
                                           required        => 0,
-			                 );
-
-
+                                         );
 
 =head2 reference
 
@@ -206,7 +190,7 @@ A path to the binary version of the reference that was used in the aligning
 has 'reference' => (isa      => 'Maybe[Str]',
                     is       => 'rw',
                     required => 0,
-		   );
+                   );
 
 =head2 norm_fit_nmode
 
@@ -214,9 +198,9 @@ Number of normal modes
 
 =cut
 has 'norm_fit_nmode'    => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
-                       is              => 'rw',
-                       required        => 0,
-                      );
+                            is              => 'rw',
+                            required        => 0,
+                           );
 
 =head2 norm_confidence
 
@@ -224,9 +208,9 @@ Confidence of normal fit
 
 =cut
 has 'norm_fit_confidence'    => (isa             => 'Maybe[Num]',
-                            is              => 'rw',
-                            required        => 0,
-                           );
+                                 is              => 'rw',
+                                 required        => 0,
+                                );
 
 =head2 norm_fit_pass
 
@@ -234,9 +218,9 @@ Normal fit pass/fail
 
 =cut
 has 'norm_fit_pass'     => (isa      => 'Maybe[Bool]',
-                       is       => 'rw',
-                       required => 0,
-                      );
+                            is       => 'rw',
+                            required => 0,
+                           );
 
 =head2 norm_fit_modes
 
@@ -244,9 +228,9 @@ Normal fit modes (amp, mean and stdev for each mode)
 
 =cut
 has 'norm_fit_modes'     => (isa      => 'Maybe[ArrayRef]',
-                       is       => 'rw',
-                       required => 0,
-                      );
+                             is       => 'rw',
+                             required => 0,
+                            );
 
 __PACKAGE__->meta->make_immutable;
 
@@ -273,8 +257,6 @@ __END__
 
 =item Math::Round
 
-=item npg_common::diagram::visio_histo_google
-
 =item npg_tracking::util::types
 
 =back
@@ -285,11 +267,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL, by Marina Gourtovaia
 
 This file is part of NPG.
 
