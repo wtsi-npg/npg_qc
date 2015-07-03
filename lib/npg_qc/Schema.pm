@@ -14,7 +14,7 @@ __PACKAGE__->load_namespaces;
 # Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-24 09:37:40
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iHP1VU0U0dqzLPd7RT3OCw
 
-use Readonly;
+use namespace::autoclean;
 our $VERSION = '0';
 with qw/npg_tracking::util::db_connect/;
 
@@ -51,7 +51,7 @@ for the npgqc database.
 
 =item DBIx::Class::Schema
 
-=item Readonly
+=item namespace::autoclean;
 
 =item npg_tracking::util::db_connect
 

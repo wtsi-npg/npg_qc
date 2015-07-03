@@ -5,6 +5,7 @@
 package npg_qc::illumina::loader::Offset;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw{-no_match_vars};
 use Readonly;
@@ -89,8 +90,9 @@ sub _process_offset {
 
     return 1;
   }
-no Moose;
+
 __PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -103,6 +105,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

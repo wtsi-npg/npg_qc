@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::UpstreamTagsCheck;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Model' }
 
@@ -37,7 +38,6 @@ sub sort_unexpected_tags {
 	return $upstream_tags_results;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -54,6 +54,8 @@ __END__
 =item Carp
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model
 

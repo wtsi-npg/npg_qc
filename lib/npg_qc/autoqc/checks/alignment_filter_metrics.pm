@@ -6,6 +6,7 @@
 package npg_qc::autoqc::checks::alignment_filter_metrics;
 
 use Moose;
+use namespace::autoclean;
 use English qw( -no_match_vars );
 use JSON;
 use Perl6::Slurp;
@@ -46,7 +47,6 @@ override 'execute' => sub {
     return 1;
 };
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 
@@ -87,6 +87,8 @@ npg_qc::autoqc::checks::alignment_filter_metrics - stats for splitting files by 
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item English
 

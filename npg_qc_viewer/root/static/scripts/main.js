@@ -115,58 +115,72 @@ function( manual_qc,  collapse, insert_size, adapter, mismatch, unveil) {
   }
 
   jQuery('.bcviz_insert_size').each(function(i) {
-    d = jQuery(this).data('check');
-    w = jQuery(this).data('width') || 650;
-    h = jQuery(this).data('height') || 300;
-    t = jQuery(this).data('title') || _getTitle('Insert Sizes : ',d);
-    chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+    var self = $(this);
+    var d = self.data('check'),
+        w = self.data('width') || 650,
+        h = self.data('height') || 300,
+        t = self.data('title') || _getTitle('Insert Sizes : ',d);
+    var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+    //Removing data from page to free memory
+    self.removeAttr('data-check data-width data-height data-title');
+    //Nulling variables to ease GC
+    d = null; w = null; h = null; t = null;
+
     if (chart != null) {
       if (chart.svg != null) {
-        div = document.createElement("div");
-        jQuery(div).append(function() { return chart.svg.node(); } );
-        jQuery(div).addClass('chart');
-        jQuery(this).append(div);
+        div = $(document.createElement("div"));
+        div.append(function() { return chart.svg.node(); } );
+        div.addClass('chart');
+        self.append(div);
       }
     }
   });
 
-  jQuery('.bcviz_adapter').each(function(i) {
-    d = jQuery(this).data('check');
-    h = jQuery(this).data('height') || 200;
-    t = jQuery(this).data('title') || _getTitle('Adapter Start Count : ', d);
+  jQuery('.bcviz_adapter').each(function() {
+    var self = $(this);
+    var d = self.data('check'),
+        h = self.data('height') || 200,
+        t = self.data('title') || _getTitle('Adapter Start Count : ', d);
 
     // override width to ensure two graphs can fit side by side
-    w = jQuery(this).parent().width() / 2 - 40;
-    chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-    fwd_div = document.createElement("div");
-    if (chart != null && chart.svg_fwd != null) { jQuery(fwd_div).append( function() { return chart.svg_fwd.node(); } ); }
-    jQuery(fwd_div).addClass('chart_left');
-    rev_div = document.createElement("div");
-    if (chart != null && chart.svg_rev != null) { jQuery(rev_div).append( function() { return chart.svg_rev.node(); } ); }
-    jQuery(rev_div).addClass('chart_right');
-    jQuery(this).append(fwd_div,rev_div);
+    var w = jQuery(this).parent().width() / 2 - 40;
+    var chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+    self.removeAttr('data-check data-height data-title');
+    d = null; h = null; t = null;
+
+    var fwd_div = $(document.createElement("div"));
+    if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
+    fwd_div.addClass('chart_left');
+    rev_div = $(document.createElement("div"));
+    if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
+    rev_div.addClass('chart_right');
+    self.append(fwd_div,rev_div);
   });
 
-  jQuery('.bcviz_mismatch').each(function(i) {
-    d = jQuery(this).data('check');
-    h = jQuery(this).data('height');
-    t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
+  jQuery('.bcviz_mismatch').each(function() {
+    var self = $(this)
+    var d = jQuery(this).data('check'),
+        h = jQuery(this).data('height'),
+        t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
 
     // override width to ensure two graphs can fit side by side
-    w = jQuery(this).parent().width() / 2 - 90;
-    chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-    fwd_div = document.createElement("div");
-    if (chart != null && chart.svg_fwd != null) { jQuery(fwd_div).append( function() { return chart.svg_fwd.node(); } ); }
-    jQuery(fwd_div).addClass('chart_left');
+    var w = jQuery(this).parent().width() / 2 - 90;
+    var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+    self.removeAttr('data-check data-height data-title');
+    d = null; h = null; t = null;
 
-    rev_div = document.createElement("div");
-    if (chart != null && chart.svg_rev != null) { jQuery(rev_div).append( function() { return chart.svg_rev.node(); } ); }
-    jQuery(rev_div).addClass('chart_right');
+    var fwd_div = $(document.createElement("div"));
+    if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
+    fwd_div.addClass('chart_left');
 
-    leg_div = document.createElement("div");
-    if (chart != null && chart.svg_legend != null) { jQuery(leg_div).append( function() { return chart.svg_legend.node(); } ); }
-    jQuery(leg_div).addClass('chart_legend');
+    var rev_div = $(document.createElement("div"));
+    if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
+    rev_div.addClass('chart_right');
 
-    jQuery(this).append(fwd_div,rev_div,leg_div);
+    var leg_div = $(document.createElement("div"));
+    if (chart != null && chart.svg_legend != null) { leg_div.append( function() { return chart.svg_legend.node(); } ); }
+    leg_div.addClass('chart_legend');
+
+    self.append(fwd_div,rev_div,leg_div);
   });
 });

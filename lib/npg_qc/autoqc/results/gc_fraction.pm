@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::gc_fraction;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::gc_fraction);
@@ -54,8 +55,7 @@ has 'threshold_difference'      => ( isa      => 'Maybe[Int]',
                                      is       => 'rw',
 		                   );
 
-
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -97,6 +97,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =back
 

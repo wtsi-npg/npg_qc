@@ -193,6 +193,8 @@ sub get_all_outcomes : Path('get_all_outcomes') {
   return;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 

@@ -5,6 +5,7 @@
 package npg_qc::illumina::loader;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use Readonly;
 use Module::Pluggable::Object;
@@ -169,8 +170,8 @@ sub lane_summary_saved {
   return $count >= scalar @ends;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -183,6 +184,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

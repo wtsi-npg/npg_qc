@@ -12,6 +12,7 @@ use File::Basename qw(fileparse);
 use File::Spec::Functions qw(catfile);
 use DateTime;
 use Moose;
+use namespace::autoclean;
 use List::Util qw(shuffle);
 use Readonly;
 
@@ -350,9 +351,8 @@ sub _parse_output {
     return $match;
 }
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable();
+
 1;
 
 __END__
@@ -421,6 +421,12 @@ Needs up to 2.5Gb of Memory reserved when submitted to LSF.
 =head1 DIAGNOSTICS
 
 =head1 DEPENDENCIES
+
+=over
+
+=item namespace::autoclean
+
+=back
 
 =head1 BUGS AND LIMITATIONS
 

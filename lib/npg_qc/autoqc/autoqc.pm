@@ -1,6 +1,7 @@
 package npg_qc::autoqc::autoqc;
 
 use Moose;
+use namespace::autoclean;
 use MooseX::ClassAttribute;
 use Class::Load qw(load_class);
 use Carp;
@@ -276,8 +277,8 @@ sub can_run {
     return $check->can_run;
 }
 
-no Moose;
 no MooseX::ClassAttribute;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -291,6 +292,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::ClassAttribute
 
