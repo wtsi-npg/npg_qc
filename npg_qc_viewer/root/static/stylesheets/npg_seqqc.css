@@ -397,17 +397,6 @@ a, a:link, a:visited, a:hover {
   padding-left: 20px;
 
 }
-
-.fastqcheck_plot {
-  vertical-align: text-top;
-}
-
-
-.fastqcheck_legend {
-  vertical-align: text-top;
-  padding-left: 10px;
-}
-
 /******************* annotation section **************/
 #annotations_frame {
   height: 100px;
