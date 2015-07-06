@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Using "jquery-unveil" plugin for heatmaps
+ - Removing data from DOM after passing them to local variables
+ - Nulling variables after using them for bcviz to free memory
+
 release 58.5
  - stop using depricated Class::MOP::load_class method
  - use namespace::autoclean instead of "no Moose" in Moose objects
