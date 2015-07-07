@@ -95,8 +95,7 @@ __PACKAGE__->table('bam_flagstats');
 =head2 subset
 
   data_type: 'varchar'
-  default_value: 'target'
-  is_nullable: 0
+  is_nullable: 1
   size: 10
 
 =head2 library
@@ -229,12 +228,7 @@ __PACKAGE__->add_columns(
     size => 10,
   },
   'subset',
-  {
-    data_type => 'varchar',
-    default_value => 'target',
-    is_nullable => 0,
-    size => 10,
-  },
+  { data_type => 'varchar', is_nullable => 1, size => 10 },
   'library',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'unpaired_mapped_reads',
@@ -326,13 +320,22 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-23 16:41:44
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yqOj2YWv7tpkWqPSO+n8Xg
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-07-07 15:14:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Q1XOqnqkPaDUpC7qsMr8Jw
+
+
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 
 __PACKAGE__->set_flators4non_scalar(qw( histogram info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('human_split', 'is_string');
-__PACKAGE__->set_inflator4scalar('subset', 'is_string');
+
+__PACKAGE__->inflate_column('subset', {
+  inflate => sub {
+    my $db_value = shift;
+    $db_value eq 'target' ? undef : $db_value;
+  },
+});
 
 our $VERSION = '0';
 
@@ -405,4 +408,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-

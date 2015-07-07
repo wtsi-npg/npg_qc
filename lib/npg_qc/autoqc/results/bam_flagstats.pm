@@ -27,6 +27,7 @@ Readonly::Scalar my $METRICS_FIELD_LIST => [qw(
 Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 
 Readonly::Scalar my $HUMAN_SPLIT_ATTR_DEFAULT => 'all';
+Readonly::Scalar my $SUBSET_ATTR_DEFAULT      => 'target';
 
 has [ qw/ +path +id_run +position / ] => ( required   => 0, );
 
@@ -71,10 +72,13 @@ sub BUILD {
     }
   }
 
-  if ( $self->_has_human_split && !$self->_has_subset &&
-       $self->human_split ne $HUMAN_SPLIT_ATTR_DEFAULT ) {
+  if ( $self->_has_human_split &&
+       $self->human_split ne $HUMAN_SPLIT_ATTR_DEFAULT &&
+      !$self->_has_subset) {
     $self->subset($self->human_split);
-  } elsif ( $self->_has_subset && !$self->_has_human_split ) {
+  } elsif ( $self->_has_subset &&
+            $self->subset ne $SUBSET_ATTR_DEFAULT &&
+           !$self->_has_human_split) {
     # Do reverse as well so the human_split column, while we
     # have it, is correctly populated
     $self->human_split($self->subset);
