@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 5.5.41, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.32, for debian-linux-gnu (x86_64)
 --
 -- Host: nqct-db    Database: npgqct
 -- ------------------------------------------------------
@@ -182,7 +182,7 @@ CREATE TABLE `bam_flagstats` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   `path` varchar(256) DEFAULT NULL,
   `human_split` varchar(10) DEFAULT 'all',
-  `subset` varchar(10) NOT NULL DEFAULT 'target',
+  `subset` varchar(10) DEFAULT NULL,
   `library` varchar(256) DEFAULT NULL,
   `unpaired_mapped_reads` bigint(20) unsigned DEFAULT NULL,
   `paired_mapped_reads` bigint(20) unsigned DEFAULT NULL,
@@ -1534,4 +1534,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-06-23 16:48:53
+-- Dump completed on 2015-07-07 16:02:57
