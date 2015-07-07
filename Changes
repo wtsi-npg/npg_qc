@@ -3,7 +3,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - bam_flagstats autoqc result object - new field, subset, added; it replaces
    human_split field in result type evaluations; human_split is retained for now
    to be compatible with existing data and code
- 
+ - Using "jquery-unveil" plugin for heatmaps
+ - Removing data from DOM after passing them to local variables
+ - Nulling variables after using them for bcviz to free memory
+
 release 58.5
  - stop using depricated Class::MOP::load_class method
  - use namespace::autoclean instead of "no Moose" in Moose objects
