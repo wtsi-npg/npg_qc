@@ -163,13 +163,15 @@ __END__
 
 =head1 NAME
 
-    npg_qc::autoqc::results::bam_flagstats
+npg_qc::autoqc::results::bam_flagstats
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
 =head1 SUBROUTINES/METHODS
+
+=head2 BUILD - ensures human_split an dsubset fields are populated consistently
 
 =head2 parsing_flagstats - parsing Picard MarkDuplicates metrics output file and save the result to the object
 
@@ -207,11 +209,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Guoying Qi E<lt>gq1@sanger.ac.ukE<gt><gt>
+Guoying Qi E<lt>gq1@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Guoying Qi
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
