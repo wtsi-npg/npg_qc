@@ -370,6 +370,40 @@ sub slice {
     return $c;
 }
 
+=head2 remove
+
+Returns a collection object after removing the elements specified in the criteria.
+The criteria is defined as an array of check_name or class_name.
+
+my $plex_results = $collection->remove(q[check_name], [ 'qX_yield', 'gc bias' ]);
+
+=cut
+
+sub remove {
+
+  my ($self, $criterion, $values) = @_;
+
+  if (!defined $criterion) { croak q[Cannot remove with undefined criterion]; }
+  if (!defined $values)     { croak qq[Cannot remove with undefined $criterion values]; }
+
+  if ($criterion !~ /check_name|class_name/smx) {
+    croak q[Can only remove based on either check_name or class_name];
+  }
+
+  my $c = __PACKAGE__->new();
+
+  foreach my $r (@{$self->results}) {
+    if ($r->$criterion) {
+      my $to_check = $r->$criterion;
+      if( none { $_ eq $to_check } @{$values}) {
+        $c->add($r);
+      }
+    } else {
+      $c->add($r);
+    }
+  }
+  return $c;
+}
 
 =head2 search
 
