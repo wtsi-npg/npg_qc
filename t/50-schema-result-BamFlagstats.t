@@ -18,7 +18,7 @@ my $rs = $schema->resultset('BamFlagstats');
 {
   my $json = '{"histogram":{},"id_run":"9225","info":{"Picard-tools":"1.72(1230)","Picard_metrics_header":"# /software/hpag/biobambam/0.0.76/bin/bammarkduplicates I=sorted.bam O=/dev/stdout tmpfile=HJH8I0e3i9/ M=/tmp/Kr78slLXuv level=0\n","Samtools":"0.1.18 (r982:295)"},"library":"9418068",
 "library_size":-1,
-"mate_mapped_defferent_chr":0,"mate_mapped_defferent_chr_5":0,"num_total_reads":2,"paired_mapped_reads":1,"paired_read_duplicates":0,"percent_duplicate":0,"position":"1","proper_mapped_pair":2,"read_pair_optical_duplicates":0,"read_pairs_examined":1,"tag_index":"0","unmapped_reads":0,"unpaired_mapped_reads":0,"unpaired_read_duplicates":0,"subset":"target"}';
+"mate_mapped_defferent_chr":0,"mate_mapped_defferent_chr_5":0,"num_total_reads":2,"paired_mapped_reads":1,"paired_read_duplicates":0,"percent_duplicate":0,"position":"1","proper_mapped_pair":2,"read_pair_optical_duplicates":0,"read_pairs_examined":1,"tag_index":"0","unmapped_reads":0,"unpaired_mapped_reads":0,"unpaired_read_duplicates":0}';
 
   my $values = from_json($json);
   isa_ok($rs->new($values), 'npg_qc::Schema::Result::BamFlagstats');
@@ -43,7 +43,7 @@ my $rs = $schema->resultset('BamFlagstats');
 {
   my $json = '{"histogram":{},"human_split":"phix","id_run":"12287","info":{"Picard-tools":"1.72(1230)","Picard_metrics_header":"# /software/hpag/biobambam/0.0.76/bin/bammarkduplicates I=sorted.bam O=/dev/stdout tmpfile=/HJH8I0e3i9/ M=/tmp/Kr78slLXuv level=0\n","Samtools":"0.1.18 (r982:295)"},"library":"9418068",
 "library_size":-1,
-"mate_mapped_defferent_chr":0,"mate_mapped_defferent_chr_5":0,"num_total_reads":2,"paired_mapped_reads":1,"paired_read_duplicates":0,"percent_duplicate":0,"position":"1","proper_mapped_pair":2,"read_pair_optical_duplicates":0,"read_pairs_examined":1,"tag_index":"89","unmapped_reads":0,"unpaired_mapped_reads":0,"unpaired_read_duplicates":0,"subset":"target"}';
+"mate_mapped_defferent_chr":0,"mate_mapped_defferent_chr_5":0,"num_total_reads":2,"paired_mapped_reads":1,"paired_read_duplicates":0,"percent_duplicate":0,"position":"1","proper_mapped_pair":2,"read_pair_optical_duplicates":0,"read_pairs_examined":1,"tag_index":"89","unmapped_reads":0,"unpaired_mapped_reads":0,"unpaired_read_duplicates":0}';
 
   my $v = from_json($json);
   $rs->result_class->deflate_unique_key_components($v);

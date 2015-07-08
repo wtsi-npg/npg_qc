@@ -6,7 +6,7 @@ UPDATE `bam_flagstats` set subset=human_split where (human_split != 'all' and hu
 UPDATE `bam_flagstats` set subset='target' where subset IS NULL;
 
 # remove default from subset
-ALTER TABLE `bam_flagstats` MODIFY COLUMN  `subset` varchar(10);
+ALTER TABLE `bam_flagstats` MODIFY COLUMN  `subset` varchar(10) NOT NULL DEFAULT 'target';
 
 # drop current unique key
 ALTER TABLE `bam_flagstats` DROP KEY `unq_run_lane_index_sp_flag`;
@@ -15,23 +15,20 @@ ALTER TABLE `bam_flagstats` ADD CONSTRAINT UNIQUE  `unq_run_lane_index_subset_fl
 
 # create a trigger to populate the new column so that old data with old software
 # can be still loaded
+
 delimiter // \
 CREATE TRIGGER bfs_populate_subset BEFORE INSERT ON bam_flagstats \
 FOR EACH ROW \
 BEGIN \
-  DECLARE temp varchar(10) default 'target';
-  IF NEW.subset IS NULL THEN \
-    IF NEW.human_split IS NOT NULL and NEW.human_split != 'all' THEN \
+    DECLARE temp varchar(10);
+    IF NEW.subset = 'target' and NEW.human_split IS NOT NULL and NEW.human_split != 'all' THEN \
       SET temp = NEW.human_split; \
+      SET NEW.subset = temp; \
     END IF; \
-    SET NEW.subset = temp; \
-  END IF; \
 END // \
 delimiter ;
 
 #DROP TRIGGER IF EXISTS bfs_populate_subset; #to remove the trigger when not needed any more
-
-
 
 
 
