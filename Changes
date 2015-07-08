@@ -4,6 +4,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - Removing data from DOM after passing them to local variables
  - Nulling variables after using them for bcviz to free memory
  - Removing gc bias and qX Yield checks when looking at non-run views
+ - Removing collapser
 
 release 58.5
  - stop using depricated Class::MOP::load_class method
