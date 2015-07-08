@@ -1,9 +1,15 @@
 [% studies = {}; FOREACH lane_key IN sorted_rl_map_keys -%]
   [%
      lane_collection = rl_map.$lane_key;
+
      NEXT IF (!lane_collection || lane_collection.size == 0);
-     temp = lane_collection.sort;
-     checks = lane_collection.results;
+     IF run_view && run_view == 1;
+       checks = lane_collection.results;
+     ELSE;
+       trimmed_lane_collection = lane_collection.remove('check_name', ['qX yield', 'gc bias']);
+       checks = trimmed_lane_collection.results;
+     END;
+
      provenance = '';
      checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'});
   -%]
