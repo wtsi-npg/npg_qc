@@ -80,6 +80,7 @@ has 'results' => (
           'delete' => 'delete',
           'get'    => 'get',
           'elements'    => 'all',
+          'grep'        => 'grep',
       },
                  );
 
@@ -372,8 +373,8 @@ sub slice {
 
 =head2 remove
 
-Returns a collection object after removing the elements specified in the criteria.
-The criteria is defined as an array of check_name or class_name.
+Utility method wrapping grep functionality to remove from collection those
+elements matching criteria. Returns a new collection without the elements.
 
 my $plex_results = $collection->remove(q[check_name], [ 'qX_yield', 'gc bias' ]);
 
@@ -391,17 +392,11 @@ sub remove {
   }
 
   my $c = __PACKAGE__->new();
-
-  foreach my $r (@{$self->results}) {
-    if ($r->$criterion) {
-      my $to_check = $r->$criterion;
-      if( none { $_ eq $to_check } @{$values}) {
-        $c->add($r);
-      }
-    } else {
-      $c->add($r);
-    }
-  }
+  
+  my @filtered = $self->grep(sub { my $obj = $_; none { $obj->check_name eq $_ } @{$values} } ); 
+  
+  $c->push(@filtered);
+ 
   return $c;
 }
 
