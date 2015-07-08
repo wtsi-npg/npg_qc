@@ -1,17 +1,21 @@
-# create a new column defaulting to NULL;
-ALTER TABLE `bam_flagstats` ADD COLUMN  `subset` varchar(10) default NULL AFTER `human_split`;
+################
+#
+# `human_split` column name does not reflect the nature of data in this column.
+# A new column, `subset`, is introduced to eventually replace the `human_split` column.
+# On one of the clusters old software will be used for archival, so backwards
+# compatibility is important.
+#
+# Archival of autoqc data should be stopped before these scripts are run.
+#
 
-# back-populate data from the old column into thr new
+# create a new column
+ALTER TABLE `bam_flagstats` ADD COLUMN  `subset` varchar(10) NOT NULL DEFAULT 'target' AFTER `human_split`;
+
+# back-populate data from the old column into the new
 UPDATE `bam_flagstats` set subset=human_split where (human_split != 'all' and human_split != 'nonhuman');
-UPDATE `bam_flagstats` set subset='target' where subset IS NULL;
 
-# remove default from subset
-ALTER TABLE `bam_flagstats` MODIFY COLUMN  `subset` varchar(10) NOT NULL DEFAULT 'target';
-
-# drop current unique key
-ALTER TABLE `bam_flagstats` DROP KEY `unq_run_lane_index_sp_flag`;
-#add new unique key
-ALTER TABLE `bam_flagstats` ADD CONSTRAINT UNIQUE  `unq_run_lane_index_subset_flag` (`id_run`,`position`,`tag_index`,`human_split`,`subset`);
+# not extending the unique key (`id_run`,`position`,`tag_index`,`human_split`) to include `subset` to
+# avoid discrepancy in the unique key definition in the old and new versions of DBIx binding
 
 # create a trigger to populate the new column so that old data with old software
 # can be still loaded

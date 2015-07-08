@@ -1,8 +1,3 @@
-#########
-# Author:        gq1
-# Created:       21 June 2009
-#
-
 package npg_qc::autoqc::results::bam_flagstats;
 
 use Moose;
@@ -70,18 +65,21 @@ sub BUILD {
       croak sprintf 'human_split and subset attrs are different: %s and %s',
         $self->human_split, $self->subset;
     }
-  }
-
-  if ( $self->_has_human_split &&
-       $self->human_split ne $HUMAN_SPLIT_ATTR_DEFAULT &&
-      !$self->_has_subset) {
-    $self->subset($self->human_split);
-  } elsif ( $self->_has_subset &&
-            $self->subset ne $SUBSET_ATTR_DEFAULT &&
-           !$self->_has_human_split) {
-    # Do reverse as well so the human_split column, while we
-    # have it, is correctly populated
-    $self->human_split($self->subset);
+  } else {
+    if ($self->_has_human_split) {
+      if (!$self->_has_subset && $self->human_split ne $HUMAN_SPLIT_ATTR_DEFAULT ) {
+        # Backwards compatibility with old results.
+        # Will be done by the trigger anyway, but let's not rely on the trigger
+        # which we will remove as soon as we can.
+        $self->subset($self->human_split);
+      }
+    } else {
+      if ($self->_has_subset && $self->subset ne $SUBSET_ATTR_DEFAULT) {
+        # Do reverse as well so that the human_split column, while we
+        # have it, is correctly populated.
+        $self->human_split($self->subset);
+      }
+    }
   }
 
   return;
@@ -210,6 +208,7 @@ npg_qc::autoqc::results::bam_flagstats
 =head1 AUTHOR
 
 Guoying Qi E<lt>gq1@sanger.ac.ukE<gt><gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 

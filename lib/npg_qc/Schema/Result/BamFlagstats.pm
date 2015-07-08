@@ -287,7 +287,7 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<unq_run_lane_index_subset_flag>
+=head2 C<unq_run_lane_index_sp_flag>
 
 =over 4
 
@@ -299,15 +299,13 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 =item * L</human_split>
 
-=item * L</subset>
-
 =back
 
 =cut
 
 __PACKAGE__->add_unique_constraint(
-  'unq_run_lane_index_subset_flag',
-  ['id_run', 'position', 'tag_index', 'human_split', 'subset'],
+  'unq_run_lane_index_sp_flag',
+  ['id_run', 'position', 'tag_index', 'human_split'],
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -326,24 +324,18 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-07-07 23:24:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5D/HDbSNAYI+1KFq9+SE+A
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-07-08 11:05:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:txZzb/HOksJVy8B6JUfuww
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
+our $VERSION = '0';
+
 __PACKAGE__->set_flators4non_scalar(qw( histogram info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('human_split', 'is_string');
-
-__PACKAGE__->inflate_column('subset', {
-  inflate => sub {
-    my $db_value = shift;
-    $db_value eq 'target' ? undef : $db_value;
-  },
-});
-
-our $VERSION = '0';
+__PACKAGE__->set_inflator4scalar('subset', 'is_string');
 
 __PACKAGE__->meta->make_immutable;
 
@@ -396,7 +388,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
