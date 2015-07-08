@@ -379,7 +379,7 @@ my $plex_results = $collection->remove(q[check_name], [ 'qX_yield', 'gc bias' ])
 
 =cut
 
-sub remove { 
+sub remove {
 
   my ($self, $criterion, $values) = @_;
 
@@ -395,7 +395,7 @@ sub remove {
   foreach my $r (@{$self->results}) {
     if ($r->$criterion) {
       my $to_check = $r->$criterion;
-      if(!grep /$to_check/, @$values) {
+      if( none { $_ eq $to_check } @{$values}) {
         $c->add($r);
       }
     } else {
@@ -404,7 +404,6 @@ sub remove {
   }
   return $c;
 }
-
 
 =head2 search
 
