@@ -4,7 +4,7 @@
 
      NEXT IF (!lane_collection || lane_collection.size == 0);
      to_remove = ['split stats phix', 'spatial filter'];
-     IF !run_view || run_view != 1;
+     IF !run_view.defined || run_view != 1;
        to_remove.push('qX yield', 'gc bias');
      END;
      trimmed_lane_collection = lane_collection.remove('check_name', to_remove);
