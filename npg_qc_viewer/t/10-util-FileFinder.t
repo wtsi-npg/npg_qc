@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Moose::Meta::Class;
 
@@ -84,6 +84,19 @@ subtest 'Attributes of the customised object' => sub {
     qc_schema      => $schema);
   is ($finder->db_lookup, 1, 'db lookup is true');
   is_deeply ($finder->location, ['t/data', 't/data/lane*'], 'location derived'); 
+};
+
+subtest 'Filename generation' => sub {
+  plan tests => 7;
+
+  my $finder = 'npg_qc_viewer::Util::FileFinder';
+  is($finder->create_filename(5,1), '5_1');
+  is($finder->create_filename(5,1, undef, 1), '5_1_1');
+  is($finder->create_filename(5,1, undef, 't'), '5_1_t');
+  is($finder->create_filename(5,1, undef, 2), '5_1_2');
+  is($finder->create_filename(5,1,3), '5_1#3');
+  is($finder->create_filename(5,1,3,1), '5_1_1#3');
+  is($finder->create_filename(5,1,3,2), '5_1_2#3');
 };
 
 1;

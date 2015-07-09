@@ -5,10 +5,6 @@ use namespace::autoclean;
 use Readonly;
 
 use npg_qc_viewer::Util::FileFinder;
-use npg_common::roles::run::lane::file_names;
-use npg_tracking::glossary::tag;
-use npg_tracking::glossary::lane;
-use npg_tracking::glossary::run;
 use npg_tracking::Schema;
 
 extends 'Catalyst::Model::Factory::PerRequest';
@@ -98,36 +94,29 @@ sub files {
   return $self->_get_file_paths($rpt_key_map);
 }
 
-sub _file_name_helper {
-  my $ref = shift;
-  return Moose::Meta::Class->create_anon_class(
-    roles => [qw/npg_common::roles::run::lane::file_names
-                 npg_tracking::glossary::tag
-                 npg_tracking::glossary::lane
-                 npg_tracking::glossary::run/])->new_object($ref);
-}
-
 sub _get_file_paths {
   my ( $self, $rpt_key_map) = @_;
 
   my $id_run = $rpt_key_map->{'id_run'};
+  my $pos    = $rpt_key_map->{'position'};
+  my $ti     = $rpt_key_map->{'tag_index'};
+  my $helper = 'npg_qc_viewer::Util::FileFinder';
 
   my $fnames = {};
-  my $helper = _file_name_helper($rpt_key_map);
   my $file_cache = $self->_file_cache->{$id_run}->{'files'};
-  my $ext = $FILE_EXTENSION;
+  my $ext = q[.] . $FILE_EXTENSION;
 
-  my $file_name = $helper->create_filename($ext);
+  my $file_name = $helper->create_filename($id_run, $pos, $ti) . $ext;
   if ($file_cache->{$file_name}) {
     $fnames->{'forward'} = $file_cache->{$file_name};
   }
 
   if ( !$fnames->{'forward'} ) { # Get for forward and reverse with end
-    $file_name = $helper->create_filename($ext, 1);
+    $file_name = $helper->create_filename($id_run, $pos, $ti, 1) . $ext;
     if ($file_cache->{$file_name}) {
       $fnames->{'forward'} = $file_cache->{$file_name};
     }
-    $file_name = $helper->create_filename($ext, 2);
+    $file_name = $helper->create_filename($id_run, $pos, $ti, 2) . $ext;
     if ($file_cache->{$file_name}) {
       $fnames->{'reverse'} = $file_cache->{$file_name};
     }
@@ -135,7 +124,7 @@ sub _get_file_paths {
 
   #Look for the extra heatmap for tag
   if ( !exists $rpt_key_map->{'tag_index'}) {
-    $file_name = $helper->create_filename($ext, q[t]);
+    $file_name = $helper->create_filename($id_run, $pos, $ti, q[t]) . $ext;
     if ($file_cache->{$file_name}) {
       $fnames->{'tags'} = $file_cache->{$file_name};
     }
@@ -170,14 +159,6 @@ __END__
 =item Catalyst::Model::Factory::PerRequest
 
 =item npg_qc_viewer::Util::FileFinder
-
-=item npg_common::roles::run::lane::file_names
-
-=item npg_tracking::glossary::tag
-
-=item npg_tracking::glossary::lane
-
-=item npg_tracking::glossary::run
 
 =item npg_qc::Schema
 

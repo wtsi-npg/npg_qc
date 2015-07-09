@@ -104,6 +104,16 @@ sub _build_files {
   return $hfiles;
 }
 
+sub create_filename {
+  my ($self, $id_run, $position, $tag_index, $end) = @_;
+
+  return sprintf '%i_%i%s%s',
+    $id_run,
+    $position,
+    $end        ? "_$end" : q[],
+    $tag_index  ? "#$tag_index" : q[];
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -146,6 +156,12 @@ In this case the value of the id_run attribute is disregarded.
 
 =head2 files - lazily built hash ref containing all actually available file names
 as keys and, in case of successful file system search, file paths as values
+
+=head2 create_filename - given run id, position, tag index (optional) and end (optional)
+returns a file name
+
+  npg_qc_viewer::Util::FileFinder->create_filename(5,3,1,2);
+  $obj->->create_filename(5,3,1);
 
 =head1 DIAGNOSTICS
 
