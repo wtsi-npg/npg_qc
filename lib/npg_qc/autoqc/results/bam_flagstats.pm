@@ -54,7 +54,8 @@ has [ qw/ num_total_reads
           unpaired_read_duplicates
           paired_read_duplicates
           read_pair_optical_duplicates
-          library_size proper_mapped_pair
+          library_size
+          proper_mapped_pair
           mate_mapped_defferent_chr
           mate_mapped_defferent_chr_5
           read_pairs_examined / ] => (
