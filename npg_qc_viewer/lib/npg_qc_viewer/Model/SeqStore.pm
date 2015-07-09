@@ -98,25 +98,20 @@ sub _get_file_paths {
   my ( $self, $rpt_key_map) = @_;
 
   my $id_run = $rpt_key_map->{'id_run'};
-  my $pos    = $rpt_key_map->{'position'};
-  my $ti     = $rpt_key_map->{'tag_index'};
-  my $helper = 'npg_qc_viewer::Util::FileFinder';
-
   my $fnames = {};
   my $file_cache = $self->_file_cache->{$id_run}->{'files'};
-  my $ext = q[.] . $FILE_EXTENSION;
 
-  my $file_name = $helper->create_filename($id_run, $pos, $ti) . $ext;
+  my $file_name = _filename($rpt_key_map);
   if ($file_cache->{$file_name}) {
     $fnames->{'forward'} = $file_cache->{$file_name};
   }
 
   if ( !$fnames->{'forward'} ) { # Get for forward and reverse with end
-    $file_name = $helper->create_filename($id_run, $pos, $ti, 1) . $ext;
+    $file_name = _filename($rpt_key_map, 1);
     if ($file_cache->{$file_name}) {
       $fnames->{'forward'} = $file_cache->{$file_name};
     }
-    $file_name = $helper->create_filename($id_run, $pos, $ti, 2) . $ext;
+    $file_name = _filename($rpt_key_map, 2);
     if ($file_cache->{$file_name}) {
       $fnames->{'reverse'} = $file_cache->{$file_name};
     }
@@ -124,7 +119,7 @@ sub _get_file_paths {
 
   #Look for the extra heatmap for tag
   if ( !exists $rpt_key_map->{'tag_index'}) {
-    $file_name = $helper->create_filename($id_run, $pos, $ti, q[t]) . $ext;
+    $file_name = _filename($rpt_key_map, q[t]);
     if ($file_cache->{$file_name}) {
       $fnames->{'tags'} = $file_cache->{$file_name};
     }
@@ -135,6 +130,12 @@ sub _get_file_paths {
   }
 
   return $fnames;
+}
+
+sub _filename {
+  my ($rpt_key_map, $end) = @_;
+  return npg_qc_viewer::Util::FileFinder
+    ->create_filename($rpt_key_map, $end) . q[.] . $FILE_EXTENSION;
 }
 
 __PACKAGE__->meta->make_immutable;

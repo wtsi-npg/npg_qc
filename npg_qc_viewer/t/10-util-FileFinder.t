@@ -87,16 +87,22 @@ subtest 'Attributes of the customised object' => sub {
 };
 
 subtest 'Filename generation' => sub {
-  plan tests => 7;
+  plan tests => 10;
 
   my $finder = 'npg_qc_viewer::Util::FileFinder';
-  is($finder->create_filename(5,1), '5_1');
-  is($finder->create_filename(5,1, undef, 1), '5_1_1');
-  is($finder->create_filename(5,1, undef, 't'), '5_1_t');
-  is($finder->create_filename(5,1, undef, 2), '5_1_2');
-  is($finder->create_filename(5,1,3), '5_1#3');
-  is($finder->create_filename(5,1,3,1), '5_1_1#3');
-  is($finder->create_filename(5,1,3,2), '5_1_2#3');
+  my $m = {id_run=>5,position=>1};
+  is($finder->create_filename($m), '5_1');
+  is($finder->create_filename($m, 1), '5_1_1');
+  is($finder->create_filename($m, 't'), '5_1_t');
+  is($finder->create_filename($m, 2), '5_1_2');
+  $m->{'tag_index'} = 3;
+  is($finder->create_filename($m), '5_1#3');
+  is($finder->create_filename($m,1), '5_1_1#3');
+  is($finder->create_filename($m,2), '5_1_2#3');
+  $m->{'tag_index'} = 0;
+  is($finder->create_filename($m), '5_1#0');
+  is($finder->create_filename($m,1), '5_1_1#0');
+  is($finder->create_filename($m,2), '5_1_2#0');
 };
 
 1;
