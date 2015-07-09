@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 69;
+use Test::More tests => 73;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -42,6 +42,26 @@ my $schema = Moose::Meta::Class->create_anon_class(
   ok($db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test positive');
   $db_loader = npg_qc::autoqc::db_loader->new(check=>['insert_size','other']);
   ok(!$db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test negative');
+}
+
+{ 
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+      path    =>['t/data/autoqc/tag_decode_stats'],
+      schema  => $schema,
+      verbose => 1,
+  );
+  my $values = {'pear' => 1, 'apple' => 2, 'orange' => 3,};
+  $db_loader->_exclude_nondb_attrs('myfile', $values, qw/pear apple orange/);
+  is_deeply($values, {'pear' => 1, 'apple' => 2, 'orange' => 3,},
+    'hash did not change');
+  $values->{'__CLASS__'} = 'fruits';
+  warning_like {$db_loader->_exclude_nondb_attrs('myfile', $values, qw/pear apple/)}
+    qr/myfile: not loading field \'orange\'/,
+    'warning about filtering out orange, but not __CLASS__';
+  is_deeply($values, {'pear' => 1, 'apple' => 2,}, 'non-db orange and __CLASS__ filtered out');
+  $db_loader->_exclude_nondb_attrs('myfile', $values, qw/pear apple orange/);
+  is_deeply($values, {'pear' => 1, 'apple' => 2,},
+    'hash did not change');
 }
 
 {
@@ -161,28 +181,31 @@ my $schema = Moose::Meta::Class->create_anon_class(
 {
   my $is_rs = $schema->resultset('InsertSize');
   $is_rs->delete_all();
+  my $file_good = 't/data/autoqc/dbix_loader/is/12187_2.insert_size.json';
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
-       json_file => ['t/data/autoqc/dbix_loader/is/12187_2.insert_size.json',
-                     't/data/autoqc/insert_size/6062_8#1.insert_size.json'],
-  );
-  warnings_exist  {eval {$db_loader->load()} }
-    [qr(Loaded t/data/autoqc/dbix_loader/is/12187_2\.insert_size\.json),
-     qr(Loading aborted, transaction has rolled back)
-    ],
-    'attempted to load both files';
-  is ($is_rs->search({})->count, 0, 'table is still empty, ie transaction has been rolled back');
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       json_file => ['t/data/autoqc/dbix_loader/is/12187_2.insert_size.json',
-                     't/data/autoqc/insert_size/6062_8#1.insert_size.json'],
+       json_file => [$file_good,
+                     't/data/autoqc/insert_size/6062_8#2.insert_size.json'],
        verbose => 0,
   );
   throws_ok {$db_loader->load()} qr/Loading aborted, transaction has rolled back/,
     'error loading a set of files with the last file corrupt';
   is ($is_rs->search({})->count, 0, 'table is empty, ie transaction has been rolled back');
+
+  my $file = 't/data/autoqc/insert_size/6062_8#1.insert_size.json';
+  $db_loader = npg_qc::autoqc::db_loader->new(
+       schema => $schema,
+       json_file => [$file_good,$file],
+  );
+  warnings_like {$db_loader->load()}  [
+    qr/Loaded $file_good/,
+    qr/${file}: not loading field 'obins'/,
+    qr/Loaded $file/,
+    qr/2 json files have been loaded/ ],
+    'loaded a file with incorrect attribute, gave warning';
+  is ($is_rs->search({})->count, 2, 'two records created');
+  $is_rs->delete_all();
 }
 
 $schema->resultset('InsertSize')->delete_all();

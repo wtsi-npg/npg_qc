@@ -1,8 +1,3 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       February 2014
-#
-
 package npg_qc::autoqc::db_loader;
 
 use Moose;
@@ -12,6 +7,7 @@ use JSON;
 use Try::Tiny;
 use Perl6::Slurp;
 use List::MoreUtils qw/none/;
+use Readonly;
 
 use npg_qc::Schema;
 use npg_tracking::util::types;
@@ -21,6 +17,8 @@ use npg_qc::autoqc::results::bam_flagstats;
 with qw/MooseX::Getopt/;
 
 our $VERSION = '0';
+
+Readonly::Scalar my $CLASS_FIELD => q[__CLASS__];
 
 has 'path'   =>  ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',
@@ -119,20 +117,25 @@ sub _json2db{
   my $count = 0;
   try {
     my $values = decode_json(slurp $json_file);
-    my $class_name = delete $values->{'__CLASS__'};
+    my $class_name = delete $values->{$CLASS_FIELD};
     if ($class_name) {
       ($class_name, my $dbix_class_name) =
         npg_qc::autoqc::role::result->class_names($class_name);
-      if ($class_name eq 'bam_flagstats') { # need to get the subset/human_split field correctly
-                                            # if one of them is missing
-        my $module = 'npg_qc::autoqc::results::' . $class_name;
-        $values = decode_json($module->load($json_file)->freeze());
-        delete $values->{'__CLASS__'};
-      }
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
+
+        if ($class_name eq 'bam_flagstats') { # need to get the subset/human_split field correctly
+                                            # if one of them is missing
+          my $module = 'npg_qc::autoqc::results::' . $class_name;
+          $values = decode_json($module->load($json_file)->freeze());
+        }
+
         my $rs = $self->schema->resultset($dbix_class_name);
-        $rs->result_class->deflate_unique_key_components($values);
+        my $result_class = $rs->result_class;
+
+        $self->_exclude_nondb_attrs($json_file, $values, $result_class->columns());
+        $result_class->deflate_unique_key_components($values);
+
         if ($self->update) {
           $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
           $count = 1;
@@ -151,6 +154,20 @@ sub _json2db{
   my $m = $count ? 'Loaded' : 'Skipped';
   $self->_log(join q[ ], $m, $json_file);
   return $count;
+}
+
+sub _exclude_nondb_attrs {
+  my ($self, $json_file, $values, @columns) = @_;
+
+  foreach my $key ( keys %{$values} ) {
+    if (none {$key eq $_} @columns) {
+      delete $values->{$key};
+      if ($key ne $CLASS_FIELD) {
+        $self->_log("$json_file: not loading field '$key'");
+      }
+    }
+  }
+  return;
 }
 
 sub _pass_filter {
@@ -235,6 +252,8 @@ npg_qc::autoqc::db_loader
 
 =item List::MoreUtils
 
+=item Readonly
+
 =item npg_qc::Schema
 
 =item npg_tracking::util::types
@@ -251,7 +270,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
