@@ -129,11 +129,6 @@ a, a:link, a:visited, a:hover {
   color: #222931;
 }
 
-.collapse_icon {
-  font-weight: bold;
-  font-size: 14px;
-}
-
 /*************** main content ************/
 
 #content {
@@ -328,18 +323,6 @@ a, a:link, a:visited, a:hover {
   -moz-border-radius-topleft: 25px;
   -webkit-border-top-left-radius: 25px;
   padding-left: 28px;
-}
-
-.collapser {
-  padding-right: 70px;
-}
-
-.collapser_open {
-  background: #aad4f4 url("/static/images/blue_collapse.png") no-repeat right center;
-}
-
-.collapser_closed {
-  background: #afcfff url("/static/images/blue_expand.png") no-repeat right center;
 }
 
 .result_full_content {
