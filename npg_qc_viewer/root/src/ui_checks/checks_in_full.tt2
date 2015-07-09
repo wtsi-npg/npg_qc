@@ -1,8 +1,8 @@
 [% studies = {}; FOREACH lane_key IN sorted_rl_map_keys -%]
   [%
      lane_collection = rl_map.$lane_key;
-
      NEXT IF (!lane_collection || lane_collection.size == 0);
+     lane_collection.sort;
      to_remove = ['split stats phix', 'spatial filter'];
      IF !run_view.defined || run_view != 1;
        to_remove.push('qX yield', 'gc bias');

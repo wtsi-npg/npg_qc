@@ -392,11 +392,11 @@ sub remove {
   }
 
   my $c = __PACKAGE__->new();
-  
-  my @filtered = $self->grep(sub { my $obj = $_; none { $obj->check_name eq $_ } @{$values} } ); 
-  
+
+  my @filtered = $self->grep(sub { my $obj = $_; none { $obj->$criterion eq $_ } @{$values} } );
+
   $c->push(@filtered);
- 
+
   return $c;
 }
 
