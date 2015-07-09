@@ -9,10 +9,9 @@
 #
 
 # create a new column
-ALTER TABLE `bam_flagstats` ADD COLUMN  `subset` varchar(10) NOT NULL DEFAULT 'target' AFTER `human_split`;
+ALTER TABLE `bam_flagstats` ADD COLUMN `subset` varchar(10) NOT NULL DEFAULT 'target' AFTER `human_split`;
 
-# back-populate data from the old column into the new
-UPDATE `bam_flagstats` set subset=human_split where (human_split != 'all' and human_split != 'nonhuman');
+UPDATE `bam_flagstats` SET subset = human_split WHERE human_split NOT IN ('all' , 'nonhuman');
 
 # not extending the unique key (`id_run`,`position`,`tag_index`,`human_split`) to include `subset` to
 # avoid discrepancy in the unique key definition in the old and new versions of DBIx binding
@@ -31,8 +30,3 @@ BEGIN \
     END IF; \
 END // \
 delimiter ;
-
-
-
-
-
