@@ -5,7 +5,7 @@
      temp = lane_collection.sort;
      to_remove = ['split stats phix', 'spatial filter'];
      IF !run_view.defined || run_view != 1;
-       to_remove.push('qX yield', 'gc bias');
+       to_remove.push('qX yield', 'gc fraction');
      END;
      trimmed_lane_collection = lane_collection.remove('check_name', to_remove);
      checks = trimmed_lane_collection.results;
