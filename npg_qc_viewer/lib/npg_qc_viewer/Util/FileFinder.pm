@@ -105,13 +105,13 @@ sub _build_files {
 }
 
 sub create_filename {
-  my ($self, $id_run, $position, $tag_index, $end) = @_;
-
+  my ($self, $map, $end) = @_;
+  
   return sprintf '%i_%i%s%s',
-    $id_run,
-    $position,
-    $end        ? "_$end" : q[],
-    $tag_index  ? "#$tag_index" : q[];
+    $map->{'id_run'},
+    $map->{'position'},
+    $end ? "_$end" : q[],
+    defined $map->{'tag_index'} ? '#'.$map->{'tag_index'} : q[];
 }
 
 __PACKAGE__->meta->make_immutable;
