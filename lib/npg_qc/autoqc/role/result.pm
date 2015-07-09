@@ -234,17 +234,17 @@ __END__
 
 =item Moose::Role
 
-=item MooseX::Storage
-
 =item Carp
 
 =item File::Spec::Functions
 
 =item JSON
 
-=item List::MoreUtils
+=item MooseX::Storage
 
 =item Readonly
+
+=item List::MoreUtils
 
 =back
 
@@ -258,7 +258,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Limited
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

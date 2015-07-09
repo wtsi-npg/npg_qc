@@ -13,9 +13,15 @@ with qw(npg_qc::autoqc::role::bam_flagstats);
 our $VERSION = '0';
 
 Readonly::Scalar my $METRICS_FIELD_LIST => [qw(
-   library unpaired_mapped_reads paired_mapped_reads unmapped_reads
-   unpaired_read_duplicates paired_read_duplicates
-   read_pair_optical_duplicates percent_duplicate library_size)];
+   library
+   unpaired_mapped_reads
+   paired_mapped_reads
+   unmapped_reads
+   unpaired_read_duplicates
+   paired_read_duplicates
+   read_pair_optical_duplicates
+   percent_duplicate
+   library_size)];
 
 # picard and biobambam mark duplicates assign this
 # value for aligned data with no mapped paired reads
@@ -24,7 +30,9 @@ Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 Readonly::Scalar my $HUMAN_SPLIT_ATTR_DEFAULT => 'all';
 Readonly::Scalar my $SUBSET_ATTR_DEFAULT      => 'target';
 
-has [ qw/ +path +id_run +position / ] => ( required   => 0, );
+has [ qw/ +path
+          +id_run
+          +position / ] => ( required   => 0, );
 
 has 'human_split' => ( isa            => 'Maybe[Str]',
                        is             => 'rw',
@@ -39,10 +47,17 @@ has 'subset'      => ( isa            => 'Maybe[Str]',
 has 'library' =>     ( isa  => 'Maybe[Str]',
                        is   => 'rw',
 );
-has [ qw/ num_total_reads unpaired_mapped_reads paired_mapped_reads
-          unmapped_reads unpaired_read_duplicates paired_read_duplicates
-          read_pair_optical_duplicates library_size proper_mapped_pair
-          mate_mapped_defferent_chr mate_mapped_defferent_chr_5
+has [ qw/ num_total_reads
+          unpaired_mapped_reads
+          paired_mapped_reads
+          unmapped_reads
+          unpaired_read_duplicates
+          paired_read_duplicates
+          read_pair_optical_duplicates
+          library_size
+          proper_mapped_pair
+          mate_mapped_defferent_chr
+          mate_mapped_defferent_chr_5
           read_pairs_examined / ] => (
     isa => 'Maybe[Int]',
     is  => 'rw',
@@ -191,7 +206,7 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item List::Util
 
-=item  Readonly
+=item Readonly
 
 =item namespace::autoclean
 
