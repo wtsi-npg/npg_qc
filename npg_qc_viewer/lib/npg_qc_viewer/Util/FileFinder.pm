@@ -106,12 +106,12 @@ sub _build_files {
 
 sub create_filename {
   my ($self, $map, $end) = @_;
-  
+
   return sprintf '%i_%i%s%s',
     $map->{'id_run'},
     $map->{'position'},
     $end ? "_$end" : q[],
-    defined $map->{'tag_index'} ? '#'.$map->{'tag_index'} : q[];
+    defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -160,8 +160,8 @@ as keys and, in case of successful file system search, file paths as values
 =head2 create_filename - given run id, position, tag index (optional) and end (optional)
 returns a file name
 
-  npg_qc_viewer::Util::FileFinder->create_filename(5,3,1,2);
-  $obj->->create_filename(5,3,1);
+  npg_qc_viewer::Util::FileFinder->create_filename({id_run=>1,position=>2,tag_index=>3},2);
+  $obj->->create_filename({id_run=>1,position=>2},1);
 
 =head1 DIAGNOSTICS
 
