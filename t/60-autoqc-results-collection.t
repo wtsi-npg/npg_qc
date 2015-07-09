@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests => 113;
+use Test::More tests => 120;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
+use List::MoreUtils qw/none/; 
 use File::Temp qw/tempdir/;
 
 local $ENV{'HOME'} = q[t/data];
@@ -83,6 +84,53 @@ my $temp = tempdir( CLEANUP => 1);
     is($positions, q[1223557], 'sort by id_run gives the same results as sort by position when id_run is the same in all results');
 }
 
+{ ##### grep
+  my $c = npg_qc::autoqc::results::collection->new();
+  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 6, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 1, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 12, path => q[mypath]));
+  
+  my @filtered = $c->grep(sub { $_->check_name ne 'qX yield'} );
+
+  is(scalar @filtered, 3, 'size correct');
+
+  my $c1 = npg_qc::autoqc::results::collection->new();
+  $c1->push(@filtered);
+  is($c1->size, 3, 'size correct');
+
+  @filtered = $c->grep(sub {
+    my $obj = $_; none { $obj->check_name eq $_} ('qX yield') }
+  );
+  is(scalar @filtered, 3, 'with list - size correct');
+
+  @filtered = $c->grep(
+    sub { my $obj = $_; none { $obj->check_name eq $_} ('qX yield', 'insert size') }
+  );
+  is(scalar @filtered, 0, 'with list - size correct'); 
+}
+
+{ ##### remove
+  my $c = npg_qc::autoqc::results::collection->new();
+  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 6, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 1, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 12, path => q[mypath]));
+  
+  my $new_c = $c->remove(q[check_name], ['qX yield'] );
+  
+  is($new_c->size, 3, 'size correct');
+  
+  $new_c = $c->remove(q[check_name], ['qX yield', 'insert size'] );
+  
+  is($new_c->size, 0, 'size correct');
+  
+  $new_c = $c->remove(q[check_name], ['adapter'] );
+  
+  is($new_c->size, 5, 'size correct');
+}
 
 {
     my $c = npg_qc::autoqc::results::collection->new();

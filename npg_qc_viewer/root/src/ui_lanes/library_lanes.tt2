@@ -50,7 +50,6 @@
   </ul>
 [%- END %]
 [%- IF run_view.defined && run_view %][% PROCESS ui_runs/run_menu.tt2 -%][% END %]
-[% PROCESS ui_lanes/collapse_menu.tt2 -%]
 </div>
 </div>
 

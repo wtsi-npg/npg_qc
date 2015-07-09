@@ -47,28 +47,27 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
 {
   my @urls = (q[/checks/runs/4025], q[/checks/runs-from-staging/4025]);
 
-       foreach my $url (@urls) {
-
-  my $req = GET($url);
-  my $res;
-  my $c;
-  warnings_like{ ($res, $c) = ctx_request($req) } [qr/Use of uninitialized value \$id in exists/, ], 
-                                      'Expected warning for non set id';
+  foreach my $url (@urls) {
+    my $req = GET($url);
+    my $res;
+    my $c;
+    warnings_like{ ($res, $c) = ctx_request($req) } [qr/Use of uninitialized value \$id in exists/, ], 
+                                        'Expected warning for non set id';
+    
+    ok ($res, $req->uri . q[ requested]);
+    ok ($res->is_success, 'request succeeded');
+    my $rl_map = $c->stash->{rl_map};
+    my $count = 0;
   
-  ok ($res, $req->uri . q[ requested]);
-  ok ($res->is_success, 'request succeeded');
-  my $rl_map = $c->stash->{rl_map};
-  my $count = 0;
-
-  foreach my $key (keys %{$rl_map}) {
-    $count += $rl_map->{$key}->size();
-  }
-
-  my $expected_count = $url eq q[/checks/runs/4025] ? 48 : 54;
-  is($count, $expected_count, qq[$expected_count result objects in stash for run 4025]);
-  is (join(' ', sort keys %{$rl_map}), join(' ', @keys), 'keys in the rl map');
-
-  			}	
+    foreach my $key (keys %{$rl_map}) {
+      #map{note $_->class_name} @{ $rl_map->{$key}->results };
+      $count += $rl_map->{$key}->size();
+    }
+  
+    my $expected_count = $url eq q[/checks/runs/4025] ? 40 : 46;
+    is($count, $expected_count, qq[$expected_count result objects in stash for run 4025]);
+    is (join(' ', sort keys %{$rl_map}), join(' ', @keys), 'keys in the rl map');
+  }	
 }
 
 {
@@ -112,7 +111,7 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
   foreach my $key (keys %{$rl_map}) {
     $count += $rl_map->{$key}->size();
   }
-  is($count, 48, '48 result objects in stash for run 4099');
+  is($count, 40, '40 result objects in stash for run 4099');
 }
 
 1;
