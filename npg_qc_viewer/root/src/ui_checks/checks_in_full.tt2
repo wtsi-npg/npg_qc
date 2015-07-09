@@ -86,7 +86,7 @@
 [% BLOCK display_full_check_content %]
 	<div [% rf_id_attr %] class="result_full">
 
-        <h2 class="[% check.check_name %]">[% util.expand_rpt_key(lane_key) %], [% check.check_name -%] 
+        <h2>[% util.expand_rpt_key(lane_key) %], [% check.check_name -%] 
 
 	[%- IF check.defined('pass') -%]:
 		[% check.pass ? 'passed' : '<span class="result_fail">failed</span>' -%]
