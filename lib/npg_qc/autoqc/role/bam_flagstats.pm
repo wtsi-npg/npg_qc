@@ -1,8 +1,3 @@
-#########
-# Author:        gq1
-# Created:       21 June 2010
-#
-
 package npg_qc::autoqc::role::bam_flagstats;
 
 use Moose::Role;
@@ -128,6 +123,8 @@ __END__
 
 =item Moose::Role
 
+=item Readonly
+
 =item npg_qc::autoqc::role::result
 
 =back
@@ -142,7 +139,7 @@ Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Guoying Qi
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
