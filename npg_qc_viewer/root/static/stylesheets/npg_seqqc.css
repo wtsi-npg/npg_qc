@@ -129,11 +129,6 @@ a, a:link, a:visited, a:hover {
   color: #222931;
 }
 
-.collapse_icon {
-  font-weight: bold;
-  font-size: 14px;
-}
-
 /*************** main content ************/
 
 #content {
@@ -330,23 +325,15 @@ a, a:link, a:visited, a:hover {
   padding-left: 28px;
 }
 
-.collapser {
-  padding-right: 70px;
-}
-
-.collapser_open {
-  background: #aad4f4 url("/static/images/blue_collapse.png") no-repeat right center;
-}
-
-.collapser_closed {
-  background: #afcfff url("/static/images/blue_expand.png") no-repeat right center;
-}
-
 .result_full_content {
   color: #333;
   padding: 10px 10px 0 10px;
   background: #fafcfc;
   border: 1px solid #aad4f4;
+}
+
+.result_full_content img {
+  vertical-align: text-top;
 }
 
 .result_full_content table {
@@ -397,17 +384,6 @@ a, a:link, a:visited, a:hover {
   padding-left: 20px;
 
 }
-
-.fastqcheck_plot {
-  vertical-align: text-top;
-}
-
-
-.fastqcheck_legend {
-  vertical-align: text-top;
-  padding-left: 10px;
-}
-
 /******************* annotation section **************/
 #annotations_frame {
   height: 100px;
