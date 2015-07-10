@@ -5,7 +5,7 @@
 <div class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]'></div>
 
 <div style='clear:both;' class="data_table">
-<table summary="adapter check results">
+<table title="adapter check results">
 
 <tr>
   <th class="laligned">read</th>
@@ -46,7 +46,7 @@
 
 [% IF check.forward_blat_hash.defined -%]
 <div class="data_table">
-<table summary="Contamination for each adapter">
+<table title="Contamination for each adapter">
   <tr> 
     <th rowspan="2">adapter name</th>
     <th [% IF has_reverse %]colspan="2"[% END %]>hits count</th>
