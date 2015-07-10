@@ -32,11 +32,8 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc','scripts/collapse', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil'],
-function( manual_qc,  collapse, insert_size, adapter, mismatch, unveil) {
-
-  collapse.init();
-
+require(['scripts/manual_qc', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil'],
+function( manual_qc, insert_size, adapter, mismatch, unveil) {
   $("img").unveil(2000);
 
   //Required to show error messages from the mqc process.
