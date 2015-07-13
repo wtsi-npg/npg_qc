@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.7
  - bam_flagstats autoqc result object:
      new field, subset, added to be used instead of human_split
      human_split is retained for now to be compatible with existing data and code
