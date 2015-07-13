@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - prepend all page titles with application name and version
+ - use updated LIMs server urls
+ - link to NPG tracking web server running on the same host as this app
+
 release 58.7
  - bam_flagstats autoqc result object:
      new field, subset, added to be used instead of human_split
