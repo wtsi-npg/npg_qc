@@ -129,6 +129,7 @@
 [%- IF sample_link -%]
 <td>
 [%- IF sample_id; lurl = [lims_url, 'samples', sample_id]; -%]
+<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), sample_id) %]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
 <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% sample_name | html %]</span></a>
 [%- END -%]
 </td>
@@ -139,6 +140,8 @@
 [%- IF lane_collection.run_lane_plex_flags.$lane_key -%]
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
+[%- IF sample_id %]<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), sample_id) %]"><img src="/static/images/to_parent.png" alt="link to a sample" /></a>
+[%- END; -%]
 [%- IF lib; lurl = [lims_url, 'assets', library_id]; -%]
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'name' => lib}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
 <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>
