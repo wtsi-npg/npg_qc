@@ -439,44 +439,6 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
     return;
 }
 
-=head2 studies
-
-Studies page - retained in order not to change dispatch type for a study
-
-=cut
-sub studies :Chained('base') :PathPart('studies') :Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{error_message} = q[This is an invalid URL];
-    $c->detach(q[Root], q[error_page]);
-    return;
-}
-
-=head2 study
-
-Study page
-
-=cut
-sub study :Chained('base') :PathPart('studies') :Args(1) {
-    my ( $self, $c, $study_id) = @_;
-
-    $self->_test_positive_int($c, $study_id);
-
-    my $row = $c->model('WarehouseDB')->resultset('CurrentStudy')->search(
-      { internal_id => $study_id, },
-      { columns => [qw/internal_id name/], distinct => 1, },
-    )->next;
-
-    if (!$row) {
-        $c->stash->{error_message} = qq[Unknown study id $study_id];
-        $c->detach(q[Root], q[error_page]);
-        return;
-    }
-
-    $c->stash->{'title'}  = q[Study '] . $row->study_name  . q['];
-    $self->_display_libs($c, { 'me.study_id' => $study_id,});
-    return;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
