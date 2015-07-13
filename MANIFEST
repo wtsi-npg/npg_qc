@@ -584,6 +584,7 @@ t/data/autoqc/genotype/6812_7.genotype.json
 t/data/autoqc/genotype/6812_8.genotype.json
 t/data/autoqc/Homo_sapiens.NCBI36.48.dna.all.fa.json
 t/data/autoqc/insert_size/6062_8#1.insert_size.json
+t/data/autoqc/insert_size/6062_8#2.insert_size.json
 t/data/autoqc/insert_size_expected_mean.json
 t/data/autoqc/insert_size_expected_size.json
 t/data/autoqc/insert_size/15155_8.insert_size.json
