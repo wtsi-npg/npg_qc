@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 55;
+use Test::More tests => 50;
 use Test::Exception;
 use HTTP::Headers;
 use HTTP::Request::Common;
