@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.7
+ - bam_flagstats autoqc result object:
+     new field, subset, added to be used instead of human_split
+     human_split is retained for now to be compatible with existing data and code
+ - autoqc loader will only load fields that correspond to database columns
+
 release 58.6
  - Using "jquery-unveil" plugin for heatmaps
  - Removing data from DOM after passing them to local variables
