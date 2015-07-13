@@ -1,0 +1,32 @@
+################
+#
+# `human_split` column name does not reflect the nature of data in this column.
+# A new column, `subset`, is introduced to eventually replace the `human_split` column.
+# On one of the clusters old software will be used for archival, so backwards
+# compatibility is important.
+#
+# Archival of autoqc data should be stopped before these scripts are run.
+#
+
+# create a new column
+ALTER TABLE `bam_flagstats` ADD COLUMN `subset` varchar(10) NOT NULL DEFAULT 'target' AFTER `human_split`;
+
+UPDATE `bam_flagstats` SET subset = human_split WHERE human_split NOT IN ('all' , 'nonhuman');
+
+# not extending the unique key (`id_run`,`position`,`tag_index`,`human_split`) to include `subset` to
+# avoid discrepancy in the unique key definition in the old and new versions of DBIx binding
+
+# create a trigger to populate the new column so that old data with old software
+# can be still loaded
+
+delimiter // \
+CREATE TRIGGER bfs_populate_subset BEFORE INSERT ON bam_flagstats \
+FOR EACH ROW \
+BEGIN \
+    DECLARE temp varchar(10);
+    IF NEW.subset = 'target' and NEW.human_split IS NOT NULL and NEW.human_split != 'all' THEN \
+      SET temp = NEW.human_split; \
+      SET NEW.subset = temp; \
+    END IF; \
+END // \
+delimiter ;
