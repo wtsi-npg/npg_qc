@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 72;
+use Test::More tests => 65;
 use Test::Exception;
 use t::util;
 use Test::Warn;
@@ -61,7 +61,6 @@ my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
   push @urls,  '/checks/path?path=t/data/staging/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/qc';
   push @urls,  '/checks/samples/3055';
   push @urls,  '/checks/libraries?name=AC0001C+1';
-  push @urls,  '/checks/studies/544'; 
   
   my @warnings = ();
   push @warnings, [$warn_id,];
@@ -75,7 +74,6 @@ my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
   push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
   push @warnings, [{carped => $warn_no_paths}, $warn_id,];
   push @warnings, [{carped => $warn_no_paths}, $warn_id,];
 
@@ -96,11 +94,9 @@ my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
   push @urls,  '/checks/runs/1.8';
   push @urls,  '/checks/runs/-7';
   push @urls,  '/checks/samples/dfsfs';
-  push @urls,  '/checks/studies/dfsfs';
   push @urls,  '/checks/runs-from-staging/dfsfs';
 
   push @urls,  '/checks/samples/1';
-  push @urls,  '/checks/studies/25';
 
   my $response;
   foreach my $url (@urls) {
