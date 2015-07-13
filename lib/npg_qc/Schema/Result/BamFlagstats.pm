@@ -92,6 +92,13 @@ __PACKAGE__->table('bam_flagstats');
   is_nullable: 1
   size: 10
 
+=head2 subset
+
+  data_type: 'varchar'
+  default_value: 'target'
+  is_nullable: 0
+  size: 10
+
 =head2 library
 
   data_type: 'varchar'
@@ -221,6 +228,13 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
     size => 10,
   },
+  'subset',
+  {
+    data_type => 'varchar',
+    default_value => 'target',
+    is_nullable => 0,
+    size => 10,
+  },
   'library',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'unpaired_mapped_reads',
@@ -281,9 +295,9 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 =item * L</position>
 
-=item * L</human_split>
-
 =item * L</tag_index>
+
+=item * L</human_split>
 
 =back
 
@@ -291,7 +305,7 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 __PACKAGE__->add_unique_constraint(
   'unq_run_lane_index_sp_flag',
-  ['id_run', 'position', 'human_split', 'tag_index'],
+  ['id_run', 'position', 'tag_index', 'human_split'],
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -310,15 +324,18 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:f6/3LLABJs3Ja3N23cOu2Q
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-07-08 11:05:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:txZzb/HOksJVy8B6JUfuww
+
+
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
+
+our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( histogram info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('human_split', 'is_string');
-
-
-our $VERSION = '0';
+__PACKAGE__->set_inflator4scalar('subset', 'is_string');
 
 __PACKAGE__->meta->make_immutable;
 
@@ -371,7 +388,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
@@ -389,4 +406,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-

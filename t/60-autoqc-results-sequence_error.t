@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 17;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::sequence_error');
@@ -8,11 +8,14 @@ use_ok ('npg_qc::autoqc::results::sequence_error');
 {
     my $r = npg_qc::autoqc::results::sequence_error->new(id_run => 2, path => q[mypath], position => 1);
     isa_ok ($r, 'npg_qc::autoqc::results::sequence_error');
+    is ($r->filename4serialization(), '2_1.sequence_error.json', 'default file name');
     is ($r->check_name, q[sequence mismatch], 'check name changed to sequence mismatch');
-    $r = npg_qc::autoqc::results::sequence_error->new(id_run => 2, path => q[mypath], position => 1, sequence_type => 'spiked_phix');
-    ok ($r->can(q[sequence_type]), 'object can call sequence_type method');
+    $r = npg_qc::autoqc::results::sequence_error->new(
+      id_run => 2, path => q[mypath], position => 1, sequence_type => 'spiked_phix');
     is ($r->sequence_type, q[spiked_phix], 'spiked phix sequence type');
     is ($r->check_name, q[sequence mismatch spiked phix], 'check name for spiked phix type');
+    is ($r->filename4serialization(), '2_1_spiked_phix.sequence_error.json',
+      'file name contains "spiked_phix" flag');
 }
 
 {
