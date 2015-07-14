@@ -3,8 +3,8 @@ package npg_qc_viewer::Controller::Checks;
 use Moose;
 use namespace::autoclean;
 use Moose::Meta::Class;
+use URI::URL;
 use Carp;
-use English qw(-no_match_vars);
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
@@ -38,6 +38,30 @@ NPG SeqQC Controller for URLs of pages displaying autoqc results
 =head1 SUBROUTINES/METHODS
 
 =cut
+
+sub _base_url_no_port {
+    my $base_url = shift;
+
+    if (!$base_url) {
+        croak 'Need base url';
+    }
+    my $url = URI::URL->new($base_url);
+    my $port = $url->port;
+    if ($port) {
+        $url =~ s/:${port}//xms; #remove port number and preceeding :
+    }
+    $url =~ s{/\Z}{}xms; # trim the last slash
+    return $url;
+}
+
+sub _get_title {
+    my $title = shift;
+    my $full_title =  qq[NPG SeqQC v$VERSION];
+    if ($title) {
+        $full_title .= ': ' . $title;
+    }
+    return $full_title;
+}
 
 sub _test_positive_int {
     my ($self, $c, $input) = @_;
@@ -220,7 +244,7 @@ sub _display_run_lanes {
         if (@{$lanes}) {
             $title .= q[ lanes ] . (join q[ ], @{$lanes});
         }
-        $c->stash->{'title'} = $title;
+        $c->stash->{'title'} = _get_title($title);
     }
 
     if ($retrieve_option ne $ALL) {
@@ -245,6 +269,7 @@ sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
     $c->stash->{'env_dev'}          = $ENV{dev};
     $c->stash->{'run_view'}         = 0;
     $c->stash->{'run_from_staging'} = 0;
+    $c->stash->{'base_url'}         = _base_url_no_port($c->request->base);
     return;
 }
 
@@ -255,7 +280,7 @@ index page
 =cut
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
-    $c->stash->{'title'} = q[NPG SeqQC - visualization and datamining for sequence quality control];
+    $c->stash->{'title'} = _get_title();
     $c->stash->{'template'} = q[about.tt2];
     return;
 }
@@ -267,7 +292,7 @@ qc checks info page
 =cut
 sub about :Path('about') :Args(0) {
     my ( $self, $c ) = @_;
-    $c->stash->{'title'} = q[NPG SeqQC: about QC checks];
+    $c->stash->{'title'} = _get_title(q[about QC checks]);
     $c->stash->{'template'} = q[about_qc_checks.tt2];
     return;
 }
@@ -301,7 +326,7 @@ sub checks_in_run :Chained('base') :PathPart('runs') :Args(1) {
     my ($self, $c, $id_run) = @_;
     $self->_test_positive_int($c, $id_run);
     #if config is needed, it's available through $c->config
-    $c->stash->{'title'}     = qq[Results for run $id_run];
+    $c->stash->{'title'}     = _get_title(qq[Results for run $id_run]);
     $c->stash->{'run_view'}  = 1;
     $c->stash->{'id_run'}    = $id_run;
     $self->_display_run_lanes($c, {run => [$id_run],} );
@@ -341,7 +366,7 @@ sub checks_in_run_from_staging :Chained('base') :PathPart('runs-from-staging') :
 
     $self->_test_positive_int($c, $id_run);
     $c->stash->{'db_lookup'}        = 0;
-    $c->stash->{'title'}            = qq[Staging results for run $id_run];
+    $c->stash->{'title'}            = _get_title(qq[Staging results for run $id_run]);
     $c->stash->{'run_from_staging'} = 1;
     $c->stash->{'run_view'}         = 1;
     $c->stash->{'id_run'}           = $id_run;
@@ -366,7 +391,7 @@ sub checks_from_path :Chained('base') :PathPart('path') :Args(0) {
           @path = @{$path_arg};
       }
 
-      $c->stash->{'title'} = q[Results from ] . join q[,], @path;
+      $c->stash->{'title'} = _get_title(q[Results from ] . join q[,], @path);
       my $collection = $c->model('Check')->load_from_path(@path);
       $self->_data2stash($c, $collection);
       $c->stash->{'db_lookup'} = 0;
@@ -393,7 +418,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         if (!ref $lib_names) {
             $lib_names = [$lib_names];
         }
-        $c->stash->{'title'} = q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$lib_names};
+        $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$lib_names});
         $self->_display_libs($c, { 'me.asset_name' => $lib_names,});
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
@@ -435,7 +460,7 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
 
     my $sample_name = $row->sample_name;
     $self->_display_libs($c, { 'me.sample_id' => [$sample_id],});
-    $c->stash->{'title'} = qq[Sample '$sample_name'];
+    $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
     return;
 }
 
@@ -496,9 +521,7 @@ __END__
 
 =item Moose::Meta::Class
 
-=item Readonly
-
-=item English
+=item URI::URL
 
 =item Carp
 
