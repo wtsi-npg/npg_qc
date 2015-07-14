@@ -1,6 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - SeqQC - display insert size normal fit confidence and number of modes in the summary table
+ - SeqQC
+     display insert size normal fit confidence and number of modes in the summary table
+     do not show adaptor plots for low contamination
 
 release 58.7
  - bam_flagstats autoqc result object:
