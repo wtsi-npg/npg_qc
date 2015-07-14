@@ -25,8 +25,8 @@ subtest 'Initial' => sub {
 
 subtest 'Sample 9184' => sub {
   plan tests => 4;
-  my $version = $npg_qc_viewer::VERSION;
   my $sample_id = 9184;
+  my $version = $npg_qc_viewer::VERSION;
   my $url = qq[http://localhost/checks/samples/$sample_id];
   warnings_like{$mech->get_ok($url)} [qr/Use of uninitialized value \$id in exists/,], 
                                     'Expected warning for runfolder location';
@@ -36,6 +36,7 @@ subtest 'Sample 9184' => sub {
 
 subtest 'Full provenance in title for different samples of same run' => sub {
   plan tests => 16;
+  my $version = $npg_qc_viewer::VERSION;
   my @samples = qw(9389
                    9388
                    9386
@@ -56,7 +57,7 @@ subtest 'Full provenance in title for different samples of same run' => sub {
     my $url = qq[http://localhost/checks/samples/$sample_id];
     warnings_like{$mech->get_ok($url)} [qr/Use of uninitialized value \$id in exists/,], 
                                         'Expected warning for uninitialized id';
-    $mech->title_is(qq[Sample '$sample_name']);
+    $mech->title_is(qq[NPG SeqQC v${version}: Sample '$sample_name']);
     $mech->content_contains($provenance);
   }
 };
