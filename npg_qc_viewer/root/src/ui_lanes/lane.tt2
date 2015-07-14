@@ -79,15 +79,13 @@
 [%- IF equartiles.defined && equartiles -%]
 <span class="expected_value">[% equartiles %]</span><br />
 [%- END -%]
-[%- quartiles = result.quartiles -%]
-[%- IF quartiles.defined && quartiles -%]
-[%- bracket = 0;
-    percent = result.percent_well_aligned_reads;
-    IF percent.defined && percent < 50;
-      bracket = 1;
-    END;
+[%- quartiles = result.quartiles;
+    IF quartiles.defined && quartiles;
+      percent = result.percent_well_aligned_reads;
+      bracket = percent.defined && percent < 50 ? 1 : 0;
+      norm_fit_info = result.norm_fit_nmode && result.norm_fit_confidence ? 1 : 0;
 -%]
-<span class="nbsp">[% IF bracket %]<span class="result_fail">{</span>[% END %][% quartiles %][% IF bracket %]<span class="result_fail">}</span>[% END %]</span>
+<span class="nbsp">[% IF bracket %]<span class="result_fail">{</span>[% END %][% quartiles %][% IF bracket %]<span class="result_fail">}</span>[% END; IF norm_fit_info; %] ([% result.norm_fit_nmode %]/[%result.norm_fit_confidence%])[% END %]</span>
 [%- END -%]
 [%- END -%]
 
