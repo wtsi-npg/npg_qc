@@ -29,7 +29,7 @@ my $mech;
   my $url = q[http://localhost/checks/libraries?name=] . $lib_name;
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/, 
                                       'Expected warning for runfolder location';
-  $mech->title_is(q[Libraries: 'NA18545pd2a 1']);
+  $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}: Libraries: 'NA18545pd2a 1']);
   $mech->content_contains($lib_name);
   my $sample_name = 'NA18545pd2a';
   $mech->content_contains($sample_name);
@@ -44,7 +44,7 @@ my $mech;
   warnings_like{$mech->get_ok($url)} [qr/No paths to run folder found/, 
                                       qr/Use of uninitialized value \$id in exists/], 
                                       'Expected warning for runfolder location';
-  $mech->title_is(q[Libraries: 'AC0001C 1']);
+  $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}: Libraries: 'AC0001C 1']);
   $mech->content_contains(q[AC0001C]);
   $mech->content_contains($lib_name);
 }

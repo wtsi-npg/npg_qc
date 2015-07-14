@@ -22,14 +22,14 @@ my $mech;
   my $url = qq[http://localhost/checks];
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/, 
                                     'Expected warning for non initialised id';
-  $mech->title_is(q[NPG SeqQC - visualization and datamining for sequence quality control]);
+  $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}]);
 }
 
 {
   my $url = qq[http://localhost/checks/about];
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/, 
                                     'Expected warning for non initialised id';
-  $mech->title_is(q[NPG SeqQC: about QC checks]);
+  $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}: about QC checks]);
 }
 
 1;

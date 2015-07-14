@@ -25,11 +25,12 @@ subtest 'Initial' => sub {
 
 subtest 'Sample 9184' => sub {
   plan tests => 4;
+  my $version = $npg_qc_viewer::VERSION;
   my $sample_id = 9184;
   my $url = qq[http://localhost/checks/samples/$sample_id];
   warnings_like{$mech->get_ok($url)} [qr/Use of uninitialized value \$id in exists/,], 
-                                      'Expected warning for uninitialized id';
-  $mech->title_is(q[Sample 'Exp2_PD2126a_WGA']);
+                                    'Expected warning for runfolder location';
+  $mech->title_is(qq[NPG SeqQC v${version}: Sample 'Exp2_PD2126a_WGA']);
   $mech->content_contains(q[Exp2_PD2126a_WGA 1 &lt;&lt; Exp2_PD2126a_WGA &lt;&lt; Renal Cancer Exome]);
 };
 

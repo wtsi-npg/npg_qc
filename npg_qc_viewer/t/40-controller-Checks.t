@@ -19,6 +19,25 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 
 my $schemas;
 use_ok 'npg_qc_viewer::Controller::Checks';
+
+{
+  throws_ok { npg_qc_viewer::Controller::Checks::_base_url_no_port()}
+    qr/Need base url/, 'error if no arg supplied';
+  is (npg_qc_viewer::Controller::Checks::_base_url_no_port('http://some.dot.com'),
+    'http://some.dot.com', 'no port, no slash - no change');
+  is (npg_qc_viewer::Controller::Checks::_base_url_no_port('http://some.dot.com/'),
+    'http://some.dot.com', 'no port - just strip last slash');
+  is (npg_qc_viewer::Controller::Checks::_base_url_no_port('http://some.dot.com:8080/'),
+    'http://some.dot.com', 'have port - strip port and slash');
+}
+
+{
+  my $prefix = qq[NPG SeqQC v${npg_qc_viewer::Controller::Checks::VERSION}];
+  is (npg_qc_viewer::Controller::Checks::_get_title(), $prefix, 'simple title');
+  is (npg_qc_viewer::Controller::Checks::_get_title('for this and that'),
+    $prefix . ': for this and that', 'custom title');
+}
+
 lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
