@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 62;
+use Test::More tests => 8;
 use Test::Exception;
 use t::util;
 use Test::Warn;
@@ -20,7 +20,8 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 my $schemas;
 use_ok 'npg_qc_viewer::Controller::Checks';
 
-{
+subtest 'Basic url checks' => sub {
+  plan tests => 4;
   throws_ok { npg_qc_viewer::Controller::Checks::_base_url_no_port()}
     qr/Need base url/, 'error if no arg supplied';
   is (npg_qc_viewer::Controller::Checks::_base_url_no_port('http://some.dot.com'),
@@ -29,14 +30,15 @@ use_ok 'npg_qc_viewer::Controller::Checks';
     'http://some.dot.com', 'no port - just strip last slash');
   is (npg_qc_viewer::Controller::Checks::_base_url_no_port('http://some.dot.com:8080/'),
     'http://some.dot.com', 'have port - strip port and slash');
-}
+};
 
-{
+subtest 'Testing titles' => sub {
+  plan tests => 2;
   my $prefix = qq[NPG SeqQC v${npg_qc_viewer::Controller::Checks::VERSION}];
   is (npg_qc_viewer::Controller::Checks::_get_title(), $prefix, 'simple title');
   is (npg_qc_viewer::Controller::Checks::_get_title('for this and that'),
     $prefix . ': for this and that', 'custom title');
-}
+};
 
 lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
@@ -45,7 +47,9 @@ my $warn_id            = qr/Use of uninitialized value \$id in exists/;
 my $warn_no_paths      = qr/No paths to run folder/; 
 my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
 
-{
+subtest 'All combinations for checks controller' => sub {
+  plan tests => 26;
+  
   my $base = tempdir(UNLINK => 1);
   my $path = $base . q[/archive];
   my $run_folder = q[150621_MS6_04099_A_MS2023387-050V2];
@@ -101,11 +105,11 @@ my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
     warnings_like {
       ok( request($url)->is_success, qq[$url request succeeds] )
     } $warning_set , 'Expected warning';
-    
   }
-}
+};
 
-{
+subtest 'All expected 404' => sub {
+  plan tests => 32;
   my @urls = ();
   push @urls,  '/checks/runs/hgdjhgjgh';
   push @urls,  '/checks/runs/0';
@@ -125,7 +129,7 @@ my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
     ok( $response->is_error, qq[response is an error] );
     is( $response->code, 404, 'error code is 404' );
   }
-}
+};
 
 1;
 
