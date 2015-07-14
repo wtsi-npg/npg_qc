@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC - display insert size normal fit confidence and number of modes in the summary table
+
 release 58.7
  - bam_flagstats autoqc result object:
      new field, subset, added to be used instead of human_split
