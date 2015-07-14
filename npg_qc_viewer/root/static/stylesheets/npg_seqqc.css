@@ -106,8 +106,8 @@ a, a:link, a:visited, a:hover {
   display: inline;
 }
 
-.dev_env {
-  color: #f4d483;      /* dark red */
+.env_dev {
+  color: #f4d483;      /* light orange */
 }
 
 /*************** page-specific menu ******/
