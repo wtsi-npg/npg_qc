@@ -35,9 +35,10 @@
       END;
     END;
   -%]
-  
+
+  <div class="results_full_lane">
   <h3>[% util.expand_rpt_key(lane_key) %] [% IF provenance.defined %] [% provenance | html %]  [% END -%] <a name="[% lane_key %]"></a></h3>
-  
+
   <div class="results_full_lane_contents">
     [% gt_results_cached=0 %]
     [% FOREACH check IN checks; -%]
