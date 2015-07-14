@@ -1,7 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - prepend all page titles with application name and version
- - use updated LIMs server urls
+ - different page title colour if running in non-live environment
+ - use updated LIMs server url
  - link to NPG tracking web server running on the same host as this app
 
 release 58.7

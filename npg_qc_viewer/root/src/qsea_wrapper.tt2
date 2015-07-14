@@ -13,7 +13,7 @@
 <div id="header">
   <h1>
     <a name="page_top"></a>&nbsp;
-    <span class="lfloat">[%- title | html -%]</span>
+    <span class="lfloat[% IF env_dev == 'dev'; %] dev_env[% END %]">[%- title | html -%]</span>
     <span class="rfloat">[% user = c.user; IF !user; user = c.authenticate({}); END; IF user; %]Logged in as [% user.username; ELSE %] Not logged in[% END %]</span>
   </h1>
 </div>

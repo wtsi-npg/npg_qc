@@ -106,6 +106,10 @@ a, a:link, a:visited, a:hover {
   display: inline;
 }
 
+.dev_env {
+  color: #f4d483;      /* dark red */
+}
+
 /*************** page-specific menu ******/
 
 #menu {
