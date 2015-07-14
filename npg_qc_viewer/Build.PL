@@ -92,6 +92,7 @@ my $builder = $class->new(
         'Readonly'                                     => '0',
         'strict'                                       => '0',
         'warnings'                                     => '0',
+        'URI::URL'                                     => '0',
 
         'npg_common::fastqcheck'                       => '0',
         'npg::authentication::sanger_sso'              => '0',
