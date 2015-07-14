@@ -1,8 +1,9 @@
 [% USE Number.Format(THOUSANDS_SEP=',') %]
 
-[% has_reverse = check.reverse_fasta_read_count.defined -%]
-
-<div class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]'></div>
+[% has_reverse = check.reverse_fasta_read_count.defined; 
+   show_plot = (check.forward_percent_contam_reads >= 2) || (has_reverse && (check.reverse_percent_contam_reads >= 2)) ? 1 : 0;
+-%]
+[% IF show_plot %]<div class='bcviz_adapter' data-check='[% check.json | replace("'", "%27") %]'></div>[% END %]
 
 <div style='clear:both;' class="data_table">
 <table summary="adapter check results">
