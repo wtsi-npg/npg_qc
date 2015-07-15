@@ -35,7 +35,7 @@ use_ok ('npg_qc::autoqc::results::sequence_error');
     lives_ok { $ape = $r->reverse_average_percent_error; } q(reverse_average_percent_error run);
     cmp_ok($ape, q(==), 1.58, q(reverse_average_percent_error value));
     my $rft = $r->reference_for_title;
-    cmp_ok($rft->{'species'}, q[==], q[Homo_sapiens];
+    cmp_ok($rft->{'species'}, q[==], q[Homo_sapiens]);
     cmp_ok($rft->{'version'}, q[==], q[NCBI36]);
 
     lives_ok {
