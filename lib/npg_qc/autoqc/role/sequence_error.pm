@@ -133,6 +133,8 @@ used in a view. Returns a hash reference with keys for prefix, posfix, species a
 
 =item PDL::Primitive
 
+=item npg_qc::autoqc::role::result
+
 =back
 
 =head1 INCOMPATIBILITIES
