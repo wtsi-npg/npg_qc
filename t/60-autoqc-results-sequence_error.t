@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 19;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::sequence_error');
@@ -34,6 +34,9 @@ use_ok ('npg_qc::autoqc::results::sequence_error');
     } q(load serialised valid result);
     lives_ok { $ape = $r->reverse_average_percent_error; } q(reverse_average_percent_error run);
     cmp_ok($ape, q(==), 1.58, q(reverse_average_percent_error value));
+    my $rft = $r->reference_for_title;
+    cmp_ok($rft->{'species'}, q[==], q[Homo_sapiens];
+    cmp_ok($rft->{'version'}, q[==], q[NCBI36]);
 
     lives_ok {
       $r = npg_qc::autoqc::results::sequence_error->load('t/data/autoqc/9999_1.sequence_error.json');
