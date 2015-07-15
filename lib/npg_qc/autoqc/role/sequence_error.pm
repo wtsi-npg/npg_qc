@@ -64,6 +64,19 @@ sub subset {
   return $self->sequence_type;
 }
 
+sub reference_for_title {
+  my $self = shift;
+  my $prefix    = '';
+  my $reference = '';
+  my $posfix    = '';
+
+  if ( $self->reference ) {
+	  ( $prefix, $reference, $posfix ) = ( $self->reference =~ /(.*)(references)(.*)/xms );
+  }
+
+  return $posfix;
+}
+
 no Moose;
 
 1;
@@ -108,6 +121,8 @@ __END__
 =item PDL::Core
 
 =item PDL::Primitive
+
+=item npg_qc::autoqc::role::result
 
 =back
 

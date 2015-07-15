@@ -37,7 +37,7 @@
 [%- END -%]
 
 [%- IF check.reference.defined -%]
-<tr><th class="laligned">binary reference path</th><td [% IF has_reverse %]colspan="2"[% END %]>[% check.reference %]</td></tr>
+<tr><th class="laligned">binary reference path</th><td [% IF has_reverse %]colspan="2"[% END %]>[% check.reference %] ...[% check.reference_for_title %]</td></tr>
 [%- END -%]
 
 [%- IF check.comments.defined && check.comments -%]
