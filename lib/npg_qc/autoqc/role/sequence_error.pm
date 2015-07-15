@@ -112,7 +112,8 @@ __END__
 
 =head2 criterion
 
-=head2 reference_for_title - Trimmed version of the reference so it can be used in a view
+=head2 reference_for_title - Trimmed version of the reference so it can be 
+used in a view. Returns a hash reference with keys for prefix, posfix, species and version.
 
 =head1 DIAGNOSTICS
 
