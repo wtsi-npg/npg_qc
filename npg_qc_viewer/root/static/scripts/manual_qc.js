@@ -27,14 +27,14 @@
 */
 
 var NPG;
-/** 
+/**
  * @module NPG
- */ 
+ */
 (function (NPG) {
   /**
    * @module NPG/QC
    */
-  (function (QC) { 
+  (function (QC) {
     var ProdConfiguration = (function() {
       /**
        * Object to keep configuration for resources.
@@ -43,25 +43,25 @@ var NPG;
        * @author jmtc
        */
       function ProdConfiguration () {}
-      
+
       /**
        * Returns the path for the resourses so it can be used by
        * other objects in the module.
        * @returns {String} Path for resources.
        */
       ProdConfiguration.prototype.getRoot = function() {
-        return '/static'; 
+        return '/static';
       };
-      
+
       return ProdConfiguration;
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
-    
+
     var LaneMQCControl = (function () {
       /**
        * Controller for individual lanes GUI.
-       * @param index {Number} 
-       * @param abstractConfiguration {Object} 
+       * @param index {Number}
+       * @param abstractConfiguration {Object}
        * @memberof module:NPG/QC
        * @constructor
        */
@@ -70,7 +70,7 @@ var NPG;
         this.outcome               = null;  // Current outcome (Is updated when linked to an object in the view)
         this.index                 = index; // Index of control in the page.
         this.abstractConfiguration = abstractConfiguration;
-        
+
         this.CONFIG_UPDATE_SERVICE      = "/mqc/update_outcome";
         this.CONFIG_ACCEPTED_PRELIMINAR = 'Accepted preliminary';
         this.CONFIG_REJECTED_PRELIMINAR = 'Rejected preliminary';
@@ -78,21 +78,21 @@ var NPG;
         this.CONFIG_REJECTED_FINAL      = 'Rejected final';
         this.CONFIG_UNDECIDED           = 'Undecided'; //Initial outcome for widgets
         this.CONFIG_INITIAL             = 'initial';
-        
+
         //Variable names for data from the DOM
         this.DATA_ID_RUN                = 'id_run';
         this.DATA_POSITION              = 'position';
-        
+
         //container names
         this.LANE_MQC_WORKING           = 'lane_mqc_working';
         this.LANE_MQC_WORKING_CLASS     = '.' + this.LANE_MQC_WORKING;
       }
-      
+
       /**
        * Change the outcome.
        */
       LaneMQCControl.prototype.updateOutcome = function(outcome) {
-        var id_run = this.lane_control.data(this.DATA_ID_RUN); 
+        var id_run = this.lane_control.data(this.DATA_ID_RUN);
         var position = this.lane_control.data(this.DATA_POSITION);
         var control = this;
         var self = this;
@@ -107,7 +107,7 @@ var NPG;
           }, "json")
           .done(function() {
             switch (outcome) {
-              case control.CONFIG_ACCEPTED_PRELIMINAR : control.setAcceptedPre(); break; 
+              case control.CONFIG_ACCEPTED_PRELIMINAR : control.setAcceptedPre(); break;
               case control.CONFIG_REJECTED_PRELIMINAR : control.setRejectedPre(); break;
               case control.CONFIG_ACCEPTED_FINAL : control.setAcceptedFinal(); break;
               case control.CONFIG_REJECTED_FINAL : control.setRejectedFinal(); break;
@@ -119,31 +119,31 @@ var NPG;
             jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
           })
           .always(function(data){
-            //Clear progress icon            
+            //Clear progress icon
             control.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
-          });  
+          });
         } else {
           window.console && console.log("Noting to do.");
         }
       };
-      
-      /** 
-       * Builds the gui controls necessary for the mqc operation and passes them to the view. 
-       */ 
+
+      /**
+       * Builds the gui controls necessary for the mqc operation and passes them to the view.
+       */
       LaneMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
         var self = this;
-        var id_run = lane_control.data(this.DATA_ID_RUN); 
+        var id_run = lane_control.data(this.DATA_ID_RUN);
         var position = lane_control.data(this.DATA_POSITION);
-        var outcomes = [self.CONFIG_ACCEPTED_PRELIMINAR, 
-                        self.CONFIG_UNDECIDED, 
+        var outcomes = [self.CONFIG_ACCEPTED_PRELIMINAR,
+                        self.CONFIG_UNDECIDED,
                         self.CONFIG_REJECTED_PRELIMINAR];
-        var labels = ["<img src='" + 
-                      self.abstractConfiguration.getRoot() + 
+        var labels = ["<img src='" +
+                      self.abstractConfiguration.getRoot() +
                       "/images/tick.png'  title='Mark lane as preliminary pass'/>", // for accepted
                       '&nbsp;&nbsp;&nbsp;', // for undecided
-                      "<img src='" + 
-                      self.abstractConfiguration.getRoot() + 
+                      "<img src='" +
+                      self.abstractConfiguration.getRoot() +
                       "/images/cross.png' title='Mark lane as preliminary fail'/>"]; // for rejected
         //Remove old working span
         self.lane_control.children(self.LANE_MQC_WORKING_CLASS).remove();
@@ -160,8 +160,8 @@ var NPG;
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
-        self.lane_control.append($("<span class='lane_mqc_save' title='Save current outcome as final (can not be changed again)'><img src='" + 
-            self.abstractConfiguration.getRoot() + 
+        self.lane_control.append($("<span class='lane_mqc_save' title='Save current outcome as final (can not be changed again)'><img src='" +
+            self.abstractConfiguration.getRoot() +
             "/images/padlock.png'></span>"));
         self.lane_control.children('.lane_mqc_save').off("click").on("click", function() {
           self.saveAsFinalOutcome();
@@ -176,10 +176,10 @@ var NPG;
         //add a new working span
         self.lane_control.append("<span class='lane_mqc_working' />");
       };
-      
-      /** 
+
+      /**
        * Checks the current outcome associated with this controller. If it is not final it will make it final
-       * will update the value in the model with an async call and update the view. 
+       * will update the value in the model with an async call and update the view.
        */
       LaneMQCControl.prototype.saveAsFinalOutcome = function() {
         var control = this;
@@ -193,69 +193,69 @@ var NPG;
           this.updateOutcome(this.CONFIG_REJECTED_FINAL);
         }
       };
-      
-      /** 
-       * Methods to deal with background colours. 
+
+      /**
+       * Methods to deal with background colours.
        */
       LaneMQCControl.prototype.setAcceptedBG = function() {
         this.lane_control.parent().css("background-color", "#B5DAFF");
       };
-      
+
       LaneMQCControl.prototype.setRejectedBG = function () {
         this.lane_control.parent().css("background-color", "#FFDDDD");
       };
-      
+
       LaneMQCControl.prototype.setAcceptedPreliminarBG = function() {
         this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
         this.lane_control.parent().prop('title', 'Preliminary pass in manual QC, waiting for final decision');
       };
-      
+
       LaneMQCControl.prototype.setRejectedPreliminarBG = function() {
         this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
         this.lane_control.parent().prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
-      
+
       LaneMQCControl.prototype.removeMQCFormat = function () {
         this.lane_control.parent().children('.padded_anchor').removeClass("padded_anchor");
         this.lane_control.parent().removeClass('td_mqc');
         this.lane_control.parent().css('text-align', 'center'); // For firefox
       };
-      
+
       LaneMQCControl.prototype.addMQCFormat = function () {
         this.lane_control.parent().css('text-align', 'left'); // For firefox
         this.lane_control.parent().addClass('td_mqc');
       };
-      
+
       LaneMQCControl.prototype.setAcceptedPre = function() {
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;
         this.lane_control.children('.lane_mqc_save').show();
       };
-      
+
       LaneMQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
         this.lane_control.children('.lane_mqc_save').show();
       };
-      
+
       LaneMQCControl.prototype.setAcceptedFinal = function() {
         this.outcome = this.CONFIG_ACCEPTED_FINAL;
         this.lane_control.empty();
         this.removeMQCFormat();
         this.setAcceptedBG();
       };
-      
+
       LaneMQCControl.prototype.setRejectedFinal = function() {
         this.outcome = this.CONFIG_REJECTED_FINAL;
         this.lane_control.empty();
         this.removeMQCFormat();
         this.setRejectedBG();
       };
-      
+
       LaneMQCControl.prototype.setUndecided = function() {
         this.outcome = this.CONFIG_UNDECIDED;
         this.lane_control.children('.lane_mqc_save').hide();
       };
-      
-      /** 
+
+      /**
        * Links the individual object with an mqc controller so it can allow mqc of a lane.
        */
       LaneMQCControl.prototype.linkControl = function(lane_control) {
@@ -265,7 +265,7 @@ var NPG;
           //If it does not have initial outcome
           this.outcome = this.CONFIG_UNDECIDED;
           this.generateActiveControls();
-        } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINAR 
+        } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINAR
             || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINAR
             || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_UNDECIDED) {
           //If previous outcome is preliminar.
@@ -280,7 +280,7 @@ var NPG;
           this.loadBGFromInitial(lane_control);
         }
       };
-      
+
       /**
        * Changes the background of the parent element depending on the initial outcome
        * of the lane.
@@ -294,7 +294,7 @@ var NPG;
         }
         lane_control.find(this.LANE_MQC_WORKING_CLASS).empty();
       };
-      
+
       LaneMQCControl.prototype.loadBGFromInitialWithPreliminary = function (lane_control) {
         this.loadBGFromInitial(lane_control);
         switch (lane_control.data(this.CONFIG_INITIAL)) {
@@ -302,7 +302,7 @@ var NPG;
           case this.CONFIG_REJECTED_PRELIMINAR : this.setRejectedPreliminarBG(); break;
         }
       };
-      
+
       return LaneMQCControl;
     }) ();
     QC.LaneMQCControl = LaneMQCControl;
@@ -320,9 +320,9 @@ var NPG;
         this.QC_IN_PROGRESS        = 'qc in progress';
         this.QC_ON_HOLD            = 'qc on hold';
       }
-      
+
       /**
-       * Validates qc conditions and if everything is ready for qc it will call the 
+       * Validates qc conditions and if everything is ready for qc it will call the
        * target function passing parameters. If not qc ready will call mop function.
        * @param mqc_run_data {Object} Run status data
        * @param lanes {array} lanes
@@ -344,7 +344,7 @@ var NPG;
         }
         return result;
       };
-      
+
       /**
        * Checks all conditions related with the user in session and the
        * status of the run. Validates the user has privileges, has role,
@@ -353,7 +353,7 @@ var NPG;
        * @param mqc_run_data {Object} Run status data
        */
       RunMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
-        if(typeof(mqc_run_data) === "undefined" 
+        if(typeof(mqc_run_data) === "undefined"
             || mqc_run_data == null) {
           throw new Error("invalid arguments");
         }
@@ -368,16 +368,16 @@ var NPG;
             || mqc_run_data.current_status_description == this.QC_ON_HOLD)
         return result;
       };
-      
+
       /**
        * Iterates through lanes and shows the outcomes
        * @param mqc_run_data
        * @param lanes
        */
       RunMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
-        if(typeof(mqc_run_data) === "undefined" 
-            || mqc_run_data == null 
-            || typeof(lanes) === "undefined" 
+        if(typeof(mqc_run_data) === "undefined"
+            || mqc_run_data == null
+            || typeof(lanes) === "undefined"
             || lanes == null) {
           throw new Error("invalid arguments");
         }
@@ -385,12 +385,12 @@ var NPG;
 
         for(var i = 0; i < lanes.length; i++) {
           lanes[i].children('.lane_mqc_control').each(function(j, obj){
-            $(obj).html("<span class='lane_mqc_working'><img src='" 
-                + self.abstractConfiguration.getRoot() 
+            $(obj).html("<span class='lane_mqc_working'><img src='"
+                + self.abstractConfiguration.getRoot()
                 + "/images/waiting.gif' width='10' height='10' title='Processing request.'></span>");
           });
         }
-        
+
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
           for(j = 0; j < cells.length; j++) {
@@ -411,16 +411,16 @@ var NPG;
           }
         }
       };
-      
+
       /**
        * Update values in lanes with values from REST. Then link the lane
        * to a controller. The lane controller will update with widgets or
        * with proper background.
        */
       RunMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
-        if(typeof(mqc_run_data) === "undefined" 
-            || mqc_run_data == null 
-            || typeof(lanes) === "undefined" 
+        if(typeof(mqc_run_data) === "undefined"
+            || mqc_run_data == null
+            || typeof(lanes) === "undefined"
             || lanes == null) {
           throw new Error("invalid arguments");
         }
@@ -446,23 +446,23 @@ var NPG;
         }
         return result;
       };
-      
+
       /**
        * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
-       * Only checks in case there is an outcome in DWH, meaning there should be an 
+       * Only checks in case there is an outcome in DWH, meaning there should be an
        * outcome in manual QC.
-       * 
+       *
        * @param lanesWithBG {array} Lanes with background.
        * @param mqc_run_data {Object} Value object with the state data for the run.
-       * 
+       *
        *  @returns A value object with two properties
-       *  outcome: true/false for the result of the match. 
+       *  outcome: true/false for the result of the match.
        *  position: null if matching, number of the first lane where there was a missmatch
        *   otherwise.
        */
       RunMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, mqc_run_data) {
-        if(typeof(lanesWithBG) === "undefined" 
-            || lanesWithBG == null 
+        if(typeof(lanesWithBG) === "undefined"
+            || lanesWithBG == null
             || typeof(mqc_run_data) === "undefined"
             || mqc_run_data == null) {
           throw new Error("invalid arguments");
@@ -484,8 +484,8 @@ var NPG;
                 //From DOM
                 var currentStatusFromView = obj.data('initial');
                 if(String(currentStatusFromREST) != String(currentStatusFromView) ) {
-                  window.console && window.console.log('Warning: conflicting outcome in DWH/MQC, position ' 
-                      + position + ' DWH:' + String(currentStatusFromView) 
+                  window.console && window.console.log('Warning: conflicting outcome in DWH/MQC, position '
+                      + position + ' DWH:' + String(currentStatusFromView)
                       + ' / MQC:' + String(currentStatusFromREST));
                 }
               } else {
@@ -509,18 +509,18 @@ var NPG;
        * @constructor
        */
       function RunTitleParser() {
-        this.reId = /^Results for run ([0-9]+) \(current run status:/;
+        this.reId = /^NPG SeqQC v\w+: Results for run ([0-9]+) \(current run status:/;
       }
 
       /**
        * Parses the id_run from the title (or text) passed as param.
        * It looks for first integer using a regexp.
-       * 
+       *
        * "^Results for run ([0-9]+) \(current run status:"
-       * 
+       *
        * @param text {String} Text to parse.
-       * 
-       * @returns the first match for the execution of the regexp, 
+       *
+       * @returns the first match for the execution of the regexp,
        * which should be the id_run for a successful execution.
        */
       RunTitleParser.prototype.parseIdRun = function (text) {
@@ -531,18 +531,18 @@ var NPG;
         var match = this.reId.exec(text);
         //There is a result from parsing
         if (match != null) {
-          //The result of parse looks like a parse 
+          //The result of parse looks like a parse
           // and has correct number of elements
           if(match.constructor === Array && match.length >= 2) {
             result = match[1];
           }
         }
         return result;
-      };      
+      };
       return RunTitleParser;
     }) ();
     QC.RunTitleParser = RunTitleParser;
-    
+
     /**
      * @module NPG/QC/UI
      */
@@ -555,11 +555,11 @@ var NPG;
          * @constructor
          * @param {String} id_pre - prefix for the id.
          * @param {String} outcome - outcome as string.
-         * @param {String} label - HTML for the label of the radio (an image 
+         * @param {String} label - HTML for the label of the radio (an image
          * for example).
-         * @param {String} name - for the radio. Using the same name for 
+         * @param {String} name - for the radio. Using the same name for
          * different radios groups them together.
-         * @param {Object} checked - if checked is not undefined the radio 
+         * @param {Object} checked - if checked is not undefined the radio
          * option will be marked as "checked" otherwise it will not be checked.
          * @author jmtc
          */
@@ -594,7 +594,7 @@ var NPG;
               + self.checked + ">" + label;
           return html;
         }
-        
+
         /**
          * Generates the HTML code of the radio and the label for this object, wraps
          * in JQuery object and returns
