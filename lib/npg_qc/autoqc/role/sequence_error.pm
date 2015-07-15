@@ -64,6 +64,19 @@ sub subset {
   return $self->sequence_type;
 }
 
+sub reference_for_title {
+  my $self = shift;
+  my $prefix    = '';
+  my $reference = '';
+  my $posfix    = '';
+
+  if ( $self->reference ) {
+    ( $prefix, $reference, $posfix ) = ( $self->reference =~ /(.*)(references)(.*)/xms );
+  }
+
+  return $posfix;
+}
+
 no Moose;
 
 1;
@@ -90,6 +103,8 @@ __END__
 =head2 reverse_average_percent_error - reverse average percentage of error across all cycles
 
 =head2 criterion
+
+=head2 reference_for_title - Trimmed version of the reference so it can be used in a view
 
 =head1 DIAGNOSTICS
 
