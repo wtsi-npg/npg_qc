@@ -509,7 +509,7 @@ var NPG;
        * @constructor
        */
       function RunTitleParser() {
-        this.reId = /^NPG SeqQC v\w+: Results for run ([0-9]+) \(current run status:/;
+        this.reId = /^NPG SeqQC v[\w\.]+: Results for run ([0-9]+) \(current run status:/;
       }
 
       /**
