@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 55;
+use Test::More tests => 50;
 use Test::Exception;
 use HTTP::Headers;
 use HTTP::Request::Common;
@@ -58,8 +58,6 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 
   push @urls, q[http://localhost/checks]; 
   push @urls, q[http://localhost/checks/about];
-  my $project_id = 378;
-  push @urls, qq[http://localhost/checks/studies/$project_id];
   my $lib = q[Exp2_PD2126a_WGA+1];
   push @urls, qq[http://localhost/checks/libraries?name=$lib];
   my $sample_id = 9184;
@@ -77,7 +75,6 @@ local $ENV{TEST_DIR}        = $util->staging_path;
   my $warn_command       = qr/Use of uninitialized value \$command in pattern match/;
   
   my @warnings = ();
-  push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
