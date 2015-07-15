@@ -294,7 +294,7 @@ End of Sequenom assay data
 
 <div class="data_table">
 
-<table summary="genotype check section one">
+<table title="genotype check section one">
 
 [% ssn = check.snp_call_set; %]
 <!--
@@ -372,7 +372,7 @@ End of Sequenom assay data
 [% gt_data_caption = 'Genotype' %]
 [% END %]
 
-<table summary="genotype check data rows">
+<table title="genotype check data rows">
 <caption>[% gt_data_caption %]</caption>
 
 <tr class="gt_callstring [% gt_class %]">
@@ -422,7 +422,7 @@ End of Sequenom assay data
 </table>
 
 [% IF check.alternate_matches.first.defined -%]
-<table summary="genotype check alternate matches">
+<table title="genotype check alternate matches">
 	[% FOREACH alt_match IN check.alternate_matches -%]
 	<tr>
 	  <th class="laligned">Closest alternative match</th>
@@ -444,7 +444,7 @@ End of Sequenom assay data
 [% END -%]
 
 [% IF check.alternate_relaxed_matches.first.defined -%]
-<table summary="genotype check alternate loose matches">
+<table title="genotype check alternate loose matches">
 	[% FOREACH alt_relaxed_match IN check.alternate_relaxed_matches -%]
 	<tr>
 	  <th class="laligned">Loose alternative match</th>
@@ -455,7 +455,7 @@ End of Sequenom assay data
 [% END -%]
 
 [% IF check.comments.defined && check.comments -%]
-<table summary="genotype check comments">
+<table title="genotype check comments">
 <tr>
   <th class="laligned">comments</th><td>[% check.comments %]</td>
 </tr>->
