@@ -66,20 +66,12 @@ sub subset {
 
 sub reference_for_title {
   my $self      = shift;
-  my $prefix    = q[];
-  my $reference = q[];
-  my $species   = q[];
-  my $version   = q[];
-  my $posfix    = q[];
-  my $slash     = q[];
   my $result    = {};
 
   if ( $self->reference ) {
-    ( $prefix, $reference, $slash, $species, $slash, $version, $slash, $posfix ) = ( $self->reference =~ /(.*)(references)(\/)([^\/]*)(\/)([^\/]*)(.*)/xms );
-    $result->{'prefix'}  = $prefix;
+    my ( $species, $version ) = ( $self->reference =~ /references\/ (\w+) \/ (\w+)/xms );
     $result->{'species'} = $species;
     $result->{'version'} = $version;
-    $result->{'posfix'}  = $posfix;
   }
 
   return $result;
