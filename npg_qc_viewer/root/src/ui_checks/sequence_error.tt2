@@ -3,7 +3,7 @@
 -%]
 
 <div class="data_table">
-<table summary="sequence mismatch check results">
+<table title="sequence mismatch check results">
 <tr><th class="laligned">read</th><td>forward</td>[% IF has_reverse %]<td>reverse</td>[% END %]</tr>
 
 [%- IF check.criterion.defined && check.criterion -%]
@@ -48,7 +48,7 @@
 </div>
 
 [% IF check.forward_common_cigars.defined && check.forward_common_cigars.size %]
-<table style='border-top: 0px;' summary="cigar tables">
+<table style='border-top: 0px;' title="cigar tables">
 <tr>
 <td>
 <div class='data_table'>
@@ -74,7 +74,7 @@
 
 <td>
 <div class='data_table'>
-<table summary="reverse common cigars">
+<table title="reverse common cigars">
 <tr><th>reverse common cigars</th><th>Count</th><th>Percentage</th></tr>
 [% FOREACH cig IN check.reverse_common_cigars %]
    [%- IF cig.0 %]

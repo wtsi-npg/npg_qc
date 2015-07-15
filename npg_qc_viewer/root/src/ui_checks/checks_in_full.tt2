@@ -12,6 +12,12 @@
 
      provenance = '';
      checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'});
+
+     trimmed_reference_path = {};
+     sequence_mismatch_collection = lane_collection.slice('check_name', 'sequence mismatch');
+     IF sequence_mismatch_collection.size > 0;
+       trimmed_reference_path = sequence_mismatch_collection.first.reference_for_title;
+     END;
   -%]
 
   [%- 
@@ -38,6 +44,9 @@
 
   <div class="results_full_lane">
   <h3>[% util.expand_rpt_key(lane_key) %] [% IF provenance.defined %] [% provenance | html %]  [% END -%] <a name="[% lane_key %]"></a></h3>
+  [%- IF trimmed_reference_path.species && trimmed_reference_path.version; -%]
+    <h4>Reference: [%- trimmed_reference_path.species -%] ([%- trimmed_reference_path.version -%])</h4>
+  [%- END -%]
 
   <div class="results_full_lane_contents">
     [% gt_results_cached=0 %]

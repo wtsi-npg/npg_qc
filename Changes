@@ -8,6 +8,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - different page title colour if running in non-live environment
  - use updated LIMs server url
  - link to NPG tracking web server running on the same host as this app
+ - showing reference species and version below lane titles
 
 release 58.7
  - bam_flagstats autoqc result object:
