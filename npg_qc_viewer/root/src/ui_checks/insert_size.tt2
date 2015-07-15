@@ -1,7 +1,7 @@
 [%- USE Number.Format(THOUSANDS_SEP=',') -%]
 
 <div class="data_table">
-<table summary="insert size check results">
+<table title="insert size check results">
 <tr><th class="laligned">pass criterion</th><td>[% check.criterion %]</td></tr>
 
 [%- IF check.reference.defined -%]

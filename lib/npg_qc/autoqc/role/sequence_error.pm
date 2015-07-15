@@ -64,6 +64,19 @@ sub subset {
   return $self->sequence_type;
 }
 
+sub reference_for_title {
+  my $self      = shift;
+  my $result    = {};
+
+  if ( $self->reference ) {
+    my ( $species, $version ) = ( $self->reference =~ /references\/ (\w+) \/ (\w+)/xms );
+    $result->{'species'} = $species;
+    $result->{'version'} = $version;
+  }
+
+  return $result;
+}
+
 no Moose;
 
 1;
@@ -91,6 +104,9 @@ __END__
 
 =head2 criterion
 
+=head2 reference_for_title - Trimmed version of the reference so it can be 
+used in a view. Returns a hash reference with keys for species and version.
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -108,6 +124,8 @@ __END__
 =item PDL::Core
 
 =item PDL::Primitive
+
+=item npg_qc::autoqc::role::result
 
 =back
 

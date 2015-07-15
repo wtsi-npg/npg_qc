@@ -102,12 +102,6 @@
     [% url = c.uri_for_action(c.controller('Checks').action_for('samples'), '2166') %]
     <td><a href="[% url %]">[% url %]</a></td>
   </tr>
-  <tr>
-    <td class="url_column">/checks/studies/XXX,<br /> where XXX is a valid study ID</td>
-    <td>qc checks for all lanes for in a study</td>
-     [% url = c.uri_for_action(c.controller('Checks').action_for('studies'), '171') %]
-    <td><a href="[% url %]">[% url %]</a></td>
-  </tr>
 </table>
 </div>
 
