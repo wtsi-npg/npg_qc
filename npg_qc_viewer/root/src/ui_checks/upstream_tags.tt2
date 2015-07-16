@@ -7,7 +7,7 @@
 
 <div class="data_table">
 Tag#0 decoding against Sanger168 tag set
-<table summary="Upstream Tag Decoding">
+<table title="Upstream Tag Decoding">
 <tr>
   <th>&nbsp;</th>
   <th>Count</th>
@@ -28,7 +28,7 @@ Tag#0 decoding against Sanger168 tag set
 
 <div class="data_table">
 Tags in upstream runs (same instrument/slot)
-<table summary="Upstream Runs">
+<table title="Upstream Runs">
 <tr>
   <th>Run</th>
   <th title="Run in progress date">Date started</th>
@@ -51,7 +51,7 @@ Tags in upstream runs (same instrument/slot)
 
 <div class="data_table">
 High-scoring tags (perfect match >= 0.01% for Sanger168 tag set)
-<table summary="tags">
+<table title="tags">
 <tr>
   <th>Tag</th>
   <th>Run</th>

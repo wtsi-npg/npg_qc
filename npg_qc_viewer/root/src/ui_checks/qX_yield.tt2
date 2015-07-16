@@ -2,7 +2,7 @@
 [% has_reverse = check.yield2.defined -%]
 
 <div class="data_table">
-<table summary="qX_yield check results">
+<table title="qX_yield check results">
 <tr>
   <th class="laligned">read</th>
   <td>forward</td>

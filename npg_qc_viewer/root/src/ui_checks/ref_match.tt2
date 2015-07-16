@@ -1,7 +1,7 @@
 [% USE Number.Format(THOUSANDS_SEP=',') %]
 
 <div class="data_table">
-<table summary="contamination check meta data">
+<table title="contamination check meta data">
   <tr>
     <th class="laligned">aligner version</th>
     <td>[% IF check.aligner_version.defined %][% check.aligner_version %][% END %]</td>
@@ -22,7 +22,7 @@
 
 [% IF check.aligned_read_count.defined -%]
 <div class="data_table">
-<table summary="contamination for each checked organism">
+<table title="contamination for each checked organism">
   <tr>
     <th>organism (version/strain)</th>
     <th>count</th>

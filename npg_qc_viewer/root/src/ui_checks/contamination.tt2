@@ -1,7 +1,7 @@
 [% USE Number.Format(THOUSANDS_SEP=',') %]
 
 <div class="data_table">
-<table summary="contamination check meta data">
+<table title="contamination check meta data">
   <tr>
     <th class="laligned">reference version</th>
     <td>[% IF check.reference_version.defined %][% check.reference_version %][% END %]</td>
@@ -27,7 +27,7 @@
 
 [% IF check.contaminant_count.defined -%]
 <div class="data_table">
-<table summary="contamination for each checked organism">
+<table title="contamination for each checked organism">
   <tr>
     <th>organism</th>
     <th>count</th>

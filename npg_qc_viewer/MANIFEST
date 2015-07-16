@@ -71,7 +71,6 @@ root/static/images/padlock.png
 root/static/images/save.png
 root/static/images/tick.png
 root/static/images/to_children.png
-root/static/images/to_parent.png
 root/static/images/waiting.gif
 root/static/scripts/main.js
 root/static/scripts/manual_qc.js
@@ -126,7 +125,6 @@ t/80-app-library.t
 t/80-app-run-stash.t
 t/80-app-run.t
 t/80-app-sample.t
-t/80-app-study.t
 t/80-app.t
 t/data/fixtures/npg/000-EntityType.yml
 t/data/fixtures/npg/000-InstrumentStatusDict.yml
