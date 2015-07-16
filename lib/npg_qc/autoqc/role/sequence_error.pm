@@ -69,7 +69,7 @@ sub reference_for_title {
   my $result    = {};
 
   if ( $self->reference ) {
-    my ( $species, $version ) = ( $self->reference =~ /references\/ (\w+) \/ (\w+)/xms );
+    my ( $species, $version ) = ( $self->reference =~ /references\/ ([^\/]+) \/ ([^\/]+)/xms );
     $result->{'species'} = $species;
     $result->{'version'} = $version;
   }

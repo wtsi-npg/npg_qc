@@ -20,7 +20,7 @@ subtest 'Loading check' => sub {
 };
 
 subtest 'Testing utility methods' => sub {
-  plan tests => 12;
+  plan tests => 14;
   my $r;
   my $ape;
 
@@ -37,14 +37,17 @@ subtest 'Testing utility methods' => sub {
   lives_ok { $ape = $r->reverse_average_percent_error; } q(reverse_average_percent_error run);
   cmp_ok($ape, q(==), 1.58, q(reverse_average_percent_error value));
   my $rft = $r->reference_for_title;
-  cmp_ok($rft->{'species'}, q[eq], q[Homo_sapiens]);
-  cmp_ok($rft->{'version'}, q[eq], q[NCBI36]);
+  cmp_ok($rft->{'species'}, q[eq], q[Homo_sapiens], q[Can correctly parse species (Homo_sapiens)]);
+  cmp_ok($rft->{'version'}, q[eq], q[NCBI36], q[Can correctly parse version (NCBI36)]);
 
   lives_ok {
     $r = npg_qc::autoqc::results::sequence_error->load('t/data/autoqc/9999_1.sequence_error.json');
   } q(load serialised valid result);
   lives_ok { $ape = $r->reverse_average_percent_error; } q(reverse_average_percent_error run);
   cmp_ok($ape, q(==), 1.58, q(reverse_average_percent_error value));
+  $rft = $r->reference_for_title;
+  cmp_ok($rft->{'species'}, q[eq], q[Homo_sapiens], q[Can correctly parse species (Homo_sapiens)]);
+  cmp_ok($rft->{'version'}, q[eq], q[NCBI36.48-1], q[Can correctly parse version (NCBI36.48-1)]);
 };
 
 1;
