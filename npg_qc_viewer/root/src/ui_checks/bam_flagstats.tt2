@@ -4,7 +4,7 @@
      paired_mapped_reads = check.paired_mapped_reads * 2;
    END;
 -%]
-<table class="data_table" summary="bam flagstats  check results">
+<table class="data_table" title="bam flagstats  check results">
 <tr><th>Reads Description</th><th>Count</th></tr>
 <tr><th class="laligned">all</th>
   <td class="raligned">[% IF check.total_reads.defined; check.total_reads | format_number; END %]</td></tr>

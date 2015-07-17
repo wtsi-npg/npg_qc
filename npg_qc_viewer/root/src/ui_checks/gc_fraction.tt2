@@ -3,7 +3,7 @@
 [% has_reverse = check.reverse_read_gc_percent.defined -%]
 
 <div class="data_table">
-<table summary="gc_fraction check results">
+<table title="gc_fraction check results">
 <tr>
   <th class="laligned">pass criterion</th>
   <td>[% check.criterion %]</td>
