@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.8
  - SeqQC
      - display insert size normal fit confidence and number of modes in the 
        summary table
@@ -10,6 +11,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      - use updated LIMs server url
      - link to NPG tracking web server running on the same host as this app
      - showing reference species and version below lane titles
+ - Using container configuration for travis
 
 release 58.7
  - bam_flagstats autoqc result object:
