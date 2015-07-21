@@ -441,9 +441,6 @@ Sample page
 sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $id_sample_lims) = @_;
 
-    #TODO remove because sample_id in clarity can be alphanumeric.
-    #$self->_test_positive_int($c, $sample_id);
-
     my $row = $c->model('MLWarehouseDB')->resultset('Sample')->search(
          {id_sample_lims => $id_sample_lims,}
     )->next;
