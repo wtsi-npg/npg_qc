@@ -141,7 +141,7 @@
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
 [%- IF lib; lurl = [lims_url, 'assets', library_id]; -%]
-<a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'name' => lib}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
+<a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => library_id}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
 <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>
 [%- END -%]
 [% IF is_dev %]<span class="watermark">R&amp;D</span>[% END %]

@@ -85,31 +85,6 @@ sub _show_option {
     return $what;
 }
 
-sub _wh_rows2run_lane_pairs {
-    my ($self, $c) = @_;
-
-    my $map = {};
-    foreach my $rs_name (qw/rs plex_rs/) {
-        if (!exists $c->stash->{$rs_name}) { next; }
-        my $rset = $c->stash->{$rs_name};
-        while (my $row = $rset->next) {
-            my $id_run = $row->id_run;
-            my $position = $row->position;
-            if (exists $map->{$id_run}) {
-                ## no critic (ProhibitBooleanGrep)
-                if (!grep {/$position/smx} @{$map->{$id_run}}) {
-                    push  @{$map->{$id_run}}, $position;
-	              }
-            ## use critic
-	          } else {
-                $map->{$id_run} = [$position];
-	          }
-	      }
-        $rset->reset;
-    }
-    return $map;
-}
-
 sub _rl_map_append {
     my ($self, $c, $rl_map) = @_;
 
@@ -164,16 +139,35 @@ sub _display_libs {
     }
 
     if ($value) {
-        $c->stash->{'rs'} = $c->model('WarehouseDB')->resultset('NpgInformation')->search($where);
-        if (!$no_plexes) {
-            $c->stash->{'plex_rs'}  = $c->model('WarehouseDB')->resultset('NpgPlexInformation')->search($where);
-        }
+        my $rs = $c->model('MLWarehouseDB')->
+          resultset(q[IseqProductMetric])->
+          search($where, { '+select' => [qw(me.id_run me.position)],
+                           '+as' => [qw(id_run position)],
+                           join => {'iseq_flowcell'=>'sample'} });
+
+        $c->stash->{'rs'} = $rs;
 
         $c->stash->{'db_lookup'} = 1;
-        my $retrieve_option = !$no_plexes ? $ALL : $LANES;
+        my $map = {};
+        while (my $row = $rs->next) {
+            my $id_run = $row->id_run;
+            my $position = $row->position;
+            if (exists $map->{$id_run}) {
+                ## no critic (ProhibitBooleanGrep)
+                if (!grep {/$position/smx} @{$map->{$id_run}}) {
+                    push  @{$map->{$id_run}}, $position;
+                }
+            ## use critic
+            } else {
+                $map->{$id_run} = [$position];
+            }
+        }
 
-        my $run_lanes = $self->_wh_rows2run_lane_pairs($c);
-        my $collection = $c->model('Check')->load_lanes($run_lanes, $c->stash->{'db_lookup'}, $retrieve_option, $c->model('NpgDB')->schema);
+        $rs->reset;
+
+        my $run_lanes = $map;
+
+        my $collection = $c->model('Check')->load_lanes($run_lanes, $c->stash->{'db_lookup'}, $ALL, $c->model('NpgDB')->schema);
         $c->stash->{'sample_link'} = 1;
         $self->_data2stash($c, $collection);
         $c->stash->{'show_total'} = 1;
@@ -413,13 +407,13 @@ Library page.
 sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
     my ( $self, $c) = @_;
 
-    if (defined $c->request->query_parameters->{name}) {
-        my $lib_names = $c->request->query_parameters->{name};
-        if (!ref $lib_names) {
-            $lib_names = [$lib_names];
+    if (defined $c->request->query_parameters->{id}) {
+        my $id_library_lims = $c->request->query_parameters->{id};
+        if (!ref $id_library_lims) {
+            $id_library_lims = [$id_library_lims];
         }
-        $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$lib_names});
-        $self->_display_libs($c, { 'me.asset_name' => $lib_names,});
+        $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
+        $self->_display_libs($c, { 'iseq_flowcell.id_library_lims' => $id_library_lims,}); #TODO is not asset_name
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
         $c->detach(q[Root], q[error_page]);
@@ -445,21 +439,22 @@ Sample page
 
 =cut
 sub sample :Chained('base') :PathPart('samples') :Args(1) {
-    my ( $self, $c, $sample_id) = @_;
+    my ( $self, $c, $id_sample_lims) = @_;
 
-    $self->_test_positive_int($c, $sample_id);
+    #TODO remove because sample_id in clarity can be alphanumeric.
+    #$self->_test_positive_int($c, $sample_id);
 
-    my $row = $c->model('WarehouseDB')->resultset('CurrentSample')->search(
-         {internal_id => $sample_id,}
+    my $row = $c->model('MLWarehouseDB')->resultset('Sample')->search(
+         {id_sample_lims => $id_sample_lims,}
     )->next;
     if (!$row) {
-        $c->stash->{error_message} = qq[Unknown sample id $sample_id];
+        $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
         $c->detach(q[Root], q[error_page]);
         return;
     }
 
-    my $sample_name = $row->sample_name;
-    $self->_display_libs($c, { 'me.sample_id' => [$sample_id],});
+    my $sample_name = $row->name || $row->id_sample_lims; #TODO Check if this is true for all cases.
+    $self->_display_libs($c, { "sample.id_sample_lims" => 1828705,}); #TODO replace me.sample_id
     $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
     return;
 }
