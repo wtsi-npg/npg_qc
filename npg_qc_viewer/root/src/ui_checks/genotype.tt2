@@ -428,10 +428,10 @@ End of Sequenom assay data
 	  <th class="laligned">Closest alternative match</th>
               [%
               alt_sample_name=alt_match.matched_sample_name;
-		row = c.model('WarehouseDB').resultset('CurrentSample').search({ 'sanger_sample_id' => "$alt_sample_name"}, ).first;
+		row = c.model('MLWarehouseDB').resultset('Sample').search({ 'name' => "$alt_sample_name"}, ).first;
 		alt_sample_id = 0;
 		IF row;
-			alt_sample_id = row.internal_id;
+			alt_sample_id = row.id_sample_lims;
 		END;
               IF alt_sample_id;
               	alt_sample_name='<a href="' _ c.uri_for_action(c.controller('Checks').action_for('samples'), alt_sample_id) _ '"><span class="lib nbsp">' _ alt_sample_name _ '</span></a>';
