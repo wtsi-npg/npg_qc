@@ -5,6 +5,7 @@ use namespace::autoclean;
 use Moose::Meta::Class;
 use URI::URL;
 use Carp;
+use List::MoreUtils qw[ any ];
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
@@ -148,26 +149,23 @@ sub _display_libs {
         $c->stash->{'rs'} = $rs;
 
         $c->stash->{'db_lookup'} = 1;
-        my $map = {};
+
+        my $run_lane_map = {};
         while (my $row = $rs->next) {
             my $id_run = $row->id_run;
             my $position = $row->position;
-            if (exists $map->{$id_run}) {
-                ## no critic (ProhibitBooleanGrep)
-                if (!grep {/$position/smx} @{$map->{$id_run}}) {
-                    push  @{$map->{$id_run}}, $position;
+            if (exists $run_lane_map->{$id_run}) {
+                if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
+                    push  @{$run_lane_map->{$id_run}}, $position;
                 }
-            ## use critic
             } else {
-                $map->{$id_run} = [$position];
+                $run_lane_map->{$id_run} = [$position];
             }
         }
 
         $rs->reset;
 
-        my $run_lanes = $map;
-
-        my $collection = $c->model('Check')->load_lanes($run_lanes, $c->stash->{'db_lookup'}, $ALL, $c->model('NpgDB')->schema);
+        my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $ALL, $c->model('NpgDB')->schema);
         $c->stash->{'sample_link'} = 1;
         $self->_data2stash($c, $collection);
         $c->stash->{'show_total'} = 1;
@@ -478,6 +476,8 @@ __END__
 =item URI::URL
 
 =item Carp
+
+=item List::MoreUtils
 
 =item npg_qc::autoqc::qc_store::options
 
