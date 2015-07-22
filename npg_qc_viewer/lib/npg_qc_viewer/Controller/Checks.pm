@@ -141,8 +141,11 @@ sub _display_libs {
 
     if ($value) {
         my $rs = $c->model('MLWarehouseDB')->
-          resultset(q[IseqProductMetric])->
-          search($where, { join => {'iseq_flowcell'=>'sample'} });
+          resultset('IseqProductMetric')->
+          search($where, {
+            prefetch => ['iseq_run_lane_metric', { 'iseq_flowcell' => 'sample' } ], 
+            join => [ 'iseq_run_lane_metric', { 'iseq_flowcell'=>'sample' } ] 
+          });
 
         $c->stash->{'rs'} = $rs;
         $c->stash->{'plex_rs'} = $rs;
@@ -213,7 +216,7 @@ sub _display_run_lanes {
     my $retrieve_option = $RESULTS_RETRIEVE_OPTIONS{$what};
     my $collection =  $c->model('Check')->load_lanes($run_lanes, $c->stash->{'db_lookup'}, $retrieve_option, $c->model('NpgDB')->schema);
 
-    my $where = {id_run => $id_runs};
+    my $where = {id_run => $id_runs}; # Query by id_run, position
     if (scalar @{$lanes}) { $where->{position} = $lanes };
     my $model = $c->model('WarehouseDB');
     if ($retrieve_option != $PLEXES) {
@@ -410,7 +413,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
             $id_library_lims = [$id_library_lims];
         }
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
-        $self->_display_libs($c, { 'iseq_flowcell.id_library_lims' => $id_library_lims,}); #TODO is not asset_name
+        $self->_display_libs($c, { 'iseq_flowcell.id_library_lims' => $id_library_lims,});
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
         $c->detach(q[Root], q[error_page]);
