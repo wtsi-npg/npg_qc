@@ -142,11 +142,10 @@ sub _display_libs {
     if ($value) {
         my $rs = $c->model('MLWarehouseDB')->
           resultset(q[IseqProductMetric])->
-          search($where, { '+select' => [qw(me.id_run me.position)],
-                           '+as' => [qw(id_run position)],
-                           join => {'iseq_flowcell'=>'sample'} });
+          search($where, { join => {'iseq_flowcell'=>'sample'} });
 
         $c->stash->{'rs'} = $rs;
+        $c->stash->{'plex_rs'} = $rs;
 
         $c->stash->{'db_lookup'} = 1;
 
@@ -448,8 +447,8 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
         return;
     }
 
-    my $sample_name = $row->name || $row->id_sample_lims; #TODO Check if this is true for all cases.
-    $self->_display_libs($c, { "sample.id_sample_lims" => 1828705,}); #TODO replace me.sample_id
+    my $sample_name = $row->name || $row->id_sample_lims;
+    $self->_display_libs($c, { "sample.id_sample_lims" => $id_sample_lims,});
     $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
     return;
 }
