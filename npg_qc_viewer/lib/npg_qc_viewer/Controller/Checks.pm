@@ -140,7 +140,8 @@ sub _display_libs {
     }
 
     if ($value) {
-        $where->{'me.tag_index'}=[ { '!=', 0 }, undef ];
+        # tag_index is NULL OR tag_index != 0
+        $where->{'me.tag_index'} = [ undef, { '!=', 0 } ];  
         my $rs = $c->model('MLWarehouseDB')->
           resultset('IseqProductMetric')->
           search($where, {
