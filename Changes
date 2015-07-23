@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - move method for file name creation from SeqQC to autoqc so that it's
+   more accessible
+
 release 58.8
  - SeqQC
      - display insert size normal fit confidence and number of modes in the 
