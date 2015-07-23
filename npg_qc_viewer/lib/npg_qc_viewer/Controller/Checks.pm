@@ -140,15 +140,15 @@ sub _display_libs {
     }
 
     if ($value) {
+        $where->{'me.tag_index'}=[ { '!=', 0 }, undef ];
         my $rs = $c->model('MLWarehouseDB')->
           resultset('IseqProductMetric')->
           search($where, {
-            prefetch => ['iseq_run_lane_metric', { 'iseq_flowcell' => 'sample' } ], 
-            join => [ 'iseq_run_lane_metric', { 'iseq_flowcell'=>'sample' } ] 
+            prefetch => ['iseq_run_lane_metric', { 'iseq_flowcell'=> ['sample', 'study'] } ], 
+            join => [ 'iseq_run_lane_metric', { 'iseq_flowcell'=> ['sample', 'study'] } ]
           });
 
         $c->stash->{'rs'} = $rs;
-        $c->stash->{'plex_rs'} = $rs;
 
         $c->stash->{'db_lookup'} = 1;
 

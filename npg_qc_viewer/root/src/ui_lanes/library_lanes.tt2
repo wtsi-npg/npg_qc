@@ -58,7 +58,7 @@
 <table id="results_summary" summary="QC results summary">
 <tr>
 [% IF sample_link %]<th[% row_span_string %]>Sample Name</th>[% END %]
-<th[% row_span_string %]>Library Name</th>
+<th[% row_span_string %]>Library</th>
 <th[% row_span_string %]>Run Id<br />------<br />Num.<br />Cycles</th>
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
@@ -73,54 +73,56 @@
     FOREACH lane_key IN sorted_rl_map_keys;
       lane_collection = rl_map.$lane_key;
       attrs = util.inflate_rpt_key(lane_key);
-      id_run   = attrs.id_run;
-      time_comp = '';
-      num_cycles = '';
-      position  = attrs.position;
+      id_run   = attrs.id_run;      #@iseq_flowcell
+      time_comp = '';               #run_complete@iseq_run_lane_metric
+      num_cycles = '';              #cycles@iseq_run_lane_metric
+      position  = attrs.position;   #@iseq_flowcell
       is_dev = 0;
-      tag_index = '';
-      tag_sequence = '';
-      pass = '';
-      lib = '';
-      library_id = '';
-      sample_id = '';
-      study_id = '';
-      sample_name = '';
+      tag_index = '';               #@iseq_flowcell
+      tag_sequence = '';            #tag_sequence4deplexing@iseq_product_metric
+      pass = '';                    #manual_qc@iseq_flowcell
+      lib = '';                     #id_library_lims@iseq_flowcell
+      library_id = '';              #id_library_lims@iseq_flowcell
+      sample_id = '';               #id_sample_lims@sample
+      study_id = '';                #name@study
+      sample_name = '';             #name@sample
       table_row = '';
       IF attrs.defined('tag_index');
         tag_index = attrs.tag_index;
-        table_row = plex_rs.search({'me.id_run' => id_run, 'me.position' => position, 'tag_index' => tag_index}).first();
+        table_row = rs.search({'me.id_run' => id_run, 'me.position' => position, 'me.tag_index' => tag_index}).first();
         IF table_row;
-          tag_sequence = table_row.tag_sequence;
+          tag_sequence = table_row.tag_sequence4deplexing; ##table_row.tag_sequence; 
           IF !run_info.exists($id_run);
               run_info.$id_run = table_row.npg_info;
           END;
-          t            = run_info.$id_run.run_complete;
-          num_cycles   = run_info.$id_run.cycles;
+          t            = table_row.iseq_run_lane_metric.run_complete; #run_info.$id_run.run_complete;
+          num_cycles   = table_row.iseq_run_lane_metric.cycles; #run_info.$id_run.cycles;
+          pass         = table_row.iseq_flowcell.manual_qc;     #table_row.manual_qc;
         END;
       ELSE;
-        table_row = rs.search({'id_run' => id_run, 'position' => position,}).first();
+        table_row = rs.search({'me.id_run' => id_run, 'me.position' => position,}).first();
         IF table_row;
-          t            = table_row.run_complete;
-          num_cycles   = table_row.cycles;
-          pass = table_row.manual_qc;
+          t            = table_row.iseq_run_lane_metric.run_complete;
+          num_cycles   = table_row.iseq_run_lane_metric.cycles; #table_row.cycles;
+          pass         = table_row.iseq_flowcell.manual_qc;     #table_row.manual_qc;
           is_dev = table_row.is_dev;
         END;
       END;
+      
       IF table_row;
-        time_comp  = String.new(text => "$t");
-        sample_id = table_row.sample_id;
-        study_id = table_row.study_id;
-        sample_name = table_row.sample_name;
-        lib = table_row.library_name;
-        library_id = table_row.asset_id;
-        libs_info.$lane_key.lib_name = lib;
+        time_comp                       = String.new(text => "$t");
+        sample_id                       = table_row.iseq_flowcell.sample.id_sample_lims;         #table_row.sample_id;
+        study_id                        = table_row.iseq_flowcell.study.id_study_lims;        #table_row.study_id;
+        sample_name                     = table_row.iseq_flowcell.sample.name;       #table_row.sample_name;
+        lib                             = table_row.iseq_flowcell.id_library_lims;   #table_row.library_name;
+        library_id                      = table_row.iseq_flowcell.legacy_library_id; #table_row.asset_id;
+        libs_info.$lane_key.lib_name    = lib;
         libs_info.$lane_key.sample_name = sample_name;
-        libs_info.$lane_key.sample_id = sample_id;
-        libs_info.$lane_key.library_id = library_id;
-        libs_info.$lane_key.study_id = study_id;
+        libs_info.$lane_key.sample_id   = sample_id;
+        libs_info.$lane_key.library_id  = library_id;
+        libs_info.$lane_key.study_id    = study_id;
         IF study_id && !studies_info.$study_id.defined;
-          studies_info.$study_id = table_row.study_name;
+          studies_info.$study_id = table_row.iseq_flowcell.study.name;               #table_row.study_name;
         END;
       END;
 -%]
