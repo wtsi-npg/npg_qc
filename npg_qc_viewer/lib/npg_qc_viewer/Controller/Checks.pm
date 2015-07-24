@@ -5,7 +5,7 @@ use namespace::autoclean;
 use Moose::Meta::Class;
 use URI::URL;
 use Carp;
-use List::MoreUtils qw[ any ];
+use List::MoreUtils qw[ any zip ];
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
@@ -89,7 +89,7 @@ sub _show_option {
 sub _rl_map_append {
     my ($self, $c, $rl_map) = @_;
     #TODO modify for plexes.
-    my $rsets = {rs => 'IseqProductMetric', prex_rs => 'IseqProductMetric', };
+    my $rsets = {rs => 'IseqProductMetric'};
     my $wh_rl_map = {};
     foreach my $rs_name (keys %{$rsets}) {
         if (!$c->stash->{$rs_name}) { next; }
@@ -141,7 +141,7 @@ sub _display_libs {
 
     if ($value) {
         # tag_index is NULL OR tag_index != 0
-        $where->{'me.tag_index'} = [ undef, { '!=', 0 } ];  
+        $where->{'me.tag_index'} = [ undef, { '!=', 0 } ];
         my $rs = $c->model('MLWarehouseDB')->
           resultset('IseqProductMetric')->
           search($where, {
@@ -177,13 +177,6 @@ sub _display_libs {
     }
 
     return;
-}
-
-sub _load_lims_data {
-  my ($self, $c, $params) = @;
-
-  my $lims_data = {};
-
 }
 
 sub _display_run_lanes {
@@ -226,7 +219,6 @@ sub _display_run_lanes {
 
     my $where = {'me.id_run' => $id_runs}; # Query by id_run, position
     if (scalar @{$lanes}) { $where->{'me.position'} = $lanes };
-    my $model = $c->model('WarehouseDB');
     my $model_mlwh = $c->model('MLWarehouseDB');
     
     if ($retrieve_option != $PLEXES) {
@@ -239,7 +231,7 @@ sub _display_run_lanes {
                             });
     }
     if ($retrieve_option != $LANES) {
-      $c->stash->{'prex_rs'} = $model_mlwh->
+      $c->stash->{'rs'} = $model_mlwh->
                                  resultset('IseqProductMetric')->
                                  search($where, {
                                    prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ], 
@@ -247,12 +239,6 @@ sub _display_run_lanes {
                                  });
     }
     
-    #if ($retrieve_option != $PLEXES) {
-    #    $c->stash->{'rs'} = $model->resultset('NpgInformation')->search($where);
-    #}
-    #if ($retrieve_option != $LANES) {
-    #    $c->stash->{'plex_rs'} = $model->resultset('NpgPlexInformation')->search($where);
-    #}
     $self->_data2stash($c, $collection);
 
     if (!$c->stash->{'title'} ) {
@@ -274,6 +260,25 @@ sub _display_run_lanes {
     }
 
     return;
+}
+
+sub _get_sample_lims {
+  my ($self, $c, $id_sample_lims) = @_;
+
+  my $row = $c->model('MLWarehouseDB')->resultset('Sample')->search(
+    {id_sample_lims => $id_sample_lims,}
+  )->next;
+
+  if (!$row) {
+    $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
+    $c->detach(q[Root], q[error_page]);
+    return;
+  }
+
+  my $sample->{'id_sample_lims'} = $row->id_sample_lims;
+  $sample->{'name'} = $row->name || $row->id_sample_lims;
+
+  return $sample;
 }
 
 =head2 base 
@@ -475,18 +480,12 @@ Sample page
 sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $id_sample_lims) = @_;
 
-    my $row = $c->model('MLWarehouseDB')->resultset('Sample')->search(
-         {id_sample_lims => $id_sample_lims,}
-    )->next;
-    if (!$row) {
-        $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
-        $c->detach(q[Root], q[error_page]);
-        return;
-    }
+    my $sample = $self->_get_sample_lims($c, $id_sample_lims);
 
-    my $sample_name = $row->name || $row->id_sample_lims;
+    $c->stash->{'lims_sample'} = $sample;
+    my $sample_name = $sample->{'name'};
     $self->_display_libs($c, { "sample.id_sample_lims" => $id_sample_lims,});
-    $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
+    $c->stash->{'title'}  = _get_title(qq[Sample '$sample_name']);
     return;
 }
 
