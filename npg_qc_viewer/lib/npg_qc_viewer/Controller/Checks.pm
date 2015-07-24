@@ -88,8 +88,8 @@ sub _show_option {
 
 sub _rl_map_append {
     my ($self, $c, $rl_map) = @_;
-
-    my $rsets = {rs => 'NpgInformation', plex_rs => 'NpgPlexInformation',};
+    #TODO modify for plexes.
+    my $rsets = {rs => 'IseqProductMetric', prex_rs => 'IseqProductMetric', };
     my $wh_rl_map = {};
     foreach my $rs_name (keys %{$rsets}) {
         if (!$c->stash->{$rs_name}) { next; }
@@ -179,6 +179,13 @@ sub _display_libs {
     return;
 }
 
+sub _load_lims_data {
+  my ($self, $c, $params) = @;
+
+  my $lims_data = {};
+
+}
+
 sub _display_run_lanes {
     my ($self, $c, $params) = @_;
 
@@ -217,15 +224,35 @@ sub _display_run_lanes {
     my $retrieve_option = $RESULTS_RETRIEVE_OPTIONS{$what};
     my $collection =  $c->model('Check')->load_lanes($run_lanes, $c->stash->{'db_lookup'}, $retrieve_option, $c->model('NpgDB')->schema);
 
-    my $where = {id_run => $id_runs}; # Query by id_run, position
-    if (scalar @{$lanes}) { $where->{position} = $lanes };
+    my $where = {'me.id_run' => $id_runs}; # Query by id_run, position
+    if (scalar @{$lanes}) { $where->{'me.position'} = $lanes };
     my $model = $c->model('WarehouseDB');
+    my $model_mlwh = $c->model('MLWarehouseDB');
+    
     if ($retrieve_option != $PLEXES) {
-        $c->stash->{'rs'} = $model->resultset('NpgInformation')->search($where);
+      #$where->{'me.tag_index'} = [ undef, { '=', 0 } ]; 
+      $c->stash->{'rs'} = $model_mlwh->
+                            resultset('IseqProductMetric')->
+                            search($where, {
+                              prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ], 
+                              join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
+                            });
     }
     if ($retrieve_option != $LANES) {
-        $c->stash->{'plex_rs'} = $model->resultset('NpgPlexInformation')->search($where);
+      $c->stash->{'prex_rs'} = $model_mlwh->
+                                 resultset('IseqProductMetric')->
+                                 search($where, {
+                                   prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ], 
+                                   join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
+                                 });
     }
+    
+    #if ($retrieve_option != $PLEXES) {
+    #    $c->stash->{'rs'} = $model->resultset('NpgInformation')->search($where);
+    #}
+    #if ($retrieve_option != $LANES) {
+    #    $c->stash->{'plex_rs'} = $model->resultset('NpgPlexInformation')->search($where);
+    #}
     $self->_data2stash($c, $collection);
 
     if (!$c->stash->{'title'} ) {
@@ -302,6 +329,7 @@ sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
 
     if (defined $c->request->query_parameters->{run}) {
         $c->stash->{'db_lookup'} = 1;
+        $c->stash->{'display'}   = 'runs';
         $self->_display_run_lanes($c);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
@@ -324,6 +352,7 @@ sub checks_in_run :Chained('base') :PathPart('runs') :Args(1) {
     $c->stash->{'title'}     = _get_title(qq[Results for run $id_run]);
     $c->stash->{'run_view'}  = 1;
     $c->stash->{'id_run'}    = $id_run;
+    $c->stash->{'display'}   = 'runs';
     $self->_display_run_lanes($c, {run => [$id_run],} );
     return;
 }
@@ -340,6 +369,7 @@ sub runs_from_staging :Chained('base') :PathPart('runs-from-staging') :Args(0) {
 
     if (exists $c->request->query_parameters->{run}) {
         $c->stash->{'db_lookup'} = 0;
+        $c->stash->{'display'}   = 'runs';
         $self->_display_run_lanes($c);
     } else {
         $c->stash->{error_message} =
@@ -365,6 +395,7 @@ sub checks_in_run_from_staging :Chained('base') :PathPart('runs-from-staging') :
     $c->stash->{'run_from_staging'} = 1;
     $c->stash->{'run_view'}         = 1;
     $c->stash->{'id_run'}           = $id_run;
+    $c->stash->{'display'}          = 'runs';
     $self->_display_run_lanes($c, {run => [$id_run],} );
     return;
 }
@@ -391,6 +422,7 @@ sub checks_from_path :Chained('base') :PathPart('path') :Args(0) {
       $self->_data2stash($c, $collection);
       $c->stash->{'db_lookup'} = 0;
       $c->stash->{'path_list'} = [@path];
+      $c->stash->{'display'}   = 'runs';
       $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
   } else {
       $c->stash->{error_message} =
@@ -414,6 +446,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
             $id_library_lims = [$id_library_lims];
         }
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
+        $c->stash->{'display'} = 'libraries';
         $self->_display_libs($c, { 'iseq_flowcell.id_library_lims' => $id_library_lims,});
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];

@@ -71,21 +71,25 @@
     legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
 
     FOREACH lane_key IN sorted_rl_map_keys;
+      #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
+      #Make hash for run/position/tag_index
       attrs = util.inflate_rpt_key(lane_key);
+      
+      #TODO clean old values
       id_run   = attrs.id_run;      #@iseq_flowcell
+      position  = attrs.position;   #@iseq_flowcell
+      tag_index = '';               #@iseq_flowcell
       time_comp = '';               #run_complete@iseq_run_lane_metric
       num_cycles = '';              #cycles@iseq_run_lane_metric
-      position  = attrs.position;   #@iseq_flowcell
       is_dev = 0;
-      tag_index = '';               #@iseq_flowcell
       tag_sequence = '';            #tag_sequence4deplexing@iseq_product_metric
       pass = '';                    #manual_qc@iseq_flowcell
       lib = '';                     #id_library_lims@iseq_flowcell
       library_id = '';              #id_library_lims@iseq_flowcell
       sample_id = '';               #id_sample_lims@sample
-      study_id = '';                #name@study
       sample_name = '';             #name@sample
+      study_id = '';                #name@study
       table_row = '';
       IF attrs.defined('tag_index');
         tag_index = attrs.tag_index;
@@ -140,11 +144,16 @@
 <td class="lib nbsp">
 <div class="rel_pos_container">
 [%- IF lane_collection.run_lane_plex_flags.$lane_key -%]
-<a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
+  <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
+
 [%- IF lib; lurl = [lims_url, 'assets', library_id]; -%]
-<a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => library_id}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
-<a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>
+  <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => lib}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
+  [%- IF !lane_collection.run_lane_plex_flags.$lane_key-%]
+    <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>
+  [%- ELSE -%]
+    <span class="lib nbsp">[% lib | html %]</span>
+  [%- END -%]
 [%- END -%]
 [% IF is_dev %]<span class="watermark">R&amp;D</span>[% END %]
 </div>
