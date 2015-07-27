@@ -30,12 +30,12 @@ __PACKAGE__->config(
     connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
-=head2 find_library_by_id
+=head2 search_library_lims_by_id
 
 TODO
 
 =cut
-sub find_library_by_id {
+sub search_library_lims_by_id {
   my ($self, $id_library_lims) = @_;
 
   if (!defined $id_library_lims) {
@@ -56,6 +56,54 @@ sub find_library_by_id {
                ],
                group_by => qw[me.id_run me.position me.tag_index iseq_flowcell.id_library_lims iseq_flowcell.legacy_library_id],
   });
+
+  return $rs;
+}
+
+=head2 search_library_lims_by_sample
+
+TODO
+
+=cut
+sub search_library_lims_by_sample {
+  my ($self, $id_sample_lims) = @_;
+
+  if (!defined $id_sample_lims) {
+    croak q[Id sample lims not defined when quering for library lims];
+  }
+
+  my $where = { 'sample.id_sample_lims' => $id_sample_lims,};
+
+  my $rs = $self->resultset('IseqProductMetric')->
+             search($where, {
+               join => [{'iseq_flowcell' => 'sample'}],
+               '+columns'  => ['me.id_run',
+                               'me.position',
+                               'me.tag_index',
+                               'iseq_flowcell.id_library_lims',
+                               'iseq_flowcell.legacy_library_id',
+               ],
+               group_by => qw[me.id_run me.position me.tag_index iseq_flowcell.id_library_lims iseq_flowcell.legacy_library_id],
+  });
+
+  return $rs;
+}
+
+=head2 search_sample_lims_by_id
+
+TODO
+
+=cut
+sub search_sample_lims_by_id {
+  my ($self, $id_sample_lims) = @_;
+
+  if (!defined $id_sample_lims) {
+    croak q[Id sample lims not defined when quering sample lims];
+  };
+
+  my $rs = $self->resultset('Sample')->search(
+    {id_sample_lims => $id_sample_lims,}
+  );
 
   return $rs;
 }
