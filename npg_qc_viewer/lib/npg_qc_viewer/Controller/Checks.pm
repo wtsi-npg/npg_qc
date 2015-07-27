@@ -64,6 +64,24 @@ sub _get_title {
     return $full_title;
 }
 
+sub _get_sample_lims {
+  my ($self, $c, $id_sample_lims) = @_;
+
+  my $row = $c->model('MLWarehouseDB')->search_sample_lims_by_id($id_sample_lims)->next;
+
+  if (!$row) {
+    $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
+    $c->detach(q[Root], q[error_page]);
+    return;
+  }
+
+  my $sample = {};
+  $sample->{'id_sample_lims'} = $row->get_column('id_sample_lims');
+  $sample->{'name'} = $row->get_column('name') || $row->('id_sample_lims');
+
+  return $sample;
+}
+
 sub _test_positive_int {
     my ($self, $c, $input) = @_;
     if ($input !~ /^\d+$/smx || $input == 0) {
@@ -130,12 +148,31 @@ sub _data2stash {
     return;
 }
 
-sub _display_libs {
-    my ($self, $c, $id_library_lims, $no_plexes) = @_;
+sub _fetch_libs_by_lib {
+  my ($self, $c, $id_library_lims) = @_;
 
-    if ($id_library_lims) {
+  my $rs;
+  if ($id_library_lims) {
+    $rs = $c->model('MLWarehouseDB')->search_library_lims_by_id($id_library_lims);
+  }
+  return $rs;
+}
+
+sub _fetch_libs_by_sample {
+  my ($self, $c, $id_sample_lims) = @_;
+  
+  my $rs;
+  if ($id_sample_lims) {
+    $rs = $c->model('MLWarehouseDB')->search_library_lims_by_sample($id_sample_lims);
+  }
+  return $rs;
+}
+
+sub _display_libs {
+    my ($self, $c, $rs, $no_plexes) = @_;
+
+    if ($rs) {
         # tag_index is NULL OR tag_index != 0
-        my $rs = $c->model('MLWarehouseDB')->find_library_by_id($id_library_lims);
 
         $c->stash->{'rs'} = $rs;
 
@@ -254,26 +291,6 @@ sub _display_run_lanes {
 sub _prepare_dwh {
   my ($self, $c) = @_;
   $c->stash->{'dwh'} = {};
-}
-
-sub _get_sample_lims {
-  my ($self, $c, $id_sample_lims) = @_;
-
-  my $row = $c->model('MLWarehouseDB')->resultset('Sample')->search(
-    {id_sample_lims => $id_sample_lims,}
-  )->next;
-
-  if (!$row) {
-    $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
-    $c->detach(q[Root], q[error_page]);
-    return;
-  }
-
-  my $sample = {};
-  $sample->{'id_sample_lims'} = $row->id_sample_lims;
-  $sample->{'name'} = $row->name || $row->id_sample_lims;
-
-  return $sample;
 }
 
 =head2 base 
@@ -447,7 +464,8 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         }
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
         $c->stash->{'display'} = 'libraries';
-        $self->_display_libs($c, $id_library_lims);
+        my $rs = $self->_fetch_libs_by_lib($c, $id_library_lims);
+        $self->_display_libs($c, $rs);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
         $c->detach(q[Root], q[error_page]);
@@ -476,11 +494,11 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $id_sample_lims) = @_;
 
     my $sample = $self->_get_sample_lims($c, $id_sample_lims);
-
     $c->stash->{'lims_sample'} = $sample;
     my $sample_name = $sample->{'name'};
-    $self->_display_libs($c, { "sample.id_sample_lims" => $id_sample_lims,});
-    $c->stash->{'title'}  = _get_title(qq[Sample '$sample_name']);
+    my $rs = $self->_fetch_libs_by_sample($c, $id_sample_lims);
+    $self->_display_libs($c, $rs);
+    $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
     return;
 }
 
