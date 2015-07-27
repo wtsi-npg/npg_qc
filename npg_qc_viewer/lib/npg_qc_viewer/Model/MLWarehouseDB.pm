@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::MLWarehouseDB;
 
 use Moose;
 use namespace::autoclean;
+use Carp;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
@@ -28,6 +29,36 @@ __PACKAGE__->config(
     schema_class => 'WTSI::DNAP::Warehouse::Schema',
     connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
+
+=head2 find_library_by_id
+
+TODO
+
+=cut
+sub find_library_by_id {
+  my ($self, $id_library_lims) = @_;
+
+  if (!defined $id_library_lims) {
+    croak q[Id library lims not defined when quering library lims];
+  }
+
+  my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims,
+                'me.tag_index' => [ undef, { '!=', 0 }],};
+
+  my $rs = $self->resultset('IseqProductMetric')->
+             search($where, {
+               join => ['iseq_flowcell'],
+               '+columns'  => ['me.id_run',
+                               'me.position',
+                               'me.tag_index',
+                               'iseq_flowcell.id_library_lims',
+                               'iseq_flowcell.legacy_library_id',
+               ],
+               group_by => qw[me.id_run me.position me.tag_index iseq_flowcell.id_library_lims iseq_flowcell.legacy_library_id],
+  });
+
+  return $rs;
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -81,5 +112,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
-

@@ -77,10 +77,10 @@
       attrs = util.inflate_rpt_key(lane_key);
       
       #TODO clean old values
-      id_run   = attrs.id_run;      #@iseq_flowcell
-      position  = attrs.position;   #@iseq_flowcell
+      id_run   = attrs.id_run;      #@iseq_product
+      position  = attrs.position;   #@iseq_product
       
-      tag_index = '';               #@iseq_flowcell
+      tag_index = '';               #@iseq_product
       time_comp = '';               #run_complete@iseq_run_lane_metric
       num_cycles = '';              #cycles@iseq_run_lane_metric
       is_dev = 0;
@@ -118,7 +118,7 @@
         time_comp                       = String.new(text => "$t");
         sample_id                       = lims_sample.id_sample_lims;                   #table_row.sample_id;
         sample_name                     = lims_sample.name;                             #table_row.sample_name;
-        study_id                        = table_row.iseq_flowcell.study.id_study_lims;  #table_row.study_id;
+        study_id                        = table_row.id_study_lims;  #table_row.study_id;
         lib                             = table_row.iseq_flowcell.id_library_lims;      #table_row.library_name;
         library_id                      = table_row.iseq_flowcell.legacy_library_id;    #table_row.asset_id;
         libs_info.$lane_key.lib_name    = lib;
@@ -222,7 +222,7 @@
   END -%]
 
 <div id="results_full">
-[% #PROCESS ui_checks/checks_in_full.tt2 -%]
+[% PROCESS ui_checks/checks_in_full.tt2 -%]
 </div> <!-- end of full_results division -->
 
 </div> <!-- end of content division -->

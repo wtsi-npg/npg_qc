@@ -88,21 +88,23 @@ sub _show_option {
 
 sub _rl_map_append {
     my ($self, $c, $rl_map) = @_;
-    #TODO modify for plexes.
-    my $rsets = {rs => 'IseqProductMetric'};
+    my $size = scalar keys %{$rl_map};
+    $c->log->debug(qq[Before $size]);
     my $wh_rl_map = {};
-    foreach my $rs_name (keys %{$rsets}) {
-        if (!$c->stash->{$rs_name}) { next; }
-        my $rs = $c->stash->{$rs_name};
-        while (my $row = $rs->next) {
-            my $rpt_key = $row->rpt_key;
-            $wh_rl_map->{$rpt_key} = 1;
-            if (!exists  $rl_map->{$rpt_key}) {
-                $rl_map->{$rpt_key} = undef;
-            }
+    my $rs_name = q[rs];
+    if ($c->stash->{$rs_name}) {
+      my $rs = $c->stash->{$rs_name};
+      while (my $row = $rs->next) {
+        my $rpt_key = $row->rpt_key;
+        $wh_rl_map->{$rpt_key} = 1;
+        if (!exists  $rl_map->{$rpt_key}) {
+          $rl_map->{$rpt_key} = undef;
         }
-        $rs->reset;
+      }
+      $rs->reset;
     }
+    $size = scalar keys %{$rl_map};
+    $c->log->debug(qq[After $size]);
     return $wh_rl_map;
 }
 
@@ -112,15 +114,15 @@ sub _data2stash {
     my $rl_map = $collection->run_lane_collections;
     my @rl_map_keys = keys %{$rl_map};
     my $has_plexes = npg_qc::autoqc::role::rpt_key->has_plexes(\@rl_map_keys);
-    my $wh_rl_map = $self->_rl_map_append($c, $rl_map);
-
-    if ($c->stash->{'sample_link'} && $has_plexes && scalar keys %{$wh_rl_map}) {
-        foreach my $key (keys %{$rl_map}) {
-            if (!exists $wh_rl_map->{$key}) {
-                delete $rl_map->{$key};
-            }
-        }
-    }
+#    my $wh_rl_map = $self->_rl_map_append($c, $rl_map);
+#
+#    if ($c->stash->{'sample_link'} && $has_plexes && scalar keys %{$wh_rl_map}) {
+#        foreach my $key (keys %{$rl_map}) {
+#            if (!exists $wh_rl_map->{$key}) {
+#                delete $rl_map->{$key};
+#            }
+#        }
+#    }
     $c->stash->{'rl_map'}         = $rl_map;
     $c->stash->{'has_plexes'}     = $has_plexes;
     $c->stash->{'collection_all'} = $collection;
@@ -129,25 +131,11 @@ sub _data2stash {
 }
 
 sub _display_libs {
-    my ($self, $c, $where, $no_plexes) = @_;
+    my ($self, $c, $id_library_lims, $no_plexes) = @_;
 
-    if (!keys %{$where}) {
-        croak 'The WHERE hash is empty';
-    }
-    my ($key, $value) = each %{$where};
-    if (!$key) {
-        croak 'Column is an empty string in the WHERE hash';
-    }
-
-    if ($value) {
+    if ($id_library_lims) {
         # tag_index is NULL OR tag_index != 0
-        $where->{'me.tag_index'} = [ undef, { '!=', 0 } ];
-        my $rs = $c->model('MLWarehouseDB')->
-          resultset('IseqProductMetric')->
-          search($where, {
-            prefetch => ['iseq_run_lane_metric', { 'iseq_flowcell'=> ['sample', 'study'] } ], 
-            join => [ 'iseq_run_lane_metric', { 'iseq_flowcell'=> ['sample', 'study'] } ]
-          });
+        my $rs = $c->model('MLWarehouseDB')->find_library_by_id($id_library_lims);
 
         $c->stash->{'rs'} = $rs;
 
@@ -155,8 +143,9 @@ sub _display_libs {
 
         my $run_lane_map = {};
         while (my $row = $rs->next) {
-            my $id_run = $row->id_run;
-            my $position = $row->position;
+            my $id_run = $row->get_column('id_run');
+            my $position = $row->get_column('position');
+            $c->log->debug(qq[Guardando $id_run $position]);
             if (exists $run_lane_map->{$id_run}) {
                 if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
                     push  @{$run_lane_map->{$id_run}}, $position;
@@ -238,14 +227,14 @@ sub _display_run_lanes {
                                    join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
                                  });
     }
-    
+
     $self->_data2stash($c, $collection);
 
     if (!$c->stash->{'title'} ) {
         my $title = q[Results ];
         if (!$c->stash->{'db_lookup'}) {
             $title .= q[(staging) ];
-	      }
+        }
         if (@{$id_runs}) {
             $title .= qq[($what) for runs ] . (join q[ ], @{$id_runs});
         }
@@ -262,6 +251,11 @@ sub _display_run_lanes {
     return;
 }
 
+sub _prepare_dwh {
+  my ($self, $c) = @_;
+  $c->stash->{'dwh'} = {};
+}
+
 sub _get_sample_lims {
   my ($self, $c, $id_sample_lims) = @_;
 
@@ -275,7 +269,8 @@ sub _get_sample_lims {
     return;
   }
 
-  my $sample->{'id_sample_lims'} = $row->id_sample_lims;
+  my $sample = {};
+  $sample->{'id_sample_lims'} = $row->id_sample_lims;
   $sample->{'name'} = $row->name || $row->id_sample_lims;
 
   return $sample;
@@ -452,7 +447,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         }
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
         $c->stash->{'display'} = 'libraries';
-        $self->_display_libs($c, { 'iseq_flowcell.id_library_lims' => $id_library_lims,});
+        $self->_display_libs($c, $id_library_lims);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
         $c->detach(q[Root], q[error_page]);
