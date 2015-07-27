@@ -71,21 +71,23 @@
     legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
 
     FOREACH lane_key IN sorted_rl_map_keys;
+      is_dev = 0;
+
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
       #Make hash for run/position/tag_index
       attrs = util.inflate_rpt_key(lane_key);
-      
+
       #TODO clean old values
-      id_run   = attrs.id_run;      #@iseq_product
-      position  = attrs.position;   #@iseq_product
-      
-      tag_index = '';               #@iseq_product
+      id_run   = attrs.id_run;
+      position  = attrs.position;
+      tag_index = '';
+
       time_comp = '';               #run_complete@iseq_run_lane_metric
       num_cycles = '';              #cycles@iseq_run_lane_metric
-      is_dev = 0;
       tag_sequence = '';            #tag_sequence4deplexing@iseq_product_metric
       pass = '';                    #manual_qc@iseq_flowcell
+
       lib = '';                     #id_library_lims@iseq_flowcell
       library_id = '';              #id_library_lims@iseq_flowcell
       sample_id = '';               #id_sample_lims@sample
@@ -116,8 +118,10 @@
       
       IF table_row;
         time_comp                       = String.new(text => "$t");
-        sample_id                       = lims_sample.id_sample_lims;                   #table_row.sample_id;
-        sample_name                     = lims_sample.name;                             #table_row.sample_name;
+        IF lims_sample;
+          sample_id                     = lims_sample.id_sample_lims;                   #table_row.sample_id;
+          sample_name                   = lims_sample.name;                             #table_row.sample_name;
+        END;
         study_id                        = table_row.id_study_lims;  #table_row.study_id;
         lib                             = table_row.iseq_flowcell.id_library_lims;      #table_row.library_name;
         library_id                      = table_row.iseq_flowcell.legacy_library_id;    #table_row.asset_id;
