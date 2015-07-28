@@ -3,7 +3,7 @@ package npg_qc::autoqc::results::bam_flagstats;
 use Moose;
 use namespace::autoclean;
 use Carp;
-use English;
+use English qw(-no_match_vars);
 use Perl6::Slurp;
 use List::Util qw(sum);
 use File::Spec::Functions qw(splitpath catpath);
@@ -150,7 +150,9 @@ sub _build_related_data {
 sub _get_filter {
   my $path = shift;
   my ($volume, $directories, $file) = splitpath($path);
+  ##no critic (RegularExpressions::ProhibitEnumeratedClasses)
   my ($filter) = $file =~ /_([a-zA-Z0-9]+)[.]stats\Z/xms;
+  ## use critic
   if (!$filter) {
     croak "Failed to get filter from $path";
   }

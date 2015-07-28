@@ -261,6 +261,7 @@ lib/npg_qc/Schema/Result/RunInfo.pm
 lib/npg_qc/Schema/Result/RunRecipe.pm
 lib/npg_qc/Schema/Result/RunTile.pm
 lib/npg_qc/Schema/Result/RunTimeline.pm
+lib/npg_qc/Schema/Result/SamtoolsStat.pm
 lib/npg_qc/Schema/Result/SequenceError.pm
 lib/npg_qc/Schema/Result/SignalMean.pm
 lib/npg_qc/Schema/Result/SpatialFilter.pm

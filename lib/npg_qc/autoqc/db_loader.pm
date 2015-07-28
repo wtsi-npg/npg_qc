@@ -134,7 +134,7 @@ sub _json2db{
 
         $self->_exclude_nondb_attrs($json_file, $values, $result_class->columns());
         $result_class->deflate_unique_key_components($values);
-        
+
         my $db_result;
         if ($self->update) {
           $db_result = $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
