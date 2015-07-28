@@ -1,4 +1,4 @@
-package npg_qc_viewer::Model::Library4RunTO;
+package npg_qc_viewer::TransferObjects::Library4RunTO;
 
 use Moose;
 use namespace::autoclean;

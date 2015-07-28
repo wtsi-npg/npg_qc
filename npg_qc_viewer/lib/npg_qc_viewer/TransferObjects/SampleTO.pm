@@ -1,4 +1,4 @@
-package npg_qc_viewer::Model::SampleTO;
+package npg_qc_viewer::TransferObjects::SampleTO;
 
 use Moose;
 use namespace::autoclean;
