@@ -44,7 +44,7 @@ sub search_product_metrics_by_run {
 
   my $where = {'me.id_run' => $id_run};
   if(defined $position) {
-    $where->{'me.position'} => $position;
+    $where->{'me.position'} = $position;
   }
 
   my $rs = $self->resultset('IseqProductMetric')->
