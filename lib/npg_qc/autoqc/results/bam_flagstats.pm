@@ -6,8 +6,9 @@ use Carp;
 use English;
 use Perl6::Slurp;
 use List::Util qw(sum);
-use File::Spec qw(split_path cat_path);
+use File::Spec::Functions qw(splitpath catpath);
 use Try::Tiny;
+use Compress::Zlib;
 use Readonly;
 
 use npg_tracking::util::types;
@@ -84,12 +85,12 @@ has [ qw/ markdups_metrics_file
     required => 0,
 );
 
-has 'samtools_stats_files' => ( isa        => 'HashRef',
-                                is         => 'ro',
-                                predicate  => '_has_samtools_stats_files',
-                                lazy_build => 1,
+has 'samtools_stats_file' => ( isa        => 'HashRef',
+                               is         => 'ro',
+                               predicate  => '_has_samtools_stats_file',
+                               lazy_build => 1,
 );
-sub _build_samtools_stats_files {
+sub _build_samtools_stats_file {
   my $self = shift;
 
   my $paths = {};
@@ -101,13 +102,13 @@ sub _build_samtools_stats_files {
     ($file_name_prefix) = $filename =~ /^([^.]+)/xms;
     if ($file_name_prefix) {
       foreach my $file ( grep { -f $_ } glob
-          cat_path($volume, $directories, $file_name_prefix . q[*.stats]) ) {
+          catpath($volume, $directories, $file_name_prefix . q[*.stats]) ) {
         $paths->{_get_filter($file)} = $file;
       }
     }
   }
 
-  if (!$mfile || $file_name_prefix) {
+  if (!$mfile || !$file_name_prefix) {
     carp 'Not looking for samtools stats files';
   }
 
@@ -122,22 +123,19 @@ sub _build_samtools_stats_files {
 }
 
 has 'related_data' => ( isa        => 'ArrayRef',
-                           is         => 'rw',
-                           lazy_build => 1,
+                        is         => 'rw',
+                        lazy_build => 1,
 );
 sub _build_related_data {
   my $self = shift;
 
   my @related = ();
-  if ($self->_has_samtools_stats_files) {
-    carp 'have files';
-    foreach my $filter (keys %{$self->samtools_stats_files}) {
+  if ($self->_has_samtools_stats_file) {
+    foreach my $filter (keys %{$self->samtools_stats_file}) {
       my $ref = {};
       $ref->{'relationship_name'} = $STATS_RELATIONSHIP_NAME;
       $ref->{'filter'} = $filter;
-      my $path =  $self->samtools_stats_files->{$filter};
-      carp "PATH $path";
-use Compress::Zlib;
+      my $path =  $self->samtools_stats_file->{$filter};
       try {
         $ref->{'file_content'} = compress(slurp $path);
         push @related, $ref;
@@ -201,15 +199,15 @@ sub execute {
     close $fh or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
   }
 
-  $self->stats_file();
+  $self->samtools_stats_file();
 
   return;
 }
 
 sub parsing_metrics_file {
-  my ($self, $matrics_file) = @_;
+  my ($self, $metrics_file) = @_;
 
-  my @file_contents = slurp ( $matrics_file, { irs => qr/\n\n/mxs } );
+  my @file_contents = slurp ( $metrics_file, { irs => qr/\n\n/mxs } );
 
   my $header = $file_contents[0];
   chomp $header;
@@ -305,6 +303,14 @@ npg_qc::autoqc::results::bam_flagstats
 
   parses samtools flagstats output file handler and save the result to the object
 
+=head2 markdups_metrics_file
+
+=head2 flagstats_metrics_file
+
+=head2 samtools_stats_file
+
+=head2 related_data
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -325,7 +331,9 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item File::Spec
 
-=iten Try:Tiny
+=item Try:Tiny
+
+=item Compress::Zlib
 
 =item Readonly
 
