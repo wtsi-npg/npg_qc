@@ -30,20 +30,46 @@ __PACKAGE__->config(
     connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
+=head2 search_product_metrics_by_run
+
+Search product metrics by id_run (and position if provided).
+
+=cut
+sub search_product_metrics_by_run {
+  my ($self, $id_run, $position) = @_;
+
+  if(!defined $id_run) {
+    croak q[Id run not defined when querying metrics by id_run];
+  }
+
+  my $where = {'me.id_run' => $id_run};
+  if(defined $position) {
+    $where->{'me.position'} => $position;
+  }
+
+  my $rs = $self->resultset('IseqProductMetric')->
+             search($where, {
+               prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ],
+               join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
+             });
+
+  return $rs;
+}
+
 =head2 search_library_lims_by_id
 
-TODO
+Search library by new id library in lims.
 
 =cut
 sub search_library_lims_by_id {
   my ($self, $id_library_lims) = @_;
 
   if (!defined $id_library_lims) {
-    croak q[Id library lims not defined when quering library lims];
+    croak q[Id library lims not defined when querying library lims];
   }
 
   my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims,
-                'me.tag_index' => [ undef, { '!=', 0 }],};
+                'me.tag_index' => [ undef, { q[!=], 0 }],};
 
   my $rs = $self->resultset('IseqProductMetric')->
              search($where, {
@@ -62,14 +88,14 @@ sub search_library_lims_by_id {
 
 =head2 search_library_lims_by_sample
 
-TODO
+Search for library by sample id in lims
 
 =cut
 sub search_library_lims_by_sample {
   my ($self, $id_sample_lims) = @_;
 
   if (!defined $id_sample_lims) {
-    croak q[Id sample lims not defined when quering for library lims];
+    croak q[Id sample lims not defined when querying for library lims];
   }
 
   my $where = { 'sample.id_sample_lims' => $id_sample_lims,};
@@ -95,14 +121,14 @@ sub search_library_lims_by_sample {
 
 =head2 search_sample_lims_by_id
 
-TODO
+Search sample by id
 
 =cut
 sub search_sample_lims_by_id {
   my ($self, $id_sample_lims) = @_;
 
   if (!defined $id_sample_lims) {
-    croak q[Id sample lims not defined when quering sample lims];
+    croak q[Id sample lims not defined when querying sample lims];
   };
 
   my $rs = $self->resultset('Sample')->search(
