@@ -6,8 +6,8 @@ use Carp;
 use English;
 use Perl6::Slurp;
 use List::Util qw(sum);
-use File::Spec qw(split_path);
-use Try:Tiny;
+use File::Spec qw(split_path cat_path);
+use Try::Tiny;
 use Readonly;
 
 use npg_tracking::util::types;
@@ -93,22 +93,32 @@ sub _build_stats_files {
   my $self = shift;
 
   my $paths = {};
-  if ($self->markdups_metrics_file) {
-    # get file name and directory
-    my ($filename, $directory);
-    my $file_name_prefix = q[].
-    if (!$file_name_prefix) {
-      croak 'Unexpected file name format: ' . $self->markdups_metrics_file;
+
+  my $mfile = $self->markdups_metrics_file || $self->flagstats_metrics_file;
+  my $file_name_prefix;
+  if ($mfile) {
+    my ($volume, $directories, $filename) = splitpath($mfile);
+    ($file_name_prefix) = $filename =~ /^([^.]+)/xms;
+    if ($file_name_prefix) {
+      foreach my $file ( grep { -f $_ } glob
+          cat_path($volume, $directories, $file_name_prefix . q[*.stats]) ) {
+        $paths->{_get_filter($file)} = $file;
+      }
     }
-    my $glob = catfile($directory, $file_name_prefix . q[*.stats]);
-    foreach my $file ( grep { -f $_ } glob $glob ) {
-      $path->{_get_filter($file)} = $file;
-    }
-    
-  } else {
-    carp 'markdups_metrics_file attr not defined, not looking for stats files';
   }
-  return $path;
+
+  if (!$mfile || $file_name_prefix) {
+    carp 'Not looking for samtools stats files';
+  }
+
+  my @found = values %{$paths};
+  if (@found) {
+    carp 'Found the following samtools stats files: ' . join q[, ], @found;
+  } else {
+    carp 'Not found samtools stats files';
+  }
+
+  return $paths;
 }
 
 has 'related_objects' => ( isa        => 'ArrayRef',
@@ -138,7 +148,7 @@ sub _build_related_objects {
 }
 sub _get_filter {
   my $path = shift;
-  my  ($volume, $directories, $file) = splitpath($path);
+  my ($volume, $directories, $file) = splitpath($path);
   my ($filter) = $file =~ /_([a-zA-Z0-9]+)[.]stats\Z/xms;
   if (!$filter) {
     croak "Failed to get filter from $path";
