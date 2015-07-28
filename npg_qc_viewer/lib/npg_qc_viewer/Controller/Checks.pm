@@ -160,7 +160,7 @@ sub _fetch_libs_by_lib {
 
 sub _fetch_libs_by_sample {
   my ($self, $c, $id_sample_lims) = @_;
-  
+
   my $rs;
   if ($id_sample_lims) {
     $rs = $c->model('MLWarehouseDB')->search_library_lims_by_sample($id_sample_lims);
@@ -246,7 +246,7 @@ sub _display_run_lanes {
     my $where = {'me.id_run' => $id_runs}; # Query by id_run, position
     if (scalar @{$lanes}) { $where->{'me.position'} = $lanes };
     my $model_mlwh = $c->model('MLWarehouseDB');
-    
+
     if ($retrieve_option != $PLEXES) {
       #$where->{'me.tag_index'} = [ undef, { '=', 0 } ]; 
       $c->stash->{'rs'} = $model_mlwh->
@@ -293,7 +293,7 @@ sub _prepare_dwh {
   $c->stash->{'dwh'} = {};
 }
 
-=head2 base 
+=head2 base
 
 Action for the base controller path
 
@@ -312,7 +312,7 @@ sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
     return;
 }
 
-=head2 index 
+=head2 index
 
 index page
 
@@ -324,7 +324,7 @@ sub index :Path :Args(0) {
     return;
 }
 
-=head2 about 
+=head2 about
 
 qc checks info page
 
