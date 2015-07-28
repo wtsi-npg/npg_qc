@@ -18,7 +18,8 @@ with qw/MooseX::Getopt/;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $CLASS_FIELD => q[__CLASS__];
+Readonly::Scalar my $CLASS_FIELD            => q[__CLASS__];
+Readonly::Scalar my $RELATED_DATA_ATTR_NAME => q[related_data];
 
 has 'path'   =>  ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',
@@ -124,11 +125,9 @@ sub _json2db{
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
 
-        if ($class_name eq 'bam_flagstats') { # need to get the subset/human_split field correctly
-                                            # if one of them is missing
-          my $module = 'npg_qc::autoqc::results::' . $class_name;
-          $values = decode_json($module->load($json_file)->freeze());
-        }
+        my $module = 'npg_qc::autoqc::results::' . $class_name;
+        my $instance = $module->load($json_file);
+        $values = decode_json($instance->freeze());
 
         my $rs = $self->schema->resultset($dbix_class_name);
         my $result_class = $rs->result_class;
@@ -146,20 +145,13 @@ sub _json2db{
             $count = 1;
           }
         }
-        if ( $db_result && has $values->{'related_objects'} ) {
-          foreach my $related_values ( @{$values->{'related_objects'}} ) {
+
+        if ($db_result && $instance->can($RELATED_DATA_ATTR_NAME)) {
+          foreach my $related_values ( @{$instance->$RELATED_DATA_ATTR_NAME} ) {
             my $relationship_name = delete $related_values->{'relationship_name'};
-            if ( $relationship_name ) {
-              #my $info = $new_row->result_source->relationship_info($relationship_name);
-              #my $class = $info->{'class_name'};
-              #my $cond = $info->{'cond'};
-              #foreach my $fk (keys %{$cond}) {
-              #  $ok = $cond->{$fk};
-              #  $fk =~ s/^foreign\.//xms;
-              #  $ok =~ s/^self\.//xms;
-              #  $obj->{$fk} = $ok;
-              #}
-              $db_result->update_or_create_related($related_values);
+            if ($relationship_name) {
+              $self->_log("Creating related record for $relationship_name");
+              $db_result->update_or_create_related($relationship_name, $related_values);
             }
           }
         }

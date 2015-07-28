@@ -33,7 +33,7 @@ Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 
 Readonly::Scalar my $HUMAN_SPLIT_ATTR_DEFAULT => 'all';
 Readonly::Scalar my $SUBSET_ATTR_DEFAULT      => 'target';
-Readonly::Scalar my $STATS_RELATIONSHIP_NAME  => 'sequence_stats';
+Readonly::Scalar my $STATS_RELATIONSHIP_NAME  => 'samtools_stats';
 
 has [ qw/ +path
           +id_run
@@ -84,12 +84,12 @@ has [ qw/ markdups_metrics_file
     required => 0,
 );
 
-has 'stats_files' => ( isa        => 'HashRef',
-                       is         => 'ro',
-                       predicate  => '_has_stats_files',
-                       lazy_build => 1,
+has 'samtools_stats_files' => ( isa        => 'HashRef',
+                                is         => 'ro',
+                                predicate  => '_has_samtools_stats_files',
+                                lazy_build => 1,
 );
-sub _build_stats_files {
+sub _build_samtools_stats_files {
   my $self = shift;
 
   my $paths = {};
@@ -121,22 +121,25 @@ sub _build_stats_files {
   return $paths;
 }
 
-has 'related_objects' => ( isa        => 'ArrayRef',
+has 'related_data' => ( isa        => 'ArrayRef',
                            is         => 'rw',
                            lazy_build => 1,
 );
-sub _build_related_objects {
+sub _build_related_data {
   my $self = shift;
 
   my @related = ();
-  if ($self->_has_stats_files) {
-    foreach my $filter (keys %{$self->stats_files}) {
+  if ($self->_has_samtools_stats_files) {
+    carp 'have files';
+    foreach my $filter (keys %{$self->samtools_stats_files}) {
       my $ref = {};
       $ref->{'relationship_name'} = $STATS_RELATIONSHIP_NAME;
       $ref->{'filter'} = $filter;
-      my $path =  $self->stats_files->{$filter};
+      my $path =  $self->samtools_stats_files->{$filter};
+      carp "PATH $path";
+use Compress::Zlib;
       try {
-        $ref->{'file_content'} = slurp $path;
+        $ref->{'file_content'} = compress(slurp $path);
         push @related, $ref;
       } catch {
         carp "Error reading ${path}: $_";
