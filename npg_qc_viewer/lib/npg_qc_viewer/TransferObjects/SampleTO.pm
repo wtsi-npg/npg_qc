@@ -71,7 +71,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2015 Genome Research Ltd.
 
 This file is part of NPG.
 
