@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - autoqc db loader extended to save data to child tables
+ - samtools flagstats files saved to a child table of bam_flagstats
+
 release 58.8
  - SeqQC
      - display insert size normal fit confidence and number of modes in the 
