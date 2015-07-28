@@ -291,6 +291,7 @@ sub _display_run_lanes {
 sub _prepare_dwh {
   my ($self, $c) = @_;
   $c->stash->{'dwh'} = {};
+  return;
 }
 
 =head2 base
