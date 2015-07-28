@@ -135,14 +135,32 @@ sub _json2db{
 
         $self->_exclude_nondb_attrs($json_file, $values, $result_class->columns());
         $result_class->deflate_unique_key_components($values);
-
+        
+        my $db_result;
         if ($self->update) {
-          $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
+          $db_result = $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
           $count = 1;
         } else {
           if (!$rs->find($values)) {
-            $rs->new($values)->set_inflated_columns($values)->insert();
+            $db_result = $rs->new($values)->set_inflated_columns($values)->insert();
             $count = 1;
+          }
+        }
+        if ( $db_result && has $values->{'related_objects'} ) {
+          foreach my $related_values ( @{$values->{'related_objects'}} ) {
+            my $relationship_name = delete $related_values->{'relationship_name'};
+            if ( $relationship_name ) {
+              #my $info = $new_row->result_source->relationship_info($relationship_name);
+              #my $class = $info->{'class_name'};
+              #my $cond = $info->{'cond'};
+              #foreach my $fk (keys %{$cond}) {
+              #  $ok = $cond->{$fk};
+              #  $fk =~ s/^foreign\.//xms;
+              #  $ok =~ s/^self\.//xms;
+              #  $obj->{$fk} = $ok;
+              #}
+              $db_result->update_or_create_related($related_values);
+            }
           }
         }
       }

@@ -308,6 +308,23 @@ __PACKAGE__->add_unique_constraint(
   ['id_run', 'position', 'tag_index', 'human_split'],
 );
 
+=head1 RELATIONS
+
+=head2 samtools_stats
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SamtoolsStat>
+
+=cut
+
+__PACKAGE__->has_many(
+  'samtools_stats',
+  'npg_qc::Schema::Result::SamtoolsStat',
+  { 'foreign.id_bam_flagstats' => 'self.id_bam_flagstats' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head1 L<Moose> ROLES APPLIED
 
 =over 4
@@ -324,8 +341,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-07-08 11:05:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:txZzb/HOksJVy8B6JUfuww
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-07-28 13:13:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:3eyUVzztOSHThDEYyFx+Tg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

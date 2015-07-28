@@ -3,10 +3,14 @@ package npg_qc::autoqc::results::bam_flagstats;
 use Moose;
 use namespace::autoclean;
 use Carp;
+use English;
 use Perl6::Slurp;
 use List::Util qw(sum);
+use File::Spec qw(split_path);
+use Try:Tiny;
 use Readonly;
 
+use npg_tracking::util::types;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::bam_flagstats);
 
@@ -29,6 +33,7 @@ Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 
 Readonly::Scalar my $HUMAN_SPLIT_ATTR_DEFAULT => 'all';
 Readonly::Scalar my $SUBSET_ATTR_DEFAULT      => 'target';
+Readonly::Scalar my $STATS_RELATIONSHIP_NAME  => 'sequence_stats';
 
 has [ qw/ +path
           +id_run
@@ -72,6 +77,75 @@ has 'histogram'         => ( isa     => 'HashRef',
                              default => sub { {} },
 );
 
+has [ qw/ markdups_metrics_file
+          flagstats_metrics_file / ] => (
+    isa => 'Maybe[NpgTrackingReadableFile]',
+    is  => 'ro',
+    required => 0,
+);
+
+has 'stats_files' => ( isa        => 'HashRef',
+                       is         => 'ro',
+                       predicate  => '_has_stats_files',
+                       lazy_build => 1,
+);
+sub _build_stats_files {
+  my $self = shift;
+
+  my $paths = {};
+  if ($self->markdups_metrics_file) {
+    # get file name and directory
+    my ($filename, $directory);
+    my $file_name_prefix = q[].
+    if (!$file_name_prefix) {
+      croak 'Unexpected file name format: ' . $self->markdups_metrics_file;
+    }
+    my $glob = catfile($directory, $file_name_prefix . q[*.stats]);
+    foreach my $file ( grep { -f $_ } glob $glob ) {
+      $path->{_get_filter($file)} = $file;
+    }
+    
+  } else {
+    carp 'markdups_metrics_file attr not defined, not looking for stats files';
+  }
+  return $path;
+}
+
+has 'related_objects' => ( isa        => 'ArrayRef',
+                           is         => 'rw',
+                           lazy_build => 1,
+);
+sub _build_related_objects {
+  my $self = shift;
+
+  my @related = ();
+  if ($self->_has_stats_files) {
+    foreach my $filter (keys %{$self->stats_files}) {
+      my $ref = {};
+      $ref->{'relationship_name'} = $STATS_RELATIONSHIP_NAME;
+      $ref->{'filter'} = $filter;
+      my $path =  $self->stats_files->{$filter};
+      try {
+        $ref->{'file_content'} = slurp $path;
+        push @related, $ref;
+      } catch {
+        carp "Error reading ${path}: $_";
+      };
+    }
+  }
+
+  return \@related;
+}
+sub _get_filter {
+  my $path = shift;
+  my  ($volume, $directories, $file) = splitpath($path);
+  my ($filter) = $file =~ /_([a-zA-Z0-9]+)[.]stats\Z/xms;
+  if (!$filter) {
+    croak "Failed to get filter from $path";
+  }
+  return $filter;
+}
+
 sub BUILD {
   my $self = shift;
 
@@ -96,6 +170,25 @@ sub BUILD {
       }
     }
   }
+
+  return;
+}
+
+sub execute {
+  my $self = shift;
+
+  if ($self->markdups_metrics_file) {
+    $self->parsing_metrics_file($self->markdups_metrics_file);
+  }
+
+  if ($self->flagstats_metrics_file) {
+    my $fn = $self->flagstats_metrics_file;
+    open my $fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
+    $self->parsing_flagstats($fh);
+    close $fh or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
+  }
+
+  $self->stats_file();
 
   return;
 }
@@ -184,11 +277,20 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head1 SUBROUTINES/METHODS
 
-=head2 BUILD - ensures human_split an dsubset fields are populated consistently
+=head2 BUILD - ensures human_split and subset fields are populated consistently
 
-=head2 parsing_flagstats - parsing Picard MarkDuplicates metrics output file and save the result to the object
+=head2 execute
 
-=head2 parsing_metrics_file - parsing samtools flagstats output file handler and save the result to the object
+  calls methods for parsing samtools flagstats and mark duplicates outputs,
+  finds and saves locations of stats files
+
+=head2 parsing_flagstats
+
+  parses Picard MarkDuplicates metrics output file and save the result to the object
+
+=head2 parsing_metrics_file
+
+  parses samtools flagstats output file handler and save the result to the object
 
 =head1 DIAGNOSTICS
 
@@ -202,13 +304,21 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item Carp
 
+=item English
+
 =item Perl6::Slurp
 
 =item List::Util
 
+=item File::Spec
+
+=iten Try:Tiny
+
 =item Readonly
 
 =item namespace::autoclean
+
+=item npg_tracking::util::types
 
 =item npg_qc::autoqc::results::result
 
