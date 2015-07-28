@@ -248,11 +248,11 @@ sub _display_run_lanes {
     my $model_mlwh = $c->model('MLWarehouseDB');
 
     if ($retrieve_option != $PLEXES) {
-      #$where->{'me.tag_index'} = [ undef, { '=', 0 } ]; 
+      #$where->{'me.tag_index'} = [ undef, { '=', 0 } ];
       $c->stash->{'rs'} = $model_mlwh->
                             resultset('IseqProductMetric')->
                             search($where, {
-                              prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ], 
+                              prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ],
                               join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
                             });
     }
@@ -260,7 +260,7 @@ sub _display_run_lanes {
       $c->stash->{'rs'} = $model_mlwh->
                                  resultset('IseqProductMetric')->
                                  search($where, {
-                                   prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ], 
+                                   prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ],
                                    join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
                                  });
     }
@@ -358,7 +358,7 @@ sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
 
 =head2 checks_in_run
 
-Fetches the checks collection for a run and passes it to the relevant 
+Fetches the checks collection for a run and passes it to the relevant
 template through the stash
 
 =cut
