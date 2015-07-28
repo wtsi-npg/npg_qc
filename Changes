@@ -1,10 +1,17 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - provenance in lane title not in every check
- - prepend all page titles with application name and version
- - different page title colour if running in non-live environment
- - use updated LIMs server url
- - link to NPG tracking web server running on the same host as this app
+release 58.8
+ - SeqQC
+     - display insert size normal fit confidence and number of modes in the 
+       summary table
+     - do not show adaptor plots for low contamination
+     - provenance in lane title not in every check
+     - prepend all page titles with application name and version
+     - different page title colour if running in non-live environment
+     - use updated LIMs server url
+     - link to NPG tracking web server running on the same host as this app
+     - showing reference species and version below lane titles
+ - Using container configuration for travis
 
 release 58.7
  - bam_flagstats autoqc result object:

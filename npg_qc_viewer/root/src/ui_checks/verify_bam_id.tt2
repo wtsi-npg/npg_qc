@@ -5,7 +5,7 @@
 
 <div class="data_table">
 
-<table summary="verify_bam_id">
+<table title="verify_bam_id">
 <tr>
   <th class="laligned">Number of SNPs</th> <td>[% check.number_of_snps %]</td>
   <th class="laligned">Average Depth</th> <td>[% check.avg_depth %]</td>

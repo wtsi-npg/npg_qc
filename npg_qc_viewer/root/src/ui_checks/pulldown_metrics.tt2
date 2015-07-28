@@ -4,7 +4,7 @@
 
 [% IF check.bait_path || check.comments -%]
 <div class="data_table">
-<table summary="pulldown summary info">
+<table title="pulldown summary info">
 <tr><th class="laligned">Pass criterion </th><td>[% check.criterion %]</td></tr>
 [% IF check.bait_path -%]
 <tr><th class="laligned">Interval files directory</th><td>[% check.bait_path %]</td></tr>
@@ -21,7 +21,7 @@
 
 [% IF check.bait_territory -%]
 <div class="data_table">
-<table summary="pulldown summary check results">
+<table title="pulldown summary check results">
 <tr><th class="laligned">Total reads count</th><td class="raligned">[% check.total_reads_num | format_number %]</td></tr>
 [% IF check.total_reads_num -%]
 <tr><th class="laligned">Unique reads, %</th><td class="raligned">[% FILTER format('%2.2f');check.unique_reads_percent;END %]</td></tr>
@@ -55,7 +55,7 @@
     IF coverage_keys.size;
 -%]
 <div class="data_table">
-<table summary="target bases coverage">
+<table title="target bases coverage">
 <tr><th>Coverage at and above</th>
 [% FOREACH ckey IN coverage_keys %]
 <td class="raligned">[% ckey %]X</td>
@@ -82,7 +82,7 @@
     IF penalty_keys.size;
 -%]
 <div class="data_table">
-<table summary="penalty vs coverage">
+<table title="penalty vs coverage">
 <tr><th>Coverage</th>
 [% FOREACH pkey IN penalty_keys %]
 <td class="raligned">[% pkey %]X</td>

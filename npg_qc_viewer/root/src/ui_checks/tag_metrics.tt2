@@ -5,7 +5,7 @@
 
 <div class="data_table">
 Tag decoding overview
-<table summary="Tag Decoding">
+<table title="Tag Decoding">
 <tr>
   <th>&nbsp;</th>
   <th>Count</th>
@@ -29,7 +29,7 @@ Tag decoding overview
 
 <div class="data_table">
 Coefficient of Variance <a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]#tag_metrics"><img src="/static/images/information.png" alt="Link to information about coefficient of variance"/></a>
-<table summary="Coefficient of Variance">
+<table title="Coefficient of Variance">
 <tr>
   <th>All matches</th>
   <th>Perfect matches</th>
@@ -48,7 +48,7 @@ Coefficient of Variance <a href="[% c.uri_for_action(c.controller('Checks').acti
 <div class="data_table">
 [%- underrepresented = check.underrepresented_tags -%]
 Individual tags
-<table summary="Metrics for individual tags">
+<table title="Metrics for individual tags">
 <tr>
   <th>Tag Index</th>
   <th>Tag</th>

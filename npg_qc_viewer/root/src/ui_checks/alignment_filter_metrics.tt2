@@ -5,7 +5,7 @@
    chimeras = check.chimeric_reads;
 -%]
 <div class="data_table">
-<table summary="alignment filter metrics">
+<table title="alignment filter metrics">
 <tr><th>Reads description</th><th>Reads, count</th><th>Reads, %</th></tr>
 [% FOREACH organism IN refs; org_hash = stats.$organism; %]
 <tr><th class="laligned">[% organism %]</th><td class="raligned">[% org_hash.count | format_number %]</td><td class="raligned">[% FILTER format('%3.2f'); org_hash.percent; END %]</td></tr>

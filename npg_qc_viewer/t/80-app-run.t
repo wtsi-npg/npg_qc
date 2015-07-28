@@ -27,6 +27,8 @@ my $mech = Test::WWW::Mechanize::Catalyst->new;
 lives_ok {$schemas->{wh}->resultset('NpgInformation')->search({id_run => 3323, position => [5, 6]},)->update({ is_dev => 1, }) }
    'is_dev column successfully updated - test prerequisite';
 
+#This prefix impacts the javascript part of the application. Update as 
+#necessary.
 my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
 
 {
