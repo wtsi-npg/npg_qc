@@ -24,7 +24,7 @@ A transfer object to pass Sample data from model to the view.
 
 =head2 id_sample_lims
 
-Id for sample in MLDataWareHouse
+Id for sample in ML Data Warehouse
 
 =cut
 has 'id_sample_lims' => (

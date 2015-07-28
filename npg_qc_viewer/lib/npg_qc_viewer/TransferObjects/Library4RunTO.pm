@@ -57,7 +57,7 @@ has 'tag_index'      => (
 
 =head2 id_library_lims
 
-New id for library in MLDataWareHouse
+New id for library in ML Data Warehouse
 
 =cut
 has 'id_library_lims' => (
@@ -68,7 +68,7 @@ has 'id_library_lims' => (
 
 =head2 legacy_library_id
 
-Old id for library in MLDataWareHouse
+Old id for library in ML Data Warehouse
 
 =cut
 has 'legacy_library_id' => (
