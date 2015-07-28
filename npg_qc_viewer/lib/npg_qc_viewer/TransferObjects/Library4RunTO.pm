@@ -52,6 +52,7 @@ Plex.
 has 'tag_index'      => (
   isa      => 'Maybe[Int]',
   is       => 'rw',
+  required => 0,
 );
 
 =head2 id_library_lims
@@ -73,7 +74,7 @@ Old id for library in MLDataWareHouse
 has 'legacy_library_id' => (
   isa      => 'Maybe[Int]',
   is       => 'rw',
-  required => 1,
+  required => 0,
 );
 
 1;

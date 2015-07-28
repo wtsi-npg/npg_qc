@@ -41,6 +41,7 @@ Name for sample.
 has 'name' => (
   isa      => 'Str',
   is       => 'rw',
+  required => 0,
 );
 
 1;
