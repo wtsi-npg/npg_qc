@@ -83,7 +83,11 @@ sub search_library_lims_by_sample {
                                'iseq_flowcell.id_library_lims',
                                'iseq_flowcell.legacy_library_id',
                ],
-               group_by => qw[me.id_run me.position me.tag_index iseq_flowcell.id_library_lims iseq_flowcell.legacy_library_id],
+               group_by => qw[me.id_run
+                              me.position
+                              me.tag_index
+                              iseq_flowcell.id_library_lims
+                              iseq_flowcell.legacy_library_id],
   });
 
   return $rs;
