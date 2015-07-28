@@ -1,4 +1,4 @@
-[% 
+[%
   USE String;
   USE Number.Format(THOUSANDS_SEP=',');
 
@@ -26,7 +26,7 @@
     IF rl_keys.size;
       sorted_rl_map_keys = util.sort_rpt_keys(rl_keys);
       IF (!run_from_staging && !path_list.defined);
-        run_ids            = util.runs_from_rpt_keys(rl_keys);
+        run_ids = util.runs_from_rpt_keys(rl_keys);
         IF run_ids.size == 1;
           run_id_to_link = run_ids.first;
         END;
@@ -63,14 +63,15 @@
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
 
-[%- libs_info = {}; studies_info = {}; run_info = {}; 
+[%- libs_info = {}; studies_info = {}; run_info = {};
     qxTotal = 0; #For total qxYield
 
     #For heatmaps
     action_plot = c.controller('Visuals').action_for('fastqcheck');
     legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
-
+    
     FOREACH lane_key IN sorted_rl_map_keys;
+      c.log.debug(lane_key);
       is_dev = 0;
 
       #Lane collection from npgqc
@@ -82,6 +83,8 @@
       id_run   = attrs.id_run;
       position  = attrs.position;
       tag_index = '';
+
+      to_product_metrics = '';
 
       time_comp = '';               #run_complete@iseq_run_lane_metric
       num_cycles = '';              #cycles@iseq_run_lane_metric
@@ -98,31 +101,31 @@
         tag_index = attrs.tag_index;
         table_row = rs.search({'me.id_run' => id_run, 'me.position' => position, 'me.tag_index' => tag_index}).first();
         IF table_row;
-          tag_sequence = table_row.tag_sequence4deplexing; ##table_row.tag_sequence; 
+          tag_sequence = table_row.tag_sequence4deplexing; ##table_row.tag_sequence;
           IF !run_info.exists($id_run);
               run_info.$id_run = table_row.npg_info;
           END;
-          t            = table_row.iseq_run_lane_metric.run_complete; #run_info.$id_run.run_complete;
-          num_cycles   = table_row.iseq_run_lane_metric.cycles; #run_info.$id_run.cycles;
-          pass         = table_row.iseq_flowcell.manual_qc;     #table_row.manual_qc;
         END;
       ELSE;
         table_row = rs.search({'me.id_run' => id_run, 'me.position' => position,}).first();
         IF table_row;
-          t            = table_row.iseq_run_lane_metric.run_complete;
-          num_cycles   = table_row.iseq_run_lane_metric.cycles; #table_row.cycles;
-          pass         = table_row.iseq_flowcell.manual_qc;     #table_row.manual_qc;
           is_dev = table_row.is_dev;
         END;
       END;
-      
+
+      IF table_row;
+        t            = table_row.iseq_run_lane_metric.run_complete;
+        num_cycles   = table_row.iseq_run_lane_metric.cycles; #table_row.cycles;
+        pass         = table_row.iseq_flowcell.manual_qc;     #table_row.manual_qc;
+      END;
+
       IF table_row;
         time_comp                       = String.new(text => "$t");
         IF lims_sample;
           sample_id                     = lims_sample.id_sample_lims;                   #table_row.sample_id;
           sample_name                   = lims_sample.name;                             #table_row.sample_name;
         END;
-        study_id                        = table_row.id_study_lims;  #table_row.study_id;
+        study_id                        = table_row.id_study_lims;                      #table_row.study_id;
         lib                             = table_row.iseq_flowcell.id_library_lims;      #table_row.library_name;
         library_id                      = table_row.iseq_flowcell.legacy_library_id;    #table_row.asset_id;
         libs_info.$lane_key.lib_name    = lib;
@@ -131,7 +134,7 @@
         libs_info.$lane_key.library_id  = library_id;
         libs_info.$lane_key.study_id    = study_id;
         IF study_id && !studies_info.$study_id.defined;
-          studies_info.$study_id = table_row.iseq_flowcell.study.name;               #table_row.study_name;
+          studies_info.$study_id = table_row.iseq_flowcell.study.name;                  #table_row.study_name;
         END;
       END;
 -%]
@@ -184,7 +187,7 @@
     END;
 -%]
 [%# Calculating totals for qXyield %]
-[% IF collection_all.size; 
+[% IF collection_all.size;
       qx_collection = collection_all.search(class_name => 'qX_yield');
       IF qx_collection.defined && qx_collection.size && qx_collection.size < 1000;
         qX_position = 0;
@@ -207,7 +210,7 @@
 
 </table>
 
-[%- 
+[%-
   IF run_view;
     PROCESS ui_runs/annotations.tt2;
 
