@@ -215,25 +215,25 @@ subtest 'filename generation' => sub {
 
     my $p = 'npg_qc::autoqc::checks::check';
     my $m = {id_run=>5,position=>1};
-    is($p->create_filename($m), '5_1');
-    is($p->create_filename($m, 1), '5_1_1');
-    is($p->create_filename($m, 't'), '5_1_t');
-    is($p->create_filename($m, 2), '5_1_2');
-    $m->{'tag_index'} = 3;
-    is($p->create_filename($m), '5_1#3');
-    is($p->create_filename($m,1), '5_1_1#3');
-    is($p->create_filename($m,2), '5_1_2#3');
+    is($p->create_filename($m), '5_1', '5_1');
+    is($p->create_filename($m, 1), '5_1_1', '5_1_1');
+    is($p->create_filename($m, 't'), '5_1_t', '5_1_t');
+    is($p->create_filename($m, 2), '5_1_2', '5_1_2');
+    $m->{'tag_index'} = '3';
+    is($p->create_filename($m), '5_1#3', '5_1 tag 3');
+    is($p->create_filename($m,1), '5_1_1#3', '5_1_1 tag 3');
+    is($p->create_filename($m,2), '5_1_2#3', '5_1_2 tag 3');
     $m->{'tag_index'} = 0;
-    is($p->create_filename($m), '5_1#0');
-    is($p->create_filename($m,1), '5_1_1#0');
-    is($p->create_filename($m,2), '5_1_2#0');
+    is($p->create_filename($m), '5_1#0', '5_1 tag 0');
+    is($p->create_filename($m,1), '5_1_1#0', '5_1_1 tag 0');
+    is($p->create_filename($m,2), '5_1_2#0', '5_1_2 tag 0');
 
     my $check = npg_qc::autoqc::checks::check->new(position => 1, path  => 'nonexisting', id_run => 2549,);
-    is($check->create_filename($check), '2549_1');
+    is($check->create_filename($check), '2549_1', q[Create filename + check -> 2549_1]);
     $check = npg_qc::autoqc::checks::check->new(position => 1, path  => 'nonexisting', id_run => 2549, tag_index => 0);
-    is($check->create_filename($check), '2549_1#0');
+    is($check->create_filename($check), '2549_1#0', q[Create filename + check -> 2549_1 tag 0]);
     $check = npg_qc::autoqc::checks::check->new(position => 1, path  => 'nonexisting', id_run => 2549, tag_index => 5);
-    is($check->create_filename($check), '2549_1#5');
+    is($check->create_filename($check), '2549_1#5', q[Create filename + check -> 2549_1 tag 5]);
 };
 
 1;
