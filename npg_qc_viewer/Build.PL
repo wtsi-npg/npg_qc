@@ -105,6 +105,7 @@ my $builder = $class->new(
         'npg_qc::autoqc::role::rpt_key'                => '0',
         'npg_qc::autoqc::results::collection'          => '0',
         'npg_qc::autoqc::checks::check'                => '0',
+        'WTSI::DNAP::Warehouse::Schema'                => '0',
    },
 
    'build_requires'    => {
