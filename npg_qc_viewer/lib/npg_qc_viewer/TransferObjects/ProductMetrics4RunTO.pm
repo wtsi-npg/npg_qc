@@ -8,6 +8,12 @@ use npg_tracking::util::types;
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
+=begin stopwords
+
+deplexing
+
+=end stopwords
+
 =head1 NAME
 
 npg_qc_viewer::TransferObjects::ProductMetrics4RunTO

@@ -10,6 +10,12 @@ our $VERSION  = '0';
 
 ## no critic (Documentation::RequirePodAtEnd)
 
+=begin stopwords
+
+lims
+
+=end stopwords
+
 =head1 NAME
 
 npg_qc_viewer::Model::MLWarehouseDB
