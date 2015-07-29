@@ -110,43 +110,18 @@ sub _build_samtools_stats_file {
 
   if (!$mfile || !$file_name_prefix) {
     carp 'Not looking for samtools stats files';
-  }
-
-  my @found = values %{$paths};
-  if (@found) {
-    carp 'Found the following samtools stats files: ' . join q[, ], @found;
-  } else {
-    carp 'Not found samtools stats files';
+  } else { 
+    my @found = values %{$paths};
+    if (@found) {
+      carp 'Found the following samtools stats files: ' . join q[, ], @found;
+    } else {
+      carp 'Not found samtools stats files';
+    }
   }
 
   return $paths;
 }
 
-has 'related_data' => ( isa        => 'ArrayRef',
-                        is         => 'rw',
-                        lazy_build => 1,
-);
-sub _build_related_data {
-  my $self = shift;
-
-  my @related = ();
-  if ($self->_has_samtools_stats_file) {
-    foreach my $filter (keys %{$self->samtools_stats_file}) {
-      my $ref = {};
-      $ref->{'relationship_name'} = $STATS_RELATIONSHIP_NAME;
-      $ref->{'filter'} = $filter;
-      my $path =  $self->samtools_stats_file->{$filter};
-      try {
-        $ref->{'file_content'} = compress(slurp $path);
-        push @related, $ref;
-      } catch {
-        carp "Error reading ${path}: $_";
-      };
-    }
-  }
-
-  return \@related;
-}
 sub _get_filter {
   my $path = shift;
   my ($volume, $directories, $file) = splitpath($path);
@@ -204,6 +179,28 @@ sub execute {
   $self->samtools_stats_file();
 
   return;
+}
+
+sub related_data {
+  my $self = shift;
+
+  my @related = ();
+  if ($self->_has_samtools_stats_file) {
+    foreach my $filter (keys %{$self->samtools_stats_file}) {
+      my $ref = {};
+      $ref->{'relationship_name'} = $STATS_RELATIONSHIP_NAME;
+      $ref->{'filter'} = $filter;
+      my $path =  $self->samtools_stats_file->{$filter};
+      try {
+        $ref->{'file_content'} = compress(slurp $path);
+        push @related, $ref;
+      } catch {
+        carp "Error reading ${path}: $_";
+      };
+    }
+  }
+
+  return \@related;
 }
 
 sub parsing_metrics_file {
@@ -307,11 +304,19 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head2 markdups_metrics_file
 
+  an optional attribute, should be set for 'execute' method to work correctly
+
 =head2 flagstats_metrics_file
+
+  an optional attribute, should be set for 'execute' method to work correctly
 
 =head2 samtools_stats_file
 
+  an attribute, is built when 'execute' method is invoked
+
 =head2 related_data
+
+  a method returning an array of related data
 
 =head1 DIAGNOSTICS
 
