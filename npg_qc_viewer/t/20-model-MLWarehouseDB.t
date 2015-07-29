@@ -9,7 +9,7 @@ use t::util;
 BEGIN { use_ok 'npg_qc_viewer::Model::MLWarehouseDB' }
 
 my $util = t::util->new();
-my $schema_package = q[ml_warehouse::Schema];
+my $schema_package = q[WTSI::DNAP::Warehouse::Schema];
 my $fixtures_path = q[t/data/fixtures/mlwarehouse];
 my ($fh,$tmpdbfilename) = tempfile(UNLINK => 1);
 my $schema;
