@@ -24,7 +24,7 @@ npg_qc_viewer::Model::MLWarehouseDB
 
 =head1 DESCRIPTION
 
-Catalyst::Model::DBIC::Schema Model using schema ml_warehouse::Schema
+Catalyst::Model::DBIC::Schema Model using schema WTSI::DNAP::Warehouse::Schema
 
 =head1 SUBROUTINES/METHODS
 
