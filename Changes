@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - remove misleading bam_flagstats check info
+
 release 58.8
  - SeqQC
      - display insert size normal fit confidence and number of modes in the 
