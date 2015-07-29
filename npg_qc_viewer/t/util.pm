@@ -79,7 +79,7 @@ sub test_env_setup {
 
   $db = $self->mlwhouse_db_path;
   if (-e $db) {unlink $db;}
-  $schema_package  = q[ml_warehouse::Schema];
+  $schema_package  = q[WTSI::DNAP::Warehouse::Schema];
   $fixtures_path   = q[t/data/fixtures/mlwarehouse];
   $schemas->{mlwh} = $self->create_test_db($schema_package, $fixtures_path, $db);
 
