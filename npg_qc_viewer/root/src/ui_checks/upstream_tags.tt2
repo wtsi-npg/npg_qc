@@ -51,18 +51,18 @@ Tags in upstream runs (same instrument/slot)
 
 <div class="data_table">
 High-scoring tags (perfect match >= 0.01% for Sanger168 tag set)
-<table title="tags">
+<table title="High-scoring tags">
 <tr>
   <th>Tag</th>
   <th>Run</th>
-  <th title="Tag index is for run where available, else index from initial decode tag set">Tag Idx</th>
+  <th title="Tag index is for run where available">Tag Idx</th>
   <th title="Count of perfect match reads for the tag">Reads (pm)</th>
   <th title="Count of one-mismatch reads for the tag">Reads (1mm)</th>
   <th title="percentage of tag#0 reads for the tag that were a perfect match">Reads (pm), % (tag#0)</th>
   <th title="percentage of tag#0 reads for the tag that had one mismatch">Reads (pm), % (lane)</th>
 </tr>
 [% FOREACH ut IN check.unexpected_tags %]
-[% IF !ut.id_run; ut.id_run = '-'; END %]
+[% IF !ut.id_run; ut.id_run = '-'; ut.tag_index = '-'; END %]
 [% IF ut.perfect_match_count / check.total_tag0_reads >= 0.0001 %]
 <tr>
   <td class="sequence_string">[% ut.tag_sequence %]</td>
