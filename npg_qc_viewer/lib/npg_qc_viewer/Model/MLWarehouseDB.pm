@@ -25,7 +25,7 @@ Catalyst::Model::DBIC::Schema Model using schema WTSI::DNAP::Warehouse::Schema
 =cut
 
 __PACKAGE__->config(
-    schema_class => 'WTSI::DNAP::Warehouse::Schema',
+    schema_class => 'ml_warehouse::Schema',
     connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
