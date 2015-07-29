@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 5;
 use Test::Exception;
 use File::Temp qw(tempfile);
 
@@ -17,5 +17,25 @@ my $schema;
 lives_ok{ $schema = $util->create_test_db(
   $schema_package, $fixtures_path, $tmpdbfilename) }
   'test db created and populated';
+
+my $m;
+lives_ok {
+  $m = npg_qc_viewer::Model::MLWarehouseDB->new( connect_info => {
+                                                   dsn      => ('dbi:SQLite:'.$tmpdbfilename),
+                                                   user     => q(),
+                                                   password => q()
+  })
+} 'create new model object';
+
+isa_ok($m, 'npg_qc_viewer::Model::MLWarehouseDB');
+
+subtest 'Data in test data' => sub {
+  plan tests => 3;
+  my $rs=$m->resultset(q(IseqProductMetric));
+  ok (defined $rs, "IseqProductMetric resultset");
+  ok ($rs->count,  "IseqProductMetric resultset has data");
+  $rs = $rs->search({id_run=>3500});
+  cmp_ok($rs->count,'==',8, "lane count for run 3500");
+};
 
 1;
