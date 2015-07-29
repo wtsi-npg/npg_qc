@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - move method for file name creation from SeqQC to autoqc so that it's
+   more accessible
  - SeqQC
      - upstream_tags template - do not report potentially confusing tag index value when
         there is no id_run in the high-scoring tags table

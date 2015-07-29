@@ -234,7 +234,6 @@ my $extended_requires = {
                 'npg_common::Alignment'                    => 0,
                 'npg_common::extractor::fastq'             => 0,
                 'npg_common::fastqcheck'                   => 0,
-                'npg_common::roles::run::lane::file_names' => 0,
                 'npg_common::roles::software_location'     => 0,
                 'npg_common::sequence::reference::base_count' => 0,
                 'npg_testing::db'                          => 0,
