@@ -1,6 +1,7 @@
 package npg_qc::autoqc::db_loader;
 
 use Moose;
+use Class::Load;
 use namespace::autoclean;
 use Carp;
 use JSON;
@@ -12,14 +13,13 @@ use Readonly;
 use npg_qc::Schema;
 use npg_tracking::util::types;
 use npg_qc::autoqc::role::result;
-use npg_qc::autoqc::results::bam_flagstats;
 
 with qw/MooseX::Getopt/;
 
 our $VERSION = '0';
 
 Readonly::Scalar my $CLASS_FIELD            => q[__CLASS__];
-Readonly::Scalar my $RELATED_DATA_ATTR_NAME => q[related_data];
+Readonly::Scalar my $RELATED_DATA_ACCESSOR_NAME => q[related_data];
 
 has 'path'   =>  ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',
@@ -126,9 +126,11 @@ sub _json2db{
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
 
         my $module = 'npg_qc::autoqc::results::' . $class_name;
+        Class::Load::load_class($module);
         my $instance = $module->load($json_file);
-        $values = decode_json($instance->freeze());
-
+        if ($module eq 'npg_qc::autoqc::results::bam_flagstats') {
+          $values = decode_json($instance->freeze());
+        }
         my $rs = $self->schema->resultset($dbix_class_name);
         my $result_class = $rs->result_class;
 
@@ -146,8 +148,8 @@ sub _json2db{
           }
         }
 
-        if ($db_result && $instance->can($RELATED_DATA_ATTR_NAME)) {
-          foreach my $related_values ( @{$instance->$RELATED_DATA_ATTR_NAME} ) {
+        if ($db_result && $instance->can($RELATED_DATA_ACCESSOR_NAME)) {
+          foreach my $related_values ( @{$instance->$RELATED_DATA_ACCESSOR_NAME} ) {
             my $relationship_name = delete $related_values->{'relationship_name'};
             if ($relationship_name) {
               $self->_log("Creating related record for $relationship_name");
@@ -247,6 +249,8 @@ npg_qc::autoqc::db_loader
 =over
 
 =item Moose
+
+=item Class::Load
 
 =item namespace::autoclean
 
