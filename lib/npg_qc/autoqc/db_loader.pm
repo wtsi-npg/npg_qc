@@ -150,6 +150,9 @@ sub _json2db{
 
         if ($db_result && $instance->can($RELATED_DATA_ACCESSOR_NAME)) {
           foreach my $related_values ( @{$instance->$RELATED_DATA_ACCESSOR_NAME} ) {
+            # We can get the relationship name from the DBIx object itself.
+            # However, then we cannot have multiple child tables. For bam_flagstats
+            # we are planning to have two.
             my $relationship_name = delete $related_values->{'relationship_name'};
             if ($relationship_name) {
               $self->_log("Creating related record for $relationship_name");
