@@ -89,7 +89,6 @@ sub test_env_setup {
   $fixtures_path = q[t/data/fixtures/npgqc];
   $schemas->{qc} = $self->create_test_db($schema_package, $fixtures_path, $db);
 
-
   $db = $self->npg_db_path;
   if (-e $db) {unlink $db;}
   $schema_package = q[npg_tracking::Schema];
