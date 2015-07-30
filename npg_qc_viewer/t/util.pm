@@ -10,7 +10,6 @@ with 'npg_testing::db';
 Readonly::Scalar our $CONFIG_PATH       => q[t/data/test_app.conf];
 Readonly::Scalar our $CONFIG_PATH_NO_DB => q[t/data/test_app_no_db.conf];
 Readonly::Scalar our $STAGING_PATH      => q[t/data];
-Readonly::Scalar our $WHOUSE_DB_PATH    => q[t/data/warehouse.db];
 Readonly::Scalar our $MLWHOUSE_DB_PATH  => q[t/data/mlwarehouse.db];
 Readonly::Scalar our $NPGQC_DB_PATH     => q[t/data/npgqc.db];
 Readonly::Scalar our $NPG_DB_PATH       => q[t/data/npg.db];
@@ -40,12 +39,6 @@ has 'staging_path' => ( isa      => 'Str',
                         default  => sub {$STAGING_PATH},
                       );
 
-has 'whouse_db_path' => ( isa      => 'Str',
-                          is       => 'ro',
-                          required => 0,
-                          default  => sub {$WHOUSE_DB_PATH},
-                        );
-
 has 'mlwhouse_db_path' => (
                           isa      => 'Str',
                           is       => 'ro',
@@ -71,16 +64,10 @@ sub test_env_setup {
 
   my $schemas = {};
 
-  my $db = $self->whouse_db_path;
+  my $db = $self->mlwhouse_db_path;
   if (-e $db) {unlink $db;}
-  my $schema_package = q[npg_warehouse::Schema];
-  my $fixtures_path = q[t/data/fixtures/warehouse];
-  $schemas->{wh} = $self->create_test_db($schema_package, $fixtures_path, $db);
-
-  $db = $self->mlwhouse_db_path;
-  if (-e $db) {unlink $db;}
-  $schema_package  = q[WTSI::DNAP::Warehouse::Schema];
-  $fixtures_path   = q[t/data/fixtures/mlwarehouse];
+  my $schema_package  = q[WTSI::DNAP::Warehouse::Schema];
+  my $fixtures_path   = q[t/data/fixtures/mlwarehouse];
   $schemas->{mlwh} = $self->create_test_db($schema_package, $fixtures_path, $db);
 
   $db = $self->npgqc_db_path;
@@ -104,10 +91,8 @@ sub test_env_setup {
   return $schemas;
 }
 
-
 sub DEMOLISH {
     my $self = shift;
-    if (-e $self->whouse_db_path)   {unlink $self->whouse_db_path;}
     if (-e $self->mlwhouse_db_path) {unlink $self->mlwhouse_db_path;}
     if (-e $self->npgqc_db_path)    {unlink $self->npgqc_db_path;}
     if (-e $self->npg_db_path)      {unlink $self->npg_db_path;}
