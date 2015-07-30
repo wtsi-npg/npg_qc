@@ -164,6 +164,11 @@ t/data/fixtures/warehouse/CurrentSample.yml
 t/data/fixtures/warehouse/CurrentStudy.yml
 t/data/fixtures/warehouse/NpgInformation.yml
 t/data/fixtures/warehouse/NpgPlexInformation.yml
+t/data/fixtures/mlwarehouse/300-IseqProductMetric.yml
+t/data/fixtures/mlwarehouse/400-iseq_flowcell.yml
+t/data/fixtures/mlwarehouse/500-sample.yml
+t/data/fixtures/mlwarehouse/500-study.yml
+t/data/fixtures/mlwarehouse/400-iseq_run_lane_metric.yml
 t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/qc/1234_1.insert_size.json
 t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/qc/1234_1.qX_yield.json
 t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/qc/1234_2.insert_size.json
