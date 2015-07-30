@@ -17,7 +17,6 @@ lib/npg_qc_viewer/Model/NpgDB.pm
 lib/npg_qc_viewer/Model/NpgQcDB.pm
 lib/npg_qc_viewer/Model/MLWarehouseDB.pm
 lib/npg_qc_viewer/Model/SeqStore.pm
-lib/npg_qc_viewer/Model/WarehouseDB.pm
 lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
 lib/npg_qc_viewer/Util/Error.pm
 lib/npg_qc_viewer/Util/ExtendedHttpStatus.pm
@@ -101,7 +100,7 @@ t/20-model-Check.t
 t/20-model-NpgDB.t
 t/20-model-NpgQcDB.t
 t/20-model-SeqStore.t
-t/20-model-WarehouseDB.t
+t/20-model-MLWarehouseDB.t
 t/20-model-visuals-Fastqcheck.t
 t/30-model-visuals-Fastqcheck.t
 t/40-controller-Checks.t
