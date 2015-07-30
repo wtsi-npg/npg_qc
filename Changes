@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 58.9
  - move method for file name creation from SeqQC to autoqc so that it's
    more accessible
  - SeqQC
