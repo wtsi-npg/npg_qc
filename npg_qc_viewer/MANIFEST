@@ -8,7 +8,6 @@ lib/npg_qc_viewer/Controller/Mqc.pm
 lib/npg_qc_viewer/Controller/MqcRun.pm
 lib/npg_qc_viewer/Controller/Root.pm
 lib/npg_qc_viewer/Controller/Visuals.pm
-lib/npg_qc_viewer/Controller/Warehouse.pm
 lib/npg_qc_viewer/TransferObjects/Library4RunTO.pm
 lib/npg_qc_viewer/TransferObjects/ProductMetrics4RunTO.pm
 lib/npg_qc_viewer/TransferObjects/SampleTO.pm
@@ -109,7 +108,6 @@ t/40-controller-Checks.t
 t/40-controller-Mqc.t
 t/40-controller-Root.t
 t/40-controller-Visuals.t
-t/40-controller-Warehouse.t
 t/45-controller-Visuals.t
 t/50-template-ui_checks-adapter.t
 t/50-template-ui_checks-bam_flagstats.t
