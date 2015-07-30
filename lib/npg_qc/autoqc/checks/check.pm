@@ -10,7 +10,6 @@ use English qw(-no_match_vars);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
-use Perl6::Slurp;
 use Readonly;
 
 use npg_tracking::util::types;
@@ -314,6 +313,8 @@ __END__
 =item Class::Load
 
 =item Carp
+
+=item Readonly
 
 =item English -no_match_vars
 
