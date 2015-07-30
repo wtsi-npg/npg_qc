@@ -10,14 +10,11 @@ use English qw(-no_match_vars);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
-use Perl6::Slurp;
 use Readonly;
 
 use npg_tracking::util::types;
 
-with qw/ npg_tracking::glossary::tag
-         npg_common::roles::run::lane::file_names
-       /;
+with qw/ npg_tracking::glossary::tag /;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit)
@@ -38,9 +35,7 @@ A top-level class for autoqc checks. Checks are performed for one lane.
 
 =cut
 
-
 Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
-
 
 =head2 path
 
@@ -217,10 +212,12 @@ sub get_input_files {
     my $self = shift;
 
     my @fnames = ();
-    my $forward = File::Spec->catfile($self->path, $self->create_filename($self->input_file_ext, 1));
+    my $forward = join q[.], File::Spec->catfile($self->path, $self->create_filename($self, 1)),
+                             $self->input_file_ext;
     my $no_end_forward = undef;
     if (!-e $forward) {
-        $no_end_forward = File::Spec->catfile($self->path, $self->create_filename($self->input_file_ext));
+        $no_end_forward = join q[.], File::Spec->catfile($self->path, $self->create_filename($self)),
+                                     $self->input_file_ext;
         if (-e $no_end_forward) {
            $forward = $no_end_forward;
         } else {
@@ -231,7 +228,8 @@ sub get_input_files {
 
     push @fnames, $forward;
     if (!defined $no_end_forward) {
-        my $reverse =  File::Spec->catfile($self->path, $self->create_filename($self->input_file_ext, 2));
+        my $reverse =  join q[.], File::Spec->catfile($self->path, $self->create_filename($self, 2)),
+                                  $self->input_file_ext;
         if (-e $reverse) {push @fnames, $reverse;}
     }
 
@@ -274,6 +272,22 @@ sub overall_pass {
   return ($apass->[0] && $apass->[1]);
 }
 
+=head2 create_filename - given run id, position, tag index (optional) and end (optional)
+returns a file name
+
+  npg_qc::autoqc::checks::check->create_filename({id_run=>1,position=>2,tag_index=>3},2);
+  $obj->->create_filename({id_run=>1,position=>2},1);
+=cut
+sub create_filename {
+  my ($self, $map, $end) = @_;
+
+  return sprintf '%i_%i%s%s',
+    $map->{'id_run'},
+    $map->{'position'},
+    $end ? "_$end" : q[],
+    defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
+}
+
 no MooseX::ClassAttribute;
 __PACKAGE__->meta->make_immutable;
 
@@ -300,6 +314,8 @@ __END__
 
 =item Carp
 
+=item Readonly
+
 =item English -no_match_vars
 
 =item File::Basename
@@ -311,8 +327,6 @@ __END__
 =item npg_tracking::glossary::tag
 
 =item npg_tracking::util::types
-
-=item npg_common::roles::run::lane::file_names
 
 =back
 
@@ -326,7 +340,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
