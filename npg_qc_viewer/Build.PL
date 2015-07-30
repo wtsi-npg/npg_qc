@@ -84,6 +84,7 @@ my $builder = $class->new(
         'HTTP::Request'                                => '0',
         'JSON'                                         => '0',
         'LWP::UserAgent'                               => '0',
+        'List::MoreUtils'                              => '0',
         'Math::Gradient'                               => '0',
         'Moose'                                        => '0',
         'Moose::Role'                                  => '0',
