@@ -110,7 +110,7 @@ sub _build_samtools_stats_file {
 
   if (!$mfile || !$file_name_prefix) {
     carp 'Not looking for samtools stats files';
-  } else { 
+  } else {
     my @found = values %{$paths};
     if (@found) {
       carp 'Found the following samtools stats files: ' . join q[, ], @found;
@@ -195,7 +195,7 @@ sub related_data {
         $ref->{'file_content'} = compress(slurp $path);
         push @related, $ref;
       } catch {
-        carp "Error reading ${path}: $_";
+        croak "Error reading ${path}: $_";
       };
     }
   }

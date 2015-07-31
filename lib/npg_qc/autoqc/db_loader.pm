@@ -1,7 +1,7 @@
 package npg_qc::autoqc::db_loader;
 
 use Moose;
-use Class::Load;
+use Class::Load qw/load_class/;
 use namespace::autoclean;
 use Carp;
 use JSON;
@@ -124,11 +124,10 @@ sub _json2db{
         npg_qc::autoqc::role::result->class_names($class_name);
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-
         my $module = 'npg_qc::autoqc::results::' . $class_name;
-        Class::Load::load_class($module);
+        load_class($module);
         my $instance = $module->load($json_file);
-        if ($module eq 'npg_qc::autoqc::results::bam_flagstats') {
+        if ($class_name eq 'bam_flagstats') {
           $values = decode_json($instance->freeze());
         }
         my $rs = $self->schema->resultset($dbix_class_name);
@@ -147,19 +146,7 @@ sub _json2db{
             $count = 1;
           }
         }
-
-        if ($db_result && $instance->can($RELATED_DATA_ACCESSOR_NAME)) {
-          foreach my $related_values ( @{$instance->$RELATED_DATA_ACCESSOR_NAME} ) {
-            # We can get the relationship name from the DBIx object itself.
-            # However, then we cannot have multiple child tables. For bam_flagstats
-            # we are planning to have two.
-            my $relationship_name = delete $related_values->{'relationship_name'};
-            if ($relationship_name) {
-              $self->_log("Creating related record for $relationship_name");
-              $db_result->update_or_create_related($relationship_name, $related_values);
-            }
-          }
-        }
+        $self->_load_related($db_result, $instance);
       }
     }
   } catch {
@@ -203,6 +190,27 @@ sub _pass_filter {
     return 0;
   }
   return 1;
+}
+
+sub _load_related {
+  my ($self, $db_result, $instance) = @_;
+
+  my $attempted = 0;
+  if ($db_result && $instance && $instance->can($RELATED_DATA_ACCESSOR_NAME)) {
+    foreach my $related_values ( @{$instance->$RELATED_DATA_ACCESSOR_NAME} ) {
+      # We can get the relationship name from the DBIx object itself.
+      # However, then we cannot have multiple child tables. For bam_flagstats
+      # we are planning to have two.
+      my $relationship_name = delete $related_values->{'relationship_name'};
+      if ($relationship_name) {
+        $self->_log("Creating related record for $relationship_name");
+        $db_result->update_or_create_related($relationship_name, $related_values);
+        $attempted = 1;
+      }
+    }
+  }
+
+  return $attempted;
 }
 
 sub _log {
