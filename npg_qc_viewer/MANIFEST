@@ -154,13 +154,6 @@ t/data/fixtures/npgqc/Contamination.yml
 t/data/fixtures/npgqc/InsertSize.yml
 t/data/fixtures/npgqc/QXYield.yml
 t/data/fixtures/npgqc/SequenceError.yml
-t/data/fixtures/warehouse/CurrentBatchRequest.yml
-t/data/fixtures/warehouse/CurrentBatch.yml
-t/data/fixtures/warehouse/CurrentRequest.yml
-t/data/fixtures/warehouse/CurrentSample.yml
-t/data/fixtures/warehouse/CurrentStudy.yml
-t/data/fixtures/warehouse/NpgInformation.yml
-t/data/fixtures/warehouse/NpgPlexInformation.yml
 t/data/fixtures/mlwarehouse/300-IseqProductMetric.yml
 t/data/fixtures/mlwarehouse/400-iseq_flowcell.yml
 t/data/fixtures/mlwarehouse/500-sample.yml
