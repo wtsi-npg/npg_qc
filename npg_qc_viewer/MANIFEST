@@ -258,6 +258,5 @@ t/perlcriticrc
 t/README
 t/scripts/npg_fixtures.pl
 t/scripts/npgqc_fixtures.pl
-t/scripts/warehouse_fixtures.pl
 t/util.pm
 
