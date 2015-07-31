@@ -32,7 +32,8 @@ my $rs;
   $rs = $real->resultset($tname)->search(
               { 'iseq_product_metrics.id_run' => $run_ids},
               {  join                        => ['iseq_product_metrics'],
-              }
+                 distinct => 1, # Otherwise there are duplicate rows.
+              },
   );
   $util->rs_list2fixture(q[400-].$tname, [$rs], $path);
 }
