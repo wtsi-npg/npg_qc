@@ -9,6 +9,7 @@ use List::MoreUtils qw[ any zip ];
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
+use npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -25,10 +26,6 @@ Readonly::Hash   our %RESULTS_RETRIEVE_OPTIONS => ('all'    => $ALL,
 =head1 NAME
 
 npg_qc_viewer::Controller::Checks
-
-=head1 VERSION
-
-$Revision: 17383 $
 
 =head1 SYNOPSIS
 
@@ -247,23 +244,59 @@ sub _display_run_lanes {
     if (scalar @{$lanes}) { $where->{'me.position'} = $lanes };
     my $model_mlwh = $c->model('MLWarehouseDB');
 
-    if ($retrieve_option != $PLEXES) {
-      #$where->{'me.tag_index'} = [ undef, { '=', 0 } ];
-      $c->stash->{'rs'} = $model_mlwh->
-                            resultset('IseqProductMetric')->
-                            search($where, {
-                              prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ],
-                              join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
-                            });
+    my $rs;
+    my $row_data = {};
+
+    $rs = $model_mlwh->resultset('IseqProductMetric')->
+                       search($where, {
+                         prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+                         order_by => qw[ me.id_run me.position me.tax_index ],
+                       },);
+
+    while (my $product_metric = $rs->next) {
+      my $key;
+      if ($retrieve_option == $LANES) {
+        $key = $product_metric->lane_rpt_key_from_key($product_metric->rpt_key);
+      } else {
+        $key = $product_metric->rpt_key;
+      }
+
+      if ( !defined $row_data->{$key} ) {
+        my $values = {};
+        $values->{'id_run'}       = $product_metric->id_run;
+        $values->{'position'}     = $product_metric->position;
+        $values->{'tag_sequence'} = $product_metric->tag_sequence4deplexing;
+        $values->{'num_cycles'}   = $product_metric->iseq_run_lane_metric->cycles;
+        $values->{'time_comp'}    = $product_metric->iseq_run_lane_metric->run_complete;
+
+        if ( defined $product_metric->iseq_flowcell ) {
+          $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
+
+          if ( defined $product_metric->iseq_flowcell->sample ) {
+            #TODO pass through facade
+            $values->{'id_sample_lims'} = $product_metric->iseq_flowcell->sample->id_sample_lims;
+            $values->{'name'}           = $product_metric->iseq_flowcell->sample->name;
+          }
+
+          if ( defined $product_metric->iseq_flowcell->study ) {
+            $values->{'id_study_lims'} = $product_metric->iseq_flowcell->study->id_study_lims;
+            $values->{'study_name'}    = $product_metric->iseq_flowcell->study->name;
+          }
+        }
+
+        $values->{'tag_index'}    = $product_metric->tag_index;
+
+        my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
+
+        $row_data->{$key} = $to;
+      }
     }
-    if ($retrieve_option != $LANES) {
-      $c->stash->{'rs'} = $model_mlwh->
-                                 resultset('IseqProductMetric')->
-                                 search($where, {
-                                   prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ],
-                                   join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
-                                 });
-    }
+
+    $rs->reset;
+    $c->stash->{'rs'} = $rs;
+    $c->stash->{'row_data'} = $row_data;
+
+    $c->log->debug(sprintf('Found runs %s', ($c->stash->{'rs'}->count)));
 
     $self->_data2stash($c, $collection);
 

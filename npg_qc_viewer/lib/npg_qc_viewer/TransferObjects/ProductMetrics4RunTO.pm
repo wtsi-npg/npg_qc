@@ -78,7 +78,6 @@ When run was complete
 
 =cut
 has 'time_comp'    => (
-  isa      => 'Maybe[Int]',
   is       => 'rw',
   required => 0,
 );
@@ -104,12 +103,42 @@ has 'manual_qc'    => (
   required => 0,
 );
 
-=head2 study_id
+=head2 id_study_lims
 
-Id of study
+Id of study lims
 
 =cut
-has 'study_id'     => (
+has 'id_study_lims'     => (
+  is       => 'rw',
+  required => 0,
+);
+
+=head2 study_name
+
+Name study lims
+
+=cut
+has 'study_name'     => (
+  is       => 'rw',
+  required => 0,
+);
+
+=head2 sample_id
+
+Id of sample lims
+
+=cut
+has 'id_sample_lims' => (
+  is       => 'rw',
+  required => 0,
+);
+
+=head2 sample_name
+
+Name of sample lims
+
+=cut
+has 'sample_name' => (
   is       => 'rw',
   required => 0,
 );
