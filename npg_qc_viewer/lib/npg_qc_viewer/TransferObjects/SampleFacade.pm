@@ -1,4 +1,4 @@
-package npg_qc_viewer::TransferObjects::SampleTO;
+package npg_qc_viewer::TransferObjects::SampleFacade;
 
 use Moose;
 use namespace::autoclean;
@@ -10,39 +10,17 @@ our $VERSION = '0';
 
 =head1 NAME
 
-npg_qc_viewer::TransferObjects::SampleTO
+npg_qc_viewer::TransferObjects::SampleFacade
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-A transfer object to pass Sample data from model to the view.
+A facade object to show a simplified Sample from model to the view.
 
 =head1 SUBROUTINES/METHODS
 
 =cut
-
-=head2 id_sample_lims
-
-Id for sample in ML Data Warehouse
-
-=cut
-has 'id_sample_lims' => (
-  isa      => 'Int',
-  is       => 'rw',
-  required => 1,
-);
-
-=head2 name
-
-Name for sample.
-
-=cut
-has 'name' => (
-  isa      => 'Str',
-  is       => 'rw',
-  required => 0,
-);
 
 =head2 row
 
@@ -50,10 +28,29 @@ Raw data.
 
 =cut
 has 'row'  => (
-  isa      => 'Str',
   is       => 'rw',
-  required => 0,
+  required => 1,
 );
+
+=head2 id_sample_lims
+
+Id for sample in ML Data Warehouse
+
+=cut
+sub id_sample_lims {
+  my $self = shift;
+  return $self->row->get_column('id_sample_lims');
+}
+
+=head2 name
+
+Name for sample.
+
+=cut
+sub name {
+  my $self = shift;
+  return $self->row->get_column('name') || $self->row->get_column('id_sample_lims');
+}
 
 __PACKAGE__->meta->make_immutable;
 
