@@ -1,12 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
 use File::Temp qw/ tempdir /;
 use Perl6::Slurp;
 use JSON;
+use Compress::Zlib;
 
 subtest 'test attributes and simple methods' => sub {
   plan tests => 18;
@@ -149,6 +150,58 @@ subtest 'high-level parsing - backwards compatibility' => sub {
     is($r->percent_singletons, 2.92540938863795, 'percent singletons');
     is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
   }
+};
+
+subtest 'finding and reading stats files' => sub {
+  plan tests => 6;
+
+  my $data_path = 't/data/autoqc/bam_flagstats/';
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run                 => 16960,
+    position               => 1,
+    tag_index              => 0,
+    markdups_metrics_file  =>
+      $data_path . '16960_1#0.markdups_metrics.txt',
+    flagstats_metrics_file =>
+      $data_path . '16960_1#0.flagstat',
+  );
+
+  warning_like { $r->execute() } qr/Found the following samtools stats files/,
+   'successfully calling execute() method';
+
+  my $stats_files = {
+     'F0x900' => $data_path . '16960_1#0_F0x900.stats',
+     'F0xB00' => $data_path . '16960_1#0_F0xB00.stats',
+                     };
+  is_deeply($r->samtools_stats_file, $stats_files, 'stats files found');
+   
+  my @related = ();
+  push @related, {'relationship_name' => 'samtools_stats',
+                  'filter'            => 'F0x900',
+                  'file_content'      =>
+                   compress("stats file for 16960_1#0_F0x900.stats\n")};
+  push @related, {'relationship_name' => 'samtools_stats',
+                  'filter'            => 'F0xB00',
+                  'file_content'      =>
+                  compress("stats file for 16960_1#0_F0xB00.stats\n")};
+  is_deeply($r->related_data(), \@related, 'stats files read');
+
+  my $invalid_path = $data_path . '16960_1#0_F0xG00.stats';
+  $r->samtools_stats_file->{'F0xB00'} = $invalid_path;
+  throws_ok { $r->related_data() }
+    qr/Error reading $invalid_path: Can\'t open \'$invalid_path\'/,
+    'error reading one of stats files';
+
+ $r = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run                 => 16960,
+    position               => 1,
+    tag_index              => 0,
+    flagstats_metrics_file =>
+      $data_path . '16960_1#0.flagstat',
+  );
+  warning_like { $r->execute() } qr/Found the following samtools stats files/,
+   'successfully calling execute() method';
+  is_deeply($r->samtools_stats_file, $stats_files, 'stats files found');
 };
 
 1;

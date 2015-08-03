@@ -103,7 +103,10 @@ sub _build_samtools_stats_file {
     if ($file_name_prefix) {
       foreach my $file ( grep { -f $_ } glob
           catpath($volume, $directories, $file_name_prefix . q[*.stats]) ) {
-        $paths->{_get_filter($file)} = $file;
+        my $filter = $self->_filter($file);
+        if ($filter) {
+          $paths->{$filter} = $file;
+        }
       }
     }
   }
@@ -122,8 +125,9 @@ sub _build_samtools_stats_file {
   return $paths;
 }
 
-sub _get_filter {
-  my $path = shift;
+sub _filter {
+  my ($self, $path) = @_;
+
   my ($volume, $directories, $file) = splitpath($path);
   ##no critic (RegularExpressions::ProhibitEnumeratedClasses)
   my ($filter) = $file =~ /_([a-zA-Z0-9]+)[.]stats\Z/xms;
@@ -131,7 +135,9 @@ sub _get_filter {
   if (!$filter) {
     croak "Failed to get filter from $path";
   }
-  return $filter;
+  my $subset = $self->subset ? $self->subset . q[_] : q[];
+
+  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
 }
 
 sub BUILD {
@@ -199,6 +205,8 @@ sub related_data {
       };
     }
   }
+
+  @related = sort { $a->{'filter'} cmp $b->{'filter'} } @related;
 
   return \@related;
 }
