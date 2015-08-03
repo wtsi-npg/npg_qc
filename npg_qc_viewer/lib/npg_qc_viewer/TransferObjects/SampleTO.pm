@@ -44,6 +44,17 @@ has 'name' => (
   required => 0,
 );
 
+=head2 row
+
+Raw data.
+
+=cut
+has 'row'  => (
+  isa      => 'Str',
+  is       => 'rw',
+  required => 0,
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
