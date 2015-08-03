@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More tests => 49;
 use Test::Exception;
+use Test::Warn;
 use Test::Deep;
 use File::Temp qw/ tempdir /;
 use Perl6::Slurp;
@@ -85,7 +86,11 @@ use_ok ('npg_qc::autoqc::results::bam_flagstats');
 
         # for $r1 the files to parse are not given
         # for $r2 the metrics files are given but the stats files are nor available
-        lives_ok { $r->execute() } 'execute method does not error';
+        my $w = 'Not looking for samtools stats files';
+        if ($r->markdups_metrics_file) {
+          $w = 'Not found samtools stats files';
+        }
+        warning_like { $r->execute() } qr/^$w/, 'execute method warns';
         is(scalar keys %{$r->$stats_attr_name}, 0, 'stats files hash empty');
         lives_and { is scalar @{$r->related_data}, 0} 'no related data';         
 
