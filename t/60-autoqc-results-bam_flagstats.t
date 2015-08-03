@@ -9,7 +9,7 @@ use Perl6::Slurp;
 use JSON;
 
 subtest 'test attributes and simple methods' => sub {
-  plan tests => 17;
+  plan tests => 18;
 
   use_ok ('npg_qc::autoqc::results::bam_flagstats');
 
@@ -61,6 +61,35 @@ subtest 'test attributes and simple methods' => sub {
             subset   => 'yhuman',
             human_split => 'yhuman')
   } 'no error when human_split and subset attrs are consistent';
+
+  $r = npg_qc::autoqc::results::bam_flagstats->
+    load('t/data/autoqc/4921_3_bam_flagstats.json');
+  ok( !$r->total_reads(), 'total reads not available' ) ;
+};
+
+subtest 'low-level parsing' => sub {
+  plan tests => 7;
+
+  my $ref = {position => 5, id_run => 4783,};
+
+  my $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
+  $r->parsing_metrics_file('t/data/autoqc/estimate_library_complexity_metrics.txt');
+  is($r->read_pairs_examined(),2384324, 'read_pairs_examined');
+  is($r->paired_mapped_reads(),  0, 'paired_mapped_reads');
+
+  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
+  open my $flagstats_fh2, '<', 't/data/autoqc/6440_1#0.bamflagstats';
+  $r->parsing_flagstats($flagstats_fh2);
+  close $flagstats_fh2; 
+  is($r->total_reads(), 2978224 , 'total reads');
+  is($r->proper_mapped_pair(),2765882, 'properly paired');
+
+  $ref->{'tag_index'} = 0;
+  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
+  lives_ok {$r->parsing_metrics_file('t/data/autoqc/12313_1#0_bam_flagstats.txt')}
+    'file with library size -1 parsed';
+  is($r->library_size, undef, 'library size is undefined');
+  is($r->read_pairs_examined, 0, 'examined zero read pairs');
 };
 
 subtest 'high-level parsing - backwards compatibility' => sub {
@@ -120,35 +149,6 @@ subtest 'high-level parsing - backwards compatibility' => sub {
     is($r->percent_singletons, 2.92540938863795, 'percent singletons');
     is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
   }
-};
-
-subtest 'low-level parsing' => sub {
-  plan tests => 8;
-
-  my $r = npg_qc::autoqc::results::bam_flagstats->
-    load('t/data/autoqc/4921_3_bam_flagstats.json');
-  ok( !$r->total_reads(), 'total reads not available' ) ;
-
-  my $ref = {position => 5, id_run => 4783,};
-
-  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  $r->parsing_metrics_file('t/data/autoqc/estimate_library_complexity_metrics.txt');
-  is($r->read_pairs_examined(),2384324, 'read_pairs_examined');
-  is($r->paired_mapped_reads(),  0, 'paired_mapped_reads');
-
-  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  open my $flagstats_fh2, '<', 't/data/autoqc/6440_1#0.bamflagstats';
-  $r->parsing_flagstats($flagstats_fh2);
-  close $flagstats_fh2; 
-  is($r->total_reads(), 2978224 , 'total reads');
-  is($r->proper_mapped_pair(),2765882, 'properly paired');
-
-  $ref->{'tag_index'} = 0;
-  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  lives_ok {$r->parsing_metrics_file('t/data/autoqc/12313_1#0_bam_flagstats.txt')}
-    'file with library size -1 parsed';
-  is($r->library_size, undef, 'library size is undefined');
-  is($r->read_pairs_examined, 0, 'examined zero read pairs');
 };
 
 1;
