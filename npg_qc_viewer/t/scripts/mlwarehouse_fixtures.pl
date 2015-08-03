@@ -11,7 +11,13 @@ my $rs;
 
 {
   ############   iseq_product_metrics  #######################
-  my $run_ids = [1272, 3323, 3500, 3965, 4025, 4950];
+  my $run_ids = [1272, 
+                 3323,
+                 3055, #For sample  
+                 3500, 
+                 3965, 
+                 4025, 
+                 4950];
   $tname = q[IseqProductMetric];
   $rs = $real->resultset($tname)->search(
               { 'id_run' => $run_ids},
@@ -36,6 +42,26 @@ my $rs;
               },
   );
   $util->rs_list2fixture(q[400-].$tname, [$rs], $path);
+  
+  ###########    sample    ####################################
+  $tname = q[Sample];
+  $rs = $real->resultset($tname)->search(
+              { 'iseq_product_metrics.id_run' => $run_ids },
+              { join => {'iseq_flowcells' => 'iseq_product_metrics' }, 
+                distinct => 1,
+              },
+  );
+  $util->rs_list2fixture(q[500-].$tname, [$rs], $path);
+  
+  ###########    study     ####################################
+  $tname = q[Study];
+  $rs = $real->resultset($tname)->search(
+              { 'iseq_product_metrics.id_run' => $run_ids },
+              { join => {'iseq_flowcells' => 'iseq_product_metrics' }, 
+                distinct => 1,
+              },
+  );
+  $util->rs_list2fixture(q[500-].$tname, [$rs], $path);
 }
 
 1;
