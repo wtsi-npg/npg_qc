@@ -55,6 +55,7 @@ sub search_product_metrics {
                   search($where, {
                     prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
                     order_by => qw[ me.id_run me.position me.tax_index ],
+                    cache    => 1,
                   },);
 
   return $rs;
