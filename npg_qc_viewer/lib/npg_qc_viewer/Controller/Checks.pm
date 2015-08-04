@@ -150,7 +150,6 @@ sub _display_libs {
         while (my $row = $rs->next) {
             my $id_run = $row->get_column('id_run');
             my $position = $row->get_column('position');
-            $c->log->debug(qq[Guardando $id_run $position]);
             if (exists $run_lane_map->{$id_run}) {
                 if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
                     push  @{$run_lane_map->{$id_run}}, $position;
