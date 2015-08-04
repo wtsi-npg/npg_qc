@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
@@ -152,7 +152,7 @@ subtest 'high-level parsing - backwards compatibility' => sub {
   }
 };
 
-subtest 'finding and reading stats files' => sub {
+subtest 'finding and reading target stats files' => sub {
   plan tests => 6;
 
   my $data_path = 't/data/autoqc/bam_flagstats/';
@@ -202,6 +202,42 @@ subtest 'finding and reading stats files' => sub {
   warning_like { $r->execute() } qr/Found the following samtools stats files/,
    'successfully calling execute() method';
   is_deeply($r->samtools_stats_file, $stats_files, 'stats files found');
+};
+
+subtest 'finding and reading phix subset stats files' => sub {
+  plan tests => 3;
+
+  my $data_path = 't/data/autoqc/bam_flagstats/';
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run                 => 16960,
+    position               => 1,
+    tag_index              => 0,
+    subset                 => 'phix',
+    markdups_metrics_file  =>
+      $data_path . '16960_1#0_phix.markdups_metrics.txt',
+    flagstats_metrics_file =>
+      $data_path . '16960_1#0_phix.flagstat',
+  );
+
+  warning_like { $r->execute() } qr/Found the following samtools stats files/,
+   'successfully calling execute() method';
+
+  my $stats_files = {
+     'F0x900' => $data_path . '16960_1#0_phix_F0x900.stats',
+     'F0xB00' => $data_path . '16960_1#0_phix_F0xB00.stats',
+                     };
+  is_deeply($r->samtools_stats_file, $stats_files, 'phix stats files found');
+   
+  my @related = ();
+  push @related, {'relationship_name' => 'samtools_stats',
+                  'filter'            => 'F0x900',
+                  'file_content'      =>
+                   compress("stats file for 16960_1#0_phix_F0x900.stats\n")};
+  push @related, {'relationship_name' => 'samtools_stats',
+                  'filter'            => 'F0xB00',
+                  'file_content'      =>
+                  compress("stats file for 16960_1#0_phix_F0xB00.stats\n")};
+  is_deeply($r->related_data(), \@related, 'phix stats files read');
 };
 
 1;
