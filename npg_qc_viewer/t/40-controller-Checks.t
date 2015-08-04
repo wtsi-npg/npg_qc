@@ -11,7 +11,7 @@ use List::MoreUtils qw ( each_array );
 BEGIN {
   local $ENV{'HOME'} = 't/data';
   use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
-} 
+}
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;

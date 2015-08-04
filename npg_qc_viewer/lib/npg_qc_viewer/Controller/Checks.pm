@@ -5,10 +5,12 @@ use namespace::autoclean;
 use Moose::Meta::Class;
 use URI::URL;
 use Carp;
-use List::MoreUtils qw[ any ];
+use List::MoreUtils qw[ any zip ];
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
+use npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
+use npg_qc_viewer::TransferObjects::SampleFacade;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -25,10 +27,6 @@ Readonly::Hash   our %RESULTS_RETRIEVE_OPTIONS => ('all'    => $ALL,
 =head1 NAME
 
 npg_qc_viewer::Controller::Checks
-
-=head1 VERSION
-
-$Revision: 17383 $
 
 =head1 SYNOPSIS
 
@@ -64,6 +62,24 @@ sub _get_title {
     return $full_title;
 }
 
+sub _get_sample_lims {
+  my ($self, $c, $id_sample_lims) = @_;
+
+  my $row = $c->model('MLWarehouseDB')->search_sample_lims_by_id($id_sample_lims)->next;
+
+  if (!$row) {
+    $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
+    $c->detach(q[Root], q[error_page]);
+    return;
+  }
+
+  my $sample = {};
+  $sample->{'id_sample_lims'} = $row->get_column('id_sample_lims');
+  $sample->{'name'} = $row->get_column('name') || $row->('id_sample_lims');
+
+  return $sample;
+}
+
 sub _test_positive_int {
     my ($self, $c, $input) = @_;
     if ($input !~ /^\d+$/smx || $input == 0) {
@@ -86,41 +102,13 @@ sub _show_option {
     return $what;
 }
 
-sub _rl_map_append {
-    my ($self, $c, $rl_map) = @_;
-
-    my $rsets = {rs => 'NpgInformation', plex_rs => 'NpgPlexInformation',};
-    my $wh_rl_map = {};
-    foreach my $rs_name (keys %{$rsets}) {
-        if (!$c->stash->{$rs_name}) { next; }
-        my $rs = $c->stash->{$rs_name};
-        while (my $row = $rs->next) {
-            my $rpt_key = $row->rpt_key;
-            $wh_rl_map->{$rpt_key} = 1;
-            if (!exists  $rl_map->{$rpt_key}) {
-                $rl_map->{$rpt_key} = undef;
-            }
-        }
-        $rs->reset;
-    }
-    return $wh_rl_map;
-}
-
 sub _data2stash {
     my ($self, $c, $collection) = @_;
 
     my $rl_map = $collection->run_lane_collections;
     my @rl_map_keys = keys %{$rl_map};
     my $has_plexes = npg_qc::autoqc::role::rpt_key->has_plexes(\@rl_map_keys);
-    my $wh_rl_map = $self->_rl_map_append($c, $rl_map);
 
-    if ($c->stash->{'sample_link'} && $has_plexes && scalar keys %{$wh_rl_map}) {
-        foreach my $key (keys %{$rl_map}) {
-            if (!exists $wh_rl_map->{$key}) {
-                delete $rl_map->{$key};
-            }
-        }
-    }
     $c->stash->{'rl_map'}         = $rl_map;
     $c->stash->{'has_plexes'}     = $has_plexes;
     $c->stash->{'collection_all'} = $collection;
@@ -128,26 +116,31 @@ sub _data2stash {
     return;
 }
 
+sub _fetch_libs_by_lib {
+  my ($self, $c, $id_library_lims) = @_;
+
+  my $rs;
+  if ($id_library_lims) {
+    $rs = $c->model('MLWarehouseDB')->search_library_lims_by_id($id_library_lims);
+  }
+  return $rs;
+}
+
+sub _fetch_libs_by_sample {
+  my ($self, $c, $id_sample_lims) = @_;
+
+  my $rs;
+  if ($id_sample_lims) {
+    $rs = $c->model('MLWarehouseDB')->search_library_lims_by_sample($id_sample_lims);
+  }
+  return $rs;
+}
+
 sub _display_libs {
-    my ($self, $c, $where, $no_plexes) = @_;
+    my ($self, $c, $rs, $no_plexes) = @_;
 
-    if (!keys %{$where}) {
-        croak 'The WHERE hash is empty';
-    }
-    my ($key, $value) = each %{$where};
-    if (!$key) {
-        croak 'Column is an empty string in the WHERE hash';
-    }
-
-    if ($value) {
+    if ($rs) {
         # tag_index is NULL OR tag_index != 0
-        $where->{'me.tag_index'} = [ undef, { '!=', 0 } ];  
-        my $rs = $c->model('MLWarehouseDB')->
-          resultset('IseqProductMetric')->
-          search($where, {
-            prefetch => ['iseq_run_lane_metric', { 'iseq_flowcell'=> ['sample', 'study'] } ], 
-            join => [ 'iseq_run_lane_metric', { 'iseq_flowcell'=> ['sample', 'study'] } ]
-          });
 
         $c->stash->{'rs'} = $rs;
 
@@ -155,8 +148,8 @@ sub _display_libs {
 
         my $run_lane_map = {};
         while (my $row = $rs->next) {
-            my $id_run = $row->id_run;
-            my $position = $row->position;
+            my $id_run = $row->get_column('id_run');
+            my $position = $row->get_column('position');
             if (exists $run_lane_map->{$id_run}) {
                 if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
                     push  @{$run_lane_map->{$id_run}}, $position;
@@ -217,22 +210,18 @@ sub _display_run_lanes {
     my $retrieve_option = $RESULTS_RETRIEVE_OPTIONS{$what};
     my $collection =  $c->model('Check')->load_lanes($run_lanes, $c->stash->{'db_lookup'}, $retrieve_option, $c->model('NpgDB')->schema);
 
-    my $where = {id_run => $id_runs}; # Query by id_run, position
-    if (scalar @{$lanes}) { $where->{position} = $lanes };
-    my $model = $c->model('WarehouseDB');
-    if ($retrieve_option != $PLEXES) {
-        $c->stash->{'rs'} = $model->resultset('NpgInformation')->search($where);
-    }
-    if ($retrieve_option != $LANES) {
-        $c->stash->{'plex_rs'} = $model->resultset('NpgPlexInformation')->search($where);
-    }
+    my $where = {'me.id_run' => $id_runs}; # Query by id_run, position
+    if (scalar @{$lanes}) { $where->{'me.position'} = $lanes };
+
+    $self->_run_lanes_from_dwh($c, $where, $retrieve_option);
+
     $self->_data2stash($c, $collection);
 
     if (!$c->stash->{'title'} ) {
         my $title = q[Results ];
         if (!$c->stash->{'db_lookup'}) {
             $title .= q[(staging) ];
-	      }
+        }
         if (@{$id_runs}) {
             $title .= qq[($what) for runs ] . (join q[ ], @{$id_runs});
         }
@@ -249,7 +238,71 @@ sub _display_run_lanes {
     return;
 }
 
-=head2 base 
+sub _run_lanes_from_dwh {
+  my ($self, $c, $where, $retrieve_option) = @_;
+
+  my $rs;
+  my $row_data = {};
+  my $model_mlwh = $c->model('MLWarehouseDB');
+
+  $rs = $model_mlwh->search_product_metrics($where);
+
+  while (my $product_metric = $rs->next) {
+    my $key;
+    if ($retrieve_option == $LANES) {
+      $key = $product_metric->lane_rpt_key_from_key($product_metric->rpt_key);
+    } else {
+      $key = $product_metric->rpt_key;
+    }
+
+    if ( !defined $row_data->{$key} ) {
+      my $values = {};
+      #TODO maybe validate
+      $values->{'id_run'}       = $product_metric->id_run;
+      $values->{'position'}     = $product_metric->position;
+      $values->{'tag_sequence'} = $product_metric->tag_sequence4deplexing;
+      $values->{'tag_index'}    = $product_metric->tag_index;
+
+      if ( defined $product_metric->iseq_run_lane_metric ) {
+        $values->{'num_cycles'}   = $product_metric->iseq_run_lane_metric->cycles;
+        $values->{'time_comp'}    = $product_metric->iseq_run_lane_metric->run_complete;
+      }
+
+      if ( defined $product_metric->iseq_flowcell ) {
+        $values->{'manual_qc'}         = $product_metric->iseq_flowcell->manual_qc;
+        $values->{'id_library_lims'}   = $product_metric->iseq_flowcell->id_library_lims;
+        $values->{'legacy_library_id'} = $product_metric->iseq_flowcell->legacy_library_id;
+
+        if ( defined $product_metric->iseq_flowcell->sample ) {
+          my $sample_row = $product_metric->iseq_flowcell->sample;
+
+          my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
+
+          $values->{'id_sample_lims'} = $sample->id_sample_lims;
+          $values->{'name'}           = $sample->name;
+        }
+
+        if ( defined $product_metric->iseq_flowcell->study ) {
+          my $study_row = $product_metric->iseq_flowcell->study;
+          $values->{'id_study_lims'} = $study_row->id_study_lims;
+          $values->{'study_name'}    = $study_row->name;
+        }
+      }
+
+      my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
+
+      $row_data->{$key} = $to;
+    }
+  }
+
+  $rs->reset; #TODO stop returning rs after I'm sure it is not used in template.
+  $c->stash->{'rs'} = $rs; #TODO stop returning rs after I'm sure it is not used in template.
+  $c->stash->{'row_data'} = $row_data;
+
+  return;
+}
+
+=head2 base
 
 Action for the base controller path
 
@@ -268,7 +321,7 @@ sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
     return;
 }
 
-=head2 index 
+=head2 index
 
 index page
 
@@ -280,7 +333,7 @@ sub index :Path :Args(0) {
     return;
 }
 
-=head2 about 
+=head2 about
 
 qc checks info page
 
@@ -302,6 +355,7 @@ sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
 
     if (defined $c->request->query_parameters->{run}) {
         $c->stash->{'db_lookup'} = 1;
+        $c->stash->{'display'}   = 'runs';
         $self->_display_run_lanes($c);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
@@ -313,7 +367,7 @@ sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
 
 =head2 checks_in_run
 
-Fetches the checks collection for a run and passes it to the relevant 
+Fetches the checks collection for a run and passes it to the relevant
 template through the stash
 
 =cut
@@ -324,6 +378,7 @@ sub checks_in_run :Chained('base') :PathPart('runs') :Args(1) {
     $c->stash->{'title'}     = _get_title(qq[Results for run $id_run]);
     $c->stash->{'run_view'}  = 1;
     $c->stash->{'id_run'}    = $id_run;
+    $c->stash->{'display'}   = 'runs';
     $self->_display_run_lanes($c, {run => [$id_run],} );
     return;
 }
@@ -340,6 +395,7 @@ sub runs_from_staging :Chained('base') :PathPart('runs-from-staging') :Args(0) {
 
     if (exists $c->request->query_parameters->{run}) {
         $c->stash->{'db_lookup'} = 0;
+        $c->stash->{'display'}   = 'runs';
         $self->_display_run_lanes($c);
     } else {
         $c->stash->{error_message} =
@@ -365,6 +421,7 @@ sub checks_in_run_from_staging :Chained('base') :PathPart('runs-from-staging') :
     $c->stash->{'run_from_staging'} = 1;
     $c->stash->{'run_view'}         = 1;
     $c->stash->{'id_run'}           = $id_run;
+    $c->stash->{'display'}          = 'runs';
     $self->_display_run_lanes($c, {run => [$id_run],} );
     return;
 }
@@ -391,6 +448,7 @@ sub checks_from_path :Chained('base') :PathPart('path') :Args(0) {
       $self->_data2stash($c, $collection);
       $c->stash->{'db_lookup'} = 0;
       $c->stash->{'path_list'} = [@path];
+      $c->stash->{'display'}   = 'runs';
       $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
   } else {
       $c->stash->{error_message} =
@@ -414,7 +472,9 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
             $id_library_lims = [$id_library_lims];
         }
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
-        $self->_display_libs($c, { 'iseq_flowcell.id_library_lims' => $id_library_lims,});
+        $c->stash->{'display'} = 'libraries';
+        my $rs = $self->_fetch_libs_by_lib($c, $id_library_lims);
+        $self->_display_libs($c, $rs);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
         $c->detach(q[Root], q[error_page]);
@@ -442,17 +502,11 @@ Sample page
 sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $id_sample_lims) = @_;
 
-    my $row = $c->model('MLWarehouseDB')->resultset('Sample')->search(
-         {id_sample_lims => $id_sample_lims,}
-    )->next;
-    if (!$row) {
-        $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
-        $c->detach(q[Root], q[error_page]);
-        return;
-    }
-
-    my $sample_name = $row->name || $row->id_sample_lims;
-    $self->_display_libs($c, { "sample.id_sample_lims" => $id_sample_lims,});
+    my $sample = $self->_get_sample_lims($c, $id_sample_lims);
+    $c->stash->{'lims_sample'} = $sample;
+    my $sample_name = $sample->{'name'};
+    my $rs = $self->_fetch_libs_by_sample($c, $id_sample_lims);
+    $self->_display_libs($c, $rs);
     $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
     return;
 }

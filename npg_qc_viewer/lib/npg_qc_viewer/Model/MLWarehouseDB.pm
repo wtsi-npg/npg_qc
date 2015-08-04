@@ -2,12 +2,19 @@ package npg_qc_viewer::Model::MLWarehouseDB;
 
 use Moose;
 use namespace::autoclean;
+use Carp;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
 
 ## no critic (Documentation::RequirePodAtEnd)
+
+=begin stopwords
+
+lims
+
+=end stopwords
 
 =head1 NAME
 
@@ -23,11 +30,108 @@ Catalyst::Model::DBIC::Schema Model using schema WTSI::DNAP::Warehouse::Schema
 
 =cut
 
-
 __PACKAGE__->config(
     schema_class => 'WTSI::DNAP::Warehouse::Schema',
     connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
+
+=head2 search_product_metrics
+
+Search product metrics by where conditions (me.id_run, me.position).
+
+=cut
+sub search_product_metrics {
+  my ($self, $where) = @_;
+
+  if(!defined $where){
+    croak q[Conditions were not provided for search];
+  }
+
+  if(!defined $where->{'me.id_run'}) {
+    croak q[Id run not defined when querying metrics by me.id_run];
+  }
+
+  my $rs = $self->resultset('IseqProductMetric')->
+                  search($where, {
+                    prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+                    order_by => qw[ me.id_run me.position me.tax_index ],
+                    cache    => 1,
+                  },);
+
+  return $rs;
+}
+
+=head2 search_library_lims_by_id
+
+Search library by new id library in lims.
+
+=cut
+sub search_library_lims_by_id {
+  my ($self, $id_library_lims) = @_;
+
+  if (!defined $id_library_lims) {
+    croak q[Id library lims not defined when querying library lims];
+  }
+
+  my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims,
+                'me.tag_index' => [ undef, { q[!=], 0 }],};
+
+  my $rs = $self->resultset('IseqProductMetric')->
+             search($where, {
+               join => ['iseq_flowcell'],
+               '+columns'  => ['me.id_run',
+                               'me.position',
+                               'me.tag_index',
+                               'iseq_flowcell.id_library_lims',
+                               'iseq_flowcell.legacy_library_id',
+               ],
+               group_by => qw[me.id_run me.position me.tag_index iseq_flowcell.id_library_lims iseq_flowcell.legacy_library_id],
+  });
+
+  return $rs;
+}
+
+=head2 search_library_lims_by_sample
+
+Search for library by sample id in lims
+
+=cut
+sub search_library_lims_by_sample {
+  my ($self, $id_sample_lims) = @_;
+
+  if (!defined $id_sample_lims) {
+    croak q[Id sample lims not defined when querying for library lims];
+  }
+
+  my $where = {'id_sample_lims' => $id_sample_lims,};
+
+  my $rs = $self->resultset('Sample')->
+             search($where, {
+               prefetch => ['iseq_flowcell'],
+             });
+
+  return $rs;
+}
+
+=head2 search_sample_lims_by_id
+
+Search sample by id
+
+=cut
+sub search_sample_lims_by_id {
+  my ($self, $id_sample_lims) = @_;
+
+  if (!defined $id_sample_lims) {
+    croak q[Id sample lims not defined when querying sample lims];
+  };
+
+  my $rs = $self->resultset('Sample')->search(
+    { id_sample_lims => $id_sample_lims, },
+    { prefetch => { 'iseq_flowcells' => { 'iseq_product_metrics' => 'iseq_run_lane_metric' } } },
+  );
+
+  return $rs;
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -81,5 +185,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
-

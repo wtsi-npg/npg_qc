@@ -107,7 +107,7 @@ sub parsing_metrics_file {
 
   my $header = $file_contents[0];
   chomp $header;
-  $self->set_info('Picard_metrics_header', $header);
+  $self->set_info('markdups_metrics_header', $header);
 
   my ($metrics_source) = $header =~ /(MarkDuplicates | EstimateLibraryComplexity | bam\S*markduplicates)/mxs;
 

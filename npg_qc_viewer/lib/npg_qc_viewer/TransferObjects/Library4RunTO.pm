@@ -1,38 +1,85 @@
-package npg_qc_viewer::Model::WarehouseDB;
+package npg_qc_viewer::TransferObjects::Library4RunTO;
 
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
+use npg_tracking::util::types;
 
-our $VERSION  = '0';
-
+our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
 
-npg_qc_viewer::Model::WarehouseDB
+npg_qc_viewer::TransferObjects::Library4RunTO
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Catalyst::Model::DBIC::Schema Model using schema npg_warehouse::Schema
+A transfer object to pass Library <-> Run data from the model to the view.
 
 =head1 SUBROUTINES/METHODS
 
 =cut
 
+=head2 position
 
-__PACKAGE__->config(
-    schema_class => 'npg_warehouse::Schema',
-    connect_info => [], #a fall-back position if connect_info is not defined in the config file
+Lane number.
+
+=cut
+has 'position'    => (
+  isa      => 'NpgTrackingLaneNumber',
+  is       => 'rw',
+  required => 1,
+);
+
+=head2 id_run
+
+Run id.
+
+=cut
+has 'id_run'      => (
+  isa      => 'NpgTrackingRunId',
+  is       => 'rw',
+  required => 1,
+);
+
+=head2 tag_index
+
+Plex.
+
+=cut
+has 'tag_index'      => (
+  isa      => 'Maybe[Int]',
+  is       => 'rw',
+  required => 0,
+);
+
+=head2 id_library_lims
+
+New id for library in ML Data Warehouse
+
+=cut
+has 'id_library_lims' => (
+  isa      => 'Maybe[Int]',
+  is       => 'rw',
+  required => 1,
+);
+
+=head2 legacy_library_id
+
+Old id for library in ML Data Warehouse
+
+=cut
+has 'legacy_library_id' => (
+  isa      => 'Maybe[Int]',
+  is       => 'rw',
+  required => 0,
 );
 
 __PACKAGE__->meta->make_immutable;
 
 1;
-
 __END__
 
 =head1 DIAGNOSTICS
@@ -47,9 +94,7 @@ __END__
 
 =item namespace::autoclean
 
-=item Catalyst::Model::DBIC::Schema
-
-=item npg_warehouse::Schema
+=item npg_tracking::util::types
 
 =back
 
@@ -59,13 +104,11 @@ __END__
 
 =head1 AUTHOR
 
-David Jackson
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2015 Genome Research Ltd.
 
-This file is part of NPG software.
+This file is part of NPG.
 
 NPG is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -81,5 +124,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
-
