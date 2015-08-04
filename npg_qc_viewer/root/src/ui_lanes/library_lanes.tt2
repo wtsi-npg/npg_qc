@@ -122,7 +122,7 @@
 [%- END -%]
 
 [%- IF lane_info_to.id_library_lims; lurl = [lims_url, 'assets', lane_info_to.legacy_library_id]; -%]
-  <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => lane_info_to.legacy_library_id}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
+  <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => lane_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
   [%- IF !lane_collection.run_lane_plex_flags.$lane_key-%]
     <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lane_info_to.id_library_lims | html %]</span></a>
   [%- ELSE -%]
