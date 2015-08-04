@@ -143,6 +143,26 @@ has 'sample_name' => (
   required => 0,
 );
 
+=head2 id_library_lims
+
+Id of library lims
+
+=cut
+has 'id_library_lims' => (
+  is       => 'rw',
+  required => 0,
+);
+
+=head2 legacy_library_id
+
+Legacy library id lims
+
+=cut
+has 'legacy_library_id' => (
+  is       => 'rw',
+  required => 0,
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
