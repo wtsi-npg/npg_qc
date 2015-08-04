@@ -276,7 +276,7 @@ sub _run_lanes_from_dwh {
   my $row_data = {};
   my $model_mlwh = $c->model('MLWarehouseDB');
 
-  $rs = $model_mlwh->search_product_metrics_by_run($where);
+  $rs = $model_mlwh->search_product_metrics($where);
 
   $rs = $model_mlwh->resultset('IseqProductMetric')->
                      search($where, {
@@ -307,9 +307,10 @@ sub _run_lanes_from_dwh {
         if ( defined $product_metric->iseq_flowcell->sample ) {
           my $sample_row = $product_metric->iseq_flowcell->sample;
 
-          #TODO pass through facade
-          $values->{'id_sample_lims'} = $sample_row->id_sample_lims;
-          $values->{'name'}           = $sample_row->name;
+          my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
+
+          $values->{'id_sample_lims'} = $sample->id_sample_lims;
+          $values->{'name'}           = $sample->name;
         }
 
         if ( defined $product_metric->iseq_flowcell->study ) {
