@@ -8,27 +8,3 @@ CREATE TABLE `samtools_stats` (
   UNIQUE KEY `unq_sequence_stats` (`id_bam_flagstats`,`filter`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
-CREATE TABLE `sequence_format` (
-  `id_sequence_format` TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name`               VARCHAR(8) NOT NULL, # bam, cram, ...
-  PRIMARY KEY (`id_sequence_format`),
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
-
-CREATE TABLE `sequence_summary` (
-  `id_sequence_summary` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_bam_flagstats`    BIGINT(20) UNSIGNED NOT NULL,
-  `id_sequence_format`  TINYINT UNSIGNED NOT NULL,
-  `id_run`              BIGINT(20) UNSIGNED NOT NULL,
-  `position`            TINYINT(1) UNSIGNED NOT NULL,
-  `tag_index`           MEDIUMINT,
-  `subset`              VARCHAR(10) NOT NULL,
-  `header`              TEXT NOT NULL,
-  `seqchksum`           TEXT,
-  `sha512seqchksum`     TEXT,
-  `md5`                 CHAR(32) NOT NULL,
-  `date`                TIMESTAMP NOT NULL, # to keep the history
-  `iscurrent`           TINYINT(1) NOT NULL DEFAULT 0, # by popular demand
-  PRIMARY KEY (`id_sequence_summary`),
-  CONSTRAINT `seq_summary_fk_sequence_format` FOREIGN KEY (`id_sequence_format`) REFERENCES `sequence_format` (`id_sequence_format`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `seq_summary_fk_bam_flagstats` FOREIGN KEY (`id_bam_flagstats`) REFERENCES `bam_flagstats` (`id_bam_flagstats`) ON DELETE SET NULL ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
