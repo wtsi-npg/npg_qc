@@ -35,7 +35,7 @@ __PACKAGE__->config(
     connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
-=head2 search_product_metrics_by_run
+=head2 search_product_metrics
 
 Search product metrics by where conditions (me.id_run, me.position).
 
