@@ -71,8 +71,6 @@
     legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
     
     FOREACH lane_key IN sorted_rl_map_keys;
-      is_dev = 0;
-
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
       attrs = util.inflate_rpt_key(lane_key);
@@ -80,7 +78,6 @@
       id_run   = attrs.id_run;
       position  = attrs.position;
       tag_index = '';
-      
       table_row = '';
       
       IF attrs.defined('tag_index');
@@ -93,24 +90,16 @@
         END;
       ELSE;
         table_row = rs.search({'me.id_run' => id_run, 'me.position' => position,}).first();
-        IF table_row;
-          is_dev = table_row.is_dev;
-        END;
       END;
 
       lane_info_to = c.stash.row_data.$lane_key;
       time_comp = String.new(text => "$lane_info_to.time_comp");
 
-      lib = '';                     #id_library_lims@iseq_flowcell
-      library_id = '';              #id_library_lims@iseq_flowcell
-
       IF table_row;
-        lib                             = table_row.iseq_flowcell.id_library_lims;      #table_row.library_name;
-        library_id                      = table_row.iseq_flowcell.legacy_library_id;    #table_row.asset_id;
-        libs_info.$lane_key.lib_name    = lib;
+        libs_info.$lane_key.lib_name    = lane_info_to.id_library_lims;
+        libs_info.$lane_key.library_id  = lane_info_to.legacy_library_id;
         libs_info.$lane_key.sample_name = lane_info_to.sample_name;
         libs_info.$lane_key.sample_id   = lane_info_to.id_sample_lims;
-        libs_info.$lane_key.library_id  = library_id;
         libs_info.$lane_key.study_id    = lane_info_to.study_name;
         studies_info.$study_id          = lane_info_to.study_name;
       END;
@@ -132,15 +121,15 @@
   <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
 
-[%- IF lib; lurl = [lims_url, 'assets', library_id]; -%]
-  <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => lib}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
+[%- IF lane_info_to.id_library_lims; lurl = [lims_url, 'assets', lane_info_to.legacy_library_id]; -%]
+  <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => lane_info_to.legacy_library_id}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
   [%- IF !lane_collection.run_lane_plex_flags.$lane_key-%]
-    <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>
+    <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lane_info_to.id_library_lims | html %]</span></a>
   [%- ELSE -%]
-    <span class="lib nbsp">[% lib | html %]</span>
+    <span class="lib nbsp">[% lane_info_to.id_library_lims | html %]</span>
   [%- END -%]
 [%- END -%]
-[% IF is_dev %]<span class="watermark">R&amp;D</span>[% END %]
+[% IF lane_info_to.rnd %]<span class="watermark">R&amp;D</span>[% END %]
 </div>
 </td>
 [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run); %]

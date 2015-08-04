@@ -270,6 +270,7 @@ sub _run_lanes_from_dwh {
         $values->{'manual_qc'}         = $product_metric->iseq_flowcell->manual_qc;
         $values->{'id_library_lims'}   = $product_metric->iseq_flowcell->id_library_lims;
         $values->{'legacy_library_id'} = $product_metric->iseq_flowcell->legacy_library_id;
+        $values->{'rnd'}               = $product_metric->iseq_flowcell->is_r_and_d;
 
         if ( defined $product_metric->iseq_flowcell->sample ) {
           my $sample_row = $product_metric->iseq_flowcell->sample;

@@ -163,6 +163,16 @@ has 'legacy_library_id' => (
   required => 0,
 );
 
+=head2 rnd
+
+Flag for R&D runs
+
+=cut
+has 'rnd' => (
+  is       => 'rw',
+  required => 0,
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
