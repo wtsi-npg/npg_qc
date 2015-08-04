@@ -102,43 +102,13 @@ sub _show_option {
     return $what;
 }
 
-#sub _rl_map_append {
-#    my ($self, $c, $rl_map) = @_;
-#    my $size = scalar keys %{$rl_map};
-#    $c->log->debug(qq[Before $size]);
-#    my $wh_rl_map = {};
-#    my $rs_name = q[rs];
-#    if ($c->stash->{$rs_name}) {
-#      my $rs = $c->stash->{$rs_name};
-#      while (my $row = $rs->next) {
-#        my $rpt_key = $row->rpt_key;
-#        $wh_rl_map->{$rpt_key} = 1;
-#        if (!exists  $rl_map->{$rpt_key}) {
-#          $rl_map->{$rpt_key} = undef;
-#        }
-#      }
-#      $rs->reset;
-#    }
-#    $size = scalar keys %{$rl_map};
-#    $c->log->debug(qq[After $size]);
-#    return $wh_rl_map;
-#}
-
 sub _data2stash {
     my ($self, $c, $collection) = @_;
 
     my $rl_map = $collection->run_lane_collections;
     my @rl_map_keys = keys %{$rl_map};
     my $has_plexes = npg_qc::autoqc::role::rpt_key->has_plexes(\@rl_map_keys);
-#    my $wh_rl_map = $self->_rl_map_append($c, $rl_map);
-#
-#    if ($c->stash->{'sample_link'} && $has_plexes && scalar keys %{$wh_rl_map}) {
-#        foreach my $key (keys %{$rl_map}) {
-#            if (!exists $wh_rl_map->{$key}) {
-#                delete $rl_map->{$key};
-#            }
-#        }
-#    }
+
     $c->stash->{'rl_map'}         = $rl_map;
     $c->stash->{'has_plexes'}     = $has_plexes;
     $c->stash->{'collection_all'} = $collection;
@@ -294,12 +264,16 @@ sub _run_lanes_from_dwh {
 
     if ( !defined $row_data->{$key} ) {
       my $values = {};
+      #TODO maybe validate
       $values->{'id_run'}       = $product_metric->id_run;
       $values->{'position'}     = $product_metric->position;
       $values->{'tag_sequence'} = $product_metric->tag_sequence4deplexing;
-      $values->{'num_cycles'}   = $product_metric->iseq_run_lane_metric->cycles;
-      $values->{'time_comp'}    = $product_metric->iseq_run_lane_metric->run_complete;
       $values->{'tag_index'}    = $product_metric->tag_index;
+
+      if ( defined $product_metric->iseq_run_lane_metric ) {
+        $values->{'num_cycles'}   = $product_metric->iseq_run_lane_metric->cycles;
+        $values->{'time_comp'}    = $product_metric->iseq_run_lane_metric->run_complete;
+      }
 
       if ( defined $product_metric->iseq_flowcell ) {
         $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
