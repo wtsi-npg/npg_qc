@@ -3,8 +3,6 @@ package npg_qc_viewer::TransferObjects::SampleFacade;
 use Moose;
 use namespace::autoclean;
 
-use npg_tracking::util::types;
-
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
