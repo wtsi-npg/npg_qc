@@ -78,24 +78,15 @@
       id_run   = attrs.id_run;
       position  = attrs.position;
       tag_index = '';
-      table_row = '';
-      
+
       IF attrs.defined('tag_index');
         tag_index = attrs.tag_index;
-        table_row = rs.search({'me.id_run' => id_run, 'me.position' => position, 'me.tag_index' => tag_index}).first();
-        IF table_row;
-          IF !run_info.exists($id_run);
-              run_info.$id_run = table_row.npg_info;
-          END;
-        END;
-      ELSE;
-        table_row = rs.search({'me.id_run' => id_run, 'me.position' => position,}).first();
       END;
 
       lane_info_to = c.stash.row_data.$lane_key;
       time_comp = String.new(text => "$lane_info_to.time_comp");
 
-      IF table_row;
+      IF lane_info_to;
         libs_info.$lane_key.lib_name    = lane_info_to.id_library_lims;
         libs_info.$lane_key.library_id  = lane_info_to.legacy_library_id;
         libs_info.$lane_key.sample_name = lane_info_to.sample_name;
