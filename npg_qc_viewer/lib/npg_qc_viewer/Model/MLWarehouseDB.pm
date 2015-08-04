@@ -37,26 +37,17 @@ __PACKAGE__->config(
 
 =head2 search_product_metrics_by_run
 
-Search product metrics by id_run (and position if provided).
+Search product metrics by where conditions (me.id_run, me.position).
 
 =cut
 sub search_product_metrics_by_run {
-  my ($self, $id_run, $position) = @_;
-
-  if(!defined $id_run) {
-    croak q[Id run not defined when querying metrics by id_run];
-  }
-
-  my $where = {'me.id_run' => $id_run};
-  if(defined $position) {
-    $where->{'me.position'} = $position;
-  }
+  my ($self, $where) = @_;
 
   my $rs = $self->resultset('IseqProductMetric')->
-             search($where, {
-               prefetch => ['iseq_run_lane_metric', 'iseq_flowcell' ],
-               join => [ 'iseq_run_lane_metric', 'iseq_flowcell' ]
-             });
+                     search($where, {
+                       prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+                       order_by => qw[ me.id_run me.position me.tax_index ],
+                     },);
 
   return $rs;
 }
@@ -103,23 +94,12 @@ sub search_library_lims_by_sample {
     croak q[Id sample lims not defined when querying for library lims];
   }
 
-  my $where = { 'sample.id_sample_lims' => $id_sample_lims,};
+  my $where = {'id_sample_lims' => $id_sample_lims,};
 
-  my $rs = $self->resultset('IseqProductMetric')->
+  my $rs = $self->resultset('Sample')->
              search($where, {
-               join => [{'iseq_flowcell' => 'sample'}],
-               '+columns'  => ['me.id_run',
-                               'me.position',
-                               'me.tag_index',
-                               'iseq_flowcell.id_library_lims',
-                               'iseq_flowcell.legacy_library_id',
-               ],
-               group_by => qw[me.id_run
-                              me.position
-                              me.tag_index
-                              iseq_flowcell.id_library_lims
-                              iseq_flowcell.legacy_library_id],
-  });
+               prefetch => ['iseq_flowcell'],
+             });
 
   return $rs;
 }

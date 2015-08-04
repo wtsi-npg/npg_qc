@@ -275,6 +275,8 @@ sub _run_lanes_from_dwh {
   my $row_data = {};
   my $model_mlwh = $c->model('MLWarehouseDB');
 
+  $rs = $model_mlwh->search_product_metrics_by_run($where); 
+
   $rs = $model_mlwh->resultset('IseqProductMetric')->
                      search($where, {
                        prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
@@ -302,14 +304,17 @@ sub _run_lanes_from_dwh {
         $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
 
         if ( defined $product_metric->iseq_flowcell->sample ) {
+          my $sample_row = $product_metric->iseq_flowcell->sample;
+          
           #TODO pass through facade
-          $values->{'id_sample_lims'} = $product_metric->iseq_flowcell->sample->id_sample_lims;
-          $values->{'name'}           = $product_metric->iseq_flowcell->sample->name;
+          $values->{'id_sample_lims'} = $sample_row->id_sample_lims;
+          $values->{'name'}           = $sample_row->name;
         }
 
         if ( defined $product_metric->iseq_flowcell->study ) {
-          $values->{'id_study_lims'} = $product_metric->iseq_flowcell->study->id_study_lims;
-          $values->{'study_name'}    = $product_metric->iseq_flowcell->study->name;
+          my $study_row = $product_metric->iseq_flowcell->study;
+          $values->{'id_study_lims'} = $study_row->id_study_lims;
+          $values->{'study_name'}    = $study_row->name;
         }
       }
 
