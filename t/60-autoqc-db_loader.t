@@ -1,11 +1,15 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
 use Perl6::Slurp;
 use JSON;
+use File::Temp qw/ tempdir /;
+use File::Copy;
+use Compress::Zlib;
+
 use npg_testing::db;
 
 use_ok('npg_qc::autoqc::db_loader');
@@ -326,9 +330,9 @@ subtest 'load bam_flagstats and stats files' => sub {
   plan tests => 10;
   
   my $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
+       schema  => $schema,
        verbose => 1,
-       path => ['t/data/autoqc/bam_flagstats'],
+       path    => ['t/data/autoqc/bam_flagstats'],
   );
   warnings_like { $db_loader->load() } [
 qr/16960_1\#0\.bam_flagstats\.json: not loading field \'flagstats_metrics_file\'/,
@@ -376,6 +380,79 @@ qr/2 json files have been loaded/
 
   @stats = $rs->search({'filter' => 'F0xB00'})->all();
   is(scalar @stats, 2, 'two stats records for filter F0xB00');
+};
+
+subtest 'reload bam_flagstats and stats files' => sub {
+   plan tests => 14;
+
+   my $tempdir = tempdir( CLEANUP => 1);
+   foreach my $file (glob 't/data/autoqc/bam_flagstats/16960_1#0.*') {
+     copy($file, $tempdir);
+   }
+
+   my $db_loader = npg_qc::autoqc::db_loader->new(
+        schema  => $schema,
+        verbose => 0,
+        path    => [$tempdir]
+   );
+   is($db_loader->update, 1, 'update is true by default');
+   $db_loader->load();
+   is($schema->resultset('SamtoolsStat')->search({})->count, 4, 'number of stats records did not change');
+
+   for my $file (('16960_1#0_F0x900.stats', '16960_1#0_F0xB00.stats')) {
+     open my $fh, '>', join(q[/], $tempdir, $file);
+     print $fh "$file changed\n";
+     close $fh;
+   }
+
+   my $json_file = "$tempdir/16960_1#0.bam_flagstats.json";
+   my $json = slurp $json_file;
+   $json =~ s{t/data/autoqc/bam_flagstats}{$tempdir}g;
+   $json =~ s{8333632}{33};
+   open my $fh, '>', $json_file;
+   print $fh $json;
+   close $fh;
+  
+   npg_qc::autoqc::db_loader->new(
+        schema  => $schema,
+        verbose => 0,
+        path    => [$tempdir],
+        update  => 0,
+   )->load();
+   is($schema->resultset('SamtoolsStat')->search({})->count, 4,
+     'number of stats records did not change');
+   my $rs = $schema->resultset('BamFlagstats')->search(
+     {'id_run' => 16960, 'subset' => 'target'}, {cache => 1});
+   is($rs->count, 1, 'one bamflagstats result for target');
+   my $fs = $rs->next;
+   is($fs->mate_mapped_defferent_chr, 8333632, 'old value');
+   my $stats_rs = $fs->samtools_stats;
+   is ($stats_rs->count(), 2, 'two related results');
+   while (my $stats_row = $stats_rs->next) {
+     my $filter = $stats_row->filter;
+     my $expected = "stats file for 16960_1#0_${filter}.stats\n";
+     is(uncompress($stats_row->file_content), $expected, 'stats file content not updated');
+   }
+
+   npg_qc::autoqc::db_loader->new(
+        schema  => $schema,
+        verbose => 0,
+        path    => [$tempdir],
+   )->load();
+   is($schema->resultset('SamtoolsStat')->search({})->count, 4,
+     'number of stats records did not change');
+   $rs = $schema->resultset('BamFlagstats')->search(
+     {'id_run' => 16960, 'subset' => 'target'}, {cache => 1});
+   is($rs->count, 1, 'one bamflagstats result for target');
+   $fs = $rs->next;
+   is($fs->mate_mapped_defferent_chr, 33, 'new value');
+   $stats_rs = $fs->samtools_stats;
+   is ($stats_rs->count(), 2, 'two related results');
+   while (my $stats_row = $stats_rs->next) {
+     my $filter = $stats_row->filter;
+     my $expected = "16960_1#0_${filter}.stats changed\n";
+     is(uncompress($stats_row->file_content), $expected, 'updated stats file content');
+   }
 };
 
 1;
