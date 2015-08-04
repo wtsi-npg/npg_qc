@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -320,6 +320,62 @@ subtest 'bamflagstats - both subset and human_split filters should work' => sub 
   is ($rs->search({subset => 'target'})->count, 6, '6 bam flagstats records for target files');
   is ($rs->search({subset => 'human'})->count, 2, '2 bam flagstats records for human files');
   is ($rs->search({subset => 'phix'})->count, 1, '1 bam flagstats records for phix files');
+};
+
+subtest 'load bam_flagstats and stats files' => sub {
+  plan tests => 10;
+  
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+       schema => $schema,
+       verbose => 1,
+       path => ['t/data/autoqc/bam_flagstats'],
+  );
+  warnings_like { $db_loader->load() } [
+qr/16960_1\#0\.bam_flagstats\.json: not loading field \'flagstats_metrics_file\'/,
+qr/16960_1\#0\.bam_flagstats\.json: not loading field \'samtools_stats_file\'/,
+qr/16960_1\#0\.bam_flagstats\.json: not loading field \'markdups_metrics_file\'/,
+qr/Creating related record for samtools_stats/,
+qr/Creating related record for samtools_stats/,
+qr/Loaded t\/data\/autoqc\/bam_flagstats\/16960_1\#0\.bam_flagstats\.json/,
+qr/16960_1\#0_phix\.bam_flagstats\.json: not loading field \'flagstats_metrics_file\'/,
+qr/16960_1\#0_phix\.bam_flagstats\.json: not loading field \'samtools_stats_file\'/,
+qr/16960_1\#0_phix\.bam_flagstats\.json: not loading field \'markdups_metrics_file\'/,
+qr/Creating related record for samtools_stats/,
+qr/Creating related record for samtools_stats/,
+qr/Loaded t\/data\/autoqc\/bam_flagstats\/16960_1\#0_phix\.bam_flagstats\.json/,
+qr/2 json files have been loaded/
+  ], 'warnings in verbose mode';
+  
+  my $rs = $schema->resultset('BamFlagstats');
+  my @results = $rs->search({id_run => 16960})->all();
+  is(scalar @results, 2, 'two bam_flagstats records created');
+
+  my $phix_count = 0;
+  my $target_count = 0;
+  foreach my $row (@results) {
+    if ($row->subset) {
+      if ($row->subset eq 'phix') {
+        $phix_count++;
+      }
+    } else {
+      $target_count++;
+    }
+    my @stats = $row->samtools_stats->all();
+    is(scalar @stats, 2, 'two stats records created');
+  }
+
+  is($phix_count, 1, 'one result for phix');
+  is($target_count, 1, 'one result for target');
+
+  $rs = $schema->resultset('SamtoolsStat');
+  my @stats = $rs->search({'filter' => 'F0x900'})->all();
+  is(scalar @stats, 2, 'two stats records for filter F0x900');
+  foreach my $row (@stats) {
+    is($row->bam_flagstat->id_run, 16960, 'can go back to the parent record');
+  }
+
+  @stats = $rs->search({'filter' => 'F0xB00'})->all();
+  is(scalar @stats, 2, 'two stats records for filter F0xB00');
 };
 
 1;
