@@ -354,7 +354,6 @@ sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
 
     if (defined $c->request->query_parameters->{run}) {
         $c->stash->{'db_lookup'} = 1;
-        $c->stash->{'display'}   = 'runs';
         $self->_display_run_lanes($c);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
@@ -377,7 +376,6 @@ sub checks_in_run :Chained('base') :PathPart('runs') :Args(1) {
     $c->stash->{'title'}     = _get_title(qq[Results for run $id_run]);
     $c->stash->{'run_view'}  = 1;
     $c->stash->{'id_run'}    = $id_run;
-    $c->stash->{'display'}   = 'runs';
     $self->_display_run_lanes($c, {run => [$id_run],} );
     return;
 }
@@ -394,7 +392,6 @@ sub runs_from_staging :Chained('base') :PathPart('runs-from-staging') :Args(0) {
 
     if (exists $c->request->query_parameters->{run}) {
         $c->stash->{'db_lookup'} = 0;
-        $c->stash->{'display'}   = 'runs';
         $self->_display_run_lanes($c);
     } else {
         $c->stash->{error_message} =
@@ -420,7 +417,6 @@ sub checks_in_run_from_staging :Chained('base') :PathPart('runs-from-staging') :
     $c->stash->{'run_from_staging'} = 1;
     $c->stash->{'run_view'}         = 1;
     $c->stash->{'id_run'}           = $id_run;
-    $c->stash->{'display'}          = 'runs';
     $self->_display_run_lanes($c, {run => [$id_run],} );
     return;
 }
@@ -447,7 +443,6 @@ sub checks_from_path :Chained('base') :PathPart('path') :Args(0) {
       $self->_data2stash($c, $collection);
       $c->stash->{'db_lookup'} = 0;
       $c->stash->{'path_list'} = [@path];
-      $c->stash->{'display'}   = 'runs';
       $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
   } else {
       $c->stash->{error_message} =
@@ -471,7 +466,6 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
             $id_library_lims = [$id_library_lims];
         }
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
-        $c->stash->{'display'} = 'libraries';
         my $rs = $self->_fetch_libs_by_lib($c, $id_library_lims);
         $self->_display_libs($c, $rs);
     } else {
