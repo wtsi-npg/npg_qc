@@ -247,12 +247,6 @@ sub _run_lanes_from_dwh {
 
   $rs = $model_mlwh->search_product_metrics($where);
 
-  $rs = $model_mlwh->resultset('IseqProductMetric')->
-                     search($where, {
-                       prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-                       order_by => qw[ me.id_run me.position me.tax_index ],
-                     },);
-
   while (my $product_metric = $rs->next) {
     my $key;
     if ($retrieve_option == $LANES) {
@@ -275,7 +269,9 @@ sub _run_lanes_from_dwh {
       }
 
       if ( defined $product_metric->iseq_flowcell ) {
-        $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
+        $values->{'manual_qc'}         = $product_metric->iseq_flowcell->manual_qc;
+        $values->{'id_library_lims'}   = $product_metric->iseq_flowcell->id_library_lims;
+        $values->{'legacy_library_id'} = $product_metric->iseq_flowcell->legacy_library_id;
 
         if ( defined $product_metric->iseq_flowcell->sample ) {
           my $sample_row = $product_metric->iseq_flowcell->sample;
@@ -299,8 +295,8 @@ sub _run_lanes_from_dwh {
     }
   }
 
-  $rs->reset;
-  $c->stash->{'rs'} = $rs;
+  $rs->reset; #TODO stop returning rs after I'm sure it is not used in template.
+  $c->stash->{'rs'} = $rs; #TODO stop returning rs after I'm sure it is not used in template.
   $c->stash->{'row_data'} = $row_data;
 
   return;
