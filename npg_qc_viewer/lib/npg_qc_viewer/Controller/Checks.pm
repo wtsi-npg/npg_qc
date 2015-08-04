@@ -5,7 +5,7 @@ use namespace::autoclean;
 use Moose::Meta::Class;
 use URI::URL;
 use Carp;
-use List::MoreUtils qw[ any zip ];
+use List::MoreUtils qw/ any /;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
