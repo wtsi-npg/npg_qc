@@ -47,8 +47,8 @@ sub search_product_metrics {
     croak q[Conditions were not provided for search];
   }
 
-  if(!defined $where->id_run) {
-    croak q[Id run not defined when querying metrics by id_run];
+  if(!defined $where->{'me.id_run'}) {
+    croak q[Id run not defined when querying metrics by me.id_run];
   }
 
   my $rs = $self->resultset('IseqProductMetric')->
