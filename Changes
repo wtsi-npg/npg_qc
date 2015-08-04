@@ -3,6 +3,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - autoqc db loader extended to save data to child tables
  - samtools flagstats files saved to a child table of bam_flagstats
 
+release 58.9
  - move method for file name creation from SeqQC to autoqc so that it's
    more accessible
  - SeqQC
