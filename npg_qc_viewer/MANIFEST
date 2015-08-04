@@ -255,8 +255,5 @@ t/data/sources4visuals/empty.fastqcheck
 t/data/test_app.conf
 t/data/test_app_no_db.conf
 t/perlcriticrc
-t/README
-t/scripts/npg_fixtures.pl
-t/scripts/npgqc_fixtures.pl
 t/util.pm
 
