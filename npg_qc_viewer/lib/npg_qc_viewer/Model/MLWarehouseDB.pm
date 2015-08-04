@@ -73,19 +73,11 @@ sub search_library_lims_by_id {
     croak q[Id library lims not defined when querying library lims];
   }
 
-  my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims,
-                'me.tag_index' => [ undef, { q[!=], 0 }],};
+  my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims, };
 
   my $rs = $self->resultset('IseqProductMetric')->
              search($where, {
                join => ['iseq_flowcell'],
-               '+columns'  => ['me.id_run',
-                               'me.position',
-                               'me.tag_index',
-                               'iseq_flowcell.id_library_lims',
-                               'iseq_flowcell.legacy_library_id',
-               ],
-               group_by => qw[me.id_run me.position me.tag_index iseq_flowcell.id_library_lims iseq_flowcell.legacy_library_id],
   });
 
   return $rs;
