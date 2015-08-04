@@ -10,7 +10,7 @@ our $VERSION = '0';
 
 =begin stopwords
 
-deplexing
+deplexing lims
 
 =end stopwords
 

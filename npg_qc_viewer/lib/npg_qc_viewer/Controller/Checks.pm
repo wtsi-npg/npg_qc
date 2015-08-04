@@ -10,6 +10,7 @@ use List::MoreUtils qw[ any zip ];
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
 use npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
+use npg_qc_viewer::TransferObjects::SampleFacade;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -101,27 +102,27 @@ sub _show_option {
     return $what;
 }
 
-sub _rl_map_append {
-    my ($self, $c, $rl_map) = @_;
-    my $size = scalar keys %{$rl_map};
-    $c->log->debug(qq[Before $size]);
-    my $wh_rl_map = {};
-    my $rs_name = q[rs];
-    if ($c->stash->{$rs_name}) {
-      my $rs = $c->stash->{$rs_name};
-      while (my $row = $rs->next) {
-        my $rpt_key = $row->rpt_key;
-        $wh_rl_map->{$rpt_key} = 1;
-        if (!exists  $rl_map->{$rpt_key}) {
-          $rl_map->{$rpt_key} = undef;
-        }
-      }
-      $rs->reset;
-    }
-    $size = scalar keys %{$rl_map};
-    $c->log->debug(qq[After $size]);
-    return $wh_rl_map;
-}
+#sub _rl_map_append {
+#    my ($self, $c, $rl_map) = @_;
+#    my $size = scalar keys %{$rl_map};
+#    $c->log->debug(qq[Before $size]);
+#    my $wh_rl_map = {};
+#    my $rs_name = q[rs];
+#    if ($c->stash->{$rs_name}) {
+#      my $rs = $c->stash->{$rs_name};
+#      while (my $row = $rs->next) {
+#        my $rpt_key = $row->rpt_key;
+#        $wh_rl_map->{$rpt_key} = 1;
+#        if (!exists  $rl_map->{$rpt_key}) {
+#          $rl_map->{$rpt_key} = undef;
+#        }
+#      }
+#      $rs->reset;
+#    }
+#    $size = scalar keys %{$rl_map};
+#    $c->log->debug(qq[After $size]);
+#    return $wh_rl_map;
+#}
 
 sub _data2stash {
     my ($self, $c, $collection) = @_;

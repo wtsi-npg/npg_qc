@@ -40,14 +40,22 @@ __PACKAGE__->config(
 Search product metrics by where conditions (me.id_run, me.position).
 
 =cut
-sub search_product_metrics_by_run {
+sub search_product_metrics {
   my ($self, $where) = @_;
 
+  if(!defined $where){
+    croak q[Conditions were not provided for search];
+  }
+
+  if(!defined $where->id_run) {
+    croak q[Id run not defined when querying metrics by id_run];
+  }
+
   my $rs = $self->resultset('IseqProductMetric')->
-                     search($where, {
-                       prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-                       order_by => qw[ me.id_run me.position me.tax_index ],
-                     },);
+                  search($where, {
+                    prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+                    order_by => qw[ me.id_run me.position me.tax_index ],
+                  },);
 
   return $rs;
 }
@@ -117,7 +125,8 @@ sub search_sample_lims_by_id {
   };
 
   my $rs = $self->resultset('Sample')->search(
-    {id_sample_lims => $id_sample_lims,}
+    { id_sample_lims => $id_sample_lims, },
+    { prefetch => { 'iseq_flowcells' => { 'iseq_product_metrics' => 'iseq_run_lane_metric' } } },
   );
 
   return $rs;

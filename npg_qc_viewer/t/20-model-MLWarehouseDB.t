@@ -46,7 +46,7 @@ subtest 'Data for sample' => sub {
   ok (defined $rs, "Sample resultset");
   $rs = $rs->search({id_sample_lims => 2617});
   cmp_ok($rs->count, '==', 1, "Found sample by id_sample_lims");
-  
+
   $rs = $m->search_sample_lims_by_id(2617);
   cmp_ok($rs->count, '==', 1, "Found sample when using method from Model");
   my $sample = $rs->next;
