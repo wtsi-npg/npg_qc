@@ -73,9 +73,7 @@ sub _get_sample_lims {
     return;
   }
 
-  my $sample = {};
-  $sample->{'id_sample_lims'} = $row->get_column('id_sample_lims');
-  $sample->{'name'} = $row->get_column('name') || $row->('id_sample_lims');
+  my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $row});
 
   return $sample;
 }
