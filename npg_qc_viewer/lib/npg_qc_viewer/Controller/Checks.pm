@@ -138,16 +138,18 @@ sub _display_libs {
     my ($self, $c, $rs, $no_plexes) = @_;
 
     if ($rs) {
-        # tag_index is NULL OR tag_index != 0
-
-        $c->stash->{'rs'} = $rs;
-
         $c->stash->{'db_lookup'} = 1;
 
         my $run_lane_map = {};
         while (my $row = $rs->next) {
-            my $id_run = $row->get_column('id_run');
-            my $position = $row->get_column('position');
+            my $id_run = $row->id_run;
+            my $position = $row->position;
+
+            my $where = {};
+            $where->{'me.id_run'}   = $id_run;
+            $where->{'me.position'} = $position;
+            $self->_run_lanes_from_dwh($c, $where, $ALL);
+
             if (exists $run_lane_map->{$id_run}) {
                 if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
                     push  @{$run_lane_map->{$id_run}}, $position;
@@ -240,7 +242,12 @@ sub _run_lanes_from_dwh {
   my ($self, $c, $where, $retrieve_option) = @_;
 
   my $rs;
-  my $row_data = {};
+  my $row_data;
+  if (defined $c->stash->{'row_data'}) {
+    $row_data = $c->stash->{'row_data'};
+  } else {
+    $row_data = {};
+  }
   my $model_mlwh = $c->model('MLWarehouseDB');
 
   $rs = $model_mlwh->search_product_metrics($where);
@@ -294,8 +301,6 @@ sub _run_lanes_from_dwh {
     }
   }
 
-  $rs->reset; #TODO stop returning rs after I'm sure it is not used in template.
-  $c->stash->{'rs'} = $rs; #TODO stop returning rs after I'm sure it is not used in template.
   $c->stash->{'row_data'} = $row_data;
 
   return;
