@@ -1,12 +1,5 @@
-# Author:        Kevin Lewis
-# Created:       2011-09-29
-#
-#
-
 package npg_qc::autoqc::checks::genotype;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 use Carp;
@@ -15,7 +8,6 @@ use File::Spec::Functions qw(catfile catdir);
 use List::MoreUtils qw { any };
 use File::Slurp;
 use JSON;
-use Data::Dumper;
 use npg_qc::utils::bam_genotype;
 use npg_qc::utils::iRODS;
 use npg_qc::autoqc::types;
@@ -48,10 +40,10 @@ Readonly::Scalar my $MATCH_PASS_THRESHOLD => 0.95;
 Readonly::Scalar my $MATCH_FAIL_THRESHOLD => 0.50;
 Readonly::Scalar my $MAX_ALT_MATCHES => 4;
 
-has '+input_file_ext' => (default => $EXT,);
-has '+aligner'        => (default => 'fasta',);
-has '+id_run' => (required => 0, );
-has '+position' => (isa => 'Maybe[NpgTrackingLaneNumber]', required => 0, );
+has '+file_type' => (default => $EXT,);
+has '+aligner'   => (default => 'fasta',);
+has '+id_run'    => (required => 0, );
+has '+position'  => (isa => 'Maybe[NpgTrackingLaneNumber]', required => 0, );
 
 # Human references repository - look under this directory for human genome reference files
 has 'human_references_repository' => (
@@ -698,13 +690,13 @@ npg_qc::autoqc::checks::genotype - compare genotype from bam with Sequenom QC re
 
 =head1 AUTHOR
 
-    Kevin Lewis, kl2
+Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Kevin Lewis
+Copyright (C) 2015 GRL
 
-This file is part of NPG.
+    This file is part of NPG.
 
 NPG is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

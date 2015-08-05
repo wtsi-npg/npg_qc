@@ -20,7 +20,7 @@ subtest 'object creation' => sub {
       id_run    => $idrun,
       file_type => 'bam');
     isa_ok($check, 'npg_qc::autoqc::checks::check');
-    is($check->input_file_ext, 'bam', 'file type noted');
+    is($check->file_type, 'bam', 'file type noted');
 };
 
 subtest 'validation of attributes' => sub {
@@ -158,7 +158,7 @@ subtest 'finding input' => sub {
                 position  => 1,
                 path      => $path,
                 id_run    => 2549,
-                input_file_ext => q[fastqcheck]);
+                file_type => q[fastqcheck]);
     is (join( q[ ], $check->get_input_files()),
         "$path/2549_1_1.fastqcheck $path/2549_1_2.fastqcheck",
         'two fastqcheck input files found');
@@ -170,7 +170,7 @@ subtest 'finding input' => sub {
                 path      => $path,
                 id_run    => 2549,
                 tag_index => 33,
-                input_file_ext => q[fastqcheck]);
+                file_type => q[fastqcheck]);
     is (join( q[ ], $check->get_input_files()),
         "$path/2549_1_1#33.fastqcheck $path/2549_1_2#33.fastqcheck",
         'two fastqcheck input files found');
@@ -179,7 +179,7 @@ subtest 'finding input' => sub {
                 position  => 2,
                 path      => $path,
                 id_run    => 2549,
-                input_file_ext => q[fastqcheck]);
+                file_type => q[fastqcheck]);
     is (join( q[ ], $check->get_input_files()), "$path/2549_2_1.fastqcheck",
         'one fastqcheck input files found; with _1 to identify the end');
 
@@ -194,7 +194,7 @@ subtest 'finding input' => sub {
                 position  => 2,
                 path      => $path,
                 id_run    => 2549,
-                input_file_ext => q[bam]);
+                file_type => q[bam]);
     is (join( q[ ], $check->get_input_files()), "$path/2549_2.bam", 'bam file for a lane found');
 
     $check =    npg_qc::autoqc::checks::check->new(
@@ -202,7 +202,7 @@ subtest 'finding input' => sub {
                 position  => 6,
                 id_run    => 2549,
                 tag_index => 1,
-                input_file_ext => q[bam]);
+                file_type => q[bam]);
     is (join( q[ ], $check->get_input_files()), "$path/2549_6#1.bam",
         'bam file for a plex found');
 

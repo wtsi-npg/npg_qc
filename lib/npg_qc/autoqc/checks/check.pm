@@ -3,7 +3,6 @@ package npg_qc::autoqc::checks::check;
 use Moose;
 use namespace::autoclean;
 use MooseX::ClassAttribute;
-use MooseX::Aliases;
 use Class::Load qw(load_class);
 use Carp;
 use English qw(-no_match_vars);
@@ -81,18 +80,16 @@ has 'tmp_path'    => (isa        => 'Str',
                       default    => sub { return tempdir(CLEANUP => 1); },
                      );
 
-=head2 input_file_ext
+=head2 file_type
 
-Input file extension.
+File type, also input file extension.
 
 =cut
-has 'input_file_ext' => (isa        => 'Str',
-                         is         => 'ro',
-                         required   => 0,
-                         default    => $FILE_EXTENSION,
-                         writer     => '_set_ext',
-                         alias      => 'file_type',
-                        );
+has 'file_type' => (isa        => 'Str',
+                    is         => 'ro',
+                    required   => 0,
+                    default    => $FILE_EXTENSION,
+                   );
 
 
 =head2 input_file
@@ -200,11 +197,11 @@ sub get_input_files {
 
     my @fnames = ();
     my $forward = join q[.], File::Spec->catfile($self->path, $self->create_filename($self, 1)),
-                             $self->input_file_ext;
+                             $self->file_type;
     my $no_end_forward = undef;
     if (!-e $forward) {
         $no_end_forward = join q[.], File::Spec->catfile($self->path, $self->create_filename($self)),
-                                     $self->input_file_ext;
+                                     $self->file_type;
         if (-e $no_end_forward) {
            $forward = $no_end_forward;
         } else {
@@ -216,7 +213,7 @@ sub get_input_files {
     push @fnames, $forward;
     if (!defined $no_end_forward) {
         my $reverse =  join q[.], File::Spec->catfile($self->path, $self->create_filename($self, 2)),
-                                  $self->input_file_ext;
+                                  $self->file_type;
         if (-e $reverse) {push @fnames, $reverse;}
     }
 
@@ -292,8 +289,6 @@ __END__
 =item namespace::autoclean
 
 =item MooseX::ClassAttribute
-
-=item MooseX::Aliases
 
 =item Class::Load
 
