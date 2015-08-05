@@ -274,7 +274,6 @@ sub _run_lanes_from_dwh {
       }
 
       if ( defined $product_metric->iseq_flowcell ) {
-        $values->{'manual_qc'}         = $product_metric->iseq_flowcell->manual_qc;
         $values->{'id_library_lims'}   = $product_metric->iseq_flowcell->id_library_lims;
         $values->{'legacy_library_id'} = $product_metric->iseq_flowcell->legacy_library_id;
         $values->{'rnd'}               = $product_metric->iseq_flowcell->is_r_and_d;
@@ -298,6 +297,19 @@ sub _run_lanes_from_dwh {
       my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
 
       $row_data->{$key} = $to;
+
+      #To load the run data from a non 0 tag.
+      $key = $product_metric->lane_rpt_key_from_key($product_metric->rpt_key);
+      if ( !defined $row_data->{$key} && $values->{'tag_index'} != 0 ) {
+        #Only for lane
+        $values->{'manual_qc'}         = $product_metric->iseq_flowcell->manual_qc;
+        #Remove non lane relevant data
+        foreach my $plex_only (qw[ tag_sequence id_library_lims legacy_library_id ]) {
+          delete $values->{$plex_only};
+        }
+        $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
+        $row_data->{$key} = $to;
+      }
     }
   }
 
