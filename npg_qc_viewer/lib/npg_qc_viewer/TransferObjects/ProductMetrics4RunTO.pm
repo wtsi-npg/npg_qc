@@ -10,7 +10,7 @@ our $VERSION = '0';
 
 =begin stopwords
 
-deplexing lims
+deplexing lims rnd
 
 =end stopwords
 
@@ -159,6 +159,26 @@ Legacy library id lims
 
 =cut
 has 'legacy_library_id' => (
+  is       => 'rw',
+  required => 0,
+);
+
+=head2 id_pool_lims
+
+Id pool lims
+
+=cut
+has 'id_pool_lims' => (
+  is       => 'rw',
+  required => 0,
+);
+
+=head2 rnd
+
+Flag for R&D runs
+
+=cut
+has 'rnd' => (
   is       => 'rw',
   required => 0,
 );

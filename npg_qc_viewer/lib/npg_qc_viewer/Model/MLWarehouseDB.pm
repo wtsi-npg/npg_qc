@@ -54,7 +54,7 @@ sub search_product_metrics {
   my $rs = $self->resultset('IseqProductMetric')->
                   search($where, {
                     prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-                    order_by => qw[ me.id_run me.position me.tax_index ],
+                    order_by => qw[ me.id_run me.position me.tag_index ],
                     cache    => 1,
                   },);
 
@@ -73,42 +73,36 @@ sub search_library_lims_by_id {
     croak q[Id library lims not defined when querying library lims];
   }
 
-  my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims,
-                'me.tag_index' => [ undef, { q[!=], 0 }],};
+  my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims, };
 
   my $rs = $self->resultset('IseqProductMetric')->
              search($where, {
-               join => ['iseq_flowcell'],
-               '+columns'  => ['me.id_run',
-                               'me.position',
-                               'me.tag_index',
-                               'iseq_flowcell.id_library_lims',
-                               'iseq_flowcell.legacy_library_id',
-               ],
-               group_by => qw[me.id_run me.position me.tag_index iseq_flowcell.id_library_lims iseq_flowcell.legacy_library_id],
+               join  => ['iseq_flowcell'],
+               cache => 1,
   });
 
   return $rs;
 }
 
-=head2 search_library_lims_by_sample
+=head2 search_pool_lims_by_id
 
-Search for library by sample id in lims
+=Search pool by id pool lims.
 
 =cut
-sub search_library_lims_by_sample {
-  my ($self, $id_sample_lims) = @_;
+sub search_pool_lims_by_id {
+  my ($self, $id_pool_lims) = @_;
 
-  if (!defined $id_sample_lims) {
-    croak q[Id sample lims not defined when querying for library lims];
+  if (!defined $id_pool_lims) {
+    croak q[Id pool lims not defined when querying pool lims];
   }
 
-  my $where = {'id_sample_lims' => $id_sample_lims,};
+  my $where = { 'iseq_flowcell.id_pool_lims' => $id_pool_lims, };
 
-  my $rs = $self->resultset('Sample')->
+  my $rs = $self->resultset('IseqProductMetric')->
              search($where, {
-               prefetch => ['iseq_flowcell'],
-             });
+               join  => ['iseq_flowcell'],
+               cache => 1,
+  });
 
   return $rs;
 }
@@ -118,17 +112,21 @@ sub search_library_lims_by_sample {
 Search sample by id
 
 =cut
-sub search_sample_lims_by_id {
+sub search_sample_by_sample_id {
   my ($self, $id_sample_lims) = @_;
 
   if (!defined $id_sample_lims) {
     croak q[Id sample lims not defined when querying sample lims];
   };
 
-  my $rs = $self->resultset('Sample')->search(
-    { id_sample_lims => $id_sample_lims, },
-    { prefetch => { 'iseq_flowcells' => { 'iseq_product_metrics' => 'iseq_run_lane_metric' } } },
-  );
+  my $where = { 'sample.id_sample_lims' => $id_sample_lims, };
+
+  my $rs = $self->resultset('IseqProductMetric')->
+                    search($where, {
+                    prefetch => {'iseq_flowcell' => 'sample'},
+                    join     => {'iseq_flowcell' => 'sample'},
+                    cache    => 1,
+  });
 
   return $rs;
 }
