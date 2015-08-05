@@ -73,7 +73,7 @@ sub _get_sample_lims {
     return;
   }
 
-  my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $row});
+  my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $row->iseq_flowcell->sample});
 
   return $sample;
 }
@@ -273,16 +273,14 @@ sub _run_lanes_from_dwh {
         my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
         $row_data->{$key} = $to;
 
-        if ( $product_metric->tag_index != 0 ) {
-          my $lane_key = $product_metric->lane_rpt_key_from_key($product_metric->rpt_key);
-          if ( !defined $row_data->{$lane_key} ) {
-            foreach my $plex_only (qw[ tag_sequence id_library_lims legacy_library_id ]) {
-              delete $values->{$plex_only};
-            }
-            $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
-            my $lane_to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
-            $row_data->{$lane_key} = $lane_to;
+        my $lane_key = $product_metric->lane_rpt_key_from_key($product_metric->rpt_key);
+        if ( $product_metric->tag_index != 0  && !defined $row_data->{$lane_key} ) {
+          foreach my $plex_only (qw[ tag_sequence id_library_lims legacy_library_id ]) {
+            delete $values->{$plex_only};
           }
+          $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
+          my $lane_to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
+          $row_data->{$lane_key} = $lane_to;
         }
       }
     }
@@ -293,7 +291,7 @@ sub _run_lanes_from_dwh {
   return;
 }
 
-sub _build_hash(){
+sub _build_hash {
   my ($self, $product_metric) = @_;
 
   my $values = {};

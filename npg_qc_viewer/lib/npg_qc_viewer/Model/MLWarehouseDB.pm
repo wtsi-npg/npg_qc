@@ -78,7 +78,7 @@ sub search_library_lims_by_id {
   my $rs = $self->resultset('IseqProductMetric')->
              search($where, {
                join  => ['iseq_flowcell'],
-               cache => 1, 
+               cache => 1,
   });
 
   return $rs;
