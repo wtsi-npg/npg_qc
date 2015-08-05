@@ -268,7 +268,7 @@ my $ref = q[t/data/autoqc];
     my $check = $qc->_create_test_object();
     ok(defined $check->tag_index, 'tag index defined');
     is($check->tag_index, 0, 'tag index 0');
-    is($check->input_file_ext, 'fastq', 'default fastq file type propagated');
+    is($check->file_type, 'fastq', 'default fastq file type propagated');
 
     $qc = npg_qc::autoqc::autoqc->new(
           archive_path => $path,
@@ -284,7 +284,7 @@ my $ref = q[t/data/autoqc];
     $check = $qc->_create_test_object();
     ok(defined $check->tag_index, 'tag index defined');
     is($check->tag_index, 5, 'tag index 5');
-    is($check->input_file_ext, 'bam', 'bam file type propagated');
+    is($check->file_type, 'bam', 'bam file type propagated');
 }
 
 {
@@ -305,7 +305,7 @@ my $ref = q[t/data/autoqc];
     my $check = $qc->_create_test_object();
     ok(defined $check->tag_index, 'tag index defined');
     is($check->tag_index, 2, 'tag index 2');
-    is($check->input_file_ext, 'bam', 'filetype is bam');
+    is($check->file_type, 'bam', 'filetype is bam');
 
     is($check->bam_file, 't/data/autoqc/090721_IL29_2549/data/2549_6#2.bam', 'bam file correct');
 }

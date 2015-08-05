@@ -3,7 +3,6 @@ package npg_qc::autoqc::checks::check;
 use Moose;
 use namespace::autoclean;
 use MooseX::ClassAttribute;
-use MooseX::Aliases;
 use Class::Load qw(load_class);
 use Carp;
 use English qw(-no_match_vars);
@@ -14,7 +13,9 @@ use Readonly;
 
 use npg_tracking::util::types;
 
-with qw/ npg_tracking::glossary::tag /;
+with qw/ npg_tracking::glossary::run
+         npg_tracking::glossary::lane
+         npg_tracking::glossary::tag /;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit)
@@ -49,24 +50,15 @@ has 'path'        => (isa      => 'Str',
 
 =head2 position
 
-Lane number. An integer from 1 to 8 inclusive. Read-only.
-
-=cut
-has 'position'    => (isa       => 'NpgTrackingLaneNumber',
-                      is        => 'ro',
-                      required  => 1,
-                     );
-
+Lane number. An integer from 1 to 8 inclusive.
 
 =head2 id_run
 
-Run id for the lane to be checked. Read-only.
+Run id for the lane to be checked.
 
-=cut
-has 'id_run'      => (isa      => 'NpgTrackingRunId',
-                      is       => 'ro',
-                      required => 1,
-                     );
+=head2 tag_index
+
+An optional tag index
 
 =head2 tmp_path
 
@@ -81,18 +73,16 @@ has 'tmp_path'    => (isa        => 'Str',
                       default    => sub { return tempdir(CLEANUP => 1); },
                      );
 
-=head2 input_file_ext
+=head2 file_type
 
-Input file extension.
+File type, also input file extension.
 
 =cut
-has 'input_file_ext' => (isa        => 'Str',
-                         is         => 'ro',
-                         required   => 0,
-                         default    => $FILE_EXTENSION,
-                         writer     => '_set_ext',
-                         alias      => 'file_type',
-                        );
+has 'file_type' => (isa        => 'Str',
+                    is         => 'ro',
+                    required   => 0,
+                    default    => $FILE_EXTENSION,
+                   );
 
 
 =head2 input_file
@@ -140,7 +130,7 @@ sub _build_result {
     my $module = "npg_qc::autoqc::results::$ref";
     load_class($module);
 
-    my $nref = { id_run => $self->id_run, position  => $self->position, };
+    my $nref = { id_run => $self->id_run, position => $self->position, };
     $nref->{'path'} = $self->path;
     if (defined $self->tag_index) {
         # In newish Moose undefined but set tag index is serialized to json,
@@ -154,15 +144,6 @@ sub _build_result {
     return $result;
 }
 
-=head2 _cant_run_ms
-
-A message describing why the check cannot be run
-
-=cut
-has '_cant_run_ms' => (isa => 'Str',
-  is => 'rw',
-  required => 0,
-);
 
 =head2 execute
 
@@ -200,11 +181,11 @@ sub get_input_files {
 
     my @fnames = ();
     my $forward = join q[.], File::Spec->catfile($self->path, $self->create_filename($self, 1)),
-                             $self->input_file_ext;
+                             $self->file_type;
     my $no_end_forward = undef;
     if (!-e $forward) {
         $no_end_forward = join q[.], File::Spec->catfile($self->path, $self->create_filename($self)),
-                                     $self->input_file_ext;
+                                     $self->file_type;
         if (-e $no_end_forward) {
            $forward = $no_end_forward;
         } else {
@@ -216,7 +197,7 @@ sub get_input_files {
     push @fnames, $forward;
     if (!defined $no_end_forward) {
         my $reverse =  join q[.], File::Spec->catfile($self->path, $self->create_filename($self, 2)),
-                                  $self->input_file_ext;
+                                  $self->file_type;
         if (-e $reverse) {push @fnames, $reverse;}
     }
 
@@ -293,8 +274,6 @@ __END__
 
 =item MooseX::ClassAttribute
 
-=item MooseX::Aliases
-
 =item Class::Load
 
 =item Carp
@@ -308,6 +287,10 @@ __END__
 =item File::Spec::Functions
 
 =item File::Temp
+
+=item npg_tracking::glossary::run
+
+=item npg_tracking::glossary::lane
 
 =item npg_tracking::glossary::tag
 
