@@ -1,12 +1,6 @@
-#########
-# Author:        mg8
-# Created:       30 July 2009
-#
-
-
 use strict;
 use warnings;
-use Test::More tests => 59;
+use Test::More tests => 58;
 use Test::Deep;
 use Test::Exception;
 use File::Path;
@@ -245,7 +239,6 @@ my $ref = q[t/data/autoqc];
           strain =>       q[dodo],
           species =>      q[frog],
           reference_genome  => q[some genome],
-          sequence_type => q[spiked_phix],
           repository => $ref,
     );
 
@@ -253,7 +246,6 @@ my $ref = q[t/data/autoqc];
     is($check->strain, q[dodo], 'strain set for the check object');
     is($check->species, q[frog], 'species set for the check object');
     is($check->reference_genome, q[some genome], 'species set for the check object');
-    is($check->sequence_type, q[spiked_phix], 'sequence type set for the check object');
     ok(!defined $check->tag_index, 'tag index not defined');
 }
 
