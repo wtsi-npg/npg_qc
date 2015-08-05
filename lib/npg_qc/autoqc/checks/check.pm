@@ -13,7 +13,9 @@ use Readonly;
 
 use npg_tracking::util::types;
 
-with qw/ npg_tracking::glossary::tag /;
+with qw/ npg_tracking::glossary::run
+         npg_tracking::glossary::lane
+         npg_tracking::glossary::tag /;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit)
@@ -48,24 +50,15 @@ has 'path'        => (isa      => 'Str',
 
 =head2 position
 
-Lane number. An integer from 1 to 8 inclusive. Read-only.
-
-=cut
-has 'position'    => (isa       => 'NpgTrackingLaneNumber',
-                      is        => 'ro',
-                      required  => 1,
-                     );
-
+Lane number. An integer from 1 to 8 inclusive.
 
 =head2 id_run
 
-Run id for the lane to be checked. Read-only.
+Run id for the lane to be checked.
 
-=cut
-has 'id_run'      => (isa      => 'NpgTrackingRunId',
-                      is       => 'ro',
-                      required => 1,
-                     );
+=head2 tag_index
+
+An optional tag index
 
 =head2 tmp_path
 
@@ -137,7 +130,7 @@ sub _build_result {
     my $module = "npg_qc::autoqc::results::$ref";
     load_class($module);
 
-    my $nref = { id_run => $self->id_run, position  => $self->position, };
+    my $nref = { id_run => $self->id_run, position => $self->position, };
     $nref->{'path'} = $self->path;
     if (defined $self->tag_index) {
         # In newish Moose undefined but set tag index is serialized to json,
@@ -151,15 +144,6 @@ sub _build_result {
     return $result;
 }
 
-=head2 _cant_run_ms
-
-A message describing why the check cannot be run
-
-=cut
-has '_cant_run_ms' => (isa => 'Str',
-  is => 'rw',
-  required => 0,
-);
 
 =head2 execute
 
@@ -303,6 +287,10 @@ __END__
 =item File::Spec::Functions
 
 =item File::Temp
+
+=item npg_tracking::glossary::run
+
+=item npg_tracking::glossary::lane
 
 =item npg_tracking::glossary::tag
 

@@ -446,22 +446,22 @@ override 'can_run' => sub {
 	# make sure that a sample name has been supplied and that the bam file is aligned with one of the recognised human references
 
 	if(!defined $self->sample_name) {
-		$self->_cant_run_ms('No sample name specified');
+		$self->result->add_comment('No sample name specified');
 		return 0;
 	}
 
 	if(!$self->alignments_in_bam) {
-		$self->_cant_run_ms('alignments_in_bam is false');
+		$self->result->add_comment('alignments_in_bam is false');
 		return 0;
 	}
 
 	if(!defined($self->reference_fasta) || (! -r $self->reference_fasta)) {
-		$self->_cant_run_ms('Reference genome missing or unreadable');
+		$self->result->add_comment('Reference genome missing or unreadable');
 		return 0;
 	}
 
 	if(! any { $_ =~ $self->reference_fasta; } (keys %{$self->_ref_to_snppos_suffix_map})) {
-		$self->_cant_run_ms('Specified reference genome may be non-human');
+		$self->result->add_comment('Specified reference genome may be non-human');
 		return 0;
 	}
 
@@ -474,7 +474,6 @@ override 'execute' => sub {
 	return 1 if super() == 0;
 
 	if(!$self->can_run()) {
-		$self->result->add_comment($self->_cant_run_ms);
 		return 1;
 	}
 

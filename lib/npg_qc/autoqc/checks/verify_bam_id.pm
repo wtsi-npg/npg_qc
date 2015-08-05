@@ -95,7 +95,6 @@ override 'execute' => sub {
   my $cmd = "$VERIFY_NAME $cmd_options";
 
   if(!$self->can_run()) {
-    $self->result->add_comment($self->_cant_run_ms);
     return 1;
   }
 
@@ -121,10 +120,6 @@ override 'execute' => sub {
   }
   return 1;
 };
-
-####################
-# private attributes
-####################
 
 __PACKAGE__->meta->make_immutable();
 

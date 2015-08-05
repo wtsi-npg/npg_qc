@@ -83,8 +83,7 @@ subtest 'validation of attributes' => sub {
     my $check = npg_qc::autoqc::checks::check->new(position => 2, path => $path, id_run => $idrun );
     throws_ok {$check->path('path')}
         qr/Cannot\ assign\ a\ value\ to\ a\ read-only/, 'check::path is read-only';
-    throws_ok {$check->position(3)}
-        qr/Cannot\ assign\ a\ value\ to\ a\ read-only/, 'check::position is read-only';
+    lives_ok {$check->position(3)} 'check::position is read-write';
     throws_ok {$check->id_run(3)}
         qr/Cannot\ assign\ a\ value\ to\ a\ read-only/, 'check::id_run is read-only';
     lives_ok {$check->tag_index(3)} 'check::tag_index is writable';
