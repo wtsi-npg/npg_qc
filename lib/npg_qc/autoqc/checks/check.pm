@@ -63,22 +63,10 @@ has 'position'    => (isa       => 'NpgTrackingLaneNumber',
 Run id for the lane to be checked. Read-only.
 
 =cut
-has 'id_run'      => (
-                       isa      => 'NpgTrackingRunId',
-                       is       => 'ro',
-                       required => 1,
+has 'id_run'      => (isa      => 'NpgTrackingRunId',
+                      is       => 'ro',
+                      required => 1,
                      );
-
-=head2 sequence_type
-
-Sequence type as phix for spiked phix or similar. Read-only.
-
-=cut
-has 'sequence_type'  => (
-                         isa      => 'Maybe[Str]',
-                         is       => 'ro',
-                         required => 0,
-		        );
 
 =head2 tmp_path
 
@@ -146,24 +134,23 @@ sub _build_result {
     ## use critic
 
     my ($ref) = ($pkg_name) =~ /(\w*)$/smx;
-    if ($ref eq q[check]) { $ref =  q[result]; }
+    if ($ref eq q[check]) {
+        $ref =  q[result];
+    }
     my $module = "npg_qc::autoqc::results::$ref";
     load_class($module);
 
     my $nref = { id_run => $self->id_run, position  => $self->position, };
     $nref->{'path'} = $self->path;
     if (defined $self->tag_index) {
-      # In newish Moose undefined but set tag index is serialized to json,
-      # which is not good for result objects that do hot have tag_index db column
-      $nref->{'tag_index'} = $self->tag_index;
+        # In newish Moose undefined but set tag index is serialized to json,
+        # which is not good for result objects that do hot have tag_index db column
+        $nref->{'tag_index'} = $self->tag_index;
     }
     my $result = $module->new($nref);
 
     $result->set_info('Check', $pkg_name);
     $result->set_info('Check_version', $module_version);
-    if ($result->can(q[sequence_type])) {
-        $result->sequence_type($self->sequence_type);
-    }
     return $result;
 }
 
@@ -244,8 +231,7 @@ an array ref with filenames that is suitable for setting the filename attribute.
 
 =cut
 sub generate_filename_attr {
-
-    my ($self) = shift;
+    my $self = shift;
 
     my $count = 0;
     my $filename;
@@ -265,11 +251,10 @@ if the evaluation is performed separately for a forward and a reverse sequence.
 
 =cut
 sub overall_pass {
-
-  my ($self, $apass, $count) = @_;
-  if ($apass->[0] != 1 || $count == 1) {return $apass->[0];}
-  if ($apass->[1] != 1) {return $apass->[1];}
-  return ($apass->[0] && $apass->[1]);
+    my ($self, $apass, $count) = @_;
+    if ($apass->[0] != 1 || $count == 1) {return $apass->[0];}
+    if ($apass->[1] != 1) {return $apass->[1];}
+    return ($apass->[0] && $apass->[1]);
 }
 
 =head2 create_filename - given run id, position, tag index (optional) and end (optional)
@@ -279,13 +264,13 @@ returns a file name
   $obj->->create_filename({id_run=>1,position=>2},1);
 =cut
 sub create_filename {
-  my ($self, $map, $end) = @_;
+    my ($self, $map, $end) = @_;
 
-  return sprintf '%i_%i%s%s',
-    $map->{'id_run'},
-    $map->{'position'},
-    $end ? "_$end" : q[],
-    defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
+    return sprintf '%i_%i%s%s',
+        $map->{'id_run'},
+        $map->{'position'},
+        $end ? "_$end" : q[],
+        defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
 }
 
 no MooseX::ClassAttribute;

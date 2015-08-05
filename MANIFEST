@@ -440,7 +440,6 @@ t/60-autoqc-results-spatial_filter.t
 t/60-autoqc-results-split_stats.t
 t/60-autoqc-results-tag_decode_stats.t
 t/60-autoqc-results-tag_metrics.t
-t/70-autoqc-checks-check.t
 t/80-autoqc-qc-script.t
 t/autoqc_util.pm
 t/data/api_dbic_fixtures/npg_qc/RunTimeline.yml
