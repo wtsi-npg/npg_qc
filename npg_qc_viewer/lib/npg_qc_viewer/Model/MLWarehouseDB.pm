@@ -102,8 +102,9 @@ sub search_sample_by_sample_id {
 
   my $rs = $self->resultset('IseqProductMetric')->
                     search($where, {
-                    join  => {'iseq_flowcell' => 'sample'},
-                    cache => 1,
+                    prefetch => {'iseq_flowcell' => 'sample'},
+                    join     => {'iseq_flowcell' => 'sample'},
+                    cache    => 1,
   });
 
   return $rs;
