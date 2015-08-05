@@ -124,6 +124,16 @@ sub _fetch_by_lib {
   return $rs;
 }
 
+sub _fetch_by_pool {
+  my ($self, $c, $id_pool_lims) = @_;
+  
+  my $rs;
+  if ($id_pool_lims) {
+    $rs = $c->model('MLWarehouseDB')->search_pool_lims_by_id($id_pool_lims);
+  }
+  return $rs;
+}
+
 sub _fetch_by_sample {
   my ($self, $c, $id_sample_lims) = @_;
 
@@ -135,20 +145,22 @@ sub _fetch_by_sample {
 }
 
 sub _display_libs {
-    my ($self, $c, $rs, $no_plexes) = @_;
+    my ($self, $c, $rs, $sample_link, $what) = @_;
 
     if ($rs) {
         $c->stash->{'db_lookup'} = 1;
 
         my $run_lane_map = {};
         while (my $row = $rs->next) {
-            my $id_run = $row->id_run;
-            my $position = $row->position;
+            my $id_run    = $row->id_run;
+            my $position  = $row->position;
+            my $tag_index = $row->tag_index;
 
             my $where = {};
-            $where->{'me.id_run'}   = $id_run;
-            $where->{'me.position'} = $position;
-            $self->_run_lanes_from_dwh($c, $where, $LANES);
+            $where->{'me.id_run'}    = $id_run;
+            $where->{'me.position'}  = $position;
+            $where->{'me.tag_index'} = $tag_index;
+            $self->_run_lanes_from_dwh($c, $where, $what);
 
             if (exists $run_lane_map->{$id_run}) {
                 if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
@@ -159,10 +171,8 @@ sub _display_libs {
             }
         }
 
-        $rs->reset;
-
-        my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $ALL, $c->model('NpgDB')->schema);
-        $c->stash->{'sample_link'} = 1;
+        my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $LANES, $c->model('NpgDB')->schema);
+        $c->stash->{'sample_link'} = $sample_link;
         $self->_data2stash($c, $collection);
         $c->stash->{'show_total'} = 1;
     } else {
@@ -258,7 +268,7 @@ sub _run_lanes_from_dwh {
         $key = $product_metric->lane_rpt_key_from_key($product_metric->rpt_key);
         if ( !defined $row_data->{$key} ) {
           my $values = $self->_build_hash($product_metric);
-          foreach my $plex_only (qw[ tag_sequence ]) {
+          foreach my $plex_only (qw[ tag_sequence id_library_lims legacy_library_id ]) {
             delete $values->{$plex_only};
           }
           $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
@@ -308,6 +318,7 @@ sub _build_hash {
   if ( defined $product_metric->iseq_flowcell ) {
     $values->{'id_library_lims'}   = $product_metric->iseq_flowcell->id_library_lims;
     $values->{'legacy_library_id'} = $product_metric->iseq_flowcell->legacy_library_id;
+    $values->{'id_pool_lims'}      = $product_metric->iseq_flowcell->id_pool_lims;
     $values->{'rnd'}               = $product_metric->iseq_flowcell->is_r_and_d;
 
     if ( defined $product_metric->iseq_flowcell->sample ) {
@@ -495,12 +506,37 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         }
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
         my $rs = $self->_fetch_by_lib($c, $id_library_lims);
-        $self->_display_libs($c, $rs);
+        my $sample_link = 1;
+        $self->_display_libs($c, $rs, $sample_link);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
         $c->detach(q[Root], q[error_page]);
     }
     return;
+}
+
+=head2 pools
+
+Pool page.
+
+=cut
+sub pools :Chained('base') :PathPart('pools') :Args(0) {
+  my ( $self, $c) = @_;
+
+  if (defined $c->request->query_parameters->{id}) {
+      my $id_pool_lims = $c->request->query_parameters->{id};
+      if (!ref $id_pool_lims) {
+          $id_pool_lims = [$id_pool_lims];
+      }
+      $c->stash->{'title'} = _get_title(q[Pools: ] . join q[, ], map {q['].$_.q[']} @{$id_pool_lims});
+      my $rs = $self->_fetch_by_pool($c, $id_pool_lims);
+      my $sample_link = 0;
+      $self->_display_libs($c, $rs, $sample_link);
+  } else {
+      $c->stash->{error_message} = q[This is an invalid URL];
+      $c->detach(q[Root], q[error_page]);
+  }
+  return;
 }
 
 =head2 samples
@@ -527,7 +563,8 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
     $c->stash->{'lims_sample'} = $sample;
     my $sample_name = $sample->name;
     my $rs = $self->_fetch_by_sample($c, $id_sample_lims);
-    $self->_display_libs($c, $rs);
+    my $sample_link = 1;
+    $self->_display_libs($c, $rs, $sample_link);
     $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
     return;
 }

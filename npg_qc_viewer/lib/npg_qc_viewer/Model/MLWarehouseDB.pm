@@ -84,7 +84,28 @@ sub search_library_lims_by_id {
   return $rs;
 }
 
+=head2 search_pool_lims_by_id
 
+=Search pool by id pool lims.
+
+=cut
+sub search_pool_lims_by_id {
+  my ($self, $id_pool_lims) = @_;
+
+  if (!defined $id_pool_lims) {
+    croak q[Id pool lims not defined when querying pool lims];
+  }
+
+  my $where = { 'iseq_flowcell.id_pool_lims' => $id_pool_lims, };
+
+  my $rs = $self->resultset('IseqProductMetric')->
+             search($where, {
+               join  => ['iseq_flowcell'],
+               cache => 1,
+  });
+
+  return $rs;
+}
 
 =head2 search_sample_lims_by_id
 

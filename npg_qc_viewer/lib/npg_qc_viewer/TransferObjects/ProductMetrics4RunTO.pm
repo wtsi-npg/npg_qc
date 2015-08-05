@@ -163,6 +163,16 @@ has 'legacy_library_id' => (
   required => 0,
 );
 
+=head2 id_pool_lims
+
+Id pool lims
+
+=cut
+has 'id_pool_lims' => (
+  is       => 'rw',
+  required => 0,
+);
+
 =head2 rnd
 
 Flag for R&D runs

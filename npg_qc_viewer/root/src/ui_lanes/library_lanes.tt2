@@ -87,12 +87,11 @@
       time_comp = String.new(text => "$lane_info_to.time_comp");
 
       IF lane_info_to;
-        libs_info.$lane_key.lib_name    = lane_info_to.id_library_lims;
-        libs_info.$lane_key.library_id  = lane_info_to.legacy_library_id;
-        libs_info.$lane_key.sample_name = lane_info_to.sample_name;
-        libs_info.$lane_key.sample_id   = lane_info_to.id_sample_lims;
-        libs_info.$lane_key.study_id    = lane_info_to.study_name;
-        studies_info.$study_id          = lane_info_to.study_name;
+        libs_info.$lane_key.sample_name  = lane_info_to.sample_name;
+        libs_info.$lane_key.sample_id    = lane_info_to.id_sample_lims;
+        libs_info.$lane_key.study_id     = lane_info_to.study_name;
+        libs_info.$lane_key.id_pool_lims = lane_info_to.id_pool_lims;
+        studies_info.$study_id           = lane_info_to.study_name;
       END;
 -%]
 
@@ -112,12 +111,12 @@
   <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
 
-[%- IF lane_info_to.id_library_lims; lurl = [lims_url, 'assets', lane_info_to.legacy_library_id]; -%]
-  <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => lane_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
-  [%- IF !lane_collection.run_lane_plex_flags.$lane_key-%]
+[%- IF lane_info_to.id_pool_lims || lane_info_to.id_library_lims; -%]
+  [%- IF !lane_collection.run_lane_plex_flags.$lane_key && lane_info_to.id_library_lims; lurl = [lims_url, 'assets', lane_info_to.legacy_library_id]; -%]
+    <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => lane_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
     <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lane_info_to.id_library_lims | html %]</span></a>
   [%- ELSE -%]
-    <span class="lib nbsp">[% lane_info_to.id_library_lims | html %]</span>
+    <span class="lib nbsp">[% lane_info_to.id_pool_lims | html %]</span>
   [%- END -%]
 [%- END -%]
 [% IF lane_info_to.rnd %]<span class="watermark">R&amp;D</span>[% END %]
