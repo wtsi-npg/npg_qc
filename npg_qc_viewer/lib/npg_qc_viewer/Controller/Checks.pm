@@ -316,7 +316,7 @@ sub _build_hash {
       my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
 
       $values->{'id_sample_lims'} = $sample->id_sample_lims;
-      $values->{'name'}           = $sample->name;
+      $values->{'sample_name'}    = $sample->name;
     }
 
     if ( defined $product_metric->iseq_flowcell->study ) {
@@ -525,7 +525,7 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
 
     my $sample = $self->_get_sample_lims($c, $id_sample_lims);
     $c->stash->{'lims_sample'} = $sample;
-    my $sample_name = $sample->{'name'};
+    my $sample_name = $sample->name;
     my $rs = $self->_fetch_by_sample($c, $id_sample_lims);
     $self->_display_libs($c, $rs);
     $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
