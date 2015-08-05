@@ -21,18 +21,13 @@
   -%]
 
   [%- 
-    library = libs_info.$lane_key.lib_name;
+    pool = libs_info.$lane_key.id_pool_lims;
     sample  = libs_info.$lane_key.sample_name;
     sample_id = libs_info.$lane_key.sample_id;
-    library_id = libs_info.$lane_key.library_id;
-    study_id = libs_info.$lane_key.study_id;
-    study_name = '';
-    IF study_id;
-      study_name = studies_info.$study_id;
-    END;
+    study_name = libs_info.$lane_key.study_id || '';
            
-    IF library; 
-      provenance = ' | ' _ library;
+    IF pool; 
+      provenance = ' | ' _ pool;
       IF sample; 
         provenance = provenance _ ' << ' _ sample;
         IF studies; 
