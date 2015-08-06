@@ -63,7 +63,7 @@
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
 
-[%- libs_info = {}; studies_info = {}; run_info = {};
+[%- studies_info = {}; run_info = {};
     qxTotal = 0; #For total qxYield
 
     #For heatmaps
