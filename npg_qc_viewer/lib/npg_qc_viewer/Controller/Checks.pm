@@ -145,6 +145,20 @@ sub _fetch_by_sample {
   return $rs;
 }
 
+sub _filter_run_lane_collection_with_keys {
+  my ($self, $collection, $keys) = @_;
+  
+  my $temp_collection = npg_qc::autoqc::results::collection->new();
+  my $temp_run_lanes = $collection->run_lane_collections;
+  foreach my $key ( @{$keys} ) {
+    if ( $temp_run_lanes->{$key} ) {
+      $temp_collection->add($temp_run_lanes->{$key}->results);
+    }
+  }
+
+  return $temp_collection;
+}
+
 sub _display_pools {
   my ($self, $c, $rs, $sample_link) = @_;
 
@@ -152,48 +166,40 @@ sub _display_pools {
     $c->stash->{'db_lookup'} = 1;
     my $what = $LANES;
 
-    my $checked = {};
+    my $checked = [];
     my $run_lane_map = {};
     while (my $row = $rs->next) {
-      my $id_run    = $row->id_run;
-      my $position  = $row->position;
-      my $tag_index = $row->tag_index;
+      my $id_run   = $row->id_run;
+      my $position = $row->position;
 
       my $where = {};
       $where->{'me.id_run'}    = $id_run;
       $where->{'me.position'}  = $position;
-      $where->{'me.tag_index'}  = $tag_index;
+      $where->{'me.tag_index'} = $row->tag_index;
 
       #Only process run+lane once disregarding how many plexes matched the pool
       my $run_lane_key = $row->lane_rpt_key_from_key($row->rpt_key);
-      if (! $checked->{$run_lane_key}) {
+      if ( none { $_ eq $run_lane_key } @{ $checked } ) {
         $self->_run_lanes_from_dwh($c, $where, $what);
-        $checked->{$run_lane_key} = 1;
+        push @{ $checked }, $run_lane_key;
       }
 
       if (exists $run_lane_map->{$id_run}) {
-        if ( none { $_ eq $position } @{$run_lane_map->{$id_run}} ) {
+        if ( none { $_ eq $position } @{ $run_lane_map->{$id_run} } ) {
           push @{$run_lane_map->{$id_run}}, $position;
         }
       } else {
-          $run_lane_map->{$id_run} = [$position];
+        $run_lane_map->{$id_run} = [$position];
       }
     }
 
     my $row_data = $c->stash->{'row_data'} || {};
 
     my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-    my $temp_collection = npg_qc::autoqc::results::collection->new();
-    my $temp_run_lanes = $collection->run_lane_collections;
-
-    foreach my $key ( keys %{$row_data} ) {
-      if ($temp_run_lanes->{$key}) {
-        $temp_collection->add($temp_run_lanes->{$key}->results);
-      }
-    }
+    $collection = $self->_filter_run_lane_collection_with_keys($collection, $checked);
 
     $c->stash->{'sample_link'} = $sample_link;
-    $self->_data2stash($c, $temp_collection);
+    $self->_data2stash($c, $collection);
     $c->stash->{'show_total'} = 1;
   } else {
     $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
@@ -223,26 +229,19 @@ sub _display_libs {
           $self->_run_lanes_from_dwh($c, $where, $what);
 
           if (exists $run_lane_map->{$id_run}) {
-              if ( none { $_ eq $position } @{$run_lane_map->{$id_run}} ) {
-                push @{$run_lane_map->{$id_run}}, $position;
-              }
+            if ( none { $_ eq $position } @{$run_lane_map->{$id_run}} ) {
+              push @{$run_lane_map->{$id_run}}, $position;
+            }
           } else {
-              $run_lane_map->{$id_run} = [$position];
+            $run_lane_map->{$id_run} = [$position];
           }
       }
 
       my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-      my $temp_collection = npg_qc::autoqc::results::collection->new();
-      my $temp_run_lanes = $collection->run_lane_collections;
-
-      foreach my $key ( @{$rpt_keys} ) {
-        if ($temp_run_lanes->{$key}) {
-          $temp_collection->add($temp_run_lanes->{$key}->results);
-        }
-      }
+      $collection = $self->_filter_run_lane_collection_with_keys($collection, $rpt_keys);
 
       $c->stash->{'sample_link'} = $sample_link;
-      $self->_data2stash($c, $temp_collection);
+      $self->_data2stash($c, $collection);
       $c->stash->{'show_total'} = 1;
   } else {
       $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
