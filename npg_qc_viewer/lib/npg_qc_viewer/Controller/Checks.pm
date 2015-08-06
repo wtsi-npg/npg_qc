@@ -179,12 +179,8 @@ sub _display_libs {
         my $temp_run_lanes = $collection->run_lane_collections;
 
         foreach my $key ( @{$rpt_keys} ) {
-          $c->log->debug("Checking " . $key);
           if ($temp_run_lanes->{$key}) {
-            $c->log->debug("Found " . $key);
             $temp_collection->add($temp_run_lanes->{$key}->results);
-          } else {
-            $c->log->debug("Not found " . $key);
           }
         }
 
@@ -295,7 +291,6 @@ sub _run_lanes_from_dwh {
           if ( $product_metric->tag_index ) { #Pool
             $values->{'id_library_lims'} = $product_metric->iseq_flowcell->id_pool_lims;
             foreach my $to_delete ( qw[ legacy_library_id sample_name id_sample_lims study_name id_study_lims ] ) {
-              $c->log->debug("Delete " . $key . " " . $to_delete);
               delete $values->{$to_delete};
             }
           }
@@ -527,7 +522,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
         my $rs = $self->_fetch_by_lib($c, $id_library_lims);
         my $sample_link = 1;
-        $self->_display_libs($c, $rs, $sample_link, $PLEXES);
+        $self->_display_libs($c, $rs, $sample_link, $ALL);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
         $c->detach(q[Root], q[error_page]);
@@ -551,7 +546,7 @@ sub pools :Chained('base') :PathPart('pools') :Args(0) {
       $c->stash->{'title'} = _get_title(q[Pools: ] . join q[, ], map {q['].$_.q[']} @{$id_pool_lims});
       my $rs = $self->_fetch_by_pool($c, $id_pool_lims);
       my $sample_link = 0;
-      $self->_display_libs($c, $rs, $sample_link, $LANES);
+      $self->_display_libs($c, $rs, $sample_link, $ALL);
   } else {
       $c->stash->{error_message} = q[This is an invalid URL];
       $c->detach(q[Root], q[error_page]);
@@ -584,7 +579,7 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my $sample_name = $sample->name;
     my $rs = $self->_fetch_by_sample($c, $id_sample_lims);
     my $sample_link = 1;
-    $self->_display_libs($c, $rs, $sample_link, $PLEXES);
+    $self->_display_libs($c, $rs, $sample_link, $ALL);
     $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
     return;
 }
