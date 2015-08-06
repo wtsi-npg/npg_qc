@@ -162,7 +162,7 @@ sub _display_libs {
             $where->{'me.id_run'}    = $id_run;
             $where->{'me.position'}  = $position;
             $where->{'me.tag_index'} = $tag_index;
-            push(@{$rpt_keys}, $row->rpt_key);
+            push @{$rpt_keys}, $row->rpt_key;
             $self->_run_lanes_from_dwh($c, $where, $what);
 
             if (exists $run_lane_map->{$id_run}) {
@@ -276,7 +276,7 @@ sub _run_lanes_from_dwh {
   while (my $product_metric = $rs->next) {
     if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
       if ( !defined $product_metric->tag_index ||
-           ( $product_metric->iseq_flowcell 
+           ( $product_metric->iseq_flowcell
              && $product_metric->iseq_flowcell->entity_type ne 'library_indexed_spike' )) {
         #Using first tax index available as representative for the lane.
 
@@ -305,7 +305,6 @@ sub _run_lanes_from_dwh {
     if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
       if (defined $product_metric->tag_index) {
         my $key = $product_metric->rpt_key;
-        my $values = $self->_build_hash($product_metric);
 
         if ( !defined $row_data->{$key} ) {
           my $values = $self->_build_hash($product_metric);
