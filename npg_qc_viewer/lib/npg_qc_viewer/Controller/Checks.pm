@@ -292,10 +292,12 @@ sub _run_lanes_from_dwh {
         if ( !defined $row_data->{$key} ) {
           my $values = $self->_build_hash($product_metric);
           delete $values->{'tag_sequence'};
-          if ($product_metric->tag_index) {
-            #In lane level this could be replaced.
+          if ( $product_metric->tag_index ) { #Pool
             $values->{'id_library_lims'} = $product_metric->iseq_flowcell->id_pool_lims;
-            delete $values->{'legacy_library_id'};
+            foreach my $to_delete ( qw[ legacy_library_id sample_name id_sample_lims study_name id_study_lims ] ) {
+              $c->log->debug("Delete " . $key . " " . $to_delete);
+              delete $values->{$to_delete};
+            }
           }
           $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
           my $to = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
