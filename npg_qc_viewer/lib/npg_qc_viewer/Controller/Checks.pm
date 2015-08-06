@@ -5,7 +5,7 @@ use namespace::autoclean;
 use Moose::Meta::Class;
 use URI::URL;
 use Carp;
-use List::MoreUtils qw/ any /;
+use List::MoreUtils qw/ none /;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
@@ -172,9 +172,9 @@ sub _display_pools {
       }
 
       if (exists $run_lane_map->{$id_run}) {
-          if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
-            push @{$run_lane_map->{$id_run}}, $position;
-          }
+        if ( none { $_ eq $position } @{$run_lane_map->{$id_run}} ) {
+          push @{$run_lane_map->{$id_run}}, $position;
+        }
       } else {
           $run_lane_map->{$id_run} = [$position];
       }
@@ -223,7 +223,7 @@ sub _display_libs {
           $self->_run_lanes_from_dwh($c, $where, $what);
 
           if (exists $run_lane_map->{$id_run}) {
-              if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
+              if ( none { $_ eq $position } @{$run_lane_map->{$id_run}} ) {
                 push @{$run_lane_map->{$id_run}}, $position;
               }
           } else {
