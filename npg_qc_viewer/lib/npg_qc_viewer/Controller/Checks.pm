@@ -147,7 +147,7 @@ sub _fetch_by_sample {
 
 sub _filter_run_lane_collection_with_keys {
   my ($self, $collection, $keys) = @_;
-  
+
   my $temp_collection = npg_qc::autoqc::results::collection->new();
   my $temp_run_lanes = $collection->run_lane_collections;
   foreach my $key ( @{$keys} ) {
@@ -157,6 +157,19 @@ sub _filter_run_lane_collection_with_keys {
   }
 
   return $temp_collection;
+}
+
+sub _as_query_conditions {
+  my ($self, $obj) = @_;
+  my $conditions = {};
+
+  $conditions->{'id_run'}   = $obj->id_run;
+  $conditions->{'position'} = $obj->position;
+  if ( $obj->tag_index ) {
+    $conditions->{'tag_index'} = $obj->tag_index;
+  }
+
+  return $conditions;
 }
 
 sub _display_pools {
@@ -172,12 +185,7 @@ sub _display_pools {
       my $id_run   = $row->id_run;
       my $position = $row->position;
 
-      my $where = {};
-      $where->{'id_run'}    = $id_run;
-      $where->{'position'}  = $position;
-      if ( $row->tag_index ) {
-        $where->{'tag_index'} = $row->tag_index;
-      }
+      my $where = $self->_as_query_conditions($row);
 
       #Only process run+lane once disregarding how many plexes matched the pool
       my $run_lane_key = $row->lane_rpt_key_from_key($row->rpt_key);
@@ -220,12 +228,7 @@ sub _display_libs {
           my $id_run    = $row->id_run;
           my $position  = $row->position;
 
-          my $where = {};
-          $where->{'id_run'}    = $id_run;
-          $where->{'position'}  = $position;
-          if ( $row->tag_index ) {
-            $where->{'tag_index'} = $row->tag_index;
-          }
+          my $where = $self->_as_query_conditions($row);
 
           push @{$rpt_keys}, $row->rpt_key;
           $self->_run_lanes_from_dwh($c, $where, $what);
@@ -288,7 +291,7 @@ sub _display_run_lanes {
     my $retrieve_option = $RESULTS_RETRIEVE_OPTIONS{$what};
     my $collection =  $c->model('Check')->load_lanes($run_lanes, $c->stash->{'db_lookup'}, $retrieve_option, $c->model('NpgDB')->schema);
 
-    my $where = {'id_run' => $id_runs}; # Query by id_run, position
+    my $where = { 'id_run' => $id_runs };
     if (scalar @{$lanes}) { $where->{'position'} = $lanes };
 
     $self->_run_lanes_from_dwh($c, $where, $retrieve_option);
