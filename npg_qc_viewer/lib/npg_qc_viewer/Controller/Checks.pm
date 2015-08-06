@@ -9,6 +9,7 @@ use List::MoreUtils qw/ any /;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
+use npg_qc::autoqc::results::collection;
 use npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
 use npg_qc_viewer::TransferObjects::SampleFacade;
 
@@ -126,7 +127,7 @@ sub _fetch_by_lib {
 
 sub _fetch_by_pool {
   my ($self, $c, $id_pool_lims) = @_;
-  
+
   my $rs;
   if ($id_pool_lims) {
     $rs = $c->model('MLWarehouseDB')->search_pool_lims_by_id($id_pool_lims);
@@ -144,42 +145,110 @@ sub _fetch_by_sample {
   return $rs;
 }
 
-sub _display_libs {
-    my ($self, $c, $rs, $sample_link, $what) = @_;
+sub _display_pools {
+  my ($self, $c, $rs, $sample_link) = @_;
 
-    if ($rs) {
-        $c->stash->{'db_lookup'} = 1;
+  if ($rs) {
+    $c->stash->{'db_lookup'} = 1;
+    my $what = $LANES;
 
-        my $run_lane_map = {};
-        while (my $row = $rs->next) {
-            my $id_run    = $row->id_run;
-            my $position  = $row->position;
-            my $tag_index = $row->tag_index;
+    my $checked = {};
+    my $run_lane_map = {};
+    while (my $row = $rs->next) {
+      my $id_run    = $row->id_run;
+      my $position  = $row->position;
+      my $tag_index = $row->tag_index;
 
-            my $where = {};
-            $where->{'me.id_run'}    = $id_run;
-            $where->{'me.position'}  = $position;
-            $where->{'me.tag_index'} = $tag_index;
-            $self->_run_lanes_from_dwh($c, $where, $what);
+      my $where = {};
+      $where->{'me.id_run'}    = $id_run;
+      $where->{'me.position'}  = $position;
+      $where->{'me.tag_index'}  = $tag_index;
 
-            if (exists $run_lane_map->{$id_run}) {
-                if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
-                    push  @{$run_lane_map->{$id_run}}, $position;
-                }
-            } else {
-                $run_lane_map->{$id_run} = [$position];
-            }
-        }
+      #Only process run+lane once disregarding how many plexes matched the pool
+      my $run_lane_key = $row->lane_rpt_key_from_key($row->rpt_key);
+      if (! $checked->{$run_lane_key}) {
+        $self->_run_lanes_from_dwh($c, $where, $what);
+        $checked->{$run_lane_key} = 1;
+      }
 
-        my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $LANES, $c->model('NpgDB')->schema);
-        $c->stash->{'sample_link'} = $sample_link;
-        $self->_data2stash($c, $collection);
-        $c->stash->{'show_total'} = 1;
-    } else {
-        $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
+      if (exists $run_lane_map->{$id_run}) {
+          if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
+            push @{$run_lane_map->{$id_run}}, $position;
+          }
+      } else {
+          $run_lane_map->{$id_run} = [$position];
+      }
     }
 
-    return;
+    my $row_data = $c->stash->{'row_data'} || {};
+
+    my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
+    my $temp_collection = npg_qc::autoqc::results::collection->new();
+    my $temp_run_lanes = $collection->run_lane_collections;
+
+    foreach my $key ( keys %{$row_data} ) {
+      if ($temp_run_lanes->{$key}) {
+        $temp_collection->add($temp_run_lanes->{$key}->results);
+      }
+    }
+
+    $c->stash->{'sample_link'} = $sample_link;
+    $self->_data2stash($c, $temp_collection);
+    $c->stash->{'show_total'} = 1;
+  } else {
+    $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
+  }
+
+  return;
+}
+
+sub _display_libs {
+  my ($self, $c, $rs, $sample_link, $what) = @_;
+
+  if ($rs) {
+      $c->stash->{'db_lookup'} = 1;
+
+      my $run_lane_map = {};
+      my $rpt_keys = [];
+      while (my $row = $rs->next) {
+          my $id_run    = $row->id_run;
+          my $position  = $row->position;
+          my $tag_index = $row->tag_index;
+
+          my $where = {};
+          $where->{'me.id_run'}    = $id_run;
+          $where->{'me.position'}  = $position;
+          $where->{'me.tag_index'} = $tag_index;
+          push @{$rpt_keys}, $row->rpt_key;
+          $self->_run_lanes_from_dwh($c, $where, $what);
+
+          if (exists $run_lane_map->{$id_run}) {
+              if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
+                push @{$run_lane_map->{$id_run}}, $position;
+              }
+          } else {
+              $run_lane_map->{$id_run} = [$position];
+          }
+      }
+
+      my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
+      my $temp_collection = npg_qc::autoqc::results::collection->new();
+      my $temp_run_lanes = $collection->run_lane_collections;
+
+      foreach my $key ( @{$rpt_keys} ) {
+        if ($temp_run_lanes->{$key}) {
+          $temp_collection->add($temp_run_lanes->{$key}->results);
+        }
+      }
+
+      $c->stash->{'sample_link'} = $sample_link;
+      $self->_data2stash($c, $temp_collection);
+      $c->stash->{'show_total'} = 1;
+  } else {
+      $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
+  }
+
+  return;
 }
 
 sub _display_run_lanes {
@@ -251,46 +320,49 @@ sub _display_run_lanes {
 sub _run_lanes_from_dwh {
   my ($self, $c, $where, $retrieve_option) = @_;
 
-  my $row_data;
-  if (defined $c->stash->{'row_data'}) {
-    $row_data = $c->stash->{'row_data'};
-  } else {
-    $row_data = {};
-  }
+  my $row_data = $c->stash->{'row_data'} || {};
+
   my $model_mlwh = $c->model('MLWarehouseDB');
 
   my $rs = $model_mlwh->search_product_metrics($where);
 
   while (my $product_metric = $rs->next) {
-    my $key;
-    if ($retrieve_option == $LANES ) {
-      if ( $product_metric->tag_index != 0 ) {
-        $key = $product_metric->lane_rpt_key_from_key($product_metric->rpt_key);
+    if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
+      if ( !defined $product_metric->tag_index ||
+           ( $product_metric->iseq_flowcell
+             && $product_metric->iseq_flowcell->entity_type ne 'library_indexed_spike' )) {
+        #Using first tax index available as representative for the lane.
+
+        my $key = $product_metric->rpt_key;
+        if ($product_metric->tag_index) {
+          $key = $product_metric->lane_rpt_key_from_key($key);
+        }
+
         if ( !defined $row_data->{$key} ) {
           my $values = $self->_build_hash($product_metric);
-          foreach my $plex_only (qw[ tag_sequence id_library_lims legacy_library_id ]) {
-            delete $values->{$plex_only};
+          delete $values->{'tag_sequence'};
+          if ( $product_metric->tag_index ) { #Pool
+            $values->{'id_library_lims'} = $product_metric->iseq_flowcell->id_pool_lims;
+            foreach my $to_delete ( qw[ legacy_library_id sample_name id_sample_lims study_name id_study_lims ] ) {
+              delete $values->{$to_delete};
+            }
           }
           $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
-          my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
+          my $to = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
+
           $row_data->{$key} = $to;
         }
       }
-    } else {
-      $key = $product_metric->rpt_key;
-      if ( !defined $row_data->{$key} ) {
-        my $values = $self->_build_hash($product_metric);
-        my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
-        $row_data->{$key} = $to;
+    }
 
-        my $lane_key = $product_metric->lane_rpt_key_from_key($product_metric->rpt_key);
-        if ( $product_metric->tag_index != 0  && !defined $row_data->{$lane_key} ) {
-          foreach my $plex_only (qw[ tag_sequence id_library_lims legacy_library_id ]) {
-            delete $values->{$plex_only};
-          }
-          $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
-          my $lane_to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
-          $row_data->{$lane_key} = $lane_to;
+    if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
+      if (defined $product_metric->tag_index) {
+        my $key = $product_metric->rpt_key;
+
+        if ( !defined $row_data->{$key} ) {
+          my $values = $self->_build_hash($product_metric);
+          my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
+          $row_data->{$key} = $to;
         }
       }
     }
@@ -310,10 +382,8 @@ sub _build_hash {
   $values->{'tag_index'}    = $product_metric->tag_index;
   $values->{'tag_sequence'} = $product_metric->tag_sequence4deplexing;
 
-  if ( defined $product_metric->iseq_run_lane_metric ) {
-    $values->{'num_cycles'}   = $product_metric->iseq_run_lane_metric->cycles;
-    $values->{'time_comp'}    = $product_metric->iseq_run_lane_metric->run_complete;
-  }
+  $values->{'num_cycles'}   = $product_metric->iseq_run_lane_metric->cycles;
+  $values->{'time_comp'}    = $product_metric->iseq_run_lane_metric->run_complete;
 
   if ( defined $product_metric->iseq_flowcell ) {
     $values->{'id_library_lims'}   = $product_metric->iseq_flowcell->id_library_lims;
@@ -321,15 +391,12 @@ sub _build_hash {
     $values->{'id_pool_lims'}      = $product_metric->iseq_flowcell->id_pool_lims;
     $values->{'rnd'}               = $product_metric->iseq_flowcell->is_r_and_d;
 
-    if ( defined $product_metric->iseq_flowcell->sample ) {
-      my $sample_row = $product_metric->iseq_flowcell->sample;
+    my $sample_row = $product_metric->iseq_flowcell->sample;
+    my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
 
-      my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
-
-      $values->{'id_sample_lims'} = $sample->id_sample_lims;
-      $values->{'sample_name'}    = $sample->name;
-    }
-
+    $values->{'id_sample_lims'} = $sample->id_sample_lims;
+    $values->{'sample_name'}    = $sample->name;
+    #TODO replace for direct access from iseq_flowcell
     if ( defined $product_metric->iseq_flowcell->study ) {
       my $study_row = $product_metric->iseq_flowcell->study;
       $values->{'id_study_lims'} = $study_row->id_study_lims;
@@ -507,7 +574,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
         $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
         my $rs = $self->_fetch_by_lib($c, $id_library_lims);
         my $sample_link = 1;
-        $self->_display_libs($c, $rs, $sample_link);
+        $self->_display_libs($c, $rs, $sample_link, $ALL);
     } else {
         $c->stash->{error_message} = q[This is an invalid URL];
         $c->detach(q[Root], q[error_page]);
@@ -517,25 +584,28 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
 
 =head2 pools
 
-Pool page.
+Pools page - retained in order not to change dispatch type for a pool
 
 =cut
 sub pools :Chained('base') :PathPart('pools') :Args(0) {
-  my ( $self, $c) = @_;
+  my ($self, $c) = @_;
+  $c->stash->{error_message} = q[This is an invalid URL];
+  $c->detach(q[Root], q[error_page]);
+  return;
+}
 
-  if (defined $c->request->query_parameters->{id}) {
-      my $id_pool_lims = $c->request->query_parameters->{id};
-      if (!ref $id_pool_lims) {
-          $id_pool_lims = [$id_pool_lims];
-      }
-      $c->stash->{'title'} = _get_title(q[Pools: ] . join q[, ], map {q['].$_.q[']} @{$id_pool_lims});
-      my $rs = $self->_fetch_by_pool($c, $id_pool_lims);
-      my $sample_link = 0;
-      $self->_display_libs($c, $rs, $sample_link);
-  } else {
-      $c->stash->{error_message} = q[This is an invalid URL];
-      $c->detach(q[Root], q[error_page]);
-  }
+=head2 pool
+
+Pool page.
+
+=cut
+sub pool :Chained('base') :PathPart('pools') :Args(1) {
+  my ( $self, $c, $id_pool_lims) = @_;
+
+  $c->stash->{'title'} = _get_title(q[Pools: ] . join q[, ], map {q['].$_.q[']} $id_pool_lims);
+  my $rs = $self->_fetch_by_pool($c, $id_pool_lims);
+  my $sample_link = 0;
+  $self->_display_pools($c, $rs, $sample_link);
   return;
 }
 
@@ -560,11 +630,10 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $id_sample_lims) = @_;
 
     my $sample = $self->_get_sample_lims($c, $id_sample_lims);
-    $c->stash->{'lims_sample'} = $sample;
     my $sample_name = $sample->name;
     my $rs = $self->_fetch_by_sample($c, $id_sample_lims);
     my $sample_link = 1;
-    $self->_display_libs($c, $rs, $sample_link);
+    $self->_display_libs($c, $rs, $sample_link, $ALL);
     $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
     return;
 }
