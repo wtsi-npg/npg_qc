@@ -8,7 +8,6 @@ lib/npg_qc_viewer/Controller/Mqc.pm
 lib/npg_qc_viewer/Controller/MqcRun.pm
 lib/npg_qc_viewer/Controller/Root.pm
 lib/npg_qc_viewer/Controller/Visuals.pm
-lib/npg_qc_viewer/TransferObjects/Library4RunTO.pm
 lib/npg_qc_viewer/TransferObjects/ProductMetrics4RunTO.pm
 lib/npg_qc_viewer/TransferObjects/SampleFacade.pm
 lib/npg_qc_viewer/Model/Check.pm
