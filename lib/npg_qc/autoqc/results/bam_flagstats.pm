@@ -3,12 +3,18 @@ package npg_qc::autoqc::results::bam_flagstats;
 use Moose;
 use namespace::autoclean;
 use Carp;
+use English qw(-no_match_vars);
 use Perl6::Slurp;
 use List::Util qw(sum);
+use File::Spec::Functions qw(splitpath catfile catpath);
+use Try::Tiny;
+use Compress::Zlib;
 use Readonly;
 
-extends qw(npg_qc::autoqc::results::result);
-with qw(npg_qc::autoqc::role::bam_flagstats);
+use npg_tracking::util::types;
+extends qw( npg_qc::autoqc::results::result );
+with    qw( npg_qc::autoqc::role::sequence_subset
+            npg_qc::autoqc::role::bam_flagstats );
 
 our $VERSION = '0';
 
@@ -29,6 +35,7 @@ Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 
 Readonly::Scalar my $HUMAN_SPLIT_ATTR_DEFAULT => 'all';
 Readonly::Scalar my $SUBSET_ATTR_DEFAULT      => 'target';
+Readonly::Scalar my $STATS_RELATIONSHIP_NAME  => 'samtools_stats';
 
 has [ qw/ +path
           +id_run
@@ -37,11 +44,6 @@ has [ qw/ +path
 has 'human_split' => ( isa            => 'Maybe[Str]',
                        is             => 'rw',
                        predicate      => '_has_human_split',
-);
-
-has 'subset'      => ( isa            => 'Maybe[Str]',
-                       is             => 'rw',
-                       predicate      => '_has_subset',
 );
 
 has 'library' =>     ( isa  => 'Maybe[Str]',
@@ -72,24 +74,96 @@ has 'histogram'         => ( isa     => 'HashRef',
                              default => sub { {} },
 );
 
+has [ qw/ markdups_metrics_file
+          flagstats_metrics_file / ] => (
+    isa        => 'Maybe[NpgTrackingReadableFile]',
+    is         => 'ro',
+    required   => 0,
+    lazy_build => 1,
+);
+sub _build_markdups_metrics_file {
+  my $self = shift;
+  return $self->_file_attr('.markdups_metrics.txt');
+}
+sub _build_flagstats_metrics_file {
+  my $self = shift;
+  return $self->_file_attr('.flagstat');
+}
+sub _file_attr {
+  my ($self, $file_type) = @_;
+  if (!$file_type) {
+    croak 'Need file type';
+  }
+  if ($self->path) {
+    return catfile($self->path, $self->filename4type($file_type));
+  }
+  return;
+}
+
+has 'samtools_stats_file' => ( isa        => 'HashRef',
+                               is         => 'ro',
+                               lazy_build => 1,
+);
+sub _build_samtools_stats_file {
+  my $self = shift;
+
+  my $paths = {};
+
+  if ($self->path) {
+    my $path = catfile($self->path, $self->filename4type(q[*.stats]));
+    foreach my $file ( grep { -f $_ } glob $path) {
+      my $filter = $self->_filter($file);
+      if ($filter) {
+        $paths->{$filter} = $file;
+      }
+    }
+
+    my @found = values %{$paths};
+    if (@found) {
+      carp 'Found the following samtools stats files: ' . join q[, ], @found;
+    } else {
+      carp 'Not found samtools stats files';
+    }
+  } else {
+    carp 'Path not given - not looking for samtools stats files';
+  }
+
+  return $paths;
+}
+
+sub _filter {
+  my ($self, $path) = @_;
+
+  my ($volume, $directories, $file) = splitpath($path);
+  ##no critic (RegularExpressions::ProhibitEnumeratedClasses)
+  my ($filter) = $file =~ /_([a-zA-Z0-9]+)[.]stats\Z/xms;
+  ## use critic
+  if (!$filter) {
+    croak "Failed to get filter from $path";
+  }
+  my $subset = $self->subset ? $self->subset . q[_] : q[];
+
+  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
+}
+
 sub BUILD {
   my $self = shift;
 
-  if ($self->_has_human_split && $self->_has_subset) {
+  if ($self->_has_human_split && $self->has_subset) {
     if ($self->human_split ne $self->subset) {
       croak sprintf 'human_split and subset attrs are different: %s and %s',
         $self->human_split, $self->subset;
     }
   } else {
     if ($self->_has_human_split) {
-      if (!$self->_has_subset && $self->human_split ne $HUMAN_SPLIT_ATTR_DEFAULT ) {
+      if (!$self->has_subset && $self->human_split ne $HUMAN_SPLIT_ATTR_DEFAULT ) {
         # Backwards compatibility with old results.
         # Will be done by the trigger anyway, but let's not rely on the trigger
         # which we will remove as soon as we can.
-        $self->subset($self->human_split);
+        $self->set_subset($self->human_split);
       }
     } else {
-      if ($self->_has_subset && $self->subset ne $SUBSET_ATTR_DEFAULT) {
+      if ($self->has_subset && $self->subset ne $SUBSET_ATTR_DEFAULT) {
         # Do reverse as well so that the human_split column, while we
         # have it, is correctly populated.
         $self->human_split($self->subset);
@@ -100,10 +174,51 @@ sub BUILD {
   return;
 }
 
-sub parsing_metrics_file {
-  my ($self, $matrics_file) = @_;
+sub execute {
+  my $self = shift;
 
-  my @file_contents = slurp ( $matrics_file, { irs => qr/\n\n/mxs } );
+  if (!$self->path) {
+    croak 'Path not set, cannot run execute';
+  }
+
+  $self->parsing_metrics_file($self->markdups_metrics_file);
+
+  my $fn = $self->flagstats_metrics_file;
+  open my $fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
+  $self->parsing_flagstats($fh);
+  close $fh or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
+
+  $self->samtools_stats_file();
+
+  return;
+}
+
+sub related_data {
+  my $self = shift;
+
+  my @related = ();
+  foreach my $filter (keys %{$self->samtools_stats_file}) {
+    my $ref = {};
+    $ref->{'relationship_name'} = $STATS_RELATIONSHIP_NAME;
+    $ref->{'filter'} = $filter;
+    my $path =  $self->samtools_stats_file->{$filter};
+    try {
+      $ref->{'file_content'} = compress(slurp $path);
+      push @related, $ref;
+    } catch {
+      croak "Error reading ${path}: $_";
+    };
+  }
+
+  @related = sort { $a->{'filter'} cmp $b->{'filter'} } @related;
+
+  return \@related;
+}
+
+sub parsing_metrics_file {
+  my ($self, $metrics_file) = @_;
+
+  my @file_contents = slurp ( $metrics_file, { irs => qr/\n\n/mxs } );
 
   my $header = $file_contents[0];
   chomp $header;
@@ -158,10 +273,14 @@ sub parsing_flagstats {
     chomp $line;
     my $number = sum $line =~ /^(\d+)\s*\+\s*(\d+)\b/mxs;
 
-    ( $line =~ /properly\ paired/mxs )                                            ? $self->proper_mapped_pair($number)
-      :( $line =~ /with\ mate\ mapped\ to\ a\ different\ chr$/mxs )               ? $self->mate_mapped_defferent_chr($number)
-      :( $line =~ /with\ mate\ mapped\ to\ a\ different\ chr\ \(mapQ\>\=5\)/mxs ) ? $self->mate_mapped_defferent_chr_5($number)
-      :( $line =~ /in\ total/mxs )                                                ? $self->num_total_reads($number)
+    ( $line =~ /properly\ paired/mxs )
+      ? $self->proper_mapped_pair($number)
+      : ( $line =~ /with\ mate\ mapped\ to\ a\ different\ chr$/mxs )
+      ? $self->mate_mapped_defferent_chr($number)
+      : ( $line =~ /with\ mate\ mapped\ to\ a\ different\ chr\ \(mapQ\>\=5\)/mxs )
+      ? $self->mate_mapped_defferent_chr_5($number)
+      :( $line =~ /in\ total/mxs )
+      ? $self->num_total_reads($number)
       : next;
   }
   return;
@@ -184,11 +303,40 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head1 SUBROUTINES/METHODS
 
-=head2 BUILD - ensures human_split an dsubset fields are populated consistently
+=head2 subset
 
-=head2 parsing_flagstats - parsing Picard MarkDuplicates metrics output file and save the result to the object
+  an optional subset, see npg_qc::autoqc::role:::sequence_subset for details.
 
-=head2 parsing_metrics_file - parsing samtools flagstats output file handler and save the result to the object
+=head2 BUILD - ensures human_split and subset fields are populated consistently
+
+=head2 execute
+
+  calls methods for parsing samtools flagstats and mark duplicates outputs,
+  finds and saves locations of stats files
+
+=head2 parsing_flagstats
+
+  parses Picard MarkDuplicates metrics output file and save the result to the object
+
+=head2 parsing_metrics_file
+
+  parses samtools flagstats output file handler and save the result to the object
+
+=head2 markdups_metrics_file
+
+  an optional attribute, should be set for 'execute' method to work correctly
+
+=head2 flagstats_metrics_file
+
+  an optional attribute, should be set for 'execute' method to work correctly
+
+=head2 samtools_stats_file
+
+  an attribute, is built when 'execute' method is invoked
+
+=head2 related_data
+
+  a method returning an array of related data
 
 =head1 DIAGNOSTICS
 
@@ -202,17 +350,29 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item Carp
 
+=item English
+
 =item Perl6::Slurp
 
 =item List::Util
+
+=item File::Spec
+
+=item Try:Tiny
+
+=item Compress::Zlib
 
 =item Readonly
 
 =item namespace::autoclean
 
+=item npg_tracking::util::types
+
 =item npg_qc::autoqc::results::result
 
 =item npg_qc::autoqc::role::bam_flagstats
+
+=item npg_qc::autoqc::role::sequence_subset
 
 =back
 

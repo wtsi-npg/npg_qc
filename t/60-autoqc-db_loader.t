@@ -1,11 +1,15 @@
 use strict;
 use warnings;
-use Test::More tests => 73;
+use Test::More tests => 12;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
 use Perl6::Slurp;
 use JSON;
+use File::Temp qw/ tempdir /;
+use File::Copy;
+use Compress::Zlib;
+
 use npg_testing::db;
 
 use_ok('npg_qc::autoqc::db_loader');
@@ -14,7 +18,9 @@ my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
 
-{
+subtest 'basic object attrubutes and filtering' => sub {
+  plan tests => 11;
+
   my $db_loader = npg_qc::autoqc::db_loader->new();
   isa_ok($db_loader, 'npg_qc::autoqc::db_loader');
 
@@ -42,9 +48,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   ok($db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test positive');
   $db_loader = npg_qc::autoqc::db_loader->new(check=>['insert_size','other']);
   ok(!$db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test negative');
-}
+};
 
-{ 
+subtest 'exclude attributes not represented in the db' => sub {
+  plan tests => 4;
+
   my $db_loader = npg_qc::autoqc::db_loader->new(
       path    =>['t/data/autoqc/tag_decode_stats'],
       schema  => $schema,
@@ -62,9 +70,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   $db_loader->_exclude_nondb_attrs('myfile', $values, qw/pear apple orange/);
   is_deeply($values, {'pear' => 1, 'apple' => 2,},
     'hash did not change');
-}
+};
 
-{
+subtest 'loading insert_size results' => sub {
+  plan tests => 25;
+
   my $is_rs = $schema->resultset('InsertSize');
   my $current_count = $is_rs->search({})->count;
 
@@ -136,9 +146,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   );
   lives_ok {$db_loader->load()} 'load new insert size result';
   is($is_rs->search({})->count, $current_count+1, 'a new records added');
-}
+};
 
-{
+subtest 'loading veryfy_bam_id results' => sub {
+  plan tests => 8;
+
   my $is_rs = $schema->resultset('VerifyBamId');
   my $current_count = $is_rs->search({})->count;
   my $count_loaded;
@@ -159,9 +171,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   is($row->freemix, 0.00025, 'freemix');
   is($row->freeLK0, 823213.22, 'freeLK0');
   is($row->freeLK1, 823213.92, 'freeLK1');
-}
+};
 
-{
+subtest 'loading from multiple paths' => sub {
+  plan tests => 3;
+
   my $is_rs = $schema->resultset('InsertSize');
   $is_rs->delete_all();
   my $db_loader = npg_qc::autoqc::db_loader->new(
@@ -176,9 +190,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   lives_ok {$count = $db_loader->load()} 'loading from multiple paths';
   is($count, 3, '3 loaded records reported');
   is($is_rs->search({})->count, 2, 'two records created');
-}
+};
 
-{
+subtest 'capturing errors and warnings' => sub {
+  plan tests => 4;
+
   my $is_rs = $schema->resultset('InsertSize');
   $is_rs->delete_all();
   my $file_good = 't/data/autoqc/dbix_loader/is/12187_2.insert_size.json';
@@ -206,13 +222,16 @@ my $schema = Moose::Meta::Class->create_anon_class(
     'loaded a file with incorrect attribute, gave warning';
   is ($is_rs->search({})->count, 2, 'two records created');
   $is_rs->delete_all();
-}
+};
 
 $schema->resultset('InsertSize')->delete_all();
 my $path = 't/data/autoqc/dbix_loader/run';
 my $num_lane_jsons = 11;
 my $num_plex_jsons = 44;
-{
+
+subtest 'using filteres' => sub {
+  plan tests => 7;
+
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
        verbose => 0,
@@ -263,9 +282,11 @@ my $num_plex_jsons = 44;
        update => 0,
   );
   is ($db_loader->load(), 0, 'loading the same files again with update option false'); 
-}
+};
 
-{
+subtest 'loading results for different checks' => sub {
+  plan tests => 4;
+
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
        verbose => 0,
@@ -291,9 +312,11 @@ my $num_plex_jsons = 44;
   is ($plex_count, $num_plex_jsons, 'number of plexes loaded');
   is ($total_count, $num_plex_jsons+$num_lane_jsons, 'number of records loaded');
   is ($tag_zero_count, 8, 'number of tag zero records loaded');
-}
+};
 
-{
+subtest 'bamflagstats - both subset and human_split filters should work' => sub {
+  plan tests => 6;
+
   my $rs = $schema->resultset('BamFlagstats');
   is ($rs->search({human_split => 'all'})->count, 6, '6 bam flagstats records for target files');
   is ($rs->search({human_split => 'human'})->count, 2, '2 bam flagstats records for human files');
@@ -301,6 +324,135 @@ my $num_plex_jsons = 44;
   is ($rs->search({subset => 'target'})->count, 6, '6 bam flagstats records for target files');
   is ($rs->search({subset => 'human'})->count, 2, '2 bam flagstats records for human files');
   is ($rs->search({subset => 'phix'})->count, 1, '1 bam flagstats records for phix files');
-}
+};
+
+subtest 'load bam_flagstats and stats files' => sub {
+  plan tests => 10;
+  
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+       schema  => $schema,
+       verbose => 1,
+       path    => ['t/data/autoqc/bam_flagstats'],
+  );
+  warnings_like { $db_loader->load() } [
+qr/16960_1\#0\.bam_flagstats\.json: not loading field \'flagstats_metrics_file\'/,
+qr/16960_1\#0\.bam_flagstats\.json: not loading field \'samtools_stats_file\'/,
+qr/16960_1\#0\.bam_flagstats\.json: not loading field \'markdups_metrics_file\'/,
+qr/Creating related record for samtools_stats/,
+qr/Creating related record for samtools_stats/,
+qr/Loaded t\/data\/autoqc\/bam_flagstats\/16960_1\#0\.bam_flagstats\.json/,
+qr/16960_1\#0_phix\.bam_flagstats\.json: not loading field \'flagstats_metrics_file\'/,
+qr/16960_1\#0_phix\.bam_flagstats\.json: not loading field \'samtools_stats_file\'/,
+qr/16960_1\#0_phix\.bam_flagstats\.json: not loading field \'markdups_metrics_file\'/,
+qr/Creating related record for samtools_stats/,
+qr/Creating related record for samtools_stats/,
+qr/Loaded t\/data\/autoqc\/bam_flagstats\/16960_1\#0_phix\.bam_flagstats\.json/,
+qr/2 json files have been loaded/
+  ], 'warnings in verbose mode';
+  
+  my $rs = $schema->resultset('BamFlagstats');
+  my @results = $rs->search({id_run => 16960})->all();
+  is(scalar @results, 2, 'two bam_flagstats records created');
+
+  my $phix_count = 0;
+  my $target_count = 0;
+  foreach my $row (@results) {
+    if ($row->subset) {
+      if ($row->subset eq 'phix') {
+        $phix_count++;
+      }
+    } else {
+      $target_count++;
+    }
+    my @stats = $row->samtools_stats->all();
+    is(scalar @stats, 2, 'two stats records created');
+  }
+
+  is($phix_count, 1, 'one result for phix');
+  is($target_count, 1, 'one result for target');
+
+  $rs = $schema->resultset('SamtoolsStat');
+  my @stats = $rs->search({'filter' => 'F0x900'})->all();
+  is(scalar @stats, 2, 'two stats records for filter F0x900');
+  foreach my $row (@stats) {
+    is($row->bam_flagstat->id_run, 16960, 'can go back to the parent record');
+  }
+
+  @stats = $rs->search({'filter' => 'F0xB00'})->all();
+  is(scalar @stats, 2, 'two stats records for filter F0xB00');
+};
+
+subtest 'reload bam_flagstats and stats files' => sub {
+   plan tests => 14;
+
+   my $tempdir = tempdir( CLEANUP => 1);
+   foreach my $file (glob 't/data/autoqc/bam_flagstats/16960_1#0.*') {
+     copy($file, $tempdir);
+   }
+
+   my $db_loader = npg_qc::autoqc::db_loader->new(
+        schema  => $schema,
+        verbose => 0,
+        path    => [$tempdir]
+   );
+   is($db_loader->update, 1, 'update is true by default');
+   $db_loader->load();
+   is($schema->resultset('SamtoolsStat')->search({})->count, 4, 'number of stats records did not change');
+
+   for my $file (('16960_1#0_F0x900.stats', '16960_1#0_F0xB00.stats')) {
+     open my $fh, '>', join(q[/], $tempdir, $file);
+     print $fh "$file changed\n";
+     close $fh;
+   }
+
+   my $json_file = "$tempdir/16960_1#0.bam_flagstats.json";
+   my $json = slurp $json_file;
+   $json =~ s{t/data/autoqc/bam_flagstats}{$tempdir}g;
+   $json =~ s{8333632}{33};
+   open my $fh, '>', $json_file;
+   print $fh $json;
+   close $fh;
+  
+   npg_qc::autoqc::db_loader->new(
+        schema  => $schema,
+        verbose => 0,
+        path    => [$tempdir],
+        update  => 0,
+   )->load();
+   is($schema->resultset('SamtoolsStat')->search({})->count, 4,
+     'number of stats records did not change');
+   my $rs = $schema->resultset('BamFlagstats')->search(
+     {'id_run' => 16960, 'subset' => 'target'}, {cache => 1});
+   is($rs->count, 1, 'one bamflagstats result for target');
+   my $fs = $rs->next;
+   is($fs->mate_mapped_defferent_chr, 8333632, 'old value');
+   my $stats_rs = $fs->samtools_stats;
+   is ($stats_rs->count(), 2, 'two related results');
+   while (my $stats_row = $stats_rs->next) {
+     my $filter = $stats_row->filter;
+     my $expected = "stats file for 16960_1#0_${filter}.stats\n";
+     is(uncompress($stats_row->file_content), $expected, 'stats file content not updated');
+   }
+
+   npg_qc::autoqc::db_loader->new(
+        schema  => $schema,
+        verbose => 0,
+        path    => [$tempdir],
+   )->load();
+   is($schema->resultset('SamtoolsStat')->search({})->count, 4,
+     'number of stats records did not change');
+   $rs = $schema->resultset('BamFlagstats')->search(
+     {'id_run' => 16960, 'subset' => 'target'}, {cache => 1});
+   is($rs->count, 1, 'one bamflagstats result for target');
+   $fs = $rs->next;
+   is($fs->mate_mapped_defferent_chr, 33, 'new value');
+   $stats_rs = $fs->samtools_stats;
+   is ($stats_rs->count(), 2, 'two related results');
+   while (my $stats_row = $stats_rs->next) {
+     my $filter = $stats_row->filter;
+     my $expected = "16960_1#0_${filter}.stats changed\n";
+     is(uncompress($stats_row->file_content), $expected, 'updated stats file content');
+   }
+};
 
 1;

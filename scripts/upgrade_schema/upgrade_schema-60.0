@@ -1,0 +1,10 @@
+CREATE TABLE `samtools_stats` (
+  `id_samtools_stats`       BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_bam_flagstats`        BIGINT(20) UNSIGNED NOT NULL,
+  `filter`                  VARCHAR(8) NOT NULL,
+  `file_content`            BLOB,
+  PRIMARY KEY (`id_samtools_stats`),
+  CONSTRAINT `seq_summary_fk_bam_flagstats` FOREIGN KEY (`id_bam_flagstats`) REFERENCES `bam_flagstats` (`id_bam_flagstats`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  UNIQUE KEY `unq_sequence_stats` (`id_bam_flagstats`,`filter`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+

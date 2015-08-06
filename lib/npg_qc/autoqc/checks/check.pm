@@ -2,10 +2,8 @@ package npg_qc::autoqc::checks::check;
 
 use Moose;
 use namespace::autoclean;
-use MooseX::ClassAttribute;
 use Class::Load qw(load_class);
 use Carp;
-use English qw(-no_match_vars);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
@@ -26,11 +24,11 @@ npg_qc::autoqc::checks::check
 
 =head1 SYNOPSIS
 
-  my $check1 = npg_qc::autoqc::checks::check->new(path => q[a/valid/path], position => 1, id_run => 2222);
+  my $check = npg_qc::autoqc::checks::check->new(path => q[a/valid/path], position => 1, id_run => 2222);
 
 =head1 DESCRIPTION
 
-A top-level class for autoqc checks. Checks are performed for one lane.
+A parent class for autoqc checks. Checks are performed either for a lane or for a plex(index,lanelet).
 
 =head1 SUBROUTINES/METHODS
 
@@ -84,7 +82,6 @@ has 'file_type' => (isa        => 'Str',
                     default    => $FILE_EXTENSION,
                    );
 
-
 =head2 input_file
 
 A ref to a list with names of input files for this check
@@ -101,7 +98,6 @@ sub _build_input_files {
     return \@files;
 }
 
-
 =head2 result
 
 A result object. Read-only.
@@ -113,7 +109,6 @@ has 'result'     =>  (isa        => 'Object',
                       lazy_build => 1,
                      );
 sub _build_result {
-
     my $self = shift;
 
     my $pkg_name = ref $self;
@@ -144,10 +139,10 @@ sub _build_result {
     return $result;
 }
 
-
 =head2 execute
 
-The actual test should be performed within this method. In this class this method only checks that the given path exists.
+The actual test should implement this method.
+Here this method only checks that the given path exists.
 
 =cut
 sub execute {
@@ -160,7 +155,6 @@ sub execute {
     return 1;
 }
 
-
 =head2 can_run
 
 Decides whether this check can be run for a particular run.
@@ -169,7 +163,6 @@ Decides whether this check can be run for a particular run.
 sub can_run {
     return 1;
 }
-
 
 =head2 get_input_files
 
@@ -180,23 +173,23 @@ sub get_input_files {
     my $self = shift;
 
     my @fnames = ();
-    my $forward = join q[.], File::Spec->catfile($self->path, $self->create_filename($self, 1)),
+    my $forward = join q[.], catfile($self->path, $self->create_filename($self, 1)),
                              $self->file_type;
     my $no_end_forward = undef;
     if (!-e $forward) {
-        $no_end_forward = join q[.], File::Spec->catfile($self->path, $self->create_filename($self)),
+        $no_end_forward = join q[.], catfile($self->path, $self->create_filename($self)),
                                      $self->file_type;
         if (-e $no_end_forward) {
            $forward = $no_end_forward;
         } else {
-           $self->result->comments(qq[Neither $forward no $no_end_forward file found]);
+           $self->result->comments(qq[Neither $forward nor $no_end_forward file found]);
            return @fnames;
         }
     }
 
     push @fnames, $forward;
     if (!defined $no_end_forward) {
-        my $reverse =  join q[.], File::Spec->catfile($self->path, $self->create_filename($self, 2)),
+        my $reverse =  join q[.], catfile($self->path, $self->create_filename($self, 2)),
                                   $self->file_type;
         if (-e $reverse) {push @fnames, $reverse;}
     }
@@ -204,31 +197,26 @@ sub get_input_files {
     return @fnames;
 }
 
-
 =head2 generate_filename_attr
 
 Gets an array containing paths to forward and reverse (if any) input files, and returns
-an array ref with filenames that is suitable for setting the filename attribute.
+an array ref with file names that is suitable for setting the filename attribute.
 
 =cut
 sub generate_filename_attr {
     my $self = shift;
-
-    my $count = 0;
-    my $filename;
+    my @filenames = ();
     foreach my $fname (@{$self->input_files}) {
         my($name, $directories, $suffix) = fileparse($fname);
-        $filename->[$count] = $name;
-        $count++;
+        push @filenames, $name;
     }
-    return $filename;
+    return \@filenames;
 }
-
 
 =head2 overall_pass
 
-Use this function to compute overall lane pass value for a particular check
-if the evaluation is performed separately for a forward and a reverse sequence.
+If the evaluation is performed separately for a forward and a reverse sequence,
+computes overall lane pass value for a particular check.
 
 =cut
 sub overall_pass {
@@ -242,7 +230,7 @@ sub overall_pass {
 returns a file name
 
   npg_qc::autoqc::checks::check->create_filename({id_run=>1,position=>2,tag_index=>3},2);
-  $obj->->create_filename({id_run=>1,position=>2},1);
+  $obj->create_filename({id_run=>1,position=>2},1);
 =cut
 sub create_filename {
     my ($self, $map, $end) = @_;
@@ -254,7 +242,6 @@ sub create_filename {
         defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
 }
 
-no MooseX::ClassAttribute;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -272,15 +259,11 @@ __END__
 
 =item namespace::autoclean
 
-=item MooseX::ClassAttribute
-
 =item Class::Load
 
 =item Carp
 
 =item Readonly
-
-=item English -no_match_vars
 
 =item File::Basename
 

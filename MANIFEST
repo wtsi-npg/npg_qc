@@ -162,6 +162,7 @@ lib/npg_qc/autoqc/role/ref_match.pm
 lib/npg_qc/autoqc/role/result.pm
 lib/npg_qc/autoqc/role/rpt_key.pm
 lib/npg_qc/autoqc/role/sequence_error.pm
+lib/npg_qc/autoqc/role/sequence_subset.pm
 lib/npg_qc/autoqc/role/split_stats.pm
 lib/npg_qc/autoqc/role/tag_decode_stats.pm
 lib/npg_qc/autoqc/role/tag_metrics.pm
@@ -261,6 +262,7 @@ lib/npg_qc/Schema/Result/RunInfo.pm
 lib/npg_qc/Schema/Result/RunRecipe.pm
 lib/npg_qc/Schema/Result/RunTile.pm
 lib/npg_qc/Schema/Result/RunTimeline.pm
+lib/npg_qc/Schema/Result/SamtoolsStat.pm
 lib/npg_qc/Schema/Result/SequenceError.pm
 lib/npg_qc/Schema/Result/SignalMean.pm
 lib/npg_qc/Schema/Result/SpatialFilter.pm
@@ -446,6 +448,14 @@ t/data/api_dbic_fixtures/npg/RunStatusDict.yml
 t/data/api_dbic_fixtures/npg/RunStatus.yml
 t/data/api_dbic_fixtures/npg/Run.yml
 t/data/autoqc/12313_1#0_bam_flagstats.txt
+t/data/autoqc/bam_flagstats/16960_1#0.flagstat
+t/data/autoqc/bam_flagstats/16960_1#0.markdups_metrics.txt
+t/data/autoqc/bam_flagstats/16960_1#0_F0x900.stats
+t/data/autoqc/bam_flagstats/16960_1#0_F0xB00.stats
+t/data/autoqc/bam_flagstats/16960_1#0_phix.flagstat
+t/data/autoqc/bam_flagstats/16960_1#0_phix.markdups_metrics.txt
+t/data/autoqc/bam_flagstats/16960_1#0_phix_F0x900.stats
+t/data/autoqc/bam_flagstats/16960_1#0_phix_F0xB00.stats
 t/data/autoqc/dbix_loader/run/12233_1.upstream_tags.json
 t/data/autoqc/dbix_loader/run/12233_1.adapter.json
 t/data/autoqc/dbix_loader/run/12233_1.gc_fraction.json

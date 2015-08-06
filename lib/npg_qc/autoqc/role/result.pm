@@ -158,6 +158,27 @@ sub to_string {
     return $s;
 }
 
+=head2 filename_root
+
+=cut
+sub filename_root {
+    my $self = shift;
+    return sprintf q[%s_%s%s%s],
+        $self->id_run,
+        $self->position,
+        $self->tag_label(),
+        $self->can(q[subset]) && $self->subset ? q[_] . $self->subset : q[];
+}
+
+=head2 filename4type
+
+=cut
+sub filename4type {
+    my ($self, $file_type) = @_;
+    $file_type ||= q[];
+    return $self->filename_root . $file_type;
+}
+
 =head2 filename4serialization
 
 Filename that should be used to write json serialization of this object to
@@ -165,13 +186,7 @@ Filename that should be used to write json serialization of this object to
 =cut
 sub filename4serialization {
     my $self = shift;
-    return sprintf q[%s_%s%s%s.%s.%s],
-        $self->id_run,
-        $self->position,
-        $self->tag_label(),
-        $self->can(q[subset]) && $self->subset ? q[_] . $self->subset : q[],
-        $self->class_name,
-        q[json];
+    return (join q[.], $self->filename_root, $self->class_name, q[json]);
 }
 
 =head2 write2file

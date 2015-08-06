@@ -58,7 +58,7 @@ has 'pass'         => (isa      => 'Maybe[Bool]',
 
 =head2 path
 
-A path to a directory with fastq input files.
+A path to the input file(s) directory.
 
 =cut
 has 'path'        => (isa      => 'Str',

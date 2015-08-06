@@ -1,6 +1,7 @@
 package npg_qc::autoqc::db_loader;
 
 use Moose;
+use Class::Load qw/load_class/;
 use namespace::autoclean;
 use Carp;
 use JSON;
@@ -12,13 +13,13 @@ use Readonly;
 use npg_qc::Schema;
 use npg_tracking::util::types;
 use npg_qc::autoqc::role::result;
-use npg_qc::autoqc::results::bam_flagstats;
 
 with qw/MooseX::Getopt/;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $CLASS_FIELD => q[__CLASS__];
+Readonly::Scalar my $CLASS_FIELD            => q[__CLASS__];
+Readonly::Scalar my $RELATED_DATA_ACCESSOR_NAME => q[related_data];
 
 has 'path'   =>  ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',
@@ -123,28 +124,29 @@ sub _json2db{
         npg_qc::autoqc::role::result->class_names($class_name);
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-
-        if ($class_name eq 'bam_flagstats') { # need to get the subset/human_split field correctly
-                                            # if one of them is missing
-          my $module = 'npg_qc::autoqc::results::' . $class_name;
-          $values = decode_json($module->load($json_file)->freeze());
+        my $module = 'npg_qc::autoqc::results::' . $class_name;
+        load_class($module);
+        my $instance = $module->load($json_file);
+        if ($class_name eq 'bam_flagstats') {
+          $values = decode_json($instance->freeze());
         }
-
         my $rs = $self->schema->resultset($dbix_class_name);
         my $result_class = $rs->result_class;
 
         $self->_exclude_nondb_attrs($json_file, $values, $result_class->columns());
         $result_class->deflate_unique_key_components($values);
 
+        my $db_result;
         if ($self->update) {
-          $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
+          $db_result = $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
           $count = 1;
         } else {
           if (!$rs->find($values)) {
-            $rs->new($values)->set_inflated_columns($values)->insert();
+            $db_result = $rs->new($values)->set_inflated_columns($values)->insert();
             $count = 1;
           }
         }
+        $self->_load_related($db_result, $instance);
       }
     }
   } catch {
@@ -188,6 +190,27 @@ sub _pass_filter {
     return 0;
   }
   return 1;
+}
+
+sub _load_related {
+  my ($self, $db_result, $instance) = @_;
+
+  my $attempted = 0;
+  if ($db_result && $instance && $instance->can($RELATED_DATA_ACCESSOR_NAME)) {
+    foreach my $related_values ( @{$instance->$RELATED_DATA_ACCESSOR_NAME} ) {
+      # We can get the relationship name from the DBIx object itself.
+      # However, then we cannot have multiple child tables. For bam_flagstats
+      # we are planning to have two.
+      my $relationship_name = delete $related_values->{'relationship_name'};
+      if ($relationship_name) {
+        $self->_log("Creating related record for $relationship_name");
+        $db_result->update_or_create_related($relationship_name, $related_values);
+        $attempted = 1;
+      }
+    }
+  }
+
+  return $attempted;
 }
 
 sub _log {
@@ -237,6 +260,8 @@ npg_qc::autoqc::db_loader
 =over
 
 =item Moose
+
+=item Class::Load
 
 =item namespace::autoclean
 
