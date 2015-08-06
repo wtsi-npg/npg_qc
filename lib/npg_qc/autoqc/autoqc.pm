@@ -131,9 +131,6 @@ has 'species'          => ( isa => 'Str', is => 'ro', required => 0,
                             documentation => 'Species name as used in the reference repository. No synonyms please.',);
 has 'strain'           => ( isa => 'Str', is => 'ro', required => 0,
                             documentation => 'Strain as used in the reference repository.',);
-has 'sequence_type'    => ( isa => 'Str', is => 'ro', required => 0,
-                            documentation => 'Sequence type as phix for spiked phix or similar.',);
-
 
 =head2 qc_in
 
@@ -227,7 +224,7 @@ sub _create_test_object {
                 id_run    => $self->id_run,
 	       };
 
-    my @attrs = qw/tag_index repository reference_genome species strain sequence_type file_type/;
+    my @attrs = qw/tag_index repository reference_genome species strain file_type/;
     foreach my $attr_name (@attrs) {
         if ($attr_name eq q[tag_index] ) {
             if (defined $self->$attr_name) {
@@ -329,7 +326,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

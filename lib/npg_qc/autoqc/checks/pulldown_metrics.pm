@@ -1,8 +1,3 @@
-# Author:        Marina Gourtovaia
-# Created:       10 May 2012
-#
-#
-
 package npg_qc::autoqc::checks::pulldown_metrics;
 
 use Moose;
@@ -42,8 +37,8 @@ Readonly::Hash   my %PICARD_METRICS_FIELDS_MAPPING => {
     'HS_LIBRARY_SIZE'      => 'library_size',
                                        };
 
-has '+input_file_ext' => (default => 'bam',);
-has '+aligner'        => (default => 'fasta',);
+has '+file_type'         => (default => 'bam',);
+has '+aligner'           => (default => 'fasta',);
 
 has 'alignments_in_bam'  => (
 	is => 'ro',
@@ -288,7 +283,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
