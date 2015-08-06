@@ -83,24 +83,20 @@
         tag_index = attrs.tag_index;
       END;
 
-      lane_info_to = c.stash.row_data.$lane_key;
-      time_comp = String.new(text => "$lane_info_to.time_comp");
+      row_info_to = c.stash.row_data.$lane_key || {};
+      time_comp = String.new(text => "$row_info_to.time_comp");
 
-      IF lane_info_to;
-        libs_info.$lane_key.sample_name  = lane_info_to.sample_name;
-        libs_info.$lane_key.sample_id    = lane_info_to.id_sample_lims;
-        libs_info.$lane_key.study_id     = lane_info_to.study_name;
-        libs_info.$lane_key.id_pool_lims = lane_info_to.id_pool_lims;
-        studies_info.$study_id           = lane_info_to.study_name;
+      IF row_info_to;
+        studies_info.$study_id = row_info_to.study_name;
       END;
 -%]
 
 <tr>
 [%- IF sample_link -%]
 <td class="nbsp">
-[%- IF lane_info_to.id_sample_lims; lurl = [lims_url, 'samples', lane_info_to.id_sample_lims]; -%]
-<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), lane_info_to.id_sample_lims) %]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
-<a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lane_info_to.sample_name | html %]</span></a>
+[%- IF row_info_to.id_sample_lims; lurl = [lims_url, 'samples', row_info_to.id_sample_lims]; -%]
+<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.id_sample_lims) %]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
+<a href="[% lurl.join('/') %]"><span class="lib nbsp">[% row_info_to.sample_name | html %]</span></a>
 [%- END -%]
 </td>
 [%- END -%]
@@ -111,22 +107,22 @@
   <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
 
-[%- IF lane_info_to.id_pool_lims || lane_info_to.id_library_lims; -%]
-  [%- IF !lane_collection.run_lane_plex_flags.$lane_key && lane_info_to.id_library_lims; lurl = [lims_url, 'assets', lane_info_to.legacy_library_id]; -%]
-    <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => lane_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
-    <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lane_info_to.id_library_lims | html %]</span></a>
+[%- IF row_info_to.id_library_lims; -%]
+  [%- IF !lane_collection.run_lane_plex_flags.$lane_key && row_info_to.id_library_lims; lurl = [lims_url, 'assets', row_info_to.legacy_library_id]; -%]
+    <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => row_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
+    <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
   [%- ELSE -%]
-    <span class="lib nbsp">[% lane_info_to.id_pool_lims | html %]</span>
+    <span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span>
   [%- END -%]
 [%- END -%]
-[% IF lane_info_to.rnd %]<span class="watermark">R&amp;D</span>[% END %]
+[% IF row_info_to.rnd %]<span class="watermark">R&amp;D</span>[% END %]
 </div>
 </td>
 [% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run); %]
 <td class="id_run"><div class="rel_pos_container">
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run) %]" ><img src="/static/images/focus_on.png" alt="link to run checks" /></a>
 <a href="[% rurl = [npg_url, 'run', id_run]; rurl.join('/'); %]" title="date completed [% time_comp.truncate(10) %]">[% id_run %]</a>
-[%- IF lane_info_to.num_cycles %]<br />[% lane_info_to.num_cycles %][% END -%]
+[%- IF row_info_to.num_cycles %]<br />[% row_info_to.num_cycles %][% END -%]
 </div></td>
 
 [% PROCESS "ui_lanes/lane.tt2" %]
