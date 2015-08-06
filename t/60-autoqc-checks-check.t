@@ -215,7 +215,7 @@ subtest 'finding input' => sub {
     lives_ok { $result = $check->execute } 'no error when no input files found';
     is ($result, 0, 'execute returns zero when input not found');
     is ($check->result->comments,
-        "Neither $path/2549_4_1.fastq no $path/2549_4.fastq file found",
+        "Neither $path/2549_4_1.fastq nor $path/2549_4.fastq file found",
         'comment when no input files found');
 };
 

@@ -10,7 +10,7 @@ use JSON;
 use Compress::Zlib;
 
 subtest 'test attributes and simple methods' => sub {
-  plan tests => 18;
+  plan tests => 20;
 
   use_ok ('npg_qc::autoqc::results::bam_flagstats');
 
@@ -25,7 +25,9 @@ subtest 'test attributes and simple methods' => sub {
   is($r->subset, undef, 'subset field is not set');
   $r->human_split('human');
   is($r->check_name(), 'bam flagstats', 'check name has not changed');
-  $r->subset('human');
+  ok(!$r->has_subset, 'subset attr is not set');
+  $r->set_subset('human');
+  ok($r->has_subset, 'subset attr is set');
   is($r->check_name(), 'bam flagstats human', 'check name has changed');
   is($r->filename4serialization(), '4783_5_human.bam_flagstats.json',
       'file name contains "human" flag');
@@ -94,7 +96,7 @@ subtest 'low-level parsing' => sub {
 };
 
 subtest 'high-level parsing - backwards compatibility' => sub {
-  plan tests => 24;
+  plan tests => 30;
 
   my $tempdir = tempdir( CLEANUP => 1);
   my $package = 'npg_qc::autoqc::results::bam_flagstats';
@@ -103,7 +105,9 @@ subtest 'high-level parsing - backwards compatibility' => sub {
   my $dups_attr_name  = 'markdups_metrics_file';
   my $fstat_attr_name = 'flagstats_metrics_file';
   my $stats_attr_name = 'samtools_stats_file';
-  my $h1 = {position => 5,id_run => 4783,};
+  my $h1 = {position => 5,
+            id_run   => 4783,
+            path     => q[t/data/autoqc]};
 
   my $r1 = $package->new($h1);
   $r1->parsing_metrics_file($dups);
@@ -112,20 +116,26 @@ subtest 'high-level parsing - backwards compatibility' => sub {
   $r1->parsing_flagstats($flagstats_fh);
   close $flagstats_fh;
 
-  $h1->{$dups_attr_name} = $dups;
+  $h1->{$dups_attr_name}  = $dups;
   $h1->{$fstat_attr_name} = $fstat;
   my $r2 = $package->new($h1);
   my $expected = from_json(
     slurp q{t/data/autoqc/4783_5_bam_flagstats.json}, {chomp=>1});
-  for my $r (($r1, $r2)) {
+  $expected->{'path'} = q[t/data/autoqc];
 
-    # for $r1 the files to parse are not given
-    # for $r2 the metrics files are given but the stats files are nor available
-    my $w = 'Not looking for samtools stats files';
-    if ($r->markdups_metrics_file) {
-      $w = 'Not found samtools stats files';
+  my $w = 'Not found samtools stats files';
+  my $count = 0;
+  for my $r (($r1, $r2)) {
+    $count++;
+    if ($count == 1) {
+      throws_ok { $r->execute() }
+        qr/Attribute \(markdups_metrics_file\) does not pass the type constraint/,
+        'execute method fails';
+      warning_like { $r->$stats_attr_name } qr/^$w/, "$stats_attr_name method warns";
+    } else {
+      warning_like { $r->execute() } qr/^$w/, 'execute method warns';
     }
-    warning_like { $r->execute() } qr/^$w/, 'execute method warns';
+
     is(scalar keys %{$r->$stats_attr_name}, 0, 'stats files hash empty');
     lives_and { is scalar @{$r->related_data}, 0} 'no related data';         
 
@@ -136,10 +146,10 @@ subtest 'high-level parsing - backwards compatibility' => sub {
     } 'no error when serializing to json string and file';
 
     my $from_json_hash = from_json($result_json);
-    delete $from_json_hash->{__CLASS__}; 
+    delete $from_json_hash->{__CLASS__};
+    delete $from_json_hash->{$stats_attr_name};
     delete $from_json_hash->{$dups_attr_name};
     delete $from_json_hash->{$fstat_attr_name};
-    delete $from_json_hash->{$stats_attr_name};
 
     is_deeply($from_json_hash, $expected, 'correct json output');
     is($r->total_reads(), 32737230 , 'total reads');
@@ -150,28 +160,43 @@ subtest 'high-level parsing - backwards compatibility' => sub {
     is($r->percent_singletons, 2.92540938863795, 'percent singletons');
     is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
   }
+
+  delete $h1->{'path'};
+  delete $h1->{$dups_attr_name};
+  delete $h1->{$fstat_attr_name};
+  $r1 = $package->new($h1);
+  warning_like {$r1->samtools_stats_file}
+    qr/Path not given - not looking for samtools stats files/,
+    'warning when looking for samtool stats files';
+  is_deeply($r1->samtools_stats_file, {}, 'samtools stats files not found');
+  is($r1->markdups_metrics_file, undef, 'markdups metrics not found');
+  is($r1->flagstats_metrics_file, undef, 'flagstats metrics not found');
+  throws_ok { $r1->execute() } qr/Path not set, cannot run execute/,
+    'no path - execute fails';
 };
 
 subtest 'finding and reading target stats files' => sub {
   plan tests => 6;
 
-  my $data_path = 't/data/autoqc/bam_flagstats/';
+  my $data_path = 't/data/autoqc/bam_flagstats';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
     id_run                 => 16960,
     position               => 1,
     tag_index              => 0,
-    markdups_metrics_file  =>
-      $data_path . '16960_1#0.markdups_metrics.txt',
-    flagstats_metrics_file =>
-      $data_path . '16960_1#0.flagstat',
+    path                   => $data_path,
   );
+
+  is($r->markdups_metrics_file, $data_path.'/16960_1#0.markdups_metrics.txt',
+    'markdups metrics found');
+  is($r->flagstats_metrics_file, $data_path.'/16960_1#0.flagstat',
+    'flagstats metrics found');
 
   warning_like { $r->execute() } qr/Found the following samtools stats files/,
    'successfully calling execute() method';
 
   my $stats_files = {
-     'F0x900' => $data_path . '16960_1#0_F0x900.stats',
-     'F0xB00' => $data_path . '16960_1#0_F0xB00.stats',
+     'F0x900' => $data_path . '/16960_1#0_F0x900.stats',
+     'F0xB00' => $data_path . '/16960_1#0_F0xB00.stats',
                      };
   is_deeply($r->samtools_stats_file, $stats_files, 'stats files found');
    
@@ -186,45 +211,36 @@ subtest 'finding and reading target stats files' => sub {
                   compress("stats file for 16960_1#0_F0xB00.stats\n")};
   is_deeply($r->related_data(), \@related, 'stats files read');
 
-  my $invalid_path = $data_path . '16960_1#0_F0xG00.stats';
+  my $invalid_path = $data_path . '/16960_1#0_F0xG00.stats';
   $r->samtools_stats_file->{'F0xB00'} = $invalid_path;
   throws_ok { $r->related_data() }
     qr/Error reading $invalid_path: Can\'t open \'$invalid_path\'/,
     'error reading one of stats files';
-
- $r = npg_qc::autoqc::results::bam_flagstats->new(
-    id_run                 => 16960,
-    position               => 1,
-    tag_index              => 0,
-    flagstats_metrics_file =>
-      $data_path . '16960_1#0.flagstat',
-  );
-  warning_like { $r->execute() } qr/Found the following samtools stats files/,
-   'successfully calling execute() method';
-  is_deeply($r->samtools_stats_file, $stats_files, 'stats files found');
 };
 
 subtest 'finding and reading phix subset stats files' => sub {
-  plan tests => 3;
+  plan tests => 5;
 
-  my $data_path = 't/data/autoqc/bam_flagstats/';
+  my $data_path = 't/data/autoqc/bam_flagstats';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
     id_run                 => 16960,
     position               => 1,
     tag_index              => 0,
     subset                 => 'phix',
-    markdups_metrics_file  =>
-      $data_path . '16960_1#0_phix.markdups_metrics.txt',
-    flagstats_metrics_file =>
-      $data_path . '16960_1#0_phix.flagstat',
+    path                   =>  $data_path
   );
+
+  is($r->markdups_metrics_file, $data_path.'/16960_1#0_phix.markdups_metrics.txt',
+    'phix markdups metrics found');
+  is($r->flagstats_metrics_file, $data_path.'/16960_1#0_phix.flagstat',
+    'phix flagstats metrics found');
 
   warning_like { $r->execute() } qr/Found the following samtools stats files/,
    'successfully calling execute() method';
 
   my $stats_files = {
-     'F0x900' => $data_path . '16960_1#0_phix_F0x900.stats',
-     'F0xB00' => $data_path . '16960_1#0_phix_F0xB00.stats',
+     'F0x900' => $data_path . '/16960_1#0_phix_F0x900.stats',
+     'F0xB00' => $data_path . '/16960_1#0_phix_F0xB00.stats',
                      };
   is_deeply($r->samtools_stats_file, $stats_files, 'phix stats files found');
    
