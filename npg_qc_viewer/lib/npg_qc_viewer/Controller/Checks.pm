@@ -147,50 +147,56 @@ sub _fetch_by_sample {
 
 sub _display_pools {
   my ($self, $c, $rs, $sample_link) = @_;
-  
+
   if ($rs) {
-      $c->stash->{'db_lookup'} = 1;
-      my $what = $LANES;
+    $c->stash->{'db_lookup'} = 1;
+    my $what = $LANES;
 
-      my $run_lane_map = {};
-      while (my $row = $rs->next) {
-          my $id_run    = $row->id_run;
-          my $position  = $row->position;
-          my $tag_index = $row->tag_index;
+    my $checked = {};
+    my $run_lane_map = {};
+    while (my $row = $rs->next) {
+      my $id_run    = $row->id_run;
+      my $position  = $row->position;
+      my $tag_index = $row->tag_index;
 
-          my $where = {};
-          $where->{'me.id_run'}    = $id_run;
-          $where->{'me.position'}  = $position;
-          $where->{'me.tag_index'} = $tag_index;
+      my $where = {};
+      $where->{'me.id_run'}    = $id_run;
+      $where->{'me.position'}  = $position;
+      $where->{'me.tag_index'}  = $tag_index;
 
-          $self->_run_lanes_from_dwh($c, $where, $what);
+      #Only process run+lane once disregarding how many plexes matched the pool
+      my $run_lane_key = $row->lane_rpt_key_from_key($row->rpt_key);
+      if (! $checked->{$run_lane_key}) {
+        $self->_run_lanes_from_dwh($c, $where, $what);
+        $checked->{$run_lane_key} = 1;
+      }
 
-          if (exists $run_lane_map->{$id_run}) {
-              if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
-                push @{$run_lane_map->{$id_run}}, $position;
-              }
-          } else {
-              $run_lane_map->{$id_run} = [$position];
+      if (exists $run_lane_map->{$id_run}) {
+          if (! any { @{$run_lane_map->{$id_run}} eq $position } ) {
+            push @{$run_lane_map->{$id_run}}, $position;
           }
+      } else {
+          $run_lane_map->{$id_run} = [$position];
       }
+    }
 
-      my $row_data = $c->stash->{'row_data'} || {};
+    my $row_data = $c->stash->{'row_data'} || {};
 
-      my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-      my $temp_collection = npg_qc::autoqc::results::collection->new();
-      my $temp_run_lanes = $collection->run_lane_collections;
+    my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
+    my $temp_collection = npg_qc::autoqc::results::collection->new();
+    my $temp_run_lanes = $collection->run_lane_collections;
 
-      foreach my $key ( keys %{$row_data} ) {
-        if ($temp_run_lanes->{$key}) {
-          $temp_collection->add($temp_run_lanes->{$key}->results);
-        }
+    foreach my $key ( keys %{$row_data} ) {
+      if ($temp_run_lanes->{$key}) {
+        $temp_collection->add($temp_run_lanes->{$key}->results);
       }
+    }
 
-      $c->stash->{'sample_link'} = $sample_link;
-      $self->_data2stash($c, $temp_collection);
-      $c->stash->{'show_total'} = 1;
+    $c->stash->{'sample_link'} = $sample_link;
+    $self->_data2stash($c, $temp_collection);
+    $c->stash->{'show_total'} = 1;
   } else {
-      $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
+    $c->stash->{'template'} = q[ui_lanes/library_lanes.tt2];
   }
 
   return;
