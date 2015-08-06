@@ -578,25 +578,28 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
 
 =head2 pools
 
-Pool page.
+Pools page - retained in order not to change dispatch type for a pool
 
 =cut
 sub pools :Chained('base') :PathPart('pools') :Args(0) {
-  my ( $self, $c) = @_;
+  my ($self, $c) = @_;
+  $c->stash->{error_message} = q[This is an invalid URL];
+  $c->detach(q[Root], q[error_page]);
+  return;
+}
 
-  if (defined $c->request->query_parameters->{id}) {
-      my $id_pool_lims = $c->request->query_parameters->{id};
-      if (!ref $id_pool_lims) {
-          $id_pool_lims = [$id_pool_lims];
-      }
-      $c->stash->{'title'} = _get_title(q[Pools: ] . join q[, ], map {q['].$_.q[']} @{$id_pool_lims});
-      my $rs = $self->_fetch_by_pool($c, $id_pool_lims);
-      my $sample_link = 0;
-      $self->_display_pools($c, $rs, $sample_link);
-  } else {
-      $c->stash->{error_message} = q[This is an invalid URL];
-      $c->detach(q[Root], q[error_page]);
-  }
+=head2 pool
+
+Pool page.
+
+=cut
+sub pool :Chained('base') :PathPart('pools') :Args(1) {
+  my ( $self, $c, $id_pool_lims) = @_;
+
+  $c->stash->{'title'} = _get_title(q[Pools: ] . join q[, ], map {q['].$_.q[']} $id_pool_lims);
+  my $rs = $self->_fetch_by_pool($c, $id_pool_lims);
+  my $sample_link = 0;
+  $self->_display_pools($c, $rs, $sample_link);
   return;
 }
 
@@ -621,7 +624,6 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $id_sample_lims) = @_;
 
     my $sample = $self->_get_sample_lims($c, $id_sample_lims);
-    $c->stash->{'lims_sample'} = $sample;
     my $sample_name = $sample->name;
     my $rs = $self->_fetch_by_sample($c, $id_sample_lims);
     my $sample_link = 1;
