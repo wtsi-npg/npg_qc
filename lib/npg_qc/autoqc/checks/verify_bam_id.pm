@@ -1,20 +1,11 @@
-# Author:        Jennifer Liddle
-# Created:       2014-02-06
-#
-#
-
 package npg_qc::autoqc::checks::verify_bam_id;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 use Carp;
 use File::Basename;
-use Data::Dumper;
 use npg_qc::autoqc::types;
 use Readonly;
-use FindBin qw($Bin);
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_common::roles::software_location
@@ -28,7 +19,7 @@ Readonly::Scalar my $MIN_SNPS => 10**4;
 Readonly::Scalar my $MIN_AVG_DEPTH => 4;
 Readonly::Scalar my $MIN_FREEMIX => 0.05;
 
-has '+input_file_ext' => (default => $EXT,);
+has '+file_type' => (default => $EXT,);
 
 has 'alignments_in_bam'  => (
 	is => 'ro',
@@ -104,7 +95,6 @@ override 'execute' => sub {
   my $cmd = "$VERIFY_NAME $cmd_options";
 
   if(!$self->can_run()) {
-    $self->result->add_comment($self->_cant_run_ms);
     return 1;
   }
 
@@ -130,10 +120,6 @@ override 'execute' => sub {
   }
   return 1;
 };
-
-####################
-# private attributes
-####################
 
 __PACKAGE__->meta->make_immutable();
 
@@ -175,7 +161,19 @@ npg_qc::autoqc::checks::verify_bam_id - compare genotype from bam with Sequenom 
 
 =over
 
+=item Moose
+
+=item Carp
+
+=item File::Basename
+
 =item namespace::autoclean
+
+=item Readonly
+
+=item npg_common::roles::software_location
+
+=item npg_tracking::data::snv::find
 
 =back
 
@@ -185,7 +183,7 @@ npg_qc::autoqc::checks::verify_bam_id - compare genotype from bam with Sequenom 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Jennifer Liddle
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

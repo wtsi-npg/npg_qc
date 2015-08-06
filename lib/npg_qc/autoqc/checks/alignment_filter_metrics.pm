@@ -1,8 +1,3 @@
-# Author:        Marina Gourtovaia
-# Created:       2012-04-25
-#
-#
-
 package npg_qc::autoqc::checks::alignment_filter_metrics;
 
 use Moose;
@@ -16,7 +11,7 @@ extends qw(npg_qc::autoqc::checks::check);
 
 our $VERSION = '0';
 
-has '+input_file_ext' => (default => 'bam_alignment_filter_metrics.json',);
+has '+file_type' => (default => 'bam_alignment_filter_metrics.json',);
 
 override 'execute' => sub {
     my ($self) = @_;
@@ -106,7 +101,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
