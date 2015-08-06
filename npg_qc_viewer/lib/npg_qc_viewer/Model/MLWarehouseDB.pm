@@ -37,18 +37,23 @@ __PACKAGE__->config(
 
 =head2 search_product_metrics
 
-Search product metrics by where conditions (me.id_run, me.position).
+Search product metrics by where conditions (id_run, position, tag_index).
 
 =cut
 sub search_product_metrics {
-  my ($self, $where) = @_;
+  my ($self, $run_details) = @_;
 
-  if(!defined $where){
+  if(!defined $run_details){
     croak q[Conditions were not provided for search];
   }
 
-  if(!defined $where->{'me.id_run'}) {
+  if(!defined $run_details->{'id_run'}) {
     croak q[Id run not defined when querying metrics by me.id_run];
+  }
+
+  my $where = {};
+  foreach my $key (keys %{$run_details}) {
+    $where->{'me.' . $key} = $run_details->{$key};
   }
 
   my $rs = $self->resultset('IseqProductMetric')->
