@@ -319,6 +319,18 @@ sub _display_run_lanes {
     return;
 }
 
+sub _remove_plex_only_keys {
+  my ($self, $values) = @_;
+  foreach my $to_delete ( qw[ legacy_library_id 
+                              sample_name 
+                              id_sample_lims 
+                              study_name 
+                              id_study_lims ] ) {
+    delete $values->{$to_delete};
+  }
+  return $values;
+}
+
 sub _run_lanes_from_dwh {
   my ($self, $c, $where, $retrieve_option) = @_;
 
@@ -334,7 +346,7 @@ sub _run_lanes_from_dwh {
         #Using first tax index available as representative for the lane.
 
         my $key = $product_metric->rpt_key;
-        if ($product_metric->tag_index) {
+        if ( $product_metric->tag_index ) {
           $key = $product_metric->lane_rpt_key_from_key($key);
         }
 
@@ -343,9 +355,7 @@ sub _run_lanes_from_dwh {
           delete $values->{'tag_sequence'};
           if ( $product_metric->tag_index ) { #Pool
             $values->{'id_library_lims'} = $product_metric->iseq_flowcell->id_pool_lims;
-            foreach my $to_delete ( qw[ legacy_library_id sample_name id_sample_lims study_name id_study_lims ] ) {
-              delete $values->{$to_delete};
-            }
+            $values = $self->_remove_plex_only_keys($values);
           }
           $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
           my $to = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
