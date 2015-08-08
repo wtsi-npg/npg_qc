@@ -112,7 +112,7 @@ sub search_pool_lims_by_id {
   return $rs;
 }
 
-=head2 search_sample_lims_by_id
+=head2 search_sample_by_sample_id
 
 Search sample by id
 
