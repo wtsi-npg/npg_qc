@@ -91,7 +91,7 @@ sub search_library_lims_by_id {
 
 =head2 search_pool_lims_by_id
 
-=Search pool by id pool lims.
+Search pool by id pool lims.
 
 =cut
 sub search_pool_lims_by_id {
