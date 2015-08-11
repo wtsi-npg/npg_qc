@@ -145,20 +145,6 @@ sub _fetch_by_sample {
   return $rs;
 }
 
-sub _filter_run_lane_collection_with_keys {
-  my ($self, $collection, $keys) = @_;
-
-  my $temp_collection = npg_qc::autoqc::results::collection->new();
-  my $temp_run_lanes = $collection->run_lane_collections;
-  foreach my $key ( @{$keys} ) {
-    if ( $temp_run_lanes->{$key} ) {
-      $temp_collection->add($temp_run_lanes->{$key}->results);
-    }
-  }
-
-  return $temp_collection;
-}
-
 sub _as_query_conditions {
   my ($self, $obj) = @_;
   my $conditions = {};
@@ -206,7 +192,6 @@ sub _display_pools {
     my $row_data = $c->stash->{'row_data'} || {};
 
     my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-    $collection = $self->_filter_run_lane_collection_with_keys($collection, $rpt_keys);
 
     $self->_data2stash($c, $collection);
   } else {
@@ -243,7 +228,6 @@ sub _display_libs {
       }
 
       my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-      $collection = $self->_filter_run_lane_collection_with_keys($collection, $rpt_keys);
 
       $self->_data2stash($c, $collection);
   } else {
