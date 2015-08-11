@@ -2,6 +2,198 @@
 - cancelled: 0
   cycles: 76
   flowcell_barcode: ~
+  id_run: 3055
+  instrument_model: HK
+  instrument_name: IL6
+  paired_read: 1
+  pf_bases: 912144
+  pf_cluster_count: 120019
+  pf_cluster_density: ~
+  position: 1
+  q20_yield_kb_forward_read: 829385
+  q20_yield_kb_reverse_read: 802685
+  q30_yield_kb_forward_read: 384682
+  q30_yield_kb_reverse_read: 390397
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  qc_complete: 2009-06-15 13:31:20
+  raw_cluster_count: 137489
+  raw_cluster_density: ~
+  run_complete: 2009-06-01 19:26:39
+  run_pending: 2009-05-29 13:21:06
+  tags_decode_cv: ~
+  tags_decode_percent: ~
+- cancelled: 0
+  cycles: 76
+  flowcell_barcode: ~
+  id_run: 3055
+  instrument_model: HK
+  instrument_name: IL6
+  paired_read: 1
+  pf_bases: 1091635
+  pf_cluster_count: 143636
+  pf_cluster_density: ~
+  position: 2
+  q20_yield_kb_forward_read: 918980
+  q20_yield_kb_reverse_read: 846748
+  q30_yield_kb_forward_read: 363877
+  q30_yield_kb_reverse_read: 350454
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  qc_complete: 2009-06-15 13:31:20
+  raw_cluster_count: 162799
+  raw_cluster_density: ~
+  run_complete: 2009-06-01 19:26:39
+  run_pending: 2009-05-29 13:21:06
+  tags_decode_cv: ~
+  tags_decode_percent: ~
+- cancelled: 0
+  cycles: 76
+  flowcell_barcode: ~
+  id_run: 3055
+  instrument_model: HK
+  instrument_name: IL6
+  paired_read: 1
+  pf_bases: 488878
+  pf_cluster_count: 64326
+  pf_cluster_density: ~
+  position: 3
+  q20_yield_kb_forward_read: 449240
+  q20_yield_kb_reverse_read: 401370
+  q30_yield_kb_forward_read: 145832
+  q30_yield_kb_reverse_read: 115864
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  qc_complete: 2009-06-15 13:31:20
+  raw_cluster_count: 70441
+  raw_cluster_density: ~
+  run_complete: 2009-06-01 19:26:39
+  run_pending: 2009-05-29 13:21:06
+  tags_decode_cv: ~
+  tags_decode_percent: ~
+- cancelled: 0
+  cycles: 76
+  flowcell_barcode: ~
+  id_run: 3055
+  instrument_model: HK
+  instrument_name: IL6
+  paired_read: 1
+  pf_bases: 1415833
+  pf_cluster_count: 186294
+  pf_cluster_density: ~
+  position: 4
+  q20_yield_kb_forward_read: 1207496
+  q20_yield_kb_reverse_read: 1172065
+  q30_yield_kb_forward_read: 491785
+  q30_yield_kb_reverse_read: 524382
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  qc_complete: 2009-06-15 13:31:20
+  raw_cluster_count: 234533
+  raw_cluster_density: ~
+  run_complete: 2009-06-01 19:26:39
+  run_pending: 2009-05-29 13:21:06
+  tags_decode_cv: ~
+  tags_decode_percent: ~
+- cancelled: 0
+  cycles: 76
+  flowcell_barcode: ~
+  id_run: 3055
+  instrument_model: HK
+  instrument_name: IL6
+  paired_read: 1
+  pf_bases: 1319873
+  pf_cluster_count: 173667
+  pf_cluster_density: ~
+  position: 5
+  q20_yield_kb_forward_read: 1108689
+  q20_yield_kb_reverse_read: 1053521
+  q30_yield_kb_forward_read: 293011
+  q30_yield_kb_reverse_read: 338867
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  qc_complete: 2009-06-15 13:31:20
+  raw_cluster_count: 224592
+  raw_cluster_density: ~
+  run_complete: 2009-06-01 19:26:39
+  run_pending: 2009-05-29 13:21:06
+  tags_decode_cv: ~
+  tags_decode_percent: ~
+- cancelled: 0
+  cycles: 76
+  flowcell_barcode: ~
+  id_run: 3055
+  instrument_model: HK
+  instrument_name: IL6
+  paired_read: 1
+  pf_bases: 152260
+  pf_cluster_count: 20034
+  pf_cluster_density: ~
+  position: 6
+  q20_yield_kb_forward_read: 142354
+  q20_yield_kb_reverse_read: 136273
+  q30_yield_kb_forward_read: 32616
+  q30_yield_kb_reverse_read: 26341
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  qc_complete: 2009-06-15 13:31:20
+  raw_cluster_count: 22055
+  raw_cluster_density: ~
+  run_complete: 2009-06-01 19:26:39
+  run_pending: 2009-05-29 13:21:06
+  tags_decode_cv: ~
+  tags_decode_percent: ~
+- cancelled: 0
+  cycles: 76
+  flowcell_barcode: ~
+  id_run: 3055
+  instrument_model: HK
+  instrument_name: IL6
+  paired_read: 1
+  pf_bases: 1029959
+  pf_cluster_count: 135521
+  pf_cluster_density: ~
+  position: 7
+  q20_yield_kb_forward_read: 856405
+  q20_yield_kb_reverse_read: 809548
+  q30_yield_kb_forward_read: 288223
+  q30_yield_kb_reverse_read: 321347
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  qc_complete: 2009-06-15 13:31:20
+  raw_cluster_count: 154765
+  raw_cluster_density: ~
+  run_complete: 2009-06-01 19:26:39
+  run_pending: 2009-05-29 13:21:06
+  tags_decode_cv: ~
+  tags_decode_percent: ~
+- cancelled: 0
+  cycles: 76
+  flowcell_barcode: ~
+  id_run: 3055
+  instrument_model: HK
+  instrument_name: IL6
+  paired_read: 1
+  pf_bases: 1026196
+  pf_cluster_count: 135026
+  pf_cluster_density: ~
+  position: 8
+  q20_yield_kb_forward_read: 857731
+  q20_yield_kb_reverse_read: 790407
+  q30_yield_kb_forward_read: 288650
+  q30_yield_kb_reverse_read: 300375
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  qc_complete: 2009-06-15 13:31:20
+  raw_cluster_count: 159701
+  raw_cluster_density: ~
+  run_complete: 2009-06-01 19:26:39
+  run_pending: 2009-05-29 13:21:06
+  tags_decode_cv: ~
+  tags_decode_percent: ~
+- cancelled: 0
+  cycles: 76
+  flowcell_barcode: ~
   id_run: 3323
   instrument_model: HK
   instrument_name: IL27

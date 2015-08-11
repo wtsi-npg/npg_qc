@@ -145,20 +145,6 @@ sub _fetch_by_sample {
   return $rs;
 }
 
-sub _filter_run_lane_collection_with_keys {
-  my ($self, $collection, $keys) = @_;
-
-  my $temp_collection = npg_qc::autoqc::results::collection->new();
-  my $temp_run_lanes = $collection->run_lane_collections;
-  foreach my $key ( @{$keys} ) {
-    if ( $temp_run_lanes->{$key} ) {
-      $temp_collection->add($temp_run_lanes->{$key}->results);
-    }
-  }
-
-  return $temp_collection;
-}
-
 sub _as_query_conditions {
   my ($self, $obj) = @_;
   my $conditions = {};
@@ -206,7 +192,6 @@ sub _display_pools {
     my $row_data = $c->stash->{'row_data'} || {};
 
     my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-    $collection = $self->_filter_run_lane_collection_with_keys($collection, $rpt_keys);
 
     $self->_data2stash($c, $collection);
   } else {
@@ -243,7 +228,6 @@ sub _display_libs {
       }
 
       my $collection = $c->model('Check')->load_lanes($run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-      $collection = $self->_filter_run_lane_collection_with_keys($collection, $rpt_keys);
 
       $self->_data2stash($c, $collection);
   } else {
@@ -321,14 +305,22 @@ sub _display_run_lanes {
 
 sub _remove_plex_only_keys {
   my ($self, $values) = @_;
+  my $new_values = {%$values};
   foreach my $to_delete ( qw[ legacy_library_id
                               sample_name
                               id_sample_lims
                               study_name
                               id_study_lims ] ) {
-    delete $values->{$to_delete};
+    delete $new_values->{$to_delete};
   }
-  return $values;
+  return $new_values;
+}
+
+sub _remove_lane_only_keys {
+  my ($self, $values) = @_;
+  my $new_values = {%$values};
+  delete $new_values->{'manual_qc'};
+  return $new_values;
 }
 
 sub _run_lanes_from_dwh {
@@ -354,10 +346,9 @@ sub _run_lanes_from_dwh {
           my $values = $self->_build_hash($product_metric);
           delete $values->{'tag_sequence'};
           if ( $product_metric->tag_index ) { #Pool
-            $values->{'id_library_lims'} = $product_metric->iseq_flowcell->id_pool_lims;
+            $values->{'id_library_lims'} = $values->{'id_pool_lims'};
             $values = $self->_remove_plex_only_keys($values);
           }
-          $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
           my $to = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
 
           $row_data->{$key} = $to;
@@ -371,6 +362,7 @@ sub _run_lanes_from_dwh {
 
         if ( !defined $row_data->{$key} ) {
           my $values = $self->_build_hash($product_metric);
+          $values = $self->_remove_lane_only_keys($values);
           my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
           $row_data->{$key} = $to;
         }
@@ -400,6 +392,7 @@ sub _build_hash {
     $values->{'legacy_library_id'} = $product_metric->iseq_flowcell->legacy_library_id;
     $values->{'id_pool_lims'}      = $product_metric->iseq_flowcell->id_pool_lims;
     $values->{'rnd'}               = $product_metric->iseq_flowcell->is_r_and_d;
+    $values->{'manual_qc'}         = $product_metric->iseq_flowcell->manual_qc;
 
     my $sample_row = $product_metric->iseq_flowcell->sample;
     my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});

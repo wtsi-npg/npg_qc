@@ -48,7 +48,7 @@ my $warn_no_paths      = qr/No paths to run folder/;
 my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
 
 subtest 'All combinations for checks controller' => sub {
-  plan tests => 26;
+  plan tests => 28;
   
   my $base = tempdir(UNLINK => 1);
   my $path = $base . q[/archive];
@@ -83,7 +83,8 @@ subtest 'All combinations for checks controller' => sub {
   push @urls,  '/checks/runs-from-staging/4025';
   push @urls,  '/checks/path?path=t/data/staging/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/qc';
   push @urls,  '/checks/samples/3055';
-  push @urls,  '/checks/libraries?name=AC0001C+1';
+  push @urls,  '/checks/libraries?id=NT28560W';
+  push @urls,  '/checks/pools/NT28560W';
   
   my @warnings = ();
   push @warnings, [$warn_id,];
@@ -98,7 +99,8 @@ subtest 'All combinations for checks controller' => sub {
   push @warnings, [$warn_id,];
   push @warnings, [$warn_id,];
   push @warnings, [{carped => $warn_no_paths}, $warn_id,];
-  push @warnings, [{carped => $warn_no_paths}, $warn_id,];
+  push @warnings, [$warn_id,]; #id_run 4025
+  push @warnings, [$warn_id,]; #id_run 4025
 
   my $it = each_array( @urls, @warnings );
   while ( my ($url, $warning_set) = $it->() ) {

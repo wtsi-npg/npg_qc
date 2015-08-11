@@ -1,6 +1,374 @@
 ---
 - actual_forward_read_length: ~
   actual_reverse_read_length: ~
+  adapters_percent_forward_read: 8.23
+  adapters_percent_reverse_read: 8.59
+  gc_percent_forward_read: 48.14
+  gc_percent_reverse_read: 48.00
+  genotype_mean_depth: 0.35
+  genotype_sample_name_match: ~
+  genotype_sample_name_relaxed_match: ~
+  human_percent_duplicate: ~
+  human_percent_mapped: ~
+  id_iseq_flowcell_tmp: 2514299
+  id_iseq_pr_metrics_tmp: 153993597
+  id_run: 3055
+  indexing_read_length: ~
+  insert_size_median: 159
+  insert_size_normal_fit_confidence: ~
+  insert_size_num_modes: ~
+  insert_size_quartile1: 102
+  insert_size_quartile3: 227
+  mean_bait_coverage: ~
+  num_reads: 24003740
+  on_bait_percent: ~
+  on_or_near_bait_percent: ~
+  percent_duplicate: 0.48
+  percent_mapped: 66.80
+  position: 1
+  q20_yield_kb_forward_read: 829385
+  q20_yield_kb_reverse_read: 802685
+  q30_yield_kb_forward_read: 384682
+  q30_yield_kb_reverse_read: 390397
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  ref_match1_name: Homo sapiens 1000Genomes
+  ref_match1_percent: 95.10
+  ref_match2_name: Gorilla gorilla gorilla
+  ref_match2_percent: 85.30
+  sequence_mismatch_percent_forward_read: 5.67
+  sequence_mismatch_percent_reverse_read: 6.00
+  tag_decode_count: ~
+  tag_decode_percent: ~
+  tag_index: ~
+  tag_sequence4deplexing: ~
+  verify_bam_id_average_depth: ~
+  verify_bam_id_score: ~
+  verify_bam_id_snp_count: ~
+- actual_forward_read_length: ~
+  actual_reverse_read_length: ~
+  adapters_percent_forward_read: 8.22
+  adapters_percent_reverse_read: 8.00
+  gc_percent_forward_read: 48.35
+  gc_percent_reverse_read: 48.35
+  genotype_mean_depth: 1.00
+  genotype_sample_name_match: ~
+  genotype_sample_name_relaxed_match: ~
+  human_percent_duplicate: ~
+  human_percent_mapped: ~
+  id_iseq_flowcell_tmp: 2514300
+  id_iseq_pr_metrics_tmp: 153993598
+  id_run: 3055
+  indexing_read_length: ~
+  insert_size_median: 160
+  insert_size_normal_fit_confidence: ~
+  insert_size_num_modes: ~
+  insert_size_quartile1: 102
+  insert_size_quartile3: 227
+  mean_bait_coverage: ~
+  num_reads: 28727124
+  on_bait_percent: ~
+  on_or_near_bait_percent: ~
+  percent_duplicate: 0.52
+  percent_mapped: 69.68
+  position: 2
+  q20_yield_kb_forward_read: 918980
+  q20_yield_kb_reverse_read: 846748
+  q30_yield_kb_forward_read: 363877
+  q30_yield_kb_reverse_read: 350454
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  ref_match1_name: Homo sapiens 1000Genomes
+  ref_match1_percent: 95.80
+  ref_match2_name: Gorilla gorilla gorilla
+  ref_match2_percent: 86.80
+  sequence_mismatch_percent_forward_read: 5.97
+  sequence_mismatch_percent_reverse_read: 6.56
+  tag_decode_count: ~
+  tag_decode_percent: ~
+  tag_index: ~
+  tag_sequence4deplexing: ~
+  verify_bam_id_average_depth: ~
+  verify_bam_id_score: ~
+  verify_bam_id_snp_count: ~
+- actual_forward_read_length: ~
+  actual_reverse_read_length: ~
+  adapters_percent_forward_read: 16.78
+  adapters_percent_reverse_read: 10.27
+  gc_percent_forward_read: 53.45
+  gc_percent_reverse_read: 53.41
+  genotype_mean_depth: ~
+  genotype_sample_name_match: ~
+  genotype_sample_name_relaxed_match: ~
+  human_percent_duplicate: 67.79
+  human_percent_mapped: 86.68
+  id_iseq_flowcell_tmp: 2514301
+  id_iseq_pr_metrics_tmp: 153993599
+  id_run: 3055
+  indexing_read_length: ~
+  insert_size_median: 119
+  insert_size_normal_fit_confidence: ~
+  insert_size_num_modes: ~
+  insert_size_quartile1: 118
+  insert_size_quartile3: 119
+  mean_bait_coverage: ~
+  num_reads: 12853068
+  on_bait_percent: ~
+  on_or_near_bait_percent: ~
+  percent_duplicate: 97.34
+  percent_mapped: 11.39
+  position: 3
+  q20_yield_kb_forward_read: 449240
+  q20_yield_kb_reverse_read: 401370
+  q30_yield_kb_forward_read: 145832
+  q30_yield_kb_reverse_read: 115864
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  ref_match1_name: Danio rerio zv9
+  ref_match1_percent: 18.40
+  ref_match2_name: Mus musculus NCBIm37
+  ref_match2_percent: 0.20
+  sequence_mismatch_percent_forward_read: 4.28
+  sequence_mismatch_percent_reverse_read: 20.95
+  tag_decode_count: ~
+  tag_decode_percent: ~
+  tag_index: ~
+  tag_sequence4deplexing: ~
+  verify_bam_id_average_depth: ~
+  verify_bam_id_score: ~
+  verify_bam_id_snp_count: ~
+- actual_forward_read_length: ~
+  actual_reverse_read_length: ~
+  adapters_percent_forward_read: 0.02
+  adapters_percent_reverse_read: 0.01
+  gc_percent_forward_read: 44.60
+  gc_percent_reverse_read: 44.84
+  genotype_mean_depth: ~
+  genotype_sample_name_match: ~
+  genotype_sample_name_relaxed_match: ~
+  human_percent_duplicate: ~
+  human_percent_mapped: ~
+  id_iseq_flowcell_tmp: 2514302
+  id_iseq_pr_metrics_tmp: 153993600
+  id_run: 3055
+  indexing_read_length: ~
+  insert_size_median: 188
+  insert_size_normal_fit_confidence: ~
+  insert_size_num_modes: ~
+  insert_size_quartile1: 172
+  insert_size_quartile3: 206
+  mean_bait_coverage: ~
+  num_reads: 37258728
+  on_bait_percent: ~
+  on_or_near_bait_percent: ~
+  percent_duplicate: 95.46
+  percent_mapped: 98.31
+  position: 4
+  q20_yield_kb_forward_read: 1207496
+  q20_yield_kb_reverse_read: 1172065
+  q30_yield_kb_forward_read: 491785
+  q30_yield_kb_reverse_read: 524382
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  ref_match1_name: PhiX Illumina
+  ref_match1_percent: 98.60
+  ref_match2_name: Shigella sonnei Ss046
+  ref_match2_percent: 0.10
+  sequence_mismatch_percent_forward_read: 1.71
+  sequence_mismatch_percent_reverse_read: 2.01
+  tag_decode_count: ~
+  tag_decode_percent: ~
+  tag_index: ~
+  tag_sequence4deplexing: ~
+  verify_bam_id_average_depth: ~
+  verify_bam_id_score: ~
+  verify_bam_id_snp_count: ~
+- actual_forward_read_length: ~
+  actual_reverse_read_length: ~
+  adapters_percent_forward_read: 2.91
+  adapters_percent_reverse_read: 1.16
+  gc_percent_forward_read: 53.35
+  gc_percent_reverse_read: 53.61
+  genotype_mean_depth: ~
+  genotype_sample_name_match: ~
+  genotype_sample_name_relaxed_match: ~
+  human_percent_duplicate: 41.77
+  human_percent_mapped: 79.12
+  id_iseq_flowcell_tmp: 2514303
+  id_iseq_pr_metrics_tmp: 153993601
+  id_run: 3055
+  indexing_read_length: ~
+  insert_size_median: 99
+  insert_size_normal_fit_confidence: ~
+  insert_size_num_modes: ~
+  insert_size_quartile1: 99
+  insert_size_quartile3: 99
+  mean_bait_coverage: ~
+  num_reads: 34726158
+  on_bait_percent: ~
+  on_or_near_bait_percent: ~
+  percent_duplicate: 89.74
+  percent_mapped: 1.98
+  position: 5
+  q20_yield_kb_forward_read: 1108689
+  q20_yield_kb_reverse_read: 1053521
+  q30_yield_kb_forward_read: 293011
+  q30_yield_kb_reverse_read: 338867
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  ref_match1_name: Danio rerio zv9
+  ref_match1_percent: 3.10
+  ref_match2_name: Mus musculus NCBIm37
+  ref_match2_percent: 0.10
+  sequence_mismatch_percent_forward_read: 11.38
+  sequence_mismatch_percent_reverse_read: 16.56
+  tag_decode_count: ~
+  tag_decode_percent: ~
+  tag_index: ~
+  tag_sequence4deplexing: ~
+  verify_bam_id_average_depth: ~
+  verify_bam_id_score: ~
+  verify_bam_id_snp_count: ~
+- actual_forward_read_length: ~
+  actual_reverse_read_length: ~
+  adapters_percent_forward_read: 9.94
+  adapters_percent_reverse_read: 9.28
+  gc_percent_forward_read: 53.55
+  gc_percent_reverse_read: 53.61
+  genotype_mean_depth: ~
+  genotype_sample_name_match: ~
+  genotype_sample_name_relaxed_match: ~
+  human_percent_duplicate: 88.90
+  human_percent_mapped: 90.57
+  id_iseq_flowcell_tmp: 2514304
+  id_iseq_pr_metrics_tmp: 153993602
+  id_run: 3055
+  indexing_read_length: ~
+  insert_size_median: 92
+  insert_size_normal_fit_confidence: ~
+  insert_size_num_modes: ~
+  insert_size_quartile1: 86
+  insert_size_quartile3: 119
+  mean_bait_coverage: ~
+  num_reads: 3987034
+  on_bait_percent: ~
+  on_or_near_bait_percent: ~
+  percent_duplicate: 95.73
+  percent_mapped: 4.95
+  position: 6
+  q20_yield_kb_forward_read: 142354
+  q20_yield_kb_reverse_read: 136273
+  q30_yield_kb_forward_read: 32616
+  q30_yield_kb_reverse_read: 26341
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  ref_match1_name: Danio rerio zv9
+  ref_match1_percent: 11.60
+  ref_match2_name: Mus musculus NCBIm37
+  ref_match2_percent: 0.70
+  sequence_mismatch_percent_forward_read: 7.39
+  sequence_mismatch_percent_reverse_read: 23.80
+  tag_decode_count: ~
+  tag_decode_percent: ~
+  tag_index: ~
+  tag_sequence4deplexing: ~
+  verify_bam_id_average_depth: ~
+  verify_bam_id_score: ~
+  verify_bam_id_snp_count: ~
+- actual_forward_read_length: ~
+  actual_reverse_read_length: ~
+  adapters_percent_forward_read: 0.41
+  adapters_percent_reverse_read: 0.31
+  gc_percent_forward_read: 58.06
+  gc_percent_reverse_read: 58.32
+  genotype_mean_depth: ~
+  genotype_sample_name_match: ~
+  genotype_sample_name_relaxed_match: ~
+  human_percent_duplicate: ~
+  human_percent_mapped: ~
+  id_iseq_flowcell_tmp: 2514305
+  id_iseq_pr_metrics_tmp: 153993603
+  id_run: 3055
+  indexing_read_length: ~
+  insert_size_median: 172
+  insert_size_normal_fit_confidence: ~
+  insert_size_num_modes: ~
+  insert_size_quartile1: 140
+  insert_size_quartile3: 207
+  mean_bait_coverage: ~
+  num_reads: 27104180
+  on_bait_percent: ~
+  on_or_near_bait_percent: ~
+  percent_duplicate: ~
+  percent_mapped: ~
+  position: 7
+  q20_yield_kb_forward_read: 856405
+  q20_yield_kb_reverse_read: 809548
+  q30_yield_kb_forward_read: 288223
+  q30_yield_kb_reverse_read: 321347
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  ref_match1_name: Leishmania donovani V1_Un
+  ref_match1_percent: 98.20
+  ref_match2_name: Leishmania infantum JPCM5
+  ref_match2_percent: 91.30
+  sequence_mismatch_percent_forward_read: 1.54
+  sequence_mismatch_percent_reverse_read: 1.82
+  tag_decode_count: ~
+  tag_decode_percent: ~
+  tag_index: ~
+  tag_sequence4deplexing: ~
+  verify_bam_id_average_depth: ~
+  verify_bam_id_score: ~
+  verify_bam_id_snp_count: ~
+- actual_forward_read_length: ~
+  actual_reverse_read_length: ~
+  adapters_percent_forward_read: 1.29
+  adapters_percent_reverse_read: 0.72
+  gc_percent_forward_read: 58.26
+  gc_percent_reverse_read: 58.52
+  genotype_mean_depth: ~
+  genotype_sample_name_match: ~
+  genotype_sample_name_relaxed_match: ~
+  human_percent_duplicate: ~
+  human_percent_mapped: ~
+  id_iseq_flowcell_tmp: 2514306
+  id_iseq_pr_metrics_tmp: 153993604
+  id_run: 3055
+  indexing_read_length: ~
+  insert_size_median: 204
+  insert_size_normal_fit_confidence: ~
+  insert_size_num_modes: ~
+  insert_size_quartile1: 162
+  insert_size_quartile3: 247
+  mean_bait_coverage: ~
+  num_reads: 27005160
+  on_bait_percent: ~
+  on_or_near_bait_percent: ~
+  percent_duplicate: ~
+  percent_mapped: ~
+  position: 8
+  q20_yield_kb_forward_read: 857731
+  q20_yield_kb_reverse_read: 790407
+  q30_yield_kb_forward_read: 288650
+  q30_yield_kb_reverse_read: 300375
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: 0
+  ref_match1_name: Leishmania donovani V1_Un
+  ref_match1_percent: 97.40
+  ref_match2_name: Leishmania infantum JPCM5
+  ref_match2_percent: 93.20
+  sequence_mismatch_percent_forward_read: 1.71
+  sequence_mismatch_percent_reverse_read: 1.96
+  tag_decode_count: ~
+  tag_decode_percent: ~
+  tag_index: ~
+  tag_sequence4deplexing: ~
+  verify_bam_id_average_depth: ~
+  verify_bam_id_score: ~
+  verify_bam_id_snp_count: ~
+- actual_forward_read_length: ~
+  actual_reverse_read_length: ~
   adapters_percent_forward_read: 0.08
   adapters_percent_reverse_read: 0.08
   gc_percent_forward_read: 27.96
@@ -11,7 +379,7 @@
   human_percent_duplicate: 13.72
   human_percent_mapped: 87.93
   id_iseq_flowcell_tmp: 2515795
-  id_iseq_pr_metrics_tmp: 144736759
+  id_iseq_pr_metrics_tmp: 153994668
   id_run: 3323
   indexing_read_length: ~
   insert_size_median: 324
@@ -57,7 +425,7 @@
   human_percent_duplicate: 56.23
   human_percent_mapped: 65.04
   id_iseq_flowcell_tmp: 2515796
-  id_iseq_pr_metrics_tmp: 144736760
+  id_iseq_pr_metrics_tmp: 153994669
   id_run: 3323
   indexing_read_length: ~
   insert_size_median: 284
@@ -103,7 +471,7 @@
   human_percent_duplicate: 61.74
   human_percent_mapped: 74.29
   id_iseq_flowcell_tmp: 2515797
-  id_iseq_pr_metrics_tmp: 144736761
+  id_iseq_pr_metrics_tmp: 153994670
   id_run: 3323
   indexing_read_length: ~
   insert_size_median: 300
@@ -149,7 +517,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2515798
-  id_iseq_pr_metrics_tmp: 144736762
+  id_iseq_pr_metrics_tmp: 153994671
   id_run: 3323
   indexing_read_length: ~
   insert_size_median: 186
@@ -195,7 +563,7 @@
   human_percent_duplicate: 6.15
   human_percent_mapped: 98.48
   id_iseq_flowcell_tmp: 2515799
-  id_iseq_pr_metrics_tmp: 144736763
+  id_iseq_pr_metrics_tmp: 153994672
   id_run: 3323
   indexing_read_length: ~
   insert_size_median: 284
@@ -241,7 +609,7 @@
   human_percent_duplicate: 1.19
   human_percent_mapped: 98.03
   id_iseq_flowcell_tmp: 2515800
-  id_iseq_pr_metrics_tmp: 144736764
+  id_iseq_pr_metrics_tmp: 153994673
   id_run: 3323
   indexing_read_length: ~
   insert_size_median: 255
@@ -287,7 +655,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2515801
-  id_iseq_pr_metrics_tmp: 144736765
+  id_iseq_pr_metrics_tmp: 153994674
   id_run: 3323
   indexing_read_length: ~
   insert_size_median: 502
@@ -333,7 +701,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2515802
-  id_iseq_pr_metrics_tmp: 144736766
+  id_iseq_pr_metrics_tmp: 153994675
   id_run: 3323
   indexing_read_length: ~
   insert_size_median: 506
@@ -379,7 +747,7 @@
   human_percent_duplicate: 56.60
   human_percent_mapped: 62.25
   id_iseq_flowcell_tmp: 2516861
-  id_iseq_pr_metrics_tmp: 144737883
+  id_iseq_pr_metrics_tmp: 153995792
   id_run: 3500
   indexing_read_length: ~
   insert_size_median: 299
@@ -425,7 +793,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2516862
-  id_iseq_pr_metrics_tmp: 144737884
+  id_iseq_pr_metrics_tmp: 153995793
   id_run: 3500
   indexing_read_length: ~
   insert_size_median: 315
@@ -471,7 +839,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2516863
-  id_iseq_pr_metrics_tmp: 144737885
+  id_iseq_pr_metrics_tmp: 153995794
   id_run: 3500
   indexing_read_length: ~
   insert_size_median: 316
@@ -517,7 +885,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2516864
-  id_iseq_pr_metrics_tmp: 144737886
+  id_iseq_pr_metrics_tmp: 153995795
   id_run: 3500
   indexing_read_length: ~
   insert_size_median: 188
@@ -563,7 +931,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2516865
-  id_iseq_pr_metrics_tmp: 144737887
+  id_iseq_pr_metrics_tmp: 153995796
   id_run: 3500
   indexing_read_length: ~
   insert_size_median: 315
@@ -609,7 +977,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2516866
-  id_iseq_pr_metrics_tmp: 144737888
+  id_iseq_pr_metrics_tmp: 153995797
   id_run: 3500
   indexing_read_length: ~
   insert_size_median: 485
@@ -655,7 +1023,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2516867
-  id_iseq_pr_metrics_tmp: 144737889
+  id_iseq_pr_metrics_tmp: 153995798
   id_run: 3500
   indexing_read_length: ~
   insert_size_median: 316
@@ -701,7 +1069,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2516868
-  id_iseq_pr_metrics_tmp: 144737890
+  id_iseq_pr_metrics_tmp: 153995799
   id_run: 3500
   indexing_read_length: ~
   insert_size_median: 495
@@ -747,7 +1115,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2519864
-  id_iseq_pr_metrics_tmp: 144740704
+  id_iseq_pr_metrics_tmp: 153998516
   id_run: 3965
   indexing_read_length: ~
   insert_size_median: 275
@@ -793,7 +1161,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2519865
-  id_iseq_pr_metrics_tmp: 144740705
+  id_iseq_pr_metrics_tmp: 153998517
   id_run: 3965
   indexing_read_length: ~
   insert_size_median: 276
@@ -839,7 +1207,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2519866
-  id_iseq_pr_metrics_tmp: 144740706
+  id_iseq_pr_metrics_tmp: 153998518
   id_run: 3965
   indexing_read_length: ~
   insert_size_median: 278
@@ -885,7 +1253,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2519867
-  id_iseq_pr_metrics_tmp: 144740707
+  id_iseq_pr_metrics_tmp: 153998519
   id_run: 3965
   indexing_read_length: ~
   insert_size_median: 189
@@ -931,7 +1299,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2519868
-  id_iseq_pr_metrics_tmp: 144740708
+  id_iseq_pr_metrics_tmp: 153998520
   id_run: 3965
   indexing_read_length: ~
   insert_size_median: 258
@@ -977,7 +1345,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2519869
-  id_iseq_pr_metrics_tmp: 144740709
+  id_iseq_pr_metrics_tmp: 153998521
   id_run: 3965
   indexing_read_length: ~
   insert_size_median: 254
@@ -1023,7 +1391,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2519870
-  id_iseq_pr_metrics_tmp: 144740710
+  id_iseq_pr_metrics_tmp: 153998522
   id_run: 3965
   indexing_read_length: ~
   insert_size_median: 255
@@ -1069,7 +1437,7 @@
   human_percent_duplicate: 56.73
   human_percent_mapped: 98.54
   id_iseq_flowcell_tmp: 2519871
-  id_iseq_pr_metrics_tmp: 144740711
+  id_iseq_pr_metrics_tmp: 153998523
   id_run: 3965
   indexing_read_length: ~
   insert_size_median: ~
@@ -1115,7 +1483,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2520040
-  id_iseq_pr_metrics_tmp: 144741212
+  id_iseq_pr_metrics_tmp: 153999024
   id_run: 4025
   indexing_read_length: ~
   insert_size_median: 221
@@ -1161,7 +1529,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2520041
-  id_iseq_pr_metrics_tmp: 144741213
+  id_iseq_pr_metrics_tmp: 153999025
   id_run: 4025
   indexing_read_length: ~
   insert_size_median: 240
@@ -1207,7 +1575,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2520042
-  id_iseq_pr_metrics_tmp: 144741214
+  id_iseq_pr_metrics_tmp: 153999026
   id_run: 4025
   indexing_read_length: ~
   insert_size_median: 229
@@ -1253,7 +1621,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2520043
-  id_iseq_pr_metrics_tmp: 144741215
+  id_iseq_pr_metrics_tmp: 153999027
   id_run: 4025
   indexing_read_length: ~
   insert_size_median: 189
@@ -1299,7 +1667,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2520044
-  id_iseq_pr_metrics_tmp: 144741216
+  id_iseq_pr_metrics_tmp: 153999028
   id_run: 4025
   indexing_read_length: ~
   insert_size_median: 173
@@ -1345,7 +1713,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2520045
-  id_iseq_pr_metrics_tmp: 144741217
+  id_iseq_pr_metrics_tmp: 153999029
   id_run: 4025
   indexing_read_length: ~
   insert_size_median: 189
@@ -1391,7 +1759,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2520046
-  id_iseq_pr_metrics_tmp: 144741218
+  id_iseq_pr_metrics_tmp: 153999030
   id_run: 4025
   indexing_read_length: ~
   insert_size_median: 186
@@ -1437,7 +1805,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2520047
-  id_iseq_pr_metrics_tmp: 144741219
+  id_iseq_pr_metrics_tmp: 153999031
   id_run: 4025
   indexing_read_length: ~
   insert_size_median: 186
@@ -1483,7 +1851,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532520
-  id_iseq_pr_metrics_tmp: 144754991
+  id_iseq_pr_metrics_tmp: 154012803
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 410
@@ -1529,7 +1897,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532530
-  id_iseq_pr_metrics_tmp: 144754992
+  id_iseq_pr_metrics_tmp: 154012804
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 343
@@ -1575,7 +1943,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532516
-  id_iseq_pr_metrics_tmp: 144754993
+  id_iseq_pr_metrics_tmp: 154012805
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 307
@@ -1621,7 +1989,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532511
-  id_iseq_pr_metrics_tmp: 144754994
+  id_iseq_pr_metrics_tmp: 154012806
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 383
@@ -1667,7 +2035,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532526
-  id_iseq_pr_metrics_tmp: 144754995
+  id_iseq_pr_metrics_tmp: 154012807
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 335
@@ -1713,7 +2081,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532531
-  id_iseq_pr_metrics_tmp: 144754996
+  id_iseq_pr_metrics_tmp: 154012808
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 405
@@ -1759,7 +2127,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532510
-  id_iseq_pr_metrics_tmp: 144754997
+  id_iseq_pr_metrics_tmp: 154012809
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 524
@@ -1805,7 +2173,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532527
-  id_iseq_pr_metrics_tmp: 144754998
+  id_iseq_pr_metrics_tmp: 154012810
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 320
@@ -1851,7 +2219,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: ~
-  id_iseq_pr_metrics_tmp: 144754999
+  id_iseq_pr_metrics_tmp: 154012811
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 352
@@ -1897,7 +2265,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532522
-  id_iseq_pr_metrics_tmp: 144755000
+  id_iseq_pr_metrics_tmp: 154012812
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 326
@@ -1943,7 +2311,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532525
-  id_iseq_pr_metrics_tmp: 144755001
+  id_iseq_pr_metrics_tmp: 154012813
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 348
@@ -1989,7 +2357,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532532
-  id_iseq_pr_metrics_tmp: 144755002
+  id_iseq_pr_metrics_tmp: 154012814
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 377
@@ -2035,7 +2403,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532515
-  id_iseq_pr_metrics_tmp: 144755003
+  id_iseq_pr_metrics_tmp: 154012815
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 418
@@ -2081,7 +2449,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532512
-  id_iseq_pr_metrics_tmp: 144755004
+  id_iseq_pr_metrics_tmp: 154012816
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 472
@@ -2127,7 +2495,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532518
-  id_iseq_pr_metrics_tmp: 144755005
+  id_iseq_pr_metrics_tmp: 154012817
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 352
@@ -2173,7 +2541,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532521
-  id_iseq_pr_metrics_tmp: 144755006
+  id_iseq_pr_metrics_tmp: 154012818
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 370
@@ -2219,7 +2587,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532524
-  id_iseq_pr_metrics_tmp: 144755007
+  id_iseq_pr_metrics_tmp: 154012819
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 290
@@ -2265,7 +2633,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532523
-  id_iseq_pr_metrics_tmp: 144755008
+  id_iseq_pr_metrics_tmp: 154012820
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 335
@@ -2311,7 +2679,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532529
-  id_iseq_pr_metrics_tmp: 144755009
+  id_iseq_pr_metrics_tmp: 154012821
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 342
@@ -2357,7 +2725,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532517
-  id_iseq_pr_metrics_tmp: 144755010
+  id_iseq_pr_metrics_tmp: 154012822
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 376
@@ -2403,7 +2771,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532513
-  id_iseq_pr_metrics_tmp: 144755011
+  id_iseq_pr_metrics_tmp: 154012823
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 433
@@ -2449,7 +2817,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532533
-  id_iseq_pr_metrics_tmp: 144755012
+  id_iseq_pr_metrics_tmp: 154012824
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 461
@@ -2495,7 +2863,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532519
-  id_iseq_pr_metrics_tmp: 144755013
+  id_iseq_pr_metrics_tmp: 154012825
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 390
@@ -2541,7 +2909,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532528
-  id_iseq_pr_metrics_tmp: 144755014
+  id_iseq_pr_metrics_tmp: 154012826
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 307
@@ -2587,7 +2955,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532514
-  id_iseq_pr_metrics_tmp: 144755015
+  id_iseq_pr_metrics_tmp: 154012827
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 365
@@ -2633,7 +3001,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532539
-  id_iseq_pr_metrics_tmp: 144755016
+  id_iseq_pr_metrics_tmp: 154012828
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 210
@@ -2679,7 +3047,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532536
-  id_iseq_pr_metrics_tmp: 144755017
+  id_iseq_pr_metrics_tmp: 154012829
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 211
@@ -2725,7 +3093,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532540
-  id_iseq_pr_metrics_tmp: 144755018
+  id_iseq_pr_metrics_tmp: 154012830
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 197
@@ -2771,7 +3139,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532542
-  id_iseq_pr_metrics_tmp: 144755019
+  id_iseq_pr_metrics_tmp: 154012831
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 214
@@ -2817,7 +3185,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532535
-  id_iseq_pr_metrics_tmp: 144755020
+  id_iseq_pr_metrics_tmp: 154012832
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 216
@@ -2863,7 +3231,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532541
-  id_iseq_pr_metrics_tmp: 144755021
+  id_iseq_pr_metrics_tmp: 154012833
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 223
@@ -2909,7 +3277,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532534
-  id_iseq_pr_metrics_tmp: 144755022
+  id_iseq_pr_metrics_tmp: 154012834
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 194
@@ -2955,7 +3323,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532537
-  id_iseq_pr_metrics_tmp: 144755023
+  id_iseq_pr_metrics_tmp: 154012835
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 207
@@ -3001,7 +3369,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: ~
-  id_iseq_pr_metrics_tmp: 144755024
+  id_iseq_pr_metrics_tmp: 154012836
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 210
@@ -3047,7 +3415,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532543
-  id_iseq_pr_metrics_tmp: 144755025
+  id_iseq_pr_metrics_tmp: 154012837
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 256
@@ -3093,7 +3461,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532538
-  id_iseq_pr_metrics_tmp: 144755026
+  id_iseq_pr_metrics_tmp: 154012838
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 208
@@ -3139,7 +3507,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532549
-  id_iseq_pr_metrics_tmp: 144755027
+  id_iseq_pr_metrics_tmp: 154012839
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 235
@@ -3185,7 +3553,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532554
-  id_iseq_pr_metrics_tmp: 144755028
+  id_iseq_pr_metrics_tmp: 154012840
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 229
@@ -3231,7 +3599,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532546
-  id_iseq_pr_metrics_tmp: 144755029
+  id_iseq_pr_metrics_tmp: 154012841
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 196
@@ -3277,7 +3645,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532550
-  id_iseq_pr_metrics_tmp: 144755030
+  id_iseq_pr_metrics_tmp: 154012842
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 208
@@ -3323,7 +3691,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532552
-  id_iseq_pr_metrics_tmp: 144755031
+  id_iseq_pr_metrics_tmp: 154012843
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 223
@@ -3369,7 +3737,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532545
-  id_iseq_pr_metrics_tmp: 144755032
+  id_iseq_pr_metrics_tmp: 154012844
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 217
@@ -3415,7 +3783,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532555
-  id_iseq_pr_metrics_tmp: 144755033
+  id_iseq_pr_metrics_tmp: 154012845
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 206
@@ -3461,7 +3829,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532551
-  id_iseq_pr_metrics_tmp: 144755034
+  id_iseq_pr_metrics_tmp: 154012846
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 225
@@ -3507,7 +3875,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532547
-  id_iseq_pr_metrics_tmp: 144755035
+  id_iseq_pr_metrics_tmp: 154012847
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 235
@@ -3553,7 +3921,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532544
-  id_iseq_pr_metrics_tmp: 144755036
+  id_iseq_pr_metrics_tmp: 154012848
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 203
@@ -3599,7 +3967,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: ~
-  id_iseq_pr_metrics_tmp: 144755037
+  id_iseq_pr_metrics_tmp: 154012849
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 212
@@ -3645,7 +4013,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532553
-  id_iseq_pr_metrics_tmp: 144755038
+  id_iseq_pr_metrics_tmp: 154012850
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 227
@@ -3691,7 +4059,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532548
-  id_iseq_pr_metrics_tmp: 144755039
+  id_iseq_pr_metrics_tmp: 154012851
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 222
@@ -3737,7 +4105,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532556
-  id_iseq_pr_metrics_tmp: 144755040
+  id_iseq_pr_metrics_tmp: 154012852
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 228
@@ -3783,7 +4151,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532562
-  id_iseq_pr_metrics_tmp: 144755041
+  id_iseq_pr_metrics_tmp: 154012853
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 186
@@ -3829,7 +4197,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532567
-  id_iseq_pr_metrics_tmp: 144755042
+  id_iseq_pr_metrics_tmp: 154012854
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 192
@@ -3875,7 +4243,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532559
-  id_iseq_pr_metrics_tmp: 144755043
+  id_iseq_pr_metrics_tmp: 154012855
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 190
@@ -3921,7 +4289,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532563
-  id_iseq_pr_metrics_tmp: 144755044
+  id_iseq_pr_metrics_tmp: 154012856
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 189
@@ -3967,7 +4335,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532565
-  id_iseq_pr_metrics_tmp: 144755045
+  id_iseq_pr_metrics_tmp: 154012857
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 204
@@ -4013,7 +4381,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532558
-  id_iseq_pr_metrics_tmp: 144755046
+  id_iseq_pr_metrics_tmp: 154012858
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 193
@@ -4059,7 +4427,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532564
-  id_iseq_pr_metrics_tmp: 144755047
+  id_iseq_pr_metrics_tmp: 154012859
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 200
@@ -4105,7 +4473,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532560
-  id_iseq_pr_metrics_tmp: 144755048
+  id_iseq_pr_metrics_tmp: 154012860
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 189
@@ -4151,7 +4519,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532557
-  id_iseq_pr_metrics_tmp: 144755049
+  id_iseq_pr_metrics_tmp: 154012861
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 190
@@ -4197,7 +4565,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: ~
-  id_iseq_pr_metrics_tmp: 144755050
+  id_iseq_pr_metrics_tmp: 154012862
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 188
@@ -4243,7 +4611,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532566
-  id_iseq_pr_metrics_tmp: 144755051
+  id_iseq_pr_metrics_tmp: 154012863
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 187
@@ -4289,7 +4657,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532561
-  id_iseq_pr_metrics_tmp: 144755052
+  id_iseq_pr_metrics_tmp: 154012864
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 190
@@ -4335,7 +4703,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532573
-  id_iseq_pr_metrics_tmp: 144755053
+  id_iseq_pr_metrics_tmp: 154012865
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 197
@@ -4381,7 +4749,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532578
-  id_iseq_pr_metrics_tmp: 144755054
+  id_iseq_pr_metrics_tmp: 154012866
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 198
@@ -4427,7 +4795,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532570
-  id_iseq_pr_metrics_tmp: 144755055
+  id_iseq_pr_metrics_tmp: 154012867
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 189
@@ -4473,7 +4841,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532574
-  id_iseq_pr_metrics_tmp: 144755056
+  id_iseq_pr_metrics_tmp: 154012868
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 200
@@ -4519,7 +4887,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532576
-  id_iseq_pr_metrics_tmp: 144755057
+  id_iseq_pr_metrics_tmp: 154012869
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 200
@@ -4565,7 +4933,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532569
-  id_iseq_pr_metrics_tmp: 144755058
+  id_iseq_pr_metrics_tmp: 154012870
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 188
@@ -4611,7 +4979,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532575
-  id_iseq_pr_metrics_tmp: 144755059
+  id_iseq_pr_metrics_tmp: 154012871
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 189
@@ -4657,7 +5025,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532571
-  id_iseq_pr_metrics_tmp: 144755060
+  id_iseq_pr_metrics_tmp: 154012872
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 181
@@ -4703,7 +5071,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532568
-  id_iseq_pr_metrics_tmp: 144755061
+  id_iseq_pr_metrics_tmp: 154012873
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 190
@@ -4749,7 +5117,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: ~
-  id_iseq_pr_metrics_tmp: 144755062
+  id_iseq_pr_metrics_tmp: 154012874
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 189
@@ -4795,7 +5163,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532577
-  id_iseq_pr_metrics_tmp: 144755063
+  id_iseq_pr_metrics_tmp: 154012875
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 198
@@ -4841,7 +5209,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532572
-  id_iseq_pr_metrics_tmp: 144755064
+  id_iseq_pr_metrics_tmp: 154012876
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 185
@@ -4887,7 +5255,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532584
-  id_iseq_pr_metrics_tmp: 144755065
+  id_iseq_pr_metrics_tmp: 154012877
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 196
@@ -4933,7 +5301,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532589
-  id_iseq_pr_metrics_tmp: 144755066
+  id_iseq_pr_metrics_tmp: 154012878
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 214
@@ -4979,7 +5347,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532581
-  id_iseq_pr_metrics_tmp: 144755067
+  id_iseq_pr_metrics_tmp: 154012879
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 218
@@ -5025,7 +5393,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532585
-  id_iseq_pr_metrics_tmp: 144755068
+  id_iseq_pr_metrics_tmp: 154012880
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 200
@@ -5071,7 +5439,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532587
-  id_iseq_pr_metrics_tmp: 144755069
+  id_iseq_pr_metrics_tmp: 154012881
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 208
@@ -5117,7 +5485,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532580
-  id_iseq_pr_metrics_tmp: 144755070
+  id_iseq_pr_metrics_tmp: 154012882
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 191
@@ -5163,7 +5531,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532586
-  id_iseq_pr_metrics_tmp: 144755071
+  id_iseq_pr_metrics_tmp: 154012883
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 205
@@ -5209,7 +5577,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532582
-  id_iseq_pr_metrics_tmp: 144755072
+  id_iseq_pr_metrics_tmp: 154012884
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 201
@@ -5255,7 +5623,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532579
-  id_iseq_pr_metrics_tmp: 144755073
+  id_iseq_pr_metrics_tmp: 154012885
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 196
@@ -5301,7 +5669,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: ~
-  id_iseq_pr_metrics_tmp: 144755074
+  id_iseq_pr_metrics_tmp: 154012886
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 197
@@ -5347,7 +5715,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532588
-  id_iseq_pr_metrics_tmp: 144755075
+  id_iseq_pr_metrics_tmp: 154012887
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 202
@@ -5393,7 +5761,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532583
-  id_iseq_pr_metrics_tmp: 144755076
+  id_iseq_pr_metrics_tmp: 154012888
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 189
@@ -5439,7 +5807,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532595
-  id_iseq_pr_metrics_tmp: 144755077
+  id_iseq_pr_metrics_tmp: 154012889
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 200
@@ -5485,7 +5853,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532600
-  id_iseq_pr_metrics_tmp: 144755078
+  id_iseq_pr_metrics_tmp: 154012890
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 196
@@ -5531,7 +5899,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532592
-  id_iseq_pr_metrics_tmp: 144755079
+  id_iseq_pr_metrics_tmp: 154012891
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 194
@@ -5577,7 +5945,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532596
-  id_iseq_pr_metrics_tmp: 144755080
+  id_iseq_pr_metrics_tmp: 154012892
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 207
@@ -5623,7 +5991,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532598
-  id_iseq_pr_metrics_tmp: 144755081
+  id_iseq_pr_metrics_tmp: 154012893
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 198
@@ -5669,7 +6037,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532591
-  id_iseq_pr_metrics_tmp: 144755082
+  id_iseq_pr_metrics_tmp: 154012894
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 200
@@ -5715,7 +6083,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532597
-  id_iseq_pr_metrics_tmp: 144755083
+  id_iseq_pr_metrics_tmp: 154012895
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 201
@@ -5761,7 +6129,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532593
-  id_iseq_pr_metrics_tmp: 144755084
+  id_iseq_pr_metrics_tmp: 154012896
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 202
@@ -5807,7 +6175,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532590
-  id_iseq_pr_metrics_tmp: 144755085
+  id_iseq_pr_metrics_tmp: 154012897
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 197
@@ -5853,7 +6221,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: ~
-  id_iseq_pr_metrics_tmp: 144755086
+  id_iseq_pr_metrics_tmp: 154012898
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 194
@@ -5899,7 +6267,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532599
-  id_iseq_pr_metrics_tmp: 144755087
+  id_iseq_pr_metrics_tmp: 154012899
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 185
@@ -5945,7 +6313,7 @@
   human_percent_duplicate: ~
   human_percent_mapped: ~
   id_iseq_flowcell_tmp: 2532594
-  id_iseq_pr_metrics_tmp: 144755088
+  id_iseq_pr_metrics_tmp: 154012900
   id_run: 4950
   indexing_read_length: ~
   insert_size_median: 201
