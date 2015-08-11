@@ -66,7 +66,7 @@ sub _get_title {
 sub _get_sample_lims {
   my ($self, $c, $id_sample_lims) = @_;
 
-  my $row = $c->model('MLWarehouseDB')->search_sample_by_sample_id($id_sample_lims)->next;
+  my $row = $c->model('MLWarehouseDB')->search_product_by_sample_id($id_sample_lims)->next;
 
   if (!$row) {
     $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
@@ -120,7 +120,7 @@ sub _fetch_by_lib {
 
   my $rs;
   if ($id_library_lims) {
-    $rs = $c->model('MLWarehouseDB')->search_library_lims_by_id($id_library_lims);
+    $rs = $c->model('MLWarehouseDB')->search_product_by_id_library_lims($id_library_lims);
   }
   return $rs;
 }
@@ -130,7 +130,7 @@ sub _fetch_by_pool {
 
   my $rs;
   if ($id_pool_lims) {
-    $rs = $c->model('MLWarehouseDB')->search_pool_lims_by_id($id_pool_lims);
+    $rs = $c->model('MLWarehouseDB')->search_product_by_id_pool_lims($id_pool_lims);
   }
   return $rs;
 }
@@ -140,7 +140,7 @@ sub _fetch_by_sample {
 
   my $rs;
   if ($id_sample_lims) {
-    $rs = $c->model('MLWarehouseDB')->search_sample_by_sample_id($id_sample_lims);
+    $rs = $c->model('MLWarehouseDB')->search_product_by_sample_id($id_sample_lims);
   }
   return $rs;
 }
@@ -321,10 +321,10 @@ sub _display_run_lanes {
 
 sub _remove_plex_only_keys {
   my ($self, $values) = @_;
-  foreach my $to_delete ( qw[ legacy_library_id 
-                              sample_name 
-                              id_sample_lims 
-                              study_name 
+  foreach my $to_delete ( qw[ legacy_library_id
+                              sample_name
+                              id_sample_lims
+                              study_name
                               id_study_lims ] ) {
     delete $values->{$to_delete};
   }

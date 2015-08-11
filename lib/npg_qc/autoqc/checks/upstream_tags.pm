@@ -1,8 +1,3 @@
-# Author:        Kevin Lewis
-# Created:       2013-09-02
-#
-#
-
 package npg_qc::autoqc::checks::upstream_tags;
 
 use Moose;
@@ -52,7 +47,7 @@ Readonly::Scalar my $SLOT_POS  => 4;
 
 Readonly::Scalar our $DEFAULT_JAVA_XMX => q{-Xmx1000m};
 
-has '+input_file_ext' => (default => $EXT,);
+has '+file_type' => (default => $EXT,);
 
 ##############################################################################
 # Input/output paths
@@ -936,11 +931,11 @@ npg_qc::autoqc::checks::upstream_tags
 
 =head1 AUTHOR
 
-    Kevin Lewis, kl2
+Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 GRL, by Kevin Lewis
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

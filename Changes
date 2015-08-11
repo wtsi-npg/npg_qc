@@ -1,5 +1,14 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - autoqc check and autoqc objects: remove unused 'sequence_type' attribute
+ - autoqc check and result objects - use existing roles for id_run and
+   position definitions
+ - refactor autoqc check to use file_type attribute name instead of
+   input_file_ext
+ - tags_reporters check - remove hardcoded solexa path
+ - genotype and verify_bam_id_checks - use standard way of reporting run-time
+   problems
+
 release 58.9
  - move method for file name creation from SeqQC to autoqc so that it's
    more accessible

@@ -40,25 +40,28 @@ subtest 'Data in test data' => sub {
 };
 
 subtest 'Data for sample' => sub {
-  plan tests => 7;
+  plan tests => 9;
   my $rs;
   $rs = $m->resultset(q[Sample]);
   ok (defined $rs, "Sample resultset");
   $rs = $rs->search({id_sample_lims => 2617});
   cmp_ok($rs->count, '==', 1, "Found sample by id_sample_lims");
 
-  $rs = $m->search_sample_lims_by_id(2617);
-  cmp_ok($rs->count, '==', 1, "Found sample when using method from Model");
-  my $sample = $rs->next;
+  $rs = $m->search_product_by_sample_id(2617);
+  cmp_ok($rs->count, '>', 0, "Found product when using method from Model");
+  my $product = $rs->next;
 
-  my $sample_facade = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample});
+  ok (defined $product->iseq_flowcell, "Product has iseq_flowcell.");
+  ok (defined $product->iseq_flowcell->sample, "iseq_flowcell has sample.");
+  my $sample_facade = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $product->iseq_flowcell->sample});
   cmp_ok($sample_facade->id_sample_lims, '==', 2617, q[Correct id sample lims]);
   cmp_ok($sample_facade->name, 'eq', q[NA20774-TOS], q[Correct sample name from name]);
 
-  $rs = $m->search_sample_lims_by_id(2617);
-  $rs->update({'name' => undef});
-  cmp_ok($rs->count, '==', 1, "Found sample when using method from Model");
-  $sample = $rs->next;
+  $rs = $m->search_product_by_sample_id(2617);
+  cmp_ok($rs->count, '>', 0, "Found product when using method from Model");
+  $product = $rs->next;
+  my $sample = $product->iseq_flowcell->sample;
+  $sample->name( undef );
 
   $sample_facade = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample});
   cmp_ok($sample_facade->name, '==', 2617, q[Correct sample name from id sample lims]);
