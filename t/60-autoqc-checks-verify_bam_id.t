@@ -62,7 +62,7 @@ my $dir = tempdir(CLEANUP => 1);
     my $r = npg_qc::autoqc::checks::verify_bam_id->new( 
       id_run => 2549, 
       position => 4, 
-      input_file_ext => 'bam', 
+      file_type => 'bam', 
       path => 't/data/autoqc/', 
       bam_file => 'alignment.bam',
       repository => $repos,
@@ -82,7 +82,7 @@ my $dir = tempdir(CLEANUP => 1);
     my $r = npg_qc::autoqc::checks::verify_bam_id->new( 
       id_run => 2549, 
       position => 1, 
-      input_file_ext => 'bam', 
+      file_type => 'bam', 
       path => 't/data/autoqc/', 
       bam_file => 'alignment.bam',
       repository => $repos,
@@ -101,7 +101,7 @@ my $dir = tempdir(CLEANUP => 1);
     my $r = npg_qc::autoqc::checks::verify_bam_id->new( 
       id_run => 2549, 
       position => 1, 
-      input_file_ext => 'bam', 
+      file_type => 'bam', 
       path => 't/data/autoqc/', 
       bam_file => 'alignment.bam',
       repository => $repos,
@@ -118,7 +118,7 @@ my $dir = tempdir(CLEANUP => 1);
     my $r = npg_qc::autoqc::checks::verify_bam_id->new( 
       id_run => 2549, 
       position => 2, 
-      input_file_ext => 'bam', 
+      file_type => 'bam', 
       path => 't/data/autoqc/', 
       bam_file => 'alignment.bam',
       repository => $repos,
