@@ -7,12 +7,6 @@ use npg_qc_viewer::TransferObjects::SampleFacade;
 
 use t::util;
 
-#  use Digest::SHA qw(sha256 sha256_hex sha256_base64);
-#  my $data = "2";
-#  my $digest = sha256($data); note $digest;
-#  $digest = sha256_hex($data); note $digest;
-#  $digest = sha256_base64($data); note $digest;
-
 BEGIN { use_ok 'npg_qc_viewer::Model::MLWarehouseDB' }
 
 my $util = t::util->new();
