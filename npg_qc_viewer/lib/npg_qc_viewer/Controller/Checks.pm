@@ -378,7 +378,7 @@ sub _run_lanes_from_dwh {
 
         if ( !defined $row_data->{$key} ) {
           my $values = $self->_build_hash($product_metric);
-          $values = $self->removelane_only_keys($values);
+          $values = $self->_remove_lane_only_keys($values);
           my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
           $row_data->{$key} = $to;
         }
