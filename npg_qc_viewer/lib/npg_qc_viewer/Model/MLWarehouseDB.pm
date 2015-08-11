@@ -66,6 +66,28 @@ sub search_product_metrics {
   return $rs;
 }
 
+=head2 search_product_by_children
+
+Search product by one of the child tables
+
+=cut
+sub search_proudct_by_children {
+  my ($self, $conditions) = @_;
+  
+  if (!defined $conditions) {
+    croak q[Impossible to query without conditions.];
+  }
+  
+  my $rs = $self->resultset('IseqProductMetric')->
+                    search( $conditions, {
+                      prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+                      join     => {'iseq_flowcell' => 'sample'},
+                      cache    => 1,
+  });
+  
+  return $rs;
+}
+
 =head2 search_product_by_id_library_lims
 
 Search product id library lims.
@@ -130,6 +152,28 @@ sub search_product_by_sample_id {
                     search($where, {
                     prefetch => {'iseq_flowcell' => 'sample'},
                     join     => {'iseq_flowcell' => 'sample'},
+                    cache    => 1,
+  });
+
+  return $rs;
+}
+
+=head2 search_sample_by_sample_id
+
+Search sample by id sample lims
+
+=cut
+sub search_sample_by_sample_id {
+  my ($self, $id_sample_lims) = @_;
+  
+  if (!defined $id_sample_lims) {
+    croak q[Id sample lims not defined when querying sample lims];
+  };
+
+  my $where = { 'me.id_sample_lims' => $id_sample_lims, };
+
+  my $rs = $self->resultset('Sample')->
+                    search($where, {
                     cache    => 1,
   });
 

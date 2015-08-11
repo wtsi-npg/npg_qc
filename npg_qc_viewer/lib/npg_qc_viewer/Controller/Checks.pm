@@ -63,22 +63,6 @@ sub _get_title {
     return $full_title;
 }
 
-sub _get_sample_lims {
-  my ($self, $c, $id_sample_lims) = @_;
-
-  my $row = $c->model('MLWarehouseDB')->search_product_by_sample_id($id_sample_lims)->next;
-
-  if (!$row) {
-    $c->stash->{error_message} = qq[Unknown id_sample_lims $id_sample_lims];
-    $c->detach(q[Root], q[error_page]);
-    return;
-  }
-
-  my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $row->iseq_flowcell->sample});
-
-  return $sample;
-}
-
 sub _test_positive_int {
     my ($self, $c, $input) = @_;
     if ($input !~ /^\d+$/smx || $input == 0) {
@@ -143,6 +127,22 @@ sub _fetch_by_sample {
     $rs = $c->model('MLWarehouseDB')->search_product_by_sample_id($id_sample_lims);
   }
   return $rs;
+}
+
+sub _fetch_sample_by_sample {
+  my ($self, $c, $id_sample_lims) = @_;
+
+  my $rs;
+  my $sample;
+  if (defined $id_sample_lims) {
+    $rs = $c->model('MLWarehouseDB')->search_sample_by_sample_id($id_sample_lims);
+    
+    if ( $rs->count > 0 ) {
+      $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $rs->next});
+    }
+  }
+  
+  return $sample;
 }
 
 sub _as_query_conditions {
@@ -633,7 +633,7 @@ Sample page
 sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $id_sample_lims) = @_;
 
-    my $sample = $self->_get_sample_lims($c, $id_sample_lims);
+    my $sample = $self->_fetch_sample_by_sample($c, $id_sample_lims);
     my $sample_name = $sample->name;
     my $rs = $self->_fetch_by_sample($c, $id_sample_lims);
     my $sample_link = 1;
