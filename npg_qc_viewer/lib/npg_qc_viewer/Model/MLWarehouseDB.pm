@@ -66,12 +66,12 @@ sub search_product_metrics {
   return $rs;
 }
 
-=head2 search_library_lims_by_id
+=head2 search_product_by_id_library_lims
 
-Search library by new id library in lims.
+Search product id library lims.
 
 =cut
-sub search_library_lims_by_id {
+sub search_product_by_id_library_lims {
   my ($self, $id_library_lims) = @_;
 
   if (!defined $id_library_lims) {
@@ -89,12 +89,12 @@ sub search_library_lims_by_id {
   return $rs;
 }
 
-=head2 search_pool_lims_by_id
+=head2 search_product_by_id_pool_lims
 
-Search pool by id pool lims.
+Search for product by id pool lims.
 
 =cut
-sub search_pool_lims_by_id {
+sub search_product_by_id_pool_lims {
   my ($self, $id_pool_lims) = @_;
 
   if (!defined $id_pool_lims) {
@@ -112,12 +112,12 @@ sub search_pool_lims_by_id {
   return $rs;
 }
 
-=head2 search_sample_by_sample_id
+=head2 search_product_by_sample_id
 
-Search sample by id
+Search product by id sample lims
 
 =cut
-sub search_sample_by_sample_id {
+sub search_product_by_sample_id {
   my ($self, $id_sample_lims) = @_;
 
   if (!defined $id_sample_lims) {
