@@ -321,14 +321,22 @@ sub _display_run_lanes {
 
 sub _remove_plex_only_keys {
   my ($self, $values) = @_;
+  my $new_values = {%$values};
   foreach my $to_delete ( qw[ legacy_library_id
                               sample_name
                               id_sample_lims
                               study_name
                               id_study_lims ] ) {
-    delete $values->{$to_delete};
+    delete $new_values->{$to_delete};
   }
-  return $values;
+  return $new_values;
+}
+
+sub _remove_lane_only_keys {
+  my ($self, $values) = @_;
+  my $new_values = {%$values};
+  delete $new_values->{'manual_qc'};
+  return $new_values;
 }
 
 sub _run_lanes_from_dwh {
@@ -354,10 +362,9 @@ sub _run_lanes_from_dwh {
           my $values = $self->_build_hash($product_metric);
           delete $values->{'tag_sequence'};
           if ( $product_metric->tag_index ) { #Pool
-            $values->{'id_library_lims'} = $product_metric->iseq_flowcell->id_pool_lims;
+            $values->{'id_library_lims'} = $values->{'id_pool_lims'};
             $values = $self->_remove_plex_only_keys($values);
           }
-          $values->{'manual_qc'} = $product_metric->iseq_flowcell->manual_qc;
           my $to = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
 
           $row_data->{$key} = $to;
@@ -371,6 +378,7 @@ sub _run_lanes_from_dwh {
 
         if ( !defined $row_data->{$key} ) {
           my $values = $self->_build_hash($product_metric);
+          $values = $self->removelane_only_keys($values);
           my $to  = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
           $row_data->{$key} = $to;
         }
@@ -400,6 +408,7 @@ sub _build_hash {
     $values->{'legacy_library_id'} = $product_metric->iseq_flowcell->legacy_library_id;
     $values->{'id_pool_lims'}      = $product_metric->iseq_flowcell->id_pool_lims;
     $values->{'rnd'}               = $product_metric->iseq_flowcell->is_r_and_d;
+    $values->{'manual_qc'}         = $product_metric->iseq_flowcell->manual_qc;
 
     my $sample_row = $product_metric->iseq_flowcell->sample;
     my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
