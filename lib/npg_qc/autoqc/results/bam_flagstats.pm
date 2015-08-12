@@ -7,8 +7,6 @@ use English qw(-no_match_vars);
 use Perl6::Slurp;
 use List::Util qw(sum);
 use File::Spec::Functions qw(splitpath catfile catpath);
-use Try::Tiny;
-use Compress::Zlib;
 use Readonly;
 
 use npg_tracking::util::types;
@@ -34,7 +32,6 @@ Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 
 Readonly::Scalar my $HUMAN_SPLIT_ATTR_DEFAULT => 'all';
 Readonly::Scalar my $SUBSET_ATTR_DEFAULT      => 'target';
-Readonly::Scalar my $STATS_RELATIONSHIP_NAME  => 'samtools_stats';
 
 has [ qw/ +path
           +id_run
@@ -375,10 +372,6 @@ npg_qc::autoqc::results::bam_flagstats
 =item List::Util
 
 =item File::Spec
-
-=item Try:Tiny
-
-=item Compress::Zlib
 
 =item Readonly
 
