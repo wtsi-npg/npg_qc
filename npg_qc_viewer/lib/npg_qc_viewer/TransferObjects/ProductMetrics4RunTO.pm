@@ -183,6 +183,18 @@ has 'rnd' => (
   required => 0,
 );
 
+=head2 is_gclp
+
+Flag for gclp flowcell
+
+=cut
+has 'is_gclp' => (
+  isa      => 'Bool',
+  is       => 'rw',
+  required => 0,
+  default => 0,
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
