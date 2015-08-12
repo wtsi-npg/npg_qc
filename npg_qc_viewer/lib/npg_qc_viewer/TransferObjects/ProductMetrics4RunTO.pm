@@ -32,6 +32,11 @@ A transfer object to pass Product Metric data from the model to the view.
 
 =cut
 
+=head2 BUILD
+
+Just makes sure is_gclp is always 0/1.
+
+=cut
 sub BUILD {
   my $self = shift;
 
