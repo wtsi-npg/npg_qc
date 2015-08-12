@@ -285,7 +285,7 @@ sub _display_run_lanes {
 
 sub _remove_plex_only_keys {
   my ($self, $values) = @_;
-  my $new_values = {%$values};
+  my $new_values = {%{$values}};
   foreach my $to_delete ( qw[ legacy_library_id
                               sample_name
                               id_sample_lims
@@ -298,7 +298,7 @@ sub _remove_plex_only_keys {
 
 sub _remove_lane_only_keys {
   my ($self, $values) = @_;
-  my $new_values = {%$values};
+  my $new_values = {%{$values}};
   delete $new_values->{'manual_qc'};
   return $new_values;
 }
