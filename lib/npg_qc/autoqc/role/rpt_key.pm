@@ -1,8 +1,3 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       25 August 2010
-#
-
 package npg_qc::autoqc::role::rpt_key;
 
 use Moose::Role;
@@ -169,7 +164,6 @@ sub rpt_key_delim {
     return $RPT_KEY_DELIM;
 }
 
-
 1;
 __END__
 
@@ -200,11 +194,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
