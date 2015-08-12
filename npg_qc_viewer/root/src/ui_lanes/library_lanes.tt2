@@ -94,9 +94,9 @@
 <tr>
 [%- IF sample_link -%]
 <td class="nbsp">
-[%- IF row_info_to.id_sample_lims; lurl = [lims_url, 'samples', row_info_to.id_sample_lims]; -%]
-<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.id_sample_lims) %]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
-<a href="[% lurl.join('/') %]"><span class="lib nbsp">[% row_info_to.sample_name | html %]</span></a>
+[%- IF row_info_to.id_sample_lims; -%]
+<a href="[%- c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.id_sample_lims) -%]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
+<a href="[%- c.model('LimsServer').generate_url('sample', row_info_to.is_gclp, row_info_to.id_sample_lims); -%]"><span class="lib nbsp">[% row_info_to.sample_name | html %]</span></a>
 [%- END -%]
 </td>
 [%- END -%]
@@ -108,9 +108,15 @@
 [%- END -%]
 
 [%- IF row_info_to.id_library_lims; -%]
-  [%- IF !lane_collection.run_lane_plex_flags.$lane_key && row_info_to.id_library_lims; lurl = [lims_url, 'assets', row_info_to.legacy_library_id]; -%]
+  [%- IF !lane_collection.run_lane_plex_flags.$lane_key;
+        lurl = '';
+        IF row_info_to.is_gclp && row_info_to.entity_id_lims;
+          lurl = c.model('LimsServer').generate_url('library', row_info_to.is_gclp, row_info_to.entity_id_lims);
+        ELSIF !row_info_to.is_gclp && row_info_to.legacy_library_id;
+          lurl = c.model('LimsServer').generate_url('library', row_info_to.is_gclp, row_info_to.legacy_library_id);
+        END; -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => row_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
-    <a href="[% lurl.join('/') %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
+    [%- IF lurl != ''; -%]<a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a> [%- END; -%]
   [%- ELSE -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_library_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
     <span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span>
