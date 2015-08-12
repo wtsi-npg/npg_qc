@@ -14,7 +14,7 @@ our $VERSION = '0';
 
 =begin stopwords
 
-deplexing lims rnd
+deplexing lims rnd gclp flowcell
 
 =end stopwords
 
