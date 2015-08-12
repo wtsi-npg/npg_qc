@@ -12,6 +12,7 @@ lib/npg_qc_viewer/TransferObjects/ProductMetrics4RunTO.pm
 lib/npg_qc_viewer/TransferObjects/SampleFacade.pm
 lib/npg_qc_viewer/Model/Check.pm
 lib/npg_qc_viewer/Model/GenotypeCheck.pm
+lib/npg_qc_viewer/Model/LimsServer.pm
 lib/npg_qc_viewer/Model/NpgDB.pm
 lib/npg_qc_viewer/Model/NpgQcDB.pm
 lib/npg_qc_viewer/Model/MLWarehouseDB.pm
@@ -96,6 +97,7 @@ t/10-npg_tracking-daemon-seqqc.t
 t/10-util-Error.t
 t/10-util-FileFinder.t
 t/20-model-Check.t
+t/20-model-LimsServer.t
 t/20-model-NpgDB.t
 t/20-model-NpgQcDB.t
 t/20-model-SeqStore.t
