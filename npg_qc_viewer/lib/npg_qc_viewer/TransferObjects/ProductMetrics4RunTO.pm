@@ -37,6 +37,8 @@ sub BUILD {
 
   #To make sure there is no undef, see npg_qc_viewer::Model::LimsServer
   $self->is_gclp($self->is_gclp ? 1 : 0);
+
+  return;
 }
 
 =head2 num_cycles
