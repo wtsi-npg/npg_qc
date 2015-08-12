@@ -388,22 +388,25 @@ sub _build_hash {
   $values->{'time_comp'}    = $product_metric->iseq_run_lane_metric->run_complete;
 
   if ( defined $product_metric->iseq_flowcell ) {
-    $values->{'id_library_lims'}   = $product_metric->iseq_flowcell->id_library_lims;
-    $values->{'legacy_library_id'} = $product_metric->iseq_flowcell->legacy_library_id;
-    $values->{'id_pool_lims'}      = $product_metric->iseq_flowcell->id_pool_lims;
-    $values->{'rnd'}               = $product_metric->iseq_flowcell->is_r_and_d;
-    $values->{'manual_qc'}         = $product_metric->iseq_flowcell->manual_qc;
+    my $flowcell = $product_metric->iseq_flowcell;
+    $values->{'id_library_lims'}   = $flowcell->id_library_lims;
+    $values->{'legacy_library_id'} = $flowcell->legacy_library_id; #For sequencescape
+    $values->{'id_pool_lims'}      = $flowcell->id_pool_lims;
+    $values->{'rnd'}               = $flowcell->is_r_and_d;
+    $values->{'manual_qc'}         = $flowcell->manual_qc;
+    $values->{'is_gcpl'}           = $flowcell->from_gclp;
+    $values->{'entity_id_lims'}    = $flowcell->entity_id_lims; #For clearscape
 
-    my $sample_row = $product_metric->iseq_flowcell->sample;
-    my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
+    #To study through flowcell
+    $values->{'id_study_lims'}  = $flowcell->study_id;
+    $values->{'study_name'}     = $flowcell->study_name;
 
-    $values->{'id_sample_lims'} = $sample->id_sample_lims;
-    $values->{'sample_name'}    = $sample->name;
-    #TODO replace for direct access from iseq_flowcell
-    if ( defined $product_metric->iseq_flowcell->study ) {
-      my $study_row = $product_metric->iseq_flowcell->study;
-      $values->{'id_study_lims'} = $study_row->id_study_lims;
-      $values->{'study_name'}    = $study_row->name;
+    if ( defined $flowcell->sample ) {
+      my $sample_row = $flowcell->sample;
+      my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
+
+      $values->{'id_sample_lims'} = $sample->id_sample_lims;
+      $values->{'sample_name'}    = $sample->name;
     }
   }
 

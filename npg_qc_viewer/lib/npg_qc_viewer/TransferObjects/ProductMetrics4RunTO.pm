@@ -192,7 +192,18 @@ has 'is_gclp' => (
   isa      => 'Bool',
   is       => 'rw',
   required => 0,
-  default => 0,
+  default  => 0,
+);
+
+=head2 entity_id_lims
+
+Id for entity lims
+
+=cut
+has 'entity_id_lims' => (
+  isa      => 'Str',
+  is       => 'rw',
+  required => 0,
 );
 
 __PACKAGE__->meta->make_immutable;
