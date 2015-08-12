@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 73;
+use Test::More tests => 75;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -301,6 +301,33 @@ my $num_plex_jsons = 44;
   is ($rs->search({subset => 'target'})->count, 6, '6 bam flagstats records for target files');
   is ($rs->search({subset => 'human'})->count, 2, '2 bam flagstats records for human files');
   is ($rs->search({subset => 'phix'})->count, 1, '1 bam flagstats records for phix files');
+}
+
+{
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+       schema => $schema,
+       verbose => 1,
+       path => ['t/data/autoqc/bam_flagstats/qc'],
+  );
+  my $file = 't/data/autoqc/bam_flagstats/qc/16960_1#0.bam_flagstats.json';
+  my $w = "${file}: not loading field";
+  warnings_like { $db_loader->load() }
+    [ qr/$w \'sequence_file\'/,
+      qr/$w \'flagstats_metrics_file\'/,
+      qr/$w \'samtools_stats_file\'/,
+      qr/$w \'markdups_metrics_file\'/,
+      qr/$w \'_file_path_root\'/,
+      qr/Loaded $file/,
+      qr/1 json files have been loaded/ ],
+    'warnings when loading extended bam_flagstats json';
+
+  $db_loader = npg_qc::autoqc::db_loader->new(
+       schema => $schema,
+       verbose => 0,
+       path => ['t/data/autoqc/bam_flagstats'],
+  );
+  throws_ok { $db_loader->load() } qr/Loading aborted, transaction has rolled back/,
+    'error loading json result without id_run';
 }
 
 1;
