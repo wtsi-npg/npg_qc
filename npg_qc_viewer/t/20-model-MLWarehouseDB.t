@@ -39,8 +39,32 @@ subtest 'Data in test data' => sub {
   cmp_ok($rs->count,'==',8, "lane count for run 3500");
 };
 
+subtest 'Data for library' => sub {
+  plan tests => 4;
+
+  my $rs;
+  $rs = $m->search_product_by_id_library_lims(q[NT15219S]);
+  ok (defined $rs, q[Resultset for library by id_library_lims]);
+  cmp_ok($rs->count, '>', 0, q[Found flowcell by id_library_lims]);
+  my $flowcell = $rs->next->iseq_flowcell;
+  cmp_ok($flowcell->id_library_lims, 'eq', q[NT15219S], q[Correct id library lims]);
+  cmp_ok($flowcell->flowcell_barcode, 'eq', q[42DGLAAXX], q[Correct flowcell]);
+};
+
+subtest 'Data for pool' => sub {
+  plan tests => 5;
+  my $rs;
+  $rs = $m->search_product_by_id_pool_lims(q[NT19992S]);
+  ok (defined $rs, q[Resultset for library by id_pool_lims]);
+  cmp_ok($rs->count, '>', 0, q[Found flowcell by id_pool_lims]);
+  my $flowcell = $rs->next->iseq_flowcell;
+  cmp_ok($flowcell->id_pool_lims,     'eq', q[NT19992S], q[Correct id pool lims]);
+  cmp_ok($flowcell->id_library_lims,  'eq', q[NT19992S], q[Correct id library lims]);
+  cmp_ok($flowcell->flowcell_barcode, 'eq', q[42DGLAAXX], q[Correct flowcell]);
+};
+
 subtest 'Data for sample' => sub {
-  plan tests => 9;
+  plan tests => 12;
   my $rs;
   $rs = $m->resultset(q[Sample]);
   ok (defined $rs, "Sample resultset");
@@ -65,30 +89,13 @@ subtest 'Data for sample' => sub {
 
   $sample_facade = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample});
   cmp_ok($sample_facade->name, '==', 2617, q[Correct sample name from id sample lims]);
-};
-
-subtest 'Data for library' => sub {
-  plan tests => 4;
-
-  my $rs;
-  $rs = $m->search_product_by_id_library_lims(q[NT15219S]);
-  ok (defined $rs, q[Resultset for library by id_library_lims]);
-  cmp_ok($rs->count, '>', 0, q[Found flowcell by id_library_lims]);
-  my $flowcell = $rs->next->iseq_flowcell;
-  cmp_ok($flowcell->id_library_lims, 'eq', q[NT15219S], q[Correct id library lims]);
-  cmp_ok($flowcell->flowcell_barcode, 'eq', q[42DGLAAXX], q[Correct flowcell]);
-};
-
-subtest 'Data for pool' => sub {
-  plan tests => 5;
-  my $rs;
-  $rs = $m->search_product_by_id_pool_lims(q[NT19992S]);
-  ok (defined $rs, q[Resultset for library by id_pool_lims]);
-  cmp_ok($rs->count, '>', 0, q[Found flowcell by id_pool_lims]);
-  my $flowcell = $rs->next->iseq_flowcell;
-  cmp_ok($flowcell->id_pool_lims,     'eq', q[NT19992S], q[Correct id pool lims]);
-  cmp_ok($flowcell->id_library_lims,  'eq', q[NT19992S], q[Correct id library lims]);
-  cmp_ok($flowcell->flowcell_barcode, 'eq', q[42DGLAAXX], q[Correct flowcell]);
+  
+  $rs = $m->search_sample_by_sample_id(2617);
+  cmp_ok($rs->count, '>', 0, "Found product when using method from Model");
+  $sample = $rs->next;
+  cmp_ok($sample->id_sample_lims, '==', 2617, q[Correct id sample lims]);
+  cmp_ok($sample->name, 'eq', q[NA20774-TOS], q[Correct sample name from name]);
+  $sample->name( undef );
 };
 
 1;
