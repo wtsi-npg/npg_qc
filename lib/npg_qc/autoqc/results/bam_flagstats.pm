@@ -105,7 +105,8 @@ sub _build_flagstats_metrics_file {
   return;
 }
 
-has '_file_path_root'     => ( isa        => 'Str',
+has '_file_path_root'     => ( traits     => [ 'DoNotSerialize' ],
+                               isa        => 'Str',
                                is         => 'ro',
                                lazy_build => 1,
 );

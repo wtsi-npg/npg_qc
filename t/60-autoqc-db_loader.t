@@ -316,7 +316,6 @@ my $num_plex_jsons = 44;
       qr/$w \'flagstats_metrics_file\'/,
       qr/$w \'samtools_stats_file\'/,
       qr/$w \'markdups_metrics_file\'/,
-      qr/$w \'_file_path_root\'/,
       qr/Loaded $file/,
       qr/1 json files have been loaded/ ],
     'warnings when loading extended bam_flagstats json';

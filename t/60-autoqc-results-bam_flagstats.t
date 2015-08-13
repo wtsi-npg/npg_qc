@@ -166,7 +166,7 @@ subtest 'high-level parsing - backwards compatibility' => sub {
 };
 
 subtest 'finding files, ca;culating metrics' => sub {
-  plan tests => 10;
+  plan tests => 12;
 
   my $data_path = 't/data/autoqc/bam_flagstats';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
@@ -196,7 +196,10 @@ subtest 'finding files, ca;culating metrics' => sub {
   lives_ok {$r->execute} 'metrics parsing ok';
   is($r->library_size, 240428087, 'library size value');
   is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
-  $r->write2file($data_path);
+
+  my $j;
+  lives_ok { $j=$r->freeze } 'serialization to json is ok';
+  unlike($j, qr/_file_path_root/, 'serialization does not contain excluded attr');
 };
 
 subtest 'finding phix subset files (no run id)' => sub {
