@@ -111,7 +111,7 @@
   [%- IF !lane_collection.run_lane_plex_flags.$lane_key;
         lurl = '';
         IF row_info_to.is_gclp && row_info_to.entity_id_lims;
-          lurl = c.model('LimsServer').generate_url('library', row_info_to.is_gclp, row_info_to.entity_id_lims);
+          lurl = c.model('LimsServer').generate_url('library', row_info_to.is_gclp, row_info_to.id_library_lims);
         ELSIF !row_info_to.is_gclp && row_info_to.legacy_library_id;
           lurl = c.model('LimsServer').generate_url('library', row_info_to.is_gclp, row_info_to.legacy_library_id);
         END; -%]

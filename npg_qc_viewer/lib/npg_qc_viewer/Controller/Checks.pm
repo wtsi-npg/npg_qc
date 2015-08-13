@@ -369,13 +369,13 @@ sub _build_hash {
 
   if ( defined $product_metric->iseq_flowcell ) {
     my $flowcell = $product_metric->iseq_flowcell;
-    $values->{'id_library_lims'}   = $flowcell->id_library_lims;
+    $values->{'id_library_lims'}   = $flowcell->id_library_lims; #For clarity
     $values->{'legacy_library_id'} = $flowcell->legacy_library_id; #For sequencescape
     $values->{'id_pool_lims'}      = $flowcell->id_pool_lims;
     $values->{'rnd'}               = $flowcell->is_r_and_d;
     $values->{'manual_qc'}         = $flowcell->manual_qc;
     $values->{'is_gclp'}           = $flowcell->from_gclp;
-    $values->{'entity_id_lims'}    = $flowcell->entity_id_lims; #For clearscape
+    $values->{'entity_id_lims'}    = $flowcell->entity_id_lims; #Not used yet but can be used for pools
 
     #To study through flowcell
     $values->{'id_study_lims'}  = $flowcell->study_id;
