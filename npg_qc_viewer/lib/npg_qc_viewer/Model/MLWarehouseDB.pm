@@ -80,13 +80,7 @@ sub search_product_by_id_library_lims {
 
   my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims, };
 
-  my $rs = $self->resultset('IseqProductMetric')->
-             search($where, {
-               join  => ['iseq_flowcell'],
-               cache => 1,
-  });
-
-  return $rs;
+  return $self->search_product_by_child_id($where);
 }
 
 =head2 search_product_by_id_pool_lims
@@ -103,13 +97,7 @@ sub search_product_by_id_pool_lims {
 
   my $where = { 'iseq_flowcell.id_pool_lims' => $id_pool_lims, };
 
-  my $rs = $self->resultset('IseqProductMetric')->
-             search($where, {
-               join  => ['iseq_flowcell'],
-               cache => 1,
-  });
-
-  return $rs;
+  return $self->search_product_by_child_id($where);
 }
 
 =head2 search_product_by_sample_id
@@ -125,6 +113,27 @@ sub search_product_by_sample_id {
   };
 
   my $where = { 'sample.id_sample_lims' => $id_sample_lims, };
+
+  return $self->search_product_by_child_id($where);
+}
+
+=head2 search_product_by_child_id
+
+Search product by id lims in one of the children tables. The where clause
+should be defined as a hash with the condition to query the relationship
+Product->Flowcell->Sample.
+e.g 
+
+my $where = { 'id_sample_lims' => $id_sample_lims };
+$rs = $c->model('MLWarehouseDB')->search_product_by_child_id($where);
+
+=cut
+sub search_product_by_child_id {
+  my ($self, $where) = @_;
+
+  if (!defined $where) {
+    croak q[Condition for id lims not defined when querying product by children id];
+  };
 
   my $rs = $self->resultset('IseqProductMetric')->
                     search($where, {
