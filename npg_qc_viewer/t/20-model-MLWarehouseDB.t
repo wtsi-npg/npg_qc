@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 8;
 use Test::Exception;
 use File::Temp qw(tempfile);
 use npg_qc_viewer::TransferObjects::SampleFacade;
@@ -65,6 +65,30 @@ subtest 'Data for sample' => sub {
 
   $sample_facade = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample});
   cmp_ok($sample_facade->name, '==', 2617, q[Correct sample name from id sample lims]);
+};
+
+subtest 'Data for library' => sub {
+  plan tests => 4;
+
+  my $rs;
+  $rs = $m->search_product_by_id_library_lims(q[NT15219S]);
+  ok (defined $rs, q[Resultset for library by id_library_lims]);
+  cmp_ok($rs->count, '>', 0, q[Found flowcell by id_library_lims]);
+  my $flowcell = $rs->next->iseq_flowcell;
+  cmp_ok($flowcell->id_library_lims, 'eq', q[NT15219S], q[Correct id library lims]);
+  cmp_ok($flowcell->flowcell_barcode, 'eq', q[42DGLAAXX], q[Correct flowcell]);
+};
+
+subtest 'Data for pool' => sub {
+  plan tests => 5;
+  my $rs;
+  $rs = $m->search_product_by_id_pool_lims(q[NT19992S]);
+  ok (defined $rs, q[Resultset for library by id_pool_lims]);
+  cmp_ok($rs->count, '>', 0, q[Found flowcell by id_pool_lims]);
+  my $flowcell = $rs->next->iseq_flowcell;
+  cmp_ok($flowcell->id_pool_lims,     'eq', q[NT19992S], q[Correct id pool lims]);
+  cmp_ok($flowcell->id_library_lims,  'eq', q[NT19992S], q[Correct id library lims]);
+  cmp_ok($flowcell->flowcell_barcode, 'eq', q[42DGLAAXX], q[Correct flowcell]);
 };
 
 1;
