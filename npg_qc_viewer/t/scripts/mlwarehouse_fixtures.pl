@@ -91,7 +91,8 @@ sub rs_list2fixture_filtered {
                     cohort
                     country_of_origin
                     geographical_region
-                    supplier_name /];
+                    supplier_name 
+                    sample_visibility /];
   my $mask = { name        => q[random_sample_name], };
   rs_list2fixture_filtered(q[500-].$tname, [$rs], $path, $remove, $mask);
   
@@ -106,7 +107,8 @@ sub rs_list2fixture_filtered {
   $remove = [qw/ ethically_approved
                     faculty_sponsor
                     abstract
-                    description /];
+                    description
+                    study_visibility /];
   $mask = { name        => q[random_study_name], 
             study_title => q[random_study_title] };
   rs_list2fixture_filtered(q[500-].$tname, [$rs], $path, $remove, $mask);
