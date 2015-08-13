@@ -114,9 +114,7 @@ sub _build__file_path_root {
   my $self = shift;
   my $path = q[];
   if ($self->sequence_file) {
-    # not usind x flag since might have # as a part of the path
-    ##no critic (RegularExpressions::RequireExtendedFormatting)
-    ($path) = $self->sequence_file =~ /\A(.+)\.[[:lower:]]+\Z/sm;
+    ($path) = $self->sequence_file =~ /\A(.+)\.[[:lower:]]+\Z/smx;
   }
   return $path;
 }
@@ -156,9 +154,7 @@ sub _filter {
   my ($self, $path) = @_;
 
   my ($volume, $directories, $file) = splitpath($path);
-  ##no critic (RegularExpressions::ProhibitEnumeratedClasses)
-  my ($filter) = $file =~ /_([a-zA-Z0-9]+)[.]stats\Z/xms;
-  ## use critic
+  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
   if (!$filter) {
     croak "Failed to get filter from $path";
   }
@@ -292,8 +288,7 @@ sub filename_root {
     my ($volume, $directories, $file) = splitpath($self->_file_path_root);
     my $subset = $self->subset;
     if ($subset) {
-      ##no critic (RegularExpressions::RequireExtendedFormatting)
-      $file =~ s/_${subset}\Z//ms;
+      $file =~ s/\Q_${subset}\E\Z//msx;
     }
     return $file;
   }
