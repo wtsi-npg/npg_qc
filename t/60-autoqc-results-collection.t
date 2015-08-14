@@ -330,13 +330,13 @@ my $temp = tempdir( CLEANUP => 1);
     is ($c->size(), 0, 'empty collection because non-existing position required by a filter');
 }
 
-
 {
     my $load_dir = q[t/data/autoqc/load];
     my $c = npg_qc::autoqc::results::collection->new();
-    $c->add_from_dir($load_dir);
+    warnings_like {$c->add_from_dir($load_dir)}
+        [ qr/Cannot\ identify\ class\ for\ ${load_dir}\/some\.json/],
+        'warning when an object for a json file does nor exist';
     is($c->size(), 3, 'three results added by de-serialization');
-    warnings_like {$c->add_from_dir($load_dir)} [ qr/Cannot\ identify\ class\ for\ t\/data\/autoqc\/load\/some\.json/], 'warning when an object for a json file does nor exist';
 }
 
 {

@@ -165,10 +165,19 @@ Filename that should be used to write json serialization of this object to
 =cut
 sub filename4serialization {
     my $self = shift;
-    return sprintf q[%s_%s%s%s.%s.%s],
-        $self->id_run,
-        $self->position,
-        $self->tag_label(),
+
+    my $root;
+    if ($self->can('filename_root')) {
+        $root = $self->filename_root;
+    }
+    if (!$root) {
+        $root = sprintf q[%s_%s%s],
+            $self->id_run,
+            $self->position,
+            $self->tag_label();
+    }
+    return sprintf q[%s%s.%s.%s],
+        $root,
         $self->can(q[subset]) && $self->subset ? q[_] . $self->subset : q[],
         $self->class_name,
         q[json];
