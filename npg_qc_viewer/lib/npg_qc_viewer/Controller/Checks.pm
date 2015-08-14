@@ -617,6 +617,13 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
     my ( $self, $c, $id_sample_lims) = @_;
 
     my $sample = $self->_fetch_sample_by_sample($c, $id_sample_lims);
+
+    if (!$sample) {
+        $c->stash->{error_message} = qq[Unknown sample id $id_sample_lims];
+        $c->detach(q[Root], q[error_page]);
+        return;
+    }
+
     my $sample_name = $sample->name;
     my $rs = $self->_fetch_by_sample($c, $id_sample_lims);
     my $sample_link = 1;
