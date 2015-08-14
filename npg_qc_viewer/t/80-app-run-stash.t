@@ -9,8 +9,9 @@ use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
 
 use t::util;
-
-local $ENV{'HOME'}='t/data';
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+}
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
