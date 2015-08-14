@@ -88,7 +88,6 @@ subtest 'Full provenance in title for different samples of same run' => sub {
     my $url = qq[http://localhost/checks/samples/$sample_id];
     warnings_like{$mech->get_ok($url)} [ qr/Use of uninitialized value \$id in exists/,], 
                                          'Expected warning for uninitialized id';
-    #note $mech->content();
     $mech->title_is(qq[NPG SeqQC v${version}: Sample '$sample_name']);
     $mech->content_contains($provenance);
   }
