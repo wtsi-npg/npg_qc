@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Test::Exception;
 use Test::WWW::Mechanize::Catalyst;
 use Test::Warn;
@@ -29,6 +29,8 @@ my $mech;
 
   my $id_run = '4025';
   $mech->content_contains($id_run);
+  my $sample_name = 'random_sample_name';
+  $mech->content_contains($sample_name);
 }
 
 {
