@@ -1,7 +1,6 @@
 Build.PL
 Changes
 lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
-lib/Catalyst/Controller/AjaxProxy.pm
 lib/npg_tracking/daemon/seqqc.pm
 lib/npg_qc_viewer/Controller/Checks.pm
 lib/npg_qc_viewer/Controller/Mqc.pm
@@ -90,7 +89,6 @@ t/00-distribution.t
 t/00-podcoverage.t
 t/00-pod.t
 t/10-authentication-SangerSSOnpg.t
-t/10-controller-AjaxProxy.t
 t/10-npg_tracking-daemon-seqqc.t
 t/10-util-Error.t
 t/10-util-FileFinder.t
