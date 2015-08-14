@@ -60,22 +60,35 @@ subtest 'Sample 9272' => sub {
 };
 
 subtest 'Full provenance in title for different samples of same run' => sub {
-  plan tests => 5;
+  plan tests => 8;
   
   my $version = $npg_qc_viewer::VERSION;
   
-  my @samples = qw( 11082 );
+  my @samples = qw( 9272 9286 );
   
-  my @sample_names = qw( random_sample_name );
+  my @sample_names = qw( sample1 sample2 );
+  
+  my $it = each_array ( @samples, @sample_names );
+  
+  while ( my ($sample_id, $sample_name) = $it->() ) {
+    my $where = { 'me.id_sample_lims' => $sample_id, };
+    my $rs = $schemas->{'mlwh'}->resultset('Sample')->search($where, { join => {'iseq_flowcells' => 'iseq_product_metrics'}, });
+    
+    while (my $sample = $rs->next ) {
+      $sample->update({'name' => $sample_name,});
+    }
+  }
 
-  my @provenances = (q[NT19992S &lt;&lt; random_sample_name &lt;&lt; random_study_name], );
+  my @provenances = ( q[NT28560W &lt;&lt; sample1 &lt;&lt; random_study_name], 
+                      q[NT28561A &lt;&lt; sample2 &lt;&lt; random_study_name],
+                    );
 
-  my $it = each_array( @samples, @sample_names, @provenances);
+  $it = each_array( @samples, @sample_names, @provenances);
   while ( my ($sample_id, $sample_name, $provenance) = $it->() ) {
     my $url = qq[http://localhost/checks/samples/$sample_id];
-    warnings_like{$mech->get_ok($url)} [ { carped => qr/No paths to run folder found/ },
-                                         qr/Use of uninitialized value \$id in exists/,], 
+    warnings_like{$mech->get_ok($url)} [ qr/Use of uninitialized value \$id in exists/,], 
                                          'Expected warning for uninitialized id';
+    #note $mech->content();
     $mech->title_is(qq[NPG SeqQC v${version}: Sample '$sample_name']);
     $mech->content_contains($provenance);
   }
