@@ -56,7 +56,7 @@ my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
 {
   my $url = q[http://localhost/checks/runs/4025];
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
-                                      'Expected warning for run folder found';
+                                      'Expected warning for id found';
   $mech->title_is($title_prefix . q[Results for run 4025 (current run status: qc complete)]);
   $mech->content_contains('Back to Run 4025');
   $mech->content_contains(152);  # num cycles
@@ -69,7 +69,7 @@ my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
 
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)->update({ id_user => 64, id_run_status_dict => 26, });
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
-                                      'Expected warning for run folder found';
+                                      'Expected warning for id found';
   $mech->title_is($title_prefix . q[Results for run 4025 (current run status: qc in progress, taken by mg8)]);
 }
 
@@ -91,7 +91,7 @@ my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
 {
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
-                                        'Expected warning for run folder found';
+                                        'Expected warning for id found';
   $mech->title_is($title_prefix . q[Results (lanes) for runs 4025 lanes 1]);
   $mech->content_contains(152);  # num cycles
   $mech->content_contains('NT28560W'); #library name
@@ -105,14 +105,14 @@ my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=all];
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
-                                       'Expected warning for run folder found';
+                                       'Expected warning for id found';
   $mech->title_is($title_prefix . q[Results (all) for runs 4025]);
 }
 
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=plexes];
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
-                                       'Expected warning for run folder found';
+                                       'Expected warning for id found';
   $mech->title_is($title_prefix . q[Results (plexes) for runs 4025]);
   $mech->content_lacks(152);  # num cycles
   $mech->content_lacks('NT28560W'); #library name
@@ -184,7 +184,7 @@ subtest 'R&D' => sub {
 
   my $url = q[http://localhost/checks/runs/4025];
   warnings_like{$mech->get_ok($url)} [ qr/Use of uninitialized value \$id in exists/, ],
-                                        'Expected warning for run folder found';
+                                        'Expected warning for id found';
   $mech->content_contains('NT28560W</span></a> <span class="watermark">R&amp;D</span>'); #library name with R&D watermark
   $mech->content_contains('NT28561A</span></a> <span class="watermark">R&amp;D</span>'); #library name with R&D watermark
   $mech->content_lacks('Illumina phiX</span></a> <span class="watermark">R&amp;D</span>');
