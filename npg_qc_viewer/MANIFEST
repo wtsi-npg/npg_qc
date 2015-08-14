@@ -9,7 +9,6 @@ lib/npg_qc_viewer/Controller/MqcRun.pm
 lib/npg_qc_viewer/Controller/Root.pm
 lib/npg_qc_viewer/Controller/Visuals.pm
 lib/npg_qc_viewer/TransferObjects/ProductMetrics4RunTO.pm
-lib/npg_qc_viewer/TransferObjects/SampleFacade.pm
 lib/npg_qc_viewer/Model/Check.pm
 lib/npg_qc_viewer/Model/GenotypeCheck.pm
 lib/npg_qc_viewer/Model/LimsServer.pm

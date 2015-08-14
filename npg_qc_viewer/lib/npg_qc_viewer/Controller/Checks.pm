@@ -11,7 +11,6 @@ use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
 use npg_qc::autoqc::results::collection;
 use npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
-use npg_qc_viewer::TransferObjects::SampleFacade;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -136,10 +135,7 @@ sub _fetch_sample_by_sample {
   my $sample;
   if (defined $id_sample_lims) {
     $rs = $c->model('MLWarehouseDB')->search_sample_by_sample_id($id_sample_lims);
-
-    if ( $rs->count > 0 ) {
-      $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $rs->next});
-    }
+    $sample = $rs->next;
   }
 
   return $sample;
@@ -376,18 +372,10 @@ sub _build_hash {
     $values->{'manual_qc'}         = $flowcell->manual_qc;
     $values->{'is_gclp'}           = $flowcell->from_gclp;
     $values->{'entity_id_lims'}    = $flowcell->entity_id_lims; #Not used yet but can be used for pools
-
-    #To study through flowcell
-    $values->{'id_study_lims'}  = $flowcell->study_id;
-    $values->{'study_name'}     = $flowcell->study_name;
-
-    if ( defined $flowcell->sample ) {
-      my $sample_row = $flowcell->sample;
-      my $sample = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample_row});
-
-      $values->{'id_sample_lims'} = $sample->id_sample_lims;
-      $values->{'sample_name'}    = $sample->name;
-    }
+    $values->{'id_study_lims'}     = $flowcell->study_id;
+    $values->{'study_name'}        = $flowcell->study_name;
+    $values->{'id_sample_lims'}    = $flowcell->sample_id;
+    $values->{'sample_name'}       = $flowcell->sample_name;
   }
 
   return $values;

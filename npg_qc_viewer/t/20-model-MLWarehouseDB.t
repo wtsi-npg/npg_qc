@@ -3,7 +3,6 @@ use warnings;
 use Test::More tests => 8;
 use Test::Exception;
 use File::Temp qw(tempfile);
-use npg_qc_viewer::TransferObjects::SampleFacade;
 
 use t::util;
 
@@ -64,9 +63,9 @@ subtest 'Data for pool' => sub {
 };
 
 subtest 'Data for sample' => sub {
-  plan tests => 12;
-  my $rs;
-  $rs = $m->resultset(q[Sample]);
+  plan tests => 11;
+
+  my $rs = $m->resultset(q[Sample]);
   ok (defined $rs, "Sample resultset");
   $rs = $rs->search({id_sample_lims => 2617});
   cmp_ok($rs->count, '==', 1, "Found sample by id_sample_lims");
@@ -77,25 +76,19 @@ subtest 'Data for sample' => sub {
 
   ok (defined $product->iseq_flowcell, "Product has iseq_flowcell.");
   ok (defined $product->iseq_flowcell->sample, "iseq_flowcell has sample.");
-  my $sample_facade = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $product->iseq_flowcell->sample});
-  cmp_ok($sample_facade->id_sample_lims, '==', 2617, q[Correct id sample lims]);
-  cmp_ok($sample_facade->name, 'eq', q[random_sample_name], q[Correct sample name from name]);
+  my $sample = $product->iseq_flowcell->sample;
+  cmp_ok($sample->id_sample_lims, '==', 2617, q[Correct id sample lims]);
+  cmp_ok($sample->name, 'eq', q[random_sample_name], q[Correct sample name from name]);
 
   $rs = $m->search_product_by_sample_id(2617);
   cmp_ok($rs->count, '>', 0, "Found product when using method from Model");
-  $product = $rs->next;
-  my $sample = $product->iseq_flowcell->sample;
-  $sample->name( undef );
-
-  $sample_facade = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $sample});
-  cmp_ok($sample_facade->name, '==', 2617, q[Correct sample name from id sample lims]);
   
   $rs = $m->search_sample_by_sample_id(2617);
   cmp_ok($rs->count, '>', 0, "Found product when using method from Model");
   $sample = $rs->next;
   cmp_ok($sample->id_sample_lims, '==', 2617, q[Correct id sample lims]);
   cmp_ok($sample->name, 'eq', q[random_sample_name], q[Correct sample name from name]);
-  $sample->name( undef );
+
 };
 
 1;
