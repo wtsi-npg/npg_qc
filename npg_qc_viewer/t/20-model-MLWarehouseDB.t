@@ -79,7 +79,7 @@ subtest 'Data for sample' => sub {
   ok (defined $product->iseq_flowcell->sample, "iseq_flowcell has sample.");
   my $sample_facade = npg_qc_viewer::TransferObjects::SampleFacade->new({row => $product->iseq_flowcell->sample});
   cmp_ok($sample_facade->id_sample_lims, '==', 2617, q[Correct id sample lims]);
-  cmp_ok($sample_facade->name, 'eq', q[NA20774-TOS], q[Correct sample name from name]);
+  cmp_ok($sample_facade->name, 'eq', q[random_sample_name], q[Correct sample name from name]);
 
   $rs = $m->search_product_by_sample_id(2617);
   cmp_ok($rs->count, '>', 0, "Found product when using method from Model");
@@ -94,7 +94,7 @@ subtest 'Data for sample' => sub {
   cmp_ok($rs->count, '>', 0, "Found product when using method from Model");
   $sample = $rs->next;
   cmp_ok($sample->id_sample_lims, '==', 2617, q[Correct id sample lims]);
-  cmp_ok($sample->name, 'eq', q[NA20774-TOS], q[Correct sample name from name]);
+  cmp_ok($sample->name, 'eq', q[random_sample_name], q[Correct sample name from name]);
   $sample->name( undef );
 };
 
