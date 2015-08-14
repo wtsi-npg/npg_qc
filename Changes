@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC 
+   - remove ajax proxy controller
+   - stop 00 tests accessing live db credentials and databases
  - autoqc check and autoqc objects: remove unused 'sequence_type' attribute
  - autoqc check and result objects - use existing roles for id_run and
    position definitions
