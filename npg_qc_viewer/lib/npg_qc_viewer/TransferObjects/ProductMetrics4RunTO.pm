@@ -3,14 +3,18 @@ package npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
 use Moose;
 use namespace::autoclean;
 
-use npg_tracking::util::types;
+with qw/
+          npg_tracking::glossary::run
+          npg_tracking::glossary::lane
+          npg_tracking::glossary::tag
+       /;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
 =begin stopwords
 
-deplexing lims rnd
+deplexing lims rnd gclp flowcell
 
 =end stopwords
 
@@ -28,38 +32,19 @@ A transfer object to pass Product Metric data from the model to the view.
 
 =cut
 
-=head2 position
+=head2 BUILD
 
-Lane number.
-
-=cut
-has 'position'     => (
-  isa      => 'NpgTrackingLaneNumber',
-  is       => 'rw',
-  required => 1,
-);
-
-=head2 id_run
-
-Run id.
+Just makes sure is_gclp is always 0/1.
 
 =cut
-has 'id_run'       => (
-  isa      => 'NpgTrackingRunId',
-  is       => 'rw',
-  required => 1,
-);
+sub BUILD {
+  my $self = shift;
 
-=head2 tag_index
+  #To make sure there is no undef, see npg_qc_viewer::Model::LimsServer
+  $self->is_gclp($self->is_gclp ? 1 : 0);
 
-Plex.
-
-=cut
-has 'tag_index'    => (
-  isa      => 'Maybe[Int]',
-  is       => 'rw',
-  required => 0,
-);
+  return;
+}
 
 =head2 num_cycles
 
@@ -179,6 +164,29 @@ Flag for R&D runs
 
 =cut
 has 'rnd' => (
+  is       => 'rw',
+  required => 0,
+);
+
+=head2 is_gclp
+
+Flag for gclp flowcell
+
+=cut
+has 'is_gclp' => (
+  isa      => 'Bool',
+  is       => 'rw',
+  required => 0,
+  default  => 0,
+);
+
+=head2 entity_id_lims
+
+Id for entity lims
+
+=cut
+has 'entity_id_lims' => (
+  isa      => 'Str',
   is       => 'rw',
   required => 0,
 );

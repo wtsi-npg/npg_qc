@@ -80,13 +80,7 @@ sub search_product_by_id_library_lims {
 
   my $where = { 'iseq_flowcell.id_library_lims' => $id_library_lims, };
 
-  my $rs = $self->resultset('IseqProductMetric')->
-             search($where, {
-               join  => ['iseq_flowcell'],
-               cache => 1,
-  });
-
-  return $rs;
+  return $self->_search_product_by_child_id($where);
 }
 
 =head2 search_product_by_id_pool_lims
@@ -103,13 +97,7 @@ sub search_product_by_id_pool_lims {
 
   my $where = { 'iseq_flowcell.id_pool_lims' => $id_pool_lims, };
 
-  my $rs = $self->resultset('IseqProductMetric')->
-             search($where, {
-               join  => ['iseq_flowcell'],
-               cache => 1,
-  });
-
-  return $rs;
+  return $self->_search_product_by_child_id($where);
 }
 
 =head2 search_product_by_sample_id
@@ -126,10 +114,49 @@ sub search_product_by_sample_id {
 
   my $where = { 'sample.id_sample_lims' => $id_sample_lims, };
 
+  return $self->_search_product_by_child_id($where);
+}
+
+sub _search_product_by_child_id {
+#  Search product by id lims in one of the children tables. The where clause
+#  should be defined as a hash with the condition to query the relationship
+#  Product->Flowcell->Sample.
+#
+#  my $where = { 'id_sample_lims' => $id_sample_lims };
+#  $rs = $c->model('MLWarehouseDB')->_search_product_by_child_id($where);
+
+  my ($self, $where) = @_;
+
+  if (!defined $where) {
+    croak q[Condition for id lims not defined when querying product by children id];
+  };
+
   my $rs = $self->resultset('IseqProductMetric')->
                     search($where, {
                     prefetch => {'iseq_flowcell' => 'sample'},
                     join     => {'iseq_flowcell' => 'sample'},
+                    cache    => 1,
+  });
+
+  return $rs;
+}
+
+=head2 search_sample_by_sample_id
+
+Search sample by id sample lims
+
+=cut
+sub search_sample_by_sample_id {
+  my ($self, $id_sample_lims) = @_;
+
+  if (!defined $id_sample_lims) {
+    croak q[Id sample lims not defined when querying sample lims];
+  };
+
+  my $where = { 'me.id_sample_lims' => $id_sample_lims, };
+
+  my $rs = $self->resultset('Sample')->
+                    search($where, {
                     cache    => 1,
   });
 

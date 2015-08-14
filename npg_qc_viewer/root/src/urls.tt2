@@ -1,7 +1,5 @@
-[% lims_url = 'http://sequencescape.psd.sanger.ac.uk:6600';
-   port = 9000;
+[% port = 9000;
    IF env_dev == 'dev';
-     lims_url = 'http://dev.psd.sanger.ac.uk:6610';
      port = 9010;
    END;
    base_url = base_url _ ':' _ port;
