@@ -11,50 +11,64 @@ our $VERSION = '0';
 ##no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 
 sub generate_url {
-  my ($self, $entity_type, $from_gclp, $id_entity_lims) = @_;
+  my ($self, $entity_type, $values) = @_;
 
   if (!$entity_type) {
-    croak 'Entity type (library|sample) is missing';
+    croak 'Entity type (library|pool|sample) is missing';
   }
-  if ($entity_type !~ /^sample$|^library$/smx) {
+  if ($entity_type !~ /^sample$|^library$|^pool$/smx) {
     croak "Unknown entity type $entity_type";
   }
-
-  if (!defined $from_gclp) {
-    croak 'LIMS flag is missing';
+  if (!$values) {
+    croak 'LIMS values object is missing';
   }
-  if (!$id_entity_lims) {
-    croak 'LIMS object id is missing';
+  my $expected_type = 'npg_qc_viewer::TransferObjects::ProductMetrics4RunTO';
+  my $actual = ref $values || q[];
+  if (ref $values ne $expected_type) {
+    croak "$expected_type is expected, got $actual";
   }
 
-  my $method = '_link_' . ($from_gclp ? 'clarity' : 'sscape');
-  return $self->$method($entity_type, $id_entity_lims);
+  my $method = '_link_' . ($values->is_gclp ? 'clarity' : 'sscape');
+  return $self->$method($entity_type, $values);
 }
 
 sub _link_clarity {
-  my ($self, $entity_type, $id_entity_lims) = @_;
+  my ($self, $entity_type, $values) = @_;
 
   my $url = npg_qc_viewer->config->{'Model::LimsServer'}->{'clarity_url'};
   my $link = q[];
-  if ($url) {
+  if ($url and $entity_type ne 'pool') {
     my $scope = $entity_type eq 'sample' ? 'Sample' : 'Container';
+    my $id;
     if ($scope eq 'Container') {
-      ($id_entity_lims) = $id_entity_lims =~ /\A([^:]+)/smx;
+      if ($values->id_library_lims) {
+        ($id) = $values->id_library_lims =~ /\A([^:]+)/smx;
+      }
+    } else {
+      $id = $values->id_sample_lims;
     }
-    $link = sprintf '%s/search?scope=%s&query=%s', $url, $scope, $id_entity_lims;
+    if ($id) {
+      $link = sprintf '%s/search?scope=%s&query=%s', $url, $scope, $id;
+    }
   }
 
   return $link;
 }
 
 sub _link_sscape {
-  my ($self, $entity_type, $id_entity_lims) = @_;
+  my ($self, $entity_type, $values) = @_;
 
   my $url = npg_qc_viewer->config->{'Model::LimsServer'}->{'sscape_url'};
   my $link = q[];
   if ($url) {
     my $scope = $entity_type eq 'sample' ? 'samples' : 'assets';
-    $link = join q[/], $url, $scope, $id_entity_lims;
+    my $id = $entity_type eq 'sample'
+           ? $values->id_sample_lims
+           : ($entity_type eq 'pool'
+           ? $values->entity_id_lims : $values->legacy_library_id);
+    if ($id) {
+      $link = join q[/], $url, $scope, $id;
+    }
   }
   return $link;
 }
@@ -82,11 +96,13 @@ Catalyst model for wrapping LIMS server information.
   Generates a link to a LIMS resource.
 
   my $is_gclp_lims = 1;
-  my $id_entity_lims = 'KN-3456';
+  my $values = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new();
   my $surl = $c->model('LimsServer')
-    ->generate_url('sample', '$is_gclp_lims', $id_entity_lims);
-  my $lurl = $c->model('LimsServer')
-    ->generate_url('library', '$is_gclp_lims', $id_entity_lims);
+    ->generate_url('sample', '$is_gclp_lims', $values);
+  $lurl = $c->model('LimsServer')
+    ->generate_url('library', '$is_gclp_lims', $values);
+  $lurl = $c->model('LimsServer')
+    ->generate_url('pool', '$is_gclp_lims', $values);
 
 =head1 DIAGNOSTICS
 

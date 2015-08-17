@@ -1,6 +1,7 @@
 package npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 
 with qw/
@@ -39,10 +40,8 @@ Just makes sure is_gclp is always 0/1.
 =cut
 sub BUILD {
   my $self = shift;
-
   #To make sure there is no undef, see npg_qc_viewer::Model::LimsServer
   $self->is_gclp($self->is_gclp ? 1 : 0);
-
   return;
 }
 
@@ -54,7 +53,7 @@ Number of cycles. Usually cycles@iseq_run_lane_metric
 has 'num_cycles'   => (
   isa      => 'Maybe[Int]',
   is       => 'rw',
-  required => 1,
+  required => 0,
 );
 
 =head2 time_comp
@@ -63,6 +62,7 @@ When run was complete
 
 =cut
 has 'time_comp'    => (
+  isa      => 'Maybe[DateTime]',
   is       => 'rw',
   required => 0,
 );
@@ -73,6 +73,7 @@ Tag sequence for deplexing
 
 =cut
 has 'tag_sequence' => (
+  isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
 );
@@ -83,17 +84,7 @@ Result of manual qc.
 
 =cut
 has 'manual_qc'    => (
-  isa      => 'Maybe[Int]',
-  is       => 'rw',
-  required => 0,
-);
-
-=head2 id_study_lims
-
-Id of study lims
-
-=cut
-has 'id_study_lims'     => (
+  isa      => 'Bool',
   is       => 'rw',
   required => 0,
 );
@@ -104,6 +95,7 @@ Name study lims
 
 =cut
 has 'study_name'     => (
+  isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
 );
@@ -114,6 +106,7 @@ Id of sample lims
 
 =cut
 has 'id_sample_lims' => (
+  isa      => 'Str',
   is       => 'rw',
   required => 0,
 );
@@ -124,6 +117,7 @@ Name of sample lims
 
 =cut
 has 'sample_name' => (
+  isa      => 'Str',
   is       => 'rw',
   required => 0,
 );
@@ -134,6 +128,7 @@ Id of library lims
 
 =cut
 has 'id_library_lims' => (
+  isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
 );
@@ -144,6 +139,7 @@ Legacy library id lims
 
 =cut
 has 'legacy_library_id' => (
+  isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
 );
@@ -154,6 +150,7 @@ Id pool lims
 
 =cut
 has 'id_pool_lims' => (
+  isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
 );
@@ -186,7 +183,7 @@ Id for entity lims
 
 =cut
 has 'entity_id_lims' => (
-  isa      => 'Str',
+  isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
 );
@@ -206,6 +203,8 @@ __END__
 
 =item Moose
 
+=item MooseX::StrictConstructor
+
 =item namespace::autoclean
 
 =item npg_tracking::util::types
@@ -217,6 +216,8 @@ __END__
 =head1 BUGS AND LIMITATIONS
 
 =head1 AUTHOR
+
+Jaime Tovar Corona E<lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
