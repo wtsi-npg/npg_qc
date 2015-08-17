@@ -116,9 +116,11 @@
           lurl = c.model('LimsServer').generate_url('library', row_info_to.is_gclp, row_info_to.legacy_library_id);
         END; -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => row_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
-    [%- IF lurl != ''; -%]<a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a> [%- END; -%]
+    <a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
   [%- ELSE -%]
-    <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_library_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
+    [%- IF !row_info_to.is_gclp; -%]
+      <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_library_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
+    [%- END; -%]
     <span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span>
   [%- END -%]
 [%- END -%]
