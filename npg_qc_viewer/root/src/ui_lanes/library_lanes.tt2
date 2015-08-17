@@ -94,10 +94,8 @@
 <tr>
 [%- IF sample_link -%]
 <td class="nbsp">
-[%- IF row_info_to.id_sample_lims; -%]
 <a href="[%- c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.id_sample_lims) -%]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
-<a href="[%- c.model('LimsServer').generate_url('sample', row_info_to.is_gclp, row_info_to.id_sample_lims); -%]"><span class="lib nbsp">[% row_info_to.sample_name | html %]</span></a>
-[%- END -%]
+<a href="[%- c.model('LimsServer').generate_url('sample', row_info_to); -%]"><span class="lib nbsp">[% row_info_to.sample_name | html %]</span></a>
 </td>
 [%- END -%]
 
@@ -109,19 +107,15 @@
 
 [%- IF row_info_to.id_library_lims; -%]
   [%- IF !lane_collection.run_lane_plex_flags.$lane_key;
-        lurl = '';
-        IF row_info_to.is_gclp && row_info_to.entity_id_lims;
-          lurl = c.model('LimsServer').generate_url('library', row_info_to.is_gclp, row_info_to.id_library_lims);
-        ELSIF !row_info_to.is_gclp && row_info_to.legacy_library_id;
-          lurl = c.model('LimsServer').generate_url('library', row_info_to.is_gclp, row_info_to.legacy_library_id);
-        END; -%]
+        lurl = c.model('LimsServer').generate_url('library', row_info_to);
+  -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => row_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
     <a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
-  [%- ELSE -%]
-    [%- IF !row_info_to.is_gclp; -%]
-      <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_library_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
-    [%- END; -%]
-    <span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span>
+  [%- ELSE;
+    lurl = c.model('LimsServer').generate_url('pool', row_info_to);
+  -%]
+    <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_pool_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
+    <a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
   [%- END -%]
 [%- END -%]
 [% IF row_info_to.rnd %]<span class="watermark">R&amp;D</span>[% END %]

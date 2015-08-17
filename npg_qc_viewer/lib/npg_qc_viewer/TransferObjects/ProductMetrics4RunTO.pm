@@ -1,6 +1,7 @@
 package npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 
 with qw/
@@ -205,6 +206,8 @@ __END__
 =over
 
 =item Moose
+
+=item MooseX::StrictConstructor
 
 =item namespace::autoclean
 
