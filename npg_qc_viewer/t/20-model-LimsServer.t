@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 18;
 use Test::Exception;
 
 use npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
@@ -58,12 +58,16 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   is($s->generate_url('library', $values),
      q[http://clarity.com/clarity/search?scope=Container&query=1235678],
     'clarity container url');
+  $values->id_library_lims(undef);
+  is($s->generate_url('library', $values), q[], 'url is an empty string');
 
   is($s->generate_url('pool', $values),
      q[], 'clarity container url is empty');
   $values->is_gclp(0);
   is($s->generate_url('pool', $values), 
-    q[http://sscape.com/assets/123567X], 'sscape pool url');     
+    q[http://sscape.com/assets/123567X], 'sscape pool url');
+  $values->entity_id_lims(undef);
+  is($s->generate_url('pool', $values), q[], 'url is an empty string');   
 }
 
 1;

@@ -41,11 +41,15 @@ sub _link_clarity {
     my $scope = $entity_type eq 'sample' ? 'Sample' : 'Container';
     my $id;
     if ($scope eq 'Container') {
-      ($id) = $values->id_library_lims =~ /\A([^:]+)/smx;
+      if ($values->id_library_lims) {
+        ($id) = $values->id_library_lims =~ /\A([^:]+)/smx;
+      }
     } else {
       $id = $values->id_sample_lims;
     }
-    $link = sprintf '%s/search?scope=%s&query=%s', $url, $scope, $id;
+    if ($id) {
+      $link = sprintf '%s/search?scope=%s&query=%s', $url, $scope, $id;
+    }
   }
 
   return $link;
@@ -62,7 +66,9 @@ sub _link_sscape {
            ? $values->id_sample_lims
            : ($entity_type eq 'pool'
            ? $values->entity_id_lims : $values->legacy_library_id);
-    $link = join q[/], $url, $scope, $id;
+    if ($id) {
+      $link = join q[/], $url, $scope, $id;
+    }
   }
   return $link;
 }
