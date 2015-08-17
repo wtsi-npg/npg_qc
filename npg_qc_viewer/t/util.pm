@@ -27,11 +27,17 @@ sub _build_config_path {
     return $CONFIG_PATH;
 }
 
+has 'fixtures'  => ( isa      => 'Bool',
+                     is       => 'ro',
+                     required => 0,
+                     default  => 1,
+		               );
+
 has 'db_connect'  => ( isa      => 'Bool',
                        is       => 'ro',
                        required => 0,
                        default  => 1,
-		     );
+		                 );
 
 has 'staging_path' => ( isa      => 'Str',
                         is       => 'ro',
@@ -66,27 +72,29 @@ sub test_env_setup {
     my $db = $self->whouse_db_path;
     if (-e $db) {unlink $db;}
     my $schema_package = q[npg_warehouse::Schema];
-    my $fixtures_path = q[t/data/fixtures/warehouse];
+    my $fixtures_path = $self->fixtures ? q[t/data/fixtures/warehouse] : q[];
     $schemas->{wh} = $self->create_test_db($schema_package, $fixtures_path, $db);
 
     $db = $self->npgqc_db_path;
     if (-e $db) {unlink $db;}
     $schema_package = q[npg_qc::Schema];
-    $fixtures_path = q[t/data/fixtures/npgqc];
+    $fixtures_path = $self->fixtures ? q[t/data/fixtures/npgqc] : q[];
     $schemas->{qc} = $self->create_test_db($schema_package, $fixtures_path, $db);
 
 
     $db = $self->npg_db_path;
     if (-e $db) {unlink $db;}
     $schema_package = q[npg_tracking::Schema];
-    $fixtures_path = q[t/data/fixtures/npg];
+    $fixtures_path = $self->fixtures ? q[t/data/fixtures/npg] : q[];
     $schemas->{npg} = $self->create_test_db($schema_package, $fixtures_path, $db);
 
-    my $npg = $schemas->{npg};
-    $npg->resultset('Run')->find({id_run => 4025, })->set_tag(1, 'staging');
-    $npg->resultset('Run')->find({id_run => 3965, })->set_tag(1, 'staging');
-    $npg->resultset('Run')->find({id_run => 3323, })->set_tag(1, 'staging');
-    $npg->resultset('Run')->find({id_run => 3500, })->set_tag(1, 'staging');
+    if ($self->fixtures) {
+        my $npg = $schemas->{npg};
+        $npg->resultset('Run')->find({id_run => 4025, })->set_tag(1, 'staging');
+        $npg->resultset('Run')->find({id_run => 3965, })->set_tag(1, 'staging');
+        $npg->resultset('Run')->find({id_run => 3323, })->set_tag(1, 'staging');
+        $npg->resultset('Run')->find({id_run => 3500, })->set_tag(1, 'staging');
+    }
 
     return $schemas;
 }

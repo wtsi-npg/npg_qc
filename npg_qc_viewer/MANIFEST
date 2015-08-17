@@ -1,7 +1,6 @@
 Build.PL
 Changes
 lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
-lib/Catalyst/Controller/AjaxProxy.pm
 lib/npg_tracking/daemon/seqqc.pm
 lib/npg_qc_viewer/Controller/Checks.pm
 lib/npg_qc_viewer/Controller/Mqc.pm
@@ -90,7 +89,6 @@ t/00-distribution.t
 t/00-podcoverage.t
 t/00-pod.t
 t/10-authentication-SangerSSOnpg.t
-t/10-controller-AjaxProxy.t
 t/10-npg_tracking-daemon-seqqc.t
 t/10-util-Error.t
 t/10-util-FileFinder.t
@@ -107,17 +105,6 @@ t/40-controller-Root.t
 t/40-controller-Visuals.t
 t/40-controller-Warehouse.t
 t/45-controller-Visuals.t
-t/50-template-ui_checks-adapter.t
-t/50-template-ui_checks-bam_flagstats.t
-t/50-template-ui_checks-checks_in_full.t
-t/50-template-ui_checks-contamination.t
-t/50-template-ui_checks-gc_fraction.t
-t/50-template-ui_checks-insert_size.t
-t/50-template-ui_checks-qX_yield.t
-t/50-template-ui_checks-split_stats.t
-t/50-template-ui_checks-tag_decode_stats.t
-t/50-template-ui_lanes-lane.t
-t/50-template-ui_lanes-library_lanes.t
 t/70-view_TT.t
 t/80-app-fastqcheck.t
 t/80-app-help.t
