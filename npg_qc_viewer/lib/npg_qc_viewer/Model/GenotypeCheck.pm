@@ -41,13 +41,13 @@ sub fetch_genotype_json { ## no critic (ProhibitManyArgs)
   my $qcs=npg_qc::autoqc::qc_store->new(%init);
   my $c=$qcs->load_run($id_run, $db_lookup, [ $position ], $PLEXES);
 
-	my $trr;
-	if(defined $tag_index) {
-		$trr=$c->search({class_name => q[genotype], tag_index => $tag_index, });
-	}
-	else {
-		$trr=$c->slice(q[class_name], q[genotype]);
-	}
+  my $trr;
+  if(defined $tag_index) {
+    $trr=$c->search({class_name => q[genotype], tag_index => $tag_index, });
+  }
+  else {
+    $trr=$c->slice(q[class_name], q[genotype]);
+  }
 
   return $trr;
 }
@@ -58,28 +58,28 @@ Returns a hash ref with plex_name keys and JSON string values containing composi
 
 =cut
 sub fetch_composite_genotype_data {
-	my ($self, $library_id) = @_;
-	my $cgc;
+  my ($self, $library_id) = @_;
+  my $cgc;
 
-	if($library_id and defined npg_qc_viewer->config->{'Model::GenotypeCheck'}->{'composite_results_loc'}) {
-		my $composite_results_loc = npg_qc_viewer->config->{'Model::GenotypeCheck'}->{'composite_results_loc'};
+  if($library_id and defined npg_qc_viewer->config->{'Model::GenotypeCheck'}->{'composite_results_loc'}) {
+    my $composite_results_loc = npg_qc_viewer->config->{'Model::GenotypeCheck'}->{'composite_results_loc'};
 
-		if(opendir my $dh, $composite_results_loc) {
-			while(my $plex_dir = readdir $dh) {
-				next if $plex_dir =~ /^[.]/smx;
+    if(opendir my $dh, $composite_results_loc) {
+      while(my $plex_dir = readdir $dh) {
+        next if $plex_dir =~ /^[.]/smx;
 
-				my $cgd = $self->fetch_cgd_for_plex($library_id, $plex_dir, $composite_results_loc);
-				if($cgd) {
-					$cgc->{$plex_dir} = $cgd;
-				}
-			}
-		}
-		else {
-			carp q[Failed to open composite_results_location: ], $composite_results_loc;
-		}
-	}
+        my $cgd = $self->fetch_cgd_for_plex($library_id, $plex_dir, $composite_results_loc);
+        if($cgd) {
+          $cgc->{$plex_dir} = $cgd;
+        }
+      }
+    }
+    else {
+      carp q[Failed to open composite_results_location: ], $composite_results_loc;
+    }
+  }
 
-	return $cgc;
+  return $cgc;
 }
 
 =head2 fetch_cgd_for_plex
@@ -89,32 +89,32 @@ Returns hash ref generated from the JSON string containing composite genotype ch
 
 =cut
 sub fetch_cgd_for_plex {
-	my ($self, $library_id, $plex_name, $composite_results_loc) = @_;
-	my $cgd;
+  my ($self, $library_id, $plex_name, $composite_results_loc) = @_;
+  my $cgd;
 
-	## no critic qw(ControlStructures::ProhibitUnlessBlocks)
-	unless(defined $library_id and $library_id) {
-		return;
-	}
-	## use critic
+  ## no critic qw(ControlStructures::ProhibitUnlessBlocks)
+  unless(defined $library_id and $library_id) {
+    return;
+  }
+  ## use critic
 
-	$plex_name ||= q[W30467];
-	$composite_results_loc ||= npg_qc_viewer->config->{'Model::GenotypeCheck'}->{'composite_results_loc'};
+  $plex_name ||= q[W30467];
+  $composite_results_loc ||= npg_qc_viewer->config->{'Model::GenotypeCheck'}->{'composite_results_loc'};
 
-	my $cgc_file = $library_id . q[.json];
-	##no critic (ProhibitMagicNumbers)
-	my $cgc_path = join q[/], $composite_results_loc, $plex_name, substr($library_id, 0, 1), substr($library_id, 1, 3), $library_id, $cgc_file;
+  my $cgc_file = $library_id . q[.json];
+  ##no critic (ProhibitMagicNumbers)
+  my $cgc_path = join q[/], $composite_results_loc, $plex_name, substr($library_id, 0, 1), substr($library_id, 1, 3), $library_id, $cgc_file;
 
-	##use critic
+  ##use critic
 
-	if(-f $cgc_path) {
-		my $s = read_file($cgc_path);
-		if($s) {
-			$cgd = from_json($s);
-		}
-	}
+  if(-f $cgc_path) {
+    my $s = read_file($cgc_path);
+    if($s) {
+      $cgd = from_json($s);
+    }
+  }
 
-	return $cgd;
+  return $cgd;
 }
 
 __PACKAGE__->meta->make_immutable;

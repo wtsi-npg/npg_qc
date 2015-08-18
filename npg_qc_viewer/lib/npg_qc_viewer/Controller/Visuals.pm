@@ -34,27 +34,27 @@ Image rendering
 
 =cut
 sub _render {
-    my ($self, $c, $method, $args) = @_;
+  my ($self, $c, $method, $args) = @_;
 
-    my $image_string;
-    eval {
-        $image_string = $c->model(q[Visuals::Fastqcheck])->$method($args);
-        1;
-    } or do {
-        if ($EVAL_ERROR) {
-            $c->error($EVAL_ERROR);
-            return;
-	}
-    };
+  my $image_string;
+  eval {
+    $image_string = $c->model(q[Visuals::Fastqcheck])->$method($args);
+    1;
+  } or do {
+    if ($EVAL_ERROR) {
+      $c->error($EVAL_ERROR);
+      return;
+	  }
+  };
 
-    if ($image_string) {
-        $c->res->content_type(q[image/png]);
-        $c->res->body( $image_string );
-    } else {
-        $c->error(qq[image string empty for $method])
-    }
+  if ($image_string) {
+    $c->res->content_type(q[image/png]);
+    $c->res->body( $image_string );
+  } else {
+    $c->error(qq[image string empty for $method])
+  }
 
-    return;
+  return;
 }
 
 
@@ -64,8 +64,8 @@ Action for the base controller path
 
 =cut
 sub base :Chained('/') :PathPart('visuals') :CaptureArgs(0) {
-    my ($self, $c) = @_;
-    return;
+  my ($self, $c) = @_;
+  return;
 }
 
 
@@ -75,14 +75,14 @@ An action for generating a visual representation of a fastqcheck file
 
 =cut
 sub fastqcheck :Chained('base') :PathPath('fastqcheck') :Args(0) {
-    my ( $self, $c) = @_;
+  my ( $self, $c) = @_;
 
-    my $model = $c->model(q[Visuals::Fastqcheck]);
-    if (!$model->has_schema) {
-        $model->schema($c->model(q[NpgQcDB]));
-    }
-    $self->_render($c, q[fastqcheck2image], $c->request->query_parameters);
-    return;
+  my $model = $c->model(q[Visuals::Fastqcheck]);
+  if (!$model->has_schema) {
+    $model->schema($c->model(q[NpgQcDB]));
+  }
+  $self->_render($c, q[fastqcheck2image], $c->request->query_parameters);
+  return;
 
 }
 
@@ -92,9 +92,9 @@ An action for generating a legend for a visual representation of fastqcheck file
 
 =cut
 sub fastqcheck_legend :Chained('base') :PathPath('fastqcheck_legend') :Args(0) {
-    my ( $self, $c) = @_;
-    $self->_render($c, q[fastqcheck_legend]);
-    return;
+  my ( $self, $c) = @_;
+  $self->_render($c, q[fastqcheck_legend]);
+  return;
 }
 
 __PACKAGE__->meta->make_immutable;

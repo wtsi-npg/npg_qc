@@ -39,60 +39,60 @@ NPG SeqQC Controller for URLs of pages displaying autoqc results
 =cut
 
 sub _base_url_no_port {
-    my $base_url = shift;
+  my $base_url = shift;
 
-    if (!$base_url) {
-        croak 'Need base url';
-    }
-    my $url = URI::URL->new($base_url);
-    my $port = $url->port;
-    if ($port) {
-        $url =~ s/:${port}//xms; #remove port number and preceeding :
-    }
-    $url =~ s{/\Z}{}xms; # trim the last slash
-    return $url;
+  if (!$base_url) {
+    croak 'Need base url';
+  }
+  my $url = URI::URL->new($base_url);
+  my $port = $url->port;
+  if ($port) {
+    $url =~ s/:${port}//xms; #remove port number and preceeding :
+  }
+  $url =~ s{/\Z}{}xms; # trim the last slash
+  return $url;
 }
 
 sub _get_title {
-    my $title = shift;
-    my $full_title =  qq[NPG SeqQC v$VERSION];
-    if ($title) {
-        $full_title .= ': ' . $title;
-    }
-    return $full_title;
+  my $title = shift;
+  my $full_title =  qq[NPG SeqQC v$VERSION];
+  if ($title) {
+    $full_title .= ': ' . $title;
+  }
+  return $full_title;
 }
 
 sub _test_positive_int {
-    my ($self, $c, $input) = @_;
-    if ($input !~ /^\d+$/smx || $input == 0) {
-        $c->stash->{error_message} =
-             qq[The last URL component must be a positive integer. You entered $input];
-        $c->detach(q[Root], q[error_page]);
-    }
-    return;
+  my ($self, $c, $input) = @_;
+  if ($input !~ /^\d+$/smx || $input == 0) {
+    $c->stash->{error_message} =
+       qq[The last URL component must be a positive integer. You entered $input];
+    $c->detach(q[Root], q[error_page]);
+  }
+  return;
 }
 
 sub _show_option {
-    my ($self, $c, $default) = @_;
-    my $what;
-    if (exists $c->request->query_parameters->{'show'}) {
-        $what = $c->request->query_parameters->{'show'};
-    }
-    if (!$what || !exists $RESULTS_RETRIEVE_OPTIONS{$what}) {
-        $what = $default ? $default : $DEFAULT_RESULTS_RETRIEVE_OPTION;
-    }
-    return $what;
+  my ($self, $c, $default) = @_;
+  my $what;
+  if (exists $c->request->query_parameters->{'show'}) {
+    $what = $c->request->query_parameters->{'show'};
+  }
+  if (!$what || !exists $RESULTS_RETRIEVE_OPTIONS{$what}) {
+    $what = $default ? $default : $DEFAULT_RESULTS_RETRIEVE_OPTION;
+  }
+  return $what;
 }
 
 sub _data2stash {
-    my ($self, $c, $collection) = @_;
+  my ($self, $c, $collection) = @_;
 
-    my $rl_map     = $collection->run_lane_collections;
-    my $has_plexes = npg_qc::autoqc::role::rpt_key->has_plexes([keys %{$rl_map}]);
-    $c->stash->{'rl_map'}         = $rl_map;
-    $c->stash->{'has_plexes'}     = $has_plexes;
-    $c->stash->{'collection_all'} = $collection;
-    return;
+  my $rl_map   = $collection->run_lane_collections;
+  my $has_plexes = npg_qc::autoqc::role::rpt_key->has_plexes([keys %{$rl_map}]);
+  $c->stash->{'rl_map'}     = $rl_map;
+  $c->stash->{'has_plexes'}   = $has_plexes;
+  $c->stash->{'collection_all'} = $collection;
+  return;
 }
 
 sub _filter_run_lane_collection_with_keys {
@@ -167,70 +167,70 @@ sub _display_libs {
 }
 
 sub _display_run_lanes {
-    my ($self, $c, $params) = @_;
+  my ($self, $c, $params) = @_;
 
-    my $id_runs;
-    my $lanes = [];
+  my $id_runs;
+  my $lanes = [];
 
-    if ($params && exists $params->{'run'}) {
-        $id_runs = $params->{'run'};
-        if ($params->{'lane'}) {
-            $lanes = $params->{'lane'};
-        }
-    } else {
-        $id_runs = $c->request->query_parameters->{'run'};
-        if (!ref $id_runs) {
-            $id_runs = [$id_runs];
-        }
+  if ($params && exists $params->{'run'}) {
+    $id_runs = $params->{'run'};
+    if ($params->{'lane'}) {
+      $lanes = $params->{'lane'};
     }
-
-    if (exists $c->request->query_parameters->{'lane'}) {
-        $lanes = $c->request->query_parameters->{'lane'};
-        if (!ref $lanes) {
-            $lanes = [$lanes];
-        }
+  } else {
+    $id_runs = $c->request->query_parameters->{'run'};
+    if (!ref $id_runs) {
+      $id_runs = [$id_runs];
     }
+  }
 
-    if (exists $c->request->query_parameters->{'db_lookup'}) {
-        $c->stash->{'db_lookup'} = $c->request->query_parameters->{'db_lookup'};
+  if (exists $c->request->query_parameters->{'lane'}) {
+    $lanes = $c->request->query_parameters->{'lane'};
+    if (!ref $lanes) {
+      $lanes = [$lanes];
     }
+  }
 
-    my $run_lanes = {};
-    foreach my $id_run (@{$id_runs}) {
-        $run_lanes->{$id_run} = $lanes;
+  if (exists $c->request->query_parameters->{'db_lookup'}) {
+    $c->stash->{'db_lookup'} = $c->request->query_parameters->{'db_lookup'};
+  }
+
+  my $run_lanes = {};
+  foreach my $id_run (@{$id_runs}) {
+    $run_lanes->{$id_run} = $lanes;
+  }
+
+  my $what = $self->_show_option($c);
+  my $retrieve_option = $RESULTS_RETRIEVE_OPTIONS{$what};
+  my $collection = $c->model('Check')->load_lanes(
+    $run_lanes, $c->stash->{'db_lookup'}, $retrieve_option, $c->model('NpgDB')->schema);
+
+  my $where = { 'id_run' => $id_runs };
+  if (scalar @{$lanes}) { $where->{'position'} = $lanes };
+
+  $self->_run_lanes_from_dwh($c, $where, $retrieve_option);
+
+  $self->_data2stash($c, $collection);
+
+  if (!$c->stash->{'title'} ) {
+    my $title = q[Results ];
+    if (!$c->stash->{'db_lookup'}) {
+      $title .= q[(staging) ];
     }
-
-    my $what = $self->_show_option($c);
-    my $retrieve_option = $RESULTS_RETRIEVE_OPTIONS{$what};
-    my $collection = $c->model('Check')->load_lanes(
-        $run_lanes, $c->stash->{'db_lookup'}, $retrieve_option, $c->model('NpgDB')->schema);
-
-    my $where = { 'id_run' => $id_runs };
-    if (scalar @{$lanes}) { $where->{'position'} = $lanes };
-
-    $self->_run_lanes_from_dwh($c, $where, $retrieve_option);
-
-    $self->_data2stash($c, $collection);
-
-    if (!$c->stash->{'title'} ) {
-        my $title = q[Results ];
-        if (!$c->stash->{'db_lookup'}) {
-            $title .= q[(staging) ];
-        }
-        if (@{$id_runs}) {
-            $title .= qq[($what) for runs ] . (join q[ ], @{$id_runs});
-        }
-        if (@{$lanes}) {
-            $title .= q[ lanes ] . (join q[ ], @{$lanes});
-        }
-        $c->stash->{'title'} = _get_title($title);
+    if (@{$id_runs}) {
+      $title .= qq[($what) for runs ] . (join q[ ], @{$id_runs});
     }
-
-    if ($retrieve_option ne $ALL) {
-        $c->stash->{'show_total'} = 1;
+    if (@{$lanes}) {
+      $title .= q[ lanes ] . (join q[ ], @{$lanes});
     }
+    $c->stash->{'title'} = _get_title($title);
+  }
 
-    return;
+  if ($retrieve_option ne $ALL) {
+    $c->stash->{'show_total'} = 1;
+  }
+
+  return;
 }
 
 sub _run_lanes_from_dwh {
@@ -312,17 +312,17 @@ Action for the base controller path
 =cut
 sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
 {
-    my ($self, $c) = @_;
-    $c->stash->{'util'}             = Moose::Meta::Class->create_anon_class(
-                      roles => ['npg_qc::autoqc::role::rpt_key'])->new_object();
-    $c->stash->{'rl_map'}           = {};
-    $c->stash->{'db_lookup'}        = 1;
-    $c->stash->{'env_dev'}          = $ENV{dev};
-    $c->stash->{'run_view'}         = 0;
-    $c->stash->{'run_from_staging'} = 0;
-    $c->stash->{'base_url'}         = _base_url_no_port($c->request->base);
-    $c->stash->{'template'}         = q[ui_lanes/library_lanes.tt2];
-    return;
+  my ($self, $c) = @_;
+  $c->stash->{'util'}       = Moose::Meta::Class->create_anon_class(
+            roles => ['npg_qc::autoqc::role::rpt_key'])->new_object();
+  $c->stash->{'rl_map'}       = {};
+  $c->stash->{'db_lookup'}    = 1;
+  $c->stash->{'env_dev'}      = $ENV{dev};
+  $c->stash->{'run_view'}     = 0;
+  $c->stash->{'run_from_staging'} = 0;
+  $c->stash->{'base_url'}     = _base_url_no_port($c->request->base);
+  $c->stash->{'template'}     = q[ui_lanes/library_lanes.tt2];
+  return;
 }
 
 =head2 index
@@ -331,10 +331,10 @@ index page
 
 =cut
 sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
-    $c->stash->{'title'} = _get_title();
-    $c->stash->{'template'} = q[about.tt2];
-    return;
+  my ( $self, $c ) = @_;
+  $c->stash->{'title'} = _get_title();
+  $c->stash->{'template'} = q[about.tt2];
+  return;
 }
 
 =head2 about
@@ -343,10 +343,10 @@ qc checks info page
 
 =cut
 sub about :Path('about') :Args(0) {
-    my ( $self, $c ) = @_;
-    $c->stash->{'title'} = _get_title(q[about QC checks]);
-    $c->stash->{'template'} = q[about_qc_checks.tt2];
-    return;
+  my ( $self, $c ) = @_;
+  $c->stash->{'title'} = _get_title(q[about QC checks]);
+  $c->stash->{'template'} = q[about_qc_checks.tt2];
+  return;
 }
 
 =head2 list_runs
@@ -355,16 +355,16 @@ More complex URLs for runs
 
 =cut
 sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
-    my ($self, $c) = @_;
+  my ($self, $c) = @_;
 
-    if (defined $c->request->query_parameters->{run}) {
-        $c->stash->{'db_lookup'} = 1;
-        $self->_display_run_lanes($c);
-    } else {
-        $c->stash->{error_message} = q[This is an invalid URL];
-        $c->detach(q[Root], q[error_page]);
-    }
-    return;
+  if (defined $c->request->query_parameters->{run}) {
+    $c->stash->{'db_lookup'} = 1;
+    $self->_display_run_lanes($c);
+  } else {
+    $c->stash->{error_message} = q[This is an invalid URL];
+    $c->detach(q[Root], q[error_page]);
+  }
+  return;
 }
 
 
@@ -375,14 +375,14 @@ template through the stash
 
 =cut
 sub checks_in_run :Chained('base') :PathPart('runs') :Args(1) {
-    my ($self, $c, $id_run) = @_;
-    $self->_test_positive_int($c, $id_run);
-    #if config is needed, it's available through $c->config
-    $c->stash->{'title'}     = _get_title(qq[Results for run $id_run]);
-    $c->stash->{'run_view'}  = 1;
-    $c->stash->{'id_run'}    = $id_run;
-    $self->_display_run_lanes($c, {run => [$id_run],} );
-    return;
+  my ($self, $c, $id_run) = @_;
+  $self->_test_positive_int($c, $id_run);
+  #if config is needed, it's available through $c->config
+  $c->stash->{'title'}   = _get_title(qq[Results for run $id_run]);
+  $c->stash->{'run_view'}  = 1;
+  $c->stash->{'id_run'}  = $id_run;
+  $self->_display_run_lanes($c, {run => [$id_run],} );
+  return;
 }
 
 
@@ -393,17 +393,17 @@ and passes it to the relevant template through the stash
 
 =cut
 sub runs_from_staging :Chained('base') :PathPart('runs-from-staging') :Args(0) {
-    my ($self, $c) = @_;
+  my ($self, $c) = @_;
 
-    if (exists $c->request->query_parameters->{run}) {
-        $c->stash->{'db_lookup'} = 0;
-        $self->_display_run_lanes($c);
-    } else {
-        $c->stash->{error_message} =
-             q[Run to load is not given. Append ?run=some_run to URL];
-        $c->detach(q[Root], q[error_page]);
-    }
-    return;
+  if (exists $c->request->query_parameters->{run}) {
+    $c->stash->{'db_lookup'} = 0;
+    $self->_display_run_lanes($c);
+  } else {
+    $c->stash->{error_message} =
+       q[Run to load is not given. Append ?run=some_run to URL];
+    $c->detach(q[Root], q[error_page]);
+  }
+  return;
 }
 
 
@@ -414,16 +414,16 @@ and passes it to the relevant template through the stash
 
 =cut
 sub checks_in_run_from_staging :Chained('base') :PathPart('runs-from-staging') :Args(1) {
-    my ($self, $c, $id_run) = @_;
+  my ($self, $c, $id_run) = @_;
 
-    $self->_test_positive_int($c, $id_run);
-    $c->stash->{'db_lookup'}        = 0;
-    $c->stash->{'title'}            = _get_title(qq[Staging results for run $id_run]);
-    $c->stash->{'run_from_staging'} = 1;
-    $c->stash->{'run_view'}         = 1;
-    $c->stash->{'id_run'}           = $id_run;
-    $self->_display_run_lanes($c, {run => [$id_run],} );
-    return;
+  $self->_test_positive_int($c, $id_run);
+  $c->stash->{'db_lookup'}    = 0;
+  $c->stash->{'title'}      = _get_title(qq[Staging results for run $id_run]);
+  $c->stash->{'run_from_staging'} = 1;
+  $c->stash->{'run_view'}     = 1;
+  $c->stash->{'id_run'}       = $id_run;
+  $self->_display_run_lanes($c, {run => [$id_run],} );
+  return;
 }
 
 =head2 checks_from_path
@@ -456,22 +456,22 @@ Library page.
 
 =cut
 sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
-    my ( $self, $c) = @_;
+  my ( $self, $c) = @_;
 
-    if (defined $c->request->query_parameters->{'id'}) {
-        my $id_library_lims = $c->request->query_parameters->{'id'};
-        if (!ref $id_library_lims) {
-            $id_library_lims = [$id_library_lims];
-        }
-        $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
-        my $rs = $c->model('MLWarehouseDB')->search_product_by_id_library_lims($id_library_lims);
-        $c->stash->{'sample_link'} = 1;
-        $self->_display_libs($c, $rs, $ALL);
-    } else {
-        $c->stash->{error_message} = q[This is an invalid URL];
-        $c->detach(q[Root], q[error_page]);
+  if (defined $c->request->query_parameters->{'id'}) {
+    my $id_library_lims = $c->request->query_parameters->{'id'};
+    if (!ref $id_library_lims) {
+      $id_library_lims = [$id_library_lims];
     }
-    return;
+    $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
+    my $rs = $c->model('MLWarehouseDB')->search_product_by_id_library_lims($id_library_lims);
+    $c->stash->{'sample_link'} = 1;
+    $self->_display_libs($c, $rs, $ALL);
+  } else {
+    $c->stash->{error_message} = q[This is an invalid URL];
+    $c->detach(q[Root], q[error_page]);
+  }
+  return;
 }
 
 =head2 pools

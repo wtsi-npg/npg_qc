@@ -29,13 +29,13 @@ Returns a JSON string containing upstream tags results sorted by perfect match r
 
 ## no critic qw(BuiltinFunctions::ProhibitReverseSortBlock)
 sub sort_unexpected_tags {
-	my ($self, $upstream_tags_results) = @_;
+  my ($self, $upstream_tags_results) = @_;
 
-	if($upstream_tags_results->unexpected_tags and @{$upstream_tags_results->unexpected_tags}) {
-		$upstream_tags_results->{unexpected_tags} = [ sort { $b->{perfect_match_count} <=> $a->{perfect_match_count}; } (@{$upstream_tags_results->unexpected_tags}) ];
-	}
+  if($upstream_tags_results->unexpected_tags and @{$upstream_tags_results->unexpected_tags}) {
+    $upstream_tags_results->{unexpected_tags} = [ sort { $b->{perfect_match_count} <=> $a->{perfect_match_count}; } (@{$upstream_tags_results->unexpected_tags}) ];
+  }
 
-	return $upstream_tags_results;
+  return $upstream_tags_results;
 }
 
 __PACKAGE__->meta->make_immutable;
