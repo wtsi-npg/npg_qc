@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 75;
+use Test::More tests => 68;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -91,7 +91,8 @@ $qc_schema->resultset('TagMetrics')->create({id_run => 4950, position =>1, path 
   $mech->title_is($title_prefix . q[Results for run 10107 (current run status: qc on hold, taken by melanie)]);
 }
 
-{
+subtest 'Run 4025 Lane 1' => sub {
+  plan tests => 10;
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
                                         'Expected warning for id found';
@@ -103,7 +104,43 @@ $qc_schema->resultset('TagMetrics')->create({id_run => 4950, position =>1, path 
   $mech->content_lacks('run 4025 lane 2'); #side menu link
   $mech->content_lacks('Run annotations');
   $mech->content_lacks('Lane annotations');
-}
+};
+
+subtest 'Library links lane SE' => sub {
+  plan tests => 5;
+
+  my $where = { 'iseq_product_metrics.id_run' => 4025, 'me.id_pool_lims' => 'NT28560W'};
+  my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')->search($where, { join => 'iseq_product_metrics', });
+
+  while (my $flowcell = $rs->next ) {
+    $flowcell->update({'legacy_library_id' => 111111,});
+  }
+
+  my $url = q[http://localhost/checks/runs?run=4025&lane=1];
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                        'Expected warning for id found';
+  $mech->content_contains(152);  # num cycles
+  $mech->content_contains('NT28560W'); #library name
+  $mech->content_contains('assets/111111'); #SE link
+};
+
+subtest 'Library links lane Clarity' => sub {
+  plan tests => 5;
+
+  my $where = { 'iseq_product_metrics.id_run' => 4025, 'me.id_pool_lims' => 'NT28560W'};
+  my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')->search($where, { join => 'iseq_product_metrics', });
+
+  while (my $flowcell = $rs->next ) {
+    $flowcell->update({'legacy_library_id' => 111111, 'id_lims' => 'C_GCLP'});
+  }
+
+  my $url = q[http://localhost/checks/runs?run=4025&lane=1];
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                        'Expected warning for id found';
+  $mech->content_contains(152);  # num cycles
+  $mech->content_contains('NT28560W'); #library name
+  $mech->content_contains('search?scope=Container&query=NT28560W'); #SE link
+};
 
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=all];
