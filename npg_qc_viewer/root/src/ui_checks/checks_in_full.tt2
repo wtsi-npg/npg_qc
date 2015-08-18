@@ -4,7 +4,7 @@
      NEXT IF (!lane_collection || lane_collection.size == 0);
      temp = lane_collection.sort;
      to_remove = ['split stats phix', 'spatial filter'];
-     IF !run_view.defined || run_view != 1;
+     IF !run_view;
        to_remove.push('qX yield', 'gc fraction');
      END;
      trimmed_lane_collection = lane_collection.remove('check_name', to_remove);
@@ -19,22 +19,12 @@
        trimmed_reference_path = sequence_mismatch_collection.first.reference_for_title;
      END;
 
-     row_info_to = c.stash.row_data.$lane_key  || {};
-
-     provenance = '';
-     IF row_info_to.id_library_lims; 
-       provenance = ' | ' _ row_info_to.id_library_lims;
-       IF row_info_to.sample_name; 
-         provenance = provenance _ ' << ' _ row_info_to.sample_name;
-         IF row_info_to.study_name; 
-           provenance = provenance _ ' << ' _ row_info_to.study_name;
-         END;
-       END;
-     END;
+     row_info_to = c.stash.row_data.$lane_key;
+     provenance = row_info_to.defined ? row_info_to.provenance.join(' << ') : '';
   -%]
 
   <div class="results_full_lane">
-  <h3>[% util.expand_rpt_key(lane_key) %] [% IF provenance.defined %] [% provenance | html %]  [% END -%] <a name="[% lane_key %]"></a></h3>
+  <h3>[% util.expand_rpt_key(lane_key) %] | [% provenance | html %] <a name="[% lane_key %]"></a></h3>
   [%- IF trimmed_reference_path.species && trimmed_reference_path.version; -%]
     <h4>Reference: [%- trimmed_reference_path.species -%] ([%- trimmed_reference_path.version -%])</h4>
   [%- END -%]

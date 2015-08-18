@@ -28,13 +28,16 @@ my $mech = Test::WWW::Mechanize::Catalyst->new;
 #necessary.
 my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
 
+my $qc_schema = $schemas->{'qc'};
+$qc_schema->resultset('TagMetrics')->create({id_run => 4950, position =>1, path => 'some path'});
+
 {
   my $base = tempdir(UNLINK => 1);
   my $path = $base . q[/archive];
   my $run_folder = q[150621_MS6_04099_A_MS2023387-050V2];
   make_path $path.q[/].$run_folder;
   
-  my $npg   = $schemas->{npg};
+  my $npg   = $schemas->{'npg'};
   
   foreach my $id_run ( 4950 ) {
     my $values = { id_run               => $id_run,

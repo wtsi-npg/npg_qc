@@ -74,23 +74,23 @@ sub test_env_setup {
   if (-e $db) {unlink $db;}
   my $schema_package  = q[WTSI::DNAP::Warehouse::Schema];
   my $fixtures_path   = $self->fixtures ? q[t/data/fixtures/mlwarehouse] : q[];
-  $schemas->{mlwh}    = $self->create_test_db($schema_package, $fixtures_path, $db);
+  $schemas->{'mlwh'}    = $self->create_test_db($schema_package, $fixtures_path, $db);
 
 
   $db = $self->npgqc_db_path;
   if (-e $db) {unlink $db;}
   $schema_package = q[npg_qc::Schema];
   $fixtures_path  = $self->fixtures ? q[t/data/fixtures/npgqc] : q[];
-  $schemas->{qc}  = $self->create_test_db($schema_package, $fixtures_path, $db);
+  $schemas->{'qc'}  = $self->create_test_db($schema_package, $fixtures_path, $db);
 
   $db = $self->npg_db_path;
   if (-e $db) {unlink $db;}
   $schema_package = q[npg_tracking::Schema];
   $fixtures_path  = $self->fixtures ? q[t/data/fixtures/npg] : q[];
-  $schemas->{npg} = $self->create_test_db($schema_package, $fixtures_path, $db);
+  $schemas->{'npg'} = $self->create_test_db($schema_package, $fixtures_path, $db);
 
   if ($self->fixtures) {
-    my $npg = $schemas->{npg};
+    my $npg = $schemas->{'npg'};
     $npg->resultset('Run')->find({id_run => 4025, })->set_tag(1, 'staging');
     $npg->resultset('Run')->find({id_run => 3965, })->set_tag(1, 'staging');
     $npg->resultset('Run')->find({id_run => 3323, })->set_tag(1, 'staging');
