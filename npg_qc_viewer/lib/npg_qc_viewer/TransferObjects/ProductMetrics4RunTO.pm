@@ -31,20 +31,6 @@ A transfer object to pass Product Metric data from the model to the view.
 
 =head1 SUBROUTINES/METHODS
 
-=cut
-
-=head2 BUILD
-
-Just makes sure is_gclp is always 0/1.
-
-=cut
-sub BUILD {
-  my $self = shift;
-  #To make sure there is no undef, see npg_qc_viewer::Model::LimsServer
-  $self->is_gclp($self->is_gclp ? 1 : 0);
-  return;
-}
-
 =head2 num_cycles
 
 Number of cycles. Usually cycles@iseq_run_lane_metric
@@ -100,13 +86,13 @@ has 'study_name'     => (
   required => 0,
 );
 
-=head2 sample_id
+=head2 id_sample_lims
 
 Id of sample lims
 
 =cut
 has 'id_sample_lims' => (
-  isa      => 'Str',
+  isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
 );
@@ -117,7 +103,7 @@ Name of sample lims
 
 =cut
 has 'sample_name' => (
-  isa      => 'Str',
+  isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
 );
@@ -187,6 +173,31 @@ has 'entity_id_lims' => (
   is       => 'rw',
   required => 0,
 );
+
+=head2 reset_as_pool
+
+Resets object's attributes as fits for a pool
+
+=cut
+sub reset_as_pool {
+  my $self = shift;
+  for my $attr (qw/tag_sequence study_name id_sample_lims sample_name/) {
+    $self->$attr(undef);
+  }
+  $self->id_library_lims($self->id_pool_lims);
+  return;
+}
+
+=head2 provenance
+
+Returns a list containing library id and, optionally, sample and study names
+
+=cut
+sub provenance {
+  my $self = shift;
+  my @p = grep { $_ } ($self->id_library_lims, $self->sample_name, $self->study_name);
+  return @p;
+}
 
 __PACKAGE__->meta->make_immutable;
 

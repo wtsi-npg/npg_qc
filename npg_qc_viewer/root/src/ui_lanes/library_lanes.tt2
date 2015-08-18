@@ -6,7 +6,6 @@
   PROCESS urls.tt2;
   checks_info = collection_all.check_names;
 
-  lib_names = [];
   temp = [];
   FOREACH check_name IN checks_info.list;
     IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
@@ -63,8 +62,7 @@
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
 
-[%- studies_info = {}; run_info = {};
-    qxTotal = 0; #For total qxYield
+[%- qxTotal = 0; #For total qxYield
 
     #For heatmaps
     action_plot = c.controller('Visuals').action_for('fastqcheck');
@@ -85,10 +83,6 @@
 
       row_info_to = c.stash.row_data.$lane_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
-
-      IF row_info_to;
-        studies_info.$study_id = row_info_to.study_name;
-      END;
 -%]
 
 <tr>
@@ -101,20 +95,21 @@
 
 <td class="lib nbsp">
 <div class="rel_pos_container">
-[%- IF lane_collection.run_lane_plex_flags.$lane_key -%]
+[%- IF lane_collection.run_lane_plex_flags.${lane_key} -%]
   <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
 
 [%- IF row_info_to.id_library_lims; -%]
-  [%- IF !lane_collection.run_lane_plex_flags.$lane_key;
+  [%- IF !lane_collection.run_lane_plex_flags.${lane_key};
         lurl = c.model('LimsServer').generate_url('library', row_info_to);
   -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => row_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
     <a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
   [%- ELSE;
+    row_info_to.reset_as_pool();
     lurl = c.model('LimsServer').generate_url('pool', row_info_to);
   -%]
-    <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_pool_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
+    <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_library_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
     <a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
   [%- END -%]
 [%- END -%]
