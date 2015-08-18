@@ -23,8 +23,8 @@ A model for the NPG QC database DBIx schema
 =cut
 
 __PACKAGE__->config(
-    schema_class => 'npg_qc::Schema',
-    connect_info => [], #a fall-back position if connect_info is not defined in the config file
+  schema_class => 'npg_qc::Schema',
+  connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
 __PACKAGE__->meta->make_immutable;

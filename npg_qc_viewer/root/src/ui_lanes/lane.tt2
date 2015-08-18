@@ -2,7 +2,7 @@
     USE Number.Format(THOUSANDS_SEP=',');
 
     lane_class = 'lane';
-    IF pass == 1; lane_class = lane_class _ ' passed'; ELSIF pass == 0; lane_class = lane_class _ ' failed'; END;
+    IF row_info_to.manual_qc == 1; lane_class = lane_class _ ' passed'; ELSIF row_info_to.manual_qc == 0; lane_class = lane_class _ ' failed'; END;
 -%]
 
 <td class="[% lane_class %] nbsp">
@@ -23,7 +23,7 @@
 <a href="#[% lane_key %]">[% END -%]
 [%- tag_index -%]
 [%- IF have_link %]</a>[% END -%]
-[%- IF tag_sequence.defined && tag_sequence %]<br />[% tag_sequence %][% END %][% END %]</td>
+[%- IF row_info_to.tag_sequence.defined && row_info_to.tag_sequence %]<br />[% row_info_to.tag_sequence %][% END %][% END %]</td>
 [%- END -%]
 
 [%- FOREACH check_name IN checks_list -%]
