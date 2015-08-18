@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 9;
 use Test::Exception;
 use Test::WWW::Mechanize::Catalyst;
 use Test::Warn;
@@ -19,7 +19,8 @@ my $mech;
   $mech = Test::WWW::Mechanize::Catalyst->new;
 }
 
-{
+subtest 'Basic test for ibraries' => sub {
+  plan tests => 6;
   my $lib_name = 'NT28560W';
   my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
   warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/, 
@@ -31,7 +32,16 @@ my $mech;
   $mech->content_contains($id_run);
   my $sample_name = 'random_sample_name';
   $mech->content_contains($sample_name);
-}
+};
+
+subtest 'Sample links for library SE' => sub {
+  plan tests => 3;
+
+  my $url = q[http://localhost/checks/libraries?id=NT28560W];
+  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
+                                        'Expected warning for id found';
+  $mech->content_contains(q[samples/9272]); #Link to sample in SE
+};
 
 {
   #no id_run for this library
