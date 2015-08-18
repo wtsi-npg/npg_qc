@@ -3,6 +3,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - SeqQC 
    - remove ajax proxy controller
    - stop 00 tests accessing live db credentials and databases
+   - using mlwarehouse for dwh information displayed in SeqQC viewer
+   - removing tests related to template compilation
+   - providing links to lims for pool/library/sample
  - autoqc check and autoqc objects: remove unused 'sequence_type' attribute
  - autoqc check and result objects - use existing roles for id_run and
    position definitions
