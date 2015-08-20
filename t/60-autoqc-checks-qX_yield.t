@@ -1,8 +1,3 @@
-#########
-# Author:        mg8
-# Created:       30 July 2009
-#
-
 use strict;
 use warnings;
 use Test::More tests => 13;
@@ -260,7 +255,7 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
                                                       id_run    => 2549,
                                                       input_files => [],
                                                      );
-   $e->result->comments(q[Neither t/data/autoqc/090721_IL29_2549/2549_4_1.fastqcheck no t/data/autoqc/090721_IL29_2549/2549_4.fastqcheck file found]);
+   $e->result->comments(q[Neither t/data/autoqc/090721_IL29_2549/2549_4_1.fastqcheck nor t/data/autoqc/090721_IL29_2549/2549_4.fastqcheck file found]);
    cmp_deeply($check->result, $e->result, 'results wheninput not found');
 }
 

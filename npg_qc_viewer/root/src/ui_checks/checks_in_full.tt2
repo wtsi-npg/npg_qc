@@ -4,46 +4,27 @@
      NEXT IF (!lane_collection || lane_collection.size == 0);
      temp = lane_collection.sort;
      to_remove = ['split stats phix', 'spatial filter'];
-     IF !run_view.defined || run_view != 1;
+     IF !run_view;
        to_remove.push('qX yield', 'gc fraction');
      END;
      trimmed_lane_collection = lane_collection.remove('check_name', to_remove);
      checks = trimmed_lane_collection.results;
 
-     provenance = '';
      checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'});
 
      trimmed_reference_path = {};
      sequence_mismatch_collection = lane_collection.slice('check_name', 'sequence mismatch');
+
      IF sequence_mismatch_collection.size > 0;
        trimmed_reference_path = sequence_mismatch_collection.first.reference_for_title;
      END;
-  -%]
 
-  [%- 
-    library = libs_info.$lane_key.lib_name;
-    sample  = libs_info.$lane_key.sample_name;
-    sample_id = libs_info.$lane_key.sample_id;
-    library_id = libs_info.$lane_key.library_id;
-    study_id = libs_info.$lane_key.study_id;
-    study_name = '';
-    IF study_id;
-      study_name = studies_info.$study_id;
-    END;
-           
-    IF library; 
-      provenance = ' | ' _ library;
-      IF sample; 
-        provenance = provenance _ ' << ' _ sample;
-        IF studies; 
-          provenance = provenance _ ' << ' _ study_name;
-        END;
-      END;
-    END;
+     row_info_to = c.stash.row_data.$lane_key;
+     provenance = row_info_to.defined ? row_info_to.provenance.join(' << ') : '';
   -%]
 
   <div class="results_full_lane">
-  <h3>[% util.expand_rpt_key(lane_key) %] [% IF provenance.defined %] [% provenance | html %]  [% END -%] <a name="[% lane_key %]"></a></h3>
+  <h3>[% util.expand_rpt_key(lane_key) %] | [% provenance | html %] <a name="[% lane_key %]"></a></h3>
   [%- IF trimmed_reference_path.species && trimmed_reference_path.version; -%]
     <h4>Reference: [%- trimmed_reference_path.species -%] ([%- trimmed_reference_path.version -%])</h4>
   [%- END -%]

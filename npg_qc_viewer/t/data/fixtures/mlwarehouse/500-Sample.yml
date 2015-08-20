@@ -1,0 +1,2500 @@
+---
+- accession_number: "ERS000112\n"
+  common_name: Mus musculus
+  consent_withdrawn: 0
+  control: ~
+  created: 2008-09-05 12:16:02
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 1730
+  id_sample_tmp: 4685
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ~
+  public_name: A/J
+  recorded_at: 2015-01-20 16:33:15
+  reference_genome: Mus_musculus (std_unmasked_NCBIm37)
+  sanger_sample_id: ~
+  strain: A/J
+  taxon_id: 10090
+  uuid_sample_lims: 443b7378-b9c2-11df-9e66-00144f01a414
+- accession_number: "ERS000111\n"
+  common_name: Mus musculus
+  consent_withdrawn: 0
+  control: ~
+  created: 2008-11-20 12:14:47
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 2116
+  id_sample_tmp: 5071
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ''
+  public_name: AKR/J
+  recorded_at: 2015-01-20 16:33:24
+  reference_genome: Mus_musculus (std_unmasked_NCBIm37)
+  sanger_sample_id: ~
+  strain: AKR/J
+  taxon_id: 10090
+  uuid_sample_lims: 4a323582-b9c2-11df-9e66-00144f01a414
+- accession_number: "SRS000594\n"
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2008-11-26 10:03:38
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 2134
+  id_sample_tmp: 5089
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ''
+  public_name: NA07056
+  recorded_at: 2015-01-20 16:33:25
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 4ac1c058-b9c2-11df-9e66-00144f01a414
+- accession_number: "SRS001741\n"
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-01-21 11:27:08
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 2617
+  id_sample_tmp: 5572
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ''
+  public_name: NA20774
+  recorded_at: 2015-01-20 16:33:35
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 54088296-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS010428
+  common_name: Anopheles gambiae
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-03-06 11:05:34
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 3055
+  id_sample_tmp: 6009
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: anopheles gambiae
+  public_name: 4783
+  recorded_at: 2015-01-20 16:33:45
+  reference_genome: Anopheles_gambiae (PEST)
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 7165
+  uuid_sample_lims: 5c368d6e-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS039405
+  common_name: Danio rerio
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-03-25 16:00:47
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 4123
+  id_sample_tmp: 6652
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Zebrafish
+  public_name: 6_1npg
+  recorded_at: 2015-01-20 16:34:01
+  reference_genome: Danio_rerio (zv9)
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 7955
+  uuid_sample_lims: 6b0efb28-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS039406
+  common_name: Danio rerio
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-03-25 16:00:47
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 4124
+  id_sample_tmp: 6653
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Zebrafish
+  public_name: 6_3npg
+  recorded_at: 2015-01-20 16:34:01
+  reference_genome: Danio_rerio (zv9)
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 7955
+  uuid_sample_lims: 6b13403e-b9c2-11df-9e66-00144f01a414
+- accession_number: ~
+  common_name: ~
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-03-25 16:00:47
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 4125
+  id_sample_tmp: 6654
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Zebrafish
+  public_name: ~
+  recorded_at: 2015-01-20 16:34:01
+  reference_genome: Danio_rerio (zv9)
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: ~
+  uuid_sample_lims: 6b177b5e-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS010489
+  common_name: Plasmodium falciparum
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-04-22 10:04:22
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 4927
+  id_sample_tmp: 7042
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Plasmodium falciparum
+  public_name: 5571
+  recorded_at: 2015-01-20 16:34:09
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 5833
+  uuid_sample_lims: 74673802-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS008276
+  common_name: Leishmania donovani donovani
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-05-06 15:48:56
+  deleted_at: ~
+  description: BPK173/0 clone 3
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 5740
+  id_sample_tmp: 7802
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Leishmania donovani
+  public_name: MHOM/NP/02/BPK 173/0 cl3
+  recorded_at: 2015-01-20 16:34:30
+  reference_genome: Leishmania_donovani (V1_Un)
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 99875
+  uuid_sample_lims: 886e03da-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS008285
+  common_name: Leishmania donovani donovani
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-05-06 15:48:57
+  deleted_at: ~
+  description: BPK087/0 clone 11
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 5749
+  id_sample_tmp: 7811
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Leishmania donovani
+  public_name: MHOM/NP/02/BPK 087/0 cl11
+  recorded_at: 2015-01-20 16:34:30
+  reference_genome: Leishmania_donovani (V1_Un)
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 99875
+  uuid_sample_lims: 8989817c-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS010536
+  common_name: Plasmodium falciparum (3D7)
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-05-26 19:13:59
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 6648
+  id_sample_tmp: 8675
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Plasmodium falciparum
+  public_name: 4633
+  recorded_at: 2015-01-20 16:34:55
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 36329
+  uuid_sample_lims: a309800c-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS010537
+  common_name: Plasmodium falciparum (3D7)
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-05-26 19:13:59
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 6649
+  id_sample_tmp: 8676
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Plasmodium falciparum
+  public_name: 4633
+  recorded_at: 2015-01-20 16:34:55
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 36329
+  uuid_sample_lims: a30fde98-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS010538
+  common_name: Plasmodium falciparum (3D7)
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-05-26 19:13:59
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 6650
+  id_sample_tmp: 8677
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Plasmodium falciparum
+  public_name: 4633
+  recorded_at: 2015-01-20 16:34:55
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 36329
+  uuid_sample_lims: a316acd2-b9c2-11df-9e66-00144f01a414
+- accession_number: ERS010553
+  common_name: Plasmodium falciparum
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-05-29 09:47:23
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 6749
+  id_sample_tmp: 8776
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Plasmodium falciparum
+  public_name: 5100
+  recorded_at: 2015-01-20 16:34:57
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 5833
+  uuid_sample_lims: a6c1f59e-b9c2-11df-9e66-00144f01a414
+- accession_number: EGAN00001000655
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-13 10:55:15
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9184
+  id_sample_tmp: 10994
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: PD2126a
+  recorded_at: 2015-01-20 16:35:47
+  reference_genome: Homo_sapiens (CGP_GRCh37.NCBI.allchr_MT)
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 036d2e12-b9c3-11df-9e66-00144f01a414
+- accession_number: EGAN00001000656
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-13 10:55:16
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9185
+  id_sample_tmp: 10995
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: PD2126b
+  recorded_at: 2015-01-20 16:35:47
+  reference_genome: Homo_sapiens (CGP_GRCh37.NCBI.allchr_MT)
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 0376852a-b9c3-11df-9e66-00144f01a414
+- accession_number: EGAN00001000633
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-16 13:32:12
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9272
+  id_sample_tmp: 11082
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ~
+  public_name: B1267
+  recorded_at: 2015-01-20 16:35:49
+  reference_genome: Homo_sapiens (CGP_GRCh37.NCBI.allchr_MT)
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 06dde7b2-b9c3-11df-9e66-00144f01a414
+- accession_number: EGAN00001000646
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-16 13:32:15
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9285
+  id_sample_tmp: 11095
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ~
+  public_name: B3006
+  recorded_at: 2015-01-20 16:35:49
+  reference_genome: Homo_sapiens (CGP_GRCh37.NCBI.allchr_MT)
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 080affee-b9c3-11df-9e66-00144f01a414
+- accession_number: EGAN00001000647
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-16 13:32:15
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9286
+  id_sample_tmp: 11096
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ~
+  public_name: B3009
+  recorded_at: 2015-01-20 16:35:49
+  reference_genome: Homo_sapiens (CGP_GRCh37.NCBI.allchr_MT)
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 0814f08a-b9c3-11df-9e66-00144f01a414
+- accession_number: ERS005402
+  common_name: Plasmodium ovale
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-20 08:47:53
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9365
+  id_sample_tmp: 11151
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Plasmodium ovale
+  public_name: ~
+  recorded_at: 2015-01-20 16:35:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 36330
+  uuid_sample_lims: 0a4a672c-b9c3-11df-9e66-00144f01a414
+- accession_number: ERS006704
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-20 09:42:59
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9386
+  id_sample_tmp: 11172
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ''
+  public_name: ~
+  recorded_at: 2015-01-20 16:35:51
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 0b0924e6-b9c3-11df-9e66-00144f01a414
+- accession_number: ERS006705
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-20 09:42:59
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9387
+  id_sample_tmp: 11173
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ''
+  public_name: ~
+  recorded_at: 2015-01-20 16:35:51
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 0b12d874-b9c3-11df-9e66-00144f01a414
+- accession_number: ERS006706
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-20 09:42:59
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9388
+  id_sample_tmp: 11174
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ''
+  public_name: ~
+  recorded_at: 2015-01-20 16:35:51
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 0b1ca4d0-b9c3-11df-9e66-00144f01a414
+- accession_number: ERS006707
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-10-20 09:43:00
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9389
+  id_sample_tmp: 11175
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ''
+  public_name: ~
+  recorded_at: 2015-01-20 16:35:51
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: 9606
+  uuid_sample_lims: 0b270376-b9c3-11df-9e66-00144f01a414
+- accession_number: ~
+  common_name: ~
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-11-05 20:03:54
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9831
+  id_sample_tmp: 11617
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ~
+  public_name: ~
+  recorded_at: 2015-01-20 16:36:00
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: ~
+  uuid_sample_lims: 21ca7018-b9c3-11df-9e66-00144f01a414
+- accession_number: ~
+  common_name: ~
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-11-05 20:03:54
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9832
+  id_sample_tmp: 11618
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ~
+  public_name: ~
+  recorded_at: 2015-01-20 16:36:00
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: ~
+  uuid_sample_lims: 21d7090e-b9c3-11df-9e66-00144f01a414
+- accession_number: ~
+  common_name: ~
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-11-05 20:03:54
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9836
+  id_sample_tmp: 11622
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ~
+  public_name: ~
+  recorded_at: 2015-01-20 16:36:00
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: ~
+  uuid_sample_lims: 220bea34-b9c3-11df-9e66-00144f01a414
+- accession_number: ~
+  common_name: ~
+  consent_withdrawn: 0
+  control: ~
+  created: 2009-11-05 20:03:54
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 9837
+  id_sample_tmp: 11623
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: ''
+  public_name: ~
+  recorded_at: 2015-01-20 16:36:00
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ~
+  taxon_id: ~
+  uuid_sample_lims: 2218b9e4-b9c3-11df-9e66-00144f01a414
+- accession_number: ERS007672
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:27:58
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33365
+  id_sample_tmp: 35062
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009701891
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 572.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e72fb6-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007673
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:01
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33366
+  id_sample_tmp: 35063
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009801032
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 572.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e737ae-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007674
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:03
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33367
+  id_sample_tmp: 35064
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009900854
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 930.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e73fa6-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007675
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:05
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33368
+  id_sample_tmp: 35065
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000001728
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 930.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e74794-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007677
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:07
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33369
+  id_sample_tmp: 35066
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000201178
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 930.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e74f82-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007679
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:09
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33370
+  id_sample_tmp: 35067
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009801536
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 803.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e757ac-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007681
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:12
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33371
+  id_sample_tmp: 35068
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009901357
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 803.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e75f9a-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007683
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:14
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33372
+  id_sample_tmp: 35069
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000000978
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 803.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7679c-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007684
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:16
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33373
+  id_sample_tmp: 35070
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000001233
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 803.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e76f8a-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007686
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:18
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33374
+  id_sample_tmp: 35071
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000101715
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 803.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7776e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007688
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:28:21
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33375
+  id_sample_tmp: 35072
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009601792
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 509.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e77f70-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007690
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:30
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33376
+  id_sample_tmp: 35073
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000200930
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 509.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7875e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007692
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:32
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33377
+  id_sample_tmp: 35074
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009400880
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 14.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e78f56-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007693
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:34
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33378
+  id_sample_tmp: 35075
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009702330
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 14.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7974e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007694
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:37
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33379
+  id_sample_tmp: 35076
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000200020
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 14.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e79f32-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007695
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:39
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33380
+  id_sample_tmp: 35077
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009400970
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 14.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7a72a-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007697
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:41
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33381
+  id_sample_tmp: 35078
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009600911
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7af18-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007699
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:43
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33382
+  id_sample_tmp: 35079
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009900646
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7b710-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007701
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:45
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33383
+  id_sample_tmp: 35080
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000101539
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7bf08-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007702
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:47
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33384
+  id_sample_tmp: 35081
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000200539
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7c700-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007703
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:49
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33385
+  id_sample_tmp: 35082
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000500041
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7ceee-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007704
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:29:52
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33386
+  id_sample_tmp: 35083
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009700503
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7d6e6-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007706
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:23
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33387
+  id_sample_tmp: 35084
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009901972
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7ded4-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007708
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:25
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33388
+  id_sample_tmp: 35085
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000201415
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7e6d6-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007710
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:28
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33389
+  id_sample_tmp: 35086
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000500133
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 194.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7eed8-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007711
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:30
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33390
+  id_sample_tmp: 35087
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000201493
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 1171.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7f6f8-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007712
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:32
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33391
+  id_sample_tmp: 35088
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000401786
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 1171.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e7fefa-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007713
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:34
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33392
+  id_sample_tmp: 35089
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009400328
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 6.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e806f2-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007714
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:36
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33393
+  id_sample_tmp: 35090
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000102058
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 6.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e80eea-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007716
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:38
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33394
+  id_sample_tmp: 35091
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009400397
+  recorded_at: 2015-01-20 16:45:17
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 6.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e816d8-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007718
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:41
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33395
+  id_sample_tmp: 35092
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009400937
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 6.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e81eda-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007720
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:43
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33396
+  id_sample_tmp: 35093
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009401471
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 6.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e826d2-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007722
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:31:45
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33397
+  id_sample_tmp: 35094
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009502139
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 6.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e82eca-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007724
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:30
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33398
+  id_sample_tmp: 35095
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000102039
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 6.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e836b8-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007726
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:32
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33399
+  id_sample_tmp: 35096
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000201208
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 6.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e83eb0-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007728
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:33
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33400
+  id_sample_tmp: 35097
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000000221
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 877.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e8469e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007730
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:35
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33401
+  id_sample_tmp: 35098
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000000626
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 877.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e84e96-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007731
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:36
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33402
+  id_sample_tmp: 35099
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000001761
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 877.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e8568e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007733
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:38
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33403
+  id_sample_tmp: 35100
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009901618
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 799.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e85e7c-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007734
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:40
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33404
+  id_sample_tmp: 35101
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009901297
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 799.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e86692-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007737
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:41
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33405
+  id_sample_tmp: 35102
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009901774
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 823.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e86e8a-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007739
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:42
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33406
+  id_sample_tmp: 35103
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA009902308
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: 823.0
+  taxon_id: 1773
+  uuid_sample_lims: 21e87678-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007741
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:44
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33407
+  id_sample_tmp: 35104
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000601463
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: E054
+  taxon_id: 1773
+  uuid_sample_lims: 21e87e70-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS007743
+  common_name: Mycobacterium tuberculosis
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-19 12:32:46
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 33408
+  id_sample_tmp: 35105
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Mycobacterium tuberculosis
+  public_name: NLA000601339
+  recorded_at: 2015-01-20 16:45:18
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: E054
+  taxon_id: 1773
+  uuid_sample_lims: 21e88668-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008005
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:40
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35004
+  id_sample_tmp: 36606
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T9N3
+  recorded_at: 2015-01-20 16:45:49
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T9N3
+  taxon_id: 1280
+  uuid_sample_lims: 22171c4e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008006
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:42
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35005
+  id_sample_tmp: 36607
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T8N28
+  recorded_at: 2015-01-20 16:45:49
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T8N28
+  taxon_id: 1280
+  uuid_sample_lims: 2217243c-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008007
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:44
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35006
+  id_sample_tmp: 36608
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T8N2
+  recorded_at: 2015-01-20 16:45:49
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T8N2
+  taxon_id: 1280
+  uuid_sample_lims: 22172c20-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008008
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:46
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35007
+  id_sample_tmp: 36609
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T7N7
+  recorded_at: 2015-01-20 16:45:49
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T7N7
+  taxon_id: 1280
+  uuid_sample_lims: 2217340e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008009
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:48
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35008
+  id_sample_tmp: 36610
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T7N3
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T7N3
+  taxon_id: 1280
+  uuid_sample_lims: 22173bfc-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008010
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:50
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35009
+  id_sample_tmp: 36611
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T6N28
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T6N28
+  taxon_id: 1280
+  uuid_sample_lims: 221743d6-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008011
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:52
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35010
+  id_sample_tmp: 36612
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T6N2
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T6N2
+  taxon_id: 1280
+  uuid_sample_lims: 22174bba-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008012
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:53
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35011
+  id_sample_tmp: 36613
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T2N5
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T2N5
+  taxon_id: 1280
+  uuid_sample_lims: 221753a8-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008013
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:56
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35012
+  id_sample_tmp: 36614
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T2N1
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T2N1
+  taxon_id: 1280
+  uuid_sample_lims: 22175b96-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008014
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:41:58
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35013
+  id_sample_tmp: 36615
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T11N9
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T11N9
+  taxon_id: 1280
+  uuid_sample_lims: 22176384-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008015
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:02
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35014
+  id_sample_tmp: 36616
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T223A1
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T223A1
+  taxon_id: 1280
+  uuid_sample_lims: 22176b72-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008016
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:03
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35015
+  id_sample_tmp: 36617
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T197N3
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T197N3
+  taxon_id: 1280
+  uuid_sample_lims: 22177388-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008017
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:05
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35016
+  id_sample_tmp: 36618
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T197N1
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T197N1
+  taxon_id: 1280
+  uuid_sample_lims: 22177b6c-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008018
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:07
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35017
+  id_sample_tmp: 36619
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T194N4
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T194N4
+  taxon_id: 1280
+  uuid_sample_lims: 2217835a-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008019
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:09
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35018
+  id_sample_tmp: 36620
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T194N1
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T194N1
+  taxon_id: 1280
+  uuid_sample_lims: 22178b48-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008020
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:11
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35019
+  id_sample_tmp: 36621
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T192T3
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T192T3
+  taxon_id: 1280
+  uuid_sample_lims: 2217935e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008021
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:13
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35020
+  id_sample_tmp: 36622
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T188N3
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T188N3
+  taxon_id: 1280
+  uuid_sample_lims: 22179b4c-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008022
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:15
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35021
+  id_sample_tmp: 36623
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T188N1
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T188N1
+  taxon_id: 1280
+  uuid_sample_lims: 2217a330-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008023
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:17
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35022
+  id_sample_tmp: 36624
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T183N8
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T183N8
+  taxon_id: 1280
+  uuid_sample_lims: 2217ab1e-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008024
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:19
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35023
+  id_sample_tmp: 36625
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T183N2
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T183N2
+  taxon_id: 1280
+  uuid_sample_lims: 2217b30c-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008025
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:21
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35024
+  id_sample_tmp: 36626
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T182N1
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T182N1
+  taxon_id: 1280
+  uuid_sample_lims: 2217bb04-c628-11df-8e7f-00144f2062b0
+- accession_number: ERS008026
+  common_name: Staphylococcus aureus
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-03-29 08:43:22
+  deleted_at: ~
+  description: ~
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 35025
+  id_sample_tmp: 36627
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Staphylococcus aureus
+  public_name: T178N3
+  recorded_at: 2015-01-20 16:45:50
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: T178N3
+  taxon_id: 1280
+  uuid_sample_lims: 2217c2e8-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008583
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:35
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118118
+  id_sample_tmp: 119704
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00367
+  recorded_at: 2015-01-20 17:18:15
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b63c84e-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS006893
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:36
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118119
+  id_sample_tmp: 119705
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00173
+  recorded_at: 2015-01-20 17:18:15
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b63d0a0-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008578
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:37
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118120
+  id_sample_tmp: 119706
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00361
+  recorded_at: 2015-01-20 17:18:15
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b63d8c0-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS006898
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:38
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118121
+  id_sample_tmp: 119707
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00179
+  recorded_at: 2015-01-20 17:18:15
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b63e11c-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008594
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:39
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118122
+  id_sample_tmp: 119708
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00380
+  recorded_at: 2015-01-20 17:18:15
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b63e978-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008548
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:40
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118123
+  id_sample_tmp: 119709
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00312
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b63f1d4-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008547
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:41
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118124
+  id_sample_tmp: 119710
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00311
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b63fa1c-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008582
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:42
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118125
+  id_sample_tmp: 119711
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00366
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b640246-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS006903
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:42
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118126
+  id_sample_tmp: 119712
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00185
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b640a8e-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008545
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:43
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118127
+  id_sample_tmp: 119713
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00308
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b6412fe-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS006896
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:44
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118128
+  id_sample_tmp: 119714
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00177
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b641b46-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008539
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-06 14:52:45
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118129
+  id_sample_tmp: 119715
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00269
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b64237a-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS006904
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:05
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118138
+  id_sample_tmp: 119724
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00186
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b646d26-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008537
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:06
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118139
+  id_sample_tmp: 119725
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00267
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b64756e-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS006905
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:07
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118140
+  id_sample_tmp: 119726
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00187
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b647dde-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008591
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:08
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118141
+  id_sample_tmp: 119727
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00377
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b6485f4-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008587
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:08
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118142
+  id_sample_tmp: 119728
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00372
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b648e3c-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008587
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:09
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118143
+  id_sample_tmp: 119729
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00266
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b64965c-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS006899
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:10
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118144
+  id_sample_tmp: 119730
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00180
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b649e86-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008574
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:11
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118145
+  id_sample_tmp: 119731
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00357
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b64a6ce-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS006902
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:12
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118146
+  id_sample_tmp: 119732
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00183
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b64aeee-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008584
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:12
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118147
+  id_sample_tmp: 119733
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00368
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b64b736-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008544
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:13
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118148
+  id_sample_tmp: 119734
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00306
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b64bf6a-c628-11df-8e7f-00144f2062b0
+- accession_number: SRS008588
+  common_name: Homo sapiens
+  consent_withdrawn: 0
+  control: ~
+  created: 2010-06-07 10:51:14
+  deleted_at: ~
+  description: ''
+  donor_id: ~
+  id_lims: SQSCP
+  id_sample_lims: 118149
+  id_sample_tmp: 119735
+  last_updated: 2012-08-03 10:07:02
+  name: random_sample_name
+  organism: Human
+  public_name: HG00373
+  recorded_at: 2015-01-20 17:18:16
+  reference_genome: ' '
+  sanger_sample_id: ~
+  strain: ''
+  taxon_id: 9606
+  uuid_sample_lims: 5b64c794-c628-11df-8e7f-00144f2062b0
