@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.0
  - SeqQC 
    - remove ajax proxy controller
    - stop 00 tests accessing live db credentials and databases
