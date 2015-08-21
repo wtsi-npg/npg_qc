@@ -180,8 +180,8 @@ while(<>) {
   init_calls(\%calls);
 }
 
-if($errexit_count) { 
-  croak qq[Maximum fatal errors (], $MAX_FATAL_ERRS , q[) detected, exiting];
+if($errexit_count) {
+  croak q[Maximum fatal errors (], $MAX_FATAL_ERRS , q[) detected, exiting];
 }
 
 sub dump_results {
