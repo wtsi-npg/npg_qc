@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - genotype check data extraction scripts - updated scripts to fail more readily
+    and informatively when an iRODS error occurs
+
 release 59.0
  - SeqQC 
    - remove ajax proxy controller
