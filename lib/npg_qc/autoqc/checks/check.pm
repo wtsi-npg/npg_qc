@@ -2,22 +2,18 @@ package npg_qc::autoqc::checks::check;
 
 use Moose;
 use namespace::autoclean;
-use MooseX::ClassAttribute;
-use MooseX::Aliases;
 use Class::Load qw(load_class);
 use Carp;
-use English qw(-no_match_vars);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
-use Perl6::Slurp;
 use Readonly;
 
 use npg_tracking::util::types;
 
-with qw/ npg_tracking::glossary::tag
-         npg_common::roles::run::lane::file_names
-       /;
+with qw/ npg_tracking::glossary::run
+         npg_tracking::glossary::lane
+         npg_tracking::glossary::tag /;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit)
@@ -28,19 +24,17 @@ npg_qc::autoqc::checks::check
 
 =head1 SYNOPSIS
 
-  my $check1 = npg_qc::autoqc::checks::check->new(path => q[a/valid/path], position => 1, id_run => 2222);
+  my $check = npg_qc::autoqc::checks::check->new(path => q[a/valid/path], position => 1, id_run => 2222);
 
 =head1 DESCRIPTION
 
-A top-level class for autoqc checks. Checks are performed for one lane.
+A parent class for autoqc checks. Checks are performed either for a lane or for a plex(index,lanelet).
 
 =head1 SUBROUTINES/METHODS
 
 =cut
 
-
 Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
-
 
 =head2 path
 
@@ -54,36 +48,15 @@ has 'path'        => (isa      => 'Str',
 
 =head2 position
 
-Lane number. An integer from 1 to 8 inclusive. Read-only.
-
-=cut
-has 'position'    => (isa       => 'NpgTrackingLaneNumber',
-                      is        => 'ro',
-                      required  => 1,
-                     );
-
+Lane number. An integer from 1 to 8 inclusive.
 
 =head2 id_run
 
-Run id for the lane to be checked. Read-only.
+Run id for the lane to be checked.
 
-=cut
-has 'id_run'      => (
-                       isa      => 'NpgTrackingRunId',
-                       is       => 'ro',
-                       required => 1,
-                     );
+=head2 tag_index
 
-=head2 sequence_type
-
-Sequence type as phix for spiked phix or similar. Read-only.
-
-=cut
-has 'sequence_type'  => (
-                         isa      => 'Maybe[Str]',
-                         is       => 'ro',
-                         required => 0,
-		        );
+An optional tag index
 
 =head2 tmp_path
 
@@ -98,19 +71,16 @@ has 'tmp_path'    => (isa        => 'Str',
                       default    => sub { return tempdir(CLEANUP => 1); },
                      );
 
-=head2 input_file_ext
+=head2 file_type
 
-Input file extension.
+File type, also input file extension.
 
 =cut
-has 'input_file_ext' => (isa        => 'Str',
-                         is         => 'ro',
-                         required   => 0,
-                         default    => $FILE_EXTENSION,
-                         writer     => '_set_ext',
-                         alias      => 'file_type',
-                        );
-
+has 'file_type' => (isa        => 'Str',
+                    is         => 'ro',
+                    required   => 0,
+                    default    => $FILE_EXTENSION,
+                   );
 
 =head2 input_file
 
@@ -128,7 +98,6 @@ sub _build_input_files {
     return \@files;
 }
 
-
 =head2 result
 
 A result object. Read-only.
@@ -140,7 +109,6 @@ has 'result'     =>  (isa        => 'Object',
                       lazy_build => 1,
                      );
 sub _build_result {
-
     my $self = shift;
 
     my $pkg_name = ref $self;
@@ -151,40 +119,30 @@ sub _build_result {
     ## use critic
 
     my ($ref) = ($pkg_name) =~ /(\w*)$/smx;
-    if ($ref eq q[check]) { $ref =  q[result]; }
+    if ($ref eq q[check]) {
+        $ref =  q[result];
+    }
     my $module = "npg_qc::autoqc::results::$ref";
     load_class($module);
 
-    my $nref = { id_run => $self->id_run, position  => $self->position, };
+    my $nref = { id_run => $self->id_run, position => $self->position, };
     $nref->{'path'} = $self->path;
     if (defined $self->tag_index) {
-      # In newish Moose undefined but set tag index is serialized to json,
-      # which is not good for result objects that do hot have tag_index db column
-      $nref->{'tag_index'} = $self->tag_index;
+        # In newish Moose undefined but set tag index is serialized to json,
+        # which is not good for result objects that do hot have tag_index db column
+        $nref->{'tag_index'} = $self->tag_index;
     }
     my $result = $module->new($nref);
 
     $result->set_info('Check', $pkg_name);
     $result->set_info('Check_version', $module_version);
-    if ($result->can(q[sequence_type])) {
-        $result->sequence_type($self->sequence_type);
-    }
     return $result;
 }
 
-=head2 _cant_run_ms
-
-A message describing why the check cannot be run
-
-=cut
-has '_cant_run_ms' => (isa => 'Str',
-  is => 'rw',
-  required => 0,
-);
-
 =head2 execute
 
-The actual test should be performed within this method. In this class this method only checks that the given path exists.
+The actual test should implement this method.
+Here this method only checks that the given path exists.
 
 =cut
 sub execute {
@@ -197,7 +155,6 @@ sub execute {
     return 1;
 }
 
-
 =head2 can_run
 
 Decides whether this check can be run for a particular run.
@@ -206,7 +163,6 @@ Decides whether this check can be run for a particular run.
 sub can_run {
     return 1;
 }
-
 
 =head2 get_input_files
 
@@ -217,64 +173,75 @@ sub get_input_files {
     my $self = shift;
 
     my @fnames = ();
-    my $forward = File::Spec->catfile($self->path, $self->create_filename($self->input_file_ext, 1));
+    my $forward = join q[.], catfile($self->path, $self->create_filename($self, 1)),
+                             $self->file_type;
     my $no_end_forward = undef;
     if (!-e $forward) {
-        $no_end_forward = File::Spec->catfile($self->path, $self->create_filename($self->input_file_ext));
+        $no_end_forward = join q[.], catfile($self->path, $self->create_filename($self)),
+                                     $self->file_type;
         if (-e $no_end_forward) {
            $forward = $no_end_forward;
         } else {
-           $self->result->comments(qq[Neither $forward no $no_end_forward file found]);
+           $self->result->comments(qq[Neither $forward nor $no_end_forward file found]);
            return @fnames;
         }
     }
 
     push @fnames, $forward;
     if (!defined $no_end_forward) {
-        my $reverse =  File::Spec->catfile($self->path, $self->create_filename($self->input_file_ext, 2));
+        my $reverse =  join q[.], catfile($self->path, $self->create_filename($self, 2)),
+                                  $self->file_type;
         if (-e $reverse) {push @fnames, $reverse;}
     }
 
     return @fnames;
 }
 
-
 =head2 generate_filename_attr
 
 Gets an array containing paths to forward and reverse (if any) input files, and returns
-an array ref with filenames that is suitable for setting the filename attribute.
+an array ref with file names that is suitable for setting the filename attribute.
 
 =cut
 sub generate_filename_attr {
-
-    my ($self) = shift;
-
-    my $count = 0;
-    my $filename;
+    my $self = shift;
+    my @filenames = ();
     foreach my $fname (@{$self->input_files}) {
         my($name, $directories, $suffix) = fileparse($fname);
-        $filename->[$count] = $name;
-        $count++;
+        push @filenames, $name;
     }
-    return $filename;
+    return \@filenames;
 }
-
 
 =head2 overall_pass
 
-Use this function to compute overall lane pass value for a particular check
-if the evaluation is performed separately for a forward and a reverse sequence.
+If the evaluation is performed separately for a forward and a reverse sequence,
+computes overall lane pass value for a particular check.
 
 =cut
 sub overall_pass {
-
-  my ($self, $apass, $count) = @_;
-  if ($apass->[0] != 1 || $count == 1) {return $apass->[0];}
-  if ($apass->[1] != 1) {return $apass->[1];}
-  return ($apass->[0] && $apass->[1]);
+    my ($self, $apass, $count) = @_;
+    if ($apass->[0] != 1 || $count == 1) {return $apass->[0];}
+    if ($apass->[1] != 1) {return $apass->[1];}
+    return ($apass->[0] && $apass->[1]);
 }
 
-no MooseX::ClassAttribute;
+=head2 create_filename - given run id, position, tag index (optional) and end (optional)
+returns a file name
+
+  npg_qc::autoqc::checks::check->create_filename({id_run=>1,position=>2,tag_index=>3},2);
+  $obj->create_filename({id_run=>1,position=>2},1);
+=cut
+sub create_filename {
+    my ($self, $map, $end) = @_;
+
+    return sprintf '%i_%i%s%s',
+        $map->{'id_run'},
+        $map->{'position'},
+        $end ? "_$end" : q[],
+        defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -292,15 +259,11 @@ __END__
 
 =item namespace::autoclean
 
-=item MooseX::ClassAttribute
-
-=item MooseX::Aliases
-
 =item Class::Load
 
 =item Carp
 
-=item English -no_match_vars
+=item Readonly
 
 =item File::Basename
 
@@ -308,11 +271,13 @@ __END__
 
 =item File::Temp
 
+=item npg_tracking::glossary::run
+
+=item npg_tracking::glossary::lane
+
 =item npg_tracking::glossary::tag
 
 =item npg_tracking::util::types
-
-=item npg_common::roles::run::lane::file_names
 
 =back
 
@@ -326,7 +291,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

@@ -91,15 +91,21 @@
      <td></td>
   </tr>
   <tr>
-    <td class="url_column">/checks/libraries?name=XXX,<br /> where XXX is the name of the library</td>
+    <td class="url_column">/checks/libraries?id=XXX,<br /> where XXX is the id of the library</td>
     <td>qc checks for all lanes for a library</td>
-    [% url = c.uri_for_action(c.controller('Checks').action_for('libraries'), {name=>'129P2_SLX_500_DSS_2'}); %]
+    [% url = c.uri_for_action(c.controller('Checks').action_for('libraries'), {id=>'2460276069794:A2'}); %]
     <td><a href="[% url %]">[% url %]</a></td>
   </tr>
   <tr>
     <td class="url_column">/checks/samples/XXX,<br /> where XXX is a valid sample ID</td>
     <td>qc checks for all lanes for a sample</td>
     [% url = c.uri_for_action(c.controller('Checks').action_for('samples'), '2166') %]
+    <td><a href="[% url %]">[% url %]</a></td>
+  </tr>
+  <tr>
+    <td class="url_column">/checks/pool/XXX,<br /> where XXX is a valid sample ID</td>
+    <td>qc checks for all lanes for a pool</td>
+    [% url = c.uri_for_action(c.controller('Checks').action_for('pools'), 'NT18086M') %]
     <td><a href="[% url %]">[% url %]</a></td>
   </tr>
 </table>

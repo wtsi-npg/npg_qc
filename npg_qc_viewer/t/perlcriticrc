@@ -7,7 +7,7 @@ max_chain_length = 4
 [Subroutines::ProhibitUnusedPrivateSubroutines]
 private_name_regex = ^_(?!_|build)\w+
 [Documentation::PodSpelling]
-stop_words = NPG Gourtovaia SeqQC autoqc qc Readonly DateTime JSON fastqcheck DBIx PNG plex Tovar TT fastq plexes boolean lookup
+stop_words = NPG Gourtovaia SeqQC autoqc qc Readonly DateTime JSON fastqcheck DBIx PNG plex Tovar TT fastq plexes boolean lookup LIMS
 [Documentation::RequirePodSections]
 lib_sections    = NAME | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | BUGS AND LIMITATIONS | DEPENDENCIES | CONFIGURATION AND ENVIRONMENT | INCOMPATIBILITIES | AUTHOR | LICENSE AND COPYRIGHT
 

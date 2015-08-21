@@ -6,6 +6,7 @@ use Readonly;
 
 use npg_qc_viewer::Util::FileFinder;
 use npg_tracking::Schema;
+use npg_qc::autoqc::checks::check;
 
 extends 'Catalyst::Model::Factory::PerRequest';
 __PACKAGE__->config( class => 'npg_qc_viewer::Model::SeqStore' );
@@ -134,7 +135,7 @@ sub _get_file_paths {
 
 sub _filename {
   my ($rpt_key_map, $end) = @_;
-  return npg_qc_viewer::Util::FileFinder
+  return npg_qc::autoqc::checks::check
     ->create_filename($rpt_key_map, $end) . q[.] . $FILE_EXTENSION;
 }
 
@@ -162,6 +163,8 @@ __END__
 =item npg_qc_viewer::Util::FileFinder
 
 =item npg_qc::Schema
+
+=item npg_qc::autoqc::checks::check
 
 =item npg_tracking::Schema
 

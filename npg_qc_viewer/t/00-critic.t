@@ -16,6 +16,9 @@ if($EVAL_ERROR) {
   plan skip_all => 'Test::Perl::Critic not installed';
 
 } else {
+
+  local $ENV{'HOME'} = 't/data';
+
   Test::Perl::Critic->import(
 			   -severity => 1,
 			   -exclude  => [ 'tidy',

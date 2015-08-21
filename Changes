@@ -1,5 +1,36 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.0
+ - SeqQC 
+   - remove ajax proxy controller
+   - stop 00 tests accessing live db credentials and databases
+   - using mlwarehouse for dwh information displayed in SeqQC viewer
+   - removing tests related to template compilation
+   - providing links to lims for pool/library/sample
+ - autoqc check and autoqc objects: remove unused 'sequence_type' attribute
+ - autoqc check and result objects - use existing roles for id_run and
+   position definitions
+ - result object - to remove dependency on id run, position and tag index,
+     allow individual results to overwrite the root of the output file name
+ - refactor autoqc check to use file_type attribute name instead of
+   input_file_ext
+ - tags_reporters check - remove hardcoded solexa path
+ - genotype and verify_bam_id_checks - use standard way of reporting run-time
+   problems
+ - bam_flagstats
+     - one call to compute all metrics
+     - method for finding stats files
+     - if id_run not given, derive the root of the output file name from
+       the input sequence file name 
+
+release 58.9
+ - move method for file name creation from SeqQC to autoqc so that it's
+   more accessible
+ - SeqQC
+     - upstream_tags template - do not report potentially confusing tag index value when
+        there is no id_run in the high-scoring tags table
+ - remove misleading bam_flagstats check info
+
 release 58.8
  - SeqQC
      - display insert size normal fit confidence and number of modes in the 
