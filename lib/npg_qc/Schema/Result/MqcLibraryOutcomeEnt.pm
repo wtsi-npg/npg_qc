@@ -237,8 +237,8 @@ sub update_outcome {
     if ($self->in_storage) {
       #Check if previous outcome is not final
       if($self->mqc_outcome->is_final_outcome) {
-        croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i',
-              $self->id_run, $self->position);
+        croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i tag_index %i',
+              $self->id_run, $self->position, $self->tag_index);
       } else { #Update
         $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username, 'modified_by' => $username});
       }
@@ -249,8 +249,8 @@ sub update_outcome {
       $self->insert();
     }
   } else {
-    croak(sprintf 'Error while trying to transit id_run %i position %i to a non-existing outcome "%s".',
-          $self->id_run, $self->position, $outcome);
+    croak(sprintf 'Error while trying to transit id_run %i position %i tag_index %i to a non-existing outcome "%s".',
+          $self->id_run, $self->position, $self->tag_index, $outcome);
   }
   return 1;
 }
@@ -277,6 +277,7 @@ sub _create_historic {
   my $historic = $rs->create({
     id_run         => $self->id_run,
     position       => $self->position,
+    tag_index      => $self->tag_index,
     id_mqc_outcome => $self->id_mqc_outcome,
     username       => $self->username,
     last_modified  => $self->last_modified,

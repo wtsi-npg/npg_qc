@@ -50,6 +50,7 @@ sub update_outcome : Path('update_outcome') {
 
   my $id_run;
   my $position;
+  my $tag_index;
   my $username;
   my $new_outcome;
   my $error;
@@ -65,6 +66,7 @@ sub update_outcome : Path('update_outcome') {
     ####Loading state
     my $params = $c->request->parameters;
     $position    = $params->{'position'};
+    $tag_index   = $params->{'tag_index'};
     $new_outcome = $params->{'new_oc'};
     $id_run      = $params->{'id_run'};
     $username    = $c->user->username;
@@ -82,39 +84,54 @@ sub update_outcome : Path('update_outcome') {
       $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
     }
 
-    $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
-      {'id_run' => $id_run, 'position' => $position})->next;
-    if (!$ent) {
-      $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
-        id_run         => $id_run,
-        position       => $position,
-        username       => $username,
-        modified_by    => $username});
+    if (!$tag_index) { # Working as lane MQC
+      $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
+        {'id_run' => $id_run, 'position' => $position})->next;
+      if (!$ent) {
+        $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
+          id_run         => $id_run,
+          position       => $position,
+          username       => $username,
+          modified_by    => $username});
+      }
+      $ent->update_outcome($new_outcome, $username);
+    } else { # Working as library MQC
+      $ent = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->search(
+        {'id_run' => $id_run, 'position' => $position, 'tag_index' => $tag_index})->next;
+      if (!$ent) {
+        $ent = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->new_result({
+          id_run         => $id_run,
+          position       => $position,
+          tag_index      => $tag_index,
+          username       => $username,
+          modified_by    => $username});
+      }
+      $ent->update_outcome($new_outcome, $username);
     }
-    $ent->update_outcome($new_outcome, $username);
 
   } catch {
     $error = $_;
   };
 
   my $error_code = $OK_CODE;
-  my $lane_update_error;
+  my $mqc_update_error;
 
   if ($error) {
     ($error, $error_code) = $self->parse_error($error);
   } else {
-    if($ent->has_final_outcome) { ##If final outcome update lane as qc complete
+    if($ent->has_final_outcome && !$tag_index) { #If final outcome update lane as qc complete
       try {
         $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
       } catch {
-        $lane_update_error = qq[ Error updating lane status: $_];
+        $mqc_update_error = qq[ Error updating lane status: $_];
       };
     }
   }
 
-  my $message = $error || qq[Manual QC $new_outcome for run $id_run, position $position saved.];
-  if ($lane_update_error) {
-    $message .= $lane_update_error;
+  my $message = $error || $tag_index ? qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.] 
+                                          : qq[Manual QC $new_outcome for run $id_run, position $position saved.];
+  if ($mqc_update_error) {
+    $message .= $mqc_update_error;
   }
 
   _set_response($c, {'message' => $message}, $error_code);
