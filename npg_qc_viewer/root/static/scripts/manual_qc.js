@@ -502,26 +502,41 @@ var NPG;
     }) ();
     QC.RunMQCControl = RunMQCControl;
 
+    var RunTitleParseResult = (function () {
+      /**
+       * Object to deal with title parsing from page (Run + Lane).
+       * @memberof module:NPG/QC
+       * @constructor
+       */
+      function RunTitleParseResult(id_run, position, isRunPage) {
+        this.id_run    = id_run;
+        this.position  = position;
+        this.isRunPage = isRunPage;
+      }
+      return RunTitleParseResult;
+    }) ();
+    QC.RunTitleParseResult = RunTitleParseResult;
+
     var RunTitleParser = (function () {
       /**
-       * Object to deal with id_run parsing from text.
+       * Object to deal with title parsing from page.
        * @memberof module:NPG/QC
        * @constructor
        */
       function RunTitleParser() {
-        this.reId = /^NPG SeqQC v[\w\.]+: Results for run ([0-9]+) \(current run status:/;
+        this.reId = /^NPG SeqQC v[\w\.]+: Results (for run ([0-9]+) \(current run status:|\(all\) for runs ([0-9]+) lanes ([0-9]+)$)/;
       }
 
       /**
        * Parses the id_run from the title (or text) passed as param.
        * It looks for first integer using a regexp.
        *
-       * "^Results for run ([0-9]+) \(current run status:"
+       * "^NPG SeqQC v[\w\.]+: Results (for run ([0-9]+) \(current run status:|\(all\) for runs ([0-9]+) lanes ([0-9]+)$)"
        *
        * @param text {String} Text to parse.
        *
-       * @returns the first match for the execution of the regexp,
-       * which should be the id_run for a successful execution.
+       * @returns A RunTitleParseResult object on successful parsing with the
+       * regular expression.
        */
       RunTitleParser.prototype.parseIdRun = function (text) {
         if(typeof(text) === "undefined" || text == null) {
@@ -533,8 +548,17 @@ var NPG;
         if (match != null) {
           //The result of parse looks like a parse
           // and has correct number of elements
-          if(match.constructor === Array && match.length >= 2) {
-            result = match[1];
+          if(match.constructor === Array && match.length > 2) {
+            if (match[1].indexOf('for run') === 0) {
+              var isRunPage = true;
+              var id_run = match[2];
+              result = new NPG.QC.RunTitleParseResult(id_run, null, isRunPage);
+            } else if (match[1].indexOf('(all) for') === 0) {
+              var isRunPage = false;
+              var id_run    = match[3];
+              var position  = match[4];
+              result = new NPG.QC.RunTitleParseResult(id_run, position, isRunPage);
+            }
           }
         }
         return result;

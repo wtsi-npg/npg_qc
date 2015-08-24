@@ -51,9 +51,21 @@
     var title4 = parser.parseIdRun('NPG SeqQC v56.7: Results for run (current run status: qc in progress, taken by user)');
     assert.equal(title4, null, 'Can deal with missing run_id (lexical validation)');
     var title5 = parser.parseIdRun('NPG SeqQC v56.7: Results for run 16074 (current run status: qc in progress, taken by user)');
-    assert.equal(title5, '16074', 'Correctly parses run_id from correctly formed title');
+    assert.equal(title5.id_run, '16074', 'Correctly parses run_id from correctly formed title');
     var title6 = parser.parseIdRun('NPG SeqQC v56.7: Results for run 16074 (current run status: ');
-    assert.equal(title6, '16074', 'Correctly parses run_id from non qc title');
+    assert.equal(title6.id_run, '16074', 'Correctly parses run_id from non qc title');
+    assert.equal(title6.position, null, 'Correctly sets position as null');
+    assert.ok(title6.isRunPage, 'Correctly identifies the page as a single run page');
+    var title7 = parser.parseIdRun('NPG SeqQC v56.7: Results (all) for runs 16074 lanes 1');
+    assert.equal(title7.id_run, '16074', 'Correctly parses run_id and position from non qc title');
+    assert.equal(title7.position, '1', 'Correctly sets position as 1');
+    assert.ok(!title7.isRunPage, 'Correctly identifies the page as a run + lane page');
+    var title8 = parser.parseIdRun('NPG SeqQC v56.7: Results (all) for runs 16074 lanes 1 2');
+    assert.equal(title8, null, 'Can deal with multi lane pages (lexical validation)');
+    var title9 = parser.parseIdRun('NPG SeqQC v56.7: Results (all) for runs 16074 16075 lanes 1');
+    assert.equal(title9, null, 'Can deal with multi run pages (lexical validation)');
+    var title10 = parser.parseIdRun('NPG SeqQC v56.7: Results (all) for runs 16074 16075 lanes 1 2');
+    assert.equal(title10, null, 'Can deal with multi run, multi lane pages (lexical validation)');
   });
   
   QUnit.test("NPG.QC.RunMQCControl.initQC", function(assert) {
