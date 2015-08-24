@@ -14,7 +14,7 @@ subtest 'empty composition' => sub {
   my $c = $cpname->new(id_run => 1, position => 2);
   my $cmps = $pname->new();
   isa_ok ($cmps, $pname);
-  is ($cmps->num_components, 0, 'composition is empty');
+  is ($cmps->has_no_components, 1, 'composition is empty');
   is ($cmps->num_components, 0, 'no components');
   lives_ok { $cmps->find($c) } 'calling find for an empty composition';
   lives_ok { $cmps->sort() } 'calling sort for an empty composition';
