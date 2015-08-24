@@ -1,6 +1,6 @@
 -- Changes for library MQC
 --
--- Table structure for table `mqc_library_outcome_hist`
+-- Table structure for table `mqc_library_outcome_ent`
 --
 CREATE TABLE IF NOT EXISTS `mqc_library_outcome_ent` (
   `id_mqc_library_outcome_ent` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS `mqc_library_outcome_ent` (
   PRIMARY KEY (`id_mqc_library_outcome_ent`),
   UNIQUE INDEX `id_run_UNIQUE` (`id_run` ASC, `position` ASC, `tag_index` ASC),
   INDEX `fk_mqc_library_outcome_ent_mqc_outcome_dict1_idx` (`id_mqc_outcome` ASC))
-ENGINE = InnoDB;
+ENGINE = InnoDB
+COMMENT = 'Entity table for library manual qc';
 --
 -- Table structure for table `mqc_library_outcome_hist`
 --
@@ -30,4 +31,6 @@ CREATE TABLE IF NOT EXISTS `mqc_library_outcome_hist` (
   `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
   PRIMARY KEY (`id_mqc_library_outcome_hist`),
   INDEX `fk_mqc_library_outcome_hist_mqc_outcome_dict1_idx` (`id_mqc_outcome` ASC))
-ENGINE = InnoDB;
+ENGINE = InnoDB
+COMMENT = 'Historic table for library manual qc;
+
