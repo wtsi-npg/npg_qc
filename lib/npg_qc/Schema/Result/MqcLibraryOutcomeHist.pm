@@ -8,7 +8,7 @@ package npg_qc::Schema::Result::MqcLibraryOutcomeHist;
 
 =head1 NAME
 
-npg_qc::Schema::Result::MqcLibraryOutcomeHist
+npg_qc::Schema::Result::MqcLibraryOutcomeHist - Historic table for library manual qc
 
 =cut
 
@@ -82,6 +82,7 @@ Lane
 
   data_type: 'smallint'
   extra: {unsigned => 1}
+  is_foreign_key: 1
   is_nullable: 0
 
 =head2 username
@@ -124,7 +125,12 @@ __PACKAGE__->add_columns(
   'tag_index',
   { data_type => 'bigint', is_nullable => 0 },
   'id_mqc_outcome',
-  { data_type => 'smallint', extra => { unsigned => 1 }, is_nullable => 0 },
+  {
+    data_type => 'smallint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
   'username',
   { data_type => 'char', is_nullable => 1, size => 128 },
   'last_modified',
@@ -150,13 +156,30 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_mqc_library_outcome_hist');
 
+=head1 RELATIONS
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-08-21 18:34:16
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:uTrXz9lS+rqAJNgq34Q5Kg
+=head2 mqc_outcome
 
-our $VERSION = '0';
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'mqc_outcome',
+  'npg_qc::Schema::Result::MqcOutcomeDict',
+  { id_mqc_outcome => 'id_mqc_outcome' },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-08-25 14:33:40
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BEsy2XPPyvIo3yeHwYZeyg
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
+our $VERSION = '0';
+
 __PACKAGE__->meta->make_immutable;
 
 1;

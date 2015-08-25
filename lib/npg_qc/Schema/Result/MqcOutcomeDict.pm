@@ -119,6 +119,36 @@ __PACKAGE__->set_primary_key('id_mqc_outcome');
 
 =head1 RELATIONS
 
+=head2 mqc_library_outcome_ents
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeEnt>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_library_outcome_ents',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeEnt',
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 mqc_library_outcome_hists
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeHist>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_library_outcome_hists',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeHist',
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 mqc_outcome_ents
 
 Type: has_many
@@ -150,8 +180,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yp0Z5RWtf5JyeRvWEJ5uGA
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-08-25 14:33:40
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fSPwWGXYSpjAyHfa6FbXWQ
 
 our $VERSION = '0';
 
