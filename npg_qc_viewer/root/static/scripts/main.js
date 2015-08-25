@@ -57,38 +57,95 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
     if(parent.hasClass('passed') || parent.hasClass('failed')) {
       lanesWithBG.push(parent);
     } else {
-      lanes.push(parent);
+      var tag_index = obj.data('tag_index');
+      if (typeof (tag_index) != undefined && tag_index != null){
+        if(tag_index != 0 && tag_index != 888) {
+          lanes.push(parent);
+        }
+      } else {
+        lanes.push(parent);
+      }
     }
   });
 
   // Getting the run_id from the title of the page using the qc part too.
-  var id_run = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
+  var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
   //If id_run //TODO move to object.
-  if(typeof(id_run) != undefined && id_run != null) {
+  if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
+
+
+    var id_run = runTitleParserResult.id_run;
     var prodConfiguration = new NPG.QC.ProdConfiguration();
-    var jqxhr = $.ajax({
-      url: "/mqc/mqc_runs/" + id_run,
-      cache: false
-    }).done(function() {
-      var control = new NPG.QC.RunMQCControl(prodConfiguration);
-      var mqc_run_data = jqxhr.responseJSON;
-      if(control.isStateForMQC(mqc_run_data)) {
-        var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);
-        if(DWHMatch.outcome) {
-          control.initQC(jqxhr.responseJSON, lanes,
-              function (mqc_run_data, runMQCControl, lanes) {
-                //Show working icons
-                for(var i = 0; i < lanes.length; i++) {
-                  lanes[i].children('a').addClass('padded_anchor');
-                  lanes[i].children('.lane_mqc_control').each(function(j, obj){
-                    $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
-                  });
+
+    if (runTitleParserResult.isRunPage) {
+      window.console && console.log("Run page");
+      var jqxhr = $.ajax({
+        url: "/mqc/mqc_runs/" + id_run,
+        cache: false
+      }).done(function() {
+        var control = new NPG.QC.RunMQCControl(prodConfiguration);
+        var mqc_run_data = jqxhr.responseJSON;
+        if(control.isStateForMQC(mqc_run_data)) {
+          var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);
+          if(DWHMatch.outcome) {
+            control.initQC(jqxhr.responseJSON, lanes,
+                function (mqc_run_data, runMQCControl, lanes) {
+                  //Show working icons
+                  for(var i = 0; i < lanes.length; i++) {
+                    lanes[i].children('a').addClass('padded_anchor');
+                    lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                      $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                    });
+                  }
+                  runMQCControl.prepareLanes(mqc_run_data, lanes);
+                },
+                function () { //There is no mqc so I just remove the working image and padding for anchor
+                  $('.lane_mqc_working').empty();
                 }
-                runMQCControl.prepareLanes(mqc_run_data, lanes);
-              },
-              function () { //There is no mqc so I just remove the working image and padding for anchor
-                $('.lane_mqc_working').empty();
+            );
+          } else {
+            $("#ajax_status").append("<li class='failed_mqc'>"
+                + "Conflicting data when comparing Data Ware House and Manual QC databases for run: "
+                + id_run
+                + ", lane: "
+                + DWHMatch.position
+                + ". Displaying of QC widgets aborted.</li>");
+            //Clear progress icon
+            $('.lane_mqc_working').empty();
+          }
+        } else {
+          control.showMQCOutcomes(jqxhr.responseJSON, lanes);
+        }
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        window.console && console.log( "error: " + errorThrown + " " + textStatus);
+        $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
+        //Clear progress icon
+        $('.lane_mqc_working').empty();
+      });
+    } else {
+      window.console && console.log("Run + Lane page");
+      window.console && console.log("Run " + id_run);
+      window.console && console.log("Position " + runTitleParserResult.position);
+
+      var control = new NPG.QC.LanePageMQCControl(prodConfiguration);
+      var mqc_run_data = {};
+      if(true) {
+        /*var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);*/
+        if (true) /*(DWHMatch.outcome)*/ {
+          control.initQC(mqc_run_data, lanes,
+            function (mqc_run_data, runMQCControl, lanes) {
+              //Show working icons
+              for(var i = 0; i < lanes.length; i++) {
+                lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                  obj = $(obj);
+                  obj.html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                });
               }
+              runMQCControl.prepareLanes(mqc_run_data, lanes);
+            },
+            function () { //There is no mqc so I just remove the working image and padding for anchor
+              $('.lane_mqc_working').empty();
+            }
           );
         } else {
           $("#ajax_status").append("<li class='failed_mqc'>"
@@ -103,12 +160,7 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
       } else {
         control.showMQCOutcomes(jqxhr.responseJSON, lanes);
       }
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-      window.console && console.log( "error: " + errorThrown + " " + textStatus);
-      $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
-      //Clear progress icon
-      $('.lane_mqc_working').empty();
-    });
+    }
   }
 
   jQuery('.bcviz_insert_size').each(function(i) {

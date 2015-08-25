@@ -71,17 +71,18 @@ var NPG;
         this.index                 = index; // Index of control in the page.
         this.abstractConfiguration = abstractConfiguration;
 
-        this.CONFIG_UPDATE_SERVICE      = "/mqc/update_outcome";
-        this.CONFIG_ACCEPTED_PRELIMINAR = 'Accepted preliminary';
-        this.CONFIG_REJECTED_PRELIMINAR = 'Rejected preliminary';
-        this.CONFIG_ACCEPTED_FINAL      = 'Accepted final';
-        this.CONFIG_REJECTED_FINAL      = 'Rejected final';
-        this.CONFIG_UNDECIDED           = 'Undecided'; //Initial outcome for widgets
-        this.CONFIG_INITIAL             = 'initial';
+        this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome";
+        this.CONFIG_ACCEPTED_PRELIMINARY = 'Accepted preliminary';
+        this.CONFIG_REJECTED_PRELIMINARY = 'Rejected preliminary';
+        this.CONFIG_ACCEPTED_FINAL       = 'Accepted final';
+        this.CONFIG_REJECTED_FINAL       = 'Rejected final';
+        this.CONFIG_UNDECIDED            = 'Undecided'; //Initial outcome for widgets
+        this.CONFIG_INITIAL              = 'initial';
 
         //Variable names for data from the DOM
         this.DATA_ID_RUN                = 'id_run';
         this.DATA_POSITION              = 'position';
+        this.DATA_TAG_INDEX             = 'tag_index';
 
         //container names
         this.LANE_MQC_WORKING           = 'lane_mqc_working';
@@ -107,8 +108,8 @@ var NPG;
           }, "json")
           .done(function() {
             switch (outcome) {
-              case control.CONFIG_ACCEPTED_PRELIMINAR : control.setAcceptedPre(); break;
-              case control.CONFIG_REJECTED_PRELIMINAR : control.setRejectedPre(); break;
+              case control.CONFIG_ACCEPTED_PRELIMINARY : control.setAcceptedPre(); break;
+              case control.CONFIG_REJECTED_PRELIMINARY : control.setRejectedPre(); break;
               case control.CONFIG_ACCEPTED_FINAL : control.setAcceptedFinal(); break;
               case control.CONFIG_REJECTED_FINAL : control.setRejectedFinal(); break;
               case control.CONFIG_UNDECIDED : control.setUndecided(); break;
@@ -135,9 +136,9 @@ var NPG;
         var self = this;
         var id_run = lane_control.data(this.DATA_ID_RUN);
         var position = lane_control.data(this.DATA_POSITION);
-        var outcomes = [self.CONFIG_ACCEPTED_PRELIMINAR,
+        var outcomes = [self.CONFIG_ACCEPTED_PRELIMINARY,
                         self.CONFIG_UNDECIDED,
-                        self.CONFIG_REJECTED_PRELIMINAR];
+                        self.CONFIG_REJECTED_PRELIMINARY];
         var labels = ["<img src='" +
                       self.abstractConfiguration.getRoot() +
                       "/images/tick.png'  title='Mark lane as preliminary pass'/>", // for accepted
@@ -186,10 +187,10 @@ var NPG;
         if(this.outcome == this.CONFIG_UNDECIDED) {
           throw new Error('Invalid state');
         }
-        if(this.outcome == this.CONFIG_ACCEPTED_PRELIMINAR) {
+        if(this.outcome == this.CONFIG_ACCEPTED_PRELIMINARY) {
           this.updateOutcome(this.CONFIG_ACCEPTED_FINAL);
         }
-        if(this.outcome == this.CONFIG_REJECTED_PRELIMINAR) {
+        if(this.outcome == this.CONFIG_REJECTED_PRELIMINARY) {
           this.updateOutcome(this.CONFIG_REJECTED_FINAL);
         }
       };
@@ -205,12 +206,12 @@ var NPG;
         this.lane_control.parent().css("background-color", "#FFDDDD");
       };
 
-      LaneMQCControl.prototype.setAcceptedPreliminarBG = function() {
+      LaneMQCControl.prototype.setAcceptedPreliminaryBG = function() {
         this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
         this.lane_control.parent().prop('title', 'Preliminary pass in manual QC, waiting for final decision');
       };
 
-      LaneMQCControl.prototype.setRejectedPreliminarBG = function() {
+      LaneMQCControl.prototype.setRejectedPreliminaryBG = function() {
         this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
         this.lane_control.parent().prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
@@ -227,12 +228,12 @@ var NPG;
       };
 
       LaneMQCControl.prototype.setAcceptedPre = function() {
-        this.outcome = this.CONFIG_ACCEPTED_PRELIMINAR;
+        this.outcome = this.CONFIG_ACCEPTED_PRELIMINARY;
         this.lane_control.children('.lane_mqc_save').show();
       };
 
       LaneMQCControl.prototype.setRejectedPre = function() {
-        this.outcome = this.CONFIG_REJECTED_PRELIMINAR;
+        this.outcome = this.CONFIG_REJECTED_PRELIMINARY;
         this.lane_control.children('.lane_mqc_save').show();
       };
 
@@ -265,15 +266,15 @@ var NPG;
           //If it does not have initial outcome
           this.outcome = this.CONFIG_UNDECIDED;
           this.generateActiveControls();
-        } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINAR
-            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINAR
+        } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINARY
+            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINARY
             || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_UNDECIDED) {
           //If previous outcome is preliminar.
           this.outcome = lane_control.data(this.CONFIG_INITIAL);
           this.generateActiveControls();
           switch (this.outcome){
-            case this.CONFIG_ACCEPTED_PRELIMINAR : this.setAcceptedPre(); break;
-            case this.CONFIG_REJECTED_PRELIMINAR : this.setRejectedPre(); break;
+            case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPre(); break;
+            case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPre(); break;
             case this.CONFIG_UNDECIDED : this.setUndecided(); break;
           }
         } else {
@@ -298,14 +299,325 @@ var NPG;
       LaneMQCControl.prototype.loadBGFromInitialWithPreliminary = function (lane_control) {
         this.loadBGFromInitial(lane_control);
         switch (lane_control.data(this.CONFIG_INITIAL)) {
-          case this.CONFIG_ACCEPTED_PRELIMINAR : this.setAcceptedPreliminarBG(); break;
-          case this.CONFIG_REJECTED_PRELIMINAR : this.setRejectedPreliminarBG(); break;
+          case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPreliminaryBG(); break;
+          case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPreliminaryBG(); break;
         }
       };
 
       return LaneMQCControl;
     }) ();
     QC.LaneMQCControl = LaneMQCControl;
+
+    /* Plex */
+    var LibraryMQCControl = (function () {
+      /**
+       * Controller for individual lanes GUI.
+       * @param index {Number}
+       * @param abstractConfiguration {Object}
+       * @memberof module:NPG/QC
+       * @constructor
+       */
+      function LibraryMQCControl(index, abstractConfiguration) {
+        this.lane_control          = null;  // Container linked to this controller
+        this.outcome               = null;  // Current outcome (Is updated when linked to an object in the view)
+        this.index                 = index; // Index of control in the page.
+        this.abstractConfiguration = abstractConfiguration;
+
+        this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome";
+        this.CONFIG_ACCEPTED_PRELIMINARY = 'Accepted preliminary';
+        this.CONFIG_REJECTED_PRELIMINARY = 'Rejected preliminary';
+        this.CONFIG_ACCEPTED_FINAL       = 'Accepted final';
+        this.CONFIG_REJECTED_FINAL       = 'Rejected final';
+        this.CONFIG_UNDECIDED            = 'Undecided'; //Initial outcome for widgets
+        this.CONFIG_INITIAL              = 'initial';
+
+        //Variable names for data from the DOM
+        this.DATA_ID_RUN                = 'id_run';
+        this.DATA_POSITION              = 'position';
+        this.DATA_TAG_INDEX             = 'tag_index';
+
+        //container names
+        this.LANE_MQC_WORKING           = 'lane_mqc_working';
+        this.LANE_MQC_WORKING_CLASS     = '.' + this.LANE_MQC_WORKING;
+      }
+
+      /**
+       * Change the outcome.
+       */
+      LibraryMQCControl.prototype.updateOutcome = function(outcome) {
+        var id_run    = this.lane_control.data(this.DATA_ID_RUN);
+        var position  = this.lane_control.data(this.DATA_POSITION);
+        var tag_index = this.lane_control.data(this.DATA_TAG_INDEX);
+        var control   = this;
+        var self      = this;
+        if(outcome != control.outcome) {
+          //Show progress icon
+          control.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
+              + this.abstractConfiguration.getRoot()
+              + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
+          //AJAX call.
+          $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, tag_index : tag_index, new_oc : outcome}, function(data){
+            var response = data;
+          }, "json")
+          .done(function() {
+            switch (outcome) {
+              case control.CONFIG_ACCEPTED_PRELIMINARY : control.setAcceptedPre();   break;
+              case control.CONFIG_REJECTED_PRELIMINARY : control.setRejectedPre();   break;
+              case control.CONFIG_ACCEPTED_FINAL       : control.setAcceptedFinal(); break;
+              case control.CONFIG_REJECTED_FINAL       : control.setRejectedFinal(); break;
+              case control.CONFIG_UNDECIDED            : control.setUndecided();     break;
+            }
+          })
+          .fail(function(data) {
+            window.console && console.log(data.responseJSON.message);
+            jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
+          })
+          .always(function(data){
+            //Clear progress icon
+            control.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
+          });
+        } else {
+          window.console && console.log("Noting to do.");
+        }
+      };
+
+      /**
+       * Builds the gui controls necessary for the mqc operation and passes them to the view.
+       */
+      LibraryMQCControl.prototype.generateActiveControls = function() {
+        var lane_control = this.lane_control;
+        var self = this;
+        var id_run    = lane_control.data(this.DATA_ID_RUN);
+        var position  = lane_control.data(this.DATA_POSITION);
+        var tag_index = lane_control.data(this.DATA_TAG_INDEX);
+        var outcomes  = [self.CONFIG_ACCEPTED_PRELIMINARY,
+                         self.CONFIG_UNDECIDED,
+                         self.CONFIG_REJECTED_PRELIMINARY];
+        var labels    = ["<img src='" +
+                         self.abstractConfiguration.getRoot() +
+                         "/images/tick.png'  title='Mark lane as preliminary pass'/>", // for accepted
+                         '&nbsp;&nbsp;&nbsp;', // for undecided
+                         "<img src='" +
+                         self.abstractConfiguration.getRoot() +
+                         "/images/cross.png' title='Mark lane as preliminary fail'/>"]; // for rejected
+        //Remove old working span
+        self.lane_control.children(self.LANE_MQC_WORKING_CLASS).remove();
+        //Create and add radios
+        var name = 'radios_' + tag_index;
+        for(var i = 0; i < outcomes.length; i++) {
+          var outcome = outcomes[i];
+          var label = labels[i];
+          var checked = null;
+          if (self.outcome == outcome) {
+            checked = true;
+          }
+          var radio = new NPG.QC.UI.MQCOutcomeRadio(tag_index, outcome, label, name, checked);
+          self.lane_control.append(radio.asObject());
+        }
+        self.addMQCFormat();
+        self.lane_control.append($("<span class='lane_mqc_save' title='Save current outcome as final (can not be changed again)'><img src='" +
+            self.abstractConfiguration.getRoot() +
+            "/images/padlock.png'></span>"));
+        self.lane_control.children('.lane_mqc_save').off("click").on("click", function() {
+          self.saveAsFinalOutcome();
+        });
+        if (self.outcome == self.CONFIG_UNDECIDED) {
+          self.lane_control.children('.lane_mqc_save').hide();
+        }
+        //link the radio group to the update function
+        $("input[name='" + name + "']").on("change", function () {
+          self.updateOutcome(this.value);
+        });
+        //add a new working span
+        self.lane_control.append("<span class='lane_mqc_working' />");
+      };
+
+      /**
+       * Checks the current outcome associated with this controller. If it is not final it will make it final
+       * will update the value in the model with an async call and update the view.
+       */
+      LibraryMQCControl.prototype.saveAsFinalOutcome = function() {
+        var control = this;
+        if(this.outcome == this.CONFIG_UNDECIDED) {
+          throw new Error('Invalid state');
+        }
+        if(this.outcome == this.CONFIG_ACCEPTED_PRELIMINARY) {
+          this.updateOutcome(this.CONFIG_ACCEPTED_FINAL);
+        }
+        if(this.outcome == this.CONFIG_REJECTED_PRELIMINARY) {
+          this.updateOutcome(this.CONFIG_REJECTED_FINAL);
+        }
+      };
+
+      /**
+       * Methods to deal with background colours.
+       */
+      LibraryMQCControl.prototype.setAcceptedBG = function() {
+        this.lane_control.parent().css("background-color", "#B5DAFF");
+      };
+
+      LibraryMQCControl.prototype.setRejectedBG = function () {
+        this.lane_control.parent().css("background-color", "#FFDDDD");
+      };
+
+      LibraryMQCControl.prototype.setAcceptedPreliminaryBG = function() {
+        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.lane_control.parent().prop('title', 'Preliminary pass in manual QC, waiting for final decision');
+      };
+
+      LibraryMQCControl.prototype.setRejectedPreliminaryBG = function() {
+        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.lane_control.parent().prop('title', 'Preliminary fail in manual QC, waiting for final decision');
+      };
+
+      LibraryMQCControl.prototype.removeMQCFormat = function () {
+        this.lane_control.parent().children('.padded_anchor').removeClass("padded_anchor");
+        this.lane_control.parent().removeClass('td_mqc');
+        this.lane_control.parent().css('text-align', 'center'); // For firefox
+      };
+
+      LibraryMQCControl.prototype.addMQCFormat = function () {
+        this.lane_control.parent().css('text-align', 'left'); // For firefox
+        this.lane_control.parent().addClass('td_mqc');
+      };
+
+      LibraryMQCControl.prototype.setAcceptedPre = function() {
+        this.outcome = this.CONFIG_ACCEPTED_PRELIMINARY;
+        this.lane_control.children('.lane_mqc_save').show();
+      };
+
+      LibraryMQCControl.prototype.setRejectedPre = function() {
+        this.outcome = this.CONFIG_REJECTED_PRELIMINARY;
+        this.lane_control.children('.lane_mqc_save').show();
+      };
+
+      LibraryMQCControl.prototype.setAcceptedFinal = function() {
+        this.outcome = this.CONFIG_ACCEPTED_FINAL;
+        this.lane_control.empty();
+        this.removeMQCFormat();
+        this.setAcceptedBG();
+      };
+
+      LibraryMQCControl.prototype.setRejectedFinal = function() {
+        this.outcome = this.CONFIG_REJECTED_FINAL;
+        this.lane_control.empty();
+        this.removeMQCFormat();
+        this.setRejectedBG();
+      };
+
+      LibraryMQCControl.prototype.setUndecided = function() {
+        this.outcome = this.CONFIG_UNDECIDED;
+        this.lane_control.children('.lane_mqc_save').hide();
+      };
+
+      /**
+       * Links the individual object with an mqc controller so it can allow mqc of a lane.
+       */
+      LibraryMQCControl.prototype.linkControl = function(lane_control) {
+        lane_control.extra_handler = this;
+        this.lane_control = lane_control;
+        if ( typeof(lane_control.data(this.CONFIG_INITIAL)) === "undefined") {
+          //If it does not have initial outcome
+          this.outcome = this.CONFIG_UNDECIDED;
+          this.generateActiveControls();
+        } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINARY
+            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINARY
+            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_UNDECIDED) {
+          //If previous outcome is preliminary.
+          this.outcome = lane_control.data(this.CONFIG_INITIAL);
+          this.generateActiveControls();
+          switch (this.outcome){
+            case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPre(); break;
+            case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPre(); break;
+            case this.CONFIG_UNDECIDED : this.setUndecided(); break;
+          }
+        } else {
+          this.loadBGFromInitial(lane_control);
+        }
+      };
+
+      /**
+       * Changes the background of the parent element depending on the initial outcome
+       * of the lane.
+       */
+      LibraryMQCControl.prototype.loadBGFromInitial = function (lane_control) {
+        lane_control.extra_handler = this;
+        this.lane_control = lane_control;
+        switch (lane_control.data(this.CONFIG_INITIAL)){
+          case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
+          case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
+        }
+        lane_control.find(this.LANE_MQC_WORKING_CLASS).empty();
+      };
+
+      LibraryMQCControl.prototype.loadBGFromInitialWithPreliminary = function (lane_control) {
+        this.loadBGFromInitial(lane_control);
+        switch (lane_control.data(this.CONFIG_INITIAL)) {
+          case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPreliminaryBG(); break;
+          case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPreliminaryBG(); break;
+        }
+      };
+
+      return LibraryMQCControl;
+    }) ();
+    QC.LibraryMQCControl = LibraryMQCControl;
+    /* Plex */
+
+    var LanePageMQCControl = (function () {
+      function LanePageMQCControl (abstractConfiguration){
+        this.abstractConfiguration = abstractConfiguration;
+        this.mqc_run_data          = null;
+      }
+
+      LanePageMQCControl.prototype.initQC = function (mqc_run_data, plexes, targetFunction, mopFunction) {
+        var result = null;
+        if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //There is a data object
+          this.mqc_run_data = mqc_run_data;
+          if(true)/*(this.isStateForMQC(mqc_run_data))*/ {
+            result = targetFunction(mqc_run_data, this, plexes);
+          } else {
+            result = mopFunction();
+          }
+        } else {
+          result = mopFunction();
+        }
+        return result;
+      };
+
+      LanePageMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
+        if(typeof(mqc_run_data) === "undefined"
+            || mqc_run_data == null
+            || typeof(lanes) === "undefined"
+            || lanes == null) {
+          throw new Error("invalid arguments");
+        }
+        var result = null;
+        var self = this;
+        for(var i = 0; i < lanes.length; i++) {
+          var cells = lanes[i].children('.lane_mqc_control');
+          for(j = 0; j < cells.length; j++) {
+            obj = $(cells[j]); //Wrap as an jQuery object.
+            //Lane from row.
+            var position = obj.data('position');
+            var tag_index = obj.data('tag_index');
+            //Filling previous outcomes
+            if('qc_lane_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
+              //From REST
+              current_status = mqc_run_data.qc_lane_status[position];
+              //To html element, LaneControl will render.
+              obj.data('initial', current_status);
+            }
+            //Set up mqc controlers and link them to the individual lanes.
+            var c = new NPG.QC.LibraryMQCControl(i, self.abstractConfiguration);
+            c.linkControl(obj);
+          }
+        }
+        return result;
+      };
+
+      return LanePageMQCControl;
+    }) ();
+    QC.LanePageMQCControl = LanePageMQCControl;
 
     /**
      * Object with rules for general things about QC and its
