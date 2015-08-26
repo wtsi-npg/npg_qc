@@ -127,6 +127,12 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
       window.console && console.log("Position " + position);
 
       var save_all = $($('.lane_mqc_save')[0]);
+      var all_accept = $($('.lane_mqc_accept_all')[0]);
+      var all_reject = $($('.lane_mqc_reject_all')[0]);
+      var all_und = $($('.lane_mqc_undecided_all')[0]);
+      all_accept.hide();
+      all_reject.hide();
+      all_und.hide();
       save_all.hide();
 
       var jqxhr = $.ajax({
@@ -136,6 +142,37 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
         var control = new NPG.QC.LanePageMQCControl(prodConfiguration);
         var mqc_run_data = jqxhr.responseJSON;
         if(control.isStateForMQC(mqc_run_data)) {
+          all_accept.off("click").on("click", function () {
+            var new_outcome;
+            for (var i = 0; i < lanes.length; i++) {
+              obj = $(lanes[i].children('.lane_mqc_control')[0]);
+              var controller = obj.data('gui_controller');
+              controller.updateOutcome(controller.CONFIG_ACCEPTED_PRELIMINARY);
+              new_outcome = new_outcome || controller.CONFIG_ACCEPTED_PRELIMINARY;
+            }
+            $('input:radio').val([new_outcome]);
+          });
+          all_reject.off("click").on("click", function () {
+            var new_outcome;
+            for (var i = 0; i < lanes.length; i++) {
+              obj = $(lanes[i].children('.lane_mqc_control')[0]);
+              var controller = obj.data('gui_controller');
+              controller.updateOutcome(controller.CONFIG_REJECTED_PRELIMINARY);
+              new_outcome = new_outcome || controller.CONFIG_REJECTED_PRELIMINARY;
+            }
+            $('input:radio').val([new_outcome]);
+          });
+          all_und.off("click").on("click", function () {
+            var new_outcome;
+            for (var i = 0; i < lanes.length; i++) {
+              obj = $(lanes[i].children('.lane_mqc_control')[0]);
+              var controller = obj.data('gui_controller');
+              controller.updateOutcome(controller.CONFIG_UNDECIDED);
+              new_outcome = new_outcome || controller.CONFIG_UNDECIDED;
+            }
+            $('input:radio').val([new_outcome]);
+          });
+
           save_all.off("click").on("click", function() {
             var preliminaryOutcomes = 0;
             for (var i = 0; i < lanes.length; i++) {
@@ -160,7 +197,10 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
               $($('.lane_mqc_save')[0]).hide();
             } //for
           }); //save_all
-          save_all.show();
+          all_accept.show();
+          all_reject.show();
+          all_und.show();
+          //save_all.show();
 
           //var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);
           if (true) /*(DWHMatch.outcome)*/ {
