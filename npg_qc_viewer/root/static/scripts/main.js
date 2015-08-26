@@ -136,12 +136,11 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
         var control = new NPG.QC.LanePageMQCControl(prodConfiguration);
         var mqc_run_data = jqxhr.responseJSON;
         if(control.isStateForMQC(mqc_run_data)) {
-          save_all.data('link', {'individual_controls' : []});
           save_all.off("click").on("click", function() {
             var preliminaryOutcomes = 0;
             for (var i = 0; i < lanes.length; i++) {
               obj = $(lanes[i].children('.lane_mqc_control')[0]);
-              var controller = obj.data('extra_handler');
+              var controller = obj.data('gui_controller');
               var tag_index  = obj.data('tag_index');
               window.console && console.log('tag_index ' + tag_index + ' outcome ' + controller.outcome);
               if (controller.outcome != controller.CONFIG_UNDECIDED) {
@@ -155,7 +154,7 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
             if (preliminaryOutcomes == lanes.length) {
               for (var i = 0; i < lanes.length; i++) {
                 obj = $(lanes[i].children('.lane_mqc_control')[0]);
-                var controller = obj.data('extra_handler');
+                var controller = obj.data('gui_controller');
                 controller.saveAsFinalOutcome();
               }
               $($('.lane_mqc_save')[0]).hide();

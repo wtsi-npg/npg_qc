@@ -260,7 +260,7 @@ var NPG;
        * Links the individual object with an mqc controller so it can allow mqc of a lane.
        */
       LaneMQCControl.prototype.linkControl = function(lane_control) {
-        lane_control.extra_handler = this;
+        lane_control.data('gui_controller', this);
         this.lane_control = lane_control;
         if ( typeof(lane_control.data(this.CONFIG_INITIAL)) === "undefined") {
           //If it does not have initial outcome
@@ -287,7 +287,7 @@ var NPG;
        * of the lane.
        */
       LaneMQCControl.prototype.loadBGFromInitial = function (lane_control) {
-        lane_control.extra_handler = this;
+        lane_control.data('gui_controller', this);
         this.lane_control = lane_control;
         switch (lane_control.data(this.CONFIG_INITIAL)){
           case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
@@ -311,7 +311,7 @@ var NPG;
     /* Plex */
     var LibraryMQCControl = (function () {
       /**
-       * Controller for individual lanes GUI.
+       * Controller for individual plexes GUI.
        * @param index {Number}
        * @param abstractConfiguration {Object}
        * @memberof module:NPG/QC
@@ -505,7 +505,7 @@ var NPG;
        * Links the individual object with an mqc controller so it can allow mqc of a lane.
        */
       LibraryMQCControl.prototype.linkControl = function(lane_control) {
-        lane_control.extra_handler = this;
+        lane_control.data('gui_controller', this);
         this.lane_control = lane_control;
         if ( typeof(lane_control.data(this.CONFIG_INITIAL)) === "undefined") {
           //If it does not have initial outcome
@@ -532,8 +532,7 @@ var NPG;
        * of the lane.
        */
       LibraryMQCControl.prototype.loadBGFromInitial = function (lane_control) {
-        lane_control.data('extra_handler', this);
-        lane_control.extra_handler = this;
+        lane_control.data('gui_controller', this);
         this.lane_control = lane_control;
         switch (lane_control.data(this.CONFIG_INITIAL)){
           case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
@@ -561,6 +560,8 @@ var NPG;
         this.mqc_run_data          = null;
         this.QC_IN_PROGRESS        = 'qc in progress';
         this.QC_ON_HOLD            = 'qc on hold';
+
+        this.DATA_TAG_INDEX        = 'tag_index';
       }
 
       LanePageMQCControl.prototype.initQC = function (mqc_run_data, plexes, targetFunction, mopFunction) {
@@ -629,7 +630,7 @@ var NPG;
           for(j = 0; j < cells.length; j++) {
             obj = $(cells[j]); //Wrap as an jQuery object.
             //Lane from row.
-            var tag_index = obj.data('tag_index');
+            var tag_index = obj.data(this.DATA_TAG_INDEX);
             //Filling previous outcomes
             if('qc_plex_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
               //From REST
@@ -659,7 +660,7 @@ var NPG;
           for(j = 0; j < cells.length; j++) {
             obj = $(cells[j]); //Wrap as an jQuery object.
             //Plex from row.
-            var tag_index = obj.data('tag_index');
+            var tag_index = obj.data(this.DATA_TAG_INDEX);
             //Filling previous outcomes
             if('qc_plex_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
               //From REST
@@ -670,7 +671,6 @@ var NPG;
             //Set up mqc controlers and link them to the individual lanes.
             var c = new NPG.QC.LibraryMQCControl(i, self.abstractConfiguration);
             c.linkControl(obj);
-            obj.data('extra_handler', c);
           }
         }
         return result;
