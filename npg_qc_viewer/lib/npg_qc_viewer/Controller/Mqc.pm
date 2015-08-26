@@ -174,6 +174,45 @@ sub get_current_outcome : Path('get_current_outcome') {
   return;
 }
 
+sub get_current_library_outcome : Path('get_current_library_outcome') {
+  my ($self, $c) = @_;
+
+  my $desc;
+  my $error;
+  try {
+    $self->_validate_req_method($c, $ALLOW_METHOD_GET);
+
+    my $params = $c->request->parameters;
+    my $position  = $params->{'position'};
+    my $id_run    = $params->{'id_run'};
+    my $tag_index = $params->{'tag_index'};
+
+    if (!$id_run) {
+      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
+    }
+    if (!$position) {
+      $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
+    }
+    if (!$tag_index) {
+      $self->raise_error(q[Tag_index should be defined], $BAD_REQUEST_CODE);
+    }
+
+    my $ent = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->search(
+      {id_run => $id_run, position => $position, tag_index => $tag_index})->next;
+    $desc = $ent ? $ent->mqc_outcome->short_desc : q[];
+  } catch {
+    my $error_code;
+    ($error, $error_code) = $self->parse_error($_);
+    _set_response($c, {message => qq[Error : $error]}, $error_code)
+  };
+
+  if (!$error) {
+    _set_response($c, {'outcome'=>$desc});
+  }
+
+  return;
+}
+
 #For future use
 sub get_all_outcomes : Path('get_all_outcomes') {
   my ($self, $c) = @_;

@@ -559,13 +559,15 @@ var NPG;
       function LanePageMQCControl (abstractConfiguration){
         this.abstractConfiguration = abstractConfiguration;
         this.mqc_run_data          = null;
+        this.QC_IN_PROGRESS        = 'qc in progress';
+        this.QC_ON_HOLD            = 'qc on hold';
       }
 
       LanePageMQCControl.prototype.initQC = function (mqc_run_data, plexes, targetFunction, mopFunction) {
         var result = null;
         if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //There is a data object
           this.mqc_run_data = mqc_run_data;
-          if(true)/*(this.isStateForMQC(mqc_run_data))*/ {
+          if(this.isStateForMQC(mqc_run_data)) {
             result = targetFunction(mqc_run_data, this, plexes);
           } else {
             result = mopFunction();
@@ -574,6 +576,73 @@ var NPG;
           result = mopFunction();
         }
         return result;
+      };
+
+      /**
+       * Checks all conditions related with the user in session and the
+       * status of the run. Validates the user has privileges, has role,
+       * the run is in correct status and the user in session is the
+       * same as the user who took the QCing.
+       * @param mqc_run_data {Object} Run status data
+       */
+      LanePageMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
+        if(typeof(mqc_run_data) === "undefined"
+            || mqc_run_data == null) {
+          throw new Error("invalid arguments");
+        }
+
+        var result = typeof(mqc_run_data.taken_by) !== "undefined"  //Data object has all values needed.
+          && typeof(mqc_run_data.current_user)!== "undefined"
+          && typeof(mqc_run_data.has_manual_qc_role)!== "undefined"
+          && typeof(mqc_run_data.current_status_description)!== "undefined"
+          && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
+          && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
+          && (mqc_run_data.current_status_description == this.QC_IN_PROGRESS
+            || mqc_run_data.current_status_description == this.QC_ON_HOLD)
+        return result;
+      };
+
+      /**
+       * Iterates through lanes and shows the outcomes
+       * @param mqc_run_data
+       * @param lanes
+       */
+      LanePageMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
+        if(typeof(mqc_run_data) === "undefined"
+            || mqc_run_data == null
+            || typeof(lanes) === "undefined"
+            || lanes == null) {
+          throw new Error("invalid arguments");
+        }
+        var self = this;
+
+        for(var i = 0; i < lanes.length; i++) {
+          lanes[i].children('.lane_mqc_control').each(function(j, obj){
+            $(obj).html("<span class='lane_mqc_working'><img src='"
+                + self.abstractConfiguration.getRoot()
+                + "/images/waiting.gif' width='10' height='10' title='Processing request.'></span>");
+          });
+        }
+
+        for(var i = 0; i < lanes.length; i++) {
+          var cells = lanes[i].children('.lane_mqc_control');
+          for(j = 0; j < cells.length; j++) {
+            obj = $(cells[j]); //Wrap as an jQuery object.
+            //Lane from row.
+            var tag_index = obj.data('tag_index');
+            //Filling previous outcomes
+            if('qc_plex_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
+              //From REST
+              current_status = mqc_run_data.qc_plex_status[tag_index];
+              //To html element, LaneControl will render.
+              obj.data('initial', current_status);
+            }
+            //Set up mqc controlers and link them to the individual lanes.
+            var c = new NPG.QC.LibraryMQCControl(i, self.abstractConfiguration);
+            c.loadBGFromInitialWithPreliminary(obj);
+            lanes[i].children('.padded_anchor').removeClass("padded_anchor");
+          }
+        }
       };
 
       LanePageMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
@@ -589,13 +658,12 @@ var NPG;
           var cells = lanes[i].children('.lane_mqc_control');
           for(j = 0; j < cells.length; j++) {
             obj = $(cells[j]); //Wrap as an jQuery object.
-            //Lane from row.
-            var position = obj.data('position');
+            //Plex from row.
             var tag_index = obj.data('tag_index');
             //Filling previous outcomes
-            if('qc_lane_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
+            if('qc_plex_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
               //From REST
-              current_status = mqc_run_data.qc_lane_status[position];
+              current_status = mqc_run_data.qc_plex_status[tag_index];
               //To html element, LaneControl will render.
               obj.data('initial', current_status);
             }

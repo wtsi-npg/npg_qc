@@ -123,67 +123,83 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
     } else {
       window.console && console.log("Run + Lane page");
       window.console && console.log("Run " + id_run);
-      window.console && console.log("Position " + runTitleParserResult.position);
+      var position = runTitleParserResult.position;
+      window.console && console.log("Position " + position);
 
-      var control = new NPG.QC.LanePageMQCControl(prodConfiguration);
-      var mqc_run_data = {};
       var save_all = $($('.lane_mqc_save')[0]);
-      save_all.data('link', {'individual_controls' : []});
-      save_all.off("click").on("click", function() {
-        var preliminaryOutcomes = 0;
-        for (var i = 0; i < lanes.length; i++) {
-          obj = $(lanes[i].children('.lane_mqc_control')[0]);
-          var controller = obj.data('extra_handler');
-          var tag_index  = obj.data('tag_index');
-          window.console && console.log('tag_index ' + tag_index + ' outcome ' + controller.outcome);
-          if (controller.outcome != controller.CONFIG_UNDECIDED) {
-            preliminaryOutcomes++;
+      save_all.hide();
+
+      var jqxhr = $.ajax({
+        url: "/mqc/mqc_libraries/" + id_run + '_' + position,
+        cache: false
+      }).done(function() {
+        var control = new NPG.QC.LanePageMQCControl(prodConfiguration);
+        var mqc_run_data = jqxhr.responseJSON;
+        if(control.isStateForMQC(mqc_run_data)) {
+          save_all.data('link', {'individual_controls' : []});
+          save_all.off("click").on("click", function() {
+            var preliminaryOutcomes = 0;
+            for (var i = 0; i < lanes.length; i++) {
+              obj = $(lanes[i].children('.lane_mqc_control')[0]);
+              var controller = obj.data('extra_handler');
+              var tag_index  = obj.data('tag_index');
+              window.console && console.log('tag_index ' + tag_index + ' outcome ' + controller.outcome);
+              if (controller.outcome != controller.CONFIG_UNDECIDED) {
+                preliminaryOutcomes++;
+              } else {
+                $("#ajax_status").append("<li class='failed_mqc'>"
+                    + "Tag " + tag_index + ' can not be undecided.</li>');
+                break;
+              }
+            }
+            if (preliminaryOutcomes == lanes.length) {
+              for (var i = 0; i < lanes.length; i++) {
+                obj = $(lanes[i].children('.lane_mqc_control')[0]);
+                var controller = obj.data('extra_handler');
+                controller.saveAsFinalOutcome();
+              }
+              $($('.lane_mqc_save')[0]).hide();
+            } //for
+          }); //save_all
+          save_all.show();
+
+          //var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);
+          if (true) /*(DWHMatch.outcome)*/ {
+            control.initQC(mqc_run_data, lanes,
+              function (mqc_run_data, runMQCControl, lanes) {
+                //Show working icons
+                for(var i = 0; i < lanes.length; i++) {
+                  lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                    obj = $(obj);
+                    obj.html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                  });
+                }
+                runMQCControl.prepareLanes(mqc_run_data, lanes);
+              },
+              function () { //There is no mqc so I just remove the working image and padding for anchor
+                $('.lane_mqc_working').empty();
+              }
+            );
           } else {
             $("#ajax_status").append("<li class='failed_mqc'>"
-                + "Tag " + tag_index + ' can not be undecided.</li>');
-            break;
+                + "Conflicting data when comparing Data Ware House and Manual QC databases for run: "
+                + id_run
+                + ", lane: "
+                + DWHMatch.position
+                + ". Displaying of QC widgets aborted.</li>");
+            //Clear progress icon
+            $('.lane_mqc_working').empty();
           }
-        }
-        if (preliminaryOutcomes == lanes.length) {
-          for (var i = 0; i < lanes.length; i++) {
-            obj = $(lanes[i].children('.lane_mqc_control')[0]);
-            var controller = obj.data('extra_handler');
-            controller.saveAsFinalOutcome();
-          }
-          $($('.lane_mqc_save')[0]).hide();
-        }
-      });
-      if(true) {
-        /*var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);*/
-        if (true) /*(DWHMatch.outcome)*/ {
-          control.initQC(mqc_run_data, lanes,
-            function (mqc_run_data, runMQCControl, lanes) {
-              //Show working icons
-              for(var i = 0; i < lanes.length; i++) {
-                lanes[i].children('.lane_mqc_control').each(function(j, obj){
-                  obj = $(obj);
-                  obj.html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
-                });
-              }
-              runMQCControl.prepareLanes(mqc_run_data, lanes);
-            },
-            function () { //There is no mqc so I just remove the working image and padding for anchor
-              $('.lane_mqc_working').empty();
-            }
-          );
         } else {
-          $("#ajax_status").append("<li class='failed_mqc'>"
-              + "Conflicting data when comparing Data Ware House and Manual QC databases for run: "
-              + id_run
-              + ", lane: "
-              + DWHMatch.position
-              + ". Displaying of QC widgets aborted.</li>");
-          //Clear progress icon
-          $('.lane_mqc_working').empty();
-        }
-      } else {
-        control.showMQCOutcomes(jqxhr.responseJSON, lanes);
-      }
+          control.showMQCOutcomes(jqxhr.responseJSON, lanes);
+        } //if(true)
+
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        window.console && console.log( "error: " + errorThrown + " " + textStatus);
+        $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
+        //Clear progress icon
+        $('.lane_mqc_working').empty();
+      });
     }
   }
 

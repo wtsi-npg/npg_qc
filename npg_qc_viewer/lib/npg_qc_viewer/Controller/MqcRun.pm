@@ -74,6 +74,63 @@ sub mqc_runs_GET {
   return;
 }
 
+## no critic (NamingConventions::Capitalization)
+sub mqc_libraries : Path('/mqc/mqc_libraries') : ActionClass('REST') { }
+
+sub mqc_libraries_GET {
+  my ( $self, $c, $id_run_position ) = @_;
+  my $error;
+  my $authenticated = 0;
+
+  try {
+    try {
+      ####Authorisation
+      $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
+      $authenticated = 1;
+    } catch {
+      $authenticated = 0;
+    };
+
+    #Get from DB
+    my ($id_run, $position) = split(/_/, $id_run_position);
+    my $ent = $c->model('NpgDB')->resultset('RunStatus')->find({'id_run' => $id_run, 'iscurrent' => 1},);
+    my $qc_outcomes = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->get_outcomes_as_hash($id_run, $position);
+
+    # Return a 200 OK, with the data in entity
+    # serialized in the body
+    if($ent) {
+      my $hash_entity = {};
+      $hash_entity->{'id_run'}                     = $id_run;
+      $hash_entity->{'position'}                   = $position;
+      $hash_entity->{'current_status_description'} = $ent->run_status_dict->description;
+      #username from status 
+      $hash_entity->{'taken_by'}                   = $ent->user->username;
+      ##### Check if there are mqc values and add.
+      $hash_entity->{'qc_plex_status'}             = $qc_outcomes;
+
+      #username from authentication
+      $hash_entity->{'current_user'}               = $authenticated ? $c->user->username                : q[];
+      $hash_entity->{'has_manual_qc_role'}         = $authenticated ? $c->check_user_roles(($MQC_ROLE)) : q[];
+
+      $self->status_ok($c, entity => $hash_entity,);
+    }
+  } catch {
+    $error = $_;
+  };
+
+  my $error_code;
+
+  if ($error) {
+    ( $error, $error_code ) = $self->parse_error($error);
+    $self->status_internal_server_error(
+      $c,
+      message => $error,
+    );
+  }
+
+  return;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
