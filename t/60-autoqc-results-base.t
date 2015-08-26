@@ -118,6 +118,7 @@ subtest 'extended_base' => sub {
   my $eb = npg_qc::autoqc::results::test_extended->new(
     id_run => 1, position => 3, tag_index => 3
   );
+
   is ($eb->composition->num_components, 1, 'composition created');
   ok ($eb->is_old_style_result, 'old style object');
   is ($eb->to_string,

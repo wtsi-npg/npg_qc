@@ -5,18 +5,14 @@ use namespace::autoclean;
 use Carp;
 use Readonly;
 
-use npg_qc::illumina::sequence::component;
-use npg_qc::illumina::sequence::composition;
-
-with qw( npg_qc::autoqc::role::result );
+with qw( npg_qc::illumina::sequence::factory
+         npg_qc::autoqc::role::result );
 
 our $VERSION = '0';
 
-Readonly::Scalar my $COMPOSITION_PACKAGE => 'npg_qc::illumina::sequence::composition';
-
 has 'composition' => (
     is         => 'ro',
-    isa        => $COMPOSITION_PACKAGE,
+    isa        => 'npg_qc::illumina::sequence::composition',
     lazy_build => 1,
     handles   => {
       'composition_digest' => 'digest',
@@ -24,19 +20,16 @@ has 'composition' => (
 );
 sub _build_composition {
   my $self = shift;
-  my $composition = $COMPOSITION_PACKAGE->new();
-  if ($self->is_old_style_result()) {
-    my $c = npg_qc::illumina::sequence::component->new(
-      id_run    => $self->id_run,
-      position  => $self->position,
-      tag_index => $self->can('tag_index') && defined $self->tag_index
-                 ? $self->tag_index : undef,
-      subset    => $self->can('subset') && defined $self->subset
-                 ? $self->subset : undef,
-    );
-    $composition->add_component($c);
+  my $c;
+  if ($self->is_old_style_result) {
+    $c = $self->create_sequence_composition();
+    if (!defined $c) {
+      croak 'Failed to generate composition';
+    }
+  } else {
+    $c = npg_qc::illumina::sequence::composition->new();
   }
-  return $composition;
+  return $c;
 }
 
 sub is_old_style_result {
@@ -67,7 +60,7 @@ around 'equals_byvalue' => sub {
     if ($self->is_old_style_result()) {
       $comp =  $self->$orig($other);
     } else {
-      if ($other_type eq $COMPOSITION_PACKAGE) {
+      if ($other_type eq ref $self->composition) {
         $comp = ($self->composition_digest cmp $other->digest) == 0 ? 1 : 0;
       }
     }
