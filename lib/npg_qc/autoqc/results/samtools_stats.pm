@@ -40,6 +40,11 @@ sub execute {
   return;
 }
 
+override 'filename_root' => sub  {
+  my $self = shift;
+  return join q[_], super(), $self->filter;
+};
+
 __PACKAGE__->meta->make_immutable;
 
 1;
