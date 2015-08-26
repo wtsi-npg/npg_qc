@@ -415,15 +415,6 @@ var NPG;
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
-        self.lane_control.append($("<span class='lane_mqc_save' title='Save current outcome as final (can not be changed again)'><img src='" +
-            self.abstractConfiguration.getRoot() +
-            "/images/padlock.png'></span>"));
-        self.lane_control.children('.lane_mqc_save').off("click").on("click", function() {
-          self.saveAsFinalOutcome();
-        });
-        if (self.outcome == self.CONFIG_UNDECIDED) {
-          self.lane_control.children('.lane_mqc_save').hide();
-        }
         //link the radio group to the update function
         $("input[name='" + name + "']").on("change", function () {
           self.updateOutcome(this.value);
@@ -483,12 +474,12 @@ var NPG;
 
       LibraryMQCControl.prototype.setAcceptedPre = function() {
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINARY;
-        this.lane_control.children('.lane_mqc_save').show();
+        /*this.lane_control.children('.lane_mqc_save').show();*/
       };
 
       LibraryMQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINARY;
-        this.lane_control.children('.lane_mqc_save').show();
+        /*this.lane_control.children('.lane_mqc_save').show();*/
       };
 
       LibraryMQCControl.prototype.setAcceptedFinal = function() {
@@ -507,7 +498,7 @@ var NPG;
 
       LibraryMQCControl.prototype.setUndecided = function() {
         this.outcome = this.CONFIG_UNDECIDED;
-        this.lane_control.children('.lane_mqc_save').hide();
+        /*this.lane_control.children('.lane_mqc_save').hide();*/
       };
 
       /**
@@ -518,7 +509,7 @@ var NPG;
         this.lane_control = lane_control;
         if ( typeof(lane_control.data(this.CONFIG_INITIAL)) === "undefined") {
           //If it does not have initial outcome
-          this.outcome = this.CONFIG_UNDECIDED;
+          this.outcome = this.CONFIG_ACCEPTED_PRELIMINARY;
           this.generateActiveControls();
         } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINARY
             || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINARY
@@ -541,6 +532,7 @@ var NPG;
        * of the lane.
        */
       LibraryMQCControl.prototype.loadBGFromInitial = function (lane_control) {
+        lane_control.data('extra_handler', this);
         lane_control.extra_handler = this;
         this.lane_control = lane_control;
         switch (lane_control.data(this.CONFIG_INITIAL)){
@@ -610,6 +602,7 @@ var NPG;
             //Set up mqc controlers and link them to the individual lanes.
             var c = new NPG.QC.LibraryMQCControl(i, self.abstractConfiguration);
             c.linkControl(obj);
+            obj.data('extra_handler', c);
           }
         }
         return result;

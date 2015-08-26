@@ -72,8 +72,6 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
   var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
   //If id_run //TODO move to object.
   if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
-
-
     var id_run = runTitleParserResult.id_run;
     var prodConfiguration = new NPG.QC.ProdConfiguration();
 
@@ -129,6 +127,32 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
 
       var control = new NPG.QC.LanePageMQCControl(prodConfiguration);
       var mqc_run_data = {};
+      var save_all = $($('.lane_mqc_save')[0]);
+      save_all.data('link', {'individual_controls' : []});
+      save_all.off("click").on("click", function() {
+        var preliminaryOutcomes = 0;
+        for (var i = 0; i < lanes.length; i++) {
+          obj = $(lanes[i].children('.lane_mqc_control')[0]);
+          var controller = obj.data('extra_handler');
+          var tag_index  = obj.data('tag_index');
+          window.console && console.log('tag_index ' + tag_index + ' outcome ' + controller.outcome);
+          if (controller.outcome != controller.CONFIG_UNDECIDED) {
+            preliminaryOutcomes++;
+          } else {
+            $("#ajax_status").append("<li class='failed_mqc'>"
+                + "Tag " + tag_index + ' can not be undecided.</li>');
+            break;
+          }
+        }
+        if (preliminaryOutcomes == lanes.length) {
+          for (var i = 0; i < lanes.length; i++) {
+            obj = $(lanes[i].children('.lane_mqc_control')[0]);
+            var controller = obj.data('extra_handler');
+            controller.saveAsFinalOutcome();
+          }
+          $($('.lane_mqc_save')[0]).hide();
+        }
+      });
       if(true) {
         /*var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);*/
         if (true) /*(DWHMatch.outcome)*/ {
