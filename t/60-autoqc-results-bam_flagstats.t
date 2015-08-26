@@ -129,7 +129,7 @@ subtest 'high-level parsing - backwards compatibility' => sub {
         qr/markdups_metrics_file not found/, 'execute method fails';
     } else {
       lives_ok { $r->execute() } 'execute method is ok';
-    }      
+    } 
 
     my $result_json;
     lives_ok {
@@ -141,7 +141,10 @@ subtest 'high-level parsing - backwards compatibility' => sub {
     delete $from_json_hash->{__CLASS__};
     delete $from_json_hash->{$dups_attr_name};
     delete $from_json_hash->{$fstat_attr_name};
-
+    if ($count == 2) {
+      $expected->{$stats_attr_name} = {};
+      $expected->{'related_objects'} = [];
+    }
     is_deeply($from_json_hash, $expected, 'correct json output');
     is($r->total_reads(), 32737230 , 'total reads');
     is($r->total_mapped_reads(), '30992462', 'total mapped reads');
@@ -165,7 +168,7 @@ subtest 'high-level parsing - backwards compatibility' => sub {
     'no input file - execute fails';
 };
 
-subtest 'finding files, ca;culating metrics' => sub {
+subtest 'finding files, calculating metrics' => sub {
   plan tests => 12;
 
   my $data_path = 't/data/autoqc/bam_flagstats';

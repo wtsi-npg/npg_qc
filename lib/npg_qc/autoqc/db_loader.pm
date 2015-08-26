@@ -2,6 +2,7 @@ package npg_qc::autoqc::db_loader;
 
 use Moose;
 use namespace::autoclean;
+use Class::Load qw/load_class/;
 use Carp;
 use JSON;
 use Try::Tiny;
@@ -12,7 +13,6 @@ use Readonly;
 use npg_qc::Schema;
 use npg_tracking::util::types;
 use npg_qc::autoqc::role::result;
-use npg_qc::autoqc::results::bam_flagstats;
 
 with qw/MooseX::Getopt/;
 
@@ -123,11 +123,11 @@ sub _json2db{
         npg_qc::autoqc::role::result->class_names($class_name);
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-
-        if ($class_name eq 'bam_flagstats') { # need to get the subset/human_split field correctly
-                                            # if one of them is missing
-          my $module = 'npg_qc::autoqc::results::' . $class_name;
-          $values = decode_json($module->load($json_file)->freeze());
+        my $module = 'npg_qc::autoqc::results::' . $class_name;
+        load_class($module);
+        my $instance = $module->load($json_file);
+        if ($class_name eq 'bam_flagstats') {
+          $values = decode_json($instance->freeze());
         }
 
         my $rs = $self->schema->resultset($dbix_class_name);
@@ -239,6 +239,8 @@ npg_qc::autoqc::db_loader
 =item Moose
 
 =item namespace::autoclean
+
+=item Class::Load
 
 =item MooseX::Getopt
 

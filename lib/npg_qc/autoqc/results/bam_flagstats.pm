@@ -6,12 +6,22 @@ use Carp;
 use English qw(-no_match_vars);
 use Perl6::Slurp;
 use List::Util qw(sum);
-use File::Spec::Functions qw(splitpath catfile catpath);
+use File::Spec::Functions qw( splitpath
+                              catpath
+                              catfile
+                              splitdir
+                              catdir );
 use Readonly;
 
 use npg_tracking::util::types;
+use npg_qc::autoqc::results::sequence_summary;
+use npg_qc::autoqc::results::samtools_stats;
+
 extends qw( npg_qc::autoqc::results::result );
-with    qw( npg_qc::autoqc::role::bam_flagstats );
+with    qw(
+            npg_qc::illumina::sequence::factory
+            npg_qc::autoqc::role::bam_flagstats
+          );
 
 our $VERSION = '0';
 
@@ -81,6 +91,7 @@ has 'sequence_file' => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
     required   => 0,
+    predicate  => '_has_sequence_file',
 );
 
 has [ qw/ markdups_metrics_file
@@ -150,17 +161,39 @@ sub _build_samtools_stats_file {
   return $paths;
 }
 
-sub _filter {
-  my ($self, $path) = @_;
+has 'related_objects' => ( isa        => 'ArrayRef[Object]',
+                           is         => 'ro',
+                           lazy_build => 1,
+                           writer     => '_set_related_objects',
+                           predicate  => '_has_related_objects',
+);
+sub _build_related_objects {
+  my $self = shift;
 
-  my ($volume, $directories, $file) = splitpath($path);
-  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
-  if (!$filter) {
-    croak "Failed to get filter from $path";
+  my @objects = ();
+  my $composition = $self->create_sequence_composition();
+  if ($composition) {
+    foreach my $filter (sort keys %{$self->samtools_stats_file}) {
+      push @objects,
+        npg_qc::autoqc::results::samtools_stats->new(
+          composition => $composition,
+          filter      => $filter,
+          stats_file  => $self->samtools_stats_file->{$filter}
+        );
+    }
+    
+    if ($self->_has_sequence_file) {
+      push @objects,
+        npg_qc::autoqc::results::sequence_summary->new(
+          composition   => $composition,
+          sequence_file => $self->sequence_file
+        );
+    }
+    #extra test data are needed, commented out for now
+    #map { $_->execute() } @objects;
   }
-  my $subset = $self->subset ? $self->subset . q[_] : q[];
 
-  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
+  return \@objects;
 }
 
 sub BUILD {
@@ -191,6 +224,15 @@ sub BUILD {
   return;
 }
 
+around 'write2file' => sub {
+  my ($orig, $self, $path) = @_;
+  if ($self->_has_related_objects()) {
+    map { $_->write2file($path) } @{$self->related_objects()};
+  }
+  $self->_set_related_objects([]);
+  return $self->$orig($path);
+};
+
 sub execute {
   my $self = shift;
 
@@ -206,6 +248,8 @@ sub execute {
   open my $fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
   $self->parsing_flagstats($fh);
   close $fh or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
+
+  $self->related_objects();
 
   return;
 }
@@ -294,6 +338,79 @@ sub filename_root {
   }
   return;
 }
+
+sub create_related_objects {
+  my ($self, $path) = @_;
+
+  if (!$self->_has_related_objects()) {
+    if (!$self->sequence_file) {
+      $self->_set_sequence_file(_find_sequence_file($path));
+    }
+    $self->related_objects();
+  }
+
+  return;
+}
+
+sub _find_sequence_file {
+  my $path = shift;
+
+  if (!$path) {
+    croak 'Path should be given';
+  }
+  if (!-f $path) {
+    croak 'File path should be given';
+  }
+  my ($volume, $directories, $file) = splitpath($path);
+  my @dirs = splitdir $directories;
+  pop @dirs; # move one directory up
+  my $count = $file =~ s/json\Z/cram/xms;
+  if ( !$count ) {
+    croak "Expected json file, got $path";
+  }
+  my $seq_file = catpath($volume, catdir @dirs, $file);
+  if ( !-f $seq_file ) {
+    croak "$seq_file is not found, cannot compute related objects for " . __PACKAGE__;
+  }
+  
+  return $seq_file;
+}
+
+sub _filter {
+  my ($self, $path) = @_;
+
+  my ($volume, $directories, $file) = splitpath($path);
+  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
+  if (!$filter) {
+    croak "Failed to get filter from $path";
+  }
+  my $subset = $self->subset ? $self->subset . q[_] : q[];
+
+  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
+}
+
+#sub _some {
+#  if ($obj->can('related_objects') && !$obj->has_related_objects && $obj->can('create_related_objects')) {
+#    $obj->create_related_objects();
+#    foreach my $o (@{$obj->related_objects}) {
+#      $self->values2db(decode_json($o->freeze());
+#    }
+#  }
+#}
+#
+#if ($obj->can('composition') && $obj->can('composition_digest') {
+#  my $d = $obj->composition_digest;
+#  $values->{'digest') = $d;
+#  if (!$components_rs->search({'digest' => $d})->count) {
+#    foreach my $c (@{$obj->composition->components}) {
+#      my $v = decode_json($c->freeze());
+#      $v->{'digest'} = $d;
+#      $v->{'num_components'} = $obj->composition->num_components;
+#      $components_rs->new($v)->set_inflated_columns($v)->insert();
+#    }
+#  }
+#}
+# continue with saving values
 
 __PACKAGE__->meta->make_immutable;
 
