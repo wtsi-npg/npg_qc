@@ -95,24 +95,23 @@ var NPG;
       LaneMQCControl.prototype.updateOutcome = function(outcome) {
         var id_run = this.lane_control.data(this.DATA_ID_RUN);
         var position = this.lane_control.data(this.DATA_POSITION);
-        var control = this;
         var self = this;
-        if(outcome != control.outcome) {
+        if(outcome != self.outcome) {
           //Show progress icon
-          control.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
+          self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
           //AJAX call.
-          $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
+          $.post(self.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
             var response = data;
           }, "json")
           .done(function() {
             switch (outcome) {
-              case control.CONFIG_ACCEPTED_PRELIMINARY : control.setAcceptedPre(); break;
-              case control.CONFIG_REJECTED_PRELIMINARY : control.setRejectedPre(); break;
-              case control.CONFIG_ACCEPTED_FINAL : control.setAcceptedFinal(); break;
-              case control.CONFIG_REJECTED_FINAL : control.setRejectedFinal(); break;
-              case control.CONFIG_UNDECIDED : control.setUndecided(); break;
+              case self.CONFIG_ACCEPTED_PRELIMINARY : self.setAcceptedPre(); break;
+              case self.CONFIG_REJECTED_PRELIMINARY : self.setRejectedPre(); break;
+              case self.CONFIG_ACCEPTED_FINAL       : self.setAcceptedFinal(); break;
+              case self.CONFIG_REJECTED_FINAL       : self.setRejectedFinal(); break;
+              case self.CONFIG_UNDECIDED            : self.setUndecided(); break;
             }
           })
           .fail(function(data) {
@@ -121,7 +120,7 @@ var NPG;
           })
           .always(function(data){
             //Clear progress icon
-            control.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
+            self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });
         } else {
           window.console && console.log("Noting to do.");
@@ -348,24 +347,23 @@ var NPG;
         var id_run    = this.lane_control.data(this.DATA_ID_RUN);
         var position  = this.lane_control.data(this.DATA_POSITION);
         var tag_index = this.lane_control.data(this.DATA_TAG_INDEX);
-        var control   = this;
         var self      = this;
-        if(outcome != control.outcome) {
+        if(outcome != self.outcome) {
           //Show progress icon
-          control.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
+          self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
           //AJAX call.
-          $.post(control.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, tag_index : tag_index, new_oc : outcome}, function(data){
+          $.post(self.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, tag_index : tag_index, new_oc : outcome}, function(data){
             var response = data;
           }, "json")
           .done(function() {
             switch (outcome) {
-              case control.CONFIG_ACCEPTED_PRELIMINARY : control.setAcceptedPre();   break;
-              case control.CONFIG_REJECTED_PRELIMINARY : control.setRejectedPre();   break;
-              case control.CONFIG_ACCEPTED_FINAL       : control.setAcceptedFinal(); break;
-              case control.CONFIG_REJECTED_FINAL       : control.setRejectedFinal(); break;
-              case control.CONFIG_UNDECIDED            : control.setUndecided();     break;
+              case self.CONFIG_ACCEPTED_PRELIMINARY : self.setAcceptedPre();   break;
+              case self.CONFIG_REJECTED_PRELIMINARY : self.setRejectedPre();   break;
+              case self.CONFIG_ACCEPTED_FINAL       : self.setAcceptedFinal(); break;
+              case self.CONFIG_REJECTED_FINAL       : self.setRejectedFinal(); break;
+              case self.CONFIG_UNDECIDED            : self.setUndecided();     break;
             }
           })
           .fail(function(data) {
@@ -374,7 +372,7 @@ var NPG;
           })
           .always(function(data){
             //Clear progress icon
-            control.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
+            self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });
         } else {
           window.console && console.log("Noting to do.");
@@ -509,7 +507,7 @@ var NPG;
         this.lane_control = lane_control;
         if ( typeof(lane_control.data(this.CONFIG_INITIAL)) === "undefined") {
           //If it does not have initial outcome
-          this.outcome = this.CONFIG_ACCEPTED_PRELIMINARY;
+          this.outcome = this.CONFIG_UNDECIDED;
           this.generateActiveControls();
         } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINARY
             || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINARY
