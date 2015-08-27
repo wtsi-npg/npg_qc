@@ -125,9 +125,14 @@ sub _build__file_path_root {
   my $self = shift;
   my $path = q[];
   if ($self->sequence_file) {
-    ($path) = $self->sequence_file =~ /\A(.+)\.[[:lower:]]+\Z/smx;
+    ($path) =  _drop_extension($self->sequence_file);
   }
   return $path;
+}
+sub _drop_extension {
+  my $path = shift;
+  ($path) = $path =~ /\A(.+)\.[[:lower:]]+\Z/smx;
+  return $path
 }
 
 has 'samtools_stats_file' => ( isa        => 'HashRef',
@@ -344,14 +349,12 @@ sub filename_root {
 
 sub create_related_objects {
   my ($self, $path) = @_;
-
   if (!$self->_has_related_objects()) {
     if (!$self->sequence_file) {
       $self->_set_sequence_file(_find_sequence_file($path));
     }
     $self->related_objects();
   }
-
   return;
 }
 
@@ -364,14 +367,16 @@ sub _find_sequence_file {
   if (!-f $path) {
     croak 'File path should be given';
   }
+
   my ($volume, $directories, $file) = splitpath($path);
+  $file = _drop_extension($file);
+  $file =~ s/\Q_bam_flagstats\E\Z//msx;
+  $file = join q[.], $file, 'cram';
   my @dirs = splitdir $directories;
-  pop @dirs; # move one directory up
-  my $count = $file =~ s/json\Z/cram/xms;
-  if ( !$count ) {
-    croak "Expected json file, got $path";
+  if (! pop @dirs) { # move one directory up
+    pop @dirs
   }
-  my $seq_file = catpath($volume, catdir @dirs, $file);
+  my $seq_file = catpath($volume, catdir(@dirs), $file);
   if ( !-f $seq_file ) {
     croak "$seq_file is not found, cannot compute related objects for " . __PACKAGE__;
   }

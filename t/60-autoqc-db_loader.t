@@ -232,12 +232,12 @@ my $num_plex_jsons = 44;
   is($db_loader->load(), 0, 'no files loaded - filtering by lane');
 
   $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
+       schema  => $schema,
        verbose => 0,
-       path => [$path],
-       id_run => [12233],
-       lane => [1,2],
-       check => [qw(pulldown_metrics some_other)],
+       path    => [$path],
+       id_run  => [12233],
+       lane    => [1,2],
+       check   => [qw(pulldown_metrics some_other)],
   );
   is($db_loader->load(), 0, 'no files loaded - filtering by check name');
 
@@ -258,20 +258,21 @@ my $num_plex_jsons = 44;
   is ($db_loader->load(), $num_lane_jsons, 'loading the same files again updates all files');
 
   $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       verbose => 0,
-       path => [$path],
-       update => 0,
+       schema       => $schema,
+       verbose      => 0,
+       path         => [$path],
+       update       => 0,
   );
   is ($db_loader->load(), 0, 'loading the same files again with update option false'); 
 }
 
 {
   my $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       verbose => 0,
-       path => [$path, "$path/lane"],
-       update => 0,
+       schema       => $schema,
+       verbose      => 0,
+       path         => [$path, "$path/lane"],
+       update       => 0,
+       load_related => 0,
   );
   is ($db_loader->load(), $num_plex_jsons, 'loading from two paths without update');
   my $total_count = 0;
@@ -306,9 +307,10 @@ my $num_plex_jsons = 44;
 
 {
   my $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       verbose => 1,
-       path => ['t/data/autoqc/bam_flagstats/qc'],
+       schema       => $schema,
+       verbose      => 1,
+       path         => ['t/data/autoqc/bam_flagstats/qc'],
+       load_related => 0,
   );
   my $file = 't/data/autoqc/bam_flagstats/qc/16960_1#0.bam_flagstats.json';
   my $w = 'Not loading field';
@@ -322,9 +324,10 @@ my $num_plex_jsons = 44;
     'warnings when loading extended bam_flagstats json';
 
   $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       verbose => 0,
-       path => ['t/data/autoqc/bam_flagstats'],
+       schema       => $schema,
+       verbose      => 0,
+       path         => ['t/data/autoqc/bam_flagstats'],
+       load_related => 0,
   );
   throws_ok { $db_loader->load() } qr/Loading aborted, transaction has rolled back/,
     'error loading json result without id_run';

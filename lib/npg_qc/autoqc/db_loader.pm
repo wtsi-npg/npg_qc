@@ -50,6 +50,12 @@ has 'update'  => ( is       => 'ro',
                    default  => 1,
                  );
 
+has 'load_related'  => ( is       => 'ro',
+                         isa      => 'Bool',
+                         required => 0,
+                         default  => 1,
+                       );
+
 has 'json_file' => ( is          => 'ro',
                      isa         => 'ArrayRef',
                      required    => 0,
@@ -127,30 +133,28 @@ sub _json2db{
         npg_qc::autoqc::role::result->class_names($class_name);
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-        if ($json_file) {
+        if ($json_file) { # Stop recursion beyond the original json file
           my $module = 'npg_qc::autoqc::results::' . $class_name;
           load_class($module);
-          my $instance = $module->load($json_file);
+          my $obj = $module->load($json_file);
           if ($class_name eq 'bam_flagstats') {
-            $values = decode_json($instance->freeze());
+            $values = decode_json($obj->freeze());
+          }
+          # Backwards compatibility - load related objects.
+          # New code should create serialized related objects which will
+          # be loaded from json files. For cases where we cannot produce serialized
+          # version of objects, we will generate the objects now.
+          if ( $self->load_related &&
+               $obj->can('related_objects') &&
+               $obj->can('create_related_objects') ) {
+            $obj->create_related_objects($json_file);
+            foreach my $o (@{$obj->related_objects}) {
+              $self->_json2db($o->freeze()); # Recursion
+            }
           }
         }
-
-        my $rs = $self->schema->resultset($dbix_class_name);
-        my $result_class = $rs->result_class;
-
-        $self->_exclude_nondb_attrs($values, $result_class->columns());
-        $result_class->deflate_unique_key_components($values);
-
-        if ($self->update) {
-          $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
-          $count = 1;
-        } else {
-          if (!$rs->find($values)) {
-            $rs->new($values)->set_inflated_columns($values)->insert();
-            $count = 1;
-          }
-        }
+        # Load the main object
+        $count = $self->_values2db($dbix_class_name, $values, $self->update);
       }
     }
   } catch {
@@ -160,6 +164,28 @@ sub _json2db{
   };
   my $m = $count ? 'Loaded' : 'Skipped';
   $self->_log(join q[ ], $m, $json_file || q[json string]);
+  return $count;
+}
+
+sub _values2db {
+  my ($self, $dbix_class_name, $values, $update) = @_;
+
+  my $count = 0;
+  my $rs = $self->schema->resultset($dbix_class_name);
+  my $result_class = $rs->result_class;
+
+  $self->_exclude_nondb_attrs($values, $result_class->columns());
+  $result_class->deflate_unique_key_components($values);
+
+  if ($update) {
+    $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
+    $count = 1;
+  } else {
+    if (!$rs->find($values)) {
+      $rs->new($values)->set_inflated_columns($values)->insert();
+      $count = 1;
+    }
+  }
   return $count;
 }
 
