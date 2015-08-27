@@ -85,6 +85,22 @@ sub update_outcome : Path('update_outcome') {
     }
 
     if (!$tag_index) { # Working as lane MQC
+      my $where = {
+        'me.id_run'    => $id_run,
+        'me.position'  => $position,
+        'me.tag_index' => {'!=' => 0},
+        'entity_type'  => {'!=' => 'library_indexed_spike'},
+      };
+      my $rs = $c->model('MLWarehouseDB')->resultset('IseqProductMetric')->search($where, {
+                    prefetch => ['iseq_run_lane_metric', 'iseq_flowcell'],
+                    order_by => qw[ me.id_run me.position me.tag_index ],
+                    cache    => 1,
+                  });
+      my $tags = [];
+      while(my $prod = $rs->next) {
+        push @{$tags}, $prod->tag_index;
+      }
+
       $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
         {'id_run' => $id_run, 'position' => $position})->next;
       if (!$ent) {
@@ -94,7 +110,7 @@ sub update_outcome : Path('update_outcome') {
           username       => $username,
           modified_by    => $username});
       }
-      $ent->update_outcome($new_outcome, $username);
+      $ent->update_outcome_with_libraries($new_outcome, $username, $tags);
     } else { # Working as library MQC
       $ent = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->search(
         {'id_run' => $id_run, 'position' => $position, 'tag_index' => $tag_index})->next;
@@ -108,7 +124,6 @@ sub update_outcome : Path('update_outcome') {
       }
       $ent->update_outcome($new_outcome, $username);
     }
-
   } catch {
     $error = $_;
   };
@@ -128,8 +143,8 @@ sub update_outcome : Path('update_outcome') {
     }
   }
 
-  my $message = $error || $tag_index ? qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.] 
-                                          : qq[Manual QC $new_outcome for run $id_run, position $position saved.];
+  my $message = $error || ($tag_index ? qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.]
+                                      : qq[Manual QC $new_outcome for run $id_run, position $position saved.]);
   if ($mqc_update_error) {
     $message .= $mqc_update_error;
   }

@@ -115,6 +115,7 @@ var NPG;
             }
           })
           .fail(function(data) {
+            self.lane_control.children('input:radio').val([self.outcome]);
             window.console && console.log(data.responseJSON.message);
             jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
           })
@@ -367,6 +368,7 @@ var NPG;
             }
           })
           .fail(function(data) {
+            self.lane_control.children('input:radio').val([self.outcome]);
             window.console && console.log(data.responseJSON.message);
             jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
           })
@@ -598,6 +600,8 @@ var NPG;
           && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */
           && (mqc_run_data.current_status_description == this.QC_IN_PROGRESS
             || mqc_run_data.current_status_description == this.QC_ON_HOLD)
+          && (mqc_run_data.current_lane_outcome != 'Accepted final'
+            && mqc_run_data.current_lane_outcome != 'Rejected final')
         return result;
       };
 
@@ -988,7 +992,7 @@ var NPG;
               + "name='" + self.group + "' value='" + self.outcome + "'"
               + self.checked + ">" + label;
           return html;
-        }
+        };
 
         /**
          * Generates the HTML code of the radio and the label for this object, wraps
@@ -1003,6 +1007,62 @@ var NPG;
         return MQCOutcomeRadio;
       })();
       UI.MQCOutcomeRadio = MQCOutcomeRadio;
+
+      var MQCLibrary4LaneStats = (function() {
+        MQCLibrary4LaneStats = function(id_run, position, id) {
+          this.id_run = id_run;
+          this.position = position;
+          this.id = id;
+          this.name = 'MQCLibrary4LaneStats';
+          this.css_class = 'mqc_library_4_lane_stats';
+
+          this.uiObject = null;
+          this.uiAccepted = null;
+          this.uiRejected = null;
+          this.uiTotal = null;
+
+          this.STATS_VALUE_CLASS     = 'library_4_lane_stats_value';
+          this.TOTAL_ACCEPTED_CLASS  = 'library_4_lane_stats_accepted';
+          this.TOTAL_REJECTED_CLASS  = 'library_4_lane_stats_rejected';
+          this.TOTAL_LIBRARIES_CLASS = 'library_4_lane_stats_total';
+        }
+
+        MQCLibrary4LaneStats.prototype.update = function (accepted, total, rejected) {
+          var self = this;
+          var values = [accepted, total, rejected];
+          self.uiObject.children(self.STATS_VALUE_CLASS).each(function (i, obj) {
+            obj.text(values.shift());
+          });
+        };
+
+        MQCLibrary4LaneStats.prototype.asHtml = function () {
+          var self = this;
+          var accepted = "<span class='" + self.STATS_VALUE_CLASS + " " + self.TOTAL_ACCEPTED_CLASS + "'></span>/";
+          var rejected = "<span class='" + self.STATS_VALUE_CLASS + " " + self.TOTAL_REJECTED_CLASS + "'></span>/";
+          var total_libraries = "<span class='" + self.STATS_VALUE_CLASS + " " + self.TOTAL_LIBRARIES_CLASS + "'></span>";
+          var html = "<div class='" + self.css_class + "' id=" + self.id + ">"
+                      + accepted
+                      + total_libraries
+                      + rejected
+                      + "</div>";
+
+          return html;
+        };
+
+        MQCLibrary4LaneStats.prototype.asObject = function () {
+          var self = this;
+          var obj = $(self.asHtml());
+          self.uiObject = obj;
+          self.uiAccepted = $(obj.children(self.TOTAL_ACCEPTED_CLASS)[0]);
+          self.uiRejected = $(obj.children(self.TOTAL_REJECTED_CLASS)[0]);
+          self.uiTotal    = $(obj.children(self.TOTAL_LIBRARIES_CLASS)[0]);
+
+          obj.data('npg_controller', self);
+          return obj;
+        };
+        return MQCLibrary4LaneStats;
+      })();
+      UI.MQCLibrary4LaneStats = MQCLibrary4LaneStats;
     })(NPG.QC.UI || (NPG.QC.UI = {}));
     var UI = NPG.QC.UI;
   }) (NPG.QC || (NPG.QC = {}));

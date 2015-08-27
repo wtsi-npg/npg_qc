@@ -195,9 +195,19 @@ sub is_accepted {
   return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
 }
 
+sub is_rejected {
+  my $self = shift;
+  return $self->short_desc =~ m{rejected}ism; #The short description includes the word rejected.
+}
+
 sub is_final_accepted {
   my $self = shift;
   return $self->is_final_outcome && $self->is_accepted;
+}
+
+sub is_undecided {
+  my $self = shift;
+  return $self->short_desc =~ m{undecided}ism;
 }
 
 __PACKAGE__->meta->make_immutable;

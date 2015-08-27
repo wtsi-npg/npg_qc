@@ -95,6 +95,8 @@ sub mqc_libraries_GET {
     my ($id_run, $position) = split(/_/, $id_run_position);
     my $ent = $c->model('NpgDB')->resultset('RunStatus')->find({'id_run' => $id_run, 'iscurrent' => 1},);
     my $qc_outcomes = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->get_outcomes_as_hash($id_run, $position);
+    my $ent_lane = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->find({'id_run' => $id_run, 'position' => $position},);
+    my $current_lane_outcome = $ent_lane ? $ent_lane->mqc_outcome->short_desc : q[Undecided]; 
 
     # Return a 200 OK, with the data in entity
     # serialized in the body
@@ -107,7 +109,7 @@ sub mqc_libraries_GET {
       $hash_entity->{'taken_by'}                   = $ent->user->username;
       ##### Check if there are mqc values and add.
       $hash_entity->{'qc_plex_status'}             = $qc_outcomes;
-
+      $hash_entity->{'current_lane_outcome'}       = $current_lane_outcome;
       #username from authentication
       $hash_entity->{'current_user'}               = $authenticated ? $c->user->username                : q[];
       $hash_entity->{'has_manual_qc_role'}         = $authenticated ? $c->check_user_roles(($MQC_ROLE)) : q[];

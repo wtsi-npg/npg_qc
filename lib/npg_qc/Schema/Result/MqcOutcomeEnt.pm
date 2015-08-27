@@ -230,6 +230,59 @@ around 'insert' => sub {
   return $return_super;
 };
 
+sub update_outcome_with_libraries {
+  my ($self, $outcome, $username, $tag_indexes) = @_;
+
+  my $outcome_dict_object = $self->_valid_outcome($outcome);
+  if($outcome_dict_object->is_final_outcome) {
+    my $outcomes_libraries = $self->fetch_mqc_library_outcomes($tag_indexes);
+    if($outcome_dict_object->is_accepted) {
+      #all plexes with qc
+      if(scalar @{ $tag_indexes } == $outcomes_libraries->count ) {
+        while(my $library = $outcomes_libraries->next) {
+          if ($library->is_undecided) {
+            croak("Error All libraries need to have a pass or fail outcome.");
+          }
+        }
+      } else {
+        croak("Error All libraries need to have an outcome.");
+      }
+    } else {
+      #All plexes with undecided
+      while(my $library = $outcomes_libraries->next) {
+        if (!$library->is_undecided) {
+          croak("Error All libraries need to have undecided outcome.");
+        }
+      }
+    }
+
+    foreach my $tag_index (@$tag_indexes) {
+      my $ent = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt')->search(
+        {'id_run' => $self->id_run, 'position' => $self->position, 'tag_index' => $tag_index})->next;
+      if (!$ent) {
+        $ent = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt')->new_result({
+          id_run         => $self->id_run,
+          position       => $self->position,
+          tag_index      => $tag_index,
+          username       => $username,
+          modified_by    => $username});
+      }
+      my $new_outcome = q[Undecided];
+      if ($ent->in_storage) {
+        if($ent->mqc_outcome->short_desc eq q[Accepted preliminary]) {
+          $new_outcome = q[Accepted final];
+        } elsif ($ent->mqc_outcome->short_desc eq q[Rejected preliminary]) {
+          $new_outcome = q[Rejected final];
+        }
+      }
+      $ent->update_outcome($new_outcome, $username);
+    }
+  }
+
+  $self->update_outcome($outcome, $username);
+  return 1;
+}
+
 sub update_outcome {
   my ($self, $outcome, $username) = @_;
 
@@ -293,9 +346,19 @@ sub _create_historic {
     id_mqc_outcome => $self->id_mqc_outcome,
     username       => $self->username,
     last_modified  => $self->last_modified,
-    modified_by    => $self->modified_by});
-
+    modified_by    => $self->modified_by
+  });
   return 1;
+}
+
+sub fetch_mqc_library_outcomes {
+  my ($self, $tag_indexes) = @_;
+
+  my $rs = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt');
+  $rs->search_rs({'id_run' => $self->id_run,
+    'position' => $self->position,
+  });
+  return $rs;
 }
 
 #Fetches valid outcome object from the database.
