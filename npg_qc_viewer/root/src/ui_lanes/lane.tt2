@@ -19,7 +19,7 @@
      <span class='lane_mqc_accept_all' title='Set all as accepted' hidden><img src='/static/images/tick.png'/></span>
      <span class='lane_mqc_undecided_all' title='Set all as undecided' hidden>und</span>
      <span class='lane_mqc_reject_all' title='Set all as rejected' hidden><img src='/static/images/cross.png'/></span>
-     <span class='lane_mqc_save' title='Save all current outcomes as final' hidden><img src='/static/images/padlock.png'></span>[%- END; -%]
+   [%- END; -%]
 [% END -%]
 [%- IF run_view; -%]
 <span id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'></span>
