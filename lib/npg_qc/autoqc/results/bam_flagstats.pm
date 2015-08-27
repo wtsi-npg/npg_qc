@@ -11,6 +11,7 @@ use File::Spec::Functions qw( splitpath
                               catfile
                               splitdir
                               catdir );
+use Try::Tiny;
 use Readonly;
 
 use npg_tracking::util::types;
@@ -91,7 +92,6 @@ has 'sequence_file' => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
     required   => 0,
-    predicate  => '_has_sequence_file',
 );
 
 has [ qw/ markdups_metrics_file
@@ -171,28 +171,27 @@ sub _build_related_objects {
   my $self = shift;
 
   my @objects = ();
-  my $composition = $self->create_sequence_composition();
-  if ($composition) {
-    foreach my $filter (sort keys %{$self->samtools_stats_file}) {
-      push @objects,
-        npg_qc::autoqc::results::samtools_stats->new(
-          composition => $composition,
-          filter      => $filter,
-          stats_file  => $self->samtools_stats_file->{$filter}
-        );
-    }
-    
-    if ($self->_has_sequence_file) {
+  if ($self->sequence_file) {
+    my $composition = $self->create_sequence_composition();
+    if ($composition) {
+      foreach my $filter (sort keys %{$self->samtools_stats_file}) {
+        push @objects,
+          npg_qc::autoqc::results::samtools_stats->new(
+            composition => $composition,
+            filter      => $filter,
+            stats_file  => $self->samtools_stats_file->{$filter}
+          );
+      }
+
       push @objects,
         npg_qc::autoqc::results::sequence_summary->new(
           composition   => $composition,
           sequence_file => $self->sequence_file
         );
+ 
+      map { $_->execute() } @objects;
     }
-    #extra test data are needed, commented out for now
-    #map { $_->execute() } @objects;
   }
-
   return \@objects;
 }
 
@@ -249,7 +248,11 @@ sub execute {
   $self->parsing_flagstats($fh);
   close $fh or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
 
-  $self->related_objects();
+  try {
+    $self->related_objects();
+  } catch {
+    carp qq[Warning: failed to build related objects: $_];
+  };
 
   return;
 }
@@ -389,29 +392,6 @@ sub _filter {
   return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
 }
 
-#sub _some {
-#  if ($obj->can('related_objects') && !$obj->has_related_objects && $obj->can('create_related_objects')) {
-#    $obj->create_related_objects();
-#    foreach my $o (@{$obj->related_objects}) {
-#      $self->values2db(decode_json($o->freeze());
-#    }
-#  }
-#}
-#
-#if ($obj->can('composition') && $obj->can('composition_digest') {
-#  my $d = $obj->composition_digest;
-#  $values->{'digest') = $d;
-#  if (!$components_rs->search({'digest' => $d})->count) {
-#    foreach my $c (@{$obj->composition->components}) {
-#      my $v = decode_json($c->freeze());
-#      $v->{'digest'} = $d;
-#      $v->{'num_components'} = $obj->composition->num_components;
-#      $components_rs->new($v)->set_inflated_columns($v)->insert();
-#    }
-#  }
-#}
-# continue with saving values
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -484,7 +464,9 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item List::Util
 
-=item File::Spec
+=item File::Spec::Functions
+
+=item Try::Tiny
 
 =item Readonly
 

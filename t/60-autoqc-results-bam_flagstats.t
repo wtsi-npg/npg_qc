@@ -142,7 +142,6 @@ subtest 'high-level parsing - backwards compatibility' => sub {
     delete $from_json_hash->{$dups_attr_name};
     delete $from_json_hash->{$fstat_attr_name};
     if ($count == 2) {
-      $expected->{$stats_attr_name} = {};
       $expected->{'related_objects'} = [];
     }
     is_deeply($from_json_hash, $expected, 'correct json output');
@@ -196,7 +195,9 @@ subtest 'finding files, calculating metrics' => sub {
      'F0xB00' => $data_path . '/16960_1#0_F0xB00.stats',               };
   is_deeply($r->samtools_stats_file, $stats_files, 'stats files are correct');
 
-  lives_ok {$r->execute} 'metrics parsing ok';
+  warning_like {$r->execute}
+    qr{failed to build related objects: Can't open 't/data/autoqc/bam_flagstats/16960_1#0.bam.md5'},
+    'metrics parsing ok, warning about a failure to build related objects';
   is($r->library_size, 240428087, 'library size value');
   is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
 
@@ -214,7 +215,9 @@ subtest 'finding phix subset files (no run id)' => sub {
     sequence_file    => join(q[/], $data_path, '16960_1#0_phix.bam')
   );
 
-  lives_ok {$r->execute} 'metrics parsing ok';
+  warning_like {$r->execute}
+    qr/cannot create npg_qc::illumina::sequence::component object/,
+    'metrics parsing ok, warning about failure to  build related objects';
   is($r->library_size, 691461, 'library size value');
   is($r->mate_mapped_defferent_chr, 0, 'mate_mapped_defferent_chr value');
 
