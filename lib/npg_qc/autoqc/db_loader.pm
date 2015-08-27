@@ -133,28 +133,32 @@ sub _json2db{
         npg_qc::autoqc::role::result->class_names($class_name);
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-        if ($json_file) { # Stop recursion beyond the original json file
-          my $module = 'npg_qc::autoqc::results::' . $class_name;
-          load_class($module);
-          my $obj = $module->load($json_file);
-          if ($class_name eq 'bam_flagstats') {
-            $values = decode_json($obj->freeze());
-          }
-          # Backwards compatibility - load related objects.
-          # New code should create serialized related objects which will
-          # be loaded from json files. For cases where we cannot produce serialized
-          # version of objects, we will generate the objects now.
-          if ( $self->load_related &&
-               $obj->can('related_objects') &&
-               $obj->can('create_related_objects') ) {
-            $obj->create_related_objects($json_file);
-            foreach my $o (@{$obj->related_objects}) {
-              $self->_json2db($o->freeze()); # Recursion
-            }
-          }
+
+        my $module = 'npg_qc::autoqc::results::' . $class_name;
+        load_class($module);
+        my $obj = $module->thaw($json);
+
+        if ($class_name eq 'bam_flagstats') {
+          $values = decode_json($obj->freeze());
+        }
+        if ( $obj->can('composition') && $obj->can('composition_digest') ) {
+          $values->{'digest'} = $self->_ensure_composition_exists($obj);
         }
         # Load the main object
         $count = $self->_values2db($dbix_class_name, $values, $self->update);
+
+        # Backwards compatibility - load related objects.
+        # New code should create serialized related objects which will
+        # be loaded from json files. For cases where we cannot produce serialized
+        # version of objects, we will generate the objects now.
+        if ( $json_file && $self->load_related &&
+             $obj->can('related_objects') &&
+             $obj->can('create_related_objects') ) {
+          $obj->create_related_objects($json_file);
+          foreach my $o (@{$obj->related_objects}) {
+            $self->_json2db($o->freeze()); # Recursion
+          }
+        }
       }
     }
   } catch {
@@ -165,6 +169,25 @@ sub _json2db{
   my $m = $count ? 'Loaded' : 'Skipped';
   $self->_log(join q[ ], $m, $json_file || q[json string]);
   return $count;
+}
+
+sub _ensure_composition_exists {
+  my ($self, $obj) = @_;
+
+  # Load components for a composition that is not yet in the database
+  my $d = $obj->composition_digest;
+  my $num_components = $obj->composition->num_components;
+  foreach my $c (@{$obj->composition->components}) {
+    my $values = decode_json($c->freeze());
+    $values->{'digest'}         = $d;
+    $values->{'num_components'} = $num_components;
+    my $count = $self->_values2db('SequenceComponent', $values, 0); #need insert only
+    _log(sprintf '%s component %s for digest %s',
+            $count ? 'Created' : 'Found',
+            $c->freeze(),
+            $c->digest() );
+  }
+  return $d;
 }
 
 sub _values2db {
