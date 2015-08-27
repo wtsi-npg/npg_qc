@@ -93,7 +93,7 @@ sub load{
   my $transaction = sub {
     my $count = 0;
     foreach my $json_file (@{$self->json_file}) {
-      $count += $self->_json2db($json_file);
+      $count += $self->_json2db(slurp($json_file), $json_file);
     }
     return $count;
   };
@@ -112,28 +112,34 @@ sub load{
 }
 
 sub _json2db{
-  my ($self, $json_file) = @_;
+  my ($self, $json, $json_file) = @_;
+
+  if (!$json) {
+    croak 'JSON string representation of the object is missing';
+  }
 
   my $count = 0;
   try {
-    my $values = decode_json(slurp $json_file);
+    my $values = decode_json($json);
     my $class_name = delete $values->{$CLASS_FIELD};
     if ($class_name) {
       ($class_name, my $dbix_class_name) =
         npg_qc::autoqc::role::result->class_names($class_name);
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-        my $module = 'npg_qc::autoqc::results::' . $class_name;
-        load_class($module);
-        my $instance = $module->load($json_file);
-        if ($class_name eq 'bam_flagstats') {
-          $values = decode_json($instance->freeze());
+        if ($json_file) {
+          my $module = 'npg_qc::autoqc::results::' . $class_name;
+          load_class($module);
+          my $instance = $module->load($json_file);
+          if ($class_name eq 'bam_flagstats') {
+            $values = decode_json($instance->freeze());
+          }
         }
 
         my $rs = $self->schema->resultset($dbix_class_name);
         my $result_class = $rs->result_class;
 
-        $self->_exclude_nondb_attrs($json_file, $values, $result_class->columns());
+        $self->_exclude_nondb_attrs($values, $result_class->columns());
         $result_class->deflate_unique_key_components($values);
 
         if ($self->update) {
@@ -148,22 +154,23 @@ sub _json2db{
       }
     }
   } catch {
-    $self->_log("Attempted to load $json_file");
+    my $j =  $json_file || $json;
+    $self->_log("Attempted to load $j");
     croak $_;
   };
   my $m = $count ? 'Loaded' : 'Skipped';
-  $self->_log(join q[ ], $m, $json_file);
+  $self->_log(join q[ ], $m, $json_file || q[json string]);
   return $count;
 }
 
 sub _exclude_nondb_attrs {
-  my ($self, $json_file, $values, @columns) = @_;
+  my ($self, $values, @columns) = @_;
 
   foreach my $key ( keys %{$values} ) {
     if (none {$key eq $_} @columns) {
       delete $values->{$key};
       if ($key ne $CLASS_FIELD) {
-        $self->_log("$json_file: not loading field '$key'");
+        $self->_log("Not loading field '$key'");
       }
     }
   }

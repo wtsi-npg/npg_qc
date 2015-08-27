@@ -51,15 +51,16 @@ my $schema = Moose::Meta::Class->create_anon_class(
       verbose => 1,
   );
   my $values = {'pear' => 1, 'apple' => 2, 'orange' => 3,};
-  $db_loader->_exclude_nondb_attrs('myfile', $values, qw/pear apple orange/);
+  $db_loader->_exclude_nondb_attrs($values, qw/pear apple orange/);
   is_deeply($values, {'pear' => 1, 'apple' => 2, 'orange' => 3,},
     'hash did not change');
   $values->{'__CLASS__'} = 'fruits';
-  warning_like {$db_loader->_exclude_nondb_attrs('myfile', $values, qw/pear apple/)}
-    qr/myfile: not loading field \'orange\'/,
+  warning_like {$db_loader->_exclude_nondb_attrs($values, qw/pear apple/)}
+    qr/Not loading field \'orange\'/,
     'warning about filtering out orange, but not __CLASS__';
-  is_deeply($values, {'pear' => 1, 'apple' => 2,}, 'non-db orange and __CLASS__ filtered out');
-  $db_loader->_exclude_nondb_attrs('myfile', $values, qw/pear apple orange/);
+  is_deeply($values, {'pear' => 1, 'apple' => 2,},
+    'non-db orange and __CLASS__ filtered out');
+  $db_loader->_exclude_nondb_attrs($values, qw/pear apple orange/);
   is_deeply($values, {'pear' => 1, 'apple' => 2,},
     'hash did not change');
 }
@@ -200,7 +201,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
   );
   warnings_like {$db_loader->load()}  [
     qr/Loaded $file_good/,
-    qr/${file}: not loading field 'obins'/,
+    qr/Not loading field 'obins'/,
     qr/Loaded $file/,
     qr/2 json files have been loaded/ ],
     'loaded a file with incorrect attribute, gave warning';
@@ -310,7 +311,7 @@ my $num_plex_jsons = 44;
        path => ['t/data/autoqc/bam_flagstats/qc'],
   );
   my $file = 't/data/autoqc/bam_flagstats/qc/16960_1#0.bam_flagstats.json';
-  my $w = "${file}: not loading field";
+  my $w = 'Not loading field';
   warnings_like { $db_loader->load() }
     [ qr/$w \'sequence_file\'/,
       qr/$w \'flagstats_metrics_file\'/,
