@@ -29,7 +29,6 @@ local $ENV{TEST_DIR}        = $util->staging_path;
   my $schemas;
   lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
   use_ok 'Catalyst::Test', 'npg_qc_viewer';
-  $schemas->{wh}->resultset('NpgPlexInformation')->search({id_run => 4950, 'tag_index' => {'!=' => 0,},})->update({sample_id=>118118,});
 }
 
 {
@@ -58,9 +57,9 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 
   push @urls, q[http://localhost/checks]; 
   push @urls, q[http://localhost/checks/about];
-  my $lib = q[Exp2_PD2126a_WGA+1];
-  push @urls, qq[http://localhost/checks/libraries?name=$lib];
-  my $sample_id = 9184;
+  my $lib = q[NT28560W];
+  push @urls, qq[http://localhost/checks/libraries?id=$lib];
+  my $sample_id = 9272;
   push @urls, qq[http://localhost/checks/samples/$sample_id];
   $sample_id = 9286;
   push @urls, qq[http://localhost/checks/samples/$sample_id];

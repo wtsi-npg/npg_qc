@@ -10,10 +10,15 @@ use File::Path qw/make_path/;
 
 use t::util;
 
-local $ENV{'HOME'}='t/data';
+my $schemas;
+
 my $util = t::util->new();
-local $ENV{CATALYST_CONFIG} = $util->config_path;
-local $ENV{TEST_DIR}        = $util->staging_path;
+lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
+local $ENV{'CATALYST_CONFIG'} = $util->config_path;
+local $ENV{'TEST_DIR'}        = $util->staging_path;
+local $ENV{'HOME'}            = 't/data';
+
+use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
 my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
 
@@ -23,8 +28,6 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
   my $run_folder = q[150621_MS6_04099_A_MS2023387-050V2];
   make_path $path.q[/].$run_folder;
   
-  my $schemas;
-  lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
   my $npgqc = $schemas->{qc};
   my $npg   = $schemas->{npg};
   
@@ -41,7 +44,6 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
   $row->set_tag(7, 'staging');
   
   is($npgqc->resultset('QXYield')->count, 42);
-  use_ok 'Catalyst::Test', 'npg_qc_viewer';
 }
 
 {

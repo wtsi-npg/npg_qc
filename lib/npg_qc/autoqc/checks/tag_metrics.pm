@@ -1,12 +1,5 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       26 October 2011
-#
-
 package npg_qc::autoqc::checks::tag_metrics;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 use MooseX::ClassAttribute;
@@ -71,9 +64,9 @@ class_has 'spiked_control_description' => (isa        => 'Str',
                                            default    => 'SPIKED_CONTROL',
 		                          );
 
-has '+input_file_ext' => (default  => 'bam.tag_decode.metrics',);
+has '+file_type' => (default  => 'bam.tag_decode.metrics',);
 
-has '_columns'    => (isa => 'Maybe[HashRef]', is => 'ro', writer => '_set_columns',);
+has '_columns'   => (isa => 'Maybe[HashRef]', is => 'ro', writer => '_set_columns',);
 
 sub _set_column_indices {
   my ($self, $columns_header) = @_;
@@ -216,7 +209,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
