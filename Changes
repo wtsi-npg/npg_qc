@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
  
+ - tag_sniff new option to truncate tag sequences
  - tag_sniff now checks common tag sequences against tag sets in the warehouse
  - compile fastq_summ with samtools-1.2 and htslib-1.2.1
  - Removing global functions from manual_qc.js
