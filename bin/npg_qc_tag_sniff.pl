@@ -47,6 +47,7 @@ sub usage {
   print STDERR "\n";
   print STDERR "        --tag_length\n";
   print STDERR "          truncate tag sequence to this length, default 0 no truncation\n";
+  print STDERR "          if the value is -ve the tag is truncated from the start\n";
   print STDERR "\n";
   print STDERR "\n";
   return;
@@ -146,7 +147,11 @@ sub main{
     while (<>) {
 	  if (/((BC:)|(RT:))Z:([A-Z]*)/) {
 	    my $tag = $4;
-      $tag = substr($tag, 0, $tagLength) if $tagLength;
+      if ($tagLength < 0) {
+        $tag = substr($tag, $tagLength);
+      } elsif ($tagLength) {
+        $tag = substr($tag, 0, $tagLength);
+      }
 	    $tagsFound++;
 	    $tagsFound{$tag}++;
 	}
