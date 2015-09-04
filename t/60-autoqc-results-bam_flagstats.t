@@ -216,7 +216,7 @@ subtest 'finding phix subset files (no run id)' => sub {
   );
 
   warning_like {$r->execute}
-    qr/cannot create npg_qc::illumina::sequence::component object/,
+    qr/Warning: failed to build related objects/,
     'metrics parsing ok, warning about failure to  build related objects';
   is($r->library_size, 691461, 'library size value');
   is($r->mate_mapped_defferent_chr, 0, 'mate_mapped_defferent_chr value');

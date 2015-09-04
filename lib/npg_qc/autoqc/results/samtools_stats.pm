@@ -5,13 +5,12 @@ use namespace::autoclean;
 use npg_tracking::util::types;
 use Compress::Zlib;
 use Perl6::Slurp;
-use Readonly;
 
 extends qw(npg_qc::autoqc::results::base);
 
 our $VERSION = '0';
 
-has 'stats_file'     => ( 
+has 'stats_file'     => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
     required   => 1,
@@ -53,16 +52,36 @@ __END__
 
 =head1 NAME
 
-npg_qc::autoqc::results::qX_yield
+npg_qc::autoqc::results::samtools_stats
 
 =head1 SYNOPSIS
 
-
 =head1 DESCRIPTION
 
-A class for wrapping results of qX (q20) check. Inherits from npg_qc::autoqc::results::result.
+A class representing a filter-specific samtools stats file.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 stats_file
+
+Attribute, a path of the samtools stats file
+
+=head2 filter
+
+Attribute, the filter name that was used by samtools to produce the stats,
+required.
+
+=head2 stats
+
+Attribute, compressed content of the samtool stats file, required
+
+=head2 filename_root
+
+Extends the parent method, appends filter name to the filename root.
+
+=head2 execute
+
+Method forcing all lazy attributes of the object to be built.
 
 =head1 DIAGNOSTICS
 
@@ -78,6 +97,12 @@ A class for wrapping results of qX (q20) check. Inherits from npg_qc::autoqc::re
 
 =item npg_tracking::util::types
 
+=item Compress::Zlib
+
+=item Perl6::Slurp
+
+=item npg_qc::autoqc::results::base
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -86,7 +111,7 @@ A class for wrapping results of qX (q20) check. Inherits from npg_qc::autoqc::re
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 

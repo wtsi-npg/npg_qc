@@ -19,7 +19,7 @@ Readonly::Array my @ATTRIBUTES => qw/ sequence_format
                                       seqchksum_sha512
                                     /;
 
-has 'sequence_file'  => ( 
+has 'sequence_file'  => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
     required   => 1,
@@ -39,7 +39,7 @@ sub _build_sequence_format {
 sub _build_header {
   my $self = shift;
   return join q[], grep { $_ != /^SQ/smx }
-    slurp '-|', 'samtools1', 'view', '-H', $self->sequence_file; 
+    slurp q{-|}, 'samtools1', 'view', '-H', $self->sequence_file;
 }
 sub _build_md5 {
   my $self = shift;
@@ -56,7 +56,9 @@ sub _build_seqchksum_sha512 {
 
 sub execute {
   my $self = shift;
-  map { $self->$_ } @ATTRIBUTES;
+  for my $attr ( @ATTRIBUTES ) {
+    $self->$attr;
+  }
   return;
 }
 
@@ -71,13 +73,40 @@ npg_qc::autoqc::results::sequence_summary
 
 =head1 SYNOPSIS
 
-
 =head1 DESCRIPTION
 
 A class for wrapping information about a sequence such as
 a header, md5, etc.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 sequence_file
+
+Attribute, a path of bam/cram input file.
+
+=head2 sequence_format
+
+Attribute, sequence format (bam|cram) derived from the sequence file extension.
+
+=head2 header
+
+Attribute, header of the bam/cram sequence file, SQ lines filtered out.
+
+=head2 md5
+
+Attribute, md5 of the sequence file.
+
+=head2 seqchksum
+
+Attribute, seqchksum of the sequence file.
+
+=head2 seqchksum_sha512
+
+Attribute, seqchksum_sha512 of the sequence file.
+
+=head2 execute
+
+Method forcing all lazy attributes of the object to be built.
 
 =head1 DIAGNOSTICS
 
@@ -98,6 +127,8 @@ a header, md5, etc.
 =item Perl6::Slurp
 
 =item npg_tracking::util::types
+
+=item npg_qc::autoqc::results::base
 
 =back
 

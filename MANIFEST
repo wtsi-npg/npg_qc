@@ -130,6 +130,7 @@ lib/npg_qc/autoqc/qc_store/query.pm
 lib/npg_qc/autoqc/results/adapter.pm
 lib/npg_qc/autoqc/results/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/results/bam_flagstats.pm
+lib/npg_qc/autoqc/results/base.pm
 lib/npg_qc/autoqc/results/collection.pm
 lib/npg_qc/autoqc/results/contamination.pm
 lib/npg_qc/autoqc/results/gc_bias.pm
@@ -140,7 +141,9 @@ lib/npg_qc/autoqc/results/pulldown_metrics.pm
 lib/npg_qc/autoqc/results/qX_yield.pm
 lib/npg_qc/autoqc/results/ref_match.pm
 lib/npg_qc/autoqc/results/result.pm
+lib/npg_qc/autoqc/results/samtools_stats.pm
 lib/npg_qc/autoqc/results/sequence_error.pm
+lib/npg_qc/autoqc/results/sequence_summary.pm
 lib/npg_qc/autoqc/results/spatial_filter.pm
 lib/npg_qc/autoqc/results/split_stats.pm
 lib/npg_qc/autoqc/results/tag_decode_stats.pm

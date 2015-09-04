@@ -3,33 +3,28 @@ package npg_qc::autoqc::results::base;
 use Moose;
 use namespace::autoclean;
 use Carp;
-use Readonly;
 
-with qw( npg_qc::illumina::sequence::factory
-         npg_qc::autoqc::role::result );
+use npg_tracking::glossary::composition;
+with qw( npg_qc::autoqc::role::result );
+with 'npg_tracking::glossary::composition::factory' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
 our $VERSION = '0';
 
 has 'composition' => (
     is         => 'ro',
-    isa        => 'npg_qc::illumina::sequence::composition',
+    isa        => 'npg_tracking::glossary::composition',
     lazy_build => 1,
     handles   => {
       'composition_digest' => 'digest',
-    }
+    },
 );
 sub _build_composition {
   my $self = shift;
-  my $c;
   if ($self->is_old_style_result) {
-    $c = $self->create_sequence_composition();
-    if (!defined $c) {
-      croak 'Failed to generate composition';
-    }
-  } else {
-    $c = npg_qc::illumina::sequence::composition->new();
+    return $self->create_composition();
   }
-  return $c;
+  return npg_tracking::glossary::composition->new();
 }
 
 sub is_old_style_result {
@@ -74,21 +69,48 @@ around 'equals_byvalue' => sub {
 };
 
 __PACKAGE__->meta->make_immutable;
-
 1;
 __END__
 
 =head1 NAME
 
-npg_qc::autoqc::results::result
+npg_qc::autoqc::results::base
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-A base class to wrap the result of autoqc.
+An alternative composition-based parent object for autoqc result objects.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 composition
+
+An npg_tracking::glossary::composition composition objects. If the derived
+class inplements id_run and position methods/attributes, a one-component
+composition is created automatically. Otherwise an empry composition object
+is created.
+
+=head2 is_old_style_result
+
+A method returning true if the derived class implements id_run and position
+methods/attributes.
+
+=head2 filename_root
+
+Autoqc result object interface method, see npg_qc::autoqc::role::result for
+details. Suggested filename root for serialisation.
+For an old-style object as defined by the is_old_style_result method returns an
+empty string, otherwise returns a composition digest.
+
+=head2 to_string
+
+Autoqc result object interface method, see npg_qc::autoqc::role::result for
+details. Returns a human readable string representation of the object'
+
+=head2 equals_byvalue
+
+Autoqc result object interface method, see npg_qc::autoqc::role::result for details.
 
 =head1 DIAGNOSTICS
 
@@ -102,13 +124,15 @@ A base class to wrap the result of autoqc.
 
 =item namespace::autoclean
 
-=item npg_tracking::util::types
+=item Carp
 
-=item npg_tracking::glossary::run
+=item npg_tracking::glossary::composition
 
-=item npg_tracking::glossary::lane
+=item npg_tracking::glossary::composition::factory
 
-=item npg_tracking::glossary::tag
+=item npg_tracking::glossary::composition::component::illumina
+
+=item npg_qc::autoqc::role::result
 
 =back
 

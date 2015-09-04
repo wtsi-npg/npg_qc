@@ -20,9 +20,11 @@ use npg_qc::autoqc::results::samtools_stats;
 
 extends qw( npg_qc::autoqc::results::result );
 with    qw(
-            npg_qc::illumina::sequence::factory
+            npg_tracking::glossary::subset
             npg_qc::autoqc::role::bam_flagstats
           );
+with 'npg_tracking::glossary::composition::factory' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
 our $VERSION = '0';
 
@@ -48,12 +50,7 @@ has [ qw/ +path
           +id_run
           +position / ] => ( required   => 0, );
 
-has 'subset' => ( isa         => 'Maybe[Str]',
-                  is          => 'ro',
-                  required    => 0,
-                  predicate   => 'has_subset',
-                  writer      => '_set_subset',
-);
+has '+subset' => ( writer      => '_set_subset', );
 
 has 'human_split' => ( isa            => 'Maybe[Str]',
                        is             => 'rw',
@@ -177,7 +174,7 @@ sub _build_related_objects {
 
   my @objects = ();
   if ($self->sequence_file) {
-    my $composition = $self->create_sequence_composition();
+    my $composition = $self->create_composition();
     if ($composition) {
       foreach my $filter (sort keys %{$self->samtools_stats_file}) {
         push @objects,
@@ -193,8 +190,10 @@ sub _build_related_objects {
           composition   => $composition,
           sequence_file => $self->sequence_file
         );
- 
-      map { $_->execute() } @objects;
+
+      for my $o ( @objects ) {
+        $o->execute;
+      }
     }
   }
   return \@objects;
@@ -231,7 +230,9 @@ sub BUILD {
 around 'write2file' => sub {
   my ($orig, $self, $path) = @_;
   if ($self->_has_related_objects()) {
-    map { $_->write2file($path) } @{$self->related_objects()};
+    for my $o ( @{$self->related_objects()} ) {
+      $o->write2file($path);
+    }
   }
   $self->_set_related_objects([]);
   return $self->$orig($path);
@@ -380,7 +381,7 @@ sub _find_sequence_file {
   if ( !-f $seq_file ) {
     croak "$seq_file is not found, cannot compute related objects for " . __PACKAGE__;
   }
-  
+
   return $seq_file;
 }
 
@@ -414,20 +415,46 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head1 SUBROUTINES/METHODS
 
+=head2 id_run
+
+  an optional attribute
+
+=head2 position
+
+  an optional attribute
+
+=head2 tag_index
+
+  an optional attribute
+
 =head2 subset
 
-  an optional subset, see npg_qc::autoqc::role:::sequence_subset for details.
+  an optional subset, see npg_tracking::glossary::subset for details.
 
 =head2 BUILD - ensures human_split and subset fields are populated consistently
 
 =head2 sequence_file
 
   an optional attribute, a full path to the sequence, should be set
-  for 'execute' method to work correctly 
+  for 'execute' method to work correctly
+
+=head2 write2file
+
+  extended parent method of the same name, serializes related objects to files
+  and resets the related objects attribute to an empty array, then calls
+  teh parent method
 
 =head2 execute
 
   calls methods for parsing samtools flagstats and mark duplicates outputs
+
+=head2 related_objects
+
+  a lazy attribute, an array of related autoqc result objects
+
+=head2 create_related_objects
+
+  method forcing related objects attribute to be built
 
 =head2 parsing_flagstats
 
@@ -479,11 +506,15 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item npg_tracking::util::types
 
+=item npg_tracking::glossary::subset
+
+=item npg_tracking::glossary::composition::factory
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =item npg_qc::autoqc::results::result
 
 =item npg_qc::autoqc::role::bam_flagstats
-
-=item npg_qc::autoqc::role::sequence_subset
 
 =back
 

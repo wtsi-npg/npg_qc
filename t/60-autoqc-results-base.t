@@ -4,8 +4,8 @@ use Test::More tests => 7;
 use Test::Exception;
 
 my $bp  = q[npg_qc::autoqc::results::base];
-my $cp  = q[npg_qc::illumina::sequence::component];
-my $csp = q[npg_qc::illumina::sequence::composition];
+my $cp  = q[npg_tracking::glossary::composition::component::illumina];
+my $csp = q[npg_tracking::glossary::composition];
 
 subtest 'load the packages' => sub {
   use_ok ($cp);
@@ -37,6 +37,7 @@ subtest 'base object with one-component composition' => sub {
   my $cmps = $b->composition;
   is ($cmps->has_no_components, 0, 'composition is not empty');
   is ($cmps->num_components, 1, 'one component');
+  diag $b->freeze();
   my $digest = 'c674faa835fd34457c29af3492ef291c623ce67a230b29eb8c3b6891a4d98837'; 
   is ($b->composition_digest, $digest, 'digest');
   my $b1 = $bp->thaw($b->freeze());
@@ -94,7 +95,7 @@ subtest 'overwritten methods' => sub {
     qr/Cannot evaluate input HASH/,
     'error comparing to a hash';
   throws_ok { $b->equals_byvalue($c1) }
-    qr/Cannot evaluate input npg_qc::illumina::sequence::component/,
+    qr/Cannot evaluate input npg_tracking::glossary::composition::component/,
     'error comparing to a component object';
   is ($b->equals_byvalue($csp->new(components => [$c1, $c2, $c3, $c4])),
     1, 'compositions are the same');
