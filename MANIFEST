@@ -448,7 +448,6 @@ t/data/api_dbic_fixtures/npg_qc/RunTimeline.yml
 t/data/api_dbic_fixtures/npg/RunStatusDict.yml
 t/data/api_dbic_fixtures/npg/RunStatus.yml
 t/data/api_dbic_fixtures/npg/Run.yml
-t/data/autoqc/12313_1#0_bam_flagstats.txt
 t/data/autoqc/bam_flagstats/16960_1#0.bam
 t/data/autoqc/bam_flagstats/16960_1#0.flagstat
 t/data/autoqc/bam_flagstats/16960_1#0.markdups_metrics.txt
@@ -583,7 +582,6 @@ t/data/autoqc/alignment_refmatch.sam
 t/data/autoqc/alignment.bam
 t/data/autoqc/alignment.sam
 t/data/autoqc/alignment_small.sam
-t/data/autoqc/estimate_library_complexity_metrics.txt
 t/data/autoqc/fixtures/Adapter.yml
 t/data/autoqc/gc_bias/sam-3lines
 t/data/autoqc/gc_bias/sam_aligned_header
