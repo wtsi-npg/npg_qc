@@ -95,8 +95,8 @@ subtest 'low-level parsing' => sub {
   is($r->read_pairs_examined, 0, 'examined zero read pairs');
 };
 
-subtest 'high-level parsing - backwards compatibility' => sub {
-  plan tests => 25;
+subtest 'high-level parsing' => sub {
+  plan tests => 15;
 
   my $tempdir = tempdir( CLEANUP => 1);
   my $package = 'npg_qc::autoqc::results::bam_flagstats';
@@ -105,65 +105,48 @@ subtest 'high-level parsing - backwards compatibility' => sub {
   my $dups_attr_name    = 'markdups_metrics_file';
   my $fstat_attr_name   = 'flagstats_metrics_file';
   my $stats_attr_name   = 'samtools_stats_file';
-  my $h1 = {position => 5,
-            id_run   => 4783};
 
-  my $r1 = $package->new($h1);
-  $r1->parsing_metrics_file($dups);
-
-  open my $flagstats_fh, '<', $fstat;
-  $r1->parsing_flagstats($flagstats_fh);
-  close $flagstats_fh;
-
+  my $h1 = {position => 5, id_run   => 4783};
   $h1->{$dups_attr_name}    = $dups;
   $h1->{$fstat_attr_name}   = $fstat;
-  my $r2 = $package->new($h1);
+  my $r = $package->new($h1);
+
   my $expected = from_json(
     slurp q{t/data/autoqc/4783_5_bam_flagstats.json}, {chomp=>1});
+  $expected->{'related_objects'} = [];
 
-  my $count = 0;
-  for my $r (($r1, $r2)) {
-    $count++;
-    if ($count == 1) {
-      throws_ok { $r->execute() }
-        qr/markdups_metrics_file not found/, 'execute method fails';
-    } else {
-      lives_ok { $r->execute() } 'execute method is ok';
-    } 
+  lives_ok { $r->execute() } 'execute method is ok';
+  my $result_json;
+  lives_ok {
+    $result_json = $r->freeze();
+    $r->store(qq{$tempdir/4783_5_bam_flagstats.json});
+  } 'no error when serializing to json string and file';
 
-    my $result_json;
-    lives_ok {
-      $result_json = $r->freeze();
-      $r->store(qq{$tempdir/4783_5_bam_flagstats.json});
-    } 'no error when serializing to json string and file';
-
-    my $from_json_hash = from_json($result_json);
-    delete $from_json_hash->{__CLASS__};
-    delete $from_json_hash->{$dups_attr_name};
-    delete $from_json_hash->{$fstat_attr_name};
-    if ($count == 2) {
-      $expected->{'related_objects'} = [];
-    }
-    is_deeply($from_json_hash, $expected, 'correct json output');
-    is($r->total_reads(), 32737230 , 'total reads');
-    is($r->total_mapped_reads(), '30992462', 'total mapped reads');
-    is($r->percent_mapped_reads, 94.6703859795102, 'percent mapped reads');
-    is($r->percent_duplicate_reads, 15.6023713120952, 'percent duplicate reads');
-    is($r->percent_properly_paired ,89.7229484595978, 'percent properly paired');
-    is($r->percent_singletons, 2.92540938863795, 'percent singletons');
-    is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
-  }
+  my $from_json_hash = from_json($result_json);
+  delete $from_json_hash->{__CLASS__};
+  delete $from_json_hash->{$dups_attr_name};
+  delete $from_json_hash->{$fstat_attr_name};
+   
+  is_deeply($from_json_hash, $expected, 'correct json output');
+  is($r->total_reads(), 32737230 , 'total reads');
+  is($r->total_mapped_reads(), '30992462', 'total mapped reads');
+  is($r->percent_mapped_reads, 94.6703859795102, 'percent mapped reads');
+  is($r->percent_duplicate_reads, 15.6023713120952, 'percent duplicate reads');
+  is($r->percent_properly_paired ,89.7229484595978, 'percent properly paired');
+  is($r->percent_singletons, 2.92540938863795, 'percent singletons');
+  is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
+  
 
   delete $h1->{$dups_attr_name};
   delete $h1->{$fstat_attr_name};
-  $r1 = $package->new($h1);
-  warning_like {$r1->samtools_stats_file}
+  $r = $package->new($h1);
+  warning_like {$r->samtools_stats_file}
     qr/Sequence file not given - not looking for samtools stats files/,
     'warning when looking for samtool stats files';
-  is_deeply($r1->samtools_stats_file, {}, 'samtools stats files not found');
-  is($r1->markdups_metrics_file, undef, 'markdups metrics not found');
-  is($r1->flagstats_metrics_file, undef, 'flagstats metrics not found');
-  throws_ok { $r1->execute() } qr/markdups_metrics_file not found/,
+  is_deeply($r->samtools_stats_file, {}, 'samtools stats files not found');
+  is($r->markdups_metrics_file, undef, 'markdups metrics not found');
+  is($r->flagstats_metrics_file, undef, 'flagstats metrics not found');
+  throws_ok { $r->execute() } qr/markdups_metrics_file not found/,
     'no input file - execute fails';
 };
 
