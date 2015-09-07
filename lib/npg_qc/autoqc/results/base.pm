@@ -2,6 +2,7 @@ package npg_qc::autoqc::results::base;
 
 use Moose;
 use namespace::autoclean;
+use File::Spec::Functions qw( splitpath );
 use Carp;
 
 use npg_tracking::glossary::composition;
@@ -35,6 +36,13 @@ sub is_old_style_result {
 sub filename_root {
   my $self = shift;
   return $self->is_old_style_result() ? q[] : $self->composition_digest;
+}
+
+sub filename_root_from_filename {
+  my ($self, $file_path) = @_;
+  my ($volume, $directories, $file) = splitpath($file_path);
+  $file =~ s/[.](?:[^.]+)\Z//smx;
+  return $file;
 }
 
 around 'to_string' => sub {
@@ -123,6 +131,8 @@ Autoqc result object interface method, see npg_qc::autoqc::role::result for deta
 =item Moose
 
 =item namespace::autoclean
+
+=item File::Spec::Functions
 
 =item Carp
 

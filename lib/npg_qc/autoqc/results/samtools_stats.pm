@@ -41,7 +41,7 @@ sub execute {
 
 override 'filename_root' => sub  {
   my $self = shift;
-  return join q[_], super(), $self->filter;
+  return $self->filename_root_from_filename($self->stats_file);
 };
 
 __PACKAGE__->meta->make_immutable;

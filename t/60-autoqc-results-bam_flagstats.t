@@ -9,6 +9,7 @@ use Perl6::Slurp;
 use JSON;
 use Compress::Zlib;
 use Archive::Extract;
+use File::Spec::Functions qw( splitdir catdir);
 
 my $tempdir = tempdir( CLEANUP => 1);
 
@@ -210,12 +211,14 @@ subtest 'finding phix subset files (no run id)' => sub {
 };
 
 subtest 'full functionality with full file sets' => sub {
-  plan tests => 72;
+  plan tests => 96;
 
   my $archive = '17448_1_9';
   my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
   $ae->extract(to => $tempdir) or die $ae->error;
   $archive = join q[/], $tempdir, $archive;
+  my $qc_dir = join q[/], $archive, 'qc';
+  mkdir $qc_dir;
 
   my $fproot_common = $archive . '/17448_1#9';
   my $composition_digest = 'bfc10d33f4518996db01d1b70ebc17d986684d2e04e20ab072b8b9e51ae73dfa';
@@ -264,6 +267,22 @@ subtest 'full functionality with full file sets' => sub {
       is ($ro->sequence_file, $sfile, 'seq file path');
       isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
       is ($ro->composition_digest, $composition_digest, 'composition digest');
+
+      my $local_qc_dir = join q[/], $qc_dir, $file_type;
+      if (!-e $local_qc_dir) {
+        mkdir $local_qc_dir;
+      }
+      lives_ok { $r->write2file($local_qc_dir) } 'no error serializing objects to a file';
+      is (scalar @{$r->related_objects}, 0, 'related objects array is empty');
+      foreach my $output_type ( qw(.bam_flagstats.json
+                                   .sequence_summary.json
+                                   _F0xB00.samtools_stats.json
+                                   _F0x900.samtools_stats.json) ) {
+        my @dirs = splitdir $fproot;
+        my $name = pop @dirs;
+        my $output = catdir($local_qc_dir, $name) . $output_type;
+        ok (-e $output, "output $output created");
+      }
     }
   }
 };

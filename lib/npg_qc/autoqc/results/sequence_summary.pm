@@ -70,6 +70,11 @@ sub execute {
   return;
 }
 
+override 'filename_root' => sub  {
+  my $self = shift;
+  return $self->filename_root_from_filename($self->sequence_file);
+};
+
 __PACKAGE__->meta->make_immutable;
 
 1;

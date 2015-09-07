@@ -235,6 +235,20 @@ around 'write2file' => sub {
   return $self->$orig($path);
 };
 
+sub filename_root {
+  my $self = shift;
+
+  if (!$self->id_run && $self->_file_path_root) {
+    my ($volume, $directories, $file) = splitpath($self->_file_path_root);
+    my $subset = $self->subset;
+    if ($subset) {
+      $file =~ s/\Q_${subset}\E\Z//msx;
+    }
+    return $file;
+  }
+  return;
+}
+
 sub execute {
   my $self = shift;
 
@@ -248,6 +262,19 @@ sub execute {
     }
   }
 
+  return;
+}
+
+sub create_related_objects {
+  my ($self, $path) = @_;
+  if (!$self->_has_related_objects()) {
+    if (!$self->sequence_file) {
+      $self->_set_sequence_file(_find_sequence_file($path));
+    }
+    foreach my $ro ( @{$self->related_objects()} ) {
+      $ro->execute();
+    }
+  }
   return;
 }
 
@@ -331,31 +358,6 @@ sub _parse_flagstats {
   }
   close $samtools_output_fh  or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
 
-  return;
-}
-
-sub filename_root {
-  my $self = shift;
-
-  if (!$self->id_run && $self->_file_path_root) {
-    my ($volume, $directories, $file) = splitpath($self->_file_path_root);
-    my $subset = $self->subset;
-    if ($subset) {
-      $file =~ s/\Q_${subset}\E\Z//msx;
-    }
-    return $file;
-  }
-  return;
-}
-
-sub create_related_objects {
-  my ($self, $path) = @_;
-  if (!$self->_has_related_objects()) {
-    if (!$self->sequence_file) {
-      $self->_set_sequence_file(_find_sequence_file($path));
-    }
-    $self->related_objects();
-  }
   return;
 }
 
