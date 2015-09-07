@@ -66,7 +66,7 @@ subtest 'test attributes and simple methods' => sub {
   } 'no error when human_split and subset attrs are consistent';
 
   $r = npg_qc::autoqc::results::bam_flagstats->
-    load('t/data/autoqc/4921_3_bam_flagstats.json');
+    load('t/data/autoqc/bam_flagstats/4921_3_bam_flagstats.json');
   ok( !$r->total_reads(), 'total reads not available' ) ;
 };
 
@@ -75,8 +75,8 @@ subtest 'high-level parsing' => sub {
 
   my $tempdir = tempdir( CLEANUP => 1);
   my $package = 'npg_qc::autoqc::results::bam_flagstats';
-  my $dups  = 't/data/autoqc/4783_5_metrics_optical.txt';
-  my $fstat = 't/data/autoqc/4783_5_mk.flagstat';
+  my $dups  = 't/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt';
+  my $fstat = 't/data/autoqc/bam_flagstats/4783_5.flagstat';
   my $dups_attr_name    = 'markdups_metrics_file';
   my $fstat_attr_name   = 'flagstats_metrics_file';
   my $stats_attr_name   = 'samtools_stats_file';
@@ -87,7 +87,7 @@ subtest 'high-level parsing' => sub {
   my $r = $package->new($h1);
 
   my $expected = from_json(
-    slurp q{t/data/autoqc/4783_5_bam_flagstats.json}, {chomp=>1});
+    slurp q{t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json}, {chomp=>1});
   $expected->{'related_objects'} = [];
 
   lives_ok { $r->execute() } 'execute method is ok';
