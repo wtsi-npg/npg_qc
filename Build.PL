@@ -162,15 +162,16 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 EOF
 
 my $extended_build_requires = {
+                'Archive::Extract'                => 0,
+                'DateTime::Format::SQLite'        => 0,
+                'File::Copy'                      => 0,
+                'File::Path'                      => 0,
                 'Pod::Usage'                      => 0,
-                'npg_testing::db'                 => 0,
                 'Test::Deep'                      => '0.103',
                 'Test::Distribution'              => 0,
                 'Test::Perl::Critic'              => 0,
                 'Test::Warn'                      => '0.11',
-                'DateTime::Format::SQLite'        => 0,
-                'File::Copy'                      => 0,
-                'File::Path'                      => 0,
+                'npg_testing::db'                 => 0,
                 'npg_tracking::Schema'            => 0,
 };
 
@@ -317,7 +318,7 @@ my $builder = $class->new(
                 'module_name'         => 'npg_qc',
                 'dist_author'         => q(npg <npg@sanger.ac.uk>),
                 'dist_version'        => $class->git_tag(),
-                'dist_abstract'       => 'Illumina and WTSI quality control for NGS data',
+                'dist_abstract'       => 'Illumina and WTSI quality control for Illumina sequencing data',
                 'license'             => 'gpl',
 
           'configure_requires' => {
