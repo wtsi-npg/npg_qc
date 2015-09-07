@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
@@ -103,6 +103,7 @@ subtest 'high-level parsing' => sub {
   delete $from_json_hash->{__CLASS__};
   delete $from_json_hash->{$dups_attr_name};
   delete $from_json_hash->{$fstat_attr_name};
+  delete $from_json_hash->{'fully_build_related'};
    
   is_deeply($from_json_hash, $expected, 'correct json output');
   is($r->total_reads(), 32737230 , 'total reads');
@@ -137,10 +138,11 @@ subtest 'finding files, calculating metrics' => sub {
 
   my $fproot = $archive_16960 . '/16960_1#0';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
-    id_run        => 16960,
-    position      => 1,
-    tag_index     => 0,
-    sequence_file => $fproot . '.bam'
+    id_run              => 16960,
+    position            => 1,
+    tag_index           => 0,
+    sequence_file       => $fproot . '.bam',
+    fully_build_related => 0,
   );
 
   is($r->_file_path_root, $fproot, 'file path root');
@@ -158,16 +160,24 @@ subtest 'finding files, calculating metrics' => sub {
      'F0x900' => $fproot . '_F0x900.stats',
      'F0xB00' => $fproot . '_F0xB00.stats',               };
   is_deeply($r->samtools_stats_file, $stats_files, 'stats files are correct');
-  my $bam_md5 = join q[.], $r->sequence_file, 'md5';
-  warning_like {$r->execute}
-    qr{failed to build related objects: Can't open '$bam_md5'},
-    'metrics parsing ok, warning about a failure to build related objects';
+ 
+  $r->execute();
   is($r->library_size, 240428087, 'library size value');
   is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
-
   my $j;
   lives_ok { $j=$r->freeze } 'serialization to json is ok';
   unlike($j, qr/_file_path_root/, 'serialization does not contain excluded attr');
+
+  $r = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run              => 16960,
+    position            => 1,
+    tag_index           => 0,
+    sequence_file       => $fproot . '.bam',
+  );
+  my $bam_md5 = join q[.], $r->sequence_file, 'md5';
+  throws_ok {$r->execute}
+    qr{Can't open '$bam_md5'},
+    'error calling execute() on related objects';
 };
 
 subtest 'finding phix subset files (no run id)' => sub {
@@ -175,13 +185,12 @@ subtest 'finding phix subset files (no run id)' => sub {
 
   my $fproot = $archive_16960 . '/16960_1#0_phix';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
-    subset           => 'phix',
-    sequence_file    => $fproot . '.bam'
+    subset              => 'phix',
+    sequence_file       => $fproot . '.bam',
+    fully_build_related => 0,
   );
 
-  warning_like {$r->execute}
-    qr/Warning: failed to build related objects/,
-    'metrics parsing ok, warning about failure to  build related objects';
+  lives_ok {$r->execute} 'metrics parsing ok';
   is($r->library_size, 691461, 'library size value');
   is($r->mate_mapped_defferent_chr, 0, 'mate_mapped_defferent_chr value');
 
@@ -204,5 +213,49 @@ subtest 'finding phix subset files (no run id)' => sub {
   lives_ok { $r->freeze } 'no run id - serialization to json is ok';
 };
 
+subtest 'full functionality with full file sets' => sub {
+  plan tests => 16;
+
+  my $archive = '17448_1_9';
+  my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
+  $ae->extract(to => $tempdir) or die $ae->error;
+  $archive = join q[/], $tempdir, $archive;
+
+  my $fproot = $archive . '/17448_1#9';
+  my $sfile = $fproot . '.cram';
+  my $composition_digest = 'bfc10d33f4518996db01d1b70ebc17d986684d2e04e20ab072b8b9e51ae73dfa';
+
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run        => 17448,
+    position      => 1,
+    tag_index     => 9,
+    sequence_file => $sfile,
+    fully_build_related => 0,
+  );
+
+  $r->execute();
+  ok ($r->_has_related_objects, 'related object array has been set');
+  my @ros = @{$r->related_objects};
+  is (scalar @ros, 3, 'three related objects');
+
+  my @filters = qw/F0x900 F0xB00/;
+  my $i = 0;
+  while ($i < 2) {
+    my $ro = $ros[$i];
+    my $filter = $filters[$i];
+    isa_ok ($ro, 'npg_qc::autoqc::results::samtools_stats');
+    is ($ro->filter, $filter, 'correct filter');
+    is ($ro->stats_file, $fproot . q[_] . $filter . '.stats', 'stats file path');
+    isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+    is ($ro->composition_digest, $composition_digest, 'composition digest');
+    $i++;
+  }
+
+  my $ro = $ros[2];
+  isa_ok ($ro, 'npg_qc::autoqc::results::sequence_summary');
+  is ($ro->sequence_file, $sfile, 'seq file path');
+  isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+  is ($ro->composition_digest, $composition_digest, 'composition digest');
+};
 
 1;

@@ -52,6 +52,11 @@ has [ qw/ +path
 
 has '+subset' => ( writer      => '_set_subset', );
 
+has 'fully_build_related' =>  ( isa     => 'Bool',
+                                is      => 'ro',
+                                default => 1,
+);
+
 has 'human_split' => ( isa            => 'Maybe[Str]',
                        is             => 'rw',
                        predicate      => '_has_human_split',
@@ -173,7 +178,7 @@ sub _build_related_objects {
   my $self = shift;
 
   my @objects = ();
-  if ($self->sequence_file) {
+  if ($self->sequence_file && $self->id_run && $self->position) {
     my $composition = $self->create_composition();
     if ($composition) {
       foreach my $filter (sort keys %{$self->samtools_stats_file}) {
@@ -190,10 +195,6 @@ sub _build_related_objects {
           composition   => $composition,
           sequence_file => $self->sequence_file
         );
-
-      for my $o ( @objects ) {
-        $o->execute;
-      }
     }
   }
   return \@objects;
@@ -243,12 +244,13 @@ sub execute {
 
   $self->_parse_markdups_metrics();
   $self->_parse_flagstats();
+  $self->related_objects();
 
-  try {
-    $self->related_objects();
-  } catch {
-    carp qq[Warning: failed to build related objects: $_];
-  };
+  if ($self->fully_build_related) {
+    for my $ro ( @{$self->related_objects()} ) {
+      $ro->execute();
+    }
+  }
 
   return;
 }
@@ -440,11 +442,16 @@ npg_qc::autoqc::results::bam_flagstats
   an optional attribute, a full path to the sequence, should be set
   for 'execute' method to work correctly
 
+=head2 fully_build_related
+ 
+ a boolen attribute; if true, execute() method is called on the related objects
+ within this object's execute() method
+
 =head2 write2file
 
   extended parent method of the same name, serializes related objects to files
   and resets the related objects attribute to an empty array, then calls
-  teh parent method
+  the parent method
 
 =head2 execute
 
