@@ -38,7 +38,7 @@ sub _build_sequence_format {
 }
 sub _build_header {
   my $self = shift;
-  return join q[], grep { $_ != /^SQ/smx }
+  return join q[], grep { $_ ne /^SQ/smx }
     slurp q{-|}, 'samtools1', 'view', '-H', $self->sequence_file;
 }
 sub _build_md5 {
