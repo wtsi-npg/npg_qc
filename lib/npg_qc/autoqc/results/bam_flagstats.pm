@@ -241,18 +241,8 @@ around 'write2file' => sub {
 sub execute {
   my $self = shift;
 
-  for my $attr ( qw/markdups_metrics_file flagstats_metrics_file/ ) {
-    if (!$self->$attr) {
-      croak "$attr not found";
-    }
-  }
-
-  $self->parsing_metrics_file($self->markdups_metrics_file);
-
-  my $fn = $self->flagstats_metrics_file;
-  open my $fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
-  $self->parsing_flagstats($fh);
-  close $fh or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
+  $self->_parse_markdups_metrics();
+  $self->_parse_flagstats();
 
   try {
     $self->related_objects();
@@ -263,10 +253,13 @@ sub execute {
   return;
 }
 
-sub parsing_metrics_file {
-  my ($self, $metrics_file) = @_;
+sub _parse_markdups_metrics {
+  my $self = shift;
 
-  my @file_contents = slurp ( $metrics_file, { irs => qr/\n\n/mxs } );
+  if (!$self->markdups_metrics_file) {
+    croak 'markdups_metrics_file not found';
+  }
+  my @file_contents = slurp ( $self->markdups_metrics_file, { irs => qr/\n\n/mxs } );
 
   my $header = $file_contents[0];
   chomp $header;
@@ -277,7 +270,7 @@ sub parsing_metrics_file {
   my $metrics = $file_contents[1];
   my $histogram  = $file_contents[2];
 
-  my @metrics_lines = split /\n/mxs, $metrics;
+    my @metrics_lines = split /\n/mxs, $metrics;
   my @metrics_numbers = split /\t/mxs, $metrics_lines[2];
 
   if (scalar  @metrics_numbers > scalar @{$METRICS_FIELD_LIST} ) {
@@ -314,9 +307,16 @@ sub parsing_metrics_file {
   return;
 }
 
-sub parsing_flagstats {
-  my ($self, $samtools_output_fh) = @_;
+sub _parse_flagstats {
+  my $self = shift;
 
+  my $fn = $self->flagstats_metrics_file;
+  if (!$fn) {
+    croak 'flagstats_metrics_file not found';
+  }
+
+  ## no critic (InputOutput::RequireBriefOpen)
+  open my $samtools_output_fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
   while ( my $line = <$samtools_output_fh> ) {
     chomp $line;
     my $number = sum $line =~ /^(\d+)\s*\+\s*(\d+)\b/mxs;
@@ -331,6 +331,8 @@ sub parsing_flagstats {
       ? $self->num_total_reads($number)
       : next;
   }
+  close $samtools_output_fh  or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
+
   return;
 }
 
@@ -455,14 +457,6 @@ npg_qc::autoqc::results::bam_flagstats
 =head2 create_related_objects
 
   method forcing related objects attribute to be built
-
-=head2 parsing_flagstats
-
-  parses Picard MarkDuplicates metrics output file and save the result to the object
-
-=head2 parsing_metrics_file
-
-  parses samtools flagstats output file handler and save the result to the object
 
 =head2 markdups_metrics_file
 
