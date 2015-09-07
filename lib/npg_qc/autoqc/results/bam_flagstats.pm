@@ -154,7 +154,6 @@ sub _build_samtools_stats_file {
         $paths->{$filter} = $file;
       }
     }
-
     if (scalar keys %{$paths} == 0) {
       carp 'Not found samtools stats files';
     }

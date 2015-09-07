@@ -210,48 +210,62 @@ subtest 'finding phix subset files (no run id)' => sub {
 };
 
 subtest 'full functionality with full file sets' => sub {
-  plan tests => 16;
+  plan tests => 72;
 
   my $archive = '17448_1_9';
   my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
   $ae->extract(to => $tempdir) or die $ae->error;
   $archive = join q[/], $tempdir, $archive;
 
-  my $fproot = $archive . '/17448_1#9';
-  my $sfile = $fproot . '.cram';
+  my $fproot_common = $archive . '/17448_1#9';
   my $composition_digest = 'bfc10d33f4518996db01d1b70ebc17d986684d2e04e20ab072b8b9e51ae73dfa';
-
-  my $r = npg_qc::autoqc::results::bam_flagstats->new(
-    id_run        => 17448,
-    position      => 1,
-    tag_index     => 9,
-    sequence_file => $sfile,
-    fully_build_related => 0,
-  );
-
-  $r->execute();
-  ok ($r->_has_related_objects, 'related object array has been set');
-  my @ros = @{$r->related_objects};
-  is (scalar @ros, 3, 'three related objects');
-
   my @filters = qw/F0x900 F0xB00/;
-  my $i = 0;
-  while ($i < 2) {
-    my $ro = $ros[$i];
-    my $filter = $filters[$i];
-    isa_ok ($ro, 'npg_qc::autoqc::results::samtools_stats');
-    is ($ro->filter, $filter, 'correct filter');
-    is ($ro->stats_file, $fproot . q[_] . $filter . '.stats', 'stats file path');
-    isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
-    is ($ro->composition_digest, $composition_digest, 'composition digest');
-    $i++;
-  }
 
-  my $ro = $ros[2];
-  isa_ok ($ro, 'npg_qc::autoqc::results::sequence_summary');
-  is ($ro->sequence_file, $sfile, 'seq file path');
-  isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
-  is ($ro->composition_digest, $composition_digest, 'composition digest');
+  foreach my $subset ( qw(default phix) ) {
+    foreach my $file_type ( qw(cram bam) ) {
+
+      my $ref = {
+        id_run        => 17448,
+        position      => 1,
+        tag_index     => 9,
+                };
+      my $fproot = $fproot_common;
+      if ($subset eq 'phix') {
+        $fproot .= q[_] . $subset;
+        $ref->{'subset'} = $subset;
+        $composition_digest = 'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb';
+      }
+
+      my $sfile = join q[.], $fproot, $file_type;
+      $ref->{'sequence_file'} = $sfile;
+     
+      my $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
+      ok ($r->fully_build_related, 'related objects should be fully built');
+      lives_ok { $r->execute() } 'no error calling execute()';
+
+      ok ($r->_has_related_objects, 'related object array has been set');
+      my @ros = @{$r->related_objects};
+      is (scalar @ros, 3, 'three related objects');
+
+      my $i = 0;
+      while ($i < 2) {
+        my $ro = $ros[$i];
+        my $filter = $filters[$i];
+        isa_ok ($ro, 'npg_qc::autoqc::results::samtools_stats');
+        is ($ro->filter, $filter, 'correct filter');
+        is ($ro->stats_file, $fproot . q[_] . $filter . '.stats', 'stats file path');
+        isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+        is ($ro->composition_digest, $composition_digest, 'composition digest');
+        $i++;
+      }
+
+      my $ro = $ros[2];
+      isa_ok ($ro, 'npg_qc::autoqc::results::sequence_summary');
+      is ($ro->sequence_file, $sfile, 'seq file path');
+      isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+      is ($ro->composition_digest, $composition_digest, 'composition digest');
+    }
+  }
 };
 
 1;

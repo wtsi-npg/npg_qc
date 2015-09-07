@@ -33,7 +33,8 @@ has [ @ATTRIBUTES ] => (
 );
 sub _build_sequence_format {
   my $self = shift;
-  my ($format) = $self->sequence_file =~ /[.]([^.]+)\Z/smx;
+  my ($path, $format) = $self->sequence_file =~ /\A(.+)[.]([^.]+)\Z/smx;
+  $self->_set_root_path($path);
   return $format;
 }
 sub _build_header {
@@ -47,12 +48,19 @@ sub _build_md5 {
 }
 sub _build_seqchksum {
   my $self = shift;
-  return slurp $self->sequence_file . '.seqchksum';
+  return slurp $self->_root_path . '.seqchksum';
 }
 sub _build_seqchksum_sha512 {
   my $self = shift;
-  return slurp $self->sequence_file . '.sha512seqchksum';
+  return slurp $self->_root_path . '.sha512primesums512.seqchksum';
 }
+
+has '_root_path'  => (
+    isa        => 'Str',
+    is         => 'ro',
+    required   => 0,
+    writer     => '_set_root_path',
+);
 
 sub execute {
   my $self = shift;
