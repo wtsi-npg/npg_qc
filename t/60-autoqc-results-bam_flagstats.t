@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
@@ -210,14 +210,15 @@ subtest 'finding phix subset files (no run id)' => sub {
   lives_ok { $r->freeze } 'no run id - serialization to json is ok';
 };
 
+my $archive = '17448_1_9';
+my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
+$ae->extract(to => $tempdir) or die $ae->error;
+$archive = join q[/], $tempdir, $archive;
+my $qc_dir = join q[/], $archive, 'qc';
+
 subtest 'full functionality with full file sets' => sub {
   plan tests => 96;
 
-  my $archive = '17448_1_9';
-  my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
-  $ae->extract(to => $tempdir) or die $ae->error;
-  $archive = join q[/], $tempdir, $archive;
-  my $qc_dir = join q[/], $archive, 'qc';
   mkdir $qc_dir;
 
   my $fproot_common = $archive . '/17448_1#9';
@@ -285,6 +286,34 @@ subtest 'full functionality with full file sets' => sub {
       }
     }
   }
+};
+
+subtest 'creating related objects' => sub {
+  plan tests => 6;
+  
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+        id_run        => 17448,
+        position      => 1,
+        tag_index     => 9
+  );
+
+  my $name = q[17448_1#9.bam_flagstats.json];
+  throws_ok { $r->create_related_objects() }
+    qr/Path should be given/, 'no attribute - error';
+  throws_ok { $r->create_related_objects(join q[/], $qc_dir, $name) }
+    qr/File path should be given/, 'file does not exist - error';
+  my $file         = join q[/], $qc_dir, 'cram', $name;
+  my $file_to_find = join q[/], $qc_dir, '17448_1#9.cram';
+  throws_ok { $r->create_related_objects($file) }
+    qr/Validation failed for 'NpgTrackingReadableFile' with value "$file_to_find"/,
+    'no cram file one directory up - error';
+
+  my $file_ok      = join q[/], $qc_dir, $name;
+  rename $file, $file_ok;
+  lives_ok { $r->create_related_objects($file_ok) } 'related objects built';
+  ok ($r->_has_related_objects, 'related object array has been set');
+  my @ros = @{$r->related_objects};
+  is (scalar @ros, 3, 'three related objects');
 };
 
 1;

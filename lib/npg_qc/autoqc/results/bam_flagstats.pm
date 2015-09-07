@@ -94,6 +94,7 @@ has 'sequence_file' => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
     required   => 0,
+  writer     => '_set_sequence_file',
 );
 
 has [ qw/ markdups_metrics_file
@@ -373,18 +374,14 @@ sub _find_sequence_file {
 
   my ($volume, $directories, $file) = splitpath($path);
   $file = _drop_extension($file);
-  $file =~ s/\Q_bam_flagstats\E\Z//msx;
+  $file =~ s/[\._]bam_flagstats\Z//msx;
   $file = join q[.], $file, 'cram';
   my @dirs = splitdir $directories;
   if (! pop @dirs) { # move one directory up
     pop @dirs
   }
-  my $seq_file = catpath($volume, catdir(@dirs), $file);
-  if ( !-f $seq_file ) {
-    croak "$seq_file is not found, cannot compute related objects for " . __PACKAGE__;
-  }
 
-  return $seq_file;
+  return catpath $volume, catdir(@dirs), $file;
 }
 
 sub _filter {
