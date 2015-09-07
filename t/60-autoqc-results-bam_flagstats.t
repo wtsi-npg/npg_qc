@@ -8,6 +8,9 @@ use File::Temp qw/ tempdir /;
 use Perl6::Slurp;
 use JSON;
 use Compress::Zlib;
+use Archive::Extract;
+
+my $tempdir = tempdir( CLEANUP => 1);
 
 subtest 'test attributes and simple methods' => sub {
   plan tests => 20;
@@ -73,7 +76,6 @@ subtest 'test attributes and simple methods' => sub {
 subtest 'high-level parsing' => sub {
   plan tests => 15;
 
-  my $tempdir = tempdir( CLEANUP => 1);
   my $package = 'npg_qc::autoqc::results::bam_flagstats';
   my $dups  = 't/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt';
   my $fstat = 't/data/autoqc/bam_flagstats/4783_5.flagstat';
@@ -125,36 +127,40 @@ subtest 'high-level parsing' => sub {
     'no input file - execute fails';
 };
 
+my $archive_16960 = '16960_1_0';
+my $ae_16960 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_16960}.tar.gz");
+$ae_16960->extract(to => $tempdir) or die $ae_16960->error;
+$archive_16960 = join q[/], $tempdir, $archive_16960;
+
 subtest 'finding files, calculating metrics' => sub {
   plan tests => 12;
 
-  my $data_path = 't/data/autoqc/bam_flagstats';
+  my $fproot = $archive_16960 . '/16960_1#0';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
     id_run        => 16960,
     position      => 1,
     tag_index     => 0,
-    sequence_file => join(q[/], $data_path, '16960_1#0.bam')
+    sequence_file => $fproot . '.bam'
   );
 
-  is($r->_file_path_root, join(q[/], $data_path, '16960_1#0'),
-    'file path root');
+  is($r->_file_path_root, $fproot, 'file path root');
   is($r->filename_root, undef, 'filename root undefined');
   is($r->filename4serialization, '16960_1#0.bam_flagstats.json',
     'filename for serialization'); 
-  is($r->markdups_metrics_file, $data_path.'/16960_1#0.markdups_metrics.txt',
+  is($r->markdups_metrics_file,  $fproot . '.markdups_metrics.txt',
     'markdups metrics found');
-  is($r->flagstats_metrics_file, $data_path.'/16960_1#0.flagstat',
+  is($r->flagstats_metrics_file, $fproot . '.flagstat',
     'flagstats metrics found');
   warning_like { $r->samtools_stats_file() } qr/Found the following samtools stats files/,
    'successfully finding stats files';
 
   my $stats_files = {
-     'F0x900' => $data_path . '/16960_1#0_F0x900.stats',
-     'F0xB00' => $data_path . '/16960_1#0_F0xB00.stats',               };
+     'F0x900' => $fproot . '_F0x900.stats',
+     'F0xB00' => $fproot . '_F0xB00.stats',               };
   is_deeply($r->samtools_stats_file, $stats_files, 'stats files are correct');
-
+  my $bam_md5 = join q[.], $r->sequence_file, 'md5';
   warning_like {$r->execute}
-    qr{failed to build related objects: Can't open 't/data/autoqc/bam_flagstats/16960_1#0.bam.md5'},
+    qr{failed to build related objects: Can't open '$bam_md5'},
     'metrics parsing ok, warning about a failure to build related objects';
   is($r->library_size, 240428087, 'library size value');
   is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
@@ -167,10 +173,10 @@ subtest 'finding files, calculating metrics' => sub {
 subtest 'finding phix subset files (no run id)' => sub {
   plan tests => 11;
 
-  my $data_path = 't/data/autoqc/bam_flagstats';
+  my $fproot = $archive_16960 . '/16960_1#0_phix';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
     subset           => 'phix',
-    sequence_file    => join(q[/], $data_path, '16960_1#0_phix.bam')
+    sequence_file    => $fproot . '.bam'
   );
 
   warning_like {$r->execute}
@@ -179,24 +185,24 @@ subtest 'finding phix subset files (no run id)' => sub {
   is($r->library_size, 691461, 'library size value');
   is($r->mate_mapped_defferent_chr, 0, 'mate_mapped_defferent_chr value');
 
-  is($r->_file_path_root, join(q[/], $data_path, '16960_1#0_phix'),
-    'file path root');
+  is($r->_file_path_root, $fproot, 'file path root');
   is($r->filename_root, '16960_1#0', 'filename root');
    is($r->filename4serialization, '16960_1#0_phix.bam_flagstats.json',
     'filename for serialization');  
-  is($r->markdups_metrics_file, $data_path.'/16960_1#0_phix.markdups_metrics.txt',
+  is($r->markdups_metrics_file, $fproot . '.markdups_metrics.txt',
     'phix markdups metrics found');
-  is($r->flagstats_metrics_file, $data_path.'/16960_1#0_phix.flagstat',
+  is($r->flagstats_metrics_file, $fproot . '.flagstat',
     'phix flagstats metrics found');
   warning_like { $r->samtools_stats_file() } qr/Found the following samtools stats files/,
    'successfully finding stats files';
 
   my $stats_files = {
-     'F0x900' => $data_path . '/16960_1#0_phix_F0x900.stats',
-     'F0xB00' => $data_path . '/16960_1#0_phix_F0xB00.stats',
+     'F0x900' => $fproot . '_F0x900.stats',
+     'F0xB00' => $fproot . '_F0xB00.stats',
                      };
   is_deeply($r->samtools_stats_file, $stats_files, 'phix stats files found');
   lives_ok { $r->freeze } 'no run id - serialization to json is ok';
 };
+
 
 1;
