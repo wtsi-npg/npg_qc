@@ -155,10 +155,7 @@ sub _build_samtools_stats_file {
       }
     }
 
-    my @found = values %{$paths};
-    if (@found) {
-      carp 'Found the following samtools stats files: ' . join q[, ], @found;
-    } else {
+    if (scalar keys %{$paths} == 0) {
       carp 'Not found samtools stats files';
     }
   } else {

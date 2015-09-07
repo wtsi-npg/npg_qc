@@ -134,7 +134,7 @@ $ae_16960->extract(to => $tempdir) or die $ae_16960->error;
 $archive_16960 = join q[/], $tempdir, $archive_16960;
 
 subtest 'finding files, calculating metrics' => sub {
-  plan tests => 12;
+  plan tests => 11;
 
   my $fproot = $archive_16960 . '/16960_1#0';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
@@ -153,8 +153,6 @@ subtest 'finding files, calculating metrics' => sub {
     'markdups metrics found');
   is($r->flagstats_metrics_file, $fproot . '.flagstat',
     'flagstats metrics found');
-  warning_like { $r->samtools_stats_file() } qr/Found the following samtools stats files/,
-   'successfully finding stats files';
 
   my $stats_files = {
      'F0x900' => $fproot . '_F0x900.stats',
@@ -181,7 +179,7 @@ subtest 'finding files, calculating metrics' => sub {
 };
 
 subtest 'finding phix subset files (no run id)' => sub {
-  plan tests => 11;
+  plan tests => 10;
 
   my $fproot = $archive_16960 . '/16960_1#0_phix';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
@@ -202,8 +200,6 @@ subtest 'finding phix subset files (no run id)' => sub {
     'phix markdups metrics found');
   is($r->flagstats_metrics_file, $fproot . '.flagstat',
     'phix flagstats metrics found');
-  warning_like { $r->samtools_stats_file() } qr/Found the following samtools stats files/,
-   'successfully finding stats files';
 
   my $stats_files = {
      'F0x900' => $fproot . '_F0x900.stats',
