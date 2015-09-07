@@ -130,6 +130,7 @@ lib/npg_qc/autoqc/qc_store/query.pm
 lib/npg_qc/autoqc/results/adapter.pm
 lib/npg_qc/autoqc/results/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/results/bam_flagstats.pm
+lib/npg_qc/autoqc/results/base.pm
 lib/npg_qc/autoqc/results/collection.pm
 lib/npg_qc/autoqc/results/contamination.pm
 lib/npg_qc/autoqc/results/gc_bias.pm
@@ -140,7 +141,9 @@ lib/npg_qc/autoqc/results/pulldown_metrics.pm
 lib/npg_qc/autoqc/results/qX_yield.pm
 lib/npg_qc/autoqc/results/ref_match.pm
 lib/npg_qc/autoqc/results/result.pm
+lib/npg_qc/autoqc/results/samtools_stats.pm
 lib/npg_qc/autoqc/results/sequence_error.pm
+lib/npg_qc/autoqc/results/sequence_summary.pm
 lib/npg_qc/autoqc/results/spatial_filter.pm
 lib/npg_qc/autoqc/results/split_stats.pm
 lib/npg_qc/autoqc/results/tag_decode_stats.pm
@@ -445,7 +448,6 @@ t/data/api_dbic_fixtures/npg_qc/RunTimeline.yml
 t/data/api_dbic_fixtures/npg/RunStatusDict.yml
 t/data/api_dbic_fixtures/npg/RunStatus.yml
 t/data/api_dbic_fixtures/npg/Run.yml
-t/data/autoqc/12313_1#0_bam_flagstats.txt
 t/data/autoqc/bam_flagstats/16960_1#0.bam
 t/data/autoqc/bam_flagstats/16960_1#0.flagstat
 t/data/autoqc/bam_flagstats/16960_1#0.markdups_metrics.txt
@@ -458,6 +460,10 @@ t/data/autoqc/bam_flagstats/16960_1#0_phix.markdups_metrics.txt
 t/data/autoqc/bam_flagstats/16960_1#0_phix_F0x900.stats
 t/data/autoqc/bam_flagstats/16960_1#0_phix_F0xB00.stats
 t/data/autoqc/bam_flagstats/qc/16960_1#0.bam_flagstats.json
+t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json
+t/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt
+t/data/autoqc/bam_flagstats/4783_5.flagstat
+t/data/autoqc/bam_flagstats/4921_3_bam_flagstats.json
 t/data/autoqc/dbix_loader/run/12233_1.upstream_tags.json
 t/data/autoqc/dbix_loader/run/12233_1.adapter.json
 t/data/autoqc/dbix_loader/run/12233_1.gc_fraction.json
@@ -559,13 +565,8 @@ t/data/autoqc/4078_1.sequence_error.json
 t/data/autoqc/4360_8_tag_decode_stats.json
 t/data/autoqc/4453_2#0.gc_fraction.json
 t/data/autoqc/4453_2#0.qX_yield.json
-t/data/autoqc/4783_5_bam_flagstats.json
-t/data/autoqc/4783_5_metrics_optical.txt
-t/data/autoqc/4783_5_mk.flagstat
-t/data/autoqc/4921_3_bam_flagstats.json
 t/data/autoqc/5374_2_1-5374_2_2_human_split_stats.json
 t/data/autoqc/5428_2.ref_match.json
-t/data/autoqc/6440_1#0.bamflagstats
 t/data/autoqc/9999_1.blat
 t/data/autoqc/9999_1.fastq
 t/data/autoqc/9999_1.sequence_error.json
@@ -580,7 +581,6 @@ t/data/autoqc/alignment_refmatch.sam
 t/data/autoqc/alignment.bam
 t/data/autoqc/alignment.sam
 t/data/autoqc/alignment_small.sam
-t/data/autoqc/estimate_library_complexity_metrics.txt
 t/data/autoqc/fixtures/Adapter.yml
 t/data/autoqc/gc_bias/sam-3lines
 t/data/autoqc/gc_bias/sam_aligned_header

@@ -2,6 +2,7 @@ package npg_qc::autoqc::db_loader;
 
 use Moose;
 use namespace::autoclean;
+use Class::Load qw/load_class/;
 use Carp;
 use JSON;
 use Try::Tiny;
@@ -12,7 +13,6 @@ use Readonly;
 use npg_qc::Schema;
 use npg_tracking::util::types;
 use npg_qc::autoqc::role::result;
-use npg_qc::autoqc::results::bam_flagstats;
 
 with qw/MooseX::Getopt/;
 
@@ -49,6 +49,12 @@ has 'update'  => ( is       => 'ro',
                    required => 0,
                    default  => 1,
                  );
+
+has 'load_related'  => ( is       => 'ro',
+                         isa      => 'Bool',
+                         required => 0,
+                         default  => 1,
+                       );
 
 has 'json_file' => ( is          => 'ro',
                      isa         => 'ArrayRef',
@@ -93,7 +99,7 @@ sub load{
   my $transaction = sub {
     my $count = 0;
     foreach my $json_file (@{$self->json_file}) {
-      $count += $self->_json2db($json_file);
+      $count += $self->_json2db(slurp($json_file), $json_file);
     }
     return $count;
   };
@@ -112,11 +118,15 @@ sub load{
 }
 
 sub _json2db{
-  my ($self, $json_file) = @_;
+  my ($self, $json, $json_file) = @_;
+
+  if (!$json) {
+    croak 'JSON string representation of the object is missing';
+  }
 
   my $count = 0;
   try {
-    my $values = decode_json(slurp $json_file);
+    my $values = decode_json($json);
     my $class_name = delete $values->{$CLASS_FIELD};
     if ($class_name) {
       ($class_name, my $dbix_class_name) =
@@ -124,46 +134,92 @@ sub _json2db{
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
 
-        if ($class_name eq 'bam_flagstats') { # need to get the subset/human_split field correctly
-                                            # if one of them is missing
-          my $module = 'npg_qc::autoqc::results::' . $class_name;
-          $values = decode_json($module->load($json_file)->freeze());
+        my $module = 'npg_qc::autoqc::results::' . $class_name;
+        load_class($module);
+        my $obj = $module->thaw($json);
+
+        if ($class_name eq 'bam_flagstats') {
+          $values = decode_json($obj->freeze());
         }
+        if ( $obj->can('composition') && $obj->can('composition_digest') ) {
+          $values->{'digest'} = $self->_ensure_composition_exists($obj);
+        }
+        # Load the main object
+        $count = $self->_values2db($dbix_class_name, $values, $self->update);
 
-        my $rs = $self->schema->resultset($dbix_class_name);
-        my $result_class = $rs->result_class;
-
-        $self->_exclude_nondb_attrs($json_file, $values, $result_class->columns());
-        $result_class->deflate_unique_key_components($values);
-
-        if ($self->update) {
-          $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
-          $count = 1;
-        } else {
-          if (!$rs->find($values)) {
-            $rs->new($values)->set_inflated_columns($values)->insert();
-            $count = 1;
+        # Backwards compatibility - load related objects.
+        # New code should create serialized related objects which will
+        # be loaded from json files. For cases where we cannot produce serialized
+        # version of objects, we will generate the objects now.
+        if ( $json_file && $self->load_related &&
+             $obj->can('related_objects') &&
+             $obj->can('create_related_objects') ) {
+          $obj->create_related_objects($json_file);
+          foreach my $o (@{$obj->related_objects}) {
+            $self->_json2db($o->freeze()); # Recursion
           }
         }
       }
     }
   } catch {
-    $self->_log("Attempted to load $json_file");
+    my $j =  $json_file || $json;
+    $self->_log("Attempted to load $j");
     croak $_;
   };
   my $m = $count ? 'Loaded' : 'Skipped';
-  $self->_log(join q[ ], $m, $json_file);
+  $self->_log(join q[ ], $m, $json_file || q[json string]);
+  return $count;
+}
+
+sub _ensure_composition_exists {
+  my ($self, $obj) = @_;
+
+  # Load components for a composition that is not yet in the database
+  my $d = $obj->composition_digest;
+  my $num_components = $obj->composition->num_components;
+  foreach my $c (@{$obj->composition->components}) {
+    my $values = decode_json($c->freeze());
+    $values->{'digest'}         = $d;
+    $values->{'num_components'} = $num_components;
+    my $count = $self->_values2db('SequenceComponent', $values, 0); #need insert only
+    _log(sprintf '%s component %s for digest %s',
+            $count ? 'Created' : 'Found',
+            $c->freeze(),
+            $c->digest() );
+  }
+  return $d;
+}
+
+sub _values2db {
+  my ($self, $dbix_class_name, $values, $update) = @_;
+
+  my $count = 0;
+  my $rs = $self->schema->resultset($dbix_class_name);
+  my $result_class = $rs->result_class;
+
+  $self->_exclude_nondb_attrs($values, $result_class->columns());
+  $result_class->deflate_unique_key_components($values);
+
+  if ($update) {
+    $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
+    $count = 1;
+  } else {
+    if (!$rs->find($values)) {
+      $rs->new($values)->set_inflated_columns($values)->insert();
+      $count = 1;
+    }
+  }
   return $count;
 }
 
 sub _exclude_nondb_attrs {
-  my ($self, $json_file, $values, @columns) = @_;
+  my ($self, $values, @columns) = @_;
 
   foreach my $key ( keys %{$values} ) {
     if (none {$key eq $_} @columns) {
       delete $values->{$key};
       if ($key ne $CLASS_FIELD) {
-        $self->_log("$json_file: not loading field '$key'");
+        $self->_log("Not loading field '$key'");
       }
     }
   }
@@ -239,6 +295,8 @@ npg_qc::autoqc::db_loader
 =item Moose
 
 =item namespace::autoclean
+
+=item Class::Load
 
 =item MooseX::Getopt
 

@@ -413,7 +413,7 @@ my $temp = tempdir( CLEANUP => 1);
 
 {
     my $c = npg_qc::autoqc::results::collection->new();
-    is (join(q[ ], (sort @{$c->_result_classes})), q[adapter alignment_filter_metrics bam_flagstats contamination gc_bias gc_fraction genotype insert_size pulldown_metrics qX_yield ref_match sequence_error spatial_filter split_stats tag_decode_stats tag_metrics tags_reporters upstream_tags verify_bam_id], 'list of result classes');
+    is (join(q[ ], (sort @{$c->_result_classes})), q[adapter alignment_filter_metrics bam_flagstats contamination gc_bias gc_fraction genotype insert_size pulldown_metrics qX_yield ref_match samtools_stats sequence_error sequence_summary spatial_filter split_stats tag_decode_stats tag_metrics tags_reporters upstream_tags verify_bam_id], 'list of result classes');
 }
 
 {

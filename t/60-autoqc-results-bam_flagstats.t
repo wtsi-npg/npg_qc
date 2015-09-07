@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 4;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
@@ -66,106 +66,66 @@ subtest 'test attributes and simple methods' => sub {
   } 'no error when human_split and subset attrs are consistent';
 
   $r = npg_qc::autoqc::results::bam_flagstats->
-    load('t/data/autoqc/4921_3_bam_flagstats.json');
+    load('t/data/autoqc/bam_flagstats/4921_3_bam_flagstats.json');
   ok( !$r->total_reads(), 'total reads not available' ) ;
 };
 
-subtest 'low-level parsing' => sub {
-  plan tests => 7;
-
-  my $ref = {position => 5, id_run => 4783,};
-
-  my $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  $r->parsing_metrics_file('t/data/autoqc/estimate_library_complexity_metrics.txt');
-  is($r->read_pairs_examined(),2384324, 'read_pairs_examined');
-  is($r->paired_mapped_reads(),  0, 'paired_mapped_reads');
-
-  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  open my $flagstats_fh2, '<', 't/data/autoqc/6440_1#0.bamflagstats';
-  $r->parsing_flagstats($flagstats_fh2);
-  close $flagstats_fh2; 
-  is($r->total_reads(), 2978224 , 'total reads');
-  is($r->proper_mapped_pair(),2765882, 'properly paired');
-
-  $ref->{'tag_index'} = 0;
-  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  lives_ok {$r->parsing_metrics_file('t/data/autoqc/12313_1#0_bam_flagstats.txt')}
-    'file with library size -1 parsed';
-  is($r->library_size, undef, 'library size is undefined');
-  is($r->read_pairs_examined, 0, 'examined zero read pairs');
-};
-
-subtest 'high-level parsing - backwards compatibility' => sub {
-  plan tests => 25;
+subtest 'high-level parsing' => sub {
+  plan tests => 15;
 
   my $tempdir = tempdir( CLEANUP => 1);
   my $package = 'npg_qc::autoqc::results::bam_flagstats';
-  my $dups  = 't/data/autoqc/4783_5_metrics_optical.txt';
-  my $fstat = 't/data/autoqc/4783_5_mk.flagstat';
+  my $dups  = 't/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt';
+  my $fstat = 't/data/autoqc/bam_flagstats/4783_5.flagstat';
   my $dups_attr_name    = 'markdups_metrics_file';
   my $fstat_attr_name   = 'flagstats_metrics_file';
   my $stats_attr_name   = 'samtools_stats_file';
-  my $h1 = {position => 5,
-            id_run   => 4783};
 
-  my $r1 = $package->new($h1);
-  $r1->parsing_metrics_file($dups);
-
-  open my $flagstats_fh, '<', $fstat;
-  $r1->parsing_flagstats($flagstats_fh);
-  close $flagstats_fh;
-
+  my $h1 = {position => 5, id_run   => 4783};
   $h1->{$dups_attr_name}    = $dups;
   $h1->{$fstat_attr_name}   = $fstat;
-  my $r2 = $package->new($h1);
+  my $r = $package->new($h1);
+
   my $expected = from_json(
-    slurp q{t/data/autoqc/4783_5_bam_flagstats.json}, {chomp=>1});
+    slurp q{t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json}, {chomp=>1});
+  $expected->{'related_objects'} = [];
 
-  my $count = 0;
-  for my $r (($r1, $r2)) {
-    $count++;
-    if ($count == 1) {
-      throws_ok { $r->execute() }
-        qr/markdups_metrics_file not found/, 'execute method fails';
-    } else {
-      lives_ok { $r->execute() } 'execute method is ok';
-    }      
+  lives_ok { $r->execute() } 'execute method is ok';
+  my $result_json;
+  lives_ok {
+    $result_json = $r->freeze();
+    $r->store(qq{$tempdir/4783_5_bam_flagstats.json});
+  } 'no error when serializing to json string and file';
 
-    my $result_json;
-    lives_ok {
-      $result_json = $r->freeze();
-      $r->store(qq{$tempdir/4783_5_bam_flagstats.json});
-    } 'no error when serializing to json string and file';
-
-    my $from_json_hash = from_json($result_json);
-    delete $from_json_hash->{__CLASS__};
-    delete $from_json_hash->{$dups_attr_name};
-    delete $from_json_hash->{$fstat_attr_name};
-
-    is_deeply($from_json_hash, $expected, 'correct json output');
-    is($r->total_reads(), 32737230 , 'total reads');
-    is($r->total_mapped_reads(), '30992462', 'total mapped reads');
-    is($r->percent_mapped_reads, 94.6703859795102, 'percent mapped reads');
-    is($r->percent_duplicate_reads, 15.6023713120952, 'percent duplicate reads');
-    is($r->percent_properly_paired ,89.7229484595978, 'percent properly paired');
-    is($r->percent_singletons, 2.92540938863795, 'percent singletons');
-    is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
-  }
+  my $from_json_hash = from_json($result_json);
+  delete $from_json_hash->{__CLASS__};
+  delete $from_json_hash->{$dups_attr_name};
+  delete $from_json_hash->{$fstat_attr_name};
+   
+  is_deeply($from_json_hash, $expected, 'correct json output');
+  is($r->total_reads(), 32737230 , 'total reads');
+  is($r->total_mapped_reads(), '30992462', 'total mapped reads');
+  is($r->percent_mapped_reads, 94.6703859795102, 'percent mapped reads');
+  is($r->percent_duplicate_reads, 15.6023713120952, 'percent duplicate reads');
+  is($r->percent_properly_paired ,89.7229484595978, 'percent properly paired');
+  is($r->percent_singletons, 2.92540938863795, 'percent singletons');
+  is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
+  
 
   delete $h1->{$dups_attr_name};
   delete $h1->{$fstat_attr_name};
-  $r1 = $package->new($h1);
-  warning_like {$r1->samtools_stats_file}
+  $r = $package->new($h1);
+  warning_like {$r->samtools_stats_file}
     qr/Sequence file not given - not looking for samtools stats files/,
     'warning when looking for samtool stats files';
-  is_deeply($r1->samtools_stats_file, {}, 'samtools stats files not found');
-  is($r1->markdups_metrics_file, undef, 'markdups metrics not found');
-  is($r1->flagstats_metrics_file, undef, 'flagstats metrics not found');
-  throws_ok { $r1->execute() } qr/markdups_metrics_file not found/,
+  is_deeply($r->samtools_stats_file, {}, 'samtools stats files not found');
+  is($r->markdups_metrics_file, undef, 'markdups metrics not found');
+  is($r->flagstats_metrics_file, undef, 'flagstats metrics not found');
+  throws_ok { $r->execute() } qr/markdups_metrics_file not found/,
     'no input file - execute fails';
 };
 
-subtest 'finding files, ca;culating metrics' => sub {
+subtest 'finding files, calculating metrics' => sub {
   plan tests => 12;
 
   my $data_path = 't/data/autoqc/bam_flagstats';
@@ -193,7 +153,9 @@ subtest 'finding files, ca;culating metrics' => sub {
      'F0xB00' => $data_path . '/16960_1#0_F0xB00.stats',               };
   is_deeply($r->samtools_stats_file, $stats_files, 'stats files are correct');
 
-  lives_ok {$r->execute} 'metrics parsing ok';
+  warning_like {$r->execute}
+    qr{failed to build related objects: Can't open 't/data/autoqc/bam_flagstats/16960_1#0.bam.md5'},
+    'metrics parsing ok, warning about a failure to build related objects';
   is($r->library_size, 240428087, 'library size value');
   is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
 
@@ -211,7 +173,9 @@ subtest 'finding phix subset files (no run id)' => sub {
     sequence_file    => join(q[/], $data_path, '16960_1#0_phix.bam')
   );
 
-  lives_ok {$r->execute} 'metrics parsing ok';
+  warning_like {$r->execute}
+    qr/Warning: failed to build related objects/,
+    'metrics parsing ok, warning about failure to  build related objects';
   is($r->library_size, 691461, 'library size value');
   is($r->mate_mapped_defferent_chr, 0, 'mate_mapped_defferent_chr value');
 

@@ -6,12 +6,25 @@ use Carp;
 use English qw(-no_match_vars);
 use Perl6::Slurp;
 use List::Util qw(sum);
-use File::Spec::Functions qw(splitpath catfile catpath);
+use File::Spec::Functions qw( splitpath
+                              catpath
+                              catfile
+                              splitdir
+                              catdir );
+use Try::Tiny;
 use Readonly;
 
 use npg_tracking::util::types;
+use npg_qc::autoqc::results::sequence_summary;
+use npg_qc::autoqc::results::samtools_stats;
+
 extends qw( npg_qc::autoqc::results::result );
-with    qw( npg_qc::autoqc::role::bam_flagstats );
+with    qw(
+            npg_tracking::glossary::subset
+            npg_qc::autoqc::role::bam_flagstats
+          );
+with 'npg_tracking::glossary::composition::factory' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
 our $VERSION = '0';
 
@@ -37,12 +50,7 @@ has [ qw/ +path
           +id_run
           +position / ] => ( required   => 0, );
 
-has 'subset' => ( isa         => 'Maybe[Str]',
-                  is          => 'ro',
-                  required    => 0,
-                  predicate   => 'has_subset',
-                  writer      => '_set_subset',
-);
+has '+subset' => ( writer      => '_set_subset', );
 
 has 'human_split' => ( isa            => 'Maybe[Str]',
                        is             => 'rw',
@@ -114,9 +122,14 @@ sub _build__file_path_root {
   my $self = shift;
   my $path = q[];
   if ($self->sequence_file) {
-    ($path) = $self->sequence_file =~ /\A(.+)\.[[:lower:]]+\Z/smx;
+    ($path) =  _drop_extension($self->sequence_file);
   }
   return $path;
+}
+sub _drop_extension {
+  my $path = shift;
+  ($path) = $path =~ /\A(.+)\.[[:lower:]]+\Z/smx;
+  return $path
 }
 
 has 'samtools_stats_file' => ( isa        => 'HashRef',
@@ -150,17 +163,40 @@ sub _build_samtools_stats_file {
   return $paths;
 }
 
-sub _filter {
-  my ($self, $path) = @_;
+has 'related_objects' => ( isa        => 'ArrayRef[Object]',
+                           is         => 'ro',
+                           lazy_build => 1,
+                           writer     => '_set_related_objects',
+                           predicate  => '_has_related_objects',
+);
+sub _build_related_objects {
+  my $self = shift;
 
-  my ($volume, $directories, $file) = splitpath($path);
-  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
-  if (!$filter) {
-    croak "Failed to get filter from $path";
+  my @objects = ();
+  if ($self->sequence_file) {
+    my $composition = $self->create_composition();
+    if ($composition) {
+      foreach my $filter (sort keys %{$self->samtools_stats_file}) {
+        push @objects,
+          npg_qc::autoqc::results::samtools_stats->new(
+            composition => $composition,
+            filter      => $filter,
+            stats_file  => $self->samtools_stats_file->{$filter}
+          );
+      }
+
+      push @objects,
+        npg_qc::autoqc::results::sequence_summary->new(
+          composition   => $composition,
+          sequence_file => $self->sequence_file
+        );
+
+      for my $o ( @objects ) {
+        $o->execute;
+      }
+    }
   }
-  my $subset = $self->subset ? $self->subset . q[_] : q[];
-
-  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
+  return \@objects;
 }
 
 sub BUILD {
@@ -191,6 +227,17 @@ sub BUILD {
   return;
 }
 
+around 'write2file' => sub {
+  my ($orig, $self, $path) = @_;
+  if ($self->_has_related_objects()) {
+    for my $o ( @{$self->related_objects()} ) {
+      $o->write2file($path);
+    }
+  }
+  $self->_set_related_objects([]);
+  return $self->$orig($path);
+};
+
 sub execute {
   my $self = shift;
 
@@ -206,6 +253,12 @@ sub execute {
   open my $fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
   $self->parsing_flagstats($fh);
   close $fh or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
+
+  try {
+    $self->related_objects();
+  } catch {
+    carp qq[Warning: failed to build related objects: $_];
+  };
 
   return;
 }
@@ -295,6 +348,56 @@ sub filename_root {
   return;
 }
 
+sub create_related_objects {
+  my ($self, $path) = @_;
+  if (!$self->_has_related_objects()) {
+    if (!$self->sequence_file) {
+      $self->_set_sequence_file(_find_sequence_file($path));
+    }
+    $self->related_objects();
+  }
+  return;
+}
+
+sub _find_sequence_file {
+  my $path = shift;
+
+  if (!$path) {
+    croak 'Path should be given';
+  }
+  if (!-f $path) {
+    croak 'File path should be given';
+  }
+
+  my ($volume, $directories, $file) = splitpath($path);
+  $file = _drop_extension($file);
+  $file =~ s/\Q_bam_flagstats\E\Z//msx;
+  $file = join q[.], $file, 'cram';
+  my @dirs = splitdir $directories;
+  if (! pop @dirs) { # move one directory up
+    pop @dirs
+  }
+  my $seq_file = catpath($volume, catdir(@dirs), $file);
+  if ( !-f $seq_file ) {
+    croak "$seq_file is not found, cannot compute related objects for " . __PACKAGE__;
+  }
+
+  return $seq_file;
+}
+
+sub _filter {
+  my ($self, $path) = @_;
+
+  my ($volume, $directories, $file) = splitpath($path);
+  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
+  if (!$filter) {
+    croak "Failed to get filter from $path";
+  }
+  my $subset = $self->subset ? $self->subset . q[_] : q[];
+
+  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -312,20 +415,46 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head1 SUBROUTINES/METHODS
 
+=head2 id_run
+
+  an optional attribute
+
+=head2 position
+
+  an optional attribute
+
+=head2 tag_index
+
+  an optional attribute
+
 =head2 subset
 
-  an optional subset, see npg_qc::autoqc::role:::sequence_subset for details.
+  an optional subset, see npg_tracking::glossary::subset for details.
 
 =head2 BUILD - ensures human_split and subset fields are populated consistently
 
 =head2 sequence_file
 
   an optional attribute, a full path to the sequence, should be set
-  for 'execute' method to work correctly 
+  for 'execute' method to work correctly
+
+=head2 write2file
+
+  extended parent method of the same name, serializes related objects to files
+  and resets the related objects attribute to an empty array, then calls
+  teh parent method
 
 =head2 execute
 
   calls methods for parsing samtools flagstats and mark duplicates outputs
+
+=head2 related_objects
+
+  a lazy attribute, an array of related autoqc result objects
+
+=head2 create_related_objects
+
+  method forcing related objects attribute to be built
 
 =head2 parsing_flagstats
 
@@ -367,7 +496,9 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item List::Util
 
-=item File::Spec
+=item File::Spec::Functions
+
+=item Try::Tiny
 
 =item Readonly
 
@@ -375,11 +506,15 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item npg_tracking::util::types
 
+=item npg_tracking::glossary::subset
+
+=item npg_tracking::glossary::composition::factory
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =item npg_qc::autoqc::results::result
 
 =item npg_qc::autoqc::role::bam_flagstats
-
-=item npg_qc::autoqc::role::sequence_subset
 
 =back
 

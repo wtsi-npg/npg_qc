@@ -28,9 +28,9 @@ npg_qc::autoqc::autoqc
 
 =head1 SYNOPSIS
 
-  my $autoqc = npg_qc::autoqc::autoqc->new(archive_path=>q[/staging/IL29/analysis/123456_IL2_2222/Data/Intensities/Bustard-2009-10-01/GERALD-2009-10-01/archive], position=>1, check=>q[insert_size]);
+  my $autoqc = npg_qc::autoqc::autoqc->new(archive_path=>q[some_path], position=>1, check=>q[insert_size]);
   $autoqc->run();
-  my $checks = npg_qc::autoqc::autoqc->list_all_checks();
+  my $checks = npg_qc::autoqc::autoqc->checks_list();
 
 =head1 DESCRIPTION
 
