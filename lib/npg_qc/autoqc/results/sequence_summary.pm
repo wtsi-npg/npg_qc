@@ -62,13 +62,14 @@ has '_root_path'  => (
     writer     => '_set_root_path',
 );
 
-sub execute {
+override 'execute' => sub {
   my $self = shift;
+  super();
   for my $attr ( @ATTRIBUTES ) {
     $self->$attr;
   }
   return;
-}
+};
 
 override 'filename_root' => sub  {
   my $self = shift;

@@ -18,6 +18,7 @@ has 'composition' => (
     lazy_build => 1,
     handles   => {
       'composition_digest' => 'digest',
+      'num_components'     => 'num_components',
     },
 );
 sub _build_composition {
@@ -75,6 +76,14 @@ around 'equals_byvalue' => sub {
 
   return $comp;
 };
+
+sub execute {
+  my $self = shift;
+  if ($self->num_components == 0) {
+    croak 'Empty composition - cannot run execute()';
+  }
+  return;
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
