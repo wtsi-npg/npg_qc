@@ -20,6 +20,7 @@ has 'composition' => (
       'composition_digest' => 'digest',
       'num_components'     => 'num_components',
     },
+    predicate  => 'has_composition',
 );
 sub _build_composition {
   my $self = shift;
@@ -48,7 +49,7 @@ sub filename_root_from_filename {
 
 around 'to_string' => sub {
   my ($orig, $self) = @_;
-  return join q[ ], __PACKAGE__ , $self->composition->freeze;
+  return join q[ ], ref $self , $self->composition->freeze;
 };
 
 around 'equals_byvalue' => sub {
@@ -76,6 +77,29 @@ around 'equals_byvalue' => sub {
 
   return $comp;
 };
+
+sub composition_subset {
+  my $self = shift;
+
+  my @subsets = $self->composition->component_values4attr('subset');
+  my $subset;
+  if (@subsets) {
+    if (scalar @subsets > 1) {
+      croak 'Multiple subsets within the composition: ' . join q[,] , @subsets;
+    }
+    $subset = $subsets[0];
+  }
+
+  if ( $self->can('subset') ) {
+    if ( (!$self->subset && $subset) ||
+         ($self->subset && !$subset) ||
+         ($self->subset && $subset && $self->subset ne $subset) ) {
+      croak 'Inconsistent subset values for this object and components of the composition';
+    }
+  }
+
+  return $subset;
+}
 
 sub execute {
   my $self = shift;
@@ -128,6 +152,16 @@ details. Returns a human readable string representation of the object'
 =head2 equals_byvalue
 
 Autoqc result object interface method, see npg_qc::autoqc::role::result for details.
+
+=head2 composition_subset
+
+A single, possibly undefined, value describing the subset attribute values of the components.
+An error if a single value cannot be produced or if it is not the same as the value returned
+by the subset method/attribute of this object (if such method/attribute is available).
+
+=head2 execute
+
+=head2 filename_root_from_filename
 
 =head1 DIAGNOSTICS
 

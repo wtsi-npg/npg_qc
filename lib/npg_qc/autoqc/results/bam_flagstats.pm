@@ -1,6 +1,7 @@
 package npg_qc::autoqc::results::bam_flagstats;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
@@ -138,31 +139,31 @@ sub _drop_extension {
   return $path
 }
 
-has 'samtools_stats_file' => ( isa        => 'HashRef',
+has 'samtools_stats_file' => ( isa        => 'ArrayRef',
                                is         => 'ro',
                                lazy_build => 1,
 );
 sub _build_samtools_stats_file {
   my $self = shift;
 
-  my $paths = {};
-
+  my @paths = ();
   if ($self->sequence_file) {
-    my $path = $self->_file_path_root . q[*.stats];
-    foreach my $file ( grep { -f $_ } glob $path) {
-      my $filter = $self->_filter($file);
-      if ($filter) {
-        $paths->{$filter} = $file;
-      }
-    }
-    if (scalar keys %{$paths} == 0) {
-      carp 'Not found samtools stats files';
+    my @underscores = ($self->sequence_file =~ /_/gsmx);
+    my $n = 1 + scalar @underscores;
+    @paths = sort grep { -f $_ && _matches_seq_file($_, $n) } glob $self->_file_path_root . q[_*.stats];
+    if (!@paths) {
+      carp 'Samtools stats files are not found';
     }
   } else {
     carp 'Sequence file not given - not looking for samtools stats files';
   }
 
-  return $paths;
+  return \@paths;
+}
+sub _matches_seq_file {
+  my ($path, $expected_num_underscores) = @_;
+  my @underscores = ($path =~ /_/gsmx);
+  return scalar @underscores == $expected_num_underscores;
 }
 
 has 'related_objects' => ( isa        => 'ArrayRef[Object]',
@@ -177,22 +178,15 @@ sub _build_related_objects {
   my @objects = ();
   if ($self->sequence_file && $self->id_run && $self->position) {
     my $composition = $self->create_composition();
-    if ($composition) {
-      foreach my $filter (sort keys %{$self->samtools_stats_file}) {
-        push @objects,
-          npg_qc::autoqc::results::samtools_stats->new(
-            composition => $composition,
-            filter      => $filter,
-            stats_file  => $self->samtools_stats_file->{$filter}
-          );
-      }
-
-      push @objects,
-        npg_qc::autoqc::results::sequence_summary->new(
-          composition   => $composition,
-          sequence_file => $self->sequence_file
-        );
-    }
+    @objects = map { npg_qc::autoqc::results::samtools_stats->new(
+                          composition => $composition,
+                          stats_file  => $_
+                        )
+                   } @{$self->samtools_stats_file};
+    push @objects, npg_qc::autoqc::results::sequence_summary->new(
+                     composition   => $composition,
+                     sequence_file => $self->sequence_file
+                   );
   }
   return \@objects;
 }
@@ -252,7 +246,7 @@ sub filename_root {
 
 sub execute {
   my $self = shift;
-
+use Test::More;
   $self->_parse_markdups_metrics();
   $self->_parse_flagstats();
   $self->related_objects();
@@ -384,19 +378,6 @@ sub _find_sequence_file {
   return catpath $volume, catdir(@dirs), $file;
 }
 
-sub _filter {
-  my ($self, $path) = @_;
-
-  my ($volume, $directories, $file) = splitpath($path);
-  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
-  if (!$filter) {
-    croak "Failed to get filter from $path";
-  }
-  my $subset = $self->subset ? $self->subset . q[_] : q[];
-
-  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -470,7 +451,7 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head2 samtools_stats_file
 
-  an attribute, is built when 'execute' method is invoked
+  an attribute which is built when 'execute' method is invoked
 
 =head2 filename_root
 
@@ -483,6 +464,8 @@ npg_qc::autoqc::results::bam_flagstats
 =over
 
 =item Moose
+
+=item MooseX::StrictConstructor
 
 =item Carp
 

@@ -1,10 +1,13 @@
 package npg_qc::autoqc::results::samtools_stats;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use npg_tracking::util::types;
 use Compress::Zlib;
 use Perl6::Slurp;
+use File::Spec::Functions qw( splitpath );
+use Carp;
 
 extends qw(npg_qc::autoqc::results::base);
 
@@ -19,25 +22,41 @@ has 'stats_file'     => (
 has 'filter'         => (
     is         => 'ro',
     isa        => 'Str',
-    required   => 1,
+    required   => 0,
+    lazy_build => 1,
 );
+sub _build_filter {
+  my ($self, $path) = @_;
+
+  my ($volume, $directories, $file) = splitpath($self->stats_file);
+  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
+  if (!$filter) {
+    croak "Failed to get filter from $path";
+  }
+
+  my $subset = $self->composition_subset();
+  $subset = $subset ? $subset . q[_] : q[];
+  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
+}
 
 has 'stats'         => (
     is         => 'ro',
     isa        => 'Str',
     required   => 0,
     lazy_build => 1,
+    predicate  => '_has_stats',
 );
 sub _build_stats {
   my $self = shift;
   return compress(slurp $self->stats_file);
 }
 
-sub execute {
+override 'execute' => sub {
   my $self = shift;
+  super();
   $self->stats();
   return;
-}
+};
 
 override 'filename_root' => sub  {
   my $self = shift;
@@ -93,6 +112,8 @@ Method forcing all lazy attributes of the object to be built.
 
 =item Moose
 
+=item MooseX::StrictConstructor
+
 =item namespace::autoclean
 
 =item npg_tracking::util::types
@@ -100,6 +121,10 @@ Method forcing all lazy attributes of the object to be built.
 =item Compress::Zlib
 
 =item Perl6::Slurp
+
+=item File::Spec::Functions
+
+=item Carp
 
 =item npg_qc::autoqc::results::base
 

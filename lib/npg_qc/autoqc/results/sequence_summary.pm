@@ -1,6 +1,7 @@
 package npg_qc::autoqc::results::sequence_summary;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use DateTime;
 use Perl6::Slurp;
@@ -131,6 +132,8 @@ Method forcing all lazy attributes of the object to be built.
 =over
 
 =item Moose
+
+=item MooseX::StrictConstructor
 
 =item namespace::autoclean
 

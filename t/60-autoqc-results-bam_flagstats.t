@@ -122,7 +122,7 @@ subtest 'high-level parsing' => sub {
   warning_like {$r->samtools_stats_file}
     qr/Sequence file not given - not looking for samtools stats files/,
     'warning when looking for samtool stats files';
-  is_deeply($r->samtools_stats_file, {}, 'samtools stats files not found');
+  is_deeply($r->samtools_stats_file, [], 'samtools stats files not found');
   is($r->markdups_metrics_file, undef, 'markdups metrics not found');
   is($r->flagstats_metrics_file, undef, 'flagstats metrics not found');
   throws_ok { $r->execute() } qr/markdups_metrics_file not found/,
@@ -152,13 +152,10 @@ subtest 'finding files, calculating metrics' => sub {
     'filename for serialization'); 
   is($r->markdups_metrics_file,  $fproot . '.markdups_metrics.txt',
     'markdups metrics found');
-  is($r->flagstats_metrics_file, $fproot . '.flagstat',
-    'flagstats metrics found');
+  is($r->flagstats_metrics_file, $fproot . '.flagstat', 'flagstats metrics found');
 
-  my $stats_files = {
-     'F0x900' => $fproot . '_F0x900.stats',
-     'F0xB00' => $fproot . '_F0xB00.stats',               };
-  is_deeply($r->samtools_stats_file, $stats_files, 'stats files are correct');
+  my @stats_files = sort ($fproot . '_F0x900.stats', $fproot . '_F0xB00.stats');
+  is (join(q[ ], @{$r->samtools_stats_file}), join(q[ ],@stats_files), 'stats files');
  
   $r->execute();
   is($r->library_size, 240428087, 'library size value');
@@ -174,8 +171,7 @@ subtest 'finding files, calculating metrics' => sub {
     sequence_file       => $fproot . '.bam',
   );
   my $bam_md5 = join q[.], $r->sequence_file, 'md5';
-  throws_ok {$r->execute}
-    qr{Can't open '$bam_md5'},
+  throws_ok {$r->execute} qr{Can't open '$bam_md5'},
     'error calling execute() on related objects';
 };
 
@@ -202,11 +198,8 @@ subtest 'finding phix subset files (no run id)' => sub {
   is($r->flagstats_metrics_file, $fproot . '.flagstat',
     'phix flagstats metrics found');
 
-  my $stats_files = {
-     'F0x900' => $fproot . '_F0x900.stats',
-     'F0xB00' => $fproot . '_F0xB00.stats',
-                     };
-  is_deeply($r->samtools_stats_file, $stats_files, 'phix stats files found');
+  my @stats_files = sort ($fproot . '_F0x900.stats', $fproot . '_F0xB00.stats');
+  is (join(q[ ], @{$r->samtools_stats_file}), join(q[ ],@stats_files), 'phix stats files');
   lives_ok { $r->freeze } 'no run id - serialization to json is ok';
 };
 

@@ -437,6 +437,7 @@ t/60-autoqc-results-pulldown_metrics.t
 t/60-autoqc-results-qX_yield.t
 t/60-autoqc-results-ref_match.t
 t/60-autoqc-results-result.t
+t/60-autoqc-results-samtools_stats.t
 t/60-autoqc-results-sequence_error.t
 t/60-autoqc-results-sequence_summary.t
 t/60-autoqc-results-spatial_filter.t

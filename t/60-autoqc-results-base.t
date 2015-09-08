@@ -37,7 +37,6 @@ subtest 'base object with one-component composition' => sub {
   my $cmps = $b->composition;
   is ($cmps->has_no_components, 0, 'composition is not empty');
   is ($cmps->num_components, 1, 'one component');
-  diag $b->freeze();
   my $digest = 'c674faa835fd34457c29af3492ef291c623ce67a230b29eb8c3b6891a4d98837'; 
   is ($b->composition_digest, $digest, 'digest');
   my $b1 = $bp->thaw($b->freeze());
@@ -123,7 +122,7 @@ subtest 'extended_base' => sub {
   is ($eb->composition->num_components, 1, 'composition created');
   ok ($eb->is_old_style_result, 'old style object');
   is ($eb->to_string,
-    'npg_qc::autoqc::results::base {"components":[{"id_run":1,"position":3,"tag_index":3}]}',
+    'npg_qc::autoqc::results::test_extended {"components":[{"id_run":1,"position":3,"tag_index":3}]}',
     'to_string via inheritance');
   is ($eb->filename4serialization, '1_3#3.test_extended.json', 
     'filename as result object');
