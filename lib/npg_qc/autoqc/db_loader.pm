@@ -149,7 +149,7 @@ sub _json2db{
 
         # Backwards compatibility - load related objects.
         # New code should create serialized related objects which will
-        # be loaded from json files. For cases where we cannot produce serialized
+        # be loaded from json files. For cases where we cannot produce the serialized
         # version of objects, we will generate the objects now.
         if ( $json_file && $self->load_related &&
              $obj->can('related_objects') &&
@@ -181,7 +181,7 @@ sub _ensure_composition_exists {
     my $values = decode_json($c->freeze());
     $values->{'digest'}         = $d;
     $values->{'num_components'} = $num_components;
-    my $count = $self->_values2db('SequenceComponent', $values, 0); #need insert only
+    my $count = $self->_values2db('SequenceComponent', $values); #need insert only
     _log(sprintf '%s component %s for digest %s',
             $count ? 'Created' : 'Found',
             $c->freeze(),
@@ -193,23 +193,22 @@ sub _ensure_composition_exists {
 sub _values2db {
   my ($self, $dbix_class_name, $values, $update) = @_;
 
-  my $count = 0;
+  my $row;
   my $rs = $self->schema->resultset($dbix_class_name);
   my $result_class = $rs->result_class;
-
   $self->_exclude_nondb_attrs($values, $result_class->columns());
   $result_class->deflate_unique_key_components($values);
 
-  if ($update) {
-    $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
-    $count = 1;
+  my $found = $rs->find($values);
+  if ($found) {
+    if ($update) {
+      $row = $found->set_inflated_columns($values)->update();
+    } 
   } else {
-    if (!$rs->find($values)) {
-      $rs->new($values)->set_inflated_columns($values)->insert();
-      $count = 1;
-    }
+    $row = $rs->new($values)->set_inflated_columns($values)->insert();
   }
-  return $count;
+
+  return $row ? 1 : 0;
 }
 
 sub _exclude_nondb_attrs {

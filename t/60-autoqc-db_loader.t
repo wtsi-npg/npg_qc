@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 75;
+use Test::More tests => 11;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -14,7 +14,9 @@ my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
 
-{
+subtest 'simple attributes and methods' => sub {
+  plan tests => 11;
+
   my $db_loader = npg_qc::autoqc::db_loader->new();
   isa_ok($db_loader, 'npg_qc::autoqc::db_loader');
 
@@ -42,9 +44,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   ok($db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test positive');
   $db_loader = npg_qc::autoqc::db_loader->new(check=>['insert_size','other']);
   ok(!$db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test negative');
-}
+};
 
-{ 
+subtest 'excluding non-db attributes' => sub {
+  plan tests => 4;
+
   my $db_loader = npg_qc::autoqc::db_loader->new(
       path    =>['t/data/autoqc/tag_decode_stats'],
       schema  => $schema,
@@ -63,9 +67,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   $db_loader->_exclude_nondb_attrs($values, qw/pear apple orange/);
   is_deeply($values, {'pear' => 1, 'apple' => 2,},
     'hash did not change');
-}
+};
 
-{
+subtest 'loading insert_size results' => sub {
+  plan tests => 20;
+
   my $is_rs = $schema->resultset('InsertSize');
   my $current_count = $is_rs->search({})->count;
 
@@ -137,9 +143,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   );
   lives_ok {$db_loader->load()} 'load new insert size result';
   is($is_rs->search({})->count, $current_count+1, 'a new records added');
-}
+};
 
-{
+subtest 'loading veryfy_bam_id results' => sub {
+  plan tests => 8;
+
   my $is_rs = $schema->resultset('VerifyBamId');
   my $current_count = $is_rs->search({})->count;
   my $count_loaded;
@@ -160,9 +168,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   is($row->freemix, 0.00025, 'freemix');
   is($row->freeLK0, 823213.22, 'freeLK0');
   is($row->freeLK1, 823213.92, 'freeLK1');
-}
+};
 
-{
+subtest 'loading from multiple paths' => sub {
+  plan tests => 3;
+
   my $is_rs = $schema->resultset('InsertSize');
   $is_rs->delete_all();
   my $db_loader = npg_qc::autoqc::db_loader->new(
@@ -177,9 +187,11 @@ my $schema = Moose::Meta::Class->create_anon_class(
   lives_ok {$count = $db_loader->load()} 'loading from multiple paths';
   is($count, 3, '3 loaded records reported');
   is($is_rs->search({})->count, 2, 'two records created');
-}
+};
 
-{
+subtest 'errors and warnings' => sub {
+  plan tests => 4;
+
   my $is_rs = $schema->resultset('InsertSize');
   $is_rs->delete_all();
   my $file_good = 't/data/autoqc/dbix_loader/is/12187_2.insert_size.json';
@@ -207,13 +219,16 @@ my $schema = Moose::Meta::Class->create_anon_class(
     'loaded a file with incorrect attribute, gave warning';
   is ($is_rs->search({})->count, 2, 'two records created');
   $is_rs->delete_all();
-}
+};
 
 $schema->resultset('InsertSize')->delete_all();
 my $path = 't/data/autoqc/dbix_loader/run';
 my $num_lane_jsons = 11;
 my $num_plex_jsons = 44;
-{
+
+subtest 'loading and reloading' => sub {
+  plan tests => 7;
+
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
        verbose => 0,
@@ -264,9 +279,11 @@ my $num_plex_jsons = 44;
        update       => 0,
   );
   is ($db_loader->load(), 0, 'loading the same files again with update option false'); 
-}
+};
 
-{
+subtest 'loading a range of results' => sub {
+  plan tests => 4;
+
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
@@ -293,9 +310,11 @@ my $num_plex_jsons = 44;
   is ($plex_count, $num_plex_jsons, 'number of plexes loaded');
   is ($total_count, $num_plex_jsons+$num_lane_jsons, 'number of records loaded');
   is ($tag_zero_count, 8, 'number of tag zero records loaded');
-}
+};
 
-{
+subtest 'checking bam_flagstats records' => sub {
+  plan tests => 6;
+
   my $rs = $schema->resultset('BamFlagstats');
   is ($rs->search({human_split => 'all'})->count, 6, '6 bam flagstats records for target files');
   is ($rs->search({human_split => 'human'})->count, 2, '2 bam flagstats records for human files');
@@ -303,9 +322,11 @@ my $num_plex_jsons = 44;
   is ($rs->search({subset => 'target'})->count, 6, '6 bam flagstats records for target files');
   is ($rs->search({subset => 'human'})->count, 2, '2 bam flagstats records for human files');
   is ($rs->search({subset => 'phix'})->count, 1, '1 bam flagstats records for phix files');
-}
+};
 
-{
+subtest 'loading bam_flagstats results' => sub {
+  plan tests => 2;
+
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 1,
@@ -331,6 +352,6 @@ my $num_plex_jsons = 44;
   );
   throws_ok { $db_loader->load() } qr/Loading aborted, transaction has rolled back/,
     'error loading json result without id_run';
-}
+};
 
 1;
