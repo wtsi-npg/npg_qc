@@ -70,7 +70,7 @@ subtest 'excluding non-db attributes' => sub {
 };
 
 subtest 'loading insert_size results' => sub {
-  plan tests => 20;
+  plan tests => 25;
 
   my $is_rs = $schema->resultset('InsertSize');
   my $current_count = $is_rs->search({})->count;
@@ -325,33 +325,20 @@ subtest 'checking bam_flagstats records' => sub {
 };
 
 subtest 'loading bam_flagstats results' => sub {
-  plan tests => 2;
+  plan tests => 1;
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 1,
-       path         => ['t/data/autoqc/bam_flagstats/qc'],
-       load_related => 0,
-  );
-  my $file = 't/data/autoqc/bam_flagstats/qc/16960_1#0.bam_flagstats.json';
-  my $w = 'Not loading field';
-  warnings_like { $db_loader->load() }
-    [ qr/$w \'sequence_file\'/,
-      qr/$w \'flagstats_metrics_file\'/,
-      qr/$w \'samtools_stats_file\'/,
-      qr/$w \'markdups_metrics_file\'/,
-      qr/Loaded $file/,
-      qr/1 json files have been loaded/ ],
-    'warnings when loading extended bam_flagstats json';
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
        path         => ['t/data/autoqc/bam_flagstats'],
        load_related => 0,
   );
-  throws_ok { $db_loader->load() } qr/Loading aborted, transaction has rolled back/,
-    'error loading json result without id_run';
+  warnings_like { $db_loader->load() } [
+    qr/Skipped t\/data\/autoqc\/bam_flagstats\/4783_5_bam_flagstats\.json/, # no __CLASS__ key
+    qr/Not loading field \'fully_build_related\'/,
+    qr/Loaded t\/data\/autoqc\/bam_flagstats\/4921_3_bam_flagstats\.json/,
+    qr/1 json files have been loaded/
+  ], 'warnings when loading bam_flagstats results';
 };
 
 1;

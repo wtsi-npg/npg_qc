@@ -133,7 +133,6 @@ sub _json2db{
         npg_qc::autoqc::role::result->class_names($class_name);
 
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-
         my $module = 'npg_qc::autoqc::results::' . $class_name;
         load_class($module);
         my $obj = $module->thaw($json);
@@ -193,7 +192,7 @@ sub _ensure_composition_exists {
 sub _values2db {
   my ($self, $dbix_class_name, $values, $update) = @_;
 
-  my $row;
+  my $count = 0;
   my $rs = $self->schema->resultset($dbix_class_name);
   my $result_class = $rs->result_class;
   $self->_exclude_nondb_attrs($values, $result_class->columns());
@@ -202,13 +201,15 @@ sub _values2db {
   my $found = $rs->find($values);
   if ($found) {
     if ($update) {
-      $row = $found->set_inflated_columns($values)->update();
-    } 
+      $found->set_inflated_columns($values)->update();
+      $count++;
+    }
   } else {
-    $row = $rs->new($values)->set_inflated_columns($values)->insert();
+    $rs->new($values)->set_inflated_columns($values)->insert();
+    $count++;
   }
 
-  return $row ? 1 : 0;
+  return $count;
 }
 
 sub _exclude_nondb_attrs {
