@@ -141,24 +141,9 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 sequence_summaries
 
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::SequenceSummary>
-
-=cut
-
-__PACKAGE__->has_many(
-  'sequence_summaries',
-  'npg_qc::Schema::Result::SequenceSummary',
-  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 16:20:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:DwYIuE02mFbYqQ50PNHSGg
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 16:38:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cgTVxFpy8hxjjJHY1YLF0Q
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

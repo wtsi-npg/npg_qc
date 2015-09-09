@@ -39,10 +39,9 @@ CREATE TABLE `sequence_summary` (
   `date`                TIMESTAMP NOT NULL COMMENT 'Date the record was created',
   `iscurrent`           TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Boolean flag to indicate that the record is current, defaults to 1',
   PRIMARY KEY (`id_sequence_summary`),
-  CONSTRAINT `seq_sum_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
-
-#FULLTEXT `seqsum_h` (`header`)
+  CONSTRAINT `seq_sum_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FULLTEXT `seqsum_h` (`header`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 CREATE TABLE `samtools_stats` (
   `id_samtools_stats`   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
