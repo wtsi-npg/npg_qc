@@ -65,6 +65,7 @@ Auto-generated primary key
 
   data_type: 'bigint'
   extra: {unsigned => 1}
+  is_foreign_key: 1
   is_nullable: 0
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
@@ -135,7 +136,12 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   'id_seq_composition',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  {
+    data_type => 'bigint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
   'sequence_format',
   { data_type => 'varchar', is_nullable => 0, size => 6 },
   'header',
@@ -174,9 +180,26 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_sequence_summary');
 
+=head1 RELATIONS
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 16:38:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SDSxybel2cQxOR38Dv6Zmg
+=head2 seq_composition
+
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::SeqComposition>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'seq_composition',
+  'npg_qc::Schema::Result::SeqComposition',
+  { id_seq_composition => 'id_seq_composition' },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 17:35:44
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:glQpr8F7Nst/qIueaRFUEA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

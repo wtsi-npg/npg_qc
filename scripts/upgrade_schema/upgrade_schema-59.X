@@ -13,8 +13,10 @@ CREATE TABLE `seq_component` (
 CREATE TABLE `seq_composition` (
   `id_seq_composition` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
   `digest`             CHAR(64) NOT NULL COMMENT 'A SHA256 hex digest of the JSON representation of the composition as defined in npg_tracking::glossary::composition',
+  `size`               TINYINT UNSIGNED NOT NULL COMMENT 'Total number of components in a composition',
   PRIMARY KEY (`id_seq_composition`),
-  UNIQUE KEY `unq_seq_compos_d` (`digest`)
+  UNIQUE KEY `unq_seq_compos_d` (`digest`),
+  UNIQUE KEY `unq_seq_compos_ps` (`id_seq_composition`, `size`) /* To allow for a composite foreign key in seq_component_composition */
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 CREATE TABLE `seq_component_composition` (
@@ -25,7 +27,7 @@ CREATE TABLE `seq_component_composition` (
   PRIMARY KEY (`id_seq_comcom`),
   UNIQUE KEY `unq_seq_comcom` (`id_seq_component`, `id_seq_composition`, `size`),
   CONSTRAINT `seq_comcom_cmpon` FOREIGN KEY (`id_seq_component`)   REFERENCES `seq_component` (`id_seq_component`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `seq_comcom_cmpos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `seq_comcom_cmpos` FOREIGN KEY (`id_seq_composition`, `size`) REFERENCES `seq_composition` (`id_seq_composition`, `size`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 CREATE TABLE `sequence_summary` (
@@ -39,9 +41,10 @@ CREATE TABLE `sequence_summary` (
   `date`                TIMESTAMP NOT NULL COMMENT 'Date the record was created',
   `iscurrent`           TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Boolean flag to indicate that the record is current, defaults to 1',
   PRIMARY KEY (`id_sequence_summary`),
-  CONSTRAINT `seq_sum_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  FULLTEXT `seqsum_h` (`header`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+  CONSTRAINT `seq_sum_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  /* FULLTEXT `seqsum_h` (`header`) -- cannot have with InnoDB engine unless server version 5.6 */
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
 
 CREATE TABLE `samtools_stats` (
   `id_samtools_stats`   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',

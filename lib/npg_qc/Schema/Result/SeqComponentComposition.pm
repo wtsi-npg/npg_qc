@@ -83,6 +83,7 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
+  is_foreign_key: 1
   is_nullable: 0
 
 Total number of components in a composition
@@ -112,7 +113,12 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   'size',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  {
+    data_type => 'tinyint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
 );
 
 =head1 PRIMARY KEY
@@ -176,13 +182,13 @@ Related object: L<npg_qc::Schema::Result::SeqComposition>
 __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
-  { id_seq_composition => 'id_seq_composition' },
+  { id_seq_composition => 'id_seq_composition', size => 'size' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 16:20:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:wHveC3VAcr3ffYkaOgn53g
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 17:35:44
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YBtIODeL5JKL68rbUTrwFg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

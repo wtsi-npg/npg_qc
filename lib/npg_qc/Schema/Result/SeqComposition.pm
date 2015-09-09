@@ -69,6 +69,14 @@ Auto-generated primary key
 
 A SHA256 hex digest of the JSON representation of the composition as defined in npg_tracking::glossary::composition
 
+=head2 size
+
+  data_type: 'tinyint'
+  extra: {unsigned => 1}
+  is_nullable: 0
+
+Total number of components in a composition
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -81,6 +89,8 @@ __PACKAGE__->add_columns(
   },
   'digest',
   { data_type => 'char', is_nullable => 0, size => 64 },
+  'size',
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -108,6 +118,20 @@ __PACKAGE__->set_primary_key('id_seq_composition');
 =cut
 
 __PACKAGE__->add_unique_constraint('unq_seq_compos_d', ['digest']);
+
+=head2 C<unq_seq_compos_ps>
+
+=over 4
+
+=item * L</id_seq_composition>
+
+=item * L</size>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint('unq_seq_compos_ps', ['id_seq_composition', 'size']);
 
 =head1 RELATIONS
 
@@ -137,13 +161,31 @@ Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
 __PACKAGE__->has_many(
   'seq_component_compositions',
   'npg_qc::Schema::Result::SeqComponentComposition',
+  {
+    'foreign.id_seq_composition' => 'self.id_seq_composition',
+    'foreign.size' => 'self.size',
+  },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 sequence_summaries
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SequenceSummary>
+
+=cut
+
+__PACKAGE__->has_many(
+  'sequence_summaries',
+  'npg_qc::Schema::Result::SequenceSummary',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 16:38:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cgTVxFpy8hxjjJHY1YLF0Q
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 17:35:44
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zzx4SOq+Lh95G58mYLuWWw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
