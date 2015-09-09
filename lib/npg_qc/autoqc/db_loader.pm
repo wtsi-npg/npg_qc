@@ -141,10 +141,10 @@ sub _json2db{
           $values = decode_json($obj->freeze());
         }
         if ( $obj->can('composition') && $obj->can('composition_digest') ) {
-          $values->{'digest'} = $self->_ensure_composition_exists($obj);
+          $values->{'id_seq_composition'} = $self->_ensure_composition_exists($obj);
         }
         # Load the main object
-        $count = $self->_values2db($dbix_class_name, $values, $self->update);
+        $count = $self->_values2db($dbix_class_name, $values);
 
         # Backwards compatibility - load related objects.
         # New code should create serialized related objects which will
@@ -173,24 +173,39 @@ sub _json2db{
 sub _ensure_composition_exists {
   my ($self, $obj) = @_;
 
-  # Load components for a composition that is not yet in the database
-  my $d = $obj->composition_digest;
-  my $num_components = $obj->composition->num_components;
-  foreach my $c (@{$obj->composition->components}) {
-    my $values = decode_json($c->freeze());
-    $values->{'digest'}         = $d;
-    $values->{'num_components'} = $num_components;
-    my $count = $self->_values2db('SequenceComponent', $values); #need insert only
-    _log(sprintf '%s component %s for digest %s',
-            $count ? 'Created' : 'Found',
-            $c->freeze(),
-            $c->digest() );
+  my $composition_row = $self->schema->resultset('SeqComposition')
+    ->find_or_new({'digest' => $obj->composition_digest});
+  my $composition_exists = 1;
+  if (!$composition_row->in_storage()) {
+    $composition_row->insert();
+    $composition_exists = 0;
   }
-  return $d;
+  my $pk = $composition_row->id_seq_composition;
+
+  if (!$composition_exists) {
+    my $component_rs   = $self->schema->resultset('SeqComponent');
+    my $comcom_rs      = $self->schema->resultset('SeqComponentComposition');
+    my $num_components = $obj->composition->num_components;
+    foreach  my $c (@{$obj->composition->components}) {
+      my $values = decode_json($c->freeze());
+      $values->{'digest'} = $c->digest();
+      my $row = $component_rs->find_or_create($values);
+      # Whether the component existed or not, we have to create a new
+      # composition membership record for it.
+      $values = {
+        'id_seq_composition' => $pk,
+        'id_seq_component'   => $row->id_seq_component,
+        'size'               => $num_components,
+      };
+      $comcom_rs->create($values);
+    }
+  }
+
+  return $pk;
 }
 
 sub _values2db {
-  my ($self, $dbix_class_name, $values, $update) = @_;
+  my ($self, $dbix_class_name, $values) = @_;
 
   my $count = 0;
   my $rs = $self->schema->resultset($dbix_class_name);
@@ -200,7 +215,7 @@ sub _values2db {
 
   my $found = $rs->find($values);
   if ($found) {
-    if ($update) {
+    if ($self->update) {
       $found->set_inflated_columns($values)->update();
       $count++;
     }
