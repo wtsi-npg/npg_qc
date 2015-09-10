@@ -90,7 +90,7 @@ has 'sequence_file' => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
     required   => 0,
-  writer     => '_set_sequence_file',
+    writer     => '_set_sequence_file',
 );
 
 has [ qw/ markdups_metrics_file
