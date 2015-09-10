@@ -207,7 +207,7 @@ my $archive = '17448_1_9';
 my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
 $ae->extract(to => $tempdir) or die $ae->error;
 $archive = join q[/], $tempdir, $archive;
-my $qc_dir = join q[/], $archive, 'qc';
+my $qc_dir = join q[/], $archive, 'testqc';
 
 subtest 'full functionality with full file sets' => sub {
   plan tests => 96;
