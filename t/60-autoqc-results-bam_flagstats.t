@@ -104,7 +104,6 @@ subtest 'high-level parsing' => sub {
   delete $from_json_hash->{__CLASS__};
   delete $from_json_hash->{$dups_attr_name};
   delete $from_json_hash->{$fstat_attr_name};
-  delete $from_json_hash->{'fully_build_related'};
    
   is_deeply($from_json_hash, $expected, 'correct json output');
   is($r->total_reads(), 32737230 , 'total reads');
@@ -133,6 +132,7 @@ my $archive_16960 = '16960_1_0';
 my $ae_16960 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_16960}.tar.gz");
 $ae_16960->extract(to => $tempdir) or die $ae_16960->error;
 $archive_16960 = join q[/], $tempdir, $archive_16960;
+note `find $archive_16960`;
 
 subtest 'finding files, calculating metrics' => sub {
   plan tests => 11;
@@ -143,7 +143,7 @@ subtest 'finding files, calculating metrics' => sub {
     position            => 1,
     tag_index           => 0,
     sequence_file       => $fproot . '.bam',
-    fully_build_related => 0,
+    related_objects     => [],
   );
 
   is($r->_file_path_root, $fproot, 'file path root');
@@ -182,7 +182,7 @@ subtest 'finding phix subset files (no run id)' => sub {
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
     subset              => 'phix',
     sequence_file       => $fproot . '.bam',
-    fully_build_related => 0,
+    related_objects     => [],
   );
 
   lives_ok {$r->execute} 'metrics parsing ok';
@@ -208,9 +208,10 @@ my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive
 $ae->extract(to => $tempdir) or die $ae->error;
 $archive = join q[/], $tempdir, $archive;
 my $qc_dir = join q[/], $archive, 'testqc';
+note `find $archive`;
 
 subtest 'full functionality with full file sets' => sub {
-  plan tests => 96;
+  plan tests => 92;
 
   mkdir $qc_dir;
 
@@ -237,7 +238,6 @@ subtest 'full functionality with full file sets' => sub {
       $ref->{'sequence_file'} = $sfile;
      
       my $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-      ok ($r->fully_build_related, 'related objects should be fully built');
       lives_ok { $r->execute() } 'no error calling execute()';
 
       ok ($r->_has_related_objects, 'related object array has been set');

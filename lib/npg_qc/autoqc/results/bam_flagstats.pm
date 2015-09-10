@@ -53,11 +53,6 @@ has [ qw/ +path
 
 has '+subset' => ( writer      => '_set_subset', );
 
-has 'fully_build_related' =>  ( isa     => 'Bool',
-                                is      => 'ro',
-                                default => 1,
-);
-
 has 'human_split' => ( isa            => 'Maybe[Str]',
                        is             => 'rw',
                        predicate      => '_has_human_split',
@@ -246,15 +241,11 @@ sub filename_root {
 
 sub execute {
   my $self = shift;
-use Test::More;
+
   $self->_parse_markdups_metrics();
   $self->_parse_flagstats();
-  $self->related_objects();
-
-  if ($self->fully_build_related) {
-    for my $ro ( @{$self->related_objects()} ) {
-      $ro->execute();
-    }
+  for my $ro ( @{$self->related_objects()} ) {
+    $ro->execute();
   }
 
   return;
@@ -417,11 +408,6 @@ npg_qc::autoqc::results::bam_flagstats
 
   an optional attribute, a full path to the sequence, should be set
   for 'execute' method to work correctly
-
-=head2 fully_build_related
- 
- a boolen attribute; if true, execute() method is called on the related objects
- within this object's execute() method
 
 =head2 write2file
 
