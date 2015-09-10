@@ -335,7 +335,6 @@ subtest 'loading bam_flagstats results' => sub {
   );
   warnings_like { $db_loader->load() } [
     qr/Skipped t\/data\/autoqc\/bam_flagstats\/4783_5_bam_flagstats\.json/, # no __CLASS__ key
-    qr/Not loading field \'fully_build_related\'/,
     qr/Loaded t\/data\/autoqc\/bam_flagstats\/4921_3_bam_flagstats\.json/,
     qr/1 json files have been loaded/
   ], 'warnings when loading bam_flagstats results';
