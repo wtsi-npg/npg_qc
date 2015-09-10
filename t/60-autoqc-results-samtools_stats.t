@@ -4,7 +4,6 @@ use Test::More tests => 5;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 use Archive::Extract;
-use Compress::Zlib;
 use Perl6::Slurp;
 
 use npg_tracking::glossary::composition::component::illumina;
@@ -48,7 +47,7 @@ subtest 'object with an empty composition' => sub {
 };
 
 subtest 'object with an one-component composition' => sub { 
-  plan tests => 10;
+  plan tests => 12;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
@@ -63,15 +62,17 @@ subtest 'object with an one-component composition' => sub {
   ok (!$r->_has_stats, 'stats attribute is not built yet');
   lives_ok { $r->execute() } 'execute() method runs successfully';
   ok ($r->_has_stats, 'stats attribute has been built');
-  is (uncompress($r->stats), slurp($file1), 'stats file content saved correctly');
+  is ($r->stats, slurp($file1), 'stats file content saved correctly');
   is ($r->filename_root, '17448_1#9_F0x900', 'filename root');
+  ok ($r->_has_filter, 'filter attribute has been built');
+  is ($r->filter, 'F0x900', 'filter is set');
   is ($r->to_string(),
     'npg_qc::autoqc::results::samtools_stats {"components":[{"id_run":17448,"position":1,"tag_index":9}]}',
     'string representation');
 };
 
 subtest 'object with an one-component phix subset composition' => sub { 
-  plan tests => 6;
+  plan tests => 7;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9, subset => 'phix');
@@ -80,9 +81,10 @@ subtest 'object with an one-component phix subset composition' => sub {
   $r->composition->add_component($c);
   is ($r->composition_digest(),
     'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb', 'digest');
+  ok (!$r->_has_filter, 'filter attribute has not been built');
   is ($r->filter, 'F0xB00', 'filter');
   is ($r->composition_subset, 'phix', 'phix subset');
-  is (uncompress($r->stats), slurp($file2), 'stats file content saved correctly');
+  is ($r->stats, slurp($file2), 'stats file content saved correctly');
   is ($r->filename_root, '17448_1#9_phix_F0xB00', 'filename root');
   is ($r->to_string(),
     'npg_qc::autoqc::results::samtools_stats {"components":[{"id_run":17448,"position":1,"subset":"phix","tag_index":9}]}',
@@ -90,7 +92,7 @@ subtest 'object with an one-component phix subset composition' => sub {
 };
 
 subtest 'serialization and instantiation' => sub { 
-  plan tests => 13;
+  plan tests => 16;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
@@ -98,6 +100,7 @@ subtest 'serialization and instantiation' => sub {
   $r->composition->add_component($c);
   my $digest = $r->composition_digest;
   ok (!$r->_has_stats, 'stats attribute is not built yet');
+  ok (!$r->_has_filter, 'filter attribute is not built yet');
   
   my $json = $r->freeze();
   my $r1 = npg_qc::autoqc::results::samtools_stats->thaw($json);
@@ -105,10 +108,12 @@ subtest 'serialization and instantiation' => sub {
   is ($r1->to_string, $r->to_string, 'the same string representation');
   is ($r1->composition_digest, $digest, 'the same composition digest');
   ok (!$r1->_has_stats, 'stats attribute is not built yet');
+  ok (!$r->_has_filter, 'filter attribute is not built yet');
   lives_ok { $r1->execute() } 'execute() method runs successfully';
   ok ($r1->_has_stats, 'stats attribute has been built');
+  ok ($r1->_has_filter, 'filter attribute has been built');
   is ($r1->filter, 'F0x900', 'filter');
-  is (uncompress($r1->stats), slurp($file1), 'stats file content generated correctly');
+  is ($r1->stats, slurp($file1), 'stats file content generated correctly');
 
   my $json1 = $r1->freeze();
   isnt ($json, $json1, 'different json representations');

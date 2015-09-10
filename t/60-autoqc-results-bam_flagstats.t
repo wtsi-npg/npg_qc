@@ -7,7 +7,6 @@ use Test::Deep;
 use File::Temp qw/ tempdir /;
 use Perl6::Slurp;
 use JSON;
-use Compress::Zlib;
 use Archive::Extract;
 use File::Spec::Functions qw( splitdir catdir);
 

@@ -4,7 +4,6 @@ use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
 use npg_tracking::util::types;
-use Compress::Zlib;
 use Perl6::Slurp;
 use File::Spec::Functions qw( splitpath );
 use Carp;
@@ -24,6 +23,7 @@ has 'filter'         => (
     isa        => 'Str',
     required   => 0,
     lazy_build => 1,
+    predicate  => '_has_filter',
 );
 sub _build_filter {
   my ($self, $path) = @_;
@@ -48,12 +48,14 @@ has 'stats'         => (
 );
 sub _build_stats {
   my $self = shift;
-  return compress(slurp $self->stats_file);
+  my $content = slurp $self->stats_file;
+  return $content;
 }
 
 override 'execute' => sub {
   my $self = shift;
   super();
+  $self->filter();
   $self->stats();
   return;
 };
@@ -117,8 +119,6 @@ Method forcing all lazy attributes of the object to be built.
 =item namespace::autoclean
 
 =item npg_tracking::util::types
-
-=item Compress::Zlib
 
 =item Perl6::Slurp
 
