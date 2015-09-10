@@ -147,7 +147,7 @@ empty string, otherwise returns a composition digest.
 =head2 to_string
 
 Autoqc result object interface method, see npg_qc::autoqc::role::result for
-details. Returns a human readable string representation of the object'
+details. Returns a human readable string representation of the object.
 
 =head2 equals_byvalue
 

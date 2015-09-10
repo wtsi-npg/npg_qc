@@ -1,5 +1,20 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - alternative base class npg_qc::autoqc::results::base for autoqc results objects,
+     able to represent results that are derived from merged files and described by
+     a composition of multiple components
+ - autoqc result objects for samtools stats file, sam/bam headers and digests
+     derived from the new base class
+ - bam_flagstats result extension to produce samtools_stats and sequence_summary
+     results (related objects) either at run time or later
+ - database tables for storing component and composition objects
+ - autoqc db loader extension
+     - to load data represented by classes derived from the new base class
+     - to build related objects in memory and to load them to the database
+       bypassing serialization to a file - a way to save cram headers and stats
+       file where the analysis pipeline did not run the current code that
+       produces samtools_stats and sequence_summary objects as individual files
+
 release 59.0
  - SeqQC 
    - remove ajax proxy controller
