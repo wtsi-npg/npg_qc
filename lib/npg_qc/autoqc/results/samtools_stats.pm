@@ -48,7 +48,7 @@ has 'stats'         => (
 );
 sub _build_stats {
   my $self = shift;
-  my $content = slurp $self->stats_file;
+  my $content = slurp $self->stats_file; # need scalar context
   return $content;
 }
 

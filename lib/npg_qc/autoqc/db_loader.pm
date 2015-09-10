@@ -10,8 +10,12 @@ use Perl6::Slurp;
 use List::MoreUtils qw/none/;
 use Readonly;
 
-use npg_qc::Schema;
 use npg_tracking::util::types;
+# MooseX::Storage::Engine does not cope with nested objects,
+# forgets to import the module before using it. So we have
+# to have the illumina component class already in memory.
+use npg_tracking::glossary::composition::component::illumina;
+use npg_qc::Schema;
 use npg_qc::autoqc::role::result;
 
 with qw/MooseX::Getopt/;
@@ -99,7 +103,9 @@ sub load{
   my $transaction = sub {
     my $count = 0;
     foreach my $json_file (@{$self->json_file}) {
-      $count += $self->_json2db(slurp($json_file), $json_file);
+      # Force scalar context since json file can contain multiple strings
+      my $json = slurp($json_file);
+      $count += $self->_json2db($json, $json_file);
     }
     return $count;
   };
@@ -173,8 +179,10 @@ sub _json2db{
 sub _ensure_composition_exists {
   my ($self, $obj) = @_;
 
+  my $num_components = $obj->composition->num_components;
   my $composition_row = $self->schema->resultset('SeqComposition')
-    ->find_or_new({'digest' => $obj->composition_digest});
+    ->find_or_new({ 'digest' => $obj->composition_digest,
+                    'size'   => $num_components, });
   my $composition_exists = 1;
   if (!$composition_row->in_storage()) {
     $composition_row->insert();
@@ -183,9 +191,10 @@ sub _ensure_composition_exists {
   my $pk = $composition_row->id_seq_composition;
 
   if (!$composition_exists) {
+
     my $component_rs   = $self->schema->resultset('SeqComponent');
     my $comcom_rs      = $self->schema->resultset('SeqComponentComposition');
-    my $num_components = $obj->composition->num_components;
+
     foreach  my $c (@{$obj->composition->components}) {
       my $values = decode_json($c->freeze());
       $values->{'digest'} = $c->digest();

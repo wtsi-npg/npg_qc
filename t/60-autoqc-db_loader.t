@@ -6,6 +6,9 @@ use Test::Warn;
 use Moose::Meta::Class;
 use Perl6::Slurp;
 use JSON;
+use Archive::Extract;
+use File::Temp qw/ tempdir /;
+
 use npg_testing::db;
 
 use_ok('npg_qc::autoqc::db_loader');
@@ -325,7 +328,7 @@ subtest 'checking bam_flagstats records' => sub {
 };
 
 subtest 'loading bam_flagstats results' => sub {
-  plan tests => 1;
+  plan tests => 5;
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
@@ -338,6 +341,54 @@ subtest 'loading bam_flagstats results' => sub {
     qr/Loaded t\/data\/autoqc\/bam_flagstats\/4921_3_bam_flagstats\.json/,
     qr/1 json files have been loaded/
   ], 'warnings when loading bam_flagstats results';
+
+  $db_loader = npg_qc::autoqc::db_loader->new(
+       schema       => $schema,
+       verbose      => 0,
+       path         => ['t/data/autoqc/bam_flagstats'],
+  );
+  throws_ok { $db_loader->load() }
+    qr/Attribute \(sequence_file\) does not pass the type constraint/,
+    'error building related objects - no bam file where expected';
+
+  my $archive = '17448_1_9';
+  my $tempdir = tempdir( CLEANUP => 1);
+  my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
+  $ae->extract(to => $tempdir) or die $ae->error;
+  $archive = join q[/], $tempdir, $archive;
+  my $json_dir1 = join q[/], $archive, 'qc';
+  my $json_dir2 = join q[/], $json_dir1, 'all_json';
+  #note `find $archive`;
+
+  $db_loader = npg_qc::autoqc::db_loader->new(
+       schema       => $schema,
+       verbose      => 0,
+       path         => [$json_dir2],
+  );
+  lives_ok { $db_loader->load() }
+    'can load bamflag_stats w/o related, samtools stats and sequence summary';
+
+  $db_loader = npg_qc::autoqc::db_loader->new(
+       schema       => $schema,
+       verbose      => 0,
+       path         => [$json_dir1],
+  );
+  throws_ok { $db_loader->load() }
+    qr/Attribute \(sequence_file\) does not pass the type constraint/,
+    'no cram file upstream - error';
+
+  rename "${json_dir1}/17448_1#9.no_related.bam_flagstats.json",
+         "${json_dir1}/17448_1#9.bam_flagstats.json";
+  rename "${json_dir1}/17448_1#9_phix.no_related.bam_flagstats.json",
+         "${json_dir1}/17448_1#9_phix.bam_flagstats.json";
+       
+  $db_loader = npg_qc::autoqc::db_loader->new(
+       schema       => $schema,
+       verbose      => 0,
+       path         => [$json_dir1],
+  );
+  lives_ok { $db_loader->load() }
+    'can load bamflag_stats with in-memory related objects';
 };
 
 1;

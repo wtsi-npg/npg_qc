@@ -1,8 +1,3 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       February 2014
-#
-
 package npg_qc::Schema::Flators;
 
 use strict;
@@ -79,12 +74,15 @@ sub deflate_unique_key_components {
   my $source = $package_name->result_source_instance();
   my %constraints = $source->unique_constraints();
   my @names = grep {$_ ne 'primary'} keys %constraints;
-  if (scalar @names > 1) {
-    croak qq[Multiple unique constraints in $package_name];
-  }
-  foreach my $col_name (@{$constraints{$names[0]}}) {
-    if (!defined $values->{$col_name} && defined $source->column_info($col_name)->{'default_value'}) {
-      $values->{$col_name} = $source->column_info($col_name)->{'default_value'};
+
+  if (@names) {
+    if (scalar @names > 1) {
+      croak qq[Multiple unique constraints in $package_name];
+    }
+    foreach my $col_name (@{$constraints{$names[0]}}) {
+      if (!defined $values->{$col_name} && defined $source->column_info($col_name)->{'default_value'}) {
+        $values->{$col_name} = $source->column_info($col_name)->{'default_value'};
+      }
     }
   }
 
@@ -181,7 +179,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
