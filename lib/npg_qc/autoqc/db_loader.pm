@@ -216,13 +216,25 @@ sub _ensure_composition_exists {
 sub _values2db {
   my ($self, $dbix_class_name, $values) = @_;
 
+  my $iscurrent_column_name      = 'iscurrent';
+  my $composition_fk_column_name = 'id_seq_composition';
   my $count = 0;
   my $rs = $self->schema->resultset($dbix_class_name);
   my $result_class = $rs->result_class;
   $self->_exclude_nondb_attrs($values, $result_class->columns());
-  $result_class->deflate_unique_key_components($values);
 
-  my $found = $dbix_class_name ne 'SequenceSummary' ? $rs->find($values) : undef;
+  my $found;
+  if ($result_class->has_column($iscurrent_column_name)) {
+    my $fk_value = $values->{$composition_fk_column_name};
+    if ($fk_value) {
+      $rs->search({$composition_fk_column_name => $fk_value})
+         ->update({$iscurrent_column_name => 0});
+    }
+  } else {
+    $result_class->deflate_unique_key_components($values);
+    $found = $rs->find($values);
+  }
+
   if ($found) {
     if ($self->update) {
       $found->set_inflated_columns($values)->update();

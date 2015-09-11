@@ -433,7 +433,7 @@ subtest 'loading bam_flagstats and its related objects from files' => sub {
 };
 
 subtest 'loading bam_flagstats and its related objects from memory' => sub {
-  plan tests =>9;
+  plan tests => 14;
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
@@ -480,8 +480,15 @@ subtest 'loading bam_flagstats and its related objects from memory' => sub {
 
   is ($schema->resultset('SamtoolsStats')->search({})->count, 4,
     'samtools stats number of rows as before');
-  is ($schema->resultset('SequenceSummary')->search({})->count, 4,
+  my @ss = $schema->resultset('SequenceSummary')->
+    search({}, {'order_by' => 'id_sequence_summary'})->all();
+  is (scalar @ss, 4,
     'sequence summary number of rows twice the previous number');
+  is ($ss[0]->iscurrent, 0, 'iscurrent flag is reset to false');
+  is ($ss[1]->iscurrent, 0, 'iscurrent flag is reset to false');
+  is ($ss[2]->iscurrent, 1, 'iscurrent flag is set to true');
+  is ($ss[3]->iscurrent, 1, 'iscurrent flag is set to true');
+  ok ($ss[0]->date, 'date is set');
 };
 
 1;
