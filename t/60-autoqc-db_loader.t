@@ -11,6 +11,7 @@ use File::Temp qw/ tempdir /;
 use List::MoreUtils qw/ uniq /;
 
 use npg_testing::db;
+use t::autoqc_util qw/ write_samtools_script /; 
 
 use_ok('npg_qc::autoqc::db_loader');
 
@@ -361,6 +362,10 @@ $archive = join q[/], $tempdir, $archive;
 my $json_dir1 = join q[/], $archive, 'qc';
 my $json_dir2 = join q[/], $json_dir1, 'all_json';
 #note `find $archive`;
+my $samtools_path  = join q[/], $tempdir, 'samtools1';
+local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
+# Create mock samtools1 that will output the header
+write_samtools_script($samtools_path, join(q[/],$archive,'cram.header'));
 
 subtest 'loading bam_flagstats and its related objects from files' => sub {
   plan tests => 48;

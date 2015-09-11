@@ -4,13 +4,15 @@ use Test::More tests => 6;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
-use File::Temp qw/ tempdir /;
+use File::Temp qw( tempdir );
 use Perl6::Slurp;
 use JSON;
 use Archive::Extract;
 use File::Spec::Functions qw( splitdir catdir);
 
-my $tempdir = tempdir( CLEANUP => 1);
+use t::autoqc_util qw( write_samtools_script );
+
+my $tempdir = tempdir(CLEANUP => 1);
 
 subtest 'test attributes and simple methods' => sub {
   plan tests => 20;
@@ -133,6 +135,10 @@ $ae_16960->extract(to => $tempdir) or die $ae_16960->error;
 $archive_16960 = join q[/], $tempdir, $archive_16960;
 note `find $archive_16960`;
 
+my $samtools_path  = join q[/], $tempdir, 'samtools1';
+local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
+write_samtools_script($samtools_path);
+
 subtest 'finding files, calculating metrics' => sub {
   plan tests => 11;
 
@@ -208,6 +214,7 @@ $ae->extract(to => $tempdir) or die $ae->error;
 $archive = join q[/], $tempdir, $archive;
 my $qc_dir = join q[/], $archive, 'testqc';
 note `find $archive`;
+write_samtools_script($samtools_path, join(q[/], $archive, 'cram.header'));
 
 subtest 'full functionality with full file sets' => sub {
   plan tests => 92;

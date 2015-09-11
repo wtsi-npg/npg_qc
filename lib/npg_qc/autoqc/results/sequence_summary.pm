@@ -8,6 +8,7 @@ use Perl6::Slurp;
 use Readonly;
 
 use npg_tracking::util::types;
+use npg_common::roles::software_location;
 
 extends 'npg_qc::autoqc::results::base';
 
@@ -41,7 +42,7 @@ sub _build_sequence_format {
 sub _build_header {
   my $self = shift;
   return join q[], grep { $_ ne /^SQ/smx }
-    slurp q{-|}, 'samtools1', 'view', '-H', $self->sequence_file;
+    slurp q{-|}, $self->_samtools, 'view', '-H', $self->sequence_file;
 }
 sub _build_md5 {
   my $self = shift;
@@ -56,12 +57,25 @@ sub _build_seqchksum_sha512 {
   return slurp $self->_root_path . '.sha512primesums512.seqchksum';
 }
 
-has '_root_path'  => (
+has '_root_path' => (
     isa        => 'Str',
+    traits     => [ 'DoNotSerialize' ],
     is         => 'ro',
     required   => 0,
     writer     => '_set_root_path',
 );
+
+has '_samtools' => (
+    isa        => 'NpgCommonResolvedPathExecutable',
+    coerce     => 1,
+    is         => 'ro',
+    traits     => [ 'DoNotSerialize' ],
+    required   => 0,
+    lazy_build => 1,
+);
+sub _build__samtools {
+  return 'samtools1';
+}
 
 override 'execute' => sub {
   my $self = shift;
@@ -144,6 +158,8 @@ Method forcing all lazy attributes of the object to be built.
 =item Perl6::Slurp
 
 =item npg_tracking::util::types
+
+=item npg_common::roles::software_location
 
 =item npg_qc::autoqc::results::base
 
