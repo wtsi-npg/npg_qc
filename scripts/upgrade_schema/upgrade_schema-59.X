@@ -25,7 +25,7 @@ CREATE TABLE `seq_component_composition` (
   `id_seq_composition` BIGINT(20) UNSIGNED NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
   `size`               TINYINT UNSIGNED NOT NULL    COMMENT 'Total number of components in a composition',
   PRIMARY KEY (`id_seq_comcom`),
-  UNIQUE KEY `unq_seq_comcom` (`id_seq_component`, `id_seq_composition`, `size`),
+  UNIQUE KEY `unq_seq_comcom` (`id_seq_component`, `id_seq_composition`),
   CONSTRAINT `seq_comcom_cmpon` FOREIGN KEY (`id_seq_component`)   REFERENCES `seq_component` (`id_seq_component`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `seq_comcom_cmpos` FOREIGN KEY (`id_seq_composition`, `size`) REFERENCES `seq_composition` (`id_seq_composition`, `size`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;

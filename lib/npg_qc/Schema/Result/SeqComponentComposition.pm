@@ -143,16 +143,11 @@ __PACKAGE__->set_primary_key('id_seq_comcom');
 
 =item * L</id_seq_composition>
 
-=item * L</size>
-
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint(
-  'unq_seq_comcom',
-  ['id_seq_component', 'id_seq_composition', 'size'],
-);
+__PACKAGE__->add_unique_constraint('unq_seq_comcom', ['id_seq_component', 'id_seq_composition']);
 
 =head1 RELATIONS
 
@@ -187,8 +182,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 17:35:44
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YBtIODeL5JKL68rbUTrwFg
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-11 16:26:51
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:l9HRSiRUN47Baf3NyuVG+Q
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
