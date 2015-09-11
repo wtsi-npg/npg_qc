@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 13;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -8,6 +8,7 @@ use Perl6::Slurp;
 use JSON;
 use Archive::Extract;
 use File::Temp qw/ tempdir /;
+use List::MoreUtils qw/ uniq /;
 
 use npg_testing::db;
 
@@ -327,8 +328,8 @@ subtest 'checking bam_flagstats records' => sub {
   is ($rs->search({subset => 'phix'})->count, 1, '1 bam flagstats records for phix files');
 };
 
-subtest 'loading bam_flagstats results' => sub {
-  plan tests => 5;
+subtest 'testing load_related flag' => sub {
+  plan tests => 2;
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
@@ -350,25 +351,91 @@ subtest 'loading bam_flagstats results' => sub {
   throws_ok { $db_loader->load() }
     qr/Attribute \(sequence_file\) does not pass the type constraint/,
     'error building related objects - no bam file where expected';
+};
 
-  my $archive = '17448_1_9';
-  my $tempdir = tempdir( CLEANUP => 1);
-  my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
-  $ae->extract(to => $tempdir) or die $ae->error;
-  $archive = join q[/], $tempdir, $archive;
-  my $json_dir1 = join q[/], $archive, 'qc';
-  my $json_dir2 = join q[/], $json_dir1, 'all_json';
-  #note `find $archive`;
+my $archive = '17448_1_9';
+my $tempdir = tempdir( CLEANUP => 1);
+my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
+$ae->extract(to => $tempdir) or die $ae->error;
+$archive = join q[/], $tempdir, $archive;
+my $json_dir1 = join q[/], $archive, 'qc';
+my $json_dir2 = join q[/], $json_dir1, 'all_json';
+#note `find $archive`;
 
-  $db_loader = npg_qc::autoqc::db_loader->new(
+subtest 'loading bam_flagstats and its related objects from files' => sub {
+  plan tests => 48;
+
+  my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
        path         => [$json_dir2],
   );
   lives_ok { $db_loader->load() }
     'can load bamflag_stats w/o related, samtools stats and sequence summary';
+  
+  my @objects = $schema->resultset('BamFlagstats')->search(
+    {'id_run' => 17448}, {order_by => {'-asc' => 'subset'}})->all();
+  is (scalar @objects, 2, 'two objects');
+  is ($objects[0]->subset, 'phix', 'object for target subset');
+  is ($objects[1]->subset, undef,  'object for phix subset');
 
-  $db_loader = npg_qc::autoqc::db_loader->new(
+  @objects = $schema->resultset('SamtoolsStats')->search({})->all();
+  is (scalar @objects, 4, 'four objects');
+  my @filters = sort { $a cmp $b } uniq map { $_->filter} @objects;
+  is (join(q[ ],@filters), 'F0x900 F0xB00', 'two distinct filters');
+
+  my @da_component = qw(
+    9c2dfacdbfa50be10bfbab6df20a8ebdcd8e67bf0e659b1fe6be667c6258d33c
+    31d7631510fd4090dddc218ebc46d4d3cab3447964e620f25713293a21c7d6a6
+  ); # two distinct components
+  my @da_composition = qw(
+    bfc10d33f4518996db01d1b70ebc17d986684d2e04e20ab072b8b9e51ae73dfa
+    ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb
+  ); # two distinct compositions
+
+  is (join(q[ ], sort {$a cmp $b} (uniq map { $_->seq_composition->digest} @objects)),
+   join(q[ ], @da_composition), 'two distinct composition keys');
+  my @da = @da_composition;
+  unshift @da, $da[0];
+  push @da, $da[-1];
+  my $i = 0;
+  foreach my $o (@objects) {
+    my $composition = $o->seq_composition;
+    isa_ok ($composition, 'npg_qc::Schema::Result::SeqComposition');
+    is ($composition->size, 1, 'composition of one');
+    is ($composition->digest, $da[$i], 'composition digest');
+    my $cc_link_rs = $composition->seq_component_compositions;
+    is ($cc_link_rs->count, 1, 'one link to component');
+    my $component = $cc_link_rs->next->seq_component;
+    isa_ok ($component, 'npg_qc::Schema::Result::SeqComponent');
+    $i++;
+  }
+
+  $i = 0;
+  @objects = $schema->resultset('SequenceSummary')->search({})->all();
+  is (scalar @objects, 2, 'two objects');
+  foreach my $o (@objects) {
+    my $composition = $o->seq_composition;
+    isa_ok ($composition, 'npg_qc::Schema::Result::SeqComposition');
+    is ($composition->size, 1, 'composition of one');
+    is ($composition->digest, $da_composition[$i], 'composition digest');
+    my $cc_link_rs = $composition->seq_component_compositions;
+    is ($cc_link_rs->count, 1, 'one link to component');
+    my $component = $cc_link_rs->next->seq_component;
+    isa_ok ($component, 'npg_qc::Schema::Result::SeqComponent');
+    is ($component->digest, $da_component[$i], 'component digest');
+    is ($component->id_run, 17448, 'run id');
+    is ($component->position, 1, 'position');
+    is ($component->tag_index, 9, 'tag_index');
+    is ($component->subset, $i ? 'phix' : undef, 'subset value');
+    $i++;
+  }
+};
+
+subtest 'loading bam_flagstats and its related objects from memory' => sub {
+  plan tests =>9;
+
+  my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
        path         => [$json_dir1],
@@ -381,7 +448,10 @@ subtest 'loading bam_flagstats results' => sub {
          "${json_dir1}/17448_1#9.bam_flagstats.json";
   rename "${json_dir1}/17448_1#9_phix.no_related.bam_flagstats.json",
          "${json_dir1}/17448_1#9_phix.bam_flagstats.json";
-       
+      
+  $schema->resultset('SequenceSummary')->delete();
+  $schema->resultset('SamtoolsStats')->delete();
+ 
   $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
@@ -389,6 +459,29 @@ subtest 'loading bam_flagstats results' => sub {
   );
   lives_ok { $db_loader->load() }
     'can load bamflag_stats with in-memory related objects';
+
+  is ($schema->resultset('SeqComposition')->search({})->count, 2,
+    'no new compositions'); 
+  is ($schema->resultset('SeqComponent')->search({})->count, 2,
+    'no new components');
+  is ($schema->resultset('SeqComponentComposition')->search({})->count, 2,
+    'no new memberships');
+  is ($schema->resultset('SamtoolsStats')->search({})->count, 4,
+    'samtools stats number of rows as before');
+  is ($schema->resultset('SequenceSummary')->search({})->count, 2,
+    'sequence summary number of rows as before');
+
+  $db_loader = npg_qc::autoqc::db_loader->new(
+       schema       => $schema,
+       verbose      => 0,
+       path         => [$json_dir1],
+  );
+  $db_loader->load(); # reload
+
+  is ($schema->resultset('SamtoolsStats')->search({})->count, 4,
+    'samtools stats number of rows as before');
+  is ($schema->resultset('SequenceSummary')->search({})->count, 4,
+    'sequence summary number of rows twice the previous number');
 };
 
 1;

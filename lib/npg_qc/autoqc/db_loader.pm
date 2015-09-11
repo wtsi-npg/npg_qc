@@ -222,7 +222,7 @@ sub _values2db {
   $self->_exclude_nondb_attrs($values, $result_class->columns());
   $result_class->deflate_unique_key_components($values);
 
-  my $found = $rs->find($values);
+  my $found = $dbix_class_name ne 'SequenceSummary' ? $rs->find($values) : undef;
   if ($found) {
     if ($self->update) {
       $found->set_inflated_columns($values)->update();
