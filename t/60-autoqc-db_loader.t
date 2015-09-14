@@ -61,7 +61,7 @@ subtest 'simple attributes and methods' => sub {
   $values = {'some' => 'data', 'composition' => 'composed'};
   my $outcome;
   warning_like { $outcome = $db_loader->_pass_filter($values, 'sequence_summary') }
-    qr/Filtering compisitions is not implemented, will be loaded/,
+    qr/Filtering compositions is not implemented, will be loaded/,
     'warning that composition fields cannot be screened';
   is ($outcome, 1, 'composition passed filter')
 };

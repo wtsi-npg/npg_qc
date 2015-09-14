@@ -287,7 +287,7 @@ sub _pass_filter {
   }
 
   if ( exists $values->{'composition'} ) {
-    $self->_log('Filtering compisitions is not implemented, will be loaded');
+    $self->_log('Filtering compositions is not implemented, will be loaded');
   }
 
   return 1;
