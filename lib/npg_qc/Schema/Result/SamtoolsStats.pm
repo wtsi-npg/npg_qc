@@ -80,10 +80,10 @@ Filter used to produce the stats file
 
 =head2 stats
 
-  data_type: 'blob'
+  data_type: 'mediumblob'
   is_nullable: 0
 
-Compressed (gzip) samtools stats file content
+Compressed samtools stats file content
 
 =cut
 
@@ -105,7 +105,7 @@ __PACKAGE__->add_columns(
   'filter',
   { data_type => 'varchar', is_nullable => 0, size => 8 },
   'stats',
-  { data_type => 'blob', is_nullable => 0 },
+  { data_type => 'mediumblob', is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -154,8 +154,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 16:20:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oJUD09t4wZx/K+H2FVaL3Q
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-14 17:35:41
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gxBn3P+F0EV0spaDg/HHRQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

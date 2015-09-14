@@ -50,7 +50,7 @@ CREATE TABLE `samtools_stats` (
   `id_samtools_stats`   BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
   `id_seq_composition`  BIGINT(20) UNSIGNED NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
   `filter`              VARCHAR(8) NOT NULL COMMENT 'Filter used to produce the stats file',
-  `stats`               BLOB       NOT NULL COMMENT 'Compressed (gzip) samtools stats file content',
+  `stats`               MEDIUMBLOB NOT NULL COMMENT 'Compressed samtools stats file content',
   PRIMARY KEY (`id_samtools_stats`),
   CONSTRAINT `seq_sum_compos_ss` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   UNIQUE KEY `unq_seqstats` (`id_seq_composition`,`filter`)
