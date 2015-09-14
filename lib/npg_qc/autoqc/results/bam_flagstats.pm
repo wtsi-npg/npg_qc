@@ -147,10 +147,10 @@ sub _build_samtools_stats_file {
     my $n = 1 + scalar @underscores;
     @paths = sort grep { -f $_ && _matches_seq_file($_, $n) } glob $self->_file_path_root . q[_*.stats];
     if (!@paths) {
-      carp 'Samtools stats files are not found';
+      warn 'WARNING: Samtools stats files are not found for ' . $self->to_string() . qq[\n];
     }
   } else {
-    carp 'Sequence file not given - not looking for samtools stats files';
+    warn 'WARNING: Sequence file not given - not looking for samtools stats files' . qq[\n];
   }
 
   return \@paths;
