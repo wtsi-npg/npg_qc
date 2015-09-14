@@ -137,7 +137,6 @@ sub _json2db{
     if ($class_name) {
       ($class_name, my $dbix_class_name) =
         npg_qc::autoqc::role::result->class_names($class_name);
-
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
         my $module = 'npg_qc::autoqc::results::' . $class_name;
         load_class($module);
@@ -173,6 +172,7 @@ sub _json2db{
   };
   my $m = $count ? 'Loaded' : 'Skipped';
   $self->_log(join q[ ], $m, $json_file || q[json string]);
+
   return $count;
 }
 
@@ -264,21 +264,32 @@ sub _exclude_nondb_attrs {
 
 sub _pass_filter {
   my ($self, $values, $class_name) = @_;
+
   if (!$values || !(ref $values) || ref $values ne 'HASH') {
     croak 'Need hashed values to do filtering';
   }
   if (!$class_name) {
     croak 'Need class name to do filtering';
   }
+
   if ( scalar @{$self->check} && none {$_ eq $class_name} @{$self->check}) {
     return 0;
   }
-  if ( scalar @{$self->id_run} && none {$_ == $values->{'id_run'}} @{$self->id_run}) {
-    return 0;
+  if ( exists $values->{'id_run'} ) {
+    if ( scalar @{$self->id_run} && none {$_ == $values->{'id_run'}} @{$self->id_run}) {
+      return 0;
+    }
   }
-  if ( scalar @{$self->lane} && none {$_ == $values->{'position'}} @{$self->lane}) {
-    return 0;
+  if ( exists $values->{'position'} ) {
+    if ( scalar @{$self->lane} && none {$_ == $values->{'position'}} @{$self->lane}) {
+      return 0;
+    }
   }
+
+  if ( exists $values->{'composition'} ) {
+    $self->_log('Filtering compisitions is not implemented, will be loaded');
+  }
+
   return 1;
 }
 

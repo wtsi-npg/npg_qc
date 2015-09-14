@@ -20,7 +20,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
 
 subtest 'simple attributes and methods' => sub {
-  plan tests => 11;
+  plan tests => 14;
 
   my $db_loader = npg_qc::autoqc::db_loader->new();
   isa_ok($db_loader, 'npg_qc::autoqc::db_loader');
@@ -49,6 +49,21 @@ subtest 'simple attributes and methods' => sub {
   ok($db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test positive');
   $db_loader = npg_qc::autoqc::db_loader->new(check=>['insert_size','other']);
   ok(!$db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test negative');
+  ok(!$db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test negative');
+
+  $db_loader = npg_qc::autoqc::db_loader->new(
+      path     =>['t/data/autoqc/tag_decode_stats'],
+      schema   => $schema,
+      verbose  => 1,
+      id_run   => [1234],
+      position => [1]
+  );
+  $values = {'some' => 'data', 'composition' => 'composed'};
+  my $outcome;
+  warning_like { $outcome = $db_loader->_pass_filter($values, 'sequence_summary') }
+    qr/Filtering compisitions is not implemented, will be loaded/,
+    'warning that composition fields cannot be screened';
+  is ($outcome, 1, 'composition passed filter')
 };
 
 subtest 'excluding non-db attributes' => sub {
@@ -443,6 +458,7 @@ subtest 'loading bam_flagstats and its related objects from memory' => sub {
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
+       id_run       => [17448],
        path         => [$json_dir1],
   );
   throws_ok { $db_loader->load() }
@@ -460,6 +476,7 @@ subtest 'loading bam_flagstats and its related objects from memory' => sub {
   $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
+       id_run       => [17448],
        path         => [$json_dir1],
   );
   lives_ok { $db_loader->load() }
@@ -479,6 +496,7 @@ subtest 'loading bam_flagstats and its related objects from memory' => sub {
   $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
+       id_run       => [17448],
        path         => [$json_dir1],
   );
   $db_loader->load(); # reload
