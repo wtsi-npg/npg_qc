@@ -81,7 +81,7 @@ sub set_flators_wcompression4non_scalar {
          }
          return $result;
        },
-       deflate => sub { warn "UNCOMPRESS $package_name\n";
+       deflate => sub {
          my $data = shift;
          defined $data ? encode_base64(compress(to_json($data)), q[]) : $data;
        },
