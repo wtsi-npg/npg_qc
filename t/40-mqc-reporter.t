@@ -33,6 +33,14 @@ sub _create_schema {
     q[npg_qc::Schema], q[t/data/reporter/npg_qc]);
 }
 
+sub _create_mlwh_schema {
+  return Moose::Meta::Class->create_anon_class(
+    roles => [qw/npg_testing::db/]
+  )->new_object()->create_test_db(
+    q[WTSI::DNAP::Warehouse::Schema], q[t/data/reporter/mlwarehouse]
+  );
+}
+
 sub _get_data {
   my ($schema, $pair, $field) = @_;
   my $row = $schema->resultset('MqcOutcomeEnt')->search({id_run => $pair->[0], position => $pair->[1]})->next(); 
@@ -43,7 +51,8 @@ sub _get_data {
 }
 
 my $npg_qc_schema = _create_schema();
-my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, verbose => 1);
+my $mlwh_schema   = _create_mlwh_schema();
+my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_schema => $mlwh_schema, verbose => 1);
 
 #
 # test successful posting
@@ -83,14 +92,14 @@ my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, verbose =
   ok(!$row->reported, 'row for run 6600 position 5 reported time not set');
   $row->update({id_mqc_outcome => 1});
   ok (!$row->has_final_outcome, 'set outcome back to not final');
-  
+
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>6})->next;
   ok($row, 'row for run 6600 position 6 exists - test prerequisite');
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set - test prerequisite');
   $row->update({id_mqc_outcome => 3});
   ok ($row->has_final_outcome, 'outcome is final');
   warnings_like { $reporter->load() } [
-    qr/Error retrieving lane id for run 6600 position 6/,
+    qr/Error retrieving iseq_flowcell for run 6600 position 6/,
     qr/Lane id is not set for run 6600 position 6/],
     'error retrieving lane id is logged';
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set');
