@@ -15,8 +15,8 @@ use Try::Tiny;
 use Readonly;
 
 use st::api::base;
-use st::api::lims;
 use npg_qc::Schema;
+use WTSI::DNAP::Warehouse::Schema;
 
 with 'MooseX::Getopt';
 
@@ -29,11 +29,21 @@ has 'qc_schema' => ( isa        => 'npg_qc::Schema',
                      required   => 0,
                      lazy_build => 1,
                      metaclass  => 'NoGetopt',
-                   );
-
+);
 sub _build_qc_schema {
   my $self = shift;
   return npg_qc::Schema->connect();
+}
+
+has 'mlwh_schema' => ( isa        => 'WTSI::DNAP::Warehouse::Schema',
+                       is         => 'ro',
+                       required   => 0,
+                       lazy_build => 1,
+                       metaclass  => 'NoGetopt',
+);
+sub _build_mlwh_schema {
+  my $self = shift;
+  return WTSI::DNAP::Warehouse::Schema->connect();
 }
 
 has 'nPass'  => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nPass',  metaclass => 'NoGetopt',);
@@ -56,7 +66,13 @@ sub load {
     my $from_gclp;
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
     try {
-      my $iseq_flowcell = st::api::lims->new(id_run => $outcome->id_run, position => $outcome->position);
+      my $where = {'me.id_run'=>$outcome->id_run, 'me.position'=>$outcome->position};
+      my $rswh = $self->mlwh_schema->resultset('IseqProductMetric')->search($where, { prefetch => 'iseq_flowcell',
+                                                                                      order_by => qw[ me.id_run me.position me.tag_index ]
+                                                                                    },
+      );
+      my $product_metric = $rs->next;
+      my $iseq_flowcell = $product_metric->iseq_flowcell;
       $lane_id   = $iseq_flowcell->lane_id;
       $from_gclp = $iseq_flowcell->from_gclp;
     } catch {
@@ -181,8 +197,6 @@ Reads all the QC records which need to have a pass or fail sent to LIMS, and sen
 =item Readonly
 
 =item st::api::base
-
-=item st::api::lims
 
 =item npg_qc::Schema
 
