@@ -67,30 +67,27 @@ sub load {
     if ($from_gclp) {
       _log(qq[GCLP run, nothing to do for $details.]);
     } elsif ($lane_id) {
-        my $result;
-        if ($outcome->is_accepted()) {
-          $result = 'pass';
-          $self->_set_nPass($self->nPass + 1);
-        } else {
-          $result = 'fail';
-          $self->_set_nFail($self->nFail + 1);
-        }
-
-        my $url = $self->_create_url($lane_id, $result);
-        if ($self->verbose) {
-          _log(qq(Sending outcome for $details to $url));
-        }
-
-        my $error_txt = $self->_report($lane_id, $result, $url);
-        if ($error_txt) {
-          _log($error_txt);
-          $self->_set_nError($self->nError+1);
-        } else {
-          $outcome->update_reported();
-        }
+      my $result;
+      if ($outcome->is_accepted()) {
+        $result = 'pass';
+        $self->_set_nPass($self->nPass + 1);
       } else {
-        _log(qq(Lane id is not set for $details));
+        $result = 'fail';
+        $self->_set_nFail($self->nFail + 1);
       }
+      my $url = $self->_create_url($lane_id, $result);
+      if ($self->verbose) {
+        _log(qq(Sending outcome for $details to $url));
+      }
+      my $error_txt = $self->_report($lane_id, $result, $url);
+      if ($error_txt) {
+        _log($error_txt);
+        $self->_set_nError($self->nError+1);
+      } else {
+        $outcome->update_reported();
+      }
+    } else {
+      _log(qq(Lane id is not set for $details));
     }
   }
   return;
