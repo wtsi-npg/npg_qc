@@ -53,38 +53,44 @@ sub load {
   while (my $outcome = $rs->next()) {
 
     my $lane_id;
+    my $from_gclp;
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
     try {
-      $lane_id = st::api::lims->new(id_run => $outcome->id_run, position => $outcome->position)->lane_id;
+      my $iseq_flowcell = st::api::lims->new(id_run => $outcome->id_run, position => $outcome->position);
+      $lane_id   = $iseq_flowcell->lane_id;
+      $from_gclp = $iseq_flowcell->from_gclp;
     } catch {
       $self->_set_nError($self->nError+1);
-      _log(qq(Error retrieving lane id for $details: $_));
+      _log(qq(Error retrieving iseq_flowcell for $details: $_));
     };
 
-    if ($lane_id) {
-      my $result;
-      if ($outcome->is_accepted()) {
-        $result = 'pass';
-        $self->_set_nPass($self->nPass + 1);
-      } else {
-        $result = 'fail';
-        $self->_set_nFail($self->nFail+1);
-      }
+    if ($from_gclp) {
+      _log(qq[GCLP run, nothing to do for $details.]);
+    } elsif ($lane_id) {
+        my $result;
+        if ($outcome->is_accepted()) {
+          $result = 'pass';
+          $self->_set_nPass($self->nPass + 1);
+        } else {
+          $result = 'fail';
+          $self->_set_nFail($self->nFail + 1);
+        }
 
-      my $url = $self->_create_url($lane_id,$result);
-      if ($self->verbose) {
-        _log(qq(Sending outcome for $details to $url));
-      }
+        my $url = $self->_create_url($lane_id, $result);
+        if ($self->verbose) {
+          _log(qq(Sending outcome for $details to $url));
+        }
 
-      my $error_txt = $self->_report($lane_id, $result, $url);
-      if ($error_txt) {
-        _log($error_txt);
-        $self->_set_nError($self->nError+1);
+        my $error_txt = $self->_report($lane_id, $result, $url);
+        if ($error_txt) {
+          _log($error_txt);
+          $self->_set_nError($self->nError+1);
+        } else {
+          $outcome->update_reported();
+        }
       } else {
-        $outcome->update_reported();
+        _log(qq(Lane id is not set for $details));
       }
-    } else {
-      _log(qq(Lane id is not set for $details));
     }
   }
   return;
