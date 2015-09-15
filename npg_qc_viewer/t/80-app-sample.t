@@ -7,15 +7,13 @@ use List::MoreUtils qw ( each_array );
 
 use Test::WWW::Mechanize::Catalyst;
 
-BEGIN {
-  local $ENV{'HOME'} = 't/data';
-}
 use t::util;
 
 my $schemas;
 my $util = t::util->new();
-local $ENV{CATALYST_CONFIG} = $util->config_path;
-local $ENV{TEST_DIR}        = $util->staging_path;
+local $ENV{'CATALYST_CONFIG'} = $util->config_path;
+local $ENV{'TEST_DIR'}        = $util->staging_path;
+local $ENV{'HOME'}            = 't/data';
 
 my $mech;
 
