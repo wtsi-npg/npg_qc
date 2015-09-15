@@ -164,23 +164,43 @@ with 'npg_qc::Schema::Flators';
 
 our $VERSION = '0';
 
-__PACKAGE__->set_flators_wcompression4non_scalar(qw(stats));
-
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Result class definition in DBIx binding for npg-qc database.
+DBIx ORM result class definition for samtools_stats table in NPG QC database.
 
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=cut
+
+=head2 set_inflated_columns
+
+Extends set_inflated_columns method of L<DBIx::Class::Row>
+to deflate (xz compress) a scalar value that goes into
+the stats column.
+
+=cut
+
+around 'set_inflated_columns' => sub {
+  my $orig = shift;
+  my $self = shift;
+  my $upd  = shift;
+  if (exists $upd->{'stats'}) {
+    $upd->{'stats'} = __PACKAGE__->compress_xz($upd->{'stats'});
+  }
+  return $self->$orig($upd);
+};
+
+__PACKAGE__->set_inflator4xz_compressed_scalar(qw(stats));
+
+__PACKAGE__->meta->make_immutable;
+1;
+__END__
 
 =head1 DEPENDENCIES
 
@@ -203,6 +223,8 @@ Result class definition in DBIx binding for npg-qc database.
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
+
+=item npg_qc::Schema::Flators
 
 =back
 
