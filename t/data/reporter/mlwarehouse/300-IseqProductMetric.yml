@@ -1,85 +1,26 @@
 ---
-- adapters_percent_forward_read: 8.23
-  adapters_percent_reverse_read: 8.59
-  gc_percent_forward_read: 48.14
-  gc_percent_reverse_read: 48.00
-  genotype_mean_depth: 0.35
-  id_iseq_flowcell_tmp: 660007001
+- id_iseq_flowcell_tmp: 660005001
   id_iseq_pr_metrics_tmp: 2500000
   id_run: 6600
-  insert_size_median: 159
-  insert_size_quartile1: 102
-  insert_size_quartile3: 227
-  num_reads: 24003740
-  percent_duplicate: 0.48
-  percent_mapped: 66.80
-  position: 7
-  q20_yield_kb_forward_read: 829385
-  q20_yield_kb_reverse_read: 802685
-  q30_yield_kb_forward_read: 384682
-  q30_yield_kb_reverse_read: 390397
-  q40_yield_kb_forward_read: 0
-  q40_yield_kb_reverse_read: 0
-  ref_match1_name: Homo sapiens 1000Genomes
-  ref_match1_percent: 95.10
-  ref_match2_name: Gorilla gorilla gorilla
-  ref_match2_percent: 85.30
-  sequence_mismatch_percent_forward_read: 5.67
-  sequence_mismatch_percent_reverse_read: 6.00
+  position: 5
   tag_index: 1
-- adapters_percent_forward_read: 8.23
-  adapters_percent_reverse_read: 8.59
-  gc_percent_forward_read: 48.14
-  gc_percent_reverse_read: 48.00
-  genotype_mean_depth: 0.35
-  id_iseq_flowcell_tmp: 660008001
-  id_iseq_pr_metrics_tmp: 2500001
-  id_run: 6600
-  insert_size_median: 159
-  insert_size_quartile1: 102
-  insert_size_quartile3: 227
-  num_reads: 24003740
-  percent_duplicate: 0.48
-  percent_mapped: 66.80
-  position: 8
-  q20_yield_kb_forward_read: 829385
-  q20_yield_kb_reverse_read: 802685
-  q30_yield_kb_forward_read: 384682
-  q30_yield_kb_reverse_read: 390397
-  q40_yield_kb_forward_read: 0
-  q40_yield_kb_reverse_read: 0
-  ref_match1_name: Homo sapiens 1000Genomes
-  ref_match1_percent: 95.10
-  ref_match2_name: Gorilla gorilla gorilla
-  ref_match2_percent: 85.30
-  sequence_mismatch_percent_forward_read: 5.67
-  sequence_mismatch_percent_reverse_read: 6.00
-  tag_index: 1
-- adapters_percent_forward_read: 8.23
-  adapters_percent_reverse_read: 8.59
-  gc_percent_forward_read: 48.14
-  gc_percent_reverse_read: 48.00
-  genotype_mean_depth: 0.35
-  id_iseq_flowcell_tmp: 551508001
+- id_iseq_flowcell_tmp: 660007001
   id_iseq_pr_metrics_tmp: 2500002
-  id_run: 5515
-  insert_size_median: 159
-  insert_size_quartile1: 102
-  insert_size_quartile3: 227
-  num_reads: 24003740
-  percent_duplicate: 0.48
-  percent_mapped: 66.80
+  id_run: 6600
+  position: 7
+  tag_index: 1
+- id_iseq_flowcell_tmp: 660008001
+  id_iseq_pr_metrics_tmp: 2500003
+  id_run: 6600
   position: 8
-  q20_yield_kb_forward_read: 829385
-  q20_yield_kb_reverse_read: 802685
-  q30_yield_kb_forward_read: 384682
-  q30_yield_kb_reverse_read: 390397
-  q40_yield_kb_forward_read: 0
-  q40_yield_kb_reverse_read: 0
-  ref_match1_name: Homo sapiens 1000Genomes
-  ref_match1_percent: 95.10
-  ref_match2_name: Gorilla gorilla gorilla
-  ref_match2_percent: 85.30
-  sequence_mismatch_percent_forward_read: 5.67
-  sequence_mismatch_percent_reverse_read: 6.00
+  tag_index: 1
+- id_iseq_flowcell_tmp: 551508001
+  id_iseq_pr_metrics_tmp: 2500004
+  id_run: 5515
+  position: 8
+  tag_index: 1
+- id_iseq_flowcell_tmp: 660004001
+  id_iseq_pr_metrics_tmp: 2500005
+  id_run: 6600
+  position: 4
   tag_index: 1

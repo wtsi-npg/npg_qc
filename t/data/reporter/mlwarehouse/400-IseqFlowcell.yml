@@ -1,76 +1,61 @@
 ---
-- cost_code: S0706
-  entity_id_lims: 1000001
+- entity_id_lims: 1000001
   entity_type: library
-  external_release: 0
-  forward_read_length: 76
+  id_flowcell_lims: 3881
+  id_iseq_flowcell_tmp: 660004001
+  id_lims: C_GCLP
+  id_pool_lims: NT13483B
+  id_sample_tmp: 5572
+  last_updated: 2015-06-08 11:25:39
+  legacy_library_id: 53965
+  position: 4
+  recorded_at: 2015-06-08 11:25:39
+  tag_index: 1
+- entity_id_lims: 1000001
+  entity_type: library
+  id_flowcell_lims: 3881
+  id_iseq_flowcell_tmp: 660005001
+  id_lims: SQSCP
+  id_pool_lims: NT13483B
+  id_sample_tmp: 5572
+  last_updated: 2015-06-08 11:25:39
+  legacy_library_id: 53965
+  position: 5
+  recorded_at: 2015-06-08 11:25:39
+  tag_index: 1
+- entity_id_lims: 1000001
+  entity_type: library
   id_flowcell_lims: 3881
   id_iseq_flowcell_tmp: 660007001
-  id_library_lims: NT13483B
   id_lims: SQSCP
   id_pool_lims: NT13483B
   id_sample_tmp: 5572
-  id_study_tmp: 166
-  is_r_and_d: 0
-  is_spiked: 0
   last_updated: 2015-06-08 11:25:39
   legacy_library_id: 53965
-  manual_qc: ~
-  pipeline_id_lims: Standard
   position: 7
-  priority: 0
   recorded_at: 2015-06-08 11:25:39
-  requested_insert_size_from: 200
-  requested_insert_size_to: 200
-  reverse_read_length: 76
   tag_index: 1
-- cost_code: S0706
-  entity_id_lims: 1000002
+- entity_id_lims: 1000002
   entity_type: library
-  external_release: 0
-  forward_read_length: 76
   id_flowcell_lims: 3881
   id_iseq_flowcell_tmp: 660008001
-  id_library_lims: NT13483B
   id_lims: SQSCP
   id_pool_lims: NT13483B
   id_sample_tmp: 5572
-  id_study_tmp: 166
-  is_r_and_d: 0
-  is_spiked: 0
   last_updated: 2015-06-08 11:25:39
   legacy_library_id: 53965
-  manual_qc: ~
-  pipeline_id_lims: Standard
-  position: 7
-  priority: 0
+  position: 8
   recorded_at: 2015-06-08 11:25:39
-  requested_insert_size_from: 200
-  requested_insert_size_to: 200
-  reverse_read_length: 76
   tag_index: 1
-- cost_code: S0706
-  entity_id_lims: 1000003
+- entity_id_lims: 1000003
   entity_type: library
-  external_release: 0
-  forward_read_length: 76
   id_flowcell_lims: 3881
   id_iseq_flowcell_tmp: 551508001
-  id_library_lims: NT13483B
   id_lims: SQSCP
   id_pool_lims: NT13483B
   id_sample_tmp: 5572
-  id_study_tmp: 166
-  is_r_and_d: 0
-  is_spiked: 0
   last_updated: 2015-06-08 11:25:39
   legacy_library_id: 53965
-  manual_qc: ~
-  pipeline_id_lims: Standard
   position: 8
-  priority: 0
   recorded_at: 2015-06-08 11:25:39
-  requested_insert_size_from: 200
-  requested_insert_size_to: 200
-  reverse_read_length: 76
   tag_index: 1
