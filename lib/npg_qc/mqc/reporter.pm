@@ -74,24 +74,24 @@ sub load {
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
     my $iseq_flowcell;
     try {
-      my $runs_rs = $self->tracking_schema->resultset("Run");
+      my $runs_rs = $self->tracking_schema->resultset(q[Run]);
       my $run = $runs_rs->find( $outcome->id_run );
       my $flowcell_id = $run->flowcell_id;
       my $batch_id    = $run->batch_id;
-      
+
       my $driver = { 'mlwh_schema'      => $self->mlwh_schema,
                      'flowcell_barcode' => $flowcell_id,
                      'position'         => $outcome->position,
-      }; 
+      };
       if ($batch_id) {
         $driver->{ 'id_flowcell_lims' } = $batch_id;
-      } 
+      }
 
       my $l = st::api::lims->new( position => $outcome->position,
                                   driver   => st::api::lims::ml_warehouse->new($driver) );
       $lane_id   = $l->lane_id;
 
-      my $where = {'id_flowcell_lims' => $batch_id, 
+      my $where = {'id_flowcell_lims' => $batch_id,
                    'flowcell_barcode' => $flowcell_id,
                    'position'         => $outcome->position,
       };
