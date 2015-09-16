@@ -6,6 +6,7 @@ use Test::Warn;
 use Moose::Meta::Class;
 use LWP::UserAgent;
 use HTTP::Response;
+use npg_testing::db;
 
 local $ENV{NPG_WEBSERVICE_CACHE_DIR} = 't/data/reporter';
 
