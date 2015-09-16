@@ -87,12 +87,7 @@ sub load {
         _log(qq[GCLP run, nothing to do for $details.]);
       }
     } elsif ($lane_id) {
-      my $result;
-      if ($outcome->is_accepted()) {
-        $result = 'pass';
-      } else {
-        $result = 'fail';
-      }
+      my $result = $outcome->is_accepted() ? 'pass' : 'fail';
       my $url = $self->_create_url($lane_id, $result);
       if ($self->verbose) {
         _log(qq(Sending outcome for $details to $url));
@@ -163,11 +158,7 @@ Reads all the QC records which need to have a pass or fail sent to LIMS, and sen
 
 =head2 qc_schema - an attribute; the schema to use for the qc database. Defaults to npg_qc::Schema
 
-=head2 nPass - an attribute; the number of QC records which are marked as 'Pass'
-
-=head2 nFail - an attribute; the number of QC records which are marked as 'Fail'
-
-=head2 nError - an attribute; the number of QC records which failed to update for some reason
+=head2 mlwh_schema - an attribute; the schema to use for ml warehouse database. Defaults to WTSI::DNAP::Warehouse::Schema
 
 =head2 load - method to perform the reading and updating
 
@@ -200,6 +191,8 @@ Reads all the QC records which need to have a pass or fail sent to LIMS, and sen
 =item st::api::base
 
 =item npg_qc::Schema
+
+=item WTSI::DNAP::Warehouse::Schema
 
 =back
 
