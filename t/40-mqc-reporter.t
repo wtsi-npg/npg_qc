@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 41;
+use Test::More tests => 5;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -18,13 +18,14 @@ sub post_nowhere {
 
 use_ok('npg_qc::mqc::reporter');
 
-{
+subtest 'Initial' => sub {
+  plan tests => 2;
   my $reporter = npg_qc::mqc::reporter->new();
   isa_ok($reporter, 'npg_qc::mqc::reporter');
   like( $reporter->_create_url(33, 'pass'),
      qr/npg_actions\/assets\/33\/pass_qc_state/,
      'url for sending');
-}
+};
 
 my @pairs = ([6600,7], [6600,8], [5515,8]);
 
@@ -55,11 +56,8 @@ my $npg_qc_schema = _create_schema();
 my $mlwh_schema   = _create_mlwh_schema();
 my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_schema => $mlwh_schema, verbose => 1, report_gclp => 1);
 
-#
-# test successful posting
-#
-
-{
+subtest 'Succesful posting 3 lanes to report' => sub {
+  plan tests => 6 + 9;
   foreach my $p (@pairs) {
     ok (!_get_data($npg_qc_schema, $p, 'reported'), 'reporting time is not set');
     ok (!_get_data($npg_qc_schema, $p, 'modified_by'), 'modified_by field is not set');
@@ -70,9 +68,10 @@ my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_sche
     is (_get_data($npg_qc_schema, $p, 'username'), 'cat', 'original username');
     ok (_get_data($npg_qc_schema, $p, 'modified_by'), 'modified_by field is set');
   }
-}
+};
 
-{
+subtest 'Not reporting, individual cases' => sub {
+  plan tests => 7 + 5 + 5;
   my $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>4})->next;
   ok($row, 'row for run 6600 position 4 exists - test prerequisite');
   ok(!$row->reported, 'row for run 6600 position 4 reported time not set - test prerequisite');
@@ -105,7 +104,7 @@ my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_sche
     qr/No mlwarehouse data for run 6600 position 6/,],
     'Warning no mlwarehouse data found logged';
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set');
-}
+};
 
 #
 # test failed postings
@@ -119,7 +118,8 @@ sub postfail_nowhere {
   return $r;
 }
 
-{
+subtest 'Testing failing to report, getting 500 status from lims' => sub {
+  plan tests => 6;
   my $npg_qc_schema = _create_schema();
   my $mlwh_schema   = _create_mlwh_schema();
 
@@ -131,7 +131,7 @@ sub postfail_nowhere {
     ok (!_get_data($npg_qc_schema, $p, 'reported'), 'reporting time is not set');
     ok (!_get_data($npg_qc_schema, $p, 'modified_by'), 'modified_by field is not set');
   }
-}
+};
 
 1;
 
