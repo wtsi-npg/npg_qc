@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC
+   - add the total yield in library view RT#488973
+   - summary table: display supplier sample name along the library barcode RT#488964,
+     remove separate sample column
+
 release 59.0
  - SeqQC 
    - remove ajax proxy controller
