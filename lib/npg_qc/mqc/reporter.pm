@@ -185,6 +185,8 @@ Reads all the QC records which need to have a pass or fail sent to LIMS, and sen
 
 =head2 mlwh_schema - an attribute; the schema to use for ml warehouse database. Defaults to WTSI::DNAP::Warehouse::Schema
 
+=head2 tracking_schema - an attribute; the schema to use for ml warehouse database. Defaults to WTSI::DNAP::Warehouse::Schema
+
 =head2 load - method to perform the reading and updating
 
 =head1 DIAGNOSTICS
