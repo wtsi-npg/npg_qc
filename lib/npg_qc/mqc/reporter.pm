@@ -66,18 +66,26 @@ sub load {
     my $from_gclp;
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
     try {
-      my $where = {'me.id_run'=>$outcome->id_run, 'me.position'=>$outcome->position};
+      my $where = {'me.id_run'=>$outcome->id_run,
+                   'me.position'=>$outcome->position,
+                   'me.tag_index'=> { '!=', undef },
+                   'iseq_flowcell.entity_type' => {'!=', 'library_indexed_spike'}};
       my $rswh = $self->mlwh_schema->resultset('IseqProductMetric')->search($where, { prefetch => 'iseq_flowcell',
                                                                                       order_by => qw[ me.id_run me.position me.tag_index ]
                                                                                     },
       );
-      my $product_metric = $rs->next;
-      my $iseq_flowcell = $product_metric->iseq_flowcell;
-      $lane_id   = $iseq_flowcell->lane_id;
-      $from_gclp = $iseq_flowcell->from_gclp;
+      my $product_metric = $rswh->next;
+      if ($product_metric && $product_metric->iseq_flowcell) {
+        my $iseq_flowcell = $product_metric->iseq_flowcell;
+        $lane_id   = $iseq_flowcell->lane_id;
+        $from_gclp = $iseq_flowcell->from_gclp;
+      } else {
+        _log(qq[No mlwarehouse data for details $details]);
+        continue;
+      }
     } catch {
       $self->_set_nError($self->nError+1);
-      _log(qq(Error retrieving iseq_flowcell for $details: $_));
+      _log(qq(Error retrieving mlwarehouse data for $details: $_));
     };
 
     if ($from_gclp) {
