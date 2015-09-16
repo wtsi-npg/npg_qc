@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 47;
+use Test::More tests => 41;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -53,7 +53,7 @@ sub _get_data {
 
 my $npg_qc_schema = _create_schema();
 my $mlwh_schema   = _create_mlwh_schema();
-my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_schema => $mlwh_schema, verbose => 1);
+my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_schema => $mlwh_schema, verbose => 1, report_gclp => 1);
 
 #
 # test successful posting
@@ -64,17 +64,7 @@ my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_sche
     ok (!_get_data($npg_qc_schema, $p, 'reported'), 'reporting time is not set');
     ok (!_get_data($npg_qc_schema, $p, 'modified_by'), 'modified_by field is not set');
   }
-
   $reporter->load();
-  is($reporter->nPass, 2, 'correct number of passes');
-  is($reporter->nFail, 1, 'correct number of fails');
-  is($reporter->nError, 0, 'correct number of errors');
-
-  $reporter->load();
-  is($reporter->nPass, 0, 'correct number of passes after loading');
-  is($reporter->nFail, 0, 'correct number of fails after loading');
-  is($reporter->nError, 0, 'correct number of errors after loading');
-
   foreach my $p (@pairs) {
     ok (_get_data($npg_qc_schema, $p, 'reported'), 'reporting time is set');
     is (_get_data($npg_qc_schema, $p, 'username'), 'cat', 'original username');
@@ -83,13 +73,25 @@ my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_sche
 }
 
 {
-  my $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>5})->next;
+  my $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>4})->next;
+  ok($row, 'row for run 6600 position 4 exists - test prerequisite');
+  ok(!$row->reported, 'row for run 6600 position 4 reported time not set - test prerequisite');
+  $row->update({id_mqc_outcome => 3});
+  ok ($row->has_final_outcome, 'outcome is final');
+  warnings_like { $reporter->load() } [
+    qr/GCLP run, nothing to do for run 6600 position 4/,],
+    'Message GCLP run logged';
+  ok(!$row->reported, 'row for run 6600 position 4 reported time not set');
+  ok($row->has_final_outcome, 'outcome is final');
+  $row->update({id_mqc_outcome => 1});
+  ok (!$row->has_final_outcome, 'set outcome back to not final');
+
+  $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>5})->next;
   ok($row, 'row for run 6600 position 5 exists - test prerequisite');
   ok(!$row->reported, 'row for run 6600 position 5 reported time not set - test prerequisite');
   $row->update({id_mqc_outcome => 3});
   ok ($row->has_final_outcome, 'outcome is final');
-  warning_like { $reporter->load() } qr/Lane id is not set for run 6600 position 5/,
-    'absence of lane id is logged';
+  $reporter->load() ;
   ok(!$row->reported, 'row for run 6600 position 5 reported time not set');
   $row->update({id_mqc_outcome => 1});
   ok (!$row->has_final_outcome, 'set outcome back to not final');
@@ -100,9 +102,8 @@ my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_sche
   $row->update({id_mqc_outcome => 3});
   ok ($row->has_final_outcome, 'outcome is final');
   warnings_like { $reporter->load() } [
-    qr/Error retrieving iseq_flowcell for run 6600 position 6/,
-    qr/Lane id is not set for run 6600 position 6/],
-    'error retrieving lane id is logged';
+    qr/No mlwarehouse data for run 6600 position 6/,],
+    'Warning no mlwarehouse data found logged';
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set');
 }
 
@@ -120,17 +121,11 @@ sub postfail_nowhere {
 
 {
   my $npg_qc_schema = _create_schema();
+  my $mlwh_schema   = _create_mlwh_schema();
 
-  my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema);
+  my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_schema => $mlwh_schema);
   $reporter->load();
-  is($reporter->nPass, 2, 'correct number of passes');
-  is($reporter->nFail, 1, 'correct number of fails');
-  is($reporter->nError, 3, 'correct number of errors');
-
   $reporter->load();
-  is($reporter->nPass, 2, 'correct number of passes after failing');
-  is($reporter->nFail, 1, 'correct number of fails after failing');
-  is($reporter->nError, 3, 'correct number of errors after failing');
 
   foreach my $p (@pairs) {
     ok (!_get_data($npg_qc_schema, $p, 'reported'), 'reporting time is not set');
