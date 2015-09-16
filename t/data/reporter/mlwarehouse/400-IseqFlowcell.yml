@@ -1,7 +1,8 @@
 ---
 - entity_id_lims: 1000001
   entity_type: library
-  id_flowcell_lims: 3881
+  id_flowcell_lims: 40666
+  flowcell_barcode: 000MJAAXX
   id_iseq_flowcell_tmp: 660004001
   id_lims: C_GCLP
   id_pool_lims: NT13483B
@@ -13,7 +14,8 @@
   tag_index: 1
 - entity_id_lims: 1000002
   entity_type: library
-  id_flowcell_lims: 3881
+  id_flowcell_lims: 40666
+  flowcell_barcode: 000MJAAXX
   id_iseq_flowcell_tmp: 660005001
   id_lims: SQSCP
   id_pool_lims: NT13483B
@@ -25,7 +27,8 @@
   tag_index: 1
 - entity_id_lims: 1000003
   entity_type: library
-  id_flowcell_lims: 3881
+  id_flowcell_lims: 40666
+  flowcell_barcode: 000MJAAXX
   id_iseq_flowcell_tmp: 660007001
   id_lims: SQSCP
   id_pool_lims: NT13483B
@@ -37,7 +40,8 @@
   tag_index: 1
 - entity_id_lims: 1000004
   entity_type: library
-  id_flowcell_lims: 3881
+  id_flowcell_lims: 40666
+  flowcell_barcode: 000MJAAXX
   id_iseq_flowcell_tmp: 660008001
   id_lims: SQSCP
   id_pool_lims: NT13483B
@@ -49,7 +53,8 @@
   tag_index: 1
 - entity_id_lims: 1000005
   entity_type: library
-  id_flowcell_lims: 3881
+  id_flowcell_lims: 48999
+  flowcell_barcode: 001MJAAXX
   id_iseq_flowcell_tmp: 551508001
   id_lims: SQSCP
   id_pool_lims: NT13483B

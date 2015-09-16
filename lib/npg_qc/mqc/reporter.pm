@@ -15,7 +15,10 @@ use Try::Tiny;
 use Readonly;
 
 use st::api::base;
+use st::api::lims;
+use st::api::lims::ml_warehouse;
 use npg_qc::Schema;
+use npg_tracking::Schema;
 use WTSI::DNAP::Warehouse::Schema;
 
 with 'MooseX::Getopt';
@@ -46,6 +49,17 @@ sub _build_mlwh_schema {
   return WTSI::DNAP::Warehouse::Schema->connect();
 }
 
+has 'tracking_schema' => ( isa  => 'npg_tracking::Schema',
+                     is         => 'ro',
+                     required   => 0,
+                     lazy_build => 1,
+                     metaclass  => 'NoGetopt',
+);
+sub _build_tracking_schema {
+  my $self = shift;
+  return npg_tracking::Schema->connect();
+}
+
 has 'verbose' => ( isa => 'Bool', is => 'ro', default => 0, documentation => 'print verbose messages');
 has 'report_gclp' => ( isa => 'Bool', is => 'ro', default => 0, documentation => 'show warning for glcp runs');
 
@@ -58,48 +72,59 @@ sub load {
     my $lane_id;
     my $from_gclp;
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
-    my $product_metric;
+    my $iseq_flowcell;
     try {
-      my $where = {'me.id_run'=>$outcome->id_run,
-                   'me.position'=>$outcome->position,
-                   'me.tag_index'=> { q[!=], undef },
-                   'iseq_flowcell.entity_type' => {q[!=], 'library_indexed_spike'}};
-      my $rswh = $self->mlwh_schema->resultset('IseqProductMetric')->search($where, { prefetch => 'iseq_flowcell',
-                                                                                      order_by => qw[ me.id_run me.position me.tag_index ]
-                                                                                    },
-      );
-      $product_metric = $rswh->next;
+      my $runs_rs = $self->tracking_schema->resultset("Run");
+      my $run = $runs_rs->find( $outcome->id_run );
+      my $flowcell_id = $run->flowcell_id;
+      my $batch_id    = $run->batch_id;
+      
+      my $driver = { 'mlwh_schema'      => $self->mlwh_schema,
+                     'flowcell_barcode' => $flowcell_id,
+                     'position'         => $outcome->position,
+      }; 
+      if ($batch_id) {
+        $driver->{ 'id_flowcell_lims' } = $batch_id;
+      } 
+
+      my $l = st::api::lims->new( position => $outcome->position,
+                                  driver   => st::api::lims::ml_warehouse->new($driver) );
+      $lane_id   = $l->lane_id;
+
+      my $where = {'id_flowcell_lims' => $batch_id, 
+                   'flowcell_barcode' => $flowcell_id,
+                   'position'         => $outcome->position,
+      };
+      my $rswh = $self->mlwh_schema
+                      ->resultset('IseqFlowcell')
+                      ->search($where);
+      $iseq_flowcell = $rswh->next;
     } catch {
       _log(qq(Error retrieving mlwarehouse data for $details: $_));
     };
 
-    if ($product_metric && $product_metric->iseq_flowcell) {
-      my $iseq_flowcell = $product_metric->iseq_flowcell;
-      $lane_id   = $iseq_flowcell->lane_id;
+    if ($iseq_flowcell) {
       $from_gclp = $iseq_flowcell->from_gclp;
-    } else {
-      _log(qq[No mlwarehouse data for $details]);
-      next;
-    }
 
-    if ($from_gclp) {
-      if ($self->report_gclp) {
-        _log(qq[GCLP run, nothing to do for $details.]);
-      }
-    } elsif ($lane_id) {
-      my $result = $outcome->is_accepted() ? 'pass' : 'fail';
-      my $url = $self->_create_url($lane_id, $result);
-      if ($self->verbose) {
-        _log(qq(Sending outcome for $details to $url));
-      }
-      my $error_txt = $self->_report($lane_id, $result, $url);
-      if ($error_txt) {
-        _log($error_txt);
+      if ($from_gclp) {
+        if ($self->report_gclp) {
+          _log(qq[GCLP run, nothing to do for $details.]);
+        }
+      } elsif ($lane_id) {
+        my $result = $outcome->is_accepted() ? 'pass' : 'fail';
+        my $url = $self->_create_url($lane_id, $result);
+        if ($self->verbose) {
+          _log(qq(Sending outcome for $details to $url));
+        }
+        my $error_txt = $self->_report($lane_id, $result, $url);
+        if ($error_txt) {
+          _log($error_txt);
+        } else {
+          $outcome->update_reported();
+        }
       } else {
-        $outcome->update_reported();
+        _log(qq(Lane id is not set for $details));
       }
-    } else {
-      _log(qq(Lane id is not set for $details));
     }
   }
   return;

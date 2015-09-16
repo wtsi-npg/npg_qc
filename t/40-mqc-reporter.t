@@ -43,18 +43,33 @@ sub _create_mlwh_schema {
   );
 }
 
+sub _create_tracking_schema {
+  return Moose::Meta::Class->create_anon_class(
+    roles => [qw/npg_testing::db/]
+  )->new_object()->create_test_db(
+    q[npg_tracking::Schema], q[t/data/reporter/npg_tracking]
+  );
+}
+
 sub _get_data {
   my ($schema, $pair, $field) = @_;
-  my $row = $schema->resultset('MqcOutcomeEnt')->search({id_run => $pair->[0], position => $pair->[1]})->next(); 
+  my $row = $schema->resultset('MqcOutcomeEnt')
+                   ->search({id_run => $pair->[0], position => $pair->[1]})->next(); 
   if (!$row) {
     die 'cannot find db row';
   }
   return $row->$field;
 }
 
-my $npg_qc_schema = _create_schema();
-my $mlwh_schema   = _create_mlwh_schema();
-my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_schema => $mlwh_schema, verbose => 1, report_gclp => 1);
+my $npg_qc_schema       = _create_schema();
+my $mlwh_schema         = _create_mlwh_schema();
+my $npg_tracking_schema = _create_tracking_schema();
+my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, 
+                                          mlwh_schema => $mlwh_schema, 
+                                          tracking_schema => $npg_tracking_schema, 
+                                          verbose => 1, 
+                                          report_gclp => 1
+);
 
 subtest 'Succesful posting 3 lanes to report' => sub {
   plan tests => 6 + 9;
@@ -101,7 +116,7 @@ subtest 'Not reporting, individual cases' => sub {
   $row->update({id_mqc_outcome => 3});
   ok ($row->has_final_outcome, 'outcome is final');
   warnings_like { $reporter->load() } [
-    qr/No mlwarehouse data for run 6600 position 6/,],
+    qr/Error retrieving mlwarehouse data for run 6600 position 6/,],
     'Warning no mlwarehouse data found logged';
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set');
 };
@@ -120,10 +135,13 @@ sub postfail_nowhere {
 
 subtest 'Testing failing to report, getting 500 status from lims' => sub {
   plan tests => 6;
-  my $npg_qc_schema = _create_schema();
-  my $mlwh_schema   = _create_mlwh_schema();
+  my $npg_qc_schema       = _create_schema();
+  my $mlwh_schema         = _create_mlwh_schema();
+  my $npg_tracking_schema = _create_tracking_schema();
 
-  my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema, mlwh_schema => $mlwh_schema);
+  my $reporter = npg_qc::mqc::reporter->new(qc_schema => $npg_qc_schema,
+                                            mlwh_schema => $mlwh_schema,
+                                            tracking_schema => $npg_tracking_schema);
   $reporter->load();
   $reporter->load();
 
