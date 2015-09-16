@@ -62,8 +62,8 @@ sub load {
     try {
       my $where = {'me.id_run'=>$outcome->id_run,
                    'me.position'=>$outcome->position,
-                   'me.tag_index'=> { '!=', undef },
-                   'iseq_flowcell.entity_type' => {'!=', 'library_indexed_spike'}};
+                   'me.tag_index'=> { q[!=], undef },
+                   'iseq_flowcell.entity_type' => {q[!=], 'library_indexed_spike'}};
       my $rswh = $self->mlwh_schema->resultset('IseqProductMetric')->search($where, { prefetch => 'iseq_flowcell',
                                                                                       order_by => qw[ me.id_run me.position me.tag_index ]
                                                                                     },
