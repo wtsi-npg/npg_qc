@@ -46,18 +46,11 @@ sub _build_mlwh_schema {
   return WTSI::DNAP::Warehouse::Schema->connect();
 }
 
-has 'nPass'  => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nPass',  metaclass => 'NoGetopt',);
-has 'nFail'  => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nFail',  metaclass => 'NoGetopt',);
-has 'nError' => ( isa => 'Int', is => 'ro', default => 0, writer => '_set_nError', metaclass => 'NoGetopt',);
-
 has 'verbose' => ( isa => 'Bool', is => 'ro', default => 0, documentation => 'print verbose messages');
+has 'report_gclp' => ( isa => 'Bool', is => 'ro', default => 0, documentation => 'show warning for glcp runs');
 
 sub load {
   my $self = shift;
-
-  $self->_set_nPass(0);
-  $self->_set_nFail(0);
-  $self->_set_nError(0);
 
   my $rs = $self->qc_schema->resultset('MqcOutcomeEnt')->get_ready_to_report();
   while (my $outcome = $rs->next()) {
@@ -65,6 +58,7 @@ sub load {
     my $lane_id;
     my $from_gclp;
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
+    my $product_metric;
     try {
       my $where = {'me.id_run'=>$outcome->id_run,
                    'me.position'=>$outcome->position,
@@ -74,30 +68,30 @@ sub load {
                                                                                       order_by => qw[ me.id_run me.position me.tag_index ]
                                                                                     },
       );
-      my $product_metric = $rswh->next;
-      if ($product_metric && $product_metric->iseq_flowcell) {
-        my $iseq_flowcell = $product_metric->iseq_flowcell;
-        $lane_id   = $iseq_flowcell->lane_id;
-        $from_gclp = $iseq_flowcell->from_gclp;
-      } else {
-        _log(qq[No mlwarehouse data for details $details]);
-        continue;
-      }
+      $product_metric = $rswh->next;
     } catch {
-      $self->_set_nError($self->nError+1);
       _log(qq(Error retrieving mlwarehouse data for $details: $_));
     };
 
+    if ($product_metric && $product_metric->iseq_flowcell) {
+      my $iseq_flowcell = $product_metric->iseq_flowcell;
+      $lane_id   = $iseq_flowcell->lane_id;
+      $from_gclp = $iseq_flowcell->from_gclp;
+    } else {
+      _log(qq[No mlwarehouse data for $details]);
+      next;
+    }
+
     if ($from_gclp) {
-      _log(qq[GCLP run, nothing to do for $details.]);
+      if ($self->report_gclp) {
+        _log(qq[GCLP run, nothing to do for $details.]);
+      }
     } elsif ($lane_id) {
       my $result;
       if ($outcome->is_accepted()) {
         $result = 'pass';
-        $self->_set_nPass($self->nPass + 1);
       } else {
         $result = 'fail';
-        $self->_set_nFail($self->nFail + 1);
       }
       my $url = $self->_create_url($lane_id, $result);
       if ($self->verbose) {
@@ -106,7 +100,6 @@ sub load {
       my $error_txt = $self->_report($lane_id, $result, $url);
       if ($error_txt) {
         _log($error_txt);
-        $self->_set_nError($self->nError+1);
       } else {
         $outcome->update_reported();
       }
