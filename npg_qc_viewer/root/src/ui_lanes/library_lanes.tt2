@@ -56,8 +56,7 @@
 
 <table id="results_summary" summary="QC results summary">
 <tr>
-[% IF sample_link %]<th[% row_span_string %]>Sample Name</th>[% END %]
-<th[% row_span_string %]>Library</th>
+<th[% row_span_string %]>Library<br />------<br />Sample<br />Name</th>
 <th[% row_span_string %]>Run Id<br />------<br />Num.<br />Cycles</th>
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
@@ -86,42 +85,39 @@
 -%]
 
 <tr>
-[%- IF sample_link -%]
-<td class="nbsp">
-<a href="[%- c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.id_sample_lims) -%]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
-<a href="[%- c.model('LimsServer').generate_url('sample', row_info_to); -%]"><span class="lib nbsp">[% row_info_to.sample_name | html %]</span></a>
-</td>
-[%- END -%]
-
 <td class="lib nbsp">
 <div class="rel_pos_container">
 [%- IF lane_collection.run_lane_plex_flags.${lane_key} -%]
   <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
-
+<span class="lib nbsp">
 [%- IF row_info_to.id_library_lims; -%]
   [%- IF !lane_collection.run_lane_plex_flags.${lane_key};
         lurl = c.model('LimsServer').generate_url('library', row_info_to);
   -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => row_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
-    <a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
+    <a href="[% lurl %]">[% row_info_to.id_library_lims | html %]</a><br />
+    <a href="[%- c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.id_sample_lims) -%]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
+    <a href="[%- c.model('LimsServer').generate_url('sample', row_info_to); -%]">[% row_info_to.sample_name4display | html %]</a>
   [%- ELSE;
     row_info_to.reset_as_pool();
     lurl = c.model('LimsServer').generate_url('pool', row_info_to);
   -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_library_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
-    <a href="[% lurl %]"><span class="lib nbsp">[% row_info_to.id_library_lims | html %]</span></a>
+    <a href="[% lurl %]">[% row_info_to.id_library_lims | html %]</a>
   [%- END -%]
 [%- END -%]
+</span>
 [% IF row_info_to.rnd %]<span class="watermark">R&amp;D</span>[% END %]
 </div>
 </td>
-[% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run); %]
-<td class="id_run"><div class="rel_pos_container">
+<td class="id_run">
+<div class="rel_pos_container">
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run) %]" ><img src="/static/images/focus_on.png" alt="link to run checks" /></a>
 <a href="[% rurl = [npg_url, 'run', id_run]; rurl.join('/'); %]" title="date completed [% time_comp.truncate(10) %]">[% id_run %]</a>
 [%- IF row_info_to.num_cycles %]<br />[% row_info_to.num_cycles %][% END -%]
-</div></td>
+</div>
+</td>
 
 [% PROCESS "ui_lanes/lane.tt2" %]
 </tr>

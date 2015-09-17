@@ -290,16 +290,17 @@ sub _build_hash {
 
   if ( defined $product_metric->iseq_flowcell ) {
     my $flowcell = $product_metric->iseq_flowcell;
-    $values->{'id_library_lims'}   = $flowcell->id_library_lims;
-    $values->{'legacy_library_id'} = $flowcell->legacy_library_id;
-    $values->{'id_pool_lims'}      = $flowcell->id_pool_lims;
-    $values->{'rnd'}               = $flowcell->is_r_and_d;
-    $values->{'manual_qc'}         = $flowcell->manual_qc;
-    $values->{'is_gclp'}           = $flowcell->from_gclp;
-    $values->{'entity_id_lims'}    = $flowcell->entity_id_lims;
-    $values->{'study_name'}        = $flowcell->study_name;
-    $values->{'id_sample_lims'}    = $flowcell->sample_id;
-    $values->{'sample_name'}       = $flowcell->sample_name;
+    $values->{'id_library_lims'}      = $flowcell->id_library_lims;
+    $values->{'legacy_library_id'}    = $flowcell->legacy_library_id;
+    $values->{'id_pool_lims'}         = $flowcell->id_pool_lims;
+    $values->{'rnd'}                  = $flowcell->is_r_and_d;
+    $values->{'manual_qc'}            = $flowcell->manual_qc;
+    $values->{'is_gclp'}              = $flowcell->from_gclp;
+    $values->{'entity_id_lims'}       = $flowcell->entity_id_lims;
+    $values->{'study_name'}           = $flowcell->study_name;
+    $values->{'id_sample_lims'}       = $flowcell->sample_id;
+    $values->{'sample_name'}          = $flowcell->sample_name;
+    $values->{'supplier_sample_name'} = $flowcell->sample_supplier_name;
   }
 
   return $values;
@@ -465,7 +466,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
     }
     $c->stash->{'title'} = _get_title(q[Libraries: ] . join q[, ], map {q['].$_.q[']} @{$id_library_lims});
     my $rs = $c->model('MLWarehouseDB')->search_product_by_id_library_lims($id_library_lims);
-    $c->stash->{'sample_link'} = 1;
+    $c->stash->{'show_total'}  = 1;
     $self->_display_libs($c, $rs, $ALL);
   } else {
     $c->stash->{error_message} = q[This is an invalid URL];
@@ -496,7 +497,6 @@ sub pool :Chained('base') :PathPart('pools') :Args(1) {
 
   $c->stash->{'title'} = _get_title(qq[Pool $id_pool_lims]);
   my $rs = $c->model('MLWarehouseDB')->search_product_by_id_pool_lims($id_pool_lims);
-  $c->stash->{'sample_link'} = 0;
   $c->stash->{'show_total'}  = 1;
   $self->_display_libs($c, $rs, $LANES);
   return;
@@ -531,7 +531,6 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
 
   my $sample_name = $sample->name;
   my $rs = $c->model('MLWarehouseDB')->search_product_by_sample_id($id_sample_lims);
-  $c->stash->{'sample_link'} = 0;
   $c->stash->{'show_total'}  = 1;
   $self->_display_libs($c, $rs, $ALL);
   $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
