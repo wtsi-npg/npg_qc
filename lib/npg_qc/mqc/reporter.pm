@@ -58,25 +58,31 @@ sub load {
     my $lane_id;
     my $from_gclp;
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
-    my $product_metric;
     try {
       my $where = {'me.id_run'=>$outcome->id_run,
                    'me.position'=>$outcome->position,
-                   'iseq_flowcell.entity_type' => {q[!=], 'library_indexed_spike'}};
-      my $rswh = $self->mlwh_schema->resultset('IseqProductMetric')->search($where, { prefetch => 'iseq_flowcell',
-                                                                                      order_by => qw[ me.id_run me.position me.tag_index ]
-                                                                                    },
+                   'iseq_flowcell.entity_type' => {q[!=], 'library_indexed_spike'} };
+      my $rswh = $self->mlwh_schema
+                      ->resultset('IseqProductMetric')
+                      ->search($where, { prefetch => 'iseq_flowcell',
+                                         order_by => [ { -asc  => [qw/ me.id_run me.position /] },
+                                                       { -desc => 'me.tag_index' },
+                                                     ],
+                                       },
       );
-      $product_metric = $rswh->next;
+      while (my $product_metric = $rswh->next) {
+        if( $product_metric->iseq_flowcell
+            && $product_metric->iseq_flowcell->lane_id ) {
+          my $iseq_flowcell = $product_metric->iseq_flowcell;
+          $lane_id   = $iseq_flowcell->lane_id;
+          $from_gclp = $iseq_flowcell->from_gclp;
+          last;
+        }
+      }
     } catch {
       _log(qq(Error retrieving mlwarehouse data for $details: $_));
     };
-
-    if ($product_metric && $product_metric->iseq_flowcell) {
-      my $iseq_flowcell = $product_metric->iseq_flowcell;
-      $lane_id   = $iseq_flowcell->lane_id;
-      $from_gclp = $iseq_flowcell->from_gclp;
-    } else {
+    if (!defined $lane_id || !defined $from_gclp ) {
       _log(qq[No mlwarehouse data for $details]);
       next;
     }
@@ -158,8 +164,6 @@ Reads all the QC records which need to have a pass or fail sent to LIMS, and sen
 =head2 qc_schema - an attribute; the schema to use for the qc database. Defaults to npg_qc::Schema
 
 =head2 mlwh_schema - an attribute; the schema to use for ml warehouse database. Defaults to WTSI::DNAP::Warehouse::Schema
-
-=head2 tracking_schema - an attribute; the schema to use for ml warehouse database. Defaults to WTSI::DNAP::Warehouse::Schema
 
 =head2 load - method to perform the reading and updating
 
