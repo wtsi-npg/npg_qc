@@ -3,9 +3,9 @@ package npg_qc::autoqc::results::sequence_summary;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
-use DateTime;
 use Perl6::Slurp;
 use Readonly;
+use Carp;
 
 use npg_tracking::util::types;
 use npg_common::roles::software_location;
@@ -24,7 +24,8 @@ Readonly::Array my @ATTRIBUTES => qw/ sequence_format
 has 'sequence_file'  => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
-    required   => 1,
+    traits     => [ 'DoNotSerialize' ],
+    required   => 0,
 );
 
 has [ @ATTRIBUTES ] => (
@@ -71,14 +72,15 @@ has '_samtools' => (
     is         => 'ro',
     traits     => [ 'DoNotSerialize' ],
     required   => 0,
-    lazy_build => 1,
+    writer     => '_set_samtools',
 );
-sub _build__samtools {
-  return 'samtools1';
-}
 
 override 'execute' => sub {
   my $self = shift;
+  if (!$self->sequence_file) {
+    croak 'CRAM/BAM file path (sequence_file attribute) should be set';
+  }
+  $self->_set_samtools('samtools1');
   super();
   for my $attr ( @ATTRIBUTES ) {
     $self->$attr;
@@ -153,7 +155,7 @@ Method forcing all lazy attributes of the object to be built.
 
 =item Readonly
 
-=item DateTime
+=item Carp
 
 =item Perl6::Slurp
 

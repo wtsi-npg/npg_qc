@@ -26,22 +26,24 @@ my $file = join q[/], $archive, '17448_1#9.cram';
 use_ok ('npg_qc::autoqc::results::sequence_summary');
 
 subtest 'simple tests' => sub {
-  plan tests => 7;
+  plan tests => 8;
 
-  throws_ok { npg_qc::autoqc::results::sequence_summary->new() }
-    qr/Attribute \(sequence_file\) is required/,
-    'no-argument constructor - error';
+  my $r;
+  lives_ok { $r = npg_qc::autoqc::results::sequence_summary->new() }
+    'no-argument constructor - ok';
+  isa_ok ($r, 'npg_qc::autoqc::results::sequence_summary');
+  throws_ok { $r->execute }
+    qr/CRAM\/BAM file path \(sequence_file attribute\) should be set/,
+    'sequence file does not given - error';
+  
   throws_ok { npg_qc::autoqc::results::sequence_summary->new(
         sequence_file => '/some/file') } 
     qr/Validation failed for 'NpgTrackingReadableFile' with value "\/some\/file"/,
     'sequence file does not exist - error';
 
-  my $r;
   lives_ok { $r = npg_qc::autoqc::results::sequence_summary->new(
         sequence_file => $file ) }
     'one-arg constructor (sequence_file) - object created';
-  isa_ok ($r, 'npg_qc::autoqc::results::sequence_summary');
-
   is ($r->num_components, 0, 'no components');
   throws_ok { $r->composition_digest() }
     qr/Composition is empty, cannot compute digest/,
@@ -52,7 +54,7 @@ subtest 'simple tests' => sub {
 };
 
 subtest 'object with an one-component composition' => sub {
-  plan tests => 7;
+  plan tests => 15;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
@@ -71,6 +73,19 @@ subtest 'object with an one-component composition' => sub {
   my @header = slurp $header_file;
   my $filter = q[@SQ];
   is ($r->header, join(q[], grep { $_ !~ /\A$filter/ } @header), 'header generated and filtered correctly');
+
+  my $json = $r->freeze();
+
+  my @attrs = qw(sequence_file _root_path _samtools);
+  for my $attr ( @attrs ) {
+    unlike ($json, qr/$attr/, "serialization des not contain $attr attribute"); 
+  }
+  lives_ok { $r = npg_qc::autoqc::results::sequence_summary->thaw($json) }
+    'object instantiated from JSON string';
+  for my $attr ( @attrs ) {
+    lives_and { is $r->$attr, undef} "$attr value is undefined";
+  }
+  lives_ok { $r->freeze() } 'can serialize';
 };
 
 1;
