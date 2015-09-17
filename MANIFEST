@@ -172,6 +172,8 @@ lib/npg_qc/autoqc/types.pm
 lib/npg_qc/controller.pm
 lib/npg_qc/file_store.pm
 lib/npg_qc/mqc/reporter.pm
+lib/npg_qc/mqc/role/MQCEntRole.pm
+lib/npg_qc/mqc/role/TimeZoneConsumerRole.pm
 lib/npg_qc/model/analysis_lane.pm
 lib/npg_qc/model/analysis_lane_qcal.pm
 lib/npg_qc/model/analysis.pm
