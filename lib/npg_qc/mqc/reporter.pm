@@ -46,8 +46,16 @@ sub _build_mlwh_schema {
   return WTSI::DNAP::Warehouse::Schema->connect();
 }
 
-has 'verbose' => ( isa => 'Bool', is => 'ro', default => 0, documentation => 'print verbose messages');
-has 'report_gclp' => ( isa => 'Bool', is => 'ro', default => 0, documentation => 'show warning for glcp runs');
+has 'verbose' => ( isa           => 'Bool',
+                   is            => 'ro',
+                   default       => 0,
+                   documentation => 'print verbose messages'
+);
+has 'report_gclp' => ( isa           => 'Bool',
+                       is            => 'ro',
+                       default       => 0,
+                       documentation => 'show warning for glcp runs'
+);
 
 sub load {
   my $self = shift;
