@@ -15,7 +15,8 @@ our $VERSION = '0';
 has 'stats_file'     => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
-    required   => 1,
+    traits     => [ 'DoNotSerialize' ],
+    required   => 0,
 );
 
 has 'filter'         => (
@@ -23,7 +24,6 @@ has 'filter'         => (
     isa        => 'Str',
     required   => 0,
     lazy_build => 1,
-    predicate  => '_has_filter',
 );
 sub _build_filter {
   my ($self, $path) = @_;
@@ -44,7 +44,6 @@ has 'stats'         => (
     isa        => 'Str',
     required   => 0,
     lazy_build => 1,
-    predicate  => '_has_stats',
 );
 sub _build_stats {
   my $self = shift;
@@ -54,6 +53,9 @@ sub _build_stats {
 
 override 'execute' => sub {
   my $self = shift;
+  if (!$self->stats_file) {
+    croak 'Samtools stats file path (stats_file attribute) should be set';
+  }
   super();
   $self->filter();
   $self->stats();

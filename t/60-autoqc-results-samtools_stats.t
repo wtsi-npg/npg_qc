@@ -18,21 +18,24 @@ my $file1 = join q[/], $archive, '17448_1#9_F0x900.stats';
 use_ok ('npg_qc::autoqc::results::samtools_stats');
 
 subtest 'object with an empty composition' => sub {
-  plan tests => 8;
+  plan tests => 9;
 
-  throws_ok { npg_qc::autoqc::results::samtools_stats->new() }
-    qr/Attribute \(stats_file\) is required/,
-    'no-argument constructor - error';
+  my $r;
+  lives_ok { $r = npg_qc::autoqc::results::samtools_stats->new() }
+    'no-argument constructor - ok';
+  isa_ok ($r, 'npg_qc::autoqc::results::samtools_stats');
+  throws_ok { $r->execute }
+    qr/Samtools stats file path \(stats_file attribute\) should be set/,
+    'no stats file - error';
+  
   throws_ok { npg_qc::autoqc::results::samtools_stats->new(
         stats_file => '/some/file') } 
     qr/Validation failed for 'NpgTrackingReadableFile' with value "\/some\/file"/,
     'stats file does not exist - error';
 
-  my $r;
   lives_ok { $r = npg_qc::autoqc::results::samtools_stats->new(
         stats_file => $file1 ) }
     'one-arg constructor (stats_file) - object created';
-  isa_ok ($r, 'npg_qc::autoqc::results::samtools_stats');
 
   is ($r->num_components, 0, 'no components');
   throws_ok { $r->composition_digest() }
@@ -47,7 +50,7 @@ subtest 'object with an empty composition' => sub {
 };
 
 subtest 'object with an one-component composition' => sub { 
-  plan tests => 12;
+  plan tests => 9;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
@@ -59,12 +62,9 @@ subtest 'object with an one-component composition' => sub {
     'bfc10d33f4518996db01d1b70ebc17d986684d2e04e20ab072b8b9e51ae73dfa', 'digest');
   is ($r->filter, 'F0x900', 'filter');
   is ($r->composition_subset, undef, 'subset undefined');
-  ok (!$r->_has_stats, 'stats attribute is not built yet');
   lives_ok { $r->execute() } 'execute() method runs successfully';
-  ok ($r->_has_stats, 'stats attribute has been built');
   is ($r->stats, slurp($file1), 'stats file content saved correctly');
   is ($r->filename_root, '17448_1#9_F0x900', 'filename root');
-  ok ($r->_has_filter, 'filter attribute has been built');
   is ($r->filter, 'F0x900', 'filter is set');
   is ($r->to_string(),
     'npg_qc::autoqc::results::samtools_stats {"components":[{"id_run":17448,"position":1,"tag_index":9}]}',
@@ -72,7 +72,7 @@ subtest 'object with an one-component composition' => sub {
 };
 
 subtest 'object with an one-component phix subset composition' => sub { 
-  plan tests => 7;
+  plan tests => 6;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9, subset => 'phix');
@@ -81,7 +81,6 @@ subtest 'object with an one-component phix subset composition' => sub {
   $r->composition->add_component($c);
   is ($r->composition_digest(),
     'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb', 'digest');
-  ok (!$r->_has_filter, 'filter attribute has not been built');
   is ($r->filter, 'F0xB00', 'filter');
   is ($r->composition_subset, 'phix', 'phix subset');
   is ($r->stats, slurp($file2), 'stats file content saved correctly');
@@ -92,35 +91,31 @@ subtest 'object with an one-component phix subset composition' => sub {
 };
 
 subtest 'serialization and instantiation' => sub { 
-  plan tests => 16;
+  plan tests => 12;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
   my $r = npg_qc::autoqc::results::samtools_stats->new(stats_file => $file1);
   $r->composition->add_component($c);
   my $digest = $r->composition_digest;
-  ok (!$r->_has_stats, 'stats attribute is not built yet');
-  ok (!$r->_has_filter, 'filter attribute is not built yet');
+  lives_ok { $r->execute() } 'execute() method runs successfully';
+  is ($r->filter, 'F0x900', 'filter');
+  is ($r->stats, slurp($file1), 'stats file content generated correctly');
   
-  my $json = $r->freeze();
-  my $r1 = npg_qc::autoqc::results::samtools_stats->thaw($json);
+  my $json;
+  lives_ok { $json = $r->freeze(); } 'serialization ok';
+  unlike ($json, qr/stats_file/, 'stats_file attribute is not serialized');
+  my $r1;
+  lives_ok {$r1 = npg_qc::autoqc::results::samtools_stats->thaw($json) }
+    'object instantiated from JSON string';
   isa_ok ($r1, 'npg_qc::autoqc::results::samtools_stats');
   is ($r1->to_string, $r->to_string, 'the same string representation');
   is ($r1->composition_digest, $digest, 'the same composition digest');
-  ok (!$r1->_has_stats, 'stats attribute is not built yet');
-  ok (!$r->_has_filter, 'filter attribute is not built yet');
-  lives_ok { $r1->execute() } 'execute() method runs successfully';
-  ok ($r1->_has_stats, 'stats attribute has been built');
-  ok ($r1->_has_filter, 'filter attribute has been built');
-  is ($r1->filter, 'F0x900', 'filter');
-  is ($r1->stats, slurp($file1), 'stats file content generated correctly');
-
-  my $json1 = $r1->freeze();
-  isnt ($json, $json1, 'different json representations');
-  my $r2 = npg_qc::autoqc::results::samtools_stats->thaw($json1);
-  isa_ok ($r2, 'npg_qc::autoqc::results::samtools_stats');
-  is ($r2->composition_digest, $digest, 'the same composition digest');
-  ok ($r2->_has_stats, 'stats attribute has been built');
+  is ($r1->stats_file, undef, 'stats file value undefined');
+  throws_ok { $r1->execute }
+    qr/Samtools stats file path \(stats_file attribute\) should be set/,
+    'no stats file - execute error';
+  lives_ok { $r1->freeze(); } 'serialization ok';
 };
 
 1;
