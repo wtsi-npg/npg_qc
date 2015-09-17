@@ -1,6 +1,8 @@
 package npg_qc::mqc::role::TimeZoneConsumerRole;
 
 use Readonly;
+use strict;
+use warnings;
 use DateTime;
 use DateTime::TimeZone;
 
@@ -8,7 +10,7 @@ our $VERSION = '0';
 
 use Moose::Role;
 
-sub _get_time_now {
+sub get_time_now {
   return DateTime->now(time_zone => DateTime::TimeZone->new(name => q[local]));
 }
 
@@ -21,7 +23,7 @@ __END__
 
 =head1 NAME
 
-  npg_qc::mqc::role::MQCEntRole
+  npg_qc::mqc::role::TimeZoneConsumerRole
 
 =head1 SYNOPSIS
 
@@ -31,7 +33,9 @@ __END__
 
 =head1 SUBROUTINES/METHODS
 
-=head2 
+=head2 get_time_now
+
+  Returns current time considering TimeZone.
 
 =head1 DIAGNOSTICS
 
@@ -41,7 +45,15 @@ __END__
 
 =over
 
+=item strict
+
+=item warnings
+
 =item Moose::Role
+
+=item DateTime
+
+=item DateTime::TimeZone
 
 =item Readonly
 
@@ -50,6 +62,10 @@ __END__
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 

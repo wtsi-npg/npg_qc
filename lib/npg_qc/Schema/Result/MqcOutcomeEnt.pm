@@ -206,7 +206,8 @@ use Carp;
 use DateTime;
 use DateTime::TimeZone;
 
-with 'npg_qc::mqc::role::MQCEntRole', 'npg_qc::mqc::role::TimeZoneConsumerRole';
+with qw/npg_qc::mqc::role::MQCEntRole
+        npg_qc::mqc::role::TimeZoneConsumerRole/;
 
 sub update_outcome_with_libraries {
   my ($self, $outcome, $username, $tag_indexes) = @_;
@@ -219,23 +220,24 @@ sub update_outcome_with_libraries {
       if(scalar @{ $tag_indexes } == $outcomes_libraries->count ) {
         while(my $library = $outcomes_libraries->next) {
           if ($library->is_undecided) {
-            croak("Error All libraries need to have a pass or fail outcome.");
+            croak('Error All libraries need to have a pass or fail outcome.');
           }
         }
       } else {
-        croak("Error All libraries need to have an outcome.");
+        croak('Error All libraries need to have an outcome.');
       }
     } else {
       #All plexes with undecided
       while(my $library = $outcomes_libraries->next) {
         if (!$library->is_undecided) {
-          croak("Error All libraries need to have undecided outcome.");
+          croak('Error All libraries need to have undecided outcome.');
         }
       }
     }
 
-    foreach my $tag_index (@$tag_indexes) {
-      my $ent = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt')->search(
+    foreach my $tag_index (@{$tag_indexes}) {
+      my $resultset = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt');
+      my $ent = $resultset->search(
         {'id_run' => $self->id_run, 'position' => $self->position, 'tag_index' => $tag_index})->next;
       if (!$ent) {
         $ent = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt')->new_result({
@@ -261,19 +263,21 @@ sub update_outcome_with_libraries {
   return 1;
 }
 
-#Create and save historic from the entity current data.
-sub _create_historic {
+sub data_for_historic {
   my $self = shift;
-  my $rs = $self->result_source->schema->resultset('MqcOutcomeHist');
-  my $historic = $rs->create({
+  return {
     id_run         => $self->id_run,
     position       => $self->position,
     id_mqc_outcome => $self->id_mqc_outcome,
     username       => $self->username,
     last_modified  => $self->last_modified,
     modified_by    => $self->modified_by
-  });
-  return 1;
+  };
+}
+
+sub historic_resultset {
+  my $self = shift;
+  return 'MqcOutcomeHist';
 }
 
 sub fetch_mqc_library_outcomes {
@@ -294,7 +298,7 @@ sub update_reported {
           $self->id_run, $self->position);
   }
   #It does not check if the reported is null just in case we need to update a reported one.
-  return $self->update({'reported' => $self->_get_time_now, 'modified_by' => $username}); #Only update the modified_by field.
+  return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username}); #Only update the modified_by field.
 }
 
 sub short_desc {
@@ -312,7 +316,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Catalog for manual MQC statuses.
+Entity for lane MQC outcome.
 
 =head1 DIAGNOSTICS
 
@@ -320,25 +324,9 @@ Catalog for manual MQC statuses.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 update_outcome
+=head2 update_outcome_with_libraries
 
-  Updates the outcome of the entity with values provided.
-
-  $obj->($outcome, $username)
-
-=head2 has_final_outcome
-
-  Returns true id this entry corresponds to a final outcome, otherwise returns false.
-  
-=head2 is_accepted
-
-  Returns the result of checking if the outcome is considered accepted. Delegates the 
-  check to L<npg_qc::Schema::Result::MqcOutcomeDict>
-  
-=head2 is_final_accepted
-
-  Returns the result of checking if the outcome is considered final and accepted. 
-  Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
+=head2 fetch_mqc_library_outcomes
 
 =head2 update_reported
 
@@ -347,13 +335,26 @@ Catalog for manual MQC statuses.
 
 =head2 update
 
-  Default DBIx update method extended to create an entry in the table corresponding to 
+  With around on DBIx update method to create an entry in the table corresponding to 
   the MqcOutcomeHist class
 
 =head2 insert
 
-  Default DBIx insert method extended to create an entry in the table corresponding to 
+  With around on DBIx insert method to create an entry in the table corresponding to 
   the MqcOutcomeHist class
+
+=head2 data_for_historic
+
+  Returns a hash with elements for the historic representation of the entity, a 
+  subset of values of the instance.
+
+=head2 historic_resultset
+
+  Returns the name of the historic resultset associated with this entity
+
+=head2 short_desc
+
+  Returns minimal info of entity (run, lane, tag_index) for error messaging
 
 =head1 DEPENDENCIES
 
@@ -374,10 +375,6 @@ Catalog for manual MQC statuses.
 =item DBIx::Class::Core
 
 =item Carp
-
-=item DateTime
-
-=item DateTime::TimeZone
 
 =back
 

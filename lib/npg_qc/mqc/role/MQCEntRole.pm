@@ -1,20 +1,24 @@
 package npg_qc::mqc::role::MQCEntRole;
 
-use Readonly;
+use strict;
+use warnings;
 use Carp;
 
 our $VERSION = '0';
 
 use Moose::Role;
-#TODO require update
-#TODO require insert
-#TODO require mqc_outcome
+
 requires 'short_desc';
+requires 'mqc_outcome';
+requires 'update';
+requires 'insert';
+requires 'data_for_historic';
+requires 'historic_resultset';
 
 around 'update' => sub {
   my $orig = shift;
   my $self = shift;
-  $self->last_modified($self->_get_time_now);
+  $self->last_modified($self->get_time_now);
   my $return_super = $self->$orig(@_);
 
   $self->_create_historic();
@@ -24,7 +28,7 @@ around 'update' => sub {
 around 'insert' => sub {
   my $orig = shift;
   my $self = shift;
-  $self->last_modified($self->_get_time_now);
+  $self->last_modified($self->get_time_now);
   my $return_super = $self->$orig(@_);
 
   $self->_create_historic();
@@ -89,6 +93,14 @@ sub is_undecided {
   return $self->mqc_outcome->is_undecided;
 }
 
+#Create and save historic from the entity current data.
+sub _create_historic {
+  my $self = shift;
+  my $rs = $self->result_source->schema->resultset($self->historic_resultset);
+  my $historic = $rs->create($self->data_for_historic);
+  return 1;
+}
+
 #Fetches valid outcome object from the database.
 sub _valid_outcome {
   my ($self, $outcome) = @_;
@@ -125,7 +137,25 @@ __END__
 
 =head1 SUBROUTINES/METHODS
 
-=head2 
+=head2 update_outcome
+
+  Updates the outcome of the entity with values provided.
+
+  $obj->($outcome, $username)
+
+=head2 has_final_outcome
+
+  Returns true id this entry corresponds to a final outcome, otherwise returns false.
+  
+=head2 is_accepted
+
+  Returns the result of checking if the outcome is considered accepted. Delegates the 
+  check to L<npg_qc::Schema::Result::MqcOutcomeDict>
+  
+=head2 is_final_accepted
+
+  Returns the result of checking if the outcome is considered final and accepted. 
+  Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
 
 =head1 DIAGNOSTICS
 
@@ -144,6 +174,10 @@ __END__
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
