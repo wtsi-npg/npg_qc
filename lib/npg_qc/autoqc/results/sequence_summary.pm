@@ -4,6 +4,7 @@ use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Perl6::Slurp;
+use Encode qw(encode);
 use Readonly;
 use Carp;
 
@@ -42,8 +43,9 @@ sub _build_sequence_format {
 }
 sub _build_header {
   my $self = shift;
-  return join q[], grep { $_ !~ /\A\@SQ/smx }
+  my $s = join q[], grep { ($_ !~ /\A\@SQ/smx) }
     slurp q{-|}, $self->_samtools, 'view', '-H', $self->sequence_file;
+  return encode('utf8', $s);
 }
 sub _build_md5 {
   my $self = shift;
@@ -121,7 +123,8 @@ Attribute, sequence format (bam|cram) derived from the sequence file extension.
 
 =head2 header
 
-Attribute, header of the bam/cram sequence file, SQ lines filtered out.
+Attribute, header of the bam/cram sequence file, @SQ lines filtered out.
+To be compatible with JSON format, this string is UTF8-encoded.
 
 =head2 md5
 
@@ -152,6 +155,8 @@ Method forcing all lazy attributes of the object to be built.
 =item MooseX::StrictConstructor
 
 =item namespace::autoclean
+
+=item Encode
 
 =item Readonly
 
