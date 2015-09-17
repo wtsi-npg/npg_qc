@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - MQC reporter now uses MLWH to fetch lane information to report MQC outcomes
+     it also handles missing data for GCLP runs.
+
 release 59.0
  - SeqQC 
    - remove ajax proxy controller
