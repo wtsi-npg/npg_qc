@@ -203,11 +203,8 @@ __PACKAGE__->belongs_to(
 our $VERSION = '0';
 
 use Carp;
-use DateTime;
-use DateTime::TimeZone;
 
-with qw/npg_qc::mqc::role::MQCEntRole
-        npg_qc::mqc::role::TimeZoneConsumerRole/;
+with qw/npg_qc::mqc::role::MQCEntRole/;
 
 sub update_outcome_with_libraries {
   my ($self, $outcome, $username, $tag_indexes) = @_;

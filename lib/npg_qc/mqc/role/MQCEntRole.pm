@@ -8,6 +8,8 @@ our $VERSION = '0';
 
 use Moose::Role;
 
+with qw/npg_qc::mqc::role::TimeZoneConsumerRole/;
+
 requires 'short_desc';
 requires 'mqc_outcome';
 requires 'update';
