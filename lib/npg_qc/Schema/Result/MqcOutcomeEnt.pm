@@ -204,7 +204,7 @@ our $VERSION = '0';
 
 use Carp;
 
-with qw/npg_qc::mqc::role::MQCEntRole/;
+with qw/npg_qc::Schema::MQCEntRole/;
 
 sub update_outcome_with_libraries {
   my ($self, $outcome, $username, $tag_indexes) = @_;

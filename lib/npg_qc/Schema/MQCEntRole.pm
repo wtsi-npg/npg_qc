@@ -1,4 +1,4 @@
-package npg_qc::mqc::role::MQCEntRole;
+package npg_qc::Schema::MQCEntRole;
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ our $VERSION = '0';
 
 use Moose::Role;
 
-with qw/npg_qc::mqc::role::TimeZoneConsumerRole/;
+with qw/npg_qc::Schema::TimeZoneConsumerRole/;
 
 requires 'short_desc';
 requires 'mqc_outcome';
@@ -129,7 +129,7 @@ __END__
 
 =head1 NAME
 
-  npg_qc::mqc::role::MQCEntRole
+  npg_qc::Schema::MQCEntRole
 
 =head1 SYNOPSIS
 

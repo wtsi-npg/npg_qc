@@ -1,4 +1,4 @@
-package npg_qc::mqc::role::TimeZoneConsumerRole;
+package npg_qc::Schema::TimeZoneConsumerRole;
 
 use Readonly;
 use strict;
@@ -23,7 +23,7 @@ __END__
 
 =head1 NAME
 
-  npg_qc::mqc::role::TimeZoneConsumerRole
+  npg_qc::Schema::TimeZoneConsumerRole
 
 =head1 SYNOPSIS
 
