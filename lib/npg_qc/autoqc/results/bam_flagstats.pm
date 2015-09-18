@@ -89,6 +89,7 @@ has 'histogram'         => ( isa     => 'HashRef',
 has 'sequence_file' => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
+    traits     => [ 'DoNotSerialize' ],
     required   => 0,
     writer     => '_set_sequence_file',
 );
@@ -97,6 +98,7 @@ has [ qw/ markdups_metrics_file
           flagstats_metrics_file / ] => (
     isa        => 'Maybe[NpgTrackingReadableFile]',
     is         => 'ro',
+    traits     => [ 'DoNotSerialize' ],
     required   => 0,
     lazy_build => 1,
 );
