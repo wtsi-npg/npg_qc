@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - 'write2file' method of autoqc result objects removed since it duplicated
+     the 'store' method
  - alternative base class npg_qc::autoqc::results::base for autoqc results objects,
      able to represent results that are derived from merged files and described by
      a composition of multiple components

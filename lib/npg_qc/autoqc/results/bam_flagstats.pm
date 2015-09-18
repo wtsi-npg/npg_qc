@@ -214,11 +214,11 @@ sub BUILD {
   return;
 }
 
-around 'write2file' => sub {
+around 'store' => sub {
   my ($orig, $self, $path) = @_;
   if ($self->_has_related_objects()) {
     for my $o ( @{$self->related_objects()} ) {
-      $o->write2file($path);
+      $o->store($path);
     }
   }
   $self->_set_related_objects([]);
@@ -409,7 +409,7 @@ npg_qc::autoqc::results::bam_flagstats
   an optional attribute, a full path to the sequence, should be set
   for 'execute' method to work correctly
 
-=head2 write2file
+=head2 store
 
   extended parent method of the same name, serializes related objects to files
   and resets the related objects attribute to an empty array, then calls

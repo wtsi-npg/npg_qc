@@ -183,27 +183,17 @@ sub filename4serialization {
         q[json];
 }
 
-=head2 write2file
+=head2 store
 
-Serializes the object as a json string to a folder given by the destination argument.
-The output file name follows the pattern idrun_position.check_name.extension.
+Extends 'store' method provided by inheritance.
+Uses filename4serialization for default file name if none or directory is passed as argument.
 
 =cut
-sub write2file {
-    my ($self, $destination) = @_;
-
-    $destination = catfile($destination, $self->filename4serialization());
-    open my $fh, q[>], $destination or croak "Cannot open $destination for writing";
-    ##no critic (RequireBracedFileHandleWithPrint) 
-    print $fh $self->freeze() or croak "Cannot write to $destination";
-    close $fh or carp "Cannot close a handle to $destination";
-    return 1;
-}
-
-around 'store' => sub { #use filename4serialization for default file name if none or directory is passed as argument
+around 'store' => sub {
     my ($orig, $self, $file) = @_;
-    $file = (not defined $file) ? $self->filename4serialization() :
-            -d $file            ? catfile($file,$self->filename4serialization()) :
+    my $fn = $self->filename4serialization();
+    $file = (not defined $file) ? $fn :
+            -d $file            ? catfile($file,$fn) :
                                   $file;
     return $self->$orig($file);
 };

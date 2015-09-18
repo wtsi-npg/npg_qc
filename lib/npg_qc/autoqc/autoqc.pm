@@ -255,7 +255,7 @@ sub run {
 
     my $check = $self->_create_test_object();
     $check->execute();
-    $check->result->write2file($self->qc_out);
+    $check->result->store($self->qc_out);
 
     return 1;
 }

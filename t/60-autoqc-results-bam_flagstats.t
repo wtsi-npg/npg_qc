@@ -272,7 +272,7 @@ subtest 'full functionality with full file sets' => sub {
       if (!-e $local_qc_dir) {
         mkdir $local_qc_dir;
       }
-      lives_ok { $r->write2file($local_qc_dir) } 'no error serializing objects to a file';
+      lives_ok { $r->store($local_qc_dir) } 'no error serializing objects to a file';
       is (scalar @{$r->related_objects}, 0, 'related objects array is empty');
       foreach my $output_type ( qw(.bam_flagstats.json
                                    .sequence_summary.json
