@@ -17,6 +17,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
        file where the analysis pipeline did not run the current code that
        produces samtools_stats and sequence_summary objects as individual files
      - ability to mark records as current
+ - SeqQC
+   - add the total yield in library view RT#488973
+   - summary table: display supplier sample name along the library barcode RT#488964,
+     remove separate sample column
 
 release 59.0
  - SeqQC 
