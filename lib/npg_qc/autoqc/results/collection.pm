@@ -162,7 +162,6 @@ sub add_from_dir {
 
     foreach my $file (@files) {
         my ($filename, $dir, $extension) = fileparse($file);
-        my $loaded = 0;
         foreach my $class (@classes) {
             if ($filename =~ /$class/smx) {
                 my $module = $RESULTS_NAMESPACE . q[::] . $class;
@@ -171,12 +170,8 @@ sub add_from_dir {
                 if (!defined $lanes || !@{$lanes} || grep {/^$position$/smx} @{$lanes} ) {
                     $self->add($result);
                 }
-                $loaded = 1;
                 last;
             }
-        }
-        if (!$loaded) {
-            carp qq[Cannot identify class for $file];
         }
     }
 
