@@ -159,6 +159,11 @@ __END__
   Returns the result of checking if the outcome is considered final and accepted. 
   Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
 
+=head2 is_undecided
+
+  Returns true if the current outcome is undecided. 
+  Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT

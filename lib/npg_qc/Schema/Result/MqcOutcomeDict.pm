@@ -233,13 +233,23 @@ Catalog for manual MQC statuses.
 
 =head2 is_accepted
 
-  Utility method which checks the short description to decide if the outcome can 
+  Utility method which checks the short description to decide if the outcome can
   be considered accepted.
-  
+
+=head2 is_rejected
+
+  Utility method which checks the short description to decide if the outcome can
+  be considered rejected.
+
 =head2 is_final_accepted
 
-  Utility method which checks the short description to decide if the outcome can 
+  Utility method which checks the short description to decide if the outcome can
   be considered final and accepted.
+
+=head2 is_undecided
+
+  Utility method which checks the short description to decide if the outcome can
+  be considered as undecided.
 
 =cut
 
