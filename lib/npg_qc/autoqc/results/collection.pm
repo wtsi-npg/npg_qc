@@ -92,7 +92,13 @@ has '_result_classes' => ( isa         => 'ArrayRef',
 sub _build__result_classes {
     my $self = shift;
 
-    my @except = map {join q[::], $RESULTS_NAMESPACE, $_} qw/base result collection/;
+    my @except = map {join q[::], $RESULTS_NAMESPACE, $_} qw/
+                                                             sequence_summary
+                                                             samtools_stats
+                                                             base
+                                                             result
+                                                             collection
+                                                           /;
 
     my @classes = Module::Pluggable::Object->new(
         require     => 1,
