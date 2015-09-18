@@ -6,6 +6,8 @@ use File::Spec::Functions qw( splitpath );
 use Carp;
 
 use npg_tracking::glossary::composition;
+use npg_tracking::glossary::composition::component::illumina;
+
 with qw( npg_qc::autoqc::role::result );
 with 'npg_tracking::glossary::composition::factory' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};

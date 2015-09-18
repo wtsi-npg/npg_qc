@@ -11,10 +11,6 @@ use List::MoreUtils qw/none/;
 use Readonly;
 
 use npg_tracking::util::types;
-# MooseX::Storage::Engine does not cope with nested objects,
-# forgets to import the module before using it. So we have
-# to have the illumina component class already in memory.
-use npg_tracking::glossary::composition::component::illumina;
 use npg_qc::Schema;
 use npg_qc::autoqc::role::result;
 
