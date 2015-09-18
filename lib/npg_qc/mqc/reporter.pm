@@ -46,15 +46,17 @@ sub _build_mlwh_schema {
   return WTSI::DNAP::Warehouse::Schema->connect();
 }
 
-has 'verbose' => ( isa           => 'Bool',
-                   is            => 'ro',
-                   default       => 0,
-                   documentation => 'print verbose messages'
+has 'verbose'     => (
+  isa           => 'Bool',
+  is            => 'ro',
+  default       => 0,
+  documentation => 'print verbose messages',
 );
-has 'report_gclp' => ( isa           => 'Bool',
-                       is            => 'ro',
-                       default       => 0,
-                       documentation => 'show warning for glcp runs'
+has 'report_gclp' => (
+  isa           => 'Bool',
+  is            => 'ro',
+  default       => 0,
+  documentation => 'show warning for glcp runs',
 );
 
 sub load {
@@ -67,9 +69,9 @@ sub load {
     my $from_gclp;
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
     try {
-      my $where = {'me.id_run'=>$outcome->id_run,
-                   'me.position'=>$outcome->position,
-                   'iseq_flowcell.entity_type' => {q[!=], 'library_indexed_spike'} };
+      my $where = {'me.id_run'=> $outcome->id_run,
+                   'me.position'=> $outcome->position,
+                   'iseq_flowcell.entity_type'=> {q[!=], 'library_indexed_spike'} };
       my $rswh = $self->mlwh_schema
                       ->resultset('IseqProductMetric')
                       ->search($where, { prefetch => 'iseq_flowcell',
