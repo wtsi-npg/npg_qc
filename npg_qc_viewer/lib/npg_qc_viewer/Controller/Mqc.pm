@@ -13,12 +13,15 @@ with 'npg_qc_viewer::Util::Error';
 
 our $VERSION  = '0';
 
-Readonly::Scalar my $BAD_REQUEST_CODE    => 400;
-Readonly::Scalar my $OK_CODE             => 200;
-Readonly::Scalar my $METHOD_NOT_ALLOWED  => 405;
-Readonly::Scalar my $ALLOW_METHOD_POST   => q[POST];
-Readonly::Scalar my $ALLOW_METHOD_GET    => q[GET];
-Readonly::Scalar my $MQC_ROLE            => q[manual_qc];
+Readonly::Scalar my $BAD_REQUEST_CODE      => 400;
+Readonly::Scalar my $OK_CODE               => 200;
+Readonly::Scalar my $METHOD_NOT_ALLOWED    => 405;
+Readonly::Scalar my $INTERNAL_SERVER_ERROR => 500;
+Readonly::Scalar my $ALLOW_METHOD_POST     => q[POST];
+Readonly::Scalar my $ALLOW_METHOD_GET      => q[GET];
+Readonly::Scalar my $MQC_ROLE              => q[manual_qc];
+Readonly::Scalar my $MODE_LANE_MQC         => q[LANE_MQC];
+Readonly::Scalar my $MODE_LIBRARY_MQC      => q[LIBRARY_MQC];
 
 sub _validate_req_method {
   my ($self, $c, $allowed) = @_;
@@ -45,8 +48,8 @@ sub _set_response {
   return;
 }
 
-sub update_outcome : Path('update_outcome') {
-  my ($self, $c) = @_;
+sub _update_outcome {
+  my ($self, $c, $working_as) = @_;
 
   my $id_run;
   my $position;
@@ -54,7 +57,6 @@ sub update_outcome : Path('update_outcome') {
   my $username;
   my $new_outcome;
   my $error;
-
   my $ent;
 
   try {
@@ -71,6 +73,9 @@ sub update_outcome : Path('update_outcome') {
     $id_run      = $params->{'id_run'};
     $username    = $c->user->username;
 
+    if (!$working_as) {
+      $self->raise_error(q[Run id should be defined], $INTERNAL_SERVER_ERROR);
+    }
     if (!$id_run) {
       $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
     }
@@ -84,44 +89,25 @@ sub update_outcome : Path('update_outcome') {
       $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
     }
 
-    if (!$tag_index) { # Working as lane MQC
-      my $where = {
-        'me.id_run'    => $id_run,
-        'me.position'  => $position,
-        'me.tag_index' => {'!=' => 0},
-        'entity_type'  => {'!=' => 'library_indexed_spike'},
-      };
-      my $rs = $c->model('MLWarehouseDB')->resultset('IseqProductMetric')->search($where, {
-                    prefetch => ['iseq_run_lane_metric', 'iseq_flowcell'],
-                    order_by => qw[ me.id_run me.position me.tag_index ],
-                    cache    => 1,
-                  });
-      my $tags = [];
-      while(my $prod = $rs->next) {
-        push @{$tags}, $prod->tag_index;
-      }
+    if ($working_as eq $MODE_LANE_MQC) { # Working as lane MQC
+      my $tags = $c->model('MLWarehouseDB')
+                   ->fetch_tag_index_array_for_run_position($id_run, $position);
 
-      $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
-        {'id_run' => $id_run, 'position' => $position})->next;
-      if (!$ent) {
-        $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->new_result({
-          id_run         => $id_run,
-          position       => $position,
-          username       => $username,
-          modified_by    => $username});
-      }
+      $ent = $c->model('NpgQcDB')
+               ->search_outcome_ent(
+                 $id_run,
+                 $position,
+                 $username
+      );
       $ent->update_outcome_with_libraries($new_outcome, $username, $tags);
     } else { # Working as library MQC
-      $ent = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->search(
-        {'id_run' => $id_run, 'position' => $position, 'tag_index' => $tag_index})->next;
-      if (!$ent) {
-        $ent = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->new_result({
-          id_run         => $id_run,
-          position       => $position,
-          tag_index      => $tag_index,
-          username       => $username,
-          modified_by    => $username});
-      }
+      $ent = $c->model('NpgQcDB')
+               ->search_library_outcome_ent(
+                 $id_run,
+                 $position,
+                 $tag_index,
+                 $username
+      );
       $ent->update_outcome($new_outcome, $username);
     }
   } catch {
@@ -143,13 +129,28 @@ sub update_outcome : Path('update_outcome') {
     }
   }
 
-  my $message = $error || ($tag_index ? qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.]
-                                      : qq[Manual QC $new_outcome for run $id_run, position $position saved.]);
+  my $message = $error 
+                || (($working_as eq $MODE_LANE_MQC) ? qq[Manual QC $new_outcome for run $id_run, position $position saved.]
+                                                    : qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.]);
   if ($mqc_update_error) {
     $message .= $mqc_update_error;
   }
 
   _set_response($c, {'message' => $message}, $error_code);
+}
+
+sub update_outcome_library : Path('update_outcome_library') {
+  my ($self, $c) = @_;
+
+  $self->_update_outcome($c, $MODE_LIBRARY_MQC);
+
+  return;
+}
+
+sub update_outcome_lane : Path('update_outcome_lane') {
+  my ($self, $c) = @_;
+
+  $self->_update_outcome($c, $MODE_LANE_MQC);
 
   return;
 }

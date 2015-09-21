@@ -27,6 +27,45 @@ __PACKAGE__->config(
   connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
+sub search_outcome_ent {
+  my ( $self, $id_run, $position, $username ) = @_;
+  my $ent;
+  $ent = $self->resultset('MqcOutcomeEnt')
+              ->search(
+                {'id_run' => $id_run, 'position' => $position})->next;
+  if (!$ent) {
+    $ent = $self->resultset('MqcOutcomeEnt')
+                ->new_result({
+                    id_run      => $id_run,
+                    position    => $position,
+                    username    => $username,
+                    modified_by => $username
+    });
+  }
+  return $ent;
+}
+
+sub search_library_outcome_ent {
+  my ( $self, $id_run, $position, $tag_index, $username ) = @_;
+  my $ent = $self->model('NpgQcDB')
+                 ->resultset('MqcLibraryOutcomeEnt')
+                 ->search({'id_run'    => $id_run,
+                           'position'  => $position,
+                           'tag_index' => $tag_index})->next;
+  if (!$ent) {
+    $ent = $self->model('NpgQcDB')
+                ->resultset('MqcLibraryOutcomeEnt')
+                ->new_result({
+                  id_run         => $id_run,
+                  position       => $position,
+                  tag_index      => $tag_index,
+                  username       => $username,
+                  modified_by    => $username
+    });
+  }
+  return $ent;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -71,7 +71,7 @@ var NPG;
         this.index                 = index; // Index of control in the page.
         this.abstractConfiguration = abstractConfiguration;
 
-        this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome";
+        this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome_lane";
         this.CONFIG_ACCEPTED_PRELIMINARY = 'Accepted preliminary';
         this.CONFIG_REJECTED_PRELIMINARY = 'Rejected preliminary';
         this.CONFIG_ACCEPTED_FINAL       = 'Accepted final';
@@ -323,7 +323,7 @@ var NPG;
         this.index                 = index; // Index of control in the page.
         this.abstractConfiguration = abstractConfiguration;
 
-        this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome";
+        this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome_library";
         this.CONFIG_ACCEPTED_PRELIMINARY = 'Accepted preliminary';
         this.CONFIG_REJECTED_PRELIMINARY = 'Rejected preliminary';
         this.CONFIG_ACCEPTED_FINAL       = 'Accepted final';

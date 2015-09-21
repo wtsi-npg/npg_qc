@@ -163,6 +163,45 @@ sub search_sample_by_sample_id {
   return $rs;
 }
 
+=head2 fecth_tag_index_array_for_run_position
+
+  Search for tag indexes associated with a run, position and return them as
+  an array. It does the search explicitely excluding tag_index = 0 and 
+  entity_type = 'library_index_spike'.
+
+=cut
+sub fetch_tag_index_array_for_run_position {
+  my ($self, $id_run, $position);
+
+  if(!defined $id_run) {
+    croak q[Id run is required when searching for tag_indexes but not defined];
+  }
+  if(!defined $position) {
+    croak q[Position is required when searching for tag_indexes but not defined];
+  }
+
+  my $where = {
+    'me.id_run'    => $id_run,
+    'me.position'  => $position,
+    'me.tag_index' => { '!=' => 0 },
+    'entity_type'  => { '!=' => 'library_indexed_spike' },
+  };
+
+  my $rs = $self->resultset('IseqProductMetric')
+                ->search($where, {
+                    prefetch => ['iseq_run_lane_metric', 'iseq_flowcell'],
+                    order_by => qw[ me.id_run me.position me.tag_index ],
+                    cache    => 1,
+  });
+
+  my $tags = [];
+  while(my $prod = $rs->next) {
+    push @{$tags}, $prod->tag_index;
+  }
+
+  return $tags; #TODO needs a test.
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
