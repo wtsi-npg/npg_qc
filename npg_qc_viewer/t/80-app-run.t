@@ -220,7 +220,7 @@ subtest 'Test for run + lane + plexes' => sub {
 }
 
 subtest 'R&D' => sub {
-  plan tests => 5;
+  plan tests => 4;
   my $where = { 'iseq_product_metrics.id_run' => 4025, };
   my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')->search($where, { join => 'iseq_product_metrics', });
   
@@ -231,9 +231,8 @@ subtest 'R&D' => sub {
   my $url = q[http://localhost/checks/runs/4025];
   warnings_like{$mech->get_ok($url)} [ qr/Use of uninitialized value \$id in exists/, ],
                                         'Expected warning for id found';
-  $mech->content_contains('NT28560W</span></a><span class="watermark">R&amp;D</span>'); #library name with R&D watermark
-  $mech->content_contains('NT28561A</span></a><span class="watermark">R&amp;D</span>'); #library name with R&D watermark
-  $mech->content_lacks('Illumina phiX</span></a><span class="watermark">R&amp;D</span>');
+  $mech->content_contains('9272">random_sample_name</a></span><span class="watermark">R&amp;D</span>'); #library name with R&D watermark
+  $mech->content_contains('9286">random_sample_name</a></span><span class="watermark">R&amp;D</span>'); #library name with R&D watermark
 };
 
 1;
