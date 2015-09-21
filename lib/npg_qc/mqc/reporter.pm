@@ -1,8 +1,3 @@
-#########
-# Author:        Jennifer Liddle
-# Created:       Friday 13th February 2015
-#
-
 package npg_qc::mqc::reporter;
 
 use Moose;
@@ -24,22 +19,24 @@ our $VERSION = '0';
 
 Readonly::Scalar my $HTTP_TIMEOUT => 60;
 
-has 'qc_schema' => ( isa        => 'npg_qc::Schema',
-                     is         => 'ro',
-                     required   => 0,
-                     lazy_build => 1,
-                     metaclass  => 'NoGetopt',
+has 'qc_schema' => (
+  isa        => 'npg_qc::Schema',
+  is         => 'ro',
+  required   => 0,
+  lazy_build => 1,
+  metaclass  => 'NoGetopt',
 );
 sub _build_qc_schema {
   my $self = shift;
   return npg_qc::Schema->connect();
 }
 
-has 'mlwh_schema' => ( isa        => 'WTSI::DNAP::Warehouse::Schema',
-                       is         => 'ro',
-                       required   => 0,
-                       lazy_build => 1,
-                       metaclass  => 'NoGetopt',
+has 'mlwh_schema' => (
+  isa        => 'WTSI::DNAP::Warehouse::Schema',
+  is         => 'ro',
+  required   => 0,
+  lazy_build => 1,
+  metaclass  => 'NoGetopt',
 );
 sub _build_mlwh_schema {
   my $self = shift;
@@ -50,14 +47,27 @@ has 'verbose'     => (
   isa           => 'Bool',
   is            => 'ro',
   default       => 0,
-  documentation => 'print verbose messages',
+  documentation => 'print verbose messages, defaults to false',
 );
-has 'report_gclp' => (
+
+has 'warn_gclp' => (
   isa           => 'Bool',
   is            => 'ro',
   default       => 0,
-  documentation => 'show warning for glcp runs',
+  documentation => 'show warning for glcp runs, defaults to false',
 );
+
+has '_ua'     => ( isa           => 'LWP::UserAgent',
+                   is            => 'ro',
+                   lazy_build    => 1,
+);
+sub _build__ua {
+  my $ua = LWP::UserAgent->new;
+  $ua->env_proxy();            # agent has to respect our proxy env settings
+  $ua->agent(join q[/], __PACKAGE__, $VERSION);
+  $ua->timeout($HTTP_TIMEOUT); # set a one minute timeout
+  return $ua;
+}
 
 sub load {
   my $self = shift;
@@ -69,80 +79,83 @@ sub load {
     my $from_gclp;
     my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
     try {
-      my $where = {'me.id_run'=> $outcome->id_run,
-                   'me.position'=> $outcome->position,
-                   'iseq_flowcell.entity_type'=> {q[!=], 'library_indexed_spike'} };
+      my $where = {'me.id_run'                 => $outcome->id_run,
+                   'me.position'               => $outcome->position,
+                   'iseq_flowcell.entity_type' => {q[!=], 'library_indexed_spike'} };
       my $rswh = $self->mlwh_schema
                       ->resultset('IseqProductMetric')
                       ->search($where, { prefetch => 'iseq_flowcell',
-                                         order_by => [ { -asc  => [qw/ me.id_run me.position /] },
-                                                       { -desc => 'me.tag_index' },
-                                                     ],
+                                         order_by => { -desc => 'me.tag_index' },
                                        },
       );
-      while (my $product_metric = $rswh->next) {
-        if( $product_metric->iseq_flowcell
-            && $product_metric->iseq_flowcell->lane_id ) {
-          my $iseq_flowcell = $product_metric->iseq_flowcell;
-          $lane_id   = $iseq_flowcell->lane_id;
-          $from_gclp = $iseq_flowcell->from_gclp;
-          last;
+      while ( my $product_metric_row = $rswh->next ) {
+        my $fc = $product_metric_row->iseq_flowcell;
+        if( $fc ) {
+          $lane_id   = $fc->lane_id;
+          $from_gclp = $fc->from_gclp;
+          if ( $lane_id ) {
+            last;
+          }
         }
       }
     } catch {
-      _log(qq(Error retrieving mlwarehouse data for $details: $_));
+      _log(qq(Error retrieving data for $details: $_));
     };
-    if (!defined $lane_id || !defined $from_gclp ) {
-      _log(qq[No mlwarehouse data for $details]);
+
+    if ( !$lane_id ) {
+      _log(qq[No LIMs data for $details]);
       next;
     }
 
     if ($from_gclp) {
-      if ($self->report_gclp) {
-        _log(qq[GCLP run, nothing to do for $details.]);
-      }
-    } elsif ($lane_id) {
-      my $result = $outcome->is_accepted() ? 'pass' : 'fail';
-      my $url = $self->_create_url($lane_id, $result);
-      if ($self->verbose) {
-        _log(qq(Sending outcome for $details to $url));
-      }
-      my $error_txt = $self->_report($lane_id, $result, $url);
-      if ($error_txt) {
-        _log($error_txt);
-      } else {
-        $outcome->update_reported();
+      if ($self->warn_gclp) {
+        _log(qq[GCLP run, cannot report $details]);
       }
     } else {
-      _log(qq(Lane id is not set for $details));
+      my $qc_result = $outcome->is_accepted() ? 'pass' : 'fail';
+      if ( $self->_report(
+           $self->_payload($lane_id, $qc_result),
+           $self->_url($lane_id, $qc_result)) ) {
+        $outcome->update_reported();
+      }
     }
   }
   return;
 }
 
-sub _create_url {
-  my ($self, $lane_id, $result) = @_;
-  return st::api::base->lims_url() . q[/npg_actions/assets/].$lane_id.q(/).$result.'_qc_state';
+sub _url {
+  my ($self, $lane_id, $qc_result) = @_;
+  return st::api::base->lims_url() .
+         q[/npg_actions/assets/].$lane_id.q(/).$qc_result.'_qc_state';
+}
+
+sub _payload {
+  my ($self, $lane_id, $qc_result) = @_;
+  return q(<?xml version="1.0" encoding="UTF-8"?>) .
+           q(<qc_information>) .
+            qq(<message>Asset $lane_id  ${qc_result}ed manual qc</message>) .
+           q(</qc_information>);
 }
 
 sub _report {
-  my ($self, $lane_id, $result, $url) = @_;
-  my $ua = LWP::UserAgent->new;
-  $ua->env_proxy();     # agent has to respect our proxy env settings
-  $ua->agent(join q[/], __PACKAGE__, $VERSION);
-  $ua->timeout($HTTP_TIMEOUT);     # set a one minute timeout
+  my ($self, $payload, $url) = @_;
+
   my $req = HTTP::Request->new(POST => $url);
   $req->header('content-type' => 'text/xml');
-  $req->content(qq(<?xml version="1.0" encoding="UTF-8"?><qc_information><message>Asset $lane_id  ${result}ed manual qc</message></qc_information>));
-  my $resp = $ua->request($req);
-  if (!$resp->is_success) {
-    my $m = sprintf 'Response code %i : %s : %s',
-      $resp->code,
-      $resp->message || q(),
-      $resp->content || q();
-    return $m;
+  $req->content($payload);
+  if ($self->verbose) {
+    _log(qq(Sending $payload to $url));
   }
-  return q();
+
+  my $resp = $self->_ua->request($req);
+  my $result = $resp->is_success;
+  if (!$result) {
+    _log(sprintf 'Response code %i : %s : %s',
+                                $resp->code,
+                                $resp->message || q(),
+                                $resp->content || q());
+  }
+  return $result;
 }
 
 sub _log {
@@ -167,15 +180,36 @@ npg_qc::mqc::reporter
 
 =head1 DESCRIPTION
 
-Reads all the QC records which need to have a pass or fail sent to LIMS, and sends them.
+  Reporter for manual QC results. The lane-level results are posted
+  to a Sequencescape URL. GCLP results are not reported. 
 
 =head1 SUBROUTINES/METHODS
 
-=head2 qc_schema - an attribute; the schema to use for the qc database. Defaults to npg_qc::Schema
+=head2 verbose
 
-=head2 mlwh_schema - an attribute; the schema to use for ml warehouse database. Defaults to WTSI::DNAP::Warehouse::Schema
+  Boolean verbose flag, false by default.
 
-=head2 load - method to perform the reading and updating
+=head2 warn_gclp
+
+  Boolean flag switching on warnings when a GCLP lane is encounted,
+  false by default.
+
+=head2 qc_schema
+
+  An attribute - the schema to use for the qc database.
+  Defaults to npg_qc::Schema,
+
+=head2 mlwh_schema
+
+  An attribute - the schema to use for ml warehouse database.
+  Defaults to WTSI::DNAP::Warehouse::Schema.
+
+=head2 load
+  
+  Rertrieves all unreported lane-level manual QC results, filters out
+  GCLP results and tries to report the remaining to a Sequencescape URL.
+  If successful, marks the manual qc outcome as reported by setting a
+  time stamp. Unsuccessfull attempts are logged.
 
 =head1 DIAGNOSTICS
 

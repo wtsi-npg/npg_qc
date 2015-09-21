@@ -20,7 +20,7 @@ mqc_outcome_reporter
 =head1 USAGE
 
   mqc_outcome_reporter
-  mqc_outcome_reporter --verbose --report_gclp
+  mqc_outcome_reporter --verbose --warn_gclp
 
 =head1 CONFIGURATION
 
@@ -35,7 +35,7 @@ This script reports any outstanding final manual QC outcomes to LIMS.
 =head1 OPTIONS
 
  verbose - a boolean option
- report_gclp - a boolean option
+ warn_gclp - a boolean option
 
 =head1 DIAGNOSTICS
 
