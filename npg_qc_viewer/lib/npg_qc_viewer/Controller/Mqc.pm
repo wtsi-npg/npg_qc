@@ -229,42 +229,6 @@ sub get_current_library_outcome : Path('get_current_library_outcome') {
   return;
 }
 
-#For future use
-sub get_all_outcomes : Path('get_all_outcomes') {
-  my ($self, $c) = @_;
-
-  my $error;
-  my $id_run;
-  my $positions = {};
-
-  try {
-    $self->_validate_req_method($c, $ALLOW_METHOD_GET);
-
-    my $params = $c->request->parameters;
-    $id_run   = $params->{'id_run'};
-    if (!$id_run) {
-      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
-    }
-
-    my $res = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search({id_run => $id_run},);
-    while(my $ent = $res->next) {
-      my $position = $ent->position;
-      my $short_desc = $ent->mqc_outcome->short_desc;
-      $positions->{$position} = $short_desc;
-    }
-  } catch {
-    my $error_code;
-    ($error, $error_code) = $self->parse_error($_);
-     _set_response($c, {message => qq[Error: $error] }, $error_code);
-  };
-
-  if (!$error) {
-    _set_response($c, {$id_run => $positions});
-  }
-
-  return;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
