@@ -88,19 +88,21 @@ sub load {
                                          order_by => { -desc => 'me.tag_index' },
                                        },
       );
-      while (my $product_metric_row = $rswh->next) {
-        my $fc     = $product_metric_row->iseq_flowcell;
-        $lane_id   = $fc->lane_id;
-        if( $fc && $lane_id ) {
+      while ( my $product_metric_row = $rswh->next ) {
+        my $fc = $product_metric_row->iseq_flowcell;
+        if( $fc ) {
+          $lane_id   = $fc->lane_id;
           $from_gclp = $fc->from_gclp;
-          last;
+          if ( $lane_id ) {
+            last;
+          }
         }
       }
     } catch {
       _log(qq(Error retrieving data for $details: $_));
     };
 
-    if (!$lane_id || !defined $from_gclp ) {
+    if ( !$lane_id ) {
       _log(qq[No LIMs data for $details]);
       next;
     }
@@ -112,8 +114,8 @@ sub load {
     } else {
       my $qc_result = $outcome->is_accepted() ? 'pass' : 'fail';
       if ( $self->_report(
-             $self->_payload($lane_id, $qc_result),
-             $self->_url($lane_id, $qc_result)) ) {
+           $self->_payload($lane_id, $qc_result),
+           $self->_url($lane_id, $qc_result)) ) {
         $outcome->update_reported();
       }
     }
