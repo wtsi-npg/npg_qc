@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
- 
+
+ - MQC reporter uses MLWH to fetch lane information to report MQC outcomes;
+     it skips GCLP runs.
  - tag_sniff new option to truncate tag sequences
  - tag_sniff now checks common tag sequences against tag sets in the warehouse
  - SeqQC
