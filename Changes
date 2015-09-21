@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC
+   - fix missing composite genotype check visualisation broken when cleaning
+     template for MLWH
+
 release 59.0
  - SeqQC 
    - remove ajax proxy controller
