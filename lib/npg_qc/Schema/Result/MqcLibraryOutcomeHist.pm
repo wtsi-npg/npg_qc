@@ -76,6 +76,7 @@ Lane
 =head2 tag_index
 
   data_type: 'bigint'
+  default_value: -1
   is_nullable: 0
 
 =head2 id_mqc_outcome
@@ -123,7 +124,7 @@ __PACKAGE__->add_columns(
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
   'tag_index',
-  { data_type => 'bigint', is_nullable => 0 },
+  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
   'id_mqc_outcome',
   {
     data_type => 'smallint',
@@ -174,11 +175,13 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-08-25 14:33:40
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BEsy2XPPyvIo3yeHwYZeyg
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-18 14:34:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5GjFSZPPAnqEPdxq3KQluQ
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 our $VERSION = '0';
+
+__PACKAGE__->set_inflator4scalar('tag_index');
 
 __PACKAGE__->meta->make_immutable;
 

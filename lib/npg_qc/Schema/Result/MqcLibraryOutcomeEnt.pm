@@ -76,6 +76,7 @@ Lane
 =head2 tag_index
 
   data_type: 'bigint'
+  default_value: -1
   is_nullable: 0
 
 =head2 id_mqc_outcome
@@ -131,7 +132,7 @@ __PACKAGE__->add_columns(
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
   'tag_index',
-  { data_type => 'bigint', is_nullable => 0 },
+  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
   'id_mqc_outcome',
   {
     data_type => 'smallint',
@@ -206,13 +207,16 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-08-25 14:33:40
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Z9/bZ6+u4alQpVexwwrLJw
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-18 14:34:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:enQroYzqNS2pZjTzOQye9A
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 our $VERSION = '0';
 
-with qw/npg_qc::Schema::MQCEntRole/;
+with qw/npg_qc::Schema::Flators
+        npg_qc::Schema::MQCEntRole/;
+
+__PACKAGE__->set_inflator4scalar('tag_index');
 
 sub data_for_historic {
   my $self = shift;
