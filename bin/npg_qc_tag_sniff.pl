@@ -116,7 +116,7 @@ sub showTags{
             if ( exists($matches{$tag}->{$id}) ){
                 printf "%-2d(%-3d) ", $id, $matches{$tag}->{$id};
             } else {
-                printf qq[        ];
+                printf q[        ];
             }
         }
         print "\n";
