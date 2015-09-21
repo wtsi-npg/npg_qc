@@ -179,7 +179,7 @@
   END -%]
 
 <div id="results_full">
-[% PROCESS ui_checks/checks_in_full.tt2 -%]
+[% PROCESS ui_checks/checks_in_full.tt2  library_id=row_info_to.legacy_library_id -%]
 </div> <!-- end of full_results division -->
 
 </div> <!-- end of content division -->
