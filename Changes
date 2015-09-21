@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
-
+ 
+ - tag_sniff new option to truncate tag sequences
+ - tag_sniff now checks common tag sequences against tag sets in the warehouse
  - SeqQC
    - add the total yield in library view RT#488973
    - summary table: display supplier sample name along the library barcode RT#488964,
