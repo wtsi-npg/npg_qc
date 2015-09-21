@@ -4,7 +4,6 @@ use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Perl6::Slurp;
-use Encode qw(encode);
 use Readonly;
 use Carp;
 
@@ -43,9 +42,9 @@ sub _build_sequence_format {
 }
 sub _build_header {
   my $self = shift;
-  my $s = join q[], grep { ($_ !~ /\A\@SQ/smx) }
-    slurp q{-|}, $self->_samtools, 'view', '-H', $self->sequence_file;
-  return encode('utf8', $s);
+  return join q[], grep { ($_ !~ /\A\@SQ/smx) }
+    slurp q{-|}, {'utf8' => 1},
+    $self->_samtools, 'view', '-H', $self->sequence_file;
 }
 sub _build_md5 {
   my $self = shift;
@@ -155,8 +154,6 @@ Method forcing all lazy attributes of the object to be built.
 =item MooseX::StrictConstructor
 
 =item namespace::autoclean
-
-=item Encode
 
 =item Readonly
 
