@@ -172,8 +172,6 @@ lib/npg_qc/autoqc/types.pm
 lib/npg_qc/controller.pm
 lib/npg_qc/file_store.pm
 lib/npg_qc/mqc/reporter.pm
-lib/npg_qc/mqc/role/MQCEntRole.pm
-lib/npg_qc/mqc/role/TimeZoneConsumerRole.pm
 lib/npg_qc/model/analysis_lane.pm
 lib/npg_qc/model/analysis_lane_qcal.pm
 lib/npg_qc/model/analysis.pm
@@ -215,6 +213,8 @@ lib/npg_qc/model/summary.pm
 lib/npg_qc/model/tile_score.pm
 lib/npg_qc/Schema.pm
 lib/npg_qc/Schema/Flators.pm
+lib/npg_qc/Schema/MQCEntRole.pm
+lib/npg_qc/Schema/TimeZoneConsumerRole.pm
 lib/npg_qc/Schema/Result/Adapter.pm
 lib/npg_qc/Schema/Result/AlignmentFilterMetrics.pm
 lib/npg_qc/Schema/Result/AnalysisLane.pm
