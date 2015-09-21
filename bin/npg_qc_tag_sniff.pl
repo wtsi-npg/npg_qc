@@ -66,17 +66,17 @@ sub selectModeTags {
     my @topTags = ();
 
     foreach my $tag (sort {$tagsFound{$b} <=> $tagsFound{$a};} (keys %tagsFound)) {
-  if (!(defined $maxCount)) {
-      $maxCount = $tagsFound{$tag};
-  }
-  if ( (($relativeMaxDrop * $tagsFound{$tag}) < $previousCount) ||
-       (($absoluteMaxDrop * $tagsFound{$tag}) < $maxCount) ||
-       (!$degeneratingToleration && ($tag =~ /^N*$/)) # may wish to stop with this or exclude it
-      ) {
-      last;
-  }
-  $previousCount = $tagsFound{$tag};
-  push @topTags,$tag;
+      if (!(defined $maxCount)) {
+        $maxCount = $tagsFound{$tag};
+      }
+      if ( (($relativeMaxDrop * $tagsFound{$tag}) < $previousCount) ||
+           (($absoluteMaxDrop * $tagsFound{$tag}) < $maxCount) ||
+           (!$degeneratingToleration && ($tag =~ /^N*$/)) # may wish to stop with this or exclude it
+         ) {
+          last;
+      }
+      $previousCount = $tagsFound{$tag};
+      push @topTags,$tag;
     }
     return @topTags;
 }
@@ -147,19 +147,19 @@ sub main{
     my $tagsFound = 0;
 
     while (<>) {
-    if (/((BC:)|(RT:))Z:([A-Z]*)/) {
-      my $tag = $4;
-      if ($tagLength < 0) {
-        $tag = substr $tag, $tagLength;
-      } elsif ($tagLength) {
-        $tag = substr $tag, 0, $tagLength;
+      if (/((BC:)|(RT:))Z:([A-Z]*)/) {
+        my $tag = $4;
+        if ($tagLength < 0) {
+          $tag = substr $tag, $tagLength;
+        } elsif ($tagLength) {
+          $tag = substr $tag, 0, $tagLength;
+        }
+        $tagsFound++;
+        $tagsFound{$tag}++;
       }
-      $tagsFound++;
-      $tagsFound{$tag}++;
-  }
-  if ($tagsFound == $sampleSize) {
-      last;
-  }
+      if ($tagsFound == $sampleSize) {
+        last;
+      }
     }
 
     if ($sampleSize != $tagsFound) {
@@ -180,10 +180,10 @@ sub initialise {
     my $rc = GetOptions(\%options,
                         'help',
                         'sample_size:i',
-      'relative_max_drop:i',
-      'absolute_max_drop:i',
-      'degenerate_toleration',
-      'tag_length:i',
+                        'relative_max_drop:i',
+                        'absolute_max_drop:i',
+                        'degenerate_toleration',
+                        'tag_length:i',
                         );
     if ( ! $rc) {
         print {*STDERR} "\nerror in command line parameters\n" or croak 'print failed';
