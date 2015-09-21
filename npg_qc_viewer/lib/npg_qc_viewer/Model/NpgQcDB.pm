@@ -47,14 +47,12 @@ sub search_outcome_ent {
 
 sub search_library_outcome_ent {
   my ( $self, $id_run, $position, $tag_index, $username ) = @_;
-  my $ent = $self->model('NpgQcDB')
-                 ->resultset('MqcLibraryOutcomeEnt')
+  my $ent = $self->resultset('MqcLibraryOutcomeEnt')
                  ->search({'id_run'    => $id_run,
                            'position'  => $position,
                            'tag_index' => $tag_index})->next;
   if (!$ent) {
-    $ent = $self->model('NpgQcDB')
-                ->resultset('MqcLibraryOutcomeEnt')
+    $ent = $self->resultset('MqcLibraryOutcomeEnt')
                 ->new_result({
                   id_run         => $id_run,
                   position       => $position,
