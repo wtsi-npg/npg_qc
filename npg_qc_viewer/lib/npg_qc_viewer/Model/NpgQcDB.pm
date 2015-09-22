@@ -27,6 +27,12 @@ __PACKAGE__->config(
   connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
+=head2 search_outcome_ent
+
+  Find previous mqc outcome for the id_run/position, create
+  it for the specified user if it does not exist.
+
+=cut
 sub search_outcome_ent {
   my ( $self, $id_run, $position, $username ) = @_;
   my $ent;
@@ -45,6 +51,12 @@ sub search_outcome_ent {
   return $ent;
 }
 
+=head2 search_library_outcome_ent
+
+  Find previous mqc outcome for the id_run/position/tag_index,
+  create it for the specified user if it does not exist.
+
+=cut
 sub search_library_outcome_ent {
   my ( $self, $id_run, $position, $tag_index, $username ) = @_;
   my $ent = $self->resultset('MqcLibraryOutcomeEnt')
