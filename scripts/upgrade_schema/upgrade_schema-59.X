@@ -33,8 +33,8 @@ CREATE TABLE `seq_component_composition` (
 CREATE TABLE `sequence_summary` (
   `id_sequence_summary` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
   `id_seq_composition`  BIGINT(20) UNSIGNED NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
-  `sequence_format`     VARCHAR(6)          NOT NULL COMMENT 'Sequencing file format, e.g. SAM, BAM',
-  `header`              TEXT NOT NULL COMMENT 'File header, excluding SQ lines, the field is searchable',
+  `sequence_format`     VARCHAR(6) NOT NULL COLLATE utf8_unicode_ci COMMENT 'Sequencing file format, e.g. SAM, BAM',
+  `header`              TEXT NOT NULL COLLATE utf8_unicode_ci COMMENT 'File header, excluding SQ lines, the field is searchable',
   `seqchksum`           TEXT NOT NULL COMMENT 'Alignment and header independent sequence file digest, see bamseqchksum in https://github.com/wtsi-npg/biobambam, default checksum',
   `seqchksum_sha512`    TEXT NOT NULL COMMENT 'Alignment and header independent sequence file digest, see bamseqchksum in https://github.com/wtsi-npg/biobambam, sha512primesums512 checksum',
   `md5`                 CHAR(32) NOT NULL COMMENT 'md5 of the sequence file',
@@ -43,7 +43,7 @@ CREATE TABLE `sequence_summary` (
   PRIMARY KEY (`id_sequence_summary`),
   CONSTRAINT `seq_sum_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
   /* FULLTEXT `seqsum_h` (`header`) -- cannot have with InnoDB engine unless server version 5.6 */
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 CREATE TABLE `samtools_stats` (
