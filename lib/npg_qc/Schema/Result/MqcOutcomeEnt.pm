@@ -233,16 +233,24 @@ sub update_outcome_with_libraries {
     }
 
     foreach my $tag_index (@{$tag_indexes}) {
-      my $resultset = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt');
-      my $ent = $resultset->search(
-        {'id_run' => $self->id_run, 'position' => $self->position, 'tag_index' => $tag_index})->next;
+      my $resultset = $self->result_source
+                           ->schema
+                           ->resultset('MqcLibraryOutcomeEnt');
+      my $ent = $resultset->search({'id_run' => $self->id_run,
+                                    'position' => $self->position,
+                                    'tag_index' => $tag_index
+      })->next;
       if (!$ent) {
-        $ent = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt')->new_result({
-          id_run         => $self->id_run,
-          position       => $self->position,
-          tag_index      => $tag_index,
-          username       => $username,
-          modified_by    => $username});
+        $ent = $self->result_source
+                    ->schema
+                    ->resultset('MqcLibraryOutcomeEnt')
+                    ->new_result({
+                      id_run      => $self->id_run,
+                      position    => $self->position,
+                      tag_index   => $tag_index,
+                      username    => $username,
+                      modified_by => $username
+        });
       }
       my $new_outcome = q[Undecided];
       if ($ent->in_storage) {
