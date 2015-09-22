@@ -169,7 +169,7 @@ sub search_sample_by_sample_id {
   return $rs;
 }
 
-=head2 fecth_tag_index_array_for_run_position
+=head2 fetch_tag_index_array_for_run_position
 
   Search for tag indexes associated with a run, position and return them as
   an array. It does the search explicitely excluding tag_index = 0 and 
@@ -190,10 +190,10 @@ sub fetch_tag_index_array_for_run_position {
   my $cs_alias = $resultset->current_source_alias;
 
   my $where = {
-    $cs_alias . '.id_run'    => $id_run,
-    $cs_alias . '.position'  => $position,
-    $cs_alias . '.tag_index' => { '!=' => 0 },
-    'entity_type'  => { '!=' => 'library_indexed_spike' },
+    $cs_alias . '.id_run'     => $id_run,
+    $cs_alias . '.position'   => $position,
+    $cs_alias . '.tag_index'  => { q[!=] => 0 },
+    'entity_type'  => { q[!=] => 'library_indexed_spike' },
   };
 
   my $rs = $resultset->search($where, {
