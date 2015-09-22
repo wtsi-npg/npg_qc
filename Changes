@@ -17,10 +17,16 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
        file where the analysis pipeline did not run the current code that
        produces samtools_stats and sequence_summary objects as individual files
      - ability to mark records as current
+ - reporter for manual QC results retrieves LIMs info from ml warehouse;
+     it skips GCLP runs RT#480489.
+ - tag_sniff new option to truncate tag sequences
+ - tag_sniff checks common tag sequences against tag sets in the warehouse
  - SeqQC
    - add the total yield in library view RT#488973
    - summary table: display supplier sample name along the library barcode RT#488964,
      remove separate sample column
+   - fix missing composite genotype check visualisation broken when cleaning
+     template for ml warehouse
 
 release 59.0
  - SeqQC 

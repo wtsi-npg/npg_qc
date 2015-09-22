@@ -256,6 +256,7 @@ my $extended_requires = {
                 'npg_tracking::util::types'                => 0,
                 'st::api::base'                            => 0,
                 'st::api::lims'                            => 0,
+                'WTSI::DNAP::Warehouse::Schema'            => 0,
 };
 
 my $build_requires = {
