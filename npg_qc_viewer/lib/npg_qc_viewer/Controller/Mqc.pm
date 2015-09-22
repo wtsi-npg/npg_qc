@@ -67,23 +67,23 @@ sub _update_outcome {
 
     ####Loading state
     my $params = $c->request->parameters;
-    $position    = $params->{'position'};
-    $tag_index   = $params->{'tag_index'};
     $new_outcome = $params->{'new_oc'};
     $id_run      = $params->{'id_run'};
+    $position    = $params->{'position'};
+    $tag_index   = $params->{'tag_index'};
     $username    = $c->user->username;
 
     if (!$working_as) {
-      $self->raise_error(q[Run id should be defined], $INTERNAL_SERVER_ERROR);
+      $self->raise_error(q[Working_as should be defined], $INTERNAL_SERVER_ERROR);
     }
     if (!$id_run) {
-      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
+      $self->raise_error(q[Run_id should be defined], $BAD_REQUEST_CODE);
     }
     if (!$position) {
       $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
     }
     if (!$new_outcome) {
-      $self->raise_error(q[Mqc outcome should be defined], $BAD_REQUEST_CODE)
+      $self->raise_error(q[MQC outcome should be defined], $BAD_REQUEST_CODE)
     }
     if (!$username) {
       $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
@@ -101,6 +101,9 @@ sub _update_outcome {
       );
       $ent->update_outcome_with_libraries($new_outcome, $username, $tags);
     } else { # Working as library MQC
+      if (!$tag_index) {
+        $self->raise_error(q[Tag_index should be defined], $BAD_REQUEST_CODE)
+      }
       $ent = $c->model('NpgQcDB')
                ->search_library_outcome_ent(
                  $id_run,
@@ -129,7 +132,7 @@ sub _update_outcome {
     }
   }
 
-  my $message = $error 
+  my $message = $error
                 || (($working_as eq $MODE_LANE_MQC) ? qq[Manual QC $new_outcome for run $id_run, position $position saved.]
                                                     : qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.]);
   if ($mqc_update_error) {
@@ -137,6 +140,7 @@ sub _update_outcome {
   }
 
   _set_response($c, {'message' => $message}, $error_code);
+  return;
 }
 
 sub update_outcome_library : Path('update_outcome_library') {
@@ -246,20 +250,25 @@ A Catalyst Controller for logging manual qc actions.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 update_outcome_lane
 
-=head2 update_outcome
+  Updates the mqc outcome for the lane using parameters from
+  request (id_run, position, new_oc).
 
-  Updates the mqc outcome using parameters from request (id_run, position, new_oc).
+=head2 update_outcome_library
+
+  Updates the mqc outcome for the library using parameters from
+  request (id_run, position, tag_index, new_oc).
 
 =head2 get_current_outcome
 
-  Return JSON with current outcome for the paramaters from request (id_run, position).
+  Returns JSON with current outcome for the paramaters in
+  request (id_run, position).
 
-=head2 get_all_outcomes
+=head2 get_current_library_outcome
 
-  Return JSON with all current outcomes for the parameter from request (id_run).
-
-=head2 
+  Returns JSON with current outcome for the parameters in
+  request(id_run, position, tag_index).
 
 =head1 DIAGNOSTICS
 
