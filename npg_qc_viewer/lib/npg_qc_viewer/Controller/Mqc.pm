@@ -101,9 +101,6 @@ sub _update_outcome {
       );
       $ent->update_outcome_with_libraries($new_outcome, $username, $tags);
     } else { # Working as library MQC
-      if (!$tag_index) {
-        $self->raise_error(q[Tag_index should be defined], $BAD_REQUEST_CODE)
-      }
       $ent = $c->model('NpgQcDB')
                ->search_library_outcome_ent(
                  $id_run,
