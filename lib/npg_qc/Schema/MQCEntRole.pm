@@ -3,12 +3,15 @@ package npg_qc::Schema::MQCEntRole;
 use strict;
 use warnings;
 use Carp;
+use Readonly;
 
 our $VERSION = '0';
 
 use Moose::Role;
 
 with qw/npg_qc::Schema::TimeZoneConsumerRole/;
+
+Readonly::Scalar my $MQC_OUTCOME_DICT => q[MqcOutcomeDict];
 
 requires 'short_desc';
 requires 'mqc_outcome';
@@ -17,17 +20,35 @@ requires 'insert';
 requires 'data_for_historic';
 requires 'historic_resultset';
 
-around 'update' => sub {
-  my $orig = shift;
-  my $self = shift;
-  $self->last_modified($self->get_time_now);
-  my $return_super = $self->$orig(@_);
-
-  $self->_create_historic();
-  return $return_super;
+Readonly my %DELEGATION_TO_MQC_OUTCOME => {
+  'has_final_outcome' => 'is_final_outcome',
+  'is_accepted'       => 'is_accepted',
+  'is_final_accepted' => 'is_final_accepted',
+  'is_undecided'      => 'is_undecided',
 };
 
-around 'insert' => sub {
+{ #TODO move 
+  my $rel = q[mqc_outcome];
+  my $attr = q[_] . $rel . q[_row];
+  my $del  = \%DELEGATION_TO_MQC_OUTCOME;
+  has $attr => ( isa        => 'Maybe[npg_qc::Schema::Result::' . $MQC_OUTCOME_DICT . ']',
+                 is         => 'ro',
+                 weak_ref   => 1,
+                 lazy_build => 1,
+                 handles    => $del,
+  );
+  
+  __PACKAGE__->meta->add_method('_build_' . $attr, sub {my $r = shift; return $r->$rel;} );
+  
+  foreach my $method ( keys %{$del} ) {
+    around $method => sub {
+      my ($orig, $self) = @_;
+      return $self->$attr ? $self->$orig() : undef;
+    };
+  }
+}
+
+around [qw/update insert/] => sub {
   my $orig = shift;
   my $self = shift;
   $self->last_modified($self->get_time_now);
@@ -75,26 +96,6 @@ sub update_outcome {
   return 1;
 }
 
-sub has_final_outcome {
-  my $self = shift;
-  return $self->mqc_outcome->is_final_outcome;
-}
-
-sub is_accepted {
-  my $self = shift;
-  return $self->mqc_outcome->is_accepted;
-}
-
-sub is_final_accepted {
-  my $self = shift;
-  return $self->mqc_outcome->is_final_accepted;
-}
-
-sub is_undecided {
-  my $self = shift;
-  return $self->mqc_outcome->is_undecided;
-}
-
 #Create and save historic from the entity current data.
 sub _create_historic {
   my $self = shift;
@@ -107,7 +108,7 @@ sub _create_historic {
 sub _valid_outcome {
   my ($self, $outcome) = @_;
 
-  my $rs = $self->result_source->schema->resultset('MqcOutcomeDict');
+  my $rs = $self->result_source->schema->resultset($MQC_OUTCOME_DICT);
   my $outcome_dict;
   if ($outcome =~ /\d+/xms) {
     $outcome_dict = $rs->find($outcome);
