@@ -26,6 +26,21 @@ sub get_outcomes_as_hash{
   return $previous_mqc;
 }
 
+sub search_library_outcome_ent {
+  my ( $self, $id_run, $position, $tag_index, $username ) = @_;
+  my $values = {};
+  $values->{'id_run'}    = $id_run; 
+  $values->{'position'}  = $position;
+  $values->{'tag_index'} = $tag_index;
+  my $ent = $self->search($values)->next;
+  if (!$ent) {
+    $values->{'username'}    = $username;
+    $values->{'modified_by'} = $username;
+    $ent = $self->new_result($values);
+  }
+  return $ent;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -54,6 +69,11 @@ Extended ResultSet with specific functionality for for manual MQC.
 =head2 get_outcomes_as_hash
 
   Returns a hash of plex=>outcome for those plexes in the database for the id_run/position specified.
+
+=head2 search_library_outcome_ent
+
+  Find previous mqc outcome for the id_run/position/tag_index,
+  create it for the specified user if it does not exist.
 
 =head1 DEPENDENCIES
 

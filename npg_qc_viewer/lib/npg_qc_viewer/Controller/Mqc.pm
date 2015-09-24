@@ -94,19 +94,21 @@ sub _update_outcome {
                    ->fetch_tag_index_array_for_run_position($id_run, $position);
 
       $ent = $c->model('NpgQcDB')
+               ->resultset('MqcOutcomeEnt')
                ->search_outcome_ent(
                  $id_run,
                  $position,
-                 $username
       );
-      $ent->update_outcome_with_libraries($new_outcome, $username, $tags);
+      $c->model('NpgQcDB')
+        ->resultset('MqcOutcomeEnt')
+        ->update_outcome_with_libraries($ent, $new_outcome, $username, $tags);
     } else { # Working as library MQC
       $ent = $c->model('NpgQcDB')
+               ->resultset('MqcOutcomeEnt')
                ->search_library_outcome_ent(
                  $id_run,
                  $position,
                  $tag_index,
-                 $username
       );
       $ent->update_outcome($new_outcome, $username);
     }

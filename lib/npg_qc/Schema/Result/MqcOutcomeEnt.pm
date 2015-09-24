@@ -200,95 +200,23 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ifqd4uXLKB/KQXtKle8Tnw
 
+use Carp;
+
 our $VERSION = '0';
 
-use Carp;
+use npg_qc::Schema::MQCEntRole qw[$MQC_LIBRARY_ENT $MQC_LANE_HIST];
 
 with qw/npg_qc::Schema::MQCEntRole/;
 
-sub update_outcome_with_libraries {
-  my ($self, $outcome, $username, $tag_indexes) = @_;
-
-  my $outcome_dict_object = $self->_valid_outcome($outcome);
-  if($outcome_dict_object->is_final_outcome) {
-    my $outcomes_libraries = $self->fetch_mqc_library_outcomes($tag_indexes);
-    if($outcome_dict_object->is_accepted) {
-      #all plexes with qc
-      if(scalar @{ $tag_indexes } == $outcomes_libraries->count ) {
-        while(my $library = $outcomes_libraries->next) {
-          if ($library->is_undecided) {
-            croak('Error All libraries need to have a pass or fail outcome.');
-          }
-        }
-      } else {
-        croak('Error All libraries need to have an outcome.');
-      }
-    } else {
-      #All plexes with undecided
-      while(my $library = $outcomes_libraries->next) {
-        if (!$library->is_undecided) {
-          croak('Error All libraries need to have undecided outcome.');
-        }
-      }
-    }
-
-    foreach my $tag_index (@{$tag_indexes}) {
-      my $resultset = $self->result_source
-                           ->schema
-                           ->resultset('MqcLibraryOutcomeEnt');
-      my $ent = $resultset->search({'id_run' => $self->id_run,
-                                    'position' => $self->position,
-                                    'tag_index' => $tag_index
-      })->next;
-      if (!$ent) {
-        $ent = $self->result_source
-                    ->schema
-                    ->resultset('MqcLibraryOutcomeEnt')
-                    ->new_result({
-                      id_run      => $self->id_run,
-                      position    => $self->position,
-                      tag_index   => $tag_index,
-                      username    => $username,
-                      modified_by => $username
-        });
-      }
-      my $new_outcome = q[Undecided];
-      if ($ent->in_storage) {
-        if($ent->mqc_outcome->short_desc eq q[Accepted preliminary]) {
-          $new_outcome = q[Accepted final];
-        } elsif ($ent->mqc_outcome->short_desc eq q[Rejected preliminary]) {
-          $new_outcome = q[Rejected final];
-        }
-      }
-      $ent->update_outcome($new_outcome, $username);
-    }
-  }
-
-  $self->update_outcome($outcome, $username);
-  return 1;
-}
-
-sub data_for_historic {
-  my $self = shift;
-  return {
-    id_run         => $self->id_run,
-    position       => $self->position,
-    id_mqc_outcome => $self->id_mqc_outcome,
-    username       => $self->username,
-    last_modified  => $self->last_modified,
-    modified_by    => $self->modified_by
-  };
-}
-
 sub historic_resultset {
   my $self = shift;
-  return 'MqcOutcomeHist';
+  return $MQC_LANE_HIST;
 }
 
 sub fetch_mqc_library_outcomes {
   my ($self, $tag_indexes) = @_;
 
-  my $rs = $self->result_source->schema->resultset('MqcLibraryOutcomeEnt');
+  my $rs = $self->result_source->schema->resultset($MQC_LANE_HIST);
   $rs->search_rs({'id_run' => $self->id_run,
     'position' => $self->position,
   });
@@ -328,8 +256,6 @@ Entity for lane MQC outcome.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
-
-=head2 update_outcome_with_libraries
 
 =head2 fetch_mqc_library_outcomes
 

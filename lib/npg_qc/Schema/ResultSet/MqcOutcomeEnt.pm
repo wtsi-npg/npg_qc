@@ -41,6 +41,65 @@ sub get_outcomes_as_hash{
   return $previous_mqc;
 }
 
+sub update_outcome_with_libraries {
+  my ($self, $lane_ent, $outcome, $username, $tag_indexes) = @_;
+
+  my $outcome_dict_object = $lane_ent->valid_outcome($outcome);
+  if($outcome_dict_object->is_final_outcome) {
+    my $outcomes_libraries = $lane_ent->fetch_mqc_library_outcomes($tag_indexes);
+    if($outcome_dict_object->is_accepted) {
+      #all plexes with qc
+      if(scalar @{ $tag_indexes } == $outcomes_libraries->count ) {
+        while(my $library = $outcomes_libraries->next) {
+          if ($library->is_undecided) {
+            croak('Error All libraries need to have a pass or fail outcome.');
+          }
+        }
+      } else {
+        croak('Error All libraries need to have an outcome.');
+      }
+    } else {
+      #All plexes with undecided
+      while(my $library = $outcomes_libraries->next) {
+        if (!$library->is_undecided) {
+          croak('Error All libraries need to have undecided outcome.');
+        }
+      }
+    }
+
+    foreach my $tag_index (@{$tag_indexes}) {
+      my $librar_ent = $self->search_library_outcome_ent($lane_ent->id_run, $lane_ent->position, $tag_index, $username);
+      my $new_outcome = q[Undecided];
+      if ($librar_ent->in_storage) {
+        if($librar_ent->mqc_outcome->short_desc eq q[Accepted preliminary]) {
+          $new_outcome = q[Accepted final];
+        } elsif ($librar_ent->mqc_outcome->short_desc eq q[Rejected preliminary]) {
+          $new_outcome = q[Rejected final];
+        }
+      }
+      $librar_ent->update_outcome($new_outcome, $username);
+    }
+  }
+
+  $lane_ent->update_outcome($outcome, $username);
+  return 1;
+}
+
+sub search_outcome_ent {
+  my ( $self, $id_run, $position, $username ) = @_;
+  my $ent;
+  my $values = {};
+  $values->{'id_run'}   = $id_run;
+  $values->{'position'} = $position;
+  $ent = $self->search($values)->next;
+  if (!$ent) {
+    $values->{'username'}    = $username;
+    $values->{'modified_by'} = $username;
+    $ent = $self->new_result($values);
+  }
+  return $ent;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -81,6 +140,11 @@ Extended ResultSet with specific functionality for for manual MQC.
 =head2 get_outcomes_as_hash
 
   Returns a hash of lane=>outcome for those lanes in the database for the id_run specified.
+
+=head2 search_outcome_ent
+
+  Find previous mqc outcome for the id_run/position, create
+  it for the specified user if it does not exist.
 
 =head1 DEPENDENCIES
 
