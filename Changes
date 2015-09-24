@@ -27,6 +27,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      remove separate sample column
    - fix missing composite genotype check visualisation broken when cleaning
      template for ml warehouse
+ - genotype check data extraction scripts - updated scripts to fail more readily
+    and informatively when an iRODS error occurs
 
 release 59.0
  - SeqQC 
