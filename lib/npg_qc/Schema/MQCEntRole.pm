@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use Readonly;
+use base 'Exporter';
 
 our $VERSION = '0';
 
@@ -11,13 +12,23 @@ use Moose::Role;
 
 with qw/npg_qc::Schema::TimeZoneConsumerRole/;
 
-Readonly::Scalar my $MQC_OUTCOME_DICT => q[MqcOutcomeDict];
+our @EXPORT_OK = qw/$MQC_OUTCOME_DICT
+                    $MQC_LANE_ENT
+                    $MQC_LANE_HIST
+                    $MQC_LIBRARY_ENT
+                    $MQC_LIBRARY_HIST
+                   /;
+
+Readonly::Scalar our $MQC_OUTCOME_DICT  => q[MqcOutcomeDict];
+Readonly::Scalar our $MQC_LANE_ENT      => q[MqcOutcomeEnt];
+Readonly::Scalar our $MQC_LANE_HIST     => q[MqcOutcomeHist];
+Readonly::Scalar our $MQC_LIBRARY_ENT   => q[MqcLibraryOutcomeEnt];
+Readonly::Scalar our $MQC_LIBRARY_HIST  => q[MqcLibraryOutcomeHist];
 
 requires 'short_desc';
 requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
-requires 'data_for_historic';
 requires 'historic_resultset';
 
 Readonly my %DELEGATION_TO_MQC_OUTCOME => {
@@ -37,9 +48,9 @@ Readonly my %DELEGATION_TO_MQC_OUTCOME => {
                  lazy_build => 1,
                  handles    => $del,
   );
-  
+
   __PACKAGE__->meta->add_method('_build_' . $attr, sub {my $r = shift; return $r->$rel;} );
-  
+
   foreach my $method ( keys %{$del} ) {
     around $method => sub {
       my ($orig, $self) = @_;
@@ -58,6 +69,44 @@ around [qw/update insert/] => sub {
   return $return_super;
 };
 
+sub data_for_historic {
+  my $self = shift;
+  my $my_cols = {$self->get_columns};
+  my @hist_cols = $self->result_source
+                       ->schema
+                       ->source($self->historic_resultset)
+                       ->columns;
+  my $vals = {}; #TODO Nicer way to do this?
+  foreach my $x (@hist_cols) {
+    if ( exists $my_cols->{$x} ) {
+      $vals->{$x} = $my_cols->{$x};
+    }
+  }
+  return $vals;
+}
+
+sub validate_username {
+  my ( $self, $username ) = @_;
+
+  if(!defined $username){
+    croak q[Mandatory parameter 'username' missing in call];
+  }
+  if ($username =~ /^\d+$/smx) {
+    croak "Have a number $username instead as username";
+  }
+  return;
+}
+
+#sub toggle_outcome {
+#  my ( $self, $username ) = @_;
+#
+#  $self->validate_username($username);
+#  my $outcome = $self->mqc_outcome;
+#
+#
+#  return;
+#}
+
 sub update_outcome {
   my ($self, $outcome, $username) = @_;
 
@@ -65,23 +114,22 @@ sub update_outcome {
   if(!defined $outcome){
     croak q[Mandatory parameter 'outcome' missing in call];
   }
-  if(!defined $username){
-    croak q[Mandatory parameter 'username' missing in call];
-  }
-  if ($username =~ /^\d+$/smx) {
-    croak "Have a number $username instead as username";
-  }
-  my $outcome_dict_obj = $self->_valid_outcome($outcome);
+  $self->validate_username($username);
+  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
   if($outcome_dict_obj) { # The new outcome is a valid one
     my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
     #There is a row that matches the id_run and position
     if ($self->in_storage) {
       #Check if previous outcome is not final
-      if($self->mqc_outcome->is_final_outcome) {
+      if($self->has_final_outcome) {
         croak(sprintf 'Error while trying to update a final outcome for %s',
               $self->short_desc);
       } else { #Update
-        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username, 'modified_by' => $username});
+        $self->update({
+          'id_mqc_outcome' => $outcome_id,
+          'username' => $username,
+          'modified_by' => $username
+        });
       }
     } else { #Is a new row just insert.
       $self->id_mqc_outcome($outcome_id);
@@ -105,7 +153,7 @@ sub _create_historic {
 }
 
 #Fetches valid outcome object from the database.
-sub _valid_outcome {
+sub find_valid_outcome {
   my ($self, $outcome) = @_;
 
   my $rs = $self->result_source->schema->resultset($MQC_OUTCOME_DICT);
@@ -140,6 +188,12 @@ __END__
 
 =head1 SUBROUTINES/METHODS
 
+=head2 data_for_historic
+
+  Looks at the entity columns and the matching historic metadata to
+  find those columns which intersect and copies from entity to a new
+  hash intersecting values.
+
 =head2 update_outcome
 
   Updates the outcome of the entity with values provided.
@@ -149,12 +203,12 @@ __END__
 =head2 has_final_outcome
 
   Returns true id this entry corresponds to a final outcome, otherwise returns false.
-  
+
 =head2 is_accepted
 
   Returns the result of checking if the outcome is considered accepted. Delegates the 
   check to L<npg_qc::Schema::Result::MqcOutcomeDict>
-  
+
 =head2 is_final_accepted
 
   Returns the result of checking if the outcome is considered final and accepted. 
@@ -164,6 +218,11 @@ __END__
 
   Returns true if the current outcome is undecided. 
   Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
+
+=head2 find_valid_outcome
+
+  Finds the MqcOutcomeDict entity that matches the outcome. Or nothing if there is
+  no valid outcome matching the parameter.
 
 =head1 DIAGNOSTICS
 
