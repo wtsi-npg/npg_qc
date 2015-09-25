@@ -6,16 +6,14 @@ use Moose::Meta::Class;
 use npg_testing::db;
 use DateTime;
 
+my $table = 'MqcLibraryOutcomeEnt';
+
 #Test model mapping
-use_ok('npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
+use_ok('npg_qc::Schema::Result::' . $table);
 
 my $schema = Moose::Meta::Class->create_anon_class(
            roles => [qw/npg_testing::db/])
            ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
-
-my $table = 'MqcLibraryOutcomeEnt';
-my $hist_table = 'MqcLibraryOutcomeHist';
-my $dict_table = 'MqcOutcomeDict';
 
 #Test insert
 subtest 'Test insert' => sub {
@@ -31,7 +29,7 @@ subtest 'Test insert' => sub {
     'modified_by'    => 'user'};
     
   my $object = $schema->resultset($table)->create($values);
-  isa_ok($object, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
+  isa_ok($object, 'npg_qc::Schema::Result::' . $table);
 
   my $rs = $schema->resultset($table)->search({});
   is ($rs->count, 1, q[one row created in the table]);
@@ -40,7 +38,7 @@ subtest 'Test insert' => sub {
   
   delete $values->{'tag_index'};
   $object = $schema->resultset($table)->create($values);
-  isa_ok($object, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
+  isa_ok($object, 'npg_qc::Schema::Result::' . $table);
 
   $rs = $schema->resultset($table)->search({});
   is ($rs->count, 2, q[Two rows in the table]);
