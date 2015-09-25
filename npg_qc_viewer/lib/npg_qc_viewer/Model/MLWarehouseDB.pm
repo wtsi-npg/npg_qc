@@ -51,17 +51,20 @@ sub search_product_metrics {
     croak q[Id run not defined when querying metrics by me.id_run];
   }
 
+  my $resultset = $self->resultset('IseqProductMetric');
+  my $cs_alias = $resultset->current_source_alias;
+
   my $where = {};
   foreach my $key (keys %{$run_details}) {
-    $where->{'me.' . $key} = $run_details->{$key};
+    $where->{$cs_alias . '.' . $key} = $run_details->{$key};
   }
 
-  my $rs = $self->resultset('IseqProductMetric')->
-                  search($where, {
-                    prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-                    order_by => qw[ me.id_run me.position me.tag_index ],
-                    cache    => 1,
-                  },);
+  my $rs = $resultset->
+             search($where, {
+               prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+               order_by => qw[ me.id_run me.position me.tag_index ],
+               cache    => 1,
+             },);
 
   return $rs;
 }
@@ -153,7 +156,10 @@ sub search_sample_by_sample_id {
     croak q[Id sample lims not defined when querying sample lims];
   };
 
-  my $where = { 'me.id_sample_lims' => $id_sample_lims, };
+  my $resultset = $self->resultset('Sample');
+  my $cs_alias = $resultset->current_source_alias;
+
+  my $where = { $cs_alias . '.id_sample_lims' => $id_sample_lims, };
 
   my $rs = $self->resultset('Sample')->
                     search($where, {
@@ -180,18 +186,20 @@ sub fetch_tag_index_array_for_run_position {
     croak q[Position is required when searching for tag_indexes but not defined];
   }
 
+  my $resultset = $self->resultset('IseqProductMetric');
+  my $cs_alias = $resultset->current_source_alias;
+
   my $where = {
-    'me.id_run'    => $id_run,
-    'me.position'  => $position,
-    'me.tag_index' => { '!=' => 0 },
+    $cs_alias . '.id_run'    => $id_run,
+    $cs_alias . '.position'  => $position,
+    $cs_alias . '.tag_index' => { '!=' => 0 },
     'entity_type'  => { '!=' => 'library_indexed_spike' },
   };
 
-  my $rs = $self->resultset('IseqProductMetric')
-                ->search($where, {
-                    prefetch => ['iseq_run_lane_metric', 'iseq_flowcell'],
-                    order_by => qw[ me.id_run me.position me.tag_index ],
-                    cache    => 1,
+  my $rs = $resultset->search($where, {
+             prefetch => ['iseq_run_lane_metric', 'iseq_flowcell'],
+             order_by => qw[ me.id_run me.position me.tag_index ],
+             cache    => 1,
   });
 
   my $tags = [];
