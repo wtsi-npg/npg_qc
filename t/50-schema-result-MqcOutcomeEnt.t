@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 44;
+use Test::More tests => 45;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -93,6 +93,39 @@ my $dict_table = 'MqcOutcomeDict';
   my $ent = $rs->next;
   cmp_ok($ent->username, 'eq', $ent->modified_by, 'Username equals modified_by after manual update.');
 }
+
+subtest 'Data for historic' => sub {
+  plan tests => 14;
+
+  my $values = {
+    'id_run'         => 1,
+    'position'       => 3,
+    'id_mqc_outcome' => 0, 
+    'username'       => 'user',
+    'modified_by'    => 'user',
+  };
+
+  my $entity = $schema->resultset($table)->new_result($values);
+  my $historic = $entity->data_for_historic;
+  is($entity->id_run, $historic->{'id_run'}, 'Id run matches');
+  is($entity->position, $historic->{'position'}, 'Position matches');
+  is($entity->id_mqc_outcome, $historic->{'id_mqc_outcome'}, 'Id mqc outcome matches');
+  is($entity->username, $historic->{'username'}, 'Username matches');
+  is($entity->modified_by, $historic->{'modified_by'}, 'Modified by matches');
+  is($entity->last_modified, $historic->{'last_modified'}, 'Last modified matches');
+  
+  $values->{'reported'} = DateTime->now();
+  $entity = $schema->resultset($table)->new_result($values);
+  $historic = $entity->data_for_historic;
+  is($entity->id_run, $historic->{'id_run'}, 'Id run matches');
+  is($entity->position, $historic->{'position'}, 'Position matches');
+  is($entity->id_mqc_outcome, $historic->{'id_mqc_outcome'}, 'Id mqc outcome matches');
+  is($entity->username, $historic->{'username'}, 'Username matches');
+  is($entity->modified_by, $historic->{'modified_by'}, 'Modified by matches');
+  is($entity->last_modified, $historic->{'last_modified'}, 'Last modified matches');
+  ok($entity->reported, 'There is value for reported in entity');
+  ok(!defined $historic->{'reported'}, 'There is no value for reported in historic');
+};
 
 #Test update with historic
 {
