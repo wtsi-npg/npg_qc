@@ -17,7 +17,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
 
 #Test insert
 subtest 'Test insert' => sub {
-  plan tests => 5;
+  plan tests => 6;
 
   my $values = {
     'id_run'         => 1, 
@@ -42,7 +42,8 @@ subtest 'Test insert' => sub {
 
   $rs = $schema->resultset($table)->search({});
   is ($rs->count, 2, q[Two rows in the table]);
-  
+  $rs = $schema->resultset($table)->search({'id_run' => 1, 'position' => 1, 'tag_index' => -1});
+  is ($rs->count, 1, q[One row in table with undef tag_index as -1]);
   #TODO add extra search to be sure I can get something inserted with !defined tag_index.
 };
 
