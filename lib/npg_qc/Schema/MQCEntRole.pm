@@ -194,6 +194,10 @@ __END__
   find those columns which intersect and copies from entity to a new
   hash intersecting values.
 
+=head2 validate_username
+
+  To make sure the username is alphanumeric
+
 =head2 update_outcome
 
   Updates the outcome of the entity with values provided.
