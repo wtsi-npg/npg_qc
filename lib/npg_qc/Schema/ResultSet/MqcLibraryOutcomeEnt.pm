@@ -3,6 +3,7 @@ package npg_qc::Schema::ResultSet::MqcLibraryOutcomeEnt;
 use Moose;
 use namespace::autoclean;
 use MooseX::NonMoose;
+use Carp;
 
 extends 'DBIx::Class::ResultSet';
 
@@ -15,23 +16,38 @@ sub BUILDARGS {
 
 sub get_outcomes_as_hash{
   my ($self, $id_run, $position) = @_;
-  #TODO validate params
 
+  if(!defined $id_run) {
+    croak q[Mandatory parameter 'id_run' missing in call];
+  }
+  if(!defined $position) {
+    croak q[Mandatory parameter 'position' missing in call];
+  }
   #Loading previuos status qc for tracking and mqc.
   my $previous_mqc = {};
   my $previous_rs = $self->search({'id_run'=>$id_run, 'position'=>$position});
   while (my $obj = $previous_rs->next) {
-    $previous_mqc->{$obj->tag_index} = $obj->mqc_outcome->short_desc;
+    $previous_mqc->{$obj->tag_index} = $obj->mqc_outcome->short_desc; #TODO tag_index = undef?
   }
   return $previous_mqc;
 }
 
 sub search_library_outcome_ent {
   my ( $self, $id_run, $position, $tag_index, $username ) = @_;
+
+  if(!defined $id_run) {
+    croak q[Mandatory parameter 'id_run' missing in call];
+  }
+  if(!defined $position) {
+    croak q[Mandatory parameter 'position' missing in call];
+  }
+  if(!defined $username) {
+    croak q[Mandatory parameter 'username' missing in call];
+  }
   my $values = {};
-  $values->{'id_run'}    = $id_run; 
+  $values->{'id_run'}    = $id_run;
   $values->{'position'}  = $position;
-  $values->{'tag_index'} = $tag_index;
+  $values->{'tag_index'} = $tag_index; #TODO tag_index = undef?
   my $ent = $self->search($values)->next;
   if (!$ent) {
     $values->{'username'}    = $username;
