@@ -6,13 +6,13 @@ use Moose::Meta::Class;
 use npg_testing::db;
 use DateTime;
 
-use_ok('npg_qc::Schema::Result::MqcLibraryOutcomeHist');
+my $table = 'MqcLibraryOutcomeHist';
+
+use_ok('npg_qc::Schema::Result::' . $table);
 
 my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
-
-my $table = 'MqcLibraryOutcomeHist';
 
 subtest 'Test insert' => sub {
   plan tests => 2;
@@ -25,14 +25,14 @@ subtest 'Test insert' => sub {
   };
 
   my $object = $schema->resultset($table)->create($values);
-  isa_ok($object, 'npg_qc::Schema::Result::MqcLibraryOutcomeHist');
+  isa_ok($object, 'npg_qc::Schema::Result::' . $table);
 
   my $rs = $schema->resultset($table)->search({});
   is ($rs->count, 1, q[one row created in the table]);  
 };
 
 subtest 'Test insert with tag_index null' => sub {
-  plan tests => 4, skip_all => 'Skipping until fixing tax_index null';  #TODO enable tests.
+  plan tests => 4;
   my $values = {
       'id_run'         => 1, 
       'position'       => 2,
@@ -41,7 +41,7 @@ subtest 'Test insert with tag_index null' => sub {
   };
 
   my $object = $schema->resultset($table)->create($values);
-  isa_ok($object, 'npg_qc::Schema::Result::MqcLibraryOutcomeHist');
+  isa_ok($object, 'npg_qc::Schema::Result::' . $table);
 
   my $rs = $schema->resultset($table)->search({'id_run'=>1, 'position'=>2});
   is ($rs->count, 1, q[one row matches in the table]);
