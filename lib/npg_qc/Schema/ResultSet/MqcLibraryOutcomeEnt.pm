@@ -25,7 +25,10 @@ sub get_outcomes_as_hash{
   }
   #Loading previuos status qc for tracking and mqc.
   my $previous_mqc = {};
-  my $previous_rs = $self->search({'id_run'=>$id_run, 'position'=>$position});
+  my $previous_rs = $self->search({
+    'id_run'   => $id_run,
+    'position' => $position
+  });
   while (my $obj = $previous_rs->next) {
     $previous_mqc->{$obj->tag_index} = $obj->mqc_outcome->short_desc; #TODO tag_index = undef?
   }
