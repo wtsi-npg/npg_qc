@@ -68,16 +68,16 @@ sub update_outcome_with_libraries {
     }
 
     foreach my $tag_index (@{$tag_indexes}) {
-      my $librar_ent = $self->search_library_outcome_ent($lane_ent->id_run, $lane_ent->position, $tag_index, $username);
+      my $library_ent = $self->search_library_outcome_ent($lane_ent->id_run, $lane_ent->position, $tag_index, $username);
       my $new_outcome = q[Undecided];
-      if ($librar_ent->in_storage) {
-        if($librar_ent->mqc_outcome->short_desc eq q[Accepted preliminary]) {
+      if ($library_ent->in_storage) {
+        if($library_ent->mqc_outcome->short_desc eq q[Accepted preliminary]) {
           $new_outcome = q[Accepted final];
-        } elsif ($librar_ent->mqc_outcome->short_desc eq q[Rejected preliminary]) {
+        } elsif ($library_ent->mqc_outcome->short_desc eq q[Rejected preliminary]) {
           $new_outcome = q[Rejected final];
         }
       }
-      $librar_ent->update_outcome($new_outcome, $username);
+      $library_ent->update_outcome($new_outcome, $username);
     }
   }
 
@@ -145,6 +145,10 @@ Extended ResultSet with specific functionality for for manual MQC.
 
   Find previous mqc outcome for the id_run/position, create
   it for the specified user if it does not exist.
+
+=head2 update_outcome_with_libraries
+  Updates children library mqc outcomes then updates outcome of lane mqc entity
+  passed as parameter.
 
 =head1 DEPENDENCIES
 
