@@ -1,7 +1,10 @@
-/*  File: mode_detect.c // detects modes from NPG insert size distribution
+/*  File: norm_fit.c // detects modes from NPG insert size distribution
  * Authors: designed and written by Irina Abnizova (ia1) and Steven Leonard (srl)
  *
   Last edited:
+  30 Jan -sds, monotonuity, separate treating of first and last bin peaks: twice larger std
+  Jan 2015--added first and last bins as possible peaks(after bug in run 14975)
+        -- added estimation of standard deviation for all modes filtered in
   10 Sept SpuriousPeaks filter is added
   3 September 2014-Steve added other estimation of std (if there are other peaks >height/2)
 
@@ -13,7 +16,7 @@ input: inp.txt containing one column for sample: min_isize,...hist
 
 output1:pass_info.txt : pass, confidence, num_modes; mode info:amplitude, mu,sd
 
-usage:./mode_detect inp.txt pass_info
+usage:./norm_fit inp.txt pass_info
 */
 
 
@@ -47,7 +50,7 @@ float Differ2Normal(float hist[],float histN[],int bins[],int nbins);// returns 
 
 float SmoothWin3(float val1,float val2,float val3);
 float SmoothWin2(float val1,float val2);
-int CountPeaks(float hist[], int bins[], int nbins);// returns k=num_peaks
+int CountPeaksNew(float hist[], int bins[], int nbins);// returns k=num_peaks
 int FilterDistance(int pos[], float amp[], int dist, int npos);//returns num_clus=#modes
 //============================================================MAIN
 
@@ -83,6 +86,7 @@ int main(int argc, char **argv)
     float sd;
     float maxN, scale, confidence;
     float histN[100];
+    float sds[100];// standard deviations of other modes if any
 
 	static struct option long_options[] =
         { {"min_distance", 1, 0, 'd'},
@@ -162,13 +166,14 @@ int main(int argc, char **argv)
     printf("mode_detection started\n");
 
     //1============================count peaks first time
-    num_peI = CountPeaks(hist,bins,nbins);
+
+    num_peI = CountPeaksNew(hist,bins,nbins);
     if (0 == num_peI)
     {
         printf("No peaks initially - aborting mode_detection\n");
         return 0;
     }
-    
+
     //1.2 ========================= smooth until stable
     num_peS = num_peI;
     diff = 1;
@@ -185,8 +190,7 @@ int main(int argc, char **argv)
         }
         histS[nbins-1] = SmoothWin2(hist[nbins-2],hist[nbins-1]);
 
-        //-------------- count peaks for smoothed histS
-        num_peaks = CountPeaks(histS,bins,nbins);
+        num_peaks = CountPeaksNew(histS,bins,nbins);
         diff = (num_peS - num_peaks);
         num_peS = num_peaks;
 
@@ -197,8 +201,14 @@ int main(int argc, char **argv)
         }
     } //end while
 
-    // ------------------find peak amps and positions
+    // ------------------find peak amps and positions:  4 jan
     k = 0;
+    if ((hist[0]-hist[1]) >= 0)
+	    {
+			amp[k] = hist[0];
+            pos[k] = bins[0];
+				k++;
+        }
     for (i=1; i<nbins-1; i++)
     {
         //peak amp and position
@@ -209,6 +219,13 @@ int main(int argc, char **argv)
             k++;
         }
     }
+    // Last bin peak
+    if ((hist[nbins-1]-hist[nbins-2]) >= 0)
+    {
+				amp[k] = hist[nbins-1];
+	            pos[k] = bins[nbins-1];
+					k++;
+    }
     num_peS = k;
     if (0 == num_peS)
     {
@@ -218,7 +235,7 @@ int main(int argc, char **argv)
 
     height = GetMax(amp,num_peS);//find max function for peaks after stabilizing
 
-    //1 ====================  filter for relative peak amplitude
+    //2 ====================  filter for relative peak amplitude
     k = 0;
     for (i=0; i<num_peS; i++)
     {
@@ -237,20 +254,27 @@ int main(int argc, char **argv)
     //2.2=====================removes spurios peaks (not smoothed yet) as not peaks up to min_distance/2
     num_peD = SpuriousPeaks(hist, bins, nbins, amp, pos, min_distance, num_peD);
 
-    //2 number of modes is the number of remaining peaks after distance and spurious peak (if needed)
+    //3 ----number of modes is the number of remaining peaks after distance and spurious peak (if needed)
     num_modes = num_peD;
+    //3.1  ----estimate stds of filtered in remaining peaks=modes
 
-    //3 -----------compute params of main mode
+      for (k=0; k<num_modes; k++)
+      {
+		  sds[k]=EstimateStd(hist,bins,nbins,pos[k],amp[k]);// std of a filtered mode
+          //printf("st dev of a mode %.2f\n", sds[k]);
+	  }
+
+    //4 -----------compute params of main mode
     mu = FindMainMode(hist,bins,nbins,height);// mu for Norm fit
     sd = EstimateStd(hist,bins,nbins,mu,height);//for smoothed hist
 
-    //4 ---------------------Norm fit toMain Mode
+    //5 ---------------------Norm fit toMain Mode
     for (i=0; i<nbins; i++)
     {
         histN[i] = FitNormal(mu,sd,bins[i]);// value from Norm pdf at bin
     }
 
-    // 4.2 scale histN to get same main peak height, smoothed
+    // 5.2 scale histN to get same main peak height, smoothed
     maxN = GetMax(histN,nbins);
     scale = height / maxN;// difference in max height b/w fitNorm and original hist
     for (i=0; i<nbins; i++)
@@ -258,10 +282,10 @@ int main(int argc, char **argv)
         histN[i] *= scale;
     }
 
-    //5 compute confidence of normal fit
+    //6 compute confidence of normal fit
     confidence = Differ2Normal(hist,histN,bins,nbins);
 
-    //6 pass if only a single mode
+    //7 pass if only a single mode
     pass = (num_modes == 1 ? 1 : 0);
 
     printf("num peaks initially %d\n", num_peI);
@@ -282,10 +306,10 @@ int main(int argc, char **argv)
     fprintf(fp,"confidence=%.2f\n", confidence);
     fprintf(fp,"nmode=%d\n", num_modes);
     fprintf(fp,"#amplitude,mu,std of main mode after smoothing\n%.2f %d %.2f\n", height, mu, sd);
-    fprintf(fp,"#amplitude,mu filtered modes\n");
+    fprintf(fp,"#amplitude,mu,std of all filtered modes\n");
     for (k=0; k<num_modes; k++)
     {
-        fprintf(fp,"%.2f %d\n",amp[k],pos[k]);
+        fprintf(fp,"%.2f %d %.2f\n",amp[k],pos[k],sds[k]);
     }
     fclose(fp);
 
@@ -349,7 +373,7 @@ float GetMax (float hist[], int nbins)
     return Hmax;
 }
 
-//// ------------------------------estimate std of main mode
+//// ------------------------------estimate std of a mode
 float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
 {
     int n;
@@ -361,9 +385,9 @@ float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
 
     for (n=0; n<nbins; n++)
     {
-        if (bins[n] >= mu)
+        if (bins[n] >= mu)// to the Right of mode
         {
-            if (hist[n] > threshold)
+            if ((hist[n] > threshold) & (hist[n] >= hist[n+1]))// added monotonity condition 29 Jan
             {
                 ma_bin = bins[n];
             }
@@ -376,9 +400,9 @@ float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
 
     for (n=nbins-1; n>=0; n--)
     {
-        if (bins[n] <= mu)
+        if (bins[n] <= mu)// to the Left of mode
         {
-            if (hist[n] > threshold)
+            if ((hist[n] > threshold) & (hist[n-1] <= hist[n]))// added monotonity condition 29 Jan
             {
                 mi_bin = bins[n];
             }
@@ -390,6 +414,12 @@ float EstimateStd (float hist[],int bins[],int nbins, int mu, float height)
     }
 
     sd = 0.5 * (ma_bin - mi_bin);
+
+    if (mu==bins[0])
+    sd = (ma_bin - mi_bin);
+    if (mu==bins[nbins-1])
+    sd = (ma_bin - mi_bin);
+
 
     return sd;
 }
@@ -463,12 +493,16 @@ float SmoothWin2(float val1,float val2)
 }
 
 //-------------------------------COUNT peaks
-int CountPeaks(float hist[], int bins[], int nbins)
+int CountPeaksNew(float hist[], int bins[], int nbins)
 {
     int k,i;
 
     // find peak_amps
-    k = 0;
+    k=0;
+    if ((hist[0]-hist[1]) >= 0)
+    {
+			k++;
+    }
     for (i=1; i<nbins-1; i++)
     {
         if ( ((hist[i]-hist[i-1]) > 0 ) && ((hist[i+1]-hist[i]) <= 0))
@@ -476,6 +510,10 @@ int CountPeaks(float hist[], int bins[], int nbins)
             k++;
         }
 
+    }
+    if ((hist[nbins-1]-hist[nbins-2]) >= 0)
+	{
+					k++;
     }
     return k;
 }
@@ -571,7 +609,7 @@ int SpuriousPeaks(float hist[], int bins[], int nbins, float amp[], int pos[], i
     {
         k = npos;
     }
-    
+
 
     return k;
 }
