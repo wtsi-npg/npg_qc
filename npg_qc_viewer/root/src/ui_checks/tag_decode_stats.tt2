@@ -9,7 +9,7 @@
 
 [%- IF errors_all.size -%]
 Tag decoding statistics
-<table summary="Tag Decoding Stats">
+<table title="Tag Decoding Stats">
 <tr>
   <th rowspan="2">Errors</th>
   <th colspan="2">All Reads</th>
@@ -41,7 +41,7 @@ Tag decoding statistics
 
 <div class="data_table">
 Coefficient of Variance (st.dev./mean), %
-<table summary="Coefficient of Variance">
+<table title="Coefficient of Variance">
 <tr>
   <th>All Reads</th>
   <th>PF Filtered Reads</th>
@@ -65,7 +65,7 @@ Coefficient of Variance (st.dev./mean), %
 
 [%- IF dist_good.size -%]
 Tag distribution
-<table summary="Tag Decoding Stats">
+<table title="Tag Decoding Stats">
 <tr>
   <th rowspan="2">Code</th>
   <th rowspan="2">Tag</th>

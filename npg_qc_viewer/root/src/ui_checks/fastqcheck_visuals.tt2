@@ -1,15 +1,15 @@
 [%-
-  fnames = c.model('SeqStore').files(util.inflate_rpt_key(lane_key), db_lookup, path_list);
+  fnames = c.model('SeqStore', {qc_schema => c.model('NpgQcDB').schema, npg_tracking_schema => c.model('NpgDB').schema}).files(util.inflate_rpt_key(lane_key), db_lookup, path_list);
   IF fnames.size;
     use_db = fnames.db_lookup;
+    fnames.delete('db_lookup');
     FOREACH key IN fnames.keys.sort;
-      IF key != 'db_lookup';
-        fname =  fnames.item("$key");
+      fname =  fnames.item("$key");
+      #action_plot and action_legend are defined in library_lanes
 -%]
 
-<img class="fastqcheck_plot" src="[%  c.uri_for_action(c.controller('Visuals').action_for('fastqcheck'), {path => "$fname", read => "$key", 'db_lookup' => "$use_db"}) | html %]"  alt="visualization for [% fname %]" />
-[%- END -%]
+<img src="/static/images/waiting.gif" data-src="[% c.uri_for_action(action_plot, {path => "$fname", read => "$key", 'db_lookup' => "$use_db"}) | html %]"  alt="visualization for [% fname %]" />
 [%- END -%]
 
-<img class="fastqcheck_legend" src="[%  c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend')) %]"  alt="legend for the fastqcheck file visualization" />
+<img src="[% legend_uri_for_action %]"  alt="legend for the fastqcheck file visualization" />
 [%- END -%]

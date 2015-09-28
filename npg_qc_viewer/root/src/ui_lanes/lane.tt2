@@ -2,7 +2,7 @@
     USE Number.Format(THOUSANDS_SEP=',');
 
     lane_class = 'lane';
-    IF pass == 1; lane_class = lane_class _ ' passed'; ELSIF pass == 0; lane_class = lane_class _ ' failed'; END;
+    IF row_info_to.manual_qc == 1; lane_class = lane_class _ ' passed'; ELSIF row_info_to.manual_qc == 0; lane_class = lane_class _ ' failed'; END;
 -%]
 
 <td class="[% lane_class %] nbsp">
@@ -16,7 +16,6 @@
 <span id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'></span>
 [% END -%]
 </td>
-
 [%- IF has_plexes -%]
 <td class="tag_info">
 [%- IF tag_index.defined; lane_link = c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'lane', 'db_lookup'=>"$db_lookup"}); -%]
@@ -24,7 +23,7 @@
 <a href="#[% lane_key %]">[% END -%]
 [%- tag_index -%]
 [%- IF have_link %]</a>[% END -%]
-[%- IF tag_sequence.defined && tag_sequence %]<br />[% tag_sequence %][% END %][% END %]</td>
+[%- IF row_info_to.tag_sequence.defined && row_info_to.tag_sequence %]<br />[% row_info_to.tag_sequence %][% END %][% END %]</td>
 [%- END -%]
 
 [%- FOREACH check_name IN checks_list -%]
@@ -66,9 +65,12 @@
 [%- END -%]
 
 [%  BLOCK qX_yield -%]
-[%  result.yield1 | format_number -%]
+[%  qxTotal = qxTotal + result.yield1;
+    result.yield1 | format_number -%]
 [%-   IF result.yield2.defined -%]
-<br />[% result.yield2 | format_number -%]
+<br />[% 
+         qxTotal = qxTotal + result.yield2;
+         result.yield2 | format_number -%]
 [%-   END -%]
 [%- END -%]
 
@@ -77,15 +79,13 @@
 [%- IF equartiles.defined && equartiles -%]
 <span class="expected_value">[% equartiles %]</span><br />
 [%- END -%]
-[%- quartiles = result.quartiles -%]
-[%- IF quartiles.defined && quartiles -%]
-[%- bracket = 0;
-    percent = result.percent_well_aligned_reads;
-    IF percent.defined && percent < 50;
-      bracket = 1;
-    END;
+[%- quartiles = result.quartiles;
+    IF quartiles.defined && quartiles;
+      percent = result.percent_well_aligned_reads;
+      bracket = percent.defined && percent < 50 ? 1 : 0;
+      norm_fit_info = result.norm_fit_nmode && result.norm_fit_confidence ? 1 : 0;
 -%]
-<span class="nbsp">[% IF bracket %]<span class="result_fail">{</span>[% END %][% quartiles %][% IF bracket %]<span class="result_fail">}</span>[% END %]</span>
+<span class="nbsp">[% IF bracket %]<span class="result_fail">{</span>[% END %][% quartiles %][% IF bracket %]<span class="result_fail">}</span>[% END; IF norm_fit_info; %] ([% result.norm_fit_nmode %]/[%result.norm_fit_confidence%])[% END %]</span>
 [%- END -%]
 [%- END -%]
 

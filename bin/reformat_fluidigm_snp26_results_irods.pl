@@ -13,6 +13,8 @@ Readonly::Scalar my $FLUIDIGM_RESULT_RSNAME_COL => 1;
 Readonly::Scalar my $FLUIDIGM_RESULT_SAMPLE_NAME_COL => 4;
 Readonly::Scalar my $FLUIDIGM_RESULT_CALL_COL => 9;
 
+Readonly::Scalar my $MAX_FATAL_ERRS => 64;
+
 my %opts;
 getopts('qshn:', \%opts);
 
@@ -115,12 +117,26 @@ my %calls = (
   rs999072 => {strand => q[+], call => q[NN], qc22 => q[N], qc26 => q[N], },
 );
 
+my $errexit_count = 0;
 my $sample_name = q[];
 
 while(<>) {
   chomp;
 
   my $h = from_json($_);
+
+  if($h->{error} or $errexit_count) {
+    # any error reported in the input is fatal, but report the first $MAX_FATAL_ERRS occurrences, then just finish
+    #  reading the input (to avoid potential "broken pipe" upset to an iRODS client supplying the input), then croak
+    if($h->{error}) {
+      if(++$errexit_count < $MAX_FATAL_ERRS) { # fatal, but not right away
+        carp q[error in JSON input; code: ], $h->{error}->{code}, q[; message: ], $h->{error}->{message};
+      }
+    }
+
+    next;
+  }
+
   my $do_name = sprintf q[%s/%s], (defined $h->{collection}? $h->{collection}: q[COLL_UNSPECIFIED]), (defined $h->{data_object}? $h->{data_object}: q[DATAOBJ_UNSPECIFIED]);
 
   my @avu_sn = (grep { $_->{attribute} eq q[sample]; } @{$h->{avus}});
@@ -134,7 +150,7 @@ while(<>) {
 
   my $data = $h->{data};
   for my $row (split /\n/smx, $data) {
-    my ($rsname, $sn, $call) = (split /\t/smx, $row)[$FLUIDIGM_RESULT_RSNAME_COL,$FLUIDIGM_RESULT_SAMPLE_NAME_COL,$FLUIDIGM_RESULT_CALL_COL]; # magic numbers?
+    my ($rsname, $sn, $call) = (split /\t/smx, $row)[$FLUIDIGM_RESULT_RSNAME_COL,$FLUIDIGM_RESULT_SAMPLE_NAME_COL,$FLUIDIGM_RESULT_CALL_COL];
 
     ## no critic qw(ControlStructures::ProhibitUnlessBlocks)
     unless($rsname) {
@@ -164,8 +180,9 @@ while(<>) {
   init_calls(\%calls);
 }
 
-# flush out calls for last sample
-dump_results(\%calls, $sample_name);
+if($errexit_count) {
+  croak q[Maximum fatal errors (], $MAX_FATAL_ERRS , q[) detected, exiting];
+}
 
 sub dump_results {
   my ($calls, $sn) = @_;

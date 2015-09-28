@@ -1,14 +1,9 @@
-#########
-# Author:        Marina Gourtovaia mg8@sanger.ac.uk
-# Created:       29 July 2009
-#
-
 package npg_qc::autoqc::autoqc;
 
-use strict;
-use warnings;
 use Moose;
+use namespace::autoclean;
 use MooseX::ClassAttribute;
+use Class::Load qw(load_class);
 use Carp;
 use English qw(-no_match_vars);
 use Readonly;
@@ -33,9 +28,9 @@ npg_qc::autoqc::autoqc
 
 =head1 SYNOPSIS
 
-  my $autoqc = npg_qc::autoqc::autoqc->new(archive_path=>q[/staging/IL29/analysis/123456_IL2_2222/Data/Intensities/Bustard-2009-10-01/GERALD-2009-10-01/archive], position=>1, check=>q[insert_size]);
+  my $autoqc = npg_qc::autoqc::autoqc->new(archive_path=>q[some_path], position=>1, check=>q[insert_size]);
   $autoqc->run();
-  my $checks = npg_qc::autoqc::autoqc->list_all_checks();
+  my $checks = npg_qc::autoqc::autoqc->checks_list();
 
 =head1 DESCRIPTION
 
@@ -136,9 +131,6 @@ has 'species'          => ( isa => 'Str', is => 'ro', required => 0,
                             documentation => 'Species name as used in the reference repository. No synonyms please.',);
 has 'strain'           => ( isa => 'Str', is => 'ro', required => 0,
                             documentation => 'Strain as used in the reference repository.',);
-has 'sequence_type'    => ( isa => 'Str', is => 'ro', required => 0,
-                            documentation => 'Sequence type as phix for spiked phix or similar.',);
-
 
 =head2 qc_in
 
@@ -225,14 +217,14 @@ sub _create_test_object {
     my $self = shift;
 
     my $pkg = $CHECKS_NAMESPACE . q[::] . $self->check;
-    Class::MOP::load_class($pkg);
+    load_class($pkg);
     my $init = {
                 path      => $self->qc_in,
                 position  => $self->position,
                 id_run    => $self->id_run,
 	       };
 
-    my @attrs = qw/tag_index repository reference_genome species strain sequence_type file_type/;
+    my @attrs = qw/tag_index repository reference_genome species strain file_type/;
     foreach my $attr_name (@attrs) {
         if ($attr_name eq q[tag_index] ) {
             if (defined $self->$attr_name) {
@@ -263,7 +255,7 @@ sub run {
 
     my $check = $self->_create_test_object();
     $check->execute();
-    $check->result->write2file($self->qc_out);
+    $check->result->store($self->qc_out);
 
     return 1;
 }
@@ -282,8 +274,8 @@ sub can_run {
     return $check->can_run;
 }
 
-no Moose;
 no MooseX::ClassAttribute;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -298,7 +290,11 @@ __END__
 
 =item Moose
 
+=item namespace::autoclean
+
 =item MooseX::ClassAttribute
+
+=item Cass::Load
 
 =item File::Spec
 
@@ -330,7 +326,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

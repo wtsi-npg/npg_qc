@@ -5,6 +5,7 @@
 package npg_qc::illumina::loader::Bustard_Summary;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw{-no_match_vars};
 use Readonly;
@@ -358,8 +359,8 @@ sub _process_tile_result_by_lane_read_tile{
   return 1;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -372,6 +373,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

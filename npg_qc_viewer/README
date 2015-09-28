@@ -1,64 +1,94 @@
 Running your own development server:
 ------------------------------------
 
-unset CATALYST_HOME
-export PATH=/software/perl-5.16.3/bin:$PATH
-export PERL5LIB=lib:/software/npg/lib/perl5:/software/npg/cpan/lib/perl5
+Current Build script will set the project ready for running the server.
 
-make sure you have installed dependencies with bower
+The Build scripts needs ENV variables to build:
+  
+  PATH     - pointing to Perl (currently v5.16.3 is supported) and 
+             NodeJS (v0.12.1) with npm (v2.5.1)
+                          
+  PERL5LIB - for npg libraries and CPAN libraries
+  
+In case there is a CATALYST_HOME variable, it needs to be unset.
+  
+  $ unset CATALYST_HOME
+  
+The project uses bower to manage dependencies, if not available, install with
 
-# in the npg_qc_viewer directory
-pushd root/static && bower install && popd
+  $ npm install -g bower
+  
+Updating and running the Build script should install JS dependencies with
+bower.
 
-# If you are including a working copy of bcviz (not yet official release) use bower to configure the linking
+  $ perl Build.PL --installjsdeps && ./Build
 
-  - In bcviz
+If you are including a working copy of bcviz (not yet official release) 
+use bower to configure the linking
+
+  - In bcviz (your working copy)
 
     $ bower link
 
   - In npg_qc
-
+    
+    # in the npg_qc_viewer folder
     $ pushd root/static && bower link bcviz && popd
 
 If needed, edit the decryption_key value in npg_qc_viewer.conf
 
-# in the npg_qc_viewer directory
-perl bin/npg_qc_viewer_server.pl -p YOUR_PORT
+  # in the npg_qc_viewer folder
+  $ perl bin/npg_qc_viewer_server.pl -p YOUR_PORT
 
-CATALYST_DEBUG=1 to enable debugging
+  CATALYST_DEBUG=1 to enable debugging
 
-CATALYST_AUTOCRUD=1 to enable the autocrud plugin
+  CATALYST_AUTOCRUD=1 to enable the autocrud plugin
 
-autocrud pages - npg tracking:
-read-only: autocrud/npgdb
-admin:     autocrud/site/admin/schema/npgdb
+  autocrud pages - npg tracking:
+  read-only: autocrud/npgdb
+  admin:     autocrud/site/admin/schema/npgdb
 
-Building and testing:
----------------------
+Building and testing Perl modules
+---------------------------------
 
-unset CATALYST_HOME
-export PATH=/software/perl-5.16.3/bin:$PATH
-export PERL5LIB=/software/npg/lib/perl5:/software/npg/cpan/lib/perl5
-# in the npg_qc_viewer directory
-perl Build.PL
-CATALYST_DEBUG=0 TEST_AUTHOR=1 ./Build test
-or
-CATALYST_DEBUG=0  TEST_AUTHOR=1 prove -vl t
+The Build scripts needs ENV variables to build:
+
+  PATH     - pointing to Perl (currently v5.16.3 is supported) and 
+             NodeJS (v0.12.1) with npm (v2.5.1)
+  PERL5LIB - for npg libraries and cpan libraries
+  
+In case there is a CATALYST_HOME variable, it needs to be unset.
+  
+  $ unset CATALYST_HOME
+
+Updating and running the Build script should install JS dependencies with
+bower.
+
+  # in the npg_qc_viewer folder
+  # Building
+  $ perl Build.PL --installjsdeps && ./Build 
+  
+  # Testing
+  $ TEST_AUTHOR=1 ./Build test
+  # or
+  $ CATALYST_DEBUG=0  TEST_AUTHOR=1 prove -vl t
 
 Testing Javascript for npg_qc_viewer
 ------------------------------------
 
 Headless testing:
 
-# in the npg_qc_viewer directory
+Build the project following the steps described in the first section.
+
 Install node package dependencies if they are not available.
- - npm install -g bower
- - npm install -g node-qunit-phantomjs
 
-Install bower dependencies following the steps described in the first section.
+  $ npm install -g node-qunit-phantomjs
 
-pushd root/static && node-qunit-phantomjs test/test.html --verbose && popd
+Running the tests
+
+  $ pushd root/static && node-qunit-phantomjs test/test.html --verbose && popd
 
 Testing in browser:
 
-Open file npg_qc_viewer/root/static/test/test.html in a browser window.
+  Open file npg_qc_viewer/root/static/test/test.html in a browser window.
+

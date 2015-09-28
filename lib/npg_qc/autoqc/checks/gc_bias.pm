@@ -1,14 +1,7 @@
-#########
-# Author:        Aylwyn Scally
-# Created:       2008-11-26
-#
-#
-
 package npg_qc::autoqc::checks::gc_bias;
 
-use strict;
-use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Fatal qw(open close);
@@ -39,8 +32,8 @@ Readonly::Scalar my $SIG_PIPE_FATAL_ERROR       => 141;
 Readonly::Scalar our $EXT                => 'bam';
 
 
-has '+input_file_ext' => (default    => $EXT,);
-has '+aligner'        => (default    => q[fasta],);
+has '+file_type' => (default    => $EXT,);
+has '+aligner'   => (default    => q[fasta],);
 
 has 'window_depth_cmd'  =>  ( is         => 'ro',
                               isa        => 'NpgCommonResolvedPathExecutable',
@@ -322,7 +315,6 @@ sub find_R_library {    ## no critic (NamingConventions::Capitalization)
     return $path_to_R_lib;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -365,13 +357,19 @@ npg_qc::autoqc::checks::gc_bias - assess the degree of gc_bias in reads
 
 =head1 DEPENDENCIES
 
+=over
+
+=item namespace::autoclean
+
+=back
+
 =head1 AUTHOR
 
-    John O'Brien, jo3
+John O'Brien, jo3
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by John O'Brien
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

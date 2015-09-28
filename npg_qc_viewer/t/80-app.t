@@ -1,17 +1,24 @@
 use strict;
 use warnings;
-use Test::More tests => 44;
+use Test::More tests => 50;
 use Test::Exception;
 use HTTP::Headers;
 use HTTP::Request::Common;
 use XML::LibXML;
 use Carp;
+use Test::Warn;
+use List::MoreUtils qw ( each_array );
 
 use t::util;
 
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
+}
+
 # programmatically adding break points $DB::single = 1;
 # run under the debugger perl -Ilib -d t/test.t
-# set CATALYST_SERVER = 1 to test against a running surver
+# set CATALYST_SERVER = 1 to test against a running server
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
@@ -22,7 +29,6 @@ local $ENV{TEST_DIR}        = $util->staging_path;
   my $schemas;
   lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
   use_ok 'Catalyst::Test', 'npg_qc_viewer';
-  $schemas->{wh}->resultset('NpgPlexInformation')->search({id_run => 4950, 'tag_index' => {'!=' => 0,},})->update({sample_id=>118118,});
 }
 
 {
@@ -49,13 +55,11 @@ local $ENV{TEST_DIR}        = $util->staging_path;
 
   my @urls = ();
 
-  push @urls, q[http://localhost/checks];
+  push @urls, q[http://localhost/checks]; 
   push @urls, q[http://localhost/checks/about];
-  my $project_id = 378;
-  push @urls, qq[http://localhost/checks/studies/$project_id];
-  my $lib = q[Exp2_PD2126a_WGA+1];
-  push @urls, qq[http://localhost/checks/libraries?name=$lib];
-  my $sample_id = 9184;
+  my $lib = q[NT28560W];
+  push @urls, qq[http://localhost/checks/libraries?id=$lib];
+  my $sample_id = 9272;
   push @urls, qq[http://localhost/checks/samples/$sample_id];
   $sample_id = 9286;
   push @urls, qq[http://localhost/checks/samples/$sample_id];
@@ -65,15 +69,33 @@ local $ENV{TEST_DIR}        = $util->staging_path;
   push @urls, qq[http://localhost/checks/runs/$run_id];
   push @urls, qq[http://localhost/checks/runs-from-staging/$run_id];
   push @urls, q[http://localhost/checks/path?path=t/data/results];
+  
+  my $warn_id            = qr/Use of uninitialized value \$id in exists/;
+  my $warn_command       = qr/Use of uninitialized value \$command in pattern match/;
+  
+  my @warnings = ();
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_id,];
+  push @warnings, [$warn_command, $warn_command, $warn_command, $warn_command, $warn_id,];
 
-  foreach my $url (@urls) {
-
+  my $it = each_array( @urls, @warnings );
+  while ( my ($url, $warning_set) = $it->() ) {
     my $request = GET($url);
-    my $responce;
-    ok( $responce = request($request),  qq[request to $url] );
-    ok( $responce->is_success, qq[request to $url is successful]);
-    is( $responce->content_type, q[text/html], 'HTML content type');
-    my $content = $responce->content();
+    my $response;
+    warnings_like{
+      ok( $response = request($request),  qq[request to $url] )
+    } $warning_set ,
+       'Expected warning';
+    
+    ok( $response->is_success, qq[request to $url is successful]);
+    is( $response->content_type, q[text/html], 'HTML content type');
+    my $content = $response->content();
     eval { $xml_parser->parse_html_string($content); };
 
     ok ( (!ref($@) || ($@->message() =~ /Content\ error\ in\ the\ external\ subset/)), 'XML parsed OK');

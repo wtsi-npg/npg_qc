@@ -1,41 +1,38 @@
 [% studies = {}; FOREACH lane_key IN sorted_rl_map_keys -%]
   [%
-     lane_collection = rl_map.$lane_key;
+     lane_collection = rl_map.${lane_key};
      NEXT IF (!lane_collection || lane_collection.size == 0);
      temp = lane_collection.sort;
-     checks = lane_collection.results;
-     provenance = '';
-     checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'}) 
+     to_remove = ['split stats phix', 'spatial filter'];
+     IF !run_view;
+       to_remove.push('qX yield', 'gc fraction');
+     END;
+     trimmed_lane_collection = lane_collection.remove('check_name', to_remove);
+     checks = trimmed_lane_collection.results;
+
+     checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'});
+
+     trimmed_reference_path = {};
+     sequence_mismatch_collection = lane_collection.slice('check_name', 'sequence mismatch');
+
+     IF sequence_mismatch_collection.size > 0;
+       trimmed_reference_path = sequence_mismatch_collection.first.reference_for_title;
+     END;
+
+     row_info_to = c.stash.row_data.$lane_key;
+     provenance = row_info_to.defined ? row_info_to.provenance.join(' << ') : '';
+     library_id = row_info_to.legacy_library_id; #used in genotype
   -%]
 
   <div class="results_full_lane">
-  <h3 class="collapser">[% util.expand_rpt_key(lane_key) %]<a name="[% lane_key %]"></a></h3>
-
-  [%- 
-    library = libs_info.$lane_key.lib_name;
-    sample  = libs_info.$lane_key.sample_name;
-    sample_id = libs_info.$lane_key.sample_id;
-    library_id = libs_info.$lane_key.library_id;
-    study_id = libs_info.$lane_key.study_id;
-    study_name = '';
-    IF study_id;
-      study_name = studies_info.$study_id;
-    END;
-           
-    IF library; 
-      provenance = ' | ' _ library;
-      IF sample; 
-        provenance = provenance _ ' << ' _ sample;
-        IF studies; 
-          provenance = provenance _ ' << ' _ study_name;
-        END;
-      END;
-    END;
-  -%]
+  <h3>[% util.expand_rpt_key(lane_key) %] | [% provenance | html %] <a name="[% lane_key %]"></a></h3>
+  [%- IF trimmed_reference_path.species && trimmed_reference_path.version; -%]
+    <h4>Reference: [%- trimmed_reference_path.species -%] ([%- trimmed_reference_path.version -%])</h4>
+  [%- END -%]
 
   <div class="results_full_lane_contents">
     [% gt_results_cached=0 %]
-    [% FOREACH check IN checks; IF check.check_name != 'split stats phix' && check.check_name != 'spatial filter'; -%]
+    [% FOREACH check IN checks; -%]
       [%- rf_id_attr = '' -%]
       [%- rf_info_attr = '' -%]
 
@@ -71,7 +68,7 @@
         [% INCLUDE display_full_check_content check=check %]
       [%- END -%]
 
-    [%- END; END -%] [%# of FOREACH and IF %]
+    [%- END; -%] [%# of FOREACH %]
   </div>
 
   </div>
@@ -80,12 +77,11 @@
 [% BLOCK display_full_check_content %]
 	<div [% rf_id_attr %] class="result_full">
 
-        <h2 class="collapser [% check.check_name %]">[% util.expand_rpt_key(lane_key) %], [% check.check_name -%] 
+        <h2>[% util.expand_rpt_key(lane_key) %], [% check.check_name -%] 
 
 	[%- IF check.defined('pass') -%]:
 		[% check.pass ? 'passed' : '<span class="result_fail">failed</span>' -%]
 	[%- END -%]
-	[% IF provenance.defined %] [% provenance | html %]  [% END -%]
 	</h2>
   
 	<div class="result_full_content">

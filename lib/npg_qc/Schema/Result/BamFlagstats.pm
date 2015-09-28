@@ -20,6 +20,18 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
+=head1 ADDITIONAL CLASSES USED
+
+=over 4
+
+=item * L<namespace::autoclean>
+
+=back
+
+=cut
+
+use namespace::autoclean;
+
 =head1 COMPONENTS LOADED
 
 =over 4
@@ -78,6 +90,13 @@ __PACKAGE__->table('bam_flagstats');
   data_type: 'varchar'
   default_value: 'all'
   is_nullable: 1
+  size: 10
+
+=head2 subset
+
+  data_type: 'varchar'
+  default_value: 'target'
+  is_nullable: 0
   size: 10
 
 =head2 library
@@ -209,6 +228,13 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
     size => 10,
   },
+  'subset',
+  {
+    data_type => 'varchar',
+    default_value => 'target',
+    is_nullable => 0,
+    size => 10,
+  },
   'library',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'unpaired_mapped_reads',
@@ -269,9 +295,9 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 =item * L</position>
 
-=item * L</human_split>
-
 =item * L</tag_index>
+
+=item * L</human_split>
 
 =back
 
@@ -279,7 +305,7 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 __PACKAGE__->add_unique_constraint(
   'unq_run_lane_index_sp_flag',
-  ['id_run', 'position', 'human_split', 'tag_index'],
+  ['id_run', 'position', 'tag_index', 'human_split'],
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -298,15 +324,18 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-02-13 15:21:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:J4ClXt5n2NVz/umd9TN/6Q
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-07-08 11:05:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:txZzb/HOksJVy8B6JUfuww
+
+
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
+
+our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( histogram info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('human_split', 'is_string');
-
-
-our $VERSION = '0';
+__PACKAGE__->set_inflator4scalar('subset', 'is_string');
 
 __PACKAGE__->meta->make_immutable;
 
@@ -335,6 +364,8 @@ Result class definition in DBIx binding for npg-qc database.
 
 =item Moose
 
+=item namespace::autoclean
+
 =item MooseX::NonMoose
 
 =item MooseX::MarkAsMethods
@@ -357,7 +388,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 
@@ -375,4 +406,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-

@@ -1,13 +1,7 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       03 September 2009
-#
-
 package npg_qc::autoqc::results::collection;
 
-use strict;
-use warnings;
 use Moose;
+use namespace::autoclean;
 use MooseX::AttributeHelpers;
 use Carp;
 use English qw(-no_match_vars);
@@ -79,6 +73,7 @@ has 'results' => (
           'delete' => 'delete',
           'get'    => 'get',
           'elements'    => 'all',
+          'grep'        => 'grep',
       },
                  );
 
@@ -86,7 +81,7 @@ has 'results' => (
 =head2 _result_classes
 
 A reference to a list of result classes. While making a list, the build method
-requires each of the class modules.
+loads each of the class modules into memory.
 
 =cut
 has '_result_classes' => ( isa         => 'ArrayRef',
@@ -94,16 +89,21 @@ has '_result_classes' => ( isa         => 'ArrayRef',
                            required    => 0,
                            lazy_build  => 1,
                          );
-
-
 sub _build__result_classes {
     my $self = shift;
+
+    my @except = map {join q[::], $RESULTS_NAMESPACE, $_} qw/
+                                                             sequence_summary
+                                                             samtools_stats
+                                                             base
+                                                             result
+                                                             collection
+                                                           /;
 
     my @classes = Module::Pluggable::Object->new(
         require     => 1,
         search_path => $RESULTS_NAMESPACE,
-        except      => [$RESULTS_NAMESPACE . q[::result],
-                        $RESULTS_NAMESPACE . q[::collection]],
+        except      => \@except,
     )->plugins;
     my @class_names = ();
     foreach my $class (@classes) {
@@ -127,7 +127,6 @@ one by one .
 =cut
 sub add {
     my ($self, $r) = @_;
-
     if(ref $r eq q{ARRAY}) {
         foreach my $el (@{$r}) {
             $self->push($el);
@@ -163,7 +162,6 @@ sub add_from_dir {
 
     foreach my $file (@files) {
         my ($filename, $dir, $extension) = fileparse($file);
-        my $loaded = 0;
         foreach my $class (@classes) {
             if ($filename =~ /$class/smx) {
                 my $module = $RESULTS_NAMESPACE . q[::] . $class;
@@ -172,12 +170,8 @@ sub add_from_dir {
                 if (!defined $lanes || !@{$lanes} || grep {/^$position$/smx} @{$lanes} ) {
                     $self->add($result);
                 }
-                $loaded = 1;
                 last;
             }
-        }
-        if (!$loaded) {
-            carp qq[Cannot identify class for $file];
         }
     }
 
@@ -370,6 +364,34 @@ sub slice {
     return $c;
 }
 
+=head2 remove
+
+Utility method wrapping grep functionality to remove from collection those
+elements matching criteria. Returns a new collection without the elements.
+
+my $plex_results = $collection->remove(q[check_name], [ 'qX_yield', 'gc bias' ]);
+
+=cut
+
+sub remove {
+
+  my ($self, $criterion, $values) = @_;
+
+  if (!defined $criterion) { croak q[Cannot remove with undefined criterion]; }
+  if (!defined $values)     { croak qq[Cannot remove with undefined $criterion values]; }
+
+  if ($criterion !~ /check_name|class_name/smx) {
+    croak q[Can only remove based on either check_name or class_name];
+  }
+
+  my $c = __PACKAGE__->new();
+
+  my @filtered = $self->grep(sub { my $obj = $_; none { $obj->$criterion eq $_ } @{$values} } );
+
+  $c->push(@filtered);
+
+  return $c;
+}
 
 =head2 search
 
@@ -537,10 +559,7 @@ sub check_names {
     return {'list' => \@check_names, 'map' => $map,};
 }
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable;
-
 
 1;
 __END__
@@ -553,11 +572,9 @@ __END__
 
 =over
 
-=item strict
-
-=item warnings
-
 =item Moose
+
+=item namespace::autoclean
 
 =item MooseX::AttributeHelpers
 
@@ -595,11 +612,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

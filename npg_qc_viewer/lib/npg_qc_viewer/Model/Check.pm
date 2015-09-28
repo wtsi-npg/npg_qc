@@ -1,6 +1,7 @@
 package npg_qc_viewer::Model::Check;
 
 use Moose;
+use namespace::autoclean;
 use npg_qc_viewer;
 extends 'Catalyst::Model::Adaptor';
 
@@ -13,7 +14,7 @@ my $connect_info;
 if (defined npg_qc_viewer->config->{'Model::Check'}) {
     if (defined npg_qc_viewer->config->{'Model::Check'}->{'use_db'} &&
             npg_qc_viewer->config->{'Model::Check'}->{'use_db'} eq 'no' ) {
-	$use_db = 0;
+        $use_db = 0;
     }
     if (defined npg_qc_viewer->config->{'Model::Check'}->{'connect_info'}) {
         $connect_info = npg_qc_viewer->config->{'Model::Check'}->{'connect_info'};
@@ -29,6 +30,7 @@ __PACKAGE__->config( class => 'npg_qc::autoqc::qc_store',
                      args  => $init,
                    );
 
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -54,6 +56,8 @@ A model for retrieving QC checks both from the database and the file system.
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model::Adaptor
 

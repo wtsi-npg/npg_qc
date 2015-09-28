@@ -1,10 +1,7 @@
-[% npg_url = 'http://sfweb.internal.sanger.ac.uk:';
-   lims_url = 'http://psd-support.internal.sanger.ac.uk:6600';
+[% port = 9000;
    IF env_dev == 'dev';
-     lims_url = 'http://dev.psd.sanger.ac.uk:6610';
-     npg_url = npg_url _ '9010';
-   ELSE;
-     npg_url = npg_url _ '9000';
+     port = 9010;
    END;
-   npg_url = npg_url _ '/perl/npg';
+   base_url = base_url _ ':' _ port;
+   npg_url = base_url _ '/perl/npg';
 %]

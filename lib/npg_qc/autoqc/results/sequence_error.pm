@@ -8,6 +8,7 @@ package npg_qc::autoqc::results::sequence_error;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::sequence_error);
@@ -94,7 +95,7 @@ has reverse_cigar_char_count_by_cycle => ( is  => 'rw',
                                            isa => 'Maybe[HashRef]',
                                          );
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -138,6 +139,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =back
 

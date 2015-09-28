@@ -1,13 +1,7 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       29 July 2009
-#
-
 package npg_qc::autoqc::checks::qX_yield;
 
-use strict;
-use warnings;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 use Carp;
 use English qw(-no_match_vars);
@@ -48,7 +42,7 @@ Readonly::Scalar our $DEFAULT_READ_LENGTH_HS       => 75;
 Readonly::Scalar our $THOUSAND                  => 1000;
 Readonly::Scalar our $NA                        => -1;
 
-has '+input_file_ext' => (default    => $EXT,);
+has '+file_type' => (default    => $EXT,);
 
 
 override 'execute'            => sub  {
@@ -142,7 +136,7 @@ sub _get_threshold {
   return round($threshold);
 }
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -157,6 +151,8 @@ __END__
 
 =item Moose
 
+=item namespace::autoclean
+
 =item Carp
 
 =item English -no_match_vars
@@ -168,6 +164,8 @@ __END__
 =item npg_common::fastqcheck
 
 =item npg_qc::autoqc::checks::check
+
+=item npg::api::run
 
 =back
 
@@ -181,7 +179,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

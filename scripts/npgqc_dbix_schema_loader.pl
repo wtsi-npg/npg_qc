@@ -49,7 +49,11 @@ make_schema_at(
     {
         debug               => 0,
         dump_directory      => q[lib],
-        naming              => q[current],
+        naming              => { 
+            relationships => 'current', 
+            monikers => 'current', 
+            column_accessors => 'preserve',
+        },
         skip_load_external  => 1,
         use_moose           => 1,
         preserve_case       => 1,
@@ -87,7 +91,8 @@ make_schema_at(
           'errors_by_cycle'                => q[ErrorsByCycle],
           'errors_by_nucleotide'           => q[ErrorsByNucleotide],
           'errors_by_cycle_and_nucleotide' => q[ErrorsByCycleAndNucleotide],
-          'cumulative_errors_by_cycle'     => q[CumulativeErrorsByCycle]
+          'cumulative_errors_by_cycle'     => q[CumulativeErrorsByCycle],
+          'samtools_stats'                 => q[SamtoolsStats],
         },
 
         result_roles_map   => $roles_map,
@@ -95,6 +100,8 @@ make_schema_at(
         components => [qw(InflateColumn::DateTime)],
 
         result_components_map => $components_map,
+
+        additional_classes => (qw[namespace::autoclean],),
     },
     [$dsn, $config->{'dbuser'}, $config->{'dbpass'}]
 );

@@ -38,11 +38,11 @@ sub class_name {
     my ($ref) = (ref $self) =~ /(\w*)$/smx;
     if ($ref =~ /^[[:upper:]]/xms) {
         if ($ref eq 'QXYield') {
-	    $ref = 'qX_yield';
+            $ref = 'qX_yield';
         } else {
             $ref =~ s/([[:lower:]])([[:upper:]])/$1_$2/gmxs;
             $ref = lc $ref;
-	}
+        }
     }
     return $ref;
 }
@@ -75,7 +75,6 @@ sub package_name {
     return (ref $self);
 }
 
-
 =head2 check_name
 
 Human readable check name
@@ -84,10 +83,6 @@ Human readable check name
 sub check_name {
     my $self = shift;
     my $name = $self->class_name;
-    $name =~ s/sequence_error/sequence mismatch/xms;
-    if ($self->can(q[sequence_type]) && $self->sequence_type) {
-        $name .= q[ ] . $self->sequence_type;
-    }
     $name =~ s/_/ /gsmx;
     return $name;
 }
@@ -170,36 +165,35 @@ Filename that should be used to write json serialization of this object to
 =cut
 sub filename4serialization {
     my $self = shift;
-    return sprintf q[%s_%s%s%s.%s.%s],
-                   $self->id_run,
-                   $self->position,
-                   $self->tag_label(),
-                   $self->can(q[sequence_type]) && $self->sequence_type ? q[_] . $self->sequence_type : q[],
-                   $self->class_name,
-                   q[json];
+
+    my $root;
+    if ($self->can('filename_root')) {
+        $root = $self->filename_root;
+    }
+    if (!$root) {
+        $root = sprintf q[%s_%s%s],
+            $self->id_run,
+            $self->position,
+            $self->tag_label();
+    }
+    return sprintf q[%s%s.%s.%s],
+        $root,
+        $self->can(q[subset]) && $self->subset ? q[_] . $self->subset : q[],
+        $self->class_name,
+        q[json];
 }
 
-=head2 write2file
+=head2 store
 
-Serializes the object as a json string to a folder given by the destination argument.
-The output file name follows the pattern idrun_position.check_name.extension.
+Extends 'store' method provided by inheritance.
+Uses filename4serialization for default file name if none or directory is passed as argument.
 
 =cut
-sub write2file {
-    my ($self, $destination) = @_;
-
-    $destination = catfile($destination, $self->filename4serialization());
-    open my $fh, q[>], $destination or croak "Cannot open $destination for writing";
-    ##no critic (RequireBracedFileHandleWithPrint) 
-    print $fh $self->freeze() or croak "Cannot write to $destination";
-    close $fh or carp "Cannot close a handle to $destination";
-    return 1;
-}
-
-around 'store' => sub { #use filename4serialization for default file name if none or directory is passed as argument
+around 'store' => sub {
     my ($orig, $self, $file) = @_;
-    $file = (not defined $file) ? $self->filename4serialization() :
-            -d $file            ? catfile($file,$self->filename4serialization()) :
+    my $fn = $self->filename4serialization();
+    $file = (not defined $file) ? $fn :
+            -d $file            ? catfile($file,$fn) :
                                   $file;
     return $self->$orig($file);
 };
@@ -239,17 +233,17 @@ __END__
 
 =item Moose::Role
 
-=item MooseX::Storage
-
 =item Carp
 
 =item File::Spec::Functions
 
 =item JSON
 
-=item List::MoreUtils
+=item MooseX::Storage
 
 =item Readonly
+
+=item List::MoreUtils
 
 =back
 
@@ -263,7 +257,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Limited
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

@@ -1,23 +1,18 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       14 April 2009
-#
-
 package npg_qc::autoqc::results::result;
 
 use Moose;
+use namespace::autoclean;
 use MooseX::AttributeHelpers;
 
 use npg_tracking::util::types;
 
-with qw(
-         npg_qc::autoqc::role::result
-         npg_tracking::glossary::tag
-       );
+with qw( npg_qc::autoqc::role::result
+         npg_tracking::glossary::run
+         npg_tracking::glossary::lane
+         npg_tracking::glossary::tag );
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
-
 
 =head1 NAME
 
@@ -38,8 +33,17 @@ A base class to wrap the result of autoqc.
 
 =head1 SUBROUTINES/METHODS
 
-=cut
+=head2 position
 
+Lane number. An integer from 1 to 8 inclusive.
+
+=head2 id_run
+
+Run id for the lane to be checked.
+
+=head2 tag_index
+
+An optional tag index
 
 =head2 pass
 
@@ -54,35 +58,13 @@ has 'pass'         => (isa      => 'Maybe[Bool]',
 
 =head2 path
 
-A path to a directory with fastq input files.
+A path to the input file(s) directory.
 
 =cut
 has 'path'        => (isa      => 'Str',
                       is       => 'rw',
                       required => 1,
                      );
-
-=head2 position
-
-Lane number. An integer from 1 to 8 inclusive.
-
-=cut
-has 'position'    => (isa      => 'NpgTrackingLaneNumber',
-                      is       => 'rw',
-                      required => 1,
-                     );
-
-
-=head2 id_run
-
-Run id for the lane to be checked.
-
-=cut
-has 'id_run'      => (
-                      isa      => 'NpgTrackingRunId',
-                      is       => 'rw',
-                      required => 1,
-		     );
 
 =head2 info
 
@@ -113,7 +95,7 @@ has 'comments'     => (isa => 'Maybe[Str]',
                        required => 0,
                       );
 
-no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -128,7 +110,13 @@ __END__
 
 =item Moose
 
+=item namespace::autoclean
+
 =item npg_tracking::util::types
+
+=item npg_tracking::glossary::run
+
+=item npg_tracking::glossary::lane
 
 =item npg_tracking::glossary::tag
 
@@ -140,11 +128,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

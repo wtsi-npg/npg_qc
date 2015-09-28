@@ -2,6 +2,7 @@ package npg_qc_viewer::Model::NpgDB;
 
 use Carp;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
@@ -37,7 +38,7 @@ sub runlane_annotations {
   my ($self, $id_run) = @_;
 
   if (!defined $id_run) {
-    croak q[Run id not defined when quering runlane annotations];
+    croak q[Run id not defined when querying runlane annotations];
   }
 
   my $rs = $self->resultset('RunLaneAnnotation')->search(
@@ -62,7 +63,7 @@ sub run_annotations {
   my ($self, $id_run) = @_;
 
   if (!defined $id_run) {
-    croak q[Run id not defined when quering run annotations];
+    croak q[Run id not defined when querying run annotations];
   }
 
   my $rs = $self->resultset('RunAnnotation')->search(
@@ -105,6 +106,8 @@ sub update_lane_manual_qc_complete {
   return;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -117,6 +120,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Readonly
 

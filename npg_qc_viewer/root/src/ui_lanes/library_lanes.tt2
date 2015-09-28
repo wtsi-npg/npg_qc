@@ -1,11 +1,11 @@
-[% 
+[%
   USE String;
+  USE Number.Format(THOUSANDS_SEP=',');
 
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
   checks_info = collection_all.check_names;
 
-  lib_names = [];
   temp = [];
   FOREACH check_name IN checks_info.list;
     IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
@@ -25,7 +25,7 @@
     IF rl_keys.size;
       sorted_rl_map_keys = util.sort_rpt_keys(rl_keys);
       IF (!run_from_staging && !path_list.defined);
-        run_ids            = util.runs_from_rpt_keys(rl_keys);
+        run_ids = util.runs_from_rpt_keys(rl_keys);
         IF run_ids.size == 1;
           run_id_to_link = run_ids.first;
         END;
@@ -49,7 +49,6 @@
   </ul>
 [%- END %]
 [%- IF run_view.defined && run_view %][% PROCESS ui_runs/run_menu.tt2 -%][% END %]
-[% PROCESS ui_lanes/collapse_menu.tt2 -%]
 </div>
 </div>
 
@@ -57,98 +56,68 @@
 
 <table id="results_summary" summary="QC results summary">
 <tr>
-[% IF sample_link %]<th[% row_span_string %]>Sample Name</th>[% END %]
-<th[% row_span_string %]>Library Name</th>
+<th[% row_span_string %]>Library<br />------<br />Sample<br />Name</th>
 <th[% row_span_string %]>Run Id<br />------<br />Num.<br />Cycles</th>
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
 
-[%- libs_info = {}; studies_info = {}; run_info = {}; 
+[%- qxTotal = 0; #For total qxYield
+
+    #For heatmaps
+    action_plot = c.controller('Visuals').action_for('fastqcheck');
+    legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
+    
     FOREACH lane_key IN sorted_rl_map_keys;
+      #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
       attrs = util.inflate_rpt_key(lane_key);
+
       id_run   = attrs.id_run;
-      time_comp = '';
-      num_cycles = '';
       position  = attrs.position;
-      is_dev = 0;
       tag_index = '';
-      tag_sequence = '';
-      pass = '';
-      lib = '';
-      library_id = '';
-      sample_id = '';
-      study_id = '';
-      sample_name = '';
-      table_row = '';
+
       IF attrs.defined('tag_index');
         tag_index = attrs.tag_index;
-        table_row = plex_rs.search({'me.id_run' => id_run, 'me.position' => position, 'tag_index' => tag_index}).first();
-        IF table_row;
-          tag_sequence = table_row.tag_sequence;
-          IF !run_info.exists($id_run);
-              run_info.$id_run = table_row.npg_info;
-          END;
-          t            = run_info.$id_run.run_complete;
-          num_cycles   = run_info.$id_run.cycles;
-        END;
-      ELSE;
-        table_row = rs.search({'id_run' => id_run, 'position' => position,}).first();
-        IF table_row;
-          t            = table_row.run_complete;
-          num_cycles   = table_row.cycles;
-          pass = table_row.manual_qc;
-          is_dev = table_row.is_dev;
-        END;
       END;
-      IF table_row;
-        time_comp  = String.new(text => "$t");
-        sample_id = table_row.sample_id;
-        study_id = table_row.study_id;
-        sample_name = table_row.sample_name;
-        lib = table_row.library_name;
-        library_id = table_row.asset_id;
-        libs_info.$lane_key.lib_name = lib;
-        libs_info.$lane_key.sample_name = sample_name;
-        libs_info.$lane_key.sample_id = sample_id;
-        libs_info.$lane_key.library_id = library_id;
-        libs_info.$lane_key.study_id = study_id;
-        IF study_id && !studies_info.$study_id.defined;
-          studies_info.$study_id = table_row.study_name;
-        END;
-      END;
+
+      row_info_to = c.stash.row_data.$lane_key || {};
+      time_comp = String.new(text => "$row_info_to.time_comp");
 -%]
 
 <tr>
-[%- IF sample_link -%]
-<td>
-[%- IF sample_id; lurl = [lims_url, 'samples', sample_id]; -%]
-[% IF study_id %]<a href="[% c.uri_for_action(c.controller('Checks').action_for('studies'), study_id) %]"><img src="/static/images/to_parent.png" alt="link to a study" /></a>[% END %]
-<a href="[% lurl.join('/') %]"><span class="lib nbsp">[% sample_name | html %]</span></a>
-[%- END -%]
-</td>
-[%- END -%]
-
 <td class="lib nbsp">
 <div class="rel_pos_container">
-[%- IF lane_collection.run_lane_plex_flags.$lane_key -%]
-<a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
+[%- IF lane_collection.run_lane_plex_flags.${lane_key} -%]
+  <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
-[%- IF sample_id %]<a href="[% c.uri_for_action(c.controller('Checks').action_for('samples'), sample_id) %]"><img src="/static/images/to_parent.png" alt="link to a sample" /></a>
-[%- END; -%]
-[%- IF lib; lurl = [lims_url, 'assets', library_id]; -%]
-<a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'name' => lib}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
-<a href="[% lurl.join('/') %]"><span class="lib nbsp">[% lib | html %]</span></a>
+<span class="lib nbsp">
+[%- IF row_info_to.id_library_lims; -%]
+  [%- IF !lane_collection.run_lane_plex_flags.${lane_key};
+        lurl = c.model('LimsServer').generate_url('library', row_info_to);
+  -%]
+    <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => row_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
+    <a href="[% lurl %]">[% row_info_to.id_library_lims | html %]</a><br />
+    <a href="[%- c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.id_sample_lims) -%]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
+    <a href="[%- c.model('LimsServer').generate_url('sample', row_info_to); -%]">[% row_info_to.sample_name4display | html %]</a>
+  [%- ELSE;
+    row_info_to.reset_as_pool();
+    lurl = c.model('LimsServer').generate_url('pool', row_info_to);
+  -%]
+    <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_library_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
+    <a href="[% lurl %]">[% row_info_to.id_library_lims | html %]</a>
+  [%- END -%]
 [%- END -%]
-[% IF is_dev %]<span class="watermark">R&amp;D</span>[% END %]
+</span>
+[% IF row_info_to.rnd %]<span class="watermark">R&amp;D</span>[% END %]
 </div>
 </td>
-[% url = c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run); %]
-<td class="id_run"><div class="rel_pos_container">
+<td class="id_run">
+<div class="rel_pos_container">
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run) %]" ><img src="/static/images/focus_on.png" alt="link to run checks" /></a>
 <a href="[% rurl = [npg_url, 'run', id_run]; rurl.join('/'); %]" title="date completed [% time_comp.truncate(10) %]">[% id_run %]</a>
-[%- IF num_cycles %]<br />[% num_cycles %][% END -%]
-</div></td>
+[%- IF row_info_to.num_cycles %]<br />[% row_info_to.num_cycles %][% END -%]
+</div>
+</td>
 
 [% PROCESS "ui_lanes/lane.tt2" %]
 </tr>
@@ -163,13 +132,31 @@
       column_counter = column_counter + 1;
     END;
 -%]
-
-[%- PROCESS "ui_lanes/lanes_total.tt2" -%]
+[%# Calculating totals for qXyield %]
+[% IF collection_all.size;
+      qx_collection = collection_all.search(class_name => 'qX_yield');
+      IF qx_collection.defined && qx_collection.size && qx_collection.size < 1000;
+        qX_position = 0;
+        FOREACH check_name IN checks_list;
+          column_counter = column_counter+1;
+          IF check_name == 'qX yield'; qX_position = column_counter; END;
+        END;
+%]
+<tr id="total">
+  <td colspan="[% qX_position - 1 %]" />
+  <td class="total">[% qxTotal | format_number %]</td>
+  [%- IF  column_counter - qX_position > 0 -%]
+    <td colspan="[% column_counter - qX_position %]" />
+  [%- END -%]
+</tr>
+[%-   END -%]
+[%- END -%]
+[%# Calculating totals for qXyield end %]
 [%- END -%]
 
 </table>
 
-[%- 
+[%-
   IF run_view;
     PROCESS ui_runs/annotations.tt2;
 

@@ -1,86 +1,144 @@
 package npg_qc_viewer::Model::SeqStore;
 
-use Carp;
 use Moose;
+use namespace::autoclean;
 use Readonly;
 
-use npg_common::run::file_finder;
+use npg_qc_viewer::Util::FileFinder;
+use npg_tracking::Schema;
+use npg_qc::autoqc::checks::check;
 
-BEGIN { extends 'Catalyst::Model' }
+extends 'Catalyst::Model::Factory::PerRequest';
+__PACKAGE__->config( class => 'npg_qc_viewer::Model::SeqStore' );
 
 our $VERSION = '0';
-## no critic (Documentation::RequirePodAtEnd)
+##no critic (Documentation::RequirePodAtEnd)
 
-Readonly::Scalar our $FILE_EXTENSION => q[fastqcheck];
+Readonly::Scalar our $FILE_EXTENSION  => q[fastqcheck];
 
 =head1 NAME
 
-npg_qc_viewer::Model::SeqStore - access to sequence store
+npg_qc_viewer::Model::SeqStore
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Catalyst model for accessing both short and long-term sequence store
+Catalyst model for accessing fastqcheck file storage.
+
+Extends the Catalyst::Model::Factory::PerRequest model to allow for
+cached data to be kept per request when looking for files.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 files
-
-A list of fastqcheck file paths for a run and position
+=head2 qc_schema
 
 =cut
+
+has 'qc_schema' => (
+  isa      => 'Maybe[npg_qc::Schema]',
+  is       => 'ro',
+  required => 0,
+);
+
+=head2 npg_tracking_schema
+
+=cut
+
+has 'npg_tracking_schema' => (
+  isa      => 'Maybe[npg_tracking::Schema]',
+  is       => 'ro',
+  required => 0,
+);
+
+has '_file_cache' => (
+  isa     => 'HashRef',
+  is      => 'ro',
+  default => sub { return {}; },
+);
+sub _add2cache {
+  my ( $self, $ref ) = @_;
+
+  $ref->{'qc_schema'}           = $self->qc_schema;
+  $ref->{'npg_tracking_schema'} = $self->npg_tracking_schema;
+
+  my $id_run = $ref->{'id_run'};
+  if ( !$self->_file_cache->{$id_run} ) {
+    my $finder = npg_qc_viewer::Util::FileFinder->new($ref);
+    $self->_file_cache->{$id_run} =
+      {'files' => $finder->files, 'db_lookup' => $finder->db_lookup};
+  }
+  return;
+}
+
+=head2 files
+
+A hash of fastqcheck file paths for a given query
+
+=cut
+
 sub files {
-    my @sargs = @_;
-    my $self        = shift @sargs;
-    my $rpt_key_map = shift @sargs;
-    my $db_lookup   = shift @sargs;
+  my @sargs       = @_;
+  my $self        = shift @sargs;
+  my $rpt_key_map = shift @sargs;    # tag_index position id_run
+  my $db_lookup   = shift @sargs;
 
-    if (@sargs && (ref $sargs[0]) eq q[ARRAY]) {   # this is a list of paths
-        $db_lookup = 0;
-        my $all_files = {};
-        my $count = 0;
-        foreach my $path (@{$sargs[0]}) {
-            my $files = $self->_files4one_path($rpt_key_map, $db_lookup, $path);
-            foreach my $ftype (keys %{$files}) {
-                $all_files->{$ftype} = $files->{$ftype};
-	    }
-	}
-        if (scalar keys %{$all_files}) {
-            $all_files->{db_lookup} = 0;
-	}
-        return $all_files;
-    } else {
-        return $self->_files4one_path($rpt_key_map, $db_lookup);
-    }
-    return;
+  my $ref = {};
+  $ref->{'id_run'}    = $rpt_key_map->{'id_run'};
+  $ref->{'db_lookup'} = $db_lookup;
+  #Checking for locations (passed as array)
+  if (@sargs && ( ref $sargs[0] ) eq q[ARRAY] ) {
+    $ref->{'location'}  = $sargs[0];
+  }
+  $self->_add2cache($ref);
+
+  return $self->_get_file_paths($rpt_key_map);
 }
 
-sub _files4one_path {
-    my ($self, $rpt_key_map, $db_lookup, $path) = @_;
+sub _get_file_paths {
+  my ( $self, $rpt_key_map) = @_;
 
-    my $ref = {
-            position          => $rpt_key_map->{position},
-            file_extension    => $FILE_EXTENSION,
-            with_t_file       => 1,
-            id_run            => $rpt_key_map->{id_run},
-            db_lookup         => $db_lookup,
-              };
-    if (exists $rpt_key_map->{tag_index} && defined $rpt_key_map->{tag_index}) {
-        $ref->{tag_index}                = $rpt_key_map->{tag_index};
-        $ref->{with_t_file}              = 0;
-        if ($path) { $ref->{lane_archive_lookup}  = 0; }
+  my $id_run = $rpt_key_map->{'id_run'};
+  my $fnames = {};
+  my $file_cache = $self->_file_cache->{$id_run}->{'files'};
+
+  my $file_name = _filename($rpt_key_map);
+  if ($file_cache->{$file_name}) {
+    $fnames->{'forward'} = $file_cache->{$file_name};
+  }
+
+  if ( !$fnames->{'forward'} ) { # Get for forward and reverse with end
+    $file_name = _filename($rpt_key_map, 1);
+    if ($file_cache->{$file_name}) {
+      $fnames->{'forward'} = $file_cache->{$file_name};
     }
-    if ($path) { $ref->{archive_path} = $path; }
-    my $finder = npg_common::run::file_finder->new($ref);
-    my $files =  $finder->files();
-    if (scalar keys %{$files}) {
-        $files->{db_lookup} = $finder->db_lookup;
+    $file_name = _filename($rpt_key_map, 2);
+    if ($file_cache->{$file_name}) {
+      $fnames->{'reverse'} = $file_cache->{$file_name};
     }
-    return $files;
+  }
+
+  #Look for the extra heatmap for tag
+  if ( !exists $rpt_key_map->{'tag_index'}) {
+    $file_name = _filename($rpt_key_map, q[t]);
+    if ($file_cache->{$file_name}) {
+      $fnames->{'tags'} = $file_cache->{$file_name};
+    }
+  }
+
+  if ( scalar keys %{$fnames} ) { #Keep the value of db_lookup for the template
+    $fnames->{'db_lookup'} = $self->_file_cache->{$id_run}->{'db_lookup'};
+  }
+
+  return $fnames;
 }
 
-no Moose;
+sub _filename {
+  my ($rpt_key_map, $end) = @_;
+  return npg_qc::autoqc::checks::check
+    ->create_filename($rpt_key_map, $end) . q[.] . $FILE_EXTENSION;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -96,13 +154,19 @@ __END__
 
 =item Readonly
 
-=item Carp
-
 =item Moose
 
-=item Catalyst::Model
+=item namespace::autoclean
 
-=item npg_common::run::file_finder
+=item Catalyst::Model::Factory::PerRequest
+
+=item npg_qc_viewer::Util::FileFinder
+
+=item npg_qc::Schema
+
+=item npg_qc::autoqc::checks::check
+
+=item npg_tracking::Schema
 
 =back
 
@@ -114,9 +178,11 @@ __END__
 
 Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
+Jaime Tovar E<lt>jmtc@sanger.ac.ukE<gt>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2015 Genome Research Ltd.
 
 This file is part of NPG software.
 

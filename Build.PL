@@ -6,7 +6,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
   use File::Path qw(make_path remove_tree);
   use File::Which qw(which);
-  use Cwd qw(abs_path);
+  use npg_tracking::util::abs_path qw(abs_path);
   use File::Basename;
 
   my $c_tools = {
@@ -32,16 +32,29 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
   sub _samtools_option {
     my $self = shift;
-    my @found = which('samtools');
+
+    my @found = which('samtools1');
     my $samtools = @found ? abs_path( $found[0] ) : q[];
-    if ($samtools) { 
-      $samtools = dirname $samtools;
-      if ($self->verbose) {
-        warn "Found samtools in $samtools\n";
+    @found = which('htsfile');
+    my $hts = @found ? abs_path( $found[0] ) : q[];
+    my $pkgs = [];
+    if ($samtools && $hts) {
+      foreach my $p (($samtools, $hts)) {
+        $p = dirname $p;
+        if ( $p =~ m{/bin\Z}smx ) {
+          $p = dirname $p;
+        }
+        if ($self->verbose) {
+          warn "Found $p\n";
+        }
+        push @{$pkgs}, $p;
+        $samtools = 'SAMTOOLS_LOC=' . $samtools;
       }
-      $samtools = 'SAMTOOLS_LOC=' . $samtools;
+      $pkgs->[0] = 'SAMTOOLS_LOC=' . $pkgs->[0];
+      $pkgs->[1] = 'HTSLIB_LOC='   . $pkgs->[1];
     }
-    return $samtools;
+
+    return $pkgs;
   }
 
   sub ACTION_build {
@@ -58,19 +71,20 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
         my $bdir = _c_build_dir($tool);
         make_path $bdir;
         my $silent = $self->verbose ? q[] : '--silent';
-        my $samtools = q[];
-
+        my $extra_info = q[];
+        
         if ($c_tools->{$tool}->{'samtools'}) {
-          $samtools = $self->_samtools_option();
-          if (!$samtools) {
-            warn 'Samtools executable is not on the path, ' .
+          my @pkgs = @{$self->_samtools_option()};
+          if (!@pkgs) {
+            warn 'Samtools and/or hts executables are not on the path, ' .
                  "skipping $tool build\n";
             next;
           }
+          $extra_info = join q[ ], @pkgs;
         }
 
         my $command = sprintf 'make %s --directory %s %s',
-                      $silent, _c_src_dir($tool), $samtools;
+                      $silent, _c_src_dir($tool), $extra_info;
         if (system $command) {
           die "Failed to compile $ename";
         }
@@ -148,20 +162,22 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 EOF
 
 my $extended_build_requires = {
+                'Archive::Extract'                => 0,
+                'DateTime::Format::SQLite'        => 0,
+                'File::Copy'                      => 0,
+                'File::Path'                      => 0,
                 'Pod::Usage'                      => 0,
-                'npg_testing::db'                 => 0,
                 'Test::Deep'                      => '0.103',
                 'Test::Distribution'              => 0,
                 'Test::Perl::Critic'              => 0,
                 'Test::Warn'                      => '0.11',
-                'DateTime::Format::SQLite'        => 0,
-                'File::Copy'                      => 0,
-                'File::Path'                      => 0,
+                'npg_testing::db'                 => 0,
                 'npg_tracking::Schema'            => 0,
 };
 
 my $extended_requires = {
                 'autodie'                         => '2.10',
+                'Class::Load'                     => '0',
                 'Class::Std'                      => '0.0.8',
                 'Compress::Zlib'                  => 0,
                 'Cwd'                             => 0,
@@ -186,6 +202,8 @@ my $extended_requires = {
                 'HTTP::Request'                   => 0,
                 'HTTP::Response'                  => 0,
                 'IPC::SysV'                       => 0,
+                'IO::Compress::Xz'                => '2.068',
+                'IO::Uncompress::UnXz'            => '2.068',
                 'JSON'                            => '2.12',
                 'lib'                             => '0.5565',
                 'Lingua::EN::Inflect'             => 0,
@@ -200,7 +218,6 @@ my $extended_requires = {
                 'Moose::Meta::Class'              => 0,
                 'Moose::Role'                     => '0.93',
                 'Moose::Util::TypeConstraints'    => 0,
-                'MooseX::Aliases'                 => 0,
                 'MooseX::AttributeCloner'         => 0,
                 'MooseX::AttributeHelpers'        => 0,
                 'MooseX::ClassAttribute'          => 0,
@@ -208,6 +225,7 @@ my $extended_requires = {
                 'MooseX::NonMoose'                => 0,
                 'MooseX::Storage'                 => 0,
                 'MooseX::StrictConstructor'       => '0.08',
+                'namespace::autoclean'            => 0,
                 'Parallel::ForkManager'           => 0,
                 'PDL::Core'                       => 0,
                 'PDL::Lite'                       => 0,
@@ -218,11 +236,18 @@ my $extended_requires = {
                 'npg_common::Alignment'                    => 0,
                 'npg_common::extractor::fastq'             => 0,
                 'npg_common::fastqcheck'                   => 0,
-                'npg_common::roles::run::lane::file_names' => 0,
                 'npg_common::roles::software_location'     => 0,
-                'npg_common::sequence::reference::base_count' => 0,
+                'npg_common::sequence::reference::base_count'  => 0,
                 'npg_testing::db'                          => 0,
                 'npg_tracking::data::reference::list'      => 0,
+                'npg_tracking::data::bait::find'           => 0,
+                'npg_tracking::data::snv::find'            => 0,
+                'npg_tracking::glossary::composition'      => 0,
+                'npg_tracking::glossary::composition::factory' => 0,
+                'npg_tracking::glossary::composition::component::illumina' => 0,
+                'npg_tracking::glossary::run'              => 0,
+                'npg_tracking::glossary::lane'             => 0,
+                'npg_tracking::glossary::subset'           => 0,
                 'npg_tracking::glossary::tag'              => 0,
                 'npg_tracking::illumina::run::folder'      => 0,
                 'npg_tracking::illumina::run::short_info'  => 0,
@@ -231,6 +256,7 @@ my $extended_requires = {
                 'npg_tracking::util::types'                => 0,
                 'st::api::base'                            => 0,
                 'st::api::lims'                            => 0,
+                'WTSI::DNAP::Warehouse::Schema'            => 0,
 };
 
 my $build_requires = {
@@ -295,7 +321,7 @@ my $builder = $class->new(
                 'module_name'         => 'npg_qc',
                 'dist_author'         => q(npg <npg@sanger.ac.uk>),
                 'dist_version'        => $class->git_tag(),
-                'dist_abstract'       => 'Illumina and WTSI quality control for NGS data',
+                'dist_abstract'       => 'Illumina and WTSI quality control for Illumina sequencing data',
                 'license'             => 'gpl',
 
           'configure_requires' => {

@@ -6,6 +6,7 @@
 package npg_qc::autoqc::qc_store;
 
 use Moose;
+use namespace::autoclean;
 use Try::Tiny;
 use Carp;
 use List::MoreUtils qw/any/;
@@ -215,7 +216,6 @@ sub run_from_db {
   return $c;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -230,6 +230,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Carp
 

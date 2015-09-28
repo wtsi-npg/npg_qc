@@ -1,11 +1,7 @@
-# Author:        Marina Gourtovaia
-# Created:       10 May 2012
-#
-#
-
 package npg_qc::autoqc::checks::pulldown_metrics;
 
 use Moose;
+use namespace::autoclean;
 use English qw( -no_match_vars );
 use Carp;
 use File::Spec::Functions qw( catdir );
@@ -41,8 +37,8 @@ Readonly::Hash   my %PICARD_METRICS_FIELDS_MAPPING => {
     'HS_LIBRARY_SIZE'      => 'library_size',
                                        };
 
-has '+input_file_ext' => (default => 'bam',);
-has '+aligner'        => (default => 'fasta',);
+has '+file_type'         => (default => 'bam',);
+has '+aligner'           => (default => 'fasta',);
 
 has 'alignments_in_bam'  => (
 	is => 'ro',
@@ -217,7 +213,6 @@ carp q[Comparing intervals files with cmd: ], $cmd;
     return 0;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 
@@ -266,6 +261,8 @@ npg_qc::autoqc::checks::pulldown_metrics - a QC check to determine whether the p
 
 =item Moose
 
+=item namespace::autoclean
+
 =item English
 
 =item Carp
@@ -286,7 +283,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 GRL, by Marina Gourtovaia
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

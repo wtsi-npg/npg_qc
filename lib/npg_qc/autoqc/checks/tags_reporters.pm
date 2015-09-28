@@ -1,15 +1,8 @@
-# Author:        Kevin Lewis
-# Created:       2013-11-14
-#
-#
-
 package npg_qc::autoqc::checks::tags_reporters;
 
-use strict;
-use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
-use Data::Dumper;
 use File::Basename;
 use File::Slurp;
 use File::Spec::Functions qw(catfile catdir);
@@ -18,7 +11,6 @@ use JSON;
 use npg_qc::utils::iRODS;
 use npg_qc::autoqc::types;
 use Readonly;
-use FindBin qw($Bin);
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find
@@ -27,14 +19,12 @@ with qw(npg_tracking::data::reference::find
 
 our $VERSION = '0';
 
-# Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
-Readonly::Scalar my $SAMTOOLS_NAME => q[/software/solexa/npg/bin/samtools_irods];
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $TAGS_LIST_FILENAME => q[tag_group_6.tags];
 Readonly::Scalar my $REPORTERS_LIST_FILENAME => q[tag_group_42.tags];
 Readonly::Scalar my $DB_LOOKUP_DEFAULT => 1;
 
-has '+input_file_ext' => (default => $EXT,);
+has '+file_type' => (default => $EXT,);
 
 ##############################################################################
 # Input/output paths
@@ -43,13 +33,10 @@ has '+input_file_ext' => (default => $EXT,);
 #  used to lazy-build the input output paths below
 ##############################################################################
 
-#############################################################
-# in_dir: 
-#############################################################
 has 'in_dir'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          lazy_build  => 1,
-                        );
+                   is         => 'ro',
+                   lazy_build  => 1,
+                 );
 sub _build_in_dir {
 	my $self = shift;
 
@@ -58,13 +45,10 @@ sub _build_in_dir {
 	return $ip;
 }
 
-########################################
-# out_dir: 
-########################################
 has 'out_dir'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          lazy_build  => 1,
-                        );
+                    is         => 'ro',
+                    lazy_build  => 1,
+                  );
 sub _build_out_dir {
 	my $self = shift;
 
@@ -223,27 +207,7 @@ has 'reads_from_bam_cmd'   => ( is      => 'ro',
 sub _build_reads_from_bam_cmd {
 	my $self = shift;
 
-	return sprintf q[%s view %s ], $self->samtools_name, $self->lane_bam_file;
-}
-
-########################################################################################
-# you can override the executable name. May be useful for variants like "samtools_irods"
-########################################################################################
-has 'samtools_name' => (
-	is => 'ro',
-	isa => 'Str',
-	default => $SAMTOOLS_NAME,
-);
-
-has 'samtools' => (
-	is => 'ro',
-	isa => 'NpgCommonResolvedPathExecutable',
-	lazy_build => 1,
-	coerce => 1,
-);
-sub _build_samtools {
-	my ($self) = @_;
-	return $self->samtools_name;
+	return sprintf q[%s view %s ], $self->samtools_irods, $self->lane_bam_file;
 }
 
 override 'can_run' => sub {
@@ -371,23 +335,10 @@ override 'execute' => sub {
 	$self->result->tag_totals_pct(\@tag_totals_pct);
 	## use critic
 
-#	$self->result->pass = 1;  # no pass/fail criterion yet, so leave undef
-
 	return 1;
 };
 
-################
-# auxiliary subs
-################
-
-
-####################
-# private attributes
-####################
-
-no Moose;
 __PACKAGE__->meta->make_immutable();
-
 
 1;
 
@@ -425,13 +376,19 @@ npg_qc::autoqc::checks::tags_reporters
 
 =head1 DEPENDENCIES
 
+=over
+
+=item namespace::autoclean
+
+=back
+
 =head1 AUTHOR
 
-    Kevin Lewis, kl2
+Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 GRL, by Kevin Lewis
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

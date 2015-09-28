@@ -49,6 +49,34 @@ sub criterion {
   return;
 }
 
+sub check_name {
+  my $self = shift;
+  my $name = 'sequence mismatch';
+  if ($self->sequence_type) {
+    $name .= q[ ] . $self->sequence_type;
+  }
+  $name =~ s/_/ /gsmx;
+  return $name;
+}
+
+sub subset {
+  my $self = shift;
+  return $self->sequence_type;
+}
+
+sub reference_for_title {
+  my $self      = shift;
+  my $result    = {};
+
+  if ( $self->reference ) {
+    my ( $species, $version ) = ( $self->reference =~ /references\/ ([^\/]+) \/ ([^\/]+)/xms );
+    $result->{'species'} = $species;
+    $result->{'version'} = $version;
+  }
+
+  return $result;
+}
+
 no Moose;
 
 1;
@@ -62,19 +90,22 @@ __END__
 
 =head1 SYNOPSIS
 
-
 =head1 DESCRIPTION
-
 
 =head1 SUBROUTINES/METHODS
 
 =head2 check_name - human readable check name
+
+=head2 subset - returns the value of the sequence_type attribute
 
 =head2 forward_average_percent_error - forware average percentage of error across all cycle
 
 =head2 reverse_average_percent_error - reverse average percentage of error across all cycles
 
 =head2 criterion
+
+=head2 reference_for_title - Trimmed version of the reference so it can be 
+used in a view. Returns a hash reference with keys for species and version.
 
 =head1 DIAGNOSTICS
 
@@ -93,6 +124,8 @@ __END__
 =item PDL::Core
 
 =item PDL::Primitive
+
+=item npg_qc::autoqc::role::result
 
 =back
 

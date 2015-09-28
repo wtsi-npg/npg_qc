@@ -8,6 +8,7 @@ package npg_qc::file_store;
 use strict;
 use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw{-no_match_vars};
 use File::Spec;
@@ -141,7 +142,6 @@ sub save_files {
   return $count;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -177,14 +177,27 @@ Saves into a database fastqcheck files found in the given paths. Also saves a nu
 
 =head1 DEPENDENCIES
 
-Moose
-MooseX::Getopt
-Carp
-English qw{-no_match_vars}
-File::Spec
-Perl6::Slurp
-File::Basename
-npg_qc::Schema
+=over
+
+=item Moose
+
+=item namespace::autoclean
+
+=item MooseX::Getopt
+
+=item Carp
+
+=item English qw{-no_match_vars}
+
+=item File::Spec
+
+=item Perl6::Slurp
+
+=item File::Basename
+
+=item npg_qc::Schema
+
+=back
 
 =head1 INCOMPATIBILITIES
 

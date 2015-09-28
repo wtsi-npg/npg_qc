@@ -2,7 +2,9 @@
 
 # $VERSION = '0';
 
-declare -a repos_roots=('/lustre/scratch109/srpipe/genotypes' '/lustre/scratch110/srpipe/genotypes' )
+GTCK_REPOS_ROOT="${GTCK_REPOS_ROOT:-/nfs/srpipe_references/genotypes /lustre/scratch109/srpipe/genotypes /lustre/scratch110/srpipe/genotypes}"
+
+printf '*** gtck_install_to_repos.sh ***\n'
 
 if [[ ! -e latest_combined_file.txt ]]
 then
@@ -18,7 +20,7 @@ fi
 
 dttag="$(cat latest_combined_file.txt)"
 
-for repos_root in "${repos_roots[@]}"
+for repos_root in ${GTCK_REPOS_ROOT} # single value or space-delimited list
 do
   for ext in aix bin six
   do

@@ -1,6 +1,7 @@
 package npg_qc_viewer::Model::NpgQcDB;
 
 use Moose;
+use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
@@ -22,9 +23,11 @@ A model for the NPG QC database DBIx schema
 =cut
 
 __PACKAGE__->config(
-    schema_class => 'npg_qc::Schema',
-    connect_info => [], #a fall-back position if connect_info is not defined in the config file
+  schema_class => 'npg_qc::Schema',
+  connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
@@ -38,6 +41,8 @@ __END__
 =over
 
 =item Moose
+
+=item namespace::autoclean
 
 =item Catalyst::Model::DBIC::Schema
 

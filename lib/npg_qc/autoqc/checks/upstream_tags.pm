@@ -1,11 +1,7 @@
-# Author:        Kevin Lewis
-# Created:       2013-09-02
-#
-#
-
 package npg_qc::autoqc::checks::upstream_tags;
 
 use Moose;
+use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Fatal qw(open close);
@@ -51,7 +47,7 @@ Readonly::Scalar my $SLOT_POS  => 4;
 
 Readonly::Scalar our $DEFAULT_JAVA_XMX => q{-Xmx1000m};
 
-has '+input_file_ext' => (default => $EXT,);
+has '+file_type' => (default => $EXT,);
 
 ##############################################################################
 # Input/output paths
@@ -889,9 +885,7 @@ sub _generate_run_info_row {
 # private attributes
 ####################
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
-
 
 1;
 
@@ -929,13 +923,19 @@ npg_qc::autoqc::checks::upstream_tags
 
 =head1 DEPENDENCIES
 
+=over
+
+=item namespace::autoclean
+
+=back
+
 =head1 AUTHOR
 
-    Kevin Lewis, kl2
+Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 GRL, by Kevin Lewis
+Copyright (C) 2015 GRL
 
 This file is part of NPG.
 

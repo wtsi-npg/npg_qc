@@ -1,20 +1,13 @@
-# Author:        Kevin Lewis
-# Created:       2011-09-29
-#
-#
-
 package npg_qc::autoqc::checks::genotype;
 
-use strict;
-use warnings;
 use Moose;
+use namespace::autoclean;
 use Carp;
 use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
 use List::MoreUtils qw { any };
 use File::Slurp;
 use JSON;
-use Data::Dumper;
 use npg_qc::utils::bam_genotype;
 use npg_qc::utils::iRODS;
 use npg_qc::autoqc::types;
@@ -39,18 +32,18 @@ Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $SEQUENOM_QC_PLEX => q[W30467];
 Readonly::Scalar my $DEFAULT_QC_PLEX => q[sequenom_fluidigm_combo];
 Readonly::Scalar my $DEFAULT_SNP_CALL_SET => q[W30467];
-Readonly::Scalar my $DEFAULT_MIN_COMMON_SNPS => 21;
+Readonly::Scalar my $DEFAULT_MIN_COMMON_SNPS => 18;
 Readonly::Scalar my $DEFAULT_RELIABLE_READ_DEPTH => 5;
 Readonly::Scalar my $DEFAULT_POSS_DUP_LEVEL => 95;
-Readonly::Scalar my $DEFAULT_MIN_SAMPLE_CALL_RATE => 95;
+Readonly::Scalar my $DEFAULT_MIN_SAMPLE_CALL_RATE => 75;
 Readonly::Scalar my $MATCH_PASS_THRESHOLD => 0.95;
 Readonly::Scalar my $MATCH_FAIL_THRESHOLD => 0.50;
 Readonly::Scalar my $MAX_ALT_MATCHES => 4;
 
-has '+input_file_ext' => (default => $EXT,);
-has '+aligner'        => (default => 'fasta',);
-has '+id_run' => (required => 0, );
-has '+position' => (isa => 'Maybe[NpgTrackingLaneNumber]', required => 0, );
+has '+file_type' => (default => $EXT,);
+has '+aligner'   => (default => 'fasta',);
+has '+id_run'    => (required => 0, );
+has '+position'  => (isa => 'Maybe[NpgTrackingLaneNumber]', required => 0, );
 
 # Human references repository - look under this directory for human genome reference files
 has 'human_references_repository' => (
@@ -453,22 +446,22 @@ override 'can_run' => sub {
 	# make sure that a sample name has been supplied and that the bam file is aligned with one of the recognised human references
 
 	if(!defined $self->sample_name) {
-		$self->_cant_run_ms('No sample name specified');
+		$self->result->add_comment('No sample name specified');
 		return 0;
 	}
 
 	if(!$self->alignments_in_bam) {
-		$self->_cant_run_ms('alignments_in_bam is false');
+		$self->result->add_comment('alignments_in_bam is false');
 		return 0;
 	}
 
 	if(!defined($self->reference_fasta) || (! -r $self->reference_fasta)) {
-		$self->_cant_run_ms('Reference genome missing or unreadable');
+		$self->result->add_comment('Reference genome missing or unreadable');
 		return 0;
 	}
 
 	if(! any { $_ =~ $self->reference_fasta; } (keys %{$self->_ref_to_snppos_suffix_map})) {
-		$self->_cant_run_ms('Specified reference genome may be non-human');
+		$self->result->add_comment('Specified reference genome may be non-human');
 		return 0;
 	}
 
@@ -481,7 +474,6 @@ override 'execute' => sub {
 	return 1 if super() == 0;
 
 	if(!$self->can_run()) {
-		$self->result->add_comment($self->_cant_run_ms);
 		return 1;
 	}
 
@@ -650,7 +642,6 @@ sub _build__ref_to_snppos_suffix_map {
 	}
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 
@@ -690,15 +681,21 @@ npg_qc::autoqc::checks::genotype - compare genotype from bam with Sequenom QC re
 
 =head1 DEPENDENCIES
 
+=over
+
+=item namespace::autoclean
+
+=back
+
 =head1 AUTHOR
 
-    Kevin Lewis, kl2
+Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Kevin Lewis
+Copyright (C) 2015 GRL
 
-This file is part of NPG.
+    This file is part of NPG.
 
 NPG is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
