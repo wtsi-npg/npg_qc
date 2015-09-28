@@ -177,7 +177,7 @@ sub search_sample_by_sample_id {
 
 =cut
 sub fetch_tag_index_array_for_run_position {
-  my ($self, $id_run, $position);
+  my ($self, $id_run, $position) = @_;
 
   if(!defined $id_run) {
     croak q[Id run is required when searching for tag_indexes but not defined];
