@@ -44,7 +44,7 @@ sub get_outcomes_as_hash{
 sub update_outcome_with_libraries {
   my ($self, $lane_ent, $outcome, $username, $tag_indexes) = @_;
 
-  my $outcome_dict_object = $lane_ent->valid_outcome($outcome);
+  my $outcome_dict_object = $lane_ent->find_valid_outcome($outcome);
   if($outcome_dict_object->is_final_outcome) {
     my $outcomes_libraries = $lane_ent->fetch_mqc_library_outcomes($tag_indexes);
     if($outcome_dict_object->is_accepted) {
