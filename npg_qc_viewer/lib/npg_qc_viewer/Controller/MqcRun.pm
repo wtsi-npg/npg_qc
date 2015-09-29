@@ -17,9 +17,10 @@ with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 
 our $VERSION = '0';
 
-Readonly::Scalar my $MQC_ROLE     => q[manual_qc];
-Readonly::Scalar my $MQC_LANE_ENT => q[MqcOutcomeEnt];
-Readonly::Scalar my $MQC_LIB_ENT  => q[MqcLibraryOutcomeEnt];
+Readonly::Scalar my $MQC_ROLE      => q[manual_qc];
+Readonly::Scalar my $MQC_LANE_ENT  => q[MqcOutcomeEnt];
+Readonly::Scalar my $MQC_LIB_ENT   => q[MqcLibraryOutcomeEnt];
+Readonly::Scalar my $MQC_LIB_LIMIT => 50;
 
 sub _authenticate {
   my ( $self, $c ) = @_;
@@ -116,6 +117,10 @@ sub mqc_libraries_GET {
     my $current_lane_outcome = $ent_lane ? $ent_lane->mqc_outcome->short_desc
                                          : q[Undecided];
 
+    $hash_entity->{'mqc_lib_limit'}          = $MQC_LIB_LIMIT;
+    #TODO add plex stats
+    # - phix tag_index
+    # - number of plexes
     # Return a 200 OK, with the data in entity
     # serialized in the body
     if($ent) {
