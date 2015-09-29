@@ -49,31 +49,27 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
   //Read information about lanes from page.
   var lanes = []; //Lanes without previous QC, blank BG
   var lanesWithBG = []; //Lanes with previous QC, BG with colour
-  //Select non-qced lanes.
-  $('.lane_mqc_control').each(function (i, obj) {
-    obj = $(obj);
-    var parent = obj.parent();
-    //Not considering lanes previously marked as passes/failed
-    if(parent.hasClass('passed') || parent.hasClass('failed')) {
-      lanesWithBG.push(parent);
-    } else {
-      var tag_index = obj.data('tag_index');
-      if (typeof (tag_index) != undefined && tag_index != null){
-        if(tag_index != 0 && tag_index != 888) {
-          lanes.push(parent);
-        }
-      } else {
-        lanes.push(parent);
-      }
-    }
-  });
 
   // Getting the run_id from the title of the page using the qc part too.
-  var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document).find("title").text());
+  var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
+                                                        .find("title")
+                                                        .text());
   //If id_run //TODO move to object.
   if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
     var id_run = runTitleParserResult.id_run;
     var prodConfiguration = new NPG.QC.ProdConfiguration();
+
+    //Select non-qced lanes.
+    $('.lane_mqc_control').each(function (i, obj) {
+      obj = $(obj);
+      var parent = obj.parent();
+      //Not considering lanes previously marked as passes/failed
+      if(parent.hasClass('passed') || parent.hasClass('failed')) {
+        lanesWithBG.push(parent);
+      } else {
+        lanes.push(parent);
+      }
+    });
 
     if (runTitleParserResult.isRunPage) {
       window.console && console.log("Run page");
@@ -81,7 +77,7 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
         url: "/mqc/mqc_runs/" + id_run,
         cache: false
       }).done(function() {
-        var control = new NPG.QC.RunMQCControl(prodConfiguration);
+        var control = new NPG.QC.RunPageMQCControl(prodConfiguration);
         var mqc_run_data = jqxhr.responseJSON;
         if(control.isStateForMQC(mqc_run_data)) {
           var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);
@@ -180,6 +176,7 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
               function (mqc_run_data, runMQCControl, lanes) {
                 //Show working icons
                 for(var i = 0; i < lanes.length; i++) {
+                  //TODO checar que el tag este en la lista de tags.
                   lanes[i].children('.lane_mqc_control').each(function(j, obj){
                     obj = $(obj);
                     obj.html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
