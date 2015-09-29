@@ -116,8 +116,6 @@ sub mqc_libraries_GET {
                      ->find({'id_run' => $id_run, 'position' => $position},);
     my $current_lane_outcome = $ent_lane ? $ent_lane->mqc_outcome->short_desc
                                          : q[Undecided];
-
-    $hash_entity->{'mqc_lib_limit'}          = $MQC_LIB_LIMIT;
     #TODO add plex stats
     # - phix tag_index
     # - number of plexes
@@ -125,10 +123,14 @@ sub mqc_libraries_GET {
     # serialized in the body
     if($ent) {
       my $hash_entity = $self->_fill_entity_for_response($id_run, $ent, $authenticated, $c);
+      my $tags = $c->model('MLWarehouseDB')
+                   ->fetch_tag_index_array_for_run_position($id_run, $position);
+      $hash_entity->{'mqc_lib_limit'}          = $MQC_LIB_LIMIT;
       $hash_entity->{'position'}             = $position;
       ##### Check if there are mqc values and add.
       $hash_entity->{'qc_plex_status'}       = $qc_outcomes;
       $hash_entity->{'current_lane_outcome'} = $current_lane_outcome;
+      $hash_entity->{'tags'}                 = $tags;
 
       $self->status_ok($c, entity => $hash_entity,);
     }
