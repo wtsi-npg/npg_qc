@@ -104,11 +104,12 @@ sub _update_outcome {
         ->update_outcome_with_libraries($ent, $new_outcome, $username, $tags);
     } else { # Working as library MQC
       $ent = $c->model('NpgQcDB')
-               ->resultset('MqcOutcomeEnt')
+               ->resultset('MqcLibraryOutcomeEnt')
                ->search_library_outcome_ent(
                  $id_run,
                  $position,
                  $tag_index,
+                 $username
       );
       $ent->update_outcome($new_outcome, $username);
     }
