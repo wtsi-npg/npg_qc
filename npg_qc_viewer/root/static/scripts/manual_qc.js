@@ -61,6 +61,7 @@ var NPG;
       function MQCControl(index, abstractConfiguration) {
         this.outcome               = null;  // Current outcome (Is updated when linked to an object in the view)
         this.index                 = index; // Index of control in the page.
+        this.lane_control          = null;  // Container linked to this controller
         this.abstractConfiguration = abstractConfiguration;
 
         this.CONFIG_ACCEPTED_PRELIMINARY = 'Accepted preliminary';
@@ -72,6 +73,12 @@ var NPG;
 
         //container names
         this.LANE_MQC_WORKING           = 'lane_mqc_working';
+        this.LANE_MQC_WORKING_CLASS     = '.' + this.LANE_MQC_WORKING;
+
+        //Variable names for data from the DOM
+        this.DATA_ID_RUN                = 'id_run';
+        this.DATA_POSITION              = 'position';
+        this.DATA_TAG_INDEX             = 'tag_index';
       }
 
       /*Insert here*/
@@ -215,17 +222,7 @@ var NPG;
        */
       function LaneMQCControl(index, abstractConfiguration) {
         NPG.QC.MQCControl.call(this, index, abstractConfiguration);
-        this.lane_control          = null;  // Container linked to this controller
-        this.abstractConfiguration = abstractConfiguration;
-
         this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome_lane";
-
-        //Variable names for data from the DOM
-        this.DATA_ID_RUN                = 'id_run';
-        this.DATA_POSITION              = 'position';
-        this.DATA_TAG_INDEX             = 'tag_index';
-
-        this.LANE_MQC_WORKING_CLASS     = '.' + this.LANE_MQC_WORKING;
       }
 
       LaneMQCControl.prototype = new NPG.QC.MQCControl();
@@ -335,16 +332,7 @@ var NPG;
        */
       function LibraryMQCControl(index, abstractConfiguration) {
         NPG.QC.MQCControl.call(this, index, abstractConfiguration);
-        this.lane_control          = null;  // Container linked to this controller
-
         this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome_library";
-
-        //Variable names for data from the DOM
-        this.DATA_ID_RUN                = 'id_run';
-        this.DATA_POSITION              = 'position';
-        this.DATA_TAG_INDEX             = 'tag_index';
-
-        this.LANE_MQC_WORKING_CLASS     = '.' + this.LANE_MQC_WORKING;
       }
 
       LibraryMQCControl.prototype = new NPG.QC.MQCControl();
@@ -528,6 +516,37 @@ var NPG;
       };
 
       /**
+       * Uses the data from mqc_run_data (list of tag_indexes) to filter the
+       * array of lanes from the page. It creates a new array which contains
+       * only lanes with tag_indexes which need to be qc'ed (without
+       * tag_index in {0, phix, empty}).
+       * @param mqc_run_data data from REST
+       * @param lanes dom elements from page
+       * @returns {Array}
+       */
+      LanePageMQCControl.prototype.onlyQCAble = function (mqc_run_data, lanes) {
+        this.validateMQCData(mqc_run_data);
+        if(typeof(lanes) === "undefined"
+            || lanes == null) {
+          throw new Error("invalid arguments");
+        }
+        var lanes_temp = [];
+        for(var i = 0; i < lanes.length; i++) {
+          var lane = lanes[i];
+          var cells = lane.children('.lane_mqc_control')
+          for(j = 0; j < cells.length; j++) {
+            obj = $(cells[j]); //Wrap as an jQuery object.
+            var tag_index = obj.data(this.DATA_TAG_INDEX);
+            tag_index = String(tag_index);
+            if($.inArray(tag_index, mqc_run_data.tags) != -1) {
+              lanes_temp.push(lane);
+            }
+          }
+        }
+        return lanes_temp;
+      };
+
+      /**
        * Iterates through lanes and shows the outcomes
        * @param mqc_run_data
        * @param lanes
@@ -550,7 +569,7 @@ var NPG;
 
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
-          for(j = 0; j < cells.length; j++) {
+          for(var j = 0; j < cells.length; j++) {
             obj = $(cells[j]); //Wrap as an jQuery object.
             //Lane from row.
             var tag_index = obj.data(this.DATA_TAG_INDEX);

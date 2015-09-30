@@ -135,6 +135,9 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
       }).done(function() {
         var control = new NPG.QC.LanePageMQCControl(prodConfiguration);
         var mqc_run_data = jqxhr.responseJSON;
+        //Filter lanes for qc using data from REST
+        lanes = control.onlyQCAble(mqc_run_data, lanes);
+
         if(control.isStateForMQC(mqc_run_data)) {
           all_accept.off("click").on("click", function () {
             var new_outcome;
@@ -170,34 +173,22 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
           all_reject.show();
           all_und.show();
 
-          //var DWHMatch = control.laneOutcomesMatch(lanesWithBG, mqc_run_data);
-          if (true) /*(DWHMatch.outcome)*/ {
-            control.initQC(mqc_run_data, lanes,
-              function (mqc_run_data, runMQCControl, lanes) {
-                //Show working icons
-                for(var i = 0; i < lanes.length; i++) {
-                  //TODO checar que el tag este en la lista de tags.
-                  lanes[i].children('.lane_mqc_control').each(function(j, obj){
-                    obj = $(obj);
-                    obj.html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
-                  });
-                }
-                runMQCControl.prepareLanes(mqc_run_data, lanes);
-              },
-              function () { //There is no mqc so I just remove the working image and padding for anchor
-                $('.lane_mqc_working').empty();
+          control.initQC(mqc_run_data, lanes,
+            function (mqc_run_data, runMQCControl, lanes) {
+              //Show working icons
+              for(var i = 0; i < lanes.length; i++) {
+                //TODO checar que el tag este en la lista de tags.
+                lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                  obj = $(obj);
+                  obj.html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                });
               }
-            );
-          } else {
-            $("#ajax_status").append("<li class='failed_mqc'>"
-                + "Conflicting data when comparing Data Ware House and Manual QC databases for run: "
-                + id_run
-                + ", lane: "
-                + DWHMatch.position
-                + ". Displaying of QC widgets aborted.</li>");
-            //Clear progress icon
-            $('.lane_mqc_working').empty();
-          }
+              runMQCControl.prepareLanes(mqc_run_data, lanes);
+            },
+            function () { //There is no mqc so I just remove the working image and padding for anchor
+              $('.lane_mqc_working').empty();
+            }
+          );
         } else {
           control.showMQCOutcomes(jqxhr.responseJSON, lanes);
         } //if(true)
