@@ -39,17 +39,17 @@ has 'java_max_heap_size'     => (is      => 'ro',
                                  isa     => 'Str',
                                  default => $JAVA_MAX_HEAP_SIZE,
                                  );
-                             
+
 has 'java_gc_type'           => (is      => 'ro',
                                  isa     => 'Str',
                                  default => $JAVA_GC_TYPE,
                                  );
-                            
+
 has 'java_use_perf_data'     => (is      => 'ro',
                                  isa     => 'Str',
                                  default => $JAVA_USE_PERF_DATA,
                                  );
-                           
+
 has 'java_jar_path'          => (is      => 'ro',
                                  isa     => 'NpgCommonResolvedPathJarFile',
                                  coerce  => 1,
@@ -66,7 +66,7 @@ has 'alignments_in_bam' => (is         => 'ro',
                             isa        => 'Maybe[Bool]',
                             lazy_build => 1,
                             );
-                            
+
 sub _build_alignments_in_bam {
     my ($self) = @_;
     return $self->lims->alignments_in_bam;
@@ -90,13 +90,13 @@ sub _build_output_dir {
 has 'input_str' => (is => 'ro',
                     isa        => 'Str',
                     lazy_build => 1,
-                    ); 
+                    );
 
 sub _build_input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
     my $notes = $self->lims->library_name;
-    my $input_file = $self->input_files->[0]; 
+    my $input_file = $self->input_files->[0];
     return qq["$sample_id|$input_file|$notes"];
 }
 
@@ -116,7 +116,7 @@ has 'bam_file' => (is         => 'ro',
                    isa        => 'Str',
                    lazy_build => 1,
                    );
-                   
+
 sub _build_bam_file {
     my $self = shift;
     return $self->input_files->[0];
@@ -145,8 +145,8 @@ sub _build_command {
     my $single_end_option=q[];
     if(!npg::api::run->new({id_run => $self->id_run})->is_paired_read()){
         $single_end_option=q[-singleEnd];
-    }    
-    my $command = $self->java_cmd. sprintf qq[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
+    }
+    my $command = $self->java_cmd. sprintf q[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
                                            $self->java_max_heap_size,
                                            $self->java_gc_type,
                                            $self->java_use_perf_data,
@@ -174,16 +174,16 @@ override 'can_run' => sub {
 override 'execute' => sub {
     my ($self) = @_;
 
-    if (super() == 0) { 
+    if (super() == 0) {
     	return 1;
     }
 
     my $can_run = $self->can_run();
-    
+
     if ($self->messages->count) {
         $self->result->add_comment(join q[ ], $self->messages->messages);
     }
-    
+
     if (!$can_run) {
     	return 1;
     }
@@ -192,11 +192,11 @@ override 'execute' => sub {
     $self->result->set_info( 'Jar_version', $RNASEQC_JAR_VERSION );
 
     my $command = $self->command;
-    
+
     if (system $command) {
         carp "Failed to execute $command";
     }
-    
+
     #TODO: Call to _parse_metrics(<metrics.tsv file handler>)
     #      my $results = $self->_parse_metrics($fh);
     $self->result->rnaseqc_metrics_path($self->output_dir);
@@ -207,42 +207,42 @@ override 'execute' => sub {
 
 #TODO: Parse metrics file. No need to parse the output or RNA-SeQC. 
 #      Leave a half-baked stub for future use.
-sub _parse_metrics {
-    my ($self, $fh) = @_;
-        
-    if (!$fh) {
-        croak q[File handle is not available, cannot parse rna-seqc metrics];
-    }
-    
-    my @lines = ();
-    
-    while (my $line = <$fh>) {
-        chomp $line;
-        push @lines, $line;
-    }
-    
-    close $fh or croak qq[Cannot close pipe in __PACKAGE__ : $ERRNO, $CHILD_ERROR];
-
-    my @keys = split /\t/smx, $lines[0];
-    my @values = split /\t/smx, $lines[1];
-    my $num_keys = scalar @keys;
-    my $num_values = scalar @values;
-    if ($num_keys != $num_values) {
-        croak qq[Mismatch in number of keys and values, $num_keys agains $num_values];
-    }
-
-    my $results = {};
-    my $i = 0;
-    while ($i < $num_keys) {
-        if ($keys[$i]) {
-            my $value = $values[$i] || undef;
-            $results->{$keys[$i]} = $value;
-    }
-        $i++;
-    }
-
-    return $results;
-}
+#sub _parse_metrics {
+#    my ($self, $fh) = @_;
+#
+#    if (!$fh) {
+#        croak q[File handle is not available, cannot parse rna-seqc metrics];
+#    }
+#
+#    my @lines = ();
+#
+#    while (my $line = <$fh>) {
+#        chomp $line;
+#        push @lines, $line;
+#    }
+#
+#    close $fh or croak qq[Cannot close pipe in __PACKAGE__ : $ERRNO, $CHILD_ERROR];
+#
+#    my @keys = split /\t/smx, $lines[0];
+#    my @values = split /\t/smx, $lines[1];
+#    my $num_keys = scalar @keys;
+#    my $num_values = scalar @values;
+#    if ($num_keys != $num_values) {
+#        croak qq[Mismatch in number of keys and values, $num_keys agains $num_values];
+#    }
+#
+#    my $results = {};
+#    my $i = 0;
+#    while ($i < $num_keys) {
+#        if ($keys[$i]) {
+#            my $value = $values[$i] || undef;
+#            $results->{$keys[$i]} = $value;
+#    }
+#        $i++;
+#    }
+#
+#    return $results;
+#}
 
 
 __PACKAGE__->meta->make_immutable();
