@@ -2,11 +2,11 @@
 var TestConfiguration = (function() {
   function TestConfiguration () {
   }
-    
+
   TestConfiguration.prototype.getRoot = function() {
     return 'test/images';
   };
-    
+
   return TestConfiguration;
 }) ();
 
@@ -21,12 +21,12 @@ test('Object initialisation', function() {
   ok(obj.index !== undefined, "New object has an initial index.");
   ok(obj.lane_control == null, "New object has null lane_control.");
   ok(obj.outcome == null, "New object has null outcome.");
-    
-  obj = new NPG.QC.RunMQCControl();
-  ok(obj !== undefined, 'variable is now an instance of RunMQCControl'); 
-  obj = new NPG.QC.RunMQCControl(1, new TestConfiguration());
-  ok(obj !== undefined, 'variable is now an instance of RunMQCControl');
-  
+
+  obj = new NPG.QC.RunPageMQCControl();
+  ok(obj !== undefined, 'variable is now an instance of RunPageMQCControl');
+  obj = new NPG.QC.RunPageMQCControl(1, new TestConfiguration());
+  ok(obj !== undefined, 'variable is now an instance of RunPageMQCControl');
+
   obj = new NPG.QC.RunTitleParser();
   ok(obj !== undefined, 'variable is now an instance of RunTitleParser');
 });

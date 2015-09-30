@@ -8,6 +8,7 @@
 <script type="text/javascript" src="../bower_components/blanket/dist/qunit/blanket.js"></script>
 <!-- Your project file goes here -->
 <script type="text/javascript" src="../scripts/manual_qc.js" data-cover></script>
+<script type="text/javascript" src="../scripts/manual_qc_ui.js" data-cover></script>
 <!-- Your tests file goes here -->
 <script type="text/javascript" src="test.js"></script>
 <script>
@@ -68,9 +69,9 @@
     assert.equal(title10, null, 'Can deal with multi run, multi lane pages (lexical validation)');
   });
   
-  QUnit.test("NPG.QC.RunMQCControl.initQC", function(assert) {
+  QUnit.test("NPG.QC.RunPageMQCControl.initQC", function(assert) {
     var data1 = null; 
-    var control = new NPG.QC.RunMQCControl('1', new TestConfiguration());
+    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
     var returnTrue = function () { return true; };
     var returnFalse = function () { return false; };
     var result1 = control.initQC(data1, null, returnTrue, returnFalse);
@@ -109,7 +110,7 @@
     data1.current_status_description = 'qc in progress';
   });
   
-  QUnit.test("NPG.QC.RunMQCControl.isStateForMQC", function(assert){
+  QUnit.test("NPG.QC.RunPageMQCControl.isStateForMQC", function(assert){
     var result = null;
     
     var TAKEN_BY = 'taken_by'; 
@@ -117,7 +118,7 @@
     var HAS_MANUAL_QC_ROLE = 'has_manual_qc_role';
     var CURRENT_STATUS_DESCRIPTION = 'current_status_description';
     
-    var control = new NPG.QC.RunMQCControl('1', new TestConfiguration());
+    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
     var ok_taken_by = 'me', ok_current_user = 'me';
     var ok_has_manual_qc_role = 1;
     var ok_current_status_description_1 = 'qc in progress', ok_current_status_description_2 = 'qc on hold';
@@ -159,10 +160,10 @@
     }
   });
   
-  QUnit.test("NPG.QC.RunMQCControl.laneOutcomesMatch", function(assert){
+  QUnit.test("NPG.QC.RunPageMQCControl.laneOutcomesMatch", function(assert){
     var data1 = null;
     var lanesWithBG = [];
-    var control = new NPG.QC.RunMQCControl('1', new TestConfiguration());
+    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
     assert.raises(function () {control.laneOutcomesMatch();}, /invalid arguments/, "Throws exception with invalid number of arguments");
     
     data1 = new Object();
@@ -215,8 +216,8 @@
     assert.equal(result.position, null, 'Empty position as there was no error.');
   });
   
-  QUnit.test("NPG.QC.RunMQCControl.prepareLanes", function(assert) {
-    var control = new NPG.QC.RunMQCControl('1', new TestConfiguration());
+  QUnit.test("NPG.QC.RunPageMQCControl.prepareLanes", function(assert) {
+    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
     assert.raises(function () {control.prepareLanes();}, /invalid arguments/, "Throws exception with invalid number of arguments");
     assert.raises(function () {control.prepareLanes(null, null);}, /invalid arguments/, "Throws exception with both arguments null");
     assert.raises(function () {control.prepareLanes(null, 1);}, /invalid arguments/, "Throws exception with first argument null");
@@ -224,8 +225,8 @@
     
   });
   
-  QUnit.test("NPG.QC.RunMQCControl.showMQCOutcomes", function(assert) {
-    var control = new NPG.QC.RunMQCControl('1', new TestConfiguration());
+  QUnit.test("NPG.QC.RunPageMQCControl.showMQCOutcomes", function(assert) {
+    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
     assert.raises(function () {control.showMQCOutcomes();}, /invalid arguments/, "Throws exception with invalid number of arguments");
     assert.raises(function () {control.showMQCOutcomes(null, null);}, /invalid arguments/, "Throws exception with both arguments null");
     assert.raises(function () {control.showMQCOutcomes(null, 1);}, /invalid arguments/, "Throws exception with first argument null");
@@ -246,7 +247,7 @@
 <div id='mqc_lane2' data-id_run='3' data-position='4' data-initial='Accepted final' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
 </div>
 
-<div id="Test_NPG.QC.RunMQCControl.laneOutcomesMatch">
+<div id="Test_NPG.QC.RunPageMQCControl.laneOutcomesMatch">
 <div class='laneOutcomesMatchTdlanes1'><div data-position='1' data-initial='Accepted final' class='lane_mqc_control'></div></div>
 <div class='laneOutcomesMatchTdlanes2'><div data-position='1' data-initial='Accepted final' class='lane_mqc_control'></div></div>
 <div class='laneOutcomesMatchTdlanes2'><div data-position='2' data-initial='Accepted final' class='lane_mqc_control'></div></div>
