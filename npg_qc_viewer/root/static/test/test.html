@@ -71,7 +71,9 @@
   QUnit.test("NPG.QC.RunMQCControl.initQC", function(assert) {
     var data1 = null; 
     var control = new NPG.QC.RunMQCControl('1', new TestConfiguration());
-    var result1 = control.initQC(data1, null, function () {return true}, function(){return false});
+    var returnTrue = function () { return true; };
+    var returnFalse = function () { return false; };
+    var result1 = control.initQC(data1, null, returnTrue, returnFalse);
     assert.equal(result1, false, 'Control can deal with null data object.');
     data1 = new Object();
     var result2 = control.initQC(data1, null, function () {return true}, function(){return false});

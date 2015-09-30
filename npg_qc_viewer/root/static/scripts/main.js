@@ -140,7 +140,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
 
         var uno = function(target, outcome) {
           target.off("click").on("click", function () {
-            return;
+            return true;
           }
         };
 
