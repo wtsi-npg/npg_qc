@@ -11,8 +11,19 @@ use Readonly;
 with qw( npg_qc::autoqc::role::result );
 
 our $VERSION = '0';
-## no critic (Documentation::RequirePodAtEnd)
 
+sub criterion {
+    my $self = shift;
+
+    return q[Fail if RNA-SeQC fails to run];
+}
+
+
+no Moose::Role;
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -29,20 +40,6 @@ npg_qc::autoqc::role::rna_seqc
 =head2 criterion
 
  Pass/Fail criterion
-
-=cut
-
-sub criterion {
-    my $self = shift;
-
-    return q[Fail if RNA-SeQC fails to run];
-}
-
-
-no Moose::Role;
-
-1;
-__END__
 
 =head1 DIAGNOSTICS
 

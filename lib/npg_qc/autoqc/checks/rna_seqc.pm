@@ -1,8 +1,3 @@
-# Author:        Ruben Bautista
-# Created:       2015-08-11
-#
-#
-
 package npg_qc::autoqc::checks::rna_seqc;
 
 use Moose;
@@ -11,6 +6,7 @@ use English qw( -no_match_vars );
 use Carp;
 use File::Spec::Functions qw( catdir );
 use File::Basename;
+use npg_qc::autoqc::types;
 use Readonly;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -20,6 +16,7 @@ with qw(npg_tracking::data::reference::find
 
 our $VERSION = '0';
 
+Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $RNASEQC_JAR_NAME       => q[RNA-SeQC_v1.1.8.jar];
 Readonly::Scalar my $RNASEQC_JAR_VERSION    => q[1.1.8];
 Readonly::Scalar my $RNASEQC_GTF_TTYPE_COL  => 2;
@@ -32,7 +29,8 @@ Readonly::Scalar my $JAVA_USE_PERF_DATA     => q[-UsePerfData];
 
 
 
-has '+input_file_ext' => (default => q[bam],);
+has '+file_type' => (default => $EXT,);
+
 has '+aligner' => (default => q[fasta],);
 #has '+qc_out'=> (default => '',);
 
@@ -132,15 +130,9 @@ has 'transcriptome' => (is         => 'ro',
 
 sub _build_transcriptome {
     my $self = shift;
-    my $trans_gtf = $self->gtf_file;
-    my $gtf_rep = $RNASEQC_GTF_REPOSITORY;
-    my $gtf_dir = $RNASEQC_GTF_DIRECTORY;
-    my $repository = $self->repository;
-    $trans_gtf =~ s/$repository/$gtf_rep/msx;
-    $trans_gtf =~ s/gtf/$gtf_dir/msx;
+    my $trans_gtf = $self->rnaseqc_gtf_file;
     return $trans_gtf;
 }
-
 
 has 'command' => (is         => 'ro',
                   isa        => 'Str',
@@ -150,16 +142,21 @@ has 'command' => (is         => 'ro',
 
 sub _build_command {
     my $self = shift;
-    my $command = $self->java_cmd . sprintf qq[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d],
-        $self->java_max_heap_size,
-        $self->java_gc_type,
-        $self->java_use_perf_data,
-        $self->java_jar_path,
-        $self->input_str,
-        $self->output_dir,
-        $self->reference_fasta,
-        $self->transcriptome,
-        $self->transcript_type;
+    my $single_end_option=q[];
+    if(!npg::api::run->new({id_run => $self->id_run})->is_paired_read()){
+        $single_end_option=q[-singleEnd];
+    }    
+    my $command = $self->java_cmd. sprintf qq[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
+                                           $self->java_max_heap_size,
+                                           $self->java_gc_type,
+                                           $self->java_use_perf_data,
+                                           $self->java_jar_path,
+                                           $self->input_str,
+                                           $self->output_dir,
+                                           $self->reference_fasta,
+                                           $self->transcriptome,
+                                           $self->transcript_type,
+                                           $single_end_option;
     return $command;
 }
 
@@ -197,7 +194,7 @@ override 'execute' => sub {
     my $command = $self->command;
     
     if (system $command) {
-        croak "Failed to execute $command";
+        carp "Failed to execute $command";
     }
     
     #TODO: Call to _parse_metrics(<metrics.tsv file handler>)

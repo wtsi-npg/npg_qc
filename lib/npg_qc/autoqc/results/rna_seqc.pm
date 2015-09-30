@@ -13,7 +13,17 @@ extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::rna_seqc);
 
 our $VERSION = '0';
-## no critic (Documentation::RequirePodAtEnd)
+
+has 'rnaseqc_metrics_path' => (isa        => 'Maybe[Str]',
+                               is         => 'rw',
+                               required   => 0,
+                               );
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -28,18 +38,6 @@ our $VERSION = '0';
 =head2 metrics_path
 
 An absolute path to the directory with RNA-SeQC metrics files.
-
-=cut
-has 'rnaseqc_metrics_path' => (isa        => 'Maybe[Str]',
-                               is         => 'rw',
-                               required   => 0,
-                               );
-
-__PACKAGE__->meta->make_immutable;
-
-1;
-
-__END__
 
 =head1 DIAGNOSTICS
 
