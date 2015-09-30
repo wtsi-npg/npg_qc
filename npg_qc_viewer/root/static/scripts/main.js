@@ -32,8 +32,8 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil'],
-function( manual_qc, insert_size, adapter, mismatch, unveil) {
+require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil'],
+function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   $("img").unveil(2000);
 
   //Required to show error messages from the mqc process.
@@ -137,6 +137,12 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
         var mqc_run_data = jqxhr.responseJSON;
         //Filter lanes for qc using data from REST
         lanes = control.onlyQCAble(mqc_run_data, lanes);
+
+        var uno = function(target, outcome) {
+          target.off("click").on("click", function () {
+            return;
+          }
+        };
 
         if(control.isStateForMQC(mqc_run_data)) {
           all_accept.off("click").on("click", function () {
