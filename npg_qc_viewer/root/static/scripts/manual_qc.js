@@ -553,8 +553,7 @@ var NPG;
        */
       LanePageMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
         this.validateMQCData(mqc_run_data);
-        if(typeof(lanes) === "undefined"
-            || lanes == null) {
+        if(typeof(lanes) === "undefined" || lanes == null) {
           throw new Error("invalid arguments");
         }
         var self = this;
@@ -590,8 +589,7 @@ var NPG;
 
       LanePageMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
         this.validateMQCData(mqc_run_data);
-        if(typeof(lanes) === "undefined"
-            || lanes == null) {
+        if(typeof(lanes) === "undefined" || lanes == null) {
           throw new Error("invalid arguments");
         }
         var result = null;
@@ -980,9 +978,9 @@ var NPG;
           var self = this;
           var obj = $(self.asHtml());
           self.uiObject = obj;
-          self.uiAccepted = $(obj.children(self.TOTAL_ACCEPTED_CLASS)[0]);
-          self.uiRejected = $(obj.children(self.TOTAL_REJECTED_CLASS)[0]);
-          self.uiTotal    = $(obj.children(self.TOTAL_LIBRARIES_CLASS)[0]);
+          self.uiAccepted = $(obj.children(self.TOTAL_ACCEPTED_CLASS).first());
+          self.uiRejected = $(obj.children(self.TOTAL_REJECTED_CLASS).first());
+          self.uiTotal    = $(obj.children(self.TOTAL_LIBRARIES_CLASS).first());
 
           obj.data('npg_controller', self);
           return obj;

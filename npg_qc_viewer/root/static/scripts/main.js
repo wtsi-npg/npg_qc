@@ -122,9 +122,9 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
       var position = runTitleParserResult.position;
       window.console && console.log("Position " + position);
 
-      var all_accept = $($('.lane_mqc_accept_all')[0]);
-      var all_reject = $($('.lane_mqc_reject_all')[0]);
-      var all_und = $($('.lane_mqc_undecided_all')[0]);
+      var all_accept = $($('.lane_mqc_accept_all').first());
+      var all_reject = $($('.lane_mqc_reject_all').first());
+      var all_und = $($('.lane_mqc_undecided_all').first());
       all_accept.hide();
       all_reject.hide();
       all_und.hide();
@@ -142,7 +142,7 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
           all_accept.off("click").on("click", function () {
             var new_outcome;
             for (var i = 0; i < lanes.length; i++) {
-              obj = $(lanes[i].children('.lane_mqc_control')[0]);
+              obj = $(lanes[i].children('.lane_mqc_control').first());
               var controller = obj.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_ACCEPTED_PRELIMINARY);
               new_outcome = new_outcome || controller.CONFIG_ACCEPTED_PRELIMINARY;
@@ -152,7 +152,7 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
           all_reject.off("click").on("click", function () {
             var new_outcome;
             for (var i = 0; i < lanes.length; i++) {
-              obj = $(lanes[i].children('.lane_mqc_control')[0]);
+              obj = $(lanes[i].children('.lane_mqc_control').first());
               var controller = obj.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_REJECTED_PRELIMINARY);
               new_outcome = new_outcome || controller.CONFIG_REJECTED_PRELIMINARY;
@@ -162,7 +162,7 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
           all_und.off("click").on("click", function () {
             var new_outcome;
             for (var i = 0; i < lanes.length; i++) {
-              obj = $(lanes[i].children('.lane_mqc_control')[0]);
+              obj = $(lanes[i].children('.lane_mqc_control').first());
               var controller = obj.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_UNDECIDED);
               new_outcome = new_outcome || controller.CONFIG_UNDECIDED;
@@ -177,7 +177,6 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
             function (mqc_run_data, runMQCControl, lanes) {
               //Show working icons
               for(var i = 0; i < lanes.length; i++) {
-                //TODO checar que el tag este en la lista de tags.
                 lanes[i].children('.lane_mqc_control').each(function(j, obj){
                   obj = $(obj);
                   obj.html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
@@ -191,7 +190,7 @@ function( manual_qc, insert_size, adapter, mismatch, unveil) {
           );
         } else {
           control.showMQCOutcomes(jqxhr.responseJSON, lanes);
-        } //if(true)
+        }
 
       }).fail(function(jqXHR, textStatus, errorThrown) {
         window.console && console.log( "error: " + errorThrown + " " + textStatus);
