@@ -138,11 +138,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
         //Filter lanes for qc using data from REST
         lanes = control.onlyQCAble(mqc_run_data, lanes);
 
-        var uno = function(target, outcome) {
-          target.off("click").on("click", function () {
-            return true;
-          }
-        };
+
 
         if(control.isStateForMQC(mqc_run_data)) {
           all_accept.off("click").on("click", function () {
