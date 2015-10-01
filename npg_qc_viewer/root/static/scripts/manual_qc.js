@@ -58,9 +58,8 @@ var NPG;
     QC.ProdConfiguration = ProdConfiguration;
 
     var MQCControl = (function () {
-      function MQCControl(index, abstractConfiguration) {
+      function MQCControl(abstractConfiguration) {
         this.outcome               = null;  // Current outcome (Is updated when linked to an object in the view)
-        this.index                 = index; // Index of control in the page.
         this.lane_control          = null;  // Container linked to this controller
         this.abstractConfiguration = abstractConfiguration;
 
@@ -218,13 +217,12 @@ var NPG;
     var LaneMQCControl = (function () {
       /**
        * Controller for individual lanes GUI.
-       * @param index {Number}
        * @param abstractConfiguration {Object}
        * @memberof module:NPG/QC
        * @constructor
        */
-      function LaneMQCControl(index, abstractConfiguration) {
-        NPG.QC.MQCControl.call(this, index, abstractConfiguration);
+      function LaneMQCControl(abstractConfiguration) {
+        NPG.QC.MQCControl.call(this, abstractConfiguration);
         this.CONFIG_UPDATE_SERVICE = "/mqc/update_outcome_lane";
       }
 
@@ -329,13 +327,12 @@ var NPG;
     var LibraryMQCControl = (function () {
       /**
        * Controller for individual plexes GUI.
-       * @param index {Number}
        * @param abstractConfiguration {Object}
        * @memberof module:NPG/QC
        * @constructor
        */
-      function LibraryMQCControl(index, abstractConfiguration) {
-        NPG.QC.MQCControl.call(this, index, abstractConfiguration);
+      function LibraryMQCControl(abstractConfiguration) {
+        NPG.QC.MQCControl.call(this, abstractConfiguration);
         this.CONFIG_UPDATE_SERVICE = "/mqc/update_outcome_library";
 
         this.tag_index = null;

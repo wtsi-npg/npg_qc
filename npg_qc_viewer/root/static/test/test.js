@@ -15,16 +15,14 @@ test('Object initialisation', function() {
   ok(obj == null, "Variable is initially null.");
   obj = new NPG.QC.LaneMQCControl();
   ok(obj !== undefined, "Variable is now an instance.");
-  ok(obj.index === undefined, "Object has no initial index.");
-  obj = new NPG.QC.LaneMQCControl(0, new TestConfiguration());
-  ok(obj !== undefined, "Variable is now a new instance called with parameters for constructor.");
-  ok(obj.index !== undefined, "New object has an initial index.");
+  obj = new NPG.QC.LaneMQCControl(new TestConfiguration());
+  ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
   ok(obj.lane_control == null, "New object has null lane_control.");
   ok(obj.outcome == null, "New object has null outcome.");
 
   obj = new NPG.QC.RunPageMQCControl();
   ok(obj !== undefined, 'variable is now an instance of RunPageMQCControl');
-  obj = new NPG.QC.RunPageMQCControl(1, new TestConfiguration());
+  obj = new NPG.QC.RunPageMQCControl(new TestConfiguration());
   ok(obj !== undefined, 'variable is now an instance of RunPageMQCControl');
 
   obj = new NPG.QC.RunTitleParser();

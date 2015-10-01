@@ -18,7 +18,7 @@
     assert.equal(lane.data('id_run'), '2', "id_run is 2.");
     assert.equal(lane.data('position'), '3', "position is 3.");
     assert.equal(lane.data('initial'), undefined, "No initial value.");
-    var control = new NPG.QC.LaneMQCControl(0, new TestConfiguration());
+    var control = new NPG.QC.LaneMQCControl(new TestConfiguration());
     assert.notEqual(control, undefined, "Control is an instance.");
     control.linkControl(lane);
     assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
@@ -33,7 +33,7 @@
     assert.equal(lane.data('position'), '4', "position is 4.");
     assert.notEqual(lane.data('initial'), undefined, "Has initial value.");
     assert.equal(lane.data('initial'), 'Accepted final', "Initial value as expected.");
-    var control = new NPG.QC.LaneMQCControl(1, new TestConfiguration());
+    var control = new NPG.QC.LaneMQCControl(new TestConfiguration());
     assert.notEqual(control, undefined, "Control is an instance.");
     control.linkControl(lane);
     assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
@@ -71,7 +71,7 @@
   
   QUnit.test("NPG.QC.RunPageMQCControl.initQC", function(assert) {
     var data1 = null; 
-    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
+    var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
     var returnTrue = function () { return true; };
     var returnFalse = function () { return false; };
     var result1 = control.initQC(data1, null, returnTrue, returnFalse);
@@ -118,7 +118,7 @@
     var HAS_MANUAL_QC_ROLE = 'has_manual_qc_role';
     var CURRENT_STATUS_DESCRIPTION = 'current_status_description';
     
-    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
+    var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
     var ok_taken_by = 'me', ok_current_user = 'me';
     var ok_has_manual_qc_role = 1;
     var ok_current_status_description_1 = 'qc in progress', ok_current_status_description_2 = 'qc on hold';
@@ -163,7 +163,7 @@
   QUnit.test("NPG.QC.RunPageMQCControl.laneOutcomesMatch", function(assert){
     var data1 = null;
     var lanesWithBG = [];
-    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
+    var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
     assert.raises(function () {control.laneOutcomesMatch();}, /invalid arguments/, "Throws exception with invalid number of arguments");
     
     data1 = new Object();
@@ -217,7 +217,7 @@
   });
   
   QUnit.test("NPG.QC.RunPageMQCControl.prepareLanes", function(assert) {
-    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
+    var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
     assert.raises(function () {control.prepareLanes();}, /invalid arguments/, "Throws exception with invalid number of arguments");
     assert.raises(function () {control.prepareLanes(null, null);}, /invalid arguments/, "Throws exception with both arguments null");
     assert.raises(function () {control.prepareLanes(null, 1);}, /invalid arguments/, "Throws exception with first argument null");
@@ -226,7 +226,7 @@
   });
   
   QUnit.test("NPG.QC.RunPageMQCControl.showMQCOutcomes", function(assert) {
-    var control = new NPG.QC.RunPageMQCControl('1', new TestConfiguration());
+    var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
     assert.raises(function () {control.showMQCOutcomes();}, /invalid arguments/, "Throws exception with invalid number of arguments");
     assert.raises(function () {control.showMQCOutcomes(null, null);}, /invalid arguments/, "Throws exception with both arguments null");
     assert.raises(function () {control.showMQCOutcomes(null, 1);}, /invalid arguments/, "Throws exception with first argument null");
