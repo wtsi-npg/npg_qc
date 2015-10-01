@@ -506,7 +506,7 @@ var NPG;
        * Checks all conditions related with the user in session and the
        * status of the run. Validates the user has privileges, has role,
        * the run is in correct status and the user in session is the
-       * same as the user who took the QCing.
+       * same as the user who took the MQCing.
        * @param mqc_run_data {Object} Run status data
        */
       LanePageMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
@@ -523,7 +523,7 @@ var NPG;
        * Uses the data from mqc_run_data (list of tag_indexes) to filter the
        * array of lanes from the page. It creates a new array which contains
        * only lanes with tag_indexes which need to be qc'ed (without
-       * tag_index in {0, phix, empty}).
+       * tag_index in {0, phix}).
        * @param mqc_run_data data from REST
        * @param lanes dom elements from page
        * @returns {Array}
