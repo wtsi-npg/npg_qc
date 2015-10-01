@@ -18,16 +18,19 @@ my $schema = Moose::Meta::Class->create_anon_class(
 
 subtest q[search library outcome ent] => sub {
   plan tests => 5;
-  
+
   my $id_run   = 1;
   my $position = 2;
   my $tag_index = 1;
   my $username = q[user];
-  
+
   my $resultset = $schema->resultset($table);
-  my $rs = $resultset->search({'id_run' => $id_run, 'position' => $position}); 
+  my $rs = $resultset->search({
+    'id_run' => $id_run,
+    'position' => $position
+  }); 
   is($rs->count, 0, q[No outcomes in table for run]);
-  
+
   my $ent = $resultset->search_library_outcome_ent($id_run, $position, $tag_index, $username);
   ok(!$ent->in_storage, q[Entity not in storage]);
   is($rs->count, 0, q[One entity created but not in database]);
