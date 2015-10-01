@@ -138,13 +138,11 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
         //Filter lanes for qc using data from REST
         lanes = control.onlyQCAble(mqc_run_data, lanes);
 
-
-
         if(control.isStateForMQC(mqc_run_data)) {
           all_accept.off("click").on("click", function () {
             var new_outcome;
             for (var i = 0; i < lanes.length; i++) {
-              obj = $(lanes[i].children('.lane_mqc_control').first());
+              var obj = $(lanes[i].children('.lane_mqc_control').first());
               var controller = obj.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_ACCEPTED_PRELIMINARY);
               new_outcome = new_outcome || controller.CONFIG_ACCEPTED_PRELIMINARY;
@@ -154,7 +152,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
           all_reject.off("click").on("click", function () {
             var new_outcome;
             for (var i = 0; i < lanes.length; i++) {
-              obj = $(lanes[i].children('.lane_mqc_control').first());
+              var obj = $(lanes[i].children('.lane_mqc_control').first());
               var controller = obj.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_REJECTED_PRELIMINARY);
               new_outcome = new_outcome || controller.CONFIG_REJECTED_PRELIMINARY;
@@ -164,7 +162,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
           all_und.off("click").on("click", function () {
             var new_outcome;
             for (var i = 0; i < lanes.length; i++) {
-              obj = $(lanes[i].children('.lane_mqc_control').first());
+              var obj = $(lanes[i].children('.lane_mqc_control').first());
               var controller = obj.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_UNDECIDED);
               new_outcome = new_outcome || controller.CONFIG_UNDECIDED;

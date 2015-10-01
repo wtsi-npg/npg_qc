@@ -222,7 +222,7 @@ var NPG;
        */
       function LaneMQCControl(index, abstractConfiguration) {
         NPG.QC.MQCControl.call(this, index, abstractConfiguration);
-        this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome_lane";
+        this.CONFIG_UPDATE_SERVICE = "/mqc/update_outcome_lane";
       }
 
       LaneMQCControl.prototype = new NPG.QC.MQCControl();
@@ -332,7 +332,7 @@ var NPG;
        */
       function LibraryMQCControl(index, abstractConfiguration) {
         NPG.QC.MQCControl.call(this, index, abstractConfiguration);
-        this.CONFIG_UPDATE_SERVICE       = "/mqc/update_outcome_library";
+        this.CONFIG_UPDATE_SERVICE = "/mqc/update_outcome_library";
       }
 
       LibraryMQCControl.prototype = new NPG.QC.MQCControl();
@@ -535,7 +535,7 @@ var NPG;
           var lane = lanes[i];
           var cells = lane.children('.lane_mqc_control')
           for(j = 0; j < cells.length; j++) {
-            obj = $(cells[j]); //Wrap as an jQuery object.
+            var obj = $(cells[j]); //Wrap as an jQuery object.
             var tag_index = obj.data(this.DATA_TAG_INDEX);
             tag_index = String(tag_index);
             if($.inArray(tag_index, mqc_run_data.tags) != -1) {
@@ -569,13 +569,13 @@ var NPG;
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
           for(var j = 0; j < cells.length; j++) {
-            obj = $(cells[j]); //Wrap as an jQuery object.
+            var obj = $(cells[j]); //Wrap as an jQuery object.
             //Lane from row.
             var tag_index = obj.data(this.DATA_TAG_INDEX);
             //Filling previous outcomes
             if('qc_plex_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
               //From REST
-              current_status = mqc_run_data.qc_plex_status[tag_index];
+              var current_status = mqc_run_data.qc_plex_status[tag_index];
               //To html element, LaneControl will render.
               obj.data('initial', current_status);
             }
@@ -597,13 +597,13 @@ var NPG;
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
           for(j = 0; j < cells.length; j++) {
-            obj = $(cells[j]); //Wrap as an jQuery object.
+            var obj = $(cells[j]); //Wrap as an jQuery object.
             //Plex from row.
             var tag_index = obj.data(this.DATA_TAG_INDEX);
             //Filling previous outcomes
             if('qc_plex_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
               //From REST
-              current_status = mqc_run_data.qc_plex_status[tag_index];
+              var current_status = mqc_run_data.qc_plex_status[tag_index];
               //To html element, LaneControl will render.
               obj.data('initial', current_status);
             }
@@ -693,14 +693,14 @@ var NPG;
 
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
-          for(j = 0; j < cells.length; j++) {
-            obj = $(cells[j]); //Wrap as an jQuery object.
+          for(var j = 0; j < cells.length; j++) {
+            var obj = $(cells[j]); //Wrap as an jQuery object.
             //Lane from row.
             var position = obj.data('position');
             //Filling previous outcomes
             if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
               //From REST
-              current_status = mqc_run_data.qc_lane_status[position];
+              var current_status = mqc_run_data.qc_lane_status[position];
               //To html element, LaneControl will render.
               obj.data('initial', current_status);
             }
@@ -728,14 +728,14 @@ var NPG;
         var self = this;
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
-          for(j = 0; j < cells.length; j++) {
-            obj = $(cells[j]); //Wrap as an jQuery object.
+          for(var j = 0; j < cells.length; j++) {
+            var obj = $(cells[j]); //Wrap as an jQuery object.
             //Lane from row.
             var position = obj.data('position');
             //Filling previous outcomes
             if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
               //From REST
-              current_status = mqc_run_data.qc_lane_status[position];
+              var current_status = mqc_run_data.qc_lane_status[position];
               //To html element, LaneControl will render.
               obj.data('initial', current_status);
             }
