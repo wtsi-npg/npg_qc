@@ -56,7 +56,7 @@ sub search_product_metrics {
 
   my $where = {};
   foreach my $key (keys %{$run_details}) {
-    $where->{$cs_alias . '.' . $key} = $run_details->{$key};
+    $where->{$cs_alias . q[.] . $key} = $run_details->{$key};
   }
 
   my $rs = $resultset->
