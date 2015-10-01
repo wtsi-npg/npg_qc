@@ -79,6 +79,9 @@ var NPG;
         this.DATA_ID_RUN                = 'id_run';
         this.DATA_POSITION              = 'position';
         this.DATA_TAG_INDEX             = 'tag_index';
+
+        this.id_run    = null;
+        this.position  = null;
       }
 
       /*Insert here*/
@@ -231,8 +234,6 @@ var NPG;
        * Change the outcome.
        */
       LaneMQCControl.prototype.updateOutcome = function(outcome) {
-        var id_run = this.lane_control.data(this.DATA_ID_RUN);
-        var position = this.lane_control.data(this.DATA_POSITION);
         var self = this;
         if(outcome != self.outcome) {
           //Show progress icon
@@ -240,7 +241,9 @@ var NPG;
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
           //AJAX call.
-          $.post(self.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, new_oc : outcome}, function(data){
+          $.post(self.CONFIG_UPDATE_SERVICE, { id_run   : self.id_run,
+                                               position : self.position,
+                                               new_oc   : outcome}, function(data){
             var response = data;
           }, "json")
           .done(function() {
@@ -272,8 +275,8 @@ var NPG;
       LaneMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
         var self = this;
-        var id_run = lane_control.data(this.DATA_ID_RUN);
-        var position = lane_control.data(this.DATA_POSITION);
+        self.id_run   = lane_control.data(this.DATA_ID_RUN);
+        self.position = lane_control.data(this.DATA_POSITION);
         var outcomes = [self.CONFIG_ACCEPTED_PRELIMINARY,
                         self.CONFIG_UNDECIDED,
                         self.CONFIG_REJECTED_PRELIMINARY];
@@ -287,7 +290,8 @@ var NPG;
         //Remove old working span
         self.lane_control.children(self.LANE_MQC_WORKING_CLASS).remove();
         //Create and add radios
-        var name = 'radios_' + position;
+        var id_pre = self.id_run + '_' + self.position;
+        var name = 'radios_' + id_pre;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
           var label = labels[i];
@@ -295,7 +299,7 @@ var NPG;
           if (self.outcome == outcome) {
             checked = true;
           }
-          var radio = new NPG.QC.UI.MQCOutcomeRadio(position, outcome, label, name, checked);
+          var radio = new NPG.QC.UI.MQCOutcomeRadio(id_pre, outcome, label, name, checked);
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
@@ -333,6 +337,8 @@ var NPG;
       function LibraryMQCControl(index, abstractConfiguration) {
         NPG.QC.MQCControl.call(this, index, abstractConfiguration);
         this.CONFIG_UPDATE_SERVICE = "/mqc/update_outcome_library";
+
+        this.tag_index = null;
       }
 
       LibraryMQCControl.prototype = new NPG.QC.MQCControl();
@@ -341,9 +347,6 @@ var NPG;
        * Change the outcome.
        */
       LibraryMQCControl.prototype.updateOutcome = function(outcome) {
-        var id_run    = this.lane_control.data(this.DATA_ID_RUN);
-        var position  = this.lane_control.data(this.DATA_POSITION);
-        var tag_index = this.lane_control.data(this.DATA_TAG_INDEX);
         var self      = this;
         if(outcome != self.outcome) {
           //Show progress icon
@@ -351,7 +354,10 @@ var NPG;
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
           //AJAX call.
-          $.post(self.CONFIG_UPDATE_SERVICE, { id_run: id_run, position : position, tag_index : tag_index, new_oc : outcome}, function(data){
+          $.post(self.CONFIG_UPDATE_SERVICE, { id_run    : self.id_run,
+                                               position  : self.position,
+                                               tag_index : self.tag_index,
+                                               new_oc    : outcome}, function(data){
             var response = data;
           }, "json")
           .done(function() {
@@ -383,9 +389,9 @@ var NPG;
       LibraryMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
         var self = this;
-        var id_run    = lane_control.data(this.DATA_ID_RUN);
-        var position  = lane_control.data(this.DATA_POSITION);
-        var tag_index = lane_control.data(this.DATA_TAG_INDEX);
+        self.id_run    = lane_control.data(this.DATA_ID_RUN);
+        self.position  = lane_control.data(this.DATA_POSITION);
+        self.tag_index = lane_control.data(this.DATA_TAG_INDEX);
         var outcomes  = [self.CONFIG_ACCEPTED_PRELIMINARY,
                          self.CONFIG_UNDECIDED,
                          self.CONFIG_REJECTED_PRELIMINARY];
@@ -399,7 +405,8 @@ var NPG;
         //Remove old working span
         self.lane_control.children(self.LANE_MQC_WORKING_CLASS).remove();
         //Create and add radios
-        var name = 'radios_' + tag_index;
+        var id_pre = self.id_run + '_' + self.position + '_' + self.tag_index;
+        var name = 'radios_' + id_pre;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
           var label = labels[i];
@@ -407,7 +414,7 @@ var NPG;
           if (self.outcome == outcome) {
             checked = true;
           }
-          var radio = new NPG.QC.UI.MQCOutcomeRadio(tag_index, outcome, label, name, checked);
+          var radio = new NPG.QC.UI.MQCOutcomeRadio(id_pre, outcome, label, name, checked);
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
