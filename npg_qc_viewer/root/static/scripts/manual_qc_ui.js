@@ -73,6 +73,43 @@ var NPG;
       })();
       UI.MQCOutcomeRadio = MQCOutcomeRadio;
 
+      var MQCLibraryOverallControls = (function () {
+        MQCLibraryOverallControls = function() {
+          this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
+
+          this.CLASS_ALL_ACCEPT    = 'lane_mqc_accept_all';
+          this.CLASS_ALL_REJECT    = 'lane_mqc_reject_all';
+          this.CLASS_ALL_UNDECIDED = 'lane_mqc_undecided_all';
+          //Title for the individual controls
+          this.TITLE_ACCEPT    = 'Set all as accepted';
+          this.TITLE_REJECT    = 'Set all as rejected';
+          this.TITLE_UNDECIDED = 'Set all as undecided';
+
+          this.ICON_ACCEPT    = "<img src='/static/images/tick.png'/>";
+          this.ICON_REJECT    = "<img src='/static/images/cross.png'/>";
+          this.ICON_UNDECIDED = "und";
+        }
+
+        MQCLibraryOverallControls.prototype.setupControls = function (placeholder) {
+          placeholder = placeholder || $($('.' + this.PLACEHOLDER_CLASS));
+          var accept = this.buildControl(this.CLASS_ALL_ACCEPT, this.TITLE_ACCEPT, this.ICON_ACCEPT);
+          var und    = this.buildControl(this.CLASS_ALL_UNDECIDED, this.TITLE_UNDECIDED, this.ICON_UNDECIDED);
+          var reject = this.buildControl(this.CLASS_ALL_REJECT, this.TITLE_REJECT, this.ICON_REJECT);
+          placeholder.html(accept + und + reject);
+        };
+
+        MQCLibraryOverallControls.prototype.buildControl = function (cssClass, title, representation) {
+          var html = "<span class='" + cssClass
+                     + "' title='" + title
+                     + "' hidden>" + representation
+                     + "</span>";
+          return html;
+        };
+
+        return MQCLibraryOverallControls;
+      }) ();
+      UI.MQCLibraryOverallControls = MQCLibraryOverallControls;
+
       var MQCLibrary4LaneStats = (function() {
         MQCLibrary4LaneStats = function(id_run, position, id) {
           this.id_run = id_run;

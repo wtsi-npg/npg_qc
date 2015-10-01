@@ -122,13 +122,6 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
       var position = runTitleParserResult.position;
       window.console && console.log("Position " + position);
 
-      var all_accept = $($('.lane_mqc_accept_all').first());
-      var all_reject = $($('.lane_mqc_reject_all').first());
-      var all_und = $($('.lane_mqc_undecided_all').first());
-      all_accept.hide();
-      all_reject.hide();
-      all_und.hide();
-
       var jqxhr = $.ajax({
         url: "/mqc/mqc_libraries/" + id_run + '_' + position,
         cache: false
@@ -139,6 +132,13 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
         lanes = control.onlyQCAble(mqc_run_data, lanes);
 
         if(control.isStateForMQC(mqc_run_data)) {
+          var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
+          overallControls.setupControls();
+
+          var all_accept = $($('.lane_mqc_accept_all').first());
+          var all_reject = $($('.lane_mqc_reject_all').first());
+          var all_und = $($('.lane_mqc_undecided_all').first());
+
           all_accept.off("click").on("click", function () {
             var new_outcome;
             for (var i = 0; i < lanes.length; i++) {

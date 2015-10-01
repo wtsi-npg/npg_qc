@@ -16,9 +16,7 @@
 [%- IF have_link %]
    </a>
    [%- IF !run_view; -%]
-     <span class='lane_mqc_accept_all' title='Set all as accepted' hidden><img src='/static/images/tick.png'/></span>
-     <span class='lane_mqc_undecided_all' title='Set all as undecided' hidden>und</span>
-     <span class='lane_mqc_reject_all' title='Set all as rejected' hidden><img src='/static/images/cross.png'/></span>
+     <span class='library_mqc_overall_controls'></span>
    [%- END; -%]
 [% END -%]
 [%- IF run_view; -%]

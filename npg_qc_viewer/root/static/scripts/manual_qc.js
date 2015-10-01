@@ -344,7 +344,7 @@ var NPG;
        * Change the outcome.
        */
       LibraryMQCControl.prototype.updateOutcome = function(outcome) {
-        var self      = this;
+        var self = this;
         if(outcome != self.outcome) {
           //Show progress icon
           self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
@@ -584,7 +584,7 @@ var NPG;
               obj.data('initial', current_status);
             }
             //Set up mqc controlers and link them to the individual lanes.
-            var c = new NPG.QC.LibraryMQCControl(i, self.abstractConfiguration);
+            var c = new NPG.QC.LibraryMQCControl(self.abstractConfiguration);
             c.loadBGFromInitialWithPreliminary(obj);
             lanes[i].children('.padded_anchor').removeClass("padded_anchor");
           }
@@ -612,7 +612,7 @@ var NPG;
               obj.data('initial', current_status);
             }
             //Set up mqc controlers and link them to the individual lanes.
-            var c = new NPG.QC.LibraryMQCControl(i, self.abstractConfiguration);
+            var c = new NPG.QC.LibraryMQCControl(self.abstractConfiguration);
             c.linkControl(obj);
           }
         }
@@ -709,7 +709,7 @@ var NPG;
               obj.data('initial', current_status);
             }
             //Set up mqc controlers and link them to the individual lanes.
-            var c = new NPG.QC.LaneMQCControl(i, self.abstractConfiguration);
+            var c = new NPG.QC.LaneMQCControl(self.abstractConfiguration);
             c.loadBGFromInitialWithPreliminary(obj);
             lanes[i].children('.padded_anchor').removeClass("padded_anchor");
           }
@@ -744,7 +744,7 @@ var NPG;
               obj.data('initial', current_status);
             }
             //Set up mqc controlers and link them to the individual lanes.
-            var c = new NPG.QC.LaneMQCControl(i, self.abstractConfiguration);
+            var c = new NPG.QC.LaneMQCControl(self.abstractConfiguration);
             c.linkControl(obj);
           }
         }
@@ -808,7 +808,7 @@ var NPG;
 
     var RunTitleParseResult = (function () {
       /**
-       * Object to deal with title parsing from page (Run + Lane).
+       * Transfer object to deal with title parsing from page (Run + Lane).
        * @memberof module:NPG/QC
        * @constructor
        */
