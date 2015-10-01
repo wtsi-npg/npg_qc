@@ -1,13 +1,34 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
- 
+
+ - 'write2file' method of autoqc result objects removed since it duplicated
+     the 'store' method
+ - alternative base class npg_qc::autoqc::results::base for autoqc results objects,
+     able to represent results that are derived from merged files and described by
+     a composition of multiple components
+ - autoqc result objects for samtools stats file, sam/bam headers and digests
+     derived from the new base class
+ - bam_flagstats result extension to produce samtools_stats and sequence_summary
+     results (related objects) either at run time or later
+ - database tables for storing component and composition objects
+ - autoqc db loader extension
+     - to load data represented by classes derived from the new base class
+     - to build related objects in memory and to load them to the database
+       bypassing serialization to a file - a way to save cram headers and stats
+       file where the analysis pipeline did not run the current code that
+       produces samtools_stats and sequence_summary objects as individual files
+     - ability to mark records as current
+ - reporter for manual QC results retrieves LIMs info from ml warehouse;
+     it skips GCLP runs RT#480489.
  - tag_sniff new option to truncate tag sequences
- - tag_sniff now checks common tag sequences against tag sets in the warehouse
+ - tag_sniff checks common tag sequences against tag sets in the warehouse
  - SeqQC
    - add the total yield in library view RT#488973
    - summary table: display supplier sample name along the library barcode RT#488964,
      remove separate sample column
    - fix missing composite genotype check visualisation broken when cleaning
-     template for MLWH
+     template for ml warehouse
+ - genotype check data extraction scripts - updated scripts to fail more readily
+    and informatively when an iRODS error occurs
 
 release 59.0
  - SeqQC 

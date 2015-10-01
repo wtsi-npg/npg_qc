@@ -1,13 +1,18 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
-use File::Temp qw/ tempdir /;
+use File::Temp qw( tempdir );
 use Perl6::Slurp;
 use JSON;
-use Compress::Zlib;
+use Archive::Extract;
+use File::Spec::Functions qw( splitdir catdir);
+
+use t::autoqc_util qw( write_samtools_script );
+
+my $tempdir = tempdir(CLEANUP => 1);
 
 subtest 'test attributes and simple methods' => sub {
   plan tests => 20;
@@ -66,173 +71,248 @@ subtest 'test attributes and simple methods' => sub {
   } 'no error when human_split and subset attrs are consistent';
 
   $r = npg_qc::autoqc::results::bam_flagstats->
-    load('t/data/autoqc/4921_3_bam_flagstats.json');
+    load('t/data/autoqc/bam_flagstats/4921_3_bam_flagstats.json');
   ok( !$r->total_reads(), 'total reads not available' ) ;
 };
 
-subtest 'low-level parsing' => sub {
-  plan tests => 7;
+subtest 'high-level parsing' => sub {
+  plan tests => 15;
 
-  my $ref = {position => 5, id_run => 4783,};
-
-  my $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  $r->parsing_metrics_file('t/data/autoqc/estimate_library_complexity_metrics.txt');
-  is($r->read_pairs_examined(),2384324, 'read_pairs_examined');
-  is($r->paired_mapped_reads(),  0, 'paired_mapped_reads');
-
-  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  open my $flagstats_fh2, '<', 't/data/autoqc/6440_1#0.bamflagstats';
-  $r->parsing_flagstats($flagstats_fh2);
-  close $flagstats_fh2; 
-  is($r->total_reads(), 2978224 , 'total reads');
-  is($r->proper_mapped_pair(),2765882, 'properly paired');
-
-  $ref->{'tag_index'} = 0;
-  $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
-  lives_ok {$r->parsing_metrics_file('t/data/autoqc/12313_1#0_bam_flagstats.txt')}
-    'file with library size -1 parsed';
-  is($r->library_size, undef, 'library size is undefined');
-  is($r->read_pairs_examined, 0, 'examined zero read pairs');
-};
-
-subtest 'high-level parsing - backwards compatibility' => sub {
-  plan tests => 25;
-
-  my $tempdir = tempdir( CLEANUP => 1);
   my $package = 'npg_qc::autoqc::results::bam_flagstats';
-  my $dups  = 't/data/autoqc/4783_5_metrics_optical.txt';
-  my $fstat = 't/data/autoqc/4783_5_mk.flagstat';
+  my $dups  = 't/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt';
+  my $fstat = 't/data/autoqc/bam_flagstats/4783_5.flagstat';
   my $dups_attr_name    = 'markdups_metrics_file';
   my $fstat_attr_name   = 'flagstats_metrics_file';
   my $stats_attr_name   = 'samtools_stats_file';
-  my $h1 = {position => 5,
-            id_run   => 4783};
 
-  my $r1 = $package->new($h1);
-  $r1->parsing_metrics_file($dups);
-
-  open my $flagstats_fh, '<', $fstat;
-  $r1->parsing_flagstats($flagstats_fh);
-  close $flagstats_fh;
-
+  my $h1 = {position => 5, id_run   => 4783};
   $h1->{$dups_attr_name}    = $dups;
   $h1->{$fstat_attr_name}   = $fstat;
-  my $r2 = $package->new($h1);
+  my $r = $package->new($h1);
+
   my $expected = from_json(
-    slurp q{t/data/autoqc/4783_5_bam_flagstats.json}, {chomp=>1});
+    slurp q{t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json}, {chomp=>1});
+  $expected->{'related_objects'} = [];
 
-  my $count = 0;
-  for my $r (($r1, $r2)) {
-    $count++;
-    if ($count == 1) {
-      throws_ok { $r->execute() }
-        qr/markdups_metrics_file not found/, 'execute method fails';
-    } else {
-      lives_ok { $r->execute() } 'execute method is ok';
-    }      
+  lives_ok { $r->execute() } 'execute method is ok';
+  my $result_json;
+  lives_ok {
+    $result_json = $r->freeze();
+    $r->store(qq{$tempdir/4783_5_bam_flagstats.json});
+  } 'no error when serializing to json string and file';
 
-    my $result_json;
-    lives_ok {
-      $result_json = $r->freeze();
-      $r->store(qq{$tempdir/4783_5_bam_flagstats.json});
-    } 'no error when serializing to json string and file';
-
-    my $from_json_hash = from_json($result_json);
-    delete $from_json_hash->{__CLASS__};
-    delete $from_json_hash->{$dups_attr_name};
-    delete $from_json_hash->{$fstat_attr_name};
-
-    is_deeply($from_json_hash, $expected, 'correct json output');
-    is($r->total_reads(), 32737230 , 'total reads');
-    is($r->total_mapped_reads(), '30992462', 'total mapped reads');
-    is($r->percent_mapped_reads, 94.6703859795102, 'percent mapped reads');
-    is($r->percent_duplicate_reads, 15.6023713120952, 'percent duplicate reads');
-    is($r->percent_properly_paired ,89.7229484595978, 'percent properly paired');
-    is($r->percent_singletons, 2.92540938863795, 'percent singletons');
-    is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
-  }
+  my $from_json_hash = from_json($result_json);
+  delete $from_json_hash->{__CLASS__};
+  delete $from_json_hash->{$dups_attr_name};
+  delete $from_json_hash->{$fstat_attr_name};
+   
+  is_deeply($from_json_hash, $expected, 'correct json output');
+  is($r->total_reads(), 32737230 , 'total reads');
+  is($r->total_mapped_reads(), '30992462', 'total mapped reads');
+  is($r->percent_mapped_reads, 94.6703859795102, 'percent mapped reads');
+  is($r->percent_duplicate_reads, 15.6023713120952, 'percent duplicate reads');
+  is($r->percent_properly_paired ,89.7229484595978, 'percent properly paired');
+  is($r->percent_singletons, 2.92540938863795, 'percent singletons');
+  is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
+  
 
   delete $h1->{$dups_attr_name};
   delete $h1->{$fstat_attr_name};
-  $r1 = $package->new($h1);
-  warning_like {$r1->samtools_stats_file}
+  $r = $package->new($h1);
+  warning_like {$r->samtools_stats_file}
     qr/Sequence file not given - not looking for samtools stats files/,
     'warning when looking for samtool stats files';
-  is_deeply($r1->samtools_stats_file, {}, 'samtools stats files not found');
-  is($r1->markdups_metrics_file, undef, 'markdups metrics not found');
-  is($r1->flagstats_metrics_file, undef, 'flagstats metrics not found');
-  throws_ok { $r1->execute() } qr/markdups_metrics_file not found/,
+  is_deeply($r->samtools_stats_file, [], 'samtools stats files not found');
+  is($r->markdups_metrics_file, undef, 'markdups metrics not found');
+  is($r->flagstats_metrics_file, undef, 'flagstats metrics not found');
+  throws_ok { $r->execute() } qr/markdups_metrics_file not found/,
     'no input file - execute fails';
 };
 
-subtest 'finding files, ca;culating metrics' => sub {
-  plan tests => 12;
+my $archive_16960 = '16960_1_0';
+my $ae_16960 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_16960}.tar.gz");
+$ae_16960->extract(to => $tempdir) or die $ae_16960->error;
+$archive_16960 = join q[/], $tempdir, $archive_16960;
+note `find $archive_16960`;
 
-  my $data_path = 't/data/autoqc/bam_flagstats';
+my $samtools_path  = join q[/], $tempdir, 'samtools1';
+local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
+write_samtools_script($samtools_path);
+
+subtest 'finding files, calculating metrics' => sub {
+  plan tests => 11;
+
+  my $fproot = $archive_16960 . '/16960_1#0';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
-    id_run        => 16960,
-    position      => 1,
-    tag_index     => 0,
-    sequence_file => join(q[/], $data_path, '16960_1#0.bam')
+    id_run              => 16960,
+    position            => 1,
+    tag_index           => 0,
+    sequence_file       => $fproot . '.bam',
+    related_objects     => [],
   );
 
-  is($r->_file_path_root, join(q[/], $data_path, '16960_1#0'),
-    'file path root');
+  is($r->_file_path_root, $fproot, 'file path root');
   is($r->filename_root, undef, 'filename root undefined');
   is($r->filename4serialization, '16960_1#0.bam_flagstats.json',
     'filename for serialization'); 
-  is($r->markdups_metrics_file, $data_path.'/16960_1#0.markdups_metrics.txt',
+  is($r->markdups_metrics_file,  $fproot . '.markdups_metrics.txt',
     'markdups metrics found');
-  is($r->flagstats_metrics_file, $data_path.'/16960_1#0.flagstat',
-    'flagstats metrics found');
-  warning_like { $r->samtools_stats_file() } qr/Found the following samtools stats files/,
-   'successfully finding stats files';
+  is($r->flagstats_metrics_file, $fproot . '.flagstat', 'flagstats metrics found');
 
-  my $stats_files = {
-     'F0x900' => $data_path . '/16960_1#0_F0x900.stats',
-     'F0xB00' => $data_path . '/16960_1#0_F0xB00.stats',               };
-  is_deeply($r->samtools_stats_file, $stats_files, 'stats files are correct');
-
-  lives_ok {$r->execute} 'metrics parsing ok';
+  my @stats_files = sort ($fproot . '_F0x900.stats', $fproot . '_F0xB00.stats');
+  is (join(q[ ], @{$r->samtools_stats_file}), join(q[ ],@stats_files), 'stats files');
+ 
+  $r->execute();
   is($r->library_size, 240428087, 'library size value');
   is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
-
   my $j;
   lives_ok { $j=$r->freeze } 'serialization to json is ok';
   unlike($j, qr/_file_path_root/, 'serialization does not contain excluded attr');
+
+  $r = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run              => 16960,
+    position            => 1,
+    tag_index           => 0,
+    sequence_file       => $fproot . '.bam',
+  );
+  my $bam_md5 = join q[.], $r->sequence_file, 'md5';
+  throws_ok {$r->execute} qr{Can't open '$bam_md5'},
+    'error calling execute() on related objects';
 };
 
 subtest 'finding phix subset files (no run id)' => sub {
-  plan tests => 11;
+  plan tests => 10;
 
-  my $data_path = 't/data/autoqc/bam_flagstats';
+  my $fproot = $archive_16960 . '/16960_1#0_phix';
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
-    subset           => 'phix',
-    sequence_file    => join(q[/], $data_path, '16960_1#0_phix.bam')
+    subset              => 'phix',
+    sequence_file       => $fproot . '.bam',
+    related_objects     => [],
   );
 
   lives_ok {$r->execute} 'metrics parsing ok';
   is($r->library_size, 691461, 'library size value');
   is($r->mate_mapped_defferent_chr, 0, 'mate_mapped_defferent_chr value');
 
-  is($r->_file_path_root, join(q[/], $data_path, '16960_1#0_phix'),
-    'file path root');
+  is($r->_file_path_root, $fproot, 'file path root');
   is($r->filename_root, '16960_1#0', 'filename root');
    is($r->filename4serialization, '16960_1#0_phix.bam_flagstats.json',
     'filename for serialization');  
-  is($r->markdups_metrics_file, $data_path.'/16960_1#0_phix.markdups_metrics.txt',
+  is($r->markdups_metrics_file, $fproot . '.markdups_metrics.txt',
     'phix markdups metrics found');
-  is($r->flagstats_metrics_file, $data_path.'/16960_1#0_phix.flagstat',
+  is($r->flagstats_metrics_file, $fproot . '.flagstat',
     'phix flagstats metrics found');
-  warning_like { $r->samtools_stats_file() } qr/Found the following samtools stats files/,
-   'successfully finding stats files';
 
-  my $stats_files = {
-     'F0x900' => $data_path . '/16960_1#0_phix_F0x900.stats',
-     'F0xB00' => $data_path . '/16960_1#0_phix_F0xB00.stats',
-                     };
-  is_deeply($r->samtools_stats_file, $stats_files, 'phix stats files found');
+  my @stats_files = sort ($fproot . '_F0x900.stats', $fproot . '_F0xB00.stats');
+  is (join(q[ ], @{$r->samtools_stats_file}), join(q[ ],@stats_files), 'phix stats files');
   lives_ok { $r->freeze } 'no run id - serialization to json is ok';
+};
+
+my $archive = '17448_1_9';
+my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
+$ae->extract(to => $tempdir) or die $ae->error;
+$archive = join q[/], $tempdir, $archive;
+my $qc_dir = join q[/], $archive, 'testqc';
+note `find $archive`;
+write_samtools_script($samtools_path, join(q[/], $archive, 'cram.header'));
+
+subtest 'full functionality with full file sets' => sub {
+  plan tests => 92;
+
+  mkdir $qc_dir;
+
+  my $fproot_common = $archive . '/17448_1#9';
+  my $composition_digest = 'bfc10d33f4518996db01d1b70ebc17d986684d2e04e20ab072b8b9e51ae73dfa';
+  my @filters = qw/F0x900 F0xB00/;
+
+  foreach my $subset ( qw(default phix) ) {
+    foreach my $file_type ( qw(cram bam) ) {
+
+      my $ref = {
+        id_run        => 17448,
+        position      => 1,
+        tag_index     => 9,
+                };
+      my $fproot = $fproot_common;
+      if ($subset eq 'phix') {
+        $fproot .= q[_] . $subset;
+        $ref->{'subset'} = $subset;
+        $composition_digest = 'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb';
+      }
+
+      my $sfile = join q[.], $fproot, $file_type;
+      $ref->{'sequence_file'} = $sfile;
+     
+      my $r = npg_qc::autoqc::results::bam_flagstats->new($ref);
+      lives_ok { $r->execute() } 'no error calling execute()';
+
+      ok ($r->_has_related_objects, 'related object array has been set');
+      my @ros = @{$r->related_objects};
+      is (scalar @ros, 3, 'three related objects');
+
+      my $i = 0;
+      while ($i < 2) {
+        my $ro = $ros[$i];
+        my $filter = $filters[$i];
+        isa_ok ($ro, 'npg_qc::autoqc::results::samtools_stats');
+        is ($ro->filter, $filter, 'correct filter');
+        is ($ro->stats_file, $fproot . q[_] . $filter . '.stats', 'stats file path');
+        isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+        is ($ro->composition_digest, $composition_digest, 'composition digest');
+        $i++;
+      }
+
+      my $ro = $ros[2];
+      isa_ok ($ro, 'npg_qc::autoqc::results::sequence_summary');
+      is ($ro->sequence_file, $sfile, 'seq file path');
+      isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+      is ($ro->composition_digest, $composition_digest, 'composition digest');
+
+      my $local_qc_dir = join q[/], $qc_dir, $file_type;
+      if (!-e $local_qc_dir) {
+        mkdir $local_qc_dir;
+      }
+      lives_ok { $r->store($local_qc_dir) } 'no error serializing objects to a file';
+      is (scalar @{$r->related_objects}, 0, 'related objects array is empty');
+      foreach my $output_type ( qw(.bam_flagstats.json
+                                   .sequence_summary.json
+                                   _F0xB00.samtools_stats.json
+                                   _F0x900.samtools_stats.json) ) {
+        my @dirs = splitdir $fproot;
+        my $name = pop @dirs;
+        my $output = catdir($local_qc_dir, $name) . $output_type;
+        ok (-e $output, "output $output created");
+      }
+    }
+  }
+};
+
+subtest 'creating related objects' => sub {
+  plan tests => 6;
+  
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+        id_run        => 17448,
+        position      => 1,
+        tag_index     => 9
+  );
+
+  my $name = q[17448_1#9.bam_flagstats.json];
+  throws_ok { $r->create_related_objects() }
+    qr/Path should be given/, 'no attribute - error';
+  throws_ok { $r->create_related_objects(join q[/], $qc_dir, $name) }
+    qr/File path should be given/, 'file does not exist - error';
+  my $file         = join q[/], $qc_dir, 'cram', $name;
+  my $file_to_find = join q[/], $qc_dir, '17448_1#9.cram';
+  throws_ok { $r->create_related_objects($file) }
+    qr/Validation failed for 'NpgTrackingReadableFile' with value "$file_to_find"/,
+    'no cram file one directory up - error';
+
+  my $file_ok      = join q[/], $qc_dir, $name;
+  rename $file, $file_ok;
+  lives_ok { $r->create_related_objects($file_ok) } 'related objects built';
+  ok ($r->_has_related_objects, 'related object array has been set');
+  my @ros = @{$r->related_objects};
+  is (scalar @ros, 3, 'three related objects');
 };
 
 1;

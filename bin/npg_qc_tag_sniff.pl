@@ -66,17 +66,17 @@ sub selectModeTags {
     my @topTags = ();
 
     foreach my $tag (sort {$tagsFound{$b} <=> $tagsFound{$a};} (keys %tagsFound)) {
-	if (!(defined $maxCount)) {
-	    $maxCount = $tagsFound{$tag};
-	}
-	if ( (($relativeMaxDrop * $tagsFound{$tag}) < $previousCount) ||
-	     (($absoluteMaxDrop * $tagsFound{$tag}) < $maxCount) ||
-	     (!$degeneratingToleration && ($tag =~ /^N*$/)) # may wish to stop with this or exclude it
-	    ) {
-	    last;
-	}
-	$previousCount = $tagsFound{$tag};
-	push @topTags,$tag;
+      if (!(defined $maxCount)) {
+        $maxCount = $tagsFound{$tag};
+      }
+      if ( (($relativeMaxDrop * $tagsFound{$tag}) < $previousCount) ||
+           (($absoluteMaxDrop * $tagsFound{$tag}) < $maxCount) ||
+           (!$degeneratingToleration && ($tag =~ /^N*$/)) # may wish to stop with this or exclude it
+         ) {
+          last;
+      }
+      $previousCount = $tagsFound{$tag};
+      push @topTags,$tag;
     }
     return @topTags;
 }
@@ -98,29 +98,31 @@ sub showTags{
     foreach my $tag (@{$ra_topTags}) {
         my $rs = $s->resultset('Tag')->search({is_current=>1, expected_sequence=>$tag});
         while(my $row = $rs->next) {
-          my $name = $row->tag_group_name; 
-          my $id = $row->tag_group_internal_id; 
-          my $map_id = $row->map_id; 
-          next unless defined($name) && defined($id) && defined($map_id);
+          my $name = $row->tag_group_name;
+          my $id = $row->tag_group_internal_id;
+          my $map_id = $row->map_id;
+          if(!defined $name || !defined $id || !defined $map_id) {
+            next;
+          }
           $groups{$id}++;
           $names{$id} = $name;
           $matches{$tag}->{$id} = $map_id;
         }
-	      $unassigned -= $tagsFound{$tag};
+        $unassigned -= $tagsFound{$tag};
     }
     foreach my $tag (@{$ra_topTags}) {
         printf "%s = %.2f\t\t", $tag, (100 * $tagsFound{$tag}/$sampleSize);
         foreach my $id (sort {$a<=>$b} keys %groups) {
             if ( exists($matches{$tag}->{$id}) ){
-      	        printf "%-2d(%-3d) ", $id, $matches{$tag}->{$id};
+                printf "%-2d(%-3d) ", $id, $matches{$tag}->{$id};
             } else {
-      	        printf "        ";
+                printf q[        ];
             }
         }
         print "\n";
     }
     printf "%s = %.2f%s\n", "REMAINDER", (100 * $unassigned/$sampleSize), "%";
-    
+
     if ( %groups ){
         printf "#matches\tgroup id\tgroup name\n";
         foreach (sort {$a<=>$b} keys %groups) {
@@ -145,19 +147,19 @@ sub main{
     my $tagsFound = 0;
 
     while (<>) {
-	  if (/((BC:)|(RT:))Z:([A-Z]*)/) {
-	    my $tag = $4;
-      if ($tagLength < 0) {
-        $tag = substr($tag, $tagLength);
-      } elsif ($tagLength) {
-        $tag = substr($tag, 0, $tagLength);
+      if (/((BC:)|(RT:))Z:([A-Z]*)/) {
+        my $tag = $4;
+        if ($tagLength < 0) {
+          $tag = substr $tag, $tagLength;
+        } elsif ($tagLength) {
+          $tag = substr $tag, 0, $tagLength;
+        }
+        $tagsFound++;
+        $tagsFound{$tag}++;
       }
-	    $tagsFound++;
-	    $tagsFound{$tag}++;
-	}
-	if ($tagsFound == $sampleSize) {
-	    last;
-	}
+      if ($tagsFound == $sampleSize) {
+        last;
+      }
     }
 
     if ($sampleSize != $tagsFound) {
@@ -178,10 +180,10 @@ sub initialise {
     my $rc = GetOptions(\%options,
                         'help',
                         'sample_size:i',
-			'relative_max_drop:i',
-			'absolute_max_drop:i',
-			'degenerate_toleration',
-			'tag_length:i',
+                        'relative_max_drop:i',
+                        'absolute_max_drop:i',
+                        'degenerate_toleration',
+                        'tag_length:i',
                         );
     if ( ! $rc) {
         print {*STDERR} "\nerror in command line parameters\n" or croak 'print failed';
