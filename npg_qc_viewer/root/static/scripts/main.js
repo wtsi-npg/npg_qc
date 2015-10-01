@@ -134,44 +134,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
         if(control.isStateForMQC(mqc_run_data)) {
           var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
           overallControls.setupControls();
-
-          var all_accept = $($('.lane_mqc_accept_all').first());
-          var all_reject = $($('.lane_mqc_reject_all').first());
-          var all_und = $($('.lane_mqc_undecided_all').first());
-
-          all_accept.off("click").on("click", function () {
-            var new_outcome;
-            for (var i = 0; i < lanes.length; i++) {
-              var obj = $(lanes[i].children('.lane_mqc_control').first());
-              var controller = obj.data('gui_controller');
-              controller.updateOutcome(controller.CONFIG_ACCEPTED_PRELIMINARY);
-              new_outcome = new_outcome || controller.CONFIG_ACCEPTED_PRELIMINARY;
-            }
-            $('input:radio').val([new_outcome]);
-          });
-          all_reject.off("click").on("click", function () {
-            var new_outcome;
-            for (var i = 0; i < lanes.length; i++) {
-              var obj = $(lanes[i].children('.lane_mqc_control').first());
-              var controller = obj.data('gui_controller');
-              controller.updateOutcome(controller.CONFIG_REJECTED_PRELIMINARY);
-              new_outcome = new_outcome || controller.CONFIG_REJECTED_PRELIMINARY;
-            }
-            $('input:radio').val([new_outcome]);
-          });
-          all_und.off("click").on("click", function () {
-            var new_outcome;
-            for (var i = 0; i < lanes.length; i++) {
-              var obj = $(lanes[i].children('.lane_mqc_control').first());
-              var controller = obj.data('gui_controller');
-              controller.updateOutcome(controller.CONFIG_UNDECIDED);
-              new_outcome = new_outcome || controller.CONFIG_UNDECIDED;
-            }
-            $('input:radio').val([new_outcome]);
-          });
-          all_accept.show();
-          all_reject.show();
-          all_und.show();
+          overallControls.init(lanes);
 
           control.initQC(mqc_run_data, lanes,
             function (mqc_run_data, runMQCControl, lanes) {
