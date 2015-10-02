@@ -98,12 +98,8 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
                 }
             );
           } else {
-            $("#ajax_status").append("<li class='failed_mqc'>"
-                + "Conflicting data when comparing Data Ware House and Manual QC databases for run: "
-                + id_run
-                + ", lane: "
-                + DWHMatch.position
-                + ". Displaying of QC widgets aborted.</li>");
+            var errorMessage = new NPG.QC.UI.MQCConflictDWHErrorMessage(id_run, DWHMatch.position);
+            errorMessage.toConsole().display();
             //Clear progress icon
             $('.lane_mqc_working').empty();
           }
@@ -111,8 +107,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
           control.showMQCOutcomes(jqxhr.responseJSON, lanes);
         }
       }).fail(function(jqXHR, textStatus, errorThrown) {
-        window.console && console.log( "error: " + errorThrown + " " + textStatus);
-        $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
+        new NPG.QC.UI.ErrorMessage(errorThrown + " " + textStatus).toConsole().display();
         //Clear progress icon
         $('.lane_mqc_working').empty();
       });
@@ -154,10 +149,8 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
         } else {
           control.showMQCOutcomes(jqxhr.responseJSON, lanes);
         }
-
       }).fail(function(jqXHR, textStatus, errorThrown) {
-        window.console && console.log( "error: " + errorThrown + " " + textStatus);
-        $("#ajax_status").append("<li class='failed_mqc'>" + errorThrown + " " + textStatus + "</li>");
+        new NPG.QC.UI.ErrorMessage(errorThrown + " " + textStatus).toConsole().display();
         //Clear progress icon
         $('.lane_mqc_working').empty();
       });

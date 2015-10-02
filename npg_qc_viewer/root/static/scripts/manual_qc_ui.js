@@ -73,6 +73,44 @@ var NPG;
       })();
       UI.MQCOutcomeRadio = MQCOutcomeRadio;
 
+      var MQCErrorMessage = (function() {
+        MQCErrorMessage = function (errorText, placeholder) {
+          this.errorText = errorText;
+          this.placeholder = placeholder || 'ajax_status';
+        }
+
+        MQCErrorMessage.prototype.display = function() {
+          $("#" + this.placeholder).append("<li class='failed_mqc'>"
+              + this.errorText
+              + '</li>');
+          return this;
+        };
+
+        MQCErrorMessage.prototype.toConsole = function () {
+          window.console && console.log("error: " + this.errorText);
+          return this;
+        };
+
+        return MQCErrorMessage;
+      })();
+      UI.MQCErrorMessage = MQCErrorMessage;
+
+      var MQCConflictDWHErrorMessage = (function() {
+        MQCConflictDWHErrorMessage = function (id_run, position) {
+          var errorMessage = 'Conflicting data when comparing Data Ware House and Manual QC databases for run: '
+            + id_run
+            + ', lane: '
+            + position
+            + '. Displaying of QC widgets aborted.'
+          NPG.QC.UI.MQCErrorMessage.call(this,errorMessage);
+        }
+
+        MQCConflictDWHErrorMessage.prototype = new NPG.QC.UI.MQCErrorMessage();
+
+        return MQCConflictDWHErrorMessage;
+      }) ();
+      UI.MQCConflictDWHErrorMessage = MQCConflictDWHErrorMessage;
+
       var MQCLibraryOverallControls = (function () {
         MQCLibraryOverallControls = function() {
           this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
@@ -106,7 +144,7 @@ var NPG;
           return html;
         };
 
-        MQCLibraryOverallControls.prototype.init = function (lanes) {
+        MQCLibraryOverallControls.prototype.init = function (lanes) { //TODO refactor
           var all_accept = $($('.lane_mqc_accept_all').first());
           var all_reject = $($('.lane_mqc_reject_all').first());
           var all_und = $($('.lane_mqc_undecided_all').first());
