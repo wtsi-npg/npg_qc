@@ -255,8 +255,14 @@ var NPG;
           })
           .fail(function(data) {
             self.lane_control.children('input:radio').val([self.outcome]);
-            window.console && console.log(data.responseJSON.message);
-            jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
+            var errorMessage = null;
+            if (typeof(data.responseJSON) !== 'undefined') {
+              errorMessage = data.responseJSON.message;
+            } else {
+              window.console && console.log(data.responseText);
+              errorMessage = data.statusText + ": Detailed response in console.";
+            }
+            new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
           })
           .always(function(data){
             //Clear progress icon
@@ -368,8 +374,14 @@ var NPG;
           })
           .fail(function(data) {
             self.lane_control.children('input:radio').val([self.outcome]);
-            window.console && console.log(data.responseJSON.message);
-            jQuery("#ajax_status").append("<li class='failed_mqc'>" + data.responseJSON.message + "</li>");
+            var errorMessage = null;
+            if (typeof(data.responseJSON) !== 'undefined') {
+              errorMessage = data.responseJSON.message;
+            } else {
+              errorMessage = data.statusText + ": Detailed response in console.";
+              window.console && console.log(data.responseText);
+            }
+            new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
           })
           .always(function(data){
             //Clear progress icon
