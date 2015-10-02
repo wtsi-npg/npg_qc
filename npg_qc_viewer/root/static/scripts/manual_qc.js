@@ -503,6 +503,13 @@ var NPG;
         return result;
       };
 
+      /**
+       * Returns true if the current 'lane' (row in the table) is does not have
+       * a final outcome.
+       * @param mqc_run_data Transfer object with the mqc data. Must include a
+       * current_lane_outcome.
+       * @returns {Boolean}
+       */
       LanePageMQCControl.prototype.checkLaneStatus = function (mqc_run_data) {
         var result = typeof(mqc_run_data.current_lane_outcome) !== "undefined"
                      && mqc_run_data.current_lane_outcome != this.ACCEPTED_FINAL
@@ -510,6 +517,13 @@ var NPG;
         return result;
       };
 
+      /**
+       * Returns true if the number of libraries in the page is less or equal to
+       * the maximum number of libraries to be manualy QC'ed
+       * @param mqc_run_data Transfer object with the manual qc data, must
+       * include an array of tags.
+       * @returns {Boolean}
+       */
       LanePageMQCControl.prototype.checkLibLimit = function (mqc_run_data) {
         var result = typeof(mqc_run_data.tags)!== "undefined" /* Checking if number of libraries is under the limit allowed */
                      && typeof(mqc_run_data.mqc_lib_limit)!== "undefined"
