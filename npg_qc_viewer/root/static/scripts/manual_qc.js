@@ -162,17 +162,27 @@ var NPG;
         this.lane_control.children('.lane_mqc_save').hide();
       };
 
+      /**
+       * Switch the outcome and adjust the view accordingly
+       * @param outcome new outcome for the control.
+       */
       MQCControl.prototype.updateView = function(outcome) {
         switch (outcome) {
-          case self.CONFIG_ACCEPTED_PRELIMINARY : self.setAcceptedPre(); break;
-          case self.CONFIG_REJECTED_PRELIMINARY : self.setRejectedPre(); break;
-          case self.CONFIG_ACCEPTED_FINAL       : self.setAcceptedFinal(); break;
-          case self.CONFIG_REJECTED_FINAL       : self.setRejectedFinal(); break;
-          case self.CONFIG_UNDECIDED            : self.setUndecided(); break;
+          case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPre(); break;
+          case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPre(); break;
+          case this.CONFIG_ACCEPTED_FINAL       : this.setAcceptedFinal(); break;
+          case this.CONFIG_REJECTED_FINAL       : this.setRejectedFinal(); break;
+          case this.CONFIG_UNDECIDED            : this.setUndecided(); break;
         }
       };
 
+      /**
+       * What to do after getting a fail during the json request to update
+       * the outcome
+       * @param data Data from response
+       */
       MQCControl.prototype.processAfterFail = function(data) {
+        var self = this;
         self.lane_control.children('input:radio').val([self.outcome]);
         var errorMessage = null;
         if (typeof(data.responseJSON) !== 'undefined') {
