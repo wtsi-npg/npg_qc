@@ -34,6 +34,7 @@ function _getTitle(prefix, d) {
 
 require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil'],
 function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
+  //Setup for heatmaps to load on demand.
   $("img").unveil(2000);
 
   //Required to show error messages from the mqc process.
@@ -54,6 +55,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                         .find("title")
                                                         .text());
+  window.console && console.log("Elements in dom: " + document.getElementsByTagName('*').length);
   //If id_run //TODO move to object.
   if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
     var id_run = runTitleParserResult.id_run;
@@ -93,21 +95,21 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
                   }
                   runMQCControl.prepareLanes(mqc_run_data, lanes);
                 },
-                function () { //There is no mqc so I just remove the working image and padding for anchor
-                  $('.lane_mqc_working').empty();
+                function () { //There is no mqc
+                  return;
                 }
             );
           } else {
             var errorMessage = new NPG.QC.UI.MQCConflictDWHErrorMessage(id_run, DWHMatch.position);
             errorMessage.toConsole().display();
             //Clear progress icon
-            $('.lane_mqc_working').empty();
           }
         } else {
           control.showMQCOutcomes(jqxhr.responseJSON, lanes);
         }
       }).fail(function(jqXHR, textStatus, errorThrown) {
         new NPG.QC.UI.ErrorMessage(errorThrown + " " + textStatus).toConsole().display();
+      }).always(function(data){
         //Clear progress icon
         $('.lane_mqc_working').empty();
       });
@@ -136,14 +138,13 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
               //Show working icons
               for(var i = 0; i < lanes.length; i++) {
                 lanes[i].children('.lane_mqc_control').each(function(j, obj){
-                  obj = $(obj);
-                  obj.html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                  $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
                 });
               }
               runMQCControl.prepareLanes(mqc_run_data, lanes);
             },
-            function () { //There is no mqc so I just remove the working image and padding for anchor
-              $('.lane_mqc_working').empty();
+            function () { //There is no mqc
+              return;
             }
           );
         } else {
@@ -151,33 +152,13 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
         }
       }).fail(function(jqXHR, textStatus, errorThrown) {
         new NPG.QC.UI.ErrorMessage(errorThrown + " " + textStatus).toConsole().display();
+      }).always(function(data){
         //Clear progress icon
         $('.lane_mqc_working').empty();
       });
     }
   }
-
-  jQuery('.bcviz_insert_size').each(function(i) {
-    var self = $(this);
-    var d = self.data('check'),
-        w = self.data('width') || 650,
-        h = self.data('height') || 300,
-        t = self.data('title') || _getTitle('Insert Sizes : ',d);
-    var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-    //Removing data from page to free memory
-    self.removeAttr('data-check data-width data-height data-title');
-    //Nulling variables to ease GC
-    d = null; w = null; h = null; t = null;
-
-    if (chart != null) {
-      if (chart.svg != null) {
-        div = $(document.createElement("div"));
-        div.append(function() { return chart.svg.node(); } );
-        div.addClass('chart');
-        self.append(div);
-      }
-    }
-  });
+  window.console && console.log("Elements in dom MQC: " + document.getElementsByTagName('*').length);
 
   jQuery('.bcviz_adapter').each(function() {
     var self = $(this);
@@ -198,6 +179,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
     if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
     rev_div.addClass('chart_right');
     self.append(fwd_div,rev_div);
+    window.console && console.log("Elements in dom bcviz_adapter: " + document.getElementsByTagName('*').length);
   });
 
   jQuery('.bcviz_mismatch').each(function() {
@@ -225,5 +207,37 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
     leg_div.addClass('chart_legend');
 
     self.append(fwd_div,rev_div,leg_div);
+    window.console && console.log("Elements in dom bcviz_mismatch: " + document.getElementsByTagName('*').length);
   });
+
+  var maxReached = false, max_elements = 250000;
+  jQuery('.bcviz_insert_size').each(function(i) {
+    var self = $(this);
+    var d = self.data('check'),
+        w = self.data('width') || 650,
+        h = self.data('height') || 300,
+        t = self.data('title') || _getTitle('Insert Sizes : ',d);
+    var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+    //Removing data from page to free memory
+    self.removeAttr('data-check data-width data-height data-title');
+    //Nulling variables to ease GC
+    d = null; w = null; h = null; t = null;
+
+    if (chart != null) {
+      if (chart.svg != null) {
+        if(!maxReached) {
+          div = $(document.createElement("div"));
+          div.append(function() { return chart.svg.node(); } );
+          div.addClass('chart');
+          self.append(div);
+        } else {
+          window.console && console.log("Max number of elements in DOM reached, skipping plot");
+        }
+      }
+    }
+    var total_elements = document.getElementsByTagName('*').length;
+    window.console && console.log("Elements in dom bcviz_insert_size: " + total_elements);
+    maxReached = total_elements > max_elements;
+  });
+  window.console && console.log("Elements in dom: " + document.getElementsByTagName('*').length);
 });
