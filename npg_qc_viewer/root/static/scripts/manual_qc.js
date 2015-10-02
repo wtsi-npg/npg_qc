@@ -69,6 +69,7 @@ var NPG;
         this.CONFIG_REJECTED_FINAL       = 'Rejected final';
         this.CONFIG_UNDECIDED            = 'Undecided'; //Initial outcome for widgets
         this.CONFIG_INITIAL              = 'initial';
+        this.CONFIG_CONTROL_TAG          = 'gui_controller'; //For link in DOM
 
         //container names
         this.LANE_MQC_WORKING           = 'lane_mqc_working';
@@ -197,7 +198,7 @@ var NPG;
        * Links the individual object with an mqc controller so it can allow mqc of a lane.
        */
       MQCControl.prototype.linkControl = function(lane_control) {
-        lane_control.data('gui_controller', this);
+        lane_control.data(this.CONFIG_CONTROL_TAG, this);
         this.lane_control = lane_control;
         if ( typeof(lane_control.data(this.CONFIG_INITIAL)) === "undefined") {
           //If it does not have initial outcome
@@ -224,7 +225,7 @@ var NPG;
        * of the lane.
        */
       MQCControl.prototype.loadBGFromInitial = function (lane_control) {
-        lane_control.data('gui_controller', this);
+        lane_control.data(this.CONFIG_CONTROL_TAG, this);
         this.lane_control = lane_control;
         switch (lane_control.data(this.CONFIG_INITIAL)){
           case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
@@ -453,6 +454,13 @@ var NPG;
         this.REJECTED_FINAL        = 'Rejected final';
       }
 
+      /**
+       * Returns true if the user in session matches the user QCing the run and
+       * the user has manual_qc role
+       * @param mqc_run_data Transfer object with the mqc data. Must include
+       * values for taken_by, current_user and has_manual_qc_role
+       * @returns {Boolean}
+       */
       PageMQCControl.prototype.checkUserInSession = function (mqc_run_data) {
         var result = typeof(mqc_run_data.taken_by) !== "undefined"  //Data object has all values needed.
                      && typeof(mqc_run_data.current_user)!== "undefined"
@@ -462,6 +470,13 @@ var NPG;
         return result;
       };
 
+      /**
+       * Returns true if the run is currently identified as qc in progress or
+       * qc on hold.
+       * @param mqc_run_data Transfer object with the mqc data. Must contain a
+       * value for current_status_description.
+       * @returns {Boolean}
+       */
       PageMQCControl.prototype.checkRunStatus = function (mqc_run_data) {
         var result = typeof(mqc_run_data.current_status_description)!== "undefined"
                      && (mqc_run_data.current_status_description == this.QC_IN_PROGRESS
@@ -469,9 +484,14 @@ var NPG;
         return result;
       };
 
-      PageMQCControl.prototype.validateMQCData = function (mqc_run_data){
-        if(typeof(mqc_run_data) === "undefined"
-            || mqc_run_data == null) {
+      /**
+       * Checks if the field passed as parameter is not undefined and different
+       * from null. Throws an Error otherwise.
+       * @param field what to check.
+       */
+      PageMQCControl.prototype.validateRequired = function (field){
+        if(typeof(field) === "undefined"
+            || field == null) {
           throw new Error("invalid arguments");
         }
       };
@@ -539,7 +559,7 @@ var NPG;
        * @param mqc_run_data {Object} Run status data
        */
       LanePageMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
-        this.validateMQCData(mqc_run_data);
+        this.validateRequired(mqc_run_data);
 
         var result = this.checkUserInSession(mqc_run_data)
           && this.checkRunStatus(mqc_run_data)
@@ -558,7 +578,7 @@ var NPG;
        * @returns {Array}
        */
       LanePageMQCControl.prototype.onlyQCAble = function (mqc_run_data, lanes) {
-        this.validateMQCData(mqc_run_data);
+        this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined"
             || lanes == null) {
           throw new Error("invalid arguments");
@@ -585,7 +605,7 @@ var NPG;
        * @param lanes
        */
       LanePageMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
-        this.validateMQCData(mqc_run_data);
+        this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined" || lanes == null) {
           throw new Error("invalid arguments");
         }
@@ -621,7 +641,7 @@ var NPG;
       };
 
       LanePageMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
-        this.validateMQCData(mqc_run_data);
+        this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined" || lanes == null) {
           throw new Error("invalid arguments");
         }
@@ -697,7 +717,7 @@ var NPG;
        * @param mqc_run_data {Object} Run status data
        */
       RunPageMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
-        this.validateMQCData(mqc_run_data);
+        this.validateRequired(mqc_run_data);
         var result = this.checkUserInSession(mqc_run_data)
                      && this.checkRunStatus(mqc_run_data);
         return result;
@@ -709,7 +729,7 @@ var NPG;
        * @param lanes
        */
       RunPageMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
-        this.validateMQCData(mqc_run_data);
+        this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined"
             || lanes == null) {
           throw new Error("invalid arguments");
