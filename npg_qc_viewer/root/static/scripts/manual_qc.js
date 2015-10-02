@@ -83,7 +83,6 @@ var NPG;
         this.position  = null;
       }
 
-      /*Insert here*/
       /**
        * Checks the current outcome associated with this controller. If it is not final it will make it final
        * will update the value in the model with an async call and update the view.
@@ -241,7 +240,7 @@ var NPG;
           case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPreliminaryBG(); break;
         }
       };
-      /*Insert here*/
+
       return MQCControl;
     }) ();
     QC.MQCControl = MQCControl;
