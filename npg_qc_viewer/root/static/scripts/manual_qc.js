@@ -162,6 +162,28 @@ var NPG;
         this.lane_control.children('.lane_mqc_save').hide();
       };
 
+      MQCControl.prototype.updateView = function(outcome) {
+        switch (outcome) {
+          case self.CONFIG_ACCEPTED_PRELIMINARY : self.setAcceptedPre(); break;
+          case self.CONFIG_REJECTED_PRELIMINARY : self.setRejectedPre(); break;
+          case self.CONFIG_ACCEPTED_FINAL       : self.setAcceptedFinal(); break;
+          case self.CONFIG_REJECTED_FINAL       : self.setRejectedFinal(); break;
+          case self.CONFIG_UNDECIDED            : self.setUndecided(); break;
+        }
+      };
+
+      MQCControl.prototype.processAfterFail = function(data) {
+        self.lane_control.children('input:radio').val([self.outcome]);
+        var errorMessage = null;
+        if (typeof(data.responseJSON) !== 'undefined') {
+          errorMessage = data.responseJSON.message;
+        } else {
+          errorMessage = data.statusText + ": Detailed response in console.";
+          window.console && console.log(data.responseText);
+        }
+        new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
+      };
+
       /**
        * Links the individual object with an mqc controller so it can allow mqc of a lane.
        */
@@ -245,24 +267,10 @@ var NPG;
             var response = data;
           }, "json")
           .done(function() {
-            switch (outcome) {
-              case self.CONFIG_ACCEPTED_PRELIMINARY : self.setAcceptedPre(); break;
-              case self.CONFIG_REJECTED_PRELIMINARY : self.setRejectedPre(); break;
-              case self.CONFIG_ACCEPTED_FINAL       : self.setAcceptedFinal(); break;
-              case self.CONFIG_REJECTED_FINAL       : self.setRejectedFinal(); break;
-              case self.CONFIG_UNDECIDED            : self.setUndecided(); break;
-            }
+            self.updateView(outcome);
           })
           .fail(function(data) {
-            self.lane_control.children('input:radio').val([self.outcome]);
-            var errorMessage = null;
-            if (typeof(data.responseJSON) !== 'undefined') {
-              errorMessage = data.responseJSON.message;
-            } else {
-              window.console && console.log(data.responseText);
-              errorMessage = data.statusText + ": Detailed response in console.";
-            }
-            new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
+            self.processAfterFail(data);
           })
           .always(function(data){
             //Clear progress icon
@@ -364,24 +372,10 @@ var NPG;
             var response = data;
           }, "json")
           .done(function() {
-            switch (outcome) {
-              case self.CONFIG_ACCEPTED_PRELIMINARY : self.setAcceptedPre();   break;
-              case self.CONFIG_REJECTED_PRELIMINARY : self.setRejectedPre();   break;
-              case self.CONFIG_ACCEPTED_FINAL       : self.setAcceptedFinal(); break;
-              case self.CONFIG_REJECTED_FINAL       : self.setRejectedFinal(); break;
-              case self.CONFIG_UNDECIDED            : self.setUndecided();     break;
-            }
+            self.updateView(outcome);
           })
           .fail(function(data) {
-            self.lane_control.children('input:radio').val([self.outcome]);
-            var errorMessage = null;
-            if (typeof(data.responseJSON) !== 'undefined') {
-              errorMessage = data.responseJSON.message;
-            } else {
-              errorMessage = data.statusText + ": Detailed response in console.";
-              window.console && console.log(data.responseText);
-            }
-            new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
+            self.processAfterFail(data);
           })
           .always(function(data){
             //Clear progress icon
