@@ -494,6 +494,22 @@ var NPG;
             || field == null) {
           throw new Error("invalid arguments");
         }
+        return;
+      };
+
+      PageMQCControl.prototype.parseLanes = function (lanes, lanesWithBG) {
+        //Select non-qced lanes.
+        $('.lane_mqc_control').each(function (i, obj) {
+          obj = $(obj);
+          var parent = obj.parent();
+          //Not considering lanes previously marked as passes/failed
+          if(parent.hasClass('passed') || parent.hasClass('failed')) {
+            lanesWithBG.push(parent);
+          } else {
+            lanes.push(parent);
+          }
+        });
+        return;
       };
 
       return PageMQCControl;
@@ -503,16 +519,18 @@ var NPG;
     var LanePageMQCControl = (function () {
       function LanePageMQCControl (abstractConfiguration){
         NPG.QC.PageMQCControl.call(this, abstractConfiguration);
-        this.DATA_TAG_INDEX        = 'tag_index';
+        this.DATA_TAG_INDEX = 'tag_index';
+        this.REST_SERVICE   = '/mqc/mqc_libraries/';
       }
 
       LanePageMQCControl.prototype = new NPG.QC.PageMQCControl();
 
       LanePageMQCControl.prototype.initQC = function (mqc_run_data, plexes, targetFunction, mopFunction) {
         var result = null;
+        var self = this;
         if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //There is a data object
           this.mqc_run_data = mqc_run_data;
-          if(this.isStateForMQC(mqc_run_data)) {
+          if(self.isStateForMQC(mqc_run_data)) {
             result = targetFunction(mqc_run_data, this, plexes);
           } else {
             result = mopFunction();
@@ -640,6 +658,47 @@ var NPG;
         }
       };
 
+      LanePageMQCControl.prototype.prepareQC = function (id_run, position, lanes) {
+        var self = this;
+        var jqxhr = $.ajax({
+          url: self.REST_SERVICE + id_run + '_' + position,
+          cache: false
+        }).done(function() {
+          var mqc_run_data = jqxhr.responseJSON;
+          //Filter lanes for qc using data from REST
+          lanes = self.onlyQCAble(mqc_run_data, lanes);
+
+          if(self.isStateForMQC(mqc_run_data)) {
+            var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
+            overallControls.setupControls();
+            overallControls.init(lanes);
+
+            self.initQC(mqc_run_data, lanes,
+              function (mqc_run_data, self, lanes) {
+                //Show working icons
+                for(var i = 0; i < lanes.length; i++) {
+                  lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                    $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                  });
+                }
+                self.prepareLanes(mqc_run_data, lanes);
+              },
+              function () { //There is no mqc
+                return;
+              }
+            );
+          } else {
+            control.showMQCOutcomes(jqxhr.responseJSON, lanes);
+          }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          new NPG.QC.UI.ErrorMessage(errorThrown + " " + textStatus).toConsole().display();
+        }).always(function(data){
+          //Clear progress icon
+          $('.lane_mqc_working').empty();
+        });
+        return;
+      };
+
       LanePageMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
         this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined" || lanes == null) {
@@ -681,6 +740,7 @@ var NPG;
     var RunPageMQCControl = (function () {
       function RunPageMQCControl(abstractConfiguration) {
         NPG.QC.PageMQCControl.call(this, abstractConfiguration);
+        this.REST_SERVICE = '/mqc/mqc_runs/';
       }
 
       RunPageMQCControl.prototype = new NPG.QC.PageMQCControl();
@@ -696,9 +756,10 @@ var NPG;
        */
       RunPageMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
         var result = null;
+        var self = this;
         if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //There is a data object
           this.mqc_run_data = mqc_run_data;
-          if(this.isStateForMQC(mqc_run_data)) {
+          if(self.isStateForMQC(mqc_run_data)) {
             result = targetFunction(mqc_run_data, this, lanes);
           } else {
             result = mopFunction();
@@ -763,6 +824,47 @@ var NPG;
             lanes[i].children('.padded_anchor').removeClass("padded_anchor");
           }
         }
+      };
+
+      RunPageMQCControl.prototype.prepareQC = function (id_run, lanes, lanesWithBG){
+        var self = this;
+        var jqxhr = $.ajax({
+          url: self.REST_SERVICE + id_run,
+          cache: false
+        }).done(function() {
+          var mqc_run_data = jqxhr.responseJSON;
+          if(self.isStateForMQC(mqc_run_data)) {
+            var DWHMatch = self.laneOutcomesMatch(lanesWithBG, mqc_run_data);
+            if(DWHMatch.outcome) {
+              self.initQC(jqxhr.responseJSON, lanes,
+                  function (mqc_run_data, runMQCControl, lanes) {
+                    //Show working icons
+                    for(var i = 0; i < lanes.length; i++) {
+                      lanes[i].children('a').addClass('padded_anchor');
+                      lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                        $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                      });
+                    }
+                    self.prepareLanes(mqc_run_data, lanes);
+                  },
+                  function () { //There is no mqc
+                    return;
+                  }
+              );
+            } else {
+              var errorMessage = new NPG.QC.UI.MQCConflictDWHErrorMessage(id_run, DWHMatch.position);
+              errorMessage.toConsole().display();
+              //Clear progress icon
+            }
+          } else {
+            self.showMQCOutcomes(jqxhr.responseJSON, lanes);
+          }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          new NPG.QC.UI.ErrorMessage(errorThrown + " " + textStatus).toConsole().display();
+        }).always(function(data){
+          //Clear progress icon
+          $('.lane_mqc_working').empty();
+        });
       };
 
       /**
