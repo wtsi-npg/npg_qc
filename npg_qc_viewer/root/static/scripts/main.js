@@ -65,7 +65,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
       control = new NPG.QC.RunPageMQCControl(prodConfiguration);
       window.console && console.log("Run page");
       control.parseLanes(lanes, lanesWithBG);
-      control.prepareQC(id_run, lanes, lanesWithBG);
+      control.prepareMQC(id_run, lanes, lanesWithBG);
     } else {
       window.console && console.log("Run + Lane page");
       window.console && console.log("Run " + id_run);
@@ -73,7 +73,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
       window.console && console.log("Position " + position);
       control = new NPG.QC.LanePageMQCControl(prodConfiguration);
       control.parseLanes(lanes, lanesWithBG);
-      control.prepareQC(id_run, position, lanes);
+      control.prepareMQC(id_run, position, lanes);
     }
   }
   window.console && console.log("Elements in dom MQC: " + document.getElementsByTagName('*').length);

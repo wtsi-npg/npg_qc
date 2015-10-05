@@ -658,7 +658,15 @@ var NPG;
         }
       };
 
-      LanePageMQCControl.prototype.prepareQC = function (id_run, position, lanes) {
+      /**
+       * Use data from the page to make the first call to REST. Finds rows which
+       * need qc, inits qc for those rows. If it is not state for MQC it updates
+       * the view with current MQC values.
+       * @param id_run
+       * @param position
+       * @param lanes
+       */
+      LanePageMQCControl.prototype.prepareMQC = function (id_run, position, lanes) {
         var self = this;
         var jqxhr = $.ajax({
           url: self.REST_SERVICE + id_run + '_' + position,
@@ -826,7 +834,17 @@ var NPG;
         }
       };
 
-      RunPageMQCControl.prototype.prepareQC = function (id_run, lanes, lanesWithBG){
+      /**
+       * Use data from the page to make the first call to REST. Finds rows which
+       * need qc, inits qc for those rows. If it is not state for MQC it updates
+       * the view with current MQC values. If there is an inconsistence between
+       * DWH and MQC databases it will stop and show an error message in the
+       * page.
+       * @param id_run
+       * @param lanes
+       * @param lanesWithBG
+       */
+      RunPageMQCControl.prototype.prepareMQC = function (id_run, lanes, lanesWithBG){
         var self = this;
         var jqxhr = $.ajax({
           url: self.REST_SERVICE + id_run,
@@ -867,10 +885,13 @@ var NPG;
         });
       };
 
-      /**
+      /*
        * Update values in lanes with values from REST. Then link the lane
        * to a controller. The lane controller will update with widgets or
        * with proper background.
+       * @param mqc_run_data
+       * @param lanes
+       * @returns
        */
       RunPageMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
         if(typeof(mqc_run_data) === "undefined"
