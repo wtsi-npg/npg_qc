@@ -52,7 +52,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
                                                         .find("title")
                                                         .text());
   window.console && console.log("Elements in dom: " + document.getElementsByTagName('*').length);
-  //If id_run //TODO move to object.
+  //If id_run
   if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
     var id_run = runTitleParserResult.id_run;
     var prodConfiguration = new NPG.QC.ProdConfiguration();

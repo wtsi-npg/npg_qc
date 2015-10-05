@@ -885,7 +885,7 @@ var NPG;
         });
       };
 
-      /*
+      /**
        * Update values in lanes with values from REST. Then link the lane
        * to a controller. The lane controller will update with widgets or
        * with proper background.
