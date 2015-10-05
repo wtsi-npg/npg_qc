@@ -49,3 +49,26 @@ test('Object initialisation', function() {
   ok(obj !== undefined, 'variable is now an instance of RunTitleParser');
 });
 
+test('Object initialisation for UI classes.', function() {
+  var obj = null;
+
+  obj = new NPG.QC.UI.MQCOutcomeRadio();
+  ok(obj !== undefined, 'Variable is now an instance of MQCOutcomeRadio');
+  obj = null;
+  ok(obj == null);
+
+  obj = new NPG.QC.UI.MQCConflictDWHErrorMessage();
+  ok(obj !== undefined, 'Variable is now an instance of MQCOutcomeMQCConflictDWHErrorMessage');
+  obj = null;
+  ok(obj == null);
+
+  obj = new NPG.QC.UI.MQCLibraryOverallControls();
+  ok(obj !== undefined, 'Variable is now an instance of MQCLibraryOverallControls');
+  obj = null;
+  ok(obj == null);
+
+  obj = new NPG.QC.UI.MQCLibrary4LaneStats();
+  ok(obj !== undefined, 'Variable is now an instance of MQCLibrary4LaneStats');
+  obj = null;
+  ok(obj == null);
+});
