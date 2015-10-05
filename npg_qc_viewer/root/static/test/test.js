@@ -49,7 +49,7 @@ test('Object initialisation', function() {
   ok(obj !== undefined, 'variable is now an instance of RunTitleParser');
 });
 
-test('Object initialisation for UI classes.', function() {
+test('Object instantiation for UI classes.', function() {
   var obj = null;
 
   obj = new NPG.QC.UI.MQCOutcomeRadio();
