@@ -51,7 +51,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                         .find("title")
                                                         .text());
-  window.console && console.log("Elements in dom: " + document.getElementsByTagName('*').length);
+  window.console && console.log("Elements in dom before MQC: " + document.getElementsByTagName('*').length);
   //If id_run
   if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
     var id_run = runTitleParserResult.id_run;
@@ -76,7 +76,29 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
       control.prepareMQC(id_run, position, lanes);
     }
   }
-  window.console && console.log("Elements in dom MQC: " + document.getElementsByTagName('*').length);
+  window.console && console.log("Elements in dom after MQC: " + document.getElementsByTagName('*').length);
+
+  jQuery('.bcviz_insert_size').each(function(i) {
+    var self = $(this);
+    var d = self.data('check'),
+        w = self.data('width') || 650,
+        h = self.data('height') || 300,
+        t = self.data('title') || _getTitle('Insert Sizes : ',d);
+    var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+    //Removing data from page to free memory
+    self.removeAttr('data-check data-width data-height data-title');
+    //Nulling variables to ease GC
+    d = null; w = null; h = null; t = null;
+
+    if (chart != null) {
+      if (chart.svg != null) {
+        div = $(document.createElement("div"));
+        div.append(function() { return chart.svg.node(); } );
+        div.addClass('chart');
+        self.append(div);
+      }
+    }
+  });
 
   jQuery('.bcviz_adapter').each(function() {
     var self = $(this);
@@ -97,7 +119,6 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
     if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
     rev_div.addClass('chart_right');
     self.append(fwd_div,rev_div);
-    window.console && console.log("Elements in dom bcviz_adapter: " + document.getElementsByTagName('*').length);
   });
 
   jQuery('.bcviz_mismatch').each(function() {
@@ -125,37 +146,5 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
     leg_div.addClass('chart_legend');
 
     self.append(fwd_div,rev_div,leg_div);
-    window.console && console.log("Elements in dom bcviz_mismatch: " + document.getElementsByTagName('*').length);
   });
-
-  var maxReached = false, max_elements = 250000;
-  jQuery('.bcviz_insert_size').each(function(i) {
-    var self = $(this);
-    var d = self.data('check'),
-        w = self.data('width') || 650,
-        h = self.data('height') || 300,
-        t = self.data('title') || _getTitle('Insert Sizes : ',d);
-    var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-    //Removing data from page to free memory
-    self.removeAttr('data-check data-width data-height data-title');
-    //Nulling variables to ease GC
-    d = null; w = null; h = null; t = null;
-
-    if (chart != null) {
-      if (chart.svg != null) {
-        if(!maxReached) {
-          div = $(document.createElement("div"));
-          div.append(function() { return chart.svg.node(); } );
-          div.addClass('chart');
-          self.append(div);
-        } else {
-          window.console && console.log("Max number of elements in DOM reached, skipping plot");
-        }
-      }
-    }
-    var total_elements = document.getElementsByTagName('*').length;
-    window.console && console.log("Elements in dom bcviz_insert_size: " + total_elements);
-    maxReached = total_elements > max_elements;
-  });
-  window.console && console.log("Elements in dom: " + document.getElementsByTagName('*').length);
 });
