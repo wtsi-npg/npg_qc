@@ -397,7 +397,8 @@ var NPG;
       };
 
       /**
-       * Builds the gui controls necessary for the mqc operation and passes them to the view.
+       * Builds the gui controls necessary for the mqc operation and passes them
+       * to the view.
        */
       LibraryMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
@@ -497,6 +498,13 @@ var NPG;
         return;
       };
 
+      /**
+       * Find "lanes" (html rows) from the page and split them in two groups
+       * based on the QC result they already have (checked by using the css
+       * class of the row). Adds the lanes to the corresponding array.
+       * @param lanes Lanes without background
+       * @param lanesWithBG Lanes with background (pass or fail)
+       */
       PageMQCControl.prototype.parseLanes = function (lanes, lanesWithBG) {
         //Select non-qced lanes.
         $('.lane_mqc_control').each(function (i, obj) {
