@@ -236,7 +236,7 @@ sub update_reported {
 
 sub short_desc {
   my $self = shift;
-  my $s = sprintf 'id_run %i position %i', $self->id_run, $self->position;
+  my $s = sprintf 'id_run %s position %s', $self->id_run, $self->position;
   return $s;
 }
 
