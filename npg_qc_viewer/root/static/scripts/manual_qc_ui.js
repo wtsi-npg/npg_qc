@@ -141,9 +141,9 @@ var NPG;
           this.TITLE_REJECT    = 'Set all as rejected';
           this.TITLE_UNDECIDED = 'Set all as undecided';
 
-          this.ICON_ACCEPT    = "<img src='/static/images/tick.png'/>";
-          this.ICON_REJECT    = "<img src='/static/images/cross.png'/>";
-          this.ICON_UNDECIDED = "und";
+          this.ICON_ACCEPT    = "<img src='/static/images/tick.png' width='10' height='10'/>";
+          this.ICON_REJECT    = "<img src='/static/images/cross.png' width='10' height='10'/>";
+          this.ICON_UNDECIDED = "<img src='/static/images/circle.png' width='10' height='10'/>";
         }
 
         MQCLibraryOverallControls.prototype.setupControls = function (placeholder) {
@@ -155,7 +155,7 @@ var NPG;
         };
 
         MQCLibraryOverallControls.prototype.buildControl = function (cssClass, title, representation) {
-          var html = "<span class='" + cssClass
+          var html = "<span class='lane_mqc_button lane_mqc_overall " + cssClass
                      + "' title='" + title
                      + "' hidden>" + representation
                      + "</span>";
