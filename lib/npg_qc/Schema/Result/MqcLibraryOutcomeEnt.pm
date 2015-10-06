@@ -227,7 +227,7 @@ sub historic_resultset {
 
 sub short_desc {
   my $self = shift;
-  my $s = sprintf 'id_run %i position %i tag_index %i', $self->id_run, $self->position, $self->tag_index;
+  my $s = sprintf 'id_run %s position %s tag_index %s', $self->id_run, $self->position, $self->tag_index;
   return $s;
 }
 
