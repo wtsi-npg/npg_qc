@@ -217,8 +217,13 @@ sub get_current_library_outcome : Path('get_current_library_outcome') {
       $self->raise_error(q[Tag_index should be defined], $BAD_REQUEST_CODE);
     }
 
-    my $ent = $c->model('NpgQcDB')->resultset('MqcLibraryOutcomeEnt')->search(
-      {id_run => $id_run, position => $position, tag_index => $tag_index})->next;
+    my $values = {};
+    $values->{'id_run'}    = $id_run;
+    $values->{'position'}  = $position;
+    $values->{'tag_index'} = $tag_index;
+    my $ent = $c->model('NpgQcDB')
+                ->resultset('MqcLibraryOutcomeEnt')
+                ->search($values)->next;
     $desc = $ent ? $ent->mqc_outcome->short_desc : q[];
   } catch {
     my $error_code;
