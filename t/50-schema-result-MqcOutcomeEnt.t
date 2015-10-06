@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 45;
+use Test::More tests => 46;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -306,5 +306,22 @@ subtest 'Data for historic' => sub {
   my $rs2 = $schema->resultset($table)->get_ready_to_report();
   is ($rs2->count, 0, q[No entities to be reported]);
 }
+
+subtest 'test for short_desc' => sub {
+  plan tests => 2;
+  
+  my $values = {
+    'id_run'         => 300, 
+    'position'       => 10,
+    'id_mqc_outcome' => 0, 
+    'username'       => 'user', 
+    'modified_by'    => 'user'
+  };
+  my $rs = $schema->resultset($table);
+  lives_ok {$rs->find_or_new($values)->update_or_insert()} 'record inserted';
+  my $rs1 = $rs->search({'id_run' => 300});
+  my $row = $rs1->next;
+  is($row->short_desc, q[id_run 300 position 10], 'Correct short desc');
+};
 
 1;
