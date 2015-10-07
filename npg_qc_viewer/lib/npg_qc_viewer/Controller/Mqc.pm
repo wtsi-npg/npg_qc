@@ -94,7 +94,7 @@ sub _update_outcome {
     if ($working_as eq $MODE_LANE_MQC) { # Working as lane MQC
       my $hash_tags = $c->model('MLWarehouseDB')
                         ->fetch_tag_index_array_for_run_position($id_run, $position);
-      my $qc_tags = $hash_tags->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS};
+      my $qc_tags = $hash_tags->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS};
 
       $ent = $c->model('NpgQcDB')
                ->resultset('MqcOutcomeEnt')
