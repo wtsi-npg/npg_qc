@@ -1,5 +1,8 @@
 #!/usr/local/bin/bash
 
+# Exit on error
+set -e -o pipefail
+
 # $VERSION = '0';
 
 if [[ -e latest_plex_list.txt ]] && [[ -e latest_combined_file.txt ]] && ! cmp -s latest_plex_list.txt latest_combined_file.txt

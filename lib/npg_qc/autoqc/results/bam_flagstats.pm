@@ -1,17 +1,31 @@
 package npg_qc::autoqc::results::bam_flagstats;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Perl6::Slurp;
 use List::Util qw(sum);
-use File::Spec::Functions qw(splitpath catfile catpath);
+use File::Spec::Functions qw( splitpath
+                              catpath
+                              catfile
+                              splitdir
+                              catdir );
+use Try::Tiny;
 use Readonly;
 
 use npg_tracking::util::types;
+use npg_qc::autoqc::results::sequence_summary;
+use npg_qc::autoqc::results::samtools_stats;
+
 extends qw( npg_qc::autoqc::results::result );
-with    qw( npg_qc::autoqc::role::bam_flagstats );
+with    qw(
+            npg_tracking::glossary::subset
+            npg_qc::autoqc::role::bam_flagstats
+          );
+with 'npg_tracking::glossary::composition::factory' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
 our $VERSION = '0';
 
@@ -37,12 +51,7 @@ has [ qw/ +path
           +id_run
           +position / ] => ( required   => 0, );
 
-has 'subset' => ( isa         => 'Maybe[Str]',
-                  is          => 'ro',
-                  required    => 0,
-                  predicate   => 'has_subset',
-                  writer      => '_set_subset',
-);
+has '+subset' => ( writer      => '_set_subset', );
 
 has 'human_split' => ( isa            => 'Maybe[Str]',
                        is             => 'rw',
@@ -80,13 +89,16 @@ has 'histogram'         => ( isa     => 'HashRef',
 has 'sequence_file' => (
     isa        => 'NpgTrackingReadableFile',
     is         => 'ro',
+    traits     => [ 'DoNotSerialize' ],
     required   => 0,
+    writer     => '_set_sequence_file',
 );
 
 has [ qw/ markdups_metrics_file
           flagstats_metrics_file / ] => (
     isa        => 'Maybe[NpgTrackingReadableFile]',
     is         => 'ro',
+    traits     => [ 'DoNotSerialize' ],
     required   => 0,
     lazy_build => 1,
 );
@@ -114,53 +126,66 @@ sub _build__file_path_root {
   my $self = shift;
   my $path = q[];
   if ($self->sequence_file) {
-    ($path) = $self->sequence_file =~ /\A(.+)\.[[:lower:]]+\Z/smx;
+    ($path) =  _drop_extension($self->sequence_file);
   }
   return $path;
 }
+sub _drop_extension {
+  my $path = shift;
+  ($path) = $path =~ /\A(.+)\.[[:lower:]]+\Z/smx;
+  return $path
+}
 
-has 'samtools_stats_file' => ( isa        => 'HashRef',
+has 'samtools_stats_file' => ( isa        => 'ArrayRef',
                                is         => 'ro',
                                lazy_build => 1,
 );
 sub _build_samtools_stats_file {
   my $self = shift;
 
-  my $paths = {};
-
+  my @paths = ();
   if ($self->sequence_file) {
-    my $path = $self->_file_path_root . q[*.stats];
-    foreach my $file ( grep { -f $_ } glob $path) {
-      my $filter = $self->_filter($file);
-      if ($filter) {
-        $paths->{$filter} = $file;
-      }
-    }
-
-    my @found = values %{$paths};
-    if (@found) {
-      carp 'Found the following samtools stats files: ' . join q[, ], @found;
-    } else {
-      carp 'Not found samtools stats files';
+    my @underscores = ($self->sequence_file =~ /_/gsmx);
+    my $n = 1 + scalar @underscores;
+    @paths = sort grep { -f $_ && _matches_seq_file($_, $n) } glob $self->_file_path_root . q[_*.stats];
+    if (!@paths) {
+      warn 'WARNING: Samtools stats files are not found for ' . $self->to_string() . qq[\n];
     }
   } else {
-    carp 'Sequence file not given - not looking for samtools stats files';
+    warn 'WARNING: Sequence file not given - not looking for samtools stats files' . qq[\n];
   }
 
-  return $paths;
+  return \@paths;
+}
+sub _matches_seq_file {
+  my ($path, $expected_num_underscores) = @_;
+  my @underscores = ($path =~ /_/gsmx);
+  return scalar @underscores == $expected_num_underscores;
 }
 
-sub _filter {
-  my ($self, $path) = @_;
+has 'related_objects' => ( isa        => 'ArrayRef[Object]',
+                           is         => 'ro',
+                           lazy_build => 1,
+                           writer     => '_set_related_objects',
+                           predicate  => '_has_related_objects',
+);
+sub _build_related_objects {
+  my $self = shift;
 
-  my ($volume, $directories, $file) = splitpath($path);
-  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
-  if (!$filter) {
-    croak "Failed to get filter from $path";
+  my @objects = ();
+  if ($self->sequence_file && $self->id_run && $self->position) {
+    my $composition = $self->create_composition();
+    @objects = map { npg_qc::autoqc::results::samtools_stats->new(
+                          composition => $composition,
+                          stats_file  => $_
+                        )
+                   } @{$self->samtools_stats_file};
+    push @objects, npg_qc::autoqc::results::sequence_summary->new(
+                     composition   => $composition,
+                     sequence_file => $self->sequence_file
+                   );
   }
-  my $subset = $self->subset ? $self->subset . q[_] : q[];
-
-  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
+  return \@objects;
 }
 
 sub BUILD {
@@ -191,29 +216,63 @@ sub BUILD {
   return;
 }
 
+around 'store' => sub {
+  my ($orig, $self, $path) = @_;
+  if ($self->_has_related_objects()) {
+    for my $o ( @{$self->related_objects()} ) {
+      $o->store($path);
+    }
+  }
+  $self->_set_related_objects([]);
+  return $self->$orig($path);
+};
+
+sub filename_root {
+  my $self = shift;
+
+  if (!$self->id_run && $self->_file_path_root) {
+    my ($volume, $directories, $file) = splitpath($self->_file_path_root);
+    my $subset = $self->subset;
+    if ($subset) {
+      $file =~ s/\Q_${subset}\E\Z//msx;
+    }
+    return $file;
+  }
+  return;
+}
+
 sub execute {
   my $self = shift;
 
-  for my $attr ( qw/markdups_metrics_file flagstats_metrics_file/ ) {
-    if (!$self->$attr) {
-      croak "$attr not found";
-    }
+  $self->_parse_markdups_metrics();
+  $self->_parse_flagstats();
+  for my $ro ( @{$self->related_objects()} ) {
+    $ro->execute();
   }
-
-  $self->parsing_metrics_file($self->markdups_metrics_file);
-
-  my $fn = $self->flagstats_metrics_file;
-  open my $fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
-  $self->parsing_flagstats($fh);
-  close $fh or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
 
   return;
 }
 
-sub parsing_metrics_file {
-  my ($self, $metrics_file) = @_;
+sub create_related_objects {
+  my ($self, $path) = @_;
+  if (!$self->_has_related_objects()) {
+    if (!$self->sequence_file) {
+      $self->_set_sequence_file(_find_sequence_file($path));
+    }
+    foreach my $ro ( @{$self->related_objects()} ) {
+      $ro->execute();
+    }
+  }
+  return;
+}
 
-  my @file_contents = slurp ( $metrics_file, { irs => qr/\n\n/mxs } );
+sub _parse_markdups_metrics {
+  my $self = shift;
+
+  if (!$self->markdups_metrics_file) {
+    croak 'markdups_metrics_file not found';
+  }
+  my @file_contents = slurp ( $self->markdups_metrics_file, { irs => qr/\n\n/mxs } );
 
   my $header = $file_contents[0];
   chomp $header;
@@ -224,7 +283,7 @@ sub parsing_metrics_file {
   my $metrics = $file_contents[1];
   my $histogram  = $file_contents[2];
 
-  my @metrics_lines = split /\n/mxs, $metrics;
+    my @metrics_lines = split /\n/mxs, $metrics;
   my @metrics_numbers = split /\t/mxs, $metrics_lines[2];
 
   if (scalar  @metrics_numbers > scalar @{$METRICS_FIELD_LIST} ) {
@@ -261,9 +320,16 @@ sub parsing_metrics_file {
   return;
 }
 
-sub parsing_flagstats {
-  my ($self, $samtools_output_fh) = @_;
+sub _parse_flagstats {
+  my $self = shift;
 
+  my $fn = $self->flagstats_metrics_file;
+  if (!$fn) {
+    croak 'flagstats_metrics_file not found';
+  }
+
+  ## no critic (InputOutput::RequireBriefOpen)
+  open my $samtools_output_fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
   while ( my $line = <$samtools_output_fh> ) {
     chomp $line;
     my $number = sum $line =~ /^(\d+)\s*\+\s*(\d+)\b/mxs;
@@ -278,21 +344,31 @@ sub parsing_flagstats {
       ? $self->num_total_reads($number)
       : next;
   }
+  close $samtools_output_fh  or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
+
   return;
 }
 
-sub filename_root {
-  my $self = shift;
+sub _find_sequence_file {
+  my $path = shift;
 
-  if (!$self->id_run && $self->_file_path_root) {
-    my ($volume, $directories, $file) = splitpath($self->_file_path_root);
-    my $subset = $self->subset;
-    if ($subset) {
-      $file =~ s/\Q_${subset}\E\Z//msx;
-    }
-    return $file;
+  if (!$path) {
+    croak 'Path should be given';
   }
-  return;
+  if (!-f $path) {
+    croak 'File path should be given';
+  }
+
+  my ($volume, $directories, $file) = splitpath($path);
+  $file = _drop_extension($file);
+  $file =~ s/[\._]bam_flagstats\Z//msx;
+  $file = join q[.], $file, 'cram';
+  my @dirs = splitdir $directories;
+  if (! pop @dirs) { # move one directory up
+    pop @dirs
+  }
+
+  return catpath $volume, catdir(@dirs), $file;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -312,28 +388,46 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head1 SUBROUTINES/METHODS
 
+=head2 id_run
+
+  an optional attribute
+
+=head2 position
+
+  an optional attribute
+
+=head2 tag_index
+
+  an optional attribute
+
 =head2 subset
 
-  an optional subset, see npg_qc::autoqc::role:::sequence_subset for details.
+  an optional subset, see npg_tracking::glossary::subset for details.
 
 =head2 BUILD - ensures human_split and subset fields are populated consistently
 
 =head2 sequence_file
 
   an optional attribute, a full path to the sequence, should be set
-  for 'execute' method to work correctly 
+  for 'execute' method to work correctly
+
+=head2 store
+
+  extended parent method of the same name, serializes related objects to files
+  and resets the related objects attribute to an empty array, then calls
+  the parent method
 
 =head2 execute
 
   calls methods for parsing samtools flagstats and mark duplicates outputs
 
-=head2 parsing_flagstats
+=head2 related_objects
 
-  parses Picard MarkDuplicates metrics output file and save the result to the object
+  a lazy attribute, an array of related autoqc result objects
 
-=head2 parsing_metrics_file
+=head2 create_related_objects
 
-  parses samtools flagstats output file handler and save the result to the object
+  method forcing related objects attribute to be built
 
 =head2 markdups_metrics_file
 
@@ -345,7 +439,7 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head2 samtools_stats_file
 
-  an attribute, is built when 'execute' method is invoked
+  an attribute which is built when 'execute' method is invoked
 
 =head2 filename_root
 
@@ -359,6 +453,8 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item Moose
 
+=item MooseX::StrictConstructor
+
 =item Carp
 
 =item English
@@ -367,7 +463,9 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item List::Util
 
-=item File::Spec
+=item File::Spec::Functions
+
+=item Try::Tiny
 
 =item Readonly
 
@@ -375,11 +473,15 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item npg_tracking::util::types
 
+=item npg_tracking::glossary::subset
+
+=item npg_tracking::glossary::composition::factory
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =item npg_qc::autoqc::results::result
 
 =item npg_qc::autoqc::role::bam_flagstats
-
-=item npg_qc::autoqc::role::sequence_subset
 
 =back
 

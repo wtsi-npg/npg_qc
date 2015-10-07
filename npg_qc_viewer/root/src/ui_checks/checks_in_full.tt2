@@ -21,6 +21,7 @@
 
      row_info_to = c.stash.row_data.$lane_key;
      provenance = row_info_to.defined ? row_info_to.provenance.join(' << ') : '';
+     library_id = row_info_to.legacy_library_id; #used in genotype
   -%]
 
   <div class="results_full_lane">

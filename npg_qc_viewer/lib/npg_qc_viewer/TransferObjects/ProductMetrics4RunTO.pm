@@ -108,6 +108,17 @@ has 'sample_name' => (
   required => 0,
 );
 
+=head2 supplier_sample_name
+
+Supplier sample name
+
+=cut
+has 'supplier_sample_name' => (
+  isa      => 'Maybe[Str]',
+  is       => 'rw',
+  required => 0,
+);
+
 =head2 id_library_lims
 
 Id of library lims
@@ -181,7 +192,11 @@ Resets object's attributes as fits for a pool
 =cut
 sub reset_as_pool {
   my $self = shift;
-  for my $attr (qw/tag_sequence study_name id_sample_lims sample_name/) {
+  for my $attr (qw/tag_sequence
+                   study_name
+                   id_sample_lims
+                   sample_name
+                   supplier_sample_name/) {
     $self->$attr(undef);
   }
   $self->id_library_lims($self->id_pool_lims);
@@ -197,6 +212,17 @@ sub provenance {
   my $self = shift;
   my @p = grep { $_ } ($self->id_library_lims, $self->sample_name, $self->study_name);
   return @p;
+}
+
+=head2 sample_name4display
+
+Sometimes users prefer supplier_sample_name to sample_name.
+Returns supplier_sample_name, falls back to sample_name.
+
+=cut
+sub sample_name4display {
+  my $self = shift;
+  return $self->supplier_sample_name || $self->sample_name;
 }
 
 __PACKAGE__->meta->make_immutable;
