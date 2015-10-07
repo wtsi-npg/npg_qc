@@ -595,10 +595,13 @@ var NPG;
       };
 
       /**
-       * Uses the data from mqc_run_data (list of tag_indexes) to filter the
+       * Uses the data from mqc_run_data (list of qc_tags) to filter the
        * array of lanes from the page. It creates a new array which contains
        * only lanes with tag_indexes which need to be qc'ed (without
-       * tag_index in {0, phix}).
+       * tag_index in {0, phix}). Internally it also creates an array of lanes
+       * which appear in the page but are non_qc_tags. It validates number of
+       * lanes processed and number of tags qc + non qc. They should match. If
+       * they don't match, generates an error message and throws an Error.
        * @param mqc_run_data data from REST
        * @param lanes dom elements from page
        * @returns {Array}
@@ -609,7 +612,9 @@ var NPG;
             || lanes == null) {
           throw new Error("invalid arguments");
         }
-        var lanes_temp = [];
+        var lanes_qc_temp = [];
+        var lanes_non_qc_temp = [];
+        var lanes_checked = 0;
         for(var i = 0; i < lanes.length; i++) {
           var lane = lanes[i];
           var cells = lane.children('.lane_mqc_control')
@@ -617,12 +622,26 @@ var NPG;
             var obj = $(cells[j]); //Wrap as an jQuery object.
             var tag_index = obj.data(this.DATA_TAG_INDEX);
             tag_index = String(tag_index);
-            if($.inArray(tag_index, mqc_run_data.qc_tags) != -1) {
-              lanes_temp.push(lane);
+            if(tag_index !== '') {
+              lanes_checked++;
+              //tag_index is qc-able
+              if($.inArray(tag_index, mqc_run_data.qc_tags) != -1) {
+                lanes_qc_temp.push(lane);
+              } else {
+                if ($.inArray(tag_index, mqc_run_data.non_qc_tags) != -1) {
+                  lanes_non_qc_temp.push(lane);
+                }
+              }
             }
           }
         }
-        return lanes_temp;
+        if(lanes_qc_temp.length + lanes_non_qc_temp.length != lanes_checked) {
+          var errorMessage = 'Error when comparing libraries from LIMS Warehouse and QC database.';
+          new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
+          throw new Error("Conflicting data from LIMS DWH and QC database.");
+        }
+
+        return lanes_qc_temp;
       };
 
       /**
