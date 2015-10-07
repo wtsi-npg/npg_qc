@@ -215,8 +215,8 @@ sub fetch_tag_index_array_for_run_position {
 
   $where_ti = {
     -or => [
-      $cs_alias . '.tag_index' => { q[==] => 0 },
-      'entity_type'            => { q[==] => 'library_indexed_spike' },
+      $cs_alias . '.tag_index' => { q[=] => 0 },
+      'entity_type'            => { q[=] => 'library_indexed_spike' },
     ],
   };
   my $non_qc_tags = $self->_get_from_rs_as_array($rs, $where_ti);
