@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 10;
 use Test::Exception;
 use File::Temp qw(tempfile);
 
@@ -89,6 +89,47 @@ subtest 'Data for sample' => sub {
   cmp_ok($sample->id_sample_lims, '==', 2617, q[Correct id sample lims]);
   cmp_ok($sample->name, 'eq', q[random_sample_name], q[Correct sample name from name]);
 
+};
+
+subtest 'fetch_tag_index_array_for_run_position wo tag_index null' => sub {
+  plan tests => 7;
+  my $id_run = 4950;
+  my $rs = $m->resultset(q(IseqProductMetric));
+  
+  
+  
+  ok (defined $rs, "IseqProductMetric resultset");
+  ok ($rs->count, "IseqProductMetric resultset has data");
+  $rs = $rs->search({id_run=>$id_run, position=>1});
+  is($rs->count, 25, q[Correct number of elements found]);
+  
+  #Make tag_index 24 look as phix
+  my $rs1 = $rs->search({tag_index=>24});
+  my $to_phix = $rs1->next;
+  my $iseq_flowcell = $to_phix->iseq_flowcell; 
+  $iseq_flowcell->entity_type('library_indexed_spike');
+  $iseq_flowcell->update;
+  
+  my $hash = $m->fetch_tag_index_array_for_run_position($id_run, 1);
+  ok ($hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS},     'Hash has array for qc tags');
+  ok ($hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS}, 'Hash has array for non qc tags');
+  is(scalar @{$hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS}},    23, 'Correct number of tags for qc' );
+  is(scalar @{$hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS}}, 2, 'Correct number of tags for non qc' );
+};
+
+subtest 'fetch_tag_index_array_for_run_position with tag_index null' => sub {
+  plan tests => 7;
+  my $id_run = 4025;
+  my $rs = $m->resultset(q(IseqProductMetric));
+  ok (defined $rs, "IseqProductMetric resultset");
+  ok ($rs->count, "IseqProductMetric resultset has data");
+  $rs = $rs->search({id_run=>$id_run, position=>1});
+  is($rs->count, 1, q[Correct number of elements found]);
+  my $hash = $m->fetch_tag_index_array_for_run_position($id_run, 1);
+  ok ($hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS},     'Hash has array for qc tags');
+  ok ($hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS}, 'Hash has array for non qc tags');
+  is(scalar @{$hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS}},     0, 'Correct number of tags for qc' );
+  is(scalar @{$hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS}}, 0, 'Correct number of tags for non qc' );
 };
 
 1;

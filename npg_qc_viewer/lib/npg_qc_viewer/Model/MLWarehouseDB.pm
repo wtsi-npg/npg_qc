@@ -3,10 +3,14 @@ package npg_qc_viewer::Model::MLWarehouseDB;
 use Moose;
 use namespace::autoclean;
 use Carp;
+use Readonly;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
+
+Readonly::Scalar our $HASH_KEY_QC_TAGS     => q[qc_tags];
+Readonly::Scalar our $HASH_KEY_NON_QC_TAGS => q[non_qc_tags];
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -192,8 +196,7 @@ sub fetch_tag_index_array_for_run_position {
   my $where = {
     $cs_alias . '.id_run'     => $id_run,
     $cs_alias . '.position'   => $position,
-    $cs_alias . '.tag_index'  => { q[!=] => 0 },
-    'entity_type'  => { q[!=] => 'library_indexed_spike' },
+    $cs_alias . '.tag_index'  => { q[!=], undef },
   };
 
   my $rs = $resultset->search($where, {
@@ -202,12 +205,40 @@ sub fetch_tag_index_array_for_run_position {
              cache    => 1,
   });
 
-  my $tags = [];
-  while(my $prod = $rs->next) {
-    push @{$tags}, $prod->tag_index;
+  my $tags = {};
+
+  my $where_ti = {
+    $cs_alias . '.tag_index' => { q[!=] => 0 },
+    'entity_type'            => { q[!=] => 'library_indexed_spike' },
+  };
+  my $qc_tags = $self->_get_from_rs_as_array($rs, $where_ti);
+
+  $where_ti = {
+    -or => [
+      $cs_alias . '.tag_index' => { q[==] => 0 },
+      'entity_type'            => { q[==] => 'library_indexed_spike' },
+    ],
+  };
+  my $non_qc_tags = $self->_get_from_rs_as_array($rs, $where_ti);
+
+  $tags->{$HASH_KEY_QC_TAGS}     = $qc_tags;
+  $tags->{$HASH_KEY_NON_QC_TAGS} = $non_qc_tags;
+
+  return $tags;
+}
+
+sub _get_from_rs_as_array {
+  my ($self, $rs, $where) = @_;
+
+  my $temp_array = [];
+
+  my $rs1 = $rs->search($where);
+  while(my $prod = $rs1->next) {
+    my $tag_index = $prod->tag_index;
+    push @{$temp_array}, $tag_index;
   }
 
-  return $tags; #TODO needs a test.
+  return $temp_array;
 }
 
 __PACKAGE__->meta->make_immutable;
