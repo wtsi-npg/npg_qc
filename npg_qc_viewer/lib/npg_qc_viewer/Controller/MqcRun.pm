@@ -17,6 +17,8 @@ with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 
 our $VERSION = '0';
 
+use npg_qc_viewer::Model::MLWarehouseDB;
+
 Readonly::Scalar my $MQC_ROLE      => q[manual_qc];
 Readonly::Scalar my $MQC_LANE_ENT  => q[MqcOutcomeEnt];
 Readonly::Scalar my $MQC_LIB_ENT   => q[MqcLibraryOutcomeEnt];
@@ -129,10 +131,10 @@ sub mqc_libraries_GET {
       $hash_entity->{'qc_plex_status'}       = $qc_outcomes;
       $hash_entity->{'current_lane_outcome'} = $current_lane_outcome;
 
-      my $qc_tags = $tags_hash->{'qc_tags'};
+      my $qc_tags = $tags_hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS};
       $hash_entity->{'qc_tags'}                 = $qc_tags;
 
-      my $non_qc_tags = $tags_hash->{'non_qc_tags'};
+      my $non_qc_tags = $tags_hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS};
       $hash_entity->{'non_qc_tags'}             = $non_qc_tags;
 
       $self->status_ok($c, entity => $hash_entity,);

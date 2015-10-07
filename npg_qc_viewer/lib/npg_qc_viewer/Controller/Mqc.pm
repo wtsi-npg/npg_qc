@@ -13,6 +13,8 @@ with 'npg_qc_viewer::Util::Error';
 
 our $VERSION  = '0';
 
+use npg_qc_viewer::Model::MLWarehouseDB;
+
 Readonly::Scalar my $BAD_REQUEST_CODE      => 400;
 Readonly::Scalar my $OK_CODE               => 200;
 Readonly::Scalar my $METHOD_NOT_ALLOWED    => 405;
@@ -90,8 +92,9 @@ sub _update_outcome {
     }
 
     if ($working_as eq $MODE_LANE_MQC) { # Working as lane MQC
-      my $tags = $c->model('MLWarehouseDB')
-                   ->fetch_tag_index_array_for_run_position($id_run, $position);
+      my $hash_tags = $c->model('MLWarehouseDB')
+                        ->fetch_tag_index_array_for_run_position($id_run, $position);
+      my $qc_tags = $hash_tags->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS};
 
       $ent = $c->model('NpgQcDB')
                ->resultset('MqcOutcomeEnt')
@@ -101,7 +104,7 @@ sub _update_outcome {
       );
       $c->model('NpgQcDB')
         ->resultset('MqcOutcomeEnt')
-        ->update_outcome_with_libraries($ent, $new_outcome, $username, $tags);
+        ->update_outcome_with_libraries($ent, $new_outcome, $username, $qc_tags);
     } else { # Working as library MQC
       $ent = $c->model('NpgQcDB')
                ->resultset('MqcLibraryOutcomeEnt')
