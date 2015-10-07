@@ -121,14 +121,19 @@ sub mqc_libraries_GET {
     # serialized in the body
     if($ent) {
       my $hash_entity = $self->_fill_entity_for_response($id_run, $ent, $authenticated, $c);
-      my $tags = $c->model('MLWarehouseDB')
+      my $tags_hash = $c->model('MLWarehouseDB')
                    ->fetch_tag_index_array_for_run_position($id_run, $position);
       $hash_entity->{'mqc_lib_limit'}        = $MQC_LIB_LIMIT;
       $hash_entity->{'position'}             = $position;
       ##### Check if there are mqc values and add.
       $hash_entity->{'qc_plex_status'}       = $qc_outcomes;
       $hash_entity->{'current_lane_outcome'} = $current_lane_outcome;
-      $hash_entity->{'tags'}                 = $tags;
+
+      my $qc_tags = $tags_hash->{'qc_tags'};
+      $hash_entity->{'qc_tags'}                 = $qc_tags;
+
+      my $non_qc_tags = $tags_hash->{'non_qc_tags'};
+      $hash_entity->{'non_qc_tags'}             = $non_qc_tags;
 
       $self->status_ok($c, entity => $hash_entity,);
     }

@@ -571,9 +571,9 @@ var NPG;
        * @returns {Boolean}
        */
       LanePageMQCControl.prototype.checkLibLimit = function (mqc_run_data) {
-        var result = typeof(mqc_run_data.tags)!== "undefined" /* Checking if number of libraries is under the limit allowed */
+        var result = typeof(mqc_run_data.qc_tags)!== "undefined" /* Checking if number of libraries is under the limit allowed */
                      && typeof(mqc_run_data.mqc_lib_limit)!== "undefined"
-                     && mqc_run_data.tags.length <= mqc_run_data.mqc_lib_limit;
+                     && mqc_run_data.qc_tags.length <= mqc_run_data.mqc_lib_limit;
         return result;
       };
 
@@ -617,7 +617,7 @@ var NPG;
             var obj = $(cells[j]); //Wrap as an jQuery object.
             var tag_index = obj.data(this.DATA_TAG_INDEX);
             tag_index = String(tag_index);
-            if($.inArray(tag_index, mqc_run_data.tags) != -1) {
+            if($.inArray(tag_index, mqc_run_data.qc_tags) != -1) {
               lanes_temp.push(lane);
             }
           }
@@ -704,10 +704,10 @@ var NPG;
               }
             );
           } else {
-            control.showMQCOutcomes(jqxhr.responseJSON, lanes);
+            self.showMQCOutcomes(jqxhr.responseJSON, lanes);
           }
         }).fail(function(jqXHR, textStatus, errorThrown) {
-          new NPG.QC.UI.ErrorMessage(errorThrown + " " + textStatus).toConsole().display();
+          new NPG.QC.UI.MQCErrorMessage(errorThrown + " " + textStatus).toConsole().display();
         }).always(function(data){
           //Clear progress icon
           $('.lane_mqc_working').empty();
@@ -886,7 +886,7 @@ var NPG;
             self.showMQCOutcomes(jqxhr.responseJSON, lanes);
           }
         }).fail(function(jqXHR, textStatus, errorThrown) {
-          new NPG.QC.UI.ErrorMessage(errorThrown + " " + textStatus).toConsole().display();
+          new NPG.QC.UI.MQCErrorMessage(errorThrown + " " + textStatus).toConsole().display();
         }).always(function(data){
           //Clear progress icon
           $('.lane_mqc_working').empty();
