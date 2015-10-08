@@ -119,7 +119,7 @@ sub update_outcome {
   }
   $self->validate_username($username);
   my $outcome_dict_obj = $self->find_valid_outcome($outcome);
-  
+
   my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
   #There is a row that matches the id_run and position
   if ($self->in_storage) {

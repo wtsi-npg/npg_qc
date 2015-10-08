@@ -51,13 +51,51 @@ sub search_library_outcome_ent {
   $values->{'id_run'}    = $id_run;
   $values->{'position'}  = $position;
   $values->{'tag_index'} = $tag_index; #TODO tag_index = undef?
+  $self->result_class->deflate_unique_key_components($values);
   my $ent = $self->search($values)->next;
   if (!$ent) {
+    #TODO Check if I should send tag_index back to undef
     $values->{'username'}    = $username;
     $values->{'modified_by'} = $username;
     $ent = $self->new_result($values);
   }
   return $ent;
+}
+
+sub fetch_mqc_library_outcomes {
+  my ($self, $id_run, $position) = @_;
+
+  if(!defined $id_run) {
+    croak q[Mandatory parameter 'id_run' missing in call];
+  }
+  if(!defined $position) {
+    croak q[Mandatory parameter 'position' missing in call];
+  }
+
+  my $rs1 = $self->search({
+    'id_run' => $id_run,
+    'position' => $position,
+  });
+  return $rs1;
+}
+
+sub batch_update_libraries {
+  my ($self, $lane_ent, $tag_indexes_in_lims, $username) = @_;
+
+  foreach my $tag_index (@{$tag_indexes_in_lims}) {
+    my $library_ent = $self->search_library_outcome_ent($lane_ent->id_run, $lane_ent->position, $tag_index, $username);
+    my $new_outcome = q[Undecided];
+    if ($library_ent->in_storage) {
+      if($library_ent->mqc_outcome->short_desc eq q[Accepted preliminary]) {
+        $new_outcome = q[Accepted final];
+      } elsif ($library_ent->mqc_outcome->short_desc eq q[Rejected preliminary]) {
+        $new_outcome = q[Rejected final];
+      }
+    }
+    $library_ent->update_outcome($new_outcome, $username);
+  }
+
+  return 1;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -93,6 +131,16 @@ Extended ResultSet with specific functionality for for manual MQC.
 
   Find previous mqc outcome for the id_run/position/tag_index,
   create it for the specified user if it does not exist.
+
+=head2 fetch_mqc_library_outcomes
+
+  Returns a resultset with mqc library outcome entity for id_run, position
+  passed as parameters
+
+=head2 batch_update_libraries
+
+  Iterates on the list of tag_indexes provided to update outcomes to final for
+  the library outcome entities related to the lane entity passed as parameter.
 
 =head1 DEPENDENCIES
 

@@ -204,24 +204,13 @@ use Carp;
 
 our $VERSION = '0';
 
-use npg_qc::Schema::MQCEntRole qw[$MQC_LIBRARY_ENT $MQC_LANE_HIST];
+use npg_qc::Schema::MQCEntRole qw[$MQC_LIBRARY_ENT $MQC_LANE_HIST $MQC_LIB_LIMIT];
 
 with qw/npg_qc::Schema::MQCEntRole/;
 
 sub historic_resultset {
   my $self = shift;
   return $MQC_LANE_HIST;
-}
-
-sub fetch_mqc_library_outcomes {
-  my ($self) = @_;
-
-  my $rs = $self->result_source->schema->resultset($MQC_LIBRARY_ENT);
-  my $rs1 = $rs->search({
-    'id_run' => $self->id_run,
-    'position' => $self->position,
-  });
-  return $rs1;
 }
 
 sub update_reported {
@@ -241,6 +230,55 @@ sub short_desc {
   return $s;
 }
 
+sub validate_outcome_of_libraries {
+  my ($self, $outcome_dict_obj, $tag_indexes_in_lims, $library_outcome_ents) = @_;
+
+  if($outcome_dict_obj->is_accepted) {
+    #all plexes with qc
+    if(scalar @{ $tag_indexes_in_lims } == $library_outcome_ents->count ) {
+      my $tag_indexes_in_qc = [];
+      while(my $library = $library_outcome_ents->next) {
+        if ($library->is_undecided) {
+          croak('Error All libraries need to have a pass or fail outcome.');
+        }
+        push @{$tag_indexes_in_qc}, $library->tag_index;
+      }
+
+      use Array::Compare;
+      my $comp = Array::Compare->new;
+      if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
+        croak('Error Libraries in LIMS and libraries in QC does not match.');
+      }
+    } else {
+      croak('Error All libraries need to have an outcome.');
+    }
+  } else {
+    #All plexes with undecided
+    while(my $library = $library_outcome_ents->next) {
+      if (!$library->is_undecided) {
+        croak('Error All libraries need to have undecided outcome.');
+      }
+    }
+  }
+  return 1;
+}
+
+sub update_outcome_with_libraries {
+  my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
+
+  my $outcome_dict_object = $self->find_valid_outcome($outcome);
+  if( $outcome_dict_object->is_final_outcome
+        && scalar @{$tag_indexes_in_lims} <= $MQC_LIB_LIMIT ) {
+    my $rs_library_ent = $self->result_source->schema->resultset($MQC_LIBRARY_ENT);
+    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes($self->id_run, $self->position);
+    $self->validate_outcome_of_libraries($outcome_dict_object, $tag_indexes_in_lims, $outcomes_libraries);
+    $rs_library_ent->batch_update_libraries( $self, $tag_indexes_in_lims, $username );
+  }
+
+  $self->update_outcome($outcome, $username);
+  return 1;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -257,8 +295,6 @@ Entity for lane MQC outcome.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
-
-=head2 fetch_mqc_library_outcomes
 
 =head2 update_reported
 
@@ -287,6 +323,16 @@ Entity for lane MQC outcome.
 =head2 short_desc
 
   Returns minimal info of entity (run, lane, tag_index) for error messaging
+
+=head2 validate_outcome_of_libraries
+
+  Validates if overall state for the lane and the libraries allows for a final
+  outcome in the lane.
+
+=head2 update_outcome_with_libraries
+
+  Updates children library mqc outcomes then updates outcome of lane mqc entity
+  passed as parameter.
 
 =head1 DEPENDENCIES
 
