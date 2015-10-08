@@ -18,11 +18,11 @@ with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 our $VERSION = '0';
 
 use npg_qc_viewer::Model::MLWarehouseDB;
+use npg_qc::Schema::MQCEntRole qw[$MQC_LIB_LIMIT];
 
 Readonly::Scalar my $MQC_ROLE      => q[manual_qc];
 Readonly::Scalar my $MQC_LANE_ENT  => q[MqcOutcomeEnt];
 Readonly::Scalar my $MQC_LIB_ENT   => q[MqcLibraryOutcomeEnt];
-Readonly::Scalar my $MQC_LIB_LIMIT => 50;
 
 sub _authenticate {
   my ( $self, $c ) = @_;
@@ -102,6 +102,8 @@ sub mqc_libraries : Path('/mqc/mqc_libraries') : ActionClass('REST') { }
 sub mqc_libraries_GET {
   my ( $self, $c, $id_run_position ) = @_;
   my $error;
+  my $qc_name = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS;
+  my $non_qc_name = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS;
 
   try {
     my $authenticated = $self->_authenticate($c);
@@ -131,11 +133,11 @@ sub mqc_libraries_GET {
       $hash_entity->{'qc_plex_status'}       = $qc_outcomes;
       $hash_entity->{'current_lane_outcome'} = $current_lane_outcome;
 
-      my $qc_tags = $tags_hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS};
-      $hash_entity->{'qc_tags'}                 = $qc_tags;
+      my $qc_tags = $tags_hash->{$qc_name};
+      $hash_entity->{'qc_tags'}              = $qc_tags;
 
-      my $non_qc_tags = $tags_hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS};
-      $hash_entity->{'non_qc_tags'}             = $non_qc_tags;
+      my $non_qc_tags = $tags_hash->{$non_qc_name};
+      $hash_entity->{'non_qc_tags'}          = $non_qc_tags;
 
       $self->status_ok($c, entity => $hash_entity,);
     }

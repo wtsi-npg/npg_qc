@@ -3,10 +3,12 @@ package npg_qc::Schema::ResultSet::MqcOutcomeEnt;
 use Moose;
 use namespace::autoclean;
 use MooseX::NonMoose;
+use Carp;
 
 extends 'DBIx::Class::ResultSet';
 
 our $VERSION = '0';
+use npg_qc::Schema::MQCEntRole qw[$MQC_LIB_LIMIT];
 
 sub BUILDARGS {
   my ($class, $rsrc, $args) = @_;
@@ -45,7 +47,8 @@ sub update_outcome_with_libraries {
   my ($self, $lane_ent, $outcome, $username, $tag_indexes) = @_;
 
   my $outcome_dict_object = $lane_ent->find_valid_outcome($outcome);
-  if($outcome_dict_object->is_final_outcome) {
+  if( $outcome_dict_object->is_final_outcome
+        && scalar @{$tag_indexes} <= $MQC_LIB_LIMIT ) {
     my $outcomes_libraries = $lane_ent->fetch_mqc_library_outcomes($tag_indexes);
     if($outcome_dict_object->is_accepted) {
       #all plexes with qc
@@ -79,6 +82,7 @@ sub update_outcome_with_libraries {
       }
       $library_ent->update_outcome($new_outcome, $username);
     }
+    
   }
 
   $lane_ent->update_outcome($outcome, $username);

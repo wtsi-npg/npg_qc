@@ -17,6 +17,7 @@ our @EXPORT_OK = qw/$MQC_OUTCOME_DICT
                     $MQC_LANE_HIST
                     $MQC_LIBRARY_ENT
                     $MQC_LIBRARY_HIST
+                    $MQC_LIB_LIMIT
                    /;
 
 Readonly::Scalar our $MQC_OUTCOME_DICT  => q[MqcOutcomeDict];
@@ -24,6 +25,8 @@ Readonly::Scalar our $MQC_LANE_ENT      => q[MqcOutcomeEnt];
 Readonly::Scalar our $MQC_LANE_HIST     => q[MqcOutcomeHist];
 Readonly::Scalar our $MQC_LIBRARY_ENT   => q[MqcLibraryOutcomeEnt];
 Readonly::Scalar our $MQC_LIBRARY_HIST  => q[MqcLibraryOutcomeHist];
+
+Readonly::Scalar our $MQC_LIB_LIMIT     => 50;
 
 requires 'short_desc';
 requires 'mqc_outcome';
