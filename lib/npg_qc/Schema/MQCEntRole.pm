@@ -163,7 +163,8 @@ sub find_valid_outcome {
     $outcome_dict = $rs->search({short_desc => $outcome})->next;
   }
   if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
-    croak(sprintf 'Error while validating outcome "%s".', $outcome);
+    croak(sprintf 'Error while trying to transit %s to a non-existing outcome "%s".',
+          $self->short_desc, $outcome);
   }
   return $outcome_dict;
 }
