@@ -214,13 +214,14 @@ sub historic_resultset {
 }
 
 sub fetch_mqc_library_outcomes {
-  my ($self, $tag_indexes) = @_;
+  my ($self) = @_;
 
-  my $rs = $self->result_source->schema->resultset($MQC_LANE_HIST);
-  $rs->search_rs({'id_run' => $self->id_run,
+  my $rs = $self->result_source->schema->resultset($MQC_LIBRARY_ENT);
+  my $rs1 = $rs->search({
+    'id_run' => $self->id_run,
     'position' => $self->position,
   });
-  return $rs;
+  return $rs1;
 }
 
 sub update_reported {

@@ -8,7 +8,7 @@ use Carp;
 extends 'DBIx::Class::ResultSet';
 
 our $VERSION = '0';
-use npg_qc::Schema::MQCEntRole qw[$MQC_LIB_LIMIT];
+use npg_qc::Schema::MQCEntRole qw[$MQC_LIB_LIMIT $MQC_LIBRARY_ENT];
 
 sub BUILDARGS {
   my ($class, $rsrc, $args) = @_;
@@ -49,7 +49,7 @@ sub update_outcome_with_libraries {
   my $outcome_dict_object = $lane_ent->find_valid_outcome($outcome);
   if( $outcome_dict_object->is_final_outcome
         && scalar @{$tag_indexes} <= $MQC_LIB_LIMIT ) {
-    my $outcomes_libraries = $lane_ent->fetch_mqc_library_outcomes($tag_indexes);
+    my $outcomes_libraries = $lane_ent->fetch_mqc_library_outcomes();
     if($outcome_dict_object->is_accepted) {
       #all plexes with qc
       if(scalar @{ $tag_indexes } == $outcomes_libraries->count ) {
@@ -70,8 +70,9 @@ sub update_outcome_with_libraries {
       }
     }
 
+    my $rs_library_ent = $lane_ent->result_source->schema->resultset($MQC_LIBRARY_ENT);
     foreach my $tag_index (@{$tag_indexes}) {
-      my $library_ent = $self->search_library_outcome_ent($lane_ent->id_run, $lane_ent->position, $tag_index, $username);
+      my $library_ent = $rs_library_ent->search_library_outcome_ent($lane_ent->id_run, $lane_ent->position, $tag_index, $username);
       my $new_outcome = q[Undecided];
       if ($library_ent->in_storage) {
         if($library_ent->mqc_outcome->short_desc eq q[Accepted preliminary]) {

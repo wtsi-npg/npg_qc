@@ -119,30 +119,26 @@ sub update_outcome {
   }
   $self->validate_username($username);
   my $outcome_dict_obj = $self->find_valid_outcome($outcome);
-  if($outcome_dict_obj) { # The new outcome is a valid one
-    my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
-    #There is a row that matches the id_run and position
-    if ($self->in_storage) {
-      #Check if previous outcome is not final
-      if($self->has_final_outcome) {
-        croak(sprintf 'Error while trying to update a final outcome for %s',
-              $self->short_desc);
-      } else { #Update
-        $self->update({
-          'id_mqc_outcome' => $outcome_id,
-          'username' => $username,
-          'modified_by' => $username
-        });
-      }
-    } else { #Is a new row just insert.
-      $self->id_mqc_outcome($outcome_id);
-      $self->username($username);
-      $self->modified_by($username);
-      $self->insert();
+  
+  my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
+  #There is a row that matches the id_run and position
+  if ($self->in_storage) {
+    #Check if previous outcome is not final
+    if($self->has_final_outcome) {
+      croak(sprintf 'Error while trying to update a final outcome for %s',
+            $self->short_desc);
+    } else { #Update
+      $self->update({
+        'id_mqc_outcome' => $outcome_id,
+        'username' => $username,
+        'modified_by' => $username
+      });
     }
-  } else {
-    croak(sprintf 'Error while trying to transit %s to a non-existing outcome "%s".',
-          $self->short_desc, $outcome);
+  } else { #Is a new row just insert.
+    $self->id_mqc_outcome($outcome_id);
+    $self->username($username);
+    $self->modified_by($username);
+    $self->insert();
   }
   return 1;
 }
@@ -166,10 +162,10 @@ sub find_valid_outcome {
   } else {
     $outcome_dict = $rs->search({short_desc => $outcome})->next;
   }
-  if ((defined $outcome_dict) && $outcome_dict->iscurrent) {
-    return $outcome_dict;
+  if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
+    croak(sprintf 'Error while validating outcome "%s".', $outcome);
   }
-  return;
+  return $outcome_dict;
 }
 
 no Moose;
