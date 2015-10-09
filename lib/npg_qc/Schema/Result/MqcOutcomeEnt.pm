@@ -204,6 +204,7 @@ use Carp;
 
 our $VERSION = '0';
 
+use Array::Compare;
 use npg_qc::Schema::MQCEntRole qw[$MQC_LIBRARY_ENT $MQC_LANE_HIST $MQC_LIB_LIMIT];
 
 with qw/npg_qc::Schema::MQCEntRole/;
@@ -244,8 +245,6 @@ sub validate_outcome_of_libraries {
         push @{$tag_indexes_in_qc}, $library->tag_index;
       }
 
-      #TODO Check if there is better option
-      use Array::Compare;
       my $comp = Array::Compare->new;
       if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
         croak('Error: Libraries in LIMS and libraries in QC does not match.');
