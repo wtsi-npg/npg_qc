@@ -726,7 +726,13 @@ var NPG;
             self.showMQCOutcomes(jqxhr.responseJSON, lanes);
           }
         }).fail(function(jqXHR, textStatus, errorThrown) {
-          new NPG.QC.UI.MQCErrorMessage(errorThrown + " " + textStatus).toConsole().display();
+          var errorMessage;
+          if (jqXHR.responseJSON) {
+            errorMessage = jqXHR.responseJSON.error;
+          } else {
+            errorMessage = errorThrown + " " + textStatus;
+          }
+          new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
         }).always(function(data){
           //Clear progress icon
           $('.lane_mqc_working').empty();
@@ -880,7 +886,7 @@ var NPG;
           var mqc_run_data = jqxhr.responseJSON;
           if(self.isStateForMQC(mqc_run_data)) {
             var DWHMatch = self.laneOutcomesMatch(lanesWithBG, mqc_run_data);
-            if(DWHMatch.outcome) {
+//            if(DWHMatch.outcome) {
               self.initQC(jqxhr.responseJSON, lanes,
                   function (mqc_run_data, runMQCControl, lanes) {
                     //Show working icons
@@ -896,16 +902,22 @@ var NPG;
                     return;
                   }
               );
-            } else {
-              var errorMessage = new NPG.QC.UI.MQCConflictDWHErrorMessage(id_run, DWHMatch.position);
-              errorMessage.toConsole().display();
-              //Clear progress icon
-            }
+//            } else {
+//              var errorMessage = new NPG.QC.UI.MQCConflictDWHErrorMessage(id_run, DWHMatch.position);
+//              errorMessage.toConsole().display();
+//              //Clear progress icon
+//            }
           } else {
             self.showMQCOutcomes(jqxhr.responseJSON, lanes);
           }
         }).fail(function(jqXHR, textStatus, errorThrown) {
-          new NPG.QC.UI.MQCErrorMessage(errorThrown + " " + textStatus).toConsole().display();
+          var errorMessage;
+          if (jqXHR.responseJSON) {
+            errorMessage = jqXHR.responseJSON.error;
+          } else {
+            errorMessage = errorThrown + " " + textStatus;
+          }
+          new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
         }).always(function(data){
           //Clear progress icon
           $('.lane_mqc_working').empty();
