@@ -29,7 +29,7 @@ Readonly::Scalar our $MQC_LIBRARY_ENT  => q[MqcLibraryOutcomeEnt];
 Readonly::Scalar our $MQC_LIBRARY_HIST => q[MqcLibraryOutcomeHist];
 
 #MQC general configuration
-Readonly::Scalar our $MQC_LIB_LIMIT    => 500;
+Readonly::Scalar our $MQC_LIB_LIMIT    => 50;
 Readonly::Scalar our $MQC_ROLE         => q[manual_qc];
 
 requires 'short_desc';
