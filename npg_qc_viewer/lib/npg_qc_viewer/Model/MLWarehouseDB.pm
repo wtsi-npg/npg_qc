@@ -177,7 +177,8 @@ sub search_sample_by_sample_id {
 
   Search for tag indexes associated with a run, position and return them as
   an array. It does the search explicitely excluding tag_index = 0 and 
-  entity_type = 'library_index_spike'.
+  entity_type = 'library_index_spike'. Croaks if there is no data in LIMS for
+  the parameters.
 
 =cut
 sub fetch_tag_index_array_for_run_position {
@@ -204,6 +205,11 @@ sub fetch_tag_index_array_for_run_position {
              order_by => qw[ me.id_run me.position me.tag_index ],
              cache    => 1,
   });
+
+  #TODO Should this go outside (meaning an extra query)?
+  if ($rs->count != 0) {
+    croak q[Error: No LIMS data for this run/position.];
+  }
 
   my $tags = {};
 
