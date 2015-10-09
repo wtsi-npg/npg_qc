@@ -109,7 +109,7 @@ var NPG;
       };
 
       MQCControl.prototype.setRejectedBG = function () {
-        this.lane_control.parent().css("background-color", "#FFDDDD");
+        this.lane_control.parent().css("background-color", "#F99389");
       };
 
       MQCControl.prototype.setAcceptedPreliminaryBG = function() {
@@ -118,7 +118,7 @@ var NPG;
       };
 
       MQCControl.prototype.setRejectedPreliminaryBG = function() {
-        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #F99389, #F99389 10px, #FFFFFF 10px, #FFFFFF 20px)");
         this.lane_control.parent().prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
 
