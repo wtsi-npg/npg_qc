@@ -105,7 +105,7 @@ var NPG;
         };
 
         MQCErrorMessage.prototype.toConsole = function () {
-          window.console && console.log("error: " + this.errorText);
+          window.console && console.log(this.errorText);
           return this;
         };
 

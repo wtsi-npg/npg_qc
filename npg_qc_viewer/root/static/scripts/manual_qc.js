@@ -91,7 +91,7 @@ var NPG;
       MQCControl.prototype.saveAsFinalOutcome = function() {
         var control = this;
         if(this.outcome == this.CONFIG_UNDECIDED) {
-          throw new Error('Invalid state');
+          throw new Error('Error: Invalid state');
         }
         if(this.outcome == this.CONFIG_ACCEPTED_PRELIMINARY) {
           this.updateOutcome(this.CONFIG_ACCEPTED_FINAL);
@@ -610,7 +610,7 @@ var NPG;
         this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined"
             || lanes == null) {
-          throw new Error("invalid arguments");
+          throw new Error("Error: Invalid arguments");
         }
         var lanes_qc_temp = [];
         var lanes_non_qc_temp = [];
@@ -652,7 +652,7 @@ var NPG;
       LanePageMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
         this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined" || lanes == null) {
-          throw new Error("invalid arguments");
+          throw new Error("Error: Invalid arguments");
         }
         var self = this;
 
@@ -737,7 +737,7 @@ var NPG;
       LanePageMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
         this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined" || lanes == null) {
-          throw new Error("invalid arguments");
+          throw new Error("Error: Invalid arguments");
         }
         var result = null;
         var self = this;
@@ -828,7 +828,7 @@ var NPG;
         this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined"
             || lanes == null) {
-          throw new Error("invalid arguments");
+          throw new Error("Error: invalid arguments");
         }
         var self = this;
 
@@ -925,7 +925,7 @@ var NPG;
             || mqc_run_data == null
             || typeof(lanes) === "undefined"
             || lanes == null) {
-          throw new Error("invalid arguments");
+          throw new Error("Error: Invalid arguments");
         }
         var result = null;
         var self = this;
@@ -968,7 +968,7 @@ var NPG;
             || lanesWithBG == null
             || typeof(mqc_run_data) === "undefined"
             || mqc_run_data == null) {
-          throw new Error("invalid arguments");
+          throw new Error("Error: Invalid arguments");
         }
         var result = new Object();
         result['outcome'] = true; //Outcome of the validation.
@@ -1043,7 +1043,7 @@ var NPG;
        */
       RunTitleParser.prototype.parseIdRun = function (text) {
         if(typeof(text) === "undefined" || text == null) {
-          throw new Error("invalid arguments.");
+          throw new Error("Error: Invalid arguments.");
         }
         var result = null;
         var match = this.reId.exec(text);
