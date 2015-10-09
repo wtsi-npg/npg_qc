@@ -493,7 +493,7 @@ var NPG;
       PageMQCControl.prototype.validateRequired = function (field){
         if(typeof(field) === "undefined"
             || field == null) {
-          throw new Error("invalid arguments");
+          throw new Error("Error: Invalid arguments.");
         }
         return;
       };
@@ -636,9 +636,9 @@ var NPG;
           }
         }
         if(lanes_qc_temp.length + lanes_non_qc_temp.length != lanes_checked) {
-          var errorMessage = 'Error when comparing libraries from LIMS Warehouse and QC database.';
+          var errorMessage = 'Error: Conflicting data when comparing libraries from LIMS Warehouse and QC database.';
           new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
-          throw new Error("Conflicting data from LIMS DWH and QC database.");
+          throw new Error("Error: Conflicting data from LIMS DWH and QC database.");
         }
 
         return lanes_qc_temp;

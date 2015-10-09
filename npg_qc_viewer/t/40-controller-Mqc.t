@@ -72,7 +72,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
     'post request lives with body param';
   is( $response->code, 500, 'error code is 500' );
   like ($response->content,
-    qr/Error while trying to transit id_run 1234 position 4 to a non-existing outcome/,
+    qr/Error: Not possible to transit id_run 1234 position 4 to a non-existing outcome/,
     'correct error message for invalid outcome');
 
   $url = '/mqc/update_outcome?user=pipeline&password=secret';
@@ -112,7 +112,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
     qr/Manual QC Accepted final for run 4025, position 1 saved/,
     'correct confirmation message');
   unlike ($content,
-    qr/Error updating lane status/,
+    qr/Error: Problem while updating lane status/,
     'error updating lane status is absent');
 }
 

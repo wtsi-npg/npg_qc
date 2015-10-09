@@ -239,24 +239,25 @@ sub validate_outcome_of_libraries {
       my $tag_indexes_in_qc = [];
       while(my $library = $library_outcome_ents->next) {
         if ($library->is_undecided) {
-          croak('Error All libraries need to have a pass or fail outcome.');
+          croak('Error: All libraries need to have a pass or fail outcome.');
         }
         push @{$tag_indexes_in_qc}, $library->tag_index;
       }
 
+      #TODO Check if there is better option
       use Array::Compare;
       my $comp = Array::Compare->new;
       if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
-        croak('Error Libraries in LIMS and libraries in QC does not match.');
+        croak('Error: Libraries in LIMS and libraries in QC does not match.');
       }
     } else {
-      croak('Error All libraries need to have an outcome.');
+      croak('Error: All libraries need to have an outcome.');
     }
   } else {
     #All plexes with undecided
     while(my $library = $library_outcome_ents->next) {
       if (!$library->is_undecided) {
-        croak('Error All libraries need to have undecided outcome.');
+        croak('Error: All libraries need to have undecided outcome.');
       }
     }
   }

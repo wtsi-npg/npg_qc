@@ -124,11 +124,11 @@ sub _update_outcome {
   if ($error) {
     ($error, $error_code) = $self->parse_error($error);
   } else {
-    if($ent->has_final_outcome && !$tag_index) { #If final outcome update lane as qc complete
+    if($working_as eq $MODE_LANE_MQC && $ent->has_final_outcome) { #If final outcome update lane as qc complete
       try {
         $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
       } catch {
-        $mqc_update_error = qq[ Error updating lane status: $_];
+        $mqc_update_error = qq[Error: Problem while updating lane status $_];
       };
     }
   }
@@ -229,7 +229,7 @@ sub get_current_library_outcome : Path('get_current_library_outcome') {
   } catch {
     my $error_code;
     ($error, $error_code) = $self->parse_error($_);
-    _set_response($c, {message => qq[Error : $error]}, $error_code)
+    _set_response($c, {message => qq[$error]}, $error_code)
   };
 
   if (!$error) {
