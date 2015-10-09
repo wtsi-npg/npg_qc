@@ -828,7 +828,7 @@ var NPG;
         this.validateRequired(mqc_run_data);
         if(typeof(lanes) === "undefined"
             || lanes == null) {
-          throw new Error("Error: invalid arguments");
+          throw new Error("Error: Invalid arguments");
         }
         var self = this;
 

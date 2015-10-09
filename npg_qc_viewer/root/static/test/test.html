@@ -41,8 +41,8 @@
   
   QUnit.test("NPG.QC.RunTitleParser.parseRunId()", function(assert) {
     var parser = new NPG.QC.RunTitleParser();
-    assert.throws(function() {parser.parseIdRun();}, /invalid arguments/, "Validates non-empty arguments");
-    assert.throws(function() {parser.parseIdRun(null);}, /invalid arguments/, "Validates null argument");
+    assert.throws(function() {parser.parseIdRun();}, /Error: Invalid arguments/, "Validates non-empty arguments");
+    assert.throws(function() {parser.parseIdRun(null);}, /Error: Invalid arguments/, "Validates null argument");
     var title1 = parser.parseIdRun('');
     assert.equal(title1, null, 'Can deal with empty string.');
     var title2 = parser.parseIdRun('Bla bla bla');
@@ -134,8 +134,8 @@
       return theObject; 
     };
     
-    assert.raises(function () { control.isStateForMQC() }, /invalid arguments/, 'Correctly validates it gets an argument');
-    assert.raises(function () { control.isStateForMQC(null) }, /invalid arguments/, 'Correctly validates it gets an non-null argument');
+    assert.raises(function () { control.isStateForMQC() }, /Error: Invalid arguments/, 'Correctly validates it gets an argument');
+    assert.raises(function () { control.isStateForMQC(null) }, /Error: Invalid arguments/, 'Correctly validates it gets an non-null argument');
     var mqc_run_data = Object();
     result = control.isStateForMQC(mqc_run_data);
     assert.equal(result, false, 'Correctly evaluates for an empty data object.');
@@ -164,14 +164,14 @@
     var data1 = null;
     var lanesWithBG = [];
     var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-    assert.raises(function () {control.laneOutcomesMatch();}, /invalid arguments/, "Throws exception with invalid number of arguments");
+    assert.raises(function () {control.laneOutcomesMatch();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
     
     data1 = new Object();
     data1.qc_lane_status = new Object();
 
-    assert.raises(function () {control.laneOutcomesMatch(lanesWithBG);}, /invalid arguments/, "Throws exception with invalid number of arguments");
-    assert.raises(function () {control.laneOutcomesMatch(null, data1);}, /invalid arguments/, "Throws exception with null arguments");
-    assert.raises(function () {control.laneOutcomesMatch(lanesWithBG, null);}, /invalid arguments/, "Throws exception with null arguments");
+    assert.raises(function () {control.laneOutcomesMatch(lanesWithBG);}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
+    assert.raises(function () {control.laneOutcomesMatch(null, data1);}, /Error: Invalid arguments/, "Throws exception with null arguments");
+    assert.raises(function () {control.laneOutcomesMatch(lanesWithBG, null);}, /Error: Invalid arguments/, "Throws exception with null arguments");
     var result = control.laneOutcomesMatch(lanesWithBG, data1);
     assert.equal(result.outcome, true, 'Works with empty lanes in both sides.');
     assert.equal(result.position, null, 'Empty position as there was no error.');
@@ -218,19 +218,19 @@
   
   QUnit.test("NPG.QC.RunPageMQCControl.prepareLanes", function(assert) {
     var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-    assert.raises(function () {control.prepareLanes();}, /invalid arguments/, "Throws exception with invalid number of arguments");
-    assert.raises(function () {control.prepareLanes(null, null);}, /invalid arguments/, "Throws exception with both arguments null");
-    assert.raises(function () {control.prepareLanes(null, 1);}, /invalid arguments/, "Throws exception with first argument null");
-    assert.raises(function () {control.prepareLanes(1, null);}, /invalid arguments/, "Throws exception with second argument null");
+    assert.raises(function () {control.prepareLanes();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
+    assert.raises(function () {control.prepareLanes(null, null);}, /Error: Invalid arguments/, "Throws exception with both arguments null");
+    assert.raises(function () {control.prepareLanes(null, 1);}, /Error: Invalid arguments/, "Throws exception with first argument null");
+    assert.raises(function () {control.prepareLanes(1, null);}, /Error: Invalid arguments/, "Throws exception with second argument null");
     
   });
   
   QUnit.test("NPG.QC.RunPageMQCControl.showMQCOutcomes", function(assert) {
     var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-    assert.raises(function () {control.showMQCOutcomes();}, /invalid arguments/, "Throws exception with invalid number of arguments");
-    assert.raises(function () {control.showMQCOutcomes(null, null);}, /invalid arguments/, "Throws exception with both arguments null");
-    assert.raises(function () {control.showMQCOutcomes(null, 1);}, /invalid arguments/, "Throws exception with first argument null");
-    assert.raises(function () {control.showMQCOutcomes(1, null);}, /invalid arguments/, "Throws exception with second argument null");
+    assert.raises(function () {control.showMQCOutcomes();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
+    assert.raises(function () {control.showMQCOutcomes(null, null);}, /Error: Invalid arguments/, "Throws exception with both arguments null");
+    assert.raises(function () {control.showMQCOutcomes(null, 1);}, /Error: Invalid arguments/, "Throws exception with first argument null");
+    assert.raises(function () {control.showMQCOutcomes(1, null);}, /Error: Invalid arguments/, "Throws exception with second argument null");
   });
   
 </SCRIPT>
