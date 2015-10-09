@@ -128,7 +128,7 @@ sub _update_outcome {
       try {
         $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
       } catch {
-        $mqc_update_error = qq[Error: Problem while updating lane status $_];
+        $mqc_update_error = qq[Error: Problem while updating lane status. $_];
       };
     }
   }
