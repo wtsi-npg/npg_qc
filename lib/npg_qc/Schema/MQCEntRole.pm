@@ -18,15 +18,19 @@ our @EXPORT_OK = qw/$MQC_OUTCOME_DICT
                     $MQC_LIBRARY_ENT
                     $MQC_LIBRARY_HIST
                     $MQC_LIB_LIMIT
+                    $MQC_ROLE
                    /;
 
-Readonly::Scalar our $MQC_OUTCOME_DICT  => q[MqcOutcomeDict];
-Readonly::Scalar our $MQC_LANE_ENT      => q[MqcOutcomeEnt];
-Readonly::Scalar our $MQC_LANE_HIST     => q[MqcOutcomeHist];
-Readonly::Scalar our $MQC_LIBRARY_ENT   => q[MqcLibraryOutcomeEnt];
-Readonly::Scalar our $MQC_LIBRARY_HIST  => q[MqcLibraryOutcomeHist];
+#Result names
+Readonly::Scalar our $MQC_OUTCOME_DICT => q[MqcOutcomeDict];
+Readonly::Scalar our $MQC_LANE_ENT     => q[MqcOutcomeEnt];
+Readonly::Scalar our $MQC_LANE_HIST    => q[MqcOutcomeHist];
+Readonly::Scalar our $MQC_LIBRARY_ENT  => q[MqcLibraryOutcomeEnt];
+Readonly::Scalar our $MQC_LIBRARY_HIST => q[MqcLibraryOutcomeHist];
 
-Readonly::Scalar our $MQC_LIB_LIMIT     => 50;
+#MQC general configuration
+Readonly::Scalar our $MQC_LIB_LIMIT    => 500;
+Readonly::Scalar our $MQC_ROLE         => q[manual_qc];
 
 requires 'short_desc';
 requires 'mqc_outcome';
@@ -100,15 +104,7 @@ sub validate_username {
   return;
 }
 
-#sub toggle_outcome {
-#  my ( $self, $username ) = @_;
-#
-#  $self->validate_username($username);
-#  my $outcome = $self->mqc_outcome;
-#
-#
-#  return;
-#}
+#TODO implement a toggle_outcome method
 
 sub update_outcome {
   my ($self, $outcome, $username) = @_;
@@ -125,7 +121,7 @@ sub update_outcome {
   if ($self->in_storage) {
     #Check if previous outcome is not final
     if($self->has_final_outcome) {
-      croak(sprintf 'Error while trying to update a final outcome for %s',
+      croak(sprintf 'Error: Outcome is already final but trying to transit to %s.',
             $self->short_desc);
     } else { #Update
       $self->update({
@@ -163,7 +159,7 @@ sub find_valid_outcome {
     $outcome_dict = $rs->search({short_desc => $outcome})->next;
   }
   if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
-    croak(sprintf 'Error while trying to transit %s to a non-existing outcome "%s".',
+    croak(sprintf 'Error: Not possible to transit %s to a non-existing outcome "%s".',
           $self->short_desc, $outcome);
   }
   return $outcome_dict;
