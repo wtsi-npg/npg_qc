@@ -124,11 +124,12 @@ sub update_outcome {
       croak(sprintf 'Error: Outcome is already final but trying to transit to %s.',
             $self->short_desc);
     } else { #Update
-      $self->update({
-        'id_mqc_outcome' => $outcome_id,
-        'username' => $username,
-        'modified_by' => $username
-      });
+      my $values = {};
+      $values->{'id_mqc_outcome'} = $outcome_id;
+      $values->{'username'}       = $username;
+      $values->{'modified_by'}    = $username;
+      #To reaload from database otherwise the object keeps the old values
+      $self->update($values)->discard_changes();
     }
   } else { #Is a new row just insert.
     $self->id_mqc_outcome($outcome_id);
