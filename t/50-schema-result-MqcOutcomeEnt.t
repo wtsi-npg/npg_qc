@@ -227,10 +227,10 @@ subtest 'Data for historic' => sub {
   ok(!$rs->next->is_accepted, q[The outcome is not considered accepted.]);
 
   throws_ok {$object->update_outcome('some invalid', $username)}
-    qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"some invalid\"/,
+    qr/Error: Not possible to transit id_run 210 position 1 to a non-existing outcome \"some invalid\"/,
     'error updating to invalid string status';
   throws_ok {$object->update_outcome(123, $username)}
-    qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"123\"/,
+    qr/Error: Not possible to transit id_run 210 position 1 to a non-existing outcome \"123\"/,
     'error updating to invalid integer status';
   throws_ok {$object->update_outcome($status, 789)}
     qr/Have a number 789 instead as username/, 'username can be an integer';
