@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 46;
+use Test::More tests => 48;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -275,8 +275,9 @@ subtest 'Data for historic' => sub {
   $values = {'id_run' => $id_run, 'position' => $position};
   
   $object = $schema->resultset($table)->find_or_new($values);
-  my $in = $object->in_storage; #Row status from database
-  throws_ok { $object->update_outcome($status, $username) } qr/update a final outcome/, 'Invalid outcome transition croak';
+  ok($object->in_storage, 'Object is in storage.');
+  ok($object->has_final_outcome, 'Object has final outcome.');
+  throws_ok { $object->update_outcome($status, $username) } qr/Outcome is already final/, 'Invalid outcome transition croak';
   
   $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
