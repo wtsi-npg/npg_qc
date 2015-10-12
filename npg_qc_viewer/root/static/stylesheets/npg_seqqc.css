@@ -425,12 +425,13 @@ a, a:link, a:visited, a:hover {
 }
 
 /******************* manual qc widgets **************/
-.padded_anchor { /* For the anchor with the lane number */
-  padding-right: 15px;
+.td_mqc {
+  min-width: 135px;
+  text-align: "left";
 }
 
-.td_mqc {
-  min-width: 125px;
+.td_library_mqc {
+  min-width: 110px;
   text-align: "left";
 }
 
@@ -440,9 +441,18 @@ a, a:link, a:visited, a:hover {
   padding-top: 5px;
 }
 
-.lane_mqc_button { /* For all MQC button-like format. */
-  padding-left: 5px;
+.lane_mqc_control {
   padding-right: 5px;
+  padding-left: 10px;
+}
+
+.library_mqc_overall_controls {
+  padding-left: 15px;
+}
+
+.lane_mqc_button { /* For all MQC button-like format. */
+  padding-left: 6px;
+  padding-right: 6px;
   padding-top: 2px;
   padding-bottom: 2px;
   background: #F4F4F4;

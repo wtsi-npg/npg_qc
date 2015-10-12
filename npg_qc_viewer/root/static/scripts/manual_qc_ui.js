@@ -140,18 +140,18 @@ var NPG;
           this.placeholder = placeholder || 'ajax_status';
         }
 
+        MQCInfoMessage.prototype = new NPG.QC.UI.MQCErrorMessage();
+
         /**
          * Displays the message in the placeholder. Uses bold black typeface.
          */
-        MQCErrorMessage.prototype.display = function() {
+        MQCInfoMessage.prototype.display = function() {
           var cleanText = this.formatForDisplay(this.errorText);
           $("#" + this.placeholder).append("<li class='info_mqc'>"
               + cleanText
               + '</li>');
           return this;
         };
-
-        MQCInfoMessage.prototype = new NPG.QC.UI.MQCErrorMessage();
 
         return MQCInfoMessage;
       }) ();
@@ -192,6 +192,8 @@ var NPG;
 
         MQCLibraryOverallControls.prototype.setupControls = function (placeholder) {
           placeholder = placeholder || $($('.' + this.PLACEHOLDER_CLASS));
+          //Remove the lane placeholder which will not be used in library manuql QC
+          placeholder.parent().children('.lane_mqc_control').remove();
           var accept = this.buildControl(this.CLASS_ALL_ACCEPT, this.TITLE_ACCEPT, this.ICON_ACCEPT);
           var und    = this.buildControl(this.CLASS_ALL_UNDECIDED, this.TITLE_UNDECIDED, this.ICON_UNDECIDED);
           var reject = this.buildControl(this.CLASS_ALL_REJECT, this.TITLE_REJECT, this.ICON_REJECT);

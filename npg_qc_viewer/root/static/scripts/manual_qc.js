@@ -123,7 +123,6 @@ var NPG;
       };
 
       MQCControl.prototype.removeMQCFormat = function () {
-        this.lane_control.parent().children('.padded_anchor').removeClass("padded_anchor");
         this.lane_control.parent().removeClass('td_mqc');
         this.lane_control.parent().css('text-align', 'center'); // For firefox
       };
@@ -440,6 +439,16 @@ var NPG;
         self.lane_control.append("<span class='lane_mqc_working' />");
       };
 
+      LibraryMQCControl.prototype.removeMQCFormat = function () {
+        this.lane_control.parent().removeClass('td_library_mqc');
+        this.lane_control.parent().css('text-align', 'center'); // For firefox
+      };
+
+      LibraryMQCControl.prototype.addMQCFormat = function () {
+        this.lane_control.parent().css('text-align', 'left'); // For firefox
+        this.lane_control.parent().addClass('td_library_mqc');
+      };
+
       return LibraryMQCControl;
     }) ();
     QC.LibraryMQCControl = LibraryMQCControl;
@@ -571,7 +580,7 @@ var NPG;
        * @returns {Boolean}
        */
       LanePageMQCControl.prototype.checkLibLimit = function (mqc_run_data) {
-        var result = typeof(mqc_run_data.qc_tags)!== "undefined" /* Checking if number of libraries is under the limit allowed */
+        var result = typeof(mqc_run_data.qc_tags)!== "undefined"
                      && typeof(mqc_run_data.mqc_lib_limit)!== "undefined"
                      && mqc_run_data.qc_tags.length <= mqc_run_data.mqc_lib_limit;
 
@@ -586,7 +595,8 @@ var NPG;
        * Checks all conditions related with the user in session and the
        * status of the run. Validates the user has privileges, has role,
        * the run is in correct status and the user in session is the
-       * same as the user who took the MQCing.
+       * same as the user who took the MQCing. The number of libraries is bellow
+       * the limit for manual QC.
        * @param mqc_run_data {Object} Run status data
        */
       LanePageMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
@@ -594,8 +604,8 @@ var NPG;
 
         var result = this.checkUserInSession(mqc_run_data)
           && this.checkRunStatus(mqc_run_data)
-          && this.checkLibLimit(mqc_run_data)
-          && this.checkLaneStatus(mqc_run_data);
+          && this.checkLaneStatus(mqc_run_data)
+          && this.checkLibLimit(mqc_run_data); //Short-Circuit AND makes sure we check this bit only if necessary, displaying message only when necessary.
         return result;
       };
 
@@ -685,7 +695,6 @@ var NPG;
             //Set up mqc controlers and link them to the individual lanes.
             var c = new NPG.QC.LibraryMQCControl(self.abstractConfiguration);
             c.loadBGFromInitialWithPreliminary(obj);
-            lanes[i].children('.padded_anchor').removeClass("padded_anchor");
           }
         }
       };
@@ -867,7 +876,6 @@ var NPG;
             //Set up mqc controlers and link them to the individual lanes.
             var c = new NPG.QC.LaneMQCControl(self.abstractConfiguration);
             c.loadBGFromInitialWithPreliminary(obj);
-            lanes[i].children('.padded_anchor').removeClass("padded_anchor");
           }
         }
       };
@@ -896,7 +904,6 @@ var NPG;
                   function (mqc_run_data, runMQCControl, lanes) {
                     //Show working icons
                     for(var i = 0; i < lanes.length; i++) {
-                      lanes[i].children('a').addClass('padded_anchor');
                       lanes[i].children('.lane_mqc_control').each(function(j, obj){
                         $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
                       });
