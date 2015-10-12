@@ -207,7 +207,7 @@ sub fetch_tag_index_array_for_run_position {
   });
 
   #TODO Should this go outside (meaning an extra query)?
-  if ($rs->count != 0) {
+  if ($rs->count == 0) {
     croak q[Error: No LIMS data for this run/position.];
   }
 
