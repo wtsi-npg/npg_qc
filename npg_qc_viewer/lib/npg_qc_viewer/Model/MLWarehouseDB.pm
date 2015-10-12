@@ -195,6 +195,15 @@ sub fetch_tag_index_array_for_run_position {
   my $cs_alias = $resultset->current_source_alias;
 
   my $where = {
+    'id_run' => $id_run,
+  };
+  
+  my $rs_validation = $resultset->search($where);
+  if ($rs_validation->count == 0) {
+    croak q[Error: No LIMS data for this run/position.];
+  }
+
+  $where = {
     $cs_alias . '.id_run'     => $id_run,
     $cs_alias . '.position'   => $position,
     $cs_alias . '.tag_index'  => { q[!=], undef },
@@ -205,11 +214,6 @@ sub fetch_tag_index_array_for_run_position {
              order_by => qw[ me.id_run me.position me.tag_index ],
              cache    => 1,
   });
-
-  #TODO Should this go outside (meaning an extra query)?
-  if ($rs->count == 0) {
-    croak q[Error: No LIMS data for this run/position.];
-  }
 
   my $tags = {};
 

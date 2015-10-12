@@ -96,8 +96,6 @@ subtest 'fetch_tag_index_array_for_run_position wo tag_index null' => sub {
   my $id_run = 4950;
   my $rs = $m->resultset(q(IseqProductMetric));
   
-  
-  
   ok (defined $rs, "IseqProductMetric resultset");
   ok ($rs->count, "IseqProductMetric resultset has data");
   $rs = $rs->search({id_run=>$id_run, position=>1});
@@ -118,7 +116,7 @@ subtest 'fetch_tag_index_array_for_run_position wo tag_index null' => sub {
 };
 
 subtest 'fetch_tag_index_array_for_run_position with tag_index null' => sub {
-  plan tests => 7;
+  plan tests => 9;
   my $id_run = 4025;
   my $rs = $m->resultset(q(IseqProductMetric));
   ok (defined $rs, "IseqProductMetric resultset");
@@ -130,6 +128,11 @@ subtest 'fetch_tag_index_array_for_run_position with tag_index null' => sub {
   ok ($hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS}, 'Hash has array for non qc tags');
   is(scalar @{$hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS}},     0, 'Correct number of tags for qc' );
   is(scalar @{$hash->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS}}, 0, 'Correct number of tags for non qc' );
+
+  my $non_existing_run = 4951; 
+  $rs = $rs->search({id_run=>$non_existing_run, position=>1});
+  is($rs->count, 0, q[Correct number of elements found (0)]);
+  throws_ok{$m->fetch_tag_index_array_for_run_position($non_existing_run, 1)} qr/Error: No LIMS data for this run\/position/, 'No data in LIMS warehouse for this run';
 };
 
 1;
