@@ -51,7 +51,6 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                         .find("title")
                                                         .text());
-  window.console && console.log("Elements in dom before MQC: " + document.getElementsByTagName('*').length);
   //If id_run
   if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
     var id_run = runTitleParserResult.id_run;
@@ -76,7 +75,6 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
       control.prepareMQC(id_run, position, lanes);
     }
   }
-  window.console && console.log("Elements in dom after MQC: " + document.getElementsByTagName('*').length);
 
   jQuery('.bcviz_insert_size').each(function(i) {
     var self = $(this);
