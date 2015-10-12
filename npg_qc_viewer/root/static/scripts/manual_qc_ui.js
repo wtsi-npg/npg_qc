@@ -181,9 +181,9 @@ var NPG;
           this.CLASS_ALL_REJECT    = 'lane_mqc_reject_all';
           this.CLASS_ALL_UNDECIDED = 'lane_mqc_undecided_all';
           //Title for the individual controls
-          this.TITLE_ACCEPT    = 'Set all as accepted';
-          this.TITLE_REJECT    = 'Set all as rejected';
-          this.TITLE_UNDECIDED = 'Set all as undecided';
+          this.TITLE_ACCEPT    = 'Set all libraries in page as accepted';
+          this.TITLE_REJECT    = 'Set all libraries in page as rejected';
+          this.TITLE_UNDECIDED = 'Set all libraries in page as undecided';
 
           this.ICON_ACCEPT    = "<img src='/static/images/tick.png' width='10' height='10'/>";
           this.ICON_REJECT    = "<img src='/static/images/cross.png' width='10' height='10'/>";
