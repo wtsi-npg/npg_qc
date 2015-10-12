@@ -94,12 +94,23 @@ var NPG;
       var MQCErrorMessage = (function() {
         MQCErrorMessage = function (errorText, placeholder) {
           this.errorText = errorText;
+          this.EXCEPTION_STRING_SPLIT = '. at /';
           this.placeholder = placeholder || 'ajax_status';
         }
 
+        MQCErrorMessage.prototype.formatForDisplay = function () {
+          var cleanText = this.errorText;
+          var n = cleanText.indexOf(this.EXCEPTION_STRING_SPLIT);
+          if (n != -1) {
+            cleanText = cleanText.substring(0, n + 1);
+          }
+          return cleanText;
+        };
+
         MQCErrorMessage.prototype.display = function() {
+          var cleanText = this.formatForDisplay(this.errorText);
           $("#" + this.placeholder).append("<li class='failed_mqc'>"
-              + this.errorText
+              + cleanText
               + '</li>');
           return this;
         };

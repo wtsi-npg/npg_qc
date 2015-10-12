@@ -69,6 +69,18 @@ test('Object instantiation for UI classes.', function() {
 
   obj = new NPG.QC.UI.MQCLibrary4LaneStats();
   ok(obj !== undefined, 'Variable is now an instance of MQCLibrary4LaneStats');
-  obj = null;
-  ok(obj == null);
+});
+
+QUnit.test('Error messaging formating', function (assert) {
+  var obj = null;
+
+  var FROM_EXCEPTION = 'Error: No LIMS data for this run/position. at /src/../lib/npg_qc_viewer/Controller.pm line 1000.';
+  var EXPECTED_FE    = 'Error: No LIMS data for this run/position.';
+  var FROM_GNR_TEXT  = 'A random error in the interface. And some more text. No numbers should be removed 14.';
+  var EXPECTED_GT    = FROM_GNR_TEXT;
+
+  obj = new NPG.QC.UI.MQCErrorMessage(FROM_EXCEPTION);
+  assert.equal(obj.formatForDisplay(), EXPECTED_FE, 'Correctly parses from exception');
+  obj = new NPG.QC.UI.MQCErrorMessage(FROM_GNR_TEXT);
+  assert.equal(obj.formatForDisplay(), EXPECTED_GT, 'Correctly parses from general text');
 });
