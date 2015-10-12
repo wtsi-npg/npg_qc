@@ -14,8 +14,10 @@ my $schemas;
 
 my $util = t::util->new();
 lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
-local $ENV{CATALYST_CONFIG} = $util->config_path;
-local $ENV{TEST_DIR}        = $util->staging_path;
+local $ENV{'CATALYST_CONFIG'} = $util->config_path;
+local $ENV{'TEST_DIR'}        = $util->staging_path;
+local $ENV{'HOME'}            = 't/data';
+
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
 my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;

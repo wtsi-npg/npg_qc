@@ -14,6 +14,8 @@ use warnings;
 use Carp;
 use Getopt::Long;
 
+use npg_warehouse::Schema;
+
 our $VERSION = '0';
 
 ## no critic (NamingConventions::Capitalization)
@@ -43,6 +45,10 @@ sub usage {
   print STDERR "        --degenerate_toleration\n";
   print STDERR "          don't stop reporting if a tag is all N, default false\n";
   print STDERR "\n";
+  print STDERR "        --tag_length\n";
+  print STDERR "          truncate tag sequence to this length, default 0 no truncation\n";
+  print STDERR "          if the value is -ve the tag is truncated from the start\n";
+  print STDERR "\n";
   print STDERR "\n";
   return;
 }
@@ -60,17 +66,17 @@ sub selectModeTags {
     my @topTags = ();
 
     foreach my $tag (sort {$tagsFound{$b} <=> $tagsFound{$a};} (keys %tagsFound)) {
-	if (!(defined $maxCount)) {
-	    $maxCount = $tagsFound{$tag};
-	}
-	if ( (($relativeMaxDrop * $tagsFound{$tag}) < $previousCount) ||
-	     (($absoluteMaxDrop * $tagsFound{$tag}) < $maxCount) ||
-	     (!$degeneratingToleration && ($tag =~ /^N*$/)) # may wish to stop with this or exclude it
-	    ) {
-	    last;
-	}
-	$previousCount = $tagsFound{$tag};
-	push @topTags,$tag;
+      if (!(defined $maxCount)) {
+        $maxCount = $tagsFound{$tag};
+      }
+      if ( (($relativeMaxDrop * $tagsFound{$tag}) < $previousCount) ||
+           (($absoluteMaxDrop * $tagsFound{$tag}) < $maxCount) ||
+           (!$degeneratingToleration && ($tag =~ /^N*$/)) # may wish to stop with this or exclude it
+         ) {
+          last;
+      }
+      $previousCount = $tagsFound{$tag};
+      push @topTags,$tag;
     }
     return @topTags;
 }
@@ -83,11 +89,47 @@ sub showTags{
     my $sampleSize = shift;
     my %tagsFound = @_;
     my $unassigned =  $sampleSize;
+
+    my $s = npg_warehouse::Schema->connect();
+
+    my %matches = ();
+    my %groups = ();
+    my %names = ();
     foreach my $tag (@{$ra_topTags}) {
-	printf "%s = %.2f%s\n", $tag, (100 * $tagsFound{$tag}/$sampleSize), '%';
-	$unassigned -= $tagsFound{$tag};
+        my $rs = $s->resultset('Tag')->search({is_current=>1, expected_sequence=>$tag});
+        while(my $row = $rs->next) {
+          my $name = $row->tag_group_name;
+          my $id = $row->tag_group_internal_id;
+          my $map_id = $row->map_id;
+          if(!defined $name || !defined $id || !defined $map_id) {
+            next;
+          }
+          $groups{$id}++;
+          $names{$id} = $name;
+          $matches{$tag}->{$id} = $map_id;
+        }
+        $unassigned -= $tagsFound{$tag};
+    }
+    foreach my $tag (@{$ra_topTags}) {
+        printf "%s = %.2f\t\t", $tag, (100 * $tagsFound{$tag}/$sampleSize);
+        foreach my $id (sort {$a<=>$b} keys %groups) {
+            if ( exists($matches{$tag}->{$id}) ){
+                printf "%-2d(%-3d) ", $id, $matches{$tag}->{$id};
+            } else {
+                printf q[        ];
+            }
+        }
+        print "\n";
     }
     printf "%s = %.2f%s\n", "REMAINDER", (100 * $unassigned/$sampleSize), "%";
+
+    if ( %groups ){
+        printf "#matches\tgroup id\tgroup name\n";
+        foreach (sort {$a<=>$b} keys %groups) {
+            printf "%-8d\t%-8d\t%s\n", $groups{$_}, $_, $names{$_};
+        }
+    }
+
     return;
 }
 
@@ -98,19 +140,26 @@ sub main{
     my $relativeMaxDrop = $opts->{relative_max_drop};
     my $absoluteMaxDrop = $opts->{absolute_max_drop};
     my $degeneratingToleration = $opts->{degenerate_toleration};
+    my $tagLength = $opts->{tag_length};
 
     my %tagsFound;
 
     my $tagsFound = 0;
 
     while (<>) {
-	if (/((BC:)|(RT:))Z:([A-Z]*)/) {
-	    $tagsFound++;
-	    $tagsFound{$4}++;
-	}
-	if ($tagsFound == $sampleSize) {
-	    last;
-	}
+      if (/((BC:)|(RT:))Z:([A-Z]*)/) {
+        my $tag = $4;
+        if ($tagLength < 0) {
+          $tag = substr $tag, $tagLength;
+        } elsif ($tagLength) {
+          $tag = substr $tag, 0, $tagLength;
+        }
+        $tagsFound++;
+        $tagsFound{$tag}++;
+      }
+      if ($tagsFound == $sampleSize) {
+        last;
+      }
     }
 
     if ($sampleSize != $tagsFound) {
@@ -126,14 +175,15 @@ sub initialise {
 
 ## no critic (InputOutput::ProhibitInteractiveTest InputOutput::RequireCheckedSyscalls ValuesAndExpressions::RequireNumberSeparators)
 
-    my %options = (sample_size => 10000, relative_max_drop => 10, absolute_max_drop => 10, degenerate_toleration=> 0);
+    my %options = (sample_size => 10000, relative_max_drop => 10, absolute_max_drop => 10, degenerate_toleration=> 0, tag_length=> 0);
 
     my $rc = GetOptions(\%options,
                         'help',
                         'sample_size:i',
-			'relative_max_drop:i',
-			'absolute_max_drop:i',
-			'degenerate_toleration',
+                        'relative_max_drop:i',
+                        'absolute_max_drop:i',
+                        'degenerate_toleration',
+                        'tag_length:i',
                         );
     if ( ! $rc) {
         print {*STDERR} "\nerror in command line parameters\n" or croak 'print failed';

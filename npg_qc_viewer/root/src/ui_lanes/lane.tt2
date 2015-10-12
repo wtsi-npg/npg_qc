@@ -207,7 +207,7 @@
 [%- END -%]
 <span class="nbsp">[%- FILTER format('%2.1f'); result.forward_read_gc_percent; END %]
 [%- IF result.reverse_read_gc_percent.defined %]
-[% FILTER format('%2.1f'); result.reverse_read_gc_percent ; END -%]
+&nbsp;[% FILTER format('%2.1f'); result.reverse_read_gc_percent ; END -%]
 [%- END %]</span>
 [%- END -%]
 

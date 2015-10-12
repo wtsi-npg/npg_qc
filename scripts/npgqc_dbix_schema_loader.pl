@@ -91,7 +91,8 @@ make_schema_at(
           'errors_by_cycle'                => q[ErrorsByCycle],
           'errors_by_nucleotide'           => q[ErrorsByNucleotide],
           'errors_by_cycle_and_nucleotide' => q[ErrorsByCycleAndNucleotide],
-          'cumulative_errors_by_cycle'     => q[CumulativeErrorsByCycle]
+          'cumulative_errors_by_cycle'     => q[CumulativeErrorsByCycle],
+          'samtools_stats'                 => q[SamtoolsStats],
         },
 
         result_roles_map   => $roles_map,
