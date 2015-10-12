@@ -125,11 +125,24 @@ var NPG;
       UI.MQCErrorMessage = MQCErrorMessage;
 
       var MQCInfoMessage = (function (){
+
+        /**
+         * Class for sending info messages to UI interface. By default it places
+         * the info message in the same container as the error messages. Uses a
+         * different colour to make a difference. The placeholder can also be
+         * configured at construction time.
+         * @param {String} infoText - Text of the message.
+         * @param {String} placeholder - Class of the DOM element where this
+         * message will be displayed.
+         */
         MQCInfoMessage = function(infoText, placeholder) {
           this.errorText = infoText;
           this.placeholder = placeholder || 'ajax_status';
         }
 
+        /**
+         * Displays the message in the placeholder. Uses bold black typeface.
+         */
         MQCErrorMessage.prototype.display = function() {
           var cleanText = this.formatForDisplay(this.errorText);
           $("#" + this.placeholder).append("<li class='info_mqc'>"
