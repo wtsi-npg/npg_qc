@@ -195,9 +195,10 @@ sub fetch_tag_index_array_for_run_position {
   my $cs_alias = $resultset->current_source_alias;
 
   my $where = {
-    'id_run' => $id_run,
+    'id_run'   => $id_run,
+    'position' => $position,
   };
-  
+
   my $rs_validation = $resultset->search($where);
   if ($rs_validation->count == 0) {
     croak q[Error: No LIMS data for this run/position.];
