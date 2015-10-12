@@ -3,7 +3,7 @@ use warnings;
 use Test::More tests => 18;
 use Test::Exception;
 
-use npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
+use npg_qc_viewer::Util::TransferObject;
 use t::util;
 
 use_ok 'npg_qc_viewer::Model::LimsServer';
@@ -23,10 +23,10 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   throws_ok { $s->generate_url('sample') } qr/LIMS values object is missing/,
     'missing args error';
   throws_ok { $s->generate_url('sample', {'my' => 'yours'}) }
-    qr/npg_qc_viewer::TransferObjects::ProductMetrics4RunTO is expected, got HASH/,
+    qr/Util::TransferObject is expected, got HASH/,
     'wrong type arg error';
 
-  my $values = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new(
+  my $values = npg_qc_viewer::Util::TransferObject->new(
     id_run            => 1234,
     position          => 6,
     id_sample_lims    => 123,

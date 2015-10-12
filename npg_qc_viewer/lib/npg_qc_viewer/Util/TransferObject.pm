@@ -1,4 +1,4 @@
-package npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
+package npg_qc_viewer::Util::TransferObject;
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -21,7 +21,7 @@ deplexing lims rnd gclp flowcell
 
 =head1 NAME
 
-npg_qc_viewer::TransferObjects::ProductMetrics4RunTO
+npg_qc_viewer::Util::TransferObject
 
 =head1 SYNOPSIS
 
@@ -73,6 +73,7 @@ has 'manual_qc'    => (
   isa      => 'Bool',
   is       => 'rw',
   required => 0,
+  clearer  => 'unset_manual_qc',
 );
 
 =head2 study_name
@@ -244,7 +245,11 @@ __END__
 
 =item namespace::autoclean
 
-=item npg_tracking::util::types
+=item npg_tracking::glossary::run
+
+=item npg_tracking::glossary::lane
+
+=item npg_tracking::glossary::tag
 
 =back
 

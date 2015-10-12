@@ -7,7 +7,6 @@ lib/npg_qc_viewer/Controller/Mqc.pm
 lib/npg_qc_viewer/Controller/MqcRun.pm
 lib/npg_qc_viewer/Controller/Root.pm
 lib/npg_qc_viewer/Controller/Visuals.pm
-lib/npg_qc_viewer/TransferObjects/ProductMetrics4RunTO.pm
 lib/npg_qc_viewer/Model/Check.pm
 lib/npg_qc_viewer/Model/GenotypeCheck.pm
 lib/npg_qc_viewer/Model/LimsServer.pm
@@ -19,6 +18,8 @@ lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
 lib/npg_qc_viewer/Util/Error.pm
 lib/npg_qc_viewer/Util/ExtendedHttpStatus.pm
 lib/npg_qc_viewer/Util/FileFinder.pm
+lib/npg_qc_viewer/Util/TransferObject.pm
+lib/npg_qc_viewer/Util/TransferObjectFactory.pm
 lib/npg_qc_viewer.pm
 lib/npg_qc_viewer/View/TT.pm
 MANIFEST
