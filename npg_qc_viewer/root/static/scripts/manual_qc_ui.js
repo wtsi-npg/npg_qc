@@ -124,6 +124,26 @@ var NPG;
       })();
       UI.MQCErrorMessage = MQCErrorMessage;
 
+      var MQCInfoMessage = (function (){
+        MQCInfoMessage = function(infoText, placeholder) {
+          this.errorText = infoText;
+          this.placeholder = placeholder || 'ajax_status';
+        }
+
+        MQCErrorMessage.prototype.display = function() {
+          var cleanText = this.formatForDisplay(this.errorText);
+          $("#" + this.placeholder).append("<li class='info_mqc'>"
+              + cleanText
+              + '</li>');
+          return this;
+        };
+
+        MQCInfoMessage.prototype = new NPG.QC.UI.MQCErrorMessage();
+
+        return MQCInfoMessage;
+      }) ();
+      UI.MQCInfoMessage = MQCInfoMessage;
+
       var MQCConflictDWHErrorMessage = (function() {
         MQCConflictDWHErrorMessage = function (id_run, position) {
           var errorMessage = 'Conflicting data when comparing Data Ware House and Manual QC databases for run: '

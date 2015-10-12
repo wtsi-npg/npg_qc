@@ -574,6 +574,11 @@ var NPG;
         var result = typeof(mqc_run_data.qc_tags)!== "undefined" /* Checking if number of libraries is under the limit allowed */
                      && typeof(mqc_run_data.mqc_lib_limit)!== "undefined"
                      && mqc_run_data.qc_tags.length <= mqc_run_data.mqc_lib_limit;
+
+        if(mqc_run_data.qc_tags.length > mqc_run_data.mqc_lib_limit) {
+          var max_library_message = 'Number of libraries is larger than maximum number considered for manual QC. No manual QC controls will be displayed.';
+          new NPG.QC.UI.MQCInfoMessage(max_library_message).toConsole().display();
+        }
         return result;
       };
 

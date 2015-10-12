@@ -271,6 +271,12 @@ a, a:link, a:visited, a:hover {
  font-weight: bold;
 }
 
+.info_mqc {
+ background-color: #FFFFFF;
+ color: #000000;
+ font-weight: bold;
+}
+
 .passed {
  background-color: #b5daff;
 }
