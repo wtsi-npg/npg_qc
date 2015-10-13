@@ -77,39 +77,22 @@ sub _get_mqc_from_qc {
     return;
   }
 
-  my $wh_mqc = $to->manual_qc();
-  $to->unset_manual_qc();
+  my $lane_mqc_row = $self->qc_schema->resultset('MqcOutcomeEnt')->search(
+        {id_run    => $to->id_run,
+         position  => $to->position})->next();
+  if ($lane_mqc_row && $lane_mqc_row->has_final_outcome) {
+    $to->manual_qc($lane_mqc_row->is_accepted ? 1 : 0);
+  }
 
   if ( $to->tag_index ) { # tag zero is not qc-ed
     my $lib_mqc_row = $self->qc_schema->resultset('MqcLibraryOutcomeEnt')->search(
       {id_run    => $to->id_run,
        position  => $to->position,
        tag_index => $to->tag_index})->next();
-    if ( $lib_mqc_row ) {
-      if ( $lib_mqc_row->has_final_outcome ) {
-        _set_mqc_value($lib_mqc_row, $to);
-      } else {
-        if ( defined $wh_mqc && $wh_mqc == 0 ) {
-          $to->manual_qc(0);
-        }
-      }
-    }
-  } else {
-    if ( !defined $to->tag_index ) {
-      my $lane_mqc_row = $self->qc_schema->resultset('MqcOutcomeEnt')->search(
-        {id_run    => $to->id_run,
-         position  => $to->position})->next();
-      if ($lane_mqc_row && $lane_mqc_row->has_final_outcome) {
-        _set_mqc_value($lane_mqc_row, $to);
-      }
+    if ( $lib_mqc_row && $lib_mqc_row->has_final_outcome ) {
+      $to->lib_manual_qc($lib_mqc_row->is_accepted ? 1 : 0);
     }
   }
-  return;
-}
-
-sub _set_mqc_value {
-  my ($row, $to) = @_;
-  $to->manual_qc($row->is_accepted ? 1 : 0);
   return;
 }
 

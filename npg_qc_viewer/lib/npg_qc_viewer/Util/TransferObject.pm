@@ -73,7 +73,17 @@ has 'manual_qc'    => (
   isa      => 'Bool',
   is       => 'rw',
   required => 0,
-  clearer  => 'unset_manual_qc',
+);
+
+=head2 lib_manual_qc
+
+Result of library manual qc.
+
+=cut
+has 'lib_manual_qc'    => (
+  isa      => 'Bool',
+  is       => 'rw',
+  required => 0,
 );
 
 =head2 study_name
