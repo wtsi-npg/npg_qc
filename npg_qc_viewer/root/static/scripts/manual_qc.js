@@ -114,11 +114,15 @@ var NPG;
 
       MQCControl.prototype.setAcceptedPreliminaryBG = function() {
         this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.lane_control.css("padding-right", "0px");
+        this.lane_control.css("padding-left", "0px");
         this.lane_control.parent().prop('title', 'Preliminary pass in manual QC, waiting for final decision');
       };
 
       MQCControl.prototype.setRejectedPreliminaryBG = function() {
         this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #F99389, #F99389 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.lane_control.css("padding-right", "0px");
+        this.lane_control.css("padding-left", "0px");
         this.lane_control.parent().prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
 
@@ -449,6 +453,46 @@ var NPG;
         this.lane_control.parent().addClass('td_library_mqc');
       };
 
+      LibraryMQCControl.prototype.loadBGFromInitialWithPreliminary = function (lane_control) {
+        this.loadBGFromInitial(lane_control);
+        switch (lane_control.data(this.CONFIG_INITIAL)) {
+          case this.CONFIG_ACCEPTED_PRELIMINARY : this.setTagAcceptedPreliminaryBG(); break;
+          case this.CONFIG_REJECTED_PRELIMINARY : this.setTagRejectedPreliminaryBG(); break;
+        }
+        switch(lane_control.data('current_lane_outcome')) {
+          case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPreliminaryBG(); break;
+          case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPreliminaryBG(); break;
+        }
+      };
+
+      LibraryMQCControl.prototype.setAcceptedPreliminaryBG = function() {
+        var lane = this.lane_control.parent();
+        lane = $(lane);
+        lane.css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        lane.prop('title', 'Preliminary pass in manual QC, waiting for final decision');
+      };
+
+      LibraryMQCControl.prototype.setRejectedPreliminaryBG = function() {
+        var lane = this.lane_control.parent();
+        lane = $(lane);
+        lane.css("background", "repeating-linear-gradient(45deg, #F99389, #F99389 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        lane.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
+      };
+
+      LibraryMQCControl.prototype.setTagAcceptedPreliminaryBG = function() {
+        var sibling_tag_index = this.lane_control.parent().parent().children('.tag_info').first();
+        sibling_tag_index = $(sibling_tag_index);
+        sibling_tag_index.css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        sibling_tag_index.prop('title', 'Preliminary pass in manual QC, waiting for final decision');
+      };
+
+      LibraryMQCControl.prototype.setTagRejectedPreliminaryBG = function() {
+        var sibling_tag_index = this.lane_control.parent().parent().children('.tag_info').first();
+        sibling_tag_index = $(sibling_tag_index);
+        sibling_tag_index.css("background", "repeating-linear-gradient(45deg, #F99389, #F99389 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        sibling_tag_index.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
+      };
+
       return LibraryMQCControl;
     }) ();
     QC.LibraryMQCControl = LibraryMQCControl;
@@ -536,8 +580,9 @@ var NPG;
     var LanePageMQCControl = (function () {
       function LanePageMQCControl (abstractConfiguration){
         NPG.QC.PageMQCControl.call(this, abstractConfiguration);
-        this.DATA_TAG_INDEX = 'tag_index';
-        this.REST_SERVICE   = '/mqc/mqc_libraries/';
+        this.DATA_TAG_INDEX       = 'tag_index';
+        this.REST_SERVICE         = '/mqc/mqc_libraries/';
+        this.CURRENT_LANE_OUTCOME = 'current_lane_outcome';
       }
 
       LanePageMQCControl.prototype = new NPG.QC.PageMQCControl();
@@ -673,9 +718,11 @@ var NPG;
 
         for(var i = 0; i < lanes.length; i++) {
           lanes[i].children('.lane_mqc_control').each(function(j, obj){
-            $(obj).html("<span class='lane_mqc_working'><img src='"
-                + self.abstractConfiguration.getRoot()
-                + "/images/waiting.gif' width='10' height='10' title='Processing request.'></span>");
+            obj = $(obj);
+            obj.data(this.CURRENT_LANE_OUTCOME, mqc_run_data.current_lane_outcome);
+            obj.html("<span class='lane_mqc_working'><img src='"
+              + self.abstractConfiguration.getRoot()
+              + "/images/waiting.gif' width='10' height='10' title='Processing request.'></span>");
           });
         }
 
@@ -733,10 +780,16 @@ var NPG;
                 self.prepareLanes(mqc_run_data, lanes);
               },
               function () { //There is no mqc
+                $('.lane_mqc_control').css("padding-right", "0px");
+                $('.lane_mqc_control').css("padding-left", "0px");
                 return;
               }
             );
           } else {
+            $('.lane_mqc_control').css("padding-right", "0px");
+            $('.lane_mqc_control').css("padding-left", "0px");
+            $('.library_mqc_overall_controls').css("padding-right", "0px");
+            $('.library_mqc_overall_controls').css("padding-left", "0px");
             self.showMQCOutcomes(jqxhr.responseJSON, lanes);
           }
         }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -759,7 +812,6 @@ var NPG;
         if(typeof(lanes) === "undefined" || lanes == null) {
           throw new Error("Error: Invalid arguments");
         }
-        var result = null;
         var self = this;
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
@@ -779,7 +831,6 @@ var NPG;
             c.linkControl(obj);
           }
         }
-        return result;
       };
 
       return LanePageMQCControl;
@@ -911,6 +962,8 @@ var NPG;
                     self.prepareLanes(mqc_run_data, lanes);
                   },
                   function () { //There is no mqc
+                    $('.lane_mqc_control').css("padding-right", "0px");
+                    $('.lane_mqc_control').css("padding-left", "0px");
                     return;
                   }
               );
