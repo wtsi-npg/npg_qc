@@ -587,12 +587,22 @@ var NPG;
 
       LanePageMQCControl.prototype = new NPG.QC.PageMQCControl();
 
+      LanePageMQCControl.prototype.parseLanes = function (lanes) {
+        $('.lane_mqc_control').each(function (i, obj) {
+          obj = $(obj);
+          var parent = obj.parent();
+          lanes.push(parent);
+        });
+        return;
+      };
+
       LanePageMQCControl.prototype.initQC = function (mqc_run_data, plexes, targetFunction, mopFunction) {
         var result = null;
         var self = this;
         if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //There is a data object
           this.mqc_run_data = mqc_run_data;
           if(self.isStateForMQC(mqc_run_data)) {
+            self.addAllPaddings();
             result = targetFunction(mqc_run_data, this, plexes);
           } else {
             result = mopFunction();
@@ -715,11 +725,17 @@ var NPG;
           throw new Error("Error: Invalid arguments");
         }
         var self = this;
-
+        //Set manual qc outcome for the lane as it is in the database.
+        $('.lane_mqc_control').each(function(j, obj) {
+          obj = $(obj);
+          if (obj.data('position') == mqc_run_data.position
+              && obj.data('tag_index') !== 0) {
+            obj.data(self.CURRENT_LANE_OUTCOME, mqc_run_data.current_lane_outcome);
+          }
+        });
         for(var i = 0; i < lanes.length; i++) {
           lanes[i].children('.lane_mqc_control').each(function(j, obj){
             obj = $(obj);
-            obj.data(this.CURRENT_LANE_OUTCOME, mqc_run_data.current_lane_outcome);
             obj.html("<span class='lane_mqc_working'><img src='"
               + self.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'></span>");
@@ -746,6 +762,18 @@ var NPG;
         }
       };
 
+      LanePageMQCControl.prototype.removeAllPaddings = function () {
+        $('.lane_mqc_control').css("padding-right", "0px");
+        $('.lane_mqc_control').css("padding-left", "0px");
+        $('.library_mqc_overall_controls').css("padding-right", "0px");
+      };
+
+      LanePageMQCControl.prototype.addAllPaddings = function () {
+        $('.lane_mqc_control').css("padding-right", "5px");
+        $('.lane_mqc_control').css("padding-left", "10px");
+        $('.library_mqc_overall_controls').css("padding-left", "15px");
+      };
+
       /**
        * Use data from the page to make the first call to REST. Finds rows which
        * need qc, inits qc for those rows. If it is not state for MQC it updates
@@ -761,35 +789,37 @@ var NPG;
           cache: false
         }).done(function() {
           var mqc_run_data = jqxhr.responseJSON;
+          for(var i = 0; i < lanes.length; i++) {
+            lanes[i].children('.lane_mqc_control').each(function(j, obj) {
+              obj = $(obj);
+            });
+          }
+
           //Filter lanes for qc using data from REST
-          lanes = self.onlyQCAble(mqc_run_data, lanes);
+          var onlyQCAble = self.onlyQCAble(mqc_run_data, lanes);
 
           if(self.isStateForMQC(mqc_run_data)) {
             var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
             overallControls.setupControls();
-            overallControls.init(lanes);
+            overallControls.init(onlyQCAble);
 
-            self.initQC(mqc_run_data, lanes,
-              function (mqc_run_data, self, lanes) {
+            self.initQC(mqc_run_data, onlyQCAble,
+              function (mqc_run_data, self, onlyQCAble) {
                 //Show working icons
-                for(var i = 0; i < lanes.length; i++) {
-                  lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                for(var i = 0; i < onlyQCAble.length; i++) {
+                  onlyQCAble[i].children('.lane_mqc_control').each(function(j, obj){
                     $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
                   });
                 }
-                self.prepareLanes(mqc_run_data, lanes);
+                self.prepareLanes(mqc_run_data, onlyQCAble);
               },
-              function () { //There is no mqc
-                $('.lane_mqc_control').css("padding-right", "0px");
-                $('.lane_mqc_control').css("padding-left", "0px");
+              function () { //There is no mqc because of problems with data
+                self.removeAllPaddings();
                 return;
               }
             );
           } else {
-            $('.lane_mqc_control').css("padding-right", "0px");
-            $('.lane_mqc_control').css("padding-left", "0px");
-            $('.library_mqc_overall_controls').css("padding-right", "0px");
-            $('.library_mqc_overall_controls').css("padding-left", "0px");
+            self.removeAllPaddings();
             self.showMQCOutcomes(jqxhr.responseJSON, lanes);
           }
         }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -851,6 +881,16 @@ var NPG;
 
       RunPageMQCControl.prototype = new NPG.QC.PageMQCControl();
 
+      RunPageMQCControl.prototype.removeAllPaddings = function () {
+        $('.lane_mqc_control').css("padding-right", "0px");
+        $('.lane_mqc_control').css("padding-left", "0px");
+      };
+
+      RunPageMQCControl.prototype.addAllPaddings = function () {
+        $('.lane_mqc_control').css("padding-right", "5px");
+        $('.lane_mqc_control').css("padding-left", "10px");
+      };
+
       /**
        * Validates qc conditions and if everything is ready for qc it will call the
        * target function passing parameters. If not qc ready will call mop function.
@@ -866,6 +906,7 @@ var NPG;
         if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //There is a data object
           this.mqc_run_data = mqc_run_data;
           if(self.isStateForMQC(mqc_run_data)) {
+            self.addAllPaddings();
             result = targetFunction(mqc_run_data, this, lanes);
           } else {
             result = mopFunction();
