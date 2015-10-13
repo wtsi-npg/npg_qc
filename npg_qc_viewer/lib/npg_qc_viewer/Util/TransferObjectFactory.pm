@@ -77,11 +77,13 @@ sub _get_mqc_from_qc {
     return;
   }
 
-  my $lane_mqc_row = $self->qc_schema->resultset('MqcOutcomeEnt')->search(
+  if (!defined $to->manual_qc && (!defined $to->tag_index || $to->tag_index != 0)) {
+    my $lane_mqc_row = $self->qc_schema->resultset('MqcOutcomeEnt')->search(
         {id_run    => $to->id_run,
          position  => $to->position})->next();
-  if ($lane_mqc_row && $lane_mqc_row->has_final_outcome) {
-    $to->manual_qc($lane_mqc_row->is_accepted ? 1 : 0);
+    if ($lane_mqc_row && $lane_mqc_row->has_final_outcome) {
+      $to->manual_qc($lane_mqc_row->is_accepted ? 1 : 0);
+    }
   }
 
   if ( $to->tag_index ) { # tag zero is not qc-ed
