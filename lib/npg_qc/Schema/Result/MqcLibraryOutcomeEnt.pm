@@ -79,7 +79,7 @@ Lane
   default_value: -1
   is_nullable: 0
 
-=head2 id_mqc_outcome
+=head2 id_mqc_library_outcome
 
   data_type: 'smallint'
   extra: {unsigned => 1}
@@ -133,7 +133,7 @@ __PACKAGE__->add_columns(
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
   'tag_index',
   { data_type => 'bigint', default_value => -1, is_nullable => 0 },
-  'id_mqc_outcome',
+  'id_mqc_library_outcome',
   {
     data_type => 'smallint',
     extra => { unsigned => 1 },
@@ -191,24 +191,24 @@ __PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position', 'tag_
 
 =head1 RELATIONS
 
-=head2 mqc_outcome
+=head2 mqc_library_outcome
 
 Type: belongs_to
 
-Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeDict>
 
 =cut
 
 __PACKAGE__->belongs_to(
-  'mqc_outcome',
-  'npg_qc::Schema::Result::MqcOutcomeDict',
-  { id_mqc_outcome => 'id_mqc_outcome' },
+  'mqc_library_outcome',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeDict',
+  { id_mqc_library_outcome => 'id_mqc_library_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-18 14:34:46
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:enQroYzqNS2pZjTzOQye9A
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-13 12:18:54
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:adzfHyyrTYn/c+bkKHtPSA
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 our $VERSION = '0';
@@ -229,6 +229,24 @@ sub short_desc {
   my $self = shift;
   my $s = sprintf 'id_run %s position %s tag_index %s', $self->id_run, $self->position, $self->tag_index;
   return $s;
+}
+
+#Fetches valid outcome object from the database.
+sub find_valid_outcome {
+  my ($self, $outcome) = @_;
+
+  my $rs = $self->result_source->schema->resultset($MQC_OUTCOME_DICT);
+  my $outcome_dict;
+  if ($outcome =~ /\d+/xms) {
+    $outcome_dict = $rs->find($outcome);
+  } else {
+    $outcome_dict = $rs->search({short_desc => $outcome})->next;
+  }
+  if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
+    croak(sprintf 'Error: Not possible to transit %s to a non-existing outcome "%s".',
+          $self->short_desc, $outcome);
+  }
+  return $outcome_dict;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -270,6 +288,11 @@ Entity for library MQC outcome.
 =head2 historic_resultset
 
   Returns the name of the historic resultset associated with this entity
+
+=head2 find_valid_outcome
+
+  Finds the MqcOutcomeDict entity that matches the outcome. Or nothing if there is
+  no valid outcome matching the parameter.
 
 =head1 DEPENDENCIES
 

@@ -22,18 +22,18 @@ our @EXPORT_OK = qw/$MQC_OUTCOME_DICT
                    /;
 
 #Result names
-Readonly::Scalar our $MQC_OUTCOME_DICT => q[MqcOutcomeDict];
-Readonly::Scalar our $MQC_LANE_ENT     => q[MqcOutcomeEnt];
-Readonly::Scalar our $MQC_LANE_HIST    => q[MqcOutcomeHist];
-Readonly::Scalar our $MQC_LIBRARY_ENT  => q[MqcLibraryOutcomeEnt];
-Readonly::Scalar our $MQC_LIBRARY_HIST => q[MqcLibraryOutcomeHist];
+Readonly::Scalar our $MQC_OUTCOME_DICT         => q[MqcOutcomeDict];
+Readonly::Scalar our $MQC_LIBRARY_OUTCOME_DICT => q[MqcLibraryOutcomeDict];
+Readonly::Scalar our $MQC_LANE_ENT             => q[MqcOutcomeEnt];
+Readonly::Scalar our $MQC_LANE_HIST            => q[MqcOutcomeHist];
+Readonly::Scalar our $MQC_LIBRARY_ENT          => q[MqcLibraryOutcomeEnt];
+Readonly::Scalar our $MQC_LIBRARY_HIST         => q[MqcLibraryOutcomeHist];
 
 #MQC general configuration
 Readonly::Scalar our $MQC_LIB_LIMIT    => 50;
 Readonly::Scalar our $MQC_ROLE         => q[manual_qc];
 
 requires 'short_desc';
-requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
 requires 'historic_resultset';
@@ -148,24 +148,6 @@ sub _create_historic {
   return 1;
 }
 
-#Fetches valid outcome object from the database.
-sub find_valid_outcome {
-  my ($self, $outcome) = @_;
-
-  my $rs = $self->result_source->schema->resultset($MQC_OUTCOME_DICT);
-  my $outcome_dict;
-  if ($outcome =~ /\d+/xms) {
-    $outcome_dict = $rs->find($outcome);
-  } else {
-    $outcome_dict = $rs->search({short_desc => $outcome})->next;
-  }
-  if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
-    croak(sprintf 'Error: Not possible to transit %s to a non-existing outcome "%s".',
-          $self->short_desc, $outcome);
-  }
-  return $outcome_dict;
-}
-
 no Moose;
 
 1;
@@ -219,11 +201,6 @@ __END__
 
   Returns true if the current outcome is undecided. 
   Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
-
-=head2 find_valid_outcome
-
-  Finds the MqcOutcomeDict entity that matches the outcome. Or nothing if there is
-  no valid outcome matching the parameter.
 
 =head1 DIAGNOSTICS
 

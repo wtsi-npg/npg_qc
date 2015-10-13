@@ -279,6 +279,24 @@ sub update_outcome_with_libraries {
   return 1;
 }
 
+#Fetches valid outcome object from the database.
+sub find_valid_outcome {
+  my ($self, $outcome) = @_;
+
+  my $rs = $self->result_source->schema->resultset($MQC_OUTCOME_DICT);
+  my $outcome_dict;
+  if ($outcome =~ /\d+/xms) {
+    $outcome_dict = $rs->find($outcome);
+  } else {
+    $outcome_dict = $rs->search({short_desc => $outcome})->next;
+  }
+  if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
+    croak(sprintf 'Error: Not possible to transit %s to a non-existing outcome "%s".',
+          $self->short_desc, $outcome);
+  }
+  return $outcome_dict;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -333,6 +351,11 @@ Entity for lane MQC outcome.
 
   Updates children library mqc outcomes then updates outcome of lane mqc entity
   passed as parameter.
+
+=head2 find_valid_outcome
+
+  Finds the MqcOutcomeDict entity that matches the outcome. Or nothing if there is
+  no valid outcome matching the parameter.
 
 =head1 DEPENDENCIES
 
