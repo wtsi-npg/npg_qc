@@ -493,6 +493,18 @@ var NPG;
         sibling_tag_index.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
 
+      LibraryMQCControl.prototype.setAcceptedFinal = function() {
+        this.outcome = this.CONFIG_ACCEPTED_FINAL;
+        this.lane_control.empty();
+        this.removeMQCFormat();
+      };
+
+      LibraryMQCControl.prototype.setRejectedFinal = function() {
+        this.outcome = this.CONFIG_REJECTED_FINAL;
+        this.lane_control.empty();
+        this.removeMQCFormat();
+      };
+
       return LibraryMQCControl;
     }) ();
     QC.LibraryMQCControl = LibraryMQCControl;
