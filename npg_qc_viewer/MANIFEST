@@ -95,6 +95,8 @@ t/10-authentication-SangerSSOnpg.t
 t/10-npg_tracking-daemon-seqqc.t
 t/10-util-Error.t
 t/10-util-FileFinder.t
+t/10-util-TransferObject.t
+t/10-util-TransferObjectFactory.t
 t/20-model-Check.t
 t/20-model-LimsServer.t
 t/20-model-NpgDB.t
