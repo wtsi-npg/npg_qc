@@ -120,7 +120,7 @@ var NPG;
       };
 
       MQCControl.prototype.setRejectedPreliminaryBG = function() {
-        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #F99389, #F99389 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
         this.lane_control.css("padding-right", "0px");
         this.lane_control.css("padding-left", "0px");
         this.lane_control.parent().prop('title', 'Preliminary fail in manual QC, waiting for final decision');
@@ -137,12 +137,14 @@ var NPG;
       };
 
       MQCControl.prototype.setAcceptedPre = function() {
+        this.lane_control.parent().css("background-color", "#E5F2FF");
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINARY;
         this.lane_control.children('.lane_mqc_save').show();
       };
 
       MQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINARY;
+        this.lane_control.parent().css("background-color", "#FFDDDD");
         this.lane_control.children('.lane_mqc_save').show();
       };
 
@@ -161,6 +163,7 @@ var NPG;
       };
 
       MQCControl.prototype.setUndecided = function() {
+        this.lane_control.parent().css("background-color", "#FFFFFF");
         this.outcome = this.CONFIG_UNDECIDED;
         this.lane_control.children('.lane_mqc_save').hide();
       };
@@ -475,7 +478,7 @@ var NPG;
       LibraryMQCControl.prototype.setRejectedPreliminaryBG = function() {
         var lane = this.lane_control.parent();
         lane = $(lane);
-        lane.css("background", "repeating-linear-gradient(45deg, #F99389, #F99389 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        lane.css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
         lane.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
 
@@ -489,7 +492,7 @@ var NPG;
       LibraryMQCControl.prototype.setTagRejectedPreliminaryBG = function() {
         var sibling_tag_index = this.lane_control.parent().parent().children('.tag_info').first();
         sibling_tag_index = $(sibling_tag_index);
-        sibling_tag_index.css("background", "repeating-linear-gradient(45deg, #F99389, #F99389 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        sibling_tag_index.css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
         sibling_tag_index.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
 
@@ -652,7 +655,7 @@ var NPG;
                      && mqc_run_data.qc_tags.length <= mqc_run_data.mqc_lib_limit;
 
         if(mqc_run_data.qc_tags.length > mqc_run_data.mqc_lib_limit) {
-          var max_library_message = 'Number of libraries is larger than maximum number considered for manual QC. No manual QC controls will be displayed.';
+          var max_library_message = 'Too many plexes, lane level manual QC only.';
           new NPG.QC.UI.MQCInfoMessage(max_library_message).toConsole().display();
         }
         return result;
