@@ -57,10 +57,10 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
     var prodConfiguration = new NPG.QC.ProdConfiguration();
     //Read information about lanes from page.
     var lanes = []; //Lanes without previous QC, blank BG
-    var lanesWithBG = []; //Lanes with previous QC, BG with colour
     var control;
 
     if (runTitleParserResult.isRunPage) {
+      var lanesWithBG = []; //Lanes with previous QC, BG with colour
       control = new NPG.QC.RunPageMQCControl(prodConfiguration);
       window.console && console.log("Run page");
       control.parseLanes(lanes, lanesWithBG);
@@ -71,7 +71,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
       var position = runTitleParserResult.position;
       window.console && console.log("Position " + position);
       control = new NPG.QC.LanePageMQCControl(prodConfiguration);
-      control.parseLanes(lanes, lanesWithBG);
+      control.parseLanes(lanes);
       control.prepareMQC(id_run, position, lanes);
     }
   }

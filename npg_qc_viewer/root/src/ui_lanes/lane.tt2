@@ -2,7 +2,21 @@
     USE Number.Format(THOUSANDS_SEP=',');
 
     lane_class = 'lane';
-    IF row_info_to.manual_qc == 1; lane_class = lane_class _ ' passed'; ELSIF row_info_to.manual_qc == 0; lane_class = lane_class _ ' failed'; END;
+    plex_class = 'tag_info';
+    IF row_info_to.manual_qc.defined;
+      IF row_info_to.manual_qc;
+        lane_class = lane_class _ ' passed';
+      ELSE;
+        lane_class = lane_class _ ' failed';
+      END;
+    END;
+    IF row_info_to.lib_manual_qc.defined;
+      IF row_info_to.lib_manual_qc;
+        plex_class = plex_class _ ' passed';
+      ELSE;
+        plex_class = plex_class _ ' failed';
+      END;
+    END;
 -%]
 
 <td class="[% lane_class %] nbsp">
@@ -26,7 +40,7 @@
 [% END -%]
 </td>
 [%- IF has_plexes -%]
-<td class="tag_info">
+<td class="[% plex_class %]">
 [%- IF tag_index.defined; lane_link = c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'lane', 'db_lookup'=>"$db_lookup"}); -%]
 [%- have_link = 0; IF lane_collection && lane_collection.size; have_link = 1; -%]
 <a href="#[% lane_key %]">[% END -%]

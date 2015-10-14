@@ -57,13 +57,6 @@ Readonly my %DELEGATION_TO_MQC_OUTCOME => {
   );
 
   __PACKAGE__->meta->add_method('_build_' . $attr, sub {my $r = shift; return $r->$rel;} );
-
-  foreach my $method ( keys %{$del} ) {
-    around $method => sub {
-      my ($orig, $self) = @_;
-      return $self->$attr ? $self->$orig() : undef;
-    };
-  }
 }
 
 around [qw/update insert/] => sub {

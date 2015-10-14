@@ -441,15 +441,6 @@ a, a:link, a:visited, a:hover {
   padding-top: 5px;
 }
 
-.lane_mqc_control {
-  padding-right: 5px;
-  padding-left: 10px;
-}
-
-.library_mqc_overall_controls {
-  padding-left: 15px;
-}
-
 .lane_mqc_button { /* For all MQC button-like format. */
   padding-left: 6px;
   padding-right: 6px;
