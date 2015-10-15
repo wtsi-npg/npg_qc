@@ -192,7 +192,11 @@ Resets object's attributes as fits for a pool
 =cut
 sub reset_as_pool {
   my $self = shift;
-  for my $attr (qw/tag_sequence study_name id_sample_lims sample_name supplier_sample_name/) {
+  for my $attr (qw/tag_sequence
+                   study_name
+                   id_sample_lims
+                   sample_name
+                   supplier_sample_name/) {
     $self->$attr(undef);
   }
   $self->id_library_lims($self->id_pool_lims);

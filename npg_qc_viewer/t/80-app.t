@@ -18,7 +18,7 @@ BEGIN {
 
 # programmatically adding break points $DB::single = 1;
 # run under the debugger perl -Ilib -d t/test.t
-# set CATALYST_SERVER = 1 to test against a running surver
+# set CATALYST_SERVER = 1 to test against a running server
 
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;

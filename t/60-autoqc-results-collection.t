@@ -333,9 +333,8 @@ my $temp = tempdir( CLEANUP => 1);
 {
     my $load_dir = q[t/data/autoqc/load];
     my $c = npg_qc::autoqc::results::collection->new();
-    warnings_like {$c->add_from_dir($load_dir)}
-        [ qr/Cannot\ identify\ class\ for\ ${load_dir}\/some\.json/],
-        'warning when an object for a json file does nor exist';
+    lives_ok {$c->add_from_dir($load_dir)}
+       'non-autoqc json file successfully skipped';
     is($c->size(), 3, 'three results added by de-serialization');
 }
 
