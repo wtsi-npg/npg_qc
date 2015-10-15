@@ -94,13 +94,13 @@ var NPG;
       var MQCErrorMessage = (function() {
         MQCErrorMessage = function (errorText, placeholder) {
           this.errorText = errorText;
-          this.EXCEPTION_STRING_SPLIT = '. at /';
+          this.CONFIG_EXCEPTION_STRING_SPLIT = '. at /';
           this.placeholder = placeholder || 'ajax_status';
         }
 
         MQCErrorMessage.prototype.formatForDisplay = function () {
           var cleanText = this.errorText;
-          var n = cleanText.indexOf(this.EXCEPTION_STRING_SPLIT);
+          var n = cleanText.indexOf(this.CONFIG_EXCEPTION_STRING_SPLIT);
           if (n != -1) {
             cleanText = cleanText.substring(0, n + 1);
           }
@@ -175,7 +175,8 @@ var NPG;
 
       var MQCLibraryOverallControls = (function () {
         MQCLibraryOverallControls = function() {
-          this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
+          this.CONFIG_PLACEHOLDER = 'library_mqc_overall_controls'
+          this.CONFIG_PLACEHOLDER_CLASS = '.' + this.CONFIG_PLACEHOLDER;
 
           this.CLASS_ALL_ACCEPT    = 'lane_mqc_accept_all';
           this.CLASS_ALL_REJECT    = 'lane_mqc_reject_all';
@@ -191,7 +192,7 @@ var NPG;
         }
 
         MQCLibraryOverallControls.prototype.setupControls = function (placeholder) {
-          placeholder = placeholder || $($('.' + this.PLACEHOLDER_CLASS));
+          placeholder = placeholder || $($(this.CONFIG_PLACEHOLDER_CLASS));
           //Remove the lane placeholder which will not be used in library manuql QC
           placeholder.parent().children('.lane_mqc_control').remove();
           var accept = this.buildControl(this.CLASS_ALL_ACCEPT, this.TITLE_ACCEPT, this.ICON_ACCEPT);

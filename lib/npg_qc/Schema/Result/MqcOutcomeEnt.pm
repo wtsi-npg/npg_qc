@@ -205,9 +205,13 @@ use Carp;
 our $VERSION = '0';
 
 use Array::Compare;
-use npg_qc::Schema::MQCEntRole qw[$MQC_LIBRARY_ENT $MQC_LANE_HIST $MQC_LIB_LIMIT];
+use npg_qc::Schema::MQCEntRole qw[ $MQC_LIBRARY_ENT $MQC_LANE_HIST $MQC_OUTCOME_DICT $MQC_LIB_LIMIT ];
 
 with qw/npg_qc::Schema::MQCEntRole/;
+
+sub get_dictionary_relationship_name {
+  return q[mqc_outcome];
+}
 
 sub historic_resultset {
   my $self = shift;
@@ -295,6 +299,40 @@ sub find_valid_outcome {
           $self->short_desc, $outcome);
   }
   return $outcome_dict;
+}
+
+sub update_outcome {
+  my ($self, $outcome, $username) = @_;
+
+  #Validation
+  if(!defined $outcome){
+    croak q[Mandatory parameter 'outcome' missing in call];
+  }
+  $self->validate_username($username);
+  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
+
+  my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
+  #There is a row that matches the id_run and position
+  if ($self->in_storage) {
+    #Check if previous outcome is not final
+    if($self->has_final_outcome) {
+      croak(sprintf 'Error: Outcome is already final but trying to transit to %s.',
+            $self->short_desc);
+    } else { #Update
+      my $values = {};
+      $values->{'id_mqc_outcome'} = $outcome_id;
+      $values->{'username'}       = $username;
+      $values->{'modified_by'}    = $username;
+      #To reaload from database otherwise the object keeps the old values
+      $self->update($values)->discard_changes();
+    }
+  } else { #Is a new row just insert.
+    $self->id_mqc_outcome($outcome_id);
+    $self->username($username);
+    $self->modified_by($username);
+    $self->insert();
+  }
+  return 1;
 }
 
 __PACKAGE__->meta->make_immutable;

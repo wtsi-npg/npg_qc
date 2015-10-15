@@ -12,51 +12,51 @@ use Moose::Role;
 
 with qw/npg_qc::Schema::TimeZoneConsumerRole/;
 
-our @EXPORT_OK = qw/$MQC_OUTCOME_DICT
+our @EXPORT_OK = qw/
+                    $MQC_OUTCOME_DICT
                     $MQC_LANE_ENT
                     $MQC_LANE_HIST
+                    $MQC_LIBRARY_OUTCOME_DICT
                     $MQC_LIBRARY_ENT
                     $MQC_LIBRARY_HIST
                     $MQC_LIB_LIMIT
-                    $MQC_ROLE
+                    $MQC_USER_ROLE
                    /;
 
 #Result names
 Readonly::Scalar our $MQC_OUTCOME_DICT         => q[MqcOutcomeDict];
-Readonly::Scalar our $MQC_LIBRARY_OUTCOME_DICT => q[MqcLibraryOutcomeDict];
 Readonly::Scalar our $MQC_LANE_ENT             => q[MqcOutcomeEnt];
 Readonly::Scalar our $MQC_LANE_HIST            => q[MqcOutcomeHist];
+Readonly::Scalar our $MQC_LIBRARY_OUTCOME_DICT => q[MqcLibraryOutcomeDict];
 Readonly::Scalar our $MQC_LIBRARY_ENT          => q[MqcLibraryOutcomeEnt];
 Readonly::Scalar our $MQC_LIBRARY_HIST         => q[MqcLibraryOutcomeHist];
 
 #MQC general configuration
 Readonly::Scalar our $MQC_LIB_LIMIT    => 50;
-Readonly::Scalar our $MQC_ROLE         => q[manual_qc];
+Readonly::Scalar our $MQC_USER_ROLE         => q[manual_qc];
 
 requires 'short_desc';
 requires 'update';
 requires 'insert';
 requires 'historic_resultset';
 
-Readonly my %DELEGATION_TO_MQC_OUTCOME => {
+Readonly my %DELEGATION_TO_MQC_OUTCOME = (
   'has_final_outcome' => 'is_final_outcome',
   'is_accepted'       => 'is_accepted',
   'is_final_accepted' => 'is_final_accepted',
   'is_undecided'      => 'is_undecided',
-};
+);
 
-{ #TODO move 
-  my $rel = q[mqc_outcome];
-  my $attr = q[_] . $rel . q[_row];
-  my $del  = \%DELEGATION_TO_MQC_OUTCOME;
-  has $attr => ( isa        => 'Maybe[npg_qc::Schema::Result::' . $MQC_OUTCOME_DICT . ']',
-                 is         => 'ro',
-                 weak_ref   => 1,
-                 lazy_build => 1,
-                 handles    => $del,
+foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
+  __PACKAGE__->meta->add_method( $this_class_method,
+    sub {
+      my $self = shift;
+      my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
+      my $dictionary_relationship_name = $self->get_dictionary_relationship_name;
+      my $dictionary = $self->${dictionary_relationship_name};
+      $dictionary->$that_class_method;
+    }
   );
-
-  __PACKAGE__->meta->add_method('_build_' . $attr, sub {my $r = shift; return $r->$rel;} );
 }
 
 around [qw/update insert/] => sub {
@@ -98,40 +98,6 @@ sub validate_username {
 }
 
 #TODO implement a toggle_outcome method
-
-sub update_outcome {
-  my ($self, $outcome, $username) = @_;
-
-  #Validation
-  if(!defined $outcome){
-    croak q[Mandatory parameter 'outcome' missing in call];
-  }
-  $self->validate_username($username);
-  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
-
-  my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
-  #There is a row that matches the id_run and position
-  if ($self->in_storage) {
-    #Check if previous outcome is not final
-    if($self->has_final_outcome) {
-      croak(sprintf 'Error: Outcome is already final but trying to transit to %s.',
-            $self->short_desc);
-    } else { #Update
-      my $values = {};
-      $values->{'id_mqc_outcome'} = $outcome_id;
-      $values->{'username'}       = $username;
-      $values->{'modified_by'}    = $username;
-      #To reaload from database otherwise the object keeps the old values
-      $self->update($values)->discard_changes();
-    }
-  } else { #Is a new row just insert.
-    $self->id_mqc_outcome($outcome_id);
-    $self->username($username);
-    $self->modified_by($username);
-    $self->insert();
-  }
-  return 1;
-}
 
 #Create and save historic from the entity current data.
 sub _create_historic {
