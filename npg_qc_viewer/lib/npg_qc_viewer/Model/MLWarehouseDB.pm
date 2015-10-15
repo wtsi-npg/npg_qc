@@ -3,10 +3,14 @@ package npg_qc_viewer::Model::MLWarehouseDB;
 use Moose;
 use namespace::autoclean;
 use Carp;
+use Readonly;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
+
+Readonly::Scalar our $HASH_KEY_QC_TAGS     => q[qc_tags];
+Readonly::Scalar our $HASH_KEY_NON_QC_TAGS => q[non_qc_tags];
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -51,17 +55,20 @@ sub search_product_metrics {
     croak q[Id run not defined when querying metrics by me.id_run];
   }
 
+  my $resultset = $self->resultset('IseqProductMetric');
+  my $cs_alias = $resultset->current_source_alias;
+
   my $where = {};
   foreach my $key (keys %{$run_details}) {
-    $where->{'me.' . $key} = $run_details->{$key};
+    $where->{$cs_alias . q[.] . $key} = $run_details->{$key};
   }
 
-  my $rs = $self->resultset('IseqProductMetric')->
-                  search($where, {
-                    prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-                    order_by => qw[ me.id_run me.position me.tag_index ],
-                    cache    => 1,
-                  },);
+  my $rs = $resultset->
+             search($where, {
+               prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+               order_by => qw[ me.id_run me.position me.tag_index ],
+               cache    => 1,
+             },);
 
   return $rs;
 }
@@ -153,7 +160,10 @@ sub search_sample_by_sample_id {
     croak q[Id sample lims not defined when querying sample lims];
   };
 
-  my $where = { 'me.id_sample_lims' => $id_sample_lims, };
+  my $resultset = $self->resultset('Sample');
+  my $cs_alias = $resultset->current_source_alias;
+
+  my $where = { $cs_alias . '.id_sample_lims' => $id_sample_lims, };
 
   my $rs = $self->resultset('Sample')->
                     search($where, {
@@ -161,6 +171,85 @@ sub search_sample_by_sample_id {
   });
 
   return $rs;
+}
+
+=head2 fetch_tag_index_array_for_run_position
+
+  Search for tag indexes associated with a run, position and return them as
+  an array. It does the search explicitely excluding tag_index = 0 and 
+  entity_type = 'library_index_spike'. Croaks if there is no data in LIMS for
+  the parameters.
+
+=cut
+sub fetch_tag_index_array_for_run_position {
+  my ($self, $id_run, $position) = @_;
+
+  if(!defined $id_run) {
+    croak q[Id run is required when searching for tag_indexes but not defined];
+  }
+  if(!defined $position) {
+    croak q[Position is required when searching for tag_indexes but not defined];
+  }
+
+  my $resultset = $self->resultset('IseqProductMetric');
+  my $cs_alias = $resultset->current_source_alias;
+
+  my $where = {
+    'id_run'   => $id_run,
+    'position' => $position,
+  };
+
+  my $rs_validation = $resultset->search($where);
+  if ($rs_validation->count == 0) {
+    croak q[Error: No LIMS data for this run/position.];
+  }
+
+  $where = {
+    $cs_alias . '.id_run'     => $id_run,
+    $cs_alias . '.position'   => $position,
+    $cs_alias . '.tag_index'  => { q[!=], undef },
+  };
+
+  my $rs = $resultset->search($where, {
+             prefetch => ['iseq_run_lane_metric', 'iseq_flowcell'],
+             order_by => qw[ me.id_run me.position me.tag_index ],
+             cache    => 1,
+  });
+
+  my $tags = {};
+
+  my $where_ti = {
+    $cs_alias . '.tag_index' => { q[!=] => 0 },
+    'entity_type'            => { q[!=] => 'library_indexed_spike' },
+  };
+  my $qc_tags = $self->_get_from_rs_as_array($rs, $where_ti);
+
+  $where_ti = {
+    -or => [
+      $cs_alias . '.tag_index' => { q[=] => 0 },
+      'entity_type'            => { q[=] => 'library_indexed_spike' },
+    ],
+  };
+  my $non_qc_tags = $self->_get_from_rs_as_array($rs, $where_ti);
+
+  $tags->{$HASH_KEY_QC_TAGS}     = $qc_tags;
+  $tags->{$HASH_KEY_NON_QC_TAGS} = $non_qc_tags;
+
+  return $tags;
+}
+
+sub _get_from_rs_as_array {
+  my ($self, $rs, $where) = @_;
+
+  my $temp_array = [];
+
+  my $rs1 = $rs->search($where);
+  while(my $prod = $rs1->next) {
+    my $tag_index = $prod->tag_index;
+    push @{$temp_array}, $tag_index;
+  }
+
+  return $temp_array;
 }
 
 __PACKAGE__->meta->make_immutable;

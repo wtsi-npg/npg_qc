@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 44;
+use Test::More tests => 48;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -93,6 +93,39 @@ my $dict_table = 'MqcOutcomeDict';
   my $ent = $rs->next;
   cmp_ok($ent->username, 'eq', $ent->modified_by, 'Username equals modified_by after manual update.');
 }
+
+subtest 'Data for historic' => sub {
+  plan tests => 14;
+
+  my $values = {
+    'id_run'         => 1,
+    'position'       => 3,
+    'id_mqc_outcome' => 0, 
+    'username'       => 'user',
+    'modified_by'    => 'user',
+  };
+
+  my $entity = $schema->resultset($table)->new_result($values);
+  my $historic = $entity->data_for_historic;
+  is($entity->id_run, $historic->{'id_run'}, 'Id run matches');
+  is($entity->position, $historic->{'position'}, 'Position matches');
+  is($entity->id_mqc_outcome, $historic->{'id_mqc_outcome'}, 'Id mqc outcome matches');
+  is($entity->username, $historic->{'username'}, 'Username matches');
+  is($entity->modified_by, $historic->{'modified_by'}, 'Modified by matches');
+  is($entity->last_modified, $historic->{'last_modified'}, 'Last modified matches');
+  
+  $values->{'reported'} = DateTime->now();
+  $entity = $schema->resultset($table)->new_result($values);
+  $historic = $entity->data_for_historic;
+  is($entity->id_run, $historic->{'id_run'}, 'Id run matches');
+  is($entity->position, $historic->{'position'}, 'Position matches');
+  is($entity->id_mqc_outcome, $historic->{'id_mqc_outcome'}, 'Id mqc outcome matches');
+  is($entity->username, $historic->{'username'}, 'Username matches');
+  is($entity->modified_by, $historic->{'modified_by'}, 'Modified by matches');
+  is($entity->last_modified, $historic->{'last_modified'}, 'Last modified matches');
+  ok($entity->reported, 'There is value for reported in entity');
+  ok(!defined $historic->{'reported'}, 'There is no value for reported in historic');
+};
 
 #Test update with historic
 {
@@ -194,10 +227,10 @@ my $dict_table = 'MqcOutcomeDict';
   ok(!$rs->next->is_accepted, q[The outcome is not considered accepted.]);
 
   throws_ok {$object->update_outcome('some invalid', $username)}
-    qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"some invalid\"/,
+    qr/Error: Not possible to transit id_run 210 position 1 to a non-existing outcome \"some invalid\"/,
     'error updating to invalid string status';
   throws_ok {$object->update_outcome(123, $username)}
-    qr/Error while trying to transit id_run 210 position 1 to a non-existing outcome \"123\"/,
+    qr/Error: Not possible to transit id_run 210 position 1 to a non-existing outcome \"123\"/,
     'error updating to invalid integer status';
   throws_ok {$object->update_outcome($status, 789)}
     qr/Have a number 789 instead as username/, 'username can be an integer';
@@ -242,8 +275,9 @@ my $dict_table = 'MqcOutcomeDict';
   $values = {'id_run' => $id_run, 'position' => $position};
   
   $object = $schema->resultset($table)->find_or_new($values);
-  my $in = $object->in_storage; #Row status from database
-  throws_ok { $object->update_outcome($status, $username) } qr/update a final outcome/, 'Invalid outcome transition croak';
+  ok($object->in_storage, 'Object is in storage.');
+  ok($object->has_final_outcome, 'Object has final outcome.');
+  throws_ok { $object->update_outcome($status, $username) } qr/Outcome is already final/, 'Invalid outcome transition croak';
   
   $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
@@ -273,5 +307,22 @@ my $dict_table = 'MqcOutcomeDict';
   my $rs2 = $schema->resultset($table)->get_ready_to_report();
   is ($rs2->count, 0, q[No entities to be reported]);
 }
+
+subtest 'test for short_desc' => sub {
+  plan tests => 2;
+  
+  my $values = {
+    'id_run'         => 300, 
+    'position'       => 10,
+    'id_mqc_outcome' => 0, 
+    'username'       => 'user', 
+    'modified_by'    => 'user'
+  };
+  my $rs = $schema->resultset($table);
+  lives_ok {$rs->find_or_new($values)->update_or_insert()} 'record inserted';
+  my $rs1 = $rs->search({'id_run' => 300});
+  my $row = $rs1->next;
+  is($row->short_desc, q[id_run 300 position 10], 'Correct short desc');
+};
 
 1;

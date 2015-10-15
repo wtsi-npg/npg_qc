@@ -9,11 +9,20 @@
 
 [% have_link = 0;
    IF tag_index == '' && lane_collection && lane_collection.size;
-   have_link = 1 %]<a href="#[% lane_key %]">[% END -%]
+   have_link = 1 %]
+     <a href="#[% lane_key %]">
+   [% END -%]
 [%- position -%]
-[%- IF have_link %]</a>[% END -%]
+[%- IF have_link %]
+   </a>
+   [%- IF !run_view; -%]
+     <span class='library_mqc_overall_controls'></span>
+   [%- END; -%]
+[% END -%]
 [%- IF run_view; -%]
 <span id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'></span>
+[%- ELSIF id_run.defined && position.defined -%]
+&nbsp;<span id=mqc_library[%id_run%]_[%position%]_[% tag_index %] data-id_run='[% id_run %]' data-position='[% position %]' data-tag_index='[% tag_index %]' class='lane_mqc_control'></span>
 [% END -%]
 </td>
 [%- IF has_plexes -%]

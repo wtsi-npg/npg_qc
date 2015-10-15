@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 65;
+use Test::More tests => 58;
 use Test::Exception;
 use HTTP::Request::Common;
 use t::util;
@@ -17,7 +17,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
 {
   my $response;
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome' )) }
+  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome_lane' )) }
     'update get request lives';
   ok($response->is_error, q[update response is error]);
   is( $response->code, 405, 'error code is 405' );
@@ -27,34 +27,34 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
 {
   my $response;
   warning_like{
-    lives_ok { $response = request(POST '/mqc/update_outcome' ) } 'post request lives';
+    lives_ok { $response = request(POST '/mqc/update_outcome_lane' ) } 'post request lives';
   } qr[uninitialized value \$id in exists],
     'Expected warning';
   ok( $response->is_error, qq[response is an error] );
   is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
 
-  lives_ok { $response = request(POST '/mqc/update_outcome?user=frog' ) } 'post request lives';
+  lives_ok { $response = request(POST '/mqc/update_outcome_lane?user=frog' ) } 'post request lives';
   is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
 
-  lives_ok { $response = request(POST '/mqc/update_outcome?user=tiger&password=secret' ) } 'post request lives';
+  lives_ok { $response = request(POST '/mqc/update_outcome_lane?user=tiger&password=secret' ) } 'post request lives';
   is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/User tiger is not a member of manual_qc/, 'correct error message');
 
-  lives_ok { $response = request(POST '/mqc/update_outcome?user=cat' ) } 'post request lives';
+  lives_ok { $response = request(POST '/mqc/update_outcome_lane?user=cat' ) } 'post request lives';
   is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
 }
 
 {
   my $response;
-  my $url = '/mqc/update_outcome?user=cat&password=secret';
+  my $url = '/mqc/update_outcome_lane?user=cat&password=secret';
 
   lives_ok { $response = request(POST $url)}
     'post request without params lives';
   is( $response->code, 400, 'error code is 400' );
-  like ($response->content, qr/Run id should be defined/, 'correct error message');
+  like ($response->content, qr/Run_id should be defined/, 'correct error message');
 
   lives_ok { $response = request(POST $url, ['id_run' => '1234']) }
     'post request lives with body param';
@@ -64,7 +64,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   lives_ok { $response = request(POST $url, ['id_run' => '1234', 'position' => '4'])  }
     'post request lives with body param';
   is( $response->code, 400, 'error code is 400' );
-  like ($response->content, qr/Mqc outcome should be defined/,
+  like ($response->content, qr/MQC outcome should be defined/,
    'correct error message');
 
   lives_ok { $response = request(POST $url,
@@ -72,10 +72,10 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
     'post request lives with body param';
   is( $response->code, 500, 'error code is 500' );
   like ($response->content,
-    qr/Error while trying to transit id_run 1234 position 4 to a non-existing outcome/,
+    qr/Error: No LIMS data for this run\/position/,
     'correct error message for invalid outcome');
 
-  $url = '/mqc/update_outcome?user=pipeline&password=secret';
+  $url = '/mqc/update_outcome_lane?user=pipeline&password=secret';
   
   my $expected = 'manual qc complete';
   my $original = 'analysis complete';
@@ -112,7 +112,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
     qr/Manual QC Accepted final for run 4025, position 1 saved/,
     'correct confirmation message');
   unlike ($content,
-    qr/Error updating lane status/,
+    qr/Error: Problem while updating lane status/,
     'error updating lane status is absent');
 }
 
@@ -129,21 +129,6 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   ok($response->is_error, q[get_current_outcome response is error]);
   is( $response->code, 400, 'error code is 400' );
   like ($response->content, qr/Position should be defined/, 'correct error message');
-
-  lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/get_all_outcomes')) }
-   'get all outcomes lives';
-  ok($response->is_error, q[get_all_outcomes response is error]);
-  is( $response->code, 400, 'error code is 400' );
-  like ($response->content, qr/Run id should be defined/, 'correct error message');
-
-  lives_ok { $response = request(HTTP::Request->new(
-    'GET', '/mqc/get_all_outcomes?id_run=1234')) }
-    'get current outcome lives';
-
-  lives_ok { $response = request(HTTP::Request->new(
-   'GET', '/mqc/get_all_outcomes?id_run=1234')) }
-    'get current outcome lives';
-  is( $response->code, 200, 'response code is 200' );
 }
 
 1;
