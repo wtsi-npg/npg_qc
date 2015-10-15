@@ -1,5 +1,26 @@
 -- Changes for library MQC
 --
+-- Table structure for table `mqc_library_outcome_dict`
+--
+CREATE TABLE IF NOT EXISTS `mqc_library_outcome_dict` (
+  `id_mqc_library_outcome` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `short_desc` VARCHAR(50) NOT NULL,
+  `long_desc` VARCHAR(150) NULL,
+  `iscurrent` TINYINT(1) NULL COMMENT 'Catalog value still in use.',
+  `isvisible` TINYINT(1) NULL COMMENT 'Is it visible in UI',
+  PRIMARY KEY (`id_mqc_library_outcome`))
+ENGINE = InnoDB
+COMMENT 'Dictionary table for library manual qc';
+--
+-- Loading dictionary table `mqc_library_outcome_dict`
+--
+INSERT INTO `mqc_library_outcome_dict` (`id_mqc_library_outcome`,`short_desc`,`long_desc`,`iscurrent`,`isvisible`) VALUES (1,'Accepted preliminary','Library is preliminary accepted.',1,1) ON DUPLICATE KEY UPDATE iscurrent=1;
+INSERT INTO `mqc_library_outcome_dict` (`id_mqc_library_outcome`,`short_desc`,`long_desc`,`iscurrent`,`isvisible`) VALUES (2,'Rejected preliminary','Library is preliminary rejected.',1,1) ON DUPLICATE KEY UPDATE iscurrent=1;
+INSERT INTO `mqc_library_outcome_dict` (`id_mqc_library_outcome`,`short_desc`,`long_desc`,`iscurrent`,`isvisible`) VALUES (3,'Accepted final','Library has been accepted as a final decision.',1,1) ON DUPLICATE KEY UPDATE iscurrent=1;
+INSERT INTO `mqc_library_outcome_dict` (`id_mqc_library_outcome`,`short_desc`,`long_desc`,`iscurrent`,`isvisible`) VALUES (4,'Rejected final','Library has been rejected as a final decision.',1,1) ON DUPLICATE KEY UPDATE iscurrent=1;
+INSERT INTO `mqc_library_outcome_dict` (`id_mqc_library_outcome`,`short_desc`,`long_desc`,`iscurrent`,`isvisible`) VALUES (5,'Undecided','Library has no outcome',1,1) ON DUPLICATE KEY UPDATE iscurrent=1;
+INSERT INTO `mqc_library_outcome_dict` (`id_mqc_library_outcome`,`short_desc`,`long_desc`,`iscurrent`,`isvisible`) VALUES (6,'Undecided final','Library has no outcome as final decision',1,1) ON DUPLICATE KEY UPDATE iscurrent=1;
+--
 -- Table structure for table `mqc_library_outcome_ent`
 --
 CREATE TABLE IF NOT EXISTS `mqc_library_outcome_ent` (
@@ -7,16 +28,20 @@ CREATE TABLE IF NOT EXISTS `mqc_library_outcome_ent` (
   `id_run` BIGINT(20) UNSIGNED NOT NULL,
   `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane',
   `tag_index` BIGINT(20) NOT NULL DEFAULT '-1',
-  `id_mqc_outcome` SMALLINT UNSIGNED NOT NULL,
+  `id_mqc_library_outcome` SMALLINT UNSIGNED NOT NULL,
   `username` CHAR(128) NULL DEFAULT NULL COMMENT 'Web interface username',
-  `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
   `reported` TIMESTAMP NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
   PRIMARY KEY (`id_mqc_library_outcome_ent`),
-  UNIQUE KEY `id_run_UNIQUE` (`id_run`,`position`,`tag_index`),
-  KEY `fk_mqc_library_outcome_ent_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
-  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB
+  UNIQUE INDEX `id_run_UNIQUE` (`id_run` ASC, `position` ASC, `tag_index` ASC),
+  INDEX `fk_mqc_library_outcome_ent_mqc_library_outcome_dict1_idx` (`id_mqc_library_outcome` ASC),
+  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_library_outcome_dict1`
+    FOREIGN KEY (`id_mqc_library_outcome`)
+    REFERENCES `mqc_library_outcome_dict` (`id_mqc_library_outcome`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
 COMMENT = 'Entity table for library manual qc';
 --
 -- Table structure for table `mqc_library_outcome_hist`
@@ -26,13 +51,23 @@ CREATE TABLE IF NOT EXISTS `mqc_library_outcome_hist` (
   `id_run` BIGINT(20) UNSIGNED NOT NULL,
   `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane',
   `tag_index` BIGINT(20) NOT NULL DEFAULT '-1',
-  `id_mqc_outcome` SMALLINT UNSIGNED NOT NULL,
+  `id_mqc_library_outcome` SMALLINT UNSIGNED NOT NULL,
   `username` CHAR(128) NULL DEFAULT NULL COMMENT 'Web interface username',
-  `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
   PRIMARY KEY (`id_mqc_library_outcome_hist`),
-  KEY `fk_mqc_library_outcome_hist_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
-  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_outcome_dict10` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB
+  INDEX `fk_mqc_library_outcome_hist_mqc_library_outcome_dict1_idx` (`id_mqc_library_outcome` ASC),
+  CONSTRAINT `fk_mqc_library_outcome_hist_mqc_library_outcome_dict1`
+    FOREIGN KEY (`id_mqc_library_outcome`)
+    REFERENCES `mqc_library_outcome_dict` (`id_mqc_library_outcome`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
 COMMENT = 'Historic table for library manual qc';
+--
+-- Grant privileges to nqcro
+--
+GRANT SELECT ON `mqc_library_outcome_dict` TO nqcro;
+GRANT SELECT ON `mqc_library_outcome_ent` TO nqcro;
+GRANT SELECT ON `mqc_library_outcome_hist` TO nqcro;
 
