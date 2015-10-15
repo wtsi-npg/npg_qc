@@ -1,5 +1,5 @@
 
-package npg_qc::Schema::Result::MqcOutcomeEnt;
+package npg_qc::Schema::Result::MqcLibraryOutcomeEnt;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
@@ -8,7 +8,7 @@ package npg_qc::Schema::Result::MqcOutcomeEnt;
 
 =head1 NAME
 
-npg_qc::Schema::Result::MqcOutcomeEnt
+npg_qc::Schema::Result::MqcLibraryOutcomeEnt - Entity table for library manual qc
 
 =cut
 
@@ -44,15 +44,15 @@ use namespace::autoclean;
 
 __PACKAGE__->load_components('InflateColumn::DateTime');
 
-=head1 TABLE: C<mqc_outcome_ent>
+=head1 TABLE: C<mqc_library_outcome_ent>
 
 =cut
 
-__PACKAGE__->table('mqc_outcome_ent');
+__PACKAGE__->table('mqc_library_outcome_ent');
 
 =head1 ACCESSORS
 
-=head2 id_mqc_outcome_ent
+=head2 id_mqc_library_outcome_ent
 
   data_type: 'bigint'
   extra: {unsigned => 1}
@@ -73,7 +73,13 @@ __PACKAGE__->table('mqc_outcome_ent');
 
 Lane
 
-=head2 id_mqc_outcome
+=head2 tag_index
+
+  data_type: 'bigint'
+  default_value: -1
+  is_nullable: 0
+
+=head2 id_mqc_library_outcome
 
   data_type: 'smallint'
   extra: {unsigned => 1}
@@ -114,7 +120,7 @@ When was reported to LIMS
 =cut
 
 __PACKAGE__->add_columns(
-  'id_mqc_outcome_ent',
+  'id_mqc_library_outcome_ent',
   {
     data_type => 'bigint',
     extra => { unsigned => 1 },
@@ -125,7 +131,9 @@ __PACKAGE__->add_columns(
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'id_mqc_outcome',
+  'tag_index',
+  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
+  'id_mqc_library_outcome',
   {
     data_type => 'smallint',
     extra => { unsigned => 1 },
@@ -155,13 +163,13 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</id_mqc_outcome_ent>
+=item * L</id_mqc_library_outcome_ent>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key('id_mqc_outcome_ent');
+__PACKAGE__->set_primary_key('id_mqc_library_outcome_ent');
 
 =head1 UNIQUE CONSTRAINTS
 
@@ -173,121 +181,67 @@ __PACKAGE__->set_primary_key('id_mqc_outcome_ent');
 
 =item * L</position>
 
+=item * L</tag_index>
+
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position']);
+__PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position', 'tag_index']);
 
 =head1 RELATIONS
 
-=head2 mqc_outcome
+=head2 mqc_library_outcome
 
 Type: belongs_to
 
-Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeDict>
 
 =cut
 
 __PACKAGE__->belongs_to(
-  'mqc_outcome',
-  'npg_qc::Schema::Result::MqcOutcomeDict',
-  { id_mqc_outcome => 'id_mqc_outcome' },
+  'mqc_library_outcome',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeDict',
+  { id_mqc_library_outcome => 'id_mqc_library_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ifqd4uXLKB/KQXtKle8Tnw
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-13 12:18:54
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:adzfHyyrTYn/c+bkKHtPSA
 
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 use Carp;
 
 our $VERSION = '0';
 
-use Array::Compare;
-use npg_qc::Schema::MQCEntRole qw[ $MQC_LIBRARY_ENT $MQC_LANE_HIST $MQC_OUTCOME_DICT $MQC_LIB_LIMIT ];
+use npg_qc::Schema::MQCEntRole qw[ $MQC_LIBRARY_HIST $MQC_LIBRARY_OUTCOME_DICT ];
 
-with qw/npg_qc::Schema::MQCEntRole/;
+with qw/npg_qc::Schema::Flators
+        npg_qc::Schema::MQCEntRole/;
+
+__PACKAGE__->set_inflator4scalar('tag_index');
 
 sub get_dictionary_relationship_name {
-  return q[mqc_outcome];
+  return q[mqc_library_outcome];
 }
 
 sub historic_resultset {
   my $self = shift;
-  return $MQC_LANE_HIST;
-}
-
-sub update_reported {
-  my $self = shift;
-  my $username = $ENV{'USER'} || 'mqc_reporter'; #Cron username or default username for the application.
-  if(!$self->has_final_outcome) {
-    croak(sprintf 'Error while trying to update_reported non-final outcome id_run %i position %i".',
-          $self->id_run, $self->position);
-  }
-  #It does not check if the reported is null just in case we need to update a reported one.
-  return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username}); #Only update the modified_by field.
+  return $MQC_LIBRARY_HIST;
 }
 
 sub short_desc {
   my $self = shift;
-  my $s = sprintf 'id_run %s position %s', $self->id_run, $self->position;
+  my $s = sprintf 'id_run %s position %s tag_index %s', $self->id_run, $self->position, $self->tag_index;
   return $s;
-}
-
-sub validate_outcome_of_libraries {
-  my ($self, $outcome_dict_obj, $tag_indexes_in_lims, $library_outcome_ents) = @_;
-
-  if($outcome_dict_obj->is_accepted) {
-    #all plexes with qc
-    if(scalar @{ $tag_indexes_in_lims } == $library_outcome_ents->count ) {
-      my $tag_indexes_in_qc = [];
-      while(my $library = $library_outcome_ents->next) {
-        if ($library->is_undecided) {
-          croak('Error: All libraries need to have a pass or fail outcome.');
-        }
-        push @{$tag_indexes_in_qc}, $library->tag_index;
-      }
-
-      my $comp = Array::Compare->new;
-      if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
-        croak('Error: Libraries in LIMS and libraries in QC does not match.');
-      }
-    } else {
-      croak('Error: All libraries need to have an outcome.');
-    }
-  } else {
-    #All plexes with undecided
-    while(my $library = $library_outcome_ents->next) {
-      if (!$library->is_undecided) {
-        croak('Error: All libraries need to have undecided outcome.');
-      }
-    }
-  }
-  return 1;
-}
-
-sub update_outcome_with_libraries {
-  my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
-
-  my $outcome_dict_object = $self->find_valid_outcome($outcome);
-  if( $outcome_dict_object->is_final_outcome
-        && scalar @{$tag_indexes_in_lims} <= $MQC_LIB_LIMIT ) {
-    my $rs_library_ent = $self->result_source->schema->resultset($MQC_LIBRARY_ENT);
-    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes($self->id_run, $self->position);
-    $self->validate_outcome_of_libraries($outcome_dict_object, $tag_indexes_in_lims, $outcomes_libraries);
-    $rs_library_ent->batch_update_libraries( $self, $tag_indexes_in_lims, $username );
-  }
-
-  $self->update_outcome($outcome, $username);
-  return 1;
 }
 
 #Fetches valid outcome object from the database.
 sub find_valid_outcome {
   my ($self, $outcome) = @_;
 
-  my $rs = $self->result_source->schema->resultset($MQC_OUTCOME_DICT);
+  my $rs = $self->result_source->schema->resultset($MQC_LIBRARY_OUTCOME_DICT);
   my $outcome_dict;
   if ($outcome =~ /\d+/xms) {
     $outcome_dict = $rs->find($outcome);
@@ -305,13 +259,13 @@ sub update_outcome {
   my ($self, $outcome, $username) = @_;
 
   #Validation
-  if(!defined $outcome){
+  if( !defined $outcome ) {
     croak q[Mandatory parameter 'outcome' missing in call];
   }
   $self->validate_username($username);
   my $outcome_dict_obj = $self->find_valid_outcome($outcome);
 
-  my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
+  my $outcome_id = $outcome_dict_obj->id_mqc_library_outcome;
   #There is a row that matches the id_run and position
   if ($self->in_storage) {
     #Check if previous outcome is not final
@@ -320,14 +274,14 @@ sub update_outcome {
             $self->short_desc);
     } else { #Update
       my $values = {};
-      $values->{'id_mqc_outcome'} = $outcome_id;
+      $values->{'id_mqc_library_outcome'} = $outcome_id;
       $values->{'username'}       = $username;
       $values->{'modified_by'}    = $username;
       #To reaload from database otherwise the object keeps the old values
       $self->update($values)->discard_changes();
     }
   } else { #Is a new row just insert.
-    $self->id_mqc_outcome($outcome_id);
+    $self->id_mqc_library_outcome($outcome_id);
     $self->username($username);
     $self->modified_by($username);
     $self->insert();
@@ -344,7 +298,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Entity for lane MQC outcome.
+Entity for library MQC outcome.
 
 =head1 DIAGNOSTICS
 
@@ -352,20 +306,19 @@ Entity for lane MQC outcome.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 update_reported
+=head2 short_desc
 
-  Updates the value of reported to the current timestamp. Thorws exception if the
-  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
+  Returns minimal info of entity (run, lane, tag_index) for error messaging
 
 =head2 update
 
-  With around on DBIx update method to create an entry in the table corresponding to 
-  the MqcOutcomeHist class
+  Default DBIx update method extended to create an entry in the table corresponding to 
+  the MqcLibraryOutcomeHist class
 
 =head2 insert
 
-  With around on DBIx insert method to create an entry in the table corresponding to 
-  the MqcOutcomeHist class
+  Default DBIx insert method extended to create an entry in the table corresponding to 
+  the MqcLibraryOutcomeHist class
 
 =head2 data_for_historic
 
@@ -375,20 +328,6 @@ Entity for lane MQC outcome.
 =head2 historic_resultset
 
   Returns the name of the historic resultset associated with this entity
-
-=head2 short_desc
-
-  Returns minimal info of entity (run, lane, tag_index) for error messaging
-
-=head2 validate_outcome_of_libraries
-
-  Validates if overall state for the lane and the libraries allows for a final
-  outcome in the lane.
-
-=head2 update_outcome_with_libraries
-
-  Updates children library mqc outcomes then updates outcome of lane mqc entity
-  passed as parameter.
 
 =head2 find_valid_outcome
 
@@ -451,4 +390,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
