@@ -33,25 +33,26 @@ Readonly::Scalar our $MQC_LIBRARY_HIST         => q[MqcLibraryOutcomeHist];
 
 #MQC general configuration
 Readonly::Scalar our $MQC_LIB_LIMIT    => 50;
-Readonly::Scalar our $MQC_USER_ROLE         => q[manual_qc];
+Readonly::Scalar our $MQC_USER_ROLE    => q[manual_qc];
 
 requires 'short_desc';
 requires 'update';
 requires 'insert';
 requires 'historic_resultset';
 
-Readonly my %DELEGATION_TO_MQC_OUTCOME = (
+Readonly my %DELEGATION_TO_MQC_DICTIONARY = (
   'has_final_outcome' => 'is_final_outcome',
   'is_accepted'       => 'is_accepted',
+  'is_rejected'       => 'is_rejected',
   'is_final_accepted' => 'is_final_accepted',
   'is_undecided'      => 'is_undecided',
 );
 
-foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
+foreach my $this_class_method (keys %DELEGATION_TO_MQC_DICTIONARY ) {
   __PACKAGE__->meta->add_method( $this_class_method,
     sub {
       my $self = shift;
-      my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
+      my $that_class_method = $DELEGATION_TO_MQC_DICTIONARY{$this_class_method};
       my $dictionary_relationship_name = $self->get_dictionary_relationship_name;
       my $dictionary = $self->${dictionary_relationship_name};
       $dictionary->$that_class_method;
@@ -135,12 +136,6 @@ __END__
 =head2 validate_username
 
   To make sure the username is alphanumeric
-
-=head2 update_outcome
-
-  Updates the outcome of the entity with values provided.
-
-  $obj->($outcome, $username)
 
 =head2 has_final_outcome
 

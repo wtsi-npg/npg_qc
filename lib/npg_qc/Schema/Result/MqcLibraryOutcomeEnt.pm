@@ -334,6 +334,12 @@ Entity for library MQC outcome.
   Finds the MqcOutcomeDict entity that matches the outcome. Or nothing if there is
   no valid outcome matching the parameter.
 
+=head2 update_outcome
+
+  Updates the outcome of the entity with values provided.
+
+  $obj->($outcome, $username)
+
 =head1 DEPENDENCIES
 
 =over
