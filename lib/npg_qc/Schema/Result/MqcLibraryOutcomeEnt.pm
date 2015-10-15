@@ -211,9 +211,11 @@ __PACKAGE__->belongs_to(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:adzfHyyrTYn/c+bkKHtPSA
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
+use Carp;
+
 our $VERSION = '0';
 
-use npg_qc::Schema::MQCEntRole qw[ $MQC_LIBRARY_HIST, $MQC_LIBRARY_OUTCOME_DICT ];
+use npg_qc::Schema::MQCEntRole qw[ $MQC_LIBRARY_HIST $MQC_LIBRARY_OUTCOME_DICT ];
 
 with qw/npg_qc::Schema::Flators
         npg_qc::Schema::MQCEntRole/;
@@ -257,7 +259,7 @@ sub update_outcome {
   my ($self, $outcome, $username) = @_;
 
   #Validation
-  if(!defined $outcome){
+  if( !defined $outcome ) {
     croak q[Mandatory parameter 'outcome' missing in call];
   }
   $self->validate_username($username);
