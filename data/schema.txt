@@ -926,6 +926,23 @@ CREATE TABLE `mqc_outcome_hist` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `mqc_library_outcome_dict`
+--
+
+DROP TABLE IF EXISTS `mqc_library_outcome_dict`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mqc_library_outcome_dict` (
+  `id_mqc_library_outcome` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `short_desc` VARCHAR(50) NOT NULL,
+  `long_desc` VARCHAR(150) NULL,
+  `iscurrent` TINYINT(1) NULL COMMENT 'Catalog value still in use.',
+  `isvisible` TINYINT(1) NULL COMMENT 'Is it visible in UI',
+  PRIMARY KEY (`id_mqc_library_outcome`))
+ENGINE = InnoDB
+COMMENT 'Dictionary table for library manual qc';
+
+--
 -- Table structure for table `mqc_library_outcome_ent`
 --
 

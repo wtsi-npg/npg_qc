@@ -2,7 +2,8 @@
 --
 -- Table structure for table `mqc_library_outcome_dict`
 --
-CREATE TABLE IF NOT EXISTS `mqc_library_outcome_dict` (
+DROP TABLE IF EXISTS `mqc_library_outcome_dict`;
+CREATE TABLE `mqc_library_outcome_dict` (
   `id_mqc_library_outcome` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `short_desc` VARCHAR(50) NOT NULL,
   `long_desc` VARCHAR(150) NULL,
@@ -23,7 +24,8 @@ INSERT INTO `mqc_library_outcome_dict` (`id_mqc_library_outcome`,`short_desc`,`l
 --
 -- Table structure for table `mqc_library_outcome_ent`
 --
-CREATE TABLE IF NOT EXISTS `mqc_library_outcome_ent` (
+DROP TABLE IF EXISTS `mqc_library_outcome_ent`;
+CREATE TABLE `mqc_library_outcome_ent` (
   `id_mqc_library_outcome_ent` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_run` BIGINT(20) UNSIGNED NOT NULL,
   `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane',
@@ -46,7 +48,8 @@ COMMENT = 'Entity table for library manual qc';
 --
 -- Table structure for table `mqc_library_outcome_hist`
 --
-CREATE TABLE IF NOT EXISTS `mqc_library_outcome_hist` (
+DROP TABLE IF EXISTS `mqc_library_outcome_hist`;
+CREATE TABLE `mqc_library_outcome_hist` (
   `id_mqc_library_outcome_hist` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_run` BIGINT(20) UNSIGNED NOT NULL,
   `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane',
