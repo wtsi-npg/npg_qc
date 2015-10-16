@@ -113,7 +113,7 @@ sub _compare_rpt_keys {
 	         );
 }
 
-sub _compare_rpt_keys_zero_last { ## no critic (RequireArgUnpacking)
+sub _compare_rpt_keys_zero_last {
   my $a_map = __PACKAGE__->inflate_rpt_key($a);
   my $b_map = __PACKAGE__->inflate_rpt_key($b);
 
@@ -127,7 +127,7 @@ sub _compare_tags_zero_last {## no critic (RequireArgUnpacking)
   elsif ( exists $_[0]->{'tag_index'} && exists $_[1]->{'tag_index'} ) {
     if( $_[0]->{'tag_index'} == 0 ) { return $MORE; }
     elsif ( $_[1]->{'tag_index'} == 0 ) { return $LESS; }
-    else { return $_[0]->{'tag_index'} <=> $_[1]->{'tag_index'}; } 
+    else { return $_[0]->{'tag_index'} <=> $_[1]->{'tag_index'}; }
   } elsif ( !exists $_[0]->{'tag_index'} ) { return $LESS; }
   else { return $MORE; }
 }
