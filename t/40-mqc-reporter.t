@@ -104,6 +104,7 @@ subtest 'Not reporting, individual cases' => sub {
   ok($row, 'row for run 6600 position 4 exists - test prerequisite');
   ok(!$row->reported, 'row for run 6600 position 4 reported time not set - test prerequisite');
   $row->update({id_mqc_outcome => 3});
+  $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>4})->next;
   ok ($row->has_final_outcome, 'outcome is final');
   warnings_like { $reporter->load() } [
     qr/GCLP run, cannot report run 6600 position 4/],
@@ -111,22 +112,26 @@ subtest 'Not reporting, individual cases' => sub {
   ok(!$row->reported, 'row for run 6600 position 4 reported time not set');
   ok($row->has_final_outcome, 'outcome is final');
   $row->update({id_mqc_outcome => 1});
+  $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>4})->next;
   ok (!$row->has_final_outcome, 'set outcome back to not final');
 
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>5})->next;
   ok($row, 'row for run 6600 position 5 exists - test prerequisite');
   ok(!$row->reported, 'row for run 6600 position 5 reported time not set - test prerequisite');
   $row->update({id_mqc_outcome => 3});
+  $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>5})->next;
   ok ($row->has_final_outcome, 'outcome is final');
   $reporter->load() ;
   ok(!$row->reported, 'row for run 6600 position 5 reported time not set');
   $row->update({id_mqc_outcome => 1});
+  $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>5})->next;
   ok (!$row->has_final_outcome, 'set outcome back to not final');
 
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>6})->next;
   ok($row, 'row for run 6600 position 6 exists - test prerequisite');
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set - test prerequisite');
   $row->update({id_mqc_outcome => 3});
+  $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>6})->next;
   ok ($row->has_final_outcome, 'outcome is final');
   warnings_like { $reporter->load() } [
     qr/No LIMs data for run 6600 position 6/,],

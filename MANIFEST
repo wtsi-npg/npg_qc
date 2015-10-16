@@ -217,7 +217,6 @@ lib/npg_qc/model/tile_score.pm
 lib/npg_qc/Schema.pm
 lib/npg_qc/Schema/Flators.pm
 lib/npg_qc/Schema/MQCEntRole.pm
-lib/npg_qc/Schema/TimeZoneConsumerRole.pm
 lib/npg_qc/Schema/Result/Adapter.pm
 lib/npg_qc/Schema/Result/AlignmentFilterMetrics.pm
 lib/npg_qc/Schema/Result/AnalysisLane.pm

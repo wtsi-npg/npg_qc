@@ -53,31 +53,25 @@ sub _set_response {
 sub _update_outcome {
   my ($self, $c, $working_as) = @_;
 
-  my $id_run;
-  my $position;
-  my $tag_index;
-  my $username;
-  my $new_outcome;
+  if (!$working_as) {
+    croak q[Working_as should be defined];
+  }
+
   my $error;
-  my $ent;
+  my $username;
+  my $params = $c->request->parameters;
+  my $new_outcome = $params->{'new_oc'};
+  my $id_run      = $params->{'id_run'};
+  my $position    = $params->{'position'};
+  my $tag_index   = $params->{'tag_index'};
 
   try {
-    ####Validating request method
-    $self->_validate_req_method($c, $ALLOW_METHOD_POST);
-    ####Authorisation
-    $c->controller('Root')->authorise($c, ($MQC_ROLE));
 
-    ####Loading state
-    my $params = $c->request->parameters;
-    $new_outcome = $params->{'new_oc'};
-    $id_run      = $params->{'id_run'};
-    $position    = $params->{'position'};
-    $tag_index   = $params->{'tag_index'};
+    $self->_validate_req_method($c, $ALLOW_METHOD_POST);
+
+    $c->controller('Root')->authorise($c, ($MQC_ROLE));
     $username    = $c->user->username;
 
-    if (!$working_as) {
-      $self->raise_error(q[Working_as should be defined], $INTERNAL_SERVER_ERROR);
-    }
     if (!$id_run) {
       $self->raise_error(q[Run_id should be defined], $BAD_REQUEST_CODE);
     }
@@ -91,6 +85,7 @@ sub _update_outcome {
       $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
     }
 
+    my $ent;
     if ($working_as eq $MODE_LANE_MQC) { # Working as lane MQC
       my $hash_tags = $c->model('MLWarehouseDB')
                         ->fetch_tag_index_array_for_run_position($id_run, $position);
@@ -124,7 +119,7 @@ sub _update_outcome {
   if ($error) {
     ($error, $error_code) = $self->parse_error($error);
   } else {
-    if($working_as eq $MODE_LANE_MQC && $ent->has_final_outcome) { #If final outcome update lane as qc complete
+    if($working_as eq $MODE_LANE_MQC && $c->model('NpgQcDB')->is_final_outcome($new_outcome)) {
       try {
         $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
       } catch {

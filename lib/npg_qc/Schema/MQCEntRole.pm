@@ -1,16 +1,13 @@
 package npg_qc::Schema::MQCEntRole;
 
-use strict;
-use warnings;
+use Moose::Role;
+use DateTime;
+use DateTime::TimeZone;
 use Carp;
 use Readonly;
 use base 'Exporter';
 
 our $VERSION = '0';
-
-use Moose::Role;
-
-with qw/npg_qc::Schema::TimeZoneConsumerRole/;
 
 our @EXPORT_OK = qw/$MQC_OUTCOME_DICT
                     $MQC_LANE_ENT
@@ -45,18 +42,13 @@ Readonly my %DELEGATION_TO_MQC_OUTCOME => {
   'is_undecided'      => 'is_undecided',
 };
 
-{ #TODO move 
-  my $rel = q[mqc_outcome];
-  my $attr = q[_] . $rel . q[_row];
-  my $del  = \%DELEGATION_TO_MQC_OUTCOME;
-  has $attr => ( isa        => 'Maybe[npg_qc::Schema::Result::' . $MQC_OUTCOME_DICT . ']',
-                 is         => 'ro',
-                 weak_ref   => 1,
-                 lazy_build => 1,
-                 handles    => $del,
+foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
+  __PACKAGE__->meta->add_method( $this_class_method, sub {
+      my $self = shift;
+      my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
+      return $self-> mqc_outcome->$that_class_method;
+    }
   );
-
-  __PACKAGE__->meta->add_method('_build_' . $attr, sub {my $r = shift; return $r->$rel;} );
 }
 
 around [qw/update insert/] => sub {
@@ -68,6 +60,10 @@ around [qw/update insert/] => sub {
   $self->_create_historic();
   return $return_super;
 };
+
+sub get_time_now {
+  return DateTime->now(time_zone => DateTime::TimeZone->new(name => q[local]));
+}
 
 sub data_for_historic {
   my $self = shift;
@@ -121,8 +117,7 @@ sub update_outcome {
       $values->{'id_mqc_outcome'} = $outcome_id;
       $values->{'username'}       = $username;
       $values->{'modified_by'}    = $username;
-      #To reaload from database otherwise the object keeps the old values
-      $self->update($values)->discard_changes();
+      $self->update($values);
     }
   } else { #Is a new row just insert.
     $self->id_mqc_outcome($outcome_id);
@@ -159,7 +154,7 @@ sub find_valid_outcome {
   return $outcome_dict;
 }
 
-no Moose;
+no Moose::Role;
 
 1;
 
@@ -177,6 +172,8 @@ __END__
 
 
 =head1 SUBROUTINES/METHODS
+
+=head2 get_time_now
 
 =head2 data_for_historic
 
@@ -228,7 +225,13 @@ __END__
 
 =item Moose::Role
 
+=item DateTime
+
+=item DateTime::TimeZone
+
 =item Readonly
+
+=item Carp
 
 =back
 
