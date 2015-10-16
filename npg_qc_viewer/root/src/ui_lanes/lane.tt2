@@ -2,22 +2,45 @@
     USE Number.Format(THOUSANDS_SEP=',');
 
     lane_class = 'lane';
-    IF row_info_to.manual_qc == 1; lane_class = lane_class _ ' passed'; ELSIF row_info_to.manual_qc == 0; lane_class = lane_class _ ' failed'; END;
+    plex_class = 'tag_info';
+    IF row_info_to.manual_qc.defined;
+      IF row_info_to.manual_qc;
+        lane_class = lane_class _ ' passed';
+      ELSE;
+        lane_class = lane_class _ ' failed';
+      END;
+    END;
+    IF row_info_to.lib_manual_qc.defined;
+      IF row_info_to.lib_manual_qc;
+        plex_class = plex_class _ ' passed';
+      ELSE;
+        plex_class = plex_class _ ' failed';
+      END;
+    END;
 -%]
 
 <td class="[% lane_class %] nbsp">
 
 [% have_link = 0;
    IF tag_index == '' && lane_collection && lane_collection.size;
-   have_link = 1 %]<a href="#[% lane_key %]">[% END -%]
+   have_link = 1 %]
+     <a href="#[% lane_key %]">
+   [% END -%]
 [%- position -%]
-[%- IF have_link %]</a>[% END -%]
+[%- IF have_link %]
+   </a>
+   [%- IF !run_view; -%]
+     <span class='library_mqc_overall_controls'></span>
+   [%- END; -%]
+[% END -%]
 [%- IF run_view; -%]
 <span id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'></span>
+[%- ELSIF id_run.defined && position.defined -%]
+&nbsp;<span id=mqc_library[%id_run%]_[%position%]_[% tag_index %] data-id_run='[% id_run %]' data-position='[% position %]' data-tag_index='[% tag_index %]' class='lane_mqc_control'></span>
 [% END -%]
 </td>
 [%- IF has_plexes -%]
-<td class="tag_info">
+<td class="[% plex_class %]">
 [%- IF tag_index.defined; lane_link = c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'lane', 'db_lookup'=>"$db_lookup"}); -%]
 [%- have_link = 0; IF lane_collection && lane_collection.size; have_link = 1; -%]
 <a href="#[% lane_key %]">[% END -%]

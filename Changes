@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.2
+ - SeqQC
+   - Library manual QC
+
 release 59.1
  - 'write2file' method of autoqc result objects removed since it duplicated
      the 'store' method
