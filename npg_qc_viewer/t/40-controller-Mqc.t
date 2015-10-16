@@ -54,17 +54,17 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
   lives_ok { $response = request(POST $url)}
     'post request without params lives';
   is( $response->code, 400, 'error code is 400' );
-  like ($response->content, qr/Run_id should be defined/, 'correct error message');
+  like ($response->content, qr/id_run should be defined/, 'correct error message');
 
   lives_ok { $response = request(POST $url, ['id_run' => '1234']) }
     'post request lives with body param';
   is( $response->code, 400, 'code is 400' );
-  like ($response->content, qr/Position should be defined/, 'correct error message');
+  like ($response->content, qr/position should be defined/, 'correct error message');
 
   lives_ok { $response = request(POST $url, ['id_run' => '1234', 'position' => '4'])  }
     'post request lives with body param';
   is( $response->code, 400, 'error code is 400' );
-  like ($response->content, qr/MQC outcome should be defined/,
+  like ($response->content, qr/new_oc should be defined/,
    'correct error message');
 
   lives_ok { $response = request(POST $url,
@@ -122,13 +122,13 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
     'get current outcome lives';
   ok($response->is_error, q[get_current_outcome response is error]);
   is( $response->code, 400, 'error code is 400' );
-  like ($response->content, qr/Run id should be defined/, 'correct error message');
+  like ($response->content, qr/id_run should be defined/, 'correct error message');
 
   lives_ok { $response = request(HTTP::Request->new(
    'GET', '/mqc/get_current_outcome?id_run=1234')) } 'get current outcome lives';
   ok($response->is_error, q[get_current_outcome response is error]);
   is( $response->code, 400, 'error code is 400' );
-  like ($response->content, qr/Position should be defined/, 'correct error message');
+  like ($response->content, qr/position should be defined/, 'correct error message');
 }
 
 1;

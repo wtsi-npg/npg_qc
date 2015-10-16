@@ -6,22 +6,15 @@ use Readonly;
 use Try::Tiny;
 use JSON;
 use Carp;
-
 BEGIN { extends 'Catalyst::Controller' }
 
+use npg_qc_viewer::Model::MLWarehouseDB;
 with 'npg_qc_viewer::Util::Error';
 
 our $VERSION  = '0';
 
-use npg_qc_viewer::Model::MLWarehouseDB;
-
 Readonly::Scalar my $BAD_REQUEST_CODE      => 400;
-Readonly::Scalar my $OK_CODE               => 200;
 Readonly::Scalar my $METHOD_NOT_ALLOWED    => 405;
-Readonly::Scalar my $INTERNAL_SERVER_ERROR => 500;
-Readonly::Scalar my $ALLOW_METHOD_POST     => q[POST];
-Readonly::Scalar my $ALLOW_METHOD_GET      => q[GET];
-Readonly::Scalar my $MQC_ROLE              => q[manual_qc];
 Readonly::Scalar my $MODE_LANE_MQC         => q[LANE_MQC];
 Readonly::Scalar my $MODE_LIBRARY_MQC      => q[LIBRARY_MQC];
 
@@ -40,14 +33,27 @@ sub _set_response {
   if (!$message_data) {
     croak 'Message hash should be supplied';
   }
-  $c->response->headers->content_type('application/json');
 
-  if ($code) { #There was an error
+  $c->response->headers->content_type('application/json');
+  if ($code) {
     $c->response->status($code);
   }
   $c->response->body(to_json $message_data);
 
   return;
+}
+
+sub _request_params {
+  my ($self, $c, @names) = @_;
+  my $p = $c->request->parameters;
+  my $values = {};
+  foreach my $a (@names) {
+    if (!$p->{$a}) {
+      $self->raise_error(qq[$a should be defined], $BAD_REQUEST_CODE);
+    }
+    $values->{$a} = $p->{$a};
+  }
+  return $values;
 }
 
 sub _update_outcome {
@@ -57,7 +63,6 @@ sub _update_outcome {
     croak q[Working_as should be defined];
   }
 
-  my $error;
   my $username;
   my $params = $c->request->parameters;
   my $new_outcome = $params->{'new_oc'};
@@ -67,176 +72,93 @@ sub _update_outcome {
 
   try {
 
-    $self->_validate_req_method($c, $ALLOW_METHOD_POST);
-
-    $c->controller('Root')->authorise($c, ($MQC_ROLE));
+    $self->_validate_req_method($c, 'POST');
+    $c->controller('Root')->authorise($c, qw/manual_qc/);
     $username    = $c->user->username;
-
-    if (!$id_run) {
-      $self->raise_error(q[Run_id should be defined], $BAD_REQUEST_CODE);
-    }
-    if (!$position) {
-      $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
-    }
-    if (!$new_outcome) {
-      $self->raise_error(q[MQC outcome should be defined], $BAD_REQUEST_CODE)
-    }
+    $self->_request_params($c, qw/id_run position new_oc/);
     if (!$username) {
       $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
     }
 
-    my $ent;
-    if ($working_as eq $MODE_LANE_MQC) { # Working as lane MQC
+    my $message;
+    if ($working_as eq $MODE_LANE_MQC) {
       my $hash_tags = $c->model('MLWarehouseDB')
                         ->fetch_tag_index_array_for_run_position($id_run, $position);
       my $qc_tags = $hash_tags->{$npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS};
 
-      $ent = $c->model('NpgQcDB')
+      $c->model('NpgQcDB')
                ->resultset('MqcOutcomeEnt')
                ->search_outcome_ent(
                  $id_run,
                  $position,
-      );
-      $ent->update_outcome_with_libraries($new_outcome, $username, $qc_tags);
-    } else { # Working as library MQC
-      $ent = $c->model('NpgQcDB')
+      )->update_outcome_with_libraries($new_outcome, $username, $qc_tags);
+      $message = qq[Manual QC $new_outcome for run $id_run, position $position saved.];
+      if ($c->model('NpgQcDB')->is_final_outcome($new_outcome)) {
+        try {
+          $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
+        } catch {
+          $message .= qq[ Error: Problem while updating lane status. $_];
+        };
+      }
+    } else {
+      $c->model('NpgQcDB')
                ->resultset('MqcLibraryOutcomeEnt')
                ->search_library_outcome_ent(
                  $id_run,
                  $position,
                  $tag_index,
                  $username
-      );
-      $ent->update_outcome($new_outcome, $username);
+      )->update_outcome($new_outcome, $username);
+      $message = qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.]
     }
+    _set_response($c, {'message' => $message});
   } catch {
-    $error = $_;
+    my ($e, $response_code) = $self->parse_error($_);
+    _set_response($c, {'message' => $e}, $response_code);
   };
 
-  my $error_code = $OK_CODE;
-  my $mqc_update_error;
-
-  if ($error) {
-    ($error, $error_code) = $self->parse_error($error);
-  } else {
-    if($working_as eq $MODE_LANE_MQC && $c->model('NpgQcDB')->is_final_outcome($new_outcome)) {
-      try {
-        $c->model('NpgDB')->update_lane_manual_qc_complete($id_run, $position, $username);
-      } catch {
-        $mqc_update_error = qq[Error: Problem while updating lane status. $_];
-      };
-    }
-  }
-
-  my $message = $error
-                || (($working_as eq $MODE_LANE_MQC) ? qq[Manual QC $new_outcome for run $id_run, position $position saved.]
-                                                    : qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.]);
-  if ($mqc_update_error) {
-    $message .= $mqc_update_error;
-  }
-
-  _set_response($c, {'message' => $message}, $error_code);
   return;
 }
 
 sub update_outcome_library : Path('update_outcome_library') {
   my ($self, $c) = @_;
-
-  $self->_update_outcome($c, $MODE_LIBRARY_MQC);
-
-  return;
+  return $self->nupdate_outcome($c, $MODE_LIBRARY_MQC);
 }
 
 sub update_outcome_lane : Path('update_outcome_lane') {
   my ($self, $c) = @_;
+  return $self->_update_outcome($c, $MODE_LANE_MQC);
+}
 
-  $self->_update_outcome($c, $MODE_LANE_MQC);
+sub _get_outcome {
+  my ($self, $c, $resultset_name, @params) = @_;
+
+  try {
+    $self->_validate_req_method($c, 'GET');
+    my $values = $self->_request_params($c, @params);
+    my $ent = $c->model('NpgQcDB')->resultset($resultset_name)->search($values)->next;
+    _set_response($c, {'outcome'=> $ent ? $ent->mqc_outcome->short_desc : q[] });
+  }  catch {
+    my ($error, $error_code) = $self->parse_error($_);
+    _set_response($c, {message => qq[Error: $error] }, $error_code);
+  };
 
   return;
 }
 
 sub get_current_outcome : Path('get_current_outcome') {
   my ($self, $c) = @_;
-
-  my $desc;
-  my $error;
-  try {
-    $self->_validate_req_method($c, $ALLOW_METHOD_GET);
-
-    my $params = $c->request->parameters;
-    my $position = $params->{'position'};
-    my $id_run   = $params->{'id_run'};
-
-    if (!$id_run) {
-      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
-    }
-    if (!$position) {
-      $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
-    }
-
-    my $ent = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->search(
-      {id_run => $id_run, position => $position})->next;
-    $desc = $ent ? $ent->mqc_outcome->short_desc : q[];
-  }  catch {
-    my $error_code;
-    ($error, $error_code) = $self->parse_error($_);
-    _set_response($c, {message => qq[Error: $error] }, $error_code);
-  };
-
-  if (!$error) {
-    _set_response($c, {'outcome'=> $desc });
-  }
-
-  return;
+  return $self->_get_outcome($c, 'MqcOutcomeEnt', qw/id_run position/);
 }
 
 sub get_current_library_outcome : Path('get_current_library_outcome') {
   my ($self, $c) = @_;
-
-  my $desc;
-  my $error;
-  try {
-    $self->_validate_req_method($c, $ALLOW_METHOD_GET);
-
-    my $params = $c->request->parameters;
-    my $position  = $params->{'position'};
-    my $id_run    = $params->{'id_run'};
-    my $tag_index = $params->{'tag_index'};
-
-    if (!$id_run) {
-      $self->raise_error(q[Run id should be defined], $BAD_REQUEST_CODE);
-    }
-    if (!$position) {
-      $self->raise_error(q[Position should be defined], $BAD_REQUEST_CODE);
-    }
-    if (!$tag_index) {
-      $self->raise_error(q[Tag_index should be defined], $BAD_REQUEST_CODE);
-    }
-
-    my $values = {};
-    $values->{'id_run'}    = $id_run;
-    $values->{'position'}  = $position;
-    $values->{'tag_index'} = $tag_index;
-    my $ent = $c->model('NpgQcDB')
-                ->resultset('MqcLibraryOutcomeEnt')
-                ->search($values)->next;
-    $desc = $ent ? $ent->mqc_outcome->short_desc : q[];
-  } catch {
-    my $error_code;
-    ($error, $error_code) = $self->parse_error($_);
-    _set_response($c, {message => qq[$error]}, $error_code)
-  };
-
-  if (!$error) {
-    _set_response($c, {'outcome'=>$desc});
-  }
-
-  return;
+  return $self->_get_outcome($c, 'MqcLibraryOutcomeEnt', qw/id_run position tag_index/);
 }
 
 __PACKAGE__->meta->make_immutable;
-
 1;
+
 __END__
 
 =head1 NAME
@@ -247,7 +169,7 @@ npg_qc_viewer::Controller::Mqc
 
 =head1 DESCRIPTION
 
-A Catalyst Controller for logging manual qc actions.
+A Catalyst Controller for retrieving and saving  manual qc outcomes.
 
 =head1 SUBROUTINES/METHODS
 
