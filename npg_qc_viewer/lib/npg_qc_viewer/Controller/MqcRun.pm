@@ -18,7 +18,7 @@ with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 our $VERSION = '0';
 
 use npg_qc_viewer::Model::MLWarehouseDB;
-use npg_qc::Schema::MQCEntRole qw[$MQC_LIB_LIMIT];
+use npg_qc::Schema::MQCEntRole;
 
 Readonly::Scalar my $MQC_ROLE      => q[manual_qc];
 Readonly::Scalar my $MQC_LANE_ENT  => q[MqcOutcomeEnt];
@@ -127,7 +127,7 @@ sub mqc_libraries_GET {
       my $hash_entity = $self->_fill_entity_for_response($id_run, $ent, $authenticated, $c);
       my $tags_hash = $c->model('MLWarehouseDB')
                    ->fetch_tag_index_array_for_run_position($id_run, $position);
-      $hash_entity->{'mqc_lib_limit'}        = $MQC_LIB_LIMIT;
+      $hash_entity->{'mqc_lib_limit'}        = npg_qc::Schema::MQCEntRole->mqc_lib_limit;
       $hash_entity->{'position'}             = $position;
       ##### Check if there are mqc values and add.
       $hash_entity->{'qc_plex_status'}       = $qc_outcomes;

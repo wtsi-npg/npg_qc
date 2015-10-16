@@ -201,28 +201,24 @@ __PACKAGE__->belongs_to(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ifqd4uXLKB/KQXtKle8Tnw
 
 use Carp;
-
-our $VERSION = '0';
-
 use Array::Compare;
-use npg_qc::Schema::MQCEntRole qw[$MQC_LIBRARY_ENT $MQC_LANE_HIST $MQC_LIB_LIMIT];
 
 with qw/npg_qc::Schema::MQCEntRole/;
 
+our $VERSION = '0';
+
 sub historic_resultset {
-  my $self = shift;
-  return $MQC_LANE_HIST;
+  return q[MqcOutcomeHist];
 }
 
 sub update_reported {
   my $self = shift;
-  my $username = $ENV{'USER'} || 'mqc_reporter'; #Cron username or default username for the application.
+  my $username = $ENV{'USER'} || croak 'Failed to get username';
   if(!$self->has_final_outcome) {
     croak(sprintf 'Error while trying to update_reported non-final outcome id_run %i position %i".',
           $self->id_run, $self->position);
   }
-  #It does not check if the reported is null just in case we need to update a reported one.
-  return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username}); #Only update the modified_by field.
+  return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
 }
 
 sub short_desc {
@@ -268,8 +264,8 @@ sub update_outcome_with_libraries {
 
   my $outcome_dict_object = $self->find_valid_outcome($outcome);
   if( $outcome_dict_object->is_final_outcome
-        && scalar @{$tag_indexes_in_lims} <= $MQC_LIB_LIMIT ) {
-    my $rs_library_ent = $self->result_source->schema->resultset($MQC_LIBRARY_ENT);
+        && scalar @{$tag_indexes_in_lims} <= $self->mqc_lib_limit ) {
+    my $rs_library_ent = $self->result_source->schema->resultset( q[MqcLibraryOutcomeEnt]);
     my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes($self->id_run, $self->position);
     $self->validate_outcome_of_libraries($outcome_dict_object, $tag_indexes_in_lims, $outcomes_libraries);
     $rs_library_ent->batch_update_libraries( $self, $tag_indexes_in_lims, $username );

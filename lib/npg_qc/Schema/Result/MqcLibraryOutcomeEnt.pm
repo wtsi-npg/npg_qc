@@ -213,16 +213,13 @@ __PACKAGE__->belongs_to(
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 our $VERSION = '0';
 
-use npg_qc::Schema::MQCEntRole qw[$MQC_LIBRARY_HIST];
-
 with qw/npg_qc::Schema::Flators
         npg_qc::Schema::MQCEntRole/;
 
 __PACKAGE__->set_inflator4scalar('tag_index');
 
 sub historic_resultset {
-  my $self = shift;
-  return $MQC_LIBRARY_HIST;
+  return q[MqcLibraryOutcomeHist];
 }
 
 sub short_desc {

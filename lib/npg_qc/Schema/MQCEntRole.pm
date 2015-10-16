@@ -5,29 +5,10 @@ use DateTime;
 use DateTime::TimeZone;
 use Carp;
 use Readonly;
-use base 'Exporter';
 
 our $VERSION = '0';
 
-our @EXPORT_OK = qw/$MQC_OUTCOME_DICT
-                    $MQC_LANE_ENT
-                    $MQC_LANE_HIST
-                    $MQC_LIBRARY_ENT
-                    $MQC_LIBRARY_HIST
-                    $MQC_LIB_LIMIT
-                    $MQC_ROLE
-                   /;
-
-#Result names
-Readonly::Scalar our $MQC_OUTCOME_DICT => q[MqcOutcomeDict];
-Readonly::Scalar our $MQC_LANE_ENT     => q[MqcOutcomeEnt];
-Readonly::Scalar our $MQC_LANE_HIST    => q[MqcOutcomeHist];
-Readonly::Scalar our $MQC_LIBRARY_ENT  => q[MqcLibraryOutcomeEnt];
-Readonly::Scalar our $MQC_LIBRARY_HIST => q[MqcLibraryOutcomeHist];
-
-#MQC general configuration
-Readonly::Scalar our $MQC_LIB_LIMIT    => 50;
-Readonly::Scalar our $MQC_ROLE         => q[manual_qc];
+Readonly::Scalar my $MQC_LIB_LIMIT    => 50;
 
 requires 'short_desc';
 requires 'mqc_outcome';
@@ -35,7 +16,7 @@ requires 'update';
 requires 'insert';
 requires 'historic_resultset';
 
-Readonly my %DELEGATION_TO_MQC_OUTCOME => {
+Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
   'has_final_outcome' => 'is_final_outcome',
   'is_accepted'       => 'is_accepted',
   'is_final_accepted' => 'is_final_accepted',
@@ -65,6 +46,10 @@ sub get_time_now {
   return DateTime->now(time_zone => DateTime::TimeZone->new(name => q[local]));
 }
 
+sub mqc_lib_limit {
+  return $MQC_LIB_LIMIT;
+}
+
 sub data_for_historic {
   my $self = shift;
   my $my_cols = {$self->get_columns};
@@ -72,7 +57,7 @@ sub data_for_historic {
                        ->schema
                        ->source($self->historic_resultset)
                        ->columns;
-  my $vals = {}; #TODO Nicer way to do this?
+  my $vals = {};
   foreach my $x (@hist_cols) {
     if ( exists $my_cols->{$x} ) {
       $vals->{$x} = $my_cols->{$x};
@@ -93,12 +78,9 @@ sub validate_username {
   return;
 }
 
-#TODO implement a toggle_outcome method
-
 sub update_outcome {
   my ($self, $outcome, $username) = @_;
 
-  #Validation
   if(!defined $outcome){
     croak q[Mandatory parameter 'outcome' missing in call];
   }
@@ -140,7 +122,7 @@ sub _create_historic {
 sub find_valid_outcome {
   my ($self, $outcome) = @_;
 
-  my $rs = $self->result_source->schema->resultset($MQC_OUTCOME_DICT);
+  my $rs = $self->result_source->schema->resultset('MqcOutcomeDict');
   my $outcome_dict;
   if ($outcome =~ /\d+/xms) {
     $outcome_dict = $rs->find($outcome);
@@ -170,10 +152,13 @@ __END__
 
 =head1 DESCRIPTION
 
+  Common method for lane and library manual qc outcome DBIx objects.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 get_time_now
+
+=head2 mqc_lib_limit
 
 =head2 data_for_historic
 
