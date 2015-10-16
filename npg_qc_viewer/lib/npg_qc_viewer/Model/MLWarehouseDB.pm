@@ -175,10 +175,8 @@ sub search_sample_by_sample_id {
 
 =head2 fetch_tag_index_array_for_run_position
 
-  Search for tag indexes associated with a run, position and return them as
-  an array. It does the search explicitely excluding tag_index = 0 and 
-  entity_type = 'library_index_spike'. Croaks if there is no data in LIMS for
-  the parameters.
+  A hash containing tag indices for a lane is returned. Indices
+  are split into two arraya - tags that are subject to qc and not.
 
 =cut
 sub fetch_tag_index_array_for_run_position {
@@ -191,65 +189,38 @@ sub fetch_tag_index_array_for_run_position {
     croak q[Position is required when searching for tag_indexes but not defined];
   }
 
-  my $resultset = $self->resultset('IseqProductMetric');
-  my $cs_alias = $resultset->current_source_alias;
-
-  my $where = {
-    'id_run'   => $id_run,
-    'position' => $position,
-  };
-
-  my $rs_validation = $resultset->search($where);
-  if ($rs_validation->count == 0) {
+  my $rs = $self->resultset('IseqProductMetric')->search(
+    {
+      'me.id_run'     => $id_run,
+      'me.position'   => $position,
+    },
+    {
+      prefetch => 'iseq_flowcell',
+      order_by => qw[ me.id_run me.position me.tag_index ],
+      cache    => 1,
+    }
+  );
+  if ($rs->count == 0) {
     croak q[Error: No LIMS data for this run/position.];
   }
 
-  $where = {
-    $cs_alias . '.id_run'     => $id_run,
-    $cs_alias . '.position'   => $position,
-    $cs_alias . '.tag_index'  => { q[!=], undef },
-  };
-
-  my $rs = $resultset->search($where, {
-             prefetch => ['iseq_run_lane_metric', 'iseq_flowcell'],
-             order_by => qw[ me.id_run me.position me.tag_index ],
-             cache    => 1,
-  });
-
-  my $tags = {};
-
-  my $where_ti = {
-    $cs_alias . '.tag_index' => { q[!=] => 0 },
-    'entity_type'            => { q[!=] => 'library_indexed_spike' },
-  };
-  my $qc_tags = $self->_get_from_rs_as_array($rs, $where_ti);
-
-  $where_ti = {
-    -or => [
-      $cs_alias . '.tag_index' => { q[=] => 0 },
-      'entity_type'            => { q[=] => 'library_indexed_spike' },
-    ],
-  };
-  my $non_qc_tags = $self->_get_from_rs_as_array($rs, $where_ti);
-
-  $tags->{$HASH_KEY_QC_TAGS}     = $qc_tags;
-  $tags->{$HASH_KEY_NON_QC_TAGS} = $non_qc_tags;
-
-  return $tags;
-}
-
-sub _get_from_rs_as_array {
-  my ($self, $rs, $where) = @_;
-
-  my $temp_array = [];
-
-  my $rs1 = $rs->search($where);
-  while(my $prod = $rs1->next) {
-    my $tag_index = $prod->tag_index;
-    push @{$temp_array}, $tag_index;
+  my $tags = {$HASH_KEY_QC_TAGS => [], $HASH_KEY_NON_QC_TAGS => [],};
+  while (my $row = $rs->next) {
+    my $tag_index = $row->tag_index;
+    if (!defined $tag_index) {
+      next;
+    }
+    if ($tag_index && !$row->iseq_flowcell) {
+      croak 'Flowcell data missing';
+    }
+    if ($tag_index == 0 || $row->iseq_flowcell->entity_type eq 'library_indexed_spike') {
+      push @{$tags->{$HASH_KEY_NON_QC_TAGS}}, $tag_index;
+    } else {
+      push @{$tags->{$HASH_KEY_QC_TAGS}}, $tag_index;
+    }
   }
 
-  return $temp_array;
+  return $tags;
 }
 
 __PACKAGE__->meta->make_immutable;
