@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS `mqc_library_outcome_ent` (
   `reported` TIMESTAMP NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
   PRIMARY KEY (`id_mqc_library_outcome_ent`),
   UNIQUE KEY `id_run_UNIQUE` (`id_run`,`position`,`tag_index`),
-  KEY `fk_mqc_library_outcome_ent_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
   CONSTRAINT `fk_mqc_library_outcome_ent_mqc_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
 COMMENT = 'Entity table for library manual qc';
@@ -31,8 +30,10 @@ CREATE TABLE IF NOT EXISTS `mqc_library_outcome_hist` (
   `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
   PRIMARY KEY (`id_mqc_library_outcome_hist`),
-  KEY `fk_mqc_library_outcome_hist_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
   CONSTRAINT `fk_mqc_library_outcome_ent_mqc_outcome_dict10` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
 COMMENT = 'Historic table for library manual qc';
+
+grant select on npgqcp.mqc_library_outcome_ent to nqcro;
+grant select on npgqcp.mqc_library_outcome_hist to nqcro;
 
