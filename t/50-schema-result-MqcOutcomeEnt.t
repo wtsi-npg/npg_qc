@@ -1,12 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 48;
+use Test::More tests => 47;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
 use DateTime;
 
-#Test model mapping
 use_ok('npg_qc::Schema::Result::MqcOutcomeEnt');
 
 my $schema = Moose::Meta::Class->create_anon_class(
@@ -17,7 +16,6 @@ my $table = 'MqcOutcomeEnt';
 my $hist_table = 'MqcOutcomeHist';
 my $dict_table = 'MqcOutcomeDict';
 
-#Test insert
 {
   my $values = {'id_run'=>1, 
     'position'=>1,
@@ -33,7 +31,6 @@ my $dict_table = 'MqcOutcomeDict';
   is ($rs->count, 1, q[one row created in the table]);
 }
 
-#Test insert with historic
 {
   my $values = {'id_run'=>10, 
     'position'=>1,
@@ -60,7 +57,6 @@ my $dict_table = 'MqcOutcomeDict';
   is($all->count, 0, q[There are no entities ready to report]);
 }
 
-#Test select
 {
   my $values = {'id_run'=>1, 
       'position'=>2,
@@ -76,7 +72,6 @@ my $dict_table = 'MqcOutcomeDict';
   is ($rs->count, 1, q[one row matches in the table]);  
 }
 
-#Test update
 {
   my $values = {'id_run'=>1, 
     'position'=>3,
@@ -127,7 +122,6 @@ subtest 'Data for historic' => sub {
   ok(!defined $historic->{'reported'}, 'There is no value for reported in historic');
 };
 
-#Test update with historic
 {
   my $values = {'id_run'=>100, 
     'position'=>4,
@@ -136,29 +130,22 @@ subtest 'Data for historic' => sub {
     'last_modified'=>DateTime->now(),
     'modified_by'=>'user'};
 
-  #There should not be a previous historic
-  my $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3}); #Search historic that matches latest change
+  my $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3});
   is ($hist_object_rs->count, 0, q[no row matches in the historic table before update in entity]);
 
-  my $object = $schema->resultset($table)->create($values); #Insert new entity
+  my $object = $schema->resultset($table)->create($values);
   my $rs = $schema->resultset($table);
   $rs->find({'id_run'=>100, 'position'=>4})->update({'id_mqc_outcome'=>3}); #Find and update the outcome in the new outcome
   $rs = $schema->resultset($table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3}); #Search the new outcome
   is ($rs->count, 1, q[one row matches in the entity table after update]);
   
-  #The historic should be generated automatically and saved
-  $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3}); #Search historic that matches latest change
+  $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3});
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after update in entity]);
-  
-  #Test there is one record ready to be reported (final outcome and null reported)
   my $all = $schema->resultset($table)->get_ready_to_report();
   is($all->count, 1, q[There is one entity ready to be reported]);
-  
-  #Test the entity has accepted outcome
   ok($rs->next->is_accepted, q[The outcome is considered accepted.]);
 }
 
-#Test update (create) status of new entity and store
 { 
   my $id_run = 110; 
   my $position = 1;
@@ -185,9 +172,7 @@ subtest 'Data for historic' => sub {
   is ($rs->count, 1, q[one row matches in the entity table after outcome update]);
 }
 
-#Test update (existing) status of entity and store
 {
-  ##### Setting up the entity and checking fk with dictionary
   my $values = {'id_run'=>210,
     'position'       => 1,
     'id_mqc_outcome' => 1,
@@ -209,7 +194,6 @@ subtest 'Data for historic' => sub {
   ok(defined $object->mqc_outcome, q[The outcome is defined when searching.]);
   ok(!$object->has_final_outcome, q[The outcome before update is not final]);
   
-  ##### Running the test
   my $id_run = 210;
   my $position = 1;
   my $status = 'Rejected final';
@@ -223,14 +207,13 @@ subtest 'Data for historic' => sub {
   $rs = $schema->resultset($table)->search({'id_run'=>210, 'position'=>1, 'id_mqc_outcome'=>4});
   is ($rs->count, 1, q[One row matches in the entity table after outcome update]);
   
-  #Test the entity has a non accepted outcome
   ok(!$rs->next->is_accepted, q[The outcome is not considered accepted.]);
 
   throws_ok {$object->update_outcome('some invalid', $username)}
-    qr/Error: Not possible to transit id_run 210 position 1 to a non-existing outcome \"some invalid\"/,
+    qr/Outcome some invalid is invalid/,
     'error updating to invalid string status';
   throws_ok {$object->update_outcome(123, $username)}
-    qr/Error: Not possible to transit id_run 210 position 1 to a non-existing outcome \"123\"/,
+    qr/Outcome 123 is invalid/,
     'error updating to invalid integer status';
   throws_ok {$object->update_outcome($status, 789)}
     qr/Have a number 789 instead as username/, 'username can be an integer';
@@ -242,9 +225,7 @@ subtest 'Data for historic' => sub {
     'outcome should be given';
 }
 
-#Test update existing status of entity and store
 {
-  ##### Setting up the entity and checking fk with dictionary
   my $values = {'id_run'=>220, 
     'position'       => 1,
     'id_mqc_outcome' => 3, 
@@ -266,7 +247,6 @@ subtest 'Data for historic' => sub {
   is($object->id_mqc_outcome, 3, q[The outcome scalar is there and has correct value]);
   ok(defined $object->mqc_outcome, q[The outcome is defined when searching.]);
   
-  ##### Running the test
   my $id_run = 220;
   my $position = 1;
   my $status = 4;
@@ -283,8 +263,7 @@ subtest 'Data for historic' => sub {
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
 }
 
-{#Test I can't update non-final outcome
-  ##### Setting up the entity
+{
   my $values = {'id_run'=>310,
     'position'       => 1,
     'id_mqc_outcome' => 1,
@@ -293,7 +272,9 @@ subtest 'Data for historic' => sub {
     'modified_by'    => 'user'};
 
   my $object = $schema->resultset($table)->create($values);
-  throws_ok { $object->update_reported() } qr/Error while trying to update_reported non-final outcome/, 'Invalid update_reported transition croak';
+  throws_ok { $object->update_reported() }
+    qr/Outcome for id_run 310 position 1 is not final, cannot update/,
+    'Error for an invalid update_reported transition';
 }
 
 {
@@ -307,22 +288,5 @@ subtest 'Data for historic' => sub {
   my $rs2 = $schema->resultset($table)->get_ready_to_report();
   is ($rs2->count, 0, q[No entities to be reported]);
 }
-
-subtest 'test for short_desc' => sub {
-  plan tests => 2;
-  
-  my $values = {
-    'id_run'         => 300, 
-    'position'       => 10,
-    'id_mqc_outcome' => 0, 
-    'username'       => 'user', 
-    'modified_by'    => 'user'
-  };
-  my $rs = $schema->resultset($table);
-  lives_ok {$rs->find_or_new($values)->update_or_insert()} 'record inserted';
-  my $rs1 = $rs->search({'id_run' => 300});
-  my $row = $rs1->next;
-  is($row->short_desc, q[id_run 300 position 10], 'Correct short desc');
-};
 
 1;

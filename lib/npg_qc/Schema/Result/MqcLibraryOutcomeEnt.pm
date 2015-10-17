@@ -214,19 +214,9 @@ __PACKAGE__->belongs_to(
 our $VERSION = '0';
 
 with qw/npg_qc::Schema::Flators
-        npg_qc::Schema::MQCEntRole/;
+        npg_qc::Schema::Mqc::OutcomeEntity/;
 
 __PACKAGE__->set_inflator4scalar('tag_index');
-
-sub historic_resultset {
-  return q[MqcLibraryOutcomeHist];
-}
-
-sub short_desc {
-  my $self = shift;
-  my $s = sprintf 'id_run %s position %s tag_index %s', $self->id_run, $self->position, $self->tag_index;
-  return $s;
-}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -245,10 +235,6 @@ Entity for library MQC outcome.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 short_desc
-
-  Returns minimal info of entity (run, lane, tag_index) for error messaging
-
 =head2 update
 
   Default DBIx update method extended to create an entry in the table corresponding to 
@@ -263,10 +249,6 @@ Entity for library MQC outcome.
 
   Returns a hash with elements for the historic representation of the entity, a 
   subset of values of the instance.
-
-=head2 historic_resultset
-
-  Returns the name of the historic resultset associated with this entity
 
 =head1 DEPENDENCIES
 

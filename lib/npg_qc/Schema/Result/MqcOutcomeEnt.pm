@@ -203,28 +203,18 @@ __PACKAGE__->belongs_to(
 use Carp;
 use Array::Compare;
 
-with qw/npg_qc::Schema::MQCEntRole/;
+with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
 
 our $VERSION = '0';
-
-sub historic_resultset {
-  return q[MqcOutcomeHist];
-}
 
 sub update_reported {
   my $self = shift;
   my $username = $ENV{'USER'} || croak 'Failed to get username';
   if(!$self->has_final_outcome) {
-    croak(sprintf 'Error while trying to update_reported non-final outcome id_run %i position %i".',
+    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update".',
           $self->id_run, $self->position);
   }
   return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
-}
-
-sub short_desc {
-  my $self = shift;
-  my $s = sprintf 'id_run %s position %s', $self->id_run, $self->position;
-  return $s;
 }
 
 sub validate_outcome_of_libraries {
@@ -236,23 +226,23 @@ sub validate_outcome_of_libraries {
       my $tag_indexes_in_qc = [];
       while(my $library = $library_outcome_ents->next) {
         if ($library->is_undecided) {
-          croak('Error: All libraries need to have a pass or fail outcome.');
+          croak('All libraries need to have a pass or fail outcome.');
         }
         push @{$tag_indexes_in_qc}, $library->tag_index;
       }
 
-      my $comp = Array::Compare->new;
+      my $comp = Array::Compare->new();
       if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
-        croak('Error: Libraries in LIMS and libraries in QC does not match.');
+        croak('Libraries in LIMS and libraries in QC does not match.');
       }
     } else {
-      croak('Error: All libraries need to have an outcome.');
+      croak('All libraries need to have an outcome.');
     }
   } else {
     #All plexes with undecided
     while(my $library = $library_outcome_ents->next) {
       if (!$library->is_undecided) {
-        croak('Error: All libraries need to have undecided outcome.');
+        croak('All libraries need to have undecided outcome.');
       }
     }
   }
@@ -311,14 +301,6 @@ Entity for lane MQC outcome.
 
   Returns a hash with elements for the historic representation of the entity, a 
   subset of values of the instance.
-
-=head2 historic_resultset
-
-  Returns the name of the historic resultset associated with this entity
-
-=head2 short_desc
-
-  Returns minimal info of entity (run, lane, tag_index) for error messaging
 
 =head2 validate_outcome_of_libraries
 

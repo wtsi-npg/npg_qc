@@ -1,4 +1,4 @@
-package npg_qc::Schema::MQCEntRole;
+package npg_qc::Schema::Mqc::OutcomeEntity;
 
 use Moose::Role;
 use DateTime;
@@ -6,15 +6,13 @@ use DateTime::TimeZone;
 use Carp;
 use Readonly;
 
-our $VERSION = '0';
-
-Readonly::Scalar my $MQC_LIB_LIMIT    => 50;
-
-requires 'short_desc';
 requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
-requires 'historic_resultset';
+
+our $VERSION = '0';
+
+Readonly::Scalar my $MQC_LIB_LIMIT => 50;
 
 Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
   'has_final_outcome' => 'is_final_outcome',
@@ -27,7 +25,7 @@ foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
       my $self = shift;
       my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
-      return $self-> mqc_outcome->$that_class_method;
+      return $self->mqc_outcome->$that_class_method;
     }
   );
 }
@@ -37,7 +35,6 @@ around [qw/update insert/] => sub {
   my $self = shift;
   $self->last_modified($self->get_time_now);
   my $return_super = $self->$orig(@_);
-
   $self->_create_historic();
   return $return_super;
 };
@@ -55,7 +52,7 @@ sub data_for_historic {
   my $my_cols = {$self->get_columns};
   my @hist_cols = $self->result_source
                        ->schema
-                       ->source($self->historic_resultset)
+                       ->source($self->_historicrs_name)
                        ->columns;
   my $vals = {};
   foreach my $x (@hist_cols) {
@@ -90,10 +87,9 @@ sub update_outcome {
   my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
   #There is a row that matches the id_run and position
   if ($self->in_storage) {
-    #Check if previous outcome is not final
     if($self->has_final_outcome) {
-      croak(sprintf 'Error: Outcome is already final but trying to transit to %s.',
-            $self->short_desc);
+      croak('Outcome is already final but trying to transit to ' .
+            $outcome_dict_obj->short_desc);
     } else { #Update
       my $values = {};
       $values->{'id_mqc_outcome'} = $outcome_id;
@@ -110,15 +106,20 @@ sub update_outcome {
   return 1;
 }
 
-#Create and save historic from the entity current data.
+sub _historicrs_name {
+  my $self = shift;
+  my $class = ref $self;
+  ($class) = $class =~ /([^:]+)Ent\Z/smx;
+  return $class . 'Hist';
+}
+
 sub _create_historic {
   my $self = shift;
-  my $rs = $self->result_source->schema->resultset($self->historic_resultset);
-  my $historic = $rs->create($self->data_for_historic);
+  $self->result_source->schema->resultset($self->_historicrs_name)
+    ->create($self->data_for_historic);
   return 1;
 }
 
-#Fetches valid outcome object from the database.
 sub find_valid_outcome {
   my ($self, $outcome) = @_;
 
@@ -130,8 +131,7 @@ sub find_valid_outcome {
     $outcome_dict = $rs->search({short_desc => $outcome})->next;
   }
   if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
-    croak(sprintf 'Error: Not possible to transit %s to a non-existing outcome "%s".',
-          $self->short_desc, $outcome);
+    croak(sprintf "Outcome $outcome is invalid");
   }
   return $outcome_dict;
 }
@@ -145,14 +145,16 @@ __END__
 
 =head1 NAME
 
-  npg_qc::Schema::MQCEntRole
+  npg_qc::Schema::Mqc::OutcomeEntity
 
 =head1 SYNOPSIS
 
+  package OutcomeEntity;
+  with 'npg_qc::Schema::Mqc::OutcomeEntity';
 
 =head1 DESCRIPTION
 
-  Common method for lane and library manual qc outcome DBIx objects.
+  Common functionality for lane and library manual qc outcome entity DBIx objects.
 
 =head1 SUBROUTINES/METHODS
 
@@ -168,37 +170,37 @@ __END__
 
 =head2 validate_username
 
-  To make sure the username is alphanumeric
+  Checks that the username is alphanumeric. Oure numeric vakues are not allowed.
 
 =head2 update_outcome
 
   Updates the outcome of the entity with values provided.
 
-  $obj->($outcome, $username)
+  $obj->($outcome, $username);
 
 =head2 has_final_outcome
 
-  Returns true id this entry corresponds to a final outcome, otherwise returns false.
+  Returns true if this entry corresponds to a final outcome, otherwise returns false.
 
 =head2 is_accepted
 
-  Returns the result of checking if the outcome is considered accepted. Delegates the 
-  check to L<npg_qc::Schema::Result::MqcOutcomeDict>
+  Returns true if the outcome is accepted (pass), otherwise returns false.
 
 =head2 is_final_accepted
 
-  Returns the result of checking if the outcome is considered final and accepted. 
-  Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
+  Returns true if the outcome is accepted (pass) and final, otherwise returns false.
 
 =head2 is_undecided
 
-  Returns true if the current outcome is undecided. 
-  Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
+  Returns true if the outcome is ubdecided (neither pass nor fail),
+  otherwise returns false.
 
 =head2 find_valid_outcome
 
-  Finds the MqcOutcomeDict entity that matches the outcome. Or nothing if there is
-  no valid outcome matching the parameter.
+  Returns a valid current MqcOutcomeDict object that matches the outcome or
+  raises an error.
+
+  my $dict_obj = $obj->find_valid_outcome('is accepted');
 
 =head1 DIAGNOSTICS
 

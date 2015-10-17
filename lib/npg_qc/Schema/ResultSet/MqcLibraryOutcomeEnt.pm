@@ -50,11 +50,10 @@ sub search_library_outcome_ent {
   my $values = {};
   $values->{'id_run'}    = $id_run;
   $values->{'position'}  = $position;
-  $values->{'tag_index'} = $tag_index; #TODO tag_index = undef?
+  $values->{'tag_index'} = $tag_index;
   $self->result_class->deflate_unique_key_components($values);
   my $ent = $self->search($values)->next;
   if (!$ent) {
-    #TODO Check if I should send tag_index back to undef
     $values->{'username'}    = $username;
     $values->{'modified_by'} = $username;
     $ent = $self->new_result($values);
