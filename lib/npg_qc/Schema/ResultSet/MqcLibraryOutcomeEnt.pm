@@ -9,11 +9,6 @@ extends 'DBIx::Class::ResultSet';
 
 our $VERSION = '0';
 
-sub BUILDARGS {
-  my ($class, $rsrc, $args) = @_;
-  return $args;
-} # ::RS::new() expects my ($class, $rsrc, $args) = @_
-
 sub get_outcomes_as_hash{
   my ($self, $id_run, $position) = @_;
 

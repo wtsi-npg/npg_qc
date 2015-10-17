@@ -9,11 +9,6 @@ extends 'DBIx::Class::ResultSet';
 
 our $VERSION = '0';
 
-sub BUILDARGS {
-  my ($class, $rsrc, $args) = @_;
-  return $args;
-} # ::RS::new() expects my ($class, $rsrc, $args) = @_
-
 sub get_not_reported {
   my $self = shift;
   return $self->search({$self->current_source_alias . '.reported' => undef});
