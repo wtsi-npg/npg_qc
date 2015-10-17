@@ -6,19 +6,16 @@ use Readonly;
 use Try::Tiny;
 use Carp;
 
+use npg_qc_viewer::Model::MLWarehouseDB;
+use npg_qc::Schema::Mqc::OutcomeEntity;
+
 BEGIN { extends 'Catalyst::Controller::REST' }
-
-#Just to declare a default. But seems the content type should come from client
-#anyway
-__PACKAGE__->config( default => 'application/json' );
-
 with 'npg_qc_viewer::Util::Error';
 with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 
 our $VERSION = '0';
 
-use npg_qc_viewer::Model::MLWarehouseDB;
-use npg_qc::Schema::MQCEntRole;
+__PACKAGE__->config( default => 'application/json' );
 
 Readonly::Scalar my $MQC_ROLE      => q[manual_qc];
 Readonly::Scalar my $MQC_LANE_ENT  => q[MqcOutcomeEnt];
@@ -96,7 +93,7 @@ sub mqc_libraries_GET {
     my $hash_entity = $self->_fill_entity_for_response($id_run, $c);
     my $tags_hash = $c->model('MLWarehouseDB')
                    ->fetch_tag_index_array_for_run_position($id_run, $position);
-    $hash_entity->{'mqc_lib_limit'}        = npg_qc::Schema::MQCEntRole->mqc_lib_limit;
+    $hash_entity->{'mqc_lib_limit'}        = npg_qc::Schema::Mqc::OutcomeEntity->mqc_lib_limit;
     $hash_entity->{'position'}             = $position;
     $hash_entity->{'qc_plex_status'}       = $qc_outcomes;
     $hash_entity->{'current_lane_outcome'} = $current_lane_outcome;
