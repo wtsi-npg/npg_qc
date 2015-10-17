@@ -135,7 +135,7 @@ subtest 'fetch_tag_index_array_for_run_position with tag_index null' => sub {
   $rs = $rs->search({id_run=>$non_existing_run, position=>1});
   is($rs->count, 0, q[Correct number of elements found (0)]);
   throws_ok{$m->fetch_tag_index_array_for_run_position($non_existing_run, 1)}
-    qr/Error: No LIMS data for this run\/position/, 'No data in LIMS warehouse for this run';
+    qr/No LIMs data for run 4951 position 1/, 'No data in LIMS warehouse for this run';
 };
 
 1;

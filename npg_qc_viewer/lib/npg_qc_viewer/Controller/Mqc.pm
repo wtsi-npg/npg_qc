@@ -122,7 +122,7 @@ sub _update_outcome {
 
 sub update_outcome_library : Path('update_outcome_library') {
   my ($self, $c) = @_;
-  return $self->nupdate_outcome($c, $MODE_LIBRARY_MQC);
+  return $self->_update_outcome($c, $MODE_LIBRARY_MQC);
 }
 
 sub update_outcome_lane : Path('update_outcome_lane') {

@@ -226,23 +226,23 @@ sub validate_outcome_of_libraries {
       my $tag_indexes_in_qc = [];
       while(my $library = $library_outcome_ents->next) {
         if ($library->is_undecided) {
-          croak('All libraries need to have a pass or fail outcome.');
+          croak('All plex libraries should either pass or fail.');
         }
         push @{$tag_indexes_in_qc}, $library->tag_index;
       }
 
       my $comp = Array::Compare->new();
       if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
-        croak('Libraries in LIMS and libraries in QC does not match.');
+        croak('Tag indexes in LIMs and QC do not match.');
       }
     } else {
-      croak('All libraries need to have an outcome.');
+      croak('All plex libraries have to be QC-ed.');
     }
   } else {
     #All plexes with undecided
     while(my $library = $library_outcome_ents->next) {
       if (!$library->is_undecided) {
-        croak('All libraries need to have undecided outcome.');
+        croak('All plex libraries should have undecided QC outcome.');
       }
     }
   }

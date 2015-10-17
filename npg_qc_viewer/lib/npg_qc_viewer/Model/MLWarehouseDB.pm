@@ -201,7 +201,7 @@ sub fetch_tag_index_array_for_run_position {
     }
   );
   if ($rs->count == 0) {
-    croak q[Error: No LIMS data for this run/position.];
+    croak qq[No LIMs data for run $id_run position $position];
   }
 
   my $tags = {$HASH_KEY_QC_TAGS => [], $HASH_KEY_NON_QC_TAGS => [],};

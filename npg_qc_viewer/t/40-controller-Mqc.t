@@ -72,8 +72,8 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
     'post request lives with body param';
   is( $response->code, 500, 'error code is 500' );
   like ($response->content,
-    qr/Error: No LIMS data for this run\/position/,
-    'correct error message for invalid outcome');
+    qr/No LIMs data for run 1234 position 4/,
+    'error when no lims data available');
 
   $url = '/mqc/update_outcome_lane?user=pipeline&password=secret';
   
