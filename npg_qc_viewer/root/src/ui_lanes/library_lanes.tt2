@@ -23,7 +23,7 @@
   IF rl_map.defined;
     rl_keys = rl_map.keys;
     IF rl_keys.size;
-      sorted_rl_map_keys = util.sort_rpt_keys(rl_keys);
+      sorted_rl_map_keys = util.sort_rpt_keys_zero_last(rl_keys);
       IF (!run_from_staging && !path_list.defined);
         run_ids = util.runs_from_rpt_keys(rl_keys);
         IF run_ids.size == 1;
