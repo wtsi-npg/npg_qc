@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Try::Tiny;
+use Carp;
+
+use srpipe::runfolder;
+use npg_qc::Schema;
+use npg_tracking::util::config qw/get_config_staging_areas/;
+
+my $staging = get_config_staging_areas();
+
+my @folders = grep { $_ !~ /log\Z/} map { glob $staging->{'prefix'}.$_.q[/IL*/outgoing/*] } @{$staging->{'indexes'}};
+
+my @checks = qw/bam_flagstats samtools_stats sequence_summary/;
+my $rs = npg_qc::Schema->connect()->resultset('SeqComponent');
+
+foreach my $f (@folders) {
+  my $rf=srpipe::runfolder->new(runfolder_path=>$f);
+  my $id_run;
+  my $e;
+  try {
+    $id_run = $rf->id_run;
+  } catch {
+    $e = $_;
+  };
+  if (!$id_run) {
+    print "Failed to get id_run from $f: $e, skipping...\n";
+    next;
+  }
+  
+  if ( $rs->search({id_run => $id_run})->count() ) {
+    print "Run $id_run already loaded, skipping...\n";
+    next;
+  }
+
+  try {
+    my $archive = $rf->archive_path;
+    my @dirs = glob "$archive/lane*";
+    push @dirs, $archive;
+    my $command = 'npg_qc_autoqc_data.pl --verbose --id_run ' . $id_run . q[ ];
+    $command .= join q[ ], map { '--path ' . join(q[/], $_, 'qc')} @dirs;
+    $command .= q[ ];
+    $command .= join q[ ], map { "--check $_" } @checks;
+
+    print $command. "\n\n";
+    if (system($command) != 0) {
+      print "*********** $command FAILED \n\n";
+    }
+
+  } catch {
+    carp 'ERROR ' . $_;
+  };
+}
+
+1;
