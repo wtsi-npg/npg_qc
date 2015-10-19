@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.2
+  - library-level manual QC for individual plexes.
+
 release 59.1
  - 'write2file' method of autoqc result objects removed since it duplicated
      the 'store' method

@@ -3,15 +3,11 @@ package npg_qc::Schema::ResultSet::MqcOutcomeEnt;
 use Moose;
 use namespace::autoclean;
 use MooseX::NonMoose;
+use Carp;
 
 extends 'DBIx::Class::ResultSet';
 
 our $VERSION = '0';
-
-sub BUILDARGS {
-  my ($class, $rsrc, $args) = @_;
-  return $args;
-} # ::RS::new() expects my ($class, $rsrc, $args) = @_
 
 sub get_not_reported {
   my $self = shift;
@@ -39,6 +35,21 @@ sub get_outcomes_as_hash{
     $previous_mqc->{$obj->position} = $obj->mqc_outcome->short_desc;
   }
   return $previous_mqc;
+}
+
+sub search_outcome_ent {
+  my ( $self, $id_run, $position, $username ) = @_;
+  my $ent;
+  my $values = {};
+  $values->{'id_run'}   = $id_run;
+  $values->{'position'} = $position;
+  $ent = $self->search($values)->next;
+  if (!$ent) {
+    $values->{'username'}    = $username;
+    $values->{'modified_by'} = $username;
+    $ent = $self->new_result($values);
+  }
+  return $ent;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -81,6 +92,11 @@ Extended ResultSet with specific functionality for for manual MQC.
 =head2 get_outcomes_as_hash
 
   Returns a hash of lane=>outcome for those lanes in the database for the id_run specified.
+
+=head2 search_outcome_ent
+
+  Find previous mqc outcome for the id_run/position, create
+  it for the specified user if it does not exist.
 
 =head1 DEPENDENCIES
 

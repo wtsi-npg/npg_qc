@@ -216,6 +216,7 @@ lib/npg_qc/model/summary.pm
 lib/npg_qc/model/tile_score.pm
 lib/npg_qc/Schema.pm
 lib/npg_qc/Schema/Flators.pm
+lib/npg_qc/Schema/Mqc/OutcomeEntity.pm
 lib/npg_qc/Schema/Result/Adapter.pm
 lib/npg_qc/Schema/Result/AlignmentFilterMetrics.pm
 lib/npg_qc/Schema/Result/AnalysisLane.pm
@@ -248,6 +249,8 @@ lib/npg_qc/Schema/Result/LogLikelihood.pm
 lib/npg_qc/Schema/Result/MostCommonBlankPattern.pm
 lib/npg_qc/Schema/Result/MostCommonWord.pm
 lib/npg_qc/Schema/Result/MoveZ.pm
+lib/npg_qc/Schema/Result/MqcLibraryOutcomeEnt.pm
+lib/npg_qc/Schema/Result/MqcLibraryOutcomeHist.pm
 lib/npg_qc/Schema/Result/MqcOutcomeDict.pm
 lib/npg_qc/Schema/Result/MqcOutcomeEnt.pm
 lib/npg_qc/Schema/Result/MqcOutcomeHist.pm
@@ -280,6 +283,7 @@ lib/npg_qc/Schema/Result/TagsReporters.pm
 lib/npg_qc/Schema/Result/TileScore.pm
 lib/npg_qc/Schema/Result/UpstreamTags.pm
 lib/npg_qc/Schema/Result/VerifyBamId.pm
+lib/npg_qc/Schema/ResultSet/MqcLibraryOutcomeEnt.pm
 lib/npg_qc/Schema/ResultSet/MqcOutcomeEnt.pm
 lib/npg_qc/util.pm
 lib/npg_qc/utils/bam_genotype.pm

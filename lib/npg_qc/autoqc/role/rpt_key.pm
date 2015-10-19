@@ -113,6 +113,25 @@ sub _compare_rpt_keys {
 	         );
 }
 
+sub _compare_rpt_keys_zero_last {
+  my $a_map = __PACKAGE__->inflate_rpt_key($a);
+  my $b_map = __PACKAGE__->inflate_rpt_key($b);
+
+  return $a_map->{'id_run'} <=> $b_map->{'id_run'} ||
+         $a_map->{'position'} <=> $b_map->{'position'} ||
+         _compare_tags_zero_last($a_map, $b_map);
+}
+
+sub _compare_tags_zero_last {## no critic (RequireArgUnpacking)
+  if ( !exists $_[0]->{'tag_index'} && !exists $_[1]->{'tag_index'} ) { return $EQUAL; }
+  elsif ( exists $_[0]->{'tag_index'} && exists $_[1]->{'tag_index'} ) {
+    if( $_[0]->{'tag_index'} == 0 ) { return $MORE; }
+    elsif ( $_[1]->{'tag_index'} == 0 ) { return $LESS; }
+    else { return $_[0]->{'tag_index'} <=> $_[1]->{'tag_index'}; }
+  } elsif ( !exists $_[0]->{'tag_index'} ) { return $LESS; }
+  else { return $MORE; }
+}
+
 =head2 sort_rpt_keys
 
 Sorts the argument list and returns a sorted list
@@ -121,6 +140,18 @@ Sorts the argument list and returns a sorted list
 sub sort_rpt_keys {
     my ($self, $keys) = @_;
     my @a = sort _compare_rpt_keys @{$keys};
+    return @a;
+}
+
+=head2 sort_rpt_keys_zero_last
+
+Sorts the argument list and returns a sorted list with tag_index = 0 at the end
+of each group of run position tag_index.
+
+=cut
+sub sort_rpt_keys_zero_last{
+    my ($self, $keys) = @_;
+    my @a = sort _compare_rpt_keys_zero_last @{$keys};
     return @a;
 }
 
