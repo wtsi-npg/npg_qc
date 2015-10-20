@@ -1,5 +1,5 @@
 
-package npg_qc::Schema::Result::MqcOutcomeEnt;
+package npg_qc::Schema::Result::MqcLibraryOutcomeEnt;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
@@ -8,7 +8,7 @@ package npg_qc::Schema::Result::MqcOutcomeEnt;
 
 =head1 NAME
 
-npg_qc::Schema::Result::MqcOutcomeEnt
+npg_qc::Schema::Result::MqcLibraryOutcomeEnt - Entity table for library manual qc
 
 =cut
 
@@ -44,15 +44,15 @@ use namespace::autoclean;
 
 __PACKAGE__->load_components('InflateColumn::DateTime');
 
-=head1 TABLE: C<mqc_outcome_ent>
+=head1 TABLE: C<mqc_library_outcome_ent>
 
 =cut
 
-__PACKAGE__->table('mqc_outcome_ent');
+__PACKAGE__->table('mqc_library_outcome_ent');
 
 =head1 ACCESSORS
 
-=head2 id_mqc_outcome_ent
+=head2 id_mqc_library_outcome_ent
 
   data_type: 'bigint'
   extra: {unsigned => 1}
@@ -72,6 +72,12 @@ __PACKAGE__->table('mqc_outcome_ent');
   is_nullable: 0
 
 Lane
+
+=head2 tag_index
+
+  data_type: 'bigint'
+  default_value: -1
+  is_nullable: 0
 
 =head2 id_mqc_outcome
 
@@ -114,7 +120,7 @@ When was reported to LIMS
 =cut
 
 __PACKAGE__->add_columns(
-  'id_mqc_outcome_ent',
+  'id_mqc_library_outcome_ent',
   {
     data_type => 'bigint',
     extra => { unsigned => 1 },
@@ -125,6 +131,8 @@ __PACKAGE__->add_columns(
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  'tag_index',
+  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
   'id_mqc_outcome',
   {
     data_type => 'smallint',
@@ -155,13 +163,13 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</id_mqc_outcome_ent>
+=item * L</id_mqc_library_outcome_ent>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key('id_mqc_outcome_ent');
+__PACKAGE__->set_primary_key('id_mqc_library_outcome_ent');
 
 =head1 UNIQUE CONSTRAINTS
 
@@ -173,11 +181,13 @@ __PACKAGE__->set_primary_key('id_mqc_outcome_ent');
 
 =item * L</position>
 
+=item * L</tag_index>
+
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position']);
+__PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position', 'tag_index']);
 
 =head1 RELATIONS
 
@@ -197,73 +207,16 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ifqd4uXLKB/KQXtKle8Tnw
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-18 14:34:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:enQroYzqNS2pZjTzOQye9A
 
-use Carp;
-use Array::Compare;
-
-with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
-
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 our $VERSION = '0';
 
-sub update_reported {
-  my $self = shift;
-  my $username = $ENV{'USER'} || croak 'Failed to get username';
-  if(!$self->has_final_outcome) {
-    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update".',
-          $self->id_run, $self->position);
-  }
-  return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
-}
+with qw/npg_qc::Schema::Flators
+        npg_qc::Schema::Mqc::OutcomeEntity/;
 
-sub validate_outcome_of_libraries {
-  my ($self, $outcome_dict_obj, $tag_indexes_in_lims, $library_outcome_ents) = @_;
-
-  if($outcome_dict_obj->is_accepted) {
-    #all plexes with qc
-    if(scalar @{ $tag_indexes_in_lims } == $library_outcome_ents->count ) {
-      my $tag_indexes_in_qc = [];
-      while(my $library = $library_outcome_ents->next) {
-        if ($library->is_undecided) {
-          croak('All plex libraries should either pass or fail.');
-        }
-        push @{$tag_indexes_in_qc}, $library->tag_index;
-      }
-
-      my $comp = Array::Compare->new();
-      if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
-        croak('Tag indexes in LIMs and QC do not match.');
-      }
-    } else {
-      croak('All plex libraries have to be QC-ed.');
-    }
-  } else {
-    #All plexes with undecided
-    while(my $library = $library_outcome_ents->next) {
-      if (!$library->is_undecided) {
-        croak('All plex libraries should have undecided QC outcome.');
-      }
-    }
-  }
-  return 1;
-}
-
-sub update_outcome_with_libraries {
-  my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
-
-  my $outcome_dict_object = $self->find_valid_outcome($outcome);
-  if( $outcome_dict_object->is_final_outcome
-        && scalar @{$tag_indexes_in_lims} <= $self->mqc_lib_limit ) {
-    my $rs_library_ent = $self->result_source->schema->resultset( q[MqcLibraryOutcomeEnt]);
-    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes($self->id_run, $self->position);
-    $self->validate_outcome_of_libraries($outcome_dict_object, $tag_indexes_in_lims, $outcomes_libraries);
-    $rs_library_ent->batch_update_libraries( $self, $tag_indexes_in_lims, $username );
-  }
-
-  $self->update_outcome($outcome, $username);
-  return 1;
-}
+__PACKAGE__->set_inflator4scalar('tag_index');
 
 __PACKAGE__->meta->make_immutable;
 
@@ -274,7 +227,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Entity for lane MQC outcome.
+Entity for library MQC outcome.
 
 =head1 DIAGNOSTICS
 
@@ -282,35 +235,20 @@ Entity for lane MQC outcome.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 update_reported
-
-  Updates the value of reported to the current timestamp. Thorws exception if the
-  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
-
 =head2 update
 
-  With around on DBIx update method to create an entry in the table corresponding to 
-  the MqcOutcomeHist class
+  Default DBIx update method extended to create an entry in the table corresponding to 
+  the MqcLibraryOutcomeHist class
 
 =head2 insert
 
-  With around on DBIx insert method to create an entry in the table corresponding to 
-  the MqcOutcomeHist class
+  Default DBIx insert method extended to create an entry in the table corresponding to 
+  the MqcLibraryOutcomeHist class
 
 =head2 data_for_historic
 
   Returns a hash with elements for the historic representation of the entity, a 
   subset of values of the instance.
-
-=head2 validate_outcome_of_libraries
-
-  Validates if overall state for the lane and the libraries allows for a final
-  outcome in the lane.
-
-=head2 update_outcome_with_libraries
-
-  Updates children library mqc outcomes then updates outcome of lane mqc entity
-  passed as parameter.
 
 =head1 DEPENDENCIES
 
@@ -362,4 +300,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-

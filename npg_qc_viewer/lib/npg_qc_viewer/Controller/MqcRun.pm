@@ -6,70 +6,104 @@ use Readonly;
 use Try::Tiny;
 use Carp;
 
+use npg_qc_viewer::Model::MLWarehouseDB;
+use npg_qc::Schema::Mqc::OutcomeEntity;
+
 BEGIN { extends 'Catalyst::Controller::REST' }
-
-#Just to declare a default. But seems the content type should come from client
-#anyway
-__PACKAGE__->config( default => 'application/json' );
-
 with 'npg_qc_viewer::Util::Error';
 with 'npg_qc_viewer::Util::ExtendedHttpStatus';
 
 our $VERSION = '0';
 
-Readonly::Scalar my $MQC_ROLE                     => q[manual_qc];
+__PACKAGE__->config( default => 'application/json' );
+
+Readonly::Scalar my $MQC_ROLE      => q[manual_qc];
+Readonly::Scalar my $MQC_LANE_ENT  => q[MqcOutcomeEnt];
+Readonly::Scalar my $MQC_LIB_ENT   => q[MqcLibraryOutcomeEnt];
+
+sub _authenticate {
+  my ( $self, $c ) = @_;
+
+  my $authenticated;
+  try {
+    $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
+    $authenticated = 1;
+  };
+
+  return $authenticated;
+}
+
+sub _fill_entity_for_response{
+  my ($self, $id_run, $c) = @_;
+
+  my $authenticated = $self->_authenticate($c);
+  my $hash_entity = {};
+  $hash_entity->{'id_run'}                     = $id_run;
+  my $crs = $c->model('NpgDB')->resultset('Run')->find($id_run)->current_run_status;
+  $hash_entity->{'current_status_description'} = $crs ? $crs->description    : q[];
+  $hash_entity->{'taken_by'}                   = $crs ? $crs->user->username : q[];
+  #username from authentication
+  $hash_entity->{'current_user'}       = $authenticated ? $c->user->username                : q[];
+  $hash_entity->{'has_manual_qc_role'} = $authenticated ? $c->check_user_roles(($MQC_ROLE)) : q[];
+
+  return $hash_entity;
+}
 
 ## no critic (NamingConventions::Capitalization)
 sub mqc_runs : Path('/mqc/mqc_runs') : ActionClass('REST') { }
 
 sub mqc_runs_GET {
   my ( $self, $c, $id_run ) = @_;
-  my $error;
-  my $authenticated = 0;
 
   try {
-    try {
-      ####Authorisation
-      $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
-      $authenticated = 1;
-    } catch {
-      $authenticated = 0;
-    };
-
-    #Get from DB
-    my $ent = $c->model('NpgDB')->resultset('RunStatus')->find({'id_run' => $id_run, 'iscurrent' => 1},);
-    my $qc_outcomes = $c->model('NpgQcDB')->resultset('MqcOutcomeEnt')->get_outcomes_as_hash($id_run);
-
-    # Return a 200 OK, with the data in entity
-    # serialized in the body
-    if($ent) {
-      my $hash_entity = {};
-      $hash_entity->{'id_run'}                     = $id_run;
-      $hash_entity->{'current_status_description'} = $ent->run_status_dict->description;
-      #username from status 
-      $hash_entity->{'taken_by'}                   = $ent->user->username;
-      ##### Check if there are mqc values and add.
-      $hash_entity->{'qc_lane_status'}             = $qc_outcomes;
-
-      #username from authentication
-      $hash_entity->{'current_user'}               = $authenticated ? $c->user->username                : q[];
-      $hash_entity->{'has_manual_qc_role'}         = $authenticated ? $c->check_user_roles(($MQC_ROLE)) : q[];
-
-      $self->status_ok($c, entity => $hash_entity,);
-    }
+    my $hash_entity = $self->_fill_entity_for_response($id_run, $c);
+    $hash_entity->{'qc_lane_status'} = $c->model('NpgQcDB')
+                                        ->resultset($MQC_LANE_ENT)
+                                        ->get_outcomes_as_hash($id_run);
+    $self->status_ok($c, entity => $hash_entity,);
   } catch {
-    $error = $_;
+    my ( $error1, $error_code ) = $self->parse_error($_);
+    $self->status_internal_server_error($c, message => $error1,);
   };
 
-  my $error_code;
+  return;
+}
 
-  if ($error) {
-    ( $error, $error_code ) = $self->parse_error($error);
-    $self->status_internal_server_error(
-      $c,
-      message => $error,
-    );
-  }
+## no critic (NamingConventions::Capitalization)
+sub mqc_libraries : Path('/mqc/mqc_libraries') : ActionClass('REST') { }
+
+sub mqc_libraries_GET {
+  my ( $self, $c, $id_run_position ) = @_;
+
+  my $qc_name = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS;
+  my $non_qc_name = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS;
+
+  try {
+
+    my ($id_run, $position) = split /_/sm, $id_run_position;
+    my $qc_outcomes = $c->model('NpgQcDB')
+                        ->resultset($MQC_LIB_ENT)
+                        ->get_outcomes_as_hash($id_run, $position);
+    my $ent_lane = $c->model('NpgQcDB')
+                     ->resultset($MQC_LANE_ENT)
+                     ->find({'id_run' => $id_run, 'position' => $position},);
+    my $current_lane_outcome = $ent_lane ? $ent_lane->mqc_outcome->short_desc
+                                         : q[Undecided];
+
+    my $hash_entity = $self->_fill_entity_for_response($id_run, $c);
+    my $tags_hash = $c->model('MLWarehouseDB')
+                   ->fetch_tag_index_array_for_run_position($id_run, $position);
+    $hash_entity->{'mqc_lib_limit'}        = npg_qc::Schema::Mqc::OutcomeEntity->mqc_lib_limit;
+    $hash_entity->{'position'}             = $position;
+    $hash_entity->{'qc_plex_status'}       = $qc_outcomes;
+    $hash_entity->{'current_lane_outcome'} = $current_lane_outcome;
+    $hash_entity->{'qc_tags'}              = $tags_hash->{$qc_name};
+    $hash_entity->{'non_qc_tags'}          = $tags_hash->{$non_qc_name};
+    $self->status_ok($c, entity => $hash_entity,);
+  } catch {
+    my ( $error1, $error_code ) = $self->parse_error($_);
+    $self->status_internal_server_error($c,message => $error1,);
+  };
 
   return;
 }
@@ -86,7 +120,9 @@ npg_qc_viewer::Controller::MqcRun
 
 =head1 DESCRIPTION
 
-Controller to expose runs through REST
+Controller to expose manual qc outcome and other data about a run through REST
+
+=head1 SUBROUTINES/METHODS 
 
 =head2 mqc_runs
 
@@ -94,9 +130,17 @@ Controller to expose runs through REST
 
 =head2 mqc_runs_GET
 
-  Returns general information about the status of the run specified as part of the URL.
+  Returns general information about the status of the run specified as part
+  of the URL.
 
-=head1 SUBROUTINES/METHODS 
+=head2 mqc_libraries
+
+  Placeholder for the REST path for lane.
+
+=head2 mqc_libraries_GET
+
+  Returns general information about the status of the run and the lane 
+  (its plexes) specified as part of the URL.
 
 =head1 DIAGNOSTICS
 

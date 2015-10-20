@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 10;
 use Test::Exception;
 use File::Temp qw(tempfile);
 
@@ -89,6 +89,53 @@ subtest 'Data for sample' => sub {
   cmp_ok($sample->id_sample_lims, '==', 2617, q[Correct id sample lims]);
   cmp_ok($sample->name, 'eq', q[random_sample_name], q[Correct sample name from name]);
 
+};
+
+my $HASH_KEY_QC_TAGS = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS;
+my $HASH_KEY_NON_QC_TAGS = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS;
+
+subtest 'fetch_tag_index_array_for_run_position wo tag_index null' => sub {
+  plan tests => 4;
+  my $id_run = 4950;
+  my $rs = $m->resultset(q(IseqProductMetric));
+
+  $rs = $rs->search({id_run=>$id_run, position=>1});
+  is($rs->count, 25, q[Correct number of elements found]);
+  
+  #Make tag_index 24 look as phix
+  my $to_phix = $rs->search({tag_index=>24})->next;
+  my $iseq_flowcell = $to_phix->iseq_flowcell; 
+  $iseq_flowcell->entity_type('library_indexed_spike');
+  $iseq_flowcell->update;
+
+  $rs->search({tag_index=>10})->next->iseq_flowcell->delete();
+  throws_ok {$m->fetch_tag_index_array_for_run_position($id_run, 1)}
+    qr/Flowcell data missing/,
+    'error when no link to the flowcell';
+  $rs->search({tag_index=>10})->next->delete();
+
+  my $hash = $m->fetch_tag_index_array_for_run_position($id_run, 1);
+  is(scalar @{$hash->{$HASH_KEY_QC_TAGS}},    22, 'Correct number of tags for qc' );
+  is(scalar @{$hash->{$HASH_KEY_NON_QC_TAGS}}, 2, 'Correct number of tags for non qc' );
+};
+
+subtest 'fetch_tag_index_array_for_run_position with tag_index null' => sub {
+  plan tests => 7;
+  my $id_run = 4025;
+  my $rs = $m->resultset(q(IseqProductMetric));
+  $rs = $rs->search({id_run=>$id_run, position=>1});
+  is($rs->count, 1, q[Correct number of elements found]);
+  my $hash = $m->fetch_tag_index_array_for_run_position($id_run, 1);
+  ok ($hash->{$HASH_KEY_QC_TAGS},     'Hash has array for qc tags');
+  ok ($hash->{$HASH_KEY_NON_QC_TAGS}, 'Hash has array for non qc tags');
+  is(scalar @{$hash->{$HASH_KEY_QC_TAGS}},     0, 'Correct number of tags for qc' );
+  is(scalar @{$hash->{$HASH_KEY_NON_QC_TAGS}}, 0, 'Correct number of tags for non qc' );
+
+  my $non_existing_run = 4951; 
+  $rs = $rs->search({id_run=>$non_existing_run, position=>1});
+  is($rs->count, 0, q[Correct number of elements found (0)]);
+  throws_ok{$m->fetch_tag_index_array_for_run_position($non_existing_run, 1)}
+    qr/No LIMs data for run 4951 position 1/, 'No data in LIMS warehouse for this run';
 };
 
 1;
