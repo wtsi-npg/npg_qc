@@ -7,7 +7,9 @@ use Carp;
 use File::Spec::Functions qw( catdir );
 use File::Basename;
 use npg_qc::autoqc::types;
+use npg::api::run;
 use Readonly;
+
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find 
@@ -23,7 +25,7 @@ Readonly::Scalar my $RNASEQC_GTF_TTYPE_COL  => 2;
 Readonly::Scalar my $RNASEQC_GTF_REPOSITORY => q[/nfs/srpipe_references/];
 Readonly::Scalar my $RNASEQC_GTF_DIRECTORY  => q[RNA-SeQC];
 Readonly::Scalar my $RNASEQC_DEFAULT_OUTDIR => q[rna_seqc_output];
-Readonly::Scalar my $JAVA_MAX_HEAP_SIZE     => q[7000m];
+Readonly::Scalar my $JAVA_MAX_HEAP_SIZE     => q[4000m];
 Readonly::Scalar my $JAVA_GC_TYPE           => q[+UseSerialGC];
 Readonly::Scalar my $JAVA_USE_PERF_DATA     => q[-UsePerfData];
 
@@ -301,11 +303,19 @@ npg_qc::autoqc::checks::rna_seqc - a QC check that runs RNA-SeQC software over a
 
 =item File::Spec
 
+=item File::Basename
+
+=item npg_qc::autoqc::types
+
+=item npg::api::run
+ 
 =item Readonly
 
-=item npg_tracking::data::bait::find
+=item npg_tracking::data::reference::find
 
 =item npg_common::roles::software_location
+
+=item npg_tracking::data::transcriptome::find
 
 =back
 
