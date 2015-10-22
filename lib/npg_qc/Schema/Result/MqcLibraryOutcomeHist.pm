@@ -163,20 +163,20 @@ __PACKAGE__->set_primary_key('id_mqc_library_outcome_hist');
 
 Type: belongs_to
 
-Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeDict>
 
 =cut
 
 __PACKAGE__->belongs_to(
   'mqc_outcome',
-  'npg_qc::Schema::Result::MqcOutcomeDict',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeDict',
   { id_mqc_outcome => 'id_mqc_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-18 14:34:46
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5GjFSZPPAnqEPdxq3KQluQ
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-22 15:31:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vTqZreqSFOAD2/vYba2e5A
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 our $VERSION = '0';

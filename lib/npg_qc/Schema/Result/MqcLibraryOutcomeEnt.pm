@@ -195,20 +195,20 @@ __PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position', 'tag_
 
 Type: belongs_to
 
-Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeDict>
 
 =cut
 
 __PACKAGE__->belongs_to(
   'mqc_outcome',
-  'npg_qc::Schema::Result::MqcOutcomeDict',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeDict',
   { id_mqc_outcome => 'id_mqc_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-18 14:34:46
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:enQroYzqNS2pZjTzOQye9A
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-22 15:31:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:R/a3rJ5Y1pgHjiWeoAMEkA
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 our $VERSION = '0';

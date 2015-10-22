@@ -926,6 +926,23 @@ CREATE TABLE `mqc_outcome_hist` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `mqc_library_outcome_dict`
+--
+
+DROP TABLE IF EXISTS `mqc_library_outcome_dict`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mqc_library_outcome_dict` (
+  `id_mqc_outcome` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `short_desc` varchar(50) NOT NULL,
+  `long_desc` varchar(150) DEFAULT NULL,
+  `iscurrent` tinyint(1) DEFAULT NULL COMMENT 'Catalog value still in use.',
+  `isvisible` tinyint(1) DEFAULT NULL COMMENT 'Is it visible in UI',
+  PRIMARY KEY (`id_mqc_outcome`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Dictionary table for plex level library MQC';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `mqc_library_outcome_ent`
 --
 
@@ -944,8 +961,7 @@ CREATE TABLE `mqc_library_outcome_ent` (
   `reported` TIMESTAMP NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
   PRIMARY KEY (`id_mqc_library_outcome_ent`),
   UNIQUE KEY `id_run_UNIQUE` (`id_run`,`position`,`tag_index`),
-  KEY `fk_mqc_library_outcome_ent_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
-  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_library_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_library_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
 COMMENT = 'Entity table for library manual qc';
 
@@ -966,8 +982,7 @@ CREATE TABLE `mqc_library_outcome_hist` (
   `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
   PRIMARY KEY (`id_mqc_library_outcome_hist`),
-  KEY `fk_mqc_library_outcome_hist_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
-  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_outcome_dict10` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_mqc_library_outcome_hist_mqc_library_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_library_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
 COMMENT = 'Historic table for library manual qc';
 

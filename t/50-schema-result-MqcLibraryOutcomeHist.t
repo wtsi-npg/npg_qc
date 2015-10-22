@@ -32,7 +32,7 @@ subtest 'Test insert' => sub {
 };
 
 subtest 'Test insert with tag_index null' => sub {
-  plan tests => 4;
+  plan tests => 8;
   my $values = {
       'id_run'         => 1, 
       'position'       => 2,
@@ -48,6 +48,22 @@ subtest 'Test insert with tag_index null' => sub {
   my $hist = $schema->resultset($table)->find({'id_run'=>1, 'position'=>2});
   ok ($hist, q[one row matches with find through key]);
   is($hist->tag_index, undef, q[tag_index is undefined]);
+
+  $rs = $schema->resultset($table)->search({});
+  is ($rs->count, 2, q[Two rows in the table]);
+  $values = {
+    'id_run'         => 2, 
+    'position'       => 10,
+    'id_mqc_outcome' => 1, 
+    'username'       => 'user',
+    'modified_by'    => 'user'
+  };
+  $rs = $schema->resultset($table);
+  lives_ok {$rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert()} 'lane record inserted';
+  my $rs1 = $rs->search({'id_run' => 2});
+  is ($rs1->count, 1, q[one row created in the table]);
+  my $row = $rs1->next;
+  is($row->tag_index, undef, 'Tag index returns as default value');
 };
 
 subtest 'Test update' => sub {
@@ -56,7 +72,7 @@ subtest 'Test update' => sub {
     'id_run'         => 1, 
     'position'       => 3,
     'tag_index'      => 1,
-    'id_mqc_outcome' => 0, 
+    'id_mqc_outcome' => 2, 
     'username'       => 'user', 
   };
 
