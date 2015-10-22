@@ -2,11 +2,30 @@ package npg_qc_viewer::Model::NpgQcDB;
 
 use Moose;
 use namespace::autoclean;
+use Carp;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
-## no critic (Documentation::RequirePodAtEnd)
+
+__PACKAGE__->config(
+  schema_class => 'npg_qc::Schema',
+  connect_info => [], #a fall-back position if connect_info is not defined in the config file
+);
+
+sub is_final_outcome {
+  my ($self, $outcome) = @_;
+  if (!$outcome) {
+    croak 'Outcome missing';
+  }
+  my $row = $self->resultset('MqcOutcomeDict')->search({short_desc => $outcome})->next;
+  return $row && $row->is_final_outcome;
+}
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+__END__
 
 =head1 NAME
 
@@ -20,17 +39,10 @@ A model for the NPG QC database DBIx schema
 
 =head1 SUBROUTINES/METHODS
 
-=cut
+=head2 is_final_outcome
 
-__PACKAGE__->config(
-  schema_class => 'npg_qc::Schema',
-  connect_info => [], #a fall-back position if connect_info is not defined in the config file
-);
-
-__PACKAGE__->meta->make_immutable;
-
-1;
-__END__
+ Given a short description of the lane manual qc outcome returns true if the
+ outcome is valid and final, false otherwise.
 
 =head1 DIAGNOSTICS
 
@@ -47,6 +59,8 @@ __END__
 =item Catalyst::Model::DBIC::Schema
 
 =item npg_qc::Schema
+
+=item Carp
 
 =back
 

@@ -3,10 +3,14 @@ package npg_qc_viewer::Model::MLWarehouseDB;
 use Moose;
 use namespace::autoclean;
 use Carp;
+use Readonly;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
+
+Readonly::Scalar our $HASH_KEY_QC_TAGS     => q[qc_tags];
+Readonly::Scalar our $HASH_KEY_NON_QC_TAGS => q[non_qc_tags];
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -51,17 +55,20 @@ sub search_product_metrics {
     croak q[Id run not defined when querying metrics by me.id_run];
   }
 
+  my $resultset = $self->resultset('IseqProductMetric');
+  my $cs_alias = $resultset->current_source_alias;
+
   my $where = {};
   foreach my $key (keys %{$run_details}) {
-    $where->{'me.' . $key} = $run_details->{$key};
+    $where->{$cs_alias . q[.] . $key} = $run_details->{$key};
   }
 
-  my $rs = $self->resultset('IseqProductMetric')->
-                  search($where, {
-                    prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-                    order_by => qw[ me.id_run me.position me.tag_index ],
-                    cache    => 1,
-                  },);
+  my $rs = $resultset->
+             search($where, {
+               prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+               order_by => qw[ me.id_run me.position me.tag_index ],
+               cache    => 1,
+             },);
 
   return $rs;
 }
@@ -153,7 +160,10 @@ sub search_sample_by_sample_id {
     croak q[Id sample lims not defined when querying sample lims];
   };
 
-  my $where = { 'me.id_sample_lims' => $id_sample_lims, };
+  my $resultset = $self->resultset('Sample');
+  my $cs_alias = $resultset->current_source_alias;
+
+  my $where = { $cs_alias . '.id_sample_lims' => $id_sample_lims, };
 
   my $rs = $self->resultset('Sample')->
                     search($where, {
@@ -161,6 +171,56 @@ sub search_sample_by_sample_id {
   });
 
   return $rs;
+}
+
+=head2 fetch_tag_index_array_for_run_position
+
+  A hash containing tag indices for a lane is returned. Indices
+  are split into two arraya - tags that are subject to qc and not.
+
+=cut
+sub fetch_tag_index_array_for_run_position {
+  my ($self, $id_run, $position) = @_;
+
+  if(!defined $id_run) {
+    croak q[Id run is required when searching for tag_indexes but not defined];
+  }
+  if(!defined $position) {
+    croak q[Position is required when searching for tag_indexes but not defined];
+  }
+
+  my $rs = $self->resultset('IseqProductMetric')->search(
+    {
+      'me.id_run'     => $id_run,
+      'me.position'   => $position,
+    },
+    {
+      prefetch => 'iseq_flowcell',
+      order_by => qw[ me.id_run me.position me.tag_index ],
+      cache    => 1,
+    }
+  );
+  if ($rs->count == 0) {
+    croak qq[No LIMs data for run $id_run position $position];
+  }
+
+  my $tags = {$HASH_KEY_QC_TAGS => [], $HASH_KEY_NON_QC_TAGS => [],};
+  while (my $row = $rs->next) {
+    my $tag_index = $row->tag_index;
+    if (!defined $tag_index) {
+      next;
+    }
+    if ($tag_index && !$row->iseq_flowcell) {
+      croak 'Flowcell data missing';
+    }
+    if ($tag_index == 0 || $row->iseq_flowcell->entity_type eq 'library_indexed_spike') {
+      push @{$tags->{$HASH_KEY_NON_QC_TAGS}}, $tag_index;
+    } else {
+      push @{$tags->{$HASH_KEY_QC_TAGS}}, $tag_index;
+    }
+  }
+
+  return $tags;
 }
 
 __PACKAGE__->meta->make_immutable;

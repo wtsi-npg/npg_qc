@@ -119,6 +119,36 @@ __PACKAGE__->set_primary_key('id_mqc_outcome');
 
 =head1 RELATIONS
 
+=head2 mqc_library_outcome_ents
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeEnt>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_library_outcome_ents',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeEnt',
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 mqc_library_outcome_hists
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeHist>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_library_outcome_hists',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeHist',
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 mqc_outcome_ents
 
 Type: has_many
@@ -150,8 +180,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yp0Z5RWtf5JyeRvWEJ5uGA
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-08-25 14:33:40
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fSPwWGXYSpjAyHfa6FbXWQ
 
 our $VERSION = '0';
 
@@ -165,9 +195,19 @@ sub is_accepted {
   return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
 }
 
+sub is_rejected {
+  my $self = shift;
+  return $self->short_desc =~ m{rejected}ism; #The short description includes the word rejected.
+}
+
 sub is_final_accepted {
   my $self = shift;
   return $self->is_final_outcome && $self->is_accepted;
+}
+
+sub is_undecided {
+  my $self = shift;
+  return $self->short_desc =~ m{undecided}ism;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -193,13 +233,23 @@ Catalog for manual MQC statuses.
 
 =head2 is_accepted
 
-  Utility method which checks the short description to decide if the outcome can 
+  Utility method which checks the short description to decide if the outcome can
   be considered accepted.
-  
+
+=head2 is_rejected
+
+  Utility method which checks the short description to decide if the outcome can
+  be considered rejected.
+
 =head2 is_final_accepted
 
-  Utility method which checks the short description to decide if the outcome can 
+  Utility method which checks the short description to decide if the outcome can
   be considered final and accepted.
+
+=head2 is_undecided
+
+  Utility method which checks the short description to decide if the outcome can
+  be considered as undecided.
 
 =cut
 

@@ -200,130 +200,69 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ifqd4uXLKB/KQXtKle8Tnw
 
-our $VERSION = '0';
-
 use Carp;
-use DateTime;
-use DateTime::TimeZone;
+use Array::Compare;
 
-sub _get_time_now {
-  return DateTime->now(time_zone=> DateTime::TimeZone->new(name => q[local]));
-}
+with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
 
-around 'update' => sub {
-  my $orig = shift;
-  my $self = shift;
-  $self->last_modified($self->_get_time_now);
-  my $return_super = $self->$orig(@_);
-
-  $self->_create_historic();
-  return $return_super;
-};
-
-around 'insert' => sub {
-  my $orig = shift;
-  my $self = shift;
-  $self->last_modified($self->_get_time_now);
-  my $return_super = $self->$orig(@_);
-
-  $self->_create_historic();
-  return $return_super;
-};
-
-sub update_outcome {
-  my ($self, $outcome, $username) = @_;
-
-  #Validation
-  if(!defined $outcome){
-    croak q[Mandatory parameter 'outcome' missing in call];
-  }
-  if(!defined $username){
-    croak q[Mandatory parameter 'username' missing in call];
-  }
-  if ($username =~ /^\d+$/smx) {
-    croak "Have a number $username instead as username";
-  }
-  my $outcome_dict_obj = $self->_valid_outcome($outcome);
-  if($outcome_dict_obj) { # The new outcome is a valid one
-    my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
-    #There is a row that matches the id_run and position
-    if ($self->in_storage) {
-      #Check if previous outcome is not final
-      if($self->mqc_outcome->is_final_outcome) {
-        croak(sprintf 'Error while trying to update a final outcome for id_run %i position %i',
-              $self->id_run, $self->position);
-      } else { #Update
-        $self->update({'id_mqc_outcome' => $outcome_id, 'username' => $username, 'modified_by' => $username});
-      }
-    } else { #Is a new row just insert.      
-      $self->id_mqc_outcome($outcome_id);
-      $self->username($username);
-      $self->modified_by($username);
-      $self->insert();
-    }
-  } else {
-    croak(sprintf 'Error while trying to transit id_run %i position %i to a non-existing outcome "%s".',
-          $self->id_run, $self->position, $outcome);
-  }
-  return 1;
-}
-
-sub has_final_outcome {
-  my $self = shift;
-  return $self->mqc_outcome->is_final_outcome;
-}
-
-sub is_accepted {
-  my $self = shift;
-  return $self->mqc_outcome->is_accepted;
-}
-
-sub is_final_accepted {
-  my $self = shift;
-  return $self->mqc_outcome->is_final_accepted;
-}
-
-#Create and save historic from the entity current data.
-sub _create_historic {
-  my $self = shift;
-  my $rs = $self->result_source->schema->resultset('MqcOutcomeHist');
-  my $historic = $rs->create({
-    id_run         => $self->id_run,
-    position       => $self->position,
-    id_mqc_outcome => $self->id_mqc_outcome,
-    username       => $self->username,
-    last_modified  => $self->last_modified,
-    modified_by    => $self->modified_by});
-
-  return 1;
-}
-
-#Fetches valid outcome object from the database.
-sub _valid_outcome {
-  my ($self, $outcome) = @_;
-
-  my $rs = $self->result_source->schema->resultset('MqcOutcomeDict');
-  my $outcome_dict;
-  if ($outcome =~ /\d+/xms) {
-    $outcome_dict = $rs->find($outcome);
-  } else {
-    $outcome_dict = $rs->search({short_desc => $outcome})->next;
-  }
-  if ((defined $outcome_dict) && $outcome_dict->iscurrent) {
-    return $outcome_dict;
-  }
-  return;
-}
+our $VERSION = '0';
 
 sub update_reported {
   my $self = shift;
-  my $username = $ENV{'USER'} || 'mqc_reporter'; #Cron username or default username for the application.
+  my $username = $ENV{'USER'} || croak 'Failed to get username';
   if(!$self->has_final_outcome) {
-    croak(sprintf 'Error while trying to update_reported non-final outcome id_run %i position %i".',
+    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update".',
           $self->id_run, $self->position);
   }
-  #It does not check if the reported is null just in case we need to update a reported one.
-  return $self->update({'reported' => $self->_get_time_now, 'modified_by' => $username}); #Only update the modified_by field.
+  return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
+}
+
+sub validate_outcome_of_libraries {
+  my ($self, $outcome_dict_obj, $tag_indexes_in_lims, $library_outcome_ents) = @_;
+
+  if($outcome_dict_obj->is_accepted) {
+    #all plexes with qc
+    if(scalar @{ $tag_indexes_in_lims } == $library_outcome_ents->count ) {
+      my $tag_indexes_in_qc = [];
+      while(my $library = $library_outcome_ents->next) {
+        if ($library->is_undecided) {
+          croak('All plex libraries should either pass or fail.');
+        }
+        push @{$tag_indexes_in_qc}, $library->tag_index;
+      }
+
+      my $comp = Array::Compare->new();
+      if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
+        croak('Tag indexes in LIMs and QC do not match.');
+      }
+    } else {
+      croak('All plex libraries have to be QC-ed.');
+    }
+  } else {
+    #All plexes with undecided
+    while(my $library = $library_outcome_ents->next) {
+      if (!$library->is_undecided) {
+        croak('All plex libraries should have undecided QC outcome.');
+      }
+    }
+  }
+  return 1;
+}
+
+sub update_outcome_with_libraries {
+  my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
+
+  my $outcome_dict_object = $self->find_valid_outcome($outcome);
+  if( $outcome_dict_object->is_final_outcome
+        && scalar @{$tag_indexes_in_lims} <= $self->mqc_lib_limit ) {
+    my $rs_library_ent = $self->result_source->schema->resultset( q[MqcLibraryOutcomeEnt]);
+    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes($self->id_run, $self->position);
+    $self->validate_outcome_of_libraries($outcome_dict_object, $tag_indexes_in_lims, $outcomes_libraries);
+    $rs_library_ent->batch_update_libraries( $self, $tag_indexes_in_lims, $username );
+  }
+
+  $self->update_outcome($outcome, $username);
+  return 1;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -335,33 +274,13 @@ __END__
 
 =head1 DESCRIPTION
 
-Catalog for manual MQC statuses.
+Entity for lane MQC outcome.
 
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
-
-=head2 update_outcome
-
-  Updates the outcome of the entity with values provided.
-
-  $obj->($outcome, $username)
-
-=head2 has_final_outcome
-
-  Returns true id this entry corresponds to a final outcome, otherwise returns false.
-  
-=head2 is_accepted
-
-  Returns the result of checking if the outcome is considered accepted. Delegates the 
-  check to L<npg_qc::Schema::Result::MqcOutcomeDict>
-  
-=head2 is_final_accepted
-
-  Returns the result of checking if the outcome is considered final and accepted. 
-  Delegates the check to L<npg_qc::Schema::Result::MqcOutcomeDict>
 
 =head2 update_reported
 
@@ -370,13 +289,28 @@ Catalog for manual MQC statuses.
 
 =head2 update
 
-  Default DBIx update method extended to create an entry in the table corresponding to 
+  With around on DBIx update method to create an entry in the table corresponding to 
   the MqcOutcomeHist class
 
 =head2 insert
 
-  Default DBIx insert method extended to create an entry in the table corresponding to 
+  With around on DBIx insert method to create an entry in the table corresponding to 
   the MqcOutcomeHist class
+
+=head2 data_for_historic
+
+  Returns a hash with elements for the historic representation of the entity, a 
+  subset of values of the instance.
+
+=head2 validate_outcome_of_libraries
+
+  Validates if overall state for the lane and the libraries allows for a final
+  outcome in the lane.
+
+=head2 update_outcome_with_libraries
+
+  Updates children library mqc outcomes then updates outcome of lane mqc entity
+  passed as parameter.
 
 =head1 DEPENDENCIES
 
@@ -397,10 +331,6 @@ Catalog for manual MQC statuses.
 =item DBIx::Class::Core
 
 =item Carp
-
-=item DateTime
-
-=item DateTime::TimeZone
 
 =back
 

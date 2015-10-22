@@ -22,7 +22,7 @@ sub generate_url {
   if (!$values) {
     croak 'LIMS values object is missing';
   }
-  my $expected_type = 'npg_qc_viewer::TransferObjects::ProductMetrics4RunTO';
+  my $expected_type = 'npg_qc_viewer::Util::TransferObject';
   my $actual = ref $values || q[];
   if (ref $values ne $expected_type) {
     croak "$expected_type is expected, got $actual";

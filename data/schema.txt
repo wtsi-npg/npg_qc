@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 5.5.32, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.41, for debian-linux-gnu (x86_64)
 --
 -- Host: nqct-db    Database: npgqct
 -- ------------------------------------------------------
@@ -205,6 +205,18 @@ CREATE TABLE `bam_flagstats` (
   UNIQUE KEY `unq_run_lane_index_sp_flag` (`id_run`,`position`,`tag_index`,`human_split`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `cache_query`
@@ -560,7 +572,7 @@ CREATE TABLE `gc_bias` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_gc_bias`),
   UNIQUE KEY `unq_run_lane_gc_bias` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -914,6 +926,52 @@ CREATE TABLE `mqc_outcome_hist` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `mqc_library_outcome_ent`
+--
+
+DROP TABLE IF EXISTS `mqc_library_outcome_ent`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mqc_library_outcome_ent` (
+  `id_mqc_library_outcome_ent` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_run` BIGINT(20) UNSIGNED NOT NULL,
+  `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane',
+  `tag_index` BIGINT(20) NOT NULL DEFAULT '-1',
+  `id_mqc_outcome` SMALLINT UNSIGNED NOT NULL,
+  `username` CHAR(128) NULL DEFAULT NULL COMMENT 'Web interface username',
+  `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
+  `reported` TIMESTAMP NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
+  PRIMARY KEY (`id_mqc_library_outcome_ent`),
+  UNIQUE KEY `id_run_UNIQUE` (`id_run`,`position`,`tag_index`),
+  KEY `fk_mqc_library_outcome_ent_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
+  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE = InnoDB
+COMMENT = 'Entity table for library manual qc';
+
+--
+-- Table structure for table `mqc_library_outcome_hist`
+--
+
+DROP TABLE IF EXISTS `mqc_library_outcome_hist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mqc_library_outcome_hist` (
+  `id_mqc_library_outcome_hist` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_run` BIGINT(20) UNSIGNED NOT NULL,
+  `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane',
+  `tag_index` BIGINT(20) NOT NULL DEFAULT '-1',
+  `id_mqc_outcome` SMALLINT UNSIGNED NOT NULL,
+  `username` CHAR(128) NULL DEFAULT NULL COMMENT 'Web interface username',
+  `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
+  PRIMARY KEY (`id_mqc_library_outcome_hist`),
+  KEY `fk_mqc_library_outcome_hist_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
+  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_outcome_dict10` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE = InnoDB
+COMMENT = 'Historic table for library manual qc';
+
+--
 -- Table structure for table `offset`
 --
 
@@ -1202,6 +1260,81 @@ CREATE TABLE `run_timeline` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `samtools_stats`
+--
+
+DROP TABLE IF EXISTS `samtools_stats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `samtools_stats` (
+  `id_samtools_stats` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+  `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `filter` varchar(8) NOT NULL COMMENT 'Filter used to produce the stats file',
+  `stats` mediumblob NOT NULL COMMENT 'Compressed samtools stats file content',
+  PRIMARY KEY (`id_samtools_stats`),
+  UNIQUE KEY `unq_seqstats` (`id_seq_composition`,`filter`),
+  CONSTRAINT `seq_sum_compos_ss` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `seq_component`
+--
+
+DROP TABLE IF EXISTS `seq_component`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `seq_component` (
+  `id_seq_component` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+  `id_run` bigint(20) unsigned NOT NULL COMMENT 'Numeric run id',
+  `position` tinyint(1) unsigned NOT NULL COMMENT 'Numeric position (lane number)',
+  `tag_index` mediumint(8) unsigned DEFAULT NULL COMMENT 'An optional numeric tag index',
+  `subset` varchar(10) DEFAULT NULL COMMENT 'An optional sequence subset',
+  `digest` char(64) NOT NULL COMMENT 'A SHA256 hex digest of the component JSON representation as defined in npg_tracking::glossary::composition::component',
+  PRIMARY KEY (`id_seq_component`),
+  UNIQUE KEY `unq_seq_compon_d` (`digest`),
+  KEY `unq_seq_compos_rp` (`id_run`,`position`,`tag_index`,`subset`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `seq_component_composition`
+--
+
+DROP TABLE IF EXISTS `seq_component_composition`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `seq_component_composition` (
+  `id_seq_comcom` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+  `id_seq_component` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_component column of the seq_component table',
+  `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `size` tinyint(3) unsigned NOT NULL COMMENT 'Total number of components in a composition',
+  PRIMARY KEY (`id_seq_comcom`),
+  UNIQUE KEY `unq_seq_comcom` (`id_seq_component`,`id_seq_composition`),
+  KEY `seq_comcom_cmpos` (`id_seq_composition`,`size`),
+  CONSTRAINT `seq_comcom_cmpon` FOREIGN KEY (`id_seq_component`) REFERENCES `seq_component` (`id_seq_component`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `seq_comcom_cmpos` FOREIGN KEY (`id_seq_composition`, `size`) REFERENCES `seq_composition` (`id_seq_composition`, `size`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `seq_composition`
+--
+
+DROP TABLE IF EXISTS `seq_composition`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `seq_composition` (
+  `id_seq_composition` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+  `digest` char(64) NOT NULL COMMENT 'A SHA256 hex digest of the JSON representation of the composition as defined in npg_tracking::glossary::composition',
+  `size` tinyint(3) unsigned NOT NULL COMMENT 'Total number of components in a composition',
+  PRIMARY KEY (`id_seq_composition`),
+  UNIQUE KEY `unq_seq_compos_d` (`digest`),
+  UNIQUE KEY `unq_seq_compos_ps` (`id_seq_composition`,`size`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `sequence_error`
 --
 
@@ -1240,6 +1373,29 @@ CREATE TABLE `sequence_error` (
   PRIMARY KEY (`id_sequence_error`),
   UNIQUE KEY `unq_rlts_sequence_error` (`id_run`,`position`,`tag_index`,`sequence_type`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `sequence_summary`
+--
+
+DROP TABLE IF EXISTS `sequence_summary`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sequence_summary` (
+  `id_sequence_summary` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+  `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `sequence_format` varchar(6) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Sequencing file format, e.g. SAM, BAM',
+  `header` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'File header, excluding SQ lines, the field is searchable',
+  `seqchksum` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'Alignment and header independent sequence file digest, see bamseqchksum in https://github.com/wtsi-npg/biobambam, default checksum',
+  `seqchksum_sha512` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'Alignment and header independent sequence file digest, see bamseqchksum in https://github.com/wtsi-npg/biobambam, sha512primesums512 checksum',
+  `md5` char(32) COLLATE utf8_unicode_ci NOT NULL COMMENT 'md5 of the sequence file',
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Date the record was created',
+  `iscurrent` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT 'Boolean flag to indicate that the record is current, defaults to 1',
+  PRIMARY KEY (`id_sequence_summary`),
+  KEY `seq_sum_compos` (`id_seq_composition`),
+  CONSTRAINT `seq_sum_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1534,4 +1690,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-07-08 12:26:42
+-- Dump completed on 2015-09-22 12:12:29
