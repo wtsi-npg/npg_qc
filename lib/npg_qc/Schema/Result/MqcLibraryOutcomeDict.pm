@@ -52,7 +52,7 @@ __PACKAGE__->table('mqc_library_outcome_dict');
 
 =head1 ACCESSORS
 
-=head2 id_mqc_outcome
+=head2 id_mqc_library_outcome
 
   data_type: 'smallint'
   extra: {unsigned => 1}
@@ -88,7 +88,7 @@ Is it visible in UI
 =cut
 
 __PACKAGE__->add_columns(
-  'id_mqc_outcome',
+  'id_mqc_library_outcome',
   {
     data_type => 'smallint',
     extra => { unsigned => 1 },
@@ -109,13 +109,13 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</id_mqc_outcome>
+=item * L</id_mqc_library_outcome>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key('id_mqc_outcome');
+__PACKAGE__->set_primary_key('id_mqc_library_outcome');
 
 =head1 RELATIONS
 
@@ -130,7 +130,7 @@ Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeEnt>
 __PACKAGE__->has_many(
   'mqc_library_outcome_ents',
   'npg_qc::Schema::Result::MqcLibraryOutcomeEnt',
-  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_library_outcome' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
@@ -145,13 +145,13 @@ Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeHist>
 __PACKAGE__->has_many(
   'mqc_library_outcome_hists',
   'npg_qc::Schema::Result::MqcLibraryOutcomeHist',
-  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_library_outcome' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-21 14:30:00
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2hjtXYVCxtkxb/CxzjdjUA
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CoqhznB0+X8oK27t33skvw
 
 our $VERSION = '0';
 
