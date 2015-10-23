@@ -27,13 +27,13 @@ my $json = q {
 
 my $values = from_json($json); 
 my $rs = $schema->resultset('SplitStats');
-isa_ok($rs->new($values), 'npg_qc::Schema::Result::SplitStats');
+isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::SplitStats');
 
 {
   my %values1 = %{$values};
   my $v1 = \%values1;
 
-  $rs->result_class->deflate_unique_key_components($v1);
+  $rs->deflate_unique_key_components($v1);
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'lane record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);

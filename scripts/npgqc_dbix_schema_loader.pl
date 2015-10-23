@@ -50,13 +50,15 @@ make_schema_at(
         debug               => 0,
         dump_directory      => q[lib],
         naming              => { 
-            relationships => 'current', 
-            monikers => 'current', 
+            relationships    => 'current', 
+            monikers         => 'current', 
             column_accessors => 'preserve',
         },
         skip_load_external  => 1,
         use_moose           => 1,
         preserve_case       => 1,
+        use_namespaces      => 1,
+        default_resultset_class => 'ResultSet',
 
         rel_name_map        => sub {#Rename the id relationship so we can access flat versions of the objects and not only the whole trees from ORM.
           my %h = %{shift@_};

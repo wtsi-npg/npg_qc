@@ -1,7 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - transparent search query for autoqc objects irrespectively of the details of
+   object's database implementation (in-table identifies or composition)
+ - custom parent class for resultset objects
+ - calling ->new() on resultset object to create a new result replaced with
+   calling more intuitive ->new_result()
+
 release 59.2
-  - library-level manual QC for individual plexes.
+ - library-level manual QC for individual plexes.
 
 release 59.1
  - 'write2file' method of autoqc result objects removed since it duplicated
