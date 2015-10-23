@@ -9,12 +9,12 @@ use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Schema';
 
 __PACKAGE__->load_namespaces(
-    default_resultset_class => "ResultSet",
+    default_resultset_class => 'ResultSet',
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 15:34:36
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:y0/AS5S2bUtuLiLECh2kzA
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 16:29:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1VnoZJVlyZFagZssn5EKNg
 
 use namespace::autoclean;
 our $VERSION = '0';
