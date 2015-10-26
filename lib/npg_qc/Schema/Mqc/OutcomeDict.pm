@@ -2,7 +2,6 @@ package npg_qc::Schema::Mqc::OutcomeDict;
 
 use Moose::Role;
 use Carp;
-use Readonly;
 
 our $VERSION = '0';
 
@@ -86,8 +85,6 @@ __END__
 =over
 
 =item Moose::Role
-
-=item Readonly
 
 =item Carp
 
