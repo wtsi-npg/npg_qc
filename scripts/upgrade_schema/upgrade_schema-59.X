@@ -32,9 +32,11 @@ ALTER TABLE `mqc_library_outcome_hist` ADD CONSTRAINT `fk_mqc_library_outcome_hi
 --
 GRANT SELECT ON `mqc_library_outcome_dict` TO nqcro;
 --
---
+-- Updating plex level library qc to new undecided final outcome where lanes have
+-- been rejected final.
 --
 START TRANSACTION;
+
 UPDATE mqc_outcome_ent, mqc_library_outcome_ent
   SET mqc_library_outcome_ent.id_mqc_outcome = 6 -- Undecided final
   WHERE mqc_outcome_ent.id_mqc_outcome = 4 -- Rejected final
@@ -57,4 +59,7 @@ INSERT INTO mqc_library_outcome_hist (id_run, position, tag_index, id_mqc_outcom
       entity.id_run,
       entity.position,
       entity.tag_index;
+
 COMMIT;
+
+
