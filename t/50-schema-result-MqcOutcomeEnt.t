@@ -39,16 +39,28 @@ my $dict_table = 'MqcOutcomeDict';
     'last_modified'=>DateTime->now(),
     'modified_by'=>'user'};
 
-  my $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>1}); #Search historic that matches latest change
+  my $hist_object_rs = $schema->resultset($hist_table)->search({
+    'id_run'=>10,
+    'position'=>1,
+    'id_mqc_outcome'=>1
+  }); #Search historic that matches latest change
   is ($hist_object_rs->count, 0, q[no row matches in the historic table before insert in entity]);
 
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
 
-  my $rs = $schema->resultset($table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>1});
+  my $rs = $schema->resultset($table)->search({
+    'id_run'=>10,
+    'position'=>1,
+    'id_mqc_outcome'=>1
+  });
   is ($rs->count, 1, q[one row created in the entity table]);
   
-  $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>10, 'position'=>1, 'id_mqc_outcome'=>1}); #Search historic that matches latest change
+  $hist_object_rs = $schema->resultset($hist_table)->search({
+    'id_run'=>10,
+    'position'=>1,
+    'id_mqc_outcome'=>1
+  }); #Search historic that matches latest change
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after insert in entity]);
 }
 
@@ -68,7 +80,10 @@ my $dict_table = 'MqcOutcomeDict';
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
 
-  my $rs = $schema->resultset($table)->search({'id_run'=>1, 'position'=>2});
+  my $rs = $schema->resultset($table)->search({
+    'id_run'=>1,
+    'position'=>2
+  });
   is ($rs->count, 1, q[one row matches in the table]);  
 }
 
@@ -82,8 +97,15 @@ my $dict_table = 'MqcOutcomeDict';
 
   my $object = $schema->resultset($table)->create($values); #Insert new entity
   my $rs = $schema->resultset($table);
-  $rs->find({'id_run'=>1, 'position'=>3})->update({'id_mqc_outcome'=>2}); #Find and update the outcome in the new outcome
-  $rs = $schema->resultset($table)->search({'id_run'=>1, 'position'=>3, 'id_mqc_outcome'=>2}); #Search the new outcome
+  $rs->find({
+    'id_run'=>1,
+    'position'=>3
+  })->update({'id_mqc_outcome'=>2}); #Find and update the outcome in the new outcome
+  $rs = $schema->resultset($table)->search({
+    'id_run'=>1,
+    'position'=>3,
+    'id_mqc_outcome'=>2
+  }); #Search the new outcome
   is ($rs->count, 1, q[one row matches in the entity table after update]);
   my $ent = $rs->next;
   cmp_ok($ent->username, 'eq', $ent->modified_by, 'Username equals modified_by after manual update.');
@@ -130,16 +152,28 @@ subtest 'Data for historic' => sub {
     'last_modified'=>DateTime->now(),
     'modified_by'=>'user'};
 
-  my $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3});
+  my $hist_object_rs = $schema->resultset($hist_table)->search({
+    'id_run'=>100,
+    'position'=>4,
+    'id_mqc_outcome'=>3
+  });
   is ($hist_object_rs->count, 0, q[no row matches in the historic table before update in entity]);
 
   my $object = $schema->resultset($table)->create($values);
   my $rs = $schema->resultset($table);
   $rs->find({'id_run'=>100, 'position'=>4})->update({'id_mqc_outcome'=>3}); #Find and update the outcome in the new outcome
-  $rs = $schema->resultset($table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3}); #Search the new outcome
+  $rs = $schema->resultset($table)->search({
+    'id_run'=>100,
+    'position'=>4,
+    'id_mqc_outcome'=>3
+  }); #Search the new outcome
   is ($rs->count, 1, q[one row matches in the entity table after update]);
   
-  $hist_object_rs = $schema->resultset($hist_table)->search({'id_run'=>100, 'position'=>4, 'id_mqc_outcome'=>3});
+  $hist_object_rs = $schema->resultset($hist_table)->search({
+    'id_run'=>100,
+    'position'=>4,
+    'id_mqc_outcome'=>3
+  });
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after update in entity]);
   my $all = $schema->resultset($table)->get_ready_to_report();
   is($all->count, 1, q[There is one entity ready to be reported]);
@@ -158,7 +192,9 @@ subtest 'Data for historic' => sub {
   $object->last_modified(DateTime->now());
   my $in = $object->in_storage; #Row status from database
   if($in) { #Entity exists
-    my $outcome_dict = $schema->resultset($dict_table)->find($object->id_mqc_outcome);
+    my $outcome_dict = $schema->resultset($dict_table)
+                              ->find($object
+                              ->id_mqc_outcome);
     if($outcome_dict->is_final_outcome) {
       print("Problem trying to update final outcome");
     } else {
@@ -168,7 +204,11 @@ subtest 'Data for historic' => sub {
     $object->id_mqc_outcome($status);
     $object->insert();
   }
-  my $rs = $schema->resultset($table)->search({'id_run'=>110, 'position'=>1, 'id_mqc_outcome'=>1});
+  my $rs = $schema->resultset($table)->search({
+    'id_run'=>110,
+    'position'=>1,
+    'id_mqc_outcome'=>1
+  });
   is ($rs->count, 1, q[one row matches in the entity table after outcome update]);
 }
 
@@ -187,7 +227,11 @@ subtest 'Data for historic' => sub {
   ok(defined $outcome_dict, q[The dictionary is defined for outcome]);
   is($outcome_dict->id_mqc_outcome, 1, q[The dictionary object has correct value for key]);
 
-  my $rs = $schema->resultset($table)->search({'id_run'=>210, 'position'=>1, 'id_mqc_outcome'=>1});
+  my $rs = $schema->resultset($table)->search({
+    'id_run'=>210,
+    'position'=>1,
+    'id_mqc_outcome'=>1
+  });
   is ($rs->count, 1, q[one row created in the table]);
   $object = $rs->next();
   is($object->id_mqc_outcome, 1, q[The outcome scalar is there and has correct value]);
@@ -204,7 +248,11 @@ subtest 'Data for historic' => sub {
   $object = $schema->resultset($table)->find_or_new($values);
   $object->update_outcome($status, $username);
   
-  $rs = $schema->resultset($table)->search({'id_run'=>210, 'position'=>1, 'id_mqc_outcome'=>4});
+  $rs = $schema->resultset($table)->search({
+    'id_run'=>210,
+    'position'=>1,
+    'id_mqc_outcome'=>4
+  });
   is ($rs->count, 1, q[One row matches in the entity table after outcome update]);
   
   ok(!$rs->next->is_accepted, q[The outcome is not considered accepted.]);
@@ -241,7 +289,11 @@ subtest 'Data for historic' => sub {
   ok(defined $outcome_dict, q[The dictionary is defined for outcome]);
   is($outcome_dict->id_mqc_outcome, 3, q[The dictionary object has correct value for key]);
   
-  my $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
+  my $rs = $schema->resultset($table)->search({
+    'id_run'=>220,
+    'position'=>1,
+    'id_mqc_outcome'=>3
+  });
   is ($rs->count, 1, q[one row created in the table]);
   $object = $rs->next();
   is($object->id_mqc_outcome, 3, q[The outcome scalar is there and has correct value]);
@@ -259,7 +311,11 @@ subtest 'Data for historic' => sub {
   ok($object->has_final_outcome, 'Object has final outcome.');
   throws_ok { $object->update_outcome($status, $username) } qr/Outcome is already final/, 'Invalid outcome transition croak';
   
-  $rs = $schema->resultset($table)->search({'id_run'=>220, 'position'=>1, 'id_mqc_outcome'=>3});
+  $rs = $schema->resultset($table)->search({
+    'id_run'=>220,
+    'position'=>1,
+    'id_mqc_outcome'=>3
+  });
   is ($rs->count, 1, q[One row matches in the entity table because there was no update]);
 }
 

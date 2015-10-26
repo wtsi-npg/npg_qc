@@ -92,20 +92,26 @@ sub _dictionaryrs_name {
 
 sub _create_historic {
   my $self = shift;
-  $self->result_source->schema->resultset($self->_historicrs_name)
-    ->create($self->data_for_historic);
+  $self->result_source
+       ->schema
+       ->resultset($self->_historicrs_name)
+       ->create($self->data_for_historic);
   return 1;
 }
 
 sub find_valid_outcome {
   my ($self, $outcome) = @_;
 
-  my $rs = $self->result_source->schema->resultset($self->_dictionaryrs_name);
+  my $rs = $self->result_source
+                ->schema
+                ->resultset($self->_dictionaryrs_name);
   my $outcome_dict;
   if ($outcome =~ /\d+/xms) {
     $outcome_dict = $rs->find($outcome);
   } else {
-    $outcome_dict = $rs->search({short_desc => $outcome})->next;
+    $outcome_dict = $rs->search({
+      short_desc => $outcome
+    })->next;
   }
   if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
     croak(sprintf "Outcome $outcome is invalid");

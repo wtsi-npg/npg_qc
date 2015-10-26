@@ -77,7 +77,12 @@ sub batch_update_libraries {
   my ($self, $lane_ent, $tag_indexes_in_lims, $username) = @_;
 
   foreach my $tag_index (@{$tag_indexes_in_lims}) {
-    my $library_ent = $self->search_library_outcome_ent($lane_ent->id_run, $lane_ent->position, $tag_index, $username);
+    my $library_ent = $self->search_library_outcome_ent(
+      $lane_ent->id_run,
+      $lane_ent->position,
+      $tag_index,
+      $username
+    );
     my $new_outcome = q[Undecided final];
 
     if ( $library_ent->in_storage ) {
@@ -88,7 +93,9 @@ sub batch_update_libraries {
           $new_outcome = q[Rejected final];
         } elsif ( !$library_ent->is_undecided ) {
           croak sprintf 'Unable to update unexpected outcome to final for id_run %i position %i outcome %s.',
-            $library_ent->id_run, $library_ent->position, $library_ent->mqc_outcome->short_desc;
+            $library_ent->id_run,
+            $library_ent->position,
+            $library_ent->mqc_outcome->short_desc;
         }
       } else {
         croak sprintf 'Unexpected plex libray qc final outcome was found for id_run %i position %i outcome %s.',

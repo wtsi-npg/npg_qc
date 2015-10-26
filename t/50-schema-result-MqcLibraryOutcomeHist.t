@@ -59,7 +59,9 @@ subtest 'Test insert with tag_index null' => sub {
     'modified_by'    => 'user'
   };
   $rs = $schema->resultset($table);
-  lives_ok {$rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert()} 'lane record inserted';
+  lives_ok {$rs->find_or_new($values)
+               ->set_inflated_columns($values)
+               ->update_or_insert()} 'lane record inserted';
   my $rs1 = $rs->search({'id_run' => 2});
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
@@ -78,8 +80,13 @@ subtest 'Test update' => sub {
 
   my $rs = $schema->resultset($table);
   lives_ok {$rs->create($values)} 'Insert new entity';
-  lives_ok {$rs->find({ 'id_run'=>1, 'position'=>3, 'tag_index'=>1 })->update({ 'id_mqc_outcome'=>2 })}
+  lives_ok {$rs->find({
+    'id_run'=>1,
+    'position'=>3,
+    'tag_index'=>1
+  })->update({ 'id_mqc_outcome'=>2 })}
     'Find and update the outcome in the new entity';
+
   is ($schema->resultset($table)->search({ 'id_run'    =>1,
                                            'position'  =>3,
                                            'tag_index' =>1,
