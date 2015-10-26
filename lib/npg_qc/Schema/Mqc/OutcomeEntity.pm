@@ -6,11 +6,11 @@ use DateTime::TimeZone;
 use Carp;
 use Readonly;
 
+our $VERSION = '0';
+
 requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
-
-our $VERSION = '0';
 
 Readonly::Scalar my $MQC_LIB_LIMIT => 50;
 

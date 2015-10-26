@@ -153,9 +153,9 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CoqhznB0+X8oK27t33skvw
 
-our $VERSION = '0';
-
 with qw/npg_qc::Schema::Mqc::OutcomeDict/;
+
+our $VERSION = '0';
 
 sub is_final_undecided {
   my $self = shift;

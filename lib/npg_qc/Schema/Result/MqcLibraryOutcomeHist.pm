@@ -178,10 +178,9 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+ZIiWq9L3iwF/8xGwys30g
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
-our $VERSION = '0';
-
 with qw/npg_qc::Schema::Flators/;
+
+our $VERSION = '0';
 
 __PACKAGE__->set_inflator4scalar('tag_index');
 

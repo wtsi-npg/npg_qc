@@ -153,9 +153,9 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-22 15:31:22
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:diQejZUulONV1fs7m9M5Jg
 
-our $VERSION = '0';
-
 with qw/npg_qc::Schema::Mqc::OutcomeDict/;
+
+our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
 

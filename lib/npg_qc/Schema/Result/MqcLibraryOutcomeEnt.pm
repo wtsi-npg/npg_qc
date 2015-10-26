@@ -212,11 +212,10 @@ __PACKAGE__->belongs_to(
 
 use Carp;
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
-our $VERSION = '0';
-
 with qw/npg_qc::Schema::Flators
         npg_qc::Schema::Mqc::OutcomeEntity/;
+
+our $VERSION = '0';
 
 __PACKAGE__->set_inflator4scalar('tag_index');
 
