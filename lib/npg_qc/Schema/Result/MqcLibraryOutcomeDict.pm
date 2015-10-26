@@ -155,30 +155,7 @@ __PACKAGE__->has_many(
 
 our $VERSION = '0';
 
-sub is_final_outcome {
-  my $self = shift;
-  return $self->short_desc =~ m{final}ism; #The short description includes the word final.
-}
-
-sub is_accepted {
-  my $self = shift;
-  return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
-}
-
-sub is_rejected {
-  my $self = shift;
-  return $self->short_desc =~ m{rejected}ism; #The short description includes the word rejected.
-}
-
-sub is_final_accepted {
-  my $self = shift;
-  return $self->is_final_outcome && $self->is_accepted;
-}
-
-sub is_undecided {
-  my $self = shift;
-  return $self->short_desc =~ m{undecided}ism;
-}
+with qw/npg_qc::Schema::Mqc::OutcomeDict/;
 
 sub is_final_undecided {
   my $self = shift;
@@ -186,6 +163,7 @@ sub is_final_undecided {
 }
 
 __PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
@@ -200,35 +178,6 @@ Catalog for plex level library manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
-
-=head2 is_final_outcome
-
-  Utility method to check if the outcome is considered final.
-
-=head2 is_accepted
-
-  Utility method which checks the short description to decide if the outcome can
-  be considered accepted.
-
-=head2 is_rejected
-
-  Utility method which checks the short description to decide if the outcome can
-  be considered rejected.
-
-=head2 is_final_accepted
-
-  Utility method which checks the short description to decide if the outcome can
-  be considered final and accepted.
-
-=head2 is_undecided
-
-  Utility method which checks the short description to decide if the outcome can
-  be considered as undecided.
-
-=head2 is_final_undecided
-
-  Utility method which checks the short description to decide if the outcome can
-  be considered final and undecided.
 
 =cut
 
@@ -250,15 +199,22 @@ Catalog for plex level library manual MQC statuses.
 
 =item DBIx::Class::Core
 
-=item DBIx::Class::InflateColumn::DateTime
-
-=item DBIx::Class::InflateColumn::Serializer
+=item npg_qc::Schema::Mqc::OutcomeDict
 
 =back
 
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 SUBROUTINES/METHODS
+
+=head2 is_final_undecided
+
+  Utility method which checks the short description to decide if the outcome can
+  be considered final and undecided.
 
 =head1 AUTHOR
 

@@ -210,6 +210,8 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:VPfWw+P0Ncy4VQpevn8yUQ
 
+use Carp;
+
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 our $VERSION = '0';
 
@@ -217,6 +219,37 @@ with qw/npg_qc::Schema::Flators
         npg_qc::Schema::Mqc::OutcomeEntity/;
 
 __PACKAGE__->set_inflator4scalar('tag_index');
+
+sub update_outcome {
+  my ($self, $outcome, $username) = @_;
+
+  if( !defined $outcome ) {
+    croak q[Mandatory parameter 'outcome' missing in call];
+  }
+  $self->validate_username($username);
+  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
+
+  my $outcome_id = $outcome_dict_obj->id_mqc_library_outcome;
+
+  if ($self->in_storage) {
+    if($self->has_final_outcome) {
+      croak('Outcome is already final but trying to transit to ' .
+            $outcome_dict_obj->short_desc);
+    } else {
+      my $values = {};
+      $values->{'id_mqc_outcome'} = $outcome_id;
+      $values->{'username'}       = $username;
+      $values->{'modified_by'}    = $username;
+      $self->update($values);
+    }
+  } else {
+    $self->id_mqc_outcome($outcome_id);
+    $self->username($username);
+    $self->modified_by($username);
+    $self->insert();
+  }
+  return 1;
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -237,18 +270,20 @@ Entity for library MQC outcome.
 
 =head2 update
 
-  Default DBIx update method extended to create an entry in the table corresponding to 
-  the MqcLibraryOutcomeHist class
+  Default DBIx update method extended to create an entry in the table 
+  corresponding to the MqcLibraryOutcomeHist class
 
 =head2 insert
 
-  Default DBIx insert method extended to create an entry in the table corresponding to 
-  the MqcLibraryOutcomeHist class
+  Default DBIx insert method extended to create an entry in the table
+  corresponding to the MqcLibraryOutcomeHist class
 
-=head2 data_for_historic
+=head2 update_outcome
 
-  Returns a hash with elements for the historic representation of the entity, a 
-  subset of values of the instance.
+  Updates the outcome of the entity with values provided.
+
+  $obj->update_outcome($outcome, $username);
+  
 
 =head1 DEPENDENCIES
 

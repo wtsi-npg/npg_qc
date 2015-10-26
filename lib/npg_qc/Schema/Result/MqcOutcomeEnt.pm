@@ -249,6 +249,37 @@ sub validate_outcome_of_libraries {
   return 1;
 }
 
+sub update_outcome {
+  my ($self, $outcome, $username) = @_;
+
+  if(!defined $outcome){
+    croak q[Mandatory parameter 'outcome' missing in call];
+  }
+  $self->validate_username($username);
+  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
+
+  my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
+
+  if ($self->in_storage) {
+    if($self->has_final_outcome) {
+      croak('Outcome is already final but trying to transit to ' .
+            $outcome_dict_obj->short_desc);
+    } else {
+      my $values = {};
+      $values->{'id_mqc_outcome'} = $outcome_id;
+      $values->{'username'}       = $username;
+      $values->{'modified_by'}    = $username;
+      $self->update($values);
+    }
+  } else {
+    $self->id_mqc_outcome($outcome_id);
+    $self->username($username);
+    $self->modified_by($username);
+    $self->insert();
+  }
+  return 1;
+}
+
 sub update_outcome_with_libraries {
   my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
 
@@ -282,35 +313,39 @@ Entity for lane MQC outcome.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 update_reported
-
-  Updates the value of reported to the current timestamp. Thorws exception if the
-  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
-
 =head2 update
 
-  With around on DBIx update method to create an entry in the table corresponding to 
+  Default DBIx update method extended to create an entry in the table corresponding to 
   the MqcOutcomeHist class
 
 =head2 insert
 
-  With around on DBIx insert method to create an entry in the table corresponding to 
+  Default DBIx insert method extended to create an entry in the table corresponding to 
   the MqcOutcomeHist class
 
-=head2 data_for_historic
+=head2 update_reported
 
-  Returns a hash with elements for the historic representation of the entity, a 
-  subset of values of the instance.
+  Updates the value of reported to the current timestamp. Thorws exception if the
+  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
 
 =head2 validate_outcome_of_libraries
 
   Validates if overall state for the lane and the libraries allows for a final
   outcome in the lane.
 
+=head2 update_outcome
+
+  Updates the outcome of the entity with values provided.
+
+  $obj->update_outcome($outcome, $username);
+
 =head2 update_outcome_with_libraries
 
   Updates children library mqc outcomes then updates outcome of lane mqc entity
-  passed as parameter.
+  passed as parameter. It expects a MqcOutcomeEnt object, a username for the
+  operation and an arrary of plexes to update.
+  
+  $obj->update_outcome_with_libraries($new_outcome, $username, $tag_indexes_in_lims);
 
 =head1 DEPENDENCIES
 
