@@ -97,7 +97,7 @@ has 'input_str' => (is => 'ro',
 sub _build_input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
-    my $notes = $self->lims->library_name;
+    my $notes = $self->lims->library_name // $sample_id;
     my $input_file = $self->input_files->[0];
     return qq["$sample_id|$input_file|$notes"];
 }
@@ -126,7 +126,7 @@ sub _build_bam_file {
 
 
 has 'transcriptome' => (is         => 'ro',
-                        isa        => 'Str',
+                        isa        => 'Maybe[Str]',
                         lazy_build => 1,
                         );
 
@@ -135,6 +135,7 @@ sub _build_transcriptome {
     my $trans_gtf = $self->rnaseqc_gtf_file;
     return $trans_gtf;
 }
+
 
 has 'command' => (is         => 'ro',
                   isa        => 'Str',
@@ -165,8 +166,21 @@ sub _build_command {
 
 override 'can_run' => sub {
     my $self = shift;
+    my $l = $self->lims;
     if(!$self->alignments_in_bam) {
         $self->messages->push('alignments_in_bam is false');
+        return 0;
+    }
+    if (!$l->library_type || $l->library_type !~ /(?:cD|R)NA/sxm) {
+        $self->messages->push('Not RNA library type');
+        return 0;
+    }
+    if((not $l->reference_genome) or (not $l->reference_genome =~ /Homo_sapiens|Mus_musculus/smx)){
+        $self->messages->push('Not human or mouse (so skipping RNA-SeQC analysis for now');
+        return 0;
+    }
+    if(not $self->transcriptome_index_name()){
+        $self->messages->push('Not transcriptome set so no splice junction alignment');
         return 0;
     }
     return 1;
@@ -190,8 +204,9 @@ override 'execute' => sub {
     	return 1;
     }
 
-    $self->result->set_info( 'Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME] );
-    $self->result->set_info( 'Jar_version', $RNASEQC_JAR_VERSION );
+    $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
+    $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
+    $self->result->set_info('Command', $self->command);
 
     my $command = $self->command;
 
