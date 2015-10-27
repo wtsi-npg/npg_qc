@@ -234,10 +234,10 @@ subtest q[batch update libraries errors] => sub {
     
   my $rs_dict = $schema->resultset('MqcLibraryOutcomeDict');
   my $values_dict = {};
-  $values_dict->{'short_desc'}             = 'Waiting';
-  $values_dict->{'long_desc'}              = 'A new outcome';
-  $values_dict->{'iscurrent'}              = 1;
-  $values_dict->{'isvisible'}              = 1;
+  $values_dict->{'short_desc'} = 'Waiting';
+  $values_dict->{'long_desc'}  = 'A new outcome';
+  $values_dict->{'iscurrent'}  = 1;
+  $values_dict->{'isvisible'}  = 1;
   my $dict_obj = $rs_dict->create($values_dict);
   is($rs_dict->search({})->count, 7, 'New unknown dictinary value');
   $object->update({ 'id_mqc_outcome' => $dict_obj->id_mqc_library_outcome });

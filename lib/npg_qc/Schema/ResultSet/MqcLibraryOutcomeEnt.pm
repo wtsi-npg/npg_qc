@@ -99,7 +99,9 @@ sub batch_update_libraries {
         }
       } else {
         croak sprintf 'Unexpected plex libray qc final outcome was found for id_run %i position %i outcome %s.',
-          $library_ent->id_run, $library_ent->position, $library_ent->mqc_outcome->short_desc;
+          $library_ent->id_run,
+          $library_ent->position,
+          $library_ent->mqc_outcome->short_desc;
       }
     }
     $library_ent->update_outcome($new_outcome, $username);
