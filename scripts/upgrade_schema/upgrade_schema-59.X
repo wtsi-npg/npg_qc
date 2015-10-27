@@ -44,6 +44,9 @@ UPDATE mqc_outcome_ent, mqc_library_outcome_ent
   AND mqc_outcome_ent.position = mqc_library_outcome_ent.position
   AND mqc_library_outcome_ent.id_mqc_outcome = 5 -- Undecided
 ;
+
+SHOW WARNINGS;
+
 INSERT INTO mqc_library_outcome_hist (id_run, position, tag_index, id_mqc_outcome, username, modified_by)
   SELECT 
       entity.id_run,
@@ -59,6 +62,8 @@ INSERT INTO mqc_library_outcome_hist (id_run, position, tag_index, id_mqc_outcom
       entity.id_run,
       entity.position,
       entity.tag_index;
+
+SHOW WARNINGS;
 
 COMMIT;
 
