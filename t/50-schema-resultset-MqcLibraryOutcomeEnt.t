@@ -241,7 +241,7 @@ subtest q[batch update libraries errors] => sub {
   my $dict_obj = $rs_dict->create($values_dict);
   is($rs_dict->search({})->count, 7, 'New unknown dictinary value');
   $object->update({ 'id_mqc_outcome' => $dict_obj->id_mqc_library_outcome });
-  my $entities_rs = $rs->search($values_search);
+  $entities_rs = $rs->search($values_search);
   is($entities_rs->count, 1, 'One plex in database with previous outcome');
   throws_ok {$rs->batch_update_libraries($object_lane, $tag_indexes_lims, $username);}
     qr/Unable to update unexpected outcome to final for id_run 500 position 1 outcome Waiting./,
