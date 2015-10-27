@@ -282,25 +282,20 @@ Entity for lane MQC outcome.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 update_reported
-
-  Updates the value of reported to the current timestamp. Thorws exception if the
-  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
-
 =head2 update
 
-  With around on DBIx update method to create an entry in the table corresponding to 
+  Default DBIx update method extended to create an entry in the table corresponding to 
   the MqcOutcomeHist class
 
 =head2 insert
 
-  With around on DBIx insert method to create an entry in the table corresponding to 
+  Default DBIx insert method extended to create an entry in the table corresponding to 
   the MqcOutcomeHist class
 
-=head2 data_for_historic
+=head2 update_reported
 
-  Returns a hash with elements for the historic representation of the entity, a 
-  subset of values of the instance.
+  Updates the value of reported to the current timestamp. Thorws exception if the
+  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
 
 =head2 validate_outcome_of_libraries
 
@@ -310,7 +305,10 @@ Entity for lane MQC outcome.
 =head2 update_outcome_with_libraries
 
   Updates children library mqc outcomes then updates outcome of lane mqc entity
-  passed as parameter.
+  passed as parameter. It expects a MqcOutcomeEnt object, a username for the
+  operation and an arrary of plexes to update.
+  
+  $obj->update_outcome_with_libraries($new_outcome, $username, $tag_indexes_in_lims);
 
 =head1 DEPENDENCIES
 

@@ -6,11 +6,11 @@ use DateTime::TimeZone;
 use Carp;
 use Readonly;
 
+our $VERSION = '0';
+
 requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
-
-our $VERSION = '0';
 
 Readonly::Scalar my $MQC_LIB_LIMIT => 50;
 
@@ -19,6 +19,7 @@ Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
   'is_accepted'       => 'is_accepted',
   'is_final_accepted' => 'is_final_accepted',
   'is_undecided'      => 'is_undecided',
+  'is_rejected'       => 'is_rejected',
 };
 
 foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
@@ -75,37 +76,6 @@ sub validate_username {
   return;
 }
 
-sub update_outcome {
-  my ($self, $outcome, $username) = @_;
-
-  if(!defined $outcome){
-    croak q[Mandatory parameter 'outcome' missing in call];
-  }
-  $self->validate_username($username);
-  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
-
-  my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
-  #There is a row that matches the id_run and position
-  if ($self->in_storage) {
-    if($self->has_final_outcome) {
-      croak('Outcome is already final but trying to transit to ' .
-            $outcome_dict_obj->short_desc);
-    } else { #Update
-      my $values = {};
-      $values->{'id_mqc_outcome'} = $outcome_id;
-      $values->{'username'}       = $username;
-      $values->{'modified_by'}    = $username;
-      $self->update($values);
-    }
-  } else { #Is a new row just insert.
-    $self->id_mqc_outcome($outcome_id);
-    $self->username($username);
-    $self->modified_by($username);
-    $self->insert();
-  }
-  return 1;
-}
-
 sub _historicrs_name {
   my $self = shift;
   my $class = ref $self;
@@ -113,27 +83,71 @@ sub _historicrs_name {
   return $class . 'Hist';
 }
 
+sub _dictionaryrs_name {
+  my $self = shift;
+  my $class = ref $self;
+  ($class) = $class =~ /([^:]+)Ent\Z/smx;
+  return $class . 'Dict';
+}
+
 sub _create_historic {
   my $self = shift;
-  $self->result_source->schema->resultset($self->_historicrs_name)
-    ->create($self->data_for_historic);
+  $self->result_source
+       ->schema
+       ->resultset($self->_historicrs_name)
+       ->create($self->data_for_historic);
   return 1;
 }
 
 sub find_valid_outcome {
   my ($self, $outcome) = @_;
 
-  my $rs = $self->result_source->schema->resultset('MqcOutcomeDict');
+  my $rs = $self->result_source
+                ->schema
+                ->resultset($self->_dictionaryrs_name);
   my $outcome_dict;
   if ($outcome =~ /\d+/xms) {
     $outcome_dict = $rs->find($outcome);
   } else {
-    $outcome_dict = $rs->search({short_desc => $outcome})->next;
+    $outcome_dict = $rs->search({
+      short_desc => $outcome
+    })->next;
   }
   if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
     croak(sprintf "Outcome $outcome is invalid");
   }
   return $outcome_dict;
+}
+
+sub update_outcome {
+  my ($self, $outcome, $username) = @_;
+
+  if( !defined $outcome ) {
+    croak q[Mandatory parameter 'outcome' missing in call];
+  }
+  $self->validate_username($username);
+  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
+
+  my $outcome_id = $outcome_dict_obj->pk_value;
+
+  if ($self->in_storage) {
+    if($self->has_final_outcome) {
+      croak('Outcome is already final but trying to transit to ' .
+            $outcome_dict_obj->short_desc);
+    } else {
+      my $values = {};
+      $values->{'id_mqc_outcome'} = $outcome_id;
+      $values->{'username'}       = $username;
+      $values->{'modified_by'}    = $username;
+      $self->update($values);
+    }
+  } else {
+    $self->id_mqc_outcome($outcome_id);
+    $self->username($username);
+    $self->modified_by($username);
+    $self->insert();
+  }
+  return 1;
 }
 
 no Moose::Role;
@@ -170,13 +184,7 @@ __END__
 
 =head2 validate_username
 
-  Checks that the username is alphanumeric. Oure numeric vakues are not allowed.
-
-=head2 update_outcome
-
-  Updates the outcome of the entity with values provided.
-
-  $obj->($outcome, $username);
+  Checks that the username is alphanumeric. Other numeric values are not allowed.
 
 =head2 has_final_outcome
 
@@ -192,15 +200,27 @@ __END__
 
 =head2 is_undecided
 
-  Returns true if the outcome is ubdecided (neither pass nor fail),
+  Returns true if the outcome is undecided (neither pass nor fail),
   otherwise returns false.
 
 =head2 find_valid_outcome
 
-  Returns a valid current MqcOutcomeDict object that matches the outcome or
+  Returns a valid current Dictionary object that matches the outcome or
   raises an error.
 
-  my $dict_obj = $obj->find_valid_outcome('is accepted');
+  my $dict_obj = $obj->find_valid_outcome('Accepted preeliminary');
+  
+  or
+  
+  my $dict_obj = $obj->find_valid_outcome(1);
+
+=head2 update_outcome
+
+  Updates the outcome of the entity with values provided. Will store a new row
+  if this entity was not yet stored in database.
+
+  $obj->update_outcome($outcome, $username);
+
 
 =head1 DIAGNOSTICS
 

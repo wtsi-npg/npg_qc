@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.3
+ - SeqQC
+   - New dictionary table for plex level library MQC. (Issue 238)
+
 release 59.2
   - library-level manual QC for individual plexes.
 
