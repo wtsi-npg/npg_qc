@@ -249,37 +249,6 @@ sub validate_outcome_of_libraries {
   return 1;
 }
 
-sub update_outcome {
-  my ($self, $outcome, $username) = @_;
-
-  if(!defined $outcome){
-    croak q[Mandatory parameter 'outcome' missing in call];
-  }
-  $self->validate_username($username);
-  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
-
-  my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
-
-  if ($self->in_storage) {
-    if($self->has_final_outcome) {
-      croak('Outcome is already final but trying to transit to ' .
-            $outcome_dict_obj->short_desc);
-    } else {
-      my $values = {};
-      $values->{'id_mqc_outcome'} = $outcome_id;
-      $values->{'username'}       = $username;
-      $values->{'modified_by'}    = $username;
-      $self->update($values);
-    }
-  } else {
-    $self->id_mqc_outcome($outcome_id);
-    $self->username($username);
-    $self->modified_by($username);
-    $self->insert();
-  }
-  return 1;
-}
-
 sub update_outcome_with_libraries {
   my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
 
@@ -332,12 +301,6 @@ Entity for lane MQC outcome.
 
   Validates if overall state for the lane and the libraries allows for a final
   outcome in the lane.
-
-=head2 update_outcome
-
-  Updates the outcome of the entity with values provided.
-
-  $obj->update_outcome($outcome, $username);
 
 =head2 update_outcome_with_libraries
 

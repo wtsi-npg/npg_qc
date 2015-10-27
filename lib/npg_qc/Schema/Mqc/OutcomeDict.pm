@@ -30,6 +30,16 @@ sub is_undecided {
   return $self->short_desc =~ m{undecided}ism;
 }
 
+sub pk_value {
+  my $self = shift;
+  my @primary_columns = $self->primary_columns;
+  if (scalar @primary_columns != 1) {
+    croak q[Dictionary has a multi column primary key];
+  }
+  my $column = shift @primary_columns;
+  return $self->$column;
+}
+
 no Moose::Role;
 
 1;
@@ -75,6 +85,12 @@ __END__
 
   Utility method which checks the short description to decide if the outcome can
   be considered as undecided.
+
+=head2 pk_value
+
+  Returns the value of primary key for the object if the table was defined with
+  a single column primary key. Croaks if there is no primary key column or if
+  there is a multi column primary key.
 
 =head1 DIAGNOSTICS
 
