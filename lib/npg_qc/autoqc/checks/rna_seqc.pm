@@ -9,12 +9,14 @@ use File::Basename;
 use npg_qc::autoqc::types;
 use npg::api::run;
 use Readonly;
-
+use Try::Tiny;
 
 extends qw(npg_qc::autoqc::checks::check);
+
 with qw(npg_tracking::data::reference::find 
         npg_common::roles::software_location
-        npg_tracking::data::transcriptome::find);
+        npg_tracking::data::transcriptome::find
+        npg_tracking::illumina::run::folder);
 
 our $VERSION = '0';
 
@@ -24,111 +26,96 @@ Readonly::Scalar my $RNASEQC_JAR_VERSION    => q[1.1.8];
 Readonly::Scalar my $RNASEQC_GTF_TTYPE_COL  => 2;
 Readonly::Scalar my $RNASEQC_GTF_REPOSITORY => q[/nfs/srpipe_references/];
 Readonly::Scalar my $RNASEQC_GTF_DIRECTORY  => q[RNA-SeQC];
-Readonly::Scalar my $RNASEQC_DEFAULT_OUTDIR => q[rna_seqc_output];
+Readonly::Scalar my $RNASEQC_OUTDIR         => q[rna_seqc];
 Readonly::Scalar my $JAVA_MAX_HEAP_SIZE     => q[4000m];
 Readonly::Scalar my $JAVA_GC_TYPE           => q[+UseSerialGC];
 Readonly::Scalar my $JAVA_USE_PERF_DATA     => q[-UsePerfData];
 
-
-
 has '+file_type' => (default => $EXT,);
 
 has '+aligner' => (default => q[fasta],);
-#has '+qc_out'=> (default => '',);
-
 
 has 'java_max_heap_size'     => (is      => 'ro',
                                  isa     => 'Str',
-                                 default => $JAVA_MAX_HEAP_SIZE,
-                                 );
+                                 default => $JAVA_MAX_HEAP_SIZE,);
 
 has 'java_gc_type'           => (is      => 'ro',
                                  isa     => 'Str',
-                                 default => $JAVA_GC_TYPE,
-                                 );
+                                 default => $JAVA_GC_TYPE,);
 
 has 'java_use_perf_data'     => (is      => 'ro',
                                  isa     => 'Str',
-                                 default => $JAVA_USE_PERF_DATA,
-                                 );
+                                 default => $JAVA_USE_PERF_DATA,);
 
 has 'java_jar_path'          => (is      => 'ro',
                                  isa     => 'NpgCommonResolvedPathJarFile',
                                  coerce  => 1,
-                                 default => $RNASEQC_JAR_NAME,
-                                 );
+                                 default => $RNASEQC_JAR_NAME,);
 
 has 'transcript_type' => (is      => 'ro',
                           isa     => 'Int',
-                          default => $RNASEQC_GTF_TTYPE_COL,
-                          );
+                          default => $RNASEQC_GTF_TTYPE_COL,);
 
 
 has 'alignments_in_bam' => (is         => 'ro',
                             isa        => 'Maybe[Bool]',
-                            lazy_build => 1,
-                            );
+                            lazy_build => 1,);
 
 sub _build_alignments_in_bam {
     my ($self) = @_;
     return $self->lims->alignments_in_bam;
 }
 
-
 has 'output_dir' => (is => 'ro',
                      isa        => 'Str',
-                     lazy_build => 1,
-                     );
+                     lazy_build => 1,);
 
 sub _build_output_dir {
     my $self = shift;
-    my $output_dir = $self->path;
-    #my $qc_output_dir = $self->qc_out;
-    $output_dir .= q[/] . $RNASEQC_DEFAULT_OUTDIR;
-    return $output_dir;
+    my $tag_dir = q[];
+    my $run_dir = $self->id_run;
+    my $pos_dir = $self->position;
+    if ($self->can('tag_index') && $self->tag_index){
+        $tag_dir = q[#]. $self->tag_index;
+    }
+    my $qc_dir = try { $self->qc_path() } catch { $self->path } finally { q[.] };
+    my $rna_seqc_output_dir = $qc_dir. q[/]. $RNASEQC_OUTDIR. q[/]. $run_dir. q[_]. $pos_dir. $tag_dir;
+    return $rna_seqc_output_dir;
 }
-
 
 has 'input_str' => (is => 'ro',
                     isa        => 'Str',
-                    lazy_build => 1,
-                    );
+                    lazy_build => 1,);
 
 sub _build_input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
     my $notes = $self->lims->library_name // $sample_id;
-    my $input_file = $self->input_files->[0];
+    my $input_file = $self->bam_file;
     return qq["$sample_id|$input_file|$notes"];
 }
 
-
 has 'reference_fasta' => (is => 'ro',
                           isa => 'Maybe[Str]',
-                          lazy_build => 1,
-                          );
+                          lazy_build => 1,);
 
 sub _build_reference_fasta {
     my ($self) = @_;
     return $self->refs->[0];
 }
 
-
 has 'bam_file' => (is         => 'ro',
                    isa        => 'Str',
-                   lazy_build => 1,
-                   );
+                   lazy_build => 1,);
 
 sub _build_bam_file {
     my $self = shift;
     return $self->input_files->[0];
 }
 
-
 has 'transcriptome' => (is         => 'ro',
                         isa        => 'Maybe[Str]',
-                        lazy_build => 1,
-                        );
+                        lazy_build => 1,);
 
 sub _build_transcriptome {
     my $self = shift;
@@ -136,12 +123,9 @@ sub _build_transcriptome {
     return $trans_gtf;
 }
 
-
 has 'command' => (is         => 'ro',
                   isa        => 'Str',
-                  lazy_build => 1,
-                  );
-
+                  lazy_build => 1,);
 
 sub _build_command {
     my $self = shift;
@@ -149,7 +133,7 @@ sub _build_command {
     if(!npg::api::run->new({id_run => $self->id_run})->is_paired_read()){
         $single_end_option=q[-singleEnd];
     }
-    my $command = $self->java_cmd. sprintf q[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
+    my $command = q[echo ]. $self->java_cmd. sprintf q[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
                                            $self->java_max_heap_size,
                                            $self->java_gc_type,
                                            $self->java_use_perf_data,
@@ -163,6 +147,9 @@ sub _build_command {
     return $command;
 }
 
+has 'config_file_loc' => (is         => 'ro',
+                          isa        => 'Str',
+                          lazy_build => 1,);
 
 override 'can_run' => sub {
     my $self = shift;
@@ -186,23 +173,53 @@ override 'can_run' => sub {
     return 1;
 };
 
-
 override 'execute' => sub {
     my ($self) = @_;
-
+    
     if (super() == 0) {
     	return 1;
     }
-
-    my $can_run = $self->can_run();
 
     if ($self->messages->count) {
         $self->result->add_comment(join q[ ], $self->messages->messages);
     }
 
+    my $can_run = $self->can_run();
+
     if (!$can_run) {
     	return 1;
     }
+    
+    my $rna_seqc_dir = $self->output_dir;
+
+    #TODO: Directory making lines might be deleted in the future
+    #      if it's decided they should go to the same place tileviz
+    #      is created (npg_pipeline::base).
+    #---------------------------------------------------------------------------------------------
+    # check existence of rna_seqc directory
+    # create if it doesn't
+    if ( ! -d $rna_seqc_dir) {
+        my $mk_rna_seqc_dir_cmd = qq{mkdir -p $rna_seqc_dir};
+        my $return = qx{$mk_rna_seqc_dir_cmd};
+        if ( $CHILD_ERROR ) {
+            croak $rna_seqc_dir . qq{ does not exist and unable to create: $CHILD_ERROR\n$return};
+        }
+    }
+    #TODO: if run outside the pipeline this will fail 
+    #      if the env variable is not set. Inside the pipeline,
+    #      one may expect it's been set at previous stages.
+    my  $owning_group ||= $ENV{OWNING_GROUP};
+    # ensure that the owning group is what we expect
+    my $rc = `chgrp $owning_group $rna_seqc_dir`;
+    if ( $CHILD_ERROR ) {
+    	$self->messages->push("could not chgrp $rna_seqc_dir\n\t$rc"); # not fatal
+    }
+    # set correct permissions on the archive directory
+    $rc = `chmod u=rwx,g=srxw,o=rx $rna_seqc_dir`;
+    if ( $CHILD_ERROR ) {
+        $self->messages->push("could not chmod $rna_seqc_dir\n\t$rc"); # not fatal
+    }
+    #TODO: delete up to here ---------------------------------------------------------------------
 
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
     $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
@@ -325,6 +342,8 @@ npg_qc::autoqc::checks::rna_seqc - a QC check that runs RNA-SeQC software over a
 =item npg::api::run
  
 =item Readonly
+
+=item Try::Tiny
 
 =item npg_tracking::data::reference::find
 
