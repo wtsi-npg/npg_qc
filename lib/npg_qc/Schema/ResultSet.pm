@@ -14,12 +14,12 @@ sub search_autoqc {
 
   my $how = {'cache' => 1};
   if ($self->result_source->has_relationship('seq_component_compositions')) {
-    if ($size) {
-      $values->{'seq_component_compositions.size'} = $size;
-    }
     foreach my $col_name  (keys %{$values}) {
       $values->{'seq_component.' . $col_name} = $values->{$col_name};
       delete $values->{$col_name};
+    }
+    if ($size) {
+      $values->{'seq_component_compositions.size'} = $size;
     }
     $how->{'prefetch'} = {'seq_component_compositions' => 'seq_component'};
   } else {
