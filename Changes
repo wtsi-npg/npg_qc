@@ -5,6 +5,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - custom parent class for resultset objects
  - calling ->new() on resultset object to create a new result replaced with
    calling more intuitive ->new_result()
+ - upgrade genotype check to use samtools1 and bcftools1
 
 release 59.2
  - library-level manual QC for individual plexes.
