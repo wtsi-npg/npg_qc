@@ -7,9 +7,10 @@ use Carp;
 use File::Spec::Functions qw( catdir );
 use File::Basename;
 use npg_qc::autoqc::types;
-use npg::api::run;
+#use npg::api::run;
 use Readonly;
 use Try::Tiny;
+use npg_tracking::util::types;
 
 extends qw(npg_qc::autoqc::checks::check
            npg_pipeline::base
@@ -18,7 +19,7 @@ extends qw(npg_qc::autoqc::checks::check
 with qw(npg_tracking::data::reference::find 
         npg_common::roles::software_location
         npg_tracking::data::transcriptome::find
-        npg_tracking::illumina::run::folder);
+       );
 
 our $VERSION = '0';
 
@@ -26,7 +27,6 @@ Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $RNASEQC_JAR_NAME       => q[RNA-SeQC_v1.1.8.jar];
 Readonly::Scalar my $RNASEQC_JAR_VERSION    => q[1.1.8];
 Readonly::Scalar my $RNASEQC_GTF_TTYPE_COL  => 2;
-Readonly::Scalar my $RNASEQC_GTF_REPOSITORY => q[/nfs/srpipe_references/];
 Readonly::Scalar my $RNASEQC_GTF_DIRECTORY  => q[RNA-SeQC];
 Readonly::Scalar my $RNASEQC_OUTDIR         => q[rna_seqc];
 Readonly::Scalar my $JAVA_MAX_HEAP_SIZE     => q[4000m];
@@ -68,22 +68,9 @@ sub _build_alignments_in_bam {
     return $self->lims->alignments_in_bam;
 }
 
-has 'output_dir' => (is => 'ro',
-                     isa        => 'Str',
-                     lazy_build => 1,);
-
-sub _build_output_dir {
-    my $self = shift;
-    my $tag_dir = q[];
-    my $run_dir = $self->id_run;
-    my $pos_dir = $self->position;
-    if ($self->can('tag_index') && $self->tag_index){
-        $tag_dir = q[#]. $self->tag_index;
-    }
-    my $qc_dir = try { $self->qc_path() } catch { $self->path } finally { q[.] };
-    my $rna_seqc_output_dir = $qc_dir. q[/]. $RNASEQC_OUTDIR. q[/]. $run_dir. q[_]. $pos_dir. $tag_dir;
-    return $rna_seqc_output_dir;
-}
+has 'qc_out'     => (is         => 'ro',
+                     isa        => 'NpgTrackingDirectory',
+                     required   => 1,);
 
 has 'input_str' => (is => 'ro',
                     isa        => 'Str',
@@ -125,12 +112,9 @@ sub _build_transcriptome {
     return $trans_gtf;
 }
 
-has 'command' => (is         => 'ro',
-                  isa        => 'Str',
-                  lazy_build => 1,);
+sub _command {
+    my ($self, $dir_out) = @_;
 
-sub _build_command {
-    my $self = shift;
     my $single_end_option=q[];
     if(!npg::api::run->new({id_run => $self->id_run})->is_paired_read()){
         $single_end_option=q[-singleEnd];
@@ -141,7 +125,7 @@ sub _build_command {
                                            $self->java_use_perf_data,
                                            $self->java_jar_path,
                                            $self->input_str,
-                                           $self->output_dir,
+                                           $dir_out,
                                            $self->reference_fasta,
                                            $self->transcriptome,
                                            $self->transcript_type,
@@ -192,7 +176,16 @@ override 'execute' => sub {
     	return 1;
     }
     
-    my $rna_seqc_dir = $self->output_dir;
+    my $rna_seqc_dir = join q[_], $self->id_run, $self->position;
+    if (defined $self->tag_index) {
+      $rna_seqc_dir .= $self->tag_label;
+    }
+    $rna_seqc_dir = join q[/], $self->qc_out, $rna_seqc_dir;
+    if (!-e $rna_seqc_dir) {
+      if (!mkdir $rna_seqc_dir) {
+         #catch $_, exit 
+      }
+    } 
 
     #TODO: Directory making lines might be deleted in the future
     #      if it's decided they should go to the same place tileviz
@@ -200,35 +193,20 @@ override 'execute' => sub {
     #---------------------------------------------------------------------------------------------
     # check existence of rna_seqc directory
     # create if it doesn't
-    if ( ! -d $rna_seqc_dir) {
-        my $mk_rna_seqc_dir_cmd = qq{mkdir -p $rna_seqc_dir};
-        my $return = qx{$mk_rna_seqc_dir_cmd};
-        if ( $CHILD_ERROR ) {
-            croak $rna_seqc_dir . qq{ does not exist and unable to create: $CHILD_ERROR\n$return};
-        }
-    }
-    #TODO: if run outside the pipeline this will fail 
-    #      if the env variable is not set. Inside the pipeline,
-    #      one may expect it's been set at previous stages.
-    #      UPDATE 20151029: no it doesn't!
-    my  $owning_group ||= $ENV{OWNING_GROUP};
-    # ensure that the owning group is what we expect
-    my $rc = `chgrp $owning_group $rna_seqc_dir`;
-    if ( $CHILD_ERROR ) {
-    	$self->messages->push("could not chgrp $rna_seqc_dir\n\t$rc"); # not fatal
-    }
-    # set correct permissions on the archive directory
-    $rc = `chmod u=rwx,g=srxw,o=rx $rna_seqc_dir`;
-    if ( $CHILD_ERROR ) {
-        $self->messages->push("could not chmod $rna_seqc_dir\n\t$rc"); # not fatal
-    }
+    #if ( ! -d $rna_seqc_dir) {
+    #    my $mk_rna_seqc_dir_cmd = qq{mkdir -p $rna_seqc_dir};
+    #    my $return = qx{$mk_rna_seqc_dir_cmd};
+    #    if ( $CHILD_ERROR ) {
+    #        croak $rna_seqc_dir . qq{ does not exist and unable to create: $CHILD_ERROR\n$return};
+    #    }
+    #}
     #TODO: delete up to here ---------------------------------------------------------------------
 
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
     $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
     $self->result->set_info('Command', $self->command);
 
-    my $command = $self->command;
+    my $command = $self->_command($rna_seqc_dir);
 
     if (system $command) {
         carp "Failed to execute $command";
@@ -236,7 +214,7 @@ override 'execute' => sub {
 
     #TODO: Call to _parse_metrics(<metrics.tsv file handler>)
     #      my $results = $self->_parse_metrics($fh);
-    $self->result->rnaseqc_metrics_path($self->output_dir);
+    #$self->result->rnaseqc_metrics_path($self->output_dir);
 
     return 1;
 };

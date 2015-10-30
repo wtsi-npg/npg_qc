@@ -224,7 +224,7 @@ sub _create_test_object {
                 id_run    => $self->id_run,
 	       };
 
-    my @attrs = qw/tag_index repository reference_genome species strain file_type/;
+    my @attrs = qw/tag_index repository reference_genome species strain file_type qc_out/;
     foreach my $attr_name (@attrs) {
         if ($attr_name eq q[tag_index] ) {
             if (defined $self->$attr_name) {
