@@ -50,15 +50,15 @@ sub mqc_lib_limit {
 
 sub data_for_historic {
   my $self = shift;
-  my $my_cols = {$self->get_columns};
+  my %my_cols = $self->get_columns;
   my @hist_cols = $self->result_source
                        ->schema
-                       ->source($self->_historicrs_name)
+                       ->source($self->_rs_name('Hist'))
                        ->columns;
   my $vals = {};
   foreach my $x (@hist_cols) {
-    if ( exists $my_cols->{$x} ) {
-      $vals->{$x} = $my_cols->{$x};
+    if ( exists $my_cols{$x} ) {
+      $vals->{$x} = $my_cols{$x};
     }
   }
   return $vals;
@@ -76,25 +76,21 @@ sub validate_username {
   return;
 }
 
-sub _historicrs_name {
-  my $self = shift;
+sub _rs_name {
+  my ($self, $suffix) = @_;
+  if (!$suffix) {
+    croak 'Suffix undefined';
+  }
   my $class = ref $self;
   ($class) = $class =~ /([^:]+)Ent\Z/smx;
-  return $class . 'Hist';
-}
-
-sub _dictionaryrs_name {
-  my $self = shift;
-  my $class = ref $self;
-  ($class) = $class =~ /([^:]+)Ent\Z/smx;
-  return $class . 'Dict';
+  return $class . $suffix;
 }
 
 sub _create_historic {
   my $self = shift;
   $self->result_source
        ->schema
-       ->resultset($self->_historicrs_name)
+       ->resultset($self->_rs_name('Hist'))
        ->create($self->data_for_historic);
   return 1;
 }
@@ -104,7 +100,7 @@ sub find_valid_outcome {
 
   my $rs = $self->result_source
                 ->schema
-                ->resultset($self->_dictionaryrs_name);
+                ->resultset($self->_rs_name('Dict'));
   my $outcome_dict;
   if ($outcome =~ /\d+/xms) {
     $outcome_dict = $rs->find($outcome);
@@ -113,8 +109,8 @@ sub find_valid_outcome {
       short_desc => $outcome
     })->next;
   }
-  if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
-    croak(sprintf "Outcome $outcome is invalid");
+  if (!defined $outcome_dict || !$outcome_dict->iscurrent) {
+    croak("Outcome $outcome is invalid");
   }
   return $outcome_dict;
 }
@@ -127,20 +123,18 @@ sub update_outcome {
   }
   $self->validate_username($username);
   my $outcome_dict_obj = $self->find_valid_outcome($outcome);
-
   my $outcome_id = $outcome_dict_obj->pk_value;
 
   if ($self->in_storage) {
     if($self->has_final_outcome) {
       croak('Outcome is already final but trying to transit to ' .
             $outcome_dict_obj->short_desc);
-    } else {
-      my $values = {};
-      $values->{'id_mqc_outcome'} = $outcome_id;
-      $values->{'username'}       = $username;
-      $values->{'modified_by'}    = $username;
-      $self->update($values);
     }
+    my $values = {};
+    $values->{'id_mqc_outcome'} = $outcome_id;
+    $values->{'username'}       = $username;
+    $values->{'modified_by'}    = $username;
+    $self->update($values);
   } else {
     $self->id_mqc_outcome($outcome_id);
     $self->username($username);

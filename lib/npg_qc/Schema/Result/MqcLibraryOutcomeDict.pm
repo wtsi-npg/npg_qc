@@ -179,7 +179,7 @@ Catalog for plex level library manual MQC statuses.
 
 =head1 SUBROUTINES/METHODS
 
-=cut
+=head2 is_final_undecided
 
 =head1 DEPENDENCIES
 
