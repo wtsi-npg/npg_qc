@@ -73,43 +73,6 @@ sub fetch_mqc_library_outcomes {
   return $rs1;
 }
 
-sub batch_update_libraries {
-  my ($self, $lane_ent, $tag_indexes_in_lims, $username) = @_;
-
-  foreach my $tag_index (@{$tag_indexes_in_lims}) {
-    my $library_ent = $self->search_library_outcome_ent(
-      $lane_ent->id_run,
-      $lane_ent->position,
-      $tag_index,
-      $username
-    );
-    my $new_outcome = q[Undecided final];
-
-    if ( $library_ent->in_storage ) {
-      if( !$library_ent->has_final_outcome ) {
-        if( $library_ent->is_accepted ) {
-          $new_outcome = q[Accepted final];
-        } elsif ( $library_ent->is_rejected ) {
-          $new_outcome = q[Rejected final];
-        } elsif ( !$library_ent->is_undecided ) {
-          croak sprintf 'Unable to update unexpected outcome to final for id_run %i position %i outcome %s.',
-            $library_ent->id_run,
-            $library_ent->position,
-            $library_ent->mqc_outcome->short_desc;
-        }
-      } else {
-        croak sprintf 'Unexpected plex libray qc final outcome was found for id_run %i position %i outcome %s.',
-          $library_ent->id_run,
-          $library_ent->position,
-          $library_ent->mqc_outcome->short_desc;
-      }
-    }
-    $library_ent->update_outcome($new_outcome, $username);
-  }
-
-  return 1;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -144,14 +107,6 @@ Extended ResultSet with specific functionality for for manual MQC.
 
   Returns a resultset with mqc library outcome entity for id_run, position
   passed as parameters
-
-=head2 batch_update_libraries
-
-  Iterates on the list of tag_indexes provided to update outcomes to final for
-  the library outcome entities related to the lane entity passed as parameter.
-
-  my $tag_indexes = [1, 2, 3];
-  $resultset->batch_update_libraries($mqc_library_ent, $tag_indexes, $username);
 
 =head1 DEPENDENCIES
 

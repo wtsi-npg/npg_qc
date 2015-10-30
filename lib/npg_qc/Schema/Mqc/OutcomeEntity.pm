@@ -86,13 +86,6 @@ sub _rs_name {
   return $class . $suffix;
 }
 
-sub _dictionaryrs_name {
-  my $self = shift;
-  my $class = ref $self;
-  ($class) = $class =~ /([^:]+)Ent\Z/smx;
-  return $class . 'Dict';
-}
-
 sub _create_historic {
   my $self = shift;
   $self->result_source
@@ -120,6 +113,33 @@ sub find_valid_outcome {
     croak("Outcome $outcome is invalid");
   }
   return $outcome_dict;
+}
+
+sub update_to_final_outcome {
+  my ($self, $username) = @_;
+  my $new_outcome;
+  my $class = ref $self;
+  my $as_mqc_library = $class =~ /MqcLibraryOutcomeEnt\Z/smx;
+
+  if( $self->is_accepted ) {
+    $new_outcome = q[Accepted final];
+  } elsif ( $self->is_rejected ) {
+    $new_outcome = q[Rejected final];
+  } elsif ( $as_mqc_library && $self->is_undecided ) {
+    $new_outcome = q[Undecided final];
+  } else {
+    my $tag_index = q[];
+    if ( $as_mqc_library ) {
+      $tag_index = ' tag_index ' . ( $self->tag_index ? $self->tag_index : q[undef] );
+    }
+
+    my $error_message = sprintf 'Unable to update unexpected outcome to final for id_run %i position %i%s.',
+                  $self->id_run,
+                  $self->position,
+                  $tag_index;
+    croak $error_message;
+  }
+  return $self->update_outcome($new_outcome, $username);
 }
 
 sub update_outcome {
@@ -214,6 +234,16 @@ __END__
   or
   
   my $dict_obj = $obj->find_valid_outcome(1);
+
+=head2 update_to_final_outcome
+
+  Checks the current outcome for this entity and tries to define a corresponding
+  final outcome. If there is one, it will delegate the update to update_outcome
+  using the final outcome as new outcome for the entity.
+
+  Needs the username of who is requesting the change.
+
+  $obj->update_to_final_outcome($username);
 
 =head2 update_outcome
 

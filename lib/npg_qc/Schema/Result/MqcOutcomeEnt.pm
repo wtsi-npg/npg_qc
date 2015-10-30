@@ -249,19 +249,48 @@ sub validate_outcome_of_libraries {
   return 1;
 }
 
-sub update_outcome_with_libraries {
+sub update_outcome_with_libraries { #TODO 20151030 Change
   my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
-
   my $outcome_dict_object = $self->find_valid_outcome($outcome);
+
   if( $outcome_dict_object->is_final_outcome
         && scalar @{$tag_indexes_in_lims} <= $self->mqc_lib_limit ) {
-    my $rs_library_ent = $self->result_source->schema->resultset( q[MqcLibraryOutcomeEnt]);
+    my $rs_library_ent = $self->result_source->schema->resultset( q[MqcLibraryOutcomeEnt] );
     my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes($self->id_run, $self->position);
     $self->validate_outcome_of_libraries($outcome_dict_object, $tag_indexes_in_lims, $outcomes_libraries);
-    $rs_library_ent->batch_update_libraries( $self, $tag_indexes_in_lims, $username );
-  }
+    $outcomes_libraries->reset;
 
+    my $olh = {};
+    while ( my $library = $rs_library_ent->next ){
+      my $key = defined $library->tag_index ? $library->tag_index : q[A];
+      $olh->{$key} = $library;
+    }
+
+    my $new_outcome = q[Undecided final];
+
+    my $coderef1 = sub {
+      foreach my $tag_index (@{$tag_indexes_in_lims}) {
+        my $key = defined $tag_index ? $tag_index : q[A];
+        my $library_ent;
+        if ( exists $olh->{$key} ) {
+          $library_ent = $olh->{$key};
+          $library_ent->update_to_final_outcome($username);
+        } else {
+          $library_ent = $rs_library_ent->search_library_outcome_ent(
+             $self->id_run,
+             $self->position,
+             $tag_index,
+             $username
+          );
+          $library_ent->update_outcome($new_outcome, $username);
+        }
+      }
+    };
+
+    $self->result_source->schema->txn_do($coderef1);
+  }
   $self->update_outcome($outcome, $username);
+
   return 1;
 }
 

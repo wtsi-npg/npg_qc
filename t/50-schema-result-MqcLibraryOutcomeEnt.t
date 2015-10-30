@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -133,6 +133,46 @@ subtest 'Test insert with historic' => sub {
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after insert in entity]);
   is ($object->tag_index, undef, q[tag_index inflated in entity]);
   is ($hist_object_rs->next->tag_index, undef, q[tag_index inflated in historic]);
+};
+
+subtest 'Update to final' => sub {
+  plan tests => 9;
+
+  my $values = {
+    'id_run'         => 300,
+    'position'       => 1,
+    'tag_index'      => 1,
+    'id_mqc_outcome' => 1, #Accepted pre
+    'username'       => 'user',
+    'modified_by'    => 'user'
+  };
+  
+  my $username = 'someusername';
+  
+  my $object = $schema->resultset($table)->create($values);
+  ok ( $object->is_accepted && !$object->has_final_outcome,
+         'Entity has accepted not final.');
+  ok ( $object->update_to_final_outcome($username), 'Can update as final outcome' );
+  ok ( $object->is_accepted && $object->has_final_outcome,
+         'Entity has accepted final.');
+  
+  $values->{'tag_index'} = 2;
+  $values->{'id_mqc_outcome'} = 2; #Rejected pre
+  $object = $schema->resultset($table)->create($values);
+    ok ( $object->is_rejected && !$object->has_final_outcome,
+         'Entity has rejected not final.');
+  ok ( $object->update_to_final_outcome($username), 'Can update as final outcome' );
+  ok ( $object->is_rejected && $object->has_final_outcome, 
+         'Entity has rejected final.');
+  
+  $values->{'tag_index'} = 3;
+  $values->{'id_mqc_outcome'} = 5; #Undecided
+  $object = $schema->resultset($table)->create($values);
+  ok ( $object->is_undecided,
+         'Entity has undecided.');
+  ok ( $object->update_to_final_outcome($username), 'Can update as final outcome' );
+  ok ( $object->is_undecided && $object->has_final_outcome, 
+         'Entity has undecided final.');
 };
 
 1;

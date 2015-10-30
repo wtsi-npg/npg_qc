@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 47;
+use Test::More tests => 50;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -344,5 +344,164 @@ subtest 'Data for historic' => sub {
   my $rs2 = $schema->resultset($table)->get_ready_to_report();
   is ($rs2->count, 0, q[No entities to be reported]);
 }
+
+subtest 'Update to final' => sub {
+  plan tests => 9;
+
+  my $values = {
+    'id_run'         => 300,
+    'position'       => 1,
+    'id_mqc_outcome' => 1, #Accepted pre
+    'username'       => 'user',
+    'modified_by'    => 'user'
+  };
+  
+  my $username = 'someusername';
+  
+  my $object = $schema->resultset($table)->create($values);
+  ok ( $object->is_accepted && !$object->has_final_outcome,
+         'Entity has accepted not final.');
+  ok ( $object->update_to_final_outcome($username),
+         'Can update as final outcome' );
+  ok ( $object->is_accepted && $object->has_final_outcome,
+         'Entity has accepted final.');
+  
+  $values->{'position'} = 2;
+  $values->{'id_mqc_outcome'} = 2; #Rejected pre
+  $object = $schema->resultset($table)->create($values);
+  ok ( $object->is_rejected && !$object->has_final_outcome,
+         'Entity has rejected not final.');
+  ok ( $object->update_to_final_outcome($username),
+         'Can update as final outcome' );
+  ok ( $object->is_rejected && $object->has_final_outcome,
+         'Entity has accepted final.');
+  
+  $values->{'position'} = 3;
+  $values->{'id_mqc_outcome'} = 5; #Undecided
+  $object = $schema->resultset($table)->create($values);
+  ok ( $object->is_undecided,
+         'Entity has undecided.');
+  throws_ok { $object->update_to_final_outcome($username) } 
+    qr/Unable to update unexpected outcome to final for id_run 300 position 3./,
+    'Error trying to set as undecided final from undecided';
+  ok ( $object->is_undecided && !$object->has_final_outcome,
+         'Entity has undecided not final.');
+};
+
+subtest q[batch update libraries accepted final] => sub {
+  plan tests => 5;
+
+  my $id_run   = 400;
+  my $position = 2;
+  my $username = q[user];
+
+  my $values_lane = {
+    'id_run'         => $id_run,
+    'position'       => $position,
+    'id_mqc_outcome' => 1, #Accepted preeliminary
+    'username'       =>$username, 
+    'last_modified'  =>DateTime->now(),
+    'modified_by'    =>$username};
+    
+  my $object_lane = $schema->resultset(q[MqcOutcomeEnt])->create($values_lane);
+  isa_ok($object_lane, 'npg_qc::Schema::Result::MqcOutcomeEnt');
+
+  my $values_plex = {
+    'id_run'         => $id_run, 
+    'position'       => $position,
+    'username'       => $username, 
+    'last_modified'  => DateTime->now(),
+    'modified_by'    => $username
+  };
+  
+  my $rs = $schema->resultset(q[MqcLibraryOutcomeEnt]);
+
+  $values_plex->{'tag_index'}      = 10;
+  $values_plex->{'id_mqc_outcome'} = 1; #Accepted preeliminary
+  my $object_plex = $rs->create($values_plex);
+  ok($object_plex->in_storage, q[New plex in database]);
+
+  $values_plex->{'tag_index'}      = 20;
+  $values_plex->{'id_mqc_outcome'} = 2; #Rejected preeliminary
+  $object_plex = $rs->create($values_plex);
+  ok($object_plex->in_storage, q[New plex in database]);
+
+  my $tag_indexes_lims = [10, 20];
+  
+  $object_lane->update_outcome_with_libraries(q[Accepted final],
+                                              $username,
+                                              $tag_indexes_lims);
+
+  my $values_search = {
+    'id_run' => $id_run, 
+    'position' => $position,
+  };
+
+  my $changed_entities_rs = $rs->search($values_search);
+
+  my $new_desc = $changed_entities_rs->search({'tag_index' => 10})->first->mqc_outcome->short_desc;
+  is($new_desc, 'Accepted final', 'Updated to Accepted final');
+  $new_desc = $changed_entities_rs->search({'tag_index' => 20})->first->mqc_outcome->short_desc;
+  is($new_desc, 'Rejected final', 'Updated to Rejected final');
+};
+
+subtest q[batch update libraries rejected final] => sub {
+  plan tests => 6;
+
+  my $id_run   = 401;
+  my $position = 2;
+  my $username = q[user];
+
+  my $values_lane = {
+    'id_run'         => $id_run,
+    'position'       => $position,
+    'id_mqc_outcome' => 1, #Accepted preeliminary
+    'username'       =>$username, 
+    'last_modified'  =>DateTime->now(),
+    'modified_by'    =>$username};
+    
+  my $object_lane = $schema->resultset(q[MqcOutcomeEnt])->create($values_lane);
+  isa_ok($object_lane, 'npg_qc::Schema::Result::MqcOutcomeEnt');
+
+  my $values_plex = {
+    'id_run'         => $id_run, 
+    'position'       => $position,
+    'username'       => $username, 
+    'last_modified'  => DateTime->now(),
+    'modified_by'    => $username
+  };
+  
+  my $rs = $schema->resultset(q[MqcLibraryOutcomeEnt]);
+
+  $values_plex->{'tag_index'}      = 10;
+  $values_plex->{'id_mqc_outcome'} = 5; #Undecided
+  my $object_plex = $rs->create($values_plex);
+  ok($object_plex->in_storage, q[New plex in database]);
+
+  $values_plex->{'tag_index'}      = 20;
+  $values_plex->{'id_mqc_outcome'} = 5; #Undecided
+  $object_plex = $rs->create($values_plex);
+  ok($object_plex->in_storage, q[New plex in database]);
+
+  my $tag_indexes_lims = [10, 20, 30];
+  
+  $object_lane->update_outcome_with_libraries(q[Rejected final],
+                                              $username,
+                                              $tag_indexes_lims);
+
+  my $values_search = {
+    'id_run' => $id_run, 
+    'position' => $position,
+  };
+
+  my $changed_entities_rs = $rs->search($values_search);
+
+  my $new_desc = $changed_entities_rs->search({'tag_index' => 10})->first->mqc_outcome->short_desc;
+  is($new_desc, 'Undecided final', 'Updated to Undecided final');
+  $new_desc = $changed_entities_rs->search({'tag_index' => 20})->first->mqc_outcome->short_desc;
+  is($new_desc, 'Undecided final', 'Updated to Undecided final');
+  $new_desc = $changed_entities_rs->search({'tag_index' => 30})->first->mqc_outcome->short_desc;
+  is($new_desc, 'Undecided final', 'Updated to Undecided final');
+};
 
 1;
