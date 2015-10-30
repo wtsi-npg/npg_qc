@@ -131,10 +131,6 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 BUILDARGS
-
-  Calling parent constructor.
-
 =head2 get_outcomes_as_hash
 
   Returns a hash of plex=>outcome for those plexes in the database for the id_run/position specified.
@@ -154,7 +150,7 @@ Extended ResultSet with specific functionality for for manual MQC.
   Iterates on the list of tag_indexes provided to update outcomes to final for
   the library outcome entities related to the lane entity passed as parameter.
 
-  $tag_indexes = [1, 2, 3];
+  my $tag_indexes = [1, 2, 3];
   $resultset->batch_update_libraries($mqc_library_ent, $tag_indexes, $username);
 
 =head1 DEPENDENCIES

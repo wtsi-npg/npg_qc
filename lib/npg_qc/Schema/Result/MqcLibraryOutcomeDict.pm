@@ -179,7 +179,10 @@ Catalog for plex level library manual MQC statuses.
 
 =head1 SUBROUTINES/METHODS
 
-=cut
+=head2 is_final_undecided
+
+  Utility method which checks the short description to decide if the outcome can
+  be considered final and undecided.
 
 =head1 DEPENDENCIES
 
@@ -206,15 +209,6 @@ Catalog for plex level library manual MQC statuses.
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head1 SUBROUTINES/METHODS
-
-=head2 is_final_undecided
-
-  Utility method which checks the short description to decide if the outcome can
-  be considered final and undecided.
 
 =head1 AUTHOR
 
