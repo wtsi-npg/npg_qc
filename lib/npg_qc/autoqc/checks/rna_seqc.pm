@@ -11,7 +11,9 @@ use npg::api::run;
 use Readonly;
 use Try::Tiny;
 
-extends qw(npg_qc::autoqc::checks::check);
+extends qw(npg_qc::autoqc::checks::check
+           npg_pipeline::base
+);
 
 with qw(npg_tracking::data::reference::find 
         npg_common::roles::software_location
@@ -133,7 +135,7 @@ sub _build_command {
     if(!npg::api::run->new({id_run => $self->id_run})->is_paired_read()){
         $single_end_option=q[-singleEnd];
     }
-    my $command = q[echo ]. $self->java_cmd. sprintf q[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
+    my $command = $self->java_cmd. sprintf q[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
                                            $self->java_max_heap_size,
                                            $self->java_gc_type,
                                            $self->java_use_perf_data,
@@ -208,6 +210,7 @@ override 'execute' => sub {
     #TODO: if run outside the pipeline this will fail 
     #      if the env variable is not set. Inside the pipeline,
     #      one may expect it's been set at previous stages.
+    #      UPDATE 20151029: no it doesn't!
     my  $owning_group ||= $ENV{OWNING_GROUP};
     # ensure that the owning group is what we expect
     my $rc = `chgrp $owning_group $rna_seqc_dir`;
