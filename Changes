@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - upgrade genotype check to use samtools1 and bcftools1
+
 release 59.2
   - library-level manual QC for individual plexes.
 
