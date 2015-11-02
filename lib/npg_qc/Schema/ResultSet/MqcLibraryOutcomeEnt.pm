@@ -69,7 +69,7 @@ sub fetch_mqc_library_outcomes {
   my $rs1 = $self->search({
     'id_run' => $id_run,
     'position' => $position,
-  });
+  }, { 'cache' => 1 } );
   return $rs1;
 }
 
@@ -96,7 +96,8 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =head2 get_outcomes_as_hash
 
-  Returns a hash of plex=>outcome for those plexes in the database for the id_run/position specified.
+  Returns a hash of plex=>outcome for those plexes in the database for the
+  id_run/position specified.
 
 =head2 search_library_outcome_ent
 
@@ -105,8 +106,8 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =head2 fetch_mqc_library_outcomes
 
-  Returns a resultset with mqc library outcome entity for id_run, position
-  passed as parameters
+  Returns a cached resultset with mqc library outcome entity for id_run,
+  position passed as parameters.
 
 =head1 DEPENDENCIES
 

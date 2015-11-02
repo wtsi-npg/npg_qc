@@ -446,7 +446,7 @@ subtest q[batch update libraries accepted final] => sub {
 };
 
 subtest q[batch update libraries rejected final] => sub {
-  plan tests => 6;
+  plan tests => 8;
 
   my $id_run   = 401;
   my $position = 2;
@@ -502,6 +502,17 @@ subtest q[batch update libraries rejected final] => sub {
   is($new_desc, 'Undecided final', 'Updated to Undecided final');
   $new_desc = $changed_entities_rs->search({'tag_index' => 30})->first->mqc_outcome->short_desc;
   is($new_desc, 'Undecided final', 'Updated to Undecided final');
+  
+  my $rs_historic = $schema->resultset(q[MqcLibraryOutcomeHist]);
+  my $inserted_historics = $rs_historic->search({
+    'id_run'    => $id_run,
+    'position'  => $position,
+    'tag_index' => 30
+  });
+
+  is($inserted_historics->count, 1, q[One row inserted for historic]);
+  is($inserted_historics->first->mqc_outcome->short_desc,
+       q[Undecided final], q[Inserted undecided final in historic]);
 };
 
 1;

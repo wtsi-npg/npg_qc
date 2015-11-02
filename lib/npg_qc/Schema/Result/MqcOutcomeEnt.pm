@@ -255,39 +255,59 @@ sub update_outcome_with_libraries { #TODO 20151030 Change
 
   if( $outcome_dict_object->is_final_outcome
         && scalar @{$tag_indexes_in_lims} <= $self->mqc_lib_limit ) {
-    my $rs_library_ent = $self->result_source->schema->resultset( q[MqcLibraryOutcomeEnt] );
-    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes($self->id_run, $self->position);
-    $self->validate_outcome_of_libraries($outcome_dict_object, $tag_indexes_in_lims, $outcomes_libraries);
+    my $rs_library_ent = $self->result_source
+                              ->schema
+                              ->resultset( q[MqcLibraryOutcomeEnt] );
+    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes(
+      $self->id_run,
+      $self->position
+    );
+    $self->validate_outcome_of_libraries(
+      $outcome_dict_object,
+      $tag_indexes_in_lims,
+      $outcomes_libraries
+    );
     $outcomes_libraries->reset;
 
-    my $olh = {};
+    my $outcome_lib_hash = {};
+    my $undefined_placeholder = q[undefined];
     while ( my $library = $rs_library_ent->next ){
-      my $key = defined $library->tag_index ? $library->tag_index : q[A];
-      $olh->{$key} = $library;
+      my $key = defined $library->tag_index ? $library->tag_index
+                                            : $undefined_placeholder;
+      $outcome_lib_hash->{$key} = $library;
     }
 
-    my $new_outcome = q[Undecided final];
+    my $in_transaction = sub {
+      $self->validate_username($username);
+      my $rs_library_dict = $self->result_source
+                                 ->schema
+                                 ->resultset( q[MqcLibraryOutcomeDict] );
+      my $library_dict_obj = $rs_library_dict->search(
+        {'short_desc' => q[Undecided final]}
+      )->first;
+      my $new_outcome_id = $library_dict_obj->pk_value;
 
-    my $coderef1 = sub {
       foreach my $tag_index (@{$tag_indexes_in_lims}) {
-        my $key = defined $tag_index ? $tag_index : q[A];
+        my $key = defined $tag_index ? $tag_index
+                                     : $undefined_placeholder;
         my $library_ent;
-        if ( exists $olh->{$key} ) {
-          $library_ent = $olh->{$key};
+        if ( exists $outcome_lib_hash->{$key} ) {
+          $library_ent = $outcome_lib_hash->{$key};
           $library_ent->update_to_final_outcome($username);
         } else {
-          $library_ent = $rs_library_ent->search_library_outcome_ent(
-             $self->id_run,
-             $self->position,
-             $tag_index,
-             $username
-          );
-          $library_ent->update_outcome($new_outcome, $username);
+          my $values = {};
+          $values->{'id_run'}         = $self->id_run;
+          $values->{'position'}       = $self->position;
+          $values->{'tag_index'}      = $tag_index;
+          $values->{'username'}       = $username;
+          $values->{'modified_by'}    = $username;
+          $values->{'id_mqc_outcome'} = $new_outcome_id;
+          $library_ent = $rs_library_ent->create($values);
         }
       }
     };
 
-    $self->result_source->schema->txn_do($coderef1);
+    $self->result_source->schema->txn_do($in_transaction);
   }
   $self->update_outcome($outcome, $username);
 
@@ -313,12 +333,12 @@ Entity for lane MQC outcome.
 
 =head2 update
 
-  Default DBIx update method extended to create an entry in the table corresponding to 
+  Default DBIx update method extended to create an entry in the table corresponding to
   the MqcOutcomeHist class
 
 =head2 insert
 
-  Default DBIx insert method extended to create an entry in the table corresponding to 
+  Default DBIx insert method extended to create an entry in the table corresponding to
   the MqcOutcomeHist class
 
 =head2 update_reported
@@ -336,7 +356,7 @@ Entity for lane MQC outcome.
   Updates children library mqc outcomes then updates outcome of lane mqc entity
   passed as parameter. It expects a MqcOutcomeEnt object, a username for the
   operation and an arrary of plexes to update.
-  
+
   $obj->update_outcome_with_libraries($new_outcome, $username, $tag_indexes_in_lims);
 
 =head1 DEPENDENCIES
