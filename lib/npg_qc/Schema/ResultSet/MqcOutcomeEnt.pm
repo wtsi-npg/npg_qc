@@ -1,11 +1,10 @@
 package npg_qc::Schema::ResultSet::MqcOutcomeEnt;
 
 use Moose;
-use namespace::autoclean;
 use MooseX::NonMoose;
-use Carp;
+use namespace::autoclean;
 
-extends 'DBIx::Class::ResultSet';
+extends 'npg_qc::Schema::ResultSet';
 
 our $VERSION = '0';
 
@@ -16,8 +15,11 @@ sub get_not_reported {
 
 sub get_rows_with_final_current_outcome {
   my $self = shift;
-  #Final outcome comes from the short_desc of the relationship with the dictionary, only those with current status
-  return $self->search({'mqc_outcome.short_desc' => {like => '%final'}, 'mqc_outcome.iscurrent' => 1}, {'join'=>'mqc_outcome'});
+  #Final outcome comes from the short_desc of the relationship 
+  #with the dictionary, only those with current status
+  return $self->search(
+    {'mqc_outcome.short_desc' => {like => '%final'}, 'mqc_outcome.iscurrent' => 1},
+    {'join'=>'mqc_outcome'});
 }
 
 sub get_ready_to_report{
@@ -28,7 +30,6 @@ sub get_ready_to_report{
 sub get_outcomes_as_hash{
   my ($self, $id_run) = @_;
 
-  #Loading previuos status qc for tracking and mqc.
   my $previous_mqc = {};
   my $previous_rs = $self->search({'id_run'=>$id_run});
   while (my $obj = $previous_rs->next) {
@@ -65,7 +66,7 @@ npg_qc::Schema::ResultSet::MqcOutcomeEnt
 
 =head1 DESCRIPTION
 
-Extended ResultSet with specific functionality for for manual MQC.
+  Extended ResultSet for MqcOutcomeEnt  with specific functionality for manual MQC.
 
 =head1 DIAGNOSTICS
 
@@ -79,11 +80,15 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =head2 get_rows_with_final_current_outcome
 
-  Returns a list of entities with final outcomes acording to business rules. Currently it looks into the relationship with the dictionary to find those outcomes with a short description ending in 'final'.
+  Returns a list of entities with final outcomes acording to business rules.
+  Currently it looks into the relationship with the dictionary to find those
+  outcomes with a short description ending in 'final'.
 
 =head2 get_ready_to_report
 
-  Returns a list of MqcOutcomeEnt rows which are ready to be reported (have a final status but haven't been reported yet and which have an outcome marked as current in the dictionary).
+  Returns a list of MqcOutcomeEnt rows which are ready to be reported,
+  ie have a final status but haven't been reported yet and which have
+  an outcome marked as current in the dictionary.
 
 =head2 get_outcomes_as_hash
 
@@ -98,17 +103,13 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =over
 
-=item strict
-
-=item warnings
-
 =item Moose
-
-=item namespace::autoclean
 
 =item MooseX::NonMoose
 
-=item DBIx::Class::ResultSet
+=item namespace::autoclean
+
+=item npg_qc::Schema::ResultSet
 
 =back
 
