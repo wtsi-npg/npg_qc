@@ -1,6 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
 release 59.3
+ - upgrade genotype check to use samtools1 and bcftools1
  - SeqQC
    - New dictionary table for plex level library MQC. (Issue 238)
 

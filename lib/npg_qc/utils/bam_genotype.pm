@@ -21,8 +21,8 @@ use npg_common::roles::software_location;
 our $VERSION = '0';
 
 ##no critic
-Readonly::Scalar my $SAMTOOLS_NAME => 'samtools';
-Readonly::Scalar my $BCFTOOLS_NAME => 'bcftools';
+Readonly::Scalar my $SAMTOOLS_NAME => 'samtools1';
+Readonly::Scalar my $BCFTOOLS_NAME => 'bcftools1';
 
 subtype '_bamgt_ReadableFile'
       => as Str
@@ -335,14 +335,14 @@ sub _build__call_gt_cmd {
 	my $bam_file_list = $self->bam_file_list;
 
 	if(@{$bam_file_list} == 1) {
-		$cmd = sprintf q{bash -c 'set -o pipefail && %s view -b %s %s 2>/dev/null | %s mpileup -f %s -g - 2>/dev/null | %s view -l %s -g - 2>/dev/null'}, $self->samtools_extract_regions, $bam_file_list->[0], $self->_regions_string, $self->samtools_mpileup, $self->reference, $self->bcftools, $self->pos_snpname_map_filename;
+		$cmd = sprintf q{bash -c 'set -o pipefail && %s view -b %s %s 2>/dev/null | %s mpileup -l %s -f %s -g - 2>/dev/null | %s call -c -O v - 2>/dev/null'}, $self->samtools_extract_regions, $bam_file_list->[0], $self->_regions_string, $self->samtools_mpileup, $self->pos_snpname_map_filename, $self->reference, $self->bcftools;
 	}
 	else {
 		$cmd = sprintf q{bash -c 'set -o pipefail && %s merge -- - }, $self->samtools_merge;
 		for my $bam_file (@{$bam_file_list}) {
 			$cmd .= sprintf q{<(%s view -b %s %s) }, $self->samtools_extract_regions, $bam_file, $self->_regions_string;
 		}
-		$cmd .= sprintf q{ | %s mpileup -f %s -g - 2>/dev/null | %s view -l %s -g - 2>/dev/null'}, $self->samtools_mpileup, $self->reference, $self->bcftools, $self->pos_snpname_map_filename;
+		$cmd .= sprintf q{ | %s mpileup -l %s -f %s -g - 2>/dev/null | %s call -c -O v - 2>/dev/null'}, $self->samtools_mpileup, $self->pos_snpname_map_filename, $self->reference, $self->bcftools;
 	}
 
 	return $cmd;
