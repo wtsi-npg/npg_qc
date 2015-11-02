@@ -50,7 +50,7 @@ subtest 'Test insert' => sub {
     'modified_by'    => 'user'
   };
   $rs = $schema->resultset($table);
-  $rs->result_class->deflate_unique_key_components($values);
+  $rs->deflate_unique_key_components($values);
   is($values->{'tag_index'}, -1, 'tag index deflated');
   lives_ok {$rs->find_or_new($values)
                ->set_inflated_columns($values)
@@ -118,7 +118,7 @@ subtest 'Test insert with historic' => sub {
   $values_for_search->{'id_mqc_outcome'} = 1;
 
   my $rs = $schema->resultset($table);
-  $rs->result_class->deflate_unique_key_components($values_for_search);
+  $rs->deflate_unique_key_components($values_for_search);
 
   my $hist_object_rs = $schema->resultset($hist_table)->search($values_for_search);
   is ($hist_object_rs->count, 0, q[no row matches in the historic table before insert in entity]);

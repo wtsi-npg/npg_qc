@@ -95,7 +95,7 @@ subtest q[get outcomes as hash] => sub {
     'modified_by'    => 'user'
   };
   $rs = $schema->resultset($table);
-  $rs->result_class->deflate_unique_key_components($values);
+  $rs->deflate_unique_key_components($values);
   is($values->{'tag_index'}, -1, 'tag index deflated');
   lives_ok {$rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert()} 'entity record inserted';
   my $rs1 = $rs->search({'id_run' => 200});
