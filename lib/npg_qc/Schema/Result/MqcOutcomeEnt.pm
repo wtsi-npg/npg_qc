@@ -271,7 +271,7 @@ sub update_outcome_with_libraries { #TODO 20151030 Change
 
     my $outcome_lib_hash = {};
     my $undefined_placeholder = q[undefined];
-    while ( my $library = $rs_library_ent->next ){
+    while ( my $library = $outcomes_libraries->next ){
       my $key = defined $library->tag_index ? $library->tag_index
                                             : $undefined_placeholder;
       $outcome_lib_hash->{$key} = $library;
