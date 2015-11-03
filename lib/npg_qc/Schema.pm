@@ -8,11 +8,13 @@ use Moose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Schema';
 
-__PACKAGE__->load_namespaces;
+__PACKAGE__->load_namespaces(
+    default_resultset_class => 'ResultSet',
+);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2014-02-24 09:37:40
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iHP1VU0U0dqzLPd7RT3OCw
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 16:29:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1VnoZJVlyZFagZssn5EKNg
 
 use namespace::autoclean;
 our $VERSION = '0';
@@ -33,7 +35,8 @@ npg_qc::Schema
 
 A Moose class for a DBIx schema with an ability to retrieve db cridentials
 from a configuration file. Provides a schema object for a DBIx binding
-for the npgqc database.
+for the npgqc database. Instructs to use a custom class npg_qc::Schema::ResultSet
+to derive ResultSet objects from.
 
 =head1 SUBROUTINES/METHODS
 
@@ -67,7 +70,7 @@ Guoying Qi
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, Guoying Qi
+Copyright (C) 2015 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -163,25 +163,24 @@ __PACKAGE__->set_primary_key('id_mqc_library_outcome_hist');
 
 Type: belongs_to
 
-Related object: L<npg_qc::Schema::Result::MqcOutcomeDict>
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeDict>
 
 =cut
 
 __PACKAGE__->belongs_to(
   'mqc_outcome',
-  'npg_qc::Schema::Result::MqcOutcomeDict',
-  { id_mqc_outcome => 'id_mqc_outcome' },
+  'npg_qc::Schema::Result::MqcLibraryOutcomeDict',
+  { id_mqc_library_outcome => 'id_mqc_outcome' },
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-18 14:34:46
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5GjFSZPPAnqEPdxq3KQluQ
-
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
-our $VERSION = '0';
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+ZIiWq9L3iwF/8xGwys30g
 
 with qw/npg_qc::Schema::Flators/;
+
+our $VERSION = '0';
 
 __PACKAGE__->set_inflator4scalar('tag_index');
 

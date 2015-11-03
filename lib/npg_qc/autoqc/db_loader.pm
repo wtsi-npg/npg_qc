@@ -227,7 +227,7 @@ sub _values2db {
          ->update({$iscurrent_column_name => 0});
     }
   } else {
-    $result_class->deflate_unique_key_components($values);
+    $rs->deflate_unique_key_components($values);
     $found = $rs->find($values);
   }
 
@@ -237,7 +237,7 @@ sub _values2db {
       $count++;
     }
   } else {
-    $rs->new($values)->set_inflated_columns($values)->insert();
+    $rs->new_result($values)->set_inflated_columns($values)->insert();
     $count++;
   }
 

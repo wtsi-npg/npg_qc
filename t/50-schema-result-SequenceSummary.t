@@ -42,7 +42,7 @@ subtest 'load the same data twice' => sub {
   my $values =  _get_data('17448_1#9.sequence_summary.json');
   my $fk_row = $schema->resultset('SeqComposition')->create({digest => '45678', size => 2});
 
-  my $object = $ss_rs->new($values);
+  my $object = $ss_rs->new_result($values);
   isa_ok($object, 'npg_qc::Schema::Result::SequenceSummary');
   throws_ok {$object->insert()}
     qr/sequence_summary\.id_seq_composition may not be NULL/,
@@ -59,7 +59,7 @@ subtest 'load the same data twice' => sub {
   is ($row->iscurrent, 1, 'row is current');
   ok ($row->date, 'date is set');
 
-  $object = $ss_rs->new($values);
+  $object = $ss_rs->new_result($values);
   $object->id_seq_composition($fk_row->id_seq_composition);
   $object->insert();
 

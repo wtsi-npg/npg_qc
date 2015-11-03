@@ -33,7 +33,7 @@ my $table = 'InsertSize';
   };
 
   my $values = from_json($json);
-  my $object = $schema->resultset($table)->new($values);
+  my $object = $schema->resultset($table)->new_result($values);
   isa_ok($object, 'npg_qc::Schema::Result::InsertSize');
   lives_ok {$object->insert()} 'creating a row in the database lives';
 
@@ -67,7 +67,7 @@ my $json = q {
 my $values = from_json($json);
 
 {
-  lives_ok {$schema->resultset($table)->new($values)->insert()} 'lane record created';
+  lives_ok {$schema->resultset($table)->new_result($values)->insert()} 'lane record created';
   my $row = $schema->resultset($table)->find({id_run=>9225,position=>1,tag_index=>-1});
   ok($row, 'lane record retrieved');
   is($row->tag_index, undef, qq[lane tag index retrieved as undef]);
@@ -90,7 +90,7 @@ my $values = from_json($json);
   $lvalues->{"expected_size"} = [800,400];
   delete $lvalues->{"tag_index"};
   my $rs = $schema->resultset($table);
-  $rs->result_class->deflate_unique_key_components($lvalues);
+  $rs->deflate_unique_key_components($lvalues);
   lives_ok {$rs->find_or_new($lvalues)->set_inflated_columns($lvalues)->update_or_insert()} 'lane record updated';
   my $row = $rs->find({id_run=>9225,position=>1,tag_index=>-1});
   ok($row, 'updated lane record retrieved');
@@ -104,7 +104,7 @@ my $values = from_json($json);
   delete $lvalues->{"tag_index"};
   $lvalues->{"position"} = 2;
   my $rs = $schema->resultset($table);
-  $rs->result_class->deflate_unique_key_components($lvalues);
+  $rs->deflate_unique_key_components($lvalues);
   lives_ok {$rs->find_or_new($lvalues)->set_inflated_columns($lvalues)->update_or_insert()} 'lane record inserted';
   my $row = $rs->find({id_run=>9225,position=>2,tag_index=>-1});
   ok($row, 'new lane record retrieved');
@@ -120,7 +120,7 @@ my $values = from_json($json);
   $lvalues->{"expected_size"} = [];
   $lvalues->{"position"} = 3;
   my $rs = $schema->resultset($table);
-  $rs->result_class->deflate_unique_key_components($lvalues);
+  $rs->deflate_unique_key_components($lvalues);
   lives_ok {$rs->find_or_new($lvalues)->set_inflated_columns($lvalues)->update_or_insert()} 'lane record inserted';
   my $row = $rs->find({id_run=>9225,position=>3,tag_index=>-1});
   ok($row, 'new lane record retrieved');

@@ -34,13 +34,13 @@ my $schema = Moose::Meta::Class->create_anon_class(
 
 my $values = from_json($json);
 my $rs = $schema->resultset('PulldownMetrics');
-isa_ok($rs->new($values), 'npg_qc::Schema::Result::PulldownMetrics');
+isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::PulldownMetrics');
 
 {
   my %values1 = %{$values};
   my $v1 = \%values1;
 
-  $rs->result_class->deflate_unique_key_components($v1);
+  $rs->deflate_unique_key_components($v1);
   is($v1->{'tag_index'}, 0, 'tag index zero not deflated');
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'tag zero record inserted';
   my $rs1 = $rs->search({});
