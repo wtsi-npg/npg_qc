@@ -98,12 +98,13 @@ A parent class for ResultSet objects in npg_qc::Schema DBIx binding.
 =head2 search_autoqc
 
 Transparently searches for autoqc objects irrespectedly of their database
-implementation, ie the objects might have id_run, position, etc values
+implementation, i.e. the objects might have id_run, position, etc. values
 in the table with the data or they can just link to the seq_composition table.
 
-A ResultSet is returned in any context.
+A ResultSet is returned in any context. The "cache" option is enabled for
+the query.
 
-size argument is ignored if the table with the data is not linked
+The "size" argument is ignored if the table with the data is not linked
 to the seq_composition table.
 
   my $rset = $rs->search_autoqc($query, $size);
@@ -122,7 +123,7 @@ Example for a table that is not linked to the seq_composition table.
   # rows for tag 45 results
   $srs->search_autoqc({id_run => 17967, position => 1, tag_index => 45 });
 
-If the table is linked to the seq_composition table and size argument is not
+If the table is linked to the seq_composition table and the "size" argument is not
 defined or is zero, the search will be for all compositions that have a
 component defined by the search query - the first argument.
 
