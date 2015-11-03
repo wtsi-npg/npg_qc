@@ -30,7 +30,7 @@ sub get_outcomes_as_hash{
   return $previous_mqc;
 }
 
-sub search_library_outcome_ent {
+sub find_or_create_library_outcome_ent {
   my ( $self, $id_run, $position, $tag_index, $username ) = @_;
 
   if(!defined $id_run) {
@@ -98,7 +98,7 @@ npg_qc::Schema::ResultSet::MqcLibraryOutcomeEnt
   Returns a hash of plex=>outcome for those plexes in the database for the
   id_run/position specified.
 
-=head2 search_library_outcome_ent
+=head2 find_or_create_library_outcome_ent
 
   Find previous mqc outcome for the id_run/position/tag_index,
   create it for the specified user if it does not exist.
