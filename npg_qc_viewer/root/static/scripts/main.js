@@ -46,6 +46,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
   $('<img/>')[0].src = "/static/images/padlock.png";
+  $('<img/>')[0].src = "/static/images/circle.png";
 
   // Getting the run_id from the title of the page using the qc part too.
   var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
