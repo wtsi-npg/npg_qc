@@ -249,7 +249,7 @@ sub validate_outcome_of_libraries {
   return 1;
 }
 
-sub update_outcome_with_libraries { #TODO 20151030 Change
+sub update_outcome_with_libraries {
   my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
   my $outcome_dict_object = $self->find_valid_outcome($outcome);
 
