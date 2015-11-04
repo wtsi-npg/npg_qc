@@ -6,8 +6,8 @@ use English qw( -no_match_vars );
 use Carp;
 use File::Spec::Functions qw( catdir );
 use File::Basename;
+use File::Path qw(make_path);
 use npg_qc::autoqc::types;
-#use npg::api::run;
 use Readonly;
 use Try::Tiny;
 use npg_tracking::util::types;
@@ -71,6 +71,20 @@ sub _build_alignments_in_bam {
 has 'qc_out'     => (is         => 'ro',
                      isa        => 'NpgTrackingDirectory',
                      required   => 1,);
+
+has 'rna_seqc_path' => (is         => 'ro',
+                       isa        => 'Str',
+                       lazy_build => 1,);
+
+sub _build_rna_seqc_path {
+	my ($self) = @_;
+	my $archive_qc_rna_seqc_path = $self->qc_out;
+	my $lane_path = q[lane]. $self->position;
+	if (defined $self->tag_index) {
+        $archive_qc_rna_seqc_path =~ s{/$lane_path}{}smx;
+    }
+    return $archive_qc_rna_seqc_path .= q[/rna_seqc];
+}
 
 has 'input_str' => (is => 'ro',
                     isa        => 'Str',
@@ -161,7 +175,7 @@ override 'can_run' => sub {
 
 override 'execute' => sub {
     my ($self) = @_;
-    
+
     if (super() == 0) {
     	return 1;
     }
@@ -175,39 +189,23 @@ override 'execute' => sub {
     if (!$can_run) {
     	return 1;
     }
-    
-    my $rna_seqc_dir = join q[_], $self->id_run, $self->position;
-    if (defined $self->tag_index) {
-      $rna_seqc_dir .= $self->tag_label;
-    }
-    $rna_seqc_dir = join q[/], $self->qc_out, $rna_seqc_dir;
-    if (!-e $rna_seqc_dir) {
-      if (!mkdir $rna_seqc_dir) {
-         #catch $_, exit 
-      }
-    } 
 
-    #TODO: Directory making lines might be deleted in the future
-    #      if it's decided they should go to the same place tileviz
-    #      is created (npg_pipeline::base).
-    #---------------------------------------------------------------------------------------------
-    # check existence of rna_seqc directory
+    my $rna_seqc_dir = $self->rna_seqc_path;    
+    my $rpt_dir = join (q[_], $self->id_run, $self->position);
+    if (defined $self->tag_index) {
+        $rpt_dir .= $self->tag_label;
+    }
+    my $out_dir = join (q[/], $rna_seqc_dir, $self->id_run, $rpt_dir);
+    # check existence of RNA_SeQC's output directory,
     # create if it doesn't
-    #if ( ! -d $rna_seqc_dir) {
-    #    my $mk_rna_seqc_dir_cmd = qq{mkdir -p $rna_seqc_dir};
-    #    my $return = qx{$mk_rna_seqc_dir_cmd};
-    #    if ( $CHILD_ERROR ) {
-    #        croak $rna_seqc_dir . qq{ does not exist and unable to create: $CHILD_ERROR\n$return};
-    #    }
-    #}
-    #TODO: delete up to here ---------------------------------------------------------------------
+    if ( ! -d $out_dir) {
+        make_path($out_dir);
+    }
 
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
     $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
-    $self->result->set_info('Command', $self->command);
-
-    my $command = $self->_command($rna_seqc_dir);
-
+    my $command = $self->_command($out_dir);
+    $self->result->set_info('Command', $command);    
     if (system $command) {
         carp "Failed to execute $command";
     }
@@ -224,28 +222,17 @@ override 'execute' => sub {
 #      Leave a half-baked stub for future use.
 #sub _parse_metrics {
 #    my ($self, $fh) = @_;
-#
 #    if (!$fh) {
 #        croak q[File handle is not available, cannot parse rna-seqc metrics];
 #    }
-#
 #    my @lines = ();
-#
 #    while (my $line = <$fh>) {
 #        chomp $line;
 #        push @lines, $line;
 #    }
-#
 #    close $fh or croak qq[Cannot close pipe in __PACKAGE__ : $ERRNO, $CHILD_ERROR];
-#
 #    my @keys = split /\t/smx, $lines[0];
 #    my @values = split /\t/smx, $lines[1];
-#    my $num_keys = scalar @keys;
-#    my $num_values = scalar @values;
-#    if ($num_keys != $num_values) {
-#        croak qq[Mismatch in number of keys and values, $num_keys agains $num_values];
-#    }
-#
 #    my $results = {};
 #    my $i = 0;
 #    while ($i < $num_keys) {
@@ -255,7 +242,6 @@ override 'execute' => sub {
 #    }
 #        $i++;
 #    }
-#
 #    return $results;
 #}
 
