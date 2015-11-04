@@ -251,17 +251,66 @@ sub validate_outcome_of_libraries {
 
 sub update_outcome_with_libraries {
   my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
-
   my $outcome_dict_object = $self->find_valid_outcome($outcome);
+
   if( $outcome_dict_object->is_final_outcome
         && scalar @{$tag_indexes_in_lims} <= $self->mqc_lib_limit ) {
-    my $rs_library_ent = $self->result_source->schema->resultset( q[MqcLibraryOutcomeEnt]);
-    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes($self->id_run, $self->position);
-    $self->validate_outcome_of_libraries($outcome_dict_object, $tag_indexes_in_lims, $outcomes_libraries);
-    $rs_library_ent->batch_update_libraries( $self, $tag_indexes_in_lims, $username );
-  }
+    my $rs_library_ent = $self->result_source
+                              ->schema
+                              ->resultset( q[MqcLibraryOutcomeEnt] );
+    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes(
+      $self->id_run,
+      $self->position
+    );
+    $self->validate_outcome_of_libraries(
+      $outcome_dict_object,
+      $tag_indexes_in_lims,
+      $outcomes_libraries
+    );
+    $outcomes_libraries->reset;
 
+    my $outcome_lib_hash = {};
+    my $undefined_placeholder = q[undefined];
+    while ( my $library = $outcomes_libraries->next ){
+      my $key = defined $library->tag_index ? $library->tag_index
+                                            : $undefined_placeholder;
+      $outcome_lib_hash->{$key} = $library;
+    }
+
+    my $in_transaction = sub {
+      $self->validate_username($username);
+      my $rs_library_dict = $self->result_source
+                                 ->schema
+                                 ->resultset( q[MqcLibraryOutcomeDict] );
+      my $library_dict_obj = $rs_library_dict->search(
+        {'short_desc' => q[Undecided final]}
+      )->first;
+      my $new_outcome_id = $library_dict_obj->pk_value;
+
+      foreach my $tag_index (@{$tag_indexes_in_lims}) {
+        my $key = defined $tag_index ? $tag_index
+                                     : $undefined_placeholder;
+        my $library_ent;
+        if ( exists $outcome_lib_hash->{$key} ) {
+          $library_ent = $outcome_lib_hash->{$key};
+          $library_ent->update_to_final_outcome($username);
+        } else {
+          my $values = {};
+          $values->{'id_run'}         = $self->id_run;
+          $values->{'position'}       = $self->position;
+          $values->{'tag_index'}      = $tag_index;
+          $values->{'username'}       = $username;
+          $values->{'modified_by'}    = $username;
+          $values->{'id_mqc_outcome'} = $new_outcome_id;
+          $library_ent = $rs_library_ent->create($values);
+        }
+      }
+    };
+
+    $self->result_source->schema->txn_do($in_transaction);
+  }
   $self->update_outcome($outcome, $username);
+
   return 1;
 }
 
@@ -282,25 +331,20 @@ Entity for lane MQC outcome.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 update_reported
-
-  Updates the value of reported to the current timestamp. Thorws exception if the
-  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
-
 =head2 update
 
-  With around on DBIx update method to create an entry in the table corresponding to 
+  Default DBIx update method extended to create an entry in the table corresponding to
   the MqcOutcomeHist class
 
 =head2 insert
 
-  With around on DBIx insert method to create an entry in the table corresponding to 
+  Default DBIx insert method extended to create an entry in the table corresponding to
   the MqcOutcomeHist class
 
-=head2 data_for_historic
+=head2 update_reported
 
-  Returns a hash with elements for the historic representation of the entity, a 
-  subset of values of the instance.
+  Updates the value of reported to the current timestamp. Thorws exception if the
+  associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
 
 =head2 validate_outcome_of_libraries
 
@@ -310,7 +354,10 @@ Entity for lane MQC outcome.
 =head2 update_outcome_with_libraries
 
   Updates children library mqc outcomes then updates outcome of lane mqc entity
-  passed as parameter.
+  passed as parameter. It expects a MqcOutcomeEnt object, a username for the
+  operation and an arrary of plexes to update.
+
+  $obj->update_outcome_with_libraries($new_outcome, $username, $tag_indexes_in_lims);
 
 =head1 DEPENDENCIES
 

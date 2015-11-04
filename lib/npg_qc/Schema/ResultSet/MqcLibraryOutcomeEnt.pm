@@ -1,11 +1,11 @@
 package npg_qc::Schema::ResultSet::MqcLibraryOutcomeEnt;
 
 use Moose;
-use namespace::autoclean;
 use MooseX::NonMoose;
+use namespace::autoclean;
 use Carp;
 
-extends 'DBIx::Class::ResultSet';
+extends 'npg_qc::Schema::ResultSet';
 
 our $VERSION = '0';
 
@@ -18,14 +18,14 @@ sub get_outcomes_as_hash{
   if(!defined $position) {
     croak q[Mandatory parameter 'position' missing in call];
   }
-  #Loading previuos status qc for tracking and mqc.
+
   my $previous_mqc = {};
   my $previous_rs = $self->search({
     'id_run'   => $id_run,
     'position' => $position
   });
   while (my $obj = $previous_rs->next) {
-    $previous_mqc->{$obj->tag_index} = $obj->mqc_outcome->short_desc; #TODO tag_index = undef?
+    $previous_mqc->{$obj->tag_index} = $obj->mqc_outcome->short_desc;
   }
   return $previous_mqc;
 }
@@ -46,8 +46,7 @@ sub search_library_outcome_ent {
   $values->{'id_run'}    = $id_run;
   $values->{'position'}  = $position;
   $values->{'tag_index'} = $tag_index;
-  $self->result_class->deflate_unique_key_components($values);
-  my $ent = $self->search($values)->next;
+  my $ent = $self->search_autoqc($values)->next;
   if (!$ent) {
     $values->{'username'}    = $username;
     $values->{'modified_by'} = $username;
@@ -69,27 +68,8 @@ sub fetch_mqc_library_outcomes {
   my $rs1 = $self->search({
     'id_run' => $id_run,
     'position' => $position,
-  });
+  }, { 'cache' => 1 } );
   return $rs1;
-}
-
-sub batch_update_libraries {
-  my ($self, $lane_ent, $tag_indexes_in_lims, $username) = @_;
-
-  foreach my $tag_index (@{$tag_indexes_in_lims}) {
-    my $library_ent = $self->search_library_outcome_ent($lane_ent->id_run, $lane_ent->position, $tag_index, $username);
-    my $new_outcome = q[Undecided];
-    if ($library_ent->in_storage) {
-      if($library_ent->mqc_outcome->short_desc eq q[Accepted preliminary]) {
-        $new_outcome = q[Accepted final];
-      } elsif ($library_ent->mqc_outcome->short_desc eq q[Rejected preliminary]) {
-        $new_outcome = q[Rejected final];
-      }
-    }
-    $library_ent->update_outcome($new_outcome, $username);
-  }
-
-  return 1;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -105,7 +85,7 @@ npg_qc::Schema::ResultSet::MqcLibraryOutcomeEnt
 
 =head1 DESCRIPTION
 
-Extended ResultSet with specific functionality for for manual MQC.
+  Extended ResultSet for MqcLibraryOutcomeEnt with specific functionality for manual MQC.
 
 =head1 DIAGNOSTICS
 
@@ -113,13 +93,10 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 BUILDARGS
-
-  Calling parent constructor.
-
 =head2 get_outcomes_as_hash
 
-  Returns a hash of plex=>outcome for those plexes in the database for the id_run/position specified.
+  Returns a hash of plex=>outcome for those plexes in the database for the
+  id_run/position specified.
 
 =head2 search_library_outcome_ent
 
@@ -128,29 +105,22 @@ Extended ResultSet with specific functionality for for manual MQC.
 
 =head2 fetch_mqc_library_outcomes
 
-  Returns a resultset with mqc library outcome entity for id_run, position
-  passed as parameters
-
-=head2 batch_update_libraries
-
-  Iterates on the list of tag_indexes provided to update outcomes to final for
-  the library outcome entities related to the lane entity passed as parameter.
+  Returns a cached resultset with mqc library outcome entity for id_run,
+  position passed as parameters.
 
 =head1 DEPENDENCIES
 
 =over
 
-=item strict
-
-=item warnings
-
 =item Moose
-
-=item namespace::autoclean
 
 =item MooseX::NonMoose
 
-=item DBIx::Class::ResultSet
+=item namespace::autoclean
+
+=item Carp
+
+=item npg_qc::Schema::ResultSet
 
 =back
 

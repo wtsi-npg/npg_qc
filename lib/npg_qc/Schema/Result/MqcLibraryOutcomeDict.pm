@@ -1,5 +1,5 @@
 
-package npg_qc::Schema::Result::MqcOutcomeDict;
+package npg_qc::Schema::Result::MqcLibraryOutcomeDict;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
@@ -8,7 +8,7 @@ package npg_qc::Schema::Result::MqcOutcomeDict;
 
 =head1 NAME
 
-npg_qc::Schema::Result::MqcOutcomeDict
+npg_qc::Schema::Result::MqcLibraryOutcomeDict - Dictionary table for plex level library MQC
 
 =cut
 
@@ -44,15 +44,15 @@ use namespace::autoclean;
 
 __PACKAGE__->load_components('InflateColumn::DateTime');
 
-=head1 TABLE: C<mqc_outcome_dict>
+=head1 TABLE: C<mqc_library_outcome_dict>
 
 =cut
 
-__PACKAGE__->table('mqc_outcome_dict');
+__PACKAGE__->table('mqc_library_outcome_dict');
 
 =head1 ACCESSORS
 
-=head2 id_mqc_outcome
+=head2 id_mqc_library_outcome
 
   data_type: 'smallint'
   extra: {unsigned => 1}
@@ -88,7 +88,7 @@ Is it visible in UI
 =cut
 
 __PACKAGE__->add_columns(
-  'id_mqc_outcome',
+  'id_mqc_library_outcome',
   {
     data_type => 'smallint',
     extra => { unsigned => 1 },
@@ -109,53 +109,58 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</id_mqc_outcome>
+=item * L</id_mqc_library_outcome>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key('id_mqc_outcome');
+__PACKAGE__->set_primary_key('id_mqc_library_outcome');
 
 =head1 RELATIONS
 
-=head2 mqc_outcome_ents
+=head2 mqc_library_outcome_ents
 
 Type: has_many
 
-Related object: L<npg_qc::Schema::Result::MqcOutcomeEnt>
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeEnt>
 
 =cut
 
 __PACKAGE__->has_many(
-  'mqc_outcome_ents',
-  'npg_qc::Schema::Result::MqcOutcomeEnt',
-  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
+  'mqc_library_outcome_ents',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeEnt',
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_library_outcome' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 mqc_outcome_hists
+=head2 mqc_library_outcome_hists
 
 Type: has_many
 
-Related object: L<npg_qc::Schema::Result::MqcOutcomeHist>
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeHist>
 
 =cut
 
 __PACKAGE__->has_many(
-  'mqc_outcome_hists',
-  'npg_qc::Schema::Result::MqcOutcomeHist',
-  { 'foreign.id_mqc_outcome' => 'self.id_mqc_outcome' },
+  'mqc_library_outcome_hists',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeHist',
+  { 'foreign.id_mqc_outcome' => 'self.id_mqc_library_outcome' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-22 15:31:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:diQejZUulONV1fs7m9M5Jg
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CoqhznB0+X8oK27t33skvw
 
 with qw/npg_qc::Schema::Mqc::OutcomeDict/;
 
 our $VERSION = '0';
+
+sub is_final_undecided {
+  my $self = shift;
+  return $self->is_final_outcome && $self->is_undecided;
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -166,7 +171,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Catalog for manual MQC statuses.
+Catalog for plex level library manual MQC statuses.
 
 =head1 DIAGNOSTICS
 
@@ -174,7 +179,10 @@ Catalog for manual MQC statuses.
 
 =head1 SUBROUTINES/METHODS
 
-=cut
+=head2 is_final_undecided
+
+  Utility method which checks the short description to decide if the outcome can
+  be considered final and undecided.
 
 =head1 DEPENDENCIES
 
@@ -226,3 +234,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
+
