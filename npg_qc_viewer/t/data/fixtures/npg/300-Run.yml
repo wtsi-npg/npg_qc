@@ -64,4 +64,30 @@
   is_paired: 0
   priority: 1
   team: '"joint"'
+- actual_cycle_count: 76
+  batch_id: 4354
+  expected_cycle_count: 76
+  flowcell_id: ~
+  folder_name: ~
+  folder_path_glob: ~
+  id_instrument: 9
+  id_instrument_format: 4
+  id_run: 5500
+  id_run_pair: 0
+  is_paired: 1
+  priority: 1
+  team: '"joint"'
+- id_run : 10107
+  id_instrument : 110
+  priority : 1
+  actual_cycle_count : 512
+  expected_cycle_count : 512
+  id_run_pair : NULL
+  is_paired : 0
+  batch_id : 37400
+  id_instrument_format : 11
+  flowcell_id : ~
+  folder_name : ~
+  folder_path_glob : ~
+  team : '"C"'
 
