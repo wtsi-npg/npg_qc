@@ -68,10 +68,21 @@ sub _build_alignments_in_bam {
     return $self->lims->alignments_in_bam;
 }
 
+######################################################################
+# Output path:
+#  By default, the pipeline supplies the archive/(lane#/)qc path 
+#  under the Latest_Summary directory (the path attribute value is set
+#  via the qc_out value). This is used to lazy-build the output path 
+#  for the RNA-SeQC results below. The qc_out attribute remains intact
+#  so the JSON files are stored in the standard location
+######################################################################
 has 'qc_out'     => (is         => 'ro',
                      isa        => 'NpgTrackingDirectory',
                      required   => 1,);
 
+# Append rna_seqc to the output path. For indexed runs, removing the 
+# lane# element will result in the correct location of the rna_seqc 
+# dir (next to tileviz). For non-indexed runs use default qc_out. 
 has 'rna_seqc_path' => (is         => 'ro',
                        isa        => 'Str',
                        lazy_build => 1,);
@@ -93,9 +104,9 @@ has 'input_str' => (is => 'ro',
 sub _build_input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
-    my $notes = $self->lims->library_name // $sample_id;
+    my $library_name = $self->lims->library_name // $sample_id;
     my $input_file = $self->bam_file;
-    return qq["$sample_id|$input_file|$notes"];
+    return qq["$library_name|$input_file|$sample_id"];
 }
 
 has 'reference_fasta' => (is => 'ro',
@@ -191,11 +202,12 @@ override 'execute' => sub {
     }
 
     my $rna_seqc_dir = $self->rna_seqc_path;    
-    my $rpt_dir = join (q[_], $self->id_run, $self->position);
+    my $rp_dir = join (q[_], $self->id_run, $self->position);
+    my $out_dir = join (q[/], $rna_seqc_dir, $rp_dir);
     if (defined $self->tag_index) {
-        $rpt_dir .= $self->tag_label;
+        my $rpt_dir = $rp_dir . $self->tag_label;
+        $out_dir = join (q[/], $rna_seqc_dir, $rp_dir, $rpt_dir);
     }
-    my $out_dir = join (q[/], $rna_seqc_dir, $self->id_run, $rpt_dir);
     # check existence of RNA_SeQC's output directory,
     # create if it doesn't
     if ( ! -d $out_dir) {
