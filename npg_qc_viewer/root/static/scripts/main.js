@@ -8,13 +8,17 @@ require.config({
         adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
         mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
         unveil: 'bower_components/jquery-unveil/jquery.unveil',
+        'jquery.base64' : 'bower_components/table-export/jquery.base64',
+        'table-export': 'bower_components/table-export/tableExport',
     },
     shim: {
         d3: {
             //makes d3 available automatically for all modules
             exports: 'd3'
         },
-        unveil: ["jquery"]
+        unveil: ["jquery"],
+        'jquery.base64' : ["jquery"],
+        'table-export': ["jquery"],
     }
 });
 
@@ -32,7 +36,7 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil'],
+require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'jquery.base64', 'table-export'],
 function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   //Setup for heatmaps to load on demand.
   $("img").unveil(2000);
@@ -63,7 +67,6 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
     if (runTitleParserResult.isRunPage) {
       var lanesWithBG = []; //Lanes with previous QC, BG with colour
       control = new NPG.QC.RunPageMQCControl(prodConfiguration);
-      window.console && console.log("Run page");
       control.parseLanes(lanes, lanesWithBG);
       control.prepareMQC(id_run, lanes, lanesWithBG);
     } else {
@@ -73,6 +76,18 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
       control.prepareMQC(id_run, position, lanes);
     }
   }
+
+  $('#results_summary').dblclick(function () {
+    var table_html = $('#results_summary')[0].outerHTML;
+    var regexp = new RegExp('<br>|<br \/>', 'gi');
+    var regexpSpaces = new RegExp('[^a-zA-Z 0-9]+', 'g');
+
+    var without_br = $(table_html.replace(regexp, ' | ').replace(regexpSpaces, ''));
+    without_br.find('a').contents().unwrap();
+    without_br.find('thead').find('tr:last').remove(); //Remove second row in headers
+    without_br.find('#total').remove();
+    without_br.tableExport({escape:'false', filter:function(index) { return this;}});
+  });
 
   jQuery('.bcviz_insert_size').each(function(i) {
     var self = $(this);
