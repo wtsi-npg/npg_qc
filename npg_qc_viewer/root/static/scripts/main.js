@@ -8,7 +8,7 @@ require.config({
         adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
         mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
         unveil: 'bower_components/jquery-unveil/jquery.unveil',
-        'table-export': 'bower_components/table-export/tableExport.min',
+        'table-export': 'bower_components/table-export/tableExport',
     },
     shim: {
         d3: {
