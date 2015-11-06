@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 50;
+use Test::More tests => 51;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -386,6 +386,37 @@ subtest 'Update to final' => sub {
     'Error trying to set as undecided final from undecided';
   ok ( $object->is_undecided && !$object->has_final_outcome,
          'Entity has undecided not final.');
+};
+
+subtest q[batch update with no eligible libraries] => sub {
+  plan tests => 4;
+
+  my $id_run   = 40000;
+  my $position = 2;
+  my $username = q[user];
+
+  my $values = {
+    'id_run'         => $id_run,
+    'position'       => $position,
+    'id_mqc_outcome' => 1, #Accepted preeliminary
+    'username'       =>$username, 
+    'modified_by'    =>$username};
+    
+  my $lane = $schema->resultset(q[MqcOutcomeEnt])->create($values);
+  my $new_status = q[Accepted final];
+  $lane->update_outcome_with_libraries($new_status,$username,);
+  is ($lane->mqc_outcome->short_desc, $new_status, 'updated correctly');
+  is($schema->resultset(q[MqcLibraryOutcomeEnt])
+     ->search({id_run=>$id_run, position=>2})->count(),
+     0, 'no library record created');
+  
+  $values->{'position'} = 3;
+  $lane = $schema->resultset(q[MqcOutcomeEnt])->create($values);
+  $lane->update_outcome_with_libraries($new_status,$username,[]);
+  is ($lane->mqc_outcome->short_desc, $new_status, 'updated correctly');
+  is($schema->resultset(q[MqcLibraryOutcomeEnt])
+     ->search({id_run=>$id_run, position=>3})->count(),
+     0, 'no library record created');
 };
 
 subtest q[batch update libraries accepted final] => sub {

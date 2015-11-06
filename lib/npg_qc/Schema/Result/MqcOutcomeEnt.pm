@@ -253,8 +253,10 @@ sub update_outcome_with_libraries {
   my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
   my $outcome_dict_object = $self->find_valid_outcome($outcome);
 
-  if( $outcome_dict_object->is_final_outcome
-        && scalar @{$tag_indexes_in_lims} <= $self->mqc_lib_limit ) {
+  $tag_indexes_in_lims ||= [];
+  my $num_tags = scalar @{$tag_indexes_in_lims};
+  if( $num_tags && $outcome_dict_object->is_final_outcome
+        && ($num_tags <= $self->mqc_lib_limit) ) {
     my $rs_library_ent = $self->result_source
                               ->schema
                               ->resultset( q[MqcLibraryOutcomeEnt] );
