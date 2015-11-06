@@ -84,7 +84,6 @@
       row_info_to = c.stash.row_data.$lane_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
 -%]
-<tbody>
 <tr>
 <td class="lib nbsp">
 <div class="rel_pos_container">
@@ -154,7 +153,6 @@
 [%- END -%]
 [%# Calculating totals for qXyield end %]
 [%- END -%]
-</tbody>
 </table>
 
 [%-

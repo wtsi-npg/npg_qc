@@ -8,8 +8,7 @@ require.config({
         adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
         mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
         unveil: 'bower_components/jquery-unveil/jquery.unveil',
-        'jquery.base64' : 'bower_components/table-export/jquery.base64',
-        'table-export': 'bower_components/table-export/tableExport',
+        'table-export': 'bower_components/table-export/tableExport.min',
     },
     shim: {
         d3: {
@@ -17,7 +16,6 @@ require.config({
             exports: 'd3'
         },
         unveil: ["jquery"],
-        'jquery.base64' : ["jquery"],
         'table-export': ["jquery"],
     }
 });
@@ -36,7 +34,7 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'jquery.base64', 'table-export'],
+require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
 function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   //Setup for heatmaps to load on demand.
   $("img").unveil(2000);
@@ -80,13 +78,12 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   $('#results_summary').dblclick(function () {
     var table_html = $('#results_summary')[0].outerHTML;
     var regexp = new RegExp('<br>|<br \/>', 'gi');
-    var regexpSpaces = new RegExp('[^a-zA-Z 0-9]+', 'g');
-
-    var without_br = $(table_html.replace(regexp, ' | ').replace(regexpSpaces, ''));
-    without_br.find('a').contents().unwrap();
-    without_br.find('thead').find('tr:last').remove(); //Remove second row in headers
-    without_br.find('#total').remove();
-    without_br.tableExport({escape:'false', filter:function(index) { return this;}});
+    var without_br = $(table_html.replace(regexp, '|'));
+    without_br.find('thead').find('tr:gt(0)').remove(); //Second row in headers
+    without_br.find('th').removeAttr('rowspan'); //Not needed rowspans
+    without_br.find('#total').remove(); // Totals for run page
+    without_br.data('tableexport-display', 'always'); // So it can display invisible table
+    without_br.tableExport({type:'csv', fileName:'summary_data'});
   });
 
   jQuery('.bcviz_insert_size').each(function(i) {
