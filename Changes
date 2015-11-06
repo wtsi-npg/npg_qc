@@ -4,9 +4,12 @@ release 59.4
  - saving manual qc values for libraries - allow for an undefined or empty
    list of tag indices
  - tags in lanes from GCLP runs are not subject to library qc
+<<<<<<< 03fb543c7ae90a42c1e6f31cc9dfc03b4b5980e4
  - composition-based autoqc results - disable version checking between the version
    of the module that serialized the object and the version of the same module that
    is performing de-serialization
+=======
+>>>>>>> improved test coverage; tags in lanes from GCLP runs are not subject to library qc
  - script to import manual qc values from the old warehouse RT#493757
  - update_outcome method of mqc entities renamed to update_nonfinal_outcome
  - a new update_outcome method allows for update of final outcomes
