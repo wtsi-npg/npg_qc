@@ -20,24 +20,24 @@ has 'config_path' => ( isa      => 'Str',
                        lazy_build => 1,
                      );
 sub _build_config_path {
-    my $self = shift;
-    if (!$self->db_connect) {
-        return $CONFIG_PATH_NO_DB;
-    }
-    return $CONFIG_PATH;
+  my $self = shift;
+  if (!$self->db_connect) {
+    return $CONFIG_PATH_NO_DB;
+  }
+  return $CONFIG_PATH;
 }
 
 has 'fixtures'  => ( isa      => 'Bool',
                      is       => 'ro',
                      required => 0,
                      default  => 1,
-		           );
+		               );
 
 has 'db_connect'  => ( isa      => 'Bool',
                        is       => 'ro',
                        required => 0,
                        default  => 1,
-		             );
+		                 );
 
 has 'staging_path' => ( isa      => 'Str',
                         is       => 'ro',
@@ -101,10 +101,10 @@ sub test_env_setup {
 }
 
 sub DEMOLISH {
-    my $self = shift;
-    if (-e $self->mlwhouse_db_path) {unlink $self->mlwhouse_db_path;}
-    if (-e $self->npgqc_db_path)    {unlink $self->npgqc_db_path;}
-    if (-e $self->npg_db_path)      {unlink $self->npg_db_path;}
+  my $self = shift;
+  if (-e $self->mlwhouse_db_path) {unlink $self->mlwhouse_db_path;}
+  if (-e $self->npgqc_db_path)    {unlink $self->npgqc_db_path;}
+  if (-e $self->npg_db_path)      {unlink $self->npg_db_path;}
 }
 
 no Moose;
