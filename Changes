@@ -2,6 +2,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - saving manual qc values for libraries - allow for an undefined or empty
    list of tag indices
+ - tags in lanes from GCLP runs are not subject to library qc
 
 release 59.3
  - transparent search query for autoqc objects irrespectively of the details of

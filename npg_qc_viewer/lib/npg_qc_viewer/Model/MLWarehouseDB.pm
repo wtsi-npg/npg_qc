@@ -41,7 +41,14 @@ __PACKAGE__->config(
 
 =head2 search_product_metrics
 
-Search product metrics by where conditions (id_run, position, tag_index).
+Search product metrics by id_run and, optionally, position and tag_index.
+Cache option is enabled.
+
+  my $param = {'id_run' => 22, 'position' => 3};
+  my $resultset = $model->search_product_metrics($param);
+
+  my $param = {'id_run' => 22, 'position' => 3, 'tag_index' => 5};
+  my $resultset = $model->search_product_metrics($param);
 
 =cut
 sub search_product_metrics {
@@ -50,25 +57,21 @@ sub search_product_metrics {
   if(!defined $run_details){
     croak q[Conditions were not provided for search];
   }
-
-  if(!defined $run_details->{'id_run'}) {
-    croak q[Id run not defined when querying metrics by me.id_run];
+  if(!$run_details->{'id_run'}) {
+    croak q[Run id needed];
   }
-
-  my $resultset = $self->resultset('IseqProductMetric');
-  my $cs_alias = $resultset->current_source_alias;
 
   my $where = {};
   foreach my $key (keys %{$run_details}) {
-    $where->{$cs_alias . q[.] . $key} = $run_details->{$key};
+    $where->{q[me.] . $key} = $run_details->{$key};
   }
 
-  my $rs = $resultset->
-             search($where, {
-               prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-               order_by => qw[ me.id_run me.position me.tag_index ],
-               cache    => 1,
-             },);
+  my $rs = $self->resultset('IseqProductMetric')->search(
+        $where, {
+        'prefetch' => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+        'order_by' => [qw/ me.id_run me.position me.tag_index /],
+        'cache'    => 1,
+                });
 
   return $rs;
 }
@@ -125,25 +128,18 @@ sub search_product_by_sample_id {
 }
 
 sub _search_product_by_child_id {
-#  Search product by id lims in one of the children tables. The where clause
-#  should be defined as a hash with the condition to query the relationship
-#  Product->Flowcell->Sample.
-#
-#  my $where = { 'id_sample_lims' => $id_sample_lims };
-#  $rs = $c->model('MLWarehouseDB')->_search_product_by_child_id($where);
-
   my ($self, $where) = @_;
 
   if (!defined $where) {
     croak q[Condition for id lims not defined when querying product by children id];
   };
 
-  my $rs = $self->resultset('IseqProductMetric')->
-                    search($where, {
-                    prefetch => {'iseq_flowcell' => 'sample'},
-                    join     => {'iseq_flowcell' => 'sample'},
-                    cache    => 1,
-  });
+  my $rs = $self->resultset('IseqProductMetric')->search(
+                    $where, {
+                    'prefetch' => {'iseq_flowcell' => 'sample'},
+                    'join'     => {'iseq_flowcell' => 'sample'},
+                    'cache'    => 1,
+                            });
 
   return $rs;
 }
@@ -166,9 +162,7 @@ sub search_sample_by_sample_id {
   my $where = { $cs_alias . '.id_sample_lims' => $id_sample_lims, };
 
   my $rs = $self->resultset('Sample')->
-                    search($where, {
-                    cache    => 1,
-  });
+                    search($where, {'cache' => 1});
 
   return $rs;
 }
@@ -176,7 +170,7 @@ sub search_sample_by_sample_id {
 =head2 fetch_tag_index_array_for_run_position
 
   A hash containing tag indices for a lane is returned. Indices
-  are split into two arraya - tags that are subject to qc and not.
+  are split into two arrays - tags that are subject to qc and not.
 
 =cut
 sub fetch_tag_index_array_for_run_position {
@@ -189,38 +183,45 @@ sub fetch_tag_index_array_for_run_position {
     croak q[Position is required when searching for tag_indexes but not defined];
   }
 
-  my $rs = $self->resultset('IseqProductMetric')->search(
+  my $product_table = 'IseqProductMetric';
+  my $rs = $self->resultset($product_table)->search(
     {
       'me.id_run'     => $id_run,
       'me.position'   => $position,
     },
     {
-      prefetch => 'iseq_flowcell',
-      order_by => qw[ me.id_run me.position me.tag_index ],
-      cache    => 1,
+      'prefetch' => 'iseq_flowcell',
+      'order_by' => [qw/ me.id_run me.position me.tag_index /],
     }
   );
-  if ($rs->count == 0) {
-    croak qq[No LIMs data for run $id_run position $position];
-  }
 
-  my $tags = {$HASH_KEY_QC_TAGS => [], $HASH_KEY_NON_QC_TAGS => [],};
+  my @qc_tags     = ();
+  my @non_qc_tags = ();
+  my $count       = 0;
   while (my $row = $rs->next) {
+    $count++;
     my $tag_index = $row->tag_index;
     if (!defined $tag_index) {
       next;
     }
-    if ($tag_index && !$row->iseq_flowcell) {
-      croak 'Flowcell data missing';
+    my $flowcell_row = $row->iseq_flowcell;
+    if (!$flowcell_row && $tag_index) {
+      croak sprintf 'Flowcell data missing for run %i position %i tag_index %i',
+                    $id_run, $position, $tag_index;
     }
-    if ($tag_index == 0 || $row->iseq_flowcell->entity_type eq 'library_indexed_spike') {
-      push @{$tags->{$HASH_KEY_NON_QC_TAGS}}, $tag_index;
+
+    if (!$tag_index || $flowcell_row->from_gclp() || $flowcell_row->is_control()) {
+      push @non_qc_tags, $tag_index;
     } else {
-      push @{$tags->{$HASH_KEY_QC_TAGS}}, $tag_index;
+      push @qc_tags, $tag_index;
     }
   }
 
-  return $tags;
+  if ($count == 0) {
+    croak qq[No data for run $id_run position $position in $product_table] ;
+  }
+
+  return {$HASH_KEY_QC_TAGS => [@qc_tags], $HASH_KEY_NON_QC_TAGS => [@non_qc_tags],};
 }
 
 __PACKAGE__->meta->make_immutable;
