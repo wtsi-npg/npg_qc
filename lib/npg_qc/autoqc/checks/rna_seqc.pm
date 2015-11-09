@@ -201,12 +201,12 @@ override 'execute' => sub {
     	return 1;
     }
 
-    my $rna_seqc_dir = $self->rna_seqc_path;    
-    my $rp_dir = join (q[_], $self->id_run, $self->position);
-    my $out_dir = join (q[/], $rna_seqc_dir, $rp_dir);
+    my $rna_seqc_dir = $self->rna_seqc_path;
+    my $rp_dir = join q[_], $self->id_run, $self->position;
+    my $out_dir = join q[/], $rna_seqc_dir, $rp_dir;
     if (defined $self->tag_index) {
         my $rpt_dir = $rp_dir . $self->tag_label;
-        $out_dir = join (q[/], $rna_seqc_dir, $rp_dir, $rpt_dir);
+        $out_dir = join q[/], $rna_seqc_dir, $rp_dir, $rpt_dir;
     }
     # check existence of RNA_SeQC's output directory,
     # create if it doesn't
@@ -217,7 +217,7 @@ override 'execute' => sub {
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
     $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
     my $command = $self->_command($out_dir);
-    $self->result->set_info('Command', $command);    
+    $self->result->set_info('Command', $command);
     if (system $command) {
         carp "Failed to execute $command";
     }
