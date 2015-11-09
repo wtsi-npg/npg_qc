@@ -652,7 +652,7 @@ var NPG;
                      && typeof(mqc_run_data.mqc_lib_limit)!== "undefined"
                      && mqc_run_data.qc_tags.length <= mqc_run_data.mqc_lib_limit;
 
-        if(result) {
+        if(!result) {
           new NPG.QC.UI.MQCInfoMessage(
             'Too many plexes, lane level manual QC only.').toConsole().display();
         }
