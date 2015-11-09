@@ -615,8 +615,7 @@ var NPG;
         var result = null;
         var self = this;
         //Need both a data object and eligible plexes
-        if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null &&
-           typeof(plexes) === 'Array' && plexes.length > 0) {
+        if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) {
           this.mqc_run_data = mqc_run_data; //Do we need this assignment?
           self.addAllPaddings();
           result = targetFunction(mqc_run_data, this, plexes);
@@ -811,7 +810,7 @@ var NPG;
           //Filter lanes for qc using data from REST
           var onlyQCAble = self.onlyQCAble(mqc_run_data, lanes);
 
-          if(self.isStateForMQC(mqc_run_data)) {
+          if(self.isStateForMQC(mqc_run_data) && onlyQCAble.length > 0) {
             var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
             overallControls.setupControls();
             overallControls.init(onlyQCAble);
