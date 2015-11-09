@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 51;
+use Test::More tests => 63;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -10,7 +10,7 @@ use_ok('npg_qc::Schema::Result::MqcOutcomeEnt');
 
 my $schema = Moose::Meta::Class->create_anon_class(
            roles => [qw/npg_testing::db/])
-           ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures', ':memory:');
+           ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
 
 my $table = 'MqcOutcomeEnt';
 my $hist_table = 'MqcOutcomeHist';
@@ -218,7 +218,7 @@ subtest 'Data for historic' => sub {
     'id_mqc_outcome' => 1,
     'username'       => 'user', 
     'last_modified'  => DateTime->now(),
-    'modified_by'=>'user'};
+    'modified_by'    => 'user'};
 
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
@@ -240,31 +240,50 @@ subtest 'Data for historic' => sub {
   
   my $id_run = 210;
   my $position = 1;
-  my $status = 'Rejected final';
+  my $status = 'Rejected preliminary';
   my $username = 'randomuser';
   
   $values = {'id_run' => $id_run, 'position' => $position};
   
   $object = $schema->resultset($table)->find_or_new($values);
-  $object->update_outcome($status, $username);
+  $object->update_nonfinal_outcome($status, $username);
   
   $rs = $schema->resultset($table)->search({
-    'id_run'=>210,
-    'position'=>1,
-    'id_mqc_outcome'=>4
+    'id_run'  => 210,
+    'position'=> 1,
   });
   is ($rs->count, 1, q[One row matches in the entity table after outcome update]);
-  
-  ok(!$rs->next->is_accepted, q[The outcome is not considered accepted.]);
+  my $row = $rs->next; 
+  ok(!$row->is_accepted, q[The outcome is not considered accepted.]);
+  ok($row->is_rejected, q[The outcome is a fail]);
+  ok(!$row->has_final_outcome, q[The outcome is not final]);
+  is($row->username, $username, q[username is set correctly]);
+  is($row->modified_by, $username, q[modified_by is set correctly]);
+
+  $status = 'Rejected final';
+  $object->update_nonfinal_outcome($status, 'new_user', 'RT#356789');
+  $row = $schema->resultset($table)->search({
+    'id_run'  => 210,
+    'position'=> 1,
+  })->next;
+  ok($row->is_rejected, q[The outcome is a fail]);
+  ok($row->has_final_outcome, q[The outcome is final]);
+  is($row->username, 'RT#356789', q[username is reset]);
+  is($row->modified_by, 'new_user', q[modified_by is reset]);
+
+  throws_ok {$object->update_nonfinal_outcome('some invalid', $username)}
+    qr/Outcome is already final, cannot update/,
+    'error updating final outcome';
 
   throws_ok {$object->update_outcome('some invalid', $username)}
     qr/Outcome some invalid is invalid/,
-    'error updating to invalid string status';
+    'error updating to an invalid string outcome';
   throws_ok {$object->update_outcome(123, $username)}
     qr/Outcome 123 is invalid/,
     'error updating to invalid integer status';
   throws_ok {$object->update_outcome($status, 789)}
-    qr/Have a number 789 instead as username/, 'username can be an integer';
+    qr/Have a number 789 instead as username/,
+    'username cannot be an integer';
   throws_ok {$object->update_outcome($status)}
     qr/Mandatory parameter 'username' missing in call/,
     'username should be given';
@@ -272,6 +291,126 @@ subtest 'Data for historic' => sub {
     qr/Mandatory parameter 'outcome' missing in call/,
     'outcome should be given';
 }
+
+subtest q[update on a new result] => sub {
+  plan tests => 47;
+  
+  my $rs = $schema->resultset($table);
+  my $hrs = $schema->resultset($hist_table);
+
+  my $args = {'id_run' => 444, 'position' => 1};
+  my $new_row = $rs->new_result($args);
+  my $outcome = 'Accepted preliminary';
+  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+    'preliminary outcome saved';
+  ok ($new_row->in_storage, 'new object has been saved');
+
+  my $hist_rs = $hrs->search($args);
+  is ($hist_rs->count, 1, 'one historic is created');
+  my $hist_new_row = $hist_rs->next();
+
+  for my $row (($new_row, $hist_new_row)) {
+    is ($new_row->mqc_outcome->short_desc(), $outcome, 'correct prelim. outcome');
+    is ($new_row->username, 'cat', 'username');
+    is ($new_row->modified_by, 'cat', 'modified_by');
+    ok ($new_row->last_modified, 'timestamp is set');
+    isa_ok ($new_row->last_modified, 'DateTime');
+    ok (!$new_row->has_final_outcome, 'not final outcome');
+    ok ($new_row->is_accepted, 'is accepted');
+    ok (!$new_row->is_final_accepted, 'not final accepted');
+  } 
+  
+  $outcome = 'Accepted final';
+ 
+  $new_row = $rs->new_result($args);
+  throws_ok { $new_row->update_nonfinal_outcome($outcome, 'dog', 'cat') }
+    qr /columns id_run, position are not unique/,
+    'error creating a record for existing entity';
+
+  $args->{'position'} = 2;
+  $new_row = $rs->new_result($args);
+  lives_ok { $new_row->update_nonfinal_outcome($outcome, 'dog', 'cat') }
+    'final outcome saved';
+  ok ($new_row->in_storage, 'new object has been saved');
+
+  $hist_rs = $hrs->search($args);
+  is ($hist_rs->count, 1, 'one historic is created');
+  $hist_new_row = $hist_rs->next();
+
+  my $new_row_via_search = $rs->search($args)->next;
+
+  for my $row (($new_row, $new_row_via_search, $hist_new_row)) {
+    is ($new_row->mqc_outcome->short_desc(), $outcome, 'correct prelim. outcome');
+    is ($new_row->username, 'cat', 'username');
+    is ($new_row->modified_by, 'dog', 'modified_by');
+    ok ($new_row->last_modified, 'timestamp is set');
+    isa_ok ($new_row->last_modified, 'DateTime');
+    ok ($new_row->has_final_outcome, 'is final outcome');
+    ok ($new_row->is_accepted, 'is accepted');
+    ok ($new_row->is_final_accepted, 'is final accepted');
+  }
+
+  $new_row->delete();
+};
+
+subtest q[update final outcome] => sub {
+  plan tests => 6;
+
+  my $rs = $schema->resultset($table);
+
+  my $args = {'id_run' => 444, 'position' => 3};
+  my $new_row = $rs->new_result($args);
+  my $old_outcome = 'Accepted final';
+  lives_ok { $new_row->update_outcome($old_outcome, 'cat') }
+    'final outcome saved';
+  ok ($new_row->in_storage, 'new object has been saved');
+
+  my $outcome = 'Rejected final';
+  throws_ok { $new_row->update_nonfinal_outcome($outcome, 'cat') }
+    qr/Outcome is already final, cannot update/,
+    'cannot update final outcome';
+  is($new_row->mqc_outcome->short_desc, $old_outcome, 'old outcome');
+
+  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+    'can update final outcome';
+  is($new_row->mqc_outcome->short_desc, $outcome, 'new outcome');
+
+  $new_row->delete();
+};
+
+subtest q[toggle final outcome] => sub {
+  plan tests => 9;
+
+  my $rs = $schema->resultset($table);
+
+  my $args = {'id_run' => 444, 'position' => 3};
+  my $new_row = $rs->new_result($args);
+
+  throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
+    qr/Record is not stored in the database yet/,
+    'cannot toggle a new object';
+  lives_ok { $new_row->update_outcome('Accepted preliminary', 'cat') }
+    'prelim. outcome saved';
+  throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
+    qr/Cannot toggle non-final outcome Accepted preliminary/,
+    'cannot toggle a non-final outcome';
+
+  my $old_outcome = 'Accepted final';
+  lives_ok { $new_row->update_outcome($old_outcome, 'cat') }
+    'final outcome saved';
+  is($new_row->mqc_outcome->short_desc, $old_outcome, 'final outcome is set');
+
+  my $outcome = 'Rejected final';
+  lives_ok { $new_row->toggle_final_outcome('cat', 'dog') }
+    'can toggle final outcome';
+  is($new_row->mqc_outcome->short_desc, $outcome, 'new outcome');
+  
+  lives_ok { $new_row->toggle_final_outcome('cat', 'dog') }
+    'can toggle final outcome once more';
+  is($new_row->mqc_outcome->short_desc, $old_outcome, 'old outcome again');
+
+  $new_row->delete();
+};
 
 {
   my $values = {'id_run'=>220, 
@@ -309,7 +448,9 @@ subtest 'Data for historic' => sub {
   $object = $schema->resultset($table)->find_or_new($values);
   ok($object->in_storage, 'Object is in storage.');
   ok($object->has_final_outcome, 'Object has final outcome.');
-  throws_ok { $object->update_outcome($status, $username) } qr/Outcome is already final/, 'Invalid outcome transition croak';
+  throws_ok { $object->update_nonfinal_outcome($status, $username) }
+    qr/Outcome is already final/,
+    'Invalid outcome transition croak';
   
   $rs = $schema->resultset($table)->search({
     'id_run'=>220,
@@ -361,8 +502,8 @@ subtest 'Update to final' => sub {
   my $object = $schema->resultset($table)->create($values);
   ok ( $object->is_accepted && !$object->has_final_outcome,
          'Entity has accepted not final.');
-  ok ( $object->update_to_final_outcome($username),
-         'Can update as final outcome' );
+  lives_ok { $object->update_to_final_outcome($username) }
+         'Can update to final outcome';
   ok ( $object->is_accepted && $object->has_final_outcome,
          'Entity has accepted final.');
   
@@ -371,8 +512,8 @@ subtest 'Update to final' => sub {
   $object = $schema->resultset($table)->create($values);
   ok ( $object->is_rejected && !$object->has_final_outcome,
          'Entity has rejected not final.');
-  ok ( $object->update_to_final_outcome($username),
-         'Can update as final outcome' );
+  lives_ok { $object->update_to_final_outcome($username) }
+         'Can update to final outcome';
   ok ( $object->is_rejected && $object->has_final_outcome,
          'Entity has accepted final.');
   

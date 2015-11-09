@@ -108,7 +108,7 @@ sub _update_outcome {
                  $position,
                  $tag_index,
                  $username
-      )->update_outcome($new_outcome, $username);
+      )->update_nonfinal_outcome($new_outcome, $username);
       $message = qq[Manual QC $new_outcome for run $id_run, position $position, tag_index $tag_index saved.]
     }
     _set_response($c, {'message' => $message});

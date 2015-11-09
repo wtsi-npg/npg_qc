@@ -311,7 +311,7 @@ sub update_outcome_with_libraries {
 
     $self->result_source->schema->txn_do($in_transaction);
   }
-  $self->update_outcome($outcome, $username);
+  $self->update_nonfinal_outcome($outcome, $username);
 
   return 1;
 }

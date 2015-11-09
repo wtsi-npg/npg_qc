@@ -3,6 +3,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - saving manual qc values for libraries - allow for an undefined or empty
    list of tag indices
  - tags in lanes from GCLP runs are not subject to library qc
+ - script to import manual qc values from the old warehouse RT#493757
+ - update_outcome method of mqc entities renamed to update_nonfinal_outcome
+ - a new update_outcome method allows for update of final outcomes
+ - method to toggle stored final manual qc outcomes
 
 release 59.3
  - transparent search query for autoqc objects irrespectively of the details of
