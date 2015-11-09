@@ -49,6 +49,12 @@ sub filename_root_from_filename {
   return $file;
 }
 
+around 'thaw' => sub {
+  my $orig = shift;
+  my $self = shift;
+  return $self->$orig(@_, 'check_version' => 0);
+};
+
 around 'to_string' => sub {
   my ($orig, $self) = @_;
   return join q[ ], ref $self , $self->composition->freeze;
@@ -145,6 +151,13 @@ Autoqc result object interface method, see npg_qc::autoqc::role::result for
 details. Suggested filename root for serialisation.
 For an old-style object as defined by the is_old_style_result method returns an
 empty string, otherwise returns a composition digest.
+
+=head2 thaw
+
+Extends the parent method provided by the MooseX::Storage framework -
+disables version checking between the version of the module that
+serialized the object and the version of the same module that
+is performing de-serialization. 
 
 =head2 to_string
 
