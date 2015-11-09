@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Test::Warn;
 use List::MoreUtils qw ( each_array );
@@ -55,6 +55,16 @@ subtest 'Sample 9272' => sub {
                                        'Expected warnings';
   $mech->title_is(qq[NPG SeqQC v${version}: Sample 'random_sample_name']);
   $mech->content_contains(q[NT28560W &lt;&lt; random_sample_name &lt;&lt; random_study_name]);
+};
+
+subtest 'Test for summary table id for sample - affects export to CSV.' => sub {
+  plan tests => 4;
+  my $sample_id = 9272; #id_run 4025
+  my $url = qq[http://localhost/checks/samples/$sample_id];
+  warnings_like{$mech->get_ok($url)} [ qr/Use of uninitialized value \$id in exists/, ], 
+                                       'Expected warnings';
+  $mech->content_contains(q[<table id="results_summary"]);
+  $mech->content_contains(q[<a href="#" id="summary_to_csv" title="Download the summary table as a CSV file">Summary to CSV file</a>]);
 };
 
 subtest 'Full provenance in title for different samples of same run' => sub {

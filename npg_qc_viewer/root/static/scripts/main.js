@@ -75,13 +75,13 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
     }
   }
 
-  $('#results_summary').dblclick(function () {
+  $("#summary_to_csv").click(function(e) {
+    e.preventDefault();
     var table_html = $('#results_summary')[0].outerHTML;
-    var regexp = new RegExp('<br>|<br \/>', 'gi');
+    var regexp = new RegExp('<br>|<br \/>|<br\/>', 'gi');
     var without_br = $(table_html.replace(regexp, '|'));
     without_br.find('thead').find('tr:gt(0)').remove(); //Second row in headers
-    without_br.find('th').removeAttr('rowspan'); //Not needed rowspans
-    without_br.find('#total').remove(); // Totals for run page
+    without_br.find('th').removeAttr('rowspan'); // Not needed rowspans in headers
     without_br.data('tableexport-display', 'always'); // So it can display invisible table
     without_br.tableExport({type:'csv', fileName:'summary_data'});
   });

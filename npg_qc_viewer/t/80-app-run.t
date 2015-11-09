@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 52;
+use Test::More tests => 53;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -92,6 +92,18 @@ subtest 'Test for page title - this affects javascript part too.' => sub {
                                                     qr/Use of uninitialized value \$id in exists/, ],
                                         'Expected warning for run folder found';
   $mech->title_is($title_prefix . q[Results for run 10107 (current run status: qc on hold, taken by melanie)]);
+};
+
+subtest 'Test for summary table id - affects export to CSV.' => sub {
+  plan tests => 4;
+
+  my $url = q[http://localhost/checks/runs/10107];
+
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/run 10107 no longer on staging/ }, 
+                                                    qr/Use of uninitialized value \$id in exists/, ],
+                                        'Expected warning for run folder found';
+  $mech->content_contains(q[<table id="results_summary"]);
+  $mech->content_contains(q[<a href="#" id="summary_to_csv" title="Download the summary table as a CSV file">Summary to CSV file</a>]);
 };
 
 subtest 'Run 4025 Lane 1' => sub {
