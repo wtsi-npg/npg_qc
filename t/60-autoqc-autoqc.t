@@ -45,6 +45,7 @@ my $ref = q[t/data/autoqc];
                     upstream_tags => 1,
                     tags_reporters => 1,
                     verify_bam_id => 1,
+                    rna_seqc => 1,
                  };
   my $actual;
   my @checks = @{npg_qc::autoqc::autoqc->checks_list};
