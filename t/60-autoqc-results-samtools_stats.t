@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 use Archive::Extract;
@@ -116,6 +116,21 @@ subtest 'serialization and instantiation' => sub {
     qr/Samtools stats file path \(stats_file attribute\) should be set/,
     'no stats file - execute error';
   lives_ok { $r1->freeze(); } 'serialization ok';
+};
+
+subtest 'deserialization: version mismatch supressed' => sub {
+   plan tests => 4;
+ 
+  my $json_string = slurp $tempdir .
+    '/17448_1_9/qc/all_json/17448_1#9_F0x900.samtools_stats.json';
+  like ($json_string, qr/npg_qc::autoqc::results::samtools_stats-10.1/,
+    'expected version');
+  like ($json_string, qr/npg_tracking::glossary::composition-11.3/,
+    'expected version');
+  like ($json_string, qr/npg_tracking::glossary::composition::component::illumina-0.0.2/,
+    'expected version');
+  lives_ok { npg_qc::autoqc::results::samtools_stats->thaw($json_string) }
+    'version mismatch does not cause an error';
 };
 
 1;
