@@ -66,10 +66,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
       control.parseLanes(lanes, lanesWithBG);
       control.prepareMQC(id_run, lanes, lanesWithBG);
     } else {
-      window.console && console.log("Run + Lane page");
-      window.console && console.log("Run " + id_run);
       var position = runTitleParserResult.position;
-      window.console && console.log("Position " + position);
       control = new NPG.QC.LanePageMQCControl(prodConfiguration);
       control.parseLanes(lanes);
       control.prepareMQC(id_run, position, lanes);
