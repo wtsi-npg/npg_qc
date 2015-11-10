@@ -229,35 +229,6 @@ override 'execute' => sub {
     return 1;
 };
 
-
-#TODO: Parse metrics file. No need to parse the output or RNA-SeQC. 
-#      Leave a half-baked stub for future use.
-#sub _parse_metrics {
-#    my ($self, $fh) = @_;
-#    if (!$fh) {
-#        croak q[File handle is not available, cannot parse rna-seqc metrics];
-#    }
-#    my @lines = ();
-#    while (my $line = <$fh>) {
-#        chomp $line;
-#        push @lines, $line;
-#    }
-#    close $fh or croak qq[Cannot close pipe in __PACKAGE__ : $ERRNO, $CHILD_ERROR];
-#    my @keys = split /\t/smx, $lines[0];
-#    my @values = split /\t/smx, $lines[1];
-#    my $results = {};
-#    my $i = 0;
-#    while ($i < $num_keys) {
-#        if ($keys[$i]) {
-#            my $value = $values[$i] || undef;
-#            $results->{$keys[$i]} = $value;
-#    }
-#        $i++;
-#    }
-#    return $results;
-#}
-
-
 __PACKAGE__->meta->make_immutable();
 
 1;
