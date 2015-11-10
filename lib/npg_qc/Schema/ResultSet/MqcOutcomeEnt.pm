@@ -8,26 +8,22 @@ extends 'npg_qc::Schema::ResultSet';
 
 our $VERSION = '0';
 
-sub get_not_reported {
+sub get_ready_to_report {
   my $self = shift;
-  return $self->search({$self->current_source_alias . '.reported' => undef});
+  my $rs = $self->search(
+         {'reported' => undef},
+         {
+          'order_by' => [qw/id_run position/],
+          'prefetch' => 'mqc_outcome',
+         },
+                        );
+  my @rows = grep { $_->has_final_outcome } $rs->all();
+  $rs = $self->result_source->resultset;
+  $rs->set_cache(\@rows);
+  return $rs;
 }
 
-sub get_rows_with_final_current_outcome {
-  my $self = shift;
-  #Final outcome comes from the short_desc of the relationship 
-  #with the dictionary, only those with current status
-  return $self->search(
-    {'mqc_outcome.short_desc' => {like => '%final'}, 'mqc_outcome.iscurrent' => 1},
-    {'join'=>'mqc_outcome'});
-}
-
-sub get_ready_to_report{
-  my $self = shift;
-  return $self->get_not_reported->get_rows_with_final_current_outcome;
-}
-
-sub get_outcomes_as_hash{
+sub get_outcomes_as_hash {
   my ($self, $id_run) = @_;
 
   my $previous_mqc = {};
@@ -66,7 +62,7 @@ npg_qc::Schema::ResultSet::MqcOutcomeEnt
 
 =head1 DESCRIPTION
 
-  Extended ResultSet for MqcOutcomeEnt  with specific functionality for manual MQC.
+  Extended ResultSet for MqcOutcomeEnt with specific functionality for manual QC.
 
 =head1 DIAGNOSTICS
 
@@ -74,21 +70,10 @@ npg_qc::Schema::ResultSet::MqcOutcomeEnt
 
 =head1 SUBROUTINES/METHODS
 
-=head2 get_not_reported
-
-  Returns a list of entities with a null reported timestamp.
-
-=head2 get_rows_with_final_current_outcome
-
-  Returns a list of entities with final outcomes acording to business rules.
-  Currently it looks into the relationship with the dictionary to find those
-  outcomes with a short description ending in 'final'.
-
 =head2 get_ready_to_report
 
-  Returns a list of MqcOutcomeEnt rows which are ready to be reported,
-  ie have a final status but haven't been reported yet and which have
-  an outcome marked as current in the dictionary.
+  Returns a resultset representing rows which are ready to be reported,
+  ie have a final status but haven't been reported yet.
 
 =head2 get_outcomes_as_hash
 
