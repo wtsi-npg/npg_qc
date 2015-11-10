@@ -84,32 +84,3 @@ QUnit.test('Error messaging formating', function (assert) {
   obj = new NPG.QC.UI.MQCErrorMessage(FROM_GNR_TEXT);
   assert.equal(obj.formatForDisplay(), EXPECTED_GT, 'Correctly parses from general text');
 });
-
-QUnit.test('Preparing table for download as csv', function (assert) {
-  var helper = new NPG.QC.TableFormaterCSV();
-  ok(helper !== undefined, 'Variable is now an instance of ProdConfiguration');
-
-  var tableHtml = $('#results_summary')[0].outerHTML;
-
-  var indexLibrary = tableHtml.indexOf('Library');
-  assert.equal(indexLibrary, 105, 'Text contains Library');
-
-  assert.equal(tableHtml.indexOf('<br>'), 112, 'Text has <br>');
-  assert.equal(tableHtml.indexOf('|'), -1, 'Text does not have pipes');
-  var withoutBreaks = helper.removeBreaks(tableHtml);
-  //window.console.log(withoutBreaks);
-  assert.equal(withoutBreaks.indexOf('<br>'), -1, 'No more <br>');
-  assert.equal(withoutBreaks.indexOf('<br >'), -1, 'No more <br >');
-  assert.equal(withoutBreaks.indexOf('<br />'), -1, 'No more <br />');
-  assert.equal(withoutBreaks.indexOf('|'), 112, 'Replaced with pipe');
-  
-  var withFullHeaders = $(withoutBreaks);
-  helper.fixHeaders(withFullHeaders);
-  tableHtml = withFullHeaders[0].outerHTML;
-  assert.equal(tableHtml.indexOf('<br>'), -1, 'No more <br>');
-  assert.equal(tableHtml.indexOf('adapters,'), -1, 'Second header row is gone');
-  assert.equal(tableHtml.indexOf('rowspan'), -1, 'No rowspans in title');
-  
-  helper.markForExport(withFullHeaders);
-  assert.equal(withFullHeaders.data('tableexport-display'), 'always', 'Table marked for export');
-});

@@ -56,28 +56,6 @@ var NPG;
       return ProdConfiguration;
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
-    
-    var TableFormaterCSV = (function() {
-      function TableFormaterCSV () {
-        this.regexp = new RegExp('<[\s]*br[\s]*[/]?[\s]*>', 'gim');
-      }
-
-      TableFormaterCSV.prototype.removeBreaks = function (htmlText) {
-        return htmlText.replace(this.regexp, '|');
-      };
-
-      TableFormaterCSV.prototype.fixHeaders = function (obj) {
-        obj.find('thead').find('tr:gt(0)').remove(); //2nd+ row in headers
-        obj.find('th').removeAttr('rowspan'); // Not needed rowspans in headers
-      };
-
-      TableFormaterCSV.prototype.markForExport = function(obj) {
-        obj.data('tableexport-display', 'always');
-      };
-
-      return TableFormaterCSV;
-    }) ();
-    QC.TableFormaterCSV = TableFormaterCSV;
 
     var MQCControl = (function () {
       function MQCControl(abstractConfiguration) {

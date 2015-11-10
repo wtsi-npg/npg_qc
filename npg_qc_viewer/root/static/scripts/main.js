@@ -8,7 +8,7 @@ require.config({
         adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
         mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
         unveil: 'bower_components/jquery-unveil/jquery.unveil',
-        'table-export': 'bower_components/table-export/tableExport',
+        'table-export': 'bower_components/table-export/tableExport.min',
     },
     shim: {
         d3: {
@@ -34,8 +34,8 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
-function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
+require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'scripts/format_for_csv', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
+function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatch, unveil) {
   //Setup for heatmaps to load on demand.
   $("img").unveil(2000);
 
@@ -78,11 +78,8 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   $("#summary_to_csv").click(function(e) {
     e.preventDefault();
     var table_html = $('#results_summary')[0].outerHTML;
-    var helper = new NPG.QC.TableFormaterCSV();
-    var without_br = $(helper.removeBreaks(table_html));
-    helper.fixHeaders(without_br);
-    helper.markForExport(without_br);
-    without_br.tableExport({type:'csv', fileName:'summary_data'});
+    var formated_table = format_for_csv.format(table_html);
+    formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
 
   jQuery('.bcviz_insert_size').each(function(i) {
