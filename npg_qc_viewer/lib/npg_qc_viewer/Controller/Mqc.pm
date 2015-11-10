@@ -103,7 +103,7 @@ sub _update_outcome {
     } else {
       $c->model('NpgQcDB')
                ->resultset('MqcLibraryOutcomeEnt')
-               ->find_or_create_library_outcome_ent(
+               ->search_library_outcome_ent(
                  $id_run,
                  $position,
                  $tag_index,
