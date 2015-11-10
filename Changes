@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.4
+ - saving manual qc values for libraries - allow for an undefined or empty
+   list of tag indices
+ - tags in lanes from GCLP runs are not subject to library qc
  - composition-based autoqc results - disable version checking between the version
    of the module that serialized the object and the version of the same module that
    is performing de-serialization

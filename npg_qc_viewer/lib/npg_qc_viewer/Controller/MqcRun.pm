@@ -56,6 +56,9 @@ sub mqc_runs_GET {
   my ( $self, $c, $id_run ) = @_;
 
   try {
+    if (!$id_run) {
+      croak 'Run id is needed';
+    }
     my $hash_entity = $self->_fill_entity_for_response($id_run, $c);
     $hash_entity->{'qc_lane_status'} = $c->model('NpgQcDB')
                                         ->resultset($MQC_LANE_ENT)
@@ -79,8 +82,11 @@ sub mqc_libraries_GET {
   my $non_qc_name = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS;
 
   try {
-
+    $id_run_position //= q[];
     my ($id_run, $position) = split /_/sm, $id_run_position;
+    if (!$id_run || !$position) {
+      croak 'Both run id and position are needed';
+    }
     my $qc_outcomes = $c->model('NpgQcDB')
                         ->resultset($MQC_LIB_ENT)
                         ->get_outcomes_as_hash($id_run, $position);
@@ -102,7 +108,7 @@ sub mqc_libraries_GET {
     $self->status_ok($c, entity => $hash_entity,);
   } catch {
     my ( $error1, $error_code ) = $self->parse_error($_);
-    $self->status_internal_server_error($c,message => $error1,);
+    $self->status_internal_server_error($c, message => $error1,);
   };
 
   return;

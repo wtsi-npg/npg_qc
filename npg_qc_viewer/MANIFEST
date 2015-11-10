@@ -131,7 +131,6 @@ t/data/fixtures/npg/100-User2usergroup.yml
 t/data/fixtures/npg/200-Instrument.yml
 t/data/fixtures/npg/300-Annotation.yml
 t/data/fixtures/npg/300-Run.yml
-t/data/fixtures/npg/400-Run.yml
 t/data/fixtures/npg/400-RunAnnotation.yml
 t/data/fixtures/npg/400-RunLane.yml
 t/data/fixtures/npg/400-RunLaneAnnotation.yml
