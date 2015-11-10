@@ -78,11 +78,10 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   $("#summary_to_csv").click(function(e) {
     e.preventDefault();
     var table_html = $('#results_summary')[0].outerHTML;
-    var regexp = new RegExp('<br>|<br \/>|<br\/>', 'gi');
-    var without_br = $(table_html.replace(regexp, '|'));
-    without_br.find('thead').find('tr:gt(0)').remove(); //Second row in headers
-    without_br.find('th').removeAttr('rowspan'); // Not needed rowspans in headers
-    without_br.data('tableexport-display', 'always'); // So it can display invisible table
+    var helper = new NPG.QC.TableFormaterCSV();
+    var without_br = $(helper.removeBreaks(table_html));
+    helper.fixHeaders(without_br);
+    helper.markForExport(without_br);
     without_br.tableExport({type:'csv', fileName:'summary_data'});
   });
 
