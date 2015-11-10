@@ -59,7 +59,7 @@ var NPG;
     
     var TableFormaterCSV = (function() {
       function TableFormaterCSV () {
-        this.regexp = new RegExp('<br>|<br \/>|<br\/>', 'gi');
+        this.regexp = new RegExp('<[\s]*br[\s]*[/]?[\s]*>', 'gim');
       }
       
       TableFormaterCSV.prototype.removeBreaks = function (htmlText) {
@@ -67,7 +67,7 @@ var NPG;
       };
 
       TableFormaterCSV.prototype.fixHeaders = function (obj) {
-        obj.find('thead').find('tr:gt(0)').remove(); //Second row in headers
+        obj.find('thead').find('tr:gt(0)').remove(); //2nd+ row in headers
         obj.find('th').removeAttr('rowspan'); // Not needed rowspans in headers
         return obj;
       };
