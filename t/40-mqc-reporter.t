@@ -137,7 +137,7 @@ subtest 'Not reporting, individual cases' => sub {
     qc_schema   => $npg_qc_schema,
     mlwh_schema => $mlwh_schema,
     verbose     => 1,
-    warn_gclp   => 1);
+    dry_run     => 1);
 
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>6})->next;
   ok($row, 'row for run 6600 position 6 exists - test prerequisite');
@@ -146,7 +146,7 @@ subtest 'Not reporting, individual cases' => sub {
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>6})->next;
   ok ($row->has_final_outcome, 'outcome is final');
   warnings_like { $reporter->load() } [
-    qr/No lane id for run 6600 lane 6/,],
+    qr/DRY RUN: .*: No lane id for run 6600 lane 6/,],
     'Warning about absence of lane id is logged';
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set');
 };

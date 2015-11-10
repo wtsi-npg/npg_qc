@@ -118,13 +118,13 @@ sub _build__data4reporting {
 
     if ( $from_gclp ) {
       if ( $self->warn_gclp ) {
-        _log(qq[GCLP run, cannot report run $id_run lane $position]);
+        $self->_log(qq[GCLP run, cannot report run $id_run lane $position]);
       }
       next;
     }
 
     if ( !$lane_id )  {
-      _log(qq[No lane id for run $id_run lane $position]);
+      $self->_log(qq[No lane id for run $id_run lane $position]);
       next;
     }
 
@@ -147,7 +147,7 @@ sub load {
       my $lane_data = $data->{$id_run}->{$position};
       my $qc_result = $lane_data->{'outcome'};
       my $lane_id   = $lane_data->{'lane_id'};
-      _log(qq[Will report $qc_result for run $id_run lane $position, id $lane_id]);
+      $self->_log(qq[Will report $qc_result for run $id_run lane $position, id $lane_id]);
       my $reported = $self->_report(
            $self->_payload($lane_id, $qc_result),
            $self->_url($lane_id, $qc_result),
@@ -182,7 +182,7 @@ sub _report {
   $req->header('content-type' => 'text/xml');
   $req->content($payload);
   if ($self->verbose) {
-    _log(qq(Sending $payload to $url));
+    $self->_log(qq(Sending $payload to $url));
   }
 
   my $result = 1;
@@ -190,7 +190,7 @@ sub _report {
     my $resp = $self->_ua->request($req);
     $result = $resp->is_success;
     if (!$result) {
-      _log(sprintf 'Response code %i : %s : %s',
+      $self->_log(sprintf 'Response code %i : %s : %s',
                                 $resp->code,
                                 $resp->message || q(),
                                 $resp->content || q());
@@ -200,9 +200,13 @@ sub _report {
 }
 
 sub _log {
-  my $txt = shift;
+  my ($self, $txt) = @_;
   my $time = strftime '%Y-%m-%dT%H:%M:%S', localtime;
-  warn "$time: $txt\n";
+  my $m = "$time: $txt";
+  if ($self->dry_run) {
+    $m = 'DRY RUN: ' . $m;
+  }
+  warn "$m\n";
   return;
 }
 
