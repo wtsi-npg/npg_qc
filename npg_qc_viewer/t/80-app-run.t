@@ -6,8 +6,6 @@ use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
 use Test::Warn;
 
-use Test::WWW::Mechanize::Catalyst;
-
 use t::util;
 
 BEGIN {
