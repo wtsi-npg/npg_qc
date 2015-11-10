@@ -30,7 +30,7 @@ sub get_outcomes_as_hash{
   return $previous_mqc;
 }
 
-sub find_or_create_library_outcome_ent {
+sub search_library_outcome_ent {
   my ( $self, $id_run, $position, $tag_index, $username ) = @_;
 
   if(!defined $id_run) {
