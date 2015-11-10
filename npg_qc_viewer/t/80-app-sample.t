@@ -61,10 +61,10 @@ subtest 'Test for summary table id for sample - affects export to CSV.' => sub {
   plan tests => 4;
   my $sample_id = 9272; #id_run 4025
   my $url = qq[http://localhost/checks/samples/$sample_id];
-  warnings_like{$mech->get_ok($url)} [ qr/Use of uninitialized value \$id in exists/, ], 
+  warnings_like{$mech->get_ok($url)} [ qr/Use of uninitialized value \$id in exists/, ],
                                        'Expected warnings';
   $mech->content_contains(q[<table id="results_summary"]);
-  $mech->content_contains(q[<a href="#" id="summary_to_csv" title="Download the summary table as a CSV file">Summary to CSV file</a>]);
+  $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi);
 };
 
 subtest 'Full provenance in title for different samples of same run' => sub {

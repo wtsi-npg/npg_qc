@@ -65,10 +65,10 @@ subtest 'Test for summary table id for library - affects export to CSV.' => sub 
   my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
 
   warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/, 
-                                      qr/Use of uninitialized value \$id in exists/], 
+                                      qr/Use of uninitialized value \$id in exists/],
                                       'Expected warning for runfolder location';
   $mech->content_contains(q[<table id="results_summary"]);
-  $mech->content_like(qr/.+<a [^>]+ id=\"summary_to_csv\" [^>]+>[\w\s]+<\/a>.+/mxi);
+  $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi);
 };
 
 1;

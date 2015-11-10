@@ -103,7 +103,7 @@ subtest 'Test for summary table id - affects export to CSV.' => sub {
                                                     qr/Use of uninitialized value \$id in exists/, ],
                                         'Expected warning for run folder found';
   $mech->content_contains(q[<table id="results_summary"]);
-  $mech->content_contains(q[<a href="#" id="summary_to_csv" title="Download the summary table as a CSV file">Summary to CSV file</a>]);
+  $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi);
 };
 
 subtest 'Run 4025 Lane 1' => sub {
