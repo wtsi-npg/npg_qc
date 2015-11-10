@@ -56,6 +56,25 @@ var NPG;
       return ProdConfiguration;
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
+    
+    var TableFormaterCSV = (function() {
+      function TableFormaterCSV () {
+        this.regexp = new RegExp('<br>|<br \/>|<br\/>', 'gi');
+      }
+      
+      TableFormaterCSV.prototype.removeBreaks = function (htmlText) {
+        return htmlText.replace(this.regexp, '|');
+      };
+
+      TableFormaterCSV.prototype.fixHeaders = function (obj) {
+        obj.find('thead').find('tr:gt(0)').remove(); //Second row in headers
+        obj.find('th').removeAttr('rowspan'); // Not needed rowspans in headers
+        return obj;
+      };
+
+      return TableFormaterCSV;
+    }) ();
+    QC.TableFormaterCSV = TableFormaterCSV;
 
     var MQCControl = (function () {
       function MQCControl(abstractConfiguration) {
