@@ -98,7 +98,7 @@ npg_qc::Schema::ResultSet::MqcLibraryOutcomeEnt
   Returns a hash of plex=>outcome for those plexes in the database for the
   id_run/position specified.
 
-=head2 find_or_create_library_outcome_ent
+=head2 search_library_outcome_ent
 
   Find previous mqc outcome for the id_run/position/tag_index,
   create it for the specified user if it does not exist.
