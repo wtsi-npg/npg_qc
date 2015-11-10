@@ -27,7 +27,6 @@ has 'qc_schema' => (
   metaclass  => 'NoGetopt',
 );
 sub _build_qc_schema {
-  my $self = shift;
   return npg_qc::Schema->connect();
 }
 
@@ -39,7 +38,6 @@ has 'mlwh_schema' => (
   metaclass  => 'NoGetopt',
 );
 sub _build_mlwh_schema {
-  my $self = shift;
   return WTSI::DNAP::Warehouse::Schema->connect();
 }
 
@@ -82,25 +80,34 @@ has '_data4reporting' => ( isa           => 'HashRef',
 );
 sub _build__data4reporting {
   my $self = shift;
+
   my $rs = $self->qc_schema->resultset('MqcOutcomeEnt')->get_ready_to_report();
+  my $product_rs = $self->mlwh_schema->resultset('IseqProductMetric');
   my $data = {};
+
   while (my $outcome = $rs->next()) {
 
     my $lane_id;
     my $from_gclp;
-    my $details = sprintf 'run %i position %i', $outcome->id_run, $outcome->position;
-    my $where = {'me.id_run'                 => $outcome->id_run,
-                 'me.position'               => $outcome->position,
-                 'iseq_flowcell.entity_type' => {q[!=], 'library_indexed_spike'} };
-    my $rswh = $self->mlwh_schema
-                      ->resultset('IseqProductMetric')
-                      ->search($where, { prefetch => 'iseq_flowcell',
-                                         order_by => { -desc => 'me.tag_index' },
-                                       },
-                              );
-    while ( my $product_metric_row = $rswh->next ) {
-      my $fc = $product_metric_row->iseq_flowcell;
+    my $id_run   = $outcome->id_run;
+    my $position = $outcome->position;
+
+    my $rswh = $product_rs->search(
+                {
+                 'me.id_run'    => $id_run,
+                 'me.position'  => $position,
+                },
+                {
+                  'prefetch' => 'iseq_flowcell',
+                  'order_by' => { -desc => 'me.tag_index' },
+                });
+
+    while ( my $product_row = $rswh->next ) {
+      my $fc = $product_row->iseq_flowcell;
       if( $fc ) {
+        if ( $fc->is_control ) {
+          next;
+        }
         $lane_id   = $fc->lane_id;
         $from_gclp = $fc->from_gclp;
         if ( $lane_id ) {
@@ -108,40 +115,48 @@ sub _build__data4reporting {
         }
       }
     }
-  
-    if ($from_gclp) {
-      if ($self->warn_gclp) {
-        _log(qq[GCLP run, cannot report $details]);
+
+    if ( $from_gclp ) {
+      if ( $self->warn_gclp ) {
+        _log(qq[GCLP run, cannot report run $id_run lane $position]);
       }
       next;
     }
 
-    if ( !$lane_id ) {
-      _log(qq[No LIMs data for $details]);
+    if ( !$lane_id )  {
+      _log(qq[No lane id for run $id_run lane $position]);
       next;
     }
 
-    $data->{$id_run}->{$position}->{$lane_id} = $outcome->is_accepted() ? 'pass' : 'fail';
+    my $qc_outcome = $outcome->is_accepted() ? 'pass' : 'fail';
+    $data->{$id_run}->{$position} = {
+                        'outcome' => $qc_outcome,
+                        'row'     => $outcome,
+                        'lane_id' => $lane_id,
+                                    };
   }
-  return $data;   
+  return $data;
 }
 
 sub load {
   my $self = shift;
-  
+
   my $data = $self->_data4reporting();
-  foreach my $id_run (sort { $a <> $b} keys %{$data) {
-    foreach my $position (sort { $a <> $b} keys %{$data->{$id_run}} ) {
-      my $lane_id   = $data->{$id_run}->{$position};
-      my $qc_result = $data->{$id_run}->{$position}->{$lane_id};
+  foreach my $id_run (sort { $a <=> $b} keys %{$data}) {
+    foreach my $position (sort { $a <=> $b} keys %{$data->{$id_run}} ) {
+      my $lane_data = $data->{$id_run}->{$position};
+      my $qc_result = $lane_data->{'outcome'};
+      my $lane_id   = $lane_data->{'lane_id'};
+      _log(qq[Will report $qc_result for run $id_run lane $position, id $lane_id]);
       my $reported = $self->_report(
            $self->_payload($lane_id, $qc_result),
-           $self->_url($lane_id, $qc_result)
-                                 );
+           $self->_url($lane_id, $qc_result),
+                                   );
       if ($reported && !$self->dry_run) {
+        my $outcome = $lane_data->{'row'};
         $outcome->update_reported();
       }
-    }                 
+    }
   }
   return;
 }
@@ -169,7 +184,7 @@ sub _report {
   if ($self->verbose) {
     _log(qq(Sending $payload to $url));
   }
-  
+
   my $result = 1;
   if (!$self->dry_run) {
     my $resp = $self->_ua->request($req);
@@ -219,6 +234,10 @@ npg_qc::mqc::reporter
 
   Boolean flag switching on warnings when a GCLP lane is encounted,
   false by default.
+
+=head2 dry_run
+
+  Dry run flag. No reporting, no marking as reported in the qc database.
 
 =head2 qc_schema
 
