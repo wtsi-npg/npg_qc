@@ -14,9 +14,12 @@
 define(['jquery'], function (jQuery) {
 
   var regexp = new RegExp('<[\s]*br[\s]*[/]?[\s]*>', 'gim');
+  var regexp_n = new RegExp('&nbsp;', 'gim');
 
   var removeBreaks = function (htmlText) {
-    return htmlText.replace(regexp, '|');
+    var text = htmlText.replace(regexp, '|');
+    text = text.replace(regexp_n, ' ');
+    return text;
   };
 
   var fixHeaders = function (obj) {

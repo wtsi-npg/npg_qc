@@ -17,14 +17,16 @@ require(['scripts/format_for_csv',],
 
       assert.equal(tableHtml.indexOf('<br>'), 112, 'Text has <br> in expected position');
       assert.equal(tableHtml.indexOf('|'), -1, 'Text does not have pipes');
-      var withoutBreaks = format_for_csv._removeBreaks(tableHtml);
+      assert.equal(tableHtml.indexOf('&nbsp;'), 457, 'Text has nbsp in expected position');
+      var withoutBreaksNbsp = format_for_csv._removeBreaks(tableHtml);
 
-      assert.equal(withoutBreaks.indexOf('<br>'), -1, 'No more <br> in table');
-      assert.equal(withoutBreaks.indexOf('<br >'), -1, 'No more <br > in table');
-      assert.equal(withoutBreaks.indexOf('<br />'), -1, 'No more <br /> in table');
-      assert.equal(withoutBreaks.indexOf('|'), 112, 'Replaced <br> with pipe in expected position');
+      assert.equal(withoutBreaksNbsp.indexOf('<br>'), -1, 'No more <br> in table');
+      assert.equal(withoutBreaksNbsp.indexOf('<br >'), -1, 'No more <br > in table');
+      assert.equal(withoutBreaksNbsp.indexOf('<br />'), -1, 'No more <br /> in table');
+      assert.equal(withoutBreaksNbsp.indexOf('|'), 112, 'Replaced <br> with pipe in expected position');
+      assert.equal(withoutBreaksNbsp.indexOf('&nbsp;'), -1, 'No more nbsp in table');
 
-      var withFullHeaders = $(withoutBreaks);
+      var withFullHeaders = $(withoutBreaksNbsp);
       assert.equal(tableHtml.indexOf('adapters,'), 291, 'Second header is there - testing contents');
       assert.equal(tableHtml.indexOf('rowspan'), 93, 'Rowspans in header - testing contents');
       format_for_csv._fixHeaders(withFullHeaders);
