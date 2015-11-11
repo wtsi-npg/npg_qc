@@ -11,6 +11,8 @@ release 59.4
  - update_outcome method of mqc entities renamed to update_nonfinal_outcome
  - a new update_outcome method allows for update of final outcomes
  - method to toggle stored final manual qc outcomes
+ - mqc reporter - reporting might cause a loss of link between the product and
+   flowcell data in the ml warehouse, so prepare all data, then report
  - SeqQC
    - New functionality to allow export summary table to CSV
 
