@@ -191,7 +191,7 @@ sub run_from_db {
     }
     return $c;
   }
-  foreach my $check_name (grep {!/rna_seqc/} @{npg_qc::autoqc::autoqc->checks_list()}) {
+  foreach my $check_name (grep {!/rna_seqc/sm} @{npg_qc::autoqc::autoqc->checks_list()}) {
     my $dbix_query = { 'id_run' => $query->id_run};
     if (@{$query->positions}) {
       $dbix_query->{'position'} = $query->positions;
