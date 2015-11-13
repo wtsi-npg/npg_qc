@@ -8,6 +8,13 @@ extends 'npg_qc::Schema::ResultSet';
 
 our $VERSION = '0';
 
+sub get_rows_with_final_current_outcome {
+  my $self = shift;
+  return $self->search(
+    {'mqc_outcome.short_desc' => {like => '%final'}, 'mqc_outcome.iscurrent' => 1},
+    {'join'=>'mqc_outcome'});
+}
+
 sub get_ready_to_report {
   my $self = shift;
   my $rs = $self->search(
@@ -69,6 +76,12 @@ npg_qc::Schema::ResultSet::MqcOutcomeEnt
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 get_rows_with_final_current_outcome
+
+  Returns a list of entities with final outcomes acording to business rules.
+  Currently it looks into the relationship with the dictionary to find those
+  outcomes with a short description ending in 'final'.
 
 =head2 get_ready_to_report
 
