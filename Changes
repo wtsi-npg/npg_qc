@@ -1,5 +1,21 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.4
+ - saving manual qc values for libraries - allow for an undefined or empty
+   list of tag indices
+ - tags in lanes from GCLP runs are not subject to library qc
+ - composition-based autoqc results - disable version checking between the version
+   of the module that serialized the object and the version of the same module that
+   is performing de-serialization
+ - script to import manual qc values from the old warehouse RT#493757
+ - update_outcome method of mqc entities renamed to update_nonfinal_outcome
+ - a new update_outcome method allows for update of final outcomes
+ - method to toggle stored final manual qc outcomes
+ - mqc reporter - reporting might cause a loss of link between the product and
+   flowcell data in the ml warehouse, so prepare all data, then report
+ - SeqQC
+   - New functionality to allow export summary table to CSV
+
 release 59.3
  - transparent search query for autoqc objects irrespectively of the details of
    object's database implementation (in-table identifies or composition)

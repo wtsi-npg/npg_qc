@@ -70,7 +70,7 @@ subtest 'Initial' => sub {
     'payload');
 };
 
-subtest 'Succesful posting 3 lanes to report' => sub {
+subtest 'Succesfully posting report for 3 lanes' => sub {
   plan tests => 15;
 
   my $reporter = npg_qc::mqc::reporter->new(
@@ -92,7 +92,7 @@ subtest 'Succesful posting 3 lanes to report' => sub {
 };
 
 subtest 'Not reporting, individual cases' => sub {
-  plan tests => 17;
+  plan tests => 16;
 
   my $reporter = npg_qc::mqc::reporter->new(
     qc_schema   => $npg_qc_schema,
@@ -107,13 +107,19 @@ subtest 'Not reporting, individual cases' => sub {
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>4})->next;
   ok ($row->has_final_outcome, 'outcome is final');
   warnings_like { $reporter->load() } [
-    qr/GCLP run, cannot report run 6600 position 4/],
+    qr/GCLP run, cannot report run 6600 lane 4/],
     'Message GCLP run logged';
   ok(!$row->reported, 'row for run 6600 position 4 reported time not set');
-  ok($row->has_final_outcome, 'outcome is final');
+
   $row->update({id_mqc_outcome => 1});
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>4})->next;
   ok (!$row->has_final_outcome, 'set outcome back to not final');
+
+  $reporter = npg_qc::mqc::reporter->new(
+    qc_schema   => $npg_qc_schema,
+    mlwh_schema => $mlwh_schema,
+    verbose     => 1,
+    warn_gclp   => 1);
 
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>5})->next;
   ok($row, 'row for run 6600 position 5 exists - test prerequisite');
@@ -127,6 +133,12 @@ subtest 'Not reporting, individual cases' => sub {
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>5})->next;
   ok (!$row->has_final_outcome, 'set outcome back to not final');
 
+  $reporter = npg_qc::mqc::reporter->new(
+    qc_schema   => $npg_qc_schema,
+    mlwh_schema => $mlwh_schema,
+    verbose     => 1,
+    dry_run     => 1);
+
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>6})->next;
   ok($row, 'row for run 6600 position 6 exists - test prerequisite');
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set - test prerequisite');
@@ -134,8 +146,8 @@ subtest 'Not reporting, individual cases' => sub {
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>6})->next;
   ok ($row->has_final_outcome, 'outcome is final');
   warnings_like { $reporter->load() } [
-    qr/No LIMs data for run 6600 position 6/,],
-    'Warning no mlwarehouse data found logged';
+    qr/DRY RUN: .*: No lane id for run 6600 lane 6/,],
+    'Warning about absence of lane id is logged';
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set');
 };
 

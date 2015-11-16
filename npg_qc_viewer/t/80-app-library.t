@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 use Test::WWW::Mechanize::Catalyst;
 use Test::Warn;
@@ -58,4 +58,18 @@ subtest 'Sample links for library SE' => sub {
   $mech->content_contains($id_run);
 }
 
+subtest 'Test for summary table id for library - affects export to CSV.' => sub {
+  plan tests => 4;
+
+  my $lib_name = 'NT207825Q';
+  my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
+
+  warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/, 
+                                      qr/Use of uninitialized value \$id in exists/],
+                                      'Expected warning for runfolder location';
+  $mech->content_contains(q[<table id="results_summary"]);
+  $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi);
+};
+
+1;
 

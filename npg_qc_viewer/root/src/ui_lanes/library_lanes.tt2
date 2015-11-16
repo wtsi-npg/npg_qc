@@ -49,18 +49,22 @@
   </ul>
 [%- END %]
 [%- IF run_view.defined && run_view %][% PROCESS ui_runs/run_menu.tt2 -%][% END %]
+  <ul>
+    <li><a href='#' id='summary_to_csv' title='Download the summary table as a CSV file'>Summary to CSV file</a></li>
+  </ul>
 </div>
 </div>
 
 <div id="content">
 
 <table id="results_summary" summary="QC results summary">
+<thead>
 <tr>
 <th[% row_span_string %]>Library<br />------<br />Sample<br />Name</th>
 <th[% row_span_string %]>Run Id<br />------<br />Num.<br />Cycles</th>
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
-
+</thead>
 [%- qxTotal = 0; #For total qxYield
 
     #For heatmaps
@@ -83,7 +87,6 @@
       row_info_to = c.stash.row_data.$lane_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
 -%]
-
 <tr>
 <td class="lib nbsp">
 <div class="rel_pos_container">
@@ -153,7 +156,6 @@
 [%- END -%]
 [%# Calculating totals for qXyield end %]
 [%- END -%]
-
 </table>
 
 [%-

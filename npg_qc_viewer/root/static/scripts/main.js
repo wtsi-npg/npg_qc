@@ -8,13 +8,15 @@ require.config({
         adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
         mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
         unveil: 'bower_components/jquery-unveil/jquery.unveil',
+        'table-export': 'bower_components/table-export/tableExport.min',
     },
     shim: {
         d3: {
             //makes d3 available automatically for all modules
             exports: 'd3'
         },
-        unveil: ["jquery"]
+        unveil: ["jquery"],
+        'table-export': ["jquery"],
     }
 });
 
@@ -32,8 +34,8 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil'],
-function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
+require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'scripts/format_for_csv', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
+function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatch, unveil) {
   //Setup for heatmaps to load on demand.
   $("img").unveil(2000);
 
@@ -46,6 +48,7 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
   $('<img/>')[0].src = "/static/images/tick.png";
   $('<img/>')[0].src = "/static/images/cross.png";
   $('<img/>')[0].src = "/static/images/padlock.png";
+  $('<img/>')[0].src = "/static/images/circle.png";
 
   // Getting the run_id from the title of the page using the qc part too.
   var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
@@ -62,19 +65,22 @@ function( manual_qc, manual_qc_ui, insert_size, adapter, mismatch, unveil) {
     if (runTitleParserResult.isRunPage) {
       var lanesWithBG = []; //Lanes with previous QC, BG with colour
       control = new NPG.QC.RunPageMQCControl(prodConfiguration);
-      window.console && console.log("Run page");
       control.parseLanes(lanes, lanesWithBG);
       control.prepareMQC(id_run, lanes, lanesWithBG);
     } else {
-      window.console && console.log("Run + Lane page");
-      window.console && console.log("Run " + id_run);
       var position = runTitleParserResult.position;
-      window.console && console.log("Position " + position);
       control = new NPG.QC.LanePageMQCControl(prodConfiguration);
       control.parseLanes(lanes);
       control.prepareMQC(id_run, position, lanes);
     }
   }
+
+  $("#summary_to_csv").click(function(e) {
+    e.preventDefault();
+    var table_html = $('#results_summary')[0].outerHTML;
+    var formated_table = format_for_csv.format(table_html);
+    formated_table.tableExport({type:'csv', fileName:'summary_data'});
+  });
 
   jQuery('.bcviz_insert_size').each(function(i) {
     var self = $(this);

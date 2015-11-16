@@ -614,14 +614,11 @@ var NPG;
       LanePageMQCControl.prototype.initQC = function (mqc_run_data, plexes, targetFunction, mopFunction) {
         var result = null;
         var self = this;
-        if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //There is a data object
-          this.mqc_run_data = mqc_run_data;
-          if(self.isStateForMQC(mqc_run_data)) {
-            self.addAllPaddings();
-            result = targetFunction(mqc_run_data, this, plexes);
-          } else {
-            result = mopFunction();
-          }
+        //Need both a data object and eligible plexes
+        if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) {
+          this.mqc_run_data = mqc_run_data; //Do we need this assignment?
+          self.addAllPaddings();
+          result = targetFunction(mqc_run_data, this, plexes);
         } else {
           result = mopFunction();
         }
@@ -654,9 +651,9 @@ var NPG;
                      && typeof(mqc_run_data.mqc_lib_limit)!== "undefined"
                      && mqc_run_data.qc_tags.length <= mqc_run_data.mqc_lib_limit;
 
-        if(mqc_run_data.qc_tags.length > mqc_run_data.mqc_lib_limit) {
-          var max_library_message = 'Too many plexes, lane level manual QC only.';
-          new NPG.QC.UI.MQCInfoMessage(max_library_message).toConsole().display();
+        if(!result) {
+          new NPG.QC.UI.MQCInfoMessage(
+            'Too many plexes, lane level manual QC only.').toConsole().display();
         }
         return result;
       };
@@ -813,7 +810,7 @@ var NPG;
           //Filter lanes for qc using data from REST
           var onlyQCAble = self.onlyQCAble(mqc_run_data, lanes);
 
-          if(self.isStateForMQC(mqc_run_data)) {
+          if(self.isStateForMQC(mqc_run_data) && onlyQCAble.length > 0) {
             var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
             overallControls.setupControls();
             overallControls.init(onlyQCAble);
@@ -918,7 +915,7 @@ var NPG;
       RunPageMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
         var result = null;
         var self = this;
-        if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //There is a data object
+        if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //Need data object
           this.mqc_run_data = mqc_run_data;
           if(self.isStateForMQC(mqc_run_data)) {
             self.addAllPaddings();
