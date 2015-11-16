@@ -44,7 +44,7 @@ subtest 'load results for the same composition' => sub {
   my $object = $ss_rs->new_result($values);
   isa_ok($object, 'npg_qc::Schema::Result::SamtoolsStats');
   throws_ok {$object->insert()}
-    qr/samtools_stats\.id_seq_composition may not be NULL/,
+    qr/NOT NULL constraint failed: samtools_stats.id_seq_composition/,
     'foreign key referencing the composition table absent - error';
 
   $object->id_seq_composition($fk_row->id_seq_composition);
@@ -63,8 +63,8 @@ subtest 'load results for the same composition' => sub {
   $values =  _get_data('17448_1#9_phix_F0x900.samtools_stats.json');
   $values->{'id_seq_composition'} = $fk_row->id_seq_composition;
   throws_ok { $ss_rs->create($values) }
-    qr/columns id_seq_composition, filter are not unique/,
-    'cannot create a record with the came set of unique keys';
+    qr/UNIQUE constraint failed: samtools_stats\.id_seq_composition, samtools_stats\.filter/,
+    'cannot create a record with the same set of unique keys';
   lives_ok { $ss_rs->update_or_create($values) }
     'can update existing value';
   is ($ss_rs->search({})->count, 2, 'still two rows');

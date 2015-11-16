@@ -5,7 +5,7 @@ set -e -x
 perl Build.PL
 ./Build clean
 ./Build
-./Build test --test-files '*.t'
+./Build test --test-files 't/*.t'
 
 pushd npg_qc_viewer
 perl Build.PL
