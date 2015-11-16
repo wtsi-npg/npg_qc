@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# This script was adapted from work by Keith James (keithj). The original source
+# can be found as part of the wtsi-npg/data_handling project here:
+#
+#   https://github.com/wtsi-npg/data_handling
+
 set -e -x
 
 sudo apt-get install libgd2-xpm-dev # For npg_tracking
