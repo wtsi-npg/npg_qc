@@ -14,8 +14,6 @@ use warnings;
 use Carp;
 use Getopt::Long;
 
-use npg_warehouse::Schema;
-
 our $VERSION = '0';
 
 ## no critic (NamingConventions::Capitalization)
@@ -88,7 +86,13 @@ sub showTags{
     my $ra_topTags = shift;
     my $sampleSize = shift;
     my %tagsFound = @_;
-    my $unassigned =  $sampleSize;
+    my $unassigned = $sampleSize;
+
+    my $class = 'npg_warehouse::Schema';
+    my $loaded = eval "require $class"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    if( !$loaded ) {
+      croak q[Can't load module npg_warehouse::Schema];
+    }
 
     my $s = npg_warehouse::Schema->connect();
 
@@ -242,9 +246,11 @@ tag_sniff.pl
 
 =item warnings
 
-=item FindBin
+=item Carp
 
 =item Getopt::Long
+
+=item npg_warehouse::Schema
 
 =back
 
