@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC: fix warning about undef value in the adapter template
+
 release 59.4
  - saving manual qc values for libraries - allow for an undefined or empty
    list of tag indices
