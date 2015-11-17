@@ -217,6 +217,7 @@ lib/npg_qc/model/tile_score.pm
 lib/npg_qc/Schema.pm
 lib/npg_qc/Schema/Flators.pm
 lib/npg_qc/Schema/Mqc/OutcomeEntity.pm
+lib/npg_qc/Schema/Mqc/OutcomeDict.pm
 lib/npg_qc/Schema/Result/Adapter.pm
 lib/npg_qc/Schema/Result/AlignmentFilterMetrics.pm
 lib/npg_qc/Schema/Result/AnalysisLane.pm
@@ -249,6 +250,7 @@ lib/npg_qc/Schema/Result/LogLikelihood.pm
 lib/npg_qc/Schema/Result/MostCommonBlankPattern.pm
 lib/npg_qc/Schema/Result/MostCommonWord.pm
 lib/npg_qc/Schema/Result/MoveZ.pm
+lib/npg_qc/Schema/Result/MqcLibraryOutcomeDict.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeEnt.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeHist.pm
 lib/npg_qc/Schema/Result/MqcOutcomeDict.pm
@@ -283,6 +285,7 @@ lib/npg_qc/Schema/Result/TagsReporters.pm
 lib/npg_qc/Schema/Result/TileScore.pm
 lib/npg_qc/Schema/Result/UpstreamTags.pm
 lib/npg_qc/Schema/Result/VerifyBamId.pm
+lib/npg_qc/Schema/ResultSet.pm
 lib/npg_qc/Schema/ResultSet/MqcLibraryOutcomeEnt.pm
 lib/npg_qc/Schema/ResultSet/MqcOutcomeEnt.pm
 lib/npg_qc/util.pm
@@ -405,12 +408,18 @@ t/50-schema-result-TagMetrics.t
 t/50-schema-result-AlignmentFilterMetrics.t
 t/50-schema-result-PulldownMetrics.t
 t/50-schema-result-SplitStats.t
+t/50-schema-result-MqcLibraryOutcomeDict.t
+t/50-schema-result-MqcLibraryOutcomeEnt.t
+t/50-schema-result-MqcLibraryOutcomeHist.t
 t/50-schema-result-MqcOutcomeDict.t
 t/50-schema-result-MqcOutcomeEnt.t
 t/50-schema-result-MqcOutcomeHist.t
 t/50-schema-result-VerifyBamId.t
 t/50-schema-result-SamtoolsStats.t
 t/50-schema-result-SequenceSummary.t
+t/50-schema-resultset.t
+t/50-schema-resultset-MqcLibraryOutcomeEnt.t
+t/50-schema-resultset-MqcOutcomeEnt.t
 t/60-autoqc-autoqc.t
 t/60-autoqc-checks-adapter.t
 t/60-autoqc-checks-af_metrics.t
@@ -725,6 +734,7 @@ t/data/fastqcheck/5737/5737_8.fastqcheck
 t/data/fixtures/000-analysis.yml
 t/data/fixtures/000-image_store.yml
 t/data/fixtures/000-mqc_outcome_dict.yml
+t/data/fixtures/000-mqc_library_outcome_dict.yml
 t/data/fixtures/000-run_tile.yml
 t/data/fixtures/100-analysis_lane.yml
 t/data/fixtures/100-cache_query.yml

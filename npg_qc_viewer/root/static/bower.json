@@ -4,7 +4,8 @@
     "jquery": "2.0.3",
     "requirejs": "2.1.8",
     "bcviz": "git://github.com/wtsi-npg/bcviz.git#1.2.1",
-    "jquery-unveil" : "git://github.com/wtsi-npg/unveil#1.3.0"
+    "jquery-unveil" : "git://github.com/wtsi-npg/unveil#1.3.0",
+    "table-export" : "git://github.com/hhurz/tableExport.jquery.plugin.git#v1.2.2"
   },
   "devDependencies": {
     "qunit": "1.17.1", 

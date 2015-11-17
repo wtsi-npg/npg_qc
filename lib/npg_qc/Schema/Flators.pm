@@ -169,52 +169,6 @@ sub set_inflator4scalar {
   return;
 }
 
-=head2 deflate_unique_key_components
-
-Takes a hash key reference of column names and column values,
-deflates unique key components if needed, ensuring that if this hash reference
-is used for querying, correct results will be produced.
-
-  __PACKAGE__->deflate_unique_key_components($values);
-
-=cut
-
-sub deflate_unique_key_components {
-  my ($package_name, $values) = @_;
-  if (!defined $values) {
-    croak q[Values hash should be defined];
-  }
-  if (ref $values ne q[HASH]) {
-    croak q[Values should be a hash];
-  }
-  my $source = $package_name->result_source_instance();
-  my %constraints = $source->unique_constraints();
-  my @names = grep {$_ ne 'primary'} keys %constraints;
-
-  if (@names) {
-    if (scalar @names > 1) {
-      croak qq[Multiple unique constraints in $package_name];
-    }
-    foreach my $col_name (@{$constraints{$names[0]}}) {
-      if (!defined $values->{$col_name} && defined $source->column_info($col_name)->{'default_value'}) {
-        $values->{$col_name} = $source->column_info($col_name)->{'default_value'};
-      }
-    }
-  }
-
-  ################
-  #
-  # Temporary measure to push existing data through
-  #
-  ##no critic (ProhibitMagicNumbers)
-  if  ($package_name eq 'npg_qc::Schema::Result::BamFlagstats' &&
-      $values->{'library_size'} && $values->{'library_size'} == -1) {
-    $values->{'library_size'} = undef;
-  }
-  ##use critic
-  return;
-}
-
 1;
 
 __END__

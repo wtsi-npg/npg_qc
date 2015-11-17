@@ -190,6 +190,36 @@ __PACKAGE__->belongs_to(
 
 our $VERSION = '0';
 
+=head2 sequence_summaries
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SequenceSummary>
+
+=cut
+
+__PACKAGE__->has_many(
+  'sequence_summaries',
+  'npg_qc::Schema::Result::SequenceSummary',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 samtools_stats
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SamtoolsStats>
+
+=cut
+
+__PACKAGE__->has_many(
+  'samtools_stats',
+  'npg_qc::Schema::Result::SamtoolsStats',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__

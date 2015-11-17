@@ -21,11 +21,11 @@ my $rs = $schema->resultset('BamFlagstats');
 "mate_mapped_defferent_chr":0,"mate_mapped_defferent_chr_5":0,"num_total_reads":2,"paired_mapped_reads":1,"paired_read_duplicates":0,"percent_duplicate":0,"position":"1","proper_mapped_pair":2,"read_pair_optical_duplicates":0,"read_pairs_examined":1,"tag_index":"0","unmapped_reads":0,"unpaired_mapped_reads":0,"unpaired_read_duplicates":0}';
 
   my $values = from_json($json);
-  isa_ok($rs->new($values), 'npg_qc::Schema::Result::BamFlagstats');
+  isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::BamFlagstats');
   my %values1 = %{$values};
   my $v1 = \%values1;
 
-  $rs->result_class->deflate_unique_key_components($v1);
+  $rs->deflate_unique_key_components($v1);
   is($v1->{'tag_index'}, 0, 'tag index zero not deflated');
   is($v1->{'human_split'}, 'all', 'human_split correctly deflated');
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'lane record inserted';
@@ -46,7 +46,7 @@ my $rs = $schema->resultset('BamFlagstats');
 "mate_mapped_defferent_chr":0,"mate_mapped_defferent_chr_5":0,"num_total_reads":2,"paired_mapped_reads":1,"paired_read_duplicates":0,"percent_duplicate":0,"position":"1","proper_mapped_pair":2,"read_pair_optical_duplicates":0,"read_pairs_examined":1,"tag_index":"89","unmapped_reads":0,"unpaired_mapped_reads":0,"unpaired_read_duplicates":0}';
 
   my $v = from_json($json);
-  $rs->result_class->deflate_unique_key_components($v);
+  $rs->deflate_unique_key_components($v);
   is ($v->{'library_size'}, undef, 'library size converted to undef');
   lives_ok {$rs->find_or_new($v)->set_inflated_columns($v)->update_or_insert()} 'record inserted';
   my $row = $rs->search({id_run=>12287, position=>1, tag_index=>89,})->next;

@@ -6,19 +6,23 @@ use DateTime::TimeZone;
 use Carp;
 use Readonly;
 
+our $VERSION = '0';
+
 requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
 
-our $VERSION = '0';
-
 Readonly::Scalar my $MQC_LIB_LIMIT => 50;
+Readonly::Scalar my $ACCEPTED_FINAL  => 'Accepted final';
+Readonly::Scalar my $REJECTED_FINAL  => 'Rejected final';
+Readonly::Scalar my $UNDECIDED_FINAL => 'Undecided final';
 
 Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
   'has_final_outcome' => 'is_final_outcome',
   'is_accepted'       => 'is_accepted',
   'is_final_accepted' => 'is_final_accepted',
   'is_undecided'      => 'is_undecided',
+  'is_rejected'       => 'is_rejected',
 };
 
 foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
@@ -49,15 +53,15 @@ sub mqc_lib_limit {
 
 sub data_for_historic {
   my $self = shift;
-  my $my_cols = {$self->get_columns};
+  my %my_cols = $self->get_columns;
   my @hist_cols = $self->result_source
                        ->schema
-                       ->source($self->_historicrs_name)
+                       ->source($self->_rs_name('Hist'))
                        ->columns;
   my $vals = {};
   foreach my $x (@hist_cols) {
-    if ( exists $my_cols->{$x} ) {
-      $vals->{$x} = $my_cols->{$x};
+    if ( exists $my_cols{$x} ) {
+      $vals->{$x} = $my_cols{$x};
     }
   }
   return $vals;
@@ -75,65 +79,120 @@ sub validate_username {
   return;
 }
 
-sub update_outcome {
-  my ($self, $outcome, $username) = @_;
-
-  if(!defined $outcome){
-    croak q[Mandatory parameter 'outcome' missing in call];
+sub _rs_name {
+  my ($self, $suffix) = @_;
+  if (!$suffix) {
+    croak 'Suffix undefined';
   }
-  $self->validate_username($username);
-  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
-
-  my $outcome_id = $outcome_dict_obj->id_mqc_outcome;
-  #There is a row that matches the id_run and position
-  if ($self->in_storage) {
-    if($self->has_final_outcome) {
-      croak('Outcome is already final but trying to transit to ' .
-            $outcome_dict_obj->short_desc);
-    } else { #Update
-      my $values = {};
-      $values->{'id_mqc_outcome'} = $outcome_id;
-      $values->{'username'}       = $username;
-      $values->{'modified_by'}    = $username;
-      $self->update($values);
-    }
-  } else { #Is a new row just insert.
-    $self->id_mqc_outcome($outcome_id);
-    $self->username($username);
-    $self->modified_by($username);
-    $self->insert();
-  }
-  return 1;
-}
-
-sub _historicrs_name {
-  my $self = shift;
   my $class = ref $self;
   ($class) = $class =~ /([^:]+)Ent\Z/smx;
-  return $class . 'Hist';
+  return $class . $suffix;
 }
 
 sub _create_historic {
   my $self = shift;
-  $self->result_source->schema->resultset($self->_historicrs_name)
-    ->create($self->data_for_historic);
-  return 1;
+  $self->result_source
+       ->schema
+       ->resultset($self->_rs_name('Hist'))
+       ->create($self->data_for_historic);
+  return;
 }
 
 sub find_valid_outcome {
   my ($self, $outcome) = @_;
 
-  my $rs = $self->result_source->schema->resultset('MqcOutcomeDict');
+  my $rs = $self->result_source
+                ->schema
+                ->resultset($self->_rs_name('Dict'));
   my $outcome_dict;
   if ($outcome =~ /\d+/xms) {
     $outcome_dict = $rs->find($outcome);
   } else {
-    $outcome_dict = $rs->search({short_desc => $outcome})->next;
+    $outcome_dict = $rs->search({
+      short_desc => $outcome
+    })->next;
   }
-  if (!(defined $outcome_dict) || !$outcome_dict->iscurrent) {
-    croak(sprintf "Outcome $outcome is invalid");
+  if (!defined $outcome_dict || !$outcome_dict->iscurrent) {
+    croak("Outcome $outcome is invalid");
   }
   return $outcome_dict;
+}
+
+sub update_to_final_outcome {
+  my ($self, $username) = @_;
+
+  my $new_outcome;
+  my $class = ref $self;
+  my $is_mqc_library = $class =~ /Library/smx;
+
+  if( $self->is_accepted ) {
+    $new_outcome = $ACCEPTED_FINAL;
+  } elsif ( $self->is_rejected ) {
+    $new_outcome = $REJECTED_FINAL;
+  } elsif ( $is_mqc_library && $self->is_undecided ) {
+    $new_outcome = $UNDECIDED_FINAL;
+  } else {
+    croak sprintf 'Unable to update unexpected outcome to final for id_run %i position %i%s.',
+      $self->id_run,
+      $self->position,
+      $is_mqc_library ? ' tag_index ' . ( $self->tag_index ? $self->tag_index : q[undef] ) : q[];
+  }
+
+  return $self->update_nonfinal_outcome($new_outcome, $username);
+}
+
+sub toggle_final_outcome {
+  my ($self, $modified_by, $username) = @_;
+
+  if (!$self->in_storage) {
+    croak 'Record is not stored in the database yet';
+  }
+  if (!$self->has_final_outcome) {
+    croak 'Cannot toggle non-final outcome ' . $self->mqc_outcome->short_desc;
+  }
+  if ($self->is_undecided) {
+    croak 'Cannot toggle undecided final outcome';
+  }
+
+  my $new_outcome = $self->is_accepted ? $REJECTED_FINAL : $ACCEPTED_FINAL;
+  return $self->update_outcome($new_outcome, $modified_by, $username);
+}
+
+sub update_nonfinal_outcome {
+  my ($self, $outcome, $modified_by, $username) = @_;
+  if ($self->in_storage && $self->has_final_outcome) {
+    croak('Outcome is already final, cannot update');
+  }
+  return $self->update_outcome($outcome, $modified_by, $username);
+}
+
+sub update_outcome {
+  my ($self, $outcome, $modified_by, $username) = @_;
+
+  if( !defined $outcome ) {
+    croak q[Mandatory parameter 'outcome' missing in call];
+  }
+
+  $username ||= $modified_by;
+  $self->validate_username($modified_by);
+  my $outcome_dict_obj = $self->find_valid_outcome($outcome);
+  my $outcome_id = $outcome_dict_obj->pk_value;
+
+  my $values = {};
+  $values->{'id_mqc_outcome'} = $outcome_id;
+  $values->{'username'}       = $username;
+  $values->{'modified_by'}    = $modified_by;
+
+  if ($self->in_storage) {
+    $self->update($values);
+  } else {
+    while ( my ($column, $value) = each %{$values} ) {
+      $self->$column($value);
+    }
+    $self->insert();
+  }
+
+  return;
 }
 
 no Moose::Role;
@@ -158,9 +217,24 @@ __END__
 
 =head1 SUBROUTINES/METHODS
 
+=head2 update
+
+  The default method is extended to create a relevant historic record and set
+  correct local time.
+
+=head2 insert
+
+  The default method is extended to create a relevant historic record and set
+  correct local time.
+
 =head2 get_time_now
 
+  Returns a localised DateTime object representing time now.
+
 =head2 mqc_lib_limit
+
+  Returns a maximum number of plexes in a lane that can be subject to
+  library manula qc.
 
 =head2 data_for_historic
 
@@ -170,13 +244,7 @@ __END__
 
 =head2 validate_username
 
-  Checks that the username is alphanumeric. Oure numeric vakues are not allowed.
-
-=head2 update_outcome
-
-  Updates the outcome of the entity with values provided.
-
-  $obj->($outcome, $username);
+  Checks that the username is alphanumeric. Other numeric values are not allowed.
 
 =head2 has_final_outcome
 
@@ -192,15 +260,55 @@ __END__
 
 =head2 is_undecided
 
-  Returns true if the outcome is ubdecided (neither pass nor fail),
+  Returns true if the outcome is undecided (neither pass nor fail),
   otherwise returns false.
 
 =head2 find_valid_outcome
 
-  Returns a valid current MqcOutcomeDict object that matches the outcome or
+  Returns a valid current Dictionary object that matches the outcome or
   raises an error.
 
-  my $dict_obj = $obj->find_valid_outcome('is accepted');
+  my $dict_obj = $obj->find_valid_outcome('Accepted preeliminary');
+  my $dict_obj = $obj->find_valid_outcome(1);
+
+=head2 update_to_final_outcome
+
+  Checks the current outcome for this entity and tries to define a corresponding
+  final outcome. If there is one, it will delegate the update to update_nonfinal_outcome
+  using the final outcome as new outcome for the entity.
+
+  Needs the username of who is requesting the change.
+
+  $obj->update_to_final_outcome($username);
+
+=head2 update_nonfinal_outcome
+
+  Updates the outcome of the entity with values provided. Stores a new row
+  if this entity was not yet stored in database.
+
+  If the outcome current outcome of the object is final and it is already
+  stored in the database, an error is raised.
+
+  Recommended to be used by the SeqQC application,
+
+  $obj->update_nonfinal_outcome($outcome, $username);
+  $obj->update_nonfinal_outcome($outcome, $username, $rt_ticket);
+
+=head2 update_outcome
+
+  Updates the outcome of the entity with values provided. Stores a new row
+  if this entity was not yet stored in database.
+
+  $obj->update_outcome($outcome, $username);
+  $obj->update_outcome($outcome, $username, $rt_ticket);
+
+=head2 toggle_final_outcome
+
+  Updates the final accepted or rejected outcome to its opposite final outcome,
+  i.e. accepted is changed to rejected and rejected to accepted.
+
+  $obj->toggle_final_outcome($username);
+  $obj->toggle_final_outcome($username, $rt_ticket);
 
 =head1 DIAGNOSTICS
 

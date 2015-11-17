@@ -295,9 +295,9 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 =item * L</position>
 
-=item * L</tag_index>
-
 =item * L</human_split>
+
+=item * L</tag_index>
 
 =back
 
@@ -305,7 +305,7 @@ __PACKAGE__->set_primary_key('id_bam_flagstats');
 
 __PACKAGE__->add_unique_constraint(
   'unq_run_lane_index_sp_flag',
-  ['id_run', 'position', 'tag_index', 'human_split'],
+  ['id_run', 'position', 'human_split', 'tag_index'],
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -324,8 +324,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-07-08 11:05:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:txZzb/HOksJVy8B6JUfuww
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 15:32:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BcBkCGHYvKCVtsQVWCw/kQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

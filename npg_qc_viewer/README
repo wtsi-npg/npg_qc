@@ -86,9 +86,14 @@ Install node package dependencies if they are not available.
 
 Running the tests
 
-  $ pushd root/static && node-qunit-phantomjs test/test.html --verbose && popd
+  $ pushd root/static 
+  $ node-qunit-phantomjs test/test.html --verbose
+  $ node-qunit-phantomjs test/test_format_for_csv.html --verbose
+  $ popd
 
 Testing in browser:
 
-  Open file npg_qc_viewer/root/static/test/test.html in a browser window.
+  Open files in a browser window :
+    npg_qc_viewer/root/static/test/test.html
+    npg_qc_viewer/root/static/test/test_format_for_csv.html 
 
