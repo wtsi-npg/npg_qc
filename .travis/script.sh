@@ -2,16 +2,20 @@
 
 set -e -x
 
+cpanm --quiet --notest --installdeps .
 perl Build.PL
-./Build clean
 ./Build
-./Build test --test-files 't/*.t'
+export PERL5LIB=$PERL5LIB:$TRAVIS_BUILD_DIR/blib/lib:$TRAVIS_BUILD_DIR/lib
 
 pushd npg_qc_viewer
-perl Build.PL
-./Build clean
+cpanm --quiet --notest --installdeps .
+perl Build.PL --installjsdeps
 ./Build
-./Build test --test-files 't/*.t'
+popd
+
+./Build test #--verbose
+pushd npg_qc_viewer
+./Build test #--verbose
 popd
 
 pushd npg_qc_viewer/root/static
