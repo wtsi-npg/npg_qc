@@ -11,23 +11,17 @@ sudo apt-get install libgd2-xpm-dev # For npg_tracking
 sudo apt-get install liblzma-dev # For npg_qc
 sudo apt-get install --yes nodejs
 
-# CPAN
-cpanm --quiet --notest Alien::Tidyp # For npg_tracking
-cpanm --quiet --notest Module::Build
-cpanm --quiet --notest Config::Auto # For npg_qc
-cpanm --quiet --notest Readonly
+# CPAN as in npg_npg_deploy
+cpanm --notest --reinstall App::cpanminus
+cpanm --quiet --notest --reinstall ExtUtils::ParseXS
+cpanm --quiet --notest --reinstall MooseX::Role::Parameterized
+cpanm --quiet --notest Alien::Tidyp
 
 # WTSI NPG Perl repo dependencies
 cd /tmp
-git clone https://github.com/wtsi-npg/ml_warehouse.git ml_warehouse.git
-git clone https://github.com/wtsi-npg/npg_ml_warehouse.git npg_ml_warehouse.git
-git clone https://github.com/wtsi-npg/npg_tracking.git npg_tracking.git
-git clone https://github.com/wtsi-npg/npg_seq_common.git npg_seq_common.git
-
-cd /tmp/ml_warehouse.git    ; git checkout "${DNAP_WAREHOUSE_VERSION}"
-cd /tmp/npg_ml_warehouse.git; git checkout "${NPG_ML_WAREHOUSE_VERSION}"
-cd /tmp/npg_tracking.git    ; git checkout "${NPG_TRACKING_VERSION}"
-cd /tmp/npg_seq_common.git  ; git checkout "${NPG_SEQ_COMMON_VERSION}"
+git clone --branch devel --depth 1 https://github.com/wtsi-npg/ml_warehouse.git ml_warehouse.git
+git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_tracking.git npg_tracking.git
+git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_seq_common.git npg_seq_common.git
 
 # Fix seq_common
 rm /tmp/npg_seq_common.git/t/bin/aligners/bwa/bwa-0.5.8c/bwa
@@ -36,10 +30,7 @@ cp /tmp/npg_seq_common.git/t/bin/bwa /tmp/npg_seq_common.git/t/bin/aligners/bwa/
 rm -r /tmp/npg_seq_common.git/t/data/references/Homo_sapiens/default
 cp -R /tmp/npg_seq_common.git/t/data/references/Homo_sapiens/NCBI36 /tmp/npg_seq_common.git/t/data/references/Homo_sapiens/default
 
-# These are cruft, apparently
-rm -r /tmp/npg_seq_common.git/t/data/sequence/references2
-
-repos="${TRAVIS_BUILD_DIR} ${TRAVIS_BUILD_DIR}/npg_qc_viewer /tmp/ml_warehouse.git /tmp/npg_ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git"
+repos="/tmp/ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git"
 
 # Install CPAN dependencies. The src libs are on PERL5LIB because of
 # circular dependencies. The blibs are on PERL5LIB because the package
@@ -48,13 +39,13 @@ repos="${TRAVIS_BUILD_DIR} ${TRAVIS_BUILD_DIR}/npg_qc_viewer /tmp/ml_warehouse.g
 
 for repo in $repos
 do
-  export PERL5LIB=$repo/blib/lib:$PERL5LIB:$repo/lib
+  export PERL5LIB=$repo/blib/lib:$repo/lib:$PERL5LIB
 done
 
 for repo in $repos
 do
   cd "$repo"
-  cpanm --quiet --notest --installdeps . || find /home/travis/.cpanm/work -name '*.log' -exec tail -n20  {} \;
+  cpanm --quiet --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
   perl Build.PL
   ./Build
 done
@@ -64,15 +55,8 @@ done
 for repo in $repos
 do
   cd "$repo"
-  cpanm --quiet --notest --installdeps . || find /home/travis/.cpanm/work -name '*.log' -exec tail -n20  {} \;
+  cpanm --quiet --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
   ./Build install
 done
 
 cd "$TRAVIS_BUILD_DIR"
-
-npm install -g bower
-npm install -g node-qunit-phantomjs
-
-pushd npg_qc_viewer/root/static
-bower install
-popd

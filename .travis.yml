@@ -10,13 +10,6 @@ language: perl
 perl:
   - "5.16"
 
-env:
-  global:
-    - DNAP_WAREHOUSE_VERSION="1.5"
-    - NPG_ML_WAREHOUSE_VERSION="37.9"
-    - NPG_SEQ_COMMON_VERSION="50.7"
-    - NPG_TRACKING_VERSION="84.10"
-
 before_install:
  - ./.travis/before_install.sh
 install:
