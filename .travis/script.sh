@@ -13,9 +13,9 @@ perl Build.PL --installjsdeps
 ./Build
 popd
 
-./Build test #--verbose
+./Build test --verbose
 pushd npg_qc_viewer
-./Build test #--verbose
+./Build test --verbose
 popd
 
 pushd npg_qc_viewer/root/static
