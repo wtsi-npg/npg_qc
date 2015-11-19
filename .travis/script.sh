@@ -2,13 +2,14 @@
 
 set -e -x
 
-cpanm --quiet --notest --installdeps .
+unset PERL5LIB
+
+cpanm --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
 perl Build.PL
 ./Build
-export PERL5LIB=$PERL5LIB:$TRAVIS_BUILD_DIR/blib/lib:$TRAVIS_BUILD_DIR/lib
 
 pushd npg_qc_viewer
-cpanm --quiet --notest --installdeps .
+cpanm --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
 perl Build.PL --installjsdeps
 ./Build
 popd
