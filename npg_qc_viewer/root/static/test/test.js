@@ -84,3 +84,4 @@ QUnit.test('Error messaging formating', function (assert) {
   obj = new NPG.QC.UI.MQCErrorMessage(FROM_GNR_TEXT);
   assert.equal(obj.formatForDisplay(), EXPECTED_GT, 'Correctly parses from general text');
 });
+

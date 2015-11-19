@@ -30,7 +30,7 @@ subtest 'object with an empty composition' => sub {
   
   throws_ok { npg_qc::autoqc::results::samtools_stats->new(
         stats_file => '/some/file') } 
-    qr/Validation failed for 'NpgTrackingReadableFile' with value "\/some\/file"/,
+    qr/Validation failed for 'NpgTrackingReadableFile' with value/,
     'stats file does not exist - error';
 
   lives_ok { $r = npg_qc::autoqc::results::samtools_stats->new(
