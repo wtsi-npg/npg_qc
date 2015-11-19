@@ -48,14 +48,6 @@ do
   cpanm --quiet --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
   perl Build.PL
   ./Build
-done
-
-# Finally, bring any common dependencies up to the latest version and
-# install
-for repo in $repos
-do
-  cd "$repo"
-  cpanm --quiet --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
   ./Build install
 done
 
