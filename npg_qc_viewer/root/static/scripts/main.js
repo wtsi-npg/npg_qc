@@ -75,6 +75,8 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
     }
   }
 
+  window.console.log($('*').length);
+
   $("#summary_to_csv").click(function(e) {
     e.preventDefault();
     var table_html = $('#results_summary')[0].outerHTML;
@@ -82,7 +84,140 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
 
-  jQuery('.bcviz_insert_size').each(function(i) {
+  $(window).on("scroll resize lookup", function () {
+    var threshold = 2000;
+    var self = $(this);
+    var wt = self.scrollTop() - threshold, wb = wt + self.height() + threshold;
+
+    jQuery('.bcviz_insert_size').each(function(i) {
+      var self = $(this);
+      var parent = self.parent();
+      var parentTop = parent.offset().top;
+      var parentBot = parent.offset().top + parent.height();
+
+      if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
+        if (self.data('inside') === undefined || self.data('inside') == 0) {
+          window.console.log("Create insert size");
+
+          //var self = $(this);
+          var d = self.data('check'),
+              w = self.data('width') || 650,
+              h = self.data('height') || 300,
+              t = self.data('title') || _getTitle('Insert Sizes : ',d);
+          var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+          //Removing data from page to free memory
+          //self.removeAttr('data-check data-width data-height data-title');
+          //Nulling variables to ease GC
+          d = null; w = null; h = null; t = null;
+
+          if (chart != null) {
+            if (chart.svg != null) {
+              div = $(document.createElement("div"));
+              div.append(function() { return chart.svg.node(); } );
+              div.addClass('chart');
+              self.append(div);
+            }
+          }
+
+          self.data('inside', 1);
+        }
+      } else {
+        if (self.data('inside') == 1) {
+          window.console.log("Destroy insert size");
+          self.empty();
+          self.data('inside', 0);
+        }
+      }
+    });
+
+    jQuery('.bcviz_adapter').each(function() {
+      var self = $(this);
+      var parent = self.parent();
+      var parentTop = parent.offset().top;
+      var parentBot = parent.offset().top + parent.height();
+
+      if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
+        if (self.data('inside') === undefined || self.data('inside') == 0) {
+          window.console.log("Create adapter");
+
+          //var self = $(this);
+          var d = self.data('check'),
+              h = self.data('height') || 200,
+              t = self.data('title') || _getTitle('Adapter Start Count : ', d);
+
+          // override width to ensure two graphs can fit side by side
+          var w = jQuery(this).parent().width() / 2 - 40;
+          var chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+          //self.removeAttr('data-check data-height data-title');
+          d = null; h = null; t = null;
+
+          var fwd_div = $(document.createElement("div"));
+          if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
+          fwd_div.addClass('chart_left');
+          rev_div = $(document.createElement("div"));
+          if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
+          rev_div.addClass('chart_right');
+          self.append(fwd_div,rev_div);
+
+          self.data('inside', 1);
+        }
+      } else {
+        if (self.data('inside') == 1) {
+          window.console.log("Destroy adapter");
+          self.empty();
+          self.data('inside', 0);
+        }
+      }
+    });
+
+    jQuery('.bcviz_mismatch').each(function () {
+      var self = $(this);
+      var parent = self.parent();
+      var parentTop = parent.offset().top;
+      var parentBot = parent.offset().top + parent.height();
+
+      if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
+        if (self.data('inside') === undefined || self.data('inside') == 0) {
+          window.console.log("Create mismatch");
+          var d = jQuery(this).data('check'),
+              h = jQuery(this).data('height'),
+              t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
+
+          // override width to ensure two graphs can fit side by side
+          var w = jQuery(this).parent().width() / 2 - 90;
+          var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+          //self.removeAttr('data-check data-height data-title');
+          d = null; h = null; t = null;
+
+          var fwd_div = $(document.createElement("div"));
+          if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
+          fwd_div.addClass('chart_left');
+
+          var rev_div = $(document.createElement("div"));
+          if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
+          rev_div.addClass('chart_right');
+
+          var leg_div = $(document.createElement("div"));
+          if (chart != null && chart.svg_legend != null) { leg_div.append( function() { return chart.svg_legend.node(); } ); }
+          leg_div.addClass('chart_legend');
+
+          self.append(fwd_div,rev_div,leg_div);
+
+          self.data('inside', 1);
+        }
+      } else {
+        if (self.data('inside') == 1) {
+          window.console.log("Destroy mismatch");
+          self.empty();
+          self.data('inside', 0);
+        }
+      }
+    });
+
+    //window.console.log($('*').length);
+  });
+
+  /*jQuery('.bcviz_insert_size').each(function(i) {
     var self = $(this);
     var d = self.data('check'),
         w = self.data('width') || 650,
@@ -125,30 +260,38 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
     self.append(fwd_div,rev_div);
   });
 
-  jQuery('.bcviz_mismatch').each(function() {
-    var self = $(this)
-    var d = jQuery(this).data('check'),
-        h = jQuery(this).data('height'),
-        t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
+  jQuery('.bcviz_mismatch').parent().on('mouseenter', function () {
+    window.console.log($('*').length);
+    $(this).children('.bcviz_mismatch').each(function() {
+      var self = $(this)
+      var d = jQuery(this).data('check'),
+          h = jQuery(this).data('height'),
+          t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
 
-    // override width to ensure two graphs can fit side by side
-    var w = jQuery(this).parent().width() / 2 - 90;
-    var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-    self.removeAttr('data-check data-height data-title');
-    d = null; h = null; t = null;
+      // override width to ensure two graphs can fit side by side
+      var w = jQuery(this).parent().width() / 2 - 90;
+      var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+      //self.removeAttr('data-check data-height data-title');
+      d = null; h = null; t = null;
 
-    var fwd_div = $(document.createElement("div"));
-    if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
-    fwd_div.addClass('chart_left');
+      var fwd_div = $(document.createElement("div"));
+      if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
+      fwd_div.addClass('chart_left');
 
-    var rev_div = $(document.createElement("div"));
-    if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
-    rev_div.addClass('chart_right');
+      var rev_div = $(document.createElement("div"));
+      if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
+      rev_div.addClass('chart_right');
 
-    var leg_div = $(document.createElement("div"));
-    if (chart != null && chart.svg_legend != null) { leg_div.append( function() { return chart.svg_legend.node(); } ); }
-    leg_div.addClass('chart_legend');
+      var leg_div = $(document.createElement("div"));
+      if (chart != null && chart.svg_legend != null) { leg_div.append( function() { return chart.svg_legend.node(); } ); }
+      leg_div.addClass('chart_legend');
 
-    self.append(fwd_div,rev_div,leg_div);
-  });
+      self.append(fwd_div,rev_div,leg_div);
+      window.console.log($('*').length);
+    });
+  }).on('mouseleave', function () {
+    window.console.log($('*').length);
+    $(this).children('.bcviz_mismatch').empty();
+    window.console.log($('*').length);
+  });*/
 });
