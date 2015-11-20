@@ -105,8 +105,9 @@ sub _build_input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
     my $library_name = $self->lims->library_name // $sample_id;
+    my @library_names = split q[ ], $library_name;
     my $input_file = $self->bam_file;
-    return qq["$library_name|$input_file|$sample_id"];
+    return qq["$library_names[0]|$input_file|$sample_id"];
 }
 
 has 'reference_fasta' => (is => 'ro',
@@ -165,23 +166,30 @@ has 'config_file_loc' => (is         => 'ro',
 override 'can_run' => sub {
     my $self = shift;
     my $l = $self->lims;
-    if(!$self->alignments_in_bam) {
-        $self->messages->push('alignments_in_bam is false');
-        return 0;
+    my $can_run = 1;
+    my @comments;
+    if(! $self->alignments_in_bam) {
+        push @comments, q[Alignments_in_bam is false];
+        $can_run = 0;
     }
-    if (!$l->library_type || $l->library_type !~ /(?:cD|R)NA/sxm) {
-        $self->messages->push('Not RNA library type');
-        return 0;
+    if ((! $l->library_type || $l->library_type !~ /(?:cD|R)NA/sxm) && $l->library_type ne q[Pre-quality controlled]) {
+        push @comments, join q[ ], q[Not RNA library type: ], $l->library_type;
+        $can_run = 0;
     }
-    if((not $l->reference_genome) or (not $l->reference_genome =~ /Homo_sapiens|Mus_musculus/smx)){
-        $self->messages->push('Not human or mouse (so skipping RNA-SeQC analysis for now');
-        return 0;
+    if((! $l->reference_genome) or (not $l->reference_genome =~ /Homo_sapiens|Mus_musculus/smx)){
+        push @comments, q[Not human or mouse (only human and mouse transcriptomes available for now)];
+        $can_run = 0;
     }
-    if(not $self->transcriptome_index_name()){
-        $self->messages->push('Not transcriptome set so no splice junction alignment');
-        return 0;
+    if(! $self->transcriptome_index_name()){
+        push @comments, q[Not transcriptome set so not a splice junction alignment (e.g. Tophat)];
+        $can_run = 0;
     }
-    return 1;
+    if (! $can_run) {
+        my $can_run_message = join q[, ], @comments;
+        $self->result->add_comment($can_run_message);
+        carp qq[Skipping RNA-SeQC check because: $can_run_message];
+    }
+    return $can_run;
 };
 
 override 'execute' => sub {
@@ -208,8 +216,7 @@ override 'execute' => sub {
         my $rpt_dir = $rp_dir . $self->tag_label;
         $out_dir = join q[/], $rna_seqc_dir, $rp_dir, $rpt_dir;
     }
-    # check existence of RNA_SeQC's output directory,
-    # create if it doesn't
+    # check existence of RNA_SeQC's output directory create if it doesn't
     if ( ! -d $out_dir) {
         make_path($out_dir);
     }
@@ -218,6 +225,8 @@ override 'execute' => sub {
     $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
     my $command = $self->_command($out_dir);
     $self->result->set_info('Command', $command);
+
+    print qq[Ready to run RNA-SeQC with command:\n$command\n];
     if (system $command) {
         carp "Failed to execute $command";
     }
