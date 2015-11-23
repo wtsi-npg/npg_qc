@@ -68,33 +68,33 @@ sub _build_alignments_in_bam {
     return $self->lims->alignments_in_bam;
 }
 
-######################################################################
+###############################################################################
 # Output path:
-#  By default, the pipeline supplies the archive/(lane#/)qc path 
-#  under the Latest_Summary directory (the path attribute value is set
-#  via the qc_out value). This is used to lazy-build the output path 
-#  for the RNA-SeQC results below. The qc_out attribute remains intact
-#  so the JSON files are stored in the standard location
-######################################################################
+#  By default, the pipeline supplies the archive/qc/rna_seqc path under the
+#  Latest_Summary directory via the qc_out parameter. This value is used to
+#  lazy-build the output path for the RNA-SeQC results within the following
+#  path: <qc_out path>/<run_position>/<run_position#tag>. qc_out remains
+#  intact so the JSON files end up stored in a non-standard location. This
+#  behaviour may change in the future if metrics are to be read and stored.
+###############################################################################
 has 'qc_out'     => (is         => 'ro',
                      isa        => 'NpgTrackingDirectory',
                      required   => 1,);
 
-# Append rna_seqc to the output path. For indexed runs, removing the 
-# lane# element will result in the correct location of the rna_seqc 
-# dir (next to tileviz). For non-indexed runs use default qc_out. 
 has 'rna_seqc_path' => (is         => 'ro',
                        isa        => 'Str',
                        lazy_build => 1,);
 
 sub _build_rna_seqc_path {
-	my ($self) = @_;
-	my $archive_qc_rna_seqc_path = $self->qc_out;
-	my $lane_path = q[lane]. $self->position;
-	if (defined $self->tag_index) {
-        $archive_qc_rna_seqc_path =~ s{/$lane_path}{}smx;
+    my ($self) = @_;
+    my $archive_qc_rna_seqc_path = $self->qc_out;
+    my $rp_dir = join q[_], $self->id_run, $self->position;
+    my $out_dir = join q[/], $archive_qc_rna_seqc_path, $rp_dir;
+    if (defined $self->tag_index) {
+        my $rpt_dir = $rp_dir . $self->tag_label;
+        $out_dir = join q[/], $archive_qc_rna_seqc_path, $rp_dir, $rpt_dir;
     }
-    return $archive_qc_rna_seqc_path .= q[/rna_seqc];
+    return $out_dir;
 }
 
 has 'input_str' => (is => 'ro',
@@ -139,8 +139,12 @@ sub _build_transcriptome {
 }
 
 sub _command {
-    my ($self, $dir_out) = @_;
-
+    my ($self) = @_;
+    my $out_dir = $self->rna_seqc_path;
+    # check existence of RNA_SeQC's output directory create if it doesn't
+    if ( ! -d $out_dir) {
+        make_path($out_dir);
+    }
     my $single_end_option=q[];
     if(!npg::api::run->new({id_run => $self->id_run})->is_paired_read()){
         $single_end_option=q[-singleEnd];
@@ -151,7 +155,7 @@ sub _command {
                                            $self->java_use_perf_data,
                                            $self->java_jar_path,
                                            $self->input_str,
-                                           $dir_out,
+                                           $out_dir,
                                            $self->reference_fasta,
                                            $self->transcriptome,
                                            $self->transcript_type,
@@ -194,47 +198,27 @@ override 'can_run' => sub {
 
 override 'execute' => sub {
     my ($self) = @_;
-
     if (super() == 0) {
     	return 1;
     }
-
     if ($self->messages->count) {
         $self->result->add_comment(join q[ ], $self->messages->messages);
     }
-
     my $can_run = $self->can_run();
-
     if (!$can_run) {
     	return 1;
     }
-
-    my $rna_seqc_dir = $self->rna_seqc_path;
-    my $rp_dir = join q[_], $self->id_run, $self->position;
-    my $out_dir = join q[/], $rna_seqc_dir, $rp_dir;
-    if (defined $self->tag_index) {
-        my $rpt_dir = $rp_dir . $self->tag_label;
-        $out_dir = join q[/], $rna_seqc_dir, $rp_dir, $rpt_dir;
-    }
-    # check existence of RNA_SeQC's output directory create if it doesn't
-    if ( ! -d $out_dir) {
-        make_path($out_dir);
-    }
-
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
     $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
-    my $command = $self->_command($out_dir);
+    my $command = $self->_command();
     $self->result->set_info('Command', $command);
-
     print qq[Ready to run RNA-SeQC with command:\n$command\n];
     if (system $command) {
         carp "Failed to execute $command";
     }
-
     #TODO: Call to _parse_metrics(<metrics.tsv file handler>)
-    #      my $results = $self->_parse_metrics($fh);
+    #my $results = $self->_parse_metrics($fh);
     #$self->result->rnaseqc_metrics_path($self->output_dir);
-
     return 1;
 };
 
