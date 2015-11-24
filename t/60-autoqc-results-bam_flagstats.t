@@ -301,13 +301,12 @@ subtest 'creating related objects' => sub {
     qr/Path should be given/, 'no attribute - error';
   throws_ok { $r->create_related_objects(join q[/], $qc_dir, $name) }
     qr/File path should be given/, 'file does not exist - error';
-  my $file         = join q[/], $qc_dir, 'cram', $name;
-  my $file_to_find = join q[/], $qc_dir, '17448_1#9.cram';
+  my $file    = join q[/], $qc_dir, 'cram', $name;
   throws_ok { $r->create_related_objects($file) }
-    qr/Validation failed for 'NpgTrackingReadableFile' with value "$file_to_find"/,
+    qr/Validation failed for 'NpgTrackingReadableFile' with value/,
     'no cram file one directory up - error';
 
-  my $file_ok      = join q[/], $qc_dir, $name;
+  my $file_ok = join q[/], $qc_dir, $name;
   rename $file, $file_ok;
   lives_ok { $r->create_related_objects($file_ok) } 'related objects built';
   ok ($r->_has_related_objects, 'related object array has been set');

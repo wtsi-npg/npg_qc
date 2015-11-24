@@ -324,7 +324,7 @@ subtest q[update on a new result] => sub {
  
   $new_row = $rs->new_result($args);
   throws_ok { $new_row->update_nonfinal_outcome($outcome, 'dog', 'cat') }
-    qr /columns id_run, position are not unique/,
+    qr /UNIQUE constraint failed: mqc_outcome_ent\.id_run, mqc_outcome_ent\.position/,
     'error creating a record for existing entity';
 
   $args->{'position'} = 2;
