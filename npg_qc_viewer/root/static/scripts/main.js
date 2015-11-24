@@ -37,7 +37,34 @@ function _getTitle(prefix, d) {
 require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'scripts/format_for_csv', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
 function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatch, unveil) {
   //Setup for heatmaps to load on demand.
-  $("img").unveil(2000);
+  $(document).ready(function(){
+    $("img").unveil(2000);
+
+    // Getting the run_id from the title of the page using the qc part too.
+    var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
+                                                            .find("title")
+                                                            .text());
+    //If id_run
+    if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
+      var id_run = runTitleParserResult.id_run;
+      var prodConfiguration = new NPG.QC.ProdConfiguration();
+      //Read information about lanes from page.
+      var lanes = []; //Lanes without previous QC, blank BG
+      var control;
+
+      if (runTitleParserResult.isRunPage) {
+        var lanesWithBG = []; //Lanes with previous QC, BG with colour
+        control = new NPG.QC.RunPageMQCControl(prodConfiguration);
+        control.parseLanes(lanes, lanesWithBG);
+        control.prepareMQC(id_run, lanes, lanesWithBG);
+      } else {
+        var position = runTitleParserResult.position;
+        control = new NPG.QC.LanePageMQCControl(prodConfiguration);
+        control.parseLanes(lanes);
+        control.prepareMQC(id_run, position, lanes);
+      }
+    }
+  });
 
   //Required to show error messages from the mqc process.
   $("#results_summary").before('<ul id="ajax_status"></ul>');
@@ -49,34 +76,7 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
   $('<img/>')[0].src = "/static/images/cross.png";
   $('<img/>')[0].src = "/static/images/padlock.png";
   $('<img/>')[0].src = "/static/images/circle.png";
-
-  // Getting the run_id from the title of the page using the qc part too.
-  var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
-                                                        .find("title")
-                                                        .text());
-  //If id_run
-  if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
-    var id_run = runTitleParserResult.id_run;
-    var prodConfiguration = new NPG.QC.ProdConfiguration();
-    //Read information about lanes from page.
-    var lanes = []; //Lanes without previous QC, blank BG
-    var control;
-
-    if (runTitleParserResult.isRunPage) {
-      var lanesWithBG = []; //Lanes with previous QC, BG with colour
-      control = new NPG.QC.RunPageMQCControl(prodConfiguration);
-      control.parseLanes(lanes, lanesWithBG);
-      control.prepareMQC(id_run, lanes, lanesWithBG);
-    } else {
-      var position = runTitleParserResult.position;
-      control = new NPG.QC.LanePageMQCControl(prodConfiguration);
-      control.parseLanes(lanes);
-      control.prepareMQC(id_run, position, lanes);
-    }
-  }
-
-  window.console.log($('*').length);
-
+  
   $("#summary_to_csv").click(function(e) {
     e.preventDefault();
     var table_html = $('#results_summary')[0].outerHTML;
@@ -85,11 +85,14 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
   });
 
   $(window).on("scroll resize lookup", function () {
+    var insertSizeCache = jQuery('.bcviz_insert_size');
+    var adapterCache = jQuery('.bcviz_adapter');
+    var mismatchCache = jQuery('.bcviz_mismatch');
     var threshold = 2000;
     var self = $(this);
     var wt = self.scrollTop() - threshold, wb = wt + self.height() + threshold;
 
-    jQuery('.bcviz_insert_size').each(function(i) {
+    insertSizeCache.each(function(i) {
       var self = $(this);
       var parent = self.parent();
       var parentTop = parent.offset().top;
@@ -97,7 +100,6 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
 
       if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
         if (self.data('inside') === undefined || self.data('inside') == 0) {
-          window.console.log("Create insert size");
 
           //var self = $(this);
           var d = self.data('check'),
@@ -123,14 +125,13 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
         }
       } else {
         if (self.data('inside') == 1) {
-          window.console.log("Destroy insert size");
           self.empty();
           self.data('inside', 0);
         }
       }
     });
 
-    jQuery('.bcviz_adapter').each(function() {
+    adapterCache.each(function() {
       var self = $(this);
       var parent = self.parent();
       var parentTop = parent.offset().top;
@@ -138,7 +139,6 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
 
       if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
         if (self.data('inside') === undefined || self.data('inside') == 0) {
-          window.console.log("Create adapter");
 
           //var self = $(this);
           var d = self.data('check'),
@@ -163,14 +163,13 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
         }
       } else {
         if (self.data('inside') == 1) {
-          window.console.log("Destroy adapter");
           self.empty();
           self.data('inside', 0);
         }
       }
     });
 
-    jQuery('.bcviz_mismatch').each(function () {
+    mismatchCache.each(function () {
       var self = $(this);
       var parent = self.parent();
       var parentTop = parent.offset().top;
@@ -178,13 +177,12 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
 
       if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
         if (self.data('inside') === undefined || self.data('inside') == 0) {
-          window.console.log("Create mismatch");
-          var d = jQuery(this).data('check'),
-              h = jQuery(this).data('height'),
-              t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
+          var d = self.data('check'),
+              h = self.data('height'),
+              t = self.data('title') || _getTitle('Mismatch : ', d);
 
           // override width to ensure two graphs can fit side by side
-          var w = jQuery(this).parent().width() / 2 - 90;
+          var w = parent.width() / 2 - 90;
           var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
           //self.removeAttr('data-check data-height data-title');
           d = null; h = null; t = null;
@@ -202,12 +200,11 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
           leg_div.addClass('chart_legend');
 
           self.append(fwd_div,rev_div,leg_div);
-
+          
           self.data('inside', 1);
         }
       } else {
         if (self.data('inside') == 1) {
-          window.console.log("Destroy mismatch");
           self.empty();
           self.data('inside', 0);
         }
