@@ -45,7 +45,7 @@ subtest 'load the same data twice' => sub {
   my $object = $ss_rs->new_result($values);
   isa_ok($object, 'npg_qc::Schema::Result::SequenceSummary');
   throws_ok {$object->insert()}
-    qr/sequence_summary\.id_seq_composition may not be NULL/,
+    qr/NOT NULL constraint failed: sequence_summary\.id_seq_composition/,
     'foreign key referencing the composition table absent - error';
 
   $object->id_seq_composition($fk_row->id_seq_composition);

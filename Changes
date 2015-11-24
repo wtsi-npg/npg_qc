@@ -1,6 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - SeqQC: fix warning about undef value in the adapter template
+ - travis ci testing perl modules for npg_qc and npg_qc_viewer
 
 release 59.4
  - saving manual qc values for libraries - allow for an undefined or empty
