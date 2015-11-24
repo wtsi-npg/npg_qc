@@ -139,6 +139,7 @@ sub _drop_extension {
 has 'samtools_stats_file' => ( isa        => 'ArrayRef',
                                is         => 'ro',
                                lazy_build => 1,
+                               clearer    => '_clear_samtools_stats_file',
 );
 sub _build_samtools_stats_file {
   my $self = shift;
@@ -259,6 +260,7 @@ sub create_related_objects {
 
   if ($self->_has_related_objects() && !@{$self->related_objects()}) {
     $self->_clear_related_objects();
+    $self->_clear_samtools_stats_file();
   }
 
   if (!$self->_has_related_objects()) {
