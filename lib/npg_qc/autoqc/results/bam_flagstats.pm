@@ -168,6 +168,7 @@ has 'related_objects' => ( isa        => 'ArrayRef[Object]',
                            lazy_build => 1,
                            writer     => '_set_related_objects',
                            predicate  => '_has_related_objects',
+                           clearer    => '_clear_related_objects',
 );
 sub _build_related_objects {
   my $self = shift;
@@ -255,6 +256,11 @@ sub execute {
 
 sub create_related_objects {
   my ($self, $path) = @_;
+
+  if ($self->_has_related_objects() && !@{$self->related_objects()}) {
+    $self->_clear_related_objects();
+  }
+
   if (!$self->_has_related_objects()) {
     if (!$self->sequence_file) {
       $self->_set_sequence_file(_find_sequence_file($path));
