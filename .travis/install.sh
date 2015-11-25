@@ -23,13 +23,6 @@ git clone --branch devel --depth 1 https://github.com/wtsi-npg/ml_warehouse.git 
 git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_tracking.git npg_tracking.git
 git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_seq_common.git npg_seq_common.git
 
-# Fix seq_common
-rm /tmp/npg_seq_common.git/t/bin/aligners/bwa/bwa-0.5.8c/bwa
-cp /tmp/npg_seq_common.git/t/bin/bwa /tmp/npg_seq_common.git/t/bin/aligners/bwa/bwa-0.5.8c/bwa
-
-rm -r /tmp/npg_seq_common.git/t/data/references/Homo_sapiens/default
-cp -R /tmp/npg_seq_common.git/t/data/references/Homo_sapiens/NCBI36 /tmp/npg_seq_common.git/t/data/references/Homo_sapiens/default
-
 repos="/tmp/ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git"
 
 # Install CPAN dependencies. The src libs are on PERL5LIB because of
