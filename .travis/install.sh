@@ -25,16 +25,6 @@ git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_seq_common.gi
 
 repos="/tmp/ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git"
 
-# Install CPAN dependencies. The src libs are on PERL5LIB because of
-# circular dependencies. The blibs are on PERL5LIB because the package
-# version, which cpanm requires, is inserted at build time. They must
-# be before the libs for cpanm to pick them up in preference.
-
-for repo in $repos
-do
-  export PERL5LIB=$repo/blib/lib:$repo/lib:$PERL5LIB
-done
-
 for repo in $repos
 do
   cd "$repo"
