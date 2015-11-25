@@ -10,11 +10,10 @@ use File::Path qw(make_path);
 use npg_qc::autoqc::types;
 use Readonly;
 use Try::Tiny;
+use DateTime;
 use npg_tracking::util::types;
 
-extends qw(npg_qc::autoqc::checks::check
-           npg_pipeline::base
-);
+extends qw(npg_qc::autoqc::checks::check);
 
 with qw(npg_tracking::data::reference::find 
         npg_common::roles::software_location
@@ -212,7 +211,7 @@ override 'execute' => sub {
     $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
     my $command = $self->_command();
     $self->result->set_info('Command', $command);
-    print qq[Ready to run RNA-SeQC with command:\n$command\n];
+    carp qq[EXECUTING $command time ]. DateTime->now();
     if (system $command) {
         carp "Failed to execute $command";
     }
@@ -280,6 +279,8 @@ npg_qc::autoqc::checks::rna_seqc - a QC check that runs RNA-SeQC software over a
 
 =item File::Basename
 
+=item File::Path
+
 =item npg_qc::autoqc::types
 
 =item npg::api::run
@@ -287,6 +288,10 @@ npg_qc::autoqc::checks::rna_seqc - a QC check that runs RNA-SeQC software over a
 =item Readonly
 
 =item Try::Tiny
+
+=item DateTime
+
+=item npg_qc::autoqc::checks::check
 
 =item npg_tracking::data::reference::find
 
