@@ -258,11 +258,6 @@ sub execute {
 sub create_related_objects {
   my ($self, $path) = @_;
 
-  if ($self->_has_related_objects() && !@{$self->related_objects()}) {
-    $self->_clear_related_objects();
-    $self->_clear_samtools_stats_file();
-  }
-
   if (!$self->_has_related_objects()) {
     if (!$self->sequence_file) {
       $self->_set_sequence_file(_find_sequence_file($path));
@@ -270,6 +265,15 @@ sub create_related_objects {
     foreach my $ro ( @{$self->related_objects()} ) {
       $ro->execute();
     }
+  }
+  return;
+}
+
+sub clear_related_objects {
+  my $self = shift;
+  if ($self->_has_related_objects() && !@{$self->related_objects()}) {
+    $self->_clear_related_objects();
+    $self->_clear_samtools_stats_file();
   }
   return;
 }
@@ -437,13 +441,21 @@ npg_qc::autoqc::results::bam_flagstats
 
   method forcing related objects attribute to be built
 
+head2 clear_related_objects
+
+  if the related_objects array is empty, clears this attribute and the
+  samtools_stats_file attribute thus allowing to recompute related
+  objects
+
 =head2 markdups_metrics_file
 
-  an optional attribute, should be either set or built for 'execute' method to work correctly
+  an optional attribute, should be either set or built for 'execute'
+  method to work correctly
 
 =head2 flagstats_metrics_file
 
-  an optional attribute, should be either set or built for 'execute' method to work correctly
+  an optional attribute, should be either set or built for 'execute'
+  method to work correctly
 
 =head2 samtools_stats_file
 

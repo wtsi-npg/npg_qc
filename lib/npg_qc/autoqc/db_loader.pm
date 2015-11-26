@@ -56,6 +56,12 @@ has 'load_related'  => ( is       => 'ro',
                          default  => 1,
                        );
 
+has 'clear_related' => ( is       => 'ro',
+                         isa      => 'Bool',
+                         required => 0,
+                         default  => 0,
+                       );
+
 has 'json_file' => ( is          => 'ro',
                      isa         => 'ArrayRef',
                      required    => 0,
@@ -151,9 +157,14 @@ sub _json2db{
         # New code should create serialized related objects which will
         # be loaded from json files. For cases where we cannot produce the serialized
         # version of objects, we will generate the objects now.
+        # Optionally, if clear_related is true, we will disregard previous
+        # unsuccessful attempts to generate related objects.
         if ( $json_file && $self->load_related &&
              $obj->can('related_objects') &&
              $obj->can('create_related_objects') ) {
+          if ($self->clear_related and $obj->can('clear_related_objects')) {
+            $obj->clear_related_objects();
+          }
           $obj->create_related_objects($json_file);
           foreach my $o (@{$obj->related_objects}) {
             $self->_json2db($o->freeze()); # Recursion
