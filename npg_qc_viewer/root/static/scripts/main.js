@@ -85,21 +85,21 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
   });
 
   $(window).on("scroll resize lookup", function () {
-    var insertSizeCache = jQuery('.bcviz_insert_size');
-    var adapterCache = jQuery('.bcviz_adapter');
-    var mismatchCache = jQuery('.bcviz_mismatch');
+    var insertSize = jQuery('.bcviz_insert_size');
+    var adapter = jQuery('.bcviz_adapter');
+    var mismatch = jQuery('.bcviz_mismatch');
     var threshold = 2000;
     var self = $(this);
     var wt = self.scrollTop() - threshold, wb = wt + self.height() + threshold;
 
-    insertSizeCache.each(function(i) {
+    insertSize.each(function(i) {
       var self = $(this);
       var parent = self.parent();
       var parentTop = parent.offset().top;
       var parentBot = parent.offset().top + parent.height();
 
       if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
-        if (self.data('inside') === undefined || self.data('inside') == 0) {
+        if (self.data('inView') === undefined || self.data('inView') == 0) {
 
           //var self = $(this);
           var d = self.data('check'),
@@ -120,25 +120,26 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
               self.append(div);
             }
           }
-
-          self.data('inside', 1);
+          
+          parent.css('min-height', parent.height() + 'px');
+          self.data('inView', 1);
         }
       } else {
-        if (self.data('inside') == 1) {
+        if (self.data('inView') == 1) {
           self.empty();
-          self.data('inside', 0);
+          self.data('inView', 0);
         }
       }
     });
 
-    adapterCache.each(function() {
+    adapter.each(function() {
       var self = $(this);
       var parent = self.parent();
       var parentTop = parent.offset().top;
       var parentBot = parent.offset().top + parent.height();
 
-      if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
-        if (self.data('inside') === undefined || self.data('inside') == 0) {
+      if ((parentTop >= wt && parentTop <= wb) || (parentBot >= wt && parentBot <= wb)) {
+        if (self.data('inView') === undefined || self.data('inView') == 0) {
 
           //var self = $(this);
           var d = self.data('check'),
@@ -159,24 +160,25 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
           rev_div.addClass('chart_right');
           self.append(fwd_div,rev_div);
 
-          self.data('inside', 1);
+          parent.css('min-height', parent.height() + 'px');
+          self.data('inView', 1);
         }
       } else {
-        if (self.data('inside') == 1) {
+        if (self.data('inView') == 1) {
           self.empty();
-          self.data('inside', 0);
+          self.data('inView', 0);
         }
       }
     });
 
-    mismatchCache.each(function () {
+    mismatch.each(function () {
       var self = $(this);
       var parent = self.parent();
       var parentTop = parent.offset().top;
       var parentBot = parent.offset().top + parent.height();
 
       if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
-        if (self.data('inside') === undefined || self.data('inside') == 0) {
+        if (self.data('inView') === undefined || self.data('inView') == 0) {
           var d = self.data('check'),
               h = self.data('height'),
               t = self.data('title') || _getTitle('Mismatch : ', d);
@@ -201,94 +203,15 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
 
           self.append(fwd_div,rev_div,leg_div);
           
-          self.data('inside', 1);
+          parent.css('min-height', parent.height() + 'px');
+          self.data('inView', 1);
         }
       } else {
-        if (self.data('inside') == 1) {
+        if (self.data('inView') == 1) {
           self.empty();
-          self.data('inside', 0);
+          self.data('inView', 0);
         }
       }
     });
-
-    //window.console.log($('*').length);
   });
-
-  /*jQuery('.bcviz_insert_size').each(function(i) {
-    var self = $(this);
-    var d = self.data('check'),
-        w = self.data('width') || 650,
-        h = self.data('height') || 300,
-        t = self.data('title') || _getTitle('Insert Sizes : ',d);
-    var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-    //Removing data from page to free memory
-    self.removeAttr('data-check data-width data-height data-title');
-    //Nulling variables to ease GC
-    d = null; w = null; h = null; t = null;
-
-    if (chart != null) {
-      if (chart.svg != null) {
-        div = $(document.createElement("div"));
-        div.append(function() { return chart.svg.node(); } );
-        div.addClass('chart');
-        self.append(div);
-      }
-    }
-  });
-
-  jQuery('.bcviz_adapter').each(function() {
-    var self = $(this);
-    var d = self.data('check'),
-        h = self.data('height') || 200,
-        t = self.data('title') || _getTitle('Adapter Start Count : ', d);
-
-    // override width to ensure two graphs can fit side by side
-    var w = jQuery(this).parent().width() / 2 - 40;
-    var chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-    self.removeAttr('data-check data-height data-title');
-    d = null; h = null; t = null;
-
-    var fwd_div = $(document.createElement("div"));
-    if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
-    fwd_div.addClass('chart_left');
-    rev_div = $(document.createElement("div"));
-    if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
-    rev_div.addClass('chart_right');
-    self.append(fwd_div,rev_div);
-  });
-
-  jQuery('.bcviz_mismatch').parent().on('mouseenter', function () {
-    window.console.log($('*').length);
-    $(this).children('.bcviz_mismatch').each(function() {
-      var self = $(this)
-      var d = jQuery(this).data('check'),
-          h = jQuery(this).data('height'),
-          t = jQuery(this).data('title') || _getTitle('Mismatch : ', d);
-
-      // override width to ensure two graphs can fit side by side
-      var w = jQuery(this).parent().width() / 2 - 90;
-      var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-      //self.removeAttr('data-check data-height data-title');
-      d = null; h = null; t = null;
-
-      var fwd_div = $(document.createElement("div"));
-      if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
-      fwd_div.addClass('chart_left');
-
-      var rev_div = $(document.createElement("div"));
-      if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
-      rev_div.addClass('chart_right');
-
-      var leg_div = $(document.createElement("div"));
-      if (chart != null && chart.svg_legend != null) { leg_div.append( function() { return chart.svg_legend.node(); } ); }
-      leg_div.addClass('chart_legend');
-
-      self.append(fwd_div,rev_div,leg_div);
-      window.console.log($('*').length);
-    });
-  }).on('mouseleave', function () {
-    window.console.log($('*').length);
-    $(this).children('.bcviz_mismatch').empty();
-    window.console.log($('*').length);
-  });*/
 });

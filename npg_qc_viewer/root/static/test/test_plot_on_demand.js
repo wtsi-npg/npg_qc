@@ -14,7 +14,7 @@ define(["jquery"],
       var wt = self.scrollTop() - threshold, wb = self.scrollTop() + self.height() + threshold;
       var elements = ['first', 'up', 'middle', 'down', 'last'];
       for (var i = 0; i < elements.length; i++) {
-        var element = $($('#' + elements[i])[0]);
+        var element = $($('#' + elements[i]).first());
         var fromTop = element.offset().top;
         var elementBottom  = fromTop + element.height;
         if (( fromTop >= wt && fromTop <= wb ) || ( elementBottom >= wt && elementBottom <= wb )) {
