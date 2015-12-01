@@ -8,16 +8,28 @@ requirejs.config({
 
 define(["jquery"],
   function($) {
+    var overlap = function (start1, height1, start2, height2) {
+      var o1s, o1e, o2s, o2e;
+      if ( height1 >= height2 ) {
+        o1s = start1; o1e = start1 + height1;
+        o2s = start2; o2e = start2 + height2;
+      } else {
+        o1s = start2; o1e = start2 + height2;
+        o2s = start1; o2e = start1 + height1;
+      }
+      return ( (o2s >= o1s && o2s <= o1e) || (o2e >= o1s && o2e <= o1e) );  
+    } 
+
     $(window).on("scroll resize lookup", function () {
       var self = $(this);
       var threshold = self.innerHeight() * 0.75;
-      var wt = self.scrollTop() - threshold, wb = self.scrollTop() + self.height() + threshold;
+      var wt = self.scrollTop() - threshold, wh = ( self.innerHeight() + ( 2 * threshold ) );
+
       var elements = ['first', 'up', 'middle', 'down', 'last'];
       for (var i = 0; i < elements.length; i++) {
         var element = $($('#' + elements[i]).first());
         var fromTop = element.offset().top;
-        var elementBottom  = fromTop + element.height;
-        if (( fromTop >= wt && fromTop <= wb ) || ( elementBottom >= wt && elementBottom <= wb )) {
+        if (overlap(wt, wh, fromTop, element.height() )) {
           if ( element.data('inView') == 0 ) {
             element.data('inView', 1);
           }
