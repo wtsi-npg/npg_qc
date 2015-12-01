@@ -84,134 +84,121 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
 
-  $(window).on("scroll resize lookup", function () {
-    var insertSize = jQuery('.bcviz_insert_size');
-    var adapter = jQuery('.bcviz_adapter');
-    var mismatch = jQuery('.bcviz_mismatch');
+  var overlap = function (s1, h1, s2, h2) {
+    var o1s, o1e, o2s, o2e;
+    if ( h1 >= h2 ) {
+      o1s = s1; o1e = s1 + h1;
+      o2s = s2; o2e = s2 + h2;
+    } else {
+      o1s = s2; o1e = s2 + h2;
+      o2s = s1; o2e = s1 + h1;
+    }
+
+    if ( (o2s >= o1s && o2s <= o1e) || (o2e >= o1s && o2e <= o1e) ) {
+      return true;
+    } else {
+      return false;
+    }
+  } 
+
+  $(window).on('scroll resize lookup', function() {
     var threshold = 2000;
-    var self = $(this);
-    var wt = self.scrollTop() - threshold, wb = wt + self.height() + threshold;
+    var $w = $(window);
+    var wt = $w.scrollTop() - threshold;
+    var viewHeight = $w.height() + (2 * threshold);
 
-    insertSize.each(function(i) {
+    $('.results_full_lane').each(function (i, obj) {
       var self = $(this);
-      var parent = self.parent();
-      var parentTop = parent.offset().top;
-      var parentBot = parent.offset().top + parent.height();
+      var selfTop = self.offset().top;
 
-      if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
+      if ( overlap( wt, viewHeight, selfTop, self.height() ) ) {
         if (self.data('inView') === undefined || self.data('inView') == 0) {
+          window.console.log("Building plots " + i);
+          self.data('inView', 1);
+          self.find('.bcviz_insert_size').each(function () {
+            var self = $(this);
+            var parent = self.parent();
+            var d = self.data('check'),
+                w = self.data('width') || 650,
+                h = self.data('height') || 300,
+                t = self.data('title') || _getTitle('Insert Sizes : ',d);
+            var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+            //Removing data from page to free memory
+            //self.removeAttr('data-check data-width data-height data-title');
+            //Nulling variables to ease GC
+            d = null; w = null; h = null; t = null;
 
-          //var self = $(this);
-          var d = self.data('check'),
-              w = self.data('width') || 650,
-              h = self.data('height') || 300,
-              t = self.data('title') || _getTitle('Insert Sizes : ',d);
-          var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-          //Removing data from page to free memory
-          //self.removeAttr('data-check data-width data-height data-title');
-          //Nulling variables to ease GC
-          d = null; w = null; h = null; t = null;
-
-          if (chart != null) {
-            if (chart.svg != null) {
-              div = $(document.createElement("div"));
-              div.append(function() { return chart.svg.node(); } );
-              div.addClass('chart');
-              self.append(div);
+            if (chart != null) {
+              if (chart.svg != null) {
+                div = $(document.createElement("div"));
+                div.append(function() { return chart.svg.node(); } );
+                div.addClass('chart');
+                self.append(div);
+              }
             }
-          }
-          
-          parent.css('min-height', parent.height() + 'px');
-          self.data('inView', 1);
+            parent.css('min-height', parent.height() + 'px');
+          });
+          self.find('.bcviz_adapter').each(function () {
+            var self = $(this);
+            var parent = self.parent();
+            var d = self.data('check'),
+                h = self.data('height') || 200,
+                t = self.data('title') || _getTitle('Adapter Start Count : ', d);
+
+            // override width to ensure two graphs can fit side by side
+            var w = jQuery(this).parent().width() / 2 - 40;
+            var chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+            //self.removeAttr('data-check data-height data-title');
+            d = null; h = null; t = null;
+
+            var fwd_div = $(document.createElement("div"));
+            if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
+            fwd_div.addClass('chart_left');
+            rev_div = $(document.createElement("div"));
+            if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
+            rev_div.addClass('chart_right');
+            self.append(fwd_div,rev_div);
+            parent.css('min-height', parent.height() + 'px');
+          });
+          self.find('.bcviz_mismatch').each(function () {
+            var self = $(this);
+            var parent = self.parent();
+            var d = self.data('check'),
+                h = self.data('height'),
+                t = self.data('title') || _getTitle('Mismatch : ', d);
+
+            // override width to ensure two graphs can fit side by side
+            var w = parent.width() / 2 - 90;
+            var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
+            //self.removeAttr('data-check data-height data-title');
+            d = null; h = null; t = null;
+
+            var fwd_div = $(document.createElement("div"));
+            if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
+            fwd_div.addClass('chart_left');
+
+            var rev_div = $(document.createElement("div"));
+            if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
+            rev_div.addClass('chart_right');
+
+            var leg_div = $(document.createElement("div"));
+            if (chart != null && chart.svg_legend != null) { leg_div.append( function() { return chart.svg_legend.node(); } ); }
+            leg_div.addClass('chart_legend');
+
+            self.append(fwd_div,rev_div,leg_div);
+            parent.css('min-height', parent.height() + 'px');
+          });
         }
       } else {
         if (self.data('inView') == 1) {
-          self.empty();
+          window.console.log("Destroying plots " + i);
           self.data('inView', 0);
-        }
-      }
-    });
-
-    adapter.each(function() {
-      var self = $(this);
-      var parent = self.parent();
-      var parentTop = parent.offset().top;
-      var parentBot = parent.offset().top + parent.height();
-
-      if ((parentTop >= wt && parentTop <= wb) || (parentBot >= wt && parentBot <= wb)) {
-        if (self.data('inView') === undefined || self.data('inView') == 0) {
-
-          //var self = $(this);
-          var d = self.data('check'),
-              h = self.data('height') || 200,
-              t = self.data('title') || _getTitle('Adapter Start Count : ', d);
-
-          // override width to ensure two graphs can fit side by side
-          var w = jQuery(this).parent().width() / 2 - 40;
-          var chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-          //self.removeAttr('data-check data-height data-title');
-          d = null; h = null; t = null;
-
-          var fwd_div = $(document.createElement("div"));
-          if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
-          fwd_div.addClass('chart_left');
-          rev_div = $(document.createElement("div"));
-          if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
-          rev_div.addClass('chart_right');
-          self.append(fwd_div,rev_div);
-
-          parent.css('min-height', parent.height() + 'px');
-          self.data('inView', 1);
-        }
-      } else {
-        if (self.data('inView') == 1) {
-          self.empty();
-          self.data('inView', 0);
-        }
-      }
-    });
-
-    mismatch.each(function () {
-      var self = $(this);
-      var parent = self.parent();
-      var parentTop = parent.offset().top;
-      var parentBot = parent.offset().top + parent.height();
-
-      if ((parentTop > wt && parentTop < wb) || (parentBot > wt && parentBot < wb)) {
-        if (self.data('inView') === undefined || self.data('inView') == 0) {
-          var d = self.data('check'),
-              h = self.data('height'),
-              t = self.data('title') || _getTitle('Mismatch : ', d);
-
-          // override width to ensure two graphs can fit side by side
-          var w = parent.width() / 2 - 90;
-          var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-          //self.removeAttr('data-check data-height data-title');
-          d = null; h = null; t = null;
-
-          var fwd_div = $(document.createElement("div"));
-          if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
-          fwd_div.addClass('chart_left');
-
-          var rev_div = $(document.createElement("div"));
-          if (chart != null && chart.svg_rev != null) { rev_div.append( function() { return chart.svg_rev.node(); } ); }
-          rev_div.addClass('chart_right');
-
-          var leg_div = $(document.createElement("div"));
-          if (chart != null && chart.svg_legend != null) { leg_div.append( function() { return chart.svg_legend.node(); } ); }
-          leg_div.addClass('chart_legend');
-
-          self.append(fwd_div,rev_div,leg_div);
-          
-          parent.css('min-height', parent.height() + 'px');
-          self.data('inView', 1);
-        }
-      } else {
-        if (self.data('inView') == 1) {
-          self.empty();
-          self.data('inView', 0);
+          self.find('.bcviz_insert_size').empty();
+          self.find('.bcviz_adapter').empty();
+          self.find('.bcviz_mismatch').empty();
         }
       }
     });
   });
 });
+
