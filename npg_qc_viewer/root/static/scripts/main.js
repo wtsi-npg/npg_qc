@@ -107,7 +107,7 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
     var wt = $w.scrollTop() - threshold;
     var viewHeight = $w.height() + (2 * threshold);
 
-    $('.results_full_lane').each(function (i, obj) {
+    $('.results_full_lane_contents').each(function (i, obj) {
       var self = $(this);
       var selfTop = self.offset().top;
 
@@ -118,38 +118,35 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
           self.find('.bcviz_insert_size').each(function () {
             var self = $(this);
             var parent = self.parent();
-            var d = self.data('check'),
+            var d = $.extend( true, {}, self.data('check') ),
                 w = self.data('width') || 650,
                 h = self.data('height') || 300,
                 t = self.data('title') || _getTitle('Insert Sizes : ',d);
             var chart = insert_size.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-            //Removing data from page to free memory
-            //self.removeAttr('data-check data-width data-height data-title');
-            //Nulling variables to ease GC
-            d = null; w = null; h = null; t = null;
 
             if (chart != null) {
               if (chart.svg != null) {
-                div = $(document.createElement("div"));
+                var div = $(document.createElement("div"));
                 div.append(function() { return chart.svg.node(); } );
                 div.addClass('chart');
                 self.append(div);
+                div = null;
               }
             }
             parent.css('min-height', parent.height() + 'px');
+            //Nulling variables to ease GC
+            d = null, w = null, h = null, t = null, parent = null, self = null;
           });
           self.find('.bcviz_adapter').each(function () {
             var self = $(this);
             var parent = self.parent();
-            var d = self.data('check'),
+            var d = $.extend( true, {}, self.data('check') ),
                 h = self.data('height') || 200,
                 t = self.data('title') || _getTitle('Adapter Start Count : ', d);
 
             // override width to ensure two graphs can fit side by side
             var w = jQuery(this).parent().width() / 2 - 40;
             var chart = adapter.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-            //self.removeAttr('data-check data-height data-title');
-            d = null; h = null; t = null;
 
             var fwd_div = $(document.createElement("div"));
             if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
@@ -159,19 +156,19 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
             rev_div.addClass('chart_right');
             self.append(fwd_div,rev_div);
             parent.css('min-height', parent.height() + 'px');
+            //Nulling variables to ease GC
+            d = null; w = null,  h = null; t = null, chart = null, fwd_div = null, rev_div = null, parent = null, self = null;
           });
           self.find('.bcviz_mismatch').each(function () {
             var self = $(this);
             var parent = self.parent();
-            var d = self.data('check'),
+            var d = $.extend( true, {}, self.data('check') ),
                 h = self.data('height'),
                 t = self.data('title') || _getTitle('Mismatch : ', d);
 
             // override width to ensure two graphs can fit side by side
             var w = parent.width() / 2 - 90;
             var chart = mismatch.drawChart({'data': d, 'width': w, 'height': h, 'title': t});
-            //self.removeAttr('data-check data-height data-title');
-            d = null; h = null; t = null;
 
             var fwd_div = $(document.createElement("div"));
             if (chart != null && chart.svg_fwd != null) { fwd_div.append( function() { return chart.svg_fwd.node(); } ); }
@@ -187,6 +184,8 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
 
             self.append(fwd_div,rev_div,leg_div);
             parent.css('min-height', parent.height() + 'px');
+            //Nulling variables to ease GC
+            d = null; w = null,  h = null; t = null, chart = null, fwd_div = null, rev_div = null, leg_div = null, parent = null, self = null;
           });
         }
       } else {
