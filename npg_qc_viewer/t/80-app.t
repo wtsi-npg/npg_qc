@@ -24,18 +24,17 @@ my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
 
-
+my $schemas;
 {
-  my $schemas;
   lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
   use_ok 'Catalyst::Test', 'npg_qc_viewer';
 }
 
 {
   my $request = GET(q[/]);
-  my $responce;
-  ok( $responce = request($request),  'basic request to the root page' );
-  ok( $responce->is_redirect, 'root page request redirected');
+  my $response;
+  ok( $response = request($request),  'basic request to the root page' );
+  ok( $response->is_redirect, 'root page request redirected');
 }
 
 {
@@ -52,6 +51,22 @@ local $ENV{TEST_DIR}        = $util->staging_path;
                                line_numbers  => 1,
                               };
   my $xml_parser = XML::LibXML->new($parser_options);
+
+  my $npgqc = $schemas->{qc};
+  my $values = { id_verify               => 200000,
+                 id_run             => 4025,
+                 position           => 1,
+                 path               => '/some/path',
+                 number_of_snps     => '1351960',
+                 number_of_reads    => '7035086',
+                 avg_depth          => '5.20',
+                 freemix            => '0.00316',
+                 freeLK0            => '2393541.68',
+                 freeLK1            => '2392830.84',
+                 pass               => '1',
+                 info               => '{\"Check\":\"npg_qc::autoqc::checks::verify_bam_id\",\"Verify_options\":\" --bam /paht/file.vcf.gz --self --ignoreRG --minQ 20 --minAF 0.05 --maxDepth 500 --precise --out /path/4025_1.bam\",\"Check_version\":\"59.2\",\"Verifier\":\"verifyBamID\"}',
+                 tag_index          => '1' };
+  my $row = $npgqc->resultset("VerifyBamId")->create($values);
 
   my @urls = ();
 
@@ -96,7 +111,7 @@ local $ENV{TEST_DIR}        = $util->staging_path;
     ok( $response->is_success, qq[request to $url is successful]);
     is( $response->content_type, q[text/html], 'HTML content type');
     my $content = $response->content();
-    eval { $xml_parser->parse_html_string($content); };
+    eval { $xml_parser->load_html(string => $content); };
 
     ok ( (!ref($@) || ($@->message() =~ /Content\ error\ in\ the\ external\ subset/)), 'XML parsed OK');
 
