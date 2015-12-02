@@ -34,8 +34,8 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require(['scripts/manual_qc', 'scripts/manual_qc_ui', 'scripts/format_for_csv', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
-function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatch, unveil) {
+require( ['scripts/manual_qc', 'scripts/manual_qc_ui', 'scripts/format_for_csv', 'scripts/display_on_demand', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
+function( manual_qc, manual_qc_ui, format_for_csv, disp_on_demand, insert_size, adapter, mismatch, unveil) {
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
@@ -76,26 +76,13 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
   $('<img/>')[0].src = "/static/images/cross.png";
   $('<img/>')[0].src = "/static/images/padlock.png";
   $('<img/>')[0].src = "/static/images/circle.png";
-  
+
   $("#summary_to_csv").click(function(e) {
     e.preventDefault();
     var table_html = $('#results_summary')[0].outerHTML;
     var formated_table = format_for_csv.format(table_html);
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
-
-  var overlap = function (start1, height1, start2, height2) {
-    var o1s, o1e, o2s, o2e;
-    if ( height1 >= height2 ) {
-      o1s = start1; o1e = start1 + height1;
-      o2s = start2; o2e = start2 + height2;
-    } else {
-      o1s = start2; o1e = start2 + height2;
-      o2s = start1; o2e = start1 + height1;
-    }
-
-    return ( (o2s >= o1s && o2s <= o1e) || (o2e >= o1s && o2e <= o1e) );  
-  } 
 
   $(window).on('scroll resize lookup', function() {
     var threshold = 2000;
@@ -107,7 +94,7 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
       var self = $(this);
       var selfTop = self.offset().top;
 
-      if ( overlap( wt, viewHeight, selfTop, self.height() ) ) {
+      if ( disp_on_demand.overlap( wt, viewHeight, selfTop, self.height() ) ) {
         if (self.data('inView') === undefined || self.data('inView') == 0) {
           window.console.log("Building plots " + i);
           self.data('inView', 1);
