@@ -1,7 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
-
+ 
  - autoqc results db loader: an option to force a re-build of related objects
+ - SeqQC: fix warning about undef value in the adapter template
  - travis ci testing perl modules for npg_qc and npg_qc_viewer
+ - require DBD::SQLite@1.48 to run tests
 
 release 59.4
  - saving manual qc values for libraries - allow for an undefined or empty
