@@ -1,23 +1,23 @@
 require.config({
-    baseUrl: '/static',
+  baseUrl: '/static',
   catchError: true,
-    paths: {
-        jquery: 'bower_components/jquery/dist/jquery',
-        d3: 'bower_components/d3/d3.min',
-        insert_size_lib: 'bower_components/bcviz/src/qcjson/insertSizeHistogram',
-        adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
-        mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
-        unveil: 'bower_components/jquery-unveil/jquery.unveil',
-        'table-export': 'bower_components/table-export/tableExport.min',
+  paths: {
+    jquery: 'bower_components/jquery/dist/jquery',
+    d3: 'bower_components/d3/d3.min',
+    insert_size_lib: 'bower_components/bcviz/src/qcjson/insertSizeHistogram',
+    adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',
+    mismatch_lib: 'bower_components/bcviz/src/qcjson/mismatch',
+    unveil: 'bower_components/jquery-unveil/jquery.unveil',
+    'table-export': 'bower_components/table-export/tableExport.min',
+  },
+  shim: {
+    d3: {
+      //makes d3 available automatically for all modules
+      exports: 'd3'
     },
-    shim: {
-        d3: {
-            //makes d3 available automatically for all modules
-            exports: 'd3'
-        },
-        unveil: ["jquery"],
-        'table-export': ["jquery"],
-    }
+    unveil: ["jquery"],
+    'table-export': ["jquery"],
+  }
 });
 
 require.onError = function (err) {
@@ -42,8 +42,8 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
 
     // Getting the run_id from the title of the page using the qc part too.
     var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
-                                                            .find("title")
-                                                            .text());
+                                                          .find("title")
+                                                          .text());
     //If id_run
     if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
       var id_run = runTitleParserResult.id_run;
@@ -84,21 +84,17 @@ function( manual_qc, manual_qc_ui, format_for_csv ,insert_size, adapter, mismatc
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
 
-  var overlap = function (s1, h1, s2, h2) {
+  var overlap = function (start1, height1, start2, height2) {
     var o1s, o1e, o2s, o2e;
-    if ( h1 >= h2 ) {
-      o1s = s1; o1e = s1 + h1;
-      o2s = s2; o2e = s2 + h2;
+    if ( height1 >= height2 ) {
+      o1s = start1; o1e = start1 + height1;
+      o2s = start2; o2e = start2 + height2;
     } else {
-      o1s = s2; o1e = s2 + h2;
-      o2s = s1; o2e = s1 + h1;
+      o1s = start2; o1e = start2 + height2;
+      o2s = start1; o2e = start1 + height1;
     }
 
-    if ( (o2s >= o1s && o2s <= o1e) || (o2e >= o1s && o2e <= o1e) ) {
-      return true;
-    } else {
-      return false;
-    }
+    return ( (o2s >= o1s && o2s <= o1e) || (o2e >= o1s && o2e <= o1e) );  
   } 
 
   $(window).on('scroll resize lookup', function() {
