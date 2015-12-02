@@ -22,4 +22,5 @@ popd
 pushd npg_qc_viewer/root/static
 node-qunit-phantomjs test/test.html --verbose
 node-qunit-phantomjs test/test_format_for_csv.html --verbose
+node-qunit-phantomjs test/test_plot_on_demand.html --verbose
 popd
