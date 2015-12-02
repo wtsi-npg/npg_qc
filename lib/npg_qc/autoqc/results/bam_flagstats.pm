@@ -92,6 +92,7 @@ has 'sequence_file' => (
     traits     => [ 'DoNotSerialize' ],
     required   => 0,
     writer     => '_set_sequence_file',
+    clearer    => '_clear_sequence_file',
 );
 
 has [ qw/ markdups_metrics_file
@@ -256,7 +257,12 @@ sub execute {
 }
 
 sub create_related_objects {
-  my ($self, $path) = @_;
+  my ($self, $path, $force) = @_;
+
+  if ($force && $self->_has_related_objects() && !@{$self->related_objects()}) {
+    $self->_clear_related_objects();
+    $self->_clear_samtools_stats_file();
+  }
 
   if (!$self->_has_related_objects()) {
     if (!$self->sequence_file) {
@@ -266,15 +272,7 @@ sub create_related_objects {
       $ro->execute();
     }
   }
-  return;
-}
 
-sub clear_related_objects {
-  my $self = shift;
-  if ($self->_has_related_objects() && !@{$self->related_objects()}) {
-    $self->_clear_related_objects();
-    $self->_clear_samtools_stats_file();
-  }
   return;
 }
 
@@ -439,13 +437,17 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head2 create_related_objects
 
-  method forcing related objects attribute to be built
+  a factory method for creating related objects;
+  if sequence array attribute is set and force is false, does nothing;
+  if sequence array attribute is set to an empty array and force is true,
+  will rebuild th related objects
 
-head2 clear_related_objects
-
-  if the related_objects array is empty, clears this attribute and the
-  samtools_stats_file attribute thus allowing to recompute related
-  objects
+  # sequence file (bam/cram) is looked up relative to the json file
+  $obj->create_related_objects($path_to_json_representation);
+  my $force = 0;
+  $obj->create_related_objects($path_to_json_representation, $force);
+  $force = 1;
+  $obj->create_related_objects($path_to_json_representation, $force);
 
 =head2 markdups_metrics_file
 

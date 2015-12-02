@@ -1,7 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - autoqc results db loader: an option to build related objects from
-   scratch
+ - autoqc results db loader: an option to force a re-build of related objects
  - travis ci testing perl modules for npg_qc and npg_qc_viewer
 
 release 59.4
