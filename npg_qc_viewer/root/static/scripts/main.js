@@ -169,6 +169,6 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
   );
 
   var elements = [element];
-  disp_on_view.displayOnView(elements);
+  disp_on_view.displayOnView(elements, true);
 });
 
