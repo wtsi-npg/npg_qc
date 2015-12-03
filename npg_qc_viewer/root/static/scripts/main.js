@@ -85,11 +85,10 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
   });
 
   var element = disp_on_view.buildDisplayOnViewElement(
-      '.results_full_lane_contents',
-      2000,
-      function (i, obj) {
-        var self = $(obj);
-        self.find('.bcviz_insert_size').each(function () {
+      '.results_full_lane_contents', //Selector
+      2000, // Threshold
+      function (i, obj) { //Display call back
+        obj.find('.bcviz_insert_size').each(function () {
           var self = $(this);
           var parent = self.parent();
           var d = $.extend( true, {}, self.data('check') ),
@@ -111,7 +110,7 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
           //Nulling variables to ease GC
           d = null, w = null, h = null, t = null, parent = null, self = null;
         });
-        self.find('.bcviz_adapter').each(function () {
+        obj.find('.bcviz_adapter').each(function () {
           var self = $(this);
           var parent = self.parent();
           var d = $.extend( true, {}, self.data('check') ),
@@ -133,7 +132,7 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
           //Nulling variables to ease GC
           d = null; w = null,  h = null; t = null, chart = null, fwd_div = null, rev_div = null, parent = null, self = null;
         });
-        self.find('.bcviz_mismatch').each(function () {
+        obj.find('.bcviz_mismatch').each(function () {
           var self = $(this);
           var parent = self.parent();
           var d = $.extend( true, {}, self.data('check') ),
@@ -162,11 +161,10 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
           d = null; w = null,  h = null; t = null, chart = null, fwd_div = null, rev_div = null, leg_div = null, parent = null, self = null;
         });
       },
-      function (i, obj) {
-        self = $(obj);
-        self.find('.bcviz_insert_size').empty();
-        self.find('.bcviz_adapter').empty();
-        self.find('.bcviz_mismatch').empty();
+      function (i, obj) { // remove callback
+        obj.find('.bcviz_insert_size').empty();
+        obj.find('.bcviz_adapter').empty();
+        obj.find('.bcviz_mismatch').empty();
       }
   );
 
