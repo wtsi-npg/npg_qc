@@ -24,13 +24,13 @@ define(['jquery'], function (jQuery) {
   };
 
   var buildDisplayOnViewElement = function (selectorFilter, threshold, displayFunction, removeFunction) {
-    var config1 = {
+    var element = {
       selectorFilter  : selectorFilter,
       threshold       : threshold,
       displayFunction : displayFunction,
       removeFunction  : removeFunction
     };
-    return config1;
+    return element;
   };
 
   var displayOnView = function (elements) {
