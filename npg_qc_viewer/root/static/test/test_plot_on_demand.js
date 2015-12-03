@@ -18,7 +18,7 @@ define(['scripts/display_on_demand',], function(disp_on_dem) {
         var selectorFilter = '#' + elements[i];
         $($(selectorFilter).first()).data('displayed', 0);
 
-        var element = disp_on_dem.buildDisplayOnViewElement(
+        var element = disp_on_dem.buildModifyOnViewElement(
           selectorFilter,
           threshold,
           function (i, obj) { obj.data('displayed', 1) },
@@ -28,7 +28,7 @@ define(['scripts/display_on_demand',], function(disp_on_dem) {
         elementsToDisplay.push(element);
       }
 
-      disp_on_dem.displayOnView(elementsToDisplay);
+      disp_on_dem.modifyOnView(elementsToDisplay);
 
       var $first = $('#first').first();
       var $up = $('#up').first();

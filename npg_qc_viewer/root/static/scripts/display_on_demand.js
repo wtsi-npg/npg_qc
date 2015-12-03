@@ -1,11 +1,28 @@
 /*
  *
+ * Functionality to display and remove objects from DOM as they come into/leave
+ * view.
+ *
+ *
  *
  * Example:
  *
+ *   var smallPlots = buildModifyOnViewElement(
+ *     '.small_plots',
+ *     100,
+ *     function (i, obj) { callSomething(i, obj); },
+ *     function (i, obj) { callSomethingElse(i, obj); }
+ *   );
  *
+ *   var bigPlot = buildModifyOnViewElement(
+ *     '#big_plot',
+ *     1000,
+ *     function (i, obj) { callSomething(i, obj); },
+ *     function (i, obj) { return; } // Do nothing extra
+ *   );
  *
- *
+ *   var allElements = [smallPlots, bigPlot];
+ *   displayOnView(allElements);
  *
  */
 define(['jquery'], function (jQuery) {
@@ -35,7 +52,7 @@ define(['jquery'], function (jQuery) {
     return ( (o2s >= o1s && o2s <= o1e) || (o2e >= o1s && o2e <= o1e) );
   };
 
-  var buildDisplayOnViewElement = function (selectorFilter, threshold, displayCallback, removeCallback) {
+  var buildModifyOnViewElement = function (selectorFilter, threshold, displayCallback, removeCallback) {
     if(typeof(selectorFilter) === "undefined" || selectorFilter == null) {
       throw new TypeError("selectorFilter can not be undefined");
     }
@@ -54,7 +71,7 @@ define(['jquery'], function (jQuery) {
     return element;
   };
 
-  var displayOnView = function (elements, verbose) {
+  var modifyOnView = function (elements, verbose) {
     if(typeof(elements) === "undefined" || elements == null) {
       throw new TypeError("elements can not be undefined");
     }
@@ -95,8 +112,8 @@ define(['jquery'], function (jQuery) {
   };
 
   return {
-    buildDisplayOnViewElement : buildDisplayOnViewElement,
-    displayOnView : displayOnView,
+    buildModifyOnViewElement : buildModifyOnViewElement,
+    modifyOnView : modifyOnView,
   };
 });
 

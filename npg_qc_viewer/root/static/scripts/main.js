@@ -84,7 +84,7 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
 
-  var element = disp_on_view.buildDisplayOnViewElement(
+  var element = disp_on_view.buildModifyOnViewElement(
       '.results_full_lane_contents', //Selector
       2000, // Threshold
       function (i, obj) { //Display call back
@@ -169,6 +169,6 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
   );
 
   var elements = [element];
-  disp_on_view.displayOnView(elements, true);
+  disp_on_view.modifyOnView(elements, true);
 });
 
