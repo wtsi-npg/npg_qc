@@ -6,7 +6,7 @@ requirejs.config({
   },
 });
 
-define(['scripts/display_on_demand',], function(disp_on_dem) {
+define(['scripts/modify_on_view',], function(disp_on_dem) {
   // run the tests.
   QUnit.test('Testing changing objects on window scroll', function (assert) {
     var $w = $(window);

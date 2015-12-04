@@ -25,7 +25,9 @@
  *   displayOnView(allElements);
  *
  */
-define(['jquery'], function (jQuery) {
+/* globals $: false, window: false, define: false */
+/* jshint -W030, -W083 */
+define(['jquery'], function () {
   var overlap = function (start1, height1, start2, height2) {
     if(typeof(start1) === "undefined" || start1 == null) {
       throw new TypeError("First element start position can not be undefined");
@@ -58,8 +60,8 @@ define(['jquery'], function (jQuery) {
     }
 
     threshold = typeof threshold !== 'undefined' ? threshold : 0;
-    displayCallback = typeof displayCallback !== 'undefined' ? displayCallback : function (i, obj) { };
-    removeCallback = typeof removeCallback !== 'undefined' ? removeCallback : function (i, obj) { };
+    displayCallback = typeof displayCallback !== 'undefined' ? displayCallback : function () { };
+    removeCallback = typeof removeCallback !== 'undefined' ? removeCallback : function () { };
 
     var element = {
       selectorFilter  : selectorFilter,
@@ -90,20 +92,20 @@ define(['jquery'], function (jQuery) {
         var viewHeight = $w.height() + (2 * threshold);
 
         $(element.selectorFilter).each(function (i, obj) {
-          var self = $(this);
-          var selfTop = self.offset().top;
+          obj = $(obj);
+          var selfTop = obj.offset().top;
 
-          if ( overlap( wt, viewHeight, selfTop, self.height() ) ) {
-            if (self.data('display_on_view_inView') === undefined || self.data('display_on_view_inView') == 0) {
-              verbose && window.console && window.console.log("Displaying " + i);
-              self.data('display_on_view_inView', 1);
-              element.displayCallback(i, self);
+          if ( overlap( wt, viewHeight, selfTop, obj.height() ) ) {
+            if (obj.data('object_in_view') === undefined || obj.data('object_in_view') === 0) {
+              verbose && window.console && window.console.log("Element into view " + i);
+              obj.data('object_in_view', 1);
+              element.displayCallback(i, obj);
             }
           } else {
-            if (self.data('display_on_view_inView') == 1) {
-              verbose && window.console && window.console.log("Displaying " + i);
-              self.data('display_on_view_inView', 0);
-              element.removeCallback(i, self);
+            if (obj.data('object_in_view') === 1) {
+              verbose && window.console && window.console.log("Element left view " + i);
+              obj.data('object_in_view', 0);
+              element.removeCallback(i, obj);
             }
           }
         });

@@ -34,8 +34,8 @@ function _getTitle(prefix, d) {
     return t;
 }
 
-require( ['scripts/manual_qc', 'scripts/manual_qc_ui', 'scripts/format_for_csv', 'scripts/display_on_demand', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
-function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, adapter, mismatch, unveil) {
+require( ['scripts/manual_qc', 'scripts/manual_qc_ui', 'scripts/format_for_csv', 'scripts/modify_on_view', 'insert_size_lib', 'adapter_lib', 'mismatch_lib', 'unveil', 'table-export'],
+function( manual_qc, manual_qc_ui, format_for_csv, mov, insert_size, adapter, mismatch, unveil) {
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
@@ -84,7 +84,7 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
 
-  var element = disp_on_view.buildModifyOnViewElement(
+  var element = mov.buildModifyOnViewElement(
       '.results_full_lane_contents', //Selector
       2000, // Threshold
       function (i, obj) { //Display call back
@@ -169,6 +169,6 @@ function( manual_qc, manual_qc_ui, format_for_csv, disp_on_view, insert_size, ad
   );
 
   var elements = [element];
-  disp_on_view.modifyOnView(elements, true);
+  mov.modifyOnView(elements, true);
 });
 
