@@ -4,6 +4,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - SeqQC
    - fix warning about undef value in the adapter template
    - fix closing div tag in verify bam id template 
+   - upgrading jquery to 2.1.4 from 2.0.3
+   - upgrading requirejs to 2.1.20 from 2.1.8
+   - upgrading qunit to 1.20.0 from 1.15.0
+   - upgrading bcviz to 1.3.0 from 1.2.1
  - travis ci testing perl modules for npg_qc and npg_qc_viewer
  - require DBD::SQLite@1.48 to run tests
 
