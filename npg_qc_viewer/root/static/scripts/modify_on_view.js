@@ -1,9 +1,21 @@
 /*
  *
- * Functionality to display and remove objects from DOM as they come into/leave
- * view.
+ * Functionality to modify DOM objects when they come into view. It works by
+ * adding an event listener to the window. Events which change the portion of
+ * the page in view range fire operations on objects of interest.
  *
+ * The function requires a list of configurations. One for each kind of object
+ * to operate on. Each configuration can be build using the builder function
+ * provided. This function takes 4 arguments,
+ *   - jquery selector filter string to find the objects in the page
+ *   - threshold to path both extremes of the window so elements can be
+ *     pre-processed before they come into view
+ *   - call back to function to call when the object comes into view
+ *   - call back to function to call when object leaves the view
  *
+ * The callback functions can be used to generate or remove content from the
+ * object being operated on. Both functions get the index and object retrieved
+ * when iterating the result of using the jQuery selector.
  *
  * Example:
  *
@@ -96,15 +108,15 @@ define(['jquery'], function () {
           var selfTop = obj.offset().top;
 
           if ( overlap( wt, viewHeight, selfTop, obj.height() ) ) {
-            if (obj.data('object_in_view') === undefined || obj.data('object_in_view') === 0) {
+            if (obj.data('mov_object_in_view') === undefined || obj.data('mov_object_in_view') === 0) {
               verbose && window.console && window.console.log("Element into view " + i);
-              obj.data('object_in_view', 1);
+              obj.data('mov_object_in_view', 1);
               element.displayCallback(i, obj);
             }
           } else {
-            if (obj.data('object_in_view') === 1) {
+            if (obj.data('mov_object_in_view') === 1) {
               verbose && window.console && window.console.log("Element left view " + i);
-              obj.data('object_in_view', 0);
+              obj.data('mov_object_in_view', 0);
               element.removeCallback(i, obj);
             }
           }
