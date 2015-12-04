@@ -11,6 +11,8 @@
     <div id="qunit"></div>
     <div id="qunit-fixture"></div>
 
+    <div id='padding_at_start'></div>
+
     <div id="first">
       <p>Some text<p/>
     </div>
@@ -47,6 +49,796 @@
       <p>Some text<p/>
     </div>
 
+    <div id='padding_at_end'></div>
+
+    <!-- Padding for test data, to use to generate big ammounts of content -->
+    <dib id='big_padding_data' hidden>
+      <div class="results_full_lane">
+      <h3>run 18096 lane 2 | DN5D:2:S2</h3>
+      <h4>Reference: Homo_sapiens</h4>
+      <div class="results_full_lane_contents">
+       <div class="result_full">
+        <h2>run 18096 lane 2, adapter</h2>
+        <div class="result_full_content">
+         <div style="clear: both;" class="data_table">
+          <table title="adapter check results">
+           <tbody>
+            <tr>
+             <th class="laligned">read</th>
+             <td>forward</td>
+             <td>reverse</td>
+            </tr>
+            <tr>
+             <th class="laligned">fasta read count</th>
+             <td>457,296,540</td>
+             <td>457,296,540</td>
+            </tr>
+            <tr>
+             <th class="laligned">contaminated read count</th>
+             <td>1,152,161</td>
+             <td>3,504,345</td>
+            </tr>
+            <tr>
+             <th class="laligned">contam reads, %</th>
+             <td>0.25</td>
+             <td>0.77</td>
+            </tr>
+           </tbody>
+          </table>
+         </div>
+         <div class="data_table">
+          <table title="Contamination for each adapter">
+           <tbody>
+            <tr>
+             <th rowspan="2">adapter name</th>
+             <th colspan="2">hits count</th>
+            </tr>
+            <tr>
+             <td>forward</td>
+             <td>reverse</td>
+            </tr>
+            <tr>
+             <td>adaptor1</td>
+             <td class="raligned">726855</td>
+             <td class="raligned">152</td>
+            </tr>
+            <tr>
+             <td>adaptor3</td>
+             <td class="raligned">279</td>
+             <td class="raligned">3487008</td>
+            </tr>
+            <tr>
+             <td>adaptor4</td>
+             <td class="raligned">1077547</td>
+             <td class="raligned">1818</td>
+            </tr>
+            <tr>
+             <td>genomicDNA-adapter2</td>
+             <td class="raligned">78</td>
+             <td class="raligned">2629918</td>
+            </tr>
+            <tr>
+             <td>genomicDNA-primer1</td>
+             <td class="raligned">279</td>
+             <td class="raligned">3487008</td>
+            </tr>
+            <tr>
+             <td>genomicDNA-sequencingPrimer</td>
+             <td class="raligned">78</td>
+             <td class="raligned">2629918</td>
+            </tr>
+            <tr>
+             <td>Nextflex-barcode(degenerate)</td>
+             <td class="raligned">3</td>
+             <td class="raligned">0</td>
+            </tr>
+            <tr>
+             <td>PE-adapters1-1</td>
+             <td class="raligned">931296</td>
+             <td class="raligned">364</td>
+            </tr>
+            <tr>
+             <td>PE-adapters1-2</td>
+             <td class="raligned">78</td>
+             <td class="raligned">2629918</td>
+            </tr>
+            <tr>
+             <td>PE-PCR-Primers1-1</td>
+             <td class="raligned">279</td>
+             <td class="raligned">3487008</td>
+            </tr>
+            <tr>
+             <td>PE-PCR-Primers1-2</td>
+             <td class="raligned">1077547</td>
+             <td class="raligned">1818</td>
+            </tr>
+            <tr>
+             <td>PE-sequencingPrimer1</td>
+             <td class="raligned">78</td>
+             <td class="raligned">2629918</td>
+            </tr>
+            <tr>
+             <td>PE-sequencingPrimer2</td>
+             <td class="raligned">1105369</td>
+             <td class="raligned">627</td>
+            </tr>
+            <tr>
+             <td>RADseq-adapterP1.1</td>
+             <td class="raligned">73</td>
+             <td class="raligned">2651776</td>
+            </tr>
+            <tr>
+             <td>RADseq-adapterP1.2</td>
+             <td class="raligned">73</td>
+             <td class="raligned">2670406</td>
+            </tr>
+            <tr>
+             <td>RADseq-PCR2</td>
+             <td class="raligned">2</td>
+             <td class="raligned">0</td>
+            </tr>
+            <tr>
+             <td>RADseq_PCR1</td>
+             <td class="raligned">253</td>
+             <td class="raligned">2818686</td>
+            </tr>
+            <tr>
+             <td>RP1</td>
+             <td class="raligned">1</td>
+             <td class="raligned">11725</td>
+            </tr>
+            <tr>
+             <td>TruSeq-Adapter-Index-2</td>
+             <td class="raligned">21842</td>
+             <td class="raligned">6</td>
+            </tr>
+            <tr>
+             <td>TruSeq-Universal-Adapter</td>
+             <td class="raligned">279</td>
+             <td class="raligned">3487008</td>
+            </tr>
+           </tbody>
+          </table>
+         </div>
+        </div>
+       </div>
+       <div class="result_full">
+        <h2>run 18096 lane 2, gc fraction:passed</h2>
+        <div class="result_full_content">
+         <div class="data_table">
+          <table title="gc_fraction check results">
+           <tbody>
+            <tr>
+             <th class="laligned">pass criterion</th>
+             <td>The difference between actual and expected GC percent
+              is less than 20</td>
+            </tr>
+            <tr>
+             <th class="laligned">GC fraction, %</th>
+             <td>41.2 (forward)41.4 (reverse)</td>
+            </tr>
+            <tr>
+             <th class="laligned">reference genome GC fraction, %</th>
+             <td>40.9</td>
+            </tr>
+            <tr>
+             <th class="laligned">reference base count path</th>
+             <td>/path/references/Homo_sapiens/CGP_GRCh37.NCBI.allchr_MT/all/npgqc</td>
+            </tr>
+           </tbody>
+          </table>
+         </div>
+        </div>
+       </div>
+       <div class="result_full">
+        <h2>run 18096 lane 2, qX yield</h2>
+        <div class="result_full_content">
+         <div class="data_table">
+          <table title="qX_yield check results">
+           <tbody>
+            <tr>
+             <th class="laligned">read</th>
+             <td>forward</td>
+             <td>reverse</td>
+            </tr>
+            <tr>
+             <th class="laligned">yield, KB</th>
+             <td>67,532,638</td>
+             <td>64,839,619</td>
+            </tr>
+            <tr>
+             <th class="laligned">threshold, KB</th>
+             <td></td>
+             <td></td>
+            </tr>
+            <tr>
+             <th class="laligned">pass criterion</th>
+             <td>yield (number of KBs at and above Q20) is greater than
+              the threshold</td>
+            </tr>
+            <tr>
+             <th class="laligned">comments</th>
+             <td colspan="2">Unrecognised instrument model</td>
+            </tr>
+           </tbody>
+          </table>
+         </div>
+        </div>
+       </div>
+       <div class="result_full">
+        <h2>run 18096 lane 2, ref match</h2>
+        <div class="result_full_content">
+         <div class="data_table">
+          <table title="contamination check meta data">
+           <tbody>
+            <tr>
+             <th class="laligned">aligner version</th>
+             <td>1.0.1</td>
+            </tr>
+            <tr>
+             <th class="laligned">sample read count and length</th>
+             <td>10,000 : 37</td>
+            </tr>
+           </tbody>
+          </table>
+         </div>
+         <div class="data_table">
+          <table title="contamination for each checked organism">
+           <tbody>
+            <tr>
+             <th>organism (version/strain)</th>
+             <th>count</th>
+             <th>percent</th>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Homo sapiens</span>
+              1000Genomes</td>
+             <td class="raligned">9,759</td>
+             <td class="raligned">97.6</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Pan troglodytes</span>
+              CHIMP2.1.4</td>
+             <td class="raligned">9,108</td>
+             <td class="raligned">91.1</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Gorilla gorilla</span> gorilla</td>
+             <td class="raligned">8,727</td>
+             <td class="raligned">87.3</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Macaca fascicularis</span>
+              GCA_000364345.1</td>
+             <td class="raligned">5,302</td>
+             <td class="raligned">53.0</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Rhesus macaque</span>
+              GCA_000230795.1</td>
+             <td class="raligned">5,096</td>
+             <td class="raligned">51.0</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Callithrix jacchus</span>
+              calJac3</td>
+             <td class="raligned">2,856</td>
+             <td class="raligned">28.6</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Xenopus tropicalis</span>
+              Wild_type</td>
+             <td class="raligned">436</td>
+             <td class="raligned">4.4</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Heterocephalus glaber</span>
+              GCA_000247695.1</td>
+             <td class="raligned">420</td>
+             <td class="raligned">4.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Equus caballus</span> EquCab2</td>
+             <td class="raligned">372</td>
+             <td class="raligned">3.7</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Felis catus</span>
+              Felis_catus_6.2.70</td>
+             <td class="raligned">360</td>
+             <td class="raligned">3.6</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Tursiops truncatus</span>
+              GCA_000151865.2</td>
+             <td class="raligned">361</td>
+             <td class="raligned">3.6</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Canis familiaris</span>
+              CanFam3.1</td>
+             <td class="raligned">326</td>
+             <td class="raligned">3.3</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Cavia porcellus</span> cavPor3</td>
+             <td class="raligned">327</td>
+             <td class="raligned">3.3</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Onchocerca volvulus</span>
+              OvD2P9_sspace3kb_200212</td>
+             <td class="raligned">317</td>
+             <td class="raligned">3.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Mustela putorius</span>
+              MusPutFur1.0</td>
+             <td class="raligned">315</td>
+             <td class="raligned">3.1</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Myotis lucifugus</span>
+              GCA_000147115.1</td>
+             <td class="raligned">288</td>
+             <td class="raligned">2.9</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Sus scrofa</span>
+              GCA_000003025.4</td>
+             <td class="raligned">292</td>
+             <td class="raligned">2.9</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Tupaia belangeri</span>
+              GCA_000181375.1</td>
+             <td class="raligned">293</td>
+             <td class="raligned">2.9</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Oryctolagus cuniculus</span>
+              oryCun2</td>
+             <td class="raligned">269</td>
+             <td class="raligned">2.7</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Rattus norvegicus</span>
+              Rnor_5.0</td>
+             <td class="raligned">262</td>
+             <td class="raligned">2.6</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Ovis aries</span> Oar_v3.1</td>
+             <td class="raligned">255</td>
+             <td class="raligned">2.5</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Bos taurus</span>
+              Btau_4.6.1_primary_chr</td>
+             <td class="raligned">245</td>
+             <td class="raligned">2.5</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Mus musculus</span> GRCm38</td>
+             <td class="raligned">202</td>
+             <td class="raligned">2.0</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Drosophila melanogaster</span>
+              Release_5</td>
+             <td class="raligned">105</td>
+             <td class="raligned">1.1</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Haemonchus contortus</span>
+              V1_21June13</td>
+             <td class="raligned">100</td>
+             <td class="raligned">1.0</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Sarcophilus harrisii</span>
+              devil7.0</td>
+             <td class="raligned">88</td>
+             <td class="raligned">0.9</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Monodelphis domestica</span>
+              GCA_000002295.1</td>
+             <td class="raligned">94</td>
+             <td class="raligned">0.9</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Dracunculus medinensis</span>
+              v.1.0.1</td>
+             <td class="raligned">66</td>
+             <td class="raligned">0.7</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Danio rerio</span> GRCz10</td>
+             <td class="raligned">57</td>
+             <td class="raligned">0.6</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Trichuris muris</span> v110315</td>
+             <td class="raligned">52</td>
+             <td class="raligned">0.5</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Oryzias latipes</span>
+              ensembl64</td>
+             <td class="raligned">37</td>
+             <td class="raligned">0.4</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Brugia pahangi</span>
+              Brugia_pahangi_v0.04_IMG</td>
+             <td class="raligned">29</td>
+             <td class="raligned">0.3</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">PhiX</span> Sanger-SNPs</td>
+             <td class="raligned">34</td>
+             <td class="raligned">0.3</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Schistosoma mansoni</span>
+              assembly_v5</td>
+             <td class="raligned">28</td>
+             <td class="raligned">0.3</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Strongyloides ratti</span>
+              20100601</td>
+             <td class="raligned">29</td>
+             <td class="raligned">0.3</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Anopheles gambiae</span> PEST</td>
+             <td class="raligned">20</td>
+             <td class="raligned">0.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Saliva composite</span> V1</td>
+             <td class="raligned">19</td>
+             <td class="raligned">0.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Brugia malayi</span>
+              AAQA01000000</td>
+             <td class="raligned">24</td>
+             <td class="raligned">0.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Leishmania braziliensis</span>
+              MHOM_BR_75_M2904_27July2011</td>
+             <td class="raligned">18</td>
+             <td class="raligned">0.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Leishmania donovani</span>
+              V1_Un</td>
+             <td class="raligned">17</td>
+             <td class="raligned">0.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Schistocephalus solidus</span>
+              v1</td>
+             <td class="raligned">20</td>
+             <td class="raligned">0.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Echinococcus granulosus</span>
+              20110714</td>
+             <td class="raligned">16</td>
+             <td class="raligned">0.2</td>
+            </tr>
+            <tr>
+             <td><span class="dark_blue">Heligmosomoides
+               polygyrus</span> v0.02VEL</td>
+             <td class="raligned">17</td>
+             <td class="raligned">0.2</td>
+            </tr>
+           </tbody>
+          </table>
+         </div>
+        </div>
+       </div>
+       <div id="tmc_18096:2" class="result_full">
+        <h2>run 18096 lane 2, tag metrics:passed</h2>
+        <div class="result_full_content">
+         <div class="lfloat">
+          <div class="data_table">
+           Tag decoding overview
+           <table title="Tag Decoding">
+            <tbody>
+             <tr>
+              <th>&nbsp;</th>
+              <th>Count</th>
+              <th>Percent</th>
+             </tr>
+             <tr>
+              <th class="laligned">Perfect matches</th>
+              <td class="raligned">442,669,216</td>
+              <td class="raligned">96.80</td>
+             </tr>
+             <tr>
+              <th class="laligned">One mismatch</th>
+              <td class="raligned">8,105,099</td>
+              <td class="raligned">1.77</td>
+             </tr>
+             <tr>
+              <th class="laligned">No matches</th>
+              <td class="raligned">6,522,225</td>
+              <td class="raligned">1.43</td>
+             </tr>
+            </tbody>
+           </table>
+          </div>
+          <div class="data_table">
+           Coefficient of Variance
+           <table title="Coefficient of Variance">
+            <tbody>
+             <tr>
+              <th>All matches</th>
+              <th>Perfect matches</th>
+             </tr>
+             <tr>
+              <td class="raligned">8.82</td>
+              <td class="raligned">8.69</td>
+             </tr>
+            </tbody>
+           </table>
+          </div>
+         </div>
+         <div class="rfloat">
+          <div class="data_table">
+           Individual tags
+           <table title="Metrics for individual tags">
+            <tbody>
+             <tr>
+              <th>Tag Index</th>
+              <th>Tag</th>
+              <th>Reads, count</th>
+              <th>Reads, %</th>
+             </tr>
+             <tr>
+              <td>1</td>
+              <td class="sequence_string">CGATGTTT</td>
+              <td class="raligned">39,278,172</td>
+              <td class="raligned">8.59</td>
+             </tr>
+             <tr>
+              <td>2</td>
+              <td class="sequence_string">TAGCTTGT</td>
+              <td class="raligned">47,150,771</td>
+              <td class="raligned">10.31</td>
+             </tr>
+             <tr>
+              <td>3</td>
+              <td class="sequence_string">TTCTGTGT</td>
+              <td class="raligned">45,234,200</td>
+              <td class="raligned">9.89</td>
+             </tr>
+             <tr>
+              <td>4</td>
+              <td class="sequence_string">TTCCTGCT</td>
+              <td class="raligned">50,662,189</td>
+              <td class="raligned">11.08</td>
+             </tr>
+             <tr>
+              <td>5</td>
+              <td class="sequence_string">TAACGCTG</td>
+              <td class="raligned">43,809,684</td>
+              <td class="raligned">9.58</td>
+             </tr>
+             <tr>
+              <td>6</td>
+              <td class="sequence_string">TGTATGCG</td>
+              <td class="raligned">44,088,800</td>
+              <td class="raligned">9.64</td>
+             </tr>
+             <tr>
+              <td>7</td>
+              <td class="sequence_string">TATGTGGC</td>
+              <td class="raligned">46,157,679</td>
+              <td class="raligned">10.09</td>
+             </tr>
+             <tr>
+              <td>8</td>
+              <td class="sequence_string">TGACAGAC</td>
+              <td class="raligned">48,913,922</td>
+              <td class="raligned">10.70</td>
+             </tr>
+             <tr>
+              <td>9</td>
+              <td class="sequence_string">TGAAGCCA</td>
+              <td class="raligned">36,966,877</td>
+              <td class="raligned">8.08</td>
+             </tr>
+             <tr>
+              <td>10</td>
+              <td class="sequence_string">GGTCGTGT</td>
+              <td class="raligned">46,995,063</td>
+              <td class="raligned">10.28</td>
+             </tr>
+             <tr>
+              <td>888</td>
+              <td class="sequence_string">ACAACGCA</td>
+              <td class="raligned">1,516,958</td>
+              <td class="raligned">0.33</td>
+             </tr>
+             <tr>
+              <td>0</td>
+              <td class="sequence_string">&nbsp;</td>
+              <td class="raligned">6,522,225</td>
+              <td class="raligned">1.43</td>
+             </tr>
+            </tbody>
+           </table>
+          </div>
+         </div>
+         <div class="clear"></div>
+        </div>
+       </div>
+       <div id="utc_18096:2" class="result_full">
+        <h2>run 18096 lane 2, upstream tags</h2>
+        <div class="result_full_content">
+         <div class="lfloat">
+          <div class="data_table">
+           Tag#0 decoding against Sanger168 tag set
+           <table title="Upstream Tag Decoding">
+            <tbody>
+             <tr>
+              <th>&nbsp;</th>
+              <th>Count</th>
+              <th>Percent of lane reads</th>
+             </tr>
+             <tr>
+              <th class="laligned">Reads examined (tag#0)</th>
+              <td class="raligned">6,468,206</td>
+              <td class="raligned">1.414</td>
+             </tr>
+             <tr>
+              <th class="laligned">Perfect matches</th>
+              <td class="raligned">4,333</td>
+              <td class="raligned">0.001</td>
+             </tr>
+            </tbody>
+           </table>
+          </div>
+          <div class="data_table">
+           Tags in upstream runs (same instrument/slot)
+           <table title="Upstream Runs">
+            <tbody>
+             <tr>
+              <th>Run</th>
+              <th title="Run in progress date">Date started</th>
+              <th>Lane tag count</th>
+              <th
+               title="New tag count: number of tags which first appear in this run, not in any downstream runs"
+              >New tag count</th>
+              <th>Perfect matches</th>
+              <th>Percent of lane reads</th>
+             </tr>
+             <tr>
+              <td class="raligned"></td>
+              <td class="raligned">2015-11-04 11:37:42</td>
+              <td class="raligned" title="">10</td>
+              <td class="raligned" title="">10</td>
+              <td class="raligned" title="">0</td>
+              <td class="raligned" title="">0.000</td>
+             </tr>
+             <tr>
+              <td class="raligned"></td>
+              <td class="raligned">2015-10-31 05:59:32</td>
+              <td class="raligned" title="This lane is not a pool">NA</td>
+              <td class="raligned" title="This lane is not a pool">NA</td>
+              <td class="raligned" title="This lane is not a pool">NA</td>
+              <td class="raligned" title="This lane is not a pool">NA</td>
+             </tr>
+             <tr>
+              <td class="raligned"></td>
+              <td class="raligned">2015-10-26 10:37:49</td>
+              <td class="raligned" title="">12</td>
+              <td class="raligned" title="">2</td>
+              <td class="raligned" title="">195</td>
+              <td class="raligned" title="">0.000</td>
+             </tr>
+             <tr>
+              <td class="raligned"></td>
+              <td class="raligned">2015-10-22 00:56:02</td>
+              <td class="raligned" title="">12</td>
+              <td class="raligned" title="">0</td>
+              <td class="raligned" title="">0</td>
+              <td class="raligned" title="">0.000</td>
+             </tr>
+             <tr>
+              <td class="raligned"></td>
+              <td class="raligned">2015-10-18 12:53:02</td>
+              <td class="raligned" title="">12</td>
+              <td class="raligned" title="">0</td>
+              <td class="raligned" title="">0</td>
+              <td class="raligned" title="">0.000</td>
+             </tr>
+            </tbody>
+           </table>
+          </div>
+         </div>
+         <div class="rfloat">
+          <div class="data_table">
+           High-scoring tags (perfect match &gt;= 0.01% for Sanger168 tag
+           set)
+           <table title="High-scoring tags">
+            <tbody>
+             <tr>
+              <th>Tag</th>
+              <th>Run</th>
+              <th title="Tag index is for run where available">Tag Idx</th>
+              <th title="Count of perfect match reads for the tag">Reads
+               (pm)</th>
+              <th title="Count of one-mismatch reads for the tag">Reads
+               (1mm)</th>
+              <th
+               title="percentage of tag#0 reads for the tag that were a perfect match"
+              >Reads (pm), % (tag#0)</th>
+              <th
+               title="percentage of tag#0 reads for the tag that had one mismatch"
+              >Reads (pm), % (lane)</th>
+             </tr>
+             <tr>
+              <td class="sequence_string">ACTTGATG</td>
+              <td>-</td>
+              <td>-</td>
+              <td title="Count of perfect match reads for tag ACTTGATG"
+               class="raligned"
+              >1405</td>
+              <td title="Count of one-mismatch reads for tag ACTTGATG"
+               class="raligned"
+              >588</td>
+              <td
+               title="percentage of tag#0 reads that were a perfect match reads for tag ACTTGATG"
+               class="raligned"
+              >0.022</td>
+              <td
+               title="percentage of lane reads that were a perfect match reads for tag ACTTGATG"
+               class="raligned"
+              >0.000</td>
+             </tr>
+             <tr>
+              <td class="sequence_string">TGCGATCT</td>
+              <td>-</td>
+              <td>-</td>
+              <td title="Count of perfect match reads for tag TGCGATCT"
+               class="raligned"
+              >1315</td>
+              <td title="Count of one-mismatch reads for tag TGCGATCT"
+               class="raligned"
+              >2593</td>
+              <td
+               title="percentage of tag#0 reads that were a perfect match reads for tag TGCGATCT"
+               class="raligned"
+              >0.020</td>
+              <td
+               title="percentage of lane reads that were a perfect match reads for tag TGCGATCT"
+               class="raligned"
+              >0.000</td>
+             </tr>
+            </tbody>
+           </table>
+          </div>
+         </div>
+         <div class="clear"></div>
+        </div>
+       </div>
+       <div class="result_full">
+        <h2>run 18096 lane 2, percent of bases at and above quality
+         threshold</h2>
+        <div class="result_full_content">Images</div>
+       </div>
+      </div>
+     </div>
+    </dib>
+    <!-- End padding for test data, to use to generate big ammounts of content -->
     <script data-main="test_modify_on_view" src="../bower_components/requirejs/require.js"></script>
   </body>
 </html>
