@@ -33,8 +33,14 @@
  *     function (i, obj) { return; } // Do nothing extra
  *   );
  *
- *   var allElements = [smallPlots, bigPlot];
- *   displayOnView(allElements);
+ *   var medPlot = buildModifyOnViewElement(
+ *     '#med_plot',
+ *     500,
+ *     null,
+ *     function (i, obj) { doSomethingWith(obj); },
+ *   );
+ *
+ *   displayOnView([smallPlots, bigPlot, medPlot]);
  *
  */
 /* globals $: false, window: false, define: false */
@@ -42,7 +48,7 @@
 define(['jquery'], function () {
   var overlap = function (start1, height1, start2, height2) {
     if(typeof(start1) === "undefined" || start1 == null) {
-      throw new TypeError("First element start position can not be undefined");
+      throw new TypeError("First element start position cannot be undefined");
     }
     if(typeof(height1) === "undefined" || height1 == null) {
       throw new TypeError("First element height can not be undefined");
