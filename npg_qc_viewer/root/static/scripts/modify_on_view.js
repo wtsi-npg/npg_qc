@@ -29,7 +29,7 @@
  *   var bigPlot = buildModifyOnViewElement(
  *     '#big_plot',
  *     1000,
- *     function (i, obj) { callSomething(i, obj); },
+ *     function (i, obj) { doSomethingWith(obj); },
  *     function (i, obj) { return; } // Do nothing extra
  *   );
  *
@@ -75,14 +75,14 @@ define(['jquery'], function () {
     displayCallback = typeof displayCallback !== 'undefined' ? displayCallback : function () { };
     removeCallback = typeof removeCallback !== 'undefined' ? removeCallback : function () { };
 
-    var element = {
+    var composite = {
       selectorFilter  : selectorFilter,
       threshold       : threshold,
       displayCallback : displayCallback,
       removeCallback  : removeCallback
     };
 
-    return element;
+    return composite;
   };
 
   var modifyOnView = function (elements, verbose) {
@@ -100,14 +100,14 @@ define(['jquery'], function () {
         var element = elements[j];
         var threshold = element.threshold;
         var $w = $(window);
-        var wt = $w.scrollTop() - threshold;
+        var viewTop = $w.scrollTop() - threshold;
         var viewHeight = $w.height() + (2 * threshold);
 
         $(element.selectorFilter).each(function (i, obj) {
           obj = $(obj);
-          var selfTop = obj.offset().top;
+          var objTop = obj.offset().top;
 
-          if ( overlap( wt, viewHeight, selfTop, obj.height() ) ) {
+          if ( overlap( viewTop, viewHeight, objTop, obj.height() ) ) {
             if (obj.data('mov_object_in_view') === undefined || obj.data('mov_object_in_view') === 0) {
               verbose && window.console && window.console.log("Element into view " + i);
               obj.data('mov_object_in_view', 1);
