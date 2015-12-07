@@ -21,8 +21,8 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
       var element = disp_on_dem.buildModifyOnViewElement(
         selectorFilter,
         threshold,
-        function (i, obj) { obj.data('displayed', 1) },
-        function (i, obj) { obj.data('displayed', 0) }
+        function (i, obj) { if (obj.data('displayed') !== 1) { obj.data('displayed', 1) } },
+        function (i, obj) { if (obj.data('displayed') !== 0) { obj.data('displayed', 0) } }
       );
 
       elementsToDisplay.push(element);
@@ -133,8 +133,8 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
       var element = disp_on_dem.buildModifyOnViewElement(
         selectorFilter,
         threshold,
-        function (i, obj) { obj.data('displayed', 1) },
-        function (i, obj) { obj.data('displayed', 0) }
+        function (i, obj) { if (obj.data('displayed') !== 1) { obj.data('displayed', 1) } },
+        function (i, obj) { if (obj.data('displayed') !== 0) { obj.data('displayed', 0) } }
       );
 
       elementsToDisplay.push(element);

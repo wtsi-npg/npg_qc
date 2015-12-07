@@ -114,17 +114,11 @@ define(['jquery'], function () {
           var objTop = obj.offset().top;
 
           if ( overlap( viewTop, viewHeight, objTop, obj.height() ) ) {
-            if (obj.data('mov_object_in_view') === undefined || obj.data('mov_object_in_view') === 0) {
-              verbose && window.console && window.console.log("Element into view " + i);
-              obj.data('mov_object_in_view', 1);
-              element.displayCallback(i, obj);
-            }
+            verbose && window.console && window.console.log("Element in view " + i);
+            element.displayCallback(i, obj);
           } else {
-            if (obj.data('mov_object_in_view') === 1) {
-              verbose && window.console && window.console.log("Element left view " + i);
-              obj.data('mov_object_in_view', 0);
-              element.removeCallback(i, obj);
-            }
+            verbose && window.console && window.console.log("Element out of view " + i);
+            element.removeCallback(i, obj);
           }
         });
       }
