@@ -38,7 +38,7 @@ subtest 'simple tests' => sub {
   
   throws_ok { npg_qc::autoqc::results::sequence_summary->new(
         sequence_file => '/some/file') } 
-    qr/Validation failed for 'NpgTrackingReadableFile' with value "\/some\/file"/,
+    qr/Validation failed for 'NpgTrackingReadableFile' with value/,
     'sequence file does not exist - error';
 
   lives_ok { $r = npg_qc::autoqc::results::sequence_summary->new(

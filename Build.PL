@@ -173,6 +173,7 @@ my $extended_build_requires = {
                 'Test::Warn'                      => '0.11',
                 'npg_testing::db'                 => 0,
                 'npg_tracking::Schema'            => 0,
+                'DBD::SQLite'                     => '1.48',
 };
 
 my $extended_requires = {

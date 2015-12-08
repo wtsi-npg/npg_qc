@@ -2,7 +2,7 @@ require.config({
     baseUrl: '/static',
   catchError: true,
     paths: {
-        jquery: 'bower_components/jquery/jquery',
+        jquery: 'bower_components/jquery/dist/jquery',
         d3: 'bower_components/d3/d3.min',
         insert_size_lib: 'bower_components/bcviz/src/qcjson/insertSizeHistogram',
         adapter_lib: 'bower_components/bcviz/src/qcjson/adapter',

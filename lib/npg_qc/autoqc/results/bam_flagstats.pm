@@ -92,6 +92,7 @@ has 'sequence_file' => (
     traits     => [ 'DoNotSerialize' ],
     required   => 0,
     writer     => '_set_sequence_file',
+    clearer    => '_clear_sequence_file',
 );
 
 has [ qw/ markdups_metrics_file
@@ -139,6 +140,7 @@ sub _drop_extension {
 has 'samtools_stats_file' => ( isa        => 'ArrayRef',
                                is         => 'ro',
                                lazy_build => 1,
+                               clearer    => '_clear_samtools_stats_file',
 );
 sub _build_samtools_stats_file {
   my $self = shift;
@@ -168,6 +170,7 @@ has 'related_objects' => ( isa        => 'ArrayRef[Object]',
                            lazy_build => 1,
                            writer     => '_set_related_objects',
                            predicate  => '_has_related_objects',
+                           clearer    => '_clear_related_objects',
 );
 sub _build_related_objects {
   my $self = shift;
@@ -254,7 +257,13 @@ sub execute {
 }
 
 sub create_related_objects {
-  my ($self, $path) = @_;
+  my ($self, $path, $force) = @_;
+
+  if ($force && $self->_has_related_objects() && !@{$self->related_objects()}) {
+    $self->_clear_related_objects();
+    $self->_clear_samtools_stats_file();
+  }
+
   if (!$self->_has_related_objects()) {
     if (!$self->sequence_file) {
       $self->_set_sequence_file(_find_sequence_file($path));
@@ -263,6 +272,7 @@ sub create_related_objects {
       $ro->execute();
     }
   }
+
   return;
 }
 
@@ -427,15 +437,27 @@ npg_qc::autoqc::results::bam_flagstats
 
 =head2 create_related_objects
 
-  method forcing related objects attribute to be built
+  a factory method for creating related objects;
+  if sequence array attribute is set and force is false, does nothing;
+  if sequence array attribute is set to an empty array and force is true,
+  will rebuild th related objects
+
+  # sequence file (bam/cram) is looked up relative to the json file
+  $obj->create_related_objects($path_to_json_representation);
+  my $force = 0;
+  $obj->create_related_objects($path_to_json_representation, $force);
+  $force = 1;
+  $obj->create_related_objects($path_to_json_representation, $force);
 
 =head2 markdups_metrics_file
 
-  an optional attribute, should be either set or built for 'execute' method to work correctly
+  an optional attribute, should be either set or built for 'execute'
+  method to work correctly
 
 =head2 flagstats_metrics_file
 
-  an optional attribute, should be either set or built for 'execute' method to work correctly
+  an optional attribute, should be either set or built for 'execute'
+  method to work correctly
 
 =head2 samtools_stats_file
 
