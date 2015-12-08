@@ -1,5 +1,19 @@
+/*
+ * Module to profide functionality to generate bcviz plots when they will come
+ * into view. The module exposes one function which receives a selector and a
+ * threshold as parameters. The selector is used to find DOM elements. Each
+ * element is checked to confirm if it be in view or out of view. If it is in
+ * view, bcviz plots will be generated for that element. If the element is not
+ * in view and it has plots in it, they will be removed.
+ *
+ * Example:
+ *
+ *   plots_on_view('.results_full_lane_contents', 2000);
+ *
+ */
 /* globals $: false, define: false, document: false */
 /* jshint -W030, -W083 */
+'use strict';
 define([
   'jquery',
   'bower_components/bcviz/src/qcjson/insertSizeHistogram',
@@ -40,7 +54,7 @@ define([
         self.append(fwd_div,rev_div);
         parent.css('min-height', parent.height() + 'px');
         //Nulling variables to ease GC
-        d = null; w = null,  h = null; t = null, chart = null, fwd_div = null, rev_div = null, parent = null, self = null;
+        d = null; w = null;  h = null; t = null; chart = null; fwd_div = null; rev_div = null; parent = null; self = null;
       }
     });
   };
@@ -76,7 +90,7 @@ define([
         self.append(fwd_div,rev_div,leg_div);
         parent.css('min-height', parent.height() + 'px');
         //Nulling variables to ease GC
-        d = null; w = null,  h = null; t = null, chart = null, fwd_div = null, rev_div = null, leg_div = null, parent = null, self = null;
+        d = null; w = null;  h = null; t = null; chart = null; fwd_div = null; rev_div = null; leg_div = null; parent = null; self = null;
       }
     });
   };
@@ -106,7 +120,7 @@ define([
         }
         parent.css('min-height', parent.height() + 'px');
         //Nulling variables to ease GC
-        d = null, w = null, h = null, t = null, parent = null, self = null;
+        d = null; w = null; h = null; t = null; parent = null; self = null;
       }
     });
   };

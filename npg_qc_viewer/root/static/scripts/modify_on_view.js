@@ -45,6 +45,7 @@
  */
 /* globals $: false, window: false, define: false */
 /* jshint -W030, -W083 */
+'use strict';
 define(['jquery'], function () {
   var overlap = function (start1, height1, start2, height2) {
     if(typeof(start1) === "undefined" || start1 == null) {

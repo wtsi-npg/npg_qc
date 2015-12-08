@@ -79,6 +79,6 @@ function( manual_qc, manual_qc_ui, plots, format_for_csv, unveil) {
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
 
-  plots.plots_on_view('.results_full_lane_contents', 2000); 
+  plots.plots_on_view('.results_full_lane_contents', 2000);
 });
 
