@@ -10,30 +10,29 @@
   <body>
     <div id="qunit"></div> 
     <div id="qunit-fixture"></div>
+  
+    <div id='Test_NPG.QC.TableToCSV.formatTable'>
+    <table id="results_summary" summary="QC results summary">
+        <thead>
+        <tr>
+            <th rowspan='2'>Library<br>------<br>Sample<br>Name</th>
+            <th rowspan='2'>Run Id<br>------<br >Num.<br />Cycles</th>
+            <th>adapter</th>
+        </tr>
+        <tr>
+            <th class="check_labels">adapters,<br>%</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><a>DN419445D:2:S1</a></td>
+            <td><a title="date completed 2015-11-04">18096</a> &nbsp; <a title="date completed 2015-11-04">18096</a><br>310</div></td>
+            <td><a href="#18096:1">1</a></td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+    <script data-main="test_format_for_csv" src="../bower_components/requirejs/require.js"></script>
   </body>
-  
-  <div id='Test_NPG.QC.TableToCSV.formatTable'>
-  <table id="results_summary" summary="QC results summary">
-    <thead>
-      <tr>
-        <th rowspan='2'>Library<br>------<br>Sample<br>Name</th>
-        <th rowspan='2'>Run Id<br>------<br >Num.<br />Cycles</th>
-        <th>adapter</th>
-      </tr>
-      <tr>
-        <th class="check_labels">adapters,<br>%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a>DN419445D:2:S1</a></td>
-        <td><a title="date completed 2015-11-04">18096</a> &nbsp; <a title="date completed 2015-11-04">18096</a><br>310</div></td>
-        <td><a href="#18096:1">1</a></td>
-      </tr>
-    </tbody>
-  </table>
-  </div>
-  
-  <script data-main="test_format_for_csv" src="../bower_components/requirejs/require.js"></script>
 </html>
 
