@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.6
  - SeqQC
    - generating bcviz plots only when they will become visible and remove
      them when they will not be visible
