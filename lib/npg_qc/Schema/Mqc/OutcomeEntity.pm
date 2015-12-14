@@ -12,7 +12,7 @@ requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
 
-Readonly::Scalar my $MQC_LIB_LIMIT => 50;
+Readonly::Scalar my $MQC_LIB_LIMIT => 400;
 Readonly::Scalar my $ACCEPTED_FINAL  => 'Accepted final';
 Readonly::Scalar my $REJECTED_FINAL  => 'Rejected final';
 Readonly::Scalar my $UNDECIDED_FINAL => 'Undecided final';

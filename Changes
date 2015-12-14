@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.6
+ - SeqQC
+   - generating bcviz plots only when they will become visible and remove
+     them when they will not be visible
+   - set max number of plexes for manual QC as 400
+
 release 59.5
  - autoqc results db loader: an option to force a re-build of related objects
  - SeqQC
