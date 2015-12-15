@@ -1,6 +1,6 @@
 "use strict";
 requirejs.config({
-  baseUrl: '../',
+  baseUrl: '../../root/static',
   paths: {
     jquery: 'bower_components/jquery/dist/jquery',
   },

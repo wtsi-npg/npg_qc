@@ -4,7 +4,7 @@ var TestConfiguration = (function() {
   }
 
   TestConfiguration.prototype.getRoot = function() {
-    return 'test/images';
+    return './';
   };
 
   return TestConfiguration;
