@@ -13,12 +13,9 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOC');
 
     if ($self->args('installjsdeps')) {
       if (which('node') and which('bower')) {
-        my $current = getcwd();
-        chdir 'root/static';
         warn "Checking/fetching javascript dependencies\n";
       
         my $result = system 'bower install';
-        chdir $current;
         if ($result) {
           die 'Fail to install bower javascript dependencies';
         }
