@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC
+   - bower configuration in npg_qc_viewer root
+
 release 59.6
  - SeqQC
    - generating bcviz plots only when they will become visible and remove
