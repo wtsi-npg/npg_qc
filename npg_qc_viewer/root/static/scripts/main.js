@@ -28,7 +28,8 @@ require([
   'scripts/manual_qc_ui',
   'scripts/plots',
   'scripts/format_for_csv',
-  'unveil'
+  'unveil',
+  'table-export'
 ],
 function( manual_qc, manual_qc_ui, plots, format_for_csv, unveil) {
   //Setup for heatmaps to load on demand.
