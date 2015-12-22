@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 59.7
  - SeqQC
    - bower configuration files in npg_qc/npg_qc_viewer
    - moving client test files to npg_qc/npg_qc_viewer/t/client
