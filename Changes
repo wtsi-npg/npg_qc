@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - autoqc
+   - added Broad Institute's RNA-SeQC to list of QC checks. Carried out only on
+     RNA library types and mouse or human samples. Tophat-generated transcriptome
+     and GTF/GFF annotation files are required.
+
 release 60.0
  - JSON service (retrieval) for qc outcomes
  - update link to picard in POD

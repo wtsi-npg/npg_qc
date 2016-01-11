@@ -179,7 +179,7 @@ override 'can_run' => sub {
         push @comments, join q[ ], q[Not RNA library type: ], $l->library_type;
         $can_run = 0;
     }
-    if((! $l->reference_genome) or (not $l->reference_genome =~ /Homo_sapiens|Mus_musculus/smx)){
+    if((! $l->reference_genome) || (not $l->reference_genome =~ /Homo_sapiens|Mus_musculus/smx)){
         push @comments, q[Not human or mouse (only human and mouse transcriptomes available for now)];
         $can_run = 0;
     }

@@ -53,6 +53,10 @@ An absolute path to the directory with RNA-SeQC metrics files.
 
 =item Readonly
 
+=item npg_qc::autoqc::results::result
+
+=item npg_qc::autoqc::role::rna_seqc 
+
 =back
 
 =head1 INCOMPATIBILITIES

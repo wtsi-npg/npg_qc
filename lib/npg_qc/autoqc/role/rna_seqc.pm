@@ -53,6 +53,8 @@ npg_qc::autoqc::role::rna_seqc
 
 =item Readonly
 
+=item npg_qc::autoqc::role::result
+
 =back
 
 =head1 INCOMPATIBILITIES
