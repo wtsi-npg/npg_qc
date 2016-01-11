@@ -6,8 +6,7 @@ Current Build script will set the project ready for running the server.
 The Build scripts needs ENV variables to build:
   
   PATH     - pointing to Perl (currently v5.16.3 is supported) and 
-             NodeJS (v0.12.1) with npm (v2.5.1)
-                          
+             bower (tested with v1.7.2)
   PERL5LIB - for npg libraries and CPAN libraries
   
 In case there is a CATALYST_HOME variable, it needs to be unset.
@@ -54,7 +53,7 @@ Building and testing Perl modules
 The Build scripts needs ENV variables to build:
 
   PATH     - pointing to Perl (currently v5.16.3 is supported) and 
-             NodeJS (v0.12.1) with npm (v2.5.1)
+             bower (tested with v1.7.2)
   PERL5LIB - for npg libraries and cpan libraries
   
 In case there is a CATALYST_HOME variable, it needs to be unset.
