@@ -144,6 +144,7 @@ sub load {
   my $data = $self->_data4reporting();
   foreach my $id_run (sort { $a <=> $b} keys %{$data}) {
     foreach my $position (sort { $a <=> $b} keys %{$data->{$id_run}} ) {
+      sleep 1; # To help LIMs server
       my $lane_data = $data->{$id_run}->{$position};
       my $qc_result = $lane_data->{'outcome'};
       my $lane_id   = $lane_data->{'lane_id'};
