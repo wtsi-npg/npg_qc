@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - give LIMs time to process posting qc outcomes as individual events
+
 release 59.7
  - SeqQC
    - bower configuration files in npg_qc/npg_qc_viewer
