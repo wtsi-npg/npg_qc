@@ -33,7 +33,7 @@ use bower to configure the linking
   - In npg_qc
     
     # in the npg_qc_viewer folder
-    $ pushd root/static && bower link bcviz && popd
+    $ bower link bcviz
 
 If needed, edit the decryption_key value in npg_qc_viewer.conf
 
