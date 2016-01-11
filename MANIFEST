@@ -387,7 +387,6 @@ t/30-illumina-loader-Runinfo.t
 t/30-illumina-loader-Run_Timeline.t
 t/30-illumina-loader-Signal_Mean.t
 t/30-illumina-loader.t
-t/40-mqc-reporter.t
 t/50-npg_qc-Schema.t
 t/50-schema-result-Contamination.t
 t/50-schema-result-Fastqcheck.t
@@ -464,6 +463,7 @@ t/60-autoqc-results-spatial_filter.t
 t/60-autoqc-results-split_stats.t
 t/60-autoqc-results-tag_decode_stats.t
 t/60-autoqc-results-tag_metrics.t
+t/70-mqc-reporter.t
 t/80-autoqc-qc-script.t
 t/autoqc_util.pm
 t/data/api_dbic_fixtures/npg_qc/RunTimeline.yml
