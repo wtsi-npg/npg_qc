@@ -195,16 +195,28 @@ sub update_outcome {
   return;
 }
 
+sub pack {##no critic (Subroutines::ProhibitBuiltinHomonyms)
+   my $self = shift;
+   my $h = {};
+   $h->{'id_run'}      = $self->id_run;
+   $h->{'position'}    = $self->position;
+   $h->{'mqc_outcome'} = $self->mqc_outcome->short_desc;
+   if ($self->can('tag_index') and defined $self->tag_index) {
+     $h->{'tag_index'} = $self->tag_index;
+   }
+
+   return $h;
+}
+
 no Moose::Role;
 
 1;
 
 __END__
 
-
 =head1 NAME
 
-  npg_qc::Schema::Mqc::OutcomeEntity
+npg_qc::Schema::Mqc::OutcomeEntity
 
 =head1 SYNOPSIS
 
@@ -213,102 +225,107 @@ __END__
 
 =head1 DESCRIPTION
 
-  Common functionality for lane and library manual qc outcome entity DBIx objects.
+Common functionality for lane and library manual qc outcome entity DBIx objects.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 update
 
-  The default method is extended to create a relevant historic record and set
-  correct local time.
+The default method is extended to create a relevant historic record and set
+correct local time.
 
 =head2 insert
 
-  The default method is extended to create a relevant historic record and set
-  correct local time.
+The default method is extended to create a relevant historic record and set
+correct local time.
 
 =head2 get_time_now
 
-  Returns a localised DateTime object representing time now.
+Returns a localised DateTime object representing time now.
 
 =head2 mqc_lib_limit
 
-  Returns a maximum number of plexes in a lane that can be subject to
-  library manula qc.
+Returns a maximum number of plexes in a lane that can be subject to
+library manula qc.
 
 =head2 data_for_historic
 
-  Looks at the entity columns and the matching historic metadata to
-  find those columns which intersect and copies from entity to a new
-  hash intersecting values.
+Looks at the entity columns and the matching historic metadata to
+find those columns which intersect and copies from entity to a new
+hash intersecting values.
 
 =head2 validate_username
 
-  Checks that the username is alphanumeric. Other numeric values are not allowed.
+Checks that the username is alphanumeric. Other numeric values are not allowed.
 
 =head2 has_final_outcome
 
-  Returns true if this entry corresponds to a final outcome, otherwise returns false.
+Returns true if this entry corresponds to a final outcome, otherwise returns false.
 
 =head2 is_accepted
 
-  Returns true if the outcome is accepted (pass), otherwise returns false.
+Returns true if the outcome is accepted (pass), otherwise returns false.
 
 =head2 is_final_accepted
 
-  Returns true if the outcome is accepted (pass) and final, otherwise returns false.
+Returns true if the outcome is accepted (pass) and final, otherwise returns false.
 
 =head2 is_undecided
 
-  Returns true if the outcome is undecided (neither pass nor fail),
-  otherwise returns false.
+Returns true if the outcome is undecided (neither pass nor fail),
+otherwise returns false.
 
 =head2 find_valid_outcome
 
-  Returns a valid current Dictionary object that matches the outcome or
-  raises an error.
+Returns a valid current Dictionary object that matches the outcome or
+raises an error.
 
   my $dict_obj = $obj->find_valid_outcome('Accepted preeliminary');
   my $dict_obj = $obj->find_valid_outcome(1);
 
 =head2 update_to_final_outcome
 
-  Checks the current outcome for this entity and tries to define a corresponding
-  final outcome. If there is one, it will delegate the update to update_nonfinal_outcome
-  using the final outcome as new outcome for the entity.
+Checks the current outcome for this entity and tries to define a corresponding
+final outcome. If there is one, it will delegate the update to update_nonfinal_outcome
+using the final outcome as new outcome for the entity.
 
-  Needs the username of who is requesting the change.
+Needs the username of who is requesting the change.
 
   $obj->update_to_final_outcome($username);
 
 =head2 update_nonfinal_outcome
 
-  Updates the outcome of the entity with values provided. Stores a new row
-  if this entity was not yet stored in database.
+Updates the outcome of the entity with values provided. Stores a new row
+if this entity was not yet stored in database.
 
-  If the outcome current outcome of the object is final and it is already
-  stored in the database, an error is raised.
+If the outcome current outcome of the object is final and it is already
+stored in the database, an error is raised.
 
-  Recommended to be used by the SeqQC application,
+Recommended to be used by the SeqQC application,
 
   $obj->update_nonfinal_outcome($outcome, $username);
   $obj->update_nonfinal_outcome($outcome, $username, $rt_ticket);
 
 =head2 update_outcome
 
-  Updates the outcome of the entity with values provided. Stores a new row
-  if this entity was not yet stored in database.
+Updates the outcome of the entity with values provided. Stores a new row
+if this entity was not yet stored in database.
 
   $obj->update_outcome($outcome, $username);
   $obj->update_outcome($outcome, $username, $rt_ticket);
 
 =head2 toggle_final_outcome
 
-  Updates the final accepted or rejected outcome to its opposite final outcome,
-  i.e. accepted is changed to rejected and rejected to accepted.
+Updates the final accepted or rejected outcome to its opposite final outcome,
+i.e. accepted is changed to rejected and rejected to accepted.
 
   $obj->toggle_final_outcome($username);
   $obj->toggle_final_outcome($username, $rt_ticket);
+
+=head2 pack
+
+Returns a hash reference containing record identifies (id_run, position and,
+where appropriate, tag_index) and a short description of the outcome.
 
 =head1 DIAGNOSTICS
 
