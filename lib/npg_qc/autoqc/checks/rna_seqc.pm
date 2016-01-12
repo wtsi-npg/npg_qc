@@ -8,6 +8,7 @@ use File::Spec::Functions qw( catdir );
 use File::Basename;
 use File::Path qw(make_path);
 use npg_qc::autoqc::types;
+use npg::api::run;
 use Readonly;
 use Try::Tiny;
 use DateTime;
