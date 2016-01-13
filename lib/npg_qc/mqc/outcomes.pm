@@ -4,6 +4,7 @@ use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Readonly;
+use List::MoreUtils qw/ none /;
 
 use npg_tracking::glossary::rpt;
 
@@ -32,20 +33,20 @@ sub get {
   foreach my $id_run ( keys %{$hashed_queries} ) {
     my @positions = keys $hashed_queries->{$id_run};
     foreach my $p ( keys %{$hashed_queries->{$id_run}} ) {
-      my @tags = grep { $_ != $NO_TAG_FLAG } @{$hashed_queries->{$id_run}->{$p}};
+      my @tags = @{$hashed_queries->{$id_run}->{$p}};
       my $query = {'id_run' => $id_run, 'position' => $p};
-      if ( @tags ) {
+      if ( none {$_ == $NO_TAG_FLAG} @tags ) {
         $query->{'tag_index'} = \@tags;
       }
       my @lib_rows = $self->qc_schema()->resultset('MqcLibraryOutcomeEnt')
-                     ->search($query)->all();
+                     ->search($query, {'join' => 'mqc_outcome'})->all();
       if ( @lib_rows ) {
         push @lib_outcomes, @lib_rows;
       }
     }
     my $q = {'id_run' => $id_run, 'position' => \@positions};
     my @seq_rows = $self->qc_schema()->resultset('MqcOutcomeEnt')
-                   ->search($q)->all();
+                   ->search($q, {'join' => 'mqc_outcome'})->all();
     if ( @seq_rows ) {
         push @seq_outcomes, @seq_rows;
     }
@@ -59,14 +60,14 @@ sub get {
 }
 
 sub save {
-
+  return;
 }
 
 sub _map_outcomes {
   my $outcomes = shift;
   my $map = {};
   foreach my $o (@{$outcomes}) {
-    my $packed = $_->pack();
+    my $packed = $o->pack();
     $map->{npg_tracking::glossary::rpt->deflate_rpt($packed)} = $packed;
   }
   return $map;
@@ -116,6 +117,8 @@ and then on rpt keys.
 =item namespace::autoclean
 
 =item Readonly
+
+=item List::MoreUtils
 
 =item npg_tracking::glossary::rpt
 
