@@ -4,6 +4,7 @@ use Test::More tests => 4;
 use Test::Exception;
 use URI::Escape qw(uri_escape);
 use JSON::XS;
+use HTTP::Request;
 
 use npg_tracking::glossary::rpt;
 use t::util;
@@ -19,10 +20,17 @@ my $qc_schema = $schemas->{'qc'};
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
-#use HTTP::Request::Common;
+sub _message {
+  my ($request, $rpt) = @_;
+  return sprintf q[%s on '%s'%s%s],
+      $request->method, $request->uri,
+      $request->method eq 'GET' ? q() :
+      q[ with content '] . $request->content . q['],
+      $rpt ? qq[ ($rpt)] : q();
+}
 
 subtest 'retrieving data via GET and POST' => sub {
-  plan tests => 34;
+  plan tests => 68;
 
  my @urls = qw( 
     5:3:7
@@ -51,41 +59,58 @@ subtest 'retrieving data via GET and POST' => sub {
   ];
 
   my $base_url = '/qcoutcomes';
-  my $r1 = request($base_url);
-  #my $r2 = request POST $base_url;
-  for my $response ($r1) {
-    ok($response->is_error, "response for '$base_url' is an error");
+  my $r1 = HTTP::Request->new('GET',  $base_url);
+  my $r2 = HTTP::Request->new('POST', $base_url);
+  $r2->header( 'Content-type' => 'application/json' );
+
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    my $m = _message($request);
+    ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
     is($response->header('Content-type'), 'application/json', 'json content type');
     is($response->content, '{"error":"rpt list not defined!"}', 'error message');
   }
 
   my $url = join q[?], $base_url, 'rpt_list=wrong';
-  $r1 = request($url);
-  #$r2 = request POST $base_url, ['wrong' => {}];
-  for my $response ($r1) {
-    ok($response->is_error, "response for '$url' is an error");
+  $r1 = HTTP::Request->new('GET',  $url);
+  $r2 = HTTP::Request->new('POST', $base_url);
+  $r2->header( 'Content-type' => 'application/json' );
+  $r2->content('{"wrong":{}}');
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    my $m = _message($request);
+    ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
     like($response->content,
       qr/Both id_run and position should be available/, 'error message');
   }
 
-  $url = join q[?], $base_url, 'rpt_list='. uri_escape('5:8:7;5:8:8');
-  $r1 = request($url);
-  #$r2 = request POST $base_url, ['5:8:7;5:8:8' => {}];
-  for my $response ($r1) {
-    ok($response->is_error, "response for '$url (5:8:7;5:8:8)' is an error");
+  my $rpt = '5:8:7;5:8:8';
+  $url = join q[?], $base_url, 'rpt_list='. uri_escape($rpt);
+  $r1 = HTTP::Request->new('GET',  $url);
+  $r2 = HTTP::Request->new('POST', $base_url);
+  $r2->header( 'Content-type' => 'application/json' );
+  $r2->content(qq[{"$rpt":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    my $m = _message($request, $rpt);
+    ok($response->is_error, qq[response for $m is an error]);  
     is($response->code, 400, 'error code is 400 - bad request' );
     like($response->content,
       qr/Cannot deal with multi-component compositions/, 'error message');
   }
 
-  $url = join q[?], $base_url, 'rpt_list='. uri_escape('5:3:7');
-  $r1 = request($url);
-  #$r2 = request POST $base_url, ['5:3:7' => {}];
-  for my $response ($r1) {
+  $rpt = '5:3:7';
+  $url = join q[?], $base_url, 'rpt_list='. uri_escape($rpt);
+  $r1 = HTTP::Request->new('GET',  $url);
+  $r2 = HTTP::Request->new('POST', $base_url);
+  $r2->header( 'Content-type' => 'application/json' );
+  $r2->content(qq[{"$rpt":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
     ok($response->is_success, 'success');
-    is($response->code, 200, "response code for '$url (5:3:7)' is 200");
+    is($response->code, 200, 'response code 200 for ' . _message($request, $rpt));
     is($response->header('Content-type'), 'application/json', 'json content type');
     is($response->content, '{"lib":{},"seq":{}}', 'response content');
   }
@@ -113,13 +138,21 @@ subtest 'retrieving data via GET and POST' => sub {
     }
     
     my $rpt_list = $urls[$j];
-    my $url = $base_url . '?' . join q[&], map {'rpt_list=' . uri_escape($_)}
-      @{npg_tracking::glossary::rpt->split_rpts($rpt_list)};
-    my $response = request($url);
-    is($response->code, 200, "response code for '$url ($rpt_list)' is 200");
-    is_deeply(decode_json($response->content), decode_json($jsons->[$j]), 'response content');
+    my @rpts = @{npg_tracking::glossary::rpt->split_rpts($rpt_list)};
+    my $url = $base_url . '?' . join q[&], map {'rpt_list=' . uri_escape($_)} @rpts;
+    my %h = map { $_ => {} } @rpts;
+    
+    my $request1 = HTTP::Request->new('GET',  $url);
+    my $request2 = HTTP::Request->new('POST', $base_url);
+    $request2->header( 'Content-type' => 'application/json' );
+    $request2->content(encode_json(\%h));
+    for my $request ($request1, $request2) {
+      my $response = request($request);
+      is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
+      is_deeply(decode_json($response->content), decode_json($jsons->[$j]), 'response content');
+    }
            
-    $j++;        
+    $j++; 
   }
 };
 
