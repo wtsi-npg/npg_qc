@@ -23,7 +23,7 @@ npg_qc_viewer::Controller::QcOutcomes
 
 =head1 SYNOPSIS
 
-Controller for a QC outcomes JSON service. The service allows for
+Controller for the QC outcomes JSON service. The service allows for
 retrieving, creating and updating QC outcomes.
 
 =head1 DESCRIPTION
