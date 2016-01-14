@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - give LIMs time to process posting qc outcomes as individual events
+ - SeqQC
+   - upgrading bcviz to 1.3.1 from 1.3.0 (individual minified files)
+
 release 59.7
  - SeqQC
    - bower configuration files in npg_qc/npg_qc_viewer

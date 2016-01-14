@@ -16,9 +16,9 @@
 'use strict';
 define([
   'jquery',
-  'bower_components/bcviz/src/qcjson/insertSizeHistogram',
-  'bower_components/bcviz/src/qcjson/adapter',
-  'bower_components/bcviz/src/qcjson/mismatch',
+  'bower_components/bcviz/dist/insertSizeHistogram.min',
+  'bower_components/bcviz/dist/adapter.min',
+  'bower_components/bcviz/dist/mismatch.min',
   'scripts/modify_on_view'
 ], function(jQuery, insert_size, adapter, mismatch, mov) {
   var _getTitle = function (prefix, d) {
