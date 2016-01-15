@@ -815,6 +815,8 @@ t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/Data/Intens
 t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/Data/Intensities/PB_basecalls_20101014-161249/Matrix/s_1_1_matrix.txt
 t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/Data/Intensities/PB_basecalls_20101014-161249/Matrix/s_1_2_matrix.txt
 t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/RunInfo.xml
+t/data/qcoutcomes/fixtures/000-mqc_library_outcome_dict.yml
+t/data/qcoutcomes/fixtures/000-mqc_outcome_dict.yml
 t/data/qc_webcache/npg/run/10.xml
 t/data/qc_webcache/npg/run/12.xml
 t/data/qc_webcache/npg/run/1.xml

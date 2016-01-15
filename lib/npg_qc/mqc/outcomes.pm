@@ -5,6 +5,7 @@ use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Readonly;
 use List::MoreUtils qw/ none /;
+use Carp;
 
 use npg_tracking::glossary::rpt;
 
@@ -21,8 +22,13 @@ has 'qc_schema' => (
 sub get {
   my ( $self, $qlist) = @_;
 
+  if (!$qlist || (ref $qlist ne 'ARRAY')) {
+    croak 'Input is missing or is not an array';
+  }
+
   my $hashed_queries = {};
   foreach my $q ( @{$qlist} ) {
+    _validate_query($q);
     my $tag = defined $q->{'tag_index'} ? $q->{'tag_index'} : $NO_TAG_FLAG;
     push @{$hashed_queries->{$q->{'id_run'}}->{$q->{'position'}}}, $tag;
   }
@@ -31,8 +37,8 @@ sub get {
   my @seq_outcomes = ();
 
   foreach my $id_run ( keys %{$hashed_queries} ) {
-    my @positions = keys $hashed_queries->{$id_run};
-    foreach my $p ( keys %{$hashed_queries->{$id_run}} ) {
+    my @positions = keys %{$hashed_queries->{$id_run}};
+    foreach my $p ( @positions ) {
       my @tags = @{$hashed_queries->{$id_run}->{$p}};
       my $query = {'id_run' => $id_run, 'position' => $p};
       if ( none {$_ == $NO_TAG_FLAG} @tags ) {
@@ -48,7 +54,7 @@ sub get {
     my @seq_rows = $self->qc_schema()->resultset('MqcOutcomeEnt')
                    ->search($q, {'join' => 'mqc_outcome'})->all();
     if ( @seq_rows ) {
-        push @seq_outcomes, @seq_rows;
+      push @seq_outcomes, @seq_rows;
     }
   }
 
@@ -60,6 +66,14 @@ sub get {
 }
 
 sub save {
+  return;
+}
+
+sub _validate_query {
+  my $q = shift;
+  if (!defined $q->{'id_run'} || !defined $q->{'position'}) {
+    croak q[Both 'id_run' and 'position' keys should be defined];
+  }
   return;
 }
 
@@ -83,9 +97,13 @@ npg_qc::mqc::outcomes
 
 =head1 SYNOPSIS
 
+  my $o = npg_qc::mqc::outcomes->new(qc_schema  => $qc_schema);
+  $o->get($data_array);
+  $o->save($data_array);
+
 =head1 DESCRIPTION
 
-Helper object for operation on QC outcomes (retrieval and saving).
+Helper object for operations on QC outcomes (retrieval and saving).
 
 =head1 SUBROUTINES/METHODS
 
@@ -95,10 +113,38 @@ DBIx npg qc schema object, required attribute.
 
 =head2 get
 
-Takes an array of queries.
+Takes an array of queries. Each query hash should contain at least the 'id_run'
+and 'position' keys and can also contain the 'tag_index' key.
+ 
 Returns simple representations of rows hashed first on the type of
 the outcome 'lib' for library outcomes and 'seq' for sequencing outcomes
 and then on rpt keys.
+
+  use Data::Dumper;
+  print Dumper $obj->get([{id_run=>5,position=>3,tag_index=>7});
+
+  $VAR1 = {
+          'lib' => {
+                     '5:3:7' => {
+                                  'tag_index' => 7,
+                                  'mqc_outcome' => 'Undecided final',
+                                  'position' => 3,
+                                  'id_run' => 5
+                                }
+                   },
+          'seq' => {
+                     '5:3' => {
+                                'mqc_outcome' => 'Accepted final',
+                                'position' => 3,
+                                'id_run' => 5
+                              }
+                   }
+          };
+
+For a query with id_run and position the sequencing lane outcome and all known
+library outcomes for this position are be returned. For a query with id_run,
+position and tag_index both the sequencing lane outcome and library outcome are
+returned. 
 
 =head2 save
 
@@ -119,6 +165,8 @@ and then on rpt keys.
 =item Readonly
 
 =item List::MoreUtils
+
+=item Carp
 
 =item npg_tracking::glossary::rpt
 
