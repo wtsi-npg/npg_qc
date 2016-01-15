@@ -34,11 +34,13 @@ Retrieving records:
 
   curl -X GET -H "Content-type: application/json" -H "Accept: application/json"  \
     "http://server:5050/qcoutcomes?rpt_list=5%3A8%3A7"&rpt_list=6%3A3"
-  curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"rpt_list":["5:8:7","6:3"]}' http://server:5050/qcoutcomes
+  curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
+    -d '{"rpt_list":["5:8:7","6:3"]}' http://server:5050/qcoutcomes
 
 Updating/creating records:
 
-  curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"lib":{"5:8:7":{"qc_outcome":"Final Rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
+  curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
+    -d '{"lib":{"5:8:7":{"qc_outcome":"Final Rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
 
 =head1 SUBROUTINES/METHODS
 
@@ -68,10 +70,13 @@ sub outcomes_GET {
 
 =head2 outcomes_POST
 
-Handles POST requests for the '/qcoutcomes' URL. If the data contain part of the
+Handles POST requests for the '/qcoutcomes' URL. If the data part of the
 request contains 'Action' key and it is set to 'UPDATE', the request is interpreted as
-an UPDATE_OR_CREATE action. In all other cases the request is interpreted as GET, the
-query parameters - a list of run:position:tag lists, is expected to be assigned to the 'rpt_list' key.
+an UPDATE_OR_CREATE action. In all other cases the request is interpreted as GET.
+
+JSON payload example for retrieving the data
+
+ '{"5:8:7":{},"5:8:6":{},"6:8:7":{},"6:8:6":{}}'
 
 The UPDATE action has not yet been implemented.
 
