@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - JSON service (retrieval) for qc outcomes
  - give LIMs time to process posting qc outcomes as individual events
  - SeqQC
    - upgrading bcviz to 1.3.1 from 1.3.0 (individual minified files)
