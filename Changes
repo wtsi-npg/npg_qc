@@ -2,6 +2,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - JSON service (retrieval) for qc outcomes
  - update link to picard in POD
+ - SeqQC
+   - tag metrics as first check shown in summary table
+   - showing tag index detail for tag metrics check in summary table
 
 release 59.8
  - give LIMs time to process posting qc outcomes as individual events
