@@ -74,9 +74,7 @@
           td_class = td_class _ ' passed';
         END; %]
         <td class="[% td_class %]">
-          [% USE Number.Format(THOUSANDS_SEP=','); %]
           [% FILTER format('%2.2f'); tag_metrics_cache.$id_run.$position.matches_pf_percent.$tag_index * 100; END; %]<br />
-          <span class="dark_blue">[% tag_metrics_cache.$id_run.$position.reads_pf_count.$tag_index | format_number; %]</span>
         </td>
 [%      NEXT;
       END; %]
