@@ -59,27 +59,38 @@
     IF lane_collection && lane_collection.size;
       result_collection = lane_collection.slice('check_name', check_name);
       IF result_collection.defined && result_collection.size;
-         result = result_collection.get(0);
-         IF result.pass == 1;
-           td_class = td_class _ ' passed';
-         ELSIF result.pass == 0;
-           td_class = td_class _ ' failed';
-         ELSE;
-           td_class = td_class _ ' outcome_unknown';
-         END;
-    END;
--%]
+        result = result_collection.get(0);
+        IF result.pass == 1;
+          td_class = td_class _ ' passed';
+        ELSIF result.pass == 0;
+          td_class = td_class _ ' failed';
+        ELSE;
+          td_class = td_class _ ' outcome_unknown';
+        END;
+      ELSIF check_name.match('tag metrics');
+        IF tag_metrics_cache.$id_run.$position.underrepresented_tags.$tag_index;
+          td_class = td_class _ ' failed';
+        ELSE;
+          td_class = td_class _ ' passed';
+        END; %]
+        <td class="[% td_class %]">
+          [% USE Number.Format(THOUSANDS_SEP=','); %]
+          [% FILTER format('%2.2f'); tag_metrics_cache.$id_run.$position.matches_pf_percent.$tag_index * 100; END; %]<br />
+          <span class="dark_blue">[% tag_metrics_cache.$id_run.$position.reads_pf_count.$tag_index | format_number; %]</span>
+        </td>
+[%      NEXT;
+      END; %]
  <td class="[% td_class %]">
 [%-
-           IF result;
-             TRY;
-             class_name = map.$check_name;
-             PROCESS "$class_name" result;
-             CATCH;
-             CLEAR;
-             error.info;
-             END;
-           END;
+      IF result;
+        TRY;
+          class_name = map.$check_name;
+          PROCESS "$class_name" result;
+        CATCH;
+          CLEAR;
+          error.info;
+        END;
+      END;
 -%]
  </td>
 [%-   ELSE -%]

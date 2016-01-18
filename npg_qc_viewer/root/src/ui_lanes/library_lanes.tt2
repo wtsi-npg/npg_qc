@@ -1,17 +1,35 @@
 [%
   USE String;
   USE Number.Format(THOUSANDS_SEP=',');
+  USE Dumper;
 
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
   checks_info = collection_all.check_names;
 
+  tag_metrics_cache = {};
   temp = [];
   FOREACH check_name IN checks_info.list;
     IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
       temp.push(check_name);
     END;
   END;
+
+  #Dumper.dump(temp);
+
+  BLOCK move_to_first; #to_move
+    moving=[];
+    FOREACH check_name IN temp;
+      IF check_name == to_move;
+        moving.unshift(to_move);
+      ELSE;
+        moving.push(check_name);
+      END;
+    END;
+    temp=moving;
+  END;
+
+  PROCESS move_to_first to_move='tag metrics';
   checks_list=temp;
   map=checks_info.map;
 
@@ -85,6 +103,22 @@
       END;
 
       row_info_to = c.stash.row_data.$lane_key || {};
+      #TODO Modified
+      IF !attrs.defined('tag_index');
+        FOREACH check_result IN lane_collection.results;
+          IF check_result.check_name == 'tag metrics';
+            IF !tag_metrics_cache.exists("$id_run");
+              tag_metrics_cache.import({$id_run => {}});
+            END;
+            tag_metrics_cache_run = tag_metrics_cache.item("$id_run");
+            tag_metrics_position = check_result.item('position');
+            IF !tag_metrics_cache_run.exists($tag_metrics_position);
+              tag_metrics_cache_run.import({$tag_metrics_position => check_result});
+            END;
+          END;
+        END;
+        #Dumper.dump(tag_metrics_cache);
+      END;
       time_comp = String.new(text => "$row_info_to.time_comp");
 -%]
 <tr>
