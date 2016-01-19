@@ -10,7 +10,7 @@
 
 <div id="content">
 
- <a name="tag_metrics"></a>
+ <a name="tag metrics_check"></a>
  <h3>Tag metrics</h3>
  Coefficient of variance calculation:<br/>
   <a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">mean</a> = &Sigma;(x<sub>i</sub>) &frasl; N<br/>
