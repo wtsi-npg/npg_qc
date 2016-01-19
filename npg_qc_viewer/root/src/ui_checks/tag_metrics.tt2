@@ -56,8 +56,6 @@ Individual tags
   <th>Reads, %</th>
 </tr>
 
-[%# TODO Use this tag info for the hash %]
-
 [%- FOREACH code = tag_indices -%]
   <tr[% IF underrepresented.$code %] class="result_fail"[% END %]>
     <td>[% code %]</td>

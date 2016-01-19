@@ -1,7 +1,6 @@
 [%
   USE String;
   USE Number.Format(THOUSANDS_SEP=',');
-  USE Dumper;
 
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
@@ -14,8 +13,6 @@
       temp.push(check_name);
     END;
   END;
-
-  #Dumper.dump(temp);
 
   BLOCK move_to_first; #to_move
     moving=[];
@@ -103,7 +100,6 @@
       END;
 
       row_info_to = c.stash.row_data.$lane_key || {};
-      #TODO Modified
       IF !attrs.defined('tag_index');
         FOREACH check_result IN lane_collection.results;
           IF check_result.check_name == 'tag metrics';
@@ -117,7 +113,6 @@
             END;
           END;
         END;
-        #Dumper.dump(tag_metrics_cache);
       END;
       time_comp = String.new(text => "$row_info_to.time_comp");
 -%]

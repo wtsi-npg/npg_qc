@@ -51,7 +51,7 @@
 
 [%- FOREACH check_name IN checks_list -%]
   [% IF check_name.match('genotype') && !check_name.match('W30467') %]
-        [% NEXT %]
+    [% NEXT %]
   [% END %]
 [%-
     result = '';
@@ -69,13 +69,13 @@
         END;
       ELSIF check_name.match('tag metrics');
         IF tag_metrics_cache && tag_metrics_cache.$id_run && tag_metrics_cache.$id_run.$position;
-          IF tag_metrics_cache.$id_run.$position.underrepresented_tags && 
+          IF tag_metrics_cache.$id_run.$position.underrepresented_tags &&
              tag_metrics_cache.$id_run.$position.underrepresented_tags.$tag_index;
             td_class = td_class _ ' failed';
           ELSE;
             td_class = td_class _ ' outcome_unknown';
           END; %]
-          
+
           <td class="[% td_class %]">
             [% FILTER format('%2.2f'); tag_metrics_cache.$id_run.$position.matches_pf_percent.$tag_index * 100; END; %]
           </td>
