@@ -12,10 +12,17 @@
 
  <a name="tag metrics_check"></a>
  <h3>Tag metrics</h3>
- Coefficient of variance calculation:<br/>
-  <a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">mean</a> = &Sigma;(x<sub>i</sub>) &frasl; N<br/>
+ <h4>For lanes</h4>
+  <p>Coefficient of variance calculation:</p>
+  <p><a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">mean</a> = &Sigma;(x<sub>i</sub>) &frasl; N<br/>
   <a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">rms</a> = &radic;( &Sigma;(x<sub>i</sub>-mean)&sup2; &frasl; (N-1))<br/>
-  coef_of_var = rms&#47;mean * 100
+  coef_of_var = rms&#47;mean * 100</p>
+ 
+ <br/>
+ <h4>For individual tags</h4>
+ <p>The single value displayed is the percentage of reads with perfect match for that tag.</p>
+ 
+ <br/>
 
 <a name="upstream tags_check"></a>
  <h3>Upstream Tags Check</h3>
