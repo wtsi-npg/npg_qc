@@ -86,7 +86,7 @@ sub outcomes_POST {
   my ( $self, $c ) = @_;
 
   my $data = $c->request->data();
-  my $action = (delete $data->{'Acton'}) || q[];
+  my $action = (delete $data->{'Action'}) || q[];
   if ($action eq 'UPDATE') {
     $c->log->debug('Will call outcome update');
     $self->_update_outcomes($c, $data);
