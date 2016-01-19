@@ -12,7 +12,7 @@
       gc_bias          = '<span class="nbsp">plot created</span><br />'
       bam_flagstats    = '<span class="nbsp">mapped %</span><br /><span class="dark_blue nbsp">duplicates %</span>'
       genotype         = 'match<br/><span class="dark_blue nbsp">mean cvg.<br/>depth<br/></span>'
-      tag_metrics      = 'decode rate, %<br /><span class="dark_blue">CV %</span>'
+      tag_metrics      = 'decode rate, %<br />CV %'
       pulldown_metrics = '<span class="nbsp">coverage at 20X, %</span><br /><span class="nbsp">mean depth per Gb</span><br /><span class="dark_blue nbsp">on bait bases, %</span><br /><span class="dark_blue nbsp">on target bases, %</span>'
       alignment_filter_metrics = '<span class="nbsp">target, %</span>'
       spatial_filter      = 'filter fail,<br/>total'
