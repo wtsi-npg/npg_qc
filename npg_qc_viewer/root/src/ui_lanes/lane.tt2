@@ -77,7 +77,7 @@
           END; %]
           
           <td class="[% td_class %]">
-            [% FILTER format('%2.2f'); tag_metrics_cache.$id_run.$position.matches_pf_percent.$tag_index * 100; END; %]<br />&nbsp;
+            [% FILTER format('%2.2f'); tag_metrics_cache.$id_run.$position.matches_pf_percent.$tag_index * 100; END; %]
           </td>
 [%        NEXT;
         END;
