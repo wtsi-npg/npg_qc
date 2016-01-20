@@ -56,6 +56,7 @@
 [%-
     result = '';
     td_class = 'check_summary';
+
     IF lane_collection && lane_collection.size;
       result_collection = lane_collection.slice('check_name', check_name);
       IF result_collection.defined && result_collection.size;
@@ -67,21 +68,22 @@
         ELSE;
           td_class = td_class _ ' outcome_unknown';
         END;
-      ELSIF check_name.match('tag metrics');
-        IF tag_metrics_cache && tag_metrics_cache.$id_run && tag_metrics_cache.$id_run.$position;
-          IF tag_metrics_cache.$id_run.$position.underrepresented_tags &&
-             tag_metrics_cache.$id_run.$position.underrepresented_tags.$tag_index;
+      ELSIF check_name.match('tag metrics') && tag_index.defined;
+        IF tag_metrics_cache.defined && tag_metrics_cache.exists("$id_run") && tag_metrics_cache.$id_run.exists("$position");
+          IF tag_metrics_cache.$id_run.$position.underrepresented_tags.exists("$tag_index");
             td_class = td_class _ ' failed';
           ELSE;
             td_class = td_class _ ' outcome_unknown';
-          END; %]
-
+          END; -%]
           <td class="[% td_class %]">
-            [% FILTER format('%2.2f'); tag_metrics_cache.$id_run.$position.matches_pf_percent.$tag_index * 100; END; %]
+            [%- IF tag_metrics_cache.$id_run.$position.matches_pf_percent.defined &&
+                   tag_metrics_cache.$id_run.$position.matches_pf_percent.exists("$tag_index"); -%]
+              [%- FILTER format('%2.2f'); tag_metrics_cache.$id_run.$position.matches_pf_percent.$tag_index * 100; END; -%]
+            [%- END; -%]
           </td>
-[%        NEXT;
+[%-       NEXT;
         END;
-      END; %]
+      END; -%]
  <td class="[% td_class %]">
 [%-
       IF result;
