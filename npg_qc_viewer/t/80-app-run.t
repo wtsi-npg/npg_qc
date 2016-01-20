@@ -27,7 +27,12 @@ my $mech = Test::WWW::Mechanize::Catalyst->new;
 my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
 
 my $qc_schema = $schemas->{'qc'};
-$qc_schema->resultset('TagMetrics')->create({id_run => 4950, position =>1, path => 'some path'});
+$qc_schema->resultset('TagMetrics')->create({
+  id_run => 4950,
+  position =>1,
+  path => 'some path',
+  reads_pf_count=>'{"11":53,"21":750446,"7":1580,"2":89,"17":144186,"22":1383279,"1":299626,"18":10582,"0":349419,"13":3601072,"16":93071,"23":1057688,"6":895140,"3":356213,"9":116,"12":1180579,"15":1366955,"14":965235,"20":1044190,"8":190608,"4":433648,"24":560261,"10":965361,"19":1647412,"5":122}'
+});
 
 {
   my $base = tempdir(UNLINK => 1);
