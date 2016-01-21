@@ -59,9 +59,9 @@ __END__
 =head1 DESCRIPTION
 
  An autoqc result object that wrapps results of barcode decoding
- by picard http://picard.sourceforge.net/command-line-overview.shtml#ExtractIlluminaBarcodes
+ by picard https://broadinstitute.github.io/picard/command-line-overview.html#ExtractIlluminaBarcodes
  according to the metric described in
- http://picard.sourceforge.net/picard-metric-definitions.shtml#ExtractIlluminaBarcodes.BarcodeMetric
+ https://broadinstitute.github.io/picard/picard-metric-definitions.html#ExtractIlluminaBarcodes.BarcodeMetric
 
 =head1 SUBROUTINES/METHODS
 
