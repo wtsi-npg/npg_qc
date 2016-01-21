@@ -10,23 +10,14 @@
   temp = [];
   FOREACH check_name IN checks_info.list;
     IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
-      temp.push(check_name);
-    END;
-  END;
-
-  BLOCK move_to_first; #to_move
-    moving=[];
-    FOREACH check_name IN temp;
-      IF check_name == to_move;
-        moving.unshift(to_move);
+      IF check_name == 'tag metrics';
+        temp.unshift(check_name);
       ELSE;
-        moving.push(check_name);
+        temp.push(check_name);
       END;
     END;
-    temp=moving;
   END;
 
-  PROCESS move_to_first to_move='tag metrics';
   checks_list=temp;
   map=checks_info.map;
 
