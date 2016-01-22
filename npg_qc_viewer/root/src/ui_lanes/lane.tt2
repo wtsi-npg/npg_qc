@@ -49,58 +49,62 @@
 [%- IF row_info_to.tag_sequence.defined && row_info_to.tag_sequence %]<br />[% row_info_to.tag_sequence %][% END %][% END %]</td>
 [%- END -%]
 
-[%- FOREACH check_name IN checks_list -%]
-  [% IF check_name.match('genotype') && !check_name.match('W30467') %]
-    [% NEXT %]
-  [% END %]
-[%-
-    result = '';
-    td_class = 'check_summary';
+[%- FOREACH check_name IN checks_list;
+      IF check_name.match('genotype') && !check_name.match('W30467');
+        NEXT;
+      END;
 
-    IF lane_collection && lane_collection.size;
-      result_collection = lane_collection.slice('check_name', check_name);
-      IF result_collection.defined && result_collection.size;
-        result = result_collection.get(0);
-        IF result.pass == 1;
-          td_class = td_class _ ' passed';
-        ELSIF result.pass == 0;
-          td_class = td_class _ ' failed';
-        ELSE;
-          td_class = td_class _ ' outcome_unknown';
-        END;
-      ELSIF check_name.match('tag metrics') && tag_index.defined;
-        IF tag_metrics_cache.defined && tag_metrics_cache.exists("$id_run") && tag_metrics_cache.$id_run.exists("$position");
-          IF tag_metrics_cache.$id_run.$position.underrepresented_tags.exists("$tag_index");
-            td_class = td_class _ ' failed';
-          ELSE;
-            td_class = td_class _ ' outcome_unknown';
-          END; -%]
-          <td class="[% td_class %]">
-            [%- IF tag_metrics_cache.$id_run.$position.matches_pf_percent.defined &&
-                   tag_metrics_cache.$id_run.$position.matches_pf_percent.exists("$tag_index"); -%]
-              [%- FILTER format('%2.2f'); tag_metrics_cache.$id_run.$position.matches_pf_percent.$tag_index * 100; END; -%]
-            [%- END; -%]
-          </td>
-[%-       NEXT;
-        END;
-      END; -%]
+      result = '';
+      pool_tag_metrics = '';
+      td_class = 'check_summary';
+
+      IF lane_collection && lane_collection.size;
+        result_collection = lane_collection.slice('check_name', check_name);
+        IF result_collection.defined && result_collection.size;
+          result = result_collection.get(0);
+          PROCESS update_td_class check_result=result.pass;
+        ELSIF check_name.match('tag metrics') && tag_index.defined;
+          IF tag_metrics_cache.defined && tag_metrics_cache.exists("$id_run") && tag_metrics_cache.$id_run.exists("$position");
+            pool_tag_metrics = tag_metrics_cache.$id_run.$position;
+            tag_metrics_lib_result = pool_tag_metrics.underrepresented_tags.exists("$tag_index")? 0 : '';
+            PROCESS update_td_class check_result=tag_metrics_lib_result;
+          END;
+        END; -%]
  <td class="[% td_class %]">
-[%-
-      IF result;
-        TRY;
-          class_name = map.$check_name;
-          PROCESS "$class_name" result;
+[%-     TRY;
+          IF result;
+            class_name = map.$check_name;
+            PROCESS "$class_name" result;
+          ELSIF pool_tag_metrics;
+            PROCESS tag_metrics_for_library result=pool_tag_metrics;
+          END;
         CATCH;
           CLEAR;
           error.info;
-        END;
-      END;
--%]
+        END;-%]
  </td>
 [%-   ELSE -%]
 <td></td>
 [%-   END -%]
 [%- END -%]
+
+[%- BLOCK update_td_class;
+      IF check_result == 1;
+        td_class = td_class _ ' passed';
+      ELSIF check_result == 0;
+        td_class = td_class _ ' failed';
+      ELSE;
+        td_class = td_class _ ' outcome_unknown';
+      END;
+    END;
+
+    BLOCK tag_metrics_for_library;
+      tag_metrics_data = '';
+      IF result.matches_pf_percent.defined &&
+         result.matches_pf_percent.exists("$tag_index");
+        tag_metrics_data = FILTER format('%2.2f'); result.matches_pf_percent.$tag_index * 100; END;
+      END; -%][%- tag_metrics_data -%][%-
+    END;-%]
 
 [%  BLOCK qX_yield -%]
 [%  qxTotal = qxTotal + result.yield1;
