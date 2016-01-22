@@ -8,6 +8,8 @@ use Test::Warn;
 use t::util;
 
 my $util = t::util->new();
+$util->modify_logged_user_method();
+
 local $ENV{'CATALYST_CONFIG'} = $util->config_path;
 local $ENV{'TEST_DIR'}        = $util->staging_path;
 local $ENV{'HOME'}            = 't/data';
@@ -21,14 +23,12 @@ my $mech;
 }
 
 subtest 'Basic test for ibraries' => sub {
-  plan tests => 6;
+  plan tests => 5;
   my $lib_name = 'NT28560W';
   my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
-  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/, 
-                                      'Expected warning for runfolder location';
+  $mech->get_ok($url);
   $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}: Libraries: 'NT28560W']);
   $mech->content_contains($lib_name);
-
   my $id_run = '4025';
   $mech->content_contains($id_run);
   my $sample_name = 'random_sample_name';
@@ -36,11 +36,10 @@ subtest 'Basic test for ibraries' => sub {
 };
 
 subtest 'Sample links for library SE' => sub {
-  plan tests => 3;
+  plan tests => 2;
 
   my $url = q[http://localhost/checks/libraries?id=NT28560W];
-  warning_like{$mech->get_ok($url)} qr/Use of uninitialized value \$id in exists/,
-                                        'Expected warning for id found';
+  $mech->get_ok($url);
   $mech->content_contains(q[samples/9272]); #Link to sample in SE
 };
 
@@ -49,8 +48,7 @@ subtest 'Sample links for library SE' => sub {
   # the strings are in the title, test the whole contents when done
   my $lib_name = 'NT207825Q';
   my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
-  warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/, 
-                                      qr/Use of uninitialized value \$id in exists/], 
+  warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/], 
                                       'Expected warning for runfolder location';
   $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}: Libraries: '$lib_name']);
   $mech->content_contains($lib_name);
@@ -63,9 +61,7 @@ subtest 'Test for summary table id for library - affects export to CSV.' => sub 
 
   my $lib_name = 'NT207825Q';
   my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
-
-  warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/, 
-                                      qr/Use of uninitialized value \$id in exists/],
+  warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/],
                                       'Expected warning for runfolder location';
   $mech->content_contains(q[<table id="results_summary"]);
   $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi);

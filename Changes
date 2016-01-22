@@ -1,6 +1,16 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - update link to picard in POD
+ - SeqQC:
+   - remove use of autocrud plugin - it's never been used
+   - simplify the authorisation and it make more secure (do not fetch
+     user credentials from the url), move the code to a new User model
+   - in tests extend the User model to allow for getting user credentials
+     from the url
+   - avoid warnings in tests by setting the default for the username to
+     an empty string
+   - if the user is logged in and is authorised to do manual qc, display
+     a visual que on the top of the page
 
  - give LIMs time to process posting qc outcomes as individual events
  - SeqQC

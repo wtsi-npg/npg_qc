@@ -6,14 +6,15 @@ use Readonly;
 use Try::Tiny;
 use JSON;
 use Carp;
+
 BEGIN { extends 'Catalyst::Controller' }
 
-use npg_qc_viewer::Model::MLWarehouseDB;
-with 'npg_qc_viewer::Util::Error';
+with qw/ npg_qc_viewer::Util::Error /;
 
 our $VERSION  = '0';
 
 Readonly::Scalar my $BAD_REQUEST_CODE      => 400;
+Readonly::Scalar my $UNAUTHORISED          => 401;
 Readonly::Scalar my $METHOD_NOT_ALLOWED    => 405;
 Readonly::Scalar my $MODE_LANE_MQC         => q[LANE_MQC];
 Readonly::Scalar my $MODE_LIBRARY_MQC      => q[LIBRARY_MQC];
@@ -73,12 +74,15 @@ sub _update_outcome {
   try {
 
     $self->_validate_req_method($c, 'POST');
-    $c->controller('Root')->authorise($c, qw/manual_qc/);
-    $username    = $c->user->username;
-    $self->_request_params($c, qw/id_run position new_oc/);
+    my $user_info = $c->model('User')->logged_user($c);
+    $username = $user_info->{'username'};
     if (!$username) {
-      $self->raise_error(q[Username should be defined], $BAD_REQUEST_CODE)
+      $self->raise_error('Login failed', $UNAUTHORISED);
     }
+    if (!$user_info->{'has_mqc_role'}) {
+      $self->raise_error(qq[User $username is not authorised for manual qc], $UNAUTHORISED);
+    }
+    $self->_request_params($c, qw/id_run position new_oc/);
 
     my $message;
     if ($working_as eq $MODE_LANE_MQC) {

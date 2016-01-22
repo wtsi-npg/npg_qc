@@ -1,20 +1,20 @@
 use strict;
 use warnings;
-use Test::More tests => 58;
+use Test::More tests => 57;
 use Test::Exception;
 use HTTP::Request::Common;
 use t::util;
-use Test::Warn;
 
 my $util = t::util->new();
+$util->modify_logged_user_method();
+
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 local $ENV{TEST_DIR}        = $util->staging_path;
 
-use_ok 'npg_qc_viewer::Controller::Mqc';
 my $schemas;
 lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
-
+use_ok 'npg_qc_viewer::Controller::Mqc';
 {
   my $response;
   lives_ok { $response = request(HTTP::Request->new('GET', '/mqc/update_outcome_lane' )) }
@@ -26,10 +26,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
 {
   my $response;
-  warning_like{
-    lives_ok { $response = request(POST '/mqc/update_outcome_lane' ) } 'post request lives';
-  } qr[uninitialized value \$id in exists],
-    'Expected warning';
+  lives_ok { $response = request(POST '/mqc/update_outcome_lane' ) } 'post request lives';
   ok( $response->is_error, qq[response is an error] );
   is( $response->code, 401, 'error code is 401' );
   like ($response->content, qr/Login failed/, 'correct error message');
@@ -40,7 +37,7 @@ use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
   lives_ok { $response = request(POST '/mqc/update_outcome_lane?user=tiger&password=secret' ) } 'post request lives';
   is( $response->code, 401, 'error code is 401' );
-  like ($response->content, qr/User tiger is not a member of manual_qc/, 'correct error message');
+  like ($response->content, qr/User tiger is not authorised for manual qc/, 'correct error message');
 
   lives_ok { $response = request(POST '/mqc/update_outcome_lane?user=cat' ) } 'post request lives';
   is( $response->code, 401, 'error code is 401' );

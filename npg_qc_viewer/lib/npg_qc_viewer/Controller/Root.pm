@@ -3,11 +3,8 @@ package npg_qc_viewer::Controller::Root;
 use Moose;
 use namespace::autoclean;
 use Readonly;
-use Try::Tiny;
 
 BEGIN { extends 'Catalyst::Controller' }
-
-with 'npg_qc_viewer::Util::Error';
 
 our $VERSION  = '0';
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitBuiltinHomonyms)
@@ -29,8 +26,6 @@ Catalyst Controller.
 __PACKAGE__->config->{namespace} = q[];
 
 Readonly::Scalar  our $NOT_FOUND_ERROR_CODE => 404;
-Readonly::Scalar  our $UNAUTHORISED_CODE    => 401;
-Readonly::Scalar  our $ADMIN_GROUP_NAME     => q[admin];
 
 =head2 index
 
@@ -54,8 +49,6 @@ sub default :Path {
   $c->detach(q[error_page]);
   return;
 }
-
-
 
 =head2 error_page
 
@@ -82,30 +75,6 @@ sub error_page :Path :Args(1) {
   return;
 }
 
-=head2 auto
-
-Runs at the start of each request (least specific auto)
-
-=cut
-sub auto :Private {
-  my ( $self, $c ) = @_;
-  #TODO consider using CatalystX::SimpleLogin
-
-  #Whether the URL is valid or not, we are here.
-  #Pre-compile a reg exp?
-
-  if ( $c->req->path =~ /^autocrud\/site\/admin /smx) {
-    try {
-    $self->authorise($c, $ADMIN_GROUP_NAME);
-    } catch {
-    my ($error, $error_code) = $self->parse_error($_);
-      $self->detach2error($c, $error_code, $error);
-    };
-    $c->stash->{'template'} = q[about.tt2];
-  }
-  return 1; # essential to return 1, see Catalyst despatch schema
-}
-
 =head2 end
 
 Attempt to render a view, if needed.
@@ -113,57 +82,6 @@ Attempt to render a view, if needed.
 =cut 
 
 sub end : ActionClass('RenderView') {}
-
-=head2 authorise
-
-User authorisation
-
-=cut
-
-sub authorise {
-  my ($self, $c, @roles) = @_;
-  my $user  = $c->req->params->{'user'};
-  my $realm = $c->req->params->{'realm'};
-  my $h = {};
-
-  if (defined $user or defined $realm) {
-    my $password   = $c->req->params->{password};
-    $password = $password ? $password : q[];
-    $user   = $user ? $user : q[];
-    $c->logout;
-    if (defined $user) {
-      $h = { username => $user, password => $password };
-    }
-  }
-  my $auth_ok;
-  try {
-    $auth_ok = $c->authenticate( $h, $realm);
-  } catch {
-    # non-existing realm gives an error
-    $self->raise_error(qq[Login failed: $_], $UNAUTHORISED_CODE);
-  };
-
-  if ( !$auth_ok ) {
-    $self->raise_error(q[Login failed], $UNAUTHORISED_CODE);
-  }
-  $c->log->debug('succeeded to authenticate');
-
-  if (!$c->user_exists()) {
-    $self->raise_error(q[User is not logged in], $UNAUTHORISED_CODE);
-  }
-
-  if (@roles) {
-    my $all_roles = join q[,], @roles;
-    $c->log->debug(qq[asked to authorised against $all_roles]);
-    my $logged_user = $c->user->username;
-    if ( !$c->check_user_roles(@roles) ) {
-      $self->raise_error(
-        qq[User $logged_user is not a member of $all_roles], $UNAUTHORISED_CODE);
-    }
-  }
-
-  return;
-}
 
 =head2 detach2error
 
@@ -194,8 +112,6 @@ __END__
 =over
 
 =item Readonly
-
-=item Try::Tiny
 
 =item Moose
 
