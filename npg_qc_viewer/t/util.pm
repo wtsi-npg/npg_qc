@@ -117,24 +117,6 @@ sub logged_user4test_domain {
   return $self->$orig($c,{username => $user, password => $password});
 }
 
-sub authorise {
-  my ($p, $c, @roles) = @_;
-  my $user = $c->req->params->{'user'} || q[];
-  my $password = $c->req->params->{'password'} || q[];
-  $c->logout;
-  if (!$c->authenticate({username => $user, password => $password})) {
-    die q[Login failed];
-  }
-  if (!$c->user->username) {
-    die q[User is not logged in];
-  }
-  if (@roles && !$c->check_user_roles(@roles) ) {
-    die sprintf q[User %s is not a member of %s],
-      $c->user->username, join q[,], @roles;
-  }
-  return;
-}
-
 sub DEMOLISH {
   my $self = shift;
   if (-e $self->mlwhouse_db_path) {unlink $self->mlwhouse_db_path;}
