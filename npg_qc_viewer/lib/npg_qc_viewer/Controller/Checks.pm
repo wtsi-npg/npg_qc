@@ -296,7 +296,6 @@ sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
   $c->stash->{'run_from_staging'} = 0;
   $c->stash->{'base_url'}     = _base_url_no_port($c->request->base);
   $c->stash->{'template'}     = q[ui_lanes/library_lanes.tt2];
-  $c->stash->{'user_info'}    = $c->model('User')->logged_user($c);
   return;
 }
 
