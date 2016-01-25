@@ -41,13 +41,20 @@ function( manual_qc, manual_qc_ui, plots, format_for_csv, unveil) {
                                                           .find("title")
                                                           .text());
 
-    var data = {};
-    //$.post( "", function( data ) {
-    //  window.console.log( data );
-    //});
-    window.console.log(data);
+    var data = { '18425:1': {}, '18245:1': {}, '18245:1:1': {}};
+    $.ajax({
+      url: "/qcoutcomes",
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(data)
+    }).complete(function(jqXHR, textStatus) {
+      window.console.log( jqXHR.responseJSON );
+    }).fail(function(jqXHR, textStatus) {
+      window.console.log( jqXHR.responseJSON );
+    }).success(function (data, textStatus, jqXHR) {
+      window.console.log( jqXHR.responseJSON );
+    });
 
-    //TODO get current mqc from JSON service.
     //If id_run
     if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
       var id_run = runTitleParserResult.id_run;
