@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - JSON service (retrieval) for qc outcomes
  - update link to picard in POD
 
 release 59.8
