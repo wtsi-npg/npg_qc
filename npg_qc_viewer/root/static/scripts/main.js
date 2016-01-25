@@ -40,6 +40,14 @@ function( manual_qc, manual_qc_ui, plots, format_for_csv, unveil) {
     var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                           .find("title")
                                                           .text());
+
+    var data = {};
+    //$.post( "", function( data ) {
+    //  window.console.log( data );
+    //});
+    window.console.log(data);
+
+    //TODO get current mqc from JSON service.
     //If id_run
     if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
       var id_run = runTitleParserResult.id_run;
