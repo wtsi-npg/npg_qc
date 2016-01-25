@@ -21,6 +21,11 @@
   checks_list=temp;
   map=checks_info.map;
 
+  tag_metrics_collection = collection_all.search(check_name => 'tag metrics');
+  FOREACH tag_metrics_result IN tag_metrics_collection.results;
+    tag_metrics_cache.${tag_metrics_result.id_run}.${tag_metrics_result.position} = tag_metrics_result;
+  END;
+
   row_span_string = '';
   IF checks_list.size;
     row_span_string = ' rowspan="2"';
@@ -91,22 +96,6 @@
       END;
 
       row_info_to = c.stash.row_data.$lane_key || {};
-      IF !attrs.defined('tag_index');
-        FOREACH check_result IN lane_collection.results;
-          IF check_result.check_name == 'tag metrics';
-            IF id_run.defined && !tag_metrics_cache.exists("$id_run");
-              tag_metrics_cache.import({$id_run => {}});
-            END;
-            tag_metrics_cache_run = tag_metrics_cache.$id_run;
-            IF position.defined && position && check_result.position.defined;
-              tag_metrics_position = check_result.position;
-              IF !tag_metrics_cache_run.exists("$tag_metrics_position");
-                tag_metrics_cache_run.import({$tag_metrics_position => check_result});
-              END;
-            END;
-          END;
-        END;
-      END;
       time_comp = String.new(text => "$row_info_to.time_comp");
 -%]
 <tr>
