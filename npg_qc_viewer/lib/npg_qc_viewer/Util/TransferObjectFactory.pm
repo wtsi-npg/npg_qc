@@ -65,37 +65,7 @@ sub create_object {
   $self->_add_npg_data($values);
   $self->_add_lims_data($values);
   my $to = npg_qc_viewer::Util::TransferObject->new($values);
-  $self->_get_mqc_from_qc($to);
-
   return $to;
-}
-
-sub _get_mqc_from_qc {
-  my ($self, $to) = @_;
-
-  if ($self->lane_level && defined $to->manual_qc) {
-    return;
-  }
-
-  if (!defined $to->manual_qc && (!defined $to->tag_index || $to->tag_index != 0)) {
-    my $lane_mqc_row = $self->qc_schema->resultset('MqcOutcomeEnt')->search(
-        {id_run    => $to->id_run,
-         position  => $to->position})->next();
-    if ($lane_mqc_row && $lane_mqc_row->has_final_outcome) {
-      $to->manual_qc($lane_mqc_row->is_accepted ? 1 : 0);
-    }
-  }
-
-  if ( $to->tag_index ) { # tag zero is not qc-ed
-    my $lib_mqc_row = $self->qc_schema->resultset('MqcLibraryOutcomeEnt')->search(
-      {id_run    => $to->id_run,
-       position  => $to->position,
-       tag_index => $to->tag_index})->next();
-    if ( $lib_mqc_row && $lib_mqc_row->has_final_outcome ) {
-      $to->lib_manual_qc($lib_mqc_row->is_accepted ? 1 : 0);
-    }
-  }
-  return;
 }
 
 sub _add_npg_data {
@@ -122,14 +92,12 @@ sub _add_lims_data {
     $values->{'legacy_library_id'}    = $flowcell->legacy_library_id;
     $values->{'id_pool_lims'}         = $flowcell->id_pool_lims;
     $values->{'rnd'}                  = $flowcell->is_r_and_d;
-    $values->{'manual_qc'}            = $flowcell->manual_qc;
     $values->{'is_gclp'}              = $flowcell->from_gclp;
     $values->{'entity_id_lims'}       = $flowcell->entity_id_lims;
     $values->{'study_name'}           = $flowcell->study_name;
     $values->{'id_sample_lims'}       = $flowcell->sample_id;
     $values->{'sample_name'}          = $flowcell->sample_name;
     $values->{'supplier_sample_name'} = $flowcell->sample_supplier_name;
-    $values->{'manual_qc'}            = $flowcell->manual_qc;
   }
   return;
 }
