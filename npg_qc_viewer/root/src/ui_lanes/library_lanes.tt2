@@ -6,14 +6,25 @@
   PROCESS urls.tt2;
   checks_info = collection_all.check_names;
 
+  tag_metrics_cache = {};
   temp = [];
   FOREACH check_name IN checks_info.list;
     IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
-      temp.push(check_name);
+      IF check_name == 'tag metrics';
+        temp.unshift(check_name);
+      ELSE;
+        temp.push(check_name);
+      END;
     END;
   END;
+
   checks_list=temp;
   map=checks_info.map;
+
+  tag_metrics_collection = collection_all.search(check_name => 'tag metrics');
+  FOREACH tag_metrics_result IN tag_metrics_collection.results;
+    tag_metrics_cache.${tag_metrics_result.id_run}.${tag_metrics_result.position} = tag_metrics_result;
+  END;
 
   row_span_string = '';
   IF checks_list.size;

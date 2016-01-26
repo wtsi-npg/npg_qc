@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - JSON service (retrieval) for qc outcomes
  - update link to picard in POD
  - SeqQC:
    - remove use of autocrud plugin - it's never been used
@@ -11,7 +12,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      an empty string
    - if the user is logged in and is authorised to do manual qc, display
      a visual que on the top of the page
+   - tag metrics column moved next to the column with tag index and tag sequence
+   - show deplexing percent for individual tags in tag metrics column
 
+release 59.8
  - give LIMs time to process posting qc outcomes as individual events
  - SeqQC
    - upgrading bcviz to 1.3.1 from 1.3.0 (individual minified files)

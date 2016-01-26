@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -123,6 +123,18 @@ subtest q[find or new outcome entity] => sub {
   is($row->mqc_outcome, undef, 'outcome entity relationship is undefined');
 };
 
+subtest q[packed data] => sub {
+  plan tests => 2;
+
+  my $expected = {'id_run' => 2, 'position' => 2, 'mqc_outcome' => 'Rejected preliminary'};
+  is_deeply($resultset->find({id_run => 2, position => 2})->pack(),
+    $expected, 'correct lane 2 data returned');
+
+  $resultset->search({id_run => 2, position => 1})->update({'id_mqc_outcome' => 1});
+  $expected->{'position'}    = 1;
+  $expected->{'mqc_outcome'} = 'Accepted preliminary';
+  is_deeply($resultset->find({id_run => 2, position => 1})->pack(),
+    $expected, 'correct lane 1 data returned');
+};
+
 1;
-
-
