@@ -163,9 +163,9 @@ sub _command {
     return $command;
 }
 
-has 'config_file_loc' => (is         => 'ro',
-                          isa        => 'Str',
-                          lazy_build => 1,);
+#has 'config_file_loc' => (is         => 'ro',
+#                          isa        => 'Str',
+#                          lazy_build => 1,);
 
 override 'can_run' => sub {
     my $self = shift;
