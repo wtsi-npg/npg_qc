@@ -69,7 +69,7 @@ Author: Ruben E Bautista-Garcia<lt>rb11@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 GRL, by Ruben Bautista
+Copyright (C) 2016 Genome Research Limited
 
 This file is part of NPG.
 

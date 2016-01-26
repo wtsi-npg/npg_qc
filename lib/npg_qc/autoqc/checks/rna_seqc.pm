@@ -204,8 +204,7 @@ override 'execute' => sub {
     if ($self->messages->count) {
         $self->result->add_comment(join q[ ], $self->messages->messages);
     }
-    my $can_run = $self->can_run();
-    if (!$can_run) {
+    if (!$self->can_run()) {
     	return 1;
     }
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
@@ -216,9 +215,6 @@ override 'execute' => sub {
     if (system $command) {
         carp "Failed to execute $command";
     }
-    #TODO: Call to _parse_metrics(<metrics.tsv file handler>)
-    #my $results = $self->_parse_metrics($fh);
-    #$self->result->rnaseqc_metrics_path($self->output_dir);
     return 1;
 };
 
@@ -231,26 +227,19 @@ __END__
 
 =head1 NAME
 
-npg_qc::autoqc::checks::rna_seqc - a QC check that runs RNA-SeQC software over an RNA-Seq sample 
+npg_qc::autoqc::checks::rna_seqc 
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
+QC check that runs RNA-SeQC software over an RNA-Seq sample
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
     Moose-based.
-
-=head2 alignments_in_bam
-
-=head2 java_max_heap_size
-
-=head2 rnaseqc_jar_path
-
-=head2 rnaseqc_command
 
 =head1 DIAGNOSTICS
 
@@ -308,7 +297,7 @@ Ruben E Bautista-Garcia<lt>rb11@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 GRL, by Ruben Bautista
+Copyright (C) 2016 Genome Research Limited
 
 This file is part of NPG.
 
