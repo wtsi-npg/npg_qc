@@ -14,8 +14,8 @@
  <h3>Tag metrics</h3>
  <h4>Description</h4>
  <p>This check displays statistics about decoding of the index read. The semantics of the summary table data differs for pools and individual libraries.</p>
- <p>For a pool the overall decoding percent is displayed followed by the coefficient of variance that characterises the uniformity of tag distribution in a pool. The background of the table cell is blue if the overall decoding rate is over 80%, for lesser values the background is red.</p>
- <p>For an individual library, the decoding percent for this library within a pool is displayed. If the number of PF reads (reads passing Illumina's filter) for this library is at least one tenth the average number of PF reads for libraries with PF reads in this pool, the background is grey; otherwise, the background is red.</p>
+ <p>For a pool the overall decoding percent is displayed, followed by the coefficient of variance that characterises the uniformity of tag distribution in a pool. The background of the table cell is blue if the overall decoding rate is over 80%, for lesser values the background is red.</p>
+ <p>For an individual library (tag), the decoding percent for this library within a pool is displayed. If the number of reads for this tag is at least one tenth the average number of reads per tag for this pool, the background is grey; otherwise, the background is red.</p>
  <br/>
  <h4>Coefficient of variance calculation:</h4>
   <p><a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">mean</a> = &Sigma;(x<sub>i</sub>) &frasl; N<br/>
