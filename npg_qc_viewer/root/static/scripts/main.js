@@ -41,18 +41,41 @@ function( manual_qc, manual_qc_ui, plots, format_for_csv, unveil) {
                                                           .find("title")
                                                           .text());
 
-    var data = { '18425:1': {}, '18245:1': {}, '18245:1:1': {}};
+    var classNameForOutcome = function (qc_outcome) {
+      var new_class = '';
+      if( qc_outcome.mqc_outcome === 'Accepted final' ) {
+        new_class = 'passed';
+      }
+      return new_class;
+    };
+
+    var processOutcomes = function (outcomes, rowClass) {
+      var rpt_keys = Object.keys(outcomes);
+
+      for (var i = 0; i < rpt_keys.length; i++) {
+        var rpt_key = rpt_keys[i];
+        var qc_outcome = outcomes[rpt_key];
+
+        var new_class = classNameForOutcome(qc_outcome) ;
+        $("." + rowClass + "[data-rpt_key='" + rpt_key + "']").addClass(new_class);
+      }
+    }
+
+    var data = { };
+    $('.lane').each(function (i, obj) {
+      $obj = $(obj);
+      data[$obj.data('rpt_key')] = {};
+    });
     $.ajax({
       url: "/qcoutcomes",
       type: 'POST',
       contentType: 'application/json',
       data: JSON.stringify(data)
-    }).complete(function(jqXHR, textStatus) {
-      window.console.log( jqXHR.responseJSON );
-    }).fail(function(jqXHR, textStatus) {
+    }).error(function(jqXHR, textStatus, errorThrown) {
       window.console.log( jqXHR.responseJSON );
     }).success(function (data, textStatus, jqXHR) {
-      window.console.log( jqXHR.responseJSON );
+      processOutcomes(data.lib, 'tag_info');
+      processOutcomes(data.seq, 'lane');
     });
 
     //If id_run
