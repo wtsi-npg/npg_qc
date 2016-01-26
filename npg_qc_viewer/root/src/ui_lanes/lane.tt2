@@ -49,43 +49,62 @@
 [%- IF row_info_to.tag_sequence.defined && row_info_to.tag_sequence %]<br />[% row_info_to.tag_sequence %][% END %][% END %]</td>
 [%- END -%]
 
-[%- FOREACH check_name IN checks_list -%]
-  [% IF check_name.match('genotype') && !check_name.match('W30467') %]
-        [% NEXT %]
-  [% END %]
-[%-
-    result = '';
-    td_class = 'check_summary';
-    IF lane_collection && lane_collection.size;
-      result_collection = lane_collection.slice('check_name', check_name);
-      IF result_collection.defined && result_collection.size;
+[%- FOREACH check_name IN checks_list;
+      IF check_name.match('genotype') && !check_name.match('W30467');
+        NEXT;
+      END;
+
+      result = '';
+      plex_tag_metrics = 0;
+      td_class = 'check_summary';
+      IF lane_collection && lane_collection.size;
+        result_collection = lane_collection.slice('check_name', check_name);
+        IF result_collection.defined && result_collection.size;
          result = result_collection.get(0);
-         IF result.pass == 1;
-           td_class = td_class _ ' passed';
-         ELSIF result.pass == 0;
-           td_class = td_class _ ' failed';
-         ELSE;
-           td_class = td_class _ ' outcome_unknown';
-         END;
-    END;
+         PROCESS update_td_class check_outcome = result.pass;
+        ELSE;
+          IF tag_index.defined && check_name == 'tag metrics';
+            result = tag_metrics_cache.${id_run}.${position}; #Might be an empty string if no key
+            IF result;
+              plex_tag_metrics = 1;
+              PROCESS update_td_class4plex_tag_metrics;
+            END;
+          END;
+        END;
+      END;
 -%]
  <td class="[% td_class %]">
-[%-
-           IF result;
-             TRY;
-             class_name = map.$check_name;
-             PROCESS "$class_name" result;
-             CATCH;
-             CLEAR;
-             error.info;
-             END;
-           END;
+[%-   IF result;
+        TRY;
+          class_name = map.$check_name;
+          PROCESS "$class_name" result;
+        CATCH;
+          CLEAR;
+          error.info;
+        END;
+      END;
 -%]
- </td>
-[%-   ELSE -%]
-<td></td>
-[%-   END -%]
-[%- END -%]
+</td>
+[%- END; #End of 'FOREACH check_name IN checks_list' loop -%]
+
+[%- BLOCK update_td_class;
+      IF check_outcome == 1;
+        td_class = td_class _ ' passed';
+      ELSIF check_outcome == 0;
+        td_class = td_class _ ' failed';
+      ELSE;
+        td_class = td_class _ ' outcome_unknown';
+      END;
+    END;
+-%]
+
+[%- BLOCK update_td_class4plex_tag_metrics;
+      IF result.matches_pf_percent.exists("$tag_index");
+        outcome = result.underrepresented_tags.exists("$tag_index") ? 0 : '';
+        PROCESS update_td_class check_outcome = outcome;
+      END;
+    END;
+-%]
 
 [%  BLOCK qX_yield -%]
 [%  qxTotal = qxTotal + result.yield1;
@@ -191,13 +210,24 @@
 [%- END -%]
 [%- END -%]
 
-[% BLOCK tag_metrics -%]
-[% href='#tmc_' _ result.id_run _ ':' _ result.position %]
-[%- IF result.matches_pf_percent.defined -%]
+[%- BLOCK tag_metrics;
+      IF !plex_tag_metrics;
+        href='#tmc_' _ result.id_run _ ':' _ result.position;
+        IF result.matches_pf_percent.defined;
+-%]
 <a href="[% href %]">[% FILTER format('%2.2f'); 100-result.errors_percent; END %]</a><br />
 <span class="dark_blue"><a href="[% href %]">[% FILTER format('%4.2f'); result.variance_coeff(1); END %]</a></span>
-[%- END -%]
-[%- END -%]
+[%-     END;
+      ELSE;
+        IF result.matches_pf_percent.exists("$tag_index");
+          value = result.matches_pf_percent.${tag_index};
+          IF value.defined;
+            FILTER format('%2.2f'); value * 100; END;
+          END;
+        END;
+      END;
+    END;
+#End of tag_metrics block  -%]
 
 [% BLOCK upstream_tags -%]
 [% href='#utc_' _ result.id_run _ ':' _ result.position %]

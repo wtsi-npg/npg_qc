@@ -2,6 +2,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - JSON service (retrieval) for qc outcomes
  - update link to picard in POD
+ - SeqQC
+   - tag metrics column moved next to the column with tag index and tag sequence
+   - show deplexing percent for individual tags in tag metrics column
 
 release 59.8
  - give LIMs time to process posting qc outcomes as individual events

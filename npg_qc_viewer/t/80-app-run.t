@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 53;
+use Test::More tests => 39;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -27,7 +27,12 @@ my $mech = Test::WWW::Mechanize::Catalyst->new;
 my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
 
 my $qc_schema = $schemas->{'qc'};
-$qc_schema->resultset('TagMetrics')->create({id_run => 4950, position =>1, path => 'some path'});
+$qc_schema->resultset('TagMetrics')->create({
+  id_run => 4950,
+  position =>1,
+  path => 'some path',
+  reads_pf_count=>'{"2":89,"1":299626,"0":349419}'
+});
 
 {
   my $base = tempdir(UNLINK => 1);
@@ -202,7 +207,8 @@ subtest 'Test for run + lane + plexes' => sub {
   $mech->content_unlike(qr/run\ 4950\ lane\ 1$/);
 };
 
-{
+subtest 'Test for run + lane + show all' => sub {
+  plan tests => 16;
   my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=all];
   warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ }, 
                                                     qr/Use of uninitialized value \$id in exists/, ],
@@ -227,7 +233,81 @@ subtest 'Test for run + lane + plexes' => sub {
                     qr/Use of uninitialized value \$id in exists/, ],
                       'Expected warning for run folder found';  
   }
-}
+};
+
+subtest 'Tag metrics as first check in summary table' =>  sub {
+  plan tests => 27;
+  for my $i (6 .. 8) {
+    $qc_schema->resultset(q[TagMetrics])->create({
+      id_run=>4025,
+      position=>$i,
+      path=>'some path',
+      metrics_file=>'some other path',
+      barcode_tag_name=>'BC',
+      tags=>'{"3":"TAGGCATGCTAAGCCT","1":"TAAGGCGAGCGTAAGA","4":"CTCTCTACGCGTAAGA","0":"NNNNNNNNNNNNNNNN","2":"TAGGCATGAAGGAGTA","5":"TAAGGCGAGTAAGGAG"}',
+      reads_count=>'{"3":"169","1":"89436","4":"88734","0":"218304","2":"184300","5":"135309"}',
+      reads_pf_count=>'{"3":"169","1":"89436","4":"88734","0":"218304","2":"184300","5":"135309"}',
+      perfect_matches_count=>'{"3":"120","1":"84364","4":"83074","0":"0","2":"173449","5":"128520"}',
+      perfect_matches_pf_count=>'{"3":"120","1":"84364","4":"83074","0":"0","2":"173449","5":"128520"}',
+      one_mismatch_matches_count=>'{"3":"49","1":"5072","4":"5660","0":"0","2":"10851","5":"6789"}',
+      one_mismatch_matches_pf_count=>'{"3":"49","1":"5072","4":"5660","0":"0","2":"10851","5":"6789"}',
+      matches_percent=>'{"3":"0.000012","1":"0.006554","4":"0.006503","0":"0.015999","2":"0.013507","5":"0.009916"}',
+      matches_pf_percent=>'{"3":"0.000012","1":"0.006554","4":"0.006503","0":"0.015999","2":"0.013507","5":"0.009916"}',
+      max_mismatches_param=>'1',
+      min_mismatch_delta_param=>'1',
+      max_no_calls_param=>'2',
+      pass=>'1',
+      info=>'{"Check":"npg_qc::autoqc::checks::tag_metrics","Check_version":"59.6"}',
+      tag_index=>-1
+    });
+  }
+
+  for my $i (-1 .. 5) {
+    for my $j (6 .. 8) {
+      my $obj = $qc_schema->resultset(q[QXYield])->update_or_new({
+        id_run=>4025,
+        position=>$j,
+        path=>q[some path],
+        filename1=>q[some filename],
+        filename2=>q[other filename],
+        threshold_quality=>'20',
+        yield1=>'1952450',
+        yield2=>'1891079',
+        comments=>'Unrecognised instrument model',
+        info=>'{"Check":"npg_qc::autoqc::checks::qX_yield","Check_version":"59.6"}',
+        tag_index=>$i
+      });
+      if (!$obj->in_storage) {
+        $obj->insert;
+      }
+    }
+  }
+
+  my $url = q[http://localhost/checks/runs?db_lookup=1&run=4025&lane=8&show=all];
+  $mech->get_ok($url);
+  $mech->title_is($title_prefix . q[Results (all) for runs 4025 lanes 8]);
+  $mech->content_contains(q[<th rowspan="2">Tag</th><th>tag<br />metrics<br/>], q[Tag metrics next to tag column]); 
+  $mech->content_contains(q[<td class="tag_info"><a href="#4025:8"></a></td> <td class="check_summary passed"><a href="#tmc_4025:8">69.52</a><br />], 
+                          q[Original content for tag metrics for lane level]);
+  $mech->content_contains(q[<a href="#4025:8:1">1</a></td> <td class="check_summary outcome_unknown">0.66], q[Tag metrics for tag 1]);
+  $mech->content_contains(q[<a href="#4025:8:2">2</a></td> <td class="check_summary outcome_unknown">1.35], q[Tag metrics for tag 2]);
+  $mech->content_contains(q[<a href="#4025:8:3">3</a></td> <td class="check_summary failed">0.00], q[Tag metrics for tag 3]);
+  $mech->content_contains(q[<a href="#4025:8:4">4</a></td> <td class="check_summary outcome_unknown">0.65], q[Tag metrics for tag 4]);
+  $mech->content_contains(q[<a href="#4025:8:0">0</a></td> <td class="check_summary outcome_unknown">1.60], q[Tag metrics for tag 0]);
+  
+  $url = q[http://localhost/checks/runs?db_lookup=1&run=4025&lane=6&lane=7&lane=8&show=all];
+  $mech->get_ok($url);
+  $mech->title_is($title_prefix . q[Results (all) for runs 4025 lanes 6 7 8]);
+  $mech->content_contains(q[<th rowspan="2">Tag</th><th>tag<br />metrics<br/>], q[Tag metrics next to tag column]);
+  for my $i (6 .. 8) {
+    $mech->content_contains(qq[<td class="tag_info"><a href="#4025:$i"></a></td> <td class="check_summary passed"><a href="#tmc_4025:$i">69.52</a><br />], 
+                            q[Original content for tag metrics for lane level]);
+    $mech->content_contains(qq[<th rowspan="2">Tag</th><th>tag<br />metrics<br/>], q[Tag metrics next to tag column]);
+    $mech->content_contains(qq[<a href="#4025:$i:1">1</a></td> <td class="check_summary outcome_unknown">0.66], qq[Tag metrics for lane $i tag 1]);
+    $mech->content_contains(qq[<a href="#4025:$i:3">3</a></td> <td class="check_summary failed">0.00], qq[Tag metrics for lane $i tag 3]);
+    $mech->content_contains(qq[<a href="#4025:$i:0">0</a></td> <td class="check_summary outcome_unknown">1.60], qq[Tag metrics for lane $i tag 0]);
+  }
+};
 
 subtest 'R&D' => sub {
   plan tests => 4;
