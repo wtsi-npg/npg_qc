@@ -36,34 +36,8 @@ function( manual_qc, manual_qc_ui, manual_qc_outcomes, plots, format_for_csv, un
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
-
-    // Getting the run_id from the title of the page using the qc part too.
-    var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
-                                                          .find("title")
-                                                          .text());
-
     manual_qc_outcomes.fetchQCOutcomes();
-
-    //If id_run
-    if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
-      var id_run = runTitleParserResult.id_run;
-      var prodConfiguration = new NPG.QC.ProdConfiguration();
-      //Read information about lanes from page.
-      var lanes = []; //Lanes without previous QC, blank BG
-      var control;
-
-      if (runTitleParserResult.isRunPage) {
-        var lanesWithBG = []; //Lanes with previous QC, BG with colour
-        control = new NPG.QC.RunPageMQCControl(prodConfiguration);
-        control.parseLanes(lanes, lanesWithBG);
-        control.prepareMQC(id_run, lanes, lanesWithBG);
-      } else {
-        var position = runTitleParserResult.position;
-        control = new NPG.QC.LanePageMQCControl(prodConfiguration);
-        control.parseLanes(lanes);
-        control.prepareMQC(id_run, position, lanes);
-      }
-    }
+    manual_qc_outcomes.setPageForManualQC();
   });
 
   //Required to show error messages from the mqc process.
