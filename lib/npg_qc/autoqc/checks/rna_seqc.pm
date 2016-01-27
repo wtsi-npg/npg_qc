@@ -32,6 +32,7 @@ Readonly::Scalar my $RNASEQC_OUTDIR         => q[rna_seqc];
 Readonly::Scalar my $JAVA_MAX_HEAP_SIZE     => q[4000m];
 Readonly::Scalar my $JAVA_GC_TYPE           => q[+UseSerialGC];
 Readonly::Scalar my $JAVA_USE_PERF_DATA     => q[-UsePerfData];
+Readonly::Scalar my $CHILD_ERROR_SHIFT     => 8;
 
 has '+file_type' => (default => $EXT,);
 
@@ -200,6 +201,7 @@ override 'execute' => sub {
     $self->result->set_info('Command', $command);
     carp qq[EXECUTING $command time ]. DateTime->now();
     if (system $command) {
+        my $error =  printf "Child %s exited with value %d\n", $command, $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
         carp "Failed to execute $command";
     }
     return 1;
