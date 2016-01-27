@@ -68,15 +68,6 @@ sub _build_alignments_in_bam {
     return $self->lims->alignments_in_bam;
 }
 
-###############################################################################
-# Output path:
-#  By default, the pipeline supplies the archive/qc/rna_seqc path under the
-#  Latest_Summary directory via the qc_out parameter. This value is used to
-#  lazy-build the output path for the RNA-SeQC results within the following
-#  path: <qc_out path>/<run_position>/<run_position#tag>. qc_out remains
-#  intact so the JSON files end up stored in a non-standard location. This
-#  behaviour may change in the future if metrics are to be read and stored.
-###############################################################################
 has 'qc_out'     => (is         => 'ro',
                      isa        => 'NpgTrackingDirectory',
                      required   => 1,);
@@ -162,10 +153,6 @@ sub _command {
                                            $single_end_option;
     return $command;
 }
-
-#has 'config_file_loc' => (is         => 'ro',
-#                          isa        => 'Str',
-#                          lazy_build => 1,);
 
 override 'can_run' => sub {
     my $self = shift;
