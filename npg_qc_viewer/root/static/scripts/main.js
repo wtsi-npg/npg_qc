@@ -26,12 +26,13 @@ require.onError = function (err) {
 require([
   'scripts/manual_qc',
   'scripts/manual_qc_ui',
+  'scripts/manual_qc_outcomes',
   'scripts/plots',
   'scripts/format_for_csv',
   'unveil',
   'table-export'
 ],
-function( manual_qc, manual_qc_ui, plots, format_for_csv, unveil) {
+function( manual_qc, manual_qc_ui, manual_qc_outcomes, plots, format_for_csv, unveil) {
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
@@ -41,42 +42,7 @@ function( manual_qc, manual_qc_ui, plots, format_for_csv, unveil) {
                                                           .find("title")
                                                           .text());
 
-    var classNameForOutcome = function (qc_outcome) {
-      var new_class = '';
-      if( qc_outcome.mqc_outcome === 'Accepted final' ) {
-        new_class = 'passed';
-      }
-      return new_class;
-    };
-
-    var processOutcomes = function (outcomes, rowClass) {
-      var rpt_keys = Object.keys(outcomes);
-
-      for (var i = 0; i < rpt_keys.length; i++) {
-        var rpt_key = rpt_keys[i];
-        var qc_outcome = outcomes[rpt_key];
-
-        var new_class = classNameForOutcome(qc_outcome) ;
-        $("." + rowClass + "[data-rpt_key='" + rpt_key + "']").addClass(new_class);
-      }
-    }
-
-    var data = { };
-    $('.lane').each(function (i, obj) {
-      $obj = $(obj);
-      data[$obj.data('rpt_key')] = {};
-    });
-    $.ajax({
-      url: "/qcoutcomes",
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify(data)
-    }).error(function(jqXHR, textStatus, errorThrown) {
-      window.console.log( jqXHR.responseJSON );
-    }).success(function (data, textStatus, jqXHR) {
-      processOutcomes(data.lib, 'tag_info');
-      processOutcomes(data.seq, 'lane');
-    });
+    manual_qc_outcomes.fetchQCOutcomes();
 
     //If id_run
     if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
