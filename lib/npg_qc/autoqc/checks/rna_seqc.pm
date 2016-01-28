@@ -4,13 +4,9 @@ use Moose;
 use namespace::autoclean;
 use English qw( -no_match_vars );
 use Carp;
-use File::Spec::Functions qw( catdir );
-use File::Basename;
 use File::Path qw(make_path);
-use npg_qc::autoqc::types;
 use npg::api::run;
 use Readonly;
-use Try::Tiny;
 use DateTime;
 use npg_tracking::util::types;
 
@@ -254,19 +250,11 @@ QC check that runs RNA-SeQC software over an RNA-Seq sample
 
 =item Carp
 
-=item File::Spec
-
-=item File::Basename
-
 =item File::Path
-
-=item npg_qc::autoqc::types
 
 =item npg::api::run
  
 =item Readonly
-
-=item Try::Tiny
 
 =item DateTime
 
