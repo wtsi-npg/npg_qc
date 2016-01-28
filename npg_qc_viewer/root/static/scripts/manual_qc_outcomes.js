@@ -15,14 +15,14 @@ define(['jquery'], function ($) {
 
     for (var i = 0; i < rpt_keys.length; i++) {
       var rpt_key = rpt_keys[i];
-
       var qc_outcome = outcomes[rpt_key];
       var new_class = _classNameForOutcome(qc_outcome) ;
       var rptKeyAsSelector;
       if(elementClass === 'lane') {
         rptKeyAsSelector = 'tr[id*="rpt_key:' + rpt_key + '"]';
       } else {
-        rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A '); //With : escaped as \\:
+        //jQuery can handle ':' as part of id but needs to be escaped as '\\3A '
+        rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
       }
       rptKeyAsSelector = rptKeyAsSelector + ' td.' + elementClass;
       $(rptKeyAsSelector).addClass(new_class);
@@ -43,6 +43,11 @@ define(['jquery'], function ($) {
     return rptKeys;
   };
 
+  var updateQCOutcomes = function (outcomesData) {
+    _processOutcomes(outcomesData.lib, 'tag_info');
+    _processOutcomes(outcomesData.seq, 'lane');
+  };
+
   var showMQCOutcomes = function (rptKeys, outcomesURL) {
     var data = { };
     for( var i = 0; i < rptKeys.length; i++ ) {
@@ -61,18 +66,13 @@ define(['jquery'], function ($) {
     });
   };
 
-  var updateQCOutcomes = function (outcomesData) {
-    _processOutcomes(outcomesData.lib, 'tag_info');
-    _processOutcomes(outcomesData.seq, 'lane');
-  };
-
   var setPageForManualQC = function() {
     // Getting the run_id from the title of the page using the qc part too.
     var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                           .find("title")
                                                           .text());
     //If id_run
-    if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
+    if(typeof(runTitleParserResult) !== undefined && runTitleParserResult != null) {
       var id_run = runTitleParserResult.id_run;
       var prodConfiguration = new NPG.QC.ProdConfiguration();
       //Read information about lanes from page.
