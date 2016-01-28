@@ -4,40 +4,66 @@ define(['jquery'], function ($) {
     var new_class = '';
     if( qc_outcome.mqc_outcome === 'Accepted final' ) {
       new_class = 'passed';
+    } else if (qc_outcome.mqc_outcome === 'Rejected final') {
+      new_class = 'failed';
     }
     return new_class;
   };
 
-  var _processOutcomes = function (outcomes, rowClass) {
+  var _processOutcomes = function (outcomes, elementClass) {
     var rpt_keys = Object.keys(outcomes);
 
     for (var i = 0; i < rpt_keys.length; i++) {
       var rpt_key = rpt_keys[i];
-      var qc_outcome = outcomes[rpt_key];
 
+      var qc_outcome = outcomes[rpt_key];
       var new_class = _classNameForOutcome(qc_outcome) ;
-      $("." + rowClass + "[data-rpt_key='" + rpt_key + "']").addClass(new_class);
+      var rptKeyAsSelector;
+      if(elementClass === 'lane') {
+        rptKeyAsSelector = 'tr[id*="rpt_key:' + rpt_key + '"]';
+      } else {
+        rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A '); //With : escaped as \\:
+      }
+      rptKeyAsSelector = rptKeyAsSelector + ' td.' + elementClass;
+      $(rptKeyAsSelector).addClass(new_class);
     }
   };
 
-  var fetchQCOutcomes = function () {
-    var data = { };
-    $('.lane').each(function (i, obj) {
+  var parseRptKeys = function (idTable) {
+    var rptKeys = [];
+    $('#' + idTable + ' tr').each(function (i, obj) {
       var $obj = $(obj);
-      data[$obj.data('rpt_key')] = {};
+      if( $obj.attr('id') !== undefined ) {
+        var rptKey = $obj.attr('id').substring('rpt_key:'.length);
+        if( rptKey !== undefined && $.inArray(rptKey, rptKeys) === -1 ) {
+          rptKeys.push(rptKey);
+        }
+      }
     });
+    return rptKeys;
+  };
+
+  var showMQCOutcomes = function (rptKeys, outcomesURL) {
+    var data = { };
+    for( var i = 0; i < rptKeys.length; i++ ) {
+      data[rptKeys[i]] = {};
+    }
 
     $.ajax({
-      url: "/qcoutcomes",
+      url: outcomesURL,
       type: 'POST',
       contentType: 'application/json',
       data: JSON.stringify(data)
     }).error(function(jqXHR, textStatus, errorThrown) {
       window.console.log( jqXHR.responseJSON );
     }).success(function (data, textStatus, jqXHR) {
-      _processOutcomes(data.lib, 'tag_info');
-      _processOutcomes(data.seq, 'lane');
+      updateQCOutcomes(data);
     });
+  };
+
+  var updateQCOutcomes = function (outcomesData) {
+    _processOutcomes(outcomesData.lib, 'tag_info');
+    _processOutcomes(outcomesData.seq, 'lane');
   };
 
   var setPageForManualQC = function() {
@@ -68,7 +94,9 @@ define(['jquery'], function ($) {
   };
 
   return {
-    fetchQCOutcomes : fetchQCOutcomes,
+    showMQCOutcomes : showMQCOutcomes,
     setPageForManualQC : setPageForManualQC,
+    updateQCOutcomes: updateQCOutcomes,
+    parseRptKeys: parseRptKeys,
   };
 });

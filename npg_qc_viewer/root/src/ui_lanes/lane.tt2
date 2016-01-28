@@ -5,7 +5,7 @@
     plex_class = 'tag_info';
 -%]
 
-<td class="[% lane_class %] nbsp" data-rpt_key='[% util.lane_rpt_key_from_key(lane_key) %]'>
+<td class="[% lane_class %] nbsp"'>
 
 [% have_link = 0;
    IF tag_index == '' && lane_collection && lane_collection.size;
@@ -26,7 +26,7 @@
 [% END -%]
 </td>
 [%- IF has_plexes -%]
-<td class="[% plex_class %]"[%- IF tag_index; -%] data-rpt_key='[%- lane_key -%]'[%- END; -%]>
+<td class="[% plex_class %]">
 [%- IF tag_index.defined; lane_link = c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'lane', 'db_lookup'=>"$db_lookup"}); -%]
 [%- have_link = 0; IF lane_collection && lane_collection.size; have_link = 1; -%]
 <a href="#[% lane_key %]">[% END -%]

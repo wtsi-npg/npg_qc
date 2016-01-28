@@ -36,7 +36,9 @@ function( manual_qc, manual_qc_ui, manual_qc_outcomes, plots, format_for_csv, un
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
-    manual_qc_outcomes.fetchQCOutcomes();
+    var rptKeys = manual_qc_outcomes.parseRptKeys('results_summary');
+    var outcomesURL = '/qcoutcomes';
+    manual_qc_outcomes.showMQCOutcomes(rptKeys, outcomesURL);
     manual_qc_outcomes.setPageForManualQC();
   });
 
