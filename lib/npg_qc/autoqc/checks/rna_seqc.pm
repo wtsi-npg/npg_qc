@@ -34,46 +34,53 @@ has '+file_type' => (default => $EXT,);
 
 has '+aligner' => (default => q[fasta],);
 
-has 'java_max_heap_size'     => (is      => 'ro',
-                                 isa     => 'Str',
-                                 default => $JAVA_MAX_HEAP_SIZE,);
+has '_java_max_heap_size'     => (is      => 'ro',
+                                  isa     => 'Str',
+                                  default => $JAVA_MAX_HEAP_SIZE,
+                                  init_arg => undef,);
 
-has 'java_gc_type'           => (is      => 'ro',
-                                 isa     => 'Str',
-                                 default => $JAVA_GC_TYPE,);
+has '_java_gc_type'           => (is      => 'ro',
+                                  isa     => 'Str',
+                                  default => $JAVA_GC_TYPE,
+                                  init_arg => undef,);
 
-has 'java_use_perf_data'     => (is      => 'ro',
-                                 isa     => 'Str',
-                                 default => $JAVA_USE_PERF_DATA,);
+has '_java_use_perf_data'     => (is      => 'ro',
+                                  isa     => 'Str',
+                                  default => $JAVA_USE_PERF_DATA,
+                                  init_arg => undef,);
 
-has 'java_jar_path'          => (is      => 'ro',
-                                 isa     => 'NpgCommonResolvedPathJarFile',
-                                 coerce  => 1,
-                                 default => $RNASEQC_JAR_NAME,);
+has '_java_jar_path'          => (is      => 'ro',
+                                  isa     => 'NpgCommonResolvedPathJarFile',
+                                  coerce  => 1,
+                                  default => $RNASEQC_JAR_NAME,
+                                  init_arg => undef,);
 
-has 'transcript_type' => (is      => 'ro',
-                          isa     => 'Int',
-                          default => $RNASEQC_GTF_TTYPE_COL,);
+has '_ttype_gtf_column' => (is      => 'ro',
+                            isa     => 'Int',
+                            default => $RNASEQC_GTF_TTYPE_COL,
+                            init_arg => undef,);
 
 
-has 'alignments_in_bam' => (is         => 'ro',
-                            isa        => 'Maybe[Bool]',
-                            lazy_build => 1,);
+has '_alignments_in_bam' => (is         => 'ro',
+                             isa        => 'Maybe[Bool]',
+                             lazy_build => 1,
+                             init_arg => undef,);
 
-sub _build_alignments_in_bam {
+sub _build__alignments_in_bam {
     my ($self) = @_;
     return $self->lims->alignments_in_bam;
 }
 
 has 'qc_out'     => (is         => 'ro',
-                     isa        => 'NpgTrackingDirectory',
-                     required   => 1,);
+                      isa        => 'NpgTrackingDirectory',
+                      required   => 1,);
 
-has 'rna_seqc_path' => (is         => 'ro',
-                       isa        => 'Str',
-                       lazy_build => 1,);
+has '_rna_seqc_path' => (is         => 'ro',
+                         isa        => 'Str',
+                         lazy_build => 1,
+                         init_arg => undef,);
 
-sub _build_rna_seqc_path {
+sub _build__rna_seqc_path {
     my ($self) = @_;
     my $archive_qc_rna_seqc_path = $self->qc_out;
     my $rp_dir = join q[_], $self->id_run, $self->position;
@@ -85,42 +92,46 @@ sub _build_rna_seqc_path {
     return $out_dir;
 }
 
-has 'input_str' => (is => 'ro',
-                    isa        => 'Str',
-                    lazy_build => 1,);
+has '_input_str' => (is => 'ro',
+                     isa        => 'Str',
+                     lazy_build => 1,
+                     init_arg => undef,);
 
-sub _build_input_str {
+sub _build__input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
     my $library_name = $self->lims->library_name // $sample_id;
     my @library_names = split q[ ], $library_name;
-    my $input_file = $self->bam_file;
+    my $input_file = $self->_bam_file;
     return qq["$library_names[0]|$input_file|$sample_id"];
 }
 
-has 'reference_fasta' => (is => 'ro',
-                          isa => 'Maybe[Str]',
-                          lazy_build => 1,);
+has '_reference_fasta' => (is => 'ro',
+                           isa => 'Maybe[Str]',
+                           lazy_build => 1,
+                           init_arg => undef,);
 
-sub _build_reference_fasta {
+sub _build__reference_fasta {
     my ($self) = @_;
     return $self->refs->[0];
 }
 
-has 'bam_file' => (is         => 'ro',
-                   isa        => 'Str',
-                   lazy_build => 1,);
+has '_bam_file' => (is         => 'ro',
+                    isa        => 'Str',
+                    lazy_build => 1,
+                    init_arg => undef,);
 
-sub _build_bam_file {
+sub _build__bam_file {
     my $self = shift;
     return $self->input_files->[0];
 }
 
-has 'transcriptome' => (is         => 'ro',
-                        isa        => 'Maybe[Str]',
-                        lazy_build => 1,);
+has '_annotation_gtf' => (is         => 'ro',
+                          isa        => 'Maybe[Str]',
+                          lazy_build => 1,
+                          init_arg => undef,);
 
-sub _build_transcriptome {
+sub _build__annotation_gtf {
     my $self = shift;
     my $trans_gtf = $self->rnaseqc_gtf_file;
     return $trans_gtf;
@@ -128,7 +139,7 @@ sub _build_transcriptome {
 
 sub _command {
     my ($self) = @_;
-    my $out_dir = $self->rna_seqc_path;
+    my $out_dir = $self->_rna_seqc_path;
     # check existence of RNA_SeQC's output directory create if it doesn't
     if ( ! -d $out_dir) {
         make_path($out_dir);
@@ -138,15 +149,15 @@ sub _command {
         $single_end_option=q[-singleEnd];
     }
     my $command = $self->java_cmd. sprintf q[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
-                                           $self->java_max_heap_size,
-                                           $self->java_gc_type,
-                                           $self->java_use_perf_data,
-                                           $self->java_jar_path,
-                                           $self->input_str,
+                                           $self->_java_max_heap_size,
+                                           $self->_java_gc_type,
+                                           $self->_java_use_perf_data,
+                                           $self->_java_jar_path,
+                                           $self->_input_str,
                                            $out_dir,
-                                           $self->reference_fasta,
-                                           $self->transcriptome,
-                                           $self->transcript_type,
+                                           $self->_reference_fasta,
+                                           $self->_annotation_gtf,
+                                           $self->_ttype_gtf_column,
                                            $single_end_option;
     return $command;
 }
@@ -156,7 +167,7 @@ override 'can_run' => sub {
     my $l = $self->lims;
     my $can_run = 1;
     my @comments;
-    if(! $self->alignments_in_bam) {
+    if(! $self->_alignments_in_bam) {
         push @comments, q[Alignments_in_bam is false];
         $can_run = 0;
     }
