@@ -48,11 +48,16 @@ define(['jquery'], function ($) {
     _processOutcomes(outcomesData.seq, 'lane');
   };
 
-  var showMQCOutcomes = function (rptKeys, outcomesURL) {
+  var buildQuery = function (rptKeys) {
     var data = { };
     for( var i = 0; i < rptKeys.length; i++ ) {
       data[rptKeys[i]] = {};
     }
+    return data;
+  };
+
+  var fetchMQCOutcomes = function (rptKeys, outcomesURL, callOnSuccess) {
+    var data = buildQuery(rptKeys);
 
     $.ajax({
       url: outcomesURL,
@@ -62,7 +67,7 @@ define(['jquery'], function ($) {
     }).error(function(jqXHR, textStatus, errorThrown) {
       window.console.log( jqXHR.responseJSON );
     }).success(function (data, textStatus, jqXHR) {
-      updateQCOutcomes(data);
+      callOnSuccess(data, textStatus, jqXHR);
     });
   };
 
@@ -94,7 +99,8 @@ define(['jquery'], function ($) {
   };
 
   return {
-    showMQCOutcomes : showMQCOutcomes,
+    fetchMQCOutcomes : fetchMQCOutcomes,
+    buildQuery: buildQuery,
     setPageForManualQC : setPageForManualQC,
     updateQCOutcomes: updateQCOutcomes,
     parseRptKeys: parseRptKeys,
