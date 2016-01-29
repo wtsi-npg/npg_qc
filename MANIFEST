@@ -175,6 +175,7 @@ lib/npg_qc/autoqc/types.pm
 lib/npg_qc/controller.pm
 lib/npg_qc/file_store.pm
 lib/npg_qc/mqc/reporter.pm
+lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/model/analysis_lane.pm
 lib/npg_qc/model/analysis_lane_qcal.pm
 lib/npg_qc/model/analysis.pm
@@ -387,7 +388,6 @@ t/30-illumina-loader-Runinfo.t
 t/30-illumina-loader-Run_Timeline.t
 t/30-illumina-loader-Signal_Mean.t
 t/30-illumina-loader.t
-t/40-mqc-reporter.t
 t/50-npg_qc-Schema.t
 t/50-schema-result-Contamination.t
 t/50-schema-result-Fastqcheck.t
@@ -464,6 +464,8 @@ t/60-autoqc-results-spatial_filter.t
 t/60-autoqc-results-split_stats.t
 t/60-autoqc-results-tag_decode_stats.t
 t/60-autoqc-results-tag_metrics.t
+t/70-mqc-reporter.t
+t/70-mqc-outcomes.t
 t/80-autoqc-qc-script.t
 t/autoqc_util.pm
 t/data/api_dbic_fixtures/npg_qc/RunTimeline.yml
@@ -813,6 +815,8 @@ t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/Data/Intens
 t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/Data/Intensities/PB_basecalls_20101014-161249/Matrix/s_1_1_matrix.txt
 t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/Data/Intensities/PB_basecalls_20101014-161249/Matrix/s_1_2_matrix.txt
 t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/RunInfo.xml
+t/data/qcoutcomes/fixtures/000-mqc_library_outcome_dict.yml
+t/data/qcoutcomes/fixtures/000-mqc_outcome_dict.yml
 t/data/qc_webcache/npg/run/10.xml
 t/data/qc_webcache/npg/run/12.xml
 t/data/qc_webcache/npg/run/1.xml

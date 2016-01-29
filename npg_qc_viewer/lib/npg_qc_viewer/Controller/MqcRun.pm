@@ -6,45 +6,30 @@ use Readonly;
 use Try::Tiny;
 use Carp;
 
-use npg_qc_viewer::Model::MLWarehouseDB;
-use npg_qc::Schema::Mqc::OutcomeEntity;
-
 BEGIN { extends 'Catalyst::Controller::REST' }
-with 'npg_qc_viewer::Util::Error';
-with 'npg_qc_viewer::Util::ExtendedHttpStatus';
+with qw/
+        npg_qc_viewer::Util::Error
+        npg_qc_viewer::Util::ExtendedHttpStatus
+       /;
 
 our $VERSION = '0';
 
 __PACKAGE__->config( default => 'application/json' );
 
-Readonly::Scalar my $MQC_ROLE      => q[manual_qc];
 Readonly::Scalar my $MQC_LANE_ENT  => q[MqcOutcomeEnt];
 Readonly::Scalar my $MQC_LIB_ENT   => q[MqcLibraryOutcomeEnt];
-
-sub _authenticate {
-  my ( $self, $c ) = @_;
-
-  my $authenticated;
-  try {
-    $c->controller('Root')->authorise( $c, ($MQC_ROLE) );
-    $authenticated = 1;
-  };
-
-  return $authenticated;
-}
 
 sub _fill_entity_for_response{
   my ($self, $id_run, $c) = @_;
 
-  my $authenticated = $self->_authenticate($c);
   my $hash_entity = {};
   $hash_entity->{'id_run'}                     = $id_run;
   my $crs = $c->model('NpgDB')->resultset('Run')->find($id_run)->current_run_status;
   $hash_entity->{'current_status_description'} = $crs ? $crs->description    : q[];
   $hash_entity->{'taken_by'}                   = $crs ? $crs->user->username : q[];
-  #username from authentication
-  $hash_entity->{'current_user'}       = $authenticated ? $c->user->username                : q[];
-  $hash_entity->{'has_manual_qc_role'} = $authenticated ? $c->check_user_roles(($MQC_ROLE)) : q[];
+  my $user_info = $c->model('User')->logged_user($c);
+  $hash_entity->{'current_user'}       = $user_info->{'username'};
+  $hash_entity->{'has_manual_qc_role'} = $user_info->{'has_mqc_role'};
 
   return $hash_entity;
 }

@@ -13,12 +13,9 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOC');
 
     if ($self->args('installjsdeps')) {
       if (which('node') and which('bower')) {
-        my $current = getcwd();
-        chdir 'root/static';
         warn "Checking/fetching javascript dependencies\n";
       
         my $result = system 'bower install';
-        chdir $current;
         if ($result) {
           die 'Fail to install bower javascript dependencies';
         }
@@ -85,6 +82,7 @@ my $builder = $class->new(
         'GD::Image'                                    => '0',
         'HTTP::Request'                                => '0',
         'JSON'                                         => '0',
+        'JSON::XS'                                     => '0',
         'LWP::UserAgent'                               => '0',
         'List::MoreUtils'                              => '0',
         'Math::Gradient'                               => '0',
@@ -104,12 +102,15 @@ my $builder = $class->new(
         'npg_tracking::Schema'                         => '0',
         'npg_tracking::daemon'                         => '0',
         'npg_tracking::util::types'                    => '0',
+        'npg_tracking::glossary::composition::component::illumina' => '0',
+        'npg_tracking::glossary::composition::factory::rpt' => '0',
         'npg_qc::Schema'                               => '0',
         'npg_qc::autoqc::qc_store'                     => '0',
         'npg_qc::autoqc::qc_store::options'            => '0',
         'npg_qc::autoqc::role::rpt_key'                => '0',
         'npg_qc::autoqc::results::collection'          => '0',
         'npg_qc::autoqc::checks::check'                => '0',
+        'npg_qc::mqc::outcomes'                        => '0',
         'WTSI::DNAP::Warehouse::Schema'                => '0',
    },
 
@@ -134,7 +135,9 @@ my $builder = $class->new(
         'Test::Distribution'                            => '0',
         'Test::MockObject'                              => '0',
         'Test::WWW::Mechanize::Catalyst'                => '0',
+        'URI::Escape'                                   => '0',
         'XML::LibXML'                                   => '1.70',
+        'npg_tracking::glossary::rpt'                   => '0',
    },
 );
 

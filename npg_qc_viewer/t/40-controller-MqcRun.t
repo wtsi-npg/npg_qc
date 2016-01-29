@@ -7,6 +7,8 @@ use JSON;
 use t::util;
 
 my $util = t::util->new();
+$util->modify_logged_user_method();
+
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
@@ -66,7 +68,7 @@ lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
            'current_user'               => q[],
            'has_manual_qc_role'         => q[],
            'qc_plex_status'             => {},
-           'mqc_lib_limit'              => 50,
+           'mqc_lib_limit'              => 400,
            'position'                   => '1',
            'id_run'                     => '4025',
            'taken_by'                   => 'pipeline',
@@ -115,7 +117,7 @@ lives_ok { $schema = $util->test_env_setup()} 'test db created and populated';
            'current_user'               => q[],
            'has_manual_qc_role'         => q[],
            'qc_plex_status'             => {},
-           'mqc_lib_limit'              => 50,
+           'mqc_lib_limit'              => 400,
            'position'                   => '1',
            'id_run'                     => '4950',
            'taken_by'                   => q[sl1],

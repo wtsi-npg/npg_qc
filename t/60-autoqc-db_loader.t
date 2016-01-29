@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 14;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -8,6 +8,7 @@ use Perl6::Slurp;
 use JSON;
 use Archive::Extract;
 use File::Temp qw/ tempdir /;
+use File::Copy 'cp';
 use List::MoreUtils qw/ uniq /;
 
 use npg_testing::db;
@@ -512,6 +513,32 @@ subtest 'loading bam_flagstats and its related objects from memory' => sub {
   is ($ss[2]->iscurrent, 1, 'iscurrent flag is set to true');
   is ($ss[3]->iscurrent, 1, 'iscurrent flag is set to true');
   ok ($ss[0]->date, 'date is set');
+};
+
+subtest 'force load related objects from memory' => sub {
+  plan tests => 2;
+
+  my $new_dir =  join q[/], $tempdir, 'test1';
+  mkdir $new_dir;
+  my $file = '17448_1#9.bam_flagstats.json';
+  my $new_file = join q[/], $new_dir, $file;
+  cp join(q[/], $tempdir, '17448_1_9/qc/all_json', $file), $new_file;
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+       schema       => $schema,
+       verbose      => 0,
+       json_file    => [$new_file],
+  );
+  lives_ok { $db_loader->load() } 'no attempt to recompute related objects';
+
+  $db_loader = npg_qc::autoqc::db_loader->new(
+       schema       => $schema,
+       verbose      => 0,
+       force_load_related => 1,
+       json_file    => [$new_file],
+  );
+  throws_ok { $db_loader->load() }
+    qr/Attribute \(sequence_file\) does not pass the type constraint/,
+    'attempt to recompute related objects';
 };
 
 1;

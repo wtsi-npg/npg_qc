@@ -17,9 +17,7 @@ popd
 ./Build test --verbose
 pushd npg_qc_viewer
 ./Build test --verbose
-popd
-
-pushd npg_qc_viewer/root/static
-node-qunit-phantomjs test/test.html --verbose
-node-qunit-phantomjs test/test_format_for_csv.html --verbose
+node-qunit-phantomjs t/client/test.html --verbose
+node-qunit-phantomjs t/client/test_format_for_csv.html --verbose
+node-qunit-phantomjs t/client/test_modify_on_view.html --verbose
 popd

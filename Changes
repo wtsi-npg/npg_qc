@@ -1,6 +1,48 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - JSON service (retrieval) for qc outcomes
+ - update link to picard in POD
+ - SeqQC:
+   - remove use of autocrud plugin - it's never been used
+   - simplify the authorisation and it make more secure (do not fetch
+     user credentials from the url), move the code to a new User model
+   - in tests extend the User model to allow for getting user credentials
+     from the url
+   - avoid warnings in tests by setting the default for the username to
+     an empty string
+   - if the user is logged in and is authorised to do manual qc, display
+     a visual que on the top of the page
+   - tag metrics column moved next to the column with tag index and tag sequence
+   - show deplexing percent for individual tags in tag metrics column
+
+release 59.8
+ - give LIMs time to process posting qc outcomes as individual events
+ - SeqQC
+   - upgrading bcviz to 1.3.1 from 1.3.0 (individual minified files)
+
+release 59.7
+ - SeqQC
+   - bower configuration files in npg_qc/npg_qc_viewer
+   - moving client test files to npg_qc/npg_qc_viewer/t/client
+   - fix regression, missing require for table-export
+
+release 59.6
+ - SeqQC
+   - generating bcviz plots only when they will become visible and remove
+     them when they will not be visible
+   - set max number of plexes for manual QC as 400
+
+release 59.5
+ - autoqc results db loader: an option to force a re-build of related objects
+ - SeqQC
+   - fix warning about undef value in the adapter template
+   - fix closing div tag in verify bam id template 
+   - upgrading jquery to 2.1.4 from 2.0.3
+   - upgrading requirejs to 2.1.20 from 2.1.8
+   - upgrading qunit to 1.20.0 from 1.15.0
+   - upgrading bcviz to 1.3.0 from 1.2.1
  - travis ci testing perl modules for npg_qc and npg_qc_viewer
+ - require DBD::SQLite@1.48 to run tests
 
 release 59.4
  - saving manual qc values for libraries - allow for an undefined or empty
