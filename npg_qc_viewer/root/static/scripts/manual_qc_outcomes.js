@@ -1,5 +1,6 @@
+/* globals document: false, $: false, define: false, window: false, NPG: false */
 'use strict';
-define(['jquery'], function ($) {
+define(['jquery'], function () {
   var _classNameForOutcome = function (qc_outcome) {
     var new_class = '';
     if( qc_outcome.mqc_outcome === 'Accepted final' ) {
@@ -71,7 +72,7 @@ define(['jquery'], function ($) {
     });
   };
 
-  var setPageForManualQC = function() {
+  var setPageForManualQCProcess = function() {
     // Getting the run_id from the title of the page using the qc part too.
     var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                           .find("title")
@@ -98,11 +99,24 @@ define(['jquery'], function ($) {
     }
   };
 
+  var processManualQC = function (tableID, qcOutcomesURL) {
+    tableID = tableID ? tableID : 'results_summary';
+    qcOutcomesURL = qcOutcomesURL ? qcOutcomesURL : '/qcoutcomes';
+    var rptKeys = parseRptKeys(tableID);
+    var outcomesURL = qcOutcomesURL;
+    var process = function (data, textStatus, jqXHR) {
+      updateQCOutcomes(data);
+      setPageForManualQCProcess();
+    };
+    fetchMQCOutcomes(rptKeys, outcomesURL, process);
+  };
+
   return {
     fetchMQCOutcomes : fetchMQCOutcomes,
     buildQuery: buildQuery,
-    setPageForManualQC : setPageForManualQC,
+    setPageForManualQCProcess : setPageForManualQCProcess,
     updateQCOutcomes: updateQCOutcomes,
     parseRptKeys: parseRptKeys,
+    processManualQC: processManualQC,
   };
 });
