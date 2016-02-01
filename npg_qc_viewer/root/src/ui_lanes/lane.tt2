@@ -5,7 +5,7 @@
     plex_class = 'tag_info';
 -%]
 
-<td class="[% lane_class %] nbsp"'>
+<td class="[% lane_class %] nbsp">
 
 [% have_link = 0;
    IF tag_index == '' && lane_collection && lane_collection.size;
