@@ -65,7 +65,8 @@ define(['jquery'], function () {
       url: outcomesURL,
       type: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify(data)
+      data: JSON.stringify(data),
+      cache: false
     }).error(function(jqXHR, textStatus, errorThrown) {
       window.console.log( jqXHR.responseJSON );
     }).success(function (data, textStatus, jqXHR) {
