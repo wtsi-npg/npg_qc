@@ -6,7 +6,7 @@ require.config({
   },
 });
 
-require(['scripts/manual_qc_outcomes',],
+require(['scripts/qc_outcomes_view',],
   function(mqc_outcomes) {
     QUnit.test('Parsing RPT keys', function (assert) {
       var rptKeys = mqc_outcomes.parseRptKeys('results_summary');
@@ -28,7 +28,7 @@ require(['scripts/manual_qc_outcomes',],
       assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
 
       lanes =0; lanesWithClass = 0;
-      mqc_outcomes.updateQCOutcomes(qcOutcomes);
+      mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
         lanes++;
         var $obj = $(obj);
@@ -40,7 +40,7 @@ require(['scripts/manual_qc_outcomes',],
       assert.equal(lanesWithClass, 3, 'Correct number of lanes with updated class');
 
       lanes =0; lanesWithClass = 0;
-      mqc_outcomes.updateQCOutcomes(qcOutcomes);
+      mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.lane').each(function (i, obj) {
         lanes++;
         var $obj = $(obj);
@@ -80,7 +80,7 @@ require(['scripts/manual_qc_outcomes',],
         var rptKeys = mqc_outcomes.parseRptKeys('results_summary');
         var whatToDoWithOutcomes = function(data, textStatus, jqXHR) {
           var lanes = 0, lanesWithClass = 0;
-          mqc_outcomes.updateQCOutcomes(data);
+          mqc_outcomes.updateDisplayQCOutcomes(data);
           $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
             lanes++;
             var $obj = $(obj);

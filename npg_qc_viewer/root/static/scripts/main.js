@@ -26,17 +26,17 @@ require.onError = function (err) {
 require([
   'scripts/manual_qc',
   'scripts/manual_qc_ui',
-  'scripts/manual_qc_outcomes',
+  'scripts/qc_outcomes_view',
   'scripts/plots',
   'scripts/format_for_csv',
   'unveil',
   'table-export'
 ],
-function( manual_qc, manual_qc_ui, manual_qc_outcomes, plots, format_for_csv, unveil) {
+function( manual_qc, manual_qc_ui, qc_outcomes_view, plots, format_for_csv, unveil) {
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
-    manual_qc_outcomes.processManualQC();
+    qc_outcomes_view.processQC();
   });
 
   //Required to show error messages from the mqc process.

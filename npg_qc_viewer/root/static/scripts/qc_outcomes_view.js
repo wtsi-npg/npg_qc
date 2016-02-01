@@ -35,9 +35,10 @@ define(['jquery'], function () {
     var idPrefix = 'rpt_key:';
     $('#' + idTable + ' tr').each(function (i, obj) {
       var $obj = $(obj);
-      if( $obj.attr('id') !== undefined && $obj.attr('id').startsWith(idPrefix)) {
-        var rptKey = $obj.attr('id').substring(idPrefix.length);
-        if( rptKey !== undefined && $.inArray(rptKey, rptKeys) === -1 ) {
+      var id = $obj.attr('id');
+      if( typeof(id) !== 'undefined' && id !== null && id.lastIndexOf(idPrefix) === 0 ) {
+        var rptKey = id.substring(idPrefix.length);
+        if( typeof(rptKey) !== 'undefined' && $.inArray(rptKey, rptKeys) === -1 ) {
           rptKeys.push(rptKey);
         }
       }
@@ -45,7 +46,7 @@ define(['jquery'], function () {
     return rptKeys;
   };
 
-  var updateQCOutcomes = function (outcomesData) {
+  var updateDisplayQCOutcomes = function (outcomesData) {
     _processOutcomes(outcomesData.lib, 'tag_info');
     _processOutcomes(outcomesData.seq, 'lane');
   };
@@ -80,7 +81,7 @@ define(['jquery'], function () {
                                                           .find("title")
                                                           .text());
     //If id_run
-    if(typeof(runTitleParserResult) !== undefined && runTitleParserResult != null) {
+    if(typeof(runTitleParserResult) !== 'undefined' && runTitleParserResult != null) {
       var id_run = runTitleParserResult.id_run;
       var prodConfiguration = new NPG.QC.ProdConfiguration();
       //Read information about lanes from page.
@@ -101,13 +102,13 @@ define(['jquery'], function () {
     }
   };
 
-  var processManualQC = function (tableID, qcOutcomesURL) {
+  var processQC = function (tableID, qcOutcomesURL) {
     tableID = tableID ? tableID : 'results_summary';
     qcOutcomesURL = qcOutcomesURL ? qcOutcomesURL : '/qcoutcomes';
     var rptKeys = parseRptKeys(tableID);
     var outcomesURL = qcOutcomesURL;
     var process = function (data, textStatus, jqXHR) {
-      updateQCOutcomes(data);
+      updateDisplayQCOutcomes(data);
       setPageForManualQCProcess();
     };
     fetchMQCOutcomes(rptKeys, outcomesURL, process);
@@ -117,8 +118,8 @@ define(['jquery'], function () {
     fetchMQCOutcomes : fetchMQCOutcomes,
     buildQuery: buildQuery,
     setPageForManualQCProcess : setPageForManualQCProcess,
-    updateQCOutcomes: updateQCOutcomes,
+    updateDisplayQCOutcomes: updateDisplayQCOutcomes,
     parseRptKeys: parseRptKeys,
-    processManualQC: processManualQC,
+    processQC: processQC,
   };
 });
