@@ -22,7 +22,7 @@ define(['jquery'], function () {
       if(elementClass === 'lane') {
         rptKeyAsSelector = 'tr[id*="rpt_key:' + rpt_key + '"]';
       } else if (elementClass === 'tag_info') {
-        //jQuery can handle ':' as part of id but needs to be escaped as '\\3A '
+        //jQuery can handle ':' as part of a DOM id but needs to be escaped as '\\3A '
         rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
       } else {
         throw 'Invalid type of rpt key element class ' + elementClass;
