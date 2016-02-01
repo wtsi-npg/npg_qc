@@ -32,10 +32,11 @@ define(['jquery'], function () {
 
   var parseRptKeys = function (idTable) {
     var rptKeys = [];
+    var idPrefix = 'rpt_key:';
     $('#' + idTable + ' tr').each(function (i, obj) {
       var $obj = $(obj);
-      if( $obj.attr('id') !== undefined ) {
-        var rptKey = $obj.attr('id').substring('rpt_key:'.length);
+      if( $obj.attr('id') !== undefined && $obj.attr('id').startsWith(idPrefix)) {
+        var rptKey = $obj.attr('id').substring(idPrefix.length);
         if( rptKey !== undefined && $.inArray(rptKey, rptKeys) === -1 ) {
           rptKeys.push(rptKey);
         }
