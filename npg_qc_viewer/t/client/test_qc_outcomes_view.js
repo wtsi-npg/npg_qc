@@ -9,7 +9,7 @@ require.config({
 require(['scripts/qc_outcomes_view',],
   function(mqc_outcomes) {
     QUnit.test('Parsing RPT keys', function (assert) {
-      var rptKeys = mqc_outcomes.parseRptKeys('results_summary');
+      var rptKeys = mqc_outcomes._parseRptKeys('results_summary');
       var expected = ['18245:1', '18245:1:1', '18245:1:2','19001:1', '19001:1:1', '19001:1:2'];
       assert.deepEqual(rptKeys, expected, 'Correct rpt keys');
     });
@@ -28,7 +28,7 @@ require(['scripts/qc_outcomes_view',],
       assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
 
       rows = 0; lanesWithClass = 0;
-      mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -40,7 +40,7 @@ require(['scripts/qc_outcomes_view',],
       assert.equal(lanesWithClass, 3, 'Correct number of lanes with updated class');
 
       rows = 0; lanesWithClass = 0;
-      mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.lane').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -51,7 +51,7 @@ require(['scripts/qc_outcomes_view',],
       assert.equal(rows, 3, 'Correct number of lanes');
       assert.equal(lanesWithClass, 0, 'Correct number of lanes with updated class different run');
     });
-    
+
     QUnit.test('Updating lib outcomes Accepted final', function(assert) {
       var qcOutcomes = {"lib":{"18245:1:1":{"tag_index":1,"mqc_outcome":"Accepted final","position":"1","id_run":"18245"}},
                         "seq":{}};
@@ -67,7 +67,7 @@ require(['scripts/qc_outcomes_view',],
       assert.equal(tagsWithClass, 0, 'Initially tags have no class');
 
       rows = 0; tagsWithClass = 0;
-      mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -83,7 +83,7 @@ require(['scripts/qc_outcomes_view',],
       });
 
       rows = 0; tagsWithClass = 0;
-      mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -105,14 +105,14 @@ require(['scripts/qc_outcomes_view',],
         var dataAsObject = JSON.parse(options.data);
         var expectedData = JSON.parse('{"18245:1":{},"18245:1:1":{},"18245:1:2":{},"19001:1":{},"19001:1:1":{},"19001:1:2":{}}');
         assert.deepEqual(dataAsObject, expectedData, 'Data in request is as expected');
-        
+
         var data = {
           "lib":{ "19001:1:2":{ "tag_index":2,"mqc_outcome":"Rejected preliminary","position":"1","id_run":"19001" } },
-          "seq":{ "18245:1":{ "mqc_outcome":"Accepted final", "position":1, "id_run":18245 } } 
+          "seq":{ "18245:1":{ "mqc_outcome":"Accepted final", "position":1, "id_run":18245 } }
         };
-        options.success = function (callback) { 
+        options.success = function (callback) {
           callback(data, 'success', {});
-          return options; 
+          return options;
         };
         options.error = function (callback) { return options; };
         return options;
@@ -120,7 +120,6 @@ require(['scripts/qc_outcomes_view',],
 
       try {
         var lanes = 0, lanesWithClass = 0;
-        var rptKeys = mqc_outcomes.parseRptKeys('results_summary');
         var whatToDoWithOutcomes = function(data, textStatus, jqXHR) {
           var lanes = 0, lanesWithClass = 0;
           $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
@@ -141,7 +140,7 @@ require(['scripts/qc_outcomes_view',],
           assert.equal(tags, 3, 'Correct number of tags');
           assert.equal(tagsWithClass, 1, 'Correct number of tags with new class');
         };
-        
+
         $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
           lanes++;
           if ($(obj).hasClass('qc_outcome_accepted_final')) {
@@ -151,7 +150,7 @@ require(['scripts/qc_outcomes_view',],
         assert.equal(lanes, 3, 'Correct number of lanes');
         assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
 
-        mqc_outcomes.fetchMQCOutcomes(rptKeys, '/qcoutcomes', whatToDoWithOutcomes);
+        mqc_outcomes.fetchAndProcessQC('results_summary', '/qcoutcomes', whatToDoWithOutcomes);
       } catch (err) {
         console.log(err);
       } finally {

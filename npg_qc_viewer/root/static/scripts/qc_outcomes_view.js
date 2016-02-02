@@ -1,4 +1,27 @@
-/* globals document: false, $: false, define: false, window: false, NPG: false */
+/*
+ * Module which provides functionality for fetching and rendering QC outcomes
+ * from the npg_qc_viewer qcoutcomes JSON service. 
+ *
+ * The function processQC wraps the logic for fetching the QC outcomes and
+ * rendering them in the current page. It also allows to define a callback
+ * function to do post processing e.g. prepare the interface for manual QC.
+ * 
+ * The function requires the DOM id for the summary table and the URL for the
+ * JSON service as parameters. The callback for postprocessing is optional.
+ *
+ * Example:
+ *
+ *   var postRendering = function() {
+ *     doSomethingWithRenderedPage();
+ *     andMaybeSomethingElse();
+ *   }
+ *
+ *   qc_outcomes_view.fetchAndProcessQC('summary_table_id',
+ *                              'qcoutcomes_json_url',
+ *                              postRendering);
+ *
+ */
+/* globals $: false, define: false */
 'use strict';
 define(['jquery'], function () {
   var _classNames = 'qc_outcome_accepted_final qc_outcome_accepted_preliminary qc_outcome_rejected_final qc_outcome_rejected_preliminary qc_outcome_undecided qc_outcome_undecided_final'.split(' ');
@@ -35,7 +58,7 @@ define(['jquery'], function () {
     }
   };
 
-  var parseRptKeys = function (idTable) {
+  var _parseRptKeys = function (idTable) {
     var rptKeys = [];
     var idPrefix = 'rpt_key:';
     $('#' + idTable + ' tr').each(function (i, obj) {
@@ -51,12 +74,12 @@ define(['jquery'], function () {
     return rptKeys;
   };
 
-  var updateDisplayQCOutcomes = function (outcomesData) {
+  var _updateDisplayQCOutcomes = function (outcomesData) {
     _processOutcomes(outcomesData.lib, 'tag_info');
     _processOutcomes(outcomesData.seq, 'lane');
   };
 
-  var buildQuery = function (rptKeys) {
+  var _buildQuery = function (rptKeys) {
     var data = { };
     for( var i = 0; i < rptKeys.length; i++ ) {
       data[rptKeys[i]] = {};
@@ -64,8 +87,8 @@ define(['jquery'], function () {
     return data;
   };
 
-  var fetchMQCOutcomes = function (rptKeys, outcomesURL, callOnSuccess) {
-    var data = buildQuery(rptKeys);
+  var _fetchQCOutcomesUpdateView = function (rptKeys, outcomesURL, callOnSuccess) {
+    var data = _buildQuery(rptKeys);
 
     $.ajax({
       url: outcomesURL,
@@ -74,32 +97,41 @@ define(['jquery'], function () {
       data: JSON.stringify(data),
       cache: false
     }).error(function(jqXHR, textStatus, errorThrown) {
-      window.console.log( jqXHR.responseJSON );
-      throw "Error while fetching QC outcomes.";
+      $('#ajax_status').append("<li class='failed_mqc'>Error while fetching QC outcomes. " + errorThrown + '</li>');
     }).success(function (data, textStatus, jqXHR) {
       try {
-        updateDisplayQCOutcomes(data);
-        callOnSuccess();
+        _updateDisplayQCOutcomes(data);
+        if(typeof callOnSuccess === 'function' ) {
+          callOnSuccess();
+        }
       } catch (er) {
         throw er;
       }
     });
   };
 
-  var processQC = function (tableID, qcOutcomesURL, callbackAfterUpdateView) {
+  var fetchAndProcessQC = function (tableID, qcOutcomesURL, callbackAfterUpdateView) {
     try {
-      var rptKeys = parseRptKeys(tableID);
-      fetchMQCOutcomes(rptKeys, qcOutcomesURL, callbackAfterUpdateView);
+      var rptKeys = _parseRptKeys(tableID);
+      _fetchQCOutcomesUpdateView(rptKeys, qcOutcomesURL, callbackAfterUpdateView);
     } catch (er) {
-      window.console.log(er);
+      var message;
+      if(typeof er === 'string') {
+        message = er;
+      } else if (typeof er === 'object' && typeof er['message'] === 'string') {
+          message = er.message;
+      } else {
+        message = '' + er;
+      }
+      $('#ajax_status').append("<li class='failed_mqc'>" + message + '</li>');
     }
   };
 
   return {
-    fetchMQCOutcomes : fetchMQCOutcomes,
-    buildQuery: buildQuery,
-    updateDisplayQCOutcomes: updateDisplayQCOutcomes,
-    parseRptKeys: parseRptKeys,
-    processQC: processQC,
+    _fetchQCOutcomesUpdateView : _fetchQCOutcomesUpdateView,
+    _buildQuery: _buildQuery,
+    _updateDisplayQCOutcomes: _updateDisplayQCOutcomes,
+    _parseRptKeys: _parseRptKeys,
+    fetchAndProcessQC: fetchAndProcessQC,
   };
 });
