@@ -57,6 +57,33 @@ var NPG;
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
 
+    QC.launchManualQCProcesses = function () {
+      // Getting the run_id from the title of the page using the qc part too.
+      var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
+                                                            .find("title")
+                                                            .text());
+      //If id_run
+      if(typeof(runTitleParserResult) !== 'undefined' && runTitleParserResult != null) {
+        var id_run = runTitleParserResult.id_run;
+        var prodConfiguration = new NPG.QC.ProdConfiguration();
+        //Read information about lanes from page.
+        var lanes = []; //Lanes without previous QC, blank BG
+        var control;
+
+        if (runTitleParserResult.isRunPage) {
+          var lanesWithBG = []; //Lanes with previous QC, BG with colour
+          control = new NPG.QC.RunPageMQCControl(prodConfiguration);
+          control.parseLanes(lanes, lanesWithBG);
+          control.prepareMQC(id_run, lanes, lanesWithBG);
+        } else {
+          var position = runTitleParserResult.position;
+          control = new NPG.QC.LanePageMQCControl(prodConfiguration);
+          control.parseLanes(lanes);
+          control.prepareMQC(id_run, position, lanes);
+        }
+      }
+    };
+
     var MQCControl = (function () {
       function MQCControl(abstractConfiguration) {
         this.outcome               = null;  // Current outcome (Is updated when linked to an object in the view)
@@ -104,23 +131,35 @@ var NPG;
       /**
        * Methods to deal with background colours.
        */
+      MQCControl.prototype.removeAllQCOutcomeCSSClasses = function () {
+        this.lane_control.parent()
+                         .css("background-color", "#ffffff")
+                         .removeClass(function (index, css) {
+          return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
+        });
+      };
+
       MQCControl.prototype.setAcceptedBG = function() {
-        this.lane_control.parent().css("background-color", "#B5DAFF");
+        this.removeAllQCOutcomeCSSClasses();
+        this.lane_control.parent().addClass('qc_outcome_accepted_final');
       };
 
       MQCControl.prototype.setRejectedBG = function () {
-        this.lane_control.parent().css("background-color", "#F99389");
+        this.removeAllQCOutcomeCSSClasses();
+        this.lane_control.parent().addClass('qc_outcome_rejected_final');
       };
 
       MQCControl.prototype.setAcceptedPreliminaryBG = function() {
-        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.removeAllQCOutcomeStyles();
+        this.lane_control.parent().addClass('qc_outcome_accepted_preliminary');
         this.lane_control.css("padding-right", "0px");
         this.lane_control.css("padding-left", "0px");
         this.lane_control.parent().prop('title', 'Preliminary pass in manual QC, waiting for final decision');
       };
 
       MQCControl.prototype.setRejectedPreliminaryBG = function() {
-        this.lane_control.parent().css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        this.removeAllQCOutcomeCSSClasses();
+        this.lane_control.parent().addClass('qc_outcome_rejected_preliminary');
         this.lane_control.css("padding-right", "0px");
         this.lane_control.css("padding-left", "0px");
         this.lane_control.parent().prop('title', 'Preliminary fail in manual QC, waiting for final decision');
@@ -137,13 +176,15 @@ var NPG;
       };
 
       MQCControl.prototype.setAcceptedPre = function() {
-        this.lane_control.parent().css("background-color", "#E5F2FF");
         this.outcome = this.CONFIG_ACCEPTED_PRELIMINARY;
+        this.removeAllQCOutcomeCSSClasses();
+        this.lane_control.parent().css("background-color", "#E5F2FF");
         this.lane_control.children('.lane_mqc_save').show();
       };
 
       MQCControl.prototype.setRejectedPre = function() {
         this.outcome = this.CONFIG_REJECTED_PRELIMINARY;
+        this.removeAllQCOutcomeCSSClasses();
         this.lane_control.parent().css("background-color", "#FFDDDD");
         this.lane_control.children('.lane_mqc_save').show();
       };
@@ -163,8 +204,8 @@ var NPG;
       };
 
       MQCControl.prototype.setUndecided = function() {
-        this.lane_control.parent().css("background-color", "#FFFFFF");
         this.outcome = this.CONFIG_UNDECIDED;
+        this.removeAllQCOutcomeCSSClasses();
         this.lane_control.children('.lane_mqc_save').hide();
       };
 
@@ -471,28 +512,28 @@ var NPG;
       LibraryMQCControl.prototype.setAcceptedPreliminaryBG = function() {
         var lane = this.lane_control.parent();
         lane = $(lane);
-        lane.css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        lane.addClass("qc_outcome_accepted_preliminary");
         lane.prop('title', 'Preliminary pass in manual QC, waiting for final decision');
       };
 
       LibraryMQCControl.prototype.setRejectedPreliminaryBG = function() {
         var lane = this.lane_control.parent();
         lane = $(lane);
-        lane.css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        lane.addClass("qc_outcome_rejected_preliminary");
         lane.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
 
       LibraryMQCControl.prototype.setTagAcceptedPreliminaryBG = function() {
         var sibling_tag_index = this.lane_control.parent().parent().children('.tag_info').first();
         sibling_tag_index = $(sibling_tag_index);
-        sibling_tag_index.css("background", "repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        sibling_tag_index.addClass("qc_outcome_accepted_preliminary");
         sibling_tag_index.prop('title', 'Preliminary pass in manual QC, waiting for final decision');
       };
 
       LibraryMQCControl.prototype.setTagRejectedPreliminaryBG = function() {
         var sibling_tag_index = this.lane_control.parent().parent().children('.tag_info').first();
         sibling_tag_index = $(sibling_tag_index);
-        sibling_tag_index.css("background", "repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px)");
+        sibling_tag_index.addClass("qc_outcome_rejected_preliminary");
         sibling_tag_index.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
       };
 
@@ -579,7 +620,7 @@ var NPG;
           obj = $(obj);
           var parent = obj.parent();
           //Not considering lanes previously marked as passes/failed
-          if(parent.hasClass('passed') || parent.hasClass('failed')) {
+          if(parent.hasClass('qc_outcome_accepted_final') || parent.hasClass('qc_outcome_rejected_final')) {
             lanesWithBG.push(parent);
           } else {
             lanes.push(parent);
@@ -855,6 +896,12 @@ var NPG;
           throw new Error("Error: Invalid arguments");
         }
         var self = this;
+
+        $('.lane, .tag_info').css("background-color", "#ffffff")
+                  .removeClass(function (index, css) {
+          return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
+        });
+
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
           for(j = 0; j < cells.length; j++) {

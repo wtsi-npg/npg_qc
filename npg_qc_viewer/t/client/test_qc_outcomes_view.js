@@ -15,43 +15,86 @@ require(['scripts/qc_outcomes_view',],
     });
 
     QUnit.test('Updating seq outcomes Accepted final', function(assert) {
-      var qcOutcomes = {"lib":{},"seq":{"18245:1":{"mqc_outcome":"Accepted final","position":"1","id_run":"18245"}, "19001:1": {}}};
-      var lanes = 0, lanesWithClass = 0;
+      var qcOutcomes = {"lib":{},"seq":{"18245:1":{"mqc_outcome":"Accepted final","position":"1","id_run":"18245"}}};
+      var rows = 0, lanesWithClass = 0;
       $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
-        lanes++;
+        rows++;
         var $obj = $(obj);
-        if ($obj.hasClass('passed')) {
+        if ($obj.hasClass('qc_outcome_accepted_final')) {
           lanesWithClass++;
         }
       });
-      assert.equal(lanes, 3, 'Correct number of lanes');
+      assert.equal(rows, 3, 'Correct number of rows');
       assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
 
-      lanes =0; lanesWithClass = 0;
+      rows = 0; lanesWithClass = 0;
       mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
-        lanes++;
+        rows++;
         var $obj = $(obj);
-        if ($obj.hasClass('passed')) {
+        if ($obj.hasClass('qc_outcome_accepted_final')) {
           lanesWithClass++;
         }
       });
-      assert.equal(lanes, 3, 'Correct number of lanes');
+      assert.equal(rows, 3, 'Correct number of lanes');
       assert.equal(lanesWithClass, 3, 'Correct number of lanes with updated class');
 
-      lanes =0; lanesWithClass = 0;
+      rows = 0; lanesWithClass = 0;
       mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.lane').each(function (i, obj) {
-        lanes++;
+        rows++;
         var $obj = $(obj);
-        if ($obj.hasClass('passed')) {
+        if ($obj.hasClass('qc_outcome_accepted_final')) {
           lanesWithClass++;
         }
       });
-      assert.equal(lanes, 3, 'Correct number of lanes');
-      assert.equal(lanesWithClass, 0, 'Correct number of lanes with updated class');
+      assert.equal(rows, 3, 'Correct number of lanes');
+      assert.equal(lanesWithClass, 0, 'Correct number of lanes with updated class different run');
     });
     
+    QUnit.test('Updating lib outcomes Accepted final', function(assert) {
+      var qcOutcomes = {"lib":{"18245:1:1":{"tag_index":1,"mqc_outcome":"Accepted final","position":"1","id_run":"18245"}},
+                        "seq":{}};
+      var rows = 0, tagsWithClass = 0;
+      $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
+        rows++;
+        var $obj = $(obj);
+        if ($obj.hasClass('qc_outcome_accepted_final')) {
+          tagsWithClass++;
+        }
+      });
+      assert.equal(rows, 3, 'Correct number of rows');
+      assert.equal(tagsWithClass, 0, 'Initially tags have no class');
+
+      rows = 0; tagsWithClass = 0;
+      mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
+      $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
+        rows++;
+        var $obj = $(obj);
+        if ($obj.hasClass('qc_outcome_accepted_final')) {
+          tagsWithClass++;
+        }
+      });
+      assert.equal(rows, 3, 'Correct number of rows');
+      assert.equal(tagsWithClass, 1, 'Correct number of tags with updated class');
+      $('#rpt_key\\3A 18245\\3A 1\\3A 1 td.tag_info').each(function (i, obj) {
+        var $obj = $(obj);
+        assert.ok($obj.hasClass('qc_outcome_accepted_final'), 'rpt key has correct outcome');
+      });
+
+      rows = 0; tagsWithClass = 0;
+      mqc_outcomes.updateDisplayQCOutcomes(qcOutcomes);
+      $('tr[id*="rpt_key:19001:1"] td.tag_info').each(function (i, obj) {
+        rows++;
+        var $obj = $(obj);
+        if ($obj.hasClass('qc_outcome_accepted_final')) {
+          tagsWithClass++;
+        }
+      });
+      assert.equal(rows, 3, 'Correct number of rows');
+      assert.equal(tagsWithClass, 0, 'Correct number of tags with updated class different run');
+    });
+
     QUnit.test('Test chainging the interface mocking ajax', function (assert) {
       expect(10);
       var old_ajax = $.ajax;
@@ -80,7 +123,6 @@ require(['scripts/qc_outcomes_view',],
         var rptKeys = mqc_outcomes.parseRptKeys('results_summary');
         var whatToDoWithOutcomes = function(data, textStatus, jqXHR) {
           var lanes = 0, lanesWithClass = 0;
-          mqc_outcomes.updateDisplayQCOutcomes(data);
           $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
             lanes++;
             if ($(obj).hasClass('qc_outcome_accepted_final')) {

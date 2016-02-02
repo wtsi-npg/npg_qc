@@ -424,6 +424,32 @@ a, a:link, a:visited, a:hover {
   background-color: #e7edf3;
 }
 
+/******************* QC outcome classes *************/
+.qc_outcome_accepted_final {
+  background: #b5daff none; /* 'none' after colour removes the repeating-linear-gradient */
+}
+
+.qc_outcome_accepted_preliminary {
+  background: #ffffff repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px);
+}
+
+.qc_outcome_rejected_final {
+  background: #F99389 none;
+}
+
+.qc_outcome_rejected_preliminary {
+  background: #ffffff repeating-linear-gradient(45deg, #FFDDDD, #FFDDDD 10px, #FFFFFF 10px, #FFFFFF 20px);
+}
+
+.qc_outcome_undecided {
+  background: #ffffff none;
+}
+
+.qc_outcome_undecided_final {
+  background: #ffffff none;
+}
+
+
 /******************* manual qc widgets **************/
 .td_mqc {
   min-width: 135px;

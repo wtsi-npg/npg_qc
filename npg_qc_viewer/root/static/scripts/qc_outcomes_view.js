@@ -1,14 +1,17 @@
 /* globals document: false, $: false, define: false, window: false, NPG: false */
 'use strict';
 define(['jquery'], function () {
-  var _classNameForOutcome = function (qc_outcome) {
-    var new_class = '';
-    if( qc_outcome.mqc_outcome === 'Accepted final' ) {
-      new_class = 'passed';
-    } else if (qc_outcome.mqc_outcome === 'Rejected final') {
-      new_class = 'failed';
+  var _classNames = 'qc_outcome_accepted_final qc_outcome_accepted_preliminary qc_outcome_rejected_final qc_outcome_rejected_preliminary qc_outcome_undecided qc_outcome_undecided_final'.split(' ');
+
+  var _classNameForOutcome = function (qcOutcome) {
+    var mqcOutcome = typeof qcOutcome !== 'undefined' && typeof qcOutcome.mqc_outcome !== 'undefined' ? qcOutcome.mqc_outcome : '';
+    var newClass = 'qc_outcome_' + mqcOutcome.toLowerCase();
+    newClass = newClass.replace(/ /g, '_');
+    if (_classNames.indexOf(newClass) !== -1) {
+      return newClass;
+    } else {
+      throw 'Unexpected outcome description ' + qcOutcome.mqc_outcome;
     }
-    return new_class;
   };
 
   var _processOutcomes = function (outcomes, elementClass) {
@@ -72,54 +75,29 @@ define(['jquery'], function () {
       cache: false
     }).error(function(jqXHR, textStatus, errorThrown) {
       window.console.log( jqXHR.responseJSON );
+      throw "Error while fetching QC outcomes.";
     }).success(function (data, textStatus, jqXHR) {
-      callOnSuccess(data, textStatus, jqXHR);
+      try {
+        updateDisplayQCOutcomes(data);
+        callOnSuccess();
+      } catch (er) {
+        throw er;
+      }
     });
   };
 
-  var setPageForManualQCProcess = function() {
-    // Getting the run_id from the title of the page using the qc part too.
-    var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
-                                                          .find("title")
-                                                          .text());
-    //If id_run
-    if(typeof(runTitleParserResult) !== 'undefined' && runTitleParserResult != null) {
-      var id_run = runTitleParserResult.id_run;
-      var prodConfiguration = new NPG.QC.ProdConfiguration();
-      //Read information about lanes from page.
-      var lanes = []; //Lanes without previous QC, blank BG
-      var control;
-
-      if (runTitleParserResult.isRunPage) {
-        var lanesWithBG = []; //Lanes with previous QC, BG with colour
-        control = new NPG.QC.RunPageMQCControl(prodConfiguration);
-        control.parseLanes(lanes, lanesWithBG);
-        control.prepareMQC(id_run, lanes, lanesWithBG);
-      } else {
-        var position = runTitleParserResult.position;
-        control = new NPG.QC.LanePageMQCControl(prodConfiguration);
-        control.parseLanes(lanes);
-        control.prepareMQC(id_run, position, lanes);
-      }
+  var processQC = function (tableID, qcOutcomesURL, callbackAfterUpdateView) {
+    try {
+      var rptKeys = parseRptKeys(tableID);
+      fetchMQCOutcomes(rptKeys, qcOutcomesURL, callbackAfterUpdateView);
+    } catch (er) {
+      window.console.log(er);
     }
-  };
-
-  var processQC = function (tableID, qcOutcomesURL) {
-    tableID = tableID ? tableID : 'results_summary';
-    qcOutcomesURL = qcOutcomesURL ? qcOutcomesURL : '/qcoutcomes';
-    var rptKeys = parseRptKeys(tableID);
-    var outcomesURL = qcOutcomesURL;
-    var process = function (data, textStatus, jqXHR) {
-      updateDisplayQCOutcomes(data);
-      setPageForManualQCProcess();
-    };
-    fetchMQCOutcomes(rptKeys, outcomesURL, process);
   };
 
   return {
     fetchMQCOutcomes : fetchMQCOutcomes,
     buildQuery: buildQuery,
-    setPageForManualQCProcess : setPageForManualQCProcess,
     updateDisplayQCOutcomes: updateDisplayQCOutcomes,
     parseRptKeys: parseRptKeys,
     processQC: processQC,

@@ -36,7 +36,7 @@ function( manual_qc, manual_qc_ui, qc_outcomes_view, plots, format_for_csv, unve
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
-    qc_outcomes_view.processQC();
+    qc_outcomes_view.processQC('results_summary', '/qcoutcomes', NPG.QC.launchManualQCProcesses);
   });
 
   //Required to show error messages from the mqc process.
