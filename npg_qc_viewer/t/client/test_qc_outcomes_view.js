@@ -53,7 +53,7 @@ require(['scripts/qc_outcomes_view',],
     });
     
     QUnit.test('Test chainging the interface mocking ajax', function (assert) {
-      expect(8);
+      expect(10);
       var old_ajax = $.ajax;
       $.ajax = function (options) {
         assert.equal(options.url, "/qcoutcomes", 'Correct request url');
@@ -64,7 +64,7 @@ require(['scripts/qc_outcomes_view',],
         assert.deepEqual(dataAsObject, expectedData, 'Data in request is as expected');
         
         var data = {
-          "lib":{},
+          "lib":{ "19001:1:2":{ "tag_index":2,"mqc_outcome":"Rejected preliminary","position":"1","id_run":"19001" } },
           "seq":{ "18245:1":{ "mqc_outcome":"Accepted final", "position":1, "id_run":18245 } } 
         };
         options.success = function (callback) { 
@@ -83,19 +83,26 @@ require(['scripts/qc_outcomes_view',],
           mqc_outcomes.updateDisplayQCOutcomes(data);
           $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
             lanes++;
-            var $obj = $(obj);
-            if ($obj.hasClass('passed')) {
+            if ($(obj).hasClass('qc_outcome_accepted_final')) {
               lanesWithClass++;
             }
           });
           assert.equal(lanes, 3, 'Correct number of lanes');
           assert.equal(lanesWithClass, 3, 'Correct number of lanes with new class');
+          var tags = 0, tagsWithClass = 0;
+          $('tr[id*="rpt_key:19001:1"]  td.tag_info').each(function (i, obj) {
+            tags++;
+            if ($(obj).hasClass('qc_outcome_rejected_preliminary')) {
+              tagsWithClass++;
+            }
+          });
+          assert.equal(tags, 3, 'Correct number of tags');
+          assert.equal(tagsWithClass, 1, 'Correct number of tags with new class');
         };
         
         $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
           lanes++;
-          var $obj = $(obj);
-          if ($obj.hasClass('passed')) {
+          if ($(obj).hasClass('qc_outcome_accepted_final')) {
             lanesWithClass++;
           }
         });
