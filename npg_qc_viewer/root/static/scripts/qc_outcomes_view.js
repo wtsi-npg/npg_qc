@@ -1,11 +1,11 @@
 /*
  * Module which provides functionality for fetching and rendering QC outcomes
- * from the npg_qc_viewer qcoutcomes JSON service. 
+ * from the npg_qc_viewer qcoutcomes JSON service.
  *
- * The function processQC wraps the logic for fetching the QC outcomes and
- * rendering them in the current page. It also allows to define a callback
+ * The function fetchAndProcessQC wraps the logic for fetching the QC outcomes
+ * and rendering them in the current page. It also allows to define a callback
  * function to do post processing e.g. prepare the interface for manual QC.
- * 
+ *
  * The function requires the DOM id for the summary table and the URL for the
  * JSON service as parameters. The callback for postprocessing is optional.
  *
@@ -48,7 +48,7 @@ define(['jquery'], function () {
       if(elementClass === 'lane') {
         rptKeyAsSelector = 'tr[id*="rpt_key:' + rpt_key + '"]';
       } else if (elementClass === 'tag_info') {
-        //jQuery can handle ':' as part of a DOM id but needs to be escaped as '\\3A '
+        //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
         rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
       } else {
         throw 'Invalid type of rpt key element class ' + elementClass;
