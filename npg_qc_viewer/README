@@ -34,11 +34,3 @@ Using custom bcviz
 In bcviz (your working copy) run 'bower link'.
 In npg-qc, npg_qc_viewer directory, run 'bower link bcviz'.
 
-Autocrud
---------
-
-  CATALYST_AUTOCRUD=1 bin/npg_qc_viewer_server.pl -p YOUR_PORT
-
-autocrud pages - npg tracking:
-read-only: autocrud/npgdb
-admin:     autocrud/site/admin/schema/npgdb
