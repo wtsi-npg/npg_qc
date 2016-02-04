@@ -26,6 +26,18 @@
 define(['jquery'], function () {
   var _classNames = 'qc_outcome_accepted_final qc_outcome_accepted_preliminary qc_outcome_rejected_final qc_outcome_rejected_preliminary qc_outcome_undecided qc_outcome_undecided_final'.split(' ');
 
+  var _displayError = function( er ) {
+    var message;
+    if(typeof er === 'string') {
+      message = er;
+    } else if (typeof er === 'object' && typeof er.message === 'string') {
+      message = er.message;
+    } else {
+      message = '' + er;
+    }
+    $('#ajax_status').append("<li class='failed_mqc'>" + message + '</li>');
+  };
+
   var _classNameForOutcome = function (qcOutcome) {
     var mqcOutcome = typeof qcOutcome !== 'undefined' && typeof qcOutcome.mqc_outcome !== 'undefined' ? qcOutcome.mqc_outcome : '';
     var newClass = 'qc_outcome_' + mqcOutcome.toLowerCase();
@@ -97,7 +109,7 @@ define(['jquery'], function () {
       data: JSON.stringify(data),
       cache: false
     }).error(function(jqXHR, textStatus, errorThrown) {
-      $('#ajax_status').append("<li class='failed_mqc'>Error while fetching QC outcomes. " + errorThrown + '</li>');
+      _displayError(errorThrown);
     }).success(function (data) {
       try {
         _updateDisplayWithQCOutcomes(data);
@@ -105,7 +117,7 @@ define(['jquery'], function () {
           callOnSuccess();
         }
       } catch (er) {
-        throw er;
+        _displayError(er);
       }
     });
   };
@@ -115,15 +127,7 @@ define(['jquery'], function () {
       var rptKeys = _parseRptKeys(tableID);
       _fetchQCOutcomesUpdateView(rptKeys, qcOutcomesURL, callbackAfterUpdateView);
     } catch (er) {
-      var message;
-      if(typeof er === 'string') {
-        message = er;
-      } else if (typeof er === 'object' && typeof er.message === 'string') {
-          message = er.message;
-      } else {
-        message = '' + er;
-      }
-      $('#ajax_status').append("<li class='failed_mqc'>" + message + '</li>');
+      _displayError(er);
     }
   };
 
