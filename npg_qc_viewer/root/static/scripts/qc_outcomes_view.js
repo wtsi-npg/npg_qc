@@ -100,13 +100,11 @@ define(['jquery'], function () {
   };
 
   var _fetchQCOutcomesUpdateView = function (rptKeys, outcomesURL, callOnSuccess) {
-    var data = _buildQuery(rptKeys);
-
     $.ajax({
       url: outcomesURL,
       type: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify(data),
+      data: JSON.stringify(_buildQuery(rptKeys)),
       cache: false
     }).error(function(jqXHR, textStatus, errorThrown) {
       _displayError(errorThrown);
