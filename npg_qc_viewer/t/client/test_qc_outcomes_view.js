@@ -55,44 +55,44 @@ require(['scripts/qc_outcomes_view',],
     QUnit.test('Updating lib outcomes Accepted final', function(assert) {
       var qcOutcomes = {"lib":{"18245:1:1":{"tag_index":1,"mqc_outcome":"Accepted final","position":"1","id_run":"18245"}},
                         "seq":{}};
-      var rows = 0, tagsWithClass = 0;
+      var rows = 0, elementsWithClass = 0;
       $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
         if ($obj.hasClass('qc_outcome_accepted_final')) {
-          tagsWithClass++;
+          elementsWithClass++;
         }
       });
       assert.equal(rows, 3, 'Correct number of rows');
-      assert.equal(tagsWithClass, 0, 'Initially tags have no class');
+      assert.equal(elementsWithClass, 0, 'Initially tags have no class');
 
-      rows = 0; tagsWithClass = 0;
+      rows = 0; elementsWithClass = 0;
       mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
         if ($obj.hasClass('qc_outcome_accepted_final')) {
-          tagsWithClass++;
+          elementsWithClass++;
         }
       });
       assert.equal(rows, 3, 'Correct number of rows');
-      assert.equal(tagsWithClass, 1, 'Correct number of tags with updated class');
+      assert.equal(elementsWithClass, 1, 'Correct number of tags with updated class');
       $('#rpt_key\\3A 18245\\3A 1\\3A 1 td.tag_info').each(function (i, obj) {
         var $obj = $(obj);
         assert.ok($obj.hasClass('qc_outcome_accepted_final'), 'rpt key has correct outcome');
       });
 
-      rows = 0; tagsWithClass = 0;
+      rows = 0; elementsWithClass = 0;
       mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
         if ($obj.hasClass('qc_outcome_accepted_final')) {
-          tagsWithClass++;
+          elementsWithClass++;
         }
       });
       assert.equal(rows, 3, 'Correct number of rows');
-      assert.equal(tagsWithClass, 0, 'Correct number of tags with updated class different run');
+      assert.equal(elementsWithClass, 0, 'Correct number of tags with updated class different run');
     });
 
     QUnit.test('Test chainging the interface mocking ajax', function (assert) {
@@ -130,15 +130,15 @@ require(['scripts/qc_outcomes_view',],
           });
           assert.equal(lanes, 3, 'Correct number of lanes');
           assert.equal(lanesWithClass, 3, 'Correct number of lanes with new class');
-          var tags = 0, tagsWithClass = 0;
+          var tags = 0, elementsWithClass = 0;
           $('tr[id*="rpt_key:19001:1"]  td.tag_info').each(function (i, obj) {
             tags++;
             if ($(obj).hasClass('qc_outcome_rejected_preliminary')) {
-              tagsWithClass++;
+              elementsWithClass++;
             }
           });
           assert.equal(tags, 3, 'Correct number of tags');
-          assert.equal(tagsWithClass, 1, 'Correct number of tags with new class');
+          assert.equal(elementsWithClass, 1, 'Correct number of tags with new class');
         };
 
         $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
@@ -156,6 +156,109 @@ require(['scripts/qc_outcomes_view',],
       } finally {
         $.ajax = old_ajax;
       }
+    });
+
+    QUnit.test("Updating seq and lib outcomes for sample page", function (assert) {
+      var _classNames = 'qc_outcome_accepted_final qc_outcome_accepted_preliminary qc_outcome_rejected_final qc_outcome_rejected_preliminary qc_outcome_undecided qc_outcome_undecided_final'.split(' ');
+      var countQCClasses = function (obj) {
+        var qcClasses = 0;
+        for(var j = 0; j < _classNames.length; j++) {
+          if(obj.hasClass(_classNames[j])) {
+            qcClasses++;
+          }
+        }
+        return qcClasses;
+      }
+
+      $('#results_summary').empty().append($('#fixture_sample_data').first().html());
+      $('#fixture_sample_data').empty();
+
+      var qcOutcomes = {"lib":{"19100:1:1":{"tag_index":1,"mqc_outcome":"Accepted final","position":"1","id_run":"19100"},
+                               "19100:1:2":{"tag_index":2,"mqc_outcome":"Rejected final","position":"1","id_run":"19100"},
+                               "19101:1:1":{"tag_index":1,"mqc_outcome":"Undecided","position":"1","id_run":"19101"}},
+                        "seq":{"19100:1":{"mqc_outcome":"Accepted final","position":"1","id_run":"19100"}}};
+      var rows = 0, elementsWithClass = 0,
+          totalQCClasses = 0, expected = ['accepted_final', 'rejected_final'];
+      //19100
+      $('tr[id*="rpt_key:19100:1"] td.tag_info').each(function (i, obj) {
+        rows++;
+        totalQCClasses += countQCClasses($(obj));
+      });
+      assert.equal(rows, 2, 'Correct number of rows');
+      assert.equal(totalQCClasses, 0, 'Initially tags without classes for run 19100');
+
+      rows = 0; elementsWithClass = 0; totalQCClasses = 0;
+      $('tr[id*="rpt_key:19100:1"] td.lane').each(function (i, obj) {
+        rows++;
+        totalQCClasses += countQCClasses($(obj));
+      });
+      assert.equal(rows, 2, 'Correct number of rows');
+      assert.equal(totalQCClasses, 0, 'Initially lanes without classes for run 19100');
+
+      //19101
+      rows = 0; elementsWithClass = 0; totalQCClasses = 0;
+      $('tr[id*="rpt_key:19101:1"] td.tag_info').each(function (i, obj) {
+        rows++;
+        totalQCClasses += countQCClasses($(obj));
+      });
+      assert.equal(rows, 1, 'Correct number of rows');
+      assert.equal(totalQCClasses, 0, 'Initially tags without classes for run 19101');
+
+      rows = 0; elementsWithClass = 0; totalQCClasses = 0;
+      $('tr[id*="rpt_key:19101:1"] td.lane').each(function (i, obj) {
+        rows++;
+        totalQCClasses += countQCClasses($(obj));
+      });
+      assert.equal(rows, 1, 'Correct number of rows');
+      assert.equal(elementsWithClass, 0, 'Initially lanes without classes for run 19101');
+
+      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
+
+      //19100
+      rows = 0; elementsWithClass = 0;
+      $('tr[id*="rpt_key:19100:1"] td.tag_info').each(function (i, obj) {
+        rows++;
+        if ($(obj).hasClass('qc_outcome_' + expected[i])
+            && countQCClasses($(obj)) == 1 ) {
+          elementsWithClass++;
+        }
+      });
+      assert.equal(rows, 2, 'Correct number of rows');
+      assert.equal(elementsWithClass, 2, 'Correct number of tags with updated class for run 19100');
+
+      rows = 0; elementsWithClass = 0;
+      $('tr[id*="rpt_key:19100:1"] td.lane').each(function (i, obj) {
+        rows++;
+        if ($(obj).hasClass('qc_outcome_accepted_final')
+            && countQCClasses($(obj)) == 1 ) {
+          elementsWithClass++;
+        }
+      });
+      assert.equal(rows, 2, 'Correct number of rows');
+      assert.equal(elementsWithClass, 2, 'Correct number of lanes with updated class for run 19100');
+
+      //19101
+      rows = 0; elementsWithClass = 0;
+      $('tr[id*="rpt_key:19101:1"] td.tag_info').each(function (i, obj) {
+        rows++;
+        if ($(obj).hasClass('qc_outcome_undecided')
+            && countQCClasses($(obj)) == 1 ) {
+          elementsWithClass++;
+        }
+      });
+      assert.equal(rows, 1, 'Correct number of rows');
+      assert.equal(elementsWithClass, 1, 'Correct number of tags without new class for run 19101');
+
+      rows = 0; elementsWithClass = 0;
+      $('tr[id*="rpt_key:19101:1"] td.lane').each(function (i, obj) {
+        rows++;
+        if ($(obj).hasClass('qc_outcome_undecided')
+            && countQCClasses($(obj)) == 1 ) {
+          elementsWithClass++;
+        }
+      });
+      assert.equal(rows, 1, 'Correct number of rows');
+      assert.equal(elementsWithClass, 0, 'Correct number of lanes with new class for run 19101');
     });
 
     // run the tests.
