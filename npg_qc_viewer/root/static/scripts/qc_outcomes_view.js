@@ -74,7 +74,7 @@ define(['jquery'], function () {
     return rptKeys;
   };
 
-  var _updateDisplayQCOutcomes = function (outcomesData) {
+  var _updateDisplayWithQCOutcomes = function (outcomesData) {
     _processOutcomes(outcomesData.lib, 'tag_info');
     _processOutcomes(outcomesData.seq, 'lane');
   };
@@ -100,7 +100,7 @@ define(['jquery'], function () {
       $('#ajax_status').append("<li class='failed_mqc'>Error while fetching QC outcomes. " + errorThrown + '</li>');
     }).success(function (data) {
       try {
-        _updateDisplayQCOutcomes(data);
+        _updateDisplayWithQCOutcomes(data);
         if(typeof callOnSuccess === 'function' ) {
           callOnSuccess();
         }
@@ -130,7 +130,7 @@ define(['jquery'], function () {
   return {
     _fetchQCOutcomesUpdateView : _fetchQCOutcomesUpdateView,
     _buildQuery: _buildQuery,
-    _updateDisplayQCOutcomes: _updateDisplayQCOutcomes,
+    _updateDisplayWithQCOutcomes: _updateDisplayWithQCOutcomes,
     _parseRptKeys: _parseRptKeys,
     fetchAndProcessQC: fetchAndProcessQC,
   };

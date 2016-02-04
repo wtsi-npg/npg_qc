@@ -28,7 +28,7 @@ require(['scripts/qc_outcomes_view',],
       assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
 
       rows = 0; lanesWithClass = 0;
-      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -40,7 +40,7 @@ require(['scripts/qc_outcomes_view',],
       assert.equal(lanesWithClass, 3, 'Correct number of lanes with updated class');
 
       rows = 0; lanesWithClass = 0;
-      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.lane').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -67,7 +67,7 @@ require(['scripts/qc_outcomes_view',],
       assert.equal(elementsWithClass, 0, 'Initially tags have no class');
 
       rows = 0; elementsWithClass = 0;
-      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -83,7 +83,7 @@ require(['scripts/qc_outcomes_view',],
       });
 
       rows = 0; elementsWithClass = 0;
-      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -212,7 +212,7 @@ require(['scripts/qc_outcomes_view',],
       assert.equal(rows, 1, 'Correct number of rows');
       assert.equal(elementsWithClass, 0, 'Initially lanes without classes for run 19101');
 
-      mqc_outcomes._updateDisplayQCOutcomes(qcOutcomes);
+      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
 
       //19100
       rows = 0; elementsWithClass = 0;
