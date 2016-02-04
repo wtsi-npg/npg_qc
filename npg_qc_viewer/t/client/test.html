@@ -225,14 +225,6 @@
     
   });
   
-  QUnit.test("NPG.QC.RunPageMQCControl.showMQCOutcomes", function(assert) {
-    var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-    assert.raises(function () {control.showMQCOutcomes();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
-    assert.raises(function () {control.showMQCOutcomes(null, null);}, /Error: Invalid arguments/, "Throws exception with both arguments null");
-    assert.raises(function () {control.showMQCOutcomes(null, 1);}, /Error: Invalid arguments/, "Throws exception with first argument null");
-    assert.raises(function () {control.showMQCOutcomes(1, null);}, /Error: Invalid arguments/, "Throws exception with second argument null");
-  });
-  
 </SCRIPT>
 </head>
 <body>

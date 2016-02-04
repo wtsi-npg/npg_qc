@@ -98,7 +98,7 @@ define(['jquery'], function () {
       cache: false
     }).error(function(jqXHR, textStatus, errorThrown) {
       $('#ajax_status').append("<li class='failed_mqc'>Error while fetching QC outcomes. " + errorThrown + '</li>');
-    }).success(function (data, textStatus, jqXHR) {
+    }).success(function (data) {
       try {
         _updateDisplayQCOutcomes(data);
         if(typeof callOnSuccess === 'function' ) {
@@ -118,7 +118,7 @@ define(['jquery'], function () {
       var message;
       if(typeof er === 'string') {
         message = er;
-      } else if (typeof er === 'object' && typeof er['message'] === 'string') {
+      } else if (typeof er === 'object' && typeof er.message === 'string') {
           message = er.message;
       } else {
         message = '' + er;

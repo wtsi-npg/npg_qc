@@ -25,7 +25,8 @@
 * Dependencies: jQuery library
 *
 */
-
+/* globals $: false, window: false, document : false */
+"use strict";
 var NPG;
 /**
  * @module NPG
@@ -149,22 +150,6 @@ var NPG;
         this.lane_control.parent().addClass('qc_outcome_rejected_final');
       };
 
-      MQCControl.prototype.setAcceptedPreliminaryBG = function() {
-        this.removeAllQCOutcomeStyles();
-        this.lane_control.parent().addClass('qc_outcome_accepted_preliminary');
-        this.lane_control.css("padding-right", "0px");
-        this.lane_control.css("padding-left", "0px");
-        this.lane_control.parent().prop('title', 'Preliminary pass in manual QC, waiting for final decision');
-      };
-
-      MQCControl.prototype.setRejectedPreliminaryBG = function() {
-        this.removeAllQCOutcomeCSSClasses();
-        this.lane_control.parent().addClass('qc_outcome_rejected_preliminary');
-        this.lane_control.css("padding-right", "0px");
-        this.lane_control.css("padding-left", "0px");
-        this.lane_control.parent().prop('title', 'Preliminary fail in manual QC, waiting for final decision');
-      };
-
       MQCControl.prototype.removeMQCFormat = function () {
         this.lane_control.parent().removeClass('td_mqc');
         this.lane_control.parent().css('text-align', 'center'); // For firefox
@@ -281,14 +266,6 @@ var NPG;
         lane_control.find(this.LANE_MQC_WORKING_CLASS).empty();
       };
 
-      MQCControl.prototype.loadBGFromInitialWithPreliminary = function (lane_control) {
-        this.loadBGFromInitial(lane_control);
-        switch (lane_control.data(this.CONFIG_INITIAL)) {
-          case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPreliminaryBG(); break;
-          case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPreliminaryBG(); break;
-        }
-      };
-
       return MQCControl;
     }) ();
     QC.MQCControl = MQCControl;
@@ -321,7 +298,6 @@ var NPG;
           $.post(self.CONFIG_UPDATE_SERVICE, { id_run   : self.id_run,
                                                position : self.position,
                                                new_oc   : outcome}, function(data){
-            var response = data;
           }, "json")
           .done(function() {
             self.updateView(outcome);
@@ -329,7 +305,7 @@ var NPG;
           .fail(function(data) {
             self.processAfterFail(data);
           })
-          .always(function(data){
+          .always(function(){
             //Clear progress icon
             self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });
@@ -497,46 +473,6 @@ var NPG;
         this.lane_control.parent().addClass('td_library_mqc');
       };
 
-      LibraryMQCControl.prototype.loadBGFromInitialWithPreliminary = function (lane_control) {
-        this.loadBGFromInitial(lane_control);
-        switch (lane_control.data(this.CONFIG_INITIAL)) {
-          case this.CONFIG_ACCEPTED_PRELIMINARY : this.setTagAcceptedPreliminaryBG(); break;
-          case this.CONFIG_REJECTED_PRELIMINARY : this.setTagRejectedPreliminaryBG(); break;
-        }
-        switch(lane_control.data('current_lane_outcome')) {
-          case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPreliminaryBG(); break;
-          case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPreliminaryBG(); break;
-        }
-      };
-
-      LibraryMQCControl.prototype.setAcceptedPreliminaryBG = function() {
-        var lane = this.lane_control.parent();
-        lane = $(lane);
-        lane.addClass("qc_outcome_accepted_preliminary");
-        lane.prop('title', 'Preliminary pass in manual QC, waiting for final decision');
-      };
-
-      LibraryMQCControl.prototype.setRejectedPreliminaryBG = function() {
-        var lane = this.lane_control.parent();
-        lane = $(lane);
-        lane.addClass("qc_outcome_rejected_preliminary");
-        lane.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
-      };
-
-      LibraryMQCControl.prototype.setTagAcceptedPreliminaryBG = function() {
-        var sibling_tag_index = this.lane_control.parent().parent().children('.tag_info').first();
-        sibling_tag_index = $(sibling_tag_index);
-        sibling_tag_index.addClass("qc_outcome_accepted_preliminary");
-        sibling_tag_index.prop('title', 'Preliminary pass in manual QC, waiting for final decision');
-      };
-
-      LibraryMQCControl.prototype.setTagRejectedPreliminaryBG = function() {
-        var sibling_tag_index = this.lane_control.parent().parent().children('.tag_info').first();
-        sibling_tag_index = $(sibling_tag_index);
-        sibling_tag_index.addClass("qc_outcome_rejected_preliminary");
-        sibling_tag_index.prop('title', 'Preliminary fail in manual QC, waiting for final decision');
-      };
-
       LibraryMQCControl.prototype.setAcceptedFinal = function() {
         this.outcome = this.CONFIG_ACCEPTED_FINAL;
         this.lane_control.empty();
@@ -645,8 +581,7 @@ var NPG;
 
       LanePageMQCControl.prototype.parseLanes = function (lanes) {
         $('.lane_mqc_control').each(function (i, obj) {
-          obj = $(obj);
-          var parent = obj.parent();
+          var parent = $(obj).parent();
           lanes.push(parent);
         });
         return;
@@ -740,8 +675,8 @@ var NPG;
         var lanes_checked = 0;
         for(var i = 0; i < lanes.length; i++) {
           var lane = lanes[i];
-          var cells = lane.children('.lane_mqc_control')
-          for(j = 0; j < cells.length; j++) {
+          var cells = lane.children('.lane_mqc_control');
+          for(var j = 0; j < cells.length; j++) {
             var obj = $(cells[j]); //Wrap as an jQuery object.
             var tag_index = obj.data(this.DATA_TAG_INDEX);
             tag_index = String(tag_index);
@@ -765,54 +700,6 @@ var NPG;
         }
 
         return lanes_qc_temp;
-      };
-
-      /**
-       * Iterates through lanes and shows the outcomes
-       * @param mqc_run_data
-       * @param lanes
-       */
-      LanePageMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
-        this.validateRequired(mqc_run_data);
-        if(typeof(lanes) === "undefined" || lanes == null) {
-          throw new Error("Error: Invalid arguments");
-        }
-        var self = this;
-        //Set manual qc outcome for the lane as it is in the database.
-        $('.lane_mqc_control').each(function(j, obj) {
-          obj = $(obj);
-          if (obj.data('position') == mqc_run_data.position
-              && obj.data('tag_index') !== 0) {
-            obj.data(self.CURRENT_LANE_OUTCOME, mqc_run_data.current_lane_outcome);
-          }
-        });
-        for(var i = 0; i < lanes.length; i++) {
-          lanes[i].children('.lane_mqc_control').each(function(j, obj){
-            obj = $(obj);
-            obj.html("<span class='lane_mqc_working'><img src='"
-              + self.abstractConfiguration.getRoot()
-              + "/images/waiting.gif' width='10' height='10' title='Processing request.'></span>");
-          });
-        }
-
-        for(var i = 0; i < lanes.length; i++) {
-          var cells = lanes[i].children('.lane_mqc_control');
-          for(var j = 0; j < cells.length; j++) {
-            var obj = $(cells[j]); //Wrap as an jQuery object.
-            //Lane from row.
-            var tag_index = obj.data(this.DATA_TAG_INDEX);
-            //Filling previous outcomes
-            if('qc_plex_status' in mqc_run_data && tag_index in mqc_run_data.qc_plex_status) {
-              //From REST
-              var current_status = mqc_run_data.qc_plex_status[tag_index];
-              //To html element, LaneControl will render.
-              obj.data('initial', current_status);
-            }
-            //Set up mqc controlers and link them to the individual lanes.
-            var c = new NPG.QC.LibraryMQCControl(self.abstractConfiguration);
-            c.loadBGFromInitialWithPreliminary(obj);
-          }
-        }
       };
 
       LanePageMQCControl.prototype.removeAllPaddings = function () {
@@ -873,7 +760,6 @@ var NPG;
             );
           } else {
             self.removeAllPaddings();
-            self.showMQCOutcomes(jqxhr.responseJSON, lanes);
           }
         }).fail(function(jqXHR, textStatus, errorThrown) {
           var errorMessage;
@@ -904,7 +790,7 @@ var NPG;
 
         for(var i = 0; i < lanes.length; i++) {
           var cells = lanes[i].children('.lane_mqc_control');
-          for(j = 0; j < cells.length; j++) {
+          for(var j = 0; j < cells.length; j++) {
             var obj = $(cells[j]); //Wrap as an jQuery object.
             //Plex from row.
             var tag_index = obj.data(this.DATA_TAG_INDEX);
@@ -991,47 +877,6 @@ var NPG;
       };
 
       /**
-       * Iterates through lanes and shows the outcomes
-       * @param mqc_run_data
-       * @param lanes
-       */
-      RunPageMQCControl.prototype.showMQCOutcomes = function (mqc_run_data, lanes) {
-        this.validateRequired(mqc_run_data);
-        if(typeof(lanes) === "undefined"
-            || lanes == null) {
-          throw new Error("Error: Invalid arguments");
-        }
-        var self = this;
-
-        for(var i = 0; i < lanes.length; i++) {
-          lanes[i].children('.lane_mqc_control').each(function(j, obj){
-            $(obj).html("<span class='lane_mqc_working'><img src='"
-                + self.abstractConfiguration.getRoot()
-                + "/images/waiting.gif' width='10' height='10' title='Processing request.'></span>");
-          });
-        }
-
-        for(var i = 0; i < lanes.length; i++) {
-          var cells = lanes[i].children('.lane_mqc_control');
-          for(var j = 0; j < cells.length; j++) {
-            var obj = $(cells[j]); //Wrap as an jQuery object.
-            //Lane from row.
-            var position = obj.data('position');
-            //Filling previous outcomes
-            if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
-              //From REST
-              var current_status = mqc_run_data.qc_lane_status[position];
-              //To html element, LaneControl will render.
-              obj.data('initial', current_status);
-            }
-            //Set up mqc controlers and link them to the individual lanes.
-            var c = new NPG.QC.LaneMQCControl(self.abstractConfiguration);
-            c.loadBGFromInitialWithPreliminary(obj);
-          }
-        }
-      };
-
-      /**
        * Use data from the page to make the first call to REST. Finds rows which
        * need qc, inits qc for those rows. If it is not state for MQC it updates
        * the view with current MQC values. If there is an inconsistence between
@@ -1049,31 +894,22 @@ var NPG;
         }).done(function() {
           var mqc_run_data = jqxhr.responseJSON;
           if(self.isStateForMQC(mqc_run_data)) {
-            var DWHMatch = self.laneOutcomesMatch(lanesWithBG, mqc_run_data);
-//            if(DWHMatch.outcome) {
-              self.initQC(jqxhr.responseJSON, lanes,
-                  function (mqc_run_data, runMQCControl, lanes) {
-                    //Show working icons
-                    for(var i = 0; i < lanes.length; i++) {
-                      lanes[i].children('.lane_mqc_control').each(function(j, obj){
-                        $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
-                      });
-                    }
-                    self.prepareLanes(mqc_run_data, lanes);
-                  },
-                  function () { //There is no mqc
-                    $('.lane_mqc_control').css("padding-right", "0px");
-                    $('.lane_mqc_control').css("padding-left", "0px");
-                    return;
-                  }
-              );
-//            } else {
-//              var errorMessage = new NPG.QC.UI.MQCConflictDWHErrorMessage(id_run, DWHMatch.position);
-//              errorMessage.toConsole().display();
-//              //Clear progress icon
-//            }
-          } else {
-            self.showMQCOutcomes(jqxhr.responseJSON, lanes);
+            self.initQC(jqxhr.responseJSON, lanes,
+                        function (mqc_run_data, runMQCControl, lanes) {
+                          //Show working icons
+                          for(var i = 0; i < lanes.length; i++) {
+                            lanes[i].children('.lane_mqc_control').each(function(j, obj){
+                              $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
+                            });
+                          }
+                          self.prepareLanes(mqc_run_data, lanes);
+                        },
+                        function () { //There is no mqc
+                          $('.lane_mqc_control').css("padding-right", "0px");
+                          $('.lane_mqc_control').css("padding-left", "0px");
+                          return;
+                        }
+            );
           }
         }).fail(function(jqXHR, textStatus, errorThrown) {
           var errorMessage;
@@ -1147,7 +983,7 @@ var NPG;
             || mqc_run_data == null) {
           throw new Error("Error: Invalid arguments");
         }
-        var result = new Object();
+        var result = {};
         result['outcome'] = true; //Outcome of the validation.
         result['position'] = null; //Which lane has the problem (if there is a problem).
         for(var i = 0; i < lanesWithBG.length && result; i++) {
