@@ -15,7 +15,10 @@ BEGIN {
   use_ok 'npg_qc::autoqc::qc_store'
 };
 
-my $schema = npg_testing::db->create_test_db(q{npg_qc::Schema},q[t/data/fixtures]);
+my $schema = Moose::Meta::Class->create_anon_class(
+           roles => [qw/npg_testing::db/])
+           ->new_object({})->create_test_db(
+             q[npg_qc::Schema], 't/data/fixtures');
 
 {
   local $ENV{dev} = q[non-existing];
