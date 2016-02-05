@@ -23,8 +23,7 @@
  */
 /* globals $: false, define: false */
 'use strict';
-define(['jquery'], function () {
-  var _classNames = 'qc_outcome_accepted_final qc_outcome_accepted_preliminary qc_outcome_rejected_final qc_outcome_rejected_preliminary qc_outcome_undecided qc_outcome_undecided_final'.split(' ');
+define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
 
   var _displayError = function( er ) {
     var message;
@@ -38,35 +37,28 @@ define(['jquery'], function () {
     $('#ajax_status').append("<li class='failed_mqc'>" + message + '</li>');
   };
 
-  var _classNameForOutcome = function (qcOutcome) {
-    var mqcOutcome = typeof qcOutcome !== 'undefined' && typeof qcOutcome.mqc_outcome !== 'undefined' ? qcOutcome.mqc_outcome : '';
-    var newClass = 'qc_outcome_' + mqcOutcome.toLowerCase();
-    newClass = newClass.replace(/ /g, '_');
-    if (_classNames.indexOf(newClass) !== -1) {
-      return newClass;
-    } else {
-      throw 'Unexpected outcome description ' + qcOutcome.mqc_outcome;
-    }
-  };
-
   var _processOutcomes = function (outcomes, elementClass) {
     var rpt_keys = Object.keys(outcomes);
 
     for (var i = 0; i < rpt_keys.length; i++) {
       var rpt_key = rpt_keys[i];
       var qc_outcome = outcomes[rpt_key];
-      var new_class = _classNameForOutcome(qc_outcome) ;
       var rptKeyAsSelector;
       if(elementClass === 'lane') {
         rptKeyAsSelector = 'tr[id*="rpt_key:' + rpt_key + '"]';
       } else if (elementClass === 'tag_info') {
+
         //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
         rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
       } else {
         throw 'Invalid type of rpt key element class ' + elementClass;
       }
       rptKeyAsSelector = rptKeyAsSelector + ' td.' + elementClass;
-      $(rptKeyAsSelector).addClass(new_class);
+      if (typeof qc_outcome.mqc_outcome !== 'undefined') {
+        qc_css_styles.displayElementAs($(rptKeyAsSelector), qc_outcome.mqc_outcome);
+      } else {
+        throw 'Malformed QC outcomes data for ' + rpt_key;
+      }
     }
   };
 
@@ -78,7 +70,7 @@ define(['jquery'], function () {
       var id = $obj.attr('id');
       if( typeof(id) !== 'undefined' && id !== null && id.lastIndexOf(idPrefix) === 0 ) {
         var rptKey = id.substring(idPrefix.length);
-        if( typeof(rptKey) !== 'undefined' && $.inArray(rptKey, rptKeys) === -1 ) {
+        if ( typeof(rptKey ) !== 'undefined' && $.inArray(rptKey, rptKeys) === -1 ) {
           rptKeys.push(rptKey);
         }
       }
@@ -112,7 +104,7 @@ define(['jquery'], function () {
       try {
         _updateDisplayWithQCOutcomes(data);
         if(typeof callOnSuccess === 'function' ) {
-          callOnSuccess();
+          callOnSuccess(qc_css_styles);
         }
       } catch (er) {
         _displayError(er);

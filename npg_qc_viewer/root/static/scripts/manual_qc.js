@@ -58,7 +58,8 @@ var NPG;
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
 
-    QC.launchManualQCProcesses = function () {
+    QC.launchManualQCProcesses = function (qc_css_styles) {
+      QC.qc_css_styles = qc_css_styles;
       // Getting the run_id from the title of the page using the qc part too.
       var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                             .find("title")
@@ -133,21 +134,19 @@ var NPG;
        * Methods to deal with background colours.
        */
       MQCControl.prototype.removeAllQCOutcomeCSSClasses = function () {
-        this.lane_control.parent()
-                         .css("background-color", "#ffffff")
-                         .removeClass(function (index, css) {
-          return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
-        });
+        var parent = this.lane_control.parent().first();
+        QC.qc_css_styles.removePreviousQCOutcomeStyles(parent);
+        parent.css("background-color", "#ffffff");
       };
 
       MQCControl.prototype.setAcceptedBG = function() {
         this.removeAllQCOutcomeCSSClasses();
-        this.lane_control.parent().addClass('qc_outcome_accepted_final');
+        QC.qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_ACCEPTED_FINAL);
       };
 
       MQCControl.prototype.setRejectedBG = function () {
         this.removeAllQCOutcomeCSSClasses();
-        this.lane_control.parent().addClass('qc_outcome_rejected_final');
+        QC.qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_REJECTED_FINAL);
       };
 
       MQCControl.prototype.removeMQCFormat = function () {

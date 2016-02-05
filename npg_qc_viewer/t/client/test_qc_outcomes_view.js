@@ -6,8 +6,8 @@ require.config({
   },
 });
 
-require(['scripts/qc_outcomes_view',],
-  function(mqc_outcomes) {
+require(['scripts/qc_outcomes_view', 'scripts/qc_css_styles'],
+  function(mqc_outcomes, qc_css_styles) {
     QUnit.test('Parsing RPT keys', function (assert) {
       var rptKeys = mqc_outcomes._parseRptKeys('results_summary');
       var expected = ['18245:1', '18245:1:1', '18245:1:2','19001:1', '19001:1:1', '19001:1:2'];
@@ -259,6 +259,26 @@ require(['scripts/qc_outcomes_view',],
       });
       assert.equal(rows, 1, 'Correct number of rows');
       assert.equal(elementsWithClass, 0, 'Correct number of lanes with new class for run 19101');
+    });
+
+    QUnit.test("QC outcomes map to css styles", function (assert) {
+      var element = $('<div></div>');
+      assert.throws(
+        function () { qc_css_styles.displayElementAs(element, 'Accepted maybe') },
+        /corresponding style for QC outcome/,
+        'Throws exception for unknown QC outcome'
+      );
+      assert.ok(!element.hasClass('qc_outcome_accepted_preliminary'), 'Without class before call');
+      qc_css_styles.displayElementAs(element, 'Accepted preliminary');
+      assert.ok(element.hasClass('qc_outcome_accepted_preliminary'), 'With class after call');
+      qc_css_styles.displayElementAs(element, 'Rejected final');
+      assert.ok(element.hasClass('qc_outcome_rejected_final') &&
+                !element.hasClass('qc_outcome_accepted_preliminary'), 'Replaced class after call');
+      try {
+        qc_css_styles.displayElementAs(element, 'Accepted maybe');
+      } catch(er) {
+        assert.ok(element.hasClass('qc_outcome_rejected_final'), 'Does not remove old class unless new class is valid.' );
+      }
     });
 
     // run the tests.
