@@ -136,7 +136,7 @@ var NPG;
       MQCControl.prototype.removeAllQCOutcomeCSSClasses = function () {
         var parent = this.lane_control.parent().first();
         QC.qc_css_styles.removePreviousQCOutcomeStyles(parent);
-        parent.css("background-color", "#ffffff");
+        parent.css("background-color", "");
       };
 
       MQCControl.prototype.setAcceptedBG = function() {
@@ -782,7 +782,7 @@ var NPG;
         }
         var self = this;
 
-        $('.lane, .tag_info').css("background-color", "#ffffff")
+        $('.lane, .tag_info').css("background-color", "")
                   .removeClass(function (index, css) {
           return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
         });
