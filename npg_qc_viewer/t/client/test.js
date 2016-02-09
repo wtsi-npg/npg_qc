@@ -282,11 +282,6 @@ require(['scripts/qc_css_styles'],
       obj = null;
       ok(obj == null);
 
-      obj = new NPG.QC.UI.MQCConflictDWHErrorMessage();
-      ok(obj !== undefined, 'Variable is now an instance of MQCOutcomeMQCConflictDWHErrorMessage');
-      obj = null;
-      ok(obj == null);
-
       obj = new NPG.QC.UI.MQCLibraryOverallControls();
       ok(obj !== undefined, 'Variable is now an instance of MQCLibraryOverallControls');
       obj = null;
