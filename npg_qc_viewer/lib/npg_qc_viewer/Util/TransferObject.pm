@@ -64,28 +64,6 @@ has 'tag_sequence' => (
   required => 0,
 );
 
-=head2 manual_qc
-
-Result of manual qc.
-
-=cut
-has 'manual_qc'    => (
-  isa      => 'Bool',
-  is       => 'rw',
-  required => 0,
-);
-
-=head2 lib_manual_qc
-
-Result of library manual qc.
-
-=cut
-has 'lib_manual_qc'    => (
-  isa      => 'Bool',
-  is       => 'rw',
-  required => 0,
-);
-
 =head2 study_name
 
 Name study lims

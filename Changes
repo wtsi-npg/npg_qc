@@ -14,6 +14,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      a visual que on the top of the page
    - tag metrics column moved next to the column with tag index and tag sequence
    - show deplexing percent for individual tags in tag metrics column
+   - retrieve qc outcomes from npg_qc_viewer qcoutcomes JSON service for
+     initial page rendering
 
 release 59.8
  - give LIMs time to process posting qc outcomes as individual events

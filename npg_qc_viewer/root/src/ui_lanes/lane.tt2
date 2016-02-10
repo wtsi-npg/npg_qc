@@ -3,20 +3,6 @@
 
     lane_class = 'lane';
     plex_class = 'tag_info';
-    IF row_info_to.manual_qc.defined;
-      IF row_info_to.manual_qc;
-        lane_class = lane_class _ ' passed';
-      ELSE;
-        lane_class = lane_class _ ' failed';
-      END;
-    END;
-    IF row_info_to.lib_manual_qc.defined;
-      IF row_info_to.lib_manual_qc;
-        plex_class = plex_class _ ' passed';
-      ELSE;
-        plex_class = plex_class _ ' failed';
-      END;
-    END;
 -%]
 
 <td class="[% lane_class %] nbsp">

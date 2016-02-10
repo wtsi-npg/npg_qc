@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 37;
+use Test::More tests => 38;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -23,9 +23,10 @@ lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 use_ok 'Test::WWW::Mechanize::Catalyst', 'npg_qc_viewer';
 my $mech = Test::WWW::Mechanize::Catalyst->new;
 
-#This prefix impacts the javascript part of the application. Update as 
+#This prefixes impact the javascript part of the application. Update as 
 #necessary.
 my $title_prefix = qq[NPG SeqQC v${npg_qc_viewer::VERSION}: ];
+my $row_id_prefix = q[rpt_key:];
 
 my $qc_schema = $schemas->{'qc'};
 $qc_schema->resultset('TagMetrics')->create({
@@ -72,6 +73,7 @@ $qc_schema->resultset('TagMetrics')->create({
   $mech->content_contains('Lane annotations');
   $mech->content_contains('NPG QC');
   $mech->content_contains('20,442,728'); #for total qxYield
+  $mech->content_contains($row_id_prefix . q[4025:1]); #Relevant for qcoutcomes js
 
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)->update({ id_user => 64, id_run_status_dict => 26, });
   $mech->get_ok($url);
@@ -196,7 +198,7 @@ subtest 'Test for run + lane + plexes' => sub {
 };
 
 subtest 'Test for run + lane + show all' => sub {
-  plan tests => 16;
+  plan tests => 18;
   my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=all];
   warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
                                         'Expected warning for run folder found';
@@ -208,6 +210,8 @@ subtest 'Test for run + lane + show all' => sub {
   $mech->content_contains('ATCACGTT'); #tag sequence
   $mech->content_contains('Tag'); #column name
   $mech->content_contains('NT207825Q'); #library name for tag 1
+  $mech->content_contains($row_id_prefix . q[4950:1"]); #Relevant for qcoutcomes js
+  $mech->content_contains($row_id_prefix . q[4950:1:1"]); #Relevant for qcoutcomes js
 
   my @menu = (
               'Page Top',

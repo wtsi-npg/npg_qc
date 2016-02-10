@@ -97,8 +97,9 @@
 
       row_info_to = c.stash.row_data.$lane_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
+      table_row_id = lane_key.defined ? ' id="rpt_key:' _ lane_key _ '"' : '';
 -%]
-<tr>
+<tr[%- table_row_id -%]>
 <td class="lib nbsp">
 <div class="rel_pos_container">
 [%- IF lane_collection.run_lane_plex_flags.${lane_key} -%]
@@ -135,7 +136,7 @@
 
 [% PROCESS "ui_lanes/lane.tt2" %]
 </tr>
-[%- END -%]
+[%- END #foreach lane_key in sorted_rl_map_keys -%]
 
 [%- IF show_total.defined && show_total;
     column_counter = 3;
