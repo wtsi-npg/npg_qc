@@ -140,62 +140,6 @@ require(['scripts/qc_css_styles'],
       }
     });
 
-    QUnit.test("NPG.QC.RunPageMQCControl.laneOutcomesMatch", function(assert){
-      var data1 = null;
-      var lanesWithBG = [];
-      var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-      assert.raises(function () {control.laneOutcomesMatch();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
-
-      data1 = new Object();
-      data1.qc_lane_status = new Object();
-
-      assert.raises(function () {control.laneOutcomesMatch(lanesWithBG);}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
-      assert.raises(function () {control.laneOutcomesMatch(null, data1);}, /Error: Invalid arguments/, "Throws exception with null arguments");
-      assert.raises(function () {control.laneOutcomesMatch(lanesWithBG, null);}, /Error: Invalid arguments/, "Throws exception with null arguments");
-      var result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with empty lanes in both sides.');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      data1.qc_lane_status[1] = 'Accepted final';
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with mqc status and not matching DWH status.');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      var elements = $('.laneOutcomesMatchTdlanes1').each(function (i, obj) {
-        lanesWithBG.push($(obj));
-      });
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with matching in both sides.');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      lanesWithBG = [];
-      var elements = $('.laneOutcomesMatchTdlanes2').each(function (i, obj) {
-        lanesWithBG.push($(obj));
-      });
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, false, 'Correctly validates problems with more outcomesin DWH.');
-      assert.equal(result.position, 2, 'Problem is in lane 2');
-      data1.qc_lane_status[2] = 'Accepted final';
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with matching in both sides, multiple items');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      lanesWithBG = [];
-      var elements = $('.laneOutcomesMatchTdlanes3').each(function (i, obj) {
-        lanesWithBG.push($(obj));
-      });
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Correctly validates problems with unmatching outcomes DWH vs MQC.');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      data1.qc_lane_status[2] = 'Rejected final';
-      data1.qc_lane_status[3] = 'Accepted final';
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with more outcomes in MQC than DWH, multiple items');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-    });
-
     QUnit.test("NPG.QC.RunPageMQCControl.prepareLanes", function(assert) {
       var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
       assert.raises(function () {control.prepareLanes();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
