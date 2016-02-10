@@ -40,6 +40,7 @@ define(['jquery'], function () {
     newClass = newClass.replace(/ /g, '_');
 
     if (_isValidStyleClass(newClass)) {
+      //TODO Consider only remove/add if object does not have the new class
       removePreviousQCOutcomeStyles(element);
       element.addClass(newClass);  
     } else {
