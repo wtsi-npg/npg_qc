@@ -6,3 +6,4 @@ blib/
 src/*/build/*
 *~
 bower_components
+*.bak

@@ -7,6 +7,8 @@ use JSON;
 use t::util;
 
 my $util = t::util->new();
+$util->modify_logged_user_method();
+
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 
 use_ok 'Catalyst::Test', 'npg_qc_viewer';

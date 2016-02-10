@@ -23,9 +23,9 @@ Inherits from npg_qc::autoqc::checks::check. See description of attributes in th
 =head1 DESCRIPTION
 
  An autoqc check object that parses results of barcode decoding
- by picard http://picard.sourceforge.net/command-line-overview.shtml#ExtractIlluminaBarcodes
+ by picard https://broadinstitute.github.io/picard/command-line-overview.html#ExtractIlluminaBarcodes
  according to the metric described in
- http://picard.sourceforge.net/picard-metric-definitions.shtml#ExtractIlluminaBarcodes.BarcodeMetric
+ https://broadinstitute.github.io/picard/picard-metric-definitions.html#ExtractIlluminaBarcodes.BarcodeMetric
 
 
 =head1 SUBROUTINES/METHODS

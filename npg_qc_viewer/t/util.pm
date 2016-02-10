@@ -3,6 +3,7 @@ package t::util;
 use Carp;
 use English qw{-no_match_vars};
 use Moose;
+use Class::Load qw/load_class/;;
 use Readonly;
 
 with 'npg_testing::db';
@@ -98,6 +99,22 @@ sub test_env_setup {
   }
 
   return $schemas;
+}
+
+sub modify_logged_user_method {
+  my $class = 'npg_qc_viewer::Model::User';
+  load_class($class);
+  $class->meta->add_around_method_modifier('logged_user', \&logged_user4test_domain);
+  return; 
+}
+
+sub logged_user4test_domain {
+  my $orig = shift;
+  my $self = shift;
+  my $c    = shift;
+  my $user = $c->req->params->{'user'} || q[];
+  my $password = $c->req->params->{'password'} || q[];
+  return $self->$orig($c,{username => $user, password => $password});
 }
 
 sub DEMOLISH {

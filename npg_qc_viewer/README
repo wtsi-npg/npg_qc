@@ -11,11 +11,13 @@ Headless javascript testing:
   node-qunit-phantomjs t/client/test.html --verbose
   node-qunit-phantomjs t/client/test_format_for_csv.html --verbose
   node-qunit-phantomjs t/client/test_modify_on_view.html --verbose
+  node-qunit-phantomjs t/client/test_qc_outcomes_view.html --verbose
 
 In browser javascript testing - open files in a browser window:
   t/client/test.html
   t/client/test_format_for_csv.html
   t/client/test_modify_on_view.html
+  t/client/test_qc_outcomes_view.html
 
 Running your own development server
 -----------------------------------
@@ -32,11 +34,3 @@ Using custom bcviz
 In bcviz (your working copy) run 'bower link'.
 In npg-qc, npg_qc_viewer directory, run 'bower link bcviz'.
 
-Autocrud
---------
-
-  CATALYST_AUTOCRUD=1 bin/npg_qc_viewer_server.pl -p YOUR_PORT
-
-autocrud pages - npg tracking:
-read-only: autocrud/npgdb
-admin:     autocrud/site/admin/schema/npgdb

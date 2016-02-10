@@ -41,7 +41,7 @@ sub raise_error {
 
 =head2 compose_error
 
- Create and returns an error message. If teh error code is given,
+ Create and returns an error message. If the error code is given,
  it is prepended to the message in a standard way.
 
  $obj->compose_error('some error', 401);
@@ -62,8 +62,8 @@ sub compose_error {
 
 =head2 parse_error
 
- For a standard SeqQC error message, returns teh actiol error message and
- the error code. For other error messages returns teh original message and code 500.
+ For a standard SeqQC error message, returns the actuol error message and
+ the error code. For other error messages returns the original message and code 500.
 
  my ($error, $error_code) = $obj->parse_error($some error);
 

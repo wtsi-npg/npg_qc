@@ -62,7 +62,7 @@ sub refs {
   }
 
   my $command = $self->all_metrics->{'programCommand'};
-  if ($command =~ /OUTPUT_UNALIGNED/xms) {
+  if ($command && $command =~ /OUTPUT_UNALIGNED/xms) {
     push @refs, $UNMAPPED;
   }
   return @refs;

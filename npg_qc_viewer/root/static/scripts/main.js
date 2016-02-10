@@ -24,42 +24,19 @@ require.onError = function (err) {
 };
 
 require([
-  'scripts/manual_qc',
-  'scripts/manual_qc_ui',
+  'scripts/qc_outcomes_view',
   'scripts/plots',
   'scripts/format_for_csv',
   'unveil',
+  'scripts/manual_qc',
+  'scripts/manual_qc_ui',
   'table-export'
 ],
-function( manual_qc, manual_qc_ui, plots, format_for_csv, unveil) {
+function( qc_outcomes_view, plots, format_for_csv, unveil ) {
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
-
-    // Getting the run_id from the title of the page using the qc part too.
-    var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
-                                                          .find("title")
-                                                          .text());
-    //If id_run
-    if(typeof(runTitleParserResult) != undefined && runTitleParserResult != null) {
-      var id_run = runTitleParserResult.id_run;
-      var prodConfiguration = new NPG.QC.ProdConfiguration();
-      //Read information about lanes from page.
-      var lanes = []; //Lanes without previous QC, blank BG
-      var control;
-
-      if (runTitleParserResult.isRunPage) {
-        var lanesWithBG = []; //Lanes with previous QC, BG with colour
-        control = new NPG.QC.RunPageMQCControl(prodConfiguration);
-        control.parseLanes(lanes, lanesWithBG);
-        control.prepareMQC(id_run, lanes, lanesWithBG);
-      } else {
-        var position = runTitleParserResult.position;
-        control = new NPG.QC.LanePageMQCControl(prodConfiguration);
-        control.parseLanes(lanes);
-        control.prepareMQC(id_run, position, lanes);
-      }
-    }
+    qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', NPG.QC.launchManualQCProcesses);
   });
 
   //Required to show error messages from the mqc process.

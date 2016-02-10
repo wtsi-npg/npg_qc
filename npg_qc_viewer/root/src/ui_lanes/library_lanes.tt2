@@ -6,14 +6,25 @@
   PROCESS urls.tt2;
   checks_info = collection_all.check_names;
 
+  tag_metrics_cache = {};
   temp = [];
   FOREACH check_name IN checks_info.list;
     IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
-      temp.push(check_name);
+      IF check_name == 'tag metrics';
+        temp.unshift(check_name);
+      ELSE;
+        temp.push(check_name);
+      END;
     END;
   END;
+
   checks_list=temp;
   map=checks_info.map;
+
+  tag_metrics_collection = collection_all.search(check_name => 'tag metrics');
+  FOREACH tag_metrics_result IN tag_metrics_collection.results;
+    tag_metrics_cache.${tag_metrics_result.id_run}.${tag_metrics_result.position} = tag_metrics_result;
+  END;
 
   row_span_string = '';
   IF checks_list.size;
@@ -86,8 +97,9 @@
 
       row_info_to = c.stash.row_data.$lane_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
+      table_row_id = lane_key.defined ? ' id="rpt_key:' _ lane_key _ '"' : '';
 -%]
-<tr>
+<tr[%- table_row_id -%]>
 <td class="lib nbsp">
 <div class="rel_pos_container">
 [%- IF lane_collection.run_lane_plex_flags.${lane_key} -%]
@@ -124,7 +136,7 @@
 
 [% PROCESS "ui_lanes/lane.tt2" %]
 </tr>
-[%- END -%]
+[%- END #foreach lane_key in sorted_rl_map_keys -%]
 
 [%- IF show_total.defined && show_total;
     column_counter = 3;
