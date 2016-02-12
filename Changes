@@ -2,6 +2,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - SeqQC:
    - entities are marked as qcable in template
+   - title for pages with data for one id_run show run status
+   - client can get run status from title
+   - client can get username and role from page
 
 release 60.0
  - JSON service (retrieval) for qc outcomes
