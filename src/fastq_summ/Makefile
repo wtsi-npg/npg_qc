@@ -5,9 +5,9 @@ CFLAGS = -g -Wall
 BUILDDIR = build
 installdir = .
 
-SAMTOOLS_LOC= /software/solexa/pkg/samtools/samtools-1.2
-HTSLIB_LOC= /software/solexa/pkg/htslib/htslib-1.2.1
-INCLUDES= -I. -I$(SAMTOOLS_LOC)/include -I$(HTSLIB_LOC)/include
+SAMTOOLS_LOC= /software/solexa/pkg/samtools/1.3
+HTSLIB_LOC= /software/solexa/pkg/htslib/1.3
+INCLUDES= -I. -I$(SAMTOOLS_LOC)/include -I$(HTSLIB_LOC)/include/htslib
 LIBS= -lz -lm -Wl,-rpath=$(HTSLIB_LOC)/lib
 LIBPATH=
 SAMTOOLSLIB= -lbam -lhts
