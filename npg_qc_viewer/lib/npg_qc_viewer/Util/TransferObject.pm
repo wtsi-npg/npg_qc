@@ -163,6 +163,18 @@ has 'is_gclp' => (
   default  => 0,
 );
 
+=head2 is_control
+
+Flag for control entity from flowcell
+
+=cut
+has 'is_control' => (
+  isa      => 'Bool',
+  is       => 'rw',
+  required => 0,
+  default  => 0,
+);
+
 =head2 entity_id_lims
 
 Id for entity lims
@@ -212,6 +224,33 @@ Returns supplier_sample_name, falls back to sample_name.
 sub sample_name4display {
   my $self = shift;
   return $self->supplier_sample_name || $self->sample_name;
+}
+
+=head2 instance_qc_able
+
+Returns the result of executing qc_able using instance variables
+as parameters
+
+=cut
+
+sub instance_qc_able {
+  my $self = shift;
+  return $self->qc_able($self->is_gclp, $self->is_control, $self->tag_index);
+}
+
+=head2 qc_able
+
+Returns true if tag_index is undefined or tag_index is non zero
+and entity is not gclp and entity is not control.
+
+=cut
+sub qc_able {
+  my ($self, $is_gclp, $is_control, $tag_index) = @_;
+  my $result = 1;
+  if (defined $tag_index) {
+    $result = !$is_gclp && $tag_index != 0  && !$is_control ? 1 : 0;
+  }
+  return $result;
 }
 
 __PACKAGE__->meta->make_immutable;

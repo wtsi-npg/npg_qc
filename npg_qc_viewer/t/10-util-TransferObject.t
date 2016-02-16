@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use_ok 'npg_qc_viewer::Util::TransferObject';
 
@@ -39,4 +39,54 @@ use_ok 'npg_qc_viewer::Util::TransferObject';
   }
 }
 
+subtest 'Transfer object qc_able' => sub {
+  plan tests => 19;
+  my $id_run = 1;
+  my $position = 1;
+  my $to = npg_qc_viewer::Util::TransferObject->new({
+    id_run => $id_run,
+    position => $position
+  });
+
+  #Params gclp, control, tag_index
+  ok($to->qc_able(0, 0, 1), q[Is qc'able when not control, not gclp, tag index not 0]);
+  ok(!$to->qc_able(1, 0, 1), q[Is not qc'able when is gclp]);
+  ok(!$to->qc_able(0, 1, 1), q[Is not qc'able when is control]);
+  ok(!$to->qc_able(0, 0, 0), q[Is not qc'able when is tag index 0]);
+  ok($to->qc_able(0, 0), q[Is qc'able when no tag index]);
+  ok($to->qc_able(1, 0), q[Is qc'able when no tag index]);
+  ok($to->qc_able(0, 1), q[Is qc'able when no tag index]);
+
+  ok(npg_qc_viewer::Util::TransferObject->qc_able(0, 0, 1), q[Is qc'able (class method) when not control, not gclp, tag index not 0]);
+  ok(!npg_qc_viewer::Util::TransferObject->qc_able(1, 0, 1), q[Is not qc'able (class method) when is gclp]);
+  ok(!npg_qc_viewer::Util::TransferObject->qc_able(0, 1, 1), q[Is not qc'able (class method) when is control]);
+  ok(!npg_qc_viewer::Util::TransferObject->qc_able(0, 0, 0), q[Is not qc'able (class method) when is tag index 0]);
+  ok(npg_qc_viewer::Util::TransferObject->qc_able(0, 0), q[Is qc'able (class method) when no tag index]);
+  ok(npg_qc_viewer::Util::TransferObject->qc_able(1, 0), q[Is qc'able (class method) when no tag index]);
+  ok(npg_qc_viewer::Util::TransferObject->qc_able(0, 1), q[Is qc'able (class method) when no tag index]);
+
+  $to = npg_qc_viewer::Util::TransferObject->new({
+    id_run     => $id_run,
+    position   => $position,
+    is_gclp    => 0,
+    is_control => 0,
+    tag_index  => 1
+  });
+  ok($to->instance_qc_able, q[Intance is qc'able when not control, not gclp, tag index not 0]);
+  $to->is_gclp(1);
+  ok(!$to->instance_qc_able, q[Intance is not qc'able when is gclp]);
+  $to->is_gclp(0); $to->is_control(1);
+  ok(!$to->instance_qc_able, q[Intance is not qc'able when is control]);
+  $to->is_control(0); $to->tag_index(0);
+  ok(!$to->instance_qc_able, q[Intance is not qc'able when is tag index 0]);
+  $to = npg_qc_viewer::Util::TransferObject->new({
+    id_run     => $id_run,
+    position   => $position,
+    is_gclp    => 0,
+    is_control => 0
+  });
+  ok($to->instance_qc_able, q[Intance is qc'able when no tag index]);
+};
+
 1;
+
