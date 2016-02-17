@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC:
+   - entities are marked as qcable in template
+
 release 60.0
  - JSON service (retrieval) for qc outcomes
  - update link to picard in POD
