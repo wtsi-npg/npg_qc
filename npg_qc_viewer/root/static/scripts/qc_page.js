@@ -3,43 +3,52 @@
 /* globals $: false, define: false */
 'use strict';
 define(['jquery'], function (jQuery) {
-  var _reTitle = /^NPG SeqQC v[\w\.]+: Results(?: \(all\))? for (run[s]?) ([0-9]+)(?: lanes ([0-9]))? \(run [0-9]+ status:(?: [a-zA-Z0-9]+){3}, taken by ([a-zA-Z0-9]+)\)$/;
-  var _reRunPage = //;
-  var _reRunStatus = /\(run [0-9]+ status:(?: [a-zA-Z0-9]+){3}, taken by ([a-zA-Z0-9]+)\)$/;
+  var _reRunLane   = /(?:(?:for (run) ([0-9]+))|(?:for (runs) ([0-9]+) lanes ([0-9]+))) \(run/;
+  var _reRunStatus = /\(run [0-9]+ status: ((?:[\S]+)(?:\s[\S]+){2}), taken by ([\S]+)\)$/;
   
   var _reLoggedUser = /^Logged in as ([a-zA-Z0-9]+)(?:[\s]{1}(?:\((mqc)\)))?$/i; // [1] username, [2] (mqc)
 
-  var _parseTitle = function(titleString) {
+  var _parseRunLane = function(titleString) {
     if ( typeof titleString !== 'string' ) {
       throw new Error('Invalid arguments');
     }
-  
-    var match = _reTitle.exec(titleString);
-    var isRunPage = null, idRun = null, position = null, runStatus = null, takenBy = null;
 
-    if (match != null) {
-      if(match.constructor === Array && match.length > 2) {
-        if (match[1].indexOf('runs') === -1) {
+    var matchRunLane = _reRunLane.exec(titleString);
+    var isRunPage = null;
+
+    if ( matchRunLane != null ) {
+      if( matchRunLane.constructor === Array && matchRunLane.length > 1 ) {
+        if ( typeof matchRunLane[1] !== 'undefined' ) {
           isRunPage = true;
-          idRun     = match[2];
-          runStatus = match[4].replace(/^\s+/g,'');
-          takenBy   = match[5];
-        } else if (match[1].indexOf('runs') === 0) {
+        } else if ( typeof matchRunLane[3] !== 'undefined' ) {
           isRunPage = false;
-          idRun     = match[2];
-          position  = match[3];
-          runStatus = match[4].replace(/^\s+/g,'');
-          takenBy   = match[5];
         }
       }
     }
-    
+
     return {
-      isRunPage: isRunPage,
-      idRun:     idRun,
-      position:  position,
-      runStatus: runStatus, //
-      takenBy:   takenBy //
+      isRunPage: isRunPage
+    };
+  };
+  
+  var _parseRunStatus = function(titleString) {
+    if ( typeof titleString !== 'string' ) {
+      throw new Error('Invalid arguments');
+    }
+
+    var matchRunStatus = _reRunStatus.exec(titleString);
+    var runStatus = null, takenBy = null;
+
+    if ( matchRunStatus != null &&
+         matchRunStatus.constructor === Array &&
+         matchRunStatus.length == 3 ) {
+      runStatus = matchRunStatus[1].replace(/^\s+/g,'');
+      takenBy   = matchRunStatus[2];
+    }
+
+    return {
+      runStatus: runStatus,
+      takenBy:   takenBy
     };
   };
 
@@ -47,21 +56,21 @@ define(['jquery'], function (jQuery) {
     if ( typeof loggedUserString !== 'string' ) {
       throw new Error('Invalid arguments');
     }
-    var loggedUser = null, loggedUserRole = null;
+    var username = null, role = null;
     
-    var match = _reLoggedUser.exec(loggedUserString);
-    if (match != null) {
-      if (match.constructor === Array && match.length > 0) {
-        loggedUser = match[1];
-        if (match.length === 3) {
-          loggedUserRole = match[2];
+    var matchLoggedUser = _reLoggedUser.exec(loggedUserString);
+    if (matchLoggedUser != null) {
+      if (matchLoggedUser.constructor === Array && matchLoggedUser.length > 1) {
+        username = matchLoggedUser[1];
+        if (matchLoggedUser.length === 3) {
+          role = matchLoggedUser[2];
         }
       }
     }
     
     return {
-      loggedUser:     loggedUser, //
-      loggedUserRole: loggedUserRole //
+      username: username, //
+      role:     role //
     };
   };
 
@@ -70,7 +79,8 @@ define(['jquery'], function (jQuery) {
     
     var loggedUserString = $('#header h1 span.rfloat').text();
     var loggedUserData = _parseLoggedUser(loggedUserString);
-    if (loggedUserData.loggedUser != null && loggedUserData.loggedUserRole === 'mqc') {
+    if ( loggedUserData.username != null &&
+         loggedUserData.role === 'mqc' ) {
       var pageTitleString = $('title').text();
       var runStatusData = _parseRunStatus(pageTitleString);
       if ( loggedUserData.role === 'mqc' &&
@@ -90,7 +100,8 @@ define(['jquery'], function (jQuery) {
   };
 
   return {
-    _parseTitle: _parseTitle,
+    _parseRunLane: _parseRunLane,
+    _parseRunStatus: _parseRunStatus,
     _parseLoggedUser: _parseLoggedUser,
     pageForMQC: pageForMQC
   };
