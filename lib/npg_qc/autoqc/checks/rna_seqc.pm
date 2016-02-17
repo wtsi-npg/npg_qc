@@ -19,11 +19,8 @@ with qw(npg_tracking::data::reference::find
 our $VERSION = '0';
 
 Readonly::Scalar our $EXT => q[bam];
-Readonly::Scalar my $RNASEQC_JAR_NAME       => q[RNA-SeQC_v1.1.8.jar];
-Readonly::Scalar my $RNASEQC_JAR_VERSION    => q[1.1.8];
+Readonly::Scalar my $RNASEQC_JAR_NAME       => q[RNA-SeQC.jar];
 Readonly::Scalar my $RNASEQC_GTF_TTYPE_COL  => 2;
-Readonly::Scalar my $RNASEQC_GTF_DIRECTORY  => q[RNA-SeQC];
-Readonly::Scalar my $RNASEQC_OUTDIR         => q[rna_seqc];
 Readonly::Scalar my $JAVA_MAX_HEAP_SIZE     => q[4000m];
 Readonly::Scalar my $JAVA_GC_TYPE           => q[+UseSerialGC];
 Readonly::Scalar my $JAVA_USE_PERF_DATA     => q[-UsePerfData];
@@ -180,7 +177,6 @@ override 'execute' => sub {
     	return 1;
     }
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
-    $self->result->set_info('Jar_version', $RNASEQC_JAR_VERSION);
     my $command = $self->_command();
     $self->result->set_info('Command', $command);
     carp qq[EXECUTING $command time ]. DateTime->now();
