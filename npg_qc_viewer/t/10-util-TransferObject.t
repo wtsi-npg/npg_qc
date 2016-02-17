@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More tests => 12;
+use Test::Exception;
 
 use_ok 'npg_qc_viewer::Util::TransferObject';
 
@@ -39,31 +40,30 @@ use_ok 'npg_qc_viewer::Util::TransferObject';
   }
 }
 
-subtest 'Transfer object qc_able' => sub {
-  plan tests => 19;
-  my $id_run = 1;
+subtest 'Transfer object qc_able function' => sub {
+  plan tests => 23;
+  my $id_run   = 1;
   my $position = 1;
   my $to = npg_qc_viewer::Util::TransferObject->new({
     id_run => $id_run,
     position => $position
   });
 
-  #Params gclp, control, tag_index
-  ok($to->qc_able(0, 0, 1), q[Is qc'able when not control, not gclp, tag index not 0]);
-  ok(!$to->qc_able(1, 0, 1), q[Is not qc'able when is gclp]);
-  ok(!$to->qc_able(0, 1, 1), q[Is not qc'able when is control]);
-  ok(!$to->qc_able(0, 0, 0), q[Is not qc'able when is tag index 0]);
-  ok($to->qc_able(0, 0), q[Is qc'able when no tag index]);
-  ok($to->qc_able(1, 0), q[Is qc'able when no tag index]);
-  ok($to->qc_able(0, 1), q[Is qc'able when no tag index]);
-
-  ok(npg_qc_viewer::Util::TransferObject->qc_able(0, 0, 1), q[Is qc'able (class method) when not control, not gclp, tag index not 0]);
-  ok(!npg_qc_viewer::Util::TransferObject->qc_able(1, 0, 1), q[Is not qc'able (class method) when is gclp]);
-  ok(!npg_qc_viewer::Util::TransferObject->qc_able(0, 1, 1), q[Is not qc'able (class method) when is control]);
-  ok(!npg_qc_viewer::Util::TransferObject->qc_able(0, 0, 0), q[Is not qc'able (class method) when is tag index 0]);
-  ok(npg_qc_viewer::Util::TransferObject->qc_able(0, 0), q[Is qc'able (class method) when no tag index]);
-  ok(npg_qc_viewer::Util::TransferObject->qc_able(1, 0), q[Is qc'able (class method) when no tag index]);
-  ok(npg_qc_viewer::Util::TransferObject->qc_able(0, 1), q[Is qc'able (class method) when no tag index]);
+  for my $entity ($to, 'npg_qc_viewer::Util::TransferObject') {
+    my $calling_as = ref $entity ? q[instance method] : q[class method];
+    #Parameters gclp, control, tag_index
+    throws_ok {$entity->qc_able()} qr/is_gclp cannot be undefined/,
+                                   qq[Throws exception ($calling_as) when is_gclp is undefined];
+    throws_ok {$entity->qc_able(0)} qr/is_control cannot be undefined/,
+                                    qq[Throws exception ($calling_as) when is_control is undefined];
+    ok($entity->qc_able(0, 0, 1), qq[Is qc'able ($calling_as) when not control, not gclp, tag index not 0]);
+    ok(!$entity->qc_able(1, 0, 1), qq[Is not qc'able ($calling_as) when is gclp]);
+    ok(!$entity->qc_able(0, 1, 1), qq[Is not qc'able ($calling_as) when is control]);
+    ok(!$entity->qc_able(0, 0, 0), qq[Is not qc'able ($calling_as) when is tag index 0]);
+    ok($entity->qc_able(0, 0), qq[Is qc'able ($calling_as) when no tag index]);
+    ok($entity->qc_able(1, 0), qq[Is qc'able ($calling_as) when no tag index]);
+    ok($entity->qc_able(0, 1), qq[Is qc'able ($calling_as) when no tag index]);
+  }
 
   $to = npg_qc_viewer::Util::TransferObject->new({
     id_run     => $id_run,

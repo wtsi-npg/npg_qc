@@ -3,6 +3,7 @@ package npg_qc_viewer::Util::TransferObject;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
+use Carp;
 
 with qw/
           npg_tracking::glossary::run
@@ -240,17 +241,22 @@ sub instance_qc_able {
 
 =head2 qc_able
 
-Returns true if tag_index is undefined or tag_index is non zero
-and entity is not gclp and entity is not control.
+Returns true if there are conditions for QC, false otherwise.
 
 =cut
 sub qc_able {
   my ($self, $is_gclp, $is_control, $tag_index) = @_;
-  my $result = 1;
-  if (defined $tag_index) {
-    $result = !$is_gclp && $tag_index != 0  && !$is_control ? 1 : 0;
+  if (!defined $is_gclp) {
+    croak q[is_gclp cannot be undefined];
   }
-  return $result;
+  if (!defined $is_control) {
+    croak q[is_control cannot be undefined];
+  }
+  my $for_qc = 1;
+  if (defined $tag_index) {
+    $for_qc = $tag_index == 0 || $is_gclp || $is_control ? 0 : 1;
+  }
+  return $for_qc;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -271,6 +277,8 @@ __END__
 =item MooseX::StrictConstructor
 
 =item namespace::autoclean
+
+=item Carp
 
 =item npg_tracking::glossary::run
 
