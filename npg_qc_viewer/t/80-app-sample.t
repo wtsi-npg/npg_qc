@@ -51,7 +51,7 @@ subtest 'Sample 9272' => sub {
   my $version = $npg_qc_viewer::VERSION;
   my $url = qq[http://localhost/checks/samples/$sample_id];
   $mech->get_ok($url);
-  $mech->title_is(qq[NPG SeqQC v${version}: Sample 'random_sample_name']);
+  $mech->title_is(qq[NPG SeqQC v${version}: Sample 'random_sample_name' (run 4025 status: qc complete)]);
   $mech->content_contains(q[NT28560W &lt;&lt; random_sample_name &lt;&lt; random_study_name]);
 };
 
@@ -87,7 +87,7 @@ subtest 'Full provenance in title for different samples of same run' => sub {
   while ( my ($sample_id, $sample_name, $provenance) = $it->() ) {
     my $url = qq[http://localhost/checks/samples/$sample_id];
     $mech->get_ok($url);
-    $mech->title_is(qq[NPG SeqQC v${version}: Sample '$sample_name']);
+    $mech->title_is(qq[NPG SeqQC v${version}: Sample '$sample_name' (run 4025 status: qc complete)]);
     $mech->content_contains($provenance);
   }
 };
