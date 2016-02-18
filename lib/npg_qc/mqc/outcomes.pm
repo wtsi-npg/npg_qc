@@ -7,11 +7,17 @@ use Readonly;
 use List::MoreUtils qw/ none /;
 use Carp;
 
+use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 use npg_tracking::glossary::rpt;
 
 our $VERSION = '0';
 
 Readonly::Scalar my $NO_TAG_FLAG => -1;
+Readonly::Scalar my $SEQ_RS_NAME => 'MqcOutcomeEnt';
+Readonly::Scalar my $LIB_RS_NAME => 'MqcLibraryOutcomeEnt';
+Readonly::Scalar my $IDRK        => 'id_run';
+Readonly::Scalar my $PK          => 'position';
+Readonly::Scalar my $TIK         => 'tag_index';
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -20,7 +26,7 @@ has 'qc_schema' => (
 );
 
 sub get {
-  my ( $self, $qlist) = @_;
+  my ($self, $qlist) = @_;
 
   if (!$qlist || (ref $qlist ne 'ARRAY')) {
     croak 'Input is missing or is not an array';
@@ -29,8 +35,8 @@ sub get {
   my $hashed_queries = {};
   foreach my $q ( @{$qlist} ) {
     _validate_query($q);
-    my $tag = defined $q->{'tag_index'} ? $q->{'tag_index'} : $NO_TAG_FLAG;
-    push @{$hashed_queries->{$q->{'id_run'}}->{$q->{'position'}}}, $tag;
+    my $tag = defined $q->{$TIK} ? $q->{$TIK} : $NO_TAG_FLAG;
+    push @{$hashed_queries->{$q->{$IDRK}}->{$q->{$PK}}}, $tag;
   }
 
   my @lib_outcomes = ();
@@ -40,19 +46,19 @@ sub get {
     my @positions = keys %{$hashed_queries->{$id_run}};
     foreach my $p ( @positions ) {
       my @tags = @{$hashed_queries->{$id_run}->{$p}};
-      my $query = {'id_run' => $id_run, 'position' => $p};
+      my $query = {$IDRK => $id_run, $PK => $p};
       if ( none {$_ == $NO_TAG_FLAG} @tags ) {
-        $query->{'tag_index'} = \@tags;
+        $query->{$TIK} = \@tags;
       }
-      my @lib_rows = $self->qc_schema()->resultset('MqcLibraryOutcomeEnt')
-                     ->search($query, {'join' => 'mqc_outcome'})->all();
+      my @lib_rows = $self->qc_schema()->resultset($LIB_RS_NAME)
+                     ->search($query, {'join' => $QC_OUTCOME})->all();
       if ( @lib_rows ) {
         push @lib_outcomes, @lib_rows;
       }
     }
-    my $q = {'id_run' => $id_run, 'position' => \@positions};
-    my @seq_rows = $self->qc_schema()->resultset('MqcOutcomeEnt')
-                   ->search($q, {'join' => 'mqc_outcome'})->all();
+    my $q = {$IDRK => $id_run, $PK => \@positions};
+    my @seq_rows = $self->qc_schema()->resultset($SEQ_RS_NAME)
+                   ->search($q, {'join' => $QC_OUTCOME})->all();
     if ( @seq_rows ) {
       push @seq_outcomes, @seq_rows;
     }
@@ -66,13 +72,26 @@ sub get {
 }
 
 sub save {
-  return;
+  my ($self, $outcomes, $username, $lane_info) = @_;
+
+  if (!$outcomes || (ref $outcomes ne 'HASH')) {
+    croak 'Outcomes hash is required';
+  }
+  if (!$username) {
+    croak 'Username is required';
+  }
+  if (!$lane_info || (ref $lane_info ne 'HASH')) {
+    croak 'Lane information hash is required';
+  }
+
+  my $queries = $self->_save_outcomes($outcomes, $username, $lane_info);
+  return $self->get($queries);
 }
 
 sub _validate_query {
   my $q = shift;
-  if (!defined $q->{'id_run'} || !defined $q->{'position'}) {
-    croak q[Both 'id_run' and 'position' keys should be defined];
+  if (!defined $q->{$IDRK} || !defined $q->{$PK}) {
+    croak qq[Both '$IDRK' and '$PK' keys should be defined];
   }
   return;
 }
@@ -87,6 +106,134 @@ sub _map_outcomes {
   return $map;
 }
 
+sub _save_outcomes {
+  my ($self, $outcomes, $username, $lane_info) = @_;
+
+  my $actions = sub {
+    my @queries = ();
+    foreach my $outcome_type ( ($LIB_OUTCOMES, $SEQ_OUTCOMES) ) {
+      my $outcomes4type = $outcomes->{$outcome_type} || [];
+      foreach my $outcome_hash ( @{$outcomes4type} ) {
+        my ($key, $o) =  %{$outcome_hash};
+        if (!$key || !$o) {
+          croak 'Empty or malformed outcome hash';
+        }
+        my ($outcome_ent, $query) = $self->_find_or_create_outcome($outcome_type, $o);
+        $self->_validate4update($outcome_ent);
+        $outcome_ent->update_outcome($o->{$QC_OUTCOME}, $username);
+        if ($outcome_type eq 'seq' && $outcome_ent->has_final_outcome) {
+          my @lib_outcomes = $self->qc_schema()
+            ->resultset($LIB_RS_NAME)->search($query)->all();
+          $self->_validate_library_outcomes($outcome_ent, \@lib_outcomes, $lane_info->{$key});
+          $self->_finalise_library_outcomes(\@lib_outcomes, $username);
+        }
+        push @queries, $query;
+      }
+    }
+    return \@queries;
+  };
+
+  return $self->qc_schema->txn_do($actions);
+}
+
+sub _find_or_create_outcome {
+  my ($self, $outcome_type, $outcome) = @_;
+
+  _validate_query($outcome);
+  my $q = {};
+  foreach my $key ( ($IDRK, $PK, $TIK) ) {
+    if (exists $outcome->{$key}) {
+      $q->{$key} = $outcome->{$key}
+    }
+  }
+
+  my $rs_name = $SEQ_RS_NAME;
+  if ($outcome_type eq $LIB_OUTCOMES) {
+    $rs_name = $LIB_RS_NAME;
+    if (!exists $q->{$TIK}) {
+      $q->{$TIK} = undef;
+    }
+  }
+  my $rs = $self->qc_schema()->resultset($rs_name);
+  my $rs_found = $rs->search_autoqc($q);
+  my $result = $rs_found->next;
+  if (!$result) {
+    $result=$rs->new_result($q); # Create result object in memory.
+                                 # Foreign key constraints are not checked
+                                 # at this point.
+  } else { # Existing database record is found.
+    if ($rs_found->next) {
+      croak 'Multiple qc outcomes where one is expected';
+    }
+  }
+  return ($result, $q);
+}
+
+sub _validate4update {
+  my ($self, $row) = @_;
+  if ($row->in_storage && $row->has_final_outcome) {
+    croak 'Final outcome cannot be updated';
+  }
+  return;
+}
+
+sub _finalise_library_outcomes {
+  my ($self, $rows, $username) = @_;
+  foreach my $row (@{$rows}) {
+    $self->_validate4update($row);
+    my $new_outcome = $row->mqc_outcome->matching_final_short_desc();
+    if (!$new_outcome) {
+      croak 'No matching final outcome for ' . $row->mqc_outcome->short_desc;
+    }
+    $row->update_outcome($new_outcome, $username);
+  }
+  return;
+}
+
+sub _validate_library_outcomes {
+  my ($self, $seq_outcome_ent, $lib_outcomes, $tag_list) = @_;
+
+  if (!$tag_list) {
+    croak 'No list of tag indexes';
+  }
+  my %tag_counts = map { $_ => 1 } @{$tag_list};
+
+  my $num_undecided = 0;
+  for my $lo (@{$lib_outcomes}) {
+    if ($lo->is_undecided) {
+      $num_undecided++;
+    }
+    my $tag_index = defined $lo->tag_index ? $lo->tag_index : $NO_TAG_FLAG;
+    $tag_counts{$tag_index}++;
+  }
+
+  if ($seq_outcome_ent->has_final_outcome &&
+      !$self->_validate_tag_indexes(\%tag_counts)) {
+    my $known = join q[ ], @{$tag_list};
+    croak "Mismatch between known tag indices [$known] and available library outcomes";
+  }
+  if ($seq_outcome_ent->is_accepted && $num_undecided) {
+    croak 'Sequencing passed, cannot have undecided lib outcomes';
+  } elsif ($seq_outcome_ent->is_rejected && $num_undecided != scalar @{$lib_outcomes}) {
+    croak 'Sequencing failed, all library outcomes should be undecided';
+  }
+
+  return;
+}
+
+sub _validate_tag_indexes {
+  my ($self, $tag_counts) = @_;
+
+  my @values = values %{$tag_counts};
+  if (!@values) {
+    return 1;  # no tag indexes known, none saved
+  }
+  if (scalar @values == 1 && exists $tag_counts->{$NO_TAG_FLAG}) {
+    return 1; # no tag indexes known, non-indexed library outcome saved
+  }
+  return none { $_ == 1 } @values;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
@@ -99,7 +246,7 @@ npg_qc::mqc::outcomes
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema  => $qc_schema);
   $o->get($data_array);
-  $o->save($data_array);
+  $o->save($data_array, $username, $lane_info);
 
 =head1 DESCRIPTION
 
@@ -147,6 +294,23 @@ position and tag_index both the sequencing lane outcome and library outcome are
 returned. 
 
 =head2 save
+
+First argument - a data structure identical to the one returned by the get method.
+Either top level lib or seq or both entries should be defined. The information in the
+datastructure is used to create/update qc outcomes tables.
+
+Second argument - username. No validation is performed.
+
+Third argument - a hash reference where lane-level rpt keys are mapped to arrays of
+tag indexes for a lane. The array can be empty. The arrays of tag indexes are used
+for validating library qc outcomes when a fanal outcome for a lane is saved.
+Library outcomes for all tag indexes present in the array should be available. Outcomes
+for any other tag indexes should not be present.
+
+All arguments are required.
+
+The method returns the data identical for to return value of the get method for the
+entities specifies in the first argument.
 
 =head1 DIAGNOSTICS
 

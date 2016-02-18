@@ -6,7 +6,10 @@ use Try::Tiny;
 use Carp;
 use List::MoreUtils qw/ any /;
 
+use npg_tracking::glossary::rpt;
 use npg_qc_viewer::Util::CompositionFactory;
+use npg_qc::Schema::Mqc::OutcomeDict;
+use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 use npg_qc::mqc::outcomes;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
@@ -97,28 +100,6 @@ sub outcomes_POST {
   return;
 }
 
-sub _rptlists2queries {
-  my $rpt_lists = shift;
-
-  my @compositions = map {
-    npg_qc_viewer::Util::CompositionFactory->new(rpt_list => $_)->create_composition()
-                         } @{$rpt_lists};
-  if ( any { $_->num_components != 1 } @compositions) {
-    croak 'Cannot deal with multi-component compositions';
-  }
-  # TODO in tracking - create a public method
-  return map {$_->components->[0]->_pack_custom()} @compositions;
-}
-
-sub _update_outcomes {
-  my ( $self, $c, $data ) = @_;
-  $self->status_bad_request(
-    $c,
-    'message' => 'updates not implemented',
-  );
-  return;
-}
-
 sub _get_outcomes {
   my ( $self, $c, $rpt_lists ) = @_;
 
@@ -130,7 +111,7 @@ sub _get_outcomes {
   } else {
      try {
        my $obj = npg_qc::mqc::outcomes->new(qc_schema => $c->model('NpgQcDB')->schema());
-       my @qlist = _rptlists2queries($rpt_lists);
+       my @qlist = map { _inflate_rpt($_) } @{$rpt_lists};
        $self->status_ok($c,
          'entity' => $obj->get(\@qlist),
        );
@@ -143,6 +124,104 @@ sub _get_outcomes {
   }
 
   return;
+}
+
+sub _inflate_rpt {
+  my $rpt = shift;
+
+  my $comp = npg_qc_viewer::Util::CompositionFactory->new(rpt_list => $rpt)
+             ->create_composition();
+  if ($comp->num_components > 1) {
+    croak 'Cannot deal with multi-component compositions';
+  }
+  # TODO in tracking - create a public method
+  return $comp->components->[0]->_pack_custom();
+}
+
+sub _update_outcomes {
+  my ( $self, $c, $data ) = @_;
+
+  my $error;
+  my $user_info = $c->model('User')->logged_user($c);
+  my $username = $user_info->{'username'};
+  if (!$username) {
+    $error = 'Login failed';
+  } else {
+    if (!$user_info->{'has_mqc_role'}) {
+      $error = qq[User $username is not authorised for manual qc];
+    }
+  }
+
+  if ($error) {
+    $self->status_forbidden($c, 'message' => $error,);
+    return;
+  }
+
+  try {
+    my $query     = $self->_format_outcomes($data);
+    my $lane_info = $self->_lane_info($c, $query);
+    my $response  = npg_qc::mqc::outcomes->new(
+      qc_schema => $c->model('NpgQcDB')->schema())->save($query, $username, $lane_info);
+    foreach my $key (keys %{$lane_info}) {
+      my $ids = npg_tracking::glossary::rpt->inflate_rpt($key);
+      try {
+        $c->model('NpgDB')->update_lane_manual_qc_complete(
+          $ids->{'id_run'}, $ids->{'position'}, $username);
+      } catch {
+        carp qq[Error updating lane status for rpt key '$key': $_];
+      };
+    }
+    $self->status_ok($c, 'entity' => $response,);
+  } catch {
+    $self->status_bad_request($c, 'message' => $_,);
+  };
+
+  return;
+}
+
+sub _format_outcomes {
+  my ($self, $data) = @_;
+
+  my $query = {};
+  my $count = 0;
+  foreach my $outcome_type ( ($LIB_OUTCOMES, $SEQ_OUTCOMES) ) {
+    my $outcomes = $data->{$outcome_type} || [];
+    my $keys = {};
+    foreach my $o ( @{$outcomes} ) {
+      $count++;
+      my ($rpt_key, $outcome) = each %{$o};
+      if (exists $keys->{$rpt_key}) {
+        croak qq[Duplicate entries for rpt key '$rpt_key'];
+      }
+      $keys->{$rpt_key} = 1;
+      my $q = _inflate_rpt($rpt_key);
+      $q->{$QC_OUTCOME} = $outcome->{$QC_OUTCOME} ||
+        croak qq[Outcome description is missing for rpt key '$rpt_key'];
+      push @{$query->{$outcome_type}}, {$rpt_key => $q};
+    }
+  }
+
+  if ($count == 0) {
+    croak 'No data sent';
+  }
+
+  return $query;
+}
+
+sub _lane_info {
+  my ($self, $c, $query) = @_;
+
+  my $info = {};
+  foreach my $o ( @{$query->{$SEQ_OUTCOMES}} ) {
+    my ($rpt_key, $outcome) = each %{$o};
+    my %q = %{$outcome};
+    my $outcome_desc = delete $q{$QC_OUTCOME};
+    if (npg_qc::Schema::Mqc::OutcomeDict->is_final_outcome_description($outcome_desc)) {
+      $info->{$rpt_key} = $c->model('MLWarehouseDB')->tags4lane(\%q);
+    }
+  }
+
+  return $info;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -170,7 +249,11 @@ __END__
 
 =item List::MoreUtils
 
+=item npg_tracking::glossary::rpt
+
 =item npg_qc::mqc::outcomes
+
+=item npg_qc::Schema::Mqc::OutcomeDict
 
 =back
 

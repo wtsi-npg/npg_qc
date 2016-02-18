@@ -1,7 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - SeqQC:
-   - entities are marked as qcable in template
+ - generic qc outcome updates
+ - custom class for authentication in tests - works with JSON POST requests
+ - entities are marked as qcable in template
 
 release 60.0
  - JSON service (retrieval) for qc outcomes

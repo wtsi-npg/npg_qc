@@ -52,9 +52,9 @@ subtest 'Transfer object qc_able function' => sub {
   for my $entity ($to, 'npg_qc_viewer::Util::TransferObject') {
     my $calling_as = ref $entity ? q[instance method] : q[class method];
     #Parameters gclp, control, tag_index
-    throws_ok {$entity->qc_able()} qr/is_gclp cannot be undefined/,
+    throws_ok {$entity->qc_able()} qr/Both gclp and control flags should be defined/,
                                    qq[Throws exception ($calling_as) when is_gclp is undefined];
-    throws_ok {$entity->qc_able(0)} qr/is_control cannot be undefined/,
+    throws_ok {$entity->qc_able(0)} qr/Both gclp and control flags should be defined/,
                                     qq[Throws exception ($calling_as) when is_control is undefined];
     ok($entity->qc_able(0, 0, 1), qq[Is qc'able ($calling_as) when not control, not gclp, tag index not 0]);
     ok(!$entity->qc_able(1, 0, 1), qq[Is not qc'able ($calling_as) when is gclp]);

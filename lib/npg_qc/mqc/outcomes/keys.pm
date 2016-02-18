@@ -1,32 +1,35 @@
-package npg_qc_viewer::Model::NpgQcDB;
+package npg_qc::mqc::outcomes::keys;
 
-use Moose;
-use namespace::autoclean;
-use Carp;
+use strict;
+use warnings;
+use base 'Exporter';
+use Readonly;
 
-BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
+our $VERSION = '0';
 
-our $VERSION  = '0';
+our @EXPORT_OK = qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 
-__PACKAGE__->config(
-  schema_class => 'npg_qc::Schema',
-  connect_info => [], #a fall-back position if connect_info is not defined in the config file
-);
-
-__PACKAGE__->meta->make_immutable;
+Readonly::Scalar our $LIB_OUTCOMES => q[lib];
+Readonly::Scalar our $SEQ_OUTCOMES => q[seq];
+Readonly::Scalar our $QC_OUTCOME   => q[mqc_outcome];
 
 1;
 __END__
 
+
 =head1 NAME
 
-npg_qc_viewer::Model::NpgQcDB
+npg_qc::mqc::outcomes::keys
 
-=head1 SYNOPSIS  
+=head1 SYNOPSIS
+
+  use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES/;
+  use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 
 =head1 DESCRIPTION
 
-A model for the NPG QC database DBIx schema
+A set of strings used as keys in input and output data structures
+in npg_qc::mqc::outcomes.
 
 =head1 SUBROUTINES/METHODS
 
@@ -38,15 +41,13 @@ A model for the NPG QC database DBIx schema
 
 =over
 
-=item Moose
+=item strict
 
-=item namespace::autoclean
+=item warnings
 
-=item Catalyst::Model::DBIC::Schema
+=item Readonly
 
-=item npg_qc::Schema
-
-=item Carp
+=item Exporter
 
 =back
 
@@ -56,13 +57,13 @@ A model for the NPG QC database DBIx schema
 
 =head1 AUTHOR
 
-Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd.
+Copyright (C) 2016 GRL, by Marina Gourtovaia
 
-This file is part of NPG software.
+This file is part of NPG.
 
 NPG is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -78,4 +79,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
