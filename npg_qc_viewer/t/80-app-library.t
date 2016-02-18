@@ -27,7 +27,7 @@ subtest 'Basic test for ibraries' => sub {
   my $lib_name = 'NT28560W';
   my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
   $mech->get_ok($url);
-  $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}: Libraries: 'NT28560W']);
+  $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}: Libraries: 'NT28560W' (run 4025 status: qc complete)]);
   $mech->content_contains($lib_name);
   my $id_run = '4025';
   $mech->content_contains($id_run);
