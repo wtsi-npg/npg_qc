@@ -65,7 +65,7 @@ $qc_schema->resultset('TagMetrics')->create({
 {
   my $url = q[http://localhost/checks/runs/4025];
   $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results for run 4025 (current run status: qc complete)]);
+  $mech->title_is($title_prefix . q[Results for run 4025 (run 4025 status: qc complete)]);
   $mech->content_contains('Back to Run 4025');
   $mech->content_contains(152);  # num cycles
   $mech->content_contains('NT28560W'); #library name
@@ -78,24 +78,30 @@ $qc_schema->resultset('TagMetrics')->create({
 
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)->update({ id_user => 64, id_run_status_dict => 26, });
   $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results for run 4025 (current run status: qc in progress, taken by mg8)]);
+  $mech->title_is($title_prefix . q[Results for run 4025 (run 4025 status: qc in progress, taken by mg8)]);
 }
 
 subtest 'Test for page title - this affects javascript part too.' => sub {
   plan tests => 6;
 
-  #This tests is linked with the javascript part of the application
+  #These tests are linked with the javascript part of the application
   #which uses the title of the page to check if manual qc GUI should
   #be shown. 
   my $url = q[http://localhost/checks/runs/10107];
+  $qc_schema->resultset('TagMetrics')->create({
+    id_run => 10107,
+    position =>1,
+    path => 'some path',
+    reads_pf_count=>'{"2":1,"1":2000,"0":3000}'
+  });
   warnings_like{$mech->get_ok($url)} [ { carped => qr/run 10107 no longer on staging/ } ],
                                         'Expected warning for run folder found';
-  $mech->title_is($title_prefix . q[Results for run 10107 (current run status: qc in progress, taken by melanie)]);
+  $mech->title_is($title_prefix . q[Results for run 10107 (run 10107 status: qc in progress, taken by melanie)]);
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 10107, iscurrent => 1},)
                  ->update({ id_user => 50, id_run_status_dict => 25, });
   warnings_like{$mech->get_ok($url)} [ { carped => qr/run 10107 no longer on staging/ }, ],
                                         'Expected warning for run folder found';
-  $mech->title_is($title_prefix . q[Results for run 10107 (current run status: qc on hold, taken by melanie)]);
+  $mech->title_is($title_prefix . q[Results for run 10107 (run 10107 status: qc on hold, taken by melanie)]);
 };
 
 subtest 'Test for summary table id - affects export to CSV.' => sub {
@@ -112,7 +118,7 @@ subtest 'Run 4025 Lane 1' => sub {
   plan tests => 9;
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
   $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results (lanes) for runs 4025 lanes 1]);
+  $mech->title_is($title_prefix . q[Results (lanes) for runs 4025 lanes 1 (run 4025 status: qc in progress, taken by mg8)]);
   $mech->content_contains(152);  # num cycles
   $mech->content_contains('NT28560W'); #library name
   $mech->content_lacks('NA18623pd2a 1');
@@ -233,7 +239,7 @@ subtest 'Page title for run + show all' =>  sub {
   plan tests => 2;
   my $url = q[http://localhost/checks/runs?run=4025&show=all];
   $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results (all) for runs 4025]);
+  $mech->title_is($title_prefix . q[Results (all) for runs 4025 (run 4025 status: qc in progress, taken by mg8)]);
 };
 
 {
@@ -348,7 +354,7 @@ subtest 'Tag metrics as first check in summary table' =>  sub {
 
   my $url = q[http://localhost/checks/runs?db_lookup=1&run=4025&lane=8&show=all];
   $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results (all) for runs 4025 lanes 8]);
+  $mech->title_is($title_prefix . q[Results (all) for runs 4025 lanes 8 (run 4025 status: qc in progress, taken by mg8)]);
   $mech->content_contains(q[<th rowspan="2">Tag</th><th>tag<br />metrics<br/>], q[Tag metrics next to tag column]); 
   $mech->content_contains(q[<td class="tag_info"><a href="#4025:8"></a></td> <td class="check_summary passed"><a href="#tmc_4025:8">69.52</a><br />], 
                           q[Original content for tag metrics for lane level]);
@@ -360,7 +366,7 @@ subtest 'Tag metrics as first check in summary table' =>  sub {
   
   $url = q[http://localhost/checks/runs?db_lookup=1&run=4025&lane=6&lane=7&lane=8&show=all];
   $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results (all) for runs 4025 lanes 6 7 8]);
+  $mech->title_is($title_prefix . q[Results (all) for runs 4025 lanes 6 7 8 (run 4025 status: qc in progress, taken by mg8)]);
   $mech->content_contains(q[<th rowspan="2">Tag</th><th>tag<br />metrics<br/>], q[Tag metrics next to tag column]);
   for my $i (6 .. 8) {
     $mech->content_contains(qq[<td class="tag_info"><a href="#4025:$i"></a></td> <td class="check_summary passed"><a href="#tmc_4025:$i">69.52</a><br />], 
