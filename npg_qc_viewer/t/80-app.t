@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More tests => 31;
 use Test::Exception;
 use HTTP::Request::Common;

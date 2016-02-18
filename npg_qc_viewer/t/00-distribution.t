@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
 use English qw(-no_match_vars);
 use t::util;

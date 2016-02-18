@@ -117,7 +117,6 @@ my $builder = $class->new(
    'build_requires'    => {
         'npg_tracking::util::build'                     => '0',
         'Catalyst::Test'                                => '0',
-        'Catalyst::Authentication::Credential::Testing' => '0',
         'DateTime'                                      => '0',
         'File::Temp'                                    => '0',
         'File::Spec'                                    => '0',

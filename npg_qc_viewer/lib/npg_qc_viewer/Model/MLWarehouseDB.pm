@@ -3,14 +3,10 @@ package npg_qc_viewer::Model::MLWarehouseDB;
 use Moose;
 use namespace::autoclean;
 use Carp;
-use Readonly;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
-
-Readonly::Scalar our $HASH_KEY_QC_TAGS     => q[qc_tags];
-Readonly::Scalar our $HASH_KEY_NON_QC_TAGS => q[non_qc_tags];
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -167,61 +163,51 @@ sub search_sample_by_sample_id {
   return $rs;
 }
 
-=head2 fetch_tag_index_array_for_run_position
+=head2 tags4lane
 
-  A hash containing tag indices for a lane is returned. Indices
-  are split into two arrays - tags that are subject to qc and not.
+An array of tag indexes that are subject to qc is returned.
+
+  $model->tags4lane({'id_run' => 4, 'position' => 4});
 
 =cut
-sub fetch_tag_index_array_for_run_position {
-  my ($self, $id_run, $position) = @_;
+sub tags4lane {
+  my ($self, $lane_hash) = @_;
 
-  if(!defined $id_run) {
-    croak q[Id run is required when searching for tag_indexes but not defined];
-  }
-  if(!defined $position) {
-    croak q[Position is required when searching for tag_indexes but not defined];
-  }
-
-  my $product_table = 'IseqProductMetric';
-  my $rs = $self->resultset($product_table)->search(
+  my $rs = $self->resultset('IseqProductMetric')->search(
     {
-      'me.id_run'     => $id_run,
-      'me.position'   => $position,
+      'me.id_run'     => $lane_hash->{'id_run'},
+      'me.position'   => $lane_hash->{'position'},
     },
     {
-      'prefetch' => 'iseq_flowcell',
-      'order_by' => [qw/ me.id_run me.position me.tag_index /],
+      'join'     => 'iseq_flowcell',
+      'order_by' => [qw/ me.tag_index /],
+      'cache'    => 1,
     }
   );
+  if ($rs->count == 0) {
+    croak sprintf 'No NPG mlwarehouse data for run %i position %i',
+      $lane_hash->{'id_run'}, $lane_hash->{'position'};
+  }
 
-  my @qc_tags     = ();
-  my @non_qc_tags = ();
-  my $count       = 0;
+  my @tags = ();
   while (my $row = $rs->next) {
-    $count++;
     my $tag_index = $row->tag_index;
-    if (!defined $tag_index) {
+    if (!$tag_index) {
       next;
     }
     my $flowcell_row = $row->iseq_flowcell;
-    if (!$flowcell_row && $tag_index) {
+    if (!$flowcell_row) {
       croak sprintf 'Flowcell data missing for run %i position %i tag_index %i',
-                    $id_run, $position, $tag_index;
+                    $lane_hash->{'id_run'}, $lane_hash->{'position'}, $tag_index;
     }
-
-    if (!$tag_index || $flowcell_row->from_gclp() || $flowcell_row->is_control()) {
-      push @non_qc_tags, $tag_index;
-    } else {
-      push @qc_tags, $tag_index;
+    #if (npg_qc_viewer::Util::TransferObject->qc_able(
+    #    $flowcell_row->from_gclp(), $flowcell_row->is_control(), $tag_index) {
+    if (!$flowcell_row->from_gclp() && !$flowcell_row->is_control()) {
+      push @tags, $tag_index;
     }
   }
 
-  if ($count == 0) {
-    croak qq[No data for run $id_run position $position in $product_table] ;
-  }
-
-  return {$HASH_KEY_QC_TAGS => [@qc_tags], $HASH_KEY_NON_QC_TAGS => [@non_qc_tags],};
+  return \@tags;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -244,6 +230,8 @@ __END__
 
 =item Catalyst::Model::DBIC::Schema
 
+=item Carp
+
 =item WTSI::DNAP::Warehouse::Schema
 
 =back
@@ -258,7 +246,7 @@ David Jackson
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Genome Research Ltd.
+Copyright (C) 2016 Genome Research Ltd.
 
 This file is part of NPG software.
 

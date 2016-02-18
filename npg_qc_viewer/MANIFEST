@@ -3,8 +3,6 @@ Changes
 lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
 lib/npg_tracking/daemon/seqqc.pm
 lib/npg_qc_viewer/Controller/Checks.pm
-lib/npg_qc_viewer/Controller/Mqc.pm
-lib/npg_qc_viewer/Controller/MqcRun.pm
 lib/npg_qc_viewer/Controller/QcOutcomes.pm
 lib/npg_qc_viewer/Controller/Root.pm
 lib/npg_qc_viewer/Controller/Visuals.pm
@@ -91,6 +89,7 @@ script/npg_qc_viewer_create.pl
 script/npg_qc_viewer_fastcgi.pl
 bin/npg_qc_viewer_server.pl
 script/npg_qc_viewer_test.pl
+t/lib/Catalyst/Authentication/Credential/NpgTest.pm
 t/00-critic.t
 t/00-distribution.t
 t/00-podcoverage.t
@@ -111,7 +110,6 @@ t/20-model-MLWarehouseDB.t
 t/20-model-visuals-Fastqcheck.t
 t/30-model-visuals-Fastqcheck.t
 t/40-controller-Checks.t
-t/40-controller-Mqc.t
 t/40-controller-QcOutcomes.t
 t/40-controller-Visuals.t
 t/45-controller-Visuals.t

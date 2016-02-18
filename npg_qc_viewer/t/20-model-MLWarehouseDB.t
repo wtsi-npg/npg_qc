@@ -1,8 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use lib 't/lib';
+use Test::More tests => 10;
 use Test::Exception;
-use File::Temp qw(tempfile);
+use File::Temp qw/tempfile/;
 use List::MoreUtils qw/all/;
 
 use t::util;
@@ -111,11 +112,8 @@ subtest 'Data for sample' => sub {
 
 };
 
-my $HASH_KEY_QC_TAGS = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_QC_TAGS;
-my $HASH_KEY_NON_QC_TAGS = $npg_qc_viewer::Model::MLWarehouseDB::HASH_KEY_NON_QC_TAGS;
-
-subtest 'fetch_tag_index_array_for_run_position wo tag_index null' => sub {
-  plan tests => 6;
+subtest 'tags for a lane' => sub {
+  plan tests => 7;
 
   my $id_run = 4950;
   my $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
@@ -127,14 +125,13 @@ subtest 'fetch_tag_index_array_for_run_position wo tag_index null' => sub {
   $iseq_flowcell->update({'entity_type' => 'library_indexed_spike'});
 
   $rs->search({tag_index=>10})->next->iseq_flowcell->delete();
-  throws_ok {$m->fetch_tag_index_array_for_run_position($id_run, 1)}
+  throws_ok {$m->tags4lane( {id_run => $id_run, position => 1} )}
     qr/Flowcell data missing for run 4950 position 1 tag_index 10/,
     'error when no link to the flowcell';
   $rs->search({tag_index=>10})->next->delete();
 
-  my $hash = $m->fetch_tag_index_array_for_run_position($id_run, 1);
-  is_deeply($hash->{$HASH_KEY_QC_TAGS}, [(1 .. 9, 11 .. 23)], 'qc tags' );
-  is_deeply($hash->{$HASH_KEY_NON_QC_TAGS}, [0, 24], 'non-qc tags' );
+  is_deeply( $m->tags4lane( {id_run => $id_run, position => 1} ),
+    [(1 .. 9, 11 .. 23)], 'correct array of tags' );
 
   $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
   while (my $row = $rs->next) {
@@ -143,25 +140,20 @@ subtest 'fetch_tag_index_array_for_run_position wo tag_index null' => sub {
       $f->update({id_lims => 'C_GCLP'});
     }
   }
-  $hash = $m->fetch_tag_index_array_for_run_position($id_run, 1);
-  is_deeply($hash->{$HASH_KEY_QC_TAGS}, [], 'no qc tags' );
-  is_deeply($hash->{$HASH_KEY_NON_QC_TAGS}, [(0 .. 9, 11.. 24)],
-    'GCLP lane - all tags are non-qc' );
-};
 
-subtest 'fetch_tag_index_array_for_run_position with tag_index null' => sub {
-  plan tests => 4;
-  my $id_run = 4025;
-  my $rs = $m->resultset(q(IseqProductMetric));
-  $rs = $rs->search({id_run=>$id_run, position=>1});
+  is_deeply($m->tags4lane( {id_run => $id_run, position => 1} ),
+    [], 'GCLP run - no tags reported' );
+
+  $id_run = 4025;
+  $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
   is($rs->count, 1, q[Correct number of elements found]);
-  my $hash = $m->fetch_tag_index_array_for_run_position($id_run, 1);
-  is_deeply ($hash->{$HASH_KEY_QC_TAGS}, [], 'No qc tags');
-  is_deeply ($hash->{$HASH_KEY_NON_QC_TAGS}, [], 'No non qc tags');
+  my $hash = $m->tags4lane({id_run=>$id_run, position=>1});
+  is_deeply ($m->tags4lane({id_run=>$id_run, position=>1}),
+    [], 'No qc tags for a lane');
 
   my $non_existing_run = 4951; 
-  throws_ok{$m->fetch_tag_index_array_for_run_position($non_existing_run, 1)}
-    qr/No data for run 4951 position 1 in IseqProductMetric/,
+  throws_ok{ $m->tags4lane({id_run=>$non_existing_run, position=>1}) }
+    qr/No NPG mlwarehouse data for run 4951 position 1/,
     'Error when data are unavailable';
 };
 
