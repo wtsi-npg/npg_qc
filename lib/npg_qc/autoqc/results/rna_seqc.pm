@@ -10,14 +10,10 @@ use namespace::autoclean;
 use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
-with qw(npg_qc::autoqc::role::rna_seqc);
 
 our $VERSION = '0';
 
-has 'rnaseqc_metrics_path' => (isa        => 'Maybe[Str]',
-                               is         => 'rw',
-                               required   => 0,
-                               );
+# No additional results functionality required by RNA-SeQC check.
 
 __PACKAGE__->meta->make_immutable;
 
@@ -34,10 +30,6 @@ __END__
 =head1 DESCRIPTION
 
 =head1 SUBROUTINES/METHODS
-
-=head2 metrics_path
-
-An absolute path to the directory with RNA-SeQC metrics files.
 
 =head1 DIAGNOSTICS
 
