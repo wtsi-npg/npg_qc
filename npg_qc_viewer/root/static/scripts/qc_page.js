@@ -1,4 +1,17 @@
 /*
+ * Module provides functionality to decide if page matches conditions for
+ * manual QC.
+ *
+ * Example:
+ *
+ *   var pageForMQC = qc_page.pageForMQC();
+ *   if ( pageForMQC.isPageForMQC ) {
+ *     if( pageForMQC.isRunPage ) {
+ *       // Do manual QC sequencing level
+ *     } else {
+ *       // Do manual QC library level
+ *     }
+ *   }
  */
 /* globals $: false, define: false */
 'use strict';
