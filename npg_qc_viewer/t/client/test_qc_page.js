@@ -105,6 +105,21 @@ require(['scripts/qc_page'],
     QUnit.test("Pages for manual QC", function (assert) {
       var originalTitle = document.title;
 
+      var emptyStrings = [ '', ' ' ];
+      for ( var i = 0; i < emptyStrings.length; i++ ) {
+        document.title = emptyStrings[i];
+        assert.throws( function() { qc_page.pageForMQC(); },
+                                    /Error: page title is expected but not available in page/,
+                                    "Throws error when page has empty title" );
+      }
+      document.title = originalTitle;
+      for ( var i = 0; i < emptyStrings.length; i++ ) {
+        $('#header h1 span.rfloat').text(emptyStrings[i]);
+        assert.throws( function() { qc_page.pageForMQC(); },
+                                    /Error: authentication data is expected but not available in page/,
+                                    "Throws error when authentication info is empty" );
+      }
+
       $('#header h1 span.rfloat').text('Logged in as aa11 (mqc)');
       var titlesForMQC = [
         'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc in progress, taken by aa11)',

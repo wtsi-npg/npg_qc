@@ -93,14 +93,20 @@ define(['jquery'], function (jQuery) {
   var pageForMQC = function() {
     var isPageForMQC = false, isRunPage = null;
 
-    var loggedUserString = $('#header h1 span.rfloat').text();
+    var loggedUserString = $.trim($('#header h1 span.rfloat').text());
+    if ( loggedUserString === '' ) {
+      throw new Error('Error: authentication data is expected but not available in page');
+    }
+
     var loggedUserData = _parseLoggedUser(loggedUserString);
     if ( loggedUserData.username != null &&
          loggedUserData.role === 'mqc' ) {
-      var pageTitleString = $('title').text();
+      var pageTitleString = $.trim($('title').text());
+      if ( pageTitleString === '' ) {
+        throw new Error('Error: page title is expected but not available in page');
+      }
       var runStatusData = _parseRunStatus(pageTitleString);
-      if ( loggedUserData.role === 'mqc' &&
-           ( runStatusData.runStatus === 'qc in progress' ||
+      if ( ( runStatusData.runStatus === 'qc in progress' ||
              runStatusData.runStatus === 'qc on hold') &&
            loggedUserData.username === runStatusData.takenBy ) {
         var runInfo = _parseRunLane(pageTitleString);
