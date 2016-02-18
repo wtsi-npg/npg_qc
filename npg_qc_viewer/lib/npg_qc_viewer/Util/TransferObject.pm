@@ -3,6 +3,7 @@ package npg_qc_viewer::Util::TransferObject;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
+use Carp;
 
 with qw/
           npg_tracking::glossary::run
@@ -163,6 +164,18 @@ has 'is_gclp' => (
   default  => 0,
 );
 
+=head2 is_control
+
+Flag for control entity from flowcell
+
+=cut
+has 'is_control' => (
+  isa      => 'Bool',
+  is       => 'rw',
+  required => 0,
+  default  => 0,
+);
+
 =head2 entity_id_lims
 
 Id for entity lims
@@ -214,6 +227,38 @@ sub sample_name4display {
   return $self->supplier_sample_name || $self->sample_name;
 }
 
+=head2 instance_qc_able
+
+Returns the result of executing qc_able using instance variables
+as parameters
+
+=cut
+
+sub instance_qc_able {
+  my $self = shift;
+  return $self->qc_able($self->is_gclp, $self->is_control, $self->tag_index);
+}
+
+=head2 qc_able
+
+Returns true if there are conditions for QC, false otherwise.
+
+=cut
+sub qc_able {
+  my ($self, $is_gclp, $is_control, $tag_index) = @_;
+  if (!defined $is_gclp) {
+    croak q[is_gclp cannot be undefined];
+  }
+  if (!defined $is_control) {
+    croak q[is_control cannot be undefined];
+  }
+  my $for_qc = 1;
+  if (defined $tag_index) {
+    $for_qc = $tag_index == 0 || $is_gclp || $is_control ? 0 : 1;
+  }
+  return $for_qc;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -232,6 +277,8 @@ __END__
 =item MooseX::StrictConstructor
 
 =item namespace::autoclean
+
+=item Carp
 
 =item npg_tracking::glossary::run
 

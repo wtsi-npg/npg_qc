@@ -93,6 +93,7 @@ sub _add_lims_data {
     $values->{'id_pool_lims'}         = $flowcell->id_pool_lims;
     $values->{'rnd'}                  = $flowcell->is_r_and_d;
     $values->{'is_gclp'}              = $flowcell->from_gclp;
+    $values->{'is_control'}           = $flowcell->is_control;
     $values->{'entity_id_lims'}       = $flowcell->entity_id_lims;
     $values->{'study_name'}           = $flowcell->study_name;
     $values->{'id_sample_lims'}       = $flowcell->sample_id;
