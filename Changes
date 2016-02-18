@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC
+   - bugfix only build request for qc_outcomes if rptkeys in page
+
 release 60.0
  - JSON service (retrieval) for qc outcomes
  - update link to picard in POD
