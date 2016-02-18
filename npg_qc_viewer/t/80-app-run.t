@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 38;
+use Test::More tests => 39;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -138,6 +138,78 @@ subtest 'Library links for run + lane SE' => sub {
   $mech->content_contains('NT28560W'); #library name
   $mech->content_contains('assets/111111'); #SE link
   $mech->content_contains('libraries?id=NT28560W'); #seqqc link for library
+};
+
+subtest 'No mqc span html tag for gclp' => sub {
+  plan tests => 24;
+
+  for my $x (0..5) {
+    $qc_schema->resultset('TagMetrics')->create({
+      id_run => 4950,
+      position => 1,
+      tag_index => $x,
+      path => 'some path',
+      reads_pf_count=>'{"2":89,"1":299626,"0":349419}'
+    });
+  }
+
+  $schemas->{npg}->resultset('RunStatus')
+                 ->search({id_run => 4950, iscurrent => 1},)
+                 ->update({ id_user => 64, id_run_status_dict => 26, });
+
+  my $url= q[http://localhost/checks/runs?run=4950&lane=1&show=all&db_lookup=1];
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
+                                        'Expected warning for run folder found';
+  $mech->content_contains(q[rpt_key:4950:1:0]);
+  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:0">]);
+  $mech->content_contains(q[rpt_key:4950:1:1]);
+  $mech->content_contains(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:1">]);
+  $mech->content_contains(q[rpt_key:4950:1:5]);
+  $mech->content_contains(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:5">]);
+
+  my $where_lane = { 'iseq_product_metrics.id_run'   => 4950,
+                     'iseq_product_metrics.position' => 1 };
+  my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
+                             ->search($where_lane, { join => 'iseq_product_metrics', });
+  while ( my $flowcell = $rs->next ) {
+    $flowcell->update({ 'id_lims' => 'C_GCLP' });
+  }
+
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
+                                        'Expected warning for run folder found';
+  $mech->content_contains(q[rpt_key:4950:1:0]);
+  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:0">]);
+  $mech->content_contains(q[rpt_key:4950:1:1]);
+  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:1">]);
+  $mech->content_contains(q[rpt_key:4950:1:5]);
+  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:5">]);
+
+  $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
+                          ->search($where_lane, { join => 'iseq_product_metrics', });
+  while ( my $flowcell = $rs->next ) {
+    $flowcell->update({ 'id_lims' => 'SQSCP' });
+    if($flowcell->tag_index && $flowcell->tag_index == 5) {
+      $flowcell->update({ 'entity_type' => 'library_indexed_spike' });
+    }
+  }
+
+  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
+                                        'Expected warning for run folder found';
+  $mech->content_contains(q[rpt_key:4950:1:0]);
+  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:0">]);
+  $mech->content_contains(q[rpt_key:4950:1:1]);
+  $mech->content_contains(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:1">]);
+  $mech->content_contains(q[rpt_key:4950:1:5]);
+  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:5">]);
+
+  ######
+  #Reset test data
+  $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
+                          ->search($where_lane, { join => 'iseq_product_metrics', });
+  while ( my $flowcell = $rs->next ) {
+    $flowcell->update({ 'id_lims' => 'SQSCP' });
+    $flowcell->update({ 'entity_type' => 'library_indexed' });
+  }
 };
 
 subtest 'Library links lane Clarity' => sub {

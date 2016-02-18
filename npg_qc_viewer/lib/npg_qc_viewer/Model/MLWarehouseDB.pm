@@ -4,6 +4,8 @@ use Moose;
 use namespace::autoclean;
 use Carp;
 
+use npg_qc_viewer::Util::TransferObject;
+
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
@@ -200,9 +202,10 @@ sub tags4lane {
       croak sprintf 'Flowcell data missing for run %i position %i tag_index %i',
                     $lane_hash->{'id_run'}, $lane_hash->{'position'}, $tag_index;
     }
-    #if (npg_qc_viewer::Util::TransferObject->qc_able(
-    #    $flowcell_row->from_gclp(), $flowcell_row->is_control(), $tag_index) {
-    if (!$flowcell_row->from_gclp() && !$flowcell_row->is_control()) {
+    my $from_gclp  = $flowcell_row->from_gclp()  ? 1 : 0;
+    my $is_control = $flowcell_row->is_control() ? 1 : 0;
+    if (npg_qc_viewer::Util::TransferObject->qc_able(
+        $from_gclp, $is_control, $tag_index)) {
       push @tags, $tag_index;
     }
   }
