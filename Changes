@@ -6,6 +6,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - title for pages with data for one id_run show run status
  - new module provides functionality so client can start manual QC
    considering data from page
+ - removing js functions to check conflicting outcomes in DWH/MQC
 
 release 60.0
  - JSON service (retrieval) for qc outcomes
