@@ -2,22 +2,31 @@ package npg_qc::Schema::Mqc::OutcomeDict;
 
 use Moose::Role;
 use Carp;
+use Readonly;
+
+my $FINAL       = 'final';
+my $PRELIMINARY = 'preliminary';
 
 our $VERSION = '0';
 
+sub is_final_outcome_description {
+  my ($self, $desc) = @_;
+  return $desc =~ /$FINAL\Z/smx; #The short description includes the word final.
+}
+
 sub is_final_outcome {
   my $self = shift;
-  return $self->short_desc =~ m{final}ism; #The short description includes the word final.
+  return $self->is_final_outcome_description($self->short_desc);
 }
 
 sub is_accepted {
   my $self = shift;
-  return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
+  return $self->short_desc =~ /\AAccepted/smx; #The short description includes the word accepted.
 }
 
 sub is_rejected {
   my $self = shift;
-  return $self->short_desc =~ m{rejected}ism; #The short description includes the word rejected.
+  return $self->short_desc =~ /\ARejected/smx; #The short description includes the word rejected.
 }
 
 sub is_final_accepted {
@@ -27,17 +36,28 @@ sub is_final_accepted {
 
 sub is_undecided {
   my $self = shift;
-  return $self->short_desc =~ m{undecided}ism;
+  return $self->short_desc =~ /\AUndecided/smx;
 }
 
 sub pk_value {
   my $self = shift;
   my @primary_columns = $self->primary_columns;
-  if (scalar @primary_columns != 1) {
-    croak q[Dictionary has a multi column primary key];
-  }
   my $column = shift @primary_columns;
   return $self->$column;
+}
+
+sub matching_final_short_desc {
+  my $self = shift;
+
+  my $desc;
+  if (!$self->is_final_outcome) {
+    $desc = $self->short_desc;
+    my $count = $desc =~ s/$PRELIMINARY/$FINAL/xms;
+    if (!$count) { # Undecided outcome does not have 'preliminary' suffix
+      $desc .= " $FINAL";
+    }
+  }
+  return $desc;
 }
 
 no Moose::Role;
@@ -61,6 +81,15 @@ __END__
   Common functionality for lane and library manual qc outcome dictionary DBIx objects.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 is_final_outcome_description
+
+  Argument - short qc outcome description.
+  Returns true if the argument describes a final outcome, false otherwise.
+  Can be used as both class and instance method.
+
+  __PACKAGE__->is_final_outcome_description('Accepted final'); # returns true
+  $row->is_final_outcome_description('Accepted preliminary'); # returns false
 
 =head2 is_final_outcome
 
@@ -91,6 +120,14 @@ __END__
   Returns the value of primary key for the object if the table was defined with
   a single column primary key. Croaks if there is no primary key column or if
   there is a multi column primary key.
+
+=head2 matching_final_short_desc
+
+  If this outcome is final, returns undefined, otherwise returns a short description
+  for a matching final outcome.
+  
+    print $dict_row->short_desc; # Rejected preliminary
+    print $dict_row->matching_final_short_desc(); # Rejected final
 
 =head1 DIAGNOSTICS
 

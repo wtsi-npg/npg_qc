@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - generic qc outcome updates
+ - custom class for authentication in tests - works with JSON POST requests
+
 release 60.0
  - JSON service (retrieval) for qc outcomes
  - update link to picard in POD
