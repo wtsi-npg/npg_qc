@@ -201,7 +201,6 @@ __PACKAGE__->belongs_to(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ifqd4uXLKB/KQXtKle8Tnw
 
 use Carp;
-use Array::Compare;
 
 with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
 
@@ -215,105 +214,6 @@ sub update_reported {
           $self->id_run, $self->position);
   }
   return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
-}
-
-sub validate_outcome_of_libraries {
-  my ($self, $outcome_dict_obj, $tag_indexes_in_lims, $library_outcome_ents) = @_;
-
-  if($outcome_dict_obj->is_accepted) {
-    #all plexes with qc
-    if(scalar @{ $tag_indexes_in_lims } == $library_outcome_ents->count ) {
-      my $tag_indexes_in_qc = [];
-      while(my $library = $library_outcome_ents->next) {
-        if ($library->is_undecided) {
-          croak('All plex libraries should either pass or fail.');
-        }
-        push @{$tag_indexes_in_qc}, $library->tag_index;
-      }
-
-      my $comp = Array::Compare->new();
-      if (!$comp->perm($tag_indexes_in_lims, $tag_indexes_in_qc)) {
-        croak('Tag indexes in LIMs and QC do not match.');
-      }
-    } else {
-      croak('All plex libraries have to be QC-ed.');
-    }
-  } else {
-    #All plexes with undecided
-    while(my $library = $library_outcome_ents->next) {
-      if (!$library->is_undecided) {
-        croak('All plex libraries should have undecided QC outcome.');
-      }
-    }
-  }
-  return 1;
-}
-
-sub update_outcome_with_libraries {
-  my ($self, $outcome, $username, $tag_indexes_in_lims) = @_;
-  my $outcome_dict_object = $self->find_valid_outcome($outcome);
-
-  $tag_indexes_in_lims ||= [];
-  my $num_tags = scalar @{$tag_indexes_in_lims};
-  if( $num_tags && $outcome_dict_object->is_final_outcome
-        && ($num_tags <= $self->mqc_lib_limit) ) {
-    my $rs_library_ent = $self->result_source
-                              ->schema
-                              ->resultset( q[MqcLibraryOutcomeEnt] );
-    my $outcomes_libraries = $rs_library_ent->fetch_mqc_library_outcomes(
-      $self->id_run,
-      $self->position
-    );
-    $self->validate_outcome_of_libraries(
-      $outcome_dict_object,
-      $tag_indexes_in_lims,
-      $outcomes_libraries
-    );
-    $outcomes_libraries->reset;
-
-    my $outcome_lib_hash = {};
-    my $undefined_placeholder = q[undefined];
-    while ( my $library = $outcomes_libraries->next ){
-      my $key = defined $library->tag_index ? $library->tag_index
-                                            : $undefined_placeholder;
-      $outcome_lib_hash->{$key} = $library;
-    }
-
-    my $in_transaction = sub {
-      $self->validate_username($username);
-      my $rs_library_dict = $self->result_source
-                                 ->schema
-                                 ->resultset( q[MqcLibraryOutcomeDict] );
-      my $library_dict_obj = $rs_library_dict->search(
-        {'short_desc' => q[Undecided final]}
-      )->first;
-      my $new_outcome_id = $library_dict_obj->pk_value;
-
-      foreach my $tag_index (@{$tag_indexes_in_lims}) {
-        my $key = defined $tag_index ? $tag_index
-                                     : $undefined_placeholder;
-        my $library_ent;
-        if ( exists $outcome_lib_hash->{$key} ) {
-          $library_ent = $outcome_lib_hash->{$key};
-          $library_ent->update_to_final_outcome($username);
-        } else {
-          my $values = {};
-          $values->{'id_run'}         = $self->id_run;
-          $values->{'position'}       = $self->position;
-          $values->{'tag_index'}      = $tag_index;
-          $values->{'username'}       = $username;
-          $values->{'modified_by'}    = $username;
-          $values->{'id_mqc_outcome'} = $new_outcome_id;
-          $library_ent = $rs_library_ent->create($values);
-        }
-      }
-    };
-
-    $self->result_source->schema->txn_do($in_transaction);
-  }
-  $self->update_nonfinal_outcome($outcome, $username);
-
-  return 1;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -345,21 +245,8 @@ Entity for lane MQC outcome.
 
 =head2 update_reported
 
-  Updates the value of reported to the current timestamp. Thorws exception if the
+  Updates the value of reported to the current timestamp. Throws exception if the
   associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
-
-=head2 validate_outcome_of_libraries
-
-  Validates if overall state for the lane and the libraries allows for a final
-  outcome in the lane.
-
-=head2 update_outcome_with_libraries
-
-  Updates children library mqc outcomes then updates outcome of lane mqc entity
-  passed as parameter. It expects a MqcOutcomeEnt object, a username for the
-  operation and an arrary of plexes to update.
-
-  $obj->update_outcome_with_libraries($new_outcome, $username, $tag_indexes_in_lims);
 
 =head1 DEPENDENCIES
 
@@ -393,7 +280,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL Genome Research Limited
+Copyright (C) 2016 GRL Genome Research Limited
 
 This file is part of NPG.
 

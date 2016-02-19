@@ -288,7 +288,6 @@ lib/npg_qc/Schema/Result/TileScore.pm
 lib/npg_qc/Schema/Result/UpstreamTags.pm
 lib/npg_qc/Schema/Result/VerifyBamId.pm
 lib/npg_qc/Schema/ResultSet.pm
-lib/npg_qc/Schema/ResultSet/MqcLibraryOutcomeEnt.pm
 lib/npg_qc/Schema/ResultSet/MqcOutcomeEnt.pm
 lib/npg_qc/util.pm
 lib/npg_qc/utils/bam_genotype.pm
@@ -419,7 +418,6 @@ t/50-schema-result-VerifyBamId.t
 t/50-schema-result-SamtoolsStats.t
 t/50-schema-result-SequenceSummary.t
 t/50-schema-resultset.t
-t/50-schema-resultset-MqcLibraryOutcomeEnt.t
 t/50-schema-resultset-MqcOutcomeEnt.t
 t/60-autoqc-autoqc.t
 t/60-autoqc-checks-adapter.t
