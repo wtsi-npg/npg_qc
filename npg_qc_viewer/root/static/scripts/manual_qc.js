@@ -22,12 +22,12 @@
 /*
 *
 * Interface for manual QC.
-* Dependencies: jQuery library
+* Dependencies: jQuery, qc_css_styles, manual_qc_ui
 *
 */
 /* globals $: false, window: false, document : false */
 "use strict";
-var NPG;
+define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css_styles, NPG) {
 /**
  * @module NPG
  */
@@ -58,8 +58,7 @@ var NPG;
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
 
-    QC.launchManualQCProcesses = function (qc_css_styles) {
-      QC.qc_css_styles = qc_css_styles;
+    QC.launchManualQCProcesses = function () {
       // Getting the run_id from the title of the page using the qc part too.
       var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                             .find("title")
@@ -135,18 +134,18 @@ var NPG;
        */
       MQCControl.prototype.removeAllQCOutcomeCSSClasses = function () {
         var parent = this.lane_control.parent().first();
-        QC.qc_css_styles.removePreviousQCOutcomeStyles(parent);
+        qc_css_styles.removePreviousQCOutcomeStyles(parent);
         parent.css("background-color", "");
       };
 
       MQCControl.prototype.setAcceptedBG = function() {
         this.removeAllQCOutcomeCSSClasses();
-        QC.qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_ACCEPTED_FINAL);
+        qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_ACCEPTED_FINAL);
       };
 
       MQCControl.prototype.setRejectedBG = function () {
         this.removeAllQCOutcomeCSSClasses();
-        QC.qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_REJECTED_FINAL);
+        qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_REJECTED_FINAL);
       };
 
       MQCControl.prototype.removeMQCFormat = function () {
@@ -1033,3 +1032,7 @@ var NPG;
   }) (NPG.QC || (NPG.QC = {}));
   var QC = NPG.QC;
 }) (NPG || (NPG = {}));
+
+return NPG;
+});
+
