@@ -27,12 +27,11 @@ require([
   'scripts/qc_outcomes_view',
   'scripts/plots',
   'scripts/format_for_csv',
-  'unveil',
   'scripts/manual_qc',
-  'scripts/manual_qc_ui',
+  'unveil',
   'table-export'
 ],
-function( qc_outcomes_view, plots, format_for_csv, unveil ) {
+function( qc_outcomes_view, plots, format_for_csv, NPG ) {
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);

@@ -22,12 +22,12 @@
 /*
 *
 * Interface for manual QC.
-* Dependencies: jQuery library
+* Dependencies: jQuery, qc_css_styles, manual_qc_ui
 *
 */
 /* globals $: false, window: false, document : false */
 "use strict";
-var NPG;
+define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css_styles, NPG) {
 /**
  * @module NPG
  */
@@ -58,8 +58,7 @@ var NPG;
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
 
-    QC.launchManualQCProcesses = function (qc_css_styles) {
-      QC.qc_css_styles = qc_css_styles;
+    QC.launchManualQCProcesses = function () {
       // Getting the run_id from the title of the page using the qc part too.
       var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
                                                             .find("title")
@@ -135,18 +134,18 @@ var NPG;
        */
       MQCControl.prototype.removeAllQCOutcomeCSSClasses = function () {
         var parent = this.lane_control.parent().first();
-        QC.qc_css_styles.removePreviousQCOutcomeStyles(parent);
+        qc_css_styles.removePreviousQCOutcomeStyles(parent);
         parent.css("background-color", "");
       };
 
       MQCControl.prototype.setAcceptedBG = function() {
         this.removeAllQCOutcomeCSSClasses();
-        QC.qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_ACCEPTED_FINAL);
+        qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_ACCEPTED_FINAL);
       };
 
       MQCControl.prototype.setRejectedBG = function () {
         this.removeAllQCOutcomeCSSClasses();
-        QC.qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_REJECTED_FINAL);
+        qc_css_styles.displayElementAs(this.lane_control.parent().first(), this.CONFIG_REJECTED_FINAL);
       };
 
       MQCControl.prototype.removeMQCFormat = function () {
@@ -962,57 +961,6 @@ var NPG;
         return result;
       };
 
-      /**
-       * Validates if lanes' outcome returned from DWH and MQC match during manual QC.
-       * Only checks in case there is an outcome in DWH, meaning there should be an
-       * outcome in manual QC.
-       *
-       * @param lanesWithBG {array} Lanes with background.
-       * @param mqc_run_data {Object} Value object with the state data for the run.
-       *
-       *  @returns A value object with two properties
-       *  outcome: true/false for the result of the match.
-       *  position: null if matching, number of the first lane where there was a missmatch
-       *   otherwise.
-       */
-      RunPageMQCControl.prototype.laneOutcomesMatch = function (lanesWithBG, mqc_run_data) {
-        if(typeof(lanesWithBG) === "undefined"
-            || lanesWithBG == null
-            || typeof(mqc_run_data) === "undefined"
-            || mqc_run_data == null) {
-          throw new Error("Error: Invalid arguments");
-        }
-        var result = {};
-        result['outcome'] = true; //Outcome of the validation.
-        result['position'] = null; //Which lane has the problem (if there is a problem).
-        for(var i = 0; i < lanesWithBG.length && result; i++) {
-          var cells = lanesWithBG[i].children('.lane_mqc_control');
-          for(var j = 0; j < cells.length && result; j++) {
-            var obj = $(cells[j]); //Wrap as an jQuery object.
-            //Lane from row.
-            var position = obj.data('position');
-            //Filling previous outcomes
-            if('qc_lane_status' in mqc_run_data) {
-              if (position in mqc_run_data.qc_lane_status) {
-                //From REST
-                var currentStatusFromREST = mqc_run_data.qc_lane_status[position];
-                //From DOM
-                var currentStatusFromView = obj.data('initial');
-                if(String(currentStatusFromREST) != String(currentStatusFromView) ) {
-                  window.console && window.console.log('Warning: conflicting outcome in DWH/MQC, position '
-                      + position + ' DWH:' + String(currentStatusFromView)
-                      + ' / MQC:' + String(currentStatusFromREST));
-                }
-              } else {
-                result.outcome = false;
-                result.position = position;
-              }
-            }
-          }
-        }
-        return result;
-      };
-
       return RunPageMQCControl;
     }) ();
     QC.RunPageMQCControl = RunPageMQCControl;
@@ -1084,3 +1032,7 @@ var NPG;
   }) (NPG.QC || (NPG.QC = {}));
   var QC = NPG.QC;
 }) (NPG || (NPG = {}));
+
+return NPG;
+});
+

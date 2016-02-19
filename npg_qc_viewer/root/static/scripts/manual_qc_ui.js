@@ -16,6 +16,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+define(['jquery'], function (jquery) {
 var NPG;
 /**
  * @module NPG
@@ -157,22 +158,6 @@ var NPG;
       }) ();
       UI.MQCInfoMessage = MQCInfoMessage;
 
-      var MQCConflictDWHErrorMessage = (function() {
-        MQCConflictDWHErrorMessage = function (id_run, position) {
-          var errorMessage = 'Conflicting data when comparing Data Ware House and Manual QC databases for run: '
-            + id_run
-            + ', lane: '
-            + position
-            + '. Displaying of QC widgets aborted.'
-          NPG.QC.UI.MQCErrorMessage.call(this,errorMessage);
-        }
-
-        MQCConflictDWHErrorMessage.prototype = new NPG.QC.UI.MQCErrorMessage();
-
-        return MQCConflictDWHErrorMessage;
-      }) ();
-      UI.MQCConflictDWHErrorMessage = MQCConflictDWHErrorMessage;
-
       var MQCLibraryOverallControls = (function () {
         MQCLibraryOverallControls = function() {
           this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
@@ -312,3 +297,7 @@ var NPG;
   }) (NPG.QC || (NPG.QC = {}));
   var QC = NPG.QC;
 }) (NPG || (NPG = {}));
+
+return NPG;
+});
+
