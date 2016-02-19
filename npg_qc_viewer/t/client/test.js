@@ -6,8 +6,8 @@ require.config({
   },
 });
 
-require(['scripts/qc_css_styles'],
-  function(qc_css_styles) {
+require(['scripts/manual_qc'],
+  function(NPG) {
 
     var TestConfiguration = (function() {
       function TestConfiguration () {
@@ -19,8 +19,6 @@ require(['scripts/qc_css_styles'],
 
       return TestConfiguration;
     }) ();
-
-    NPG.QC.qc_css_styles = qc_css_styles;
 
     QUnit.test("DOM linking", function( assert ) {
       var lane = $("#mqc_lane1");
