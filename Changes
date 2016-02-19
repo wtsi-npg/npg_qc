@@ -7,6 +7,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - new module provides functionality so client can start manual QC
    considering data from page
  - removing js functions to check conflicting outcomes in DWH/MQC
+ - SeqQC
+   - bugfix only build request for qc_outcomes if rptkeys in page
 
 release 60.0
  - JSON service (retrieval) for qc outcomes
