@@ -157,22 +157,6 @@ var NPG;
       }) ();
       UI.MQCInfoMessage = MQCInfoMessage;
 
-      var MQCConflictDWHErrorMessage = (function() {
-        MQCConflictDWHErrorMessage = function (id_run, position) {
-          var errorMessage = 'Conflicting data when comparing Data Ware House and Manual QC databases for run: '
-            + id_run
-            + ', lane: '
-            + position
-            + '. Displaying of QC widgets aborted.'
-          NPG.QC.UI.MQCErrorMessage.call(this,errorMessage);
-        }
-
-        MQCConflictDWHErrorMessage.prototype = new NPG.QC.UI.MQCErrorMessage();
-
-        return MQCConflictDWHErrorMessage;
-      }) ();
-      UI.MQCConflictDWHErrorMessage = MQCConflictDWHErrorMessage;
-
       var MQCLibraryOverallControls = (function () {
         MQCLibraryOverallControls = function() {
           this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
