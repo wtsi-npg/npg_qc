@@ -92,24 +92,26 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
   };
 
   var _fetchQCOutcomesUpdateView = function (rptKeys, outcomesURL, callOnSuccess) {
-    $.ajax({
-      url: outcomesURL,
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify(_buildQuery(rptKeys)),
-      cache: false
-    }).error(function(jqXHR, textStatus, errorThrown) {
-      _displayError(errorThrown);
-    }).success(function (data) {
-      try {
-        _updateDisplayWithQCOutcomes(data);
-        if(typeof callOnSuccess === 'function' ) {
-          callOnSuccess(qc_css_styles);
+    if ( rptKeys.length > 0 ) {
+      $.ajax({
+        url: outcomesURL,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(_buildQuery(rptKeys)),
+        cache: false
+      }).error(function(jqXHR, textStatus, errorThrown) {
+        _displayError(errorThrown);
+      }).success(function (data) {
+        try {
+          _updateDisplayWithQCOutcomes(data);
+          if(typeof callOnSuccess === 'function' ) {
+            callOnSuccess(qc_css_styles);
+          }
+        } catch (er) {
+          _displayError(er);
         }
-      } catch (er) {
-        _displayError(er);
-      }
-    });
+      });
+    }
   };
 
   var fetchAndProcessQC = function (tableID, qcOutcomesURL, callbackAfterUpdateView) {
