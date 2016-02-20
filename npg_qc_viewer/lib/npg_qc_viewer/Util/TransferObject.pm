@@ -161,7 +161,6 @@ has 'is_gclp' => (
   isa      => 'Bool',
   is       => 'rw',
   required => 0,
-  default  => 0,
 );
 
 =head2 is_control
@@ -173,7 +172,6 @@ has 'is_control' => (
   isa      => 'Bool',
   is       => 'rw',
   required => 0,
-  default  => 0,
 );
 
 =head2 entity_id_lims
@@ -229,12 +227,17 @@ sub sample_name4display {
 
 =head2 instance_qc_able
 
-Returns the result of executing qc_able using instance variables
-as parameters
+Lazy attribute. The outcome of calling $self_qc_able with 
+this object attributes is returned by the builder.
 
 =cut
-
-sub instance_qc_able {
+has 'instance_qc_able' => (
+  isa        => 'Bool',
+  is         => 'ro',
+  lazy_build => 1,
+  required   => 0,
+);
+sub _build_instance_qc_able {
   my $self = shift;
   return $self->qc_able($self->is_gclp, $self->is_control, $self->tag_index);
 }

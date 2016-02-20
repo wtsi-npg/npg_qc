@@ -1,11 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 3;
 use Test::Exception;
 
 use_ok 'npg_qc_viewer::Util::TransferObject';
 
-{
+subtest 'LIMs data' => sub {
+  plan tests => 10;
+
   my $to = npg_qc_viewer::Util::TransferObject->new(
     id_run            => 1234,
     position          => 6,
@@ -17,7 +19,7 @@ use_ok 'npg_qc_viewer::Util::TransferObject';
     num_cycles        => 33,
     id_sample_lims    => 'S4567',
     sample_name       => 'sample 1',
-    study_name        => 'study 2',
+    study_name       => 'study 2',
     supplier_sample_name => 'sample X',
     tag_sequence      => 'acgt'
   );
@@ -38,16 +40,13 @@ use_ok 'npg_qc_viewer::Util::TransferObject';
                        supplier_sample_name/) {
     is ($to->$attr, undef, "pool $attr value is undefined");
   }
-}
+};
 
-subtest 'Transfer object qc_able function' => sub {
-  plan tests => 23;
-  my $id_run   = 1;
-  my $position = 1;
-  my $to = npg_qc_viewer::Util::TransferObject->new({
-    id_run => $id_run,
-    position => $position
-  });
+subtest 'qc_able' => sub {
+  plan tests => 24;
+
+  my $to = npg_qc_viewer::Util::TransferObject->new(
+    id_run => 1, position => 1);
 
   for my $entity ($to, 'npg_qc_viewer::Util::TransferObject') {
     my $calling_as = ref $entity ? q[instance method] : q[class method];
@@ -65,27 +64,32 @@ subtest 'Transfer object qc_able function' => sub {
     ok($entity->qc_able(0, 1), qq[Is qc'able ($calling_as) when no tag index]);
   }
 
-  $to = npg_qc_viewer::Util::TransferObject->new({
-    id_run     => $id_run,
-    position   => $position,
-    is_gclp    => 0,
-    is_control => 0,
-    tag_index  => 1
-  });
-  ok($to->instance_qc_able, q[Intance is qc'able when not control, not gclp, tag index not 0]);
-  $to->is_gclp(1);
+  my $values = {id_run     => 22,
+                position   => 2,
+                is_gclp    => 0,
+                is_control => 0,
+                tag_index  => 1};
+  $to = npg_qc_viewer::Util::TransferObject->new($values);
+  ok($to->instance_qc_able,
+    q[Intance is qc'able when not control, not gclp, tag index not 0]);
+  $values->{'is_gclp'} = 1;
+  $to = npg_qc_viewer::Util::TransferObject->new($values);
   ok(!$to->instance_qc_able, q[Intance is not qc'able when is gclp]);
-  $to->is_gclp(0); $to->is_control(1);
+  $values->{'is_gclp'} = 0;
+  $values->{'is_control'} = 1;
+  $to = npg_qc_viewer::Util::TransferObject->new($values);
   ok(!$to->instance_qc_able, q[Intance is not qc'able when is control]);
-  $to->is_control(0); $to->tag_index(0);
+  $values->{'is_control'} = 1;
+  $values->{'tag_index'} = 0;
+  $to = npg_qc_viewer::Util::TransferObject->new($values);
   ok(!$to->instance_qc_able, q[Intance is not qc'able when is tag index 0]);
-  $to = npg_qc_viewer::Util::TransferObject->new({
-    id_run     => $id_run,
-    position   => $position,
-    is_gclp    => 0,
-    is_control => 0
-  });
-  ok($to->instance_qc_able, q[Intance is qc'able when no tag index]);
+  delete $values->{'tag_index'};
+  $to = npg_qc_viewer::Util::TransferObject->new($values);
+  ok($to->instance_qc_able, q[Lane is qc'able]);
+  $values->{'instance_qc_able'} = 0;
+  $to = npg_qc_viewer::Util::TransferObject->new($values);
+  ok(!$to->instance_qc_able,
+    q[Attribute set to false on object construction - lane is qc'able]);
 };
 
 1;

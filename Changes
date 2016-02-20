@@ -1,12 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - generic qc outcome updates
+ - redesign of both client and serve rside for generic qc outcome updates
  - custom class for authentication in tests - works with JSON POST requests
- - entities are marked as qcable in template
- - title for pages with data for one id_run show run status
- - new module provides functionality so client can start manual QC
-   considering data from page
- - removing js functions to check conflicting outcomes in DWH/MQC
+ - mqc widgets not shown if no lims data available
+ - title for pages with data for one id run show run status
  - SeqQC
    - bugfix only build request for qc_outcomes if rptkeys in page
 
