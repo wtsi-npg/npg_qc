@@ -27,15 +27,18 @@ require([
   'scripts/qc_outcomes_view',
   'scripts/plots',
   'scripts/format_for_csv',
+  'scripts/qc_page',
   'scripts/manual_qc',
   'unveil',
   'table-export'
 ],
-function( qc_outcomes_view, plots, format_for_csv, NPG ) {
+function( qc_outcomes_view, plots, format_for_csv, qc_page, NPG ) {
   //Setup for heatmaps to load on demand.
   $(document).ready(function(){
     $("img").unveil(2000);
-    qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', NPG.QC.launchManualQCProcesses);
+    var qcp = qc_page.pageForMQC();
+    var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) { NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes'); } : function () {};
+    qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
   });
 
   //Required to show error messages from the mqc process.

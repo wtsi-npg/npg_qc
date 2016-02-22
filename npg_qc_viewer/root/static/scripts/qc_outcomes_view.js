@@ -24,6 +24,7 @@
 /* globals $: false, define: false */
 'use strict';
 define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
+  var ID_PREFIX = 'rpt_key:';
 
   var _displayError = function( er ) {
     var message;
@@ -45,7 +46,7 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
       var qc_outcome = outcomes[rpt_key];
       var rptKeyAsSelector;
       if(elementClass === 'lane') {
-        rptKeyAsSelector = 'tr[id*="rpt_key:' + rpt_key + '"]';
+        rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + rpt_key + '"]';
       } else if (elementClass === 'tag_info') {
 
         //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
@@ -64,19 +65,28 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
 
   var _parseRptKeys = function (idTable) {
     var rptKeys = [];
-    var idPrefix = 'rpt_key:';
     $('#' + idTable + ' tr').each(function (i, obj) {
       var $obj = $(obj);
       var id = $obj.attr('id');
-      if( typeof(id) !== 'undefined' && id !== null && id.lastIndexOf(idPrefix) === 0 ) {
-        var rptKey = id.substring(idPrefix.length);
-        if ( typeof(rptKey ) !== 'undefined' && $.inArray(rptKey, rptKeys) === -1 ) {
+      if( typeof id !== 'undefined' && id !== null && id.lastIndexOf(ID_PREFIX) === 0 ) {
+        var rptKey = rptKeyFromId(id);
+        if ( typeof rptKey !== 'undefined' && $.inArray(rptKey, rptKeys) === -1 ) {
           rptKeys.push(rptKey);
         }
       }
     });
     return rptKeys;
   };
+
+  var rptKeyFromId = function (id) {
+    if ( typeof id !== 'string' ) {
+      throw 'Invalid arguments';
+    }
+    if( id.lastIndexOf(ID_PREFIX) !== 0 ) {
+      throw 'Id does not match the expected format';
+    }
+    return id.substring(ID_PREFIX.length);
+  }
 
   var _updateDisplayWithQCOutcomes = function (outcomesData) {
     _processOutcomes(outcomesData.lib, 'tag_info');
@@ -105,7 +115,7 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
         try {
           _updateDisplayWithQCOutcomes(data);
           if(typeof callOnSuccess === 'function' ) {
-            callOnSuccess(qc_css_styles);
+            callOnSuccess();
           }
         } catch (er) {
           _displayError(er);
@@ -128,6 +138,7 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
     _buildQuery: _buildQuery,
     _updateDisplayWithQCOutcomes: _updateDisplayWithQCOutcomes,
     _parseRptKeys: _parseRptKeys,
+    rptKeyFromId: rptKeyFromId,
     fetchAndProcessQC: fetchAndProcessQC,
   };
 });

@@ -158,6 +158,44 @@ require(['scripts/qc_outcomes_view', 'scripts/qc_css_styles'],
       }
     });
 
+    QUnit.test('Outcome for element from css class', function (assert) {
+      var element = $('<div></div>');
+      assert.equal(typeof qc_css_styles.getOutcomeFromStyleClass(element),
+                   'undefined', 'No outcome in style returns undefined');
+
+      var outcomes = ['Accepted preliminary', 'Rejected preliminary', 'Undecided'];
+      for (var i = 0; i < outcomes.length; i++) {
+        var outcomeToSet = outcomes[i];
+        qc_css_styles.displayElementAs(element, outcomeToSet);
+        assert.equal(qc_css_styles.getOutcomeFromStyleClass(element),
+                     outcomeToSet, 'Can get outcome from style ' + outcomeToSet);
+      }
+    });
+
+    QUnit.test('RPT key from id', function (assert) {
+      assert.throws(
+        function () { mqc_outcomes.rptKeyFromId() },
+        /Invalid arguments/,
+        'Validates undefined id'
+      );
+
+      var validIds = [ 'rpt_key:10000:1:2', 'rpt_key:10000:1' ];
+      var validRptKeys = ['10000:1:2', '10000:1'];
+      for( var i = 0; i < validIds.length; i++ ) {
+        assert.equal(mqc_outcomes.rptKeyFromId(validIds[i]), validRptKeys[i],
+                     'Valid RPT key from id ' + validIds[i] + ' -> ' + validRptKeys[i]);
+      }
+
+      var invalidIds = [ 'prefix:10000:2', '10000:2', '10000:2:1' ];
+      for( var i = 0; i < invalidIds.length; i++ ) {
+        assert.throws(
+          function () { mqc_outcomes.rptKeyFromId(invalidIds[i]) },
+          /Id does not match the expected format/,
+          'Validates unexpected format for id'
+        );
+      }
+    });
+
     QUnit.test("Updating seq and lib outcomes for sample page", function (assert) {
       var _classNames = 'qc_outcome_accepted_final qc_outcome_accepted_preliminary qc_outcome_rejected_final qc_outcome_rejected_preliminary qc_outcome_undecided qc_outcome_undecided_final'.split(' ');
       var countQCClasses = function (obj) {

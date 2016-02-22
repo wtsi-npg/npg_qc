@@ -27,7 +27,8 @@
 */
 /* globals $: false, window: false, document : false */
 "use strict";
-define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css_styles, NPG) {
+define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './manual_qc_ui'],
+       function (jquery, qc_css_styles, qc_outcomes_view, mqc_utils, NPG) {
 /**
  * @module NPG
  */
@@ -43,7 +44,9 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
        * @constructor
        * @author jmtc
        */
-      function ProdConfiguration () {}
+      function ProdConfiguration (qcOutcomesURL) {
+        this.qcOutcomesURL = qcOutcomesURL;
+      }
 
       /**
        * Returns the path for the resourses so it can be used by
@@ -58,58 +61,66 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
 
-    QC.launchManualQCProcesses = function () {
-      // Getting the run_id from the title of the page using the qc part too.
-      var runTitleParserResult = new NPG.QC.RunTitleParser().parseIdRun($(document)
-                                                            .find("title")
-                                                            .text());
-      //If id_run
-      if(typeof(runTitleParserResult) !== 'undefined' && runTitleParserResult != null) {
-        var id_run = runTitleParserResult.id_run;
-        var prodConfiguration = new NPG.QC.ProdConfiguration();
-        //Read information about lanes from page.
-        var lanes = []; //Lanes without previous QC, blank BG
-        var control;
+    QC.launchManualQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
+      if (isRunPage != null) {
+        var prodConfiguration = new NPG.QC.ProdConfiguration(qcOutcomesURL);
+        var rows = [];
+        $('.lane_mqc_control').each(function (index, element) {
+          var $element = $(element);
+          $element.css("padding-right", "5px").css("padding-left", "10px");
+          var rptKey = $element.closest('tr').attr('id');
+          rows.push(rptKey);
+        });
+        var prevOutcomes;
 
-        if (runTitleParserResult.isRunPage) {
-          var lanesWithBG = []; //Lanes with previous QC, BG with colour
-          control = new NPG.QC.RunPageMQCControl(prodConfiguration);
-          control.parseLanes(lanes, lanesWithBG);
-          control.prepareMQC(id_run, lanes, lanesWithBG);
+        if (isRunPage) {
+          prevOutcomes = qcOutcomes.seq;
         } else {
-          var position = runTitleParserResult.position;
-          control = new NPG.QC.LanePageMQCControl(prodConfiguration);
+          var control;
+          $('.library_mqc_overall_controls').css("padding-right", "0px");
+          prevOutcomes = qcOutcomes.lib;
           control.parseLanes(lanes);
-          control.prepareMQC(id_run, position, lanes);
+          control.prepareMQC(lanes);
+        }
+
+        for ( var i = 0; i < rows.length; i++) {
+          var c = isRunPage ? new NPG.QC.LaneMQCControl(prodConfiguration) : new NPG.QC.LibraryMQCControl(prodConfiguration);
+          c.rowId = rows[i];
+          c.rptKey = qc_outcomes_view.rptKeyFromId(c.rowId);
+          if ( typeof prevOutcomes[c.rptKey] !== 'undefined' ) {
+            c.outcome = prevOutcomes[c.rptKey].mqc_outcome;
+          }
+          var obj = $(mqc_utils.buildIdSelector(c.rowId)).find('.lane_mqc_control');
+          c.linkControl(obj);
         }
       }
     };
 
     var MQCControl = (function () {
       function MQCControl(abstractConfiguration) {
-        this.outcome               = null;  // Current outcome (Is updated when linked to an object in the view)
+        this.outcome;  // Current outcome (Is updated when linked to an object in the view)
+        this.rowId;
+        this.rptKey;
         this.lane_control          = null;  // Container linked to this controller
         this.abstractConfiguration = abstractConfiguration;
+
+        this.TYPE_LIB = 'lib';
+        this.TYPE_SEQ = 'seq';
 
         this.CONFIG_ACCEPTED_PRELIMINARY = 'Accepted preliminary';
         this.CONFIG_REJECTED_PRELIMINARY = 'Rejected preliminary';
         this.CONFIG_ACCEPTED_FINAL       = 'Accepted final';
         this.CONFIG_REJECTED_FINAL       = 'Rejected final';
-        this.CONFIG_UNDECIDED            = 'Undecided'; //Initial outcome for widgets
-        this.CONFIG_INITIAL              = 'initial';
+        this.CONFIG_UNDECIDED            = 'Undecided';
         this.CONFIG_CONTROL_TAG          = 'gui_controller'; //For link in DOM
 
         //container names
         this.LANE_MQC_WORKING           = 'lane_mqc_working';
         this.LANE_MQC_WORKING_CLASS     = '.' + this.LANE_MQC_WORKING;
 
-        //Variable names for data from the DOM
-        this.DATA_ID_RUN                = 'id_run';
-        this.DATA_POSITION              = 'position';
-        this.DATA_TAG_INDEX             = 'tag_index';
+        this.LANE_MQC_CONTROL           = 'lane_mqc_control';
+        this.LANE_MQC_CONTROL_CLASS     = '.' + this.LANE_MQC_CONTROL;
 
-        this.id_run    = null;
-        this.position  = null;
       }
 
       /**
@@ -211,16 +222,18 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
        * the outcome
        * @param data Data from response
        */
-      MQCControl.prototype.processAfterFail = function(data) {
+      MQCControl.prototype.processAfterFail = function(jqXHR) {
         var self = this;
         self.lane_control.children('input:radio').val([self.outcome]);
         var errorMessage = null;
-        if (typeof(data.responseJSON) !== 'undefined') {
-          errorMessage = data.responseJSON.message;
+
+        if ( typeof jqXHR.responseJSON === 'object' && typeof jqXHR.responseJSON.error === 'string') {
+          errorMessage = $.trim(jqXHR.responseJSON.error);
         } else {
-          errorMessage = data.statusText + ": Detailed response in console.";
-          window.console && console.log(data.responseText);
+          errorMessage = ( jqXHR.status || '' ) + ' ' + ( jqXHR.statusText || '');
+          console.log(jqXHR.responseText);
         }
+
         new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
       };
 
@@ -230,23 +243,18 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
       MQCControl.prototype.linkControl = function(lane_control) {
         lane_control.data(this.CONFIG_CONTROL_TAG, this);
         this.lane_control = lane_control;
-        if ( typeof(lane_control.data(this.CONFIG_INITIAL)) === "undefined") {
-          //If it does not have initial outcome
-          this.outcome = this.CONFIG_UNDECIDED;
+        if ( typeof this.outcome  === "undefined") {
           this.generateActiveControls();
-        } else if (lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_ACCEPTED_PRELIMINARY
-            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_REJECTED_PRELIMINARY
-            || lane_control.data(this.CONFIG_INITIAL) === this.CONFIG_UNDECIDED) {
+        } else if ( this.outcome === this.CONFIG_ACCEPTED_PRELIMINARY
+            || this.outcome === this.CONFIG_REJECTED_PRELIMINARY
+            || this.outcome === this.CONFIG_UNDECIDED) {
           //If previous outcome is preliminar.
-          this.outcome = lane_control.data(this.CONFIG_INITIAL);
           this.generateActiveControls();
           switch (this.outcome){
             case this.CONFIG_ACCEPTED_PRELIMINARY : this.setAcceptedPre(); break;
             case this.CONFIG_REJECTED_PRELIMINARY : this.setRejectedPre(); break;
             case this.CONFIG_UNDECIDED : this.setUndecided(); break;
           }
-        } else {
-          this.loadBGFromInitial(lane_control);
         }
       };
 
@@ -277,7 +285,7 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
        */
       function LaneMQCControl(abstractConfiguration) {
         NPG.QC.MQCControl.call(this, abstractConfiguration);
-        this.CONFIG_UPDATE_SERVICE = "/mqc/update_outcome_lane";
+        this.CONFIG_UPDATE_SERVICE = "";
       }
 
       LaneMQCControl.prototype = new NPG.QC.MQCControl();
@@ -292,18 +300,21 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
           self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
+
+          var query = mqc_utils.buildUpdateQuery(self.TYPE_SEQ, [{rptKey: self.rptKey, mqc_outcome: self.outcome}]);
+          console.log(JSON.stringify(query));
           //AJAX call.
-          $.post(self.CONFIG_UPDATE_SERVICE, { id_run   : self.id_run,
-                                               position : self.position,
-                                               new_oc   : outcome}, function(data){
-          }, "json")
-          .done(function() {
+          $.ajax({
+            url: self.abstractConfiguration.qcOutcomesURL,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(query),
+            cache: false
+          }).error(function(jqXHR) {
+            self.processAfterFail(jqXHR);
+          }).success(function (data) {
             self.updateView(outcome);
-          })
-          .fail(function(data) {
-            self.processAfterFail(data);
-          })
-          .always(function(){
+          }).always(function(){
             //Clear progress icon
             self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });
@@ -318,8 +329,6 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
       LaneMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
         var self = this;
-        self.id_run   = lane_control.data(this.DATA_ID_RUN);
-        self.position = lane_control.data(this.DATA_POSITION);
         var outcomes = [self.CONFIG_ACCEPTED_PRELIMINARY,
                         self.CONFIG_UNDECIDED,
                         self.CONFIG_REJECTED_PRELIMINARY];
@@ -333,16 +342,15 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
         //Remove old working span
         self.lane_control.children(self.LANE_MQC_WORKING_CLASS).remove();
         //Create and add radios
-        var id_pre = self.id_run + '_' + self.position;
-        var name = 'radios_' + id_pre;
+        var name = 'radios_' + self.rowId;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
           var label = labels[i];
           var checked = null;
-          if (self.outcome == outcome) {
+          if (self.outcome === outcome) {
             checked = true;
           }
-          var radio = new NPG.QC.UI.MQCOutcomeRadio(id_pre, outcome, label, name, checked);
+          var radio = new NPG.QC.UI.MQCOutcomeRadio(self.rowId, outcome, label, name, checked);
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
@@ -378,9 +386,7 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
        */
       function LibraryMQCControl(abstractConfiguration) {
         NPG.QC.MQCControl.call(this, abstractConfiguration);
-        this.CONFIG_UPDATE_SERVICE = "/mqc/update_outcome_library";
-
-        this.tag_index = null;
+        this.CONFIG_UPDATE_SERVICE = "";
       }
 
       LibraryMQCControl.prototype = new NPG.QC.MQCControl();
@@ -395,20 +401,20 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
           self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
+          var query = mqc_utils.buildUpdateQuery(self.TYPE_LIB, [{rptKey: self.rptKey, mqc_outcome: self.outcome}]);
+          console.log(JSON.stringify(query));
           //AJAX call.
-          $.post(self.CONFIG_UPDATE_SERVICE, { id_run    : self.id_run,
-                                               position  : self.position,
-                                               tag_index : self.tag_index,
-                                               new_oc    : outcome}, function(data){
-            var response = data;
-          }, "json")
-          .done(function() {
+          $.ajax({
+            url: self.abstractConfiguration.qcOutcomesURL,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(query),
+            cache: false
+          }).error(function(jqXHR) {
+            self.processAfterFail(jqXHR);
+          }).success(function (data) {
             self.updateView(outcome);
-          })
-          .fail(function(data) {
-            self.processAfterFail(data);
-          })
-          .always(function(data){
+          }).always(function(){
             //Clear progress icon
             self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });
@@ -489,44 +495,7 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
     /* Plex */
 
     var PageMQCControl = (function () {
-      function PageMQCControl (abstractConfiguration) {
-        this.abstractConfiguration = abstractConfiguration;
-        this.mqc_run_data          = null;
-        this.QC_IN_PROGRESS        = 'qc in progress';
-        this.QC_ON_HOLD            = 'qc on hold';
-        this.ACCEPTED_FINAL        = 'Accepted final';
-        this.REJECTED_FINAL        = 'Rejected final';
-      }
-
-      /**
-       * Returns true if the user in session matches the user QCing the run and
-       * the user has manual_qc role
-       * @param mqc_run_data Transfer object with the mqc data. Must include
-       * values for taken_by, current_user and has_manual_qc_role
-       * @returns {Boolean}
-       */
-      PageMQCControl.prototype.checkUserInSession = function (mqc_run_data) {
-        var result = typeof(mqc_run_data.taken_by) !== "undefined"  //Data object has all values needed.
-                     && typeof(mqc_run_data.current_user)!== "undefined"
-                     && typeof(mqc_run_data.has_manual_qc_role)!== "undefined"
-                     && mqc_run_data.taken_by == mqc_run_data.current_user /* Session & qc users are the same */
-                     && mqc_run_data.has_manual_qc_role == 1 /* Returns '' if not */;
-        return result;
-      };
-
-      /**
-       * Returns true if the run is currently identified as qc in progress or
-       * qc on hold.
-       * @param mqc_run_data Transfer object with the mqc data. Must contain a
-       * value for current_status_description.
-       * @returns {Boolean}
-       */
-      PageMQCControl.prototype.checkRunStatus = function (mqc_run_data) {
-        var result = typeof(mqc_run_data.current_status_description)!== "undefined"
-                     && (mqc_run_data.current_status_description == this.QC_IN_PROGRESS
-                       || mqc_run_data.current_status_description == this.QC_ON_HOLD);
-        return result;
-      };
+      function PageMQCControl (abstractConfiguration) {}
 
       /**
        * Checks if the field passed as parameter is not undefined and different
@@ -541,28 +510,6 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
         return;
       };
 
-      /**
-       * Find "lanes" (html rows) from the page and split them in two groups
-       * based on the QC result they already have (checked by using the css
-       * class of the row). Adds the lanes to the corresponding array.
-       * @param lanes Lanes without background
-       * @param lanesWithBG Lanes with background (pass or fail)
-       */
-      PageMQCControl.prototype.parseLanes = function (lanes, lanesWithBG) {
-        //Select non-qced lanes.
-        $('.lane_mqc_control').each(function (i, obj) {
-          obj = $(obj);
-          var parent = obj.parent();
-          //Not considering lanes previously marked as passes/failed
-          if(parent.hasClass('qc_outcome_accepted_final') || parent.hasClass('qc_outcome_rejected_final')) {
-            lanesWithBG.push(parent);
-          } else {
-            lanes.push(parent);
-          }
-        });
-        return;
-      };
-
       return PageMQCControl;
     }) ();
     QC.PageMQCControl = PageMQCControl;
@@ -571,19 +518,10 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
       function LanePageMQCControl (abstractConfiguration){
         NPG.QC.PageMQCControl.call(this, abstractConfiguration);
         this.DATA_TAG_INDEX       = 'tag_index';
-        this.REST_SERVICE         = '/mqc/mqc_libraries/';
         this.CURRENT_LANE_OUTCOME = 'current_lane_outcome';
       }
 
       LanePageMQCControl.prototype = new NPG.QC.PageMQCControl();
-
-      LanePageMQCControl.prototype.parseLanes = function (lanes) {
-        $('.lane_mqc_control').each(function (i, obj) {
-          var parent = $(obj).parent();
-          lanes.push(parent);
-        });
-        return;
-      };
 
       LanePageMQCControl.prototype.initQC = function (mqc_run_data, plexes, targetFunction, mopFunction) {
         var result = null;
@@ -700,12 +638,6 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
         return lanes_qc_temp;
       };
 
-      LanePageMQCControl.prototype.removeAllPaddings = function () {
-        $('.lane_mqc_control').css("padding-right", "0px");
-        $('.lane_mqc_control').css("padding-left", "0px");
-        $('.library_mqc_overall_controls').css("padding-right", "0px");
-      };
-
       LanePageMQCControl.prototype.addAllPaddings = function () {
         $('.lane_mqc_control').css("padding-right", "5px");
         $('.lane_mqc_control').css("padding-left", "10px");
@@ -819,59 +751,14 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
     var RunPageMQCControl = (function () {
       function RunPageMQCControl(abstractConfiguration) {
         NPG.QC.PageMQCControl.call(this, abstractConfiguration);
-        this.REST_SERVICE = '/mqc/mqc_runs/';
+        this.REST_SERVICE = '';
       }
 
       RunPageMQCControl.prototype = new NPG.QC.PageMQCControl();
 
-      RunPageMQCControl.prototype.removeAllPaddings = function () {
-        $('.lane_mqc_control').css("padding-right", "0px");
-        $('.lane_mqc_control').css("padding-left", "0px");
-      };
-
       RunPageMQCControl.prototype.addAllPaddings = function () {
         $('.lane_mqc_control').css("padding-right", "5px");
         $('.lane_mqc_control').css("padding-left", "10px");
-      };
-
-      /**
-       * Validates qc conditions and if everything is ready for qc it will call the
-       * target function passing parameters. If not qc ready will call mop function.
-       * @param mqc_run_data {Object} Run status data
-       * @param lanes {array} lanes
-       * @param targetFunction {function} What to run if state for MQC
-       * @param mopFunction {function} What to run if not state for MQC
-       * @returns the result of running the functions.
-       */
-      RunPageMQCControl.prototype.initQC = function (mqc_run_data, lanes, targetFunction, mopFunction) {
-        var result = null;
-        var self = this;
-        if(typeof(mqc_run_data) !== "undefined" && mqc_run_data != null) { //Need data object
-          this.mqc_run_data = mqc_run_data;
-          if(self.isStateForMQC(mqc_run_data)) {
-            self.addAllPaddings();
-            result = targetFunction(mqc_run_data, this, lanes);
-          } else {
-            result = mopFunction();
-          }
-        } else {
-          result = mopFunction();
-        }
-        return result;
-      };
-
-      /**
-       * Checks all conditions related with the user in session and the
-       * status of the run. Validates the user has privileges, has role,
-       * the run is in correct status and the user in session is the
-       * same as the user who took the QCing.
-       * @param mqc_run_data {Object} Run status data
-       */
-      RunPageMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
-        this.validateRequired(mqc_run_data);
-        var result = this.checkUserInSession(mqc_run_data)
-                     && this.checkRunStatus(mqc_run_data);
-        return result;
       };
 
       /**
@@ -965,70 +852,6 @@ define(['jquery', './qc_css_styles', './manual_qc_ui'], function (jquery, qc_css
     }) ();
     QC.RunPageMQCControl = RunPageMQCControl;
 
-    var RunTitleParseResult = (function () {
-      /**
-       * Transfer object to deal with title parsing from page (Run + Lane).
-       * @memberof module:NPG/QC
-       * @constructor
-       */
-      function RunTitleParseResult(id_run, position, isRunPage) {
-        this.id_run    = id_run;
-        this.position  = position;
-        this.isRunPage = isRunPage;
-      }
-      return RunTitleParseResult;
-    }) ();
-    QC.RunTitleParseResult = RunTitleParseResult;
-
-    var RunTitleParser = (function () {
-      /**
-       * Object to deal with title parsing from page.
-       * @memberof module:NPG/QC
-       * @constructor
-       */
-      function RunTitleParser() {
-        this.reId = /^NPG SeqQC v[\w\.]+: Results (for run ([0-9]+) \(current run status:|\(all\) for runs ([0-9]+) lanes ([0-9]+)$)/;
-      }
-
-      /**
-       * Parses the id_run from the title (or text) passed as param.
-       * It looks for first integer using a regexp.
-       *
-       * "^NPG SeqQC v[\w\.]+: Results (for run ([0-9]+) \(current run status:|\(all\) for runs ([0-9]+) lanes ([0-9]+)$)"
-       *
-       * @param text {String} Text to parse.
-       *
-       * @returns A RunTitleParseResult object on successful parsing with the
-       * regular expression.
-       */
-      RunTitleParser.prototype.parseIdRun = function (text) {
-        if(typeof(text) === "undefined" || text == null) {
-          throw new Error("Error: Invalid arguments.");
-        }
-        var result = null;
-        var match = this.reId.exec(text);
-        //There is a result from parsing
-        if (match != null) {
-          //The result of parse looks like a parse
-          // and has correct number of elements
-          if(match.constructor === Array && match.length > 2) {
-            if (match[1].indexOf('for run') === 0) {
-              var isRunPage = true;
-              var id_run = match[2];
-              result = new NPG.QC.RunTitleParseResult(id_run, null, isRunPage);
-            } else if (match[1].indexOf('(all) for') === 0) {
-              var isRunPage = false;
-              var id_run    = match[3];
-              var position  = match[4];
-              result = new NPG.QC.RunTitleParseResult(id_run, position, isRunPage);
-            }
-          }
-        }
-        return result;
-      };
-      return RunTitleParser;
-    }) ();
-    QC.RunTitleParser = RunTitleParser;
   }) (NPG.QC || (NPG.QC = {}));
   var QC = NPG.QC;
 }) (NPG || (NPG = {}));
