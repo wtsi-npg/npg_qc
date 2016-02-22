@@ -83,7 +83,12 @@ sub save {
     croak 'Username is required';
   }
   if (!$lane_info || (ref $lane_info ne 'HASH')) {
-    croak 'Lane information hash is required';
+    croak 'Tag indices for lanes hash is required';
+  }
+
+  if (scalar(map { @{$outcomes->{$_}} }
+      grep { defined $outcomes->{$_} } @OUTCOME_TYPES) == 0) {
+    croak 'No data to save';
   }
 
   my $queries = $self->_save_outcomes($outcomes, $username, $lane_info);
@@ -127,7 +132,7 @@ sub _save_outcomes {
         }
 
         try {
-          my ($outcome_ent, $query) = $self->_find_or_create_outcome($outcome_type, $o);
+          my ($outcome_ent, $query) = $self->_find_or_create_outcome($outcome_type, $key);
           push @queries, $query;
           if ($self->_valid4update($outcome_ent,  $outcome_description)) {
             $outcome_ent->update_outcome($outcome_description, $username);
@@ -151,29 +156,23 @@ sub _save_outcomes {
 }
 
 sub _find_or_create_outcome {
-  my ($self, $outcome_type, $outcome) = @_;
+  my ($self, $outcome_type, $key) = @_;
 
-  if (!$outcome_type || !$outcome) {
-    croak 'Two arguments required: outcome entity type string and outcome hash';
+  if (!$outcome_type || !$key) {
+    croak 'Two arguments required: outcome entity type string and rpt key string';
   }
   if ( none {$_ eq $outcome_type} @OUTCOME_TYPES ) {
     croak qq[Unknown outcome entity type '$outcome_type'];
   }
 
-  _validate_query($outcome);
-  my $q = {};
-  foreach my $key ( ($IDRK, $PK, $TIK) ) {
-    if (exists $outcome->{$key}) {
-      $q->{$key} = $outcome->{$key};
-    }
-  }
+  my $q = npg_tracking::glossary::rpt->inflate_rpt($key);
 
   my $rs_name = $SEQ_RS_NAME;
   if ($outcome_type eq $LIB_OUTCOMES) {
     $rs_name = $LIB_RS_NAME;
     if (!exists $q->{$TIK}) {
       $q->{$TIK} = undef; # Otherwise search might bring
-                          # multiple results
+                          # multiple results.
     }
   }
   my $rs = $self->qc_schema()->resultset($rs_name);

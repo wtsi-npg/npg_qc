@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON::XS;
@@ -115,26 +115,25 @@ subtest q[find or create entity - error handling] => sub {
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
   throws_ok { $o->_find_or_create_outcome() }
-    qr/Two arguments required: outcome entity type string and outcome hash/,
+    qr/Two arguments required/,
     'no arguments - error';
   throws_ok { $o->_find_or_create_outcome('lib') }
-    qr/Two arguments required: outcome entity type string and outcome hash/,
-    'no arguments - error';
+    qr/Two arguments required/,
+    'one arguments - error';
   throws_ok { $o->_find_or_create_outcome('some', {}) }
     qr/Unknown outcome entity type \'some\'/,
     'unknown entity type - error';
-  throws_ok { $o->_find_or_create_outcome('lib', {'mqc_outcome' => 'some'}) }
-    qr/Both \'id_run\' and \'position\' keys should be defined/,
-    'required data missing - error';
+  throws_ok { $o->_find_or_create_outcome('lib', '44') }
+    qr/Both id_run and position should be available /,
+    'malformed rpt key - error';
 };
 
 subtest q[find or create lib entity] => sub {
-  plan tests => 42;
+  plan tests => 30;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
-  my $outcome = {'id_run' => 45, 'position' => 2, tag_index => 1};
-  my ($row, $query) = $o->_find_or_create_outcome('lib', $outcome);
+  my ($row, $query) = $o->_find_or_create_outcome('lib', '45:2:1');
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok(!$row->in_storage, 'new object is created in memory');
   is($row->id_run, 45, 'correct run id');
@@ -157,8 +156,7 @@ subtest q[find or create lib entity] => sub {
     'modified_by'    => 'dog',
   });
   
-  $outcome = {'id_run' => 45, 'position' => 3, tag_index => 1};
-  ($row, $query) = $o->_find_or_create_outcome('lib', $outcome);
+  ($row, $query) = $o->_find_or_create_outcome('lib', '45:3:1');
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok($row->in_storage, 'object is retrieved from the db');
   is($row->id_run, 45, 'correct run id');
@@ -170,22 +168,13 @@ subtest q[find or create lib entity] => sub {
   is($row->mqc_outcome->short_desc, 'Rejected preliminary',
     'correct outcome description');
 
-  $outcome = {'id_run' => 45, 'position' => 2};
-  ($row, $query) = $o->_find_or_create_outcome('lib', $outcome);
+  ($row, $query) = $o->_find_or_create_outcome('lib', '45:2');
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok(!$row->in_storage, 'new object is created in memory');
   is($row->id_run, 45, 'correct run id');
   is($row->position, 2, 'correct position');
   is($row->tag_index, undef, 'tag index not defined');
   ok(!$row->mqc_outcome, 'no related dictionary object');
-
-  $outcome = {'id_run' => 45, 'position' => 4, tag_index => undef};
-  ($row, $query) = $o->_find_or_create_outcome('lib', $outcome);
-  isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
-  ok(!$row->in_storage, 'new object is created in memory');
-  is($row->id_run, 45, 'correct run id');
-  is($row->position, 4, 'correct position');
-  is($row->tag_index, undef, 'tag index undefined');
 
   $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
     'id_run'         => 45,
@@ -204,19 +193,7 @@ subtest q[find or create lib entity] => sub {
     'modified_by'    => 'dog',
   });
   
-  $outcome = {'id_run' => 45, 'position' => 4};
-  ($row, $query) = $o->_find_or_create_outcome('lib', $outcome);
-  isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
-  ok($row->in_storage, 'object is retrieved from the db');
-  is($row->id_run, 45, 'correct run id');
-  is($row->position, 4, 'correct position');
-  is($row->tag_index, undef, 'tag index undefined');
-  ok($row->mqc_outcome, 'related dictionary object exists');
-  is($row->mqc_outcome->short_desc, 'Rejected preliminary',
-    'correct outcome description');
-
-  $outcome = {'id_run' => 45, 'position' => 4, tag_index => undef};
-  ($row, $query) = $o->_find_or_create_outcome('lib', $outcome);
+  ($row, $query) = $o->_find_or_create_outcome('lib', '45:4');
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok($row->in_storage, 'object is retrieved from the db');
   is($row->id_run, 45, 'correct run id');
@@ -232,12 +209,10 @@ subtest q[find or create seq entity] => sub {
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
-  my $outcome = {'id_run' => 55, 'position' => 2, tag_index => 1};
-  throws_ok { $o->_find_or_create_outcome('seq', $outcome) }
+  throws_ok { $o->_find_or_create_outcome('seq', '55:2:1') }
     qr/no such column: tag_index/,
     'query with tag index gives an error for seq outcome';
-  $outcome = {'id_run' => 55, 'position' => 2};
-  my ($row, $query) = $o->_find_or_create_outcome('seq', $outcome);
+  my ($row, $query) = $o->_find_or_create_outcome('seq', '55:2');
   isa_ok($row, 'npg_qc::Schema::Result::MqcOutcomeEnt');
   ok(!$row->in_storage, 'new object is created in memory');
   is($row->id_run, 55, 'correct run id');
@@ -258,12 +233,10 @@ subtest q[find or create seq entity] => sub {
     'modified_by'    => 'dog',
   });
   
-  $outcome = {'id_run' => 55, 'position' => 3, tag_index => 1};
-  throws_ok { $o->_find_or_create_outcome('seq', $outcome) }
+  throws_ok { $o->_find_or_create_outcome('seq', '55:3:1') }
     qr/no such column: tag_index/,
     'query with tag index gives an error for seq outcome';
-  $outcome = {'id_run' => 55, 'position' => 3};
-  ($row, $query) = $o->_find_or_create_outcome('seq', $outcome);
+  ($row, $query) = $o->_find_or_create_outcome('seq', '55:3');
   isa_ok($row, 'npg_qc::Schema::Result::MqcOutcomeEnt');
   ok($row->in_storage, 'object is retrieved from the db');
   is($row->id_run, 55, 'correct run id');
@@ -353,6 +326,40 @@ subtest q[validation for an update] => sub {
   throws_ok { $o->_valid4update($outcome, 'some outcome') }
     qr/Final outcome cannot be updated/,
     'error updating a final stored lib outcome to another final outcome';  
+};
+
+subtest q[save - errors] => sub {
+  plan tests => 11;
+
+  my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
+  throws_ok {$o->save() } qr/Outcomes hash is required/,
+    'outcomes should be given';
+  throws_ok {$o->save([]) } qr/Outcomes hash is required/,
+    'outcomes should be a hash ref';
+  throws_ok {$o->save({}) } qr/Username is required/,
+    'username is required';
+  throws_ok {$o->save({}, q[]) } qr/Username is required/,
+    'username cannot be empty';
+  throws_ok {$o->save({}, q[cat]) }
+    qr/Tag indices for lanes hash is required/,
+    'lane info about tags is required';
+  throws_ok {$o->save({}, q[cat], q[1, 2, 3]) }
+    qr/Tag indices for lanes hash is required/,
+    'lane info about tags should be a hash';
+  throws_ok {$o->save({}, q[cat], {}) }
+    qr/No data to save/, 'empty outcomes hash - error';
+  throws_ok {$o->save({'some'=>[], 'other'=>[]}, q[cat], {}) }
+    qr/No data to save/,
+    'expected keys are missing in the outcomes hash - error';
+  throws_ok {$o->save({'lib'=>[], 'seq'=>{}}, q[cat], {}) }
+    qr/Not an ARRAY reference/,
+    'unexpected type of values - error';
+  throws_ok {$o->save({'lib'=>[], 'seq'=>[]}, q[cat], {}) }
+    qr/No data to save/,
+    'arrays for both lib and seq keys empty - error';
+  throws_ok {$o->save({'lib'=>[]}, q[cat], {}) }
+    qr/No data to save/,
+    'lib array empty, seq key is missing - error';
 };
 
 1;
