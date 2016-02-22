@@ -277,7 +277,7 @@ subtest q[validation for an update] => sub {
   });
   lives_and {
     is $o->_valid4update($outcome, 'Rejected preliminary'), 0 }
-    'preliminary stored seq outcome can be updated to the same outcome';
+    'preliminary stored seq outcome cannot be updated to the same outcome';
   lives_and {
     is $o->_valid4update($outcome, 'Accepted preliminary'), 1 }
     'preliminary stored seq outcome can be updated to another priliminary outcome';
@@ -288,13 +288,12 @@ subtest q[validation for an update] => sub {
   $outcome->update({'id_mqc_outcome' => $dict_id_final});
   throws_ok { $o->_valid4update($outcome, 'Accepted final') }
     qr/Final outcome cannot be updated/,
-    'error updating a final db outcome to another final outcome';
+    'error updating a final stored outcome to another final outcome';
   throws_ok { $o->_valid4update($outcome, 'Accepted preliminary') }
     qr/Final outcome cannot be updated/,
     'error updating a final stored seq outcome to a preliminary outcome';
-  throws_ok { $o->_valid4update($outcome, 'Rejected final') }
-    qr/Final outcome cannot be updated/,
-    'error updating a final stored seq outcome to the same outcome';
+  lives_and { is $o->_valid4update($outcome, 'Rejected final'), 0 }
+    'no error updating a final stored seq outcome to the same outcome';
 
   $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
   $dict_id_prel =

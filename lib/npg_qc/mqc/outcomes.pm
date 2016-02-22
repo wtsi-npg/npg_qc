@@ -197,11 +197,14 @@ sub _find_or_create_outcome {
 sub _valid4update {
   my ($self, $row, $outcome_desc) = @_;
 
-  if ($row->in_storage && $row->has_final_outcome) {
-    croak 'Final outcome cannot be updated';
+  if ($row->in_storage) {
+    if ($row->mqc_outcome->short_desc eq $outcome_desc) {
+      return 0;
+    } elsif ($row->has_final_outcome) {
+      croak 'Final outcome cannot be updated';
+    }
   }
-  return ($row->in_storage &&
-    $row->mqc_outcome->short_desc eq $outcome_desc) ? 0 : 1;
+  return 1;
 }
 
 sub _finalise_library_outcomes {
