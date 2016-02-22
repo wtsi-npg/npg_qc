@@ -172,7 +172,8 @@ sub _find_or_create_outcome {
   if ($outcome_type eq $LIB_OUTCOMES) {
     $rs_name = $LIB_RS_NAME;
     if (!exists $q->{$TIK}) {
-      $q->{$TIK} = undef;
+      $q->{$TIK} = undef; # Otherwise search might bring
+                          # multiple results
     }
   }
   my $rs = $self->qc_schema()->resultset($rs_name);
