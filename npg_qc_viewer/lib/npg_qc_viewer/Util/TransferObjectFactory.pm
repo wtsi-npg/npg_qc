@@ -99,7 +99,10 @@ sub _add_lims_data {
     $values->{'id_sample_lims'}       = $flowcell->sample_id;
     $values->{'sample_name'}          = $flowcell->sample_name;
     $values->{'supplier_sample_name'} = $flowcell->sample_supplier_name;
+  } else {
+    $values->{'instance_qc_able'}     = 0;
   }
+
   return;
 }
 
