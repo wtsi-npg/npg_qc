@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON::XS;
@@ -306,7 +306,7 @@ subtest q[validation for an update] => sub {
 
   $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')
     ->new_result({'id_run' => 47, 'position' => 2, tag_index => 3});
-  is ($o->_valid4update($outcome, 'some outcome'), 1,
+  is($o->_valid4update($outcome, 'some outcome'), 1,
     'in-memory object can be updated');
 
   $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
@@ -340,26 +340,82 @@ subtest q[save - errors] => sub {
     'username is required';
   throws_ok {$o->save({}, q[]) } qr/Username is required/,
     'username cannot be empty';
-  throws_ok {$o->save({}, q[cat]) }
-    qr/Tag indices for lanes hash is required/,
-    'lane info about tags is required';
   throws_ok {$o->save({}, q[cat], q[1, 2, 3]) }
-    qr/Tag indices for lanes hash is required/,
+    qr/Tag indices for lanes should be a hash ref/,
     'lane info about tags should be a hash';
+  throws_ok {$o->save({'seq' => {}}, q[cat]) }
+    qr/Tag indices for lanes are required/,
+    'lane info about tags is required for seq data';
   throws_ok {$o->save({}, q[cat], {}) }
     qr/No data to save/, 'empty outcomes hash - error';
-  throws_ok {$o->save({'some'=>[], 'other'=>[]}, q[cat], {}) }
+  throws_ok {$o->save({'some'=>{}, 'other'=>{}}, q[cat], {}) }
     qr/No data to save/,
     'expected keys are missing in the outcomes hash - error';
-  throws_ok {$o->save({'lib'=>[], 'seq'=>{}}, q[cat], {}) }
-    qr/Not an ARRAY reference/,
-    'unexpected type of values - error';
-  throws_ok {$o->save({'lib'=>[], 'seq'=>[]}, q[cat], {}) }
+  throws_ok {$o->save({'lib'=>[1,3,4], 'seq'=>{}}, q[cat], {}) }
+    qr/No data to save/,
+    'unexpected type of values do not count';
+  throws_ok {$o->save({'lib'=>{}, 'seq'=>{}}, q[cat], {}) }
     qr/No data to save/,
     'arrays for both lib and seq keys empty - error';
-  throws_ok {$o->save({'lib'=>[]}, q[cat], {}) }
+  throws_ok {$o->save({'lib'=>{}}, q[cat], {}) }
     qr/No data to save/,
     'lib array empty, seq key is missing - error';
+};
+
+subtest q[save outcomes] => sub {
+  plan tests => 3;
+
+  my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
+
+  my $dict_id_prelim = $qc_schema->resultset('MqcOutcomeDict')->search(
+      {'short_desc' => 'Rejected preliminary'}
+     )->next->id_mqc_outcome;
+
+  my $outcomes = {
+    '101:1:2'=>{'mqc_outcome'=>'Accepted preliminary'},
+    '101:1:4'=>{'mqc_outcome'=>'Rejected preliminary'},
+    '101:1:6'=>{'mqc_outcome'=>'Undecided'},
+                 };
+  my $expected = {};
+  foreach my $key (keys %{$outcomes}) {
+    my $h = npg_tracking::glossary::rpt->inflate_rpt($key);
+    $h->{'mqc_outcome'} = $outcomes->{$key}->{'mqc_outcome'};
+    $expected->{$key} = $h;
+  }
+
+  my $reply = {'lib' => $expected, 'seq'=> {}};
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+    $reply, 'only lib info returned');
+
+  $qc_schema->resultset('MqcOutcomeEnt')->create({
+    'id_run'         => 101,
+    'position'       => 1,
+    'id_mqc_outcome' => $dict_id_prelim,
+    'username'       => 'cat',
+    'modified_by'    => 'dog',
+  });
+  
+  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Rejected preliminary',
+                                'id_run'     =>101,
+                                'position'   =>1,};
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+    $reply, 'both lib and seq info returned');
+
+  $outcomes = {
+    '101:1:1'=>{'mqc_outcome'=>'Accepted preliminary'},
+    '101:1:3'=>{'mqc_outcome'=>'Rejected preliminary'},
+    '101:1:5'=>{'mqc_outcome'=>'Undecided'},
+              };
+  my $expected_1 = {};
+  foreach my $key (keys %{$outcomes}) {
+    my $h = npg_tracking::glossary::rpt->inflate_rpt($key);
+    $h->{'mqc_outcome'} = $outcomes->{$key}->{'mqc_outcome'};
+    $expected_1->{$key} = $h;
+  }
+  $reply->{'lib'} = $expected_1;
+  
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+    $reply, 'both extended lib and seq info returned');
 };
 
 1;

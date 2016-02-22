@@ -82,12 +82,15 @@ sub save {
   if (!$username) {
     croak 'Username is required';
   }
-  if (!$lane_info || (ref $lane_info ne 'HASH')) {
-    croak 'Tag indices for lanes hash is required';
+  if ($outcomes->{$SEQ_OUTCOMES} && !$lane_info) {
+    croak 'Tag indices for lanes are required';
+  }
+  if ($lane_info && (ref $lane_info ne 'HASH')) {
+    croak 'Tag indices for lanes should be a hash ref';
   }
 
-  if (scalar(map { @{$outcomes->{$_}} }
-      grep { defined $outcomes->{$_} } @OUTCOME_TYPES) == 0) {
+  if (scalar(map { keys %{$outcomes->{$_}} }
+      grep { ref $outcomes->{$_} eq 'HASH'} @OUTCOME_TYPES) == 0) {
     croak 'No data to save';
   }
 
@@ -119,12 +122,12 @@ sub _save_outcomes {
   my $actions = sub {
     my @queries = ();
     foreach my $outcome_type ( @OUTCOME_TYPES ) {
-      my $outcomes4type = $outcomes->{$outcome_type} || [];
-      foreach my $outcome_hash ( @{$outcomes4type} ) {
+      my $outcomes4type = $outcomes->{$outcome_type} || {};
+      foreach my $key ( keys %{$outcomes4type} ) {
 
-        my ($key, $o) =  %{$outcome_hash};
-        if (!$key || !$o) {
-          croak q[Empty or malformed outcome hash];
+        my $o =  $outcomes4type->{$key};
+        if (ref $o ne 'HASH') {
+          croak q[Outcome is not defined or is not a hash ref];
         }
         my $outcome_description = $o->{$QC_OUTCOME};
         if (!$outcome_description) {
