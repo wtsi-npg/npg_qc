@@ -1,6 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - redesign of both client and serve rside for generic qc outcome updates
+ - redesign of both client and server side for generic qc outcome updates
+ - updates to already stored outcomes are not an error, will be skipped
+ - require that all library outcomes are marked explicitly before the
+     final sequencing outcome is saved
  - custom class for authentication in tests - works with JSON POST requests
  - mqc widgets not shown if no lims data available
  - title for pages with data for one id run show run status
