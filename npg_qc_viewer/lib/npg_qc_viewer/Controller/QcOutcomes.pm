@@ -43,7 +43,7 @@ Retrieving records:
 Updating/creating records:
 
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"lib":{"5:8:7":{"qc_outcome":"Final Rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
+    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
 
 =head1 SUBROUTINES/METHODS
 
@@ -97,6 +97,7 @@ sub outcomes_POST {
 
   my $data = $c->request->data();
   my $action = (delete $data->{'Action'}) || q[];
+  $c->log->debug($action);
   if ($action eq 'UPDATE') {
     $c->log->debug('Will call outcome update');
     $self->_update_outcomes($c, $data);
