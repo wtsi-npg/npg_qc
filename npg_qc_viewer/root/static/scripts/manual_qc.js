@@ -27,8 +27,8 @@
 */
 /* globals $: false, window: false, document : false */
 "use strict";
-define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './manual_qc_ui'],
-       function (jquery, qc_css_styles, qc_outcomes_view, mqc_utils, NPG) {
+define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manual_qc_ui'],
+       function (jquery, qc_css_styles, qc_outcomes_view, qc_utils, NPG) {
 /**
  * @module NPG
  */
