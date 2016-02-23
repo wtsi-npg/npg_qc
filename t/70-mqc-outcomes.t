@@ -1,9 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 11;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON::XS;
+use DateTime;
+use DateTime::Duration;
+
 use npg_testing::db;
 use npg_tracking::glossary::rpt;
 
@@ -362,7 +365,7 @@ subtest q[save - errors] => sub {
 };
 
 subtest q[save outcomes] => sub {
-  plan tests => 3;
+  plan tests => 21;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
@@ -414,7 +417,230 @@ subtest q[save outcomes] => sub {
   $reply->{'lib'} = $expected_1;
   
   is_deeply($o->save({'lib' => $outcomes}, 'cat'),
-    $reply, 'both extended lib and seq info returned');
+    $reply, 'both lib and seq info returned');
+
+  my %all = (%{$expected}, %{$expected_1});
+  $reply->{'lib'} = \%all;
+  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Accepted preliminary',
+                                'id_run'     =>101,
+                                'position'   =>1,};
+  
+  is_deeply($o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted preliminary'}}}, 'cat', {}),
+    $reply, 'updated a seq entity to another prelim outcome');
+
+  delete $reply->{'lib'};
+  $reply->{'lib'}->{'101:1:1'} = {'mqc_outcome'=>'Accepted final',
+                                  'id_run'     =>101,
+                                  'position'   =>1,
+                                  'tag_index'  =>1,};
+  is_deeply($o->save(
+    {'lib' => {'101:1:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat'),
+    $reply, 'updated one of lib entities to a final outcome');
+
+  my $error =
+    q[Mismatch between known tag indices and available library outcomes];
+
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat', {})}
+    qr/List of known tag indexes is required for validation/,
+    'tag info is not available, but lib results are stored - error';
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:1'=>[]})}
+    qr/$error/,
+    'tag info array is empty, but lib results are stored - error';
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:1'=>[1, 2, 3]})}
+    qr/$error/,
+    'some tag info is not available, but lib results are stored - error';
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:1'=>[(1 .. 10)]})}
+    qr/$error/,
+    'more tags are available from lane info than stored - error';
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:1'=>[(1 .. 10)]})}
+    qr/$error/,
+    'more tags are available from lane info than stored - error';
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:1'=>[(5 .. 10)]})}
+    qr/$error/,
+    'only some tags match stored libs - error';
+
+  my $error4pass =
+    q[Sequencing passed, cannot have undecided lib outcomes];
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:1'=>[(1 .. 6)]})}
+    qr/$error4pass/, $error4pass;
+
+  $outcomes = {
+    '101:1:5'=>{'mqc_outcome'=>'Rejected preliminary'},
+    '101:1:6'=>{'mqc_outcome'=>'Rejected preliminary'},
+                 };
+  $o->save({'lib' => $outcomes}, 'dog');
+  lives_and { ok $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:1'=>[(1 .. 6)]}), 'got results'};
+
+  my $dict_lib_id_prelim = $qc_schema->resultset('MqcLibraryOutcomeDict')
+    ->search({'short_desc' => 'Rejected preliminary'})
+    ->next->id_mqc_library_outcome;
+  my $dict_lib_id_undecided = $qc_schema->resultset('MqcLibraryOutcomeDict')
+     ->search({'short_desc' => 'Undecided'})
+     ->next->id_mqc_library_outcome;
+  my @tag_indexes = (1 .. 6);
+  my @libs = ();
+  for (@tag_indexes) {
+    push @libs, $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
+      'id_run'         => 101,
+      'position'       => 3,
+      'tag_index'      => $_,
+      'id_mqc_outcome' => $dict_lib_id_prelim,
+      'username'       => 'cat',
+      'modified_by'    => 'dog',
+    });
+  }
+
+  my $error4fail =
+    q[Sequencing failed, all library outcomes should be undecided];
+  throws_ok { $o->save({'seq' =>
+    {'101:3'=>{'mqc_outcome'=>'Rejected final'}}}, 'cat',
+    {'101:3'=>\@tag_indexes})}
+    qr/$error4fail/, $error4fail;
+
+  map { $_->update({id_mqc_outcome => $dict_lib_id_undecided}) } @libs;
+  lives_and { ok $o->save({'seq' =>
+    {'101:3'=>{'mqc_outcome'=>'Rejected final'}}}, 'cat',
+    {'101:3'=>\@tag_indexes}), 'got results'};
+
+
+  throws_ok { $o->save({'seq' =>
+    {'101:2'=>{'mqc_outcome'=>'Rejected final'}}}, 'cat',
+    {'101:2'=>[(1 .. 6)]})}
+    qr/$error/,
+    'have tag info, but no lib outcomes stored - error';
+  throws_ok { $o->save({'seq' =>
+    {'101:2'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:2'=>[(1 .. 6)]})}
+    qr/$error/,
+    'have tag info, but no lib outcomes stored - error';
+
+  lives_and { ok $o->save({'seq' =>
+    {'101:2'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:2'=>[]}), 'empty tag list, no stored lib outcomes - ok'};
+  lives_and { ok $o->save({'seq' =>
+    {'101:3'=>{'mqc_outcome'=>'Rejected final'}}}, 'cat',
+    {'101:3'=>[]}), 'empty tag list, no stored lib outcomes - ok'};
+
+  lives_and { ok $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
+    {'101:1'=>[(1 .. 6)]}), 'got results again'};
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Rejected final'}}}, 'cat',
+    {'101:1'=>[(1 .. 6)]})}
+    qr/Final outcome cannot be updated/,
+    'error updating a final outcome to a different final outcome'; 
+};
+
+subtest q[outcomes are not saved twice] => sub {
+  plan tests => 6;
+
+  my $dict_lib_id_prelim = $qc_schema->resultset('MqcLibraryOutcomeDict')
+    ->search({'short_desc' => 'Rejected preliminary'})
+    ->next->id_mqc_library_outcome;
+
+  my $set_datetime = DateTime->now();
+  $set_datetime->subtract_duration(
+    DateTime::Duration->new(seconds => 100));
+
+  my @tag_indexes = (1 .. 3);
+  my @libs = ();
+  for (@tag_indexes) {
+    push @libs, $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
+      'id_run'         => 102,
+      'position'       => 1,
+      'tag_index'      => $_,
+      'id_mqc_outcome' => $dict_lib_id_prelim,
+      'username'       => 'dog',
+      'modified_by'    => 'dog',
+    });
+  }
+  map {$_->update({last_modified => $set_datetime})} @libs;
+
+  my $outcomes = {
+    '102:1:1'=>{'mqc_outcome'=>'Accepted preliminary'},
+    '102:1:2'=>{'mqc_outcome'=>'Rejected preliminary'},
+    '102:1:3'=>{'mqc_outcome'=>'Undecided'},
+                 };
+  npg_qc::mqc::outcomes->new(qc_schema => $qc_schema)
+    ->save({'lib' => $outcomes}, 'cat');
+
+  my $lib = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+    ->search({'id_run'=>102,'position'=>1,'tag_index'=>1})->next;
+  is($lib->mqc_outcome->short_desc, 'Accepted preliminary',
+    'outcome has changed');
+  is($lib->modified_by, 'cat', 'latest modified_by value');
+  ok(($lib->last_modified()
+               ->subtract_datetime_absolute($set_datetime)
+               ->seconds > 60),
+    'last_modified field has changed');
+
+  $lib = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+    ->search({'id_run'=>102,'position'=>1,'tag_index'=>2})->next;
+  is($lib->mqc_outcome->short_desc, 'Rejected preliminary',
+    'outcome has not changed');
+  is($lib->modified_by, 'dog', 'old modified_by value');
+  ok(($lib->last_modified()
+               ->subtract_datetime_absolute($set_datetime)
+               ->seconds < 1),
+    'last_modified field is close to the original value');
+};
+
+subtest q[order of saving outcomes: lib, then seq] => sub {
+  plan tests => 8;
+
+  my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
+  is($qc_schema->resultset('MqcLibraryOutcomeEnt')
+               ->search({id_run=>103})->count, 0,
+    'no lib results for run 103');
+  is($qc_schema->resultset('MqcOutcomeEnt')
+               ->search({id_run=>103})->count, 0,
+    'no seq results for run 103');
+
+  my $lib_outcomes = {
+    '103:1:1'=>{'mqc_outcome'=>'Accepted preliminary'},
+    '103:1:2'=>{'mqc_outcome'=>'Rejected preliminary'},
+    '103:1:3'=>{'mqc_outcome'=>'Undecided'},
+                     };
+  my $seq_outcomes = {'103:1'=>{'mqc_outcome'=>'Accepted final'}};
+  throws_ok { $o->save(
+           {'lib' => $lib_outcomes, 'seq' => $seq_outcomes},
+           'cat', {'103:1' => [1, 2, 3]}) }
+    qr/Sequencing passed, cannot have undecided lib outcomes/,
+    'sequencing outcome cannot be saved - one of lib outcomes undecided';
+  is($qc_schema->resultset('MqcLibraryOutcomeEnt')
+               ->search({id_run=>103})->count, 0,
+    'no lib results for run 103');
+  is($qc_schema->resultset('MqcOutcomeEnt')
+               ->search({id_run=>103})->count, 0,
+    'no seq results for run 103');
+
+  $lib_outcomes->{'103:1:3'}->{'mqc_outcome'} = 'Accepted preliminary';
+  lives_ok { $o->save(
+           {'lib' => $lib_outcomes, 'seq' => $seq_outcomes},
+           'cat', {'103:1' => [1, 2, 3]}) }
+  'seq result is now saved';
+  is($qc_schema->resultset('MqcLibraryOutcomeEnt')
+               ->search({id_run=>103})->count, 3,
+    'three lib results for run 103');
+  is($qc_schema->resultset('MqcOutcomeEnt')
+               ->search({id_run=>103})->count, 1,
+    'one seq results for run 103');  
 };
 
 1;

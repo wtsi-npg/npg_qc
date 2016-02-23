@@ -31,7 +31,7 @@ sub get {
   my ($self, $qlist) = @_;
 
   if (!$qlist || (ref $qlist ne 'ARRAY')) {
-    croak 'Input is missing or is not an array';
+    croak q[Input is missing or is not an array];
   }
 
   my $hashed_queries = {};
@@ -67,8 +67,8 @@ sub get {
   }
 
   my $h = {};
-  $h->{'lib'} = _map_outcomes(\@lib_outcomes);
-  $h->{'seq'} = _map_outcomes(\@seq_outcomes);
+  $h->{$LIB_OUTCOMES} = _map_outcomes(\@lib_outcomes);
+  $h->{$SEQ_OUTCOMES} = _map_outcomes(\@seq_outcomes);
 
   return $h;
 }
@@ -77,21 +77,21 @@ sub save {
   my ($self, $outcomes, $username, $lane_info) = @_;
 
   if (!$outcomes || (ref $outcomes ne 'HASH')) {
-    croak 'Outcomes hash is required';
+    croak q[Outcomes hash is required];
   }
   if (!$username) {
-    croak 'Username is required';
+    croak q[Username is required];
   }
   if ($outcomes->{$SEQ_OUTCOMES} && !$lane_info) {
-    croak 'Tag indices for lanes are required';
+    croak q[Tag indices for lanes are required];
   }
   if ($lane_info && (ref $lane_info ne 'HASH')) {
-    croak 'Tag indices for lanes should be a hash ref';
+    croak q[Tag indices for lanes should be a hash ref];
   }
 
   if (scalar(map { keys %{$outcomes->{$_}} }
       grep { ref $outcomes->{$_} eq 'HASH'} @OUTCOME_TYPES) == 0) {
-    croak 'No data to save';
+    croak q[No data to save];
   }
 
   my $queries = $self->_save_outcomes($outcomes, $username, $lane_info);
@@ -124,7 +124,6 @@ sub _save_outcomes {
     foreach my $outcome_type ( @OUTCOME_TYPES ) {
       my $outcomes4type = $outcomes->{$outcome_type} || {};
       foreach my $key ( keys %{$outcomes4type} ) {
-
         my $o =  $outcomes4type->{$key};
         if (ref $o ne 'HASH') {
           croak q[Outcome is not defined or is not a hash ref];
@@ -148,7 +147,7 @@ sub _save_outcomes {
             }
           }
         } catch {
-          croak qq[Error saving '$outcome_description' for $key : $_];
+          croak qq[Error saving '$outcome_description' for $key - $_];
         };
       }
     }
@@ -162,7 +161,7 @@ sub _find_or_create_outcome {
   my ($self, $outcome_type, $key) = @_;
 
   if (!$outcome_type || !$key) {
-    croak 'Two arguments required: outcome entity type string and rpt key string';
+    croak q[Two arguments required: outcome entity type string and rpt key string];
   }
   if ( none {$_ eq $outcome_type} @OUTCOME_TYPES ) {
     croak qq[Unknown outcome entity type '$outcome_type'];
@@ -187,7 +186,7 @@ sub _find_or_create_outcome {
                                  # at this point.
   } else { # Existing database record is found.
     if ($rs_found->next) {
-      croak 'Multiple qc outcomes where one is expected';
+      croak q[Multiple qc outcomes where one is expected];
     }
   }
 
@@ -201,7 +200,7 @@ sub _valid4update {
     if ($row->mqc_outcome->short_desc eq $outcome_desc) {
       return 0;
     } elsif ($row->has_final_outcome) {
-      croak 'Final outcome cannot be updated';
+      croak q[Final outcome cannot be updated];
     }
   }
   return 1;
@@ -211,12 +210,11 @@ sub _finalise_library_outcomes {
   my ($self, $rows, $username) = @_;
 
   foreach my $row (@{$rows}) {
-    if ($self->_valid4update($row)) {
-      my $new_outcome = $row->mqc_outcome->matching_final_short_desc();
-      if (!$new_outcome) {
-        croak sprintf q[No matching final outcome for '%s'],
-          $row->mqc_outcome->short_desc;
-      }
+    my $new_outcome = $row->mqc_outcome->matching_final_short_desc();
+    if (!$new_outcome) { # Unlikely to happen
+      croak 'No matching final outcome returned';
+    }
+    if ($self->_valid4update($row, $new_outcome)) {
       $row->update_outcome($new_outcome, $username);
     }
   }
@@ -228,7 +226,7 @@ sub _validate_library_outcomes {
   my ($self, $seq_outcome_ent, $lib_outcomes, $tag_list) = @_;
 
   if (!$tag_list) {
-    croak 'No list of tag indexes';
+    croak q[List of known tag indexes is required for validation];
   }
   my %tag_counts = map { $_ => 1 } @{$tag_list};
 
@@ -243,12 +241,14 @@ sub _validate_library_outcomes {
 
   if ($seq_outcome_ent->has_final_outcome &&
       !$self->_validate_tag_indexes(\%tag_counts)) {
-    croak q[Mismatch between known tag indices and available library outcomes];
+    croak
+    q[Mismatch between known tag indices and available library outcomes];
   }
   if ($seq_outcome_ent->is_accepted && $num_undecided) {
-    croak 'Sequencing passed, cannot have undecided lib outcomes';
-  } elsif ($seq_outcome_ent->is_rejected && $num_undecided != scalar @{$lib_outcomes}) {
-    croak 'Sequencing failed, all library outcomes should be undecided';
+    croak q[Sequencing passed, cannot have undecided lib outcomes];
+  } elsif ($seq_outcome_ent->is_rejected &&
+           $num_undecided != scalar @{$lib_outcomes}) {
+    croak q[Sequencing failed, all library outcomes should be undecided];
   }
 
   return;
