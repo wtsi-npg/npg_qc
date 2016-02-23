@@ -125,39 +125,6 @@ var NPG;
       })();
       UI.MQCErrorMessage = MQCErrorMessage;
 
-      var MQCInfoMessage = (function (){
-
-        /**
-         * Class for sending info messages to UI interface. By default it places
-         * the info message in the same container as the error messages. Uses a
-         * different colour to make a difference. The placeholder can also be
-         * configured at construction time.
-         * @param {String} infoText - Text of the message.
-         * @param {String} placeholder - Class of the DOM element where this
-         * message will be displayed.
-         */
-        MQCInfoMessage = function(infoText, placeholder) {
-          this.errorText = infoText;
-          this.placeholder = placeholder || 'ajax_status';
-        }
-
-        MQCInfoMessage.prototype = new NPG.QC.UI.MQCErrorMessage();
-
-        /**
-         * Displays the message in the placeholder. Uses bold black typeface.
-         */
-        MQCInfoMessage.prototype.display = function() {
-          var cleanText = this.formatForDisplay(this.errorText);
-          $("#" + this.placeholder).append("<li class='info_mqc'>"
-              + cleanText
-              + '</li>');
-          return this;
-        };
-
-        return MQCInfoMessage;
-      }) ();
-      UI.MQCInfoMessage = MQCInfoMessage;
-
       var MQCLibraryOverallControls = (function () {
         MQCLibraryOverallControls = function() {
           this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
@@ -237,61 +204,7 @@ var NPG;
       }) ();
       UI.MQCLibraryOverallControls = MQCLibraryOverallControls;
 
-      var MQCLibrary4LaneStats = (function() {
-        MQCLibrary4LaneStats = function(id_run, position, id) {
-          this.id_run = id_run;
-          this.position = position;
-          this.id = id;
-          this.name = 'MQCLibrary4LaneStats';
-          this.css_class = 'mqc_library_4_lane_stats';
 
-          this.uiObject = null;
-          this.uiAccepted = null;
-          this.uiRejected = null;
-          this.uiTotal = null;
-
-          this.STATS_VALUE_CLASS     = 'library_4_lane_stats_value';
-          this.TOTAL_ACCEPTED_CLASS  = 'library_4_lane_stats_accepted';
-          this.TOTAL_REJECTED_CLASS  = 'library_4_lane_stats_rejected';
-          this.TOTAL_LIBRARIES_CLASS = 'library_4_lane_stats_total';
-        }
-
-        MQCLibrary4LaneStats.prototype.update = function (accepted, total, rejected) {
-          var self = this;
-          var values = [accepted, total, rejected];
-          self.uiObject.children(self.STATS_VALUE_CLASS).each(function (i, obj) {
-            obj.text(values.shift());
-          });
-        };
-
-        MQCLibrary4LaneStats.prototype.asHtml = function () {
-          var self = this;
-          var accepted = "<span class='" + self.STATS_VALUE_CLASS + " " + self.TOTAL_ACCEPTED_CLASS + "'></span>/";
-          var rejected = "<span class='" + self.STATS_VALUE_CLASS + " " + self.TOTAL_REJECTED_CLASS + "'></span>/";
-          var total_libraries = "<span class='" + self.STATS_VALUE_CLASS + " " + self.TOTAL_LIBRARIES_CLASS + "'></span>";
-          var html = "<div class='" + self.css_class + "' id=" + self.id + ">"
-                      + accepted
-                      + total_libraries
-                      + rejected
-                      + "</div>";
-
-          return html;
-        };
-
-        MQCLibrary4LaneStats.prototype.asObject = function () {
-          var self = this;
-          var obj = $(self.asHtml());
-          self.uiObject = obj;
-          self.uiAccepted = $(obj.children(self.TOTAL_ACCEPTED_CLASS).first());
-          self.uiRejected = $(obj.children(self.TOTAL_REJECTED_CLASS).first());
-          self.uiTotal    = $(obj.children(self.TOTAL_LIBRARIES_CLASS).first());
-
-          obj.data('npg_controller', self);
-          return obj;
-        };
-        return MQCLibrary4LaneStats;
-      })();
-      UI.MQCLibrary4LaneStats = MQCLibrary4LaneStats;
     })(NPG.QC.UI || (NPG.QC.UI = {}));
     var UI = NPG.QC.UI;
   }) (NPG.QC || (NPG.QC = {}));

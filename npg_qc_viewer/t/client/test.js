@@ -47,15 +47,6 @@ require(['scripts/manual_qc'],
       assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
     });
 
-    QUnit.test("NPG.QC.RunPageMQCControl.prepareLanes", function(assert) {
-      var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-      assert.raises(function () {control.prepareLanes();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
-      assert.raises(function () {control.prepareLanes(null, null);}, /Error: Invalid arguments/, "Throws exception with both arguments null");
-      assert.raises(function () {control.prepareLanes(null, 1);}, /Error: Invalid arguments/, "Throws exception with first argument null");
-      assert.raises(function () {control.prepareLanes(1, null);}, /Error: Invalid arguments/, "Throws exception with second argument null");
-
-    });
-
     QUnit.test('Object initialisation', function() {
       var obj = null;
       ok(obj == null, "Variable is initially null.");
@@ -90,9 +81,6 @@ require(['scripts/manual_qc'],
       ok(obj !== undefined, 'Variable is now an instance of MQCLibraryOverallControls');
       obj = null;
       ok(obj == null);
-
-      obj = new NPG.QC.UI.MQCLibrary4LaneStats();
-      ok(obj !== undefined, 'Variable is now an instance of MQCLibrary4LaneStats');
     });
 
     QUnit.test('Error messaging formating', function (assert) {

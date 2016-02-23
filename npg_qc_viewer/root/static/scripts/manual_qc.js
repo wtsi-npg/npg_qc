@@ -238,7 +238,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './man
       };
 
       /**
-       * Links the individual object with an mqc controller so it can allow mqc of a lane.
+       * Links the individual object with an mqc controller so it can allow mqc.
        */
       MQCControl.prototype.linkControl = function(lane_control) {
         lane_control.data(this.CONFIG_CONTROL_TAG, this);
@@ -256,20 +256,6 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './man
             case this.CONFIG_UNDECIDED : this.setUndecided(); break;
           }
         }
-      };
-
-      /**
-       * Changes the background of the parent element depending on the initial outcome
-       * of the lane.
-       */
-      MQCControl.prototype.loadBGFromInitial = function (lane_control) {
-        lane_control.data(this.CONFIG_CONTROL_TAG, this);
-        this.lane_control = lane_control;
-        switch (lane_control.data(this.CONFIG_INITIAL)){
-          case this.CONFIG_ACCEPTED_FINAL : this.setAcceptedFinal(); break;
-          case this.CONFIG_REJECTED_FINAL : this.setRejectedFinal(); break;
-        }
-        lane_control.find(this.LANE_MQC_WORKING_CLASS).empty();
       };
 
       return MQCControl;
@@ -551,43 +537,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './man
         return result;
       };
 
-      /**
-       * Returns true if the number of libraries in the page is less or equal to
-       * the maximum number of libraries to be manualy QC'ed
-       * @param mqc_run_data Transfer object with the manual qc data, must
-       * include an array of tags.
-       * @returns {Boolean}
-       */
-      LanePageMQCControl.prototype.checkLibLimit = function (mqc_run_data) {
-        var result = typeof(mqc_run_data.qc_tags)!== "undefined"
-                     && typeof(mqc_run_data.mqc_lib_limit)!== "undefined"
-                     && mqc_run_data.qc_tags.length <= mqc_run_data.mqc_lib_limit;
-
-        if(!result) {
-          new NPG.QC.UI.MQCInfoMessage(
-            'Too many plexes, lane level manual QC only.').toConsole().display();
-        }
-        return result;
-      };
-
-      /**
-       * Checks all conditions related with the user in session and the
-       * status of the run. Validates the user has privileges, has role,
-       * the run is in correct status and the user in session is the
-       * same as the user who took the MQCing. The number of libraries is bellow
-       * the limit for manual QC.
-       * @param mqc_run_data {Object} Run status data
-       */
-      LanePageMQCControl.prototype.isStateForMQC = function (mqc_run_data) {
-        this.validateRequired(mqc_run_data);
-
-        var result = this.checkUserInSession(mqc_run_data)
-          && this.checkRunStatus(mqc_run_data)
-          && this.checkLaneStatus(mqc_run_data)
-          && this.checkLibLimit(mqc_run_data); //Short-Circuit AND makes sure we check this bit only if necessary, displaying message only when necessary.
-        return result;
-      };
-
+      //TODO
       /**
        * Uses the data from mqc_run_data (list of qc_tags) to filter the
        * array of lanes from the page. It creates a new array which contains
@@ -655,7 +605,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './man
       LanePageMQCControl.prototype.prepareMQC = function (id_run, position, lanes) {
         var self = this;
         var jqxhr = $.ajax({
-          url: self.REST_SERVICE + id_run + '_' + position,
+          url: '',
           cache: false
         }).done(function() {
           var mqc_run_data = jqxhr.responseJSON;
@@ -668,7 +618,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './man
           //Filter lanes for qc using data from REST
           var onlyQCAble = self.onlyQCAble(mqc_run_data, lanes);
 
-          if(self.isStateForMQC(mqc_run_data) && onlyQCAble.length > 0) {
+
             var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
             overallControls.setupControls();
             overallControls.init(onlyQCAble);
@@ -688,9 +638,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './man
                 return;
               }
             );
-          } else {
-            self.removeAllPaddings();
-          }
+
         }).fail(function(jqXHR, textStatus, errorThrown) {
           var errorMessage;
           if (jqXHR.responseJSON) {
@@ -741,116 +689,6 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './man
       return LanePageMQCControl;
     }) ();
     QC.LanePageMQCControl = LanePageMQCControl;
-
-    /**
-     * Object with rules for general things about QC and its
-     * user interface.
-     * @memberof module:NPG/QC
-     * @constructor
-     */
-    var RunPageMQCControl = (function () {
-      function RunPageMQCControl(abstractConfiguration) {
-        NPG.QC.PageMQCControl.call(this, abstractConfiguration);
-        this.REST_SERVICE = '';
-      }
-
-      RunPageMQCControl.prototype = new NPG.QC.PageMQCControl();
-
-      RunPageMQCControl.prototype.addAllPaddings = function () {
-        $('.lane_mqc_control').css("padding-right", "5px");
-        $('.lane_mqc_control').css("padding-left", "10px");
-      };
-
-      /**
-       * Use data from the page to make the first call to REST. Finds rows which
-       * need qc, inits qc for those rows. If it is not state for MQC it updates
-       * the view with current MQC values. If there is an inconsistence between
-       * DWH and MQC databases it will stop and show an error message in the
-       * page.
-       * @param id_run
-       * @param lanes
-       * @param lanesWithBG
-       */
-      RunPageMQCControl.prototype.prepareMQC = function (id_run, lanes, lanesWithBG){
-        var self = this;
-        var jqxhr = $.ajax({
-          url: self.REST_SERVICE + id_run,
-          cache: false
-        }).done(function() {
-          var mqc_run_data = jqxhr.responseJSON;
-          if(self.isStateForMQC(mqc_run_data)) {
-            self.initQC(jqxhr.responseJSON, lanes,
-                        function (mqc_run_data, runMQCControl, lanes) {
-                          //Show working icons
-                          for(var i = 0; i < lanes.length; i++) {
-                            lanes[i].children('.lane_mqc_control').each(function(j, obj){
-                              $(obj).html("<span class='lane_mqc_working'><img src='/static/images/waiting.gif' title='Processing request.'></span>");
-                            });
-                          }
-                          self.prepareLanes(mqc_run_data, lanes);
-                        },
-                        function () { //There is no mqc
-                          $('.lane_mqc_control').css("padding-right", "0px");
-                          $('.lane_mqc_control').css("padding-left", "0px");
-                          return;
-                        }
-            );
-          }
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-          var errorMessage;
-          if (jqXHR.responseJSON) {
-            errorMessage = jqXHR.responseJSON.error;
-          } else {
-            errorMessage = errorThrown + " " + textStatus;
-          }
-          new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
-        }).always(function(data){
-          //Clear progress icon
-          $('.lane_mqc_working').empty();
-        });
-      };
-
-      /**
-       * Update values in lanes with values from REST. Then link the lane
-       * to a controller. The lane controller will update with widgets or
-       * with proper background.
-       * @param mqc_run_data
-       * @param lanes
-       * @returns
-       */
-      RunPageMQCControl.prototype.prepareLanes = function (mqc_run_data, lanes) {
-        if(typeof(mqc_run_data) === "undefined"
-            || mqc_run_data == null
-            || typeof(lanes) === "undefined"
-            || lanes == null) {
-          throw new Error("Error: Invalid arguments");
-        }
-        var result = null;
-        var self = this;
-        for(var i = 0; i < lanes.length; i++) {
-          var cells = lanes[i].children('.lane_mqc_control');
-          for(var j = 0; j < cells.length; j++) {
-            var obj = $(cells[j]); //Wrap as an jQuery object.
-            //Lane from row.
-            var position = obj.data('position');
-            //Filling previous outcomes
-            if('qc_lane_status' in mqc_run_data && position in mqc_run_data.qc_lane_status) {
-              //From REST
-              var current_status = mqc_run_data.qc_lane_status[position];
-              //To html element, LaneControl will render.
-              obj.data('initial', current_status);
-            }
-            //Set up mqc controlers and link them to the individual lanes.
-            var c = new NPG.QC.LaneMQCControl(self.abstractConfiguration);
-            c.linkControl(obj);
-          }
-        }
-        return result;
-      };
-
-      return RunPageMQCControl;
-    }) ();
-    QC.RunPageMQCControl = RunPageMQCControl;
 
   }) (NPG.QC || (NPG.QC = {}));
   var QC = NPG.QC;

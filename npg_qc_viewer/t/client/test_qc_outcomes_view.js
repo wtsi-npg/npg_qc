@@ -158,20 +158,6 @@ require(['scripts/qc_outcomes_view', 'scripts/qc_css_styles'],
       }
     });
 
-    QUnit.test('Outcome for element from css class', function (assert) {
-      var element = $('<div></div>');
-      assert.equal(typeof qc_css_styles.getOutcomeFromStyleClass(element),
-                   'undefined', 'No outcome in style returns undefined');
-
-      var outcomes = ['Accepted preliminary', 'Rejected preliminary', 'Undecided'];
-      for (var i = 0; i < outcomes.length; i++) {
-        var outcomeToSet = outcomes[i];
-        qc_css_styles.displayElementAs(element, outcomeToSet);
-        assert.equal(qc_css_styles.getOutcomeFromStyleClass(element),
-                     outcomeToSet, 'Can get outcome from style ' + outcomeToSet);
-      }
-    });
-
     QUnit.test('RPT key from id', function (assert) {
       assert.throws(
         function () { mqc_outcomes.rptKeyFromId() },

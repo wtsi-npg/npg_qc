@@ -30,22 +30,6 @@ define(['jquery'], function () {
     });
   };
 
-  var getOutcomeFromStyleClass = function (element) {
-    if ( typeof element === 'undefined' ) {
-      throw 'Element cannot be undefined.';
-    }
-    var cssClasses = Object.keys(_outcomeStyleClassToStyle);
-    for (var i = 0; i < cssClasses.length; i++) {
-      var className = cssClasses[i];
-      if ( element.hasClass(className) ) {
-        className = className.slice(QC_PREFIX.length).replace(/_/g, ' ');
-        className = className.charAt(0).toUpperCase() + className.slice(1);
-        return className;
-      }
-    }
-    return;
-  }
-
   var displayElementAs = function( element, qcOutcome ) {
     if (typeof element === 'undefined') {
       throw 'Element cannot be undefined.';
@@ -88,7 +72,6 @@ define(['jquery'], function () {
   
   return {
     displayElementAs: displayElementAs,
-    removePreviousQCOutcomeStyles: removePreviousQCOutcomeStyles,
-    getOutcomeFromStyleClass: getOutcomeFromStyleClass
+    removePreviousQCOutcomeStyles: removePreviousQCOutcomeStyles
   };
 });
