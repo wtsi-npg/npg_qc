@@ -81,7 +81,14 @@ JSON payload example for retrieving the data
 
  '{"5:8:7":{},"5:8:6":{},"6:8:7":{},"6:8:6":{}}'
 
-The UPDATE action has not yet been implemented.
+The payload for updating the data has the same structure as this controller's
+reply to outcomes_GET. It is not necessary to set entity identifies, i.e.
+the following payload is valid:
+
+ '{"Action":"UPDATE","seq":{"5:8":{"mqc_outcome":"Undecided"}}}'.
+
+An update request can contain both 'seq' and 'lib' sections, each of the
+sections can contain multiple entries. See npg_qc::mqc::outcome->save() for details.
 
 =cut
 
@@ -154,75 +161,65 @@ sub _update_outcomes {
 
   if ($error) {
     $self->status_forbidden($c, 'message' => $error,);
-    return;
-  }
+  } else {
 
-  try {
-    my $query     = $self->_format_outcomes($data);
-    my $lane_info = $self->_lane_info($c, $query);
-    my $response  = npg_qc::mqc::outcomes->new(
-      qc_schema => $c->model('NpgQcDB')->schema())->save($query, $username, $lane_info);
-    foreach my $key (keys %{$lane_info}) {
-      my $ids = npg_tracking::glossary::rpt->inflate_rpt($key);
-      try {
-        $c->model('NpgDB')->update_lane_manual_qc_complete(
-          $ids->{'id_run'}, $ids->{'position'}, $username);
-      } catch {
-        carp qq[Error updating lane status for rpt key '$key': $_];
-      };
-    }
-    $self->status_ok($c, 'entity' => $response,);
-  } catch {
-    $self->status_bad_request($c, 'message' => $_,);
-  };
+    try {
+      my $seq_outcomes = $data->{$SEQ_OUTCOMES} || {};
+      my $lane_info = keys %{$seq_outcomes} ?
+        $self->_lane_info($c->model('MLWarehouseDB'), $seq_outcomes) : {};
+
+      my $outcomes = npg_qc::mqc::outcomes->new(
+                       qc_schema => $c->model('NpgQcDB')->schema())
+                     ->save($data, $username, $lane_info);
+
+      $seq_outcomes = $outcomes->{$SEQ_OUTCOMES} || {};
+      $self->_update_runlanes($c, $seq_outcomes, $username);
+
+      $self->status_ok($c, 'entity' => $outcomes,);
+    } catch {
+      my $e = $_;
+      if (ref $e eq 'DBIx::Class::Exception') {
+        $e = $e->{'msg'} || q[]; # This exception class does not provide
+                                 # any accessors.
+      }
+      $self->status_bad_request($c, 'message' => $e,);
+    };
+  }
 
   return;
 }
 
-sub _format_outcomes {
-  my ($self, $data) = @_;
-
-  my $query = {};
-  my $count = 0;
-  foreach my $outcome_type ( ($LIB_OUTCOMES, $SEQ_OUTCOMES) ) {
-    my $outcomes = $data->{$outcome_type} || [];
-    my $keys = {};
-    foreach my $o ( @{$outcomes} ) {
-      $count++;
-      my ($rpt_key, $outcome) = each %{$o};
-      if (exists $keys->{$rpt_key}) {
-        croak qq[Duplicate entries for rpt key '$rpt_key'];
-      }
-      $keys->{$rpt_key} = 1;
-      my $q = _inflate_rpt($rpt_key);
-      $q->{$QC_OUTCOME} = $outcome->{$QC_OUTCOME} ||
-        croak qq[Outcome description is missing for rpt key '$rpt_key'];
-      push @{$query->{$outcome_type}}, {$rpt_key => $q};
-    }
-  }
-
-  if ($count == 0) {
-    croak 'No data sent';
-  }
-
-  return $query;
-}
-
 sub _lane_info {
-  my ($self, $c, $query) = @_;
+  my ($self, $mlwh_schema, $seq_outcomes) = @_;
 
   my $info = {};
-  foreach my $o ( @{$query->{$SEQ_OUTCOMES}} ) {
-    my ($rpt_key, $outcome) = each %{$o};
-    my %q = %{$outcome};
-    my $outcome_desc = delete $q{$QC_OUTCOME};
-    if (npg_qc::Schema::Mqc::OutcomeDict->is_final_outcome_description($outcome_desc)) {
-      $info->{$rpt_key} = $c->model('MLWarehouseDB')->tags4lane(\%q);
-    }
+  foreach my $rpt_key ( keys %{$seq_outcomes} ) {
+    $info->{$rpt_key} = $mlwh_schema->tags4lane(
+      npg_tracking::glossary::rpt->inflate_rpt($rpt_key));
   }
 
   return $info;
 }
+
+sub _update_runlanes {
+  my ($self, $c, $seq_outcomes, $username) = @_;
+
+  foreach my $key ( keys %{$seq_outcomes} ) {
+    my $outcome = $seq_outcomes->{$key};
+    if (npg_qc::Schema::Mqc::OutcomeDict
+          ->is_final_outcome_description($outcome->{$QC_OUTCOME})) {
+      try {
+        $c->model('NpgDB')->update_lane_manual_qc_complete(
+          $outcome->{'id_run'}, $outcome->{'position'}, $username);
+      } catch {
+        $c->log->warn(qq[Error updating lane status for rpt key '$key': $_]);
+      };
+    }
+  }
+
+  return;
+}
+
 
 __PACKAGE__->meta->make_immutable;
 1;
