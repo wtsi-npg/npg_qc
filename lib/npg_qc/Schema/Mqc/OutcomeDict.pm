@@ -49,14 +49,14 @@ sub pk_value {
 sub matching_final_short_desc {
   my $self = shift;
 
-  my $desc;
+  my $desc = $self->short_desc;
   if (!$self->is_final_outcome) {
-    $desc = $self->short_desc;
     my $count = $desc =~ s/$PRELIMINARY/$FINAL/xms;
     if (!$count) { # Undecided outcome does not have 'preliminary' suffix
       $desc .= " $FINAL";
     }
   }
+
   return $desc;
 }
 
@@ -123,10 +123,15 @@ __END__
 
 =head2 matching_final_short_desc
 
-  If this outcome is final, returns undefined, otherwise returns a short description
-  for a matching final outcome.
+  If this outcome is final, returns a short description of this outcome,
+  otherwise returns a short description for a matching final outcome.
+  The returned outcome description does not neccessarily exist in a
+  dictionary.
   
     print $dict_row->short_desc; # Rejected preliminary
+    print $dict_row->matching_final_short_desc(); # Rejected final
+
+    print $dict_row->short_desc; # Rejected final
     print $dict_row->matching_final_short_desc(); # Rejected final
 
 =head1 DIAGNOSTICS
