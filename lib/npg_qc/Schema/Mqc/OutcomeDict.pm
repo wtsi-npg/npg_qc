@@ -125,7 +125,7 @@ __END__
 
   If this outcome is final, returns a short description of this outcome,
   otherwise returns a short description for a matching final outcome.
-  The returned outcome description does not neccessarily exist in a
+  The returned outcome description does not necessarily exist in a
   dictionary.
   
     print $dict_row->short_desc; # Rejected preliminary
