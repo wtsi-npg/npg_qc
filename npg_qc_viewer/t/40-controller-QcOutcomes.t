@@ -17,6 +17,7 @@ my $schemas;
 lives_ok { $schemas = $util->test_env_setup()}
   'test db created and populated';
 my $qc_schema = $schemas->{'qc'};
+my $wh_schema = $schemas->{'mlwh'};
 
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
@@ -191,63 +192,56 @@ subtest 'authentication and authorisation for an update' => sub {
 };
 
 subtest 'data validation for update requests' => sub {
-  plan tests => 10;
+  plan tests => 8;
 
   my $data = {'Action'   => 'UPDATE',
               'user'     => 'cat',
               'password' => 'secret',
-              'lib'      => [],
-              'seq'      => []};
+              'lib'      => {},
+              'seq'      => {}};
   my $error_code = 400;
 
   my $request = _new_post_request();
   $request->content(encode_json($data));
   my $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/No data sent/,
+  like ($response->content, qr/No data to save/,
     'should send some data');
 
-  $data->{'lib'} = [{'1:2;3:4' => {'mqc_outcome' => 'some'}}];
+  $data->{'lib'} = {'1:2;3:4' => {'mqc_outcome' => 'some'}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/Cannot deal with multi-component compositions/,
+  like ($response->content, qr/rpt string should not contain \';\'/,
     'multi-component compositions are not allowed');
 
-  $data->{'lib'} = [{'1:2' => {'mqc_outcome' => 'some'}}, {'1:4' => {'mqc_outcome' => ''}}];
+  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'some'}, '1:4' => {'mqc_outcome' => ''}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/Outcome description is missing for rpt key \'1:4\'/,
+  like ($response->content, qr/Outcome description is missing for 1:4/,
     'outcome description should be present');
 
-  $data->{'lib'} = [{'1:2' => {'mqc_outcome' => 'some'}}, {'1:4' => {'qc_outcome' => ''}}];
+  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'some'}, '1:4' => {'qc_outcome' => ''}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/Outcome description is missing for rpt key \'1:4\'/,
+  like ($response->content, qr/Outcome description is missing for 1:4/,
     'outcome description should not be empty');
-
-  $data->{'lib'} = [{'1:2' => {'mqc_outcome' => 'some'}}, {'1:2' => {'mqc_outcome' => 'some'}}];
-  $request = _new_post_request();
-  $request->content(encode_json($data));
-  $response = request($request);
-  is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/Duplicate entries for rpt key \'1:2\'/,
-    'duplicate entries are not allowed');  
 };
 
 
 subtest 'conditionally get wh info about tags' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   my $data = {'Action'   => 'UPDATE',
               'user'     => 'cat',
               'password' => 'secret',
-              'seq' =>  [{'1234:4' => {'mqc_outcome' => 'some final'}}]};
+              'seq' =>  {'1234:4' => {'mqc_outcome' => 'some'}}
+             };
   my $error_code = 400;
 
   my $request = _new_post_request();
@@ -256,13 +250,36 @@ subtest 'conditionally get wh info about tags' => sub {
   is($response->code, $error_code, "error code is $error_code");
   like ($response->content,
     qr/No NPG mlwarehouse data for run 1234 position 4/,
-    'error when no lims data available for a lane when changing to a final outcome');
+    'error when no lims data available for a lane');
 
-  $data->{'seq'}->[0]->{'1234:4'}->{'mqc_outcome'} = 'Undecided';
+  delete $data->{'seq'};
+  $data->{'lib'} = {'1234:4' => {'mqc_outcome' => 'Undecided'}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
-  ok($response->is_success, 'no error when updating to non-final outcome');
+  ok($response->is_success, 'response received for updating a lib entity');
+  
+  $wh_schema->resultset('IseqRunLaneMetric')->create({
+    cancelled =>  0,
+    cycles => 76,
+    id_run => 1234,
+    instrument_model => 'HK',
+    instrument_name => 'IL6',
+    paired_read => 1,
+    pf_bases => 912144,
+    pf_cluster_count => 120019,
+    position => 4,});
+
+  $wh_schema->resultset('IseqProductMetric')->create({
+    id_run => 1234, position => 4, id_iseq_flowcell_tmp => 2514299
+  });
+  
+  delete $data->{'lib'};
+  $data->{'seq'} = {'1234:4' => {'mqc_outcome' => 'Rejected final'}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  ok($response->is_success, 'response received for updating a seq entity');
 };
 
 subtest 'Conditional update of run/lane status in tracking' => sub {
@@ -281,7 +298,7 @@ subtest 'Conditional update of run/lane status in tracking' => sub {
   my @prelims = ('Accepted preliminary', 'Rejected preliminary', 'Undecided');
   foreach my $mqc_outcome (@prelims) {
     my $request = _new_post_request();
-    $data->{'seq'} = [{'4025:4' => {'mqc_outcome' => $mqc_outcome}}];
+    $data->{'seq'} = {'4025:4' => {'mqc_outcome' => $mqc_outcome}};
     $request->content(encode_json($data));
     my $response = request($request);
     ok($response->is_success, "updated to '$mqc_outcome'") ||
@@ -292,7 +309,7 @@ subtest 'Conditional update of run/lane status in tracking' => sub {
   } 
 
   my $mqc_outcome = 'Rejected final';
-  $data->{'seq'} = [{'4025:4' => {'mqc_outcome' => $mqc_outcome}}];
+  $data->{'seq'} = {'4025:4' => {'mqc_outcome' => $mqc_outcome}};
   my $request = _new_post_request();
   $request->content(encode_json($data));
   my $response = request($request);
