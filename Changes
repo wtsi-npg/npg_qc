@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tweak to bam_flagstats total_reads to use numbers without qc fail by default
  - SeqQC
    - bugfix only build request for qc_outcomes if rptkeys in page
 
