@@ -62,37 +62,53 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
     QC.ProdConfiguration = ProdConfiguration;
 
     QC.launchManualQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
-      if (isRunPage != null) {
-        var prodConfiguration = new NPG.QC.ProdConfiguration(qcOutcomesURL);
-        var rows = [];
-        $('.lane_mqc_control').each(function (index, element) {
-          var $element = $(element);
-          $element.css("padding-right", "5px").css("padding-left", "10px");
-          var rptKey = $element.closest('tr').attr('id');
-          rows.push(rptKey);
-        });
-        var prevOutcomes;
+      if (isRunPage == null) {
+        throw 'Error page type cannot be null';
+      }
+      var prodConfiguration = new NPG.QC.ProdConfiguration(qcOutcomesURL);
 
-        if (isRunPage) {
-          prevOutcomes = qcOutcomes.seq;
-        } else {
-          var control;
-          $('.library_mqc_overall_controls').css("padding-right", "0px");
-          prevOutcomes = qcOutcomes.lib;
-          control.parseLanes(lanes);
-          control.prepareMQC(lanes);
-        }
+      if (isRunPage) {
+        prevOutcomes = qcOutcomes.seq;
+      } else {
+        var seqOutcomes = qcOutcomes.seq;
+        prevOutcomes    = qcOutcomes.lib;
 
-        for ( var i = 0; i < rows.length; i++) {
-          var c = isRunPage ? new NPG.QC.LaneMQCControl(prodConfiguration) : new NPG.QC.LibraryMQCControl(prodConfiguration);
-          c.rowId = rows[i];
-          c.rptKey = qc_outcomes_view.rptKeyFromId(c.rowId);
-          if ( typeof prevOutcomes[c.rptKey] !== 'undefined' ) {
-            c.outcome = prevOutcomes[c.rptKey].mqc_outcome;
+        var seqKeys = Object.keys(seqOutcomes);
+        for ( i = 0; i < seqKeys.length; i++ ) {
+          if ( seqOutcomes[seqKeys[i]].mqc_outcome.indexOf('final') !== -1 ) {
+            return;
           }
-          var obj = $(mqc_utils.buildIdSelector(c.rowId)).find('.lane_mqc_control');
-          c.linkControl(obj);
         }
+        $('.library_mqc_overall_controls').css("padding-right", "0px");
+        var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
+        overallControls.setupControls();
+        overallControls.init();
+      }
+
+      var rows = [];
+      $('.lane_mqc_control').each(function (index, element) {
+        var $element = $(element);
+
+        $element.parent().find('.tag_info').css("background-color", "")
+                                            .removeClass( function (index, css) {
+                                                            return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
+        });
+
+        $element.css("padding-right", "5px").css("padding-left", "10px");
+        var rptKey = $element.closest('tr').attr('id');
+        rows.push(rptKey);
+      });
+      var prevOutcomes;
+
+      for ( var i = 0; i < rows.length; i++) {
+        var c = isRunPage ? new NPG.QC.LaneMQCControl(prodConfiguration) : new NPG.QC.LibraryMQCControl(prodConfiguration);
+        c.rowId = rows[i];
+        c.rptKey = qc_outcomes_view.rptKeyFromId(c.rowId);
+        if ( typeof prevOutcomes[c.rptKey] !== 'undefined' ) {
+          c.outcome = prevOutcomes[c.rptKey].mqc_outcome;
+        }
+        var obj = $(qc_utils.buildIdSelector(c.rowId)).find('.lane_mqc_control');
+        c.linkControl(obj);
       }
     };
 
@@ -287,8 +303,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
 
-          var query = mqc_utils.buildUpdateQuery(self.TYPE_SEQ, [{rptKey: self.rptKey, mqc_outcome: outcome}]);
-          console.log(JSON.stringify(query));
+          var query = qc_utils.buildUpdateQuery(self.TYPE_SEQ, [{rptKey: self.rptKey, mqc_outcome: outcome}]);
           //AJAX call.
           $.ajax({
             url: self.abstractConfiguration.qcOutcomesURL,
@@ -304,8 +319,6 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
             //Clear progress icon
             self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });
-        } else {
-          window.console && console.log("Noting to do.");
         }
       };
 
@@ -387,8 +400,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
           self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
-          var query = mqc_utils.buildUpdateQuery(self.TYPE_LIB, [{rptKey: self.rptKey, mqc_outcome: self.outcome}]);
-          console.log(JSON.stringify(query));
+          var query = qc_utils.buildUpdateQuery(self.TYPE_LIB, [{rptKey: self.rptKey, mqc_outcome: outcome}]);
           //AJAX call.
           $.ajax({
             url: self.abstractConfiguration.qcOutcomesURL,
@@ -404,8 +416,6 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
             //Clear progress icon
             self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });
-        } else {
-          window.console && console.log("Noting to do.");
         }
       };
 
@@ -416,9 +426,6 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
       LibraryMQCControl.prototype.generateActiveControls = function() {
         var lane_control = this.lane_control;
         var self = this;
-        self.id_run    = lane_control.data(this.DATA_ID_RUN);
-        self.position  = lane_control.data(this.DATA_POSITION);
-        self.tag_index = lane_control.data(this.DATA_TAG_INDEX);
         var outcomes  = [self.CONFIG_ACCEPTED_PRELIMINARY,
                          self.CONFIG_UNDECIDED,
                          self.CONFIG_REJECTED_PRELIMINARY];
@@ -431,9 +438,8 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
                          "/images/cross.png' title='Mark lane as preliminary fail'/>"]; // for rejected
         //Remove old working span
         self.lane_control.children(self.LANE_MQC_WORKING_CLASS).remove();
-        //Create and add radios
-        var id_pre = self.id_run + '_' + self.position + '_' + self.tag_index;
-        var name = 'radios_' + id_pre;
+        //TODO
+        var name = 'radios_' + self.rowId;
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
           var label = labels[i];
@@ -441,7 +447,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
           if (self.outcome == outcome) {
             checked = true;
           }
-          var radio = new NPG.QC.UI.MQCOutcomeRadio(id_pre, outcome, label, name, checked);
+          var radio = new NPG.QC.UI.MQCOutcomeRadio(self.rowId, outcome, label, name, checked);
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
@@ -564,8 +570,6 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './qc_utils', './manu
           var cells = lane.children('.lane_mqc_control');
           for(var j = 0; j < cells.length; j++) {
             var obj = $(cells[j]); //Wrap as an jQuery object.
-            var tag_index = obj.data(this.DATA_TAG_INDEX);
-            tag_index = String(tag_index);
             if(tag_index !== '') {
               lanes_checked++;
               //tag_index is qc-able

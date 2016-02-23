@@ -90,7 +90,7 @@ define(['jquery'], function (jQuery) {
     };
   };
 
-  var pageForMQC = function() {
+  var pageForMQC = function(qcOutcomes) {
     var isPageForMQC = false, isRunPage = null;
 
     var loggedUserString = $.trim($('#header h1 span.rfloat').text());

@@ -160,39 +160,39 @@ var NPG;
           return html;
         };
 
-        MQCLibraryOverallControls.prototype.init = function (lanes) { //TODO refactor
+        MQCLibraryOverallControls.prototype.init = function () { //TODO refactor
           var all_accept = $($('.lane_mqc_accept_all').first());
           var all_reject = $($('.lane_mqc_reject_all').first());
           var all_und = $($('.lane_mqc_undecided_all').first());
 
           all_accept.off("click").on("click", function () {
             var new_outcome;
-            for (var i = 0; i < lanes.length; i++) {
-              var obj = $(lanes[i].children('.lane_mqc_control').first());
-              var controller = obj.data('gui_controller');
+            $('.lane_mqc_control').each( function (index, element) {
+              $element = $(element);
+              var controller = $element.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_ACCEPTED_PRELIMINARY);
               new_outcome = new_outcome || controller.CONFIG_ACCEPTED_PRELIMINARY;
-            }
+            });
             $('input:radio').val([new_outcome]);
           });
           all_reject.off("click").on("click", function () {
             var new_outcome;
-            for (var i = 0; i < lanes.length; i++) {
-              var obj = $(lanes[i].children('.lane_mqc_control').first());
-              var controller = obj.data('gui_controller');
+            $('.lane_mqc_control').each( function (index, element) {
+              $element = $(element);
+              var controller = $element.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_REJECTED_PRELIMINARY);
               new_outcome = new_outcome || controller.CONFIG_REJECTED_PRELIMINARY;
-            }
+            });
             $('input:radio').val([new_outcome]);
           });
           all_und.off("click").on("click", function () {
             var new_outcome;
-            for (var i = 0; i < lanes.length; i++) {
-              var obj = $(lanes[i].children('.lane_mqc_control').first());
-              var controller = obj.data('gui_controller');
+            $('.lane_mqc_control').each( function (index, element) {
+              $element = $(element);
+              var controller = $element.data('gui_controller');
               controller.updateOutcome(controller.CONFIG_UNDECIDED);
               new_outcome = new_outcome || controller.CONFIG_UNDECIDED;
-            }
+            });
             $('input:radio').val([new_outcome]);
           });
           all_accept.show();
