@@ -287,7 +287,7 @@ define(['jquery', './qc_css_styles', './qc_outcomes_view', './mqc_utils', './man
               + this.abstractConfiguration.getRoot()
               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
 
-          var query = mqc_utils.buildUpdateQuery(self.TYPE_SEQ, [{rptKey: self.rptKey, mqc_outcome: self.outcome}]);
+          var query = mqc_utils.buildUpdateQuery(self.TYPE_SEQ, [{rptKey: self.rptKey, mqc_outcome: outcome}]);
           console.log(JSON.stringify(query));
           //AJAX call.
           $.ajax({

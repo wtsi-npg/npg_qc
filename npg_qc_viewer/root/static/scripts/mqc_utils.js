@@ -1,13 +1,15 @@
 /* globals $: false, define: false */
 'use strict';
 define(['jquery'], function (jQuery) {
+  var ACTION    = 'UPDATE';
+
   var buildUpdateQuery = function (type, qcOutcomes, query) {
     query = query || {};
     query[type] = {};
     for ( var i = 0; i < qcOutcomes.length; i++ ) {
       query[type][qcOutcomes[i].rptKey] = { mqc_outcome: qcOutcomes[i].mqc_outcome };
     }
-    query.Action = 'UDPATE';
+    query.Action = ACTION;
     return query;
   };
 
