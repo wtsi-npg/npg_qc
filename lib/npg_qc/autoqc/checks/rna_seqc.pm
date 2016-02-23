@@ -59,12 +59,21 @@ has '_ttype_gtf_column' => (is      => 'ro',
 
 has '_alignments_in_bam' => (is         => 'ro',
                              isa        => 'Maybe[Bool]',
-                             lazy_build => 1,
-                             init_arg => undef,);
+                             lazy_build => 1,);
 
 sub _build__alignments_in_bam {
     my ($self) = @_;
     return $self->lims->alignments_in_bam;
+}
+
+has '_library_type' => (is         => 'ro',
+                        isa        => 'Maybe[Str]',
+                        lazy_build => 1,);
+
+sub _build__library_type {
+    my ($self) = @_;
+    my $library_type = $self->lims->library_type // q[];
+    return $library_type;
 }
 
 has 'qc_out'     => (is         => 'ro',
@@ -87,18 +96,17 @@ sub _build__input_str {
 
 has '_reference_fasta' => (is => 'ro',
                            isa => 'Maybe[Str]',
-                           lazy_build => 1,
-                           init_arg => undef,);
+                           lazy_build => 1,);
 
 sub _build__reference_fasta {
     my ($self) = @_;
-    return $self->refs->[0];
+    my $reference_fasta = $self->refs->[0] // q[];
+    return $reference_fasta;
 }
 
 has '_bam_file' => (is         => 'ro',
                     isa        => 'Str',
-                    lazy_build => 1,
-                    init_arg => undef,);
+                    lazy_build => 1,);
 
 sub _build__bam_file {
     my $self = shift;
@@ -107,12 +115,11 @@ sub _build__bam_file {
 
 has '_annotation_gtf' => (is         => 'ro',
                           isa        => 'Maybe[Str]',
-                          lazy_build => 1,
-                          init_arg => undef,);
+                          lazy_build => 1,);
 
 sub _build__annotation_gtf {
     my $self = shift;
-    my $trans_gtf = $self->rnaseqc_gtf_file;
+    my $trans_gtf = $self->rnaseqc_gtf_file // q[];
     return $trans_gtf;
 }
 
@@ -138,27 +145,26 @@ sub _command {
 
 override 'can_run' => sub {
     my $self = shift;
-    my $l = $self->lims;
     my $can_run = 1;
     my @comments;
     if(! $self->_alignments_in_bam) {
-        push @comments, q[Alignments_in_bam is false];
+        push @comments, q[BAM file is not aligned];
         $can_run = 0;
     }
-    if ((! $l->library_type || $l->library_type !~ /(?:cD|R)NA/sxm) && $l->library_type ne q[Pre-quality controlled]) {
-        push @comments, join q[ ], q[Not RNA library type: ], $l->library_type;
+    if ((! $self->_library_type || $self->_library_type !~ /(?:m)?RNA/sxm) && $self->_library_type ne q[Pre-quality controlled]) {
+        push @comments, join q[ ], q[Library type is not RNA: ], $self->_library_type;
         $can_run = 0;
     }
-    if (! $l->reference_genome) {
+    if (! $self->_reference_fasta) {
         push @comments, q[No reference genome available];
         $can_run = 0;
     }
-    if (! $self->transcriptome_index_name()) {
-        push @comments, q[Not transcriptome set so not a splice junction alignment (e.g. Tophat)];
+    if (! $self->_annotation_gtf) {
+        push @comments, q[No GTF annotation available];
         $can_run = 0;
     }
     if (! $can_run) {
-        my $can_run_message = join q[, ], @comments;
+        my $can_run_message = join q[; ], @comments;
         $self->result->add_comment($can_run_message);
         carp qq[Skipping RNA-SeQC check because: $can_run_message];
     }

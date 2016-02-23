@@ -19,7 +19,7 @@ use npg_qc::autoqc::results::collection;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $NON_STORABLE_CHECK  => qr[rna_seqc];
+Readonly::Scalar my $NON_STORABLE_CHECK  => qr/rna_seqc/sm;
 
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitManyArgs)
 
@@ -196,7 +196,7 @@ sub run_from_db {
     return $c;
   }
   foreach my $check_name (@{npg_qc::autoqc::autoqc->checks_list()}) {
-    next if ($check_name =~ $NON_STORABLE_CHECK); 
+    next if ($check_name =~ $NON_STORABLE_CHECK);
     my $dbix_query = { 'id_run' => $query->id_run};
     if (@{$query->positions}) {
       $dbix_query->{'position'} = $query->positions;
