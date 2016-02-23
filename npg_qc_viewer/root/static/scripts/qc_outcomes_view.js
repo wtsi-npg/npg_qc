@@ -26,12 +26,20 @@
 define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
   var ID_PREFIX = 'rpt_key:';
 
+  var _displayJqXHRError = function ( jqXHR ) {
+    var message;
+    if ( typeof jqXHR.responseJSON === 'object' && typeof jqXHR.responseJSON.error === 'string' ) {
+      message = $.trim(er.responseJSON.error);
+    } else  {
+      message = ( er.status || '' ) + ' ' + ( er.statusText || '');
+    }
+    _displayError(message);
+  };
+
   var _displayError = function( er ) {
     var message;
-    if(typeof er === 'string') {
+    if( typeof er === 'string' ) {
       message = er;
-    } else if (typeof er === 'object' && typeof er.message === 'string') {
-      message = er.message;
     } else {
       message = '' + er;
     }
@@ -109,13 +117,13 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
         contentType: 'application/json',
         data: JSON.stringify(_buildQuery(rptKeys)),
         cache: false
-      }).error(function(jqXHR, textStatus, errorThrown) {
-        _displayError(errorThrown);
+      }).error(function(jqXHR) {
+        _displayJqXHRError(jqXHR);
       }).success(function (data) {
         try {
           _updateDisplayWithQCOutcomes(data);
-          if(typeof callOnSuccess === 'function' ) {
-            callOnSuccess();
+          if( typeof callOnSuccess === 'function' ) {
+            callOnSuccess(data);
           }
         } catch (er) {
           _displayError(er);
