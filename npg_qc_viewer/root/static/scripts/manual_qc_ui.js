@@ -204,7 +204,6 @@ var NPG;
       }) ();
       UI.MQCLibraryOverallControls = MQCLibraryOverallControls;
 
-
     })(NPG.QC.UI || (NPG.QC.UI = {}));
     var UI = NPG.QC.UI;
   }) (NPG.QC || (NPG.QC = {}));
