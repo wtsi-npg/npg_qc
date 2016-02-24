@@ -77,7 +77,7 @@ require(['scripts/manual_qc'],
       obj = null;
       ok(obj == null);
 
-      obj = new NPG.QC.UI.MQCLibraryOverallControls();
+      obj = new NPG.QC.UI.MQCLibraryOverallControls(new TestConfiguration());
       ok(obj !== undefined, 'Variable is now an instance of MQCLibraryOverallControls');
       obj = null;
       ok(obj == null);

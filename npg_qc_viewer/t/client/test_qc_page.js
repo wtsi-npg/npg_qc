@@ -1,4 +1,4 @@
-/* globals $: false, define: false, QUnit: false */
+/* globals $: false, define: false, QUnit: false, document: false */
 "use strict";
 require.config({
   baseUrl: '../../root/static',
@@ -26,7 +26,7 @@ require(['scripts/qc_page'],
         'NPG SeqQC v0: Results (all) for runs 16074 lanes 1 2 (run 16074 status: qc in progress, taken by aa11)',
         'NPG SeqQC v0: Results (all) for runs 16074 lanes 1 2',
         'NPG SeqQC v0: Results (all) for runs 16074 16075 lanes 1 2'
-      ]
+      ];
       for (var i = 0; i < multiple.length; i++) {
         var runlane2 = qc_page._parseRunLane(multiple[i]);
         assert.ok(!runlane2.isRunPage, 'Correctly identifies lane page');
@@ -87,7 +87,7 @@ require(['scripts/qc_page'],
       var logged    = 'Logged in as bb11';
       var loggedMQC = 'Logged in as aa11 (mqc)';
 
-      for (var i = 0; i < notLogged.length; i++) {
+      for ( var i = 0; i < notLogged.length; i++ ) {
         var result1 = qc_page._parseLoggedUser(notLogged[i]);
         assert.equal(result1.username, null, 'No logged user when not logged in, using: <' + notLogged[i] + '>');
         assert.equal(result1.role, null, 'No logged user role when not logged in, using: <' + notLogged[i] + '>');
@@ -149,17 +149,17 @@ require(['scripts/qc_page'],
       titlesNotForMQC = [
         'NPG SeqQC v0: Results (all) for runs 16074 lanes 1 2 (run 16074 status: qc in progress, taken by aa11)',
         'NPG SeqQC v0: Results (all) for runs 16074 16075 lanes 1',
-      ]
+      ];
       for( var i = 0; i < titlesNotForMQC.length; i++ ) {
         document.title = titlesNotForMQC[i];
         var pageForMQC = qc_page.pageForMQC();
         assert.ok(!pageForMQC.isPageForMQC, 'Pages with data for multiple runs/lanes not for manual QC');
       }
       
-      document.title = 'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc in progress, taken by aa11)',
+      document.title = 'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc in progress, taken by aa11)';
       
       $('#header h1 span.rfloat').text('Logged in as aa11');
-      pageForMQC = qc_page.pageForMQC();
+      var pageForMQC = qc_page.pageForMQC();
       assert.ok(!pageForMQC.isPageForMQC, 'Page is not for manual QC when user lacks mqc role');
 
       $('#header h1 span.rfloat').text('Not logged in');
