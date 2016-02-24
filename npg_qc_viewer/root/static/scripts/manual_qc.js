@@ -88,11 +88,8 @@ define([
         var seqOutcomes = qcOutcomes.seq;
         prevOutcomes    = qcOutcomes.lib;
 
-        var seqKeys = Object.keys(seqOutcomes);
-        for ( i = 0; i < seqKeys.length; i++ ) {
-          if ( seqOutcomes[seqKeys[i]].mqc_outcome.indexOf('final') !== -1 ) {
-            return;
-          }
+        if ( !qc_utils.seqFinal(seqOutcomes) ) {
+          return;
         }
         var overallControls = new NPG.QC.UI.MQCLibraryOverallControls(prodConfiguration);
         overallControls.setupControls();

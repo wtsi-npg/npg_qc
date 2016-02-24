@@ -35,6 +35,16 @@ define(['jquery'], function (jQuery) {
     return '#' + id.replace(/:/g, '\\3A ');
   };
 
+  var seqFinal = function (seqOutcomes) {
+    var seqKeys = Object.keys(seqOutcomes);
+    for ( var i = 0; i < seqKeys.length; i++ ) {
+      if ( seqOutcomes[seqKeys[i]].mqc_outcome.indexOf('final') !== -1 ) {
+        false;
+      }
+    }
+    return true;
+  };
+
   var buildIdSelectorFromRPT = function (rptKey) {
     return buildIdSelector(ID_PREFIX + rptKey);
   };
@@ -43,6 +53,7 @@ define(['jquery'], function (jQuery) {
     buildUpdateQuery: buildUpdateQuery,
     buildIdSelectorFromRPT: buildIdSelectorFromRPT,
     buildIdSelector: buildIdSelector,
+    seqFinal: seqFinal,
     removeErrorMessages: removeErrorMessages,
     rptKeyFromId: rptKeyFromId
   };

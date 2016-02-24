@@ -168,21 +168,20 @@ var NPG;
         MQCLibraryOverallControls.prototype.buildControl = function (cssClass, title, representation) {
           var html = "<span class='lane_mqc_button lane_mqc_overall " + cssClass
                      + "' title='" + title
-                     + "' hidden>" + representation
+                     + "' >" + representation
                      + "</span>";
           return html;
         };
 
         MQCLibraryOverallControls.prototype.init = function () { //TODO refactor
           var self = this;
-          var all_accept = $($('.lane_mqc_accept_all').first());
-          var all_reject = $($('.lane_mqc_reject_all').first());
-          var all_und = $($('.lane_mqc_undecided_all').first());
+          var all_accept = $($('.' + self.CLASS_ALL_ACCEPT).first());
+          var all_reject = $($('.' + self.CLASS_ALL_REJECT).first());
+          var all_und = $($('.' + self.CLASS_ALL_UNDECIDED).first());
 
           var placeholder = placeholder || $($('.' + self.PLACEHOLDER_CLASS));
 
-
-          var update = function (query, callback) {
+          var requestUpdate = function (query, callback) {
             placeholder.parent()
                        .find('.lib_mqc_working')
                        .html("<img src='"
@@ -211,63 +210,47 @@ var NPG;
             });
           };
 
-          all_accept.off("click").on("click", function () {
-            var ids = [];
-            $('.lane_mqc_control').closest('tr').each(function (index, element) {
-              ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: 'Accepted preliminary'});
-            });
-            var query = qc_utils.buildUpdateQuery('lib', ids);
-            var callback = function () {
-              var new_outcome;
-              $('.lane_mqc_control').each( function (index, element) {
-                $element = $(element);
-                var controller = $element.data('gui_controller');
-                controller.updateView(controller.CONFIG_ACCEPTED_PRELIMINARY);
-                new_outcome = new_outcome || controller.CONFIG_ACCEPTED_PRELIMINARY;
-              });
-              $('input:radio').val([new_outcome]);
-            };
-            update(query, callback);
-          });
-          all_reject.off("click").on("click", function () {
-            var ids = [];
-            $('.lane_mqc_control').closest('tr').each(function (index, element) {
-              ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: 'Rejected preliminary'});
-            });
-            var query = qc_utils.buildUpdateQuery('lib', ids);
-            var callback = function () {
-              var new_outcome;
-              $('.lane_mqc_control').each( function (index, element) {
-                $element = $(element);
-                var controller = $element.data('gui_controller');
-                controller.updateView(controller.CONFIG_REJECTED_PRELIMINARY);
-                new_outcome = new_outcome || controller.CONFIG_REJECTED_PRELIMINARY;
-              });
-              $('input:radio').val([new_outcome]);
+          var resetOnClick = function () {
+            var toReset = [all_accept, all_reject, all_und];
+            for ( var i = 0; i < toReset.length; i++ ) {
+              toReset[i].off('click').on('click', toReset[i].data('function_call'));
+              toReset[i].css('background-color', '#F4F4F4');
             }
-            update(query, callback);
-          });
-          all_und.off("click").on("click", function () {
+          };
+
+          var prepareUpdate = function (outcome, caller) {
             var ids = [];
             $('.lane_mqc_control').closest('tr').each(function (index, element) {
-              ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: 'Undecided'});
+              ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: outcome});
             });
             var query = qc_utils.buildUpdateQuery('lib', ids);
             var callback = function () {
+              resetOnClick();
               var new_outcome;
               $('.lane_mqc_control').each( function (index, element) {
                 $element = $(element);
                 var controller = $element.data('gui_controller');
-                controller.updateView(controller.CONFIG_UNDECIDED);
-                new_outcome = new_outcome || controller.CONFIG_UNDECIDED;
+                controller.updateView(outcome);
+                new_outcome = new_outcome || outcome;
               });
               $('input:radio').val([new_outcome]);
+              caller.css('background-color', '#D4D4D4');
+              caller.off('click');
             };
-            update(query, callback);
+            requestUpdate(query, callback);
+          };
+
+          all_accept.data('function_call', function () {
+            prepareUpdate('Accepted preliminary', all_accept);
           });
-          all_accept.show();
-          all_reject.show();
-          all_und.show();
+          all_reject.data('function_call', function () {
+            prepareUpdate('Rejected preliminary', all_reject);
+          });
+          all_und.data('function_call', function () {
+            prepareUpdate('Undecided', all_und);
+          });
+
+          resetOnClick();
         };
 
         return MQCLibraryOverallControls;
