@@ -329,6 +329,7 @@ define([
           }).error(function(jqXHR) {
             self.processAfterFail(jqXHR);
           }).success(function (data) {
+            $("#ajax_status").empty();
             self.updateView(outcome);
           }).always(function(){
             //Clear progress icon
@@ -426,6 +427,7 @@ define([
           }).error(function(jqXHR) {
             self.processAfterFail(jqXHR);
           }).success(function (data) {
+            $("#ajax_status").empty();
             self.updateView(outcome);
           }).always(function(){
             //Clear progress icon
