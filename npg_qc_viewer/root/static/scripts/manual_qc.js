@@ -81,6 +81,10 @@ define([
       if (isRunPage) {
         prevOutcomes = qcOutcomes.seq;
       } else {
+        $('.lane').css("background-color", "")
+                  .removeClass( function (index, css) {
+                                  return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
+                                });
         var seqOutcomes = qcOutcomes.seq;
         prevOutcomes    = qcOutcomes.lib;
 
@@ -99,12 +103,12 @@ define([
       var rows = [];
       $('.lane_mqc_control').each(function (index, element) {
         var $element = $(element);
-
-        $element.parent().find('.tag_info').css("background-color", "")
-                                            .removeClass( function (index, css) {
-                                                            return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
-        });
-
+        $element.closest('tr')
+                .find('.lane, .tag_info')
+                .css("background-color", "")
+                .removeClass( function (index, css) {
+                                return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
+                              });
         $element.css("padding-right", "5px").css("padding-left", "10px");
         var rptKey = $element.closest('tr').attr('id');
         rows.push(rptKey);
