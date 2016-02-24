@@ -133,8 +133,10 @@ var NPG;
       UI.MQCErrorMessage = MQCErrorMessage;
 
       var MQCLibraryOverallControls = (function () {
-        MQCLibraryOverallControls = function() {
+        MQCLibraryOverallControls = function(abstractConfiguration) {
           this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
+
+          this.abstractConfiguration = abstractConfiguration;
 
           this.CLASS_ALL_ACCEPT    = 'lane_mqc_accept_all';
           this.CLASS_ALL_REJECT    = 'lane_mqc_reject_all';
@@ -144,15 +146,16 @@ var NPG;
           this.TITLE_REJECT    = 'Set all libraries in page as rejected';
           this.TITLE_UNDECIDED = 'Set all libraries in page as undecided';
 
-          this.ICON_ACCEPT    = "<img src='/static/images/tick.png' width='10' height='10'/>";
-          this.ICON_REJECT    = "<img src='/static/images/cross.png' width='10' height='10'/>";
-          this.ICON_UNDECIDED = "<img src='/static/images/circle.png' width='10' height='10'/>";
+          this.ICON_ACCEPT    = "<img src='" + abstractConfiguration.getRoot() + "/images/tick.png' width='10' height='10'/>";
+          this.ICON_REJECT    = "<img src='" + abstractConfiguration.getRoot() + "/images/cross.png' width='10' height='10'/>";
+          this.ICON_UNDECIDED = "<img src='" + abstractConfiguration.getRoot() + "/images/circle.png' width='10' height='10'/>";
         }
 
         MQCLibraryOverallControls.prototype.setupControls = function (placeholder) {
           placeholder = placeholder || $($('.' + this.PLACEHOLDER_CLASS));
           //Remove the lane placeholder which will not be used in library manuql QC
           placeholder.parent().children('.lane_mqc_control').remove();
+          placeholder.parent().append('<span class="lib_mqc_working"></span>');
           var accept = this.buildControl(this.CLASS_ALL_ACCEPT, this.TITLE_ACCEPT, this.ICON_ACCEPT);
           var und    = this.buildControl(this.CLASS_ALL_UNDECIDED, this.TITLE_UNDECIDED, this.ICON_UNDECIDED);
           var reject = this.buildControl(this.CLASS_ALL_REJECT, this.TITLE_REJECT, this.ICON_REJECT);
@@ -171,11 +174,20 @@ var NPG;
         };
 
         MQCLibraryOverallControls.prototype.init = function () { //TODO refactor
+          var self = this;
           var all_accept = $($('.lane_mqc_accept_all').first());
           var all_reject = $($('.lane_mqc_reject_all').first());
           var all_und = $($('.lane_mqc_undecided_all').first());
 
+          var placeholder = placeholder || $($('.' + self.PLACEHOLDER_CLASS));
+
+
           var update = function (query, callback) {
+            placeholder.parent()
+                       .find('.lib_mqc_working')
+                       .html("<img src='"
+                             + self.abstractConfiguration.getRoot()
+                             + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
             $.ajax({
               url: '/qcoutcomes',
               type: 'POST',
@@ -194,7 +206,8 @@ var NPG;
             }).success(function (data) {
               qc_utils.removeErrorMessages();
               callback();
-            }).always(function(){
+            }).always(function() {
+              placeholder.parent().find('.lib_mqc_working').empty();
             });
           };
 

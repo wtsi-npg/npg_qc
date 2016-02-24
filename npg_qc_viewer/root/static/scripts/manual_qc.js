@@ -94,8 +94,7 @@ define([
             return;
           }
         }
-        $('.library_mqc_overall_controls').css("padding-right", "0px");
-        var overallControls = new NPG.QC.UI.MQCLibraryOverallControls();
+        var overallControls = new NPG.QC.UI.MQCLibraryOverallControls(prodConfiguration);
         overallControls.setupControls();
         overallControls.init();
       }
