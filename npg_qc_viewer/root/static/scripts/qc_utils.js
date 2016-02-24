@@ -17,6 +17,10 @@ define(['jquery'], function (jQuery) {
     return query;
   };
 
+  var removeErrorMessages = function () {
+    $("#ajax_status").empty();
+  }
+
   var rptKeyFromId = function (id) {
     if ( typeof id !== 'string' ) {
       throw 'Invalid arguments';
@@ -39,6 +43,7 @@ define(['jquery'], function (jQuery) {
     buildUpdateQuery: buildUpdateQuery,
     buildIdSelectorFromRPT: buildIdSelectorFromRPT,
     buildIdSelector: buildIdSelector,
+    removeErrorMessages: removeErrorMessages,
     rptKeyFromId: rptKeyFromId
   };
 });

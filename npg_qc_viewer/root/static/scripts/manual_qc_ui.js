@@ -116,7 +116,8 @@ var NPG;
 
         MQCErrorMessage.prototype.display = function() {
           var cleanText = this.formatForDisplay(this.errorText);
-          $("#" + this.placeholder).empty().append("<li class='failed_mqc'>"
+          qc_utils.removeErrorMessages();
+          $("#" + this.placeholder).append("<li class='failed_mqc'>"
               + cleanText
               + '</li>');
           return this;
@@ -188,7 +189,7 @@ var NPG;
               }
               new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
             }).success(function (data) {
-              $("#ajax_status").empty();
+              qc_utils.removeErrorMessages();
               callback();
             }).always(function(){
             });
