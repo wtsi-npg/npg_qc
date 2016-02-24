@@ -16,6 +16,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+"use strict";
 define([
   'jquery',
   './qc_utils'
@@ -228,7 +229,7 @@ var NPG;
               resetOnClick();
               var new_outcome;
               $('.lane_mqc_control').each( function (index, element) {
-                $element = $(element);
+                var $element = $(element);
                 var controller = $element.data('gui_controller');
                 controller.updateView(outcome);
                 new_outcome = new_outcome || outcome;
@@ -257,8 +258,10 @@ var NPG;
                 case 'Rejected preliminary': button = $('.' + self.CLASS_ALL_REJECT); break;
                 case 'Undecided': button = $('.' + self.CLASS_ALL_UNDECIDED); break;
               }
-              button.off('click');
-              button.css('background-color', '#D4D4D4');
+              if ( typeof button !== 'undefined') {
+                button.off('click');
+                button.css('background-color', '#D4D4D4');
+              }
             }
           };
           $($('.' + self.PLACEHOLDER_CLASS)).data('updateIfAllMatch', updateIfAllLibsSameOutcome);

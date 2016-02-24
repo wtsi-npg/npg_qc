@@ -1,3 +1,5 @@
+/* globals $: false, require: false, document: false */
+"use strict";
 require.config({
   baseUrl: '/static',
   catchError: true,
@@ -18,8 +20,10 @@ require.config({
 });
 
 require.onError = function (err) {
-    window.console && console.log(err.requireType);
-    window.console && console.log('modules: ' + err.requireModules);
+    if ( console ) {
+      console.log(err.requireType);
+      console.log('modules: ' + err.requireModules);
+    }
     throw err;
 };
 

@@ -463,7 +463,7 @@ define([
         for(var i = 0; i < outcomes.length; i++) {
           var outcome = outcomes[i];
           var label = labels[i];
-          var checked = self.outcome == outcome ? true : null;
+          var checked = ( self.outcome === outcome ) ? true : null;
           var radio = new NPG.QC.UI.MQCOutcomeRadio(self.rowId, outcome, label, name, checked);
           self.lane_control.append(radio.asObject());
         }

@@ -34,16 +34,6 @@ define([
 ) {
   var ID_PREFIX = 'rpt_key:';
 
-  var _displayJqXHRError = function ( jqXHR ) {
-    var message;
-    if ( typeof jqXHR.responseJSON === 'object' && typeof jqXHR.responseJSON.error === 'string' ) {
-      message = $.trim(er.responseJSON.error);
-    } else  {
-      message = ( er.status || '' ) + ' ' + ( er.statusText || '');
-    }
-    _displayError(message);
-  };
-
   var _displayError = function( er ) {
     var message;
     if( typeof er === 'string' ) {
@@ -52,6 +42,16 @@ define([
       message = '' + er;
     }
     $('#ajax_status').empty().append("<li class='failed_mqc'>" + message + '</li>');
+  };
+
+  var _displayJqXHRError = function ( jqXHR ) {
+    var message;
+    if ( typeof jqXHR.responseJSON === 'object' && typeof jqXHR.responseJSON.error === 'string' ) {
+      message = $.trim(jqXHR.responseJSON.error);
+    } else  {
+      message = ( jqXHR.status || '' ) + ' ' + ( jqXHR.statusText || '');
+    }
+    _displayError(message);
   };
 
   var _processOutcomes = function (outcomes, elementClass) {

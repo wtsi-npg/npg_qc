@@ -15,7 +15,7 @@
  */
 /* globals $: false, define: false */
 'use strict';
-define(['jquery'], function (jQuery) {
+define(['jquery'], function () {
   var _reRunLane   = /(?:(?:for (run) ([0-9]+))|(?:for (runs) ([0-9]+) lanes ([0-9]+))) \(run/;
   var _reRunStatus = /\(run [0-9]+ status: ((?:[\S]+)(?:\s[\S]+){2}), taken by ([\S]+)\)$/;
 
@@ -90,7 +90,7 @@ define(['jquery'], function (jQuery) {
     };
   };
 
-  var pageForMQC = function(qcOutcomes) {
+  var pageForMQC = function() {
     var isPageForMQC = false, isRunPage = null;
 
     var loggedUserString = $.trim($('#header h1 span.rfloat').text());
@@ -107,7 +107,7 @@ define(['jquery'], function (jQuery) {
       }
       var runStatusData = _parseRunStatus(pageTitleString);
       if ( ( runStatusData.runStatus === 'qc in progress' ||
-             runStatusData.runStatus === 'qc on hold') &&
+             runStatusData.runStatus === 'qc on hold' ) &&
            loggedUserData.username === runStatusData.takenBy ) {
         var runInfo = _parseRunLane(pageTitleString);
         isRunPage = runInfo.isRunPage;

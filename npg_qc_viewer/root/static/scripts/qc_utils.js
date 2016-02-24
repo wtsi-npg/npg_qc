@@ -3,7 +3,7 @@
  */
 /* globals $: false, define: false */
 'use strict';
-define(['jquery'], function (jQuery) {
+define(['jquery'], function () {
   var ID_PREFIX = 'rpt_key:';
   var ACTION    = 'UPDATE';
 
@@ -39,7 +39,7 @@ define(['jquery'], function (jQuery) {
     var seqKeys = Object.keys(seqOutcomes);
     for ( var i = 0; i < seqKeys.length; i++ ) {
       if ( seqOutcomes[seqKeys[i]].mqc_outcome.indexOf('final') !== -1 ) {
-        false;
+        return false;
       }
     }
     return true;
