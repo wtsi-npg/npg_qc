@@ -23,7 +23,15 @@
  */
 /* globals $: false, define: false */
 'use strict';
-define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
+define([
+  'jquery',
+  './qc_css_styles',
+  './qc_utils'
+], function (
+  jQuery,
+  qc_css_styles,
+  qc_utils
+) {
   var ID_PREFIX = 'rpt_key:';
 
   var _displayJqXHRError = function ( jqXHR ) {
@@ -77,7 +85,7 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
       var $obj = $(obj);
       var id = $obj.attr('id');
       if( typeof id !== 'undefined' && id !== null && id.lastIndexOf(ID_PREFIX) === 0 ) {
-        var rptKey = rptKeyFromId(id);
+        var rptKey = qc_utils.rptKeyFromId(id);
         if ( typeof rptKey !== 'undefined' && $.inArray(rptKey, rptKeys) === -1 ) {
           rptKeys.push(rptKey);
         }
@@ -85,16 +93,6 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
     });
     return rptKeys;
   };
-
-  var rptKeyFromId = function (id) {
-    if ( typeof id !== 'string' ) {
-      throw 'Invalid arguments';
-    }
-    if( id.lastIndexOf(ID_PREFIX) !== 0 ) {
-      throw 'Id does not match the expected format';
-    }
-    return id.substring(ID_PREFIX.length);
-  }
 
   var _updateDisplayWithQCOutcomes = function (outcomesData) {
     _processOutcomes(outcomesData.lib, 'tag_info');
@@ -146,7 +144,6 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
     _buildQuery: _buildQuery,
     _updateDisplayWithQCOutcomes: _updateDisplayWithQCOutcomes,
     _parseRptKeys: _parseRptKeys,
-    rptKeyFromId: rptKeyFromId,
     fetchAndProcessQC: fetchAndProcessQC,
   };
 });

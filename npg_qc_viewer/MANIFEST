@@ -84,6 +84,7 @@ root/static/scripts/plots.js
 root/static/scripts/qc_css_styles.js
 root/static/scripts/qc_outcomes_view.js
 root/static/scripts/qc_page.js
+root/static/scripts/qc_utils.js
 root/static/stylesheets/npg_seqqc.css
 script/npg_qc_viewer_cgi.pl
 script/npg_qc_viewer_create.pl
@@ -132,6 +133,8 @@ t/client/test_qc_outcomes_view.html
 t/client/test_qc_outcomes_view.js
 t/client/test_qc_page.html
 t/client/test_qc_page.js
+t/client/test_qc_utils.html
+t/client/test_qc_utils.js
 t/client/images/cross.png
 t/client/images/tick.png
 t/client/images/padlock.png

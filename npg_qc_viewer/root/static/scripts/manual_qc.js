@@ -118,7 +118,7 @@ define([
       for ( var i = 0; i < rows.length; i++) {
         var c = isRunPage ? new NPG.QC.LaneMQCControl(prodConfiguration) : new NPG.QC.LibraryMQCControl(prodConfiguration);
         c.rowId = rows[i];
-        c.rptKey = qc_outcomes_view.rptKeyFromId(c.rowId);
+        c.rptKey = qc_utils.rptKeyFromId(c.rowId);
         if ( typeof prevOutcomes[c.rptKey] !== 'undefined' ) {
           c.outcome = prevOutcomes[c.rptKey].mqc_outcome;
         }
