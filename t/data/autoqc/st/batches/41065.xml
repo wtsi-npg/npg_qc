@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+  <id>41065</id>
+  <status>released</status>
+  <lanes>
+    <lane position="1" id="14849976" priority="0">
+      <pool id="14625208" name="DN412574G A1:D4" request_id="9043128" qc_state="">
+        <sample sample_id="2363868" library_id="14798968" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1352">
+            <index>1</index>
+            <expected_sequence>ATCACG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363869" library_id="14798980" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1353">
+            <index>2</index>
+            <expected_sequence>CGATGT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363870" library_id="14798992" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1354">
+            <index>3</index>
+            <expected_sequence>TTAGGC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363871" library_id="14799004" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1356">
+            <index>4</index>
+            <expected_sequence>TGACCA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363872" library_id="14799016" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1358">
+            <index>5</index>
+            <expected_sequence>ACAGTG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363873" library_id="14799028" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1360">
+            <index>6</index>
+            <expected_sequence>GCCAAT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363874" library_id="14799040" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1361">
+            <index>7</index>
+            <expected_sequence>CAGATC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363875" library_id="14799052" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1363">
+            <index>8</index>
+            <expected_sequence>ACTTGA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363888" library_id="14799018" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1342">
+            <index>9</index>
+            <expected_sequence>GATCAG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363889" library_id="14799030" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1344">
+            <index>10</index>
+            <expected_sequence>TAGCTT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363890" library_id="14799042" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1355">
+            <index>11</index>
+            <expected_sequence>GGCTAC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363891" library_id="14799054" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1357">
+            <index>12</index>
+            <expected_sequence>CTTGTA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363892" library_id="14798971" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1359">
+            <index>13</index>
+            <expected_sequence>AGTCAA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363893" library_id="14798983" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1362">
+            <index>14</index>
+            <expected_sequence>AGTTCC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363894" library_id="14798995" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1364">
+            <index>15</index>
+            <expected_sequence>ATGTCA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363895" library_id="14799007" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1341">
+            <index>16</index>
+            <expected_sequence>CCGTCC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="13889311">
+        <sample sample_id="1255141" library_id="12172503" library_name="PhiXBPS24Oct14" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="3906">
+            <index>888</index>
+            <expected_sequence>ACAACGCAATC</expected_sequence>
+            <tag_group_id>42</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="2" id="14849977" priority="0">
+      <pool id="14625209" name="DN412574G A2:D3" request_id="9043141" qc_state="">
+        <sample sample_id="2363876" library_id="14798969" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1352">
+            <index>1</index>
+            <expected_sequence>ATCACG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363877" library_id="14798981" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1353">
+            <index>2</index>
+            <expected_sequence>CGATGT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363878" library_id="14798993" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1354">
+            <index>3</index>
+            <expected_sequence>TTAGGC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363879" library_id="14799005" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1356">
+            <index>4</index>
+            <expected_sequence>TGACCA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363880" library_id="14799017" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1358">
+            <index>5</index>
+            <expected_sequence>ACAGTG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363881" library_id="14799029" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1360">
+            <index>6</index>
+            <expected_sequence>GCCAAT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363882" library_id="14799041" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1361">
+            <index>7</index>
+            <expected_sequence>CAGATC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363883" library_id="14799053" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1363">
+            <index>8</index>
+            <expected_sequence>ACTTGA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363884" library_id="14798970" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1342">
+            <index>9</index>
+            <expected_sequence>GATCAG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363885" library_id="14798982" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1344">
+            <index>10</index>
+            <expected_sequence>TAGCTT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363886" library_id="14798994" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1355">
+            <index>11</index>
+            <expected_sequence>GGCTAC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2363887" library_id="14799006" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3749" project_id="82" consent_withdrawn="false">
+          <tag tag_id="1357">
+            <index>12</index>
+            <expected_sequence>CTTGTA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="13889311">
+        <sample sample_id="1255141" library_id="12172503" library_name="PhiXBPS24Oct14" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="3906">
+            <index>888</index>
+            <expected_sequence>ACAACGCAATC</expected_sequence>
+            <tag_group_id>42</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="3" id="14849978" priority="0">
+      <pool id="14690370" name="DN413810D A1:H1" request_id="9087201" qc_state="">
+        <sample sample_id="2377275" library_id="14848484" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1352">
+            <index>1</index>
+            <expected_sequence>ATCACG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377276" library_id="14848496" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1353">
+            <index>2</index>
+            <expected_sequence>CGATGT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377277" library_id="14848508" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1354">
+            <index>3</index>
+            <expected_sequence>TTAGGC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377278" library_id="14848520" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1356">
+            <index>4</index>
+            <expected_sequence>TGACCA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377279" library_id="14848532" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1358">
+            <index>5</index>
+            <expected_sequence>ACAGTG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377280" library_id="14848544" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1360">
+            <index>6</index>
+            <expected_sequence>GCCAAT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377281" library_id="14848556" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1361">
+            <index>7</index>
+            <expected_sequence>CAGATC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377282" library_id="14848568" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1363">
+            <index>8</index>
+            <expected_sequence>ACTTGA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="13889311">
+        <sample sample_id="1255141" library_id="12172503" library_name="PhiXBPS24Oct14" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="3906">
+            <index>888</index>
+            <expected_sequence>ACAACGCAATC</expected_sequence>
+            <tag_group_id>42</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="4" id="14849979" priority="0">
+      <pool id="14690370" name="DN413810D A1:H1" request_id="9087202" qc_state="">
+        <sample sample_id="2377275" library_id="14848484" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1352">
+            <index>1</index>
+            <expected_sequence>ATCACG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377276" library_id="14848496" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1353">
+            <index>2</index>
+            <expected_sequence>CGATGT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377277" library_id="14848508" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1354">
+            <index>3</index>
+            <expected_sequence>TTAGGC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377278" library_id="14848520" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1356">
+            <index>4</index>
+            <expected_sequence>TGACCA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377279" library_id="14848532" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1358">
+            <index>5</index>
+            <expected_sequence>ACAGTG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377280" library_id="14848544" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1360">
+            <index>6</index>
+            <expected_sequence>GCCAAT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377281" library_id="14848556" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1361">
+            <index>7</index>
+            <expected_sequence>CAGATC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+        <sample sample_id="2377282" library_id="14848568" library_name="" library_type="RNA-seq dUTP eukaryotic" study_id="3291" project_id="1608" consent_withdrawn="false">
+          <tag tag_id="1363">
+            <index>8</index>
+            <expected_sequence>ACTTGA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="300"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="13889311">
+        <sample sample_id="1255141" library_id="12172503" library_name="PhiXBPS24Oct14" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="3906">
+            <index>888</index>
+            <expected_sequence>ACAACGCAATC</expected_sequence>
+            <tag_group_id>42</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="5" id="14849982" priority="3">
+      <pool id="14766968" name="3745p01_170715" request_id="9182283" qc_state="">
+        <sample sample_id="2357742" library_id="14766963" library_name="293T_Hs 14766963" library_type="RNA-seq dUTP" study_id="3745" project_id="398" consent_withdrawn="false">
+          <tag tag_id="1352">
+            <index>1</index>
+            <expected_sequence>ATCACG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2357743" library_id="14766964" library_name="1_293T_chIFITM 14766964" library_type="RNA-seq dUTP" study_id="3745" project_id="398" consent_withdrawn="false">
+          <tag tag_id="1353">
+            <index>2</index>
+            <expected_sequence>CGATGT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2357744" library_id="14766965" library_name="2_293T_chIFITM 14766965" library_type="RNA-seq dUTP" study_id="3745" project_id="398" consent_withdrawn="false">
+          <tag tag_id="1354">
+            <index>3</index>
+            <expected_sequence>TTAGGC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2357745" library_id="14766966" library_name="3_293T_chIFITM 14766966" library_type="RNA-seq dUTP" study_id="3745" project_id="398" consent_withdrawn="false">
+          <tag tag_id="1356">
+            <index>4</index>
+            <expected_sequence>TGACCA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2357746" library_id="14766967" library_name="DF-1_Gg 14766967" library_type="RNA-seq dUTP" study_id="3745" project_id="398" consent_withdrawn="false">
+          <tag tag_id="1358">
+            <index>5</index>
+            <expected_sequence>ACAGTG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="13889311">
+        <sample sample_id="1255141" library_id="12172503" library_name="PhiXBPS24Oct14" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="3906">
+            <index>888</index>
+            <expected_sequence>ACAACGCAATC</expected_sequence>
+            <tag_group_id>42</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="6" id="14849983" priority="3">
+      <pool id="14801143" name="3784p01_180815" request_id="9182285" qc_state="">
+        <sample sample_id="2381771" library_id="14801131" library_name="Kolf_US_1 14801131" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1352">
+            <index>1</index>
+            <expected_sequence>ATCACG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381772" library_id="14801132" library_name="Kolf_22_1 14801132" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1353">
+            <index>2</index>
+            <expected_sequence>CGATGT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381773" library_id="14801133" library_name="Kolf_ST_1 14801133" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1354">
+            <index>3</index>
+            <expected_sequence>TTAGGC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381774" library_id="14801134" library_name="Kolf_22_ST_1 14801134" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1356">
+            <index>4</index>
+            <expected_sequence>TGACCA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381775" library_id="14801135" library_name="Kolf_US_2 14801135" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1358">
+            <index>5</index>
+            <expected_sequence>ACAGTG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381776" library_id="14801136" library_name="Kolf_22_2 14801136" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1360">
+            <index>6</index>
+            <expected_sequence>GCCAAT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381777" library_id="14801137" library_name="Kolf_ST_2 14801137" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1361">
+            <index>7</index>
+            <expected_sequence>CAGATC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381778" library_id="14801138" library_name="Kolf_22_ST_2 14801138" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1363">
+            <index>8</index>
+            <expected_sequence>ACTTGA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381779" library_id="14801139" library_name="Kolf_US_3 14801139" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1342">
+            <index>9</index>
+            <expected_sequence>GATCAG</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381780" library_id="14801140" library_name="Kolf_22_3 14801140" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1344">
+            <index>10</index>
+            <expected_sequence>TAGCTT</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381781" library_id="14801141" library_name="Kolf_ST_3 14801141" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1355">
+            <index>11</index>
+            <expected_sequence>GGCTAC</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2381782" library_id="14801142" library_name="Kolf_22_ST_3 14801142" library_type="RNA-seq dUTP" study_id="3784" project_id="1493" consent_withdrawn="false">
+          <tag tag_id="1357">
+            <index>12</index>
+            <expected_sequence>CTTGTA</expected_sequence>
+            <tag_group_id>27</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="13889311">
+        <sample sample_id="1255141" library_id="12172503" library_name="PhiXBPS24Oct14" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="3906">
+            <index>888</index>
+            <expected_sequence>ACAACGCAATC</expected_sequence>
+            <tag_group_id>42</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="7" id="14849980" priority="3">
+      <pool id="14809689" name="DN414932Q A1:F3" request_id="9165211" qc_state="">
+        <sample sample_id="2376981" library_id="14727828" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="144">
+            <index>1</index>
+            <expected_sequence>ATCACGTT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2376988" library_id="14727912" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="179">
+            <index>2</index>
+            <expected_sequence>ACTTGATG</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2376994" library_id="14727889" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="195">
+            <index>3</index>
+            <expected_sequence>TCTCGGTT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2376996" library_id="14727913" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="207">
+            <index>4</index>
+            <expected_sequence>TCCGTCTT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2377001" library_id="14727878" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="237">
+            <index>5</index>
+            <expected_sequence>TCGAGCGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2377002" library_id="14727890" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="242">
+            <index>6</index>
+            <expected_sequence>TGATACGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="13889311">
+        <sample sample_id="1255141" library_id="12172503" library_name="PhiXBPS24Oct14" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="3906">
+            <index>888</index>
+            <expected_sequence>ACAACGCAATC</expected_sequence>
+            <tag_group_id>42</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+    <lane position="8" id="14849981" priority="3">
+      <pool id="14809690" name="DN414932Q B1:G3" request_id="9165224" qc_state="">
+        <sample sample_id="2376982" library_id="14727840" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="149">
+            <index>1</index>
+            <expected_sequence>CGATGTTT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2376985" library_id="14727876" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="162">
+            <index>2</index>
+            <expected_sequence>ACAGTGGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2376989" library_id="14727829" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="188">
+            <index>3</index>
+            <expected_sequence>GATCAGCG</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2376995" library_id="14727901" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="200">
+            <index>4</index>
+            <expected_sequence>TAAGCGTT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2376998" library_id="14727842" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="213">
+            <index>5</index>
+            <expected_sequence>TTCTGTGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+        <sample sample_id="2377003" library_id="14727902" library_name="" library_type="ChIP-Seq Auto" study_id="2905" project_id="1927" consent_withdrawn="false">
+          <tag tag_id="250">
+            <index>6</index>
+            <expected_sequence>TGCATAGT</expected_sequence>
+            <tag_group_id>6</tag_group_id>
+          </tag>
+          <insert_size from="100" to="1000"/>
+        </sample>
+      </pool>
+      <hyb_buffer id="13889311">
+        <sample sample_id="1255141" library_id="12172503" library_name="PhiXBPS24Oct14" library_type="" study_id="198" project_id="" consent_withdrawn="false">
+          <tag tag_id="3906">
+            <index>888</index>
+            <expected_sequence>ACAACGCAATC</expected_sequence>
+            <tag_group_id>42</tag_group_id>
+          </tag>
+        </sample>
+      </hyb_buffer>
+    </lane>
+  </lanes>
+</batch>
