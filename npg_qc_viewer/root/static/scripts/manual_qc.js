@@ -77,6 +77,7 @@ define([
         throw 'Error page type cannot be null';
       }
       var prodConfiguration = new NPG.QC.ProdConfiguration(qcOutcomesURL);
+      var updateOverall;
 
       if (isRunPage) {
         prevOutcomes = qcOutcomes.seq;
@@ -94,6 +95,7 @@ define([
         var overallControls = new NPG.QC.UI.MQCLibraryOverallControls(prodConfiguration);
         overallControls.setupControls();
         overallControls.init();
+        updateOverall = $($('.library_mqc_overall_controls')).data('updateIfAllMatch');
       }
 
       var rows = [];
@@ -120,6 +122,9 @@ define([
         }
         var obj = $(qc_utils.buildIdSelector(c.rowId)).find('.lane_mqc_control');
         c.linkControl(obj);
+      }
+      if ( typeof updateOveral === 'function' ) {
+        updateOverall();
       }
     };
 
@@ -422,10 +427,12 @@ define([
             cache: false
           }).error(function(jqXHR) {
             self.processAfterFail(jqXHR);
-          }).success(function (data) {
+          }).success(function () {
             qc_utils.removeErrorMessages();
             self.updateView(outcome);
-          }).always(function(){
+            var updateIfAllMatch = $($('.library_mqc_overall_controls')).data('updateIfAllMatch');
+            updateIfAllMatch();
+          }).always(function () {
             //Clear progress icon
             self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
           });

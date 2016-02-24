@@ -240,6 +240,29 @@ var NPG;
             requestUpdate(query, callback);
           };
 
+          var updateIfAllLibsSameOutcome = function () {
+            var outcomes = [];
+            $('.lane_mqc_control').each( function (index, element) {
+              outcomes.push($(element).data('gui_controller').outcome);
+            });
+            var unique = true;
+            for ( var i = 0; i < outcomes.length; i++ ) {
+              if ( outcomes[0] !== outcomes[i] ) { unique = false; break; }
+            }
+            resetOnClick();
+            if ( unique ) {
+              var button;
+              switch ( outcomes[0] ) {
+                case 'Accepted preliminary': button = $('.' + self.CLASS_ALL_ACCEPT); break;
+                case 'Rejected preliminary': button = $('.' + self.CLASS_ALL_REJECT); break;
+                case 'Undecided': button = $('.' + self.CLASS_ALL_UNDECIDED); break;
+              }
+              button.off('click');
+              button.css('background-color', '#D4D4D4');
+            }
+          };
+          $($('.' + self.PLACEHOLDER_CLASS)).data('updateIfAllMatch', updateIfAllLibsSameOutcome);
+
           all_accept.data('function_call', function () {
             prepareUpdate('Accepted preliminary', all_accept);
           });
