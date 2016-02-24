@@ -157,6 +157,9 @@ var NPG;
           var und    = this.buildControl(this.CLASS_ALL_UNDECIDED, this.TITLE_UNDECIDED, this.ICON_UNDECIDED);
           var reject = this.buildControl(this.CLASS_ALL_REJECT, this.TITLE_REJECT, this.ICON_REJECT);
           placeholder.html(accept + und + reject);
+          placeholder.parent().css('text-align', 'left');
+          placeholder.css('padding-right', '5px').css('padding-left', '7px');
+          $('.lane_mqc_overall').css('padding-left', '5px');
         };
 
         MQCLibraryOverallControls.prototype.buildControl = function (cssClass, title, representation) {
