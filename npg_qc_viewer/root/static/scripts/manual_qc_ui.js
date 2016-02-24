@@ -110,7 +110,7 @@ var NPG;
 
         MQCErrorMessage.prototype.display = function() {
           var cleanText = this.formatForDisplay(this.errorText);
-          $("#" + this.placeholder).append("<li class='failed_mqc'>"
+          $("#" + this.placeholder).empty().append("<li class='failed_mqc'>"
               + cleanText
               + '</li>');
           return this;

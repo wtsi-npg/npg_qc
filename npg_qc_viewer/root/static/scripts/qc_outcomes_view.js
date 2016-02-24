@@ -43,7 +43,7 @@ define(['jquery', './qc_css_styles'], function (jQuery, qc_css_styles) {
     } else {
       message = '' + er;
     }
-    $('#ajax_status').append("<li class='failed_mqc'>" + message + '</li>');
+    $('#ajax_status').empty().append("<li class='failed_mqc'>" + message + '</li>');
   };
 
   var _processOutcomes = function (outcomes, elementClass) {
