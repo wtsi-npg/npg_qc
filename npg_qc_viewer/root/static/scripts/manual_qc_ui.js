@@ -16,7 +16,13 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-define(['jquery'], function (jquery) {
+define([
+  'jquery',
+  './qc_utils'
+], function (
+  jquery,
+  qc_utils
+) {
 var NPG;
 /**
  * @module NPG
@@ -165,35 +171,82 @@ var NPG;
           var all_reject = $($('.lane_mqc_reject_all').first());
           var all_und = $($('.lane_mqc_undecided_all').first());
 
-          all_accept.off("click").on("click", function () {
-            var new_outcome;
-            $('.lane_mqc_control').each( function (index, element) {
-              $element = $(element);
-              var controller = $element.data('gui_controller');
-              controller.updateOutcome(controller.CONFIG_ACCEPTED_PRELIMINARY);
-              new_outcome = new_outcome || controller.CONFIG_ACCEPTED_PRELIMINARY;
+          var update = function (query, callback) {
+            $.ajax({
+              url: '/qcoutcomes',
+              type: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify(query),
+              cache: false
+            }).error(function(jqXHR) {
+              var errorMessage;
+              if ( typeof jqXHR.responseJSON === 'object' && typeof jqXHR.responseJSON.error === 'string') {
+                errorMessage = $.trim(jqXHR.responseJSON.error);
+              } else {
+                errorMessage = ( jqXHR.status || '' ) + ' ' + ( jqXHR.statusText || '' );
+                console.log(jqXHR.responseText);
+              }
+              new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
+            }).success(function (data) {
+              $("#ajax_status").empty();
+              callback();
+            }).always(function(){
             });
-            $('input:radio').val([new_outcome]);
+          };
+
+          all_accept.off("click").on("click", function () {
+            var ids = [];
+            $('.lane_mqc_control').closest('tr').each(function (index, element) {
+              ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: 'Accepted preliminary'});
+            });
+            var query = qc_utils.buildUpdateQuery('lib', ids);
+            var callback = function () {
+              var new_outcome;
+              $('.lane_mqc_control').each( function (index, element) {
+                $element = $(element);
+                var controller = $element.data('gui_controller');
+                controller.updateView(controller.CONFIG_ACCEPTED_PRELIMINARY);
+                new_outcome = new_outcome || controller.CONFIG_ACCEPTED_PRELIMINARY;
+              });
+              $('input:radio').val([new_outcome]);
+            };
+            update(query, callback);
           });
           all_reject.off("click").on("click", function () {
-            var new_outcome;
-            $('.lane_mqc_control').each( function (index, element) {
-              $element = $(element);
-              var controller = $element.data('gui_controller');
-              controller.updateOutcome(controller.CONFIG_REJECTED_PRELIMINARY);
-              new_outcome = new_outcome || controller.CONFIG_REJECTED_PRELIMINARY;
+            var ids = [];
+            $('.lane_mqc_control').closest('tr').each(function (index, element) {
+              ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: 'Rejected preliminary'});
             });
-            $('input:radio').val([new_outcome]);
+            var query = qc_utils.buildUpdateQuery('lib', ids);
+            var callback = function () {
+              var new_outcome;
+              $('.lane_mqc_control').each( function (index, element) {
+                $element = $(element);
+                var controller = $element.data('gui_controller');
+                controller.updateView(controller.CONFIG_REJECTED_PRELIMINARY);
+                new_outcome = new_outcome || controller.CONFIG_REJECTED_PRELIMINARY;
+              });
+              $('input:radio').val([new_outcome]);
+            }
+            update(query, callback);
           });
           all_und.off("click").on("click", function () {
-            var new_outcome;
-            $('.lane_mqc_control').each( function (index, element) {
-              $element = $(element);
-              var controller = $element.data('gui_controller');
-              controller.updateOutcome(controller.CONFIG_UNDECIDED);
-              new_outcome = new_outcome || controller.CONFIG_UNDECIDED;
+            var ids = [];
+            $('.lane_mqc_control').closest('tr').each(function (index, element) {
+              ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: 'Undecided'});
             });
-            $('input:radio').val([new_outcome]);
+            var query = qc_utils.buildUpdateQuery('lib', ids);
+            var callback = function () {
+              var new_outcome;
+              $('.lane_mqc_control').each( function (index, element) {
+                $element = $(element);
+                var controller = $element.data('gui_controller');
+                controller.updateView(controller.CONFIG_UNDECIDED);
+                new_outcome = new_outcome || controller.CONFIG_UNDECIDED;
+              });
+              $('input:radio').val([new_outcome]);
+            };
+            update(query, callback);
           });
           all_accept.show();
           all_reject.show();
