@@ -19,7 +19,7 @@ define(['jquery'], function (jQuery) {
 
   var removeErrorMessages = function () {
     $("#ajax_status").empty();
-  }
+  };
 
   var rptKeyFromId = function (id) {
     if ( typeof id !== 'string' ) {
@@ -29,7 +29,7 @@ define(['jquery'], function (jQuery) {
       throw 'Id does not match the expected format';
     }
     return id.substring(ID_PREFIX.length);
-  }
+  };
 
   var buildIdSelector = function (id) {
     return '#' + id.replace(/:/g, '\\3A ');
