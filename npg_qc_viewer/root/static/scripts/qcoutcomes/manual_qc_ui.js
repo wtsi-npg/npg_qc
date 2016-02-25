@@ -213,9 +213,9 @@ var NPG;
             if ( unique ) {
               var button;
               switch ( outcomes[0] ) {
-                case 'Accepted preliminary': button = $('.' + self.CLASS_ALL_ACCEPT); break;
-                case 'Rejected preliminary': button = $('.' + self.CLASS_ALL_REJECT); break;
-                case 'Undecided': button = $('.' + self.CLASS_ALL_UNDECIDED); break;
+                case qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY: button = $('.' + self.CLASS_ALL_ACCEPT); break;
+                case qc_utils.OUTCOMES.REJECTED_PRELIMINARY: button = $('.' + self.CLASS_ALL_REJECT); break;
+                case qc_utils.OUTCOMES.UNDECIDED: button = $('.' + self.CLASS_ALL_UNDECIDED); break;
               }
               if ( typeof button !== 'undefined') {
                 button.off('click');
@@ -226,13 +226,13 @@ var NPG;
           $($('.' + self.PLACEHOLDER_CLASS)).data('updateIfAllMatch', updateIfAllLibsSameOutcome);
 
           all_accept.data('function_call', function () {
-            prepareUpdate('Accepted preliminary', all_accept);
+            prepareUpdate(qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, all_accept);
           });
           all_reject.data('function_call', function () {
-            prepareUpdate('Rejected preliminary', all_reject);
+            prepareUpdate(qc_utils.OUTCOMES.REJECTED_PRELIMINARY, all_reject);
           });
           all_und.data('function_call', function () {
-            prepareUpdate('Undecided', all_und);
+            prepareUpdate(qc_utils.OUTCOMES.UNDECIDED, all_und);
           });
 
           resetOnClick();

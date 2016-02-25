@@ -90,6 +90,15 @@ define(['jquery'], function () {
     return true;
   };
 
+  var QC_OUTCOMES = {
+    ACCEPTED_PRELIMINARY: 'Accepted preliminary',
+    ACCEPTED_FINAL:       'Accepted final',
+    REJECTED_PRELIMINARY: 'Rejected preliminary',
+    REJECTED_FINAL:       'Rejected final',
+    UNDECIDED:            'Undecided',
+    UNDECIDED_FINAL:      'Undecided final'
+  };
+
   return {
     buildIdSelector: buildIdSelector,
     buildQuery: buildQuery,
@@ -100,5 +109,6 @@ define(['jquery'], function () {
     removeErrorMessages: removeErrorMessages,
     rptKeyFromId: rptKeyFromId,
     seqFinal: seqFinal,
+    OUTCOMES: QC_OUTCOMES
   };
 });
