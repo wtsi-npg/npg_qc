@@ -28,11 +28,11 @@ require.onError = function (err) {
 };
 
 require([
-  'scripts/qc_outcomes_view',
+  'scripts/qcoutcomes/qc_outcomes_view',
   'scripts/plots',
   'scripts/format_for_csv',
-  'scripts/qc_page',
-  'scripts/manual_qc',
+  'scripts/qcoutcomes/qc_page',
+  'scripts/qcoutcomes/manual_qc',
   'unveil',
   'table-export'
 ],

@@ -7,7 +7,7 @@ require.config({
   },
 });
 
-require(['scripts/qc_page'],
+require(['scripts/qcoutcomes/qc_page'],
   function(qc_page) {
 
     QUnit.test("Parsing run lane", function (assert) {

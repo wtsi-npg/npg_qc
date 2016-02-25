@@ -6,7 +6,7 @@ require.config({
   },
 });
 
-require(['scripts/manual_qc'],
+require(['scripts/qcoutcomes/manual_qc'],
   function(NPG) {
 
     var TestConfiguration = (function() {

@@ -6,7 +6,7 @@ require.config({
   },
 });
 
-require(['scripts/qc_utils'],
+require(['scripts/qcoutcomes/qc_utils'],
   function(qc_utils) {
 
     QUnit.test('RPT key from id', function (assert) {
