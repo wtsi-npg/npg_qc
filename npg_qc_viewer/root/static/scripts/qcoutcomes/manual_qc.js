@@ -230,6 +230,11 @@ define([
         this.lane_control.children('.lane_mqc_save').hide();
       };
 
+      MQCControl.prototype.setUndefined = function() {
+        this.removeAllQCOutcomeCSSClasses();
+        this.lane_control.children('.lane_mqc_save').hide();
+      };
+
       /**
        * Switch the outcome and adjust the view accordingly
        * @param outcome new outcome for the control.
@@ -265,6 +270,7 @@ define([
         this.lane_control = lane_control;
         if ( typeof this.outcome  === "undefined") {
           this.generateActiveControls();
+          this.setUndefined();
         } else if ( this.outcome === qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY
             || this.outcome === qc_utils.OUTCOMES.REJECTED_PRELIMINARY
             || this.outcome === qc_utils.OUTCOMES.UNDECIDED) {
