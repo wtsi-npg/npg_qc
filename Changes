@@ -10,6 +10,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - title for pages with data for one id run show run status
  - SeqQC
    - bugfix only build request for qc_outcomes if rptkeys in page
+ - add unique db constraint for short descriptions in qc outcome
+   dictionaries; the constraints should have been set when the tables
+   were created 
 
 release 60.0
  - JSON service (retrieval) for qc outcomes

@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.5.41, for debian-linux-gnu (x86_64)
 --
--- Host: nqct-db    Database: npgqct
+-- Host: npgtest-db    Database: npgtest_mg8qc
 -- ------------------------------------------------------
 -- Server version	5.5.31-log
 
@@ -43,7 +43,7 @@ CREATE TABLE `adapter` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_adapter`),
   UNIQUE KEY `unq_run_lane_adapter` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -64,7 +64,7 @@ CREATE TABLE `alignment_filter_metrics` (
   `all_metrics` text,
   PRIMARY KEY (`id_alignment_filter_metrics`),
   UNIQUE KEY `unq_run_lane_afmetrics` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,7 +83,7 @@ CREATE TABLE `analysis` (
   `iscurrent` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_analysis`),
   KEY `id_run` (`id_run`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,7 +138,7 @@ CREATE TABLE `analysis_lane` (
   KEY `id_run` (`id_run`),
   KEY `position` (`position`),
   CONSTRAINT `al_id_analysis` FOREIGN KEY (`id_analysis`) REFERENCES `analysis` (`id_analysis`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -202,21 +202,9 @@ CREATE TABLE `bam_flagstats` (
   `num_total_reads` bigint(20) unsigned DEFAULT NULL,
   `read_pairs_examined` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id_bam_flagstats`),
-  UNIQUE KEY `unq_run_lane_index_sp_flag` (`id_run`,`position`,`tag_index`,`human_split`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  UNIQUE KEY `unq_run_lane_index_sp_flag` (`id_run`,`position`,`human_split`,`tag_index`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `cache_query`
@@ -236,7 +224,7 @@ CREATE TABLE `cache_query` (
   `is_current` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_cache_query`),
   KEY `idx_cq_idrun_type_end_is_current` (`id_run`,`type`,`end`,`is_current`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 104061952 kB';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 104061952 kB';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -257,7 +245,7 @@ CREATE TABLE `chip_summary` (
   `machine` tinytext,
   PRIMARY KEY (`id_chip_summary`),
   UNIQUE KEY `unq_idx_cs_idrun` (`id_run`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -277,7 +265,7 @@ CREATE TABLE `cluster_density` (
   `p50` double(12,3) unsigned DEFAULT NULL,
   PRIMARY KEY (`id_cluster_density`),
   UNIQUE KEY `unq_idx_cluster_density` (`id_run`,`position`,`is_pf`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -303,7 +291,7 @@ CREATE TABLE `contamination` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_contamination`),
   UNIQUE KEY `unq_run_lane_contamination` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -517,7 +505,7 @@ CREATE TABLE `fastqcheck` (
   PRIMARY KEY (`id_fastqcheck`),
   UNIQUE KEY `unique_ind_file_ids_fastqcheck` (`id_run`,`position`,`tag_index`,`section`,`split`),
   UNIQUE KEY `unique_ind_file_name_fastqcheck` (`file_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -539,7 +527,7 @@ CREATE TABLE `frequency_response_matrix` (
   `green2` float(5,2) NOT NULL,
   PRIMARY KEY (`id_frequency_response_matrix`),
   UNIQUE KEY `unq_idx_run_lane_base` (`id_run`,`cycle`,`lane`,`base`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -572,7 +560,7 @@ CREATE TABLE `gc_bias` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_gc_bias`),
   UNIQUE KEY `unq_run_lane_gc_bias` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -600,7 +588,7 @@ CREATE TABLE `gc_fraction` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_gc_fraction`),
   UNIQUE KEY `unq_run_lane_gc_fraction` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -638,7 +626,7 @@ CREATE TABLE `genotype` (
   `bam_gt_likelihood_string` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id_genotype`),
   UNIQUE KEY `unq_run_lane_genotype` (`id_run`,`position`,`tag_index`,`snp_call_set`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -658,7 +646,7 @@ CREATE TABLE `image_store` (
   `suffix` varchar(5) NOT NULL,
   PRIMARY KEY (`id_image_store`),
   UNIQUE KEY `unq_idx_rt_type_thbnl_in` (`id_run`,`type`,`thumbnail`,`image_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -721,7 +709,7 @@ CREATE TABLE `insert_size` (
   `norm_fit_modes` text,
   PRIMARY KEY (`id_insert_size`),
   UNIQUE KEY `unq_run_lane_insert_size` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -746,7 +734,7 @@ CREATE TABLE `instrument_statistics` (
   PRIMARY KEY (`id_instrument_statistics`),
   UNIQUE KEY `idx_id_run_end` (`id_run`,`end`),
   KEY `instrument_idx` (`instrument`(5))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -771,7 +759,7 @@ CREATE TABLE `lane_qc` (
   UNIQUE KEY `unq_idx_lqc_rt_end` (`id_run_tile`,`end`),
   KEY `lqrt` (`id_run_tile`),
   CONSTRAINT `lqrt` FOREIGN KEY (`id_run_tile`) REFERENCES `run_tile` (`id_run_tile`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -865,6 +853,70 @@ CREATE TABLE `move_z` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `mqc_library_outcome_dict`
+--
+
+DROP TABLE IF EXISTS `mqc_library_outcome_dict`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mqc_library_outcome_dict` (
+  `id_mqc_library_outcome` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `short_desc` varchar(50) NOT NULL,
+  `long_desc` varchar(150) DEFAULT NULL,
+  `iscurrent` tinyint(1) DEFAULT NULL COMMENT 'Catalog value still in use.',
+  `isvisible` tinyint(1) DEFAULT NULL COMMENT 'Is it visible in UI',
+  PRIMARY KEY (`id_mqc_library_outcome`),
+  UNIQUE KEY `unique_lib_outcome_desc` (`short_desc`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Dictionary table for plex level library MQC';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `mqc_library_outcome_ent`
+--
+
+DROP TABLE IF EXISTS `mqc_library_outcome_ent`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mqc_library_outcome_ent` (
+  `id_mqc_library_outcome_ent` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(3) unsigned NOT NULL COMMENT 'Lane',
+  `tag_index` bigint(20) NOT NULL DEFAULT '-1',
+  `id_mqc_outcome` smallint(5) unsigned NOT NULL,
+  `username` char(128) DEFAULT NULL COMMENT 'Web interface username',
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified_by` char(128) DEFAULT NULL COMMENT 'Last user to modify the row',
+  `reported` timestamp NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
+  PRIMARY KEY (`id_mqc_library_outcome_ent`),
+  UNIQUE KEY `id_run_UNIQUE` (`id_run`,`position`,`tag_index`),
+  KEY `fk_mqc_library_outcome_ent_mqc_library_outcome_dict1` (`id_mqc_outcome`),
+  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_library_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_library_outcome_dict` (`id_mqc_library_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Entity table for library manual qc';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `mqc_library_outcome_hist`
+--
+
+DROP TABLE IF EXISTS `mqc_library_outcome_hist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mqc_library_outcome_hist` (
+  `id_mqc_library_outcome_hist` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_run` bigint(20) unsigned NOT NULL,
+  `position` tinyint(3) unsigned NOT NULL COMMENT 'Lane',
+  `tag_index` bigint(20) NOT NULL DEFAULT '-1',
+  `id_mqc_outcome` smallint(5) unsigned NOT NULL,
+  `username` char(128) DEFAULT NULL COMMENT 'Web interface username',
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified_by` char(128) DEFAULT NULL COMMENT 'Last user to modify the row',
+  PRIMARY KEY (`id_mqc_library_outcome_hist`),
+  KEY `fk_mqc_library_outcome_hist_mqc_library_outcome_dict1` (`id_mqc_outcome`),
+  CONSTRAINT `fk_mqc_library_outcome_hist_mqc_library_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_library_outcome_dict` (`id_mqc_library_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Historic table for library manual qc';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `mqc_outcome_dict`
 --
 
@@ -877,8 +929,9 @@ CREATE TABLE `mqc_outcome_dict` (
   `long_desc` varchar(150) DEFAULT NULL,
   `iscurrent` tinyint(1) DEFAULT NULL COMMENT 'Catalog value still in use.',
   `isvisible` tinyint(1) DEFAULT NULL COMMENT 'Is it visible in UI',
-  PRIMARY KEY (`id_mqc_outcome`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id_mqc_outcome`),
+  UNIQUE KEY `unique_seq_outcome_desc` (`short_desc`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -894,14 +947,14 @@ CREATE TABLE `mqc_outcome_ent` (
   `position` tinyint(3) unsigned NOT NULL COMMENT 'Lane',
   `id_mqc_outcome` smallint(5) unsigned NOT NULL,
   `username` char(128) DEFAULT NULL COMMENT 'Web interface username',
-  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `modified_by` char(128) DEFAULT NULL COMMENT 'Last user to modify the row',
   `reported` timestamp NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
   PRIMARY KEY (`id_mqc_outcome_ent`),
   UNIQUE KEY `id_run_UNIQUE` (`id_run`,`position`),
   KEY `fk_mqc_outcome_ent_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
   CONSTRAINT `fk_mqc_outcome_ent_mqc_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -917,74 +970,13 @@ CREATE TABLE `mqc_outcome_hist` (
   `position` tinyint(3) unsigned NOT NULL COMMENT 'Lane',
   `id_mqc_outcome` smallint(5) unsigned NOT NULL,
   `username` char(128) DEFAULT NULL COMMENT 'Web interface username',
-  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `modified_by` char(128) DEFAULT NULL COMMENT 'Last user to modify the row',
   PRIMARY KEY (`id_mqc_outcome_hist`),
   KEY `fk_mqc_outcome_hist_mqc_outcome_dict1_idx` (`id_mqc_outcome`),
   CONSTRAINT `fk_mqc_outcome_ent_mqc_outcome_dict10` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_outcome_dict` (`id_mqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mqc_library_outcome_dict`
---
-
-DROP TABLE IF EXISTS `mqc_library_outcome_dict`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `mqc_library_outcome_dict` (
-  `id_mqc_library_outcome` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `short_desc` varchar(50) NOT NULL,
-  `long_desc` varchar(150) DEFAULT NULL,
-  `iscurrent` tinyint(1) DEFAULT NULL COMMENT 'Catalog value still in use.',
-  `isvisible` tinyint(1) DEFAULT NULL COMMENT 'Is it visible in UI',
-  PRIMARY KEY (`id_mqc_library_outcome`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Dictionary table for plex level library MQC';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mqc_library_outcome_ent`
---
-
-DROP TABLE IF EXISTS `mqc_library_outcome_ent`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `mqc_library_outcome_ent` (
-  `id_mqc_library_outcome_ent` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_run` BIGINT(20) UNSIGNED NOT NULL,
-  `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane',
-  `tag_index` BIGINT(20) NOT NULL DEFAULT '-1',
-  `id_mqc_outcome` SMALLINT UNSIGNED NOT NULL,
-  `username` CHAR(128) NULL DEFAULT NULL COMMENT 'Web interface username',
-  `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
-  `reported` TIMESTAMP NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
-  PRIMARY KEY (`id_mqc_library_outcome_ent`),
-  UNIQUE KEY `id_run_UNIQUE` (`id_run`,`position`,`tag_index`),
-  CONSTRAINT `fk_mqc_library_outcome_ent_mqc_library_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_library_outcome_dict` (`id_mqc_library_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB
-COMMENT = 'Entity table for library manual qc';
-
---
--- Table structure for table `mqc_library_outcome_hist`
---
-
-DROP TABLE IF EXISTS `mqc_library_outcome_hist`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `mqc_library_outcome_hist` (
-  `id_mqc_library_outcome_hist` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_run` BIGINT(20) UNSIGNED NOT NULL,
-  `position` TINYINT(3) UNSIGNED NOT NULL COMMENT 'Lane',
-  `tag_index` BIGINT(20) NOT NULL DEFAULT '-1',
-  `id_mqc_outcome` SMALLINT UNSIGNED NOT NULL,
-  `username` CHAR(128) NULL DEFAULT NULL COMMENT 'Web interface username',
-  `last_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified_by` CHAR(128) NULL COMMENT 'Last user to modify the row',
-  PRIMARY KEY (`id_mqc_library_outcome_hist`),
-  CONSTRAINT `fk_mqc_library_outcome_hist_mqc_library_outcome_dict1` FOREIGN KEY (`id_mqc_outcome`) REFERENCES `mqc_library_outcome_dict` (`id_mqc_library_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB
-COMMENT = 'Historic table for library manual qc';
 
 --
 -- Table structure for table `offset`
@@ -1004,7 +996,7 @@ CREATE TABLE `offset` (
   `y` float(8,2) NOT NULL,
   PRIMARY KEY (`id_offset`),
   UNIQUE KEY `unq_idx_run_lane_tile_cycle_image` (`id_run`,`lane`,`tile`,`cycle`,`image`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1043,7 +1035,7 @@ CREATE TABLE `pulldown_metrics` (
   `other_metrics` text,
   PRIMARY KEY (`id_pulldown_metrics`),
   UNIQUE KEY `unq_run_lane_pdmetrics` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1071,7 +1063,7 @@ CREATE TABLE `qx_yield` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_qx_yield`),
   UNIQUE KEY `unq_run_lane_qx_yield` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1088,7 +1080,7 @@ CREATE TABLE `recipe_file` (
   `xml` mediumtext NOT NULL,
   PRIMARY KEY (`id_recipe_file`),
   UNIQUE KEY `unq_idx_name_md5` (`file_name`,`md5`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1114,7 +1106,7 @@ CREATE TABLE `ref_match` (
   `info` text,
   PRIMARY KEY (`id_ref_match`),
   UNIQUE KEY `unq_run_lane_ref_match` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1151,7 +1143,7 @@ CREATE TABLE `run_and_pair` (
   `id_run_pair` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id_run_and_pair`),
   UNIQUE KEY `unq_idx_runpair_idrun` (`id_run`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1190,7 +1182,7 @@ CREATE TABLE `run_graph` (
   `cycle` smallint(5) unsigned DEFAULT NULL,
   PRIMARY KEY (`id_run_graph`),
   UNIQUE KEY `unq_idx_rungraph_idrun_end` (`id_run`,`end`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1206,7 +1198,7 @@ CREATE TABLE `run_info` (
   `run_info_xml` text NOT NULL,
   PRIMARY KEY (`id_run_info`),
   UNIQUE KEY `unq_idx_run_info` (`id_run`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1232,7 +1224,7 @@ CREATE TABLE `run_recipe` (
   UNIQUE KEY `unq_idx_run` (`id_run`),
   KEY `runrecipe_recipefile_fk` (`id_recipe_file`),
   CONSTRAINT `runrecipe_recipefile_fk` FOREIGN KEY (`id_recipe_file`) REFERENCES `recipe_file` (`id_recipe_file`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1253,7 +1245,7 @@ CREATE TABLE `run_tile` (
   `avg_newz` float DEFAULT NULL,
   PRIMARY KEY (`id_run_tile`),
   UNIQUE KEY `unq_idx_rt_idrun_end_position_tile` (`id_run`,`end`,`position`,`tile`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='table linking a tile to a run and lane position';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='table linking a tile to a run and lane position';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1271,7 +1263,7 @@ CREATE TABLE `run_timeline` (
   `end_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id_run_timeline`),
   UNIQUE KEY `unq_idx_run_timeline_idrun` (`id_run`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1289,7 +1281,7 @@ CREATE TABLE `samtools_stats` (
   PRIMARY KEY (`id_samtools_stats`),
   UNIQUE KEY `unq_seqstats` (`id_seq_composition`,`filter`),
   CONSTRAINT `seq_sum_compos_ss` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1309,7 +1301,7 @@ CREATE TABLE `seq_component` (
   PRIMARY KEY (`id_seq_component`),
   UNIQUE KEY `unq_seq_compon_d` (`digest`),
   KEY `unq_seq_compos_rp` (`id_run`,`position`,`tag_index`,`subset`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1329,7 +1321,7 @@ CREATE TABLE `seq_component_composition` (
   KEY `seq_comcom_cmpos` (`id_seq_composition`,`size`),
   CONSTRAINT `seq_comcom_cmpon` FOREIGN KEY (`id_seq_component`) REFERENCES `seq_component` (`id_seq_component`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `seq_comcom_cmpos` FOREIGN KEY (`id_seq_composition`, `size`) REFERENCES `seq_composition` (`id_seq_composition`, `size`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1346,7 +1338,7 @@ CREATE TABLE `seq_composition` (
   PRIMARY KEY (`id_seq_composition`),
   UNIQUE KEY `unq_seq_compos_d` (`digest`),
   UNIQUE KEY `unq_seq_compos_ps` (`id_seq_composition`,`size`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1387,7 +1379,7 @@ CREATE TABLE `sequence_error` (
   `sequence_type` varchar(25) NOT NULL DEFAULT 'default',
   PRIMARY KEY (`id_sequence_error`),
   UNIQUE KEY `unq_rlts_sequence_error` (`id_run`,`position`,`tag_index`,`sequence_type`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1410,7 +1402,7 @@ CREATE TABLE `sequence_summary` (
   PRIMARY KEY (`id_sequence_summary`),
   KEY `seq_sum_compos` (`id_seq_composition`),
   CONSTRAINT `seq_sum_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1439,7 +1431,7 @@ CREATE TABLE `signal_mean` (
   `base_t` float(10,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id_signal_mean`),
   UNIQUE KEY `unq_idx` (`id_run`,`position`,`cycle`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1459,7 +1451,7 @@ CREATE TABLE `spatial_filter` (
   `num_total_reads` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id_spatial_filter`),
   UNIQUE KEY `unq_run_lane_spatial_filter` (`id_run`,`position`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1492,7 +1484,7 @@ CREATE TABLE `split_stats` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_split_stats`),
   UNIQUE KEY `unq_run_lane_split_stats` (`id_run`,`position`,`tag_index`,`ref_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1511,7 +1503,7 @@ CREATE TABLE `split_stats_coverage` (
   PRIMARY KEY (`id_split_stats_coverage`),
   UNIQUE KEY `unq_split_chromosome_coverage` (`id_split_stats`,`fastq`,`chromosome`),
   CONSTRAINT `fk_constraint_split_chromosome` FOREIGN KEY (`id_split_stats`) REFERENCES `split_stats` (`id_split_stats`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1537,7 +1529,7 @@ CREATE TABLE `tag_decode_stats` (
   `info` text,
   PRIMARY KEY (`id_tag_decode_stats`),
   UNIQUE KEY `unq_run_lane_index_decoding` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1573,7 +1565,7 @@ CREATE TABLE `tag_metrics` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_tag_metrics`),
   UNIQUE KEY `unq_run_lane_tagmetrics` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1600,7 +1592,7 @@ CREATE TABLE `tags_reporters` (
   `comments` text,
   PRIMARY KEY (`id_tags_reporters`),
   UNIQUE KEY `unq_run_lane_tagsreporters` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1666,7 +1658,7 @@ CREATE TABLE `upstream_tags` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_upstream_tags`),
   UNIQUE KEY `unq_run_lane_upstreamtags` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1693,7 +1685,7 @@ CREATE TABLE `verify_bam_id` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_verify`),
   UNIQUE KEY `unq_run_lane_verify` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -1705,4 +1697,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-09-22 12:12:29
+-- Dump completed on 2016-02-25 13:46:17

@@ -117,6 +117,20 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_mqc_library_outcome');
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<unique_lib_outcome_desc>
+
+=over 4
+
+=item * L</short_desc>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint('unique_lib_outcome_desc', ['short_desc']);
+
 =head1 RELATIONS
 
 =head2 mqc_library_outcome_ents
@@ -150,8 +164,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CoqhznB0+X8oK27t33skvw
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-02-25 12:46:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:K2wdLTvUj3m+tBcWJf9HlQ
 
 with qw/npg_qc::Schema::Mqc::OutcomeDict/;
 
