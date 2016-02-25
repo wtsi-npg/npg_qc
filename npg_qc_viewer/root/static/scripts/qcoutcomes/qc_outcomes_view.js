@@ -112,7 +112,7 @@ define([
   };
 
   return {
-    _fetchQCOutcomesUpdateView : _fetchQCOutcomesUpdateView,
+    _fetchQCOutcomesUpdateView: _fetchQCOutcomesUpdateView,
     _updateDisplayWithQCOutcomes: _updateDisplayWithQCOutcomes,
     _parseRptKeys: _parseRptKeys,
     fetchAndProcessQC: fetchAndProcessQC,
