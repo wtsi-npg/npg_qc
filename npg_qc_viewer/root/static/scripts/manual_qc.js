@@ -73,8 +73,10 @@ define([
     QC.ProdConfiguration = ProdConfiguration;
 
     QC.launchManualQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
-      if (isRunPage == null) {
-        throw 'Error page type cannot be null';
+      if ( typeof isRunPage !== 'boolean' || 
+           typeof qcOutcomes !== 'object' || 
+           typeof qcOutcomesURL !== 'string' ) {
+        throw 'Invalid parameter type';
       }
       var prodConfiguration = new NPG.QC.ProdConfiguration(qcOutcomesURL);
       var updateOverall;
