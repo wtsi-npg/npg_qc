@@ -8,6 +8,7 @@ define(['jquery'], function () {
   var ACTION    = 'UPDATE';
 
   var EXCEPTION_SPLIT = /^(.*?)( at \/)/;
+  var TEST_FINAL      = /(final)$/i;
 
   var buildIdSelector = function (id) {
     return '#' + id.replace(/:/g, '\\3A ');
@@ -82,7 +83,7 @@ define(['jquery'], function () {
   var seqFinal = function (seqOutcomes) {
     var seqKeys = Object.keys(seqOutcomes);
     for ( var i = 0; i < seqKeys.length; i++ ) {
-      if ( seqOutcomes[seqKeys[i]].mqc_outcome.indexOf('final') !== -1 ) {
+      if ( TEST_FINAL.exec(seqOutcomes[seqKeys[i]].mqc_outcome) != null ) {
         return false;
       }
     }
