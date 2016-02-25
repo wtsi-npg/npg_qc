@@ -34,26 +34,6 @@ define([
 ) {
   var ID_PREFIX = 'rpt_key:';
 
-  var _displayError = function( er ) {
-    var message;
-    if( typeof er === 'string' ) {
-      message = er;
-    } else {
-      message = '' + er;
-    }
-    $('#ajax_status').empty().append("<li class='failed_mqc'>" + message + '</li>');
-  };
-
-  var _displayJqXHRError = function ( jqXHR ) {
-    var message;
-    if ( typeof jqXHR.responseJSON === 'object' && typeof jqXHR.responseJSON.error === 'string' ) {
-      message = $.trim(jqXHR.responseJSON.error);
-    } else  {
-      message = ( jqXHR.status || '' ) + ' ' + ( jqXHR.statusText || '');
-    }
-    _displayError(message);
-  };
-
   var _processOutcomes = function (outcomes, elementClass) {
     var rpt_keys = Object.keys(outcomes);
 
@@ -116,7 +96,7 @@ define([
         data: JSON.stringify(_buildQuery(rptKeys)),
         cache: false
       }).error(function(jqXHR) {
-        _displayJqXHRError(jqXHR);
+        qc_utils.displayJqXHRError(jqXHR);
       }).success(function (data) {
         try {
           _updateDisplayWithQCOutcomes(data);
@@ -124,7 +104,7 @@ define([
             callOnSuccess(data);
           }
         } catch (er) {
-          _displayError(er);
+          qc_utils.displayError(er);
         }
       });
     }
@@ -135,7 +115,7 @@ define([
       var rptKeys = _parseRptKeys(tableID);
       _fetchQCOutcomesUpdateView(rptKeys, qcOutcomesURL, callbackAfterUpdateView);
     } catch (er) {
-      _displayError(er);
+      qc_utils.displayError(er);
     }
   };
 

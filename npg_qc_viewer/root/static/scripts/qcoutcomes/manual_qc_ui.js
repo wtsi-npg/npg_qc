@@ -99,40 +99,6 @@ var NPG;
       })();
       UI.MQCOutcomeRadio = MQCOutcomeRadio;
 
-      var MQCErrorMessage = (function() {
-        MQCErrorMessage = function (errorText, placeholder) {
-          this.errorText = errorText;
-          this.EXCEPTION_STRING_SPLIT = '. at /';
-          this.placeholder = placeholder || 'ajax_status';
-        }
-
-        MQCErrorMessage.prototype.formatForDisplay = function () {
-          var cleanText = this.errorText;
-          var n = cleanText.indexOf(this.EXCEPTION_STRING_SPLIT);
-          if (n != -1) {
-            cleanText = cleanText.substring(0, n + 1);
-          }
-          return cleanText;
-        };
-
-        MQCErrorMessage.prototype.display = function() {
-          var cleanText = this.formatForDisplay(this.errorText);
-          qc_utils.removeErrorMessages();
-          $("#" + this.placeholder).append("<li class='failed_mqc'>"
-              + cleanText
-              + '</li>');
-          return this;
-        };
-
-        MQCErrorMessage.prototype.toConsole = function () {
-          window.console && console.log(this.errorText);
-          return this;
-        };
-
-        return MQCErrorMessage;
-      })();
-      UI.MQCErrorMessage = MQCErrorMessage;
-
       var MQCLibraryOverallControls = (function () {
         MQCLibraryOverallControls = function(abstractConfiguration) {
           this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
@@ -195,14 +161,7 @@ var NPG;
               data: JSON.stringify(query),
               cache: false
             }).error(function(jqXHR) {
-              var errorMessage;
-              if ( typeof jqXHR.responseJSON === 'object' && typeof jqXHR.responseJSON.error === 'string') {
-                errorMessage = $.trim(jqXHR.responseJSON.error);
-              } else {
-                errorMessage = ( jqXHR.status || '' ) + ' ' + ( jqXHR.statusText || '' );
-                console.log(jqXHR.responseText);
-              }
-              new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
+              qc_utils.displayJqXHRError(jqXHR);
             }).success(function (data) {
               qc_utils.removeErrorMessages();
               callback();

@@ -259,16 +259,9 @@ define([
       MQCControl.prototype.processAfterFail = function(jqXHR) {
         var self = this;
         self.lane_control.children('input:radio').val([self.outcome]);
-        var errorMessage = null;
 
-        if ( typeof jqXHR.responseJSON === 'object' && typeof jqXHR.responseJSON.error === 'string') {
-          errorMessage = $.trim(jqXHR.responseJSON.error);
-        } else {
-          errorMessage = ( jqXHR.status || '' ) + ' ' + ( jqXHR.statusText || '' );
-          console.log(jqXHR.responseText);
-        }
-
-        new NPG.QC.UI.MQCErrorMessage(errorMessage).toConsole().display();
+        qc_utils.displayJqXHRError(jqXHR);
+        console.log(jqXHR.responseText);
       };
 
       /**
