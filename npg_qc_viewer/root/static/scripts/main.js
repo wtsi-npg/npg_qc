@@ -41,7 +41,10 @@ function( qc_outcomes_view, plots, format_for_csv, qc_page, NPG ) {
   $(document).ready(function(){
     $("img").unveil(2000);
     var qcp = qc_page.pageForMQC();
-    var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) { NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes'); } : function () {};
+    var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) {
+                                                        NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes');
+                                                      }
+                                                    : null;
     qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
   });
 
