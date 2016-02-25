@@ -17,6 +17,14 @@ define(['jquery'], function () {
     return buildIdSelector(ID_PREFIX + rptKey);
   };
 
+  var buildQuery = function (rptKeys) {
+    var data = { };
+    for( var i = 0; i < rptKeys.length; i++ ) {
+      data[rptKeys[i]] = {};
+    }
+    return data;
+  };
+
   var buildUpdateQuery = function (type, qcOutcomes, query) {
     query = query || {};
     query[type] = {};
@@ -83,6 +91,7 @@ define(['jquery'], function () {
 
   return {
     buildIdSelector: buildIdSelector,
+    buildQuery: buildQuery,
     buildUpdateQuery: buildUpdateQuery,
     buildIdSelectorFromRPT: buildIdSelectorFromRPT,
     displayError: displayError,

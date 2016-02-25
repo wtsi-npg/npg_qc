@@ -79,21 +79,13 @@ define([
     _processOutcomes(outcomesData.seq, 'lane');
   };
 
-  var _buildQuery = function (rptKeys) {
-    var data = { };
-    for( var i = 0; i < rptKeys.length; i++ ) {
-      data[rptKeys[i]] = {};
-    }
-    return data;
-  };
-
   var _fetchQCOutcomesUpdateView = function (rptKeys, outcomesURL, callOnSuccess) {
     if ( rptKeys.length > 0 ) {
       $.ajax({
         url: outcomesURL,
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(_buildQuery(rptKeys)),
+        data: JSON.stringify(qc_utils.buildQuery(rptKeys)),
         cache: false
       }).error(function(jqXHR) {
         qc_utils.displayJqXHRError(jqXHR);
@@ -121,7 +113,6 @@ define([
 
   return {
     _fetchQCOutcomesUpdateView : _fetchQCOutcomesUpdateView,
-    _buildQuery: _buildQuery,
     _updateDisplayWithQCOutcomes: _updateDisplayWithQCOutcomes,
     _parseRptKeys: _parseRptKeys,
     fetchAndProcessQC: fetchAndProcessQC,
