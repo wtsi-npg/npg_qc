@@ -25,7 +25,7 @@
 * Dependencies: jQuery, qc_css_styles, manual_qc_ui
 *
 */
-/* globals $: false, window: false, document : false */
+/* globals $: false, define: false */
 "use strict";
 define([
   'jquery',
@@ -73,24 +73,27 @@ define([
     QC.ProdConfiguration = ProdConfiguration;
 
     QC.launchManualQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
-      if ( typeof isRunPage !== 'boolean' || 
-           typeof qcOutcomes !== 'object' || 
+      if ( typeof isRunPage !== 'boolean' ||
+           typeof qcOutcomes !== 'object' ||
            typeof qcOutcomesURL !== 'string' ) {
         throw 'Invalid parameter type';
       }
       var prodConfiguration = new NPG.QC.ProdConfiguration(qcOutcomesURL);
       var updateOverall;
+      var prevOutcomes;
 
       if (isRunPage) {
         prevOutcomes = qcOutcomes.seq;
       } else {
-        $('.lane').css("background-color", "")
-                  .removeClass( function (index, css) {
-                                  return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
-                                });
+        $('.lane').each(function (index, element){
+          var $element = $(element);
+          $element.css('background-color', '');
+          qc_css_styles.removePreviousQCOutcomeStyles($element);
+        });
         var seqOutcomes = qcOutcomes.seq;
         prevOutcomes    = qcOutcomes.lib;
 
+        // Cut process if lane is already final
         if ( !qc_utils.seqFinal(seqOutcomes) ) {
           return;
         }
@@ -100,31 +103,28 @@ define([
         updateOverall = $($('.library_mqc_overall_controls')).data('updateIfAllMatch');
       }
 
-      var rows = [];
       $('.lane_mqc_control').each(function (index, element) {
         var $element = $(element);
         $element.closest('tr')
                 .find('.lane, .tag_info')
                 .css("background-color", "")
-                .removeClass( function (index, css) {
-                                return (css.match (/qc_outcome[a-zA-Z_]+/gi) || []).join(' ');
-                              });
+                .each(function (index, element) {
+                  qc_css_styles.removePreviousQCOutcomeStyles($(element));
+                });
         $element.css("padding-right", "5px").css("padding-left", "10px");
-        var rptKey = $element.closest('tr').attr('id');
-        rows.push(rptKey);
-      });
-      var prevOutcomes;
-
-      for ( var i = 0; i < rows.length; i++) {
-        var c = isRunPage ? new NPG.QC.LaneMQCControl(prodConfiguration) : new NPG.QC.LibraryMQCControl(prodConfiguration);
-        c.rowId = rows[i];
-        c.rptKey = qc_utils.rptKeyFromId(c.rowId);
-        if ( typeof prevOutcomes[c.rptKey] !== 'undefined' ) {
-          c.outcome = prevOutcomes[c.rptKey].mqc_outcome;
+        var rowId = $element.closest('tr').attr('id');
+        if ( typeof rowId === 'string' ) {
+          var c = isRunPage ? new NPG.QC.LaneMQCControl(prodConfiguration) : new NPG.QC.LibraryMQCControl(prodConfiguration);
+          c.rowId = rowId;
+          c.rptKey = qc_utils.rptKeyFromId(c.rowId);
+          if ( typeof prevOutcomes[c.rptKey] !== 'undefined' ) {
+            c.outcome = prevOutcomes[c.rptKey].mqc_outcome;
+          }
+          var obj = $(qc_utils.buildIdSelector(c.rowId)).find('.lane_mqc_control');
+          c.linkControl(obj);
         }
-        var obj = $(qc_utils.buildIdSelector(c.rowId)).find('.lane_mqc_control');
-        c.linkControl(obj);
-      }
+      });
+
       if ( typeof updateOveral === 'function' ) {
         updateOverall();
       }
@@ -132,9 +132,9 @@ define([
 
     var MQCControl = (function () {
       function MQCControl(abstractConfiguration) {
-        this.outcome;  // Current outcome (Is updated when linked to an object in the view)
-        this.rowId;
-        this.rptKey;
+        this.outcome               = undefined;
+        this.rowId                 = undefined;
+        this.rptKey                = undefined;
         this.lane_control          = null;  // Container linked to this controller
         this.abstractConfiguration = abstractConfiguration;
 
@@ -154,7 +154,6 @@ define([
 
         this.LANE_MQC_CONTROL           = 'lane_mqc_control';
         this.LANE_MQC_CONTROL_CLASS     = '.' + this.LANE_MQC_CONTROL;
-
       }
 
       /**
@@ -162,7 +161,6 @@ define([
        * will update the value in the model with an async call and update the view.
        */
       MQCControl.prototype.saveAsFinalOutcome = function() {
-        var control = this;
         if(this.outcome == this.CONFIG_UNDECIDED) {
           throw new Error('Error: Invalid state');
         }
@@ -324,7 +322,7 @@ define([
             cache: false
           }).error(function(jqXHR) {
             self.processAfterFail(jqXHR);
-          }).success(function (data) {
+          }).success(function () {
             qc_utils.removeErrorMessages();
             self.updateView(outcome);
           }).always(function(){
@@ -338,7 +336,6 @@ define([
        * Builds the gui controls necessary for the mqc operation and passes them to the view.
        */
       LaneMQCControl.prototype.generateActiveControls = function() {
-        var lane_control = this.lane_control;
         var self = this;
         var outcomes = [self.CONFIG_ACCEPTED_PRELIMINARY,
                         self.CONFIG_UNDECIDED,
@@ -439,7 +436,6 @@ define([
        * to the view.
        */
       LibraryMQCControl.prototype.generateActiveControls = function() {
-        var lane_control = this.lane_control;
         var self = this;
         var outcomes  = [self.CONFIG_ACCEPTED_PRELIMINARY,
                          self.CONFIG_UNDECIDED,
@@ -486,7 +482,6 @@ define([
     QC.LibraryMQCControl = LibraryMQCControl;
     /* Plex */
   }) (NPG.QC || (NPG.QC = {}));
-  var QC = NPG.QC;
 }) (NPG || (NPG = {}));
 
 return NPG;
