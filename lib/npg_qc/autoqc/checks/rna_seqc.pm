@@ -151,7 +151,9 @@ override 'can_run' => sub {
         push @comments, q[BAM file is not aligned];
         $can_run = 0;
     }
-    if ((! $self->_library_type || $self->_library_type !~ /(?:m)?RNA/sxm) && $self->_library_type ne q[Pre-quality controlled]) {
+    if ((! $self->_library_type ||
+           $self->_library_type !~ /(?:(?:m)?RNA|DAFT)/sxm) &&
+           $self->_library_type ne q[Pre-quality controlled]) {
         push @comments, join q[ ], q[Library type is not RNA: ], $self->_library_type;
         $can_run = 0;
     }
