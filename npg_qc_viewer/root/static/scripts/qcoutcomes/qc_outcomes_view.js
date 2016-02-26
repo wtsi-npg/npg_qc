@@ -96,7 +96,7 @@ define([
             callOnSuccess(data);
           }
         } catch (er) {
-          qc_utils.displayError(er);
+          qc_utils.displayError('Error while displaying current QC outcomes. ' + er);
         }
       });
     }
@@ -107,7 +107,7 @@ define([
       var rptKeys = _parseRptKeys(tableID);
       _fetchQCOutcomesUpdateView(rptKeys, qcOutcomesURL, callbackAfterUpdateView);
     } catch (er) {
-      qc_utils.displayError(er);
+      qc_utils.displayError('Error while fetching current QC outcomes. ' + er);
     }
   };
 
