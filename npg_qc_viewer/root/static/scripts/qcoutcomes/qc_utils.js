@@ -9,6 +9,7 @@ define(['jquery'], function () {
 
   var EXCEPTION_SPLIT = /^(.*?)( at \/)/;
   var TEST_FINAL      = /(final)$/i;
+  var TEST_LIKE_ID    = /^rpt_key:/;
 
   var buildIdSelector = function (id) {
     return '#' + id.replace(/:/g, '\\3A ');
@@ -74,7 +75,7 @@ define(['jquery'], function () {
     if ( typeof id !== 'string' ) {
       throw 'Invalid arguments';
     }
-    if( id.lastIndexOf(ID_PREFIX) !== 0 ) {
+    if ( TEST_LIKE_ID.exec(id) == null ) {
       throw 'Id does not match the expected format';
     }
     return id.substring(ID_PREFIX.length);
