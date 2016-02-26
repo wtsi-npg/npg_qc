@@ -73,64 +73,75 @@ define([
     QC.ProdConfiguration = ProdConfiguration;
 
     QC.launchManualQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
-      if ( typeof isRunPage !== 'boolean' ||
-           typeof qcOutcomes !== 'object' ||
-           typeof qcOutcomesURL !== 'string' ) {
-        throw 'Invalid parameter type';
-      }
-      var prodConfiguration = new NPG.QC.ProdConfiguration(qcOutcomesURL);
-      var updateOverall;
-      var prevOutcomes;
-
-      if (isRunPage) {
-        prevOutcomes = qcOutcomes.seq;
-      } else {
-        prevOutcomes = qcOutcomes.lib;
-        // Cut process if lane is already final
-        if ( !qc_utils.seqFinal(qcOutcomes.seq) ) {
-          return;
+      try {
+        if ( typeof isRunPage !== 'boolean' ||
+             typeof qcOutcomes !== 'object' ||
+             typeof qcOutcomesURL !== 'string' ) {
+          throw 'Invalid parameter type.';
         }
 
-        $('.lane').each(function (index, element){
-          var $element = $(element);
-          $element.css('background-color', '');
-          qc_css_styles.removePreviousQCOutcomeStyles($element);
-        });
-        var overallControls = new NPG.QC.UI.MQCLibraryOverallControls(prodConfiguration);
-        overallControls.setupControls();
-        overallControls.init();
-        updateOverall = $($('.library_mqc_overall_controls')).data('updateIfAllMatch');
-      }
+        if ( typeof qcOutcomes.seq === 'undefined' ) {
+          throw 'Sequencing outcomes cannot be undefined.';
+        }
+        var prodConfiguration = new NPG.QC.ProdConfiguration(qcOutcomesURL);
+        var updateOverall;
+        var prevOutcomes;
 
-      $('.lane_mqc_control').each(function (index, element) {
-        var $element = $(element);
-        var rowId = $element.closest('tr').attr('id');
-        if ( typeof rowId === 'string' ) {
-          var rptKey = qc_utils.rptKeyFromId(rowId);
-          var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].mqc_outcome
-                                                                      : undefined;
-          if ( outcome !== qc_utils.OUTCOMES.ACCEPTED_FINAL &&
-               outcome !== qc_utils.OUTCOMES.REJECTED_FINAL ) {
-            var c = isRunPage ? new NPG.QC.LaneMQCControl(prodConfiguration)
-                              : new NPG.QC.LibraryMQCControl(prodConfiguration);
-            c.rowId   = rowId;
-            c.rptKey  = rptKey;
-            c.outcome = outcome;
-            $element.closest('tr')
-                    .find('.lane, .tag_info')
-                    .css("background-color", "")
-                    .each(function (index, element) {
-                      qc_css_styles.removePreviousQCOutcomeStyles($(element));
-                    });
-            $element.css("padding-right", "5px").css("padding-left", "10px");
-            var obj = $(qc_utils.buildIdSelector(c.rowId)).find('.lane_mqc_control');
-            c.linkControl(obj);
+        if ( isRunPage ) {
+          prevOutcomes = qcOutcomes.seq;
+        } else {
+          if ( typeof qcOutcomes.lib === 'undefined' ) {
+            throw 'Library outcomes cannot be undefined.';
           }
-        }
-      });
+          prevOutcomes = qcOutcomes.lib;
+          // Cut process if lane is already final
+          if ( !qc_utils.seqFinal(qcOutcomes.seq) ) {
+            return;
+          }
 
-      if ( typeof updateOverall === 'function' ) {
-        updateOverall();
+          var overallControls = new NPG.QC.UI.MQCLibraryOverallControls(prodConfiguration);
+          $('.lane').each(function (index, element){
+            var $element = $(element);
+            $element.css('background-color', '');
+            qc_css_styles.removePreviousQCOutcomeStyles($element);
+          });
+          overallControls.setupControls();
+          overallControls.init();
+          updateOverall = $($('.library_mqc_overall_controls')).data('updateIfAllMatch');
+        }
+
+        $('.lane_mqc_control').each(function (index, element) {
+          var $element = $(element);
+          var rowId = $element.closest('tr').attr('id');
+          if ( typeof rowId === 'string' ) {
+            var rptKey = qc_utils.rptKeyFromId(rowId);
+            var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].mqc_outcome
+                                                                      : undefined;
+            if ( outcome !== qc_utils.OUTCOMES.ACCEPTED_FINAL &&
+                 outcome !== qc_utils.OUTCOMES.REJECTED_FINAL ) {
+              var c = isRunPage ? new NPG.QC.LaneMQCControl(prodConfiguration)
+                                : new NPG.QC.LibraryMQCControl(prodConfiguration);
+              c.rowId   = rowId;
+              c.rptKey  = rptKey;
+              c.outcome = outcome;
+              $element.closest('tr')
+                      .find('.lane, .tag_info')
+                      .css("background-color", "")
+                      .each(function (index, element) {
+                        qc_css_styles.removePreviousQCOutcomeStyles($(element));
+                      });
+              $element.css("padding-right", "5px").css("padding-left", "10px");
+              var obj = $(qc_utils.buildIdSelector(c.rowId)).find('.lane_mqc_control');
+              c.linkControl(obj);
+            }
+          }
+        });
+
+        if ( typeof updateOverall === 'function' ) {
+          updateOverall();
+        }
+      } catch (ex) {
+        qc_utils.displayError('Error while initiating manual QC interface. ' + ex);
       }
     };
 
@@ -244,12 +255,16 @@ define([
        * @param outcome new outcome for the control.
        */
       MQCControl.prototype.updateView = function(outcome) {
-        switch (outcome) {
-          case qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY : this.setAcceptedPre(); break;
-          case qc_utils.OUTCOMES.REJECTED_PRELIMINARY : this.setRejectedPre(); break;
-          case qc_utils.OUTCOMES.ACCEPTED_FINAL       : this.setAcceptedFinal(); break;
-          case qc_utils.OUTCOMES.REJECTED_FINAL       : this.setRejectedFinal(); break;
-          case qc_utils.OUTCOMES.UNDECIDED            : this.setUndecided(); break;
+        try {
+          switch ( outcome ) {
+            case qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY : this.setAcceptedPre(); break;
+            case qc_utils.OUTCOMES.REJECTED_PRELIMINARY : this.setRejectedPre(); break;
+            case qc_utils.OUTCOMES.ACCEPTED_FINAL       : this.setAcceptedFinal(); break;
+            case qc_utils.OUTCOMES.REJECTED_FINAL       : this.setRejectedFinal(); break;
+            case qc_utils.OUTCOMES.UNDECIDED            : this.setUndecided(); break;
+          }
+        } catch (ex) {
+          qc_utils.displayError('Error while updating interface for outcome "' + outcome + '". ' + ex);
         }
       };
 
@@ -261,7 +276,6 @@ define([
       MQCControl.prototype.processAfterFail = function(jqXHR) {
         var self = this;
         self.lane_control.children('input:radio').val([self.outcome]);
-
         qc_utils.displayJqXHRError(jqXHR);
         console.log(jqXHR.responseText);
       };
@@ -310,30 +324,44 @@ define([
        * Change the outcome.
        */
       LaneMQCControl.prototype.updateOutcome = function(outcome) {
-        var self = this;
-        if(outcome != self.outcome) {
-          //Show progress icon
-          self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
-              + this.abstractConfiguration.getRoot()
-              + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
+        var prevOutcome = this.outcome;
+        try {
+          var self = this;
+          if(outcome != self.outcome) {
+            //Show progress icon
+            self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='"
+                + this.abstractConfiguration.getRoot()
+                + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
 
-          var query = qc_utils.buildUpdateQuery(self.TYPE_SEQ, [{rptKey: self.rptKey, mqc_outcome: outcome}]);
-          //AJAX call.
-          $.ajax({
-            url: self.abstractConfiguration.qcOutcomesURL,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(query),
-            cache: false
-          }).error( function(jqXHR) {
-            self.processAfterFail(jqXHR);
-          }).success( function () {
-            qc_utils.removeErrorMessages();
-            self.updateView(outcome);
-          }).always( function() {
-            //Clear progress icon
-            self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
-          });
+            var query = qc_utils.buildUpdateQuery(self.TYPE_SEQ, [{rptKey: self.rptKey, mqc_outcome: outcome}]);
+            $.ajax({
+              url: self.abstractConfiguration.qcOutcomesURL,
+              type: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify(query),
+              cache: false
+            }).error( function (jqXHR) {
+              self.processAfterFail(jqXHR);
+            }).success( function () {
+              try {
+                qc_utils.removeErrorMessages();
+                self.updateView(outcome);
+              } catch (ex) {
+                qc_utils.displayError('Succesfully updated outcome to "' +
+                                      outcome +
+                                      '", but error while updating interface. ' +
+                                      ex);
+              }
+            }).always( function () {
+              //Clear progress icon
+              self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
+            });
+          }
+        } catch (ex) {
+          qc_utils.displayError('Error while trying to update outcome to "' + outcome + '". ' + ex);
+          this.lane_control.find('input:radio').val([prevOutcome]);
+          this.updateView(prevOutcome);
+          this.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
         }
       };
 
@@ -372,7 +400,11 @@ define([
             self.abstractConfiguration.getRoot() +
             "/images/padlock.png'></span>"));
         self.lane_control.children('.lane_mqc_save').off("click").on("click", function() {
-          self.saveAsFinalOutcome();
+          try {
+            self.saveAsFinalOutcome();
+          } catch (ex) {
+            qc_utils.displayError('Error while saving outcome "' + self.outcome + '" as final. ' + ex);
+          }
         });
         if (self.outcome === qc_utils.OUTCOMES.UNDECIDED) {
           self.lane_control.children('.lane_mqc_save').hide();
@@ -409,32 +441,47 @@ define([
        * Change the outcome.
        */
       LibraryMQCControl.prototype.updateOutcome = function(outcome) {
-        var self = this;
-        if(outcome != self.outcome) {
-          //Show progress icon
-          self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='" +
-              this.abstractConfiguration.getRoot() +
-              "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
-          var query = qc_utils.buildUpdateQuery(self.TYPE_LIB, [{rptKey: self.rptKey, mqc_outcome: outcome}]);
-          //AJAX call.
-          $.ajax({
-            url: self.abstractConfiguration.qcOutcomesURL,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(query),
-            cache: false
-          }).error( function(jqXHR) {
-            self.processAfterFail(jqXHR);
-          }).success( function () {
-            qc_utils.removeErrorMessages();
-            self.updateView(outcome);
-            //Update overall controls if needed
-            var updateIfAllMatch = $($('.library_mqc_overall_controls')).data('updateIfAllMatch');
-            updateIfAllMatch();
-          }).always( function () {
-            //Clear progress icon
-            self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
-          });
+        var prevOutcome = this.outcome;
+        try {
+          var self = this;
+          if(outcome != self.outcome) {
+            var query = qc_utils.buildUpdateQuery(self.TYPE_LIB, [{rptKey: self.rptKey, mqc_outcome: outcome}]);
+            //Show progress icon
+            self.lane_control.find(self.LANE_MQC_WORKING_CLASS).html("<img src='" +
+                this.abstractConfiguration.getRoot() +
+                "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
+            //AJAX call.
+            $.ajax({
+              url: self.abstractConfiguration.qcOutcomesURL,
+              type: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify(query),
+              cache: false
+            }).error( function(jqXHR) {
+              self.processAfterFail(jqXHR);
+            }).success( function () {
+              try {
+                qc_utils.removeErrorMessages();
+                self.updateView(outcome);
+                //Update overall controls if needed
+                var updateIfAllMatch = $($('.library_mqc_overall_controls')).data('updateIfAllMatch');
+                updateIfAllMatch();
+              } catch (ex) {
+                qc_utils.displayError('Succesfully updated outcome to "' +
+                                      outcome +
+                                      '", but error while updating interface. ' +
+                                      ex);
+              }
+            }).always( function () {
+              //Clear progress icon
+              self.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
+            });
+          }
+        } catch (ex) {
+          qc_utils.displayError('Error while trying to update outcome to "' + outcome + '". ' + ex);
+          this.lane_control.find('input:radio').val([prevOutcome]);
+          this.updateView(prevOutcome);
+          this.lane_control.find(self.LANE_MQC_WORKING_CLASS).empty();
         }
       };
 

@@ -16,6 +16,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+/* globals $: false, define: false */
 "use strict";
 define([
   'jquery',
@@ -67,7 +68,7 @@ var NPG;
           } else {
             this.checked = ' checked ';
           }
-        }
+        };
 
         /**
          * Generates the HTML code of the radio and the label for this object.
@@ -101,7 +102,8 @@ var NPG;
 
       var MQCLibraryOverallControls = (function () {
         MQCLibraryOverallControls = function(abstractConfiguration) {
-          this.PLACEHOLDER_CLASS = 'library_mqc_overall_controls';
+          this.PLACEHOLDER       = 'library_mqc_overall_controls';
+          this.PLACEHOLDER_CLASS = '.' + this.PLACEHOLDER;
 
           this.abstractConfiguration = abstractConfiguration;
 
@@ -116,10 +118,10 @@ var NPG;
           this.ICON_ACCEPT    = "<img src='" + abstractConfiguration.getRoot() + "/images/tick.png' width='10' height='10'/>";
           this.ICON_REJECT    = "<img src='" + abstractConfiguration.getRoot() + "/images/cross.png' width='10' height='10'/>";
           this.ICON_UNDECIDED = "<img src='" + abstractConfiguration.getRoot() + "/images/circle.png' width='10' height='10'/>";
-        }
+        };
 
         MQCLibraryOverallControls.prototype.setupControls = function (placeholder) {
-          placeholder = placeholder || $($('.' + this.PLACEHOLDER_CLASS));
+          placeholder = placeholder || $($(this.PLACEHOLDER_CLASS));
           //Remove the lane placeholder which will not be used in library manuql QC
           placeholder.parent().children('.lane_mqc_control').remove();
           placeholder.parent().append('<span class="lib_mqc_working"></span>');
@@ -140,34 +142,43 @@ var NPG;
           return html;
         };
 
-        MQCLibraryOverallControls.prototype.init = function () { //TODO refactor
+        MQCLibraryOverallControls.prototype.init = function () {
           var self = this;
           var all_accept = $($('.' + self.CLASS_ALL_ACCEPT).first());
           var all_reject = $($('.' + self.CLASS_ALL_REJECT).first());
           var all_und = $($('.' + self.CLASS_ALL_UNDECIDED).first());
 
-          var placeholder = placeholder || $($('.' + self.PLACEHOLDER_CLASS));
+          var placeholder = $($(self.PLACEHOLDER_CLASS));
 
           var requestUpdate = function (query, callback) {
-            placeholder.parent()
-                       .find('.lib_mqc_working')
-                       .html("<img src='"
-                             + self.abstractConfiguration.getRoot()
-                             + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
-            $.ajax({
-              url: '/qcoutcomes',
-              type: 'POST',
-              contentType: 'application/json',
-              data: JSON.stringify(query),
-              cache: false
-            }).error(function(jqXHR) {
-              qc_utils.displayJqXHRError(jqXHR);
-            }).success(function (data) {
-              qc_utils.removeErrorMessages();
-              callback();
-            }).always(function() {
+            try {
+              placeholder.parent()
+                         .find('.lib_mqc_working')
+                         .html("<img src='"
+                               + self.abstractConfiguration.getRoot()
+                               + "/images/waiting.gif' width='10' height='10' title='Processing request.'>");
+              $.ajax({
+                url: '/qcoutcomes',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(query),
+                cache: false
+              }).error(function(jqXHR) {
+                qc_utils.displayJqXHRError(jqXHR);
+              }).success(function () {
+                try {
+                  qc_utils.removeErrorMessages();
+                  callback();
+                } catch (ex) {
+                  qc_utils.displayError('Succesfully updated outcomes, but error while updating interface. ' + ex);
+                }
+              }).always(function() {
+                placeholder.parent().find('.lib_mqc_working').empty();
+              });
+            } catch (ex) {
+              qc_utils.displayError('Failed to update outcomes. ' + ex);
               placeholder.parent().find('.lib_mqc_working').empty();
-            });
+            }
           };
 
           var resetOnClick = function () {
@@ -179,51 +190,59 @@ var NPG;
           };
 
           var prepareUpdate = function (outcome, caller) {
-            var ids = [];
-            $('.lane_mqc_control').closest('tr').each(function (index, element) {
-              ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: outcome});
-            });
-            var query = qc_utils.buildUpdateQuery('lib', ids);
-            var callback = function () {
-              resetOnClick();
-              var new_outcome;
-              $('.lane_mqc_control').each( function (index, element) {
-                var $element = $(element);
-                var controller = $element.data('gui_controller');
-                controller.updateView(outcome);
-                new_outcome = new_outcome || outcome;
+            try {
+              var ids = [];
+              $('.lane_mqc_control').closest('tr').each(function (index, element) {
+                ids.push({rptKey: qc_utils.rptKeyFromId($(element).attr('id')), mqc_outcome: outcome});
               });
-              $('input:radio').val([new_outcome]);
-              caller.css('background-color', '#D4D4D4');
-              caller.off('click');
-            };
-            requestUpdate(query, callback);
+              var query = qc_utils.buildUpdateQuery('lib', ids);
+              var callback = function () {
+                resetOnClick();
+                var new_outcome;
+                $('.lane_mqc_control').each( function (index, element) {
+                  var $element = $(element);
+                  var controller = $element.data('gui_controller');
+                  controller.updateView(outcome);
+                  new_outcome = new_outcome || outcome;
+                });
+                $('.lane_mqc_control').closest('table').find('input:radio').val([new_outcome]);
+                caller.css('background-color', '#D4D4D4');
+                caller.off('click');
+              };
+              requestUpdate(query, callback);
+            } catch (ex) {
+              qc_utils.displayError('Error while preparing to update outcomes. ' + ex);
+            }
           };
 
           var updateIfAllLibsSameOutcome = function () {
-            var outcomes = [];
-            $('.lane_mqc_control').each( function (index, element) {
-              outcomes.push($(element).data('gui_controller').outcome);
-            });
-            var unique = true;
-            for ( var i = 0; i < outcomes.length; i++ ) {
-              if ( outcomes[0] !== outcomes[i] ) { unique = false; break; }
-            }
-            resetOnClick();
-            if ( unique ) {
-              var button;
-              switch ( outcomes[0] ) {
-                case qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY: button = $('.' + self.CLASS_ALL_ACCEPT); break;
-                case qc_utils.OUTCOMES.REJECTED_PRELIMINARY: button = $('.' + self.CLASS_ALL_REJECT); break;
-                case qc_utils.OUTCOMES.UNDECIDED: button = $('.' + self.CLASS_ALL_UNDECIDED); break;
+            try {
+              var outcomes = [];
+              $('.lane_mqc_control').each( function (index, element) {
+                outcomes.push($(element).data('gui_controller').outcome);
+              });
+              var unique = true;
+              for ( var i = 0; i < outcomes.length; i++ ) {
+                if ( outcomes[0] !== outcomes[i] ) { unique = false; break; }
               }
-              if ( typeof button !== 'undefined') {
-                button.off('click');
-                button.css('background-color', '#D4D4D4');
+              resetOnClick();
+              if ( unique ) {
+                var button;
+                switch ( outcomes[0] ) {
+                  case qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY: button = $('.' + self.CLASS_ALL_ACCEPT); break;
+                  case qc_utils.OUTCOMES.REJECTED_PRELIMINARY: button = $('.' + self.CLASS_ALL_REJECT); break;
+                  case qc_utils.OUTCOMES.UNDECIDED: button = $('.' + self.CLASS_ALL_UNDECIDED); break;
+                }
+                if ( typeof button !== 'undefined') {
+                  button.off('click');
+                  button.css('background-color', '#D4D4D4');
+                }
               }
+            } catch (ex) {
+              qc_utils.displayError('Error while updating interface, checking if all libraries have matching outcome. ' + ex);
             }
           };
-          $($('.' + self.PLACEHOLDER_CLASS)).data('updateIfAllMatch', updateIfAllLibsSameOutcome);
+          placeholder.data('updateIfAllMatch', updateIfAllLibsSameOutcome);
 
           all_accept.data('function_call', function () {
             prepareUpdate(qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, all_accept);
@@ -243,9 +262,7 @@ var NPG;
       UI.MQCLibraryOverallControls = MQCLibraryOverallControls;
 
     })(NPG.QC.UI || (NPG.QC.UI = {}));
-    var UI = NPG.QC.UI;
   }) (NPG.QC || (NPG.QC = {}));
-  var QC = NPG.QC;
 }) (NPG || (NPG = {}));
 
 return NPG;

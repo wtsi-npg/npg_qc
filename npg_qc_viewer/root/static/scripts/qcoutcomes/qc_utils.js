@@ -76,7 +76,7 @@ define(['jquery'], function () {
       throw 'Invalid arguments';
     }
     if ( TEST_LIKE_ID.exec(id) == null ) {
-      throw 'Id does not match the expected format';
+      throw 'Id does not match the expected format.';
     }
     return id.substring(ID_PREFIX.length);
   };
