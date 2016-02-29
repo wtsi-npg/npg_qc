@@ -110,6 +110,8 @@ define([
           updateOverall = $($('.library_mqc_overall_controls')).data('updateIfAllMatch');
         }
 
+        $("<div id='about_qc'><ul><li><a href='/checks/about_qc_proc'>Help for Manual QC</a></li></ul></div>").insertAfter('#links > ul:nth-child(2)');
+
         $('.lane_mqc_control').each(function (index, element) {
           var $element = $(element);
           var rowId = $element.closest('tr').attr('id');

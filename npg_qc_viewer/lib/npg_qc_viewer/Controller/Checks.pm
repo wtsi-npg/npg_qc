@@ -323,6 +323,17 @@ sub about :Path('about') :Args(0) {
   return;
 }
 
+=head2 about_qc_proc
+
+QC help page
+
+=cut
+sub about_qc_proc :Path('about_qc_proc') :Args(0) {
+  my ( $self, $c )  = @_;
+  $c->stash->{'title'} = _get_title(q[about manual QC]);
+  $c->stash->{'template'} = q[about_qc_proc.tt2];
+}
+
 =head2 list_runs
 
 More complex URLs for runs

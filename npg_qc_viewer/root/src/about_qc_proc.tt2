@@ -1,0 +1,72 @@
+[% WRAPPER qsea_wrapper.tt2 -%]
+
+<div id="menu">
+  <div id="links">
+    <ul>
+      <li><a href="#page_top">Page Top</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="content">
+
+<div class="text_section">
+<h2>Conditions for QC process</h2>
+A run can be QC'ed by a user who has manual qc role and has previously taken the specific run for QC. Only runs with status 'qc in progress' or 'qc on hold' can be manually QC'ed. SeqQC displays the status of the run, the current user and if the user has the manual qc role on the top of the page
+</div>
+
+<div class="text_section">
+<h2>Sequencing lane level QC</h2>
+<p>Sequencing lane level QC outcomes will be initially unset (<img src="/static/images/about_qc/default.png" style="vertical-align:middle" title="Default (unset) value for all outcomes.">). The outcome can then be switched an unlimited number of times between preliminary outcomes.</p>
+<ul>
+ <li>Undecided <img src="/static/images/about_qc/lane_control_pre_und.png" style="vertical-align:middle" title="Sequencing lane level control for undecided." style="padding:10px;"></li>
+ <li>Preliminary pass <img src="/static/images/about_qc/lane_control_pre_pass.png" style="vertical-align:middle" title="Sequencing lane level control for preliminary pass." style="padding:10px;"></li>
+ <li>Preliminary fail <img src="/static/images/about_qc/lane_control_pre_fail.png" style="vertical-align:middle" title="Sequencing lane level control for preliminary fail." style="padding:10px;"></li>
+</ul>
+<p>If the latest outcome is either preliminary pass or fail, the application will also display a button which allows to save the preliminary outcome as final:
+<ul>
+ <li>Preliminary pass <img src="/static/images/about_qc/lane_control_pass_save.png" style="vertical-align:middle" title="Sequencing lane level control for preliminary pass with save button." style="padding:10px;"></li>
+ <li>Preliminary fail <img src="/static/images/about_qc/lane_control_fail_save.png" style="vertical-align:middle" title="Sequencing lane level control for preliminary fail with save button." style="padding:10px;"></li>
+</ul>
+Specific rules apply when working with lanes with indexed reads and trying to save their QC outcome as final.</p>
+
+<h4 id="rules">Pass final</h4>
+<ul>
+  <li>All library plex level manual QC outcomes (if there was any deplexing) associated with the lane have to be either preliminary pass or preliminary fail.
+   <ul>
+    <li>Control for all plexes used to set them as pass <img src="/static/images/about_qc/plex_all_pass.png" style="vertical-align:middle" title="Library plex level preliminary pass for all plexes." style="padding:10px;">
+    Control for all plexes used to set them as fail<img src="/static/images/about_qc/plex_all_fail.png" style="vertical-align:middle" title="Library plex level preliminary fail for all plexes." style="padding:10px;"></li>
+   </ul>
+  </li>
+</ul>
+<h4>Fail final</h4>
+<ul>
+  <li>All library plex level manual QC outcomes (if there was any deplexing) associated with the lane must be set to undecided <img src="/static/images/about_qc/lane_control_pre_und.png" style="vertical-align:middle" title="Sequencing lane level undecided."></li>
+</ul>
+</div>
+
+<div class="text_section">
+<h2>Library plex level QC</h2>
+<h4>Individual changes for each library plex level outcome</h4>
+<p>Library plex level QC outcomes will be initially unset (<img src="/static/images/about_qc/default.png" style="vertical-align:middle" title="Default (unset) value for all outcomes.">). They can be changed an unlimited number of times by the QC'ing user.</p>
+<ul>
+ <li>Library plex level preliminary pass <img src="/static/images/about_qc/plex_ind_pass.png" style="vertical-align:middle" title="Library plex level preliminary pass." style="padding:10px;"></li>
+ <li>Library plex level preliminary fail <img src="/static/images/about_qc/plex_ind_fail.png" style="vertical-align:middle" title="Library plex level preliminary fail." style="padding:10px;"></li>
+</ul>
+<p>They are not finalised individually, they become final when their corresponding sequencing lane level manual qc is saved as final (see <a href="#rules">rules</a>).</p>
+
+<h4>Chainging the outcome for all library plex level outcome in one lane</h4>
+The set of controls displayed in the first row of the summary table <img src="/static/images/about_qc/plex_overall.png" style="vertical-align:middle" title="Library plex level manual QC controls for all plexes in page.">, allows for outcomes to be changed globally for library plex level QC. Using this controls, the outcomes of all libraries in the page can be set with a single click.
+</div>
+
+<div class="text_section">
+<h2>Visibility for other users of the application</h2>
+<p>As the user currently doing manual QC updates the outcomes for sequencing and library QC, the latest outcome will be visible to other users of the application. The application will show the latests outcomes available at the moment the information was requested. Final and preliminary decisions will be clearly marked</p>
+<ul>
+ <li>Preliminary outcomes as seen by other users <img src="/static/images/about_qc/not_logged_pre.png" style="vertical-align:middle" title="Library plex level manual qc preliminary outcomes." style="padding:10px;"></li>
+ <li>Final outcomes as seen by all users <img src="/static/images/about_qc/not_logged_fin.png" style="vertical-align:middle" title="Library plex level manual qc final outcomes." style="padding:10px;"></li>
+</ul>
+</div>
+
+</div><!-- content -->
+[% END -%]
