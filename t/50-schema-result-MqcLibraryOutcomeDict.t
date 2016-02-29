@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 27;
+use Test::More tests => 28;
 use Moose::Meta::Class;
 use npg_testing::db;
 
@@ -40,6 +40,7 @@ ok (!$rows[2]->is_final_outcome, 'final outcome check returns false');
 ok (!$rows[2]->is_accepted, 'accepted outcome check returns false');
 ok (!$rows[2]->is_final_accepted, 'accepted & final outcome check returns false');
 is ($rows[2]->matching_final_short_desc(), 'Undecided final', 'matching final');
+is ($rows[2]->pk_value(), $rows[2]->id_mqc_library_outcome, 'primary key value');
 
 1;
 
