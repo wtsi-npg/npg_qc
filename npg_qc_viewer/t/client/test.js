@@ -6,8 +6,8 @@ require.config({
   },
 });
 
-require(['scripts/qcoutcomes/manual_qc'],
-  function(NPG) {
+require(['scripts/qcoutcomes/manual_qc', '../../t/client/test_fixtures'],
+  function(NPG, fixtures) {
 
     var TestConfiguration = (function() {
       function TestConfiguration () {
@@ -20,31 +20,18 @@ require(['scripts/qcoutcomes/manual_qc'],
       return TestConfiguration;
     }) ();
 
+    QUnit.test("loading", function ( assert ) {
+      var a = fixtures.fixtures_dont_display;
+    });
+
     QUnit.test("DOM linking", function( assert ) {
       var lane = $("#mqc_lane1");
-      assert.notEqual(lane, undefined, "mqc_lane is an instance.");
-      assert.equal(lane.data('id_run'), '2', "id_run is 2.");
-      assert.equal(lane.data('position'), '3', "position is 3.");
-      assert.equal(lane.data('initial'), undefined, "No initial value.");
       var control = new NPG.QC.LaneMQCControl(new TestConfiguration());
       assert.notEqual(control, undefined, "Control is an instance.");
       control.linkControl(lane);
       assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
       assert.equal(control.lane_control, lane, "Control and lane are correctly linked.");
       assert.equal(control.lane_control.outcome, undefined, "Outcome of lane is not defined.");
-    });
-
-    QUnit.test("DOM linking lane with previous status", function( assert ) {
-      var lane = $("#mqc_lane2");
-      assert.notEqual(lane, undefined, "mqc_lane is an instance.");
-      assert.equal(lane.data('id_run'), '3', "id_run is 3.");
-      assert.equal(lane.data('position'), '4', "position is 4.");
-      assert.notEqual(lane.data('initial'), undefined, "Has initial value.");
-      assert.equal(lane.data('initial'), 'Accepted final', "Initial value as expected.");
-      var control = new NPG.QC.LaneMQCControl(new TestConfiguration());
-      assert.notEqual(control, undefined, "Control is an instance.");
-      control.linkControl(lane);
-      assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
     });
 
     QUnit.test('Object initialisation', function() {
@@ -82,6 +69,8 @@ require(['scripts/qcoutcomes/manual_qc'],
       obj = null;
       ok(obj == null);
     });
+    
+    QUnit.test
 
     // run the tests.
     QUnit.start();
