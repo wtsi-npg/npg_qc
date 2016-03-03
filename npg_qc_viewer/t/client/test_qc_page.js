@@ -114,7 +114,7 @@ require(['scripts/qcoutcomes/qc_page'],
                        "Throws error when page has empty title" );
       }
       document.title = originalTitle;
-      for ( var i = 0; i < emptyStrings.length; i++ ) {
+      for ( i = 0; i < emptyStrings.length; i++ ) {
         $('#header h1 span.rfloat').text(emptyStrings[i]);
         assert.throws( funct,
                        /Error: authentication data is expected but not available in page/,
@@ -129,7 +129,7 @@ require(['scripts/qcoutcomes/qc_page'],
         'NPG SeqQC v0: Results (all) for runs 15000 lanes 1 (run 15000 status: qc on hold, taken by aa11)'
       ];
 
-      for( var i = 0; i < titlesForMQC.length; i++ ) {
+      for( i = 0; i < titlesForMQC.length; i++ ) {
         document.title = titlesForMQC[i];
         var pageForMQC = qc_page.pageForMQC();
         assert.ok(pageForMQC.isPageForMQC, 'Page for manual QC');
@@ -141,9 +141,9 @@ require(['scripts/qcoutcomes/qc_page'],
         "NPG SeqQC v0: Pool AA123456B"
       ];
 
-      for( var i = 0; i < titlesNotForMQC.length; i++ ) {
+      for( i = 0; i < titlesNotForMQC.length; i++ ) {
         document.title = titlesNotForMQC[i];
-        var pageForMQC = qc_page.pageForMQC();
+        pageForMQC = qc_page.pageForMQC();
         assert.ok(!pageForMQC.isPageForMQC, 'Non run pages are not for manual QC');
       }
 
@@ -151,16 +151,16 @@ require(['scripts/qcoutcomes/qc_page'],
         'NPG SeqQC v0: Results (all) for runs 16074 lanes 1 2 (run 16074 status: qc in progress, taken by aa11)',
         'NPG SeqQC v0: Results (all) for runs 16074 16075 lanes 1',
       ];
-      for( var i = 0; i < titlesNotForMQC.length; i++ ) {
+      for( i = 0; i < titlesNotForMQC.length; i++ ) {
         document.title = titlesNotForMQC[i];
-        var pageForMQC = qc_page.pageForMQC();
+        pageForMQC = qc_page.pageForMQC();
         assert.ok(!pageForMQC.isPageForMQC, 'Pages with data for multiple runs/lanes not for manual QC');
       }
 
       document.title = 'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc in progress, taken by aa11)';
 
       $('#header h1 span.rfloat').text('Logged in as aa11');
-      var pageForMQC = qc_page.pageForMQC();
+      pageForMQC = qc_page.pageForMQC();
       assert.ok(!pageForMQC.isPageForMQC, 'Page is not for manual QC when user lacks mqc role');
 
       $('#header h1 span.rfloat').text('Not logged in');

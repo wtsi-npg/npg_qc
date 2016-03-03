@@ -139,6 +139,7 @@ t/80-app-sample.t
 t/80-app.t
 t/client/test.html
 t/client/test.js
+t/client/test_fixtures.js
 t/client/test_format_for_csv.html
 t/client/test_format_for_csv.js
 t/client/test_modify_on_view.html
