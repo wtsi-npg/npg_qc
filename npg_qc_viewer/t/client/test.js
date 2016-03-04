@@ -11,11 +11,13 @@ require([
   'scripts/qcoutcomes/manual_qc',
   'scripts/qcoutcomes/qc_page',
   'scripts/qcoutcomes/qc_outcomes_view',
+  'scripts/qcoutcomes/qc_utils',
   '../../t/client/test_fixtures'
 ], function(
   NPG,
   qc_page,
   qc_outcomes_view,
+  qc_utils,
   fixtures
 ) {
     var TestConfiguration = (function() {
@@ -72,9 +74,9 @@ require([
       $.ajax = function (options) {
         var data = {
           "lib":{ },
-          "seq":{ "18000:1":{ "mqc_outcome":"Rejected preliminary", "position":1, "id_run":18000 },
-                  "18000:2":{ "mqc_outcome":"Accepted preliminary", "position":2, "id_run":18000 },
-                  "18000:3":{ "mqc_outcome":"Undecided", "position":3, "id_run":18000 }, }
+          "seq":{ "18000:1":{ "mqc_outcome":qc_utils.OUTCOMES.REJECTED_PRELIMINARY, "position":1, "id_run":18000 },
+                  "18000:2":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, "position":2, "id_run":18000 },
+                  "18000:3":{ "mqc_outcome":qc_utils.OUTCOMES.UNDECIDED, "position":3, "id_run":18000 }, }
         };
         options.success = function (callback) {
           callback(data, 'success', {});
@@ -164,8 +166,8 @@ require([
       $.ajax = function (options) {
         var data = {
           "lib":{ },
-          "seq":{ "18000:1":{ "mqc_outcome":"Accepted final", "position":1, "id_run":18000 },
-                  "18000:2":{ "mqc_outcome":"Accepted preliminary", "position":2, "id_run":18000 } }
+          "seq":{ "18000:1":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_FINAL, "position":1, "id_run":18000 },
+                  "18000:2":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, "position":2, "id_run":18000 } }
         };
         options.success = function (callback) {
           callback(data, 'success', {});
@@ -209,7 +211,7 @@ require([
         $('title').text(initialTitle);
       }
     });
-    
+
     QUnit.test("Display library manual qc mixed initial outcomes", function ( assert ) {
       expect(40);
       //Set title
@@ -221,9 +223,9 @@ require([
       $.ajax = function (options) {
         var data = {
           "lib":{
-            "18000:2:1":{"tag_index":"1","mqc_outcome":"Accepted preliminary","position":"2","id_run":"18000"},
-            "18000:2:3":{"tag_index":"3","mqc_outcome":"Undecided","position":"2","id_run":"18000"},
-            "18000:2:2":{"tag_index":"2","mqc_outcome":"Rejected preliminary","position":"2","id_run":"18000"}
+            "18000:2:1":{"tag_index":"1","mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"},
+            "18000:2:3":{"tag_index":"3","mqc_outcome":qc_utils.OUTCOMES.UNDECIDED,"position":"2","id_run":"18000"},
+            "18000:2:2":{"tag_index":"2","mqc_outcome":qc_utils.OUTCOMES.REJECTED_PRELIMINARY,"position":"2","id_run":"18000"}
           },
           "seq":{}
         };
@@ -255,7 +257,7 @@ require([
                           'checked',
                           'Control is not checked as per ajax qcoutcomes call');
         }
-        
+
         var allChecked = [
           "#radio_rpt_key\\3a 18000\\3a 2\\3a 1_Accepted\\20 preliminary",
           "#radio_rpt_key\\3a 18000\\3a 2\\3a 2_Rejected\\20 preliminary",
@@ -283,11 +285,11 @@ require([
           var thisButton = control.find('.' + individualOverallButtons[i]);
           ok(thisButton.is(':visible'),
              'Overall button is visible ' + individualOverallButtons[i]);
-          assert.equal(thisButton.attr('style'), 
+          assert.equal(thisButton.attr('style'),
                        'padding-left: 5px; background-color: rgb(244, 244, 244);',
                        'Button is not selected');
         }
-        
+
         var plexesWithControls = [ 1, 2, 3, 4 ];
         for ( i = 0; i < plexesWithControls.length; i++ ) {
           var plex = plexesWithControls[i];
@@ -331,13 +333,12 @@ require([
         $('title').text(initialTitle);
       }
     });
-    
+
     QUnit.test("Lib not in mqc", function ( assert ) {
-      expect(75);
       var cases = [
-        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)', 
-          logged: ' Not logged in' 
-        }, 
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+          logged: ' Not logged in'
+        },
         { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
           logged: 'Logged in as bb22 (mqc)'
         },
@@ -348,21 +349,21 @@ require([
           logged: 'Logged in as aa11'
         },
         { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc review pending)',
-          logged: 'Logged in as aa11'
+          logged: 'Logged in as aa11 (mqc)'
         }
       ];
-      
-      var page_fixture = fixtures.fixtures_lib_not_logged_in;
-      
+      expect(cases.length * 15);
+
+      var page_fixture = fixtures.fixtures_lib_mixed;
       //Set return ajax call
       $.ajax = function (options) {
         var data = {
           "lib":{
-            "18000:2:1":{"tag_index":"1","mqc_outcome":"Accepted preliminary","position":"2","id_run":"18000"},
-            "18000:2:2":{"tag_index":"2","mqc_outcome":"Rejected preliminary","position":"2","id_run":"18000"}
+            "18000:2:1":{"tag_index":"1","mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"},
+            "18000:2:2":{"tag_index":"2","mqc_outcome":qc_utils.OUTCOMES.REJECTED_PRELIMINARY,"position":"2","id_run":"18000"}
           },
           "seq":{
-            "18000:2":{"mqc_outcome":"Accepted preliminary","position":"2","id_run":"18000"}
+            "18000:2":{"mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"}
           }
         };
         options.success = function (callback) {
@@ -377,15 +378,15 @@ require([
         for ( var j = 0; j < cases.length; j++ ) {
           var thisCase = cases[j];
           document.title = thisCase.title;
-          
+
           $('#qunit-fixture').html(page_fixture);
           $("#header > h1 > span.lfloat.env_dev").text(thisCase.title);
           $("#header > h1 > span.rfloat").text(thisCase.logged);
-          
+
           runAsIfMain();
           ok($("#rpt_key\\3a 18000\\3a 2\\3a 1 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
           ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_rejected_preliminary'));
-          
+
           var emptyContainers = [
             "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.lane_mqc_control",
             "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls",
@@ -398,7 +399,7 @@ require([
                          0,
                          'Container is empty ' + emptyContainer);
           }
-          
+
           var allRows = [
             "#rpt_key\\3a 18000\\3a 2",
             "#rpt_key\\3a 18000\\3a 2\\3a 1",
@@ -412,14 +413,14 @@ require([
             assert.ok(laneTd.hasClass("qc_outcome_accepted_preliminary"),
                       'lane cell has preliminary class');
           }
-          
-          
+
+
           var plexesWithoutControls = [ 0, 888 ];
           for ( i = 0; i < plexesWithoutControls.length; i++ ) {
             var plex = plexesWithoutControls[i];
             var td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.lane.nbsp");
             assert.equal(td.children().length, 0, 'No controls in lane td for plex ' + plex);
-            
+
             td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.tag_info");
             assert.notOk( td.hasClass("qc_outcome_accepted_preliminary") ||
                          td.hasClass("qc_outcome_rejected_preliminary") ||
@@ -429,12 +430,96 @@ require([
         }
       } catch (err) {
         console.log(err);
-        throw err;
       } finally {
         $.ajax = initialAjax;
         $('title').text(initialTitle);
       }
-    });    
+    });
+    
+    QUnit.test("Seq not in mqc", function ( assert ) {
+      var cases = [
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)',
+          logged: ' Not logged in'
+        },
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as bb22 (mqc)'
+        },
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as bb22'
+        },
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as aa11'
+        },
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc review pending)',
+          logged: 'Logged in as aa11 (mqc)'
+        }
+      ];
+      expect(cases.length * 4 * ( Object.keys(qc_utils.OUTCOMES).length - 1 ));
+      
+      var toClass = function ( outcome ) {
+        return 'qc_outcome_' + outcome.toLowerCase().replace(' ', '_');
+      }
+
+      var page_fixture = fixtures.fixtures_seq_mixed;
+      var testNotMQC = function (expectedClass) {
+        try {
+          for ( var j = 0; j < cases.length; j++ ) {
+            var thisCase = cases[j];
+            document.title = thisCase.title;
+
+            $('#qunit-fixture').html(page_fixture);
+            $("#header > h1 > span.lfloat.env_dev").text(thisCase.title);
+            $("#header > h1 > span.rfloat").text(thisCase.logged);
+
+            runAsIfMain();
+            ok($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp").hasClass(expectedClass), 'With proper class in lane');
+            ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp").hasClass(expectedClass), 'With proper class in lane');
+
+            var emptyContainers = [
+              "#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp > span.lane_mqc_control",
+              "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.lane_mqc_control",
+            ];
+            for ( var i = 0; i < emptyContainers.length; i++ ) {
+              var emptyContainer = emptyContainers[i];
+              assert.equal($(emptyContainer).children().length,
+                           0,
+                           'Container is empty ' + emptyContainer);
+            }
+          }
+        } catch (err) {
+          console.log(err);
+        } finally {
+          $.ajax = initialAjax;
+          $('title').text(initialTitle);
+        }
+      };
+      
+      for ( var outcomeName in qc_utils.OUTCOMES ) {
+        var outcome = qc_utils.OUTCOMES[outcomeName];
+        
+        if ( outcome === qc_utils.OUTCOMES.UNDECIDED_FINAL ) { // No undecided final for lane
+          continue;
+        }
+        
+        //Set return ajax call
+        $.ajax = function (options) {
+          var data = {
+            "lib":{},
+            "seq":{
+              "18000:1":{"mqc_outcome":outcome,"position":"1","id_run":"18000"},
+              "18000:2":{"mqc_outcome":outcome,"position":"2","id_run":"18000"}
+            }
+          };
+          options.success = function (callback) {
+            callback(data, 'success', {});
+            return options;
+          };
+          options.error = function (callback) { return options; };
+          return options;
+        };
+        testNotMQC(toClass(outcome));
+      }
+    });
 
     QUnit.test("DOM linking", function( assert ) {
       var lane = $("#mqc_lane1");
@@ -486,5 +571,4 @@ require([
     QUnit.start();
   }
 );
-
 
