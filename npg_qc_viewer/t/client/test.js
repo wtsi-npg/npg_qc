@@ -331,6 +331,110 @@ require([
         $('title').text(initialTitle);
       }
     });
+    
+    QUnit.test("Lib not in mqc", function ( assert ) {
+      expect(75);
+      var cases = [
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)', 
+          logged: ' Not logged in' 
+        }, 
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as bb22 (mqc)'
+        },
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as bb22'
+        },
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as aa11'
+        },
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc review pending)',
+          logged: 'Logged in as aa11'
+        }
+      ];
+      
+      var page_fixture = fixtures.fixtures_lib_not_logged_in;
+      
+      //Set return ajax call
+      $.ajax = function (options) {
+        var data = {
+          "lib":{
+            "18000:2:1":{"tag_index":"1","mqc_outcome":"Accepted preliminary","position":"2","id_run":"18000"},
+            "18000:2:2":{"tag_index":"2","mqc_outcome":"Rejected preliminary","position":"2","id_run":"18000"}
+          },
+          "seq":{
+            "18000:2":{"mqc_outcome":"Accepted preliminary","position":"2","id_run":"18000"}
+          }
+        };
+        options.success = function (callback) {
+          callback(data, 'success', {});
+          return options;
+        };
+        options.error = function (callback) { return options; };
+        return options;
+      };
+
+      try {
+        for ( var j = 0; j < cases.length; j++ ) {
+          var thisCase = cases[j];
+          document.title = thisCase.title;
+          
+          $('#qunit-fixture').html(page_fixture);
+          $("#header > h1 > span.lfloat.env_dev").text(thisCase.title);
+          $("#header > h1 > span.rfloat").text(thisCase.logged);
+          
+          runAsIfMain();
+          ok($("#rpt_key\\3a 18000\\3a 2\\3a 1 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
+          ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_rejected_preliminary'));
+          
+          var emptyContainers = [
+            "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.lane_mqc_control",
+            "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls",
+            "#rpt_key\\3a 18000\\3a 2\\3a 1 > td.lane.nbsp > span",
+            "#rpt_key\\3a 18000\\3a 2\\3a 2 > td.lane.nbsp > span",
+          ];
+          for ( var i = 0; i < emptyContainers.length; i++ ) {
+            var emptyContainer = emptyContainers[i];
+            assert.equal($(emptyContainer).children().length,
+                         0,
+                         'Container is empty ' + emptyContainer);
+          }
+          
+          var allRows = [
+            "#rpt_key\\3a 18000\\3a 2",
+            "#rpt_key\\3a 18000\\3a 2\\3a 1",
+            "#rpt_key\\3a 18000\\3a 2\\3a 2",
+            "#rpt_key\\3a 18000\\3a 2\\3a 888",
+            "#rpt_key\\3a 18000\\3a 2\\3a 0"
+          ];
+          for ( i = 0; i < allRows.length; i++ ) {
+            var row = allRows[i];
+            var laneTd = $(row + " > td.lane.nbsp");
+            assert.ok(laneTd.hasClass("qc_outcome_accepted_preliminary"),
+                      'lane cell has preliminary class');
+          }
+          
+          
+          var plexesWithoutControls = [ 0, 888 ];
+          for ( i = 0; i < plexesWithoutControls.length; i++ ) {
+            var plex = plexesWithoutControls[i];
+            var td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.lane.nbsp");
+            assert.equal(td.children().length, 0, 'No controls in lane td for plex ' + plex);
+            
+            td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.tag_info");
+            assert.notOk( td.hasClass("qc_outcome_accepted_preliminary") ||
+                         td.hasClass("qc_outcome_rejected_preliminary") ||
+                         td.hasClass("qc_outcome_undecided") ,
+                       'tag index cell has no preliminary class');
+          }
+        }
+      } catch (err) {
+        console.log(err);
+        throw err;
+      } finally {
+        $.ajax = initialAjax;
+        $('title').text(initialTitle);
+      }
+    });    
 
     QUnit.test("DOM linking", function( assert ) {
       var lane = $("#mqc_lane1");
