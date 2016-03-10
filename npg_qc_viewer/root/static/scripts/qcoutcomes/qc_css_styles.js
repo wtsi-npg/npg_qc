@@ -6,6 +6,8 @@
 /* globals $: false, define: false */
 'use strict';
 define(['jquery'], function () {
+  var QC_PREFIX = 'qc_outcome_';
+
   var _outcomeStyleClassToStyle = {
     qc_outcome_accepted_final: "{ background: #b5daff none; }",
     qc_outcome_accepted_preliminary: "{ background: #ffffff repeating-linear-gradient(45deg, #B5DAFF, #B5DAFF 10px, #FFFFFF 10px, #FFFFFF 20px); }",
@@ -36,10 +38,10 @@ define(['jquery'], function () {
       throw 'qcOutcome cannot be undefined.';
     }
 
-    var newClass = 'qc_outcome_' + qcOutcome.toLowerCase();
+    var newClass = QC_PREFIX + qcOutcome.toLowerCase();
     newClass = newClass.replace(/ /g, '_');
 
-    if (_isValidStyleClass(newClass)) {
+    if (_isValidStyleClass(newClass) ) {
       //TODO Consider only remove/add if object does not have the new class
       removePreviousQCOutcomeStyles(element);
       element.addClass(newClass);  
@@ -70,6 +72,6 @@ define(['jquery'], function () {
   
   return {
     displayElementAs: displayElementAs,
-    removePreviousQCOutcomeStyles: removePreviousQCOutcomeStyles,
+    removePreviousQCOutcomeStyles: removePreviousQCOutcomeStyles
   };
 });

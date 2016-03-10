@@ -111,5 +111,12 @@
 </table>
 </div>
 
+<div class="text_section">
+<h2>Manual QC</h2>
+<ul>
+  <li>A help page with information about how to use SeqQC to update manual QC outcomes can be found <a href="/checks/about_qc_proc">here</a></li>
+</ul>
+</div>
+
 </div>
 [% END -%]

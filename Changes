@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - help page for manual qc
  - redesign of both client and server side for generic qc outcome updates
  - updates to already stored outcomes, including final outcomes,
      are not an error, will be skipped

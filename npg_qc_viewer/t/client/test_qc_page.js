@@ -1,4 +1,4 @@
-/* globals $: false, define: false, QUnit: false */
+/* globals $: false, require: false, QUnit: false, document: false */
 "use strict";
 require.config({
   baseUrl: '../../root/static',
@@ -7,7 +7,7 @@ require.config({
   },
 });
 
-require(['scripts/qc_page'],
+require(['scripts/qcoutcomes/qc_page'],
   function(qc_page) {
 
     QUnit.test("Parsing run lane", function (assert) {
@@ -21,12 +21,12 @@ require(['scripts/qc_page'],
       var runlane1 = qc_page._parseRunLane('NPG SeqQC v0: Results (all) for runs 16074 lanes 2 (run 16074 status: qc on hold, taken by aa11)');
       assert.ok(!runlane1.isRunPage, 'Correctly identifies lane page');
       assert.ok(runlane1.isSingleRunOrSingleLanePage, 'Page is single lane');
-      
+
       var multiple = [
         'NPG SeqQC v0: Results (all) for runs 16074 lanes 1 2 (run 16074 status: qc in progress, taken by aa11)',
         'NPG SeqQC v0: Results (all) for runs 16074 lanes 1 2',
         'NPG SeqQC v0: Results (all) for runs 16074 16075 lanes 1 2'
-      ]
+      ];
       for (var i = 0; i < multiple.length; i++) {
         var runlane2 = qc_page._parseRunLane(multiple[i]);
         assert.ok(!runlane2.isRunPage, 'Correctly identifies lane page');
@@ -87,7 +87,7 @@ require(['scripts/qc_page'],
       var logged    = 'Logged in as bb11';
       var loggedMQC = 'Logged in as aa11 (mqc)';
 
-      for (var i = 0; i < notLogged.length; i++) {
+      for ( var i = 0; i < notLogged.length; i++ ) {
         var result1 = qc_page._parseLoggedUser(notLogged[i]);
         assert.equal(result1.username, null, 'No logged user when not logged in, using: <' + notLogged[i] + '>');
         assert.equal(result1.role, null, 'No logged user role when not logged in, using: <' + notLogged[i] + '>');
@@ -106,18 +106,19 @@ require(['scripts/qc_page'],
       var originalTitle = document.title;
 
       var emptyStrings = [ '', ' ' ];
+      var funct = function() { qc_page.pageForMQC(); };
       for ( var i = 0; i < emptyStrings.length; i++ ) {
         document.title = emptyStrings[i];
-        assert.throws( function() { qc_page.pageForMQC(); },
-                                    /Error: page title is expected but not available in page/,
-                                    "Throws error when page has empty title" );
+        assert.throws( funct,
+                       /Error: page title is expected but not available in page/,
+                       "Throws error when page has empty title" );
       }
       document.title = originalTitle;
-      for ( var i = 0; i < emptyStrings.length; i++ ) {
+      for ( i = 0; i < emptyStrings.length; i++ ) {
         $('#header h1 span.rfloat').text(emptyStrings[i]);
-        assert.throws( function() { qc_page.pageForMQC(); },
-                                    /Error: authentication data is expected but not available in page/,
-                                    "Throws error when authentication info is empty" );
+        assert.throws( funct,
+                       /Error: authentication data is expected but not available in page/,
+                       "Throws error when authentication info is empty" );
       }
 
       $('#header h1 span.rfloat').text('Logged in as aa11 (mqc)');
@@ -128,36 +129,36 @@ require(['scripts/qc_page'],
         'NPG SeqQC v0: Results (all) for runs 15000 lanes 1 (run 15000 status: qc on hold, taken by aa11)'
       ];
 
-      for( var i = 0; i < titlesForMQC.length; i++ ) {
+      for( i = 0; i < titlesForMQC.length; i++ ) {
         document.title = titlesForMQC[i];
         var pageForMQC = qc_page.pageForMQC();
         assert.ok(pageForMQC.isPageForMQC, 'Page for manual QC');
       }
-      
+
       var titlesNotForMQC = [
         "NPG SeqQC v0: Libraries: 'AA123456B'",
         "NPG SeqQC v0: Sample '1234ABCD1234567'",
         "NPG SeqQC v0: Pool AA123456B"
       ];
 
-      for( var i = 0; i < titlesNotForMQC.length; i++ ) {
+      for( i = 0; i < titlesNotForMQC.length; i++ ) {
         document.title = titlesNotForMQC[i];
-        var pageForMQC = qc_page.pageForMQC();
+        pageForMQC = qc_page.pageForMQC();
         assert.ok(!pageForMQC.isPageForMQC, 'Non run pages are not for manual QC');
       }
 
       titlesNotForMQC = [
         'NPG SeqQC v0: Results (all) for runs 16074 lanes 1 2 (run 16074 status: qc in progress, taken by aa11)',
         'NPG SeqQC v0: Results (all) for runs 16074 16075 lanes 1',
-      ]
-      for( var i = 0; i < titlesNotForMQC.length; i++ ) {
+      ];
+      for( i = 0; i < titlesNotForMQC.length; i++ ) {
         document.title = titlesNotForMQC[i];
-        var pageForMQC = qc_page.pageForMQC();
+        pageForMQC = qc_page.pageForMQC();
         assert.ok(!pageForMQC.isPageForMQC, 'Pages with data for multiple runs/lanes not for manual QC');
       }
-      
-      document.title = 'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc in progress, taken by aa11)',
-      
+
+      document.title = 'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc in progress, taken by aa11)';
+
       $('#header h1 span.rfloat').text('Logged in as aa11');
       pageForMQC = qc_page.pageForMQC();
       assert.ok(!pageForMQC.isPageForMQC, 'Page is not for manual QC when user lacks mqc role');
