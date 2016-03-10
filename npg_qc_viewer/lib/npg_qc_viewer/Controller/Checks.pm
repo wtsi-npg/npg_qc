@@ -332,6 +332,7 @@ sub about_qc_proc :Path('about_qc_proc') :Args(0) {
   my ( $self, $c )  = @_;
   $c->stash->{'title'} = _get_title(q[about manual QC]);
   $c->stash->{'template'} = q[about_qc_proc.tt2];
+  return;
 }
 
 =head2 list_runs
