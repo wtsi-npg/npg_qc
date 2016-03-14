@@ -125,7 +125,7 @@ define([], function () {
     '    <tr id="rpt_key:18000:2">',
     '      <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp">NT743240I</span></div></td>',
     '      <td class="id_run"><div class="rel_pos_container">18000<br>158</div></td>',
-    '      <td class="lane nbsp"><a href="#18000:2">2</a><span class="library_mqc_overall_controls"></span><span class="lane_mqc_control"></span></td>',
+    '      <td class="lane nbsp"><a href="#18000:2">2</a><span class="lane_mqc_control"></span></td>',
     '      <td class="tag_info"><a href="#18000:2"></a></td>',
     '      <td class="check_summary passed"><a href="#tmc_18000:2">99.18</a><br><span class="dark_blue"><a href="#tmc_18000:2">38.88</a></span></td>',
     '    </tr>',
@@ -173,10 +173,68 @@ define([], function () {
     '</table>'
   ].join("\n");
 
+    var fixtures_lib_nothing_to_qc = [
+    '<ul id="ajax_status"></ul>',
+    '<div id="header">',
+    '  <h1>',
+    '    <a name="page_top"></a>&nbsp;',
+    '    <span class="lfloat env_dev">NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)</span>',
+    '    <span class="rfloat">Logged in as aa11 (mqc)</span>',
+    '  </h1> </div>',
+    '<table id="results_summary" summary="QC results summary">',
+    '  <thead>',
+    '    <tr>',
+    '      <th rowspan="2">Library<br>------<br>Sample<br>Name</th>',
+    '      <th rowspan="2">Run Id<br>------<br>Num.<br>Cycles</th>',
+    '      <th rowspan="2">Lane<br>No</th>',
+    '      <th rowspan="2">Tag</th>',
+    '      <th>tag<br>metrics<br></th>',
+    '    </tr>',
+    '    <tr>',
+    '      <th class="check_labels">decode rate, %<br>CV %</th>',
+    '    </tr>',
+    '    <tr id="rpt_key:18000:2">',
+    '      <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp">NT743240I</span></div></td>',
+    '      <td class="id_run"><div class="rel_pos_container">18000<br>158</div></td>',
+    '      <td class="lane nbsp"><a href="#18000:2">2</a></td>',
+    '      <td class="tag_info"><a href="#18000:2"></a></td>',
+    '      <td class="check_summary passed"><a href="#tmc_18000:2">99.18</a><br><span class="dark_blue"><a href="#tmc_18000:2">38.88</a></span></td>',
+    '    </tr>',
+    '    <tr id="rpt_key:18000:2:1">',
+    '      <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp">DN429410U:A4<br>1b0240fd-d555-42f7-a933-dc0a273f143f</span></div></td>',
+    '      <td class="id_run"><div class="rel_pos_container">18000<br>158</div></td>',
+    '      <td class="lane nbsp">2</td>',
+    '      <td class="tag_info"><a href="#18000:2:1">1</a><br>ATCACG</td>',
+    '      <td class="check_summary outcome_unknown">2.87</td>',
+    '    </tr>',
+    '    <tr id="rpt_key:18000:2:2">',
+    '      <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp">DN429410U:B4<br>1b0240fd-d555-42f7-a933-dc0a273f143f</span></div></td>',
+    '      <td class="id_run"><div class="rel_pos_container">18000<br>158</div></td>',
+    '      <td class="lane nbsp">2</td>',
+    '      <td class="tag_info"><a href="#18000:2:2">2</a><br>CGATGT</td><td class="check_summary failed">0.27</td>',
+    '    </tr>',
+    '    <tr id="rpt_key:18000:2:888">',
+    '      <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp">NT578110W<br>phiX_for_spiked_buffers</span></div></td>',
+    '      <td class="id_run"><div class="rel_pos_container">18000<br>158</div></td>',
+    '      <td class="lane nbsp">2</td>',
+    '      <td class="tag_info"><a href="#18000:2:888">888</a><br>ACAACG</td>',
+    '      <td class="check_summary outcome_unknown">1.19</td>',
+    '    </tr>',
+    '    <tr id="rpt_key:18000:2:0">',
+    '      <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp"></span></div></td>',
+    '      <td class="id_run"><div class="rel_pos_container">18000<br>158</div></td>',
+    '      <td class="lane nbsp">2</td>',
+    '      <td class="tag_info"><a href="#18000:2:0">0</a> </td>',
+    '      <td class="check_summary outcome_unknown">0.82</td>',
+    '    </tr>',
+    '</table>'
+  ].join("\n");
+
   return {
     fixtures_seq_display:       fixtures_seq_display,
     fixtures_seq_mixed:         fixtures_seq_mixed,
-    fixtures_lib_mixed:         fixtures_lib_mixed
+    fixtures_lib_mixed:         fixtures_lib_mixed,
+    fixtures_lib_nothing_to_qc: fixtures_lib_nothing_to_qc
   };
 });
 
