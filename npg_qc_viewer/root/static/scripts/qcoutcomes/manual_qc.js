@@ -400,7 +400,7 @@ define([
           self.lane_control.append(radio.asObject());
         }
         self.addMQCFormat();
-        self.lane_control.append($("<span class='lane_mqc_button lane_mqc_save' title='Save current outcome as final (can not be changed again)'><img src='" +
+        self.lane_control.append($("<span class='lane_mqc_button lane_mqc_save' title='Save current outcome as final (cannot be changed again)'><img src='" +
             self.abstractConfiguration.getRoot() +
             "/images/padlock.png'></span>"));
         self.lane_control.children('.lane_mqc_save').off("click").on("click", function() {
