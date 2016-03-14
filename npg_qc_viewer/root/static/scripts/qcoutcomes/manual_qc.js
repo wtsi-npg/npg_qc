@@ -94,11 +94,13 @@ define([
             throw 'Library outcomes cannot be undefined.';
           }
           prevOutcomes = qcOutcomes.lib;
-          // Cut process if lane is already final
-          if ( !qc_utils.seqFinal(qcOutcomes.seq) ) {
+          // Cut process if lane is already final or there is nothing to qc
+          if ( !qc_utils.seqFinal(qcOutcomes.seq) || $('.lane_mqc_control').length === 0 ) {
             return;
           }
 
+          $("#results_summary .lane").first()
+                                     .append('<span class="library_mqc_overall_controls"></span>');
           var overallControls = new NPG.QC.UI.MQCLibraryOverallControls(prodConfiguration);
           $('.lane').each(function (index, element){
             var $element = $(element);
