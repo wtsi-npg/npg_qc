@@ -171,11 +171,6 @@ with qw/npg_qc::Schema::Mqc::OutcomeDict/;
 
 our $VERSION = '0';
 
-sub is_final_undecided {
-  my $self = shift;
-  return $self->is_final_outcome && $self->is_undecided;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -192,11 +187,6 @@ Catalog for plex level library manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
-
-=head2 is_final_undecided
-
-  Utility method which checks the short description to decide if the outcome can
-  be considered final and undecided.
 
 =head1 DEPENDENCIES
 
@@ -230,7 +220,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL Genome Research Limited
+Copyright (C) 2016 GRL Genome Research Limited
 
 This file is part of NPG.
 

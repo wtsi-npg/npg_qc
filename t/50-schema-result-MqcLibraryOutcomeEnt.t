@@ -1,21 +1,19 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 6;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
 
-my $table = 'MqcLibraryOutcomeEnt';
+my $table      = 'MqcLibraryOutcomeEnt';
 my $hist_table = 'MqcLibraryOutcomeHist';
 
-#Test model mapping
 use_ok('npg_qc::Schema::Result::' . $table);
 
 my $schema = Moose::Meta::Class->create_anon_class(
-           roles => [qw/npg_testing::db/])
-           ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
+     roles => [qw/npg_testing::db/])
+     ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
 
-#Test insert
 subtest 'Test insert' => sub {
   plan tests => 9;
 
@@ -27,20 +25,21 @@ subtest 'Test insert' => sub {
     'username'       => 'user',
     'modified_by'    => 'user'};
 
-  my $object = $schema->resultset($table)->create($values);
-  isa_ok($object, 'npg_qc::Schema::Result::' . $table);
+  isa_ok($schema->resultset($table)->create($values),
+    'npg_qc::Schema::Result::' . $table);
 
   my $rs = $schema->resultset($table)->search({});
   is ($rs->count, 1, q[one row created in the table]);
-  $object = $rs->next;
+  my $object = $rs->next;
   is($object->tag_index, 1, 'tag_index is 1');
 
   delete $values->{'tag_index'};
-  $object = $schema->resultset($table)->create($values);
-  isa_ok($object, 'npg_qc::Schema::Result::' . $table);
+  isa_ok($schema->resultset($table)->create($values),
+    'npg_qc::Schema::Result::' . $table);
 
   $rs = $schema->resultset($table)->search({});
   is ($rs->count, 2, q[Two rows in the table]);
+
   $values = {
     'id_run'         => 2,
     'position'       => 10,
@@ -58,8 +57,6 @@ subtest 'Test insert' => sub {
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
   is($row->tag_index, undef, 'tag index inflated');
-
-  my $temp = $rs->search({'id_run' => 2})->next;
 };
 
 subtest 'Test insert with historic defined' => sub {
@@ -100,8 +97,9 @@ subtest 'Test insert with historic defined' => sub {
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after insert in entity]);
 };
 
-subtest 'Test insert with historic' => sub {
+subtest 'insert with historic' => sub {
   plan tests => 6;
+
   my $values = {
     'id_run'         => 20,
     'position'       => 3,
@@ -118,67 +116,24 @@ subtest 'Test insert with historic' => sub {
 
   my $rs = $schema->resultset($table);
   $rs->deflate_unique_key_components($values_for_search);
-
-  my $hist_object_rs = $schema->resultset($hist_table)->search($values_for_search);
-  is ($hist_object_rs->count, 0, q[no row matches in the historic table before insert in entity]);
+  is ($schema->resultset($hist_table)->search($values_for_search)->count, 0,
+    q[no row matches in the historic table before insert in entity]);
 
   my $object = $schema->resultset($table)->create($values);
-  isa_ok($object, 'npg_qc::Schema::Result::'.$table);
+  isa_ok ($object, 'npg_qc::Schema::Result::'.$table);
+  is ($object->tag_index, undef, q[tag_index inflated in entity]);
 
   $rs = $schema->resultset($table)->search({'id_run'=>20, 'position'=>3, 'id_mqc_outcome'=>1});
   is ($rs->count, 1, q[one row created in the entity table]);
 
-  $hist_object_rs = $schema->resultset($hist_table)->search($values_for_search);
-  is ($hist_object_rs->count, 1, q[one row matches in the historic table after insert in entity]);
-  is ($object->tag_index, undef, q[tag_index inflated in entity]);
+  my $hist_object_rs = $schema->resultset($hist_table)->search($values_for_search);
+  is ($hist_object_rs->count, 1,
+    q[one row matches in the historic table after insert in entity]);
   is ($hist_object_rs->next->tag_index, undef, q[tag_index inflated in historic]);
 };
 
-subtest 'Update to final' => sub {
-  plan tests => 9;
-
-  my $values = {
-    'id_run'         => 300,
-    'position'       => 1,
-    'tag_index'      => 1,
-    'id_mqc_outcome' => 1, #Accepted pre
-    'username'       => 'user',
-    'modified_by'    => 'user'
-  };
-  
-  my $username = 'someusername';
-  
-  my $object = $schema->resultset($table)->create($values);
-  ok ( $object->is_accepted && !$object->has_final_outcome,
-         'Entity has accepted not final.');
-  lives_ok { $object->update_to_final_outcome($username) }
-    'Can update as final outcome';
-  ok ( $object->is_accepted && $object->has_final_outcome,
-         'Entity has accepted final.');
-  
-  $values->{'tag_index'} = 2;
-  $values->{'id_mqc_outcome'} = 2; #Rejected pre
-  $object = $schema->resultset($table)->create($values);
-    ok ( $object->is_rejected && !$object->has_final_outcome,
-         'Entity has rejected not final.');
-  lives_ok { $object->update_to_final_outcome($username) }
-   'Can update as final outcome';
-  ok ( $object->is_rejected && $object->has_final_outcome, 
-         'Entity has rejected final.');
-  
-  $values->{'tag_index'} = 3;
-  $values->{'id_mqc_outcome'} = 5; #Undecided
-  $object = $schema->resultset($table)->create($values);
-  ok ( $object->is_undecided,
-         'Entity has undecided.');
-  lives_ok { $object->update_to_final_outcome($username) }
-    'Can update as final outcome';
-  ok ( $object->is_undecided && $object->has_final_outcome, 
-         'Entity has undecided final.');
-};
-
-subtest q[update on a new result] => sub {
-  plan tests => 47;
+subtest q[update] => sub {
+  plan tests => 53;
   
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
@@ -208,13 +163,13 @@ subtest q[update on a new result] => sub {
   $outcome = 'Accepted final';
  
   $new_row = $rs->new_result($args);
-  throws_ok { $new_row->update_nonfinal_outcome($outcome, 'dog', 'cat') }
-    qr /UNIQUE constraint failed: mqc_library_outcome_ent\.id_run, mqc_library_outcome_ent\.position, mqc_library_outcome_ent\.tag_index/,
+  throws_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
+    qr /UNIQUE constraint failed/,
     'error creating a record for existing entity';
 
   $args->{'position'} = 2;
   $new_row = $rs->new_result($args);
-  lives_ok { $new_row->update_nonfinal_outcome($outcome, 'dog', 'cat') }
+  lives_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
     'final outcome saved';
   ok ($new_row->in_storage, 'new object has been saved');
 
@@ -236,29 +191,20 @@ subtest q[update on a new result] => sub {
   }
 
   $new_row->delete();
-};
 
-subtest q[update final outcome] => sub {
-  plan tests => 6;
-
-  my $rs = $schema->resultset($table);
-
-  my $args = {'id_run' => 444, 'position' => 3, tag_index => 3};
-  my $new_row = $rs->new_result($args);
-  my $old_outcome = 'Accepted final';
-  lives_ok { $new_row->update_outcome($old_outcome, 'cat') }
+  $args = {'id_run' => 444, 'position' => 3, tag_index => 3};
+  $new_row = $rs->new_result($args);
+  $outcome = 'Accepted final';
+  lives_ok { $new_row->update_outcome($outcome, 'cat') }
     'final outcome saved';
-  ok ($new_row->in_storage, 'new object has been saved');
+  ok ($new_row->in_storage, 'outcome has been saved');
+  is ($new_row->mqc_outcome->short_desc, $outcome, 'final outcome');
 
-  my $outcome = 'Rejected final';
-  throws_ok { $new_row->update_nonfinal_outcome($outcome, 'cat') }
-    qr/Outcome is already final, cannot update/,
-    'cannot update final outcome';
-  is($new_row->mqc_outcome->short_desc, $old_outcome, 'old outcome');
-
+  $outcome = 'Rejected final';
   lives_ok { $new_row->update_outcome($outcome, 'cat') }
     'can update final outcome';
-  is($new_row->mqc_outcome->short_desc, $outcome, 'new outcome');
+  ok ($new_row->in_storage, 'outcome has been saved');
+  is ($new_row->mqc_outcome->short_desc, $outcome, 'new final outcome');
 
   $new_row->delete();
 };
