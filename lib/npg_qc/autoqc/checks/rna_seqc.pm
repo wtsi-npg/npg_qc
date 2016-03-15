@@ -7,6 +7,7 @@ use Carp;
 use npg::api::run;
 use Readonly;
 use DateTime;
+use IO::File;
 use npg_tracking::util::types;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -56,14 +57,26 @@ has '_ttype_gtf_column' => (is      => 'ro',
                             default => $RNASEQC_GTF_TTYPE_COL,
                             init_arg => undef,);
 
-
 has '_alignments_in_bam' => (is         => 'ro',
                              isa        => 'Maybe[Bool]',
                              lazy_build => 1,);
 
+#sub _build__alignments_in_bam {
+#    my ($self) = @_;
+#    return $self->lims->alignments_in_bam;
+#}
 sub _build__alignments_in_bam {
-    my ($self) = @_;
-    return $self->lims->alignments_in_bam;
+    my $self = shift;
+    my $aligned = 0;
+    my $command = $self->samtools_cmd . ' view -H ' . $self->_bam_file . ' |';
+    my $ph = IO::File->new($command) or croak qq[Cannot fork '$command', error $ERRNO];
+    while (my $line = <$ph>) {
+        if (!$aligned && $line =~ /^\@SQ/smx) {
+            $aligned = 1;
+        }
+    }
+    $ph->close();
+    return $aligned;
 }
 
 has '_library_type' => (is         => 'ro',
