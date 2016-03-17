@@ -22,10 +22,6 @@ our $VERSION = '0';
 
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $RNASEQC_JAR_NAME       => q[RNA-SeQC.jar];
-Readonly::Scalar my $RNASEQC_GTF_TTYPE_COL  => 2;
-Readonly::Scalar my $JAVA_MAX_HEAP_SIZE     => q[4000m];
-Readonly::Scalar my $JAVA_GC_TYPE           => q[+UseSerialGC];
-Readonly::Scalar my $JAVA_USE_PERF_DATA     => q[-UsePerfData];
 Readonly::Scalar my $CHILD_ERROR_SHIFT      => 8;
 Readonly::Scalar my $MAX_READS              => 100;
 Readonly::Scalar my $PAIRED_FLAG            => 0x1;
@@ -33,21 +29,6 @@ Readonly::Scalar my $PAIRED_FLAG            => 0x1;
 has '+file_type' => (default => $EXT,);
 
 has '+aligner' => (default => q[fasta],);
-
-has '_java_max_heap_size'     => (is      => 'ro',
-                                  isa     => 'Str',
-                                  default => $JAVA_MAX_HEAP_SIZE,
-                                  init_arg => undef,);
-
-has '_java_gc_type'           => (is      => 'ro',
-                                  isa     => 'Str',
-                                  default => $JAVA_GC_TYPE,
-                                  init_arg => undef,);
-
-has '_java_use_perf_data'     => (is      => 'ro',
-                                  isa     => 'Str',
-                                  default => $JAVA_USE_PERF_DATA,
-                                  init_arg => undef,);
 
 has '_java_jar_path'          => (is      => 'ro',
                                   isa     => 'NpgCommonResolvedPathJarFile',
@@ -57,17 +38,12 @@ has '_java_jar_path'          => (is      => 'ro',
 
 has '_ttype_gtf_column' => (is      => 'ro',
                             isa     => 'Int',
-                            default => $RNASEQC_GTF_TTYPE_COL,
-                            init_arg => undef,);
+                            default => 2,);
 
 has '_alignments_in_bam' => (is         => 'ro',
                              isa        => 'Maybe[Bool]',
                              lazy_build => 1,);
 
-#sub _build__alignments_in_bam {
-#    my ($self) = @_;
-#    return $self->lims->alignments_in_bam;
-#}
 sub _build__alignments_in_bam {
     my $self = shift;
     my $aligned = 0;
@@ -122,10 +98,10 @@ has 'qc_out'     => (is         => 'ro',
                      isa        => 'NpgTrackingDirectory',
                      required   => 1,);
 
-has '_input_str' => (is => 'ro',
+has '_input_str' => (is         => 'ro',
                      isa        => 'Str',
                      lazy_build => 1,
-                     init_arg => undef,);
+                     init_arg   => undef,);
 
 sub _build__input_str {
     my ($self) = @_;
@@ -136,8 +112,8 @@ sub _build__input_str {
     return qq["$library_names[0]|$input_file|$sample_id"];
 }
 
-has '_reference_fasta' => (is => 'ro',
-                           isa => 'Maybe[Str]',
+has '_reference_fasta' => (is         => 'ro',
+                           isa        => 'Maybe[Str]',
                            lazy_build => 1,);
 
 sub _build__reference_fasta {
@@ -171,10 +147,7 @@ sub _command {
     if(!$self->_is_paired_end){
         $single_end_option=q[-singleEnd];
     }
-    my $command = $self->java_cmd. sprintf q[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
-                                           $self->_java_max_heap_size,
-                                           $self->_java_gc_type,
-                                           $self->_java_use_perf_data,
+    my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
                                            $self->_java_jar_path,
                                            $self->_input_str,
                                            $self->qc_out,
@@ -210,7 +183,6 @@ override 'can_run' => sub {
     if (! $can_run) {
         my $can_run_message = join q[; ], @comments;
         $self->result->add_comment($can_run_message);
-        carp qq[Skipping RNA-SeQC check because: $can_run_message];
     }
     return $can_run;
 };
