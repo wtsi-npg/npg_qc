@@ -9,6 +9,7 @@ use Readonly;
 use DateTime;
 use IO::File;
 use npg_tracking::util::types;
+use IO::File;
 
 extends qw(npg_qc::autoqc::checks::check);
 
@@ -26,6 +27,8 @@ Readonly::Scalar my $JAVA_MAX_HEAP_SIZE     => q[4000m];
 Readonly::Scalar my $JAVA_GC_TYPE           => q[+UseSerialGC];
 Readonly::Scalar my $JAVA_USE_PERF_DATA     => q[-UsePerfData];
 Readonly::Scalar my $CHILD_ERROR_SHIFT      => 8;
+Readonly::Scalar my $MAX_READS              => 100;
+Readonly::Scalar my $PAIRED_FLAG            => 0x1;
 
 has '+file_type' => (default => $EXT,);
 
@@ -77,6 +80,32 @@ sub _build__alignments_in_bam {
     }
     $ph->close();
     return $aligned;
+}
+
+has '_is_paired_end' => (is         => 'ro',
+                         isa        => 'Maybe[Bool]',
+                         lazy_build => 1,);
+
+sub _build__is_paired_end {
+    my ($self) = @_;
+    my $paired = 0;
+    my $flag;
+    my $num_reads = 0;
+    my $view_command = $self->samtools_irods_cmd. q[ view ]. $self->_bam_file. q[ 2>/dev/null | ];
+    my $ph = IO::File->new($view_command) or croak "Error viewing bam: $OS_ERROR\n";
+    while (my $line = <$ph>) {
+        my @read = split /\t/smx, $line;
+        $flag = $read[1];
+        if ($flag & $PAIRED_FLAG){
+            $paired = 1;
+        }
+        $num_reads += 1;
+        # if enough reads have been read and none is PAIRED
+        # assume it isn't and stop reading file
+        last if ($num_reads >= $MAX_READS || $paired);
+    }
+    $ph->close();
+    return $paired;
 }
 
 has '_library_type' => (is         => 'ro',
@@ -139,7 +168,7 @@ sub _build__annotation_gtf {
 sub _command {
     my ($self) = @_;
     my $single_end_option=q[];
-    if(!npg::api::run->new({id_run => $self->id_run})->is_paired_read()){
+    if(!$self->_is_paired_end){
         $single_end_option=q[-singleEnd];
     }
     my $command = $self->java_cmd. sprintf q[ -Xmx%s -XX:%s -XX:%s -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
