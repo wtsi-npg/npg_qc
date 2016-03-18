@@ -4,12 +4,10 @@ use Moose;
 use namespace::autoclean;
 use English qw( -no_match_vars );
 use Carp;
-use npg::api::run;
 use Readonly;
 use DateTime;
 use IO::File;
 use npg_tracking::util::types;
-use IO::File;
 
 extends qw(npg_qc::autoqc::checks::check);
 
@@ -84,14 +82,23 @@ sub _build__is_paired_end {
     return $paired;
 }
 
-has '_library_type' => (is         => 'ro',
-                        isa        => 'Maybe[Str]',
-                        lazy_build => 1,);
+has '_is_rna_alignment' => (is         => 'ro',
+                            isa        => 'Maybe[Bool]',
+                            lazy_build => 1,);
 
-sub _build__library_type {
+sub _build__is_rna_alignment {
     my ($self) = @_;
-    my $library_type = $self->lims->library_type // q[];
-    return $library_type;
+    my $rna_alignment = 0;
+    my $command = $self->samtools_cmd . ' view -H ' . $self->_bam_file . ' |';
+    my $ph = IO::File->new($command) or croak qq[Cannot fork '$command', error $ERRNO];
+    while (my $line = <$ph>) {
+        if (!$rna_alignment && $line =~ /^\@PG\s+.*tophat/ismx) {
+            $rna_alignment = 1;
+        }
+    }
+    $ph->close();
+    return $rna_alignment;
+
 }
 
 has 'qc_out'     => (is         => 'ro',
@@ -166,10 +173,8 @@ override 'can_run' => sub {
         push @comments, q[BAM file is not aligned];
         $can_run = 0;
     }
-    if ((! $self->_library_type ||
-           $self->_library_type !~ /(?:(?:m)?RNA|DAFT)/sxm) &&
-           $self->_library_type ne q[Pre-quality controlled]) {
-        push @comments, join q[ ], q[Library type is not RNA: ], $self->_library_type;
+    if (! $self->_is_rna_alignment) {
+        push @comments, q[BAM file is not RNA alignment];
         $can_run = 0;
     }
     if (! $self->_reference_fasta) {
@@ -259,11 +264,11 @@ the same names. The user must consider this when passing the value of qc_out.
 
 =item Carp
 
-=item npg::api::run
- 
 =item Readonly
 
 =item DateTime
+
+=item IO::File
 
 =item npg_qc::autoqc::checks::check
 
