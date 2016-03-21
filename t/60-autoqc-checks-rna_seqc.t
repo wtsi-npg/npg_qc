@@ -15,14 +15,10 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
 
 my $repos = getcwd . '/t/data/autoqc/rna_seqc';
 
-#my $phix_ref_dir = "$dir/references/PhiX/Illumina/all/fasta";
-#`mkdir -p $phix_ref_dir`;
-#`ln -s Illumina $dir/references/PhiX/default`;
-#my $phix_ref = "$phix_ref_dir/phix-illumina.fa";
-#`touch $phix_ref`;
-
-
 `touch $dir/RNA-SeQC.jar`;
+`touch $dir/samtools`;
+`touch $dir/samtools1`;
+
 
 {
     my $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
