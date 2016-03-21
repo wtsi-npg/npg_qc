@@ -1,115 +1,141 @@
 use strict;
 use warnings;
-use Cwd qw/getcwd/;
-use Test::More tests => 16;
+use Cwd qw/getcwd abs_path/;
+use Test::More tests => 17;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 
 use_ok ('npg_qc::autoqc::checks::rna_seqc');
 
 my $dir = tempdir( CLEANUP => 1 );
-`touch $dir/RNA-SeQC.jar`;
 
-my $repos = getcwd . '/t/data/autoqc';
-
-local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc];
+local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc/rna_seqc];
+local $ENV{CLASSPATH} = $dir;
 local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
 
+my $repos = getcwd . '/t/data/autoqc/rna_seqc';
+
+#my $phix_ref_dir = "$dir/references/PhiX/Illumina/all/fasta";
+#`mkdir -p $phix_ref_dir`;
+#`ln -s Illumina $dir/references/PhiX/default`;
+#my $phix_ref = "$phix_ref_dir/phix-illumina.fa";
+#`touch $phix_ref`;
+
+
+`touch $dir/RNA-SeQC.jar`;
+
 {
-  local $ENV{CLASSPATH} = $dir;
-
-  my $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
-    id_run => 2,
-    path => q[mypath],
-    position => 1,
-    repository => $repos,
-    qc_out => q[t/data]);
-
-  isa_ok ($rnaseqc, 'npg_qc::autoqc::checks::rna_seqc');
-  lives_ok { $rnaseqc->result; } 'result object created';
-
-  local $ENV{CLASSPATH} = q[];
-
-  throws_ok {npg_qc::autoqc::checks::rna_seqc->new(id_run => 2, path => q[mypath], position => 1, qc_out => q[t/data])}
-         qr/Can\'t find \'RNA-SeQC\.jar\' because CLASSPATH is not set/,
-         q[Fails to create object when RNA-SeQC.jar not found];
+    my $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 3,
+        tag_index => 8,
+        path => q[mypath],
+        repository => $repos,
+        qc_out => q[t/data],);
+    isa_ok ($rnaseqc, 'npg_qc::autoqc::checks::rna_seqc');
+    lives_ok { $rnaseqc->result; } 'result object created';
+    local $ENV{CLASSPATH} = q[];
+    throws_ok {npg_qc::autoqc::checks::rna_seqc->new(id_run => 2, path => q[mypath], position => 1, qc_out => q[t/data])}
+        qr/Can\'t find \'RNA-SeQC\.jar\' because CLASSPATH is not set/,
+        q[Fails to create object when RNA-SeQC.jar not found];
 }
 
 {
-  local $ENV{CLASSPATH} = $dir;
-  my $qc = npg_qc::autoqc::checks::rna_seqc->new(
-    position => 2,
-    path => 'nonexisting',
-    id_run => 2549,
-    repository => $repos,
-    qc_out => q[t/data],);
-  throws_ok {$qc->execute()} qr/directory nonexisting does not exist/, 'execute: error on nonexisting path';
+    my $qc = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 3,
+        tag_index => 8,
+        path => q[nonexisting],
+        repository => $repos,
+        qc_out => q[t/data],);
+    throws_ok {$qc->execute()} qr/directory nonexisting does not exist/, 'execute: error on nonexisting path';
 }
 
 {
-  local $ENV{CLASSPATH} = $dir;
-  my $check = npg_qc::autoqc::checks::rna_seqc->new(
-    path => 't/data/autoqc/rna_seqc/data',
-    position => 4,
-    id_run => 17550,
-    tag_index => 13,
-    repository => $repos,
-    qc_out => q[t/data],
-    _reference_fasta => q[a_reference.fasta],);
-  lives_ok { $check->execute } 'no error when input not found';
+    my $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 3,
+        tag_index => 13,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,
+        qc_out => q[t/data],);
+    lives_ok { $check->execute } 'no error when input not found';
 }
 
 {
-  local $ENV{CLASSPATH} = $dir;
-  my $check = npg_qc::autoqc::checks::rna_seqc->new(
-    path => 't/data/autoqc/090721_IL29_2549/data',
-    position => 2,
-    id_run => 2549,
-    repository => $repos,
-    qc_out => q[t/data],
-    _alignments_in_bam => 0,
-    _reference_fasta => q[a_reference.fasta],
-    _annotation_gtf => q[an_annotation_file.gtf],);
-  is($check->_bam_file, 't/data/autoqc/090721_IL29_2549/data/2549_2.bam', 'bam file path for id run 2549 lane 2');
-  lives_ok { $check->execute } 'execution ok for no alignments in BAM';
-  like ($check->result->comments, qr/BAM file is not aligned/, 'comment when bam file is not aligned');
+    my $ref_repos_dir = join q[/],$dir,'references';
+    my $ref_dir = join q[/], $ref_repos_dir,'Mus_musculus','GRCm38','all';
+    `mkdir -p $ref_dir/fasta`;
+    `touch $ref_dir/fasta/Mus_musculus.GRCm38.68.dna.toplevel.fa`;
+    my $trans_repos_dir = join q[/],$dir,'transcriptomes';
+    my $trans_dir = join q[/], $trans_repos_dir,'Mus_musculus','ensembl_75_transcriptome','GRCm38';
+    `mkdir -p $trans_dir/gtf`;
+    `touch $trans_dir/gtf/ensembl_75_transcriptome-GRCm38.gtf`;
+    `mkdir -p $trans_dir/RNA-SeQC`;
+    `touch $trans_dir/RNA-SeQC/ensembl_75_transcriptome-GRCm38.gtf`;    
 
-  $check = npg_qc::autoqc::checks::rna_seqc->new(
-    path => 't/data/autoqc/090721_IL29_2549/data',
-    position => 2,
-    id_run => 2549,
-    repository => $repos,
-    qc_out => q[t/data],
-    _reference_fasta => q[a_reference.fasta],
-    _annotation_gtf => q[an_annotation_file.gtf],
-     _library_type => q[not_rna_library],);
-  lives_ok { $check->execute } 'execution ok for not RNA library type';
-  like ($check->result->comments, qr/Library type is not RNA.*/, 'comment when library type is not RNA');
+    my $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 3,
+        tag_index => 8,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,
+        ref_repository => $ref_repos_dir,
+        transcriptome_repository => $trans_repos_dir,
+        _alignments_in_bam => 0,
+        qc_out => q[t/data],);
+    is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_3#8.bam', 'bam file path for id run 17550 lane 3 tag 8');
+    lives_ok { $check->execute } 'execution ok for no alignments in BAM';
+    like ($check->result->comments, qr/BAM file is not aligned/, 'comment when bam file is not aligned');
 
-  $check = npg_qc::autoqc::checks::rna_seqc->new(
-    path => 't/data/autoqc/rna_seqc/data',
-    position => 3,
-    id_run => 17550,
-    tag_index => 8,
-    repository => $repos,
-    qc_out => q[t/data],
-    _reference_fasta => q[],
-    _annotation_gtf => q[],);
-  is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_3#8.bam', 'bam file path for id run 17550 lane 3 tag 8');
-  lives_ok { $check->execute } 'execution ok for no reference genome';
-  like ($check->result->comments, qr/No reference genome available/, 'comment when reference genome does not exist');
+    $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 3,
+        tag_index => 0,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,
+        ref_repository => $ref_repos_dir,
+        transcriptome_repository => $trans_repos_dir,
+        qc_out => q[t/data],);
+    is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_3#0.bam', 'bam file path for id run 17550 lane 3 tag 0');
+    lives_ok { $check->execute } 'execution ok for no RNA alignment';
+    like ($check->result->comments, qr/BAM file is not RNA alignment/, 'comment when bam file is not RNA alignment');
 
-  $check = npg_qc::autoqc::checks::rna_seqc->new(
-    path => 't/data/autoqc/rna_seqc/data',
-    position => 3,
-    id_run => 17550,
-    tag_index => 8,
-    repository => $repos,
-    qc_out => q[t/data],
-    _annotation_gtf => q[],
-    _reference_fasta => q[],);
-  lives_ok { $check->execute } 'execution ok for no annotation file';
-  like ($check->result->comments, qr/No GTF annotation available/, 'comment when annotation file does not exist');
+    $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 1,
+        tag_index => 1,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,
+        qc_out => q[t/data],
+        ref_repository => $ref_repos_dir,
+        transcriptome_repository => $trans_repos_dir,);
+    throws_ok { $check->execute } qr/Binary fasta reference for Danio_rerio, zv9, all does not exist/,
+        'error message when reference genome does not exist';
+
+    $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 3,
+        tag_index => 8,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,
+        qc_out => q[t/data],
+        _reference_fasta => q[],
+        transcriptome_repository => $trans_repos_dir,);
+    lives_ok { $check->execute } 'execution ok for no reference genomefile';
+    like ($check->result->comments, qr/No reference genome available/, 'comment when reference genome file is not available');
+
+    $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 3,
+        tag_index => 8,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,
+        qc_out => q[t/data],
+        _annotation_gtf => q[],
+        ref_repository => $ref_repos_dir,);
+    lives_ok { $check->execute } 'execution ok for no annotation file';
+    like ($check->result->comments, qr/No GTF annotation available/, 'comment when annotation file is not available');
 }
 
 1;
