@@ -17,7 +17,6 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
 
 `touch $dir/RNA-SeQC.jar`;
 
-
 {
     my $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 17550,
@@ -66,7 +65,13 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
     `mkdir -p $trans_dir/gtf`;
     `touch $trans_dir/gtf/ensembl_75_transcriptome-GRCm38.gtf`;
     `mkdir -p $trans_dir/RNA-SeQC`;
-    `touch $trans_dir/RNA-SeQC/ensembl_75_transcriptome-GRCm38.gtf`;    
+    `touch $trans_dir/RNA-SeQC/ensembl_75_transcriptome-GRCm38.gtf`;
+
+    my $si = join q[/], $dir, q[samtools_irods];
+    open my $fh,  q[>], $si;
+    print $fh qq[cat $repos/data/17550_3#8.bam\n];
+    close $fh;
+    `chmod +x $si`;
 
     my $check = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 17550,
@@ -81,31 +86,6 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
     is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_3#8.bam', 'bam file path for id run 17550 lane 3 tag 8');
     lives_ok { $check->execute } 'execution ok for no alignments in BAM';
     like ($check->result->comments, qr/BAM file is not aligned/, 'comment when bam file is not aligned');
-
-    $check = npg_qc::autoqc::checks::rna_seqc->new(
-        id_run => 17550,
-        position => 3,
-        tag_index => 0,
-        path => 't/data/autoqc/rna_seqc/data',
-        repository => $repos,
-        ref_repository => $ref_repos_dir,
-        transcriptome_repository => $trans_repos_dir,
-        qc_out => q[t/data],);
-    is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_3#0.bam', 'bam file path for id run 17550 lane 3 tag 0');
-    lives_ok { $check->execute } 'execution ok for no RNA alignment';
-    like ($check->result->comments, qr/BAM file is not RNA alignment/, 'comment when bam file is not RNA alignment');
-
-    $check = npg_qc::autoqc::checks::rna_seqc->new(
-        id_run => 17550,
-        position => 1,
-        tag_index => 1,
-        path => 't/data/autoqc/rna_seqc/data',
-        repository => $repos,
-        qc_out => q[t/data],
-        ref_repository => $ref_repos_dir,
-        transcriptome_repository => $trans_repos_dir,);
-    throws_ok { $check->execute } qr/Binary fasta reference for Danio_rerio, zv9, all does not exist/,
-        'error message when reference genome does not exist';
 
     $check = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 17550,
@@ -130,6 +110,39 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         ref_repository => $ref_repos_dir,);
     lives_ok { $check->execute } 'execution ok for no annotation file';
     like ($check->result->comments, qr/No GTF annotation available/, 'comment when annotation file is not available');
+
+    open $fh,  q[>], $si;
+    print $fh qq[cat $repos/data/17550_1#1.bam\n];
+    close $fh;
+
+    $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 1,
+        tag_index => 1,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,
+        qc_out => q[t/data],
+        ref_repository => $ref_repos_dir,
+        transcriptome_repository => $trans_repos_dir,);
+    throws_ok { $check->execute } qr/Binary fasta reference for Danio_rerio, zv9, all does not exist/,
+        'error message when reference genome does not exist';
+
+    $ref_dir = join q[/], $ref_repos_dir,'Danio_rerio','zv9','all';
+    `mkdir -p $ref_dir/fasta`;
+    `touch $ref_dir/fasta/zv9_toplevel.fa`;
+
+    $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 1,
+        tag_index => 1,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,
+        ref_repository => $ref_repos_dir,
+        transcriptome_repository => $trans_repos_dir,
+        qc_out => q[t/data],);
+    is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_1#1.bam', 'bam file path for id run 17550 lane 1 tag 1');
+    lives_ok { $check->execute } 'execution ok for no RNA alignment';
+    like ($check->result->comments, qr/BAM file is not RNA alignment/, 'comment when bam file is not RNA alignment');
 }
 
 1;
