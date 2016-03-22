@@ -16,8 +16,6 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
 my $repos = getcwd . '/t/data/autoqc/rna_seqc';
 
 `touch $dir/RNA-SeQC.jar`;
-`touch $dir/samtools`;
-`touch $dir/samtools1`;
 
 
 {

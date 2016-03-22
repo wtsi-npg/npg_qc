@@ -45,7 +45,7 @@ has '_alignments_in_bam' => (is         => 'ro',
 sub _build__alignments_in_bam {
     my $self = shift;
     my $aligned = 0;
-    my $command = $self->samtools_cmd . ' view -H ' . $self->_bam_file . ' |';
+    my $command = $self->samtools_irods_cmd . ' view -H ' . $self->_bam_file . ' |';
     my $ph = IO::File->new($command) or croak qq[Cannot fork '$command', error $ERRNO];
     while (my $line = <$ph>) {
         if (!$aligned && $line =~ /^\@SQ/smx) {
@@ -89,7 +89,7 @@ has '_is_rna_alignment' => (is         => 'ro',
 sub _build__is_rna_alignment {
     my ($self) = @_;
     my $rna_alignment = 0;
-    my $command = $self->samtools_cmd . ' view -H ' . $self->_bam_file . ' |';
+    my $command = $self->samtools_irods_cmd . ' view -H ' . $self->_bam_file . ' |';
     my $ph = IO::File->new($command) or croak qq[Cannot fork '$command', error $ERRNO];
     while (my $line = <$ph>) {
         if (!$rna_alignment && $line =~ /^\@PG\s+.*tophat/ismx) {
