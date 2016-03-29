@@ -22,6 +22,13 @@ Target file level release flag
   #. The initial value will be true if either manual qc is pass or a charge is made.
   #. A GUI will be provided to update (overwrite) the value.
 
+==============================
+Items from existing RT tickets
+==============================
+#. VerifyBamId highlighting RT#488816
+#. Display number of times a library has been sequenced
+#. Return of the collapser RT#517381
+
 =============================
 Other discussed topics (2015)
 =============================
