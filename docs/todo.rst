@@ -1,5 +1,5 @@
 ===========================
-#Items from Year 2015 List
+Items from Year 2015 List
 ===========================
 
 #. Grunt configuration for tasks
@@ -11,12 +11,13 @@
 Items from Plex-level Manual QC Document (2015)
 ===============================================
 
-#. Indication of Charge in Manual QC
+Indication of Charge in Manual QC
   #. An interface (GUI widgets) for making alternative charge suggestions will be displayed once a final decision for a lane is registered.
   #. By default a pass means a charge and a fail means no charge.
   #. The additional interface only has to be used if alternative charge decisions have to be communicated.
   #. The charge decisions will be stored in the QC database (maintained by NPG). Currently there is no mechanism to communicate these decisions. The SeqQC display will give indication of the charge decision
-#. Target file level release flag
+
+Target file level release flag
   #. Release flags will be provided per target file.
   #. The initial value will be true if either manual qc is pass or a charge is made.
   #. A GUI will be provided to update (overwrite) the value.
