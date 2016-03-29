@@ -3,7 +3,7 @@ Items from Year 2015 List
 ===========================
 
 #. Grunt configuration for tasks
-#. Use minified javascript files with random names - will force teh browser to fetch newly released javascript
+#. Use minified javascript files with random names - will force the browser to fetch newly released javascript
 #. Deal with failed but should be charged scenario
 #. It's currently not immediately obvious if data has been subject to a split but important if say human split has been incorrectly selected for a mouse study (or not selected for a pathogen study contaminated with human). Could be determined just using the flagstats file names.
 
@@ -34,6 +34,12 @@ Other discussed topics (2015)
 =============================
 #. Auto-suggests
 #. RNA autoqc suite
+
+==============================================
+Selected items from git project issues (2016)
+==============================================
+#. SeqQC - Create a light weight controller to provide data for what is qc-able in a page. It should work using the same/similar queries to those used for reporting current manual QC outcomes. Query the controller to take decisions about when to generate manual qc widgets in client side. (#319)
+#. SeqQC run page: display lib qc stats (num_passed:num_undef:num_failed) for a lane (#281)
 
 
 
