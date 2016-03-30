@@ -32,8 +32,12 @@ Items from existing RT tickets
 =============================
 Other discussed topics (2015)
 =============================
-#. Auto-suggests
+#. Auto-suggests (aiming towards implementation of auto pass/fail in at least some cases - SMT re-requested 2016).
 #. RNA autoqc suite
+#. Display samtools stats plots, especially indel per cycle plots.
+#. 'Library' complete - library plex data ready to merge (or merged data ready to be picked up by downstream analysts). Requires further clarification/discussion.
+#. Fix usage of numbers with and without QC fail reads from flagstats files - for bam_flagstats. To allow correct display of %mapped on QC pages (requires GCLP approval).
+#. Ref match - only show top 10 or 20 matches by default, but allow access to full report.
 
 ==============================================
 Selected items from git project issues (2016)
