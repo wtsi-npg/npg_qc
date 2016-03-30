@@ -167,43 +167,38 @@ sub _command {
 
 override 'can_run' => sub {
     my $self = shift;
-    my $can_run = 1;
-    my @comments;
-    if(! $self->_alignments_in_bam) {
-        push @comments, q[BAM file is not aligned];
-        $can_run = 0;
-    }
-    if (! $self->_is_rna_alignment) {
-        push @comments, q[BAM file is not RNA alignment];
-        $can_run = 0;
-    }
-    if (! $self->_reference_fasta) {
-        push @comments, q[No reference genome available];
-        $can_run = 0;
-    }
     if (! $self->_annotation_gtf) {
-        push @comments, q[No GTF annotation available];
-        $can_run = 0;
+        $self->result->add_comment(q[No GTF annotation available]);
+        return 0;
     }
-    if (! $can_run) {
-        my $can_run_message = join q[; ], @comments;
-        $self->result->add_comment($can_run_message);
-    }
-    return $can_run;
+    return 1;
 };
 
 override 'execute' => sub {
     my ($self) = @_;
+    my @comments;
+    my $can_execute = 1;
     if (super() == 0) {
     	return 1;
     }
-    if ($self->messages->count) {
-        $self->result->add_comment(join q[ ], $self->messages->messages);
-    }
-    if (!$self->can_run()) {
-    	return 1;
-    }
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
+    if (! $self->_reference_fasta) {
+        push @comments, q[No reference genome available];
+        $can_execute = 0;
+    }
+    if(! $self->_alignments_in_bam) {
+        push @comments, q[BAM file is not aligned];
+        $can_execute = 0;
+    }
+    if (! $self->_is_rna_alignment) {
+        push @comments, q[BAM file is not RNA alignment];
+        $can_execute = 0;
+    }
+    if (! $can_execute || ! $self->can_run()) {
+        my $can_run_message = join q[; ], @comments;
+        $self->result->add_comment($can_run_message);
+        return 1;
+    }
     my $command = $self->_command();
     $self->result->set_info('Command', $command);
     carp qq[EXECUTING $command time ]. DateTime->now();
