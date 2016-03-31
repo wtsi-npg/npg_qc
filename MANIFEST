@@ -696,17 +696,8 @@ t/data/autoqc/rendered/json_single_run/3612_7.qX_yield.json
 t/data/autoqc/rendered/json_single_run/3612_8.insert_size.json
 t/data/autoqc/rendered/json_single_run/3612_8.qX_yield.json
 t/data/autoqc/rna_seqc/data/17550_1#1.bam
-t/data/autoqc/rna_seqc/data/17550_3#0.bam
 t/data/autoqc/rna_seqc/data/17550_3#8.bam
-t/data/autoqc/rna_seqc/npg/run/17550.xml
 t/data/autoqc/rna_seqc/samplesheet_17550.csv
-t/data/autoqc/rna_seqc/st/batches/41065.xml
-t/data/autoqc/rna_seqc/st/samples/2363868.xml
-t/data/autoqc/rna_seqc/st/samples/2377275.xml
-t/data/autoqc/rna_seqc/st/samples/2377276.xml
-t/data/autoqc/rna_seqc/st/samples/2377282.xml
-t/data/autoqc/rna_seqc/st/studies/3291.xml
-t/data/autoqc/rna_seqc/st/studies/3749.xml
 t/data/autoqc/sequence_error/6376_1_1.fastq.10000
 t/data/autoqc/st/batches/3432.xml
 t/data/autoqc/st/samples/3057.xml

@@ -6,10 +6,12 @@ use Test::Exception;
 use File::Temp qw/ tempdir /;
 
 use_ok ('npg_qc::autoqc::checks::rna_seqc');
+$ENV{no_proxy} = '';
+$ENV{http_proxy} = 'http://wibble.do';
 
 my $dir = tempdir( CLEANUP => 1 );
 
-local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc/rna_seqc];
+local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/rna_seqc/samplesheet_17550.csv];
 local $ENV{CLASSPATH} = $dir;
 local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
 

@@ -203,8 +203,8 @@ override 'execute' => sub {
     $self->result->set_info('Command', $command);
     carp qq[EXECUTING $command time ]. DateTime->now();
     if (system $command) {
-        my $error =  printf "Child %s exited with value %d\n", $command, $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
-        carp "Failed to execute $command";
+        my $error = $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
+        croak sprintf "Child %s exited with value %d\n", $command, $error;
     }
     return 1;
 };
