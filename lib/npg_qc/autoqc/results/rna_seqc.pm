@@ -7,7 +7,6 @@ package npg_qc::autoqc::results::rna_seqc;
 
 use Moose;
 use namespace::autoclean;
-use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 
@@ -43,11 +42,7 @@ __END__
 
 =item namespace::autoclean
 
-=item Readonly
-
 =item npg_qc::autoqc::results::result
-
-=item npg_qc::autoqc::role::rna_seqc 
 
 =back
 
@@ -57,7 +52,7 @@ __END__
 
 =head1 AUTHOR
 
-Author: Ruben E Bautista-Garcia<lt>rb11@sanger.ac.uk<gt>
+Ruben E Bautista-Garcia<lt>rb11@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
