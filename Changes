@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 61.0
  - using test matrix with node 4.4.2 and 0.12.9 for travis
  - help page for manual qc
  - redesign of both client and server side for generic qc outcome updates
