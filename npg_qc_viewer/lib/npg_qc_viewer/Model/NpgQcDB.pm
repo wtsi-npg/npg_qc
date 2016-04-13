@@ -13,15 +13,6 @@ __PACKAGE__->config(
   connect_info => [], #a fall-back position if connect_info is not defined in the config file
 );
 
-sub is_final_outcome {
-  my ($self, $outcome) = @_;
-  if (!$outcome) {
-    croak 'Outcome missing';
-  }
-  my $row = $self->resultset('MqcOutcomeDict')->search({short_desc => $outcome})->next;
-  return $row && $row->is_final_outcome;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -38,11 +29,6 @@ npg_qc_viewer::Model::NpgQcDB
 A model for the NPG QC database DBIx schema
 
 =head1 SUBROUTINES/METHODS
-
-=head2 is_final_outcome
-
- Given a short description of the lane manual qc outcome returns true if the
- outcome is valid and final, false otherwise.
 
 =head1 DIAGNOSTICS
 
@@ -74,7 +60,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2016 Genome Research Ltd.
 
 This file is part of NPG software.
 

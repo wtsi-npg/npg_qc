@@ -10,6 +10,10 @@ language: perl
 perl:
   - "5.16"
 
+env:
+  - TRAVIS_NODE_VERSION="0.12.9"
+  - TRAVIS_NODE_VERSION="4.4.2"
+
 before_install:
  - ./.travis/before_install.sh
 install:

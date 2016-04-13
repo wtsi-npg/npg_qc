@@ -117,6 +117,20 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_mqc_library_outcome');
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<unique_lib_outcome_desc>
+
+=over 4
+
+=item * L</short_desc>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint('unique_lib_outcome_desc', ['short_desc']);
+
 =head1 RELATIONS
 
 =head2 mqc_library_outcome_ents
@@ -150,17 +164,12 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CoqhznB0+X8oK27t33skvw
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-02-25 12:46:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:K2wdLTvUj3m+tBcWJf9HlQ
 
 with qw/npg_qc::Schema::Mqc::OutcomeDict/;
 
 our $VERSION = '0';
-
-sub is_final_undecided {
-  my $self = shift;
-  return $self->is_final_outcome && $self->is_undecided;
-}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -178,11 +187,6 @@ Catalog for plex level library manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
-
-=head2 is_final_undecided
-
-  Utility method which checks the short description to decide if the outcome can
-  be considered final and undecided.
 
 =head1 DEPENDENCIES
 
@@ -216,7 +220,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL Genome Research Limited
+Copyright (C) 2016 GRL Genome Research Limited
 
 This file is part of NPG.
 

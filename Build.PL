@@ -177,7 +177,6 @@ my $extended_build_requires = {
 };
 
 my $extended_requires = {
-                'Array::Compare'                  => 0,
                 'autodie'                         => '2.10',
                 'Class::Load'                     => '0',
                 'Class::Std'                      => '0.0.8',

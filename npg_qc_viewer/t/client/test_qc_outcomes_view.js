@@ -6,7 +6,7 @@ require.config({
   },
 });
 
-require(['scripts/qc_outcomes_view', 'scripts/qc_css_styles'],
+require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_styles'],
   function(mqc_outcomes, qc_css_styles) {
     QUnit.test('Parsing RPT keys', function (assert) {
       var rptKeys = mqc_outcomes._parseRptKeys('results_summary');
