@@ -67,7 +67,7 @@ $qc_schema->resultset('TagMetrics')->create({
   $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results for run 4025 (run 4025 status: qc complete)]);
   $mech->content_contains('Back to Run 4025');
-  $mech->content_contains(152);  # num cycles
+  $mech->content_contains("<br />152</div>");  # num cycles
   $mech->content_contains('NT28560W'); #library name
   $mech->content_contains('run 4025 lane 1'); #side menu link
   $mech->content_contains('Run annotations');
@@ -119,7 +119,7 @@ subtest 'Run 4025 Lane 1' => sub {
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
   $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results (lanes) for runs 4025 lanes 1 (run 4025 status: qc in progress, taken by mg8)]);
-  $mech->content_contains(152);  # num cycles
+  $mech->content_contains("<br />152</div>");  # num cycles
   $mech->content_contains('NT28560W'); #library name
   $mech->content_lacks('NA18623pd2a 1');
   $mech->content_contains('run 4025 lane 1'); #side menu link
@@ -140,7 +140,7 @@ subtest 'Library links for run + lane SE' => sub {
 
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
   $mech->get_ok($url);
-  $mech->content_contains(152);  # num cycles
+  $mech->content_contains("<br />152</div>");  # num cycles
   $mech->content_contains('NT28560W'); #library name
   $mech->content_contains('assets/111111'); #SE link
   $mech->content_contains('libraries?id=NT28560W'); #seqqc link for library
@@ -230,7 +230,7 @@ subtest 'Library links lane Clarity' => sub {
 
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
   $mech->get_ok($url);
-  $mech->content_contains(152);  # num cycles
+  $mech->content_contains("<br />152</div>");  # num cycles
   $mech->content_contains('NT28560W'); #library name
   $mech->content_contains('search?scope=Container&query=NT28560W'); #link to Clarity LIMs
 };
@@ -246,7 +246,7 @@ subtest 'Page title for run + show all' =>  sub {
   my $url = q[http://localhost/checks/runs?run=4025&show=plexes];
   $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results (plexes) for runs 4025]);
-  $mech->content_lacks(152);  # num cycles
+  $mech->content_lacks("<br />152</div>");  # num cycles
   $mech->content_lacks('NT28560W'); #library name
 }
 
