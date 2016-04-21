@@ -45,6 +45,11 @@ Selected items from git project issues (2016)
 #. SeqQC - Create a light weight controller to provide data for what is qc-able in a page. It should work using the same/similar queries to those used for reporting current manual QC outcomes. Query the controller to take decisions about when to generate manual qc widgets in client side. (#319)
 #. SeqQC run page: display lib qc stats (num_passed:num_undef:num_failed) for a lane (#281)
 
+=========================================
+ISSUES TO CONSIDER WHEN PLANNING A CHANGE
+=========================================
+#. The API used to change the qc outcomes manually does not validate lib outcomes against lane outcomes, making any combinations possible. The GUI interface that is used during the qc process imposes some constraints, see https://github.com/wtsi-npg/npg_qc/blob/devel/lib/npg_qc/mqc/outcomes.pm. This discrepancy reflects current business needs. The behaviour of the API should not be changed inadvertendly.
+
 
 
 
