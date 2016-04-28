@@ -11,8 +11,11 @@ perl:
   - "5.16"
 
 env:
-  - TRAVIS_NODE_VERSION="0.12.9"
-  - TRAVIS_NODE_VERSION="4.4.2"
+  global:
+    - DNAP_UTILITIES_VERSION="0.5.1"
+  matrix:
+    - TRAVIS_NODE_VERSION="0.12.9"
+    - TRAVIS_NODE_VERSION="4.4.2"
 
 before_install:
  - ./.travis/before_install.sh

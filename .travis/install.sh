@@ -16,15 +16,15 @@ cpanm --notest --reinstall App::cpanminus
 cpanm --quiet --notest --reinstall ExtUtils::ParseXS
 cpanm --quiet --notest --reinstall MooseX::Role::Parameterized
 cpanm --quiet --notest Alien::Tidyp
+cpanm --no-lwp --notest https://github.com/wtsi-npg/perl-dnap-utilities/releases/download/${DNAP_UTILITIES_VERSION}/WTSI-DNAP-Utilities-${DNAP_UTILITIES_VERSION}.tar.gz
 
 # WTSI NPG Perl repo dependencies
 cd /tmp
-git clone --branch devel --depth 1 https://github.com/wtsi-npg/perl-dnap-utilities.git perl-dnap-utilities.git
 git clone --branch devel --depth 1 https://github.com/wtsi-npg/ml_warehouse.git ml_warehouse.git
 git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_tracking.git npg_tracking.git
 git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_seq_common.git npg_seq_common.git
 
-repos="/tmp/perl-dnap-utilities.git /tmp/ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git"
+repos="/tmp/ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git"
 
 for repo in $repos
 do
