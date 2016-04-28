@@ -25,7 +25,7 @@ Target file level release flag
 ==============================
 Items from existing RT tickets
 ==============================
-#. VerifyBamId highlighting RT#488816
+#. VerifyBamId highlighting RT#480016
 #. Display number of times a library has been sequenced
 #. Return of the collapser RT#517381
 
