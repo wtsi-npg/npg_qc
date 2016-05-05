@@ -54,6 +54,7 @@ root/src/ui_checks/split_stats.tt2
 root/src/ui_checks/tag_decode_stats.tt2
 root/src/ui_checks/tag_metrics.tt2
 root/src/ui_lanes/checks_header.tt2
+root/src/ui_lanes/collapse_menu.tt2
 root/src/ui_lanes/lane.tt2
 root/src/ui_lanes/library_lanes.tt2
 root/src/ui_runs/annotations.tt2
@@ -71,6 +72,8 @@ root/static/images/about_qc/plex_all_pass.png
 root/static/images/about_qc/plex_ind_fail.png
 root/static/images/about_qc/plex_ind_pass.png
 root/static/images/about_qc/plex_overall.png
+root/static/images/blue_collapse.png
+root/static/images/blue_expand.png
 root/static/images/circle.png
 root/static/images/btn_120x50_built.png
 root/static/images/btn_120x50_built_shadow.png
@@ -89,6 +92,7 @@ root/static/images/to_children.png
 root/static/images/waiting.gif
 root/static/images/save.png
 root/static/images/padlock.png
+root/static/scripts/collapse.js
 root/static/scripts/format_for_csv.js
 root/static/scripts/main.js
 root/static/scripts/modify_on_view.js

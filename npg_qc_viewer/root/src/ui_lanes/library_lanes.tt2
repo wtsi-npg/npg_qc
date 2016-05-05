@@ -63,6 +63,7 @@
   <ul>
     <li><a href='#' id='summary_to_csv' title='Download the summary table as a CSV file'>Summary to CSV file</a></li>
   </ul>
+  [% PROCESS ui_lanes/collapse_menu.tt2 -%]
 </div>
 </div>
 

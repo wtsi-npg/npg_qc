@@ -1,4 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
+ - SeqQC
+   - Reintroduce collapser
 
 release 61.1
  - SeqQC
