@@ -1,0 +1,22 @@
+{
+  "name":     "npg_qc_viewer",
+  "version":  "61.0.0",
+  "homepage": "https://github.com/wtsi-npg/npg_qc",
+  "license":  "GPL-3.0+",
+  "private":  true,
+  "repository": {
+    "type": "git",
+    "url":  "https://github.com/wtsi-npg/npg_qc.git"
+  },
+  "devDependencies" : {
+    "grunt":                 "1.0.1",
+    "grunt-cli":             "1.2.0",
+    "load-grunt-tasks":      "3.5.0",
+    "grunt-contrib-watch":   "1.0.0",
+    "grunt-contrib-jshint":  "1.0.0",
+    "grunt-contrib-qunit":   "1.2.0",
+    "grunt-jsonlint":        "1.0.7",
+    "grunt-jscs":            "2.8.0"
+  }
+}
+

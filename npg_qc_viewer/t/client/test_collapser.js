@@ -21,15 +21,8 @@ requirejs([
     var insertSizeTitle  = '#insert_size_title';
     var referenceTitle   = '#reference_title';
 
-    var collapserClass  = 'collapser';
-    var collapserOpen   = 'collapser_open';
-    var collapserClosed = 'collapser_closed';
-
     var adapterContent    = '#adapter_content';
     var insertSizeContent = '#insert_size_content';
-
-    var allCollapsible      = [ runTitle, adapterTitle, insertSizeTitle ];
-    var allCollapsibleNames = [ 'run title', 'check 1', 'check 2'];
 
     var allChecksContent = [ adapterContent, insertSizeContent ];
 
@@ -109,7 +102,6 @@ requirejs([
 
       var allVisible = [ runTitle, allResults, referenceTitle, adapterTitle,
                          insertSizeTitle ];
-      var allOpen    = [ runTitle, adapterTitle, insertSizeTitle ];
 
       $.each( allVisible, function( index, value ) {
         assert.ok( isVisible(value), 'Expected visible' );
@@ -119,12 +111,12 @@ requirejs([
       $(insertSizeTitle).trigger('click'); // To collapse
 
       assert.ok( !isVisible(adapterContent), 'Expected check 1 content not visible' );
-      assert.ok( !isVisible(insertSizeContent), 'Check 2 content is not visible')
+      assert.ok( !isVisible(insertSizeContent), 'Check 2 content is not visible');
 
       $(adapterTitle).trigger('click'); // To expand
 
       assert.ok( isVisible(adapterContent), 'Expected check 1 content is visible' );
-      assert.ok( !isVisible(insertSizeContent), 'Check 2 content is not visible')
+      assert.ok( !isVisible(insertSizeContent), 'Check 2 content is not visible');
     });
 
     QUnit.test('Calling collapse/expand all', function( assert ) {

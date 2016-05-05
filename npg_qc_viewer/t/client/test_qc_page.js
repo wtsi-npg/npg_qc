@@ -1,14 +1,16 @@
-/* globals $: false, require: false, QUnit: false, document: false */
+/* globals $, requirejs, QUnit, document */
 "use strict";
-require.config({
+requirejs.config({
   baseUrl: '../../root/static',
   paths: {
-    jquery: 'bower_components/jquery/dist/jquery',
-  },
+    'qunit': 'bower_components/qunit/qunit/qunit',
+    jquery:  'bower_components/jquery/dist/jquery'
+  }
 });
 
-require(['scripts/qcoutcomes/qc_page'],
+requirejs(['scripts/qcoutcomes/qc_page'],
   function(qc_page) {
+    QUnit.config.autostart = false;
 
     QUnit.test("Parsing run lane", function (assert) {
       assert.throws(function() {qc_page._parseRunLane();}, /Error: Invalid arguments/, "Validates non-empty arguments");

@@ -1,0 +1,18 @@
+{
+  "undef"  : true,
+  "unused" : true,
+  "strict" : true,
+  "bitwise": true,
+  "freeze" : true,
+  "funcscope" : true,
+  "futurehostile" : true,
+  "iterator" : true,
+  "nocomma" : true,
+  "curly"  : true,
+  "eqnull" : true,
+  "latedef": true,
+  "newcap" : true,
+  "noarg"  : true,
+  "node"   : true
+}
+

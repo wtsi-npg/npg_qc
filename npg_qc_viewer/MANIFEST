@@ -25,9 +25,13 @@ lib/npg_qc_viewer.pm
 lib/npg_qc_viewer/View/TT.pm
 bower.json
 .bowerrc
+.jscsrc
+.jshintrc
+Gruntfile.js
 MANIFEST
 npg_qc_viewer.conf
 npg_qc_viewer.psgi
+package.json
 README
 root/favicon.ico
 root/src/about_qc_checks.tt2
