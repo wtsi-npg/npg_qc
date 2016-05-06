@@ -15,7 +15,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOC');
       if (which('node') and which('bower')) {
         warn "Checking/fetching javascript dependencies\n";
       
-        my $result = system 'bower install';
+        my $result = system 'bower install --force-latest';
         if ($result) {
           die 'Fail to install bower javascript dependencies';
         }
