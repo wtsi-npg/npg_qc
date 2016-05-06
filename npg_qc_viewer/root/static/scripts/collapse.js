@@ -39,21 +39,23 @@
 define(['jquery'], function() {
   return {
     init: function() {
-      // Register all collapsers as closed ones
-      $('.collapser').addClass('collapser_open');
+      var collapsers = $('.collapser');
+      // Register all collapsers as open ones
+      collapsers.addClass('collapser_open');
 
       // Describe toggle behaviour of collapsers
-      $('.collapser').click(function() {
+      collapsers.click(function() {
         var self = $(this);
-        if(self.hasClass("collapser_closed")) {
-          self.removeClass("collapser_closed")
-              .addClass("collapser_open")
-              .next("div").slideDown('fast');
+        if(self.hasClass('collapser_closed')) {
+          self.removeClass('collapser_closed')
+              .addClass('collapser_open');
         } else {
-          self.removeClass("collapser_open")
-              .addClass("collapser_closed")
-              .next("div").slideUp('fast');
+          self.removeClass('collapser_open')
+              .addClass('collapser_closed');
         }
+
+        //Toggle next <div> (all results) and <h4> (references, for lanes)
+        self.nextAll('div,h4').toggle(0);
         return false;
       });
 
