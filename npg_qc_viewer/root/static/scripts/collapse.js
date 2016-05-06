@@ -33,101 +33,98 @@
 * Loading is performed by an AJAX call, so 'same origin' policy applies.
 */
 
-define(['jquery'],function(jQuery) {
-return {
-init: function() {
-    // Register all collapsers as closed ones 
-    jQuery(".collapser").addClass("collapser_open");
+/* globals $, define */
 
-    // describe toggle behaviour of collapsers
-    jQuery(".collapser").click(function(){
-	    if(jQuery(this).hasClass("collapser_closed")) {
-		jQuery(this).removeClass("collapser_closed");
-		jQuery(this).addClass("collapser_open");
-		jQuery(this).next("div").slideDown('fast');
-	    } else {
-		jQuery(this).removeClass("collapser_open");
-		jQuery(this).addClass("collapser_closed");
-		jQuery(this).next("div").slideUp('fast');
-	    }
-	    return false;
-	});
+"use strict";
+define(['jquery'], function() {
+  return {
+    init: function() {
+      // Register all collapsers as closed ones
+      $('.collapser').addClass('collapser_open');
 
-    // manipulate LANE appearance
-    //collapse all lanes
-    jQuery("#collapse_all_lanes").click(function(){
-	    //	    jQuery(this).hide()
-		//		jQuery("#expand_all_lanes").show()
-		jQuery("div.results_full_lane > h3.collapser_open").click();
-		//		jQuery(".results_full_lane_body").slideUp('fast')
-		return false;
-	});
+      // Describe toggle behaviour of collapsers
+      $('.collapser').click(function() {
+        var self = $(this);
+        if(self.hasClass("collapser_closed")) {
+          self.removeClass("collapser_closed")
+              .addClass("collapser_open")
+              .next("div").slideDown('fast');
+        } else {
+          self.removeClass("collapser_open")
+              .addClass("collapser_closed")
+              .next("div").slideUp('fast');
+        }
+        return false;
+      });
+
+      /* Manipulate LANE appearance */
+      //Collapse all lanes
+      $('#collapse_all_lanes').click(function() {
+        $('div.results_full_lane > h3.collapser_open').click();
+        return false;
+      });
     
-    //expand all lanes
-    jQuery("#expand_all_lanes").click(function(){
-	    //	    jQuery(this).hide()
-	    //		jQuery("#collapse_all_lanes").show()
-		//		jQuery(".results_full_lane_body").slideDown('fast')
-		jQuery("div.results_full_lane > h3.collapser_closed").click()
-		return false;
-	});
+      //Expand all lanes
+      $('#expand_all_lanes').click(function(){
+        $('div.results_full_lane > h3.collapser_closed').click();
+        return false;
+      });
 
-    // manipulate TEST RESULT appearance
-    //expand all results
-    jQuery("#expand_all_results").click(function(){
-	    jQuery("div.result_full > h2.collapser_closed").click();
-	    return false;
-	});
+      /* Manipulate TEST RESULT appearance */
+      //Expand all results
+      $('#expand_all_results').click(function(){
+        $('div.result_full > h2.collapser_closed').click();
+        return false;
+      });
 
-    //collapse all results
-    jQuery("#collapse_all_results").click(function(){
-	    jQuery("div.result_full > h2.collapser_open").click();
-	    return false;
-	});
+      //Collapse all results
+      $('#collapse_all_results').click(function(){
+        $('div.result_full > h2.collapser_open').click();
+        return false;
+      });
 
-	// collapse h2
-	jQuery('.collapse_h2').click(function(){
-		jQuery("h2.collapser_open:contains(" + $(this).data('section') + ")").click();
-		return false;
-	});
+      //Collapse h2
+      $('.collapse_h2').click(function(){
+        $('h2.collapser_open:contains(' + $(this).data('section') + ')').click();
+        return false;
+      });
 
-	// expand h2
-	jQuery('.expand_h2').click(function(){
-		jQuery("h2.collapser_closed:contains(" + $(this).data('section') + ")").click();
-		return false;
-	});
+      //Expand h2
+      $('.expand_h2').click(function(){
+        $('h2.collapser_closed:contains(' + $(this).data('section') + ')').click();
+        return false;
+      });
 
-	// collapse h3
-	jQuery('.collapse_h3').click(function(){
-		jQuery("h3.collapser_open:contains(" + $(this).data('section') + ")").click();
-		return false;
-	});
+      //Collapse h3
+      $('.collapse_h3').click(function(){
+        $('h3.collapser_open:contains(' + $(this).data('section') + ')').click();
+        return false;
+      });
 
-	// expand h3
-	jQuery('.expand_h3').click(function(){
-		jQuery("h3.collapser_closed:contains(" + $(this).data('section') + ")").click();
-		return false;
-	});
+      //Expand h3
+      $('.expand_h3').click(function(){
+        $('h3.collapser_closed:contains(' + $(this).data('section') + ')').click();
+        return false;
+      });
 
-	// collapse phix
-	jQuery('#collapse_phix').click(function(){
-		jQuery("h3.collapser_open:contains('#168')").click();
-		jQuery("h2.collapser_open:contains('phix')").click();
-		return false;
-	});
+      //Collapse phix
+      $('#collapse_phix').click(function(){
+        $("h3.collapser_open:contains('#168')").click();
+        $("h2.collapser_open:contains('phix')").click();
+        return false;
+      });
 
-	// expand phix
-	jQuery('#expand_phix').click(function(){
-		jQuery("h3.collapser_closed:contains('#168')").click();
-		jQuery("h2.collapser_closed:contains('phix')").click();
-		return false;
-	});
+      //Expand phix
+      $('#expand_phix').click(function(){
+        $("h3.collapser_closed:contains('#168')").click();
+        $("h2.collapser_closed:contains('phix')").click();
+        return false;
+      });
 
-    // Since javascript is active we can collapse sections and reveal the menu
-    jQuery("#collapse_menu").show();
-},
-
-}
+      //Since javascript is active we can collapse sections and reveal the menu
+      $('#collapse_menu').show();
+    },
+  };
 });
 
 
