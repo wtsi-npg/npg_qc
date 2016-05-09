@@ -111,14 +111,12 @@ define(['jquery'], function() {
 
       //Collapse phix
       $('#collapse_phix').click(function(){
-        $("h3.collapser_open:contains('#168')").click();
         $("h2.collapser_open:contains('phix')").click();
         return false;
       });
 
       //Expand phix
       $('#expand_phix').click(function(){
-        $("h3.collapser_closed:contains('#168')").click();
         $("h2.collapser_closed:contains('phix')").click();
         return false;
       });
