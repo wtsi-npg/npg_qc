@@ -96,9 +96,9 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,
         qc_out => q[t/data],
-        _reference_fasta => q[],
+        _ref_genome => q[],
         transcriptome_repository => $trans_repos_dir,);
-    lives_ok { $check->execute } 'execution ok for no reference genomefile';
+    lives_ok { $check->execute } 'execution ok for no reference genome file';
     like ($check->result->comments, qr/No reference genome available/, 'comment when reference genome file is not available');
 
     $check = npg_qc::autoqc::checks::rna_seqc->new(

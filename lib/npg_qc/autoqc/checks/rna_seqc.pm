@@ -19,14 +19,18 @@ with qw(npg_tracking::data::reference::find
 our $VERSION = '0';
 
 Readonly::Scalar our $EXT => q[bam];
-Readonly::Scalar my $RNASEQC_JAR_NAME       => q[RNA-SeQC.jar];
-Readonly::Scalar my $CHILD_ERROR_SHIFT      => 8;
-Readonly::Scalar my $MAX_READS              => 100;
-Readonly::Scalar my $PAIRED_FLAG            => 0x1;
+Readonly::Scalar my $RNASEQC_JAR_NAME  => q[RNA-SeQC.jar];
+Readonly::Scalar my $CHILD_ERROR_SHIFT => 8;
+Readonly::Scalar my $MAX_READS         => 100;
+Readonly::Scalar my $PAIRED_FLAG       => 0x1;
+Readonly::Scalar my $RRNA_ALIGNER      => q[bwa];
+Readonly::Scalar my $RRNA_STRAIN       => q[default_rRNA];
 
 has '+file_type' => (default => $EXT,);
 
-has '+aligner' => (default => q[fasta],);
+has '+aligner' => (default => 'fasta',
+                   is => 'ro',
+                   writer => '_set_aligner',);
 
 has '_java_jar_path'          => (is      => 'ro',
                                   isa     => 'NpgCommonResolvedPathJarFile',
@@ -68,6 +72,7 @@ sub _build__is_paired_end {
     my $view_command = $self->samtools_irods_cmd. q[ view ]. $self->_bam_file. q[ 2>/dev/null | ];
     my $ph = IO::File->new($view_command) or croak "Error viewing bam: $OS_ERROR\n";
     while (my $line = <$ph>) {
+        next if $line =~ /^\@/ismx;
         my @read = split /\t/smx, $line;
         $flag = $read[1];
         if ($flag & $PAIRED_FLAG){
@@ -119,11 +124,11 @@ sub _build__input_str {
     return qq["$library_names[0]|$input_file|$sample_id"];
 }
 
-has '_reference_fasta' => (is         => 'ro',
-                           isa        => 'Maybe[Str]',
-                           lazy_build => 1,);
+has '_ref_genome' => (is         => 'ro',
+                      isa        => 'Maybe[Str]',
+                      lazy_build => 1,);
 
-sub _build__reference_fasta {
+sub _build__ref_genome {
     my ($self) = @_;
     my $reference_fasta = $self->refs->[0] // q[];
     return $reference_fasta;
@@ -148,20 +153,38 @@ sub _build__annotation_gtf {
     return $trans_gtf;
 }
 
+has '_ref_rrna' => (is         => 'ro',
+                    isa        => 'Maybe[Str]',
+                    lazy_build => 1,);
+
+sub _build__ref_rrna {
+    my $self = shift;
+    my ($organism, $strain, $transcriptome) = $self->parse_reference_genome($self->lims->reference_genome);
+    $self->_set_aligner($RRNA_ALIGNER);
+    $self->_set_strain($RRNA_STRAIN);
+    $self->_set_species($organism);
+    my $ref_rrna = $self->refs->[0] // q[];
+    return $ref_rrna;
+}
+
 sub _command {
     my ($self) = @_;
-    my $single_end_option=q[];
+    my ($ref_rrna_option, $single_end_option) = q[];
     if(!$self->_is_paired_end){
-        $single_end_option=q[-singleEnd];
+        $single_end_option = q[-singleEnd];
     }
-    my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s],
+    if($self->_ref_rrna){
+        $ref_rrna_option = q[-BWArRNA ]. $self->_ref_rrna;
+    }
+    my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
                                            $self->_java_jar_path,
                                            $self->_input_str,
                                            $self->qc_out,
-                                           $self->_reference_fasta,
+                                           $self->_ref_genome,
                                            $self->_annotation_gtf,
                                            $self->_ttype_gtf_column,
-                                           $single_end_option;
+                                           $single_end_option,
+                                           $ref_rrna_option;
     return $command;
 }
 
@@ -182,7 +205,7 @@ override 'execute' => sub {
     	return 1;
     }
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
-    if (! $self->_reference_fasta) {
+    if (! $self->_ref_genome) {
         push @comments, q[No reference genome available];
         $can_execute = 0;
     }
