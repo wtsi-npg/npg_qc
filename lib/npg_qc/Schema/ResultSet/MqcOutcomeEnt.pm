@@ -30,32 +30,6 @@ sub get_ready_to_report {
   return $rs;
 }
 
-sub get_outcomes_as_hash {
-  my ($self, $id_run) = @_;
-
-  my $previous_mqc = {};
-  my $previous_rs = $self->search({'id_run'=>$id_run});
-  while (my $obj = $previous_rs->next) {
-    $previous_mqc->{$obj->position} = $obj->mqc_outcome->short_desc;
-  }
-  return $previous_mqc;
-}
-
-sub search_outcome_ent {
-  my ( $self, $id_run, $position, $username ) = @_;
-  my $ent;
-  my $values = {};
-  $values->{'id_run'}   = $id_run;
-  $values->{'position'} = $position;
-  $ent = $self->search($values)->next;
-  if (!$ent) {
-    $values->{'username'}    = $username;
-    $values->{'modified_by'} = $username;
-    $ent = $self->new_result($values);
-  }
-  return $ent;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -69,7 +43,7 @@ npg_qc::Schema::ResultSet::MqcOutcomeEnt
 
 =head1 DESCRIPTION
 
-  Extended ResultSet for MqcOutcomeEnt with specific functionality for manual QC.
+  Extended ResultSet for MqcOutcomeEnt.
 
 =head1 DIAGNOSTICS
 
@@ -87,15 +61,6 @@ npg_qc::Schema::ResultSet::MqcOutcomeEnt
 
   Returns a resultset representing rows which are ready to be reported,
   ie have a final status but haven't been reported yet.
-
-=head2 get_outcomes_as_hash
-
-  Returns a hash of lane=>outcome for those lanes in the database for the id_run specified.
-
-=head2 search_outcome_ent
-
-  Find previous mqc outcome for the id_run/position, create
-  it for the specified user if it does not exist.
 
 =head1 DEPENDENCIES
 
@@ -121,7 +86,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL Genome Research Limited
+Copyright (C) 2016 GRL Genome Research Limited
 
 This file is part of NPG.
 

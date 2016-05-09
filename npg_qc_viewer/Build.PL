@@ -15,7 +15,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOC');
       if (which('node') and which('bower')) {
         warn "Checking/fetching javascript dependencies\n";
       
-        my $result = system 'bower install';
+        my $result = system 'bower install --force-latest';
         if ($result) {
           die 'Fail to install bower javascript dependencies';
         }
@@ -117,7 +117,6 @@ my $builder = $class->new(
    'build_requires'    => {
         'npg_tracking::util::build'                     => '0',
         'Catalyst::Test'                                => '0',
-        'Catalyst::Authentication::Credential::Testing' => '0',
         'DateTime'                                      => '0',
         'File::Temp'                                    => '0',
         'File::Spec'                                    => '0',

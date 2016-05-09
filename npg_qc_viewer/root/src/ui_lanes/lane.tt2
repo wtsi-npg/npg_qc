@@ -3,20 +3,6 @@
 
     lane_class = 'lane';
     plex_class = 'tag_info';
-    IF row_info_to.manual_qc.defined;
-      IF row_info_to.manual_qc;
-        lane_class = lane_class _ ' passed';
-      ELSE;
-        lane_class = lane_class _ ' failed';
-      END;
-    END;
-    IF row_info_to.lib_manual_qc.defined;
-      IF row_info_to.lib_manual_qc;
-        plex_class = plex_class _ ' passed';
-      ELSE;
-        plex_class = plex_class _ ' failed';
-      END;
-    END;
 -%]
 
 <td class="[% lane_class %] nbsp">
@@ -29,14 +15,9 @@
 [%- position -%]
 [%- IF have_link %]
    </a>
-   [%- IF !run_view; -%]
-     <span class='library_mqc_overall_controls'></span>
-   [%- END; -%]
 [% END -%]
-[%- IF run_view; -%]
-<span id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'></span>
-[%- ELSIF id_run.defined && position.defined -%]
-&nbsp;<span id=mqc_library[%id_run%]_[%position%]_[% tag_index %] data-id_run='[% id_run %]' data-position='[% position %]' data-tag_index='[% tag_index %]' class='lane_mqc_control'></span>
+[%- IF row_info_to.instance_qc_able; -%]
+<span class='lane_mqc_control'></span>
 [% END -%]
 </td>
 [%- IF has_plexes -%]

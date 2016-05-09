@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More tests => 6;
 use Test::Exception;
 use Test::WWW::Mechanize::Catalyst;
