@@ -1,7 +1,7 @@
 /*
 * Author:        Nadeem Faruque
 *
-* Copyright (C) 2014 Genome Research Ltd.
+* Copyright (C) 2016 Genome Research Ltd.
 *
 * This file is part of NPG software.
 *
