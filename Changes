@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC
+   - Using --force-latest for bower install deps during Build
+
 release 61.0
  - using test matrix with node 4.4.2 and 0.12.9 for travis
  - help page for manual qc
