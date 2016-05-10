@@ -16,7 +16,7 @@ our $VERSION = '0';
 Readonly::Scalar my $VERIFY_NAME => q[verifyBamID];
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $MIN_SNPS => 10**4;
-Readonly::Scalar my $MIN_AVG_DEPTH => 4;
+Readonly::Scalar my $MIN_AVG_DEPTH => 2;
 Readonly::Scalar my $MIN_FREEMIX => 0.05;
 
 has '+file_type' => (default => $EXT,);
@@ -183,7 +183,7 @@ npg_qc::autoqc::checks::verify_bam_id - compare genotype from bam with Sequenom 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 
