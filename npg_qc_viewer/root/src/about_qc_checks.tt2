@@ -142,7 +142,7 @@ Any close genotype matches found under a different sample name, allowing homozyg
 <h3>VerifyBamID contamination check</h3>
 <br/><br/>
 <h4>Description</h4>
-VerifyBamID provides metrics which can be be informative in helping to 
+VerifyBamID provides metrics which can be informative in helping to 
 determine whether a sample has possibly been subject to within-species 
 DNA contamination from an unrelated individual.
 <br/>
