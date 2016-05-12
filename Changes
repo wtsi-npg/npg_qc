@@ -3,6 +3,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - SeqQC:
    - Reintroduce collapser
    - using grunt/npm to automate js testing
+ - VerifyBAMId changed condition MIN_AVG_DEPTH from > 4 to > 2 for fail
 
 release 61.1
  - SeqQC
