@@ -289,6 +289,7 @@ my $requires = {
                 'Digest::SHA1'                    => '0.0',
                 'English'                         => '1.02',
                 'MIME::Base64'                    => 0,
+                'perl'                            => '5.14.0',
                 'POSIX'                           => '1.09',
                 'Readonly'                        => '1.03',
                 'Readonly::XS'                    => 0,
