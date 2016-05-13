@@ -143,6 +143,7 @@ t/80-app-run-stash.t
 t/80-app-run.t
 t/80-app-sample.t
 t/80-app.t
+t/client/run_js_tests.sh
 t/client/test.html
 t/client/test.js
 t/client/test_collapser.html
