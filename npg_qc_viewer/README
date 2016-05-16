@@ -7,6 +7,9 @@ Testing
   ./Build
   TEST_AUTHOR=1 ./Build test
 
+Using npm:
+  npm test
+
 Using grunt:
   grunt -v
 
