@@ -14,6 +14,7 @@ Headless javascript testing:
   node-qunit-phantomjs t/client/test_qc_outcomes_view.html --verbose
   node-qunit-phantomjs t/client/test_qc_page.html --verbose
   node-qunit-phantomjs t/client/test_qc_utils.html --verbose
+  node-qunit-phantomjs t/client/test_collapser.html --verbose
 
 In browser javascript testing - open files in a browser window:
   t/client/test.html
@@ -22,6 +23,7 @@ In browser javascript testing - open files in a browser window:
   t/client/test_qc_outcomes_view.html
   t/client/test_qc_page.html
   t/client/test_qc_utils.html
+  t/client/test_collapser.html
 
 Running your own development server
 -----------------------------------

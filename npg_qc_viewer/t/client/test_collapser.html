@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
+
+  <title>QUnit Test Suite</title>
+  <link rel="stylesheet" href="../../root/static/bower_components/qunit/qunit/qunit.css" type="text/css" media="screen" />
+  <script src="../../root/static/bower_components/qunit/qunit/qunit.js" type="text/javascript">
+</script>
+  <script type="text/javascript">
+//<![CDATA[
+  QUnit.config.autostart = false;
+  //]]>
+  </script>
+</head>
+
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture">
+    <div class="results_full_lane" id="all_results">
+      <h3 class="collapser" id="run_title">run 20000 lane 1 | NT000000T <a name="20000:1"></a></h3>
+
+      <h4 id="reference_title">Reference: Homo_sapiens (1000Genomes_hs37d5)</h4>
+
+      <div class="results_full_lane_contents">
+        <div class="result_full">
+          <h2 class="collapser adapter" id="adapter_title">run 20000 lane 1, adapter</h2>
+          <div class="result_full_content" id="adapter_content">
+            <div style="clear:both;" class="data_table">
+              <table title="adapter check results">
+                <tbody>
+                  <tr>
+                    <th class="laligned">read</th>
+                    <td>forward</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="data_table">
+              <table title="Contamination for each adapter">
+                <tbody>
+                  <tr>
+                    <th>adapter name</th>
+                  </tr>
+                  <tr>
+                    <td>forward</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="result_full">
+          <h2 class="collapser insert size" id="insert_size_title">run 20000 lane 1, insert size:passed</h2>
+          <div class="result_full_content">
+            <div class="data_table">
+              <table title="insert size check results" id="insert_size_content">
+                <tbody>
+                  <tr>
+                    <th class="laligned">pass criterion</th>
+                    <td>The value of the third quartile is larger than the lower boundary of the expected size</td>
+                  </tr>
+                  <tr>
+                    <th class="laligned">binary reference path</th>
+                    <td>path</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="../../root/static/bower_components/requirejs/require.js" type="text/javascript"></script>
+<script src="test_collapser.js" type="text/javascript"></script>
+</body>
+</html>
