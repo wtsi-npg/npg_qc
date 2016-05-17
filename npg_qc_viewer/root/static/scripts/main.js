@@ -44,8 +44,8 @@ requirejs([
   qc_page,
   NPG
 ) {
-  //Setup for heatmaps to load on demand.
   $(document).ready(function(){
+    //Setup for heatmaps to load on demand.
     $("img").unveil(2000);
     collapse.init();
     var qcp = qc_page.pageForMQC();
