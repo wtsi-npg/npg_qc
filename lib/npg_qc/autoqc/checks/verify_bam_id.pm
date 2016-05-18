@@ -92,6 +92,9 @@ override 'execute' => sub {
 
   $self->result->set_info('Verifier', $VERIFY_NAME);
   $self->result->set_info('Verify_options', $cmd_options);
+  $self->result->set_info('Criterion', 'snps > ' . $MIN_SNPS .
+                                       ', average depth >= ' . $MIN_AVG_DEPTH .
+                                       ' and freemix < ' . $MIN_FREEMIX);
   my $cmd = "$VERIFY_NAME $cmd_options";
 
   if(!$self->can_run()) {

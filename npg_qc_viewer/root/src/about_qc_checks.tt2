@@ -201,9 +201,9 @@ included in the estimate, then further investigation into the
 possibility of contamination is recommended.
 <br/>
 
-Results will be coloured red where the estimates of FREEMIX are greater 
-than or equal to 0.05, average depth is greater than or equal to 2 and 
-the number of sites is greater than or equal to 10,000.
+Results will be coloured red where the estimates of FREEMIX are greater
+than or equal to 0.05, average depth is greater than or equal to 2 and
+the number of sites is greater than 10,000.
 
 <br/><br/>
 
