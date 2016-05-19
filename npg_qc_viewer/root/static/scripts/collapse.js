@@ -1,5 +1,5 @@
 /*
-* Author:        Nadeem Faruque
+* Author: Jaime Tovar <jmtc@sanger.ac.uk>
 *
 * Copyright (C) 2016 Genome Research Ltd.
 *
@@ -27,12 +27,6 @@
 *
 ************************************************************************************/
 
-/*
-* Dynamically synchronously loads a script, which will be cached by a browser.
-* Returns true if loading was successful, otherwise returns false.
-* Loading is performed by an AJAX call, so 'same origin' policy applies.
-*/
-
 /* globals $, define */
 
 "use strict";
@@ -49,6 +43,8 @@ define(['jquery'], function() {
         if(self.hasClass('collapser_closed')) {
           self.removeClass('collapser_closed')
               .addClass('collapser_open');
+          window.scrollBy(0, 1);
+          window.scrollBy(0, -1);
         } else {
           self.removeClass('collapser_open')
               .addClass('collapser_closed');
@@ -65,7 +61,7 @@ define(['jquery'], function() {
         $('div.results_full_lane > h3.collapser_open').click();
         return false;
       });
-    
+
       //Expand all lanes
       $('#expand_all_lanes').click(function(){
         $('div.results_full_lane > h3.collapser_closed').click();
@@ -109,22 +105,8 @@ define(['jquery'], function() {
         return false;
       });
 
-      //Collapse phix
-      $('#collapse_phix').click(function(){
-        $("h2.collapser_open:contains('phix')").click();
-        return false;
-      });
-
-      //Expand phix
-      $('#expand_phix').click(function(){
-        $("h2.collapser_closed:contains('phix')").click();
-        return false;
-      });
-
       //Since javascript is active we can collapse sections and reveal the menu
       $('#collapse_menu').show();
     },
   };
 });
-
-

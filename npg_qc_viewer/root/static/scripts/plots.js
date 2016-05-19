@@ -35,7 +35,7 @@ define([
     }
     obj.find('.bcviz_adapter').each(function () {
       var self = $(this);
-      if ( self.children().length === 0 ) {
+      if ( self.is(':visible') && self.children().length === 0 ) {
         var parent = self.parent();
         var d = $.extend( true, {}, self.data('check') ),
             h = self.data('height') || 200,
@@ -65,7 +65,7 @@ define([
     }
     obj.find('.bcviz_mismatch').each(function () {
       var self = $(this);
-      if ( self.children().length === 0 ) {
+      if ( self.is(':visible') && self.children().length === 0 ) {
         var parent = self.parent();
         var d = $.extend( true, {}, self.data('check') ),
             h = self.data('height'),
@@ -101,7 +101,7 @@ define([
     }
     obj.find('.bcviz_insert_size').each(function () {
       var self = $(this);
-      if ( self.children().length === 0 ) {
+      if ( self.is(':visible') && self.children().length === 0 ) {
         var parent = self.parent();
         var d = $.extend( true, {}, self.data('check') ),
             w = self.data('width') || 650,
