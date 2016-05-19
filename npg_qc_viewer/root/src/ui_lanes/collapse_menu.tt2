@@ -4,21 +4,19 @@
 <li><a id="collapse_all_results" href="#" class="collapse_icon">-</a>
     <a id="expand_all_results" href="#" class="collapse_icon">+</a>
     <b>all results</b></li>
-<li><a id="collapse_phix" href="#" class="collapse_icon">-</a>
-    <a id="expand_phix" href="#" class="collapse_icon">+</a>
-    <i>phiX</i></li>
-
-[%- FOREACH check_name IN checks_list -%]
-  [%- IF (check_name != "contamination" && check_name != "sequence mismatch phix" && check_name != "bam flagstats phix" && check_name != "spatial filter") %]
-    [%- label_name = check_name; IF check_name == "sequence mismatch"; label_name='seq. mismatch'; ELSIF check_name == "alignment filter metrics"; label_name='alignment filter'; END;%]
+[%- collapser_sections = checks_list.slice(0);
+    collapser_sections.push(heatmap_check_name); -%]
+[%- FOREACH check_name IN collapser_sections -%]
+  [%- IF (check_name != "spatial filter") %]
+    [%- label_name = check_name;
+        IF check_name == "sequence mismatch"; label_name='seq. mismatch';
+        ELSIF check_name == "alignment filter metrics"; label_name='alignment filter';
+        ELSIF check_name == heatmap_check_name; label_name='heatmap';
+        END;%]
     <li><a href="#" data-section='[% check_name %]' class="collapse_h2 collapse_icon">-</a>
         <a href="#" data-section='[% check_name %]' class="expand_h2 collapse_icon">+</a>
         [% label_name %]</li>
   [%- END -%]
 [%- END -%]
-<li>
-    <a href='#' data-section='[% heatmap_check_name %]' class='collapse_h2 collapse_icon'>-</a>
-    <a href='#' data-section='[% heatmap_check_name %]' class='expand_h2 collapse_icon'>+</a>
-    heatmap</li>
 </ul>
 </div>
