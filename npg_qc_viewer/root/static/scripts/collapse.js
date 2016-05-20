@@ -126,9 +126,13 @@ define(['jquery'], function() {
       $('.collapse_h2').click(function(){
         event.preventDefault();
         event.stopPropagation();
-        $('h2.collapser_open:contains(' + $(this).data('section') + ')')
-                                                 .each(function(index, obj) {
-          _toggleCollapseStatus(obj);
+
+        // Regular expression to filter sections, considers pass/fail
+        var pattern = new RegExp($(this).data('section') + '(:\\w+)?$');
+        $('h2.collapser_open').each(function(index, obj) {
+          if( pattern.test($(obj).text().trim()) ) {
+            _toggleCollapseStatus(obj);
+          }
         });
         _callAfterCollapseToggle();
       });
@@ -137,9 +141,13 @@ define(['jquery'], function() {
       $('.expand_h2').click(function(){
         event.preventDefault();
         event.stopPropagation();
-        $('h2.collapser_closed:contains(' + $(this).data('section') + ')')
-                                                   .each(function(index, obj) {
-          _toggleCollapseStatus(obj);
+
+        // Regular expression to filter sections, considers pass/fail
+        var pattern = new RegExp($(this).data('section') + '(:\\w+)?$');
+        $('h2.collapser_closed').each(function(index, obj) {
+          if( pattern.test($(obj).text().trim()) ) {
+            _toggleCollapseStatus(obj);
+          }
         });
         _callAfterCollapseToggle();
       });
@@ -148,8 +156,7 @@ define(['jquery'], function() {
       $('.collapse_h3').click(function(){
         event.preventDefault();
         event.stopPropagation();
-        $('h3.collapser_open:contains(' + $(this).data('section') + ')')
-                                                 .each(function(index, obj) {
+        $('h3.collapser_open').each(function(index, obj) {
           _toggleCollapseStatus(obj);
         });
         _callAfterCollapseToggle();
@@ -159,8 +166,7 @@ define(['jquery'], function() {
       $('.expand_h3').click(function(){
         event.preventDefault();
         event.stopPropagation();
-        $('h3.collapser_closed:contains(' + $(this).data('section') + ')')
-                                                   .each(function(index,obj) {
+        $('h3.collapser_closed').each(function(index,obj) {
           _toggleCollapseStatus(obj);
         });
         _callAfterCollapseToggle();
