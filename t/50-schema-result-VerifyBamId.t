@@ -97,7 +97,7 @@ qq {
 subtest 'Result with criterion in json' => sub {
   plan tests => 5;
 
-  my $temp_criterion = q[snps > 10000, average depth >= 2 and freemix < 0.05];
+  my $temp_criterion = q[snps > 10000, average depth >= 4 and freemix < 0.05];
 
   my $json_with_criterion =
 qq {
