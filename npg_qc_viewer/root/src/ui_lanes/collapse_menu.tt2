@@ -4,7 +4,7 @@
 <li><a id="collapse_all_results" href="#" class="collapse_icon">-</a>
     <a id="expand_all_results" href="#" class="collapse_icon">+</a>
     <b>all results</b></li>
-[%- collapser_sections = checks_list.slice(0);
+[%- collapser_sections = checks_info.list;
     collapser_sections.push(heatmap_check_name); -%]
 [%- FOREACH check_name IN collapser_sections -%]
   [%- IF (check_name != "spatial filter") %]

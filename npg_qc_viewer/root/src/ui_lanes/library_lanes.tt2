@@ -4,7 +4,7 @@
 
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
-  checks_info = collection_all.check_names;
+  checks_info = collection_all.check_names; # used in collapser menu template too
 
   tag_metrics_cache = {};
   temp = [];
