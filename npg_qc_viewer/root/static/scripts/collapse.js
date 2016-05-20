@@ -25,6 +25,18 @@
 *
 * Dependencies: jQuery library
 *
+* Example:
+*
+*   requirejs(['collapse'], function( collapse ) {
+*     var actionAfterCollapseToggle = function () {
+*       alert('There was a collapse toggle!!!');
+*     };
+*
+*     collapse.init(actionAfterCollapseToggle);
+*   });
+*
+*
+*
 ************************************************************************************/
 
 /* globals $, define */
@@ -32,77 +44,126 @@
 "use strict";
 define(['jquery'], function() {
   return {
-    init: function() {
+    init: function(afterCollapseToggle) {
+
+      var _callAfterCollapseToggle = function () {
+        if( typeof afterCollapseToggle === 'function' ) {
+          afterCollapseToggle();
+        }
+      };
+
+      var _toggleCollapseStatus = function(element, callback) {
+        var $element = $(element);
+        if($element.hasClass('collapser_closed')) {
+          $element.removeClass('collapser_closed')
+                  .addClass('collapser_open');
+        } else {
+          $element.removeClass('collapser_open')
+                  .addClass('collapser_closed');
+        }
+        //Toggle next <div> (all results) and <h4> (references, for lanes)
+        $element.nextAll('div,h4').toggle(0);
+        if( typeof callback === 'function' ) {
+          callback();
+        }
+      };
+
       var collapsers = $('.collapser');
+
       // Register all collapsers as open ones
       collapsers.addClass('collapser_open');
 
       // Describe toggle behaviour of collapsers
-      collapsers.click(function() {
-        var self = $(this);
-        if(self.hasClass('collapser_closed')) {
-          self.removeClass('collapser_closed')
-              .addClass('collapser_open');
-          window.scrollBy(0, 1);
-          window.scrollBy(0, -1);
-        } else {
-          self.removeClass('collapser_open')
-              .addClass('collapser_closed');
-        }
-
-        //Toggle next <div> (all results) and <h4> (references, for lanes)
-        self.nextAll('div,h4').toggle(0);
-        return false;
+      collapsers.click(function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        _toggleCollapseStatus(this, _callAfterCollapseToggle);
       });
 
       /* Manipulate LANE appearance */
       //Collapse all lanes
-      $('#collapse_all_lanes').click(function() {
-        $('div.results_full_lane > h3.collapser_open').click();
-        return false;
+      $('#collapse_all_lanes').click(function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        $('div.results_full_lane > h3.collapser_open').each(function(index, obj) {
+          _toggleCollapseStatus(obj);
+        });
+        _callAfterCollapseToggle();
       });
 
       //Expand all lanes
       $('#expand_all_lanes').click(function(){
-        $('div.results_full_lane > h3.collapser_closed').click();
-        return false;
+        event.preventDefault();
+        event.stopPropagation();
+        $('div.results_full_lane > h3.collapser_closed').each(function(index, obj) {
+          _toggleCollapseStatus(obj);
+        });
+        _callAfterCollapseToggle();
       });
 
       /* Manipulate TEST RESULT appearance */
       //Expand all results
       $('#expand_all_results').click(function(){
-        $('div.result_full > h2.collapser_closed').click();
-        return false;
+        event.preventDefault();
+        event.stopPropagation();
+        $('div.result_full > h2.collapser_closed').each(function(index, obj) {
+          _toggleCollapseStatus(obj);
+        });
+        _callAfterCollapseToggle();
       });
 
       //Collapse all results
       $('#collapse_all_results').click(function(){
-        $('div.result_full > h2.collapser_open').click();
-        return false;
+        event.preventDefault();
+        event.stopPropagation();
+        $('div.result_full > h2.collapser_open').each(function(index, obj) {
+          _toggleCollapseStatus(obj);
+        });
+        _callAfterCollapseToggle();
       });
 
       //Collapse h2
       $('.collapse_h2').click(function(){
-        $('h2.collapser_open:contains(' + $(this).data('section') + ')').click();
-        return false;
+        event.preventDefault();
+        event.stopPropagation();
+        $('h2.collapser_open:contains(' + $(this).data('section') + ')')
+                                                 .each(function(index, obj) {
+          _toggleCollapseStatus(obj);
+        });
+        _callAfterCollapseToggle();
       });
 
       //Expand h2
       $('.expand_h2').click(function(){
-        $('h2.collapser_closed:contains(' + $(this).data('section') + ')').click();
-        return false;
+        event.preventDefault();
+        event.stopPropagation();
+        $('h2.collapser_closed:contains(' + $(this).data('section') + ')')
+                                                   .each(function(index, obj) {
+          _toggleCollapseStatus(obj);
+        });
+        _callAfterCollapseToggle();
       });
 
       //Collapse h3
       $('.collapse_h3').click(function(){
-        $('h3.collapser_open:contains(' + $(this).data('section') + ')').click();
-        return false;
+        event.preventDefault();
+        event.stopPropagation();
+        $('h3.collapser_open:contains(' + $(this).data('section') + ')')
+                                                 .each(function(index, obj) {
+          _toggleCollapseStatus(obj);
+        });
+        _callAfterCollapseToggle();
       });
 
       //Expand h3
       $('.expand_h3').click(function(){
-        $('h3.collapser_closed:contains(' + $(this).data('section') + ')').click();
-        return false;
+        event.preventDefault();
+        event.stopPropagation();
+        $('h3.collapser_closed:contains(' + $(this).data('section') + ')')
+                                                   .each(function(index,obj) {
+          _toggleCollapseStatus(obj);
+        });
+        _callAfterCollapseToggle();
       });
 
       //Since javascript is active we can collapse sections and reveal the menu

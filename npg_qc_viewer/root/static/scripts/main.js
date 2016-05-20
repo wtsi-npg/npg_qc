@@ -47,7 +47,11 @@ requirejs([
   $(document).ready(function(){
     //Setup for heatmaps to load on demand.
     $("img").unveil(2000);
-    collapse.init();
+    collapse.init(function() {
+
+      // We scroll after collapse toggles to fire modify on view to generate plots
+      window.scrollBy(0,1); window.scrollBy(0,-1);
+    });
     var qcp = qc_page.pageForMQC();
     var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) {
                                                         NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes');
