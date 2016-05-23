@@ -92,7 +92,7 @@ define(['jquery'], function() {
       });
 
       //Expand all lanes
-      $('#expand_all_lanes').click(function(){
+      $('#expand_all_lanes').click(function(event){
         event.preventDefault();
         event.stopPropagation();
         $('div.results_full_lane > h3.collapser_closed').each(function(index, obj) {
@@ -103,7 +103,7 @@ define(['jquery'], function() {
 
       /* Manipulate TEST RESULT appearance */
       //Expand all results
-      $('#expand_all_results').click(function(){
+      $('#expand_all_results').click(function(event){
         event.preventDefault();
         event.stopPropagation();
         $('div.result_full > h2.collapser_closed').each(function(index, obj) {
@@ -113,7 +113,7 @@ define(['jquery'], function() {
       });
 
       //Collapse all results
-      $('#collapse_all_results').click(function(){
+      $('#collapse_all_results').click(function(event){
         event.preventDefault();
         event.stopPropagation();
         $('div.result_full > h2.collapser_open').each(function(index, obj) {
@@ -123,7 +123,7 @@ define(['jquery'], function() {
       });
 
       //Collapse h2
-      $('.collapse_h2').click(function(){
+      $('.collapse_h2').click(function(event){
         event.preventDefault();
         event.stopPropagation();
 
@@ -138,7 +138,7 @@ define(['jquery'], function() {
       });
 
       //Expand h2
-      $('.expand_h2').click(function(){
+      $('.expand_h2').click(function(event){
         event.preventDefault();
         event.stopPropagation();
 
@@ -153,7 +153,7 @@ define(['jquery'], function() {
       });
 
       //Collapse h3
-      $('.collapse_h3').click(function(){
+      $('.collapse_h3').click(function(event){
         event.preventDefault();
         event.stopPropagation();
         $('h3.collapser_open').each(function(index, obj) {
@@ -163,7 +163,7 @@ define(['jquery'], function() {
       });
 
       //Expand h3
-      $('.expand_h3').click(function(){
+      $('.expand_h3').click(function(event){
         event.preventDefault();
         event.stopPropagation();
         $('h3.collapser_closed').each(function(index,obj) {
