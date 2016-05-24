@@ -20,56 +20,79 @@
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture">
-    <div class="results_full_lane" id="all_results">
-      <h3 class="collapser" id="run_title">run 20000 lane 1 | NT000000T <a name="20000:1"></a></h3>
+    <div id="menu">
+      <div id="links">
+        <ul>
+          <li>
+            <a id="collapse_all_results" href="#" class="collapse_icon">-</a>
+            <a id="expand_all_results" href="#" class="collapse_icon">+</a>
+            <b>all results</b>
+          </li>
+          <li>
+            <a href="#" id=collapse_all_adapter data-section='adapter' class="collapse_h2 collapse_icon">-</a>
+            <a href="#" id=expand_all_adapter data-section='adapter' class="expand_h2 collapse_icon">+</a>
+            adapter
+          </li>
+          <li>
+            <a href="#" id=collapse_all_insert_size data-section='insert size' class="collapse_h2 collapse_icon">-</a>
+            <a href="#" id=expand_all_insert_size data-section='insert size' class="expand_h2 collapse_icon">+</a>
+            insert size
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="results_full">
+      <div class="results_full_lane" id="all_results">
+        <h3 class="collapser" id="run_title">run 20000 lane 1 | NT000000T <a name="20000:1"></a></h3>
 
-      <h4 id="reference_title">Reference: Homo_sapiens (1000Genomes_hs37d5)</h4>
+        <h4 id="reference_title">Reference: Homo_sapiens (1000Genomes_hs37d5)</h4>
 
-      <div class="results_full_lane_contents">
-        <div class="result_full">
-          <h2 class="collapser adapter" id="adapter_title">run 20000 lane 1, adapter</h2>
-          <div class="result_full_content" id="adapter_content">
-            <div style="clear:both;" class="data_table">
-              <table title="adapter check results">
-                <tbody>
-                  <tr>
-                    <th class="laligned">read</th>
-                    <td>forward</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="data_table">
-              <table title="Contamination for each adapter">
-                <tbody>
-                  <tr>
-                    <th>adapter name</th>
-                  </tr>
-                  <tr>
-                    <td>forward</td>
-                  </tr>
-                </tbody>
-              </table>
+        <div class="results_full_lane_contents">
+          <div class="result_full">
+            <h2 class="collapser adapter" id="adapter_title">run 20000 lane 1, adapter</h2>
+            <div class="result_full_content" id="adapter_content">
+              <div style="clear:both;" class="data_table">
+                <table title="adapter check results">
+                  <tbody>
+                    <tr>
+                      <th class="laligned">read</th>
+                      <td>forward</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="data_table">
+                <table title="Contamination for each adapter">
+                  <tbody>
+                    <tr>
+                      <th>adapter name</th>
+                    </tr>
+                    <tr>
+                      <td>forward</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="result_full">
-          <h2 class="collapser insert size" id="insert_size_title">run 20000 lane 1, insert size:passed</h2>
-          <div class="result_full_content">
-            <div class="data_table">
-              <table title="insert size check results" id="insert_size_content">
-                <tbody>
-                  <tr>
-                    <th class="laligned">pass criterion</th>
-                    <td>The value of the third quartile is larger than the lower boundary of the expected size</td>
-                  </tr>
-                  <tr>
-                    <th class="laligned">binary reference path</th>
-                    <td>path</td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="result_full">
+            <h2 class="collapser insert size" id="insert_size_title">run 20000 lane 1, insert size:passed</h2>
+            <div class="result_full_content">
+              <div class="data_table">
+                <table title="insert size check results" id="insert_size_content">
+                  <tbody>
+                    <tr>
+                      <th class="laligned">pass criterion</th>
+                      <td>The value of the third quartile is larger than the lower boundary of the expected size</td>
+                    </tr>
+                    <tr>
+                      <th class="laligned">binary reference path</th>
+                      <td>path</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

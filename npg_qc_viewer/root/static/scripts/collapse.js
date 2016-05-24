@@ -53,16 +53,14 @@ define(['jquery'], function() {
       };
 
       var _toggleCollapseStatus = function(element, callback) {
-        var $element = $(element);
-        if($element.hasClass('collapser_closed')) {
-          $element.removeClass('collapser_closed')
-                  .addClass('collapser_open');
+
+        // Manual toggle as $.toggle() is considerably slower for large number of
+        // elements
+        if ( element.is(':visible') ) {
+          element.css('display', 'none');
         } else {
-          $element.removeClass('collapser_open')
-                  .addClass('collapser_closed');
+          element.css('display', 'block');
         }
-        //Toggle next <div> (all results) and <h4> (references, for lanes)
-        $element.nextAll('div,h4').toggle(0);
         if( typeof callback === 'function' ) {
           callback();
         }
@@ -70,105 +68,92 @@ define(['jquery'], function() {
 
       var collapsers = $('.collapser');
 
-      // Register all collapsers as open ones
-      collapsers.addClass('collapser_open');
-
       // Describe toggle behaviour of collapsers
       collapsers.click(function(event) {
         event.preventDefault();
         event.stopPropagation();
-        _toggleCollapseStatus(this, _callAfterCollapseToggle);
+        var toCollapse = $(this).nextAll('div');
+        _toggleCollapseStatus(toCollapse, _callAfterCollapseToggle);
       });
 
-      /* Manipulate LANE appearance */
-      //Collapse all lanes
-      $('#collapse_all_lanes').click(function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        $('div.results_full_lane > h3.collapser_open').each(function(index, obj) {
-          _toggleCollapseStatus(obj);
-        });
-        _callAfterCollapseToggle();
+      var allHeaders = $('#results_full h2.collapser');
+      var allChecks = [];
+
+      //To keep for collapse/expand all
+      $.each(allHeaders, function(index, obj) {
+        var nextDiv = $($(obj).next('div'));
+        allChecks.push(nextDiv);
       });
 
-      //Expand all lanes
-      $('#expand_all_lanes').click(function(event){
-        event.preventDefault();
-        event.stopPropagation();
-        $('div.results_full_lane > h3.collapser_closed').each(function(index, obj) {
-          _toggleCollapseStatus(obj);
-        });
-        _callAfterCollapseToggle();
-      });
-
-      /* Manipulate TEST RESULT appearance */
+      /* Manipulate CHECK RESULT appearance */
       //Expand all results
-      $('#expand_all_results').click(function(event){
+      $('#expand_all_results').click(function(event) {
         event.preventDefault();
         event.stopPropagation();
-        $('div.result_full > h2.collapser_closed').each(function(index, obj) {
-          _toggleCollapseStatus(obj);
+        $.each(allChecks, function(index, obj) {
+          if( ! obj.is(':visible') ) {
+            _toggleCollapseStatus(obj)
+          }
         });
         _callAfterCollapseToggle();
       });
 
       //Collapse all results
-      $('#collapse_all_results').click(function(event){
+      $('#collapse_all_results').click(function(event) {
         event.preventDefault();
         event.stopPropagation();
-        $('div.result_full > h2.collapser_open').each(function(index, obj) {
-          _toggleCollapseStatus(obj);
+        $.each(allChecks, function(index, obj) {
+          if( obj.is(':visible') ) {
+            _toggleCollapseStatus(obj)
+          }
         });
         _callAfterCollapseToggle();
       });
 
+      // Each menu item keeps a list of elements to use
+      $('.collapse_h2, .expand_h2').each(function(index, obj) {
+        var self = $(obj);
+        var mySections = [];
+        // Regular expression to filter sections, considers pass/fail
+        var pattern = new RegExp(self.data('section') + '(:\\w+)?$');
+        $.each(allHeaders, function(index, obj) {
+          if( pattern.test($(obj).text().trim()) ) {
+            var nextDiv = $($(obj).next('div'));
+            mySections.push(nextDiv);
+          }
+        });
+        $.data(obj, 'mySections', mySections);
+      });
+
       //Collapse h2
-      $('.collapse_h2').click(function(event){
+      $('.collapse_h2').click(function(event) {
         event.preventDefault();
         event.stopPropagation();
+        var self = $(this);
+        var mySections = self.data('mySections');
 
-        // Regular expression to filter sections, considers pass/fail
-        var pattern = new RegExp($(this).data('section') + '(:\\w+)?$');
-        $('h2.collapser_open').each(function(index, obj) {
-          if( pattern.test($(obj).text().trim()) ) {
+        $.each(mySections, function( index, obj) {
+          if( obj.is(':visible') ) {
             _toggleCollapseStatus(obj);
           }
         });
+
         _callAfterCollapseToggle();
       });
 
       //Expand h2
-      $('.expand_h2').click(function(event){
+      $('.expand_h2').click(function(event) {
         event.preventDefault();
         event.stopPropagation();
 
-        // Regular expression to filter sections, considers pass/fail
-        var pattern = new RegExp($(this).data('section') + '(:\\w+)?$');
-        $('h2.collapser_closed').each(function(index, obj) {
-          if( pattern.test($(obj).text().trim()) ) {
+        var self = $(this);
+        var mySections = self.data('mySections');
+        $.each(mySections, function( index, obj) {
+          if( ! obj.is(':visible') ) {
             _toggleCollapseStatus(obj);
           }
         });
-        _callAfterCollapseToggle();
-      });
 
-      //Collapse h3
-      $('.collapse_h3').click(function(event){
-        event.preventDefault();
-        event.stopPropagation();
-        $('h3.collapser_open').each(function(index, obj) {
-          _toggleCollapseStatus(obj);
-        });
-        _callAfterCollapseToggle();
-      });
-
-      //Expand h3
-      $('.expand_h3').click(function(event){
-        event.preventDefault();
-        event.stopPropagation();
-        $('h3.collapser_closed').each(function(index,obj) {
-          _toggleCollapseStatus(obj);
-        });
         _callAfterCollapseToggle();
       });
 

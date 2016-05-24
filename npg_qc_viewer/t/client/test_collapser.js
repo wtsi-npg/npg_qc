@@ -33,27 +33,12 @@ requirejs([
 
     var allChecksContent = [ adapterContent, insertSizeContent ];
 
-    var isOpen = function( element ) {
-      var $element = $($(element));
-      return $element.hasClass(collapserOpen) && !$element.hasClass(collapserClosed);
-    };
-
-    var isClosed = function( element ) {
-      var $element = $($(element));
-      return $element.hasClass(collapserClosed) && !$element.hasClass(collapserOpen);
-    };
-
     var isVisible = function( element ) {
       return $($(element)).is(':visible');
     };
 
     QUnit.test('Checking pre-reqs', function(assert) {
       assert.ok( isVisible(allResults) , 'Main container visible' );
-      $.each(allCollapsible, function( index, value ) {
-        assert.ok($($(value)).hasClass(collapserClass), 'Element <' +
-                                                        allCollapsibleNames[index] +
-                                                        '> has collapse class' );
-      });
     });
 
     QUnit.test('Testing page after collapser init', function( assert ) {
@@ -61,16 +46,6 @@ requirejs([
       var $allResults = $($(allResults));
 
       assert.ok($allResults.is(':visible'), 'Main container is visible');
-      assert.notOk($allResults.hasClass(collapserOpen), 'Main container not modified');
-      assert.notOk(
-        $($(reference_title)).hasClass(collapserOpen), 'Reference title not modified'
-      );
-
-      $.each(allCollapsible, function( index, value ) {
-        assert.ok( isOpen( $($(value)) ), 'Element <' +
-                                        allCollapsibleNames[index] +
-                                        '> is open' );
-      });
       assert.ok(
         isVisible(referenceTitle), 'Element <reference title> is visible'
       );
@@ -88,9 +63,9 @@ requirejs([
       $(runTitle).trigger('click'); // To collapse
       assert.ok( isVisible(runTitle) , 'Run title is visible' );
       assert.ok( isVisible(allResults) , 'Main container is visible' );
-      assert.notOk( isVisible(referenceTitle) , 'Rereference title is not visible' );
+      assert.ok( isVisible(referenceTitle) , 'Rereference title is visible' );
       $.each(allChecksContent, function( index, value ) {
-        assert.notOk( isVisible(value) , 'Check is not visible' );
+        assert.ok( !isVisible(value) , 'Check is not visible' );
       });
 
       $(runTitle).trigger('click'); //To expand
@@ -119,20 +94,13 @@ requirejs([
       $.each( allVisible, function( index, value ) {
         assert.ok( isVisible(value), 'Expected visible' );
       });
-      $.each( allOpen, function( index, value ) {
-        assert.ok( isOpen(value), 'Expected open' );
-      });
-      assert.notOk( isVisible(adapterContent), 'Expected content not visible' );
-      assert.ok( isClosed(adapterTitle), 'Check 1 is closed' );
+      assert.ok( !isVisible(adapterContent), 'Expected content not visible' );
 
       $(adapterTitle).trigger('click'); // To expand
       allVisible.push(adapterContent);
       allOpen.push(adapterTitle);
       $.each( allVisible, function( index, value ) {
         assert.ok( isVisible(value), 'Expected visible' );
-      });
-      $.each( allOpen, function( index, value ) {
-        assert.ok( isOpen(value), 'Expected open' );
       });
     });
 
@@ -146,26 +114,92 @@ requirejs([
       $.each( allVisible, function( index, value ) {
         assert.ok( isVisible(value), 'Expected visible' );
       });
-      $.each( allOpen, function( index, value ) {
-        assert.ok( isOpen(value), 'Expected open' );
-      });
 
       $(adapterTitle).trigger('click'); // To collapse
       $(insertSizeTitle).trigger('click'); // To collapse
 
-      assert.ok( isOpen(runTitle), 'Expected run title open' );
-      assert.ok( isClosed(adapterTitle), 'Expected check 1 closed' );
-      assert.notOk( isVisible(adapterContent), 'Expected check 1 content not visible' );
-      assert.ok( isClosed(insertSizeTitle), 'Expected check 2 closed' );
-      assert.notOk( isVisible(insertSizeContent), 'Check 2 content is not visible')
+      assert.ok( !isVisible(adapterContent), 'Expected check 1 content not visible' );
+      assert.ok( !isVisible(insertSizeContent), 'Check 2 content is not visible')
 
       $(adapterTitle).trigger('click'); // To expand
 
-      assert.ok( isOpen(runTitle), 'Expected run title open' );
-      assert.ok( isOpen(adapterTitle), 'Expected check 1 open' );
       assert.ok( isVisible(adapterContent), 'Expected check 1 content is visible' );
-      assert.ok( isClosed(insertSizeTitle), 'Expected check 2 closed' );
-      assert.notOk( isVisible(insertSizeContent), 'Check 2 content is not visible')
+      assert.ok( !isVisible(insertSizeContent), 'Check 2 content is not visible')
+    });
+
+    QUnit.test('Calling collapse/expand all', function( assert ) {
+      collapse.init();
+      var alwaysVisible = [ runTitle, allResults, referenceTitle, adapterTitle,
+                         insertSizeTitle ];
+      var togglingSections = [ adapterContent, insertSizeContent ];
+
+      $.each( alwaysVisible, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible <always visible for this test>' );
+      });
+      $.each( togglingSections, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible' );
+      });
+
+      $('#collapse_all_results').trigger('click'); //To collapse all results
+
+      $.each( alwaysVisible, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible because they not collapse' );
+      });
+      $.each( togglingSections, function( index, value ) {
+        assert.ok( !isVisible(value), 'Expected not visible after collapse all' );
+      });
+
+      $('#expand_all_results').trigger('click'); //To expand all results
+
+      $.each( alwaysVisible, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible because they not collapse' );
+      });
+      $.each( togglingSections, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible after expand all' );
+      });
+    });
+
+    QUnit.test('Calling collapse all adapters', function( assert ) {
+      collapse.init();
+      var alwaysVisible = [ runTitle, allResults, referenceTitle, adapterTitle,
+                         insertSizeTitle, insertSizeContent ];
+      var togglingSections = [ adapterContent ];
+
+      $.each( alwaysVisible, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible <always visible for this test>' );
+      });
+      $.each( togglingSections, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible <adapter>' );
+      });
+
+      $('#collapse_all_adapter').trigger('click'); //To collapse adapter
+
+      $.each( alwaysVisible, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible because they not collapse, only adapter' );
+      });
+      $.each( togglingSections, function( index, value ) {
+        assert.ok( !isVisible(value), 'Expected not visible after collapse adapter' );
+      });
+
+      $('#collapse_all_insert_size').trigger('click');
+      assert.ok( !isVisible(insertSizeContent), 'Collapsed all insert size' );
+      $.each( togglingSections, function( index, value ) {
+        assert.ok( !isVisible(value), 'Expected not visible adapter' );
+      });
+      $('#expand_all_insert_size').trigger('click');
+      assert.ok( isVisible(insertSizeContent), 'Exapanded all insert size' );
+      $.each( togglingSections, function( index, value ) {
+        assert.ok( !isVisible(value), 'Expected not visible adapter' );
+      });
+
+      $('#expand_all_adapter').trigger('click'); //To expand adapter
+
+      $.each( alwaysVisible, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible because they did not collapse' );
+      });
+      $.each( togglingSections, function( index, value ) {
+        assert.ok( isVisible(value), 'Expected visible after expand adapter' );
+      });
     });
 
     // run the tests.
