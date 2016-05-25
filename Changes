@@ -1,10 +1,12 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC:
+   - Reintroduce collapser
+
 release 61.1
  - SeqQC
    - Using --force-latest for bower install deps during Build
  - improve test robustness (larger page sample for mech to check)
- - VerifyBamId pass/fail threshold change
 
 release 61.0
  - using test matrix with node 4.4.2 and 0.12.9 for travis

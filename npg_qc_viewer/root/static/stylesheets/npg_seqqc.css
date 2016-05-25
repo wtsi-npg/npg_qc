@@ -44,17 +44,17 @@ body {
 }
 
 h1  { font-weight: bold; }
-h2  { 
+h2  {
   font-weight: bold;
   background: #aad4f4;
   color: #476080;
   padding: 3px 6px 3px 8px;
 }
 
-h3  { 
+h3  {
   font-size: 150%;
   background-color: #aad4f4; /* medium blue */
-  color: #31353d;  /* dark font */ 
+  color: #31353d;  /* dark font */
   padding: 3px 3px 3px 8px;
 }
 
@@ -82,7 +82,7 @@ a, a:link, a:visited, a:hover {
   clear: both;
 }
 
-.rel_pos_container {position: relative;} 
+.rel_pos_container {position: relative;}
 
 /***************  header  *****************/
 #header {
@@ -131,6 +131,11 @@ a, a:link, a:visited, a:hover {
   border-top: 1px solid #aad4f4;
   background: #cce5f8;
   color: #222931;
+}
+
+.collapse_icon {
+  font-weight: bold;
+  font-size: 14px;
 }
 
 /*************** main content ************/
@@ -182,7 +187,7 @@ a, a:link, a:visited, a:hover {
 }
 
 .check_labels {
-  font-weight: normal;  
+  font-weight: normal;
 }
 
 .lane {
@@ -308,7 +313,7 @@ a, a:link, a:visited, a:hover {
 }
 
 .white {
-  color: #FFFFFF; 
+  color: #FFFFFF;
 }
 
 /*************** full results ************/
@@ -383,7 +388,7 @@ a, a:link, a:visited, a:hover {
 }
 
 .dark_blue {
-  color: #476080; 
+  color: #476080;
 }
 
 .insert_size_histogram {
