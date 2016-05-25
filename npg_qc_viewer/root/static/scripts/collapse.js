@@ -52,17 +52,14 @@ define(['jquery'], function() {
         }
       };
 
-      var _toggleCollapseStatus = function(element, callback) {
+      var _toggleCollapseStatus = function(element) {
 
-        // Manual toggle as $.toggle() is considerably slower for large number of
-        // elements
+        // Manual toggle as $.toggle() is considerably slower for large number
+        // of elements
         if ( element.is(':visible') ) {
           element.css('display', 'none');
         } else {
           element.css('display', 'block');
-        }
-        if( typeof callback === 'function' ) {
-          callback();
         }
       };
 
@@ -73,7 +70,8 @@ define(['jquery'], function() {
         event.preventDefault();
         event.stopPropagation();
         var toCollapse = $(this).nextAll('div');
-        _toggleCollapseStatus(toCollapse, _callAfterCollapseToggle);
+        _toggleCollapseStatus(toCollapse);
+        _callAfterCollapseToggle();
       });
 
       var allHeaders = $('#results_full h2.collapser');
