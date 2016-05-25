@@ -54,9 +54,11 @@ define(['jquery'], function() {
 
       var _toggleCollapseStatus = function(element) {
 
-        // Manual toggle as $.toggle() is considerably slower for large number
-        // of elements
-        if ( element.is(':visible') ) {
+        // Manual css manipulation as:
+        //   $.toggle()
+        //   $.is(:visible)
+        // are considerably slower for large number of elements
+        if ( element.css('display') === 'block' ) {
           element.css('display', 'none');
         } else {
           element.css('display', 'block');
@@ -83,15 +85,17 @@ define(['jquery'], function() {
         allChecks.push(nextDiv);
       });
 
+      $.each(allChecks, function(index, obj) {
+        obj.css('display', 'block');
+      });
+
       /* Manipulate CHECK RESULT appearance */
       //Expand all results
       $('#expand_all_results').click(function(event) {
         event.preventDefault();
         event.stopPropagation();
         $.each(allChecks, function(index, obj) {
-          if( ! obj.is(':visible') ) {
-            _toggleCollapseStatus(obj)
-          }
+          obj.css('display', 'block');
         });
         _callAfterCollapseToggle();
       });
@@ -101,9 +105,7 @@ define(['jquery'], function() {
         event.preventDefault();
         event.stopPropagation();
         $.each(allChecks, function(index, obj) {
-          if( obj.is(':visible') ) {
-            _toggleCollapseStatus(obj)
-          }
+          obj.css('display', 'none');
         });
         _callAfterCollapseToggle();
       });
@@ -131,9 +133,7 @@ define(['jquery'], function() {
         var mySections = self.data('mySections');
 
         $.each(mySections, function( index, obj) {
-          if( obj.is(':visible') ) {
-            _toggleCollapseStatus(obj);
-          }
+          obj.css('display', 'none');
         });
 
         _callAfterCollapseToggle();
@@ -147,9 +147,7 @@ define(['jquery'], function() {
         var self = $(this);
         var mySections = self.data('mySections');
         $.each(mySections, function( index, obj) {
-          if( ! obj.is(':visible') ) {
-            _toggleCollapseStatus(obj);
-          }
+          obj.css('display', 'block');
         });
 
         _callAfterCollapseToggle();
