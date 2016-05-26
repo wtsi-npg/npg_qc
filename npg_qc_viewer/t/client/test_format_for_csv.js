@@ -1,14 +1,16 @@
+/* globals $, QUnit, requirejs */
 "use strict";
-require.config({
+requirejs.config({
   baseUrl: '../../root/static',
   paths: {
-    jquery: 'bower_components/jquery/dist/jquery',
-  },
+    'qunit': 'bower_components/qunit/qunit/qunit',
+    jquery:  'bower_components/jquery/dist/jquery'
+  }
 });
 
-require(['scripts/format_for_csv',],
+requirejs(['scripts/format_for_csv',],
   function(format_for_csv) {
-    // run the tests.
+    QUnit.config.autostart = false;
     QUnit.test('Preparing table for download as csv', function (assert) {
       var tableHtml = $('#results_summary')[0].outerHTML;
 

@@ -1,13 +1,16 @@
-/* globals $: false, require: false, QUnit: false, expect: false, ok: false, notOk: false, document: false*/
+/* globals $, requirejs, QUnit, document */
+/* jshint -W083 */
+
 "use strict";
-require.config({
+requirejs.config({
   baseUrl: '../../root/static',
   paths: {
-    jquery: 'bower_components/jquery/dist/jquery',
-  },
+    'qunit': 'bower_components/qunit/qunit/qunit',
+    jquery:  'bower_components/jquery/dist/jquery'
+  }
 });
 
-require([
+requirejs([
   'scripts/qcoutcomes/manual_qc',
   'scripts/qcoutcomes/qc_page',
   'scripts/qcoutcomes/qc_outcomes_view',
@@ -44,16 +47,16 @@ require([
       qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
     };
 
-    QUnit.test("Template", function ( assert ) {
-      expect(1);
-      //Set title
+    QUnit.config.autostart = false;
+
+    QUnit.test("Template", function (assert) {
+      assert.expect(1);
       //Set fixtures
       var page_fixture = fixtures.fixtures_dont_display;
       $('#qunit-fixture').html(page_fixture);
       //Set return ajax call
-
       try {
-        ok(true, 'Is ok');
+        assert.ok(true, 'Is ok');
       } catch (err) {
         console.log(err);
       } finally {
@@ -63,7 +66,7 @@ require([
     });
 
     QUnit.test("Display sequencing manual qc", function ( assert ) {
-      expect(31);
+      assert.expect(31);
       //Set title
       document.title = 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)';
       //Set fixtures
@@ -82,7 +85,7 @@ require([
           callback(data, 'success', {});
           return options;
         };
-        options.error = function (callback) { return options; };
+        options.error = function () { return options; };
         return options;
       };
 
@@ -138,13 +141,13 @@ require([
         control = $("#radio_rpt_key\\3A 18000\\3A 1_Undecided");
         assert.equal(control.attr('value'), 'Undecided', 'Correct value for Undecided control');
 
-        ok($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+        assert.ok($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
                      'Lane 1 with save button visible');
-        ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+        assert.ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
                      'Lane 2 with save button visible');
-        notOk($("#rpt_key\\3a 18000\\3a 3 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+        assert.notOk($("#rpt_key\\3a 18000\\3a 3 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
                      'Lane 3 with save button hidden');
-        notOk($("#rpt_key\\3a 18000\\3a 4 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+        assert.notOk($("#rpt_key\\3a 18000\\3a 4 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
                      'Lane 4 with save button hidden');
       } catch (err) {
         console.log(err);
@@ -155,7 +158,7 @@ require([
     });
 
     QUnit.test("Display sequencing manual qc lane 1 is already final, lane 2 is accepted preliminary", function ( assert ) {
-      expect(15);
+      assert.expect(15);
       //Set title
       document.title = 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)';
       //Set fixtures
@@ -173,7 +176,7 @@ require([
           callback(data, 'success', {});
           return options;
         };
-        options.error = function (callback) { return options; };
+        options.error = function () { return options; };
         return options;
       };
 
@@ -200,9 +203,9 @@ require([
         assert.equal(control.length, 1, 'Has a working icon container');
         assert.equal(control.children().length, 0, 'Working icon container is empty');
 
-        notOk($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+        assert.notOk($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
                      'Lane 1 with save button visible');
-        ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+        assert.ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
                      'Lane 2 with save button visible');
       } catch (err) {
         console.log(err);
@@ -213,7 +216,7 @@ require([
     });
 
     QUnit.test("Display library manual qc mixed initial outcomes", function ( assert ) {
-      expect(41);
+      assert.expect(41);
       //Set title
       document.title = 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)';
       //Set fixtures
@@ -233,7 +236,7 @@ require([
           callback(data, 'success', {});
           return options;
         };
-        options.error = function (callback) { return options; };
+        options.error = function () { return options; };
         return options;
       };
 
@@ -272,7 +275,7 @@ require([
         }
 
         var control = $("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls");
-        ok(control.is(':visible'), 'Placeholder for overall controls is visible');
+        assert.ok(control.is(':visible'), 'Placeholder for overall controls is visible');
         assert.equal($("#results_summary .library_mqc_overall_controls").length,
                      1, 'One overall control in page');
         assert.equal(control.attr('style'),
@@ -285,7 +288,7 @@ require([
         ];
         for ( i = 0; i < individualOverallButtons.length; i++ ) {
           var thisButton = control.find('.' + individualOverallButtons[i]);
-          ok(thisButton.is(':visible'),
+          assert.ok(thisButton.is(':visible'),
              'Overall button is visible ' + individualOverallButtons[i]);
           assert.equal(thisButton.attr('style'),
                        'padding-left: 5px; background-color: rgb(244, 244, 244);',
@@ -354,7 +357,7 @@ require([
           logged: 'Logged in as aa11 (mqc)'
         }
       ];
-      expect(cases.length * 15);
+      assert.expect(cases.length * 15);
 
       var page_fixture = fixtures.fixtures_lib_mixed;
       //Set return ajax call
@@ -372,7 +375,7 @@ require([
           callback(data, 'success', {});
           return options;
         };
-        options.error = function (callback) { return options; };
+        options.error = function () { return options; };
         return options;
       };
 
@@ -386,8 +389,8 @@ require([
           $("#header > h1 > span.rfloat").text(thisCase.logged);
 
           runAsIfMain();
-          ok($("#rpt_key\\3a 18000\\3a 2\\3a 1 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
-          ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_rejected_preliminary'));
+          assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 1 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
+          assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_rejected_preliminary'));
 
           var emptyContainers = [
             "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.lane_mqc_control",
@@ -456,11 +459,11 @@ require([
           logged: 'Logged in as aa11 (mqc)'
         }
       ];
-      expect(cases.length * 4 * ( Object.keys(qc_utils.OUTCOMES).length - 1 ));
+      assert.expect(cases.length * 4 * ( Object.keys(qc_utils.OUTCOMES).length - 1 ));
 
       var toClass = function ( outcome ) {
         return 'qc_outcome_' + outcome.toLowerCase().replace(' ', '_');
-      }
+      };
 
       var page_fixture = fixtures.fixtures_seq_mixed;
       var testNotMQC = function (expectedClass) {
@@ -474,8 +477,8 @@ require([
             $("#header > h1 > span.rfloat").text(thisCase.logged);
 
             runAsIfMain();
-            ok($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp").hasClass(expectedClass), 'With proper class in lane');
-            ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp").hasClass(expectedClass), 'With proper class in lane');
+            assert.ok($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp").hasClass(expectedClass), 'With proper class in lane');
+            assert.ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp").hasClass(expectedClass), 'With proper class in lane');
 
             var emptyContainers = [
               "#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp > span.lane_mqc_control",
@@ -516,7 +519,7 @@ require([
             callback(data, 'success', {});
             return options;
           };
-          options.error = function (callback) { return options; };
+          options.error = function () { return options; };
           return options;
         };
         testNotMQC(toClass(outcome));
@@ -529,7 +532,7 @@ require([
         logged: 'Logged in as aa11'
       };
 
-      expect(13);
+      assert.expect(13);
       var page_fixture = fixtures.fixtures_lib_nothing_to_qc;
       //Set return ajax call
       $.ajax = function (options) {
@@ -546,7 +549,7 @@ require([
           callback(data, 'success', {});
           return options;
         };
-        options.error = function (callback) { return options; };
+        options.error = function () { return options; };
         return options;
       };
 
@@ -558,8 +561,8 @@ require([
         $("#header > h1 > span.rfloat").text(thisCase.logged);
 
         runAsIfMain();
-        ok($("#rpt_key\\3a 18000\\3a 2\\3a 1 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
-        ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
+        assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 1 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
+        assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
 
         assert.equal($('#results_summary .lane_mqc_control').length, 0, 'No libs or lanes for qc');
         assert.equal($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls").children().length,
@@ -609,43 +612,43 @@ require([
       assert.equal(control.lane_control.outcome, undefined, "Outcome of lane is not defined.");
     });
 
-    QUnit.test('Object initialisation', function() {
+    QUnit.test('Object initialisation', function( assert ) {
       var obj = null;
-      ok(obj == null, "Variable is initially null.");
+      assert.ok(obj == null, "Variable is initially null.");
       obj = new NPG.QC.LaneMQCControl();
-      ok(obj !== undefined, "Variable is now an instance.");
+      assert.ok(obj !== undefined, "Variable is now an instance.");
       obj = new NPG.QC.LaneMQCControl(new TestConfiguration());
-      ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
-      ok(obj.lane_control == null, "New object has null lane_control.");
-      ok(obj.abstractConfiguration !== undefined, 'Object has a configuration');
-      ok(obj.outcome == null, "New object has null outcome.");
+      assert.ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
+      assert.ok(obj.lane_control == null, "New object has null lane_control.");
+      assert.ok(obj.abstractConfiguration !== undefined, 'Object has a configuration');
+      assert.ok(obj.outcome == null, "New object has null outcome.");
 
       obj = null;
-      ok(obj == null, "Variable back to null.");
+      assert.ok(obj == null, "Variable back to null.");
       obj = new NPG.QC.LibraryMQCControl();
-      ok(obj !== undefined, "Variable is now an instance.");
+      assert.ok(obj !== undefined, "Variable is now an instance.");
       obj = new NPG.QC.LibraryMQCControl(new TestConfiguration());
-      ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
-      ok(obj.lane_control == null, "New object has null lane_control.");
-      ok(obj.abstractConfiguration !== undefined, 'Object has a configuration');
-      ok(obj.outcome == null, "New object has null outcome.");
+      assert.ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
+      assert.ok(obj.lane_control == null, "New object has null lane_control.");
+      assert.ok(obj.abstractConfiguration !== undefined, 'Object has a configuration');
+      assert.ok(obj.outcome == null, "New object has null outcome.");
     });
 
-    QUnit.test('Object instantiation for UI classes.', function() {
+    QUnit.test('Object instantiation for UI classes.', function( assert ) {
       var obj = null;
 
       obj = new NPG.QC.UI.MQCOutcomeRadio();
-      ok(obj !== undefined, 'Variable is now an instance of MQCOutcomeRadio');
+      assert.ok(obj !== undefined, 'Variable is now an instance of MQCOutcomeRadio');
       obj = null;
-      ok(obj == null);
+      assert.ok(obj == null);
 
       obj = new NPG.QC.UI.MQCLibraryOverallControls(new TestConfiguration());
-      ok(obj !== undefined, 'Variable is now an instance of MQCLibraryOverallControls');
+      assert.ok(obj !== undefined, 'Variable is now an instance of MQCLibraryOverallControls');
       obj = null;
-      ok(obj == null);
+      assert.ok(obj == null);
     });
-
-    // run the tests.
+    
+    // start QUnit because it was told to wait.
     QUnit.start();
   }
 );

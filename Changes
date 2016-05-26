@@ -2,6 +2,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - SeqQC:
    - Reintroduce collapser
+   - using grunt/npm to automate js testing
 
 release 61.1
  - SeqQC

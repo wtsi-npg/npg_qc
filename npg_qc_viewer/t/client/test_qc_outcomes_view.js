@@ -1,12 +1,14 @@
+/* globals $, QUnit, requirejs */
 "use strict";
-require.config({
+requirejs.config({
   baseUrl: '../../root/static',
   paths: {
-    jquery: 'bower_components/jquery/dist/jquery',
-  },
+    'qunit': 'bower_components/qunit/qunit/qunit',
+    jquery:  'bower_components/jquery/dist/jquery'
+  }
 });
 
-require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_styles'],
+requirejs(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_styles'],
   function(mqc_outcomes, qc_css_styles) {
     QUnit.test('Parsing RPT keys', function (assert) {
       var rptKeys = mqc_outcomes._parseRptKeys('results_summary');
@@ -96,7 +98,7 @@ require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_style
     });
 
     QUnit.test('Test chainging the interface mocking ajax', function (assert) {
-      expect(10);
+      assert.expect(10);
       var old_ajax = $.ajax;
       $.ajax = function (options) {
         assert.equal(options.url, "/qcoutcomes", 'Correct request url');
@@ -114,13 +116,13 @@ require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_style
           callback(data, 'success', {});
           return options;
         };
-        options.error = function (callback) { return options; };
+        options.error = function () { return options; };
         return options;
       };
 
       try {
         var lanes = 0, lanesWithClass = 0;
-        var whatToDoWithOutcomes = function(data, textStatus, jqXHR) {
+        var whatToDoWithOutcomes = function() {
           var lanes = 0, lanesWithClass = 0;
           $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
             lanes++;
@@ -168,7 +170,7 @@ require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_style
           }
         }
         return qcClasses;
-      }
+      };
 
       $('#results_summary').empty().append($('#fixture_sample_data').first().html());
       $('#fixture_sample_data').empty();
@@ -218,8 +220,8 @@ require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_style
       rows = 0; elementsWithClass = 0;
       $('tr[id*="rpt_key:19100:1"] td.tag_info').each(function (i, obj) {
         rows++;
-        if ($(obj).hasClass('qc_outcome_' + expected[i])
-            && countQCClasses($(obj)) == 1 ) {
+        if ($(obj).hasClass('qc_outcome_' + expected[i]) &&
+            countQCClasses($(obj)) == 1 ) {
           elementsWithClass++;
         }
       });
@@ -229,8 +231,8 @@ require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_style
       rows = 0; elementsWithClass = 0;
       $('tr[id*="rpt_key:19100:1"] td.lane').each(function (i, obj) {
         rows++;
-        if ($(obj).hasClass('qc_outcome_accepted_final')
-            && countQCClasses($(obj)) == 1 ) {
+        if ($(obj).hasClass('qc_outcome_accepted_final') &&
+            countQCClasses($(obj)) == 1 ) {
           elementsWithClass++;
         }
       });
@@ -241,8 +243,8 @@ require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_style
       rows = 0; elementsWithClass = 0;
       $('tr[id*="rpt_key:19101:1"] td.tag_info').each(function (i, obj) {
         rows++;
-        if ($(obj).hasClass('qc_outcome_undecided')
-            && countQCClasses($(obj)) == 1 ) {
+        if ($(obj).hasClass('qc_outcome_undecided') &&
+            countQCClasses($(obj)) == 1 ) {
           elementsWithClass++;
         }
       });
@@ -252,8 +254,8 @@ require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_style
       rows = 0; elementsWithClass = 0;
       $('tr[id*="rpt_key:19101:1"] td.lane').each(function (i, obj) {
         rows++;
-        if ($(obj).hasClass('qc_outcome_undecided')
-            && countQCClasses($(obj)) == 1 ) {
+        if ($(obj).hasClass('qc_outcome_undecided') &&
+            countQCClasses($(obj)) == 1 ) {
           elementsWithClass++;
         }
       });
@@ -264,7 +266,7 @@ require(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_style
     QUnit.test("QC outcomes map to css styles", function (assert) {
       var element = $('<div></div>');
       assert.throws(
-        function () { qc_css_styles.displayElementAs(element, 'Accepted maybe') },
+        function () { qc_css_styles.displayElementAs(element, 'Accepted maybe'); },
         /corresponding style for QC outcome/,
         'Throws exception for unknown QC outcome'
       );

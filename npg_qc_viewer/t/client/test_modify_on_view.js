@@ -1,13 +1,15 @@
+/* globals $, QUnit, requirejs, window */
 "use strict";
 requirejs.config({
   baseUrl: '../../root/static',
   paths: {
-    jquery: 'bower_components/jquery/dist/jquery',
-  },
+    'qunit': 'bower_components/qunit/qunit/qunit',
+    jquery:  'bower_components/jquery/dist/jquery'
+  }
 });
 
-define(['scripts/modify_on_view',], function(disp_on_dem) {
-  // run the tests.
+requirejs(['scripts/modify_on_view',], function(disp_on_dem) {
+  QUnit.config.autostart = false;
   QUnit.test('Testing changing objects on window scroll', function (assert) {
     var $w = $(window);
     var elements = ['first', 'up', 'middle', 'down', 'last'];
@@ -21,8 +23,8 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
       var element = disp_on_dem.buildModifyOnViewElement(
         selectorFilter,
         threshold,
-        function (i, obj) { if (obj.data('displayed') !== 1) { obj.data('displayed', 1) } },
-        function (i, obj) { if (obj.data('displayed') !== 0) { obj.data('displayed', 0) } }
+        function (i, obj) { if (obj.data('displayed') !== 1) { obj.data('displayed', 1); } },
+        function (i, obj) { if (obj.data('displayed') !== 0) { obj.data('displayed', 0); } }
       );
 
       elementsToDisplay.push(element);
@@ -59,7 +61,7 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 0, "down has not displayed");
     assert.equal($last.data('displayed'), 0, "last has not displayed");
 
-    window.scroll(0, $up.offset().top) - 10;
+    window.scroll(0, $up.offset().top - 10);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 1, "up has displayed");
@@ -67,7 +69,7 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 0, "down has not displayed");
     assert.equal($last.data('displayed'), 0, "last has not displayed");
 
-    window.scroll(0, $middle.offset().top) - 10;
+    window.scroll(0, $middle.offset().top - 10);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 0, "up has not displayed");
@@ -75,7 +77,7 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 1, "down has displayed");
     assert.equal($last.data('displayed'), 0, "last has not displayed");
 
-    window.scroll(0, $down.offset().top) - 10;
+    window.scroll(0, $down.offset().top - 10);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 0, "up has not displayed");
@@ -83,7 +85,7 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 1, "down has displayed");
     assert.equal($last.data('displayed'), 1, "last has displayed");
 
-    window.scroll(0, $up.offset().top) - 10;
+    window.scroll(0, $up.offset().top - 10);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 1, "up has displayed");
@@ -104,10 +106,11 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
   QUnit.test('Testing changing objects on window scroll with a big DOM', function (assert) {
     var bigHtml = $('#big_padding_data').html();
     var howManyLanes = 100;
+    var element, i;
 
     var paddingNames = ['padding_at_start', 'padding_at_end'];
-    for(var i = 0; i < paddingNames.length; i++) {
-      var element = $($('#' + paddingNames[i]).first());
+    for(i = 0; i < paddingNames.length; i++) {
+      element = $($('#' + paddingNames[i]).first());
       for(var j = 0; j < howManyLanes; j++) {
         element.append(bigHtml);
       }
@@ -119,6 +122,13 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
                  'Generated ' + ( howManyLanes * 2 ) + ' extra padding elements in DOM');
 
     var $w = $(window);
+    var $first = $('#first').first();
+    var $up = $('#up').first();
+    var $middle = $('#middle').first();
+    var $down = $('#down').first();
+    var $last = $('#last').first();
+
+    var windowStartPos = $first.offset().top - 10;
     window.scroll(0, windowStartPos);
     $w.trigger("scroll");
 
@@ -126,27 +136,21 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     var threshold = $w.innerHeight() * 0.75;
     var elementsToDisplay = [];
 
-    for (var i = 0; i < elements.length; i++) {
+    for (i = 0; i < elements.length; i++) {
       var selectorFilter = '#' + elements[i];
       $($(selectorFilter).first()).data('displayed', 0);
 
-      var element = disp_on_dem.buildModifyOnViewElement(
+      element = disp_on_dem.buildModifyOnViewElement(
         selectorFilter,
         threshold,
-        function (i, obj) { if (obj.data('displayed') !== 1) { obj.data('displayed', 1) } },
-        function (i, obj) { if (obj.data('displayed') !== 0) { obj.data('displayed', 0) } }
+        function (i, obj) { if (obj.data('displayed') !== 1) { obj.data('displayed', 1); } },
+        function (i, obj) { if (obj.data('displayed') !== 0) { obj.data('displayed', 0); } }
       );
 
       elementsToDisplay.push(element);
     }
 
     disp_on_dem.modifyOnView(elementsToDisplay);
-
-    var $first = $('#first').first();
-    var $up = $('#up').first();
-    var $middle = $('#middle').first();
-    var $down = $('#down').first();
-    var $last = $('#last').first();
 
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 0, "up has not displayed");
@@ -168,7 +172,6 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
       self.height(windowHeight / 2);
     });
 
-    var windowStartPos = $first.offset().top - 10;
     window.scroll(0, windowStartPos);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 1, "first has displayed");
@@ -177,7 +180,7 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 0, "down has not displayed");
     assert.equal($last.data('displayed'), 0, "last has not displayed");
 
-    window.scroll(0, $up.offset().top) - 10;
+    window.scroll(0, $up.offset().top - 10);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 1, "up has displayed");
@@ -185,7 +188,7 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 0, "down has not displayed");
     assert.equal($last.data('displayed'), 0, "last has not displayed");
 
-    window.scroll(0, $middle.offset().top) - 10;
+    window.scroll(0, $middle.offset().top - 10);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 0, "up has not displayed");
@@ -193,7 +196,7 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 1, "down has displayed");
     assert.equal($last.data('displayed'), 0, "last has not displayed");
 
-    window.scroll(0, $down.offset().top) - 10;
+    window.scroll(0, $down.offset().top - 10);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 0, "up has not displayed");
@@ -201,7 +204,7 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 1, "down has displayed");
     assert.equal($last.data('displayed'), 1, "last has displayed");
 
-    window.scroll(0, $up.offset().top) - 10;
+    window.scroll(0, $up.offset().top - 10);
     $w.trigger("scroll");
     assert.equal($first.data('displayed'), 0, "first has not displayed");
     assert.equal($up.data('displayed'), 1, "up has displayed");
@@ -217,8 +220,8 @@ define(['scripts/modify_on_view',], function(disp_on_dem) {
     assert.equal($down.data('displayed'), 0, "down has not displayed");
     assert.equal($last.data('displayed'), 0, "last has not displayed");
 
-    for(var i = 0; i < paddingNames.length; i++) {
-      var element = $($('#' + paddingNames[i]).first());
+    for(i = 0; i < paddingNames.length; i++) {
+      element = $($('#' + paddingNames[i]).first());
       element.empty();
     }
   });
