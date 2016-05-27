@@ -53,7 +53,7 @@ module.exports = function(grunt) {
         console: true,
         '--debug': true,
       },
-      all: ['t/client/test*.html']
+      all: ['t/client/test*.html'],
     },
     watch: {
       js: {
@@ -69,11 +69,21 @@ module.exports = function(grunt) {
           'test'
         ]
       }
-    }
+    },
   });
 
   grunt.registerTask('lint', ['jsonlint', 'jshint', 'jscs']);
-  grunt.registerTask('test', ['lint', 'qunit']);
+  grunt.registerTask('test', 'Run tests', function( pattern ) {
+    if ( !!pattern ) {
+      if ( !pattern.startsWith('t/client/') ) {
+        pattern = 't/client/' + pattern;
+      }
+      grunt.config.set('qunit.all', [pattern]);
+      grunt.task.run('qunit:all');
+    } else {
+      grunt.task.run(['lint', 'qunit']);
+    }
+  });
   grunt.registerTask('default', ['test']);
 };
 
