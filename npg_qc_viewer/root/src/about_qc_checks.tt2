@@ -142,7 +142,7 @@ Any close genotype matches found under a different sample name, allowing homozyg
 <h3>VerifyBamID contamination check</h3>
 <br/><br/>
 <h4>Description</h4>
-VerifyBamID provides metrics which can be be informative in helping to 
+VerifyBamID provides metrics which can be informative in helping to 
 determine whether a sample has possibly been subject to within-species 
 DNA contamination from an unrelated individual.
 <br/>
@@ -201,9 +201,9 @@ included in the estimate, then further investigation into the
 possibility of contamination is recommended.
 <br/>
 
-Results will be coloured red where the estimates of FREEMIX are greater 
-than or equal to 0.05, average depth is greater than or equal to 4 and 
-the number of sites is greater than or equal to 10,000.
+Results will be coloured red where the estimates of FREEMIX are greater
+than or equal to 0.05, average depth is greater than or equal to 2 and
+the number of sites is greater than 10,000.
 
 <br/><br/>
 

@@ -1,0 +1,15 @@
+{
+  "preset": "jquery",
+  "disallowTrailingComma": false,
+  "maximumLineLength": {
+    "value": 120,
+    "tabSize": 2,
+    "allExcept": ["urlComments", "regex"]
+  },
+  "requireCamelCaseOrUpperCaseIdentifiers": false,
+  "requireSpacesInsideArrayBrackets": false,
+  "requireSpacesInsideBrackets": false,
+  "requireSpacesInsideParentheses": false,
+  "validateQuoteMarks": false
+}
+

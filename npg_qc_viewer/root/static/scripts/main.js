@@ -1,6 +1,6 @@
-/* globals $: false, require: false, document: false */
+/* globals $, requirejs, document */
 "use strict";
-require.config({
+requirejs.config({
   baseUrl: '/static',
   catchError: true,
   paths: {
@@ -19,7 +19,7 @@ require.config({
   }
 });
 
-require.onError = function (err) {
+requirejs.onError = function (err) {
     if ( console ) {
       console.log(err.requireType);
       console.log('modules: ' + err.requireModules);
@@ -27,7 +27,8 @@ require.onError = function (err) {
     throw err;
 };
 
-require([
+requirejs([
+  'scripts/collapse',
   'scripts/qcoutcomes/qc_outcomes_view',
   'scripts/plots',
   'scripts/format_for_csv',
@@ -35,11 +36,22 @@ require([
   'scripts/qcoutcomes/manual_qc',
   'unveil',
   'table-export'
-],
-function( qc_outcomes_view, plots, format_for_csv, qc_page, NPG ) {
-  //Setup for heatmaps to load on demand.
+], function(
+  collapse,
+  qc_outcomes_view,
+  plots,
+  format_for_csv,
+  qc_page,
+  NPG
+) {
   $(document).ready(function(){
+    //Setup for heatmaps to load on demand.
     $("img").unveil(2000);
+    collapse.init(function() {
+
+      // We scroll after collapse toggles to fire modify on view to generate plots
+      window.scrollBy(0,1); window.scrollBy(0,-1);
+    });
     var qcp = qc_page.pageForMQC();
     var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) {
                                                         NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes');
