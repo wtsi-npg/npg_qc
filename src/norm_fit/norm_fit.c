@@ -89,25 +89,25 @@ int main(int argc, char **argv)
     float histN[100];
     float sds[100];// standard deviations of other modes if any
 
-	static struct option long_options[] =
-        { {"min_distance", 1, 0, 'd'},
-          {"min_amplitude", 1, 0, 'a'},
-          {"help", 0, 0, 'h'},
-          {0, 0, 0, 0}
-        };
+    static struct option long_options[] =
+    { {"min_distance", 1, 0, 'd'},
+      {"min_amplitude", 1, 0, 'a'},
+      {"help", 0, 0, 'h'},
+      {0, 0, 0, 0}
+    };
 
     char c;
-	while ( (c = getopt_long(argc, argv, "d:a:h?", long_options, 0)) != -1) {
-		switch (c) {
-			case 'd':	min_distance = atof(optarg); break;
-			case 'a':	min_amplitude = atof(optarg); break;
-			case 'h':
-			case '?':	usage(0);					break;
-            default:	fprintf(stderr, "ERROR: Unknown option %c\n", c);
-						usage(1);
-						break;
-		}
-	}
+    while ( (c = getopt_long(argc, argv, "d:a:h?", long_options, 0)) != -1) {
+        switch (c) {
+                    case 'd':       min_distance = atof(optarg); break;
+                    case 'a':       min_amplitude = atof(optarg); break;
+                    case 'h':
+                    case '?':       usage(0);                                       break;
+        default:    fprintf(stderr, "ERROR: Unknown option %c\n", c);
+                                            usage(1);
+                                            break;
+        }
+    }
 
     if((argc-optind) < NPAR)//two input/output files are required
     {
@@ -205,11 +205,11 @@ int main(int argc, char **argv)
     // ------------------find peak amps and positions:  4 jan
     k = 0;
     if ((hist[0]-hist[1]) >= 0)
-	    {
-			amp[k] = hist[0];
-            pos[k] = bins[0];
-				k++;
-        }
+    {
+        amp[k] = hist[0];
+        pos[k] = bins[0];
+        k++;
+    }
     for (i=1; i<nbins-1; i++)
     {
         //peak amp and position
@@ -223,9 +223,9 @@ int main(int argc, char **argv)
     // Last bin peak
     if ((hist[nbins-1]-hist[nbins-2]) >= 0)
     {
-				amp[k] = hist[nbins-1];
-	            pos[k] = bins[nbins-1];
-					k++;
+        amp[k] = hist[nbins-1];
+        pos[k] = bins[nbins-1];
+        k++;
     }
     num_peS = k;
     if (0 == num_peS)
@@ -259,11 +259,11 @@ int main(int argc, char **argv)
     num_modes = num_peD;
     //3.1  ----estimate stds of filtered in remaining peaks=modes
 
-      for (k=0; k<num_modes; k++)
-      {
-		  sds[k]=EstimateStd(hist,bins,nbins,pos[k],amp[k]);// std of a filtered mode
-          //printf("st dev of a mode %.2f\n", sds[k]);
-	  }
+    for (k=0; k<num_modes; k++)
+    {
+        sds[k]=EstimateStd(hist,bins,nbins,pos[k],amp[k]);// std of a filtered mode
+        //printf("st dev of a mode %.2f\n", sds[k]);
+    }
 
     //4 -----------compute params of main mode
     mu = FindMainMode(hist,bins,nbins,height);// mu for Norm fit
@@ -325,36 +325,36 @@ int main(int argc, char **argv)
 //// ------------------------------usage
 void usage(int code)
 {
-	FILE *usagefp = stderr;
+    FILE *usagefp = stderr;
 
-	fprintf(usagefp, "norm_fit\n\n");
-	fprintf(usagefp,
-		"Usage: norm_fit [options] hist_file pass_file\n"
-		"\n" "  fit a normal distribution to a histogram of insert sizes\n" "\n");
-	fprintf(usagefp, "\n");
-	fprintf(usagefp, "  options:\n");
-	fprintf(usagefp, "\n");
-	fprintf(usagefp, "    -d  minimum distance between peaks in bin widths\n");
-	fprintf(usagefp, "        peaks closer than this will be clustered\n");
-	fprintf(usagefp, "        default 5\n");
-	fprintf(usagefp, "\n");
-	fprintf(usagefp, "    -a  minimum relative peak amplitude\n");
-	fprintf(usagefp, "        peaks smaller than this will be ignored\n");
-	fprintf(usagefp, "        default 0.05\n");
-	fprintf(usagefp, "\n");
-	fprintf(usagefp, "  hist file format:\n");
-	fprintf(usagefp, "\n");
-	fprintf(usagefp, "    one integer value per line\n");
-	fprintf(usagefp, "\n");
-	fprintf(usagefp, "    minimum insert size\n");
-	fprintf(usagefp, "    insert size bin width\n");
-	fprintf(usagefp, "    number of bins\n");
-	fprintf(usagefp, "    bin count 1\n");
-	fprintf(usagefp, "    bin count 2\n");
-	fprintf(usagefp, "      .\n");
-	fprintf(usagefp, "      .\n");
+    fprintf(usagefp, "norm_fit\n\n");
+    fprintf(usagefp,
+            "Usage: norm_fit [options] hist_file pass_file\n"
+            "\n" "  fit a normal distribution to a histogram of insert sizes\n" "\n");
+    fprintf(usagefp, "\n");
+    fprintf(usagefp, "  options:\n");
+    fprintf(usagefp, "\n");
+    fprintf(usagefp, "    -d  minimum distance between peaks in bin widths\n");
+    fprintf(usagefp, "        peaks closer than this will be clustered\n");
+    fprintf(usagefp, "        default 5\n");
+    fprintf(usagefp, "\n");
+    fprintf(usagefp, "    -a  minimum relative peak amplitude\n");
+    fprintf(usagefp, "        peaks smaller than this will be ignored\n");
+    fprintf(usagefp, "        default 0.05\n");
+    fprintf(usagefp, "\n");
+    fprintf(usagefp, "  hist file format:\n");
+    fprintf(usagefp, "\n");
+    fprintf(usagefp, "    one integer value per line\n");
+    fprintf(usagefp, "\n");
+    fprintf(usagefp, "    minimum insert size\n");
+    fprintf(usagefp, "    insert size bin width\n");
+    fprintf(usagefp, "    number of bins\n");
+    fprintf(usagefp, "    bin count 1\n");
+    fprintf(usagefp, "    bin count 2\n");
+    fprintf(usagefp, "      .\n");
+    fprintf(usagefp, "      .\n");
 
-	exit(code);
+    exit(code);
 }
 
 //// ------------------------------maximum value
@@ -434,7 +434,7 @@ int FindMainMode (float hist[],int bins[],int nbins, float height)// mu for Norm
     for (n=0; n<nbins; n++)
     {
         if (hist[n] == height)
-        mode = bins[n];
+            mode = bins[n];
 
     }
     return mode;
@@ -502,7 +502,7 @@ int CountPeaksNew(float hist[], int bins[], int nbins)
     k=0;
     if ((hist[0]-hist[1]) >= 0)
     {
-			k++;
+                        k++;
     }
     for (i=1; i<nbins-1; i++)
     {
@@ -513,8 +513,8 @@ int CountPeaksNew(float hist[], int bins[], int nbins)
 
     }
     if ((hist[nbins-1]-hist[nbins-2]) >= 0)
-	{
-					k++;
+    {
+        k++;
     }
     return k;
 }
@@ -537,7 +537,7 @@ int FilterDistance(int *pos, float *amp, int dist, int npos)
         //1. check adjacent positions/peaks: how close they are
         for (i=0; i<npos-1; i++)
         {
-          if ((pos[i+1]-pos[i]) < dist)
+            if ((pos[i+1]-pos[i]) < dist)
             {   //1.1  if close update pos/amp of cluster maximum
                 if (amp[i+1] > clus_amp)
                 {
