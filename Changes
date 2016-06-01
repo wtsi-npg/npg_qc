@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - restored croak when closing samtools pileup command
+ 
 release 61.2
  - SeqQC:
    - Reintroduce collapser
