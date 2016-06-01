@@ -307,7 +307,7 @@ int main(int argc, char **argv)
     fprintf(fp,"confidence=%.2f\n", confidence);
     fprintf(fp,"nmode=%d\n", num_modes);
     fprintf(fp,"#amplitude,mu,std of main mode after smoothing\n%.2f %d %.2f\n", height, mu, sd);
-    fprintf(fp,"#amplitude,mu,std of all filtered modes\n");
+    fprintf(fp,"#amplitude,mu filtered modes\n");
     for (k=0; k<num_modes; k++)
     {
         fprintf(fp,"%.2f %d\n",amp[k],pos[k]);
