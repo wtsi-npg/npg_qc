@@ -1,6 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - restored croak when closing samtools pileup command
+ - genotype check, croak if error closing samtools pileup command
+ - norm_fit
+     - modify peak finding to allow for peaks in first/last bin
+     - added monotonity condition when estimating stdev
+     - drop stdev when outputting filtered modes
  
 release 61.2
  - SeqQC:

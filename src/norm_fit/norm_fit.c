@@ -2,6 +2,7 @@
  * Authors: designed and written by Irina Abnizova (ia1) and Steven Leonard (srl)
  *
   Last edited:
+  28 Sep -when outputting filtered modes skip stdev
   30 Jan -sds, monotonuity, separate treating of first and last bin peaks: twice larger std
   Jan 2015--added first and last bins as possible peaks(after bug in run 14975)
         -- added estimation of standard deviation for all modes filtered in
@@ -309,7 +310,7 @@ int main(int argc, char **argv)
     fprintf(fp,"#amplitude,mu,std of all filtered modes\n");
     for (k=0; k<num_modes; k++)
     {
-        fprintf(fp,"%.2f %d %.2f\n",amp[k],pos[k],sds[k]);
+        fprintf(fp,"%.2f %d\n",amp[k],pos[k]);
     }
     fclose(fp);
 
