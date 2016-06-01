@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 30;
+use lib 't/lib';
+use Test::More tests => 25;
 use Test::Exception;
-use HTTP::Headers;
 use HTTP::Request::Common;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -13,6 +13,8 @@ use t::util;
 my $schemas;
 
 my $util = t::util->new();
+$util->modify_logged_user_method();
+
 lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 local $ENV{'CATALYST_CONFIG'} = $util->config_path;
 local $ENV{'TEST_DIR'}        = $util->staging_path;
@@ -47,25 +49,16 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
 }
 
 {
-  my @urls = (q[/checks/runs/4025], q[/checks/runs-from-staging/4025]);
-
+  my @urls = qw(/checks/runs/4025 /checks/runs-from-staging/4025);
   foreach my $url (@urls) {
-    my $req = GET($url);
-    my $res;
-    my $c;
-    warnings_like{ ($res, $c) = ctx_request($req) } [qr/Use of uninitialized value \$id in exists/, ], 
-                                        'Expected warning for non set id';
-    
-    ok ($res, $req->uri . q[ requested]);
+    my ($res, $c) = ctx_request(GET($url));
+    ok ($res, qq[$url requested]);
     ok ($res->is_success, 'request succeeded');
     my $rl_map = $c->stash->{rl_map};
     my $count = 0;
-  
     foreach my $key (keys %{$rl_map}) {
-      #map{note $_->class_name} @{ $rl_map->{$key}->results };
       $count += $rl_map->{$key}->size();
     }
-  
     my $expected_count = $url eq q[/checks/runs/4025] ? 40 : 46;
     is($count, $expected_count, qq[$expected_count result objects in stash for run 4025]);
     is (join(' ', sort keys %{$rl_map}), join(' ', @keys), 'keys in the rl map');
@@ -73,14 +66,10 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
 }
 
 {
-  my @urls = (q[/checks/runs?run=4025&show=all], q[/checks/runs?run=4025&show=lanes]);
+  my @urls = qw(/checks/runs?run=4025&show=all /checks/runs?run=4025&show=lanes);
        foreach my $url (@urls) {
-  my $req = GET($url);
-  my $res;
-  my $c;
-  warnings_like{ ($res, $c) = ctx_request($req) } [qr/Use of uninitialized value \$id in exists/, ], 
-                                      'Expected warning for non set id';
-  ok ($res, $req->uri . q[ requested]);
+  my ($res, $c) = ctx_request(GET($url));
+  ok ($res, qq[$url requested]);
   ok ($res->is_success, 'request succeeded');
   my $rl_map = $c->stash->{rl_map};
   is (join(' ', sort keys %{$rl_map}), join(' ', @keys), 'keys in the rl map');
@@ -89,10 +78,7 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
 
 {
   my $req = GET(q[/checks/runs?run=4025&show=plexes]);
-  my $res;
-  my $c;
-  warnings_like{ ($res, $c) = ctx_request($req) } [qr/Use of uninitialized value \$id in exists/, ], 
-                                      'Expected warning for non set id';
+  my ($res, $c) = ctx_request($req);
   ok ($res, $req->uri . q[ requested]);
   ok ($res->is_success, 'request succeeded');
   ok ($c->stash->{rl_map}, 'rl map defined');
@@ -103,8 +89,7 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
   my $req = GET(q[/checks/runs/4099]);
   my $res;
   my $c;
-  warnings_like{ ($res, $c) = ctx_request($req) } [ { carped => qr/Failed to get runfolder location/ }, 
-                                                    qr/Use of uninitialized value \$id in exists/, ], 
+  warnings_like{ ($res, $c) = ctx_request($req) } [ { carped => qr/Failed to get runfolder location/ } ], 
                                       'Expected warning for run folder not found';
   ok ($res, $req->uri . q[ requested]);
   ok ($res->is_success, 'request succeeded');

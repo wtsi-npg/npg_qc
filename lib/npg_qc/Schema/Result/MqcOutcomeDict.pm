@@ -117,6 +117,20 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_mqc_outcome');
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<unique_seq_outcome_desc>
+
+=over 4
+
+=item * L</short_desc>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint('unique_seq_outcome_desc', ['short_desc']);
+
 =head1 RELATIONS
 
 =head2 mqc_outcome_ents
@@ -150,25 +164,12 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yp0Z5RWtf5JyeRvWEJ5uGA
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-02-25 12:46:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:uvX5dg+iK+c1e6Vv6zqBHQ
+
+with qw/npg_qc::Schema::Mqc::OutcomeDict/;
 
 our $VERSION = '0';
-
-sub is_final_outcome {
-  my $self = shift;
-  return $self->short_desc =~ m{final}ism; #The short description includes the word final.
-}
-
-sub is_accepted {
-  my $self = shift;
-  return $self->short_desc =~ m{accepted}ism; #The short description includes the word accepted.
-}
-
-sub is_final_accepted {
-  my $self = shift;
-  return $self->is_final_outcome && $self->is_accepted;
-}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -186,20 +187,6 @@ Catalog for manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
-
-=head2 is_final_outcome
-
-  Utility method to check if the outcome is considered final.
-
-=head2 is_accepted
-
-  Utility method which checks the short description to decide if the outcome can 
-  be considered accepted.
-  
-=head2 is_final_accepted
-
-  Utility method which checks the short description to decide if the outcome can 
-  be considered final and accepted.
 
 =cut
 
@@ -221,9 +208,7 @@ Catalog for manual MQC statuses.
 
 =item DBIx::Class::Core
 
-=item DBIx::Class::InflateColumn::DateTime
-
-=item DBIx::Class::InflateColumn::Serializer
+=item npg_qc::Schema::Mqc::OutcomeDict
 
 =back
 

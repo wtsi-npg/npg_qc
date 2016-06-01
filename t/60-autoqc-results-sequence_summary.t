@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 use Archive::Extract;
@@ -38,7 +38,7 @@ subtest 'simple tests' => sub {
   
   throws_ok { npg_qc::autoqc::results::sequence_summary->new(
         sequence_file => '/some/file') } 
-    qr/Validation failed for 'NpgTrackingReadableFile' with value "\/some\/file"/,
+    qr/Validation failed for 'NpgTrackingReadableFile' with value/,
     'sequence file does not exist - error';
 
   lives_ok { $r = npg_qc::autoqc::results::sequence_summary->new(
@@ -86,6 +86,21 @@ subtest 'object with an one-component composition' => sub {
     lives_and { is $r->$attr, undef} "$attr value is undefined";
   }
   lives_ok { $r->freeze() } 'can serialize';
+};
+
+subtest 'deserialization: version mismatch supressed' => sub {
+   plan tests => 4;
+ 
+  my $json_string = slurp $tempdir .
+    '/17448_1_9/qc/all_json/17448_1#9_phix.sequence_summary.json';
+  like ($json_string, qr/npg_qc::autoqc::results::sequence_summary-0.0/,
+    'expected version');
+  like ($json_string, qr/npg_tracking::glossary::composition-3.1.1/,
+    'expected version');
+  like ($json_string, qr/npg_tracking::glossary::composition::component::illumina-0/,
+    'expected version');
+  lives_ok { npg_qc::autoqc::results::sequence_summary->thaw($json_string) }
+    'version mismatch does not cause an error';
 };
 
 1;

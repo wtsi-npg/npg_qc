@@ -12,7 +12,11 @@
   <th class="laligned">Freemix</th> <td>[% check.freemix %]</td>
   <th class="laligned">FreeLK0</th> <td>[% check.freeLK0 %]</td>
   <th class="laligned">FreeLK1</th> <td>[% check.freeLK1 %]</td>
+ [%- IF check.criterion.defined -%]
+  <th class="laligned">Pass criterion</th> <td>[% check.criterion FILTER html %]</td>
+ [%- END -%]
 </tr>
 </table>
 
+</div>
 

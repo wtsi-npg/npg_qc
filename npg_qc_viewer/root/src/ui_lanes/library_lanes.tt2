@@ -4,16 +4,27 @@
 
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
-  checks_info = collection_all.check_names;
+  checks_info = collection_all.check_names; # used in collapser menu template too
 
+  tag_metrics_cache = {};
   temp = [];
   FOREACH check_name IN checks_info.list;
     IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
-      temp.push(check_name);
+      IF check_name == 'tag metrics';
+        temp.unshift(check_name);
+      ELSE;
+        temp.push(check_name);
+      END;
     END;
   END;
+
   checks_list=temp;
   map=checks_info.map;
+
+  tag_metrics_collection = collection_all.search(check_name => 'tag metrics');
+  FOREACH tag_metrics_result IN tag_metrics_collection.results;
+    tag_metrics_cache.${tag_metrics_result.id_run}.${tag_metrics_result.position} = tag_metrics_result;
+  END;
 
   row_span_string = '';
   IF checks_list.size;
@@ -23,7 +34,7 @@
   IF rl_map.defined;
     rl_keys = rl_map.keys;
     IF rl_keys.size;
-      sorted_rl_map_keys = util.sort_rpt_keys(rl_keys);
+      sorted_rl_map_keys = util.sort_rpt_keys_zero_last(rl_keys);
       IF (!run_from_staging && !path_list.defined);
         run_ids = util.runs_from_rpt_keys(rl_keys);
         IF run_ids.size == 1;
@@ -49,24 +60,31 @@
   </ul>
 [%- END %]
 [%- IF run_view.defined && run_view %][% PROCESS ui_runs/run_menu.tt2 -%][% END %]
+  <ul>
+    <li><a href='#' id='summary_to_csv' title='Download the summary table as a CSV file'>Summary to CSV file</a></li>
+  </ul>
+  [% PROCESS ui_lanes/collapse_menu.tt2 -%]
 </div>
 </div>
 
 <div id="content">
 
 <table id="results_summary" summary="QC results summary">
+<thead>
 <tr>
 <th[% row_span_string %]>Library<br />------<br />Sample<br />Name</th>
 <th[% row_span_string %]>Run Id<br />------<br />Num.<br />Cycles</th>
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
-
+</thead>
 [%- qxTotal = 0; #For total qxYield
 
     #For heatmaps
     action_plot = c.controller('Visuals').action_for('fastqcheck');
     legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
-    
+
+    id_runs_in_collection = []; # Used for page's title (how many different id runs in page)
+
     FOREACH lane_key IN sorted_rl_map_keys;
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
@@ -76,15 +94,17 @@
       position  = attrs.position;
       tag_index = '';
 
+      id_runs_in_collection.push(id_run);
+
       IF attrs.defined('tag_index');
         tag_index = attrs.tag_index;
       END;
 
       row_info_to = c.stash.row_data.$lane_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
+      table_row_id = lane_key.defined ? ' id="rpt_key:' _ lane_key _ '"' : '';
 -%]
-
-<tr>
+<tr[%- table_row_id -%]>
 <td class="lib nbsp">
 <div class="rel_pos_container">
 [%- IF lane_collection.run_lane_plex_flags.${lane_key} -%]
@@ -121,7 +141,7 @@
 
 [% PROCESS "ui_lanes/lane.tt2" %]
 </tr>
-[%- END -%]
+[%- END #foreach lane_key in sorted_rl_map_keys -%]
 
 [%- IF show_total.defined && show_total;
     column_counter = 3;
@@ -153,19 +173,21 @@
 [%- END -%]
 [%# Calculating totals for qXyield end %]
 [%- END -%]
-
 </table>
 
 [%-
   IF run_view;
     PROCESS ui_runs/annotations.tt2;
-
+  END;
+  distinct_id_runs_in_collection = id_runs_in_collection.unique;
+  IF distinct_id_runs_in_collection.size == 1;
+    single_id_run = distinct_id_runs_in_collection.first;
     current_run_status = '';
-    cs = c.model('NpgDB').resultset('RunStatus').find({ 'id_run' => "$id_run", 'iscurrent' => 1}, );
+    cs = c.model('NpgDB').resultset('RunStatus').find({ 'id_run' => "$single_id_run", 'iscurrent' => 1}, );
     IF cs;
       current_run_status = cs.run_status_dict.description;
       IF current_run_status;
-         title = title _ ' (current run status: ' _ current_run_status;
+         title = title _ ' (run ' _ single_id_run _ ' status: ' _ current_run_status;
          IF !run_from_staging && (current_run_status == 'qc in progress' || current_run_status == 'qc on hold');
            title = title _ ', taken by ' _ cs.user.username;
          END;

@@ -10,7 +10,7 @@ use List::MoreUtils qw/ none /;
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
 use npg_qc::autoqc::results::collection;
-use npg_qc_viewer::TransferObjects::ProductMetrics4RunTO;
+use npg_qc_viewer::Util::TransferObjectFactory;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -240,6 +240,13 @@ sub _run_lanes_from_dwh {
   my $rs = $c->model('MLWarehouseDB')->search_product_metrics($where);
 
   while (my $product_metric = $rs->next) {
+
+    my $to_factory =  npg_qc_viewer::Util::TransferObjectFactory->new(
+      product_metrics_row => $product_metric,
+      qc_schema           => $c->model('NpgQcDB'),
+      lane_level          => 1
+                      );
+
     if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
       if ( !defined $product_metric->tag_index ||
            ( $product_metric->iseq_flowcell
@@ -251,9 +258,7 @@ sub _run_lanes_from_dwh {
           $key = $product_metric->lane_rpt_key_from_key($key);
         }
         if ( !exists $row_data->{$key} ) {
-          $row_data->{$key} =
-            npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new(
-              $self->_build_hash($product_metric));
+          $row_data->{$key} = $to_factory->create_object();
         }
       }
     }
@@ -262,10 +267,8 @@ sub _run_lanes_from_dwh {
       if (defined $product_metric->tag_index) {
         my $key = $product_metric->rpt_key;
         if ( !defined $row_data->{$key} ) {
-          my $values = $self->_build_hash($product_metric);
-          delete $values->{'manual_qc'};
-          $row_data->{$key} =
-            npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new($values);
+          $to_factory->lane_level(0);
+          $row_data->{$key} = $to_factory->create_object();
         }
       }
     }
@@ -274,36 +277,6 @@ sub _run_lanes_from_dwh {
   $c->stash->{'row_data'} = $row_data;
 
   return;
-}
-
-sub _build_hash {
-  my ($self, $product_metric) = @_;
-
-  my $values = {};
-  $values->{'id_run'}       = $product_metric->id_run;
-  $values->{'position'}     = $product_metric->position;
-  $values->{'tag_index'}    = $product_metric->tag_index;
-  $values->{'tag_sequence'} = $product_metric->tag_sequence4deplexing;
-
-  $values->{'num_cycles'}   = $product_metric->iseq_run_lane_metric->cycles;
-  $values->{'time_comp'}    = $product_metric->iseq_run_lane_metric->run_complete;
-
-  if ( defined $product_metric->iseq_flowcell ) {
-    my $flowcell = $product_metric->iseq_flowcell;
-    $values->{'id_library_lims'}      = $flowcell->id_library_lims;
-    $values->{'legacy_library_id'}    = $flowcell->legacy_library_id;
-    $values->{'id_pool_lims'}         = $flowcell->id_pool_lims;
-    $values->{'rnd'}                  = $flowcell->is_r_and_d;
-    $values->{'manual_qc'}            = $flowcell->manual_qc;
-    $values->{'is_gclp'}              = $flowcell->from_gclp;
-    $values->{'entity_id_lims'}       = $flowcell->entity_id_lims;
-    $values->{'study_name'}           = $flowcell->study_name;
-    $values->{'id_sample_lims'}       = $flowcell->sample_id;
-    $values->{'sample_name'}          = $flowcell->sample_name;
-    $values->{'supplier_sample_name'} = $flowcell->sample_supplier_name;
-  }
-
-  return $values;
 }
 
 =head2 base
@@ -347,6 +320,18 @@ sub about :Path('about') :Args(0) {
   my ( $self, $c ) = @_;
   $c->stash->{'title'} = _get_title(q[about QC checks]);
   $c->stash->{'template'} = q[about_qc_checks.tt2];
+  return;
+}
+
+=head2 about_qc_proc
+
+QC help page
+
+=cut
+sub about_qc_proc :Path('about_qc_proc') :Args(0) {
+  my ( $self, $c )  = @_;
+  $c->stash->{'title'} = _get_title(q[about manual QC]);
+  $c->stash->{'template'} = q[about_qc_proc.tt2];
   return;
 }
 

@@ -12,7 +12,7 @@
       gc_bias          = '<span class="nbsp">plot created</span><br />'
       bam_flagstats    = '<span class="nbsp">mapped %</span><br /><span class="dark_blue nbsp">duplicates %</span>'
       genotype         = 'match<br/><span class="dark_blue nbsp">mean cvg.<br/>depth<br/></span>'
-      tag_metrics      = 'decode rate, %<br /><span class="dark_blue">CV %</span>'
+      tag_metrics      = 'decode rate, %<br />CV %'
       pulldown_metrics = '<span class="nbsp">coverage at 20X, %</span><br /><span class="nbsp">mean depth per Gb</span><br /><span class="dark_blue nbsp">on bait bases, %</span><br /><span class="dark_blue nbsp">on target bases, %</span>'
       alignment_filter_metrics = '<span class="nbsp">target, %</span>'
       spatial_filter      = 'filter fail,<br/>total'
@@ -25,9 +25,9 @@
 [% IF has_plexes %]<th[% row_span_string %]>Tag</th>[% END %]
 [%- FOREACH check_name IN checks_list -%]
   [% IF check_name.match('genotype') && !check_name.match('W30467') %]
-	[% NEXT %]
+    [% NEXT %]
   [% END %]
-  [% IF check_name.match('genotype') || check_name == "upstream tags" || check_name == "verify bam id" %]
+  [% IF check_name.match('genotype') || check_name == "upstream tags" || check_name == "verify bam id" || check_name.match('tag metrics') %]
     [% info_button='<br/><a href="' _ c.uri_for_action(c.controller('Checks').action_for('about')) _ '#' _ check_name _ '_check"><img src="/static/images/information.png" alt="Link to information about ' _ check_name _ ' check"/></a>' %]
   [% ELSE %]
     [% IF check_name == 'alignment filter metrics'; check_name = 'alignment filter'; END %]
@@ -40,7 +40,7 @@
 <tr>
   [%- FOREACH check_name IN checks_list; class_name = map.$check_name %]
   [% IF check_name.match('genotype') && !check_name.match('W30467') %]
-	[% NEXT %]
+    [% NEXT %]
   [% END %]
 <th class="check_labels">[% labels.$class_name %]</th>
   [%- END -%]

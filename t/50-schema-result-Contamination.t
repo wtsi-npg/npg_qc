@@ -26,8 +26,8 @@ my $schema = Moose::Meta::Class->create_anon_class(
 
   my $values = from_json($json);
   my $rs = $schema->resultset('Contamination');
-  isa_ok($rs->new($values), 'npg_qc::Schema::Result::Contamination');
-  $rs->result_class->deflate_unique_key_components($values);
+  isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::Contamination');
+  $rs->deflate_unique_key_components($values);
   is($values->{'tag_index'}, -1, 'tag index deflated correctly');
 
   my %original_values = %{$values};

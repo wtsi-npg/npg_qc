@@ -173,6 +173,7 @@ my $extended_build_requires = {
                 'Test::Warn'                      => '0.11',
                 'npg_testing::db'                 => 0,
                 'npg_tracking::Schema'            => 0,
+                'DBD::SQLite'                     => '1.48',
 };
 
 my $extended_requires = {
@@ -205,6 +206,7 @@ my $extended_requires = {
                 'IO::Compress::Xz'                => '2.068',
                 'IO::Uncompress::UnXz'            => '2.068',
                 'JSON'                            => '2.12',
+                'JSON::XS'                        => '0',
                 'lib'                             => '0.5565',
                 'Lingua::EN::Inflect'             => 0,
                 'List::MoreUtils'                 => '0.22',
@@ -245,6 +247,7 @@ my $extended_requires = {
                 'npg_tracking::glossary::composition'      => 0,
                 'npg_tracking::glossary::composition::factory' => 0,
                 'npg_tracking::glossary::composition::component::illumina' => 0,
+                'npg_tracking::glossary::rpt'              => 0,
                 'npg_tracking::glossary::run'              => 0,
                 'npg_tracking::glossary::lane'             => 0,
                 'npg_tracking::glossary::subset'           => 0,

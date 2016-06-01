@@ -1,5 +1,115 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 61.2
+ - SeqQC:
+   - Reintroduce collapser
+   - using grunt/npm to automate js testing
+ - VerifyBAMId changed condition MIN_AVG_DEPTH from > 4 to > 2 for fail
+
+release 61.1
+ - SeqQC
+   - Using --force-latest for bower install deps during Build
+ - improve test robustness (larger page sample for mech to check)
+
+release 61.0
+ - using test matrix with node 4.4.2 and 0.12.9 for travis
+ - help page for manual qc
+ - redesign of both client and server side for generic qc outcome updates
+ - updates to already stored outcomes, including final outcomes,
+     are not an error, will be skipped
+ - require that all library outcomes are marked explicitly before the
+     final sequencing outcome is saved
+ - custom class for authentication in tests - works with JSON POST requests
+ - mqc widgets not shown if no lims data available
+ - title for pages with data for one id run show run status
+ - SeqQC
+   - bugfix only build request for qc_outcomes if rptkeys in page
+   - upgrading jquery to 2.2.3 from 2.1.4
+   - upgrading requirejs to 2.2.0 from 2.1.20
+   - upgrading bcviz to 1.3.2 from 1.3.1
+   - upgrading table-export to 1.5.0 from 1.2.2
+   - upgrading qunit to 1.23.0 from 1.20.0
+ - add unique db constraint for short descriptions in qc outcome
+   dictionaries; the constraints should have been set when the tables
+   were created 
+
+release 60.0
+ - JSON service (retrieval) for qc outcomes
+ - update link to picard in POD
+ - SeqQC:
+   - remove use of autocrud plugin - it's never been used
+   - simplify the authorisation and it make more secure (do not fetch
+     user credentials from the url), move the code to a new User model
+   - in tests extend the User model to allow for getting user credentials
+     from the url
+   - avoid warnings in tests by setting the default for the username to
+     an empty string
+   - if the user is logged in and is authorised to do manual qc, display
+     a visual cue on the top of the page
+   - tag metrics column moved next to the column with tag index and tag sequence
+   - show deplexing percent for individual tags in tag metrics column
+   - retrieve qc outcomes from npg_qc_viewer qcoutcomes JSON service for
+     initial page rendering
+
+release 59.8
+ - give LIMs time to process posting qc outcomes as individual events
+ - SeqQC
+   - upgrading bcviz to 1.3.1 from 1.3.0 (individual minified files)
+
+release 59.7
+ - SeqQC
+   - bower configuration files in npg_qc/npg_qc_viewer
+   - moving client test files to npg_qc/npg_qc_viewer/t/client
+   - fix regression, missing require for table-export
+
+release 59.6
+ - SeqQC
+   - generating bcviz plots only when they will become visible and remove
+     them when they will not be visible
+   - set max number of plexes for manual QC as 400
+
+release 59.5
+ - autoqc results db loader: an option to force a re-build of related objects
+ - SeqQC
+   - fix warning about undef value in the adapter template
+   - fix closing div tag in verify bam id template 
+   - upgrading jquery to 2.1.4 from 2.0.3
+   - upgrading requirejs to 2.1.20 from 2.1.8
+   - upgrading qunit to 1.20.0 from 1.15.0
+   - upgrading bcviz to 1.3.0 from 1.2.1
+ - travis ci testing perl modules for npg_qc and npg_qc_viewer
+ - require DBD::SQLite@1.48 to run tests
+
+release 59.4
+ - saving manual qc values for libraries - allow for an undefined or empty
+   list of tag indices
+ - tags in lanes from GCLP runs are not subject to library qc
+ - composition-based autoqc results - disable version checking between the version
+   of the module that serialized the object and the version of the same module that
+   is performing de-serialization
+ - script to import manual qc values from the old warehouse RT#493757
+ - update_outcome method of mqc entities renamed to update_nonfinal_outcome
+ - a new update_outcome method allows for update of final outcomes
+ - method to toggle stored final manual qc outcomes
+ - mqc reporter - reporting might cause a loss of link between the product and
+   flowcell data in the ml warehouse, so prepare all data, then report
+ - SeqQC
+   - New functionality to allow export summary table to CSV
+
+release 59.3
+ - transparent search query for autoqc objects irrespectively of the details of
+   object's database implementation (in-table identifies or composition)
+ - custom parent class for resultset objects
+ - calling ->new() on resultset object to create a new result replaced with
+   calling more intuitive ->new_result()
+ - upgrade genotype check to use samtools1 and bcftools1
+ - SeqQC
+   - New dictionary table for plex level library MQC. (Issue 238)
+
+release 59.2
+ - library-level manual QC for individual plexes.
+
+release 59.1
  - 'write2file' method of autoqc result objects removed since it duplicated
      the 'store' method
  - alternative base class npg_qc::autoqc::results::base for autoqc results objects,
@@ -27,6 +137,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      remove separate sample column
    - fix missing composite genotype check visualisation broken when cleaning
      template for ml warehouse
+   - fix missing space between forward and reverse when reporting percent gc 
+     fraction
  - genotype check data extraction scripts - updated scripts to fail more readily
     and informatively when an iRODS error occurs
 

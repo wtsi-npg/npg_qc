@@ -38,9 +38,9 @@ my $values = from_json($json);
 {
   my %values1 = %{$values};
   my $v1 = \%values1;
-  isa_ok($rs->new($v1), 'npg_qc::Schema::Result::Adapter');
+  isa_ok($rs->new_result($v1), 'npg_qc::Schema::Result::Adapter');
 
-  $rs->result_class->deflate_unique_key_components($v1);
+  $rs->deflate_unique_key_components($v1);
   is($v1->{'tag_index'}, 95, 'tag index not deflated');
 
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}

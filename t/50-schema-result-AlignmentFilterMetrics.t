@@ -49,11 +49,11 @@ my $values = from_json($json);
 my $rs = $schema->resultset('AlignmentFilterMetrics');
 
 {
-  isa_ok($rs->new($values), 'npg_qc::Schema::Result::AlignmentFilterMetrics');
+  isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::AlignmentFilterMetrics');
   my %values1 = %{$values};
   my $v1 = \%values1;
 
-  $rs->result_class->deflate_unique_key_components($v1);
+  $rs->deflate_unique_key_components($v1);
   is($v1->{'tag_index'}, 95, 'tag index not deflated');
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'lane record inserted';
   my $rs1 = $rs->search({});

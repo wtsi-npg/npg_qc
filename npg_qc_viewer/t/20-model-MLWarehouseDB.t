@@ -1,8 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use lib 't/lib';
+use Test::More tests => 10;
 use Test::Exception;
-use File::Temp qw(tempfile);
+use File::Temp qw/tempfile/;
+use List::MoreUtils qw/all/;
 
 use t::util;
 
@@ -21,13 +23,32 @@ lives_ok{ $schema = $util->create_test_db(
 my $m;
 lives_ok {
   $m = npg_qc_viewer::Model::MLWarehouseDB->new( connect_info => {
-                                                   dsn      => ('dbi:SQLite:'.$tmpdbfilename),
-                                                   user     => q(),
-                                                   password => q()
+                                    dsn      => ('dbi:SQLite:' . $tmpdbfilename),
+                                    user     => q(),
+                                    password => q()
   })
 } 'create new model object';
 
 isa_ok($m, 'npg_qc_viewer::Model::MLWarehouseDB');
+
+subtest 'Search product metrics' => sub {
+  plan tests => 5;
+  
+  throws_ok { $m->search_product_metrics() }
+    qr/Conditions were not provided for search/,
+    'No argument - error';
+  my $data = {position=>1,};
+  throws_ok { $m->search_product_metrics($data) }
+    qr/Run id needed/,
+    'Run id is missing - error';
+
+  $data->{'id_run'} = 4950;
+  my @rows = $m->search_product_metrics($data)->all();
+  ok ((all { $_->id_run == 4950} @rows), 'Run id is correct');
+  ok ((all { $_->position == 1}  @rows), 'Position is correct');
+  my @tags = map {$_->tag_index} @rows;
+  is_deeply(\@tags, [(0 .. 24)], 'rows are sorted correctly');
+};
 
 subtest 'Data in test data' => sub {
   plan tests => 3;
@@ -89,6 +110,51 @@ subtest 'Data for sample' => sub {
   cmp_ok($sample->id_sample_lims, '==', 2617, q[Correct id sample lims]);
   cmp_ok($sample->name, 'eq', q[random_sample_name], q[Correct sample name from name]);
 
+};
+
+subtest 'tags for a lane' => sub {
+  plan tests => 7;
+
+  my $id_run = 4950;
+  my $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
+  is($rs->count, 25, q[Correct number of elements found]);
+  
+  #Make tag_index 24 look as phix
+  my $to_phix = $rs->search({tag_index=>24})->next;
+  my $iseq_flowcell = $to_phix->iseq_flowcell; 
+  $iseq_flowcell->update({'entity_type' => 'library_indexed_spike'});
+
+  $rs->search({tag_index=>10})->next->iseq_flowcell->delete();
+  throws_ok {$m->tags4lane( {id_run => $id_run, position => 1} )}
+    qr/Flowcell data missing for run 4950 position 1 tag_index 10/,
+    'error when no link to the flowcell';
+  $rs->search({tag_index=>10})->next->delete();
+
+  is_deeply( $m->tags4lane( {id_run => $id_run, position => 1} ),
+    [(1 .. 9, 11 .. 23)], 'correct array of tags' );
+
+  $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
+  while (my $row = $rs->next) {
+    my $f = $row->iseq_flowcell;
+    if ($f) {
+      $f->update({id_lims => 'C_GCLP'});
+    }
+  }
+
+  is_deeply($m->tags4lane( {id_run => $id_run, position => 1} ),
+    [], 'GCLP run - no tags reported' );
+
+  $id_run = 4025;
+  $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
+  is($rs->count, 1, q[Correct number of elements found]);
+  my $hash = $m->tags4lane({id_run=>$id_run, position=>1});
+  is_deeply ($m->tags4lane({id_run=>$id_run, position=>1}),
+    [], 'No qc tags for a lane');
+
+  my $non_existing_run = 4951; 
+  throws_ok{ $m->tags4lane({id_run=>$non_existing_run, position=>1}) }
+    qr/No NPG mlwarehouse data for run 4951 position 1/,
+    'Error when data are unavailable';
 };
 
 1;

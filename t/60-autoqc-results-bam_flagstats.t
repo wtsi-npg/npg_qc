@@ -133,7 +133,7 @@ my $archive_16960 = '16960_1_0';
 my $ae_16960 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_16960}.tar.gz");
 $ae_16960->extract(to => $tempdir) or die $ae_16960->error;
 $archive_16960 = join q[/], $tempdir, $archive_16960;
-note `find $archive_16960`;
+#note `find $archive_16960`;
 
 my $samtools_path  = join q[/], $tempdir, 'samtools1';
 local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
@@ -213,7 +213,7 @@ my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive
 $ae->extract(to => $tempdir) or die $ae->error;
 $archive = join q[/], $tempdir, $archive;
 my $qc_dir = join q[/], $archive, 'testqc';
-note `find $archive`;
+#note `find $archive`;
 write_samtools_script($samtools_path, join(q[/], $archive, 'cram.header'));
 
 subtest 'full functionality with full file sets' => sub {
@@ -288,7 +288,7 @@ subtest 'full functionality with full file sets' => sub {
 };
 
 subtest 'creating related objects' => sub {
-  plan tests => 6;
+  plan tests => 8;
   
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
         id_run        => 17448,
@@ -301,18 +301,27 @@ subtest 'creating related objects' => sub {
     qr/Path should be given/, 'no attribute - error';
   throws_ok { $r->create_related_objects(join q[/], $qc_dir, $name) }
     qr/File path should be given/, 'file does not exist - error';
-  my $file         = join q[/], $qc_dir, 'cram', $name;
-  my $file_to_find = join q[/], $qc_dir, '17448_1#9.cram';
+  my $file    = join q[/], $qc_dir, 'cram', $name;
   throws_ok { $r->create_related_objects($file) }
-    qr/Validation failed for 'NpgTrackingReadableFile' with value "$file_to_find"/,
+    qr/Validation failed for 'NpgTrackingReadableFile' with value/,
     'no cram file one directory up - error';
 
-  my $file_ok      = join q[/], $qc_dir, $name;
+  my $file_ok = join q[/], $qc_dir, $name;
   rename $file, $file_ok;
   lives_ok { $r->create_related_objects($file_ok) } 'related objects built';
   ok ($r->_has_related_objects, 'related object array has been set');
   my @ros = @{$r->related_objects};
   is (scalar @ros, 3, 'three related objects');
+
+  unlink $file_ok;
+  my $force = 1;
+  lives_ok { $r->create_related_objects($file_ok, $force) }
+    'related objects are not rebuilt';
+  $r->_set_related_objects([]);
+  $r->_clear_sequence_file();
+  throws_ok { $r->create_related_objects($file_ok, $force) }
+    qr/File path should be given/,
+    'attempt to rebuilt related objects is made';
 };
 
 1;

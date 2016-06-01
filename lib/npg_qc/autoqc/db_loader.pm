@@ -56,6 +56,12 @@ has 'load_related'  => ( is       => 'ro',
                          default  => 1,
                        );
 
+has 'force_load_related' => ( is       => 'ro',
+                              isa      => 'Bool',
+                              required => 0,
+                              default  => 0,
+                            );
+
 has 'json_file' => ( is          => 'ro',
                      isa         => 'ArrayRef',
                      required    => 0,
@@ -151,10 +157,12 @@ sub _json2db{
         # New code should create serialized related objects which will
         # be loaded from json files. For cases where we cannot produce the serialized
         # version of objects, we will generate the objects now.
+        # Optionally, if force_load_related is true, we will disregard previous
+        # unsuccessful attempts to generate related objects.
         if ( $json_file && $self->load_related &&
              $obj->can('related_objects') &&
              $obj->can('create_related_objects') ) {
-          $obj->create_related_objects($json_file);
+          $obj->create_related_objects($json_file, $self->force_load_related);
           foreach my $o (@{$obj->related_objects}) {
             $self->_json2db($o->freeze()); # Recursion
           }
@@ -227,7 +235,7 @@ sub _values2db {
          ->update({$iscurrent_column_name => 0});
     }
   } else {
-    $result_class->deflate_unique_key_components($values);
+    $rs->deflate_unique_key_components($values);
     $found = $rs->find($values);
   }
 
@@ -237,7 +245,7 @@ sub _values2db {
       $count++;
     }
   } else {
-    $rs->new($values)->set_inflated_columns($values)->insert();
+    $rs->new_result($values)->set_inflated_columns($values)->insert();
     $count++;
   }
 
@@ -312,20 +320,55 @@ npg_qc::autoqc::db_loader
 
 =head1 SUBROUTINES/METHODS
 
-=head2 path - a reference to an array with directory names from where json files have to be loaded;
-              redandant if json_files is defined by the caller
+=head2 path
 
-=head2 id_run - an array of run ids to load, optional attribute
+  Array with directory names from where json files have to be loaded;
+  redandant if json_files is defined by the caller.
 
-=head2 json_files - a reference to a list of json files, optional attribute
+=head2 json_files
 
-=head2 lane - an array of lane numbers to load, optional attribute
+  Array of json files, optional attribute.
 
-=head2 check - an array of autoqc check names to load, optional attribute
+=head2 id_run
 
-=head2 load - performs loading of json files to a database
+  An array of run ids to load, optional attribute, acts as a filter.
 
-=head2 verbose - boolean switching logging on/off, on by default
+=head2 lane
+
+  An array of lane numbers to load, optional attribute, acts as a filter.
+
+=head2 check
+
+  An array of autoqc check names to load, optional attribute.
+
+=head2 load
+
+  Method that performs loading of json files to a database.
+
+=head2 verbose
+
+  A boolean attribute, switches logging on/off, true by default.
+
+=head2 load_related
+
+  A boolean attribute, switches on-the-fly generation (no writing to disk)
+  of related objects and their loading to a database, true by default.
+
+=head2 force_load_related
+
+  A boolean attribute, false by default, forces generation and loading
+  of related objects by passing an extra flag to a factory  method that
+  creates related objects. Whether this flag is reapected and what exactly
+  happens is up to the object's implementation.
+
+=head2 update
+
+  A boolean attribute, true by default, switches on/off updates of existing
+  results. If false, only new results are inserted.
+
+=head2 schema
+
+  DBIx connection to the npg_qc database.
 
 =head1 DIAGNOSTICS
 

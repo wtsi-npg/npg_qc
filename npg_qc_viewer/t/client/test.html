@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>QUnit Test Suite</title>
+<link rel="stylesheet" href="../../root/static/bower_components/qunit/qunit/qunit.css" type="text/css" media="screen">
+<script src="../../root/static/bower_components/qunit/qunit/qunit.js"></script>
+<script>QUnit.config.autostart = false;</script>
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+
+<div id="qunit-fixture">
+<div id='mqc_lane1' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
+<div id='mqc_lane2' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
+</div>
+
+<div id="Test_NPG.QC.RunPageMQCControl.laneOutcomesMatch">
+<div class='laneOutcomesMatchTdlanes1'><div data-position='1' data-initial='Accepted final' class='lane_mqc_control'></div></div>
+<div class='laneOutcomesMatchTdlanes2'><div data-position='1' data-initial='Accepted final' class='lane_mqc_control'></div></div>
+<div class='laneOutcomesMatchTdlanes2'><div data-position='2' data-initial='Accepted final' class='lane_mqc_control'></div></div>
+<div class='laneOutcomesMatchTdlanes3'><div data-position='1' data-initial='Accepted final' class='lane_mqc_control'></div></div>
+<div class='laneOutcomesMatchTdlanes3'><div data-position='2' data-initial='Rejected final' class='lane_mqc_control'></div></div>
+</div>
+
+<script src="../../root/static/bower_components/requirejs/require.js"></script>
+<script src="test.js"></script>
+</body>
+</html>

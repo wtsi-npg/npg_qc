@@ -4,6 +4,8 @@ use Moose;
 use namespace::autoclean;
 use Carp;
 
+use npg_qc_viewer::Util::TransferObject;
+
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
 our $VERSION  = '0';
@@ -37,7 +39,14 @@ __PACKAGE__->config(
 
 =head2 search_product_metrics
 
-Search product metrics by where conditions (id_run, position, tag_index).
+Search product metrics by id_run and, optionally, position and tag_index.
+Cache option is enabled.
+
+  my $param = {'id_run' => 22, 'position' => 3};
+  my $resultset = $model->search_product_metrics($param);
+
+  my $param = {'id_run' => 22, 'position' => 3, 'tag_index' => 5};
+  my $resultset = $model->search_product_metrics($param);
 
 =cut
 sub search_product_metrics {
@@ -46,22 +55,21 @@ sub search_product_metrics {
   if(!defined $run_details){
     croak q[Conditions were not provided for search];
   }
-
-  if(!defined $run_details->{'id_run'}) {
-    croak q[Id run not defined when querying metrics by me.id_run];
+  if(!$run_details->{'id_run'}) {
+    croak q[Run id needed];
   }
 
   my $where = {};
   foreach my $key (keys %{$run_details}) {
-    $where->{'me.' . $key} = $run_details->{$key};
+    $where->{q[me.] . $key} = $run_details->{$key};
   }
 
-  my $rs = $self->resultset('IseqProductMetric')->
-                  search($where, {
-                    prefetch => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-                    order_by => qw[ me.id_run me.position me.tag_index ],
-                    cache    => 1,
-                  },);
+  my $rs = $self->resultset('IseqProductMetric')->search(
+        $where, {
+        'prefetch' => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
+        'order_by' => [qw/ me.id_run me.position me.tag_index /],
+        'cache'    => 1,
+                });
 
   return $rs;
 }
@@ -118,25 +126,18 @@ sub search_product_by_sample_id {
 }
 
 sub _search_product_by_child_id {
-#  Search product by id lims in one of the children tables. The where clause
-#  should be defined as a hash with the condition to query the relationship
-#  Product->Flowcell->Sample.
-#
-#  my $where = { 'id_sample_lims' => $id_sample_lims };
-#  $rs = $c->model('MLWarehouseDB')->_search_product_by_child_id($where);
-
   my ($self, $where) = @_;
 
   if (!defined $where) {
     croak q[Condition for id lims not defined when querying product by children id];
   };
 
-  my $rs = $self->resultset('IseqProductMetric')->
-                    search($where, {
-                    prefetch => {'iseq_flowcell' => 'sample'},
-                    join     => {'iseq_flowcell' => 'sample'},
-                    cache    => 1,
-  });
+  my $rs = $self->resultset('IseqProductMetric')->search(
+                    $where, {
+                    'prefetch' => {'iseq_flowcell' => 'sample'},
+                    'join'     => {'iseq_flowcell' => 'sample'},
+                    'cache'    => 1,
+                            });
 
   return $rs;
 }
@@ -153,14 +154,63 @@ sub search_sample_by_sample_id {
     croak q[Id sample lims not defined when querying sample lims];
   };
 
-  my $where = { 'me.id_sample_lims' => $id_sample_lims, };
+  my $resultset = $self->resultset('Sample');
+  my $cs_alias = $resultset->current_source_alias;
+
+  my $where = { $cs_alias . '.id_sample_lims' => $id_sample_lims, };
 
   my $rs = $self->resultset('Sample')->
-                    search($where, {
-                    cache    => 1,
-  });
+                    search($where, {'cache' => 1});
 
   return $rs;
+}
+
+=head2 tags4lane
+
+An array of tag indexes that are subject to qc is returned.
+
+  $model->tags4lane({'id_run' => 4, 'position' => 4});
+
+=cut
+sub tags4lane {
+  my ($self, $lane_hash) = @_;
+
+  my $rs = $self->resultset('IseqProductMetric')->search(
+    {
+      'me.id_run'     => $lane_hash->{'id_run'},
+      'me.position'   => $lane_hash->{'position'},
+    },
+    {
+      'join'     => 'iseq_flowcell',
+      'order_by' => [qw/ me.tag_index /],
+      'cache'    => 1,
+    }
+  );
+  if ($rs->count == 0) {
+    croak sprintf 'No NPG mlwarehouse data for run %i position %i',
+      $lane_hash->{'id_run'}, $lane_hash->{'position'};
+  }
+
+  my @tags = ();
+  while (my $row = $rs->next) {
+    my $tag_index = $row->tag_index;
+    if (!$tag_index) {
+      next;
+    }
+    my $flowcell_row = $row->iseq_flowcell;
+    if (!$flowcell_row) {
+      croak sprintf 'Flowcell data missing for run %i position %i tag_index %i',
+                    $lane_hash->{'id_run'}, $lane_hash->{'position'}, $tag_index;
+    }
+    my $from_gclp  = $flowcell_row->from_gclp()  ? 1 : 0;
+    my $is_control = $flowcell_row->is_control() ? 1 : 0;
+    if (npg_qc_viewer::Util::TransferObject->qc_able(
+        $from_gclp, $is_control, $tag_index)) {
+      push @tags, $tag_index;
+    }
+  }
+
+  return \@tags;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -183,6 +233,8 @@ __END__
 
 =item Catalyst::Model::DBIC::Schema
 
+=item Carp
+
 =item WTSI::DNAP::Warehouse::Schema
 
 =back
@@ -197,7 +249,7 @@ David Jackson
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Genome Research Ltd.
+Copyright (C) 2016 Genome Research Ltd.
 
 This file is part of NPG software.
 

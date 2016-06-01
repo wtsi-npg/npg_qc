@@ -14,7 +14,7 @@
   <h1>
     <a name="page_top"></a>&nbsp;
     <span class="lfloat[% IF env_dev == 'dev'; %] env_dev[% END %]">[%- title | html -%]</span>
-    <span class="rfloat">[% user = c.user; IF !user; user = c.authenticate({}); END; IF user; %]Logged in as [% user.username; ELSE %] Not logged in[% END %]</span>
+    <span class="rfloat">[% user = c.model('User').logged_user(c); IF user.username; %]Logged in as [% user.username; IF user.has_mqc_role %] (mqc)[% END;ELSE %] Not logged in[% END %]</span>
   </h1>
 </div>
 [% content %]

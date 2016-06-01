@@ -208,6 +208,23 @@ with 'npg_qc::Schema::Flators';
 
 our $VERSION = '0';
 
+=head2 seq_component_compositions
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+To simplify queries, skip SeqComposition and link directly to the linking table.
+
+=cut
+
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
