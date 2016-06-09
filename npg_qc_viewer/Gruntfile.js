@@ -11,16 +11,7 @@ module.exports = function(grunt) {
     jscs: {
       main: [
         'Gruntfile.js',
-/*        'root/static/scripts/main.js',
-        'root/static/scripts/qcoutcomes/manual_qc.js',
-        'root/static/scripts/qcoutcomes/manual_qc_ui.js',
-        'root/static/scripts/modify_on_view.js',
-        'root/static/scripts/plots.js',
-        'root/static/scripts/qcoutcomes/qc_css_styles.js',
-        'root/static/scripts/qcoutcomes/qc_outcomes_view.js',
-        'root/static/scripts/qcoutcomes/qc_page.js',
-        'root/static/scripts/qcoutcomes/qc_utils.js',
-        't/client/test*.js'*/
+        'root/static/scripts/collapse.js',
       ],
       options: {
         config: '.jscsrc'
@@ -29,18 +20,7 @@ module.exports = function(grunt) {
     jshint: {
       all: [
         'Gruntfile.js',
-/*        'root/static/scripts/main.js',
-        'root/static/scripts/qcoutcomes/manual_qc.js',
-        'root/static/scripts/qcoutcomes/manual_qc_ui.js',
-        'root/static/scripts/modify_on_view.js',
-        'root/static/scripts/plots.js',
-        'root/static/scripts/qcoutcomes/qc_css_styles.js',
-        'root/static/scripts/qcoutcomes/qc_outcomes_view.js',
-        'root/static/scripts/qcoutcomes/qc_page.js',
-        'root/static/scripts/qcoutcomes/qc_utils.js',*/
-
-        //'root/static/scripts/**/*.js',
-        //TESTS
+        'root/static/scripts/collapse.js',
         't/client/test*.js'
       ],
       options: {
@@ -53,7 +33,7 @@ module.exports = function(grunt) {
         console: true,
         '--debug': true,
       },
-      all: ['t/client/test*.html']
+      all: ['t/client/test*.html'],
     },
     watch: {
       js: {
@@ -69,11 +49,21 @@ module.exports = function(grunt) {
           'test'
         ]
       }
-    }
+    },
   });
 
   grunt.registerTask('lint', ['jsonlint', 'jshint', 'jscs']);
-  grunt.registerTask('test', ['lint', 'qunit']);
+  grunt.registerTask('test', 'Run tests', function( pattern ) {
+    if ( !!pattern ) {
+      if ( !pattern.startsWith('t/client/') ) {
+        pattern = 't/client/' + pattern;
+      }
+      grunt.config.set('qunit.all', [pattern]);
+      grunt.task.run('qunit:all');
+    } else {
+      grunt.task.run(['lint', 'qunit']);
+    }
+  });
   grunt.registerTask('default', ['test']);
 };
 
