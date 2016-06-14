@@ -17,7 +17,9 @@ sudo apt-get update -q
 #MYSQL_PASS="777"
 #echo mysql-server mysql-server/root_password password "${MYSQL_PASS}" | sudo debconf-set-selections
 #echo mysql-server mysql-server/root_password_again password "${MYSQL_PASS}" | sudo debconf-set-selections
-sudo -E apt-get install -q -y mysql-server
+sudo -E apt-get install -q -y mysql-server libmysqlclient18
+echo $PATH
+ls -l $(dirname $(which mysqld))
 
 sudo /etc/init.d/mysql stop
 sudo mysqld --skip-grant-tables &

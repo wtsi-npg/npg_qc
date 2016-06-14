@@ -173,7 +173,7 @@ my $extended_build_requires = {
                 'Test::Warn'                      => '0.11',
                 'npg_testing::db'                 => 0,
                 'npg_tracking::Schema'            => 0,
-                'DBD::SQLite'                     => '1.48',
+                'DBD::SQLite'                     => '1.50',
 };
 
 my $extended_requires = {
@@ -182,8 +182,7 @@ my $extended_requires = {
                 'Class::Std'                      => '0.0.8',
                 'Compress::Zlib'                  => 0,
                 'Cwd'                             => 0,
-                'DBI'                             => '1.608',
-                'DBIx::Class'                     => 0,
+                'DBIx::Class'                     => '0.082821', 
                 'DBIx::Class::InflateColumn::Serializer' => 0,
                 'DBIx::Class::ResultSet'          => 0,
                 'Digest::MD5'                     => 0,
@@ -298,6 +297,9 @@ my $requires = {
                 'warnings'                        => '1.05',
                 'XML::LibXML'                     => '1.70',
                 'XML::SAX'                        => 0,
+                'DateTime::Format::MySQL'         => '0.06',
+                'DBD::mysql'                      => '4.033',
+                'DBI'                             => '1.636',
 
                 'npg::util'                                => 0,
                 'npg::controller'                          => 0,
