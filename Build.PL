@@ -72,7 +72,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
         make_path $bdir;
         my $silent = $self->verbose ? q[] : '--silent';
         my $extra_info = q[];
-        
+
         if ($c_tools->{$tool}->{'samtools'}) {
           my @pkgs = @{$self->_samtools_option()};
           if (!@pkgs) {
@@ -98,7 +98,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
             flatten => 1);
         }
       }
-      
+
       # Build R script
       $self->copy_if_modified(from    => 'lib/R/gc_bias_data.R',
                               to_dir  => join(q[/], $self->base_dir, 'blib', 'lib/R'),
@@ -130,7 +130,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       $self->install_path('htdocs' => join q{/}, $self->install_base(), 'htdocs');
       $self->add_build_element('htdocs');
       $self->install_path('cgi-bin' => join q{/}, $self->install_base(), 'cgi-bin');
-      $self->add_build_element('cgi'); 
+      $self->add_build_element('cgi');
     } else {
       warn "WARNING: 'NPG_QC_WEB_INSTALL is not set, nothing to do for webinstall\n\n";
       return;
@@ -149,7 +149,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     my $script  = 'npg_qc';
     `mkdir -p $cgi_bin`;
     `cp cgi-bin/$script $cgi_bin`;
-    $script = join q[/], $cgi_bin, $script; 
+    $script = join q[/], $cgi_bin, $script;
     $self->fix_shebang_line(($script));
     `chmod +x $script`;
     return;
@@ -173,7 +173,7 @@ my $extended_build_requires = {
                 'Test::Warn'                      => '0.11',
                 'npg_testing::db'                 => 0,
                 'npg_tracking::Schema'            => 0,
-                'DBD::SQLite'                     => '1.50',
+                'DBD::SQLite'                     => '1.48',
 };
 
 my $extended_requires = {
@@ -182,7 +182,8 @@ my $extended_requires = {
                 'Class::Std'                      => '0.0.8',
                 'Compress::Zlib'                  => 0,
                 'Cwd'                             => 0,
-                'DBIx::Class'                     => '0.082821', 
+                'DBI'                             => '1.608',
+                'DBIx::Class'                     => 0,
                 'DBIx::Class::InflateColumn::Serializer' => 0,
                 'DBIx::Class::ResultSet'          => 0,
                 'Digest::MD5'                     => 0,
@@ -297,9 +298,8 @@ my $requires = {
                 'warnings'                        => '1.05',
                 'XML::LibXML'                     => '1.70',
                 'XML::SAX'                        => 0,
-                'DateTime::Format::MySQL'         => '0.06',
-                'DBD::mysql'                      => '4.033',
-                'DBI'                             => '1.636',
+                'DateTime::Format::MySQL'         => '0',
+                'DBD::mysql'                      => '0',
 
                 'npg::util'                                => 0,
                 'npg::controller'                          => 0,
@@ -318,7 +318,7 @@ if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
   }
   while (my ($key, $value) = each %{$extended_build_requires}) {
     $build_requires->{$key} = $value;
-  } 
+  }
 }
 
 my $builder = $class->new(
@@ -336,7 +336,7 @@ my $builder = $class->new(
 
           'build_requires' => $build_requires,
           'requires'      =>  $requires,
-         
+
           'dist'          => { COMPRESS => 'gzip', SUFFIX => 'gz', },
          );
 
