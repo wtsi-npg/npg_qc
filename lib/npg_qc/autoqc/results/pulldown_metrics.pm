@@ -1,13 +1,7 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       27 April 2012
-#
-
 package npg_qc::autoqc::results::pulldown_metrics;
 
 use Moose;
 use namespace::autoclean;
-use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::pulldown_metrics);
@@ -226,8 +220,6 @@ __END__
 
 =item namespace::autoclean
 
-=item Readonly
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -236,11 +228,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

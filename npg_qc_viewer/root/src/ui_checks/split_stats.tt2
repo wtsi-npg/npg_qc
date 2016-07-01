@@ -1,6 +1,0 @@
-[%- reads = [1, 2];
-    FOREACH read IN reads;
-      myurl = check.image_url(read);
--%]
-[%- IF myurl %]<img class="seq_error_plot" src="[% myurl | url | html %]" alt="split statistics" />[% END -%]
-[%- END -%]

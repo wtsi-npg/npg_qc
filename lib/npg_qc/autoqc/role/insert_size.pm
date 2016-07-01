@@ -5,8 +5,6 @@ use Readonly;
 use Math::Round qw(round);
 use List::Util qw(max min);
 
-with qw( npg_qc::autoqc::role::result );
-
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -120,7 +118,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Genome Research Ltd
+Copyright (C) 2016 Genome Research Ltd
 
 This file is part of NPG.
 

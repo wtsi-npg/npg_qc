@@ -1,19 +1,10 @@
-#########
-# Author:        gq1
-# Created:       23 March 2010
-#
-
 package npg_qc::autoqc::role::tag_decode_stats;
 
-use strict;
-use warnings;
 use Moose::Role;
 use Carp;
 use Readonly;
 use PDL::Lite;
 use PDL::Core qw(pdl);
-
-with qw(npg_qc::autoqc::role::result);
 
 our $VERSION = '0';
 
@@ -21,7 +12,6 @@ Readonly::Scalar our $PERCENT => 100;
 Readonly::Scalar our $DECODING_PASS_PERCENT => 80;
 Readonly::Scalar our $EXPECTED_NUMBER_OF_PARTS => 4;
 Readonly::Scalar our $IGNORE_TAG_INDEX         => 168;
-
 
 sub parsing_output_string {
   my ( $self, $stats_output ) = @_;
@@ -264,11 +254,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
+Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Guoying Qi
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

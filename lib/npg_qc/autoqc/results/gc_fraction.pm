@@ -1,15 +1,7 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       3 February 2010
-#
-
 package npg_qc::autoqc::results::gc_fraction;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
-
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::gc_fraction);
 
@@ -108,11 +100,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

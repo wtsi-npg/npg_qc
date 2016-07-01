@@ -1,17 +1,7 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       14 April 2009
-#
-
 package npg_qc::autoqc::results::insert_size;
 
 use Moose;
 use namespace::autoclean;
-use Carp;
-use English qw(-no_match_vars);
-use Readonly;
-use Math::Round qw(round);
-
 use npg_tracking::util::types;
 
 extends qw( npg_qc::autoqc::results::result );
@@ -249,14 +239,6 @@ __END__
 
 =item namespace::autoclean
 
-=item Carp
-
-=item English
-
-=item Readonly
-
-=item Math::Round
-
 =item npg_tracking::util::types
 
 =back
@@ -271,7 +253,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

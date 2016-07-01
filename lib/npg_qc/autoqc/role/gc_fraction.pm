@@ -1,16 +1,6 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       03 February 2010
-#
-
 package npg_qc::autoqc::role::gc_fraction;
 
-use strict;
-use warnings;
 use Moose::Role;
-use Readonly;
-
-with qw(npg_qc::autoqc::role::result);
 
 our $VERSION = '0';
 
@@ -53,8 +43,6 @@ __END__
 
 =item Moose::Role
 
-=item Readonly
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -63,11 +51,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

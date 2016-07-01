@@ -1,15 +1,7 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       10 May 2012
-#
-
 package npg_qc::autoqc::role::alignment_filter_metrics;
 
 use Moose::Role;
 use Readonly;
-use Carp;
-
-with qw( npg_qc::autoqc::role::result );
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
@@ -203,8 +195,6 @@ __END__
 
 =item Readonly
 
-=item Carp
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -213,11 +203,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

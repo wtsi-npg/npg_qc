@@ -1,19 +1,9 @@
-#########
-# Author:        John O'Brien
-# Created:       14 April 2009
-#
-
 package npg_qc::autoqc::role::contamination;
 
-use strict;
-use warnings;
 use Moose::Role;
 use Readonly;
 
-with qw(npg_qc::autoqc::role::result);
-
 our $VERSION = '0';
-
 
 Readonly::Scalar my $PERCENT => 100;
 
@@ -97,10 +87,6 @@ __END__
 
 =item Readonly
 
-=item strict
-
-=item warnings
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -109,11 +95,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
+John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by John O'Brien
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

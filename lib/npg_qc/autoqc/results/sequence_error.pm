@@ -1,12 +1,5 @@
-#########
-# Author:        gq1
-# Created:       16 November 2009
-#
-
 package npg_qc::autoqc::results::sequence_error;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 
@@ -150,11 +143,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Guoying Qi E<lt>gq1@sanger.ac.ukE<gt><gt>
+Guoying Qi E<lt>gq1@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Guoying Qi
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

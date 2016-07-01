@@ -234,6 +234,7 @@ my $extended_requires = {
                 'PDL::Primitive'                  => 0,
                 'Perl6::Slurp'                    => '0.03',
                 'Try::Tiny'                       => 0,
+                'URI::Escape'                     => 0,
 
                 'npg_common::Alignment'                    => 0,
                 'npg_common::extractor::fastq'             => 0,

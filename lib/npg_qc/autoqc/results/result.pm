@@ -6,8 +6,9 @@ use MooseX::AttributeHelpers;
 
 use npg_tracking::util::types;
 
-with qw( npg_qc::autoqc::role::result
-         npg_tracking::glossary::run
+extends qw( npg_qc::autoqc::results::base );
+
+with qw( npg_tracking::glossary::run
          npg_tracking::glossary::lane
          npg_tracking::glossary::tag );
 
@@ -20,7 +21,8 @@ npg_qc::autoqc::results::result
 
 =head1 SYNOPSIS
 
- my $r = npg_qc::autoqc::results::result->new(id_run => 1934, position => 5, path => q[mypath]);
+ my $r = npg_qc::autoqc::results::result
+  ->new(id_run => 1934, position => 5, path => q[mypath]);
  $r->pass(1); #set the pass value
  $r->equals_byvalue({id_run => 1934, position => 4,}); #returns false
  $r->equals_byvalue({id_run => 1934, position => 5,}); #returns true
@@ -33,17 +35,25 @@ A base class to wrap the result of autoqc.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 position
-
-Lane number. An integer from 1 to 8 inclusive.
-
 =head2 id_run
 
-Run id for the lane to be checked.
+An optional run id
+
+=cut
+has '+id_run'   => (required => 0,);
+
+=head2 position
+
+An optional lane number. An integer from 1 to 8 inclusive.
+
+=cut
+has '+position' => (required => 0,);
 
 =head2 tag_index
 
 An optional tag index
+
+=cut
 
 =head2 pass
 
@@ -55,15 +65,14 @@ has 'pass'         => (isa      => 'Maybe[Bool]',
                        required => 0,
                       );
 
-
 =head2 path
 
-A path to the input file(s) directory.
+An optional path to the input file(s) directory.
 
 =cut
 has 'path'        => (isa      => 'Str',
                       is       => 'rw',
-                      required => 1,
+                      required => 0,
                      );
 
 =head2 info
@@ -132,7 +141,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

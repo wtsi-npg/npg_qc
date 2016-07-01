@@ -30,13 +30,11 @@ my $flator = 'npg_qc::Schema::Flators';
 foreach my $check (@{npg_qc::autoqc::autoqc->checks_list}) {
   my ($result_name, $dbix_result_name ) = $generic_role->class_names($check);
   
-  my @roles = ($flator);
+  my @roles = ($flator, $generic_role);
   my $rpackage = $role_base . $result_name;
   my $found = eval "require $rpackage";
   if ($found) {
     push @roles, $rpackage;
-  } else {
-    push @roles, $generic_role;
   }
   $roles_map->{$dbix_result_name}      = \@roles;
   $components_map->{$dbix_result_name} = [$component]

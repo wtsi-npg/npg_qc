@@ -140,10 +140,10 @@ local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
 write_samtools_script($samtools_path);
 
 subtest 'finding files, calculating metrics' => sub {
-  plan tests => 11;
+  plan tests => 21;
 
   my $fproot = $archive_16960 . '/16960_1#0';
-  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+  my $r1 = npg_qc::autoqc::results::bam_flagstats->new(
     id_run              => 16960,
     position            => 1,
     tag_index           => 0,
@@ -151,8 +151,16 @@ subtest 'finding files, calculating metrics' => sub {
     related_objects     => [],
   );
 
+  my $r2 = npg_qc::autoqc::results::bam_flagstats->new(
+    sequence_file    => $fproot . '.bam',
+    composition      => $r1->composition,
+    related_objects  => [],
+  );
+
+    for my $r (($r1, $r2)) {
+
   is($r->_file_path_root, $fproot, 'file path root');
-  is($r->filename_root, undef, 'filename root undefined');
+  is($r->filename_root, '16960_1#0', 'filename root');
   is($r->filename4serialization, '16960_1#0.bam_flagstats.json',
     'filename for serialization'); 
   is($r->markdups_metrics_file,  $fproot . '.markdups_metrics.txt',
@@ -168,8 +176,9 @@ subtest 'finding files, calculating metrics' => sub {
   my $j;
   lives_ok { $j=$r->freeze } 'serialization to json is ok';
   unlike($j, qr/_file_path_root/, 'serialization does not contain excluded attr');
+    }
 
-  $r = npg_qc::autoqc::results::bam_flagstats->new(
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
     id_run              => 16960,
     position            => 1,
     tag_index           => 0,
@@ -195,7 +204,7 @@ subtest 'finding phix subset files (no run id)' => sub {
   is($r->mate_mapped_defferent_chr, 0, 'mate_mapped_defferent_chr value');
 
   is($r->_file_path_root, $fproot, 'file path root');
-  is($r->filename_root, '16960_1#0', 'filename root');
+  is($r->filename_root, '16960_1#0_phix', 'filename root');
    is($r->filename4serialization, '16960_1#0_phix.bam_flagstats.json',
     'filename for serialization');  
   is($r->markdups_metrics_file, $fproot . '.markdups_metrics.txt',

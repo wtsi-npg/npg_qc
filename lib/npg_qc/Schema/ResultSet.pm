@@ -38,6 +38,7 @@ sub deflate_unique_key_components {
   if (ref $values ne q[HASH]) {
     croak q[Values should be a hash];
   }
+
   my $source = $self->result_source();
   my %constraints = $source->unique_constraints();
   my @names = grep {$_ ne 'primary'} keys %constraints;
@@ -50,10 +51,18 @@ sub deflate_unique_key_components {
       if ($only_existing && !exists $values->{$col_name}) {
         next;
       }
-      if (!defined $values->{$col_name}) {
-        my $default_value = $source->column_info($col_name)->{'default_value'};
-        if (defined $default_value) {
-          $values->{$col_name} = $default_value;
+      my $default_value = $source->column_info($col_name)->{'default_value'};
+      if (!defined $default_value) {
+        next;
+      }
+      my $col_value = $values->{$col_name};
+      if (!defined $col_value) {
+        $values->{$col_name} = $default_value;
+      } elsif (ref $col_value eq 'HASH') {
+        my @keys = keys %{$col_value};
+        my $key = pop @keys;
+        if (@keys == 0 && $col_value->{$key} eq 'undef') {
+          $values->{$col_name}->{$key} = $default_value;
         }
       }
     }
@@ -191,7 +200,7 @@ Marina Gourtovaia <lt>mg8@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL Genome Research Limited
+Copyright (C) 2016 GRL Genome Research Limited
 
 This file is part of NPG.
 

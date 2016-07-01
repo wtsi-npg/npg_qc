@@ -147,8 +147,10 @@ sub _json2db{
         if ($class_name eq 'bam_flagstats') {
           $values = decode_json($obj->freeze());
         }
-        if ( $obj->can('composition') && $obj->can('composition_digest') ) {
-          $values->{'id_seq_composition'} = $self->_ensure_composition_exists($obj);
+        my $composition_key = 'id_seq_composition';
+        if ( $obj->can('composition') && $obj->can('composition_digest') &&
+             $self->schema->source($dbix_class_name)->has_column($composition_key) ) {
+          $values->{$composition_key} = $self->_ensure_composition_exists($obj);
         }
         # Load the main object
         $count = $self->_values2db($dbix_class_name, $values);
@@ -414,7 +416,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

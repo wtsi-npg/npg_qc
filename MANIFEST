@@ -155,7 +155,6 @@ lib/npg_qc/autoqc/role/adapter.pm
 lib/npg_qc/autoqc/role/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/role/bam_flagstats.pm
 lib/npg_qc/autoqc/role/contamination.pm
-lib/npg_qc/autoqc/role/gc_bias.pm
 lib/npg_qc/autoqc/role/gc_fraction.pm
 lib/npg_qc/autoqc/role/genotype.pm
 lib/npg_qc/autoqc/role/insert_size.pm
