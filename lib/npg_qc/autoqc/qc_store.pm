@@ -200,7 +200,7 @@ sub run_from_db {
     my $ti_key = 'tag_index';
     if ($rs->result_source()->has_column($ti_key)) {
       if ($query->option == $LANES) {
-        $dbix_query->{'tag_index'} = {q[==], 'undef'};
+        $dbix_query->{'tag_index'} = undef;
       } elsif ($query->option == $PLEXES) {
         $dbix_query->{'tag_index'} = {q[!=], 'undef'};
       }
