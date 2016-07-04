@@ -227,7 +227,7 @@ around 'store' => sub {
 override 'filename_root' => sub {
   my $self = shift;
   my $file;
-  if (!$self->id_run && $self->_file_path_root) {
+  if (!$self->is_old_style_result && $self->_file_path_root) {
     my ($volume, $directories);
     ($volume, $directories, $file) = splitpath($self->_file_path_root);
   } else {

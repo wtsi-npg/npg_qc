@@ -134,9 +134,8 @@ methods/attributes.
 =cut
 sub is_old_style_result {
   my $self = shift;
-  return $self->can('id_run') && $self->can('position');
-         # &&
-         #$self->has_id_run() && $self->has_composition();
+  return $self->can('id_run') && $self->can('position') &&
+         defined $self->id_run;
 }
 
 =head2 equals_byvalue
