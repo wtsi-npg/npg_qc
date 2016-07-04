@@ -164,7 +164,6 @@ lib/npg_qc/autoqc/role/ref_match.pm
 lib/npg_qc/autoqc/role/result.pm
 lib/npg_qc/autoqc/role/rpt_key.pm
 lib/npg_qc/autoqc/role/sequence_error.pm
-lib/npg_qc/autoqc/role/split_stats.pm
 lib/npg_qc/autoqc/role/tag_decode_stats.pm
 lib/npg_qc/autoqc/role/tag_metrics.pm
 lib/npg_qc/autoqc/role/tags_reporters.pm
