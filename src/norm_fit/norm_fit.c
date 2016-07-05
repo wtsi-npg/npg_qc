@@ -31,7 +31,6 @@ usage:./norm_fit inp.txt pass_info
 // ******** predefined user constants,
 
 #define NPAR 2      // Number of arguments
-
 #define MIN_DISTANCE  5     // minimum peak separation in bin widths
 #define MIN_AMPLITUDE   0.05  // minimum relative peak amplitide
 
@@ -87,7 +86,9 @@ int main(int argc, char **argv)
     float sd;
     float maxN, scale, confidence;
     float histN[100];
+    #ifdef STD_OTHER_MODES
     float sds[100];// standard deviations of other modes if any
+    #endif /* STD_OTHER_MODES */
 
     static struct option long_options[] =
     { {"min_distance", 1, 0, 'd'},
@@ -259,11 +260,13 @@ int main(int argc, char **argv)
     num_modes = num_peD;
     //3.1  ----estimate stds of filtered in remaining peaks=modes
 
+    #ifdef STD_OTHER_MODES
     for (k=0; k<num_modes; k++)
     {
         sds[k]=EstimateStd(hist,bins,nbins,pos[k],amp[k]);// std of a filtered mode
         //printf("st dev of a mode %.2f\n", sds[k]);
     }
+    #endif /* STD_OTHER_MODES */
 
     //4 -----------compute params of main mode
     mu = FindMainMode(hist,bins,nbins,height);// mu for Norm fit
