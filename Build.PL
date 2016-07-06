@@ -9,6 +9,8 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   use npg_tracking::util::abs_path qw(abs_path);
   use File::Basename;
 
+  my $C_SOURCE_DIR = q[src];
+
   my $c_tools = {
     'norm_fit' => {
       'copy'     => [qw/norm_fit/],
@@ -23,11 +25,11 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   };
 
   sub _c_build_dir {
-    return join(q[/], 'src', shift, 'build');
+    return join(q[/], $C_SOURCE_DIR, shift, 'build');
   }
 
   sub _c_src_dir {
-    return join(q[/], 'src', shift);
+    return join(q[/], $C_SOURCE_DIR, shift);
   }
 
   sub _samtools_option {
@@ -61,102 +63,101 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     my $self = shift;
     $self->SUPER::ACTION_build;
 
-    if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
-
-      # Build C executables
-      foreach my $tool ( keys %{$c_tools} ) {
-        if ($self->verbose) {
-          warn "Building $tool\n";
-        }
-        my $bdir = _c_build_dir($tool);
-        make_path $bdir;
-        my $silent = $self->verbose ? q[] : '--silent';
-        my $extra_info = q[];
-
-        if ($c_tools->{$tool}->{'samtools'}) {
-          my @pkgs = @{$self->_samtools_option()};
-          if (!@pkgs) {
-            warn 'Samtools and/or hts executables are not on the path, ' .
+    # Build C executables
+    foreach my $tool ( keys %{$c_tools} ) {
+      if ($self->verbose) {
+        warn "Building $tool\n";
+      }
+      my $bdir = _c_build_dir($tool);
+      make_path $bdir;
+      my $silent = $self->verbose ? q[] : '--silent';
+      my $extra_info = q[];
+        
+      if ($c_tools->{$tool}->{'samtools'}) {
+        my @pkgs = @{$self->_samtools_option()};
+        if (!@pkgs) {
+          warn 'Samtools and/or hts executables are not on the path, ' .
                  "skipping $tool build\n";
-            next;
-          }
-          $extra_info = join q[ ], @pkgs;
+          next;
         }
-
-        my $command = sprintf 'make %s --directory %s %s',
-                      $silent, _c_src_dir($tool), $extra_info;
-        if (system $command) {
-          die "Failed to compile $ename";
-        }
-        foreach my $ename ( @{$c_tools->{$tool}->{'copy'}} ) {
-          if ($self->verbose) {
-            warn "Copying $ename for $tool\n";
-          }
-          $self->copy_if_modified(
-            from    => join(q[/], $bdir, $ename),
-            to_dir  => join(q[/], $self->base_dir, 'blib', 'script'),
-            flatten => 1);
-        }
+        $extra_info = join q[ ], @pkgs;
       }
 
-      # Build R script
-      $self->copy_if_modified(from    => 'lib/R/gc_bias_data.R',
-                              to_dir  => join(q[/], $self->base_dir, 'blib', 'lib/R'),
-                              flatten => 1);
+      my $command = sprintf 'make %s --directory %s %s',
+                      $silent, _c_src_dir($tool), $extra_info;
+      if (system $command) {
+        die "Failed to compile $ename";
+      }
+      foreach my $ename ( @{$c_tools->{$tool}->{'copy'}} ) {
+        if ($self->verbose) {
+          warn "Copying $ename for $tool\n";
+        }
+        $self->copy_if_modified(
+          from    => join(q[/], $bdir, $ename),
+          to_dir  => join(q[/], $self->base_dir(), $self->blib(), 'script'),
+          flatten => 1);
+      }
     }
+      
+    # Build R script
+    $self->copy_if_modified(
+      from    => 'lib/R/gc_bias_data.R',
+      to_dir  => join(q[/], $self->base_dir(), $self->blib()),
+      flatten => 0);
   }
 
   sub ACTION_clean {
     my $self = shift;
     $self->SUPER::ACTION_clean;
 
-    if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
-      foreach my $tool ( keys %{$c_tools} ) {
-        if ($self->verbose) {
-          warn "Cleaning $tool\n";
-        }
-        my $silent = $self->verbose ? q[] : '--silent';
-        system "make clean $silent --directory " . _c_src_dir($tool);
-        remove_tree _c_build_dir($tool);
+    foreach my $tool ( keys %{$c_tools} ) {
+      if ($self->verbose) {
+        warn "Cleaning $tool\n";
       }
+      my $silent = $self->verbose ? q[] : '--silent';
+      system "make clean $silent --directory " . _c_src_dir($tool);
+      remove_tree _c_build_dir($tool);
     }
   }
 
-  sub ACTION_webinstall {
+  sub ACTION_webinstall { # backward compatibility
     my $self = shift;
-    if ($ENV{'NPG_QC_WEB_INSTALL'}) {
-      $self->install_path('data' => join q{/}, $self->install_base(), 'data');
-      $self->add_build_element('data');
-      $self->install_path('htdocs' => join q{/}, $self->install_base(), 'htdocs');
-      $self->add_build_element('htdocs');
-      $self->install_path('cgi-bin' => join q{/}, $self->install_base(), 'cgi-bin');
-      $self->add_build_element('cgi');
-    } else {
-      warn "WARNING: 'NPG_QC_WEB_INSTALL is not set, nothing to do for webinstall\n\n";
-      return;
-    }
     $self->SUPER::ACTION_install;
   }
 
   sub process_htdocs_files {
-    `find htdocs -type f | cpio -pdv --quiet blib`;
+    my $self = shift;
+    my $files = $self->rscan_dir('htdocs', sub {-f $_ and (/\.css$/ or /\.js$/)});
+    foreach my $f (@{$files}) {
+      $self->copy_if_modified(
+        from    => $f,
+        to_dir  => join(q[/], $self->base_dir(), $self->blib()),
+        flatten => 0);
+    }
     return;
   }
 
-  sub process_cgi_files {
+  sub process_cgibin_files {
     my $self = shift;
-    my $cgi_bin = 'blib/cgi-bin';
-    my $script  = 'npg_qc';
-    `mkdir -p $cgi_bin`;
-    `cp cgi-bin/$script $cgi_bin`;
-    $script = join q[/], $cgi_bin, $script;
-    $self->fix_shebang_line(($script));
-    `chmod +x $script`;
+    my $script = $self->copy_if_modified(
+      from    => 'cgi-bin/npg_qc',
+      to_dir  => join(q[/], $self->base_dir(), $self->blib()),
+      flatten => 0);
+    if ($script) {
+      $self->fix_shebang_line(($script));
+    }
     return;
   }
 
   sub process_data_files {
-    `find data/npg_qc_web/templates -type f | cpio -pdv --quiet blib`;
+    my $self = shift;
+    my $files = $self->rscan_dir('data/npg_qc_web/templates', sub {-f $_ and /\.tt2$/});
+    foreach my $f (@{$files}) {
+      $self->copy_if_modified(
+        from    => $f,
+        to_dir  => join(q[/], $self->base_dir(), $self->blib()),
+        flatten => 0);
+    }
     return;
   }
 EOF
@@ -313,13 +314,11 @@ my $requires = {
                 'npg::api::run_status'                     => 0,
 };
 
-if (!$ENV{'NPG_QC_WEB_INSTALL'}) {
-  while (my ($key, $value) = each %{$extended_requires}) {
-    $requires->{$key} = $value;
-  }
-  while (my ($key, $value) = each %{$extended_build_requires}) {
-    $build_requires->{$key} = $value;
-  }
+while (my ($key, $value) = each %{$extended_requires}) {
+  $requires->{$key} = $value;
+}
+while (my ($key, $value) = each %{$extended_build_requires}) {
+  $build_requires->{$key} = $value;
 }
 
 my $builder = $class->new(
@@ -340,6 +339,16 @@ my $builder = $class->new(
 
           'dist'          => { COMPRESS => 'gzip', SUFFIX => 'gz', },
          );
+
+# Build and install cgi-related files
+foreach my $path (qw(data htdocs cgi-bin)) {
+  my $name = $path;
+  $name =~ s/-//;
+  $builder->add_build_element($name);
+  if ($builder->install_base()) {
+    $builder->install_path($name => join q{/}, $builder->install_base(), $path);
+  }
+}
 
 $builder->create_build_script();
 
