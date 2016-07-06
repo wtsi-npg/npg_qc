@@ -102,7 +102,8 @@ subtest 'high-level parsing' => sub {
   } 'no error when serializing to json string and file';
 
   my $from_json_hash = from_json($result_json);
-  delete $from_json_hash->{__CLASS__};
+  delete $from_json_hash->{'__CLASS__'};
+  delete $from_json_hash->{'composition'};
   delete $from_json_hash->{$dups_attr_name};
   delete $from_json_hash->{$fstat_attr_name};
    
@@ -133,7 +134,7 @@ my $archive_16960 = '16960_1_0';
 my $ae_16960 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_16960}.tar.gz");
 $ae_16960->extract(to => $tempdir) or die $ae_16960->error;
 $archive_16960 = join q[/], $tempdir, $archive_16960;
-note `find $archive_16960`;
+#note `find $archive_16960`;
 
 my $samtools_path  = join q[/], $tempdir, 'samtools1';
 local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
@@ -232,14 +233,24 @@ subtest 'finding files, calculating metrics' => sub {
   is ($r->filename_root, '16960_1#0_phix', 'filename root');
 };
 
-subtest 'finding phix subset files (no run id)' => sub {
+subtest 'finding phix subset files via composition' => sub {
   plan tests => 10;
 
   my $fproot = $archive_16960 . '/16960_1#0_phix';
-  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+
+  my $composition = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run              => 16960,
+    position            => 1,
+    tag_index           => 0,
     subset              => 'phix',
     sequence_file       => $fproot . '.bam',
     related_objects     => [],
+  )->composition();
+
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+    sequence_file       => $fproot . '.bam',
+    related_objects     => [],
+    composition         => $composition
   );
 
   lives_ok {$r->execute} 'metrics parsing ok';

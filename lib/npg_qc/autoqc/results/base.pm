@@ -13,9 +13,16 @@ with 'npg_qc::autoqc::role::result';
 
 our $VERSION = '0';
 
+sub BUILD {
+  my $self = shift;
+  $self->composition();
+  return;
+}
+
 has 'composition' => (
     is         => 'ro',
     isa        => 'npg_tracking::glossary::composition',
+    required   => 0,
     lazy_build => 1,
     handles   => {
       'composition_digest' => 'digest',
@@ -51,13 +58,18 @@ npg_qc::autoqc::results::base
 
 =head1 DESCRIPTION
 
-An alternative composition-based parent object for autoqc result objects.
+A composition-based parent object for autoqc result objects.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 BUILD
+
+Default object constructor extension that is called after the object is created,
+but before it is returned to the caller. Builds the composition accessor.
+
 =head2 composition
 
-An npg_tracking::glossary::composition composition objects. If the derived
+A npg_tracking::glossary::composition object. If the derived
 class inplements id_run and position methods/attributes, a one-component
 composition is created automatically. Otherwise an empty composition object
 is created.

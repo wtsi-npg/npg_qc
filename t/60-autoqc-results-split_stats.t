@@ -7,6 +7,8 @@ use_ok ('npg_qc::autoqc::results::split_stats');
 
 {
   my $r = npg_qc::autoqc::results::split_stats->new(
+    id_run              => 4,
+    position            => 3,
     filename1           => '1.fastq',
     filename2           => '2.fastq',
     ref_name            => 'human',

@@ -1,15 +1,7 @@
-#########
-# Author:        mg8
-# Created:       30 July 2009
-#
-
 use strict;
 use warnings;
-use Test::More tests => 34;
-use Test::Deep;
+use Test::More tests => 42;
 use Test::Exception;
-use English qw(-no_match_vars);
-use Carp;
 
 use_ok ('npg_qc::autoqc::results::result');
 
@@ -25,6 +17,22 @@ use_ok ('npg_qc::autoqc::results::result');
     is($r->class_name(), q[result], 'class name');
     is($r->package_name(), q[npg_qc::autoqc::results::result], 'class name');
     is($r->tag_index, undef, 'tag index undefined');
+    ok($r->has_composition, 'composition is built');
+    my $c = $r->composition->components->[0];
+    is($c->id_run, 2, 'component run id');
+    is($c->position, 1, 'component position');
+    is($c->tag_index, undef, 'component tag index undefined');
+    is($c->subset, undef, 'component subset is undefined');
+
+    throws_ok {npg_qc::autoqc::results::result->new(path => q[mypath])}
+      qr/Empty composition is not allowed/,
+      'object with an empty composition is not built';
+    throws_ok {npg_qc::autoqc::results::result->new(position => 1, path => q[mypath])}
+      qr/Empty composition is not allowed/,
+      'object with an empty composition is not built';
+    throws_ok {npg_qc::autoqc::results::result->new(id_run => 3, path => q[mypath])}
+      qr/Attribute \(position\) does not pass the type constraint/,
+      'position is needed';
 }
 
 
@@ -47,7 +55,7 @@ use_ok ('npg_qc::autoqc::results::result');
     my $saved_r = npg_qc::autoqc::results::result->load($saved_path);
     sleep 1;
     unlink $saved_path;
-    cmp_deeply($r, $saved_r, 'serialization to JSON file');
+    is_deeply($r, $saved_r, 'serialization to JSON file');
 }
 
 {
@@ -113,7 +121,7 @@ use_ok ('npg_qc::autoqc::results::result');
 
 {
     throws_ok {npg_qc::autoqc::results::result->inflate_rpt_key(q[5;6])} qr/Invalid rpt key/, 'error when inflating rpt key';
-    cmp_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6]), {id_run=>5,position=>6,}, 'rpt key inflated');
-    cmp_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:1]), {id_run=>5,position=>6,tag_index=>1}, 'rpt key inflated');
-    cmp_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:0]), {id_run=>5,position=>6,tag_index=>0}, 'rpt key inflated');
+    is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6]), {id_run=>5,position=>6,}, 'rpt key inflated');
+    is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:1]), {id_run=>5,position=>6,tag_index=>1}, 'rpt key inflated');
+    is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:0]), {id_run=>5,position=>6,tag_index=>0}, 'rpt key inflated');
 }

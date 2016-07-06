@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -21,7 +21,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
 
 subtest 'simple attributes and methods' => sub {
-  plan tests => 14;
+  plan tests => 12;
 
   my $db_loader = npg_qc::autoqc::db_loader->new();
   isa_ok($db_loader, 'npg_qc::autoqc::db_loader');
@@ -51,20 +51,42 @@ subtest 'simple attributes and methods' => sub {
   $db_loader = npg_qc::autoqc::db_loader->new(check=>['insert_size','other']);
   ok(!$db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test negative');
   ok(!$db_loader->_pass_filter($values, 'tag_decode_stats'), 'filter test negative');
+};
 
-  $db_loader = npg_qc::autoqc::db_loader->new(
+subtest 'composition in filtering' => sub {
+  plan tests => 7;
+  my $db_loader = npg_qc::autoqc::db_loader->new(
       path     =>['t/data/autoqc/tag_decode_stats'],
       schema   => $schema,
       verbose  => 1,
       id_run   => [1234],
       position => [1]
   );
-  $values = {'some' => 'data', 'composition' => 'composed'};
-  my $outcome;
-  warning_like { $outcome = $db_loader->_pass_filter($values, 'sequence_summary') }
-    qr/Filtering compositions is not implemented, will be loaded/,
-    'warning that composition fields cannot be screened';
-  is ($outcome, 1, 'composition passed filter')
+  my $values = {'some' => 'data'};
+  is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
+    'no id_run, position, composition - passed filter'); 
+
+  $values->{'composition'} = 'composed';
+  is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
+    'composition is a string - passed filter');
+
+  use_ok('npg_tracking::glossary::composition');
+  use_ok('npg_tracking::glossary::composition::component::illumina');
+  my $c = npg_tracking::glossary::composition->new();
+  $c->add_component(npg_tracking::glossary::composition::component::illumina
+    ->new(id_run => 1234, position => 1, tag_index => 25));
+  $values->{'composition'} = $c;
+  is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
+    'composition is an object - passed filter');
+  $c = npg_tracking::glossary::composition->new();
+  $c->add_component(npg_tracking::glossary::composition::component::illumina
+    ->new(id_run => 1234, position => 2, tag_index => 25));
+  is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
+    'composition is an object - failed filter');
+  $c->add_component(npg_tracking::glossary::composition::component::illumina
+    ->new(id_run => 1234, position => 1, tag_index => 25));
+  is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
+    'composition has multiple components - passed filter');
 };
 
 subtest 'excluding non-db attributes' => sub {

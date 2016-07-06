@@ -260,7 +260,7 @@ sub _exclude_nondb_attrs {
   foreach my $key ( keys %{$values} ) {
     if (none {$key eq $_} @columns) {
       delete $values->{$key};
-      if ($key ne $CLASS_FIELD) {
+      if ($key ne $CLASS_FIELD && $key ne 'composition') {
         $self->_log("Not loading field '$key'");
       }
     }
@@ -281,19 +281,30 @@ sub _pass_filter {
   if ( scalar @{$self->check} && none {$_ eq $class_name} @{$self->check}) {
     return 0;
   }
-  if ( exists $values->{'id_run'} ) {
-    if ( scalar @{$self->id_run} && none {$_ == $values->{'id_run'}} @{$self->id_run}) {
-      return 0;
-    }
-  }
-  if ( exists $values->{'position'} ) {
-    if ( scalar @{$self->lane} && none {$_ == $values->{'position'}} @{$self->lane}) {
-      return 0;
-    }
-  }
 
-  if ( exists $values->{'composition'} ) {
-    $self->_log('Filtering compositions is not implemented, will be loaded');
+  if (@{$self->id_run} || @{$self->lane}) {
+    my $id_run   = $values->{'id_run'};
+    my $position = $values->{'position'};
+    if ( !$id_run  && $values->{'composition'} ) {
+      my $composition = $values->{'composition'};
+      if (ref $composition eq 'npg_tracking::glossary::composition' &&
+          $composition->num_components == 1) {
+        my $component = $composition->components->[0];
+        $id_run   = $component->id_run;
+        $position = $component->position;
+      }
+    }
+
+    if ( @{$self->id_run} && $id_run ) {
+      if ( none {$_ == $id_run} @{$self->id_run} ) {
+        return 0;
+      }
+    }
+    if ( @{$self->lane} && $position ) {
+      if ( none {$_ == $position} @{$self->lane} ) {
+        return 0;
+      }
+    }
   }
 
   return 1;

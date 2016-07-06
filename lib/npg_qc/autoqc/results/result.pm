@@ -3,6 +3,7 @@ package npg_qc::autoqc::results::result;
 use Moose;
 use namespace::autoclean;
 use MooseX::AttributeHelpers;
+use Carp;
 
 use npg_tracking::util::types;
 
@@ -34,6 +35,23 @@ npg_qc::autoqc::results::result
 A base class to wrap the result of autoqc.
 
 =head1 SUBROUTINES/METHODS
+
+=cut
+
+=head2 BUILD
+
+Default object constructor extension that is called after the object is created,
+but before it is returned to the caller. Throws an error if an empty composition
+has been built by the parent.
+
+=cut
+sub BUILD {
+  my $self = shift;
+  if ($self->composition()->num_components() == 0) {
+    confess 'Empty composition is not allowed';
+  }
+  return;
+}
 
 =head2 id_run
 
@@ -118,6 +136,10 @@ __END__
 =over
 
 =item Moose
+
+=item MooseX::AttributeHelpers
+
+=item Carp
 
 =item namespace::autoclean
 
