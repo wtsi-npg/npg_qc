@@ -14,7 +14,12 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      for columns under a unique constraint to database defaults.
  - SeqQC - outdated template for split_stats removed
  - genotype role refactored to remove hardcoded uri encoding            
-
+ - genotype check, croak if error closing samtools pileup command
+ - norm_fit
+     - modify peak finding to allow for peaks in first/last bin
+     - added monotonity condition when estimating stdev
+     - drop stdev when outputting filtered modes
+ 
 release 61.2
  - SeqQC:
    - Reintroduce collapser
