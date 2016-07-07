@@ -22,13 +22,31 @@ npg_qc::autoqc::results::result
 
 =head1 SYNOPSIS
 
+ use npg_qc::autoqc::results::result;
+
  my $r = npg_qc::autoqc::results::result
-  ->new(id_run => 1934, position => 5, path => q[mypath]);
+  ->new(id_run => 1934, position => 5);
  $r->pass(1); #set the pass value
  $r->equals_byvalue({id_run => 1934, position => 4,}); #returns false
  $r->equals_byvalue({id_run => 1934, position => 5,}); #returns true
  my $r = npg_qc::autoqc::results::result->load(q[my.json]);
  my $json_string = $r->freeze();
+
+ # Or, via composition
+
+ use npg_tracking::glossary::composition;
+ use npg_tracking::glossary::composition::component::illumina;
+ use npg_qc::autoqc::results::result;
+
+ my $composition = npg_tracking::glossary::composition->new();
+ $composition->add_component(
+   npg_tracking::glossary::composition::component::illumina->new(
+     id_run => 1, position => 2, tag_index => 3
+   );
+ );
+ my $r = npg_qc::autoqc::results::result->new(
+   $composition => $composition
+ );
 
 =head1 DESCRIPTION
 
