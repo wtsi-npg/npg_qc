@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - remove contamination check that is not run any longer,
+   result object remains
+ - to keep similar code together and to avoid listing explicitly
+   an increasing number of non-runnable checks, move checks_list()
+   method to the collection object
  - genotype check, croak if error closing samtools pileup command
  - norm_fit
      - modify peak finding to allow for peaks in first/last bin

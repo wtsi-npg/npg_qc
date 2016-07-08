@@ -1,8 +1,3 @@
-#########
-# Author:        Andy Brown ajb@sanger.ac.uk and Marina Gourtovaia mg8@sanger.ac.uk 
-# Created:       Summer 2009
-#
-
 package npg_qc::autoqc::qc_store;
 
 use Moose;
@@ -45,7 +40,7 @@ has 'use_db'       => ( isa        => 'Bool',
                         is         => 'ro',
                         required   => 0,
                         default    => 1,
-		      );
+                      );
 
 =head2 verbose
 
@@ -67,7 +62,7 @@ has 'qc_schema'    => ( isa        => 'Maybe[npg_qc::Schema]',
                         is         => 'ro',
                         required   => 0,
                         lazy_build => 1,
-		      );
+                      );
 sub _build_qc_schema {
   my $self = shift;
   if ($self->use_db) {
@@ -191,7 +186,7 @@ sub run_from_db {
     }
     return $c;
   }
-  foreach my $check_name (@{npg_qc::autoqc::autoqc->checks_list()}) {
+  foreach my $check_name (@{$c->checks_list()}) {
     my $dbix_query = { 'id_run' => $query->id_run};
     if (@{$query->positions}) {
       $dbix_query->{'position'} = $query->positions;
@@ -255,11 +250,12 @@ __END__
 
 =head1 AUTHOR
 
-Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt> and Andy Brown E<lt>ajb@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Andy Brown E<lt>ajb@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Marina Gourtovaia and Andy Brown
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

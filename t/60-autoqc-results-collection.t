@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 120;
+use Test::More tests => 121;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
@@ -24,6 +24,35 @@ my $temp = tempdir( CLEANUP => 1);
 {
     my $c = npg_qc::autoqc::results::collection->new();
     isa_ok($c, 'npg_qc::autoqc::results::collection');
+
+    my $expected = {
+                    qX_yield         => 1,
+                    insert_size      => 1,
+                    sequence_error   => 1,
+                    contamination    => 1,
+                    adapter          => 1,
+                    split_stats      => 1,
+                    spatial_filter   => 1,
+                    gc_fraction      => 1,
+                    gc_bias          => 1,
+                    genotype         => 1,
+                    tag_decode_stats => 1,
+                    bam_flagstats    => 1,
+                    ref_match        => 1,
+                    tag_metrics      => 1,
+                    pulldown_metrics => 1,
+                    alignment_filter_metrics => 1,
+                    upstream_tags => 1,
+                    tags_reporters => 1,
+                    verify_bam_id => 1,
+                 };
+    my $actual;
+    my @checks = @{$c->checks_list};
+    foreach my $check (@checks) {
+      $actual->{$check} = 1;
+    }
+    cmp_deeply ($actual, $expected, 'checks listed');
+    is(pop @checks, 'bam_flagstats', 'bam_flagstats at the end of the list');
 }
 
 {
@@ -407,12 +436,6 @@ my $temp = tempdir( CLEANUP => 1);
 
     $c->add_from_staging($id_run, [5,6]);
     is($c->size, 22, 'lane results added from staging area for lanes 5 and 6');
-}
-
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    is (join(q[ ], (sort @{$c->_result_classes})), q[adapter alignment_filter_metrics bam_flagstats contamination gc_bias gc_fraction genotype insert_size pulldown_metrics qX_yield ref_match sequence_error spatial_filter split_stats tag_decode_stats tag_metrics tags_reporters upstream_tags verify_bam_id], 'list of result classes');
 }
 
 {
