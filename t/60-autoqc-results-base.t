@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 
 my $bp  = q[npg_qc::autoqc::results::base];
@@ -77,6 +77,13 @@ subtest 'supply composition to the constructor' => sub {
    'adding an extra component changes the digest');
 };
 
+subtest 'json is only for instances' => sub{
+  plan tests =>1;
+  throws_ok { $bp->json() }
+    qr/"json" method should be called on an object instance/, 
+    q[throws exception when json() called on package];
+};
+
 subtest 'overwritten methods' => sub {
   plan tests => 9;
 
@@ -104,7 +111,7 @@ subtest 'overwritten methods' => sub {
 };
 
 subtest 'extended_base' => sub {
-  plan tests => 8;
+  plan tests => 9;
 
   package npg_qc::autoqc::results::test_extended;
   use Moose;
@@ -128,6 +135,8 @@ subtest 'extended_base' => sub {
     'filename as result object');
   is ($eb->equals_byvalue({id_run => 1, position => 3, tag_index => 3}),
     1, 'compositions are the same');
+  is ($eb->equals_byvalue({id_run => 1, position => 3, tag_index => 4}),
+    0, 'compositions are different tag_index');
   is ($eb->equals_byvalue({id_run => 1, position => 3}),
     1, 'compositions are the same for the purpose of search');
   is ($eb->equals_byvalue({id_run => 1, position => 4}),
