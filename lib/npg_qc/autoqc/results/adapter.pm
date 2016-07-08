@@ -24,7 +24,7 @@ has reverse_contaminated_read_count => ( is  => 'rw',
 has reverse_blat_hash               => ( is  => 'rw',
                                          isa => 'Maybe[HashRef]', );
 has forward_start_counts            => ( is  => 'rw',
-                                        isa => 'Maybe[HashRef]', );
+                                         isa => 'Maybe[HashRef]', );
 has reverse_start_counts            => ( is  => 'rw',
                                          isa => 'Maybe[HashRef]', );
 
