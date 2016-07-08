@@ -13,7 +13,7 @@ use npg_tracking::util::types;
 with  qw / npg_tracking::illumina::run::short_info
            npg_tracking::illumina::run::folder
            MooseX::Getopt
-        /;
+         /;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
@@ -147,7 +147,7 @@ sub BUILD {
             $self->_write_qc_in('/dev/stdin'); #horrid - need to rethink this object and bin/qc
         } elsif (defined $self->tag_index) {
             $self->_write_qc_in($self->lane_archive_path($self->position));
-	      } else {
+        } else {
             $self->_write_qc_in($self->archive_path);
         }
         if (!$self->_has_qc_out) {
@@ -155,8 +155,8 @@ sub BUILD {
                 $self->_write_qc_out($self->lane_qc_path($self->position));
             } else {
                 $self->_write_qc_out($self->qc_path);
-	          }
-       }
+            }
+        }
     }
     if (!-R $self->qc_in) {
         croak q[Input qc directory ] . $self->qc_in . q[ does not exist or is not readable];
@@ -176,7 +176,7 @@ sub _create_test_object {
                 path      => $self->qc_in,
                 position  => $self->position,
                 id_run    => $self->id_run,
-	             };
+                 };
 
     my @attrs = qw/tag_index repository reference_genome species strain file_type/;
     foreach my $attr_name (@attrs) {
@@ -188,7 +188,7 @@ sub _create_test_object {
             if ($self->$attr_name) {
                 $init->{$attr_name} = $self->$attr_name;
             }
-	      }
+        }
     }
     return $pkg->new($init);
 }
