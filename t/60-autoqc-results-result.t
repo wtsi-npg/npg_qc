@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 42;
+use Test::More tests => 48;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::result');
@@ -9,7 +9,6 @@ use_ok ('npg_qc::autoqc::results::result');
     my $r = npg_qc::autoqc::results::result->new(id_run => 2, path => q[mypath], position => 1);
     isa_ok ($r, 'npg_qc::autoqc::results::result');
 }
-
 
 {
     my $r = npg_qc::autoqc::results::result->new(id_run => 2, path => q[mypath], position => 1);
@@ -35,6 +34,46 @@ use_ok ('npg_qc::autoqc::results::result');
       'position is needed';
 }
 
+{
+    use_ok('npg_tracking::glossary::composition');
+    use_ok('npg_tracking::glossary::composition::component::illumina');
+
+    my $composition = npg_tracking::glossary::composition->new();
+    my $c = {id_run => 3, position => 4, tag_index => 5};
+    $composition->add_component(
+      npg_tracking::glossary::composition::component::illumina->new($c)
+    );
+    $c->{'position'} = 5;
+    $composition->add_component(
+      npg_tracking::glossary::composition::component::illumina->new($c)
+    );
+    my $r = npg_qc::autoqc::results::result->new(composition => $composition);
+    is ($r->composition_subset(), undef, 'composition subset is undefined');
+    
+    $c->{'subset'} = 'human';
+    $r->composition->add_component(
+      npg_tracking::glossary::composition::component::illumina->new($c)
+    );
+    throws_ok {$r->composition_subset()} qr/Multiple subsets within the composition/,
+      'error for multiple subsets';
+
+    $composition = npg_tracking::glossary::composition->new();
+    $composition->add_component(
+      npg_tracking::glossary::composition::component::illumina->new($c)
+    );
+    $c->{'id_run'} = 6;
+    $composition->add_component(
+      npg_tracking::glossary::composition::component::illumina->new($c)
+    );
+    $r = npg_qc::autoqc::results::result->new(composition => $composition);
+    is ($r->composition_subset(), 'human', 'composition subset is "human"');
+    $c->{'subset'} = 'phix';
+    $r->composition->add_component(
+      npg_tracking::glossary::composition::component::illumina->new($c)
+    );
+    throws_ok {$r->composition_subset()} qr/Multiple subsets within the composition/,
+      'error for multiple subsets';
+}
 
 {
     my $r = npg_qc::autoqc::results::result->new(id_run => 2, path => q[mypath], position => 1, tag_index => 4,);
@@ -42,7 +81,6 @@ use_ok ('npg_qc::autoqc::results::result');
     lives_ok {npg_qc::autoqc::results::result->new(id_run => 2, path => q[mypath], position => 1, tag_index => 4,)}
        'can pass undef for tag_index in the constructor';
 }
-
 
 {
     my $r = npg_qc::autoqc::results::result->new(
@@ -117,7 +155,6 @@ use_ok ('npg_qc::autoqc::results::result');
     $r->tag_index(3);
     is ($r->rpt_key, q[2549:3:3], 'rpt key');      
 }
-
 
 {
     throws_ok {npg_qc::autoqc::results::result->inflate_rpt_key(q[5;6])} qr/Invalid rpt key/, 'error when inflating rpt key';

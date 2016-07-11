@@ -6,7 +6,7 @@ use File::Spec::Functions qw(catfile splitpath);
 use JSON;
 use MooseX::Storage;
 use Readonly;
-use List::MoreUtils qw(none);
+use List::MoreUtils qw(none uniq);
 
 with Storage( 'traits' => ['OnlyWhenBuilt'],
               'format' => 'JSON',
@@ -98,32 +98,21 @@ sub check_name {
 =head2 composition_subset
 
 A single, possibly undefined, value describing the subset attribute values
-of the components. An error if a single value cannot be produced or if it is
-not the same as the value returned by the subset method/attribute of this
-object (if such method/attribute is available).
+of the components. An error if a single value cannot be produced.
 
 =cut
 sub composition_subset {
   my $self = shift;
 
-  my @subsets = $self->composition->component_values4attr('subset');
-  my $subset;
-  if (@subsets) {
-    if (scalar @subsets > 1) {
-      croak 'Multiple subsets within the composition: ' . join q[,] , @subsets;
-    }
-    $subset = $subsets[0];
+  my $token = 'undef';
+  my @subsets = uniq map { defined $_->subset ? $_->subset : $token }
+                @{$self->composition->components()};
+  if (scalar @subsets > 1) {
+    croak 'Multiple subsets within the composition: ' . join q[, ], @subsets;
   }
+  my $subset = $subsets[0];
 
-  if ( $self->can('subset') ) {
-    if ( (!$self->subset && $subset) ||
-         ($self->subset && !$subset) ||
-         ($self->subset && $subset && $self->subset ne $subset) ) {
-      croak 'Inconsistent subset values for this object and components of the composition';
-    }
-  }
-
-  return $subset;
+  return $subset eq $token ? undef : $subset;
 }
 
 =head2 is_old_style_result
@@ -190,14 +179,14 @@ sub _equals_byvalue_old {
     if (none { $_ eq $key } @SEARCH_PARAMETERS) {
       croak qq[Value of the $key attribute cannot be compared. Valid attributes: ]
             . join q[, ], @SEARCH_PARAMETERS;
-	  }
+    }
     if ($key eq q[tag_index]) {
       if ( !$self->can($key) || (!defined $h->{$key} && defined $self->$key) ||
           (defined $h->{$key} && !defined $self->$key) ) {
         return 0;
       }
       if (!defined $h->{$key} && !defined $self->$key) { next; }
-	  }
+    }
     if ($self->$key ne $h->{$key}) {return 0;}
   }
   return 1;
