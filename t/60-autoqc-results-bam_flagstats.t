@@ -169,36 +169,36 @@ subtest 'finding files, calculating metrics' => sub {
 
     for my $r (($r1, $r2, $r3)) {
 
-  is($r->_file_path_root, $fproot, 'file path root');
-  is($r->filename_root, '16960_1#0', 'filename root');
-  is($r->filename4serialization, '16960_1#0.bam_flagstats.json',
-    'filename for serialization'); 
-  is($r->markdups_metrics_file,  $fproot . '.markdups_metrics.txt',
-    'markdups metrics found');
-  is($r->flagstats_metrics_file, $fproot . '.flagstat', 'flagstats metrics found');
+      is($r->_file_path_root, $fproot, 'file path root');
+      is($r->filename_root, '16960_1#0', 'filename root');
+      is($r->filename4serialization, '16960_1#0.bam_flagstats.json',
+          'filename for serialization'); 
+      is($r->markdups_metrics_file,  $fproot . '.markdups_metrics.txt',
+          'markdups metrics found');
+      is($r->flagstats_metrics_file, $fproot . '.flagstat', 'flagstats metrics found');
 
-  my @stats_files = sort ($fproot . '_F0x900.stats', $fproot . '_F0xB00.stats');
-  is (join(q[ ], @{$r->samtools_stats_file}), join(q[ ],@stats_files), 'stats files');
- 
-  $r->execute();
-  is($r->library_size, 240428087, 'library size value');
-  is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
-  my $j;
-  lives_ok { $j=$r->freeze } 'serialization to json is ok';
-  unlike($j, qr/_file_path_root/, 'serialization does not contain excluded attr');
-  like($j, qr/npg_tracking::glossary::composition-/,
-    'serialized object contains composition info');
-  like($j, qr/npg_tracking::glossary::composition::component::illumina-/,
-    'serialized object contains component info');
-  my $tmp = npg_qc::autoqc::results::bam_flagstats->thaw($j);
-  isa_ok ($tmp, 'npg_qc::autoqc::results::bam_flagstats');
-  isa_ok ($tmp->composition, 'npg_tracking::glossary::composition');
-  isa_ok ($tmp->composition->components->[0],
-    'npg_tracking::glossary::composition::component::illumina');
-  is ($r->composition->num_components, $tmp->composition->num_components,
-    'number of components is consistent');
-  is ($r->composition_subset, undef, 'composition subset is undefined');
-  is ($r->filename_root, '16960_1#0', 'filename root');
+      my @stats_files = sort ($fproot . '_F0x900.stats', $fproot . '_F0xB00.stats');
+      is (join(q[ ], @{$r->samtools_stats_file}), join(q[ ],@stats_files), 'stats files');
+      
+      $r->execute();
+      is($r->library_size, 240428087, 'library size value');
+      is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
+      my $j;
+      lives_ok { $j=$r->freeze } 'serialization to json is ok';
+      unlike($j, qr/_file_path_root/, 'serialization does not contain excluded attr');
+      like($j, qr/npg_tracking::glossary::composition-/,
+          'serialized object contains composition info');
+      like($j, qr/npg_tracking::glossary::composition::component::illumina-/,
+          'serialized object contains component info');
+      my $tmp = npg_qc::autoqc::results::bam_flagstats->thaw($j);
+      isa_ok ($tmp, 'npg_qc::autoqc::results::bam_flagstats');
+      isa_ok ($tmp->composition, 'npg_tracking::glossary::composition');
+      isa_ok ($tmp->composition->components->[0],
+          'npg_tracking::glossary::composition::component::illumina');
+      is ($r->composition->num_components, $tmp->composition->num_components,
+          'number of components is consistent');
+      is ($r->composition_subset, undef, 'composition subset is undefined');
+      is ($r->filename_root, '16960_1#0', 'filename root');
     }
 
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
