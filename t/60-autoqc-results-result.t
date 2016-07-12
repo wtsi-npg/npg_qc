@@ -24,10 +24,10 @@ use_ok ('npg_qc::autoqc::results::result');
     is($c->subset, undef, 'component subset is undefined');
 
     throws_ok {npg_qc::autoqc::results::result->new(path => q[mypath])}
-      qr/Empty composition is not allowed/,
+      qr/Can only build old style results/,
       'object with an empty composition is not built';
     throws_ok {npg_qc::autoqc::results::result->new(position => 1, path => q[mypath])}
-      qr/Empty composition is not allowed/,
+      qr/Can only build old style results/,
       'object with an empty composition is not built';
     throws_ok {npg_qc::autoqc::results::result->new(id_run => 3, path => q[mypath])}
       qr/Attribute \(position\) does not pass the type constraint/,
@@ -35,42 +35,49 @@ use_ok ('npg_qc::autoqc::results::result');
 }
 
 {
-    use_ok('npg_tracking::glossary::composition');
+    use_ok('npg_tracking::glossary::composition::factory');
     use_ok('npg_tracking::glossary::composition::component::illumina');
 
-    my $composition = npg_tracking::glossary::composition->new();
+    my $f = npg_tracking::glossary::composition::factory->new();
     my $c = {id_run => 3, position => 4, tag_index => 5};
-    $composition->add_component(
-      npg_tracking::glossary::composition::component::illumina->new($c)
-    );
+    my $comp1 = npg_tracking::glossary::composition::component::illumina->new($c);
+    $f->add_component($comp1);
     $c->{'position'} = 5;
-    $composition->add_component(
-      npg_tracking::glossary::composition::component::illumina->new($c)
-    );
-    my $r = npg_qc::autoqc::results::result->new(composition => $composition);
+    my $comp2 = npg_tracking::glossary::composition::component::illumina->new($c);
+    $f->add_component($comp2);
+   
+    my $r = npg_qc::autoqc::results::result->new(composition => $f->create_composition());
     is ($r->composition_subset(), undef, 'composition subset is undefined');
-    
+
+    $f = npg_tracking::glossary::composition::factory->new();
+    $f->add_component($comp1);
+    $f->add_component($comp2);
     $c->{'subset'} = 'human';
-    $r->composition->add_component(
-      npg_tracking::glossary::composition::component::illumina->new($c)
-    );
+    my $comp3 = npg_tracking::glossary::composition::component::illumina->new($c);
+    $f->add_component($comp3);
+
+    $r = npg_qc::autoqc::results::result->new(composition => $f->create_composition());
     throws_ok {$r->composition_subset()} qr/Multiple subsets within the composition/,
       'error for multiple subsets';
 
-    $composition = npg_tracking::glossary::composition->new();
-    $composition->add_component(
-      npg_tracking::glossary::composition::component::illumina->new($c)
-    );
+    $f = npg_tracking::glossary::composition::factory->new();
+    $f->add_component($comp3);
     $c->{'id_run'} = 6;
-    $composition->add_component(
-      npg_tracking::glossary::composition::component::illumina->new($c)
-    );
-    $r = npg_qc::autoqc::results::result->new(composition => $composition);
+    my $comp4 = npg_tracking::glossary::composition::component::illumina->new($c);
+    $f->add_component($comp4);
+    
+    $r = npg_qc::autoqc::results::result->new(composition => $f->create_composition());
     is ($r->composition_subset(), 'human', 'composition subset is "human"');
+
+    $f = npg_tracking::glossary::composition::factory->new();
+    $f->add_component($comp3);
+    $f->add_component($comp4);
     $c->{'subset'} = 'phix';
-    $r->composition->add_component(
+    $f->add_component(
       npg_tracking::glossary::composition::component::illumina->new($c)
     );
+
+    $r = npg_qc::autoqc::results::result->new(composition => $f->create_composition());
     throws_ok {$r->composition_subset()} qr/Multiple subsets within the composition/,
       'error for multiple subsets';
 }

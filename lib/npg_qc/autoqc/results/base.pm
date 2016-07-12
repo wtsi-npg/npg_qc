@@ -7,7 +7,7 @@ use Carp;
 use npg_tracking::glossary::composition;
 use npg_tracking::glossary::composition::component::illumina;
 
-with 'npg_tracking::glossary::composition::factory' =>
+with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 with 'npg_qc::autoqc::role::result';
 
@@ -35,16 +35,25 @@ sub _build_composition {
   if ($self->is_old_style_result) {
     return $self->create_composition();
   }
-  return npg_tracking::glossary::composition->new();
+  croak 'Can only build old style results';
 }
 
-sub execute {
-  my $self = shift;
-  if ($self->num_components == 0) {
-    croak 'Empty composition - cannot run execute()';
+around 'pack' => sub {
+  my ($old, $self) = @_;
+  my $packed = $self->$old();
+  foreach my $key (keys $packed->{'composition'}) {
+    if ($key =~ /\A_[[:lower:]]/smx) {
+      delete $packed->{'composition'}->{$key};
+    }
   }
-  return;
-}
+  return $packed;
+};
+
+around 'freeze' => sub {
+  my ($old, $self) = @_;
+  $self->composition->freeze(); # Integrity check
+  return $self->$old()
+};
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -71,10 +80,19 @@ but before it is returned to the caller. Builds the composition accessor.
 
 A npg_tracking::glossary::composition object. If the derived
 class inplements id_run and position methods/attributes, a one-component
-composition is created automatically. Otherwise an empty composition object
-is created.
+composition is created automatically.
 
-=head2 execute
+=head2 pack
+
+This method that is inherited from MooseX::Storage via npg_qc::autoqc::role::result. It
+creates a hash representation of the object is extended to disregard private attributes
+of the composition object.
+
+=head2 freeze
+
+This method that is inherited from MooseX::Storage via npg_qc::autoqc::role::result. It
+returns JSON string serialization of the object. Error if the object lost integrity, ie
+its composition changed.
 
 =head1 DIAGNOSTICS
 
@@ -92,7 +110,7 @@ is created.
 
 =item npg_tracking::glossary::composition
 
-=item npg_tracking::glossary::composition::factory
+=item npg_tracking::glossary::composition::factory::attributes
 
 =item npg_tracking::glossary::composition::component::illumina
 

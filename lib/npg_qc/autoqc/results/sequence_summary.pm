@@ -76,18 +76,17 @@ has '_samtools' => (
     writer     => '_set_samtools',
 );
 
-override 'execute' => sub {
+sub execute {
   my $self = shift;
   if (!$self->sequence_file) {
     croak 'CRAM/BAM file path (sequence_file attribute) should be set';
   }
   $self->_set_samtools('samtools1');
-  super();
   for my $attr ( @ATTRIBUTES ) {
     $self->$attr;
   }
   return;
-};
+}
 
 override 'filename_root' => sub  {
   my $self = shift;
