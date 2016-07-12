@@ -70,21 +70,28 @@ subtest 'composition in filtering' => sub {
   is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
     'composition is a string - passed filter');
 
-  use_ok('npg_tracking::glossary::composition');
+  use_ok('npg_tracking::glossary::composition::factory');
   use_ok('npg_tracking::glossary::composition::component::illumina');
-  my $c = npg_tracking::glossary::composition->new();
-  $c->add_component(npg_tracking::glossary::composition::component::illumina
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component(npg_tracking::glossary::composition::component::illumina
     ->new(id_run => 1234, position => 1, tag_index => 25));
-  $values->{'composition'} = $c;
+  $values->{'composition'} = $f->create_composition();
   is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
     'composition is an object - passed filter');
-  $c = npg_tracking::glossary::composition->new();
-  $c->add_component(npg_tracking::glossary::composition::component::illumina
-    ->new(id_run => 1234, position => 2, tag_index => 25));
+
+  $f = npg_tracking::glossary::composition::factory->new();
+  my $c = npg_tracking::glossary::composition::component::illumina
+    ->new(id_run => 1234, position => 2, tag_index => 25);
+  $f->add_component($c);
+  $values->{'composition'} = $f->create_composition();
   is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
     'composition is an object - failed filter');
-  $c->add_component(npg_tracking::glossary::composition::component::illumina
+
+  $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($c);
+  $f->add_component(npg_tracking::glossary::composition::component::illumina
     ->new(id_run => 1234, position => 1, tag_index => 25));
+  $values->{'composition'} = $f->create_composition();
   is ($db_loader->_pass_filter($values, 'sequence_summary'), 1,
     'composition has multiple components - passed filter');
 };

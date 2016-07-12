@@ -51,16 +51,15 @@ sub _build_stats {
   return $content;
 }
 
-override 'execute' => sub {
+sub execute {
   my $self = shift;
   if (!$self->stats_file) {
     croak 'Samtools stats file path (stats_file attribute) should be set';
   }
-  super();
   $self->filter();
   $self->stats();
   return;
-};
+}
 
 override 'filename_root' => sub  {
   my $self = shift;
