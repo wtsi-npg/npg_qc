@@ -2,7 +2,7 @@
 
 set -e -x
 
-sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 5072E1F5 # Import public key for MySQL
+sudo apt-key add ./.travis/mysql_pubkey.asc # Import public key for MySQL
 sudo apt-get remove --purge "^mysql.*"
 sudo apt-get autoremove
 sudo apt-get autoclean
