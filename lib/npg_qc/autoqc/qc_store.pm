@@ -40,7 +40,7 @@ has 'use_db'       => ( isa        => 'Bool',
                         is         => 'ro',
                         required   => 0,
                         default    => 1,
-		      );
+                      );
 
 =head2 verbose
 
@@ -62,7 +62,7 @@ has 'qc_schema'    => ( isa        => 'Maybe[npg_qc::Schema]',
                         is         => 'ro',
                         required   => 0,
                         lazy_build => 1,
-		      );
+                      );
 sub _build_qc_schema {
   my $self = shift;
   if ($self->use_db) {
@@ -186,8 +186,8 @@ sub run_from_db {
     }
     return $c;
   }
-  foreach my $check_name (@{npg_qc::autoqc::autoqc->checks_list()}) {
-    my $dbix_query = {'id_run' => $query->id_run};
+  foreach my $check_name (@{$c->checks_list()}) {
+    my $dbix_query = { 'id_run' => $query->id_run};
     if (@{$query->positions}) {
       $dbix_query->{'position'} = $query->positions;
     }
