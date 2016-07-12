@@ -104,9 +104,12 @@ of the components. An error if a single value cannot be produced.
 sub composition_subset {
   my $self = shift;
 
-  my $token = 'undef';
+  my $token = 'none';
   my @subsets = uniq map { defined $_->subset ? $_->subset : $token }
                 @{$self->composition->components()};
+  if (scalar @subsets == 0) {
+    croak 'Composition is empty, cannot compute values for subset';
+  }
   if (scalar @subsets > 1) {
     croak 'Multiple subsets within the composition: ' . join q[, ], @subsets;
   }
