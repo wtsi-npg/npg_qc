@@ -175,6 +175,7 @@ my $extended_build_requires = {
                 'npg_testing::db'                 => 0,
                 'npg_tracking::Schema'            => 0,
                 'DBD::SQLite'                     => '1.48',
+                'npg_tracking::glossary::composition::factory' => 0,
 };
 
 my $extended_requires = {
