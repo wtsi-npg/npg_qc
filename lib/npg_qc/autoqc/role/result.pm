@@ -106,7 +106,7 @@ sub composition_subset {
 
   my $token = 'none';
   my @subsets = uniq map { defined $_->subset ? $_->subset : $token }
-                @{$self->composition->components()};
+                $self->composition->components_list;
   if (scalar @subsets == 0) {
     croak 'Composition is empty, cannot compute values for subset';
   }

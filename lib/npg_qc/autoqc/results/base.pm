@@ -38,23 +38,6 @@ sub _build_composition {
   croak 'Can only build old style results';
 }
 
-around 'pack' => sub {
-  my ($old, $self) = @_;
-  my $packed = $self->$old();
-  foreach my $key (keys $packed->{'composition'}) {
-    if ($key =~ /\A_[[:lower:]]/smx) {
-      delete $packed->{'composition'}->{$key};
-    }
-  }
-  return $packed;
-};
-
-around 'freeze' => sub {
-  my ($old, $self) = @_;
-  $self->composition->freeze(); # Integrity check
-  return $self->$old()
-};
-
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
@@ -81,18 +64,6 @@ but before it is returned to the caller. Builds the composition accessor.
 A npg_tracking::glossary::composition object. If the derived
 class inplements id_run and position methods/attributes, a one-component
 composition is created automatically.
-
-=head2 pack
-
-This method that is inherited from MooseX::Storage via npg_qc::autoqc::role::result. It
-creates a hash representation of the object is extended to disregard private attributes
-of the composition object.
-
-=head2 freeze
-
-This method that is inherited from MooseX::Storage via npg_qc::autoqc::role::result. It
-returns JSON string serialization of the object. Error if the object lost integrity, ie
-its composition changed.
 
 =head1 DIAGNOSTICS
 

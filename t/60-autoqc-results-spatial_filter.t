@@ -34,7 +34,7 @@ my $tempdir = tempdir( CLEANUP => 1);
     } 'no croak when save data into json';
 
     is ($r->composition->num_components, 1, 'one component');
-    my $component = $r->composition->components->[0];
+    my $component = $r->composition->get_component(0);
     is ($component->id_run, 8926, 'component id_run');
     is ($component->position, 1, 'component position');
     ok ($component->has_tag_index, 'component tag index has been set');

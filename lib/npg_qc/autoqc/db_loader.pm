@@ -201,7 +201,7 @@ sub _ensure_composition_exists {
     my $component_rs   = $self->schema->resultset('SeqComponent');
     my $comcom_rs      = $self->schema->resultset('SeqComponentComposition');
 
-    foreach  my $c (@{$obj->composition->components}) {
+    foreach  my $c ($obj->composition->components_list()) {
       my $values = decode_json($c->freeze());
       $values->{'digest'} = $c->digest();
       my $row = $component_rs->find_or_create($values);
@@ -289,7 +289,7 @@ sub _pass_filter {
       my $composition = $values->{'composition'};
       if (ref $composition eq 'npg_tracking::glossary::composition' &&
           $composition->num_components == 1) {
-        my $component = $composition->components->[0];
+        my $component = $composition->get_component(0);
         $id_run   = $component->id_run;
         $position = $component->position;
       }

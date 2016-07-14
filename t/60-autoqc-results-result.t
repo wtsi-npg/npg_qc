@@ -17,7 +17,7 @@ use_ok ('npg_qc::autoqc::results::result');
     is($r->package_name(), q[npg_qc::autoqc::results::result], 'class name');
     is($r->tag_index, undef, 'tag index undefined');
     ok($r->has_composition, 'composition is built');
-    my $c = $r->composition->components->[0];
+    my $c = $r->composition->get_component(0);
     is($c->id_run, 2, 'component run id');
     is($c->position, 1, 'component position');
     is($c->tag_index, undef, 'component tag index undefined');

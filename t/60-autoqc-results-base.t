@@ -19,7 +19,7 @@ subtest 'base object with no composition set' => sub {
 };
 
 subtest 'base object with one-component composition' => sub {
-  plan tests => 6;
+  plan tests => 5;
 
   my $f = npg_tracking::glossary::composition::factory->new();
   $f->add_component($cp->new(id_run => 1, position => 2));
@@ -32,9 +32,6 @@ subtest 'base object with one-component composition' => sub {
   my $b1 = npg_qc::autoqc::results::base->thaw($b->freeze());
   isa_ok ($b1, 'npg_qc::autoqc::results::base');
   ok ($b1->composition_digest eq $digest, 'objects have the same composition');
-
-  push @{$b->composition->components}, $cp->new(id_run => 1, position => 3);
-  throws_ok {$b->freeze()} qr/Composition has changed/, 'object lost integrity';
 };
 
 my $c1 = $cp->new(id_run => 1, position => 2);
