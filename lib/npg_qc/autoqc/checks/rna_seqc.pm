@@ -29,53 +29,21 @@ Readonly::Scalar my $METRICS_FILE_NAME  => q[metrics.tsv];
 Readonly::Scalar my $MINUS_ONE          => -1;
 
 Readonly::Hash   my %RNASEQC_METRICS_FIELDS_MAPPING => {
-    "Sample"                                => 'sample',
-    "Note"                                  => 'note',
-    "Total Purity Filtered Reads Sequenced" => 'total_purity_filtered_reads_sequenced',
-    "Alternative Aligments"                 => 'alternative_aligments',
-    "Failed Vendor QC Check"                => 'failed_vendor_qc_check',
-    "Read Length"                           => 'read_length',
-    "Estimated Library Size"                => 'estimated_library_size',
-    "Mapped"                                => 'mapped',
-    "Mapping Rate"                          => 'mapping_rate',
-    "Mapped Unique"                         => 'mapped_unique',
-    "Mapped Unique Rate of Total"           => 'mapped_unique_rate_of_total',
-    "Unique Rate of Mapped"                 => 'unique_rate_of_mapped',
-    "Duplication Rate of Mapped"            => 'duplication_rate_of_mapped',
-    "Base Mismatch Rate"                    => 'base_mismatch_rate',
+    "3' Norm"                               => 'end_3_norm',
+    "5' Norm"                               => 'end_5_norm',
+    "End 1 % Sense"                         => 'end_1_pct_sense',
+    "End 1 Antisense"                       => 'end_1_antisense',
+    "End 1 Sense"                           => 'end_1_sense',
+    "End 2 % Sense"                         => 'end_2_pct_sense',
+    "End 2 Antisense"                       => 'end_2_antisense',
+    "End 2 Sense"                           => 'end_2_sense',
+    "Exonic Rate"                           => 'exonic_rate',
+    "Expression Profiling Efficiency"       => 'expression_profiling_efficiency',
+    "Genes Detected"                        => 'genes_detected',
+    "Mean CV"                               => 'mean_cv',
+    "Mean Per Base Cov."                    => 'mean_per_base_cov',
     "rRNA"                                  => 'rrna',
     "rRNA rate"                             => 'rrna_rate',
-    "Mapped Pairs"                          => 'mapped_pairs',
-    "Unpaired Reads"                        => 'unpaired_reads',
-    "End 1 Mapping Rate"                    => 'end_1_mapping_rate',
-    "End 2 Mapping Rate"                    => 'end_2_mapping_rate',
-    "End 1 Mismatch Rate"                   => 'end_1_mismatch_rate',
-    "End 2 Mismatch Rate"                   => 'end_2_mismatch_rate',
-    "Fragment Length Mean"                  => 'fragment_length_mean',
-    "Fragment Length StdDev"                => 'fragment_length_stdev',
-    "Chimeric Pairs"                        => 'chimeric_pairs',
-    "Intragenic Rate"                       => 'intragenic_rate',
-    "Exonic Rate"                           => 'exonic_rate',
-    "Intronic Rate"                         => 'intronic_rate',
-    "Intergenic Rate"                       => 'intergenic_rate',
-    "Split Reads"                           => 'split_reads',
-    "Expression Profiling Efficiency"       => 'expression_profiling_efficiency',
-    "Transcripts Detected"                  => 'transcripts_detected',
-    "Genes Detected"                        => 'genes_detected',
-    "End 1 Sense"                           => 'end_1_sense',
-    "End 1 Antisense"                       => 'end_1_antisense',
-    "End 2 Sense"                           => 'end_2_sense',
-    "End 2 Antisense"                       => 'end_2_antisense',
-    "End 1 % Sense"                         => 'end_1_pct_sense',
-    "End 2 % Sense"                         => 'end_2_pct_sense',
-    "Mean Per Base Cov."                    => 'mean_per_base_cov',
-    "Mean CV"                               => 'mean_cv',
-    "No. Covered 5'"                        => 'num_covered_5_end',
-    "5' Norm"                               => 'end_5_norm',
-    "3' Norm"                               => 'end_3_norm',
-    "Num. Gaps"                             => 'num_gaps',
-    "Cumul. Gap Length"                     => 'cumul_gap_length',
-    "Gap %"                                 => 'gap_pct',
 };
 
 has '+file_type' => (default => $EXT,);
@@ -311,9 +279,7 @@ sub _save_results {
                     $self->result->$attr_name($value);
             }
         }
-        delete $results->{$key};
     }
-    $self->result->other_metrics($results);
     return;
 }
 __PACKAGE__->meta->make_immutable();
