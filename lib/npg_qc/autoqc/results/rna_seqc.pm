@@ -22,9 +22,9 @@ npg_qc::autoqc::results::rna_seqc
 
 =head1 SUBROUTINES/METHODS
 
-=head2 sample
+=head2 rrna
 
-Sample ID. sample name or library
+ rRNA reads are non-duplicate and duplicate reads aligning to rRNA regions as defined in the transcript model definition.
 
 =cut
 
@@ -32,61 +32,151 @@ has 'rrna' => (isa        => 'Maybe[Num]',
                is         => 'rw',
                required   => 0,);
 
+=head2 rrna_rate
+
+ Rate of rRNA per total reads.
+
+=cut
+
 has 'rrna_rate' => (isa        => 'Maybe[Num]',
                     is         => 'rw',
                     required   => 0,);
+
+=head2 exonic_rate
+
+ Fraction mapping within exons.
+
+=cut
 
 has 'exonic_rate' => (isa        => 'Maybe[Num]',
                       is         => 'rw',
                       required   => 0,);
 
+=head2 expression_profiling_efficiency
+
+ Ratio of exon reads to total reads.
+
+=cut
+
 has 'expression_profiling_efficiency' => (isa        => 'Maybe[Num]',
                                           is         => 'rw',
                                           required   => 0,);
 
+=head2 genes_detected
+
+ Number of Genes with at least 5 reads.
+
+=cut
+ 
 has 'genes_detected' => (isa        => 'Maybe[Num]',
                          is         => 'rw',
                          required   => 0,);
+
+=head2 end_1_sense
+
+ Number of End 1 reads that were sequenced in the sense direction.
+
+=cut
 
 has 'end_1_sense' => (isa        => 'Maybe[Num]',
                       is         => 'rw',
                       required   => 0,);
 
+=head2 end_1_antisense
+
+ Number of End 1 reads that were sequenced in the antisense direction.
+
+=cut
+
 has 'end_1_antisense' => (isa        => 'Maybe[Num]',
                           is         => 'rw',
                           required   => 0,);
+
+=head2 end_2_sense
+
+ Number of End 1 reads that were sequenced in the sense direction.
+
+=cut
 
 has 'end_2_sense' => (isa        => 'Maybe[Num]',
                       is         => 'rw',
                       required   => 0,);
 
+=head2 end_2_antisense
+
+ Number of End 2 reads that were sequenced in the antisense direction.
+
+=cut
+
 has 'end_2_antisense' => (isa        => 'Maybe[Num]',
                           is         => 'rw',
                           required   => 0,);
+
+=head2 end_1_pct_sense
+
+ Percentage of intragenic End 1 reads that were sequenced in the sense direction.
+
+=cut
 
 has 'end_1_pct_sense' => (isa        => 'Maybe[Num]',
                           is         => 'rw',
                           required   => 0,);
 
+=head2 end_2_pct_sense
+
+ Percentage of intragenic End 2 reads that were sequenced in the sense direction.
+
+=cut
+
 has 'end_2_pct_sense' => (isa        => 'Maybe[Num]',
                           is         => 'rw',
                           required   => 0,);
+
+=head 2 mean_per_base_cov
+
+ Mean Per Base Coverage of the middle 1000 expressed transcripts determined to have the highest expression levels.
+
+=cut
 
 has 'mean_per_base_cov' => (isa        => 'Maybe[Num]',
                              is         => 'rw',
                              required   => 0,);
 
+=head 2 mean_cv
+
+ Mean Coverage of the middle 1000 expressed transcripts determined to have the highest expression levels.
+
+=cut
+
 has 'mean_cv' => (isa        => 'Maybe[Num]',
                   is         => 'rw',
                   required   => 0,);
+
+=head 2 end_5_norm
+
+ Norm denotes that the end coverage is divided by the mean coverage for that transcript.
+
+=cut
 
 has 'end_5_norm' => (isa        => 'Maybe[Num]',
                      is         => 'rw',
                      required   => 0,);
 
+=head 2 end_3_norm
+
+ Norm denotes that the end coverage is divided by the mean coverage for that transcript.
+
+=cut
+
 has 'end_3_norm' => (isa        => 'Maybe[Num]',
                      is         => 'rw',
                      required   => 0,);
+
+=head 2 end_5_norm
+
+ All remaining RNA-SeQC metrics as a key-values pairs
+
+=cut
 
 has 'other_metrics'  => (isa        => 'HashRef',
                          is         => 'rw',
