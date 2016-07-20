@@ -203,6 +203,8 @@ __PACKAGE__->add_unique_constraint(
 
 =item * L<npg_qc::Schema::Flators>
 
+=item * L<npg_qc::autoqc::role::result>
+
 =item * L<npg_qc::autoqc::role::contamination>
 
 =back
@@ -210,11 +212,11 @@ __PACKAGE__->add_unique_constraint(
 =cut
 
 
-with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::contamination';
+with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::contamination';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JsEQupnn7XZncYoe8xlN3w
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-06-30 15:33:28
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:kba8fAKw8GEjJX9q3c8KkA
 
 __PACKAGE__->set_flators4non_scalar(qw( genome_factor contaminant_count info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
@@ -273,7 +275,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

@@ -1,16 +1,6 @@
-#########
-# Author:        Kevin Lewis
-# Created:       25 August 2011
-#
-
 package npg_qc::autoqc::role::verify_bam_id;
 
-use strict;
-use warnings;
 use Moose::Role;
-use Readonly;
-
-with qw(npg_qc::autoqc::role::result);
 
 our $VERSION = '0';
 
@@ -57,8 +47,6 @@ __END__
 
 =item Moose::Role
 
-=item Readonly
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -67,7 +55,7 @@ __END__
 
 =head1 AUTHOR
 
-Author: Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt>
+Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 

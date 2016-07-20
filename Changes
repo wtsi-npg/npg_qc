@@ -1,5 +1,19 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Towards composition-based autoqc:
+   - npg_qc::autoqc::results::result - Composition-aware,
+     id_run, position and path attributes become optional.
+   - npg_qc::autoqc::qc_store - Use DBIx syntax for quering on tag_index
+     (future compatibility with planned table schema changes), db load
+     compositions of size 1 only.
+   - npg_qc::autoqc::db_loader - Result classes support composition,
+     but most tables have not been converted yet. Do not generate
+     composition if no support in the result table.
+   - npg_qc::Schema::ResultSet - Enchancement for a search for tables that
+     do not yet support compositions: convert undefined values
+     for columns under a unique constraint to database defaults.
+ - SeqQC - outdated template for split_stats removed
+ - genotype role refactored to remove hardcoded uri encoding            
  - remove contamination check that is not run any longer,
    result object remains
  - to keep similar code together and to avoid listing explicitly

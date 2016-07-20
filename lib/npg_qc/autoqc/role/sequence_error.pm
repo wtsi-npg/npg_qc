@@ -6,8 +6,6 @@ use PDL::Core qw(pdl);
 use PDL::Primitive qw(stats);
 use Readonly;
 
-with qw(npg_qc::autoqc::role::result);
-
 our $VERSION = '0';
 
 Readonly::Scalar our $PERCENT               => 100;
@@ -49,19 +47,15 @@ sub criterion {
   return;
 }
 
-sub check_name {
-  my $self = shift;
-  my $name = 'sequence mismatch';
-  if ($self->sequence_type) {
-    $name .= q[ ] . $self->sequence_type;
-  }
-  $name =~ s/_/ /gsmx;
-  return $name;
-}
-
 sub subset {
   my $self = shift;
   return $self->sequence_type;
+}
+
+sub check_name_local {
+  my ($self, $name) = @_;
+  $name =~ s{^sequence_error}{sequence mismatch}smx;
+  return $name;
 }
 
 sub reference_for_title {
@@ -94,7 +88,7 @@ __END__
 
 =head1 SUBROUTINES/METHODS
 
-=head2 check_name - human readable check name
+=head2 check_name_local - check name modifier
 
 =head2 subset - returns the value of the sequence_type attribute
 
@@ -139,7 +133,7 @@ Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Genome Research Ltd
+Copyright (C) 2016 Genome Research Ltd
 
 This file is part of NPG.
 

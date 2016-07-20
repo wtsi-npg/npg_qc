@@ -102,7 +102,8 @@ subtest 'high-level parsing' => sub {
   } 'no error when serializing to json string and file';
 
   my $from_json_hash = from_json($result_json);
-  delete $from_json_hash->{__CLASS__};
+  delete $from_json_hash->{'__CLASS__'};
+  delete $from_json_hash->{'composition'};
   delete $from_json_hash->{$dups_attr_name};
   delete $from_json_hash->{$fstat_attr_name};
    
@@ -140,36 +141,70 @@ local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
 write_samtools_script($samtools_path);
 
 subtest 'finding files, calculating metrics' => sub {
-  plan tests => 11;
+  plan tests => 60;
+
+  use_ok('npg_tracking::glossary::composition::component::illumina');
+  use_ok('npg_tracking::glossary::composition::factory');
 
   my $fproot = $archive_16960 . '/16960_1#0';
-  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+  my $r1 = npg_qc::autoqc::results::bam_flagstats->new(
     id_run              => 16960,
     position            => 1,
     tag_index           => 0,
     sequence_file       => $fproot . '.bam',
     related_objects     => [],
   );
+  my $r2 = npg_qc::autoqc::results::bam_flagstats->new(
+    sequence_file    => $fproot . '.bam',
+    composition      => $r1->composition,
+    related_objects  => [],
+  );
 
-  is($r->_file_path_root, $fproot, 'file path root');
-  is($r->filename_root, undef, 'filename root undefined');
-  is($r->filename4serialization, '16960_1#0.bam_flagstats.json',
-    'filename for serialization'); 
-  is($r->markdups_metrics_file,  $fproot . '.markdups_metrics.txt',
-    'markdups metrics found');
-  is($r->flagstats_metrics_file, $fproot . '.flagstat', 'flagstats metrics found');
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($r1->composition->get_component(0));
+  $f->add_component(
+    npg_tracking::glossary::composition::component::illumina->new(
+    id_run => 16960, position => 2, tag_index => 0));
+  my $r3 = npg_qc::autoqc::results::bam_flagstats->new(
+    sequence_file    => $fproot . '.bam',
+    composition      => $f->create_composition(),
+    related_objects  => [],
+  );
 
-  my @stats_files = sort ($fproot . '_F0x900.stats', $fproot . '_F0xB00.stats');
-  is (join(q[ ], @{$r->samtools_stats_file}), join(q[ ],@stats_files), 'stats files');
+  for my $r (($r1, $r2, $r3)) {
+    is($r->_file_path_root, $fproot, 'file path root');
+    is($r->filename_root, '16960_1#0', 'filename root');
+    is($r->filename4serialization, '16960_1#0.bam_flagstats.json',
+        'filename for serialization'); 
+    is($r->markdups_metrics_file,  $fproot . '.markdups_metrics.txt',
+        'markdups metrics found');
+    is($r->flagstats_metrics_file, $fproot . '.flagstat', 'flagstats metrics found');
+
+    my @stats_files = sort ($fproot . '_F0x900.stats', $fproot . '_F0xB00.stats');
+    is (join(q[ ], @{$r->samtools_stats_file}), join(q[ ],@stats_files), 'stats files');
  
-  $r->execute();
-  is($r->library_size, 240428087, 'library size value');
-  is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
-  my $j;
-  lives_ok { $j=$r->freeze } 'serialization to json is ok';
-  unlike($j, qr/_file_path_root/, 'serialization does not contain excluded attr');
+    $r->execute();
+    is($r->library_size, 240428087, 'library size value');
+    is($r->mate_mapped_defferent_chr, 8333632, 'mate_mapped_defferent_chr value');
+    my $j;
+    lives_ok { $j=$r->freeze } 'serialization to json is ok';
+    unlike($j, qr/_file_path_root/, 'serialization does not contain excluded attr');
+    like($j, qr/npg_tracking::glossary::composition/,
+        'serialized object contains composition info');
+    like($j, qr/npg_tracking::glossary::composition::component::illumina/,
+        'serialized object contains component info');
+    my $tmp = npg_qc::autoqc::results::bam_flagstats->thaw($j);
+    isa_ok ($tmp, 'npg_qc::autoqc::results::bam_flagstats');
+    isa_ok ($tmp->composition, 'npg_tracking::glossary::composition');
+    isa_ok ($tmp->composition->get_component(0),
+        'npg_tracking::glossary::composition::component::illumina');
+    is ($r->composition->num_components, $tmp->composition->num_components,
+        'number of components is consistent');
+    is ($r->composition_subset, undef, 'composition subset is undefined');
+    is ($r->filename_root, '16960_1#0', 'filename root');
+  }
 
-  $r = npg_qc::autoqc::results::bam_flagstats->new(
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
     id_run              => 16960,
     position            => 1,
     tag_index           => 0,
@@ -178,16 +213,47 @@ subtest 'finding files, calculating metrics' => sub {
   my $bam_md5 = join q[.], $r->sequence_file, 'md5';
   throws_ok {$r->execute} qr{Can't open '$bam_md5'},
     'error calling execute() on related objects';
+
+  $r = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run              => 16960,
+    position            => 1,
+    tag_index           => 0,
+    sequence_file       => $fproot . '_phix.bam',
+  );
+  is ($r->filename_root, '16960_1#0', 'filename root');
+  $r = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run              => 16960,
+    position            => 1,
+    tag_index           => 0,
+    subset              => 'human',
+    sequence_file       => $fproot . '_phix.bam',
+  );
+  is ($r->filename_root, '16960_1#0_human', 'filename root');
+  $r = npg_qc::autoqc::results::bam_flagstats->new(
+    composition => $r3->composition,
+    sequence_file       => $fproot . '_phix.bam',
+  );
+  is ($r->filename_root, '16960_1#0_phix', 'filename root');
 };
 
-subtest 'finding phix subset files (no run id)' => sub {
+subtest 'finding phix subset files via composition' => sub {
   plan tests => 10;
 
   my $fproot = $archive_16960 . '/16960_1#0_phix';
-  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+
+  my $composition = npg_qc::autoqc::results::bam_flagstats->new(
+    id_run              => 16960,
+    position            => 1,
+    tag_index           => 0,
     subset              => 'phix',
     sequence_file       => $fproot . '.bam',
     related_objects     => [],
+  )->composition();
+
+  my $r = npg_qc::autoqc::results::bam_flagstats->new(
+    sequence_file       => $fproot . '.bam',
+    related_objects     => [],
+    composition         => $composition
   );
 
   lives_ok {$r->execute} 'metrics parsing ok';
@@ -195,7 +261,7 @@ subtest 'finding phix subset files (no run id)' => sub {
   is($r->mate_mapped_defferent_chr, 0, 'mate_mapped_defferent_chr value');
 
   is($r->_file_path_root, $fproot, 'file path root');
-  is($r->filename_root, '16960_1#0', 'filename root');
+  is($r->filename_root, '16960_1#0_phix', 'filename root');
    is($r->filename4serialization, '16960_1#0_phix.bam_flagstats.json',
     'filename for serialization');  
   is($r->markdups_metrics_file, $fproot . '.markdups_metrics.txt',

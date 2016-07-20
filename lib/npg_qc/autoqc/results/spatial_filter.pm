@@ -1,12 +1,5 @@
-#########
-# Author:        dj3
-# Created:       21 June 2009
-#
-
 package npg_qc::autoqc::results::spatial_filter;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 use Carp;
@@ -92,11 +85,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: David K. Jackson E<lt>david.jackson@sanger.ac.ukE<gt><gt>
+David K. Jackson E<lt>david.jackson@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by David K. Jackson
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

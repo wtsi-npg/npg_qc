@@ -3,8 +3,6 @@ package npg_qc::autoqc::role::bam_flagstats;
 use Moose::Role;
 use Readonly;
 
-with qw(npg_qc::autoqc::role::result);
-
 our $VERSION = '0';
 
 Readonly::Scalar my $PERCENTAGE   => 100;
@@ -70,16 +68,6 @@ sub percent_singletons {
    return;
 }
 
-sub check_name {
-  my $self = shift;
-  my $name = $self->class_name;
-  $name =~ s/_/ /gsmx;
-  if ($self->subset) {
-    $name .= q{ } . $self->subset;
-  }
-  return $name;
-}
-
 no Moose;
 
 1;
@@ -139,7 +127,7 @@ Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

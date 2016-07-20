@@ -195,18 +195,19 @@ sub run_from_db {
     if (!$table_class) {
       croak qq[No DBIx result class name for $check_name];
     }
-    my $result_set = $self->qc_schema()->resultset($table_class);
-    if ($query->option == $LANES || $query->option == $PLEXES) {
-      my $column = 'tag_index';
-      my $result_source = $result_set->result_source;
-      if (any {$_ eq $column} $result_source->columns()) {
-        my $db_default = $result_source->column_info($column)->{'default_value'};
-        my $not_default = {q[!=], $db_default};
-        $dbix_query->{$column} = ($query->option == $LANES) ? $db_default : $not_default;
+
+    my $rs = $self->qc_schema()->resultset($table_class);
+    my $ti_key = 'tag_index';
+    if ($rs->result_source()->has_column($ti_key)) {
+      if ($query->option == $LANES) {
+        $dbix_query->{'tag_index'} = undef;
+      } elsif ($query->option == $PLEXES) {
+        $dbix_query->{'tag_index'} = {q[!=], 'undef'};
       }
     }
-    my @rows = $result_set->search($dbix_query)->all();
-    $c->add(\@rows);
+
+    my $composition_size = 1;
+    $c->add([$rs->search_autoqc($dbix_query, $composition_size)->all()]);
   }
   return $c;
 }

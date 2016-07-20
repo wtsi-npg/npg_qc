@@ -1,19 +1,10 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       26 October 2011
-#
-
 package npg_qc::autoqc::role::tag_metrics;
 
-use strict;
-use warnings;
 use Carp;
 use Moose::Role;
 use PDL::Lite;
 use PDL::Core qw(pdl);
 use Readonly;
-
-with qw(npg_qc::autoqc::role::result);
 
 our $VERSION = '0';
 
@@ -220,11 +211,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

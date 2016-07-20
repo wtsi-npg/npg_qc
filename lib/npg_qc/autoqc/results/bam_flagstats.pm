@@ -24,8 +24,6 @@ with    qw(
             npg_tracking::glossary::subset
             npg_qc::autoqc::role::bam_flagstats
           );
-with 'npg_tracking::glossary::composition::factory' =>
-  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
 our $VERSION = '0';
 
@@ -46,10 +44,6 @@ Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 
 Readonly::Scalar my $HUMAN_SPLIT_ATTR_DEFAULT => 'all';
 Readonly::Scalar my $SUBSET_ATTR_DEFAULT      => 'target';
-
-has [ qw/ +path
-          +id_run
-          +position / ] => ( required   => 0, );
 
 has '+subset' => ( writer      => '_set_subset', );
 
@@ -230,19 +224,17 @@ around 'store' => sub {
   return $self->$orig($path);
 };
 
-sub filename_root {
+override 'filename_root' => sub {
   my $self = shift;
-
-  if (!$self->id_run && $self->_file_path_root) {
-    my ($volume, $directories, $file) = splitpath($self->_file_path_root);
-    my $subset = $self->subset;
-    if ($subset) {
-      $file =~ s/\Q_${subset}\E\Z//msx;
-    }
-    return $file;
+  my $file;
+  if (!$self->is_old_style_result && $self->_file_path_root) {
+    my ($volume, $directories);
+    ($volume, $directories, $file) = splitpath($self->_file_path_root);
+  } else {
+    $file = super();
   }
-  return;
-}
+  return $file;
+};
 
 sub execute {
   my $self = shift;
@@ -497,10 +489,6 @@ npg_qc::autoqc::results::bam_flagstats
 
 =item npg_tracking::glossary::subset
 
-=item npg_tracking::glossary::composition::factory
-
-=item npg_tracking::glossary::composition::component::illumina
-
 =item npg_qc::autoqc::results::result
 
 =item npg_qc::autoqc::role::bam_flagstats
@@ -518,7 +506,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

@@ -175,6 +175,7 @@ my $extended_build_requires = {
                 'npg_testing::db'                 => 0,
                 'npg_tracking::Schema'            => 0,
                 'DBD::SQLite'                     => '1.48',
+                'npg_tracking::glossary::composition::factory' => 0,
 };
 
 my $extended_requires = {
@@ -235,6 +236,7 @@ my $extended_requires = {
                 'PDL::Primitive'                  => 0,
                 'Perl6::Slurp'                    => '0.03',
                 'Try::Tiny'                       => 0,
+                'URI::Escape'                     => 0,
 
                 'npg_common::Alignment'                    => 0,
                 'npg_common::extractor::fastq'             => 0,
@@ -246,7 +248,7 @@ my $extended_requires = {
                 'npg_tracking::data::bait::find'           => 0,
                 'npg_tracking::data::snv::find'            => 0,
                 'npg_tracking::glossary::composition'      => 0,
-                'npg_tracking::glossary::composition::factory' => 0,
+                'npg_tracking::glossary::composition::factory::attributes' => 0,
                 'npg_tracking::glossary::composition::component::illumina' => 0,
                 'npg_tracking::glossary::rpt'              => 0,
                 'npg_tracking::glossary::run'              => 0,
