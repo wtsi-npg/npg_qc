@@ -1,22 +1,10 @@
-#########
-# Author:        Kevin Lewis
-# Created:       30 August 2013
-#
-
 package npg_qc::autoqc::role::upstream_tags;
 
-use strict;
-use warnings;
 use Moose::Role;
-use Readonly;
-
-with qw(npg_qc::autoqc::role::result);
 
 our $VERSION = '0';
 
 sub criterion {
-	my $self = shift;
-
 	return q[Currently no pass/fail levels set];
 }
 
@@ -49,8 +37,6 @@ __END__
 
 =item Moose::Role
 
-=item Readonly
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -59,11 +45,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt>
+Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 GRL, by Kevin Lewis
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

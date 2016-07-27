@@ -108,7 +108,6 @@ lib/npg_qc/autoqc/autoqc.pm
 lib/npg_qc/autoqc/checks/adapter.pm
 lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/checks/check.pm
-lib/npg_qc/autoqc/checks/contamination.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
 lib/npg_qc/autoqc/checks/genotype.pm
@@ -155,7 +154,6 @@ lib/npg_qc/autoqc/role/adapter.pm
 lib/npg_qc/autoqc/role/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/role/bam_flagstats.pm
 lib/npg_qc/autoqc/role/contamination.pm
-lib/npg_qc/autoqc/role/gc_bias.pm
 lib/npg_qc/autoqc/role/gc_fraction.pm
 lib/npg_qc/autoqc/role/genotype.pm
 lib/npg_qc/autoqc/role/insert_size.pm
@@ -165,7 +163,6 @@ lib/npg_qc/autoqc/role/ref_match.pm
 lib/npg_qc/autoqc/role/result.pm
 lib/npg_qc/autoqc/role/rpt_key.pm
 lib/npg_qc/autoqc/role/sequence_error.pm
-lib/npg_qc/autoqc/role/split_stats.pm
 lib/npg_qc/autoqc/role/tag_decode_stats.pm
 lib/npg_qc/autoqc/role/tag_metrics.pm
 lib/npg_qc/autoqc/role/tags_reporters.pm
@@ -423,7 +420,6 @@ t/60-autoqc-autoqc.t
 t/60-autoqc-checks-adapter.t
 t/60-autoqc-checks-af_metrics.t
 t/60-autoqc-checks-check.t
-t/60-autoqc-checks-contamination.t
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-genotype.t

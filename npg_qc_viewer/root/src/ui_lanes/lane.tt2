@@ -121,12 +121,15 @@
 [%- END -%]
 [%- END -%]
 
-[%  BLOCK split_stats -%]
-[%- IF result.num_aligned_merge.defined && result.num_total_merge.defined && result.num_total_merge != 0 -%]
-[%-   contam = (result.num_aligned_merge * 100) / result.num_total_merge -%]
-[%-   FILTER format('%2.2f'); contam; END -%]
-[%- END -%]
-[%- END -%]
+[%  BLOCK split_stats;
+    IF result.num_aligned_merge.defined && result.num_not_aligned_merge.defined;
+      total = result.num_aligned_merge + result.num_not_aligned_merge;
+      IF total;
+        contam = (result.num_aligned_merge * 100) / total;
+        FILTER format('%2.2f'); contam; END;
+      END;
+    END; 
+    END; -%]
 
 [%  BLOCK contamination -%]
 [%- IF result.contaminant_count.defined; ranked_orgs = result.ranked_organisms -%]

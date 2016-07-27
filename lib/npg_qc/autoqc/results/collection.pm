@@ -11,7 +11,6 @@ use Readonly;
 use File::Basename;
 use Moose::Meta::Class;
 
-use npg_qc::autoqc::autoqc;
 use npg_tracking::illumina::run::short_info;
 use npg_tracking::illumina::run::folder;
 
@@ -46,10 +45,18 @@ npg_qc::autoqc::results::collection
 
 =cut
 
-Readonly::Scalar  my $RESULTS_NAMESPACE    => q[npg_qc::autoqc::results];
-Readonly::Scalar  my $LESS    => -1;
-Readonly::Scalar  my $MORE    =>  1;
-Readonly::Scalar  my $EQUAL   =>  0;
+Readonly::Scalar my $RESULTS_NAMESPACE => q[npg_qc::autoqc::results];
+Readonly::Array  my @NON_LISTABLE      => map {join q[::], $RESULTS_NAMESPACE, $_}
+                                                         qw/
+                                                             sequence_summary
+                                                             samtools_stats
+                                                             base
+                                                             result
+                                                             collection
+                                                           /;
+Readonly::Scalar my $LESS    => -1;
+Readonly::Scalar my $MORE    =>  1;
+Readonly::Scalar my $EQUAL   =>  0;
 
 =head2 results
 
@@ -77,39 +84,37 @@ has 'results' => (
       },
                  );
 
+=head2 checks_list
 
-=head2 _result_classes
-
-A reference to a list of result classes. While making a list, the build method
-loads each of the class modules into memory.
+A reference to a list of result classes.
 
 =cut
-has '_result_classes' => ( isa         => 'ArrayRef',
-                           is          => 'ro',
-                           required    => 0,
-                           lazy_build  => 1,
-                         );
-sub _build__result_classes {
-    my $self = shift;
+has 'checks_list' => (isa        => 'ArrayRef',
+                      is         => 'ro',
+                      required   => 0,
+                      lazy_build => 1,
+                     );
+sub _build_checks_list {
+    return _list_classes(0);
+}
 
-    my @except = map {join q[::], $RESULTS_NAMESPACE, $_} qw/
-                                                             sequence_summary
-                                                             samtools_stats
-                                                             base
-                                                             result
-                                                             collection
-                                                           /;
-
+sub _list_classes {
+    my $load = shift;
+    $load = $load ? 1 : 0;
     my @classes = Module::Pluggable::Object->new(
-        require     => 1,
+        require     => $load,
         search_path => $RESULTS_NAMESPACE,
-        except      => \@except,
+        except      => \@NON_LISTABLE,
     )->plugins;
     my @class_names = ();
+    my $bfs = 'bam_flagstats';
     foreach my $class (@classes) {
         my ($class_name) = $class =~ /(\w+)$/smx;
-        push @class_names, $class_name;
+        if ($class_name ne $bfs) {
+            push @class_names, $class_name;
+        }
     }
+    push @class_names, $bfs;
     return \@class_names;
 }
 
@@ -156,7 +161,7 @@ sub add_from_dir {
     my $pattern = $id_run ? $id_run : q[];
     $pattern = $path . q[/] . $pattern . q[*.json];
     my @files = glob $pattern;
-    my @classes = @{$self->_result_classes};
+    my @classes = @{_list_classes(1)};
 
     ## no critic (ProhibitBooleanGrep)
 
@@ -518,7 +523,7 @@ sub check_names_map {
 
     my $classes = {};
     my $seen = {};
-    my $checks_list = npg_qc::autoqc::autoqc->checks_list;
+    my $checks_list = $self->checks_list;
     foreach my $check (@{$checks_list}) {
         $classes->{$check} = [];
     }
@@ -541,7 +546,7 @@ sub check_names_map {
 
 A reference to a list of all check names which have result objects
 in this collection. The names in the list are ordered in the same way
-as class names returned by npg_qc::autoqc::autoqc->checks_list
+as class names returned by the checks_list() attribute.
 
 =cut
 sub check_names {
@@ -550,7 +555,7 @@ sub check_names {
     my $classes = $self->check_names_map();
     my @check_names = ();
     my $map = {};
-    foreach my $check (@{npg_qc::autoqc::autoqc->checks_list}) {
+    foreach my $check (@{$self->checks_list}) {
         push @check_names, @{$classes->{$check}};
         foreach my $name (@{$classes->{$check}}) {
             $map->{$name} = $check;
@@ -598,8 +603,6 @@ __END__
 
 =item npg_tracking::illumina::run::folder
 
-=item npg_qc::autoqc::autoqc
-
 =item npg_qc::autoqc::qc_store::options
 
 =item npg_qc::autoqc::qc_store::query
@@ -616,7 +619,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

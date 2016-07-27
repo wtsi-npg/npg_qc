@@ -143,7 +143,7 @@ sub _inflate_rpt {
     croak 'Cannot deal with multi-component compositions';
   }
   # TODO in tracking - create a public method
-  return $comp->components->[0]->_pack_custom();
+  return $comp->get_component(0)->_pack_custom();
 }
 
 sub _update_outcomes {

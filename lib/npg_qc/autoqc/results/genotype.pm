@@ -1,22 +1,15 @@
-#########
-# Author:        Kevin Lewis
-# Created:       27 April 2011
-#
-
 package npg_qc::autoqc::results::genotype;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
-
+use npg_tracking::util::types;
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::genotype);
 
 our $VERSION = '0';
 
-has '+id_run' => (isa => 'Maybe[NpgTrackingRunId]', required => 0);
-has '+position' => (isa => 'Maybe[NpgTrackingLaneNumber]', required => 0);
+has '+id_run' => (isa => 'Maybe[NpgTrackingRunId]');
+has '+position' => (isa => 'Maybe[NpgTrackingLaneNumber]');
 
 has genotype_data_set    => ( is => 'rw', isa => 'Str', );
 
@@ -84,6 +77,8 @@ __END__
 
 =item namespace::autoclean
 
+=item npg_tracking::util::types
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -92,11 +87,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Kevin Lewis<lt>kl2@sanger.ac.ukE<gt>
+Kevin Lewis<lt>kl2@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Kevin Lewis
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

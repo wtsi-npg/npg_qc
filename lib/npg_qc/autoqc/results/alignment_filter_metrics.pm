@@ -1,14 +1,7 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       10 May 2012
-#
-
 package npg_qc::autoqc::results::alignment_filter_metrics;
 
 use Moose;
 use namespace::autoclean;
-use Readonly;
-
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::alignment_filter_metrics);
 
@@ -17,7 +10,7 @@ our $VERSION = '0';
 has 'all_metrics'  =>  (isa       => 'HashRef',
                         is        => 'rw',
                         required  => 0,
-		       );
+		                   );
 
 __PACKAGE__->meta->make_immutable;
 
@@ -49,8 +42,6 @@ __END__
 
 =item namespace::autoclean
 
-=item Readonly
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -59,11 +50,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

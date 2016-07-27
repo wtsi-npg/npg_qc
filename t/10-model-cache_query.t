@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 42;
+use Test::More tests => 37;
 use Test::Exception;
 use Test::Deep;
 use IO::Scalar;
@@ -23,58 +23,10 @@ my $util = t::util->new({fixtures =>1});
   isa_ok($model, 'npg_qc::model::cache_query', '$model');
 }
 
-{
-  my $model = npg_qc::model::cache_query->new({
-    util => $util,
-    ssha_sql => 'GbdhOrKXza98/jXuv9WAzNW0pcQ=',
-  });
-  throws_ok { $model->save() } qr{Column\ \'id_run\'\ cannot\ be\ null}, 'field id_run in table cache_query cannot be null';  
-}
+subtest q[testing no nulls] => sub {
+  plan tests => 7;
 
-{
-  my $model = npg_qc::model::cache_query->new({
-    util => $util,
-    ssha_sql => 'GbdhOrKXza98/jXuv9WAzNW0pcQ=',
-    id_run => 917,
-  });
-  throws_ok { $model->save() } qr{Column\ \'end\'\ cannot\ be\ null}, 'field end in table cache_query cannot be null';  
-}
-
-{
-  my $model = npg_qc::model::cache_query->new({
-    util => $util,
-    ssha_sql => 'GbdhOrKXza98/jXuv9WAzNW0pcQ=',
-    id_run => 917,
-    end    => 1,
-  });
-  throws_ok { $model->save() } qr{Column\ \'type\'\ cannot\ be\ null}, 'field type in table cache_query cannot be null';  
-}
-
-{
-  my $model = npg_qc::model::cache_query->new({
-    util => $util,
-    ssha_sql => 'GbdhOrKXza98/jXuv9WAzNW0pcQ=',
-    id_run => 917,
-    end    => 1,
-    type   => 'num_tiles_z_alert',
-  });
-  throws_ok { $model->save() } qr{Column\ \'results\'\ cannot\ be\ null}, 'field results in table cache_query cannot be null';  
-}
-
-{
-  my $model = npg_qc::model::cache_query->new({
-    util => $util,
-    ssha_sql => 'GbdhOrKXza98/jXuv9WAzNW0pcQ=',
-    id_run => 917,
-    end    => 1,
-    type   => 'num_tiles_z_alert',
-    results => 'aaa',
-  });
-  throws_ok { $model->save() } qr{Column\ \'is_current\'\ cannot\ be\ null}, 'field is_current in table cache_query cannot be null';  
-}
-
-{
-  my $model = npg_qc::model::cache_query->new({
+  my $pass = {
     util => $util,
     ssha_sql => 'GbdhOrKXza98/jXuv9WAzNW0pcQ=',
     id_run => 917,
@@ -82,9 +34,22 @@ my $util = t::util->new({fixtures =>1});
     type   => 'num_tiles_z_alert',
     results => 'aaa',
     is_current => 1,
-  });
+  };
+
+  my $copy = { %$pass };
+  my $model = npg_qc::model::cache_query->new($copy);
+
   lives_ok { $model->save() } 'save ok';
-}
+  lives_ok { $model->delete() } 'delete ok';
+
+  my @required = ('id_run', 'end', 'type', 'results', 'is_current');
+  foreach my $to_test (@required) {
+    $copy = { %$pass };
+    delete $copy->{ $to_test };
+    my $new_model = npg_qc::model::cache_query->new($copy);
+    throws_ok { $new_model->save() } qr{Column\ \'$to_test\'\ cannot\ be\ null}, qq[field $to_test in table cache_query cannot be null];
+  }
+};
 
 {
   my $model = npg_qc::model::cache_query->new({
@@ -127,7 +92,7 @@ my $util = t::util->new({fixtures =>1});
     type   => 'movez_tiles',
   });
   lives_ok { $model->cache_movez_tiles() } 'cache movez tiles';
-  lives_ok { $model->get_cache_by_id_type_end()} 'get cache movez tiles';  
+  lives_ok { $model->get_cache_by_id_type_end()} 'get cache movez tiles';
   is($model->get_cache_by_id_type_end()->[0][0], 3, 'get correct cache movez tiles');
 }
 
@@ -150,7 +115,7 @@ my $util = t::util->new({fixtures =>1});
      type   => 'cycle_count',
      end    => 1,
      });
-  my $id_runs = $model->check_cycle_count(); 
+  my $id_runs = $model->check_cycle_count();
 }
 
 {
@@ -201,7 +166,7 @@ my $util = t::util->new({fixtures =>1});
     end    => 1,
     type   => 'lane_summary',
   });
-  
+
   my $cached;
   lives_ok { $cached = $model->is_current_cached()} 'check cached or not lives';
   is($cached, 1, 'query already cached');
@@ -216,7 +181,7 @@ my $util = t::util->new({fixtures =>1});
     end    => 1,
     type   => 'lane_summary',
   });
-  
+
   my $updated;
   lives_ok { $updated = $model->set_to_not_current() } 'set_to_not_current';
   is($updated, 1, '1 row updated');

@@ -1,18 +1,7 @@
-#########
-# Author:        gq1
-# Created:       29 October 2009
-#
-
 package npg_qc::autoqc::role::qX_yield;
 
-use strict;
-use warnings;
 use Moose::Role;
 use Carp;
-use English qw(-no_match_vars);
-
-with qw( npg_qc::autoqc::role::result );
-
 
 our $VERSION = '0';
 
@@ -87,8 +76,6 @@ __END__
 
 =item Carp
 
-=item English
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -97,11 +84,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

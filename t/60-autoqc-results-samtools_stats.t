@@ -7,6 +7,7 @@ use Archive::Extract;
 use Perl6::Slurp;
 
 use npg_tracking::glossary::composition::component::illumina;
+use npg_tracking::glossary::composition::factory;
 
 my $tempdir = tempdir( CLEANUP => 1);
 my $archive = '17448_1_9';
@@ -18,44 +19,22 @@ my $file1 = join q[/], $archive, '17448_1#9_F0x900.stats';
 use_ok ('npg_qc::autoqc::results::samtools_stats');
 
 subtest 'object with an empty composition' => sub {
-  plan tests => 9;
-
-  my $r;
-  lives_ok { $r = npg_qc::autoqc::results::samtools_stats->new() }
-    'no-argument constructor - ok';
-  isa_ok ($r, 'npg_qc::autoqc::results::samtools_stats');
-  throws_ok { $r->execute }
-    qr/Samtools stats file path \(stats_file attribute\) should be set/,
-    'no stats file - error';
-  
-  throws_ok { npg_qc::autoqc::results::samtools_stats->new(
-        stats_file => '/some/file') } 
-    qr/Validation failed for 'NpgTrackingReadableFile' with value/,
-    'stats file does not exist - error';
-
-  lives_ok { $r = npg_qc::autoqc::results::samtools_stats->new(
-        stats_file => $file1 ) }
-    'one-arg constructor (stats_file) - object created';
-
-  is ($r->num_components, 0, 'no components');
-  throws_ok { $r->composition_digest() }
-    qr/Composition is empty, cannot compute digest/,
-    'composition is empty - error generating digest';
-  throws_ok { $r->filter }
-    qr/Composition is empty, cannot compute values for subset/,
-    'composition is empty - error building filter';
-  throws_ok { $r->execute() }
-    qr/Empty composition - cannot run/,
-    'composition is empty - error running execute()';
+  plan tests => 1;
+  throws_ok { npg_qc::autoqc::results::samtools_stats->new() }
+    qr/Can only build old style results/,
+    'no-argument constructor - error';
 };
 
 subtest 'object with an one-component composition' => sub { 
-  plan tests => 9;
+  plan tests => 10;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
-  my $r = npg_qc::autoqc::results::samtools_stats->new(stats_file => $file1);
-  $r->composition->add_component($c);
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($c);
+  my $r = npg_qc::autoqc::results::samtools_stats->new(
+    stats_file => $file1, composition => $f->create_composition());
+  isa_ok ($r, 'npg_qc::autoqc::results::samtools_stats');
 
   is ($r->num_components, 1, 'one component');
   is ($r->composition_digest(),
@@ -76,9 +55,11 @@ subtest 'object with an one-component phix subset composition' => sub {
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9, subset => 'phix');
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($c);
   my $file2 = join q[/], $archive, '17448_1#9_phix_F0xB00.stats';
-  my $r = npg_qc::autoqc::results::samtools_stats->new(stats_file => $file2);
-  $r->composition->add_component($c);
+  my $r = npg_qc::autoqc::results::samtools_stats->new(
+    stats_file => $file2, composition => $f->create_composition());
   is ($r->composition_digest(),
     'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb', 'digest');
   is ($r->filter, 'F0xB00', 'filter');
@@ -95,8 +76,10 @@ subtest 'serialization and instantiation' => sub {
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
-  my $r = npg_qc::autoqc::results::samtools_stats->new(stats_file => $file1);
-  $r->composition->add_component($c);
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($c);
+  my $r = npg_qc::autoqc::results::samtools_stats->new(
+    stats_file => $file1, composition => $f->create_composition());
   my $digest = $r->composition_digest;
   lives_ok { $r->execute() } 'execute() method runs successfully';
   is ($r->filter, 'F0x900', 'filter');

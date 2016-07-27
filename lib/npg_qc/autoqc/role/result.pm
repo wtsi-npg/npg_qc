@@ -2,11 +2,11 @@ package npg_qc::autoqc::role::result;
 
 use Moose::Role;
 use Carp;
-use File::Spec::Functions qw(catfile);
+use File::Spec::Functions qw(catfile splitpath);
 use JSON;
 use MooseX::Storage;
 use Readonly;
-use List::MoreUtils qw/none/;
+use List::MoreUtils qw(none uniq);
 
 with Storage( 'traits' => ['OnlyWhenBuilt'],
               'format' => 'JSON',
@@ -34,17 +34,17 @@ Name of the class that did the check
 
 =cut
 sub class_name {
-    my $self = shift;
-    my ($ref) = (ref $self) =~ /(\w*)$/smx;
-    if ($ref =~ /^[[:upper:]]/xms) {
-        if ($ref eq 'QXYield') {
-            $ref = 'qX_yield';
-        } else {
-            $ref =~ s/([[:lower:]])([[:upper:]])/$1_$2/gmxs;
-            $ref = lc $ref;
-        }
+  my $self = shift;
+  my ($ref) = (ref $self) =~ /(\w*)$/smx;
+  if ($ref =~ /^[[:upper:]]/xms) {
+    if ($ref eq 'QXYield') {
+      $ref = 'qX_yield';
+    } else {
+      $ref =~ s/([[:lower:]])([[:upper:]])/$1_$2/gmxs;
+      $ref = lc $ref;
     }
-    return $ref;
+  }
+  return $ref;
 }
 
 =head2 class_names
@@ -53,16 +53,16 @@ Converts autoqc package name or serialized class name to autoqc and DBIx result 
 
 =cut
 sub class_names {
-    my ($self, $name) = @_;
-    if (!$self) {
-      croak 'No arguments to class_names';
-    }
-    $name ||= (ref $self || $self);
-    my ($class_name) = $name =~ /(\w+)(?:-\d+.*)?$/mxs;
-    ##no critic (ProhibitParensWithBuiltins)
-    my $dbix_class_name = join q[], map {ucfirst $_} split(/_/sm, $class_name);
-    ##use critic
-    return ($class_name, $dbix_class_name);
+  my ($self, $name) = @_;
+  if (!$self) {
+    croak 'No arguments to class_names';
+  }
+  $name ||= (ref $self || $self);
+  my ($class_name) = $name =~ /(\w+)(?:-\d+.*)?$/mxs;
+  ##no critic (ProhibitParensWithBuiltins)
+  my $dbix_class_name = join q[], map {ucfirst $_} split(/_/sm, $class_name);
+  ##use critic
+  return ($class_name, $dbix_class_name);
 }
 
 =head2 package_name
@@ -71,8 +71,8 @@ Name of the package that did the check
 
 =cut
 sub package_name {
-    my $self = shift;
-    return (ref $self);
+  my $self = shift;
+  return (ref $self);
 }
 
 =head2 check_name
@@ -81,10 +81,53 @@ Human readable check name
 
 =cut
 sub check_name {
-    my $self = shift;
-    my $name = $self->class_name;
-    $name =~ s/_/ /gsmx;
-    return $name;
+  my $self = shift;
+  my $name = $self->class_name;
+  my $method = 'subset';
+  if ($self->can($method) && $self->$method) {
+    $name .= q{ } . $self->$method;
+  }
+  $method = 'check_name_local';
+  if ($self->can($method)) {
+    $name = $self->$method($name);
+  }
+  $name =~ s/_/ /gsmx;
+  return $name;
+}
+
+=head2 composition_subset
+
+A single, possibly undefined, value describing the subset attribute values
+of the components. An error if a single value cannot be produced.
+
+=cut
+sub composition_subset {
+  my $self = shift;
+
+  my $token = 'none';
+  my @subsets = uniq map { defined $_->subset ? $_->subset : $token }
+                $self->composition->components_list;
+  if (scalar @subsets == 0) {
+    croak 'Composition is empty, cannot compute values for subset';
+  }
+  if (scalar @subsets > 1) {
+    croak 'Multiple subsets within the composition: ' . join q[, ], @subsets;
+  }
+  my $subset = $subsets[0];
+
+  return $subset eq $token ? undef : $subset;
+}
+
+=head2 is_old_style_result
+
+Returns true if the derived class implements id_run and position
+methods/attributes.
+
+=cut
+sub is_old_style_result {
+  my $self = shift;
+  return $self->can('id_run') && $self->can('position') &&
+         defined $self->id_run;
 }
 
 =head2 equals_byvalue
@@ -102,60 +145,84 @@ Supports comparison on the following attributes:
 
 =cut
 sub equals_byvalue {
-    my ($self, $h) = @_;
-    if (!$h) {
-        croak q[Parameters hash should be given];
-    }
-    my @keys =keys %{$h};
-    if (!@keys) {
-        croak q[No parameters for comparison];
-    }
+  my ($self, $other) = @_;
 
-    foreach my $key (@keys) {
-        if (none { $_ eq $key } @SEARCH_PARAMETERS) {
-            croak qq[Value of the $key attribute cannot be compared. Valid attributes: ] . join q[, ], @SEARCH_PARAMETERS;
-	}
-        if ($key eq q[tag_index]) {
-            if ( !$self->can($key) || (!defined $h->{$key} && defined $self->$key) ||
-                    (defined $h->{$key} && !defined $self->$key) ) {
-                return 0;
-            }
-            if (!defined $h->{$key} && !defined $self->$key) { next; }
-	}
-        if ($self->$key ne $h->{$key}) {return 0;}
-    }
-    return 1;
-}
+  if (!defined $other) {
+    croak 'Nothing to compare to';
+  }
 
-=head2 add_comment
-
-Appends a comment to a string of comments
-  
-=cut
-sub add_comment {
-    my ($self, $comment) = @_;
-    if (!$comment) {return 1;}
-    if (!$self->comments) {
-        $self->comments($comment);
+  my $other_type = ref $other;
+  my $comp;
+  if ($other_type) {
+    if ($self->is_old_style_result()) {
+      $comp =  $self->_equals_byvalue_old($other);
     } else {
-        $self->comments($self->comments . q[ ] . $comment);
+      if ($other_type eq ref $self->composition) {
+        $comp = ($self->composition_digest cmp $other->digest) == 0 ? 1 : 0;
+      }
     }
-    return 1;
+  }
+
+  if (!defined $comp) {
+    croak 'Cannot evaluate input ' . $other;
+  }
+
+  return $comp;
 }
 
-=head2 to_string
+sub _equals_byvalue_old {
+  my ($self, $h) = @_;
 
-Human friendly object description
-  
-=cut
-sub to_string {
-    my ($self) = @_;
-    my $s = ref $self;
-    $s .= q[ object for id_run ] . $self->id_run . q[ position ] . $self->position;
-    if ($self->can('tag_index') and defined $self->tag_index) {
-        $s .= q[ tag index ] . $self->tag_index;
+  my @keys =keys %{$h};
+  if (!@keys) {
+    croak q[No parameters for comparison];
+  }
+
+  foreach my $key (@keys) {
+    if (none { $_ eq $key } @SEARCH_PARAMETERS) {
+      croak qq[Value of the $key attribute cannot be compared. Valid attributes: ]
+            . join q[, ], @SEARCH_PARAMETERS;
     }
-    return $s;
+    if ($key eq q[tag_index]) {
+      if ( !$self->can($key) || (!defined $h->{$key} && defined $self->$key) ||
+          (defined $h->{$key} && !defined $self->$key) ) {
+        return 0;
+      }
+      if (!defined $h->{$key} && !defined $self->$key) { next; }
+    }
+    if ($self->$key ne $h->{$key}) {return 0;}
+  }
+  return 1;
+}
+
+=head2 filename_root
+
+Suggested filename root for serialisation.
+
+=cut
+sub filename_root {
+  my $self = shift;
+  my $root;
+  if ($self->is_old_style_result()) {
+    $root = sprintf q[%s_%s%s%s],
+      $self->id_run,
+      $self->position,
+      $self->tag_label(),
+      $self->can(q[subset]) && $self->subset ? q[_] . $self->subset : q[];
+  } else {
+    $root = $self->composition_digest;
+  }
+  return $root;
+}
+
+=head2 filename_root_from_filename
+
+=cut
+sub filename_root_from_filename {
+  my ($self, $file_path) = @_;
+  my ($volume, $directories, $file) = splitpath($file_path);
+  $file =~ s/[.](?:[^.]+)\Z//smx;
+  return $file;
 }
 
 =head2 filename4serialization
@@ -164,24 +231,26 @@ Filename that should be used to write json serialization of this object to
 
 =cut
 sub filename4serialization {
-    my $self = shift;
-
-    my $root;
-    if ($self->can('filename_root')) {
-        $root = $self->filename_root;
-    }
-    if (!$root) {
-        $root = sprintf q[%s_%s%s],
-            $self->id_run,
-            $self->position,
-            $self->tag_label();
-    }
-    return sprintf q[%s%s.%s.%s],
-        $root,
-        $self->can(q[subset]) && $self->subset ? q[_] . $self->subset : q[],
-        $self->class_name,
-        q[json];
+  my $self = shift;
+  return sprintf q[%s.%s.%s],
+    $self->filename_root(),
+    $self->class_name(),
+    q[json];
 }
+
+=head2 thaw
+
+Extends the parent method provided by the MooseX::Storage framework -
+disables version checking between the version of the module that
+serialized the object and the version of the same module that
+is performing de-serialization. 
+
+=cut
+around 'thaw' => sub {
+  my $orig = shift;
+  my $self = shift;
+  return $self->$orig(@_, 'check_version' => 0);
+};
 
 =head2 store
 
@@ -190,13 +259,40 @@ Uses filename4serialization for default file name if none or directory is passed
 
 =cut
 around 'store' => sub {
-    my ($orig, $self, $file) = @_;
-    my $fn = $self->filename4serialization();
-    $file = (not defined $file) ? $fn :
-            -d $file            ? catfile($file,$fn) :
-                                  $file;
-    return $self->$orig($file);
+  my ($orig, $self, $file) = @_;
+  my $fn = $self->filename4serialization();
+  $file = (not defined $file) ? $fn :
+          -d $file            ? catfile($file,$fn) :
+                                $file;
+  return $self->$orig($file);
 };
+
+=head2 add_comment
+
+Appends a comment to a string of comments
+  
+=cut
+sub add_comment {
+  my ($self, $comment) = @_;
+  if ($comment) {
+    if (!$self->comments) {
+      $self->comments($comment);
+    } else {
+      $self->comments($self->comments . q[ ] . $comment);
+    }
+  }
+  return;
+}
+
+=head2 to_string
+
+Returns a human readable string representation of the object.
+
+=cut
+sub to_string {
+  my $self = shift;
+  return join q[ ], ref $self , $self->composition->freeze;
+}
 
 =head2 json
 
@@ -204,19 +300,19 @@ Serialization of this object to JSON.
 
 =cut
 sub json {
-    my $self = shift;
-    my $package_name = ref $self;
-    if (!$package_name) {
-      croak '"json" method should be called on an object instance';
+  my $self = shift;
+  my $package_name = ref $self;
+  if (!$package_name) {
+    croak '"json" method should be called on an object instance';
+  }
+  if ($package_name =~ /Schema/xms) {
+    my $h = {'__CLASS__' => $package_name};
+    foreach my $column ($self->result_source->columns()) {
+      $h->{$column} = $self->$column;
     }
-    if ($package_name =~ /Schema/xms) {
-        my $h = {'__CLASS__' => $package_name};
-        foreach my $column ($self->result_source->columns()) {
-            $h->{$column} = $self->$column;
-        }
-        return to_json($h);
-    }
-    return $self->freeze();
+    return to_json($h);
+  }
+  return $self->freeze();
 }
 
 1;
@@ -257,7 +353,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

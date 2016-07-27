@@ -28,7 +28,7 @@
 * Example:
 *
 *   requirejs(['collapse'], function( collapse ) {
-*     var actionAfterCollapseToggle = function () {
+*     var actionAfterCollapseToggle = function() {
 *       alert('There was a collapse toggle!!!');
 *     };
 *
@@ -46,8 +46,8 @@ define(['jquery'], function() {
   return {
     init: function(afterCollapseToggle) {
 
-      var _callAfterCollapseToggle = function () {
-        if( typeof afterCollapseToggle === 'function' ) {
+      var _callAfterCollapseToggle = function() {
+        if ( typeof afterCollapseToggle === 'function' ) {
           afterCollapseToggle();
         }
       };
@@ -90,6 +90,7 @@ define(['jquery'], function() {
       });
 
       /* Manipulate CHECK RESULT appearance */
+
       //Expand all results
       $('#expand_all_results').click(function(event) {
         event.preventDefault();
@@ -114,10 +115,11 @@ define(['jquery'], function() {
       $('.collapse_h2, .expand_h2').each(function(index, obj) {
         var self = $(obj);
         var mySections = [];
+
         // Regular expression to filter sections, considers pass/fail
         var pattern = new RegExp(self.data('section') + '(:\\w+)?$');
         $.each(allHeaders, function(index, obj) {
-          if( pattern.test($(obj).text().trim()) ) {
+          if ( pattern.test($(obj).text().trim()) ) {
             var nextDiv = $($(obj).next('div'));
             mySections.push(nextDiv);
           }

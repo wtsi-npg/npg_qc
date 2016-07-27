@@ -54,7 +54,6 @@ root/src/ui_checks/pulldown_metrics.tt2
 root/src/ui_checks/qX_yield.tt2
 root/src/ui_checks/ref_match.tt2
 root/src/ui_checks/sequence_error.tt2
-root/src/ui_checks/split_stats.tt2
 root/src/ui_checks/tag_decode_stats.tt2
 root/src/ui_checks/tag_metrics.tt2
 root/src/ui_lanes/checks_header.tt2
