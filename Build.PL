@@ -120,11 +120,6 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     }
   }
 
-  sub ACTION_webinstall { # backward compatibility
-    my $self = shift;
-    $self->SUPER::ACTION_install;
-  }
-
   sub process_htdocs_files {
     my $self = shift;
     my $files = $self->rscan_dir('htdocs', sub {-f $_ and (/\.css$/ or /\.js$/)});
