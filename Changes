@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 62.1
+ - Bug fix in build action for cgi files.
+
 release 62.0
  - Towards composition-based autoqc:
    - npg_qc::autoqc::results::result - Composition-aware,

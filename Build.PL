@@ -120,11 +120,6 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     }
   }
 
-  sub ACTION_webinstall { # backward compatibility
-    my $self = shift;
-    $self->SUPER::ACTION_install;
-  }
-
   sub process_htdocs_files {
     my $self = shift;
     my $files = $self->rscan_dir('htdocs', sub {-f $_ and (/\.css$/ or /\.js$/)});
@@ -145,6 +140,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       flatten => 0);
     if ($script) {
       $self->fix_shebang_line(($script));
+      `chmod +x $script`;
     }
     return;
   }
@@ -348,7 +344,7 @@ foreach my $path (qw(data htdocs cgi-bin)) {
   $name =~ s/-//;
   $builder->add_build_element($name);
   if ($builder->install_base()) {
-    $builder->install_path($name => join q{/}, $builder->install_base(), $path);
+    $builder->install_path($path => join q{/}, $builder->install_base(), $path);
   }
 }
 
