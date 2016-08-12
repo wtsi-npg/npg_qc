@@ -1,8 +1,3 @@
-#########
-# Author:        gq1
-# Created:       10 November 2009
-#
-
 use strict;
 use warnings;
 use File::Copy;
@@ -169,7 +164,7 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
 }
 
 {
-  my $error_check = npg_qc::autoqc::checks::sequence_error->new(position => 2, path => 't/data/autoqc/090721_IL29_2549/data', id_run => 2549, aligner_cmd => 'bwa', aligner_options => '-l 32 -k 2', repository => $repos, );
+  my $error_check = npg_qc::autoqc::checks::sequence_error->new(position => 2, path => 't/data/autoqc/090721_IL29_2549/data', id_run => 2549, bwa_cmd => 'bwa', aligner_options => '-l 32 -k 2', repository => $repos, );
   is( $error_check->sample_size, 10000, 'default required sample size');
   my @fastq_files = $error_check->get_input_files ();
   is( $fastq_files[0], 't/data/autoqc/090721_IL29_2549/data/2549_2_1.fastq', 'correct first fastq full name');

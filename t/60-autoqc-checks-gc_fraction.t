@@ -1,11 +1,6 @@
-#########
-# Author:        mg8
-# Created:       04 January 2010
-#
-
 use strict;
 use warnings;
-use Test::More tests => 28;
+use Test::More tests => 27;
 use Test::Deep;
 use Test::Exception;
 use Cwd;
@@ -19,32 +14,29 @@ my $repos = cwd . '/t/data/autoqc';
 use_ok ('npg_qc::autoqc::checks::gc_fraction');
 
 {
-    my $r = npg_qc::autoqc::checks::gc_fraction->new(path => 't/data/autoqc/090721_IL29_2549/data', 
-                                                     position =>1,
-                                                     id_run => 254,
-                                                     repository => $repos, );
+    my $r = npg_qc::autoqc::checks::gc_fraction->new(
+        path => 't/data/autoqc/090721_IL29_2549/data', 
+        position =>1,
+        id_run => 254,
+        repository => $repos, );
     isa_ok ($r, 'npg_qc::autoqc::checks::gc_fraction');
 }
 
 
 {
-    my $qc = npg_qc::autoqc::checks::gc_fraction->new(position => 2, path => 'nonexisting', id_run => 2549, repository => $repos, );
-    throws_ok {$qc->execute()} qr/directory\ nonexisting\ does\ not\ exist/, 'execute: error on nonexisting path';
-}
-
-{
-    my $gc = npg_qc::autoqc::checks::gc_fraction->new(position => 2, path => 'nonexisting', id_run => 2549, repository => $repos, );
+    my $gc = npg_qc::autoqc::checks::gc_fraction->new(
+        position => 2, path => 't', id_run => 2549, repository => $repos, );
     my $result = $gc->_gc_percent({A => 10.0, C => 20.0, G => 25.0, T => 30.0,});
     is ($result, ((20.0+25.0)/(10.0+20.0+25.0+30.0))*100, 'gc percent calculation');
 }
 
 {
    my $check = npg_qc::autoqc::checks::gc_fraction->new(
-                                                      path      => 't/data/autoqc/090721_IL29_2549/data',
-                                                      position  => 1,
-                                                      id_run    => 2549,
-                                                      ref_base_count_path => q[],
-                                                      repository => $repos, 
+       path      => 't/data/autoqc/090721_IL29_2549/data',
+       position  => 1,
+       id_run    => 2549,
+       ref_base_count_path => q[],
+       repository => $repos, 
                                                      );
    $check->execute();
  
@@ -67,10 +59,10 @@ use_ok ('npg_qc::autoqc::checks::gc_fraction');
 
 {
    my $check = npg_qc::autoqc::checks::gc_fraction->new(
-                                                         path      => 't/data/autoqc/090721_IL29_2549/data',
-                                                         position  => 2,
-                                                         id_run => 2549,
-                                                         repository => $repos, 
+        path      => 't/data/autoqc/090721_IL29_2549/data',
+        position  => 2,
+        id_run => 2549,
+        repository => $repos
                                                        );
    $check->execute();
 
@@ -89,11 +81,11 @@ use_ok ('npg_qc::autoqc::checks::gc_fraction');
 {
    my $bc_path = catfile(cwd, q[t/data/autoqc/Homo_sapiens.NCBI36.48.dna.all.fa]);
    my $check = npg_qc::autoqc::checks::gc_fraction->new(
-                                                         path      => 't/data/autoqc/090721_IL29_2549/data',
-                                                         position  => 8,
-                                                         id_run    => 2549,
-                                                         ref_base_count_path => $bc_path,
-                                                         repository => $repos, 
+        path      => 't/data/autoqc/090721_IL29_2549/data',
+        position  => 8,
+        id_run    => 2549,
+        ref_base_count_path => $bc_path,
+        repository => $repos, 
                                                        );
    # lane 8 is human
    $check->execute();

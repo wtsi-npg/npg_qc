@@ -4,13 +4,17 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
+
 use npg_qc::autoqc::autoqc;
 
 our $VERSION = '0';
 
-npg_qc::autoqc::autoqc->new_with_options()->run();
+npg_qc::autoqc::autoqc->new_with_options()
+  ->create_check_object()
+  ->execute();
 
 exit 0;
+
 __END__
 
 =head1 NAME
@@ -19,16 +23,16 @@ qc
 
 =head1 USAGE
 
-qc --check=insert_size --position=2 --archive_path=/path/to/fastq/files --qc_path=/path/to/where/to/write/results
+qc --check insert_size --id_run 1 --position 2 --qc_in in
+qc --check insert_size --id_run 1 --position 2 --qc_in in --qc_out out
+
+See documentation for npg_qc::autoqc::autoqc for further details.
 
 =head1 CONFIGURATION
 
 =head1 SYNOPSIS
 
-This script kicks off one auto QC check.
-It is a  wrapper around npg_qc::autoqc::autoqc object. Please see the
-documentation for that module for information on input. Calls the run method
-of the autoqc object.
+This script kicks off one QC check.
 
 =head1 DESCRIPTION
 
@@ -70,7 +74,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt> and Andy Brown E<lt>ajb@sanger.ac.u
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia and Andy Brown
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

@@ -1,14 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 43;
+use Test::More tests => 42;
 use Test::Exception;
 
 use_ok('npg_qc::autoqc::checks::tag_metrics');
-
-{
-  my $qc = npg_qc::autoqc::checks::tag_metrics->new(position => 2, path => 'nonexisting', id_run => 2549);
-  throws_ok {$qc->execute()} qr/directory\ nonexisting\ does\ not\ exist/, 'execute: error on nonexisting path';
-}
 
 {
   my $check = npg_qc::autoqc::checks::tag_metrics->new(path => 't/data/autoqc/090721_IL29_2549/data', position =>1, id_run => 2549);

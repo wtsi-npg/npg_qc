@@ -1,8 +1,3 @@
-#########
-# Author:        kl2
-# Created:       6 September 2013
-#
-
 use strict;
 use warnings;
 use Test::More tests => 4;
@@ -12,7 +7,8 @@ use_ok ('npg_qc::autoqc::results::upstream_tags');
 use_ok ('npg_qc::autoqc::results::collection');
 
 {
-    my $r = npg_qc::autoqc::results::upstream_tags->new(id_run => 2, path => q[mypath], position => 1);
+    my $r = npg_qc::autoqc::results::upstream_tags->new(
+        id_run => 2, path => q[t], position => 1);
     isa_ok ($r, 'npg_qc::autoqc::results::upstream_tags');
 }
 
@@ -23,4 +19,6 @@ use_ok ('npg_qc::autoqc::results::collection');
 
     is($c->results->[0]->criterion(), q[Currently no pass/fail levels set], 'criteria');
 }
+
+1;
 
