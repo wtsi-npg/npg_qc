@@ -2,6 +2,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - Arguments given to the qc script are passed through to the relevant
    qc check object.
+ - QC script does not try to infer the location of input files.
 
 release 62.1
  - Bug fix in build action for cgi files.
