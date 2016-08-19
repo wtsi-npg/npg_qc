@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 3;
 use File::Temp qw/tempdir/;
 
 local $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc];
@@ -11,6 +11,9 @@ my @args = ("bin/qc", "--id_run=2222", "--position=1", "--check=qX_yield", "--ta
 is (system(@args), 0, 'script exited normally');
 
 my $command = "bin/qc --id_run 2222 --position 1 --check qX_yield --tag_index 1 --qc_in $path --qc_out $odir";
+is (system($command), 0, 'script exited normally');
+
+$command = "bin/qc --rpt_list 2222:1:1 --check qX_yield --qc_in $path --qc_out $odir";
 is (system($command), 0, 'script exited normally');
 
 1;

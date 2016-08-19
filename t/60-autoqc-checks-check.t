@@ -26,11 +26,14 @@ subtest 'object creation' => sub {
 };
 
 subtest 'validation of attributes' => sub {
-    plan tests => 20;
+    plan tests => 37;
 
+    throws_ok {npg_qc::autoqc::checks::check->new(path => $path)}
+        qr/Either id_run or position key is undefined/,
+        'error on instantiating an object without any id';
     throws_ok {npg_qc::autoqc::checks::check->new(path => $path, id_run => $idrun)}
-        qr/Attribute \(position\) is required/,
-        'error on instantiating an object without a position attr';
+        qr/Either id_run or position key is undefined/,
+        'error on instantiating an object without either a position or rpt_list attr';
     throws_ok {npg_qc::autoqc::checks::check->new(
         position => 17, path => $path, id_run => $idrun)}
         qr/Validation\ failed\ for\ \'NpgTrackingLaneNumber\'/,
@@ -57,9 +60,9 @@ subtest 'validation of attributes' => sub {
         position => 1, path => 'nonexisting', id_run => $idrun)}
         qr/does not exist or is not readable/,
         'error on passing to the constructor non-existing path';
-    throws_ok {npg_qc::autoqc::checks::check->new(position => 2, path => 'nonexisting')}
-        qr/Attribute \(id_run\) is required/,
-        'error on instantiating an object without a run id';
+    throws_ok {npg_qc::autoqc::checks::check->new(position => 2, qc_in => 't')}
+        qr/Either id_run or position key is undefined/,
+        'error on instantiating an object without either a run id or an rpt_list attr';
     throws_ok {npg_qc::autoqc::checks::check->new(
         position => 1, path => 'nonexisting', id_run => -1)}
         qr/Validation\ failed\ for\ \'NpgTrackingRunId\'/,
@@ -90,8 +93,33 @@ subtest 'validation of attributes' => sub {
     lives_ok { npg_qc::autoqc::checks::check->new(
         position => 2, path => $path, id_run => $idrun, tag_index => undef )}
         'accepts undef for tag_index in the constructor';
+    
+    throws_ok { npg_qc::autoqc::checks::check->new(qc_in => 't', rpt_list => 'list') }
+        qr/Both id_run and position should be available/,
+        'error if rpt_list format is incorrect';
 
-    my $check = npg_qc::autoqc::checks::check->new(
+    my $check;
+    lives_ok { $check = npg_qc::autoqc::checks::check->new(qc_in => 't', rpt_list => '6:8')}
+        'can create a check object using rpt list attr';
+    is ($check->num_components, 1, 'components count is correct');
+    is ($check->id_run, undef, 'run id undefined');
+    is ($check->position, undef, 'position undefined');
+    is ($check->tag_index, undef, 'tag index undefined');
+    lives_ok { $check = npg_qc::autoqc::checks::check->new(qc_in => 't', rpt_list => '6:8:9')}
+        'can create a check object using rpt list attr';
+    is ($check->num_components, 1, 'components count is correct');
+    is ($check->id_run, undef, 'run id undefined');
+    is ($check->position, undef, 'position undefined');
+    is ($check->tag_index, undef, 'tag index undefined');
+    lives_ok { $check = npg_qc::autoqc::checks::check->new(
+        qc_in => 't', rpt_list => '6:8:9;7:8')}
+        'can create a check object using rpt list attr';
+    is ($check->num_components, 2, 'components count is correct');
+    is ($check->id_run, undef, 'run id undefined');
+    is ($check->position, undef, 'position undefined');
+    is ($check->tag_index, undef, 'tag index undefined');
+
+    $check = npg_qc::autoqc::checks::check->new(
         position => 2, path => $path, id_run => $idrun );
     throws_ok {$check->path('path')}
         qr/Cannot\ assign\ a\ value\ to\ a\ read-only/, 'check::path is read-only';
@@ -102,42 +130,44 @@ subtest 'validation of attributes' => sub {
 };
 
 subtest 'accessors tests' => sub {
-    plan tests => 20;
+    plan tests => 29;
+
+    my @checks = ();
+    push @checks, npg_qc::autoqc::checks::check->new(
+        position => 2, path => $path, id_run => $idrun );
+    push @checks, npg_qc::autoqc::checks::check->new(
+        path => $path, rpt_list => "${idrun}:2" );
+    for my $check (@checks) {
+        is($check->tag_index, undef, 'tag index undefined');
+        isa_ok($check->result, 'npg_qc::autoqc::results::result');
+        is($check->result->id_run, $idrun, 'run id propagated');
+        is($check->result->position, 2, 'position propagated');
+        is($check->result->path, 't/data/autoqc/090721_IL29_2549/data', 'path propagated');
+        is($check->result->tag_index, undef, 'tag index undefined');
+        ok(!$check->result->has_tag_index, 'tag index is not set');
+        is($check->can_run, 1, 'can_run getter ok');
+    }
+
+    @checks = ();
+    push @checks, npg_qc::autoqc::checks::check->new(
+        position => 2, path  => $path, id_run => $idrun, tag_index => 5 );
+     push @checks, npg_qc::autoqc::checks::check->new(
+        path => $path, rpt_list => "${idrun}:2:5" );
+    for my $check (@checks) {
+        isa_ok($check->result, 'npg_qc::autoqc::results::result');
+        is($check->result->id_run, $idrun, 'run id propagated');
+        is($check->result->position, 2, 'position propagated');
+        is($check->result->tag_index, 5, 'tag index propagated');
+        ok($check->result->has_tag_index, 'tag index is set');
+    }
 
     my $check = npg_qc::autoqc::checks::check->new(
-        position => 2, path => $path, id_run => $idrun );
-    is($check->tag_index, undef, 'tag index undefined');
-    isa_ok($check->result, 'npg_qc::autoqc::results::result');
-    is($check->result->id_run, $idrun, 'run id propagated');
-    is($check->result->position, 2, 'position propagated');
-    is($check->result->path, 't/data/autoqc/090721_IL29_2549/data', 'path propagated');
-    is($check->result->tag_index, undef, 'tag index undefined');
-    ok(!$check->result->has_tag_index, 'tag index is not set');
-
-    $check = npg_qc::autoqc::checks::check->new( position => 3, path => $path, id_run =>  2549);
-    delete $check->result->{info}->{Check_version};
-    my $r =  npg_qc::autoqc::results::result->new(position=> 3, path => $path, id_run => 2549);
-    $r->set_info('Check', 'npg_qc::autoqc::checks::check');          
-    cmp_deeply($check->result, $r, 'result object created, default tag index');
-
-    $check = npg_qc::autoqc::checks::check->new(
-        position => 2, path  => $path, id_run => $idrun, tag_index => 5 );
-    is($check->tag_index, 5, 'tag index is set by the constructor');
-    isa_ok($check->result, 'npg_qc::autoqc::results::result');
-    is($check->result->id_run, $idrun, 'run id propagated');
-    is($check->result->position, 2, 'position propagated');
-    is($check->result->tag_index, 5, 'tag index propagated');
-    ok($check->result->has_tag_index, 'tag index is set');
-
-    $check = npg_qc::autoqc::checks::check->new(position => 2, path => $path, id_run => 2549);
-    is($check->path, $path, 'path getter ok');
-    is($check->position,  2, 'position getter ok');
-    is($check->id_run,  2549, 'id_run getter ok');
-    is($check->can_run, 1, 'can_run getter ok');
-
-    $check = npg_qc::autoqc::checks::check->new(
         position => 1, path => 't', id_run => 2549,);
     is ($check->tag_label, q[], 'empty string as a tag label');
+    $check = npg_qc::autoqc::checks::check->new(
+        path => 't', rpt_list => '2549:1',);
+    is ($check->tag_label, q[], 'empty string as a tag label');
+    
     $check = npg_qc::autoqc::checks::check->new(
         position => 1, path => 't', id_run => 2549, tag_index => 22);
     is ($check->tag_label, q[#22], 'tag label for tag_index 22');
@@ -184,30 +214,46 @@ subtest 'temporary directory and path tests' => sub {
 };
 
 subtest 'finding input' => sub {
-    plan tests => 12;
+    plan tests => 17;
 
-    my $check = npg_qc::autoqc::checks::check->new(
+    my @checks = ();
+    push @checks, npg_qc::autoqc::checks::check->new(
+                rpt_list  => '2549:1',
+                qc_in     => $path,
+                file_type => q[fastqcheck]);    
+    push @checks, npg_qc::autoqc::checks::check->new(
                 position  => 1,
                 qc_in     => $path,
                 id_run    => 2549,
                 file_type => q[fastqcheck]);
-    is (join( q[ ], $check->get_input_files()),
-        "$path/2549_1_1.fastqcheck $path/2549_1_2.fastqcheck",
-        'two fastqcheck input files found');
-    cmp_deeply ($check->generate_filename_attr(), ['2549_1_1.fastqcheck', '2549_1_2.fastqcheck'],
-        'output filename structure');
+    foreach my $check (@checks) {
+        is (join( q[ ], $check->get_input_files()),
+            "$path/2549_1_1.fastqcheck $path/2549_1_2.fastqcheck",
+            'two fastqcheck input files found');
+        cmp_deeply ($check->generate_filename_attr(), ['2549_1_1.fastqcheck', '2549_1_2.fastqcheck'],
+            'output filename structure');
+    }
 
-    $check = npg_qc::autoqc::checks::check->new(
+    @checks = ();
+    push @checks, npg_qc::autoqc::checks::check->new(
                 position  => 1,
                 path      => $path,
                 id_run    => 2549,
                 tag_index => 33,
                 file_type => q[fastqcheck]);
-    is (join( q[ ], $check->get_input_files()),
-        "$path/2549_1_1#33.fastqcheck $path/2549_1_2#33.fastqcheck",
-        'two fastqcheck input files found');
+    push @checks, npg_qc::autoqc::checks::check->new(
+                rpt_list  => '2549:1:33',
+                path      => $path,
+                id_run    => 2549,
+                tag_index => 33,
+                file_type => q[fastqcheck]);
+    foreach my $check (@checks) {
+        is (join( q[ ], $check->get_input_files()),
+            "$path/2549_1_1#33.fastqcheck $path/2549_1_2#33.fastqcheck",
+            'two fastqcheck input files found');
+    }
 
-    $check = npg_qc::autoqc::checks::check->new(
+    my $check = npg_qc::autoqc::checks::check->new(
                 position  => 2,
                 path      => $path,
                 id_run    => 2549,
@@ -250,6 +296,18 @@ subtest 'finding input' => sub {
     is ($check->result->comments,
         "Neither $path/2549_4_1.fastq nor $path/2549_4.fastq file found",
         'comment when no input files found');
+
+    throws_ok { npg_qc::autoqc::checks::check->new(
+                    rpt_list  => '2549:1;45:7',
+                    qc_in     => $path,
+                    file_type => q[fastqcheck])->input_files() }
+        qr/Multiple components, input file\(s\) should be given/,
+        'cannot infer input files for multiple components';
+    lives_ok { npg_qc::autoqc::checks::check->new(
+                    rpt_list  => '2549:1;45:7',
+                    qc_in     => $path,
+                    input_files => [qw(some other)])->input_files() }
+        'input files supplied - OK';
 };
 
 subtest 'saving info about the check' => sub {
@@ -263,31 +321,38 @@ subtest 'saving info about the check' => sub {
 };
 
 subtest 'filename generation' => sub {
-    plan tests => 13;
+    plan tests => 14;
 
-    my $p = 'npg_qc::autoqc::checks::check';
-    my $m = {id_run => 5, position => 1};
-    is($p->create_filename($m), '5_1', '5_1');
-    is($p->create_filename($m, 1), '5_1_1', '5_1_1');
-    is($p->create_filename($m, 't'), '5_1_t', '5_1_t');
-    is($p->create_filename($m, 2), '5_1_2', '5_1_2');
-    $m->{'tag_index'} = '3';
-    is($p->create_filename($m), '5_1#3', '5_1 tag 3');
-    is($p->create_filename($m,1), '5_1_1#3', '5_1_1 tag 3');
-    is($p->create_filename($m,2), '5_1_2#3', '5_1_2 tag 3');
-    $m->{'tag_index'} = 0;
-    is($p->create_filename($m), '5_1#0', '5_1 tag 0');
-    is($p->create_filename($m,1), '5_1_1#0', '5_1_1 tag 0');
-    is($p->create_filename($m,2), '5_1_2#0', '5_1_2 tag 0');
+    my $check = npg_qc::autoqc::checks::check->new(
+        position => 1, path => 't', id_run => 5,);
+    is($check->create_filename(), '5_1', '5_1');
+    is($check->create_filename(1), '5_1_1', '5_1_1');
+    is($check->create_filename('t'), '5_1_t', '5_1_t');
+    is($check->create_filename(2), '5_1_2', '5_1_2');
 
-    my $check = npg_qc::autoqc::checks::check->new(position => 1, path => 't', id_run => 2549,);
-    is($check->create_filename($check), '2549_1', q[file name for 2549_1]);
     $check = npg_qc::autoqc::checks::check->new(
-        position => 1, path => 't', id_run => 2549, tag_index => 0);
-    is($check->create_filename($check), '2549_1#0', q[file name for 2549_1 tag 0]);
+        position => 1, path => 't', id_run => 5, tag_index => 3);
+    is($check->create_filename(), '5_1#3', '5_1 tag 3');
+    is($check->create_filename(1), '5_1_1#3', '5_1_1 tag 3');
+    is($check->create_filename(2), '5_1_2#3', '5_1_2 tag 3');
+
     $check = npg_qc::autoqc::checks::check->new(
-        position => 1, path => 't', id_run => 2549, tag_index => 5);
-    is($check->create_filename($check), '2549_1#5', q[file name for 2549_1 tag 5]);
+        position => 1, path => 't', id_run => 5, tag_index => 0);
+    is($check->create_filename(), '5_1#0', '5_1 tag 0');
+    is($check->create_filename(1), '5_1_1#0', '5_1_1 tag 0');
+    is($check->create_filename(2), '5_1_2#0', '5_1_2 tag 0');
+
+    $check = npg_qc::autoqc::checks::check->new(path => 't', rpt_list => '2549:1');
+    is($check->create_filename(), '2549_1', q[file name for 2549_1]);
+    $check = npg_qc::autoqc::checks::check->new(path => 't', rpt_list => '2549:1:0');
+    is($check->create_filename(), '2549_1#0', q[file name for 2549_1 tag 0]);
+    $check = npg_qc::autoqc::checks::check->new(path => 't', rpt_list => '2549:1:5');
+    is($check->create_filename(), '2549_1#5', q[file name for 2549_1 tag 5]);
+
+    $check = npg_qc::autoqc::checks::check->new(path => 't', rpt_list => '2549:1;45:9');
+    throws_ok { $check->create_filename() }
+        qr/Multiple components, cannot generate file name/,
+        'cannot create file name for multiple components';
 };
 
 subtest 'running the check' => sub {

@@ -16,14 +16,11 @@ use npg_tracking::util::types;
 with qw/ npg_tracking::glossary::run
          npg_tracking::glossary::lane
          npg_tracking::glossary::tag
+         npg_tracking::glossary::rpt
          MooseX::Getopt
        /;
 
-our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
-
-Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
-Readonly::Scalar our $STD_IN          => '/dev/stdin';
 
 =head1 NAME
 
@@ -38,17 +35,57 @@ npg_qc::autoqc::checks::check
 =head1 DESCRIPTION
 
 A parent class for autoqc checks. Checks are performed either for a lane or
-for a plex (index, lanelet).
+for a plex (index, lanelet) or for a composition of the former defined by the
+rpt_list attribute.
 
 =head1 SUBROUTINES/METHODS
 
+=cut
+
+=head2 rpt_list
+
+Semi-colon separated list of run:position or run:position:tag.
+An optional attribute. Shoudl be given if id_run and position are not supplied.
+
+=cut
+
+has 'rpt_list' => (isa           => q[Str],
+                   is            => q[ro],
+                   required      => 0,
+                   lazy_build    => 1,
+                  );
+sub _build_rpt_list {
+  my $self = shift;
+  return $self->deflate_rpt();
+}
+
+with 'npg_tracking::glossary::composition::factory::rpt' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+
+our $VERSION = '0';
+
+Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
+Readonly::Scalar our $STD_IN          => '/dev/stdin';
+
 =head2 id_run
+
+An optional run id.
+
+=cut
+
+has '+id_run' => ( required => 0, );
 
 =head2 position
 
+An optional position.
+
+=cut
+
+has '+position' => ( required => 0, );
+
 =head2 tag_index
 
-An optional tag index
+An optional tag index.
 
 =cut
 
@@ -81,10 +118,46 @@ around 'process_argv' => sub  {
   return $ref;
 };
 
+=head2 composition
+
+A npg_tracking::glossary::composition object.
+
+=cut
+
+has 'composition' => (
+    is         => 'ro',
+    isa        => 'npg_tracking::glossary::composition',
+    required   => 0,
+    lazy_build => 1,
+    handles   => {
+      'num_components'     => 'num_components',
+    },
+);
+sub _build_composition {
+  my $self = shift;
+  return $self->create_composition();
+}
+
+=head2 BUILD
+
+A constructor helper, runs after the default constructor.
+
+=cut
+
+sub BUILD {
+  my $self = shift;
+  $self->composition();
+  return;
+}
+
 =head2 qc_in
 
 A path to a directory with input files. If not defined, the input
 will be read from standard in.
+
+=head2 path
+
+Alias for qc_in.
 
 =cut
 
@@ -166,11 +239,13 @@ A ref to a list with names of input files for this check
 has 'input_files'    => (isa        => 'ArrayRef',
                          is         => 'ro',
                          required   => 0,
-                         predicate  => '_has_input_files',
                          lazy_build => 1,
                         );
 sub _build_input_files {
   my $self = shift;
+  if ($self->composition->num_components > 1) {
+    croak 'Multiple components, input file(s) should be given';
+  }
   my @files = sort $self->get_input_files();
   return \@files;
 }
@@ -189,26 +264,25 @@ has 'result'     =>  (isa        => 'Object',
 sub _build_result {
   my $self = shift;
 
-  my $pkg_name = ref $self;
+  my $class_name = ref $self;
   my $module_version = $VERSION;
+  my $module = $class_name;
 
-  my ($ref) = ($pkg_name) =~ /(\w*)$/smx;
-  if ($ref eq q[check]) {
-    $ref =  q[result];
-  }
-  my $module = "npg_qc::autoqc::results::$ref";
+  $module =~ s/checks/results/xms;
+  $module =~ s/check\Z/result/xms;
   load_class($module);
 
-  my $nref = { id_run => $self->id_run, position => $self->position, };
-  $nref->{'path'} = $self->qc_in;
-  if (defined $self->tag_index) {
-    # In newish Moose undefined but set tag index is serialized to json,
-    # which is not good for result objects that do hot have tag_index db column
-    $nref->{'tag_index'} = $self->tag_index;
+  my $nref = {};
+  if ($self->composition->num_components == 1) {
+    $nref = $self->inflate_rpts($self->rpt_list)->[0];
   }
+  $nref->{'composition'} = $self->composition;
+  $nref->{'path'} = $self->qc_in;
+
   my $result = $module->new($nref);
-  $result->set_info('Check', $pkg_name);
+  $result->set_info('Check', $class_name);
   $result->set_info('Check_version', $module_version);
+
   return $result;
 }
 
@@ -261,11 +335,11 @@ sub get_input_files {
   my $self = shift;
 
   my @fnames = ();
-  my $forward = join q[.], catfile($self->qc_in, $self->create_filename($self, 1)),
+  my $forward = join q[.], catfile($self->qc_in, $self->create_filename(1)),
                              $self->file_type;
   my $no_end_forward = undef;
   if (!-e $forward) {
-    $no_end_forward = join q[.], catfile($self->qc_in, $self->create_filename($self)),
+    $no_end_forward = join q[.], catfile($self->qc_in, $self->create_filename()),
                                  $self->file_type;
     if (-e $no_end_forward) {
       $forward = $no_end_forward;
@@ -277,7 +351,7 @@ sub get_input_files {
 
   push @fnames, $forward;
   if (!defined $no_end_forward) {
-    my $reverse =  join q[.], catfile($self->qc_in, $self->create_filename($self, 2)),
+    my $reverse =  join q[.], catfile($self->qc_in, $self->create_filename(2)),
                               $self->file_type;
     if (-e $reverse) {push @fnames, $reverse;}
   }
@@ -317,17 +391,21 @@ sub overall_pass {
 
 =head2 create_filename
 
-Given run id, position, tag index (optional) and end (optional),
-returns a file name
+Returns a file name for a one-component composition.
 
-  npg_qc::autoqc::checks::check->create_filename({id_run=>1,position=>2,tag_index=>3},2);
-  $obj->create_filename({id_run=>1,position=>2},1);
+  $obj->create_filename(2);
+  $obj->create_filename(1);
 
 =cut
 
 sub create_filename {
-  my ($self, $map, $end) = @_;
+  my ($self, $end) = @_;
 
+  if ($self->num_components > 1) {
+    croak 'Multiple components, cannot generate file name';
+  }
+
+  my $map = $self->inflate_rpts($self->rpt_list)->[0];
   return sprintf '%i_%i%s%s',
     $map->{'id_run'},
     $map->{'position'},
