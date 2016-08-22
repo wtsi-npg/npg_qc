@@ -14,7 +14,8 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
 {
   my @sequences;
   my @qualities;
-  open ( my $fh, q{<}, q{t/data/autoqc/sequence_error/6376_1_1.fastq.10000} ) || die q{unable to open t/data/autoqc/1937_1_1.fastq};
+  open ( my $fh, q{<}, q{t/data/autoqc/sequence_error/6376_1_1.fastq.10000} )
+    or die q{unable to open t/data/autoqc/1937_1_1.fastq};
   my $count = 0;
   while ( <$fh> ) {
     chomp;
@@ -164,7 +165,11 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
 }
 
 {
-  my $error_check = npg_qc::autoqc::checks::sequence_error->new(position => 2, path => 't/data/autoqc/090721_IL29_2549/data', id_run => 2549, bwa_cmd => 'bwa', aligner_options => '-l 32 -k 2', repository => $repos, );
+  my $error_check = npg_qc::autoqc::checks::sequence_error->new(
+                id_run   => 2549,
+                position => 2,
+                path     => 't/data/autoqc/090721_IL29_2549/data',
+                repository => $repos, );
   is( $error_check->sample_size, 10000, 'default required sample size');
   my @fastq_files = $error_check->get_input_files ();
   is( $fastq_files[0], 't/data/autoqc/090721_IL29_2549/data/2549_2_1.fastq', 'correct first fastq full name');
@@ -180,7 +185,14 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
   $f = $dir . q[/2549_8_2.fastq];
   `touch $f`;
 
-  my $error_check = npg_qc::autoqc::checks::sequence_error->new(position => 8, path => $dir, id_run => 2549, bwa_cmd => $bwa, aligner_options => '-l 32 -k 2', reference=>$test_reference, repository => $repos,);
+  my $error_check = npg_qc::autoqc::checks::sequence_error->new(
+      id_run          => 2549,
+      position        => 8,
+      path            => $dir,
+      bwa_cmd         => $bwa,
+      aligner_options => '-l 32 -k 2',
+      reference       =>$test_reference,
+      repository      => $repos,);
   is( $error_check->_actual_sample_size, undef, 'actual sample size undefined');
   lives_ok { $error_check->execute } 'does not fail with empty files';
   is( $error_check->_actual_sample_size, undef, 'actual sample size undefined');
@@ -191,7 +203,14 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
   `cp t/data/autoqc/090721_IL29_2549/data/2549_7_1.fastqcheck $dir`;
   $f = $dir . q[/2549_7_1.fastq];
   `touch $f`;
-  $error_check = npg_qc::autoqc::checks::sequence_error->new(position => 7, path => $dir, id_run => 2549, bwa_cmd => $bwa, aligner_options => '-l 32 -k 2', reference=>$test_reference, repository => $repos,);
+  $error_check = npg_qc::autoqc::checks::sequence_error->new(
+      id_run          => 2549,
+      position        => 7,
+      path            => $dir,
+      bwa_cmd         => $bwa,
+      aligner_options => '-l 32 -k 2',
+      reference       => $test_reference,
+      repository      => $repos,);
   is( $error_check->_actual_sample_size, undef, 'actual sample size undefined');
   lives_ok { $error_check->execute } 'does not fail with empty files';
   is( $error_check->_actual_sample_size, undef, 'actual sample size undefined');
