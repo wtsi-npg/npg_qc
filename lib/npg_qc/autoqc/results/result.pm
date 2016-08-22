@@ -38,14 +38,15 @@ npg_qc::autoqc::results::result
  use npg_tracking::glossary::composition::component::illumina;
  use npg_qc::autoqc::results::result;
 
- my $composition = npg_tracking::glossary::composition->new();
- $composition->add_component(
-   npg_tracking::glossary::composition::component::illumina->new(
-     id_run => 1, position => 2, tag_index => 3
-   );
- );
+ my $c1 = npg_tracking::glossary::composition::component::illumina->new(
+      id_run => 1, position => 2, tag_index => 3,
+    );
+
+ my $composition = npg_tracking::glossary::composition->new(components => [$c1]);
+  (or create_composition, after add_component, via npg_tracking::glossary::composition::factory)
+ 
  my $r = npg_qc::autoqc::results::result->new(
-   $composition => $composition
+    composition => $composition
  );
 
 =head1 DESCRIPTION
