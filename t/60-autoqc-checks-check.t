@@ -130,7 +130,7 @@ subtest 'validation of attributes' => sub {
 };
 
 subtest 'accessors tests' => sub {
-    plan tests => 29;
+    plan tests => 34;
 
     my @checks = ();
     push @checks, npg_qc::autoqc::checks::check->new(
@@ -146,7 +146,15 @@ subtest 'accessors tests' => sub {
         is($check->result->tag_index, undef, 'tag index undefined');
         ok(!$check->result->has_tag_index, 'tag index is not set');
         is($check->can_run, 1, 'can_run getter ok');
+        is($check->get_id_run, $idrun, 'id run retrieved');
+        is($check->to_string,
+            'npg_qc::autoqc::checks::check {"components":[{"id_run":2549,"position":2}]}',
+            'object string representation');
     }
+
+    my $c = npg_qc::autoqc::checks::check->new(
+        path => $path, rpt_list => "2:5:1;1:2:44;1:3:44;2:6:1" );
+    is($c->get_id_run, undef, 'id run cannot be inferred');
 
     @checks = ();
     push @checks, npg_qc::autoqc::checks::check->new(

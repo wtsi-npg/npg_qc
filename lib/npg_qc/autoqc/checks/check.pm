@@ -8,6 +8,7 @@ use Class::Load qw(load_class);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
+use List::MoreUtils qw(uniq);
 use Readonly;
 use Carp;
 
@@ -326,6 +327,22 @@ sub can_run {
   return 1;
 }
 
+=head2 get_id_run
+
+If all components belong to the same run, returns its id.
+In other cases returns an undefined value.
+
+=cut
+
+sub get_id_run {
+  my $self = shift;
+  my @ids = uniq map { $_->id_run } $self->composition->components_list();
+  if (scalar @ids == 1) {
+    return $ids[0];
+  }
+  return;
+}
+
 =head2 get_input_files
 
 Returns an array containing full paths to input files.
@@ -413,6 +430,16 @@ sub create_filename {
     defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
 }
 
+=head2 to_string
+
+Returns a human readable string representation of the object.
+
+=cut
+sub to_string {
+  my $self = shift;
+  return join q[ ], ref $self , $self->composition->freeze;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -447,6 +474,8 @@ __END__
 =item File::Spec::Functions
 
 =item File::Temp
+
+=item List::MoreUtils
 
 =item npg_tracking::glossary::run
 
