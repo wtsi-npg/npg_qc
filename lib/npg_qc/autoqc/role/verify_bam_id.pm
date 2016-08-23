@@ -1,23 +1,21 @@
-#########
-# Author:        Kevin Lewis
-# Created:       25 August 2011
-#
-
 package npg_qc::autoqc::role::verify_bam_id;
 
-use strict;
-use warnings;
 use Moose::Role;
-use Readonly;
-
-with qw(npg_qc::autoqc::role::result);
 
 our $VERSION = '0';
 
-sub criterion {
-	my $self = shift;
+#Fallback string for versions up to v61.1
+Readonly::Scalar my $INITIAL_CRITERION =>
+  q[snps > 10000, average depth >= 4 and freemix < 0.05];
 
-	return q[];
+sub criterion {
+  my $self = shift;
+
+  if ($self->info && $self->info->{'Criterion'}) {
+    return $self->info->{'Criterion'};
+  } else {
+    return $INITIAL_CRITERION;
+  }
 }
 
 no Moose;
@@ -29,7 +27,7 @@ __END__
 
 =head1 NAME
 
-    npg_qc::autoqc::role::verify_bam_id
+  npg_qc::autoqc::role::verify_bam_id
 
 =head1 SYNOPSIS
 
@@ -49,8 +47,6 @@ __END__
 
 =item Moose::Role
 
-=item Readonly
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -59,11 +55,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt>
+Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Kevin Lewis
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

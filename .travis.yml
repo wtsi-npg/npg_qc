@@ -21,6 +21,6 @@ before_install:
  - ./.travis/before_install.sh
 install:
  - ./.travis/install.sh
-script: 
+script:
  - ./.travis/script.sh
 

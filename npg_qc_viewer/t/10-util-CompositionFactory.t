@@ -18,7 +18,7 @@ use_ok 'npg_qc_viewer::Util::CompositionFactory';
   isa_ok($f, 'npg_qc_viewer::Util::CompositionFactory');
   my $composition = $f->create_composition();
   isa_ok($composition, 'npg_tracking::glossary::composition');
-  my @types = map {ref $_} @{$composition->components};
+  my @types = map {ref $_} $composition->components_list();
   is((scalar @types), 3, 'three components');
   ok((all {$_ eq 'npg_tracking::glossary::composition::component::illumina'} @types),
     'components have correct type');

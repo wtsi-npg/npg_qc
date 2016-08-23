@@ -275,6 +275,8 @@ __PACKAGE__->add_unique_constraint(
 
 =item * L<npg_qc::Schema::Flators>
 
+=item * L<npg_qc::autoqc::role::result>
+
 =item * L<npg_qc::autoqc::role::tag_metrics>
 
 =back
@@ -282,11 +284,11 @@ __PACKAGE__->add_unique_constraint(
 =cut
 
 
-with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::tag_metrics';
+with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::tag_metrics';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:7gOJdN0bxI9/UNr1CWOVOA
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-06-30 15:33:28
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yAs47z1KaagzQh1gWvdmTg
 
 __PACKAGE__->set_flators4non_scalar(qw( tags reads_count reads_pf_count perfect_matches_count perfect_matches_pf_count one_mismatch_matches_count one_mismatch_matches_pf_count matches_percent matches_pf_percent info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
@@ -345,7 +347,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

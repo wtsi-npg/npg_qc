@@ -25,9 +25,13 @@ lib/npg_qc_viewer.pm
 lib/npg_qc_viewer/View/TT.pm
 bower.json
 .bowerrc
+.jscsrc
+.jshintrc
+Gruntfile.js
 MANIFEST
 npg_qc_viewer.conf
 npg_qc_viewer.psgi
+package.json
 README
 root/favicon.ico
 root/src/about_qc_checks.tt2
@@ -50,10 +54,10 @@ root/src/ui_checks/pulldown_metrics.tt2
 root/src/ui_checks/qX_yield.tt2
 root/src/ui_checks/ref_match.tt2
 root/src/ui_checks/sequence_error.tt2
-root/src/ui_checks/split_stats.tt2
 root/src/ui_checks/tag_decode_stats.tt2
 root/src/ui_checks/tag_metrics.tt2
 root/src/ui_lanes/checks_header.tt2
+root/src/ui_lanes/collapse_menu.tt2
 root/src/ui_lanes/lane.tt2
 root/src/ui_lanes/library_lanes.tt2
 root/src/ui_runs/annotations.tt2
@@ -89,6 +93,7 @@ root/static/images/to_children.png
 root/static/images/waiting.gif
 root/static/images/save.png
 root/static/images/padlock.png
+root/static/scripts/collapse.js
 root/static/scripts/format_for_csv.js
 root/static/scripts/main.js
 root/static/scripts/modify_on_view.js
@@ -137,8 +142,11 @@ t/80-app-run-stash.t
 t/80-app-run.t
 t/80-app-sample.t
 t/80-app.t
+t/client/run_js_tests.sh
 t/client/test.html
 t/client/test.js
+t/client/test_collapser.html
+t/client/test_collapser.js
 t/client/test_fixtures.js
 t/client/test_format_for_csv.html
 t/client/test_format_for_csv.js

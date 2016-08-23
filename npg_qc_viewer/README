@@ -7,13 +7,15 @@ Testing
   ./Build
   TEST_AUTHOR=1 ./Build test
 
-Headless javascript testing:
-  node-qunit-phantomjs t/client/test.html --verbose
-  node-qunit-phantomjs t/client/test_format_for_csv.html --verbose
-  node-qunit-phantomjs t/client/test_modify_on_view.html --verbose
-  node-qunit-phantomjs t/client/test_qc_outcomes_view.html --verbose
-  node-qunit-phantomjs t/client/test_qc_page.html --verbose
-  node-qunit-phantomjs t/client/test_qc_utils.html --verbose
+Using npm:
+  npm test
+
+Using grunt:
+  grunt -v
+  
+  or for testing by file name pattern match:
+
+  grunt test:<pattern>.html (e.g. `grunt test:*qc*.html`)
 
 In browser javascript testing - open files in a browser window:
   t/client/test.html
@@ -22,6 +24,7 @@ In browser javascript testing - open files in a browser window:
   t/client/test_qc_outcomes_view.html
   t/client/test_qc_page.html
   t/client/test_qc_utils.html
+  t/client/test_collapser.html
 
 Running your own development server
 -----------------------------------

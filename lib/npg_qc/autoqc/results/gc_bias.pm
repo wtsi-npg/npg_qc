@@ -1,18 +1,8 @@
-#########
-# Author:        John O'Brien
-# Created:       14 April 2009
-#
-
 package npg_qc::autoqc::results::gc_bias;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
-
 extends qw(npg_qc::autoqc::results::result);
-with qw(npg_qc::autoqc::role::gc_bias);
-
 
 our $VERSION = '0';
 
@@ -101,11 +91,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
+John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by John O'Brien
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

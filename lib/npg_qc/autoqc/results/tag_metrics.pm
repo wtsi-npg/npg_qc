@@ -1,15 +1,7 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       26 October 2011
-#
-
 package npg_qc::autoqc::results::tag_metrics;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
-use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::tag_metrics);
@@ -77,11 +69,9 @@ __END__
 
 =item namespace::autoclean
 
-=item Readonly
-
 =item npg_qc::autoqc::results::result
 
-=item npg_qc::autoqc::role::barcode_metrics
+=item npg_qc::autoqc::role::tag_metrics
 
 =back
 
@@ -91,11 +81,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

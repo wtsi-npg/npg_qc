@@ -1,17 +1,8 @@
-#########
-# Author:        John O'Brien
-# Created:       14 April 2009
-#
-
 package npg_qc::autoqc::role::ref_match;
 
-use strict;
-use warnings;
 use Moose::Role;
-
-with qw(npg_qc::autoqc::role::result);
-
 use Readonly;
+
 our $VERSION = '0';
 
 Readonly::Scalar my $PERCENT => 100;
@@ -86,10 +77,6 @@ reference.
 
 =item Readonly
 
-=item strict
-
-=item warnings
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -98,11 +85,11 @@ reference.
 
 =head1 AUTHOR
 
-Author: John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
+John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by John O'Brien
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

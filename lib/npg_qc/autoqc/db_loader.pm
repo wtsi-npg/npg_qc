@@ -147,8 +147,10 @@ sub _json2db{
         if ($class_name eq 'bam_flagstats') {
           $values = decode_json($obj->freeze());
         }
-        if ( $obj->can('composition') && $obj->can('composition_digest') ) {
-          $values->{'id_seq_composition'} = $self->_ensure_composition_exists($obj);
+        my $composition_key = 'id_seq_composition';
+        if ( $obj->can('composition') && $obj->can('composition_digest') &&
+             $self->schema->source($dbix_class_name)->has_column($composition_key) ) {
+          $values->{$composition_key} = $self->_ensure_composition_exists($obj);
         }
         # Load the main object
         $count = $self->_values2db($dbix_class_name, $values);
@@ -199,7 +201,7 @@ sub _ensure_composition_exists {
     my $component_rs   = $self->schema->resultset('SeqComponent');
     my $comcom_rs      = $self->schema->resultset('SeqComponentComposition');
 
-    foreach  my $c (@{$obj->composition->components}) {
+    foreach  my $c ($obj->composition->components_list()) {
       my $values = decode_json($c->freeze());
       $values->{'digest'} = $c->digest();
       my $row = $component_rs->find_or_create($values);
@@ -258,7 +260,7 @@ sub _exclude_nondb_attrs {
   foreach my $key ( keys %{$values} ) {
     if (none {$key eq $_} @columns) {
       delete $values->{$key};
-      if ($key ne $CLASS_FIELD) {
+      if ($key ne $CLASS_FIELD && $key ne 'composition') {
         $self->_log("Not loading field '$key'");
       }
     }
@@ -279,19 +281,30 @@ sub _pass_filter {
   if ( scalar @{$self->check} && none {$_ eq $class_name} @{$self->check}) {
     return 0;
   }
-  if ( exists $values->{'id_run'} ) {
-    if ( scalar @{$self->id_run} && none {$_ == $values->{'id_run'}} @{$self->id_run}) {
-      return 0;
-    }
-  }
-  if ( exists $values->{'position'} ) {
-    if ( scalar @{$self->lane} && none {$_ == $values->{'position'}} @{$self->lane}) {
-      return 0;
-    }
-  }
 
-  if ( exists $values->{'composition'} ) {
-    $self->_log('Filtering compositions is not implemented, will be loaded');
+  if (@{$self->id_run} || @{$self->lane}) {
+    my $id_run   = $values->{'id_run'};
+    my $position = $values->{'position'};
+    if ( !$id_run  && $values->{'composition'} ) {
+      my $composition = $values->{'composition'};
+      if (ref $composition eq 'npg_tracking::glossary::composition' &&
+          $composition->num_components == 1) {
+        my $component = $composition->get_component(0);
+        $id_run   = $component->id_run;
+        $position = $component->position;
+      }
+    }
+
+    if ( @{$self->id_run} && $id_run ) {
+      if ( none {$_ == $id_run} @{$self->id_run} ) {
+        return 0;
+      }
+    }
+    if ( @{$self->lane} && $position ) {
+      if ( none {$_ == $position} @{$self->lane} ) {
+        return 0;
+      }
+    }
   }
 
   return 1;
@@ -414,7 +427,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

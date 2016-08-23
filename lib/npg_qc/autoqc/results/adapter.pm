@@ -1,53 +1,28 @@
-#########
-# Author:        John O'Brien and Marina Gourtovaia
-# Created:       14 April 2009
-#
-
 package npg_qc::autoqc::results::adapter;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
-
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::adapter);
 
-
 our $VERSION = '0';
-
 
 has forward_read_filename           => ( is  => 'rw',
                                          isa => 'Maybe[Str]', );
-
-
 has reverse_read_filename           => ( is  => 'rw',
                                          isa => 'Maybe[Str]', );
-
-
 has forward_fasta_read_count        => ( is  => 'rw',
                                          isa => 'Int', );
-
-
 has forward_contaminated_read_count => ( is  => 'rw',
                                          isa => 'Int', );
-
-
 has forward_blat_hash               => ( is  => 'rw',
                                          isa => 'HashRef', );
-
-
 has reverse_fasta_read_count        => ( is  => 'rw',
                                          isa => 'Maybe[Int]', );
-
-
 has reverse_contaminated_read_count => ( is  => 'rw',
                                          isa => 'Maybe[Int]', );
-
-
 has reverse_blat_hash               => ( is  => 'rw',
                                          isa => 'Maybe[HashRef]', );
-
 has forward_start_counts            => ( is  => 'rw',
                                          isa => 'Maybe[HashRef]', );
 has reverse_start_counts            => ( is  => 'rw',
@@ -106,11 +81,12 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt> and John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by John O'Brien and Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 
