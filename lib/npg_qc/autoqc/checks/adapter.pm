@@ -4,8 +4,6 @@
 
 package npg_qc::autoqc::checks::adapter;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 use Carp;
@@ -409,7 +407,7 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by John O'Brien and Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

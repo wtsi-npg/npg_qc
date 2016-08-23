@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 42;
+use Test::More tests => 56;
 use Test::Exception;
 
 use_ok('npg_qc::autoqc::checks::tag_metrics');
@@ -9,11 +9,20 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
   my $check = npg_qc::autoqc::checks::tag_metrics->new(path => 't/data/autoqc/090721_IL29_2549/data', position =>1, id_run => 2549);
   isa_ok($check, 'npg_qc::autoqc::checks::tag_metrics');
   ok($check->can_run, 'can run the check on a lane');
+  $check = npg_qc::autoqc::checks::tag_metrics->new(path => 't/data/autoqc/090721_IL29_2549/data', rpt_list => '2549:1');
+  ok($check->can_run, 'can run the check on a lane');
+
+   $check = npg_qc::autoqc::checks::tag_metrics->new(path => 't/data/autoqc/090721_IL29_2549/data', rpt_list => '2549:1;2549:2');
+  ok(!$check->can_run, 'cannot run the check on two lanes');
 
   $check = npg_qc::autoqc::checks::tag_metrics->new(path => 't/data/autoqc/090721_IL29_2549/data', position =>1, id_run => 2549, tag_index => 1);
   ok(!$check->can_run, 'cannot run the check on a plex with tag index 1');
+  $check = npg_qc::autoqc::checks::tag_metrics->new(path => 't/data/autoqc/090721_IL29_2549/data', rpt_list => '2549:1:1');
+  ok(!$check->can_run, 'cannot run the check on a plex with tag index 1');
 
   $check = npg_qc::autoqc::checks::tag_metrics->new(path => 't/data/autoqc/090721_IL29_2549/data', position =>1, id_run => 2549, tag_index => 0);
+  ok(!$check->can_run, 'cannot run the check on a plex with tag index 0');
+  $check = npg_qc::autoqc::checks::tag_metrics->new(path => 't/data/autoqc/090721_IL29_2549/data', rpt_list => '2549:1:0');
   ok(!$check->can_run, 'cannot run the check on a plex with tag index 0');
 }
 
@@ -88,22 +97,26 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
 }
 
 {
-  my $check = npg_qc::autoqc::checks::tag_metrics->new(path      => 't/data/autoqc/tag_metrics',
-                                                       position  => 1,
-                                                       id_run    => 6551);
+  my @checks = ();
+  push @checks, npg_qc::autoqc::checks::tag_metrics->new(qc_in     => 't/data/autoqc/tag_metrics',
+                                                         position  => 1,
+                                                         id_run    => 6551);
+  push @checks, npg_qc::autoqc::checks::tag_metrics->new(qc_in     => 't/data/autoqc/tag_metrics',
+                                                         rpt_list  => '6551:1');
+  foreach my $check (@checks) {
+    is(scalar @{$check->input_files}, 1, 'one input file found');
+    is($check->input_files->[0], 't/data/autoqc/tag_metrics/6551_1.bam.tag_decode.metrics','input file name');
+    is($check->result->pass, undef, 'check outcome undefined');
+    lives_ok { $check->execute } 'executing is OK';
 
-  is(scalar @{$check->input_files}, 1, 'one input file found');
-  is($check->input_files->[0], 't/data/autoqc/tag_metrics/6551_1.bam.tag_decode.metrics','input file name');
-  is($check->result->pass, undef, 'check outcome undefined');
-  lives_ok { $check->execute } 'executing is OK';
-
-  my $r = $check->result;
-  is(join(q[ ], sort {$a <=> $b}  keys %{$r->tags}), '0 1 2 3 4 5 6 7 8 9 10 11 12 168', '14 barcodes parsed');
-  is($r->tags->{10}, 'TAGCTTGT', 'tag 10 sequence is correct');
-  is($r->tags->{0}, 'NNNNNNNN', 'tag zero sequence is correct');
-  is($r->matches_percent->{0}, 0.023683, 'matches percent  is correct');
-  is($r->spiked_control_index, 168, 'spiked control index is 168');
-  is($r->pass, 1, 'check passed');
+    my $r = $check->result;
+    is(join(q[ ], sort {$a <=> $b}  keys %{$r->tags}), '0 1 2 3 4 5 6 7 8 9 10 11 12 168', '14 barcodes parsed');
+    is($r->tags->{10}, 'TAGCTTGT', 'tag 10 sequence is correct');
+    is($r->tags->{0}, 'NNNNNNNN', 'tag zero sequence is correct');
+    is($r->matches_percent->{0}, 0.023683, 'matches percent  is correct');
+    is($r->spiked_control_index, 168, 'spiked control index is 168');
+    is($r->pass, 1, 'check passed');
+  }
 }
 
 1;

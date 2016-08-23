@@ -49,43 +49,6 @@ Readonly::Scalar our $DEFAULT_JAVA_XMX => q{-Xmx1000m};
 
 has '+file_type' => (default => $EXT,);
 
-##############################################################################
-# Input/output paths
-#  By default, the pipeline supplies the archive path under the Latest_Summary
-#  directory (the path attribute value is set via the qc_in value). This is
-#  used to lazy-build the input output paths below
-##############################################################################
-
-#############################################################
-# in_dir: lane_path and archive_qc_path are derived from this
-#############################################################
-has 'in_dir'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          lazy_build  => 1,
-                        );
-sub _build_in_dir {
-	my $self = shift;
-
-	my $ip = $self->path;
-
-	return $ip;
-}
-
-########################################
-# out_dir: cal_path is derived from this
-########################################
-has 'out_dir'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          lazy_build  => 1,
-                        );
-sub _build_out_dir {
-	my $self = shift;
-
-	my $op = $self->path;
-
-	return $op;
-}
-
 #####################################################################################################
 # Three paths used to locate input files and where to output auxiliary data:
 #    i) cal_path - where the metrics_output file will be written; derived from out_dir by default
@@ -101,16 +64,14 @@ sub _build_out_dir {
 #   the correct location.
 ##################################################################################################
 has 'cal_path'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          lazy_build  => 1,
-                        );
+                     is         => 'ro',
+                     lazy_build  => 1,
+                   );
 sub _build_cal_path {
-	my $self = shift;
-
-	my $rp = $self->out_dir;
-	$rp =~ s{/archive$}{}smx;
-
-	return $rp;
+  my $self = shift;
+  my $rp = $self->qc_in;
+  $rp =~ s{/archive$}{}smx;
+  return $rp;
 }
 
 ###########################################
@@ -118,18 +79,14 @@ sub _build_cal_path {
 #  Directory containing the tag#0 bam file.
 ###########################################
 has 'lane_path'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          lazy_build  => 1,
-                        );
+                      is         => 'ro',
+                      lazy_build  => 1,
+                    );
 sub _build_lane_path {
-	my $self = shift;
-
-	my $lp_root = $self->in_dir;
-	$lp_root =~ s{/archive$}{}smx;
-
-	my $lp = sprintf q[%s/lane%d/], $lp_root, $self->position;
-
-	return $lp;
+  my $self = shift;
+  my $lp_root = $self->qc_in;
+  $lp_root =~ s{/archive$}{}smx;
+  return sprintf q[%s/lane%d/], $lp_root, $self->position;
 }
 
 #########################################################################################
@@ -138,16 +95,14 @@ sub _build_lane_path {
 #   for the current run/lane.
 #########################################################################################
 has 'archive_qc_path'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          lazy_build  => 1,
-                        );
+                            is         => 'ro',
+                            lazy_build  => 1,
+                          );
 sub _build_archive_qc_path {
-	my $self = shift;
-
-	my $rp = $self->in_dir;
-	$rp .= q[/qc];
-
-	return $rp;
+  my $self = shift;
+  my $rp = $self->qc_in;
+  $rp .= q[/qc];
+  return $rp;
 }
 
 #########################################################################################
@@ -155,16 +110,13 @@ sub _build_archive_qc_path {
 #  directory containing tag_sets
 #########################################################################################
 has 'tag_sets_repository'  => ( isa        => 'Str',
-                              is         => 'ro',
-                              lazy_build  => 1,
-                            );
+                                is         => 'ro',
+                                lazy_build  => 1,
+                              );
 sub _build_tag_sets_repository {
-	my $self = shift;
-
-    my $rp = Moose::Meta::Class->create_anon_class(
-        roles => [qw/npg_tracking::data::reference::list/])->new_object()->tag_sets_repository;
-
-	return $rp;
+  return Moose::Meta::Class->create_anon_class(
+    roles => [qw/npg_tracking::data::reference::list/])
+    ->new_object()->tag_sets_repository;
 }
 
 ##############################################################################
@@ -177,166 +129,164 @@ has 'tag0_bam_file'  => ( isa        => 'Str',
                           lazy_build  => 1,
                         );
 sub _build_tag0_bam_file {
-	my $self = shift;
+  my $self = shift;
 
-	my $lane_path = $self->lane_path;
-	## no critic qw(ControlStructures::ProhibitUnlessBlocks)
-	unless($lane_path =~ m{/$}smx) {
-		$lane_path .= q[/];
-	}
-	## use critic
-	my $basefilename = sprintf q[%s_%s#0.bam], $self->id_run, $self->position;
+  my $lane_path = $self->lane_path;
+  ## no critic qw(ControlStructures::ProhibitUnlessBlocks)
+  unless($lane_path =~ m{/$}smx) {
+    $lane_path .= q[/];
+  }
+  ## use critic
+  my $basefilename = sprintf q[%s_%s#0.bam], $self->id_run, $self->position;
 
-	my $file = $lane_path . $basefilename;
+  my $file = $lane_path . $basefilename;
 
-	if(! -f $file) {
-		carp q[Looking in irods for bam file];
+  if(! -f $file) {
+    carp q[Looking in irods for bam file];
+    $file = sprintf q[irods:/seq/%s/%s], $self->id_run, $basefilename;
+  }
 
-		$file = sprintf q[irods:/seq/%s/%s], $self->id_run, $basefilename;
-	}
-
-	return $file;
+  return $file;
 }
 
 ###############################################################
 #  num_back_runs - how many previous runs should be reported on
 ###############################################################
-has 'num_back_runs' => ( isa => 'NpgTrackingNonNegativeInt',
-                         is => 'rw',
+has 'num_back_runs' => ( isa     => 'NpgTrackingNonNegativeInt',
+                         is      => 'rw',
                          default => $NUM_BACK_RUNS,
                        );
 
 ###############################################################
 #  max_mismatches: BamIndexDecoder parameter
 ###############################################################
-has 'max_mismatches' => ( isa => 'NpgTrackingNonNegativeInt',
-                         is => 'rw',
+has 'max_mismatches' => ( isa    => 'NpgTrackingNonNegativeInt',
+                         is      => 'rw',
                          default => $MAX_MISMATCHES_DEFAULT,
-                       );
+                        );
 
 ###############################################################
 #  max_no_calls: BamIndexDecoder parameter
 ###############################################################
-has 'max_no_calls' => ( isa => 'NpgTrackingNonNegativeInt',
-                         is => 'rw',
-                         default => $MAX_NO_CALLS_DEFAULT,
-                       );
+has 'max_no_calls' => ( isa     => 'NpgTrackingNonNegativeInt',
+                        is      => 'rw',
+                        default => $MAX_NO_CALLS_DEFAULT,
+                      );
 
 #########################################################
 #  total_tag0_reads - total read count for tag#0 bam file
 #########################################################
-has 'total_tag0_reads' => ( isa => 'NpgTrackingNonNegativeInt',
-			is => 'ro',
-			required   => 0,
-			lazy_build  => 1,
-                       );
+has 'total_tag0_reads' => ( isa        => 'NpgTrackingNonNegativeInt',
+                            is         => 'ro',
+                            required   => 0,
+                            lazy_build => 1,
+                          );
 sub _build_total_tag0_reads {
-	my $self = shift;
+  my $self = shift;
 
-	my $total_reads = 0;
-	for my $read_count (values %{$self->tag0_BamIndexDecoder_metrics->result->reads_pf_count}) {
-		$total_reads += $read_count;
-	}
+  my $total_reads = 0;
+  for my $read_count (values %{$self->tag0_BamIndexDecoder_metrics->result->reads_pf_count}) {
+    $total_reads += $read_count;
+  }
 
-	return $total_reads;
+  return $total_reads;
 }
 
 #######################################################################################
 #  total_tag0_perfect_matches_reads - total perfect match read count for tag#0 bam file
 #######################################################################################
-has 'total_tag0_perfect_matches_reads' => ( isa => 'NpgTrackingNonNegativeInt',
-			is => 'ro',
-			required   => 0,
-			lazy_build  => 1,
-                       );
+has 'total_tag0_perfect_matches_reads' => ( isa        => 'NpgTrackingNonNegativeInt',
+                                            is         => 'ro',
+                                            required   => 0,
+                                            lazy_build => 1,
+                                          );
 sub _build_total_tag0_perfect_matches_reads {
-	my $self = shift;
+  my $self = shift;
 
-	my $total_reads = 0;
-	my $phix_tag_indices = $self->_run_info_data->{runs_info}->[0]->{phix_tagidx};
-	my $pmc = $self->tag0_BamIndexDecoder_metrics->result->perfect_matches_pf_count;
-	for my $perfect_matches_tagidx (keys %{$self->tag0_BamIndexDecoder_metrics->result->perfect_matches_pf_count}) {
-		next if($phix_tag_indices->{$perfect_matches_tagidx});
-		$total_reads += $pmc->{$perfect_matches_tagidx};
-	}
+  my $total_reads = 0;
+  my $phix_tag_indices = $self->_run_info_data->{runs_info}->[0]->{phix_tagidx};
+  my $pmc = $self->tag0_BamIndexDecoder_metrics->result->perfect_matches_pf_count;
+  for my $perfect_matches_tagidx (keys %{$self->tag0_BamIndexDecoder_metrics->result->perfect_matches_pf_count}) {
+    next if($phix_tag_indices->{$perfect_matches_tagidx});
+    $total_reads += $pmc->{$perfect_matches_tagidx};
+  }
 
-	return $total_reads;
+  return $total_reads;
 }
 
 ##################################################################################
 # _tag_metrics_results - the results of the tag_metrics qc check for this run/lane
 ##################################################################################
-has '_tag_metrics_results' => (
-	isa => 'Object',
-	is => 'ro',
-	lazy_build => 1,
-);
+has '_tag_metrics_results' => ( isa        => 'Object',
+                                is         => 'ro',
+                                lazy_build => 1,
+                              );
 sub _build__tag_metrics_results {
-	my $self = shift;
+  my $self = shift;
 
-	######################################################################
-	# Accessing file system then using the database as a fallback reverses
-	# the order used by SeqQC, for example. Will this cause confusion? The
-	# reason for using this order is to be sure that a consistent set of
-	# data sources is used when a non-Latest_Summary path is specified by
-	# the caller
-	######################################################################
-	my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
-	my $aqp = $self->archive_qc_path;
-	my $c=$qcs->load_from_path($aqp);
-	my $tmr=$c->slice(q[class_name], q[tag_metrics]);
-	$tmr=$tmr->slice(q[position], $self->position);
+  ######################################################################
+  # Accessing file system then using the database as a fallback reverses
+  # the order used by SeqQC, for example. Will this cause confusion? The
+  # reason for using this order is to be sure that a consistent set of
+  # data sources is used when a non-Latest_Summary path is specified by
+  # the caller
+  ######################################################################
+  my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
+  my $aqp = $self->archive_qc_path;
+  my $c=$qcs->load_from_path($aqp);
+  my $tmr=$c->slice(q[class_name], q[tag_metrics]);
+  $tmr=$tmr->slice(q[position], $self->position);
 
-	if(!$tmr->results || (@{$tmr->results} == 0)) {
-		$c=$qcs->load_run($self->id_run, $self->db_lookup, [ $self->position ]);
-		$tmr=$c->slice(q[class_name], q[tag_metrics]);
-	}
+  if(!$tmr->results || (@{$tmr->results} == 0)) {
+    $c=$qcs->load_run($self->id_run, $self->db_lookup, [ $self->position ]);
+    $tmr=$c->slice(q[class_name], q[tag_metrics]);
+  }
 
-	return $tmr;
+  return $tmr;
 }
 
 ###################################################################
 # total_pm_lane_reads - total perfect match reads for this run/lane
 ###################################################################
-has 'total_pm_lane_reads' => ( isa => 'NpgTrackingNonNegativeInt',
-			is => 'ro',
-			required   => 0,
-			lazy_build  => 1,
-                       );
+has 'total_pm_lane_reads' => ( isa        => 'NpgTrackingNonNegativeInt',
+                               is         => 'ro',
+                               required   => 0,
+                               lazy_build => 1,
+                             );
 sub _build_total_pm_lane_reads {
-	my $self = shift;
+  my $self = shift;
 
-	my $tmr=$self->_tag_metrics_results;
+  my $tmr=$self->_tag_metrics_results;
 
-	my $tplr = 0;
-	my $pmcr = $tmr->results->[0]->perfect_matches_pf_count;  # this should work for all cases
-	for my $k (keys %{$pmcr}) {
-		$tplr += $pmcr->{$k};
-	}
+  my $tplr = 0;
+  my $pmcr = $tmr->results->[0]->perfect_matches_pf_count;  # this should work for all cases
+  for my $k (keys %{$pmcr}) {
+    $tplr += $pmcr->{$k};
+  }
 
-	return $tplr;
+  return $tplr;
 }
 
 ##############################################################
 # total_lane_reads - from tag_metrics result for this run/lane
 ##############################################################
-has 'total_lane_reads' => ( isa => 'NpgTrackingNonNegativeInt',
-			is => 'ro',
-			required   => 0,
-			lazy_build  => 1,
-                       );
+has 'total_lane_reads' => ( isa        => 'NpgTrackingNonNegativeInt',
+                            is         => 'ro',
+                            required   => 0,
+                            lazy_build => 1,
+                          );
 sub _build_total_lane_reads {
-	my $self = shift;
+  my $self = shift;
 
-	my $tmr=$self->_tag_metrics_results;
+  my $tmr=$self->_tag_metrics_results;
 
-	my $tlr = 0;
-	my $rcr = $tmr->results->[0]->reads_pf_count;  # this should work for all cases
-	for my $k (keys %{$rcr}) {
-		$tlr += $rcr->{$k};
-	}
+  my $tlr = 0;
+  my $rcr = $tmr->results->[0]->reads_pf_count;  # this should work for all cases
+  for my $k (keys %{$rcr}) {
+    $tlr += $rcr->{$k};
+  }
 
-	return $tlr;
+  return $tlr;
 }
 
 ###################################################################################################
@@ -345,33 +295,32 @@ sub _build_total_lane_reads {
 #  file is sorted/collated by read name, but it may fail the file is if most of the reads with a BC tag
 #  are unmapped and at the end of the bam file
 ###################################################################################################
-has 'tag0_index_length'    => (is         => 'ro',
-                              isa        => 'Maybe[Int]',
-                              lazy_build => 1,
-			);
-
+has 'tag0_index_length'    => ( is         => 'ro',
+                                isa        => 'Maybe[Int]',
+                                lazy_build => 1,
+                              );
 sub _build_tag0_index_length {
-    my $self = shift;
+  my $self = shift;
 
-    ## no critic (ProhibitTwoArgOpen ErrorHandling::RequireCheckingReturnValueOfEval
-    my $index_length = 0;
-    my $bfile = $self->tag0_bam_file;
-    my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools . qq[ view $bfile" ];
-    open my $ph, q(-|), $command or croak qq[Cannot fork '$command', error $ERRNO];
-    while (my $line = <$ph>) {
-        if($line =~ /\t(BC|RT):Z:(\S+)/smx) {
-            $index_length = length $2;
-            last;
-        }
+  ## no critic (ProhibitTwoArgOpen ErrorHandling::RequireCheckingReturnValueOfEval
+  my $index_length = 0;
+  my $bfile = $self->tag0_bam_file;
+  my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools . qq[ view $bfile" ];
+  open my $ph, q(-|), $command or croak qq[Cannot fork '$command', error $ERRNO];
+  while (my $line = <$ph>) {
+    if($line =~ /\t(BC|RT):Z:(\S+)/smx) {
+      $index_length = length $2;
+      last;
     }
-    eval { close $ph; };
-    #The exit status of the child is 141 from SIGPIPE or 1 if fail to write to stdout 
-    #and fail to close happens first - don't croak if we've set index_length
-    my $child_error = $CHILD_ERROR >> $SHIFT_EIGHT;
-    if ($child_error != 0 && $child_error != $SIG_PIPE_FATAL_ERROR && ! $index_length) {
-        croak qq[Error in pipe "$command": $child_error];
-    }
-    return $index_length;
+  }
+  eval { close $ph; };
+  #The exit status of the child is 141 from SIGPIPE or 1 if fail to write to stdout 
+  #and fail to close happens first - don't croak if we've set index_length
+  my $child_error = $CHILD_ERROR >> $SHIFT_EIGHT;
+  if ($child_error != 0 && $child_error != $SIG_PIPE_FATAL_ERROR && ! $index_length) {
+    croak qq[Error in pipe "$command": $child_error];
+  }
+  return $index_length;
 }
 
 ###################################################################################################
@@ -381,23 +330,23 @@ sub _build_tag0_index_length {
 #   optimistic.
 ###################################################################################################
 has 'barcode_filename'  => ( isa        => 'NpgTrackingReadableFile',
-                          is         => 'ro',
-                          required   => 0,
-                          lazy_build  => 1,
-                        );
+                             is         => 'ro',
+                             required   => 0,
+                             lazy_build => 1,
+                           );
 sub _build_barcode_filename {
-    my $self = shift;
-    my $filename = $BARCODE_FILENAME;
+  my $self = shift;
+  my $filename = $BARCODE_FILENAME;
 
-	my $tag0_index_length = $self->tag0_index_length;
+  my $tag0_index_length = $self->tag0_index_length;
 
-    ## no critic (ProhibitMagicNumbers)
-    if ( $tag0_index_length && $tag0_index_length =~ /^\d$/smx && $tag0_index_length >=5 && $tag0_index_length <=7) {
-      $filename = sprintf 'sanger168_%i.tags', $tag0_index_length;
-    }
-    ## use critic
+  ## no critic (ProhibitMagicNumbers)
+  if ( $tag0_index_length && $tag0_index_length =~ /^\d$/smx && $tag0_index_length >=5 && $tag0_index_length <=7) {
+    $filename = sprintf 'sanger168_%i.tags', $tag0_index_length;
+  }
+  ## use critic
 
-    return File::Spec->catfile($self->tag_sets_repository, $filename);
+  return File::Spec->catfile($self->tag_sets_repository, $filename);
 }
 
 ####################################################################
@@ -405,51 +354,48 @@ sub _build_barcode_filename {
 #  in the qc_in directory (usually recalibrated_path for this check)
 ####################################################################
 has 'metrics_output_file'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          required   => 0,
-                          lazy_build  => 1,
-                        );
+                                is         => 'ro',
+                                required   => 0,
+                                lazy_build => 1,
+                              );
 sub _build_metrics_output_file {
-    my $self = shift;
+  my $self = shift;
 
-    my $filename = sprintf q[%s/%d_%d#0_tagfile.metrics], $self->cal_path, $self->id_run, $self->position;
+  my $filename = sprintf q[%s/%d_%d#0_tagfile.metrics], $self->cal_path, $self->id_run, $self->position;
 
-    return $filename;
+  return $filename;
 }
 
 #####################################################################
 # min_percent_match - threshold for reporting unexpected_tags results
 #####################################################################
-has 'min_match_percent' => ( isa => 'Num',
-                         is => 'ro',
-                         default => $MIN_MATCH_PERCENT,
-                       );
+has 'min_match_percent' => ( isa     => 'Num',
+                             is      => 'ro',
+                             default => $MIN_MATCH_PERCENT,
+                           );
 
 #####################################################################
 # db_lookup (default: 1) - passed to qc_store; determines if database
 #  lookup is done or only staging area
 #####################################################################
-has 'db_lookup' => ( isa => 'Bool',
-                     is => 'ro',
+has 'db_lookup' => ( isa     => 'Bool',
+                     is      => 'ro',
                      default => 1,
-);
+                   );
 
-has 'bid_jar_path' => (
-        is      => 'ro',
-        isa     => 'NpgCommonResolvedPathJarFile',
-        coerce  => 1,
-        default => $BID_JAR_NAME,
-);
+has 'bid_jar_path' => ( is      => 'ro',
+                        isa     => 'NpgCommonResolvedPathJarFile',
+                        coerce  => 1,
+                        default => $BID_JAR_NAME,
+                      );
 
-has 'run_rows' => (
-	isa => 'ArrayRef',
-	is => 'ro',
-	lazy_build => 1,
-);
+has 'run_rows' => ( isa        => 'ArrayRef',
+                    is         => 'ro',
+                    lazy_build => 1,
+                  );
 sub _build_run_rows {
-	my ($self) = @_;
-
-	return _fetch_run_rows($self->id_run);
+  my ($self) = @_;
+  return _fetch_run_rows($self->id_run);
 }
 
 #########################################################################################################
@@ -458,235 +404,227 @@ sub _build_run_rows {
 #      set up to map from tag sequences to id_runs
 #    runs_info - array whose entries contain tag set information for this and upstream runs
 #########################################################################################################
-has '_run_info_data' => (
-	isa => 'HashRef',
-	is => 'ro',
-	lazy_build => 1,
-);
+has '_run_info_data' => ( isa        => 'HashRef',
+                          is         => 'ro',
+                          lazy_build => 1,
+                         );
 sub _build__run_info_data {
-	my ($self) = @_;
+  my ($self) = @_;
 
-        # fetch initial runs history for intrument from tracking db
-        my $run_rows = $self->run_rows;
+  # fetch initial runs history for intrument from tracking db
+  my $run_rows = $self->run_rows;
 
-	my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
-	my $run_lanes = { (map { $_->[$ID_RUN_POS] => [ $self->position ] } @{$run_rows}) };
-	my $c=$qcs->load_lanes($run_lanes, 1, );
-	my $rl_tag_metrics=$c->slice(q[class_name], q[tag_metrics]);
-	my $rl_tag_metrics_results=$rl_tag_metrics->results;
+  my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
+  my $run_lanes = { (map { $_->[$ID_RUN_POS] => [ $self->position ] } @{$run_rows}) };
+  my $c=$qcs->load_lanes($run_lanes, 1, );
+  my $rl_tag_metrics=$c->slice(q[class_name], q[tag_metrics]);
+  my $rl_tag_metrics_results=$rl_tag_metrics->results;
 
-	my $lane = $self->position;
-	my $num_back_runs = $self->num_back_runs;
-	my $rid = _additional_run_info($lane, $run_rows, $rl_tag_metrics_results, $num_back_runs);
+  my $lane = $self->position;
+  my $num_back_runs = $self->num_back_runs;
+  my $rid = _additional_run_info($lane, $run_rows, $rl_tag_metrics_results, $num_back_runs);
 
-	return $rid;
+  return $rid;
 }
 
 has 'java_xmx_flag'   => ( is      => 'ro',
-                         isa     => 'Str',
-                         default => $DEFAULT_JAVA_XMX,
-                       );
+                           isa     => 'Str',
+                           default => $DEFAULT_JAVA_XMX,
+                         );
 
 has 'maskflags_name'   => ( is      => 'ro',
-                         isa     => 'NpgCommonResolvedPathExecutable',
-                         coerce  => 1,
-                         default => 'bammaskflags',
-                       );
+                            isa     => 'NpgCommonResolvedPathExecutable',
+                            coerce  => 1,
+                            default => 'bammaskflags',
+                          );
 
-has 'maskflags_cmd'   => ( is      => 'ro',
-                         isa     => 'Str',
-                         lazy_build  => 1,
-                       );
+has 'maskflags_cmd'   => ( is         => 'ro',
+                           isa        => 'Str',
+                           lazy_build => 1,
+                         );
 sub _build_maskflags_cmd {
-	my $self = shift;
-
-	return $self->maskflags_name . q[ maskneg=107];
+  my $self = shift;
+  return $self->maskflags_name . q[ maskneg=107];
 }
 
 ## no critic qw(NamingConventions::Capitalization NamingConventions::ProhibitMixedCaseSubs)
 has 'BamIndexDecoder_cmd'  => ( isa        => 'Str',
-                          is         => 'ro',
-                          required   => 0,
-                          lazy_build  => 1,
-                        );
+                                is         => 'ro',
+                                required   => 0,
+                                lazy_build => 1,
+                              );
 sub _build_BamIndexDecoder_cmd {
-	my $self = shift;
+  my $self = shift;
 
-        my $bid_cmd_template = q[java %s -jar %s COMPRESSION_LEVEL=0 INPUT=%s OUTPUT=/dev/null BARCODE_FILE=%s METRICS_FILE=%s MAX_MISMATCHES=%d MAX_NO_CALLS=%d VALIDATION_STRINGENCY=LENIENT];
+  my $bid_cmd_template = q[java %s -jar %s COMPRESSION_LEVEL=0 INPUT=%s OUTPUT=/dev/null BARCODE_FILE=%s METRICS_FILE=%s MAX_MISMATCHES=%d MAX_NO_CALLS=%d VALIDATION_STRINGENCY=LENIENT];
 
-        my $bid_cmd = sprintf $bid_cmd_template,
-		$self->java_xmx_flag,
-		$self->bid_jar_path,
-		$self->tag0_bam_file,
-		$self->barcode_filename,
-		$self->metrics_output_file,
-		$self->max_mismatches,
-		$self->max_no_calls;
+  my $bid_cmd = sprintf $bid_cmd_template,
+  $self->java_xmx_flag,
+  $self->bid_jar_path,
+  $self->tag0_bam_file,
+  $self->barcode_filename,
+  $self->metrics_output_file,
+  $self->max_mismatches,
+  $self->max_no_calls;
 
-        $bid_cmd .= q[ > /dev/null 2>&1]; # all useful output goes to metrics_file
+  $bid_cmd .= q[ > /dev/null 2>&1]; # all useful output goes to metrics_file
 
-	return $bid_cmd;
+  return $bid_cmd;
 }
 
 ##################################################################################
 # tag0_BamIndexDecoder_metrics: tag metrics check object - created with the output
 #  from a BamIndexDecoder run on the tag#0 bam file
 ##################################################################################
-has 'tag0_BamIndexDecoder_metrics' => (
-	isa => 'Object',
-	is => 'ro',
-	lazy_build => 1,
-);
+has 'tag0_BamIndexDecoder_metrics' => ( isa        => 'Object',
+                                        is         => 'ro',
+                                        lazy_build => 1,
+                                      );
 sub _build_tag0_BamIndexDecoder_metrics {
-	my ($self) = @_;
+  my ($self) = @_;
 
-	my $bid_cmd = $self->BamIndexDecoder_cmd;
+  my $bid_cmd = $self->BamIndexDecoder_cmd;
 
-        system($bid_cmd) == 0 or croak qq[Failed to execute BamIndexDecoder command: $bid_cmd];
+  system($bid_cmd) == 0 or croak qq[Failed to execute BamIndexDecoder command: $bid_cmd];
 
-        #############################################################
-        # Read BamIndexDecoder output into a tag_metrics check object
-        #  for easier manipulation of values
-        #############################################################
-        my $tmc=npg_qc::autoqc::checks::tag_metrics->new(id_run => $self->id_run, position => $self->position, input_files => [ $self->metrics_output_file ], path => q{.});
-        $tmc->execute;    # parse input_file
+  #############################################################
+  # Read BamIndexDecoder output into a tag_metrics check object
+  #  for easier manipulation of values
+  #############################################################
+  my $tmc=npg_qc::autoqc::checks::tag_metrics->new(
+    id_run => $self->id_run,
+    position => $self->position,
+    input_files => [ $self->metrics_output_file ], path => q{.});
+  $tmc->execute;    # parse input_file
 
-        return $tmc;
+  return $tmc;
 }
 ## use critic
 
 #############################################################################################
 # _tmc_tag_indexes: maps tag sequences to tag indices for tag set used in BamIndexDecoder run
 #############################################################################################
-has '_tmc_tag_indexes' => (
-	isa => 'HashRef',
-	is => 'ro',
-	lazy_build => 1,
-);
+has '_tmc_tag_indexes' => ( isa        => 'HashRef',
+                            is         => 'ro',
+                            lazy_build => 1,
+                          );
 sub _build__tmc_tag_indexes {
-	my ($self) = @_;
-
-	return { reverse %{$self->tag0_BamIndexDecoder_metrics->result->tags} };  # tag_seq -> tag_idx map for sanger168 tag set
+  my ($self) = @_;
+  # tag_seq -> tag_idx map for sanger168 tag set
+  return { reverse %{$self->tag0_BamIndexDecoder_metrics->result->tags} };
 }
 
 ## no critic qw(BuiltinFunctions::ProhibitReverseSortBlock)
 #############################################################################################################
 # unexpected_tags - tags seen in tag#0 bam file which do not appear in the tag set specified for the run/lane
 #############################################################################################################
-has 'unexpected_tags' => (
-	isa => 'ArrayRef',
-	is => 'ro',
-	lazy_build => 1,
-);
+has 'unexpected_tags' => ( isa        => 'ArrayRef',
+                           is         => 'ro',
+                           lazy_build => 1,
+                         );
 sub _build_unexpected_tags {
-	my ($self) = @_;
+  my ($self) = @_;
 
-	my @ret = ();
-	my $bid_metrics = $self->tag0_BamIndexDecoder_metrics;
-	my $tti = $self->_tmc_tag_indexes;
+  my @ret = ();
+  my $bid_metrics = $self->tag0_BamIndexDecoder_metrics;
+  my $tti = $self->_tmc_tag_indexes;
 
-	my $tag_seq_runs = $self->_run_info_data->{tag_seq_runs};
-	for my $tag_seq (sort { $bid_metrics->result->perfect_matches_pf_count->{$tti->{$b}}  <=> $bid_metrics->result->perfect_matches_pf_count->{$tti->{$a}}; } (grep { !/NNNNN/sm && defined $tti->{$_} && $bid_metrics->result->matches_percent->{$tti->{$_}} >= $self->min_match_percent} (values %{$bid_metrics->result->tags}))) {
-		my $id_run = ($tag_seq_runs->{$tag_seq}->{id_run}? $tag_seq_runs->{$tag_seq}->{id_run}: q[]);
-		my $tag_idx = ($id_run? $tag_seq_runs->{$tag_seq}->{tag_idx}: $tti->{$tag_seq});
-		my $pmc = $bid_metrics->result->perfect_matches_pf_count->{$tti->{$tag_seq}};
-		my $omm = $bid_metrics->result->one_mismatch_matches_count->{$tti->{$tag_seq}};
+  my $tag_seq_runs = $self->_run_info_data->{tag_seq_runs};
+  for my $tag_seq (sort { $bid_metrics->result->perfect_matches_pf_count->{$tti->{$b}}  <=> $bid_metrics->result->perfect_matches_pf_count->{$tti->{$a}}; } (grep { !/NNNNN/sm && defined $tti->{$_} && $bid_metrics->result->matches_percent->{$tti->{$_}} >= $self->min_match_percent} (values %{$bid_metrics->result->tags}))) {
+    my $id_run = ($tag_seq_runs->{$tag_seq}->{id_run}? $tag_seq_runs->{$tag_seq}->{id_run}: q[]);
+    my $tag_idx = ($id_run? $tag_seq_runs->{$tag_seq}->{tag_idx}: $tti->{$tag_seq});
+    my $pmc = $bid_metrics->result->perfect_matches_pf_count->{$tti->{$tag_seq}};
+    my $omm = $bid_metrics->result->one_mismatch_matches_count->{$tti->{$tag_seq}};
 
-		my $entry = { tag_sequence => $tag_seq, id_run => $id_run, tag_index => $tag_idx, perfect_match_count => $pmc, one_mismatch_matches => $omm, };
+    my $entry = { tag_sequence => $tag_seq, id_run => $id_run, tag_index => $tag_idx, perfect_match_count => $pmc, one_mismatch_matches => $omm, };
 
-		push @ret, $entry;
-	}
+    push @ret, $entry;
+  }
 
-	return \@ret;
+  return \@ret;
 }
 ## use critic
 
 ##################################################################################
 # prev_runs - runs which were done before this run on the same instrument and slot
 ##################################################################################
-has 'prev_runs' => (
-	isa => 'ArrayRef',
-	is => 'ro',
-	lazy_build => 1,
-);
+has 'prev_runs' => ( isa => 'ArrayRef',
+                     is => 'ro',
+                     lazy_build => 1,
+                   );
 sub _build_prev_runs {
-	my ($self) = @_;
+  my ($self) = @_;
 
-	my @ret = ();
-	my $run_info_list = $self->_run_info_data->{runs_info};
-	my $tag_seq_runs = $self->_run_info_data->{tag_seq_runs};
+  my @ret = ();
+  my $run_info_list = $self->_run_info_data->{runs_info};
+  my $tag_seq_runs = $self->_run_info_data->{tag_seq_runs};
 
-	for my $i (0..($self->num_back_runs - 1)) {
-		my $tti = $self->_tmc_tag_indexes;
-		push @ret, _generate_run_info_row($run_info_list->[$i], $self->position, $self->tag0_BamIndexDecoder_metrics, $tti);
-	}
+  for my $i (0..($self->num_back_runs - 1)) {
+    my $tti = $self->_tmc_tag_indexes;
+    push @ret, _generate_run_info_row($run_info_list->[$i], $self->position, $self->tag0_BamIndexDecoder_metrics, $tti);
+  }
 
-	return \@ret;
+  return \@ret;
 }
 
 ########################################################################################
 # you can override the executable name. May be useful for variants like "samtools_irods"
 ########################################################################################
-has 'samtools_name' => (
-	is => 'ro',
-	isa => 'Str',
-	default => $SAMTOOLS_NAME,
-);
+has 'samtools_name' => ( is      => 'ro',
+                         isa     => 'Str',
+                         default => $SAMTOOLS_NAME,
+                       );
 
-has 'samtools' => (
-	is => 'ro',
-	isa => 'NpgCommonResolvedPathExecutable',
-	lazy_build => 1,
-	coerce => 1,
-);
+has 'samtools' => ( is         => 'ro',
+                    isa        => 'NpgCommonResolvedPathExecutable',
+                    lazy_build => 1,
+                    coerce     => 1,
+                  );
 sub _build_samtools {
-	my ($self) = @_;
-	return $self->samtools_name;
+  my ($self) = @_;
+  return $self->samtools_name;
 }
 
 override 'can_run' => sub {
-	my $self = shift;
+  my $self = shift;
 
-	if(defined $self->tag_index) {
-		return 0;
-	}
+  if (!$self->id_run || !$self->position) {
+    $self->result->add_comment('Run id and position should be defined');
+    return 0;
+  }
 
-	if(!$self->lims->is_pool) {
-		return 0;
-	}
+  if(defined $self->tag_index) {
+    $self->result->add_comment('Tag index cannot be defined');
+    return 0;
+  }
 
-	return 1;
+  if(!$self->lims->is_pool) {
+    $self->result->add_comment('Lane is not a pool');
+    return 0;
+  }
+
+  return 1;
 };
 
 override 'execute' => sub {
-	my ($self) = @_;
+  my ($self) = @_;
 
-#	return 1 if super() == 0;
+  if(!$self->can_run()) {
+    return 1;
+  }
 
-	if(!$self->can_run()) {
-		return 1;
-	}
+  my $ri = $self->_run_info_data->{runs_info}->[0];
+  $self->result->barcode_file($self->barcode_filename);
+  $self->result->instrument_name($ri->{instrument_name});
+  $self->result->instrument_slot($ri->{slot});
+  $self->result->total_lane_reads($self->total_lane_reads);
+  $self->result->perfect_match_lane_reads($self->total_pm_lane_reads);
+  $self->result->total_tag0_reads($self->total_tag0_reads);
+  $self->result->tag0_perfect_match_reads($self->total_tag0_perfect_matches_reads);
+  $self->result->prev_runs($self->prev_runs);
+  $self->result->unexpected_tags($self->unexpected_tags);
 
-	if(! -d $self->in_dir) {
-		carp q[Warning: input directory "], $self->in_dir, q[" not found; iRODS, qcdb and possibly Latest_Summary will be used as input sources];
-	}
-
-	my $ri = $self->_run_info_data->{runs_info}->[0];
-	$self->result->barcode_file($self->barcode_filename);
-	$self->result->instrument_name($ri->{instrument_name});
-	$self->result->instrument_slot($ri->{slot});
-#	$self->result->run_in_progress_date($ri->{status_date});
-	$self->result->total_lane_reads($self->total_lane_reads);
-	$self->result->perfect_match_lane_reads($self->total_pm_lane_reads);
-	$self->result->total_tag0_reads($self->total_tag0_reads);
-	$self->result->tag0_perfect_match_reads($self->total_tag0_perfect_matches_reads);
-#	$self->result->pass = 1;  # no pass/fail criterion yet, so leave undef
-
-	$self->result->prev_runs($self->prev_runs);
-
-	$self->result->unexpected_tags($self->unexpected_tags);
-
-	return 1;
+  return 1;
 };
 
 ################
@@ -694,57 +632,57 @@ override 'execute' => sub {
 ################
 
 sub _fetch_run_rows {
-	my ($id_run) = @_;
+  my ($id_run) = @_;
 
-        ###############
-        # Connect to db
-        ###############
-        my $config_file = "$ENV{HOME}/.npg/npg_tracking-Schema";
-        my $db_config = Config::Auto::parse($config_file);
-        my $dbh;
-        eval {
-                Readonly::Scalar my $DB_CONNECT_TIMEOUT => 30;
-                local $SIG{ALRM} = sub { croak "database connection timed out\n" };
-                alarm $DB_CONNECT_TIMEOUT;
-                $dbh = DBI->connect($db_config->{live_ro}->{dsn}, $db_config->{live_ro}->{dbuser}) or croak q[Couldn't connect to database: ] . DBI->errstr;
-                alarm 0;
-        } or croak "Timeout connecting to database $db_config->{live_ro}->{dsn} as user $db_config->{live_ro}->{dbuser}\n";
+  ###############
+  # Connect to db
+  ###############
+  my $config_file = "$ENV{HOME}/.npg/npg_tracking-Schema";
+  my $db_config = Config::Auto::parse($config_file);
+  my $dbh;
+  eval {
+    Readonly::Scalar my $DB_CONNECT_TIMEOUT => 30;
+    local $SIG{ALRM} = sub { croak "database connection timed out\n" };
+    alarm $DB_CONNECT_TIMEOUT;
+    $dbh = DBI->connect($db_config->{live_ro}->{dsn}, $db_config->{live_ro}->{dbuser}) or croak q[Couldn't connect to database: ] . DBI->errstr;
+    alarm 0;
+  } or croak "Timeout connecting to database $db_config->{live_ro}->{dsn} as user $db_config->{live_ro}->{dbuser}\n";
 
-        ###################
-        # Prepare statement
-        ###################
-	## no critic qw(NamingConventions::ProhibitMixedCaseVars NamingConventions::Capitalization)
-        my $getInstrumentRunHistory_sth = $dbh->prepare(
-                qq[select
-                        r.id_run,
-                        rs.date,
-                        i.id_instrument,
-                        i.name,
-                        if(tr.id_tag=22, 'A', IF(tr.id_tag=23, 'B', 'X')) as slot
-                from
-                        (run r left outer join tag_run tr on r.id_run = tr.id_run and tr.id_tag in (22,23)),
-                        instrument i,
-                        run_status rs
-                where
-                        r.id_instrument = i.id_instrument
-                        and r.id_run = rs.id_run
-                        and rs.id_run_status_dict = 4
-                        and i.id_instrument = (select id_instrument from run where id_run = ?)
-                        and rs.date <= (select max(date) from run_status where id_run = ? and id_run_status_dict in (2,3,4))
-                        and if(tr.id_tag=22, 'A', IF(tr.id_tag=23, 'B', 'X')) = (select if(id_tag=22, 'A', IF(id_tag=23, 'B', 'X')) from (run rx left outer join tag_run trx on rx.id_run = trx.id_run and trx.id_tag in (22,23)) where rx.id_run = ? and (trx.id_tag in (22,23) or trx.id_tag is null))
-                order by
-                        rs.date desc limit $MAX_RUNS]
-        ) or croak q[Couldn't prepare statement: ] . $dbh->errstr;
+  ###################
+  # Prepare statement
+  ###################
+  ## no critic qw(NamingConventions::ProhibitMixedCaseVars NamingConventions::Capitalization)
+  my $getInstrumentRunHistory_sth = $dbh->prepare(
+    qq[select
+      r.id_run,
+      rs.date,
+      i.id_instrument,
+      i.name,
+      if(tr.id_tag=22, 'A', IF(tr.id_tag=23, 'B', 'X')) as slot
+    from
+      (run r left outer join tag_run tr on r.id_run = tr.id_run and tr.id_tag in (22,23)),
+      instrument i,
+      run_status rs
+    where
+      r.id_instrument = i.id_instrument
+      and r.id_run = rs.id_run
+      and rs.id_run_status_dict = 4
+      and i.id_instrument = (select id_instrument from run where id_run = ?)
+      and rs.date <= (select max(date) from run_status where id_run = ? and id_run_status_dict in (2,3,4))
+      and if(tr.id_tag=22, 'A', IF(tr.id_tag=23, 'B', 'X')) = (select if(id_tag=22, 'A', IF(id_tag=23, 'B', 'X')) from (run rx left outer join tag_run trx on rx.id_run = trx.id_run and trx.id_tag in (22,23)) where rx.id_run = ? and (trx.id_tag in (22,23) or trx.id_tag is null))
+    order by
+      rs.date desc limit $MAX_RUNS]
+  ) or croak q[Couldn't prepare statement: ] . $dbh->errstr;
 
-	## use critic
+  ## use critic
 
-        ############
-        # fetch data
-        ############
-        $getInstrumentRunHistory_sth->execute($id_run, $id_run, $id_run) or croak $getInstrumentRunHistory_sth->errstr;
-        my $rows = $getInstrumentRunHistory_sth->fetchall_arrayref;
+  ############
+  # fetch data
+  ############
+  $getInstrumentRunHistory_sth->execute($id_run, $id_run, $id_run) or croak $getInstrumentRunHistory_sth->errstr;
+  my $rows = $getInstrumentRunHistory_sth->fetchall_arrayref;
 
-        return $rows;
+  return $rows;
 }
 
 ######################################################################################################
@@ -753,90 +691,90 @@ sub _fetch_run_rows {
 #       upstream runs. 
 ######################################################################################################
 sub _additional_run_info {
-	my ($lane, $run_rows, $tmr_results, $num_back_runs) = @_;
+  my ($lane, $run_rows, $tmr_results, $num_back_runs) = @_;
 
-        my %tsr;        # tag sequence runs (where tags are first seen)
+  my %tsr;        # tag sequence runs (where tags are first seen)
 
-        my $downstream_tags;
-        $downstream_tags->{master_len} = 0;
-        $downstream_tags->{bucket} = [];
+  my $downstream_tags;
+  $downstream_tags->{master_len} = 0;
+  $downstream_tags->{bucket} = [];
 
-        my @ri = ();
-        my $num_results = @{$run_rows};
-        if($num_results < $num_back_runs) { $num_back_runs = $num_results; }
+  my @ri = ();
+  my $num_results = @{$run_rows};
+  if($num_results < $num_back_runs) { $num_back_runs = $num_results; }
 
-        for my $i (0..($num_back_runs - 1)) {
-		my $run_info = {};
+  for my $i (0..($num_back_runs - 1)) {
+    my $run_info = {};
 
-		# Record run-level info
-		my $row = $run_rows->[$i];
-		my $id_run = $run_info->{id_run} = $row->[$ID_RUN_POS];
-		$run_info->{status_date} = $row->[$STATUS_DATE_POS];
-		$run_info->{id_instrument} = $row->[$ID_INSTRUMENT_POS];   # ??
-		$run_info->{instrument_name} = $row->[$INSTRUMENT_NAME_POS];  # ?? Yes, appears in results
-		$run_info->{slot} = $row->[$SLOT_POS];  # ?? Yes, appears in results
-		$run_info->{no_tag_metrics_results} = 0;
+    # Record run-level info
+    my $row = $run_rows->[$i];
+    my $id_run = $run_info->{id_run} = $row->[$ID_RUN_POS];
+    $run_info->{status_date} = $row->[$STATUS_DATE_POS];
+    $run_info->{id_instrument} = $row->[$ID_INSTRUMENT_POS];   # ??
+    $run_info->{instrument_name} = $row->[$INSTRUMENT_NAME_POS];  # ?? Yes, appears in results
+    $run_info->{slot} = $row->[$SLOT_POS];  # ?? Yes, appears in results
+    $run_info->{no_tag_metrics_results} = 0;
 
-		# note assumption of unique entry for a given id_run
-		my $tmr_run_info = (grep { $_->id_run == $id_run; } (@{$tmr_results}))[0];
+    # note assumption of unique entry for a given id_run
+    my $tmr_run_info = (grep { $_->id_run == $id_run; } (@{$tmr_results}))[0];
 
-		if($tmr_run_info) {
-			my $tags_info = $tmr_run_info->tags;
+    if($tmr_run_info) {
+      my $tags_info = $tmr_run_info->tags;
 
-			while(my ($tag_index, $tag_sequence) = each %{$tags_info}) {
+      while(my ($tag_index, $tag_sequence) = each %{$tags_info}) {
 
-				if($tag_index == 0) {  # Ns
-					next;
-				}
-
-				###################################################################################################
-				# save the phix sequence to allow detection of phiX reads when handling data from tag_metrics check
-				###################################################################################################
-				if($tmr_run_info->spiked_control_index and $tag_index == $tmr_run_info->spiked_control_index) {
-					$run_info->{phix_tagidx}->{$tag_index} = 1;
-					$run_info->{phix_tagseq}->{$tag_sequence} = 1;
-					next;
-				}
-
-				my $tag_len = length $tag_sequence;
-				$run_info->{lengths}->{$tag_len}++; # allows determination of length of tag in this lane, and a check for inconsistencies
-				$run_info->{tags}->{$tag_index}->{tag_sequence} = $tag_sequence;
-				$run_info->{tags}->{$tag_index}->{appears_downstream} = 0;
-
-				# if necessary, adjust length of tag for comparison with master run
-				my $cmp_tag_seq = $tag_sequence;
-				if($downstream_tags->{master_len}) {
-					if($tag_len > $downstream_tags->{master_len}) {
-						$cmp_tag_seq = substr $tag_sequence, 0, $downstream_tags->{master_len};
-					}
-				}
-				else {
-					$downstream_tags->{master_len} = $tag_len;
-				}
-
-				# now check to see if the tag appeared in a downstream run
-				if(any { /^$cmp_tag_seq/smx } @{$downstream_tags->{bucket}}) {
-					$run_info->{tags}->{$tag_index}->{appears_downstream} = 1;
-				}
-				else {
-					push @{$downstream_tags->{bucket}}, $tag_sequence;     # note: actual tag sequence, with unadjusted length
-					$tsr{$tag_sequence}->{id_run} = $id_run;
-					$tsr{$tag_sequence}->{tag_idx} = $tag_index;
-				}
-			}
-		}
-		else {
-			$run_info->{no_tag_metrics_results} = 1;
-		}
-
-		push @ri, $run_info;
+        if($tag_index == 0) {  # Ns
+          next;
         }
 
-	my $rid;
-	$rid->{runs_info} = \@ri;
-	$rid->{tag_seq_runs} = \%tsr;
+        ###################################################################################################
+        # save the phix sequence to allow detection of phiX reads when handling data from tag_metrics check
+        ###################################################################################################
+        if($tmr_run_info->spiked_control_index and $tag_index == $tmr_run_info->spiked_control_index) {
+          $run_info->{phix_tagidx}->{$tag_index} = 1;
+          $run_info->{phix_tagseq}->{$tag_sequence} = 1;
+          next;
+        }
 
-	return $rid;
+        my $tag_len = length $tag_sequence;
+        $run_info->{lengths}->{$tag_len}++; # allows determination of length of tag in this lane, and a check for inconsistencies
+        $run_info->{tags}->{$tag_index}->{tag_sequence} = $tag_sequence;
+        $run_info->{tags}->{$tag_index}->{appears_downstream} = 0;
+
+        # if necessary, adjust length of tag for comparison with master run
+        my $cmp_tag_seq = $tag_sequence;
+        if($downstream_tags->{master_len}) {
+          if($tag_len > $downstream_tags->{master_len}) {
+            $cmp_tag_seq = substr $tag_sequence, 0, $downstream_tags->{master_len};
+          }
+        }
+        else {
+          $downstream_tags->{master_len} = $tag_len;
+        }
+
+        # now check to see if the tag appeared in a downstream run
+        if(any { /^$cmp_tag_seq/smx } @{$downstream_tags->{bucket}}) {
+          $run_info->{tags}->{$tag_index}->{appears_downstream} = 1;
+        }
+        else {
+          push @{$downstream_tags->{bucket}}, $tag_sequence;     # note: actual tag sequence, with unadjusted length
+          $tsr{$tag_sequence}->{id_run} = $id_run;
+          $tsr{$tag_sequence}->{tag_idx} = $tag_index;
+        }
+      }
+    }
+    else {
+      $run_info->{no_tag_metrics_results} = 1;
+    }
+
+    push @ri, $run_info;
+  }
+
+  my $rid;
+  $rid->{runs_info} = \@ri;
+  $rid->{tag_seq_runs} = \%tsr;
+
+  return $rid;
 }
 
 #######################################################################################################
@@ -844,41 +782,41 @@ sub _additional_run_info {
 #       fetch tag information for run the row. Check on which different tags were used in upstream runs
 #######################################################################################################
 sub _generate_run_info_row {
-         my ($run_info, $lane, $tag_metrics_data, $tti) = @_;
+  my ($run_info, $lane, $tag_metrics_data, $tti) = @_;
 
-	my $ret = {};
+  my $ret = {};
 
-	$ret->{id_run} = $run_info->{id_run};
-	$ret->{run_in_progress_date} = $run_info->{status_date};
+  $ret->{id_run} = $run_info->{id_run};
+  $ret->{run_in_progress_date} = $run_info->{status_date};
 
-	if($run_info->{no_tag_metrics_results}) {
-		$ret->{is_a_pool} = q[N];
-		return $ret;
-	}
+  if($run_info->{no_tag_metrics_results}) {
+    $ret->{is_a_pool} = q[N];
+    return $ret;
+  }
 
-	my $new_tag_reads = 0;
-	my $perfect_matches_total = 0;
-	my $ti_count = 0;
-	my $appears_downstream_count = 0;
-	for my $tag_index (sort keys %{$run_info->{tags}}) {
-		$ti_count++;
-		if($run_info->{tags}->{$tag_index}->{appears_downstream}) {
-			$appears_downstream_count++;
-		}
-		else {
-			my $tag_seq = $run_info->{tags}->{$tag_index}->{tag_sequence};
-			my $tag_idx = $tti->{$tag_seq};   # be sure to use the correct tag index for the sequence (from decode set, not from run)
-			if(defined $tag_idx) {
-				$perfect_matches_total += $tag_metrics_data->result->perfect_matches_pf_count->{$tag_idx};
-			}
-		}
-	}
-	$ret->{new_tag_count} = ($ti_count - $appears_downstream_count);
-	$ret->{downstream_tag_count} = $appears_downstream_count;
-	$ret->{tag_lengths} = [ (sort keys %{$run_info->{lengths}}) ];
-	$ret->{perfect_match_reads} = $perfect_matches_total;
+  my $new_tag_reads = 0;
+  my $perfect_matches_total = 0;
+  my $ti_count = 0;
+  my $appears_downstream_count = 0;
+  for my $tag_index (sort keys %{$run_info->{tags}}) {
+    $ti_count++;
+    if($run_info->{tags}->{$tag_index}->{appears_downstream}) {
+      $appears_downstream_count++;
+    }
+    else {
+      my $tag_seq = $run_info->{tags}->{$tag_index}->{tag_sequence};
+      my $tag_idx = $tti->{$tag_seq};   # be sure to use the correct tag index for the sequence (from decode set, not from run)
+      if(defined $tag_idx) {
+        $perfect_matches_total += $tag_metrics_data->result->perfect_matches_pf_count->{$tag_idx};
+      }
+    }
+  }
+  $ret->{new_tag_count} = ($ti_count - $appears_downstream_count);
+  $ret->{downstream_tag_count} = $appears_downstream_count;
+  $ret->{tag_lengths} = [ (sort keys %{$run_info->{lengths}}) ];
+  $ret->{perfect_match_reads} = $perfect_matches_total;
 
-	return $ret;
+  return $ret;
 }
 
 ####################
@@ -935,7 +873,7 @@ Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

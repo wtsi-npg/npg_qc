@@ -62,7 +62,7 @@ Class Attribute. Returns an expected description of the spiked control.
 class_has 'spiked_control_description' => (isa        => 'Str',
                                            is         => 'ro',
                                            default    => 'SPIKED_CONTROL',
-		                          );
+                                          );
 
 has '+file_type' => (default  => 'bam.tag_decode.metrics',);
 
@@ -84,7 +84,7 @@ sub _set_column_indices {
   }
   if (scalar keys %{$columns} != scalar keys %METRICS_MAPPING) {
     croak q[Not all needed columns are present in ] . $self->result->metrics_file .
-	  q[. Was looking for ] . (join q[ ], sort keys %METRICS_MAPPING);
+    q[. Was looking for ] . (join q[ ], sort keys %METRICS_MAPPING);
   }
   $self->_set_columns($columns);
   return;
@@ -92,18 +92,18 @@ sub _set_column_indices {
 
 sub _parse_header {
   my ($self, $header) = @_;
-  ## no critic (ProhibitNoisyQuotes)
+
   my @components = split /\s/smx, $header;
   foreach my $component (@components) {
     if (!$component) { next; }
-    my $delim = '=';
+    my $delim = q[=];
     my @pair = split /$delim/smx, $component;
     if (scalar @pair == 2) {
-      my $key = $pair[0];
+      my $key   = $pair[0];
       my $value = $pair[1];
       if (!$value || !$key) { next; }
       if (exists $HEADER_MAPPING{$key}) {
-	my $attr = $HEADER_MAPPING{$key};
+        my $attr = $HEADER_MAPPING{$key};
         $self->result->$attr($value);
       }
     }
@@ -143,7 +143,8 @@ sub _parse_tag_metrics {
 
 override 'can_run' => sub  {
   my $self = shift;
-  return defined $self->tag_index ? 0 : 1;
+  return ($self->num_components() == 1 &&
+    !defined $self->composition->get_component(0)->tag_index) ? 1 : 0;
 };
 
 override 'execute' => sub  {
@@ -209,7 +210,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

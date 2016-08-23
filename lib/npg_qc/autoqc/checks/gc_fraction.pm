@@ -12,14 +12,8 @@ use npg_tracking::util::abs_path qw(abs_path);
 use npg_common::fastqcheck;
 use npg_common::sequence::reference::base_count;
 
-#########################################################
-# 'extends' should prepend 'with' since the
-# fields required by the npg_qc::autoqc::align::reference
-# role are defined there; there is a bug in Moose::Role
-#########################################################
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find);
-
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd RequireCheckingReturnValueOfEval ProhibitParensWithBuiltins)
@@ -233,7 +227,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

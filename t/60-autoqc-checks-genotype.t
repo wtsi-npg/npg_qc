@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Cwd;
 use File::Temp qw/ tempdir /;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::checks::genotype');
@@ -27,6 +27,10 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
     is($r->samtools, $st, 'correct samtools path');
     lives_ok {$r->bcftools } 'No error calling "bcftools" accessor';
     is($r->bcftools, $bt, 'correct bcftools path');
+
+    lives_ok {npg_qc::autoqc::checks::genotype->new(
+        repository => $ref_repos, rpt_list => '2:1', path => q[t]); }
+      'object via the rpt_list';
 }
 
 1;

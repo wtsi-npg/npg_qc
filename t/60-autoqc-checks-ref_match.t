@@ -1,7 +1,3 @@
-#########
-# Author:        jo3
-# Created:       Autumn 2010
-#
 use strict;
 use warnings;
 use autodie qw(:all);
@@ -9,7 +5,7 @@ use File::Temp qw/ tempdir /;
 use File::Spec::Functions qw(catfile);
 use Cwd;
 
-use Test::More tests => 44;
+use Test::More tests => 46;
 use Test::Deep;
 use Test::Exception;
 
@@ -288,8 +284,9 @@ close $fh;
 }
 
 {
-    my $test = npg_qc::autoqc::checks::ref_match->new(
-                path           => $fastq_path,
+    my @checks = ();
+    push @checks, npg_qc::autoqc::checks::ref_match->new(
+                qc_in          => $fastq_path,
                 aligner_cmd    => $bt,
                 id_run         => 1937,
                 position       =>    3,
@@ -297,10 +294,19 @@ close $fh;
                 request_list   => ['Vibrio_cholerae'],
                 repository => $repos,
     );
-
-    lives_ok {$test->execute} 'execute lives';
-
-    is_deeply( $test->result->aligned_read_count(), { 'Vibrio_cholerae' => 2 }, 'Correct match count saved' );
+    push @checks, npg_qc::autoqc::checks::ref_match->new(
+                qc_in          => $fastq_path,
+                aligner_cmd    => $bt,
+                rpt_list       => '1937:3',
+                ref_repository => $ref_repos,
+                request_list   => ['Vibrio_cholerae'],
+                repository => $repos,
+    );
+    foreach my $test (@checks) {
+        lives_ok {$test->execute} 'execute lives';
+        is_deeply( $test->result->aligned_read_count(), { 'Vibrio_cholerae' => 2 },
+            'Correct match count saved' );
+    }
 }
 
 1;

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 27;
+use Test::More tests => 36;
 use Test::Deep;
 use Test::Exception;
 use Cwd;
@@ -80,31 +80,38 @@ use_ok ('npg_qc::autoqc::checks::gc_fraction');
 
 {
    my $bc_path = catfile(cwd, q[t/data/autoqc/Homo_sapiens.NCBI36.48.dna.all.fa]);
-   my $check = npg_qc::autoqc::checks::gc_fraction->new(
-        path      => 't/data/autoqc/090721_IL29_2549/data',
+   my @checks = ();
+   push @checks, npg_qc::autoqc::checks::gc_fraction->new(
+        qc_in     => 't/data/autoqc/090721_IL29_2549/data',
         position  => 8,
         id_run    => 2549,
         ref_base_count_path => $bc_path,
-        repository => $repos, 
-                                                       );
-   # lane 8 is human
-   $check->execute();
+        repository => $repos);
+   push @checks, npg_qc::autoqc::checks::gc_fraction->new(
+        qc_in     => 't/data/autoqc/090721_IL29_2549/data',
+        rpt_list    => '2549:8',
+        ref_base_count_path => $bc_path,
+        repository => $repos);
+
+   foreach my $check (@checks) {
+      $check->execute();
  
-   is($check->result->pass, 1, 'pass undefined');
-   is($check->result->threshold_difference, 20 , 'threshold difference');
+      is($check->result->pass, 1, 'pass undefined');
+      is($check->result->threshold_difference, 20 , 'threshold difference');
 
-   my $gc_string = sprintf("%.2f", $check->result->ref_gc_percent);
-   is($gc_string, '40.89', 'reference gc content undefined');
+      my $gc_string = sprintf("%.2f", $check->result->ref_gc_percent);
+      is($gc_string, '40.89', 'reference gc content undefined');
 
-   $gc_string = sprintf("%.2f", $check->result->forward_read_gc_percent);
-   is($gc_string, '44.24', 'forward read gc percent');
+      $gc_string = sprintf("%.2f", $check->result->forward_read_gc_percent);
+      is($gc_string, '44.24', 'forward read gc percent');
 
-   $gc_string = sprintf("%.2f", $check->result->reverse_read_gc_percent);
-   is($gc_string, '44.28', 'reverse read gc percent');
+      $gc_string = sprintf("%.2f", $check->result->reverse_read_gc_percent);
+      is($gc_string, '44.28', 'reverse read gc percent');
 
-   is($check->result->forward_read_filename, q[2549_8_1.fastqcheck], 'forward read name');
-   is($check->result->reverse_read_filename, q[2549_8_2.fastqcheck], 'reverse read name');
+      is($check->result->forward_read_filename, q[2549_8_1.fastqcheck], 'forward read name');
+      is($check->result->reverse_read_filename, q[2549_8_2.fastqcheck], 'reverse read name');
 
-   is($check->ref_base_count_path, $bc_path, 'base count path');
-   is($check->result->comments, undef, 'no comments');
+      is($check->ref_base_count_path, $bc_path, 'base count path');
+      is($check->result->comments, undef, 'no comments');
+   }
 }

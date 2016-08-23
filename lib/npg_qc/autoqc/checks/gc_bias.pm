@@ -31,7 +31,6 @@ Readonly::Scalar my $SIG_PIPE_FATAL_ERROR       => 141;
 
 Readonly::Scalar our $EXT                => 'bam';
 
-
 has '+file_type' => (default    => $EXT,);
 has '+aligner'   => (default    => q[fasta],);
 
@@ -369,7 +368,7 @@ John O'Brien, jo3
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 
