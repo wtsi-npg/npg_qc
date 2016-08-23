@@ -21,7 +21,8 @@ cpanm --no-lwp --notest https://github.com/wtsi-npg/perl-dnap-utilities/releases
 # WTSI NPG Perl repo dependencies
 cd /tmp
 git clone --branch devel --depth 1 https://github.com/wtsi-npg/ml_warehouse.git ml_warehouse.git
-git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_tracking.git npg_tracking.git
+#git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_tracking.git npg_tracking.git
+git clone --branch lims4composition --depth 1 https://github.com/mgcam/npg_tracking.git npg_tracking.git
 git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_seq_common.git npg_seq_common.git
 
 repos="/tmp/ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git"
