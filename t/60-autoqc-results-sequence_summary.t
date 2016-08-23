@@ -7,6 +7,7 @@ use Archive::Extract;
 use Perl6::Slurp;
 
 use npg_tracking::glossary::composition::component::illumina;
+use npg_tracking::glossary::composition::factory;
 use t::autoqc_util qw/ write_samtools_script /;
 
 my $tempdir = tempdir( CLEANUP => 1);
@@ -25,41 +26,41 @@ my $file = join q[/], $archive, '17448_1#9.cram';
 
 use_ok ('npg_qc::autoqc::results::sequence_summary');
 
-subtest 'simple tests' => sub {
-  plan tests => 8;
+subtest 'errors' => sub {
+  plan tests => 4;
 
-  my $r;
-  lives_ok { $r = npg_qc::autoqc::results::sequence_summary->new() }
-    'no-argument constructor - ok';
+  throws_ok { npg_qc::autoqc::results::sequence_summary->new() }
+    qr/Can only build old style results/,
+    'composition required';
+
+  my $c = npg_tracking::glossary::composition::component::illumina->new(
+    id_run => 17448, position => 1, tag_index => 9);
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($c);
+  my $composition = $f->create_composition();
+  my $r = npg_qc::autoqc::results::sequence_summary->new(
+   composition => $composition);
   isa_ok ($r, 'npg_qc::autoqc::results::sequence_summary');
   throws_ok { $r->execute }
     qr/CRAM\/BAM file path \(sequence_file attribute\) should be set/,
     'sequence file does not given - error';
   
   throws_ok { npg_qc::autoqc::results::sequence_summary->new(
-        sequence_file => '/some/file') } 
+      sequence_file => '/some/file', composition => $composition) } 
     qr/Validation failed for 'NpgTrackingReadableFile' with value/,
     'sequence file does not exist - error';
-
-  lives_ok { $r = npg_qc::autoqc::results::sequence_summary->new(
-        sequence_file => $file ) }
-    'one-arg constructor (sequence_file) - object created';
-  is ($r->num_components, 0, 'no components');
-  throws_ok { $r->composition_digest() }
-    qr/Composition is empty, cannot compute digest/,
-    'composition is empty - error generating digest';
-  throws_ok { $r->execute() }
-    qr/Empty composition - cannot run/,
-    'composition is empty - error running execute()';
 };
 
 subtest 'object with an one-component composition' => sub {
-  plan tests => 15;
+  plan tests => 16;
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
-  my $r = npg_qc::autoqc::results::sequence_summary->new(sequence_file => $file);
-  $r->composition->add_component($c);
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($c);
+  my $r = npg_qc::autoqc::results::sequence_summary->new(
+   sequence_file => $file, composition => $f->create_composition());
+  isa_ok ($r, 'npg_qc::autoqc::results::sequence_summary');
 
   is ($r->num_components, 1, 'one component');
   is ($r->composition_digest(),

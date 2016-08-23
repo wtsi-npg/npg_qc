@@ -11,15 +11,14 @@ use File::Temp qw/ tempdir /;
 use Perl6::Slurp;
 use JSON;
 
-
 use_ok ('npg_qc::autoqc::results::tag_decode_stats');
 
-my $tempdir = tempdir( CLEANUP => 0);
+my $tempdir = tempdir( CLEANUP => 1);
 {
-    my $r = npg_qc::autoqc::results::tag_decode_stats->new({
+    my $r = npg_qc::autoqc::results::tag_decode_stats->new(
                                        position => 8,
                                        id_run   => 4360,
-                                 });
+                                 );
     isa_ok ($r, 'npg_qc::autoqc::results::tag_decode_stats');
 
     my $stats_output_string = slurp 't/data/autoqc/tag_decode_output.txt';
@@ -34,10 +33,10 @@ my $tempdir = tempdir( CLEANUP => 0);
 
 ## tests when the decoded tags might not be found
 {
-    my $r = npg_qc::autoqc::results::tag_decode_stats->new({
+    my $r = npg_qc::autoqc::results::tag_decode_stats->new(
                                        position => 8,
                                        id_run   => 4360,
-                                 });
+                                 );
     isa_ok ($r, 'npg_qc::autoqc::results::tag_decode_stats');
 
     my $stats_output_string = slurp 't/data/autoqc/tag_decode_output_no_found_tags.txt';
@@ -71,7 +70,8 @@ my $tempdir = tempdir( CLEANUP => 0);
     };
 
     ok( exists $hash->{__CLASS__}, q{__CLASS__ key found} );
-    delete $hash->{__CLASS__};
+    delete $hash->{'__CLASS__'};
+    delete $hash->{'composition'};
 
     is_deeply( $hash, $expected_hash_structure, q{expected results obtained} );
 }

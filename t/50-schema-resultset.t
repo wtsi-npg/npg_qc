@@ -4,7 +4,7 @@ use Test::More tests => 7;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_tracking::glossary::composition::component::illumina;
-use npg_tracking::glossary::composition;
+use npg_tracking::glossary::composition::factory;
 
 use_ok 'npg_qc::Schema';
 
@@ -146,8 +146,9 @@ subtest q[results linked to composition] => sub {
           my $component_h = {id_run => $r, position => $p, tag_index => $i, subset => $s};
           my $component =
             npg_tracking::glossary::composition::component::illumina->new($component_h);
-          my $composition = npg_tracking::glossary::composition->new();
-          $composition->add_component($component);
+          my $f = npg_tracking::glossary::composition::factory->new();
+          $f->add_component($component);
+          my $composition = $f->create_composition();
           $component_h->{'digest'} = $component->digest;
           my $component_row = $component_rs->create($component_h);
           if ($r == 4000 && $p == 1 && !defined $s) {
@@ -166,7 +167,10 @@ subtest q[results linked to composition] => sub {
           $samtools_rs->create(_samtools_data($composition_row->id_seq_composition, 'f2'));
 
           if ($r == 5000 && $p == 1 && !defined $s) {
-            $composition->add_component($stash->{$i}->{'component'});
+            $f = npg_tracking::glossary::composition::factory->new();
+            $f->add_component($component);
+            $f->add_component($stash->{$i}->{'component'});
+            $composition = $f->create_composition();
             $composition_row = $composition_rs->create(
               {size => 1, digest => $composition->digest});
             $com_com_rs->create({size => 2,

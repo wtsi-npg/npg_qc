@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More tests => 15;
 use Test::Exception;
 use File::Temp qw(tempfile);

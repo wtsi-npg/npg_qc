@@ -4,7 +4,7 @@
 
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
-  checks_info = collection_all.check_names;
+  checks_info = collection_all.check_names; # used in collapser menu template too
 
   tag_metrics_cache = {};
   temp = [];
@@ -63,6 +63,7 @@
   <ul>
     <li><a href='#' id='summary_to_csv' title='Download the summary table as a CSV file'>Summary to CSV file</a></li>
   </ul>
+  [% PROCESS ui_lanes/collapse_menu.tt2 -%]
 </div>
 </div>
 
@@ -81,7 +82,9 @@
     #For heatmaps
     action_plot = c.controller('Visuals').action_for('fastqcheck');
     legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
-    
+
+    id_runs_in_collection = []; # Used for page's title (how many different id runs in page)
+
     FOREACH lane_key IN sorted_rl_map_keys;
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
@@ -90,6 +93,8 @@
       id_run   = attrs.id_run;
       position  = attrs.position;
       tag_index = '';
+
+      id_runs_in_collection.push(id_run);
 
       IF attrs.defined('tag_index');
         tag_index = attrs.tag_index;
@@ -173,13 +178,16 @@
 [%-
   IF run_view;
     PROCESS ui_runs/annotations.tt2;
-
+  END;
+  distinct_id_runs_in_collection = id_runs_in_collection.unique;
+  IF distinct_id_runs_in_collection.size == 1;
+    single_id_run = distinct_id_runs_in_collection.first;
     current_run_status = '';
-    cs = c.model('NpgDB').resultset('RunStatus').find({ 'id_run' => "$id_run", 'iscurrent' => 1}, );
+    cs = c.model('NpgDB').resultset('RunStatus').find({ 'id_run' => "$single_id_run", 'iscurrent' => 1}, );
     IF cs;
       current_run_status = cs.run_status_dict.description;
       IF current_run_status;
-         title = title _ ' (current run status: ' _ current_run_status;
+         title = title _ ' (run ' _ single_id_run _ ' status: ' _ current_run_status;
          IF !run_from_staging && (current_run_status == 'qc in progress' || current_run_status == 'qc on hold');
            title = title _ ', taken by ' _ cs.user.username;
          END;

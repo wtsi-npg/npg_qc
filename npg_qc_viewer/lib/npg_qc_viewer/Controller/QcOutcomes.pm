@@ -6,7 +6,10 @@ use Try::Tiny;
 use Carp;
 use List::MoreUtils qw/ any /;
 
+use npg_tracking::glossary::rpt;
 use npg_qc_viewer::Util::CompositionFactory;
+use npg_qc::Schema::Mqc::OutcomeDict;
+use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 use npg_qc::mqc::outcomes;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
@@ -40,7 +43,7 @@ Retrieving records:
 Updating/creating records:
 
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"lib":{"5:8:7":{"qc_outcome":"Final Rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
+    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
 
 =head1 SUBROUTINES/METHODS
 
@@ -78,7 +81,14 @@ JSON payload example for retrieving the data
 
  '{"5:8:7":{},"5:8:6":{},"6:8:7":{},"6:8:6":{}}'
 
-The UPDATE action has not yet been implemented.
+The payload for updating the data has the same structure as this controller's
+reply to outcomes_GET. It is not necessary to set entity identifies, i.e.
+the following payload is valid:
+
+ '{"Action":"UPDATE","seq":{"5:8":{"mqc_outcome":"Undecided"}}}'.
+
+An update request can contain both 'seq' and 'lib' sections, each of the
+sections can contain multiple entries. See npg_qc::mqc::outcome->save() for details.
 
 =cut
 
@@ -87,6 +97,7 @@ sub outcomes_POST {
 
   my $data = $c->request->data();
   my $action = (delete $data->{'Action'}) || q[];
+  $c->log->debug($action);
   if ($action eq 'UPDATE') {
     $c->log->debug('Will call outcome update');
     $self->_update_outcomes($c, $data);
@@ -94,28 +105,6 @@ sub outcomes_POST {
     $c->log->debug('Will retrieve outcomes');
     $self->_get_outcomes($c, [keys %{$data}]);
   }
-  return;
-}
-
-sub _rptlists2queries {
-  my $rpt_lists = shift;
-
-  my @compositions = map {
-    npg_qc_viewer::Util::CompositionFactory->new(rpt_list => $_)->create_composition()
-                         } @{$rpt_lists};
-  if ( any { $_->num_components != 1 } @compositions) {
-    croak 'Cannot deal with multi-component compositions';
-  }
-  # TODO in tracking - create a public method
-  return map {$_->components->[0]->_pack_custom()} @compositions;
-}
-
-sub _update_outcomes {
-  my ( $self, $c, $data ) = @_;
-  $self->status_bad_request(
-    $c,
-    'message' => 'updates not implemented',
-  );
   return;
 }
 
@@ -130,7 +119,7 @@ sub _get_outcomes {
   } else {
      try {
        my $obj = npg_qc::mqc::outcomes->new(qc_schema => $c->model('NpgQcDB')->schema());
-       my @qlist = _rptlists2queries($rpt_lists);
+       my @qlist = map { _inflate_rpt($_) } @{$rpt_lists};
        $self->status_ok($c,
          'entity' => $obj->get(\@qlist),
        );
@@ -144,6 +133,94 @@ sub _get_outcomes {
 
   return;
 }
+
+sub _inflate_rpt {
+  my $rpt = shift;
+
+  my $comp = npg_qc_viewer::Util::CompositionFactory->new(rpt_list => $rpt)
+             ->create_composition();
+  if ($comp->num_components > 1) {
+    croak 'Cannot deal with multi-component compositions';
+  }
+  # TODO in tracking - create a public method
+  return $comp->get_component(0)->_pack_custom();
+}
+
+sub _update_outcomes {
+  my ( $self, $c, $data ) = @_;
+
+  my $error;
+  my $user_info = $c->model('User')->logged_user($c);
+  my $username = $user_info->{'username'};
+  if (!$username) {
+    $error = 'Login failed';
+  } else {
+    if (!$user_info->{'has_mqc_role'}) {
+      $error = qq[User $username is not authorised for manual qc];
+    }
+  }
+
+  if ($error) {
+    $self->status_forbidden($c, 'message' => $error,);
+  } else {
+
+    try {
+      my $seq_outcomes = $data->{$SEQ_OUTCOMES} || {};
+      my $lane_info = keys %{$seq_outcomes} ?
+        $self->_lane_info($c->model('MLWarehouseDB'), $seq_outcomes) : {};
+
+      my $outcomes = npg_qc::mqc::outcomes->new(
+                       qc_schema => $c->model('NpgQcDB')->schema())
+                     ->save($data, $username, $lane_info);
+
+      $seq_outcomes = $outcomes->{$SEQ_OUTCOMES} || {};
+      $self->_update_runlanes($c, $seq_outcomes, $username);
+
+      $self->status_ok($c, 'entity' => $outcomes,);
+    } catch {
+      my $e = $_;
+      if (ref $e eq 'DBIx::Class::Exception') {
+        $e = $e->{'msg'} || q[]; # This exception class does not provide
+                                 # any accessors.
+      }
+      $self->status_bad_request($c, 'message' => $e,);
+    };
+  }
+
+  return;
+}
+
+sub _lane_info {
+  my ($self, $mlwh_schema, $seq_outcomes) = @_;
+
+  my $info = {};
+  foreach my $rpt_key ( keys %{$seq_outcomes} ) {
+    $info->{$rpt_key} = $mlwh_schema->tags4lane(
+      npg_tracking::glossary::rpt->inflate_rpt($rpt_key));
+  }
+
+  return $info;
+}
+
+sub _update_runlanes {
+  my ($self, $c, $seq_outcomes, $username) = @_;
+
+  foreach my $key ( keys %{$seq_outcomes} ) {
+    my $outcome = $seq_outcomes->{$key};
+    if (npg_qc::Schema::Mqc::OutcomeDict
+          ->is_final_outcome_description($outcome->{$QC_OUTCOME})) {
+      try {
+        $c->model('NpgDB')->update_lane_manual_qc_complete(
+          $outcome->{'id_run'}, $outcome->{'position'}, $username);
+      } catch {
+        $c->log->warn(qq[Error updating lane status for rpt key '$key': $_]);
+      };
+    }
+  }
+
+  return;
+}
+
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -170,7 +247,11 @@ __END__
 
 =item List::MoreUtils
 
+=item npg_tracking::glossary::rpt
+
 =item npg_qc::mqc::outcomes
+
+=item npg_qc::Schema::Mqc::OutcomeDict
 
 =back
 

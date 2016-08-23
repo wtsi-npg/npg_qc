@@ -1,14 +1,28 @@
+/* globals $, requirejs, QUnit, document */
+/* jshint -W083 */
+
 "use strict";
-require.config({
+requirejs.config({
   baseUrl: '../../root/static',
   paths: {
-    jquery: 'bower_components/jquery/dist/jquery',
-  },
+    'qunit': 'bower_components/qunit/qunit/qunit',
+    jquery:  'bower_components/jquery/dist/jquery'
+  }
 });
 
-require(['scripts/qc_css_styles'],
-  function(qc_css_styles) {
-
+requirejs([
+  'scripts/qcoutcomes/manual_qc',
+  'scripts/qcoutcomes/qc_page',
+  'scripts/qcoutcomes/qc_outcomes_view',
+  'scripts/qcoutcomes/qc_utils',
+  '../../t/client/test_fixtures'
+], function(
+  NPG,
+  qc_page,
+  qc_outcomes_view,
+  qc_utils,
+  fixtures
+) {
     var TestConfiguration = (function() {
       function TestConfiguration () {
       }
@@ -19,15 +33,577 @@ require(['scripts/qc_css_styles'],
 
       return TestConfiguration;
     }) ();
+    NPG.QC.ProdConfiguration = TestConfiguration;
 
-    NPG.QC.qc_css_styles = qc_css_styles;
+    var initialAjax = $.ajax;
+    var initialTitle = $('title').text();
+
+    var runAsIfMain = function () {
+      var qcp = qc_page.pageForMQC();
+      var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) {
+                                                          NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes');
+                                                        }
+                                                      : null;
+      qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
+    };
+
+    QUnit.config.autostart = false;
+
+    QUnit.test("Template", function (assert) {
+      assert.expect(1);
+      //Set fixtures
+      var page_fixture = fixtures.fixtures_dont_display;
+      $('#qunit-fixture').html(page_fixture);
+      //Set return ajax call
+      try {
+        assert.ok(true, 'Is ok');
+      } catch (err) {
+        console.log(err);
+      } finally {
+        $.ajax = initialAjax;
+        $('title').text(initialTitle);
+      }
+    });
+
+    QUnit.test("Display sequencing manual qc", function ( assert ) {
+      assert.expect(31);
+      //Set title
+      document.title = 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)';
+      //Set fixtures
+      var page_fixture = fixtures.fixtures_seq_display;
+      $('#qunit-fixture').html(page_fixture);
+      //Set return ajax call
+
+      $.ajax = function (options) {
+        var data = {
+          "lib":{ },
+          "seq":{ "18000:1":{ "mqc_outcome":qc_utils.OUTCOMES.REJECTED_PRELIMINARY, "position":1, "id_run":18000 },
+                  "18000:2":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, "position":2, "id_run":18000 },
+                  "18000:3":{ "mqc_outcome":qc_utils.OUTCOMES.UNDECIDED, "position":3, "id_run":18000 }, }
+        };
+        options.success = function (callback) {
+          callback(data, 'success', {});
+          return options;
+        };
+        options.error = function () { return options; };
+        return options;
+      };
+
+      try {
+        runAsIfMain();
+        var allNotChecked = [
+          "#radio_rpt_key\\3A 18000\\3A 1_Accepted\\20 preliminary",
+          "#radio_rpt_key\\3A 18000\\3A 1_Undecided",
+          "#radio_rpt_key\\3A 18000\\3A 2_Rejected\\20 preliminary",
+          "#radio_rpt_key\\3A 18000\\3A 2_Undecided",
+          "#radio_rpt_key\\3A 18000\\3A 3_Accepted\\20 preliminary",
+          "#radio_rpt_key\\3A 18000\\3A 3_Rejected\\20 preliminary",
+          "#radio_rpt_key\\3A 18000\\3A 4_Accepted\\20 preliminary",
+          "#radio_rpt_key\\3A 18000\\3A 4_Rejected\\20 preliminary",
+          "#radio_rpt_key\\3A 18000\\3A 4_Undecided",
+        ];
+        for ( var i = 0; i < allNotChecked.length; i++ ) {
+          var notCheckedSelector = allNotChecked[i];
+          var notCheckedControl = $(notCheckedSelector);
+          assert.notEqual(notCheckedControl.attr('checked'), 'checked', 'Control is not checked as per ajax qcoutcomes call');
+        }
+
+        var allChecked = [
+          "#radio_rpt_key\\3A 18000\\3A 1_Rejected\\20 preliminary",
+          "#radio_rpt_key\\3A 18000\\3A 2_Accepted\\20 preliminary",
+          "#radio_rpt_key\\3A 18000\\3A 3_Undecided",
+        ];
+        for ( i = 0; i < allChecked.length; i++ ) {
+          var checkedSelector = allChecked[i];
+          var checkedControl = $(checkedSelector);
+          assert.equal(checkedControl.attr('checked'), 'checked', 'Control is checked as per ajax qcoutcomes call');
+        }
+
+        var lanes = [ 1, 2, 3, 4 ];
+        for ( i = 0; i < lanes.length; i++ ) {
+          var workingContainerSelector = "#rpt_key\\3a 18000\\3a " +
+                                         lanes[i] +
+                                         " > td.lane.nbsp.td_mqc > span > span.lane_mqc_working";
+          var workingContainerControl = $(workingContainerSelector);
+          assert.equal(workingContainerControl.length, 1, 'Has a working icon container for lane ' + lanes[i]);
+          assert.equal(workingContainerControl.children().length, 0, 'Working icon container is empty for lane ' + lanes[i]);
+
+          var placeholder = $( "#rpt_key\\3A 18000\\3a " + lanes[i] + " > td.lane.nbsp.td_mqc > span" );
+          assert.equal(placeholder.attr('style'),
+                       'padding-right: 5px; padding-left: 10px;',
+                       "Correct style for lane " + lanes[i] + " control's span");
+        }
+
+        var control = $("#radio_rpt_key\\3A 18000\\3A 1_Accepted\\20 preliminary");
+        assert.equal(control.attr('value'), 'Accepted preliminary', 'Correct value for Accepted preliminary control');
+        control = $("#radio_rpt_key\\3A 18000\\3A 1_Rejected\\20 preliminary");
+        assert.equal(control.attr('value'), 'Rejected preliminary', 'Correct value for Rejected preliminary control');
+        control = $("#radio_rpt_key\\3A 18000\\3A 1_Undecided");
+        assert.equal(control.attr('value'), 'Undecided', 'Correct value for Undecided control');
+
+        assert.ok($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+                     'Lane 1 with save button visible');
+        assert.ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+                     'Lane 2 with save button visible');
+        assert.notOk($("#rpt_key\\3a 18000\\3a 3 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+                     'Lane 3 with save button hidden');
+        assert.notOk($("#rpt_key\\3a 18000\\3a 4 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+                     'Lane 4 with save button hidden');
+      } catch (err) {
+        console.log(err);
+      } finally {
+        $.ajax = initialAjax;
+        $('title').text(initialTitle);
+      }
+    });
+
+    QUnit.test("Display sequencing manual qc lane 1 is already final, lane 2 is accepted preliminary", function ( assert ) {
+      assert.expect(15);
+      //Set title
+      document.title = 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)';
+      //Set fixtures
+      var page_fixture = fixtures.fixtures_seq_mixed;
+      $('#qunit-fixture').html(page_fixture);
+      //Set return ajax call
+
+      $.ajax = function (options) {
+        var data = {
+          "lib":{ },
+          "seq":{ "18000:1":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_FINAL, "position":1, "id_run":18000 },
+                  "18000:2":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, "position":2, "id_run":18000 } }
+        };
+        options.success = function (callback) {
+          callback(data, 'success', {});
+          return options;
+        };
+        options.error = function () { return options; };
+        return options;
+      };
+
+      try {
+        runAsIfMain();
+        var control = $("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.qc_outcome_accepted_final");
+        assert.equal(control.length, 1, "There is a td showing the accepted final for lane 1");
+        control = $("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.qc_outcome_accepted_final > span");
+        assert.equal(control.length, 1, 'There is a container for the controls for lane 1');
+        assert.equal(control.children().length, 0, "Span for mqc controls is empty in lane 1");
+        assert.equal(control.attr('style'), undefined, 'No style for container in lane 1');
+        control = $("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.td_mqc > span > span.lane_mqc_working");
+        assert.equal(control.length, 0, 'There is no working icon container for lane 1');
+        control = $("#radio_rpt_key\\3A 18000\\3A 2_Accepted\\20 preliminary");
+        assert.equal(control.attr('value'), 'Accepted preliminary', 'Correct value for Accepted preliminary control');
+        assert.equal(control.attr('checked'), 'checked', 'Accepted is checked as per ajax qcoutcomes call');
+        control = $("#radio_rpt_key\\3A 18000\\3A 2_Rejected\\20 preliminary");
+        assert.equal(control.attr('value'), 'Rejected preliminary', 'Correct value for Rejected preliminary control');
+        assert.notEqual(control.attr('checked'), 'checked', 'Rejected is not checked as per ajax qcoutcomes call');
+        control = $("#radio_rpt_key\\3A 18000\\3A 2_Undecided");
+        assert.equal(control.attr('value'), 'Undecided', 'Correct value for Undecided control');
+        assert.notEqual(control.attr('checked'), 'checked', 'Undecided is not checked as per ajax qcoutcomes call');
+        control = $("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp.td_mqc > span > span.lane_mqc_working");
+        assert.equal(control.length, 1, 'Has a working icon container');
+        assert.equal(control.children().length, 0, 'Working icon container is empty');
+
+        assert.notOk($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+                     'Lane 1 with save button visible');
+        assert.ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp.td_mqc > span > span.lane_mqc_button.lane_mqc_save").is(":visible"),
+                     'Lane 2 with save button visible');
+      } catch (err) {
+        console.log(err);
+      } finally {
+        $.ajax = initialAjax;
+        $('title').text(initialTitle);
+      }
+    });
+
+    QUnit.test("Display library manual qc mixed initial outcomes", function ( assert ) {
+      assert.expect(41);
+      //Set title
+      document.title = 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)';
+      //Set fixtures
+      var page_fixture = fixtures.fixtures_lib_mixed;
+      $('#qunit-fixture').html(page_fixture);
+      //Set return ajax call
+      $.ajax = function (options) {
+        var data = {
+          "lib":{
+            "18000:2:1":{"tag_index":"1","mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"},
+            "18000:2:3":{"tag_index":"3","mqc_outcome":qc_utils.OUTCOMES.UNDECIDED,"position":"2","id_run":"18000"},
+            "18000:2:2":{"tag_index":"2","mqc_outcome":qc_utils.OUTCOMES.REJECTED_PRELIMINARY,"position":"2","id_run":"18000"}
+          },
+          "seq":{}
+        };
+        options.success = function (callback) {
+          callback(data, 'success', {});
+          return options;
+        };
+        options.error = function () { return options; };
+        return options;
+      };
+
+      try {
+        runAsIfMain();
+        var allNotChecked = [
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 1_Undecided",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 1_Rejected\\20 preliminary",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 2_Accepted\\20 preliminary",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 2_Undecided",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 3_Accepted\\20 preliminary",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 3_Rejected\\20 preliminary",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 4_Accepted\\20 preliminary",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 4_Undecided",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 4_Rejected\\20 preliminary",
+        ];
+        for ( var i = 0; i < allNotChecked.length; i++ ) {
+          var notCheckedSelector = allNotChecked[i];
+          var notCheckedControl = $(notCheckedSelector);
+          assert.notEqual(notCheckedControl.attr('checked'),
+                          'checked',
+                          'Control is not checked as per ajax qcoutcomes call');
+        }
+
+        var allChecked = [
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 1_Accepted\\20 preliminary",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 2_Rejected\\20 preliminary",
+          "#radio_rpt_key\\3a 18000\\3a 2\\3a 3_Undecided",
+        ];
+        for ( i = 0; i < allChecked.length; i++ ) {
+          var checkedSelector = allChecked[i];
+          var checkedControl = $(checkedSelector);
+          assert.equal(checkedControl.attr('checked'),
+                       'checked',
+                       'Control is checked as per ajax qcoutcomes call');
+        }
+
+        var control = $("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls");
+        assert.ok(control.is(':visible'), 'Placeholder for overall controls is visible');
+        assert.equal($("#results_summary .library_mqc_overall_controls").length,
+                     1, 'One overall control in page');
+        assert.equal(control.attr('style'),
+                     'padding-right: 5px; padding-left: 7px;',
+                     'Overall controls have correct style.');
+        var individualOverallButtons = [
+          'lane_mqc_accept_all',
+          'lane_mqc_reject_all',
+          'lane_mqc_undecided_all'
+        ];
+        for ( i = 0; i < individualOverallButtons.length; i++ ) {
+          var thisButton = control.find('.' + individualOverallButtons[i]);
+          assert.ok(thisButton.is(':visible'),
+             'Overall button is visible ' + individualOverallButtons[i]);
+          assert.equal(thisButton.attr('style'),
+                       'padding-left: 5px; background-color: rgb(244, 244, 244);',
+                       'Button is not selected');
+        }
+
+        var plexesWithControls = [ 1, 2, 3, 4 ];
+        for ( i = 0; i < plexesWithControls.length; i++ ) {
+          var plex = plexesWithControls[i];
+          var workingContainerSelector = "#rpt_key\\3a 18000\\3a 2\\3a " +
+                                         plex +
+                                         " > td.lane.nbsp.td_library_mqc > span > span";
+          var workingContainerControl = $(workingContainerSelector);
+          assert.equal(workingContainerControl.length,
+                       1,
+                       'Has a working icon container for plex ' + plex);
+          assert.equal(workingContainerControl.children().length,
+                       0,
+                       'Working icon container is empty for plex ' + plex);
+
+          var placeholder = $("#rpt_key\\3a 18000\\3a 2\\3a " +
+                              plex +
+                              " > td.lane.nbsp.td_library_mqc > span" );
+          assert.equal(placeholder.attr('style'),
+                       'padding-right: 5px; padding-left: 10px;',
+                       "Correct style for plex " + plex + " control's span");
+          var td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.tag_info");
+          assert.ok( !( td.hasClass("qc_outcome_accepted_preliminary") ||
+                        td.hasClass("qc_outcome_rejected_preliminary") ||
+                        td.hasClass("qc_outcome_undecided") ),
+                     'tag index cell has no preliminary class');
+        }
+        var plexesWithoutControls = [ 0, 888 ];
+        for ( i = 0; i < plexesWithoutControls.length; i++ ) {
+          plex = plexesWithoutControls[i];
+          td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.lane.nbsp");
+          assert.equal(td.children().length, 0, 'No controls in td for plex ' + plex);
+          assert.ok( !(td.hasClass("qc_outcome_accepted_preliminary") ||
+                       td.hasClass("qc_outcome_rejected_preliminary") ||
+                       td.hasClass("qc_outcome_undecided") ),
+                     'tag index cell has no preliminary class');
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        $.ajax = initialAjax;
+        $('title').text(initialTitle);
+      }
+    });
+
+    QUnit.test("Lib not in mqc", function ( assert ) {
+      var cases = [
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+          logged: ' Not logged in'
+        },
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as bb22 (mqc)'
+        },
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as bb22'
+        },
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as aa11'
+        },
+        { title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc review pending)',
+          logged: 'Logged in as aa11 (mqc)'
+        }
+      ];
+      assert.expect(cases.length * 15);
+
+      var page_fixture = fixtures.fixtures_lib_mixed;
+      //Set return ajax call
+      $.ajax = function (options) {
+        var data = {
+          "lib":{
+            "18000:2:1":{"tag_index":"1","mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"},
+            "18000:2:2":{"tag_index":"2","mqc_outcome":qc_utils.OUTCOMES.REJECTED_PRELIMINARY,"position":"2","id_run":"18000"}
+          },
+          "seq":{
+            "18000:2":{"mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"}
+          }
+        };
+        options.success = function (callback) {
+          callback(data, 'success', {});
+          return options;
+        };
+        options.error = function () { return options; };
+        return options;
+      };
+
+      try {
+        for ( var j = 0; j < cases.length; j++ ) {
+          var thisCase = cases[j];
+          document.title = thisCase.title;
+
+          $('#qunit-fixture').html(page_fixture);
+          $("#header > h1 > span.lfloat.env_dev").text(thisCase.title);
+          $("#header > h1 > span.rfloat").text(thisCase.logged);
+
+          runAsIfMain();
+          assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 1 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
+          assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_rejected_preliminary'));
+
+          var emptyContainers = [
+            "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.lane_mqc_control",
+            "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls",
+            "#rpt_key\\3a 18000\\3a 2\\3a 1 > td.lane.nbsp > span",
+            "#rpt_key\\3a 18000\\3a 2\\3a 2 > td.lane.nbsp > span",
+          ];
+          for ( var i = 0; i < emptyContainers.length; i++ ) {
+            var emptyContainer = emptyContainers[i];
+            assert.equal($(emptyContainer).children().length,
+                         0,
+                         'Container is empty ' + emptyContainer);
+          }
+
+          var allRows = [
+            "#rpt_key\\3a 18000\\3a 2",
+            "#rpt_key\\3a 18000\\3a 2\\3a 1",
+            "#rpt_key\\3a 18000\\3a 2\\3a 2",
+            "#rpt_key\\3a 18000\\3a 2\\3a 888",
+            "#rpt_key\\3a 18000\\3a 2\\3a 0"
+          ];
+          for ( i = 0; i < allRows.length; i++ ) {
+            var row = allRows[i];
+            var laneTd = $(row + " > td.lane.nbsp");
+            assert.ok(laneTd.hasClass("qc_outcome_accepted_preliminary"),
+                      'lane cell has preliminary class');
+          }
+
+
+          var plexesWithoutControls = [ 0, 888 ];
+          for ( i = 0; i < plexesWithoutControls.length; i++ ) {
+            var plex = plexesWithoutControls[i];
+            var td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.lane.nbsp");
+            assert.equal(td.children().length, 0, 'No controls in lane td for plex ' + plex);
+
+            td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.tag_info");
+            assert.notOk( td.hasClass("qc_outcome_accepted_preliminary") ||
+                         td.hasClass("qc_outcome_rejected_preliminary") ||
+                         td.hasClass("qc_outcome_undecided") ,
+                       'tag index cell has no preliminary class');
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        $.ajax = initialAjax;
+        $('title').text(initialTitle);
+      }
+    });
+
+    QUnit.test("Seq not in mqc", function ( assert ) {
+      var cases = [
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)',
+          logged: ' Not logged in'
+        },
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as bb22 (mqc)'
+        },
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as bb22'
+        },
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc in progress, taken by aa11)',
+          logged: 'Logged in as aa11'
+        },
+        { title: 'NPG SeqQC v0: Results for run 18000 (run 18000 status: qc review pending)',
+          logged: 'Logged in as aa11 (mqc)'
+        }
+      ];
+      assert.expect(cases.length * 4 * ( Object.keys(qc_utils.OUTCOMES).length - 1 ));
+
+      var toClass = function ( outcome ) {
+        return 'qc_outcome_' + outcome.toLowerCase().replace(' ', '_');
+      };
+
+      var page_fixture = fixtures.fixtures_seq_mixed;
+      var testNotMQC = function (expectedClass) {
+        try {
+          for ( var j = 0; j < cases.length; j++ ) {
+            var thisCase = cases[j];
+            document.title = thisCase.title;
+
+            $('#qunit-fixture').html(page_fixture);
+            $("#header > h1 > span.lfloat.env_dev").text(thisCase.title);
+            $("#header > h1 > span.rfloat").text(thisCase.logged);
+
+            runAsIfMain();
+            assert.ok($("#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp").hasClass(expectedClass), 'With proper class in lane');
+            assert.ok($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp").hasClass(expectedClass), 'With proper class in lane');
+
+            var emptyContainers = [
+              "#rpt_key\\3a 18000\\3a 1 > td.lane.nbsp > span.lane_mqc_control",
+              "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.lane_mqc_control",
+            ];
+            for ( var i = 0; i < emptyContainers.length; i++ ) {
+              var emptyContainer = emptyContainers[i];
+              assert.equal($(emptyContainer).children().length,
+                           0,
+                           'Container is empty ' + emptyContainer);
+            }
+          }
+        } catch (err) {
+          console.log(err);
+        } finally {
+          $.ajax = initialAjax;
+          $('title').text(initialTitle);
+        }
+      };
+
+      for ( var outcomeName in qc_utils.OUTCOMES ) {
+        var outcome = qc_utils.OUTCOMES[outcomeName];
+
+        if ( outcome === qc_utils.OUTCOMES.UNDECIDED_FINAL ) { // No undecided final for lane
+          continue;
+        }
+
+        //Set return ajax call
+        $.ajax = function (options) {
+          var data = {
+            "lib":{},
+            "seq":{
+              "18000:1":{"mqc_outcome":outcome,"position":"1","id_run":"18000"},
+              "18000:2":{"mqc_outcome":outcome,"position":"2","id_run":"18000"}
+            }
+          };
+          options.success = function (callback) {
+            callback(data, 'success', {});
+            return options;
+          };
+          options.error = function () { return options; };
+          return options;
+        };
+        testNotMQC(toClass(outcome));
+      }
+    });
+
+    QUnit.test("In MQC but nothing to MQC", function ( assert ) {
+      var thisCase = {
+        title: 'NPG SeqQC v0: Results (all) for runs 18000 lanes 2 (run 18000 status: qc in progress, taken by aa11)',
+        logged: 'Logged in as aa11'
+      };
+
+      assert.expect(13);
+      var page_fixture = fixtures.fixtures_lib_nothing_to_qc;
+      //Set return ajax call
+      $.ajax = function (options) {
+        var data = {
+          "lib":{
+            "18000:2:1":{"tag_index":"1","mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"},
+            "18000:2:2":{"tag_index":"2","mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"}
+          },
+          "seq":{
+            "18000:2":{"mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"}
+          }
+        };
+        options.success = function (callback) {
+          callback(data, 'success', {});
+          return options;
+        };
+        options.error = function () { return options; };
+        return options;
+      };
+
+      try {
+        document.title = thisCase.title;
+
+        $('#qunit-fixture').html(page_fixture);
+        $("#header > h1 > span.lfloat.env_dev").text(thisCase.title);
+        $("#header > h1 > span.rfloat").text(thisCase.logged);
+
+        runAsIfMain();
+        assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 1 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
+        assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_accepted_preliminary'));
+
+        assert.equal($('#results_summary .lane_mqc_control').length, 0, 'No libs or lanes for qc');
+        assert.equal($("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls").children().length,
+                     0, 'Container is empty');
+
+        var allRows = [
+        "#rpt_key\\3a 18000\\3a 2",
+        "#rpt_key\\3a 18000\\3a 2\\3a 1",
+        "#rpt_key\\3a 18000\\3a 2\\3a 2",
+        "#rpt_key\\3a 18000\\3a 2\\3a 888",
+        "#rpt_key\\3a 18000\\3a 2\\3a 0"
+        ];
+        for ( var i = 0; i < allRows.length; i++ ) {
+        var row = allRows[i];
+        var laneTd = $(row + " > td.lane.nbsp");
+        assert.ok(laneTd.hasClass("qc_outcome_accepted_preliminary"),
+                  'lane cell has preliminary class');
+        }
+
+        var plexesWithoutControls = [ 0, 888 ];
+        for ( i = 0; i < plexesWithoutControls.length; i++ ) {
+        var plex = plexesWithoutControls[i];
+        var td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.lane.nbsp");
+        assert.equal(td.children().length, 0, 'No controls in lane td for plex ' + plex);
+
+        td = $("#rpt_key\\3a 18000\\3a 2\\3a " + plex + " > td.tag_info");
+        assert.notOk( td.hasClass("qc_outcome_accepted_preliminary") ||
+                        td.hasClass("qc_outcome_rejected_preliminary") ||
+                        td.hasClass("qc_outcome_undecided"),
+                      'tag index cell has no preliminary class');
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        $.ajax = initialAjax;
+        $('title').text(initialTitle);
+      }
+    });
 
     QUnit.test("DOM linking", function( assert ) {
       var lane = $("#mqc_lane1");
-      assert.notEqual(lane, undefined, "mqc_lane is an instance.");
-      assert.equal(lane.data('id_run'), '2', "id_run is 2.");
-      assert.equal(lane.data('position'), '3', "position is 3.");
-      assert.equal(lane.data('initial'), undefined, "No initial value.");
       var control = new NPG.QC.LaneMQCControl(new TestConfiguration());
       assert.notEqual(control, undefined, "Control is an instance.");
       control.linkControl(lane);
@@ -36,283 +612,44 @@ require(['scripts/qc_css_styles'],
       assert.equal(control.lane_control.outcome, undefined, "Outcome of lane is not defined.");
     });
 
-    QUnit.test("DOM linking lane with previous status", function( assert ) {
-      var lane = $("#mqc_lane2");
-      assert.notEqual(lane, undefined, "mqc_lane is an instance.");
-      assert.equal(lane.data('id_run'), '3', "id_run is 3.");
-      assert.equal(lane.data('position'), '4', "position is 4.");
-      assert.notEqual(lane.data('initial'), undefined, "Has initial value.");
-      assert.equal(lane.data('initial'), 'Accepted final', "Initial value as expected.");
-      var control = new NPG.QC.LaneMQCControl(new TestConfiguration());
-      assert.notEqual(control, undefined, "Control is an instance.");
-      control.linkControl(lane);
-      assert.notEqual(control.lane_control, undefined, "lane_control in Control is linked.");
-    });
-
-    QUnit.test("NPG.QC.RunPageMQCControl.initQC", function(assert) {
-      var data1 = null;
-      var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-      var returnTrue = function () { return true; };
-      var returnFalse = function () { return false; };
-      var result1 = control.initQC(data1, null, returnTrue, returnFalse);
-      assert.equal(result1, false, 'Control can deal with null data object.');
-      data1 = new Object();
-      var result2 = control.initQC(data1, null, function () {return true}, function(){return false});
-      assert.equal(result2, false, 'Control can deal with empty data object');
-      data1.taken_by = 'me';
-      data1.current_user = 'me';
-      data1.has_manual_qc_role = 1;
-      data1.current_status_description = 'qc in progress';
-      var result3 = control.initQC(data1, null, function () {return true}, function() {return false});
-      assert.equal(result3, true, 'Completes with correct data (qc in progress)');
-      data1.current_status_description = 'qc on hold';
-      var result31 = control.initQC(data1, null, function () {return true}, function() {return false});
-      assert.equal(result31, true, 'Completes with correct data (qc on hold)');
-      //
-      data1.taken_by = 'other';
-      var result4 = control.initQC(data1, null, function () {return true}, function() {return false});
-      assert.equal(result4, false, 'Does not run if taken by and current user are different');
-      data1.taken_by = 'me';
-      //
-      data1.current_user = 'other';
-      var result5 = control.initQC(data1, null, function () {return true}, function() {return false});
-      assert.equal(result5, false, 'Does not run if current user and taken by are different');
-      data1.current_user = 'me';
-      //
-      data1.has_manual_qc_role = '';
-      var result6 = control.initQC(data1, null, function () {return true}, function() {return false});
-      assert.equal(result6, false, 'Does not run if has manual qc role is not available');
-      data1.has_manual_qc_role = 1;
-      //
-      data1.current_status_description = 'blablabla';
-      var result7 = control.initQC(data1, null, function () {return true}, function() {return false});
-      assert.equal(result7, false, 'Does not run if current status description is a unexpected one');
-      data1.current_status_description = 'qc in progress';
-    });
-
-    QUnit.test("NPG.QC.RunPageMQCControl.isStateForMQC", function(assert){
-      var result = null;
-
-      var TAKEN_BY = 'taken_by';
-      var CURRENT_USER = 'current_user';
-      var HAS_MANUAL_QC_ROLE = 'has_manual_qc_role';
-      var CURRENT_STATUS_DESCRIPTION = 'current_status_description';
-
-      var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-      var ok_taken_by = 'me', ok_current_user = 'me';
-      var ok_has_manual_qc_role = 1;
-      var ok_current_status_description_1 = 'qc in progress', ok_current_status_description_2 = 'qc on hold';
-
-      var createFullObject = function () {
-        var theObject = new Object();
-
-        theObject[TAKEN_BY] = ok_taken_by;
-        theObject[CURRENT_USER] = ok_current_user;
-        theObject[HAS_MANUAL_QC_ROLE] = ok_has_manual_qc_role;
-        theObject[CURRENT_STATUS_DESCRIPTION] = ok_current_status_description_1;
-
-        return theObject;
-      };
-
-      assert.raises(function () { control.isStateForMQC() }, /Error: Invalid arguments/, 'Correctly validates it gets an argument');
-      assert.raises(function () { control.isStateForMQC(null) }, /Error: Invalid arguments/, 'Correctly validates it gets an non-null argument');
-      var mqc_run_data = Object();
-      result = control.isStateForMQC(mqc_run_data);
-      assert.equal(result, false, 'Correctly evaluates for an empty data object.');
-
-      mqc_run_data = createFullObject();
-      assert.equal(control.isStateForMQC(mqc_run_data), true, 'Correctly evaluates for a full object.');
-
-      mqc_run_data[CURRENT_STATUS_DESCRIPTION] = ok_current_status_description_2;
-      assert.equal(control.isStateForMQC(mqc_run_data), true, 'Correctly evaluates for a full object different current_status_description.');
-
-      var all_names = [TAKEN_BY, CURRENT_USER, HAS_MANUAL_QC_ROLE, CURRENT_STATUS_DESCRIPTION];
-      for(var i = 0; i < all_names.length; i++) {
-        mqc_run_data = createFullObject();
-        mqc_run_data[all_names[i]] = null;
-        assert.equal(control.isStateForMQC(mqc_run_data), false, 'Correctly evaluates for a full object with null in ' + all_names[i]);
-      }
-
-      for(var i = 0; i < all_names.length; i++) {
-        mqc_run_data = createFullObject();
-        mqc_run_data[all_names[i]] = 'xxxxxx';
-        assert.equal(control.isStateForMQC(mqc_run_data), false, 'Correctly evaluates for a full object with incorrect value in ' + all_names[i]);
-      }
-    });
-
-    QUnit.test("NPG.QC.RunPageMQCControl.laneOutcomesMatch", function(assert){
-      var data1 = null;
-      var lanesWithBG = [];
-      var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-      assert.raises(function () {control.laneOutcomesMatch();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
-
-      data1 = new Object();
-      data1.qc_lane_status = new Object();
-
-      assert.raises(function () {control.laneOutcomesMatch(lanesWithBG);}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
-      assert.raises(function () {control.laneOutcomesMatch(null, data1);}, /Error: Invalid arguments/, "Throws exception with null arguments");
-      assert.raises(function () {control.laneOutcomesMatch(lanesWithBG, null);}, /Error: Invalid arguments/, "Throws exception with null arguments");
-      var result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with empty lanes in both sides.');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      data1.qc_lane_status[1] = 'Accepted final';
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with mqc status and not matching DWH status.');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      var elements = $('.laneOutcomesMatchTdlanes1').each(function (i, obj) {
-        lanesWithBG.push($(obj));
-      });
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with matching in both sides.');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      lanesWithBG = [];
-      var elements = $('.laneOutcomesMatchTdlanes2').each(function (i, obj) {
-        lanesWithBG.push($(obj));
-      });
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, false, 'Correctly validates problems with more outcomesin DWH.');
-      assert.equal(result.position, 2, 'Problem is in lane 2');
-      data1.qc_lane_status[2] = 'Accepted final';
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with matching in both sides, multiple items');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      lanesWithBG = [];
-      var elements = $('.laneOutcomesMatchTdlanes3').each(function (i, obj) {
-        lanesWithBG.push($(obj));
-      });
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Correctly validates problems with unmatching outcomes DWH vs MQC.');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-      data1.qc_lane_status[2] = 'Rejected final';
-      data1.qc_lane_status[3] = 'Accepted final';
-
-      result = control.laneOutcomesMatch(lanesWithBG, data1);
-      assert.equal(result.outcome, true, 'Works with more outcomes in MQC than DWH, multiple items');
-      assert.equal(result.position, null, 'Empty position as there was no error.');
-    });
-
-    QUnit.test("NPG.QC.RunPageMQCControl.prepareLanes", function(assert) {
-      var control = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-      assert.raises(function () {control.prepareLanes();}, /Error: Invalid arguments/, "Throws exception with invalid number of arguments");
-      assert.raises(function () {control.prepareLanes(null, null);}, /Error: Invalid arguments/, "Throws exception with both arguments null");
-      assert.raises(function () {control.prepareLanes(null, 1);}, /Error: Invalid arguments/, "Throws exception with first argument null");
-      assert.raises(function () {control.prepareLanes(1, null);}, /Error: Invalid arguments/, "Throws exception with second argument null");
-
-    });
-
-    QUnit.test("NPG.QC.RunTitleParser.parseRunId()", function(assert) {
-      var parser = new NPG.QC.RunTitleParser();
-      assert.throws(function() {parser.parseIdRun();}, /Error: Invalid arguments/, "Validates non-empty arguments");
-      assert.throws(function() {parser.parseIdRun(null);}, /Error: Invalid arguments/, "Validates null argument");
-      var title1 = parser.parseIdRun('');
-      assert.equal(title1, null, 'Can deal with empty string.');
-      var title2 = parser.parseIdRun('Bla bla bla');
-      assert.equal(title2, null, 'Can deal with random string');
-      var title3 = parser.parseIdRun('NPG SeqQC v56.7: Results for run number (current run status: qc in progress, taken by user)');
-      assert.equal(title3, null, 'Can deal with non valid run_id (lexical validation)');
-      var title4 = parser.parseIdRun('NPG SeqQC v56.7: Results for run (current run status: qc in progress, taken by user)');
-      assert.equal(title4, null, 'Can deal with missing run_id (lexical validation)');
-      var title5 = parser.parseIdRun('NPG SeqQC v56.7: Results for run 16074 (current run status: qc in progress, taken by user)');
-      assert.equal(title5.id_run, '16074', 'Correctly parses run_id from correctly formed title');
-      var title6 = parser.parseIdRun('NPG SeqQC v56.7: Results for run 16074 (current run status: ');
-      assert.equal(title6.id_run, '16074', 'Correctly parses run_id from non qc title');
-      assert.equal(title6.position, null, 'Correctly sets position as null');
-      assert.ok(title6.isRunPage, 'Correctly identifies the page as a single run page');
-      var title7 = parser.parseIdRun('NPG SeqQC v56.7: Results (all) for runs 16074 lanes 1');
-      assert.equal(title7.id_run, '16074', 'Correctly parses run_id and position from non qc title');
-      assert.equal(title7.position, '1', 'Correctly sets position as 1');
-      assert.ok(!title7.isRunPage, 'Correctly identifies the page as a run + lane page');
-      var title8 = parser.parseIdRun('NPG SeqQC v56.7: Results (all) for runs 16074 lanes 1 2');
-      assert.equal(title8, null, 'Can deal with multi lane pages (lexical validation)');
-      var title9 = parser.parseIdRun('NPG SeqQC v56.7: Results (all) for runs 16074 16075 lanes 1');
-      assert.equal(title9, null, 'Can deal with multi run pages (lexical validation)');
-      var title10 = parser.parseIdRun('NPG SeqQC v56.7: Results (all) for runs 16074 16075 lanes 1 2');
-      assert.equal(title10, null, 'Can deal with multi run, multi lane pages (lexical validation)');
-    });
-
-    QUnit.test('Object initialisation', function() {
+    QUnit.test('Object initialisation', function( assert ) {
       var obj = null;
-      ok(obj == null, "Variable is initially null.");
+      assert.ok(obj == null, "Variable is initially null.");
       obj = new NPG.QC.LaneMQCControl();
-      ok(obj !== undefined, "Variable is now an instance.");
+      assert.ok(obj !== undefined, "Variable is now an instance.");
       obj = new NPG.QC.LaneMQCControl(new TestConfiguration());
-      ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
-      ok(obj.lane_control == null, "New object has null lane_control.");
-      ok(obj.abstractConfiguration !== undefined, 'Object has a configuration');
-      ok(obj.outcome == null, "New object has null outcome.");
+      assert.ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
+      assert.ok(obj.lane_control == null, "New object has null lane_control.");
+      assert.ok(obj.abstractConfiguration !== undefined, 'Object has a configuration');
+      assert.ok(obj.outcome == null, "New object has null outcome.");
 
       obj = null;
-      ok(obj == null, "Variable back to null.");
+      assert.ok(obj == null, "Variable back to null.");
       obj = new NPG.QC.LibraryMQCControl();
-      ok(obj !== undefined, "Variable is now an instance.");
+      assert.ok(obj !== undefined, "Variable is now an instance.");
       obj = new NPG.QC.LibraryMQCControl(new TestConfiguration());
-      ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
-      ok(obj.lane_control == null, "New object has null lane_control.");
-      ok(obj.abstractConfiguration !== undefined, 'Object has a configuration');
-      ok(obj.outcome == null, "New object has null outcome.");
-
-      obj = null;
-      ok(obj == null, "Variable back to null.");
-      obj = new NPG.QC.RunPageMQCControl();
-      ok(obj !== undefined, 'variable is now an instance of RunPageMQCControl');
-      obj = new NPG.QC.RunPageMQCControl(new TestConfiguration());
-      ok(obj !== undefined, 'variable is now an instance of RunPageMQCControl');
-
-      obj = null;
-      ok(obj == null, "Variable back to null.");
-      obj = new NPG.QC.LanePageMQCControl();
-      ok(obj !== undefined, 'variable is now an instance of LanePageMQCControl');
-      obj = new NPG.QC.LanePageMQCControl(new TestConfiguration());
-      ok(obj !== undefined, 'variable is now an instance of LanePageMQCControl');
-
-      obj = new NPG.QC.RunTitleParser();
-      ok(obj !== undefined, 'variable is now an instance of RunTitleParser');
+      assert.ok(obj !== undefined, "Variable is now a new instance called with parameter for constructor.");
+      assert.ok(obj.lane_control == null, "New object has null lane_control.");
+      assert.ok(obj.abstractConfiguration !== undefined, 'Object has a configuration');
+      assert.ok(obj.outcome == null, "New object has null outcome.");
     });
 
-    QUnit.test('Object instantiation for UI classes.', function() {
+    QUnit.test('Object instantiation for UI classes.', function( assert ) {
       var obj = null;
 
       obj = new NPG.QC.UI.MQCOutcomeRadio();
-      ok(obj !== undefined, 'Variable is now an instance of MQCOutcomeRadio');
+      assert.ok(obj !== undefined, 'Variable is now an instance of MQCOutcomeRadio');
       obj = null;
-      ok(obj == null);
+      assert.ok(obj == null);
 
-      obj = new NPG.QC.UI.MQCConflictDWHErrorMessage();
-      ok(obj !== undefined, 'Variable is now an instance of MQCOutcomeMQCConflictDWHErrorMessage');
+      obj = new NPG.QC.UI.MQCLibraryOverallControls(new TestConfiguration());
+      assert.ok(obj !== undefined, 'Variable is now an instance of MQCLibraryOverallControls');
       obj = null;
-      ok(obj == null);
-
-      obj = new NPG.QC.UI.MQCLibraryOverallControls();
-      ok(obj !== undefined, 'Variable is now an instance of MQCLibraryOverallControls');
-      obj = null;
-      ok(obj == null);
-
-      obj = new NPG.QC.UI.MQCLibrary4LaneStats();
-      ok(obj !== undefined, 'Variable is now an instance of MQCLibrary4LaneStats');
+      assert.ok(obj == null);
     });
-
-    QUnit.test('Error messaging formating', function (assert) {
-      var obj = null;
-
-      var FROM_EXCEPTION = 'Error: No LIMS data for this run/position. at /src/../lib/npg_qc_viewer/Controller.pm line 1000.';
-      var EXPECTED_FE    = 'Error: No LIMS data for this run/position.';
-      var FROM_GNR_TEXT  = 'A random error in the interface. And some more text. No numbers should be removed 14.';
-      var EXPECTED_GT    = FROM_GNR_TEXT;
-
-      obj = new NPG.QC.UI.MQCErrorMessage(FROM_EXCEPTION);
-      assert.equal(obj.formatForDisplay(), EXPECTED_FE, 'Correctly parses from exception');
-      obj = new NPG.QC.UI.MQCErrorMessage(FROM_GNR_TEXT);
-      assert.equal(obj.formatForDisplay(), EXPECTED_GT, 'Correctly parses from general text');
-    });
-
-    // run the tests.
+    
+    // start QUnit because it was told to wait.
     QUnit.start();
   }
 );
-
 

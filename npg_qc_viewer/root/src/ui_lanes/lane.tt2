@@ -15,14 +15,9 @@
 [%- position -%]
 [%- IF have_link %]
    </a>
-   [%- IF !run_view; -%]
-     <span class='library_mqc_overall_controls'></span>
-   [%- END; -%]
 [% END -%]
-[%- IF run_view; -%]
-<span id=mqc_lane[% position %] data-id_run='[% id_run %]' data-position='[% position %]' class='lane_mqc_control'></span>
-[%- ELSIF id_run.defined && position.defined -%]
-&nbsp;<span id=mqc_library[%id_run%]_[%position%]_[% tag_index %] data-id_run='[% id_run %]' data-position='[% position %]' data-tag_index='[% tag_index %]' class='lane_mqc_control'></span>
+[%- IF row_info_to.instance_qc_able; -%]
+<span class='lane_mqc_control'></span>
 [% END -%]
 </td>
 [%- IF has_plexes -%]
@@ -126,12 +121,15 @@
 [%- END -%]
 [%- END -%]
 
-[%  BLOCK split_stats -%]
-[%- IF result.num_aligned_merge.defined && result.num_total_merge.defined && result.num_total_merge != 0 -%]
-[%-   contam = (result.num_aligned_merge * 100) / result.num_total_merge -%]
-[%-   FILTER format('%2.2f'); contam; END -%]
-[%- END -%]
-[%- END -%]
+[%  BLOCK split_stats;
+    IF result.num_aligned_merge.defined && result.num_not_aligned_merge.defined;
+      total = result.num_aligned_merge + result.num_not_aligned_merge;
+      IF total;
+        contam = (result.num_aligned_merge * 100) / total;
+        FILTER format('%2.2f'); contam; END;
+      END;
+    END; 
+    END; -%]
 
 [%  BLOCK contamination -%]
 [%- IF result.contaminant_count.defined; ranked_orgs = result.ranked_organisms -%]

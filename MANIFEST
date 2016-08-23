@@ -108,7 +108,6 @@ lib/npg_qc/autoqc/autoqc.pm
 lib/npg_qc/autoqc/checks/adapter.pm
 lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/checks/check.pm
-lib/npg_qc/autoqc/checks/contamination.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
 lib/npg_qc/autoqc/checks/genotype.pm
@@ -157,7 +156,6 @@ lib/npg_qc/autoqc/role/adapter.pm
 lib/npg_qc/autoqc/role/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/role/bam_flagstats.pm
 lib/npg_qc/autoqc/role/contamination.pm
-lib/npg_qc/autoqc/role/gc_bias.pm
 lib/npg_qc/autoqc/role/gc_fraction.pm
 lib/npg_qc/autoqc/role/genotype.pm
 lib/npg_qc/autoqc/role/insert_size.pm
@@ -167,7 +165,6 @@ lib/npg_qc/autoqc/role/ref_match.pm
 lib/npg_qc/autoqc/role/result.pm
 lib/npg_qc/autoqc/role/rpt_key.pm
 lib/npg_qc/autoqc/role/sequence_error.pm
-lib/npg_qc/autoqc/role/split_stats.pm
 lib/npg_qc/autoqc/role/tag_decode_stats.pm
 lib/npg_qc/autoqc/role/tag_metrics.pm
 lib/npg_qc/autoqc/role/tags_reporters.pm
@@ -178,6 +175,7 @@ lib/npg_qc/controller.pm
 lib/npg_qc/file_store.pm
 lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/outcomes.pm
+lib/npg_qc/mqc/outcomes/keys.pm
 lib/npg_qc/model/analysis_lane.pm
 lib/npg_qc/model/analysis_lane_qcal.pm
 lib/npg_qc/model/analysis.pm
@@ -289,7 +287,6 @@ lib/npg_qc/Schema/Result/TileScore.pm
 lib/npg_qc/Schema/Result/UpstreamTags.pm
 lib/npg_qc/Schema/Result/VerifyBamId.pm
 lib/npg_qc/Schema/ResultSet.pm
-lib/npg_qc/Schema/ResultSet/MqcLibraryOutcomeEnt.pm
 lib/npg_qc/Schema/ResultSet/MqcOutcomeEnt.pm
 lib/npg_qc/util.pm
 lib/npg_qc/utils/bam_genotype.pm
@@ -420,13 +417,11 @@ t/50-schema-result-VerifyBamId.t
 t/50-schema-result-SamtoolsStats.t
 t/50-schema-result-SequenceSummary.t
 t/50-schema-resultset.t
-t/50-schema-resultset-MqcLibraryOutcomeEnt.t
 t/50-schema-resultset-MqcOutcomeEnt.t
 t/60-autoqc-autoqc.t
 t/60-autoqc-checks-adapter.t
 t/60-autoqc-checks-af_metrics.t
 t/60-autoqc-checks-check.t
-t/60-autoqc-checks-contamination.t
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-genotype.t
@@ -468,6 +463,7 @@ t/60-autoqc-results-spatial_filter.t
 t/60-autoqc-results-split_stats.t
 t/60-autoqc-results-tag_decode_stats.t
 t/60-autoqc-results-tag_metrics.t
+t/60-autoqc-results-verify_bam_id.t
 t/70-mqc-reporter.t
 t/70-mqc-outcomes.t
 t/80-autoqc-qc-script.t
@@ -715,6 +711,8 @@ t/data/autoqc/st/samples/9832.xml
 t/data/autoqc/tag_sets/sanger168.tags
 t/data/autoqc/tag_sets/sanger168_6.tags
 t/data/autoqc/tag_sets/sanger168_7.tags
+t/data/autoqc/verify_bam_id/19999_2#1.verify_bam_id.json
+t/data/autoqc/verify_bam_id/20000_1#2.verify_bam_id.json
 t/data/fastqcheck/4308/4308_1_2.fastqcheck
 t/data/fastqcheck/4308/4308_4_2#5.fastqcheck
 t/data/fastqcheck/4308/4308_4#5.fastqcheck

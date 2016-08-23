@@ -2,21 +2,27 @@ package npg_qc::autoqc::results::base;
 
 use Moose;
 use namespace::autoclean;
-use File::Spec::Functions qw( splitpath );
 use Carp;
 
 use npg_tracking::glossary::composition;
 use npg_tracking::glossary::composition::component::illumina;
 
-with qw( npg_qc::autoqc::role::result );
-with 'npg_tracking::glossary::composition::factory' =>
+with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+with 'npg_qc::autoqc::role::result';
 
 our $VERSION = '0';
+
+sub BUILD {
+  my $self = shift;
+  $self->composition();
+  return;
+}
 
 has 'composition' => (
     is         => 'ro',
     isa        => 'npg_tracking::glossary::composition',
+    required   => 0,
     lazy_build => 1,
     handles   => {
       'composition_digest' => 'digest',
@@ -29,92 +35,7 @@ sub _build_composition {
   if ($self->is_old_style_result) {
     return $self->create_composition();
   }
-  return npg_tracking::glossary::composition->new();
-}
-
-sub is_old_style_result {
-  my $self = shift;
-  return $self->can('id_run') && $self->can('position');
-}
-
-sub filename_root {
-  my $self = shift;
-  return $self->is_old_style_result() ? q[] : $self->composition_digest;
-}
-
-sub filename_root_from_filename {
-  my ($self, $file_path) = @_;
-  my ($volume, $directories, $file) = splitpath($file_path);
-  $file =~ s/[.](?:[^.]+)\Z//smx;
-  return $file;
-}
-
-around 'thaw' => sub {
-  my $orig = shift;
-  my $self = shift;
-  return $self->$orig(@_, 'check_version' => 0);
-};
-
-around 'to_string' => sub {
-  my ($orig, $self) = @_;
-  return join q[ ], ref $self , $self->composition->freeze;
-};
-
-around 'equals_byvalue' => sub {
-  my ($orig, $self, $other) = @_;
-
-  if (!defined $other) {
-    croak 'Nothing to compare to';
-  }
-
-  my $other_type = ref $other;
-  my $comp;
-  if ($other_type) {
-    if ($self->is_old_style_result()) {
-      $comp =  $self->$orig($other);
-    } else {
-      if ($other_type eq ref $self->composition) {
-        $comp = ($self->composition_digest cmp $other->digest) == 0 ? 1 : 0;
-      }
-    }
-  }
-
-  if (!defined $comp) {
-    croak 'Cannot evaluate input ' . $other;
-  }
-
-  return $comp;
-};
-
-sub composition_subset {
-  my $self = shift;
-
-  my @subsets = $self->composition->component_values4attr('subset');
-  my $subset;
-  if (@subsets) {
-    if (scalar @subsets > 1) {
-      croak 'Multiple subsets within the composition: ' . join q[,] , @subsets;
-    }
-    $subset = $subsets[0];
-  }
-
-  if ( $self->can('subset') ) {
-    if ( (!$self->subset && $subset) ||
-         ($self->subset && !$subset) ||
-         ($self->subset && $subset && $self->subset ne $subset) ) {
-      croak 'Inconsistent subset values for this object and components of the composition';
-    }
-  }
-
-  return $subset;
-}
-
-sub execute {
-  my $self = shift;
-  if ($self->num_components == 0) {
-    croak 'Empty composition - cannot run execute()';
-  }
-  return;
+  croak 'Can only build old style results';
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -129,54 +50,20 @@ npg_qc::autoqc::results::base
 
 =head1 DESCRIPTION
 
-An alternative composition-based parent object for autoqc result objects.
+A composition-based parent object for autoqc result objects.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 BUILD
+
+Default object constructor extension that is called after the object is created,
+but before it is returned to the caller. Builds the composition accessor.
+
 =head2 composition
 
-An npg_tracking::glossary::composition composition objects. If the derived
+A npg_tracking::glossary::composition object. If the derived
 class inplements id_run and position methods/attributes, a one-component
-composition is created automatically. Otherwise an empry composition object
-is created.
-
-=head2 is_old_style_result
-
-A method returning true if the derived class implements id_run and position
-methods/attributes.
-
-=head2 filename_root
-
-Autoqc result object interface method, see npg_qc::autoqc::role::result for
-details. Suggested filename root for serialisation.
-For an old-style object as defined by the is_old_style_result method returns an
-empty string, otherwise returns a composition digest.
-
-=head2 thaw
-
-Extends the parent method provided by the MooseX::Storage framework -
-disables version checking between the version of the module that
-serialized the object and the version of the same module that
-is performing de-serialization. 
-
-=head2 to_string
-
-Autoqc result object interface method, see npg_qc::autoqc::role::result for
-details. Returns a human readable string representation of the object.
-
-=head2 equals_byvalue
-
-Autoqc result object interface method, see npg_qc::autoqc::role::result for details.
-
-=head2 composition_subset
-
-A single, possibly undefined, value describing the subset attribute values of the components.
-An error if a single value cannot be produced or if it is not the same as the value returned
-by the subset method/attribute of this object (if such method/attribute is available).
-
-=head2 execute
-
-=head2 filename_root_from_filename
+composition is created automatically.
 
 =head1 DIAGNOSTICS
 
@@ -190,17 +77,13 @@ by the subset method/attribute of this object (if such method/attribute is avail
 
 =item namespace::autoclean
 
-=item File::Spec::Functions
-
 =item Carp
 
 =item npg_tracking::glossary::composition
 
-=item npg_tracking::glossary::composition::factory
+=item npg_tracking::glossary::composition::factory::attributes
 
 =item npg_tracking::glossary::composition::component::illumina
-
-=item npg_qc::autoqc::role::result
 
 =back
 

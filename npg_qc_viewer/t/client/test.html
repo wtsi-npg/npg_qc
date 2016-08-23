@@ -1,26 +1,17 @@
-<!DOCTYPE html>
 <html>
 <head>
 <title>QUnit Test Suite</title>
 <link rel="stylesheet" href="../../root/static/bower_components/qunit/qunit/qunit.css" type="text/css" media="screen">
-<script type="text/javascript" src="../../root/static/bower_components/qunit/qunit/qunit.js"></script>
-<script type="text/javascript" src="../../root/static/bower_components/jquery/dist/jquery.js"></script>
-<!-- Your project file goes here -->
-<script type="text/javascript" src="../../root/static/scripts/manual_qc.js" data-cover></script>
-<script type="text/javascript" src="../../root/static/scripts/manual_qc_ui.js" data-cover></script>
-
+<script src="../../root/static/bower_components/qunit/qunit/qunit.js"></script>
 <script>QUnit.config.autostart = false;</script>
 </head>
 <body>
-<h1 id="qunit-header">QUnit Test Suite</h1>
-<h2 id="qunit-banner"></h2>
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
 
 <div id="qunit-fixture">
-<div id='mqc_lane1' data-id_run='2' data-position='3' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
-<div id='mqc_lane2' data-id_run='3' data-position='4' data-initial='Accepted final' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
+<div id='mqc_lane1' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
+<div id='mqc_lane2' class='lane_mqc_control'><div class='lane_mqc_working'></div></div>
 </div>
 
 <div id="Test_NPG.QC.RunPageMQCControl.laneOutcomesMatch">
@@ -30,6 +21,8 @@
 <div class='laneOutcomesMatchTdlanes3'><div data-position='1' data-initial='Accepted final' class='lane_mqc_control'></div></div>
 <div class='laneOutcomesMatchTdlanes3'><div data-position='2' data-initial='Rejected final' class='lane_mqc_control'></div></div>
 </div>
-<script data-main="test" src="../../root/static/bower_components/requirejs/require.js"></script>
+
+<script src="../../root/static/bower_components/requirejs/require.js"></script>
+<script src="test.js"></script>
 </body>
 </html>

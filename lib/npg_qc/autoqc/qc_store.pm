@@ -1,8 +1,3 @@
-#########
-# Author:        Andy Brown ajb@sanger.ac.uk and Marina Gourtovaia mg8@sanger.ac.uk 
-# Created:       Summer 2009
-#
-
 package npg_qc::autoqc::qc_store;
 
 use Moose;
@@ -49,7 +44,7 @@ has 'use_db'       => ( isa        => 'Bool',
                         is         => 'ro',
                         required   => 0,
                         default    => 1,
-		      );
+                      );
 
 =head2 verbose
 
@@ -71,7 +66,7 @@ has 'qc_schema'    => ( isa        => 'Maybe[npg_qc::Schema]',
                         is         => 'ro',
                         required   => 0,
                         lazy_build => 1,
-		      );
+                      );
 sub _build_qc_schema {
   my $self = shift;
   if ($self->use_db) {
@@ -195,8 +190,7 @@ sub run_from_db {
     }
     return $c;
   }
-  foreach my $check_name (@{npg_qc::autoqc::autoqc->checks_list()}) {
-    next if ($check_name =~ $NON_STORABLE_CHECK);
+  foreach my $check_name (@{$c->checks_list()}) {
     my $dbix_query = { 'id_run' => $query->id_run};
     if (@{$query->positions}) {
       $dbix_query->{'position'} = $query->positions;
@@ -205,18 +199,19 @@ sub run_from_db {
     if (!$table_class) {
       croak qq[No DBIx result class name for $check_name];
     }
-    my $result_set = $self->qc_schema()->resultset($table_class);
-    if ($query->option == $LANES || $query->option == $PLEXES) {
-      my $column = 'tag_index';
-      my $result_source = $result_set->result_source;
-      if (any {$_ eq $column} $result_source->columns()) {
-        my $db_default = $result_source->column_info($column)->{'default_value'};
-        my $not_default = {q[!=], $db_default};
-        $dbix_query->{$column} = ($query->option == $LANES) ? $db_default : $not_default;
+
+    my $rs = $self->qc_schema()->resultset($table_class);
+    my $ti_key = 'tag_index';
+    if ($rs->result_source()->has_column($ti_key)) {
+      if ($query->option == $LANES) {
+        $dbix_query->{'tag_index'} = undef;
+      } elsif ($query->option == $PLEXES) {
+        $dbix_query->{'tag_index'} = {q[!=], 'undef'};
       }
     }
-    my @rows = $result_set->search($dbix_query)->all();
-    $c->add(\@rows);
+
+    my $composition_size = 1;
+    $c->add([$rs->search_autoqc($dbix_query, $composition_size)->all()]);
   }
   return $c;
 }
@@ -262,11 +257,12 @@ __END__
 
 =head1 AUTHOR
 
-Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt> and Andy Brown E<lt>ajb@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Andy Brown E<lt>ajb@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Marina Gourtovaia and Andy Brown
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

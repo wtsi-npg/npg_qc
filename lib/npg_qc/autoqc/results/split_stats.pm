@@ -1,19 +1,10 @@
-#########
-# Author:        gq1
-# Created:       2009-09-21
-#
-
 package npg_qc::autoqc::results::split_stats;
 
-use strict;
-use warnings;
 use Moose;
+use MooseX::Aliases;
 use namespace::autoclean;
-use Carp;
-use English qw(-no_match_vars);
 
 extends qw(npg_qc::autoqc::results::result);
-with qw(npg_qc::autoqc::role::split_stats);
 
 our $VERSION = '0';
 
@@ -43,6 +34,7 @@ has 'ref_name'            =>  (isa            => 'Maybe[Str]',
                                is             => 'rw',
                                required       => 0,
 		                         );
+alias subset => 'ref_name';
 
 has 'reference'           =>  (isa            => 'Maybe[Str]',
                                is             => 'rw',
@@ -109,6 +101,8 @@ npg_qc::autoqc::results::split_stats
 
 =head2 position
 
+=head2 subset
+
 =head2 path
 
 =head2 filename1
@@ -143,15 +137,9 @@ npg_qc::autoqc::results::split_stats
 
 =over
 
-=item strict
-
-=item warnings
-
-=item Carp
-
-=item English
-
 =item Moose
+
+=item MooseX::Aliases
 
 =item namespace::autoclean
 
@@ -169,7 +157,7 @@ Guoying Qi, E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Guoying Qi
+Copyright (C) 2016 GRL
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

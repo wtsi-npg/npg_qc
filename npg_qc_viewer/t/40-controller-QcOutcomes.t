@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use lib 't/lib';
+use Test::More tests => 8;
 use Test::Exception;
 use URI::Escape qw(uri_escape);
 use JSON::XS;
@@ -16,9 +17,12 @@ my $schemas;
 lives_ok { $schemas = $util->test_env_setup()}
   'test db created and populated';
 my $qc_schema = $schemas->{'qc'};
+my $wh_schema = $schemas->{'mlwh'};
 
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
+
+my $base_url = '/qcoutcomes';
 
 sub _message {
   my ($request, $rpt) = @_;
@@ -27,6 +31,12 @@ sub _message {
       $request->method eq 'GET' ? q() :
       q[ with content '] . $request->content . q['],
       $rpt ? qq[ ($rpt)] : q();
+}
+
+sub _new_post_request {
+  my $request = HTTP::Request->new('POST', $base_url);
+  $request->header( 'Content-type' => 'application/json' );
+  return $request;
 }
 
 subtest 'retrieving data via GET and POST' => sub {
@@ -58,7 +68,6 @@ subtest 'retrieving data via GET and POST' => sub {
     '{"lib":{"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5}},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}'
   ];
 
-  my $base_url = '/qcoutcomes';
   my $r1 = HTTP::Request->new('GET',  $base_url);
   my $r2 = HTTP::Request->new('POST', $base_url);
   $r2->header( 'Content-type' => 'application/json' );
@@ -154,6 +163,161 @@ subtest 'retrieving data via GET and POST' => sub {
            
     $j++; 
   }
+};
+
+subtest 'authentication and authorisation for an update' => sub {
+  plan tests => 7;
+
+  my $error_code = 403;
+
+  my $request = _new_post_request();
+  $request->content('{"Action":"UPDATE"}');
+  my $response = request($request);
+  ok( $response->is_error, qq[response is an error] );
+  is( $response->code, $error_code, "error code is $error_code" );
+  like ($response->content, qr/Login failed/, 'no user credentials - error');
+
+  $request = _new_post_request();
+  $request->content('{"Action":"UPDATE","user":"frog","password":"public"}');
+  $response = request($request);
+  is( $response->code, $error_code, "error code is $error_code" );
+  like ($response->content, qr/Login failed/, 'frog is not authenticated');
+
+  $request = _new_post_request();
+  $request->content('{"Action":"UPDATE","user":"tiger","password":"secret"}');
+  $response = request($request);
+  is( $response->code, $error_code, "error code is $error_code" );
+  like ($response->content, qr/User tiger is not authorised for manual qc/,
+    'tiger is not authorised');
+};
+
+subtest 'data validation for update requests' => sub {
+  plan tests => 8;
+
+  my $data = {'Action'   => 'UPDATE',
+              'user'     => 'cat',
+              'password' => 'secret',
+              'lib'      => {},
+              'seq'      => {}};
+  my $error_code = 400;
+
+  my $request = _new_post_request();
+  $request->content(encode_json($data));
+  my $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/No data to save/,
+    'should send some data');
+
+  $data->{'lib'} = {'1:2;3:4' => {'mqc_outcome' => 'some'}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/rpt string should not contain \';\'/,
+    'multi-component compositions are not allowed');
+
+  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'some'}, '1:4' => {'mqc_outcome' => ''}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/Outcome description is missing for 1:4/,
+    'outcome description should be present');
+
+  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'some'}, '1:4' => {'qc_outcome' => ''}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/Outcome description is missing for 1:4/,
+    'outcome description should not be empty');
+};
+
+
+subtest 'conditionally get wh info about tags' => sub {
+  plan tests => 4;
+
+  my $data = {'Action'   => 'UPDATE',
+              'user'     => 'cat',
+              'password' => 'secret',
+              'seq' =>  {'1234:4' => {'mqc_outcome' => 'some'}}
+             };
+  my $error_code = 400;
+
+  my $request = _new_post_request();
+  $request->content(encode_json($data));
+  my $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content,
+    qr/No NPG mlwarehouse data for run 1234 position 4/,
+    'error when no lims data available for a lane');
+
+  delete $data->{'seq'};
+  $data->{'lib'} = {'1234:4' => {'mqc_outcome' => 'Undecided'}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  ok($response->is_success, 'response received for updating a lib entity');
+  
+  $wh_schema->resultset('IseqRunLaneMetric')->create({
+    cancelled =>  0,
+    cycles => 76,
+    id_run => 1234,
+    instrument_model => 'HK',
+    instrument_name => 'IL6',
+    paired_read => 1,
+    pf_bases => 912144,
+    pf_cluster_count => 120019,
+    position => 4,});
+
+  $wh_schema->resultset('IseqProductMetric')->create({
+    id_run => 1234, position => 4, id_iseq_flowcell_tmp => 2514299
+  });
+  
+  delete $data->{'lib'};
+  $data->{'seq'} = {'1234:4' => {'mqc_outcome' => 'Rejected final'}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  ok($response->is_success, 'response received for updating a seq entity');
+};
+
+subtest 'Conditional update of run/lane status in tracking' => sub {
+  plan tests => 9;
+  
+  my $original = 'analysis complete';
+  my $rl=$schemas->{'npg'}->resultset('RunLane')->find({id_run=>4025, position=>4});
+  $rl->update_status($original);
+  is($rl->current_run_lane_status->description, $original,
+    "lane status is set to $original");
+
+  my $data = {'Action'   => 'UPDATE',
+              'user'     => 'pipeline',
+              'password' => 'secret'};
+  
+  my @prelims = ('Accepted preliminary', 'Rejected preliminary', 'Undecided');
+  foreach my $mqc_outcome (@prelims) {
+    my $request = _new_post_request();
+    $data->{'seq'} = {'4025:4' => {'mqc_outcome' => $mqc_outcome}};
+    $request->content(encode_json($data));
+    my $response = request($request);
+    ok($response->is_success, "updated to '$mqc_outcome'") ||
+      diag 'RESPONSE: ' . $response->content;
+    
+    is($rl->current_run_lane_status->description, $original,
+      'lane status has not changed');
+  } 
+
+  my $mqc_outcome = 'Rejected final';
+  $data->{'seq'} = {'4025:4' => {'mqc_outcome' => $mqc_outcome}};
+  my $request = _new_post_request();
+  $request->content(encode_json($data));
+  my $response = request($request);
+  ok($response->is_success, "updated to '$mqc_outcome'") ||
+    diag 'RESPONSE: ' . $response->content;
+  my $expected_lane_status = 'manual qc complete';
+  is($rl->current_run_lane_status->description, $expected_lane_status,
+    "lane status changed to $expected_lane_status");
 };
 
 1;

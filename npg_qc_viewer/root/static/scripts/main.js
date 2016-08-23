@@ -1,4 +1,6 @@
-require.config({
+/* globals $, requirejs, document */
+"use strict";
+requirejs.config({
   baseUrl: '/static',
   catchError: true,
   paths: {
@@ -17,26 +19,45 @@ require.config({
   }
 });
 
-require.onError = function (err) {
-    window.console && console.log(err.requireType);
-    window.console && console.log('modules: ' + err.requireModules);
+requirejs.onError = function (err) {
+    if ( console ) {
+      console.log(err.requireType);
+      console.log('modules: ' + err.requireModules);
+    }
     throw err;
 };
 
-require([
-  'scripts/qc_outcomes_view',
+requirejs([
+  'scripts/collapse',
+  'scripts/qcoutcomes/qc_outcomes_view',
   'scripts/plots',
   'scripts/format_for_csv',
+  'scripts/qcoutcomes/qc_page',
+  'scripts/qcoutcomes/manual_qc',
   'unveil',
-  'scripts/manual_qc',
-  'scripts/manual_qc_ui',
   'table-export'
-],
-function( qc_outcomes_view, plots, format_for_csv, unveil ) {
-  //Setup for heatmaps to load on demand.
+], function(
+  collapse,
+  qc_outcomes_view,
+  plots,
+  format_for_csv,
+  qc_page,
+  NPG
+) {
   $(document).ready(function(){
+    //Setup for heatmaps to load on demand.
     $("img").unveil(2000);
-    qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', NPG.QC.launchManualQCProcesses);
+    collapse.init(function() {
+
+      // We scroll after collapse toggles to fire modify on view to generate plots
+      window.scrollBy(0,1); window.scrollBy(0,-1);
+    });
+    var qcp = qc_page.pageForMQC();
+    var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) {
+                                                        NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes');
+                                                      }
+                                                    : null;
+    qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
   });
 
   //Required to show error messages from the mqc process.

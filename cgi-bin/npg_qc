@@ -1,4 +1,6 @@
 #!/usr/local/bin/perl -T
+use strict;
+use warnings;
 
 my @npg_libs;
 BEGIN {
@@ -6,15 +8,14 @@ BEGIN {
   if ($libs_string) {
     my @libs = split /:/smx, $libs_string;
     foreach my $l (@libs) {
-      my ($dtl) = $l =~ /([a-z0-9\/\._\-]+)/i;
+      my ($dtl) = $l =~ /([\w\/\.\-]+)/smxia;
+      #'a' modifiler for ascii only interpretation of \w
       if ($dtl) {push @npg_libs, $dtl;}
     }
   }
 }
 
-use strict;
 use lib @npg_libs;
-use warnings;
 use npg_qc::controller;
 use npg_qc::util;
 

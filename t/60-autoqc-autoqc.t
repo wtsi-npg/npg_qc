@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 58;
+use Test::More tests => 54;
 use Test::Deep;
 use Test::Exception;
 use File::Path;
@@ -25,38 +25,6 @@ my $ref = q[t/data/autoqc];
 }
 
 {
-  my $expected = {
-                    qX_yield         => 1,
-                    insert_size      => 1,
-                    sequence_error   => 1,
-                    contamination    => 1,
-                    adapter          => 1,
-                    split_stats      => 1,
-                    spatial_filter   => 1,
-                    gc_fraction      => 1,
-                    gc_bias          => 1,
-                    genotype         => 1,
-                    tag_decode_stats => 1,
-                    bam_flagstats    => 1,
-                    ref_match        => 1,
-                    tag_metrics      => 1,
-                    pulldown_metrics => 1,
-                    alignment_filter_metrics => 1,
-                    upstream_tags => 1,
-                    tags_reporters => 1,
-                    verify_bam_id => 1,
-                    rna_seqc => 1,
-                 };
-  my $actual;
-  my @checks = @{npg_qc::autoqc::autoqc->checks_list};
-  foreach my $check (@checks) {
-    $actual->{$check} = 1;
-  }
-  cmp_deeply ($actual, $expected, 'checks listed');
-  is (join(q[ ], sort @checks), join(q[ ], sort keys %{$actual}), 'check list is sorted');
-}
-
-{
   my $id_run = 2222;
   my $qc_subpath = q[t/data];
   my $archive_subpath = q[t];
@@ -64,14 +32,6 @@ my $ref = q[t/data/autoqc];
   throws_ok {
      npg_qc::autoqc::autoqc->new(archive_path => $archive_subpath, id_run => $id_run, qc_path => $qc_subpath, position => 1)
   } qr/is required/, 'error when not setting the check name through the constructor';
-
-  throws_ok {
-    npg_qc::autoqc::autoqc->new(check => q[check], archive_path => $archive_subpath, id_run => $id_run, qc_path => $qc_subpath, position => 1)
-  } qr/Invalid\ check\ name/smx, 'error when setting invalid check name';
-
-  throws_ok {
-    npg_qc::autoqc::autoqc->new(check => q[insert_sizes], archive_path => $archive_subpath, id_run => $id_run, qc_path => $qc_subpath, position => 1)
-  } qr/Invalid\ check\ name/smx, 'error when setting invalid check name';
 
   my $qc = npg_qc::autoqc::autoqc->new(check => q[split_stats], archive_path => $archive_subpath, id_run => $id_run, qc_path => $qc_subpath, position => 1);
   throws_ok { $qc->can_run() } qr/Can't locate/, 'split-stats check: unable to invoke a method that has to create a check object';

@@ -1,15 +1,7 @@
-#########
-# Author:        Kevin Lewis
-# Created:       12 August 2013
-#
-
 package npg_qc::autoqc::results::upstream_tags;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
-use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::upstream_tags);
@@ -73,8 +65,6 @@ __END__
 
 =item namespace::autoclean
 
-=item Readonly
-
 =item npg_qc::autoqc::results::result
 
 =back
@@ -85,11 +75,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt><gt>
+Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 GRL, by Kevin Lewis
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

@@ -2,22 +2,18 @@ package npg_qc::autoqc::autoqc;
 
 use Moose;
 use namespace::autoclean;
-use MooseX::ClassAttribute;
 use Class::Load qw(load_class);
 use Carp;
-use English qw(-no_match_vars);
 use Readonly;
 use File::Spec;
 use List::Util qw(first);
-use Module::Pluggable::Object;
 
 use npg_tracking::util::types;
-use npg_qc::autoqc::checks::check;
 
 with  qw / npg_tracking::illumina::run::short_info
            npg_tracking::illumina::run::folder
            MooseX::Getopt
-        /;
+         /;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
@@ -28,52 +24,19 @@ npg_qc::autoqc::autoqc
 
 =head1 SYNOPSIS
 
-  my $autoqc = npg_qc::autoqc::autoqc->new(archive_path=>q[some_path], position=>1, check=>q[insert_size]);
-  $autoqc->run();
-  my $checks = npg_qc::autoqc::autoqc->checks_list();
+  my $aqc = npg_qc::autoqc::autoqc->new(archive_path=>q[some_path], position=>1, check=>q[insert_size]);
+  $aqc->run();
 
 =head1 DESCRIPTION
 
-A wrapper around autoqc lib.
+A wrapper around autoqc check libraries.
 
 =head1 SUBROUTINES/METHODS
 
 =cut
 
-
-Readonly::Array  my @NON_RUNNABLE_CHECKS => qw(tag_decode_stats split_stats bam_flagstats);
 Readonly::Scalar my $CHECKS_NAMESPACE    => q[npg_qc::autoqc::checks];
 Readonly::Scalar my $NO_TAG_INDEX        => -1;
-
-=head2 checks_list
-
-Class Attribute. Returns a ref to a list of attributes that are included into
-the output of a check.
-
-=cut
-class_has 'checks_list' => (isa        => 'ArrayRef',
-                            is         => 'ro',
-                            required   => 0,
-                            lazy_build => 1,
-		          );
-sub _build_checks_list {
-
-    my @classes = Module::Pluggable::Object->new(
-                          require     => 0,
-                          search_path => $CHECKS_NAMESPACE,
-                          except      => $CHECKS_NAMESPACE . q[::check],
-                                                )->plugins;
-
-    my @class_names = ();
-    foreach my $class (@classes) {
-        my @names = split /:/smx , $class;
-        push @class_names, (pop @names);
-    }
-    @class_names = sort @class_names;
-    push @class_names, @NON_RUNNABLE_CHECKS;
-    return \@class_names;
-}
-
 
 =head2 tag_index
 
@@ -92,30 +55,21 @@ has 'tag_index'    => (isa       => 'Int',
 The name of the check to perform.
 
 =cut
-has 'check'    => (   isa      => 'Str',
-                      is       => 'ro',
-                      required => 1,
-                      documentation => 'QC check name, one of returned by the check_list methods',
-                      trigger  => \&_set_check_name,
+has 'check'    => (isa      => 'Str',
+                   is       => 'ro',
+                   required => 1,
+                   documentation => 'QC check name',
                   );
-sub _set_check_name {
-    my ($self, $name) = @_;
-    my @values = grep { /^$name$/sxm } @{$self->checks_list};
-    if (@values == 0) {
-        croak qq[Invalid check name $name, please choose a name from the list '] . join(q[ ], @{$self->checks_list}) . q['];
-    }
-}
-
 
 =head2 position
 
 Lane number.
-
+0000000
 =cut
-has 'position' => (   isa      => 'NpgTrackingLaneNumber',
-                      is       => 'ro',
-                      required => 1,
-                      documentation => 'Lane (position) number, an integer from 1 to 8 inclusive.',
+has 'position' => (isa      => 'NpgTrackingLaneNumber',
+                   is       => 'ro',
+                   required => 1,
+                   documentation => 'Lane (position) number.',
                   );
 
 =head2 repository
@@ -183,7 +137,7 @@ has 'qc_report_dir' => (isa       => 'NpgTrackingDirectory',
                        );
 
 sub _build_run_folder {
-    my ($self) = @_;
+    my $self = shift;
     return first {$_ ne q()} reverse File::Spec->splitdir($self->runfolder_path);
 }
 
@@ -214,7 +168,7 @@ sub BUILD {
             } else {
                 $self->_write_qc_out($self->qc_path);
             }
-	   }
+        }
     }
     if (!-R $self->qc_in) {
         croak q[Input qc directory ] . $self->qc_in . q[ does not exist or is not readable];
@@ -234,18 +188,18 @@ sub _create_test_object {
                 path      => $self->qc_in,
                 position  => $self->position,
                 id_run    => $self->id_run,
-	};
+                 };
 
     my @attrs = qw/tag_index repository reference_genome species strain file_type qc_out qc_report_dir/;
     foreach my $attr_name (@attrs) {
         if ($attr_name eq q[tag_index] ) {
             if (defined $self->$attr_name) {
                 $init->{$attr_name} = $self->$attr_name;
-	       }
+            }
         } else {
             if ($self->$attr_name) {
                 $init->{$attr_name} = $self->$attr_name;
-	       }
+            }
         }
     }
     return $pkg->new($init);
@@ -258,7 +212,6 @@ Creates an object that can perform the requested test, calls test execution and 
 
 =cut
 sub run {
-
     my $self = shift;
 
     if (!-e $self->qc_out) {
@@ -280,10 +233,8 @@ If there are any problems with this test, returns 1.
 
 =cut
 sub can_run {
-
     my $self = shift;
-    my $check = $self->_create_test_object();
-    return $check->can_run;
+    return $self->_create_test_object()->can_run;
 }
 
 no MooseX::ClassAttribute;
@@ -306,19 +257,15 @@ __END__
 
 =item MooseX::ClassAttribute
 
-=item Cass::Load
+=item Class::Load
 
 =item File::Spec
 
 =item Carp
 
-=item English -no_match_vars
-
 =item Readonly
 
 =item List::Util
-
-=item Module::Pluggable::Object
 
 =item npg_tracking::illumina::run::short_info
 
@@ -338,7 +285,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

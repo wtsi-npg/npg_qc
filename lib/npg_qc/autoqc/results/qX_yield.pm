@@ -1,17 +1,10 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       14 April 2009
-#
-
 package npg_qc::autoqc::results::qX_yield;
 
 use Moose;
 use namespace::autoclean;
 use npg_tracking::util::types;
-use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
-
 with qw ( npg_qc::autoqc::role::qX_yield );
 
 our $VERSION = '0';
@@ -139,11 +132,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

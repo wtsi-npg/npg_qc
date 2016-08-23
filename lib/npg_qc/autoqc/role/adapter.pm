@@ -3,8 +3,6 @@ package npg_qc::autoqc::role::adapter;
 use Moose::Role;
 use Readonly;
 
-with qw(npg_qc::autoqc::role::result);
-
 our $VERSION = '0';
 
 Readonly::Scalar our $PERCENT              => 100;
@@ -85,7 +83,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Genome Research Ltd
+Copyright (C) 2016 Genome Research Ltd
 
 This file is part of NPG.
 

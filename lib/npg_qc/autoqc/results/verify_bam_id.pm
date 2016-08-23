@@ -1,12 +1,5 @@
-#########
-# Author:        Kevin Lewis
-# Created:       27 April 2011
-#
-
 package npg_qc::autoqc::results::verify_bam_id;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 
@@ -78,11 +71,11 @@ __END__
 
 =head1 AUTHOR
 
-Author: Kevin Lewis<lt>kl2@sanger.ac.ukE<gt>
+Kevin Lewis<lt>kl2@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Kevin Lewis
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

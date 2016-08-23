@@ -1,12 +1,6 @@
-#########
-# Author:        kl2
-# Created:       1 September 2009
-#
-
 use strict;
 use warnings;
 use Test::More tests => 4;
-use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::genotype');
 use_ok ('npg_qc::autoqc::results::collection');
@@ -21,6 +15,6 @@ use_ok ('npg_qc::autoqc::results::collection');
     $c->add_from_dir(q[t/data/autoqc/genotype], [1], 6812);
     $c=$c->slice('class_name', 'genotype');
 
-    is($c->results->[0]->criterion(), q[Sample name is PD6732b_wg, number of common SNPs &ge; 21 and percentage of loosely matched calls &gt; 95% (fail: &lt;50%)], 'criteria');
+    is($c->results->[0]->criterion(), q[Sample name is PD6732b_wg, number of common SNPs %3E%3D 21 and percentage of loosely matched calls %3E 95%25 (fail: %3C50%25)], 'criteria');
 }
 

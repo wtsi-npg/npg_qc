@@ -3,7 +3,7 @@
      lane_collection = rl_map.${lane_key};
      NEXT IF (!lane_collection || lane_collection.size == 0);
      temp = lane_collection.sort;
-     to_remove = ['split stats phix', 'spatial filter'];
+     to_remove = ['split stats phix', 'spatial filter',  'split stats'];
      IF !run_view;
        to_remove.push('qX yield', 'gc fraction');
      END;
@@ -25,7 +25,7 @@
   -%]
 
   <div class="results_full_lane">
-  <h3>[% util.expand_rpt_key(lane_key) %] | [% provenance | html %] <a name="[% lane_key %]"></a></h3>
+  <h3 class="collapser">[% util.expand_rpt_key(lane_key) %] | [% provenance | html %] <a name="[% lane_key %]"></a></h3>
   [%- IF trimmed_reference_path.species && trimmed_reference_path.version; -%]
     <h4>Reference: [%- trimmed_reference_path.species -%] ([%- trimmed_reference_path.version -%])</h4>
   [%- END -%]
@@ -77,7 +77,7 @@
 [% BLOCK display_full_check_content %]
 	<div [% rf_id_attr %] class="result_full">
 
-        <h2>[% util.expand_rpt_key(lane_key) %], [% check.check_name -%] 
+        <h2 class="collapser [% check.check_name %]">[% util.expand_rpt_key(lane_key) %], [% check.check_name -%]
 
 	[%- IF check.defined('pass') -%]:
 		[% check.pass ? 'passed' : '<span class="result_fail">failed</span>' -%]

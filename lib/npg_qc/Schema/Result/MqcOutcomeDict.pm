@@ -117,6 +117,20 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_mqc_outcome');
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<unique_seq_outcome_desc>
+
+=over 4
+
+=item * L</short_desc>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint('unique_seq_outcome_desc', ['short_desc']);
+
 =head1 RELATIONS
 
 =head2 mqc_outcome_ents
@@ -150,8 +164,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-22 15:31:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:diQejZUulONV1fs7m9M5Jg
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-02-25 12:46:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:uvX5dg+iK+c1e6Vv6zqBHQ
 
 with qw/npg_qc::Schema::Mqc::OutcomeDict/;
 

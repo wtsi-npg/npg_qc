@@ -214,7 +214,7 @@ sub _build_json_genotype {
 
 	for my $chrpos (keys %$pos_snpname_map) { $calls{$pos_snpname_map->{$chrpos}}->{call} = 'NN'; }	# initialise all calls to 'NN'
 
-	open $f, "$call_gt_cmd|" or croak "Failed to open filter";
+	open $f, q{-|}, $call_gt_cmd or croak "Failed to open filter";
 	while(<$f>) {
 		next if(/^#/);
 
@@ -250,8 +250,7 @@ sub _build_json_genotype {
 			$calls{$snp_name}->{gt_pl} = $pl;
 		}
 	}
-#	close($f) or croak 'Error calling genotype from bam file';
-	close($f);
+	close($f) or croak 'Error calling genotype from bam file';
 
 	$json_genotype->{bam} = $self->bam_file_list->[0];
 	$json_genotype->{reference} = $self->reference;
