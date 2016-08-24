@@ -2,6 +2,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - autoqc
    - added Broad Institute's RNA-SeQC to list of QC checks
+
 release 62.1
  - Bug fix in build action for cgi files.
 
@@ -63,7 +64,6 @@ release 61.0
  - add unique db constraint for short descriptions in qc outcome
    dictionaries; the constraints should have been set when the tables
    were created 
->>>>>>> master
 
 release 60.0
  - JSON service (retrieval) for qc outcomes

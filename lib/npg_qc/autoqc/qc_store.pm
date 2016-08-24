@@ -191,6 +191,7 @@ sub run_from_db {
     return $c;
   }
   foreach my $check_name (@{$c->checks_list()}) {
+    next if ($check_name =~ $NON_STORABLE_CHECK);
     my $dbix_query = { 'id_run' => $query->id_run};
     if (@{$query->positions}) {
       $dbix_query->{'position'} = $query->positions;

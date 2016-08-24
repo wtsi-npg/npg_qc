@@ -26,11 +26,11 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         tag_index => 8,
         path => q[mypath],
         repository => $repos,
-        qc_out => q[t/data],);
+        qc_report_dir => q[t/data],);
     isa_ok ($rnaseqc, 'npg_qc::autoqc::checks::rna_seqc');
     lives_ok { $rnaseqc->result; } 'result object created';
     local $ENV{CLASSPATH} = q[];
-    throws_ok {npg_qc::autoqc::checks::rna_seqc->new(id_run => 2, path => q[mypath], position => 1, qc_out => q[t/data])}
+    throws_ok {npg_qc::autoqc::checks::rna_seqc->new(id_run => 2, path => q[mypath], position => 1, qc_report_dir => q[t/data])}
         qr/Can\'t find \'RNA-SeQC\.jar\' because CLASSPATH is not set/,
         q[Fails to create object when RNA-SeQC.jar not found];
 }
@@ -42,7 +42,7 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         tag_index => 8,
         path => q[nonexisting],
         repository => $repos,
-        qc_out => q[t/data],);
+        qc_report_dir => q[t/data],);
     throws_ok {$qc->execute()} qr/directory nonexisting does not exist/, 'execute: error on nonexisting path';
 }
 
@@ -53,7 +53,7 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         tag_index => 13,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,
-        qc_out => q[t/data],);
+        qc_report_dir => q[t/data],);
     lives_ok { $check->execute } 'no error when input not found';
 }
 
@@ -84,7 +84,7 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         ref_repository => $ref_repos_dir,
         transcriptome_repository => $trans_repos_dir,
         _alignments_in_bam => 0,
-        qc_out => q[t/data],);
+        qc_report_dir => q[t/data],);
     is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_3#8.bam', 'bam file path for id run 17550 lane 3 tag 8');
     lives_ok { $check->execute } 'execution ok for no alignments in BAM';
     like ($check->result->comments, qr/BAM file is not aligned/, 'comment when bam file is not aligned');
@@ -95,7 +95,7 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         tag_index => 8,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,
-        qc_out => q[t/data],
+        qc_report_dir => q[t/data],
         _ref_genome => q[],
         transcriptome_repository => $trans_repos_dir,);
     lives_ok { $check->execute } 'execution ok for no reference genome file';
@@ -107,7 +107,7 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         tag_index => 8,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,
-        qc_out => q[t/data],
+        qc_report_dir => q[t/data],
         _annotation_gtf => q[],
         ref_repository => $ref_repos_dir,);
     lives_ok { $check->execute } 'execution ok for no annotation file';
@@ -123,7 +123,7 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         tag_index => 1,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,
-        qc_out => q[t/data],
+        qc_report_dir => q[t/data],
         ref_repository => $ref_repos_dir,
         transcriptome_repository => $trans_repos_dir,);
     throws_ok { $check->execute } qr/Binary fasta reference for Danio_rerio, zv9, all does not exist/,
@@ -141,7 +141,7 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         repository => $repos,
         ref_repository => $ref_repos_dir,
         transcriptome_repository => $trans_repos_dir,
-        qc_out => q[t/data],);
+        qc_report_dir => q[t/data],);
     is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_1#1.bam', 'bam file path for id run 17550 lane 1 tag 1');
     lives_ok { $check->execute } 'execution ok for no RNA alignment';
     like ($check->result->comments, qr/BAM file is not RNA alignment/, 'comment when bam file is not RNA alignment');

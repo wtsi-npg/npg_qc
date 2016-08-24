@@ -32,21 +32,21 @@ Readonly::Scalar my $METRICS_FILE_NAME => q[metrics.tsv];
 Readonly::Scalar my $MINUS_ONE         => -1;
 
 Readonly::Hash   my %RNASEQC_METRICS_FIELDS_MAPPING => {
-    "3' Norm"                               => 'end_3_norm',
-    "5' Norm"                               => 'end_5_norm',
-    "End 1 % Sense"                         => 'end_1_pct_sense',
-    "End 1 Antisense"                       => 'end_1_antisense',
-    "End 1 Sense"                           => 'end_1_sense',
-    "End 2 % Sense"                         => 'end_2_pct_sense',
-    "End 2 Antisense"                       => 'end_2_antisense',
-    "End 2 Sense"                           => 'end_2_sense',
-    "Exonic Rate"                           => 'exonic_rate',
-    "Expression Profiling Efficiency"       => 'expression_profiling_efficiency',
-    "Genes Detected"                        => 'genes_detected',
-    "Mean CV"                               => 'mean_cv',
-    "Mean Per Base Cov."                    => 'mean_per_base_cov',
-    "rRNA"                                  => 'rrna',
-    "rRNA rate"                             => 'rrna_rate',
+    '3\' Norm'                               => 'end_3_norm',
+    '5\' Norm'                               => 'end_5_norm',
+    'End 1 % Sense'                         => 'end_1_pct_sense',
+    'End 1 Antisense'                       => 'end_1_antisense',
+    'End 1 Sense'                           => 'end_1_sense',
+    'End 2 % Sense'                         => 'end_2_pct_sense',
+    'End 2 Antisense'                       => 'end_2_antisense',
+    'End 2 Sense'                           => 'end_2_sense',
+    'Exonic Rate'                           => 'exonic_rate',
+    'Expression Profiling Efficiency'       => 'expression_profiling_efficiency',
+    'Genes Detected'                        => 'genes_detected',
+    'Mean CV'                               => 'mean_cv',
+    'Mean Per Base Cov.'                    => 'mean_per_base_cov',
+    'rRNA'                                  => 'rrna',
+    'rRNA rate'                             => 'rrna_rate',
 };
 
 has '+file_type' => (default => $EXT,);
@@ -261,11 +261,11 @@ override 'execute' => sub {
 
 sub _parse_metrics {
     my ($self) = @_;
-    my $filename = File::Spec->catfile($self->qc_report_dir, $METRICS_FILE_NAME); 
+    my $filename = File::Spec->catfile($self->qc_report_dir, $METRICS_FILE_NAME);
     if (! -e $filename) {
         croak q[Metrics file is not available, cannot parse RNA-SeQC metrics];
     }
-    my $fh = IO::File->new($filename, "r");
+    my $fh = IO::File->new($filename, 'r');
     my @lines;
     if (defined $fh){
         @lines = $fh->getlines();
@@ -274,12 +274,12 @@ sub _parse_metrics {
     my @keys = split /\t/smx, $lines[0];
     my @values = split /\t/smx, $lines[1], $MINUS_ONE;
     if (scalar @keys != scalar @values) {
-        croak qq[Mismatch in number of keys and values];
+        croak q[Mismatch in number of keys and values];
     }
     my $i = 0;
     my $results = {};
     foreach(@keys){
-        chomp($values[$i]);
+        chomp $values[$i];
         $results->{$_} = $values[$i];
         $i++;
     }
@@ -293,7 +293,7 @@ sub _save_results {
         if (defined $value) {
             my $attr_name = $RNASEQC_METRICS_FIELDS_MAPPING{$key};
             if ($value eq q[?]) {
-                carp "Field $attr_name is set to '?', skipping...";
+                carp qq[Field $attr_name is set to '?', skipping...];
 	        } else {
                     $self->result->$attr_name($value);
             }
