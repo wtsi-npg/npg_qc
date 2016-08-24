@@ -280,7 +280,15 @@ int main(int argc, char **argv)
 
     // 5.2 scale histN to get same main peak height, smoothed
     maxN = GetMax(histN,nbins);
-    scale = height / maxN;// difference in max height b/w fitNorm and original hist
+    if(maxN != 0.0)
+    {
+      scale = height / maxN;// difference in max height b/w fitNorm and original hist
+    }
+    else
+    {
+      scale = 0.0;
+    }
+
     for (i=0; i<nbins; i++)
     {
         histN[i] *= scale;
@@ -449,8 +457,15 @@ float FitNormal(int mu, float sd,int bin)// returns one value from Norm pdf
     float cons;
     float histN;
 
-    cons = 1.0 / (sd * sqrt(6.28));
-    histN = cons * exp(-(bin-mu)*(bin-mu)/(2*sd*sd));
+    if(sd == 0)
+    {
+      histN = 0.0;
+    }
+    else
+    {
+      cons = 1.0 / (sd * sqrt(6.28));
+      histN = cons * exp(-(bin-mu)*(bin-mu)/(2*sd*sd));
+    }
 
     return histN;
 }
