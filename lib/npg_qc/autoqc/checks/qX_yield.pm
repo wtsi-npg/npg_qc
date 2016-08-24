@@ -1,6 +1,7 @@
 package npg_qc::autoqc::checks::qX_yield;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Readonly;
 use Carp;
@@ -32,7 +33,6 @@ A fast qX check that uses a fastqcheck file.
 =head1 SUBROUTINES/METHODS
 
 =cut
-
 
 Readonly::Scalar our $Q_CUTOFF                  => 20;
 Readonly::Scalar our $EXT                       => 'fastqcheck';
@@ -104,7 +104,6 @@ override 'execute'            => sub  {
 
 
 sub _get_threshold {
-
   my ($self, $fq) = @_;
 
   if ($self->num_components > 1) {
@@ -113,10 +112,10 @@ sub _get_threshold {
 
   my $read_length = 0;
   try {
-      $read_length = $fq->read_length();
+    $read_length = $fq->read_length();
   };
   if ($read_length <= 0) {
-      return $NA;
+    return $NA;
   }
 
   my $id_run = $self->composition->get_component(0)->id_run();
@@ -157,6 +156,8 @@ __END__
 =over
 
 =item Moose
+
+=item MooseX::StrictConstructor
 
 =item namespace::autoclean
 

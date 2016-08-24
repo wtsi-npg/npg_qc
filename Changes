@@ -4,6 +4,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    qc check object.
  - QC script does not try to infer the location of input files.
  - QC script accepts the rpt_list argument.
+ - tag_index attribute of the check object cannot be assigned to undef.
 
 release 62.1
  - Bug fix in build action for cgi files.
