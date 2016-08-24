@@ -2,7 +2,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - Arguments given to the qc script are passed through to the relevant
    qc check object.
- - QC script does not try to infer the location of input files.
+ - QC script does not try to infer the directory with input files.
+ - tag_index attribute of the check object cannot be assigned to undef.
 
 release 62.1
  - Bug fix in build action for cgi files.

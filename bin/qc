@@ -11,7 +11,7 @@ our $VERSION = '0';
 
 npg_qc::autoqc::autoqc->new_with_options()
   ->create_check_object()
-  ->execute();
+  ->run();
 
 exit 0;
 

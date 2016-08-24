@@ -52,34 +52,7 @@ An optional tag index
 
 =cut
 
-has '+tag_index' => ( traits => ['NoGetopt'], );
-
-around 'process_argv' => sub  {
-  my $orig = shift;
-  my $self = shift;
-
-  my $ref = $self->$orig();
-  my %params = @{$ref->extra_argv()};
-  for my $attr (qw/tag_index/) {
-    my $cli_option = q[--] . $attr;
-    if (defined $params{$cli_option}) {
-      $ref->constructor_params->{$attr} = $params{$cli_option};
-      delete $params{$cli_option};
-    }
-  }
-
-  foreach my $key (keys %params) {
-    if ($key =~ /\A(--check|--tag_index)/smx) {
-      delete $params{$key};
-    }
-  }
-
-  if (keys %params) {
-    carp 'Unused options: ' . join q[ ], %params;
-  }
-
-  return $ref;
-};
+has '+tag_index' => ( isa => 'NpgTrackingTagIndex', );
 
 =head2 qc_in
 
@@ -235,10 +208,7 @@ Here this method only checks that the given path exists.
 
 sub execute {
   my $self = shift;
-  if (!@{$self->input_files}) {
-    return 0;
-  }
-  return 1;
+  return scalar @{$self->input_files} ? 1 : 0;
 }
 
 =head2 can_run

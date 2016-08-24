@@ -87,9 +87,10 @@ subtest 'validation of attributes' => sub {
          position => 2, path => $path, id_run => $idrun, tag_index => 10.5)}
         qr/Validation\ failed\ for/,
         'error on passing to the constructor tag index as a float';
-    lives_ok { npg_qc::autoqc::checks::check->new(
+    throws_ok { npg_qc::autoqc::checks::check->new(
         position => 2, path => $path, id_run => $idrun, tag_index => undef )}
-        'accepts undef for tag_index in the constructor';
+        qr/Validation\ failed\ for\ \'NpgTrackingTagIndex\'/,
+        'does not accept undef for tag_index in the constructor';
 
     my $check = npg_qc::autoqc::checks::check->new(
         position => 2, path => $path, id_run => $idrun );
