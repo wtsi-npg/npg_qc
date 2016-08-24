@@ -421,8 +421,23 @@ sub create_filename {
   if ($self->num_components > 1) {
     croak 'Multiple components, cannot generate file name';
   }
+  return $self->create_filename4attrs(
+    $self->inflate_rpts($self->rpt_list)->[0], $end);
+}
 
-  my $map = $self->inflate_rpts($self->rpt_list)->[0];
+=head2 create_filename4attrs
+
+Returns a file name. Can be used both as an instance and class method.
+
+  my $map = {id_run => 1, position => 2, tag_index => 3};
+  __PACKAGE__->create_filename4attrs($map, 2);
+  $map = {id_run => 1, position => 2};
+  $obj->create_filename4attrs($map, 1);
+
+=cut
+
+sub create_filename4attrs {
+  my ($self, $map, $end) = @_;
   return sprintf '%i_%i%s%s',
     $map->{'id_run'},
     $map->{'position'},

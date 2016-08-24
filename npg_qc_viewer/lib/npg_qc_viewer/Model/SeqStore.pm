@@ -136,7 +136,7 @@ sub _get_file_paths {
 sub _filename {
   my ($rpt_key_map, $end) = @_;
   return npg_qc::autoqc::checks::check
-    ->create_filename($rpt_key_map, $end) . q[.] . $FILE_EXTENSION;
+    ->create_filename4attrs($rpt_key_map, $end) . q[.] . $FILE_EXTENSION;
 }
 
 __PACKAGE__->meta->make_immutable;
