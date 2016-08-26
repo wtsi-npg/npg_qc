@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use File::Temp qw/ tempdir /;
-use Test::More tests => 21;
+use Test::More tests => 27;
 use Test::Deep;
 use Test::Exception;
 
@@ -68,7 +68,7 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
   throws_ok {
     npg_qc::autoqc::checks::adapter->new( 
                     position => 3,
-                    path     => 't/data/autoqc/090721_IL29_2549/data',
+                    qc_in   => 't/data/autoqc/090721_IL29_2549/data',
                     id_run   => 2549,
                     adapter_fasta => '/no/such/file',
                   )
@@ -78,7 +78,7 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
   my $test;
   lives_ok {
     $test = npg_qc::autoqc::checks::adapter->new( position => 3,
-                    path     => 't/data/autoqc/090721_IL29_2549/data',
+                    qc_in    => 't/data/autoqc/090721_IL29_2549/data',
                     id_run   => 2549,
                   )
   } 'Create the check object';
@@ -91,7 +91,7 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
   lives_ok {
     $test = npg_qc::autoqc::checks::adapter
              ->new( position => 3,
-                    path     => 't/data/autoqc/090721_IL29_2549/data',
+                    qc_in    => 't/data/autoqc/090721_IL29_2549/data',
                     id_run   => 2549,
                     adapter_fasta => 't/data/autoqc/adapter.fasta',
                   )
@@ -123,7 +123,7 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
 
   my $test = npg_qc::autoqc::checks::adapter
              ->new( position => 2,
-                    path     => $dir,
+                    qc_in    => $dir,
                     id_run   => 9999,
                     adapter_fasta => 't/data/autoqc/adapter.fasta',
                   );
@@ -136,23 +136,29 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
 }
 
 {
-  my $test = npg_qc::autoqc::checks::adapter->new(
+  my @checks = ();
+  push @checks, npg_qc::autoqc::checks::adapter->new(
                  position      => 1,
-                 path          => $test_parent,
+                 qc_in         => $test_parent,
                  id_run        => 9999,
                  adapter_fasta => 't/data/autoqc/adapter.fasta',
-                 aligner_path   => $bt,
-                      );
-  lives_ok { $test->execute() } 'No failures in mocked run';
+                 aligner_path  => $bt );
+  push @checks, npg_qc::autoqc::checks::adapter->new(
+                 rpt_list      => '9999:1',
+                 qc_in         => $test_parent,
+                 adapter_fasta => 't/data/autoqc/adapter.fasta',
+                 aligner_path  => $bt );
 
-  is( $test->result->forward_read_filename, '9999_1.fastq',
+  foreach my $test (@checks) { 
+    lives_ok { $test->execute() } 'No failures in mocked run';
+    is( $test->result->forward_read_filename, '9999_1.fastq',
         'forward read name set correctly in the result object' );
-  ok( !defined $test->result->reverse_read_filename(),
+    ok( !defined $test->result->reverse_read_filename(),
         'reverse read name is not defined in the result object' );
-
-  is( $test->result->forward_fasta_read_count, 10_000,'read count' );
-  is( $test->result->forward_contaminated_read_count, 467, 'contaminated read count' );
-  is_deeply( $test->result->forward_blat_hash, \%blat_hash, 'adapter report'  );
+    is( $test->result->forward_fasta_read_count, 10_000,'read count' );
+    is( $test->result->forward_contaminated_read_count, 467, 'contaminated read count' );
+    is_deeply( $test->result->forward_blat_hash, \%blat_hash, 'adapter report'  );
+  }
 }
 
 {

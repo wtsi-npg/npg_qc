@@ -1,12 +1,5 @@
-#########
-# Author:        gq1
-# Created:       10 November 2009
-#
-
 package npg_qc::autoqc::checks::sequence_error;
 
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 use Readonly;
@@ -162,7 +155,6 @@ sub _calc_and_set_pass {
   }
   return;
 }
-
 
 sub process_all_fastqs{
   my $self = shift;
@@ -345,12 +337,10 @@ sub parsing_sam{
       $self->_add_array($count_total, $count);
 
       if( $num_reads_aligned == 0 ){
-
         $read_length = $current_read_length;
       }
 
       if( $read_length != $current_read_length ){
-
         croak "different read length in the alignment: $sam\n:$md ".$cigar ;
       }
 
@@ -366,15 +356,11 @@ sub parsing_sam{
       }
 
     }else{
-
       $num_reads_not_aligned++;
     }
   }
 
-  close $sam_fh or croak "can not close file $sam: $ERRNO";
-
-  print "$num_reads_aligned reads aligned, $num_reads_not_aligned reads not aligned, read_length: $read_length\n"
-  or carp "can't print on stdout for$ERRNO";
+  close $sam_fh or croak "cannot close file $sam: $ERRNO";
 
   foreach my $base_count ( @{ $n_count_by_base } ) {
     $base_count ||= 0;
@@ -396,7 +382,6 @@ sub parsing_sam{
       _extract_per_cycle_count_listref_for_cigar_char($cig_vs_cycle_count_pdl, $_)
     } split q(),$CIGAR_VALID_CHAR},
   };
-
 }
 
 sub _reverse_cigar {
@@ -483,7 +468,6 @@ sub parsing_md_string{
       $match_array[$base_index] = 0;
       $base_index++;
     }
-
   }
   return \@match_array;
 }
@@ -707,24 +691,48 @@ npg_qc::autoqc::checks::sequence_error
 
 =head1 SUBROUTINES/METHODS
 
-=head2 check_read_orientation - parsing flag field in sam file, return the orientation of the alignment
+=head2 check_read_orientation
 
-=head2 matches_per_base - given md, cigar string, and flag for each read, return an array of 0 and 1 values. 0 for not- mismatch and 1 for mismatch.
-Parsing md string first and add positions of insertion, soft and hard clipping,  as not mismatch. And then reverse it if necessary based on flag
+  parsing flag field in sam file, return the orientation of the alignment
 
-=head2 matches_per_base_eland - the export output of eland no gap and no need reverse the md string, md string enough to check mismatch
+=head2 matches_per_base
 
-=head2 modify_match_by_cigar - there is no insertion clipping information in md string, modify the mismatch array by checking cigar string 
+  given md, cigar string, and flag for each read, return an array of 0 and 1 values.
+  0 for not- mismatch and 1 for mismatch.
+  Parsing md string first and add positions of insertion, soft and hard clipping,
+  as not mismatch. And then reverse it if necessary based on flag
 
-=head2 parsing_md_string - given a md string, return an array of 0 and 1, 0 for not- mismatch and 1 for mismatch. Ignore the deletion in the read
+=head2 matches_per_base_eland
 
-=head2 parsing_md_string_eland - md string in eland not follow the latest sam specification
+  the export output of eland no gap and no need reverse the md string, md string
+  enough to check mismatch
 
-=head2 parsing_sam - given a sam file, return an array, representing the total number of mismatch for each cycle
+=head2 modify_match_by_cigar
 
-=head2 process_all_fastqs - process all fastq files
+  there is no insertion clipping information in md string, modify the mismatch
+  array by checking cigar string 
 
-=head2 process_one_fastq - process one fastq
+=head2 parsing_md_string
+
+  given a md string, return an array of 0 and 1, 0 for not- mismatch and 1 for mismatch.
+  Ignore the deletion in the read
+
+=head2 parsing_md_string_eland
+
+  md string in eland not follow the latest sam specification
+
+=head2 parsing_sam
+
+  given a sam file, return an array,
+  representing the total number of mismatch for each cycle
+
+=head2 process_all_fastqs
+
+  process all fastq files
+
+=head2 process_one_fastq
+
+  process one fastq
 
 =head1 INCOMPATIBILITIES
 
@@ -736,7 +744,7 @@ Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

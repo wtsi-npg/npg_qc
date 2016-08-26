@@ -41,9 +41,9 @@ has '+file_type'         => (default => 'bam',);
 has '+aligner'           => (default => 'fasta',);
 
 has 'alignments_in_bam'  => (
-	is => 'ro',
-	isa => 'Maybe[Bool]',
-	lazy_build => 1,
+	  is => 'ro',
+	  isa => 'Maybe[Bool]',
+	  lazy_build => 1,
 );
 sub _build_alignments_in_bam {
     my ($self) = @_;
@@ -51,22 +51,22 @@ sub _build_alignments_in_bam {
 }
 
 has 'max_java_heap_size' => (
-        is => 'ro',
-	isa => 'Str',
-	default => $MAX_JAVA_HEAP_SIZE,
+    is      => 'ro',
+    isa     => 'Str',
+    default => $MAX_JAVA_HEAP_SIZE,
 );
 
 has 'picard_jar_path' => (
-        is      => 'ro',
-        isa     => 'NpgCommonResolvedPathJarFile',
-        coerce  => 1,
-	default => $PICARD_JAR_NAME,
+    is      => 'ro',
+    isa     => 'NpgCommonResolvedPathJarFile',
+    coerce  => 1,
+    default => $PICARD_JAR_NAME,
 );
 
 has 'picard_command' => (
-        is      => 'ro',
-	isa     => 'Str',
-        lazy_build => 1,
+    is         => 'ro',
+    isa        => 'Str',
+    lazy_build => 1,
 );
 
 sub _build_picard_command {
@@ -85,10 +85,10 @@ override 'can_run' => sub {
 
     if(!$self->alignments_in_bam) {
         $self->messages->push('alignments_in_bam is false');
-	return 0;
+        return 0;
     }
     if(!$self->bait_name) {
-	return 0;
+        return 0;
     }
     return 1;
 };
@@ -124,8 +124,7 @@ override 'execute' => sub {
 
     if($self->_interval_files_identical) {
         $self->result->interval_files_identical(1);
-    }
-    else {
+    } else {
         $self->result->interval_files_identical(0);
     }
 
@@ -134,7 +133,6 @@ override 'execute' => sub {
     if($self->result->on_bait_bases_percent < $MIN_ON_BAIT_BASES_PERCENTAGE) {
         $self->result->pass(0);
     }
-
 
     return 1;
 };
@@ -172,7 +170,7 @@ sub _parse_metrics {
         if ($keys[$i]) {
             my $value = $values[$i] || undef;
             $results->{$keys[$i]} = $value;
-	}
+        }
         $i++;
     }
     return $results;
@@ -186,14 +184,14 @@ sub _save_results {
         if (exists $PICARD_METRICS_FIELDS_MAPPING{$key}) {
             if (defined $value) {
                 my $attr_name = $PICARD_METRICS_FIELDS_MAPPING{$key};
-	        if ($value eq q[?]) {
-		    carp "Field $attr_name is set to '?', skipping...";
-		} else {
+                if ($value eq q[?]) {
+		                carp "Field $attr_name is set to '?', skipping...";
+                } else {
                     $self->result->$attr_name($value);
                 }
-	    }
+	          }
             delete $results->{$key};
-	}
+        }
     }
     $self->result->other_metrics($results);
     return;
@@ -222,12 +220,13 @@ __END__
 
 =head1 NAME
 
-npg_qc::autoqc::checks::pulldown_metrics - a QC check to determine whether the pulldown bait works correctly
+npg_qc::autoqc::checks::pulldown_metrics
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
+    A QC check to determine whether the pulldown bait works correctly
 
 =head1 SUBROUTINES/METHODS
 
@@ -283,7 +282,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

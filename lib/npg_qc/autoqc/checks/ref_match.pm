@@ -1,17 +1,11 @@
-#########
-# Author:        John O'Brien
-# Created:       24 September 2009
-
 package npg_qc::autoqc::checks::ref_match;
 
-use strict;
-use warnings;
+use Moose;
 use Carp;
 use English qw(-no_match_vars);
 use File::Basename qw(fileparse);
 use File::Spec::Functions qw(catfile);
 use DateTime;
-use Moose;
 use namespace::autoclean;
 use List::Util qw(shuffle);
 use Readonly;
@@ -24,7 +18,6 @@ with    qw/npg_tracking::data::reference::list
           /;
 
 our $VERSION = '0';
-### no critic (Documentation::RequirePodAtEnd)
 
 Readonly::Scalar my $UNMAPPED_FLAG      =>      4;
 Readonly::Scalar my $SAMPLE_READ_LENGTH =>     37;
@@ -444,7 +437,7 @@ John O'Brien, E<lt>jo3@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by John O'Brien
+Copyright (C) 2016 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
