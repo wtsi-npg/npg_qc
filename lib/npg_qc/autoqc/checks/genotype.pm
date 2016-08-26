@@ -42,8 +42,6 @@ Readonly::Scalar my $MAX_ALT_MATCHES => 4;
 
 has '+file_type' => (default => $EXT,);
 has '+aligner'   => (default => 'fasta',);
-has '+id_run'    => (required => 0, );
-has '+position'  => (isa => 'Maybe[NpgTrackingLaneNumber]', required => 0, );
 
 # Human references repository - look under this directory for human genome reference files
 has 'human_references_repository' => (
