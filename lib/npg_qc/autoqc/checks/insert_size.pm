@@ -35,6 +35,7 @@ our $VERSION = '0';
 Readonly::Scalar my $NORM_FIT_EXE                           => q[norm_fit];
 Readonly::Scalar my $NORM_FIT_MIN_PROPERLY_ALIGNED_PAIRS    => 5000;
 Readonly::Scalar my $NORM_FIT_MAX_BIN_THRESHOLD             => 0.9;
+Readonly::Scalar my $NORM_FIT_CONFIDENCE_PASS_LEVEL  => 0.0;
 
 ## no critic (Documentation::RequirePodAtEnd RequireCheckingReturnValueOfEval ProhibitParensWithBuiltins RequireNumberSeparators)
 =head1 NAME
@@ -308,6 +309,7 @@ override 'execute'            => sub {
 
   my @lines = slurp $output;
 
+  my $norm_fit_pass;
   my @modes = ();
   foreach my $line (@lines) {
       if ($line =~ /^\#/xms) {
@@ -319,7 +321,7 @@ override 'execute'            => sub {
           } elsif ($name eq q[confidence]) {
               $self->result->norm_fit_confidence($value);
           } elsif ($name eq q[pass]) {
-              $self->result->norm_fit_pass($value);
+              $norm_fit_pass = $value;
           }
       } else {
           # all other lines are assumed to contain amplitude, mean and optionally std for each mode
@@ -329,6 +331,9 @@ override 'execute'            => sub {
       }
   }
   $self->result->norm_fit_modes(\@modes);
+  if($self->result->norm_fit_confidence > $NORM_FIT_CONFIDENCE_PASS_LEVEL) {
+    $self->result->norm_fit_pass($norm_fit_pass);
+  }
 
   return 1;
 };
