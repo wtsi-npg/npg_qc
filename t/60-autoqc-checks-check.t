@@ -26,7 +26,7 @@ subtest 'object creation' => sub {
 };
 
 subtest 'validation of attributes' => sub {
-    plan tests => 37;
+    plan tests => 36;
 
     throws_ok {npg_qc::autoqc::checks::check->new(path => $path)}
         qr/Either id_run or position key is undefined/,
@@ -56,10 +56,6 @@ subtest 'validation of attributes' => sub {
 
     lives_ok {npg_qc::autoqc::checks::check->new(position => 2, id_run => $idrun)}
         'no error on instantiating an object without a path/qc_in attr';
-    throws_ok {npg_qc::autoqc::checks::check->new(
-        position => 1, path => 'nonexisting', id_run => $idrun)}
-        qr/does not exist or is not readable/,
-        'error on passing to the constructor non-existing path';
     throws_ok {npg_qc::autoqc::checks::check->new(position => 2, qc_in => 't')}
         qr/Either id_run or position key is undefined/,
         'error on instantiating an object without either a run id or an rpt_list attr';
@@ -106,7 +102,7 @@ subtest 'validation of attributes' => sub {
     is ($check->position, undef, 'position undefined');
     is ($check->tag_index, undef, 'tag index undefined');
     lives_ok { $check = npg_qc::autoqc::checks::check->new(qc_in => 't', rpt_list => '6:8:9')}
-        'can create a check object using rpt list attr';
+        'can create a check object using rpt list and qc_in attrs';
     is ($check->num_components, 1, 'components count is correct');
     is ($check->id_run, undef, 'run id undefined');
     is ($check->position, undef, 'position undefined');
@@ -182,24 +178,40 @@ subtest 'accessors tests' => sub {
 };
 
 subtest 'input and output directories' => sub {
-    plan tests => 3;
+    plan tests => 10;
 
-    my $check = npg_qc::autoqc::checks::check->new(
+    lives_ok { npg_qc::autoqc::checks::check->new(rpt_list => '6:8:9')}
+        'object constructor - qc_in and qc_out are optional';
+    lives_ok {npg_qc::autoqc::checks::check->new(position => 1, id_run => 2)}
+        'object constructor - qc_in and qc_out are optional';
+    throws_ok {npg_qc::autoqc::checks::check->new(
+        position => 1, qc_in => 'nonexisting', id_run => $idrun)}
+        qr/does not exist or is not readable/, 'if set, qc_in should exist';
+    throws_ok {npg_qc::autoqc::checks::check->new(
+        position => 1, qc_out => 'nonexisting', id_run => $idrun)}
+        qr/does not exist or is not writable/, 'if set, qc_out should exist';
+
+    my $check;
+    lives_ok { $check = npg_qc::autoqc::checks::check->new(
                             position => 1,
                             qc_in    => $tdir,
-                            id_run   => $idrun);
-    is($check->qc_out, $tdir, 'qc out is built');
-    $check = npg_qc::autoqc::checks::check->new(
+                            id_run   => $idrun)
+    } 'object constructor - qc_out is optional';
+    is($check->qc_out, $tdir, 'qc out is set to qc_in');
+
+    lives_ok { $check = npg_qc::autoqc::checks::check->new(
                             position => 1,
                             qc_out   => $tdir,
-                            id_run   => $idrun);
-    is($check->qc_in, '/dev/stdin', 'qc in defaults to standard in');
+                            id_run   => $idrun)
+    } 'object constructor - qc_in is optional';
+    ok(!$check->has_qc_in, 'qc_in is not set');
+    is($check->qc_in, undef, 'qc_in undefined if not given');
     $check = npg_qc::autoqc::checks::check->new(
                             position => 1,
                             id_run   => $idrun);
     throws_ok {$check->qc_out}
       qr/qc_out should be defined/,
-      'output directory is required in input is not given';     
+      'output directory cannot be built if input is not given';     
 };
 
 subtest 'temporary directory and path tests' => sub {
@@ -222,7 +234,7 @@ subtest 'temporary directory and path tests' => sub {
 };
 
 subtest 'finding input' => sub {
-    plan tests => 17;
+    plan tests => 19;
 
     my @checks = ();
     push @checks, npg_qc::autoqc::checks::check->new(
@@ -306,6 +318,17 @@ subtest 'finding input' => sub {
         'comment when no input files found');
 
     throws_ok { npg_qc::autoqc::checks::check->new(
+                    rpt_list  => '2549:1',
+                    file_type => q[fastqcheck])->input_files() }
+        qr/Input file\(s\) are not given, qc_in should be defined/,
+        'cannot infer input files without qc_in';
+
+    throws_ok { npg_qc::autoqc::checks::check->new(
+                    rpt_list  => '2549:1;45:7',
+                    file_type => q[fastqcheck])->input_files() }
+        qr/Multiple components, input file\(s\) should be given/,
+        'cannot infer input files for multiple components';
+    throws_ok { npg_qc::autoqc::checks::check->new(
                     rpt_list  => '2549:1;45:7',
                     qc_in     => $path,
                     file_type => q[fastqcheck])->input_files() }
@@ -313,19 +336,71 @@ subtest 'finding input' => sub {
         'cannot infer input files for multiple components';
     lives_ok { npg_qc::autoqc::checks::check->new(
                     rpt_list  => '2549:1;45:7',
-                    qc_in     => $path,
                     input_files => [qw(some other)])->input_files() }
-        'input files supplied - OK';
+        'no qc_in, input files supplied - OK';
 };
 
-subtest 'saving info about the check' => sub {
-    plan tests => 2;
+subtest 'creating a result object' => sub {
+    plan tests => 42;
 
     my $check = npg_qc::autoqc::checks::check->new(
         position => 1, path => 't', id_run => 2549,);
     like($check->result->get_info('Check'), qr{npg_qc::autoqc::checks::check},
         'check name and version number in the info');
-    ok($check->result->get_info('Check_version'), 'check version exists and is a number');
+    ok($check->result->get_info('Check_version'), 'check version exists');
+    is($check->result->path, 't', 'path is set');
+    is($check->result->id_run, 2549, 'run id');
+    is($check->result->position, 1, 'position');
+    is($check->result->tag_index, undef, 'tag index undefined');
+    ok($check->result->has_composition, 'composition attr set');
+     is($check->result->num_components, 1, 'one component');
+
+    $check = npg_qc::autoqc::checks::check->new(
+        position => 1, id_run => 2549, tag_index => 4);
+    like($check->result->get_info('Check'), qr{npg_qc::autoqc::checks::check},
+        'check name and version number in the info');
+    ok($check->result->get_info('Check_version'), 'check version exists');
+    is($check->result->path, undef, 'path is not set');
+    is($check->result->id_run, 2549, 'run id');
+    is($check->result->position, 1, 'position');
+    is($check->result->tag_index, 4, 'tag index');
+    ok($check->result->has_composition, 'composition attr set');
+    is($check->result->num_components, 1, 'one component');
+
+    $check = npg_qc::autoqc::checks::check->new(
+        position => 1, id_run => 2549, tag_index => 0);
+    is($check->result->path, undef, 'path is not set');
+    is($check->result->id_run, 2549, 'run id');
+    is($check->result->position, 1, 'position');
+    is($check->result->tag_index, 0, 'tag index zero');
+    ok($check->result->has_composition, 'composition attr set');
+    is($check->result->num_components, 1, 'one component');
+
+    $check = npg_qc::autoqc::checks::check->new(rpt_list => '2549:1');
+    is($check->result->id_run, 2549, 'run id');
+    is($check->result->position, 1, 'position');
+    is($check->result->tag_index, undef, 'tag index undefined');
+    ok($check->result->has_composition, 'composition attr set');
+    is($check->result->num_components, 1, 'one component');
+    $check = npg_qc::autoqc::checks::check->new(rpt_list => '2549:1:4');
+    is($check->result->id_run, 2549, 'run id');
+    is($check->result->position, 1, 'position');
+    is($check->result->tag_index, 4, 'tag index');
+    ok($check->result->has_composition, 'composition attr set');
+    is($check->result->num_components, 1, 'one component');
+    $check = npg_qc::autoqc::checks::check->new(rpt_list => '2549:1:0');
+    is($check->result->id_run, 2549, 'run id');
+    is($check->result->position, 1, 'position');
+    is($check->result->tag_index, 0, 'tag index zero');
+    ok($check->result->has_composition, 'composition attr set');
+    is($check->result->num_components, 1, 'one component');
+
+    $check = npg_qc::autoqc::checks::check->new(rpt_list => '2549:1:4;2549:1:0');
+    is($check->result->id_run, undef, 'run id undefined');
+    is($check->result->position, undef, 'position undefined');
+    is($check->result->tag_index, undef, 'tag index undefined');
+    ok($check->result->has_composition, 'composition attr set');
+    is($check->result->num_components, 2, 'two components');    
 };
 
 subtest 'filename generation' => sub {

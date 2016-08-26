@@ -66,7 +66,6 @@ with 'npg_tracking::glossary::composition::factory::rpt' =>
 our $VERSION = '0';
 
 Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
-Readonly::Scalar our $STD_IN          => '/dev/stdin';
 
 =head2 id_run
 
@@ -135,12 +134,12 @@ Alias for qc_in.
 
 =cut
 
-has 'qc_in'        => (isa      => 'Str',
-                       is       => 'ro',
-                       required => 0,
-                       alias    => 'path',
-                       default  => $STD_IN,
-                       trigger  => \&_test_qc_in,
+has 'qc_in'        => (isa        => 'Str',
+                       is         => 'ro',
+                       required   => 0,
+                       alias      => 'path',
+                       predicate  => 'has_qc_in',
+                       trigger    => \&_test_qc_in,
                       );
 sub _test_qc_in {
   my ($self, $qc_in) = @_;
@@ -164,7 +163,7 @@ has 'qc_out'      => (isa        => 'Str',
                      );
 sub _build_qc_out {
   my $self = shift;
-  if ($self->qc_in eq $STD_IN) {
+  if (!$self->has_qc_in) {
     croak 'qc_out should be defined';
   }
   $self->_test_qc_out($self->qc_in);
@@ -220,6 +219,9 @@ sub _build_input_files {
   if ($self->composition->num_components > 1) {
     croak 'Multiple components, input file(s) should be given';
   }
+  if (!$self->has_qc_in) {
+    croak 'Input file(s) are not given, qc_in should be defined';
+  }
   my @files = sort $self->get_input_files();
   return \@files;
 }
@@ -251,7 +253,9 @@ sub _build_result {
     $nref = $self->inflate_rpts($self->rpt_list)->[0];
   }
   $nref->{'composition'} = $self->composition;
-  $nref->{'path'} = $self->qc_in;
+  if ($self->has_qc_in) {
+    $nref->{'path'} = $self->qc_in;
+  }
 
   my $result = $module->new($nref);
   $result->set_info('Check', $class_name);
