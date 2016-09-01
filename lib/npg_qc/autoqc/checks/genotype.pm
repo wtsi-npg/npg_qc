@@ -340,49 +340,44 @@ has 'input_files_md5' => (
 	lazy_build => 1,
 );
 sub _build_input_files_md5 {
-	my ($self) = @_;
-	my $md5 = q{};
-	Readonly::Scalar my $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH => 6;
+    my ($self) = @_;
+    my $md5;
+    Readonly::Scalar my $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH => 6;
 
-	my @md5_vals = ();
-	for my $input_file (@{$self->input_files}) {
-		if($input_file =~ /^irods:/smx) {
-			my $irods_filename = substr $input_file, $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH;  # strip leading "irods:"
+    my @md5_vals = ();
+    for my $input_file (@{$self->input_files}) {
+        $md5 = q{};
+        if ($input_file =~ /^irods:/smx) {
+            my $irods_filename = substr $input_file, $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH;  # strip leading "irods:"
+            try {
+                my $data_obj = WTSI::NPG::iRODS::DataObject->new(
+                    $self->irods, $irods_filename
+                );
+                $md5 = $data_obj->checksum;
+            } catch {
+                my $msg = "Unable to find md5 checksum for ".
+                    "iRODS file '$irods_filename': $_";
+                carp($msg);
+                $md5 = '0000000000000000';
+            }
+        } else {
+            my $md5_file = "${input_file}.md5";
+            if(-r $md5_file) {
+                open my $f, '<', $md5_file or croak "$md5_file readable, but open fails";
+                $md5 = <$f>;
+                chomp $md5;
+                close $f or croak "Failed to close $md5_file";
+            }
+            unless ($md5) {
+                my $msg = "Unable to read md5 checksum from file '$md5_file'";
+                carp($msg);
+                $md5 = '0000000000000000';
+            }
+        }
+        push @md5_vals, $md5;
+    }
 
-                        try {
-                            my $data_obj = WTSI::NPG::iRODS::DataObject->new(
-                                $self->irods, $irods_filename
-                            );
-                            $md5 = $data_obj->checksum;
-                        } catch {
-                            my $msg = "Unable to find md5 checksum for "+
-                                "iRODS file '$irods_filename': $_";
-                            carp($msg);
-                            $md5 = '0000000000000000';
-                        }
-			push @md5_vals, $md5;
-		}
-		else {
-			my $md5_file = "${input_file}.md5";
-			$md5 = q{};
-			if(-r $md5_file) {
-				open my $f, '<', $md5_file or croak "$md5_file readable, but open fails";
-				$md5 = <$f>;
-				close $f or croak "Failed to close $md5_file";
-
-			}
-                        unless ($md5) {
-                            my $msg = "Unable to read md5 checksum from "+
-                                "file '$md5_file'";
-                            carp($msg);
-                            $md5 = '0000000000000000';
-                        }
-			push @md5_vals, $md5;
-		}
-
-	}
-
-	return join q[;], @md5_vals;
+    return join q[;], @md5_vals;
 }
 
 #####################################################################################################################
