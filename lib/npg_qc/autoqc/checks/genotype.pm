@@ -9,10 +9,10 @@ use List::MoreUtils qw { any };
 use File::Slurp;
 use JSON;
 use npg_qc::utils::bam_genotype;
-use npg_qc::utils::iRODS;
 use npg_qc::autoqc::types;
 use Readonly;
 use FindBin qw($Bin);
+use WTSI::NPG::iRODS::DataObject;
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find
@@ -20,6 +20,14 @@ with qw(npg_tracking::data::reference::find
        );
 
 our $VERSION = '0';
+
+has 'irods' =>
+  (is       => 'ro',
+   isa      => 'WTSI::NPG::iRODS',
+   required => 1,
+   default  => sub {
+       return WTSI::NPG::iRODS->new;
+   });
 
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
@@ -340,10 +348,10 @@ sub _build_input_files_md5 {
 		if($input_file =~ /^irods:/smx) {
 			my $irods_filename = substr $input_file, $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH;  # strip leading "irods:"
 
-			$md5 = npg_qc::utils::iRODS->new->get_file_md5($irods_filename);
-
-			$md5 ||= '0000000000000000';
-
+                        my $data_obj = WTSI::NPG::iRODS::DataObject->new(
+                            $self->irods, $irods_filename
+                        );
+			$md5 = $data_obj->checksum || '0000000000000000';
 			push @md5_vals, $md5;
 		}
 		else {
