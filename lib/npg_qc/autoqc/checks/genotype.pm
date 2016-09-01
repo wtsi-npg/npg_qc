@@ -12,6 +12,7 @@ use npg_qc::utils::bam_genotype;
 use npg_qc::autoqc::types;
 use Readonly;
 use FindBin qw($Bin);
+use Try::Tiny;
 use WTSI::NPG::iRODS::DataObject;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -348,25 +349,34 @@ sub _build_input_files_md5 {
 		if($input_file =~ /^irods:/smx) {
 			my $irods_filename = substr $input_file, $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH;  # strip leading "irods:"
 
-                        my $data_obj = WTSI::NPG::iRODS::DataObject->new(
-                            $self->irods, $irods_filename
-                        );
-			$md5 = $data_obj->checksum || '0000000000000000';
+                        try {
+                            my $data_obj = WTSI::NPG::iRODS::DataObject->new(
+                                $self->irods, $irods_filename
+                            );
+                            $md5 = $data_obj->checksum;
+                        } catch {
+                            my $msg = "Unable to find md5 checksum for "+
+                                "iRODS file '$irods_filename': $_";
+                            carp($msg);
+                            $md5 = '0000000000000000';
+                        }
 			push @md5_vals, $md5;
 		}
 		else {
 			my $md5_file = "${input_file}.md5";
-
 			$md5 = q{};
 			if(-r $md5_file) {
 				open my $f, '<', $md5_file or croak "$md5_file readable, but open fails";
-
 				$md5 = <$f>;
-
 				close $f or croak "Failed to close $md5_file";
 
 			}
-			$md5 ||= '0000000000000000';
+                        unless ($md5) {
+                            my $msg = "Unable to read md5 checksum from "+
+                                "file '$md5_file'";
+                            carp($msg);
+                            $md5 = '0000000000000000';
+                        }
 			push @md5_vals, $md5;
 		}
 
