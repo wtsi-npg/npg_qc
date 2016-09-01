@@ -9,6 +9,8 @@ use WTSI::NPG::iRODS;
 use_ok ('npg_qc::autoqc::checks::genotype');
 
 my $ref_repos = cwd . '/t/data/autoqc';
+my $expected_md5 = q[a4790111996a3f1c0247d65f4998e492];
+
 my $dir = tempdir(CLEANUP => 1);
 my $st = join q[/], $dir, q[samtools_irods];
 `touch $st`;
@@ -17,18 +19,19 @@ my $bt = join q[/], $dir, q[bcftools1];
 `touch $bt`;
 `chmod +x $bt`;
 local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
-my $expected_md5 = 'a4790111996a3f1c0247d65f4998e492';
 my $data_dir = $dir."/data";
 mkdir($data_dir);
 `cp t/data/autoqc/alignment.bam $data_dir/2_1_1.bam`;
 `echo -n $expected_md5 > $data_dir/2_1_1.bam.md5`;
 
 # create and populate a temporary iRODS collection
-my $pid = $$;
 my $irods = WTSI::NPG::iRODS->new;
-my $irods_tmp_coll = $irods->add_collection("GenotypeTest.$pid");
+my $irods_tmp_coll;
+my $irods_data_coll;
+my $pid = $$;
+$irods_tmp_coll = $irods->add_collection("GenotypeTest.$pid");
 $irods->put_collection($data_dir, $irods_tmp_coll);
-my $irods_data_coll = $irods_tmp_coll."/data";
+$irods_data_coll = $irods_tmp_coll."/data";
 
 {
     my $r;
@@ -63,6 +66,9 @@ my $irods_data_coll = $irods_tmp_coll."/data";
        "iRODS MD5 string matches expected value");
 
 }
+
+# remove temporary iRODS collection
+$irods->remove_collection($irods_tmp_coll);
 
 1;
 
