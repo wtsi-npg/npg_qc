@@ -115,6 +115,7 @@ lib/npg_qc/autoqc/checks/insert_size.pm
 lib/npg_qc/autoqc/checks/pulldown_metrics.pm
 lib/npg_qc/autoqc/checks/qX_yield.pm
 lib/npg_qc/autoqc/checks/ref_match.pm
+lib/npg_qc/autoqc/checks/rna_seqc.pm
 lib/npg_qc/autoqc/checks/sequence_error.pm
 lib/npg_qc/autoqc/checks/spatial_filter.pm
 lib/npg_qc/autoqc/checks/tag_metrics.pm
@@ -140,6 +141,7 @@ lib/npg_qc/autoqc/results/pulldown_metrics.pm
 lib/npg_qc/autoqc/results/qX_yield.pm
 lib/npg_qc/autoqc/results/ref_match.pm
 lib/npg_qc/autoqc/results/result.pm
+lib/npg_qc/autoqc/results/rna_seqc.pm
 lib/npg_qc/autoqc/results/samtools_stats.pm
 lib/npg_qc/autoqc/results/sequence_error.pm
 lib/npg_qc/autoqc/results/sequence_summary.pm
@@ -426,6 +428,7 @@ t/60-autoqc-checks-insert_size.t
 t/60-autoqc-checks-pulldown_metrics.t
 t/60-autoqc-checks-qX_yield.t
 t/60-autoqc-checks-ref_match.t
+t/60-autoqc-checks-rna_seqc.t
 t/60-autoqc-checks-sequence_error.t
 t/60-autoqc-checks-tag_metrics.t
 t/60-autoqc-checks-tags_reporters.t
@@ -451,6 +454,7 @@ t/60-autoqc-results-pulldown_metrics.t
 t/60-autoqc-results-qX_yield.t
 t/60-autoqc-results-ref_match.t
 t/60-autoqc-results-result.t
+t/60-autoqc-results-rna_seqc.t
 t/60-autoqc-results-samtools_stats.t
 t/60-autoqc-results-sequence_error.t
 t/60-autoqc-results-sequence_summary.t
@@ -686,6 +690,9 @@ t/data/autoqc/rendered/json_single_run/3612_7.insert_size.json
 t/data/autoqc/rendered/json_single_run/3612_7.qX_yield.json
 t/data/autoqc/rendered/json_single_run/3612_8.insert_size.json
 t/data/autoqc/rendered/json_single_run/3612_8.qX_yield.json
+t/data/autoqc/rna_seqc/data/17550_1#1.bam
+t/data/autoqc/rna_seqc/data/17550_3#8.bam
+t/data/autoqc/rna_seqc/samplesheet_17550.csv
 t/data/autoqc/sequence_error/6376_1_1.fastq.10000
 t/data/autoqc/st/batches/3432.xml
 t/data/autoqc/st/samples/3057.xml
