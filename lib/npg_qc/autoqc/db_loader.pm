@@ -50,18 +50,6 @@ has 'update'  => ( is       => 'ro',
                    default  => 1,
                  );
 
-has 'load_related'  => ( is       => 'ro',
-                         isa      => 'Bool',
-                         required => 0,
-                         default  => 1,
-                       );
-
-has 'force_load_related' => ( is       => 'ro',
-                              isa      => 'Bool',
-                              required => 0,
-                              default  => 0,
-                            );
-
 has 'json_file' => ( is          => 'ro',
                      isa         => 'ArrayRef',
                      required    => 0,
@@ -154,21 +142,6 @@ sub _json2db{
         }
         # Load the main object
         $count = $self->_values2db($dbix_class_name, $values);
-
-        # Backwards compatibility - load related objects.
-        # New code should create serialized related objects which will
-        # be loaded from json files. For cases where we cannot produce the serialized
-        # version of objects, we will generate the objects now.
-        # Optionally, if force_load_related is true, we will disregard previous
-        # unsuccessful attempts to generate related objects.
-        if ( $json_file && $self->load_related &&
-             $obj->can('related_objects') &&
-             $obj->can('create_related_objects') ) {
-          $obj->create_related_objects($json_file, $self->force_load_related);
-          foreach my $o (@{$obj->related_objects}) {
-            $self->_json2db($o->freeze()); # Recursion
-          }
-        }
       }
     }
   } catch {
@@ -361,18 +334,6 @@ npg_qc::autoqc::db_loader
 =head2 verbose
 
   A boolean attribute, switches logging on/off, true by default.
-
-=head2 load_related
-
-  A boolean attribute, switches on-the-fly generation (no writing to disk)
-  of related objects and their loading to a database, true by default.
-
-=head2 force_load_related
-
-  A boolean attribute, false by default, forces generation and loading
-  of related objects by passing an extra flag to a factory  method that
-  creates related objects. Whether this flag is reapected and what exactly
-  happens is up to the object's implementation.
 
 =head2 update
 

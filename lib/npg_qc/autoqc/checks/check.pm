@@ -256,6 +256,9 @@ sub _build_result {
   if ($self->has_qc_in) {
     $nref->{'path'} = $self->qc_in;
   }
+  if ($self->can('subset') && $self->subset) {
+    $nref->{'subset'} = $self->subset;
+  }
 
   my $result = $module->new($nref);
   $result->set_info('Check', $class_name);
@@ -274,7 +277,13 @@ execution and writes out test results to the output directory.
 sub run {
   my $self = shift;
   $self->execute();
-  $self->result()->store($self->qc_out);
+  my @results = ($self->result());
+  if ($self->can('related_results')) {
+    push @results, @{$self->related_results()};
+  }
+  foreach my $r (@results) {
+    $r->store($self->qc_out);
+  }
   return 1;
 }
 

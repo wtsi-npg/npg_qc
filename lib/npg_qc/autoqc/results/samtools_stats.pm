@@ -26,14 +26,13 @@ has 'filter'         => (
     lazy_build => 1,
 );
 sub _build_filter {
-  my ($self, $path) = @_;
+  my $self = shift;
 
   my ($volume, $directories, $file) = splitpath($self->stats_file);
   my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
   if (!$filter) {
-    croak "Failed to get filter from $path";
+    croak "Failed to get filter from $file";
   }
-
   my $subset = $self->composition_subset();
   $subset = $subset ? $subset . q[_] : q[];
   return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
