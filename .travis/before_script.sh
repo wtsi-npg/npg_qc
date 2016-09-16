@@ -13,7 +13,7 @@ before_script_4_1_x() {
     sudo -E -u postgres createdb -O irods ICAT
     sudo -E -u postgres sh -c "echo \"ALTER USER irods WITH PASSWORD 'irods'\" | psql"
     sudo /var/lib/irods/packaging/setup_irods.sh < ./.travis/setup_irods
-    sudo jq -f .travis.server_config /etc/irods/server_config.json > server_config.tmp
+    sudo jq -f ./.travis/server_config /etc/irods/server_config.json > server_config.tmp
     sudo mv server_config.tmp /etc/irods/server_config.json
     ls -l /etc/irods
     sudo /etc/init.d/irods restart
