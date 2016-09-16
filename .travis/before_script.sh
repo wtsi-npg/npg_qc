@@ -22,7 +22,7 @@ before_script_4_1_x() {
     sudo -E su irods -c "mkdir -p /var/lib/irods/iRODS/Test"
     sudo -E su irods -c "iadmin mkresc testResc unixfilesystem `hostname --fqdn`:/var/lib/irods/iRODS/Test"
     mkdir $HOME/.irods
-    sed -e "s#__USER__#$USER#" -e "s#__HOME__#$HOME#" < .travis.irodsenv.json > $HOME/.irods/irods_environment.json
+    sed -e "s#__USER__#$USER#" -e "s#__HOME__#$HOME#" < ./.travis/irodsenv.json > $HOME/.irods/irods_environment.json
     cat $HOME/.irods/irods_environment.json
     ls -la $HOME/.irods/
     echo testuser | script -q -c "iinit"
