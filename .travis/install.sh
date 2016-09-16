@@ -53,6 +53,7 @@ install_4_1_x() {
     sudo apt-get install -qq odbc-postgresql unixodbc-dev
     sudo apt-get install -qq python-sphinx
     sudo -H pip install breathe
+    source $TRAVIS_BUILD_DIR/.travis/irods_paths.sh
 
     wget http://downloads.sourceforge.net/project/check/check/0.9.14/check-0.9.14.tar.gz -O /tmp/check-0.9.14.tar.gz
     tar xfz /tmp/check-0.9.14.tar.gz -C /tmp
@@ -87,6 +88,7 @@ install_baton() {
     tar xfz /tmp/baton-${BATON_VERSION}.tar.gz -C /tmp
     cd /tmp/baton-${BATON_VERSION}
     ./configure --with-irods=$IRODS_HOME ; make ; sudo make install
+    cd $TRAVIS_BUILD_DIR
     sudo ldconfig
 
 }
