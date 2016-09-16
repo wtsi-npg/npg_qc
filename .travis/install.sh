@@ -91,7 +91,7 @@ install_baton() {
     ls  # FIXME
     ls $TRAVIS_BUILD_DIR # FIXME
     #ls $IRODS_HOME # FIXME
-    ./configure --with-irods=$IRODS_HOME ; make ; sudo make install
+    ./configure ; make ; sudo make install
     cd $TRAVIS_BUILD_DIR
     sudo ldconfig
 
