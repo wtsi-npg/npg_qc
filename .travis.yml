@@ -21,23 +21,19 @@ env:
     - DNAP_UTILITIES_VERSION="0.5.2"
     - secure: cDfB188ECmloGfScZQezqwiFef7l+gXgn2RiTOxINriy9wYS6RmZxuZBHGuR36u7QV3QEJtMdihyQ+XBN2eQPf5jULQXV15t7gArXEVPzzF8i+f8MTgVHugU3TqmPLQkY94wBBbpzvRD9xCAC/uNiQcLLwuD2SjPfTXkqgqqtd0=
     - PGVERSION="9.3"
+    - JANSSON_VERSION="2.7"
     - CK_DEFAULT_TIMEOUT=20
     - PLATFORM=ubuntu12
     - ARCH=x86_64
     - RENCI_URL=ftp://ftp.renci.org
     - WTSI_NPG_URL=https://github.com/wtsi-npg/irods
     - PG_PLUGIN_VERSION=1.9
+    - BATON_VERSION="0.16.4"
   matrix:
     - TRAVIS_NODE_VERSION="0.12.9"
     - TRAVIS_NODE_VERSION="4.4.2"
 
 before_install:
-  # workaround for iRODS buffer overflow
-  # see https://github.com/travis-ci/travis-ci/issues/5227
-  - cat /etc/hosts # optionally check the content *before*
-  #- sudo hostname "$(hostname | cut -c1-63)"
-  #- sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo tee /etc/hosts
-  #- cat /etc/hosts # optionally check the content *after*
   - ./.travis/before_install.sh
 
 install:

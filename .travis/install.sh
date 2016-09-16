@@ -60,14 +60,16 @@ install_4_1_x() {
     autoreconf -fi
     ./configure ; make ; sudo make install
 
-    wget https://github.com/akheron/jansson/archive/v2.7.tar.gz -O /tmp/jansson-2.7.tar.gz
-    tar xfz /tmp/jansson-2.7.tar.gz -C /tmp
-    cd /tmp/jansson-2.7
+    # Jansson
+    wget -q https://github.com/akheron/jansson/archive/v${JANSSON_VERSION}.tar.gz -O /tmp/jansson-${JANSSON_VERSION}.tar.gz
+    tar xfz /tmp/jansson-${JANSSON_VERSION}.tar.gz -C /tmp
+    cd /tmp/jansson-${JANSSON_VERSION}
     autoreconf -fi
     ./configure ; make ; sudo make install
+    sudo ldconfig
 
     cd $TRAVIS_BUILD_DIR
-    #sudo ldconfig
+    sudo ldconfig
 
     # introduced for irods 4.1.x
     sudo apt-get install -qq python-psutil python-requests
@@ -79,12 +81,22 @@ install_4_1_x() {
     sudo dpkg -i irods-runtime-${IRODS_VERSION}-${PLATFORM}-${ARCH}.deb irods-dev-${IRODS_VERSION}-${PLATFORM}-${ARCH}.deb
 }
 
+install_baton() {
+
+    wget -q https://github.com/wtsi-npg/baton/releases/download/${BATON_VERSION}/baton-${BATON_VERSION}.tar.gz -O /tmp/baton-${BATON_VERSION}.tar.gz
+    tar xfz /tmp/baton-${BATON_VERSION}.tar.gz -C /tmp
+    cd /tmp/baton-${BATON_VERSION}
+    ./configure --with-irods=$IRODS_HOME ; make ; sudo make install
+    sudo ldconfig
+
+}
 
 case $IRODS_VERSION in
 
     4.1.9)
         install_common
         install_4_1_x
+        install_baton
         ;;
 
     *)
