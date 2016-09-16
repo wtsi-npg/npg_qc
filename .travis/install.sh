@@ -31,7 +31,7 @@ install_common() {
     #git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_tracking.git npg_tracking.git
     git clone --branch lims4composition --depth 1 https://github.com/mgcam/npg_tracking.git npg_tracking.git
     git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_seq_common.git npg_seq_common.git
-    git clone --branch devel --depth 1 https://github.com/wtsi-npg/perl-irods-wrap.git perl_irods_wrap.git
+    git clone --branch devel --depth 1 https://github.com/wtsi-npg/perl-irods-wrap.git perl-irods-wrap.git
 
     repos="/tmp/ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git /tmp/perl-irods-wrap.git"
 
