@@ -75,9 +75,6 @@ install_4_1_x() {
     sudo apt-get install super libjson-perl jq
     sudo -H pip install jsonschema
 
-    pwd
-    ls
-
     sudo dpkg -i irods-icat-${IRODS_VERSION}-${PLATFORM}-${ARCH}.deb irods-database-plugin-postgres-${PG_PLUGIN_VERSION}-${PLATFORM}-${ARCH}.deb
     sudo dpkg -i irods-runtime-${IRODS_VERSION}-${PLATFORM}-${ARCH}.deb irods-dev-${IRODS_VERSION}-${PLATFORM}-${ARCH}.deb
 }
