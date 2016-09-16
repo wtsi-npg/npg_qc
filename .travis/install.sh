@@ -66,6 +66,9 @@ install_4_1_x() {
     autoreconf -fi
     ./configure ; make ; sudo make install
 
+    cd $TRAVIS_BUILD_DIR
+    #sudo ldconfig
+
     # introduced for irods 4.1.x
     sudo apt-get install -qq python-psutil python-requests
     sudo apt-get install -qq python-sphinx
