@@ -13,8 +13,8 @@ language: perl
 perl:
   - "5.16"
 
-#addons:
-#  postgresql: "9.3" # TODO is this needed?
+addons:
+  postgresql: "9.3"
 
 env:
   global:
