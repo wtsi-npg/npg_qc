@@ -87,6 +87,9 @@ install_baton() {
     wget -q https://github.com/wtsi-npg/baton/releases/download/${BATON_VERSION}/baton-${BATON_VERSION}.tar.gz -O /tmp/baton-${BATON_VERSION}.tar.gz
     tar xfz /tmp/baton-${BATON_VERSION}.tar.gz -C /tmp
     cd /tmp/baton-${BATON_VERSION}
+    pwd # FIXME temporary
+    ls  # FIXME
+    ls $TRAVIS_BUILD_DIR # FIXME
     ./configure --with-irods=$IRODS_HOME ; make ; sudo make install
     cd $TRAVIS_BUILD_DIR
     sudo ldconfig
