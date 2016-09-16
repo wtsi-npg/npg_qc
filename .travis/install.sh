@@ -45,6 +45,7 @@ install_common() {
     done
     
     cd $TRAVIS_BUILD_DIR
+    sudo ldconfig
 }
 
 install_4_1_x() {
