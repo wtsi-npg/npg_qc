@@ -7,6 +7,7 @@ use Carp;
 use English qw(-no_match_vars);
 use Perl6::Slurp;
 use List::Util qw(sum);
+use File::Spec::Functions qw(catfile);
 use Readonly;
 
 use npg_tracking::util::types;
@@ -44,7 +45,7 @@ has [ qw/ _sequence_file
     required   => 0,
     lazy_build => 1,
 );
-has '+_sequence_file' => (init_arg   => undef,);
+has '+_sequence_file' => (init_arg   => undef);
 sub _build__sequence_file {
   my $self = shift;
   return $self->input_files->[0];
@@ -64,7 +65,12 @@ has '_file_path_root'     => ( isa        => 'Str',
 );
 sub _build__file_path_root {
   my $self = shift;
-  my ($path) = $self->_sequence_file =~ /\A(.+)\.[[:lower:]]+\Z/smx;
+  my $path;
+  if ($self->has_filename_root && $self->has_qc_in) {
+    $path = catfile $self->qc_in, $self->filename_root;
+  } else {
+    ($path) = $self->_sequence_file =~ /\A(.+)\.[[:lower:]]+\Z/smx;
+  }
   return $path;
 }
 
@@ -75,7 +81,7 @@ has 'samtools_stats_file' => ( isa        => 'ArrayRef',
 sub _build_samtools_stats_file {
   my $self = shift;
 
-  my @underscores = ($self->_sequence_file =~ /_/gsmx);
+  my @underscores = ($self->_file_path_root =~ /_/gsmx);
   my $n = 1 + scalar @underscores;
   my @paths = sort grep { -f $_ && _matches_seq_file($_, $n) } glob $self->_file_path_root . q[_*.stats];
   if (!@paths) {
@@ -98,19 +104,22 @@ sub _build_related_results {
   my $self = shift;
 
   my @objects = map { npg_qc::autoqc::results::samtools_stats->new(
-                          composition => $self->composition,
-                          stats_file  => $_
+                        filename_root => $self->result->filename_root,
+                        composition   => $self->composition,
+                        stats_file    => $_
                       )
                    } @{$self->samtools_stats_file};
   push @objects, npg_qc::autoqc::results::sequence_summary->new(
-                     composition   => $self->composition,
-                     sequence_file => $self->_sequence_file
+                   filename_root   => $self->result->filename_root,
+                   composition     => $self->composition,
+                   sequence_format => $self->file_type,
+                   file_path_root  => $self->_file_path_root
                  );
 
   return \@objects;
 }
 
-sub execute {
+override 'execute' => sub {
   my $self = shift;
 
   $self->_parse_markdups_metrics();
@@ -120,7 +129,7 @@ sub execute {
   }
 
   return;
-}
+};
 
 sub _parse_markdups_metrics {
   my $self = shift;
@@ -217,11 +226,11 @@ npg_qc::autoqc::checks::bam_flagstats
 
 =head2 subset
 
-  an optional subset, see npg_tracking::glossary::subset for details.
+  An optional subset, see npg_tracking::glossary::subset for details.
 
 =head2 related_results
 
-  a lazy attribute, an array of related autoqc result objects
+  A lazy attribute, an array of related autoqc result objects.
 
 =head2 markdups_metrics_file
 
@@ -229,7 +238,7 @@ npg_qc::autoqc::checks::bam_flagstats
 
 =head2 samtools_stats_file
 
-  an array of samtools stats file paths
+  An an array of samtools stats file paths.
 
 =head2 execute
 
@@ -254,6 +263,8 @@ npg_qc::autoqc::checks::bam_flagstats
 =item Perl6::Slurp
 
 =item List::Util
+
+=item File::Spec::Functions
 
 =item Readonly
 

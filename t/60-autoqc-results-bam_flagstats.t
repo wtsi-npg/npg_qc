@@ -20,7 +20,11 @@ subtest 'test attributes and simple methods' => sub {
   $r->human_split('human');
   is($r->check_name(), 'bam flagstats', 'check name has not changed');
   ok(!$r->has_subset, 'subset attr is not set');
-  $r->_set_subset('human');
+
+  $r = npg_qc::autoqc::results::bam_flagstats->new(
+            position => 5,
+            id_run   => 4783,
+            subset   => 'human');
   ok($r->has_subset, 'subset attr is set');
   is($r->check_name(), 'bam flagstats human', 'check name has changed');
   is($r->filename4serialization(), '4783_5_human.bam_flagstats.json',

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw( tempdir );
@@ -182,7 +182,7 @@ my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive
 $ae->extract(to => $tempdir) or die $ae->error;
 $archive = join q[/], $tempdir, $archive;
 my $qc_dir = join q[/], $archive, 'testqc';
-note `find $archive`;
+#note `find $archive`;
 write_samtools_script($samtools_path, join(q[/], $archive, 'cram.header'));
 
 subtest 'full functionality with full file sets' => sub {
@@ -217,6 +217,81 @@ subtest 'full functionality with full file sets' => sub {
 
       my $sfile = join q[.], $fproot, $file_type;
       $ref->{'input_files'} = [$sfile];
+     
+      my $r = npg_qc::autoqc::checks::bam_flagstats->new($ref);
+      lives_ok { $r->run() } 'no error calling run()';
+
+      my @ros = @{$r->related_results};
+      is (scalar @ros, 3, 'three related results');
+
+      my $i = 0;
+      while ($i < 2) {
+        my $ro = $ros[$i];
+        my $filter = $filters[$i];
+        isa_ok ($ro, 'npg_qc::autoqc::results::samtools_stats');
+        is ($ro->filter, $filter, 'correct filter');
+        is ($ro->stats_file, $fproot . q[_] . $filter . '.stats', 'stats file path');
+        isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+        is ($ro->composition_digest, $composition_digest, 'composition digest');
+        $i++;
+      }
+
+      my $ro = $ros[2];
+      isa_ok ($ro, 'npg_qc::autoqc::results::sequence_summary');
+      isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+      is ($ro->composition_digest, $composition_digest, 'composition digest');
+
+      foreach my $output_type ( qw(.bam_flagstats.json
+                                   .sequence_summary.json
+                                   _F0xB00.samtools_stats.json
+                                   _F0x900.samtools_stats.json) ) {
+        my @dirs = splitdir $fproot;
+        my $name = pop @dirs;
+        my $output = catdir($local_qc_dir, $name) . $output_type;
+        ok (-e $output, "output $output created");
+      }
+    }
+  }
+};
+
+subtest 'filename_root is given instead of input file' => sub {
+  plan tests => 76;
+
+  $qc_dir = join q[/], $archive, 'testqc1';
+  mkdir $qc_dir;
+
+  my $fproot_common = $archive . '/17448_1#9';
+  my $composition_digest = 'bfc10d33f4518996db01d1b70ebc17d986684d2e04e20ab072b8b9e51ae73dfa';
+  my @filters = qw/F0x900 F0xB00/;
+
+  foreach my $subset ( qw(default phix) ) {
+    foreach my $file_type ( qw(cram bam) ) {
+
+      my $local_qc_dir = join q[/], $qc_dir, $file_type;
+      if (!-e $local_qc_dir) {
+        mkdir $local_qc_dir;
+      }
+
+      my $ref = {
+        id_run        => 17448,
+        position      => 1,
+        tag_index     => 9,
+        qc_in         => $archive,
+        qc_out        => $local_qc_dir,
+        filename_root => '17448_1#9',
+        file_type     => $file_type,
+                };
+      my $fproot = $fproot_common;
+      if ($subset eq 'phix') {
+        $fproot .= q[_] . $subset;
+        $ref->{'subset'} = $subset;
+        $ref->{filename_root} = '17448_1#9_phix';
+        $composition_digest = 'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb';
+      }
+
+      if ($file_type eq 'bam') {
+        unlink join q[.] , $fproot, $file_type;
+      }
      
       my $r = npg_qc::autoqc::checks::bam_flagstats->new($ref);
       lives_ok { $r->run() } 'no error calling run()';

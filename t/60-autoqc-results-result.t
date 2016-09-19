@@ -97,6 +97,7 @@ use_ok ('npg_qc::autoqc::results::result');
                                                  );
     my $saved_path = q[/tmp/autoqc_check.json];
     $r->store($saved_path);
+    delete $r->{'filename_root'};
     my $saved_r = npg_qc::autoqc::results::result->load($saved_path);
     sleep 1;
     unlink $saved_path;

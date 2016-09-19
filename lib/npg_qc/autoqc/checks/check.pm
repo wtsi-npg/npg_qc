@@ -177,6 +177,19 @@ sub _test_qc_out {
   return;
 }
 
+=head2 filename_root
+
+A filename root for storing the serialized result objects and finding
+input files.
+
+=cut
+
+has 'filename_root' => (isa           => q[Str],
+                        is            => q[ro],
+                        required      => 0,
+                        predicate     => 'has_filename_root',
+                       );
+
 =head2 tmp_path
 
 A path to a directory that can be used by the check to write temporary files to.
@@ -258,6 +271,9 @@ sub _build_result {
   }
   if ($self->can('subset') && $self->subset) {
     $nref->{'subset'} = $self->subset;
+  }
+  if ($self->has_filename_root) {
+    $nref->{'filename_root'} = $self->filename_root;
   }
 
   my $result = $module->new($nref);

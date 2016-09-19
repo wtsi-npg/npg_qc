@@ -126,7 +126,7 @@ subtest 'validation of attributes' => sub {
 };
 
 subtest 'accessors tests' => sub {
-    plan tests => 34;
+    plan tests => 36;
 
     my @checks = ();
     push @checks, npg_qc::autoqc::checks::check->new(
@@ -149,8 +149,18 @@ subtest 'accessors tests' => sub {
     }
 
     my $c = npg_qc::autoqc::checks::check->new(
-        path => $path, rpt_list => "2:5:1;1:2:44;1:3:44;2:6:1" );
+        path     => $path,
+        rpt_list => "2:5:1;1:2:44;1:3:44;2:6:1"
+    );
     is($c->get_id_run, undef, 'id run cannot be inferred');
+    is($c->result->filename_root,
+      '90b32bf73573b149c95c3fcd6d7288e0cfb998c682ff8efae46cdc79505a3249',
+      'filename root from digest');
+    $c = npg_qc::autoqc::checks::check->new(
+        rpt_list      => "2:5:1;1:2:44;1:3:44;2:6:1",
+        filename_root => 'XAFTU'
+    );
+    is($c->result->filename_root, 'XAFTU', 'filename root as given');
 
     @checks = ();
     push @checks, npg_qc::autoqc::checks::check->new(
