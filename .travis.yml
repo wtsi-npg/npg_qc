@@ -43,6 +43,7 @@ before_script:
   - source ./.travis/before_script.sh
   - ienv
   - ilsresc -l
+  - which ils
   - ils
 
 script:

@@ -5,7 +5,8 @@ set -e -x
 IRODS_VERSION=${IRODS_VERSION:=4.1.9}
 
 before_script_common() {
-    source $TRAVIS_BUILD_DIR/.travis/irods_paths.sh
+    #source $TRAVIS_BUILD_DIR/.travis/irods_paths.sh
+    return
 }
 
 before_script_4_1_x() {
