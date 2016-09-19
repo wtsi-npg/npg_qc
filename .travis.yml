@@ -43,12 +43,6 @@ before_script:
   - source ./.travis/before_script.sh
   - ienv
   - ilsresc -l
-  - env
-  - ls /usr/lib/irods
-  - ls /usr/bin/irods
-  - ls /home/travis/build/wtsi-npg/
-  - ls /home/travis/build/wtsi-npg/npg_qc/
-  - ls /home/travis/build/wtsi-npg/npg_qc/iRODS
   - ils
 
 script:
