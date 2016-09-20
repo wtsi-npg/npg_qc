@@ -6,6 +6,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - QC script accepts the rpt_list argument.
  - tag_index attribute of the check object cannot be assigned to undef.
  - added Broad Institute's RNA-SeQC to autoqc QC checks
+ - Travis CI build: pr to master - build against master branches of
+   other NPG packages.
 
 release 62.1
  - Bug fix in build action for cgi files.
