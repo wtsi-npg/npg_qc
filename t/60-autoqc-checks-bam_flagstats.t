@@ -28,7 +28,7 @@ subtest 'test attributes and simple methods' => sub {
   $c = npg_qc::autoqc::checks::bam_flagstats->new(
             position => 5,
             id_run   => 4783,
-            subset => 'phix');
+            subset   => 'phix');
   is ($c->subset, 'phix', 'subset attr is set correctly');
   my $json = $c->result()->freeze();
   like ($json, qr/\"subset\":\"phix\"/, 'subset field is serialized');
@@ -255,7 +255,7 @@ subtest 'full functionality with full file sets' => sub {
 };
 
 subtest 'filename_root is given instead of input file' => sub {
-  plan tests => 76;
+  plan tests => 84;
 
   $qc_dir = join q[/], $archive, 'testqc1';
   mkdir $qc_dir;
@@ -325,6 +325,18 @@ subtest 'filename_root is given instead of input file' => sub {
         my $output = catdir($local_qc_dir, $name) . $output_type;
         ok (-e $output, "output $output created");
       }
+
+      my $command = 'bin/qc --check bam_flagstats';
+      $ref->{'qc_out'} = join q[/], $ref->{'qc_out'}, 'out'.$file_type;
+      mkdir $ref->{'qc_out'};
+      foreach my $arg (keys %{$ref}) {
+        $command .= q[ --] . $arg . q[ ] . $ref->{$arg};
+      }
+      is (system($command), 0, 'script exited normally');
+      my $name = $ref->{'filename_root'};
+      $name .= '.bam_flagstats.json';
+      $name = join q[/], $ref->{'qc_out'}, $name;
+      ok(-e $name, "json output $name exists");
     }
   }
 };

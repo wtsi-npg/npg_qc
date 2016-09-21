@@ -35,6 +35,8 @@ Readonly::Scalar my $METRICS_FIELD_LIST => [qw(
 Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 Readonly::Scalar our $EXT => q[bam];
 
+has '+subset' => ( isa => 'Str', );
+
 has '+file_type' => (default => $EXT,);
 
 has [ qw/ _sequence_file
