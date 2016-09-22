@@ -437,11 +437,14 @@ Returns a file name. Can be used both as an instance and class method.
 
 sub create_filename4attrs {
   my ($self, $map, $end) = @_;
-  return sprintf '%i_%i%s%s',
+  return sprintf '%i_%i%s%s%s',
     $map->{'id_run'},
     $map->{'position'},
     $end ? "_$end" : q[],
-    defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
+    defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[],
+    (   $self->can('subset')
+     && $self->can('has_subset')
+     && $self->has_subset()   ) ? q[_].$self->subset : q[];
 }
 
 =head2 to_string

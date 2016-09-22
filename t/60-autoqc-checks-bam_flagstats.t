@@ -216,7 +216,11 @@ subtest 'full functionality with full file sets' => sub {
       }
 
       my $sfile = join q[.], $fproot, $file_type;
-      $ref->{'input_files'} = [$sfile];
+      if ($file_type eq 'bam') {
+        $ref->{'input_files'} = [$sfile];
+      } else {
+        $ref->{'qc_in'} = $archive;
+      }
      
       my $r = npg_qc::autoqc::checks::bam_flagstats->new($ref);
       lives_ok { $r->run() } 'no error calling run()';
