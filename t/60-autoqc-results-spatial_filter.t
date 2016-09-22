@@ -1,16 +1,11 @@
-#########
-# Author:        dj3
-# Created:       2009-09-21
-#
-
 use strict;
 use warnings;
 use Test::More tests => 27;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 use Perl6::Slurp;
-use JSON;
 use Carp;
+use JSON;
 
 use_ok ('npg_qc::autoqc::results::spatial_filter');
 
@@ -31,13 +26,13 @@ my $tempdir = tempdir( CLEANUP => 1);
     lives_ok {
       $r->freeze();
       $r->store(qq{$tempdir/spatial_filter_1.json});
-    } 'no croak when save data into json';
+    } 'no error when save data into json';
 
     is ($r->composition->num_components, 1, 'one component');
     my $component = $r->composition->get_component(0);
     is ($component->id_run, 8926, 'component id_run');
     is ($component->position, 1, 'component position');
-    ok ($component->has_tag_index, 'component tag index has been set');
+    ok (!$component->has_tag_index, 'component tag index has not been set');
     is ($component->tag_index, undef, 'component tag index is undefined');
 }
 
@@ -61,7 +56,7 @@ my $tempdir = tempdir( CLEANUP => 1);
     lives_ok {
       $r->freeze();
       $r->store($tempdir);
-    } 'no croak when save data into json (store passed directory)';
+    } 'no error when save data into json (store passed directory)';
 
     my $hash = from_json( slurp qq{$tempdir/8926_2.spatial_filter.json} );
 
@@ -115,7 +110,7 @@ my $tempdir = tempdir( CLEANUP => 1);
     lives_ok {
       $r->freeze();
       $r->store($tempdir);
-    } 'no croak when save data into json (store passed directory)';
+    } 'no error when save data into json (store passed directory)';
 
     my $hash = from_json( slurp qq{$tempdir/8926_4.spatial_filter.json} );
 
@@ -132,6 +127,5 @@ my $tempdir = tempdir( CLEANUP => 1);
     delete $hash->{'composition'};
     is_deeply( $hash, $expected_hash_structure, q{expected results obtained} );
 }
-
 
 1;

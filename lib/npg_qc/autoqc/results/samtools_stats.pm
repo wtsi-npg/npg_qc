@@ -26,17 +26,16 @@ has 'filter'         => (
     lazy_build => 1,
 );
 sub _build_filter {
-  my ($self, $path) = @_;
+  my $self = shift;
 
   my ($volume, $directories, $file) = splitpath($self->stats_file);
-  my ($filter) = $file =~ /_([[:lower:][:upper:][:digit:]]+)[.]stats\Z/xms;
+  my ($filter) = $file =~ /_([[:alnum:]]+)[.]stats\Z/xms;
   if (!$filter) {
-    croak "Failed to get filter from $path";
+    croak "Failed to get filter from $file";
   }
-
   my $subset = $self->composition_subset();
   $subset = $subset ? $subset . q[_] : q[];
-  return  ($file =~ / \d _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
+  return  ($file =~ / [[:alnum:]] _ $subset $filter [.]stats\Z/xms) ? $filter : undef;
 }
 
 has 'stats'         => (
@@ -51,6 +50,12 @@ sub _build_stats {
   return $content;
 }
 
+around 'filename_root' => sub {
+  my $orig = shift;
+  my $self = shift;
+  return join q[_], $self->$orig(), $self->filter();
+};
+
 sub execute {
   my $self = shift;
   if (!$self->stats_file) {
@@ -60,11 +65,6 @@ sub execute {
   $self->stats();
   return;
 }
-
-override 'filename_root' => sub  {
-  my $self = shift;
-  return $self->filename_root_from_filename($self->stats_file);
-};
 
 __PACKAGE__->meta->make_immutable;
 
@@ -86,20 +86,19 @@ A class representing a filter-specific samtools stats file.
 
 =head2 stats_file
 
-Attribute, a path of the samtools stats file
+Attribute, a path of the samtools stats file, is not serialized to JSON.
 
 =head2 filter
 
-Attribute, the filter name that was used by samtools to produce the stats,
-required.
+Attribute, the filter name that was used by samtools to produce the stats.
 
 =head2 stats
 
-Attribute, compressed content of the samtool stats file, required
+Attribute, compressed content of the samtool stats file.
 
 =head2 filename_root
 
-Extends the parent method, appends filter name to the filename root.
+Parent's attribute is modified to add _filter at the end.
 
 =head2 execute
 
@@ -141,7 +140,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

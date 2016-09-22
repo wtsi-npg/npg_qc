@@ -177,6 +177,19 @@ sub _test_qc_out {
   return;
 }
 
+=head2 filename_root
+
+A filename root for storing the serialized result objects and finding
+input files.
+
+=cut
+
+has 'filename_root' => (isa           => q[Str],
+                        is            => q[ro],
+                        required      => 0,
+                        predicate     => 'has_filename_root',
+                       );
+
 =head2 tmp_path
 
 A path to a directory that can be used by the check to write temporary files to.
@@ -256,6 +269,12 @@ sub _build_result {
   if ($self->has_qc_in) {
     $nref->{'path'} = $self->qc_in;
   }
+  if ($self->can('subset') && $self->subset) {
+    $nref->{'subset'} = $self->subset;
+  }
+  if ($self->has_filename_root) {
+    $nref->{'filename_root'} = $self->filename_root;
+  }
 
   my $result = $module->new($nref);
   $result->set_info('Check', $class_name);
@@ -274,7 +293,13 @@ execution and writes out test results to the output directory.
 sub run {
   my $self = shift;
   $self->execute();
-  $self->result()->store($self->qc_out);
+  my @results = ($self->result());
+  if ($self->can('related_results')) {
+    push @results, @{$self->related_results()};
+  }
+  foreach my $r (@results) {
+    $r->store($self->qc_out);
+  }
   return 1;
 }
 
@@ -412,11 +437,14 @@ Returns a file name. Can be used both as an instance and class method.
 
 sub create_filename4attrs {
   my ($self, $map, $end) = @_;
-  return sprintf '%i_%i%s%s',
+  return sprintf '%i_%i%s%s%s',
     $map->{'id_run'},
     $map->{'position'},
     $end ? "_$end" : q[],
-    defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[];
+    defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[],
+    (   $self->can('subset')
+     && $self->can('has_subset')
+     && $self->has_subset()   ) ? q[_].$self->subset : q[];
 }
 
 =head2 to_string

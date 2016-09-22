@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 3;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 use Archive::Extract;
@@ -22,46 +22,39 @@ local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
 my $header_file = join q[/],$archive,'cram.header';
 write_samtools_script($samtools_path, $header_file);
 
-my $file = join q[/], $archive, '17448_1#9.cram';
+my $file_path_root = join q[/], $archive, '17448_1#9';
 
 use_ok ('npg_qc::autoqc::results::sequence_summary');
 
-subtest 'errors' => sub {
-  plan tests => 4;
-
-  throws_ok { npg_qc::autoqc::results::sequence_summary->new() }
-    qr/Can only build old style results/,
-    'composition required';
-
-  my $c = npg_tracking::glossary::composition::component::illumina->new(
-    id_run => 17448, position => 1, tag_index => 9);
-  my $f = npg_tracking::glossary::composition::factory->new();
-  $f->add_component($c);
-  my $composition = $f->create_composition();
-  my $r = npg_qc::autoqc::results::sequence_summary->new(
-   composition => $composition);
-  isa_ok ($r, 'npg_qc::autoqc::results::sequence_summary');
-  throws_ok { $r->execute }
-    qr/CRAM\/BAM file path \(sequence_file attribute\) should be set/,
-    'sequence file does not given - error';
-  
-  throws_ok { npg_qc::autoqc::results::sequence_summary->new(
-      sequence_file => '/some/file', composition => $composition) } 
-    qr/Validation failed for 'NpgTrackingReadableFile' with value/,
-    'sequence file does not exist - error';
-};
-
 subtest 'object with an one-component composition' => sub {
-  plan tests => 16;
+  plan tests => 18;
+
+  throws_ok { npg_qc::autoqc::results::sequence_summary->new(
+              file_path_root  => '/some/path/xyts',
+              sequence_format => 'bam')
+  } qr/Can only build old style results/, 'composition required';
 
   my $c = npg_tracking::glossary::composition::component::illumina->new(
     id_run => 17448, position => 1, tag_index => 9);
   my $f = npg_tracking::glossary::composition::factory->new();
   $f->add_component($c);
   my $r = npg_qc::autoqc::results::sequence_summary->new(
-   sequence_file => $file, composition => $f->create_composition());
+    composition => $f->create_composition(),
+    filename_root   => '17448_1#9',
+    sequence_format => 'cram'
+  );
   isa_ok ($r, 'npg_qc::autoqc::results::sequence_summary');
+  throws_ok { $r->execute() } qr/file_path_root attribute is required/,
+    'file_path_root attribute is required';
 
+  $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($c);
+  $r = npg_qc::autoqc::results::sequence_summary->new(
+    composition => $f->create_composition(),
+    file_path_root  => $file_path_root,
+    sequence_format => 'cram',
+    filename_root   => '17448_1#9'
+  );
   is ($r->num_components, 1, 'one component');
   is ($r->composition_digest(),
     'bfc10d33f4518996db01d1b70ebc17d986684d2e04e20ab072b8b9e51ae73dfa', 'digest');
@@ -77,14 +70,15 @@ subtest 'object with an one-component composition' => sub {
 
   my $json = $r->freeze();
 
-  my @attrs = qw(sequence_file _root_path _samtools);
+  my @attrs = qw(sequence_file file_path_root samtools);
   for my $attr ( @attrs ) {
     unlike ($json, qr/$attr/, "serialization des not contain $attr attribute"); 
   }
   lives_ok { $r = npg_qc::autoqc::results::sequence_summary->thaw($json) }
     'object instantiated from JSON string';
   for my $attr ( @attrs ) {
-    lives_and { is $r->$attr, undef} "$attr value is undefined";
+    my $predicate = "_has_$attr";
+    lives_and { is $r->$predicate, '' } "$attr is not set";
   }
   lives_ok { $r->freeze() } 'can serialize';
 };
