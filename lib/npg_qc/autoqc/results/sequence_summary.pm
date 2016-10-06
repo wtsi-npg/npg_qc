@@ -14,19 +14,41 @@ extends 'npg_qc::autoqc::results::base';
 
 our $VERSION = '0';
 
-Readonly::Array my @ATTRIBUTES => qw/ sequence_format
-                                      header
+Readonly::Array my @ATTRIBUTES => qw/ header
                                       md5
                                       seqchksum
                                       seqchksum_sha512
                                     /;
 
-has 'sequence_file'  => (
-    isa        => 'NpgTrackingReadableFile',
-    is         => 'ro',
+has 'file_path_root' => (
+    isa        => 'Str',
     traits     => [ 'DoNotSerialize' ],
+    is         => 'ro',
+    predicate  => '_has_file_path_root',
     required   => 0,
 );
+
+has 'sequence_format' => (
+    is         => 'ro',
+    isa        => 'Str',
+    required   => 1,
+);
+
+has '_sequence_file' => (
+    isa        => 'Str',
+    traits     => [ 'DoNotSerialize' ],
+    is         => 'ro',
+    predicate  => '_has_sequence_file',
+    required   => 0,
+    lazy_build => 1,
+);
+sub _build__sequence_file {
+  my $self = shift;
+  if (!$self->_has_file_path_root) {
+    croak 'file_path_root attribute is required';
+  }
+  return join q[.], $self->file_path_root, $self->sequence_format;
+}
 
 has [ @ATTRIBUTES ] => (
     is         => 'ro',
@@ -34,64 +56,58 @@ has [ @ATTRIBUTES ] => (
     required   => 0,
     lazy_build => 1,
 );
-sub _build_sequence_format {
-  my $self = shift;
-  my ($path, $format) = $self->sequence_file =~ /\A(.+)[.]([^.]+)\Z/smx;
-  $self->_set_root_path($path);
-  return $format;
-}
+
 sub _build_header {
   my $self = shift;
-  return join q[], grep { ($_ !~ /\A\@SQ/smx) }
-    slurp q{-|}, {'utf8' => 1},
-    $self->_samtools, 'view', '-H', $self->sequence_file;
+
+  my $header = q[];
+  my $header_file = $self->_sequence_file . q[.header];
+
+  if (-f $header_file) { # Maybe a pre-generated header file exists.
+    $header = slurp $header_file;
+  } elsif (-f $self->_sequence_file) { # Maybe the bam|cram file exists,
+                                       # should exist in the prod pipeline.
+    $header =  join q[], grep { ($_ !~ /\A\@SQ/smx) }
+      slurp q{-|}, {'utf8' => 1},
+      $self->_samtools, 'view', '-H', $self->_sequence_file;
+  } else {
+    carp sprintf 'WARNING: Cannot generate header, %s does not exist or is not a file',
+         $self->_sequence_file;
+  }
+
+  return $header;
 }
 sub _build_md5 {
   my $self = shift;
-  return slurp $self->sequence_file . '.md5';
+  return slurp $self->_sequence_file . '.md5';
 }
 sub _build_seqchksum {
   my $self = shift;
-  return slurp $self->_root_path . '.seqchksum';
+  return slurp $self->file_path_root . '.seqchksum';
 }
 sub _build_seqchksum_sha512 {
   my $self = shift;
-  return slurp $self->_root_path . '.sha512primesums512.seqchksum';
+  return slurp $self->file_path_root . '.sha512primesums512.seqchksum';
 }
-
-has '_root_path' => (
-    isa        => 'Str',
-    traits     => [ 'DoNotSerialize' ],
-    is         => 'ro',
-    required   => 0,
-    writer     => '_set_root_path',
-);
 
 has '_samtools' => (
     isa        => 'NpgCommonResolvedPathExecutable',
     coerce     => 1,
     is         => 'ro',
     traits     => [ 'DoNotSerialize' ],
+    predicate  => '_has_samtools',
     required   => 0,
     writer     => '_set_samtools',
 );
 
 sub execute {
   my $self = shift;
-  if (!$self->sequence_file) {
-    croak 'CRAM/BAM file path (sequence_file attribute) should be set';
-  }
   $self->_set_samtools('samtools1');
   for my $attr ( @ATTRIBUTES ) {
     $self->$attr;
   }
   return;
 }
-
-override 'filename_root' => sub  {
-  my $self = shift;
-  return $self->filename_root_from_filename($self->sequence_file);
-};
 
 __PACKAGE__->meta->make_immutable;
 
@@ -111,13 +127,14 @@ a header, md5, etc.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 sequence_file
+=head2 file_path_root
 
-Attribute, a path of bam/cram input file.
+Attribute, a path of the relevant bam/cram file with extension truncated,
+required, is not serialized to json.
 
 =head2 sequence_format
 
-Attribute, sequence format (bam|cram) derived from the sequence file extension.
+Attribute, sequence format (bam|cram), required.
 
 =head2 header
 
@@ -178,7 +195,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

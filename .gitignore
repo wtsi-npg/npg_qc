@@ -8,3 +8,6 @@ src/*/build/*
 bower_components
 node_modules
 *.bak
+.project
+.includepath
+
