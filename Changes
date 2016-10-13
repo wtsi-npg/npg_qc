@@ -1,6 +1,5 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-
  - make bam_flagstats check runnable under the qc script
  - remove autoqc loader backwards compatibility with analysis code
    that does not generate related results for the bam_flagstats results
@@ -10,6 +9,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - QC script accepts the rpt_list argument.
  - tag_index attribute of the check object cannot be assigned to undef.
  - added Broad Institute's RNA-SeQC to autoqc QC checks
+ - SeqQC - genotype view fixed (escaping)
 
 release 62.1
  - Bug fix in build action for cgi files.
