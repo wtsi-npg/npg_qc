@@ -306,7 +306,7 @@ End of Sequenom assay data
 
 <tr>
   <th class="laligned">pass criterion <a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]#genotype_check"><img src="/static/images/information.png" alt="Link to information about genotype check"/></a></th>
-  <td>[% check.criterion %]</td>
+  <td>[% FILTER html; check.criterion; END %]</td>
 </tr>
 
 <tr>

@@ -12,15 +12,10 @@ sub criterion {
     my $min_common_snps = $self->search_parameters->{'min_common_snps'};
     my $poss_dup_level  = $self->search_parameters->{'poss_dup_level'};
     if ($min_common_snps and $poss_dup_level) {
-      $c = sprintf q[Sample name is %s, number of common SNPs %s %s and percentage of loosely matched calls %s %s%s (fail: %s50%s)],
-         $self->expected_sample_name,
-         uri_escape(q[>=]),
-         $min_common_snps,
-         uri_escape(q[>]),
-         $poss_dup_level,
-         uri_escape(q[%]),
-         uri_escape(q[<]),
-         uri_escape(q[%]);
+      my $sn = $self->expected_sample_name;
+      $c = qq[Sample name is $sn, number of common SNPs >= $min_common_snps ] .
+           qq[and percentage of loosely matched calls > $poss_dup_level] .
+            q[% (fail: < 50%)];
     }
   }
   return $c;
