@@ -32,8 +32,8 @@ Readonly::Scalar my $METRICS_FILE_NAME => q[metrics.tsv];
 Readonly::Scalar my $MINUS_ONE         => -1;
 
 Readonly::Hash   my %RNASEQC_METRICS_FIELDS_MAPPING => {
-    '3\' Norm'                               => 'end_3_norm',
-    '5\' Norm'                               => 'end_5_norm',
+    '3\' Norm'                              => 'end_3_norm',
+    '5\' Norm'                              => 'end_5_norm',
     'End 1 % Sense'                         => 'end_1_pct_sense',
     'End 1 Antisense'                       => 'end_1_antisense',
     'End 1 Sense'                           => 'end_1_sense',
@@ -59,11 +59,11 @@ has 'qc_report_dir' => (is       => 'ro',
                         isa      => 'NpgTrackingDirectory',
                         required => 1,);
 
-has '_java_jar_path'          => (is      => 'ro',
-                                  isa     => 'NpgCommonResolvedPathJarFile',
-                                  coerce  => 1,
-                                  default => $RNASEQC_JAR_NAME,
-                                  init_arg => undef,);
+has '_java_jar_path' => (is       => 'ro',
+                         isa      => 'NpgCommonResolvedPathJarFile',
+                         coerce   => 1,
+                         default  => $RNASEQC_JAR_NAME,
+                         init_arg => undef,);
 
 has '_ttype_gtf_column' => (is      => 'ro',
                             isa     => 'Int',
@@ -192,7 +192,8 @@ sub _build__ref_rrna {
 
 sub _command {
     my ($self) = @_;
-    my ($ref_rrna_option, $single_end_option) = q[];
+    my $ref_rrna_option = q[];
+    my $single_end_option = q[];
     if(!$self->_is_paired_end){
         $single_end_option = q[-singleEnd];
     }
@@ -246,9 +247,7 @@ override 'execute' => sub {
         return 1;
     }
     my $command = $self->_command();
-    $self->result->set_info('Command', $command);
     carp qq[EXECUTING $command time ]. DateTime->now();
-
     if (system $command) {
         my $error = $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
         croak sprintf "Child %s exited with value %d\n", $command, $error;
@@ -294,11 +293,13 @@ sub _save_results {
             my $attr_name = $RNASEQC_METRICS_FIELDS_MAPPING{$key};
             if ($value eq q[?]) {
                 carp qq[Field $attr_name is set to '?', skipping...];
-	        } else {
-                    $self->result->$attr_name($value);
+            } else {
+                $self->result->$attr_name($value);
             }
         }
+        delete $results->{$key};
     }
+    $self->result->other_metrics($results);
     return;
 }
 __PACKAGE__->meta->make_immutable();
