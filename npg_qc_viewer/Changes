@@ -1,5 +1,7 @@
 Changes for NPG SeqQC
 
+ - add composite alternate matches to genotype check display
+
 release 20.6
  - added norm_fit information
  - fixed typos in check verify_bam_id template
