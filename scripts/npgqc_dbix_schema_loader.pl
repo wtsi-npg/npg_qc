@@ -8,6 +8,7 @@ use lib qw/lib/;
 
 use npg_qc::autoqc::autoqc;
 use npg_qc::autoqc::role::result;
+use npg_qc::autoqc::results::collection;
 
 our $VERSION = '0';
 
@@ -26,8 +27,9 @@ my $role_base = 'npg_qc::autoqc::role::';
 my $generic_role = $role_base . 'result';
 my $component = 'InflateColumn::Serializer';
 my $flator = 'npg_qc::Schema::Flators';
+my $results = npg_qc::autoqc::results::collection->new();
 
-foreach my $check (@{npg_qc::autoqc::autoqc->checks_list}) {
+foreach my $check (@{$results->checks_list}) {
   my ($result_name, $dbix_result_name ) = $generic_role->class_names($check);
   
   my @roles = ($flator, $generic_role);
