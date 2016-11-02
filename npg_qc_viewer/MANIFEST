@@ -3,6 +3,7 @@ Changes
 lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
 lib/npg_tracking/daemon/seqqc.pm
 lib/npg_qc_viewer/Controller/Checks.pm
+lib/npg_qc_viewer/Controller/Illumina.pm
 lib/npg_qc_viewer/Controller/QcOutcomes.pm
 lib/npg_qc_viewer/Controller/Root.pm
 lib/npg_qc_viewer/Controller/Visuals.pm
@@ -56,6 +57,7 @@ root/src/ui_checks/ref_match.tt2
 root/src/ui_checks/sequence_error.tt2
 root/src/ui_checks/tag_decode_stats.tt2
 root/src/ui_checks/tag_metrics.tt2
+root/src/ui_illuminaqc/summary.tt2
 root/src/ui_lanes/checks_header.tt2
 root/src/ui_lanes/collapse_menu.tt2
 root/src/ui_lanes/lane.tt2

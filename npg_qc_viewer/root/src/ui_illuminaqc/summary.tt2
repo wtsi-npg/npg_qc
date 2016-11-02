@@ -1,0 +1,57 @@
+[% 
+   USE Number.Format(THOUSANDS_SEP=',');
+
+   WRAPPER qsea_wrapper.tt2;
+   IF mlwh_lanes.size;
+     lane1 = mlwh_lanes.0;
+%]
+<div id="menu">
+<div id="links">
+  <ul>
+    <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('index')) %]">Help</a></li>
+  </ul>
+  <ul>
+    <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), run_id_to_link) %]">Autoqc for Run [% run_id_to_link %]</a></li>
+  </ul>
+</div>
+</div>
+
+<div id="content">
+
+<h2>Summary</h2>
+<div class="result_full_content">
+<div class="data_table">
+<table title="run details">
+<tbody>
+<tr><td>[% lane1.paired_read ? 'Paired' : 'Single' %] run, [% lane1.cycles %] cycles</td></tr>
+<tr><td>Instrument [% lane1.instrument_name %], model [% lane1.instrument_model %]</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<h2>Clusters and Bases</h2>
+<div class="result_full_content">
+<div class="data_table">
+<table title="cluster density">
+<tbody>
+<tr><th rowspan="2">Lane</th> <th colspan="2">Cluster Density</th> <th colspan="2">Cluster Count per Tile</th> <th>Number of Bases</th></tr>
+<tr>                          <th>raw</th><th>pf</th>              <th>raw</th><th>pf</th>           <th>pf</th>             </tr>
+[% FOREACH lane IN mlwh_lanes %]
+<tr><th>[% lane.position %]</th>
+    <td class="raligned">[% lane.raw_cluster_density | format_number %]</td>
+    <td class="raligned">[% lane.pf_cluster_density | format_number %]</td>
+    <td class="raligned">[% lane.raw_cluster_count | format_number %]</td>
+    <td class="raligned">[% lane.pf_cluster_count | format_number %]</td>
+    <td class="raligned">[% lane.pf_bases | format_number %]</td></tr>
+[% END %]
+</tbody>
+</table>
+</div>
+</div>
+
+[% END %]
+
+</div> <!-- end of content division -->
+
+[%- END -%]

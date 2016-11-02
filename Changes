@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - a very concise replacement for NPG_QC pages
+
  - make bam_flagstats check runnable under the qc script
  - remove autoqc loader backwards compatibility with analysis code
    that does not generate related results for the bam_flagstats results
