@@ -133,6 +133,7 @@ t/20-model-MLWarehouseDB.t
 t/20-model-visuals-Fastqcheck.t
 t/30-model-visuals-Fastqcheck.t
 t/40-controller-Checks.t
+t/40-controller-Illumina.t
 t/40-controller-QcOutcomes.t
 t/40-controller-Visuals.t
 t/45-controller-Visuals.t

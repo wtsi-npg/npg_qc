@@ -15,7 +15,7 @@ npg_qc_viewer::Controller::Illumina
 
 =head1 SYNOPSIS
 
-Controller for Illumina qc results.
+Controller for Illumina QC results.
 
 =head1 DESCRIPTION
 
