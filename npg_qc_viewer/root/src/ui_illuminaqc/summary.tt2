@@ -36,15 +36,22 @@
 <div class="data_table">
 <table title="cluster density">
 <tbody>
-<tr><th rowspan="2">Lane</th> <th colspan="2">Cluster Density</th> <th colspan="2">Cluster Count per Tile</th> <th>Number of Bases</th></tr>
-<tr>                          <th>raw</th><th>pf</th>              <th>raw</th><th>pf</th>           <th>pf</th>             </tr>
-[% FOREACH lane IN mlwh_lanes %]
+<tr><th rowspan="2">Lane</th>
+    <th colspan="2">Cluster Density per mm<sup>2</sup></th>
+    <th colspan="2">Cluster Count per Tile</th>
+    <th>Number of Bases, Kb</th></tr>
+<tr><th>raw</th><th>pf</th><th>raw</th><th>pf</th><th>pf</th></tr>
+[% names = [ 'raw_cluster_density',
+             'pf_cluster_density',
+             'raw_cluster_count',
+             'pf_cluster_count',
+             'pf_bases'
+           ]; FOREACH lane IN mlwh_lanes %]
 <tr><th>[% lane.position %]</th>
-    <td class="raligned">[% lane.raw_cluster_density | format_number %]</td>
-    <td class="raligned">[% lane.pf_cluster_density | format_number %]</td>
-    <td class="raligned">[% lane.raw_cluster_count | format_number %]</td>
-    <td class="raligned">[% lane.pf_cluster_count | format_number %]</td>
-    <td class="raligned">[% lane.pf_bases | format_number %]</td></tr>
+[% FOREACH name IN names %]
+    <td class="raligned">[% IF lane.${name}.defined; lane.${name} | format_number; ELSE %]&nbsp;[% END  %]</td>
+[% END %]
+</tr>
 [% END %]
 </tbody>
 </table>
@@ -56,3 +63,4 @@
 </div> <!-- end of content division -->
 
 [%- END -%]
+
