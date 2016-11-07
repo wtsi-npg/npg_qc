@@ -1,11 +1,13 @@
 package npg_qc::autoqc::checks::qX_yield;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Readonly;
 use Carp;
 use English qw(-no_match_vars);
 use Math::Round qw(round);
+use Try::Tiny;
 
 use npg_common::fastqcheck;
 use npg::api::run;
@@ -31,7 +33,6 @@ A fast qX check that uses a fastqcheck file.
 =head1 SUBROUTINES/METHODS
 
 =cut
-
 
 Readonly::Scalar our $Q_CUTOFF                  => 20;
 Readonly::Scalar our $EXT                       => 'fastqcheck';
@@ -91,9 +92,11 @@ override 'execute'            => sub  {
       $count++;
   }
 
-  if (!defined $self->tag_index) {
+  if ($self->num_components == 1 && !defined $self->composition->get_component(0)->tag_index) {
       my $pass = $self->overall_pass(\@apass, $count);
-      if ($pass != $NA) { $self->result->pass($pass); }
+      if ($pass != $NA) {
+          $self->result->pass($pass);
+      }
   }
 
   return 1;
@@ -101,18 +104,22 @@ override 'execute'            => sub  {
 
 
 sub _get_threshold {
-
   my ($self, $fq) = @_;
 
-  ##no critic (RequireCheckingReturnValueOfEval)
+  if ($self->num_components > 1) {
+      return $NA;
+  }
 
-  my $read_length;
-  eval {
-      $read_length = $fq->read_length();
+  my $read_length = 0;
+  try {
+    $read_length = $fq->read_length();
   };
-  if ($EVAL_ERROR || $read_length <= 0) { return $NA;}
+  if ($read_length <= 0) {
+    return $NA;
+  }
 
-  my $model = npg::api::run->new({ id_run => $self->id_run, })->instrument->model;
+  my $id_run = $self->composition->get_component(0)->id_run();
+  my $model = npg::api::run->new( {id_run => $id_run})->instrument->model;
   my $threshold;
 
   if($model eq 'HK') {
@@ -128,7 +135,6 @@ sub _get_threshold {
     }
   }
   else {
-    # warn - unrecognised instrument
     $self->result->comments('Unrecognised instrument model');
     $threshold = $NA;
   }
@@ -151,15 +157,19 @@ __END__
 
 =item Moose
 
+=item MooseX::StrictConstructor
+
 =item namespace::autoclean
 
 =item Carp
 
-=item English -no_match_vars
+=item English
 
 =item Readonly
 
-=item Math::Round round
+=item Math::Round
+
+=item Try::Tiny
 
 =item npg_common::fastqcheck
 
@@ -179,7 +189,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

@@ -1,11 +1,6 @@
-#########
-# Author:        jo3
-# Created:       30 July 2009
-#
-
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 24;
 use Test::Exception;
 use Cwd qw/getcwd/;
 use File::Temp qw/tempdir/;
@@ -97,22 +92,27 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
    lives_ok {$check->_bam_is_aligned} 'bam alignment from header lives';
    is($check->_bam_is_aligned, 0, 'bam is not aligned');
 
+   my @checks = ();
+   push @checks, npg_qc::autoqc::checks::gc_bias->new(
+                 qc_in      => 't/data/autoqc/090721_IL29_2549/data',
+                 position   => 6,
+                 id_run     => 2549,
+                 tag_index  => 1,
+                 repository => $repos);
+   push @checks, npg_qc::autoqc::checks::gc_bias->new(
+                 qc_in      => 't/data/autoqc/090721_IL29_2549/data',
+                 rpt_list   => '2549:6:1',
+                 repository => $repos);
 
-   $check = npg_qc::autoqc::checks::gc_bias->new(
-                                                   path      => 't/data/autoqc/090721_IL29_2549/data',
-                                                   position  => 6,
-                                                   id_run    => 2549,
-                                                   tag_index => 1,
-                                                   repository => $repos,
-                                                );
+   foreach my $check (@checks) {
+      write_samtools_script($st, q[t/data/autoqc/gc_bias/sam-3lines]);
+      lives_ok {$check->read_length} 'read length for a non-empty file lives';
+      is($check->read_length, 76, 'read length is 76');
 
-   write_samtools_script($st, q[t/data/autoqc/gc_bias/sam-3lines]);
-   lives_ok {$check->read_length} 'read length for a non-empty file lives';
-   is($check->read_length, 76, 'read length is 76');
-
-   write_samtools_script($st, q[t/data/autoqc/gc_bias/sam_aligned_header]);
-   lives_ok {$check->_bam_is_aligned} 'bam alignment from header lives';
-   is($check->_bam_is_aligned, 1, 'bam is aligned');
+      write_samtools_script($st, q[t/data/autoqc/gc_bias/sam_aligned_header]);
+      lives_ok {$check->_bam_is_aligned} 'bam alignment from header lives';
+      is($check->_bam_is_aligned, 1, 'bam is aligned');
+   }
 }
 
 1;

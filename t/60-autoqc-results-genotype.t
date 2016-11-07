@@ -15,6 +15,6 @@ use_ok ('npg_qc::autoqc::results::collection');
     $c->add_from_dir(q[t/data/autoqc/genotype], [1], 6812);
     $c=$c->slice('class_name', 'genotype');
 
-    is($c->results->[0]->criterion(), q[Sample name is PD6732b_wg, number of common SNPs %3E%3D 21 and percentage of loosely matched calls %3E 95%25 (fail: %3C50%25)], 'criteria');
+    is($c->results->[0]->criterion(), q[Sample name is PD6732b_wg, number of common SNPs >= 21 and percentage of loosely matched calls > 95% (fail: < 50%)], 'criteria');
 }
 
