@@ -52,6 +52,7 @@ sub summary : PathPart('runs') : Chained('iqc') Args(Int) {
                         {order_by => { -asc => 'position'}})
                ->all();
   $c->stash->{'mlwh_lanes'}     = \@rows;
+  $c->stash->{'id_run'}         = $id_run;
   $c->stash->{'title'}          = qq[Illumina QC results for run $id_run];
   $c->stash->{'template'}       = q[ui_illuminaqc/summary.tt2];
   return;

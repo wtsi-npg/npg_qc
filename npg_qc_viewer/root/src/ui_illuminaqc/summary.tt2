@@ -4,7 +4,11 @@
    WRAPPER qsea_wrapper.tt2;
    IF mlwh_lanes.size;
      lane1 = mlwh_lanes.0;
-     id_run = lane1.id_run;
+     display_stats = 1;
+   ELSE;
+     display_stats = 0;
+   END
+
 %]
 <div id="menu">
 <div id="links">
@@ -17,6 +21,8 @@
 </div>
 </div>
 
+
+[% IF display_stats %]
 <div id="content">
 
 <h2>Summary</h2>
@@ -58,9 +64,7 @@
 </div>
 </div>
 
+</div> <!-- end of content division -->
 [% END %]
 
-</div> <!-- end of content division -->
-
 [%- END -%]
-
