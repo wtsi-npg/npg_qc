@@ -18,13 +18,25 @@ our $VERSION = '59.8';
 
 ## no critic (NamingConventions::Capitalization)
 
+### revisit these no critics later (kl2 8/11/16)
+
+## no critic (Subroutines::ProhibitExcessComplexity)
+## no critic (BuiltinFunctions::ProhibitStringySplit)
+## no critic (CodeLayout::ProhibitParensWithBuiltins)
+## no critic (ControlStructures::ProhibitCStyleForLoops)
+## no critic (ValuesAndExpressions::ProhibitInterpolationOfLiterals)
+## no critic (ValuesAndExpressions::ProhibitNoisyQuotes)
+## no critic (ControlStructures::ProhibitPostfixControls)
+## no critic (ValuesAndExpressions::ProhibitEmptyQuotes)
+#######
+
 ## no critic (RegularExpressions::ProhibitUnusedCapture RegularExpressions::RequireLineBoundaryMatching RegularExpressions::ProhibitEnumeratedClasses RegularExpressions::RequireDotMatchAnything RegularExpressions::RequireExtendedFormatting)
 
 ## no critic (InputOutput::RequireBracedFileHandleWithPrint InputOutput::RequireCheckedSyscalls)
 
 ## no critic (BuiltinFunctions::ProhibitReverseSortBlock)
 
-## no critic (Subroutines::RequireArgUnpacking) 
+## no critic (Subroutines::RequireArgUnpacking)
 
 sub usage {
 
@@ -194,7 +206,7 @@ sub main{
         usage;
         exit 1;
     }
-    
+
     my $tagsFound = 0;
     my %tagsFound;
 
