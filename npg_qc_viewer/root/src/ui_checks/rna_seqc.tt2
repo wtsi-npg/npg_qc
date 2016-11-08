@@ -1,0 +1,29 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+<div class="data_table">
+
+<table title="rna_seqc">
+<tr>
+  <tr><th class="laligned">3' Norm</th> <td>[% check.end_3_norm %]</td></tr>
+  <tr><th class="laligned">5' Norm</th> <td>[% check.end_5_norm %]</td></tr>
+  <tr><th class="laligned">End 1 % Sense</th> <td>[% check.end_1_pct_sense %]</td></tr>
+  <tr><th class="laligned">End 1 Antisense</th> <td>[% check.end_1_antisense %]</td></tr>
+  <tr><th class="laligned">End 1 Sense</th> <td>[% check.end_1_sense %]</td></tr>
+  <tr><th class="laligned">End 2 % Sense</th> <td>[% check.end_2_pct_sense %]</td></tr>
+  <tr><th class="laligned">End 2 Antisense</th> <td>[% check.end_2_antisense %]</td></tr>
+  <tr><th class="laligned">End 2 Sense</th> <td>[% check.end_2_sense %]</td></tr>
+  <tr><th class="laligned">Exonic Rate</th> <td>[% check.exonic_rate %]</td></tr>
+  <tr><th class="laligned">Expression Profiling Efficiency</th> <td>[% check.expression_profiling_efficiency %]</td></tr>
+  <tr><th class="laligned">Genes Detected</th> <td>[% check.genes_detected %]</td></tr>
+  <tr><th class="laligned">Mean CV</th> <td>[% check.mean_cv %]</td></tr>
+  <tr><th class="laligned">Mean Per Base Cov.</th> <td>[% check.mean_per_base_cov %]</td></tr>
+  <tr><th class="laligned">rRNA</th> <td>[% check.rrna %]</td></tr>
+  <tr><th class="laligned">rRNA rate</th> <td>[% check.rrna_rate %]</td></tr>
+ [%- IF check.criterion.defined -%]
+  <tr><th class="laligned">Pass criterion</th> <td>[% check.criterion FILTER html %]</td></tr>
+ [%- END -%]
+</tr>
+</table>
+
+</div>
+

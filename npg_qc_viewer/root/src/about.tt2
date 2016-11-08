@@ -13,18 +13,19 @@
 <div id="first_section"  class="text_section">
 <h2>Currently implemented checks<a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]"><img src="/static/images/information.png" alt="Link to information about qc checks"/></a></h2>
 <ul>
-  <li>qX yield (threshold quality 20)</li>
-  <li>insert size</li>
   <li>adapter</li>
-  <li>ref_match</li>
-  <li>split statistics</li>
-  <li>sequence mismatch</li>
-  <li>gc fraction</li>
-  <li>qc bias</li>
-  <li>tag metrics (formely tag decode stats)</li>
   <li>bam flag stats</li>
   <li>fastqcheck files rendering as heatmaps</li>
+  <li>gc fraction</li>
   <li>genotype - sample ID check (Sequenom genotypes)</li>
+  <li>insert size</li>
+  <li>qc bias</li>
+  <li>qX yield (threshold quality 20)</li>
+  <li>ref_match</li>
+  <li>rna seqc (subset)</li>
+  <li>sequence mismatch</li>
+  <li>split statistics</li>
+  <li>tag metrics (formely tag decode stats)</li>
   <li>upstream tags - check for contamination of tag#0 BAM file</li>
   <li>verify BAM ID - check for sample contamination</li>
 </ul>
