@@ -1,8 +1,8 @@
 -- MySQL dump 10.13  Distrib 5.5.41, for debian-linux-gnu (x86_64)
 --
--- Host: npgtest-db    Database: npgtest_mg8qc
+-- Host: npgtest-db    Database: npgtest_rb11
 -- ------------------------------------------------------
--- Server version	5.5.31-log
+-- Server version	5.7.13-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -43,7 +43,7 @@ CREATE TABLE `adapter` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_adapter`),
   UNIQUE KEY `unq_run_lane_adapter` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -64,7 +64,7 @@ CREATE TABLE `alignment_filter_metrics` (
   `all_metrics` text,
   PRIMARY KEY (`id_alignment_filter_metrics`),
   UNIQUE KEY `unq_run_lane_afmetrics` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -203,7 +203,7 @@ CREATE TABLE `bam_flagstats` (
   `read_pairs_examined` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id_bam_flagstats`),
   UNIQUE KEY `unq_run_lane_index_sp_flag` (`id_run`,`position`,`human_split`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -560,7 +560,7 @@ CREATE TABLE `gc_bias` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_gc_bias`),
   UNIQUE KEY `unq_run_lane_gc_bias` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -588,7 +588,7 @@ CREATE TABLE `gc_fraction` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_gc_fraction`),
   UNIQUE KEY `unq_run_lane_gc_fraction` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -709,7 +709,7 @@ CREATE TABLE `insert_size` (
   `norm_fit_modes` text,
   PRIMARY KEY (`id_insert_size`),
   UNIQUE KEY `unq_run_lane_insert_size` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1035,7 +1035,7 @@ CREATE TABLE `pulldown_metrics` (
   `other_metrics` text,
   PRIMARY KEY (`id_pulldown_metrics`),
   UNIQUE KEY `unq_run_lane_pdmetrics` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1063,7 +1063,7 @@ CREATE TABLE `qx_yield` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_qx_yield`),
   UNIQUE KEY `unq_run_lane_qx_yield` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1106,7 +1106,7 @@ CREATE TABLE `ref_match` (
   `info` text,
   PRIMARY KEY (`id_ref_match`),
   UNIQUE KEY `unq_run_lane_ref_match` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1128,6 +1128,43 @@ CREATE TABLE `ref_snp_info` (
   PRIMARY KEY (`id_ref_snp_info`),
   UNIQUE KEY `unq_ref_chr_pos` (`reference`,`chr`,`pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `rna_seqc`
+--
+
+DROP TABLE IF EXISTS `rna_seqc`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rna_seqc` (
+  `id_rna_seqc` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+  `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `path` varchar(256) DEFAULT NULL,
+  `info` text,
+  `rrna` bigint(20) unsigned DEFAULT NULL,
+  `rrna_rate` bigint(20) unsigned DEFAULT NULL,
+  `exonic_rate` bigint(20) unsigned DEFAULT NULL,
+  `expression_profiling_efficiency` bigint(20) unsigned DEFAULT NULL,
+  `genes_detected` bigint(20) unsigned DEFAULT NULL,
+  `end_1_sense` bigint(20) unsigned DEFAULT NULL,
+  `end_1_antisense` bigint(20) unsigned DEFAULT NULL,
+  `end_2_sense` bigint(20) unsigned DEFAULT NULL,
+  `end_2_antisense` bigint(20) unsigned DEFAULT NULL,
+  `end_1_pct_sense` bigint(20) unsigned DEFAULT NULL,
+  `end_2_pct_sense` bigint(20) unsigned DEFAULT NULL,
+  `mean_per_base_cov` bigint(20) unsigned DEFAULT NULL,
+  `mean_cv` bigint(20) unsigned DEFAULT NULL,
+  `end_5_norm` bigint(20) unsigned DEFAULT NULL,
+  `end_3_norm` bigint(20) unsigned DEFAULT NULL,
+  `other_metrics` text,
+  `metrics` mediumblob COMMENT 'Compressed metrics.tsv metrics file content',
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Date the record was created',
+  `iscurrent` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT 'Boolean flag to indicate that the record is current, defaults to 1',
+  PRIMARY KEY (`id_rna_seqc`),
+  KEY `rna_seqc_compos` (`id_seq_composition`),
+  CONSTRAINT `rna_seqc_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1281,7 +1318,7 @@ CREATE TABLE `samtools_stats` (
   PRIMARY KEY (`id_samtools_stats`),
   UNIQUE KEY `unq_seqstats` (`id_seq_composition`,`filter`),
   CONSTRAINT `seq_sum_compos_ss` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1301,7 +1338,7 @@ CREATE TABLE `seq_component` (
   PRIMARY KEY (`id_seq_component`),
   UNIQUE KEY `unq_seq_compon_d` (`digest`),
   KEY `unq_seq_compos_rp` (`id_run`,`position`,`tag_index`,`subset`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1321,7 +1358,7 @@ CREATE TABLE `seq_component_composition` (
   KEY `seq_comcom_cmpos` (`id_seq_composition`,`size`),
   CONSTRAINT `seq_comcom_cmpon` FOREIGN KEY (`id_seq_component`) REFERENCES `seq_component` (`id_seq_component`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `seq_comcom_cmpos` FOREIGN KEY (`id_seq_composition`, `size`) REFERENCES `seq_composition` (`id_seq_composition`, `size`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1338,7 +1375,7 @@ CREATE TABLE `seq_composition` (
   PRIMARY KEY (`id_seq_composition`),
   UNIQUE KEY `unq_seq_compos_d` (`digest`),
   UNIQUE KEY `unq_seq_compos_ps` (`id_seq_composition`,`size`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1379,7 +1416,7 @@ CREATE TABLE `sequence_error` (
   `sequence_type` varchar(25) NOT NULL DEFAULT 'default',
   PRIMARY KEY (`id_sequence_error`),
   UNIQUE KEY `unq_rlts_sequence_error` (`id_run`,`position`,`tag_index`,`sequence_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1402,7 +1439,7 @@ CREATE TABLE `sequence_summary` (
   PRIMARY KEY (`id_sequence_summary`),
   KEY `seq_sum_compos` (`id_seq_composition`),
   CONSTRAINT `seq_sum_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1565,7 +1602,7 @@ CREATE TABLE `tag_metrics` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_tag_metrics`),
   UNIQUE KEY `unq_run_lane_tagmetrics` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1658,7 +1695,7 @@ CREATE TABLE `upstream_tags` (
   `tag_index` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_upstream_tags`),
   UNIQUE KEY `unq_run_lane_upstreamtags` (`id_run`,`position`,`tag_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1697,4 +1734,4 @@ CREATE TABLE `verify_bam_id` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-02-25 13:46:17
+-- Dump completed on 2016-11-08 10:42:54
