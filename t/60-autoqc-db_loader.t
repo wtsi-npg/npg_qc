@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 14;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -469,6 +469,35 @@ subtest 'loading bam_flagstats and its related objects from files' => sub {
     is ($component->subset, $i ? 'phix' : undef, 'subset value');
     $i++;
   }
+};
+
+subtest 'no error if no DBIx binding for result' => sub {
+  plan tests => 2;
+
+  package npg_qc::autoqc::results::some;
+  use Moose;
+  extends qw(npg_qc::autoqc::results::base);
+  no Moose;
+  1;
+
+  package main;
+
+  my $j = '{"__CLASS__":"npg_qc::autoqc::results::some","composition":{"__CLASS__":"npg_tracking::glossary::composition-85.4","components":[{"__CLASS__":"npg_tracking::glossary::composition::component::illumina","id_run":21255,"position":1,"tag_index":1}]}}';
+  
+  my $dir = tempdir( CLEANUP => 1);
+  my $path = join q[/], $dir, '21255_1#1.some.json';
+  open my $fh, '>', $path or die "Cannot open $path for writing";
+  print $fh $j or die "Cannot write to $path";
+  close $fh or warn "Failed to close file handle for $path";
+  
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+    json_file => [$path],
+    schema    => $schema,
+  );
+  my $num_loaded;
+  lives_ok { $num_loaded = $db_loader->load() }
+    'no error loading a result that does not have a corresponding DBIx source';
+  is ( $num_loaded, 0, 'count of loaded files is zero');
 };
 
 1;

@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - autoqc loader does not try loading a result for which there is
+   no coresponding DBIx binding
+
+release 62.2
  - make bam_flagstats check runnable under the qc script
  - remove autoqc loader backwards compatibility with analysis code
    that does not generate related results for the bam_flagstats results
