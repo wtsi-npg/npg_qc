@@ -279,6 +279,7 @@ sub _parse_metrics {
     my $results = {};
     foreach(@keys){
         chomp $values[$i];
+        chomp $_;
         $results->{$_} = $values[$i];
         $i++;
     }

@@ -85,91 +85,91 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
 =head2 rrna
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 rrna_rate
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 exonic_rate
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 expression_profiling_efficiency
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 genes_detected
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_1_sense
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_1_antisense
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_2_sense
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_2_antisense
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_1_pct_sense
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_2_pct_sense
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 mean_per_base_cov
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 mean_cv
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_5_norm
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_3_norm
 
-  data_type: 'bigint'
+  data_type: 'float'
   extra: {unsigned => 1}
   is_nullable: 1
 
@@ -225,35 +225,35 @@ __PACKAGE__->add_columns(
   'info',
   { data_type => 'text', is_nullable => 1 },
   'rrna',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'rrna_rate',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'exonic_rate',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'expression_profiling_efficiency',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'genes_detected',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_1_sense',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_1_antisense',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_2_sense',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_2_antisense',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_1_pct_sense',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_2_pct_sense',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'mean_per_base_cov',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'mean_cv',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_5_norm',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_3_norm',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'other_metrics',
   { data_type => 'text', is_nullable => 1 },
   'metrics',
@@ -319,15 +319,33 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-10-25 14:50:10
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:O7WLo51sSmOzKhK3AQW5LQ
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-11-11 14:10:26
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:/acbhXi0BTkTRboZWtfs8g
+
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 
 __PACKAGE__->set_flators4non_scalar(qw( other_metrics info ));
 
-
 our $VERSION = '0';
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+=head2 seq_component_compositions
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+To simplify queries, skip SeqComposition and link directly to the linking table.
+
+=cut
+
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
