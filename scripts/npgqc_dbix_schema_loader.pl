@@ -6,7 +6,7 @@ use DBIx::Class::Schema::Loader qw(make_schema_at);
 use Config::Auto;
 use lib qw/lib/;
 
-use npg_qc::autoqc::autoqc;
+use npg_qc::autoqc::results::collection;
 use npg_qc::autoqc::role::result;
 
 our $VERSION = '0';
@@ -27,7 +27,7 @@ my $generic_role = $role_base . 'result';
 my $component = 'InflateColumn::Serializer';
 my $flator = 'npg_qc::Schema::Flators';
 
-foreach my $check (@{npg_qc::autoqc::autoqc->checks_list}) {
+foreach my $check (@{npg_qc::autoqc::results::collection->new()->checks_list()}) {
   my ($result_name, $dbix_result_name ) = $generic_role->class_names($check);
   
   my @roles = ($flator, $generic_role);
