@@ -58,7 +58,9 @@ make_schema_at(
         use_namespaces      => 1,
         default_resultset_class => 'ResultSet',
 
-        rel_name_map        => sub {#Rename the id relationship so we can access flat versions of the objects and not only the whole trees from ORM.
+        rel_name_map        => sub { # Rename the id relationship so we can access
+                                     # flat versions of the objects and not only
+                                     # the whole trees from ORM.
           my %h = %{shift@_};
           my $name=$h{name};
           $name=~s/^id_//;
