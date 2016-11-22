@@ -111,7 +111,9 @@ use_ok ('npg_qc::autoqc::results::result');
                                         id_run    => 2549,
                                                  );
     throws_ok {$r->equals_byvalue({})} qr/No parameters for comparison/, 'error when an empty hash is given in equals_byvalue';
-    throws_ok {$r->equals_byvalue({position => 3, unknown => 5,})} qr/cannot be compared/, 'error when a hash with an unknown key is used in equals_byvalue';
+    throws_ok {$r->equals_byvalue({position => 3, unknown => 5,})}
+      qr/Can't locate object method \"unknown\"/,
+     'error when a hash representing an unknown attribute is used in equals_byvalue';
     ok($r->equals_byvalue({position => 3, id_run => 2549,}), 'equals_byvalue returns true');
     ok($r->equals_byvalue({position => 3, class_name => q[result],}), 'equals_byvalue returns true');
     ok($r->equals_byvalue({position => 3, check_name => q[result], tag_index => undef,}), 'equals_byvalue returns true');
