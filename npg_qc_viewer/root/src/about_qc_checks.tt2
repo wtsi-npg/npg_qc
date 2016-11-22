@@ -122,7 +122,7 @@ Any close genotype matches found under a different sample name, allowing homozyg
 <a name="rna seqc"></a>
  <h3>RNA-SeQC metrics</h3>
  <h4>Description</h4>
- <p>Subset of metrics obtained from Borad Institute's RNA-SeQC package. The following summary statistics are calculated by counting the number of reads that have the given characteristics.</p>
+ <p>Subset of metrics obtained from Broad Institute's RNA-SeQC package. The following summary statistics are calculated by counting the number of reads that have the given characteristics.</p>
  <br/>
  <h4>Mapped Reads</h4>
  <p><b>rRNA</b> reads are non-duplicate and duplicate reads aligning to rRNA regions as defined in the transcript model definition. <b>rRNA Rate</b> is per total reads. </p>
