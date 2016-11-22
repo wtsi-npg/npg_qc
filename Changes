@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+
+ - translation from a database composition representation to the
+     npg_tracking::glossary::composition type object.
+
 release 62.5
  - a very concise replacement for NPG_QC pages
  - no templates rna_seqc results - we should not try rendering

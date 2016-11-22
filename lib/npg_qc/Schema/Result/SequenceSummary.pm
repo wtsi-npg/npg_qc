@@ -204,7 +204,7 @@ __PACKAGE__->belongs_to(
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
-with 'npg_qc::Schema::Flators';
+with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 our $VERSION = '0';
 
@@ -224,6 +224,15 @@ __PACKAGE__->has_many(
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
+
+=head2 composition
+
+An lazy-build attribute representing a composition this result
+curresponds to.
+
+=cut
+
+__PACKAGE__->create_composition_attribute();
 
 __PACKAGE__->meta->make_immutable;
 1;

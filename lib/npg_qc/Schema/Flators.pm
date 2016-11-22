@@ -134,7 +134,7 @@ setting the inflator for compressed scalar data.
 =cut
 
 sub compress_xz {
-  my ($package, $data) = @_;
+  my ($package_name, $data) = @_;
   my $out;
   if (defined $data) {
     xz \$data => \$out or croak "xz failed: $XzError\n";
@@ -166,6 +166,41 @@ sub set_inflator4scalar {
       }
     },
   });
+  return;
+}
+
+=head2 create_composition_attribute
+
+Adds a lazy-build 'composition' attribute and a build method for it
+for tables that have 'iseq_composition' column - an attempt to 
+mirrow the functionality of the result objects and hide the complexity
+of database implementation for composition.
+
+ __PACKAGE__->create_composition_attribute();
+
+=cut
+
+sub create_composition_attribute {
+  my $package_name = shift;
+
+  if (!$package_name->result_source_instance()->has_column('id_seq_composition')) {
+    croak "Cannot create composition attribute for $package_name";
+  }
+
+  my $meta = $package_name->meta();
+  $meta->add_attribute(
+    'composition' => ( is         => 'ro',
+                       isa        => 'npg_tracking::glossary::composition',
+                       lazy_build => 1,
+                     )
+  );
+  $meta->add_method(
+    '_build_composition' => sub {
+      my $self = shift;
+      return $self->seq_composition()->create_composition();
+    }
+  );
+
   return;
 }
 
@@ -207,7 +242,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
