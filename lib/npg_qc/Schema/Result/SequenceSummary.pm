@@ -204,7 +204,8 @@ __PACKAGE__->belongs_to(
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
-with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
+with qw/ npg_qc::Schema::Flators
+         npg_qc::autoqc::role::result /;
 
 our $VERSION = '0';
 
