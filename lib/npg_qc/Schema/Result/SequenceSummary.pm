@@ -229,7 +229,7 @@ __PACKAGE__->has_many(
 =head2 composition
 
 An lazy-build attribute representing a composition this result
-curresponds to.
+corresponds to.
 
 =cut
 

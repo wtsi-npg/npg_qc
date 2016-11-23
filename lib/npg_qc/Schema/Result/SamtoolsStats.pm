@@ -219,7 +219,7 @@ __PACKAGE__->set_inflator4xz_compressed_scalar(qw(stats));
 =head2 composition
 
 An lazy-build attribute representing a composition this result
-curresponds to. 
+corresponds to. 
 
 =cut
 
