@@ -1,7 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - Travis CI build: pr to master - build against master branches of
-   other NPG packages.
+ - Travis CI build: when building dependencies, us the same
+   branch as the one the pull request is made to.
  - back to testing with mysql 5.7.13 in travis
 
 release 62.5
