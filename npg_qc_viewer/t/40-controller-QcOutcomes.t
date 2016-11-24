@@ -121,7 +121,7 @@ subtest 'retrieving data via GET and POST' => sub {
     ok($response->is_success, 'success');
     is($response->code, 200, 'response code 200 for ' . _message($request, $rpt));
     is($response->header('Content-type'), 'application/json', 'json content type');
-    is($response->content, '{"lib":{},"seq":{}}', 'response content');
+    is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{}}'), 'response content');
   }
 
   my $values = {id_run => 5, username => 'u1'};
@@ -321,3 +321,4 @@ subtest 'Conditional update of run/lane status in tracking' => sub {
 };
 
 1;
+
