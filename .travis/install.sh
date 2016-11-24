@@ -18,10 +18,9 @@ cpanm --notest --reinstall App::cpanminus
 cpanm --quiet --notest --reinstall ExtUtils::ParseXS
 cpanm --quiet --notest --reinstall MooseX::Role::Parameterized
 cpanm --quiet --notest Alien::Tidyp
-cpanm --no-lwp --notest https://github.com/wtsi-npg/perl-dnap-utilities/releases/download/${DNAP_UTILITIES_VERSION}/WTSI-DNAP-Utilities-${DNAP_UTILITIES_VERSION}.tar.gz
 
 # WTSI NPG Perl repo dependencies
-repos="ml_warehouse npg_tracking npg_seq_common"
+repos="perl-dnap-utilities ml_warehouse npg_tracking npg_seq_common"
 for repo in $repos
 do
   # Logic of keeping branch consistent was taken from @dkj

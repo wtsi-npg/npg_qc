@@ -9,7 +9,6 @@ perl:
 
 env:
   global:
-    - DNAP_UTILITIES_VERSION="0.5.3"
     - WTSI_NPG_GITHUB_URL=https://github.com/wtsi-npg
   matrix:
     - TRAVIS_NODE_VERSION="0.12.9"
