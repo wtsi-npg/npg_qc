@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 14;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -339,7 +339,6 @@ subtest 'loading a range of results' => sub {
        verbose      => 0,
        path         => [$path, "$path/lane"],
        update       => 0,
-       load_related => 0,
   );
   is ($db_loader->load(), $num_plex_jsons, 'loading from two paths without update');
   my $total_count = 0;
@@ -374,29 +373,19 @@ subtest 'checking bam_flagstats records' => sub {
   is ($rs->search({subset => 'phix'})->count, 1, '1 bam flagstats records for phix files');
 };
 
-subtest 'testing load_related flag' => sub {
-  plan tests => 2;
+subtest 'loading bam_flagststs' => sub {
+  plan tests => 1;
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 1,
        path         => ['t/data/autoqc/bam_flagstats'],
-       load_related => 0,
   );
   warnings_like { $db_loader->load() } [
     qr/Skipped t\/data\/autoqc\/bam_flagstats\/4783_5_bam_flagstats\.json/, # no __CLASS__ key
     qr/Loaded t\/data\/autoqc\/bam_flagstats\/4921_3_bam_flagstats\.json/,
     qr/1 json files have been loaded/
   ], 'warnings when loading bam_flagstats results';
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
-       path         => ['t/data/autoqc/bam_flagstats'],
-  );
-  throws_ok { $db_loader->load() }
-    qr/Attribute \(sequence_file\) does not pass the type constraint/,
-    'error building related objects - no bam file where expected';
 };
 
 my $archive = '17448_1_9';
@@ -482,92 +471,33 @@ subtest 'loading bam_flagstats and its related objects from files' => sub {
   }
 };
 
-subtest 'loading bam_flagstats and its related objects from memory' => sub {
-  plan tests => 14;
-
-  my $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
-       id_run       => [17448],
-       path         => [$json_dir1],
-  );
-  throws_ok { $db_loader->load() }
-    qr/Attribute \(sequence_file\) does not pass the type constraint/,
-    'no cram file upstream - error';
-
-  rename "${json_dir1}/17448_1#9.no_related.bam_flagstats.json",
-         "${json_dir1}/17448_1#9.bam_flagstats.json";
-  rename "${json_dir1}/17448_1#9_phix.no_related.bam_flagstats.json",
-         "${json_dir1}/17448_1#9_phix.bam_flagstats.json";
-      
-  $schema->resultset('SequenceSummary')->delete();
-  $schema->resultset('SamtoolsStats')->delete();
- 
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
-       id_run       => [17448],
-       path         => [$json_dir1],
-  );
-  lives_ok { $db_loader->load() }
-    'can load bamflag_stats with in-memory related objects';
-
-  is ($schema->resultset('SeqComposition')->search({})->count, 2,
-    'no new compositions'); 
-  is ($schema->resultset('SeqComponent')->search({})->count, 2,
-    'no new components');
-  is ($schema->resultset('SeqComponentComposition')->search({})->count, 2,
-    'no new memberships');
-  is ($schema->resultset('SamtoolsStats')->search({})->count, 4,
-    'samtools stats number of rows as before');
-  is ($schema->resultset('SequenceSummary')->search({})->count, 2,
-    'sequence summary number of rows as before');
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
-       id_run       => [17448],
-       path         => [$json_dir1],
-  );
-  $db_loader->load(); # reload
-
-  is ($schema->resultset('SamtoolsStats')->search({})->count, 4,
-    'samtools stats number of rows as before');
-  my @ss = $schema->resultset('SequenceSummary')->
-    search({}, {'order_by' => 'id_sequence_summary'})->all();
-  is (scalar @ss, 4,
-    'sequence summary number of rows twice the previous number');
-  is ($ss[0]->iscurrent, 0, 'iscurrent flag is reset to false');
-  is ($ss[1]->iscurrent, 0, 'iscurrent flag is reset to false');
-  is ($ss[2]->iscurrent, 1, 'iscurrent flag is set to true');
-  is ($ss[3]->iscurrent, 1, 'iscurrent flag is set to true');
-  ok ($ss[0]->date, 'date is set');
-};
-
-subtest 'force load related objects from memory' => sub {
+subtest 'no error if no DBIx binding for result' => sub {
   plan tests => 2;
 
-  my $new_dir =  join q[/], $tempdir, 'test1';
-  mkdir $new_dir;
-  my $file = '17448_1#9.bam_flagstats.json';
-  my $new_file = join q[/], $new_dir, $file;
-  cp join(q[/], $tempdir, '17448_1_9/qc/all_json', $file), $new_file;
-  my $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
-       json_file    => [$new_file],
-  );
-  lives_ok { $db_loader->load() } 'no attempt to recompute related objects';
+  package npg_qc::autoqc::results::some;
+  use Moose;
+  extends qw(npg_qc::autoqc::results::base);
+  no Moose;
+  1;
 
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
-       force_load_related => 1,
-       json_file    => [$new_file],
+  package main;
+
+  my $j = '{"__CLASS__":"npg_qc::autoqc::results::some","composition":{"__CLASS__":"npg_tracking::glossary::composition-85.4","components":[{"__CLASS__":"npg_tracking::glossary::composition::component::illumina","id_run":21255,"position":1,"tag_index":1}]}}';
+  
+  my $dir = tempdir( CLEANUP => 1);
+  my $path = join q[/], $dir, '21255_1#1.some.json';
+  open my $fh, '>', $path or die "Cannot open $path for writing";
+  print $fh $j or die "Cannot write to $path";
+  close $fh or warn "Failed to close file handle for $path";
+  
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+    json_file => [$path],
+    schema    => $schema,
   );
-  throws_ok { $db_loader->load() }
-    qr/Attribute \(sequence_file\) does not pass the type constraint/,
-    'attempt to recompute related objects';
+  my $num_loaded;
+  lives_ok { $num_loaded = $db_loader->load() }
+    'no error loading a result that does not have a corresponding DBIx source';
+  is ( $num_loaded, 0, 'count of loaded files is zero');
 };
 
 1;

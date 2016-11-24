@@ -306,7 +306,7 @@ End of Sequenom assay data
 
 <tr>
   <th class="laligned">pass criterion <a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]#genotype_check"><img src="/static/images/information.png" alt="Link to information about genotype check"/></a></th>
-  <td>[% check.criterion %]</td>
+  <td>[% FILTER html; check.criterion; END %]</td>
 </tr>
 
 <tr>
@@ -327,9 +327,11 @@ End of Sequenom assay data
 [% IF display_cgc %]
 [% snm_lbl_supp = ' (simple : <span class="gt_composite">composite</span>)' %]
 [% snm_style = 'class="gt_composite"' %]
+[% snm_res_supp = ' (simple and composite)' %]
 [% ELSE %]
 [% snm_lbl_supp = '' %]
 [% snm_style = '' %]
+[% snm_res_supp = '' %]
 [% END %]
 
 <tr>
@@ -366,14 +368,9 @@ End of Sequenom assay data
 [% END %]
 </table>
 
-[% IF display_cgc %]
-[% gt_data_caption = 'Genotypes (simple and composite)' %]
-[% ELSE %]
-[% gt_data_caption = 'Genotype' %]
-[% END %]
 
 <table title="genotype check data rows">
-<caption>[% gt_data_caption %]</caption>
+<caption>Genotype results[% snm_res_supp %]</caption>
 
 <tr class="gt_callstring [% gt_class %]">
   <th class="laligned">Sample Reception calls</th>
@@ -421,38 +418,12 @@ End of Sequenom assay data
 [% END %]
 </table>
 
-[% IF check.alternate_matches.first.defined -%]
-<table title="genotype check alternate matches">
-	[% FOREACH alt_match IN check.alternate_matches -%]
-	<tr>
-	  <th class="laligned">Closest alternative match</th>
-              [%
-              alt_sample_name=alt_match.matched_sample_name;
-		row = c.model('MLWarehouseDB').resultset('Sample').search({ 'name' => "$alt_sample_name"}, ).first;
-		alt_sample_id = 0;
-		IF row;
-			alt_sample_id = row.id_sample_lims;
-		END;
-              IF alt_sample_id;
-              	alt_sample_name='<a href="' _ c.uri_for_action(c.controller('Checks').action_for('samples'), alt_sample_id) _ '"><span class="lib nbsp">' _ alt_sample_name _ '</span></a>';
-              END;
-              %]
-          <td>Matched [% alt_match.match_count | format_number %] of [% alt_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); alt_match.match_pct * 100; END %]%) with sample [% alt_sample_name %]</td>
-	</tr>
-	[%- END -%]
-</table>
-[% END -%]
 
-[% IF check.alternate_relaxed_matches.first.defined -%]
-<table title="genotype check alternate loose matches">
-	[% FOREACH alt_relaxed_match IN check.alternate_relaxed_matches -%]
-	<tr>
-	  <th class="laligned">Loose alternative match</th>
-	  <td>Matched [% alt_relaxed_match.match_count | format_number %] of [% alt_relaxed_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); alt_relaxed_match.match_pct * 100; END %]%) with sample [% alt_relaxed_match.matched_sample_name %]</td>
-	</tr>
-	[%- END -%]
-</table>
-[% END -%]
+[% INCLUDE alternate_match_table gt_result=check gt_class="gt_simple" gt_name="simple" %]
+[% IF display_cgc %]
+[% INCLUDE alternate_match_table gt_result=cgc gt_class="gt_composite" gt_name="composite" %]
+[% END %]
+
 
 [% IF check.comments.defined && check.comments -%]
 <table title="genotype check comments">
@@ -537,3 +508,40 @@ End of Sequenom assay data
 
 [% END %]
 
+
+
+[% BLOCK alternate_match_table %]
+
+[% IF gt_result.alternate_matches.first.defined || gt_result.alternate_relaxed_matches.first.defined -%]
+<table title="[% gt_name %] genotype check alternate matches">
+  [% IF gt_result.alternate_matches.first.defined -%]
+  	[% FOREACH alt_match IN gt_result.alternate_matches -%]
+	  <tr class="[% gt_class %]">
+	    <th class="laligned">Closest alternative match</th>
+              [%
+              alt_sample_name=alt_match.matched_sample_name;
+		row = c.model('MLWarehouseDB').resultset('Sample').search({ 'name' => "$alt_sample_name"}, ).first;
+		alt_sample_id = 0;
+		IF row;
+			alt_sample_id = row.id_sample_lims;
+		END;
+              IF alt_sample_id;
+              	alt_sample_name='<a href="' _ c.uri_for_action(c.controller('Checks').action_for('samples'), alt_sample_id) _ '"><span class="lib nbsp">' _ alt_sample_name _ '</span></a>';
+              END;
+              %]
+      <td>Matched [% alt_match.match_count | format_number %] of [% alt_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); alt_match.match_pct * 100; END %]%) with sample [% alt_sample_name %]</td>
+	  </tr>
+	  [%- END -%]
+  [%- END -%]
+  [% IF gt_result.alternate_relaxed_matches.first.defined -%]
+	  [% FOREACH alt_relaxed_match IN gt_result.alternate_relaxed_matches -%]
+	  <tr class="[% gt_class %]">
+	    <th class="laligned">Loose alternative match</th>
+	    <td>Matched [% alt_relaxed_match.match_count | format_number %] of [% alt_relaxed_match.common_snp_count | format_number %] loci ([%  FILTER format('%2.1f'); alt_relaxed_match.match_pct * 100; END %]%) with sample [% alt_relaxed_match.matched_sample_name %]</td>
+	  </tr>
+	  [%- END -%]
+  [% END -%]
+</table>
+
+[% END -%]
+[% END -%]

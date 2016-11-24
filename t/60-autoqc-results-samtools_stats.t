@@ -33,7 +33,9 @@ subtest 'object with an one-component composition' => sub {
   my $f = npg_tracking::glossary::composition::factory->new();
   $f->add_component($c);
   my $r = npg_qc::autoqc::results::samtools_stats->new(
-    stats_file => $file1, composition => $f->create_composition());
+    stats_file    => $file1,
+    composition   => $f->create_composition(),
+    filename_root => '17448_1#9');
   isa_ok ($r, 'npg_qc::autoqc::results::samtools_stats');
 
   is ($r->num_components, 1, 'one component');
@@ -59,13 +61,14 @@ subtest 'object with an one-component phix subset composition' => sub {
   $f->add_component($c);
   my $file2 = join q[/], $archive, '17448_1#9_phix_F0xB00.stats';
   my $r = npg_qc::autoqc::results::samtools_stats->new(
-    stats_file => $file2, composition => $f->create_composition());
-  is ($r->composition_digest(),
-    'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb', 'digest');
+    stats_file  => $file2,
+    composition => $f->create_composition());
+  my $digest = 'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb';
+  is ($r->composition_digest(), $digest, 'digest');
   is ($r->filter, 'F0xB00', 'filter');
   is ($r->composition_subset, 'phix', 'phix subset');
   is ($r->stats, slurp($file2), 'stats file content saved correctly');
-  is ($r->filename_root, '17448_1#9_phix_F0xB00', 'filename root');
+  is ($r->filename_root, $digest.'_F0xB00', 'filename root');
   is ($r->to_string(),
     'npg_qc::autoqc::results::samtools_stats {"components":[{"id_run":17448,"position":1,"subset":"phix","tag_index":9}]}',
     'string representation');

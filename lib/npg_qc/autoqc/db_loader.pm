@@ -7,7 +7,7 @@ use Carp;
 use JSON;
 use Try::Tiny;
 use Perl6::Slurp;
-use List::MoreUtils qw/none/;
+use List::MoreUtils qw/any none/;
 use Readonly;
 
 use npg_tracking::util::types;
@@ -50,18 +50,6 @@ has 'update'  => ( is       => 'ro',
                    default  => 1,
                  );
 
-has 'load_related'  => ( is       => 'ro',
-                         isa      => 'Bool',
-                         required => 0,
-                         default  => 1,
-                       );
-
-has 'force_load_related' => ( is       => 'ro',
-                              isa      => 'Bool',
-                              required => 0,
-                              default  => 0,
-                            );
-
 has 'json_file' => ( is          => 'ro',
                      isa         => 'ArrayRef',
                      required    => 0,
@@ -91,6 +79,20 @@ has 'schema' =>    ( isa        => 'npg_qc::Schema',
                     );
 sub _build_schema {
   return npg_qc::Schema->connect();
+}
+
+has '_schema_sources' => ( isa        => 'ArrayRef',
+                           is         => 'ro',
+                           required   => 0,
+                           lazy_build => 1,
+                         );
+sub _build__schema_sources {
+  my $self = shift;
+  return [$self->schema()->sources()];
+}
+sub _schema_has_source {
+  my ($self, $source_name) = @_;
+  return any { $_ eq $source_name } @{$self->_schema_sources()};
 }
 
 has 'verbose' =>    ( is       => 'ro',
@@ -140,34 +142,21 @@ sub _json2db{
       ($class_name, my $dbix_class_name) =
         npg_qc::autoqc::role::result->class_names($class_name);
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-        my $module = 'npg_qc::autoqc::results::' . $class_name;
-        load_class($module);
-        my $obj = $module->thaw($json);
+        if ($self->_schema_has_source($dbix_class_name)) {
+          my $module = 'npg_qc::autoqc::results::' . $class_name;
+          load_class($module);
+          my $obj = $module->thaw($json);
 
-        if ($class_name eq 'bam_flagstats') {
-          $values = decode_json($obj->freeze());
-        }
-        my $composition_key = 'id_seq_composition';
-        if ( $obj->can('composition') && $obj->can('composition_digest') &&
-             $self->schema->source($dbix_class_name)->has_column($composition_key) ) {
-          $values->{$composition_key} = $self->_ensure_composition_exists($obj);
-        }
-        # Load the main object
-        $count = $self->_values2db($dbix_class_name, $values);
-
-        # Backwards compatibility - load related objects.
-        # New code should create serialized related objects which will
-        # be loaded from json files. For cases where we cannot produce the serialized
-        # version of objects, we will generate the objects now.
-        # Optionally, if force_load_related is true, we will disregard previous
-        # unsuccessful attempts to generate related objects.
-        if ( $json_file && $self->load_related &&
-             $obj->can('related_objects') &&
-             $obj->can('create_related_objects') ) {
-          $obj->create_related_objects($json_file, $self->force_load_related);
-          foreach my $o (@{$obj->related_objects}) {
-            $self->_json2db($o->freeze()); # Recursion
+          if ($class_name eq 'bam_flagstats') {
+            $values = decode_json($obj->freeze());
           }
+          my $composition_key = 'id_seq_composition';
+          if ( $obj->can('composition') && $obj->can('composition_digest') &&
+              $self->schema->source($dbix_class_name)->has_column($composition_key) ) {
+            $values->{$composition_key} = $self->_ensure_composition_exists($obj);
+          }
+          # Load the main object
+          $count = $self->_values2db($dbix_class_name, $values);
         }
       }
     }
@@ -361,18 +350,6 @@ npg_qc::autoqc::db_loader
 =head2 verbose
 
   A boolean attribute, switches logging on/off, true by default.
-
-=head2 load_related
-
-  A boolean attribute, switches on-the-fly generation (no writing to disk)
-  of related objects and their loading to a database, true by default.
-
-=head2 force_load_related
-
-  A boolean attribute, false by default, forces generation and loading
-  of related objects by passing an extra flag to a factory  method that
-  creates related objects. Whether this flag is reapected and what exactly
-  happens is up to the object's implementation.
 
 =head2 update
 

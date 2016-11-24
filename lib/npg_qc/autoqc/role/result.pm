@@ -197,10 +197,17 @@ sub _equals_byvalue_old {
 
 =head2 filename_root
 
-Suggested filename root for serialisation.
+A non-serializable attribute, a suggested filename root for storing the serialized object.
 
 =cut
-sub filename_root {
+
+has 'filename_root' => (isa         => q[Str],
+                        traits      => [ 'DoNotSerialize' ],
+                        is          => q[ro],
+                        required    => 0,
+                        lazy_build  => 1,
+                       );
+sub _build_filename_root {
   my $self = shift;
   my $root;
   if ($self->is_old_style_result()) {

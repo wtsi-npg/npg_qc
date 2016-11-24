@@ -15,5 +15,5 @@
   <li><a href="[% base %]/[% run_folder_glob %]/latest?redir">Latest Analysis</a></li>
   <li><a href="[% base %]/[% run_folder_glob %]/ivc?redir">Latest IVC</a></li>
 [% END -%]
-  <li><a href="[% npg_url %]_qc/summary/[% id_run %]">NPG QC</a></li>
+  <li><a href="[% c.uri_for_action(c.controller('Illumina').action_for('summary'), id_run) %]">NPG QC</a></li>
 </ul>
