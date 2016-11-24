@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - back to testing with mysql 5.7.13 in travis
+
 release 62.5
  - a very concise replacement for NPG_QC pages
  - no templates rna_seqc results - we should not try rendering
