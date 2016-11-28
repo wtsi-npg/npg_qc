@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Travis CI build: when building dependencies, us the same
+   branch as the one the pull request is made to.
  - back to testing with mysql 5.7.13 in travis
  - drop node 0.12 from node travis matrix
  - add perl 5.22-shrplib to travis matrix

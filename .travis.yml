@@ -1,7 +1,4 @@
-# This file was adapted from work by Keith James (keithj). The original source
-# can be found as part of the wtsi-npg/data_handling project here:
-#
-#   https://github.com/wtsi-npg/data_handling
+# This file was adapted from work by Keith James (keithj)
 
 sudo: required
 
@@ -13,7 +10,7 @@ perl:
 
 env:
   global:
-    - DNAP_UTILITIES_VERSION="0.5.1"
+    - WTSI_NPG_GITHUB_URL=https://github.com/wtsi-npg
   matrix:
     - TRAVIS_NODE_VERSION="4.5.0"
 
