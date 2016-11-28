@@ -2,9 +2,7 @@
 
 [% IF !check.genes_detected.defined; %]
 <div class="data_table">
-<table title="no rna">
-  <tr><th>File is not RNA alignment</th><tr>
-</table>
+<p> Reason: not an RNA alignment</p>
 </div>
 [% ELSE %]
 <h6>mapped reads</h6>
@@ -81,7 +79,12 @@
          run_folder_glob = rfglob _ rfname;
        END;
      END;
--%]  <p>Other RNA-SeQC <a href="[% base %]/[% run_folder_glob %]/Latest_Summary/archive/qc/rna_seqc?redir">metrics.</a></p>
+     run_position_dir = check.id_run _ '_' _ check.position;
+     rna_seqc_report_dir = run_position_dir;
+     IF check.tag_index.defined;
+        rna_seqc_report_dir = run_position_dir _ '/' _ run_position_dir _ '%23' _ check.tag_index;
+     END;
+-%]  <p>Other RNA-SeQC <a href="[% base %]/[% run_folder_glob %]/Latest_Summary/archive/qc/rna_seqc/[% rna_seqc_report_dir | url %]?redir">metrics</a>.</p>
 [% END; %]
 </div>
 [% END; %]
