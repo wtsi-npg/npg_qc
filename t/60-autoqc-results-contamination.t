@@ -37,10 +37,10 @@ ok(!$r->normalised_contamination(), 'normalized measure not defined if read_coun
 $r->read_count(100_000);
 
 is_deeply( $r->normalised_contamination(),
-           { Homo_sapiens          => '62.0',
-             Danio_rerio           =>  '0.0',
-             Mus_musculus          =>  '1.3',
-             Clostridium_difficile =>  '0.3', },
+           { Homo_sapiens          => '62.00',
+             Danio_rerio           =>  '0.00',
+             Mus_musculus          =>  '1.34',
+             Clostridium_difficile =>  '0.30', },
            'Calculate normalized measures' );
 
 my $comment1 = 'ABC';
