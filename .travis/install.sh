@@ -7,8 +7,6 @@
 
 set -e -x
 
-WTSI_NPG_BUILD_BRANCH=${WTSI_NPG_BUILD_BRANCH:=$TRAVIS_BRANCH}
-
 sudo apt-get install libgd2-xpm-dev # For npg_tracking
 sudo apt-get install liblzma-dev # For npg_qc
 sudo apt-get install --yes nodejs
@@ -19,6 +17,8 @@ cpanm --quiet --notest --reinstall ExtUtils::ParseXS
 cpanm --quiet --notest --reinstall MooseX::Role::Parameterized
 cpanm --quiet --notest Alien::Tidyp
 
+# Git branch to merge to or custom branch
+WTSI_NPG_BUILD_BRANCH=${WTSI_NPG_BUILD_BRANCH:=$TRAVIS_BRANCH}
 # WTSI NPG Perl repo dependencies
 repos="perl-dnap-utilities ml_warehouse npg_tracking npg_seq_common"
 for repo in $repos
