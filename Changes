@@ -1,5 +1,20 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Travis CI build: when building dependencies, us the same
+   branch as the one the pull request is made to.
+ - back to testing with mysql 5.7.13 in travis
+ - drop node 0.12 from node travis matrix
+ - add perl 5.22-shrplib to travis matrix
+
+release 62.5
+ - a very concise replacement for NPG_QC pages
+ - no templates rna_seqc results - we should not try rendering
+
+release 62.4
+ - autoqc loader does not try loading a result for which there is
+   no coresponding DBIx binding
+
+release 62.3
  - make bam_flagstats check runnable under the qc script
  - remove autoqc loader backwards compatibility with analysis code
    that does not generate related results for the bam_flagstats results
