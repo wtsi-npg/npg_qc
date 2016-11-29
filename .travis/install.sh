@@ -16,20 +16,21 @@ cpanm --notest --reinstall App::cpanminus
 cpanm --quiet --notest --reinstall ExtUtils::ParseXS
 cpanm --quiet --notest --reinstall MooseX::Role::Parameterized
 cpanm --quiet --notest Alien::Tidyp
-cpanm --no-lwp --notest https://github.com/wtsi-npg/perl-dnap-utilities/releases/download/${DNAP_UTILITIES_VERSION}/WTSI-DNAP-Utilities-${DNAP_UTILITIES_VERSION}.tar.gz
 
+# Git branch to merge to or custom branch
+WTSI_NPG_BUILD_BRANCH=${WTSI_NPG_BUILD_BRANCH:=$TRAVIS_BRANCH}
 # WTSI NPG Perl repo dependencies
-cd /tmp
-git clone --branch devel --depth 1 https://github.com/wtsi-npg/ml_warehouse.git ml_warehouse.git
-#git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_tracking.git npg_tracking.git
-git clone --branch subset_in_factories --depth 1 https://github.com/mgcam/npg_tracking.git npg_tracking.git
-git clone --branch devel --depth 1 https://github.com/wtsi-npg/npg_seq_common.git npg_seq_common.git
-
-repos="/tmp/ml_warehouse.git /tmp/npg_tracking.git /tmp/npg_seq_common.git"
-
+repos="perl-dnap-utilities ml_warehouse npg_tracking npg_seq_common"
 for repo in $repos
 do
-  cd "$repo"
+  # Logic of keeping branch consistent was taken from @dkj
+  # contribution to https://github.com/wtsi-npg/npg_irods
+  cd /tmp
+  # Always clone master when using depth 1 to get current tag
+  git clone --branch master --depth 1 ${WTSI_NPG_GITHUB_URL}/${repo}.git ${repo}.git
+  cd /tmp/${repo}.git
+  # Shift off master to appropriate branch (if possible)
+  git ls-remote --heads --exit-code origin ${WTSI_NPG_BUILD_BRANCH} && git pull origin ${WTSI_NPG_BUILD_BRANCH} && echo "Switched to branch ${WTSI_NPG_BUILD_BRANCH}"
   cpanm --quiet --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
   perl Build.PL
   ./Build

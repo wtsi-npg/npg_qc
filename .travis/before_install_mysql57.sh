@@ -11,20 +11,30 @@ sudo apt-get autoclean
 sudo rm -rf /var/lib/mysql
 sudo rm -rf /var/log/mysql
 
-# Specify which version we want
-echo "deb http://repo.mysql.com/apt/ubuntu/ precise mysql-5.7" | sudo tee /etc/apt/sources.list.d/mysql.list
-sudo -E apt-get update -q
-sudo -E apt-get -q -y install mysql-server libmysqlclient-dev libdbd-mysql-perl
+# Get packages from oracle
+sudo -E apt-get install libaio1 apparmor
+wget http://downloads.mysql.com/archives/get/file/mysql-common_5.7.13-1ubuntu12.04_amd64.deb
+wget http://downloads.mysql.com/archives/get/file/libmysqlclient20_5.7.13-1ubuntu12.04_amd64.deb
+wget http://downloads.mysql.com/archives/get/file/mysql-community-client_5.7.13-1ubuntu12.04_amd64.deb
+wget http://downloads.mysql.com/archives/get/file/mysql-client_5.7.13-1ubuntu12.04_amd64.deb
+wget http://downloads.mysql.com/archives/get/file/mysql-community-server_5.7.13-1ubuntu12.04_amd64.deb
+wget http://downloads.mysql.com/archives/get/file/mysql-server_5.7.13-1ubuntu12.04_amd64.deb
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password \"''\""
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password \"''\""
+sudo dpkg-preconfigure mysql-community-server_5.7.13-1ubuntu12.04_amd64.deb  
+sudo dpkg -i mysql-{common,community-client,client,community-server,server}_*.deb
+sudo dpkg -i libmysqlclient20_5.7.13-1ubuntu12.04_amd64.deb
+sudo -E apt-get -q -y install libmysqlclient-dev libdbd-mysql-perl
 
 sudo /etc/init.d/mysql stop
 sleep 5
 # Start the server without password
-sudo mysqld --skip-grant-tables --explicit_defaults_for_timestamp=false --sql-mode="STRICT_TRANS_TABLES" &
+sudo mysqld --user=root --skip-grant-tables --explicit_defaults_for_timestamp=false --sql-mode="STRICT_TRANS_TABLES" &
 
 #Give some time for server to start
 sleep 10
 
 # print versions
 mysql --version
-mysql -e "SELECT @@GLOBAL.sql_mode; SELECT @@SESSION.sql_mode; SHOW GLOBAL VARIABLES LIKE '%version%'; show variables like '%time%';" -uroot
+mysql -h localhost -e "SELECT @@GLOBAL.sql_mode; SELECT @@SESSION.sql_mode; SHOW GLOBAL VARIABLES LIKE '%version%'; show variables like '%time%';" -uroot
 
