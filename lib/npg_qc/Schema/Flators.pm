@@ -173,7 +173,7 @@ sub set_inflator4scalar {
 
 Adds a lazy-build 'composition' attribute and a build method for it
 for tables that have 'iseq_composition' column - an attempt to 
-mirrow the functionality of the result objects and hide the complexity
+mirror the functionality of the result objects and hide the complexity
 of database implementation for composition.
 
  __PACKAGE__->create_composition_attribute();
