@@ -5,6 +5,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - back to testing with mysql 5.7.13 in travis
  - drop node 0.12 from node travis matrix
  - add perl 5.22-shrplib to travis matrix
+ - to reduce uncertainty in ranking close results, increase precision
+   used for ranking contamination results
 
 release 62.5
  - a very concise replacement for NPG_QC pages
