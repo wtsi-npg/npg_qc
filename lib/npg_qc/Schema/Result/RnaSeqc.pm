@@ -324,9 +324,9 @@ with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
-__PACKAGE__->set_flators4non_scalar(qw( other_metrics info ));
-
 our $VERSION = '0';
+
+__PACKAGE__->set_flators4non_scalar(qw( other_metrics info ));
 
 =head2 seq_component_compositions
 
@@ -345,11 +345,6 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
@@ -361,6 +356,23 @@ Result class definition in DBIx binding for npg-qc database.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=cut
+
+=head2 composition
+
+An lazy-build attribute representing a composition this result
+corresponds to. 
+
+=cut
+
+__PACKAGE__->create_composition_attribute();
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
 
 =head1 DEPENDENCIES
 
