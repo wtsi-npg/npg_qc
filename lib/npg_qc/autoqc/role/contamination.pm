@@ -26,7 +26,7 @@ sub normalised_contamination {
         my $value =  ( $raw_count / $fastq_size )
                              * $genome_correction{$organism}
                              * $PERCENT;
-        $normalized_value{$organism} = sprintf '%.1f', $value;
+        $normalized_value{$organism} = sprintf '%.2f', $value;
     }
 
     return \%normalized_value;
