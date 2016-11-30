@@ -49,8 +49,9 @@ getopts('hr:s:p:jo:g:m:a:x:c', \%opts);
 ##########
 my @bam_file_list;
 my $ext = $opts{c}? q[cram]: q[bam];
-if($opts{r}) {
-	@bam_file_list = map { my ($r, $p, $t) = (split ":", $_); find_runlanefolder($r, $p, $t, $ext) or sprintf "irods:/seq/%d/%d_%d%s.%s", $r, $r, $p, $t? "#$t": "", $ext; } (split ";", $opts{r});
+my $rpt_list = $opts{r};
+if($rpt_list) {
+	@bam_file_list = map { my ($r, $p, $t) = (split ":", $_); find_runlanefolder($r, $p, $t, $ext) or sprintf "irods:/seq/%d/%d_%d%s.%s", $r, $r, $p, $t? "#$t": "", $ext; } (split ";", $rpt_list);
 
 	carp qq[bam_file_list:\n\t], join("\n\t", @bam_file_list), "\n";
 }
@@ -92,7 +93,6 @@ my %attribs = (
 	alignments_in_bam => 1,
 	reference_fasta => $reference_genome,
 	input_files => [ (@bam_file_list) ],
-	path => q[.],
 );
 if(defined $plex_name) {
 	$attribs{sequenom_plex} = $plex_name;
@@ -108,6 +108,8 @@ if(defined $poss_dup_level) {
 if(defined $gt_exec_path) {
 	$attribs{genotype_executables_path} = $gt_exec_path;
 }
+
+$attribs{rpt_list} = $rpt_list;
 
 my $gtck= npg_qc::autoqc::checks::genotype->new(%attribs);
 
