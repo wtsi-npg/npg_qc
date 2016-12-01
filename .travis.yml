@@ -18,20 +18,19 @@ addons:
 
 env:
   global:
-    - DNAP_UTILITIES_VERSION="0.5.2"
     - secure: cDfB188ECmloGfScZQezqwiFef7l+gXgn2RiTOxINriy9wYS6RmZxuZBHGuR36u7QV3QEJtMdihyQ+XBN2eQPf5jULQXV15t7gArXEVPzzF8i+f8MTgVHugU3TqmPLQkY94wBBbpzvRD9xCAC/uNiQcLLwuD2SjPfTXkqgqqtd0=
     - PGVERSION="9.3"
     - JANSSON_VERSION="2.7"
-    - CK_DEFAULT_TIMEOUT=20
-    - PLATFORM=ubuntu12
-    - ARCH=x86_64
-    - RENCI_URL=ftp://ftp.renci.org
-    - WTSI_NPG_URL=https://github.com/wtsi-npg/irods
-    - PG_PLUGIN_VERSION=1.9
+    - DISPOSABLE_IRODS_VERSION="1.1"
+    - RENCI_FTP_URL=ftp://ftp.renci.org
+    - WTSI_NPG_GITHUB_URL=https://github.com/wtsi-npg/irods
     - BATON_VERSION="0.16.4"
+    - DNAP_UTILITIES_VERSION="0.5.3"
   matrix:
     - TRAVIS_NODE_VERSION="0.12.9"
     - TRAVIS_NODE_VERSION="4.4.2"
+    - IRODS_VERSION=3.3.1 IRODS_RIP_DIR=/usr/local/irods
+    - IRODS_VERSION=4.1.9 PG_PLUGIN_VERSION=1.9 PLATFORM=ubuntu12
 
 before_install:
   - ./.travis/before_install.sh
@@ -39,12 +38,9 @@ before_install:
 install:
   - ./.travis/install.sh
 
-before_script:
-  - source ./.travis/before_script.sh
-  - ienv
-  - ilsresc -l
-  - ils
-
 script:
+  - ienv
+  - ils
+  - ilsresc -l
   - ./.travis/script.sh
 
