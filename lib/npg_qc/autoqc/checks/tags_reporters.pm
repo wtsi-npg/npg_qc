@@ -8,7 +8,6 @@ use File::Slurp;
 use File::Spec::Functions qw(catfile catdir);
 use List::MoreUtils qw(any);
 use JSON;
-use npg_qc::utils::iRODS;
 use npg_qc::autoqc::types;
 use Readonly;
 
