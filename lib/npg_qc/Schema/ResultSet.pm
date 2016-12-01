@@ -13,7 +13,8 @@ sub search_autoqc {
   my ($self, $values, $size) = @_;
 
   my $how = {'cache' => 1};
-  if ($self->result_source->has_relationship('seq_component_compositions')) {
+  my $rsource = $self->result_source();
+  if ($rsource->has_relationship('seq_component_compositions')) {
     foreach my $col_name  (keys %{$values}) {
       $values->{'seq_component.' . $col_name} = $values->{$col_name};
       delete $values->{$col_name};
@@ -23,6 +24,10 @@ sub search_autoqc {
     }
     $how->{'prefetch'} = {'seq_component_compositions' => 'seq_component'};
   } else {
+    my $ti_key = 'tag_index';
+    if (exists $values->{$ti_key} && !$rsource->has_column($ti_key)) {
+      delete $values->{$ti_key};
+    }
     $self->deflate_unique_key_components($values, 1);
   }
   my $rs = $self->search_rs($values, $how);
