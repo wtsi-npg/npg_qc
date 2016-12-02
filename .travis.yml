@@ -33,6 +33,7 @@ env:
     - IRODS_VERSION=4.1.9 PG_PLUGIN_VERSION=1.9 PLATFORM=ubuntu12
 
 before_install:
+  - ./.travis/before_install_mysql57.sh
   - ./.travis/before_install.sh
 
 install:
