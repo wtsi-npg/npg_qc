@@ -60,7 +60,7 @@ sub class_names {
   $name ||= (ref $self || $self);
   my ($class_name) = $name =~ /(\w+)(?:-\d+.*)?$/mxs;
   ##no critic (ProhibitParensWithBuiltins)
-  my $dbix_class_name = join q[], map {ucfirst $_} split(/_/sm, $class_name);
+  my $dbix_class_name = join q[], map { ucfirst } split(/_/sm, $class_name);
   ##use critic
   return ($class_name, $dbix_class_name);
 }
