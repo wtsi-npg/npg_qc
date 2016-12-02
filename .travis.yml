@@ -23,7 +23,7 @@ env:
     - JANSSON_VERSION="2.7"
     - DISPOSABLE_IRODS_VERSION="1.1"
     - RENCI_FTP_URL=ftp://ftp.renci.org
-    - WTSI_NPG_GITHUB_URL=https://github.com/wtsi-npg/irods
+    - WTSI_NPG_GITHUB_URL=https://github.com/wtsi-npg
     - BATON_VERSION="0.16.4"
     - DNAP_UTILITIES_VERSION="0.5.3"
   matrix:
