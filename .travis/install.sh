@@ -59,8 +59,8 @@ fi
 ./configure ${baton_irods_conf} ; make ; sudo make install
 sudo ldconfig
 
-# WTSI NPG Perl repo dependencies, only one at the moment
-for repo in perl-dnap-utilities; do
+# WTSI NPG Perl repo dependencies
+for repo in ml_warehouse npg_tracking npg_seq_common perl-dnap-utilities; do
     cd /tmp
     # Always clone master when using depth 1 to get current tag
     git clone --branch master --depth 1 ${WTSI_NPG_GITHUB_URL}/${repo}.git ${repo}.git
