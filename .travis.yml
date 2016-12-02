@@ -40,6 +40,7 @@ install:
   - ./.travis/install.sh
 
 script:
+  - export PATH=$IRODS_RIP_DIR/iRODS/clients/icommands/bin:$PATH
   - ienv
   - ils
   - ilsresc -l
