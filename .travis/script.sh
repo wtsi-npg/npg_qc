@@ -2,22 +2,44 @@
 
 set -e -x
 
-unset PERL5LIB
+IRODS_VERSION=${IRODS_VERSION:=4.1.9}
 
-export PATH=/home/travis/.nvm/versions/node/v${TRAVIS_NODE_VERSION}/bin:$PATH
+script_common() {
 
-cpanm --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
-perl Build.PL
-./Build
+    unset PERL5LIB
 
-pushd npg_qc_viewer
-cpanm --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
-perl Build.PL --installjsdeps
-./Build
-popd
+    export PATH=/home/travis/.nvm/versions/node/v${TRAVIS_NODE_VERSION}/bin:$PATH
 
-./Build test --verbose
-pushd npg_qc_viewer
-./Build test --verbose
-grunt -v
-popd
+    cpanm --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
+    perl Build.PL
+    ./Build
+
+    pushd npg_qc_viewer
+    cpanm --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;
+    perl Build.PL --installjsdeps
+    ./Build
+    popd
+
+    ./Build test --verbose
+    pushd npg_qc_viewer
+    ./Build test --verbose
+    grunt -v
+    popd
+}
+
+script_4_1_x() {
+    return
+}
+
+
+case $IRODS_VERSION in
+
+    4.1.9)
+        script_common
+        script_4_1_x
+        ;;
+
+    *)
+        echo Unknown iRODS version $IRODS_VERSION
+        exit 1
+esac
