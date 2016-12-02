@@ -35,6 +35,7 @@ env:
     - TRAVIS_NODE_VERSION="4.5.0"
 
 before_install:
+  - ./.travis/before_install_mysql57.sh
   - ./.travis/before_install.sh
 
 install:
