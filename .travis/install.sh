@@ -75,7 +75,7 @@ done
 for repo in $repos
 do
     cd $repo
-    cpanm --quiet --notest --installdeps .
+    cpanm --verbose --notest --installdeps .
     ./Build install
 done
 
