@@ -75,8 +75,10 @@ done
 for repo in $repos
 do
     cd $repo
-    cpanm --verbose --notest --installdeps . # FIXME set to quiet
+    #cpanm --verbose --notest --installdeps . # FIXME set to quiet
     ./Build install
 done
 
 cd $TRAVIS_BUILD_DIR
+
+cpanm --verbose --notest --installdeps . # FIXME set to quiet
