@@ -60,7 +60,7 @@ fi
 sudo ldconfig
 
 # WTSI NPG Perl repo dependencies
-for repo in ml_warehouse npg_tracking npg_seq_common perl-dnap-utilities; do
+for repo in perl-dnap-utilities ml_warehouse npg_tracking npg_seq_common; do
     cd /tmp
     # Always clone master when using depth 1 to get current tag
     git clone --branch master --depth 1 ${WTSI_NPG_GITHUB_URL}/${repo}.git ${repo}.git
@@ -75,7 +75,7 @@ done
 for repo in $repos
 do
     cd $repo
-    cpanm --verbose --notest --installdeps .
+    cpanm --verbose --notest --installdeps . # FIXME set to quiet
     ./Build install
 done
 
