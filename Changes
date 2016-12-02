@@ -8,7 +8,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - to reduce uncertainty in ranking close results, increase precision
    used for ranking contamination results
  - call_gtck_composite_rpt.pl - supply rpt list to genotype check
- - Code and tests changes to reduce number of warnings under Perl 5.22.2 
+ - Code and tests changes to reduce number of warnings under Perl 5.22.2
+ - sequence mismatch - do not return PDL special values, treat NaN as
+   a bad value and return undefined instead
 
 release 62.5
  - a very concise replacement for NPG_QC pages
