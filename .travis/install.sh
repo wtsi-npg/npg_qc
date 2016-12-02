@@ -75,13 +75,10 @@ done
 for repo in $repos
 do
     cd $repo
-    #cpanm --verbose --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;		
-    #cpanm --verbose --notest --installdeps . # FIXME set to quiet
+    cpanm --verbose --notest --installdeps . || find /home/travis/.cpanm/work -cmin -1 -name '*.log' -exec tail -n20  {} \;		
     perl Build.PL
     ./Build		
     ./Build install
 done
 
 cd $TRAVIS_BUILD_DIR
-
-cpanm --verbose --notest --installdeps . # FIXME set to quiet
