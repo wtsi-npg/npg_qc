@@ -12,6 +12,7 @@ language: perl
 
 perl:
   - "5.16"
+  - "5.22-shrplib"
 
 addons:
   postgresql: "9.3"
