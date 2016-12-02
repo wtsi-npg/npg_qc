@@ -59,7 +59,7 @@ fi
 sudo ldconfig
 
 # WTSI NPG Perl repo dependencies
-repos="perl-dnap-utilities ml_warehouse npg_tracking npg_seq_common"
+repos="perl-dnap-utilities ml_warehouse npg_tracking npg_seq_common perl-irods-wrap"
 for repo in $repos
 do
   # Logic of keeping branch consistent was taken from @dkj
