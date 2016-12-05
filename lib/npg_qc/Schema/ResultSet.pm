@@ -25,7 +25,7 @@ sub search_autoqc {
     $how->{'prefetch'} = {'seq_component_compositions' => 'seq_component'};
   } else {
     my $ti_key = 'tag_index';
-    if (exists $values->{$ti_key} && !$rsource->has_column($ti_key)) {
+    if (exists $values->{$ti_key} && ($rsource->name() eq 'spatial_filter')) {
       delete $values->{$ti_key};
     }
     $self->deflate_unique_key_components($values, 1);
