@@ -14,7 +14,6 @@ use FindBin qw($Bin);
 
 use npg_qc::autoqc::checks::tag_metrics;
 use npg_qc::autoqc::qc_store;
-use npg_qc::utils::iRODS;
 use npg_qc::autoqc::types;
 
 extends qw(npg_qc::autoqc::checks::check);
