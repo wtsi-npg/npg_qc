@@ -85,7 +85,7 @@ sub _build_samtools_stats_file {
 
   my @underscores = ($self->_file_path_root =~ /_/gsmx);
   my $n = 1 + scalar @underscores;
-  my @paths = sort grep { -f $_ && _matches_seq_file($_, $n) } glob $self->_file_path_root . q[_*.stats];
+  my @paths = sort grep { -f && _matches_seq_file($_, $n) } glob $self->_file_path_root . q[_*.stats];
   if (!@paths) {
     warn 'WARNING: Samtools stats files are not found for ' . $self->to_string() . qq[\n];
   }
