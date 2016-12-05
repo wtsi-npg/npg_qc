@@ -175,10 +175,10 @@ sub runfolder_list_in_staging {
 
       if( $folder_name && $folder_path_glob ){
            my @dir = glob qq{$folder_path_glob/$folder_name};
-           @dir = grep {-d $_} @dir;
+           @dir = grep {-d } @dir;
 
            my %fs_inode_hash; #ignore multiple paths point to the same folder
-           @dir = grep { not $fs_inode_hash { join q(,), stat $_ }++ } @dir;
+           @dir = grep { not $fs_inode_hash { join q(,), stat }++ } @dir;
 
            if( scalar  @dir != 1 ){
               $self->mlog("Run $id_run: no runfolder available or more than one available");
