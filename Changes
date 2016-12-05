@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Fix in npg_qc::utils::bam_genotype for rare out of order mpileup failures 
  - Travis CI build: when building dependencies, us the same
    branch as the one the pull request is made to.
  - back to testing with mysql 5.7.13 in travis
