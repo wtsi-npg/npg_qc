@@ -97,6 +97,7 @@ my $builder = $class->new(
         'Moose::Meta::Class'                           => '0',
         'Moose::Role'                                  => '0',
         'MooseX::StrictConstructor'                    => '0',
+        'MooseX::Types::Moose'                         => '0',
         'namespace::autoclean'                         => '0',
         'Params::Validate'                             => '0',
         'Readonly'                                     => '0',

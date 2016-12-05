@@ -308,9 +308,9 @@ sub get_read_cycle_range_from_recipe {
     my $last_indexing_cycle = shift @row;
 
     $cycle_range = [1, $cycle];
-    if($end == 1 && $cycle_read1){
+    if($end eq q(1) && $cycle_read1){
       $cycle_range = [1, $cycle_read1];
-    }elsif($end == 2 && $cycle_read2){
+    }elsif($end eq q(2) && $cycle_read2){
         $cycle_range = [$cycle_read1 + 1, $cycle];
         if($first_indexing_cycle && $last_indexing_cycle){
           $cycle_range = [$last_indexing_cycle + 1, $cycle];

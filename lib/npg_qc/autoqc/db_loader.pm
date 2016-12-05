@@ -7,7 +7,7 @@ use Carp;
 use JSON;
 use Try::Tiny;
 use Perl6::Slurp;
-use List::MoreUtils qw/none/;
+use List::MoreUtils qw/any none/;
 use Readonly;
 
 use npg_tracking::util::types;
@@ -81,6 +81,20 @@ sub _build_schema {
   return npg_qc::Schema->connect();
 }
 
+has '_schema_sources' => ( isa        => 'ArrayRef',
+                           is         => 'ro',
+                           required   => 0,
+                           lazy_build => 1,
+                         );
+sub _build__schema_sources {
+  my $self = shift;
+  return [$self->schema()->sources()];
+}
+sub _schema_has_source {
+  my ($self, $source_name) = @_;
+  return any { $_ eq $source_name } @{$self->_schema_sources()};
+}
+
 has 'verbose' =>    ( is       => 'ro',
                       isa      => 'Bool',
                       required => 0,
@@ -128,20 +142,22 @@ sub _json2db{
       ($class_name, my $dbix_class_name) =
         npg_qc::autoqc::role::result->class_names($class_name);
       if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-        my $module = 'npg_qc::autoqc::results::' . $class_name;
-        load_class($module);
-        my $obj = $module->thaw($json);
+        if ($self->_schema_has_source($dbix_class_name)) {
+          my $module = 'npg_qc::autoqc::results::' . $class_name;
+          load_class($module);
+          my $obj = $module->thaw($json);
 
-        if ($class_name eq 'bam_flagstats') {
-          $values = decode_json($obj->freeze());
+          if ($class_name eq 'bam_flagstats') {
+            $values = decode_json($obj->freeze());
+          }
+          my $composition_key = 'id_seq_composition';
+          if ( $obj->can('composition') && $obj->can('composition_digest') &&
+              $self->schema->source($dbix_class_name)->has_column($composition_key) ) {
+            $values->{$composition_key} = $self->_ensure_composition_exists($obj);
+          }
+          # Load the main object
+          $count = $self->_values2db($dbix_class_name, $values);
         }
-        my $composition_key = 'id_seq_composition';
-        if ( $obj->can('composition') && $obj->can('composition_digest') &&
-             $self->schema->source($dbix_class_name)->has_column($composition_key) ) {
-          $values->{$composition_key} = $self->_ensure_composition_exists($obj);
-        }
-        # Load the main object
-        $count = $self->_values2db($dbix_class_name, $values);
       }
     }
   } catch {

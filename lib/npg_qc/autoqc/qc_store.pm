@@ -188,6 +188,8 @@ sub run_from_db {
     }
     return $c;
   }
+
+  my $ti_key = 'tag_index';
   foreach my $check_name (@{$c->checks_list()}) {
     my $dbix_query = { 'id_run' => $query->id_run};
     if (@{$query->positions}) {
@@ -197,17 +199,13 @@ sub run_from_db {
     if (!$table_class) {
       croak qq[No DBIx result class name for $check_name];
     }
-
-    my $rs = $self->qc_schema()->resultset($table_class);
-    my $ti_key = 'tag_index';
-    if ($rs->result_source()->has_column($ti_key)) {
-      if ($query->option == $LANES) {
-        $dbix_query->{'tag_index'} = undef;
-      } elsif ($query->option == $PLEXES) {
-        $dbix_query->{'tag_index'} = {q[!=], 'undef'};
-      }
+    if ($query->option == $LANES) {
+      $dbix_query->{$ti_key} = undef;
+    } elsif ($query->option == $PLEXES) {
+      $dbix_query->{$ti_key} = {q[!=], 'undef'};
     }
 
+    my $rs = $self->qc_schema()->resultset($table_class);
     my $composition_size = 1;
     $c->add([$rs->search_autoqc($dbix_query, $composition_size)->all()]);
   }

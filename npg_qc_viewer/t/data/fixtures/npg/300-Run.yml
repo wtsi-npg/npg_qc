@@ -82,7 +82,7 @@
   priority : 1
   actual_cycle_count : 512
   expected_cycle_count : 512
-  id_run_pair : NULL
+  id_run_pair : ~
   is_paired : 0
   batch_id : 37400
   id_instrument_format : 11
