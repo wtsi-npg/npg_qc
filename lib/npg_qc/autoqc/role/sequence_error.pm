@@ -4,6 +4,7 @@ use Moose::Role;
 use PDL::Lite;
 use PDL::Core qw(pdl);
 use PDL::Primitive qw(stats);
+use PDL::Bad qw(isgood);
 use Readonly;
 
 our $VERSION = '0';
@@ -36,7 +37,24 @@ sub reverse_average_percent_error {
 
 sub _average_percent{
   my $error_rate_by_cycle = shift;
-  return sprintf '%.2f',(stats($error_rate_by_cycle))[0]*$PERCENT;
+
+  my $a = stats($error_rate_by_cycle);
+  # When some of the input values for the calculation are missing,
+  # the resulting piddle can contain, depending on your Perl, either
+  # nan or NaN value. Not good if we want to load them to a float
+  # column of the databse (warehouse). In the downstream code we
+  # can try to convert these values to undefined values. But, while
+  # we have piddles object and PDL available, we can do this properly.
+  # So ...
+  $a->badflag(1);             # initialise bad value marking,
+  $a->inplace->setnantobad(); # ask to treat NaN as bad value
+  my $mask = isgood($a);      # without touching the original piddle,
+                              # create a mask telling us whether each value
+                              # is good (1) or bad (0).
+  if (($mask)[0]) {
+    return sprintf '%.2f',($a)[0]*$PERCENT;
+  }
+  return;
 }
 
 sub criterion {
