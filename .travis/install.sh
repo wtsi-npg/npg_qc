@@ -14,8 +14,6 @@ set -e -x
 # TRAVIS_BRANCH unless set in the Travis build environment.
 WTSI_NPG_BUILD_BRANCH=${WTSI_NPG_BUILD_BRANCH:=$TRAVIS_BRANCH}
 
-sudo apt-get install -qq odbc-postgresql unixodbc-dev # TODO is this needed?
-
 sudo apt-get install libgd2-xpm-dev # For npg_tracking
 sudo apt-get install liblzma-dev # For npg_qc
 sudo apt-get install --yes nodejs
