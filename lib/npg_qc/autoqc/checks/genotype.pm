@@ -28,7 +28,7 @@ has 'irods' =>
    required => 1,
    default  => sub {
        return WTSI::NPG::iRODS->new;
-   });
+   },);
 
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
@@ -368,7 +368,7 @@ sub _build_input_files_md5 {
                 chomp $md5;
                 close $f or croak "Failed to close $md5_file";
             }
-            unless ($md5) {
+            if (! $md5) {
                 my $msg = "Unable to read md5 checksum from file '$md5_file'";
                 carp($msg);
                 $md5 = '0000000000000000';
