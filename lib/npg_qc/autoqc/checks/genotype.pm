@@ -355,7 +355,7 @@ sub _build_input_files_md5 {
                 );
                 $md5 = $data_obj->checksum;
             } catch {
-                my $msg = "Unable to find md5 checksum for ".
+                my $msg = 'Unable to find md5 checksum for '.
                     "iRODS file '$irods_filename': $_";
                 carp($msg);
                 $md5 = '0000000000000000';
