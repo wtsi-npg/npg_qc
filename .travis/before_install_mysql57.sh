@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -x
+set -e -u -x
 
 sudo apt-key add ./.travis/mysql_pubkey.asc # Import public key for MySQL
 sudo apt-get remove --purge "^mysql.*"

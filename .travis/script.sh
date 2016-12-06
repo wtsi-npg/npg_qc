@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -x
+set -e -u -x
 
 unset PERL5LIB
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e -x
+# set -u fails cause npm install to fail
 
 sudo apt-get update -qq
 
