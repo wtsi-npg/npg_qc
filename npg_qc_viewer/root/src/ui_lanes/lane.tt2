@@ -430,21 +430,19 @@ END
 
 [% BLOCK rna_seqc %]
 [%  IF result.exonic_rate.defined %]
-[%     result.exonic_rate | format_number(3,1) %]
+      <span>[% result.exonic_rate | format_number(3,1) %]</span>
 [%  ELSE %]
-       <span>na</span>
+      <span>na</span>
 [%  END %]
-<br/>
 [%  IF result.rrna_rate.defined %]
-       <span class="dark_blue">[% result.rrna_rate | format_number(3,1) %]</span>
+      <span class="dark_blue">[% result.rrna_rate | format_number(3,1) %]</span>
 [%  ELSE %]
-       <span class="dark_blue">na</span>
+      <span class="dark_blue">na</span>
 [%  END %]
-<br/>
 [%  IF result.mean_cv.defined %]
-[%     result.mean_cv | format_number(2,1) %]
+      <span>[% result.mean_cv | format_number(2,1) %]</span>
 [%  ELSE %]
-       <span>na</span>
+      <span>na</span>
 [%  END %]
 [% END %]
 
