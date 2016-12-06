@@ -178,31 +178,6 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   data_type: 'text'
   is_nullable: 1
 
-=head2 metrics
-
-  data_type: 'mediumblob'
-  is_nullable: 1
-
-Compressed metrics.tsv metrics file content
-
-=head2 date
-
-  data_type: 'timestamp'
-  datetime_undef_if_invalid: 1
-  default_value: current_timestamp
-  is_nullable: 0
-
-Date the record was created
-
-=head2 iscurrent
-
-  data_type: 'tinyint'
-  default_value: 1
-  extra: {unsigned => 1}
-  is_nullable: 0
-
-Boolean flag to indicate that the record is current, defaults to 1
-
 =cut
 
 __PACKAGE__->add_columns(
@@ -256,22 +231,6 @@ __PACKAGE__->add_columns(
   { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'other_metrics',
   { data_type => 'text', is_nullable => 1 },
-  'metrics',
-  { data_type => 'mediumblob', is_nullable => 1 },
-  'date',
-  {
-    data_type => 'timestamp',
-    datetime_undef_if_invalid => 1,
-    default_value => \'current_timestamp',
-    is_nullable => 0,
-  },
-  'iscurrent',
-  {
-    data_type => 'tinyint',
-    default_value => 1,
-    extra => { unsigned => 1 },
-    is_nullable => 0,
-  },
 );
 
 =head1 PRIMARY KEY
@@ -319,8 +278,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-11-11 14:10:26
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:/acbhXi0BTkTRboZWtfs8g
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2016-12-06 11:41:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T+W05fIQCWmHH4bJUw2MYw
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
