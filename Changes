@@ -1,6 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-
+ - npg_qc::autoqc::qc_store - load rna_seqc results into npg_qc db
+   (requires rna_seqc table exists in database).
+ - Updated data/schema.txt including definition for rna_seqc table.
+ - SeQC:
+   - Added template for rna_seqc check with selected metrics shown
+     in summary
+   - Include a link to original RNA-SeQC report only visible 
+     when db_lookup=0.
  - translation from a database composition representation to the
      npg_tracking::glossary::composition type object
  - db query for compisition-based tables should include a condition

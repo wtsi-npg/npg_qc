@@ -126,17 +126,17 @@ Any close genotype matches found under a different sample name, allowing homozyg
  <br/>
  <h4>Mapped Reads</h4>
  <p><b>rRNA</b> reads are non-duplicate and duplicate reads aligning to rRNA regions as defined in the transcript model definition. <b>rRNA Rate</b> is per total reads. </p>
- </br>
+ <br/>
  <h4>Transcript-associated Reads</h4>
  <p>Rates are per mapped read. <b>Exonic Rate</b> is the fraction mapping within exons. <b>Expression Profile Efficiency</b> is the ratio of exon reads to total reads. <b>Transcripts/Genes Detected </b> is the number of transcripts/Genes with at least 5 reads. </p>
  <br/>
  <h4>Strand Specificity</h4>
  <p><b>End 1/2 Sense</b> are the number of End 1 or 2 reads that were sequenced in the sense direction. Similarly, <b>End 1/2 Antisense</b> are the number of End 1 or 2 reads that were sequenced in the antisense direction.<b>End 1/2 Sense %</b> are percentages of intragenic End 1/2 reads that were sequenced in the sense direction. </p>
- </br>
+ <br/>
  <h4>Coverage Metrics Highest 1000 Expressed Transcripts</h4>
  <p>The metrics in this table are calculated across the transcripts that were determined to have the highest expression levels. <b>5'</b> and <b>3'</b> values are per-base coverage averaged across all top transcripts.   5' and 3' ends are 200 base pairs.  Gap % is the total cumulative gap length divided by the total cumulative transcript lengths. </p>
- </br>
-</br>
+ <br/>
+<br/>
 
  <a name="tag metrics_check"></a>
  <h3>Tag metrics</h3>
@@ -157,7 +157,7 @@ Any close genotype matches found under a different sample name, allowing homozyg
 Check for contamination of tag#0 BAM file by reads from upstream runs
 <br/><br/>
 
-</br>
+<br/>
 
 <a name="verifyBamId"></a>
 <h3>VerifyBamID contamination check</h3>
