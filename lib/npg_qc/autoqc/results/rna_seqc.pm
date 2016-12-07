@@ -36,6 +36,11 @@ has 'other_metrics'  => (isa        => 'HashRef[Str]',
                          default => sub { {} },
                          required   => 0,);
 
+has 'store_nomore' => (is   => 'rw',
+                       isa  => 'Bool',
+                       required => 0,
+                       default => 0,);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
