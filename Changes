@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - translation from a database composition representation to the
+     npg_tracking::glossary::composition type object
+ - db query for compisition-based tables should include a condition
+     on tag_index if only lanes or plexes are being retrieved
  - Fix in npg_qc::utils::bam_genotype for rare out of order mpileup failures 
  - Travis CI build: when building dependencies, us the same
    branch as the one the pull request is made to.

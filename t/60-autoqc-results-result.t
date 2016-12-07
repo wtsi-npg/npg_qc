@@ -111,7 +111,9 @@ use_ok ('npg_qc::autoqc::results::result');
                                         id_run    => 2549,
                                                  );
     throws_ok {$r->equals_byvalue({})} qr/No parameters for comparison/, 'error when an empty hash is given in equals_byvalue';
-    throws_ok {$r->equals_byvalue({position => 3, unknown => 5,})} qr/cannot be compared/, 'error when a hash with an unknown key is used in equals_byvalue';
+    throws_ok {$r->equals_byvalue({position => 3, unknown => 5,})}
+      qr/Can't locate object method \"unknown\"/,
+     'error when a hash representing an unknown attribute is used in equals_byvalue';
     ok($r->equals_byvalue({position => 3, id_run => 2549,}), 'equals_byvalue returns true');
     ok($r->equals_byvalue({position => 3, class_name => q[result],}), 'equals_byvalue returns true');
     ok($r->equals_byvalue({position => 3, check_name => q[result], tag_index => undef,}), 'equals_byvalue returns true');
@@ -123,7 +125,6 @@ use_ok ('npg_qc::autoqc::results::result');
 {
     my $r = npg_qc::autoqc::results::result->new(
                                         position  => 3,
-                                        path      => 't/data/autoqc/090721_IL29_2549/data',
                                         id_run    => 2549,
                                         tag_index => 5,
                                                  );
@@ -137,7 +138,6 @@ use_ok ('npg_qc::autoqc::results::result');
 {
     my $r = npg_qc::autoqc::results::result->new(
                                         position  => 3,
-                                        path      => 't/data/autoqc/090721_IL29_2549/data',
                                         id_run    => 2549,
                                                 );
     $r->set_info('Aligner', 'bwa-0.55');
@@ -149,23 +149,31 @@ use_ok ('npg_qc::autoqc::results::result');
 {
     my $r = npg_qc::autoqc::results::result->new(
                                         position  => 3,
-                                        path      => 't/data/autoqc/090721_IL29_2549/data',
                                         id_run    => 2549,
-                                                );
+                                                 );
     is (npg_qc::autoqc::results::result->rpt_key_delim, q[:], 'rpt key delim');
     is (npg_qc::autoqc::role::result->rpt_key_delim, q[:], 'rpt key delim');
     is ($r->rpt_key_delim, q[:], 'rpt key delim');
     is ($r->rpt_key, q[2549:3], 'rpt key');
     
-    $r->tag_index(0);
+    $r = npg_qc::autoqc::results::result->new(
+                                        position  => 3,
+                                        id_run    => 2549,
+                                        tag_index => 0
+                                             );
     is ($r->rpt_key, q[2549:3:0], 'rpt key');
 
-    $r->tag_index(3);
+    $r = npg_qc::autoqc::results::result->new(
+                                        position  => 3,
+                                        id_run    => 2549,
+                                        tag_index => 3
+                                             );
     is ($r->rpt_key, q[2549:3:3], 'rpt key');      
 }
 
 {
-    throws_ok {npg_qc::autoqc::results::result->inflate_rpt_key(q[5;6])} qr/Invalid rpt key/, 'error when inflating rpt key';
+    throws_ok {npg_qc::autoqc::results::result->inflate_rpt_key(q[5;6])}
+      qr/rpt string should not contain ';'/, 'error when inflating rpt key';
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6]), {id_run=>5,position=>6,}, 'rpt key inflated');
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:1]), {id_run=>5,position=>6,tag_index=>1}, 'rpt key inflated');
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:0]), {id_run=>5,position=>6,tag_index=>0}, 'rpt key inflated');

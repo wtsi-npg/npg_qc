@@ -64,7 +64,7 @@ subtest 'json is only for instances' => sub{
 };
 
 subtest 'methods' => sub {
-  plan tests => 9;
+  plan tests => 19;
 
   my $f = npg_tracking::glossary::composition::factory->new();
   $f->add_component($c1, $c2, $c3, $c4);
@@ -74,25 +74,45 @@ subtest 'methods' => sub {
   ok (!$b->is_old_style_result, 'not old style object');
   like ($b->to_string, qr/npg_qc::autoqc::results::base/, 'custom to_string');
   throws_ok { $b->equals_byvalue() }
-    qr/Nothing to compare to/,
+    qr/Can compare to HASH only/,
     'error comparing to undef';
   throws_ok { $b->equals_byvalue(4) }
-    qr/Cannot evaluate input 4/,
+    qr/Can compare to HASH only/,
     'error comparing to a scalar';
-  throws_ok { $b->equals_byvalue({id_run => 2, position => 4}) }
-    qr/Cannot evaluate input HASH/,
-    'error comparing to a hash';
   throws_ok { $b->equals_byvalue($c1) }
-    qr/Cannot evaluate input npg_tracking::glossary::composition::component/,
+    qr/Can compare to HASH only/,
     'error comparing to a component object';
+  throws_ok { $b->equals_byvalue({id_run => 2, position => 4}) }
+    qr/Not ready to deal with multi-component composition/,
+    'error since this object has multiple omponents';
 
   $f = npg_tracking::glossary::composition::factory->new();
-  $f->add_component($c2, $c1, $c3, $c4);
-  is ($b->equals_byvalue($f->create_composition()), 1, 'compositions are the same');
+  $f->add_component($c3);
+  $b = npg_qc::autoqc::results::base->new(
+    composition => $f->create_composition()
+  );
+  is ($b->equals_byvalue({check_name => 'base'}), 1, 'equal by check name');
+  is ($b->equals_byvalue({check_name => 'insert size'}), 0, 'not equal by check name');
+  is ($b->equals_byvalue({class_name => 'base'}), 1, 'equal by class name');
+  is ($b->equals_byvalue({class_name => 'insert_size'}), 0, 'not equal by class name');
+  is ($b->equals_byvalue({id_run => 1}), 1, 'equal by id_run');
+  is ($b->equals_byvalue({id_run => 2}), 0, 'no equal by id_run');
+  is ($b->equals_byvalue({tag_index => 5}), 1, 'equal by tag_index');
+  is ($b->equals_byvalue({tag_index => 4, check_name => 'base'}), 0, 'not equal');
+
   $f = npg_tracking::glossary::composition::factory->new();
-  $f->add_component($c1, $c2, $c3);
-  is ($b->equals_byvalue($f->create_composition()), 0, 'compositions are different');
-  is ($b->filename4serialization, $digest1_4 . '.base.json', 'custom filename');
+  $f->add_component($c1);
+  $b = npg_qc::autoqc::results::base->new(
+    composition => $f->create_composition()
+  );
+  is ($b->equals_byvalue({tag_index => 5, id_run => 1}), 0, 'not equal');
+  is ($b->equals_byvalue({tag_index => undef, id_run => 1}), 1, 'equal');
+  is ($b->equals_byvalue({position => 2, id_run => 1}), 1, 'equal');
+  is ($b->equals_byvalue({position => 2, id_run => 1, tag_index => undef}), 1, 'equal');
+
+  is ($b->filename4serialization,
+    'c674faa835fd34457c29af3492ef291c623ce67a230b29eb8c3b6891a4d98837.base.json',
+    'custom filename');
 };
 
 subtest 'extended_base' => sub {

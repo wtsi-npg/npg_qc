@@ -6,6 +6,8 @@ use List::MoreUtils qw/ uniq /;
 use Try::Tiny;
 use Readonly;
 
+with 'npg_tracking::glossary::rpt';
+
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -33,13 +35,10 @@ A string concatenating id_run, position and tag index (where present)
 
 =cut
 sub rpt_key {
-    my ($obj) = @_;
-
-    my $key = join $RPT_KEY_DELIM, $obj->id_run, $obj->position;
-    if ($obj->can('tag_index') && defined $obj->tag_index) {
-        $key = join $RPT_KEY_DELIM, $key,  $obj->tag_index;
-    }
-    return $key;
+    my $self = shift;
+    return $self->can('composition') ?
+      $self->composition()->freeze2rpt() :
+      $self->deflate_rpt();
 }
 
 =head2 lane_rpt_key_from_key
@@ -60,18 +59,7 @@ Extract id_run, position and tag_index from rpt key and return as a hash ref
 =cut
 sub inflate_rpt_key {
     my ($self, $key) = @_;
-
-    my @values = split /$RPT_KEY_DELIM/smx, $key;
-    if (@values < $RPT_KEY_MIN_LENGTH || @values > $RPT_KEY_MAX_LENGTH) {
-        croak qq[Invalid rpt key $key];
-    }
-    my $map = {};
-    $map->{'id_run'} = $values[0];
-    $map->{'position'} = $values[1];
-    if (@values == $RPT_KEY_MAX_LENGTH) {
-        $map->{'tag_index'} = $values[2];
-    }
-    return $map;
+    return $self->inflate_rpt($key);
 }
 
 =head2 expand_rpt_key

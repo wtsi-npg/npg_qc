@@ -175,6 +175,57 @@ __PACKAGE__->has_many(
 
 our $VERSION = '0';
 
+use Carp;
+use npg_tracking::glossary::composition::component::illumina;
+
+# Have serialization to JSON and rtp done for us
+with 'npg_tracking::glossary::composition::serializable' => {
+  -excludes => [qw/digest compute_digest thaw/]
+};
+
+=head2 unpack
+
+Implementation of a method required by the
+npg_tracking::glossary::composition::serializable role.
+
+=cut
+
+sub unpack { ## no critic(Subroutines::ProhibitBuiltinHomonyms)
+  croak 'Unpacking is not implemented';
+}
+
+=head2 pack
+
+Implementation of a method required by the
+npg_tracking::glossary::composition::serializable role.
+
+Returns a hash with main attributes of the object and their values.
+
+=cut
+
+sub pack { ## no critic(Subroutines::ProhibitBuiltinHomonyms)
+  my $self = shift;
+  my $h = {};
+  for my $column (qw/id_run position tag_index subset/) {
+    $h->{$column} = $self->$column;
+  }
+  return $h;
+}
+
+=head2 create_component
+
+Returns a component object npg_tracking::glossary::composition::component::illumina
+corresponding to this row.
+
+ my $illumina_component = $self->create_component();
+
+=cut
+
+sub create_component {
+  my $self = shift;
+  return npg_tracking::glossary::composition::component::illumina->thaw($self->freeze());
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
@@ -225,7 +276,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 
