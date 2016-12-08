@@ -8,11 +8,12 @@
 # iRODS setup added by Iain Bancarz (ib5), adapted from baton:
 #   https://github.com/wtsi-npg/baton
 
-set -e -x
+set -e -u -x
 
 # The default build branch for all repositories. This defaults to
 # TRAVIS_BRANCH unless set in the Travis build environment.
 WTSI_NPG_BUILD_BRANCH=${WTSI_NPG_BUILD_BRANCH:=$TRAVIS_BRANCH}
+IRODS_RIP_DIR=${IRODS_RIP_DIR:+$IRODS_RIP_DIR}
 
 sudo apt-get install libgd2-xpm-dev # For npg_tracking
 sudo apt-get install liblzma-dev # For npg_qc
@@ -58,6 +59,7 @@ fi
 sudo ldconfig
 
 # WTSI NPG Perl repo dependencies
+repos=""
 for repo in perl-dnap-utilities ml_warehouse npg_tracking npg_seq_common perl-irods-wrap; do
     cd /tmp
     # Always clone master when using depth 1 to get current tag
