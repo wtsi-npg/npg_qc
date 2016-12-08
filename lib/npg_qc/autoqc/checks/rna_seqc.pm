@@ -277,10 +277,10 @@ sub _parse_metrics {
     }
     my $i = 0;
     my $results = {};
-    foreach(@keys){
+    foreach my $key (@keys){
         chomp $values[$i];
-        chomp $_;
-        $results->{$_} = $values[$i];
+        chomp $key;
+        $results->{$key} = $values[$i];
         $i++;
     }
     return $results;
