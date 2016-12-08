@@ -60,7 +60,7 @@ sub class_names {
   $name ||= (ref $self || $self);
   my ($class_name) = $name =~ /(\w+)(?:-\d+.*)?$/mxs;
   ##no critic (ProhibitParensWithBuiltins)
-  my $dbix_class_name = join q[], map {ucfirst $_} split(/_/sm, $class_name);
+  my $dbix_class_name = join q[], map { ucfirst } split(/_/sm, $class_name);
   ##use critic
   return ($class_name, $dbix_class_name);
 }
@@ -132,66 +132,71 @@ sub is_old_style_result {
 
 =head2 equals_byvalue
 
-Determines whether the values of the attributes in the object are as listed in the argument hash. 
-Takes a reference to a hash where keys are the names of the attributes and values are expected values. 
-Returns true if all values are as expected, otherwise returns false.
 Supports comparison on the following attributes:
   id_run, position, tag_index, check_name, class_name.
 
- my $r = npg_qc::autoqc::results::result->new({id_run => 222, position => 2, path => q[my_path]});
- $r->equals_byvalue({id_run => 222, position => 2,}); #returns 1
- $r->equals_byvalue({id_run => 222, position => 1,}); #returns 0
- $r->equals_byvalue({id_run => 222,});                #returns 1
+Returns true if this object has the properties listed in a hash.
+
+ my $r = npg_qc::autoqc::results::result->new({id_run => 222, position => 2);
+ $r->equals_byvalue({id_run => 222, position => 2});  # true
+ $r->equals_byvalue({id_run => 222, position => 1});  # false
+ $r->equals_byvalue({id_run => 222});                 # true
+ $r->equals_byvalue({id_run => 222, tag_index => 1}); # false
+ $r->equals_byvalue({check_name => 'result'});        # true
+
+ my $component = npg_tracking::glossary::composition::component::illumina->new(
+   id_run => 1, position => 2);
+ my $f = npg_tracking::glossary::composition::factory->new();
+ $f->add_component($c);
+ my $r = npg_qc::autoqc::results::some->new(
+   composition => $f->create_composition()
+ );
+ $r->equals_byvalue({id_run => 222, position => 1});  # false
+ $r->equals_byvalue({id_run => 1, position => 2});    # true
 
 =cut
 sub equals_byvalue {
   my ($self, $other) = @_;
 
-  if (!defined $other) {
-    croak 'Nothing to compare to';
+  if (!defined $other || ref $other ne 'HASH') {
+    croak 'Can compare to HASH only';
   }
 
-  my $other_type = ref $other;
-  my $comp;
-  if ($other_type) {
-    if ($self->is_old_style_result()) {
-      $comp =  $self->_equals_byvalue_old($other);
-    } else {
-      if ($other_type eq ref $self->composition) {
-        $comp = ($self->composition_digest cmp $other->digest) == 0 ? 1 : 0;
-      }
-    }
-  }
+  my %test = %{$other};
 
-  if (!defined $comp) {
-    croak 'Cannot evaluate input ' . $other;
-  }
-
-  return $comp;
-}
-
-sub _equals_byvalue_old {
-  my ($self, $h) = @_;
-
-  my @keys =keys %{$h};
-  if (!@keys) {
+  my @attrs = keys %test;
+  if (!@attrs) {
     croak q[No parameters for comparison];
   }
 
-  foreach my $key (@keys) {
-    if (none { $_ eq $key } @SEARCH_PARAMETERS) {
-      croak qq[Value of the $key attribute cannot be compared. Valid attributes: ]
-            . join q[, ], @SEARCH_PARAMETERS;
-    }
-    if ($key eq q[tag_index]) {
-      if ( !$self->can($key) || (!defined $h->{$key} && defined $self->$key) ||
-          (defined $h->{$key} && !defined $self->$key) ) {
+  for my $attr (qw(class_name check_name)) {
+    if ($test{$attr}) {
+      if ($self->$attr ne $test{$attr}) {
         return 0;
       }
-      if (!defined $h->{$key} && !defined $self->$key) { next; }
+      delete $test{$attr};
     }
-    if ($self->$key ne $h->{$key}) {return 0;}
   }
+
+  @attrs = keys %test;
+  if (@attrs) {
+    my $composition = $self->composition();
+    if ($composition->num_components() > 1) {
+      croak 'Not ready to deal with multi-component composition';
+    }
+    my $component = $composition->get_component(0);
+    for my $attr (@attrs) {
+      if (defined $test{$attr} && defined $component->$attr &&
+        $component->$attr ne $test{$attr}) {
+        return 0;
+      }
+      if ((!defined $test{$attr} && defined $component->$attr) ||
+        (defined $test{$attr} && !defined $component->$attr)) {
+        return 0;
+      }
+    }
+  }
+
   return 1;
 }
 
