@@ -5,6 +5,7 @@ use namespace::autoclean;
 use Readonly;
 
 extends 'npg_qc::autoqc::results::result';
+with 'npg_qc::autoqc::role::unstorable';
 
 our $VERSION = '0';
 
@@ -35,11 +36,6 @@ has 'other_metrics'  => (isa        => 'HashRef[Str]',
                          is         => 'rw',
                          default => sub { {} },
                          required   => 0,);
-
-has 'store_nomore' => (is   => 'rw',
-                       isa  => 'Bool',
-                       required => 0,
-                       default => 0,);
 
 __PACKAGE__->meta->make_immutable;
 

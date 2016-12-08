@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - create new role for results to provide a flag to control whether to
+   store or not the result into a JSON file, if the check should have 
+   not been executed.
+ - results object of rna_seqc check is unstorable, if it cannot be run
+   then no serialization file is created.
  - npg_qc::autoqc::qc_store - load rna_seqc results into npg_qc db
    (requires rna_seqc table exists in database).
  - Updated data/schema.txt including definition for rna_seqc table.
