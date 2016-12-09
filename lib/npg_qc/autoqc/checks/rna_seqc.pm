@@ -243,6 +243,7 @@ override 'execute' => sub {
     }
     if (! $can_execute || ! $self->can_run()) {
         my $can_run_message = join q[; ], @comments;
+        $self->result->add_comment($can_run_message);
         $self->result->stop_storing;
         carp qq[RNA-SeQC check should not be executed due to: $can_run_message];
         return 1;

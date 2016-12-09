@@ -12,6 +12,7 @@ has 'store_nomore' => (is   => 'rw',
 sub stop_storing {
     my $self = shift;
     $self->store_nomore(1);
+    return;
 }
 
 1;
@@ -55,7 +56,9 @@ used to avoid serialization.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 no_store
+=head2 stop_storing
+
+Sets value of store_nomore flag to 1
 
 =cut
 

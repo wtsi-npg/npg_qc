@@ -7,7 +7,7 @@ use_ok ('npg_qc::autoqc::results::rna_seqc');
 
 subtest 'Loading check' => sub {
     plan tests => 4;
-    my $r = npg_qc::autoqc::results::rna_seqc->new(id_run => 12, position => 3, path => q[mypath]);
+    my $r = npg_qc::autoqc::results::rna_seqc->new(id_run => 18407, position => 1, tag_index => 7, path => q[mypath]);
     isa_ok ($r, 'npg_qc::autoqc::results::rna_seqc');
     is($r->check_name(), 'rna seqc', 'check name');
     is($r->class_name(), 'rna_seqc', 'class name');

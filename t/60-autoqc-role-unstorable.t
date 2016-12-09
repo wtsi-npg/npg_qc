@@ -24,6 +24,12 @@ package npg_test::autoqc_check;
 use Moose;
 use npg_test::autoqc_result;
 extends 'npg_qc::autoqc::checks::check';
+has 'necessary_condition' => (is => 'ro', isa => 'Str', default => 'met',);
+override 'execute' => sub {
+    my ($self) = @_;
+    $self->necessary_condition eq 'met' ? return 1 : $self->result->stop_storing;
+    return 1;
+};
 no Moose;
 
 
