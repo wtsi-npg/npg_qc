@@ -135,6 +135,21 @@ __PACKAGE__->add_unique_constraint('unq_seq_compos_ps', ['id_seq_composition', '
 
 =head1 RELATIONS
 
+=head2 rna_seqcs
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::RnaSeqc>
+
+=cut
+
+__PACKAGE__->has_many(
+  'rna_seqcs',
+  'npg_qc::Schema::Result::RnaSeqc',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 samtools_stats
 
 Type: has_many
@@ -184,8 +199,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-09 17:35:44
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zzx4SOq+Lh95G58mYLuWWw
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-10-25 14:50:10
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8NLCyZyGS5x1emB/RF7omg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

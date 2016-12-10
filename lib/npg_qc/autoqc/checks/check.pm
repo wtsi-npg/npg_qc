@@ -298,6 +298,9 @@ sub run {
     push @results, @{$self->related_results()};
   }
   foreach my $r (@results) {
+    if ($r->can('store_nomore') && $r->store_nomore){
+      next;
+    }
     $r->store($self->qc_out);
   }
   return 1;
