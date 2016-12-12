@@ -26,9 +26,12 @@ has 'irods' =>
   (is       => 'ro',
    isa      => 'WTSI::NPG::iRODS',
    required => 1,
-   default  => sub {
-       return WTSI::NPG::iRODS->new;
-   },);
+   lazy     => 1,
+   builder  => '_build_irods',);
+
+sub _build_irods {
+  return WTSI::NPG::iRODS->new;
+};
 
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
