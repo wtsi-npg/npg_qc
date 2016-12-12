@@ -61,22 +61,12 @@ __PACKAGE__->table('rna_seqc');
   is_auto_increment: 1
   is_nullable: 0
 
-Auto-generated primary key
-
 =head2 id_seq_composition
 
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
   is_nullable: 0
-
-A foreign key referencing the id_seq_composition column of the seq_composition table
-
-=head2 path
-
-  data_type: 'varchar'
-  is_nullable: 1
-  size: 256
 
 =head2 info
 
@@ -195,8 +185,6 @@ __PACKAGE__->add_columns(
     is_foreign_key => 1,
     is_nullable => 0,
   },
-  'path',
-  { data_type => 'varchar', is_nullable => 1, size => 256 },
   'info',
   { data_type => 'text', is_nullable => 1 },
   'rrna',
@@ -278,8 +266,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2016-12-06 11:41:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T+W05fIQCWmHH4bJUw2MYw
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2016-12-12 11:36:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:t/Y5qHFkstoZgjKVXoIxLw
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 

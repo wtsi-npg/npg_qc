@@ -27,7 +27,7 @@ Readonly::Array my @ATTRIBUTES => qw/ rrna
 
 has [ @ATTRIBUTES ] => (
     is         => 'rw',
-    isa        => 'Maybe[Num]',
+    isa        => 'Num',
     required   => 0,
 );
 
