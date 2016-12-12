@@ -264,6 +264,7 @@ lib/npg_qc/Schema/Result/QXYield.pm
 lib/npg_qc/Schema/Result/RecipeFile.pm
 lib/npg_qc/Schema/Result/RefMatch.pm
 lib/npg_qc/Schema/Result/RefSnpInfo.pm
+lib/npg_qc/Schema/Result/RnaSeqc.pm
 lib/npg_qc/Schema/Result/RunAndPair.pm
 lib/npg_qc/Schema/Result/RunConfig.pm
 lib/npg_qc/Schema/Result/RunGraph.pm
