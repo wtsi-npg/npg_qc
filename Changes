@@ -1,5 +1,24 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - make building the iRODS handle of npg_qc::autoqc::checks::genotype
+   lazy to avoid calling baton until required at runtime
+ - translation from a database composition representation to the
+     npg_tracking::glossary::composition type object
+ - db query for compisition-based tables should include a condition
+     on tag_index if only lanes or plexes are being retrieved
+ - Fix in npg_qc::utils::bam_genotype for rare out of order mpileup failures 
+ - Travis CI build: when building dependencies, us the same
+   branch as the one the pull request is made to.
+ - back to testing with mysql 5.7.13 in travis
+ - drop node 0.12 from node travis matrix
+ - add perl 5.22-shrplib to travis matrix
+ - to reduce uncertainty in ranking close results, increase precision
+   used for ranking contamination results
+ - call_gtck_composite_rpt.pl - supply rpt list to genotype check
+ - Code and tests changes to reduce number of warnings under Perl 5.22.2
+ - sequence mismatch - do not return PDL special values, treat NaN as
+   a bad value and return undefined instead
+
 release 62.5
  - a very concise replacement for NPG_QC pages
  - no templates rna_seqc results - we should not try rendering

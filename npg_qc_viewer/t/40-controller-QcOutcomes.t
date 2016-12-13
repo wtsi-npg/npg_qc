@@ -121,7 +121,7 @@ subtest 'retrieving data via GET and POST' => sub {
     ok($response->is_success, 'success');
     is($response->code, 200, 'response code 200 for ' . _message($request, $rpt));
     is($response->header('Content-type'), 'application/json', 'json content type');
-    is($response->content, '{"lib":{},"seq":{}}', 'response content');
+    is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{}}'), 'response content');
   }
 
   my $values = {id_run => 5, username => 'u1'};
@@ -216,7 +216,7 @@ subtest 'data validation for update requests' => sub {
   like ($response->content, qr/rpt string should not contain \';\'/,
     'multi-component compositions are not allowed');
 
-  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'some'}, '1:4' => {'mqc_outcome' => ''}};
+  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'Undecided'}, '1:4' => {'mqc_outcome' => ''}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
@@ -224,7 +224,7 @@ subtest 'data validation for update requests' => sub {
   like ($response->content, qr/Outcome description is missing for 1:4/,
     'outcome description should be present');
 
-  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'some'}, '1:4' => {'qc_outcome' => ''}};
+  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'Undecided'}, '1:4' => {'qc_outcome' => ''}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
@@ -321,3 +321,4 @@ subtest 'Conditional update of run/lane status in tracking' => sub {
 };
 
 1;
+

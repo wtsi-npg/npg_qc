@@ -5,12 +5,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 37;
+use Test::More tests => 77;
 use Test::Exception;
-use Test::Deep;
 use IO::Scalar;
 use t::util;
-use npg_qc::model::cache_query;
 
 use_ok('npg_qc::model::cache_query');
 
@@ -128,7 +126,26 @@ subtest q[testing no nulls] => sub {
   lives_ok { $model->cache_lane_summary(37) } 'cache lane summary lives';
   my $rows_ref;
   lives_ok { $rows_ref = $model->get_cache_by_id_type_end() } 'get lane summary lives';
-  is_deeply($rows_ref, [{'clusters_pf' => '66598','lane_yield' => '7392','perc_pf_clusters_sd' => '0.00','perc_pf_align_sd' => undef,'clusters_pf_sd' => '0','perc_pf_clusters' => '79.88','align_score' => undef,'perc_pf_align' => undef,'perc_error_rate' => undef,'first_cycle_int_sd' => '0','perc_error_rate_sd' => undef,'clusters_raw_sd' => '0','perc_int_20_cycles_sd' => '0.00','first_cycle_int' => '159','lane' => '1','clusters_raw' => '83372','end' => '1','perc_int_20_cycles' => '99.06','align_score_sd' => undef},{'clusters_pf' => '66598','lane_yield' => '2464','perc_pf_clusters_sd' => '0.00','perc_pf_align_sd' => undef,'clusters_pf_sd' => '0','perc_pf_clusters' => '79.88','align_score' => undef,'perc_pf_align' => undef,'perc_error_rate' => undef,'first_cycle_int_sd' => '0','perc_error_rate_sd' => undef,'clusters_raw_sd' => '0','perc_int_20_cycles_sd' => '0.00','first_cycle_int' => '159','lane' => '2','clusters_raw' => '83372','end' => '1','perc_int_20_cycles' => '99.06','align_score_sd' => undef}] , 'get correct cache summary');
+
+  my $expected = [{'clusters_pf' => '66598','lane_yield' => '7392','perc_pf_clusters_sd' => '0.00','perc_pf_align_sd' => undef,'clusters_pf_sd' => '0','perc_pf_clusters' => '79.88','align_score' => undef,'perc_pf_align' => undef,'perc_error_rate' => undef,'first_cycle_int_sd' => '0','perc_error_rate_sd' => undef,'clusters_raw_sd' => '0','perc_int_20_cycles_sd' => '0','first_cycle_int' => '159','lane' => '1','clusters_raw' => '83372','end' => '1','perc_int_20_cycles' => '99.06','align_score_sd' => undef},{'clusters_pf' => '66598','lane_yield' => '2464','perc_pf_clusters_sd' => '0.00','perc_pf_align_sd' => undef,'clusters_pf_sd' => '0','perc_pf_clusters' => '79.88','align_score' => undef,'perc_pf_align' => undef,'perc_error_rate' => undef,'first_cycle_int_sd' => '0','perc_error_rate_sd' => undef,'clusters_raw_sd' => '0','perc_int_20_cycles_sd' => '0.00','first_cycle_int' => '159','lane' => '2','clusters_raw' => '83372','end' => '1','perc_int_20_cycles' => '99.06','align_score_sd' => undef}];
+
+  my $num_results = 2;
+  is (scalar @{$rows_ref}, $num_results, 'two results returned');
+  my $i = 0;
+  while ($i < $num_results) {
+    my $row  = $rows_ref->[$i];
+    my $erow = $expected->[$i];
+    my @keys = sort keys %{$row};
+    is (join(q[:], @keys), join(q[:], sort keys %{$erow}), 'correct set of fields');
+    # Force comparison as numbers so '0' and '0.00' are considered equal
+    foreach my $key (@keys) {
+      defined $row->{$key} ?
+        ok ( defined $erow->{$key} && ($row->{$key} == $erow->{$key}), $key) :
+        ok (!defined $erow->{$key}, $key);
+    }
+
+    $i++;
+  }
 }
 
 {

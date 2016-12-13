@@ -190,7 +190,25 @@ __PACKAGE__->has_many(
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
+use npg_tracking::glossary::composition::factory;
+
 our $VERSION = '0';
+
+=head2 create_composition
+
+A factory method returning a composition of illumina components. 
+
+=cut
+
+sub create_composition {
+  my $self = shift;
+  my $factory = npg_tracking::glossary::composition::factory->new();
+  my $clinks = $self->seq_component_compositions();
+  while (my $clink = $clinks->next()) {
+    $factory->add_component($clink->seq_component()->create_component());
+  }
+  return $factory->create_composition();
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -242,7 +260,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2016 GRL
 
 This file is part of NPG.
 

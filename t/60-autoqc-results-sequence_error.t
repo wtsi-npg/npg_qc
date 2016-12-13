@@ -29,7 +29,7 @@ subtest 'Testing utility methods' => sub {
   } q(load serialised empty result);
   isa_ok ($r, 'npg_qc::autoqc::results::sequence_error');
   lives_ok { $ape = $r->reverse_average_percent_error; } q(reverse_average_percent_error run);
-  cmp_ok($ape, q(eq), q(nan), q(reverse_average_percent_error value));
+  is ($ape, undef, q(reverse_average_percent_error value is undefined));
 
   lives_ok {
     $r = npg_qc::autoqc::results::sequence_error->load('t/data/autoqc/4068_3.sequence_error.json');

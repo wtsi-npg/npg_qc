@@ -244,7 +244,9 @@ my $extended_requires = {
                 'npg_tracking::data::bait::find'           => 0,
                 'npg_tracking::data::snv::find'            => 0,
                 'npg_tracking::glossary::composition'      => 0,
+                'npg_tracking::glossary::composition::factory' => 0,
                 'npg_tracking::glossary::composition::factory::attributes' => 0,
+                'npg_tracking::glossary::composition::component'           => 0,
                 'npg_tracking::glossary::composition::component::illumina' => 0,
                 'npg_tracking::glossary::rpt'              => 0,
                 'npg_tracking::glossary::run'              => 0,
@@ -259,6 +261,7 @@ my $extended_requires = {
                 'st::api::base'                            => 0,
                 'st::api::lims'                            => 0,
                 'WTSI::DNAP::Warehouse::Schema'            => 0,
+                'WTSI::NPG::iRODS'                         => 0,
 };
 
 my $build_requires = {

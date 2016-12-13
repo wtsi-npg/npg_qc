@@ -49,11 +49,11 @@ subtype 'LaneNumber'
 
 subtype 'Executable'
       => as Str
-      => where { -x $_ };
+      => where { -x };
 
 subtype 'ReadableFile'
       => as Str
-      => where { -r $_ };
+      => where { -r };
 
 subtype 'SampleSize4Aligning'
       => as Int

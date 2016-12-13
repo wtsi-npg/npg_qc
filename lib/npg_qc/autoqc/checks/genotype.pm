@@ -9,10 +9,11 @@ use List::MoreUtils qw { any };
 use File::Slurp;
 use JSON;
 use npg_qc::utils::bam_genotype;
-use npg_qc::utils::iRODS;
 use npg_qc::autoqc::types;
 use Readonly;
 use FindBin qw($Bin);
+use Try::Tiny;
+use WTSI::NPG::iRODS::DataObject;
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find
@@ -20,6 +21,17 @@ with qw(npg_tracking::data::reference::find
        );
 
 our $VERSION = '0';
+
+has 'irods' =>
+  (is       => 'ro',
+   isa      => 'WTSI::NPG::iRODS',
+   required => 1,
+   lazy     => 1,
+   builder  => '_build_irods',);
+
+sub _build_irods {
+  return WTSI::NPG::iRODS->new;
+};
 
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
@@ -331,40 +343,44 @@ has 'input_files_md5' => (
 	lazy_build => 1,
 );
 sub _build_input_files_md5 {
-	my ($self) = @_;
-	my $md5 = q{};
-	Readonly::Scalar my $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH => 6;
+    my ($self) = @_;
+    my $md5;
+    Readonly::Scalar my $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH => 6;
 
-	my @md5_vals = ();
-	for my $input_file (@{$self->input_files}) {
-		if($input_file =~ /^irods:/smx) {
-			my $irods_filename = substr $input_file, $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH;  # strip leading "irods:"
+    my @md5_vals = ();
+    for my $input_file (@{$self->input_files}) {
+        $md5 = q{};
+        if ($input_file =~ /^irods:/smx) {
+            my $irods_filename = substr $input_file, $IRODS_PREFIX_LEN_IS_THIS_READABLE_ENOUGH;  # strip leading "irods:"
+            try {
+                my $data_obj = WTSI::NPG::iRODS::DataObject->new(
+                    $self->irods, $irods_filename
+                );
+                $md5 = $data_obj->checksum;
+            } catch {
+                my $msg = 'Unable to find md5 checksum for '.
+                    "iRODS file '$irods_filename': $_";
+                carp($msg);
+                $md5 = '0000000000000000';
+            }
+        } else {
+            my $md5_file = "${input_file}.md5";
+            if(-r $md5_file) {
+                open my $f, '<', $md5_file or croak "$md5_file readable, but open fails";
+                $md5 = <$f>;
+                chomp $md5;
+                close $f or croak "Failed to close $md5_file";
+            }
+            if (! $md5) {
+                my $msg = "Unable to read md5 checksum from file '$md5_file'";
+                carp($msg);
+                $md5 = '0000000000000000';
+            }
+        }
+        push @md5_vals, $md5;
+    }
 
-			$md5 = npg_qc::utils::iRODS->new->get_file_md5($irods_filename);
-
-			$md5 ||= '0000000000000000';
-
-			push @md5_vals, $md5;
-		}
-		else {
-			my $md5_file = "${input_file}.md5";
-
-			$md5 = q{};
-			if(-r $md5_file) {
-				open my $f, '<', $md5_file or croak "$md5_file readable, but open fails";
-
-				$md5 = <$f>;
-
-				close $f or croak "Failed to close $md5_file";
-
-			}
-			$md5 ||= '0000000000000000';
-			push @md5_vals, $md5;
-		}
-
-	}
-
-	return join q[;], @md5_vals;
+    return join q[;], @md5_vals;
 }
 
 #####################################################################################################################
