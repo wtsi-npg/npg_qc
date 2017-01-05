@@ -55,9 +55,19 @@ has '+aligner' => (default => 'fasta',
                    is => 'ro',
                    writer => '_set_aligner',);
 
-has 'qc_report_dir' => (is       => 'ro',
-                        isa      => 'NpgTrackingDirectory',
-                        required => 1,);
+has 'output_dir' => (is       => 'ro',
+                     isa      => 'Str',
+                     required => 0,
+                     lazy     => 1,
+                     builder  => '_build_output_dir',);
+
+sub _build_output_dir {
+    my ($self) = @_;
+    my $rpt_dir;
+    my $qc_out_path = $self->qc_out;
+    my $output_dir = File::Spec->catdir($qc_out_path, $self->result->filename_root . q[_rna_seqc]);
+    return $output_dir;
+}
 
 has '_java_jar_path' => (is       => 'ro',
                          isa      => 'NpgCommonResolvedPathJarFile',
@@ -69,11 +79,12 @@ has '_ttype_gtf_column' => (is      => 'ro',
                             isa     => 'Int',
                             default => 2,);
 
-has '_alignments_in_bam' => (is         => 'ro',
-                             isa        => 'Maybe[Bool]',
-                             lazy_build => 1,);
+has '_alignments_in_bam' => (is      => 'ro',
+                             isa     => 'Bool',
+                             lazy    => 1,
+                             builder => '_build_alignments_in_bam',);
 
-sub _build__alignments_in_bam {
+sub _build_alignments_in_bam {
     my $self = shift;
     my $aligned = 0;
     my $command = $self->samtools_irods_cmd . ' view -H ' . $self->_bam_file . ' |';
@@ -87,11 +98,12 @@ sub _build__alignments_in_bam {
     return $aligned;
 }
 
-has '_is_paired_end' => (is         => 'ro',
-                         isa        => 'Maybe[Bool]',
-                         lazy_build => 1,);
+has '_is_paired_end' => (is      => 'ro',
+                         isa     => 'Bool',
+                         lazy    => 1,
+                         builder => '_build_is_paired_end',);
 
-sub _build__is_paired_end {
+sub _build_is_paired_end {
     my ($self) = @_;
     my $paired = 0;
     my $flag;
@@ -114,11 +126,12 @@ sub _build__is_paired_end {
     return $paired;
 }
 
-has '_is_rna_alignment' => (is         => 'ro',
-                            isa        => 'Maybe[Bool]',
-                            lazy_build => 1,);
+has '_is_rna_alignment' => (is      => 'ro',
+                            isa     => 'Bool',
+                            lazy    => 1,
+                            builder => '_build_is_rna_alignment',);
 
-sub _build__is_rna_alignment {
+sub _build_is_rna_alignment {
     my ($self) = @_;
     my $rna_alignment = 0;
     my $command = $self->samtools_irods_cmd . ' view -H ' . $self->_bam_file . ' |';
@@ -133,12 +146,13 @@ sub _build__is_rna_alignment {
 
 }
 
-has '_input_str' => (is         => 'ro',
-                     isa        => 'Str',
-                     lazy_build => 1,
-                     init_arg   => undef,);
+has '_input_str' => (is       => 'ro',
+                     isa      => 'Str',
+                     lazy     => 1,
+                     builder  => '_build_input_str',
+                     init_arg => undef,);
 
-sub _build__input_str {
+sub _build_input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
     my $library_name = $self->lims->library_name // $sample_id;
@@ -147,40 +161,47 @@ sub _build__input_str {
     return qq["$library_names[0]|$input_file|$sample_id"];
 }
 
-has '_ref_genome' => (is         => 'ro',
-                      isa        => 'Maybe[Str]',
-                      lazy_build => 1,);
+has '_ref_genome' => (is       => 'ro',
+                      isa      => 'Str',
+                      required => 0,
+                      lazy     => 1,
+                      builder  => '_build_ref_genome',);
 
-sub _build__ref_genome {
+sub _build_ref_genome {
     my ($self) = @_;
     my $reference_fasta = $self->refs->[0] // q[];
     return $reference_fasta;
 }
 
-has '_bam_file' => (is         => 'ro',
-                    isa        => 'NpgTrackingReadableFile',
-                    lazy_build => 1,);
+has '_bam_file' => (is      => 'ro',
+                    isa     => 'NpgTrackingReadableFile',
+                    lazy    => 1,
+                    builder => '_build_bam_file',);
 
-sub _build__bam_file {
+sub _build_bam_file {
     my $self = shift;
     return $self->input_files->[0];
 }
 
-has '_annotation_gtf' => (is         => 'ro',
-                          isa        => 'Maybe[Str]',
-                          lazy_build => 1,);
+has '_annotation_gtf' => (is       => 'ro',
+                          isa      => 'Str',
+                          required => 0,
+                          lazy     => 1,
+                          builder  => '_build_annotation_gtf',);
 
-sub _build__annotation_gtf {
+sub _build_annotation_gtf {
     my $self = shift;
     my $trans_gtf = $self->rnaseqc_gtf_file // q[];
     return $trans_gtf;
 }
 
-has '_ref_rrna' => (is         => 'ro',
-                    isa        => 'Maybe[Str]',
-                    lazy_build => 1,);
+has '_ref_rrna' => (is       => 'ro',
+                    isa      => 'Str',
+                    required => 0,
+                    lazy     => 1,
+                    builder  => '_build_ref_rrna',);
 
-sub _build__ref_rrna {
+sub _build_ref_rrna {
     my $self = shift;
     my ($organism, $strain, $transcriptome) = $self->parse_reference_genome($self->lims->reference_genome);
     $self->_set_aligner($RRNA_ALIGNER);
@@ -203,7 +224,7 @@ sub _command {
     my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
                                            $self->_java_jar_path,
                                            $self->_input_str,
-                                           $self->qc_report_dir,
+                                           $self->output_dir,
                                            $self->_ref_genome,
                                            $self->_annotation_gtf,
                                            $self->_ttype_gtf_column,
@@ -260,9 +281,9 @@ override 'execute' => sub {
 
 sub _parse_metrics {
     my ($self) = @_;
-    my $filename = File::Spec->catfile($self->qc_report_dir, $METRICS_FILE_NAME);
+    my $filename = File::Spec->catfile($self->output_dir, $METRICS_FILE_NAME);
     if (! -e $filename) {
-        croak q[Metrics file is not available, cannot parse RNA-SeQC metrics];
+        croak qq[No such file $filename: cannot parse RNA-SeQC metrics];
     }
     my $fh = IO::File->new($filename, 'r');
     my @lines;
@@ -292,8 +313,8 @@ sub _save_results {
         my $value = $results->{$key};
         if (defined $value) {
             my $attr_name = $RNASEQC_METRICS_FIELDS_MAPPING{$key};
-            if ($value eq q[?]) {
-                carp qq[Field $attr_name is set to '?', skipping...];
+            if ($value eq q[NaN]) {
+                carp qq[Value of $attr_name is 'NaN', skipping...];
             } else {
                 $self->result->$attr_name($value);
             }
@@ -301,6 +322,7 @@ sub _save_results {
         delete $results->{$key};
     }
     $self->result->other_metrics($results);
+    $self->result->output_dir($self->output_dir);
     return;
 }
 __PACKAGE__->meta->make_immutable();

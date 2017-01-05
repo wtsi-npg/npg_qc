@@ -28,13 +28,16 @@ Readonly::Array my @ATTRIBUTES => qw/ rrna
 has [ @ATTRIBUTES ] => (
     is         => 'rw',
     isa        => 'Num',
-    required   => 0,
-);
+    required   => 0,);
 
 has 'other_metrics'  => (isa        => 'HashRef[Str]',
                          is         => 'rw',
                          default => sub { {} },
                          required   => 0,);
+
+has 'output_dir' => (is       => 'rw',
+                     isa      => 'Str',
+                     required => 0,);
 
 __PACKAGE__->meta->make_immutable;
 
