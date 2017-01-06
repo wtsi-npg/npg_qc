@@ -63,7 +63,6 @@ has 'output_dir' => (is       => 'ro',
 
 sub _build_output_dir {
     my ($self) = @_;
-    my $rpt_dir;
     my $qc_out_path = $self->qc_out;
     my $output_dir = File::Spec->catdir($qc_out_path, $self->result->filename_root . q[_rna_seqc]);
     return $output_dir;
