@@ -61,12 +61,12 @@
              run_folder_glob = rfglob _ rfname;
            END;
          END;
-         run_position_dir = check.id_run _ '_' _ check.position;
-         rna_seqc_report_dir = run_position_dir;
+         rna_seqc_output_dir = check.id_run _ '_' _ check.position;
          IF check.tag_index.defined;
-           rna_seqc_report_dir = run_position_dir _ '/' _ run_position_dir _ '%23' _ check.tag_index;
-         END %]
-         <p>Other RNA-SeQC <a href="[% base %]/[% run_folder_glob %]/Latest_Summary/archive/qc/rna_seqc/[% rna_seqc_report_dir | url %]?redir">metrics</a>.</p>
+           rna_seqc_output_dir = rna_seqc_output_dir _ '%23' _ check.tag_index;
+         END;
+         rna_seqc_output_dir = rna_seqc_output_dir _ '_rna_seqc' %]
+         <p>Other RNA-SeQC <a href="[% base %]/[% run_folder_glob %]/Latest_Summary/archive/lane[% check.position %]/qc/[% rna_seqc_output_dir | url %]?redir">metrics</a>.</p>
 [%     END; 
      END %]
      </div>
