@@ -61,12 +61,16 @@ __PACKAGE__->table('rna_seqc');
   is_auto_increment: 1
   is_nullable: 0
 
+Auto-generated primary key
+
 =head2 id_seq_composition
 
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
   is_nullable: 0
+
+A foreign key referencing the id_seq_composition column of the seq_composition table
 
 =head2 info
 
@@ -233,6 +237,20 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_rna_seqc');
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<rna_seqc_id_compos_unq>
+
+=over 4
+
+=item * L</id_seq_composition>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint('rna_seqc_id_compos_unq', ['id_seq_composition']);
+
 =head1 RELATIONS
 
 =head2 seq_composition
@@ -266,8 +284,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2016-12-12 11:36:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:t/Y5qHFkstoZgjKVXoIxLw
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-01-19 11:15:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2mZZ7aTIqW6xAZ63EQaX1g
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
