@@ -1,14 +1,15 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - remove attribute qc_report_dir from check object: the output directory
+   is created by default using the sample's filename root
  - upgrade_schema-60.x to create rna_seqc table has been included.
- - npg_qc::autoqc::qc_store - load rna_seqc results into npg_qc db
-   (requires rna_seqc table exists in database).
- - Updated data/schema.txt including definition for rna_seqc table.
+ - npg_qc::autoqc::qc_store - load rna_seqc results into npg_qc db:
+   requires rna_seqc table exists in database.
+ - updated data/schema.txt including definition for rna_seqc table.
  - SeQC:
-   - Added template for rna_seqc check with selected metrics shown
+   - added template for rna_seqc check with selected metrics shown
      in summary
-   - Include a link to original RNA-SeQC report only visible 
-     when db_lookup=0.
+   - include a link to original RNA-SeQC report in check's template
  - translation from a database composition representation to the
      npg_tracking::glossary::composition type object
  - db query for compisition-based tables should include a condition

@@ -31,7 +31,7 @@ subtest 'Find CLASSPATH' => sub {
     isa_ok ($rnaseqc, 'npg_qc::autoqc::checks::rna_seqc');
     lives_ok { $rnaseqc->result; } 'result object created';
     local $ENV{CLASSPATH} = q[];
-    throws_ok {npg_qc::autoqc::checks::rna_seqc->new(id_run => 2, path => q[mypath], position => 1, qc_report_dir => q[t/data])}
+    throws_ok {npg_qc::autoqc::checks::rna_seqc->new(id_run => 2, path => q[mypath], position => 1,)}
         qr/Can\'t find \'RNA-SeQC\.jar\' because CLASSPATH is not set/,
         q[Fails to create object when RNA-SeQC.jar not found];
 };
