@@ -3,6 +3,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - current staging directories do not have autoqc results in
    bustard_path; stop looking there
  - ClearPress Perl library is pinned to v. 473.0.5
+ - upstream_tags autoqc check: stop falling back on files in IRODs
 
 release 62.6
  - make building the iRODS handle of npg_qc::autoqc::checks::genotype
