@@ -83,7 +83,10 @@ has 'lane_path'  => ( isa        => 'Str',
                     );
 sub _build_lane_path {
   my $self = shift;
-  return sprintf q[%s/lane%d/], $self->qc_in, $self->position;
+  my $lp_root = $self->qc_in;
+  # If in the archive directory, look one level up
+  $lp_root =~ s{/archive$}{}smx;
+  return sprintf q[%s/lane%d/], $lp_root, $self->position;
 }
 
 #########################################################################################
