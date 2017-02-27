@@ -84,6 +84,7 @@ has 'lane_path'  => ( isa        => 'Str',
 sub _build_lane_path {
   my $self = shift;
   my $lp_root = $self->qc_in;
+  # If in the archive directory, look one level up
   $lp_root =~ s{/archive$}{}smx;
   return sprintf q[%s/lane%d/], $lp_root, $self->position;
 }
@@ -120,32 +121,16 @@ sub _build_tag_sets_repository {
 
 ##############################################################################
 # tag0_bam_file (input data)
-#  type should be something like 'NpgTrackingReadableFile', but that currently
-#   doesn't cope with iRODS paths
+#  type should be something like 'NpgTrackingReadableFile'
 ##############################################################################
 has 'tag0_bam_file'  => ( isa        => 'Str',
                           is         => 'ro',
-                          lazy_build  => 1,
+                          lazy_build => 1,
                         );
 sub _build_tag0_bam_file {
   my $self = shift;
-
-  my $lane_path = $self->lane_path;
-  ## no critic qw(ControlStructures::ProhibitUnlessBlocks)
-  unless($lane_path =~ m{/$}smx) {
-    $lane_path .= q[/];
-  }
-  ## use critic
   my $basefilename = sprintf q[%s_%s#0.bam], $self->id_run, $self->position;
-
-  my $file = $lane_path . $basefilename;
-
-  if(! -f $file) {
-    carp q[Looking in irods for bam file];
-    $file = sprintf q[irods:/seq/%s/%s], $self->id_run, $basefilename;
-  }
-
-  return $file;
+  return $self->lane_path . $basefilename;
 }
 
 ###############################################################
