@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 62.7
  - current staging directories do not have autoqc results in
    bustard_path; stop looking there
  - ClearPress Perl library is pinned to v. 473.0.5
