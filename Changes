@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - specify an appropriate "accept" header when sending manual qc
+   outcomes to LIMs (header was not set resulting in 406 responce
+   code)
+
 release 62.7
  - current staging directories do not have autoqc results in
    bustard_path; stop looking there
