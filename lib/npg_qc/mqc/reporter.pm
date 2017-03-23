@@ -18,6 +18,7 @@ with 'MooseX::Getopt';
 our $VERSION = '0';
 
 Readonly::Scalar my $HTTP_TIMEOUT => 60;
+Readonly::Scalar my $CONTENT_TYPE => 'text/xml';
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -180,7 +181,8 @@ sub _report {
   my ($self, $payload, $url) = @_;
 
   my $req = HTTP::Request->new(POST => $url);
-  $req->header('content-type' => 'text/xml');
+  $req->header('content-type' => $CONTENT_TYPE);
+  $req->header('accept'       => $CONTENT_TYPE);
   $req->content($payload);
   if ($self->verbose) {
     $self->_log(qq(Sending $payload to $url));
