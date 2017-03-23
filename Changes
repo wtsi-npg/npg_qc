@@ -1,6 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+
  - Sort results for merged genotypes aswell - to avoid out of order failure.
+ - specify an appropriate "accept" header when sending manual qc
+   outcomes to LIMs (header was not set resulting in 406 responce
+   code)
 
 release 62.7
  - current staging directories do not have autoqc results in
