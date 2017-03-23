@@ -936,7 +936,6 @@ t/perlcriticrc
 t/util.pm
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140601_HS2_13108_A_C37W5ACXX/InterOp/TileMetricsOut.bin
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX/InterOp/TileMetricsOut.bin
-t/data/fixtures/npg_tracking/000-cost_group.yml
 t/data/fixtures/npg_tracking/000-designation.yml
 t/data/fixtures/npg_tracking/000-entity_type.yml
 t/data/fixtures/npg_tracking/000-ext_service.yml
@@ -948,7 +947,6 @@ t/data/fixtures/npg_tracking/000-tag.yml
 t/data/fixtures/npg_tracking/000-usergroup.yml
 t/data/fixtures/npg_tracking/000-user.yml
 t/data/fixtures/npg_tracking/100-annotation.yml
-t/data/fixtures/npg_tracking/100-cost_code.yml
 t/data/fixtures/npg_tracking/100-event_type.yml
 t/data/fixtures/npg_tracking/100-instrument_format.yml
 t/data/fixtures/npg_tracking/100-tag_frequency.yml
