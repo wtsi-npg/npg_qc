@@ -283,9 +283,7 @@ my $build_requires = {
 my $requires = {
                 'base'                            => '2.12',
                 'Carp'                            => '1.04',
-                'ClearPress::model'               => '0',
-                'ClearPress::view'                => '0',
-                'ClearPress::view::error'         => '0',
+                'ClearPress'                      => '== 473.0.5',
                 'Data::Dumper'                    => '2.121_08',
                 'DateTime'                        => '0.5',
                 'Digest::SHA1'                    => '0.0',

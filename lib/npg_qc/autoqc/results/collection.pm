@@ -248,7 +248,6 @@ sub load_from_staging {
 
 
     if ( $query->option == $LANES || $query->option == $ALL ) {
-        $self->add_from_dir($finder->bustard_path, $query->positions, $query->id_run);
         $self->add_from_dir($finder->qc_path, $query->positions, $query->id_run);
     }
 

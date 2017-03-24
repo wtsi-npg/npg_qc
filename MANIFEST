@@ -538,6 +538,9 @@ t/data/autoqc/dbix_loader/run/lane/12233_1#72.sequence_error.json
 t/data/autoqc/dbix_loader/run/12166_2.spatial_filter.json
 t/data/autoqc/dbix_loader/run/11180_1.tags_reporters.json
 t/data/autoqc/upstream_tags/9669_1.upstream_tags.json
+t/data/autoqc/upstream_tags/lane1/12920_1#0.bam
+t/data/autoqc/upstream_tags/lane1/13362_1#0.bam
+t/data/autoqc/upstream_tags/lane1/6954_1#0.bam
 t/data/autoqc/090721_IL29_2549/Config/TileLayout.xml
 t/data/autoqc/090721_IL29_2549/data/2549_1_1#33.fastqcheck
 t/data/autoqc/090721_IL29_2549/data/2549_1_1.fastqcheck
@@ -933,7 +936,6 @@ t/perlcriticrc
 t/util.pm
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140601_HS2_13108_A_C37W5ACXX/InterOp/TileMetricsOut.bin
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX/InterOp/TileMetricsOut.bin
-t/data/fixtures/npg_tracking/000-cost_group.yml
 t/data/fixtures/npg_tracking/000-designation.yml
 t/data/fixtures/npg_tracking/000-entity_type.yml
 t/data/fixtures/npg_tracking/000-ext_service.yml
@@ -945,7 +947,6 @@ t/data/fixtures/npg_tracking/000-tag.yml
 t/data/fixtures/npg_tracking/000-usergroup.yml
 t/data/fixtures/npg_tracking/000-user.yml
 t/data/fixtures/npg_tracking/100-annotation.yml
-t/data/fixtures/npg_tracking/100-cost_code.yml
 t/data/fixtures/npg_tracking/100-event_type.yml
 t/data/fixtures/npg_tracking/100-instrument_format.yml
 t/data/fixtures/npg_tracking/100-tag_frequency.yml
