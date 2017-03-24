@@ -21,13 +21,7 @@ our $VERSION = '59.8';
 ### revisit these no critics later (kl2 8/11/16)
 
 ## no critic (Subroutines::ProhibitExcessComplexity)
-## no critic (BuiltinFunctions::ProhibitStringySplit)
 ## no critic (CodeLayout::ProhibitParensWithBuiltins)
-## no critic (ControlStructures::ProhibitCStyleForLoops)
-## no critic (ValuesAndExpressions::ProhibitInterpolationOfLiterals)
-## no critic (ValuesAndExpressions::ProhibitNoisyQuotes)
-## no critic (ControlStructures::ProhibitPostfixControls)
-## no critic (ValuesAndExpressions::ProhibitEmptyQuotes)
 #######
 
 ## no critic (RegularExpressions::ProhibitUnusedCapture RegularExpressions::RequireLineBoundaryMatching RegularExpressions::ProhibitEnumeratedClasses RegularExpressions::RequireDotMatchAnything RegularExpressions::RequireExtendedFormatting)
@@ -59,8 +53,13 @@ sub usage {
   print STDERR "          split tag sequence into parts with the specified langths and look for matches to each part separately, default do not split tag\n";
   print STDERR "          parts are removed in turn, if a value is -ve the next part is taken from the end otherwise it is taken from the beginning\n";
   print STDERR "\n";
-  print STDERR "        --clip\n";
+  print STDERR "        --revcomp <int>,<int>,.. \n";
+  print STDERR "          reverse complement tag sequence before looking for matches, default do not reverse complement\n";
+  print STDERR "          each part of the tag sequence is reverse complemented independently, int=0(do not revcomp) otherwise revcomp\n";
+  print STDERR "\n";
+  print STDERR "        --clip <int>,<int>,.. \n";
   print STDERR "          clip expected_sequence to the length of the tag sequence when looking for matches, default no clipping\n";
+  print STDERR "          each part of tag sequence clipped independently, clip<0 left clip, clip=0 no clip and clip>0 right clip\n";
   print STDERR "\n";
   print STDERR "        --groups <int>,<int>,..\n";
   print STDERR "          restrict matches to a comma separated set of tag groups, default look for matches in all tag groups\n";
@@ -108,7 +107,7 @@ sub showTags{
 
     my $ra_topTags = shift;
     my $sampleSize = shift;
-    my $clip = shift;
+    my $clips = shift;
     my $groups = shift;
     my %tagsFound = @_;
     my $unassigned = $sampleSize;
@@ -119,7 +118,7 @@ sub showTags{
       croak q[Can't load module npg_warehouse::Schema];
     }
 
-    my $tag_group_internal_id = ($groups ? [split(",",$groups)] : undef);
+    my $tag_group_internal_id = ($groups ? [split(/[,]/, $groups)] : undef);
 
     my $s = npg_warehouse::Schema->connect();
 
@@ -127,12 +126,16 @@ sub showTags{
     my @groups = ();
     my %names = ();
     foreach my $tag (@{$ra_topTags}) {
-        my @subtags = split(":", $tag);
-        for (my $i=0; $i<=$#subtags; $i++) {
+        my @subtags = split(/[:]/, $tag);
+        foreach my $i (0..$#subtags) {
             my $subtag = $subtags[$i];
             my $expected_sequence = $subtag;
-            if ($clip) {
-                $expected_sequence = {like => "$subtag%"};
+            if ($clips->[$i]) {
+                if ($clips->[$i] < 0 ) {
+                    $expected_sequence = {like => "%$subtag"};
+                } elsif ($clips->[$i]) {
+                    $expected_sequence = {like => "$subtag%"};
+                }
             }
             my $rs;
             if (defined($tag_group_internal_id)) {
@@ -156,8 +159,8 @@ sub showTags{
     }
     foreach my $tag (@{$ra_topTags}) {
         printf "%s = %5.2f\t\t", $tag, (100 * $tagsFound{$tag}/$sampleSize);
-        my @subtags = split(":", $tag);
-        for (my $i=0; $i<=$#subtags; $i++) {
+        my @subtags = split(/[:]/, $tag);
+        foreach my $i (0..$#subtags) {
             my $subtag = $subtags[$i];
             foreach my $id (sort {$a<=>$b} keys %{$groups[$i]}) {
                 if ( exists($matches{$subtag}->{$id}) ){
@@ -166,7 +169,9 @@ sub showTags{
                     printf q[        ];
                 }
             }
-            print "\t:\t" if $i < $#subtags;
+            if ( $i < $#subtags ){
+                print "\t:\t";
+            }
         }
         print "\n";
     }
@@ -198,11 +203,18 @@ sub main{
     my $clip = $opts->{clip};
     my $groups = $opts->{groups};
 
-    my @tagLengths = $tagLength ? split(",",$tagLength) : ();
-    my @revcomps = $revcomp ? split(",",$revcomp) : ();
+    my @tagLengths = $tagLength ? split(/[,]/,$tagLength) : ();
 
+    my @revcomps = $revcomp ? split(/[,]/,$revcomp) : ();
     if  (@tagLengths && @revcomps && ($#tagLengths != $#revcomps)) {
         print {*STDERR} "\nif you specify a list for both tag_length and revcomp they must be the same length\n" or croak 'print failed';
+        usage;
+        exit 1;
+    }
+
+    my @clips = $clip ? split(/[,]/,$clip) : ();
+    if  (@tagLengths && @clips && ($#tagLengths != $#clips)) {
+        print {*STDERR} "\nif you specify a list for both tag_length and clip they must be the same length\n" or croak 'print failed';
         usage;
         exit 1;
     }
@@ -213,10 +225,9 @@ sub main{
     while (<>) {
         if (/((BC:)|(RT:))Z:([A-Z]*)/) {
             my $tag = $4;
-##### TESTING ####
             if (@tagLengths) {
                 my @subtags = ();
-                for(my $i=0; $i<=$#tagLengths; $i++) {
+                foreach my $i (0..$#tagLengths) {
                     my $subtag;
                     if ($tagLengths[$i] < 0) {
                         $subtag = substr $tag, $tagLengths[$i];
@@ -231,9 +242,8 @@ sub main{
                     }
                     push(@subtags, $subtag);
                 }
-                $tag = join(":",@subtags);
+                $tag = join(q{:},@subtags);
             }
-#### TESTING ####
             $tagsFound++;
             $tagsFound{$tag}++;
         }
@@ -247,7 +257,7 @@ sub main{
     }
 
     my @modeTags = selectModeTags($relativeMaxDrop, $absoluteMaxDrop, $degeneratingToleration, %tagsFound);
-    showTags(\@modeTags, $sampleSize, $clip, $groups, %tagsFound);
+    showTags(\@modeTags, $sampleSize, \@clips, $groups, %tagsFound);
     return;
 }
 
@@ -255,7 +265,7 @@ sub initialise {
 
 ## no critic (InputOutput::ProhibitInteractiveTest InputOutput::RequireCheckedSyscalls ValuesAndExpressions::RequireNumberSeparators)
 
-    my %options = (sample_size => 10000, relative_max_drop => 10, absolute_max_drop => 10, degenerate_toleration => 0, tag_length => "", revcomp => "", clip => 0, groups => "");
+    my %options = (sample_size => 10000, relative_max_drop => 10, absolute_max_drop => 10, degenerate_toleration => 0, tag_length => q{}, revcomp => q{}, clip => q{}, groups => q{});
 
     my $rc = GetOptions(\%options,
                         'help',
@@ -265,7 +275,7 @@ sub initialise {
                         'degenerate_toleration',
                         'tag_length=s',
                         'revcomp=s',
-                        'clip',
+                        'clip=s',
                         'groups=s',
                         );
     if ( ! $rc) {
