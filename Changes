@@ -1,8 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-
+release 62.8
  - tag_sniff modified clip and revcomp options to handle split tags
- - Sort results for merged genotypes aswell - to avoid out of order failure.
+ - Sort results for merged genotypes as well - to avoid out of order failure.
  - specify an appropriate "accept" header when sending manual qc
    outcomes to LIMs (header was not set resulting in 406 responce
    code)
