@@ -35,7 +35,8 @@ sub search_autoqc {
     if (exists $values->{$ti_key} && ($rsource->name() eq 'spatial_filter')) {
       delete $values->{$ti_key};
     }
-    $self->deflate_unique_key_components($values, 1);
+    my $only_existing = 1;
+    $self->deflate_unique_key_components($values, $only_existing);
   }
   my $rs = $self->search_rs($values, $how);
   return $rs;

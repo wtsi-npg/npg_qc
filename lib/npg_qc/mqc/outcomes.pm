@@ -183,7 +183,8 @@ sub _find_or_create_outcome {
   if (!$result) {
     # Create result object in memory.
     # Foreign key constraints are not checked at this point.
-    $result=$rs->new_result($q)->set_inflated_columns($q);
+    $rs->deflate_unique_key_components($q); # Changes $q object
+    $result=$rs->new_result($q);
   } else { # Existing database record is found.
     if ($rs_found->next) {
       croak q[Multiple qc outcomes where one is expected];
