@@ -13,17 +13,18 @@ sub search_autoqc {
   my ($self, $query, $size) = @_;
 
   my $how = {'cache' => 1};
-  # Remap the query so that we do not change the input data,
-  # thus allowing the caller to reuse the variable.
+  # Copy the query so that we do not change the input data,
+  # thus allowing the caller to reuse the variable representing
+  # the query.
   my %local_values = %{$query};
   my $values = \%local_values;
   my $rsource = $self->result_source();
   if ($rsource->has_relationship('seq_component_compositions')) {
     foreach my $col_name  (keys %{$values}) {
-      if (!$rsource->has_column($col_name)) {
-        $values->{'seq_component.' . $col_name} = $values->{$col_name};
-        delete $values->{$col_name};
-      }
+      my $new_key = join q[.],
+        $rsource->has_column($col_name) ? 'me' : 'seq_component', $col_name;
+      $values->{$new_key} = $values->{$col_name};
+      delete $values->{$col_name};
     }
     if ($size) {
       $values->{'seq_component_compositions.size'} = $size;
