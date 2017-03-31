@@ -3,6 +3,19 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - composition-based autoqc results db search via DBIx: allow for
    a search query that contains fields from the main table
 
+release 62.8
+ - tag_sniff modified clip and revcomp options to handle split tags
+ - Sort results for merged genotypes as well - to avoid out of order failure.
+ - specify an appropriate "accept" header when sending manual qc
+   outcomes to LIMs (header was not set resulting in 406 responce
+   code)
+
+release 62.7
+ - current staging directories do not have autoqc results in
+   bustard_path; stop looking there
+ - ClearPress Perl library is pinned to v. 473.0.5
+ - upstream_tags autoqc check: stop falling back on files in IRODs
+
 release 62.6
  - make building the iRODS handle of npg_qc::autoqc::checks::genotype
    lazy to avoid calling baton until required at runtime
