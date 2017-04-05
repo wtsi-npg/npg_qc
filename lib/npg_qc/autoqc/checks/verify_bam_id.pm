@@ -63,13 +63,6 @@ override 'can_run' => sub {
     return 0;
   }
 
-  # we want to run iff there is a VCF file for this organism/strain/bait
-
-  if (!$self->snv_file) {
-    $self->result->add_comment(q(Can't find VCF file));
-    return 0;
-  }
-
   if (!$self->lims->sample_name) { # sample_name() only returns non empty value iff there is a single sample_name
     $self->result->add_comment(q(Can only run on single sample));
     return 0;
@@ -80,6 +73,11 @@ override 'can_run' => sub {
 
 override 'execute' => sub {
   my ($self) = @_;
+
+  if (!$self->snv_file) {
+    croak q(Can't find snv file);
+  }
+
   my $outfile = $self->tmp_path . q(/) . basename($self->bam_file);
 
   my $cmd_options =

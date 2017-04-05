@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Cwd;
 use File::Temp qw/ tempdir /;
-use Test::More tests => 50;
+use Test::More tests => 49;
 use Test::Exception;
 
 my $repos = cwd . '/t/data/autoqc';
@@ -101,7 +101,8 @@ my $dir = tempdir(CLEANUP => 1);
   is($r->lims->library_type, 'Standard', 'Standard library type returned OK');
   is($r->alignments_in_bam, 1, 'Alignments in bam');
   is($r->snv_path, undef, 'snv path is not set');
-  is($r->can_run, 0, 'Not done if library_type is Standard and bam file is aligned BUT there is no VCF file');
+  throws_ok {$r->execute()} qr/Can't find snv file/,
+    'Not done if library_type is Standard and bam file is aligned BUT there is no VCF file';
 }
 
 {
@@ -117,7 +118,6 @@ my $dir = tempdir(CLEANUP => 1);
   is($r->lims->reference_genome, 'Anopheles_gambiae (PEST)' , 'Has a reference genome');    
   my $snv_path = join '/', cwd, 't/data/autoqc/population_snv_with_vcf/Anopheles_gambiae/default/Standard/PEST';
   is($r->snv_path, $snv_path, 'snv path is set correctly');
-  is($r->can_run, 1, 'Done if library_type is Standard and bam file is aligned and there is a VCF file');
 }
 
 {

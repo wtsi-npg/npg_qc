@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Cwd qw/getcwd abs_path/;
-use Test::More tests => 17;
+use Test::More tests => 16;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 
@@ -112,8 +112,8 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
         qc_report_dir => q[t/data],
         _annotation_gtf => q[],
         ref_repository => $ref_repos_dir,);
-    lives_ok { $check->execute } 'execution ok for no annotation file';
-    like ($check->result->comments, qr/No GTF annotation available/, 'comment when annotation file is not available');
+    throws_ok { $check->execute } qr/No GTF annotation available/,
+      'error in execution for no annotation file';
 
     open $fh,  q[>], $si;
     print $fh qq[cat $repos/data/17550_1#1.bam\n];
