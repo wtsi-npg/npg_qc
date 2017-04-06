@@ -1,7 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
+use List::MoreUtils qw(uniq);
 use Moose::Meta::Class;
 use npg_tracking::glossary::composition::component::illumina;
 use npg_tracking::glossary::composition::factory;
@@ -128,7 +129,7 @@ sub _samtools_data {
          };
 }
 
-subtest q[results linked to composition] => sub {
+subtest q[results linked to a composition] => sub {
   plan tests => 23;
 
   my $component_rs   = $schema->resultset('SeqComponent');
@@ -240,6 +241,42 @@ subtest q[results linked to composition] => sub {
   is ($rs->count, 22, '22 results retrieved');
   $rs = $samtools_rs->search_autoqc({id_run => 5000, subset => undef});
   is ($rs->count, 66, '44 results retrieved');
+};
+
+subtest q[mixed queries for results linked to a composition] => sub {
+  plan tests => 8;
+
+  my $samtools_rs = $schema->resultset('SamtoolsStats');
+
+  my $query = {'id_run' => 3500, 'position' => 1, 'tag_index' => 2};
+  my @rows = $samtools_rs->search_autoqc($query)->all();
+  is (scalar @rows, 6, 'six results for a tag');
+  @rows = uniq map { $_->filter() } @rows;
+  is (join(q[,], sort @rows),'f1,f2', 'results for two filters');
+    
+  $query->{'filter'} = 'some';
+  @rows = $samtools_rs->search_autoqc($query)->all();
+  is (scalar @rows, 0, 'no results - filter value does not exist');
+  
+  $query->{'filter'} = 'f1';
+  @rows = $samtools_rs->search_autoqc($query)->all();
+  is (scalar @rows, 3, 'three results for f1 filter');
+ 
+  $query->{'filter'} = 'f2';
+  @rows = $samtools_rs->search_autoqc($query)->all();
+  is (scalar @rows, 3, 'three results for f2 filter');
+
+  $query->{'subset'} = undef;
+  @rows = $samtools_rs->search_autoqc($query)->all();
+  is (scalar @rows, 1, 'one results for f2 filter, target subset');
+
+  $query->{'subset'} = 'phix';
+  @rows = $samtools_rs->search_autoqc($query)->all();
+  is (scalar @rows, 1, 'one results for f2 filter, phix subset');
+
+  $query->{'subset'} = [qw(phix human)];
+  @rows = $samtools_rs->search_autoqc($query)->all();
+  is (scalar @rows, 2, 'two results for f2 filter, phix and human subsets');
 };
 
 1;

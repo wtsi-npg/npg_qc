@@ -1,13 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - genotype check: speed up pipeline job submission for deeply plexed lanes
-   by moving calls that involde access to reference repository out of the
-   can_run method
-
  - genotype and verify_bam_id checks:
      speed up pipeline job submission for deeply plexed lanes by
      moving calls that involde access to reference repository out of the
      can_run method
+ - composition-based autoqc results db search via DBIx: allow for
+   a search query that contains fields from the main table
 
 release 62.8
  - tag_sniff modified clip and revcomp options to handle split tags

@@ -232,10 +232,12 @@ sub _values2db {
 
   if ($found) {
     if ($self->update) {
+      # We need to convert non-scalar values (hashes or arrays) to scalars
       $found->set_inflated_columns($values)->update();
       $count++;
     }
   } else {
+    # See comment above
     $rs->new_result($values)->set_inflated_columns($values)->insert();
     $count++;
   }
