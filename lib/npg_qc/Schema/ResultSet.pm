@@ -10,13 +10,20 @@ extends 'DBIx::Class::ResultSet';
 our $VERSION = '0';
 
 sub search_autoqc {
-  my ($self, $values, $size) = @_;
+  my ($self, $query, $size) = @_;
 
   my $how = {'cache' => 1};
+  # Copy the query so that we do not change the input data,
+  # thus allowing the caller to reuse the variable representing
+  # the query.
+  my %local_values = %{$query};
+  my $values = \%local_values;
   my $rsource = $self->result_source();
   if ($rsource->has_relationship('seq_component_compositions')) {
     foreach my $col_name  (keys %{$values}) {
-      $values->{'seq_component.' . $col_name} = $values->{$col_name};
+      my $new_key = join q[.],
+        $rsource->has_column($col_name) ? 'me' : 'seq_component', $col_name;
+      $values->{$new_key} = $values->{$col_name};
       delete $values->{$col_name};
     }
     if ($size) {
@@ -28,7 +35,8 @@ sub search_autoqc {
     if (exists $values->{$ti_key} && ($rsource->name() eq 'spatial_filter')) {
       delete $values->{$ti_key};
     }
-    $self->deflate_unique_key_components($values, 1);
+    my $only_existing = 1;
+    $self->deflate_unique_key_components($values, $only_existing);
   }
   my $rs = $self->search_rs($values, $how);
   return $rs;
