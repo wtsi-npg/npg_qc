@@ -13,11 +13,12 @@ with qw(npg_common::roles::software_location
 
 our $VERSION = '0';
 
-Readonly::Scalar my $VERIFY_NAME => q[verifyBamID];
-Readonly::Scalar our $EXT => q[bam];
-Readonly::Scalar my $MIN_SNPS => 10**4;
+Readonly::Scalar my $HUMAN         => q[Homo_sapiens];
+Readonly::Scalar my $VERIFY_NAME   => q[verifyBamID];
+Readonly::Scalar our $EXT          => q[bam];
+Readonly::Scalar my $MIN_SNPS      => 10**4;
 Readonly::Scalar my $MIN_AVG_DEPTH => 2;
-Readonly::Scalar my $MIN_FREEMIX => 0.05;
+Readonly::Scalar my $MIN_FREEMIX   => 0.05;
 
 has '+file_type' => (default => $EXT,);
 
@@ -58,20 +59,20 @@ override 'can_run' => sub {
     return 0;
   }
 
-  if(!defined($self->lims->reference_genome)) {
+  my $ref = $self->lims->reference_genome;
+  if(!$ref) {
 		$self->result->add_comment('No reference genome specified');
     return 0;
   }
 
-  # we want to run iff there is a VCF file for this organism/strain/bait
-
-  if (!$self->snv_file) {
-    $self->result->add_comment(q(Can't find VCF file));
-    return 0;
+  if($ref !~ /\A$HUMAN/smx) {
+    $self->result->add_comment("Non-human reference genome '$ref'");
+		return 0;
   }
 
-  if (!$self->lims->sample_name) { # sample_name() only returns non empty value iff there is a single sample_name
-    $self->result->add_comment(q(Can only run on single sample));
+  # sample_name() only returns non empty value if there is a single sample_name
+  if (!$self->lims->sample_name) {
+    $self->result->add_comment(q(Can only run on a single sample));
     return 0;
   }
 
@@ -80,6 +81,14 @@ override 'can_run' => sub {
 
 override 'execute' => sub {
   my ($self) = @_;
+
+  if(!$self->can_run()) {
+    return 1;
+  }
+  if (!$self->snv_file) {
+    croak q(Can't find snv file);
+  }
+
   my $outfile = $self->tmp_path . q(/) . basename($self->bam_file);
 
   my $cmd_options =
@@ -96,10 +105,6 @@ override 'execute' => sub {
                                        ', average depth >= ' . $MIN_AVG_DEPTH .
                                        ' and freemix < ' . $MIN_FREEMIX);
   my $cmd = "$VERIFY_NAME $cmd_options";
-
-  if(!$self->can_run()) {
-    return 1;
-  }
 
   if (system $cmd) {
     croak "Failed to execute $cmd";
