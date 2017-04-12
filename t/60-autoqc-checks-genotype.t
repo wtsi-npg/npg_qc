@@ -21,8 +21,8 @@ my $bt = join q[/], $dir, q[bcftools1];
 local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
 my $data_dir = $dir."/data";
 mkdir($data_dir);
-`cp t/data/autoqc/alignment.bam $data_dir/2_1_1.bam`;
-`echo -n $expected_md5 > $data_dir/2_1_1.bam.md5`;
+`cp t/data/autoqc/alignment.bam $data_dir/2_1.bam`;
+`echo -n $expected_md5 > $data_dir/2_1.bam.md5`;
 
 # create and populate a temporary iRODS collection
 my $irods = WTSI::NPG::iRODS->new;
@@ -34,13 +34,11 @@ $irods->put_collection($data_dir, $irods_tmp_coll);
 $irods_data_coll = $irods_tmp_coll."/data";
 
 {
-    my $r;
-
-    $r = npg_qc::autoqc::checks::genotype->new(
-        id_run => 2,
-        path => $data_dir,
-        position => 1,
-        repository => $ref_repos,
+    my $r = npg_qc::autoqc::checks::genotype->new(
+        id_run      => 2,
+        position    => 1,
+        input_files => ["$data_dir/2_1.bam"],
+        repository  => $ref_repos,
     );
     isa_ok ($r, 'npg_qc::autoqc::checks::genotype');
     lives_ok { $r->result; } 'No error creating result object';
@@ -55,16 +53,15 @@ $irods_data_coll = $irods_tmp_coll."/data";
         repository => $ref_repos, rpt_list => '2:1', path => q[t]); }
       'object via the rpt_list';
 
-    my $irods_path = "irods:".$irods_data_coll."/2_1_1.bam";
+    my $irods_path = 'irods:'.$irods_data_coll.'/2_1.bam';
     $r = npg_qc::autoqc::checks::genotype->new(
-        id_run => 2,
-        input_files => [$irods_path, ],
-        position => 1,
-        repository => $ref_repos,
+        id_run      => 2,
+        position    => 1,
+        input_files => [$irods_path],
+        repository  => $ref_repos,
     );
     is($r->input_files_md5, $expected_md5,
        "iRODS MD5 string matches expected value");
-
 }
 
 # remove temporary iRODS collection

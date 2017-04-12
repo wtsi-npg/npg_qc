@@ -5,14 +5,16 @@ use namespace::autoclean;
 use Carp;
 use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
-use List::MoreUtils qw { any };
+use List::MoreUtils qw(any);
 use File::Slurp;
 use JSON;
-use npg_qc::utils::bam_genotype;
-use npg_qc::autoqc::types;
 use Readonly;
 use FindBin qw($Bin);
 use Try::Tiny;
+
+use npg_qc::utils::bam_genotype;
+use npg_qc::autoqc::types;
+use WTSI::NPG::iRODS;
 use WTSI::NPG::iRODS::DataObject;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -21,17 +23,6 @@ with qw(npg_tracking::data::reference::find
        );
 
 our $VERSION = '0';
-
-has 'irods' =>
-  (is       => 'ro',
-   isa      => 'WTSI::NPG::iRODS',
-   required => 1,
-   lazy     => 1,
-   builder  => '_build_irods',);
-
-sub _build_irods {
-  return WTSI::NPG::iRODS->new;
-};
 
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
@@ -65,6 +56,17 @@ sub _build_human_references_repository {
 	my $self = shift;
 	return catdir($self->ref_repository, $HUMAN_REFERENCES_DIR);
 }
+
+has 'irods' =>(
+   is       => 'ro',
+   isa      => 'WTSI::NPG::iRODS',
+   required => 1,
+   lazy     => 1,
+   builder  => '_build_irods',
+);
+sub _build_irods {
+  return WTSI::NPG::iRODS->new();
+};
 
 # you can override the executable name. May be useful for variants like "samtools_irods"
 has 'samtools_name' => (
@@ -457,8 +459,6 @@ sub _build_bam_genotype {
 override 'can_run' => sub {
 	my $self = shift;
 
-	# make sure that a sample name has been supplied and that the bam file is aligned with one of the recognised human references
-
 	if(!defined $self->sample_name) {
 		$self->result->add_comment('No sample name specified');
 		return 0;
@@ -469,17 +469,7 @@ override 'can_run' => sub {
 		return 0;
 	}
 
-	if(!defined($self->reference_fasta) || (! -r $self->reference_fasta)) {
-		$self->result->add_comment('Reference genome missing or unreadable');
-		return 0;
-	}
-
-	if(! any { $_ =~ $self->reference_fasta; } (keys %{$self->_ref_to_snppos_suffix_map})) {
-		$self->result->add_comment('Specified reference genome may be non-human');
-		return 0;
-	}
-
-	return 1;
+  return $self->entity_has_human_reference();
 };
 
 override 'execute' => sub {
@@ -491,7 +481,16 @@ override 'execute' => sub {
 		return 1;
 	}
 
-# run check
+  if(!defined($self->reference_fasta) || (! -r $self->reference_fasta)) {
+		croak 'Reference genome missing or unreadable';
+	}
+
+  # make sure that the bam file is aligned with one of the recognised human references
+	if(! any { $_ =~ $self->reference_fasta; } (keys %{$self->_ref_to_snppos_suffix_map})) {
+		croak 'Specified reference genome may be non-human';
+	}
+
+  # run check
 	my $gt_check_cmd = sprintf
 			q{set -o pipefail && printf "%s" | %s %s %s | %s %s %s},
 			$self->tsv_genotype,
@@ -697,7 +696,35 @@ npg_qc::autoqc::checks::genotype - compare genotype from bam with Sequenom QC re
 
 =over
 
+=item Moose
+
 =item namespace::autoclean
+
+=item Carp
+
+=item File::Basename
+
+=item File::Spec::Functions
+
+=item List::MoreUtils
+
+=item File::Slurp
+
+=item JSON
+
+=item Readonly
+
+=item FindBin
+
+=item Try::Tiny
+
+=item npg_tracking::data::reference::find
+
+=item WTSI::NPG::iRODS
+
+=item WTSI::NPG::iRODS::DataObject
+
+=item npg_common::roles::software_location
 
 =back
 
@@ -707,7 +734,7 @@ Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2017 GRL
 
     This file is part of NPG.
 

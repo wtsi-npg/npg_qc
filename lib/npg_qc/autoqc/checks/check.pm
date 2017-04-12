@@ -66,6 +66,7 @@ with 'npg_tracking::glossary::composition::factory::rpt' =>
 our $VERSION = '0';
 
 Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
+Readonly::Scalar my  $HUMAN           => q[Homo_sapiens];
 
 =head2 id_run
 
@@ -447,11 +448,41 @@ sub create_filename4attrs {
      && $self->has_subset()   ) ? q[_].$self->subset : q[];
 }
 
+=head2 entity_has_human_reference
+
+Returns true if the reference_genome attribute is defined
+for the entiry and the value of the attribute indicates
+that the reference is for Homo Sapiens.
+
+=cut
+
+sub entity_has_human_reference {
+  my $self = shift;
+
+  if (!$self->can('lims')) {
+    $self->result->add_comment('lim saccessor is not defined');
+    return 0;
+  }
+
+  my $ref = $self->lims->reference_genome;
+  if(!$ref) {
+    $self->result->add_comment('No reference genome specified');
+    return 0;
+  }
+  if($ref !~ /\A$HUMAN/smx) {
+    $self->result->add_comment("Non-human reference genome '$ref'");
+    return 0;
+  }
+
+  return 1;
+}
+
 =head2 to_string
 
 Returns a human readable string representation of the object.
 
 =cut
+
 sub to_string {
   my $self = shift;
   return join q[ ], ref $self , $self->composition->freeze;
@@ -514,7 +545,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 

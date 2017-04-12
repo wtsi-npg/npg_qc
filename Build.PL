@@ -262,6 +262,7 @@ my $extended_requires = {
                 'st::api::lims'                            => 0,
                 'WTSI::DNAP::Warehouse::Schema'            => 0,
                 'WTSI::NPG::iRODS'                         => 0,
+                'WTSI::NPG::iRODS::DataObject'             => 0,
 };
 
 my $build_requires = {

@@ -13,11 +13,11 @@ with qw(npg_common::roles::software_location
 
 our $VERSION = '0';
 
-Readonly::Scalar my $VERIFY_NAME => q[verifyBamID];
-Readonly::Scalar our $EXT => q[bam];
-Readonly::Scalar my $MIN_SNPS => 10**4;
+Readonly::Scalar my $VERIFY_NAME   => q[verifyBamID];
+Readonly::Scalar our $EXT          => q[bam];
+Readonly::Scalar my $MIN_SNPS      => 10**4;
 Readonly::Scalar my $MIN_AVG_DEPTH => 2;
-Readonly::Scalar my $MIN_FREEMIX => 0.05;
+Readonly::Scalar my $MIN_FREEMIX   => 0.05;
 
 has '+file_type' => (default => $EXT,);
 
@@ -47,39 +47,35 @@ override 'can_run' => sub {
   my $self = shift;
 
   if ($self->lims->library_type && $self->lims->library_type =~ /(?:cD|R)NA/sxm) {
-    $self->result->add_comment("library_type is $self->lims->library_type");
+    $self->result->add_comment('library_type is ' . $self->lims->library_type);
     return 0;
   }
 
-  # make sure that the bam file is aligned and a reference genome is defined
-
+  # make sure that the bam file is aligned
   if(!$self->alignments_in_bam) {
     $self->result->add_comment('alignments_in_bam is false');
     return 0;
   }
 
-  if(!defined($self->lims->reference_genome)) {
-		$self->result->add_comment('No reference genome specified');
+  # sample_name() only returns non empty value if there is a single sample_name
+  if (!$self->lims->sample_name) {
+    $self->result->add_comment('Can only run on a single sample');
     return 0;
   }
 
-  # we want to run iff there is a VCF file for this organism/strain/bait
-
-  if (!$self->snv_file) {
-    $self->result->add_comment(q(Can't find VCF file));
-    return 0;
-  }
-
-  if (!$self->lims->sample_name) { # sample_name() only returns non empty value iff there is a single sample_name
-    $self->result->add_comment(q(Can only run on single sample));
-    return 0;
-  }
-
-  return 1;
+  return $self->entity_has_human_reference();
 };
 
 override 'execute' => sub {
   my ($self) = @_;
+
+  if(!$self->can_run()) {
+    return 1;
+  }
+  if (!$self->snv_file) {
+    croak q(Can't find snv file);
+  }
+
   my $outfile = $self->tmp_path . q(/) . basename($self->bam_file);
 
   my $cmd_options =
@@ -96,10 +92,6 @@ override 'execute' => sub {
                                        ', average depth >= ' . $MIN_AVG_DEPTH .
                                        ' and freemix < ' . $MIN_FREEMIX);
   my $cmd = "$VERIFY_NAME $cmd_options";
-
-  if(!$self->can_run()) {
-    return 1;
-  }
 
   if (system $cmd) {
     croak "Failed to execute $cmd";
