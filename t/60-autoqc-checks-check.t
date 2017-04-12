@@ -449,7 +449,7 @@ subtest 'filename generation' => sub {
 };
 
 subtest 'running the check' => sub {
-    plan tests => 6;
+    plan tests => 7;
 
     my $check = npg_qc::autoqc::checks::check->new(
                 id_run    => 2549,
@@ -458,6 +458,8 @@ subtest 'running the check' => sub {
                 qc_in     => $path,
                 qc_out    => $tdir);
     is($check->can_run(), 1, 'can run');
+    is($check->entity_has_human_reference(), 0,
+      'no lims accessor - reference cannot be considered as human');
     $check->run();
     isa_ok($check->result(), 'npg_qc::autoqc::results::result');
     my $jpath = "$tdir/2549_1.result.json";

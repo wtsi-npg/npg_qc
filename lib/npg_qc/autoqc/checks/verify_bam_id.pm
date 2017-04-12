@@ -13,7 +13,6 @@ with qw(npg_common::roles::software_location
 
 our $VERSION = '0';
 
-Readonly::Scalar my $HUMAN         => q[Homo_sapiens];
 Readonly::Scalar my $VERIFY_NAME   => q[verifyBamID];
 Readonly::Scalar our $EXT          => q[bam];
 Readonly::Scalar my $MIN_SNPS      => 10**4;
@@ -48,35 +47,23 @@ override 'can_run' => sub {
   my $self = shift;
 
   if ($self->lims->library_type && $self->lims->library_type =~ /(?:cD|R)NA/sxm) {
-    $self->result->add_comment("library_type is $self->lims->library_type");
+    $self->result->add_comment('library_type is ' . $self->lims->library_type);
     return 0;
   }
 
-  # make sure that the bam file is aligned and a reference genome is defined
-
+  # make sure that the bam file is aligned
   if(!$self->alignments_in_bam) {
     $self->result->add_comment('alignments_in_bam is false');
     return 0;
   }
 
-  my $ref = $self->lims->reference_genome;
-  if(!$ref) {
-		$self->result->add_comment('No reference genome specified');
-    return 0;
-  }
-
-  if($ref !~ /\A$HUMAN/smx) {
-    $self->result->add_comment("Non-human reference genome '$ref'");
-		return 0;
-  }
-
   # sample_name() only returns non empty value if there is a single sample_name
   if (!$self->lims->sample_name) {
-    $self->result->add_comment(q(Can only run on a single sample));
+    $self->result->add_comment('Can only run on a single sample');
     return 0;
   }
 
-  return 1;
+  return $self->entity_has_human_reference();
 };
 
 override 'execute' => sub {

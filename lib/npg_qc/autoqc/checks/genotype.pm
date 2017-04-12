@@ -24,8 +24,7 @@ with qw(npg_tracking::data::reference::find
 
 our $VERSION = '0';
 
-Readonly::Scalar my  $HUMAN                => q[Homo_sapiens];
-Readonly::Scalar our $HUMAN_REFERENCES_DIR => $HUMAN;
+Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
 Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
 Readonly::Scalar my $SAMTOOLS_EXTRACT_REGIONS_NAME => q[samtools1];
@@ -470,13 +469,7 @@ override 'can_run' => sub {
 		return 0;
 	}
 
-  my $ref = $self->lims->reference_genome;
-  if($ref && $ref !~ /\A$HUMAN/smx) {
-    $self->result->add_comment("Non-human reference genome '$ref'");
-		return 0;
-  }
-
-  return 1;
+  return $self->entity_has_human_reference();
 };
 
 override 'execute' => sub {
