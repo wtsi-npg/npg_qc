@@ -41,3 +41,34 @@ Using custom bcviz
 In bcviz (your working copy) run 'bower link'.
 In npg-qc, npg_qc_viewer directory, run 'bower link bcviz'.
 
+Testing with webdriver:
+
+  Server 
+    # Starting inside project folder (npg_qc)
+    pushd npg_qc_viewer 
+    # Create a .npg folder and populate with test configuration files
+    # If bower dependencies haven't been installed:
+    bower install
+    export PERL5LIB=t/client/lib:lib:$PERL5LIB
+
+    Run server
+      HOME=./ dev=dev CATALYST_CONFIG=t/client/npg_qc_viewer_integration.conf bin/npg_qc_viewer_server.pl -p 38000
+
+  Testing with webdriverjs:
+  
+    Run webdriver script to start a client
+      # If needed, ssh to client with X11 forwarding enabled (ssh -Y servername)
+      # Starting inside project folder (npg_qc)
+      pushd npg_qc_viewer
+      npm install --only=dev
+      HTTP_PORT=38000 node t/client/integration/changeLanePreliminaryOutcome.js
+      popd
+
+  Testing with Selenium::Remote::Driver
+
+    Run client script
+      # If needed, ssh to client with X11 forwarding enabled (ssh -Y servername)
+      # Starting inside project folder (npg_qc)
+      pushd npg_qc_viewer
+      HTTP_PORT=38000 perl t/client/integration/changeLanePreliminaryOutcome.pl
+      popd

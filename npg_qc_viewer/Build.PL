@@ -145,6 +145,7 @@ my $builder = $class->new(
         'URI::Escape'                                   => '0',
         'XML::LibXML'                                   => '1.70',
         'npg_tracking::glossary::rpt'                   => '0',
+        'Selenium::Remote::Driver'                      => '0',
    },
 );
 
