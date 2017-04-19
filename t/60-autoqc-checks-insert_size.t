@@ -9,12 +9,10 @@ use Cwd qw(cwd);
 use File::Spec::Functions qw(catfile);
 use File::Temp qw/ tempdir /;
 
-use npg_qc::autoqc::results::insert_size;
+use npg_tracking::util::abs_path qw(abs_path);
 use t::autoqc_util;
 
 my $current_dir = cwd();
-
-use_ok('npg_qc::autoqc::checks::insert_size');
 
 local $ENV{'http_proxy'} = 'wibble.com';
 local $ENV{'no_proxy'} = q[];
@@ -25,6 +23,7 @@ my $ref = catfile($repos, q[references]);
 my $format = q[sam];
 my $test_bam = 0;
 
+use_ok('npg_qc::autoqc::results::insert_size');
 use_ok('npg_qc::autoqc::checks::insert_size');
 
 sub _additional_modules {
@@ -42,7 +41,7 @@ sub _additional_modules {
   if ($use_fastx) {
     push @expected, q[FASTX Toolkit fastx_reverse_complement 0.0.12];
   }
-  push @expected, join(q[ ], join(q[/], $current_dir, q[blib/script/norm_fit]),
+  push @expected, join(q[ ], abs_path(join(q[/], $current_dir, q[blib/script/norm_fit])),
     $npg_qc::autoqc::results::insert_size::VERSION);
   return @expected;
 }

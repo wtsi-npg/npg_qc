@@ -3,6 +3,7 @@ use warnings;
 use Cwd;
 use Test::More tests => 48;
 use Test::Exception;
+use npg_tracking::util::abs_path qw(abs_path);
 
 my $repos                   = 't/data/autoqc';
 my $snv_repository          = 't/data';
@@ -34,7 +35,8 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
     ok($r->alignments_in_bam, 'Alignments in bam true');
     is($r->lims->reference_genome, 'Homo_sapiens (1000Genomes_hs37d5)', 'reference genome');    
     ok($r->can_run, 'Can run at lane level for single plex in pool') or diag $r->result->comments;
-    my $snv_path = join '/', cwd, 't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5';
+    my $snv_path = abs_path(join '/', cwd,
+      't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5');
     is($r->snv_path, $snv_path, 'snv path is set');
   }
 }
@@ -60,8 +62,8 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
     ok($r->alignments_in_bam, 'Alignments in bam true');
     is($r->lims->reference_genome, 'Homo_sapiens (1000Genomes_hs37d5)', 'reference genome');    
     ok((not $r->can_run), 'Cannot run at lane level for multi plex in pool') or diag $r->result->comments;
-    my $snv_path = join '/', cwd,
-      't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5';
+    my $snv_path = abs_path(join '/', cwd,
+      't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5');
     is($r->snv_path, $snv_path, 'snv path is set');
   }
 }
@@ -95,8 +97,8 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
   is($r->lims->reference_genome, 'Anopheles_gambiae (PEST)', 'reference');
   is($r->can_run, 0, 'Not done - reference is not human');
 
-  my $snv_path = join '/', cwd,
-    't/data/autoqc/population_snv_with_vcf/Anopheles_gambiae/default/Standard/PEST';
+  my $snv_path = abs_path(join '/', cwd,
+    't/data/autoqc/population_snv_with_vcf/Anopheles_gambiae/default/Standard/PEST');
   is($r->snv_path, $snv_path, 'snv path is set correctly');
 
   $h->{'position'}       = 8;
