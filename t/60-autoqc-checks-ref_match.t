@@ -4,16 +4,16 @@ use autodie qw(:all);
 use File::Temp qw/ tempdir /;
 use File::Spec::Functions qw(catfile);
 use Cwd;
-
 use Test::More tests => 46;
 use Test::Deep;
 use Test::Exception;
+use npg_tracking::util::abs_path qw(abs_path);
 
 use_ok('npg_qc::autoqc::checks::ref_match');
 
 my $fastq_path = 't/data/autoqc';
 my $repos = join q[/], cwd, q[t/data/autoqc];
-my $ref_repos  = getcwd() . '/t/data/autoqc/references';
+my $ref_repos  = abs_path(getcwd() . '/t/data/autoqc/references');
 
 my $dir = tempdir( CLEANUP => 1 );
 my $bt = join q[/], $dir, q[bowtie];
