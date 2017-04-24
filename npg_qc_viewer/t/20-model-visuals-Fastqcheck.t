@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 10;
+use Test::More tests => 9;
 use Test::Exception;
 use Cwd;
 use File::Spec;
@@ -47,8 +47,6 @@ isa_ok(npg_qc_viewer::Model::Visuals::Fastqcheck->new(), 'npg_qc_viewer::Model::
 {
   my $model = npg_qc_viewer::Model::Visuals::Fastqcheck->new();
   my $path = File::Spec->catfile(cwd, 't', 'data', 'sources4visuals', 'empty.fastqcheck');
-
-  my $rendered;
-  lives_ok { $rendered = GD::Image->new($model->fastqcheck2image({path=>$path,})) } 'fastqcheck2image for an empty fastq file lives';
-  ok (!$rendered, 'undef is returned for an empty fastq file');
+  lives_and { ok !$model->fastqcheck2image({path=>$path,}) }
+    'fastqcheck2image for an empty fastq file lives';
 }
