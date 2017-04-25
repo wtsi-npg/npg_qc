@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 62.9
+ - fix for GD image generation test in response to a change in constructor
+   behaviour in GD.pm
+ - compute expected path in tests in a way that takes into account
+   substitutions
  - genotype and verify_bam_id checks:
      speed up pipeline job submission for deeply plexed lanes by
      moving calls that involde access to reference repository out of the
