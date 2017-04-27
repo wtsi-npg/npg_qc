@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC
+   - Build will fail if no node, npm or bower are available in path
+
 release 62.9
  - fix for GD image generation test in response to a change in constructor
    behaviour in GD.pm
