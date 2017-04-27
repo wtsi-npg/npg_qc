@@ -28,7 +28,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOC');
         }
       } else {
         warn "To install javascript dependencies, node and bower should be on the path;\n";
-        warn "javascript dependencies not installed.\n";
+        die 'Javascript dependencies cannot be installed';
       }
     }
 
