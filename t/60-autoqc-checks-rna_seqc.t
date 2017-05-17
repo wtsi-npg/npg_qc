@@ -71,7 +71,7 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
     `mkdir -p $trans_dir/RNA-SeQC`;
     `touch $trans_dir/RNA-SeQC/ensembl_75_transcriptome-GRCm38.gtf`;
 
-    my $si = join q[/], $dir, q[samtools_irods];
+    my $si = join q[/], $dir, q[samtools];
     open my $fh,  q[>], $si;
     print $fh qq[cat $repos/data/17550_3#8.bam\n];
     close $fh;

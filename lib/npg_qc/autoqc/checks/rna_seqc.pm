@@ -76,7 +76,7 @@ has '_alignments_in_bam' => (is         => 'ro',
 sub _build__alignments_in_bam {
     my $self = shift;
     my $aligned = 0;
-    my $command = $self->samtools_irods_cmd . ' view -H ' . $self->_bam_file . ' |';
+    my $command = $self->samtools_cmd . ' view -H ' . $self->_bam_file . ' |';
     my $ph = IO::File->new($command) or croak qq[Cannot fork '$command', error $ERRNO];
     while (my $line = <$ph>) {
         if (!$aligned && $line =~ /^\@SQ/smx) {
@@ -96,7 +96,7 @@ sub _build__is_paired_end {
     my $paired = 0;
     my $flag;
     my $num_reads = 0;
-    my $view_command = $self->samtools_irods_cmd. q[ view ]. $self->_bam_file. q[ 2>/dev/null | ];
+    my $view_command = $self->samtools_cmd. q[ view ]. $self->_bam_file. q[ 2>/dev/null | ];
     my $ph = IO::File->new($view_command) or croak "Error viewing bam: $OS_ERROR\n";
     while (my $line = <$ph>) {
         next if $line =~ /^\@/ismx;
@@ -121,7 +121,7 @@ has '_is_rna_alignment' => (is         => 'ro',
 sub _build__is_rna_alignment {
     my ($self) = @_;
     my $rna_alignment = 0;
-    my $command = $self->samtools_irods_cmd . ' view -H ' . $self->_bam_file . ' |';
+    my $command = $self->samtools_cmd . ' view -H ' . $self->_bam_file . ' |';
     my $ph = IO::File->new($command) or croak qq[Cannot fork '$command', error $ERRNO];
     while (my $line = <$ph>) {
         if (!$rna_alignment && $line =~ /^\@PG\s+.*tophat/ismx) {

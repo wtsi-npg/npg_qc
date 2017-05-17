@@ -137,7 +137,7 @@ has 'reads_from_bam_cmd'   => ( is          => 'ro',
                               );
 sub _build_reads_from_bam_cmd {
   my $self = shift;
-  return sprintf q[%s view %s ], $self->samtools_irods, $self->lane_bam_file;
+  return sprintf q[%s view %s ], $self->samtools_cmd, $self->lane_bam_file;
 }
 
 override 'can_run' => sub {

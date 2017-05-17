@@ -23,7 +23,7 @@ with qw(npg_tracking::data::reference::find
 
 our $VERSION = '0';
 
-Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
+Readonly::Scalar my $SAMTOOLS_NAME => q[samtools];
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $BARCODE_FILENAME => q[sanger168.tags];
 Readonly::Scalar my $BID_JAR_NAME    => q[BamIndexDecoder.jar];

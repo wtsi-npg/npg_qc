@@ -35,7 +35,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   sub _samtools_option {
     my $self = shift;
 
-    my @found = which('samtools1');
+    my @found = which('samtools');
     my $samtools = @found ? abs_path( $found[0] ) : q[];
     @found = which('htsfile');
     my $hts = @found ? abs_path( $found[0] ) : q[];
