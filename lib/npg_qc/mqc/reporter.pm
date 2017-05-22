@@ -17,7 +17,7 @@ with 'MooseX::Getopt';
 
 our $VERSION = '0';
 
-Readonly::Scalar my $HTTP_TIMEOUT => 60;
+Readonly::Scalar my $HTTP_TIMEOUT => 120;
 Readonly::Scalar my $CONTENT_TYPE => 'text/xml';
 
 has 'qc_schema' => (
