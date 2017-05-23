@@ -32,8 +32,8 @@ Readonly::Scalar my $METRICS_FILE_NAME => q[metrics.tsv];
 Readonly::Scalar my $MINUS_ONE         => -1;
 
 Readonly::Hash   my %RNASEQC_METRICS_FIELDS_MAPPING => {
-    '3\' Norm'                               => 'end_3_norm',
-    '5\' Norm'                               => 'end_5_norm',
+    '3\' Norm'                              => 'end_3_norm',
+    '5\' Norm'                              => 'end_5_norm',
     'End 1 % Sense'                         => 'end_1_pct_sense',
     'End 1 Antisense'                       => 'end_1_antisense',
     'End 1 Sense'                           => 'end_1_sense',
@@ -55,25 +55,35 @@ has '+aligner' => (default => 'fasta',
                    is => 'ro',
                    writer => '_set_aligner',);
 
-has 'qc_report_dir' => (is       => 'ro',
-                        isa      => 'NpgTrackingDirectory',
-                        required => 1,);
+has 'output_dir' => (is       => 'ro',
+                     isa      => 'Str',
+                     required => 0,
+                     lazy     => 1,
+                     builder  => '_build_output_dir',);
 
-has '_java_jar_path'          => (is      => 'ro',
-                                  isa     => 'NpgCommonResolvedPathJarFile',
-                                  coerce  => 1,
-                                  default => $RNASEQC_JAR_NAME,
-                                  init_arg => undef,);
+sub _build_output_dir {
+    my ($self) = @_;
+    my $qc_out_path = $self->qc_out;
+    my $output_dir = File::Spec->catdir($qc_out_path, $self->result->filename_root . q[_rna_seqc]);
+    return $output_dir;
+}
+
+has '_java_jar_path' => (is       => 'ro',
+                         isa      => 'NpgCommonResolvedPathJarFile',
+                         coerce   => 1,
+                         default  => $RNASEQC_JAR_NAME,
+                         init_arg => undef,);
 
 has '_ttype_gtf_column' => (is      => 'ro',
                             isa     => 'Int',
                             default => 2,);
 
-has '_alignments_in_bam' => (is         => 'ro',
-                             isa        => 'Maybe[Bool]',
-                             lazy_build => 1,);
+has '_alignments_in_bam' => (is      => 'ro',
+                             isa     => 'Bool',
+                             lazy    => 1,
+                             builder => '_build_alignments_in_bam',);
 
-sub _build__alignments_in_bam {
+sub _build_alignments_in_bam {
     my $self = shift;
     my $aligned = 0;
     my $command = $self->samtools_irods_cmd . ' view -H ' . $self->_bam_file . ' |';
@@ -87,11 +97,12 @@ sub _build__alignments_in_bam {
     return $aligned;
 }
 
-has '_is_paired_end' => (is         => 'ro',
-                         isa        => 'Maybe[Bool]',
-                         lazy_build => 1,);
+has '_is_paired_end' => (is      => 'ro',
+                         isa     => 'Bool',
+                         lazy    => 1,
+                         builder => '_build_is_paired_end',);
 
-sub _build__is_paired_end {
+sub _build_is_paired_end {
     my ($self) = @_;
     my $paired = 0;
     my $flag;
@@ -114,11 +125,12 @@ sub _build__is_paired_end {
     return $paired;
 }
 
-has '_is_rna_alignment' => (is         => 'ro',
-                            isa        => 'Maybe[Bool]',
-                            lazy_build => 1,);
+has '_is_rna_alignment' => (is      => 'ro',
+                            isa     => 'Bool',
+                            lazy    => 1,
+                            builder => '_build_is_rna_alignment',);
 
-sub _build__is_rna_alignment {
+sub _build_is_rna_alignment {
     my ($self) = @_;
     my $rna_alignment = 0;
     my $command = $self->samtools_irods_cmd . ' view -H ' . $self->_bam_file . ' |';
@@ -133,12 +145,13 @@ sub _build__is_rna_alignment {
 
 }
 
-has '_input_str' => (is         => 'ro',
-                     isa        => 'Str',
-                     lazy_build => 1,
-                     init_arg   => undef,);
+has '_input_str' => (is       => 'ro',
+                     isa      => 'Str',
+                     lazy     => 1,
+                     builder  => '_build_input_str',
+                     init_arg => undef,);
 
-sub _build__input_str {
+sub _build_input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
     my $library_name = $self->lims->library_name // $sample_id;
@@ -147,40 +160,47 @@ sub _build__input_str {
     return qq["$library_names[0]|$input_file|$sample_id"];
 }
 
-has '_ref_genome' => (is         => 'ro',
-                      isa        => 'Maybe[Str]',
-                      lazy_build => 1,);
+has '_ref_genome' => (is       => 'ro',
+                      isa      => 'Str',
+                      required => 0,
+                      lazy     => 1,
+                      builder  => '_build_ref_genome',);
 
-sub _build__ref_genome {
+sub _build_ref_genome {
     my ($self) = @_;
     my $reference_fasta = $self->refs->[0] // q[];
     return $reference_fasta;
 }
 
-has '_bam_file' => (is         => 'ro',
-                    isa        => 'NpgTrackingReadableFile',
-                    lazy_build => 1,);
+has '_bam_file' => (is      => 'ro',
+                    isa     => 'NpgTrackingReadableFile',
+                    lazy    => 1,
+                    builder => '_build_bam_file',);
 
-sub _build__bam_file {
+sub _build_bam_file {
     my $self = shift;
     return $self->input_files->[0];
 }
 
-has '_annotation_gtf' => (is         => 'ro',
-                          isa        => 'Maybe[Str]',
-                          lazy_build => 1,);
+has '_annotation_gtf' => (is       => 'ro',
+                          isa      => 'Str',
+                          required => 0,
+                          lazy     => 1,
+                          builder  => '_build_annotation_gtf',);
 
-sub _build__annotation_gtf {
+sub _build_annotation_gtf {
     my $self = shift;
     my $trans_gtf = $self->rnaseqc_gtf_file // q[];
     return $trans_gtf;
 }
 
-has '_ref_rrna' => (is         => 'ro',
-                    isa        => 'Maybe[Str]',
-                    lazy_build => 1,);
+has '_ref_rrna' => (is       => 'ro',
+                    isa      => 'Str',
+                    required => 0,
+                    lazy     => 1,
+                    builder  => '_build_ref_rrna',);
 
-sub _build__ref_rrna {
+sub _build_ref_rrna {
     my $self = shift;
     my ($organism, $strain, $transcriptome) = $self->parse_reference_genome($self->lims->reference_genome);
     $self->_set_aligner($RRNA_ALIGNER);
@@ -192,7 +212,8 @@ sub _build__ref_rrna {
 
 sub _command {
     my ($self) = @_;
-    my ($ref_rrna_option, $single_end_option) = q[];
+    my $ref_rrna_option = q[];
+    my $single_end_option = q[];
     if(!$self->_is_paired_end){
         $single_end_option = q[-singleEnd];
     }
@@ -202,7 +223,7 @@ sub _command {
     my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
                                            $self->_java_jar_path,
                                            $self->_input_str,
-                                           $self->qc_report_dir,
+                                           $self->output_dir,
                                            $self->_ref_genome,
                                            $self->_annotation_gtf,
                                            $self->_ttype_gtf_column,
@@ -246,9 +267,7 @@ override 'execute' => sub {
         return 1;
     }
     my $command = $self->_command();
-    $self->result->set_info('Command', $command);
     carp qq[EXECUTING $command time ]. DateTime->now();
-
     if (system $command) {
         my $error = $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
         croak sprintf "Child %s exited with value %d\n", $command, $error;
@@ -261,9 +280,9 @@ override 'execute' => sub {
 
 sub _parse_metrics {
     my ($self) = @_;
-    my $filename = File::Spec->catfile($self->qc_report_dir, $METRICS_FILE_NAME);
+    my $filename = File::Spec->catfile($self->output_dir, $METRICS_FILE_NAME);
     if (! -e $filename) {
-        croak q[Metrics file is not available, cannot parse RNA-SeQC metrics];
+        croak qq[No such file $filename: cannot parse RNA-SeQC metrics];
     }
     my $fh = IO::File->new($filename, 'r');
     my @lines;
@@ -278,9 +297,10 @@ sub _parse_metrics {
     }
     my $i = 0;
     my $results = {};
-    foreach(@keys){
+    foreach my $key (@keys){
         chomp $values[$i];
-        $results->{$_} = $values[$i];
+        chomp $key;
+        $results->{$key} = $values[$i];
         $i++;
     }
     return $results;
@@ -292,13 +312,16 @@ sub _save_results {
         my $value = $results->{$key};
         if (defined $value) {
             my $attr_name = $RNASEQC_METRICS_FIELDS_MAPPING{$key};
-            if ($value eq q[?]) {
-                carp qq[Field $attr_name is set to '?', skipping...];
-	        } else {
-                    $self->result->$attr_name($value);
+            if ($value eq q[NaN]) {
+                carp qq[Value of $attr_name is 'NaN', skipping...];
+            } else {
+                $self->result->$attr_name($value);
             }
         }
+        delete $results->{$key};
     }
+    $self->result->other_metrics($results);
+    $self->result->output_dir($self->output_dir);
     return;
 }
 __PACKAGE__->meta->make_immutable();
@@ -316,10 +339,11 @@ npg_qc::autoqc::checks::rna_seqc
 
 =head1 DESCRIPTION
 
-QC check that runs Broad Institute's RNA-SeQC software over an RNA sample.
-Files generated by RNA-SeQC are overwriten everytime it is executed and except
-for the directory where the metrics are stored (named after Sample ID) all use
-the same names. The user must consider this when passing the value of qc_report_dir. 
+QC check that runs Broad Institute's RNA-SeQC; a java program which computes a
+series of quality control metrics for RNA-seq data. The output consists of
+HTML reports and tab delimited files of metrics data from which a selection of
+them are extracted to generate an autoqc result. The output directory is
+created by default using the sample's filename root.
 
 =head1 SUBROUTINES/METHODS
 

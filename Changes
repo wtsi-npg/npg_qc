@@ -1,6 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - SeqQC
+ - remove attribute qc_report_dir from check object: the output directory
+   is created by default using the sample's filename root
+ - npg_qc::autoqc::qc_store - load rna_seqc results into new rna_seqc
+   table in npg_qc database.
+ - SeqQC:
+   - added template for rna_seqc check with selected metrics shown
+     in summary
+   - include a link to original RNA-SeQC report in check's template
    - Build will fail if no node, npm or bower are available in path
 
 release 62.9

@@ -1,0 +1,73 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+[% IF !check.genes_detected.defined; %]
+     <div class="data_table">
+     <p> Reason: not an RNA alignment</p>
+     </div>
+[% ELSE %]
+     <h6>mapped reads</h6>
+     <div style='clear:both;' class="data_table">
+     <table title="mapped_reads">
+     <tr><th>rRNA</th><th>rRNA rate</th></tr>
+     <tr><td align="right">[% IF check.rrna.defined; check.rrna | format_number; END %]</td>
+         <td align="right">[% IF check.rrna_rate.defined; check.rrna_rate | format_number(3,1); END %]</td>
+     </tr>
+     </table>
+     </div>
+     <h6>transcript-associated reads</h6>
+     <div style='clear:both;' class="data_table">
+     <table title=transcript_associated_reads>
+     <tr><th>exonic rate</th><th>expression profiling efficiency</th><th>transcripts/genes detected</th>
+     <tr><td align="right">[% IF check.exonic_rate.defined; check.exonic_rate | format_number(3,1); END %]</td>
+         <td align="right">[% IF check.expression_profiling_efficiency.defined; check.expression_profiling_efficiency | format_number(3,1); END %]</td>
+         <td align="right">[% IF check.genes_detected.defined; check.genes_detected | format_number; END %]</td>
+     </tr>
+     </table>
+     </div>
+     <h6>strand specificity</h6>
+     <div style='clear:both;' class="data_table">
+     <table title=strand_specificity>
+     <tr><th>end 1 sense</th><th>end 1 antisense</th><th>end 2 sense</th><th>end 2 antisense</th><th>end 1 % sense</th><th>end 2 % sense</th></tr>
+     <tr><td align="right">[% IF check.end_1_sense.defined; check.end_1_sense | format_number; END %]</td>
+         <td align="right">[% IF check.end_1_antisense.defined; check.end_1_antisense | format_number; END %]</td>
+         <td align="right">[% IF check.end_2_sense.defined; check.end_2_sense | format_number; END %]</td>
+         <td align="right">[% IF check.end_2_antisense.defined; check.end_2_antisense | format_number; END %]</td>
+         <td align="right">[% IF check.end_1_pct_sense.defined; check.end_1_pct_sense | format_number(3,1); END %]</td>
+         <td align="right">[% IF check.end_2_pct_sense.defined; check.end_2_pct_sense | format_number(3,1); END %]</td>
+     </tr>
+     </table>
+     </div>
+     <h6>coverage metrics</h6>
+     <div style='clear:both;' class="data_table">
+     <table title=coverage_metrics>
+     <tr><th>mean per base cov.</th><th>mean CV</th><th>no. covered 3' (norm)</th><th>no. covered 5' (norm)</th></tr>
+     <tr><td align="right">[% IF check.mean_per_base_cov.defined; check.mean_per_base_cov | format_number(2,1); END %]</td>
+         <td align="right">[% IF check.mean_cv.defined; check.mean_cv | format_number(2,1); END %]</td>
+         <td align="right">[% IF check.end_3_norm.defined; check.end_3_norm | format_number(3,1); END %]</td>
+         <td align="right">[% IF check.end_5_norm.defined; check.end_5_norm | format_number(3,1); END %]</td>
+     </tr>
+     </table>
+     </div>
+     <div class="data_table">
+[%   IF check.id_run.defined;
+       IF c.model('NpgDB').resultset('Run').find(id_run).is_tag_set('staging');
+         base = base_url _ '/cgi-bin/locate_runfolder';
+         run_folder_glob = id_run;
+         npg_run_row = c.model('NpgDB').resultset('Run').find(id_run);
+         IF npg_run_row;
+           rfglob = npg_run_row.folder_path_glob;
+           rfname = npg_run_row.folder_name;
+           IF rfglob && rfname;
+             run_folder_glob = rfglob _ rfname;
+           END;
+         END;
+         rna_seqc_output_dir = check.id_run _ '_' _ check.position;
+         IF check.tag_index.defined;
+           rna_seqc_output_dir = rna_seqc_output_dir _ '%23' _ check.tag_index;
+         END;
+         rna_seqc_output_dir = rna_seqc_output_dir _ '_rna_seqc' %]
+         <p>Other RNA-SeQC <a href="[% base %]/[% run_folder_glob %]/Latest_Summary/archive/lane[% check.position %]/qc/[% rna_seqc_output_dir | url %]?redir">metrics</a>.</p>
+[%     END; 
+     END %]
+     </div>
+[% END %]
