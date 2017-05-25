@@ -119,43 +119,6 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       remove_tree _c_build_dir($tool);
     }
   }
-
-  sub process_htdocs_files {
-    my $self = shift;
-    my $files = $self->rscan_dir('htdocs', sub {-f $_ and (/\.css$/ or /\.js$/)});
-    foreach my $f (@{$files}) {
-      $self->copy_if_modified(
-        from    => $f,
-        to_dir  => join(q[/], $self->base_dir(), $self->blib()),
-        flatten => 0);
-    }
-    return;
-  }
-
-  sub process_cgibin_files {
-    my $self = shift;
-    my $script = $self->copy_if_modified(
-      from    => 'cgi-bin/npg_qc',
-      to_dir  => join(q[/], $self->base_dir(), $self->blib()),
-      flatten => 0);
-    if ($script) {
-      $self->fix_shebang_line(($script));
-      `chmod +x $script`;
-    }
-    return;
-  }
-
-  sub process_data_files {
-    my $self = shift;
-    my $files = $self->rscan_dir('data/npg_qc_web/templates', sub {-f $_ and /\.tt2$/});
-    foreach my $f (@{$files}) {
-      $self->copy_if_modified(
-        from    => $f,
-        to_dir  => join(q[/], $self->base_dir(), $self->blib()),
-        flatten => 0);
-    }
-    return;
-  }
 EOF
 
 my $extended_build_requires = {
@@ -339,16 +302,6 @@ my $builder = $class->new(
 
           'dist'          => { COMPRESS => 'gzip', SUFFIX => 'gz', },
          );
-
-# Build and install cgi-related files
-foreach my $path (qw(data htdocs cgi-bin)) {
-  my $name = $path;
-  $name =~ s/-//;
-  $builder->add_build_element($name);
-  if ($builder->install_base()) {
-    $builder->install_path($path => join q{/}, $builder->install_base(), $path);
-  }
-}
 
 $builder->create_build_script();
 

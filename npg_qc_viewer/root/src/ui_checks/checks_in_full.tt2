@@ -3,7 +3,7 @@
      lane_collection = rl_map.${lane_key};
      NEXT IF (!lane_collection || lane_collection.size == 0);
      temp = lane_collection.sort;
-     to_remove = ['split stats phix', 'spatial filter',  'split stats', 'rna seqc'];
+     to_remove = ['split stats phix', 'spatial filter',  'split stats'];
      IF !run_view;
        to_remove.push('qX yield', 'gc fraction');
      END;

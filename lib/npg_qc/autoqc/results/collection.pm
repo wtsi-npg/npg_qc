@@ -555,7 +555,6 @@ sub check_names {
     my @check_names = ();
     my $map = {};
     foreach my $check (@{$self->checks_list}) {
-      if ($check eq 'rna_seqc') { next; }
         push @check_names, @{$classes->{$check}};
         foreach my $name (@{$classes->{$check}}) {
             $map->{$name} = $check;
