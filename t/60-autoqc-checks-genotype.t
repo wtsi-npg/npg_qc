@@ -25,7 +25,7 @@ mkdir($data_dir);
 `echo -n $expected_md5 > $data_dir/2_1.bam.md5`;
 
 # create and populate a temporary iRODS collection
-my $irods = WTSI::NPG::iRODS->new;
+my $irods = WTSI::NPG::iRODS->new(strict_baton_version => 0);
 my $irods_tmp_coll;
 my $irods_data_coll;
 my $pid = $$;
