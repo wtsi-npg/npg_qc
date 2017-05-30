@@ -35,6 +35,7 @@ $irods_data_coll = $irods_tmp_coll."/data";
 
 {
     my $r = npg_qc::autoqc::checks::genotype->new(
+        irods       => $irods,
         id_run      => 2,
         position    => 1,
         input_files => ["$data_dir/2_1.bam"],
@@ -55,13 +56,15 @@ $irods_data_coll = $irods_tmp_coll."/data";
 
     my $irods_path = 'irods:'.$irods_data_coll.'/2_1.bam';
     $r = npg_qc::autoqc::checks::genotype->new(
+        irods       => $irods,
         id_run      => 2,
         position    => 1,
         input_files => [$irods_path],
         repository  => $ref_repos,
     );
     is($r->input_files_md5, $expected_md5,
-       "iRODS MD5 string matches expected value");
+       "iRODS MD5 string matches expected value") or
+         diag `ils -L $irods_data_coll/2_1.bam`
 }
 
 # remove temporary iRODS collection
