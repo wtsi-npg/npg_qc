@@ -151,7 +151,7 @@ subtest 'Argument input files' => sub {
         repository => $repos,
         ref_repository => $ref_repos_dir,
         transcriptome_repository => $trans_repos_dir,);
-    throws_ok { $check->execute } qr/Binary fasta reference for Danio_rerio, zv9, all does not exist/,
+    throws_ok { $check->execute } qr/Binary fasta reference for Danio_rerio, zv9(, all)? does not exist/,
         'error message when reference genome does not exist';
 
     $ref_dir = join q[/], $ref_repos_dir,'Danio_rerio','zv9','all';
