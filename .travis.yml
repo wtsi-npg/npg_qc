@@ -24,7 +24,7 @@ env:
     - PGVERSION="9.3"
     - DISPOSABLE_IRODS_VERSION="1.2"
     - JANSSON_VERSION="2.7"
-    - BATON_VERSION="0.17.0"
+    - BATON_VERSION="1.0.0"
     - TRAVIS_NODE_VERSION="4.5.0"
     - RENCI_URL=ftp://ftp.renci.org
     - WTSI_NPG_GITHUB_URL=https://github.com/wtsi-npg
