@@ -396,9 +396,9 @@ $archive = join q[/], $tempdir, $archive;
 my $json_dir1 = join q[/], $archive, 'qc';
 my $json_dir2 = join q[/], $json_dir1, 'all_json';
 #note `find $archive`;
-my $samtools_path  = join q[/], $tempdir, 'samtools1';
+my $samtools_path  = join q[/], $tempdir, 'samtools';
 local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
-# Create mock samtools1 that will output the header
+# Create mock samtools that will output the header
 write_samtools_script($samtools_path, join(q[/],$archive,'cram.header'));
 
 subtest 'loading bam_flagstats and its related objects from files' => sub {

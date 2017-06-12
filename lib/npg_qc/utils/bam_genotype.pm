@@ -21,7 +21,7 @@ use npg_common::roles::software_location;
 our $VERSION = '0';
 
 ##no critic
-Readonly::Scalar my $SAMTOOLS_NAME => 'samtools1';
+Readonly::Scalar my $SAMTOOLS_NAME => 'samtools';
 Readonly::Scalar my $BCFTOOLS_NAME => 'bcftools1';
 
 subtype '_bamgt_ReadableFile'

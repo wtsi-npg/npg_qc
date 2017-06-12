@@ -26,10 +26,10 @@ our $VERSION = '0';
 
 Readonly::Scalar our $HUMAN_REFERENCES_DIR => q[Homo_sapiens];
 Readonly::Scalar my $GENOTYPE_DATA => 'sgd';
-Readonly::Scalar my $SAMTOOLS_NAME => q[samtools_irods];
-Readonly::Scalar my $SAMTOOLS_EXTRACT_REGIONS_NAME => q[samtools1];
-Readonly::Scalar my $SAMTOOLS_MERGE_NAME => q[samtools1];
-Readonly::Scalar my $SAMTOOLS_MPILEUP_NAME => q[samtools1];
+Readonly::Scalar my $SAMTOOLS_NAME => q[samtools];
+Readonly::Scalar my $SAMTOOLS_EXTRACT_REGIONS_NAME => q[samtools];
+Readonly::Scalar my $SAMTOOLS_MERGE_NAME => q[samtools];
+Readonly::Scalar my $SAMTOOLS_MPILEUP_NAME => q[samtools];
 Readonly::Scalar my $BCFTOOLS_NAME => q[bcftools1];
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $SEQUENOM_QC_PLEX => q[W30467];

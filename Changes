@@ -9,6 +9,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      in summary
    - include a link to original RNA-SeQC report in check's template
    - Build will fail if no node, npm or bower are available in path
+ - stop using multiple versions of samtools
  - do not install NPGQC web app
  - increase HTTP timeout when reporting manual qc outcomes to LIMs
 
