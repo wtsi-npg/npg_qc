@@ -7,8 +7,7 @@ use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 use Carp;
 use Getopt::Long;
 use Pod::Usage;
-use Readonly;
-use npg_qc::autoqc::autoqc;
+use npg_qc::autoqc::results::collection;
 use npg_qc::autoqc::role::result;
 use npg_qc::Schema;
 
@@ -19,9 +18,9 @@ my $lanes;
 my $help;
 my $checks;
 
-GetOptions ('help' => \$help,
+GetOptions ('help'     => \$help,
             'id_run=i' => \$id_run,
-            'lane=i@' => \$lanes,
+            'lane=i@'  => \$lanes,
             'check=s@' => \$checks,);
 
 if ($help) { pod2usage(0); }
@@ -32,21 +31,23 @@ if (!$lanes || !@{$lanes}) {
   croak q[--lane should be given explicitly];
 }
 
-my @list = qw/fastqcheck/;
-push @list, @{npg_qc::autoqc::autoqc->checks_list()};
+my @list = qw/ fastqcheck
+               sequence_summary
+               samtools_stats /;
+push @list, @{npg_qc::autoqc::results::collection->new()->checks_list()};
 @list = $checks ? @{$checks} : @list;
 
 warn qq[Running qc_db_delete_autoqc with the following options:\n\tid_run:\t$id_run\n\tlane:\t] .
         join(q[, ], @{$lanes}) . qq[\n\tcheck:\t] . ($checks ? join(q[, ], @list) : 'all').
         qq[\n];
-##no critic (ProhibitComplexMappings)
-my @table_names = map {my @a=npg_qc::autoqc::role::result->class_names($_); $a[1]} @list;
-##use critic
+my @table_names = map { [npg_qc::autoqc::role::result->class_names($_)]->[1] } @list;
 
+my $query = {id_run => $id_run, position => $lanes};
 my $schema = npg_qc::Schema->connect();
 my $transaction = sub {
   foreach my $table (@table_names) {
-    my $rs = $schema->resultset($table)->search({id_run => $id_run, position => $lanes,});
+    my $method = $table eq 'Fastqcheck' ? 'search' : 'search_autoqc';
+    my $rs = $schema->resultset($table)->$method($query);
     my $num_records = 0;
     while (my $row = $rs->next) {
       $row->delete;
@@ -120,7 +121,11 @@ qc_db_delete_autoqc
 
 =item lib
 
-=item npg_qc::autoqc::autoqc
+=item Getopt::Long
+
+=item Pod::Usage
+
+=item Carp
 
 =back
 
@@ -136,7 +141,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Marina Gourtovaia
+Copyright (C) 2017 GRL, by Marina Gourtovaia
 
 This file is part of NPG.
 
