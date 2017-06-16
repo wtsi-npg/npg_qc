@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - update script for deleting autoqc database results so that it
+   can handle composition-based tables
  - remove attribute qc_report_dir from check object: the output directory
    is created by default using the sample's filename root
  - npg_qc::autoqc::qc_store - load rna_seqc results into new rna_seqc
