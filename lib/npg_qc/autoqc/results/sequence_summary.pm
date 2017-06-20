@@ -102,7 +102,7 @@ has '_samtools' => (
 
 sub execute {
   my $self = shift;
-  $self->_set_samtools('samtools1');
+  $self->_set_samtools('samtools');
   for my $attr ( @ATTRIBUTES ) {
     $self->$attr;
   }

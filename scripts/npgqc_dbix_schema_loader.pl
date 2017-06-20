@@ -8,6 +8,7 @@ use lib qw/lib/;
 
 use npg_qc::autoqc::results::collection;
 use npg_qc::autoqc::role::result;
+use npg_qc::autoqc::results::collection;
 
 our $VERSION = '0';
 

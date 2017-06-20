@@ -12,7 +12,7 @@ my $ref_repos = cwd . '/t/data/autoqc';
 my $expected_md5 = q[a4790111996a3f1c0247d65f4998e492];
 
 my $dir = tempdir(CLEANUP => 1);
-my $st = join q[/], $dir, q[samtools_irods];
+my $st = join q[/], $dir, q[samtools];
 `touch $st`;
 `chmod +x $st`;
 my $bt = join q[/], $dir, q[bcftools1];
@@ -25,7 +25,7 @@ mkdir($data_dir);
 `echo -n $expected_md5 > $data_dir/2_1.bam.md5`;
 
 # create and populate a temporary iRODS collection
-my $irods = WTSI::NPG::iRODS->new;
+my $irods = WTSI::NPG::iRODS->new(strict_baton_version => 0);
 my $irods_tmp_coll;
 my $irods_data_coll;
 my $pid = $$;
@@ -35,6 +35,7 @@ $irods_data_coll = $irods_tmp_coll."/data";
 
 {
     my $r = npg_qc::autoqc::checks::genotype->new(
+        irods       => $irods,
         id_run      => 2,
         position    => 1,
         input_files => ["$data_dir/2_1.bam"],
@@ -55,13 +56,15 @@ $irods_data_coll = $irods_tmp_coll."/data";
 
     my $irods_path = 'irods:'.$irods_data_coll.'/2_1.bam';
     $r = npg_qc::autoqc::checks::genotype->new(
+        irods       => $irods,
         id_run      => 2,
         position    => 1,
         input_files => [$irods_path],
         repository  => $ref_repos,
     );
     is($r->input_files_md5, $expected_md5,
-       "iRODS MD5 string matches expected value");
+       "iRODS MD5 string matches expected value") or
+         diag `ils -L $irods_data_coll/2_1.bam`
 }
 
 # remove temporary iRODS collection

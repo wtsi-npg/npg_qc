@@ -1,6 +1,7 @@
 Changes for NPG SeqQC
 
  - add composite alternate matches to genotype check display
+ - add metrics for RNA-SeQC qc check: new template and an "about" entry with information explaining metrics
 
 release 20.6
  - added norm_fit information
@@ -232,7 +233,7 @@ Links within the SeqQC pages are shown as blue arrows
  - the focus icon (4 outward arrows) to the left of the pool/library name takes you to the page of all lanes/plexes of this library
  - the focus icon to the left of the run number takes you to the main run page
 
-New  ± icon on the headers for lane results and an individual result:
+New  ï¿½ icon on the headers for lane results and an individual result:
  - collapse/expand relevant part of the page. 
 
 release 8.4

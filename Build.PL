@@ -4,6 +4,8 @@ use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
+  use strict;
+  use warnings;  
   use File::Path qw(make_path remove_tree);
   use File::Which qw(which);
   use npg_tracking::util::abs_path qw(abs_path);
@@ -35,7 +37,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   sub _samtools_option {
     my $self = shift;
 
-    my @found = which('samtools1');
+    my @found = which('samtools');
     my $samtools = @found ? abs_path( $found[0] ) : q[];
     @found = which('htsfile');
     my $hts = @found ? abs_path( $found[0] ) : q[];
@@ -86,12 +88,9 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       my $command = sprintf 'make %s --directory %s %s',
                       $silent, _c_src_dir($tool), $extra_info;
       if (system $command) {
-        die "Failed to compile $ename";
+        die "Failed to compile $tool";
       }
       foreach my $ename ( @{$c_tools->{$tool}->{'copy'}} ) {
-        if ($self->verbose) {
-          warn "Copying $ename for $tool\n";
-        }
         $self->copy_if_modified(
           from    => join(q[/], $bdir, $ename),
           to_dir  => join(q[/], $self->base_dir(), $self->blib(), 'script'),
@@ -118,43 +117,6 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       system "make clean $silent --directory " . _c_src_dir($tool);
       remove_tree _c_build_dir($tool);
     }
-  }
-
-  sub process_htdocs_files {
-    my $self = shift;
-    my $files = $self->rscan_dir('htdocs', sub {-f $_ and (/\.css$/ or /\.js$/)});
-    foreach my $f (@{$files}) {
-      $self->copy_if_modified(
-        from    => $f,
-        to_dir  => join(q[/], $self->base_dir(), $self->blib()),
-        flatten => 0);
-    }
-    return;
-  }
-
-  sub process_cgibin_files {
-    my $self = shift;
-    my $script = $self->copy_if_modified(
-      from    => 'cgi-bin/npg_qc',
-      to_dir  => join(q[/], $self->base_dir(), $self->blib()),
-      flatten => 0);
-    if ($script) {
-      $self->fix_shebang_line(($script));
-      `chmod +x $script`;
-    }
-    return;
-  }
-
-  sub process_data_files {
-    my $self = shift;
-    my $files = $self->rscan_dir('data/npg_qc_web/templates', sub {-f $_ and /\.tt2$/});
-    foreach my $f (@{$files}) {
-      $self->copy_if_modified(
-        from    => $f,
-        to_dir  => join(q[/], $self->base_dir(), $self->blib()),
-        flatten => 0);
-    }
-    return;
   }
 EOF
 
@@ -339,16 +301,6 @@ my $builder = $class->new(
 
           'dist'          => { COMPRESS => 'gzip', SUFFIX => 'gz', },
          );
-
-# Build and install cgi-related files
-foreach my $path (qw(data htdocs cgi-bin)) {
-  my $name = $path;
-  $name =~ s/-//;
-  $builder->add_build_element($name);
-  if ($builder->install_base()) {
-    $builder->install_path($path => join q{/}, $builder->install_base(), $path);
-  }
-}
 
 $builder->create_build_script();
 
