@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 63.0
  - update script for deleting autoqc database results so that it
    can handle composition-based tables
  - remove attribute qc_report_dir from check object: the output directory
