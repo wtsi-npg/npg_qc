@@ -135,6 +135,21 @@ __PACKAGE__->add_unique_constraint('unq_seq_compos_ps', ['id_seq_composition', '
 
 =head1 RELATIONS
 
+=head2 insert_sizes
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::InsertSize>
+
+=cut
+
+__PACKAGE__->has_many(
+  'insert_sizes',
+  'npg_qc::Schema::Result::InsertSize',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 rna_seqc
 
 Type: might_have
@@ -199,8 +214,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-01-19 11:15:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:sUtyrkK1I4aaxjciaI6mLQ
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-22 11:32:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Z5xwY8DlAUEiyfPoj0LmgQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

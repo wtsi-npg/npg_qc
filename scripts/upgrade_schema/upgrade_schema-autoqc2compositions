@@ -1,0 +1,19 @@
+--
+-- autoqc results - enable composition-based storage
+--
+-- "When you add a foreign key constraint to a table using ALTER TABLE,
+--  remember to create the required indexes first."
+-- see https://dev.mysql.com/doc/refman/5.7/en/create-table-foreign-keys.html
+
+ALTER TABLE insert_size
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_insert_size,
+  ADD INDEX insert_size_compos_ind (id_seq_composition),
+  ADD CONSTRAINT insert_size_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- reduce fragmentation
+OPTIMIZE TABLE insert_size;
+
