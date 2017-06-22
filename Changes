@@ -1,4 +1,7 @@
-LIST OF CHANGES FOR NPG-QC PACKAGE
+iLIST OF CHANGES FOR NPG-QC PACKAGE
+
+ - db composition creation via a factory method autoqc
+ - db loader - unused 'update' option removed
 
 release 63.0
  - update script for deleting autoqc database results so that it

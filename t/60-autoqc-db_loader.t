@@ -120,7 +120,7 @@ subtest 'excluding non-db attributes' => sub {
 };
 
 subtest 'loading insert_size results' => sub {
-  plan tests => 25;
+  plan tests => 19;
 
   my $is_rs = $schema->resultset('InsertSize');
   my $current_count = $is_rs->search({})->count;
@@ -169,30 +169,6 @@ subtest 'loading insert_size results' => sub {
   $row = $rs->next;
   is(join(q[ ],@{$row->expected_size}), '100 300', 'updated insert size');
   is($row->num_well_aligned_reads, 60, 'updated number well-aligned reads');
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       path   => ['t/data/autoqc/dbix_loader/is'],
-       update => 0,
-  );
-  warnings_exist {$db_loader->load()}
-    [qr(Skipped t/data/autoqc/dbix_loader/is/12187_2\.insert_size\.json),
-     qr(0 json files have been loaded)],
-    'file skipped warning';
-  $rs = $is_rs->search({});
-  is($rs->count, $current_count, 'no new records added');
-  $row = $rs->next;
-  is(join(q[ ],@{$row->expected_size}), '100 300', 'insert size not updated');
-  is($row->num_well_aligned_reads, 60, 'number well-aligned reads not updated');
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       path   => ['t/data/autoqc/dbix_loader/is/more'],
-       update => 0,
-       verbose => 0,
-  );
-  lives_ok {$db_loader->load()} 'load new insert size result';
-  is($is_rs->search({})->count, $current_count+1, 'a new records added');
 };
 
 subtest 'loading veryfy_bam_id results' => sub {
@@ -277,7 +253,7 @@ my $num_lane_jsons = 11;
 my $num_plex_jsons = 44;
 
 subtest 'loading and reloading' => sub {
-  plan tests => 7;
+  plan tests => 6;
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
@@ -321,14 +297,6 @@ subtest 'loading and reloading' => sub {
   is($count, $num_lane_jsons, 'number of new records in the db is correct');
 
   is ($db_loader->load(), $num_lane_jsons, 'loading the same files again updates all files');
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
-       path         => [$path],
-       update       => 0,
-  );
-  is ($db_loader->load(), 0, 'loading the same files again with update option false'); 
 };
 
 subtest 'loading a range of results' => sub {
@@ -337,10 +305,9 @@ subtest 'loading a range of results' => sub {
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
-       path         => [$path, "$path/lane"],
-       update       => 0,
+       path         => [$path, "$path/lane"]
   );
-  is ($db_loader->load(), $num_plex_jsons, 'loading from two paths without update');
+  is ($db_loader->load(), 55, 'loading from two paths');
   my $total_count = 0;
   my $plex_count = 0;
   my $tag_zero_count = 0;

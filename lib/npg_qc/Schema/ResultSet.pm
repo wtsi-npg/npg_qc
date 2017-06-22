@@ -1,9 +1,9 @@
 package npg_qc::Schema::ResultSet;
 
 use Moose;
-use namespace::autoclean;
-use MooseX::MarkAsMethods;
+use MooseX::MarkAsMethods autoclean => 1;
 use Carp;
+use JSON;
 
 extends 'DBIx::Class::ResultSet';
 
@@ -96,6 +96,55 @@ sub deflate_unique_key_components {
   return;
 }
 
+sub find_or_create_seq_composition {
+  my ($self, $composition) = @_;
+
+  if (!$self->result_source()->has_relationship('seq_composition')) {
+    return;
+  }
+
+  if (!$composition ||
+      (ref $composition ne 'npg_tracking::glossary::composition')) {
+    croak 'Composition object argument expected';
+  }
+
+  my $transaction = sub {
+
+    my $schema         = $self->result_source->schema();
+    my $num_components = $composition->num_components;
+
+    my $digest = $composition->digest;
+    my $composition_row = $schema->resultset('SeqComposition')
+                                  ->find_or_new({
+                    'digest' => $composition->digest,
+                    'size'   => $num_components
+                                               });
+    # If composition exists, we assume that it's properly defined, i.e.
+    # all relevant components and records in the linking table exist.
+    if (!$composition_row->in_storage) {
+      $composition_row = $composition_row->insert(); # Save composition
+      my $pk = $composition_row->id_seq_composition;
+      my $component_rs = $schema->resultset('SeqComponent');
+
+      foreach  my $c ($composition->components_list()) {
+        my $values = decode_json($c->freeze());
+        $values->{'digest'} = $c->digest();
+        # Find or instantiate and save each component
+        my $row = $component_rs->find_or_create($values);
+        # Whether the component existed or not, we have to create a new
+        # composition membership record for it.
+        $row->create_related('seq_component_compositions',
+                             {'id_seq_composition' => $pk,
+                              'size'               => $num_components});
+      }
+    }
+
+    return $composition_row;
+  };
+
+  return $self->result_source()->schema()->txn_do($transaction);
+}
+
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 1;
@@ -183,6 +232,18 @@ not in the hash.
   my $only_existing = 1;
   $rs->deflate_unique_key_components($values, $only_existing);
 
+=head2 find_or_create_seq_composition
+
+ A factory method. Given a npg_tracking::glossary::composition object,
+ will either find a database record for this composition or create one.
+ A found or created npg_qc::Schema::Result::SeqComposition row is
+ returned. If a row is created, all relevant (not already existing)
+ component rows are created and a a record is created in a linking table
+ for every component-composition pair.
+
+ Returns undefined if this result set doe not have a relationship to
+ the seq_composition table.
+
 =head1 DEPENDENCIES
 
 =over
@@ -191,11 +252,11 @@ not in the hash.
 
 =item MooseX::MarkAsMethods
 
-=item namespace::autoclean
-
 =item Carp
 
 =item DBIx::Class::ResultSet
+
+=item JSON
 
 =back
 
