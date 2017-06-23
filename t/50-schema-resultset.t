@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 12;
 use Test::Exception;
-use List::MoreUtils qw(uniq);
+use List::MoreUtils qw(uniq none);
 use Moose::Meta::Class;
-use npg_tracking::glossary::composition::component::illumina;
 use npg_tracking::glossary::composition::factory;
+use npg_tracking::glossary::composition::component::illumina;
 
 use_ok 'npg_qc::Schema';
 
@@ -277,6 +277,186 @@ subtest q[mixed queries for results linked to a composition] => sub {
   $query->{'subset'} = [qw(phix human)];
   @rows = $samtools_rs->search_autoqc($query)->all();
   is (scalar @rows, 2, 'two results for f2 filter, phix and human subsets');
+};
+
+subtest q[error or failure to return a composition] => sub {
+  plan tests => 4;
+
+  my $rs = $schema->resultset('SeqComponent');
+
+  throws_ok {$rs->find_or_create_seq_composition()}
+    qr/Composition object argument expected/, 'no argument - error';
+  throws_ok {$rs->find_or_create_seq_composition({1=>2})}
+    qr/Composition object argument expected/, 'wrong argument type - error';
+
+  ok(!$rs->result_source()->has_relationship('seq_composition'),
+    'is not directly related to seq_composition');
+
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component(npg_tracking::glossary::composition::component::illumina
+                    ->new({id_run => 1, position => 3}));
+  is($rs->find_or_create_seq_composition($f->create_composition()), undef,
+    'composition row is not returned');
+};
+
+subtest q[not saving composition subset value "all"] => sub {
+  plan tests => 2;
+
+  my $ssrs = $schema->resultset('SamtoolsStats');
+  ok($ssrs->result_source()->has_relationship('seq_composition'),
+    'is linked to seq_composition');
+
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component(npg_tracking::glossary::composition::component::illumina
+    ->new({id_run => 9999, position => 3, subset => 'all'}));
+  $f->add_component(npg_tracking::glossary::composition::component::illumina
+    ->new({id_run => 9999, position => 4, subset => 'all'}));
+  throws_ok { $ssrs->find_or_create_seq_composition($f->create_composition()) }
+    qr/Subset \"all\" not allowed/,
+    'error creating composition with "all" subset';
+};
+
+my $id_run;
+
+subtest q[finding existing composition] => sub {
+  plan tests => 15;
+
+  my $rs_component = $schema->resultset('SeqComponent');
+  my $rs_composition = $schema->resultset('SeqComposition');
+  my $rs_cc          = $schema->resultset('SeqComponentComposition');
+  my $ssrs           = $schema->resultset('SamtoolsStats');
+
+  my @ids = sort { $a <=> $b } map {$_->id_run()} $rs_component->search()->all();
+  $id_run = @ids ? pop @ids : 0;
+  $id_run++;
+
+  my @values = (
+    [{id_run => $id_run,position => 1}],
+    [{id_run => $id_run,position => 1}, {id_run => $id_run,position => 2}],
+    [{id_run => $id_run,position => 1,subset=>'phix'}],
+    [{id_run => $id_run,position => 1,tag_index => 22},
+     {id_run => $id_run,position => 1,tag_index => 23}],
+    [{id_run => $id_run,position => 1,tag_index => 0}],
+    [{id_run => $id_run,position => 1,tag_index => 22,subset => 'human'},
+     {id_run => $id_run,position => 1,tag_index => 23,subset => 'human'}],
+    [{id_run => $id_run,position => 1,tag_index => 22,subset => 'phix'},
+     {id_run => $id_run,position => 1,tag_index => 23,subset => 'phix'}],  
+  );  
+
+  my $count = 0;
+
+  foreach my $values_array (@values) {
+
+    my $f = npg_tracking::glossary::composition::factory->new();
+    my @component_ids = ();
+    foreach my $value (@{$values_array}) {
+      my $component = npg_tracking::glossary::composition::component::illumina
+                      ->new($value);
+      $f->add_component($component);
+      my %temp = %{$value};
+      $temp{'digest'} = $component->digest();
+      push @component_ids, $rs_component->find_or_create(\%temp)->id_seq_component();
+    }
+    my $composition = $f->create_composition();
+    my $num_components = $composition->num_components;
+    my $pk_value = $rs_composition->create(
+      {digest => $composition->digest, size => $num_components}
+    )->id_seq_composition;
+    foreach my $id (@component_ids) {
+      $rs_cc->create({'size'               => $num_components,
+                      'id_seq_component'   => $id,
+                      'id_seq_composition' => $pk_value,
+                     });
+    }
+
+    my $row = $ssrs->find_or_create_seq_composition($composition);
+    isa_ok($row, 'npg_qc::Schema::Result::SeqComposition');
+    is($row->id_seq_composition, $pk_value, 'existing row returned');
+
+    if ($count == 1) {
+      # Test that composition created by explicitly specifying undefined
+      # values can still be found.
+      my $f = npg_tracking::glossary::composition::factory->new();
+      foreach my $value (@{$values_array}) {
+        $f->add_component(npg_tracking::glossary::composition::component::illumina
+                          ->new(%{$value}, tag_index => undef, subset => undef));
+      }
+      $row = $ssrs->find_or_create_seq_composition($f->create_composition());
+      is($row->id_seq_composition, $pk_value, 'existing row returned');
+    }
+
+    $count++;
+  }
+};
+
+subtest q[creating new composition from new and existing components] => sub {
+  plan tests => 64;
+
+  my @values = (
+    [{id_run => $id_run,position => 2}],
+    [{id_run => $id_run,position => 3}, {id_run => $id_run,position => 2}],
+    [{id_run => $id_run,position => 2,subset=>'phix'}],
+    [{id_run => $id_run,position => 1,tag_index => 22},
+     {id_run => $id_run,position => 1,tag_index => 23},
+     {id_run => $id_run,position => 1,tag_index => 24}],
+    [{id_run => $id_run,position => 1,tag_index => 12},
+     {id_run => $id_run,position => 1,tag_index => 13},
+     {id_run => $id_run,position => 1,tag_index => 14}],
+    [{id_run => $id_run,position => 3,tag_index => 0}],
+    [{id_run => $id_run,position => 1,tag_index => 22,subset => 'human'},
+     {id_run => $id_run,position => 1,tag_index => 24,subset => 'human'}],
+    [{id_run => $id_run,position => 1,tag_index => 25,subset => 'phix'},
+     {id_run => $id_run,position => 1,tag_index => 26,subset => 'phix'}],  
+  );  
+
+  my @existing_pks = map { $_->id_seq_composition }
+                     $schema->resultset('SeqComposition')->search({})->all();
+  my $rs_component = $schema->resultset('SeqComponent');
+  my $num_existing_components = $rs_component->search({})->count();
+
+  my $ssrs = $schema->resultset('SamtoolsStats');
+
+  foreach my $values_array (@values) {
+
+    my $f = npg_tracking::glossary::composition::factory->new();
+    foreach my $value (@{$values_array}) {
+      my $component = npg_tracking::glossary::composition::component::illumina
+                      ->new($value);
+      $f->add_component($component);
+    }
+    my $composition = $f->create_composition();
+    my $num_components = $composition->num_components;
+ 
+    my $row = $ssrs->find_or_create_seq_composition($composition);
+    isa_ok($row, 'npg_qc::Schema::Result::SeqComposition');
+
+    my $pk_value = $row->id_seq_composition;
+    ok((none { $_== $pk_value } @existing_pks), 'a new row returned');
+    is($row->size, $num_components, 'composition size recorded corectly');
+    my @sizes = map { $_->size } $row->seq_component_compositions()->all();
+    is(scalar @sizes, $num_components, 'correct number of linking records created');
+    @sizes = uniq @sizes;
+    ok ((scalar @sizes == 1 && $sizes[0] == $num_components),
+     'composition size recorded corectly in a linking table');
+    ok($row->create_composition()->digest() eq $composition->digest(),
+      'composition and component records created correctly');
+
+    foreach my $value (@{$values_array}) {
+      my $digest = npg_tracking::glossary::composition::component::illumina
+                   ->new($value)->digest;
+      my %temp = %{$value};
+      for my $key (qw/tag_index subset/) {
+        if (!exists $temp{$key}) {
+          $temp{$key} = undef;
+        }
+      }
+      is ($rs_component->search(\%temp)->single()->digest, $digest,
+        'component digest recorded correctly');
+    }
+  }
+
+  is($rs_component->search({})->count(), $num_existing_components + 10,
+    '10 new components are added');
 };
 
 1;

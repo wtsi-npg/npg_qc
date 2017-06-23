@@ -99,21 +99,25 @@ sub deflate_unique_key_components {
 sub find_or_create_seq_composition {
   my ($self, $composition) = @_;
 
-  if (!$self->result_source()->has_relationship('seq_composition')) {
-    return;
-  }
-
   if (!$composition ||
       (ref $composition ne 'npg_tracking::glossary::composition')) {
     croak 'Composition object argument expected';
   }
 
+  my $result_source = $self->result_source();
+  if (!$result_source->has_relationship('seq_composition')) {
+    return;
+  }
+
+  my $num_components = $composition->num_components;
+  if (!$num_components) {
+    croak 'Empty composition';
+  }
+
+  my $schema = $result_source->schema();
+
   my $transaction = sub {
 
-    my $schema         = $self->result_source->schema();
-    my $num_components = $composition->num_components;
-
-    my $digest = $composition->digest;
     my $composition_row = $schema->resultset('SeqComposition')
                                   ->find_or_new({
                     'digest' => $composition->digest,
@@ -128,8 +132,26 @@ sub find_or_create_seq_composition {
 
       foreach  my $c ($composition->components_list()) {
         my $values = decode_json($c->freeze());
+
+        ##########
+        # Through inheritance from the reference finder role some of the
+        # autoqc results generated with npg_tracking releases up to and
+        # including release 86.3 had subset attribute set to 'all' where
+        # it should be undefined, for example, for prexes.
+        #
+        # See https://github.com/wtsi-npg/npg_tracking/pull/403 for
+        # details.
+        #
+        # It's too late to unset the value at this point. The digest
+        # was computed for a composition with subset "all", and a search
+        # by composition is based on the digest value.
+        #
+        if ($values->{'subset'} && $values->{'subset'} eq 'all') {
+          croak 'Subset "all" not allowed';
+        }
+
         $values->{'digest'} = $c->digest();
-        # Find or instantiate and save each component
+        # Find or (instantiate and save) each component
         my $row = $component_rs->find_or_create($values);
         # Whether the component existed or not, we have to create a new
         # composition membership record for it.
@@ -142,7 +164,7 @@ sub find_or_create_seq_composition {
     return $composition_row;
   };
 
-  return $self->result_source()->schema()->txn_do($transaction);
+  return $schema->txn_do($transaction);
 }
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
