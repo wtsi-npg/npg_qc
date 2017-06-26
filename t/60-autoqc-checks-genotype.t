@@ -12,7 +12,7 @@ my $ref_repos = cwd . '/t/data/autoqc';
 my $expected_md5 = q[a4790111996a3f1c0247d65f4998e492];
 
 my $dir = tempdir(CLEANUP => 1);
-my $st = join q[/], $dir, q[samtools_irods];
+my $st = join q[/], $dir, q[samtools];
 `touch $st`;
 `chmod +x $st`;
 my $bt = join q[/], $dir, q[bcftools1];

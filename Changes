@@ -1,5 +1,12 @@
-LIST OF CHANGES FOR NPG-QC PACKAGE
+iLIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - db composition creation via a factory method autoqc
+ - db loader - unused 'update' option removed
+ - saving a component with subset attribute value 'all' errors
+
+release 63.0
+ - update script for deleting autoqc database results so that it
+   can handle composition-based tables
  - remove attribute qc_report_dir from check object: the output directory
    is created by default using the sample's filename root
  - npg_qc::autoqc::qc_store - load rna_seqc results into new rna_seqc
@@ -9,6 +16,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      in summary
    - include a link to original RNA-SeQC report in check's template
    - Build will fail if no node, npm or bower are available in path
+ - stop using multiple versions of samtools
  - do not install NPGQC web app
  - increase HTTP timeout when reporting manual qc outcomes to LIMs
 

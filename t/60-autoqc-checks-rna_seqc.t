@@ -98,7 +98,7 @@ subtest 'Argument input files' => sub {
     `mkdir -p $trans_dir/RNA-SeQC`;
     `touch $trans_dir/RNA-SeQC/ensembl_75_transcriptome-GRCm38.gtf`;
 
-    my $si = join q[/], $dir, q[samtools_irods];
+    my $si = join q[/], $dir, q[samtools];
     open my $fh,  q[>], $si;
     print $fh qq[cat $repos/data/17550_3#8.bam\n];
     close $fh;
@@ -151,7 +151,7 @@ subtest 'Argument input files' => sub {
         repository => $repos,
         ref_repository => $ref_repos_dir,
         transcriptome_repository => $trans_repos_dir,);
-    throws_ok { $check->execute } qr/Binary fasta reference for Danio_rerio, zv9, all does not exist/,
+    throws_ok { $check->execute } qr/Binary fasta reference for Danio_rerio, zv9(, all)? does not exist/,
         'error message when reference genome does not exist';
 
     $ref_dir = join q[/], $ref_repos_dir,'Danio_rerio','zv9','all';

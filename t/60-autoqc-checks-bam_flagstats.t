@@ -83,7 +83,7 @@ $ae_16960->extract(to => $tempdir) or die $ae_16960->error;
 $archive_16960 = join q[/], $tempdir, $archive_16960;
 #note `find $archive_16960`;
 
-my $samtools_path  = join q[/], $tempdir, 'samtools1';
+my $samtools_path  = join q[/], $tempdir, 'samtools';
 local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
 write_samtools_script($samtools_path);
 

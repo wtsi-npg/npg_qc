@@ -16,9 +16,9 @@ my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive
 $ae->extract(to => $tempdir) or die $ae->error;
 $archive = join q[/], $tempdir, $archive;
 
-my $samtools_path  = join q[/], $tempdir, 'samtools1';
+my $samtools_path  = join q[/], $tempdir, 'samtools';
 local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
-# Create mock samtools1 that will output the header
+# Create mock samtools that will output the header
 my $header_file = join q[/],$archive,'cram.header';
 write_samtools_script($samtools_path, $header_file);
 

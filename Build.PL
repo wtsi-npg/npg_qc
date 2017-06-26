@@ -4,6 +4,8 @@ use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
+  use strict;
+  use warnings;  
   use File::Path qw(make_path remove_tree);
   use File::Which qw(which);
   use npg_tracking::util::abs_path qw(abs_path);
@@ -35,7 +37,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   sub _samtools_option {
     my $self = shift;
 
-    my @found = which('samtools1');
+    my @found = which('samtools');
     my $samtools = @found ? abs_path( $found[0] ) : q[];
     @found = which('htsfile');
     my $hts = @found ? abs_path( $found[0] ) : q[];
@@ -86,12 +88,9 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       my $command = sprintf 'make %s --directory %s %s',
                       $silent, _c_src_dir($tool), $extra_info;
       if (system $command) {
-        die "Failed to compile $ename";
+        die "Failed to compile $tool";
       }
       foreach my $ename ( @{$c_tools->{$tool}->{'copy'}} ) {
-        if ($self->verbose) {
-          warn "Copying $ename for $tool\n";
-        }
         $self->copy_if_modified(
           from    => join(q[/], $bdir, $ename),
           to_dir  => join(q[/], $self->base_dir(), $self->blib(), 'script'),
