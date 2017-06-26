@@ -79,7 +79,7 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
 =head2 rrna
 
-  data_type: 'float'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
@@ -103,31 +103,31 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
 =head2 genes_detected
 
-  data_type: 'float'
+  data_type: 'integer'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_1_sense
 
-  data_type: 'float'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_1_antisense
 
-  data_type: 'float'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_2_sense
 
-  data_type: 'float'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 end_2_antisense
 
-  data_type: 'float'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
@@ -192,7 +192,7 @@ __PACKAGE__->add_columns(
   'info',
   { data_type => 'text', is_nullable => 1 },
   'rrna',
-  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'rrna_rate',
   { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'exonic_rate',
@@ -200,15 +200,15 @@ __PACKAGE__->add_columns(
   'expression_profiling_efficiency',
   { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'genes_detected',
-  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_1_sense',
-  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_1_antisense',
-  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_2_sense',
-  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_2_antisense',
-  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_1_pct_sense',
   { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'end_2_pct_sense',
@@ -284,8 +284,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-01-19 11:15:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2mZZ7aTIqW6xAZ63EQaX1g
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-26 15:08:54
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:r4ry1eMCad+EnAC0dfmYQQ
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
