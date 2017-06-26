@@ -199,15 +199,8 @@ sub tile_max {
 
 sub get_id_run_actual{
   my ($self) = @_;
-  my $id_run = $self->id_run();
-  my $pair_id_run = $self->id_run_pair($id_run);
-  if( ( $self->end() == 1 ) || ( $self->end() == 2 &&  !$pair_id_run ) ){
-    $self->id_run_actual($id_run);
-    return;
-  }
-
-  $self->id_run_actual($self->id_run_pair($id_run));
-  return 1;
+  $self->id_run_actual($self->id_run);
+  return;
 }
 
 sub get_instrument{
