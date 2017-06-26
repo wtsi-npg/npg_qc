@@ -1,8 +1,3 @@
-#########
-# Author:        gq1
-# Created:       2008-07-16
-#
-
 package npg_qc::model::move_z;
 use strict;
 use warnings;
@@ -10,9 +5,6 @@ use base qw(npg_qc::model);
 use English qw(-no_match_vars);
 use Carp;
 use Readonly;
-
-use npg::util::image::heatmap;
-use npg::util::image::image_map;
 
 our $VERSION = '0';
 
@@ -116,36 +108,7 @@ sub cycles_for_run{
 
   return \@rows;
 }
-#get all the newZ value and the start time
-sub data_for_plot {
-  my ($self, $id_run) = @_;
 
-  my @rows;
-  eval {
-    my $dbh = $self->util->dbh();
-    my $query = q{SELECT move_z.start, move_z.newz
-                  FROM move_z,
-                       run_tile
-                  WHERE run_tile.id_run = ?
-                  AND run_tile.id_run_tile = move_z.id_run_tile
-                  ORDER BY move_z.start};
-    my $sth = $dbh->prepare($query);
-    $sth->execute($id_run);
-
-    while (my @row = $sth->fetchrow_array()) {
-      push @rows, \@row;
-    }
-    1;
-  } or do {
-    croak $EVAL_ERROR;
-  };
-
-  if (!scalar@rows) {
-    return [];
-  }
-
-  return \@rows;
-}
 #get all newz values different from the average for every tile but from one cycle
 sub newz_by_cycle {
   my ($self, $id_run, $cycle) = @_;
@@ -443,63 +406,6 @@ sub run_alerts{
   return$self->{run_alerts};
 }
 
-
-sub heatmap_with_map { ## no critic (ProhibitManyArgs)
-  my ($self, $id_run, $end, $dataset, $url, $cycle) = @_;
-
-  my $data_refs = {
-    id_run    => $id_run,
-    end       => $end,
-    dataset   => $dataset,
-    image_url => $url,
-    id        => $dataset . q{:} . $id_run . q{:} . $end,
-    hover_map => 1,
-    gradient_style => 'movez',
-  };
-
-  my $data_array;
-  if($cycle){
-    $data_array = $self->newz_by_cycle($id_run, $cycle);
-  }else{
-    $data_array = $self->variance_newz($id_run, $end);
-  }
-  #move_z value only link to read 1 run tile 
-  $end = 1;
-
-  my $heatmap_obj = npg::util::image::heatmap->new({
-    data_array => $data_array,
-  });
-
-  my $rt_obj = npg_qc::model::run_tile->new({util => $self->util()});
-  my $run_tiles = $rt_obj->run_tiles_per_run_by_lane_end($id_run);
-
-  eval {
-    $heatmap_obj->plot_illumina_map($data_refs);
-    $data_refs->{data} = $heatmap_obj->image_map_reference();
-    foreach my $box (@{$data_refs->{data}}) {
-      my $data_information = $box->[-1];
-      my $params = q{id_run=} . $id_run . q{&position=} . $data_information->{position} . q{&tile=} . $data_information->{tile} . q{&end=} . $end . q{&cycle=1};
-      $data_information->{value} = $data_information->{value} == $NOT_APPLICABLE   ? 'n/a'
-                                 : $data_information->{value} == $LESS_THAN_5K     ? '<5k'
-                                 : $data_information->{value} == $BETWEEN_5K_10K   ? '5k-10k'
-                                 : $data_information->{value} == $GREATER_THAN_10K ? '>10k'
-                                 :                                                   q{}
-                                 ;
-
-      my $run_tile = $run_tiles->[$end-1]->[$data_information->{position}-1]->[$data_information->{tile} -1];
-      my $id_run_tile = $run_tile->id_run_tile();
-
-      $data_information->{url} = q{javascript:run_tile_page(SCRIPT_NAME+'/run_tile/' +} . $run_tile->id_run_tile() .q{);" onclick="open_tile_viewer(SCRIPT_NAME + '/run_tile/}. $id_run_tile.q{;read_tile_viewer');};
-    }
-    my $image_map_object = npg::util::image::image_map->new();
-    $self->{map} = $image_map_object->render_map($data_refs);
-  } or do {
-    croak 'Unable to render map: ' . $EVAL_ERROR;
-  };
-
-  return $self->{map};
-}
-
 1;
 __END__
 =head1 NAME
@@ -517,7 +423,6 @@ npg_qc::model::move_z
 =head2  average_newz - query the database to get the average newz for each tile across the cycles (except cycle 1 currently)
 =head2  init - override method, based on id_run_tile and cycle number to get the primary key of move_z, id_move_z 
 =head2  cycles_for_run - query the database to check how many cycles for a given run
-=head2  data_for_plot  - get all the newZ values and corresponding start times
 =head2  fields         - a list of fields
 =head2  max_tiles_lane - check how many tiles for each lane
 =head2  move_zlist
@@ -528,8 +433,6 @@ except cycle 1 currently
 =head2 run_alerts - get a hash ref, id_runs as keys and the number of tiles with high difference of z values 
 
 =head2 cycle_count - returns the maximum cycle count found for the run
-
-=head2 heatmap_with_map - returns a html snippet with the heatmap url and with a hovermap over it
 
 =head1 DIAGNOSTICS
 
@@ -553,7 +456,7 @@ Guoying Qi, E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Guoying Qi
+Copyright (C) 2017 GRL
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

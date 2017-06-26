@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - deleted VC (view-controller) part of the Clearpress npg_qc web server
+
 release 63.0
  - update script for deleting autoqc database results so that it
    can handle composition-based tables

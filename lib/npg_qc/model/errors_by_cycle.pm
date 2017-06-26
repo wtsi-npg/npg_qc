@@ -1,17 +1,10 @@
-#########
-# Author:        ajb
-# Created:       2008-06-10
-#
 
-package npg_qc::model::errors_by_cycle;
 use strict;
 use warnings;
 use base qw(npg_qc::model);
 use English qw{-no_match_vars};
 use Readonly;
 use Carp;
-use npg::util::image::heatmap;
-use npg::util::image::image_map;
 
 our $VERSION = '0';
 
@@ -76,41 +69,6 @@ sub id_run {
   return $self->{id_run};
 }
 
-sub heatmap_with_map { ## no critic (ProhibitManyArgs)
-  my ($self, $id_run, $end, $dataset, $url, $cycle) = @_;
-
-  my $data_refs = {
-    id_run    => $id_run,
-    end       => $end,
-    dataset   => $dataset,
-    image_url => $url,
-    id        => $dataset . q{:} . $id_run . q{:} . $end,
-    hover_map => 1,
-  };
-
-  my $data_array = $self->heatmap_data($data_refs);
-
-  my $heatmap_obj = npg::util::image::heatmap->new({
-    data_array => $data_array,
-  });
-
-  eval {
-    $heatmap_obj->plot_illumina_map($data_refs);
-    $data_refs->{data} = $heatmap_obj->image_map_reference();
-    foreach my $box (@{$data_refs->{data}}) {
-      my $data_information = $box->[-1];
-      my $params = q{id_run=} . $id_run . q{&position=} . $data_information->{position} . q{&tile=} . $data_information->{tile} . q{&end=} . $end . q{&cycle=} . $cycle;
-      $box->[-1]->{url} = q{#" onclick="open_tile_viewer(SCRIPT_NAME + '/run_tile/;read_tile_viewer?} . $params .q{');return false;};
-    }
-    my $image_map_object = npg::util::image::image_map->new();
-    $self->{map} = $image_map_object->render_map($data_refs);
-  } or do {
-    croak 'Unable to render map: ' . $EVAL_ERROR;
-  };
-
-  return $self->{map};
-}
-
 sub run_tile {
   my $self  = shift;
   my $pkg   = 'npg_qc::model::run_tile';
@@ -118,187 +76,6 @@ sub run_tile {
 		    'util' => $self->util(),
 		    'id_run_tile' => $self->id_run_tile(),
 		   });
-}
-
-sub data_for_plot {
-  my ($self, $id_run, $position, $tile) = @_;
-
-  my @rows;
-  eval {
-
-    my $cycles;
-    my $dbh = $self->util->dbh();
-    my $query = q{SELECT DISTINCT ec.cycle, ec.error_percentage
-                  FROM   run_tile rt,
-                         errors_by_cycle ec
-                  WHERE  rt.id_run = ?
-                  AND    rt.position = ?
-                  AND    rt.tile = ?
-                  AND    rt.end = 1
-                  AND    rt.id_run_tile = ec.id_run_tile
-                  AND    rescore = 1
-                  ORDER BY position, cycle};
-    my $sth = $dbh->prepare($query);
-    $sth->execute($id_run, $position, $tile);
-
-    while (my @row = $sth->fetchrow_array()) {
-      if ($row[1] > $MAX_ERROR_PERCENTAGE) {
-        $row[1] = $MAX_ERROR_PERCENTAGE;
-      }
-      push @rows, \@row;
-      $cycles = $row[0];
-
-    }
-
-    $query = q{SELECT DISTINCT ec.cycle, ec.error_percentage
-               FROM   run_tile rt,
-                      errors_by_cycle ec
-               WHERE  rt.id_run = ?
-               AND    rt.position = ?
-               AND    rt.tile = ?
-               AND    rt.end = 2
-               AND    rt.id_run_tile = ec.id_run_tile
-               AND    rescore = 1
-               ORDER BY position, cycle};
-    $sth = $dbh->prepare($query);
-    $sth->execute($id_run, $position, $tile);
-
-    while (my @row = $sth->fetchrow_array()) {
-      if ($row[1] > $MAX_ERROR_PERCENTAGE) {
-        $row[1] = $MAX_ERROR_PERCENTAGE;
-      }
-      $row[0] += $cycles;
-      push @rows, \@row;
-    }
-
-    1;
-
-  } or do {
-    croak $EVAL_ERROR;
-  };
-
-  if (!scalar@rows) {
-    return [];
-
-  }
-  return \@rows;
-}
-
-sub data_for_plot_blank_error {
-  my ($self, $id_run, $position, $tile) = @_;
-
-  my @rows;
-  eval {
-
-    my $cycles;
-    my $dbh = $self->util->dbh();
-    my $query = q{SELECT rt.end, ec.cycle, ec.blank_percentage
-                  FROM   run_tile rt,
-                         errors_by_cycle ec
-                  WHERE  rt.id_run = ?
-                  AND    rt.position = ?
-                  AND    rt.tile = ?
-                  AND    rt.id_run_tile = ec.id_run_tile
-                  AND    rescore = 1
-                  ORDER BY end, position, cycle};
-    my $sth = $dbh->prepare($query);
-    $sth->execute($id_run, $position, $tile);
-
-    my $cycle_max_first_end = 0;
-    while (my @row = $sth->fetchrow_array()) {
-
-      if ($row[2] > $MAX_ERROR_PERCENTAGE) {
-        $row[2] = $MAX_ERROR_PERCENTAGE;
-      }
-
-      my $row_plot_data = [];
-      if($row[0] == 1){
-        $cycle_max_first_end = $row[1];
-        $row_plot_data = [$row[1], $row[2]];
-      }elsif($row[0] == 2){
-        $row_plot_data = [$row[1]+$cycle_max_first_end, $row[2]];
-      }
-      push @rows, $row_plot_data;
-
-    }
-    1;
-  } or do {
-    croak $EVAL_ERROR;
-  };
-
-  if (!scalar@rows) {
-    return [];
-  }
-
-  return \@rows;
-}
-
-sub data_for_plot_including_pre_chastity {
-  my ($self, $id_run, $position, $tile) = @_;
-  my @rows;
-  my %collated;
-  eval {
-
-    my $cycles;
-    my $dbh = $self->util->dbh();
-    my $query = q{SELECT DISTINCT ec.cycle, rescore, ec.error_percentage
-                  FROM   run_tile rt,
-                         errors_by_cycle ec
-                  WHERE  rt.id_run = ?
-                  AND    rt.position = ?
-                  AND    rt.tile = ?
-                  AND    rt.end = 1
-                  AND    rt.id_run_tile = ec.id_run_tile
-                  ORDER BY rescore, cycle};
-    my $sth = $dbh->prepare($query);
-    $sth->execute($id_run, $position, $tile);
-
-    while (my @row = $sth->fetchrow_array()) {
-      if ($row[2] > $MAX_ERROR_PERCENTAGE) {
-        $row[2] = $MAX_ERROR_PERCENTAGE;
-      }
-      $collated{$row[0]}->{$row[1]} = $row[2];
-      $cycles = $row[0];
-
-    }
-
-    $query = q{SELECT DISTINCT  ec.cycle, rescore, ec.error_percentage
-               FROM   run_tile rt,
-                      errors_by_cycle ec
-               WHERE  rt.id_run = ?
-               AND    rt.position = ?
-               AND    rt.tile = ?
-               AND    rt.end = 2
-               AND    rt.id_run_tile = ec.id_run_tile
-               ORDER BY rescore, cycle};
-    $sth = $dbh->prepare($query);
-    $sth->execute($id_run, $position, $tile);
-
-    while (my @row = $sth->fetchrow_array()) {
-      if ($row[2] > $MAX_ERROR_PERCENTAGE) {
-        $row[2] = $MAX_ERROR_PERCENTAGE;
-      }
-      $row[0] += $cycles;
-      $collated{$row[0]}->{$row[1]} = $row[2];
-    }
-
-    foreach my $cycle (sort { $a <=> $b } keys %collated) {
-      push @rows, [$cycle, $collated{$cycle}{0}, $collated{$cycle}{1}];
-    }
-
-    1;
-
-  } or do {
-    croak $EVAL_ERROR;
-  };
-
-  if (!scalar@rows) {
-    return [];
-
-  }
-
-
-  return \@rows;
 }
 
 sub average_perc_for_lane {
@@ -411,72 +188,6 @@ sub cycles_for_run {
   return [1..$cycle_count];
 }
 
-sub heatmap_data_per_cycle {
-  my ($self) = @_;
-  my $cycle = $self->cycle();
-  my $id_run = $self->{id_run};
-  my $dbh = $self->util->dbh();
-
-  my $query = qq{SELECT max(tile) FROM run_tile WHERE id_run = $id_run};
-  my $sth = $dbh->prepare($query);
-  $sth->execute();
-  my $tile_count = $sth->fetchrow_array();
-
-  $query = qq{SELECT max(ec.cycle) FROM run_tile rt, errors_by_cycle ec WHERE rt.id_run = $id_run AND ec.id_run_tile = rt.id_run_tile};
-  $sth = $dbh->prepare($query);
-  $sth->execute();
-  my $cycle_count = $sth->fetchrow_array();
-
-  my $end = 1;
-
-  if ($cycle > $cycle_count) {
-    $end = 2;
-    $cycle = $cycle - $cycle_count;
-  }
-
-  $query = q{SELECT rt.position, rt.tile, ec.cycle, ec.error_percentage
-             FROM   run_tile rt,
-                    errors_by_cycle ec
-             WHERE  rt.id_run = ?
-             AND    rt.end = ?
-             AND    rt.id_run_tile = ec.id_run_tile
-             AND    ec.rescore = 1
-             AND    ec.cycle = ?
-             ORDER BY cycle, position, tile};
-
-  $dbh = $self->util->dbh();
-  $sth = $dbh->prepare($query);
-  $sth->execute($id_run, $end, $cycle);
-
-  my $data = [[],[],[],[],[],[],[],[]];
-
-  while (my @row = $sth->fetchrow_array) {
-    my $position = $row[0] - 1;
-
-    my $value = $row[$FOURTH_ARRAY_INDEX] > $MAX_ERROR_PERCENTAGE ? $HEATMAP_VALUE_GT_20
-              : $row[$FOURTH_ARRAY_INDEX] > $FIVE                 ? $HEATMAP_VALUE_GT_5
-              :                                                     $row[$FOURTH_ARRAY_INDEX]
-              ;
-
-    push @{$data->[$position]}, $value;
-  }
-
-  foreach my $array (@{$data}) {
-
-    if (scalar @{$array} == 0) {
-
-      my $temp_count = $tile_count - 1;
-      for my $i (0..$temp_count) {
-        push @{$array}, 0;
-      }
-
-    }
-
-  }
-
-  return $data;
-}
-
 sub all_data_for_run {
   my ($self) = @_;
   my $id_run = $self->id_run();
@@ -526,36 +237,7 @@ sub all_data_for_run {
 
   return $self->{all_data_for_run};
 }
-sub all_thumbnail_data {
-  my ($self) = @_;
 
-  if (!$self->{all_thumbnail_data}) {
-    my $adf_run = $self->all_data_for_run();
-
-    foreach my $lane (@{$adf_run}) {
-      if ($lane) {
-        foreach my $tile (@{$lane}) {
-          push @{$self->{all_thumbnail_data}->[$tile->{position}]->[$tile->{tile}]->{error_percentage}->[0]}, $tile->{cycle};
-          push @{$self->{all_thumbnail_data}->[$tile->{position}]->[$tile->{tile}]->{error_percentage}->[1]}, $tile->{error_percentage};
-          push @{$self->{all_thumbnail_data}->[$tile->{position}]->[$tile->{tile}]->{blank_percentage}->[0]}, $tile->{cycle};
-          push @{$self->{all_thumbnail_data}->[$tile->{position}]->[$tile->{tile}]->{blank_percentage}->[1]}, $tile->{blank_percentage};
-        }
-      }
-    }
-  }
-
-  return $self->{all_thumbnail_data};
-}
-
-sub all_thumbs_map {
-  my ($self, $imr) = @_;
-
-  if ($imr) { $self->{all_thumbs_map} = $imr;}
-
-  return $self->{all_thumbs_map};
-}
-
-1;
 __END__
 =head1 NAME
 
@@ -571,10 +253,7 @@ npg_qc::model::errors_by_cycle
 
 =head2 init 
 
-=head2 data_for_plot_blank_error
-
 =head2 id_run - accessor for id_run
-
 
 =head2 fields - return array of fields, first of which is the primary key
 
@@ -583,10 +262,6 @@ npg_qc::model::errors_by_cycle
 =head2 run_tile - returns run_tile object that this object belongs to
 
   my $oRunTile = $oErrorsByCycle->run_tile();
-
-=head2 data_for_plot - generates the data to plot errors_by_cycle for a lane in order to be plotted
-
-  my $aDataForPlot = $oErrorsByCycle->data_for_plot($id_run, $position, $tile);
 
 =head2 errors_by_tile - fetches the errors by cycle for a given tile
 
@@ -608,8 +283,6 @@ npg_qc::model::errors_by_cycle
 
   my $aLanes = $oErrorsByCycle->lanes();
 
-=head2 heatmap_data_per_cycle - obtains the error percentages per tile for a given cycle
-
 =head2 cycle_count - returns (and caches) the cycle count for a single run of the run/runpair
 
   my $iCycleCount = $oErrorsByCycle->cycle_count();
@@ -618,17 +291,7 @@ npg_qc::model::errors_by_cycle
 
   my $aCyclesForRun = $oErrorsByCycle->cycles_for_run();
 
-=head2 heatmap_with_map - returns some html code with a heatmap url and a hovermap for it
-
-=head2 data_for_plot_including_pre_chastity - returns the data required to draw a plot with two lines, pre- and post-chastity
-
-  my $aDataForPlotIncludingChastity = $oErrorsByCycle->data_for_plot_including_pre_chastity($id_run, $position, $tile);
-
 =head2 all_data_for_run - retrieves all the rescore error percent and blank percent for a run
-
-=head2 all_thumbnail_data - turns all_data_for_run into format to be processed generating all the thumbnails for a run
-
-=head2 all_thumbs_map - accessor to store and retrieve all the map data points
 
 =head1 DIAGNOSTICS
 
@@ -652,7 +315,7 @@ Andy Brown, E<lt>ajb@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Andy Brown
+Copyright (C) 2017 GRL
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

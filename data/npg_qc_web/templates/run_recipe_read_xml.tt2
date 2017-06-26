@@ -1,5 +1,0 @@
-[% SET recipe_xml = model.recipe_xml %][% IF recipe_xml %][% recipe_xml %][% ELSE %]<?xml version="1.0" encoding="utf-8"?>
-<RecipeFile>
-There is no recipe xml file stored for this run [% model.id_run %]
-</RecipeFile>
-[% END %]

@@ -1,8 +1,3 @@
-#########
-# Author:        ajb
-# Created:       2008-06-27
-#
-
 package npg_qc::model::summary;
 use strict;
 use warnings;
@@ -12,8 +7,6 @@ use English qw(-no_match_vars);
 use npg_qc::model::chip_summary;
 use npg_qc::model::lane_qc;
 use npg_qc::model::run_tile;
-use npg::util::image::image_map;
-use npg::util::image::heatmap;
 use npg::api::run;
 use Statistics::Lite qw(:all);
 use Readonly;
@@ -253,48 +246,6 @@ sub alerts {
   }
 
   return $self->{alerts};
-}
-
-sub heatmap_with_map {
-  my ($self, $id_run, $end, $dataset, $url) = @_;
-
-  my $data_refs = {
-    id_run    => $id_run,
-    end       => $end,
-    dataset   => $dataset,
-    image_url => $url,
-    id        => $dataset . q{:} . $id_run . q{:} . $end,
-    hover_map => 1,
-  };
-
-  my $data_array = $self->heatmap_data($data_refs);
-
-  my $heatmap_obj = npg::util::image::heatmap->new({
-    data_array => $data_array,
-  });
-
-  my $rt_obj = npg_qc::model::run_tile->new({util => $self->util()});
-  my $run_tiles = $rt_obj->run_tiles_per_run_by_lane_end($id_run);
-
-  eval {
-    $heatmap_obj->plot_illumina_map($data_refs);
-    $data_refs->{data} = $heatmap_obj->image_map_reference();
-    foreach my $box (@{$data_refs->{data}}) {
-      my $data_information = $box->[-1];
-      my $params = q{id_run=} . $id_run . q{&position=} . $data_information->{position} . q{&tile=} . $data_information->{tile} . q{&end=} . $end . q{&cycle=1};
-
-      my $run_tile = $run_tiles->[$end-1]->[$data_information->{position}-1]->[$data_information->{tile} -1];
-      my $id_run_tile = $run_tile->id_run_tile();
-
-      $box->[-1]->{url} = q{javascript:run_tile_page(SCRIPT_NAME+'/run_tile/' +} . $run_tile->id_run_tile() .q{);" onclick="open_tile_viewer(SCRIPT_NAME + '/run_tile/}. $id_run_tile.q{;read_tile_viewer');};
-    }
-    my $image_map_object = npg::util::image::image_map->new();
-    $self->{map} = $image_map_object->render_map($data_refs);
-  } or do {
-    croak 'Unable to render map: ' . $EVAL_ERROR;
-  };
-
-  return $self->{map};
 }
 
 sub complete_runs {
@@ -695,10 +646,6 @@ Base model to sit under npg_qc::view::summary
 
   my $hAlerts = $oSummary->alerts();
 
-=head2 heatmap_data - returns arrayref of data for a heatmap to be generated with
-
-  my $aHeatmapData = $oSummary->heatmap_data({$arg_refs});
-
 =head2 complete_runs - returns arrayref containing id_run and end for which the summary data is complete
 
   my $aCompleteRuns = $oSummary->complete_runs();
@@ -752,7 +699,7 @@ Andy Brown, E<lt>ajb@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Andy Brown
+Copyright (C) 2017 GRL
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
