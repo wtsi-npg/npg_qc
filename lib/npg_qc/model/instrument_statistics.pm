@@ -190,15 +190,6 @@ sub tile_max {
     $self->{tile_max} = $ref->[0]->[0];
   }
   return $self->{tile_max};
-
-
-
-  if (!$self->{tile_max}) {
-    my $rt = npg_qc::model::run_tile->new({ util => $self->util() });
-    $self->{tile_max} = $rt->tile_max($id_run);
-  }
-
-  return $self->{tile_max};
 }
 
 sub get_id_run_actual{
