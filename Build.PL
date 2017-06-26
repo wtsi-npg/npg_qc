@@ -191,7 +191,6 @@ my $requires = {
                 'warnings'                        => 0,
                 'URI::Escape'                     => 0,
                 'XML::LibXML'                     => 0,
-                'XML::SAX'                        => 0,
 
                 'npg_common::Alignment'                    => 0,
                 'npg_common::extractor::fastq'             => 0,
@@ -218,6 +217,7 @@ my $requires = {
                 'npg_tracking::Schema'                     => 0,
                 'npg_tracking::util::abs_path'             => 0,
                 'npg_tracking::util::types'                => 0,
+                'npg::util'                                => 0,
                 'st::api::base'                            => 0,
                 'st::api::lims'                            => 0,
                 'WTSI::DNAP::Warehouse::Schema'            => 0,

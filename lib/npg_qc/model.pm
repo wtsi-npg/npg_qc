@@ -6,7 +6,6 @@ package npg_qc::model;
 use strict;
 use warnings;
 use base qw(ClearPress::model);
-use npg_qc::util;
 use English qw(-no_match_vars);
 use Carp;
 use npg_qc::model::run_tile;
@@ -681,7 +680,7 @@ Roger Pettett, E<lt>rmp@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 GRL, by Roger Pettett
+Copyright (C) 2007 GRL
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

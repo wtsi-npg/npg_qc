@@ -1,14 +1,10 @@
-#########
-# Author:        gq1
-# Created:       2008-09-30
-#
 package npg_qc::illumina::loader::Run_Caching;
 
 use Moose;
 use namespace::autoclean;
 use Carp;
 use English qw{-no_match_vars};
-use npg_qc::util;
+use npg::util;
 use npg_qc::model::run_graph;
 use npg_qc::model::cache_query;
 
@@ -16,13 +12,13 @@ extends 'npg_qc::illumina::loader::base';
 
 our $VERSION = '0';
 
-has 'npg_qc_util' =>  (isa => q{npg_qc::util},
+has 'npg_qc_util' =>  (isa => q{npg::util},
                        is => q{ro},
                        lazy_build => 1,
                       );
 sub _build_npg_qc_util {
   my $self = shift;
-  return npg_qc::util->new({ configpath => $self->schema->config_file,});
+  return npg::util->new({ configpath => $self->schema->config_file,});
 }
 
 sub cache_run {
@@ -177,6 +173,8 @@ npg_qc::illumina::loader::Run_Caching
 =item Carp
 
 =item English
+
+=item npg::util
 
 =back
 
