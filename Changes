@@ -4,6 +4,11 @@ iLIST OF CHANGES FOR NPG-QC PACKAGE
  - db loader - unused 'update' option removed
  - saving a component with subset attribute value 'all' errors
 
+release 63.1
+ - label fix for rna_seqc in SeqQC viewer
+ - MySQL does not save correctly integers to float columns;
+   change column definitions for rna_seqc
+
 release 63.0
  - update script for deleting autoqc database results so that it
    can handle composition-based tables
