@@ -14,7 +14,6 @@ bin/npg_qc_tag_sniff.pl
 bin/call_gtck_composite_rpt.pl
 Build.PL
 Changes
-data/npg_qc_web/config.ini
 lib/npg_qc/model/cache_query.pm
 lib/npg_qc/model/instrument_statistics.pm
 lib/npg_qc/model.pm
@@ -296,6 +295,7 @@ t/70-mqc-reporter.t
 t/70-mqc-outcomes.t
 t/80-autoqc-qc-script.t
 t/autoqc_util.pm
+t/data/config.ini
 t/data/api_dbic_fixtures/npg_qc/RunTimeline.yml
 t/data/api_dbic_fixtures/npg/RunStatusDict.yml
 t/data/api_dbic_fixtures/npg/RunStatus.yml
@@ -656,14 +656,6 @@ t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/Data/Intens
 t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/RunInfo.xml
 t/data/qcoutcomes/fixtures/000-mqc_library_outcome_dict.yml
 t/data/qcoutcomes/fixtures/000-mqc_outcome_dict.yml
-t/data/qc_webcache/npg/run/10.xml
-t/data/qc_webcache/npg/run/12.xml
-t/data/qc_webcache/npg/run/1.xml
-t/data/qc_webcache/npg/run/3.xml
-t/data/qc_webcache/npg/run/4281.xml
-t/data/qc_webcache/npg/run/4308.xml
-t/data/qc_webcache/npg/run/5330.xml
-t/data/qc_webcache/npg/run/956.xml
 t/data/reporter/npg_qc/mqc_outcome_dict.yml
 t/data/reporter/npg_qc/mqc_outcome_ent.yml
 t/data/reporter/mlwarehouse/300-IseqProductMetric.yml

@@ -10,7 +10,7 @@ BEGIN {
 }
 
 $ENV{'dev'} = 'test';
-my $config_file = q[data/npg_qc_web/config.ini];
+my $config_file = q[t/data/config.ini];
 my $schema = Moose::Meta::Class->create_anon_class(
   roles => [qw/npg_testing::db/])
   ->new_object({ config_file => $config_file,})
