@@ -3,9 +3,8 @@ use warnings;
 use npg_tracking::util::build;
 
 my $class = npg_tracking::util::build->subclass(code => <<'EOF');
-
   use strict;
-  use warnings;  
+  use warnings;
   use File::Path qw(make_path remove_tree);
   use File::Which qw(which);
   use npg_tracking::util::abs_path qw(abs_path);
@@ -37,28 +36,48 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   sub _samtools_option {
     my $self = shift;
 
-    my @found = which('samtools');
-    my $samtools = @found ? abs_path( $found[0] ) : q[];
-    @found = which('htsfile');
-    my $hts = @found ? abs_path( $found[0] ) : q[];
-    my $pkgs = [];
-    if ($samtools && $hts) {
-      foreach my $p (($samtools, $hts)) {
-        $p = dirname $p;
-        if ( $p =~ m{/bin\Z}smx ) {
-          $p = dirname $p;
-        }
-        if ($self->verbose) {
-          warn "Found $p\n";
-        }
-        push @{$pkgs}, $p;
-        $samtools = 'SAMTOOLS_LOC=' . $samtools;
-      }
-      $pkgs->[0] = 'SAMTOOLS_LOC=' . $pkgs->[0];
-      $pkgs->[1] = 'HTSLIB_LOC='   . $pkgs->[1];
+    my ($samtools, $htslib);
+
+    # Requires the samtools source code to build
+    if ($ENV{SAMTOOLS_SOURCE_PATH}) {
+      $samtools = $ENV{SAMTOOLS_SOURCE_PATH};
+    } else {
+      $samtools = _relative_to_bin('samtools')
     }
 
-    return $pkgs;
+    if ($ENV{HTSLIB_INSTALL_PATH}) {
+      $htslib = $ENV{HTSLIB_INSTALL_PATH};
+    } else {
+      $htslib = _relative_to_bin('htsfile')
+    }
+
+    my @pkgs;
+    if ($samtools && $htslib) {
+      push @pkgs, "SAMTOOLS_LOC=$samtools";
+      push @pkgs, "HTSLIB_LOC=$htslib";
+
+      if ($self->verbose) {
+        warn "Found samtools source $samtools\n";
+        warn "Found htslib installed $htslib\n";
+      }
+    }
+
+    return \@pkgs;
+  }
+
+  sub _relative_to_bin {
+    my ($executable) = @_;
+
+    my $path;
+    my @found = which($executable);
+    if (@found) {
+      $path = dirname abs_path($found[0]);
+      if ($path =~ m{/bin\Z}smx) {
+        $path = dirname $path;
+      }
+    }
+
+    return $path;
   }
 
   sub ACTION_build {
@@ -74,11 +93,11 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       make_path $bdir;
       my $silent = $self->verbose ? q[] : '--silent';
       my $extra_info = q[];
-        
+
       if ($c_tools->{$tool}->{'samtools'}) {
         my @pkgs = @{$self->_samtools_option()};
         if (!@pkgs) {
-          warn 'Samtools and/or hts executables are not on the path, ' .
+          warn 'samtools and htslib locations not declared or detected, ' .
                  "skipping $tool build\n";
           next;
         }
@@ -97,7 +116,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
           flatten => 1);
       }
     }
-      
+
     # Build R script
     $self->copy_if_modified(
       from    => 'lib/R/gc_bias_data.R',
