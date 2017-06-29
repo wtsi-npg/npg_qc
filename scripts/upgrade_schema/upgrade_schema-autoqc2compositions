@@ -14,6 +14,199 @@ ALTER TABLE insert_size
     REFERENCES seq_composition (id_seq_composition)
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 
--- reduce fragmentation
+ALTER TABLE adapter
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_adapter,
+  ADD INDEX adapter_compos_ind (id_seq_composition),
+  ADD CONSTRAINT adapter_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE alignment_filter_metrics
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_alignment_filter_metrics,
+  ADD INDEX alignment_filter_metrics_compos_ind (id_seq_composition),
+  ADD CONSTRAINT alignment_filter_metrics_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE bam_flagstats
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_bam_flagstats,
+  ADD INDEX bam_flagstats_compos_ind (id_seq_composition),
+  ADD CONSTRAINT bam_flagstats_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE contamination
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_contamination,
+  ADD INDEX contamination_compos_ind (id_seq_composition),
+  ADD CONSTRAINT contamination_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE gc_bias
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_gc_bias,
+  ADD INDEX gc_bias_compos_ind (id_seq_composition),
+  ADD CONSTRAINT gc_bias_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE gc_fraction
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_gc_fraction,
+  ADD INDEX gc_fraction_compos_ind (id_seq_composition),
+  ADD CONSTRAINT gc_fraction_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE genotype
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_genotype,
+  ADD INDEX genotype_compos_ind (id_seq_composition),
+  ADD CONSTRAINT genotype_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE pulldown_metrics
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_pulldown_metrics,
+  ADD INDEX pulldown_metrics_compos_ind (id_seq_composition),
+  ADD CONSTRAINT pulldown_metrics_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE qx_yield
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_qx_yield,
+  ADD INDEX qx_yield_compos_ind (id_seq_composition),
+  ADD CONSTRAINT qx_yield_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE qx_yield
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_qx_yield,
+  ADD INDEX qx_yield_compos_ind (id_seq_composition),
+  ADD CONSTRAINT qx_yield_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE ref_match
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_ref_match,
+  ADD INDEX ref_match_compos_ind (id_seq_composition),
+  ADD CONSTRAINT ref_match_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE sequence_error
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_sequence_error,
+  ADD INDEX sequence_error_compos_ind (id_seq_composition),
+  ADD CONSTRAINT sequence_error_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE spatial_filter
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_spatial_filter,
+  ADD INDEX spatial_filter_compos_ind (id_seq_composition),
+  ADD CONSTRAINT spatial_filter_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE split_stats
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_split_stats,
+  ADD INDEX split_stats_compos_ind (id_seq_composition),
+  ADD CONSTRAINT split_stats_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE tag_decode_stats
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_tag_decode_stats,
+  ADD INDEX tag_decode_stats_compos_ind (id_seq_composition),
+  ADD CONSTRAINT tag_decode_stats_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE tag_metrics
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_tag_metrics,
+  ADD INDEX tag_metrics_compos_ind (id_seq_composition),
+  ADD CONSTRAINT tag_metrics_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE tags_reporters
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_tags_reporters,
+  ADD INDEX tags_reporters_compos_ind (id_seq_composition),
+  ADD CONSTRAINT tags_reporters_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE upstream_tags
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_upstream_tags,
+  ADD INDEX upstream_tags_compos_ind (id_seq_composition),
+  ADD CONSTRAINT upstream_tags_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE verify_bam_id
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_verify_bam_id,
+  ADD INDEX verify_bam_id_compos_ind (id_seq_composition),
+  ADD CONSTRAINT verify_bam_id_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- after back-filling reduce fragmentation
+
+OPTIMIZE TABLE iseq_composition;
+OPTIMIZE TABLE iseq_component;
+OPTIMIZE TABLE iseq_component_composition;
 OPTIMIZE TABLE insert_size;
+OPTIMIZE TABLE adapter;
+OPTIMIZE TABLE bam_flagstats;
+OPTIMIZE TABLE alignment_filter_metrics;
+OPTIMIZE TABLE contamination;
+OPTIMIZE TABLE gc_bias;
+OPTIMIZE TABLE gc_fraction;
+OPTIMIZE TABLE genotype;
+OPTIMIZE TABLE pulldown_metrics;
+OPTIMIZE TABLE qx_yield;
+OPTIMIZE TABLE ref_match;
+OPTIMIZE TABLE sequence_error;
+OPTIMIZE TABLE spatial_filter; 
+OPTIMIZE TABLE split_stats;
+OPTIMIZE TABLE tag_decode_stats;
+OPTIMIZE TABLE tag_metrics;
+OPTIMIZE TABLE tags_reporters;
+OPTIMIZE TABLE upstream_tags; 
+OPTIMIZE TABLE verify_bam_id; 
 
