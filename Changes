@@ -1,5 +1,9 @@
-iLIST OF CHANGES FOR NPG-QC PACKAGE
+LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - composition-enabled autoqc objects storage
+     schema changes
+     DBIx binding updates
+     script for back-filling foreign keys to composition table
  - db composition creation via a factory method autoqc
  - db loader - unused 'update' option removed
  - saving a component with subset attribute value 'all' errors

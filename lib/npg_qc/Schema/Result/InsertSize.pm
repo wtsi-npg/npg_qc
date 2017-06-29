@@ -374,6 +374,9 @@ with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc:
 # Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-22 11:32:15
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9C50EOFAqHy4BLhc4tM4AA
 
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+
 __PACKAGE__->set_flators4non_scalar(qw( bins expected_size filenames info norm_fit_modes ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 
@@ -431,7 +434,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 
