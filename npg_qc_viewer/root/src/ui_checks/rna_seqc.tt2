@@ -40,7 +40,7 @@
      <h6>coverage metrics</h6>
      <div style='clear:both;' class="data_table">
      <table title=coverage_metrics>
-     <tr><th>mean per base cov.</th><th>mean CV</th><th>no. covered 3' (norm)</th><th>no. covered 5' (norm)</th></tr>
+     <tr><th>mean per base cov.</th><th>mean CV</th><th>covered 3' (norm)</th><th>covered 5' (norm)</th></tr>
      <tr><td align="right">[% IF check.mean_per_base_cov.defined; check.mean_per_base_cov | format_number(2,1); END %]</td>
          <td align="right">[% IF check.mean_cv.defined; check.mean_cv | format_number(2,1); END %]</td>
          <td align="right">[% IF check.end_3_norm.defined; check.end_3_norm | format_number(3,1); END %]</td>
