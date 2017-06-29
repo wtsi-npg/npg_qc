@@ -1,4 +1,5 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
+ - upstream_tags modified so it can work with the rpt_list argument
 
  - remove attribute qc_report_dir from check object: the output directory
    is created by default using the sample's filename root
