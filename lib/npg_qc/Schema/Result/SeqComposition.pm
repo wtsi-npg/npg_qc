@@ -135,6 +135,111 @@ __PACKAGE__->add_unique_constraint('unq_seq_compos_ps', ['id_seq_composition', '
 
 =head1 RELATIONS
 
+=head2 adapters
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::Adapter>
+
+=cut
+
+__PACKAGE__->has_many(
+  'adapters',
+  'npg_qc::Schema::Result::Adapter',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 alignment_filter_metrics
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::AlignmentFilterMetrics>
+
+=cut
+
+__PACKAGE__->has_many(
+  'alignment_filter_metrics',
+  'npg_qc::Schema::Result::AlignmentFilterMetrics',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 bam_flagstats
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::BamFlagstats>
+
+=cut
+
+__PACKAGE__->has_many(
+  'bam_flagstats',
+  'npg_qc::Schema::Result::BamFlagstats',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 contaminations
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::Contamination>
+
+=cut
+
+__PACKAGE__->has_many(
+  'contaminations',
+  'npg_qc::Schema::Result::Contamination',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 gc_bias
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::GcBias>
+
+=cut
+
+__PACKAGE__->has_many(
+  'gc_bias',
+  'npg_qc::Schema::Result::GcBias',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 gc_fractions
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::GcFraction>
+
+=cut
+
+__PACKAGE__->has_many(
+  'gc_fractions',
+  'npg_qc::Schema::Result::GcFraction',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 genotypes
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::Genotype>
+
+=cut
+
+__PACKAGE__->has_many(
+  'genotypes',
+  'npg_qc::Schema::Result::Genotype',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 insert_sizes
 
 Type: has_many
@@ -146,6 +251,51 @@ Related object: L<npg_qc::Schema::Result::InsertSize>
 __PACKAGE__->has_many(
   'insert_sizes',
   'npg_qc::Schema::Result::InsertSize',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 pulldown_metrics
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::PulldownMetrics>
+
+=cut
+
+__PACKAGE__->has_many(
+  'pulldown_metrics',
+  'npg_qc::Schema::Result::PulldownMetrics',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 qx_yields
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::QXYield>
+
+=cut
+
+__PACKAGE__->has_many(
+  'qx_yields',
+  'npg_qc::Schema::Result::QXYield',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 ref_matches
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::RefMatch>
+
+=cut
+
+__PACKAGE__->has_many(
+  'ref_matches',
+  'npg_qc::Schema::Result::RefMatch',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
@@ -198,6 +348,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 sequence_errors
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SequenceError>
+
+=cut
+
+__PACKAGE__->has_many(
+  'sequence_errors',
+  'npg_qc::Schema::Result::SequenceError',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 sequence_summaries
 
 Type: has_many
@@ -213,9 +378,114 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 spatial_filters
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-22 11:32:16
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Z5xwY8DlAUEiyfPoj0LmgQ
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SpatialFilter>
+
+=cut
+
+__PACKAGE__->has_many(
+  'spatial_filters',
+  'npg_qc::Schema::Result::SpatialFilter',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 split_stats
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SplitStats>
+
+=cut
+
+__PACKAGE__->has_many(
+  'split_stats',
+  'npg_qc::Schema::Result::SplitStats',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 tag_decode_stats
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::TagDecodeStats>
+
+=cut
+
+__PACKAGE__->has_many(
+  'tag_decode_stats',
+  'npg_qc::Schema::Result::TagDecodeStats',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 tag_metrics
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::TagMetrics>
+
+=cut
+
+__PACKAGE__->has_many(
+  'tag_metrics',
+  'npg_qc::Schema::Result::TagMetrics',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 tags_reporters
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::TagsReporters>
+
+=cut
+
+__PACKAGE__->has_many(
+  'tags_reporters',
+  'npg_qc::Schema::Result::TagsReporters',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 upstream_tags
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::UpstreamTags>
+
+=cut
+
+__PACKAGE__->has_many(
+  'upstream_tags',
+  'npg_qc::Schema::Result::UpstreamTags',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 verify_bam_ids
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::VerifyBamId>
+
+=cut
+
+__PACKAGE__->has_many(
+  'verify_bam_ids',
+  'npg_qc::Schema::Result::VerifyBamId',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:474fSanHX4y/Nw9w0si1JQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

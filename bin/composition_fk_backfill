@@ -33,6 +33,10 @@ if (!$table) {
   croak 'Table needed';
 }
 
+if ($number) {
+  warn "number $number \n";
+}
+
 my $rs_name = [npg_qc::autoqc::role::result->class_names($table)]->[1];
 
 my $schema = npg_qc::Schema->connect();

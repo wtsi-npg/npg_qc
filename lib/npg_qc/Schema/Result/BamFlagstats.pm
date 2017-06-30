@@ -61,6 +61,15 @@ __PACKAGE__->table('bam_flagstats');
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 id_seq_composition
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_foreign_key: 1
+  is_nullable: 1
+
+A foreign key referencing the id_seq_composition column of the seq_composition table
+
 =head2 id_run
 
   data_type: 'bigint'
@@ -213,6 +222,13 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
+  'id_seq_composition',
+  {
+    data_type => 'bigint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 1,
+  },
   'id_run',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
   'position',
@@ -308,6 +324,28 @@ __PACKAGE__->add_unique_constraint(
   ['id_run', 'position', 'human_split', 'tag_index'],
 );
 
+=head1 RELATIONS
+
+=head2 seq_composition
+
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::SeqComposition>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'seq_composition',
+  'npg_qc::Schema::Result::SeqComposition',
+  { id_seq_composition => 'id_seq_composition' },
+  {
+    is_deferrable => 1,
+    join_type     => 'LEFT',
+    on_delete     => 'NO ACTION',
+    on_update     => 'NO ACTION',
+  },
+);
+
 =head1 L<Moose> ROLES APPLIED
 
 =over 4
@@ -326,8 +364,8 @@ __PACKAGE__->add_unique_constraint(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-06-30 15:33:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:nOyS25ijwZFVnmkw4Eh1Mg
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oc/1AgF5kAlwzpF5y5IeSg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

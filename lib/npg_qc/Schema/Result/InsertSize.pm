@@ -61,6 +61,15 @@ __PACKAGE__->table('insert_size');
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 id_seq_composition
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_foreign_key: 1
+  is_nullable: 1
+
+A foreign key referencing the id_seq_composition column of the seq_composition table
+
 =head2 id_run
 
   data_type: 'bigint'
@@ -216,15 +225,6 @@ __PACKAGE__->table('insert_size');
   data_type: 'text'
   is_nullable: 1
 
-=head2 id_seq_composition
-
-  data_type: 'bigint'
-  extra: {unsigned => 1}
-  is_foreign_key: 1
-  is_nullable: 1
-
-A foreign key referencing the id_seq_composition column of the seq_composition table
-
 =cut
 
 __PACKAGE__->add_columns(
@@ -234,6 +234,13 @@ __PACKAGE__->add_columns(
     extra => { unsigned => 1 },
     is_auto_increment => 1,
     is_nullable => 0,
+  },
+  'id_seq_composition',
+  {
+    data_type => 'bigint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 1,
   },
   'id_run',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
@@ -289,13 +296,6 @@ __PACKAGE__->add_columns(
   { data_type => 'tinyint', is_nullable => 1 },
   'norm_fit_modes',
   { data_type => 'text', is_nullable => 1 },
-  'id_seq_composition',
-  {
-    data_type => 'bigint',
-    extra => { unsigned => 1 },
-    is_foreign_key => 1,
-    is_nullable => 1,
-  },
 );
 
 =head1 PRIMARY KEY
@@ -371,8 +371,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::insert_size';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-22 11:32:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9C50EOFAqHy4BLhc4tM4AA
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:f/pXFPYmb0tEBYO0IEDong
 
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
