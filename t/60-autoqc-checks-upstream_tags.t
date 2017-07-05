@@ -11,7 +11,7 @@ my $tag_sets_repository = cwd . '/t/data/autoqc/tag_sets';
 
 use_ok ('npg_qc::autoqc::checks::upstream_tags');
 
-SKIP: { skip 'require bammaskflags', 10, unless `which bammaskflags`;
+SKIP: { skip 'require bammaskflags', 11, unless `which bammaskflags`;
 
   my $dir = tempdir(CLEANUP => 1);
   `touch $dir/BamIndexDecoder.jar`;
