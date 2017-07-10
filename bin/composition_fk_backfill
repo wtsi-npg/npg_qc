@@ -48,7 +48,7 @@ if (!$rs->result_source()->has_relationship($RELATIONSHIP_NAME)) {
 
 # Get records in random order - gives a speed-up if a number
 # of scripts are running in parallel.
-$rs = $rs->search({id_seq_composition => undef},{order_by => 'RAND()'});
+$rs = $rs->search({id_seq_composition => undef});
 my $count = $rs->count();
 if ($count == 0) {
   carp 'All composition foreign keys are set';
