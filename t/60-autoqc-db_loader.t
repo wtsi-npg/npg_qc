@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -8,7 +8,7 @@ use Perl6::Slurp;
 use JSON;
 use Archive::Extract;
 use File::Temp qw/ tempdir /;
-use File::Copy 'cp';
+use File::Copy qw/ cp /;
 use List::MoreUtils qw/ uniq /;
 
 use npg_testing::db;
@@ -232,6 +232,8 @@ subtest 'errors and warnings' => sub {
     'error loading a set of files with the last file corrupt';
   is ($is_rs->search({})->count, 0, 'table is empty, ie transaction has been rolled back');
 
+  
+
   my $file = 't/data/autoqc/insert_size/6062_8#1.insert_size.json';
   $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
@@ -367,6 +369,37 @@ my $samtools_path  = join q[/], $tempdir, 'samtools';
 local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
 # Create mock samtools that will output the header
 write_samtools_script($samtools_path, join(q[/],$archive,'cram.header'));
+
+subtest 'roll-back for composition-based results' => sub {
+  plan tests => 3;
+
+  my $comp_dir = join q[/], $tempdir, 'compositions';
+  mkdir $comp_dir;
+  cp "$json_dir2/17448_1#9_phix_F0x900.samtools_stats.json", $comp_dir;
+  cp "$json_dir2/17448_1#9_phix_F0xB00.samtools_stats.json", $comp_dir;
+  my $file_good = "$comp_dir/17448_1#9_phix_F0x900.samtools_stats.json";
+  my $file = "$comp_dir/17448_1#9_phix_F0xB00.samtools_stats.json";
+  my $content = slurp $file;
+  # Create a json file with run id that will fail validation
+  $content =~ s/17448/-17448/;
+  open my $fh, '>', $file or die "Failed to open $file for writing";
+  print $fh $content or die "Failed to write to $file";
+  close $fh or die "Failed to close filehandle for $file";
+
+  my $crs = $schema->resultset('SeqComponent');
+  is($crs->search({id_run => 17448})->count(), 0,
+    'prerequisite - no components with run id 17448');
+
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+       schema => $schema,
+       json_file => [$file_good, $file],
+       verbose => 0,
+  );
+  throws_ok {$db_loader->load()}
+    qr/Validation failed for 'NpgTrackingRunId' with value -17448/,
+    'error loading two files where the last file has invalid run id';
+  is($crs->search({id_run => 17448})->count(), 0, 'no components with run id 17448');
+};
 
 subtest 'loading bam_flagstats and its related objects from files' => sub {
   plan tests => 48;
