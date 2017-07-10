@@ -19,7 +19,7 @@ with qw/MooseX::Getopt/;
 our $VERSION = '0';
 
 Readonly::Scalar my $CLASS_FIELD             => q[__CLASS__];
-Readonly::Scalar my $SEQ_COMPISITION_PK_NAME => q[id_seq_composition];
+Readonly::Scalar my $SEQ_COMPOSITION_PK_NAME => q[id_seq_composition];
 
 has 'path'   =>  ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',
@@ -143,8 +143,8 @@ sub _json2db{
           my $rs  = $self->schema->resultset($dbix_class_name);
           my $related_composition = $rs->find_or_create_seq_composition($obj->composition());
           if ($related_composition) {
-            $values->{$SEQ_COMPISITION_PK_NAME} =
-              $related_composition->$SEQ_COMPISITION_PK_NAME();
+            $values->{$SEQ_COMPOSITION_PK_NAME} =
+              $related_composition->$SEQ_COMPOSITION_PK_NAME();
           }
           $self->_values2db($rs, $values);
           $count++;
