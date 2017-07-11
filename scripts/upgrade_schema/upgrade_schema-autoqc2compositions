@@ -9,7 +9,10 @@
 -- Sample script to add columns in parallel. First merge statements for each table
 -- into one line, then pipe this line into mysql client. 
 --
--- cat this_file | perl -ne 'my $line=q[];while (<>) {if ($_ =~ /==table/) {$_ =~ s/\s\Z//g;$line = $_;} else {if ($line) {$_ =~ s/\s\Z//g;if ($_) {$line .= $_;} else {print "${line}\n"; $line=q[];} } }}' | perl -nle 'my ($table_name) = $_ =~ /==table\ (\w+)/; print $table_name;my $command = qq[(echo "$_" | mysql --reconnect -h localhost -D dbname -P 3306 -u someuser 2>&1 > ${table_name}.log) &]; print $command; system($command)'
+
+--
+-- List of tables to be changed
+-- adapter bam_flagstats alignment_filter_metrics contamination gc_bias gc_fraction genotype insert_size pulldown_metrics qx_yield ref_match sequence_error spatial_filter split_stats tag_decode_stats tag_metrics tags_reporters upstream_tags verify_bam_id
 --
 
 SELECT '==table adapter';
@@ -306,7 +309,7 @@ OPTIMIZE TABLE verify_bam_id;
 
 --
 -- Rolling back - just in case we need to.
--- No need to drop indexes, they are deleted together ith the column.
+-- No need to drop indexes, they are deleted together with the column.
 --
 ALTER TABLE adapter DROP FOREIGN KEY adapter_compos_fk, DROP COLUMN id_seq_composition;
 ALTER TABLE bam_flagstats DROP FOREIGN KEY bam_flagstats_compos_fk, DROP COLUMN id_seq_composition;
