@@ -496,7 +496,7 @@ our $VERSION = '0';
 
 =head2 create_composition
 
-A factory method returning a composition of illumina components. 
+A factory method returning a npg_tracking::glossary::composition object of illumina components. 
 
 =cut
 
@@ -548,6 +548,8 @@ Result class definition in DBIx binding for npg-qc database.
 
 =item DBIx::Class::InflateColumn::Serializer
 
+=item npg_tracking::glossary::composition::factory
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -560,7 +562,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 
