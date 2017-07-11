@@ -57,6 +57,12 @@ if ($count == 0) {
 
 warn "${table}: $count rows to backfill\n";
 
+my @pk_columns = $rs->result_source()->primary_columns();
+if (scalar @pk_columns != 1) {
+  croak "None or multiple primary key columns in $table";
+}
+my $pk_name = $pk_columns[0];
+
 my $one_percent = int($count / $HUNDRED);
 my $time = DateTime->now();
 my $i = $START;
@@ -72,7 +78,7 @@ while (my $result= $rs->next()) {
       "\n";
     $time = $now;
   }
-  if (defined $number && ($result->id_insert_size % $TEN != $number)) {
+  if (defined $number && ($result->$pk_name % $TEN != $number)) {
     next;
   }
   my $composition_obj = $result->create_composition();
@@ -87,7 +93,7 @@ __END__
 
 =head1 NAME
 
-qc_db_delete_autoqc
+composition_fk_backfill
 
 =head1 USAGE
 
