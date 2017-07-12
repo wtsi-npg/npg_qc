@@ -64,11 +64,20 @@ if (scalar @pk_columns != 1) {
 my $pk_name = $pk_columns[0];
 
 my $one_percent = int($count / $HUNDRED);
+if ($one_percent == 0 && defined $number) { # Number of records is below 100
+  if ($number > 0) {
+    warn "$count records, this script will not proceed\n";
+    exit 0;
+  } else {
+    warn "$count records, this script will update all records\n";
+    $number = undef;
+  }
+}
 my $time = DateTime->now();
 my $i = $START;
 while (my $result= $rs->next()) {
   $i++;
-  if ($i % $one_percent == 0) {
+  if ($one_percent && ($i % $one_percent == 0)) {
     my $now = DateTime->now();
     warn sprintf 'mod %s - %i percent done in %i mins %i sec%s',
       defined $number ? $number : 'none',

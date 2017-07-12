@@ -4,6 +4,7 @@ use Moose;
 use MooseX::MarkAsMethods autoclean => 1;
 use Carp;
 use JSON;
+use Try::Tiny;
 
 extends 'DBIx::Class::ResultSet';
 
@@ -164,7 +165,16 @@ sub find_or_create_seq_composition {
     return $composition_row;
   };
 
-  return $schema->txn_do($transaction);
+  my $row;
+  try {
+    $row = $schema->txn_do($transaction);
+  } catch {
+    if ($_ =~ /Duplicate\ entry/smx) {
+      $row = $schema->txn_do($transaction);
+    }
+  };
+
+  return $row;
 }
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
