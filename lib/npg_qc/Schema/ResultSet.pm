@@ -169,8 +169,11 @@ sub find_or_create_seq_composition {
   try {
     $row = $schema->txn_do($transaction);
   } catch {
-    if ($_ =~ /Duplicate\ entry/smx) {
+    my $e = $_;
+    if ($e =~ /Duplicate\ entry/smx) {
       $row = $schema->txn_do($transaction);
+    } else {
+      croak $e;
     }
   };
 
