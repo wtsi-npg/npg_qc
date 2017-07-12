@@ -328,9 +328,14 @@ with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc:
 # Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:06
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SlF1nbqMtfFzdvgswpeeYg
 
-__PACKAGE__->set_flators4non_scalar(qw( tags reads_count reads_pf_count perfect_matches_count perfect_matches_pf_count one_mismatch_matches_count one_mismatch_matches_pf_count matches_percent matches_pf_percent info ));
-__PACKAGE__->set_inflator4scalar('tag_index');
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
+__PACKAGE__->set_flators4non_scalar(
+  qw( tags reads_count reads_pf_count perfect_matches_count perfect_matches_pf_count
+      one_mismatch_matches_count one_mismatch_matches_pf_count matches_percent
+      matches_pf_percent info ));
+__PACKAGE__->set_inflator4scalar('tag_index');
 
 our $VERSION = '0';
 
@@ -350,6 +355,11 @@ Result class definition in DBIx binding for npg-qc database.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 create_composition
+
+A factory method returning a one-component npg_tracking::glossary::composition
+object corresponding to this row.
 
 =head1 DEPENDENCIES
 
@@ -373,6 +383,10 @@ Result class definition in DBIx binding for npg-qc database.
 
 =item DBIx::Class::InflateColumn::Serializer
 
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -385,7 +399,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 

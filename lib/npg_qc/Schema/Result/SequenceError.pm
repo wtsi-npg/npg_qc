@@ -373,11 +373,13 @@ with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc:
 # Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:05
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vJPiWeVKocHlaFgF0UbYjA
 
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+
 __PACKAGE__->set_flators4non_scalar(qw( forward_common_cigars quality_bin_values reverse_common_cigars info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('sequence_type', 'is_string');
 __PACKAGE__->set_flators_wcompression4non_scalar( qw(forward_cigar_char_count_by_cycle forward_count forward_errors forward_n_count forward_quality_bins reverse_cigar_char_count_by_cycle reverse_count reverse_errors reverse_n_count reverse_quality_bins) );
-
 
 our $VERSION = '0';
 
@@ -397,6 +399,11 @@ Result class definition in DBIx binding for npg-qc database.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 create_composition
+
+A factory method returning a one-component npg_tracking::glossary::composition
+object corresponding to this row.
 
 =head1 DEPENDENCIES
 
@@ -420,6 +427,10 @@ Result class definition in DBIx binding for npg-qc database.
 
 =item DBIx::Class::InflateColumn::Serializer
 
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -432,7 +443,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 

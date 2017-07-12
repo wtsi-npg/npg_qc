@@ -370,6 +370,9 @@ with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc:
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+
 our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( histogram info ));
@@ -394,6 +397,11 @@ Result class definition in DBIx binding for npg-qc database.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 create_composition
+
+A factory method returning a one-component npg_tracking::glossary::composition
+object corresponding to this row.
+
 =head1 DEPENDENCIES
 
 =over
@@ -416,6 +424,10 @@ Result class definition in DBIx binding for npg-qc database.
 
 =item DBIx::Class::InflateColumn::Serializer
 
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -428,7 +440,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 

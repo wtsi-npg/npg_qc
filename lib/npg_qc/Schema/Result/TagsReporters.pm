@@ -262,6 +262,9 @@ with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc:
 # Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:06
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ha1flG+3E7rxiH5T5N8fPw
 
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+
 __PACKAGE__->set_flators4non_scalar(qw( tag_list amp_rows tag_totals tag_totals_pct info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 
@@ -285,6 +288,11 @@ Result class definition in DBIx binding for npg-qc database.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 create_composition
+
+A factory method returning a one-component npg_tracking::glossary::composition
+object corresponding to this row.
+
 =head1 DEPENDENCIES
 
 =over
@@ -307,6 +315,10 @@ Result class definition in DBIx binding for npg-qc database.
 
 =item DBIx::Class::InflateColumn::Serializer
 
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -319,7 +331,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 

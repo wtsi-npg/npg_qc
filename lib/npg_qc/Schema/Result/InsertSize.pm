@@ -380,7 +380,6 @@ with 'npg_tracking::glossary::composition::factory::attributes' =>
 __PACKAGE__->set_flators4non_scalar(qw( bins expected_size filenames info norm_fit_modes ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 
-
 our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
@@ -399,6 +398,13 @@ Result class definition in DBIx binding for npg-qc database.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 create_composition
+
+A factory method returning a one-component npg_tracking::glossary::composition
+object corresponding to this row. 
+
+=cut
 
 =head1 DEPENDENCIES
 
@@ -421,6 +427,10 @@ Result class definition in DBIx binding for npg-qc database.
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
+
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
 
 =back
 
