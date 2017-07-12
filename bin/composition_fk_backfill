@@ -16,7 +16,7 @@ our $VERSION = '0';
 Readonly::Scalar my $RELATIONSHIP_NAME => 'seq_composition';
 Readonly::Scalar my $FK_COLUMN_NAME    => 'id_seq_composition';
 Readonly::Scalar my $TEN               => 10;
-Readonly::Scalar my $PAGE_SIZE         => 10000;
+Readonly::Scalar my $PAGE_SIZE         => 10_000;
 
 my $help;
 my $table;
@@ -79,7 +79,7 @@ while ($page_number < $last_page) {
     my $composition_row = $rs->find_or_create_seq_composition($composition_obj);
     $result->update({$FK_COLUMN_NAME => $composition_row->$FK_COLUMN_NAME});
   }
-  
+
   my $now = DateTime->now();
   warn sprintf 'mod %s, page %i out of %i - done in %i mins %i sec%s',
         defined $number ? $number : 'none',
