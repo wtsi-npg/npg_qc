@@ -283,11 +283,10 @@ SELECT @@error_count;
 
 -- After back-filling reduce fragmentation.
 
-OPTIMIZE TABLE iseq_composition;
-OPTIMIZE TABLE iseq_component;
-OPTIMIZE TABLE iseq_component_composition;
+OPTIMIZE TABLE seq_composition;
+OPTIMIZE TABLE seq_component;
+OPTIMIZE TABLE seq_component_composition;
 
-OPTIMIZE TABLE insert_size;
 OPTIMIZE TABLE adapter;
 OPTIMIZE TABLE bam_flagstats;
 OPTIMIZE TABLE alignment_filter_metrics;
@@ -295,17 +294,18 @@ OPTIMIZE TABLE contamination;
 OPTIMIZE TABLE gc_bias;
 OPTIMIZE TABLE gc_fraction;
 OPTIMIZE TABLE genotype;
+OPTIMIZE TABLE insert_size;
 OPTIMIZE TABLE pulldown_metrics;
 OPTIMIZE TABLE qx_yield;
 OPTIMIZE TABLE ref_match;
 OPTIMIZE TABLE sequence_error;
-OPTIMIZE TABLE spatial_filter; 
+OPTIMIZE TABLE spatial_filter;
 OPTIMIZE TABLE split_stats;
 OPTIMIZE TABLE tag_decode_stats;
 OPTIMIZE TABLE tag_metrics;
 OPTIMIZE TABLE tags_reporters;
-OPTIMIZE TABLE upstream_tags; 
-OPTIMIZE TABLE verify_bam_id; 
+OPTIMIZE TABLE upstream_tags;
+OPTIMIZE TABLE verify_bam_id;
 
 --
 -- Rolling back - just in case we need to.
