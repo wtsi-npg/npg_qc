@@ -331,10 +331,17 @@ use MooseX::Aliases;
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
+our $VERSION = '0';
+
 __PACKAGE__->set_flators4non_scalar(qw( alignment_depth1 alignment_depth2 info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 
-our $VERSION = '0';
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
 
 alias subset => 'ref_name';
 
@@ -359,6 +366,14 @@ Result class definition in DBIx binding for npg-qc database.
 
 A factory method returning a one-component npg_tracking::glossary::composition
 object corresponding to this row.
+
+=head2 seq_component_compositions
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+To simplify queries, skip SeqComposition and link directly to the linking table.
 
 =head2 subset
 

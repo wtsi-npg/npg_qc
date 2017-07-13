@@ -380,6 +380,13 @@ __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('human_split', 'is_string');
 __PACKAGE__->set_inflator4scalar('subset', 'is_string');
 
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -401,6 +408,14 @@ Result class definition in DBIx binding for npg-qc database.
 
 A factory method returning a one-component npg_tracking::glossary::composition
 object corresponding to this row.
+
+=head2 seq_component_compositions
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+To simplify queries, skip SeqComposition and link directly to the linking table.
 
 =head1 DEPENDENCIES
 

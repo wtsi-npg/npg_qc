@@ -259,10 +259,17 @@ with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc:
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
+our $VERSION = '0';
+
 __PACKAGE__->set_flators4non_scalar(qw( genome_factor contaminant_count info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 
-our $VERSION = '0';
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
 
 __PACKAGE__->meta->make_immutable;
 

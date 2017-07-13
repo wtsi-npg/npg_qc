@@ -376,12 +376,19 @@ with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc:
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 
+our $VERSION = '0';
+
 __PACKAGE__->set_flators4non_scalar(qw( forward_common_cigars quality_bin_values reverse_common_cigars info ));
 __PACKAGE__->set_inflator4scalar('tag_index');
 __PACKAGE__->set_inflator4scalar('sequence_type', 'is_string');
 __PACKAGE__->set_flators_wcompression4non_scalar( qw(forward_cigar_char_count_by_cycle forward_count forward_errors forward_n_count forward_quality_bins reverse_cigar_char_count_by_cycle reverse_count reverse_errors reverse_n_count reverse_quality_bins) );
 
-our $VERSION = '0';
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
 
 __PACKAGE__->meta->make_immutable;
 
@@ -404,6 +411,14 @@ Result class definition in DBIx binding for npg-qc database.
 
 A factory method returning a one-component npg_tracking::glossary::composition
 object corresponding to this row.
+
+=head2 seq_component_compositions
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+To simplify queries, skip SeqComposition and link directly to the linking table.
 
 =head1 DEPENDENCIES
 

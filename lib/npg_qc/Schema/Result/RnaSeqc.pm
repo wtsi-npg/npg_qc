@@ -293,15 +293,7 @@ our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( other_metrics info ));
 
-=head2 seq_component_compositions
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
-
-To simplify queries, skip SeqComposition and link directly to the linking table.
-
-=cut
+__PACKAGE__->create_composition_attribute();
 
 __PACKAGE__->has_many(
   'seq_component_compositions',
@@ -309,6 +301,13 @@ __PACKAGE__->has_many(
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
 
 =head1 SYNOPSIS
 
@@ -322,22 +321,18 @@ Result class definition in DBIx binding for npg-qc database.
 
 =head1 SUBROUTINES/METHODS
 
-=cut
-
 =head2 composition
 
 An lazy-build attribute representing a composition this result
-corresponds to. 
+corresponds to.
 
-=cut
+=head2 seq_component_compositions
 
-__PACKAGE__->create_composition_attribute();
+Type: has_many
 
-__PACKAGE__->meta->make_immutable;
+Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
 
-1;
-
-__END__
+To simplify queries, skip SeqComposition and link directly to the linking table.
 
 =head1 DEPENDENCIES
 
@@ -373,7 +368,7 @@ Ruben Bautista E<lt>rb11@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 
