@@ -1,8 +1,10 @@
 iLIST OF CHANGES FOR NPG-QC PACKAGE
 
- - db composition creation via a factory method autoqc
- - db loader - unused 'update' option removed
- - saving a component with subset attribute value 'all' errors
+ - db composition creation via a factory method
+ - db autoqc loader - unused 'update' option removed
+ - db autoqc loader - will retry a transaction that failed because
+     a db lock could not be aquired
+ - saving a component with subset attribute value 'all' gives an error
 
 release 63.0
  - update script for deleting autoqc database results so that it

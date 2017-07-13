@@ -20,6 +20,7 @@ our $VERSION = '0';
 
 Readonly::Scalar my $CLASS_FIELD             => q[__CLASS__];
 Readonly::Scalar my $SEQ_COMPOSITION_PK_NAME => q[id_seq_composition];
+Readonly::Scalar my $SLEEP_TIME              => 180;
 
 has 'path'   =>  ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',
@@ -115,7 +116,13 @@ sub load{
   } catch {
     my $m = "Loading aborted, transaction has rolled back: $_";
     $self->_log($m);
-    croak $m;
+    if ($m =~ /\ lock/smxi) { # Failure to acquire a lock
+      $self->_log("Will pause for $SLEEP_TIME seconds, then retry");
+      sleep $SLEEP_TIME;
+      $num_loaded = $self->schema->txn_do($transaction);
+    } else {
+      croak $m;
+    }
   };
   $self->_log("$num_loaded json files have been loaded");
 

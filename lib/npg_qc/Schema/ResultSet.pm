@@ -4,6 +4,7 @@ use Moose;
 use MooseX::MarkAsMethods autoclean => 1;
 use Carp;
 use JSON;
+use Try::Tiny;
 
 extends 'DBIx::Class::ResultSet';
 
@@ -164,7 +165,24 @@ sub find_or_create_seq_composition {
     return $composition_row;
   };
 
-  return $schema->txn_do($transaction);
+  # When multiple processes are running in parallel they occasionally
+  # try to create the same composition or component at roughly the
+  # same time. If the 'Duplicate entry' error is due to this, rerunning
+  # the transaction should not produce an error since an existing row
+  # will be returned.
+  my $row;
+  try {
+    $row = $schema->txn_do($transaction);
+  } catch {
+    my $e = $_;
+    if ($e =~ /Duplicate\ entry/smx) {
+      $row = $schema->txn_do($transaction);
+    } else {
+      croak $e;
+    }
+  };
+
+  return $row;
 }
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
@@ -280,6 +298,8 @@ not in the hash.
 
 =item JSON
 
+=item Try::Tiny
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -296,7 +316,7 @@ Marina Gourtovaia <lt>mg8@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL Genome Research Limited
+Copyright (C) 2017 GRL Genome Research Limited
 
 This file is part of NPG.
 
