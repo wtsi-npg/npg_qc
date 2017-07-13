@@ -116,7 +116,8 @@ sub load{
   } catch {
     my $m = "Loading aborted, transaction has rolled back: $_";
     $self->_log($m);
-    if ($m =~ /\ lock/smxi) { # Failure to acquire a lock
+    # Retry only if failed to get a lock
+    if ($m =~ /Deadlock found when trying to get lock/smxi) {
       $self->_log("Will pause for $SLEEP_TIME seconds, then retry");
       sleep $SLEEP_TIME;
       $num_loaded = $self->schema->txn_do($transaction);
