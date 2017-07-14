@@ -288,8 +288,8 @@ OPTIMIZE TABLE seq_component;
 OPTIMIZE TABLE seq_component_composition;
 
 OPTIMIZE TABLE adapter;
-OPTIMIZE TABLE bam_flagstats;
 OPTIMIZE TABLE alignment_filter_metrics;
+OPTIMIZE TABLE bam_flagstats;
 OPTIMIZE TABLE contamination;
 OPTIMIZE TABLE gc_bias;
 OPTIMIZE TABLE gc_fraction;
