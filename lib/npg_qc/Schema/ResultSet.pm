@@ -13,17 +13,23 @@ our $VERSION = '0';
 sub search_autoqc {
   my ($self, $query, $size) = @_;
 
-  my $how = {'cache' => 1};
+  my $how = {};
   # Copy the query so that we do not change the input data,
   # thus allowing the caller to reuse the variable representing
   # the query.
-  my %local_values = %{$query};
-  my $values = \%local_values;
+  my $values = {};
+  foreach my $key (keys %{$query}) {
+    $values->{$key} = $query->{$key};
+  }
   my $rsource = $self->result_source();
-  if ($rsource->has_relationship('seq_component_compositions')) {
+  if ($rsource->has_relationship('seq_composition')) {
+    my $seq_component_rsource = $rsource->schema()->source('SeqComponent');
     foreach my $col_name  (keys %{$values}) {
+      # Query by id_run, position and other attributes of the component
+      # should be performed against the seq_component table.
       my $new_key = join q[.],
-        $rsource->has_column($col_name) ? 'me' : 'seq_component', $col_name;
+        $seq_component_rsource->has_column($col_name) ? 'seq_component':'me',
+        $col_name;
       $values->{$new_key} = $values->{$col_name};
       delete $values->{$col_name};
     }
@@ -39,8 +45,8 @@ sub search_autoqc {
     my $only_existing = 1;
     $self->deflate_unique_key_components($values, $only_existing);
   }
-  my $rs = $self->search_rs($values, $how);
-  return $rs;
+
+  return $self->search_rs($values, $how);
 }
 
 sub deflate_unique_key_components {

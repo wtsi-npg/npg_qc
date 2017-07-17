@@ -4,6 +4,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      schema changes
      DBIx binding updates
      script for back-filling foreign keys to composition table
+ - bug fix on search_autoqc method
  - db composition creation via a factory method
  - db autoqc loader - unused 'update' option removed
  - db autoqc loader - will retry a transaction that failed because

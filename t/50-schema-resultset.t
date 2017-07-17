@@ -7,32 +7,78 @@ use Moose::Meta::Class;
 use npg_tracking::glossary::composition::factory;
 use npg_tracking::glossary::composition::component::illumina;
 
-use_ok 'npg_qc::Schema';
-
 my $schema_package = q[npg_qc::Schema];
+use_ok $schema_package;
+
 my $schema;
 lives_ok{ $schema = Moose::Meta::Class->create_anon_class(
             roles => [qw/npg_testing::db/])->new_object()
             ->create_test_db($schema_package) } 'test db created';
 isa_ok($schema, $schema_package);
 
-subtest q[results with id_run and position only in the table] => sub {
-  plan tests => 2;
+# Utility method for saving to a database one-component composition
+# if it does not exist already.
+# Returns primary key column value for seq_composition
+sub _save_composition {
+  my $component_h = shift;
+  my $component_rs   = $schema->resultset('SeqComponent');
+  my $composition_rs = $schema->resultset('SeqComposition');
+  my $com_com_rs     = $schema->resultset('SeqComponentComposition');
 
-  $schema->resultset('SpatialFilter')->create({id_run => 8926, position => 2});
-  is ($schema->resultset('SpatialFilter')->search({
-    id_run => 8926, position => 2})->count(), 1, 'one result');
-  throws_ok {$schema->resultset('SpatialFilter')->search({
-    id_run => 8926, position => 2, tag_index => undef})->count()}
+  my $component =
+    npg_tracking::glossary::composition::component::illumina->new($component_h);
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component($component);
+  my $composition = $f->create_composition();
+  my $composition_digest = $composition->digest;
+  my $composition_row = $composition_rs->find({digest => $composition_digest});
+  if (!$composition_row) {
+    $component_h->{'digest'} = $component->digest;
+    my $component_row = $component_rs->create($component_h);
+    $composition_row = $composition_rs->create(
+      {size => 1, digest => $composition_digest});
+    $com_com_rs->create({size => 1,
+                       id_seq_component   => $component_row->id_seq_component,
+                       id_seq_composition => $composition_row->id_seq_composition
+                     });
+  }
+  return $composition_row->id_seq_composition;
+}
+
+subtest q[results with id_run and position only in the table] => sub {
+  plan tests => 7;
+
+  my $rs = $schema->resultset('SpatialFilter');
+  my $h = {id_run => 8926, position => 2};
+  my $row = $rs->create($h);
+  is ($rs->search($h)->count(), 1, 'one results');
+  is ($rs->search_autoqc($h)->count(), 0, 'no results');
+  throws_ok {$rs->search(
+    {id_run => 8926, tag_index => undef, position => 2})->count()}
     qr/no such column: tag_index/,
-    'error with tag_index as a part of the query';
+    'error in vanilla DBIx search query';
+  lives_ok {$rs->search_autoqc(
+    {id_run => 8926, tag_index => undef, position => 2})->count()}
+    'no error in autoqc search query';
+
+  my $id = _save_composition($h);
+  $row->update({'id_seq_composition' => $id});
+  $h = {id_run => 8926, position => 2};
+  is ($rs->search_autoqc($h)->count(), 1, 'autoqc search - one results');
+  $h->{'tag_index'} = undef;
+  lives_and { is $rs->search_autoqc($h)->count(), 1}
+    'no error in autoqc search query, one result';
+  throws_ok { $rs->search($h)->count() }
+    qr/no such column: tag_index/,
+    'error with tag_index as a part of the vanilla DBIx query';
 };
 
 subtest q[results with id_run, position and tag_index in the table] => sub {
   plan tests => 15;
 
   my $is_rs = $schema->resultset('InsertSize');
-  $is_rs->create({id_run => 3500, position => 1});
+  my $rid = _save_composition({id_run => 3500, position => 1});
+  $is_rs->create({id_run => 3500, position => 1, id_seq_composition => $rid});
   my $rs = $is_rs->search_autoqc({id_run => 3500, position => 1});
   is ($rs->count, 1, 'one result retrieved');
   is ($rs->next->tag_index, undef, 'lane-level result');
@@ -49,7 +95,9 @@ subtest q[results with id_run, position and tag_index in the table] => sub {
   foreach my $i ((0 .. 10)) {
     foreach my $p ((1 .. 2)) {
       foreach my $r ((3500, 4000, 5000)) {
-        $is_rs->create({id_run => $r, position => $p, tag_index => $i});
+        my $id = _save_composition({id_run => $r, position => $p, tag_index => $i});
+        $is_rs->create(
+          {id_run => $r, position => $p, tag_index => $i, id_seq_composition => $id});
       }
     }
   }
@@ -81,10 +129,21 @@ subtest q[results with id_run, position, tag_index and subset in the table] => s
   foreach my $i ((0 .. 10)) {
     foreach my $p ((1 .. 2)) {
       foreach my $r ((3500, 4000, 5000)) {
-        foreach my $s (qw/target human phix/) {
-          my $hs = $s eq 'target' ? 'all' : $s;
-          $fs_rs->create(
-            {id_run => $r, position => $p, tag_index => $i, subset => $s, human_split => $hs});
+        foreach my $s (qw/all human phix/) {
+          my $id = _save_composition({
+             id_run      => $r,
+             position    => $p,
+             tag_index   => $i,
+             subset      => $s eq 'all' ? undef : $s,
+          });
+          $fs_rs->create({
+             id_run             => $r,
+             position           => $p,
+             tag_index          => $i,
+             subset             => $s,
+             human_split        => $s,
+             id_seq_composition => $id
+          });
         }
       }
     }
@@ -98,15 +157,15 @@ subtest q[results with id_run, position, tag_index and subset in the table] => s
   is ($rs->count, 3, '3 results retrieved');
   $rs = $fs_rs->search_autoqc({id_run => 3500, position => [1,2], tag_index => 0});
   is ($rs->count, 6, '6 results retrieved');
-  $rs = $fs_rs->search_autoqc({id_run => 4000, position => [1,2], tag_index => 3, human_split => undef});
+  $rs = $fs_rs->search_autoqc({id_run => 4000, position => [1,2], tag_index => 3, subset => undef});
   is ($rs->count, 2, '2 results retrieved');
-  $rs = $fs_rs->search_autoqc({id_run => 5000, position => 1, tag_index => 3, human_split => 'human'});
+  $rs = $fs_rs->search_autoqc({id_run => 5000, position => 1, tag_index => 3, subset => 'human'});
   is ($rs->count, 1, 'one result retrieved');
-  $rs = $fs_rs->search_autoqc({id_run => 5000, position => 1, tag_index => 3, human_split => 'yhuman'});
+  $rs = $fs_rs->search_autoqc({id_run => 5000, position => 1, tag_index => 3, subset => 'yhuman'});
   is ($rs->count, 0, 'no results retrieved');
-  $rs = $fs_rs->search_autoqc({human_split => ['phix']});
+  $rs = $fs_rs->search_autoqc({subset => ['phix']});
   is ($rs->count, 66, '66 results retrieved');
-  $rs = $fs_rs->search_autoqc({human_split => undef});
+  $rs = $fs_rs->search_autoqc({subset => undef});
   is ($rs->count, 66, '66 results retrieved');
 };
 
@@ -142,7 +201,7 @@ subtest q[results linked to a composition] => sub {
 
   foreach my $i ((0 .. 10)) {
     foreach my $p ((1 .. 2)) {
-      foreach my $r ((3500, 4000, 5000)) {
+      foreach my $r ((35000, 40000, 50000)) {
         foreach my $s (('human', undef, 'phix')) {
           my $component_h = {id_run => $r, position => $p, tag_index => $i, subset => $s};
           my $component =
@@ -152,94 +211,103 @@ subtest q[results linked to a composition] => sub {
           my $composition = $f->create_composition();
           $component_h->{'digest'} = $component->digest;
           my $component_row = $component_rs->create($component_h);
-          if ($r == 4000 && $p == 1 && !defined $s) {
+          if ($r == 40000 && $p == 1 && !defined $s) {
             $stash->{$i}->{'component'} = $component;
             $stash->{$i}->{'row'} = $component_row;
           }
           my $composition_row = $composition_rs->create(
             {size => 1, digest => $composition->digest});
-          $com_com_rs->create({size => 1,
-                               id_seq_component   => $component_row->id_seq_component,
-                               id_seq_composition => $composition_row->id_seq_composition
+          $com_com_rs->create({
+             size               => 1,
+             id_seq_component   => $component_row->id_seq_component,
+             id_seq_composition => $composition_row->id_seq_composition
                               });
       
-          $summary_rs->create(_seq_summary_data($composition_row->id_seq_composition));
-          $samtools_rs->create(_samtools_data($composition_row->id_seq_composition, 'f1'));
-          $samtools_rs->create(_samtools_data($composition_row->id_seq_composition, 'f2'));
+          $summary_rs->create(
+            _seq_summary_data($composition_row->id_seq_composition));
+          $samtools_rs->create(
+            _samtools_data($composition_row->id_seq_composition, 'f1'));
+          $samtools_rs->create(
+            _samtools_data($composition_row->id_seq_composition, 'f2'));
 
-          if ($r == 5000 && $p == 1 && !defined $s) {
+          if ($r == 50000 && $p == 1 && !defined $s) {
             $f = npg_tracking::glossary::composition::factory->new();
             $f->add_component($component);
             $f->add_component($stash->{$i}->{'component'});
-            $composition = $f->create_composition();
+            $composition     = $f->create_composition();
             $composition_row = $composition_rs->create(
-              {size => 1, digest => $composition->digest});
-            $com_com_rs->create({size => 2,
-                                 id_seq_component   => $component_row->id_seq_component,
-                                 id_seq_composition => $composition_row->id_seq_composition
+              {size => 2, digest => $composition->digest});
+            $com_com_rs->create({
+              size               => 2,
+              id_seq_component   => $component_row->id_seq_component,
+              id_seq_composition => $composition_row->id_seq_composition
                                 });
-            $com_com_rs->create({size => 2,
-                                 id_seq_component   => $stash->{$i}->{'row'}->id_seq_component,
-                                 id_seq_composition => $composition_row->id_seq_composition
+            $com_com_rs->create({
+              size               => 2,
+              id_seq_component   => $stash->{$i}->{'row'}->id_seq_component,
+              id_seq_composition => $composition_row->id_seq_composition
                                 });
-            $summary_rs->create(_seq_summary_data($composition_row->id_seq_composition));
-            $samtools_rs->create(_samtools_data($composition_row->id_seq_composition, 'f1'));
-            $samtools_rs->create(_samtools_data($composition_row->id_seq_composition, 'f2'));
+            $summary_rs->create(
+              _seq_summary_data($composition_row->id_seq_composition));
+            $samtools_rs->create(
+              _samtools_data($composition_row->id_seq_composition, 'f1'));
+            $samtools_rs->create(
+              _samtools_data($composition_row->id_seq_composition, 'f2'));
           }
         }
       }
     }
   }
 
-  my $rs = $summary_rs->search_autoqc({id_run => 3500, position => 1});
+  my $rs = $summary_rs->search_autoqc({id_run => 35000, position => 1});
   is ($rs->count, 33, '33 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 3500, position => 1}, 1);
+  $rs = $summary_rs->search_autoqc({id_run => 35000, position => 1}, 1);
   is ($rs->count, 33, '33 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 3500, position => 1}, 2);
+  $rs = $summary_rs->search_autoqc({id_run => 35000, position => 1}, 2);
   is ($rs->count, 0, 'no results retrieved');
 
-  $rs = $samtools_rs->search_autoqc({id_run => 3500, position => 1});
+  $rs = $samtools_rs->search_autoqc({id_run => 35000, position => 1});
   is ($rs->count, 66, '66 results retrieved');
-  $rs = $samtools_rs->search_autoqc({id_run => 3500, position => 1}, 1);
+  $rs = $samtools_rs->search_autoqc({id_run => 35000, position => 1}, 1);
   is ($rs->count, 66, '66 results retrieved');
-  $rs = $samtools_rs->search_autoqc({id_run => 3500, position => 1}, 2);
+  $rs = $samtools_rs->search_autoqc({id_run => 35000, position => 1}, 2);
   is ($rs->count, 0, 'no results retrieved');
 
-  $rs = $summary_rs->search_autoqc({id_run => 3500, position => 1, tag_index => undef});
+  $rs = $summary_rs->search_autoqc({id_run => 35000, position => 1, tag_index => undef});
   is ($rs->count, 0, 'no results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 3500, position => 1, tag_index => 0});
+  $rs = $summary_rs->search_autoqc({id_run => 35000, position => 1, tag_index => 0});
   is ($rs->count, 3, '3 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 3500, position => [1,2], tag_index => 3});
+  $rs = $summary_rs->search_autoqc({id_run => 35000, position => [1,2], tag_index => 3});
   is ($rs->count, 6, '6 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 3500, position => [1,2], tag_index => 3, subset => undef});
+  $rs = $summary_rs->search_autoqc({id_run => 35000, position => [1,2], tag_index => 3, subset => undef});
   is ($rs->count, 2, '2 results retrieved');
-  $rs = $samtools_rs->search_autoqc({id_run => 3500, position => [1,2], tag_index => 3, subset => undef});
+  $rs = $samtools_rs->search_autoqc({id_run => 35000, position => [1,2], tag_index => 3, subset => undef});
   is ($rs->count, 4, '4 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 3500, position => 1, tag_index => 3, subset => 'human'});
+  $rs = $summary_rs->search_autoqc({id_run => 35000, position => 1, tag_index => 3, subset => 'human'});
   is ($rs->count, 1, 'one result retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 3500, position => 1, tag_index => 3, subset => 'yhuman'});
+  $rs = $summary_rs->search_autoqc({id_run => 35000, position => 1, tag_index => 3, subset => 'yhuman'});
   is ($rs->count, 0, 'no results retrieved');
 
-  $rs = $summary_rs->search_autoqc({id_run => 3500, subset => ['phix']});
+  $rs = $summary_rs->search_autoqc({id_run => 35000, subset => ['phix']});
   is ($rs->count, 22, '22 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 3500, subset => undef});
+  $rs = $summary_rs->search_autoqc({id_run => 35000, subset => undef});
   is ($rs->count, 22, '22 results retrieved');
 
-  $rs = $summary_rs->search_autoqc({id_run => 5000, subset => 'human'}, 1);
+  $rs = $summary_rs->search_autoqc({id_run => 50000, subset => 'human'}, 1);
   is ($rs->count, 22, '22 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 5000, subset => 'human'}, 2);
+  $rs = $summary_rs->search_autoqc({id_run => 50000, subset => 'human'}, 2);
   is ($rs->count, 0, 'no results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 5000, subset => undef}, 1);
+  $rs = $summary_rs->search_autoqc({id_run => 50000, subset => undef}, 1);
   is ($rs->count, 22, '22 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 5000, subset => undef}, 2);
+  $rs = $summary_rs->search_autoqc({id_run => 50000, subset => undef}, 2);
   is ($rs->count, 11, '11 results retrieved');
-  $rs = $summary_rs->search_autoqc({id_run => 5000, subset => undef});
+  $rs = $summary_rs->search_autoqc({id_run => 50000, subset => undef});
   is ($rs->count, 33, '33 results retrieved');
-  $rs = $samtools_rs->search_autoqc({id_run => 5000, subset => undef}, 1);
+  $rs = $samtools_rs->search_autoqc({id_run => 50000, subset => undef}, 1);
   is ($rs->count, 44, '44 results retrieved');
-  $rs = $samtools_rs->search_autoqc({id_run => 5000, subset => undef}, 2);
+  $rs = $samtools_rs->search_autoqc({id_run => 50000, subset => undef}, 2);
   is ($rs->count, 22, '22 results retrieved');
-  $rs = $samtools_rs->search_autoqc({id_run => 5000, subset => undef});
+  $rs = $samtools_rs->search_autoqc({id_run => 50000, subset => undef});
   is ($rs->count, 66, '44 results retrieved');
 };
 
@@ -248,7 +316,7 @@ subtest q[mixed queries for results linked to a composition] => sub {
 
   my $samtools_rs = $schema->resultset('SamtoolsStats');
 
-  my $query = {'id_run' => 3500, 'position' => 1, 'tag_index' => 2};
+  my $query = {'id_run' => 35000, 'position' => 1, 'tag_index' => 2};
   my @rows = $samtools_rs->search_autoqc($query)->all();
   is (scalar @rows, 6, 'six results for a tag');
   @rows = uniq map { $_->filter() } @rows;
