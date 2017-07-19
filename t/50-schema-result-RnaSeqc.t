@@ -2,24 +2,16 @@ use strict;
 use warnings;
 use Test::More tests => 2;
 use Test::Exception;
-use File::Temp qw/ tempdir /;
-use Cwd qw/getcwd abs_path/;
-use Archive::Extract;
 use Perl6::Slurp;
 use JSON;
 use npg_testing::db;
 
 use_ok('npg_qc::Schema::Result::RnaSeqc');
 
-
 my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
-
-my $tempdir = tempdir( CLEANUP => 1);
-my $repos = getcwd . q[/t/data/autoqc/rna_seqc];
-my $archive = join q[/], $repos, q[data];
-
+my $archive = q[t/data/autoqc/rna_seqc/data];
 my $rs = $schema->resultset('RnaSeqc');
 my $rc = $rs->result_class;
 
