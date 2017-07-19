@@ -124,6 +124,8 @@ my $builder = $class->new(
 
    'build_requires'    => {
         'npg_tracking::util::build'                     => '0',
+        'npg_qc::autoqc::db_loader'                     => '0',
+        'Archive::Extract'                              => '0',
         'Catalyst::Test'                                => '0',
         'DateTime'                                      => '0',
         'File::Temp'                                    => '0',

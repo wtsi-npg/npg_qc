@@ -3,6 +3,8 @@ package t::util;
 use Moose;
 use Class::Load qw/load_class/;
 use Readonly;
+use Archive::Extract;
+use File::Temp qw/ tempdir /;
 
 use npg_qc::autoqc::db_loader;
 with 'npg_testing::db';
@@ -80,7 +82,8 @@ sub test_env_setup {
   $db = $self->npgqc_db_path;
   if (-e $db) {unlink $db;}
   $schema_package = q[npg_qc::Schema];
-  $schemas->{'qc'}  = $self->create_test_db($schema_package, q[], $db);
+  $fixtures_path  = $self->fixtures ? q[t/data/fixtures/npgqc] : q[];
+  $schemas->{'qc'}  = $self->create_test_db($schema_package, $fixtures_path, $db);
 
   $db = $self->npg_db_path;
   if (-e $db) {unlink $db;}
@@ -97,9 +100,15 @@ sub test_env_setup {
   }
 
   if ($self->fixtures) {
+
+    my $tempdir = tempdir( CLEANUP => 1);
+    my $ae = Archive::Extract->new(
+      archive => 't/data/fixtures/npgqc_json.tar.gz');
+    $ae->extract(to => $tempdir) or die $ae->error;
+
     npg_qc::autoqc::db_loader->new(
       schema  => $schemas->{'qc'},
-      path    => ['t/data/fixtures/npgqc_json'],
+      path    => ["${tempdir}/npgqc_json"],
       verbose => 0
     )->load();
   }
