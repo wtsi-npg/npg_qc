@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - npg_qc::autoqc::results::collection
+     remove unused functionality;
+     ensure existing methods work with objects that do not have id_run,
+     position, etc
+ - remove superfluous method call from a template
+
 release 63.1
  - label fix for rna_seqc in SeqQC viewer
  - MySQL does not save correctly integers to float columns;
