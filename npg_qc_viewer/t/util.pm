@@ -1,11 +1,10 @@
 package t::util;
 
-use Carp;
-use English qw{-no_match_vars};
 use Moose;
-use Class::Load qw/load_class/;;
+use Class::Load qw/load_class/;
 use Readonly;
 
+use npg_qc::autoqc::db_loader;
 with 'npg_testing::db';
 
 Readonly::Scalar our $CONFIG_PATH       => q[t/data/test_app.conf];
@@ -15,9 +14,9 @@ Readonly::Scalar our $MLWHOUSE_DB_PATH  => q[t/data/mlwarehouse.db];
 Readonly::Scalar our $NPGQC_DB_PATH     => q[t/data/npgqc.db];
 Readonly::Scalar our $NPG_DB_PATH       => q[t/data/npg.db];
 
-has 'config_path' => ( isa      => 'Str',
-                       is       => 'ro',
-                       required => 0,
+has 'config_path' => ( isa        => 'Str',
+                       is         => 'ro',
+                       required   => 0,
                        lazy_build => 1,
                      );
 sub _build_config_path {
@@ -81,8 +80,7 @@ sub test_env_setup {
   $db = $self->npgqc_db_path;
   if (-e $db) {unlink $db;}
   $schema_package = q[npg_qc::Schema];
-  $fixtures_path  = $self->fixtures ? q[t/data/fixtures/npgqc] : q[];
-  $schemas->{'qc'}  = $self->create_test_db($schema_package, $fixtures_path, $db);
+  $schemas->{'qc'}  = $self->create_test_db($schema_package, q[], $db);
 
   $db = $self->npg_db_path;
   if (-e $db) {unlink $db;}
@@ -98,6 +96,14 @@ sub test_env_setup {
     $npg->resultset('Run')->find({id_run => 3500, })->set_tag(1, 'staging');
   }
 
+  if ($self->fixtures) {
+    npg_qc::autoqc::db_loader->new(
+      schema  => $schemas->{'qc'},
+      path    => ['t/data/fixtures/npgqc_json'],
+      verbose => 0
+    )->load();
+  }
+  
   return $schemas;
 }
 
