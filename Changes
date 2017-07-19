@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - db query for tag_index NULL or NOT NULL: undef as a string
+   might not give problems now, but will when all db records are
+   linked to compositions
+
 release 63.1
  - label fix for rna_seqc in SeqQC viewer
  - MySQL does not save correctly integers to float columns;
