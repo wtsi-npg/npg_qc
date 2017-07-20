@@ -243,7 +243,6 @@ sub _run_lanes_from_dwh {
 
     my $to_factory =  npg_qc_viewer::Util::TransferObjectFactory->new(
       product_metrics_row => $product_metric,
-      qc_schema           => $c->model('NpgQcDB'),
       lane_level          => 1
                       );
 
