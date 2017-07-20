@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - db query for tag_index NULL or NOT NULL: undef as a string
+   might not give problems now, but will when all db records are
+   linked to compositions
  - npg_qc::autoqc::results::collection
      remove unused functionality;
      ensure existing methods work with objects that do not have id_run,
