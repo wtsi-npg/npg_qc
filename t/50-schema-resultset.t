@@ -37,10 +37,10 @@ sub _save_composition {
     my $component_row = $component_rs->create($component_h);
     $composition_row = $composition_rs->create(
       {size => 1, digest => $composition_digest});
-    $com_com_rs->create({size => 1,
-                       id_seq_component   => $component_row->id_seq_component,
-                       id_seq_composition => $composition_row->id_seq_composition
-                     });
+    $com_com_rs->create({size               => 1,
+                         id_seq_component   => $component_row->id_seq_component,
+                         id_seq_composition => $composition_row->id_seq_composition
+                       });
   }
   return $composition_row->id_seq_composition;
 }
