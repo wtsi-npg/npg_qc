@@ -18,6 +18,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - db query for tag_index NULL or NOT NULL: undef as a string
    might not give problems now, but will when all db records are
    linked to compositions
+ - remove unused qc_chema property from TransferObjectFactory 
+ - set explicit dist to precise in travis yml
 
 release 63.1
  - label fix for rna_seqc in SeqQC viewer
