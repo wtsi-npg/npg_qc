@@ -16,7 +16,6 @@ npg_qc_viewer::Util::TransferObjectFactory
 
   my $factory = npg_qc_viewer::Util::TransferObjectFactory->new(
      product_metrics_row => $product_metrics,
-     qc_schema           => $qc_schema,
      lane_level          => 1);
   my $lane_transfer_object = $factory->create_object();
   $factory->lane_level(0);
@@ -27,15 +26,6 @@ npg_qc_viewer::Util::TransferObjectFactory
 A factory to generate npg_qc_viewer::Util::TransferObject objects.
 
 =head1 SUBROUTINES/METHODS
-
-=head2 qc_schema
-
-=cut
-has 'qc_schema'   => (
-  isa      => 'Object',
-  is       => 'ro',
-  required => 1,
-);
 
 =head2 product_metrics_row
 
