@@ -1,9 +1,10 @@
 package npg_qc::Schema::ResultSet;
 
 use Moose;
-use namespace::autoclean;
-use MooseX::MarkAsMethods;
+use MooseX::MarkAsMethods autoclean => 1;
 use Carp;
+use JSON;
+use Try::Tiny;
 
 extends 'DBIx::Class::ResultSet';
 
@@ -96,6 +97,94 @@ sub deflate_unique_key_components {
   return;
 }
 
+sub find_or_create_seq_composition {
+  my ($self, $composition) = @_;
+
+  if (!$composition ||
+      (ref $composition ne 'npg_tracking::glossary::composition')) {
+    croak 'Composition object argument expected';
+  }
+
+  my $result_source = $self->result_source();
+  if (!$result_source->has_relationship('seq_composition')) {
+    return;
+  }
+
+  my $num_components = $composition->num_components;
+  if (!$num_components) {
+    croak 'Empty composition';
+  }
+
+  my $schema = $result_source->schema();
+
+  my $transaction = sub {
+
+    my $composition_row = $schema->resultset('SeqComposition')
+                                  ->find_or_new({
+                    'digest' => $composition->digest,
+                    'size'   => $num_components
+                                               });
+    # If composition exists, we assume that it's properly defined, i.e.
+    # all relevant components and records in the linking table exist.
+    if (!$composition_row->in_storage) {
+      $composition_row = $composition_row->insert(); # Save composition
+      my $pk = $composition_row->id_seq_composition;
+      my $component_rs = $schema->resultset('SeqComponent');
+
+      foreach  my $c ($composition->components_list()) {
+        my $values = decode_json($c->freeze());
+
+        ##########
+        # Through inheritance from the reference finder role some of the
+        # autoqc results generated with npg_tracking releases up to and
+        # including release 86.3 had subset attribute set to 'all' where
+        # it should be undefined, for example, for prexes.
+        #
+        # See https://github.com/wtsi-npg/npg_tracking/pull/403 for
+        # details.
+        #
+        # It's too late to unset the value at this point. The digest
+        # was computed for a composition with subset "all", and a search
+        # by composition is based on the digest value.
+        #
+        if ($values->{'subset'} && $values->{'subset'} eq 'all') {
+          croak 'Subset "all" not allowed';
+        }
+
+        $values->{'digest'} = $c->digest();
+        # Find or (instantiate and save) each component
+        my $row = $component_rs->find_or_create($values);
+        # Whether the component existed or not, we have to create a new
+        # composition membership record for it.
+        $row->create_related('seq_component_compositions',
+                             {'id_seq_composition' => $pk,
+                              'size'               => $num_components});
+      }
+    }
+
+    return $composition_row;
+  };
+
+  # When multiple processes are running in parallel they occasionally
+  # try to create the same composition or component at roughly the
+  # same time. If the 'Duplicate entry' error is due to this, rerunning
+  # the transaction should not produce an error since an existing row
+  # will be returned.
+  my $row;
+  try {
+    $row = $schema->txn_do($transaction);
+  } catch {
+    my $e = $_;
+    if ($e =~ /Duplicate\ entry/smx) {
+      $row = $schema->txn_do($transaction);
+    } else {
+      croak $e;
+    }
+  };
+
+  return $row;
+}
+
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 1;
@@ -183,6 +272,18 @@ not in the hash.
   my $only_existing = 1;
   $rs->deflate_unique_key_components($values, $only_existing);
 
+=head2 find_or_create_seq_composition
+
+ A factory method. Given a npg_tracking::glossary::composition object,
+ will either find a database record for this composition or create one.
+ A found or created npg_qc::Schema::Result::SeqComposition row is
+ returned. If a row is created, all relevant (not already existing)
+ component rows are created and a a record is created in a linking table
+ for every component-composition pair.
+
+ Returns undefined if this result set doe not have a relationship to
+ the seq_composition table.
+
 =head1 DEPENDENCIES
 
 =over
@@ -191,11 +292,13 @@ not in the hash.
 
 =item MooseX::MarkAsMethods
 
-=item namespace::autoclean
-
 =item Carp
 
 =item DBIx::Class::ResultSet
+
+=item JSON
+
+=item Try::Tiny
 
 =back
 
@@ -213,7 +316,7 @@ Marina Gourtovaia <lt>mg8@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL Genome Research Limited
+Copyright (C) 2017 GRL Genome Research Limited
 
 This file is part of NPG.
 

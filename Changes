@@ -1,4 +1,10 @@
-LIST OF CHANGES FOR NPG-QC PACKAGE
+iLIST OF CHANGES FOR NPG-QC PACKAGE
+
+ - db composition creation via a factory method
+ - db autoqc loader - unused 'update' option removed
+ - db autoqc loader - will retry a transaction that failed because
+     a db lock could not be aquired
+ - saving a component with subset attribute value 'all' gives an error
 
  - db query for tag_index NULL or NOT NULL: undef as a string
    might not give problems now, but will when all db records are

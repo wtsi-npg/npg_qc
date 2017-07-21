@@ -416,6 +416,7 @@ t/50-schema-result-MqcOutcomeEnt.t
 t/50-schema-result-MqcOutcomeHist.t
 t/50-schema-result-VerifyBamId.t
 t/50-schema-result-SamtoolsStats.t
+t/50-schema-result-SeqComposition.t
 t/50-schema-result-SequenceSummary.t
 t/50-schema-resultset.t
 t/50-schema-resultset-MqcOutcomeEnt.t

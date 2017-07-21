@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -8,7 +8,7 @@ use Perl6::Slurp;
 use JSON;
 use Archive::Extract;
 use File::Temp qw/ tempdir /;
-use File::Copy 'cp';
+use File::Copy qw/ cp /;
 use List::MoreUtils qw/ uniq /;
 
 use npg_testing::db;
@@ -120,7 +120,7 @@ subtest 'excluding non-db attributes' => sub {
 };
 
 subtest 'loading insert_size results' => sub {
-  plan tests => 25;
+  plan tests => 19;
 
   my $is_rs = $schema->resultset('InsertSize');
   my $current_count = $is_rs->search({})->count;
@@ -169,30 +169,6 @@ subtest 'loading insert_size results' => sub {
   $row = $rs->next;
   is(join(q[ ],@{$row->expected_size}), '100 300', 'updated insert size');
   is($row->num_well_aligned_reads, 60, 'updated number well-aligned reads');
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       path   => ['t/data/autoqc/dbix_loader/is'],
-       update => 0,
-  );
-  warnings_exist {$db_loader->load()}
-    [qr(Skipped t/data/autoqc/dbix_loader/is/12187_2\.insert_size\.json),
-     qr(0 json files have been loaded)],
-    'file skipped warning';
-  $rs = $is_rs->search({});
-  is($rs->count, $current_count, 'no new records added');
-  $row = $rs->next;
-  is(join(q[ ],@{$row->expected_size}), '100 300', 'insert size not updated');
-  is($row->num_well_aligned_reads, 60, 'number well-aligned reads not updated');
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema => $schema,
-       path   => ['t/data/autoqc/dbix_loader/is/more'],
-       update => 0,
-       verbose => 0,
-  );
-  lives_ok {$db_loader->load()} 'load new insert size result';
-  is($is_rs->search({})->count, $current_count+1, 'a new records added');
 };
 
 subtest 'loading veryfy_bam_id results' => sub {
@@ -256,6 +232,8 @@ subtest 'errors and warnings' => sub {
     'error loading a set of files with the last file corrupt';
   is ($is_rs->search({})->count, 0, 'table is empty, ie transaction has been rolled back');
 
+  
+
   my $file = 't/data/autoqc/insert_size/6062_8#1.insert_size.json';
   $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
@@ -277,7 +255,7 @@ my $num_lane_jsons = 11;
 my $num_plex_jsons = 44;
 
 subtest 'loading and reloading' => sub {
-  plan tests => 7;
+  plan tests => 6;
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema => $schema,
@@ -321,14 +299,6 @@ subtest 'loading and reloading' => sub {
   is($count, $num_lane_jsons, 'number of new records in the db is correct');
 
   is ($db_loader->load(), $num_lane_jsons, 'loading the same files again updates all files');
-
-  $db_loader = npg_qc::autoqc::db_loader->new(
-       schema       => $schema,
-       verbose      => 0,
-       path         => [$path],
-       update       => 0,
-  );
-  is ($db_loader->load(), 0, 'loading the same files again with update option false'); 
 };
 
 subtest 'loading a range of results' => sub {
@@ -337,10 +307,9 @@ subtest 'loading a range of results' => sub {
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
-       path         => [$path, "$path/lane"],
-       update       => 0,
+       path         => [$path, "$path/lane"]
   );
-  is ($db_loader->load(), $num_plex_jsons, 'loading from two paths without update');
+  is ($db_loader->load(), 55, 'loading from two paths');
   my $total_count = 0;
   my $plex_count = 0;
   my $tag_zero_count = 0;
@@ -400,6 +369,37 @@ my $samtools_path  = join q[/], $tempdir, 'samtools';
 local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
 # Create mock samtools that will output the header
 write_samtools_script($samtools_path, join(q[/],$archive,'cram.header'));
+
+subtest 'roll-back for composition-based results' => sub {
+  plan tests => 3;
+
+  my $comp_dir = join q[/], $tempdir, 'compositions';
+  mkdir $comp_dir;
+  cp "$json_dir2/17448_1#9_phix_F0x900.samtools_stats.json", $comp_dir;
+  cp "$json_dir2/17448_1#9_phix_F0xB00.samtools_stats.json", $comp_dir;
+  my $file_good = "$comp_dir/17448_1#9_phix_F0x900.samtools_stats.json";
+  my $file = "$comp_dir/17448_1#9_phix_F0xB00.samtools_stats.json";
+  my $content = slurp $file;
+  # Create a json file with run id that will fail validation
+  $content =~ s/17448/-17448/;
+  open my $fh, '>', $file or die "Failed to open $file for writing";
+  print $fh $content or die "Failed to write to $file";
+  close $fh or die "Failed to close filehandle for $file";
+
+  my $crs = $schema->resultset('SeqComponent');
+  is($crs->search({id_run => 17448})->count(), 0,
+    'prerequisite - no components with run id 17448');
+
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+       schema => $schema,
+       json_file => [$file_good, $file],
+       verbose => 0,
+  );
+  throws_ok {$db_loader->load()}
+    qr/Validation failed for 'NpgTrackingRunId' with value -17448/,
+    'error loading two files where the last file has invalid run id';
+  is($crs->search({id_run => 17448})->count(), 0, 'no components with run id 17448');
+};
 
 subtest 'loading bam_flagstats and its related objects from files' => sub {
   plan tests => 48;
