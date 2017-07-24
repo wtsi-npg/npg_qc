@@ -5,7 +5,7 @@ use namespace::autoclean;
 use Moose::Meta::Class;
 use URI::URL;
 use Carp;
-use List::MoreUtils qw/ none /;
+use List::MoreUtils qw/any uniq/;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::role::rpt_key;
@@ -87,10 +87,10 @@ sub _show_option {
 sub _data2stash {
   my ($self, $c, $collection) = @_;
 
-  my $rl_map   = $collection->run_lane_collections;
+  my $rl_map     = $collection->run_lane_collections;
   my $has_plexes = npg_qc::autoqc::role::rpt_key->has_plexes([keys %{$rl_map}]);
-  $c->stash->{'rl_map'}     = $rl_map;
-  $c->stash->{'has_plexes'}   = $has_plexes;
+  $c->stash->{'rl_map'}         = $rl_map;
+  $c->stash->{'has_plexes'}     = $has_plexes;
   $c->stash->{'collection_all'} = $collection;
   return;
 }
@@ -126,41 +126,39 @@ sub _display_libs {
   my ($self, $c, $rs, $what) = @_;
 
   if ($rs) {
-    $c->stash->{'db_lookup'} = 1;
 
+    $c->stash->{'db_lookup'} = 1;
     my $run_lane_map = {};
-    my $rpt_keys = [];
+    my $rpt_map = {};
+
     while (my $row = $rs->next) {
-      my $id_run   = $row->id_run;
-      my $position = $row->position;
-      my $where = $self->_as_query_conditions($row);
+
+      push @{$run_lane_map->{$row->id_run}}, $row->position;
 
       if ( $what == $LANES ) {
         #Only process run+lane once disregarding how many plexes matched the pool
         my $run_lane_key = $row->lane_rpt_key_from_key($row->rpt_key);
-        if ( none { $_ eq $run_lane_key } @{ $rpt_keys } ) {
-          $self->_run_lanes_from_dwh($c, $where, $what);
-          push @{ $rpt_keys }, $run_lane_key;
+        if (!$rpt_map->{$run_lane_key}) {
+          $rpt_map->{$run_lane_key} = $self->_as_query_conditions($row);
         }
       } else {
-        push @{$rpt_keys}, $row->rpt_key;
-        $self->_run_lanes_from_dwh($c, $where, $what);
+        $rpt_map->{$row->rpt_key} = $self->_as_query_conditions($row);
       }
+    }
 
-      if (exists $run_lane_map->{$id_run}) {
-        if ( none { $_ eq $position } @{ $run_lane_map->{$id_run} } ) {
-          push @{$run_lane_map->{$id_run}}, $position;
-        }
-      } else {
-        $run_lane_map->{$id_run} = [$position];
-      }
+    foreach my $id_run (keys %{$run_lane_map}) {
+      $run_lane_map->{$id_run} = [uniq @{$run_lane_map->{$id_run}}];
     }
 
     my $collection = $c->model('Check')->load_lanes(
       $run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-    $collection = $self->_filter_run_lane_collection_with_keys($collection, $rpt_keys);
-
+    my @rpt_map_keys = keys %{$rpt_map};
+    $collection = $self->_filter_run_lane_collection_with_keys($collection, \@rpt_map_keys);
     $self->_data2stash($c, $collection);
+
+    for my $key (@rpt_map_keys) {
+      $self->_run_lanes_from_dwh($c, $rpt_map->{$key}, $what);
+    }
   }
 
   return;
@@ -204,13 +202,11 @@ sub _display_run_lanes {
   my $retrieve_option = $RESULTS_RETRIEVE_OPTIONS{$what};
   my $collection = $c->model('Check')->load_lanes(
     $run_lanes, $c->stash->{'db_lookup'}, $retrieve_option, $c->model('NpgDB')->schema);
+  $self->_data2stash($c, $collection);
 
   my $where = { 'id_run' => $id_runs };
   if (scalar @{$lanes}) { $where->{'position'} = $lanes };
-
   $self->_run_lanes_from_dwh($c, $where, $retrieve_option);
-
-  $self->_data2stash($c, $collection);
 
   if (!$c->stash->{'title'} ) {
     my $title = q[Results ];
@@ -236,28 +232,35 @@ sub _display_run_lanes {
 sub _run_lanes_from_dwh {
   my ($self, $c, $where, $retrieve_option) = @_;
 
-  my $row_data = $c->stash->{'row_data'} || {};
+  if (!defined $c->stash->{'rl_map'}) {
+    croak 'Method called out of order';
+  }
+
+  my $row_data = $c->stash->{'row_data'};
   my $rs = $c->model('MLWarehouseDB')->search_product_metrics($where);
 
   while (my $product_metric = $rs->next) {
-
-    my $to_factory =  npg_qc_viewer::Util::TransferObjectFactory->new(
-      product_metrics_row => $product_metric,
-      lane_level          => 1
-                      );
-
+    my $flowcell = $product_metric->iseq_flowcell;
     if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
       if ( !defined $product_metric->tag_index ||
-           ( $product_metric->iseq_flowcell
-             && $product_metric->iseq_flowcell->entity_type ne 'library_indexed_spike' )) {
-        #Using first tax index available as representative for the lane.
+           ( $flowcell && $flowcell->entity_type ne 'library_indexed_spike' )) {
+             #Using first tag index available as representative for the lane.
 
         my $key = $product_metric->rpt_key;
         if ( $product_metric->tag_index ) {
           $key = $product_metric->lane_rpt_key_from_key($key);
         }
-        if ( !exists $row_data->{$key} ) {
-          $row_data->{$key} = $to_factory->create_object();
+        if ( !$row_data->{$key} ) {
+          my $lane_collection = $c->stash->{'rl_map'}->{$key};
+          my $is_pool = 0;
+          if ($lane_collection && !$lane_collection->is_empty) {
+            $is_pool = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
+                       @{$lane_collection->check_names()->{'list'}};
+          }
+          $row_data->{$key} =  npg_qc_viewer::Util::TransferObjectFactory->new(
+                                 product_metrics_row => $product_metric,
+                                 is_pool             => $is_pool
+                               )->create_object();
         }
       }
     }
@@ -265,9 +268,11 @@ sub _run_lanes_from_dwh {
     if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
       if (defined $product_metric->tag_index) {
         my $key = $product_metric->rpt_key;
-        if ( !defined $row_data->{$key} ) {
-          $to_factory->lane_level(0);
-          $row_data->{$key} = $to_factory->create_object();
+        if ( !$row_data->{$key} ) {
+          $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory->new(
+                                product_metrics_row => $product_metric,
+                                is_plex             => 1
+                              )->create_object();
         }
       }
     }
@@ -288,9 +293,10 @@ sub base :Chained('/') :PathPart('checks') :CaptureArgs(0)
   my ($self, $c) = @_;
   $c->stash->{'util'}       = Moose::Meta::Class->create_anon_class(
             roles => ['npg_qc::autoqc::role::rpt_key'])->new_object();
+  $c->stash->{'row_data'}     = {};
   $c->stash->{'rl_map'}       = {};
   $c->stash->{'db_lookup'}    = 1;
-  $c->stash->{'env_dev'}      = $ENV{dev};
+  $c->stash->{'env_dev'}      = $ENV{'dev'};
   $c->stash->{'run_view'}     = 0;
   $c->stash->{'run_from_staging'} = 0;
   $c->stash->{'base_url'}     = _base_url_no_port($c->request->base);
@@ -329,7 +335,7 @@ QC help page
 =cut
 sub about_qc_proc :Path('about_qc_proc') :Args(0) {
   my ( $self, $c )  = @_;
-  $c->stash->{'title'} = _get_title(q[about manual QC]);
+  $c->stash->{'title'}    = _get_title(q[about manual QC]);
   $c->stash->{'template'} = q[about_qc_proc.tt2];
   return;
 }
@@ -346,7 +352,7 @@ sub list_runs :Chained('base') :PathPart('runs') :Args(0) {
     $c->stash->{'db_lookup'} = 1;
     $self->_display_run_lanes($c);
   } else {
-    $c->stash->{error_message} = q[This is an invalid URL];
+    $c->stash->{'error_message'} = q[This is an invalid URL];
     $c->detach(q[Root], q[error_page]);
   }
   return;
@@ -453,7 +459,7 @@ sub libraries :Chained('base') :PathPart('libraries') :Args(0) {
     $c->stash->{'show_total'}  = 1;
     $self->_display_libs($c, $rs, $ALL);
   } else {
-    $c->stash->{error_message} = q[This is an invalid URL];
+    $c->stash->{'error_message'} = q[This is an invalid URL];
     $c->detach(q[Root], q[error_page]);
   }
   return;
@@ -466,7 +472,7 @@ Pools page - retained in order not to change dispatch type for a pool
 =cut
 sub pools :Chained('base') :PathPart('pools') :Args(0) {
   my ($self, $c) = @_;
-  $c->stash->{error_message} = q[This is an invalid URL];
+  $c->stash->{'error_message'} = q[This is an invalid URL];
   $c->detach(q[Root], q[error_page]);
   return;
 }
@@ -493,7 +499,7 @@ Samples page - retained in order not to change dispatch type for a sample
 =cut
 sub samples :Chained('base') :PathPart('samples') :Args(0) {
   my ($self, $c) = @_;
-  $c->stash->{error_message} = q[This is an invalid URL];
+  $c->stash->{'error_message'} = q[This is an invalid URL];
   $c->detach(q[Root], q[error_page]);
   return;
 }
@@ -508,14 +514,14 @@ sub sample :Chained('base') :PathPart('samples') :Args(1) {
 
   my $sample = $c->model('MLWarehouseDB')->search_sample_by_sample_id($id_sample_lims)->next;
   if (!$sample) {
-    $c->stash->{error_message} = qq[Unknown sample id $id_sample_lims];
+    $c->stash->{'error_message'} = qq[Unknown sample id $id_sample_lims];
     $c->detach(q[Root], q[error_page]);
     return;
   }
 
   my $sample_name = $sample->name;
   my $rs = $c->model('MLWarehouseDB')->search_product_by_sample_id($id_sample_lims);
-  $c->stash->{'show_total'}  = 1;
+  $c->stash->{'show_total'} = 1;
   $self->_display_libs($c, $rs, $ALL);
   $c->stash->{'title'} = _get_title(qq[Sample '$sample_name']);
   return;

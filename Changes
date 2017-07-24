@@ -20,6 +20,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    linked to compositions
  - remove unused qc_chema property from TransferObjectFactory 
  - set explicit dist to precise in travis yml
+ - simplify and optmise pool detection in the viewer
+ - remove links to Clarity LIMs, generalise code for linking to LIMs
 
 release 63.1
  - label fix for rna_seqc in SeqQC viewer
