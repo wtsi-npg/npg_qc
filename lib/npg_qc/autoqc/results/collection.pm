@@ -404,49 +404,14 @@ sub run_lane_collections {
     return $map;
 }
 
-=head2 run_lane_plex_flags
-
-Returns a hash map where keys are rpt keys for lanes and values are booleans indicating
-whether this lane has plex-level results.
-
-=cut
-sub run_lane_plex_flags {
-    my $self = shift;
-    my $map = $self->run_lane_collections;
-
-    my $flags = {};
-    foreach my $rpt_key (keys %{$map}) {
-        my $rpt_h = npg_qc::autoqc::role::rpt_key->inflate_rpt_key($rpt_key);
-        if (!defined $rpt_h->{'tag_index'}) { # it's a lane-level entry
-            if (!exists $flags->{$rpt_key}) {
-                my $has_plexes = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
-                                 @{$map->{$rpt_key}->check_names()->{'list'}};
-                $flags->{$rpt_key} = $has_plexes ? 1 : 0;
-            }
-        } else { # it's a plex-level entry
-            my $lane_key = npg_qc::autoqc::role::rpt_key->lane_rpt_key_from_key($rpt_key);
-            $flags->{$lane_key} = 1;
-        }
-    }
-    return $flags;
-}
-
 sub _check_names_map {
     my $self = shift;
 
+    my $seen    = {};
     my $classes = {};
-    my $seen = {};
-    my $checks_list = $self->checks_list;
-    foreach my $check (@{$checks_list}) {
-        $classes->{$check} = [];
-    }
-
     foreach my $result (@{$self->results}) {
         my $class_name = $result->class_name;
         my $check_name = $result->check_name;
-        if (!exists $classes->{$class_name}) {
-            croak qq[Unknown class name $class_name];
-        }
         if (!exists $seen->{$check_name}) {
             push @{$classes->{$class_name}}, $check_name;
             $seen->{$check_name} = 1;
@@ -468,13 +433,15 @@ sub check_names {
     my $classes = $self->_check_names_map();
     my @check_names = ();
     my $map = {};
-    foreach my $check (@{$self->checks_list}) {
-        push @check_names, @{$classes->{$check}};
-        foreach my $name (@{$classes->{$check}}) {
-            $map->{$name} = $check;
+    foreach my $check (@{$self->checks_list}) { # To ensure order
+        if ($classes->{$check}) {
+            push @check_names, @{$classes->{$check}};
+            foreach my $name (@{$classes->{$check}}) {
+                $map->{$name} = $check;
+            }
         }
     }
-    return {'list' => \@check_names, 'map' => $map,};
+    return {'list' => \@check_names, 'map' => $map};
 }
 
 __PACKAGE__->meta->make_immutable;

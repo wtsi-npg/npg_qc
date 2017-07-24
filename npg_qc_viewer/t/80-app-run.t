@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 39;
+use Test::More tests => 38;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -76,7 +76,8 @@ $qc_schema->resultset('TagMetrics')->create({
   $mech->content_contains('20,442,728'); #for total qxYield
   $mech->content_contains($row_id_prefix . q[4025:1]); #Relevant for qcoutcomes js
 
-  $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)->update({ id_user => 64, id_run_status_dict => 26, });
+  $schemas->{npg}->resultset('RunStatus')->search({id_run => 4025, iscurrent => 1},)
+                                         ->update({ id_user => 64, id_run_status_dict => 26, });
   $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results for run 4025 (run 4025 status: qc in progress, taken by mg8)]);
 }
@@ -133,10 +134,8 @@ subtest 'Library links for run + lane SE' => sub {
 
   my $where = { 'iseq_product_metrics.id_run' => 4025, 'me.id_pool_lims' => 'NT28560W'};
   my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
-                             ->search($where, { join => 'iseq_product_metrics', });
-  while (my $flowcell = $rs->next ) {
-    $flowcell->update({'legacy_library_id' => 111111,});
-  }
+                             ->search($where, { join => 'iseq_product_metrics', })
+                             ->update({'legacy_library_id' => 111111,});
 
   my $url = q[http://localhost/checks/runs?run=4025&lane=1];
   $mech->get_ok($url);
@@ -144,6 +143,13 @@ subtest 'Library links for run + lane SE' => sub {
   $mech->content_contains('NT28560W'); #library name
   $mech->content_contains('assets/111111'); #SE link
   $mech->content_contains('libraries?id=NT28560W'); #seqqc link for library
+};
+
+subtest 'Page title for run + show all' =>  sub {
+  plan tests => 2;
+  my $url = q[http://localhost/checks/runs?run=4025&show=all];
+  $mech->get_ok($url);
+  $mech->title_is($title_prefix . q[Results (all) for runs 4025 (run 4025 status: qc in progress, taken by mg8)]);
 };
 
 subtest 'No mqc span html tag for gclp' => sub {
@@ -216,30 +222,6 @@ subtest 'No mqc span html tag for gclp' => sub {
     $flowcell->update({ 'id_lims' => 'SQSCP' });
     $flowcell->update({ 'entity_type' => 'library_indexed' });
   }
-};
-
-subtest 'Library links lane Clarity' => sub {
-  plan tests => 4;
-
-  my $where = { 'iseq_product_metrics.id_run' => 4025, 'me.id_pool_lims' => 'NT28560W'};
-  my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
-                   ->search($where, { join => 'iseq_product_metrics', });
-  while (my $flowcell = $rs->next ) {
-    $flowcell->update({'legacy_library_id' => 111111, 'id_lims' => 'C_GCLP'});
-  }
-
-  my $url = q[http://localhost/checks/runs?run=4025&lane=1];
-  $mech->get_ok($url);
-  $mech->content_contains("<br />152</div>");  # num cycles
-  $mech->content_contains('NT28560W'); #library name
-  $mech->content_contains('search?scope=Container&query=NT28560W'); #link to Clarity LIMs
-};
-
-subtest 'Page title for run + show all' =>  sub {
-  plan tests => 2;
-  my $url = q[http://localhost/checks/runs?run=4025&show=all];
-  $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results (all) for runs 4025 (run 4025 status: qc in progress, taken by mg8)]);
 };
 
 {
@@ -378,18 +360,23 @@ subtest 'Tag metrics as first check in summary table' =>  sub {
   }
 };
 
-subtest 'R&D visual cue' => sub {
-  plan tests => 3;
+subtest 'R&D visual cue and links to LIMS' => sub {
+  plan tests => 4;
+
   my $where = { 'iseq_product_metrics.id_run' => 4025, };
-  my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')->search($where, { join => 'iseq_product_metrics', });
-  while (my $flowcell = $rs->next ) {
-    $flowcell->update({'is_r_and_d' => 1,});
-  }
+  $schemas->{'mlwh'}->resultset('IseqFlowcell')
+          ->search($where, { join => 'iseq_product_metrics', })
+          ->update({'is_r_and_d' => 1,});
+  $where->{'me.position'} = 1;
+  $schemas->{'mlwh'}->resultset('IseqFlowcell')
+                    ->search($where, { join => 'iseq_product_metrics', })
+                    ->update({'id_lims' => 'C_GCLP'});
 
   my $url = q[http://localhost/checks/runs/4025];
   $mech->get_ok($url);
-  $mech->content_contains('9272">random_sample_name</a></span><span class="watermark">R&amp;D</span>'); #library name with R&D watermark
-  $mech->content_contains('9286">random_sample_name</a></span><span class="watermark">R&amp;D</span>'); #library name with R&D watermark
+  $mech->content_contains('NT28560W'); #library name
+  $mech->content_contains('<a href="">random_sample_name</a></span><span class="watermark">R&amp;D</span>'); #GCLP (no link), R&D watermark
+  $mech->content_contains('9286">random_sample_name</a></span><span class="watermark">R&amp;D</span>'); #link to a sample an d R&D watermark
 };
 
 subtest 'Displaying user info' => sub {

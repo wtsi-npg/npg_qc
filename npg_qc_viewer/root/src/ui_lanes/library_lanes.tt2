@@ -89,17 +89,10 @@
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
       attrs = util.inflate_rpt_key(lane_key);
-
       id_run   = attrs.id_run;
-      position  = attrs.position;
-      tag_index = '';
-
       id_runs_in_collection.push(id_run);
-
-      IF attrs.defined('tag_index');
-        tag_index = attrs.tag_index;
-      END;
-
+      position  = attrs.position;
+      tag_index = attrs.defined('tag_index') ? attrs.tag_index : '';
       row_info_to = c.stash.row_data.$lane_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
       table_row_id = lane_key.defined ? ' id="rpt_key:' _ lane_key _ '"' : '';
@@ -107,20 +100,19 @@
 <tr[%- table_row_id -%]>
 <td class="lib nbsp">
 <div class="rel_pos_container">
-[%- IF lane_collection.run_lane_plex_flags.${lane_key} -%]
+[%- IF row_info_to.is_pool -%]
   <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>
 [%- END -%]
 <span class="lib nbsp">
 [%- IF row_info_to.id_library_lims; -%]
-  [%- IF !lane_collection.run_lane_plex_flags.${lane_key};
+  [%- IF !row_info_to.is_pool;
         lurl = c.model('LimsServer').generate_url('library', row_info_to);
   -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('libraries'), {'id' => row_info_to.id_library_lims}) %]"><img src="/static/images/focus_on.png" alt="link to all lanes/plexes for a library" /></a>
     <a href="[% lurl %]">[% row_info_to.id_library_lims | html %]</a><br />
-    <a href="[%- c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.id_sample_lims) -%]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
+    <a href="[%- c.uri_for_action(c.controller('Checks').action_for('samples'), row_info_to.sample_id) -%]"><img src="/static/images/focus_on.png" alt="link to a sample" /></a>
     <a href="[%- c.model('LimsServer').generate_url('sample', row_info_to); -%]">[% row_info_to.sample_name4display | html %]</a>
   [%- ELSE;
-    row_info_to.reset_as_pool();
     lurl = c.model('LimsServer').generate_url('pool', row_info_to);
   -%]
     <a href="[% c.uri_for_action(c.controller('Checks').action_for('pools'), row_info_to.id_library_lims) %]"><img src="/static/images/focus_on.png" alt="link to pool" /></a>
