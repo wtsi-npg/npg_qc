@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 88;
+use Test::More tests => 70;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
@@ -42,10 +42,10 @@ my $temp = tempdir( CLEANUP => 1);
                     tag_metrics      => 1,
                     pulldown_metrics => 1,
                     alignment_filter_metrics => 1,
-                    upstream_tags => 1,
-                    tags_reporters => 1,
-                    verify_bam_id => 1,
-                    rna_seqc => 1,
+                    upstream_tags    => 1,
+                    tags_reporters   => 1,
+                    verify_bam_id    => 1,
+                    rna_seqc         => 1,
                  };
     my $actual;
     my @checks = @{$c->checks_list};
@@ -355,47 +355,6 @@ my $temp = tempdir( CLEANUP => 1);
     is ($c->size, 1, 'loading from directory');
     $c->add_from_dir($lqc, [], 234);
     is ($c->size, 1, 'loading from directory');
-}
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 12, tag_index => 0, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 12, tag_index => 1, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::split_stats->new(position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::adapter->new(    position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::adapter->new(    position => 7, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 13, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 13, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 6, id_run => 14, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 14, path => q[mypath]));
-
-    my $flags = $c->run_lane_plex_flags();
-
-    is (scalar keys %{$flags}, 5, 'five run lane entries');
-
-    my @keys = qw/12:8 12:7 13:8 14:6 14:2/;
-    foreach my $key (@keys) {
-        ok( exists $flags->{$key}, "entry $key exists");
-    }
-
-    my $one_key = shift @keys;
-    foreach my $key (@keys) {
-        is($flags->{$key}, 0, "entry $key is zero");
-    }
-    is($flags->{$one_key}, 1, "entry $one_key is one");
-    
-    $c->add(npg_qc::autoqc::results::tag_metrics->new(position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::tag_metrics->new(position => 2, id_run => 14, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::tag_decode_stats->new(position => 2, id_run => 22, path => q[mypath]));
-    $flags = $c->run_lane_plex_flags();
-    is (scalar keys %{$flags}, 6, 'six run lane entries');
-    foreach my $key (qw/22:2 12:8 14:2/) {
-        is($flags->{$key}, 1, "entry $key is one");
-    }
-    foreach my $key (qw/12:7 13:8 14:6/) {
-        is($flags->{$key}, 0, "entry $key is zero");
-    }
 }
 
 1;
