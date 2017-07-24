@@ -152,10 +152,11 @@ sub _display_libs {
 
     my $collection = $c->model('Check')->load_lanes(
       $run_lane_map, $c->stash->{'db_lookup'}, $what, $c->model('NpgDB')->schema);
-    $collection = $self->_filter_run_lane_collection_with_keys($collection, [keys %{$rpt_map}]);
+    my @rpt_map_keys = keys %{$rpt_map};
+    $collection = $self->_filter_run_lane_collection_with_keys($collection, \@rpt_map_keys);
     $self->_data2stash($c, $collection);
 
-    for my $key (keys %{$rpt_map}) {
+    for my $key (@rpt_map_keys) {
       $self->_run_lanes_from_dwh($c, $rpt_map->{$key}, $what);
     }
   }
