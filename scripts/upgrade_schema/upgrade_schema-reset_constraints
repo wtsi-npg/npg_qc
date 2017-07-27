@@ -1,4 +1,15 @@
 --
+-- seq_component - rename one of the indexes,
+-- add additional search indexes
+--
+
+ALTER TABLE seq_component
+  DROP INDEX unq_seq_compos_rp,
+  ADD UNIQUE INDEX unq_seq_component_runpostagsubset (id_run,position,tag_index,subset),
+  ADD INDEX seq_component_tagindex (tag_index),
+  ADD INDEX seq_component_subset (subset);
+
+--
 -- autoqc results - enable storage of results for multi-component
 -- compositions, create views for ease of querying
 --

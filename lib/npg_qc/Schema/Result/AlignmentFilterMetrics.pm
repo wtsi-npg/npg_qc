@@ -66,7 +66,7 @@ __PACKAGE__->table('alignment_filter_metrics');
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
-  is_nullable: 1
+  is_nullable: 0
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
@@ -123,7 +123,7 @@ __PACKAGE__->add_columns(
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_foreign_key => 1,
-    is_nullable => 1,
+    is_nullable => 0,
   },
   'id_run',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
@@ -153,6 +153,23 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_alignment_filter_metrics');
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<alignment_filter_metrics_compos_ind_unique>
+
+=over 4
+
+=item * L</id_seq_composition>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint(
+  'alignment_filter_metrics_compos_ind_unique',
+  ['id_seq_composition'],
+);
+
 =head1 RELATIONS
 
 =head2 seq_composition
@@ -167,12 +184,7 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  {
-    is_deferrable => 1,
-    join_type     => 'LEFT',
-    on_delete     => 'NO ACTION',
-    on_update     => 'NO ACTION',
-  },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -193,8 +205,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::alignment_filter_metrics';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-25 16:17:01
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bJ87aiTDn3l75IvtTRy4dQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-27 14:12:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:6I9mh3dB/AVIH3dY0akHeA
 
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};

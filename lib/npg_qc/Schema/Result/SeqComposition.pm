@@ -150,16 +150,16 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 alignment_filter_metrics
+=head2 alignment_filter_metric
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::AlignmentFilterMetrics>
 
 =cut
 
-__PACKAGE__->has_many(
-  'alignment_filter_metrics',
+__PACKAGE__->might_have(
+  'alignment_filter_metric',
   'npg_qc::Schema::Result::AlignmentFilterMetrics',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -484,8 +484,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-25 16:17:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fAeZYm9lI5a0lFBXEPbeSA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-27 14:12:47
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+cA3XncxbYrxNFS/fgMXhw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
