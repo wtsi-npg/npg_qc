@@ -1,19 +1,23 @@
-iLIST OF CHANGES FOR NPG-QC PACKAGE
+LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - composition-enabled autoqc objects storage
+     schema changes
+     DBIx binding updates
+     script for back-filling foreign keys to composition table
+ - bug fix on search_autoqc method
  - db composition creation via a factory method
  - db autoqc loader - unused 'update' option removed
  - db autoqc loader - will retry a transaction that failed because
      a db lock could not be aquired
  - saving a component with subset attribute value 'all' gives an error
-
- - db query for tag_index NULL or NOT NULL: undef as a string
-   might not give problems now, but will when all db records are
-   linked to compositions
  - npg_qc::autoqc::results::collection
      remove unused functionality;
      ensure existing methods work with objects that do not have id_run,
      position, etc
  - remove superfluous method call from a template
+ - db query for tag_index NULL or NOT NULL: undef as a string
+   might not give problems now, but will when all db records are
+   linked to compositions
  - remove unused qc_chema property from TransferObjectFactory 
  - set explicit dist to precise in travis yml
  - simplify and optmise pool detection in the viewer

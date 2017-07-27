@@ -1,9 +1,0 @@
----
-- id_run: 8926
-  id_spatial_filter: 1
-  info: '{}'
-  num_spatial_filter_fail_reads: 358824
-  num_total_reads: 439161826
-  path: ~
-  position: 2
-

@@ -1,11 +1,12 @@
 package t::util;
 
-use Carp;
-use English qw{-no_match_vars};
 use Moose;
-use Class::Load qw/load_class/;;
+use Class::Load qw/load_class/;
 use Readonly;
+use Archive::Extract;
+use File::Temp qw/ tempdir /;
 
+use npg_qc::autoqc::db_loader;
 with 'npg_testing::db';
 
 Readonly::Scalar our $CONFIG_PATH       => q[t/data/test_app.conf];
@@ -15,9 +16,9 @@ Readonly::Scalar our $MLWHOUSE_DB_PATH  => q[t/data/mlwarehouse.db];
 Readonly::Scalar our $NPGQC_DB_PATH     => q[t/data/npgqc.db];
 Readonly::Scalar our $NPG_DB_PATH       => q[t/data/npg.db];
 
-has 'config_path' => ( isa      => 'Str',
-                       is       => 'ro',
-                       required => 0,
+has 'config_path' => ( isa        => 'Str',
+                       is         => 'ro',
+                       required   => 0,
                        lazy_build => 1,
                      );
 sub _build_config_path {
@@ -98,6 +99,20 @@ sub test_env_setup {
     $npg->resultset('Run')->find({id_run => 3500, })->set_tag(1, 'staging');
   }
 
+  if ($self->fixtures) {
+
+    my $tempdir = tempdir( CLEANUP => 1);
+    my $ae = Archive::Extract->new(
+      archive => 't/data/fixtures/npgqc_json.tar.gz');
+    $ae->extract(to => $tempdir) or die $ae->error;
+
+    npg_qc::autoqc::db_loader->new(
+      schema  => $schemas->{'qc'},
+      path    => ["${tempdir}/npgqc_json"],
+      verbose => 0
+    )->load();
+  }
+  
   return $schemas;
 }
 

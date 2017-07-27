@@ -264,6 +264,8 @@ Result class definition in DBIx binding for npg-qc database.
 
 =item DBIx::Class::InflateColumn::Serializer
 
+=item npg_tracking::glossary::composition::component::illumina
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -276,7 +278,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 
