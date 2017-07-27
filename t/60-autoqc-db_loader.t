@@ -318,7 +318,8 @@ subtest 'loading a range of results' => sub {
                   AlignmentFilterMetrics);
   foreach my $table (@tables) {
     $total_count +=$schema->resultset($table)->search({})->count;
-    $plex_count +=$schema->resultset($table)->search({tag_index => {'>', -1},})->count;
+    $plex_count +=$schema->resultset($table)->search(
+     {tag_index => [ -and => {'!=', undef}, {'>', -1}]})->count;
     $tag_zero_count +=$schema->resultset($table)->search({tag_index => 0,})->count;
   }
 
@@ -331,13 +332,9 @@ subtest 'loading a range of results' => sub {
 };
 
 subtest 'checking bam_flagstats records' => sub {
-  plan tests => 6;
-
+  plan tests => 3;
   my $rs = $schema->resultset('BamFlagstats');
-  is ($rs->search({human_split => 'all'})->count, 6, '6 bam flagstats records for target files');
-  is ($rs->search({human_split => 'human'})->count, 2, '2 bam flagstats records for human files');
-  is ($rs->search({human_split => 'phix'})->count, 1, '1 bam flagstats records for phix files');
-  is ($rs->search({subset => 'target'})->count, 6, '6 bam flagstats records for target files');
+  is ($rs->search({subset =>  undef})->count, 6, '6 bam flagstats records for target files');
   is ($rs->search({subset => 'human'})->count, 2, '2 bam flagstats records for human files');
   is ($rs->search({subset => 'phix'})->count, 1, '1 bam flagstats records for phix files');
 };
@@ -415,8 +412,8 @@ subtest 'loading bam_flagstats and its related objects from files' => sub {
   my @objects = $schema->resultset('BamFlagstats')->search(
     {'id_run' => 17448}, {order_by => {'-asc' => 'subset'}})->all();
   is (scalar @objects, 2, 'two objects');
-  is ($objects[0]->subset, 'phix', 'object for target subset');
-  is ($objects[1]->subset, undef,  'object for phix subset');
+  is ($objects[0]->subset, undef, 'object for target subset');
+  is ($objects[1]->subset, 'phix',  'object for phix subset');
 
   @objects = $schema->resultset('SamtoolsStats')->search({})->all();
   is (scalar @objects, 4, 'four objects');
