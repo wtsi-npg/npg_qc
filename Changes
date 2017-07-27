@@ -10,6 +10,18 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - db autoqc loader - will retry a transaction that failed because
      a db lock could not be aquired
  - saving a component with subset attribute value 'all' gives an error
+ - npg_qc::autoqc::results::collection
+     remove unused functionality;
+     ensure existing methods work with objects that do not have id_run,
+     position, etc
+ - remove superfluous method call from a template
+ - db query for tag_index NULL or NOT NULL: undef as a string
+   might not give problems now, but will when all db records are
+   linked to compositions
+ - remove unused qc_chema property from TransferObjectFactory 
+ - set explicit dist to precise in travis yml
+ - simplify and optmise pool detection in the viewer
+ - remove links to Clarity LIMs, generalise code for linking to LIMs
 
 release 63.1
  - label fix for rna_seqc in SeqQC viewer

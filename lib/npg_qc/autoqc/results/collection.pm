@@ -33,8 +33,9 @@ npg_qc::autoqc::results::collection
  $collection->add($r);
  $collection->size(); #returns 1
  $collection->sort();
- my $slice_collection = $collection->slice(q[position], 3);
- my $search_result_collection = $collection->search({position => 1});
+ $collection->slice(q[position], 3);
+ $collection->search({check_name => 'insert size'});
+ $collection->search({class_name => 'insert_size'});
 
 =head1 DESCRIPTION
 
@@ -54,9 +55,6 @@ Readonly::Array  my @NON_LISTABLE      => map {join q[::], $RESULTS_NAMESPACE, $
                                                              result
                                                              collection
                                                            /;
-Readonly::Scalar my $LESS    => -1;
-Readonly::Scalar my $MORE    =>  1;
-Readonly::Scalar my $EQUAL   =>  0;
 
 =head2 results
 
@@ -77,10 +75,9 @@ has 'results' => (
           'sort_in_place' => 'sort_in_place',
           'first'  => 'first',
           'last'   => 'last',
-          'delete' => 'delete',
           'get'    => 'get',
-          'elements'    => 'all',
-          'grep'        => 'grep',
+          'grep'   => 'grep',
+          'elements' => 'all',
       },
                  );
 
@@ -117,7 +114,6 @@ sub _list_classes {
     push @class_names, $bfs;
     return \@class_names;
 }
-
 
 =head2 add
 
@@ -216,7 +212,6 @@ sub add_from_staging {
     return 1;
 }
 
-
 =head2 load_from_staging
 
 De-serializes objects from JSON files found in staging area.
@@ -274,7 +269,6 @@ sub load_from_staging {
     return 1;
 }
 
-
 =head2 is_empty
 
 Tests whether the collection is empty, returns true or false.
@@ -288,84 +282,38 @@ sub is_empty {
     return !$self->empty;
 }
 
-sub _sort_by_id_run { ## no critic (RequireArgUnpacking)
-    return ( $_[0]->id_run <=> $_[1]->id_run) ||
-           ( $_[0]->position <=> $_[1]->position) ||
-           ( (!defined $_[0]->tag_index && !defined $_[1]->tag_index) ? $EQUAL : (
-               (defined $_[0]->tag_index  && defined $_[1]->tag_index) ? ($_[0]->tag_index <=> $_[1]->tag_index) : (
-                   !defined $_[0]->tag_index ? $LESS : $MORE
-               )
-             )
-           ) || ( $_[0]->check_name cmp $_[1]->check_name);
-}
-sub _sort_by_position { ## no critic (RequireArgUnpacking)
-    return ( $_[0]->position <=> $_[1]->position) || ( $_[0]->check_name cmp $_[1]->check_name);
-}
-sub _sort_by_check_name { ## no critic (RequireArgUnpacking)
-    return ($_[0]->check_name cmp $_[1]->check_name) || ($_[0]->position <=> $_[1]->position);
-}
-
-
 =head2 sort_collection
 
-Sorts the collection (in place) on one of the attributes of the  npg_qc::autoqc::results::result object.
-The accepted attributes: position, check_name. When sorting on one attribute, performs a
-secondary sort on the another one. Changes the order of the objects returned by the results method.
+Sorts the collection (in place) on the check_name attribute of the result object.
 
- $collection->sort_collection();               #default sorting on position
- $collection->sort_collection(q[position]);    #explicit sorting on position
- $collection->sort_collection(q[check_name]);  #sorting on the check name
+ $collection->sort_collection();
 
 =cut
 sub sort_collection {
-    my ($self, $criterion) = @_;
-
-    if (!defined $criterion) {
-        $criterion = q[position];
-    } else {
-        if ($criterion !~ /id_run|position|check_name/xsmi)  {
-            croak q[Can only sort based on either id_run or position or check_name];
-        }
-    }
-    if ($self->size <= 1) {return;}
-    my $sort_method = "_sort_by_$criterion";
-    $self->sort_in_place(\&{$sort_method});
-    return 1;
+    my $self = shift;
+    return $self->sort_in_place(sub { $_[0]->check_name cmp $_[1]->check_name });
 }
-
 
 =head2 slice
 
 Returns a collection object that is a subset of this collection object.
-Chooses the object according to a specified criteria.
-The accepted criteria are position, check_name, and class_name.
+Chooses the object according to a specified criterion.
 If this collection does not have any objects that satisfy the slicing criterion,
 an empty collection is returned.
 
- my $lane_one_results = $collection->slice(q[position], 1);
  my $qX_results       = $collection->slice(q[class_name], q[qX_yield]);
  my $q40_results      = $collection->slice(q[check_name], q[q40 yield]);
 
 =cut
 sub slice {
-
     my ($self, $criterion, $value) = @_;
-
-    if (!defined $criterion) { croak q[Cannot slice on undefined criterion]; }
-    if (!defined $value)     { croak qq[Cannot slice on undefined $criterion value]; }
-
-    if ($criterion !~ /position|check_name|class_name/smx) {
-        croak q[Can only slice based on either position or check_name or class_name];
+    if (!defined $criterion) {
+        croak q[Cannot slice on undefined criterion];
     }
-
-    my $c = __PACKAGE__->new();
-
-    foreach my $r (@{$self->results}) {
-        if ($r->$criterion && $r->$criterion eq $value) {
-            $c->add($r);
-        }
+    if (!defined $value) {
+        croak qq[Cannot slice on undefined $criterion value];
     }
-    return $c;
+    return $self->search({$criterion => $value});
 }
 
 =head2 remove
@@ -378,7 +326,6 @@ my $plex_results = $collection->remove(q[check_name], [ 'qX_yield', 'gc bias' ])
 =cut
 
 sub remove {
-
   my ($self, $criterion, $values) = @_;
 
   if (!defined $criterion) { croak q[Cannot remove with undefined criterion]; }
@@ -389,9 +336,7 @@ sub remove {
   }
 
   my $c = __PACKAGE__->new();
-
   my @filtered = $self->grep(sub { my $obj = $_; none { $obj->$criterion eq $_ } @{$values} } );
-
   $c->push(@filtered);
 
   return $c;
@@ -409,7 +354,6 @@ used in comparing the objects in the collection to the criteria.
 =cut
 sub search {
     my ($self, $h) = @_;
-
     my $c = __PACKAGE__->new();
     foreach my $r (@{$self->results}) {
         if ($r->equals_byvalue($h)) {
@@ -417,31 +361,6 @@ sub search {
         }
     }
     return $c;
-}
-
-
-=head2 filter_by_positions
-
-Takes a reference to a list with positions as an argument. Deletes from the
-collection all result objects with a position attribute not in the given list.
-
-=cut
-sub filter_by_positions {
-
-    my ($self, $lanes) = @_;
-
-    my $i = $self->size() - 1;
-
-    my $position;
-    while ($i >= 0) {
-        $position = $self->get($i)->position;
-        if (none {/$position/smx} @{$lanes}) {
-            $self->delete($i);
-        }
-        $i--;
-    }
-
-    return;
 }
 
 =head2 run_lane_map
@@ -485,54 +404,14 @@ sub run_lane_collections {
     return $map;
 }
 
-=head2 run_lane_plex_flags
-
-Returns a hash map where keys are rpt keys for lanes and values are booleans indicating
-whether this lane has plex-level results.
-
-=cut
-sub run_lane_plex_flags {
-    my $self = shift;
-    my $map = $self->run_lane_collections;
-
-    my $flags = {};
-    foreach my $rpt_key (keys %{$map}) {
-        my $rpt_h = npg_qc::autoqc::role::rpt_key->inflate_rpt_key($rpt_key);
-        if (!defined $rpt_h->{'tag_index'}) { # it's a lane-level entry
-            if (!exists $flags->{$rpt_key}) {
-                my $has_plexes = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
-                                 @{$map->{$rpt_key}->check_names()->{'list'}};
-                $flags->{$rpt_key} = $has_plexes ? 1 : 0;
-            }
-        } else { # it's a plex-level entry
-            my $lane_key = npg_qc::autoqc::role::rpt_key->lane_rpt_key_from_key($rpt_key);
-            $flags->{$lane_key} = 1;
-        }
-    }
-    return $flags;
-}
-
-=head2 check_names_map
-
-A mapping of class names to actually available check names
-
-=cut
-sub check_names_map {
+sub _check_names_map {
     my $self = shift;
 
+    my $seen    = {};
     my $classes = {};
-    my $seen = {};
-    my $checks_list = $self->checks_list;
-    foreach my $check (@{$checks_list}) {
-        $classes->{$check} = [];
-    }
-
     foreach my $result (@{$self->results}) {
         my $class_name = $result->class_name;
         my $check_name = $result->check_name;
-        if (!exists $classes->{$class_name}) {
-            croak qq[Unknown class name $class_name];
-        }
         if (!exists $seen->{$check_name}) {
             push @{$classes->{$class_name}}, $check_name;
             $seen->{$check_name} = 1;
@@ -551,16 +430,18 @@ as class names returned by the checks_list() attribute.
 sub check_names {
     my $self = shift;
 
-    my $classes = $self->check_names_map();
+    my $classes = $self->_check_names_map();
     my @check_names = ();
     my $map = {};
-    foreach my $check (@{$self->checks_list}) {
-        push @check_names, @{$classes->{$check}};
-        foreach my $name (@{$classes->{$check}}) {
-            $map->{$name} = $check;
+    foreach my $check (@{$self->checks_list}) { # To ensure order
+        if ($classes->{$check}) {
+            push @check_names, @{$classes->{$check}};
+            foreach my $name (@{$classes->{$check}}) {
+                $map->{$name} = $check;
+            }
         }
     }
-    return {'list' => \@check_names, 'map' => $map,};
+    return {'list' => \@check_names, 'map' => $map};
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -618,7 +499,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 

@@ -81,7 +81,7 @@ sub deflate_unique_key_components {
       } elsif (ref $col_value eq 'HASH') {
         my @keys = keys %{$col_value};
         my $key = pop @keys;
-        if (@keys == 0 && $col_value->{$key} eq 'undef') {
+        if (@keys == 0 && (exists $col_value->{$key} && !defined $col_value->{$key})) {
           $values->{$col_name}->{$key} = $default_value;
         }
       }

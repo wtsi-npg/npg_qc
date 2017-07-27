@@ -202,7 +202,7 @@ sub run_from_db {
     if ($query->option == $LANES) {
       $dbix_query->{$ti_key} = undef;
     } elsif ($query->option == $PLEXES) {
-      $dbix_query->{$ti_key} = {q[!=], 'undef'};
+      $dbix_query->{$ti_key} = {q[!=], undef};
     }
 
     my $rs = $self->qc_schema()->resultset($table_class);

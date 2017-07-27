@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 121;
+use Test::More tests => 70;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
@@ -42,10 +42,10 @@ my $temp = tempdir( CLEANUP => 1);
                     tag_metrics      => 1,
                     pulldown_metrics => 1,
                     alignment_filter_metrics => 1,
-                    upstream_tags => 1,
-                    tags_reporters => 1,
-                    verify_bam_id => 1,
-                    rna_seqc => 1,
+                    upstream_tags    => 1,
+                    tags_reporters   => 1,
+                    verify_bam_id    => 1,
+                    rna_seqc         => 1,
                  };
     my $actual;
     my @checks = @{$c->checks_list};
@@ -65,239 +65,30 @@ my $temp = tempdir( CLEANUP => 1);
     }
     is($c->size(), 4, 'collection size');
     ok(!$c->is_empty(), 'collection is  not empty');
-
-    $c->delete(1);
-    is($c->get(1)->position, 7, 'element at index 1 removed');
-
-    my @a = $c->all;
-    cmp_ok(@a, q(==), 3, 'all list size');
-
     $c->clear();
     ok($c->is_empty, 'collection is empty after clearing it');
 }
 
-
 {
     my $c = npg_qc::autoqc::results::collection->new();
-    lives_ok {$c->sort_collection(q[check_name])} 'sort OK for an empty collection';
+    lives_ok {$c->sort_collection()} 'sort OK for an empty collection';
     $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
-    lives_ok {$c->sort_collection(q[check_name])} 'sort OK for a collection with one result';
-}
+    lives_ok {$c->sort_collection()} 'sort OK for a collection with one result';
 
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    foreach my $pos ((1,5,7,2,5,3,2)) {
-       $c->add(npg_qc::autoqc::results::qX_yield->new(position => $pos, id_run => 12, path => q[mypath]));
-    }
-    $c->sort_collection();
-
-    my $positions = q[];
-    foreach my $r (@{$c->results}) {
-        $positions .= $r->position;
-    }
-    is($positions, q[1223557], 'sort by position with the check name the same');
-}
-
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    foreach my $pos ((1,5,7,2,5,3,2)) {
-       $c->add(npg_qc::autoqc::results::qX_yield->new(position => $pos, id_run => 12, path => q[mypath]));
-    }
-    $c->sort_collection(q[id_run]);
-
-    my $positions = q[];
-    foreach my $r (@{$c->results}) {
-        $positions .= $r->position;
-    }
-    is($positions, q[1223557], 'sort by id_run gives the same results as sort by position when id_run is the same in all results');
-}
-
-{ ##### grep
-  my $c = npg_qc::autoqc::results::collection->new();
-  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
-  $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 12, path => q[mypath]));
-  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 6, id_run => 12, path => q[mypath]));
-  $c->add(npg_qc::autoqc::results::insert_size->new(position => 1, id_run => 12, path => q[mypath]));
-  $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 12, path => q[mypath]));
-  
-  my @filtered = $c->grep(sub { $_->check_name ne 'qX yield'} );
-
-  is(scalar @filtered, 3, 'size correct');
-
-  my $c1 = npg_qc::autoqc::results::collection->new();
-  $c1->push(@filtered);
-  is($c1->size, 3, 'size correct');
-
-  @filtered = $c->grep(sub {
-    my $obj = $_; none { $obj->check_name eq $_} ('qX yield') }
-  );
-  is(scalar @filtered, 3, 'with list - size correct');
-
-  @filtered = $c->grep(
-    sub { my $obj = $_; none { $obj->check_name eq $_} ('qX yield', 'insert size') }
-  );
-  is(scalar @filtered, 0, 'with list - size correct'); 
-}
-
-{ ##### remove
-  my $c = npg_qc::autoqc::results::collection->new();
-  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
-  $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 12, path => q[mypath]));
-  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 6, id_run => 12, path => q[mypath]));
-  $c->add(npg_qc::autoqc::results::insert_size->new(position => 1, id_run => 12, path => q[mypath]));
-  $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 12, path => q[mypath]));
-  
-  my $new_c = $c->remove(q[check_name], ['qX yield'] );
-  
-  is($new_c->size, 3, 'size correct');
-  
-  $new_c = $c->remove(q[check_name], ['qX yield', 'insert size'] );
-  
-  is($new_c->size, 0, 'size correct');
-  
-  $new_c = $c->remove(q[check_name], ['adapter'] );
-  
-  is($new_c->size, 5, 'size correct');
-}
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    my @check_classes = qw(qX_yield insert_size insert_size qX_yield);
-    foreach my $cl (@check_classes) {
-        my $clpath = "npg_qc::autoqc::results::$cl";
-        $c->add($clpath->new(position => 2, id_run => 12, path => q[mypath]));
-    }
-    $c->sort_collection(q[check_name]);
-
-    my $names = q[];
-    foreach my $r (@{$c->results}) {
-        $names .= q[ ] . $r->check_name;
-    }
-    is($names, q[ insert size insert size qX yield qX yield], 'sort by check name with position the same');
-}
-
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    my @check_classes = qw(qX_yield insert_size insert_size qX_yield);
-    foreach my $cl (@check_classes) {
-        my $clpath = "npg_qc::autoqc::results::$cl";
-        $c->add($clpath->new(position => 2, id_run => 12, path => q[mypath]));
-    }
-    $c->sort_collection(q[check_name]);
-
-    my $names = q[];
-    foreach my $r (@{$c->results}) {
-        $names .= q[ ] . $r->check_name;
-    }
-    is($names, q[ insert size insert size qX yield qX yield], 'sort by name with position the same');
-}
-
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
-    throws_ok {$c->sort_collection(q[some_name])} qr/Can only sort based on either id_run or position or check_name/, 'error when the sort criteria is invalid';
-}
-
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::split_stats->new(position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::adapter->new(    position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::adapter->new(    position => 7, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 13, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 13, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 6, id_run => 14, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 14, path => q[mypath]));
-    $c->sort_collection(q[id_run]);
-    my $r = $c->get(0);
-    ok($r->id_run == 12 && $r->position == 7 && $r->class_name eq q[adapter], 'result No 0 after sorting by id_run');
-    $r = $c->get(1);
-    ok($r->id_run == 12 && $r->position == 8 && $r->class_name eq q[adapter], 'result No 1 after sorting by id_run');
-    $r = $c->get(2);
-    ok($r->id_run == 12 && $r->position == 8 && $r->class_name eq q[qX_yield], 'result No 2 after sorting by id_run');
-    $r = $c->get(3);
-    ok($r->id_run == 12 && $r->position == 8 && $r->class_name eq q[split_stats], 'result No 3 after sorting by id_run');
-    $r = $c->get(4);
-    ok($r->id_run == 13 && $r->position == 8 && $r->class_name eq q[insert_size], 'result No 4 after sorting by id_run');
-    $r = $c->get(5);
-    ok($r->id_run == 13 && $r->position == 8 && $r->class_name eq q[qX_yield], 'result No 5 after sorting by id_run');
-    $r = $c->get(6);
-    ok($r->id_run == 14 && $r->position == 2 && $r->class_name eq q[insert_size], 'result No 6 after sorting by id_run');
-    $r = $c->get(7);
-    ok($r->id_run == 14 && $r->position == 6 && $r->class_name eq q[insert_size], 'result No 7 after sorting by id_run');
-}
-
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 7,  id_run => 12,                 path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 7,  id_run => 12, tag_index => 0, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 7,  id_run => 12, tag_index => 1, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 7,  id_run => 12, tag_index => 2, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8,  id_run => 12,                 path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8,  id_run => 12, tag_index => 0, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 8,  id_run => 12, tag_index => 0, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8,  id_run => 12, tag_index => 2, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 8,  id_run => 12, tag_index => 2, path => q[mypath]));
-
-    $c->sort_collection(q[id_run]);
-    my $r = $c->get(0);
-    ok($r->position == 7 && !defined $r->tag_index, 'result No 0 after sorting by id_run');
-    $r = $c->get(1);
-    ok($r->position == 7 && $r->tag_index == 0, 'next result');
-    $r = $c->get(2);
-    ok($r->position == 7 && $r->tag_index == 1, 'next result');
-    $r = $c->get(3);
-    ok($r->position == 7 && $r->tag_index == 2, 'next result');
-    $r = $c->get(4);
-    ok($r->position == 8 && !defined $r->tag_index, 'next result');
-    $r = $c->get(5);
-    ok($r->position == 8 && $r->class_name eq q[insert_size] && $r->tag_index == 0, 'next result');
-    $r = $c->get(6);
-    ok($r->position == 8 && $r->class_name eq q[qX_yield] && $r->tag_index == 0, 'next result');
-    $r = $c->get(7);
-    ok($r->position == 8 && $r->class_name eq q[insert_size] && $r->tag_index == 2, 'next result');
-    $r = $c->get(8);
-    ok($r->position == 8 && $r->class_name eq q[qX_yield] && $r->tag_index == 2, 'next result');
-}
-
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
+    $c = npg_qc::autoqc::results::collection->new();
     $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
     $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 12, path => q[mypath]));
     $c->add(npg_qc::autoqc::results::qX_yield->new(position => 6, id_run => 12, path => q[mypath]));
     $c->add(npg_qc::autoqc::results::insert_size->new(position => 1, id_run => 12, path => q[mypath]));
     $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 12, path => q[mypath]));
 
-    $c->sort_collection(q[check_name]);
-
+    $c->sort_collection();
     my $names = q[];
-    my $positions = q[];
     foreach my $r (@{$c->results}) {
         $names .= q[ ] . $r->check_name;
-        $positions .= q[ ] . $r->position;
     }
-    is($names, q[ insert size insert size insert size qX yield qX yield], 'names in sort by name (primary), position (secondary)');
-    is($positions, q[ 1 2 8 6 8], 'positions in sort by name (primary), position (secondary)');
-
-    $c->sort_collection(q[position]);
-
-    $names = q[];
-    $positions = q[];
-    foreach my $r (@{$c->results}) {
-        $names .= q[ ] . $r->check_name;
-        $positions .= q[ ] . $r->position;
-    }
-    is($names, q[ insert size insert size qX yield insert size qX yield], 'names in sort by position (primary), name (secondary)');
-    is($positions, q[ 1 2 6 8 8], 'positions in sort by position (primary), name (secondary)');
+    is($names, q[ insert size insert size insert size qX yield qX yield], 'names in sort by name');
 }
-
 
 {
     my $c = npg_qc::autoqc::results::collection->new();
@@ -324,7 +115,6 @@ my $temp = tempdir( CLEANUP => 1);
     is($c->search({position => 8, id_run => 12, tag_index => 5, })->size(), 2, 'two results are found by search');
 }
 
-
 {
     my $c = npg_qc::autoqc::results::collection->new();
     $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
@@ -338,7 +128,6 @@ my $temp = tempdir( CLEANUP => 1);
     is($c->slice(q[class_name], q[qX_yield])->size(), 2, 'three results are returned by slice by check name');
 }
 
-
 {
     my @results = ();
     push @results, npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]);
@@ -349,15 +138,6 @@ my $temp = tempdir( CLEANUP => 1);
     $c->add(npg_qc::autoqc::results::insert_size->new(position => 1, id_run => 12, path => q[mypath]));
     lives_ok {$c->add(\@results)} 'no error when adding a list ref to a collection';
     is ($c->size(), 4, 'total of 4 objects after adding an array ref');
-
-
-    my $lanes = [1, 8];
-    $c->filter_by_positions($lanes);
-    is ($c->size(), 4, 'total of 4 objects after filtering existing position');
-
-    $lanes = [2, 7];
-    $c->filter_by_positions($lanes);
-    is ($c->size(), 0, 'empty collection because non-existing position required by a filter');
 }
 
 {
@@ -366,6 +146,27 @@ my $temp = tempdir( CLEANUP => 1);
     lives_ok {$c->add_from_dir($load_dir)}
        'non-autoqc json file successfully skipped';
     is($c->size(), 3, 'three results added by de-serialization');
+}
+
+{ ##### remove
+  my $c = npg_qc::autoqc::results::collection->new();
+  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 8, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::qX_yield->new(position => 6, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 1, id_run => 12, path => q[mypath]));
+  $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 12, path => q[mypath]));
+  
+  my $new_c = $c->remove(q[check_name], ['qX yield'] );
+  
+  is($new_c->size, 3, 'size correct');
+  
+  $new_c = $c->remove(q[check_name], ['qX yield', 'insert size'] );
+  
+  is($new_c->size, 0, 'size correct');
+  
+  $new_c = $c->remove(q[check_name], ['adapter'] );
+  
+  is($new_c->size, 5, 'size correct');
 }
 
 {
@@ -470,7 +271,6 @@ my $temp = tempdir( CLEANUP => 1);
     is  (scalar keys %{$check_names->{map}}, 0, 'empty collection check name map is empty');
 }
 
-
 {
     local $ENV{TEST_DIR} = q[t/data];
     my $c = npg_qc::autoqc::results::collection->new();
@@ -555,47 +355,6 @@ my $temp = tempdir( CLEANUP => 1);
     is ($c->size, 1, 'loading from directory');
     $c->add_from_dir($lqc, [], 234);
     is ($c->size, 1, 'loading from directory');
-}
-
-{
-    my $c = npg_qc::autoqc::results::collection->new();
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 12, tag_index => 0, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 12, tag_index => 1, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::split_stats->new(position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::adapter->new(    position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::adapter->new(    position => 7, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::qX_yield->new(   position => 8, id_run => 13, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 13, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 6, id_run => 14, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 14, path => q[mypath]));
-
-    my $flags = $c->run_lane_plex_flags();
-
-    is (scalar keys %{$flags}, 5, 'five run lane entries');
-
-    my @keys = qw/12:8 12:7 13:8 14:6 14:2/;
-    foreach my $key (@keys) {
-        ok( exists $flags->{$key}, "entry $key exists");
-    }
-
-    my $one_key = shift @keys;
-    foreach my $key (@keys) {
-        is($flags->{$key}, 0, "entry $key is zero");
-    }
-    is($flags->{$one_key}, 1, "entry $one_key is one");
-    
-    $c->add(npg_qc::autoqc::results::tag_metrics->new(position => 8, id_run => 12, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::tag_metrics->new(position => 2, id_run => 14, path => q[mypath]));
-    $c->add(npg_qc::autoqc::results::tag_decode_stats->new(position => 2, id_run => 22, path => q[mypath]));
-    $flags = $c->run_lane_plex_flags();
-    is (scalar keys %{$flags}, 6, 'six run lane entries');
-    foreach my $key (qw/22:2 12:8 14:2/) {
-        is($flags->{$key}, 1, "entry $key is one");
-    }
-    foreach my $key (qw/12:7 13:8 14:6/) {
-        is($flags->{$key}, 0, "entry $key is zero");
-    }
 }
 
 1;

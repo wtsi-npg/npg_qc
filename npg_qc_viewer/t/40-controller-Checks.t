@@ -3,9 +3,10 @@ use warnings;
 use lib 't/lib';
 use Test::More tests => 8;
 use Test::Exception;
-use t::util;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
+
+use t::util;
 
 BEGIN {
   local $ENV{'HOME'} = 't/data';
@@ -55,8 +56,8 @@ subtest 'All combinations for checks controller' => sub {
   my $run_folder = q[150621_MS6_04099_A_MS2023387-050V2];
   make_path $path.q[/].$run_folder;
   
-  my $npgqc = $schemas->{qc};
-  my $npg   = $schemas->{npg};
+  my $npgqc = $schemas->{'qc'};
+  my $npg   = $schemas->{'npg'};
   
   my $values = { id_run               => 4099,
                  batch_id             => 4178,
