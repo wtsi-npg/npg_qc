@@ -1,7 +1,0 @@
-<!-- start: $Id: errors_by_cycle_read_heatmap_with_hover_ajax.tt2 3389 2008-11-06 16:26:37Z gq1 $ -->
-<div class="vertical_heatmap">
-<p align="center">Cycle: [% model.cycle %]</p>
-
-<p align="center">[% model.map %]</p>
-</div>
-<!-- end: $Id: errors_by_cycle_read_heatmap_with_hover_ajax.tt2 3389 2008-11-06 16:26:37Z gq1 $ -->

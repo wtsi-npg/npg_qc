@@ -1,8 +1,3 @@
-#########
-# Author:        gq1
-# Created:       2008-10-23
-#
-
 package npg_qc::model::instrument_statistics;
 use strict;
 use warnings;
@@ -188,26 +183,19 @@ sub get_all_field_from_db{
 }
 sub tile_max {
   my ($self, $id_run) = @_;
-
+  $id_run ||= $self->id_run();
   if (!$self->{tile_max}) {
-    my $rt = npg_qc::model::run_tile->new({ util => $self->util() });
-    $self->{tile_max} = $rt->tile_max($id_run);
+    my $query = q(SELECT max(tile) FROM run_tile where id_run = ?);
+    my $ref = $self->util->dbh->selectall_arrayref($query, {}, $id_run);
+    $self->{tile_max} = $ref->[0]->[0];
   }
-
   return $self->{tile_max};
 }
 
 sub get_id_run_actual{
   my ($self) = @_;
-  my $id_run = $self->id_run();
-  my $pair_id_run = $self->id_run_pair($id_run);
-  if( ( $self->end() == 1 ) || ( $self->end() == 2 &&  !$pair_id_run ) ){
-    $self->id_run_actual($id_run);
-    return;
-  }
-
-  $self->id_run_actual($self->id_run_pair($id_run));
-  return 1;
+  $self->id_run_actual($self->id_run);
+  return;
 }
 
 sub get_instrument{
@@ -249,7 +237,7 @@ sub get_num_tile_movez_out{
 
       my $sth = $dbh->prepare($query);
 
-      $sth->execute($self->id_run_actual(), $self->end());
+      $sth->execute($self->id_run, $self->end());
 
       my @row = $sth->fetchrow_array();
       if(@row){
@@ -637,8 +625,8 @@ npg_qc::model::instrument_statistics
 =head2 get_runlist_todo
 =head2 get_all_field_from_db
 =head2 tile_max
-=head2 get_id_run_actual
 =head2 get_instrument
+=head2 get_id_run_actual
 =head2 get_num_tile_movez_out
 =head2 get_num_tiles_low_cluster
 =head2 get_num_tiles_high_cluster
@@ -657,7 +645,7 @@ npg_qc::model::instrument_statistics
 =head2 avg_error_per_run
 =head2 latest_runs_by_instrument
 
-=head1 DIAGNOSTICS
+=head1 DIAGNOSTIC
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -679,7 +667,7 @@ Guoying Qi, E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Guoying Qi
+Copyright (C) 2017 GRL
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

@@ -1,4 +1,0 @@
-<!-- start: $Id: move_z_read_heatmap_with_hover_ajax.tt2 3389 2008-11-06 16:26:37Z gq1 $ -->
-<h6> Cycle: [% model.cycle %]</h6>
-<p align="center">[% model.map %]</p>
-<!-- end: $Id: move_z_read_heatmap_with_hover_ajax.tt2 3389 2008-11-06 16:26:37Z gq1 $ -->
