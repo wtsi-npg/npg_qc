@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 64.0
  - composition-enabled autoqc objects storage
      schema changes
      DBIx binding updates
@@ -22,7 +23,6 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - set explicit dist to precise in travis yml
  - simplify and optmise pool detection in the viewer
  - remove links to Clarity LIMs, generalise code for linking to LIMs
-
  - deleted VC (view-controller) part of the Clearpress npg_qc web server
 
 release 63.1
