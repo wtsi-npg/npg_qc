@@ -149,7 +149,7 @@ __PACKAGE__->set_primary_key('id_seq_component');
 
 __PACKAGE__->add_unique_constraint('unq_seq_compon_d', ['digest']);
 
-=head2 C<unq_seq_component_runpostagsubset>
+=head2 C<unq_seq_compos_rp>
 
 =over 4
 
@@ -166,7 +166,7 @@ __PACKAGE__->add_unique_constraint('unq_seq_compon_d', ['digest']);
 =cut
 
 __PACKAGE__->add_unique_constraint(
-  'unq_seq_component_runpostagsubset',
+  'unq_seq_compos_rp',
   ['id_run', 'position', 'tag_index', 'subset'],
 );
 
@@ -188,8 +188,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-27 14:12:47
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:908hb0NvwuwmDvP63rM53Q
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-31 10:56:27
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:wYJH53XP8XTIZ6ITAZY3yw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -197,13 +197,13 @@ __PACKAGE__->has_many(
 
 =head2 gc_bias
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::GcBias>
 
 =cut
 
-__PACKAGE__->has_many(
+__PACKAGE__->might_have(
   'gc_bias',
   'npg_qc::Schema::Result::GcBias',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
@@ -484,8 +484,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-27 14:12:47
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+cA3XncxbYrxNFS/fgMXhw
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-31 10:56:27
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8Qf4qgKC03jZfMXIkONbQQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

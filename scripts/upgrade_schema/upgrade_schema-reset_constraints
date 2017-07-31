@@ -4,8 +4,6 @@
 --
 
 ALTER TABLE seq_component
-  DROP INDEX unq_seq_compos_rp,
-  ADD UNIQUE INDEX unq_seq_component_runpostagsubset (id_run,position,tag_index,subset),
   ADD INDEX seq_component_tagindex (tag_index),
   ADD INDEX seq_component_subset (subset);
 
@@ -24,7 +22,8 @@ ALTER TABLE adapter
   DROP INDEX unq_run_lane_adapter,
   MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
   MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
-  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL;
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  ADD INDEX adapter_idrun_ind (id_run);
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'adapter', @@warning_count, @@error_count;
@@ -63,7 +62,8 @@ ALTER TABLE alignment_filter_metrics
   DROP INDEX unq_run_lane_afmetrics,
   MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
   MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
-  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL;
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  ADD INDEX alignment_filter_metrics_idrun_ind (id_run);
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'alignment_filter_metrics', @@warning_count, @@error_count;
@@ -104,7 +104,8 @@ ALTER TABLE bam_flagstats
   MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
   MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
   MODIFY COLUMN subset varchar(10) DEFAULT NULL,
-  MODIFY COLUMN human_split varchar(10) DEFAULT NULL;
+  MODIFY COLUMN human_split varchar(10) DEFAULT NULL,
+  ADD INDEX bam_flagstats_idrun_ind (id_run);
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'bam_flagstats', @@warning_count, @@error_count;
@@ -132,5 +133,45 @@ SHOW WARNINGS;
 SELECT 'bam_flagstats', @@warning_count, @@error_count;
 
 SELECT '==done table bam_flagstats';
+
+SELECT '==table gc_bias';
+
+ALTER TABLE gc_bias
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX gc_bias_compos_ind_unique (id_seq_composition),
+  DROP INDEX gc_bias_compos_ind,
+  DROP INDEX unq_run_lane_gc_bias,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  ADD INDEX gc_bias_idrun_ind (id_run);
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'gc_bias', @@warning_count, @@error_count;
+
+OPTIMIZE TABLE gc_bias;
+
+CREATE VIEW npgqcp.v_gc_bias AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         a.*
+  FROM npgqcp.gc_bias a,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE    a.id_seq_composition  = sc.id_seq_composition
+    AND   sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component    = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'gc_bias', @@warning_count, @@error_count;
+
+SELECT '==done table gc_bias';
 
 SHOW FULL TABLES IN npgqcp WHERE TABLE_TYPE LIKE 'VIEW';
