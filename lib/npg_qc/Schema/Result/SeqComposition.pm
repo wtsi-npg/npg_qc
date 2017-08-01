@@ -180,16 +180,16 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 contaminations
+=head2 contamination
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::Contamination>
 
 =cut
 
-__PACKAGE__->has_many(
-  'contaminations',
+__PACKAGE__->might_have(
+  'contamination',
   'npg_qc::Schema::Result::Contamination',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -210,16 +210,16 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 gc_fractions
+=head2 gc_fraction
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::GcFraction>
 
 =cut
 
-__PACKAGE__->has_many(
-  'gc_fractions',
+__PACKAGE__->might_have(
+  'gc_fraction',
   'npg_qc::Schema::Result::GcFraction',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -240,46 +240,46 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 insert_sizes
+=head2 insert_size
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::InsertSize>
 
 =cut
 
-__PACKAGE__->has_many(
-  'insert_sizes',
+__PACKAGE__->might_have(
+  'insert_size',
   'npg_qc::Schema::Result::InsertSize',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 pulldown_metrics
+=head2 pulldown_metric
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::PulldownMetrics>
 
 =cut
 
-__PACKAGE__->has_many(
-  'pulldown_metrics',
+__PACKAGE__->might_have(
+  'pulldown_metric',
   'npg_qc::Schema::Result::PulldownMetrics',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 qx_yields
+=head2 qx_yield
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::QXYield>
 
 =cut
 
-__PACKAGE__->has_many(
-  'qx_yields',
+__PACKAGE__->might_have(
+  'qx_yield',
   'npg_qc::Schema::Result::QXYield',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -348,16 +348,16 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 sequence_errors
+=head2 sequence_error
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::SequenceError>
 
 =cut
 
-__PACKAGE__->has_many(
-  'sequence_errors',
+__PACKAGE__->might_have(
+  'sequence_error',
   'npg_qc::Schema::Result::SequenceError',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -484,8 +484,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-07-31 10:56:27
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8Qf4qgKC03jZfMXIkONbQQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-01 13:57:24
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Mfnt3zxBEOPCXqcjGAlZxQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

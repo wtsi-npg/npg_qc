@@ -174,4 +174,282 @@ SELECT 'gc_bias', @@warning_count, @@error_count;
 
 SELECT '==done table gc_bias';
 
+SELECT '==table contamination';
+
+ALTER TABLE contamination
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX contamination_compos_ind_unique (id_seq_composition),
+  DROP INDEX contamination_compos_ind,
+  DROP INDEX unq_run_lane_contamination,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'contamination', @@warning_count, @@error_count;
+
+OPTIMIZE TABLE contamination;
+
+CREATE VIEW npgqcp.v_contamination AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         a.*
+  FROM npgqcp.contamination a,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE    a.id_seq_composition  = sc.id_seq_composition
+    AND   sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component    = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'contamination', @@warning_count, @@error_count;
+
+SELECT '==table gc_fraction';
+
+ALTER TABLE gc_fraction
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX gc_fraction_compos_ind_unique (id_seq_composition),
+  DROP INDEX gc_fraction_compos_ind,
+  DROP INDEX unq_run_lane_gc_fraction,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  ADD INDEX gc_fraction_idrun_ind (id_run);
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'gc_fraction', @@warning_count, @@error_count;
+
+OPTIMIZE TABLE gc_fraction;
+
+CREATE VIEW npgqcp.v_gc_fraction AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         a.*
+  FROM npgqcp.gc_fraction a,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE    a.id_seq_composition  = sc.id_seq_composition
+    AND   sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component    = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'gc_fraction', @@warning_count, @@error_count;
+
+SELECT '==done table gc_fraction';
+
+SELECT '==table genotype';
+
+ALTER TABLE genotype
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX genotype_compos_ind_unique (id_seq_composition,snp_call_set),
+  DROP INDEX genotype_compos_ind,
+  DROP INDEX unq_run_lane_genotype,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  ADD INDEX genotype_idrun_ind (id_run);
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'genotype', @@warning_count, @@error_count;
+
+OPTIMIZE TABLE genotype;
+
+CREATE VIEW npgqcp.v_genotype AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         a.*
+  FROM npgqcp.genotype a,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE    a.id_seq_composition  = sc.id_seq_composition
+    AND   sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component    = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'genotype', @@warning_count, @@error_count;
+
+SELECT '==done table genotype';
+
+SELECT '==table insert_size';
+
+ALTER TABLE insert_size
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX insert_size_compos_ind_unique (id_seq_composition),
+  DROP INDEX insert_size_compos_ind,
+  DROP INDEX unq_run_lane_insert_size,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  ADD INDEX insert_size_idrun_ind (id_run);
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'insert_size', @@warning_count, @@error_count;
+
+OPTIMIZE TABLE insert_size;
+
+CREATE VIEW npgqcp.v_insert_size AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         a.*
+  FROM npgqcp.insert_size a,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE    a.id_seq_composition  = sc.id_seq_composition
+    AND   sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component    = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'insert_size', @@warning_count, @@error_count;
+
+SELECT '==done table insert_size';
+
+SELECT '==table pulldown_metrics';
+
+ALTER TABLE pulldown_metrics
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX pulldown_metrics_compos_ind_unique (id_seq_composition),
+  DROP INDEX pulldown_metrics_compos_ind,
+  DROP INDEX unq_run_lane_pdmetrics ,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  ADD INDEX pulldown_metrics_idrun_ind (id_run);
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'pulldown_metrics', @@warning_count, @@error_count;
+
+OPTIMIZE TABLE pulldown_metrics;
+
+CREATE VIEW npgqcp.v_pulldown_metrics AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         a.*
+  FROM npgqcp.pulldown_metrics a,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE    a.id_seq_composition  = sc.id_seq_composition
+    AND   sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component    = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'pulldown_metrics', @@warning_count, @@error_count;
+
+SELECT '==done table pulldown_metrics';
+
+SELECT '==table qx_yield';
+
+ALTER TABLE qx_yield
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX qx_yield_compos_ind_unique (id_seq_composition),
+  DROP INDEX qx_yield_compos_ind,
+  DROP INDEX unq_run_lane_qx_yield,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  ADD INDEX qx_yield_idrun_ind (id_run);
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'qx_yield', @@warning_count, @@error_count;
+
+OPTIMIZE TABLE qx_yield;
+
+CREATE VIEW npgqcp.v_qx_yield AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         a.*
+  FROM npgqcp.qx_yield a,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE    a.id_seq_composition  = sc.id_seq_composition
+    AND   sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component    = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'qx_yield', @@warning_count, @@error_count;
+
+SELECT '==done table qx_yield';
+
+SELECT '==table sequence_error';
+
+ALTER TABLE sequence_error
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX sequence_error_compos_ind_unique (id_seq_composition),
+  DROP INDEX sequence_error_compos_ind,
+  DROP INDEX unq_rlts_sequence_error,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL,
+  MODIFY COLUMN sequence_type varchar(25) DEFAULT NULL,
+  ADD INDEX sequence_error_idrun_ind (id_run);
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'sequence_error', @@warning_count, @@error_count;
+
+OPTIMIZE TABLE sequence_error;
+
+CREATE VIEW npgqcp.v_sequence_error AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         a.*
+  FROM npgqcp.sequence_error a,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE    a.id_seq_composition  = sc.id_seq_composition
+    AND   sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component    = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'sequence_error', @@warning_count, @@error_count;
+
+SELECT '==done table sequence_error';
+
 SHOW FULL TABLES IN npgqcp WHERE TABLE_TYPE LIKE 'VIEW';

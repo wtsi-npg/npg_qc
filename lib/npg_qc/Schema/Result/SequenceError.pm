@@ -66,7 +66,7 @@ __PACKAGE__->table('sequence_error');
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
-  is_nullable: 1
+  is_nullable: 0
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
@@ -74,13 +74,13 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 path
 
@@ -207,14 +207,12 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 =head2 tag_index
 
   data_type: 'bigint'
-  default_value: -1
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 sequence_type
 
   data_type: 'varchar'
-  default_value: 'default'
-  is_nullable: 0
+  is_nullable: 1
   size: 25
 
 =cut
@@ -232,12 +230,12 @@ __PACKAGE__->add_columns(
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_foreign_key => 1,
-    is_nullable => 1,
+    is_nullable => 0,
   },
   'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
   'path',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'forward_read_filename',
@@ -285,14 +283,9 @@ __PACKAGE__->add_columns(
   'info',
   { data_type => 'text', is_nullable => 1 },
   'tag_index',
-  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
+  { data_type => 'bigint', is_nullable => 1 },
   'sequence_type',
-  {
-    data_type => 'varchar',
-    default_value => 'default',
-    is_nullable => 0,
-    size => 25,
-  },
+  { data_type => 'varchar', is_nullable => 1, size => 25 },
 );
 
 =head1 PRIMARY KEY
@@ -309,26 +302,17 @@ __PACKAGE__->set_primary_key('id_sequence_error');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<unq_rlts_sequence_error>
+=head2 C<sequence_error_compos_ind_unique>
 
 =over 4
 
-=item * L</id_run>
-
-=item * L</position>
-
-=item * L</tag_index>
-
-=item * L</sequence_type>
+=item * L</id_seq_composition>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint(
-  'unq_rlts_sequence_error',
-  ['id_run', 'position', 'tag_index', 'sequence_type'],
-);
+__PACKAGE__->add_unique_constraint('sequence_error_compos_ind_unique', ['id_seq_composition']);
 
 =head1 RELATIONS
 
@@ -344,12 +328,7 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  {
-    is_deferrable => 1,
-    join_type     => 'LEFT',
-    on_delete     => 'NO ACTION',
-    on_update     => 'NO ACTION',
-  },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -370,8 +349,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::sequence_error';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:05
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vJPiWeVKocHlaFgF0UbYjA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-01 13:57:24
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gvMazXM95ozmZTuupKoXqg
 
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
