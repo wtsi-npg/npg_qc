@@ -285,16 +285,16 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 ref_matches
+=head2 ref_match
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::RefMatch>
 
 =cut
 
-__PACKAGE__->has_many(
-  'ref_matches',
+__PACKAGE__->might_have(
+  'ref_match',
   'npg_qc::Schema::Result::RefMatch',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -378,114 +378,114 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 spatial_filters
+=head2 spatial_filter
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::SpatialFilter>
 
 =cut
 
-__PACKAGE__->has_many(
-  'spatial_filters',
+__PACKAGE__->might_have(
+  'spatial_filter',
   'npg_qc::Schema::Result::SpatialFilter',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 split_stats
+=head2 split_stat
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::SplitStats>
 
 =cut
 
-__PACKAGE__->has_many(
-  'split_stats',
+__PACKAGE__->might_have(
+  'split_stat',
   'npg_qc::Schema::Result::SplitStats',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 tag_decode_stats
+=head2 tag_decode_stat
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::TagDecodeStats>
 
 =cut
 
-__PACKAGE__->has_many(
-  'tag_decode_stats',
+__PACKAGE__->might_have(
+  'tag_decode_stat',
   'npg_qc::Schema::Result::TagDecodeStats',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 tag_metrics
+=head2 tag_metric
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::TagMetrics>
 
 =cut
 
-__PACKAGE__->has_many(
-  'tag_metrics',
+__PACKAGE__->might_have(
+  'tag_metric',
   'npg_qc::Schema::Result::TagMetrics',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 tags_reporters
+=head2 tags_reporter
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::TagsReporters>
 
 =cut
 
-__PACKAGE__->has_many(
-  'tags_reporters',
+__PACKAGE__->might_have(
+  'tags_reporter',
   'npg_qc::Schema::Result::TagsReporters',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 upstream_tags
+=head2 upstream_tag
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::UpstreamTags>
 
 =cut
 
-__PACKAGE__->has_many(
-  'upstream_tags',
+__PACKAGE__->might_have(
+  'upstream_tag',
   'npg_qc::Schema::Result::UpstreamTags',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 verify_bam_ids
+=head2 verify_bam_id
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::VerifyBamId>
 
 =cut
 
-__PACKAGE__->has_many(
-  'verify_bam_ids',
+__PACKAGE__->might_have(
+  'verify_bam_id',
   'npg_qc::Schema::Result::VerifyBamId',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-01 13:57:24
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Mfnt3zxBEOPCXqcjGAlZxQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-03 12:42:13
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XvUVRxvQlw5tvrVm6VXeCg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

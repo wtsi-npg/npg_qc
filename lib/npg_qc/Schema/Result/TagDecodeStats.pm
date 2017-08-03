@@ -66,7 +66,7 @@ __PACKAGE__->table('tag_decode_stats');
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
-  is_nullable: 1
+  is_nullable: 0
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
@@ -74,19 +74,18 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 tag_index
 
   data_type: 'bigint'
-  default_value: -1
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 path
 
@@ -149,14 +148,14 @@ __PACKAGE__->add_columns(
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_foreign_key => 1,
-    is_nullable => 1,
+    is_nullable => 0,
   },
   'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
   'tag_index',
-  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
+  { data_type => 'bigint', is_nullable => 1 },
   'path',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'tag_code',
@@ -191,24 +190,17 @@ __PACKAGE__->set_primary_key('id_tag_decode_stats');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<unq_run_lane_index_decoding>
+=head2 C<tag_decode_stats_compos_ind_unique>
 
 =over 4
 
-=item * L</id_run>
-
-=item * L</position>
-
-=item * L</tag_index>
+=item * L</id_seq_composition>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint(
-  'unq_run_lane_index_decoding',
-  ['id_run', 'position', 'tag_index'],
-);
+__PACKAGE__->add_unique_constraint('tag_decode_stats_compos_ind_unique', ['id_seq_composition']);
 
 =head1 RELATIONS
 
@@ -224,12 +216,7 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  {
-    is_deferrable => 1,
-    join_type     => 'LEFT',
-    on_delete     => 'NO ACTION',
-    on_update     => 'NO ACTION',
-  },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -250,8 +237,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::tag_decode_stats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:frKhZwgcnvVdtB9ekm/nkg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-03 12:42:13
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YOqOeP1zDrzkC5fXuX1NsA
 
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};

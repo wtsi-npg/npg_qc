@@ -66,7 +66,7 @@ __PACKAGE__->table('spatial_filter');
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
-  is_nullable: 1
+  is_nullable: 0
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
@@ -74,13 +74,13 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 path
 
@@ -120,12 +120,12 @@ __PACKAGE__->add_columns(
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_foreign_key => 1,
-    is_nullable => 1,
+    is_nullable => 0,
   },
   'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
   'path',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'info',
@@ -150,19 +150,17 @@ __PACKAGE__->set_primary_key('id_spatial_filter');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<unq_run_lane_spatial_filter>
+=head2 C<spatial_filter_compos_ind_unique>
 
 =over 4
 
-=item * L</id_run>
-
-=item * L</position>
+=item * L</id_seq_composition>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint('unq_run_lane_spatial_filter', ['id_run', 'position']);
+__PACKAGE__->add_unique_constraint('spatial_filter_compos_ind_unique', ['id_seq_composition']);
 
 =head1 RELATIONS
 
@@ -178,12 +176,7 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  {
-    is_deferrable => 1,
-    join_type     => 'LEFT',
-    on_delete     => 'NO ACTION',
-    on_update     => 'NO ACTION',
-  },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -202,8 +195,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:h5n/8IZosGlgX+ThTR/Fmw
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-03 12:42:13
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:nVp0C/30OiIJ/zVGmDyy6A
 
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
