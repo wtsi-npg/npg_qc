@@ -204,6 +204,7 @@ with 'npg_tracking::glossary::composition::factory::attributes' =>
 our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( info ));
+__PACKAGE__->create_composition_attribute();
 
 __PACKAGE__->has_many(
   'seq_component_compositions',

@@ -246,7 +246,7 @@ with 'npg_tracking::glossary::composition::factory::attributes' =>
 our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( tag_code distribution_all distribution_good errors_good errors_all info ));
-__PACKAGE__->set_inflator4scalar('tag_index');
+__PACKAGE__->create_composition_attribute();
 
 __PACKAGE__->has_many(
   'seq_component_compositions',
