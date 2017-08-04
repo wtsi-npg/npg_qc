@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - constraints in autoqc db tables are reset to allow for saving
+   results for multi-component compositions
+
 release 64.0
  - composition-enabled autoqc objects storage
      schema changes
