@@ -54,7 +54,8 @@ $values->{'id_seq_composition'} =
   cmp_deeply($row->forward_start_counts, $values->{'forward_start_counts'},
     'contaminant_count ref hash content is correct');
 
-  $v1 = \%values1; 
+  %values1 = %{$values};
+  $v1 = \%values1;
   delete $v1->{'id_run'};
   delete $v1->{'position'};
   delete $v1->{'tag_index'};
@@ -63,6 +64,11 @@ $values->{'id_seq_composition'} =
     'another or the same row?';
   is ($row->id_adapter, $row1->id_adapter, 'new row is not created');
 
+  %values1 = %{$values};
+  $v1 = \%values1;
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  delete $v1->{'tag_index'};
   $v1->{'id_seq_composition'} =
   t::autoqc_util::find_or_save_composition($schema,
     {id_run => 9225, position => 1, tag_index => 96});

@@ -2,10 +2,11 @@ use strict;
 use warnings;
 use Test::More tests => 6;
 use Test::Exception;
-use Test::Deep;
 use Moose::Meta::Class;
 use JSON;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::TagDecodeStats');
 
@@ -18,19 +19,20 @@ my $json = q {
 };
 
 my $values = from_json($json);
+$values->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 4360, position => 8});
 my $rs = $schema->resultset('TagDecodeStats');
 isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::TagDecodeStats');
 {
   my %values1 = %{$values};
   my $v1 = \%values1;
-
-  $rs->deflate_unique_key_components($v1);
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
   is(ref $row->tag_code, 'HASH', 'tag_code returned as hash ref');
-  cmp_deeply($row->tag_code, $values->{'tag_code'},
+  is_deeply($row->tag_code, $values->{'tag_code'},
     'tag_code hash content is correct'); 
 }
 

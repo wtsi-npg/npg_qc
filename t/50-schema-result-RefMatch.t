@@ -1,11 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 14;
 use Test::Exception;
-use Test::Deep;
 use Moose::Meta::Class;
 use JSON;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::RefMatch');
 
@@ -13,7 +14,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
 
-  my $table = 'RefMatch';
+my $table = 'RefMatch';
 
 my $json = q { 
   {
@@ -34,6 +35,10 @@ my $json = q {
 };
 
 my $values = from_json($json);
+$values->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 9225, position => 1, tag_index => 93});
+
 my $rs = $schema->resultset('RefMatch');
 isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::RefMatch');
 
@@ -41,16 +46,39 @@ isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::RefMatch');
   my %values1 = %{$values};
   my $v1 = \%values1;
 
-  $rs->deflate_unique_key_components($v1);
-  is($v1->{'tag_index'}, 93, 'tag index not deflated');
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'tag record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
   is($row->tag_index, 93, 'tag index retrieved correctly');
   is(ref $row->aligned_read_count, 'HASH', 'aligned_read_count returned as hash ref');
-  cmp_deeply($row->aligned_read_count, $values->{'aligned_read_count'},
-    'aligned_read_count hash content is correct'); 
+  is_deeply($row->aligned_read_count, $values->{'aligned_read_count'},
+    'aligned_read_count hash content is correct');
+
+  %values1 = %{$values};
+  $v1 = \%values1; 
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  delete $v1->{'tag_index'};
+  my $row1;
+  lives_ok {$row1 = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'another or the same row?';
+  is ($row->id_ref_match, $row1->id_ref_match, 'new row is not created');
+
+  %values1 = %{$values};
+  $v1 = \%values1;
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  delete $v1->{'tag_index'};
+  $v1->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 9225, position => 1, tag_index => 96});
+  lives_ok {$row1 = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'another row';
+  isnt ($row->id_ref_match, $row1->id_ref_match, 'new row is created');
+  is ($row1->id_run, undef, 'id run value is undefined');
+  is ($row1->position, undef, 'position value is undefined');
+  is ($row1->tag_index, undef, 'tag_index value is undefined');
 }
 
 1;

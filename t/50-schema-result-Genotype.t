@@ -1,11 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests =>8;
+use Test::More tests => 11;
 use Test::Exception;
 use Test::Deep;
 use Moose::Meta::Class;
 use JSON;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::Genotype');
 
@@ -39,14 +41,15 @@ my $schema = Moose::Meta::Class->create_anon_class(
 };
 
 my $values = from_json($json);
+$values->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 9225, position => 1, tag_index => 93});
 my $rs = $schema->resultset('Genotype');
 isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::Genotype');
 {
   my %values1 = %{$values};
   my $v1 = \%values1;
 
-  $rs->deflate_unique_key_components($v1);
-  is($v1->{'tag_index'}, 93, 'tag index not deflated');
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'tag record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);
@@ -54,7 +57,21 @@ isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::Genotype');
   is($row->tag_index, 93, 'tag index retrieved correctly');
   is(ref $row->sample_name_relaxed_match, 'HASH', 'sample_name_relaxed_match returned as a hash ref');
   cmp_deeply($row->sample_name_relaxed_match, $values->{'sample_name_relaxed_match'},
-    'actual_quantile_y array content is correct'); 
+    'actual_quantile_y array content is correct');
+
+  $v1 = \%values1; 
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  delete $v1->{'tag_index'};
+  my $row1;
+  lives_ok {$row1 = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'another or the same row?';
+  is ($row->id_genotype, $row1->id_genotype, 'new row is not created');
+
+  $v1->{'snp_call_set'} = 'new set';
+  lives_ok {$row1 = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'row for another snip set is created';
+  isnt ($row->id_genotype, $row1->id_genotype, 'new row is created');
 }
 
 1;
