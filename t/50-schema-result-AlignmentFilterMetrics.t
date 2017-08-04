@@ -1,11 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 11;
 use Test::Exception;
 use Test::Deep;
 use Moose::Meta::Class;
 use JSON;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::AlignmentFilterMetrics');
 
@@ -47,14 +49,15 @@ q {
 
 my $values = from_json($json);
 my $rs = $schema->resultset('AlignmentFilterMetrics');
+$values->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 9225, position => 1, tag_index => 95});
 
 {
   isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::AlignmentFilterMetrics');
-  my %values1 = %{$values};
-  my $v1 = \%values1;
 
-  $rs->deflate_unique_key_components($v1);
-  is($v1->{'tag_index'}, 95, 'tag index not deflated');
+  my %values1 = %{$values};
+  my $v1 = \%values1; 
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'lane record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);
@@ -63,6 +66,19 @@ my $rs = $schema->resultset('AlignmentFilterMetrics');
   is(ref $row->all_metrics->{'refList'}, 'ARRAY', 'refList returned as an array');
   cmp_deeply($row->all_metrics->{'refList'}, $values->{'all_metrics'}->{'refList'},
     'refList array content is correct');
+
+  $v1 = \%values1; 
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  delete $v1->{'tag_index'};
+  $v1->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 9225, position => 1, tag_index => 96});
+  lives_ok {$row = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'another row';
+  is ($row->id_run, undef, 'id run value is undefined');
+  is ($row->position, undef, 'position value is undefined');
+  is ($row->tag_index, undef, 'tag_index value is undefined');
 }
 
 1;
