@@ -24,6 +24,7 @@ release 64.0
  - simplify and optmise pool detection in the viewer
  - remove links to Clarity LIMs, generalise code for linking to LIMs
  - deleted VC (view-controller) part of the Clearpress npg_qc web server
+ - index unq_seq_compos_rp for seq_component becomes unique
 
 release 63.1
  - label fix for rna_seqc in SeqQC viewer
