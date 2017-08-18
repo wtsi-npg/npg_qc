@@ -1,0 +1,9 @@
+-- Make unq_seq_compos_rp a unique index
+
+ALTER TABLE seq_component
+  DROP INDEX unq_seq_compos_rp,
+  ADD UNIQUE INDEX unq_seq_compos_rp (id_run, position, tag_index, subset);
+SHOW ERRORS;
+SHOW WARNINGS;
+
+SHOW INDEXES FROM seq_component;

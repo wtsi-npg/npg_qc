@@ -4,11 +4,15 @@ use Test::More tests => 49;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
+use Archive::Extract;
 
 local $ENV{'HOME'};
 use npg_testing::db;
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
+use npg_qc::autoqc::db_loader;
+use npg_tracking::glossary::composition::factory;
+use npg_tracking::glossary::composition::component::illumina;
 
 BEGIN { 
   $ENV{'HOME'} = q[t/data];
@@ -19,6 +23,18 @@ my $schema = Moose::Meta::Class->create_anon_class(
            roles => [qw/npg_testing::db/])
            ->new_object({})->create_test_db(
              q[npg_qc::Schema], 't/data/fixtures');
+
+my $temp = tempdir( CLEANUP => 1);
+
+my $ae = Archive::Extract->new(
+      archive => 't/data/fixtures/autoqc_json.tar.gz');
+$ae->extract(to => $temp) or die $ae->error;
+
+npg_qc::autoqc::db_loader->new(
+  schema  => $schema,
+  path    => ["${temp}/autoqc_json"],
+  verbose => 0
+)->load();
 
 {
   local $ENV{dev} = q[non-existing];
@@ -72,7 +88,6 @@ my $schema = Moose::Meta::Class->create_anon_class(
 }
 
 {
-  my $temp = tempdir( CLEANUP => 1);
   my $other =  join(q[/], $temp, q[nfs]);
   mkdir $other;
   $other = join(q[/], $other, q[sf44]);
@@ -151,9 +166,25 @@ my $schema = Moose::Meta::Class->create_anon_class(
 }
 
 {
-  $schema->resultset('QXYield')->create({id_run=>3510,position=>4,tag_index=>-1,threshold_quality=>40,});
-  $schema->resultset('QXYield')->create({id_run=>3510,position=>5,tag_index=>-1,threshold_quality=>40,});
-  $schema->resultset('InsertSize')->create({id_run=>3510,position=>1,tag_index=>-1});
+  my $qrs = $schema->resultset('QXYield');
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component(npg_tracking::glossary::composition::component::illumina->new(
+    id_run=>3510, position=>4));
+  my $fk_id = $qrs->find_or_create_seq_composition($f->create_composition())
+                 ->id_seq_composition();
+  $qrs->create({id_run=>3510,position=>4,tag_index=>-1,threshold_quality=>40,id_seq_composition=>$fk_id});
+  $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component(npg_tracking::glossary::composition::component::illumina->new(
+    id_run=>3510, position=>5));
+  $fk_id = $qrs->find_or_create_seq_composition($f->create_composition())
+                 ->id_seq_composition();
+  $qrs->create({id_run=>3510,position=>5,tag_index=>-1,threshold_quality=>40,id_seq_composition=>$fk_id});
+  $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component(npg_tracking::glossary::composition::component::illumina->new(
+    id_run=>3510, position=>1));
+  $fk_id = $qrs->find_or_create_seq_composition($f->create_composition())
+                 ->id_seq_composition();
+  $schema->resultset('InsertSize')->create({id_run=>3510,position=>1,tag_index=>-1,id_seq_composition=>$fk_id});
 
   local $ENV{TEST_DIR} = q[t/data];
   my $model = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema);

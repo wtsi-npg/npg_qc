@@ -1,0 +1,209 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
+use Carp;
+use Getopt::Long;
+use Pod::Usage;
+use npg_qc::autoqc::role::result;
+use npg_qc::Schema;
+use DateTime;
+
+our $VERSION = '0';
+
+Readonly::Scalar my $RELATIONSHIP_NAME => 'seq_composition';
+Readonly::Scalar my $FK_COLUMN_NAME    => 'id_seq_composition';
+Readonly::Scalar my $TEN               => 10;
+Readonly::Scalar my $PAGE_SIZE         => 10_000;
+
+my $help;
+my $table;
+my $number;
+
+GetOptions ('help'     => \$help,
+            'table=s'  => \$table,
+            'number=i' => \$number);
+
+if ($help) { pod2usage(0); }
+
+if (!$table) {
+  croak 'Table needed';
+}
+
+if ($number) {
+  warn "number $number \n";
+}
+
+my $rs_name = [npg_qc::autoqc::role::result->class_names($table)]->[1];
+
+my $schema = npg_qc::Schema->connect();
+my $rs = $schema->resultset($rs_name);
+if (!$rs->result_source()->has_relationship($RELATIONSHIP_NAME)) {
+  croak "Table $table is not linked to $RELATIONSHIP_NAME";
+}
+
+
+# Get records in random order - gives a speed-up if a number
+# of scripts are running in parallel.
+$rs = $rs->search({id_seq_composition => undef}, {page => 1, rows => $PAGE_SIZE});
+my $pager = $rs->pager();
+my $count = $pager->total_entries();
+if ($count == 0) {
+  warn "All composition foreign keys are set\n";
+  exit 0;
+}
+
+warn "${table}: $count rows to backfill\n";
+
+my @pk_columns = $rs->result_source()->primary_columns();
+if (scalar @pk_columns != 1) {
+  croak "None or multiple primary key columns in $table";
+}
+my $pk_name = $pk_columns[0];
+
+my $time        = DateTime->now();
+my $page_number = 0;
+my $last_page   = $pager->last_page();
+warn "Resultset consists of $last_page pages\n";
+my $id = 0;
+
+while ($page_number < $last_page) {
+  $page_number++;
+  if ($page_number != 1) {
+    # Calling the next page does a fresh query.
+    # Eventually we will be requesting rows that do not exist
+    # in a resultset, while still leaving halve of the rows
+    # not updated. To avoid this, we will request page 1 as
+    # many times as there were original pages and start from
+    # the row where we finished on the previous iteration.
+    $rs = $schema->resultset($rs_name)->search(
+      {id_seq_composition => undef, $pk_name => {'>', $id}},
+      {page => 1, rows => $PAGE_SIZE}
+    );
+  }
+  my $paged=$rs->page(1);
+  while (my $result= $paged->next()) {
+    $id = $result->$pk_name;
+    if (defined $number && ($id % $TEN != $number)) { # Sharding step
+      next;
+    }
+    my $composition_obj = $result->create_composition();
+    my $composition_row = $rs->find_or_create_seq_composition($composition_obj);
+    $result->update({$FK_COLUMN_NAME => $composition_row->$FK_COLUMN_NAME});
+  }
+
+  my $now = DateTime->now();
+  warn sprintf 'mod %s, page %i out of %i - done in %i mins %i sec%s',
+        defined $number ? $number : 'none',
+        $page_number,
+        $last_page,
+        $now->delta_ms($time)->minutes(),
+        $now->delta_ms($time)->seconds(),
+        "\n";
+  $time = $now;
+}
+
+1;
+
+__END__
+
+
+=head1 NAME
+
+composition_fk_backfill
+
+=head1 USAGE
+
+  composition_fk_backfill --table insert_size
+  composition_fk_backfill --number 3
+
+=head1 CONFIGURATION
+
+=head1 DESCRIPTION
+
+=head1 REQUIRED ARGUMENTS
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+  Print a brief help message and exits.
+
+=item B<--table>
+
+  Table name
+
+=item B<--number>
+
+  An optional number from 0 to 9 used to randomise selection and allow
+  for ten scripts working in parallel on the same table without interfering
+  with each other. The selection is based on the value of the remainder after
+  division of the value of the primary key by ten.
+
+=back
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=over
+
+=item strict
+
+=item warnings
+
+=item FindBin
+
+=item lib
+
+=item Getopt::Long
+
+=item Pod::Usage
+
+=item Carp
+
+=item DateTime
+
+=item npg_qc::Schema
+
+=item npg_qc::autoqc::role::result
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+=head1 EXIT STATUS
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2017 GRL
+
+This file is part of NPG.
+
+NPG is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+

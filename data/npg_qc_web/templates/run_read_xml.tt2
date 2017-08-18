@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-[% id_runs = model.both_run_complete.id_runs %]
-<runs complete="[% model.both_run_complete %]">
- [% FOREACH run = model.one_pair_complete_data.id_runs %]
-  <run id_run="[% run.key %]" one_run_complete="[% run.value %]"  />  
-  [% END %]
-</runs>

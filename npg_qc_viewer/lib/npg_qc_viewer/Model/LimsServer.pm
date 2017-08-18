@@ -8,64 +8,33 @@ extends 'Catalyst::Model';
 
 our $VERSION = '0';
 
-##no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
-
 sub generate_url {
-  my ($self, $entity_type, $values) = @_;
+  my ($self, $entity_type, $to) = @_;
 
-  if (!$entity_type) {
-    croak 'Entity type (library|pool|sample) is missing';
-  }
+  $entity_type ||= q[];
   if ($entity_type !~ /^sample$|^library$|^pool$/smx) {
-    croak "Unknown entity type $entity_type";
-  }
-  if (!$values) {
-    croak 'LIMS values object is missing';
+    croak qq[Unknown entity type "$entity_type"];
   }
   my $expected_type = 'npg_qc_viewer::Util::TransferObject';
-  my $actual = ref $values || q[];
-  if (ref $values ne $expected_type) {
-    croak "$expected_type is expected, got $actual";
+  my $actual = ref $to;
+  if ($actual ne $expected_type) {
+    croak "$expected_type is expected in second argument, got $actual";
   }
 
-  my $method = '_link_' . ($values->is_gclp ? 'clarity' : 'sscape');
-  return $self->$method($entity_type, $values);
-}
-
-sub _link_clarity {
-  my ($self, $entity_type, $values) = @_;
-
-  my $url = npg_qc_viewer->config->{'Model::LimsServer'}->{'clarity_url'};
-  my $link = q[];
-  if ($url and $entity_type ne 'pool') {
-    my $scope = $entity_type eq 'sample' ? 'Sample' : 'Container';
-    my $id;
-    if ($scope eq 'Container') {
-      if ($values->id_library_lims) {
-        ($id) = $values->id_library_lims =~ /\A([^:]+)/smx;
-      }
-    } else {
-      $id = $values->id_sample_lims;
-    }
-    if ($id) {
-      $link = sprintf '%s/search?scope=%s&query=%s', $url, $scope, $id;
-    }
-  }
-
-  return $link;
+  return $to->lims_live ? $self->_link_sscape($entity_type, $to) : q[];
 }
 
 sub _link_sscape {
-  my ($self, $entity_type, $values) = @_;
+  my ($self, $entity_type, $to) = @_;
 
   my $url = npg_qc_viewer->config->{'Model::LimsServer'}->{'sscape_url'};
   my $link = q[];
   if ($url) {
     my $scope = $entity_type eq 'sample' ? 'samples' : 'assets';
     my $id = $entity_type eq 'sample'
-           ? $values->id_sample_lims
+           ? $to->sample_id
            : ($entity_type eq 'pool'
-           ? $values->entity_id_lims : $values->legacy_library_id);
+           ? $to->entity_id_lims : $to->legacy_library_id);
     if ($id) {
       $link = join q[/], $url, $scope, $id;
     }
@@ -95,14 +64,10 @@ Catalyst model for wrapping LIMS server information.
   
   Generates a link to a LIMS resource.
 
-  my $is_gclp_lims = 1;
-  my $values = npg_qc_viewer::TransferObjects::ProductMetrics4RunTO->new();
-  my $surl = $c->model('LimsServer')
-    ->generate_url('sample', '$is_gclp_lims', $values);
-  $lurl = $c->model('LimsServer')
-    ->generate_url('library', '$is_gclp_lims', $values);
-  $lurl = $c->model('LimsServer')
-    ->generate_url('pool', '$is_gclp_lims', $values);
+  # $to is a npg_qc_viewer::Util::TransferObject object
+  my $surl = $c->model('LimsServer')->generate_url('sample', $to);
+  my $lurl = $c->model('LimsServer')->generate_url('library', $to);
+  my $lurl = $c->model('LimsServer')->generate_url('pool', $to);
 
 =head1 DIAGNOSTICS
 
@@ -132,7 +97,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Genome Research Ltd.
+Copyright (C) 2017 Genome Research Ltd.
 
 This file is part of NPG software.
 

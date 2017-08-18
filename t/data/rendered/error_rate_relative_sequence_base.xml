@@ -1,7 +1,0 @@
-<error_rate_relative_sequence_base>
-  <row read_as="." really_a="26.57" really_c="22.38" really_g="22.23" really_t="28.82" rescore="0" />
-  <row read_as="A" really_a="91.17" really_c="4.24" really_g="2.22" really_t="2.37" rescore="0" />
-  <row read_as="C" really_a="2.31" really_c="92.57" really_g="2.33" really_t="2.79" rescore="0" />
-  <row read_as="G" really_a="1.91" really_c="1.91" really_g="92.64" really_t="3.54" rescore="0" />
-  <row read_as="T" really_a="2.55" really_c="2.80" really_g="2.22" really_t="92.42" rescore="0" />
-</error_rate_relative_sequence_base>

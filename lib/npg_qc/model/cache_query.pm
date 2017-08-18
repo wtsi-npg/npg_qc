@@ -455,63 +455,6 @@ sub get_runs_cache_movez_tiles{
     return $id_runs;
 
 }
-# cache all movez tiles not being done before
-sub cache_movez_tiles_all{
-  my ($self) = @_;
-
-  my $util   = $self->util();
-
-  my $id_runs = $self->get_runs_cache_movez_tiles();
-  if($id_runs){
-
-    $util->transactions(0);
-    eval{
-      foreach my $id_run (@{$id_runs}){
-        my $cache_query1 = npg_qc::model::cache_query->new({
-                           util   => $util,
-                           id_run => $id_run,
-                           end    => 1,
-                           type   => 'movez_tiles',
-                     });
-        eval{
-          $cache_query1->set_to_not_current();
-          $cache_query1->cache_movez_tiles();
-          1;
-        } or do {
-          carp $EVAL_ERROR;
-        };
-        if($self->paired_read($id_run)){
-             my $cache_query2 = npg_qc::model::cache_query->new({
-                           util   => $util,
-                           id_run => $id_run,
-                           end    => 2,
-                           type   => 'movez_tiles',
-                     });
-            eval{
-               $cache_query2->set_to_not_current();
-               $cache_query2->cache_movez_tiles();
-               1;
-            } or do {
-              carp $EVAL_ERROR;
-            };
-        }
-        $util->dbh->commit();
-      }
-      $util->dbh->commit();
-      $util->transactions(1);
-      1;
-    } or do {
-      $util->transactions(1);
-      $util->dbh->rollback();
-      croak $EVAL_ERROR;
-    };
-    return scalar @{$id_runs};
-  }else{
-    carp "There is no runs to cache movez tiles\n";
-    return 0;
-  }
-  return;
-}
 
 sub is_current_cached{
   my ($self) = @_;
@@ -679,11 +622,7 @@ HAVING count_lane = (SELECT lane FROM run_recipe WHERE id_run  = ?)
 sub complete_signal_mean_data{
   my ($self, $id_run) = @_;
 
-  my $id_run_pair = $self->id_run_pair($id_run);
-
-  if(!$id_run_pair){
-    $id_run_pair = $id_run;
-  }
+  my $id_run_pair = $id_run;
 
   my $util   = $self->util();
   my $num_lanes_complete = 0;
@@ -726,12 +665,6 @@ sub complete_errors_by_cycle_data{
 
   my $actual_id_run = $id_run;
 
-  if ($end == 2){
-    $actual_id_run =  $self->id_run_pair($id_run);
-  }
-  if(!$actual_id_run){
-    $actual_id_run = $id_run;
-  }
   my $util   = $self->util();
   my $num_lanes_complete = 0;
   eval {
@@ -794,8 +727,6 @@ npg_qc::model::cache_query
 
 =head2 check_cycle_count - check cycle count cached or not if given id_run, if not cache it and return the cycle count
 
-=head2 cache_movez_tiles - cache number of movez  tiles out of range given id_run
-
 =head2 run_cache - cache sql query with some args
 
 =head2 get_cache_by_id_type_end - given id_run, query type and end, get the current cached rows_ref
@@ -807,6 +738,8 @@ npg_qc::model::cache_query
 =head2 cache_lane_summary_all - cache all lane summary not being done before
 
 =head2 get_runs_cache_movez_tiles - get all id_runs need to be cached for movez_tiles
+
+=head2 cache_movez_tiles
 
 =head2 cache_movez_tiles_all - cache all movez tiles not being done before
 

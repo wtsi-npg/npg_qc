@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<run_configs>[% FOREACH run_config = model.run_configs %]
-  <run_config id_run_config="[% run_config.id_run_config %]" id_run="[% run_config.id_run %]" config_text="[% run_config.text_for_xml %]" />[% END %]
-</run_configs>

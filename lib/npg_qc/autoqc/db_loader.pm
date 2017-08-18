@@ -18,7 +18,9 @@ with qw/MooseX::Getopt/;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $CLASS_FIELD => q[__CLASS__];
+Readonly::Scalar my $CLASS_FIELD             => q[__CLASS__];
+Readonly::Scalar my $SEQ_COMPOSITION_PK_NAME => q[id_seq_composition];
+Readonly::Scalar my $SLEEP_TIME              => 180;
 
 has 'path'   =>  ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',
@@ -42,12 +44,6 @@ has 'check'   => ( is          => 'ro',
                    isa         => 'ArrayRef[Str]',
                    required    => 0,
                    default     => sub {[]},
-                 );
-
-has 'update'  => ( is       => 'ro',
-                   isa      => 'Bool',
-                   required => 0,
-                   default  => 1,
                  );
 
 has 'json_file' => ( is          => 'ro',
@@ -120,7 +116,14 @@ sub load{
   } catch {
     my $m = "Loading aborted, transaction has rolled back: $_";
     $self->_log($m);
-    croak $m;
+    # Retry only if failed to get a lock
+    if ($m =~ /Deadlock found when trying to get lock/smxi) {
+      $self->_log("Will pause for $SLEEP_TIME seconds, then retry");
+      sleep $SLEEP_TIME;
+      $num_loaded = $self->schema->txn_do($transaction);
+    } else {
+      croak $m;
+    }
   };
   $self->_log("$num_loaded json files have been loaded");
 
@@ -129,10 +132,6 @@ sub load{
 
 sub _json2db{
   my ($self, $json, $json_file) = @_;
-
-  if (!$json) {
-    croak 'JSON string representation of the object is missing';
-  }
 
   my $count = 0;
   try {
@@ -146,103 +145,46 @@ sub _json2db{
           my $module = 'npg_qc::autoqc::results::' . $class_name;
           load_class($module);
           my $obj = $module->thaw($json);
-
           if ($class_name eq 'bam_flagstats') {
             $values = decode_json($obj->freeze());
           }
-          my $composition_key = 'id_seq_composition';
-          if ( $obj->can('composition') && $obj->can('composition_digest') &&
-              $self->schema->source($dbix_class_name)->has_column($composition_key) ) {
-            $values->{$composition_key} = $self->_ensure_composition_exists($obj);
+          my $rs  = $self->schema->resultset($dbix_class_name);
+          my $related_composition = $rs->find_or_create_seq_composition($obj->composition());
+          if ($related_composition) {
+            $values->{$SEQ_COMPOSITION_PK_NAME} =
+              $related_composition->$SEQ_COMPOSITION_PK_NAME();
           }
-          # Load the main object
-          $count = $self->_values2db($dbix_class_name, $values);
+          $self->_values2db($rs, $values);
+          $count++;
         }
       }
     }
   } catch {
-    my $j =  $json_file || $json;
-    $self->_log("Attempted to load $j");
-    croak $_;
+    my $e = $_;
+    $self->_log("Attempted to load $json_file, error $e");
+    croak $e;
   };
-  my $m = $count ? 'Loaded' : 'Skipped';
-  $self->_log(join q[ ], $m, $json_file || q[json string]);
+
+  $self->_log(join q[ ], $count ? 'Loaded' : 'Skipped', $json_file);
 
   return $count;
-}
-
-sub _ensure_composition_exists {
-  my ($self, $obj) = @_;
-
-  my $num_components = $obj->composition->num_components;
-  my $composition_row = $self->schema->resultset('SeqComposition')
-    ->find_or_new({ 'digest' => $obj->composition_digest,
-                    'size'   => $num_components, });
-  my $composition_exists = 1;
-  if (!$composition_row->in_storage()) {
-    $composition_row->insert();
-    $composition_exists = 0;
-  }
-  my $pk = $composition_row->id_seq_composition;
-
-  if (!$composition_exists) {
-
-    my $component_rs   = $self->schema->resultset('SeqComponent');
-    my $comcom_rs      = $self->schema->resultset('SeqComponentComposition');
-
-    foreach  my $c ($obj->composition->components_list()) {
-      my $values = decode_json($c->freeze());
-      $values->{'digest'} = $c->digest();
-      my $row = $component_rs->find_or_create($values);
-      # Whether the component existed or not, we have to create a new
-      # composition membership record for it.
-      $values = {
-        'id_seq_composition' => $pk,
-        'id_seq_component'   => $row->id_seq_component,
-        'size'               => $num_components,
-      };
-      $comcom_rs->create($values);
-    }
-  }
-
-  return $pk;
 }
 
 sub _values2db {
-  my ($self, $dbix_class_name, $values) = @_;
+  my ($self, $rs, $values) = @_;
 
-  my $iscurrent_column_name      = 'iscurrent';
-  my $composition_fk_column_name = 'id_seq_composition';
-  my $count = 0;
-  my $rs = $self->schema->resultset($dbix_class_name);
   my $result_class = $rs->result_class;
   $self->_exclude_nondb_attrs($values, $result_class->columns());
-
-  my $found;
-  if ($result_class->has_column($iscurrent_column_name)) {
-    my $fk_value = $values->{$composition_fk_column_name};
-    if ($fk_value) {
-      $rs->search({$composition_fk_column_name => $fk_value})
-         ->update({$iscurrent_column_name => 0});
-    }
-  } else {
-    $rs->deflate_unique_key_components($values);
-    $found = $rs->find($values);
+  $rs->deflate_unique_key_components($values);
+  my $row = $rs->find_or_new($values);
+  if ($result_class->has_column('iscurrent') && $row->in_storage) {
+    $row->update({'iscurrent' => 0});
+    $row = $rs->new_result($values);
   }
+  # We need to convert non-scalar values (hashes or arrays) to scalars
+  $row->set_inflated_columns($values)->insert_or_update();
 
-  if ($found) {
-    if ($self->update) {
-      # We need to convert non-scalar values (hashes or arrays) to scalars
-      $found->set_inflated_columns($values)->update();
-      $count++;
-    }
-  } else {
-    # See comment above
-    $rs->new_result($values)->set_inflated_columns($values)->insert();
-    $count++;
-  }
-
-  return $count;
+  return;
 }
 
 sub _exclude_nondb_attrs {
@@ -352,11 +294,6 @@ npg_qc::autoqc::db_loader
 =head2 verbose
 
   A boolean attribute, switches logging on/off, true by default.
-
-=head2 update
-
-  A boolean attribute, true by default, switches on/off updates of existing
-  results. If false, only new results are inserted.
 
 =head2 schema
 

@@ -523,7 +523,7 @@ End of Sequenom assay data
 		row = c.model('MLWarehouseDB').resultset('Sample').search({ 'name' => "$alt_sample_name"}, ).first;
 		alt_sample_id = 0;
 		IF row;
-			alt_sample_id = row.id_sample_lims;
+			alt_sample_id = row.sample_id;
 		END;
               IF alt_sample_id;
               	alt_sample_name='<a href="' _ c.uri_for_action(c.controller('Checks').action_for('samples'), alt_sample_id) _ '"><span class="lib nbsp">' _ alt_sample_name _ '</span></a>';

@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 use Carp;
 
-use npg_qc_viewer::Util::TransferObject;
+use npg_qc_viewer::Util::TransferObjectFactory;
 
 BEGIN { extends 'Catalyst::Model::DBIC::Schema' }
 
@@ -202,10 +202,7 @@ sub tags4lane {
       croak sprintf 'Flowcell data missing for run %i position %i tag_index %i',
                     $lane_hash->{'id_run'}, $lane_hash->{'position'}, $tag_index;
     }
-    my $from_gclp  = $flowcell_row->from_gclp()  ? 1 : 0;
-    my $is_control = $flowcell_row->is_control() ? 1 : 0;
-    if (npg_qc_viewer::Util::TransferObject->qc_able(
-        $from_gclp, $is_control, $tag_index)) {
+    if (npg_qc_viewer::Util::TransferObjectFactory->qc_able($flowcell_row, $tag_index)) {
       push @tags, $tag_index;
     }
   }
@@ -249,7 +246,7 @@ David Jackson
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd.
+Copyright (C) 2017 Genome Research Ltd.
 
 This file is part of NPG software.
 

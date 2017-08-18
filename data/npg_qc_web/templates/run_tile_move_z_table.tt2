@@ -1,9 +1,0 @@
-<table id="move_z_[% end %]_run" class="zebra">
-  <caption>Move Z data by cycle:[% end %]</caption>
-  <thead>
-    <tr><th>Cycle</th><th>Current Z</th><th>Target Z</th><th>New Z</th><th>Start time</th><th>Stop time</th><th>Move</th></tr>
-  </thead>
-  <tbody>[% FOREACH mz = tile.move_zes %]
-    <tr><td>[% mz.cycle %]</td><td>[% mz.currentz %]</td><td>[% mz.targetz %]</td><td>[% mz.newz %]</td><td>[% mz.start %]</td><td>[% mz.stop %]</td><td>[% mz.move %]</td></tr>
-  [% END %]</tbody>
-</table>

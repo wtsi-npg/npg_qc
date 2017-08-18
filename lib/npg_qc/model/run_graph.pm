@@ -143,51 +143,9 @@ sub get_error_cluster_control_lane{
 #get the actual id_run number based on its end
 sub get_actual_id_run{
   my ($self, $id_run, $end) = @_;
-
-  my $actual_id_run = $id_run;
-  eval{
-    if($end != 1){
-      my $paired_id_run = $self->id_run_pair($id_run);
-      if($paired_id_run){
-        $actual_id_run = $paired_id_run;
-      }
-    }
-    1;
-  } or do{
-    croak $EVAL_ERROR;
-  };
-
-  return $actual_id_run;
+  return $id_run;
 }
-#given id_run, get the id_run for its paired run
-sub get_pair_id_run{
-    my ($self, $id_run) = @_;
 
-    my $query = q{SELECT id_run_pair
-                  FROM run_and_pair
-                  WHERE id_run = ?         
-                 };
-    my $pair_id_run;
-    eval {
-      my $dbh = $self->util->dbh();
-      #print $query, "\n";
-      my $sth = $dbh->prepare($query);
-
-      $sth->execute($id_run);
-
-      my @row = $sth->fetchrow_array();
-      if(@row){
-        #print $row[0], "\n";          
-        $pair_id_run = $row[0];
-      }else{
-        $pair_id_run = $id_run;
-      }
-      1;
-    } or do {
-      croak $EVAL_ERROR;
-    };
-    return $pair_id_run;
-}
 #get the run list which data already being calculated
 sub get_runlist_done{
     my ($self) = @_;

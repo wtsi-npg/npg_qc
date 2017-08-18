@@ -16,7 +16,7 @@ our $VERSION = '0';
 
 =begin stopwords
 
-deplexing lims rnd gclp flowcell
+deplexing lims rnd metadata flowcell
 
 =end stopwords
 
@@ -28,90 +28,91 @@ npg_qc_viewer::Util::TransferObject
 
 =head1 DESCRIPTION
 
-A transfer object to pass Product Metric data from the model to the view.
+A wrapper object for LIMs and run metadata about an entity
+(individual library or a pool)
 
 =head1 SUBROUTINES/METHODS
 
 =head2 num_cycles
 
-Number of cycles. Usually cycles@iseq_run_lane_metric
+Number of cycles in a run
 
 =cut
 has 'num_cycles'   => (
   isa      => 'Maybe[Int]',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
 =head2 time_comp
 
-When run was complete
+Date and time when run was complete
 
 =cut
 has 'time_comp'    => (
   isa      => 'Maybe[DateTime]',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
 =head2 tag_sequence
 
-Tag sequence for deplexing
+Tag sequence used for deplexing
 
 =cut
 has 'tag_sequence' => (
   isa      => 'Maybe[Str]',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
 =head2 study_name
 
-Name study lims
+Study name
 
 =cut
 has 'study_name'     => (
   isa      => 'Maybe[Str]',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
-=head2 id_sample_lims
+=head2 sample_id
 
-Id of sample lims
+Sample identifier
 
 =cut
-has 'id_sample_lims' => (
+has 'sample_id' => (
   isa      => 'Maybe[Str]',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
 =head2 sample_name
 
-Name of sample lims
+Sample name
 
 =cut
 has 'sample_name' => (
   isa      => 'Maybe[Str]',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
-=head2 supplier_sample_name
+=head2 sample_supplier_name
 
 Supplier sample name
 
 =cut
-has 'supplier_sample_name' => (
+has 'sample_supplier_name' => (
   isa      => 'Maybe[Str]',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
 =head2 id_library_lims
 
-Id of library lims
+Library identifier
 
 =cut
 has 'id_library_lims' => (
@@ -122,21 +123,10 @@ has 'id_library_lims' => (
 
 =head2 legacy_library_id
 
-Legacy library id lims
+Legacy library identifier
 
 =cut
 has 'legacy_library_id' => (
-  isa      => 'Maybe[Str]',
-  is       => 'rw',
-  required => 0,
-);
-
-=head2 id_pool_lims
-
-Id pool lims
-
-=cut
-has 'id_pool_lims' => (
   isa      => 'Maybe[Str]',
   is       => 'rw',
   required => 0,
@@ -148,60 +138,66 @@ Flag for R&D runs
 
 =cut
 has 'rnd' => (
-  is       => 'rw',
-  required => 0,
-);
-
-=head2 is_gclp
-
-Flag for gclp flowcell
-
-=cut
-has 'is_gclp' => (
-  isa      => 'Bool',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
 =head2 is_control
 
-Flag for control entity from flowcell
+Flag for control/'spiked in' entity from flowcell
 
 =cut
 has 'is_control' => (
   isa      => 'Bool',
-  is       => 'rw',
+  is       => 'ro',
+  required => 0,
+);
+
+=head2 is_pool
+
+Flag for a pooled lane
+
+=cut
+has 'is_pool' => (
+  isa      => 'Bool',
+  is       => 'ro',
+  required => 0,
+);
+
+=head2 lims_live
+
+Boolean flag, false if LIMs system for this entity is
+not available to link to.
+
+=cut
+has 'lims_live' => (
+  isa      => 'Bool',
+  is       => 'ro',
   required => 0,
 );
 
 =head2 entity_id_lims
 
-Id for entity lims
+LIMs identifier for this entity
 
 =cut
 has 'entity_id_lims' => (
   isa      => 'Maybe[Str]',
-  is       => 'rw',
+  is       => 'ro',
   required => 0,
 );
 
-=head2 reset_as_pool
+=head2 instance_qc_able
 
-Resets object's attributes as fits for a pool
+Boolean attribute, true if the entity is subject to manual QC,
+false otherwise.
 
 =cut
-sub reset_as_pool {
-  my $self = shift;
-  for my $attr (qw/tag_sequence
-                   study_name
-                   id_sample_lims
-                   sample_name
-                   supplier_sample_name/) {
-    $self->$attr(undef);
-  }
-  $self->id_library_lims($self->id_pool_lims);
-  return;
-}
+has 'instance_qc_able' => (
+  isa        => 'Bool',
+  is         => 'ro',
+  required   => 0,
+);
 
 =head2 provenance
 
@@ -210,8 +206,7 @@ Returns a list containing library id and, optionally, sample and study names
 =cut
 sub provenance {
   my $self = shift;
-  my @p = grep { $_ } ($self->id_library_lims, $self->sample_name, $self->study_name);
-  return @p;
+  return (grep { $_ } ($self->id_library_lims, $self->sample_name, $self->study_name));
 }
 
 =head2 sample_name4display
@@ -222,44 +217,7 @@ Returns supplier_sample_name, falls back to sample_name.
 =cut
 sub sample_name4display {
   my $self = shift;
-  return $self->supplier_sample_name || $self->sample_name;
-}
-
-=head2 instance_qc_able
-
-Lazy attribute. The outcome of calling $self_qc_able with 
-this object attributes is returned by the builder.
-
-=cut
-has 'instance_qc_able' => (
-  isa        => 'Bool',
-  is         => 'ro',
-  lazy_build => 1,
-  required   => 0,
-);
-sub _build_instance_qc_able {
-  my $self = shift;
-  return $self->qc_able($self->is_gclp, $self->is_control, $self->tag_index);
-}
-
-=head2 qc_able
-
-Returns true if there are conditions for QC, false otherwise.
-
-=cut
-sub qc_able {
-  my ($self, $is_gclp, $is_control, $tag_index) = @_;
-
-  if (!defined $is_gclp || !defined $is_control) {
-    croak q[Both gclp and control flags should be defined];
-  }
-
-  my $for_qc = 1;
-  if (defined $tag_index) {
-    $for_qc = ( $tag_index == 0 || $is_gclp || $is_control) ? 0 : 1;
-  }
-
-  return $for_qc;
+  return $self->sample_supplier_name || $self->sample_name;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -301,7 +259,7 @@ Jaime Tovar Corona E<lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Genome Research Ltd.
+Copyright (C) 2017 Genome Research Ltd.
 
 This file is part of NPG.
 

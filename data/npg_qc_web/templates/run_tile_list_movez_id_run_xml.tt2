@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<id_runs>
-  [% FOREACH run = model.movez_id_runs %]
-    <id_run id="[% run.key %]" tiles="[% run.value %]"/>
-  [% END %]
-</id_runs>
