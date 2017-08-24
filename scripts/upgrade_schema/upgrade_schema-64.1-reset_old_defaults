@@ -1,0 +1,103 @@
+--
+-- reset to NULL the values for tag_index and subset
+-- that were previously inflated to NULL
+--
+
+SELECT '==table adapter';
+UPDATE adapter SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'adapter', @@warning_count, @@error_count;
+
+SELECT '==table alignment_filter_metrics';
+UPDATE alignment_filter_metrics SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'alignment_filter_metrics', @@warning_count, @@error_count;
+
+SELECT '==table bam_flagstats';
+UPDATE bam_flagstats SET tag_index = NULL WHERE tag_index = -1;
+UPDATE bam_flagstats SET subset = NULL WHERE subset = 'all';
+UPDATE bam_flagstats SET human_split = NULL WHERE human_split = 'target';
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'bam_flagstats', @@warning_count, @@error_count;
+
+SELECT '==table contamination';
+UPDATE contamination SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'contamination', @@warning_count, @@error_count;
+
+SELECT '==table gc_bias';
+UPDATE gc_bias SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'gc_bias', @@warning_count, @@error_count;
+
+SELECT '==table gc_fraction';
+UPDATE gc_fraction SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'gc_fraction', @@warning_count, @@error_count;
+
+SELECT '==table genotype';
+UPDATE genotype SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'genotype', @@warning_count, @@error_count;
+
+SELECT '==table insert_size';
+UPDATE insert_size SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'insert_size', @@warning_count, @@error_count;
+
+SELECT '==table pulldown_metrics';
+UPDATE pulldown_metrics SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'pulldown_metrics', @@warning_count, @@error_count;
+
+SELECT '==table qx_yield';
+UPDATE qx_yield SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'qx_yield', @@warning_count, @@error_count;
+
+SELECT '==table ref_match';
+UPDATE ref_match SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'ref_match', @@warning_count, @@error_count;
+
+SELECT '==table sequence_error';
+UPDATE sequence_error SET tag_index = NULL WHERE tag_index = -1;
+UPDATE sequence_error SET sequence_type = NULL WHERE sequence_type = 'target';
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'sequence_error', @@warning_count, @@error_count;
+
+SELECT '==table split_stats';
+UPDATE split_stats SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'split_stats', @@warning_count, @@error_count;
+
+SELECT '==table tags_reporters';
+UPDATE tags_reporters SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'tags_reporters', @@warning_count, @@error_count;
+
+SELECT '==table upstream_tags';
+UPDATE upstream_tags SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'upstream_tags', @@warning_count, @@error_count;
+
+SELECT '==table verify_bam_id';
+UPDATE verify_bam_id SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'verify_bam_id', @@warning_count, @@error_count;
