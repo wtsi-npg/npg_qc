@@ -46,7 +46,7 @@ rpt_list attribute.
 =head2 rpt_list
 
 Semi-colon separated list of run:position or run:position:tag.
-An optional attribute. Shoudl be given if id_run and position are not supplied.
+An optional attribute. Should be given if id_run and position are not supplied.
 
 =cut
 
