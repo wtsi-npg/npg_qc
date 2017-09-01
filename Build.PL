@@ -225,6 +225,7 @@ my $requires = {
                 'npg_tracking::glossary::composition::factory::attributes' => 0,
                 'npg_tracking::glossary::composition::component'           => 0,
                 'npg_tracking::glossary::composition::component::illumina' => 0,
+                'npg_tracking::glossary::composition::factory::rpt_list'   => 0,
                 'npg_tracking::glossary::rpt'              => 0,
                 'npg_tracking::glossary::run'              => 0,
                 'npg_tracking::glossary::lane'             => 0,
