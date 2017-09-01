@@ -6,6 +6,9 @@ use DateTime::TimeZone;
 use Carp;
 use Readonly;
 
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+
 our $VERSION = '0';
 
 requires 'mqc_outcome';
@@ -232,6 +235,11 @@ i.e. accepted is changed to rejected and rejected to accepted.
 Returns a hash reference containing record identifies (id_run, position and,
 where appropriate, tag_index) and a short description of the outcome.
 
+=head create_composition
+
+Returns a npg_tracking::glossary::composition object corresponding to
+this result.
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -250,6 +258,10 @@ where appropriate, tag_index) and a short description of the outcome.
 
 =item Carp
 
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -262,7 +274,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd
+Copyright (C) 2017 Genome Research Ltd
 
 This file is part of NPG.
 
