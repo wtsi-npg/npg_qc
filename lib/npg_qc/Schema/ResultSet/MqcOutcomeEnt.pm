@@ -17,12 +17,11 @@ sub get_rows_with_final_current_outcome {
 
 sub get_ready_to_report {
   my $self = shift;
-  my $rs = $self->search(
-         {'reported' => undef},
-         {
-          'order_by' => [qw/id_run position/],
-          'prefetch' => 'mqc_outcome',
-         },
+  my $rs = $self->search({'reported' => undef }, {'prefetch' => 'mqc_outcome'})
+                ->search_autoqc({})
+                ->search(
+                  {},
+                  {'order_by' => [qw/seq_component.id_run seq_component.position/]}
                         );
   my @rows = grep { $_->has_final_outcome } $rs->all();
   $rs = $self->result_source->resultset;
@@ -53,7 +52,7 @@ npg_qc::Schema::ResultSet::MqcOutcomeEnt
 
 =head2 get_rows_with_final_current_outcome
 
-  Returns a list of entities with final outcomes acording to business rules.
+  Returns a list of entities with final outcomes according to business rules.
   Currently it looks into the relationship with the dictionary to find those
   outcomes with a short description ending in 'final'.
 
