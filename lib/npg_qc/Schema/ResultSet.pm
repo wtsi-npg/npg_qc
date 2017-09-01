@@ -5,10 +5,13 @@ use MooseX::MarkAsMethods autoclean => 1;
 use Carp;
 use JSON;
 use Try::Tiny;
+use Readonly;
 
 extends 'DBIx::Class::ResultSet';
 
 our $VERSION = '0';
+
+Readonly::Scalar my $COMPOSITION_FK_COLUMN_NAME => 'id_seq_composition';
 
 sub search_autoqc {
   my ($self, $query, $size) = @_;
@@ -21,30 +24,20 @@ sub search_autoqc {
   foreach my $key (keys %{$query}) {
     $values->{$key} = $query->{$key};
   }
-  my $rsource = $self->result_source();
-  if ($rsource->has_relationship('seq_composition')) {
-    my $seq_component_rsource = $rsource->schema()->source('SeqComponent');
-    foreach my $col_name  (keys %{$values}) {
-      # Query by id_run, position and other attributes of the component
-      # should be performed against the seq_component table.
-      my $new_key = join q[.],
-        $seq_component_rsource->has_column($col_name) ? 'seq_component':'me',
-        $col_name;
-      $values->{$new_key} = $values->{$col_name};
-      delete $values->{$col_name};
-    }
-    if ($size) {
-      $values->{'seq_component_compositions.size'} = $size;
-    }
-    $how->{'prefetch'} = {'seq_component_compositions' => 'seq_component'};
-  } else {
-    my $ti_key = 'tag_index';
-    if (exists $values->{$ti_key} && ($rsource->name() eq 'spatial_filter')) {
-      delete $values->{$ti_key};
-    }
-    my $only_existing = 1;
-    $self->deflate_unique_key_components($values, $only_existing);
+  my $seq_component_rsource = $self->result_source()->schema()->source('SeqComponent');
+  foreach my $col_name  (keys %{$values}) {
+    # Query by id_run, position and other attributes of the component
+    # should be performed against the seq_component table.
+    my $new_key = join q[.],
+      $seq_component_rsource->has_column($col_name) ? 'seq_component':'me',
+      $col_name;
+    $values->{$new_key} = $values->{$col_name};
+    delete $values->{$col_name};
   }
+  if ($size) {
+    $values->{'seq_component_compositions.size'} = $size;
+  }
+  $how->{'prefetch'} = {'seq_component_compositions' => 'seq_component'};
 
   return $self->search_rs($values, $how);
 }
@@ -163,8 +156,8 @@ sub find_or_create_seq_composition {
         # Whether the component existed or not, we have to create a new
         # composition membership record for it.
         $row->create_related('seq_component_compositions',
-                             {'id_seq_composition' => $pk,
-                              'size'               => $num_components});
+               {$COMPOSITION_FK_COLUMN_NAME => $pk,
+                'size'                      => $num_components});
       }
     }
 
@@ -189,6 +182,10 @@ sub find_or_create_seq_composition {
   };
 
   return $row;
+}
+
+sub composition_fk_column_name {
+  return $COMPOSITION_FK_COLUMN_NAME;
 }
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
@@ -305,6 +302,8 @@ not in the hash.
 =item JSON
 
 =item Try::Tiny
+
+=item Readonly
 
 =back
 
