@@ -58,17 +58,12 @@ sub get {
       if ( none { !defined } @tags ) {
         $query->{$TIK} = \@tags;
       }
-      my $db_query = $self->qc_schema()->resultset($LIB_RS_NAME)
-                          ->search({}, {'join' => $QC_OUTCOME})
-                          ->search_autoqc($query);
-      push @lib_outcomes, $db_query->all();
+      push @lib_outcomes, $self->_create_query($LIB_RS_NAME, $query)->all();
     }
 
     # Get seq outcomes for a lane.
-    my $db_query = $self->qc_schema()->resultset($SEQ_RS_NAME)
-                        ->search({}, {'join' => $QC_OUTCOME})
-                        ->search_autoqc({$IDRK => $id_run, $PK => \@positions});
-    push @seq_outcomes, $db_query->all();
+    my $q = {$IDRK => $id_run, $PK => \@positions};
+    push @seq_outcomes, $self->_create_query($SEQ_RS_NAME, $q)->all();
   }
 
   my $h = {};
@@ -140,10 +135,7 @@ sub _save_outcomes {
             }
             $outcome_ent->update_outcome($outcome_description, $username);
             if ($outcome_type eq 'seq' && $outcome_ent->has_final_outcome) {
-              my $db_query = $self->qc_schema()->resultset($LIB_RS_NAME)
-                                  ->search({}, {'join' => $QC_OUTCOME})
-                                  ->search_autoqc($query);
-              my @lib_outcomes = $db_query->all();
+              my @lib_outcomes = $self->_create_query($LIB_RS_NAME, $query)->all();
               $self->_validate_library_outcomes(
                       $outcome_ent, \@lib_outcomes, $lane_info->{$key});
               $self->_finalise_library_outcomes(\@lib_outcomes, $username);
@@ -158,6 +150,14 @@ sub _save_outcomes {
   };
 
   return $self->qc_schema->txn_do($actions);
+}
+
+sub _create_query {
+  my ($self, $rsname, $query) = @_;
+  my $db_query = $self->qc_schema()->resultset($rsname)
+                                   ->search({}, {'join' => $QC_OUTCOME})
+                                   ->search_autoqc($query);
+  return $db_query;
 }
 
 sub _find_or_new_outcome {
