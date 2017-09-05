@@ -36,7 +36,9 @@ sub get {
 
   my $hashed_queries = {};
   foreach my $q ( @{$qlist} ) {
-    _validate_query($q);
+    if (!defined $q->{$IDRK} || !defined $q->{$PK}) {
+      croak qq[Both '$IDRK' and '$PK' keys should be defined];
+    }
     push @{$hashed_queries->{$q->{$IDRK}}->{$q->{$PK}}},
       defined $q->{$TIK} ? $q->{$TIK} : undef;
   }
@@ -66,7 +68,7 @@ sub get {
     my $db_query = $self->qc_schema()->resultset($SEQ_RS_NAME)
                         ->search({}, {'join' => $QC_OUTCOME})
                         ->search_autoqc({$IDRK => $id_run, $PK => \@positions});
-    push @lib_outcomes, $db_query->all();
+    push @seq_outcomes, $db_query->all();
   }
 
   my $h = {};
@@ -99,14 +101,6 @@ sub save {
 
   my $queries = $self->_save_outcomes($outcomes, $username, $lane_info);
   return $self->get($queries);
-}
-
-sub _validate_query {
-  my $q = shift;
-  if (!defined $q->{$IDRK} || !defined $q->{$PK}) {
-    croak qq[Both '$IDRK' and '$PK' keys should be defined];
-  }
-  return;
 }
 
 sub _map_outcomes {
@@ -195,7 +189,6 @@ sub _find_or_new_outcome {
 
 sub _valid4update {
   my ($self, $row, $outcome_desc) = @_;
-
   if ($row->in_storage) {
     if ($row->mqc_outcome->short_desc eq $outcome_desc) {
       return 0;
