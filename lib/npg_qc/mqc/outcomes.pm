@@ -140,8 +140,10 @@ sub _save_outcomes {
             }
             $outcome_ent->update_outcome($outcome_description, $username);
             if ($outcome_type eq 'seq' && $outcome_ent->has_final_outcome) {
-              my @lib_outcomes = $self->qc_schema()->resultset($LIB_RS_NAME)
-                                      ->search($query)->all();
+              my $db_query = $self->qc_schema()->resultset($LIB_RS_NAME)
+                                  ->search({}, {'join' => $QC_OUTCOME})
+                                  ->search_autoqc($query);
+              my @lib_outcomes = $db_query->all();
               $self->_validate_library_outcomes(
                       $outcome_ent, \@lib_outcomes, $lane_info->{$key});
               $self->_finalise_library_outcomes(\@lib_outcomes, $username);
