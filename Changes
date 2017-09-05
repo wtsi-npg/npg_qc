@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - composition-ebabled manual qc:
+     db tables linked to the seq_composition table
+     search proceeds via releated composition tables
+     when mqc outcomes are saved, a composition is created if does not exist
+
 release 64.0
  - composition-enabled autoqc objects storage
      schema changes
