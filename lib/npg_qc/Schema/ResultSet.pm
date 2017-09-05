@@ -287,6 +287,11 @@ not in the hash.
  Returns undefined if this result set doe not have a relationship to
  the seq_composition table.
 
+=head2 composition_fk_column_name
+
+ Returns the name of the column with a foreign key linking this table to the
+ seq_composition table.
+
 =head1 DEPENDENCIES
 
 =over
