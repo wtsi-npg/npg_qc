@@ -17,7 +17,7 @@ use_ok ('npg_qc::autoqc::results::bam_flagstats');
 use_ok ('npg_qc::autoqc::checks::bam_flagstats');
 
 subtest 'test attributes and simple methods' => sub {
-  plan tests => 5;
+  plan tests => 4;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
             position => 5,
@@ -32,7 +32,6 @@ subtest 'test attributes and simple methods' => sub {
   is ($c->subset, 'phix', 'subset attr is set correctly');
   my $json = $c->result()->freeze();
   like ($json, qr/\"subset\":\"phix\"/, 'subset field is serialized');
-  like ($json, qr/\"human_split\":\"phix\"/, 'human_split field is serialized');
 };
 
 subtest 'high-level parsing' => sub {

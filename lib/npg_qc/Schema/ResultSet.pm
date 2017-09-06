@@ -88,18 +88,6 @@ sub deflate_unique_key_components {
     }
   }
 
-  ################
-  #
-  # Temporary measure to push existing data through
-  #
-
-  ##no critic (ProhibitMagicNumbers)
-  if  ($self->result_class eq 'npg_qc::Schema::Result::BamFlagstats' &&
-      $values->{'library_size'} && $values->{'library_size'} == -1) {
-    $values->{'library_size'} = undef;
-  }
-  ##use critic
-
   return;
 }
 

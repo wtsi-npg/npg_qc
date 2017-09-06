@@ -253,7 +253,7 @@ my $temp = tempdir( CLEANUP => 1);
     $c->add(npg_qc::autoqc::results::qX_yield->new(id_run=>1, position=>1, tag_index=>4, path=>q[t]));
     $c->add(npg_qc::autoqc::results::adapter->new(id_run=>1, position=>1, tag_index=>1, path=>q[t]));
     $c->add(npg_qc::autoqc::results::bam_flagstats->new(id_run=>1, position=>3, path=>q[t]));
-    $c->add(npg_qc::autoqc::results::bam_flagstats->new(id_run=>1, position=>3, path=>q[t], human_split => q[human]));
+    $c->add(npg_qc::autoqc::results::bam_flagstats->new(id_run=>1, position=>3, path=>q[t], subset => q[human]));
 
     my $check_names = $c->check_names;
 

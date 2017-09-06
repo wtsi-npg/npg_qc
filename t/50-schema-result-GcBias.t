@@ -1,19 +1,20 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 14;
 use Test::Exception;
 use Test::Deep;
 use Moose::Meta::Class;
 use JSON;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::GcBias');
 
 my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
-
-  my $table = 'GcBias';
+my $table = 'GcBias';
 
 my $json = q { 
 {
@@ -38,21 +39,46 @@ my $json = q {
 my $values = from_json($json);
 my $rs = $schema->resultset('GcBias');
 isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::GcBias');
+$values->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 9225, position => 1, tag_index => 0});
 
 {
   my %values1 = %{$values};
   my $v1 = \%values1;
 
-  $rs->deflate_unique_key_components($v1);
-  is($v1->{'tag_index'}, 0, 'tag index zero not deflated');
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'tag zero record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
-  is($row->tag_index, 0, 'tag index zero retrieved correctly');
-  is(ref $row->actual_quantile_y, 'ARRAY', 'actual_quantile_y returned as an array');
+  is ($row->tag_index, 0, 'tag index zero retrieved correctly');
+  is (ref $row->actual_quantile_y, 'ARRAY', 'actual_quantile_y returned as an array');
   cmp_deeply($row->actual_quantile_y, $values->{'actual_quantile_y'},
-    'actual_quantile_y array content is correct');  
+    'actual_quantile_y array content is correct');
+
+  %values1 = %{$values};
+  $v1 = \%values1;
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  delete $v1->{'tag_index'};
+  my $row1;
+  lives_ok {$row1 = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'attempt to insert the record again';
+  is($row->id_gc_bias, $row1->id_gc_bias, 'new record is not created');
+
+  %values1 = %{$values};
+  $v1 = \%values1;
+  $v1->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,{id_run => 9225, position => 1});
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  delete $v1->{'tag_index'};
+  lives_ok {$row1 = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'another record is created';
+  isnt ($row->id_gc_bias, $row1->id_gc_bias, 'new record is created');
+  is ($row1->id_run, undef, 'id run value is undefined');
+  is ($row1->position, undef, 'position value is undefined');
+  is ($row1->tag_index, undef, 'tag_index value is undefined');
 }
 
 1;

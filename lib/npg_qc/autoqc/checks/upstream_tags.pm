@@ -86,7 +86,7 @@ sub _build_lane_path {
   my $lp_root = $self->qc_in;
   # If in the archive directory, look one level up
   $lp_root =~ s{/archive$}{}smx;
-  return sprintf q[%s/lane%d/], $lp_root, $self->position;
+  return sprintf q[%s/lane%d/], $lp_root, $self->composition->get_component(0)->position;
 }
 
 #########################################################################################
@@ -129,7 +129,7 @@ has 'tag0_bam_file'  => ( isa        => 'Str',
                         );
 sub _build_tag0_bam_file {
   my $self = shift;
-  my $basefilename = sprintf q[%s_%s#0.bam], $self->id_run, $self->position;
+  my $basefilename = sprintf q[%s_%s#0.bam],$self->get_id_run(),$self->composition->get_component(0)->position();
   return $self->lane_path . $basefilename;
 }
 
@@ -219,10 +219,11 @@ sub _build__tag_metrics_results {
   my $aqp = $self->archive_qc_path;
   my $c=$qcs->load_from_path($aqp);
   my $tmr=$c->slice(q[class_name], q[tag_metrics]);
-  $tmr=$tmr->slice(q[position], $self->position);
+  my $position=$self->composition->get_component(0)->position;
+  $tmr=$tmr->slice(q[position],$position);
 
   if(!$tmr->results || (@{$tmr->results} == 0)) {
-    $c=$qcs->load_run($self->id_run, $self->db_lookup, [ $self->position ]);
+    $c=$qcs->load_run($self->get_id_run, $self->db_lookup, [ $position ]);
     $tmr=$c->slice(q[class_name], q[tag_metrics]);
   }
 
@@ -345,7 +346,7 @@ has 'metrics_output_file'  => ( isa        => 'Str',
 sub _build_metrics_output_file {
   my $self = shift;
 
-  my $filename = sprintf q[%s/%d_%d#0_tagfile.metrics], $self->cal_path, $self->id_run, $self->position;
+  my $filename = sprintf q[%s/%d_%d#0_tagfile.metrics], $self->cal_path, $self->get_id_run, $self->composition->get_component(0)->position;
 
   return $filename;
 }
@@ -379,7 +380,7 @@ has 'run_rows' => ( isa        => 'ArrayRef',
                   );
 sub _build_run_rows {
   my ($self) = @_;
-  return _fetch_run_rows($self->id_run);
+  return _fetch_run_rows($self->get_id_run);
 }
 
 #########################################################################################################
@@ -399,12 +400,12 @@ sub _build__run_info_data {
   my $run_rows = $self->run_rows;
 
   my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
-  my $run_lanes = { (map { $_->[$ID_RUN_POS] => [ $self->position ] } @{$run_rows}) };
+  my $lane = $self->composition->get_component(0)->position;
+  my $run_lanes = { (map { $_->[$ID_RUN_POS] => [ $lane ] } @{$run_rows}) };
   my $c=$qcs->load_lanes($run_lanes, 1, );
   my $rl_tag_metrics=$c->slice(q[class_name], q[tag_metrics]);
   my $rl_tag_metrics_results=$rl_tag_metrics->results;
 
-  my $lane = $self->position;
   my $num_back_runs = $self->num_back_runs;
   my $rid = _additional_run_info($lane, $run_rows, $rl_tag_metrics_results, $num_back_runs);
 
@@ -476,8 +477,8 @@ sub _build_tag0_BamIndexDecoder_metrics {
   #  for easier manipulation of values
   #############################################################
   my $tmc=npg_qc::autoqc::checks::tag_metrics->new(
-    id_run => $self->id_run,
-    position => $self->position,
+    id_run      => $self->get_id_run,
+    position    => $self->composition->get_component(0)->position,
     input_files => [ $self->metrics_output_file ], path => q{.});
   $tmc->execute;    # parse input_file
 
@@ -545,7 +546,7 @@ sub _build_prev_runs {
 
   for my $i (0..($self->num_back_runs - 1)) {
     my $tti = $self->_tmc_tag_indexes;
-    push @ret, _generate_run_info_row($run_info_list->[$i], $self->position, $self->tag0_BamIndexDecoder_metrics, $tti);
+    push @ret, _generate_run_info_row($run_info_list->[$i], $self->composition->get_component(0)->position, $self->tag0_BamIndexDecoder_metrics, $tti);
   }
 
   return \@ret;
@@ -572,12 +573,12 @@ sub _build_samtools {
 override 'can_run' => sub {
   my $self = shift;
 
-  if (!$self->id_run || !$self->position) {
+   if (!$self->get_id_run() || !$self->composition->get_component(0)->position){
     $self->result->add_comment('Run id and position should be defined');
     return 0;
   }
 
-  if(defined $self->tag_index) {
+  if(defined $self->composition->get_component(0)->tag_index) {
     $self->result->add_comment('Tag index cannot be defined');
     return 0;
   }
