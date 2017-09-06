@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tag_sniff modified to load the whole tag table upfront
+     revcomp matches now output in reverse video
+
 release 64.0
  - composition-enabled autoqc objects storage
      schema changes
