@@ -10,14 +10,14 @@
 --
 
 SELECT '==table mqc_outcome_ent';
--- ALTER TABLE mqc_outcome_ent
---  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
---    'A foreign key referencing the id_seq_composition column of the seq_composition table'
---    AFTER id_mqc_outcome_ent,
---  ADD INDEX mqc_outcome_ent_compos_ind (id_seq_composition),
---  ADD CONSTRAINT mqc_outcome_ent_compos_fk FOREIGN KEY (id_seq_composition)
---    REFERENCES seq_composition (id_seq_composition)
---    ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE mqc_outcome_ent
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_mqc_outcome_ent,
+  ADD INDEX mqc_outcome_ent_compos_ind (id_seq_composition),
+  ADD CONSTRAINT mqc_outcome_ent_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
 SHOW WARNINGS;
 SELECT @@warning_count;
 SHOW ERRORS;
