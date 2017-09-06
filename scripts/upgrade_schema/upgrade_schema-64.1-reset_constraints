@@ -125,7 +125,7 @@ CREATE VIEW npgqcp.v_alignment_filter_metrics AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
          comp.tag_index AS c_tag_index,
-         comp.subset    AS subset,
+         comp.subset    AS c_subset,
          comp.digest    AS component_digest,
          sc.digest      AS composition_digest,
          sc.size        AS composition_size,
