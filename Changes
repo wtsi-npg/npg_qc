@@ -1,4 +1,5 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
+ - upstream_tags modified so it can work with the rpt_list argument
 
  - constraints in autoqc db tables are reset to allow for saving
    results for multi-component compositions
