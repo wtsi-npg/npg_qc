@@ -13,8 +13,9 @@ use strict;
 use warnings;
 use Carp;
 use Getopt::Long;
+use Term::ANSIColor qw(:constants);
 
-our $VERSION = '59.8';
+our $VERSION = '0';
 
 ## no critic (NamingConventions::Capitalization)
 
@@ -107,6 +108,7 @@ sub showTags{
 
     my $ra_topTags = shift;
     my $sampleSize = shift;
+    my $revcomps = shift;
     my $clips = shift;
     my $groups = shift;
     my %tagsFound = @_;
@@ -120,7 +122,30 @@ sub showTags{
 
     my $tag_group_internal_id = ($groups ? [split(/[,]/, $groups)] : undef);
 
+    # read the tag table
+    my %db_tags = ();
     my $s = npg_warehouse::Schema->connect();
+    my $rs;
+    if (defined($tag_group_internal_id)) {
+        $rs = $s->resultset('Tag')->search({is_current=>1, tag_group_internal_id=>$tag_group_internal_id});
+    } else {
+        $rs = $s->resultset('Tag')->search({is_current=>1});
+    }
+    while(my $row = $rs->next) {
+      my $name = $row->tag_group_name;
+      my $id = $row->tag_group_internal_id;
+      my $map_id = $row->map_id;
+      my $sequence = $row->expected_sequence;
+      if (!defined $name || !defined $id || !defined $map_id || !defined $sequence) {
+        next;
+      }
+      push(@{$db_tags{$sequence}},[$name,$id,$map_id,0]);
+      if (@{$revcomps}) {
+        $sequence =~ tr/ACGTN/TGCAN/;
+        $sequence = reverse($sequence);
+        push(@{$db_tags{$sequence}},[$name,$id,$map_id,1]);
+      }
+    }
 
     my %matches = ();
     my @groups = ();
@@ -129,30 +154,31 @@ sub showTags{
         my @subtags = split(/[:]/, $tag);
         foreach my $i (0..$#subtags) {
             my $subtag = $subtags[$i];
-            my $expected_sequence = $subtag;
+            my @matches = ();
             if ($clips->[$i]) {
-                if ($clips->[$i] < 0 ) {
-                    $expected_sequence = {like => "%$subtag"};
+                if ($clips->[$i] < 0) {
+                    @matches = grep {m/$subtag$/} keys %db_tags;
                 } elsif ($clips->[$i]) {
-                    $expected_sequence = {like => "$subtag%"};
+                    @matches = grep {m/^$subtag/} keys %db_tags;
+                }
+            } else {
+                if (exists($db_tags{$subtag}) ) {
+                    push(@matches,$subtag);
                 }
             }
-            my $rs;
-            if (defined($tag_group_internal_id)) {
-                $rs = $s->resultset('Tag')->search({is_current=>1, expected_sequence=>$expected_sequence, tag_group_internal_id=>$tag_group_internal_id});
-            } else {
-                $rs = $s->resultset('Tag')->search({is_current=>1, expected_sequence=>$expected_sequence});
-            }
-            while(my $row = $rs->next) {
-              my $name = $row->tag_group_name;
-              my $id = $row->tag_group_internal_id;
-              my $map_id = $row->map_id;
-              if (!defined $name || !defined $id || !defined $map_id) {
-                next;
-              }
-              $groups[$i]->{$id}++;
-              $names{$id} = $name;
-              $matches{$subtag}->{$id} = $map_id;
+            foreach my $sequence (@matches) {
+                foreach my $match (@{$db_tags{$sequence}}) {
+                    my ($name,$id,$map_id,$revcomp) = @{$match};
+                    $groups[$i]->{$id}++;
+                    $names{$id} = $name;
+                    if ($revcomps->[$i] && $revcomp) {
+                        $matches{$subtag}->{$id} = [$map_id,1];
+                    } elsif ($revcomp) {
+                        continue;
+                    } else {
+                        $matches{$subtag}->{$id} = [$map_id,0];
+                    }
+                }
             }
         }
         $unassigned -= $tagsFound{$tag};
@@ -164,7 +190,10 @@ sub showTags{
             my $subtag = $subtags[$i];
             foreach my $id (sort {$a<=>$b} keys %{$groups[$i]}) {
                 if ( exists($matches{$subtag}->{$id}) ){
-                    printf "%2d(%3d) ", $id, $matches{$subtag}->{$id};
+                    my ($map_id, $revcomp) = @{$matches{$subtag}->{$id}};
+                    print $revcomp ? REVERSE : q[];
+                    printf "%2d(%3d) ", $id, $map_id;
+                    print $revcomp ? RESET : q[];
                 } else {
                     printf q[        ];
                 }
@@ -236,10 +265,6 @@ sub main{
                         $subtag = substr $tag, 0, $tagLengths[$i];
                         $tag = substr $tag, $tagLengths[$i];
                     }
-                    if ($revcomps[$i]) {
-                        $subtag =~ tr/ACGTN/TGCAN/;
-                        $subtag = reverse($subtag);
-                    }
                     push(@subtags, $subtag);
                 }
                 $tag = join(q{:},@subtags);
@@ -257,7 +282,7 @@ sub main{
     }
 
     my @modeTags = selectModeTags($relativeMaxDrop, $absoluteMaxDrop, $degeneratingToleration, %tagsFound);
-    showTags(\@modeTags, $sampleSize, \@clips, $groups, %tagsFound);
+    showTags(\@modeTags, $sampleSize, \@revcomps, \@clips, $groups, %tagsFound);
     return;
 }
 
