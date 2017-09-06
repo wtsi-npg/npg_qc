@@ -2,10 +2,11 @@ use strict;
 use warnings;
 use Test::More tests => 6;
 use Test::Exception;
-use Test::Deep;
 use Moose::Meta::Class;
 use JSON;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::SplitStats');
 
@@ -25,21 +26,21 @@ my $json = q {
 "num_aligned1":80087,"filename2":"/nfs/sf15/IL39/analysis/101006_IL39_05374/Data/Intensities/Bustard1.8.1a2_18-10-2010_RTA/GERALD_18-10-2010_RTA/archive/5374_2_2.fastq","info":{"Check":"npg_common::Fastq_Split","Aligner":"/software/solexa/bin/bwa","Aligner_version":"0.5.8 (r1442)","Check_version":"10270","Aligner_options":"-t 2"},"num_aligned2":54681,"num_not_aligned1":19738559,"id_run":"5374","ref_name":"human","num_not_aligned_merge":19708668}
 }; 
 
-my $values = from_json($json); 
+my $v = from_json($json);
+$v->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema, {id_run => 5374, position => 2});
 my $rs = $schema->resultset('SplitStats');
-isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::SplitStats');
+isa_ok($rs->new_result($v), 'npg_qc::Schema::Result::SplitStats');
 
 {
-  my %values1 = %{$values};
+  my %values1 = %{$v};
   my $v1 = \%values1;
-
-  $rs->deflate_unique_key_components($v1);
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'lane record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
   is(ref $row->alignment_depth2, 'HASH', 'alignment_depth2 returned as hash ref');
-  cmp_deeply($row->alignment_depth2, $values->{'alignment_depth2'},
+  is_deeply($row->alignment_depth2, $v->{'alignment_depth2'},
     'alignment_depth2 hash content is correct'); 
 }
 
