@@ -1,9 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
- - upstream_tags modified so it can work with the rpt_list argument
 
+release 64.1
+ - SeqQC viewer - function to draw readonly representation of the
+   utility flag
+ - autoqc checks parect object - refactore to use a new factory for
+   rpt list to composition transformation
+ - upstream_tags modified so it can work with the rpt_list argument
  - constraints in autoqc db tables are reset to allow for saving
    results for multi-component compositions
-
  - tag_sniff modified to load the whole tag table upfront
      revcomp matches now output in reverse video
 
