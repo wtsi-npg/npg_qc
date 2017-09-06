@@ -15,7 +15,7 @@ use Carp;
 use Getopt::Long;
 use Term::ANSIColor qw(:constants);
 
-our $VERSION = '64.0-dirty';
+our $VERSION = '0';
 
 ## no critic (NamingConventions::Capitalization)
 
