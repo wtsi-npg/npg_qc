@@ -73,7 +73,6 @@ SHOW WARNINGS;
 SELECT 'rna_seqc', @@warning_count, @@error_count;
 
 SELECT '==table adapter';
-
 ALTER TABLE adapter
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -87,7 +86,6 @@ ALTER TABLE adapter
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'adapter', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_adapter AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -107,11 +105,9 @@ CREATE VIEW npgqcp.v_adapter AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'adapter', @@warning_count, @@error_count;
-
 SELECT '==done table adapter';
 
 SELECT '==table alignment_filter_metrics';
-
 ALTER TABLE alignment_filter_metrics
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -125,7 +121,6 @@ ALTER TABLE alignment_filter_metrics
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'alignment_filter_metrics', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_alignment_filter_metrics AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -145,11 +140,9 @@ CREATE VIEW npgqcp.v_alignment_filter_metrics AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'alignment_filter_metrics', @@warning_count, @@error_count;
-
 SELECT '==done table alignment_filter_metrics';
 
 SELECT '==table bam_flagstats';
-
 ALTER TABLE bam_flagstats
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -165,7 +158,6 @@ ALTER TABLE bam_flagstats
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'bam_flagstats', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_bam_flagstats AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -185,11 +177,9 @@ CREATE VIEW npgqcp.v_bam_flagstats AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'bam_flagstats', @@warning_count, @@error_count;
-
 SELECT '==done table bam_flagstats';
 
 SELECT '==table contamination';
-
 ALTER TABLE contamination
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -202,7 +192,6 @@ ALTER TABLE contamination
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'contamination', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_contamination AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -222,11 +211,9 @@ CREATE VIEW npgqcp.v_contamination AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'contamination', @@warning_count, @@error_count;
-
 SELECT '==done table contamination';
 
 SELECT '==table gc_bias';
-
 ALTER TABLE gc_bias
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -240,7 +227,6 @@ ALTER TABLE gc_bias
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'gc_bias', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_gc_bias AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -260,11 +246,9 @@ CREATE VIEW npgqcp.v_gc_bias AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'gc_bias', @@warning_count, @@error_count;
-
 SELECT '==done table gc_bias';
 
 SELECT '==table gc_fraction';
-
 ALTER TABLE gc_fraction
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -278,7 +262,6 @@ ALTER TABLE gc_fraction
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'gc_fraction', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_gc_fraction AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -298,11 +281,9 @@ CREATE VIEW npgqcp.v_gc_fraction AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'gc_fraction', @@warning_count, @@error_count;
-
 SELECT '==done table gc_fraction';
 
 SELECT '==table genotype';
-
 ALTER TABLE genotype
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -336,11 +317,9 @@ CREATE VIEW npgqcp.v_genotype AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'genotype', @@warning_count, @@error_count;
-
 SELECT '==done table genotype';
 
 SELECT '==table insert_size';
-
 ALTER TABLE insert_size
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -354,7 +333,6 @@ ALTER TABLE insert_size
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'insert_size', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_insert_size AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -374,11 +352,9 @@ CREATE VIEW npgqcp.v_insert_size AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'insert_size', @@warning_count, @@error_count;
-
 SELECT '==done table insert_size';
 
 SELECT '==table pulldown_metrics';
-
 ALTER TABLE pulldown_metrics
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -392,7 +368,6 @@ ALTER TABLE pulldown_metrics
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'pulldown_metrics', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_pulldown_metrics AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -412,11 +387,9 @@ CREATE VIEW npgqcp.v_pulldown_metrics AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'pulldown_metrics', @@warning_count, @@error_count;
-
 SELECT '==done table pulldown_metrics';
 
 SELECT '==table qx_yield';
-
 ALTER TABLE qx_yield
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -430,7 +403,6 @@ ALTER TABLE qx_yield
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'qx_yield', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_qx_yield AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -450,11 +422,9 @@ CREATE VIEW npgqcp.v_qx_yield AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'qx_yield', @@warning_count, @@error_count;
-
 SELECT '==done table qx_yield';
 
 SELECT '==table ref_match';
-
 ALTER TABLE ref_match
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -468,7 +438,6 @@ ALTER TABLE ref_match
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'ref_match', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_ref_match AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -488,11 +457,9 @@ CREATE VIEW npgqcp.v_ref_match AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'ref_match', @@warning_count, @@error_count;
-
 SELECT '==done table ref_match';
 
 SELECT '==table sequence_error';
-
 ALTER TABLE sequence_error
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -507,7 +474,6 @@ ALTER TABLE sequence_error
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'sequence_error', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_sequence_error AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -527,11 +493,9 @@ CREATE VIEW npgqcp.v_sequence_error AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'sequence_error', @@warning_count, @@error_count;
-
 SELECT '==done table sequence_error';
 
 SELECT '==table spatial_filter';
-
 ALTER TABLE spatial_filter
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -544,7 +508,6 @@ ALTER TABLE spatial_filter
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'spatial_filter', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_spatial_filter AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -564,12 +527,9 @@ CREATE VIEW npgqcp.v_spatial_filter AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'spatial_filter', @@warning_count, @@error_count;
-
 SELECT '==done table spatial_filter';
 
-
 SELECT '==table split_stats';
-
 ALTER TABLE split_stats
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -584,7 +544,6 @@ ALTER TABLE split_stats
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'split_stats', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_split_stats AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -604,12 +563,9 @@ CREATE VIEW npgqcp.v_split_stats AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'split_stats', @@warning_count, @@error_count;
-
 SELECT '==done table split_stats';
 
-
 SELECT '==table tag_decode_stats';
-
 ALTER TABLE tag_decode_stats
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -623,7 +579,6 @@ ALTER TABLE tag_decode_stats
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'tag_decode_stats', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_tag_decode_stats AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -643,12 +598,9 @@ CREATE VIEW npgqcp.v_tag_decode_stats AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'tag_decode_stats', @@warning_count, @@error_count;
-
 SELECT '==done table tag_decode_stats';
 
-
 SELECT '==table tag_metrics';
-
 ALTER TABLE tag_metrics
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -662,7 +614,6 @@ ALTER TABLE tag_metrics
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'tag_metrics', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_tag_metrics AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -682,11 +633,9 @@ CREATE VIEW npgqcp.v_tag_metrics AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'tag_metrics', @@warning_count, @@error_count;
-
 SELECT '==done table tag_metrics';
 
 SELECT '==table tags_reporters';
-
 ALTER TABLE tags_reporters
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -700,7 +649,6 @@ ALTER TABLE tags_reporters
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'tags_reporters', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_tags_reporters AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -720,11 +668,9 @@ CREATE VIEW npgqcp.v_tags_reporters AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'tags_reporters', @@warning_count, @@error_count;
-
 SELECT '==done table tags_reporters';
 
 SELECT '==table upstream_tags';
-
 ALTER TABLE upstream_tags
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -738,7 +684,6 @@ ALTER TABLE upstream_tags
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'upstream_tags', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_upstream_tags AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -758,12 +703,9 @@ CREATE VIEW npgqcp.v_upstream_tags AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'upstream_tags', @@warning_count, @@error_count;
-
 SELECT '==done table upstream_tags';
 
-
 SELECT '==table verify_bam_id';
-
 ALTER TABLE verify_bam_id
   MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
@@ -777,7 +719,6 @@ ALTER TABLE verify_bam_id
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'verify_bam_id', @@warning_count, @@error_count;
-
 CREATE VIEW npgqcp.v_verify_bam_id AS
   SELECT comp.id_run    AS c_id_run,
          comp.position  AS c_position,
@@ -797,7 +738,6 @@ CREATE VIEW npgqcp.v_verify_bam_id AS
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'verify_bam_id', @@warning_count, @@error_count;
-
 SELECT '==done table verify_bam_id';
 
 SHOW FULL TABLES IN npgqcp WHERE TABLE_TYPE LIKE 'VIEW';
