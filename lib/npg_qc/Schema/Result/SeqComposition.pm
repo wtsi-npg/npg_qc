@@ -135,61 +135,61 @@ __PACKAGE__->add_unique_constraint('unq_seq_compos_ps', ['id_seq_composition', '
 
 =head1 RELATIONS
 
-=head2 adapters
+=head2 adapter
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::Adapter>
 
 =cut
 
-__PACKAGE__->has_many(
-  'adapters',
+__PACKAGE__->might_have(
+  'adapter',
   'npg_qc::Schema::Result::Adapter',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 alignment_filter_metrics
+=head2 alignment_filter_metric
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::AlignmentFilterMetrics>
 
 =cut
 
-__PACKAGE__->has_many(
-  'alignment_filter_metrics',
+__PACKAGE__->might_have(
+  'alignment_filter_metric',
   'npg_qc::Schema::Result::AlignmentFilterMetrics',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 bam_flagstats
+=head2 bam_flagstat
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::BamFlagstats>
 
 =cut
 
-__PACKAGE__->has_many(
-  'bam_flagstats',
+__PACKAGE__->might_have(
+  'bam_flagstat',
   'npg_qc::Schema::Result::BamFlagstats',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 contaminations
+=head2 contamination
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::Contamination>
 
 =cut
 
-__PACKAGE__->has_many(
-  'contaminations',
+__PACKAGE__->might_have(
+  'contamination',
   'npg_qc::Schema::Result::Contamination',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -197,29 +197,29 @@ __PACKAGE__->has_many(
 
 =head2 gc_bias
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::GcBias>
 
 =cut
 
-__PACKAGE__->has_many(
+__PACKAGE__->might_have(
   'gc_bias',
   'npg_qc::Schema::Result::GcBias',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 gc_fractions
+=head2 gc_fraction
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::GcFraction>
 
 =cut
 
-__PACKAGE__->has_many(
-  'gc_fractions',
+__PACKAGE__->might_have(
+  'gc_fraction',
   'npg_qc::Schema::Result::GcFraction',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -240,16 +240,16 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 insert_sizes
+=head2 insert_size
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::InsertSize>
 
 =cut
 
-__PACKAGE__->has_many(
-  'insert_sizes',
+__PACKAGE__->might_have(
+  'insert_size',
   'npg_qc::Schema::Result::InsertSize',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -315,46 +315,46 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 pulldown_metrics
+=head2 pulldown_metric
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::PulldownMetrics>
 
 =cut
 
-__PACKAGE__->has_many(
-  'pulldown_metrics',
+__PACKAGE__->might_have(
+  'pulldown_metric',
   'npg_qc::Schema::Result::PulldownMetrics',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 qx_yields
+=head2 qx_yield
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::QXYield>
 
 =cut
 
-__PACKAGE__->has_many(
-  'qx_yields',
+__PACKAGE__->might_have(
+  'qx_yield',
   'npg_qc::Schema::Result::QXYield',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 ref_matches
+=head2 ref_match
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::RefMatch>
 
 =cut
 
-__PACKAGE__->has_many(
-  'ref_matches',
+__PACKAGE__->might_have(
+  'ref_match',
   'npg_qc::Schema::Result::RefMatch',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -408,16 +408,16 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 sequence_errors
+=head2 sequence_error
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::SequenceError>
 
 =cut
 
-__PACKAGE__->has_many(
-  'sequence_errors',
+__PACKAGE__->might_have(
+  'sequence_error',
   'npg_qc::Schema::Result::SequenceError',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -438,114 +438,114 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 spatial_filters
+=head2 spatial_filter
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::SpatialFilter>
 
 =cut
 
-__PACKAGE__->has_many(
-  'spatial_filters',
+__PACKAGE__->might_have(
+  'spatial_filter',
   'npg_qc::Schema::Result::SpatialFilter',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 split_stats
+=head2 split_stat
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::SplitStats>
 
 =cut
 
-__PACKAGE__->has_many(
-  'split_stats',
+__PACKAGE__->might_have(
+  'split_stat',
   'npg_qc::Schema::Result::SplitStats',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 tag_decode_stats
+=head2 tag_decode_stat
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::TagDecodeStats>
 
 =cut
 
-__PACKAGE__->has_many(
-  'tag_decode_stats',
+__PACKAGE__->might_have(
+  'tag_decode_stat',
   'npg_qc::Schema::Result::TagDecodeStats',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 tag_metrics
+=head2 tag_metric
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::TagMetrics>
 
 =cut
 
-__PACKAGE__->has_many(
-  'tag_metrics',
+__PACKAGE__->might_have(
+  'tag_metric',
   'npg_qc::Schema::Result::TagMetrics',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 tags_reporters
+=head2 tags_reporter
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::TagsReporters>
 
 =cut
 
-__PACKAGE__->has_many(
-  'tags_reporters',
+__PACKAGE__->might_have(
+  'tags_reporter',
   'npg_qc::Schema::Result::TagsReporters',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 upstream_tags
+=head2 upstream_tag
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::UpstreamTags>
 
 =cut
 
-__PACKAGE__->has_many(
-  'upstream_tags',
+__PACKAGE__->might_have(
+  'upstream_tag',
   'npg_qc::Schema::Result::UpstreamTags',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 verify_bam_ids
+=head2 verify_bam_id
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::VerifyBamId>
 
 =cut
 
-__PACKAGE__->has_many(
-  'verify_bam_ids',
+__PACKAGE__->might_have(
+  'verify_bam_id',
   'npg_qc::Schema::Result::VerifyBamId',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-21 18:06:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9O3SlZxHM/mbGOvXHxlRAA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-06 17:33:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GgZ/NpEeHklthvr+twsCbA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

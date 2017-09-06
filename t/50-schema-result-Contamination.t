@@ -1,11 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 6;
 use Test::Exception;
-use Test::Deep;
 use Moose::Meta::Class;
 use JSON;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::Contamination');
 
@@ -25,23 +26,23 @@ my $schema = Moose::Meta::Class->create_anon_class(
 "contaminant_count":{"Streptococcus_equi":0,"Danio_rerio":0,"Escherichia_coli":0,"Mycobacterium_tuberculosis":0,"Human_herpesvirus_4":0,"Homo_sapiens":0,"Staphylococcus_aureus":0,"Clostridium_difficile":0,"Leishmania_major":0,"Plasmodium_falciparum":0,"Mus_musculus":0,"PhiX":0}}';
 
   my $values = from_json($json);
+  $values->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema, {id_run => 4056, position => 1});
   my $rs = $schema->resultset('Contamination');
   isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::Contamination');
-  $rs->deflate_unique_key_components($values);
-  is($values->{'tag_index'}, -1, 'tag index deflated correctly');
 
   my %original_values = %{$values};
 
-  lives_ok {$rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert()} 'lane record inserted';
+  lives_ok {$rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert()}
+    'lane record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);  
   my $row = $rs1->next;
-  is($row->tag_index, undef, 'tag index inflated correctly');
   is(ref $row->contaminant_count, 'HASH', 'contaminant_count column value returned as a hash');
- 
-  cmp_deeply($row->contaminant_count, $original_values{'contaminant_count'},
+  is_deeply($row->contaminant_count, $original_values{'contaminant_count'},
     'contaminant_count ref hash content is correct');
 }
+
 1;
 
 

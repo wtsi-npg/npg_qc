@@ -21,7 +21,7 @@
  *                              postRendering);
  *
  */
-/* globals $: false, define: false */
+/* globals $: false, define: false, Element: false */
 'use strict';
 define([
   'jquery',
@@ -34,6 +34,40 @@ define([
 ) {
   var ID_PREFIX = 'rpt_key:';
 
+  /*
+   *This function assigns a string defined icon (ie:&#10003) in the .lane column to signal
+   *the outcome of the usability flag from a certain tag. If a previous icon exists, it
+   *removes it before adding the new one.
+   *
+   *It requires a DOM object (obj) and a boolean flag (usability) displaying wether
+   *the usability of the tag lane is switched on (✓) or off (✘).
+   *
+   *
+   * Example:
+   *
+   *  $('.lane').each(function (i, obj) {
+   *    mqc_outcomes.usabilityDisplaySwitch(obj,1);
+   *  });
+   *
+   */
+  var usabilityDisplaySwitch = function (obj, usability) {
+    if (!(obj instanceof Element)) {
+      throw new TypeError('Parameter obj must be defined and of type (DOM) Element');
+    }
+    if (typeof usability !== 'boolean') {
+      throw new TypeError('Usability should be boolean');
+    }
+    var o = $(obj);
+    var icon;
+    o.children().remove('.utility_PASS, .utility_FAIL');//in case an icon exists
+    if(usability){
+      icon = $('<div class="utility_PASS">&#10003;</div>');//&#10003=check ✓
+    } else {
+      icon = $('<div class="utility_FAIL">&#10008;</div>');//&#10008=cross ✘
+    }
+    o.append(icon);
+  };
+
   var _processOutcomes = function (outcomes, elementClass) {
     var rpt_keys = Object.keys(outcomes);
 
@@ -44,7 +78,6 @@ define([
       if(elementClass === 'lane') {
         rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + rpt_key + '"]';
       } else if (elementClass === 'tag_info') {
-
         //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
         rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
       } else {
@@ -115,6 +148,7 @@ define([
     _fetchQCOutcomesUpdateView: _fetchQCOutcomesUpdateView,
     _updateDisplayWithQCOutcomes: _updateDisplayWithQCOutcomes,
     _parseRptKeys: _parseRptKeys,
-    fetchAndProcessQC: fetchAndProcessQC,
+    usabilityDisplaySwitch: usabilityDisplaySwitch,
+    fetchAndProcessQC: fetchAndProcessQC
   };
 });

@@ -5,6 +5,17 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      search proceeds via releated composition tables
      when mqc outcomes are saved, a composition is created if does not exist
 
+release 64.1
+ - SeqQC viewer - function to draw readonly representation of the
+   utility flag
+ - autoqc checks parect object - refactore to use a new factory for
+   rpt list to composition transformation
+ - upstream_tags modified so it can work with the rpt_list argument
+ - constraints in autoqc db tables are reset to allow for saving
+   results for multi-component compositions
+ - tag_sniff modified to load the whole tag table upfront
+     revcomp matches now output in reverse video
+
 release 64.0
  - composition-enabled autoqc objects storage
      schema changes

@@ -58,6 +58,8 @@ make_schema_at(
         preserve_case       => 1,
         use_namespaces      => 1,
         default_resultset_class => 'ResultSet',
+        
+        exclude => qr/^v_/,
 
         rel_name_map        => sub { # Rename the id relationship so we can access
                                      # flat versions of the objects and not only

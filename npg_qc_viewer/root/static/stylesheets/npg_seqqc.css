@@ -506,6 +506,16 @@ input[type=radio]:checked + label {
   color: #000;
 }
 
+/******************* usability flag widgets **************/
+.utility_PASS {
+  font-size: 200%;
+  color: #A2DEFF;/*solid blue*/
+}
+.utility_FAIL {
+  font-size: 200%;
+  color: #FF8885;/*solid red*/
+}
+
 /******************* pages that do not display results **************/
 .text_section {
   margin: 0 20px 30px 20px;

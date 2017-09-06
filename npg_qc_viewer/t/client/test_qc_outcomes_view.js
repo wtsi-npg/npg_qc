@@ -8,8 +8,12 @@ requirejs.config({
   }
 });
 
-requirejs(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_styles'],
-  function(mqc_outcomes, qc_css_styles) {
+requirejs([
+  'scripts/qcoutcomes/qc_outcomes_view',
+  'scripts/qcoutcomes/qc_css_styles'
+], function(mqc_outcomes, qc_css_styles) {
+
+
     QUnit.test('Parsing RPT keys', function (assert) {
       var rptKeys = mqc_outcomes._parseRptKeys('results_summary');
       var expected = ['18245:1', '18245:1:1', '18245:1:2','19001:1', '19001:1:1', '19001:1:2'];
@@ -28,6 +32,17 @@ requirejs(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_sty
       });
       assert.equal(rows, 3, 'Correct number of rows');
       assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
+
+      rows = 0; lanesWithClass = 0;
+      $('tr[id*="rpt_key:19001:1"] td.lane').each(function (i, obj) {
+        rows++;
+        var $obj = $(obj);
+        if ($obj.hasClass('qc_outcome_accepted_final')) {
+          lanesWithClass++;
+        }
+      });
+      assert.equal(rows, 3, 'Correct number of lanes');
+      assert.equal(lanesWithClass, 0, 'Correct initial number of 190001 lanes with class different run');
 
       rows = 0; lanesWithClass = 0;
       mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
@@ -279,8 +294,76 @@ requirejs(['scripts/qcoutcomes/qc_outcomes_view', 'scripts/qcoutcomes/qc_css_sty
       try {
         qc_css_styles.displayElementAs(element, 'Accepted maybe');
       } catch(er) {
-        assert.ok(element.hasClass('qc_outcome_rejected_final'), 'Does not remove old class unless new class is valid.' );
+        assert.ok(element.hasClass('qc_outcome_rejected_final'),
+          'Does not remove old class unless new class is valid.');
       }
+    });
+
+    QUnit.test("Parameter validation tests for usabilityDisplaySwitch", function (assert) {
+      assert.throws(
+        function() {
+          mqc_outcomes.usabilityDisplaySwitch();
+        },
+        /Parameter obj must be defined and of type \(DOM\) Element/i,
+        'Throws with no params'
+      );
+      assert.throws(
+        function() {
+          mqc_outcomes.usabilityDisplaySwitch(1);
+        },
+        /Parameter obj must be defined and of type \(DOM\) Element/i,
+        'Throws with one (non DOM) param'
+      );
+      var some_element = $('td.lane')[0];
+      assert.throws(
+        function() {
+          mqc_outcomes.usabilityDisplaySwitch(some_element);
+        },
+        /usability should be boolean/i,
+        'Throws with one param'
+      );
+      assert.throws(
+        function() {
+          mqc_outcomes.usabilityDisplaySwitch(some_element, 'string');
+        },
+        /usability should be boolean/i,
+        'Throws with one string instead of boolean'
+      );
+    });
+
+    QUnit.test("Test for FAIL/PASS usability icon in LaneNo column", function (assert) {
+      var laneCellsNumb = $('td.lane').length;
+      assert.equal(laneCellsNumb, 9, 'Correct number of .lane cells');
+      var total_icons_fails = $("td.lane > div.utility_FAIL").length;
+      var total_icons_pass = $("td.lane > div.utility_PASS").length;
+      assert.equal(total_icons_fails, 0, 'No initial .lane cells with FAIL icons');
+      assert.equal(total_icons_pass, 0, 'No initial .lane cells with PASS icons');
+      $('td.lane').each(function (i, obj) {
+        mqc_outcomes.usabilityDisplaySwitch(obj, false);
+      });
+      $('td.lane.nbsp > div').each(function(i, obj){
+        if($(obj).attr('class') === "utility_FAIL"){
+          total_icons_fails++;
+        }
+      });
+      assert.equal(total_icons_fails, laneCellsNumb,
+        '1 FAIL icon per .lane cell added with usabilityDisplaySwitch()');
+      total_icons_pass = $("td.lane > div.utility_PASS").length;
+      assert.equal(total_icons_pass, 0,
+        'No .lane cells with PASS after all cells were switched to FAIL');
+      $('td.lane').each(function (i, obj) {
+        mqc_outcomes.usabilityDisplaySwitch(obj, true);
+      });
+      $('td.lane.nbsp > div').each(function(i, obj){
+        if($(obj).attr('class') === "utility_PASS"){
+          total_icons_pass++;
+        }
+      });
+      assert.equal(total_icons_pass, laneCellsNumb,
+        '1 PASS icon per .lane cell changed with usabilityDisplaySwitch()');
+      total_icons_fails = $("td.lane > div.utility_FAIL").length;
+      assert.equal(total_icons_fails, 0,
+        'No .lane cells with FAIL after all cells were switched to PASS');
     });
 
     // run the tests.
