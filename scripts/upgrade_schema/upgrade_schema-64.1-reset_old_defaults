@@ -18,6 +18,7 @@ SELECT 'alignment_filter_metrics', @@warning_count, @@error_count;
 SELECT '==table bam_flagstats';
 UPDATE bam_flagstats SET tag_index = NULL WHERE tag_index = -1;
 UPDATE bam_flagstats SET subset = NULL WHERE subset = 'all';
+UPDATE bam_flagstats SET subset = NULL WHERE subset = 'target'; 
 UPDATE bam_flagstats SET human_split = NULL WHERE human_split = 'target';
 SHOW ERRORS;
 SHOW WARNINGS;
