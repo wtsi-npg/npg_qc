@@ -9,6 +9,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
       npg_qc::Schema::Composition role;
      document 'composition' attribute
 
+ - creating new SQL tables to handle usability feature
+
 release 64.1
  - SeqQC viewer - function to draw readonly representation of the
    utility flag
