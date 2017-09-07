@@ -1,51 +1,51 @@
-DROP TABLE IF EXISTS `usability_outcome_hist`;
-DROP TABLE IF EXISTS `usability_outcome_ent`;
-DROP TABLE IF EXISTS `usability_outcome_dict`;
-CREATE TABLE `usability_outcome_dict` (
-  `id_usability_outcome` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `uqc_outcome_hist`;
+DROP TABLE IF EXISTS `uqc_outcome_ent`;
+DROP TABLE IF EXISTS `uqc_outcome_dict`;
+CREATE TABLE `uqc_outcome_dict` (
+  `id_uqc_outcome` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `short_desc` varchar(50) NOT NULL,
   `long_desc` varchar(150) DEFAULT NULL,
   `iscurrent` tinyint(1) DEFAULT NULL COMMENT 'Catalog value still in use.',
   `isvisible` tinyint(1) DEFAULT NULL COMMENT 'Is it visible in UI',
-  PRIMARY KEY (`id_usability_outcome`),
-  UNIQUE KEY `unique_usability_outcome_desc` (`short_desc`)
+  PRIMARY KEY (`id_uqc_outcome`),
+  UNIQUE KEY `unique_uqc_outcome_desc` (`short_desc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Dictionary table for usability states';
 
-CREATE TABLE `usability_outcome_ent` (
-  `id_usability_outcome_ent` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `uqc_outcome_ent` (
+  `id_uqc_outcome_ent` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `id_seq_composition` bigint(20) unsigned NOT NULL,
-  `id_usability_outcome` smallint(5) unsigned NOT NULL COMMENT
+  `id_uqc_outcome` smallint(5) unsigned NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
   `username` char(128) DEFAULT NULL COMMENT 'Web interface username',
   `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_by` char(128) DEFAULT NULL COMMENT 'Last user to modify the row',
   `reported` timestamp NULL DEFAULT NULL COMMENT 'When was reported to LIMS',
-  `rationale` varchar(150) DEFAULT NULL COMMENT 'Explanation of usability choice',
-  PRIMARY KEY (`id_usability_outcome_ent`),
+  `rationale` varchar(150) DEFAULT NULL COMMENT 'Explanation of usability qc choice',
+  PRIMARY KEY (`id_uqc_outcome_ent`),
   UNIQUE KEY `id_seq_composition_UNIQUE` (`id_seq_composition`),
-  KEY `fk_usability_outcome_ent_usability_outcome_dict1` (`id_usability_outcome`),
-  KEY `fk_usability_outcome_ent_seq_composition` (`id_seq_composition`),
-  CONSTRAINT `fk_usability_outcome_ent_usability_outcome_dict1` FOREIGN KEY (`id_usability_outcome`) REFERENCES usability_outcome_dict (`id_usability_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_usability_outcome_ent_seq_composition` FOREIGN KEY (`id_seq_composition`) REFERENCES seq_composition (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Entity table for usability';
+  KEY `fk_uqc_outcome_ent_uqc_outcome_dict1` (`id_uqc_outcome`),
+  KEY `fk_uqc_outcome_ent_seq_composition` (`id_seq_composition`),
+  CONSTRAINT `fk_uqc_outcome_ent_uqc_outcome_dict1` FOREIGN KEY (`id_uqc_outcome`) REFERENCES uqc_outcome_dict (`id_uqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_uqc_outcome_ent_seq_composition` FOREIGN KEY (`id_seq_composition`) REFERENCES seq_composition (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Entity table for usability qc';
 
-CREATE TABLE `usability_outcome_hist` (
-  `id_usability_outcome_hist` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `uqc_outcome_hist` (
+  `id_uqc_outcome_hist` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
-  `id_usability_outcome` smallint(5) unsigned NOT NULL,
+  `id_uqc_outcome` smallint(5) unsigned NOT NULL,
   `username` char(128) DEFAULT NULL COMMENT 'Web interface username',
   `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_by` char(128) DEFAULT NULL COMMENT 'Last user to modify the row',
-  PRIMARY KEY (`id_usability_outcome_hist`),
-  KEY `fk_usability_outcome_hist_usability_outcome_dict1` (`id_usability_outcome`),
-  KEY `fk_usability_outcome_hist_seq_composition` (`id_seq_composition`),  
-  CONSTRAINT `fk_usability_outcome_hist_usability_outcome_dict1` FOREIGN KEY (`id_usability_outcome`) REFERENCES usability_outcome_dict (`id_usability_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_usability_outcome_hist_seq_composition` FOREIGN KEY (`id_seq_composition`) REFERENCES seq_composition (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Historic table for usability';
+  PRIMARY KEY (`id_uqc_outcome_hist`),
+  KEY `fk_uqc_outcome_hist_uqc_outcome_dict1` (`id_uqc_outcome`),
+  KEY `fk_uqc_outcome_hist_seq_composition` (`id_seq_composition`),  
+  CONSTRAINT `fk_uqc_outcome_hist_uqc_outcome_dict1` FOREIGN KEY (`id_uqc_outcome`) REFERENCES uqc_outcome_dict (`id_uqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_uqc_outcome_hist_seq_composition` FOREIGN KEY (`id_seq_composition`) REFERENCES seq_composition (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Historic table for usability qc';
 
-INSERT INTO `usability_outcome_dict` ( `short_desc`, `long_desc`, `iscurrent`, `isvisible`)
-VALUES ('usability_PASS','The data usability is accepted',1,1), ('usability_FAIL', 'The data usability is rejected', 1,1), ('usability_UNDECIDED', 'The data usability is undecided', 1,1);
+INSERT INTO `uqc_outcome_dict` ( `short_desc`, `long_desc`, `iscurrent`, `isvisible`)
+VALUES ('uqc_PASS','The data usability is accepted',1,1), ('uqc_FAIL', 'The data usability is rejected', 1,1), ('uqc_UNDECIDED', 'The data usability is undecided', 1,1);
 
 SHOW WARNINGS;
 SELECT @@warning_count;
