@@ -1,41 +1,35 @@
 --
 -- Tables structures required by utility feature (uqc)
 --
-DROP TABLE IF EXISTS `uqc_outcome_hist`;
-DROP TABLE IF EXISTS `uqc_outcome_ent`;
-DROP TABLE IF EXISTS `uqc_outcome_dict`;
---
 -- Table structure for table `uqc_outcome_dict`
 --
 CREATE TABLE `uqc_outcome_dict` (
   `id_uqc_outcome` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `short_desc` varchar(50) NOT NULL,
   `long_desc` varchar(150) DEFAULT NULL,
-  `iscurrent` tinyint(1) DEFAULT NULL COMMENT 'Catalog value still in use.',
-  `isvisible` tinyint(1) DEFAULT NULL COMMENT 'Is it visible in UI',
+  `iscurrent` tinyint(1) unsigned DEFAULT NULL COMMENT 'Catalog value still in use.',
+  `isvisible` tinyint(1) unsigned DEFAULT NULL COMMENT 'Is it visible in UI',
   PRIMARY KEY (`id_uqc_outcome`),
   UNIQUE KEY `unique_uqc_outcome_desc` (`short_desc`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Dictionary table for utility states';
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Dictionary table for utility qc outcomes';
 --
 -- Table structure for table `uqc_outcome_ent`
 --
 CREATE TABLE `uqc_outcome_ent` (
   `id_uqc_outcome_ent` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `id_seq_composition` bigint(20) unsigned NOT NULL,
-  `id_uqc_outcome` smallint(5) unsigned NOT NULL COMMENT
+  `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
-  `username` char(128) DEFAULT NULL COMMENT 'Web interface username',
-  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified_by` char(128) DEFAULT NULL COMMENT 'Last user to modify the row',
+  `id_uqc_outcome` smallint(5) unsigned NOT NULL,
+  `username` char(128) NOT NULL COMMENT 'Web interface username',
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `modified_by` char(128) NOT NULL COMMENT 'Last user to modify the row',
   `last_reported` timestamp NULL DEFAULT NULL COMMENT 'When was reported the last time to LIMS',
-  `rationale` varchar(150) DEFAULT NULL COMMENT 'Explanation of utility qc choice',
+  `requestor` char(128) NOT NULL COMMENT 'Member of staff who requested the change or document ID (RT ticket number) where the change request is logged',
   PRIMARY KEY (`id_uqc_outcome_ent`),
-  UNIQUE KEY `id_seq_composition_UNIQUE` (`id_seq_composition`),
-  KEY `fk_uqc_outcome_ent_uqc_outcome_dict1` (`id_uqc_outcome`),
-  KEY `fk_uqc_outcome_ent_seq_composition` (`id_seq_composition`),
+  UNIQUE KEY `id_seq_composition_unique` (`id_seq_composition`),
   CONSTRAINT `fk_uqc_outcome_ent_uqc_outcome_dict1` FOREIGN KEY (`id_uqc_outcome`) REFERENCES uqc_outcome_dict (`id_uqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_uqc_outcome_ent_seq_composition` FOREIGN KEY (`id_seq_composition`) REFERENCES seq_composition (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Entity table for utility qc';
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Entity table for utility qc outcomes';
 --
 -- Table structure for table `uqc_outcome_hist`
 --
@@ -44,21 +38,20 @@ CREATE TABLE `uqc_outcome_hist` (
   `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT
     'A foreign key referencing the id_seq_composition column of the seq_composition table',
   `id_uqc_outcome` smallint(5) unsigned NOT NULL,
-  `username` char(128) DEFAULT NULL COMMENT 'Web interface username',
-  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified_by` char(128) DEFAULT NULL COMMENT 'Last user to modify the row',
-  PRIMARY KEY (`id_uqc_outcome_hist`),
-  KEY `fk_uqc_outcome_hist_uqc_outcome_dict1` (`id_uqc_outcome`),
-  KEY `fk_uqc_outcome_hist_seq_composition` (`id_seq_composition`),  
+  `username` char(128) NOT NULL COMMENT 'Web interface username',
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `modified_by` char(128) NOT NULL COMMENT 'Last user to modify the row',
+  PRIMARY KEY (`id_uqc_outcome_hist`), 
+  UNIQUE KEY `id_seq_composition_unique` (`id_seq_composition`),
   CONSTRAINT `fk_uqc_outcome_hist_uqc_outcome_dict1` FOREIGN KEY (`id_uqc_outcome`) REFERENCES uqc_outcome_dict (`id_uqc_outcome`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_uqc_outcome_hist_seq_composition` FOREIGN KEY (`id_seq_composition`) REFERENCES seq_composition (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Historic table for utility qc';
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Historic table for utility qc outcomes';
 --
 -- Loading `uqc_outcome_dict` dictionary
 --
-INSERT INTO `uqc_outcome_dict` ( `id_uqc_outcome`,`short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES (1,'Accepted', 'The data utility is accepted',1,1) ON DUPLICATE KEY UPDATE;
-INSERT INTO `uqc_outcome_dict` ( `id_uqc_outcome`,`short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES (2,'Rejected', 'The data utility is rejected', 1,1) ON DUPLICATE KEY UPDATE;
-INSERT INTO `uqc_outcome_dict` ( `id_uqc_outcome`,`short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES (3,'Undecided', 'The data utility is undecided', 1,1) ON DUPLICATE KEY UPDATE;
+INSERT INTO `uqc_outcome_dict` ( `short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES ('Accepted', 'End user would like to utilise the product',1,1);
+INSERT INTO `uqc_outcome_dict` ( `short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES ('Rejected', 'End user will not utilise the product', 1,1);
+INSERT INTO `uqc_outcome_dict` ( `short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES ('Undecided', 'No decision, follow mqc outcome when determining utility', 1,1);
 --
 -- Create views for ease of querying
 --
@@ -71,16 +64,16 @@ CREATE VIEW v_uqc_outcome AS
         comp.digest AS component_digest,
         sc.digest AS composition_digest,
         sc.size AS composition_size,
-        a.*,
-        b.*
+        dic.short_desc,
+        ent.*
     FROM
-        uqc_outcome_ent a,
-        uqc_outcome_dict b,
+        uqc_outcome_ent ent,
+        uqc_outcome_dict dic,
         seq_composition sc,
         seq_component_composition scc,
         seq_component comp
     WHERE
-        a.id_seq_composition = sc.id_seq_composition
-            AND a.id_uqc_outcome = b.id_uqc_outcome
+                ent.id_seq_composition = sc.id_seq_composition
             AND sc.id_seq_composition = scc.id_seq_composition
-            AND comp.id_seq_component = scc.id_seq_component;
+            AND comp.id_seq_component = scc.id_seq_component
+            AND ent.id_uqc_outcome = dic.id_uqc_outcome;
