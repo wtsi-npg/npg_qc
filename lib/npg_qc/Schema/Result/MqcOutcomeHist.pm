@@ -206,6 +206,9 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-21 18:06:15
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GWEZLrCYKfBHKEHFTbkViQ
 
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+
 our $VERSION = '0';
 
 __PACKAGE__->meta->make_immutable;
@@ -224,6 +227,11 @@ Catalog for manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 create_composition
+
+Returns a npg_tracking::glossary::composition object corresponding to
+this result.
 
 =head1 DEPENDENCIES
 
@@ -246,6 +254,10 @@ Catalog for manual MQC statuses.
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
+
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
 
 =back
 
