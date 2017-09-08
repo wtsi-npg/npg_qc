@@ -59,3 +59,28 @@ CREATE TABLE `uqc_outcome_hist` (
 INSERT INTO `uqc_outcome_dict` ( `id_uqc_outcome`,`short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES (1,'Accepted', 'The data utility is accepted',1,1) ON DUPLICATE KEY UPDATE;
 INSERT INTO `uqc_outcome_dict` ( `id_uqc_outcome`,`short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES (2,'Rejected', 'The data utility is rejected', 1,1) ON DUPLICATE KEY UPDATE;
 INSERT INTO `uqc_outcome_dict` ( `id_uqc_outcome`,`short_desc`, `long_desc`, `iscurrent`, `isvisible`) VALUES (3,'Undecided', 'The data utility is undecided', 1,1) ON DUPLICATE KEY UPDATE;
+--
+-- Create views for ease of querying
+--
+CREATE VIEW v_uqc_outcome AS
+    SELECT 
+        comp.id_run AS c_id_run,
+        comp.position AS c_position,
+        comp.tag_index AS c_tag_index,
+        comp.subset AS c_subset,
+        comp.digest AS component_digest,
+        sc.digest AS composition_digest,
+        sc.size AS composition_size,
+        a.*,
+        b.*
+    FROM
+        uqc_outcome_ent a,
+        uqc_outcome_dict b,
+        seq_composition sc,
+        seq_component_composition scc,
+        seq_component comp
+    WHERE
+        a.id_seq_composition = sc.id_seq_composition
+            AND a.id_uqc_outcome = b.id_uqc_outcome
+            AND sc.id_seq_composition = scc.id_seq_composition
+            AND comp.id_seq_component = scc.id_seq_component;
