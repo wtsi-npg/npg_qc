@@ -528,6 +528,36 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 uqc_outcome_ent
+
+Type: might_have
+
+Related object: L<npg_qc::Schema::Result::UqcOutcomeEnt>
+
+=cut
+
+__PACKAGE__->might_have(
+  'uqc_outcome_ent',
+  'npg_qc::Schema::Result::UqcOutcomeEnt',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 uqc_outcome_hist
+
+Type: might_have
+
+Related object: L<npg_qc::Schema::Result::UqcOutcomeHist>
+
+=cut
+
+__PACKAGE__->might_have(
+  'uqc_outcome_hist',
+  'npg_qc::Schema::Result::UqcOutcomeHist',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 verify_bam_id
 
 Type: might_have
