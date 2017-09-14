@@ -17,22 +17,17 @@ sub search_autoqc {
   my ($self, $query, $size) = @_;
 
   my $how = {};
-  # Copy the query so that we do not change the input data,
-  # thus allowing the caller to reuse the variable representing
-  # the query.
   my $values = {};
-  foreach my $key (keys %{$query}) {
-    $values->{$key} = $query->{$key};
-  }
-  my $seq_component_rsource = $self->result_source()->schema()->source('SeqComponent');
-  foreach my $col_name  (keys %{$values}) {
+  my %comp_columns = map { $_ => 1 }
+                     $self->result_source()->schema()->source('SeqComponent')
+                          ->columns();
+  foreach my $col_name (keys %{$query}) {
     # Query by id_run, position and other attributes of the component
     # should be performed against the seq_component table.
-    my $new_key = join q[.],
-      $seq_component_rsource->has_column($col_name) ? 'seq_component':'me',
-      $col_name;
-    $values->{$new_key} = $values->{$col_name};
-    delete $values->{$col_name};
+    my $aliased = join q[.],
+                  $comp_columns{$col_name} ? 'seq_component':'me',
+                  $col_name;
+    $values->{$aliased} = $query->{$col_name};
   }
   if ($size) {
     $values->{'seq_component_compositions.size'} = $size;
