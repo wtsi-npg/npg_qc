@@ -1,4 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
+ 
+ - DBIx achema loader script: automatically add npg_qc::Schema::Composition
+     role when generating result classes for autoqc tables
+ - DBIx classes for autoqc db tables:
+     remove 'create_component' factory method which was only needed
+      for back-filling composition foreign key;
+     inherit 'composition' attribute from a newly created
+      npg_qc::Schema::Composition role;
+     document 'composition' attribute
 
 release 64.1
  - SeqQC viewer - function to draw readonly representation of the

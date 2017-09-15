@@ -272,6 +272,8 @@ __PACKAGE__->belongs_to(
 
 =over 4
 
+=item * L<npg_qc::Schema::Composition>
+
 =item * L<npg_qc::Schema::Flators>
 
 =item * L<npg_qc::autoqc::role::result>
@@ -281,19 +283,17 @@ __PACKAGE__->belongs_to(
 =cut
 
 
-with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
+with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-26 15:08:54
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:r4ry1eMCad+EnAC0dfmYQQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iF60MVXsQlJSZaqqLbjz0w
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
 our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( other_metrics info ));
-
-__PACKAGE__->create_composition_attribute();
 
 __PACKAGE__->has_many(
   'seq_component_compositions',

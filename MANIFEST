@@ -103,6 +103,7 @@ lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/mqc/outcomes/keys.pm
 lib/npg_qc/Schema.pm
+lib/npg_qc/Schema/Composition.pm
 lib/npg_qc/Schema/Flators.pm
 lib/npg_qc/Schema/Mqc/OutcomeEntity.pm
 lib/npg_qc/Schema/Mqc/OutcomeDict.pm
