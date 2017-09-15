@@ -64,7 +64,7 @@ __PACKAGE__->table('mqc_library_outcome_ent');
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
-  is_nullable: 1
+  is_nullable: 0
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
@@ -72,21 +72,18 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 0
-
-Lane
+  is_nullable: 1
 
 =head2 tag_index
 
   data_type: 'bigint'
-  default_value: -1
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 id_mqc_outcome
 
@@ -141,14 +138,14 @@ __PACKAGE__->add_columns(
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_foreign_key => 1,
-    is_nullable => 1,
+    is_nullable => 0,
   },
   'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
   'tag_index',
-  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
+  { data_type => 'bigint', is_nullable => 1 },
   'id_mqc_outcome',
   {
     data_type => 'smallint',
@@ -189,21 +186,20 @@ __PACKAGE__->set_primary_key('id_mqc_library_outcome_ent');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<id_run_UNIQUE>
+=head2 C<mqc_library_outcome_ent_compos_ind_unique>
 
 =over 4
 
-=item * L</id_run>
-
-=item * L</position>
-
-=item * L</tag_index>
+=item * L</id_seq_composition>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position', 'tag_index']);
+__PACKAGE__->add_unique_constraint(
+  'mqc_library_outcome_ent_compos_ind_unique',
+  ['id_seq_composition'],
+);
 
 =head1 RELATIONS
 
@@ -234,22 +230,14 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  {
-    is_deferrable => 1,
-    join_type     => 'LEFT',
-    on_delete     => 'NO ACTION',
-    on_update     => 'NO ACTION',
-  },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-21 18:06:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:PC0b9zOtHMv3PVZhEW2FWg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-15 14:33:11
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ToJTCdCmZugE5pmrRj0z1A
 
-use Carp;
-
-with qw/npg_qc::Schema::Flators
-        npg_qc::Schema::Mqc::OutcomeEntity/;
+with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
 
 our $VERSION = '0';
 
@@ -260,8 +248,6 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-__PACKAGE__->set_inflator4scalar('tag_index');
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -271,7 +257,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Entity for library MQC outcome.
+  Entity for library MQC outcome.
 
 =head1 DIAGNOSTICS
 
@@ -279,13 +265,17 @@ Entity for library MQC outcome.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 composition
+
+  Attribute of type npg_tracking::glossary::composition.
+
 =head2 seq_component_compositions
 
-Type: has_many
+  Type: has_many
 
-Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+  Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
 
-To simplify queries, skip SeqComposition and link directly to the linking table.
+  To simplify queries, skip SeqComposition and link directly to the linking table.
 
 =head2 update
 
@@ -314,8 +304,6 @@ To simplify queries, skip SeqComposition and link directly to the linking table.
 =item MooseX::MarkAsMethods
 
 =item DBIx::Class::Core
-
-=item Carp
 
 =back
 
