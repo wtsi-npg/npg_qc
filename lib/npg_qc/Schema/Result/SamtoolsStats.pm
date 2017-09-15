@@ -219,8 +219,7 @@ __PACKAGE__->set_inflator4xz_compressed_scalar(qw(stats));
 
 =head2 composition
 
-An lazy-build attribute representing a composition this result
-corresponds to. 
+Attribute of type npg_tracking::glossary::composition.
 
 =cut
 
