@@ -16,6 +16,16 @@ sub _build_composition {
   return $self->seq_composition()->create_composition();
 }
 
+sub composition_digest {
+  my $self = shift;
+  return $self->seq_composition()->digest;
+}
+
+sub num_components {
+  my $self = shift;
+  return $self->seq_composition()->size;
+}
+
 1;
 
 __END__
@@ -28,7 +38,9 @@ npg_qc::Schema::Composition
 
 =head1 DESCRIPTION
 
-Moose role providing a composition attribute for a row object.
+Moose role providing a composition attribute of type
+npg_tracking::glossary::composition for a row object and
+a number of composition-related methods.
 
 =head1 SUBROUTINES/METHODS
 
@@ -37,6 +49,10 @@ Moose role providing a composition attribute for a row object.
  Read-only lazy-build attribute, cannot be set in the constructor.
  Object of type npg_tracking::glossary::composition which is
  created by inspecting a linked seq_composition record.
+
+=head2 composition_digest
+
+=head2 num_components
 
 =head1 DIAGNOSTICS
 

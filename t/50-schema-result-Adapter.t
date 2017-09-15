@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 21;
 use Test::Exception;
 use Test::Deep;
 use Moose::Meta::Class;
@@ -53,6 +53,13 @@ $values->{'id_seq_composition'} =
   is(ref $row->forward_start_counts, 'HASH', 'forward_start_counts column value returned as a hash');
   cmp_deeply($row->forward_start_counts, $values->{'forward_start_counts'},
     'contaminant_count ref hash content is correct');
+  my $composition = $row->composition();
+  isa_ok($composition, 'npg_tracking::glossary::composition');
+  my $seq_composition = $row->seq_composition();
+  isa_ok($seq_composition, 'npg_qc::Schema::Result::SeqComposition');
+  is ($row->num_components, 1, 'num components');
+  is ($seq_composition->size, 1, 'num components');
+  is ($row->composition_digest, $seq_composition->digest, 'digest is correct');
 
   %values1 = %{$values};
   $v1 = \%values1;
