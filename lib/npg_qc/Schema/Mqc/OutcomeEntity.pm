@@ -8,7 +8,8 @@ use Readonly;
 
 our $VERSION = '0';
 
-requires 'mqc_outcome';
+#requires 'mqc_outcome';
+#requires 'dict_relation';
 requires 'update';
 requires 'insert';
 
@@ -26,8 +27,9 @@ Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
 foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
       my $self = shift;
+      my $outcome_type = $self->_dict_relation();
       my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
-      return $self->mqc_outcome->$that_class_method;
+      return $self->$outcome_type->$that_class_method;
     }
   );
 }
@@ -40,6 +42,18 @@ around [qw/update insert/] => sub {
   $self->_create_historic();
   return $return_super;
 };
+
+sub _dict_relation {
+  my $self = shift;
+  my $name = ref $self;
+  #mqc_outcome uqc_outcome
+  ($name) = $name =~ /::(\w+qc)(?:\w+)*OutcomeEnt\Z/smx;
+  if (!$name) {
+    croak 'Unexpected class name';
+  }
+  $name = lc $name;
+  return $name . q[_outcome];
+}
 
 sub get_time_now {
   return DateTime->now(time_zone => DateTime::TimeZone->new(name => q[local]));
@@ -82,12 +96,13 @@ sub _create_historic {
 
 sub toggle_final_outcome {
   my ($self, $modified_by, $username) = @_;
+  my $outcome_type = $self->_dict_relation();
 
   if (!$self->in_storage) {
     croak 'Record is not stored in the database yet';
   }
   if (!$self->has_final_outcome) {
-    croak 'Cannot toggle non-final outcome ' . $self->mqc_outcome->short_desc;
+    croak 'Cannot toggle non-final outcome ' . $self->$outcome_type->short_desc;
   }
   if ($self->is_undecided) {
     croak 'Cannot toggle undecided final outcome';
@@ -124,7 +139,7 @@ sub update_outcome {
   }
 
   my $values = {};
-  $values->{'id_mqc_outcome'} = $self->_outcome_id($outcome);
+  $values->{'id_' . $self->_dict_relation()} = $self->_outcome_id($outcome);
   $values->{'username'}       = $username || $modified_by;
   $values->{'modified_by'}    = $modified_by;
 
@@ -145,7 +160,8 @@ sub pack {##no critic (Subroutines::ProhibitBuiltinHomonyms)
    my $h = {};
    $h->{'id_run'}      = $self->id_run;
    $h->{'position'}    = $self->position;
-   $h->{'mqc_outcome'} = $self->mqc_outcome->short_desc;
+   my $outcome_type = $self->_dict_relation();
+   $h->{$outcome_type} = $self->$outcome_type->short_desc;
    if ($self->can('tag_index') and defined $self->tag_index) {
      $h->{'tag_index'} = $self->tag_index;
    }
