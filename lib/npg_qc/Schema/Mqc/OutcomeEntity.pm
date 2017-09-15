@@ -8,6 +8,7 @@ use Readonly;
 
 with 'npg_tracking::glossary::composition::factory::attributes' =>
   {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+with 'npg_qc::Schema::Composition';
 
 our $VERSION = '0';
 
@@ -176,6 +177,11 @@ npg_qc::Schema::Mqc::OutcomeEntity
 Common functionality for lane and library manual qc outcome entity DBIx objects.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 composition
+
+A lazy-build attribute of type npg_tracking::glossary::composition.
+It is built by inspection the linked seq_composition row.
 
 =head2 update
 
