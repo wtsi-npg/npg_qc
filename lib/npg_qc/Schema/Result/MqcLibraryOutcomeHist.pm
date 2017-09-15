@@ -214,6 +214,8 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-21 18:06:15
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:jEujIBwKDB0eOQkuc0Hnbg
 
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 with qw/npg_qc::Schema::Flators/;
 
 our $VERSION = '0';
@@ -237,6 +239,11 @@ Historic for library MQC
 
 =head1 SUBROUTINES/METHODS
 
+=head2 create_composition
+
+Returns a npg_tracking::glossary::composition object corresponding to
+this result
+
 =head1 DEPENDENCIES
 
 =over
@@ -258,6 +265,10 @@ Historic for library MQC
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
+
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
 
 =back
 
