@@ -323,8 +323,7 @@ Result class definition in DBIx binding for npg-qc database.
 
 =head2 composition
 
-An lazy-build attribute representing a composition this result
-corresponds to.
+An lazy-build attribut of type npg_tracking::glossary::composition.
 
 =head2 seq_component_compositions
 
