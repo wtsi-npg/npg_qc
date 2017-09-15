@@ -23,15 +23,16 @@ my $dsn = sprintf 'dbi:mysql:host=%s;port=%s;dbname=%s',
 
 my $roles_map = {};
 my $components_map = {};
-my $role_base = 'npg_qc::autoqc::role::';
+my $role_base    = 'npg_qc::autoqc::role::';
 my $generic_role = $role_base . 'result';
-my $component = 'InflateColumn::Serializer';
-my $flator = 'npg_qc::Schema::Flators';
+my $component    = 'InflateColumn::Serializer';
+my $flator       = 'npg_qc::Schema::Flators';
+my $composition  = 'npg_qc::Schema::Composition';
 
 foreach my $check (@{npg_qc::autoqc::results::collection->new()->checks_list()}) {
   my ($result_name, $dbix_result_name ) = $generic_role->class_names($check);
   
-  my @roles = ($flator, $generic_role);
+  my @roles = ($composition, $flator, $generic_role);
   my $rpackage = $role_base . $result_name;
   my $found = eval "require $rpackage";
   if ($found) {
