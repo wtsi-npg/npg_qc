@@ -5,6 +5,8 @@ use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
 use DateTime;
+use Data::Dumper;
+$Data::Dumper::Maxdepth = 1;
 
 use_ok('npg_qc::Schema::Result::MqcOutcomeEnt');
 
@@ -19,26 +21,23 @@ my $dict_table = 'MqcOutcomeDict';
 subtest 'Misc tests' => sub {
   plan tests => 34;
 
-  my $values = {'id_run'=>1, 
+  my $values = {'id_run'=>1,
     'position'=>1,
-    'id_mqc_outcome'=>0, 
-    'username'=>'user', 
+    'id_mqc_outcome'=>0,
+    'username'=>'user',
     'last_modified'=>DateTime->now(),
     'modified_by'=>'user'};
-
   isa_ok($schema->resultset($table)->create($values),
     'npg_qc::Schema::Result::MqcOutcomeEnt');
-
   is ($schema->resultset($table)->search({}), 1,
     q[one row created in the table]);
 
-  $values = {'id_run'=>10, 
+  $values = {'id_run'=>10,
               'position'=>1,
               'id_mqc_outcome'=>1};
   my %values1 = %{$values};
   $values1{'username'} = 'user';
   $values1{'modified_by'} = 'user';
-
   is ($schema->resultset($hist_table)->search($values)->count, 0,
     q[no historic entry for entity about to be inserted]);
   isa_ok($schema->resultset($table)->create(\%values1),
@@ -48,10 +47,10 @@ subtest 'Misc tests' => sub {
   is ($schema->resultset($hist_table)->search($values)->count, 1,
     q[one matching row created in the entity table]);
 
-  $values = {'id_run'=>1, 
+  $values = {'id_run'=>1,
       'position'=>2,
-      'id_mqc_outcome'=>0, 
-      'username'=>'user', 
+      'id_mqc_outcome'=>0,
+      'username'=>'user',
       'last_modified'=>DateTime->now(),
       'modified_by'=>'user'};
 
@@ -60,10 +59,10 @@ subtest 'Misc tests' => sub {
   is ($schema->resultset($table)->search({'id_run'=>1,'position'=>2})
     ->count, 1, q[one row matches in the table]);
 
-  $values = {'id_run'=>1, 
+  $values = {'id_run'=>1,
     'position'=>3,
-    'id_mqc_outcome'=>0, 
-    'username'=>'user', 
+    'id_mqc_outcome'=>0,
+    'username'=>'user',
     'last_modified'=>DateTime->now(),
     'modified_by'=>'user'};
 
@@ -76,10 +75,10 @@ subtest 'Misc tests' => sub {
   is($ent->id_mqc_outcome, 2, 'correct outcome id');
   is($ent->username, $ent->modified_by, 'Username equals modified_by');
 
- $values = {'id_run'=>220, 
+ $values = {'id_run'=>220,
     'position'       => 1,
-    'id_mqc_outcome' => 3, 
-    'username'       => 'user', 
+    'id_mqc_outcome' => 3,
+    'username'       => 'user',
     'last_modified'  => DateTime->now(),
     'modified_by'    => 'user'};
 
@@ -92,10 +91,10 @@ subtest 'Misc tests' => sub {
   is($object->id_mqc_outcome, 3, q[The outcome scalar is there and has correct value]);
   ok(defined $object->mqc_outcome, q[The outcome is defined when searching.]);
 
-  $values = {'id_run'=>100, 
+  $values = {'id_run'=>100,
     'position'=>4,
-    'id_mqc_outcome'=>0, 
-    'username'=>'user', 
+    'id_mqc_outcome'=>0,
+    'username'=>'user',
     'last_modified'=>DateTime->now(),
     'modified_by'=>'user'};
 
@@ -104,7 +103,7 @@ subtest 'Misc tests' => sub {
     'position'=>4,
     'id_mqc_outcome'=>3
   };
- 
+
   is ($schema->resultset($hist_table)->search($query)->count, 0,
     q[no row matches in the historic table before update in entity]);
   $schema->resultset($table)->create($values);
@@ -118,7 +117,7 @@ subtest 'Misc tests' => sub {
   $values = {'id_run'=>210,
     'position'       => 1,
     'id_mqc_outcome' => 1,
-    'username'       => 'user', 
+    'username'       => 'user',
     'last_modified'  => DateTime->now(),
     'modified_by'    => 'randomuser'};
 
@@ -166,7 +165,7 @@ subtest 'Data for historic' => sub {
   my $values = {
     'id_run'         => 1,
     'position'       => 3,
-    'id_mqc_outcome' => 0, 
+    'id_mqc_outcome' => 0,
     'username'       => 'user',
     'modified_by'    => 'user',
   };
@@ -179,7 +178,7 @@ subtest 'Data for historic' => sub {
   is($entity->username, $historic->{'username'}, 'Username matches');
   is($entity->modified_by, $historic->{'modified_by'}, 'Modified by matches');
   is($entity->last_modified, $historic->{'last_modified'}, 'Last modified matches');
-  
+
   $values->{'reported'} = DateTime->now();
   $entity = $schema->resultset($table)->new_result($values);
   $historic = $entity->data_for_historic;
@@ -195,7 +194,7 @@ subtest 'Data for historic' => sub {
 
 subtest q[update on a new result] => sub {
   plan tests => 45;
-  
+
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
   my $args = {'id_run' => 444, 'position' => 1};
@@ -219,10 +218,10 @@ subtest q[update on a new result] => sub {
     ok (!$new_row->has_final_outcome, 'not final outcome');
     ok ($new_row->is_accepted, 'is accepted');
     ok (!$new_row->is_final_accepted, 'not final accepted');
-  } 
-  
+  }
+
   $outcome = 'Accepted final';
- 
+
   $new_row = $rs->new_result($args);
   throws_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
     qr /UNIQUE constraint failed/,
@@ -278,7 +277,7 @@ subtest q[toggle final outcome] => sub {
   lives_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     'can toggle final outcome';
   is($new_row->mqc_outcome->short_desc, $outcome, 'new outcome');
-  
+
   lives_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     'can toggle final outcome once more';
   is($new_row->mqc_outcome->short_desc, $old_outcome, 'old outcome again');
@@ -292,7 +291,7 @@ subtest q[reporting] => sub {
   my $values = {'id_run'=>310,
     'position'       => 1,
     'id_mqc_outcome' => 1,
-    'username'       => 'user', 
+    'username'       => 'user',
     'last_modified'  => DateTime->now(),
     'modified_by'    => 'user'};
 
@@ -303,11 +302,11 @@ subtest q[reporting] => sub {
 
   my $rs = $schema->resultset($table)->get_ready_to_report();
   is ($rs->count, 3, q[3 entities ready to be reported]);
-  
+
   while (my $obj = $rs->next) {
     $obj->update_reported();
   }
-  
+
   my $rs2 = $schema->resultset($table)->get_ready_to_report();
   is ($rs2->count, 0, q[No entities to be reported]);
 };

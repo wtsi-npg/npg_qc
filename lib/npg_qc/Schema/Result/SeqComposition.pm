@@ -483,16 +483,16 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 uqc_outcome_hist
+=head2 uqc_outcome_hists
 
-Type: might_have
+Type: has_many
 
 Related object: L<npg_qc::Schema::Result::UqcOutcomeHist>
 
 =cut
 
-__PACKAGE__->might_have(
-  'uqc_outcome_hist',
+__PACKAGE__->has_many(
+  'uqc_outcome_hists',
   'npg_qc::Schema::Result::UqcOutcomeHist',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -514,8 +514,8 @@ __PACKAGE__->might_have(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 10:42:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8spVcL5KsuN+kD7xs4qx7w
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-18 13:20:30
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iqgrB6vRc6dZayXIWohsUQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
