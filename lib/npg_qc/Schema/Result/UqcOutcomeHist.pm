@@ -147,20 +147,6 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id_uqc_outcome_hist');
 
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<id_seq_composition_unique>
-
-=over 4
-
-=item * L</id_seq_composition>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint('id_seq_composition_unique', ['id_seq_composition']);
-
 =head1 RELATIONS
 
 =head2 seq_composition
@@ -194,8 +180,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 10:42:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1N4YkSKyTOu0Ej0RqI2ByQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-18 13:20:30
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vRSw60briOUpKF+Icv9uGA
 
 our $VERSION = '0';
 

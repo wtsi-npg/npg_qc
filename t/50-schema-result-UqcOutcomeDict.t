@@ -16,10 +16,8 @@ my @rows = $schema->resultset($table)->search({short_desc => {'-in', $decisions}
 is (scalar @rows, 2, 'two decided outcomes');
 ok (!$rows[0]->is_final_outcome, 'final outcome check returns false');
 ok ($rows[0]->is_accepted, 'accepted outcome check returns true');
-#  is ($rows[0]->matching_final_short_desc(), 'Accepted final', 'matching final');
 ok (!$rows[0]->is_final_accepted, 'accepted & final outcome check returns false');
 ok (!$rows[1]->is_final_outcome, 'final outcome check returns false');
 ok (!$rows[1]->is_accepted, 'accepted outcome check returns false');
 ok (!$rows[1]->is_final_accepted, 'accepted & final outcome check returns false');
-#is ($rows[1]->matching_final_short_desc(), 'Rejected final', 'matching final');
 1;
