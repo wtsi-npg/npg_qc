@@ -119,7 +119,7 @@ sub _outcome_id {
 }
 
 sub update_outcome {
-  my ($self, $outcome, $modified_by, $username) = @_;
+  my ($self, $outcome, $modified_by, $username, $rationale) = @_;
 
   if (!$modified_by) {
     croak q[User name required];
@@ -129,6 +129,17 @@ sub update_outcome {
   $values->{'id_mqc_outcome'} = $self->_outcome_id($outcome);
   $values->{'username'}       = $username || $modified_by;
   $values->{'modified_by'}    = $modified_by;
+
+  if((ref $self) =~ /::Uqc/smx) {
+    if (!$rationale) {
+      croak 'Rationale is required';
+    }
+    $values->{'rationale'} = $rationale;
+  } else {
+    if ($rationale) {
+      croak 'Only uqc outcome can take rationale';
+    }
+  }
 
   if ($self->in_storage) {
     $self->update($values);
