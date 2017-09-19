@@ -19,7 +19,7 @@ my $hist_table = 'MqcOutcomeHist';
 my $dict_table = 'MqcOutcomeDict';
 
 subtest 'Misc tests' => sub {
-  plan tests => 34;
+  plan tests => 35;
 
   my $values = {'id_run'=>1,
     'position'=>1,
@@ -157,6 +157,9 @@ subtest 'Misc tests' => sub {
   throws_ok {$object->update_outcome(undef, 'user')}
     qr/Outcome required/,
     'outcome should be given';
+  throws_ok {$object->update_outcome('Rejected final', 'new_user',
+    'RT#356789','rationale something')
+  } qr/Only uqc outcome can take rationale/,'Rationale is not valid in MqcOutcomeEnt';
 };
 
 subtest 'Data for historic' => sub {
