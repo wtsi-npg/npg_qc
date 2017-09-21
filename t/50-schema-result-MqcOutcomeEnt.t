@@ -5,8 +5,6 @@ use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
 use DateTime;
-use Data::Dumper;
-$Data::Dumper::Maxdepth = 1;
 
 use_ok('npg_qc::Schema::Result::MqcOutcomeEnt');
 

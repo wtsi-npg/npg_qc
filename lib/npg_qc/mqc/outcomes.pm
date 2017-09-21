@@ -8,7 +8,11 @@ use List::MoreUtils qw/ none /;
 use Carp;
 use Try::Tiny;
 
-use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
+use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES
+                                   $SEQ_OUTCOMES
+                                   $QC_OUTCOME
+                                   $UQC_OUTCOMES
+                                   $UQC_OUTCOME/;
 use npg_tracking::glossary::rpt;
 
 our $VERSION = '0';
@@ -16,10 +20,13 @@ our $VERSION = '0';
 Readonly::Scalar my $NO_TAG_FLAG => -1;
 Readonly::Scalar my $SEQ_RS_NAME => 'MqcOutcomeEnt';
 Readonly::Scalar my $LIB_RS_NAME => 'MqcLibraryOutcomeEnt';
+Readonly::Scalar my $UQC_RS_NAME => 'UqcOutcomeEnt';
 Readonly::Scalar my $IDRK        => 'id_run';
+Readonly::Scalar my $IDSCK       => 'id_seq_composition';
 Readonly::Scalar my $PK          => 'position';
 Readonly::Scalar my $TIK         => 'tag_index';
-Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES);
+Readonly::Scalar my $SEQ_COMP    => 'seq_component';
+Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOMES);
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -43,6 +50,7 @@ sub get {
 
   my @lib_outcomes = ();
   my @seq_outcomes = ();
+  my @uqc_outcomes = ();
 
   foreach my $id_run ( keys %{$hashed_queries} ) {
     my @positions = keys %{$hashed_queries->{$id_run}};
@@ -64,11 +72,22 @@ sub get {
     if ( @seq_rows ) {
       push @seq_outcomes, @seq_rows;
     }
+    my @uqc_rows = $self->qc_schema()->resultset($UQC_RS_NAME)
+                   ->search($q, {
+                    prefetch => [{
+                      seq_composition =>
+                      {seq_component_compositions => $SEQ_COMP}
+                    }, $UQC_OUTCOME]})
+                   ->all();
+    if ( @uqc_rows ) {
+      push @uqc_outcomes, @uqc_rows;
+    }
   }
 
   my $h = {};
-  $h->{$LIB_OUTCOMES} = _map_outcomes(\@lib_outcomes);
-  $h->{$SEQ_OUTCOMES} = _map_outcomes(\@seq_outcomes);
+  $h->{$LIB_OUTCOMES} = _my_map_outcomes(\@lib_outcomes);
+  $h->{$SEQ_OUTCOMES} = _my_map_outcomes(\@seq_outcomes);
+  $h->{$UQC_OUTCOMES} = _my_map_uqc_outcomes(\@uqc_outcomes);
 
   return $h;
 }
@@ -114,6 +133,52 @@ sub _map_outcomes {
     $map->{npg_tracking::glossary::rpt->deflate_rpt($packed)} = $packed;
   }
   return $map;
+}
+
+sub _my_map_outcomes {
+  my $outcomes = shift;
+  my $map = {};
+  foreach my $o (@{$outcomes}) {
+    my $packed = $o->pack();
+    my $rptkey = npg_tracking::glossary::rpt->deflate_rpt($packed);
+    my $simplepack = _my_simple_pack($packed);
+    $map->{$rptkey} = $simplepack;
+  }
+  return $map;
+}
+
+sub _my_map_uqc_outcomes {
+    my $outcomes = shift;
+    my $map = {};
+    foreach my $o (@{$outcomes}) {
+      my $packed = _my_simple_uqc_pack($o);
+      my $rptkey = npg_tracking::glossary::rpt->deflate_rpt($packed);
+      $map->{$rptkey} = $packed;
+    }
+    return $map;
+}
+
+sub _my_simple_pack {
+  my $self = shift;
+  my $h = {};
+  $h->{'mqc_outcome'} = $self->{'mqc_outcome'};
+  return $h;
+}
+
+sub _my_simple_uqc_pack {
+  my $uqc_entity = shift;
+  my $comp = $uqc_entity->seq_composition
+                        ->seq_component_compositions
+                        ->next
+                        ->seq_component;
+  my $h = {};
+  $h->{'id_run'}      = $comp->id_run;
+  $h->{'position'}    = $comp->position;
+  if ($comp->can('tag_index') and defined $comp->tag_index) {
+    $h->{'tag_index'} = $comp->tag_index;
+  }
+  $h->{'uqc_outcome'} = $uqc_entity->uqc_outcome->short_desc;
+  return $h;
 }
 
 sub _save_outcomes {
@@ -296,7 +361,7 @@ DBIx npg qc schema object, required attribute.
 
 Takes an array of queries. Each query hash should contain at least the 'id_run'
 and 'position' keys and can also contain the 'tag_index' key.
- 
+
 Returns simple representations of rows hashed first on the type of
 the outcome 'lib' for library outcomes and 'seq' for sequencing outcomes
 and then on rpt keys.
@@ -325,7 +390,7 @@ and then on rpt keys.
 For a query with id_run and position the sequencing lane outcome and all known
 library outcomes for this position are be returned. For a query with id_run,
 position and tag_index both the sequencing lane outcome and library outcome are
-returned. 
+returned.
 
 =head2 save
 

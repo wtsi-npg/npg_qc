@@ -526,7 +526,7 @@ our $VERSION = '0';
 
 =head2 create_composition
 
-A factory method returning a npg_tracking::glossary::composition object of illumina components. 
+A factory method returning a npg_tracking::glossary::composition object of illumina components.
 
 =cut
 
