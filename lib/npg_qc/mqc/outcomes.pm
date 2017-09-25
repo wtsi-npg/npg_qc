@@ -125,16 +125,6 @@ sub _validate_query {
   return;
 }
 
-sub _map_outcomes {
-  my $outcomes = shift;
-  my $map = {};
-  foreach my $o (@{$outcomes}) {
-    my $packed = $o->pack();
-    $map->{npg_tracking::glossary::rpt->deflate_rpt($packed)} = $packed;
-  }
-  return $map;
-}
-
 sub _my_map_outcomes {
   my $outcomes = shift;
   my $map = {};
@@ -362,9 +352,9 @@ DBIx npg qc schema object, required attribute.
 Takes an array of queries. Each query hash should contain at least the 'id_run'
 and 'position' keys and can also contain the 'tag_index' key.
 
-Returns simple representations of rows hashed first on the type of
-the outcome 'lib' for library outcomes and 'seq' for sequencing outcomes
-and then on rpt keys.
+Returns simple representations of rows hashed first on three type of
+outcomes: 'lib' for library outcomes, 'seq' for sequencing outcomes
+and 'uqc' for the usability quality check, then for each type a list of rpt keys.
 
   use Data::Dumper;
   print Dumper $obj->get([{id_run=>5,position=>3,tag_index=>7});
@@ -372,23 +362,26 @@ and then on rpt keys.
   $VAR1 = {
           'lib' => {
                      '5:3:7' => {
-                                  'tag_index' => 7,
-                                  'mqc_outcome' => 'Undecided final',
-                                  'position' => 3,
-                                  'id_run' => 5
+                                  'mqc_outcome' => 'Undecided final'
                                 }
                    },
           'seq' => {
                      '5:3' => {
-                                'mqc_outcome' => 'Accepted final',
-                                'position' => 3,
-                                'id_run' => 5
+                                'mqc_outcome' => 'Accepted final'
                               }
+                   }
+          'uqc' => {
+                     '5:3' =>   {
+                                  'uqc_outcome' => 'Accepted'
+                                }
+                     '5:3:7' => {
+                                  'uqc_outcome' => 'Accepted'
+                                }
                    }
           };
 
 For a query with id_run and position the sequencing lane outcome and all known
-library outcomes for this position are be returned. For a query with id_run,
+library outcomes for this position are returned. For a query with id_run,
 position and tag_index both the sequencing lane outcome and library outcome are
 returned.
 
