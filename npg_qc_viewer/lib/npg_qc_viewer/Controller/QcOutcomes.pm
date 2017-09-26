@@ -12,9 +12,6 @@ use npg_qc::Schema::Mqc::OutcomeDict;
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 use npg_qc::mqc::outcomes;
 
-use Data::Dumper;
-
-
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
 our $VERSION  = '0';
@@ -177,6 +174,16 @@ sub _update_outcomes {
                      ->save($data, $username, $lane_info);
 
       $seq_outcomes = $outcomes->{$SEQ_OUTCOMES} || {};
+
+      my $outcomes_to_update = $seq_outcomes;
+      foreach my $rpt_key (keys %{$outcomes_to_update}) {
+        my $outcome = $outcomes_to_update->{$rpt_key};
+        my $inflated_rpt = npg_tracking::glossary::rpt->inflate_rpt($rpt_key);
+        foreach my $key_name (keys %{$inflated_rpt}) {
+          $outcome->{$key_name} = $inflated_rpt->{$key_name};
+        }
+      }
+
       $self->_update_runlanes($c, $seq_outcomes, $username);
 
       $self->status_ok($c, 'entity' => $outcomes,);
