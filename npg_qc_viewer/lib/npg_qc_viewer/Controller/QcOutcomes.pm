@@ -174,15 +174,7 @@ sub _update_outcomes {
                      ->save($data, $username, $lane_info);
 
       $seq_outcomes = $outcomes->{$SEQ_OUTCOMES} || {};
-
-      my $outcomes_to_update = $seq_outcomes;
-      foreach my $rpt_key (keys %{$outcomes_to_update}) {
-        my $outcome = $outcomes_to_update->{$rpt_key};
-        my $inflated_rpt = npg_tracking::glossary::rpt->inflate_rpt($rpt_key);
-        foreach my $key_name (keys %{$inflated_rpt}) {
-          $outcome->{$key_name} = $inflated_rpt->{$key_name};
-        }
-      }
+      $seq_outcomes = _unpack($seq_outcomes);
 
       $self->_update_runlanes($c, $seq_outcomes, $username);
 
@@ -198,6 +190,18 @@ sub _update_outcomes {
   }
 
   return;
+}
+
+sub _unpack {
+  my $outcomes_to_update = shift;
+      foreach my $rpt_key (keys %{$outcomes_to_update}) {
+        my $outcome = $outcomes_to_update->{$rpt_key};
+        my $inflated_rpt = npg_tracking::glossary::rpt->inflate_rpt($rpt_key);
+        foreach my $key_name (keys %{$inflated_rpt}) {
+          $outcome->{$key_name} = $inflated_rpt->{$key_name};
+        }
+      }
+  return $outcomes_to_update;
 }
 
 sub _lane_info {

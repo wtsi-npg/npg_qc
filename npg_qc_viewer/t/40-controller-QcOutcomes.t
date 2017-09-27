@@ -6,7 +6,6 @@ use Test::Exception;
 use URI::Escape qw(uri_escape);
 use JSON::XS;
 use HTTP::Request;
-use Data::Dumper;
 
 use npg_tracking::glossary::rpt;
 use t::util;
