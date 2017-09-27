@@ -5,11 +5,11 @@ use DateTime;
 use DateTime::TimeZone;
 use Carp;
 use Readonly;
+use Data::Dumper;
+$Data::Dumper::Maxdepth = 2;
 
 our $VERSION = '0';
 
-#requires 'mqc_outcome';
-#requires 'dict_relation';
 requires 'update';
 requires 'insert';
 
@@ -27,7 +27,7 @@ Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
 foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
       my $self = shift;
-      my $outcome_type = $self->_dict_relation();
+      my $outcome_type = $self->dict_relation();
       my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
       return $self->$outcome_type->$that_class_method;
     }
@@ -43,7 +43,7 @@ around [qw/update insert/] => sub {
   return $return_super;
 };
 
-sub _dict_relation {
+sub dict_relation {
   my $self = shift;
   my $name = ref $self;
   #mqc_outcome uqc_outcome
@@ -96,7 +96,7 @@ sub _create_historic {
 
 sub toggle_final_outcome {
   my ($self, $modified_by, $username) = @_;
-  my $outcome_type = $self->_dict_relation();
+  my $outcome_type = $self->dict_relation();
 
   if (!$self->in_storage) {
     croak 'Record is not stored in the database yet';
@@ -139,7 +139,7 @@ sub update_outcome {
   }
 
   my $values = {};
-  $values->{'id_' . $self->_dict_relation()} = $self->_outcome_id($outcome);
+  $values->{'id_' . $self->dict_relation()} = $self->_outcome_id($outcome);
   $values->{'username'}       = $username || $modified_by;
   $values->{'modified_by'}    = $modified_by;
 
@@ -168,13 +168,21 @@ sub update_outcome {
 
 sub pack {##no critic (Subroutines::ProhibitBuiltinHomonyms)
    my $self = shift;
+   my $component = $self;
+   my $outcome_type = $component->dict_relation();
+   if ($outcome_type eq 'uqc_outcome'){
+       $component = $self->seq_composition
+                         ->seq_component_compositions
+                         ->next
+                         ->seq_component;
+   }
+
    my $h = {};
-   $h->{'id_run'}      = $self->id_run;
-   $h->{'position'}    = $self->position;
-   my $outcome_type = $self->_dict_relation();
+   $h->{'id_run'}      = $component->id_run;
+   $h->{'position'}    = $component->position;
    $h->{$outcome_type} = $self->$outcome_type->short_desc;
-   if ($self->can('tag_index') and defined $self->tag_index) {
-     $h->{'tag_index'} = $self->tag_index;
+   if ($component->can('tag_index') and defined $component->tag_index) {
+     $h->{'tag_index'} = $component->tag_index;
    }
 
    return $h;
@@ -198,8 +206,13 @@ npg_qc::Schema::Mqc::OutcomeEntity
 =head1 DESCRIPTION
 
 Common functionality for lane and library manual qc outcome entity DBIx objects.
+The functionality extends also to usability qc outcome entity objects.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 dict_relation
+
+Returns the corresponding type name (either mqc_outcome or uqc_outcome) of the outcome.
 
 =head2 update
 
@@ -256,8 +269,9 @@ i.e. accepted is changed to rejected and rejected to accepted.
 
 =head2 pack
 
-Returns a hash reference containing record identifies (id_run, position and,
+Returns a hash reference containing record identifiers (id_run, position and,
 where appropriate, tag_index) and a short description of the outcome.
+The method extends also to usability qc outcome entity objects.
 
 =head1 DIAGNOSTICS
 

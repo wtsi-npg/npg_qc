@@ -7,6 +7,7 @@ use Readonly;
 use List::MoreUtils qw/ none /;
 use Carp;
 use Try::Tiny;
+use npg_qc::Schema::Mqc::OutcomeEntity;
 
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES
                                    $SEQ_OUTCOMES
@@ -22,7 +23,6 @@ Readonly::Scalar my $SEQ_RS_NAME => 'MqcOutcomeEnt';
 Readonly::Scalar my $LIB_RS_NAME => 'MqcLibraryOutcomeEnt';
 Readonly::Scalar my $UQC_RS_NAME => 'UqcOutcomeEnt';
 Readonly::Scalar my $IDRK        => 'id_run';
-Readonly::Scalar my $IDSCK       => 'id_seq_composition';
 Readonly::Scalar my $PK          => 'position';
 Readonly::Scalar my $TIK         => 'tag_index';
 Readonly::Scalar my $SEQ_COMP    => 'seq_component';
@@ -85,9 +85,9 @@ sub get {
   }
 
   my $h = {};
-  $h->{$LIB_OUTCOMES} = _my_map_outcomes(\@lib_outcomes);
-  $h->{$SEQ_OUTCOMES} = _my_map_outcomes(\@seq_outcomes);
-  $h->{$UQC_OUTCOMES} = _my_map_uqc_outcomes(\@uqc_outcomes);
+  $h->{$LIB_OUTCOMES} = _map_outcomes(\@lib_outcomes);
+  $h->{$SEQ_OUTCOMES} = _map_outcomes(\@seq_outcomes);
+  $h->{$UQC_OUTCOMES} = _map_outcomes(\@uqc_outcomes);
 
   return $h;
 }
@@ -125,49 +125,23 @@ sub _validate_query {
   return;
 }
 
-sub _my_map_outcomes {
+sub _map_outcomes {
   my $outcomes = shift;
   my $map = {};
   foreach my $o (@{$outcomes}) {
+    my $outcome_type = $o->dict_relation();
     my $packed = $o->pack();
     my $rptkey = npg_tracking::glossary::rpt->deflate_rpt($packed);
-    my $simplepack = _my_simple_pack($packed);
+    my $simplepack = _simple_pack($packed, $outcome_type);
     $map->{$rptkey} = $simplepack;
   }
   return $map;
 }
 
-sub _my_map_uqc_outcomes {
-    my $outcomes = shift;
-    my $map = {};
-    foreach my $o (@{$outcomes}) {
-      my $packed = _my_simple_uqc_pack($o);
-      my $rptkey = npg_tracking::glossary::rpt->deflate_rpt($packed);
-      $map->{$rptkey} = $packed;
-    }
-    return $map;
-}
-
-sub _my_simple_pack {
-  my $self = shift;
+sub _simple_pack {
+  my ($self, $outcome_type) = @_;
   my $h = {};
-  $h->{'mqc_outcome'} = $self->{'mqc_outcome'};
-  return $h;
-}
-
-sub _my_simple_uqc_pack {
-  my $uqc_entity = shift;
-  my $comp = $uqc_entity->seq_composition
-                        ->seq_component_compositions
-                        ->next
-                        ->seq_component;
-  my $h = {};
-  $h->{'id_run'}      = $comp->id_run;
-  $h->{'position'}    = $comp->position;
-  if ($comp->can('tag_index') and defined $comp->tag_index) {
-    $h->{'tag_index'} = $comp->tag_index;
-  }
-  $h->{'uqc_outcome'} = $uqc_entity->uqc_outcome->short_desc;
+  $h->{$outcome_type} = $self->{$outcome_type};
   return $h;
 }
 
