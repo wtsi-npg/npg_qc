@@ -1,11 +1,15 @@
 use strict;
 use warnings;
 use lib 't/lib';
+use t::autoqc_util;
 use Test::More tests => 8;
 use Test::Exception;
 use URI::Escape qw(uri_escape);
 use JSON::XS;
 use HTTP::Request;
+use DateTime;
+#use Data::Dumper;
+#$Data::Dumper::Maxdepth=1;
 
 use npg_tracking::glossary::rpt;
 use t::util;
@@ -20,7 +24,7 @@ my $qc_schema = $schemas->{'qc'};
 my $wh_schema = $schemas->{'mlwh'};
 
 local $ENV{CATALYST_CONFIG} = $util->config_path;
-use_ok 'Catalyst::Test', 'npg_qc_viewer';
+use_ok ('Catalyst::Test', 'npg_qc_viewer');
 
 my $base_url = '/qcoutcomes';
 
@@ -78,7 +82,7 @@ subtest 'retrieving data via GET and POST' => sub {
     ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
     is($response->header('Content-type'), 'application/json', 'json content type');
-    is($response->content, '{"error":"rpt list not defined!"}', 'error message');
+    is($response->content, '{"error":"rpt list not defined!"}', 'error message: rpt_list not defined!');
   }
 
   my $url = join q[?], $base_url, 'rpt_list=wrong';
@@ -92,7 +96,7 @@ subtest 'retrieving data via GET and POST' => sub {
     ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
     like($response->content,
-      qr/Both id_run and position should be available/, 'error message');
+      qr/Both id_run and position should be available/, 'error message: Both id_run and position should be available in rpt_list');
   }
 
   my $rpt = '5:8:7;5:8:8';
@@ -107,7 +111,7 @@ subtest 'retrieving data via GET and POST' => sub {
     ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
     like($response->content,
-      qr/Cannot deal with multi-component compositions/, 'error message');
+      qr/Cannot deal with multi-component compositions/, 'error message: Cannot deal with multi-component compositions');
   }
 
   $rpt = '5:3:7';
@@ -121,29 +125,38 @@ subtest 'retrieving data via GET and POST' => sub {
     ok($response->is_success, 'success');
     is($response->code, 200, 'response code 200 for ' . _message($request, $rpt));
     is($response->header('Content-type'), 'application/json', 'json content type');
-    is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{},"uqc":{}}'), 'response content');
+    is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{},"uqc":{}}'),
+      'response content with empty fields (lib{},seq{},uqc{}) for no encoded values');
   }
-
+  my $id_sec_compos;
   my $values = {id_run => 5, username => 'u1'};
   for my $i (1 .. 5) {
     $values->{'position'} = $i;
     $values->{'id_mqc_outcome'} = $i;
     $qc_schema->resultset('MqcOutcomeEnt')->create($values);
+    $id_sec_compos = t::autoqc_util::find_or_save_composition($qc_schema, {
+      'id_run' => 5, 'position' => $i
+    });
   }
 
   my $j = 0;
   while ($j < @urls) {
-
     if ($j == 2) {
       $values = {id_run => 5, position => 3, username => 'u1'};
       for my $i (2 .. 7) {
         $values->{'tag_index'} = $i;
         $values->{'id_mqc_outcome'} = $i-1;
         $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
+        $id_sec_compos = t::autoqc_util::find_or_save_composition($qc_schema, {
+        'id_run' => 5, 'position' => 3, 'tag_index' => $i
+        });
       }
     } elsif ($j == 4) {
       $qc_schema->resultset('MqcLibraryOutcomeEnt')->create(
         {id_run=>5, position=>4, id_mqc_outcome=>1, username=>'u1'});
+      $id_sec_compos = t::autoqc_util::find_or_save_composition($qc_schema, {
+        'id_run' => 5, 'position' => 4
+        });
     }
 
     my $rpt_list = $urls[$j];
@@ -158,9 +171,80 @@ subtest 'retrieving data via GET and POST' => sub {
     for my $request ($request1, $request2) {
       my $response = request($request);
       is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
-      is_deeply(decode_json($response->content), decode_json($jsons->[$j]), 'response content');
+      is_deeply(decode_json($response->content), decode_json($jsons->[$j]),
+        'response content with fields (lib{...},seq{...}) for encoded values but empty uqc{} for non encoded');
     }
 
+    $j++;
+  }
+
+  $values = {'last_modified' => DateTime->now(),
+             'username' => 'u1',
+             'modified_by' =>' user',
+             'rationale' =>'rationale something'};
+  for my $i (1 .. 5) {
+    $values->{'id_uqc_outcome'} = (($i % 3) + 1),
+    $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition($qc_schema, {
+        'id_run' => 5, 'position' => $i
+    });
+    $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+    my  $k = '5:' . $i;
+    #warn ("$k =*=*=*=*=* created uqcoutcomeEnt " . Dumper($values));
+  }
+
+  $jsons = [
+    'result test no needed, next loop starts at $j=2',
+    'result test no needed, next loop starts at $j=2',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}},"uqc":{}}',
+    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}'
+  ];
+
+  $j = 2;
+  while ($j < @urls) {
+    $values = {'last_modified' => DateTime->now(),
+               'username' => 'u1',
+               'modified_by' =>' user',
+               'rationale' =>'rationale something'};
+    if ($j == 2) {
+      for my $i (2 .. 7) {
+        $values->{'id_uqc_outcome'} = (($i % 3) + 1),
+        $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition($qc_schema, {
+          'id_run' => 5, 'position' => 3, 'tag_index' => $i
+        });
+        $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+        my  $k = '5:3:' . $i;
+        #warn ("$k ========== created uqcoutcomeEnt " . Dumper($values));
+      }
+    } elsif ($j == 4) {
+      $values->{'id_uqc_outcome'} = 1,
+      $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition($qc_schema, {
+        'id_run' => 5, 'position' => 4
+      });
+      $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+      my  $k = $urls[$j] ;
+        #warn ("$k =-=-=-=-=- created uqcoutcomeEnt " . Dumper($values));
+    }
+
+    my $rpt_list = $urls[$j];
+    my @rpts = @{npg_tracking::glossary::rpt->split_rpts($rpt_list)};
+    my $url = $base_url . '?' . join q[&], map {'rpt_list=' . uri_escape($_)} @rpts;
+    my %h = map { $_ => {} } @rpts;
+
+    my $request1 = HTTP::Request->new('GET',  $url);
+    my $request2 = HTTP::Request->new('POST', $base_url);
+    $request2->header( 'Content-type' => 'application/json' );
+    $request2->content(encode_json(\%h));
+    for my $request ($request1, $request2) {
+      my $response = request($request);
+      is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
+      is_deeply(decode_json($response->content), decode_json($jsons->[$j]), "response content $j for $rpt_list: \n response: " . $response->content . "\n testmem : $jsons->[$j]");
+    }
     $j++;
   }
 };

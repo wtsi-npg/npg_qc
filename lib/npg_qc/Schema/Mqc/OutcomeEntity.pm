@@ -5,8 +5,6 @@ use DateTime;
 use DateTime::TimeZone;
 use Carp;
 use Readonly;
-use Data::Dumper;
-$Data::Dumper::Maxdepth = 2;
 
 our $VERSION = '0';
 

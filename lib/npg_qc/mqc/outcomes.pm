@@ -8,6 +8,7 @@ use List::MoreUtils qw/ none /;
 use Carp;
 use Try::Tiny;
 use npg_qc::Schema::Mqc::OutcomeEntity;
+use Test::More;
 
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES
                                    $SEQ_OUTCOMES
@@ -36,7 +37,12 @@ has 'qc_schema' => (
 
 sub get {
   my ($self, $qlist) = @_;
-
+  # note ('===========qlist============');
+  # use Data::Dumper;
+  # $Data::Dumper::Purity = 1;
+  # my $str = Dumper($qlist);
+  # note ( $str );
+  # note ('qlist=======================');
   if (!$qlist || (ref $qlist ne 'ARRAY')) {
     croak q[Input is missing or is not an array];
   }
@@ -60,13 +66,31 @@ sub get {
       if ( none {$_ == $NO_TAG_FLAG} @tags ) {
         $query->{$TIK} = \@tags;
       }
+      # note ('===========query============');
+      # $str = Dumper($query);
+      # note ( $str );
+      # note ('query=======================');
       my @lib_rows = $self->qc_schema()->resultset($LIB_RS_NAME)
                      ->search($query, {'join' => $QC_OUTCOME})->all();
       if ( @lib_rows ) {
         push @lib_outcomes, @lib_rows;
       }
+      my @uqc_rows = $self->qc_schema()->resultset($UQC_RS_NAME)
+                   ->search($query, {
+                    prefetch => [{
+                      seq_composition =>
+                      {seq_component_compositions => $SEQ_COMP}
+                    }, $UQC_OUTCOME]})
+                   ->all();
+      if ( @uqc_rows ) {
+        push @uqc_outcomes, @uqc_rows;
+      }
     }
     my $q = {$IDRK => $id_run, $PK => \@positions};
+    # note ('===========q============');
+    # $str = Dumper($q);
+    # note ( $str );
+    # note ('q=======================');
     my @seq_rows = $self->qc_schema()->resultset($SEQ_RS_NAME)
                    ->search($q, {'join' => $QC_OUTCOME})->all();
     if ( @seq_rows ) {
@@ -89,6 +113,10 @@ sub get {
   $h->{$SEQ_OUTCOMES} = _map_outcomes(\@seq_outcomes);
   $h->{$UQC_OUTCOMES} = _map_outcomes(\@uqc_outcomes);
 
+  # note ('===========h============');
+  # $str = Dumper($h);
+  # note ( $str );
+  # note ('h=======================');
   return $h;
 }
 
