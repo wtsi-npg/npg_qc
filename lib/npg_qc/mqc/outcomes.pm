@@ -103,7 +103,7 @@ sub _map_outcomes {
   my $map = {};
   foreach my $o (@{$outcomes}) {
     $map->{$o->composition()->freeze2rpt()} =
-       {'mqc_outcome' => $o->mqc_outcome()->short_desc};
+      { 'mqc_outcome' => $o->mqc_outcome()->short_desc };
   }
   return $map;
 }
