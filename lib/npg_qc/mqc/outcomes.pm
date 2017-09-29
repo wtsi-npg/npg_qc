@@ -102,8 +102,8 @@ sub _map_outcomes {
   my $outcomes = shift;
   my $map = {};
   foreach my $o (@{$outcomes}) {
-    my $packed = $o->pack();
-    $map->{npg_tracking::glossary::rpt->deflate_rpt($packed)} = $packed;
+    $map->{$o->composition()->freeze2rpt()} =
+       {'mqc_outcome' => $o->mqc_outcome()->short_desc};
   }
   return $map;
 }

@@ -1,9 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 3;
 use Test::Exception;
 use Moose::Meta::Class;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 my $table = 'MqcOutcomeEnt';
 
@@ -32,6 +34,9 @@ subtest q[outcomes ready for reporting] => sub {
       $values->{'id_run'}        = $id_run;
       $values->{'position'}      = $id;
       $values->{'id_mqc_outcome'} = $id;
+      $values->{'id_seq_composition'} =
+        t::autoqc_util::find_or_save_composition(
+          $schema, {'id_run' => $id_run, 'position'  => $id});
       $resultset->create($values);
     }
   }
@@ -69,22 +74,6 @@ subtest q[outcomes ready for reporting] => sub {
   $rs = $resultset->get_ready_to_report();
   isa_ok($rs, 'npg_qc::Schema::ResultSet::' . $table);
   is($rs->count(), 0, 'result set is empty');
-};
-
-subtest q[packed data] => sub {
-  plan tests => 2;
-
-  my @os;
-  for ((1, 2)) {
-    push @os, $resultset->create({'id_run' => 2,'position' => $_,'id_mqc_outcome' => $_});
-  }
-
-  my $expected = {'id_run' => 2, 'position' => 2, 'mqc_outcome' => 'Rejected preliminary'};
-  is_deeply($os[1]->pack(), $expected, 'correct lane 2 data returned');
-
-  $expected->{'position'}    = 1;
-  $expected->{'mqc_outcome'} = 'Accepted preliminary';
-  is_deeply($os[0]->pack(), $expected, 'correct lane 1 data returned');
 };
 
 1;

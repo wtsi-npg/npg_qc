@@ -3,8 +3,10 @@ use warnings;
 use Test::More tests => 6;
 use Test::Exception;
 use Moose::Meta::Class;
-use npg_testing::db;
 use DateTime;
+
+use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::MqcOutcomeEnt');
 
@@ -17,27 +19,37 @@ my $hist_table = 'MqcOutcomeHist';
 my $dict_table = 'MqcOutcomeDict';
 
 subtest 'Misc tests' => sub {
-  plan tests => 34;
+  plan tests => 35;
 
-  my $values = {'id_run'=>1, 
-    'position'=>1,
-    'id_mqc_outcome'=>0, 
-    'username'=>'user', 
-    'last_modified'=>DateTime->now(),
-    'modified_by'=>'user'};
+  my $values = {'id_run'         => 1, 
+                'position'       => 1,
+                'id_mqc_outcome' => 0, 
+                'username'       => 'user', 
+                'last_modified'  => DateTime->now(),
+                'modified_by'    => 'user'};
 
+  throws_ok {$schema->resultset($table)->create($values)}
+    qr/NOT NULL constraint failed: mqc_outcome_ent\.id_seq_composition/,
+    'composition foreign key is needed';
+
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 1});
   isa_ok($schema->resultset($table)->create($values),
     'npg_qc::Schema::Result::MqcOutcomeEnt');
 
   is ($schema->resultset($table)->search({}), 1,
     q[one row created in the table]);
 
-  $values = {'id_run'=>10, 
-              'position'=>1,
-              'id_mqc_outcome'=>1};
+  $values = {'id_run'         => 10, 
+             'position'       => 1,
+             'id_mqc_outcome' => 1};
   my %values1 = %{$values};
   $values1{'username'} = 'user';
   $values1{'modified_by'} = 'user';
+  $values1{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 10,
+                          'position'  => 1});
 
   is ($schema->resultset($hist_table)->search($values)->count, 0,
     q[no historic entry for entity about to be inserted]);
@@ -48,25 +60,30 @@ subtest 'Misc tests' => sub {
   is ($schema->resultset($hist_table)->search($values)->count, 1,
     q[one matching row created in the entity table]);
 
-  $values = {'id_run'=>1, 
-      'position'=>2,
-      'id_mqc_outcome'=>0, 
-      'username'=>'user', 
-      'last_modified'=>DateTime->now(),
-      'modified_by'=>'user'};
+  $values = {'id_run'         => 1, 
+             'position'       => 2,
+             'id_mqc_outcome' => 0, 
+             'username'       => 'user', 
+             'last_modified'  => DateTime->now(),
+             'modified_by'    => 'user'};
+   $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 2});
 
   isa_ok($schema->resultset($table)->create($values),
     'npg_qc::Schema::Result::MqcOutcomeEnt');
   is ($schema->resultset($table)->search({'id_run'=>1,'position'=>2})
     ->count, 1, q[one row matches in the table]);
 
-  $values = {'id_run'=>1, 
-    'position'=>3,
-    'id_mqc_outcome'=>0, 
-    'username'=>'user', 
-    'last_modified'=>DateTime->now(),
-    'modified_by'=>'user'};
-
+  $values = {'id_run'         => 1, 
+             'position'       => 3,
+             'id_mqc_outcome' => 0, 
+             'username'       => 'user', 
+             'last_modified'  => DateTime->now(),
+             'modified_by'    => 'user'};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 3});
   $schema->resultset($table)->create($values);
   $schema->resultset($table)->find({'id_run'=>1,'position'=>3})
     ->update({'id_mqc_outcome'=>2});
@@ -76,13 +93,15 @@ subtest 'Misc tests' => sub {
   is($ent->id_mqc_outcome, 2, 'correct outcome id');
   is($ent->username, $ent->modified_by, 'Username equals modified_by');
 
- $values = {'id_run'=>220, 
-    'position'       => 1,
-    'id_mqc_outcome' => 3, 
-    'username'       => 'user', 
-    'last_modified'  => DateTime->now(),
-    'modified_by'    => 'user'};
-
+ $values = {'id_run'         => 220, 
+            'position'       => 1,
+            'id_mqc_outcome' => 3, 
+            'username'       => 'user', 
+            'last_modified'  => DateTime->now(),
+            'modified_by'    => 'user'};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 220,
+                          'position'  => 1});
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::MqcOutcomeEnt');
   ok($object->has_final_outcome(), q[The newly created entity has a final outcome]);
@@ -92,17 +111,19 @@ subtest 'Misc tests' => sub {
   is($object->id_mqc_outcome, 3, q[The outcome scalar is there and has correct value]);
   ok(defined $object->mqc_outcome, q[The outcome is defined when searching.]);
 
-  $values = {'id_run'=>100, 
-    'position'=>4,
-    'id_mqc_outcome'=>0, 
-    'username'=>'user', 
-    'last_modified'=>DateTime->now(),
-    'modified_by'=>'user'};
-
+  $values = {'id_run'         => 100, 
+             'position'       => 4,
+             'id_mqc_outcome' => 0, 
+             'username'       => 'user', 
+             'last_modified'  => DateTime->now(),
+             'modified_by'    => 'user'};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 100,
+                          'position'  => 4});
   my $query = {
-    'id_run'=>100,
-    'position'=>4,
-    'id_mqc_outcome'=>3
+    'id_run'         => 100,
+    'position'       => 4,
+    'id_mqc_outcome' => 3
   };
  
   is ($schema->resultset($hist_table)->search($query)->count, 0,
@@ -115,20 +136,22 @@ subtest 'Misc tests' => sub {
   is ($schema->resultset($hist_table)->search($query)->count, 1,
     q[one row matches in the historic table after update in entity]);
 
-  $values = {'id_run'=>210,
-    'position'       => 1,
-    'id_mqc_outcome' => 1,
-    'username'       => 'user', 
-    'last_modified'  => DateTime->now(),
-    'modified_by'    => 'randomuser'};
-
+  $values = {'id_run'         => 210,
+             'position'       => 1,
+             'id_mqc_outcome' => 1,
+             'username'       => 'user', 
+             'last_modified'  => DateTime->now(),
+             'modified_by'    => 'randomuser'};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 210,
+                          'position'  => 1});
   isa_ok($schema->resultset($table)->create($values),
     'npg_qc::Schema::Result::MqcOutcomeEnt');
 
   $rs = $schema->resultset($table)->search({
-    'id_run'=>210,
-    'position'=>1,
-    'id_mqc_outcome'=>1
+    'id_run'         => 210,
+    'position'       => 1,
+    'id_mqc_outcome' => 1
   });
   is ($rs->count, 1, q[one row created in the table]);
   $object = $rs->next();
@@ -170,7 +193,9 @@ subtest 'Data for historic' => sub {
     'username'       => 'user',
     'modified_by'    => 'user',
   };
-
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 3});
   my $entity = $schema->resultset($table)->new_result($values);
   my $historic = $entity->data_for_historic;
   is($entity->id_run, $historic->{'id_run'}, 'Id run matches');
@@ -199,6 +224,8 @@ subtest q[update on a new result] => sub {
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
   my $args = {'id_run' => 444, 'position' => 1};
+  $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, $args);
 
   my $new_row = $rs->new_result($args);
   my $outcome = 'Accepted preliminary';
@@ -229,6 +256,8 @@ subtest q[update on a new result] => sub {
     'error creating a record for existing entity';
 
   $args->{'position'} = 2;
+  $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run' => 444, 'position' => 2});
   $new_row = $rs->new_result($args);
   $new_row->update_outcome($outcome, 'dog', 'cat');
 
@@ -258,6 +287,8 @@ subtest q[toggle final outcome] => sub {
   my $rs = $schema->resultset($table);
 
   my $args = {'id_run' => 444, 'position' => 3};
+  $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, $args);
   my $new_row = $rs->new_result($args);
 
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
@@ -289,12 +320,15 @@ subtest q[toggle final outcome] => sub {
 subtest q[reporting] => sub {
   plan tests => 3;
 
-  my $values = {'id_run'=>310,
-    'position'       => 1,
-    'id_mqc_outcome' => 1,
-    'username'       => 'user', 
-    'last_modified'  => DateTime->now(),
-    'modified_by'    => 'user'};
+  my $values = {'id_run'         => 310,
+                'position'       => 1,
+                'id_mqc_outcome' => 1,
+                'username'       => 'user', 
+                'last_modified'  => DateTime->now(),
+                'modified_by'    => 'user'};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 310,
+                          'position'  => 1});
 
   my $object = $schema->resultset($table)->create($values);
   throws_ok { $object->update_reported() }
