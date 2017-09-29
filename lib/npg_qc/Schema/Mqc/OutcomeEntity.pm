@@ -8,7 +8,6 @@ use Readonly;
 
 our $VERSION = '0';
 
-requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
 
@@ -26,8 +25,9 @@ Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
 foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
       my $self = shift;
+      my $outcome_type = $self->dict_relation();
       my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
-      return $self->mqc_outcome->$that_class_method;
+      return $self->$outcome_type->$that_class_method;
     }
   );
 }
@@ -40,6 +40,18 @@ around [qw/update insert/] => sub {
   $self->_create_historic();
   return $return_super;
 };
+
+sub dict_relation {
+  my $self = shift;
+  my $name = ref $self;
+  #mqc_outcome uqc_outcome
+  ($name) = $name =~ /::(\w+qc)(?:\w+)*OutcomeEnt\Z/smx;
+  if (!$name) {
+    croak 'Unexpected class name';
+  }
+  $name = lc $name;
+  return $name . q[_outcome];
+}
 
 sub get_time_now {
   return DateTime->now(time_zone => DateTime::TimeZone->new(name => q[local]));
@@ -82,12 +94,13 @@ sub _create_historic {
 
 sub toggle_final_outcome {
   my ($self, $modified_by, $username) = @_;
+  my $outcome_type = $self->dict_relation();
 
   if (!$self->in_storage) {
     croak 'Record is not stored in the database yet';
   }
   if (!$self->has_final_outcome) {
-    croak 'Cannot toggle non-final outcome ' . $self->mqc_outcome->short_desc;
+    croak 'Cannot toggle non-final outcome ' . $self->$outcome_type->short_desc;
   }
   if ($self->is_undecided) {
     croak 'Cannot toggle undecided final outcome';
@@ -117,16 +130,27 @@ sub _outcome_id {
 }
 
 sub update_outcome {
-  my ($self, $outcome, $modified_by, $username) = @_;
+  my ($self, $outcome, $modified_by, $username, $rationale) = @_;
 
   if (!$modified_by) {
     croak q[User name required];
   }
 
   my $values = {};
-  $values->{'id_mqc_outcome'} = $self->_outcome_id($outcome);
+  $values->{'id_' . $self->dict_relation()} = $self->_outcome_id($outcome);
   $values->{'username'}       = $username || $modified_by;
   $values->{'modified_by'}    = $modified_by;
+
+  if((ref $self) =~ /::Uqc/smx) {
+    if (!$rationale) {
+      croak 'Rationale is required';
+    }
+    $values->{'rationale'} = $rationale;
+  } else {
+    if ($rationale) {
+      croak 'Only uqc outcome can take rationale';
+    }
+  }
 
   if ($self->in_storage) {
     $self->update($values);
@@ -142,12 +166,21 @@ sub update_outcome {
 
 sub pack {##no critic (Subroutines::ProhibitBuiltinHomonyms)
    my $self = shift;
+   my $component = $self;
+   my $outcome_type = $component->dict_relation();
+   if ($outcome_type eq 'uqc_outcome'){
+       $component = $self->seq_composition
+                         ->seq_component_compositions
+                         ->next
+                         ->seq_component;
+   }
+
    my $h = {};
-   $h->{'id_run'}      = $self->id_run;
-   $h->{'position'}    = $self->position;
-   $h->{'mqc_outcome'} = $self->mqc_outcome->short_desc;
-   if ($self->can('tag_index') and defined $self->tag_index) {
-     $h->{'tag_index'} = $self->tag_index;
+   $h->{'id_run'}      = $component->id_run;
+   $h->{'position'}    = $component->position;
+   $h->{$outcome_type} = $self->$outcome_type->short_desc;
+   if ($component->can('tag_index') and defined $component->tag_index) {
+     $h->{'tag_index'} = $component->tag_index;
    }
 
    return $h;
@@ -171,8 +204,13 @@ npg_qc::Schema::Mqc::OutcomeEntity
 =head1 DESCRIPTION
 
 Common functionality for lane and library manual qc outcome entity DBIx objects.
+The functionality extends also to usability qc outcome entity objects.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 dict_relation
+
+Returns the corresponding type name (either mqc_outcome or uqc_outcome) of the outcome.
 
 =head2 update
 
@@ -229,8 +267,9 @@ i.e. accepted is changed to rejected and rejected to accepted.
 
 =head2 pack
 
-Returns a hash reference containing record identifies (id_run, position and,
+Returns a hash reference containing record identifiers (id_run, position and,
 where appropriate, tag_index) and a short description of the outcome.
+The method extends also to usability qc outcome entity objects.
 
 =head1 DIAGNOSTICS
 

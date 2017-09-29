@@ -43,8 +43,7 @@ subtest 'retrieving data' => sub {
   throws_ok { $o->get('something') }
     qr/Input is missing or is not an array/,
     'get method requires array input';
-
-  is_deeply($o->get([]), {'lib'=>{},'seq'=>{}}, 'empty request is OK');
+  is_deeply($o->get([]), {'lib'=>{},'seq'=>{},'uqc'=>{}}, 'empty request is OK');
 
   my $v = {'tag_index' => 0};
   throws_ok {$o->get([$v])}
@@ -54,19 +53,18 @@ subtest 'retrieving data' => sub {
   throws_ok {$o->get([$v])}
     qr/Both 'id_run' and 'position' keys should be defined/,
     'badly formed query - error';
-
   my $jsons = [
-    '{"lib":{},"seq":{}}',
-    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5}},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:6":{"tag_index":6,"mqc_outcome":"Undecided","position":3,"id_run":5},"5:3:3":{"tag_index":3,"mqc_outcome":"Rejected preliminary","position":3,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5},"5:3:4":{"tag_index":4,"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:3:2":{"tag_index":2,"mqc_outcome":"Accepted preliminary","position":3,"id_run":5}},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5}}}',
-    '{"lib":{"5:3:6":{"tag_index":6,"mqc_outcome":"Undecided","position":3,"id_run":5},"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5},"5:3:3":{"tag_index":3,"mqc_outcome":"Rejected preliminary","position":3,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5},"5:3:4":{"tag_index":4,"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:3:2":{"tag_index":2,"mqc_outcome":"Accepted preliminary","position":3,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5},"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:6":{"tag_index":6,"mqc_outcome":"Undecided","position":3,"id_run":5},"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5},"5:3:3":{"tag_index":3,"mqc_outcome":"Rejected preliminary","position":3,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5},"5:3:4":{"tag_index":4,"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:3:2":{"tag_index":2,"mqc_outcome":"Accepted preliminary","position":3,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5},"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:1":{"mqc_outcome":"Accepted preliminary","position":1,"id_run":5}}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5},"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:6":{"tag_index":6,"mqc_outcome":"Undecided","position":3,"id_run":5},"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5},"5:3:3":{"tag_index":3,"mqc_outcome":"Rejected preliminary","position":3,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5},"5:3:4":{"tag_index":4,"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:3:2":{"tag_index":2,"mqc_outcome":"Accepted preliminary","position":3,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5},"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5}},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}'
+    '{"lib":{},"seq":{},"uqc":{}}',
+    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}},"uqc":{}}',
+    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}'
   ];
 
   my @data = qw(
@@ -83,9 +81,9 @@ subtest 'retrieving data' => sub {
     5:3:5;5:3:7
   );
 
+
   my $j = 0;
   while ($j < @data) {
-
     if ($j == 1) {
       my $values = {id_run => 5, username => 'u1'};
       for my $i (1 .. 5) {
@@ -101,15 +99,15 @@ subtest 'retrieving data' => sub {
         $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
       }
     } elsif ($j == 5) {
-      $qc_schema->resultset('MqcLibraryOutcomeEnt')->create(
-        {id_run=>5, position=>4, id_mqc_outcome=>1, username=>'u1'});
+      my $values = {id_run=>5, position=>4, id_mqc_outcome=>1, username=>'u1'};
+      $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
     }
 
     my $l = $data[$j];
     is_deeply($o->get(npg_tracking::glossary::rpt->inflate_rpts($l)),
               decode_json($jsons->[$j]), qq[outcome for $l is correct]);
     $j++;
-  } 
+  }
 };
 
 subtest q[find or create entity - error handling] => sub {
@@ -158,7 +156,7 @@ subtest q[find or create lib entity] => sub {
     'username'       => 'cat',
     'modified_by'    => 'dog',
   });
-  
+
   ($row, $query) = $o->_find_or_create_outcome('lib', '45:3:1');
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok($row->in_storage, 'object is retrieved from the db');
@@ -195,7 +193,7 @@ subtest q[find or create lib entity] => sub {
     'username'       => 'cat',
     'modified_by'    => 'dog',
   });
-  
+
   ($row, $query) = $o->_find_or_create_outcome('lib', '45:4');
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok($row->in_storage, 'object is retrieved from the db');
@@ -235,7 +233,7 @@ subtest q[find or create seq entity] => sub {
     'username'       => 'cat',
     'modified_by'    => 'dog',
   });
-  
+
   throws_ok { $o->_find_or_create_outcome('seq', '55:3:1') }
     qr/no such column: tag_index/,
     'query with tag index gives an error for seq outcome';
@@ -327,7 +325,7 @@ subtest q[validation for an update] => sub {
   $outcome->update({'id_mqc_outcome' => $dict_id_final});
   throws_ok { $o->_valid4update($outcome, 'some outcome') }
     qr/Final outcome cannot be updated/,
-    'error updating a final stored lib outcome to another final outcome';  
+    'error updating a final stored lib outcome to another final outcome';
 };
 
 subtest q[save - errors] => sub {
@@ -382,11 +380,16 @@ subtest q[save outcomes] => sub {
   foreach my $key (keys %{$outcomes}) {
     my $h = npg_tracking::glossary::rpt->inflate_rpt($key);
     $h->{'mqc_outcome'} = $outcomes->{$key}->{'mqc_outcome'};
+    foreach my $hkey (keys %{$h}) {
+      if(($hkey eq 'id_run') || ($hkey eq 'position') || ($hkey eq'tag_index')){
+        delete ($h->{$hkey});
+      }
+    }
     $expected->{$key} = $h;
   }
 
-  my $reply = {'lib' => $expected, 'seq'=> {}};
-  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+  my $reply = {'lib' => $expected, 'seq'=> {}, 'uqc'=>{}};
+    is_deeply($o->save({'lib' => $outcomes}, 'cat'),
     $reply, 'only lib info returned');
 
   $qc_schema->resultset('MqcOutcomeEnt')->create({
@@ -396,10 +399,7 @@ subtest q[save outcomes] => sub {
     'username'       => 'cat',
     'modified_by'    => 'dog',
   });
-  
-  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Rejected preliminary',
-                                'id_run'     =>101,
-                                'position'   =>1,};
+  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Rejected preliminary'};
   is_deeply($o->save({'lib' => $outcomes}, 'cat'),
     $reply, 'both lib and seq info returned');
 
@@ -412,28 +412,28 @@ subtest q[save outcomes] => sub {
   foreach my $key (keys %{$outcomes}) {
     my $h = npg_tracking::glossary::rpt->inflate_rpt($key);
     $h->{'mqc_outcome'} = $outcomes->{$key}->{'mqc_outcome'};
+
+    foreach my $hkey (keys %{$h}) {
+      if(($hkey eq 'id_run') || ($hkey eq 'position') || ($hkey eq'tag_index')){
+        delete ($h->{$hkey});
+      }
+    }
     $expected_1->{$key} = $h;
   }
   $reply->{'lib'} = $expected_1;
-  
   is_deeply($o->save({'lib' => $outcomes}, 'cat'),
     $reply, 'both lib and seq info returned');
 
   my %all = (%{$expected}, %{$expected_1});
   $reply->{'lib'} = \%all;
-  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Accepted preliminary',
-                                'id_run'     =>101,
-                                'position'   =>1,};
-  
+  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Accepted preliminary'};
+
   is_deeply($o->save({'seq' =>
     {'101:1'=>{'mqc_outcome'=>'Accepted preliminary'}}}, 'cat', {}),
     $reply, 'updated a seq entity to another prelim outcome');
 
   delete $reply->{'lib'};
-  $reply->{'lib'}->{'101:1:1'} = {'mqc_outcome'=>'Accepted final',
-                                  'id_run'     =>101,
-                                  'position'   =>1,
-                                  'tag_index'  =>1,};
+  $reply->{'lib'}->{'101:1:1'} = {'mqc_outcome'=>'Accepted final'};
   is_deeply($o->save(
     {'lib' => {'101:1:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat'),
     $reply, 'updated one of lib entities to a final outcome');
@@ -544,7 +544,7 @@ subtest q[save outcomes] => sub {
     {'101:1'=>{'mqc_outcome'=>'Rejected final'}}}, 'cat',
     {'101:1'=>[(1 .. 6)]})}
     qr/Final outcome cannot be updated/,
-    'error updating a final outcome to a different final outcome'; 
+    'error updating a final outcome to a different final outcome';
 };
 
 subtest q[outcomes are not saved twice] => sub {
@@ -640,7 +640,7 @@ subtest q[order of saving outcomes: lib, then seq] => sub {
     'three lib results for run 103');
   is($qc_schema->resultset('MqcOutcomeEnt')
                ->search({id_run=>103})->count, 1,
-    'one seq results for run 103');  
+    'one seq results for run 103');
 };
 
 1;

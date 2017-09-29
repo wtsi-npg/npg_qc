@@ -468,6 +468,36 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 uqc_outcome_ent
+
+Type: might_have
+
+Related object: L<npg_qc::Schema::Result::UqcOutcomeEnt>
+
+=cut
+
+__PACKAGE__->might_have(
+  'uqc_outcome_ent',
+  'npg_qc::Schema::Result::UqcOutcomeEnt',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 uqc_outcome_hists
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::UqcOutcomeHist>
+
+=cut
+
+__PACKAGE__->has_many(
+  'uqc_outcome_hists',
+  'npg_qc::Schema::Result::UqcOutcomeHist',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 verify_bam_id
 
 Type: might_have
@@ -484,8 +514,8 @@ __PACKAGE__->might_have(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-03 12:42:13
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XvUVRxvQlw5tvrVm6VXeCg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-18 13:20:30
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iqgrB6vRc6dZayXIWohsUQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
@@ -496,7 +526,7 @@ our $VERSION = '0';
 
 =head2 create_composition
 
-A factory method returning a npg_tracking::glossary::composition object of illumina components. 
+A factory method returning a npg_tracking::glossary::composition object of illumina components.
 
 =cut
 

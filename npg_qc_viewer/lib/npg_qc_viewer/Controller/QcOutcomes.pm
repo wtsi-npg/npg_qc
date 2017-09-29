@@ -43,7 +43,7 @@ Retrieving records:
 Updating/creating records:
 
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
+    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes
 
 =head1 SUBROUTINES/METHODS
 
@@ -174,6 +174,8 @@ sub _update_outcomes {
                      ->save($data, $username, $lane_info);
 
       $seq_outcomes = $outcomes->{$SEQ_OUTCOMES} || {};
+      $seq_outcomes = _unpack($seq_outcomes);
+
       $self->_update_runlanes($c, $seq_outcomes, $username);
 
       $self->status_ok($c, 'entity' => $outcomes,);
@@ -188,6 +190,18 @@ sub _update_outcomes {
   }
 
   return;
+}
+
+sub _unpack {
+  my $outcomes_to_update = shift;
+      foreach my $rpt_key (keys %{$outcomes_to_update}) {
+        my $outcome = $outcomes_to_update->{$rpt_key};
+        my $inflated_rpt = npg_tracking::glossary::rpt->inflate_rpt($rpt_key);
+        foreach my $key_name (keys %{$inflated_rpt}) {
+          $outcome->{$key_name} = $inflated_rpt->{$key_name};
+        }
+      }
+  return $outcomes_to_update;
 }
 
 sub _lane_info {
