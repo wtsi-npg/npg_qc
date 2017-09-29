@@ -9,10 +9,18 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
       npg_qc::Schema::Composition role;
      document 'composition' attribute
  - composition-enabled manual qc:
-     db tables linked to the seq_composition table
-     search proceeds via releated composition tables
-     when mqc outcomes are saved, a composition is created if it does not exist
-     'composition' attribute is added to mqc entity result classes
+     db tables linked to the seq_composition table;
+     search proceeds via releated composition tables;
+     when mqc outcomes are saved, a composition is created if it does not exist;
+     'composition' attribute is added to mqc entity result classes;
+     drop unique consctraint for (id_run, position and tag_index) columns;
+     make a foreign key to seq_composition table not nullable and set
+     a unique constraint on the foreign key column in entity tables;
+     do not use id_run, position and tag index column values from
+     entity tables, compute rpt lists from compositions;
+     do not list explisitly id_run, position and tag_index in return
+     datastructes for both get and save outcomes methods
+ - a method to find a composition without creating one
 
 release 64.1
  - SeqQC viewer - function to draw readonly representation of the
