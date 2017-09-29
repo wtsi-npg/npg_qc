@@ -233,7 +233,7 @@ subtest 'retrieving data via GET and POST' => sub {
       my $response = request($request);
       is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
       is_deeply(decode_json($response->content), decode_json($jsons->[$j]),
-        "response content for ($rpt_list) with uqc content");
+        "response content for ($rpt_list) with uqc encoded content");
     }
     $j++;
   }
@@ -266,13 +266,14 @@ subtest 'authentication and authorisation for an update' => sub {
 };
 
 subtest 'data validation for update requests' => sub {
-  plan tests => 8;
+  plan tests => 14;
 
   my $data = {'Action'   => 'UPDATE',
               'user'     => 'cat',
               'password' => 'secret',
               'lib'      => {},
-              'seq'      => {}};
+              'seq'      => {},
+              'uqc'      => {}};
   my $error_code = 400;
 
   my $request = _new_post_request();
@@ -286,7 +287,15 @@ subtest 'data validation for update requests' => sub {
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
-  is($response->code, $error_code, "error code is $error_code");
+  is($response->code, $error_code, "error code for wrong 'lib' UPDATE request is $error_code");
+  like ($response->content, qr/rpt string should not contain \';\'/,
+    'multi-component compositions are not allowed');
+
+  $data->{'uqc'} = {'1:2;3:4' => {'uqc_outcome' => 'some'}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code for wrong 'uqc' UPDATE request is $error_code");
   like ($response->content, qr/rpt string should not contain \';\'/,
     'multi-component compositions are not allowed');
 
@@ -296,7 +305,15 @@ subtest 'data validation for update requests' => sub {
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
   like ($response->content, qr/Outcome description is missing for 1:4/,
-    'outcome description should be present');
+    'mqc_outcome description should be present');
+
+  $data->{'uqc'} = {'1:2' => {'uqc_outcome' => 'Undecided'}, '1:4' => {'uqc_outcome' => ''}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/Outcome description is missing for 1:4/,
+    'uqc_outcome description should be present');
 
   $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'Undecided'}, '1:4' => {'qc_outcome' => ''}};
   $request = _new_post_request();
@@ -304,7 +321,15 @@ subtest 'data validation for update requests' => sub {
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
   like ($response->content, qr/Outcome description is missing for 1:4/,
-    'outcome description should not be empty');
+    'mqc_outcome description should not be empty');
+
+  $data->{'uqc'} = {'1:2' => {'uqc_outcome' => 'Undecided'}, '1:4' => {'qc_outcome' => ''}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/Outcome description is missing for 1:4/,
+    'uqc_outcome description should not be empty');
 };
 
 
