@@ -8,8 +8,8 @@ use URI::Escape qw(uri_escape);
 use JSON::XS;
 use HTTP::Request;
 use DateTime;
-#use Data::Dumper;
-#$Data::Dumper::Maxdepth=1;
+use Data::Dumper;
+$Data::Dumper::Maxdepth=1;
 
 use npg_tracking::glossary::rpt;
 use t::util;
@@ -44,7 +44,7 @@ sub _new_post_request {
 }
 
 subtest 'retrieving data via GET and POST' => sub {
-  plan tests => 68;
+  plan tests => 100;
 
  my @urls = qw(
     5:3:7
@@ -128,13 +128,13 @@ subtest 'retrieving data via GET and POST' => sub {
     is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{},"uqc":{}}'),
       'response content with empty fields (lib{},seq{},uqc{}) for no encoded values');
   }
-  my $id_sec_compos;
+
   my $values = {id_run => 5, username => 'u1'};
   for my $i (1 .. 5) {
     $values->{'position'} = $i;
     $values->{'id_mqc_outcome'} = $i;
     $qc_schema->resultset('MqcOutcomeEnt')->create($values);
-    $id_sec_compos = t::autoqc_util::find_or_save_composition($qc_schema, {
+    t::autoqc_util::find_or_save_composition($qc_schema, {
       'id_run' => 5, 'position' => $i
     });
   }
@@ -147,14 +147,14 @@ subtest 'retrieving data via GET and POST' => sub {
         $values->{'tag_index'} = $i;
         $values->{'id_mqc_outcome'} = $i-1;
         $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
-        $id_sec_compos = t::autoqc_util::find_or_save_composition($qc_schema, {
+        t::autoqc_util::find_or_save_composition($qc_schema, {
         'id_run' => 5, 'position' => 3, 'tag_index' => $i
         });
       }
     } elsif ($j == 4) {
       $qc_schema->resultset('MqcLibraryOutcomeEnt')->create(
         {id_run=>5, position=>4, id_mqc_outcome=>1, username=>'u1'});
-      $id_sec_compos = t::autoqc_util::find_or_save_composition($qc_schema, {
+      t::autoqc_util::find_or_save_composition($qc_schema, {
         'id_run' => 5, 'position' => 4
         });
     }
@@ -174,7 +174,6 @@ subtest 'retrieving data via GET and POST' => sub {
       is_deeply(decode_json($response->content), decode_json($jsons->[$j]),
         'response content with fields (lib{...},seq{...}) for encoded values but empty uqc{} for non encoded');
     }
-
     $j++;
   }
 
@@ -189,20 +188,19 @@ subtest 'retrieving data via GET and POST' => sub {
     });
     $qc_schema->resultset('UqcOutcomeEnt')->create($values);
     my  $k = '5:' . $i;
-    #warn ("$k =*=*=*=*=* created uqcoutcomeEnt " . Dumper($values));
   }
 
   $jsons = [
     'result test no needed, next loop starts at $j=2',
     'result test no needed, next loop starts at $j=2',
-    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}},"uqc":{}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}},"uqc":{}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}'
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{"5:3:7":{"uqc_outcome":"Rejected"}}}',
+    '{"lib":{"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:6":{"mqc_outcome":"Undecided"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{"5:3":{"uqc_outcome":"Accepted"},"5:3:5":{"uqc_outcome":"Undecided"},"5:3:6":{"uqc_outcome":"Accepted"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:7":{"uqc_outcome":"Rejected"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3:2":{"uqc_outcome":"Undecided"}}}',
+    '{"uqc":{"5:4":{"uqc_outcome":"Rejected"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}},"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{"5:3:6":{"uqc_outcome":"Accepted"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3":{"uqc_outcome":"Accepted"},"5:3:4":{"uqc_outcome":"Rejected"},"5:4":{"uqc_outcome":"Rejected"},"5:3:7":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Undecided"}}}',
+    '{"uqc":{"5:3:6":{"uqc_outcome":"Accepted"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3":{"uqc_outcome":"Accepted"},"5:3:7":{"uqc_outcome":"Rejected"},"5:4":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Undecided"},"5:1":{"uqc_outcome":"Rejected"}},"seq":{"5:1":{"mqc_outcome":"Accepted preliminary"},"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"lib":{"5:3:2":{"mqc_outcome":"Accepted preliminary"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:6":{"mqc_outcome":"Undecided"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:3":{"mqc_outcome":"Rejected preliminary"}}}',
+    '{"uqc":{"5:3:7":{"uqc_outcome":"Rejected"},"5:4":{"uqc_outcome":"Rejected"}},"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"},"5:4":{"mqc_outcome":"Rejected final"}}}',
+    '{"uqc":{"5:3:6":{"uqc_outcome":"Accepted"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3":{"uqc_outcome":"Accepted"},"5:3:7":{"uqc_outcome":"Rejected"},"5:4":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Undecided"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"},"5:4":{"mqc_outcome":"Rejected final"}},"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:2":{"mqc_outcome":"Accepted preliminary"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"}}}',
+    '{"uqc":{"5:3:5":{"uqc_outcome":"Undecided"},"5:3:7":{"uqc_outcome":"Rejected"}},"lib":{"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}'
   ];
 
   $j = 2;
@@ -219,16 +217,7 @@ subtest 'retrieving data via GET and POST' => sub {
         });
         $qc_schema->resultset('UqcOutcomeEnt')->create($values);
         my  $k = '5:3:' . $i;
-        #warn ("$k ========== created uqcoutcomeEnt " . Dumper($values));
       }
-    } elsif ($j == 4) {
-      $values->{'id_uqc_outcome'} = 1,
-      $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition($qc_schema, {
-        'id_run' => 5, 'position' => 4
-      });
-      $qc_schema->resultset('UqcOutcomeEnt')->create($values);
-      my  $k = $urls[$j] ;
-        #warn ("$k =-=-=-=-=- created uqcoutcomeEnt " . Dumper($values));
     }
 
     my $rpt_list = $urls[$j];
@@ -243,7 +232,8 @@ subtest 'retrieving data via GET and POST' => sub {
     for my $request ($request1, $request2) {
       my $response = request($request);
       is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
-      is_deeply(decode_json($response->content), decode_json($jsons->[$j]), "response content $j for $rpt_list: \n response: " . $response->content . "\n testmem : $jsons->[$j]");
+      is_deeply(decode_json($response->content), decode_json($jsons->[$j]),
+        "response content for ($rpt_list) with uqc content");
     }
     $j++;
   }
