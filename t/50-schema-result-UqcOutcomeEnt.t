@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 9;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -17,10 +17,189 @@ my $table      = 'UqcOutcomeEnt';
 my $hist_table = 'UqcOutcomeHist';
 my $dict_table = 'UqcOutcomeDict';
 
-subtest 'Basic operations tests' => sub {
-  plan tests => 19;
+subtest 'Test insert' => sub {
+  plan tests => 8;
 
-  my $values = {'id_uqc_outcome'=>1,
+  my $values = {
+    'id_uqc_outcome'=>1,
+    'username'=>'user',
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user',
+    'rationale'=>'rationale something'
+  };
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 9001, position => 1, tag_index => 1
+  });
+  $values->{'id_seq_composition'} = $id_seq_comp;
+  isa_ok($schema->resultset($table)->create($values),
+    'npg_qc::Schema::Result::' . $table);
+
+  my $rs = $schema->resultset($table)->search({});
+  is ($rs->count, 1, q[one row created in the table]);
+  my $object = $rs->next;
+  is($object->id_uqc_outcome, 1, 'id_uqc_outcome is 1');
+
+  $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 9001, position => 1
+  });
+  $values->{'id_seq_composition'} = $id_seq_comp;
+  isa_ok($schema->resultset($table)->create($values),
+    'npg_qc::Schema::Result::' . $table);
+  $rs = $schema->resultset($table)->search({});
+  is ($rs->count, 2, q[Two rows in the table]);
+
+
+  $values = {
+    'id_uqc_outcome'=>2,
+    'username'=>'user',
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user',
+    'rationale'=>'rationale something'
+  };
+  my $query = {id_run => 9002, position => 2};
+  $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, $query);
+  $values->{'id_seq_composition'} = $id_seq_comp;
+  $rs->deflate_unique_key_components($values);
+  lives_ok {$rs->find_or_new($values)
+               ->set_inflated_columns($values)
+               ->update_or_insert()} 'lane record inserted';
+   my $rs1 = $rs->search($query, {
+                    prefetch => [{
+                    seq_composition =>
+                    {seq_component_compositions => 'seq_component'}
+                    }, 'uqc_outcome']});
+   is ($rs1->count, 1, q[one row created in the table]);
+   my $row = $rs1->next;
+   is($row->seq_composition->seq_component_compositions->next->seq_component->tag_index, undef, 'tag index inflated');
+};
+
+subtest 'Test insert with historic defined' => sub {
+  plan tests => 4;
+
+  my $values = {
+    'id_uqc_outcome'=>1,
+    'username'=>'user',
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user',
+    'rationale'=>'rationale something'
+  };
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {id_run => 9010, position => 1, tag_index => 100});
+  $values->{'id_seq_composition'} = $id_seq_comp;
+  my $hist_object_rs = $schema->resultset($hist_table)->search({
+    'id_seq_composition'=>$id_seq_comp,
+    'id_uqc_outcome'=>1
+  });
+  is ($hist_object_rs->count, 0, q[no row matches in the historic table before insert in entity]);
+  my $object = $schema->resultset($table)->create($values);
+  isa_ok($object, 'npg_qc::Schema::Result::'.$table);
+  my $rs = $schema->resultset($table)->search({
+    id_seq_composition=>$id_seq_comp,
+    id_uqc_outcome=>1
+  });
+  is ($rs->count, 1, q[one row created in the entity table]);
+  $hist_object_rs = $schema->resultset($hist_table)->search({
+    id_seq_composition=>$id_seq_comp,
+    id_uqc_outcome=>1
+  });
+  is ($hist_object_rs->count, 1, q[one row matches in the historic table after insert in entity]);
+};
+
+
+subtest 'insert with historic' => sub {
+  plan tests => 6;
+
+  my $values = {
+    'id_uqc_outcome'=>1,
+    'username'=>'user',
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user',
+    'rationale'=>'rationale something'
+  };
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 9020, position => 3
+  });
+  $values->{'id_seq_composition'} = $id_seq_comp;
+
+  my $values_for_search = {};
+  $values_for_search->{'id_run'}         = 9020;
+  $values_for_search->{'position'}       = 3;
+  $values_for_search->{'tag_index'}      = undef;
+  $values_for_search->{'me.id_uqc_outcome'} = 1;
+  my $rs = $schema->resultset($table);
+  $rs->deflate_unique_key_components($values_for_search);
+  is ($schema->resultset($hist_table)->search($values_for_search, {
+                    prefetch => [{
+                    seq_composition =>{seq_component_compositions => 'seq_component'}},
+                    'uqc_outcome']})->count, 0,
+                    q[no row matches in the historic table before insert in entity]);
+
+  my $object = $schema->resultset($table)->create($values);
+  isa_ok ($object, 'npg_qc::Schema::Result::'.$table);
+  is ($object->seq_composition->seq_component_compositions->next->seq_component->tag_index,
+   undef, q[tag_index inflated in entity]);
+
+  $rs = $schema->resultset($table)->search({'id_seq_composition'=>$id_seq_comp, 'id_uqc_outcome'=>1});
+  is ($rs->count, 1, q[one row created in the entity table]);
+
+  my $hist_object_rs = $schema->resultset($hist_table)->search($values_for_search, {
+                    prefetch => [{
+                    seq_composition =>{seq_component_compositions => 'seq_component'}},
+                    'uqc_outcome']});
+  is ($hist_object_rs->count, 1,
+    q[one row matches in the historic table after insert in entity]);
+  is ($hist_object_rs->next->
+      seq_composition->
+      seq_component_compositions->next->
+      seq_component->tag_index,
+   undef, q[tag_index inflated in historic]);
+};
+
+subtest q[update] => sub {
+  plan tests => 14;
+
+  my $rs = $schema->resultset($table);
+  my $hrs = $schema->resultset($hist_table);
+  my $args = {
+    'id_uqc_outcome'=>1,
+    'username'=>'user',
+    'last_modified'=>DateTime->now(),
+    'modified_by'=>'user',
+    'rationale'=>'rationale something'
+  };
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 9444, position => 1, tag_index => 2
+  });
+  $args->{'id_seq_composition'} = $id_seq_comp;
+
+  my $new_row = $rs->new_result($args);
+  my $outcome = 'Rejected';
+  lives_ok { $new_row->update_outcome($outcome, 'cat','cat', 'rationale other') }
+    'uqc outcome saved';
+  ok ($new_row->in_storage, 'new object has been saved');
+
+  my $hist_rs = $hrs->search({'id_seq_composition'=>$id_seq_comp, 'id_uqc_outcome'=>2});
+  is ($hist_rs->count, 1, 'one historic is created');
+  my $hist_new_row = $hist_rs->next();
+
+  isa_ok ($new_row->last_modified, 'DateTime');
+  ok ($new_row->is_rejected, 'is rejected');
+  ok (!$new_row->is_final_accepted, 'not final accepted');
+
+  for my $row (($new_row, $hist_new_row)) {
+    is ($row->uqc_outcome->short_desc(), $outcome, 'correct prelim. outcome');
+    is ($row->username, 'cat', 'username');
+    is ($row->modified_by, 'cat', 'modified_by');
+    ok ($row->last_modified, 'timestamp is set');
+  }
+};
+
+
+subtest 'Basic operations tests' => sub {
+  plan tests => 20;
+  is ($schema->resultset($table)->search({}), 6,
+    q[starting with 4 exiting rows in the table]);
+  my $values = {
+    'id_uqc_outcome'=>1,
     'username'=>'user',
     'last_modified'=>DateTime->now(),
     'modified_by'=>'user',
@@ -31,7 +210,7 @@ subtest 'Basic operations tests' => sub {
   });
   isa_ok($schema->resultset($table)->create($values),
     'npg_qc::Schema::Result::UqcOutcomeEnt');
-  is ($schema->resultset($table)->search({}), 1,
+  is ($schema->resultset($table)->search({}), 7,
     q[one row created in the table]);
   $values = {
     'id_uqc_outcome'=>2
@@ -223,7 +402,7 @@ subtest 'Data for historic' => sub {
 };
 
 subtest q[update on a new result] => sub {
-  plan tests => 35;
+  plan tests => 29;
 
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
@@ -247,13 +426,14 @@ subtest q[update on a new result] => sub {
   is ($hist_rs->count, 1, 'one historic is created');
   my $hist_new_row = $hist_rs->next();
 
+  isa_ok ($new_row->last_modified, 'DateTime');
+  ok ($new_row->is_accepted, 'is acepted');
+
   for my $row (($new_row, $hist_new_row)) {
-     is ($new_row->uqc_outcome->short_desc(), $outcome, 'correct outcome');
-     is ($new_row->username, 'cat', 'username');
-     is ($new_row->modified_by, 'cat', 'modified_by');
-     ok ($new_row->last_modified, 'timestamp is set');
-     isa_ok ($new_row->last_modified, 'DateTime');
-     ok ($new_row->is_accepted, 'is accepted');
+     is ($row->uqc_outcome->short_desc(), $outcome, 'correct outcome');
+     is ($row->username, 'cat', 'username');
+     is ($row->modified_by, 'cat', 'modified_by');
+     ok ($row->last_modified, 'timestamp is set');
   }
 
   $outcome = 'Rejected';
@@ -274,20 +454,16 @@ subtest q[update on a new result] => sub {
   $hist_new_row = $hist_rs->next();
 
   my $new_row_via_search = $rs->search($args)->next;
+  isa_ok ($new_row->last_modified, 'DateTime');
+  ok ($new_row->is_rejected, 'is rejected');
 
   for my $row (($new_row, $new_row_via_search, $hist_new_row)) {
-    is ($new_row->uqc_outcome->short_desc(), $outcome, 'correct outcome');
-    is ($new_row->username, 'cat', 'username');
-    is ($new_row->modified_by, 'dog', 'modified_by');
-    ok ($new_row->last_modified, 'timestamp is set');
-    isa_ok ($new_row->last_modified, 'DateTime');
-    ok ($new_row->is_rejected, 'is rejected');
+    is ($row->uqc_outcome->short_desc(), $outcome, 'correct outcome');
+    is ($row->username, 'cat', 'username');
+    is ($row->modified_by, 'dog', 'modified_by');
+    ok ($row->last_modified, 'timestamp is set');
   }
   $new_row->delete();
 };
-
-# TODO: VERIFY THAT TOGGLE OUTCOME DOES NOT APPLY TO UQC
-#subtest q[toggle outcome] => sub {
-# };
 
 1;

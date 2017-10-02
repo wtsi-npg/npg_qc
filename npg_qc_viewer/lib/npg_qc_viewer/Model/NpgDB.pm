@@ -14,7 +14,7 @@ our $VERSION  = '0';
 
 npg_qc_viewer::Model::NpgDB
 
-=head1 SYNOPSIS  
+=head1 SYNOPSIS
 
 =head1 DESCRIPTION
 

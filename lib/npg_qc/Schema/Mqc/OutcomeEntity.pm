@@ -10,7 +10,6 @@ with 'npg_qc::Schema::Composition';
 
 our $VERSION = '0';
 
-requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
 
@@ -28,8 +27,9 @@ Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
 foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
       my $self = shift;
+      my $outcome_type = $self->dict_relation();
       my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
-      return $self->mqc_outcome->$that_class_method;
+      return $self->$outcome_type->$that_class_method;
     }
   );
 }
@@ -42,6 +42,17 @@ around [qw/update insert/] => sub {
   $self->_create_historic();
   return $return_super;
 };
+
+sub dict_relation {
+  my $self = shift;
+  my $name = ref $self;
+  ($name) = $name =~ /::(\w+qc)(?:\w+)*OutcomeEnt\Z/smx;
+  if (!$name) {
+    croak 'Unexpected class name';
+  }
+  $name = lc $name;
+  return $name . q[_outcome];
+}
 
 sub get_time_now {
   return DateTime->now(time_zone => DateTime::TimeZone->new(name => q[local]));
@@ -84,12 +95,13 @@ sub _create_historic {
 
 sub toggle_final_outcome {
   my ($self, $modified_by, $username) = @_;
+  my $outcome_type = $self->dict_relation();
 
   if (!$self->in_storage) {
     croak 'Record is not stored in the database yet';
   }
   if (!$self->has_final_outcome) {
-    croak 'Cannot toggle non-final outcome ' . $self->mqc_outcome->short_desc;
+    croak 'Cannot toggle non-final outcome ' . $self->$outcome_type->short_desc;
   }
   if ($self->is_undecided) {
     croak 'Cannot toggle undecided final outcome';
@@ -126,7 +138,7 @@ sub update_outcome {
   }
 
   my $values = {};
-  $values->{'id_mqc_outcome'} = $self->_outcome_id($outcome);
+  $values->{'id_' . $self->dict_relation()} = $self->_outcome_id($outcome);
   $values->{'username'}       = $username || $modified_by;
   $values->{'modified_by'}    = $modified_by;
 
@@ -171,6 +183,7 @@ npg_qc::Schema::Mqc::OutcomeEntity
 =head1 DESCRIPTION
 
 Common functionality for lane and library manual qc outcome entity DBIx objects.
+The functionality extends also to usability qc outcome entity objects.
 
 =head1 SUBROUTINES/METHODS
 
@@ -178,6 +191,10 @@ Common functionality for lane and library manual qc outcome entity DBIx objects.
 
 A lazy-build attribute of type npg_tracking::glossary::composition.
 It is built by inspection the linked seq_composition row.
+
+=head2 dict_relation
+
+Returns the corresponding type name (either mqc_outcome or uqc_outcome) of the outcome.
 
 =head2 update
 

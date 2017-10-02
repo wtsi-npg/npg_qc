@@ -7,8 +7,13 @@ use Readonly;
 use List::MoreUtils qw/ any none /;
 use Carp;
 use Try::Tiny;
+use npg_qc::Schema::Mqc::OutcomeEntity;
 
-use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
+use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES
+                                   $SEQ_OUTCOMES
+                                   $QC_OUTCOME
+                                   $UQC_OUTCOMES
+                                   $UQC_OUTCOME/;
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
 
@@ -16,10 +21,12 @@ our $VERSION = '0';
 
 Readonly::Scalar my $SEQ_RS_NAME => 'MqcOutcomeEnt';
 Readonly::Scalar my $LIB_RS_NAME => 'MqcLibraryOutcomeEnt';
+Readonly::Scalar my $UQC_RS_NAME => 'UqcOutcomeEnt';
 Readonly::Scalar my $IDRK        => 'id_run';
 Readonly::Scalar my $PK          => 'position';
 Readonly::Scalar my $TIK         => 'tag_index';
-Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES);
+Readonly::Scalar my $SEQ_COMP    => 'seq_component';
+Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOMES);
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -29,7 +36,6 @@ has 'qc_schema' => (
 
 sub get {
   my ($self, $qlist) = @_;
-
   if (!$qlist || (ref $qlist ne 'ARRAY')) {
     croak q[Input is missing or is not an array];
   }
@@ -45,6 +51,7 @@ sub get {
 
   my @lib_outcomes = ();
   my @seq_outcomes = ();
+  my @uqc_outcomes = ();
 
   foreach my $id_run ( keys %{$hashed_queries} ) {
 
@@ -58,17 +65,19 @@ sub get {
       if ( none { !defined } @tags ) {
         $query->{$TIK} = \@tags;
       }
-      push @lib_outcomes, $self->_create_query($LIB_RS_NAME, $query)->all();
+      push @lib_outcomes, $self->_create_query($LIB_RS_NAME, $QC_OUTCOME, $query)->all();
     }
 
     # Get seq outcomes for a lane.
     my $q = {$IDRK => $id_run, $PK => \@positions};
-    push @seq_outcomes, $self->_create_query($SEQ_RS_NAME, $q)->all();
+    push @seq_outcomes, $self->_create_query($SEQ_RS_NAME, $QC_OUTCOME, $q)->all();
+    push @seq_outcomes, $self->_create_query($UQC_RS_NAME, $UQC_OUTCOME, $q)->all();
   }
 
   my $h = {};
   $h->{$LIB_OUTCOMES} = _map_outcomes(\@lib_outcomes);
   $h->{$SEQ_OUTCOMES} = _map_outcomes(\@seq_outcomes);
+  $h->{$UQC_OUTCOMES} = _map_outcomes(\@uqc_outcomes);
 
   return $h;
 }
@@ -103,7 +112,7 @@ sub _map_outcomes {
   my $map = {};
   foreach my $o (@{$outcomes}) {
     $map->{$o->composition()->freeze2rpt()} =
-      { 'mqc_outcome' => $o->mqc_outcome()->short_desc };
+      { 'mqc_outcome' => $o->dict_relation()->short_desc };
   }
   return $map;
 }
@@ -153,9 +162,9 @@ sub _save_outcomes {
 }
 
 sub _create_query {
-  my ($self, $rsname, $query) = @_;
+  my ($self, $rsname, $dict_rel_name, $query) = @_;
   my $db_query = $self->qc_schema()->resultset($rsname)
-                                   ->search({}, {'join' => $QC_OUTCOME})
+                                   ->search({}, {'join' => $dict_rel_name})
                                    ->search_autoqc($query);
   return $db_query;
 }
@@ -288,23 +297,44 @@ DBIx npg qc schema object, required attribute.
 
 Takes an array of queries. Each query hash should contain at least the 'id_run'
 and 'position' keys and can also contain the 'tag_index' key.
- 
-Returns simple representations of rows hashed first on the type of
-the outcome 'lib' for library outcomes and 'seq' for sequencing outcomes
-and then on rpt keys.
+
+Returns simple representations of rows hashed first on three type of
+outcomes: 'lib' for library outcomes, 'seq' for sequencing outcomes
+and 'uqc' for the usability quality check, then for each type a list of rpt keys.
 
   use Data::Dumper;
   print Dumper $obj->get([{id_run=>5,position=>3,tag_index=>7});
 
   $VAR1 = {
+<<<<<<< HEAD
     'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
     'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
+=======
+          'lib' => {
+                     '5:3:7' => {
+                                  'mqc_outcome' => 'Undecided final'
+                                }
+                   },
+          'seq' => {
+                     '5:3' => {
+                                'mqc_outcome' => 'Accepted final'
+                              }
+                   }
+          'uqc' => {
+                     '5:3' =>   {
+                                  'uqc_outcome' => 'Accepted'
+                                }
+                     '5:3:7' => {
+                                  'uqc_outcome' => 'Accepted'
+                                }
+                   }
+>>>>>>> wtsiDevelUsabilityTables
           };
 
 For a query with id_run and position the sequencing lane outcome and all known
-library outcomes for this position are be returned. For a query with id_run,
+library outcomes for this position are returned. For a query with id_run,
 position and tag_index both the sequencing lane outcome and library outcome are
-returned. 
+returned.
 
 =head2 save
 
