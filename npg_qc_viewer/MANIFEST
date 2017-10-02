@@ -16,7 +16,6 @@ lib/npg_qc_viewer/Model/MLWarehouseDB.pm
 lib/npg_qc_viewer/Model/SeqStore.pm
 lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
 lib/npg_qc_viewer/Model/User.pm
-lib/npg_qc_viewer/Util/CompositionFactory.pm
 lib/npg_qc_viewer/Util/Error.pm
 lib/npg_qc_viewer/Util/ExtendedHttpStatus.pm
 lib/npg_qc_viewer/Util/FileFinder.pm
