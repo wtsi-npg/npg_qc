@@ -118,7 +118,6 @@ t/00-podcoverage.t
 t/00-pod.t
 t/10-authentication-SangerSSOnpg.t
 t/10-npg_tracking-daemon-seqqc.t
-t/10-util-CompositionFactory.t
 t/10-util-Error.t
 t/10-util-FileFinder.t
 t/10-util-TransferObject.t
