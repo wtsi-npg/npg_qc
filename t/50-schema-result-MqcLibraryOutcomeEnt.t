@@ -134,7 +134,7 @@ subtest 'insert with historic' => sub {
 
 subtest q[update] => sub {
   plan tests => 53;
-  
+
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
 
@@ -158,10 +158,10 @@ subtest q[update] => sub {
     ok (!$new_row->has_final_outcome, 'not final outcome');
     ok ($new_row->is_accepted, 'is accepted');
     ok (!$new_row->is_final_accepted, 'not final accepted');
-  } 
-  
+  }
+
   $outcome = 'Accepted final';
- 
+
   $new_row = $rs->new_result($args);
   throws_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
     qr /UNIQUE constraint failed/,
@@ -240,7 +240,7 @@ subtest q[toggle final outcome] => sub {
   lives_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     'can toggle final outcome';
   is($new_row->mqc_outcome->short_desc, $outcome, 'new outcome');
-  
+
   lives_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     'can toggle final outcome once more';
   is($new_row->mqc_outcome->short_desc, $old_outcome, 'old outcome again');
