@@ -219,7 +219,7 @@ subtest 'Data for historic' => sub {
 };
 
 subtest q[update on a new result] => sub {
-  plan tests => 45;
+  plan tests => 42;
   
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
@@ -237,15 +237,16 @@ subtest q[update on a new result] => sub {
   is ($hist_rs->count, 1, 'one historic is created');
   my $hist_new_row = $hist_rs->next();
 
+  ok (!$new_row->has_final_outcome, 'not final outcome');
+  ok ($new_row->is_accepted, 'is accepted');
+  ok (!$new_row->is_final_accepted, 'not final accepted');
+
   for my $row (($new_row, $hist_new_row)) {
-    is ($new_row->mqc_outcome->short_desc(), $outcome, 'correct prelim. outcome');
-    is ($new_row->username, 'cat', 'username');
-    is ($new_row->modified_by, 'cat', 'modified_by');
-    ok ($new_row->last_modified, 'timestamp is set');
-    isa_ok ($new_row->last_modified, 'DateTime');
-    ok (!$new_row->has_final_outcome, 'not final outcome');
-    ok ($new_row->is_accepted, 'is accepted');
-    ok (!$new_row->is_final_accepted, 'not final accepted');
+    is ($row->mqc_outcome->short_desc(), $outcome, 'correct prelim. outcome');
+    is ($row->username, 'cat', 'username');
+    is ($row->modified_by, 'cat', 'modified_by');
+    ok ($row->last_modified, 'timestamp is set');
+    isa_ok ($row->last_modified, 'DateTime');
   } 
   
   $outcome = 'Accepted final';
