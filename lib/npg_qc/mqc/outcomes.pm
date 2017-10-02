@@ -297,21 +297,8 @@ and then on rpt keys.
   print Dumper $obj->get([{id_run=>5,position=>3,tag_index=>7});
 
   $VAR1 = {
-          'lib' => {
-                     '5:3:7' => {
-                                  'tag_index' => 7,
-                                  'mqc_outcome' => 'Undecided final',
-                                  'position' => 3,
-                                  'id_run' => 5
-                                }
-                   },
-          'seq' => {
-                     '5:3' => {
-                                'mqc_outcome' => 'Accepted final',
-                                'position' => 3,
-                                'id_run' => 5
-                              }
-                   }
+    'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
+    'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
           };
 
 For a query with id_run and position the sequencing lane outcome and all known
