@@ -6,6 +6,10 @@ use DateTime::TimeZone;
 use Carp;
 use Readonly;
 
+with 'npg_tracking::glossary::composition::factory::attributes' =>
+  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+with 'npg_qc::Schema::Composition';
+
 our $VERSION = '0';
 
 requires 'mqc_outcome';
@@ -141,16 +145,16 @@ sub update_outcome {
 }
 
 sub pack {##no critic (Subroutines::ProhibitBuiltinHomonyms)
-   my $self = shift;
-   my $h = {};
-   $h->{'id_run'}      = $self->id_run;
-   $h->{'position'}    = $self->position;
-   $h->{'mqc_outcome'} = $self->mqc_outcome->short_desc;
-   if ($self->can('tag_index') and defined $self->tag_index) {
-     $h->{'tag_index'} = $self->tag_index;
-   }
+  my $self = shift;
+  my $h = {};
+  $h->{'id_run'}      = $self->id_run;
+  $h->{'position'}    = $self->position;
+  $h->{'mqc_outcome'} = $self->mqc_outcome->short_desc;
+  if ($self->can('tag_index') and defined $self->tag_index) {
+    $h->{'tag_index'} = $self->tag_index;
+  }
 
-   return $h;
+  return $h;
 }
 
 no Moose::Role;
@@ -173,6 +177,11 @@ npg_qc::Schema::Mqc::OutcomeEntity
 Common functionality for lane and library manual qc outcome entity DBIx objects.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 composition
+
+A lazy-build attribute of type npg_tracking::glossary::composition.
+It is built by inspection the linked seq_composition row.
 
 =head2 update
 
@@ -232,6 +241,11 @@ i.e. accepted is changed to rejected and rejected to accepted.
 Returns a hash reference containing record identifies (id_run, position and,
 where appropriate, tag_index) and a short description of the outcome.
 
+=head2 create_composition
+
+Returns a npg_tracking::glossary::composition object corresponding to
+this result.
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -250,6 +264,10 @@ where appropriate, tag_index) and a short description of the outcome.
 
 =item Carp
 
+=item npg_tracking::glossary::composition::factory::attributes
+
+=item npg_tracking::glossary::composition::component::illumina
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -262,7 +280,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd
+Copyright (C) 2017 Genome Research Ltd
 
 This file is part of NPG.
 

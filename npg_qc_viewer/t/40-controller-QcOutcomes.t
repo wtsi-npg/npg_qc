@@ -8,6 +8,7 @@ use JSON::XS;
 use HTTP::Request;
 
 use npg_tracking::glossary::rpt;
+use npg_tracking::glossary::composition::factory::rpt_list;
 use t::util;
 
 use_ok('npg_qc_viewer::Controller::QcOutcomes');
@@ -124,10 +125,21 @@ subtest 'retrieving data via GET and POST' => sub {
     is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{}}'), 'response content');
   }
 
+
+  my $fkeys = {};
+  my $rs = $qc_schema->resultset('MqcOutcomeEnt');
+  foreach my $l (@urls, qw(5:1 5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6)) {
+    my $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => $l)->create_composition();
+    my $seq_c = $rs->find_or_create_seq_composition($c);
+    $fkeys->{$l} =  $seq_c->id_seq_composition();
+  }
+
   my $values = {id_run => 5, username => 'u1'};
   for my $i (1 .. 5) {
     $values->{'position'} = $i;
     $values->{'id_mqc_outcome'} = $i;
+    $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, $i};
     $qc_schema->resultset('MqcOutcomeEnt')->create($values);
   }
        
@@ -139,11 +151,16 @@ subtest 'retrieving data via GET and POST' => sub {
       for my $i (2 .. 7) {
         $values->{'tag_index'} = $i;
         $values->{'id_mqc_outcome'} = $i-1;
+        $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, 3, $i};
         $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
       }
     } elsif ($j == 4) {
       $qc_schema->resultset('MqcLibraryOutcomeEnt')->create(
-        {id_run=>5, position=>4, id_mqc_outcome=>1, username=>'u1'});
+        {id_run             => 5,
+         position           => 4,
+         id_seq_composition => $fkeys->{'5:4'},
+         id_mqc_outcome     => 1,
+         username           => 'u1'});
     }
     
     my $rpt_list = $urls[$j];

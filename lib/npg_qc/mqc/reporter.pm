@@ -88,10 +88,18 @@ sub _build__data4reporting {
 
   while (my $outcome = $rs->next()) {
 
-    my $lane_id;
-    my $from_gclp;
-    my $id_run   = $outcome->id_run;
-    my $position = $outcome->position;
+    my $composition = $outcome->seq_composition();
+    if ($composition->size > 1) {
+      next;
+    }
+    my $component = $composition->seq_component_compositions()
+                                ->first() # Safe, we have one component only.
+                                ->seq_component();
+    if (defined $component->tag_index || defined $component->subset) {
+      croak 'Incorrectly linked outcome with id ' . $outcome->id_mqc_outcome_ent;
+    }
+    my $id_run   = $component->id_run;
+    my $position = $component->position;
 
     my $rswh = $product_rs->search(
                 {
@@ -103,6 +111,8 @@ sub _build__data4reporting {
                   'order_by' => { -desc => 'me.tag_index' },
                 });
 
+    my $lane_id;
+    my $from_gclp;
     while ( my $product_row = $rswh->next ) {
       my $fc = $product_row->iseq_flowcell;
       if( $fc ) {

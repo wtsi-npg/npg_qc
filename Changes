@@ -8,6 +8,11 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      inherit 'composition' attribute from a newly created
       npg_qc::Schema::Composition role;
      document 'composition' attribute
+ - composition-enabled manual qc:
+     db tables linked to the seq_composition table
+     search proceeds via releated composition tables
+     when mqc outcomes are saved, a composition is created if it does not exist
+     'composition' attribute is added to mqc entity result classes
 
 release 64.1
  - SeqQC viewer - function to draw readonly representation of the
