@@ -12,6 +12,9 @@ use npg_qc::Schema::Mqc::OutcomeDict;
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 use npg_qc::mqc::outcomes;
 
+use Data::Dumper;
+
+
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
 our $VERSION  = '0';
@@ -43,7 +46,7 @@ Retrieving records:
 Updating/creating records:
 
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
+    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes
 
 =head1 SUBROUTINES/METHODS
 
