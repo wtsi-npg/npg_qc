@@ -1,6 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
  
- - DBIx achema loader script: automatically add npg_qc::Schema::Composition
+ - DBIx schema loader script: automatically add npg_qc::Schema::Composition
      role when generating result classes for autoqc tables
  - DBIx classes for autoqc db tables:
      remove 'create_component' factory method which was only needed
