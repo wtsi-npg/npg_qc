@@ -111,8 +111,9 @@ sub _map_outcomes {
   my $outcomes = shift;
   my $map = {};
   foreach my $o (@{$outcomes}) {
+    my $rel_name = $o->dict_relation();
     $map->{$o->composition()->freeze2rpt()} =
-      { 'mqc_outcome' => $o->dict_relation()->short_desc };
+      { $rel_name => $o->$rel_name->short_desc };
   }
   return $map;
 }
@@ -144,7 +145,8 @@ sub _save_outcomes {
             }
             $outcome_ent->update_outcome($outcome_description, $username);
             if ($outcome_type eq 'seq' && $outcome_ent->has_final_outcome) {
-              my @lib_outcomes = $self->_create_query($LIB_RS_NAME, $query)->all();
+              my $rel_name = $outcome_ent->dict_relation();
+              my @lib_outcomes = $self->_create_query($LIB_RS_NAME, $rel_name, $query)->all();
               $self->_validate_library_outcomes(
                       $outcome_ent, \@lib_outcomes, $lane_info->{$key});
               $self->_finalise_library_outcomes(\@lib_outcomes, $username);
