@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
  
+ - Cannot have default Moose constructor in derived DBIx classes - fix for
+     custom MqcOutcomeEnt resultset
  - DBIx achema loader script: automatically add npg_qc::Schema::Composition
      role when generating result classes for autoqc tables
  - DBIx classes for autoqc db tables:

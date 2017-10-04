@@ -1,8 +1,7 @@
 package npg_qc::Schema::ResultSet::MqcOutcomeEnt;
 
 use Moose;
-use MooseX::NonMoose;
-use namespace::autoclean;
+use MooseX::MarkAsMethods autoclean => 1;
 
 extends 'npg_qc::Schema::ResultSet';
 
@@ -29,7 +28,7 @@ sub get_ready_to_report {
   return $rs;
 }
 
-__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 1;
 __END__
@@ -67,9 +66,7 @@ npg_qc::Schema::ResultSet::MqcOutcomeEnt
 
 =item Moose
 
-=item MooseX::NonMoose
-
-=item namespace::autoclean
+=item MooseX::MarkAsMethods
 
 =item npg_qc::Schema::ResultSet
 
@@ -85,7 +82,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL Genome Research Limited
+Copyright (C) 2017 GRL Genome Research Limited
 
 This file is part of NPG.
 
