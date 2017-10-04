@@ -71,7 +71,7 @@ sub get {
     # Get seq outcomes for a lane.
     my $q = {$IDRK => $id_run, $PK => \@positions};
     push @seq_outcomes, $self->_create_query($SEQ_RS_NAME, $QC_OUTCOME, $q)->all();
-    push @seq_outcomes, $self->_create_query($UQC_RS_NAME, $UQC_OUTCOME, $q)->all();
+    push @uqc_outcomes, $self->_create_query($UQC_RS_NAME, $UQC_OUTCOME, $q)->all();
   }
 
   my $h = {};
