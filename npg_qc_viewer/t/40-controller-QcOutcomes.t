@@ -92,8 +92,7 @@ subtest 'retrieving data via GET and POST' => sub {
     my $m = _message($request);
     ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
-    like($response->content,
-      qr/Both id_run and position should be available/, 'error message');
+    like($response->content, qr/isn't numeric/, 'error message');
   }
 
   my $rpt = '5:8:7;5:8:8';
