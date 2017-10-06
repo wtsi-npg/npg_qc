@@ -646,6 +646,7 @@ t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/Data/Intens
 t/data/nfs/sf44/ILorHSany_sf25/incoming/100925_HS8_05330_B_205NNABXX/RunInfo.xml
 t/data/qcoutcomes/fixtures/000-mqc_library_outcome_dict.yml
 t/data/qcoutcomes/fixtures/000-mqc_outcome_dict.yml
+t/data/qcoutcomes/fixtures/000-uqc_outcome_dict.yml
 t/data/reporter/npg_qc/mqc_outcome_dict.yml
 t/data/reporter/npg_qc/mqc_outcome_ent.yml
 t/data/reporter/npg_qc/seq_component.yml

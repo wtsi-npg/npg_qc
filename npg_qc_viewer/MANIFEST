@@ -143,6 +143,7 @@ t/80-app-run-stash.t
 t/80-app-run.t
 t/80-app-sample.t
 t/80-app.t
+t/autoqc_util.pm
 t/client/run_js_tests.sh
 t/client/test.html
 t/client/test.js
@@ -184,6 +185,7 @@ t/data/fixtures/npg/400-RunStatus.yml
 t/data/fixtures/npg/400-TagRun.yml
 t/data/fixtures/npgqc/000-mqc_outcome_dict.yml
 t/data/fixtures/npgqc/000-mqc_library_outcome_dict.yml
+t/data/fixtures/npgqc/000-uqc_outcome_dict.yml
 t/data/fixtures/mlwarehouse/300-IseqProductMetric.yml
 t/data/fixtures/mlwarehouse/400-IseqFlowcell.yml
 t/data/fixtures/mlwarehouse/400-IseqRunLaneMetric.yml

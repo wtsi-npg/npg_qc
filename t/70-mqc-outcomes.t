@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 13;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON::XS;
@@ -33,7 +33,7 @@ subtest 'constructor tests' => sub {
   isa_ok($o, 'npg_qc::mqc::outcomes');
 };
 
-subtest 'retrieving data' => sub {
+subtest 'retrieving data with only lib and seq (non uqc_outcomes)' => sub {
   plan tests => 16;
 
   my $o = npg_qc::mqc::outcomes->new(
@@ -128,6 +128,110 @@ subtest 'retrieving data' => sub {
     $j++;
   }
 };
+
+
+subtest 'Prerequisite: retrieving data with only uqc_outcomes (empty lib and seq)' => sub {
+  plan tests => 6;
+
+  my $rs = $qc_schema->resultset('UqcOutcomeEnt');
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => '7:2:1' )->create_composition();
+  my $seq_c = $rs->find_or_create_seq_composition($c);
+
+  my $idseq = $seq_c->id_seq_composition();
+
+  my $values={'last_modified' => DateTime->now(),
+              'username' => 'u1',
+              'modified_by' =>' user',
+              'rationale' =>'rationale something',
+              'id_seq_composition' => $idseq,
+              'id_uqc_outcome' => 1
+            };
+  my $row = $rs->create($values);
+  ok($row, 'prerequisite: uqc has row');
+  isa_ok ($row, 'npg_qc::Schema::Result::UqcOutcomeEnt', 'prerequisite: uqc row is correct class');
+  my $row_found = $rs->search_autoqc({id_run=>7,position=>2,tag_index=>1})->next();
+  ok($row_found, 'prerequisite: finds a uqc row');
+  isa_ok ($row_found, 'npg_qc::Schema::Result::UqcOutcomeEnt', 'prerequisite: correct class');
+  is($row->id_uqc_outcome_ent, $row_found->id_uqc_outcome_ent, 'prerequisite: found then same row');
+  my $o = npg_qc::mqc::outcomes->new(qc_schema  => $qc_schema);
+  is_deeply($o->get([{id_run=>7, position=>2, tag_index=>1}]),
+              {'lib' => {},'uqc' => {'7:2:1' => {'uqc_outcome' => 'Accepted'}},'seq' => {}},
+              qq[prerequisite: uqc_outcome for 7:2:1 is correct]);
+};
+
+subtest 'retrieving data with lib, seq and uqc_outcomes' => sub {
+
+  plan tests => 8;
+  my $rs = $qc_schema->resultset('UqcOutcomeEnt');
+
+  my @data = qw(
+     5:3:7
+     5:3:7
+     5:3
+     5:3:7
+     5:3
+     5:4
+     5:4;5:3
+     5:4;5:3;5:1
+     5:4;5:3:7
+     5:4;5:3:7;5:3
+     5:3:5;5:3:7
+   );
+  my $jsons = [
+    'result test no needed, next loop starts at $j=3',
+    'result test no needed, next loop starts at $j=3',
+    'result test no needed, next loop starts at $j=3',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{"5:3:5":{"uqc_outcome":"Undecided"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3:7":{"uqc_outcome":"Rejected"},"5:3":{"uqc_outcome":"Accepted"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3:6":{"uqc_outcome":"Accepted"}}}',
+    '{"uqc":{"5:3:2":{"uqc_outcome":"Undecided"},"5:3:6":{"uqc_outcome":"Accepted"},"5:3:7":{"uqc_outcome":"Rejected"},"5:3":{"uqc_outcome":"Accepted"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Undecided"},"5:3:3":{"uqc_outcome":"Accepted"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:2":{"mqc_outcome":"Accepted preliminary"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}}}',
+    '{"uqc":{"5:4":{"uqc_outcome":"Rejected"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}},"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}}}',
+    '{"lib":{"5:3:2":{"mqc_outcome":"Accepted preliminary"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:6":{"mqc_outcome":"Undecided"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"}},"uqc":{"5:3:3":{"uqc_outcome":"Accepted"},"5:3:6":{"uqc_outcome":"Accepted"},"5:3:4":{"uqc_outcome":"Rejected"},"5:4":{"uqc_outcome":"Rejected"},"5:3:7":{"uqc_outcome":"Rejected"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3":{"uqc_outcome":"Accepted"},"5:3:5":{"uqc_outcome":"Undecided"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}}}',
+    '{"uqc":{"5:1":{"uqc_outcome":"Rejected"},"5:3:7":{"uqc_outcome":"Rejected"},"5:4":{"uqc_outcome":"Rejected"},"5:3":{"uqc_outcome":"Accepted"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3:5":{"uqc_outcome":"Undecided"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3:6":{"uqc_outcome":"Accepted"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}},"lib":{"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:6":{"mqc_outcome":"Undecided"},"5:3:5":{"mqc_outcome":"Rejected final"}}}',
+    '{"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"uqc":{"5:3:7":{"uqc_outcome":"Rejected"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Undecided"},"5:4":{"uqc_outcome":"Rejected"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3:6":{"uqc_outcome":"Accepted"},"5:3":{"uqc_outcome":"Accepted"}}}',
+    '{"uqc":{"5:3:6":{"uqc_outcome":"Accepted"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3":{"uqc_outcome":"Accepted"},"5:3:7":{"uqc_outcome":"Rejected"},"5:4":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Undecided"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"},"5:4":{"mqc_outcome":"Rejected final"}},"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:2":{"mqc_outcome":"Accepted preliminary"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"}}}',
+    '{"lib":{"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:7":{"mqc_outcome":"Undecided final"}},"uqc":{"5:3:6":{"uqc_outcome":"Accepted"},"5:3:7":{"uqc_outcome":"Rejected"},"5:3:3":{"uqc_outcome":"Accepted"},"5:3:2":{"uqc_outcome":"Undecided"},"5:3:5":{"uqc_outcome":"Undecided"},"5:3:4":{"uqc_outcome":"Rejected"},"5:3":{"uqc_outcome":"Accepted"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}'
+  ];
+  my $o = npg_qc::mqc::outcomes->new(qc_schema  => $qc_schema);
+  my $fkeys = {};
+  foreach my $l (@data, qw(5:1 5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6)) {
+    my $c = npg_tracking::glossary::composition::factory::rpt_list
+           ->new(rpt_list => $l)->create_composition();
+    my $seq_c = $rs->find_or_create_seq_composition($c);
+    $fkeys->{$l} =  $seq_c->id_seq_composition();
+  }
+
+  my $j = 3;
+  while ($j < @data) {
+    if ($j == 3) {
+      for my $i (1 .. 5) {
+        my $id_seq_c = $fkeys->{join q[:], 5, $i};
+        my $uqcvalues = {'last_modified' => DateTime->now(),
+              'username' => 'u1',
+              'modified_by' =>' user',
+              'rationale' =>'rationale something',
+              'id_seq_composition' => $id_seq_c,
+              'id_uqc_outcome' => (($i % 3)+1)};
+        $qc_schema->resultset('UqcOutcomeEnt')->create($uqcvalues);
+      }
+      for my $i (2 .. 7) {
+        my $id_seq_c = $fkeys->{join q[:], 5, 3, $i};
+        my $uqcvalues = {'last_modified' => DateTime->now(),
+              'username' => 'u1',
+              'modified_by' =>' user',
+              'rationale' =>'rationale something',
+              'id_seq_composition' => $id_seq_c,
+              'id_uqc_outcome' => (($i % 3)+1)};
+        $qc_schema->resultset('UqcOutcomeEnt')->create($uqcvalues);
+      }
+    }
+  my $l = $data[$j];
+  my $query = npg_tracking::glossary::rpt->inflate_rpts($l);
+  is_deeply($o->get($query),
+          decode_json($jsons->[$j]), qq[outcome for $l is correct]);
+  $j++;
+ }
+};
+
 
 subtest q[find or create entity - error handling] => sub {
   plan tests => 3;
