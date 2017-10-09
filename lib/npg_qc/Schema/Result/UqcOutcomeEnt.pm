@@ -98,14 +98,6 @@ Web interface username
 
 Last user to modify the row
 
-=head2 last_reported
-
-  data_type: 'timestamp'
-  datetime_undef_if_invalid: 1
-  is_nullable: 1
-
-When was reported the last time to LIMS
-
 =head2 rationale
 
   data_type: 'varchar'
@@ -149,12 +141,6 @@ __PACKAGE__->add_columns(
   },
   'modified_by',
   { data_type => 'char', is_nullable => 0, size => 128 },
-  'last_reported',
-  {
-    data_type => 'timestamp',
-    datetime_undef_if_invalid => 1,
-    is_nullable => 1,
-  },
   'rationale',
   { data_type => 'varchar', is_nullable => 0, size => 150 },
 );
@@ -218,8 +204,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 10:42:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lLVoRRCErB6tciG+8yMPyw
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-06 16:30:06
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4atyHWY4bkPHPJe7WEEbVQ
 
 use Carp;
 

@@ -185,6 +185,7 @@ lib/R/gc_bias_data.R
 MANIFEST
 README
 scripts/npgqc_dbix_schema_loader.pl
+scripts/upgrade_schema/update_schema_utility_feature
 src/fastq_summ/Makefile
 src/fastq_summ/fastq_summ.c
 src/fastq_summ/fastqcheck.c

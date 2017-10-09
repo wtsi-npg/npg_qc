@@ -18,7 +18,7 @@ my $hist_table = 'UqcOutcomeHist';
 my $dict_table = 'UqcOutcomeDict';
 
 subtest 'Test insert' => sub {
-  plan tests => 8;
+  plan tests => 9;
 
   my $values = {
     'id_uqc_outcome'=>1,
@@ -37,7 +37,8 @@ subtest 'Test insert' => sub {
   my $rs = $schema->resultset($table)->search({});
   is ($rs->count, 1, q[one row created in the table]);
   my $object = $rs->next;
-  is($object->id_uqc_outcome, 1, 'id_uqc_outcome is 1');
+  is($object->id_seq_composition, $id_seq_comp, 'id_seq_composition unique key is correct');
+  is($object->id_uqc_outcome, 1, 'id_uqc_outcome is correct');
 
   $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
         id_run => 9001, position => 1
@@ -46,13 +47,12 @@ subtest 'Test insert' => sub {
   isa_ok($schema->resultset($table)->create($values),
     'npg_qc::Schema::Result::' . $table);
   $rs = $schema->resultset($table)->search({});
-  is ($rs->count, 2, q[Two rows in the table]);
+  is ($rs->count, 2, q[Two rows in the table with different id_seq_composition]);
 
 
   $values = {
     'id_uqc_outcome'=>2,
     'username'=>'user',
-    'last_modified'=>DateTime->now(),
     'modified_by'=>'user',
     'rationale'=>'rationale something'
   };
@@ -70,7 +70,7 @@ subtest 'Test insert' => sub {
                     }, 'uqc_outcome']});
    is ($rs1->count, 1, q[one row created in the table]);
    my $row = $rs1->next;
-   is($row->seq_composition->seq_component_compositions->next->seq_component->tag_index, undef, 'tag index inflated');
+   is($row->seq_composition->seq_component_compositions->next->seq_component->tag_index, undef, 'tag index inflated through DBIX binding');
 };
 
 subtest 'Test insert with historic defined' => sub {
@@ -106,19 +106,29 @@ subtest 'Test insert with historic defined' => sub {
 
 
 subtest 'insert with historic' => sub {
-  plan tests => 6;
+  plan tests => 11;
 
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 9020, position => 3
+  });
   my $values = {
+    'id_seq_composition'=>$id_seq_comp,
     'id_uqc_outcome'=>1,
     'username'=>'user',
     'last_modified'=>DateTime->now(),
     'modified_by'=>'user',
     'rationale'=>'rationale something'
   };
-  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
-        id_run => 9020, position => 3
-  });
-  $values->{'id_seq_composition'} = $id_seq_comp;
+
+  my @notNullFields = ('id_seq_composition','id_uqc_outcome','username','modified_by','rationale');
+  foreach my $nnf (@notNullFields){
+    my $tempval = $values->{$nnf};
+    $values->{$nnf} = undef;
+    throws_ok { $schema->resultset($table)->create($values); }
+      qr/NOT NULL constraint failed/,
+      "Absent $nnf throws error";
+    $values->{$nnf} = $tempval;
+  }
 
   my $values_for_search = {};
   $values_for_search->{'id_run'}         = 9020;
@@ -151,7 +161,7 @@ subtest 'insert with historic' => sub {
       seq_composition->
       seq_component_compositions->next->
       seq_component->tag_index,
-   undef, q[tag_index inflated in historic]);
+   undef, q[tag_index inflated in historic, DBIX relationships between uqc_ent, uqc_utcome_hist, seq_composition finds tag_index ]);
 };
 
 subtest q[update] => sub {
@@ -370,7 +380,7 @@ subtest 'Misc tests' => sub {
 };
 
 subtest 'Data for historic' => sub {
-  plan tests => 12;
+  plan tests => 10;
 
   my $temp_id_seq_comp=t::autoqc_util::find_or_save_composition($schema, {
     id_run => 9001, position => 3
@@ -389,7 +399,6 @@ subtest 'Data for historic' => sub {
   is($entity->modified_by, $historic->{'modified_by'}, 'Modified by matches');
   is($entity->last_modified, $historic->{'last_modified'}, 'Last modified matches');
 
-  $values->{'last_reported'} = DateTime->now();
   $entity = $schema->resultset($table)->new_result($values);
   $historic = $entity->data_for_historic;
   is($entity->id_seq_composition, $historic->{'id_seq_composition'}, 'id_seq_composition matches');
@@ -397,8 +406,6 @@ subtest 'Data for historic' => sub {
   is($entity->username, $historic->{'username'}, 'Username matches');
   is($entity->modified_by, $historic->{'modified_by'}, 'Modified by matches');
   is($entity->last_modified, $historic->{'last_modified'}, 'Last modified matches');
-  ok($entity->last_reported, 'There is value for last_reported in entity');
-  ok(!defined $historic->{'reported'}, 'There is no value for reported in historic');
 };
 
 subtest q[update on a new result] => sub {

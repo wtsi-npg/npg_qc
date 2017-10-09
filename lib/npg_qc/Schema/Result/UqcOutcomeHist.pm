@@ -98,6 +98,14 @@ Web interface username
 
 Last user to modify the row
 
+=head2 rationale
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 150
+
+Explanation of utility qc choice
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -133,6 +141,8 @@ __PACKAGE__->add_columns(
   },
   'modified_by',
   { data_type => 'char', is_nullable => 0, size => 128 },
+  'rationale',
+  { data_type => 'varchar', is_nullable => 0, size => 150 },
 );
 
 =head1 PRIMARY KEY
@@ -180,8 +190,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-18 13:20:30
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vRSw60briOUpKF+Icv9uGA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-06 16:30:06
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:7lcvgOlmwSLc2aK+m8vhPg
 
 our $VERSION = '0';
 
