@@ -65,11 +65,15 @@ __PACKAGE__->table('uqc_outcome_dict');
   is_nullable: 0
   size: 50
 
+Short description of the uqc_outcome
+
 =head2 long_desc
 
   data_type: 'varchar'
   is_nullable: 1
   size: 150
+
+Long description of the uqc_outcome
 
 =head2 iscurrent
 
@@ -164,8 +168,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 10:42:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0SnbIZRoXEksiDK+HPBESg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-10 16:47:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iP98lfhdUgugcrUNXjX1xQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
@@ -225,7 +229,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL Genome Research Limited
+Copyright (C) 2017 GRL Genome Research Limited
 
 This file is part of NPG.
 

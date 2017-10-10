@@ -12,9 +12,6 @@ use npg_qc::Schema::Mqc::OutcomeDict;
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 use npg_qc::mqc::outcomes;
 
-use Data::Dumper;
-
-
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
 our $VERSION  = '0';
@@ -90,7 +87,7 @@ the following payload is valid:
 
  '{"Action":"UPDATE","seq":{"5:8":{"mqc_outcome":"Undecided"}}}'.
 
-An update request can contain both 'seq' and 'lib' sections, each of the
+An update request can contain 'seq' 'lib' and 'uqc' sections, each of the
 sections can contain multiple entries. See npg_qc::mqc::outcome->save() for details.
 
 =cut
@@ -272,7 +269,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd.
+Copyright (C) 2017 Genome Research Ltd.
 
 This file is part of NPG software.
 

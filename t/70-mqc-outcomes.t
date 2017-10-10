@@ -10,7 +10,6 @@ use DateTime::Duration;
 use npg_testing::db;
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
-use t::autoqc_util;
 
 use_ok('npg_qc::mqc::outcomes');
 
@@ -787,4 +786,3 @@ subtest q[order of saving outcomes: lib, then seq] => sub {
 };
 
 1;
-

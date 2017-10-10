@@ -250,7 +250,7 @@ t/50-schema-result-SamtoolsStats.t
 t/50-schema-result-SeqComposition.t
 t/50-schema-result-SequenceSummary.t
 t/50-schema-result-UqcOutcomeDict.t
-t/50-schema-result-UqcOutcomEnt.t
+t/50-schema-result-UqcOutcomeEnt.t
 t/50-schema-result-UqcOutcomeHist.t
 t/50-schema-resultset.t
 t/50-schema-resultset-MqcOutcomeEnt.t
@@ -304,7 +304,6 @@ t/60-autoqc-results-verify_bam_id.t
 t/70-mqc-reporter.t
 t/70-mqc-outcomes.t
 t/80-autoqc-qc-script.t
-t/autoqc_util.pm
 t/data/config.ini
 t/data/api_dbic_fixtures/npg_qc/RunTimeline.yml
 t/data/api_dbic_fixtures/npg/RunStatusDict.yml

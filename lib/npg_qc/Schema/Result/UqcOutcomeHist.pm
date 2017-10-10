@@ -75,6 +75,8 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   is_foreign_key: 1
   is_nullable: 0
 
+A foreign key referencing the id_uqc_outcome column of the uqc_outcome_dict table
+
 =head2 username
 
   data_type: 'char'
@@ -90,6 +92,8 @@ Web interface username
   default_value: current_timestamp
   is_nullable: 0
 
+last time the record was modified
+
 =head2 modified_by
 
   data_type: 'char'
@@ -104,7 +108,7 @@ Last user to modify the row
   is_nullable: 0
   size: 150
 
-Explanation of utility qc choice
+Audit trace
 
 =cut
 
@@ -190,8 +194,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-06 16:30:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:7lcvgOlmwSLc2aK+m8vhPg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-10 16:47:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:W25wZbDnVcThChyx0ZEQNw
 
 our $VERSION = '0';
 

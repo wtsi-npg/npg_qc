@@ -25,7 +25,6 @@ Readonly::Scalar my $UQC_RS_NAME => 'UqcOutcomeEnt';
 Readonly::Scalar my $IDRK        => 'id_run';
 Readonly::Scalar my $PK          => 'position';
 Readonly::Scalar my $TIK         => 'tag_index';
-Readonly::Scalar my $SEQ_COMP    => 'seq_component';
 Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOMES);
 
 has 'qc_schema' => (
@@ -302,7 +301,7 @@ and 'position' keys and can also contain the 'tag_index' key.
 
 Returns simple representations of rows hashed first on three type of
 outcomes: 'lib' for library outcomes, 'seq' for sequencing outcomes
-and 'uqc' for the usability quality check, then for each type a list of rpt keys.
+and 'uqc' for the user utility quality check, then rpt list string keys.
 
   use Data::Dumper;
   print Dumper $obj->get([{id_run=>5,position=>3,tag_index=>7});
@@ -323,9 +322,7 @@ and 'uqc' for the usability quality check, then for each type a list of rpt keys
                               }
                    }
           'uqc' => {
-                     '5:3' =>   {
-                                  'uqc_outcome' => 'Accepted'
-                                }
+
                      '5:3:7' => {
                                   'uqc_outcome' => 'Accepted'
                                 }
@@ -337,6 +334,10 @@ For a query with id_run and position the sequencing lane outcome and all known
 library outcomes for this position are returned. For a query with id_run,
 position and tag_index both the sequencing lane outcome and library outcome are
 returned.
+For the uqc_outcomes, only the lane outcomes are be returned for a query with id_run
+and position. For a query with id_run, position and tag_index only the plex uqc_outcomes
+are returned.
+
 
 =head2 save
 

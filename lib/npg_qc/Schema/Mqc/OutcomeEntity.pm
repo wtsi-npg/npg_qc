@@ -95,13 +95,12 @@ sub _create_historic {
 
 sub toggle_final_outcome {
   my ($self, $modified_by, $username) = @_;
-  my $outcome_type = $self->dict_relation();
 
   if (!$self->in_storage) {
     croak 'Record is not stored in the database yet';
   }
   if (!$self->has_final_outcome) {
-    croak 'Cannot toggle non-final outcome ' . $self->$outcome_type->short_desc;
+    croak 'Cannot toggle non-final outcome ' . $self->mqc_outcome->short_desc;
   }
   if ($self->is_undecided) {
     croak 'Cannot toggle undecided final outcome';
@@ -141,17 +140,6 @@ sub update_outcome {
   $values->{'id_' . $self->dict_relation()} = $self->_outcome_id($outcome);
   $values->{'username'}       = $username || $modified_by;
   $values->{'modified_by'}    = $modified_by;
-
-  if((ref $self) =~ /::Uqc/smx) {
-    if (!$rationale) {
-      croak 'Rationale is required';
-    }
-    $values->{'rationale'} = $rationale;
-  } else {
-    if ($rationale) {
-      croak 'Only uqc outcome can take rationale';
-    }
-  }
 
   if ($self->in_storage) {
     $self->update($values);
@@ -194,7 +182,7 @@ It is built by inspection the linked seq_composition row.
 
 =head2 dict_relation
 
-Returns the corresponding type name (either mqc_outcome or uqc_outcome) of the outcome.
+Returns the name of the relationship to the outcomes dictionary.
 
 =head2 update
 

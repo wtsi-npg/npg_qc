@@ -75,6 +75,8 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   is_foreign_key: 1
   is_nullable: 0
 
+A foreign key referencing the id_uqc_outcome column of the uqc_outcome_dict table
+
 =head2 username
 
   data_type: 'char'
@@ -90,6 +92,8 @@ Web interface username
   default_value: current_timestamp
   is_nullable: 0
 
+last time the record was modified
+
 =head2 modified_by
 
   data_type: 'char'
@@ -100,11 +104,11 @@ Last user to modify the row
 
 =head2 rationale
 
-  data_type: 'varchar'
+  data_type: 'char'
   is_nullable: 0
-  size: 150
+  size: 128
 
-Explanation of utility qc choice
+Audit trace
 
 =cut
 
@@ -142,7 +146,7 @@ __PACKAGE__->add_columns(
   'modified_by',
   { data_type => 'char', is_nullable => 0, size => 128 },
   'rationale',
-  { data_type => 'varchar', is_nullable => 0, size => 150 },
+  { data_type => 'char', is_nullable => 0, size => 128 },
 );
 
 =head1 PRIMARY KEY
@@ -204,8 +208,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-06 16:30:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4atyHWY4bkPHPJe7WEEbVQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-10 16:47:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oG/q5dOkJ/e9LH72FaUPzw
 
 use Carp;
 
@@ -229,7 +233,8 @@ __END__
 
 =head1 DESCRIPTION
 
-Entity for UQC outcome.
+Entity for UQC outcome. This class inherits from Mqc::OutcomeEntity and has a relationship
+to seq_composition through id_seq_composition.
 
 =head1 DIAGNOSTICS
 
