@@ -13,6 +13,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      search proceeds via releated composition tables
      when mqc outcomes are saved, a composition is created if it does not exist
      'composition' attribute is added to mqc entity result classes
+ - upgrade bower to 1.8.2 in travis
 
 release 64.1
  - SeqQC viewer - function to draw readonly representation of the
