@@ -18,46 +18,40 @@ my $table = 'UqcOutcomeHist';
 #Test insert
  subtest 'insert tests' => sub {
   plan tests => 8;
-   my $values = {'id_uqc_outcome'=>1,
-       'username'=>'user',
-       'last_modified'=>DateTime->now(),
-       'modified_by'=>'cat',
-       'rationale'=>'some rationale'};
-   $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition($schema, {
-        id_run => 9001, position => 1
-   });
+   my $values = { 'id_uqc_outcome'  => 1,
+                  'username'        => 'user',
+                  'last_modified'   => DateTime->now(),
+                  'modified_by'     => 'cat',
+                  'rationale'       => 'some rationale'};
+   $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'   => 9001,
+                          'position' => 1});
    my $object = $schema->resultset($table)->create($values);
    isa_ok($object, 'npg_qc::Schema::Result::UqcOutcomeHist');
    my $rs = $schema->resultset($table)->search({});
    is ($rs->count, 1, q[One row created in the table]);
 
-   my @notNullFields = ('id_seq_composition',
-                        'id_uqc_outcome',
-                        'username',
-                        'last_modified',
-                        'modified_by',
-                        'rationale');
-   foreach my $nnf (@notNullFields){
-     my $tempval = $values->{$nnf};
-     $values->{$nnf} = undef;
+   foreach my $notNull (sort keys %{$values}){
+     my $tempval = $values->{$notNull};
+     $values->{$notNull} = undef;
      throws_ok { $schema->resultset($table)->create($values); }
        qr/NOT NULL constraint failed/,
-       "Absent $nnf throws error";
-     $values->{$nnf} = $tempval;
+       "Absent $notNull throws error";
+     $values->{$notNull} = $tempval;
    }
  };
 
-#Test select
- subtest 'select tests' => sub{
+#Test relationships
+ subtest 'relationships tests' => sub{
   plan tests => 6;
-   my $values = {'id_uqc_outcome'=>1,
-       'username'=>'user',
-       'last_modified'=>DateTime->now(),
-       'modified_by'=>'user',
-       'rationale'=>'some rationale'};
-   my $temp_id_seq_comp=t::autoqc_util::find_or_save_composition($schema, {
-    id_run => 9001, position => 2
-   });
+   my $values = { 'id_uqc_outcome'  => 1,
+                  'username'        => 'user',
+                  'last_modified'   => DateTime->now(),
+                  'modified_by'     => 'user',
+                  'rationale'       => 'some rationale'};
+   my $temp_id_seq_comp=t::autoqc_util::find_or_save_composition(
+              $schema, { 'id_run'   => 9001,
+                         'position' => 2});
    $values->{'id_seq_composition'} = $temp_id_seq_comp;
    my $rs = $schema->resultset($table)->search({'id_seq_composition'=>$temp_id_seq_comp});
    is ($rs->count, 0, q[Row absent in the table before creation]);
@@ -75,32 +69,6 @@ my $table = 'UqcOutcomeHist';
    is ($row->uqc_outcome->short_desc, 'Accepted',
     q[DBIX relationship connects uqc_outcome with Dictionary]);
  };
-
- #Test update
- subtest 'update tests' => sub{
-  plan tests => 4;
-   my $values = {'id_uqc_outcome'=>3,
-       'username'=>'user',
-       'last_modified'=>DateTime->now(),
-       'modified_by'=>'user',
-       'rationale'=>'some rationale'};
-   my $temp_id_seq_comp=t::autoqc_util::find_or_save_composition($schema, {
-    id_run => 9001, position => 3
-   });
-   $values->{'id_seq_composition'} = $temp_id_seq_comp;
-   my $rs = $schema->resultset($table);
-   lives_ok {$rs->create($values)} 'Insert new entity';
-   is ($schema->resultset($table)->search({'id_seq_composition'=>$temp_id_seq_comp,
-    'id_uqc_outcome'=>2})->count,
-     0, q[No row matches in the table before update]);
-   lives_ok {$rs->find({'id_seq_composition'=>$temp_id_seq_comp})->update({
-    'id_uqc_outcome'=>2})}
-     'Find and update the outcome in the new entity';
-   is ($schema->resultset($table)->search({'id_seq_composition'=>$temp_id_seq_comp,
-    'id_uqc_outcome'=>2})->count, 1, q[One row matches in the table after update]);
- };
-
-
 
 
 1;
