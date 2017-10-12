@@ -57,7 +57,6 @@ subtest 'retrieving data via GET and POST' => sub {
   );
 
   my $jsons = [
-    # '{"lib":{},"seq":{},"uqc":{}}',
     '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
     '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
     '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',

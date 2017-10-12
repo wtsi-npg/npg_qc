@@ -301,43 +301,23 @@ and 'position' keys and can also contain the 'tag_index' key.
 
 Returns simple representations of rows hashed first on three type of
 outcomes: 'lib' for library outcomes, 'seq' for sequencing outcomes
-and 'uqc' for the user utility quality check, then rpt list string keys.
+and 'uqc' for the user utility outcomes check, and then on rpt list string keys.
 
   use Data::Dumper;
   print Dumper $obj->get([{id_run=>5,position=>3,tag_index=>7});
 
   $VAR1 = {
-<<<<<<< HEAD
     'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
     'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
-=======
-          'lib' => {
-                     '5:3:7' => {
-                                  'mqc_outcome' => 'Undecided final'
-                                }
-                   },
-          'seq' => {
-                     '5:3' => {
-                                'mqc_outcome' => 'Accepted final'
-                              }
-                   }
-          'uqc' => {
-
-                     '5:3:7' => {
-                                  'uqc_outcome' => 'Accepted'
-                                }
-                   }
->>>>>>> wtsiDevelUsabilityTables
+    'uqc' => {'5:3:7' => {'mqc_outcome' => 'Rejected'}}
           };
 
 For a query with id_run and position the sequencing lane outcome and all known
 library outcomes for this position are returned. For a query with id_run,
 position and tag_index both the sequencing lane outcome and library outcome are
 returned.
-For the uqc_outcomes, only the lane outcomes are be returned for a query with id_run
-and position. For a query with id_run, position and tag_index only the plex uqc_outcomes
-are returned.
-
+For the uqc_outcomes, any level outcomes for a lane are returned, whether the
+query was for a lane or plex-level result.
 
 =head2 save
 
