@@ -28,6 +28,7 @@ npg_qc_viewer::Controller::QcOutcomes
 
 Controller for the manual QC  and user utility QC outcomes JSON service.
 The service allows for retrieving, creating and updating QC outcomes.
+For user utility outcomes only the retrieval part is implemented.
 
 =head1 DESCRIPTION
 

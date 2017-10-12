@@ -225,7 +225,7 @@ otherwise returns false.
 
 Updates the outcome of the entity with values provided. Stores a new row
 if this entity was not yet stored in database. This method has not been yet
-extended to updatin gutility outcomes.
+extended to updating utility outcomes.
 
   $obj->update_outcome($outcome, $username);
   $obj->update_outcome($outcome, $username, $rt_ticket);
