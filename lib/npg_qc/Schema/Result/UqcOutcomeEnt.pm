@@ -213,7 +213,8 @@ __PACKAGE__->belongs_to(
 
 use Carp;
 
-with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
+with qw/npg_qc::Schema::Mqc::OutcomeEntity/ =>
+  { -excludes => [qw/toggle_final_outcome update_outcome/] };
 
 our $VERSION = '0';
 
