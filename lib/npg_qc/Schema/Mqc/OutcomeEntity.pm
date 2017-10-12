@@ -45,13 +45,13 @@ around [qw/update insert/] => sub {
 
 sub dict_relation {
   my $self = shift;
-  my $name = ref $self;
-  ($name) = $name =~ /::(\w+qc)(?:\w+)*OutcomeEnt\Z/smx;
-  if (!$name) {
-    croak 'Unexpected class name';
-  }
-  $name = lc $name;
-  return $name . q[_outcome];
+  my $name = $self->_is_mqc_type_outcome() ? 'm' : 'u';
+  return $name . q[qc_outcome];
+}
+
+sub _is_mqc_type_outcome {
+  my $name = ref shift;
+  return $name =~ /::Mqc(?:Library)?OutcomeEnt\Z/smx;
 }
 
 sub get_time_now {
@@ -140,6 +140,14 @@ sub update_outcome {
   $values->{'id_' . $self->dict_relation()} = $self->_outcome_id($outcome);
   $values->{'username'}       = $username || $modified_by;
   $values->{'modified_by'}    = $modified_by;
+
+  if (defined $rationale) {
+    $values->{'rationale'} = $rationale;
+  } else {
+    if (!$self->_is_mqc_type_outcome()) {
+      croak q[Rationale is required];
+    }
+  }
 
   if ($self->in_storage) {
     $self->update($values);

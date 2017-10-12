@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 18;
+use Test::More tests => 17;
 use Moose::Meta::Class;
 use npg_testing::db;
 
