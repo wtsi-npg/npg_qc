@@ -21,12 +21,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      do not list explisitly id_run, position and tag_index in return
      datastructes for both get and save outcomes methods
  - a method to find a composition without creating one
+ - utility QC feature: db tables, DBIx classes, retrieval
 
- - creating new SQL tables to handle usability feature
- - new schema result objects for UQC tables
- - modified mqc outcomes to return uqc data in json
- - tests for uqc_tables and get() requests
- 
 release 64.1
  - SeqQC viewer - function to draw readonly representation of the
    utility flag

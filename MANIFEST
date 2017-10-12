@@ -185,7 +185,6 @@ lib/R/gc_bias_data.R
 MANIFEST
 README
 scripts/npgqc_dbix_schema_loader.pl
-scripts/upgrade_schema/update_schema_utility_feature
 src/fastq_summ/Makefile
 src/fastq_summ/fastq_summ.c
 src/fastq_summ/fastqcheck.c
@@ -585,6 +584,7 @@ t/data/fixtures/000-analysis.yml
 t/data/fixtures/000-image_store.yml
 t/data/fixtures/000-mqc_outcome_dict.yml
 t/data/fixtures/000-mqc_library_outcome_dict.yml
+t/data/fixtures/000-uqc_outcome_dict.yml
 t/data/fixtures/000-run_tile.yml
 t/data/fixtures/100-analysis_lane.yml
 t/data/fixtures/100-cache_query.yml

@@ -26,12 +26,12 @@ npg_qc_viewer::Controller::QcOutcomes
 
 =head1 SYNOPSIS
 
-Controller for the QC outcomes JSON service. The service allows for
-retrieving, creating and updating QC outcomes.
+Controller for the manual QC  and user utility QC outcomes JSON service.
+The service allows for retrieving, creating and updating QC outcomes.
 
 =head1 DESCRIPTION
 
-Handles GET and post requests on the /qcoutcomes URL.
+Handles GET and POST requests on the /qcoutcomes URL.
 
 Retrieving records:
 
@@ -87,7 +87,7 @@ the following payload is valid:
 
  '{"Action":"UPDATE","seq":{"5:8":{"mqc_outcome":"Undecided"}}}'.
 
-An update request can contain 'seq' 'lib' and 'uqc' sections, each of the
+An update request can contain both 'seq' and 'lib' sections, each of the
 sections can contain multiple entries. See npg_qc::mqc::outcome->save() for details.
 
 =cut
