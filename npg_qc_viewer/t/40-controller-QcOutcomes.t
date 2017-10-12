@@ -67,7 +67,7 @@ subtest 'retrieving data via GET and POST' => sub {
     '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}},"uqc":{}}',
     '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
     '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}'
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{"5:3:7":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Accepted"}}}'
   ];
 
   my $r1 = HTTP::Request->new('GET',  $base_url);
@@ -162,6 +162,16 @@ subtest 'retrieving data via GET and POST' => sub {
          id_seq_composition => $fkeys->{'5:4'},
          id_mqc_outcome     => 1,
          username           => 'u1'});
+    } elsif ($j == 9) {
+      my $values = {'id_seq_composition' => $fkeys->{join q[:], 5, 3, 5},
+                    'id_uqc_outcome'     => 1,
+                    'username'           => 'user',
+                    'modified_by'        => 'user',
+                    'rationale'          => 'rationale something'};
+      $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+      $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, 3, 7};
+      $values->{'id_uqc_outcome'} = 2;
+      $qc_schema->resultset('UqcOutcomeEnt')->create($values);
     }
 
     my $rpt_list = $urls[$j];
