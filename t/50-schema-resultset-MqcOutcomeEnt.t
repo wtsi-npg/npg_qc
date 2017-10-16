@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
@@ -18,6 +18,9 @@ my $resultset = $schema->resultset($table);
 while (my $row = $resultset->next) {
   $row->delete;
 }
+ 
+lives_and {is $resultset->search_autoqc({})->count(), 0}
+  'having invoked search_autoqc() method can run count() method';
 
 subtest q[outcomes ready for reporting] => sub {
   plan tests => 15;
