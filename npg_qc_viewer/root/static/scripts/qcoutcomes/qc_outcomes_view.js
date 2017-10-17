@@ -68,24 +68,30 @@ define([
     o.append(icon);
   };
 
+  var _buildTdSelection = function (rpt_key, isMultiple, elementClass){
+     var rptKeyAsSelector;
+      if (isMultiple){
+        rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + rpt_key + '"]';
+      } else {
+        //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
+        rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
+      }
+      rptKeyAsSelector = rptKeyAsSelector + ' td.' + elementClass;
+      return $(rptKeyAsSelector);
+  };
+
   var _processOutcomes = function (outcomes, elementClass) {
     var rpt_keys = Object.keys(outcomes);
-
+     if ((elementClass !== 'lane') && (elementClass !== 'tag_info')) {
+       throw 'Invalid type of rpt key element class ' + elementClass;
+     }
     for (var i = 0; i < rpt_keys.length; i++) {
       var rpt_key = rpt_keys[i];
       var qc_outcome = outcomes[rpt_key];
-      var rptKeyAsSelector;
-      if(elementClass === 'lane') {
-        rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + rpt_key + '"]';
-      } else if (elementClass === 'tag_info') {
-        //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
-        rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
-      } else {
-        throw 'Invalid type of rpt key element class ' + elementClass;
-      }
-      rptKeyAsSelector = rptKeyAsSelector + ' td.' + elementClass;
+      var isMultiple = elementClass === 'lane';
+      var tdSelection =  _buildTdSelection(rpt_key, isMultiple, elementClass);
       if (typeof qc_outcome.mqc_outcome !== 'undefined') {
-        qc_css_styles.displayElementAs($(rptKeyAsSelector), qc_outcome.mqc_outcome);
+        qc_css_styles.displayElementAs(tdSelection, qc_outcome.mqc_outcome);
       } else {
         throw 'Malformed QC outcomes data for ' + rpt_key;
       }
