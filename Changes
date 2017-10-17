@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
- 
+
+release 64.2
  - Cannot have default Moose constructor in derived DBIx classes - fix for
      custom MqcOutcomeEnt resultset
  - DBIx achema loader script: automatically add npg_qc::Schema::Composition
