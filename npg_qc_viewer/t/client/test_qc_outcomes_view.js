@@ -11,17 +11,63 @@ requirejs.config({
 requirejs([
   'scripts/qcoutcomes/qc_outcomes_view',
   'scripts/qcoutcomes/qc_css_styles'
-], function(mqc_outcomes, qc_css_styles) {
+], function(qc_outcomes, qc_css_styles) {
 
 
     QUnit.test('Parsing RPT keys', function (assert) {
-      var rptKeys = mqc_outcomes._parseRptKeys('results_summary');
+      var rptKeys = qc_outcomes._parseRptKeys('results_summary');
       var expected = ['18245:1', '18245:1:1', '18245:1:2','19001:1', '19001:1:1', '19001:1:2'];
       assert.deepEqual(rptKeys, expected, 'Correct rpt keys');
     });
 
+    QUnit.test("Parameter validation tests for _selectionForKey", function (assert) {
+      assert.throws(
+        function() {
+          qc_outcomes._selectionForKey();
+        },
+        /Both key and elementClass are required/i,
+        'Throws with no params'
+      );
+      assert.throws(
+        function() {
+          qc_outcomes._selectionForKey('18245:1');
+        },
+        /Both key and elementClass are required/i,
+        'Throws with only key param'
+      );
+      assert.throws(
+        function() {
+          qc_outcomes._selectionForKey('lane');
+        },
+        /Both key and elementClass are required/i,
+        'Throws with only elementClass param'
+      );
+      
+      var selection = qc_outcomes._selectionForKey('18245:1','lane',true);
+      assert.equal(selection.length, 3, 
+        "fuzzy _selectionForKey returns 3 objects for 'lane' 18245:1");
+      selection = qc_outcomes._selectionForKey('18245:1:2','tag_info',false);
+      assert.equal(selection.length, 1, 
+        "exact match _selectionForKey returns 1 object for 'tag_info' 18245:1:2"); 
+
+    });
+
+    QUnit.test('Updating for a non-existing element', function(assert) {
+      var qcOutcomes = {"lib":{},
+                        "seq":{"18245:1":{"mqc_outcome":"Rejected final"},
+                               "19001:1":{"mqc_outcome":"Accepted final"},
+                               "1824500:1":{"mqc_outcome":"Accepted final"}},
+                        "uqc":{}};
+      var procOut = qc_outcomes._processOutcomes(qcOutcomes.seq, 'lane');     
+      var expected = {"18245:1":1,"19001:1":1,"1824500:1":0};
+      assert.deepEqual(procOut, expected, 
+        'processOutcomes reports expected hash with 2 existing and one absent element');
+    });                    
+    
     QUnit.test('Updating seq outcomes Accepted final', function(assert) {
-      var qcOutcomes = {"lib":{},"seq":{"18245:1":{"mqc_outcome":"Accepted final","position":"1","id_run":"18245"}}};
+      var qcOutcomes = {"lib":{},
+                        "seq":{"18245:1":{"mqc_outcome":"Accepted final"}},
+                        "uqc":{}};
       var rows = 0, lanesWithClass = 0;
       $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
         rows++;
@@ -32,6 +78,36 @@ requirejs([
       });
       assert.equal(rows, 3, 'Correct number of rows');
       assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
+
+      var total_icons_fails = 0;
+      var total_icons_pass = 0;
+      rows = 0;
+      $('tr[id*="rpt_key:18245:1"]  td.lane.nbsp').each(function (i, obj) {
+        rows++;
+        if($(obj).attr('class') === "utility_FAIL"){
+           total_icons_fails++;
+        }else if ($(obj).attr('class') === "utility_FAIL"){
+          total_icons_pass++;
+        }
+      });
+
+      assert.equal(rows, 3, 'Correct number of rows');
+      assert.equal((total_icons_fails + total_icons_fails), 0, 'Initially 18245:1 lanes have no utility fail or pass flag');
+
+
+      rows = 0; 
+      lanesWithClass = 0;
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
+        rows++;
+        var $obj = $(obj);
+        if ($obj.hasClass('qc_outcome_accepted_final')) {
+          lanesWithClass++;
+        }
+      });
+      assert.equal(rows, 3, 'Correct number of lanes');
+      assert.equal(lanesWithClass, 3, 'Correct number of lanes with updated class');
+
 
       rows = 0; lanesWithClass = 0;
       $('tr[id*="rpt_key:19001:1"] td.lane').each(function (i, obj) {
@@ -44,20 +120,23 @@ requirejs([
       assert.equal(rows, 3, 'Correct number of lanes');
       assert.equal(lanesWithClass, 0, 'Correct initial number of 190001 lanes with class different run');
 
-      rows = 0; lanesWithClass = 0;
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
-      $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
+      total_icons_fails = 0;
+      total_icons_pass = 0;
+      rows = 0;
+      $('tr[id*="rpt_key:18245:1"]  td.lane.nbsp').each(function (i, obj) {
         rows++;
-        var $obj = $(obj);
-        if ($obj.hasClass('qc_outcome_accepted_final')) {
-          lanesWithClass++;
+        if($(obj).attr('class') === "utility_FAIL"){
+           total_icons_fails++;
+        }else if ($(obj).attr('class') === "utility_FAIL"){
+          total_icons_pass++;
         }
       });
-      assert.equal(rows, 3, 'Correct number of lanes');
-      assert.equal(lanesWithClass, 3, 'Correct number of lanes with updated class');
+
+      assert.equal(rows, 3, 'Correct number of rows');
+      assert.equal((total_icons_fails + total_icons_fails), 0, '18245:1 lanes DO NOT HAVE any utility fail or pass flag');
 
       rows = 0; lanesWithClass = 0;
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.lane').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -70,7 +149,7 @@ requirejs([
     });
 
     QUnit.test('Updating lib outcomes Accepted final', function(assert) {
-      var qcOutcomes = {"lib":{"18245:1:1":{"tag_index":1,"mqc_outcome":"Accepted final","position":"1","id_run":"18245"}},
+      var qcOutcomes = {"lib":{"18245:1:1":{"mqc_outcome":"Accepted final"}},
                         "seq":{}};
       var rows = 0, elementsWithClass = 0;
       $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
@@ -84,7 +163,7 @@ requirejs([
       assert.equal(elementsWithClass, 0, 'Initially tags have no class');
 
       rows = 0; elementsWithClass = 0;
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -100,7 +179,7 @@ requirejs([
       });
 
       rows = 0; elementsWithClass = 0;
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -112,7 +191,7 @@ requirejs([
       assert.equal(elementsWithClass, 0, 'Correct number of tags with updated class different run');
     });
 
-    QUnit.test('Test chainging the interface mocking ajax', function (assert) {
+    QUnit.test('Test changing the interface mocking ajax', function (assert) {
       assert.expect(10);
       var old_ajax = $.ajax;
       $.ajax = function (options) {
@@ -124,9 +203,8 @@ requirejs([
         assert.deepEqual(dataAsObject, expectedData, 'Data in request is as expected');
 
         var data = {
-          "lib":{ "19001:1:2":{ "tag_index":2,"mqc_outcome":"Rejected preliminary","position":"1","id_run":"19001" } },
-          "seq":{ "18245:1":{ "mqc_outcome":"Accepted final", "position":1, "id_run":18245 } }
-        };
+          "lib":{ "19001:1:2":{ "mqc_outcome":"Rejected preliminary"} },
+          "seq":{ "18245:1":{ "mqc_outcome":"Accepted final"} }};
         options.success = function (callback) {
           callback(data, 'success', {});
           return options;
@@ -167,7 +245,7 @@ requirejs([
         assert.equal(lanes, 3, 'Correct number of lanes');
         assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
 
-        mqc_outcomes.fetchAndProcessQC('results_summary', '/qcoutcomes', whatToDoWithOutcomes);
+        qc_outcomes.fetchAndProcessQC('results_summary', '/qcoutcomes', whatToDoWithOutcomes);
       } catch (err) {
         console.log(err);
       } finally {
@@ -190,10 +268,10 @@ requirejs([
       $('#results_summary').empty().append($('#fixture_sample_data').first().html());
       $('#fixture_sample_data').empty();
 
-      var qcOutcomes = {"lib":{"19100:1:1":{"tag_index":1,"mqc_outcome":"Accepted final","position":"1","id_run":"19100"},
-                               "19100:1:2":{"tag_index":2,"mqc_outcome":"Rejected final","position":"1","id_run":"19100"},
-                               "19101:1:1":{"tag_index":1,"mqc_outcome":"Undecided","position":"1","id_run":"19101"}},
-                        "seq":{"19100:1":{"mqc_outcome":"Accepted final","position":"1","id_run":"19100"}}};
+      var qcOutcomes = {"lib":{"19100:1:1":{"mqc_outcome":"Accepted final"},
+                               "19100:1:2":{"mqc_outcome":"Rejected final"},
+                               "19101:1:1":{"mqc_outcome":"Undecided"}},
+                        "seq":{"19100:1":{"mqc_outcome":"Accepted final"}}};
       var rows = 0, elementsWithClass = 0,
           totalQCClasses = 0, expected = ['accepted_final', 'rejected_final'];
       //19100
@@ -229,7 +307,7 @@ requirejs([
       assert.equal(rows, 1, 'Correct number of rows');
       assert.equal(elementsWithClass, 0, 'Initially lanes without classes for run 19101');
 
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
 
       //19100
       rows = 0; elementsWithClass = 0;
@@ -299,72 +377,7 @@ requirejs([
       }
     });
 
-    QUnit.test("Parameter validation tests for usabilityDisplaySwitch", function (assert) {
-      assert.throws(
-        function() {
-          mqc_outcomes.usabilityDisplaySwitch();
-        },
-        /Parameter obj must be defined and of type \(DOM\) Element/i,
-        'Throws with no params'
-      );
-      assert.throws(
-        function() {
-          mqc_outcomes.usabilityDisplaySwitch(1);
-        },
-        /Parameter obj must be defined and of type \(DOM\) Element/i,
-        'Throws with one (non DOM) param'
-      );
-      var some_element = $('td.lane')[0];
-      assert.throws(
-        function() {
-          mqc_outcomes.usabilityDisplaySwitch(some_element);
-        },
-        /usability should be boolean/i,
-        'Throws with one param'
-      );
-      assert.throws(
-        function() {
-          mqc_outcomes.usabilityDisplaySwitch(some_element, 'string');
-        },
-        /usability should be boolean/i,
-        'Throws with one string instead of boolean'
-      );
-    });
 
-    QUnit.test("Test for FAIL/PASS usability icon in LaneNo column", function (assert) {
-      var laneCellsNumb = $('td.lane').length;
-      assert.equal(laneCellsNumb, 9, 'Correct number of .lane cells');
-      var total_icons_fails = $("td.lane > div.utility_FAIL").length;
-      var total_icons_pass = $("td.lane > div.utility_PASS").length;
-      assert.equal(total_icons_fails, 0, 'No initial .lane cells with FAIL icons');
-      assert.equal(total_icons_pass, 0, 'No initial .lane cells with PASS icons');
-      $('td.lane').each(function (i, obj) {
-        mqc_outcomes.usabilityDisplaySwitch(obj, false);
-      });
-      $('td.lane.nbsp > div').each(function(i, obj){
-        if($(obj).attr('class') === "utility_FAIL"){
-          total_icons_fails++;
-        }
-      });
-      assert.equal(total_icons_fails, laneCellsNumb,
-        '1 FAIL icon per .lane cell added with usabilityDisplaySwitch()');
-      total_icons_pass = $("td.lane > div.utility_PASS").length;
-      assert.equal(total_icons_pass, 0,
-        'No .lane cells with PASS after all cells were switched to FAIL');
-      $('td.lane').each(function (i, obj) {
-        mqc_outcomes.usabilityDisplaySwitch(obj, true);
-      });
-      $('td.lane.nbsp > div').each(function(i, obj){
-        if($(obj).attr('class') === "utility_PASS"){
-          total_icons_pass++;
-        }
-      });
-      assert.equal(total_icons_pass, laneCellsNumb,
-        '1 PASS icon per .lane cell changed with usabilityDisplaySwitch()');
-      total_icons_fails = $("td.lane > div.utility_FAIL").length;
-      assert.equal(total_icons_fails, 0,
-        'No .lane cells with FAIL after all cells were switched to PASS');
-    });
 
     // run the tests.
     QUnit.start();

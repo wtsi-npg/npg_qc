@@ -68,34 +68,59 @@ define([
     o.append(icon);
   };
 
-  var _buildTdSelection = function (rpt_key, isMultiple, elementClass){
-     var rptKeyAsSelector;
-      if (isMultiple){
-        rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + rpt_key + '"]';
-      } else {
-        //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
-        rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
-      }
-      rptKeyAsSelector = rptKeyAsSelector + ' td.' + elementClass;
-      return $(rptKeyAsSelector);
+  /*
+   *This function returns the DOM element corresponding to the JQuery defined by the input:
+   *key: the rpt_key, 
+   *elementClass: the name of the column, 
+   *fuzzyMatch: boolean defining whether the selector returns all plexes associated with a lane key (true)
+   *or just the exact match (false).
+   *
+   * Example:
+   *
+   *  _selectionForKey("18245:1", 'lane', 1);
+   *
+   */
+  var _selectionForKey = function (key, elementClass, fuzzyMatch) {
+    if (!key || !elementClass) {
+      throw 'Both key and elementClass are required';
+    }
+    var rptKeyAsSelector;
+    if (fuzzyMatch){
+      rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + key + '"]';
+    } else {
+      //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
+      rptKeyAsSelector = '#rpt_key\\3A ' + key.replace(/:/g, '\\3A ');
+    }
+    return $(rptKeyAsSelector + ' td.' + elementClass);
   };
 
   var _processOutcomes = function (outcomes, elementClass) {
+    if ((elementClass !== 'lane') && (elementClass !== 'tag_info')) {
+      throw 'Invalid type of rpt key element class ' + elementClass;
+    }
+    var outcomesStatus = {};
+    //console.log("1st outcome",outcomes[0]);
     var rpt_keys = Object.keys(outcomes);
-     if ((elementClass !== 'lane') && (elementClass !== 'tag_info')) {
-       throw 'Invalid type of rpt key element class ' + elementClass;
-     }
     for (var i = 0; i < rpt_keys.length; i++) {
       var rpt_key = rpt_keys[i];
       var qc_outcome = outcomes[rpt_key];
-      var isMultiple = elementClass === 'lane';
-      var tdSelection =  _buildTdSelection(rpt_key, isMultiple, elementClass);
-      if (typeof qc_outcome.mqc_outcome !== 'undefined') {
-        qc_css_styles.displayElementAs(tdSelection, qc_outcome.mqc_outcome);
-      } else {
+      if (typeof qc_outcome.mqc_outcome === 'undefined') {
         throw 'Malformed QC outcomes data for ' + rpt_key;
       }
+      var fuzzy = elementClass === 'lane';
+      var selection = _selectionForKey(rpt_key, elementClass, fuzzy);
+      var result;
+      // Allows for a mismatch between the received keys and
+      // available DOM elements.
+      if (typeof selection !== 'undefined' && selection.length > 0) {
+        qc_css_styles.displayElementAs(selection, qc_outcome.mqc_outcome);
+        result = 1;
+      } else {
+        result = 0;
+      }
+      outcomesStatus[rpt_key] = result;
     }
+    return outcomesStatus;
   };
 
   var _parseRptKeys = function (idTable) {
@@ -154,6 +179,8 @@ define([
     _fetchQCOutcomesUpdateView: _fetchQCOutcomesUpdateView,
     _updateDisplayWithQCOutcomes: _updateDisplayWithQCOutcomes,
     _parseRptKeys: _parseRptKeys,
+    _processOutcomes: _processOutcomes,
+    _selectionForKey: _selectionForKey,
     usabilityDisplaySwitch: usabilityDisplaySwitch,
     fetchAndProcessQC: fetchAndProcessQC
   };
