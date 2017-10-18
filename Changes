@@ -17,6 +17,8 @@ release 64.2
      when mqc outcomes are saved, a composition is created if it does not exist
      'composition' attribute is added to mqc entity result classes
  - upgrade bower to 1.8.2 in travis
+ - stop building on Travis under Perl 5.16,
+   see https://rt.cpan.org/Public/Bug/Display.html?id=123310
 
 release 64.1
  - SeqQC viewer - function to draw readonly representation of the
