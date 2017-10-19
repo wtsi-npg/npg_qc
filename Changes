@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - utility QC feature: db tables, DBIx classes, retrieval
+
 release 64.3 
  - DBIx schema loader script: automatically add npg_qc::Schema::Composition
  - drop unique consctraint for (id_run, position and tag_index) columns;

@@ -43,7 +43,7 @@ sub _new_post_request {
 subtest 'retrieving data via GET and POST' => sub {
   plan tests => 68;
 
- my @urls = qw( 
+ my @urls = qw(
     5:3:7
     5:3
     5:3:7
@@ -57,16 +57,16 @@ subtest 'retrieving data via GET and POST' => sub {
   );
 
   my $jsons = [
-    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}',
-    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}',
-    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}}}',
-    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}'
+    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}},"uqc":{}}',
+    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{"5:3:7":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Accepted"}}}'
   ];
 
   my $r1 = HTTP::Request->new('GET',  $base_url);
@@ -104,7 +104,7 @@ subtest 'retrieving data via GET and POST' => sub {
   for my $request ($r1, $r2) {
     my $response = request($request);
     my $m = _message($request, $rpt);
-    ok($response->is_error, qq[response for $m is an error]);  
+    ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
     like($response->content,
       qr/Cannot deal with multi-component compositions/, 'error message');
@@ -121,7 +121,7 @@ subtest 'retrieving data via GET and POST' => sub {
     ok($response->is_success, 'success');
     is($response->code, 200, 'response code 200 for ' . _message($request, $rpt));
     is($response->header('Content-type'), 'application/json', 'json content type');
-    is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{}}'), 'response content');
+    is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{},"uqc":{}}'), 'response content');
   }
 
 
@@ -141,7 +141,7 @@ subtest 'retrieving data via GET and POST' => sub {
     $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, $i};
     $qc_schema->resultset('MqcOutcomeEnt')->create($values);
   }
-       
+
   my $j = 0;
   while ($j < @urls) {
 
@@ -160,13 +160,23 @@ subtest 'retrieving data via GET and POST' => sub {
          id_seq_composition => $fkeys->{'5:4'},
          id_mqc_outcome     => 1,
          username           => 'u1'});
+    } elsif ($j == 9) {
+      my $values = {'id_seq_composition' => $fkeys->{join q[:], 5, 3, 5},
+                    'id_uqc_outcome'     => 1,
+                    'username'           => 'user',
+                    'modified_by'        => 'user',
+                    'rationale'          => 'rationale something'};
+      $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+      $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, 3, 7};
+      $values->{'id_uqc_outcome'} = 2;
+      $qc_schema->resultset('UqcOutcomeEnt')->create($values);
     }
-    
+
     my $rpt_list = $urls[$j];
     my @rpts = @{npg_tracking::glossary::rpt->split_rpts($rpt_list)};
     my $url = $base_url . '?' . join q[&], map {'rpt_list=' . uri_escape($_)} @rpts;
     my %h = map { $_ => {} } @rpts;
-    
+
     my $request1 = HTTP::Request->new('GET',  $url);
     my $request2 = HTTP::Request->new('POST', $base_url);
     $request2->header( 'Content-type' => 'application/json' );
@@ -176,8 +186,8 @@ subtest 'retrieving data via GET and POST' => sub {
       is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
       is_deeply(decode_json($response->content), decode_json($jsons->[$j]), 'response content');
     }
-           
-    $j++; 
+
+    $j++;
   }
 };
 
@@ -274,7 +284,7 @@ subtest 'conditionally get wh info about tags' => sub {
   $request->content(encode_json($data));
   $response = request($request);
   ok($response->is_success, 'response received for updating a lib entity');
-  
+
   $wh_schema->resultset('IseqRunLaneMetric')->create({
     cancelled =>  0,
     cycles => 76,
@@ -289,7 +299,7 @@ subtest 'conditionally get wh info about tags' => sub {
   $wh_schema->resultset('IseqProductMetric')->create({
     id_run => 1234, position => 4, id_iseq_flowcell_tmp => 2514299
   });
-  
+
   delete $data->{'lib'};
   $data->{'seq'} = {'1234:4' => {'mqc_outcome' => 'Rejected final'}};
   $request = _new_post_request();
@@ -300,7 +310,7 @@ subtest 'conditionally get wh info about tags' => sub {
 
 subtest 'Conditional update of run/lane status in tracking' => sub {
   plan tests => 9;
-  
+
   my $original = 'analysis complete';
   my $rl=$schemas->{'npg'}->resultset('RunLane')->find({id_run=>4025, position=>4});
   $rl->update_status($original);
@@ -310,7 +320,7 @@ subtest 'Conditional update of run/lane status in tracking' => sub {
   my $data = {'Action'   => 'UPDATE',
               'user'     => 'pipeline',
               'password' => 'secret'};
-  
+
   my @prelims = ('Accepted preliminary', 'Rejected preliminary', 'Undecided');
   foreach my $mqc_outcome (@prelims) {
     my $request = _new_post_request();
@@ -319,10 +329,10 @@ subtest 'Conditional update of run/lane status in tracking' => sub {
     my $response = request($request);
     ok($response->is_success, "updated to '$mqc_outcome'") ||
       diag 'RESPONSE: ' . $response->content;
-    
+
     is($rl->current_run_lane_status->description, $original,
       'lane status has not changed');
-  } 
+  }
 
   my $mqc_outcome = 'Rejected final';
   $data->{'seq'} = {'4025:4' => {'mqc_outcome' => $mqc_outcome}};
