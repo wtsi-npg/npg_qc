@@ -12,7 +12,6 @@ sudo: required
 language: perl
 
 perl:
-  - "5.16"
   - "5.22-shrplib"
 
 dist:
