@@ -58,7 +58,7 @@ requirejs([
                                "19001:1":{"mqc_outcome":"Accepted final"},
                                "1824500:1":{"mqc_outcome":"Accepted final"}},
                         "uqc":{}};
-      var procOut = qc_outcomes._processOutcomes(qcOutcomes.seq, 'lane');     
+      var procOut = qc_outcomes._processOutcomes(qcOutcomes.seq, 'mqc_outcome',  'lane');     
       var expected = {"18245:1":1,"19001:1":1,"1824500:1":0};
       assert.deepEqual(procOut, expected, 
         'processOutcomes reports expected hash with 2 existing and one absent element');
