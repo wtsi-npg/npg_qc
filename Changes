@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Add STAR aligner bams as a valid RNA alignments - also added tests for it
+ 
 release 64.2
  - Cannot have default Moose constructor in derived DBIx classes - fix for
      custom MqcOutcomeEnt resultset
