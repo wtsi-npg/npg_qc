@@ -9,6 +9,7 @@ use DateTime::Duration;
 
 use npg_testing::db;
 use npg_tracking::glossary::rpt;
+use npg_tracking::glossary::composition::factory::rpt_list;
 
 use_ok('npg_qc::mqc::outcomes');
 
@@ -83,26 +84,43 @@ subtest 'retrieving data' => sub {
     5:3:5;5:3:7
   );
 
+  my $fkeys = {};
+  my $rs = $qc_schema->resultset('MqcOutcomeEnt');
+  foreach my $l (@data, qw(5:1 5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6)) {
+    my $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => $l)->create_composition();
+    my $seq_c = $rs->find_or_create_seq_composition($c);
+    $fkeys->{$l} =  $seq_c->id_seq_composition();
+  }
+
   my $j = 0;
   while ($j < @data) {
-
     if ($j == 1) {
-      my $values = {id_run => 5, username => 'u1'};
+      my $values = { id_run   => 5,
+                     username => 'u1'};
       for my $i (1 .. 5) {
-        $values->{'position'} = $i;
+        $values->{'position'}       = $i;
         $values->{'id_mqc_outcome'} = $i;
+        $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, $i};
         $qc_schema->resultset('MqcOutcomeEnt')->create($values);
       }
     } elsif ($j == 3) {
-      my $values = {id_run => 5, position => 3, username => 'u1'};
+      my $values = { id_run    => 5,
+                     position  => 3,
+                     username  => 'u1'};
       for my $i (2 .. 7) {
-        $values->{'tag_index'} = $i;
+        $values->{'tag_index'}      = $i;
         $values->{'id_mqc_outcome'} = $i-1;
+        $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, 3, $i};
         $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
       }
     } elsif ($j == 5) {
-      $qc_schema->resultset('MqcLibraryOutcomeEnt')->create(
-        {id_run=>5, position=>4, id_mqc_outcome=>1, username=>'u1'});
+      my $values = {id_seq_composition => $fkeys->{'5:4'},
+                    id_run             => 5,
+                    username           => 'u1',
+                    position           => 4,
+                    id_mqc_outcome     => 1};
+      $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
     }
 
     my $l = $data[$j];
@@ -113,30 +131,28 @@ subtest 'retrieving data' => sub {
 };
 
 subtest q[find or create entity - error handling] => sub {
-  plan tests => 4;
+  plan tests => 3;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
-  throws_ok { $o->_find_or_create_outcome() }
+  throws_ok { $o->_find_or_new_outcome() }
     qr/Two arguments required/,
     'no arguments - error';
-  throws_ok { $o->_find_or_create_outcome('lib') }
+  throws_ok { $o->_find_or_new_outcome('lib') }
     qr/Two arguments required/,
     'one arguments - error';
-  throws_ok { $o->_find_or_create_outcome('some', {}) }
+  throws_ok { $o->_find_or_new_outcome('some', {}) }
     qr/Unknown outcome entity type \'some\'/,
     'unknown entity type - error';
-  throws_ok { $o->_find_or_create_outcome('lib', '44') }
-    qr/Both id_run and position should be available /,
-    'malformed rpt key - error';
 };
 
 subtest q[find or create lib entity] => sub {
-  plan tests => 30;
+  plan tests => 31;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
-  my ($row, $query) = $o->_find_or_create_outcome('lib', '45:2:1');
+  my $row = $o->_find_or_new_outcome('lib',
+    {id_run => 45, position => 2, tag_index => 1});
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok(!$row->in_storage, 'new object is created in memory');
   is($row->id_run, 45, 'correct run id');
@@ -150,16 +166,22 @@ subtest q[find or create lib entity] => sub {
     ->search({'short_desc' => 'Rejected preliminary'})
     ->next->id_mqc_library_outcome;
 
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+          ->new(rpt_list => '45:3:1')->create_composition();
+  my $seq_c = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+              ->find_or_create_seq_composition($c);
   $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
     'id_run'         => 45,
     'position'       => 3,
     'tag_index'      => 1,
+    'id_seq_composition' => $seq_c->id_seq_composition(),
     'id_mqc_outcome' => $dict_id,
     'username'       => 'cat',
     'modified_by'    => 'dog',
   });
   
-  ($row, $query) = $o->_find_or_create_outcome('lib', '45:3:1');
+  $row = $o->_find_or_new_outcome('lib',
+    {id_run => 45, position => 3, tag_index => 1});
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok($row->in_storage, 'object is retrieved from the db');
   is($row->id_run, 45, 'correct run id');
@@ -171,7 +193,7 @@ subtest q[find or create lib entity] => sub {
   is($row->mqc_outcome->short_desc, 'Rejected preliminary',
     'correct outcome description');
 
-  ($row, $query) = $o->_find_or_create_outcome('lib', '45:2');
+  $row = $o->_find_or_new_outcome('lib', {id_run => 45, position => 2});
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok(!$row->in_storage, 'new object is created in memory');
   is($row->id_run, 45, 'correct run id');
@@ -179,43 +201,53 @@ subtest q[find or create lib entity] => sub {
   is($row->tag_index, undef, 'tag index not defined');
   ok(!$row->mqc_outcome, 'no related dictionary object');
 
+  $c = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => '45:4')->create_composition();
+  $seq_c = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+         ->find_or_create_seq_composition($c);
   $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
     'id_run'         => 45,
     'position'       => 4,
+    'id_seq_composition' => $seq_c->id_seq_composition(),
     'id_mqc_outcome' => $dict_id,
     'username'       => 'cat',
     'modified_by'    => 'dog',
   });
 
+  $c = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => '45:4:1')->create_composition();
+  $seq_c = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+         ->find_or_create_seq_composition($c);
   $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
     'id_run'         => 45,
     'position'       => 4,
     'tag_index'      => 1,
+    'id_seq_composition' => $seq_c->id_seq_composition(),
     'id_mqc_outcome' => $dict_id,
     'username'       => 'cat',
     'modified_by'    => 'dog',
   });
   
-  ($row, $query) = $o->_find_or_create_outcome('lib', '45:4');
+  $row = $o->_find_or_new_outcome('lib', {id_run => 45, position => 4, tag_index => 1});
   isa_ok($row, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
   ok($row->in_storage, 'object is retrieved from the db');
   is($row->id_run, 45, 'correct run id');
   is($row->position, 4, 'correct position');
-  is($row->tag_index, undef, 'tag index undefined');
+  is($row->tag_index, 1, 'tag index 1');
   ok($row->mqc_outcome, 'related dictionary object exists');
   is($row->mqc_outcome->short_desc, 'Rejected preliminary',
     'correct outcome description');
+
+  throws_ok {$o->_find_or_new_outcome('lib', {id_run => 45, position => 4})}
+    qr/Multiple qc outcomes where one is expected/,
+    'error when multiple results are found';
 };
 
 subtest q[find or create seq entity] => sub {
-  plan tests => 17;
+  plan tests => 15;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
-
-  throws_ok { $o->_find_or_create_outcome('seq', '55:2:1') }
-    qr/no such column: tag_index/,
-    'query with tag index gives an error for seq outcome';
-  my ($row, $query) = $o->_find_or_create_outcome('seq', '55:2');
+  my $row = $o->_find_or_new_outcome('seq', {id_run => 55, position => 2});
   isa_ok($row, 'npg_qc::Schema::Result::MqcOutcomeEnt');
   ok(!$row->in_storage, 'new object is created in memory');
   is($row->id_run, 55, 'correct run id');
@@ -228,18 +260,20 @@ subtest q[find or create seq entity] => sub {
       {'short_desc' => 'Rejected preliminary'}
      )->next->id_mqc_outcome;
 
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => '55:3')->create_composition();
+  my $seq_c = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+         ->find_or_create_seq_composition($c);
   $qc_schema->resultset('MqcOutcomeEnt')->create({
     'id_run'         => 55,
     'position'       => 3,
+    'id_seq_composition' => $seq_c->id_seq_composition(),
     'id_mqc_outcome' => $dict_id,
     'username'       => 'cat',
     'modified_by'    => 'dog',
   });
-  
-  throws_ok { $o->_find_or_create_outcome('seq', '55:3:1') }
-    qr/no such column: tag_index/,
-    'query with tag index gives an error for seq outcome';
-  ($row, $query) = $o->_find_or_create_outcome('seq', '55:3');
+
+  $row = $o->_find_or_new_outcome('seq', {id_run => 55, position => 3});
   isa_ok($row, 'npg_qc::Schema::Result::MqcOutcomeEnt');
   ok($row->in_storage, 'object is retrieved from the db');
   is($row->id_run, 55, 'correct run id');
@@ -389,9 +423,14 @@ subtest q[save outcomes] => sub {
   is_deeply($o->save({'lib' => $outcomes}, 'cat'),
     $reply, 'only lib info returned');
 
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => '101:1')->create_composition();
+  my $seq_c = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+         ->find_or_create_seq_composition($c);
   $qc_schema->resultset('MqcOutcomeEnt')->create({
     'id_run'         => 101,
     'position'       => 1,
+    'id_seq_composition' => $seq_c->id_seq_composition(),
     'id_mqc_outcome' => $dict_id_prelim,
     'username'       => 'cat',
     'modified_by'    => 'dog',
@@ -496,10 +535,15 @@ subtest q[save outcomes] => sub {
   my @tag_indexes = (1 .. 6);
   my @libs = ();
   for (@tag_indexes) {
+    my $c = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => "101:3:$_")->create_composition();
+    my $seq_c = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+         ->find_or_create_seq_composition($c);
     push @libs, $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
       'id_run'         => 101,
       'position'       => 3,
       'tag_index'      => $_,
+      'id_seq_composition' => $seq_c->id_seq_composition(),
       'id_mqc_outcome' => $dict_lib_id_prelim,
       'username'       => 'cat',
       'modified_by'    => 'dog',
@@ -561,10 +605,15 @@ subtest q[outcomes are not saved twice] => sub {
   my @tag_indexes = (1 .. 3);
   my @libs = ();
   for (@tag_indexes) {
+    my $c = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => "102:1:$_")->create_composition();
+    my $seq_c = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+         ->find_or_create_seq_composition($c);
     push @libs, $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
       'id_run'         => 102,
       'position'       => 1,
       'tag_index'      => $_,
+      'id_seq_composition' => $seq_c->id_seq_composition(),
       'id_mqc_outcome' => $dict_lib_id_prelim,
       'username'       => 'dog',
       'modified_by'    => 'dog',

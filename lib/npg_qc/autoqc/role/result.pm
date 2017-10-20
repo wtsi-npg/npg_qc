@@ -26,6 +26,17 @@ npg_qc::autoqc::role::result
 
 =head1 DESCRIPTION
 
+This Moose role defines basic functionality of the autoqc result object.
+It can be applied to classes of different origin, e.g to objects inheriting
+from npg_qc::autoqc::results::base, from npg_qc::autoqc::results::result or
+to a DBIx result class representing a row in a database table that stores
+an autoqc result.
+
+The class consuming this role should have the following accessors defined:
+  composition,
+  composition_digest,
+  num_components.
+
 =head1 SUBROUTINES/METHODS
 
 =head2 class_name

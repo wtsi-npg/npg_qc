@@ -255,6 +255,66 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 mqc_library_outcome_ents
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeEnt>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_library_outcome_ents',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeEnt',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 mqc_library_outcome_hists
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeHist>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_library_outcome_hists',
+  'npg_qc::Schema::Result::MqcLibraryOutcomeHist',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 mqc_outcome_ents
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcOutcomeEnt>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_outcome_ents',
+  'npg_qc::Schema::Result::MqcOutcomeEnt',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 mqc_outcome_hists
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::MqcOutcomeHist>
+
+=cut
+
+__PACKAGE__->has_many(
+  'mqc_outcome_hists',
+  'npg_qc::Schema::Result::MqcOutcomeHist',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 pulldown_metric
 
 Type: might_have
@@ -484,8 +544,8 @@ __PACKAGE__->might_have(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-03 12:42:13
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XvUVRxvQlw5tvrVm6VXeCg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-06 17:33:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GgZ/NpEeHklthvr+twsCbA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

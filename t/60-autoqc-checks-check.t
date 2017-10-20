@@ -91,8 +91,7 @@ subtest 'validation of attributes' => sub {
         qr/Validation\ failed\ for\ \'NpgTrackingTagIndex\'/,
         'does not accept undef for tag_index in the constructor';
     throws_ok { npg_qc::autoqc::checks::check->new(qc_in => 't', rpt_list => 'list') }
-        qr/Both id_run and position should be available/,
-        'error if rpt_list format is incorrect';
+        qr/isn't numeric/, 'error if rpt_list format is incorrect';
 
     my $check;
     lives_ok { $check = npg_qc::autoqc::checks::check->new(qc_in => 't', rpt_list => '6:8')}

@@ -1,0 +1,73 @@
+--
+-- Follows logic in upgrade_schema-64.0-autoqc2compositions
+--
+
+--
+-- Tables to change: mqc_library_outcome_ent
+--                   mqc_library_outcome_hist
+--                   mqc_outcome_ent
+--                   mqc_outcome_hist
+--
+
+SELECT '==table mqc_outcome_ent';
+ALTER TABLE mqc_outcome_ent
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_mqc_outcome_ent,
+  ADD INDEX mqc_outcome_ent_compos_ind (id_seq_composition),
+  ADD CONSTRAINT mqc_outcome_ent_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+SHOW WARNINGS;
+SELECT @@warning_count;
+SHOW ERRORS;
+SELECT @@error_count;
+
+SELECT '==table mqc_outcome_hist';
+ALTER TABLE mqc_outcome_hist
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_mqc_outcome_hist ,
+  ADD INDEX mqc_outcome_hist_compos_ind (id_seq_composition),
+  ADD CONSTRAINT mqc_outcome_hist_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+SHOW WARNINGS;
+SELECT @@warning_count;
+SHOW ERRORS;
+SELECT @@error_count;
+
+SELECT '==table mqc_library_outcome_ent';
+ALTER TABLE mqc_library_outcome_ent
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_mqc_library_outcome_ent,
+  ADD INDEX mqc_library_outcome_ent_compos_ind (id_seq_composition),
+  ADD CONSTRAINT mqc_library_outcome_ent_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+SHOW WARNINGS;
+SELECT @@warning_count;
+SHOW ERRORS;
+SELECT @@error_count;
+
+SELECT '==table mqc_library_outcome_hist';
+ALTER TABLE mqc_library_outcome_hist
+  ADD COLUMN id_seq_composition BIGINT(20) UNSIGNED COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table'
+    AFTER id_mqc_library_outcome_hist,
+  ADD INDEX mqc_library_outcome_hist_compos_ind (id_seq_composition),
+  ADD CONSTRAINT mqc_library_outcome_hist_compos_fk FOREIGN KEY (id_seq_composition)
+    REFERENCES seq_composition (id_seq_composition)
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+SHOW WARNINGS;
+SELECT @@warning_count;
+SHOW ERRORS;
+SELECT @@error_count;
+
+-- Regenerate indexes
+
+OPTIMIZE TABLE mqc_library_outcome_ent;
+OPTIMIZE TABLE mqc_library_outcome_hist;
+OPTIMIZE TABLE mqc_outcome_ent;
+OPTIMIZE TABLE mqc_outcome_hist;

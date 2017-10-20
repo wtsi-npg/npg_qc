@@ -330,6 +330,8 @@ __PACKAGE__->belongs_to(
 
 =over 4
 
+=item * L<npg_qc::Schema::Composition>
+
 =item * L<npg_qc::Schema::Flators>
 
 =item * L<npg_qc::autoqc::role::result>
@@ -341,19 +343,15 @@ __PACKAGE__->belongs_to(
 =cut
 
 
-with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::pulldown_metrics';
+with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::pulldown_metrics';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-01 13:57:24
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ondY7G5srbYxr7tUSArbFw
-
-with 'npg_tracking::glossary::composition::factory::attributes' =>
-  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T6yxVg96ts6jOfEGLy4Veg
 
 our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( other_metrics info ));
-__PACKAGE__->create_composition_attribute();
 
 __PACKAGE__->has_many(
   'seq_component_compositions',
@@ -379,10 +377,9 @@ Result class definition in DBIx binding for npg-qc database.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 create_composition
+=head2 composition
 
-A factory method returning a one-component npg_tracking::glossary::composition
-object corresponding to this row.
+Attribute of type npg_tracking::glossary::composition.
 
 =head2 seq_component_compositions
 
@@ -413,10 +410,6 @@ To simplify queries, skip SeqComposition and link directly to the linking table.
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
-
-=item npg_tracking::glossary::composition::factory::attributes
-
-=item npg_tracking::glossary::composition::component::illumina
 
 =back
 

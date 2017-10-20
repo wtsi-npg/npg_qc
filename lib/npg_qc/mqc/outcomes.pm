@@ -4,16 +4,16 @@ use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Readonly;
-use List::MoreUtils qw/ none /;
+use List::MoreUtils qw/ any none /;
 use Carp;
 use Try::Tiny;
 
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 use npg_tracking::glossary::rpt;
+use npg_tracking::glossary::composition::factory::rpt_list;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $NO_TAG_FLAG => -1;
 Readonly::Scalar my $SEQ_RS_NAME => 'MqcOutcomeEnt';
 Readonly::Scalar my $LIB_RS_NAME => 'MqcLibraryOutcomeEnt';
 Readonly::Scalar my $IDRK        => 'id_run';
@@ -36,34 +36,34 @@ sub get {
 
   my $hashed_queries = {};
   foreach my $q ( @{$qlist} ) {
-    _validate_query($q);
-    my $tag = defined $q->{$TIK} ? $q->{$TIK} : $NO_TAG_FLAG;
-    push @{$hashed_queries->{$q->{$IDRK}}->{$q->{$PK}}}, $tag;
+    if (!defined $q->{$IDRK} || !defined $q->{$PK}) {
+      croak qq[Both '$IDRK' and '$PK' keys should be defined];
+    }
+    push @{$hashed_queries->{$q->{$IDRK}}->{$q->{$PK}}},
+      defined $q->{$TIK} ? $q->{$TIK} : undef;
   }
 
   my @lib_outcomes = ();
   my @seq_outcomes = ();
 
   foreach my $id_run ( keys %{$hashed_queries} ) {
+
     my @positions = keys %{$hashed_queries->{$id_run}};
+
     foreach my $p ( @positions ) {
       my @tags = @{$hashed_queries->{$id_run}->{$p}};
       my $query = {$IDRK => $id_run, $PK => $p};
-      if ( none {$_ == $NO_TAG_FLAG} @tags ) {
+      # Either get lib outcomes for a selection of tag indices or
+      # all lib outcomes for a lane.
+      if ( none { !defined } @tags ) {
         $query->{$TIK} = \@tags;
       }
-      my @lib_rows = $self->qc_schema()->resultset($LIB_RS_NAME)
-                     ->search($query, {'join' => $QC_OUTCOME})->all();
-      if ( @lib_rows ) {
-        push @lib_outcomes, @lib_rows;
-      }
+      push @lib_outcomes, $self->_create_query($LIB_RS_NAME, $query)->all();
     }
+
+    # Get seq outcomes for a lane.
     my $q = {$IDRK => $id_run, $PK => \@positions};
-    my @seq_rows = $self->qc_schema()->resultset($SEQ_RS_NAME)
-                   ->search($q, {'join' => $QC_OUTCOME})->all();
-    if ( @seq_rows ) {
-      push @seq_outcomes, @seq_rows;
-    }
+    push @seq_outcomes, $self->_create_query($SEQ_RS_NAME, $q)->all();
   }
 
   my $h = {};
@@ -98,14 +98,6 @@ sub save {
   return $self->get($queries);
 }
 
-sub _validate_query {
-  my $q = shift;
-  if (!defined $q->{$IDRK} || !defined $q->{$PK}) {
-    croak qq[Both '$IDRK' and '$PK' keys should be defined];
-  }
-  return;
-}
-
 sub _map_outcomes {
   my $outcomes = shift;
   my $map = {};
@@ -130,17 +122,20 @@ sub _save_outcomes {
         }
         my $outcome_description = $o->{$QC_OUTCOME};
         if (!$outcome_description) {
-          croak qq[Outcome description is missing for $key'];
+          croak qq[Outcome description is missing for $key];
         }
 
         try {
-          my ($outcome_ent, $query) = $self->_find_or_create_outcome($outcome_type, $key);
+          my $query = npg_tracking::glossary::rpt->inflate_rpt($key);
           push @queries, $query;
+          my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $query);
           if ($self->_valid4update($outcome_ent,  $outcome_description)) {
+            if (!$outcome_ent->in_storage) {
+              _link2composition($outcome_ent, $key);
+            }
             $outcome_ent->update_outcome($outcome_description, $username);
             if ($outcome_type eq 'seq' && $outcome_ent->has_final_outcome) {
-              my @lib_outcomes = $self->qc_schema()->resultset($LIB_RS_NAME)
-                                      ->search($query)->all();
+              my @lib_outcomes = $self->_create_query($LIB_RS_NAME, $query)->all();
               $self->_validate_library_outcomes(
                       $outcome_ent, \@lib_outcomes, $lane_info->{$key});
               $self->_finalise_library_outcomes(\@lib_outcomes, $username);
@@ -157,33 +152,33 @@ sub _save_outcomes {
   return $self->qc_schema->txn_do($actions);
 }
 
-sub _find_or_create_outcome {
-  my ($self, $outcome_type, $key) = @_;
+sub _create_query {
+  my ($self, $rsname, $query) = @_;
+  my $db_query = $self->qc_schema()->resultset($rsname)
+                                   ->search({}, {'join' => $QC_OUTCOME})
+                                   ->search_autoqc($query);
+  return $db_query;
+}
 
-  if (!$outcome_type || !$key) {
-    croak q[Two arguments required: outcome entity type string and rpt key string];
+sub _find_or_new_outcome {
+  my ($self, $outcome_type, $query) = @_;
+
+  if (!$outcome_type || !$query) {
+    croak q[Two arguments required: outcome entity type string and query];
   }
   if ( none {$_ eq $outcome_type} @OUTCOME_TYPES ) {
     croak qq[Unknown outcome entity type '$outcome_type'];
   }
 
-  my $q = npg_tracking::glossary::rpt->inflate_rpt($key);
-
-  my $rs_name = $SEQ_RS_NAME;
-  if ($outcome_type eq $LIB_OUTCOMES) {
-    $rs_name = $LIB_RS_NAME;
-    if (!exists $q->{$TIK}) {
-      $q->{$TIK} = undef; # Otherwise search might bring
-                          # multiple results.
-    }
-  }
+  my $q = { %{$query} };
+  my $rs_name = $outcome_type eq $LIB_OUTCOMES ? $LIB_RS_NAME : $SEQ_RS_NAME;
   my $rs = $self->qc_schema()->resultset($rs_name);
   my $rs_found = $rs->search_autoqc($q);
   my $result = $rs_found->next;
   if (!$result) {
     # Create result object in memory.
     # Foreign key constraints are not checked at this point.
-    $rs->deflate_unique_key_components($q); # Changes $q object
+    $rs->deflate_unique_key_components($q); # Changes $q hash
     $result=$rs->new_result($q);
   } else { # Existing database record is found.
     if ($rs_found->next) {
@@ -191,12 +186,11 @@ sub _find_or_create_outcome {
     }
   }
 
-  return ($result, $q);
+  return $result;
 }
 
 sub _valid4update {
   my ($self, $row, $outcome_desc) = @_;
-
   if ($row->in_storage) {
     if ($row->mqc_outcome->short_desc eq $outcome_desc) {
       return 0;
@@ -205,6 +199,18 @@ sub _valid4update {
     }
   }
   return 1;
+}
+
+sub _link2composition {
+  my ($outcome_ent, $rpt_key) = @_;
+  my $composition_obj = npg_tracking::glossary::composition::factory::rpt_list
+                          ->new(rpt_list => $rpt_key)
+                          ->create_composition();
+  my $rs = $outcome_ent->result_source()->resultset();
+  my $seq_composition = $rs->find_or_create_seq_composition($composition_obj);
+  my $fk_column_name  = $rs->composition_fk_column_name();
+  $outcome_ent->$fk_column_name($seq_composition->$fk_column_name);
+  return;
 }
 
 sub _finalise_library_outcomes {
@@ -236,14 +242,13 @@ sub _validate_library_outcomes {
     if ($lo->is_undecided) {
       $num_undecided++;
     }
-    my $tag_index = defined $lo->tag_index ? $lo->tag_index : $NO_TAG_FLAG;
-    $tag_counts{$tag_index}++;
+    if (defined $lo->tag_index) {
+      $tag_counts{$lo->tag_index}++;
+    }
   }
 
-  if ($seq_outcome_ent->has_final_outcome &&
-      !$self->_validate_tag_indexes(\%tag_counts)) {
-    croak
-    q[Mismatch between known tag indices and available library outcomes];
+  if ($seq_outcome_ent->has_final_outcome && any { $_ == 1 } values %tag_counts) {
+    croak q[Mismatch between known tag indices and available library outcomes];
   }
   if ($seq_outcome_ent->is_accepted && $num_undecided) {
     croak q[Sequencing passed, cannot have undecided lib outcomes];
@@ -253,19 +258,6 @@ sub _validate_library_outcomes {
   }
 
   return;
-}
-
-sub _validate_tag_indexes {
-  my ($self, $tag_counts) = @_;
-
-  my @values = values %{$tag_counts};
-  if (!@values) {
-    return 1;  # no tag indexes known, none saved
-  }
-  if (scalar @values == 1 && exists $tag_counts->{$NO_TAG_FLAG}) {
-    return 1; # no tag indexes known, non-indexed library outcome saved
-  }
-  return none { $_ == 1 } @values;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -370,6 +362,8 @@ entities specifies in the first argument.
 
 =item npg_tracking::glossary::rpt
 
+=item npg_tracking::glossary::composition::factory::rpt_list
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -382,7 +376,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 

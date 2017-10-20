@@ -59,6 +59,15 @@ __PACKAGE__->table('mqc_library_outcome_ent');
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 id_seq_composition
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_foreign_key: 1
+  is_nullable: 1
+
+A foreign key referencing the id_seq_composition column of the seq_composition table
+
 =head2 id_run
 
   data_type: 'bigint'
@@ -126,6 +135,13 @@ __PACKAGE__->add_columns(
     extra => { unsigned => 1 },
     is_auto_increment => 1,
     is_nullable => 0,
+  },
+  'id_seq_composition',
+  {
+    data_type => 'bigint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 1,
   },
   'id_run',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
@@ -206,9 +222,29 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
+=head2 seq_composition
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:VPfWw+P0Ncy4VQpevn8yUQ
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::SeqComposition>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'seq_composition',
+  'npg_qc::Schema::Result::SeqComposition',
+  { id_seq_composition => 'id_seq_composition' },
+  {
+    is_deferrable => 1,
+    join_type     => 'LEFT',
+    on_delete     => 'NO ACTION',
+    on_update     => 'NO ACTION',
+  },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-21 18:06:15
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:PC0b9zOtHMv3PVZhEW2FWg
 
 use Carp;
 
@@ -216,6 +252,13 @@ with qw/npg_qc::Schema::Flators
         npg_qc::Schema::Mqc::OutcomeEntity/;
 
 our $VERSION = '0';
+
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
 
 __PACKAGE__->set_inflator4scalar('tag_index');
 
@@ -235,6 +278,14 @@ Entity for library MQC outcome.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 seq_component_compositions
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+To simplify queries, skip SeqComposition and link directly to the linking table.
 
 =head2 update
 
@@ -278,7 +329,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL Genome Research Limited
+Copyright (C) 2017 GRL Genome Research Limited
 
 This file is part of NPG.
 

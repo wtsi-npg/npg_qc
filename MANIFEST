@@ -103,6 +103,7 @@ lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/mqc/outcomes/keys.pm
 lib/npg_qc/Schema.pm
+lib/npg_qc/Schema/Composition.pm
 lib/npg_qc/Schema/Flators.pm
 lib/npg_qc/Schema/Mqc/OutcomeEntity.pm
 lib/npg_qc/Schema/Mqc/OutcomeDict.pm
@@ -647,6 +648,9 @@ t/data/qcoutcomes/fixtures/000-mqc_library_outcome_dict.yml
 t/data/qcoutcomes/fixtures/000-mqc_outcome_dict.yml
 t/data/reporter/npg_qc/mqc_outcome_dict.yml
 t/data/reporter/npg_qc/mqc_outcome_ent.yml
+t/data/reporter/npg_qc/seq_component.yml
+t/data/reporter/npg_qc/seq_component_composition.yml
+t/data/reporter/npg_qc/seq_composition.yml
 t/data/reporter/mlwarehouse/300-IseqProductMetric.yml
 t/data/reporter/mlwarehouse/400-IseqFlowcell.yml
 t/data/requests/cgi-bin/prodsoft/npg/npg/run/1829.xml

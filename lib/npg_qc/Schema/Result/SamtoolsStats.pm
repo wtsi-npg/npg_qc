@@ -160,7 +160,8 @@ __PACKAGE__->belongs_to(
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
-with qw/ npg_qc::Schema::Flators
+with qw/ npg_qc::Schema::Composition
+         npg_qc::Schema::Flators
          npg_qc::autoqc::role::result /;
 
 our $VERSION = '0';
@@ -218,12 +219,9 @@ __PACKAGE__->set_inflator4xz_compressed_scalar(qw(stats));
 
 =head2 composition
 
-An lazy-build attribute representing a composition this result
-corresponds to. 
+Attribute of type npg_tracking::glossary::composition.
 
 =cut
-
-__PACKAGE__->create_composition_attribute();
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -265,7 +263,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 
