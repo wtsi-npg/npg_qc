@@ -3,7 +3,9 @@ use warnings;
 use Test::More tests => 6;
 use Test::Exception;
 use Moose::Meta::Class;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 my $table      = 'MqcLibraryOutcomeEnt';
 my $hist_table = 'MqcLibraryOutcomeHist';
@@ -25,6 +27,14 @@ subtest 'Test insert' => sub {
     'username'       => 'user',
     'modified_by'    => 'user'};
 
+  throws_ok {$schema->resultset($table)->create($values)}
+    qr/NOT NULL constraint failed: mqc_library_outcome_ent\.id_seq_composition/,
+    'composition foreign key is needed';
+
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 1,
+                          'tag_index' => 1});
   isa_ok($schema->resultset($table)->create($values),
     'npg_qc::Schema::Result::' . $table);
 
@@ -34,6 +44,9 @@ subtest 'Test insert' => sub {
   is($object->tag_index, 1, 'tag_index is 1');
 
   delete $values->{'tag_index'};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 1});
   isa_ok($schema->resultset($table)->create($values),
     'npg_qc::Schema::Result::' . $table);
 
@@ -42,25 +55,26 @@ subtest 'Test insert' => sub {
 
   $values = {
     'id_run'         => 2,
-    'position'       => 10,
+    'position'       => 8,
     'id_mqc_outcome' => 2,
     'username'       => 'user',
     'modified_by'    => 'user'
   };
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 2,
+                          'position'  => 8});
   $rs = $schema->resultset($table);
-  $rs->deflate_unique_key_components($values);
-  is($values->{'tag_index'}, -1, 'tag index deflated');
+
   lives_ok {$rs->find_or_new($values)
-               ->set_inflated_columns($values)
                ->update_or_insert()} 'lane record inserted';
   my $rs1 = $rs->search({'id_run' => 2});
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
-  is($row->tag_index, undef, 'tag index inflated');
+  is($row->tag_index, undef, 'tag index undefined');
 };
 
 subtest 'Test insert with historic defined' => sub {
-  plan tests => 4;
+  plan tests => 5;
   my $values = {
     'id_run'         => 10,
     'position'       => 1,
@@ -69,12 +83,14 @@ subtest 'Test insert with historic defined' => sub {
     'username'       => 'user',
     'modified_by'    => 'user'
   };
-
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 10,
+                          'position'  => 1});
   my $hist_object_rs = $schema->resultset($hist_table)->search({
-    'id_run'=>10,
-    'position'=>1,
-    'tag_index'=>100,
-    'id_mqc_outcome'=>1
+    'id_run'         => 10,
+    'position'       => 1,
+    'tag_index'      => 100,
+    'id_mqc_outcome' => 1
   });
   is ($hist_object_rs->count, 0, q[no row matches in the historic table before insert in entity]);
 
@@ -95,10 +111,12 @@ subtest 'Test insert with historic defined' => sub {
     'id_mqc_outcome'=>1
   });
   is ($hist_object_rs->count, 1, q[one row matches in the historic table after insert in entity]);
+  is ($hist_object_rs->next->id_seq_composition, $object->id_seq_composition,
+    'rows from two tables refer to teh same composition');
 };
 
 subtest 'insert with historic' => sub {
-  plan tests => 6;
+  plan tests => 7;
 
   my $values = {
     'id_run'         => 20,
@@ -107,6 +125,9 @@ subtest 'insert with historic' => sub {
     'username'       => 'user',
     'modified_by'    => 'user'
   };
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 20,
+                          'position'  => 3});
 
   my $values_for_search = {};
   $values_for_search->{'id_run'}         = 20;
@@ -115,7 +136,6 @@ subtest 'insert with historic' => sub {
   $values_for_search->{'id_mqc_outcome'} = 1;
 
   my $rs = $schema->resultset($table);
-  $rs->deflate_unique_key_components($values_for_search);
   is ($schema->resultset($hist_table)->search($values_for_search)->count, 0,
     q[no row matches in the historic table before insert in entity]);
 
@@ -129,16 +149,21 @@ subtest 'insert with historic' => sub {
   my $hist_object_rs = $schema->resultset($hist_table)->search($values_for_search);
   is ($hist_object_rs->count, 1,
     q[one row matches in the historic table after insert in entity]);
-  is ($hist_object_rs->next->tag_index, undef, q[tag_index inflated in historic]);
+  my $hist = $hist_object_rs->next;
+  is ($hist->tag_index, undef, q[tag_index is undefined in historic]);
+  is ($hist->id_seq_composition, $object->id_seq_composition,
+    'rows from two tables refer to teh same composition');
 };
 
 subtest q[update] => sub {
-  plan tests => 53;
+  plan tests => 50;
   
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
 
   my $args = {'id_run' => 444, 'position' => 1, 'tag_index' => 2};
+  $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, $args);
   my $new_row = $rs->new_result($args);
   my $outcome = 'Accepted preliminary';
   lives_ok { $new_row->update_outcome($outcome, 'cat') }
@@ -149,15 +174,16 @@ subtest q[update] => sub {
   is ($hist_rs->count, 1, 'one historic is created');
   my $hist_new_row = $hist_rs->next();
 
+  ok (!$new_row->has_final_outcome, 'not final outcome');
+  ok ($new_row->is_accepted, 'is accepted');
+  ok (!$new_row->is_final_accepted, 'not final accepted');
+
   for my $row (($new_row, $hist_new_row)) {
-    is ($new_row->mqc_outcome->short_desc(), $outcome, 'correct prelim. outcome');
-    is ($new_row->username, 'cat', 'username');
-    is ($new_row->modified_by, 'cat', 'modified_by');
-    ok ($new_row->last_modified, 'timestamp is set');
-    isa_ok ($new_row->last_modified, 'DateTime');
-    ok (!$new_row->has_final_outcome, 'not final outcome');
-    ok ($new_row->is_accepted, 'is accepted');
-    ok (!$new_row->is_final_accepted, 'not final accepted');
+    is ($row->mqc_outcome->short_desc(), $outcome, 'correct prelim. outcome');
+    is ($row->username, 'cat', 'username');
+    is ($row->modified_by, 'cat', 'modified_by');
+    ok ($row->last_modified, 'timestamp is set');
+    isa_ok ($row->last_modified, 'DateTime');
   } 
   
   $outcome = 'Accepted final';
@@ -168,6 +194,8 @@ subtest q[update] => sub {
     'error creating a record for existing entity';
 
   $args->{'position'} = 2;
+  $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run' => 444, 'position' => 2, 'tag_index' => 2});
   $new_row = $rs->new_result($args);
   lives_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
     'final outcome saved';
@@ -193,6 +221,8 @@ subtest q[update] => sub {
   $new_row->delete();
 
   $args = {'id_run' => 444, 'position' => 3, tag_index => 3};
+  $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, $args);
   $new_row = $rs->new_result($args);
   $outcome = 'Accepted final';
   lives_ok { $new_row->update_outcome($outcome, 'cat') }
@@ -215,6 +245,8 @@ subtest q[toggle final outcome] => sub {
   my $rs = $schema->resultset($table);
 
   my $args = {'id_run' => 444, 'position' => 3, tag_index => 4};
+  $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, $args);
   my $new_row = $rs->new_result($args);
 
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }

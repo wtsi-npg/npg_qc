@@ -6,10 +6,12 @@ use Moose::Meta::Class;
 use JSON::XS;
 use DateTime;
 use DateTime::Duration;
+use List::MoreUtils qw/uniq/;
 
 use npg_testing::db;
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
+use t::autoqc_util;
 
 use_ok('npg_qc::mqc::outcomes');
 
@@ -58,16 +60,16 @@ subtest 'retrieving data' => sub {
 
   my $jsons = [
     '{"lib":{},"seq":{}}',
-    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5}},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:6":{"tag_index":6,"mqc_outcome":"Undecided","position":3,"id_run":5},"5:3:3":{"tag_index":3,"mqc_outcome":"Rejected preliminary","position":3,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5},"5:3:4":{"tag_index":4,"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:3:2":{"tag_index":2,"mqc_outcome":"Accepted preliminary","position":3,"id_run":5}},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5}}}',
-    '{"lib":{"5:3:6":{"tag_index":6,"mqc_outcome":"Undecided","position":3,"id_run":5},"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5},"5:3:3":{"tag_index":3,"mqc_outcome":"Rejected preliminary","position":3,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5},"5:3:4":{"tag_index":4,"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:3:2":{"tag_index":2,"mqc_outcome":"Accepted preliminary","position":3,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5},"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:6":{"tag_index":6,"mqc_outcome":"Undecided","position":3,"id_run":5},"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5},"5:3:3":{"tag_index":3,"mqc_outcome":"Rejected preliminary","position":3,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5},"5:3:4":{"tag_index":4,"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:3:2":{"tag_index":2,"mqc_outcome":"Accepted preliminary","position":3,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5},"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:1":{"mqc_outcome":"Accepted preliminary","position":1,"id_run":5}}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5},"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:6":{"tag_index":6,"mqc_outcome":"Undecided","position":3,"id_run":5},"5:4":{"mqc_outcome":"Accepted preliminary","position":4,"id_run":5},"5:3:3":{"tag_index":3,"mqc_outcome":"Rejected preliminary","position":3,"id_run":5},"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5},"5:3:4":{"tag_index":4,"mqc_outcome":"Accepted final","position":3,"id_run":5},"5:3:2":{"tag_index":2,"mqc_outcome":"Accepted preliminary","position":3,"id_run":5}},"seq":{"5:4":{"mqc_outcome":"Rejected final","position":4,"id_run":5},"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}',
-    '{"lib":{"5:3:7":{"tag_index":7,"mqc_outcome":"Undecided final","position":3,"id_run":5},"5:3:5":{"tag_index":5,"mqc_outcome":"Rejected final","position":3,"id_run":5}},"seq":{"5:3":{"mqc_outcome":"Accepted final","position":3,"id_run":5}}}'
+    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}',
+    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}',
+    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}}}',
+    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}}}',
+    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}}}',
+    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}}}'
   ];
 
   my @data = qw(
@@ -86,7 +88,9 @@ subtest 'retrieving data' => sub {
 
   my $fkeys = {};
   my $rs = $qc_schema->resultset('MqcOutcomeEnt');
-  foreach my $l (@data, qw(5:1 5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6)) {
+  my @expanded_list = uniq map {(split q[;], $_)}
+                      @data, qw(5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6);
+  foreach my $l (@expanded_list) {
     my $c = npg_tracking::glossary::composition::factory::rpt_list
             ->new(rpt_list => $l)->create_composition();
     my $seq_c = $rs->find_or_create_seq_composition($c);
@@ -296,8 +300,10 @@ subtest q[validation for an update] => sub {
       {'short_desc' => 'Rejected final'}
      )->next->id_mqc_outcome;
 
-  my $outcome = $qc_schema->resultset('MqcOutcomeEnt')
-    ->new_result({'id_run' => 45, 'position' => 2});
+  my $values = {'id_run' => 45, 'position' => 2};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $qc_schema, {'id_run' => 45, 'position' => 2});
+  my $outcome = $qc_schema->resultset('MqcOutcomeEnt')->new_result($values);;
   lives_and {
     is $o->_valid4update($outcome, 'Rejected preliminary'), 1 }
     'in-memory object can be updated to a prelim outcome';
@@ -305,13 +311,16 @@ subtest q[validation for an update] => sub {
     is $o->_valid4update($outcome, 'Rejected final'), 1 }
     'in-memory object can be updated to a final outcome';
 
-  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
+  $values = {
     'id_run'         => 45,
     'position'       => 7,
     'id_mqc_outcome' => $dict_id_prel,
     'username'       => 'cat',
     'modified_by'    => 'dog',
-  });
+  };
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $qc_schema, {'id_run' => 45, 'position' => 7});
+  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
   lives_and {
     is $o->_valid4update($outcome, 'Rejected preliminary'), 0 }
     'preliminary stored seq outcome cannot be updated to the same outcome';
@@ -340,19 +349,24 @@ subtest q[validation for an update] => sub {
     $qc_schema->resultset('MqcLibraryOutcomeDict')->search(
     {'short_desc' => 'Undecided final'})->next->id_mqc_library_outcome;
 
-  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')
-    ->new_result({'id_run' => 47, 'position' => 2, tag_index => 3});
+  $values = {'id_run' => 47, 'position' => 2, tag_index => 3};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $qc_schema, $values);
+  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->new_result($values);
   is($o->_valid4update($outcome, 'some outcome'), 1,
     'in-memory object can be updated');
 
-  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->create({
+  $values = {
     'id_run'         => 47,
     'position'       => 2,
     'tag_index'      => 3,
     'id_mqc_outcome' => $dict_id_prel,
     'username'       => 'cat',
     'modified_by'    => 'dog',
-  });
+  };
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $qc_schema, {'id_run' => 47, 'position' => 2, tag_index => 3});
+  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
   is($o->_valid4update($outcome, 'some outcome'), 1,
     'stored lib outcome can be updated to a different outcome');
   is($o->_valid4update($outcome, $outcome->mqc_outcome->short_desc), 0,
@@ -412,14 +426,8 @@ subtest q[save outcomes] => sub {
     '101:1:4'=>{'mqc_outcome'=>'Rejected preliminary'},
     '101:1:6'=>{'mqc_outcome'=>'Undecided'},
                  };
-  my $expected = {};
-  foreach my $key (keys %{$outcomes}) {
-    my $h = npg_tracking::glossary::rpt->inflate_rpt($key);
-    $h->{'mqc_outcome'} = $outcomes->{$key}->{'mqc_outcome'};
-    $expected->{$key} = $h;
-  }
 
-  my $reply = {'lib' => $expected, 'seq'=> {}};
+  my $reply = {'lib' => $outcomes, 'seq'=> {}};
   is_deeply($o->save({'lib' => $outcomes}, 'cat'),
     $reply, 'only lib info returned');
 
@@ -436,43 +444,30 @@ subtest q[save outcomes] => sub {
     'modified_by'    => 'dog',
   });
   
-  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Rejected preliminary',
-                                'id_run'     =>101,
-                                'position'   =>1,};
+  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Rejected preliminary'};
   is_deeply($o->save({'lib' => $outcomes}, 'cat'),
     $reply, 'both lib and seq info returned');
 
-  $outcomes = {
+  my $outcomes1 = {
     '101:1:1'=>{'mqc_outcome'=>'Accepted preliminary'},
     '101:1:3'=>{'mqc_outcome'=>'Rejected preliminary'},
     '101:1:5'=>{'mqc_outcome'=>'Undecided'},
               };
-  my $expected_1 = {};
-  foreach my $key (keys %{$outcomes}) {
-    my $h = npg_tracking::glossary::rpt->inflate_rpt($key);
-    $h->{'mqc_outcome'} = $outcomes->{$key}->{'mqc_outcome'};
-    $expected_1->{$key} = $h;
-  }
-  $reply->{'lib'} = $expected_1;
+  $reply->{'lib'} = $outcomes1;
   
-  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+  is_deeply($o->save({'lib' => $outcomes1}, 'cat'),
     $reply, 'both lib and seq info returned');
 
-  my %all = (%{$expected}, %{$expected_1});
+  my %all = (%{$outcomes}, %{$outcomes1});
   $reply->{'lib'} = \%all;
-  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Accepted preliminary',
-                                'id_run'     =>101,
-                                'position'   =>1,};
+  $reply->{'seq'}->{'101:1'} = {'mqc_outcome'=>'Accepted preliminary'};
   
   is_deeply($o->save({'seq' =>
     {'101:1'=>{'mqc_outcome'=>'Accepted preliminary'}}}, 'cat', {}),
     $reply, 'updated a seq entity to another prelim outcome');
 
   delete $reply->{'lib'};
-  $reply->{'lib'}->{'101:1:1'} = {'mqc_outcome'=>'Accepted final',
-                                  'id_run'     =>101,
-                                  'position'   =>1,
-                                  'tag_index'  =>1,};
+  $reply->{'lib'}->{'101:1:1'} = {'mqc_outcome'=>'Accepted final'};
   is_deeply($o->save(
     {'lib' => {'101:1:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat'),
     $reply, 'updated one of lib entities to a final outcome');

@@ -21,6 +21,7 @@ mqc_outcome_reporter
 
   mqc_outcome_reporter
   mqc_outcome_reporter --verbose --warn_gclp
+  mqc_outcome_reporter --verbose --dry_run
 
 =head1 CONFIGURATION
 
@@ -34,8 +35,9 @@ This script reports any outstanding final manual QC outcomes to LIMS.
 
 =head1 OPTIONS
 
- verbose - a boolean option
+ verbose   - a boolean option
  warn_gclp - a boolean option
+ dry_run   - a boolean option
 
 =head1 DIAGNOSTICS
 
@@ -69,7 +71,7 @@ Jennifer Liddle <js10@sanger.ac.uk>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2017 GRL
 
 This file is part of NPG.
 

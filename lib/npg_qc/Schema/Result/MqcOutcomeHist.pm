@@ -64,7 +64,7 @@ __PACKAGE__->table('mqc_outcome_hist');
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
-  is_nullable: 1
+  is_nullable: 0
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
@@ -72,15 +72,13 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 0
-
-Lane
+  is_nullable: 1
 
 =head2 id_mqc_outcome
 
@@ -127,12 +125,12 @@ __PACKAGE__->add_columns(
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_foreign_key => 1,
-    is_nullable => 1,
+    is_nullable => 0,
   },
   'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
   'id_mqc_outcome',
   {
     data_type => 'smallint',
@@ -194,20 +192,12 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  {
-    is_deferrable => 1,
-    join_type     => 'LEFT',
-    on_delete     => 'NO ACTION',
-    on_update     => 'NO ACTION',
-  },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-08-21 18:06:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GWEZLrCYKfBHKEHFTbkViQ
-
-with 'npg_tracking::glossary::composition::factory::attributes' =>
-  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-15 14:33:12
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:jzcSpLhPAHC3W3XkadX0XA
 
 our $VERSION = '0';
 
@@ -227,11 +217,6 @@ Catalog for manual MQC statuses.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
-
-=head2 create_composition
-
-Returns a npg_tracking::glossary::composition object corresponding to
-this result.
 
 =head1 DEPENDENCIES
 
@@ -254,10 +239,6 @@ this result.
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
-
-=item npg_tracking::glossary::composition::factory::attributes
-
-=item npg_tracking::glossary::composition::component::illumina
 
 =back
 

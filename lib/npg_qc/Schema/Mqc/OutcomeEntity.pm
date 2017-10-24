@@ -6,8 +6,6 @@ use DateTime::TimeZone;
 use Carp;
 use Readonly;
 
-with 'npg_tracking::glossary::composition::factory::attributes' =>
-  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
 with 'npg_qc::Schema::Composition';
 
 our $VERSION = '0';
@@ -144,19 +142,6 @@ sub update_outcome {
   return;
 }
 
-sub pack {##no critic (Subroutines::ProhibitBuiltinHomonyms)
-  my $self = shift;
-  my $h = {};
-  $h->{'id_run'}      = $self->id_run;
-  $h->{'position'}    = $self->position;
-  $h->{'mqc_outcome'} = $self->mqc_outcome->short_desc;
-  if ($self->can('tag_index') and defined $self->tag_index) {
-    $h->{'tag_index'} = $self->tag_index;
-  }
-
-  return $h;
-}
-
 no Moose::Role;
 
 1;
@@ -236,16 +221,6 @@ i.e. accepted is changed to rejected and rejected to accepted.
   $obj->toggle_final_outcome($username);
   $obj->toggle_final_outcome($username, $rt_ticket);
 
-=head2 pack
-
-Returns a hash reference containing record identifies (id_run, position and,
-where appropriate, tag_index) and a short description of the outcome.
-
-=head2 create_composition
-
-Returns a npg_tracking::glossary::composition object corresponding to
-this result.
-
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -263,10 +238,6 @@ this result.
 =item Readonly
 
 =item Carp
-
-=item npg_tracking::glossary::composition::factory::attributes
-
-=item npg_tracking::glossary::composition::component::illumina
 
 =back
 
