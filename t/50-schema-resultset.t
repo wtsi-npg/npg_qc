@@ -318,7 +318,7 @@ subtest q[mixed queries for results linked to a composition] => sub {
   is (scalar @rows, 2, 'two results for f2 filter, phix and human subsets');
 };
 
-subtest q[error or failure to return a composition] => sub {
+subtest q[error finding a composition] => sub {
   plan tests => 4;
 
   my $rs = $schema->resultset('SeqComponent');
@@ -334,8 +334,9 @@ subtest q[error or failure to return a composition] => sub {
   my $f = npg_tracking::glossary::composition::factory->new();
   $f->add_component(npg_tracking::glossary::composition::component::illumina
                     ->new({id_run => 1, position => 3}));
-  is($rs->find_or_create_seq_composition($f->create_composition()), undef,
-    'composition row is not returned');
+  throws_ok { $rs->find_or_create_seq_composition($f->create_composition()) }
+    qr/result source 'SeqComponent' has no such relationship seq_composition/,
+    'error invoking method on a resultset that does not have seq_composition relationship';
 };
 
 subtest q[not saving composition subset value "all"] => sub {
@@ -360,7 +361,7 @@ my $id_run;
 subtest q[finding existing composition] => sub {
   plan tests => 15;
 
-  my $rs_component = $schema->resultset('SeqComponent');
+  my $rs_component   = $schema->resultset('SeqComponent');
   my $rs_composition = $schema->resultset('SeqComposition');
   my $rs_cc          = $schema->resultset('SeqComponentComposition');
   my $ssrs           = $schema->resultset('SamtoolsStats');

@@ -255,16 +255,16 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 mqc_library_outcome_ents
+=head2 mqc_library_outcome_ent
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeEnt>
 
 =cut
 
-__PACKAGE__->has_many(
-  'mqc_library_outcome_ents',
+__PACKAGE__->might_have(
+  'mqc_library_outcome_ent',
   'npg_qc::Schema::Result::MqcLibraryOutcomeEnt',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -285,16 +285,16 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 mqc_outcome_ents
+=head2 mqc_outcome_ent
 
-Type: has_many
+Type: might_have
 
 Related object: L<npg_qc::Schema::Result::MqcOutcomeEnt>
 
 =cut
 
-__PACKAGE__->has_many(
-  'mqc_outcome_ents',
+__PACKAGE__->might_have(
+  'mqc_outcome_ent',
   'npg_qc::Schema::Result::MqcOutcomeEnt',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
@@ -544,8 +544,8 @@ __PACKAGE__->might_have(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-06 17:33:16
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GgZ/NpEeHklthvr+twsCbA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-15 14:33:12
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:j2lqJ9ZKV4Ps0eTABP7AXQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -1,0 +1,113 @@
+-
+- Reset constraints and create views
+-
+SELECT '==table mqc_outcome_ent';
+ALTER TABLE mqc_outcome_ent
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX mqc_outcome_ent_compos_ind_unique (id_seq_composition),
+  DROP INDEX mqc_outcome_ent_compos_ind,
+  DROP INDEX id_run_UNIQUE,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL;
+SHOW WARNINGS;
+SHOW ERRORS;
+SELECT 'mqc_outcome_ent', @@warning_count, @@error_count;
+CREATE VIEW npgqcp.v_mqc_outcome_ent AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         mqc_outcome_ent.*
+  FROM npgqcp.mqc_outcome_ent mqc_outcome_ent,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE mqc_outcome_ent.id_seq_composition  = sc.id_seq_composition
+    AND sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component  = scc.id_seq_component;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'mqc_outcome_ent', @@warning_count, @@error_count;
+SELECT '==done table mqc_outcome_ent';
+
+SELECT '==table mqc_outcome_hist';
+ALTER TABLE mqc_outcome_hist
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL;
+SHOW WARNINGS;
+SHOW ERRORS;
+SELECT 'mqc_outcome_hist', @@warning_count, @@error_count;
+SELECT '==done table mqc_outcome_hist';
+
+SELECT '==table mqc_library_outcome_ent';
+ALTER TABLE mqc_library_outcome_ent
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  ADD UNIQUE INDEX mqc_library_outcome_ent_compos_ind_unique (id_seq_composition),
+  DROP INDEX mqc_library_outcome_ent_compos_ind,
+  DROP INDEX id_run_UNIQUE,
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL;
+SHOW WARNINGS;
+SHOW ERRORS;
+SELECT 'mqc_lib_outcome_ent', @@warning_count, @@error_count;
+CREATE VIEW npgqcp.v_mqc_library_outcome_ent AS
+  SELECT comp.id_run    AS c_id_run,
+         comp.position  AS c_position,
+         comp.tag_index AS c_tag_index,
+         comp.subset    AS c_subset,
+         comp.digest    AS component_digest,
+         sc.digest      AS composition_digest,
+         sc.size        AS composition_size,
+         mqc_lib_outcome_ent.*
+  FROM npgqcp.mqc_library_outcome_ent mqc_lib_outcome_ent,
+       npgqcp.seq_composition sc,
+       npgqcp.seq_component_composition scc,
+       npgqcp.seq_component comp
+  WHERE mqc_lib_outcome_ent.id_seq_composition  = sc.id_seq_composition
+    AND sc.id_seq_composition  = scc.id_seq_composition
+    AND comp.id_seq_component  = scc.id_seq_component;
+SHOW WARNINGS;
+SHOW ERRORS;
+SELECT 'mqc_lib_outcome_ent', @@warning_count, @@error_count;
+SELECT '==done table mqc_outcome_library_ent';
+
+SELECT '==table mqc_library_outcome_hist';
+ALTER TABLE mqc_library_outcome_hist
+  MODIFY COLUMN id_seq_composition BIGINT(20) UNSIGNED NOT NULL COMMENT
+    'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  MODIFY COLUMN id_run bigint(20) unsigned DEFAULT NULL,
+  MODIFY COLUMN position tinyint(1) unsigned DEFAULT NULL,
+  MODIFY COLUMN tag_index bigint(20) DEFAULT NULL;
+SHOW WARNINGS;
+SHOW ERRORS;
+SELECT 'mqc_lib_outcome_hist', @@warning_count, @@error_count;
+SELECT '==done table mqc_outcome_library_hist';
+
+-
+- Optimize storage space and indexes
+-
+OPTIMIZE TABLE mqc_outcome_ent;
+OPTIMIZE TABLE mqc_outcome_hist;
+OPTIMIZE TABLE mqc_library_outcome_ent;
+OPTIMIZE TABLE mqc_library_outcome_hist;
+
+-
+- Reset defaults for tag_index column
+-
+UPDATE mqc_library_outcome_ent SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'mqc_library_outcome_ent', @@warning_count, @@error_count;
+
+UPDATE mqc_library_outcome_ent SET tag_index = NULL WHERE tag_index = -1;
+SHOW ERRORS;
+SHOW WARNINGS;
+SELECT 'mqc_library_outcome_hist', @@warning_count, @@error_count;

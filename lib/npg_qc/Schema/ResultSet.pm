@@ -79,37 +79,56 @@ sub deflate_unique_key_components {
   return;
 }
 
-sub find_or_create_seq_composition {
-  my ($self, $composition) = @_;
+sub _find_composition {
+  my ($self, $digest, $num_components) = @_;
 
+  if (!$digest) {
+    croak 'Digest is not defined';
+  }
+  if (!$num_components) {
+    croak 'Number of components is not defined or is zero';
+  }
+  return $self->result_source()->schema()->resultset('SeqComposition')
+                                         ->find({
+                            'digest' => $digest,
+                            'size'   => $num_components
+                                                });
+}
+
+sub _validate {
+  my ($self, $composition) = @_;
   if (!$composition ||
       (ref $composition ne 'npg_tracking::glossary::composition')) {
     croak 'Composition object argument expected';
   }
+  $self->related_resultset('seq_composition'); # gives error if relationship
+                                               # is not defined
+  return;
+}
 
-  my $result_source = $self->result_source();
-  if (!$result_source->has_relationship('seq_composition')) {
-    return;
-  }
+sub find_seq_composition {
+  my ($self, $composition) = @_;
+  $self->_validate($composition);
+  return $self->_find_composition($composition->digest, $composition->num_components);
+}
 
+sub find_or_create_seq_composition {
+  my ($self, $composition) = @_;
+
+  $self->_validate($composition);
+  my $digest         = $composition->digest;
   my $num_components = $composition->num_components;
-  if (!$num_components) {
-    croak 'Empty composition';
-  }
-
-  my $schema = $result_source->schema();
-
+  my $schema         = $self->result_source()->schema();
   my $transaction = sub {
-
-    my $composition_row = $schema->resultset('SeqComposition')
-                                  ->find_or_new({
-                    'digest' => $composition->digest,
-                    'size'   => $num_components
-                                               });
+    my $composition_row = $self->_find_composition($digest, $num_components);
     # If composition exists, we assume that it's properly defined, i.e.
     # all relevant components and records in the linking table exist.
-    if (!$composition_row->in_storage) {
-      $composition_row = $composition_row->insert(); # Save composition
+    if (!$composition_row) {
+      $composition_row = $schema->resultset('SeqComposition')
+                                ->create({
+                    'digest' => $digest,
+                    'size'   => $num_components
+                                         });
       my $pk = $composition_row->id_seq_composition;
       my $component_rs = $schema->resultset('SeqComponent');
 
@@ -258,16 +277,22 @@ not in the hash.
   my $only_existing = 1;
   $rs->deflate_unique_key_components($values, $only_existing);
 
+=head2 find_seq_composition
+
+ Given a npg_tracking::glossary::composition object, finds a database
+ record for this composition. Id found, a npg_qc::Schema::Result::SeqComposition
+ row is returned, otherwise an undefined value is returned.
+
 =head2 find_or_create_seq_composition
 
  A factory method. Given a npg_tracking::glossary::composition object,
- will either find a database record for this composition or create one.
+ either finds a database record for this composition or creates one.
  A found or created npg_qc::Schema::Result::SeqComposition row is
  returned. If a row is created, all relevant (not already existing)
  component rows are created and a a record is created in a linking table
  for every component-composition pair.
 
- Returns undefined if this result set doe not have a relationship to
+ Gives an error if this resultset does not have a relationship to
  the seq_composition table.
 
 =head2 composition_fk_column_name
