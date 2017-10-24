@@ -6,6 +6,7 @@ use Moose::Meta::Class;
 use JSON::XS;
 use DateTime;
 use DateTime::Duration;
+use List::MoreUtils qw/uniq/;
 
 use npg_testing::db;
 use npg_tracking::glossary::rpt;
@@ -98,7 +99,9 @@ subtest 'retrieving data with only lib and seq outcomes' => sub {
 
   my $fkeys = {};
   my $rs = $qc_schema->resultset('MqcOutcomeEnt');
-  foreach my $l (@data, qw(5:1 5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6)) {
+  my @expanded_list = uniq map {(split q[;], $_)}
+                      @data, qw(5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6);
+  foreach my $l (@expanded_list) {
     my $c = npg_tracking::glossary::composition::factory::rpt_list
             ->new(rpt_list => $l)->create_composition();
     my $seq_c = $rs->find_or_create_seq_composition($c);
