@@ -10,7 +10,6 @@ with 'npg_qc::Schema::Composition';
 
 our $VERSION = '0';
 
-requires 'mqc_outcome';
 requires 'update';
 requires 'insert';
 
@@ -28,8 +27,9 @@ Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
 foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
       my $self = shift;
+      my $outcome_type = $self->dict_relation();
       my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
-      return $self->mqc_outcome->$that_class_method;
+      return $self->$outcome_type->$that_class_method;
     }
   );
 }
@@ -42,6 +42,17 @@ around [qw/update insert/] => sub {
   $self->_create_historic();
   return $return_super;
 };
+
+sub dict_relation {
+  my $self = shift;
+  my $name = $self->_is_mqc_type_outcome() ? 'm' : 'u';
+  return $name . q[qc_outcome];
+}
+
+sub _is_mqc_type_outcome {
+  my $name = ref shift;
+  return $name =~ /::Mqc(?:Library)?OutcomeEnt\Z/smx;
+}
 
 sub get_time_now {
   return DateTime->now(time_zone => DateTime::TimeZone->new(name => q[local]));
@@ -159,14 +170,19 @@ npg_qc::Schema::Mqc::OutcomeEntity
 
 =head1 DESCRIPTION
 
-Common functionality for lane and library manual qc outcome entity DBIx objects.
+Common functionality for lane and library manual qc and user utility outcomes
+entity DBIx objects.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 composition
 
 A lazy-build attribute of type npg_tracking::glossary::composition.
-It is built by inspection the linked seq_composition row.
+It is built by inspecting the linked seq_composition row.
+
+=head2 dict_relation
+
+Returns the name of the relationship to the outcomes dictionary.
 
 =head2 update
 
@@ -208,7 +224,8 @@ otherwise returns false.
 =head2 update_outcome
 
 Updates the outcome of the entity with values provided. Stores a new row
-if this entity was not yet stored in database.
+if this entity was not yet stored in database. This method has not been yet
+extended to updating utility outcomes.
 
   $obj->update_outcome($outcome, $username);
   $obj->update_outcome($outcome, $username, $rt_ticket);
@@ -216,7 +233,9 @@ if this entity was not yet stored in database.
 =head2 toggle_final_outcome
 
 Updates the final accepted or rejected outcome to its opposite final outcome,
-i.e. accepted is changed to rejected and rejected to accepted.
+i.e. accepted is changed to rejected and rejected to accepted. This method is
+not applicable to utility qc outcomes since there is no concept of final
+for this type of outcome.
 
   $obj->toggle_final_outcome($username);
   $obj->toggle_final_outcome($username, $rt_ticket);

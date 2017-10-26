@@ -184,6 +184,7 @@ t/data/fixtures/npg/400-RunStatus.yml
 t/data/fixtures/npg/400-TagRun.yml
 t/data/fixtures/npgqc/000-mqc_outcome_dict.yml
 t/data/fixtures/npgqc/000-mqc_library_outcome_dict.yml
+t/data/fixtures/npgqc/000-uqc_outcome_dict.yml
 t/data/fixtures/mlwarehouse/300-IseqProductMetric.yml
 t/data/fixtures/mlwarehouse/400-IseqFlowcell.yml
 t/data/fixtures/mlwarehouse/400-IseqRunLaneMetric.yml
