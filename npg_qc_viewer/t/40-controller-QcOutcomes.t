@@ -6,6 +6,7 @@ use Test::Exception;
 use URI::Escape qw(uri_escape);
 use JSON::XS;
 use HTTP::Request;
+use List::MoreUtils qw/uniq/;
 
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
@@ -92,8 +93,7 @@ subtest 'retrieving data via GET and POST' => sub {
     my $m = _message($request);
     ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
-    like($response->content,
-      qr/Both id_run and position should be available/, 'error message');
+    like($response->content, qr/isn't numeric/, 'error message');
   }
 
   my $rpt = '5:8:7;5:8:8';
@@ -128,7 +128,9 @@ subtest 'retrieving data via GET and POST' => sub {
 
   my $fkeys = {};
   my $rs = $qc_schema->resultset('MqcOutcomeEnt');
-  foreach my $l (@urls, qw(5:1 5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6)) {
+  my @expanded_list = uniq map {(split q[;], $_)}
+                      @urls, qw(5:1 5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6);
+  foreach my $l (@expanded_list) {
     my $c = npg_tracking::glossary::composition::factory::rpt_list
             ->new(rpt_list => $l)->create_composition();
     my $seq_c = $rs->find_or_create_seq_composition($c);
