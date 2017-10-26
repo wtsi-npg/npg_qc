@@ -7,7 +7,7 @@ use Carp;
 use List::MoreUtils qw/ any /;
 
 use npg_tracking::glossary::rpt;
-use npg_qc_viewer::Util::CompositionFactory;
+use npg_tracking::glossary::composition::factory::rpt_list;
 use npg_qc::Schema::Mqc::OutcomeDict;
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
 use npg_qc::mqc::outcomes;
@@ -119,7 +119,9 @@ sub _get_outcomes {
   } else {
      try {
        my $obj = npg_qc::mqc::outcomes->new(qc_schema => $c->model('NpgQcDB')->schema());
-       my @qlist = map { _inflate_rpt($_) } @{$rpt_lists};
+       # TODO: Using private method - to be revisited.
+       my @qlist = map { _rpt_list2composition($_)->get_component(0)->_pack_custom() }
+                   @{$rpt_lists};
        $self->status_ok($c,
          'entity' => $obj->get(\@qlist),
        );
@@ -134,16 +136,15 @@ sub _get_outcomes {
   return;
 }
 
-sub _inflate_rpt {
+sub _rpt_list2composition {
   my $rpt = shift;
-
-  my $comp = npg_qc_viewer::Util::CompositionFactory->new(rpt_list => $rpt)
-             ->create_composition();
+  my $comp = npg_tracking::glossary::composition::factory::rpt_list
+                          ->new(rpt_list => $rpt)
+                          ->create_composition();
   if ($comp->num_components > 1) {
     croak 'Cannot deal with multi-component compositions';
   }
-  # TODO in tracking - create a public method
-  return $comp->get_component(0)->_pack_custom();
+  return $comp;
 }
 
 sub _update_outcomes {
@@ -206,12 +207,13 @@ sub _update_runlanes {
   my ($self, $c, $seq_outcomes, $username) = @_;
 
   foreach my $key ( keys %{$seq_outcomes} ) {
+    my $component = _rpt_list2composition($key)->get_component(0);
     my $outcome = $seq_outcomes->{$key};
     if (npg_qc::Schema::Mqc::OutcomeDict
           ->is_final_outcome_description($outcome->{$QC_OUTCOME})) {
       try {
         $c->model('NpgDB')->update_lane_manual_qc_complete(
-          $outcome->{'id_run'}, $outcome->{'position'}, $username);
+          $component->id_run, $component->position, $username);
       } catch {
         $c->log->warn(qq[Error updating lane status for rpt key '$key': $_]);
       };
@@ -248,6 +250,8 @@ __END__
 =item List::MoreUtils
 
 =item npg_tracking::glossary::rpt
+
+=item npg_tracking::glossary::composition::factory::rpt_list
 
 =item npg_qc::mqc::outcomes
 

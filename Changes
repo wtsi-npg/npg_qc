@@ -1,7 +1,19 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+
  - Add STAR aligner bams as a valid RNA alignments - also added tests for it
  
+release 64.3 
+ - DBIx schema loader script: automatically add npg_qc::Schema::Composition
+ - drop unique consctraint for (id_run, position and tag_index) columns;
+ - make a foreign key to seq_composition table not nullable and set
+     a unique constraint on the foreign key column in entity tables;
+ - do not use id_run, position and tag index column values from
+     entity tables, compute rpt lists from compositions;
+ - do not list explisitly id_run, position and tag_index in return
+     datastructes for both get and save outcomes methods
+ - a method to find a composition without creating one
+
 release 64.2
  - Cannot have default Moose constructor in derived DBIx classes - fix for
      custom MqcOutcomeEnt resultset
@@ -14,10 +26,10 @@ release 64.2
       npg_qc::Schema::Composition role;
      document 'composition' attribute
  - composition-enabled manual qc:
-     db tables linked to the seq_composition table
-     search proceeds via releated composition tables
-     when mqc outcomes are saved, a composition is created if it does not exist
-     'composition' attribute is added to mqc entity result classes
+     db tables linked to the seq_composition table;
+     search proceeds via releated composition tables;
+     when mqc outcomes are saved, a composition is created if it does not exist;
+     'composition' attribute is added to mqc entity result classes;
  - upgrade bower to 1.8.2 in travis
  - stop building on Travis under Perl 5.16,
    see https://rt.cpan.org/Public/Bug/Display.html?id=123310
