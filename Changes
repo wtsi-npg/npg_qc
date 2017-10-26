@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 64.3.1
+ - error in a statement for data update is fixed
+
 release 64.3 
  - DBIx schema loader script: automatically add npg_qc::Schema::Composition
  - drop unique consctraint for (id_run, position and tag_index) columns;
