@@ -93,7 +93,20 @@ define([
     }
     return $(rptKeyAsSelector + ' td.' + elementClass);
   };
-
+  
+  /*
+  *This function processes the QCoutcomes defined by the input outcomes. It takes as inputs
+  *'outcomes' (the particular outcomes themselves -lib,seq or uqc-  for each rpt_key), 
+  *'outcomeType' (either mqc or uqc outcome), and the 'elementClass' (which indicates the column 
+  *where the widget will be displayed).
+  *It returns a hash (displayStatus) containing for each rpt_key a boolean indicating
+  *wether or not a matching DOM element has been found.
+  *
+  * Example:
+  *
+  *  _processOutcomes(outcomesData.seq, 'mqc_outcome', 'lane');
+  *
+  */
   var _processOutcomes = function (outcomes, outcomeType, elementClass) {
     if ((elementClass !== 'lane') && (elementClass !== 'tag_info')) {
       throw 'Invalid type of rpt key element class ' + elementClass;
@@ -103,7 +116,7 @@ define([
     for (var i in rpt_keys) {
       var rpt_key = rpt_keys[i];
       var qc_outcome = outcomes[rpt_key][outcomeType];
-      if (typeof qc_outcome === 'undefined') {
+      if (typeof qc_outcome === 'undefined' ) {
         throw 'Malformed QC outcomes data for ' + rpt_key;
       }
       var fuzzyMatch = outcomeType === 'uqc_outcome' ? false : elementClass === 'lane';  
@@ -112,8 +125,8 @@ define([
       // available DOM elements.
       if (typeof selection !== 'undefined' && selection.length > 0) {
         if (outcomeType === 'uqc_outcome'){
-          var display = qc_outcome === 'Accepted';
-          usabilityDisplaySwitch(selection[0], display);
+          var usabilityType = qc_outcome === 'Accepted' ;
+          usabilityDisplaySwitch(selection[0], usabilityType);
         }else {
           qc_css_styles.displayElementAs(selection, qc_outcome);
         }
@@ -140,12 +153,30 @@ define([
     return rptKeys;
   };
 
+  /*
+  *This function update the display of the QC outcomes defined by the input outcomesData.
+  *The function processes 3 types of outcomes : 'lib' and 'seq' (with information from the manual qc) 
+  *and 'uqc' (with information from the end user utility qc).
+  *For uqc, depending on the key, the widget might go to either lane or tag column, 
+  *so we will proces outcomes one a time.
+  *
+  * Example:
+  *
+  *  $.ajax({
+  *     url: outcomesURL,
+  *     type: 'POST',
+  *     contentType: 'application/json',
+  *     data: JSON.stringify(query),
+  *     cache: false
+  *   }).success(function (data) {
+  *      _updateDisplayWithQCOutcomes(data);
+  *   });
+  *
+  */
   var _updateDisplayWithQCOutcomes = function (outcomesData) {
     _processOutcomes(outcomesData.lib, 'mqc_outcome', 'tag_info');
     _processOutcomes(outcomesData.seq, 'mqc_outcome', 'lane');
-    // For uqc, depending on the key, the widget might go to eather
-    // lane or tag column, so will proces outcomes one a time.
-    if (outcomesData.uqc !== undefined){ 
+    if (outcomesData.uqc !== undefined){
       var rpt_keys = Object.keys(outcomesData.uqc);
       for (var i in rpt_keys) {
         var key = rpt_keys[i];
