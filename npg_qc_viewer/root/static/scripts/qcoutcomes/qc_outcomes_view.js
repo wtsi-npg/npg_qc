@@ -95,31 +95,35 @@ define([
   };
 
   var _processOutcomes = function (outcomes, outcomeType, elementClass) {
-      if ((elementClass !== 'lane') && (elementClass !== 'tag_info')) {
-        throw 'Invalid type of rpt key element class ' + elementClass;
+    if ((elementClass !== 'lane') && (elementClass !== 'tag_info')) {
+      throw 'Invalid type of rpt key element class ' + elementClass;
+    }
+    var displayStatus = {};
+    var rpt_keys = Object.keys(outcomes);
+    for (var i in rpt_keys) {
+      var rpt_key = rpt_keys[i];
+      var qc_outcome = outcomes[rpt_key][outcomeType];
+      if (typeof qc_outcome === 'undefined') {
+        throw 'Malformed QC outcomes data for ' + rpt_key;
       }
-      var rpt_keys = Object.keys(outcomes);
-      for (var i in rpt_keys) {
-        var rpt_key = rpt_keys[i];
-        var qc_outcome = outcomes[rpt_key][outcomeType];
-        if (typeof qc_outcome === 'undefined') {
-          throw 'Malformed QC outcomes data for ' + rpt_key;
+      var fuzzyMatch = outcomeType === 'uqc_outcome' ? false : elementClass === 'lane';  
+      var selection = _selectionForKey(rpt_key, elementClass, fuzzyMatch);
+      // Allows for a mismatch between the received keys and
+      // available DOM elements.
+      if (typeof selection !== 'undefined' && selection.length > 0) {
+        if (outcomeType === 'uqc_outcome'){
+          var display = qc_outcome === 'Accepted';
+          usabilityDisplaySwitch(selection[0], display);
+        }else {
+          qc_css_styles.displayElementAs(selection, qc_outcome);
         }
-        var fuzzyMatch = outcomeType === 'uqc_outcome' ? false : elementClass === 'lane';  
-        var selection = _selectionForKey(rpt_key, elementClass, fuzzyMatch);
-        // Allows for a mismatch between the received keys and
-        // available DOM elements.
-        if (typeof selection !== 'undefined' && selection.length > 0) {
-          if (outcomeType === 'uqc_outcome'){
-            var display = qc_outcome === 'Accepted';
-            usabilityDisplaySwitch(selection[0], display);
-          }else {
-            qc_css_styles.displayElementAs(selection, qc_outcome);
-          }
-        } 
+        displayStatus[rpt_key]= 1;
+      } else {
+        displayStatus[rpt_key]= 0;
       }
+    }
+    return displayStatus;
   };
-
 
   var _parseRptKeys = function (idTable) {
     var rptKeys = [];
@@ -141,13 +145,15 @@ define([
     _processOutcomes(outcomesData.seq, 'mqc_outcome', 'lane');
     // For uqc, depending on the key, the widget might go to eather
     // lane or tag column, so will proces outcomes one a time.
-    var rpt_keys = Object.keys(outcomesData.uqc);
-    for (var i in rpt_keys) {
-      var key = rpt_keys[i];
-      var elementClass = qc_utils.isLaneKey(key) ? 'lane' : 'tag_info';
-      var arr = {};
-      arr[key] = outcomesData.uqc[key];
-      _processOutcomes( arr, 'uqc_outcome', elementClass);
+    if (outcomesData.uqc !== undefined){ 
+      var rpt_keys = Object.keys(outcomesData.uqc);
+      for (var i in rpt_keys) {
+        var key = rpt_keys[i];
+        var elementClass = qc_utils.isLaneKey(key) ? 'lane' : 'tag_info';
+        var arr = {};
+        arr[key] = outcomesData.uqc[key];
+        _processOutcomes( arr, 'uqc_outcome', elementClass);
+      }
     }
   };
 

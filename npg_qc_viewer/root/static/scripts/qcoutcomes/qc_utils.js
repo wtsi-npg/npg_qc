@@ -52,7 +52,7 @@ define(['jquery'], function () {
     $('#ajax_status').empty().append("<li class='failed_mqc'>" + message + '</li>');
   };
   //This method takes an rpt_key and returns a boolean evaluating wether the key defines 
-  //either a lane (true) or a plex (false)
+  //a lane (true) or a plex (false)
   var isLaneKey = function (rpt_key) {
     if ( rpt_key == 'undefined' || typeof rpt_key !== 'string' ) {
       throw 'Invalid arguments';

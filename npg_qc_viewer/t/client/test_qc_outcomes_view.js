@@ -94,7 +94,6 @@ requirejs([
       assert.equal(rows, 3, 'Correct number of rows');
       assert.equal((total_icons_fails + total_icons_fails), 0, 'Initially 18245:1 lanes have no utility fail or pass flag');
 
-
       rows = 0; 
       lanesWithClass = 0;
       qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
@@ -376,8 +375,6 @@ requirejs([
           'Does not remove old class unless new class is valid.');
       }
     });
-
-
 
     // run the tests.
     QUnit.start();
