@@ -26,12 +26,13 @@ npg_qc_viewer::Controller::QcOutcomes
 
 =head1 SYNOPSIS
 
-Controller for the QC outcomes JSON service. The service allows for
-retrieving, creating and updating QC outcomes.
+Controller for the manual QC  and user utility QC outcomes JSON service.
+The service allows for retrieving, creating and updating QC outcomes.
+For user utility outcomes only the retrieval part is implemented.
 
 =head1 DESCRIPTION
 
-Handles GET and post requests on the /qcoutcomes URL.
+Handles GET and POST requests on the /qcoutcomes URL.
 
 Retrieving records:
 
@@ -43,7 +44,7 @@ Retrieving records:
 Updating/creating records:
 
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
+    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes
 
 =head1 SUBROUTINES/METHODS
 
@@ -269,7 +270,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd.
+Copyright (C) 2017 Genome Research Ltd.
 
 This file is part of NPG software.
 

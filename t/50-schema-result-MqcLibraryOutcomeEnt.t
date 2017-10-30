@@ -152,12 +152,12 @@ subtest 'insert with historic' => sub {
   my $hist = $hist_object_rs->next;
   is ($hist->tag_index, undef, q[tag_index is undefined in historic]);
   is ($hist->id_seq_composition, $object->id_seq_composition,
-    'rows from two tables refer to teh same composition');
+    'rows from two tables refer to the same composition');
 };
 
 subtest q[update] => sub {
   plan tests => 50;
-  
+
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
 
@@ -184,10 +184,10 @@ subtest q[update] => sub {
     is ($row->modified_by, 'cat', 'modified_by');
     ok ($row->last_modified, 'timestamp is set');
     isa_ok ($row->last_modified, 'DateTime');
-  } 
-  
+  }
+
   $outcome = 'Accepted final';
- 
+
   $new_row = $rs->new_result($args);
   throws_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
     qr /UNIQUE constraint failed/,
@@ -272,7 +272,7 @@ subtest q[toggle final outcome] => sub {
   lives_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     'can toggle final outcome';
   is($new_row->mqc_outcome->short_desc, $outcome, 'new outcome');
-  
+
   lives_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     'can toggle final outcome once more';
   is($new_row->mqc_outcome->short_desc, $old_outcome, 'old outcome again');
