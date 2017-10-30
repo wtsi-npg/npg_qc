@@ -1,6 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - utility QC feature: db tables, DBIx classes, retrieval
+ - ensure, where practical, that saving and retrieving qc outcomes
+     works for multi-component compositions
 
 release 64.3 
  - DBIx schema loader script: automatically add npg_qc::Schema::Composition

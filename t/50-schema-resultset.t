@@ -1,11 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Test::Exception;
 use List::MoreUtils qw(uniq none);
 use Moose::Meta::Class;
 
 use npg_tracking::glossary::composition::factory;
+use npg_tracking::glossary::composition::factory::rpt_list;
 use npg_tracking::glossary::composition::component::illumina;
 use t::autoqc_util;
 
@@ -497,6 +498,37 @@ subtest q[creating new composition from new and existing components] => sub {
 
   is($rs_component->search({})->count(), $num_existing_components + 10,
     '10 new components are added');
+};
+
+subtest q[search by composition] => sub {
+  plan tests => 9;
+  
+  my $rs = $schema->resultset('InsertSize');
+
+  my $total = $rs->search({})->count();
+  lives_and ( sub {is $rs->search_via_composition([])->count(), $total },
+    'can have an empty array');
+  lives_and ( sub {is $rs->search_via_composition()->count(), $total },
+    'can have an undefined array');
+
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => q(350:1) )->create_composition();
+  is ($rs->search_via_composition([$c])->count, 0, 'no rows found');
+
+  $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => q(3500:1) )->create_composition();
+  my $found_rs = $rs->search_via_composition([$c]);
+  is ($found_rs->count, 1, 'one row found');
+  my $row = $found_rs->next();
+  isa_ok ($row, 'npg_qc::Schema::Result::InsertSize');
+  is ($row->seq_composition()->digest, $c->digest, 'correct digest');
+
+  my $c1 = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => q(3500:1:1) )->create_composition();
+  $found_rs = $rs->search_via_composition([$c, $c1]);
+  is ($found_rs->count, 2, 'two rows found');
+  is ($found_rs->next()->seq_composition()->digest, $c->digest, 'correct digest');
+  is ($found_rs->next()->seq_composition()->digest, $c1->digest, 'correct digest');
 };
 
 1;

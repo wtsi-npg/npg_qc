@@ -30,7 +30,7 @@ subtest 'Testing initial assumptions' => sub {
 };
 
 subtest 'test insert' => sub {
-  plan tests => 27;
+  plan tests => 28;
 
   my $values = {
     'id_uqc_outcome' => 1,
@@ -56,6 +56,7 @@ subtest 'test insert' => sub {
   ok ($outcome, 'linked outcome row');
   isa_ok ($outcome, 'npg_qc::Schema::Result::UqcOutcomeDict');
   is ($outcome->short_desc, 'Accepted', 'correct outcome description');
+  ok ($object->description(), 'outcome description is "Accepted"');
   my $seq_composition = $object->seq_composition;
   ok ($seq_composition, 'linked composition row');
   isa_ok ($seq_composition, 'npg_qc::Schema::Result::SeqComposition');

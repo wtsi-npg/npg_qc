@@ -10,10 +10,10 @@ my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures', ':memory:');
 
-my $table = 'UqcOutcomeDict';
 my $descriptions = ['Accepted', 'Rejected','Undecided'];
-my $decisions = ['Accepted', 'Rejected'];
-my @rows = $schema->resultset($table)->search({short_desc => {'-in', $descriptions}})->all();
+my @rows = $schema->resultset('UqcOutcomeDict')
+                  ->search({short_desc => {'-in', $descriptions}})->all();
+
 is (scalar @rows, 3, 'three possible uqc outcomes');
 ok (!$rows[0]->is_final_outcome, 'final outcome check returns false');
 ok (!$rows[0]->is_rejected, 'rejected outcome check returns false');
