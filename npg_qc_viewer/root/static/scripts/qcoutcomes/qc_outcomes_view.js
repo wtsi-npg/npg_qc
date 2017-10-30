@@ -99,7 +99,7 @@ define([
   *'outcomes' (the particular outcomes themselves -lib,seq or uqc-  for each rpt_key), 
   *'outcomeType' (either mqc or uqc outcome), and the 'elementClass' (which indicates the column 
   *where the widget will be displayed).
-  *It returns a hash (displayStatus) containing for each rpt_key a boolean indicating
+  *It returns a hash (existingElements) containing for each rpt_key a boolean indicating
   *wether or not a matching DOM element has been found.
   *
   * Example:
@@ -111,7 +111,7 @@ define([
     if ((elementClass !== 'lane') && (elementClass !== 'tag_info')) {
       throw 'Invalid type of rpt key element class ' + elementClass;
     }
-    var displayStatus = {};
+    var existingElements = {};
     var rpt_keys = Object.keys(outcomes);
     for (var i in rpt_keys) {
       var rpt_key = rpt_keys[i];
@@ -125,17 +125,17 @@ define([
       // available DOM elements.
       if (typeof selection !== 'undefined' && selection.length > 0) {
         if (outcomeType === 'uqc_outcome'){
-          var usabilityType = qc_outcome === 'Accepted' ;
-          usabilityDisplaySwitch(selection[0], usabilityType);
+          var componentUsability = qc_outcome === 'Accepted' ;
+          usabilityDisplaySwitch(selection[0], componentUsability);
         }else {
           qc_css_styles.displayElementAs(selection, qc_outcome);
         }
-        displayStatus[rpt_key]= 1;
+        existingElements[rpt_key]= 1;
       } else {
-        displayStatus[rpt_key]= 0;
+        existingElements[rpt_key]= 0;
       }
     }
-    return displayStatus;
+    return existingElements;
   };
 
   var _parseRptKeys = function (idTable) {
@@ -181,9 +181,9 @@ define([
       for (var i in rpt_keys) {
         var key = rpt_keys[i];
         var elementClass = qc_utils.isLaneKey(key) ? 'lane' : 'tag_info';
-        var arr = {};
-        arr[key] = outcomesData.uqc[key];
-        _processOutcomes( arr, 'uqc_outcome', elementClass);
+        var uqcOutcomeforKey = {};
+        uqcOutcomeforKey[key] = outcomesData.uqc[key];
+        _processOutcomes( uqcOutcomeforKey, 'uqc_outcome', elementClass);
       }
     }
   };
