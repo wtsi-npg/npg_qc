@@ -149,7 +149,8 @@ requirejs([
 
     QUnit.test('Updating lib outcomes Accepted final', function(assert) {
       var qcOutcomes = {"lib":{"18245:1:1":{"mqc_outcome":"Accepted final"}},
-                        "seq":{}};
+                        "seq":{},
+                        "uqc":{}};
       var rows = 0, elementsWithClass = 0;
       $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
         rows++;
@@ -203,7 +204,8 @@ requirejs([
 
         var data = {
           "lib":{ "19001:1:2":{ "mqc_outcome":"Rejected preliminary"} },
-          "seq":{ "18245:1":{ "mqc_outcome":"Accepted final"} }};
+          "seq":{ "18245:1":{ "mqc_outcome":"Accepted final"} },
+          "uqc":{}};
         options.success = function (callback) {
           callback(data, 'success', {});
           return options;
@@ -270,7 +272,8 @@ requirejs([
       var qcOutcomes = {"lib":{"19100:1:1":{"mqc_outcome":"Accepted final"},
                                "19100:1:2":{"mqc_outcome":"Rejected final"},
                                "19101:1:1":{"mqc_outcome":"Undecided"}},
-                        "seq":{"19100:1":{"mqc_outcome":"Accepted final"}}};
+                        "seq":{"19100:1":{"mqc_outcome":"Accepted final"}},
+                        "uqc":{}};
       var rows = 0, elementsWithClass = 0,
           totalQCClasses = 0, expected = ['accepted_final', 'rejected_final'];
       //19100

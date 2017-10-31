@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>QC Outcomes View</title>
+    <link rel="stylesheet" type="text/css" href="../../root/static/bower_components/qunit/qunit/qunit.css">
+    <link rel="stylesheet" type="text/css" href="../../root/static/stylesheets/npg_seqqc.css">
+    <script src="../../root/static/bower_components/qunit/qunit/qunit.js"></script>
+    <script>QUnit.config.autostart = false;</script>
+  </head>
+  <body>
+    <div id="qunit"></div> 
+    <div id="qunit-fixture">
+      <div id='QCOutcomes'>
+        <table id="results_summary">
+          <thead>
+            <tr>
+                <th rowspan='2'>Library<br>------<br>Sample<br>Name</th>
+                <th rowspan='2'>Run Id<br>------<br >Num.<br />Cycles</th>
+                <th rowspan='2'>Lane<br>No</th>
+                <th rowspan="2">Tag</th>
+                <th>adapter</th>
+            </tr>
+            <tr>
+                <th class="check_labels">adapters,<br>%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="rpt_key:18245:1">
+              <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp">NT717708B</span></div></td>
+              <td class="id_run"><div class="rel_pos_container"><a href="/perl/npg/run/18245" title="date completed 2015-11-23">18245</a><br>311</div></td>
+              <td class="lane nbsp"><a href="#18245:1">1</a><span class="library_mqc_overall_controls"></span></td>
+              <td class="tag_info"></td>
+              <td class="check_summary failed"><a href="#tmc_18245:1">0.0</a><br><span class="dark_blue"><a href="#tmc_18245:1">1.1</a></span></td>
+            </tr>
+            <tr id="rpt_key:18245:1:1">
+              <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp"><a href="">NT716280N</a><br><a href="">PbSTM_27_1</a></span></div></td>
+              <td class="id_run"><div class="rel_pos_container"><a href="/perl/npg/run/18245" title="date completed 2015-11-23">18245</a><br>311</div></td>
+              <td class="lane nbsp"><a href="#18245:1">1</a><span class="library_mqc_overall_controls"></span></td>
+              <td class="tag_info"><a href="#18245:1:1">1</a><br>AGTGATTAGCA</td>
+              <td class="check_summary failed"><a href="#tmc_18245:1">0.0</a><br><span class="dark_blue"><a href="#tmc_18245:1">1.1</a></span></td>
+            </tr>
+            <tr id="rpt_key:18245:1:2">
+              <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp"><a href="">NT716280N</a><br><a href="">PbSTM_27_1</a></span></div></td>
+              <td class="id_run"><div class="rel_pos_container"><a href="/perl/npg/run/18245" title="date completed 2015-11-23">18245</a><br>311</div></td>
+              <td class="lane nbsp"><a href="#18245:1">1</a><span class="library_mqc_overall_controls"></span></td>
+              <td class="tag_info"><a href="#18245:1:1">1</a><br>AGTGATTAGCA</td>
+              <td class="check_summary failed"><a href="#tmc_18245:1">0.0</a><br><span class="dark_blue"><a href="#tmc_18245:1">1.1</a></span></td>
+            </tr>
+            <tr id="rpt_key:19001:1">
+              <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp">NT717708B</span></div></td>
+              <td class="id_run"><div class="rel_pos_container"><a href="/perl/npg/run/19001" title="date completed 2015-11-23">19001</a><br>311</div></td>
+              <td class="lane nbsp"><a href="#19001:1">1</a><span class="library_mqc_overall_controls"></span></td>
+              <td class="tag_info"></td>
+              <td class="check_summary failed"><a href="#tmc_19001:1">0.0</a><br><span class="dark_blue"><a href="#tmc_19001:1">1.1</a></span></td>
+            </tr>
+            <tr id="rpt_key:19001:1:1">
+              <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp"><a href="">NT716280N</a><br><a href="">PbSTM_27_1</a></span></div></td>
+              <td class="id_run"><div class="rel_pos_container"><a href="/perl/npg/run/19001" title="date completed 2015-11-23">19001</a><br>311</div></td>
+              <td class="lane nbsp"><a href="#19001:1">1</a><span class="library_mqc_overall_controls"></span></td>
+              <td class="tag_info"><a href="#19001:1:1">1</a><br>AGTGATTAGCA</td>
+              <td class="check_summary failed"><a href="#tmc_19001:1">0.0</a><br><span class="dark_blue"><a href="#tmc_19001:1">1.1</a></span></td>
+            </tr>
+            <tr id="rpt_key:19001:1:2">
+              <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp"><a href="">NT716280N</a><br><a href="">PbSTM_27_1</a></span></div></td>
+              <td class="id_run"><div class="rel_pos_container"><a href="/perl/npg/run/19001" title="date completed 2015-11-23">19001</a><br>311</div></td>
+              <td class="lane nbsp"><a href="#19001:1">1</a><span class="library_mqc_overall_controls"></span></td>
+              <td class="tag_info"><a href="#19001:1:1">1</a><br>AGTGATTAGCA</td>
+              <td class="check_summary failed"><a href="#tmc_19001:1">0.0</a><br><span class="dark_blue"><a href="#tmc_19001:1">1.1</a></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="fixture_sample">
+        <table id="fixture_sample_data">
+          <thead>
+            <tr>
+                <th rowspan='2'>Library<br>------<br>Sample<br>Name</th>
+                <th rowspan='2'>Run Id<br>------<br >Num.<br />Cycles</th>
+                <th rowspan='2'>Lane<br>No</th>
+                <th rowspan="2">Tag</th>
+                <th>adapter</th>
+            </tr>
+            <tr>
+                <th class="check_labels">adapters,<br>%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="rpt_key:19100:1:1">
+              <td class="lib nbsp">
+                <div class="rel_pos_container"><span class="lib nbsp">
+                  <a href="http://server/page">LIBID1</a><br>
+                  <a href="http://server/page">SAMPLEID1</a></span>
+                </div>
+              </td>
+              <td class="id_run">
+                <div class="rel_pos_container">
+                  <a href="http://server/page/19100" title="date completed 2015-01-01">19100</a>
+                  <br>216
+                </div>
+              </td>
+              <td class="lane nbsp">
+                1&nbsp;<span id="mqc_library19100_1_1" data-id_run="19100" data-position="1" data-tag_index="1" class="lane_mqc_control"></span>
+              </td>
+              <td class="tag_info"><a href="#19100:1:1">1</a>
+                <br>ACTGACTGACTGACTG
+              </td>
+              <td class="check_summary outcome_unknown">0.00
+                  <br>0.00
+              </td>
+              </tr>
+              <tr id="rpt_key:19100:1:2">
+              <td class="lib nbsp">
+                <div class="rel_pos_container"><span class="lib nbsp">
+                  <a href="http://server/page">LIBID1</a><br>
+                  <a href="http://server/page">SAMPLEID1</a></span>
+                </div>
+              </td>
+              <td class="id_run">
+                <div class="rel_pos_container">
+                  <a href="http://server/page/19100" title="date completed 2015-01-01">19100</a>
+                  <br>216
+                </div>
+              </td>
+              <td class="lane nbsp">
+                  1&nbsp;<span id="mqc_library19100_1_2" data-id_run="19100" data-position="1" data-tag_index="2" class="lane_mqc_control"></span>
+              </td>
+              <td class="tag_info"><a href="#19100:1:2">1</a>
+                <br>ACTGACTGACTGACTG</td>
+              <td class="check_summary outcome_unknown">0.00
+                <br>0.00</td>
+              </tr>
+              <tr id="rpt_key:19101:1:1">
+              <td class="lib nbsp">
+                <div class="rel_pos_container"><span class="lib nbsp">
+                  <a href="http://server/page">LIBID1</a><br>
+                  <a href="http://server/page">SAMPLEID1</a></span>
+                </div>
+              </td>
+              <td class="id_run">
+                <div class="rel_pos_container">
+                  <a href="http://server/page/19101" title="date completed 2015-01-01">19101</a>
+                  <br>216
+                </div>
+              </td>
+              <td class="lane nbsp">
+                  1&nbsp;<span id="mqc_library19101_1_1" data-id_run="19101" data-position="1" data-tag_index="1" class="lane_mqc_control"></span>
+              </td>
+              <td class="tag_info"><a href="#19101:1:1">1</a>
+                  <br>ACTGACTGACTGACTG
+              </td>
+              <td class="check_summary outcome_unknown">0.00
+                  <br>0.00
+              </td>
+            </tr> 
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script src="../../root/static/bower_components/requirejs/require.js"></script>
+    <script src="test_uqc_outcomes_view.js"></script>
+  </body>
+</html>
+

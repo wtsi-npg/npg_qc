@@ -36,36 +36,41 @@ define([
 
   /*
    *This function assigns a string defined icon (ie:&#10003) in the .lane column to signal
-   *the outcome of the usability flag from a certain tag. If a previous icon exists, it
+   *the outcome of the utility flag from a certain tag. If a previous icon exists, it
    *removes it before adding the new one.
    *
-   *It requires a DOM object (obj) and a boolean flag (usability) displaying wether
-   *the usability of the tag lane is switched on (✓) or off (✘).
+   *It requires a DOM object (obj) and a string (utility) describing the utility of the tag lane:
+   *Accepted (✓) or Rejected (✘). If the utility is "Undecided" there is no widget
+   *to display.
    *
    *
    * Example:
    *
    *  $('.lane').each(function (i, obj) {
-   *    mqc_outcomes.usabilityDisplaySwitch(obj,1);
+   *    mqc_outcomes.utilityDisplaySwitch(obj,"Accepted");
    *  });
    *
    */
-  var usabilityDisplaySwitch = function (obj, usability) {
+  var utilityDisplaySwitch = function (obj, utility) {
     if (!(obj instanceof Element)) {
       throw new TypeError('Parameter obj must be defined and of type (DOM) Element');
     }
-    if (typeof usability !== 'boolean') {
-      throw new TypeError('Usability should be boolean');
+    if (typeof utility !== 'string') {
+      throw new TypeError('Utility should be a string');
     }
+    if ( utility !== 'Accepted' && utility !== 'Rejected' && utility !== 'Undecided') {
+      throw new TypeError('Unknown utility ', utility);
+    }
+
     var o = $(obj);
     var icon;
     o.children().remove('.utility_PASS, .utility_FAIL');//in case an icon exists
-    if(usability){
-      icon = $('<div class="utility_PASS">&#10003;</div>');//&#10003=check ✓
-    } else {
-      icon = $('<div class="utility_FAIL">&#10008;</div>');//&#10008=cross ✘
+    if(utility === 'Accepted'){
+      icon = '<span class="utility_PASS">&#10003;</span>';//&#10003=check ✓
+    } else if (utility === 'Rejected'){
+      icon = '<span class="utility_FAIL">&#10008;</span>';//&#10008=cross ✘
     }
-    o.append(icon);
+    o.children('a').after(icon);
   };
 
   /*
@@ -94,6 +99,7 @@ define([
     return $(rptKeyAsSelector + ' td.' + elementClass);
   };
   
+
   /*
   *This function processes the QCoutcomes defined by the input outcomes. It takes as inputs
   *'outcomes' (the particular outcomes themselves -lib,seq or uqc-  for each rpt_key), 
@@ -125,8 +131,7 @@ define([
       // available DOM elements.
       if (typeof selection !== 'undefined' && selection.length > 0) {
         if (outcomeType === 'uqc_outcome'){
-          var componentUsability = qc_outcome === 'Accepted' ;
-          usabilityDisplaySwitch(selection[0], componentUsability);
+          utilityDisplaySwitch(selection[0], qc_outcome);
         }else {
           qc_css_styles.displayElementAs(selection, qc_outcome);
         }
@@ -185,6 +190,8 @@ define([
         uqcOutcomeforKey[key] = outcomesData.uqc[key];
         _processOutcomes( uqcOutcomeforKey, 'uqc_outcome', elementClass);
       }
+    } else {
+        throw 'Malformed QC outcomes data for uqc';
     }
   };
 
@@ -226,7 +233,7 @@ define([
     _parseRptKeys: _parseRptKeys,
     _processOutcomes: _processOutcomes,
     _selectionForKey: _selectionForKey,
-    usabilityDisplaySwitch: usabilityDisplaySwitch,
+    utilityDisplaySwitch: utilityDisplaySwitch,
     fetchAndProcessQC: fetchAndProcessQC
   };
 });

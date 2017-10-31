@@ -508,10 +508,12 @@ input[type=radio]:checked + label {
 
 /******************* usability flag widgets **************/
 .utility_PASS {
+  margin-left: 5px;
   font-size: 200%;
   color: #A2DEFF;/*solid blue*/
 }
 .utility_FAIL {
+  margin-left: 5px;
   font-size: 200%;
   color: #FF8885;/*solid red*/
 }

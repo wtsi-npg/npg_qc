@@ -79,7 +79,8 @@ requirejs([
           "lib":{ },
           "seq":{ "18000:1":{ "mqc_outcome":qc_utils.OUTCOMES.REJECTED_PRELIMINARY, "position":1, "id_run":18000 },
                   "18000:2":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, "position":2, "id_run":18000 },
-                  "18000:3":{ "mqc_outcome":qc_utils.OUTCOMES.UNDECIDED, "position":3, "id_run":18000 }, }
+                  "18000:3":{ "mqc_outcome":qc_utils.OUTCOMES.UNDECIDED, "position":3, "id_run":18000 }, },
+          "uqc":{}       
         };
         options.success = function (callback) {
           callback(data, 'success', {});
@@ -170,7 +171,8 @@ requirejs([
         var data = {
           "lib":{ },
           "seq":{ "18000:1":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_FINAL, "position":1, "id_run":18000 },
-                  "18000:2":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, "position":2, "id_run":18000 } }
+                  "18000:2":{ "mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY, "position":2, "id_run":18000 } },
+          "uqc":{}        
         };
         options.success = function (callback) {
           callback(data, 'success', {});
@@ -230,7 +232,8 @@ requirejs([
             "18000:2:3":{"tag_index":"3","mqc_outcome":qc_utils.OUTCOMES.UNDECIDED,"position":"2","id_run":"18000"},
             "18000:2:2":{"tag_index":"2","mqc_outcome":qc_utils.OUTCOMES.REJECTED_PRELIMINARY,"position":"2","id_run":"18000"}
           },
-          "seq":{}
+          "seq":{},
+          "uqc":{} 
         };
         options.success = function (callback) {
           callback(data, 'success', {});
@@ -369,7 +372,8 @@ requirejs([
           },
           "seq":{
             "18000:2":{"mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"}
-          }
+          },
+          "uqc":{} 
         };
         options.success = function (callback) {
           callback(data, 'success', {});
@@ -513,7 +517,8 @@ requirejs([
             "seq":{
               "18000:1":{"mqc_outcome":outcome,"position":"1","id_run":"18000"},
               "18000:2":{"mqc_outcome":outcome,"position":"2","id_run":"18000"}
-            }
+            },
+            "uqc":{} 
           };
           options.success = function (callback) {
             callback(data, 'success', {});
@@ -543,7 +548,8 @@ requirejs([
           },
           "seq":{
             "18000:2":{"mqc_outcome":qc_utils.OUTCOMES.ACCEPTED_PRELIMINARY,"position":"2","id_run":"18000"}
-          }
+          },
+          "uqc":{} 
         };
         options.success = function (callback) {
           callback(data, 'success', {});
