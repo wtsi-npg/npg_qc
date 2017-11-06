@@ -107,7 +107,7 @@ SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'mqc_library_outcome_ent', @@warning_count, @@error_count;
 
-UPDATE mqc_library_outcome_ent SET tag_index = NULL WHERE tag_index = -1;
+UPDATE mqc_library_outcome_hist SET tag_index = NULL WHERE tag_index = -1;
 SHOW ERRORS;
 SHOW WARNINGS;
 SELECT 'mqc_library_outcome_hist', @@warning_count, @@error_count;

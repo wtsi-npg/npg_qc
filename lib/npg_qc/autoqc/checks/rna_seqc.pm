@@ -136,7 +136,7 @@ sub _build_is_rna_alignment {
     my $command = $self->samtools_cmd . ' view -H ' . $self->_bam_file . ' |';
     my $ph = IO::File->new($command) or croak qq[Cannot fork '$command', error $ERRNO];
     while (my $line = <$ph>) {
-        if (!$rna_alignment && $line =~ /^\@PG\s+.*tophat/ismx) {
+        if (!$rna_alignment && $line =~ /^\@PG\s+.*TopHat|STAR/smx) {
             $rna_alignment = 1;
         }
     }
