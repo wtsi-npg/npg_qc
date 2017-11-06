@@ -26,21 +26,21 @@ requirejs([
           qc_outcomes._selectionForKey();
         },
         /Both key and elementClass are required/i,
-        'Throws with no params'
+        'Error with no params'
       );
       assert.throws(
         function() {
           qc_outcomes._selectionForKey('18245:1');
         },
         /Both key and elementClass are required/i,
-        'Throws with only key param'
+        'Error with only key param'
       );
       assert.throws(
         function() {
           qc_outcomes._selectionForKey('lane');
         },
         /Both key and elementClass are required/i,
-        'Throws with only elementClass param'
+        'Error with only elementClass param'
       );
       
       var selection = qc_outcomes._selectionForKey('18245:1','lane',true);

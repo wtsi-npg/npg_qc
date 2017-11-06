@@ -132,7 +132,7 @@ define([
       if (typeof selection !== 'undefined' && selection.length > 0) {
         if (outcomeType === 'uqc_outcome'){
           utilityDisplaySwitch(selection[0], qc_outcome);
-        }else {
+        } else {
           qc_css_styles.displayElementAs(selection, qc_outcome);
         }
         existingElements[rpt_key]= 1;

@@ -14,12 +14,20 @@ requirejs(['scripts/qcoutcomes/qc_utils'],
     QUnit.config.autostart = false;
 
     QUnit.test('isLaneKey', function (assert) {
-      var wrongArgs = [null, 123, false];
-      for ( var j = 0; j < wrongArgs.length; j++){
+      var wrongArgs = [ null, 123, false];
+      for ( var j = 0; j < wrongArgs.length +1 ; j++){
         assert.throws(
          function () { qc_utils.isLaneKey(wrongArgs[j]); },
-         /Invalid arguments/,
-         'Undefined key throws error'
+         /Invalid argument/,
+         'Invalid argument throws error'
+       );
+      }
+      wrongArgs = ['', '123', '123:1:2:3', '123::1', '122::'];
+      for ( j = 0; j < wrongArgs.length; j++){
+        assert.throws(
+         function () { qc_utils.isLaneKey(wrongArgs[j]); },
+         /Invalid key format/,
+         'Invalid key format for ' + wrongArgs[j] + ' throws error'
        );
       }
       
@@ -28,7 +36,7 @@ requirejs(['scripts/qcoutcomes/qc_utils'],
                        '1:1:4', '1:3'];
       var results = [false, true, false, true, false, true];
       for( var i = 0; i < validIds.length; i++ ){
-        assert.equal(qc_utils.isLaneKey(validIds[i]),results[i],'isLaneKey return correct value');
+        assert.equal(qc_utils.isLaneKey(validIds[i]),results[i],'isLaneKey return correct value for ' + validIds[i]);
       }
     });
 
