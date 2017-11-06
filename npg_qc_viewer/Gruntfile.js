@@ -22,6 +22,7 @@ module.exports = function(grunt) {
         'Gruntfile.js',
         'root/static/scripts/collapse.js',
         'root/static/scripts/qcoutcomes/qc_outcomes_view.js',
+        'root/static/scripts/qcoutcomes/qc_page.js',
         't/client/test*.js'
       ],
       options: {

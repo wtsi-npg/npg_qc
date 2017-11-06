@@ -4,9 +4,9 @@
  *
  * Example:
  *
- *   var pageForMQC = qc_page.pageForMQC();
- *   if ( pageForMQC.isPageForMQC ) {
- *     if( pageForMQC.isRunPage ) {
+ *   var pageForQC = qc_page.pageForQC();
+ *   if ( pageForQC.isPageForMQC ) {
+ *     if( pageForQC.isRunPage ) {
  *       // Do manual QC sequencing level
  *     } else {
  *       // Do manual QC library level
@@ -17,7 +17,7 @@
 'use strict';
 define(['jquery'], function () {
   var _reRunLane   = /(?:(?:for (run) ([0-9]+))|(?:for (runs) ([0-9]+) lanes ([0-9]+))) \(run/;
-  var _reRunStatus = /\(run [0-9]+ status: ((?:[\S]+)(?:\s[\S]+){2}), taken by ([\S]+)\)$/;
+  var _reRunStatus = /\(run [0-9]+ status: ((?:[\S]+)(?:\s[\S]+){1,2})(?:, taken by ([\S]+))?\)$/;
 
   var _reLoggedUser = /^Logged in as ([a-zA-Z0-9]+)(?:[\s]{1}(?:\((mqc)\)))?$/i; // [1] username, [2] (mqc)
 
@@ -90,8 +90,23 @@ define(['jquery'], function () {
     };
   };
 
-  var pageForMQC = function() {
-    var isPageForMQC = false, isRunPage = null;
+  var _getRunInfoFromPageTitle = function(pageTitleString){
+    var isPageForThisQC = false, isARunPage = false;
+
+    var runInfo = _parseRunLane(pageTitleString);
+    isARunPage = runInfo.isRunPage;
+    if ( runInfo.isSingleRunOrSingleLanePage ) {
+      isPageForThisQC = true;
+    }
+
+    return {
+      isPageForThisQC: isPageForThisQC,
+      isARunPage: isARunPage
+    };
+  };
+
+  var pageForQC = function() {
+    var isPageForMQC = false, isPageForUQC = false, isRunPage = null;
 
     var loggedUserString = $.trim($('#header h1 span.rfloat').text());
     if ( loggedUserString === '' ) {
@@ -102,32 +117,43 @@ define(['jquery'], function () {
     if ( loggedUserData.username != null &&
          loggedUserData.role === 'mqc' ) {
       var pageTitleString = $.trim($('title').text());
+      
       if ( pageTitleString === '' ) {
-        throw new Error('Error: page title is expected but not available in page');
+      throw new Error('Error: page title is expected but not available in page');
       }
       var runStatusData = _parseRunStatus(pageTitleString);
-      if ( ( runStatusData.runStatus === 'qc in progress' ||
-             runStatusData.runStatus === 'qc on hold' ) &&
-           loggedUserData.username === runStatusData.takenBy ) {
-        var runInfo = _parseRunLane(pageTitleString);
-        isRunPage = runInfo.isRunPage;
-        if ( runInfo.isSingleRunOrSingleLanePage ) {
-          isPageForMQC = true;
-        }
+      var acceptedStatus = ['qc in progress', 'qc on hold'];
+      var pageRunInfo = null;
+      if ( ( runStatusData.runStatus === acceptedStatus[0] ||
+             runStatusData.runStatus === acceptedStatus[1] ) &&
+             loggedUserData.username === runStatusData.takenBy  ) {
+        pageRunInfo = _getRunInfoFromPageTitle (pageTitleString);
+        isPageForMQC = pageRunInfo.isPageForThisQC;
+        isRunPage = pageRunInfo.isARunPage;
+      } else {
+          acceptedStatus = ['qc complete', 'run archived'];
+          if ( ( runStatusData.runStatus === acceptedStatus[0] ||
+                 runStatusData.runStatus === acceptedStatus[1] ) ) {
+            pageRunInfo = _getRunInfoFromPageTitle (pageTitleString);
+            isPageForUQC = pageRunInfo.isPageForThisQC;
+            isRunPage = pageRunInfo.isARunPage;
+          }
       }
     }
 
     return {
       isPageForMQC: isPageForMQC,
-      isRunPage:   isRunPage
+      isRunPage:   isRunPage,
+      isPageForUQC: isPageForUQC
     };
   };
+
 
   return {
     _parseRunLane: _parseRunLane,
     _parseRunStatus: _parseRunStatus,
     _parseLoggedUser: _parseLoggedUser,
-    pageForMQC: pageForMQC
+    pageForQC: pageForQC
   };
 });
 
