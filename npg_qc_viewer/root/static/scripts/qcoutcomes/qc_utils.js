@@ -10,7 +10,7 @@ define(['jquery'], function () {
   var EXCEPTION_SPLIT = /^(.*?)( at \/)/;
   var TEST_FINAL      = /(final)$/i;
   var TEST_LIKE_ID    = /^rpt_key:/;
-  var KEY_SEPARATORS   = /\d:\d/g;
+  var RPT_KEY_MATCH   = /^\d+:\d+$/;
 
   var buildIdSelector = function (id) {
     return '#' + id.replace(/:/g, '\\3A ');
@@ -56,21 +56,14 @@ define(['jquery'], function () {
   //This method takes an rpt_key and returns a boolean evaluating wether the key defines 
   //a lane (true) or a plex (false)
   var isLaneKey = function (rpt_key) {
-    if ( typeof rpt_key == 'undefined' || typeof rpt_key !== 'string' ) {
+    if ( typeof rpt_key !== 'string' ) {
       throw 'Invalid argument';
     }
-    var count = [], found;
-    while (found = KEY_SEPARATORS.exec(rpt_key)) {
-      count.push(found[0]);
-      KEY_SEPARATORS.lastIndex -= found[0].split(':')[1].length;
+    if ( RPT_KEY_MATCH.exec(rpt_key) != null ) {
+      return 1;
+    } else { 
+      return 0; 
     }
-    if (count.length === 1){
-      return true;  
-    } else if (count.length === 2){
-      return false
-    } else {
-      throw 'Invalid key format'
-    } 
   };
 
   var displayJqXHRError = function ( jqXHR ) {

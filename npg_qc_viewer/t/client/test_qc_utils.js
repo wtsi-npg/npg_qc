@@ -15,19 +15,11 @@ requirejs(['scripts/qcoutcomes/qc_utils'],
 
     QUnit.test('isLaneKey', function (assert) {
       var wrongArgs = [ null, 123, false];
-      for ( var j = 0; j < wrongArgs.length +1 ; j++){
+      for ( var j = 0; j < wrongArgs.length ; j++){
         assert.throws(
          function () { qc_utils.isLaneKey(wrongArgs[j]); },
          /Invalid argument/,
-         'Invalid argument throws error'
-       );
-      }
-      wrongArgs = ['', '123', '123:1:2:3', '123::1', '122::'];
-      for ( j = 0; j < wrongArgs.length; j++){
-        assert.throws(
-         function () { qc_utils.isLaneKey(wrongArgs[j]); },
-         /Invalid key format/,
-         'Invalid key format for ' + wrongArgs[j] + ' throws error'
+         'Invalid argument throws error ' + wrongArgs[j]
        );
       }
       

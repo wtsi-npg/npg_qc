@@ -59,16 +59,16 @@ define([
       throw new TypeError('Utility should be a string');
     }
     if ( utility !== 'Accepted' && utility !== 'Rejected' && utility !== 'Undecided') {
-      throw new TypeError('Unknown utility ', utility);
+      throw 'Invalid value ' + utility;
     }
 
     var o = $(obj);
     var icon;
-    o.children().remove('.utility_PASS, .utility_FAIL');//in case an icon exists
-    if(utility === 'Accepted'){
-      icon = '<span class="utility_PASS">&#10003;</span>';//&#10003=check ✓
-    } else if (utility === 'Rejected'){
-      icon = '<span class="utility_FAIL">&#10008;</span>';//&#10008=cross ✘
+    o.children().remove('.utility_pass, .utility_fail');//in case an icon exists
+    if (utility === 'Accepted') {
+      icon = '<span class="utility_pass">&#10003;</span>';//&#10003=check ✓
+    } else if (utility === 'Rejected') {
+      icon = '<span class="utility_fail">&#10008;</span>';//&#10008=cross ✘
     }
     o.children('a').after(icon);
   };
@@ -90,7 +90,7 @@ define([
       throw 'Both key and elementClass are required';
     }
     var rptKeyAsSelector;
-    if (fuzzyMatch){
+    if (fuzzyMatch) {
       rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + key + '"]';
     } else {
       //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
@@ -130,7 +130,7 @@ define([
       // Allows for a mismatch between the received keys and
       // available DOM elements.
       if (typeof selection !== 'undefined' && selection.length > 0) {
-        if (outcomeType === 'uqc_outcome'){
+        if (outcomeType === 'uqc_outcome') {
           utilityDisplaySwitch(selection[0], qc_outcome);
         } else {
           qc_css_styles.displayElementAs(selection, qc_outcome);
@@ -181,7 +181,7 @@ define([
   var _updateDisplayWithQCOutcomes = function (outcomesData) {
     _processOutcomes(outcomesData.lib, 'mqc_outcome', 'tag_info');
     _processOutcomes(outcomesData.seq, 'mqc_outcome', 'lane');
-    if (outcomesData.uqc !== undefined){
+    if (outcomesData.uqc !== undefined) {
       var rpt_keys = Object.keys(outcomesData.uqc);
       for (var i in rpt_keys) {
         var key = rpt_keys[i];
@@ -190,9 +190,7 @@ define([
         uqcOutcomeforKey[key] = outcomesData.uqc[key];
         _processOutcomes( uqcOutcomeforKey, 'uqc_outcome', elementClass);
       }
-    } else {
-        throw 'Malformed QC outcomes data for uqc';
-    }
+    } 
   };
 
   var _fetchQCOutcomesUpdateView = function (rptKeys, outcomesURL, callOnSuccess) {
