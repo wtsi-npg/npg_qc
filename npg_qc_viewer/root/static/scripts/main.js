@@ -42,7 +42,6 @@ requirejs([
   plots,
   format_for_csv,
   qc_page,
-  //WUQC,
   NPG,
 ) {
   $(document).ready(function(){

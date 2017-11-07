@@ -10,9 +10,8 @@ requirejs.config({
 
 requirejs([
   'scripts/qcoutcomes/qc_outcomes_view',
-  'scripts/qcoutcomes/qc_css_styles',
-  'scripts/qcoutcomes/qc_utils'
-], function(qc_outcomes, qc_css_styles, qc_utils) {
+  'scripts/qcoutcomes/qc_css_styles'
+], function(qc_outcomes, qc_css_styles) {
 
 
     QUnit.test('Parsing RPT keys', function (assert) {
@@ -407,10 +406,6 @@ requirejs([
     }); 
 
     QUnit.test('Trying to display a non-existing rpt_key', function(assert) {
-      var qcOutcomes = {"uqc":{"18245:1":{"uqc_outcome":"Accepted"},
-                               "19001:1":{"uqc_outcome":"Rejected"},
-                               "1824500:1":{"uqc_outcome":"Accepted"}}};
-
       assert.deepEqual(qc_outcomes._processOutcomes( {"18245:1":{"uqc_outcome":"Accepted"}}, 'uqc_outcome', 'lane'), 
         {"18245:1": 1},
         '__processOutcomes reports existing element for "18245:1"');

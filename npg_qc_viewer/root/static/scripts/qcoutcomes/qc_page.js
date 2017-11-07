@@ -119,7 +119,7 @@ define(['jquery'], function () {
       var pageTitleString = $.trim($('title').text());
       
       if ( pageTitleString === '' ) {
-      throw new Error('Error: page title is expected but not available in page');
+        throw new Error('Error: page title is expected but not available in page');
       }
       var runStatusData = _parseRunStatus(pageTitleString);
       var acceptedStatus = ['qc in progress', 'qc on hold'];
