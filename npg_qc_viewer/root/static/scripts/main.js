@@ -42,7 +42,7 @@ requirejs([
   plots,
   format_for_csv,
   qc_page,
-  NPG,
+  NPG
 ) {
   $(document).ready(function(){
     //Setup for heatmaps to load on demand.
@@ -52,17 +52,12 @@ requirejs([
       // We scroll after collapse toggles to fire modify on view to generate plots
       window.scrollBy(0,1); window.scrollBy(0,-1);
     });
-    var qcp = qc_page.pageForQC();
-
-    if (qcp.isPageForMQC){
-      qc_outcomes_view.fetchAndProcessQC('results_summary', 
-                                         '/qcoutcomes', 
-                                         NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes')
-                                        );
-    } else if (qcp.isPageForUQC){
-      $("#menu #links > ul:eq(3)").append('<li><a id="uqcClickable">UQC annotation</a></li>')
-    }
-
+    var qcp = qc_page.pageForMQC();
+    var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) {
+                                                        NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes');
+                                                      }
+                                                    : null;
+    qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
   });
 
   //Required to show error messages from the mqc process.
