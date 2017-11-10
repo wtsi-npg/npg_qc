@@ -11,11 +11,11 @@ requirejs.config({
 requirejs([
   'scripts/qcoutcomes/qc_outcomes_view',
   'scripts/qcoutcomes/qc_css_styles'
-], function(mqc_outcomes, qc_css_styles) {
+], function(qc_outcomes, qc_css_styles) {
 
 
     QUnit.test('Parsing RPT keys', function (assert) {
-      var rptKeys = mqc_outcomes._parseRptKeys('results_summary');
+      var rptKeys = qc_outcomes._parseRptKeys('results_summary');
       var expected = ['18245:1', '18245:1:1', '18245:1:2','19001:1', '19001:1:1', '19001:1:2'];
       assert.deepEqual(rptKeys, expected, 'Correct rpt keys');
     });
@@ -45,7 +45,7 @@ requirejs([
       assert.equal(lanesWithClass, 0, 'Correct initial number of 190001 lanes with class different run');
 
       rows = 0; lanesWithClass = 0;
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.lane').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -57,7 +57,7 @@ requirejs([
       assert.equal(lanesWithClass, 3, 'Correct number of lanes with updated class');
 
       rows = 0; lanesWithClass = 0;
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.lane').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -84,7 +84,7 @@ requirejs([
       assert.equal(elementsWithClass, 0, 'Initially tags have no class');
 
       rows = 0; elementsWithClass = 0;
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:18245:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -100,7 +100,7 @@ requirejs([
       });
 
       rows = 0; elementsWithClass = 0;
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
       $('tr[id*="rpt_key:19001:1"] td.tag_info').each(function (i, obj) {
         rows++;
         var $obj = $(obj);
@@ -112,7 +112,7 @@ requirejs([
       assert.equal(elementsWithClass, 0, 'Correct number of tags with updated class different run');
     });
 
-    QUnit.test('Test chainging the interface mocking ajax', function (assert) {
+    QUnit.test('Test changing the interface mocking ajax', function (assert) {
       assert.expect(10);
       var old_ajax = $.ajax;
       $.ajax = function (options) {
@@ -167,7 +167,7 @@ requirejs([
         assert.equal(lanes, 3, 'Correct number of lanes');
         assert.equal(lanesWithClass, 0, 'Initially lanes have no class');
 
-        mqc_outcomes.fetchAndProcessQC('results_summary', '/qcoutcomes', whatToDoWithOutcomes);
+        qc_outcomes.fetchAndProcessQC('results_summary', '/qcoutcomes', whatToDoWithOutcomes);
       } catch (err) {
         console.log(err);
       } finally {
@@ -229,7 +229,7 @@ requirejs([
       assert.equal(rows, 1, 'Correct number of rows');
       assert.equal(elementsWithClass, 0, 'Initially lanes without classes for run 19101');
 
-      mqc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
 
       //19100
       rows = 0; elementsWithClass = 0;
@@ -299,17 +299,64 @@ requirejs([
       }
     });
 
-    QUnit.test("Parameter validation tests for usabilityDisplaySwitch", function (assert) {
+    QUnit.test('Updating for a non-existing element', function(assert) {
+      var qcOutcomes = {"seq":{"18245:1":{"mqc_outcome":"Rejected final"},
+                               "19001:1":{"mqc_outcome":"Accepted final"},
+                               "1824500:1":{"mqc_outcome":"Accepted final"}}};
+      var procOut = qc_outcomes._processOutcomes(qcOutcomes.seq, 'mqc_outcome',  'lane');     
+      var expected = {"18245:1":1,"19001:1":1,"1824500:1":0};
+      assert.deepEqual(procOut, expected, 
+        'processOutcomes reports expected hash with 2 existing and one absent element');
+    });                    
+
+    QUnit.test("Parameter validation tests for _selectionForKey", function (assert) {
       assert.throws(
         function() {
-          mqc_outcomes.usabilityDisplaySwitch();
+          qc_outcomes._selectionForKey();
         },
-        /Parameter obj must be defined and of type \(DOM\) Element/i,
-        'Throws with no params'
+        /Both key and elementClass are required/i,
+        'Error with no params'
       );
       assert.throws(
         function() {
-          mqc_outcomes.usabilityDisplaySwitch(1);
+          qc_outcomes._selectionForKey('18245:1');
+        },
+        /Both key and elementClass are required/i,
+        'Error with only key param'
+      );
+      assert.throws(
+        function() {
+          qc_outcomes._selectionForKey('lane');
+        },
+        /Both key and elementClass are required/i,
+        'Error with only elementClass param'
+      );
+      
+      var selection = qc_outcomes._selectionForKey('18245:1','lane',true);
+      assert.equal(selection.length, 3, 
+        "fuzzy _selectionForKey returns 3 objects for 'lane' 18245:1");
+      selection = qc_outcomes._selectionForKey('18245:1:2','tag_info',false);
+      assert.equal(selection.length, 1, 
+        "exact match _selectionForKey returns 1 object for 'tag_info' 18245:1:2"); 
+    });
+
+    QUnit.test('Parsing RPT keys', function (assert) {
+      var rptKeys = qc_outcomes._parseRptKeys('results_summary');
+      var expected = ['18245:1', '18245:1:1', '18245:1:2','19001:1', '19001:1:1', '19001:1:2'];
+      assert.deepEqual(rptKeys, expected, 'Correct rpt keys');
+    });
+
+    QUnit.test("Parameter validation tests for utilityDisplaySwitch", function (assert) {
+      assert.throws(
+        function() {
+          qc_outcomes.utilityDisplaySwitch();
+       },
+       /Parameter obj must be defined and of type \(DOM\) Element/i,
+       'Throws with no params'
+      );
+      assert.throws(
+        function() {
+          qc_outcomes.utilityDisplaySwitch(1);
         },
         /Parameter obj must be defined and of type \(DOM\) Element/i,
         'Throws with one (non DOM) param'
@@ -317,55 +364,170 @@ requirejs([
       var some_element = $('td.lane')[0];
       assert.throws(
         function() {
-          mqc_outcomes.usabilityDisplaySwitch(some_element);
+          qc_outcomes.utilityDisplaySwitch(some_element);
         },
-        /usability should be boolean/i,
+        /utility should be a string/i,
         'Throws with one param'
       );
       assert.throws(
         function() {
-          mqc_outcomes.usabilityDisplaySwitch(some_element, 'string');
+          qc_outcomes.utilityDisplaySwitch(some_element, true);
         },
-        /usability should be boolean/i,
-        'Throws with one string instead of boolean'
+        /utility should be a string/i,
+        'Throws with non string parameter'
       );
     });
 
-    QUnit.test("Test for FAIL/PASS usability icon in LaneNo column", function (assert) {
-      var laneCellsNumb = $('td.lane').length;
-      assert.equal(laneCellsNumb, 9, 'Correct number of .lane cells');
-      var total_icons_fails = $("td.lane > div.utility_FAIL").length;
-      var total_icons_pass = $("td.lane > div.utility_PASS").length;
-      assert.equal(total_icons_fails, 0, 'No initial .lane cells with FAIL icons');
-      assert.equal(total_icons_pass, 0, 'No initial .lane cells with PASS icons');
+    QUnit.test('Trying to display an undefined uqc outcome', function(assert) {
+      var qcOutcomes = {"lib":{},
+                        "seq":{},
+                        "uqc":{"19001:1":{}}};
+      assert.throws(
+        function() {
+          qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+        },
+           /Malformed QC outcomes data/i,
+           'Throws with empty uqc_outcome'
+      );
+    }); 
+
+    QUnit.test('Trying to display an unrecognized uqc outcome', function(assert) {
+      var qcOutcomes = {"lib":{},
+                        "seq":{},
+                        "uqc":{"19001:1":{"uqc_outcome":"RandomOutcome"}}};
+      assert.throws(
+        function() {
+          qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+        },
+           /Invalid value/i,
+           'Throws with invalid uqc_outcome'
+      );
+    }); 
+
+    QUnit.test('Trying to display a non-existing rpt_key', function(assert) {
+      assert.deepEqual(qc_outcomes._processOutcomes( {"18245:1":{"uqc_outcome":"Accepted"}}, 'uqc_outcome', 'lane'), 
+        {"18245:1": 1},
+        '__processOutcomes reports existing element for "18245:1"');
+      assert.deepEqual(qc_outcomes._processOutcomes( {"19001:1":{"uqc_outcome":"Rejected"}}, 'uqc_outcome', 'lane'), 
+        {"19001:1": 1},
+        '__processOutcomes reports existing element for "19001:1"');
+      assert.deepEqual(qc_outcomes._processOutcomes( {"1824500:1":{"uqc_outcome":"Accepted"}}, 'uqc_outcome', 'lane'), 
+        {"1824500:1": 0},
+        '__processOutcomes reports no existing element for "1824500:1"');
+      
+    }); 
+
+    QUnit.test("utilityDisplaySwitch tests for fail/pass/undecided utility icon in LaneNo column", function (assert) {
+      var laneCellsNumb = $('td.lane > a[href]').length;
+      assert.equal(laneCellsNumb, 6, 'Correct number of .lane cells with <a> href');
+      var total_icons_fails = $("td.lane > span.utility_fail").length;
+      assert.equal(total_icons_fails, 0, 'No initial .lane cells with fail icons');
+
       $('td.lane').each(function (i, obj) {
-        mqc_outcomes.usabilityDisplaySwitch(obj, false);
+        qc_outcomes.utilityDisplaySwitch(obj, 'Rejected');
       });
-      $('td.lane.nbsp > div').each(function(i, obj){
-        if($(obj).attr('class') === "utility_FAIL"){
-          total_icons_fails++;
-        }
-      });
+      total_icons_fails = $("td.lane > span.utility_fail").length;
       assert.equal(total_icons_fails, laneCellsNumb,
-        '1 FAIL icon per .lane cell added with usabilityDisplaySwitch()');
-      total_icons_pass = $("td.lane > div.utility_PASS").length;
+      '1 fail icon per .lane cell added with utilityDisplaySwitch()');
+
+      var total_icons_pass = $("td.lane > span.utility_pass").length;
       assert.equal(total_icons_pass, 0,
-        'No .lane cells with PASS after all cells were switched to FAIL');
+        'No .lane cells with pass after all cells were switched to fail');
       $('td.lane').each(function (i, obj) {
-        mqc_outcomes.usabilityDisplaySwitch(obj, true);
+        qc_outcomes.utilityDisplaySwitch(obj, 'Accepted');
       });
-      $('td.lane.nbsp > div').each(function(i, obj){
-        if($(obj).attr('class') === "utility_PASS"){
-          total_icons_pass++;
-        }
-      });
+      total_icons_pass = $("td.lane > span.utility_pass").length;
       assert.equal(total_icons_pass, laneCellsNumb,
-        '1 PASS icon per .lane cell changed with usabilityDisplaySwitch()');
-      total_icons_fails = $("td.lane > div.utility_FAIL").length;
+        '1 pass icon per .lane cell changed with utilityDisplaySwitch()');
+      total_icons_fails = $("td.lane > span.utility_fail").length;
       assert.equal(total_icons_fails, 0,
-        'No .lane cells with FAIL after all cells were switched to PASS');
+        'No .lane cells with fail after all cells were switched to pass');
+      
+      $('td.lane').each(function (i, obj) {
+        qc_outcomes.utilityDisplaySwitch(obj, 'Undecided');
+      });
+      var total_icons = $("td.lane > span.utility_fail").length + $("td.lane > span.utility_pass").length;
+      assert.equal(total_icons, 0,
+        'No icons after all cells changed to Undecided');
     });
 
+    QUnit.test('Updating display uqc outcomes on plex', function(assert) {
+      var qcOutcomes = {"lib":{"18245:1:1":{"mqc_outcome":"Accepted final"}},
+                        "uqc":{"18245:1:1":{"uqc_outcome":"Rejected"}},
+                        "seq":{}};
+      var key = "18245:1:1";                  
+      var rptKeyAsSelector = '#rpt_key\\3A ' + key.replace(/:/g, '\\3A ');
+      var total_icons = $(rptKeyAsSelector + " td.tag_info > span.utility_fail").length + 
+                        $(rptKeyAsSelector + " td.tag_info > span.utility_pass").length;
+      assert.equal(total_icons, 0, 'Initially 18245:1:1 plex has not utility flag');
+      
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      total_icons = $(rptKeyAsSelector + " td.tag_info > span.utility_fail").length + 
+                        $(rptKeyAsSelector + " td.tag_info > span.utility_pass").length;
+      assert.equal(total_icons, 1, '18245:1:1 plex has utility flag');
+
+      qcOutcomes = {"lib":{},
+                    "uqc":{"18245:1:1":{"uqc_outcome":"Undecided"}},
+                    "seq":{}};
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      total_icons = $(rptKeyAsSelector + " td.tag_info > span.utility_fail").length + 
+                    $(rptKeyAsSelector + " td.tag_info > span.utility_pass").length;
+      assert.equal(total_icons, 0, '18245:1:1 plex has not a utility flag after updating to Undecided');
+    });
+
+    QUnit.test('Updating display uqc outcomes on lane', function(assert) {
+      var qcOutcomes = {"lib":{},
+                        "uqc":{"18245:1":{"uqc_outcome":"Rejected"},
+                               "19001:1":{"uqc_outcome":"Accepted"}},
+                        "seq":{}};
+
+      var total_icons = $("tr[id*='rpt_key:18245'] td.lane > span.utility_fail").length + 
+                        $("tr[id*='rpt_key:18245'] td.lane > span.utility_pass").length + 
+                        $("tr[id*='rpt_key:19001'] td.lane > span.utility_fail").length + 
+                        $("tr[id*='rpt_key:19001'] td.lane > span.utility_pass").length;
+
+      assert.equal(total_icons, 0, 'Initially lanes have not utility flag');
+      
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      total_icons = $("tr[id*='rpt_key:18245'] td.lane > span.utility_fail").length + 
+                    $("tr[id*='rpt_key:18245'] td.lane > span.utility_pass").length + 
+                    $("tr[id*='rpt_key:19001'] td.lane > span.utility_fail").length + 
+                    $("tr[id*='rpt_key:19001'] td.lane > span.utility_pass").length;
+      assert.equal(total_icons, 2, '2 lanes have utility flag');
+
+      qcOutcomes = {"lib":{},
+                    "uqc":{"18245:1":{"uqc_outcome":"Accepted"},
+                           "19001:1":{"uqc_outcome":"Undecided"}},
+                    "seq":{}};              
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      total_icons = $("tr[id*='rpt_key:18245'] td.lane > span.utility_fail").length + 
+                    $("tr[id*='rpt_key:18245'] td.lane > span.utility_pass").length + 
+                    $("tr[id*='rpt_key:19001'] td.lane > span.utility_fail").length + 
+                    $("tr[id*='rpt_key:19001'] td.lane > span.utility_pass").length;
+      assert.equal(total_icons, 1, 'only 1 lane has utility flag and 1 has Undecided outcome');
+    });
+
+    QUnit.test('Updating display uqc outcomes on lane and plex', function(assert) {
+      var qcOutcomes = {"lib":{"18245:1:1":{"mqc_outcome":"Accepted final"}, 
+                               "18245:1:2":{"mqc_outcome":"Rejected final"}},
+                        "uqc":{"18245:1":{"uqc_outcome":"Rejected"},
+                               "18245:1:1":{"uqc_outcome":"Accepted"}},
+                        "seq":{"18245:1":{"mqc_outcome":"Accepted final"}}};
+
+      var total_icons = $("tr[id*='rpt_key:18245'] td.lane > span.utility_fail").length + 
+                        $("tr[id*='rpt_key:18245'] td.lane > span.utility_pass").length;
+      assert.equal(total_icons, 0, 'Initially 18245 lanes have not utility flag');
+     
+      qc_outcomes._updateDisplayWithQCOutcomes(qcOutcomes);
+      total_icons = $("tr[id*='rpt_key:18245'] td.lane > span.utility_fail").length + 
+                    $("tr[id*='rpt_key:18245'] td.lane > span.utility_pass").length;
+      assert.equal(total_icons, 1, '18245 lanes have 1 utility flag');
+      
+      total_icons = $("tr[id*='rpt_key:18245'] td.lane > span.utility_fail").length + 
+                    $("tr[id*='rpt_key:18245'] td.lane > span.utility_pass").length;
+      assert.equal(total_icons, 1, '18245 plexes have 1 utility flag');
+
+    });
     // run the tests.
     QUnit.start();
   }

@@ -10,6 +10,7 @@ define(['jquery'], function () {
   var EXCEPTION_SPLIT = /^(.*?)( at \/)/;
   var TEST_FINAL      = /(final)$/i;
   var TEST_LIKE_ID    = /^rpt_key:/;
+  var RPT_KEY_MATCH   = /^\d+:\d+$/;
 
   var buildIdSelector = function (id) {
     return '#' + id.replace(/:/g, '\\3A ');
@@ -50,6 +51,19 @@ define(['jquery'], function () {
     }
     removeErrorMessages();
     $('#ajax_status').empty().append("<li class='failed_mqc'>" + message + '</li>');
+  };
+
+  //This method takes an rpt_key and returns a boolean evaluating wether the key defines 
+  //a lane (true) or a plex (false)
+  var isLaneKey = function (rpt_key) {
+    if ( typeof rpt_key !== 'string' ) {
+      throw 'Invalid argument';
+    }
+    if ( RPT_KEY_MATCH.exec(rpt_key) != null ) {
+      return 1;
+    } else { 
+      return 0; 
+    }
   };
 
   var displayJqXHRError = function ( jqXHR ) {
@@ -108,6 +122,7 @@ define(['jquery'], function () {
     displayError: displayError,
     displayJqXHRError: displayJqXHRError,
     removeErrorMessages: removeErrorMessages,
+    isLaneKey: isLaneKey,
     rptKeyFromId: rptKeyFromId,
     seqFinal: seqFinal,
     OUTCOMES: QC_OUTCOMES
