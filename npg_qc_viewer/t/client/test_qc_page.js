@@ -108,7 +108,7 @@ requirejs(['scripts/qcoutcomes/qc_page'],
       var originalTitle = document.title;
 
       var emptyStrings = [ '', ' ' ];
-      var funct = function() { qc_page.pageForMQC(); };
+      var funct = function() { qc_page.pageForQC(); };
       for ( var i = 0; i < emptyStrings.length; i++ ) {
         document.title = emptyStrings[i];
         assert.throws( funct,
@@ -133,7 +133,7 @@ requirejs(['scripts/qcoutcomes/qc_page'],
 
       for( i = 0; i < titlesForMQC.length; i++ ) {
         document.title = titlesForMQC[i];
-        var pageForMQC = qc_page.pageForMQC();
+        var pageForMQC = qc_page.pageForQC();
         assert.ok(pageForMQC.isPageForMQC, 'Page for manual QC');
       }
 
@@ -145,7 +145,7 @@ requirejs(['scripts/qcoutcomes/qc_page'],
 
       for( i = 0; i < titlesNotForMQC.length; i++ ) {
         document.title = titlesNotForMQC[i];
-        pageForMQC = qc_page.pageForMQC();
+        pageForMQC = qc_page.pageForQC();
         assert.ok(!pageForMQC.isPageForMQC, 'Non run pages are not for manual QC');
       }
 
@@ -155,18 +155,18 @@ requirejs(['scripts/qcoutcomes/qc_page'],
       ];
       for( i = 0; i < titlesNotForMQC.length; i++ ) {
         document.title = titlesNotForMQC[i];
-        pageForMQC = qc_page.pageForMQC();
+        pageForMQC = qc_page.pageForQC();
         assert.ok(!pageForMQC.isPageForMQC, 'Pages with data for multiple runs/lanes not for manual QC');
       }
 
       document.title = 'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc in progress, taken by aa11)';
 
       $('#header h1 span.rfloat').text('Logged in as aa11');
-      pageForMQC = qc_page.pageForMQC();
+      pageForMQC = qc_page.pageForQC();
       assert.ok(!pageForMQC.isPageForMQC, 'Page is not for manual QC when user lacks mqc role');
 
       $('#header h1 span.rfloat').text('Not logged in');
-      pageForMQC = qc_page.pageForMQC();
+      pageForMQC = qc_page.pageForQC();
       assert.ok(!pageForMQC.isPageForMQC, 'Page is not for manual QC when no user logged in');
 
       document.title = originalTitle;
@@ -176,15 +176,15 @@ requirejs(['scripts/qcoutcomes/qc_page'],
       var originalTitle = document.title;
 
       document.title = 'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc in progress, taken by aa11)';
-      var pageForMQC = qc_page.pageForMQC();
+      var pageForMQC = qc_page.pageForQC();
       assert.ok(pageForMQC.isRunPage, 'Page is correclty marked as run page');
 
       document.title = 'NPG SeqQC v0: Results (all) for runs 15000 lanes 1 (run 15000 status: qc on hold, taken by aa11)';
-      pageForMQC = qc_page.pageForMQC();
+      pageForMQC = qc_page.pageForQC();
       assert.ok(!pageForMQC.isRunPage, 'Page is correclty marked as not run page');
 
       document.title = "NPG SeqQC v0: Libraries: 'AA123456B'";
-      pageForMQC = qc_page.pageForMQC();
+      pageForMQC = qc_page.pageForQC();
       assert.ok(!pageForMQC.isRunPage, 'Page is correclty marked as not run page');
 
       document.title = originalTitle;

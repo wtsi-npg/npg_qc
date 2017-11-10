@@ -13,6 +13,25 @@ requirejs(['scripts/qcoutcomes/qc_utils'],
   function(qc_utils) {
     QUnit.config.autostart = false;
 
+    QUnit.test('isLaneKey', function (assert) {
+      var wrongArgs = [ null, 123, false];
+      for ( var j = 0; j < wrongArgs.length ; j++){
+        assert.throws(
+         function () { qc_utils.isLaneKey(wrongArgs[j]); },
+         /Invalid argument/,
+         'Invalid argument throws error ' + wrongArgs[j]
+       );
+      }
+      
+      var validIds = [ '100:1:2', '100:1',
+                       '10:1:3', '10:2',
+                       '1:1:4', '1:3'];
+      var results = [false, true, false, true, false, true];
+      for( var i = 0; i < validIds.length; i++ ){
+        assert.equal(qc_utils.isLaneKey(validIds[i]),results[i],'isLaneKey return correct value for ' + validIds[i]);
+      }
+    });
+
     QUnit.test('RPT key from id', function (assert) {
       assert.throws(
         function () { qc_utils.rptKeyFromId(); },
@@ -37,6 +56,7 @@ requirejs(['scripts/qcoutcomes/qc_utils'],
         );
       }
     });
+
     // run the tests.
     QUnit.start();
   }
