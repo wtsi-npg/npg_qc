@@ -33,12 +33,87 @@ define([
   qc_utils
 ) {
   var ID_PREFIX = 'rpt_key:';
+  
+  var _getColourByUQCOutcome = function (uqcOutcome) {
+    var colour = "grey";
+    if (uqcOutcome === "Accepted"){
+      colour = "green";
+    } else if (uqcOutcome === "Rejected") {
+      colour = "red";
+    }
+    return colour;
+  };
+
+  /*
+   * This function initiates the processes regarding Utility Quality Check.  
+   * It is called after getting and updating the view with the outcomes from fetchAndProcessQC()
+   *
+   * Example:
+   * var callAfterGettingOutcomes = function (data) {
+   *     launchUtilityQCProcesses(qcp.isRunPage, data, '/qcoutcomes');}
+   * fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
+   *
+   */
+  var launchUtilityQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
+    try {
+      if ( typeof isRunPage !== 'boolean' ||
+           typeof qcOutcomes !== 'object' ||
+           typeof qcOutcomesURL !== 'string' ) {
+        throw 'Invalid parameter type.';
+      }
+
+      if ( typeof qcOutcomes.uqc === 'undefined' ) {
+        throw 'uqc outcomes cannot be undefined.';
+      }
+      var prevOutcomes;
+      if ( isRunPage ) {
+        prevOutcomes = qcOutcomes.uqc;
+      } else {
+        prevOutcomes = qcOutcomes.uqc;
+        $("#results_summary .lane").first()
+                                   .append('<span class="library_uqc_overall_controls"></span>');
+      }
+      //Cut process if there is nothing to qc
+      if ( $('.lane_mqc_control').length === 0 ) {
+        return;
+      }
+      $('.lane_mqc_control').each(function (index, element) {
+        var $element = $(element);
+        var rowId = $element.closest('tr').attr('id');
+
+        if ( typeof rowId === 'string' ) {
+          var rptKey = qc_utils.rptKeyFromId(rowId);
+          var isLaneKey = qc_utils.isLaneKey(rptKey);
+
+          if (!isLaneKey) {
+            var $libraryBrElement = $($element.parent()[0].nextElementSibling).find('br');
+            $libraryBrElement[0].insertAdjacentHTML('beforebegin', '<span class="library_uqc_control"></span>');
+            $element = $($libraryBrElement.prev());
+          }
+
+          var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].uqc_outcome
+                                                                    : undefined;
+          var uqcAbleMarkColour = _getColourByUQCOutcome(outcome);            
+          $element.css("padding-right", "5px").css("padding-left", "10px").css("background-color", uqcAbleMarkColour);
+          var obj = $(qc_utils.buildIdSelector(rowId)).find('.lane_mqc_control');
+        }
+      });
+    } catch (ex) {
+      qc_utils.displayError('Error while initiating utility QC interface. ' + ex);
+    }
+  };
+
   /*
    *This function adds a clickable link to the page's menu, which on click activates the anotation process  
    *of the end user's utility.
    */
-  var addUQCAnnotationLink = function () {
+  var addUQCAnnotationLink = function (callback) {
     $("#menu #links > ul:eq(3)").append('<li><a class="uqcClickable">UQC annotation</a></li>');
+
+    $("#menu #links .uqcClickable").click(function(e) {
+      $("#menu #links .uqcClickable").remove();
+      callback();
+    });
   };
 
   /*
@@ -240,6 +315,7 @@ define([
     _selectionForKey: _selectionForKey,
     utilityDisplaySwitch: utilityDisplaySwitch,
     fetchAndProcessQC: fetchAndProcessQC,
-    addUQCAnnotationLink: addUQCAnnotationLink
+    addUQCAnnotationLink: addUQCAnnotationLink,
+    launchUtilityQCProcesses: launchUtilityQCProcesses
   };
 });
