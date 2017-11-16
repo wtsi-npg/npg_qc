@@ -33,6 +33,13 @@ define([
   qc_utils
 ) {
   var ID_PREFIX = 'rpt_key:';
+  /*
+   *This function adds a clickable link to the page's menu, which on click activates the anotation process  
+   *of the end user's utility.
+   */
+  var addUQCAnnotationLink = function () {
+    $("#menu #links > ul:eq(3)").append('<li><a class="uqcClickable">UQC annotation</a></li>');
+  };
 
   /*
    *This function assigns a string defined icon (ie:&#10003) in the .lane column to signal
@@ -232,6 +239,7 @@ define([
     _processOutcomes: _processOutcomes,
     _selectionForKey: _selectionForKey,
     utilityDisplaySwitch: utilityDisplaySwitch,
-    fetchAndProcessQC: fetchAndProcessQC
+    fetchAndProcessQC: fetchAndProcessQC,
+    addUQCAnnotationLink: addUQCAnnotationLink
   };
 });

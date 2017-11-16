@@ -518,6 +518,9 @@ input[type=radio]:checked + label {
   color: #FF8885;/*solid red*/
 }
 
+.uqcClickable:hover {
+ cursor:pointer;
+}
 /******************* pages that do not display results **************/
 .text_section {
   margin: 0 20px 30px 20px;
