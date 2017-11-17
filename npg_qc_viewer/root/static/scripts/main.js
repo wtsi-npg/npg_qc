@@ -45,10 +45,7 @@ requirejs([
   qc_page,
   NPG,
   qc_utils
-) {
-  var qcp;
-  var QC_OUTCOMES = '/qcoutcomes';
-  
+) {  
   $(document).ready(function(){
     //Setup for heatmaps to load on demand.
     $("img").unveil(2000);
@@ -57,7 +54,8 @@ requirejs([
       // We scroll after collapse toggles to fire modify on view to generate plots
       window.scrollBy(0,1); window.scrollBy(0,-1);
     });
-    qcp = qc_page.pageForQC();
+    var qcp = qc_page.pageForQC();
+    var QC_OUTCOMES = '/qcoutcomes';
     var callAfterGettingOutcomes = null;
     if (qcp.isPageForMQC){
       callAfterGettingOutcomes = function (data) {
@@ -65,9 +63,9 @@ requirejs([
     } else if (qcp.isPageForUQC) {
       qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(3)", function() {
         var callAfterGettingOutcomes = function (data) {
-          launchUtilityQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);
+          qc_outcomes_view.launchUtilityQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);
         }
-        fetchAndProcessQC('results_summary', QC_OUTCOMES, callAfterGettingOutcomes);
+        qc_outcomes_view.fetchAndProcessQC('results_summary', QC_OUTCOMES, callAfterGettingOutcomes);
       });
     }
     qc_outcomes_view.fetchAndProcessQC('results_summary', QC_OUTCOMES, callAfterGettingOutcomes);

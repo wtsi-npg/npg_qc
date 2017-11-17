@@ -32,9 +32,11 @@ define([
   qc_css_styles,
   qc_utils
 ) {
-  var ID_PREFIX = 'rpt_key:';
+  var ID_PREFIX         = 'rpt_key:';
+  var UQC_ABLE_CLASS    = '.lane_mqc_control';
+  var UQC_CONTROL_CLASS = 'uqc_control';
   
-  var _getColourByUQCOutcome = function (uqcOutcome) {
+  var _ColourByUQCOutcome = function (uqcOutcome) {
     var colour = "grey";
     if (uqcOutcome === "Accepted"){
       colour = "green";
@@ -44,17 +46,20 @@ define([
     return colour;
   };
 
-  /*
+  /**
    * This function initiates the processes regarding Utility Quality Check.  
    * It is called after getting and updating the view with the outcomes from fetchAndProcessQC()
    *
+   * @example
    * Example:
    * var callAfterGettingOutcomes = function (data) {
    *     launchUtilityQCProcesses(qcp.isRunPage, data, '/qcoutcomes');}
    * fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
-   *
+   * 
    */
   var launchUtilityQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
+
+    var UQC_CONTAINER_STRING = '<span class="' + UQC_CONTROL_CLASS + '"></span>';
     try {
       if ( typeof isRunPage !== 'boolean' ||
            typeof qcOutcomes !== 'object' ||
@@ -71,13 +76,13 @@ define([
       } else {
         prevOutcomes = qcOutcomes.uqc;
         $("#results_summary .lane").first()
-                                   .append('<span class="library_uqc_overall_controls"></span>');
+                                   .append('<span class="uqc_overall_controls"></span>');
       }
       //Cut process if there is nothing to qc
-      if ( $('.lane_mqc_control').length === 0 ) {
+      if ( $(UQC_ABLE_CLASS).length === 0 ) {
         return;
       }
-      $('.lane_mqc_control').each(function (index, element) {
+      $(UQC_ABLE_CLASS).each(function (index, element) {
         var $element = $(element);
         var rowId = $element.closest('tr').attr('id');
 
@@ -85,17 +90,21 @@ define([
           var rptKey = qc_utils.rptKeyFromId(rowId);
           var isLaneKey = qc_utils.isLaneKey(rptKey);
 
-          if (!isLaneKey) {
+          if (isLaneKey) {
+            $element.after(UQC_CONTAINER_STRING);
+            $element = $($element.next('.' + UQC_CONTROL_CLASS)[0]);
+          } else {
             var $libraryBrElement = $($element.parent()[0].nextElementSibling).find('br');
-            $libraryBrElement[0].insertAdjacentHTML('beforebegin', '<span class="library_uqc_control"></span>');
+            $libraryBrElement[0].insertAdjacentHTML('beforebegin', UQC_CONTAINER_STRING);
             $element = $($libraryBrElement.prev());
           }
 
           var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].uqc_outcome
                                                                     : undefined;
-          var uqcAbleMarkColour = _getColourByUQCOutcome(outcome);            
-          $element.css("padding-right", "5px").css("padding-left", "10px").css("background-color", uqcAbleMarkColour);
-          var obj = $(qc_utils.buildIdSelector(rowId)).find('.lane_mqc_control');
+          var uqcAbleMarkColour = _ColourByUQCOutcome(outcome);            
+          $element.css("padding-right", "5px")
+                  .css("padding-left", "10px")
+                  .css("background-color", uqcAbleMarkColour);
         }
       });
     } catch (ex) {
@@ -329,6 +338,7 @@ define([
     utilityDisplaySwitch: utilityDisplaySwitch,
     fetchAndProcessQC: fetchAndProcessQC,
     addUQCAnnotationLink: addUQCAnnotationLink,
-    launchUtilityQCProcesses: launchUtilityQCProcesses
+    launchUtilityQCProcesses: launchUtilityQCProcesses,
+    UQC_ABLE_CLASS: UQC_ABLE_CLASS
   };
 });

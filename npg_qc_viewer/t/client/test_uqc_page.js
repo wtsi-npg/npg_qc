@@ -128,6 +128,66 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       assert.equal(nbAnnotationLinks, 0, 'Annotation Link is removed after clicking on it');
     });
 
+    QUnit.test("Clickable link UQC annotation", function (assert) {
+      var nbAnnotationLinks = $(".uqcClickable").length;
+      assert.equal(nbAnnotationLinks, 0, 'No preexisting annotationLink');
+      var container = "#menu #links";
+      
+      qc_outcomes_view.addUQCAnnotationLink (container, null);
+      nbAnnotationLinks = $(" .uqcClickable").length;
+      assert.equal(nbAnnotationLinks, 1, 'Annotation Link present after call');
+      nbAnnotationLinks = $(container + " .uqcClickable").length;
+      assert.equal(nbAnnotationLinks, 1, 'Annotation Link is at the expected container');
+      
+      $(".uqcClickable").click();
+      nbAnnotationLinks = $(".uqcClickable").length;
+      assert.equal(nbAnnotationLinks, 0, 'Annotation Link is removed after clicking on it');
+    });
+
+    QUnit.test("Identifying uqc-able elements", function (assert) {
+      var qcOutcomes = {"lib":{},
+                        "uqc":{"18245:1":{"uqc_outcome":"Rejected"},
+                               "18245:1:1":{"uqc_outcome":"Undecided"},
+                               "18245:1:2":{"uqc_outcome":"Accepted"}},
+                        "seq":{}};
+
+      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(2)",
+                                            qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes, '/qcoutcomes'));
+      var nbOfUQCAbleElements = $(qc_outcomes_view.UQC_ABLE_CLASS).length;
+      var colouredElements = 0
+      assert.equal(nbOfUQCAbleElements, 6, '6 markup present initially');
+      $('.uqcClickable').trigger('click');
+      
+      var COLOURS_RGB = {
+        RED: 'rgb(255, 0, 0)',
+        GREEN: 'rgb(0, 128, 0)',
+        GREY: 'rgb(128, 128, 128)',
+      };
+
+      var expectedColours = [
+        COLOURS_RGB.RED,
+        COLOURS_RGB.GREY,
+        COLOURS_RGB.GREEN  
+      ];
+
+      [
+        "rpt_key\\3A 18245\\3A 1",
+        "rpt_key\\3A 18245\\3A 1\\3A 1",
+        "rpt_key\\3A 18245\\3A 1\\3A 2"
+      ].forEach(function(targetId, index) {
+        console.log(targetId);
+        $('#' + targetId + ' .uqc_control').each(function(i, element) {
+          var $element = $(element);
+          assert.ok(typeof $element.css("background-color") !== 'undefined');
+          assert.equal(
+            $element.css("background-color"),
+            expectedColours[index],
+            'expected colour found'
+          );
+        });
+      });
+    });
+
     QUnit.start();
   }
 );

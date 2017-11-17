@@ -528,6 +528,11 @@ requirejs([
       assert.equal(total_icons, 1, '18245 plexes have 1 utility flag');
 
     });
+
+    QUnit.test('Updating display uqc outcomes on lane and plex', function(assert) {
+
+
+    });
     // run the tests.
     QUnit.start();
   }
