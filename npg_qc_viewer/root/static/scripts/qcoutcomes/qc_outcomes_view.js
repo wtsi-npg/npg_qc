@@ -104,27 +104,40 @@ define([
   };
 
   /*
-   *This function adds a clickable link to the page's menu, which on click activates the anotation process  
-   *of the end user's utility.
+   * This function adds a clickable link to the page's menu, which on click activates the function 'callback'.
+   *
+   * It requires two arguments: 
+   * 'container' indicates the place where the link will be placed;
+   * 'callback' is the function that will be called when the link is clicked. This function is expected to 
+   * process the annotation of the end user's utility.  
+   *
+   * Example:
+   *
+   * var callAfterGettingOutcomes = function (data) {
+   *      launchUtilityQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);
+   * }
+   * addUQCAnnotationLink("#menu #links > ul:eq(3)", callAfterGettingOutcomes);
+   *
    */
-  var addUQCAnnotationLink = function (callback) {
-    $("#menu #links > ul:eq(3)").append('<li><a class="uqcClickable">UQC annotation</a></li>');
+  var addUQCAnnotationLink = function (container, callback) {
+    $(container).append('<li><a class="uqcClickable">UQC annotation</a></li>');
 
-    $("#menu #links .uqcClickable").click(function(e) {
-      $("#menu #links .uqcClickable").remove();
-      callback();
+    $(container + " .uqcClickable").click(function(e) {
+      $(container + " .uqcClickable").remove();
+      if( typeof callback === 'function' ) {
+        callback();
+      }
     });
   };
 
   /*
-   *This function assigns a string defined icon (ie:&#10003) in the .lane column to signal
-   *the outcome of the utility flag from a certain tag. If a previous icon exists, it
-   *removes it before adding the new one.
+   * This function assigns a string defined icon (ie:&#10003) in the .lane column to signal
+   * the outcome of the utility flag from a certain tag. If a previous icon exists, it
+   * removes it before adding the new one.
    *
-   *It requires a DOM object (obj) and a string (utility) describing the utility of the tag lane:
-   *Accepted (✓) or Rejected (✘). If the utility is "Undecided" there is no widget
-   *to display.
-   *
+   * It requires a DOM object (obj) and a string (utility) describing the utility of the tag lane:
+   * Accepted (✓) or Rejected (✘). If the utility is "Undecided" there is no widget
+   * to display.
    *
    * Example:
    *
@@ -156,11 +169,11 @@ define([
   };
 
   /*
-   *This function returns the DOM element(s) corresponding to the JQuery defined by the input:
-   *key: the rpt_key, 
-   *elementClass: the name of the column, 
-   *fuzzyMatch: boolean defining whether the selector returns all plexes associated with a lane key (true)
-   *or just the exact match (false).
+   * This function returns the DOM element(s) corresponding to the JQuery defined by the input:
+   * key: the rpt_key, 
+   * elementClass: the name of the column, 
+   * fuzzyMatch: boolean defining whether the selector returns all plexes associated with a lane key (true)
+   * or just the exact match (false).
    *
    * Example:
    *
@@ -183,12 +196,12 @@ define([
 
 
   /*
-  *This function processes the QCoutcomes defined by the input outcomes. It takes as inputs
-  *'outcomes' (the particular outcomes themselves -lib,seq or uqc-  for each rpt_key), 
-  *'outcomeType' (either mqc or uqc outcome), and the 'elementClass' (which indicates the column 
-  *where the widget will be displayed).
-  *It returns a hash (existingElements) containing for each rpt_key a boolean indicating
-  *wether or not a matching DOM element has been found.
+  * This function processes the QCoutcomes defined by the input outcomes. It takes as inputs
+  * 'outcomes' (the particular outcomes themselves -lib,seq or uqc-  for each rpt_key), 
+  * 'outcomeType' (either mqc or uqc outcome), and the 'elementClass' (which indicates the column 
+  * where the widget will be displayed).
+  * It returns a hash (existingElements) containing for each rpt_key a boolean indicating
+  * wether or not a matching DOM element has been found.
   *
   * Example:
   *
@@ -241,11 +254,11 @@ define([
   };
 
   /*
-  *This function update the display of the QC outcomes defined by the input outcomesData.
-  *The function processes 3 types of outcomes : 'lib' and 'seq' (with information from the manual qc) 
-  *and 'uqc' (with information from the end user utility qc).
-  *For uqc, depending on the key, the widget might go to either lane or tag column, 
-  *so we will proces outcomes one a time.
+  * This function update the display of the QC outcomes defined by the input outcomesData.
+  * The function processes 3 types of outcomes : 'lib' and 'seq' (with information from the manual qc) 
+  * and 'uqc' (with information from the end user utility qc).
+  * For uqc, depending on the key, the widget might go to either lane or tag column, 
+  * so we will proces outcomes one a time.
   *
   * Example:
   *

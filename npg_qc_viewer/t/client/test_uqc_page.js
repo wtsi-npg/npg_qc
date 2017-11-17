@@ -113,16 +113,20 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
     });
 
     QUnit.test("Clickable link UQC annotation", function (assert) {
-      var annotationLinks = $(".uqcClickable").length;
-      assert.equal(annotationLinks, 0, 'No preexisting annotationLink');
-      qc_outcomes_view.addUQCAnnotationLink ();
-      annotationLinks = $(".uqcClickable").length;
-      assert.equal(annotationLinks, 1, 'Annotation Link present after call');
+      var nbAnnotationLinks = $(".uqcClickable").length;
+      assert.equal(nbAnnotationLinks, 0, 'No preexisting annotationLink');
+      var container = "#menu #links";
+      
+      qc_outcomes_view.addUQCAnnotationLink (container, null);
+      nbAnnotationLinks = $(" .uqcClickable").length;
+      assert.equal(nbAnnotationLinks, 1, 'Annotation Link present after call');
+      nbAnnotationLinks = $(container + " .uqcClickable").length;
+      assert.equal(nbAnnotationLinks, 1, 'Annotation Link is at the expected container');
+      
       $(".uqcClickable").click();
-      assert.equal(annotationLinks, 0, 'No  annotationLink');
+      nbAnnotationLinks = $(".uqcClickable").length;
+      assert.equal(nbAnnotationLinks, 0, 'Annotation Link is removed after clicking on it');
     });
-
-    
 
     QUnit.start();
   }
