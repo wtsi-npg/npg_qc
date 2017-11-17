@@ -155,7 +155,6 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(2)",
                                             qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes));
       var nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
-      var colouredElements = 0
       assert.equal(nbOfMQCAbleElements, 6, '6 markup present initially');
       $('.uqcClickable').trigger('click');
       

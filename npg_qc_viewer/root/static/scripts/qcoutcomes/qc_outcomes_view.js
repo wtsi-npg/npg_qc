@@ -138,7 +138,7 @@ define([
   var addUQCAnnotationLink = function (container, callback) {
     $(container).append('<li><a class="uqcClickable">UQC annotation</a></li>');
 
-    $(container + " .uqcClickable").click(function(e) {
+    $(container + " .uqcClickable").click(function() {
       $(container + " .uqcClickable").remove();
       if( typeof callback === 'function' ) {
         callback();

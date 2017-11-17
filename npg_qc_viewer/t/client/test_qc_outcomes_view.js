@@ -529,10 +529,6 @@ requirejs([
 
     });
 
-    QUnit.test('Updating display uqc outcomes on lane and plex', function(assert) {
-
-
-    });
     // run the tests.
     QUnit.start();
   }
