@@ -33,15 +33,20 @@ define([
   qc_utils
 ) {
   var ID_PREFIX         = 'rpt_key:';
-  var UQC_ABLE_CLASS    = '.lane_mqc_control';
+  var MQC_ABLE_CLASS    = '.lane_mqc_control';
   var UQC_CONTROL_CLASS = 'uqc_control';
+  var COLOURS_RGB = {
+      RED:   'rgb(255, 0, 0)',
+      GREEN: 'rgb(0, 128, 0)',
+      GREY:  'rgb(128, 128, 128)',
+    };
   
   var _ColourByUQCOutcome = function (uqcOutcome) {
-    var colour = "grey";
+    var colour = COLOURS_RGB.GREY;
     if (uqcOutcome === "Accepted"){
-      colour = "green";
+      colour = COLOURS_RGB.GREEN;
     } else if (uqcOutcome === "Rejected") {
-      colour = "red";
+      colour = COLOURS_RGB.RED;
     }
     return colour;
   };
@@ -49,21 +54,21 @@ define([
   /**
    * This function initiates the processes regarding Utility Quality Check.  
    * It is called after getting and updating the view with the outcomes from fetchAndProcessQC()
+   * @param {boolean} isRunPage - Defines if the page is a run page.
+   * @param {hash} qcOutcomes - Hash mapping rtpKeys to qc_outcomes.
    *
    * @example
-   * Example:
    * var callAfterGettingOutcomes = function (data) {
-   *     launchUtilityQCProcesses(qcp.isRunPage, data, '/qcoutcomes');}
+   *     launchUtilityQCProcesses(isRunPage, data);}
    * fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
    * 
    */
-  var launchUtilityQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
+  var launchUtilityQCProcesses = function (isRunPage, qcOutcomes) {
 
     var UQC_CONTAINER_STRING = '<span class="' + UQC_CONTROL_CLASS + '"></span>';
     try {
       if ( typeof isRunPage !== 'boolean' ||
-           typeof qcOutcomes !== 'object' ||
-           typeof qcOutcomesURL !== 'string' ) {
+           typeof qcOutcomes !== 'object' ) {
         throw 'Invalid parameter type.';
       }
 
@@ -74,17 +79,19 @@ define([
       if ( isRunPage ) {
         prevOutcomes = qcOutcomes.uqc;
       } else {
+        //Cut process if there is nothing to qc
+        if ( $(MQC_ABLE_CLASS).length === 0 ) {
+          return;
+        }
         prevOutcomes = qcOutcomes.uqc;
         $("#results_summary .lane").first()
                                    .append('<span class="uqc_overall_controls"></span>');
       }
-      //Cut process if there is nothing to qc
-      if ( $(UQC_ABLE_CLASS).length === 0 ) {
-        return;
-      }
-      $(UQC_ABLE_CLASS).each(function (index, element) {
+
+      $(MQC_ABLE_CLASS).each(function (index, element) {
         var $element = $(element);
         var rowId = $element.closest('tr').attr('id');
+        var $elementToMark;
 
         if ( typeof rowId === 'string' ) {
           var rptKey = qc_utils.rptKeyFromId(rowId);
@@ -92,17 +99,17 @@ define([
 
           if (isLaneKey) {
             $element.after(UQC_CONTAINER_STRING);
-            $element = $($element.next('.' + UQC_CONTROL_CLASS)[0]);
+            $elementToMark = $($element.next('.' + UQC_CONTROL_CLASS)[0]);
           } else {
             var $libraryBrElement = $($element.parent()[0].nextElementSibling).find('br');
             $libraryBrElement[0].insertAdjacentHTML('beforebegin', UQC_CONTAINER_STRING);
-            $element = $($libraryBrElement.prev());
+            $elementToMark = $($libraryBrElement.prev());
           }
 
           var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].uqc_outcome
                                                                     : undefined;
           var uqcAbleMarkColour = _ColourByUQCOutcome(outcome);            
-          $element.css("padding-right", "5px")
+          $elementToMark.css("padding-right", "5px")
                   .css("padding-left", "10px")
                   .css("background-color", uqcAbleMarkColour);
         }
@@ -339,6 +346,6 @@ define([
     fetchAndProcessQC: fetchAndProcessQC,
     addUQCAnnotationLink: addUQCAnnotationLink,
     launchUtilityQCProcesses: launchUtilityQCProcesses,
-    UQC_ABLE_CLASS: UQC_ABLE_CLASS
+    MQC_ABLE_CLASS: MQC_ABLE_CLASS
   };
 });

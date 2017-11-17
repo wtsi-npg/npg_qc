@@ -60,9 +60,9 @@ define(['jquery'], function () {
       throw 'Invalid argument';
     }
     if ( RPT_KEY_MATCH.exec(rpt_key) != null ) {
-      return 1;
+      return true;
     } else { 
-      return 0; 
+      return false; 
     }
   };
 

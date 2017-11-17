@@ -63,7 +63,7 @@ requirejs([
     } else if (qcp.isPageForUQC) {
       qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(3)", function() {
         var callAfterGettingOutcomes = function (data) {
-          qc_outcomes_view.launchUtilityQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);
+          qc_outcomes_view.launchUtilityQCProcesses(qcp.isRunPage, data);
         }
         qc_outcomes_view.fetchAndProcessQC('results_summary', QC_OUTCOMES, callAfterGettingOutcomes);
       });

@@ -148,14 +148,15 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       var qcOutcomes = {"lib":{},
                         "uqc":{"18245:1":{"uqc_outcome":"Rejected"},
                                "18245:1:1":{"uqc_outcome":"Undecided"},
-                               "18245:1:2":{"uqc_outcome":"Accepted"}},
+                               "18245:1:2":{"uqc_outcome":"Accepted"},
+                               "19001:1":{"uqc_outcome":"Accepted"},},
                         "seq":{}};
 
       qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(2)",
-                                            qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes, '/qcoutcomes'));
-      var nbOfUQCAbleElements = $(qc_outcomes_view.UQC_ABLE_CLASS).length;
+                                            qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes));
+      var nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
       var colouredElements = 0
-      assert.equal(nbOfUQCAbleElements, 6, '6 markup present initially');
+      assert.equal(nbOfMQCAbleElements, 6, '6 markup present initially');
       $('.uqcClickable').trigger('click');
       
       var COLOURS_RGB = {
@@ -178,6 +179,7 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
         console.log(targetId);
         $('#' + targetId + ' .uqc_control').each(function(i, element) {
           var $element = $(element);
+          console.log(element);
           assert.ok(typeof $element.css("background-color") !== 'undefined');
           assert.equal(
             $element.css("background-color"),
@@ -186,6 +188,11 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
           );
         });
       });
+
+      
+
+
+
     });
 
     QUnit.start();
