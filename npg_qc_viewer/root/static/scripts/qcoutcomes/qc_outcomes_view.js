@@ -64,7 +64,6 @@ define([
    * 
    */
   var launchUtilityQCProcesses = function (isRunPage, qcOutcomes) {
-
     var UQC_CONTAINER_STRING = '<span class="' + UQC_CONTROL_CLASS + '"></span>';
     try {
       if ( typeof isRunPage !== 'boolean' ||
@@ -346,6 +345,8 @@ define([
     fetchAndProcessQC: fetchAndProcessQC,
     addUQCAnnotationLink: addUQCAnnotationLink,
     launchUtilityQCProcesses: launchUtilityQCProcesses,
-    MQC_ABLE_CLASS: MQC_ABLE_CLASS
+    MQC_ABLE_CLASS: MQC_ABLE_CLASS,
+    UQC_CONTROL_CLASS: UQC_CONTROL_CLASS,
+    COLOURS_RGB: COLOURS_RGB
   };
 });

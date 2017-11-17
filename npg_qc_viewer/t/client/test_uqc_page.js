@@ -123,28 +123,13 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       nbAnnotationLinks = $(container + " .uqcClickable").length;
       assert.equal(nbAnnotationLinks, 1, 'Annotation Link is at the expected container');
       
-      $(".uqcClickable").click();
-      nbAnnotationLinks = $(".uqcClickable").length;
-      assert.equal(nbAnnotationLinks, 0, 'Annotation Link is removed after clicking on it');
-    });
-
-    QUnit.test("Clickable link UQC annotation", function (assert) {
-      var nbAnnotationLinks = $(".uqcClickable").length;
-      assert.equal(nbAnnotationLinks, 0, 'No preexisting annotationLink');
-      var container = "#menu #links";
-      
-      qc_outcomes_view.addUQCAnnotationLink (container, null);
-      nbAnnotationLinks = $(" .uqcClickable").length;
-      assert.equal(nbAnnotationLinks, 1, 'Annotation Link present after call');
-      nbAnnotationLinks = $(container + " .uqcClickable").length;
-      assert.equal(nbAnnotationLinks, 1, 'Annotation Link is at the expected container');
-      
-      $(".uqcClickable").click();
+      $('.uqcClickable').trigger('click');
       nbAnnotationLinks = $(".uqcClickable").length;
       assert.equal(nbAnnotationLinks, 0, 'Annotation Link is removed after clicking on it');
     });
 
     QUnit.test("Identifying uqc-able elements", function (assert) {
+
       var qcOutcomes = {"lib":{},
                         "uqc":{"18245:1":{"uqc_outcome":"Rejected"},
                                "18245:1:1":{"uqc_outcome":"Undecided"},
@@ -158,27 +143,26 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       assert.equal(nbOfMQCAbleElements, 6, '6 markup present initially');
       $('.uqcClickable').trigger('click');
       
-      var COLOURS_RGB = {
-        RED: 'rgb(255, 0, 0)',
-        GREEN: 'rgb(0, 128, 0)',
-        GREY: 'rgb(128, 128, 128)',
-      };
 
       var expectedColours = [
-        COLOURS_RGB.RED,
-        COLOURS_RGB.GREY,
-        COLOURS_RGB.GREEN  
+        qc_outcomes_view.COLOURS_RGB.RED,
+        qc_outcomes_view.COLOURS_RGB.GREY,
+        qc_outcomes_view.COLOURS_RGB.GREEN,
+        qc_outcomes_view.COLOURS_RGB.GREEN,
+        qc_outcomes_view.COLOURS_RGB.GREY,
+        qc_outcomes_view.COLOURS_RGB.GREY,
       ];
 
       [
         "rpt_key\\3A 18245\\3A 1",
         "rpt_key\\3A 18245\\3A 1\\3A 1",
-        "rpt_key\\3A 18245\\3A 1\\3A 2"
+        "rpt_key\\3A 18245\\3A 1\\3A 2",
+        "rpt_key\\3A 19001\\3A 1",
+        "rpt_key\\3A 19001\\3A 1\\3A 1",
+        "rpt_key\\3A 19001\\3A 1\\3A 2"
       ].forEach(function(targetId, index) {
-        console.log(targetId);
-        $('#' + targetId + ' .uqc_control').each(function(i, element) {
+        $('#' + targetId + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).each(function(i, element) {
           var $element = $(element);
-          console.log(element);
           assert.ok(typeof $element.css("background-color") !== 'undefined');
           assert.equal(
             $element.css("background-color"),
@@ -187,12 +171,46 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
           );
         });
       });
-
+       
       
-
-
-
     });
+
+    QUnit.test("Passing a uqc_outcome to a non uqc-able element", function (assert) {
+      var qcOutcomes = {"lib":{},
+                        "uqc":{"19001:1":{"uqc_outcome":"Accepted"}},
+                        "seq":{}};
+
+
+      var nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
+      assert.equal(nbOfMQCAbleElements, 6, '6 markup present initially');
+ 
+      $("#rpt_key\\3A 19001\\3A 1 " + qc_outcomes_view.MQC_ABLE_CLASS).remove();
+      nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
+      assert.equal(nbOfMQCAbleElements, 5, '5 markup present after removing mark in 19001:1');
+      
+      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(2)",
+                                            qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes));
+
+      $('.uqcClickable').trigger('click');
+      var nbOfUQCMarkedElements = 0;
+      $("#rpt_key\\3A 19001\\3A 1 ." + qc_outcomes_view.UQC_CONTROL_CLASS).each(function(i, element) {
+        nbOfUQCMarkedElements++;
+      });
+      assert.equal(nbOfUQCMarkedElements, 0, 'No UQC Mark for 19001:1');
+
+      [
+        "rpt_key\\3A 18245\\3A 1",
+        "rpt_key\\3A 18245\\3A 1\\3A 1",
+        "rpt_key\\3A 18245\\3A 1\\3A 2",
+        "rpt_key\\3A 19001\\3A 1\\3A 1",
+        "rpt_key\\3A 19001\\3A 1\\3A 2"
+      ].forEach(function(targetId, index) {
+        var targetIsMarked = ($('#' + targetId + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
+        assert.ok(targetIsMarked,'UQC Mark is defined for the other keys :' + targetId);
+      });
+       
+    });
+    
 
     QUnit.start();
   }
