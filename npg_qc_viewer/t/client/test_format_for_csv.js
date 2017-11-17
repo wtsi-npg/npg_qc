@@ -64,6 +64,44 @@ requirejs(['scripts/format_for_csv',],
       '  </tr>',
       '</table>',
     ].join("\n");
+    QUnit.test('Throws with wrong params', function (assert) {
+      $('#qunit-fixture').append(small_table);
+      assert.throws(
+        function() {
+          format_for_csv.addDataColumns();
+        },
+        /method requires 'table' parameter/,
+        "raises exception with no table param"
+      );
+      assert.throws(
+        function() {
+          format_for_csv.addDataColumns($('#small'));
+        },
+        /method requires table parameter to be a JQuery wrapped table/,
+        "raises exception with non table param"
+      );
+      assert.throws(
+        function() {
+          format_for_csv.addDataColumns($('#small_table'));
+        },
+        /method requires 'data_prefix' parameter to be of type string/,
+        "raises exception with no data_prefix param"
+      );
+      assert.throws(
+        function() {
+          format_for_csv.addDataColumns($('#small_table'), 'some_prefix');
+        },
+        /method requires 'data_field_name_list' parameter to be of type Array/,
+        "raises exception with no data_field_name_list param"
+      );
+      assert.throws(
+        function() {
+          format_for_csv.addDataColumns($('#small_table'), 'some_prefix', 'field_name');
+        },
+        /method requires 'data_field_name_list' parameter to be of type Array/,
+        "raises exception with wront type for data_prefix param"
+      );
+    });
     QUnit.test('Add columns - table is not changed when there are no cells marked', function (assert) {
       $('#qunit-fixture').append(small_table);
       assert.equal($('#small_table tr').length, 2);

@@ -62,6 +62,18 @@ define(['jquery'], function (jQuery) {
    * addColumns($table, extra_column_prefix, extra_data_fields);
    */
   var addDataColumns = function(table, data_prefix, data_field_name_list) {
+    if(typeof table !== 'object') {
+      throw "method requires 'table' parameter";
+    }
+    if(!table.is('table')) {
+      throw 'method requires table parameter to be a JQuery wrapped table';
+    }
+    if(typeof data_prefix !== 'string') {
+      throw "method requires 'data_prefix' parameter to be of type string";
+    }
+    if(typeof data_field_name_list !== 'object' || data_field_name_list.constructor !== Array) {
+      throw "method requires 'data_field_name_list' parameter to be of type Array";
+    }
 
     // Use slice() to get copy because reverse happens in place
     var field_name_list_copy = data_field_name_list.slice().reverse();
