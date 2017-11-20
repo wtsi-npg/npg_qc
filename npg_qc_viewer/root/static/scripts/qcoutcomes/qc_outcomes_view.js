@@ -137,11 +137,13 @@ define([
   var addUQCAnnotationLink = function (container, callback) {
     $(container).append('<li><a class="uqcClickable">UQC annotation</a></li>');
 
-    $(container + " .uqcClickable").click(function() {
-      $(container + " .uqcClickable").remove();
+    $(container + " .uqcClickable").bind ("click", function(event) {
+      event.stopPropagation() ;
+      event.preventDefault();
       if( typeof callback === 'function' ) {
         callback();
       }
+      $(".uqcClickable").remove();
     });
   };
 

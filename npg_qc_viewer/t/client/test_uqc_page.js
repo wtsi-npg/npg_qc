@@ -22,8 +22,6 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       title = qc_page._parseRunStatus('NPG SeqQC v64.1: Results for run 24169 (run 24169 status: qc complete)');
       assert.equal(title.takenBy, null, 'Correctly sets -taken by- to null user');
       assert.equal(title.runStatus, 'qc complete', 'Correctly identifies the page as "qc complete"');
-
-      
     });
 
     QUnit.test("Valid pages for UQC annotation", function (assert) {
@@ -46,37 +44,37 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       }
 
       $('#header h1 span.rfloat').text('Logged in as aa11 (mqc)');
-      var titlesForUQC = [
+      var titlesForUQCWrite = [
         'NPG SeqQC v0: Results for run 15000 (run 15000 status: qc complete)',
         'NPG SeqQC v0: Results for run 15000 (run 15000 status: run archived)',
         'NPG SeqQC v0: Results (all) for runs 15000 lanes 1 (run 15000 status: qc complete)',
         'NPG SeqQC v0: Results (all) for runs 15000 lanes 1 (run 15000 status: run archived)'
       ];
 
-      for( i = 0; i < titlesForUQC.length; i++ ) {
-        document.title = titlesForUQC[i];
+      for( i = 0; i < titlesForUQCWrite.length; i++ ) {
+        document.title = titlesForUQCWrite[i];
         var pageForUQC = qc_page.pageForQC();
-        assert.ok(pageForUQC.isPageForUQC, 'Page for utility QC');
+        assert.ok(pageForUQC.isPageForUQC, 'Page for utility QC write');
       }
 
-      var titlesNotForUQC = [
-        "NPG SeqQC v0: Libraries: 'AA123456B'",
-        "NPG SeqQC v0: Sample '1234ABCD1234567'",
-        "NPG SeqQC v0: Pool AA123456B"
+      var titlesNotForUQCWrite = [
+        "NPG SeqQC v0: Libraries: 'AA123456B' (run 23317 status: qc complete)",
+        "NPG SeqQC v0: Sample '1234ABCD1234567' (run 15000 status: qc complete)",
+        "NPG SeqQC v0: Pool NT1114915D (run 15000 status: qc complete)"
       ];
 
-      for( i = 0; i < titlesNotForUQC.length; i++ ) {
-        document.title = titlesNotForUQC[i];
+      for( i = 0; i < titlesNotForUQCWrite.length; i++ ) {
+        document.title = titlesNotForUQCWrite[i];
         pageForUQC = qc_page.pageForQC();
-        assert.ok(!pageForUQC.isPageForUQC, 'Non run pages are not for Utility QC');
+        assert.ok(!pageForUQC.isPageForUQC, 'Pages other than run or lane Pages are not for Utility QC');
       }
 
-      titlesNotForUQC = [
+      titlesNotForUQCWrite = [
         'NPG SeqQC v0: Results (all) for runs 16074 lanes 1 2 (run 16074 status: qc completed)',
         'NPG SeqQC v0: Results (all) for runs 16074 16075 lanes 1',
       ];
-      for( i = 0; i < titlesNotForUQC.length; i++ ) {
-        document.title = titlesNotForUQC[i];
+      for( i = 0; i < titlesNotForUQCWrite.length; i++ ) {
+        document.title = titlesNotForUQCWrite[i];
         pageForUQC = qc_page.pageForQC();
         assert.ok(!pageForUQC.isPageForUQC, 'Pages with data for multiple runs/lanes are not for Utility QC');
       }
@@ -116,7 +114,6 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       var nbAnnotationLinks = $(".uqcClickable").length;
       assert.equal(nbAnnotationLinks, 0, 'No preexisting annotationLink');
       var container = "#menu #links";
-      
       qc_outcomes_view.addUQCAnnotationLink (container, null);
       nbAnnotationLinks = $(" .uqcClickable").length;
       assert.equal(nbAnnotationLinks, 1, 'Annotation Link present after call');
@@ -137,8 +134,10 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
                                "19001:1":{"uqc_outcome":"Accepted"},},
                         "seq":{}};
 
-      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(2)",
-                                            qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes));
+      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(1)",
+                                            function() {
+                                              qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes);
+                                            });
       var nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
       assert.equal(nbOfMQCAbleElements, 6, '6 markup present initially');
       $('.uqcClickable').trigger('click');
@@ -175,28 +174,32 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
       
     });
 
-    QUnit.test("Passing a uqc_outcome to a non uqc-able element", function (assert) {
+    QUnit.test("Passing a uqc_outcome to a non uqc-able element should not mark for UQC writing",
+     function (assert) {
       var qcOutcomes = {"lib":{},
                         "uqc":{"19001:1":{"uqc_outcome":"Accepted"}},
                         "seq":{}};
 
 
+
+      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(1)",
+                                            function() {
+                                              qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes);
+                                            });
+
       var nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
-      assert.equal(nbOfMQCAbleElements, 6, '6 markup present initially');
+      assert.equal(nbOfMQCAbleElements, 6, '6 MQC markup present initially');
  
       $("#rpt_key\\3A 19001\\3A 1 " + qc_outcomes_view.MQC_ABLE_CLASS).remove();
       nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
-      assert.equal(nbOfMQCAbleElements, 5, '5 markup present after removing mark in 19001:1');
-      
-      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(2)",
-                                            qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes));
+      assert.equal(nbOfMQCAbleElements, 5, '5 MQC markup present after removing mark in 19001:1');
 
-      $('.uqcClickable').trigger('click');
+      $('.uqcClickable').click();
       var nbOfUQCMarkedElements = 0;
-      $("#rpt_key\\3A 19001\\3A 1 ." + qc_outcomes_view.UQC_CONTROL_CLASS).each(function(i, element) {
+      $("#rpt_key\\3A 19001\\3A 1 ." + qc_outcomes_view.UQC_CONTROL_CLASS).each(function() {
         nbOfUQCMarkedElements++;
       });
-      assert.equal(nbOfUQCMarkedElements, 0, 'No UQC Mark for 19001:1');
+      assert.equal(nbOfUQCMarkedElements, 0, '19001:1 is not UQC marked' );
 
       [
         "rpt_key\\3A 18245\\3A 1",
@@ -204,9 +207,9 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view'],
         "rpt_key\\3A 18245\\3A 1\\3A 2",
         "rpt_key\\3A 19001\\3A 1\\3A 1",
         "rpt_key\\3A 19001\\3A 1\\3A 2"
-      ].forEach(function(targetId, index) {
+      ].forEach(function(targetId) {
         var targetIsMarked = ($('#' + targetId + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
-        assert.ok(targetIsMarked,'UQC Mark is defined for the other keys :' + targetId);
+        assert.ok(targetIsMarked,'UQC Mark is defined for key :' + targetId);
       });
        
     });
