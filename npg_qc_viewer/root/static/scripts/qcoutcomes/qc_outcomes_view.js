@@ -41,19 +41,21 @@ define([
       GREY:  'rgb(128, 128, 128)',
     };
   
-  var _ColourByUQCOutcome = function (uqcOutcome) {
+  var _colourElementByUQCOutcome = function (elementToMark, uqcOutcome) {
     var colour = COLOURS_RGB.GREY;
     if (uqcOutcome === "Accepted"){
       colour = COLOURS_RGB.GREEN;
     } else if (uqcOutcome === "Rejected") {
       colour = COLOURS_RGB.RED;
     }
-    return colour;
+    elementToMark.css("padding-right", "5px")
+                    .css("padding-left", "10px")
+                    .css("background-color", colour);
   };
 
   var _isElementUQCable = function (element) {
     return $(element).closest('tr').find('img[alt="link to tags"]').length == 0;
-  }
+  };
 
   /**
    * This function initiates the processes regarding Utility Quality Check.  
@@ -87,8 +89,6 @@ define([
           return;
         }
         prevOutcomes = qcOutcomes.uqc;
-        $("#results_summary .lane").first()
-                                   .append(UQC_CONTAINER_STRING);
       }
 
       $(MQC_ABLE_CLASS).each(function (index, element) {
@@ -112,10 +112,7 @@ define([
 
             var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].uqc_outcome
                                                                       : undefined;
-            var uqcAbleMarkColour = _ColourByUQCOutcome(outcome);            
-            $elementToMark.css("padding-right", "5px")
-                    .css("padding-left", "10px")
-                    .css("background-color", uqcAbleMarkColour);
+            _colourElementByUQCOutcome($elementToMark, outcome);            
           }  
         }
       });
@@ -126,6 +123,7 @@ define([
 
   /*
    * This function adds a clickable link to the page's menu, which on click activates the function 'callback'.
+   * The link is only added if there is at least an uqc annotabe element.
    *
    * It requires two arguments: 
    * 'container' indicates the place where the link will be placed;
@@ -141,6 +139,16 @@ define([
    *
    */
   var addUQCAnnotationLink = function (container, callback) {
+    var nonUQCableElements = 0;
+    $(MQC_ABLE_CLASS).each(function (index, element) {
+        if (!_isElementUQCable(element)){
+           nonUQCableElements ++;
+        }
+    });
+    if (nonUQCableElements === $(MQC_ABLE_CLASS).length){
+      return;
+    }
+
     $(container).append('<li><a class="uqcClickable">UQC annotation</a></li>');
 
     $(container + " .uqcClickable").bind ("click", function(event) {
@@ -349,6 +357,7 @@ define([
     _parseRptKeys: _parseRptKeys,
     _processOutcomes: _processOutcomes,
     _selectionForKey: _selectionForKey,
+    _isElementUQCable: _isElementUQCable,
     utilityDisplaySwitch: utilityDisplaySwitch,
     fetchAndProcessQC: fetchAndProcessQC,
     addUQCAnnotationLink: addUQCAnnotationLink,
