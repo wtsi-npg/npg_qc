@@ -51,6 +51,10 @@ define([
     return colour;
   };
 
+  var _isElementUQCable = function (element) {
+    return $(element).closest('tr').find('img[alt="link to tags"]').length == 0;
+  }
+
   /**
    * This function initiates the processes regarding Utility Quality Check.  
    * It is called after getting and updating the view with the outcomes from fetchAndProcessQC()
@@ -84,33 +88,35 @@ define([
         }
         prevOutcomes = qcOutcomes.uqc;
         $("#results_summary .lane").first()
-                                   .append('<span class="uqc_overall_controls"></span>');
+                                   .append(UQC_CONTAINER_STRING);
       }
 
       $(MQC_ABLE_CLASS).each(function (index, element) {
-        var $element = $(element);
-        var rowId = $element.closest('tr').attr('id');
-        var $elementToMark;
+        if (_isElementUQCable(element)){
+          var $element = $(element);
+          var rowId = $element.closest('tr').attr('id');
+          var $elementToMark;
 
-        if ( typeof rowId === 'string' ) {
-          var rptKey = qc_utils.rptKeyFromId(rowId);
-          var isLaneKey = qc_utils.isLaneKey(rptKey);
+          if ( typeof rowId === 'string' ) {
+            var rptKey = qc_utils.rptKeyFromId(rowId);
+            var isLaneKey = qc_utils.isLaneKey(rptKey);
 
-          if (isLaneKey) {
-            $element.after(UQC_CONTAINER_STRING);
-            $elementToMark = $($element.next('.' + UQC_CONTROL_CLASS)[0]);
-          } else {
-            var $libraryBrElement = $($element.parent()[0].nextElementSibling).find('br');
-            $libraryBrElement[0].insertAdjacentHTML('beforebegin', UQC_CONTAINER_STRING);
-            $elementToMark = $($libraryBrElement.prev());
-          }
+            if (isLaneKey) {
+              $element.after(UQC_CONTAINER_STRING);
+              $elementToMark = $($element.next('.' + UQC_CONTROL_CLASS)[0]);
+            } else {
+              var $libraryBrElement = $($element.parent()[0].nextElementSibling).find('br');
+              $libraryBrElement[0].insertAdjacentHTML('beforebegin', UQC_CONTAINER_STRING);
+              $elementToMark = $($libraryBrElement.prev());
+            }
 
-          var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].uqc_outcome
-                                                                    : undefined;
-          var uqcAbleMarkColour = _ColourByUQCOutcome(outcome);            
-          $elementToMark.css("padding-right", "5px")
-                  .css("padding-left", "10px")
-                  .css("background-color", uqcAbleMarkColour);
+            var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].uqc_outcome
+                                                                      : undefined;
+            var uqcAbleMarkColour = _ColourByUQCOutcome(outcome);            
+            $elementToMark.css("padding-right", "5px")
+                    .css("padding-left", "10px")
+                    .css("background-color", uqcAbleMarkColour);
+          }  
         }
       });
     } catch (ex) {
