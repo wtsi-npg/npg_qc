@@ -81,6 +81,15 @@ define(['jquery'], function (jQuery) {
       return data_prefix + name;
     });
 
+    /*
+      If columns can appear just in alphabetical order (no specific order is
+      necessary) the code can be refactored so:
+        - list of data elements are defined in tr->th by searching for all data
+          keys with prefix
+        - data element names are then sorted alphabetically
+        - data elements are picked using the list of names for all tr->td
+        - current param 'data_field_name_list' is not necessary any longer
+     */
     table.find('tr').each(function(i, row_element) {
       $(row_element).find('th,td').each(function(j, cell_element) {
         var $cell_element = $(cell_element);
@@ -107,4 +116,3 @@ define(['jquery'], function (jQuery) {
     format:         format
   };
 });
-
