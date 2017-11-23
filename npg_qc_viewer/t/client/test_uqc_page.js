@@ -125,21 +125,22 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view', 
       assert.equal(nbAnnotationLinks, 0, 'Annotation Link is removed after clicking on it');
 
       var plexesRows = [
-        "rpt_key\\3A 18245\\3A 1\\3A 1",
-        "rpt_key\\3A 18245\\3A 1\\3A 2",
-        "rpt_key\\3A 19001\\3A 1\\3A 1",
-        "rpt_key\\3A 19001\\3A 1\\3A 2"
+        "18245:1:1",
+        "18245:1:2",
+        "19001:1:1",
+        "19001:1:2"
       ];
-      plexesRows.forEach(function(targetId) {
-        $('#' + targetId).remove();
-      });
 
+      plexesRows.forEach(function(targetId) {
+        $(qc_utils.buildIdSelectorFromRPT(targetId)).remove();
+      });
+  
       var laneRows = [
-        "rpt_key\\3A 18245\\3A 1",
-        "rpt_key\\3A 19001\\3A 1"
+        "18245:1",
+        "19001:1"
       ];
-      laneRows.forEach(function(targetId) {        
-        assert.equal($('#' + targetId).closest("tr").find('img[alt="link to tags"]').length , 1, 
+      laneRows.forEach(function(targetId) {      
+        assert.equal($(qc_utils.buildIdSelectorFromRPT(targetId)).closest("tr").find('img[alt="link to tags"]').length , 1, 
           targetId + 'has children and therefore is not uqc_able');
       });
       qc_outcomes_view.addUQCAnnotationLink (container, null);
@@ -150,10 +151,9 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view', 
     QUnit.test("Identifying uqc-able elements", function (assert) {
 
       var qcOutcomes = {"lib":{},
-                        "uqc":{"18245:1":{"uqc_outcome":"Rejected"},
-                               "18245:1:1":{"uqc_outcome":"Undecided"},
+                        "uqc":{"18245:1:1":{"uqc_outcome":"Rejected"},
                                "18245:1:2":{"uqc_outcome":"Accepted"},
-                               "19001:1":{"uqc_outcome":"Accepted"},},
+                               "19001:1:1":{"uqc_outcome":"Undecided"},},
                         "seq":{}};
 
       qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(1)",
@@ -167,42 +167,32 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view', 
 
       var expectedColours = [
         qc_outcomes_view.COLOURS_RGB.RED,
-        qc_outcomes_view.COLOURS_RGB.GREY,
-        qc_outcomes_view.COLOURS_RGB.GREEN,
         qc_outcomes_view.COLOURS_RGB.GREEN,
         qc_outcomes_view.COLOURS_RGB.GREY,
         qc_outcomes_view.COLOURS_RGB.GREY,
       ];
 
       [
-        "rpt_key\\3A 18245\\3A 1",
-        "rpt_key\\3A 18245\\3A 1\\3A 1",
-        "rpt_key\\3A 18245\\3A 1\\3A 2",
-        "rpt_key\\3A 19001\\3A 1",
-        "rpt_key\\3A 19001\\3A 1\\3A 1",
-        "rpt_key\\3A 19001\\3A 1\\3A 2"
+        "18245:1:1",
+        "18245:1:2",
+        "19001:1:1",
+        "19001:1:2"
       ].forEach(function(targetId, index) {
-        $('#' + targetId + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).each(function(i, element) {
-          var $element = $(element);
-          assert.ok(typeof $element.css("background-color") !== 'undefined');
-          assert.equal(
-            $element.css("background-color"),
-            expectedColours[index],
-            'expected colour found'
-          );
-        });
+        var $element = $($(qc_utils.buildIdSelectorFromRPT(targetId) + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS)[0]);
+        assert.ok(typeof $element.css("background-color") !== 'undefined','colour is defined for ' + targetId);
+        assert.equal(
+          $element.css("background-color"),
+          expectedColours[index],
+          'expected colour found'
+        ); 
       });
-       
-      
+
     });
 
-    QUnit.test("Passing a uqc_outcome to a non mqc element does not mark for UQC writing",
-     function (assert) {
+    QUnit.test("Passing a uqc_outcome to a non mqc element does not mark for UQC writing", function (assert) {
       var qcOutcomes = {"lib":{},
                         "uqc":{"19001:1":{"uqc_outcome":"Accepted"}},
                         "seq":{}};
-
-
 
       qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(1)",
                                             function() {
@@ -211,27 +201,25 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view', 
 
       var nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
       assert.equal(nbOfMQCAbleElements, 6, '6 MQC markup present initially');
- 
-      $("#rpt_key\\3A 19001\\3A 1\\3A 1 " + qc_outcomes_view.MQC_ABLE_CLASS).remove();
+      $(qc_utils.buildIdSelectorFromRPT("19001:1:1") + " " + qc_outcomes_view.MQC_ABLE_CLASS).remove();
       nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
       assert.equal(nbOfMQCAbleElements, 5, '5 MQC markup present after removing mark in 19001:1:1');
 
       $('.uqcClickable').click();
       var nbOfUQCMarkedElements = 0;
-      $("#rpt_key\\3A 19001\\3A 1\\3A 1 ." + qc_outcomes_view.UQC_CONTROL_CLASS).each(function() {
+      $(qc_utils.buildIdSelectorFromRPT("19001:1:1") + " ." + qc_outcomes_view.UQC_CONTROL_CLASS).each(function() {
         nbOfUQCMarkedElements++;
       });
       assert.equal(nbOfUQCMarkedElements, 0, '19001:1:1 is not UQC marked' );
 
       [
-        "rpt_key\\3A 18245\\3A 1\\3A 1",
-        "rpt_key\\3A 18245\\3A 1\\3A 2",
-        "rpt_key\\3A 19001\\3A 1\\3A 2"
+        "18245:1:1",
+        "18245:1:2",
+        "19001:1:2"
       ].forEach(function(targetId) {
-        var targetIsMarked = ($('#' + targetId + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
+        var targetIsMarked = ($(qc_utils.buildIdSelectorFromRPT(targetId)  + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
         assert.ok(targetIsMarked,'UQC Mark is defined for key :' + targetId);
-      });
-       
+      }); 
     });
 
 
