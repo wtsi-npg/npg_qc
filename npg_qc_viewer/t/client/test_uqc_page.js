@@ -148,6 +148,79 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view', 
       assert.equal(nbAnnotationLinks, 0, 'Annotation Link is not added when page only have no uqc_able lanes');
     });
 
+    QUnit.test("Passing a uqc_outcome to a non mqc element does not mark for UQC writing", function (assert) {
+      var qcOutcomes = {"lib":{},
+                        "uqc":{"19001:1":{"uqc_outcome":"Accepted"}},
+                        "seq":{}};
+
+      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(1)",
+                                            function() {
+                                              qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes);
+                                            });
+
+      var nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
+      assert.equal(nbOfMQCAbleElements, 6, '6 MQC markup present initially');
+      $(qc_utils.buildIdSelectorFromRPT("19001:1:1") + " " + qc_outcomes_view.MQC_ABLE_CLASS).remove();
+      nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
+      assert.equal(nbOfMQCAbleElements, 5, '5 MQC markup present after removing mark in 19001:1:1');
+
+      $('.uqcClickable').click();
+      var nbOfUQCMarkedElements = 0;
+      $(qc_utils.buildIdSelectorFromRPT("19001:1:1") + " ." + qc_outcomes_view.UQC_CONTROL_CLASS).each(function() {
+        nbOfUQCMarkedElements++;
+      });
+      assert.equal(nbOfUQCMarkedElements, 0, '19001:1:1 is not UQC marked' );
+
+      [
+        "18245:1:1",
+        "18245:1:2",
+        "19001:1:2"
+      ].forEach(function(targetId) {
+        var targetIsMarked = ($(qc_utils.buildIdSelectorFromRPT(targetId)  + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
+        assert.ok(targetIsMarked,'UQC Mark is defined for key :' + targetId);
+      }); 
+    });
+
+    QUnit.test("Passing a uqc_outcome to a non qc-able element should not mark for UQC writing",
+     function (assert) {
+      var qcOutcomes = {"lib":{},
+                        "uqc":{"19001:1":{"uqc_outcome":"Accepted"},
+                               "18245:1":{"uqc_outcome":"Rejected"}},
+                        "seq":{}};
+
+      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(1)",
+                                            function() {
+                                              qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes);
+                                            });
+       
+      var uqcAbleElements = [];
+      var nonUqcAbleElements = [];
+
+      $(qc_outcomes_view.MQC_ABLE_CLASS).each(function (index, element) {
+        var isElementUQCable = qc_outcomes_view._isElementUQCable(element);
+        if (isElementUQCable){
+          uqcAbleElements[index] = qc_utils.rptKeyFromId($(element).closest('tr').attr('id'));
+        } else {
+          nonUqcAbleElements[index] = qc_utils.rptKeyFromId($(element).closest('tr').attr('id'));
+        }
+      });
+
+      $('.uqcClickable').click();
+
+      uqcAbleElements.forEach(function(rpt_key) {
+        var idSelectorFromRPT = qc_utils.buildIdSelectorFromRPT(rpt_key);
+        var targetIsMarked = ($(idSelectorFromRPT + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
+        assert.ok(targetIsMarked, rpt_key + ' is marked for uqc writing');
+      });
+
+      nonUqcAbleElements.forEach(function(rpt_key) {
+        var idSelectorFromRPT = qc_utils.buildIdSelectorFromRPT(rpt_key);
+        var targetIsMarked = ($(idSelectorFromRPT + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
+        assert.ok(!targetIsMarked, rpt_key + ' is not marked for uqc writing');
+      });
+       
+    });
+
     QUnit.test("Identifying uqc-able elements", function (assert) {
 
       var qcOutcomes = {"lib":{},
@@ -186,83 +259,7 @@ requirejs(['scripts/qcoutcomes/qc_page', 'scripts/qcoutcomes/qc_outcomes_view', 
           'expected colour found'
         ); 
       });
-
     });
-
-    QUnit.test("Passing a uqc_outcome to a non mqc element does not mark for UQC writing", function (assert) {
-      var qcOutcomes = {"lib":{},
-                        "uqc":{"19001:1":{"uqc_outcome":"Accepted"}},
-                        "seq":{}};
-
-      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(1)",
-                                            function() {
-                                              qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes);
-                                            });
-
-      var nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
-      assert.equal(nbOfMQCAbleElements, 6, '6 MQC markup present initially');
-      $(qc_utils.buildIdSelectorFromRPT("19001:1:1") + " " + qc_outcomes_view.MQC_ABLE_CLASS).remove();
-      nbOfMQCAbleElements = $(qc_outcomes_view.MQC_ABLE_CLASS).length;
-      assert.equal(nbOfMQCAbleElements, 5, '5 MQC markup present after removing mark in 19001:1:1');
-
-      $('.uqcClickable').click();
-      var nbOfUQCMarkedElements = 0;
-      $(qc_utils.buildIdSelectorFromRPT("19001:1:1") + " ." + qc_outcomes_view.UQC_CONTROL_CLASS).each(function() {
-        nbOfUQCMarkedElements++;
-      });
-      assert.equal(nbOfUQCMarkedElements, 0, '19001:1:1 is not UQC marked' );
-
-      [
-        "18245:1:1",
-        "18245:1:2",
-        "19001:1:2"
-      ].forEach(function(targetId) {
-        var targetIsMarked = ($(qc_utils.buildIdSelectorFromRPT(targetId)  + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
-        assert.ok(targetIsMarked,'UQC Mark is defined for key :' + targetId);
-      }); 
-    });
-
-
-    QUnit.test("Passing a uqc_outcome to a non qc-able element should not mark for UQC writing",
-     function (assert) {
-      var qcOutcomes = {"lib":{},
-                        "uqc":{"19001:1":{"uqc_outcome":"Accepted"},
-                               "18245:1":{"uqc_outcome":"Rejected"}},
-                        "seq":{}};
-
-      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(1)",
-                                            function() {
-                                              qc_outcomes_view.launchUtilityQCProcesses(true, qcOutcomes);
-                                            });
-       
-      var uqcAbleElements = [];
-      var nonUqcAbleElements = [];
-
-      $(qc_outcomes_view.MQC_ABLE_CLASS).each(function (index, element) {
-        var isElementUQCable = qc_outcomes_view._isElementUQCable(element);
-        if (isElementUQCable){
-          uqcAbleElements[index] = qc_utils.rptKeyFromId($(element.closest('tr')).attr('id'));
-        } else {
-          nonUqcAbleElements[index] = qc_utils.rptKeyFromId($(element.closest('tr')).attr('id'));
-        }
-      });
-
-      $('.uqcClickable').click();
-
-      uqcAbleElements.forEach(function(rpt_key) {
-        var idSelectorFromRPT = qc_utils.buildIdSelectorFromRPT(rpt_key);
-        var targetIsMarked = ($(idSelectorFromRPT + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
-        assert.ok(targetIsMarked, rpt_key + ' is marked for uqc writing');
-      });
-
-      nonUqcAbleElements.forEach(function(rpt_key) {
-        var idSelectorFromRPT = qc_utils.buildIdSelectorFromRPT(rpt_key);
-        var targetIsMarked = ($(idSelectorFromRPT + ' .' + qc_outcomes_view.UQC_CONTROL_CLASS).length === 1);
-        assert.ok(!targetIsMarked, rpt_key + ' is not marked for uqc writing');
-      });
-       
-    });
-    
 
     QUnit.start();
   }
