@@ -34,7 +34,6 @@ requirejs([
   'scripts/format_for_csv',
   'scripts/qcoutcomes/qc_page',
   'scripts/qcoutcomes/manual_qc',
-  'scripts/qcoutcomes/qc_utils',
   'unveil',
   'table-export'
 ], function(
@@ -43,9 +42,8 @@ requirejs([
   plots,
   format_for_csv,
   qc_page,
-  NPG,
-  qc_utils
-) {
+  NPG
+  ) {
   var TABLE = 'results_summary';  
   $(document).ready(function(){
     //Setup for heatmaps to load on demand.

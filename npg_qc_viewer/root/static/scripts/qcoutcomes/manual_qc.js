@@ -90,12 +90,6 @@ define([
                       .css("background-color", colour);
     };
 
-    var _isElementUQCable = function (element) {
-      return $(element).closest('tr').find('img[alt="link to tags"]').length == 0;
-    };
-
-    
-
     /*
      * This function adds a clickable link to the page's menu, which on click activates the function 'callback'.
      * The link is only added if there is at least an uqc annotabe element.
@@ -113,27 +107,34 @@ define([
      *
      */
     QC.addUQCAnnotationLink = function (callback) {
-      var container = "#menu #links > ul:eq(3)";
-      var nonUQCableElements = 0;
-      $(MQC_ABLE_CLASS).each(function (index, element) {
-          if (!_isElementUQCable(element)){
-             nonUQCableElements ++;
-          }
-      });
-      if (nonUQCableElements === $(MQC_ABLE_CLASS).length){
-        return;
-      }
+      var UQC_ANNOTATION_CONTAINER = "#menu #links > ul:eq(3)";
 
-      $(container).append('<li><a class="uqcClickable">UQC annotation</a></li>');
-
-      $(container + " .uqcClickable").bind ("click", function(event) {
+      $(UQC_ANNOTATION_CONTAINER).append('<li><a href="" class="uqcClickable">UQC annotation</a></li>');
+      $(UQC_ANNOTATION_CONTAINER + " .uqcClickable").bind ("click", function(event) {
         event.stopPropagation() ;
         event.preventDefault();
-        if( typeof callback === 'function' ) {
-          callback();
+        var nonUQCableElements = 0;
+        $(MQC_ABLE_CLASS).each(function (index, element) {
+          if (!NPG.QC.isElementUQCable(element)){
+            nonUQCableElements ++;
+          }
+        });
+        if (nonUQCableElements === $(MQC_ABLE_CLASS).length){
+          alert("\t     Only single plex lanes can be annotated.\t\n" +
+                "\tTo annotate the plexes for any of these lanes follow\t\n" +
+                "\t  the link to the corresponding runs and lane page.\t");
+        } else {
+           if (typeof callback !== 'undefined' && typeof callback === 'function') {
+             callback();
+           }
+           $(".uqcClickable").remove();
         }
-        $(".uqcClickable").remove();
       });
+    };
+    
+    //This method takes an element from a table row and returns true if the lane contains children
+    QC.isElementUQCable = function (element) {
+      return $(element).closest('tr').find('img[alt="link to tags"]').length == 0;
     };
 
     QC.launchManualQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
@@ -233,22 +234,12 @@ define([
           throw 'Invalid parameter type.';
         }
 
-        if ( typeof qcOutcomes.uqc === 'undefined' ) {
-          throw 'uqc outcomes cannot be undefined.';
-        }
         var prevOutcomes;
-        if ( isRunPage ) {
-          prevOutcomes = qcOutcomes.uqc;
-        } else {
-          //Cut process if there is nothing to qc
-          if ( $(MQC_ABLE_CLASS).length === 0 ) {
-            return;
-          }
-          prevOutcomes = qcOutcomes.uqc;
-        }
+        prevOutcomes = qcOutcomes.uqc;
+   
 
         $(MQC_ABLE_CLASS).each(function (index, element) {
-          if (_isElementUQCable(element)){
+          if (NPG.QC.isElementUQCable(element)){
             var $element = $(element);
             var rowId = $element.closest('tr').attr('id');
             var $elementToMark;
