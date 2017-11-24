@@ -45,7 +45,8 @@ requirejs([
   qc_page,
   NPG,
   qc_utils
-) {  
+) {
+  var TABLE = 'results_summary';  
   $(document).ready(function(){
     //Setup for heatmaps to load on demand.
     $("img").unveil(2000);
@@ -57,22 +58,27 @@ requirejs([
     var qcp = qc_page.pageForQC();
     var QC_OUTCOMES = '/qcoutcomes';
     var callAfterGettingOutcomes = null;
+    var isRunPage = qcp.isRunPage;
+
     if (qcp.isPageForMQC){
       callAfterGettingOutcomes = function (data) {
-        NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);}
+        NPG.QC.launchManualQCProcesses(isRunPage, data, QC_OUTCOMES);}
     } else if (qcp.isPageForUQC) {
-      qc_outcomes_view.addUQCAnnotationLink("#menu #links > ul:eq(3)", function() {
-        var callAfterGettingOutcomes = function (data) {
-          qc_outcomes_view.launchUtilityQCProcesses(qcp.isRunPage, data);
-        }
-        qc_outcomes_view.fetchAndProcessQC('results_summary', QC_OUTCOMES, callAfterGettingOutcomes);
-      });
+      callAfterGettingOutcomes = function () { 
+        NPG.QC.addUQCAnnotationLink( function() {
+          qc_outcomes_view.fetchAndProcessQC(TABLE,
+                                             QC_OUTCOMES, 
+                                             function (data) {
+                                               NPG.QC.launchUtilityQCProcesses(isRunPage, data);
+                                             });
+        });
+      }  
     }
-    qc_outcomes_view.fetchAndProcessQC('results_summary', QC_OUTCOMES, callAfterGettingOutcomes);
+    qc_outcomes_view.fetchAndProcessQC(TABLE, QC_OUTCOMES, callAfterGettingOutcomes);
   });
 
   //Required to show error messages from the mqc process.
-  $("#results_summary").before('<ul id="ajax_status"></ul>');
+  $("#" + TABLE).before('<ul id="ajax_status"></ul>');
 
   //Preload images for working icon
   $('<img/>')[0].src = "/static/images/waiting.gif";
@@ -84,7 +90,7 @@ requirejs([
 
   $("#summary_to_csv").click(function(e) {
     e.preventDefault();
-    var table_html = $('#results_summary')[0].outerHTML;
+    var table_html = $('#' + TABLE)[0].outerHTML;
     var formated_table = format_for_csv.format(table_html);
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
