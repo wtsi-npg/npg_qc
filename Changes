@@ -1,7 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 64.4 
  - utility QC feature: db tables, DBIx classes, retrieval
- - Add STAR aligner bams as a valid RNA alignments - also added tests for it
+ - Add STAR aligner bams as a valid RNA alignments
  - update bam_flagstats to be able run when no markdups metrics file exists
 
 release 64.3.1
