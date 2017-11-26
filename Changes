@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - stop generating unused DBIx classes
+
 release 64.4 
  - utility QC feature: db tables, DBIx classes, retrieval
  - Add STAR aligner bams as a valid RNA alignments
