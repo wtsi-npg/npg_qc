@@ -348,6 +348,7 @@ subtest 'loading bam_flagststs' => sub {
        path         => ['t/data/autoqc/bam_flagstats'],
   );
   warnings_like { $db_loader->load() } [
+    qr/Skipped t\/data\/autoqc\/bam_flagstats\/24135_1#1.bam_flagstats\.json/, # no __CLASS__ key
     qr/Skipped t\/data\/autoqc\/bam_flagstats\/4783_5_bam_flagstats\.json/, # no __CLASS__ key
     qr/Loaded t\/data\/autoqc\/bam_flagstats\/4921_3_bam_flagstats\.json/,
     qr/1 json files have been loaded/
