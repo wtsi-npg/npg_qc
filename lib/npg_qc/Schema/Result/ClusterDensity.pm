@@ -1,5 +1,5 @@
 
-package npg_qc::Schema::Result::RunTile;
+package npg_qc::Schema::Result::ClusterDensity;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
@@ -8,7 +8,7 @@ package npg_qc::Schema::Result::RunTile;
 
 =head1 NAME
 
-npg_qc::Schema::Result::RunTile - table linking a tile to a run and lane position
+npg_qc::Schema::Result::ClusterDensity
 
 =cut
 
@@ -44,15 +44,15 @@ use namespace::autoclean;
 
 __PACKAGE__->load_components('InflateColumn::DateTime');
 
-=head1 TABLE: C<run_tile>
+=head1 TABLE: C<cluster_density>
 
 =cut
 
-__PACKAGE__->table('run_tile');
+__PACKAGE__->table('cluster_density');
 
 =head1 ACCESSORS
 
-=head2 id_run_tile
+=head2 id_cluster_density
 
   data_type: 'bigint'
   extra: {unsigned => 1}
@@ -65,45 +65,42 @@ __PACKAGE__->table('run_tile');
   extra: {unsigned => 1}
   is_nullable: 0
 
-=head2 tile
-
-  data_type: 'smallint'
-  extra: {unsigned => 1}
-  is_nullable: 0
-
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
   is_nullable: 0
 
-=head2 end
-
-  data_type: 'char'
-  is_nullable: 0
-  size: 1
-
-=head2 row
-
-  data_type: 'smallint'
-  extra: {unsigned => 1}
-  is_nullable: 1
-
-=head2 col
+=head2 is_pf
 
   data_type: 'tinyint'
+  is_nullable: 0
+
+=head2 min
+
+  data_type: 'double precision'
   extra: {unsigned => 1}
   is_nullable: 1
+  size: [12,3]
 
-=head2 avg_newz
+=head2 max
 
-  data_type: 'float'
+  data_type: 'double precision'
+  extra: {unsigned => 1}
   is_nullable: 1
+  size: [12,3]
+
+=head2 p50
+
+  data_type: 'double precision'
+  extra: {unsigned => 1}
+  is_nullable: 1
+  size: [12,3]
 
 =cut
 
 __PACKAGE__->add_columns(
-  'id_run_tile',
+  'id_cluster_density',
   {
     data_type => 'bigint',
     extra => { unsigned => 1 },
@@ -112,75 +109,66 @@ __PACKAGE__->add_columns(
   },
   'id_run',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'tile',
-  { data_type => 'smallint', extra => { unsigned => 1 }, is_nullable => 0 },
   'position',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'end',
-  { data_type => 'char', is_nullable => 0, size => 1 },
-  'row',
-  { data_type => 'smallint', extra => { unsigned => 1 }, is_nullable => 1 },
-  'col',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
-  'avg_newz',
-  { data_type => 'float', is_nullable => 1 },
+  'is_pf',
+  { data_type => 'tinyint', is_nullable => 0 },
+  'min',
+  {
+    data_type => 'double precision',
+    extra => { unsigned => 1 },
+    is_nullable => 1,
+    size => [12, 3],
+  },
+  'max',
+  {
+    data_type => 'double precision',
+    extra => { unsigned => 1 },
+    is_nullable => 1,
+    size => [12, 3],
+  },
+  'p50',
+  {
+    data_type => 'double precision',
+    extra => { unsigned => 1 },
+    is_nullable => 1,
+    size => [12, 3],
+  },
 );
 
 =head1 PRIMARY KEY
 
 =over 4
 
-=item * L</id_run_tile>
+=item * L</id_cluster_density>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key('id_run_tile');
+__PACKAGE__->set_primary_key('id_cluster_density');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<unq_idx_rt_idrun_end_position_tile>
+=head2 C<unq_idx_cluster_density>
 
 =over 4
 
 =item * L</id_run>
 
-=item * L</end>
-
 =item * L</position>
 
-=item * L</tile>
+=item * L</is_pf>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint(
-  'unq_idx_rt_idrun_end_position_tile',
-  ['id_run', 'end', 'position', 'tile'],
-);
-
-=head1 RELATIONS
-
-=head2 lane_qcs
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::LaneQc>
-
-=cut
-
-__PACKAGE__->has_many(
-  'lane_qcs',
-  'npg_qc::Schema::Result::LaneQc',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
+__PACKAGE__->add_unique_constraint('unq_idx_cluster_density', ['id_run', 'position', 'is_pf']);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-11-28 18:47:11
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cH2xBaPi8WO/T45PH3SCnA
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:IxKAPWLGrL/QUV8+2Dd33g
 
 our $VERSION = '0';
 

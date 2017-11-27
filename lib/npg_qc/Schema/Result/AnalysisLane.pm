@@ -618,24 +618,9 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
-=head2 analysis_lane_qcals
 
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::AnalysisLaneQcal>
-
-=cut
-
-__PACKAGE__->has_many(
-  'analysis_lane_qcals',
-  'npg_qc::Schema::Result::AnalysisLaneQcal',
-  { 'foreign.id_analysis_lane' => 'self.id_analysis_lane' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CmQ1MPQulatJ8Fnm8fLg2w
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-11-28 18:47:11
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zLPPeYv9mkcHumgdmyGTOA
 
 our $VERSION = '0';
 

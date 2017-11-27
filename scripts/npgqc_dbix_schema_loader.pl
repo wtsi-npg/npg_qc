@@ -62,7 +62,6 @@ make_schema_at(
         
         exclude => qr/\A v_                    |
                          analysis_lane_qcal    |
-                         cluster_density       |
                          cumulative_errors_    |
                          error_rate_           |
                          errors_by             |

@@ -114,6 +114,7 @@ lib/npg_qc/Schema/Result/Analysis.pm
 lib/npg_qc/Schema/Result/BamFlagstats.pm
 lib/npg_qc/Schema/Result/CacheQuery.pm
 lib/npg_qc/Schema/Result/ChipSummary.pm
+lib/npg_qc/Schema/Result/ClusterDensity.pm
 lib/npg_qc/Schema/Result/Contamination.pm
 lib/npg_qc/Schema/Result/Fastqcheck.pm
 lib/npg_qc/Schema/Result/FrequencyResponseMatrix.pm
