@@ -41,22 +41,22 @@ sub get {
   my @uqc_outcomes = ();
 
   my @mcompcompositions = ();
-  my $scomponents = {};
+  my $single_components = {};
 
   foreach my $rpt_list ( uniq @{$qlist} ) {
     my $composition = _rpt_list2composition($rpt_list);
     if ($composition->num_components == 1) {
       my $c = $composition->get_component(0);
-      $scomponents->{$c->id_run()}->{$c->position()} = 1;
+      $single_components->{$c->id_run()}->{$c->position()} = 1;
     } else {
       push @mcompcompositions, $composition;
     }
   }
 
   # Get outcomes for single-component compositions
-  foreach my $id_run (keys %{$scomponents}) {
+  foreach my $id_run (keys %{$single_components}) {
     my $q = {'id_run'   => $id_run,
-             'position' => [keys %{$scomponents->{$id_run}}]};
+             'position' => [keys %{$single_components->{$id_run}}]};
     push @lib_outcomes, $self->_create_query($LIB_RS_NAME, $QC_OUTCOME,  $q)->all();
     push @seq_outcomes, $self->_create_query($SEQ_RS_NAME, $QC_OUTCOME,  $q)->all();
     push @uqc_outcomes, $self->_create_query($UQC_RS_NAME, $UQC_OUTCOME, $q)->all();
@@ -154,7 +154,7 @@ sub _save_outcomes {
               my @lib_outcomes = $self->_create_query(
                 $LIB_RS_NAME, $QC_OUTCOME,
                 {'id_run' => $component->id_run, 'position' => $component->position}
-                                                   )->all();
+                                                     )->all();
               $self->_validate_library_outcomes($outcome_ent, \@lib_outcomes, $lane_info->{$key});
               $self->_finalise_library_outcomes(\@lib_outcomes, $username);
             }
@@ -203,7 +203,7 @@ sub _find_or_new_outcome {
   my $q = {'id_seq_composition' => $seq_composition->id_seq_composition()};
   my $rs_found = $rs->search_autoqc($q);
   my $result = $rs_found->next;
-  if (!$result)  {
+  if (!$result) {
     # Create result object in memory.
     if ($composition_obj->num_components() == 1) {
       my %columns = map { $_ => 1 } $rs->result_source()->columns();
@@ -211,8 +211,12 @@ sub _find_or_new_outcome {
         my $component = $composition_obj->get_component(0);
         $q->{'id_run'}   = $component->id_run();
         $q->{'position'} = $component->position();
-        if (defined $component->tag_index() && exists $columns{'tag_index'}) {
-          $q->{'tag_index'} = $component->tag_index();
+        if (defined $component->tag_index()) {
+          if (exists $columns{'tag_index'}) {
+            $q->{'tag_index'} = $component->tag_index();
+          } else {
+            croak qq[Defined tag index value is incompatible with outcome type $outcome_type];
+          }
         }
       }
     }

@@ -452,12 +452,18 @@ subtest q[find or create lib entity] => sub {
 };
 
 subtest q[find or create seq entity] => sub {
-  plan tests => 15;
+  plan tests => 16;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
   my $c = npg_tracking::glossary::composition::factory::rpt_list
-         ->new(rpt_list => '55:2')->create_composition();
+          ->new(rpt_list => '45:3:1')->create_composition();
+  throws_ok { $o->_find_or_new_outcome('seq', $c) }
+    qr/Defined tag index value is incompatible with outcome type seq/,
+    'tag index defined - error';
+
+  $c = npg_tracking::glossary::composition::factory::rpt_list
+       ->new(rpt_list => '55:2')->create_composition();
   my $row = $o->_find_or_new_outcome('seq', $c);
   isa_ok($row, 'npg_qc::Schema::Result::MqcOutcomeEnt');
   ok(!$row->in_storage, 'new object is created in memory');

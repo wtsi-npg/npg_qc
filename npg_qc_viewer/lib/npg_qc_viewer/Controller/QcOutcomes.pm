@@ -37,9 +37,9 @@ Handles GET and POST requests on the /qcoutcomes URL.
 Retrieving records:
 
   curl -X GET -H "Content-type: application/json" -H "Accept: application/json"  \
-    "http://server:5050/qcoutcomes?rpt_list=5%3A8%3A7"&rpt_list=6%3A3"
+    "http://server:5050/qcoutcomes?rpt_list=5%3A8%3A7&rpt_list=6%3A3"
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"5:8:7":{},"6:3":{}]}' http://server:5050/qcoutcomes
+    -d '{"5:8:7":{},"6:3":{}}' http://server:5050/qcoutcomes
 
 Updating/creating records:
 
