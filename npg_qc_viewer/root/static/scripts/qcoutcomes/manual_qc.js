@@ -107,10 +107,10 @@ define([
      *
      */
     QC.addUQCAnnotationLink = function (callback) {
-      var UQC_ANNOTATION_CONTAINER = "#menu #links > ul:eq(3)";
+      var $UQC_ANNOTATION_CONTAINER = $("#summary_to_csv").parent().parent();
 
-      $(UQC_ANNOTATION_CONTAINER).append('<li><a href="" class="uqcClickable">UQC annotation</a></li>');
-      $(UQC_ANNOTATION_CONTAINER + " .uqcClickable").bind ("click", function(event) {
+      $UQC_ANNOTATION_CONTAINER.before('<ul><li><a id="uqcClickable" href="">UQC annotation</a></li></ul>');
+      $("#uqcClickable").on("click", function(event) {
         event.stopPropagation() ;
         event.preventDefault();
         var nonUQCableElements = 0;
@@ -127,7 +127,7 @@ define([
            if (typeof callback !== 'undefined' && typeof callback === 'function') {
              callback();
            }
-           $(".uqcClickable").remove();
+           $("#uqcClickable").closest('ul').remove();
         }
       });
     };
@@ -233,18 +233,15 @@ define([
              typeof qcOutcomes !== 'object' ) {
           throw 'Invalid parameter type.';
         }
-
-        var prevOutcomes;
-        prevOutcomes = qcOutcomes.uqc;
+        var uqcOutcomes = qcOutcomes.uqc;
    
-
         $(MQC_ABLE_CLASS).each(function (index, element) {
           if (NPG.QC.isElementUQCable(element)){
             var $element = $(element);
             var rowId = $element.closest('tr').attr('id');
             var $elementToMark;
 
-            if ( typeof rowId === 'string' ) {
+            if ( typeof rowId !== 'undefined' ) {
               var rptKey = qc_utils.rptKeyFromId(rowId);
               var isLaneKey = qc_utils.isLaneKey(rptKey);
 
@@ -257,8 +254,11 @@ define([
                 $elementToMark = $($libraryBrElement.prev());
               }
 
-              var outcome = typeof prevOutcomes[rptKey] !== 'undefined' ? prevOutcomes[rptKey].uqc_outcome
-                                                                        : undefined;
+              var outcome = undefined ;
+              if (typeof uqcOutcomes !== 'undefined' && 
+                  typeof uqcOutcomes[rptKey] !== 'undefined') {
+                outcome = uqcOutcomes[rptKey].uqc_outcome;
+              } 
               _colourElementByUQCOutcome($elementToMark, outcome);            
             }  
           }

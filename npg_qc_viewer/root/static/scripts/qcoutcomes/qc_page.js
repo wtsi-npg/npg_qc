@@ -122,21 +122,16 @@ define(['jquery'], function () {
         throw new Error('Error: page title is expected but not available in page');
       }
       var runStatusData = _parseRunStatus(pageTitleString);
-      var acceptedStatus = ['qc in progress', 'qc on hold'];
-      var pageRunInfo = null;
-      if ( ( runStatusData.runStatus === acceptedStatus[0] ||
-             runStatusData.runStatus === acceptedStatus[1] ) &&
+      var pageRunInfo = _getRunInfoFromPageTitle (pageTitleString);
+      isRunPage = pageRunInfo.isARunPage;
+      if ( ( runStatusData.runStatus === 'qc in progress' ||
+             runStatusData.runStatus === 'qc on hold' ) &&
              loggedUserData.username === runStatusData.takenBy  ) {
-        pageRunInfo = _getRunInfoFromPageTitle (pageTitleString);
         isPageForMQC = pageRunInfo.isPageForThisQC;
-        isRunPage = pageRunInfo.isARunPage;
       } else {
-          acceptedStatus = ['qc complete', 'run archived'];
-          if ( ( runStatusData.runStatus === acceptedStatus[0] ||
-                 runStatusData.runStatus === acceptedStatus[1] ) ) {
-            pageRunInfo = _getRunInfoFromPageTitle (pageTitleString);
+          if ( ( runStatusData.runStatus === 'qc complete' ||
+                 runStatusData.runStatus === 'run archived' ) ) {
             isPageForUQC = pageRunInfo.isPageForThisQC;
-            isRunPage = pageRunInfo.isARunPage;
           }
       }
     }
