@@ -16,20 +16,21 @@ requires 'insert';
 Readonly::Scalar my $ACCEPTED_FINAL  => 'Accepted final';
 Readonly::Scalar my $REJECTED_FINAL  => 'Rejected final';
 
-Readonly::Hash my %DELEGATION_TO_MQC_OUTCOME => {
+Readonly::Hash my %DELEGATION_TO_QC_OUTCOME => {
   'has_final_outcome' => 'is_final_outcome',
   'is_accepted'       => 'is_accepted',
   'is_final_accepted' => 'is_final_accepted',
   'is_undecided'      => 'is_undecided',
   'is_rejected'       => 'is_rejected',
+  'description'       => 'short_desc',
 };
 
-foreach my $this_class_method (keys %DELEGATION_TO_MQC_OUTCOME ) {
+foreach my $this_class_method (keys %DELEGATION_TO_QC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
       my $self = shift;
-      my $outcome_type = $self->dict_relation();
-      my $that_class_method = $DELEGATION_TO_MQC_OUTCOME{$this_class_method};
-      return $self->$outcome_type->$that_class_method;
+      my $outcome_type = $self->_dict_relation();
+      my $that_class_method = $DELEGATION_TO_QC_OUTCOME{$this_class_method};
+      return $self->$outcome_type->$that_class_method(@_);
     }
   );
 }
@@ -43,7 +44,7 @@ around [qw/update insert/] => sub {
   return $return_super;
 };
 
-sub dict_relation {
+sub _dict_relation {
   my $self = shift;
   my $name = $self->_is_mqc_type_outcome() ? 'm' : 'u';
   return $name . q[qc_outcome];
@@ -116,12 +117,10 @@ sub _outcome_id {
   if (!$outcome) {
     croak q[Outcome required];
   }
-  ## no critic(ValuesAndExpressions::ProhibitLongChainsOfMethodCalls)
   my $outcome_dict_obj = $self->result_source
                          ->schema
                          ->resultset($self->_rs_name('Dict'))
-                         ->search({'short_desc' => $outcome})->next;
-  ## use critic
+                         ->find({'short_desc' => $outcome});
   if (!$outcome_dict_obj || !$outcome_dict_obj->iscurrent) {
     croak qq[Outcome $outcome is invalid];
   }
@@ -180,10 +179,6 @@ entity DBIx objects.
 A lazy-build attribute of type npg_tracking::glossary::composition.
 It is built by inspecting the linked seq_composition row.
 
-=head2 dict_relation
-
-Returns the name of the relationship to the outcomes dictionary.
-
 =head2 update
 
 The default method is extended to create a relevant historic record and set
@@ -239,6 +234,12 @@ for this type of outcome.
 
   $obj->toggle_final_outcome($username);
   $obj->toggle_final_outcome($username, $rt_ticket);
+
+=head2 description
+
+Returns short outcome description.
+
+  my $description = $obj->description();
 
 =head1 DIAGNOSTICS
 

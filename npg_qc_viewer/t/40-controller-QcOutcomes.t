@@ -28,116 +28,125 @@ my $base_url = '/qcoutcomes';
 
 sub _message {
   my ($request, $rpt) = @_;
-  return sprintf q[%s on '%s'%s%s],
-      $request->method, $request->uri,
+  return sprintf q[%s %s%s],
+      $request->method,
       $request->method eq 'GET' ? q() :
       q[ with content '] . $request->content . q['],
       $rpt ? qq[ ($rpt)] : q();
 }
 
 sub _new_post_request {
-  my $request = HTTP::Request->new('POST', $base_url);
+  my $request = HTTP::Request->new('POST', '/qcoutcomes');
   $request->header( 'Content-type' => 'application/json' );
   return $request;
 }
 
+sub _get_url {
+  my @list = @_;
+  if (!@list) {
+    die 'Need input';
+  }
+  my $params = join q[&], map {'rpt_list=' . uri_escape($_)} @list;
+  return join q[?], '/qcoutcomes', $params;
+}
+
 subtest 'retrieving data via GET and POST' => sub {
-  plan tests => 68;
+  plan tests => 72;
 
- my @urls = qw(
-    5:3:7
-    5:3
-    5:3:7
-    5:3
-    5:4
-    5:4;5:3
-    5:4;5:3;5:1
-    5:4;5:3:7
-    5:4;5:3:7;5:3
-    5:3:5;5:3:7
-  );
-
-  my $jsons = [
-    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"}},"uqc":{}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"},"5:1":{"mqc_outcome":"Accepted preliminary"}},"uqc":{}}',
-    '{"lib":{"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:6":{"mqc_outcome":"Undecided"},"5:4":{"mqc_outcome":"Accepted preliminary"},"5:3:3":{"mqc_outcome":"Rejected preliminary"},"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"},"5:3:4":{"mqc_outcome":"Accepted final"},"5:3:2":{"mqc_outcome":"Accepted preliminary"}},"seq":{"5:4":{"mqc_outcome":"Rejected final"},"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{}}',
-    '{"lib":{"5:3:7":{"mqc_outcome":"Undecided final"},"5:3:5":{"mqc_outcome":"Rejected final"}},"seq":{"5:3":{"mqc_outcome":"Accepted final"}},"uqc":{"5:3:7":{"uqc_outcome":"Rejected"},"5:3:5":{"uqc_outcome":"Accepted"}}}'
-  ];
-
-  my $r1 = HTTP::Request->new('GET',  $base_url);
-  my $r2 = HTTP::Request->new('POST', $base_url);
-  $r2->header( 'Content-type' => 'application/json' );
-
+  my $r1 = HTTP::Request->new('GET', '/qcoutcomes');
+  my $r2 = _new_post_request();
   for my $request ($r1, $r2) {
     my $response = request($request);
     my $m = _message($request);
     ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
     is($response->header('Content-type'), 'application/json', 'json content type');
-    is($response->content, '{"error":"rpt list not defined!"}', 'error message');
+    is($response->content, '{"error":"rpt list not defined!"}',
+      'rpt list not defined - error');
   }
 
-  my $url = join q[?], $base_url, 'rpt_list=wrong';
-  $r1 = HTTP::Request->new('GET',  $url);
-  $r2 = HTTP::Request->new('POST', $base_url);
-  $r2->header( 'Content-type' => 'application/json' );
+  $r1 = HTTP::Request->new('GET',  '/qcoutcomes?rpt_list=wrong');
+  $r2 = _new_post_request();
   $r2->content('{"wrong":{}}');
   for my $request ($r1, $r2) {
     my $response = request($request);
     my $m = _message($request);
     ok($response->is_error, qq[response for $m is an error]);
     is($response->code, 400, 'error code is 400 - bad request' );
-    like($response->content, qr/isn't numeric/, 'error message');
+    like($response->content, qr/isn't numeric/, 'malformed rpt list - error');
   }
 
-  my $rpt = '5:8:7;5:8:8';
-  $url = join q[?], $base_url, 'rpt_list='. uri_escape($rpt);
-  $r1 = HTTP::Request->new('GET',  $url);
+  my $empty_response = {"lib"=>{},"seq"=>{},"uqc"=>{}};
+  my $rpt_list = '5:3:7';
+  $r1 = HTTP::Request->new('GET',  _get_url($rpt_list));
   $r2 = HTTP::Request->new('POST', $base_url);
   $r2->header( 'Content-type' => 'application/json' );
-  $r2->content(qq[{"$rpt":{}}]);
-  for my $request ($r1, $r2) {
-    my $response = request($request);
-    my $m = _message($request, $rpt);
-    ok($response->is_error, qq[response for $m is an error]);
-    is($response->code, 400, 'error code is 400 - bad request' );
-    like($response->content,
-      qr/Cannot deal with multi-component compositions/, 'error message');
-  }
-
-  $rpt = '5:3:7';
-  $url = join q[?], $base_url, 'rpt_list='. uri_escape($rpt);
-  $r1 = HTTP::Request->new('GET',  $url);
-  $r2 = HTTP::Request->new('POST', $base_url);
-  $r2->header( 'Content-type' => 'application/json' );
-  $r2->content(qq[{"$rpt":{}}]);
+  $r2->content(qq[{"$rpt_list":{}}]);
   for my $request ($r1, $r2) {
     my $response = request($request);
     ok($response->is_success, 'success');
-    is($response->code, 200, 'response code 200 for ' . _message($request, $rpt));
+    is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
     is($response->header('Content-type'), 'application/json', 'json content type');
-    is_deeply(decode_json($response->content), decode_json('{"lib":{},"seq":{},"uqc":{}}'), 'response content');
+    is_deeply(decode_json($response->content),
+      $empty_response, 'response when data not available, single component');
   }
 
+  $rpt_list = '5:3:7;5:3:5';
+  my $url = _get_url($rpt_list);
+  $r1 = HTTP::Request->new('GET', $url);
+  $r2 = _new_post_request();
+  $r2->content(qq[{"$rpt_list":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    my $m = _message($request, $rpt_list);
+    ok(!$response->is_error, qq[response for $m is not an error]);
+    is($response->code, 200, 'response code is 200' );
+    is_deeply(decode_json($response->content),
+      $empty_response,'response when data not available, multiple components');
+  }
 
-  my $fkeys = {};
+  my $lrs = $qc_schema->resultset('MqcLibraryOutcomeEnt');
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => $rpt_list)->create_composition();
+  my $seq_c = $lrs->find_or_create_seq_composition($c);
+  my $values = {};
+  $values->{'id_seq_composition'} = $seq_c->id_seq_composition();
+  $values->{'id_mqc_outcome'} = 3; # Accepted final
+  $values->{'username'} = 'dog';
+  $lrs->create($values);
+  delete $values->{'id_mqc_outcome'};
+  $values->{'id_uqc_outcome'} = 2; # Rejected
+  $values->{'modified_by'} = 'cat';
+  $values->{'rationale'} = 'my ticket';
+  $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+
+  my $expected = {"lib" => {"5:3:5;5:3:7" => {"mqc_outcome" => "Accepted final"}},
+                  "uqc" => {"5:3:5;5:3:7" => {"uqc_outcome" => "Rejected"}},
+                  "seq" => {}};
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    my $m = _message($request, $rpt_list);
+    is($response->code, 200, 'response code is 200' );
+    is_deeply(decode_json($response->content), $expected,
+      'responce for multi-component composition');
+  }
+
   my $rs = $qc_schema->resultset('MqcOutcomeEnt');
-  my @expanded_list = uniq map {(split q[;], $_)}
-                      @urls, qw(5:1 5:2 5:5 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6);
-  foreach my $l (@expanded_list) {
+  my $fkeys = {}; 
+  my @rpt_lists = qw(
+                 5:1
+                 5:2
+                 5:3 5:3:2 5:3:3 5:3:4 5:3:5 5:3:6 5:3:7
+                 5:4
+                 5:5 );
+  foreach my $l (@rpt_lists) {
     my $c = npg_tracking::glossary::composition::factory::rpt_list
             ->new(rpt_list => $l)->create_composition();
     my $seq_c = $rs->find_or_create_seq_composition($c);
     $fkeys->{$l} =  $seq_c->id_seq_composition();
   }
 
-  my $values = {id_run => 5, username => 'u1'};
+  $values = {id_run => 5, username => 'u1'};
   for my $i (1 .. 5) {
     $values->{'position'} = $i;
     $values->{'id_mqc_outcome'} = $i;
@@ -145,52 +154,140 @@ subtest 'retrieving data via GET and POST' => sub {
     $qc_schema->resultset('MqcOutcomeEnt')->create($values);
   }
 
-  my $j = 0;
-  while ($j < @urls) {
+  $expected = {"lib"=>{},
+               "uqc"=>{},
+               "seq"=>{"5:3"=>{"mqc_outcome"=>"Accepted final"}}};
+  $rpt_list = '5:3:7';
+  $r1 = HTTP::Request->new('GET', _get_url($rpt_list));
+  $r2 = _new_post_request();
+  $r2->content(qq[{"$rpt_list":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
+    is_deeply(decode_json($response->content), $expected, 'response content');
+  }
+  $rpt_list = '5:3';
+  my $r3 = HTTP::Request->new('GET', _get_url($rpt_list));
+  my $r4 = _new_post_request();
+  $r4->content(qq[{"$rpt_list":{}}]);
+  for my $request ($r3, $r4) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
+    is_deeply(decode_json($response->content), $expected, 'response content');
+  }
 
-    if ($j == 2) {
-      $values = {id_run => 5, position => 3, username => 'u1'};
-      for my $i (2 .. 7) {
-        $values->{'tag_index'} = $i;
-        $values->{'id_mqc_outcome'} = $i-1;
-        $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, 3, $i};
-        $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
-      }
-    } elsif ($j == 4) {
-      $qc_schema->resultset('MqcLibraryOutcomeEnt')->create(
+  $values = {id_run => 5, position => 3, username => 'u1'};
+  for my $i (2 .. 7) {
+    $values->{'tag_index'} = $i;
+    $values->{'id_mqc_outcome'} = $i-1;
+    $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, 3, $i};
+    $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
+  }
+
+  $expected = {"lib"=>{"5:3:2"=>{"mqc_outcome"=>"Accepted preliminary"},
+                       "5:3:3"=>{"mqc_outcome"=>"Rejected preliminary"},
+                       "5:3:4"=>{"mqc_outcome"=>"Accepted final"},
+                       "5:3:5"=>{"mqc_outcome"=>"Rejected final"},
+                       "5:3:6"=>{"mqc_outcome"=>"Undecided"},
+                       "5:3:7"=>{"mqc_outcome"=>"Undecided final"}},
+               "seq"=>{"5:3"  =>{"mqc_outcome"=>"Accepted final"}},
+               "uqc"=>{}};
+  for my $request ($r1, $r2, $r3, $r4) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200');
+    is_deeply(decode_json($response->content), $expected, 'response content');
+  }
+
+  $qc_schema->resultset('MqcLibraryOutcomeEnt')->create(
         {id_run             => 5,
          position           => 4,
          id_seq_composition => $fkeys->{'5:4'},
          id_mqc_outcome     => 1,
          username           => 'u1'});
-    } elsif ($j == 9) {
-      my $values = {'id_seq_composition' => $fkeys->{join q[:], 5, 3, 5},
-                    'id_uqc_outcome'     => 1,
-                    'username'           => 'user',
-                    'modified_by'        => 'user',
-                    'rationale'          => 'rationale something'};
-      $qc_schema->resultset('UqcOutcomeEnt')->create($values);
-      $values->{'id_seq_composition'} = $fkeys->{join q[:], 5, 3, 7};
-      $values->{'id_uqc_outcome'} = 2;
-      $qc_schema->resultset('UqcOutcomeEnt')->create($values);
-    }
 
-    my $rpt_list = $urls[$j];
-    my @rpts = @{npg_tracking::glossary::rpt->split_rpts($rpt_list)};
-    my $url = $base_url . '?' . join q[&], map {'rpt_list=' . uri_escape($_)} @rpts;
-    my %h = map { $_ => {} } @rpts;
+  $rpt_list = '5:4';
+  $expected = {"lib"=>{"5:4"=>{"mqc_outcome"=>"Accepted preliminary"}},
+               "seq"=>{"5:4"=>{"mqc_outcome"=>"Rejected final"}},
+               "uqc"=>{}};
+  $r1 = HTTP::Request->new('GET', _get_url($rpt_list));
+  $r2 = _new_post_request();
+  $r2->content(qq[{"$rpt_list":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
+    is_deeply(decode_json($response->content), $expected, 'response content');
+  }
 
-    my $request1 = HTTP::Request->new('GET',  $url);
-    my $request2 = HTTP::Request->new('POST', $base_url);
-    $request2->header( 'Content-type' => 'application/json' );
-    $request2->content(encode_json(\%h));
-    for my $request ($request1, $request2) {
-      my $response = request($request);
-      is($response->code, 200, 'response code 200 for ' . _message($request, $rpt_list));
-      is_deeply(decode_json($response->content), decode_json($jsons->[$j]), 'response content');
-    }
+  $expected = {"lib"=>{"5:3:2"=>{"mqc_outcome"=>"Accepted preliminary"},
+                       "5:3:3"=>{"mqc_outcome"=>"Rejected preliminary"},
+                       "5:3:4"=>{"mqc_outcome"=>"Accepted final"},
+                       "5:3:5"=>{"mqc_outcome"=>"Rejected final"},
+                       "5:3:6"=>{"mqc_outcome"=>"Undecided"},
+                       "5:3:7"=>{"mqc_outcome"=>"Undecided final"},
+                       "5:4"  =>{"mqc_outcome"=>"Accepted preliminary"}},
+               "seq"=>{"5:3"  =>{"mqc_outcome"=>"Accepted final"},
+                       "5:4"  =>{"mqc_outcome"=>"Rejected final"}},
+               "uqc"=>{}};
+  $r1 = HTTP::Request->new('GET', _get_url(qw/5:4 5:3/));
+  $r2 = _new_post_request();
+  $r2->content(qq[{"5:4":{},"5:3":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200 for ' . _message($request, '5:4 5:3'));
+    is_deeply(decode_json($response->content), $expected, 'response content');
+  }
 
-    $j++;
+  $r1 = HTTP::Request->new('GET', _get_url(qw/5:4 5:3:7/));
+  $r2 = _new_post_request();
+  $r2->content(qq[{"5:4":{},"5:3:7":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200 for ' . _message($request, '5:4 5:3:7'));
+    is_deeply(decode_json($response->content), $expected, 'response content');
+  }
+
+  $r1 = HTTP::Request->new('GET', _get_url(qw/5:4 5:3:7 5:3/));
+  $r2 = _new_post_request();
+  $r2->content(qq[{"5:4":{},"5:3:7":{},"5:3":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200 for ' . _message($request, '5:4 5:3:7 5:3'));
+    is_deeply(decode_json($response->content), $expected, 'response content');
+  }
+
+  $expected->{'seq'}->{'5:1'}= {'mqc_outcome'=>'Accepted preliminary'};
+  $r1 = HTTP::Request->new('GET', _get_url(qw/5:4 5:3 5:1/));
+  $r2 = _new_post_request();
+  $r2->content(qq[{"5:4":{},"5:3":{},"5:1":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200 for ' . _message($request, '5:4 5:3 5:1'));
+    is_deeply(decode_json($response->content), $expected, 'response content');
+  }
+
+  $values = {'id_seq_composition' => $fkeys->{'5:3:5'},
+             'id_uqc_outcome'     => 1,
+             'username'           => 'user',
+             'modified_by'        => 'user',
+             'rationale'          => 'rationale something'};
+  $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+  $values->{'id_seq_composition'} = $fkeys->{'5:3:7'};
+  $values->{'id_uqc_outcome'} = 2;
+  $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+
+  delete $expected->{'lib'}->{'5:4'};
+  delete $expected->{'seq'}->{'5:1'};
+  delete $expected->{'seq'}->{'5:4'};
+  $expected->{'uqc'} = {"5:3:7"=>{"uqc_outcome"=>"Rejected"},
+                        "5:3:5"=>{"uqc_outcome"=>"Accepted"}};
+
+  $r1 = HTTP::Request->new('GET', _get_url(qw/5:3:5 5:3:7/));
+  $r2 = _new_post_request();
+  $r2->content(qq[{"5:3:5":{},"5:3:7":{}}]);
+  for my $request ($r1, $r2) {
+    my $response = request($request);
+    is($response->code, 200, 'response code 200 for ' . _message($request, '5:3:5 5:3:7'));
+    is_deeply(decode_json($response->content), $expected, 'response content');
   }
 };
 
@@ -227,22 +324,25 @@ subtest 'data validation for update requests' => sub {
               'user'     => 'cat',
               'password' => 'secret',
               'lib'      => {},
-              'seq'      => {}};
+              'seq'      => {},
+              'other'    => {}};
   my $error_code = 400;
 
   my $request = _new_post_request();
   $request->content(encode_json($data));
   my $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/No data to save/,
-    'should send some data');
+  like ($response->content, qr/One of outcome types is unknown/,
+    'unknown outcome type present - error');
 
+  delete $data->{'other'};
   $data->{'lib'} = {'1:2;3:4' => {'mqc_outcome' => 'some'}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/rpt string should not contain \';\'/,
+  like ($response->content,
+    qr/Saving outcomes for multi-component compositions is not yet implemented/,
     'multi-component compositions are not allowed');
 
   $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'Undecided'}, '1:4' => {'mqc_outcome' => ''}};

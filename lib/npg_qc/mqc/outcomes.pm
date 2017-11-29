@@ -4,27 +4,23 @@ use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Readonly;
-use List::MoreUtils qw/ any none /;
+use List::MoreUtils qw/ any none uniq /;
 use Carp;
 use Try::Tiny;
-use npg_qc::Schema::Mqc::OutcomeEntity;
 
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES
                                    $SEQ_OUTCOMES
                                    $QC_OUTCOME
                                    $UQC_OUTCOMES
                                    $UQC_OUTCOME/;
-use npg_tracking::glossary::rpt;
+
 use npg_tracking::glossary::composition::factory::rpt_list;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $SEQ_RS_NAME => 'MqcOutcomeEnt';
-Readonly::Scalar my $LIB_RS_NAME => 'MqcLibraryOutcomeEnt';
-Readonly::Scalar my $UQC_RS_NAME => 'UqcOutcomeEnt';
-Readonly::Scalar my $IDRK        => 'id_run';
-Readonly::Scalar my $PK          => 'position';
-Readonly::Scalar my $TIK         => 'tag_index';
+Readonly::Scalar my $SEQ_RS_NAME   => 'MqcOutcomeEnt';
+Readonly::Scalar my $LIB_RS_NAME   => 'MqcLibraryOutcomeEnt';
+Readonly::Scalar my $UQC_RS_NAME   => 'UqcOutcomeEnt';
 Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOMES);
 
 has 'qc_schema' => (
@@ -35,48 +31,51 @@ has 'qc_schema' => (
 
 sub get {
   my ($self, $qlist) = @_;
+
   if (!$qlist || (ref $qlist ne 'ARRAY')) {
     croak q[Input is missing or is not an array];
-  }
-
-  my $hashed_queries = {};
-  foreach my $q ( @{$qlist} ) {
-    if (!defined $q->{$IDRK} || !defined $q->{$PK}) {
-      croak qq[Both '$IDRK' and '$PK' keys should be defined];
-    }
-    push @{$hashed_queries->{$q->{$IDRK}}->{$q->{$PK}}},
-      defined $q->{$TIK} ? $q->{$TIK} : undef;
   }
 
   my @lib_outcomes = ();
   my @seq_outcomes = ();
   my @uqc_outcomes = ();
 
-  foreach my $id_run ( keys %{$hashed_queries} ) {
+  my @mcompcompositions = ();
+  my $single_components = {};
 
-    my @positions = keys %{$hashed_queries->{$id_run}};
-
-    foreach my $p ( @positions ) {
-      my @tags = @{$hashed_queries->{$id_run}->{$p}};
-      my $query = {$IDRK => $id_run, $PK => $p};
-      # Either get lib outcomes for a selection of tag indices or
-      # all lib outcomes for a lane.
-      if ( none { !defined } @tags ) {
-        $query->{$TIK} = \@tags;
-      }
-      push @lib_outcomes, $self->_create_query($LIB_RS_NAME, $QC_OUTCOME, $query)->all();
+  foreach my $rpt_list ( uniq @{$qlist} ) {
+    my $composition = _rpt_list2composition($rpt_list);
+    if ($composition->num_components == 1) {
+      my $c = $composition->get_component(0);
+      $single_components->{$c->id_run()}->{$c->position()} = 1;
+    } else {
+      push @mcompcompositions, $composition;
     }
+  }
 
-    # Get seq outcomes for a lane.
-    my $q = {$IDRK => $id_run, $PK => \@positions};
-    push @seq_outcomes, $self->_create_query($SEQ_RS_NAME, $QC_OUTCOME, $q)->all();
+  # Get outcomes for single-component compositions
+  foreach my $id_run (keys %{$single_components}) {
+    my $q = {'id_run'   => $id_run,
+             'position' => [keys %{$single_components->{$id_run}}]};
+    push @lib_outcomes, $self->_create_query($LIB_RS_NAME, $QC_OUTCOME,  $q)->all();
+    push @seq_outcomes, $self->_create_query($SEQ_RS_NAME, $QC_OUTCOME,  $q)->all();
     push @uqc_outcomes, $self->_create_query($UQC_RS_NAME, $UQC_OUTCOME, $q)->all();
   }
 
+  # Get outcomes for multi-component compositions
+  if (@mcompcompositions) {
+    push @lib_outcomes, $self->_create_query4compositions(
+                               $LIB_RS_NAME, $QC_OUTCOME,  \@mcompcompositions)->all();
+    push @seq_outcomes, $self->_create_query4compositions(
+                               $SEQ_RS_NAME, $QC_OUTCOME,  \@mcompcompositions)->all();
+    push @uqc_outcomes, $self->_create_query4compositions(
+                               $UQC_RS_NAME, $UQC_OUTCOME, \@mcompcompositions)->all();
+  }
+
   my $h = {};
-  $h->{$LIB_OUTCOMES} = _map_outcomes(\@lib_outcomes);
-  $h->{$SEQ_OUTCOMES} = _map_outcomes(\@seq_outcomes);
-  $h->{$UQC_OUTCOMES} = _map_outcomes(\@uqc_outcomes);
+  $h->{$LIB_OUTCOMES} = _map_outcomes($QC_OUTCOME,  \@lib_outcomes);
+  $h->{$SEQ_OUTCOMES} = _map_outcomes($QC_OUTCOME,  \@seq_outcomes);
+  $h->{$UQC_OUTCOMES} = _map_outcomes($UQC_OUTCOME, \@uqc_outcomes);
 
   return $h;
 }
@@ -90,6 +89,9 @@ sub save {
   if (!$username) {
     croak q[Username is required];
   }
+  if ($outcomes->{$UQC_OUTCOMES}) {
+    croak 'Saving uqc outcomes is not yet implemented';
+  }
   if ($outcomes->{$SEQ_OUTCOMES} && !$lane_info) {
     croak q[Tag indices for lanes are required];
   }
@@ -97,22 +99,25 @@ sub save {
     croak q[Tag indices for lanes should be a hash ref];
   }
 
-  if (scalar(map { keys %{$outcomes->{$_}} }
-      grep { ref $outcomes->{$_} eq 'HASH'} @OUTCOME_TYPES) == 0) {
-    croak q[No data to save];
+  my @outcome_types = keys %{$outcomes};
+  if (!@outcome_types) {
+    croak 'No data to save',
+  }
+  if (any { my $temp = $_; none {$temp eq $_} @OUTCOME_TYPES } @outcome_types) {
+    croak 'One of outcome types is unknown';
   }
 
-  my $queries = $self->_save_outcomes($outcomes, $username, $lane_info);
-  return $self->get($queries);
+  $self->_save_outcomes($outcomes, $username, $lane_info);
+
+  return $self->get( [map {keys %{$_}} values %{$outcomes}] );
 }
 
 sub _map_outcomes {
-  my $outcomes = shift;
+  my ($rel_name, $outcomes) = @_;
   my $map = {};
   foreach my $o (@{$outcomes}) {
-    my $rel_name = $o->dict_relation();
     $map->{$o->composition()->freeze2rpt()} =
-      { $rel_name => $o->$rel_name->short_desc };
+      { $rel_name => $o->description() };
   }
   return $map;
 }
@@ -121,9 +126,11 @@ sub _save_outcomes {
   my ($self, $outcomes, $username, $lane_info) = @_;
 
   my $actions = sub {
-    my @queries = ();
     foreach my $outcome_type ( @OUTCOME_TYPES ) {
       my $outcomes4type = $outcomes->{$outcome_type} || {};
+      if (ref $outcomes4type ne 'HASH') {
+        croak qq[Outcome for $outcome_type is not a hash ref];
+      }
       foreach my $key ( keys %{$outcomes4type} ) {
         my $o =  $outcomes4type->{$key};
         if (ref $o ne 'HASH') {
@@ -135,19 +142,20 @@ sub _save_outcomes {
         }
 
         try {
-          my $query = npg_tracking::glossary::rpt->inflate_rpt($key);
-          push @queries, $query;
-          my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $query);
-          if ($self->_valid4update($outcome_ent,  $outcome_description)) {
-            if (!$outcome_ent->in_storage) {
-              _link2composition($outcome_ent, $key);
-            }
+          my $composition_obj = _rpt_list2composition($key);
+          if ($composition_obj->num_components > 1) {
+            croak 'Saving outcomes for multi-component compositions is not yet implemented';
+          }
+          my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $composition_obj);
+          if ($self->_valid4update($outcome_ent, $outcome_description)) {
             $outcome_ent->update_outcome($outcome_description, $username);
-            if ($outcome_type eq 'seq' && $outcome_ent->has_final_outcome) {
-              my $rel_name = $outcome_ent->dict_relation();
-              my @lib_outcomes = $self->_create_query($LIB_RS_NAME, $rel_name, $query)->all();
-              $self->_validate_library_outcomes(
-                      $outcome_ent, \@lib_outcomes, $lane_info->{$key});
+            if ($outcome_type eq $SEQ_OUTCOMES && $outcome_ent->has_final_outcome) {
+              my $component = $composition_obj->get_component(0);
+              my @lib_outcomes = $self->_create_query(
+                $LIB_RS_NAME, $QC_OUTCOME,
+                {'id_run' => $component->id_run, 'position' => $component->position}
+                                                     )->all();
+              $self->_validate_library_outcomes($outcome_ent, \@lib_outcomes, $lane_info->{$key});
               $self->_finalise_library_outcomes(\@lib_outcomes, $username);
             }
           }
@@ -156,44 +164,63 @@ sub _save_outcomes {
         };
       }
     }
-    return \@queries;
   };
 
-  return $self->qc_schema->txn_do($actions);
+  $self->qc_schema->txn_do($actions);
+  return;
 }
 
 sub _create_query {
   my ($self, $rsname, $dict_rel_name, $query) = @_;
   my $db_query = $self->qc_schema()->resultset($rsname)
                                    ->search({}, {'join' => $dict_rel_name})
-                                   ->search_autoqc($query);
+                                   ->search_autoqc($query, 1);
+  return $db_query;
+}
+
+sub _create_query4compositions {
+  my ($self, $rsname, $dict_rel_name, $compositions) = @_;
+  my $db_query = $self->qc_schema()->resultset($rsname)
+                                   ->search({}, {'join' => $dict_rel_name})
+                                   ->search_via_composition($compositions);
   return $db_query;
 }
 
 sub _find_or_new_outcome {
-  my ($self, $outcome_type, $query) = @_;
+  my ($self, $outcome_type, $composition_obj) = @_;
 
-  if (!$outcome_type || !$query) {
-    croak q[Two arguments required: outcome entity type string and query];
+  if (!$outcome_type || !$composition_obj) {
+    croak q[Two arguments required: outcome entity type string and composition object];
   }
   if ( none {$_ eq $outcome_type} @OUTCOME_TYPES ) {
     croak qq[Unknown outcome entity type '$outcome_type'];
   }
 
-  my $q = { %{$query} };
   my $rs_name = $outcome_type eq $LIB_OUTCOMES ? $LIB_RS_NAME : $SEQ_RS_NAME;
   my $rs = $self->qc_schema()->resultset($rs_name);
+
+  my $seq_composition = $rs->find_or_create_seq_composition($composition_obj);
+  my $q = {'id_seq_composition' => $seq_composition->id_seq_composition()};
   my $rs_found = $rs->search_autoqc($q);
   my $result = $rs_found->next;
   if (!$result) {
     # Create result object in memory.
-    # Foreign key constraints are not checked at this point.
-    $rs->deflate_unique_key_components($q); # Changes $q hash
-    $result=$rs->new_result($q);
-  } else { # Existing database record is found.
-    if ($rs_found->next) {
-      croak q[Multiple qc outcomes where one is expected];
+    if ($composition_obj->num_components() == 1) {
+      my %columns = map { $_ => 1 } $rs->result_source()->columns();
+      if (exists $columns{'id_run'}) {
+        my $component = $composition_obj->get_component(0);
+        $q->{'id_run'}   = $component->id_run();
+        $q->{'position'} = $component->position();
+        if (defined $component->tag_index()) {
+          if (exists $columns{'tag_index'}) {
+            $q->{'tag_index'} = $component->tag_index();
+          } else {
+            croak qq[Defined tag index value is incompatible with outcome type $outcome_type];
+          }
+        }
+      }
     }
+    $result=$rs->new_result($q);
   }
 
   return $result;
@@ -202,25 +229,19 @@ sub _find_or_new_outcome {
 sub _valid4update {
   my ($self, $row, $outcome_desc) = @_;
   if ($row->in_storage) {
-    if ($row->mqc_outcome->short_desc eq $outcome_desc) {
+    if ($row->description() eq $outcome_desc) {
       return 0;
-    } elsif ($row->has_final_outcome) {
+    } elsif ($row->has_final_outcome()) {
       croak q[Final outcome cannot be updated];
     }
   }
   return 1;
 }
 
-sub _link2composition {
-  my ($outcome_ent, $rpt_key) = @_;
-  my $composition_obj = npg_tracking::glossary::composition::factory::rpt_list
-                          ->new(rpt_list => $rpt_key)
-                          ->create_composition();
-  my $rs = $outcome_ent->result_source()->resultset();
-  my $seq_composition = $rs->find_or_create_seq_composition($composition_obj);
-  my $fk_column_name  = $rs->composition_fk_column_name();
-  $outcome_ent->$fk_column_name($seq_composition->$fk_column_name);
-  return;
+sub _rpt_list2composition {
+  my $rpt_list = shift;
+  return npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => $rpt_list)->create_composition();
 }
 
 sub _finalise_library_outcomes {
@@ -296,28 +317,33 @@ DBIx npg qc schema object, required attribute.
 
 =head2 get
 
-Takes an array of queries. Each query hash should contain at least the 'id_run'
-and 'position' keys and can also contain the 'tag_index' key.
+Takes an array of rpt list strings as an argument.
 
 Returns simple representations of rows hashed first on three type of
 outcomes: 'lib' for library outcomes, 'seq' for sequencing outcomes
 and 'uqc' for the user utility outcomes check, and then on rpt list string keys.
 
   use Data::Dumper;
-  print Dumper $obj->get([{id_run=>5,position=>3,tag_index=>7});
 
+  print Dumper $obj->get([qw(5:3:7)]);
   $VAR1 = {
     'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
     'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
     'uqc' => {'5:3:7' => {'mqc_outcome' => 'Rejected'}}
           };
 
-For a query with id_run and position the sequencing lane outcome and all known
-library outcomes for this position are returned. For a query with id_run,
-position and tag_index both the sequencing lane outcome and library outcome are
-returned.
-For the uqc_outcomes, any level outcomes for a lane are returned, whether the
-query was for a lane or plex-level result.
+  print Dumper $obj->get([qw(5:3)]);
+  $VAR1 = {
+    'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
+    'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
+    'uqc' => {'5:3:7' => {'mqc_outcome' => 'Rejected'}}
+          };
+
+If an rpt list represents a single-component composition, all level outcomes
+are returned, whether the query was for a lane or plex-level result. 
+
+If an rpt list represents a multi-component composition, the result returned
+is exactly for the entity represented by this composition.
 
 =head2 save
 
@@ -335,7 +361,7 @@ for any other tag indexes should not be present.
 
 All arguments are required.
 
-The method returns the data identical for to return value of the get method for the
+The method returns the data identical to the return value of the get method for the
 entities specifies in the first argument.
 
 =head1 DIAGNOSTICS
@@ -359,8 +385,6 @@ entities specifies in the first argument.
 =item Carp
 
 =item Try::Tiny
-
-=item npg_tracking::glossary::rpt
 
 =item npg_tracking::glossary::composition::factory::rpt_list
 

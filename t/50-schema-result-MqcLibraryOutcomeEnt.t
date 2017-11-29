@@ -156,7 +156,7 @@ subtest 'insert with historic' => sub {
 };
 
 subtest q[update] => sub {
-  plan tests => 50;
+  plan tests => 51;
 
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
@@ -177,6 +177,7 @@ subtest q[update] => sub {
   ok (!$new_row->has_final_outcome, 'not final outcome');
   ok ($new_row->is_accepted, 'is accepted');
   ok (!$new_row->is_final_accepted, 'not final accepted');
+  is ($new_row->description, 'Accepted preliminary', 'outcome description');
 
   for my $row (($new_row, $hist_new_row)) {
     is ($row->mqc_outcome->short_desc(), $outcome, 'correct prelim. outcome');
