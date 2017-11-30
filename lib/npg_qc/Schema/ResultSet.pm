@@ -37,6 +37,16 @@ sub search_autoqc {
   return $self->search_rs($values, $how);
 }
 
+sub search_via_composition {
+  my ($self, $compositions) = @_;
+
+  $compositions ||= [];
+  my $query = @{$compositions}
+    ? {'seq_composition.digest' => [map { $_->digest } @{$compositions}]}
+    : {};
+  return $self->search_rs($query,{'prefetch' => 'seq_composition'});
+}
+
 sub deflate_unique_key_components {
   my ($self, $values, $only_existing) = @_;
 
@@ -213,37 +223,20 @@ A parent class for ResultSet objects in npg_qc::Schema DBIx binding.
 
 =head2 search_autoqc
 
-Transparently searches for autoqc objects irrespectedly of their database
-implementation, i.e. the objects might have id_run, position, etc. values
-in the table with the data or they can just link to the seq_composition table.
+Search for tables that are linked to the seq_composition table.
+A ResultSet object is returned in any context.
 
-A ResultSet is returned in any context. The "cache" option is enabled for
-the query.
-
-The "size" argument is ignored if the table with the data is not linked
-to the seq_composition table.
+The "size" argument, if defined and evaluated to true, limits the results
+to compositions with the number of components equal to the value of the argument.
 
   my $rset = $rs->search_autoqc($query, $size);
 
-Example for a table that is not linked to the seq_composition table.
-
-  my $schema = npg_qc::Schema->connect();
-  my $srs = $schema->resultset("InsertSize");
-
-  # all rows for a lane
-  $srs->search_autoqc({id_run => 17967, position => 1 });
-  # all rows for a lane
-  $srs->search_autoqc({id_run => 17967, position => 1 });
-  # rows for a lane-level result
-  $srs->search_autoqc({id_run => 17967, position => 1, tag_index => undef });
-  # rows for tag 45 results
-  $srs->search_autoqc({id_run => 17967, position => 1, tag_index => 45 });
-
-If the table is linked to the seq_composition table and the "size" argument is not
-defined or is zero, the search will be for all compositions that have a
-component defined by the search query - the first argument.
-
-Example for a table that is linked to the seq_composition table.
+If the "size" argument is not defined or is zero, the search will be for all
+compositions that have a component defined by the search query - the first argument.
+The query parameters might be any attributes of the component (columns of
+the seq_component table). The query keys that do not match columns of the
+seq_component table are assumed to be the names of the columns in the table
+this resultset object represents.
 
   $srs = $schema->resultset("SequenceSummary");
 
@@ -262,6 +255,24 @@ Example for a table that is linked to the seq_composition table.
   # rows for tag 45 results, default subset where the component the query defines is one of two components
   $srs->search_autoqc({id_run => 17967, position => 1, tag_index => 45, subset => 'phix' }, size => 2);
 
+=head2 search_via_composition
+
+Search for tables that are linked to the seq_composition table.
+A ResultSet object for this resultset is returned in any context.
+
+The only argument is an array of npg_tracking::glossary::composition composition
+objects, which might be empty or undefined. For each composition object the 
+search brings either one or none table rows.
+
+  $rs->search_via_composition($composition);
+
+If compositions array is empty or undefined, all table rows are returned.
+
+  $rs->search_via_composition();
+ 
+Gives an error if this resultset does not have a relationship to
+the seq_composition table.
+
 =head2 deflate_unique_key_components
 
 Takes a hash key reference of column names and column values,
@@ -279,21 +290,21 @@ not in the hash.
 
 =head2 find_seq_composition
 
- Given a npg_tracking::glossary::composition object, finds a database
- record for this composition. Id found, a npg_qc::Schema::Result::SeqComposition
- row is returned, otherwise an undefined value is returned.
+Given a npg_tracking::glossary::composition object, finds a database
+record for this composition. Id found, a npg_qc::Schema::Result::SeqComposition
+row is returned, otherwise an undefined value is returned.
 
 =head2 find_or_create_seq_composition
 
- A factory method. Given a npg_tracking::glossary::composition object,
- either finds a database record for this composition or creates one.
- A found or created npg_qc::Schema::Result::SeqComposition row is
- returned. If a row is created, all relevant (not already existing)
- component rows are created and a a record is created in a linking table
- for every component-composition pair.
+A factory method. Given a npg_tracking::glossary::composition object,
+either finds a database record for this composition or creates one.
+A found or created npg_qc::Schema::Result::SeqComposition row is
+returned. If a row is created, all relevant (not already existing)
+component rows are created and a a record is created in a linking table
+for every component-composition pair.
 
- Gives an error if this resultset does not have a relationship to
- the seq_composition table.
+Gives an error if this resultset does not have a relationship to
+the seq_composition table.
 
 =head2 composition_fk_column_name
 

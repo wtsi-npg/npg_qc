@@ -1,13 +1,12 @@
 package npg_qc::Schema::Mqc::OutcomeDict;
 
 use Moose::Role;
-use Carp;
 use Readonly;
 
-my $FINAL       = 'final';
-my $PRELIMINARY = 'preliminary';
-
 our $VERSION = '0';
+
+Readonly::Scalar my $FINAL       => 'final';
+Readonly::Scalar my $PRELIMINARY => 'preliminary';
 
 sub is_final_outcome_description {
   my ($self, $desc) = @_;
@@ -144,7 +143,7 @@ __END__
 
 =item Moose::Role
 
-=item Carp
+=item Readonly
 
 =back
 
@@ -158,7 +157,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd
+Copyright (C) 2017 Genome Research Ltd
 
 This file is part of NPG.
 
