@@ -103,30 +103,31 @@ define([
      * var callAfterGettingOutcomes = function (data) {
      *      launchUtilityQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);
      * }
-     * addUQCAnnotationLink(callAfterGettingOutcomes);
+     * addUQCLink(callAfterGettingOutcomes);
      *
      */
-    QC.addUQCAnnotationLink = function (callback) {
-      var $UQC_ANNOTATION_CONTAINER = $("#summary_to_csv").parent().parent();
+    QC.addUQCLink = function (callback) {
+      var $UQC_LINK_CONTAINER = $("#summary_to_csv").parent().parent();
 
-      $UQC_ANNOTATION_CONTAINER.before('<ul><li><a id="uqcClickable" href="">UQC annotation</a></li></ul>');
+      if (typeof callback === 'undefined' || typeof callback !== 'function') {
+        throw new Error('Error: A defined callback function is required as parameter');  
+      }
+
+      $UQC_LINK_CONTAINER.before('<ul><li><a id="uqcClickable" href="">Utility QC</a></li></ul>');
       $("#uqcClickable").on("click", function(event) {
         event.stopPropagation() ;
         event.preventDefault();
-        var nonUQCableElements = 0;
+        var UQCableElements = 0;
         $(MQC_ABLE_CLASS).each(function (index, element) {
-          if (!NPG.QC.isElementUQCable(element)){
-            nonUQCableElements ++;
+          if (NPG.QC.isElementUQCable(element)){
+            UQCableElements ++;
           }
         });
-        if (nonUQCableElements === $(MQC_ABLE_CLASS).length){
-          alert("\t     Only single plex lanes can be annotated.\t\n" +
-                "\tTo annotate the plexes for any of these lanes follow\t\n" +
-                "\t  the link to the corresponding runs and lane page.\t");
+        if (UQCableElements === 0) {
+          alert("\tNothing subject to uqc in this page.\t\n" +
+                 "\t      Try a page with plexes.      \t");
         } else {
-           if (typeof callback !== 'undefined' && typeof callback === 'function') {
-             callback();
-           }
+           callback();
            $("#uqcClickable").closest('ul').remove();
         }
       });

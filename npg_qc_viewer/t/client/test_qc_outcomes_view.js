@@ -531,22 +531,29 @@ requirejs([
 
     });
 
-    QUnit.test("Clickable link UQC annotation", function (assert) {
+    QUnit.test("Clickable UQC link ", function (assert) {
       var page_fixture = fixtures.fixtures_menu_links;
-      var nbAnnotationLinks = $("#uqcClickable").length;
+      var nbUQCLinks = $("#uqcClickable").length;
       var container = "#menu #links";
 
       $('#qunit-fixture').after(page_fixture);
-      assert.equal(nbAnnotationLinks, 0, 'No preexisting annotation Link');
-      NPG.QC.addUQCAnnotationLink (null);
-      nbAnnotationLinks = $(" #uqcClickable").length;
-      assert.equal(nbAnnotationLinks, 1, 'Annotation Link present after call');
-      nbAnnotationLinks = $(container + " #uqcClickable").length;
-      assert.equal(nbAnnotationLinks, 1, 'Annotation Link is at the expected container');
+      assert.throws(function() {NPG.QC.addUQCLink ();},
+                    /Error: A defined callback function is required as parameter/, 
+                    "Throws error when no callback function is passed");
+      var callback = 3;
+      assert.throws(function() {NPG.QC.addUQCLink (callback);},
+                     /Error: A defined callback function is required as parameter/, 
+                     "Throws error when callback is not a function");               
+      assert.equal(nbUQCLinks, 0, 'No preexisting annotation Link');
+      NPG.QC.addUQCLink (function() {});
+      nbUQCLinks = $(" #uqcClickable").length;
+      assert.equal(nbUQCLinks, 1, 'Annotation Link present after call');
+      nbUQCLinks = $(container + " #uqcClickable").length;
+      assert.equal(nbUQCLinks, 1, 'Annotation Link is at the expected container');
       
       $('#uqcClickable').trigger('click');
-      nbAnnotationLinks = $("#uqcClickable").length;
-      assert.equal(nbAnnotationLinks, 0, 'Annotation Link is removed after clicking on it');
+      nbUQCLinks = $("#uqcClickable").length;
+      assert.equal(nbUQCLinks, 0, 'Annotation Link is removed after clicking on it');
 
       $("#fixture_sample_data").remove();
       var plexesRows = [
@@ -569,10 +576,10 @@ requirejs([
           targetId + 'has children and therefore is not uqc_able');
       });
       var calledOnClick = false;
-      var callback = function () {
+      callback = function () {
         calledOnClick = true;
       };
-      NPG.QC.addUQCAnnotationLink (callback);
+      NPG.QC.addUQCLink (callback);
       $('#uqcClickable').trigger('click');
       assert.ok(!calledOnClick, 'Instead of callback(), warning appears when page only have no uqc_able lanes');
     });
@@ -587,7 +594,7 @@ requirejs([
 
       $("#fixture_sample_data").remove();
       $('#qunit-fixture').after(page_fixture);                 
-      NPG.QC.addUQCAnnotationLink (function() {
+      NPG.QC.addUQCLink (function() {
                                     NPG.QC.launchUtilityQCProcesses(true, qcOutcomes);
                                   });
       var nbOfMQCAbleElements = $(MQC_ABLE_CLASS).length;
@@ -625,7 +632,7 @@ requirejs([
 
       $("#fixture_sample_data").remove();
       $('#qunit-fixture').after(page_fixture);
-      NPG.QC.addUQCAnnotationLink (function() {
+      NPG.QC.addUQCLink (function() {
                                     NPG.QC.launchUtilityQCProcesses(true, qcOutcomes);
                                   });
        
@@ -675,7 +682,7 @@ requirejs([
 
       $("#fixture_sample_data").remove();
       $('#qunit-fixture').after(page_fixture);
-      NPG.QC.addUQCAnnotationLink(function() {
+      NPG.QC.addUQCLink(function() {
                                    NPG.QC.launchUtilityQCProcesses(true, qcOutcomes);
                                  });
       var nbOfMQCAbleElements = $(MQC_ABLE_CLASS).length;
