@@ -121,7 +121,6 @@ lib/npg_qc/Schema/Result/FrequencyResponseMatrix.pm
 lib/npg_qc/Schema/Result/GcBias.pm
 lib/npg_qc/Schema/Result/GcFraction.pm
 lib/npg_qc/Schema/Result/Genotype.pm
-lib/npg_qc/Schema/Result/InformationContentByCycle.pm
 lib/npg_qc/Schema/Result/InsertSize.pm
 lib/npg_qc/Schema/Result/InstrumentStatistic.pm
 lib/npg_qc/Schema/Result/LaneQc.pm
@@ -155,7 +154,6 @@ lib/npg_qc/Schema/Result/SplitStats.pm
 lib/npg_qc/Schema/Result/TagDecodeStats.pm
 lib/npg_qc/Schema/Result/TagMetrics.pm
 lib/npg_qc/Schema/Result/TagsReporters.pm
-lib/npg_qc/Schema/Result/TileScore.pm
 lib/npg_qc/Schema/Result/UpstreamTags.pm
 lib/npg_qc/Schema/Result/UqcOutcomeDict.pm
 lib/npg_qc/Schema/Result/UqcOutcomeEnt.pm
