@@ -1,6 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - stop generating unused DBIx classes
+ - stop generating DBIx classes for unused tables
  - ensure, where practical, that saving and retrieving qc outcomes
      works for multi-component compositions
  - add functionality to allow more columns to be added to table dynamically

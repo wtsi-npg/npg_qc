@@ -1,5 +1,5 @@
 
-package npg_qc::Schema::Result::RunTile;
+package npg_qc::Schema::Result::MoveZ;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
@@ -8,7 +8,7 @@ package npg_qc::Schema::Result::RunTile;
 
 =head1 NAME
 
-npg_qc::Schema::Result::RunTile - table linking a tile to a run and lane position
+npg_qc::Schema::Result::MoveZ
 
 =cut
 
@@ -44,173 +44,149 @@ use namespace::autoclean;
 
 __PACKAGE__->load_components('InflateColumn::DateTime');
 
-=head1 TABLE: C<run_tile>
+=head1 TABLE: C<move_z>
 
 =cut
 
-__PACKAGE__->table('run_tile');
+__PACKAGE__->table('move_z');
 
 =head1 ACCESSORS
 
-=head2 id_run_tile
+=head2 id_move_z
 
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 id_run
+=head2 id_run_tile
 
   data_type: 'bigint'
   extra: {unsigned => 1}
+  is_foreign_key: 1
   is_nullable: 0
 
-=head2 tile
+=head2 cycle
 
   data_type: 'smallint'
   extra: {unsigned => 1}
   is_nullable: 0
 
-=head2 position
-
-  data_type: 'tinyint'
-  extra: {unsigned => 1}
-  is_nullable: 0
-
-=head2 end
-
-  data_type: 'char'
-  is_nullable: 0
-  size: 1
-
-=head2 row
+=head2 currentz
 
   data_type: 'smallint'
-  extra: {unsigned => 1}
-  is_nullable: 1
+  is_nullable: 0
 
-=head2 col
+=head2 targetz
+
+  data_type: 'smallint'
+  is_nullable: 0
+
+=head2 newz
+
+  data_type: 'smallint'
+  is_nullable: 0
+
+=head2 start
+
+  data_type: 'bigint'
+  is_nullable: 0
+
+=head2 stop
+
+  data_type: 'bigint'
+  is_nullable: 0
+
+=head2 move
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 1
-
-=head2 avg_newz
-
-  data_type: 'float'
-  is_nullable: 1
+  is_nullable: 0
 
 =cut
 
 __PACKAGE__->add_columns(
-  'id_run_tile',
+  'id_move_z',
   {
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'tile',
+  'id_run_tile',
+  {
+    data_type => 'bigint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
+  'cycle',
   { data_type => 'smallint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'position',
+  'currentz',
+  { data_type => 'smallint', is_nullable => 0 },
+  'targetz',
+  { data_type => 'smallint', is_nullable => 0 },
+  'newz',
+  { data_type => 'smallint', is_nullable => 0 },
+  'start',
+  { data_type => 'bigint', is_nullable => 0 },
+  'stop',
+  { data_type => 'bigint', is_nullable => 0 },
+  'move',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'end',
-  { data_type => 'char', is_nullable => 0, size => 1 },
-  'row',
-  { data_type => 'smallint', extra => { unsigned => 1 }, is_nullable => 1 },
-  'col',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
-  'avg_newz',
-  { data_type => 'float', is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
 
 =over 4
 
-=item * L</id_run_tile>
+=item * L</id_move_z>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key('id_run_tile');
+__PACKAGE__->set_primary_key('id_move_z');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<unq_idx_rt_idrun_end_position_tile>
+=head2 C<unq_idx_movez_rt_cycle>
 
 =over 4
 
-=item * L</id_run>
+=item * L</id_run_tile>
 
-=item * L</end>
-
-=item * L</position>
-
-=item * L</tile>
+=item * L</cycle>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint(
-  'unq_idx_rt_idrun_end_position_tile',
-  ['id_run', 'end', 'position', 'tile'],
-);
+__PACKAGE__->add_unique_constraint('unq_idx_movez_rt_cycle', ['id_run_tile', 'cycle']);
 
 =head1 RELATIONS
 
-=head2 errors_by_cycle
+=head2 run_tile
 
-Type: has_many
+Type: belongs_to
 
-Related object: L<npg_qc::Schema::Result::ErrorsByCycle>
-
-=cut
-
-__PACKAGE__->has_many(
-  'errors_by_cycle',
-  'npg_qc::Schema::Result::ErrorsByCycle',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 lane_qcs
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::LaneQc>
+Related object: L<npg_qc::Schema::Result::RunTile>
 
 =cut
 
-__PACKAGE__->has_many(
-  'lane_qcs',
-  'npg_qc::Schema::Result::LaneQc',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 moves_z
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::MoveZ>
-
-=cut
-
-__PACKAGE__->has_many(
-  'moves_z',
-  'npg_qc::Schema::Result::MoveZ',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
+__PACKAGE__->belongs_to(
+  'run_tile',
+  'npg_qc::Schema::Result::RunTile',
+  { id_run_tile => 'id_run_tile' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-12-01 15:10:03
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:QcWZ7cxL1blhXip4RLAhAg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-12-01 15:01:58
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0hs576BT8ShKx6VhOC/xTA
+
+
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 
 our $VERSION = '0';
 

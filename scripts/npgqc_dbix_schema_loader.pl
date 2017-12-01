@@ -64,12 +64,11 @@ make_schema_at(
                          analysis_lane_qcal    |
                          cumulative_errors_    |
                          error_rate_           |
-                         errors_by             |
+                         errors_by_(?:\w+)?nucleotide |
                          image_store           |
                          information_content_  |
                          log_likelihood        |
                          most_common_          |
-                         move_z                |
                          ref_snp_info          |
                          run_and_pair          |
                          run_config            |
