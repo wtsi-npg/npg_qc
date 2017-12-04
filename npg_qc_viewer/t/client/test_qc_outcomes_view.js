@@ -532,6 +532,7 @@ requirejs([
     });
 
     QUnit.test("Clickable UQC link ", function (assert) {
+
       var page_fixture = fixtures.fixtures_menu_links;
       var nbUQCLinks = $("#uqcClickable").length;
       var container = "#menu #links";

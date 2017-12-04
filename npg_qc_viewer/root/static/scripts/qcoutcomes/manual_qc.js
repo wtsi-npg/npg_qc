@@ -91,48 +91,47 @@ define([
     };
 
     /*
-     * This function adds a clickable link to the page's menu, which on click activates the function 'callback'.
-     * The link is only added if there is at least an uqc annotabe element.
-     *
-     * It requires one argument: 
-     * @param {function} 'callback' - The function that will be called when the link is clicked. 
-     * This function is expected to process the annotation of the end user's utility.  
-     *
-     * Example:
-     *
-     * var callAfterGettingOutcomes = function (data) {
-     *      launchUtilityQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);
-     * }
-     * addUQCLink(callAfterGettingOutcomes);
-     *
-     */
+    * This function adds a clickable link to the page's menu, which on click activates the function 'callback'.
+    * The link is only added if there is at least an uqc annotabe element.
+    *
+    * It requires one argument: 
+    * @param {function} 'callback' - The function that will be called when the link is clicked. 
+    * This function is expected to process the annotation of the end user's utility.  
+    *
+    * Example:
+    *
+    * var callAfterGettingOutcomes = function (data) {
+    *      launchUtilityQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);
+    * }
+    * addUQCLink(callAfterGettingOutcomes);
+    *
+    */
     QC.addUQCLink = function (callback) {
-      var $UQC_LINK_CONTAINER = $("#summary_to_csv").parent().parent();
-
       if (typeof callback === 'undefined' || typeof callback !== 'function') {
-        throw new Error('Error: A defined callback function is required as parameter');  
+        throw new Error('Error: A defined callback function is required as parameter.');  
       }
-
-      $UQC_LINK_CONTAINER.before('<ul><li><a id="uqcClickable" href="">Utility QC</a></li></ul>');
-      $("#uqcClickable").on("click", function(event) {
-        event.stopPropagation() ;
-        event.preventDefault();
-        var UQCableElements = 0;
+      var $UQC_LINK_CONTAINER = $("#summary_to_csv").parent().parent() ;
+      if (typeof $UQC_LINK_CONTAINER === 'undefined') {
+        throw new Error('Error: The UQC Link placeholder could not be found.');  
+      }
+      var UQC_LINK_ID = 'uqcClickable';
+      $UQC_LINK_CONTAINER.before('<ul><li><a id=' + UQC_LINK_ID + ' href="">Utility QC</a></li></ul>');
+      $("#" + UQC_LINK_ID).on("click", function(event) {
+        var UqcCount = 0;
         $(MQC_ABLE_CLASS).each(function (index, element) {
           if (NPG.QC.isElementUQCable(element)){
-            UQCableElements ++;
+            UqcCount ++;
           }
         });
-        if (UQCableElements === 0) {
-          alert("\tNothing subject to uqc in this page.\t\n" +
-                 "\t      Try a page with plexes.      \t");
+        if (UqcCount === 0) {
+          alert("Nothing subject to UQC in this page, try a page with plexes.");
         } else {
-           callback();
-           $("#uqcClickable").closest('ul').remove();
+          callback();
+          $("#" + UQC_LINK_ID).closest('ul').remove();
         }
       });
     };
-    
+
     //This method takes an element from a table row and returns true if the lane contains children
     QC.isElementUQCable = function (element) {
       return $(element).closest('tr').find('img[alt="link to tags"]').length == 0;
@@ -255,7 +254,7 @@ define([
                 $elementToMark = $($libraryBrElement.prev());
               }
 
-              var outcome = undefined ;
+              var outcome ;
               if (typeof uqcOutcomes !== 'undefined' && 
                   typeof uqcOutcomes[rptKey] !== 'undefined') {
                 outcome = uqcOutcomes[rptKey].uqc_outcome;

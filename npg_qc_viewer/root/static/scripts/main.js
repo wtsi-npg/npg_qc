@@ -63,7 +63,7 @@ requirejs([
         NPG.QC.launchManualQCProcesses(isRunPage, data, QC_OUTCOMES);}
     } else if (qcp.isPageForUQC) {
       callAfterGettingOutcomes = function () { 
-        NPG.QC.addUQCAnnotationLink( function() {
+        NPG.QC.addUQCLink( function() {
           qc_outcomes_view.fetchAndProcessQC(TABLE,
                                              QC_OUTCOMES, 
                                              function (data) {
