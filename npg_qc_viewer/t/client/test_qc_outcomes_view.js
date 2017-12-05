@@ -532,24 +532,34 @@ requirejs([
     });
 
     QUnit.test("Clickable UQC link ", function (assert) {
-
+      var $UQC_LINK_PLACEHOLDER = $("#summary_to_csv").parent().parent() ;
       var page_fixture = fixtures.fixtures_menu_links;
       var nbUQCLinks = $("#uqcClickable").length;
-      var container = "#menu #links";
-
+      var MENU_PLACEHODER = "#menu #links";
       $('#qunit-fixture').after(page_fixture);
-      assert.throws(function() {NPG.QC.addUQCLink ();},
+      $UQC_LINK_PLACEHOLDER = $("#summary_to_csv").parent().parent() ;
+      assert.equal($UQC_LINK_PLACEHOLDER.length, 1, 'UQC_LINK_PLACEHOLDER is present');
+      assert.throws(
+                    function() {
+                      NPG.QC.addUQCLink ();
+                    },
                     /Error: A defined callback function is required as parameter/, 
-                    "Throws error when no callback function is passed");
+                    "Throws error when no callback function is passed"
+                    );
+
       var callback = 3;
-      assert.throws(function() {NPG.QC.addUQCLink (callback);},
+      assert.throws(
+                    function() {
+                      NPG.QC.addUQCLink (callback);
+                    },
                      /Error: A defined callback function is required as parameter/, 
-                     "Throws error when callback is not a function");               
+                     "Throws error when callback is not a function");
+
       assert.equal(nbUQCLinks, 0, 'No preexisting annotation Link');
       NPG.QC.addUQCLink (function() {});
       nbUQCLinks = $(" #uqcClickable").length;
       assert.equal(nbUQCLinks, 1, 'Annotation Link present after call');
-      nbUQCLinks = $(container + " #uqcClickable").length;
+      nbUQCLinks = $( MENU_PLACEHODER + " #uqcClickable").length;
       assert.equal(nbUQCLinks, 1, 'Annotation Link is at the expected container');
       
       $('#uqcClickable').trigger('click');
@@ -578,8 +588,8 @@ requirejs([
       });
       var calledOnClick = false;
       callback = function () {
-        calledOnClick = true;
-      };
+                   calledOnClick = true;
+                };
       NPG.QC.addUQCLink (callback);
       $('#uqcClickable').trigger('click');
       assert.ok(!calledOnClick, 'Instead of callback(), warning appears when page only have no uqc_able lanes');
@@ -595,9 +605,10 @@ requirejs([
 
       $("#fixture_sample_data").remove();
       $('#qunit-fixture').after(page_fixture);                 
-      NPG.QC.addUQCLink (function() {
-                                    NPG.QC.launchUtilityQCProcesses(true, qcOutcomes);
-                                  });
+      NPG.QC.addUQCLink (
+                        function() {
+                          NPG.QC.launchUtilityQCProcesses(true, qcOutcomes, '/someUrl');
+                        });
       var nbOfMQCAbleElements = $(MQC_ABLE_CLASS).length;
       assert.equal(nbOfMQCAbleElements, 6, '6 MQC markup present initially');
       $(qc_utils.buildIdSelectorFromRPT("19001:1:1") + " " + MQC_ABLE_CLASS).remove();
@@ -633,9 +644,10 @@ requirejs([
 
       $("#fixture_sample_data").remove();
       $('#qunit-fixture').after(page_fixture);
-      NPG.QC.addUQCLink (function() {
-                                    NPG.QC.launchUtilityQCProcesses(true, qcOutcomes);
-                                  });
+      NPG.QC.addUQCLink (
+                         function() {
+                           NPG.QC.launchUtilityQCProcesses(true, qcOutcomes, '/someUrl');
+                         });
        
       var uqcAbleElements = [];
       var uqcInd = 0;
@@ -683,9 +695,10 @@ requirejs([
 
       $("#fixture_sample_data").remove();
       $('#qunit-fixture').after(page_fixture);
-      NPG.QC.addUQCLink(function() {
-                                   NPG.QC.launchUtilityQCProcesses(true, qcOutcomes);
-                                 });
+      NPG.QC.addUQCLink (
+                         function() {
+                           NPG.QC.launchUtilityQCProcesses(true, qcOutcomes, '/someUrl');
+                         });
       var nbOfMQCAbleElements = $(MQC_ABLE_CLASS).length;
       assert.equal(nbOfMQCAbleElements, 6, '6 markup present initially');
       $('#uqcClickable').trigger('click');
