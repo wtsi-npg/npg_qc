@@ -539,8 +539,8 @@ requirejs([
                   function() {
                     NPG.QC.addUQCLink (callback);
                   },
-                  /Error: The UQC Link placeholder could not be found./, 
-                  "Throws error when the UQC Link placeholder is not found"
+                  /The UQC Link placeholder could not be found./, 
+                  "Throws when the UQC Link placeholder is not found"
                   );
 
       var page_fixture = fixtures.fixtures_menu_links;
@@ -553,8 +553,8 @@ requirejs([
                     function() {
                       NPG.QC.addUQCLink ();
                     },
-                    /Error: A defined callback function is required as parameter/, 
-                    "Throws error when no callback function is passed"
+                    /A defined callback function is required as parameter/, 
+                    "Throws when no callback function is passed"
                     );
 
       callback = 3;
@@ -562,8 +562,8 @@ requirejs([
                     function() {
                       NPG.QC.addUQCLink (callback);
                     },
-                     /Error: A defined callback function is required as parameter/, 
-                     "Throws error when callback is not a function");
+                     /A defined callback function is required as parameter/, 
+                     "Throws when callback is not a function");
 
       assert.equal(nbUQCLinks, 0, 'No preexisting annotation Link');
       NPG.QC.addUQCLink (function() {});
