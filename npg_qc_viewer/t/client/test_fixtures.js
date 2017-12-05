@@ -235,7 +235,7 @@ define([], function () {
         '<div id="links">',
           '<ul><li><a href="#" id="summary_to_csv">Summary to CSV file</a></li></ul>',
         '</div>',
-      '</div>'
+    '</div>'
   ].join("\n");
 
   return {
