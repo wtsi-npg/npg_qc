@@ -111,12 +111,14 @@ define([
         throw new Error('Error: A defined callback function is required as parameter.');  
       }
       var $UQC_LINK_CONTAINER = $("#summary_to_csv").parent().parent() ;
-      if (typeof $UQC_LINK_CONTAINER === 'undefined') {
+      if ($UQC_LINK_CONTAINER.length === 0) {
         throw new Error('Error: The UQC Link placeholder could not be found.');  
       }
       var UQC_LINK_ID = 'uqcClickable';
       $UQC_LINK_CONTAINER.before('<ul><li><a id=' + UQC_LINK_ID + ' href="">Utility QC</a></li></ul>');
       $("#" + UQC_LINK_ID).on("click", function(event) {
+        event.preventDefault();
+        event.stopPropagation();
         var UqcCount = 0;
         $(MQC_ABLE_CLASS).each(function (index, element) {
           if (NPG.QC.isElementUQCable(element)){
@@ -134,7 +136,7 @@ define([
 
     //This method takes an element from a table row and returns true if the lane contains children
     QC.isElementUQCable = function (element) {
-      return $(element).closest('tr').find('img[alt="link to tags"]').length == 0;
+      return $(element).closest('tr').find('img[alt="link to tags"]').length === 0;
     };
 
     QC.launchManualQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
@@ -219,18 +221,20 @@ define([
      * It is called after getting and updating the view with the outcomes from fetchAndProcessQC()
      * @param {boolean} isRunPage - Defines if the page is a run page.
      * @param {hash} qcOutcomes - Hash mapping rtpKeys to qc_outcomes.
-     *
+     * @param {string} qcOutcomesURL - Hash mapping rtpKeys to qc_outcomes.
+
      * @example
      * var callAfterGettingOutcomes = function (data) {
      *     launchUtilityQCProcesses(isRunPage, data);}
      * fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
      * 
      */
-    QC.launchUtilityQCProcesses = function (isRunPage, qcOutcomes) {
+    QC.launchUtilityQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
       var UQC_CONTAINER_STRING = '<span class="' + UQC_CONTROL_CLASS + '"></span>';
       try {
         if ( typeof isRunPage !== 'boolean' ||
-             typeof qcOutcomes !== 'object' ) {
+             typeof qcOutcomes !== 'object' ||
+             typeof qcOutcomesURL !== 'string' ) {
           throw 'Invalid parameter type.';
         }
         var uqcOutcomes = qcOutcomes.uqc;

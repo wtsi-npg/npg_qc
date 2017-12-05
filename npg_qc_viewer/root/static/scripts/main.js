@@ -64,11 +64,12 @@ requirejs([
     } else if (qcp.isPageForUQC) {
       callAfterGettingOutcomes = function () { 
         NPG.QC.addUQCLink( function() {
-          qc_outcomes_view.fetchAndProcessQC(TABLE,
-                                             QC_OUTCOMES, 
-                                             function (data) {
-                                               NPG.QC.launchUtilityQCProcesses(isRunPage, data);
-                                             });
+          qc_outcomes_view.fetchAndProcessQC(
+                     TABLE,
+                     QC_OUTCOMES, 
+                     function (data) {
+                       NPG.QC.launchUtilityQCProcesses(isRunPage, data, QC_OUTCOMES);
+                     });
         });
       }  
     }

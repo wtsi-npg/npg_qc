@@ -533,6 +533,16 @@ requirejs([
 
     QUnit.test("Clickable UQC link ", function (assert) {
       var $UQC_LINK_PLACEHOLDER = $("#summary_to_csv").parent().parent() ;
+      assert.equal($UQC_LINK_PLACEHOLDER.length, 0, 'No $UQC_LINK_PLACEHOLDER');
+      var callback = function() {return true;};
+      assert.throws(
+                  function() {
+                    NPG.QC.addUQCLink (callback);
+                  },
+                  /Error: The UQC Link placeholder could not be found./, 
+                  "Throws error when the UQC Link placeholder is not found"
+                  );
+
       var page_fixture = fixtures.fixtures_menu_links;
       var nbUQCLinks = $("#uqcClickable").length;
       var MENU_PLACEHODER = "#menu #links";
@@ -547,7 +557,7 @@ requirejs([
                     "Throws error when no callback function is passed"
                     );
 
-      var callback = 3;
+      callback = 3;
       assert.throws(
                     function() {
                       NPG.QC.addUQCLink (callback);
