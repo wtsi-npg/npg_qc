@@ -5,6 +5,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - add functionality to allow more columns to be added to table dynamically
  - add data for new extra column for sample_name in summary table
 
+release 64.4.1
+ - fix bam_flagstats check library_size bug
+
 release 64.4 
  - utility QC feature: db tables, DBIx classes, retrieval
  - Add STAR aligner bams as a valid RNA alignments

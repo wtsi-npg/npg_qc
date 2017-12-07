@@ -174,7 +174,7 @@ sub _parse_markdups_metrics {
     if ($field_value) {
       if ($field_value =~/\?/mxs) {
         $field_value = undef;
-      } elsif ($field eq 'library_size' && $field_value < 0) {
+      } elsif ($field eq 'ESTIMATED_LIBRARY_SIZE' && $field_value < 0) {
         if ($field_value == $LIBRARY_SIZE_NOT_AVAILABLE) {
           $field_value = undef;
         } else {
