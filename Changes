@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - ensure, where practical, that saving and retrieving qc outcomes
+     works for multi-component compositions
+ - add functionality to allow more columns to be added to table dynamically
+ - add data for new extra column for sample_name in summary table
+
 release 64.4.1
  - fix bam_flagstats check library_size bug
 

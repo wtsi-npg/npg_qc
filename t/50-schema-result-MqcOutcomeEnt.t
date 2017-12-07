@@ -19,7 +19,7 @@ my $hist_table = 'MqcOutcomeHist';
 my $dict_table = 'MqcOutcomeDict';
 
 subtest 'Misc tests' => sub {
-  plan tests => 35;
+  plan tests => 36;
 
   my $values = {'id_run'         => 1, 
                 'position'       => 1,
@@ -66,7 +66,7 @@ subtest 'Misc tests' => sub {
              'username'       => 'user', 
              'last_modified'  => DateTime->now(),
              'modified_by'    => 'user'};
-   $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run'    => 1,
                           'position'  => 2});
 
@@ -93,12 +93,12 @@ subtest 'Misc tests' => sub {
   is($ent->id_mqc_outcome, 2, 'correct outcome id');
   is($ent->username, $ent->modified_by, 'Username equals modified_by');
 
- $values = {'id_run'         => 220, 
-            'position'       => 1,
-            'id_mqc_outcome' => 3, 
-            'username'       => 'user', 
-            'last_modified'  => DateTime->now(),
-            'modified_by'    => 'user'};
+  $values = {'id_run'         => 220, 
+             'position'       => 1,
+             'id_mqc_outcome' => 3, 
+             'username'       => 'user', 
+             'last_modified'  => DateTime->now(),
+             'modified_by'    => 'user'};
   $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run'    => 220,
                           'position'  => 1});
@@ -160,6 +160,7 @@ subtest 'Misc tests' => sub {
   ok(!$object->has_final_outcome, q[The outcome is not final]);
   is($object->username, 'user', q[username is set correctly]);
   is($object->modified_by, 'randomuser', q[modified_by is set correctly]);
+  ok ($object->description(), 'outcome description is "Accepted preliminary"');
 
   $object->update_outcome('Rejected final', 'new_user', 'RT#356789');
   my $row = $schema->resultset($table)
