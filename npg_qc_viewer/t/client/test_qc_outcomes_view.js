@@ -532,15 +532,16 @@ requirejs([
     });
 
     QUnit.test("Clickable UQC link ", function (assert) {
+      $("#qunit-fixture").prepend("<ul id='ajax_status'></ul>");
       var $UQC_LINK_PLACEHOLDER = $("#summary_to_csv").parent().parent() ;
       assert.equal($UQC_LINK_PLACEHOLDER.length, 0, 'No $UQC_LINK_PLACEHOLDER');
+
       var callback = function() {return true;};
-      assert.throws(
-                  function() {
-                    NPG.QC.addUQCLink (callback);
-                  },
-                  /The UQC Link placeholder could not be found./, 
-                  "Throws when the UQC Link placeholder is not found"
+      NPG.QC.addUQCLink (callback);
+      assert.equal(
+                  $("#ajax_status .failed_mqc").text(),
+                  "The UQC Link could not be added. The Link\'s placeholder could not be found.",
+                  "Warns when the UQC Link placeholder is not found"
                   );
 
       var page_fixture = fixtures.fixtures_menu_links;

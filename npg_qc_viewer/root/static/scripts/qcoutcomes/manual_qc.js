@@ -110,28 +110,33 @@ define([
       if (typeof callback === 'undefined' || typeof callback !== 'function') {
         throw ('A defined callback function is required as parameter.');  
       }
-      var $UQC_LINK_CONTAINER = $("#summary_to_csv").parent().parent() ;
-      if ($UQC_LINK_CONTAINER.length === 0) {
-        throw ('The UQC Link placeholder could not be found.');  
-      }
-      var UQC_LINK_ID = 'uqcClickable';
-      $UQC_LINK_CONTAINER.before('<ul><li><a id=' + UQC_LINK_ID + ' href="">Utility QC</a></li></ul>');
-      $("#" + UQC_LINK_ID).on("click", function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        var uqcCount = 0;
-        $(MQC_ABLE_CLASS).each(function (index, element) {
-          if (NPG.QC.isElementUQCable(element)){
-            uqcCount ++;
+
+      try {
+        var $UQC_LINK_CONTAINER = $("#summary_to_csv").parent().parent() ;
+        if ($UQC_LINK_CONTAINER.length === 0) {
+          throw ('The Link\'s placeholder could not be found.');  
+        }
+        var UQC_LINK_ID = 'uqcClickable';
+        $UQC_LINK_CONTAINER.before('<ul><li><a id=' + UQC_LINK_ID + ' href="">Utility QC</a></li></ul>');
+        $("#" + UQC_LINK_ID).on("click", function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          var uqcCount = 0;
+          $(MQC_ABLE_CLASS).each(function (index, element) {
+            if (NPG.QC.isElementUQCable(element)){
+              uqcCount ++;
+            }
+          });
+          if (uqcCount === 0) {
+            alert("Nothing subject to UQC in this page, try a page with plexes.");
+          } else {
+            callback();
+            $("#" + UQC_LINK_ID).closest('ul').remove();
           }
         });
-        if (uqcCount === 0) {
-          alert("Nothing subject to UQC in this page, try a page with plexes.");
-        } else {
-          callback();
-          $("#" + UQC_LINK_ID).closest('ul').remove();
-        }
-      });
+      } catch (ex) {
+        qc_utils.displayError('The UQC Link could not be added. ' + ex);
+      } 
     };
 
     //This method takes an element from a table row and returns true if the lane contains children
