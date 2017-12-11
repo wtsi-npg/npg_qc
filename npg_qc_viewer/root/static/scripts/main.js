@@ -91,6 +91,7 @@ requirejs([
     e.preventDefault();
     var table_html = $('#' + TABLE)[0].outerHTML;
     var formated_table = format_for_csv.format(table_html);
+    format_for_csv.addDataColumns(formated_table, 'extra_cols_', ['sample_name']);
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
   });
 

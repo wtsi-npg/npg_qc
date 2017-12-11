@@ -37,9 +37,9 @@ Handles GET and POST requests on the /qcoutcomes URL.
 Retrieving records:
 
   curl -X GET -H "Content-type: application/json" -H "Accept: application/json"  \
-    "http://server:5050/qcoutcomes?rpt_list=5%3A8%3A7"&rpt_list=6%3A3"
+    "http://server:5050/qcoutcomes?rpt_list=5%3A8%3A7&rpt_list=6%3A3"
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"rpt_list":["5:8:7","6:3"]}' http://server:5050/qcoutcomes
+    -d '{"5:8:7":{},"6:3":{}}' http://server:5050/qcoutcomes
 
 Updating/creating records:
 
@@ -83,8 +83,7 @@ JSON payload example for retrieving the data
  '{"5:8:7":{},"5:8:6":{},"6:8:7":{},"6:8:6":{}}'
 
 The payload for updating the data has the same structure as this controller's
-reply to outcomes_GET. It is not necessary to set entity identifies, i.e.
-the following payload is valid:
+reply to outcomes_GET.
 
  '{"Action":"UPDATE","seq":{"5:8":{"mqc_outcome":"Undecided"}}}'.
 
@@ -119,12 +118,10 @@ sub _get_outcomes {
      );
   } else {
      try {
-       my $obj = npg_qc::mqc::outcomes->new(qc_schema => $c->model('NpgQcDB')->schema());
-       # TODO: Using private method - to be revisited.
-       my @qlist = map { _rpt_list2composition($_)->get_component(0)->_pack_custom() }
-                   @{$rpt_lists};
        $self->status_ok($c,
-         'entity' => $obj->get(\@qlist),
+         'entity' => npg_qc::mqc::outcomes
+                   ->new(qc_schema => $c->model('NpgQcDB')->schema())
+                   ->get($rpt_lists),
        );
      } catch {
        $self->status_bad_request(
@@ -135,17 +132,6 @@ sub _get_outcomes {
   }
 
   return;
-}
-
-sub _rpt_list2composition {
-  my $rpt = shift;
-  my $comp = npg_tracking::glossary::composition::factory::rpt_list
-                          ->new(rpt_list => $rpt)
-                          ->create_composition();
-  if ($comp->num_components > 1) {
-    croak 'Cannot deal with multi-component compositions';
-  }
-  return $comp;
 }
 
 sub _update_outcomes {
@@ -161,6 +147,10 @@ sub _update_outcomes {
       $error = qq[User $username is not authorised for manual qc];
     }
   }
+
+  # Present only in test scenario
+  delete $data->{'user'};
+  delete $data->{'password'};
 
   if ($error) {
     $self->status_forbidden($c, 'message' => $error,);
@@ -208,17 +198,26 @@ sub _update_runlanes {
   my ($self, $c, $seq_outcomes, $username) = @_;
 
   foreach my $key ( keys %{$seq_outcomes} ) {
-    my $component = _rpt_list2composition($key)->get_component(0);
+
     my $outcome = $seq_outcomes->{$key};
-    if (npg_qc::Schema::Mqc::OutcomeDict
+    if (!npg_qc::Schema::Mqc::OutcomeDict
           ->is_final_outcome_description($outcome->{$QC_OUTCOME})) {
-      try {
-        $c->model('NpgDB')->update_lane_manual_qc_complete(
-          $component->id_run, $component->position, $username);
-      } catch {
-        $c->log->warn(qq[Error updating lane status for rpt key '$key': $_]);
-      };
+      next;
     }
+
+    my $composition = npg_tracking::glossary::composition::factory::rpt_list
+                          ->new(rpt_list => $key)
+                          ->create_composition();
+    if ($composition->num_components > 1) {
+      croak 'Run-lane status update is not implemented for multi-component compositions';
+    }
+    my $component = $composition->get_component(0);
+    try {
+      $c->model('NpgDB')->update_lane_manual_qc_complete(
+        $component->id_run, $component->position, $username);
+    } catch {
+      $c->log->warn(qq[Error updating lane status for rpt key '$key': $_]);
+    };
   }
 
   return;
