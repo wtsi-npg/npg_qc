@@ -182,11 +182,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-12-01 15:01:58
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0hs576BT8ShKx6VhOC/xTA
-
-
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:t17emozfzLcuETH1HG7Akg
 
 our $VERSION = '0';
 
