@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tiny tweaks to rna and verify bam id help links
  - ensure, where practical, that saving and retrieving qc outcomes
      works for multi-component compositions
  - add functionality to allow more columns to be added to table dynamically
