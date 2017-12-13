@@ -1,6 +1,5 @@
 Changes for NPG SeqQC
 
- - tiny tweaks to rna and verify bam id help links
  - add composite alternate matches to genotype check display
  - add metrics for RNA-SeQC qc check: new template and an "about" entry with information explaining metrics
 
