@@ -60,7 +60,20 @@ make_schema_at(
         use_namespaces      => 1,
         default_resultset_class => 'ResultSet',
         
-        exclude => qr/^v_/,
+        exclude => qr/\A v_                    |
+                         analysis_lane_qcal    |
+                         cumulative_errors_    |
+                         error_rate_           |
+                         errors_by_(?:\w+)?nucleotide |
+                         image_store           |
+                         information_content_  |
+                         log_likelihood        |
+                         most_common_          |
+                         ref_snp_info          |
+                         run_and_pair          |
+                         run_config            |
+                         tile_score
+                     /xms,
 
         rel_name_map        => sub { # Rename the id relationship so we can access
                                      # flat versions of the objects and not only
