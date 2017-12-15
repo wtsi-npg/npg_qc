@@ -230,11 +230,20 @@ define([], function () {
     '</table>'
   ].join("\n");
 
+  var fixtures_menu_links = [
+    '<div id="menu">',
+        '<div id="links">',
+          '<ul><li><a href="#" id="summary_to_csv">Summary to CSV file</a></li></ul>',
+        '</div>',
+    '</div>'
+  ].join("\n");
+
   return {
     fixtures_seq_display:       fixtures_seq_display,
     fixtures_seq_mixed:         fixtures_seq_mixed,
     fixtures_lib_mixed:         fixtures_lib_mixed,
-    fixtures_lib_nothing_to_qc: fixtures_lib_nothing_to_qc
+    fixtures_lib_nothing_to_qc: fixtures_lib_nothing_to_qc,
+    fixtures_menu_links:        fixtures_menu_links
   };
 });
 

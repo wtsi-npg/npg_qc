@@ -32,64 +32,114 @@ define([
   qc_css_styles,
   qc_utils
 ) {
-  var ID_PREFIX = 'rpt_key:';
+  var ID_PREFIX         = 'rpt_key:';
 
   /*
-   *This function assigns a string defined icon (ie:&#10003) in the .lane column to signal
-   *the outcome of the usability flag from a certain tag. If a previous icon exists, it
-   *removes it before adding the new one.
+   * This function assigns a string defined icon (ie:&#10003) in the .lane column to signal
+   * the outcome of the utility flag from a certain tag. If a previous icon exists, it
+   * removes it before adding the new one.
    *
-   *It requires a DOM object (obj) and a boolean flag (usability) displaying wether
-   *the usability of the tag lane is switched on (✓) or off (✘).
-   *
+   * It requires a DOM object (obj) and a string (utility) describing the utility of the tag lane:
+   * Accepted (✓) or Rejected (✘). If the utility is "Undecided" there is no widget
+   * to display.
    *
    * Example:
    *
    *  $('.lane').each(function (i, obj) {
-   *    mqc_outcomes.usabilityDisplaySwitch(obj,1);
+   *    mqc_outcomes.utilityDisplaySwitch(obj,"Accepted");
    *  });
    *
    */
-  var usabilityDisplaySwitch = function (obj, usability) {
+  var utilityDisplaySwitch = function (obj, utility) {
     if (!(obj instanceof Element)) {
       throw new TypeError('Parameter obj must be defined and of type (DOM) Element');
     }
-    if (typeof usability !== 'boolean') {
-      throw new TypeError('Usability should be boolean');
+    if (typeof utility !== 'string') {
+      throw new TypeError('Utility should be a string');
+     }
+    if ( utility !== 'Accepted' && utility !== 'Rejected' && utility !== 'Undecided') {
+      throw 'Invalid value ' + utility;
     }
+
     var o = $(obj);
     var icon;
-    o.children().remove('.utility_PASS, .utility_FAIL');//in case an icon exists
-    if(usability){
-      icon = $('<div class="utility_PASS">&#10003;</div>');//&#10003=check ✓
-    } else {
-      icon = $('<div class="utility_FAIL">&#10008;</div>');//&#10008=cross ✘
+    o.children().remove('.utility_pass, .utility_fail');//in case an icon exists
+    if (utility === 'Accepted') {
+      icon = '<span class="utility_pass">&#10003;</span>';//&#10003=check ✓
+    } else if (utility === 'Rejected') {
+      icon = '<span class="utility_fail">&#10008;</span>';//&#10008=cross ✘
     }
-    o.append(icon);
+    o.children('a').after(icon);
   };
 
-  var _processOutcomes = function (outcomes, elementClass) {
-    var rpt_keys = Object.keys(outcomes);
+  /*
+   * This function returns the DOM element(s) corresponding to the JQuery defined by the input:
+   * key: the rpt_key, 
+   * elementClass: the name of the column, 
+   * fuzzyMatch: boolean defining whether the selector returns all plexes associated with a lane key (true)
+   * or just the exact match (false).
+   *
+   * Example:
+   *
+   *  _selectionForKey("18245:1", 'lane', 1);
+   *
+   */
+  var _selectionForKey = function (key, elementClass, fuzzyMatch) {
+    if (!key || !elementClass) {
+      throw 'Both key and elementClass are required';
+    }
+    var rptKeyAsSelector;
+    if (fuzzyMatch) {
+      rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + key + '"]';
+    } else {
+      //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
+      rptKeyAsSelector = '#rpt_key\\3A ' + key.replace(/:/g, '\\3A ');
+    }
+    return $(rptKeyAsSelector + ' td.' + elementClass);
+  };
 
-    for (var i = 0; i < rpt_keys.length; i++) {
+
+  /*
+  * This function processes the QCoutcomes defined by the input outcomes. It takes as inputs
+  * 'outcomes' (the particular outcomes themselves -lib,seq or uqc-  for each rpt_key), 
+  * 'outcomeType' (either mqc or uqc outcome), and the 'elementClass' (which indicates the column 
+  * where the widget will be displayed).
+  * It returns a hash (existingElements) containing for each rpt_key a boolean indicating
+  * wether or not a matching DOM element has been found.
+  *
+  * Example:
+  *
+  *  _processOutcomes(outcomesData.seq, 'mqc_outcome', 'lane');
+  *
+  */
+  var _processOutcomes = function (outcomes, outcomeType, elementClass) {
+    if ((elementClass !== 'lane') && (elementClass !== 'tag_info')) {
+      throw 'Invalid type of rpt key element class ' + elementClass;
+    }
+    var existingElements = {};
+    var rpt_keys = Object.keys(outcomes);
+    for (var i in rpt_keys) {
       var rpt_key = rpt_keys[i];
-      var qc_outcome = outcomes[rpt_key];
-      var rptKeyAsSelector;
-      if(elementClass === 'lane') {
-        rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + rpt_key + '"]';
-      } else if (elementClass === 'tag_info') {
-        //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
-        rptKeyAsSelector = '#rpt_key\\3A ' + rpt_key.replace(/:/g, '\\3A ');
-      } else {
-        throw 'Invalid type of rpt key element class ' + elementClass;
-      }
-      rptKeyAsSelector = rptKeyAsSelector + ' td.' + elementClass;
-      if (typeof qc_outcome.mqc_outcome !== 'undefined') {
-        qc_css_styles.displayElementAs($(rptKeyAsSelector), qc_outcome.mqc_outcome);
-      } else {
+      var qc_outcome = outcomes[rpt_key][outcomeType];
+      if (typeof qc_outcome === 'undefined' ) {
         throw 'Malformed QC outcomes data for ' + rpt_key;
       }
+      var fuzzyMatch = outcomeType === 'uqc_outcome' ? false : elementClass === 'lane';  
+      var selection = _selectionForKey(rpt_key, elementClass, fuzzyMatch);
+      // Allows for a mismatch between the received keys and
+      // available DOM elements.
+      if (typeof selection !== 'undefined' && selection.length > 0) {
+        if (outcomeType === 'uqc_outcome') {
+          utilityDisplaySwitch(selection[0], qc_outcome);
+        } else {
+          qc_css_styles.displayElementAs(selection, qc_outcome);
+        }
+        existingElements[rpt_key]= 1;
+      } else {
+        existingElements[rpt_key]= 0;
+      }
     }
+    return existingElements;
   };
 
   var _parseRptKeys = function (idTable) {
@@ -107,9 +157,39 @@ define([
     return rptKeys;
   };
 
+  /*
+  * This function update the display of the QC outcomes defined by the input outcomesData.
+  * The function processes 3 types of outcomes : 'lib' and 'seq' (with information from the manual qc) 
+  * and 'uqc' (with information from the end user utility qc).
+  * For uqc, depending on the key, the widget might go to either lane or tag column, 
+  * so we will proces outcomes one a time.
+  *
+  * Example:
+  *
+  *  $.ajax({
+  *     url: outcomesURL,
+  *     type: 'POST',
+  *     contentType: 'application/json',
+  *     data: JSON.stringify(query),
+  *     cache: false
+  *   }).success(function (data) {
+  *      _updateDisplayWithQCOutcomes(data);
+  *   });
+  *
+  */
   var _updateDisplayWithQCOutcomes = function (outcomesData) {
-    _processOutcomes(outcomesData.lib, 'tag_info');
-    _processOutcomes(outcomesData.seq, 'lane');
+    _processOutcomes(outcomesData.lib, 'mqc_outcome', 'tag_info');
+    _processOutcomes(outcomesData.seq, 'mqc_outcome', 'lane');
+    if (outcomesData.uqc !== undefined) {
+      var rpt_keys = Object.keys(outcomesData.uqc);
+      for (var i in rpt_keys) {
+        var key = rpt_keys[i];
+        var elementClass = qc_utils.isLaneKey(key) ? 'lane' : 'tag_info';
+        var uqcOutcomeforKey = {};
+        uqcOutcomeforKey[key] = outcomesData.uqc[key];
+        _processOutcomes( uqcOutcomeforKey, 'uqc_outcome', elementClass);
+      }
+    } 
   };
 
   var _fetchQCOutcomesUpdateView = function (rptKeys, outcomesURL, callOnSuccess) {
@@ -148,7 +228,9 @@ define([
     _fetchQCOutcomesUpdateView: _fetchQCOutcomesUpdateView,
     _updateDisplayWithQCOutcomes: _updateDisplayWithQCOutcomes,
     _parseRptKeys: _parseRptKeys,
-    usabilityDisplaySwitch: usabilityDisplaySwitch,
+    _processOutcomes: _processOutcomes,
+    _selectionForKey: _selectionForKey,
+    utilityDisplaySwitch: utilityDisplaySwitch,
     fetchAndProcessQC: fetchAndProcessQC
   };
 });

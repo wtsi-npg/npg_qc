@@ -43,7 +43,8 @@ requirejs([
   format_for_csv,
   qc_page,
   NPG
-) {
+  ) {
+  var TABLE = 'results_summary';  
   $(document).ready(function(){
     //Setup for heatmaps to load on demand.
     $("img").unveil(2000);
@@ -52,16 +53,31 @@ requirejs([
       // We scroll after collapse toggles to fire modify on view to generate plots
       window.scrollBy(0,1); window.scrollBy(0,-1);
     });
-    var qcp = qc_page.pageForMQC();
-    var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) {
-                                                        NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes');
-                                                      }
-                                                    : null;
-    qc_outcomes_view.fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
+    var qcp = qc_page.pageForQC();
+    var QC_OUTCOMES = '/qcoutcomes';
+    var callAfterGettingOutcomes = null;
+    var isRunPage = qcp.isRunPage;
+
+    if (qcp.isPageForMQC){
+      callAfterGettingOutcomes = function (data) {
+        NPG.QC.launchManualQCProcesses(isRunPage, data, QC_OUTCOMES);}
+    } else if (qcp.isPageForUQC) {
+      callAfterGettingOutcomes = function () { 
+        NPG.QC.addUQCLink( function() {
+          qc_outcomes_view.fetchAndProcessQC(
+                     TABLE,
+                     QC_OUTCOMES, 
+                     function (data) {
+                       NPG.QC.launchUtilityQCProcesses(isRunPage, data, QC_OUTCOMES);
+                     });
+        });
+      }  
+    }
+    qc_outcomes_view.fetchAndProcessQC(TABLE, QC_OUTCOMES, callAfterGettingOutcomes);
   });
 
   //Required to show error messages from the mqc process.
-  $("#results_summary").before('<ul id="ajax_status"></ul>');
+  $("#" + TABLE).before('<ul id="ajax_status"></ul>');
 
   //Preload images for working icon
   $('<img/>')[0].src = "/static/images/waiting.gif";
@@ -73,7 +89,7 @@ requirejs([
 
   $("#summary_to_csv").click(function(e) {
     e.preventDefault();
-    var table_html = $('#results_summary')[0].outerHTML;
+    var table_html = $('#' + TABLE)[0].outerHTML;
     var formated_table = format_for_csv.format(table_html);
     format_for_csv.addDataColumns(formated_table, 'extra_cols_', ['sample_name']);
     formated_table.tableExport({type:'csv', fileName:'summary_data'});
@@ -81,4 +97,3 @@ requirejs([
 
   plots.plots_on_view('.results_full_lane_contents', 2000);
 });
-
