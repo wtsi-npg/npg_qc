@@ -1,18 +1,18 @@
 Testing
 -------
-  
+
   cd npg_qc_viewer
   unset CATALYST_HOME #if set
   perl Build.PL --installjsdeps
   ./Build
   TEST_AUTHOR=1 ./Build test
 
-Using npm:
-  npm test
+Using yarn:
+  yarn test
 
 Using grunt:
   grunt -v
-  
+
   or for testing by file name pattern match:
 
   grunt test:<pattern>.html (e.g. `grunt test:*qc*.html`)
@@ -40,4 +40,3 @@ Using custom bcviz
 
 In bcviz (your working copy) run 'bower link'.
 In npg-qc, npg_qc_viewer directory, run 'bower link bcviz'.
-

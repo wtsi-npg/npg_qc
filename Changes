@@ -3,6 +3,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - remove run_timeline component on the Illumina QC loader
  - stop generating DBIx class for run_timeline db table
  - remove unused methods of the run_graph Clearpress model
+ - replace bower with yarn@1.3.2
 
 release 64.5
  - qc outcomes model: code generalisation to simplify addition of

@@ -23,8 +23,7 @@ lib/npg_qc_viewer/Util/TransferObject.pm
 lib/npg_qc_viewer/Util/TransferObjectFactory.pm
 lib/npg_qc_viewer.pm
 lib/npg_qc_viewer/View/TT.pm
-bower.json
-.bowerrc
+yarn.lock
 .jscsrc
 .jshintrc
 Gruntfile.js
@@ -288,4 +287,3 @@ t/data/test_app.conf
 t/data/test_app_no_db.conf
 t/perlcriticrc
 t/util.pm
-

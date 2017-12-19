@@ -12,22 +12,15 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOC');
     my $self = shift;
 
     if ($self->args('installjsdeps')) {
-      if (which('node') and which('bower') and which('npm')) {
+      if (which('node') and which('yarn')) {
         warn "Installing node dependencies\n";
 
-        my $result_npm = system 'npm install';
-        if ($result_npm) {
-          die 'Fail to install node dependencies';
-        }
-
-        warn "Checking/fetching bower javascript dependencies\n";
-      
-        my $result = system 'bower install --force-latest';
-        if ($result) {
-          die 'Fail to install bower javascript dependencies';
+        my $result_yarn = system 'yarn install';
+        if ($result_yarn) {
+          die 'Fail to install JS dependencies';
         }
       } else {
-        warn "To install javascript dependencies, node and bower should be on the path;\n";
+        warn "To install javascript dependencies, node and yarn should be on the path;\n";
         die 'Javascript dependencies cannot be installed';
       }
     }
