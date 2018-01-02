@@ -1,13 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 20;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
 
-BEGIN {
-  use_ok(q{npg_qc::illumina::loader::base});
-}
+use_ok(q{npg_qc::illumina::loader::base});
 
 local $ENV{'dev'} = 'test';
 my $schema = Moose::Meta::Class->create_anon_class(
@@ -26,9 +24,6 @@ my $schema = Moose::Meta::Class->create_anon_class(
   } q{loader object creation ok};
 
   isa_ok($loader, q{npg_qc::illumina::loader::base}, q{$loader});
-
-  lives_ok {$loader->dbh} 'dbd handle generated';
-  is($loader->dbh->{mysql_auto_reconnect}, 1, 'mysql_auto_reconnect is set for dbd connection');
 
   is($loader->id_run(), '4308', 'correct id_run');
   ok($loader->is_paired_read(), 'run 4308 is paired read run');

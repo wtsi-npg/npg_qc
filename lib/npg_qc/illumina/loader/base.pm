@@ -1,7 +1,3 @@
-#############
-# Created By: ajb
-# Created On: 2009-12-03
-
 package npg_qc::illumina::loader::base;
 
 use Moose;
@@ -9,7 +5,6 @@ use namespace::autoclean;
 use Carp;
 use English qw{-no_match_vars};
 use Readonly;
-use DBI;
 use XML::LibXML;
 
 use npg_qc::Schema;
@@ -28,18 +23,17 @@ npg_qc::illumina::loader::base
 
 =head1 SYNOPSIS
 
-  my $oDerived = npg_qc::illumina::loader::<derived_class>->new({
-    verbose => 1,
+  my $oDerived = npg_qc::illumina::loader::<derived_class>->new(
+    verbose    => 1,
     run_folder => $sRunFolder,
-  });
+  );
 
-id_run or run_folder must be provided, or at least a path for npg_tracking::illumina::run::folder
-which should expose the run_folder. verbose turns on the optional logs
+id_run or run_folder must be provided, or one of runfolder-related paths
+verbose turns on the optional logs
 
 =head1 DESCRIPTION
 
-This is intended to be a base class object for loader object modules. It exports various methods to the class,
-along with consuming roles which are needed for all.
+A base class object for loader object modules.
 
 =head1 SUBROUTINES/METHODS
 
@@ -49,66 +43,39 @@ Boolean to be set on object creation
 
 =cut
 
-has q{verbose} => (isa => q{Bool}, is => q{ro},
-  documentation => q{Some output only logged if verbose mode on},);
+has q{verbose} => (isa => q{Bool},
+                   is  => q{ro}
+                  );
 
 sub _build_run_folder {
   my ($self) = @_;
   my @temp = split m{/}xms, $self->runfolder_path();
-  my $run_folder = pop @temp;
-  return $run_folder;
+  return pop @temp;
 }
 
 =head2 schema
 
-create an ojbect of dbix class schema
+create an ojbect of dbix class schema for QC database
 
 =cut
 
-has q{schema} => (isa => q{npg_qc::Schema},
-                  is => q{ro},
-                  lazy_build => 1,
-                  documentation => q{npg_qc::Schema object},);
-
+has q{schema} => (isa           => q{npg_qc::Schema},
+                  is            => q{ro},
+                  lazy_build    => 1,
+                 );
 sub _build_schema {
   return npg_qc::Schema->connect();
 }
 
-=head2 dbh
-
-dbi connection for npg_qc database derived from DBIx schema
-
-=cut
-
-has q{dbh} => (isa => q{Any},
-               is => q{ro},
-               lazy_build => 1,
-              );
-sub _build_dbh {
-  my $self = shift;
-  my @con_info = @{$self->schema->storage->connect_info()};
-  return DBI->connect(
-                  $con_info[0],
-                  $con_info[1] || q(),
-                  $con_info[2] || q(),
-                  {
-                    RaiseError => 1,
-                    PrintError => 1,
-                    PrintWarn  => 1,
-                    AutoCommit => 1,
-                    mysql_auto_reconnect => 1,
-                  });
-}
-
 =head2 schema_npg_tracking
 
-create an ojbect of dbix class schema
+create an ojbect of dbix class schema for run tracking database
 
 =cut
 
-has q{schema_npg_tracking} => (isa => q{npg_tracking::Schema},
-                  is => q{ro},
-                  lazy_build => 1,
+has q{schema_npg_tracking} => (isa        => q{npg_tracking::Schema},
+                               is         => q{ro},
+                               lazy_build => 1,
                               );
 sub _build_schema_npg_tracking {
   return npg_tracking::Schema->connect();
@@ -122,7 +89,7 @@ _build_runlist_db needed in the sub class
  
 =cut
 has 'runlist_db' => (is          => 'rw',
-                     isa         => 'HashRef',
+                     isa         => 'Maybe[HashRef]',
                      lazy_build  => 1,
                     );
 
@@ -135,19 +102,16 @@ has 'runfolder_list_todo' => (is          => 'rw',
                               isa         => 'HashRef',
                               lazy_build  => 1,
                              );
-
 sub _build_runfolder_list_todo {
   my $self = shift;
 
   my %runfolder_list_todo = ();
-
   my $runfolder_list_in_staging = $self->runfolder_list_in_staging();
-
+  my $runlist_db = $self->runlist_db();
   foreach my $id_run (keys %{$runfolder_list_in_staging}){
-
-      if( $id_run && ! $self->runlist_db->{$id_run}){
-         $runfolder_list_todo{$id_run} = $runfolder_list_in_staging->{$id_run};
-      }
+    if( !defined $runlist_db || !$runlist_db->{$id_run} ){
+      $runfolder_list_todo{$id_run} = $runfolder_list_in_staging->{$id_run};
+    }
   }
 
   return \%runfolder_list_todo;
@@ -164,35 +128,34 @@ sub runfolder_list_in_staging {
 
   my $runfolder_list = {};
   my $staging_tag = $self->schema_npg_tracking->resultset( q(Tag) )->find( { tag => q{staging} } );
-  my @runs = $staging_tag->runs();
+  my @runs = filter {$_} $staging_tag->runs();
   $self->mlog( scalar @runs . q{ runs with staging tag} );
 
   foreach my $run ( @runs ){
+    my $folder_name = $run->folder_name();
+    my $folder_path_glob = $run->folder_path_glob();
+    my $id_run = $run->id_run();
 
-      my $folder_name = $run->folder_name();
-      my $folder_path_glob = $run->folder_path_glob();
-      my $id_run = $run->id_run();
+    if( $folder_name && $folder_path_glob ){
+      my @dir = glob qq{$folder_path_glob/$folder_name};
+      @dir = grep {-d } @dir;
 
-      if( $folder_name && $folder_path_glob ){
-           my @dir = glob qq{$folder_path_glob/$folder_name};
-           @dir = grep {-d } @dir;
+      my %fs_inode_hash; #ignore multiple paths point to the same folder
+      @dir = grep { not $fs_inode_hash { join q(,), stat }++ } @dir;
 
-           my %fs_inode_hash; #ignore multiple paths point to the same folder
-           @dir = grep { not $fs_inode_hash { join q(,), stat }++ } @dir;
-
-           if( scalar  @dir != 1 ){
-              $self->mlog("Run $id_run: no runfolder available or more than one available");
-           }else{
-              $runfolder_list->{$id_run} = $dir[0];
-           }
+      if( scalar  @dir != 1 ){
+        $self->mlog("Run $id_run: no runfolder available or more than one available");
+      }else{
+        $runfolder_list->{$id_run} = $dir[0];
       }
+    }
   }
   return $runfolder_list;
 }
 
 
-has q{parser} => (isa => q{XML::LibXML},
-                  is => q{ro},
+has q{parser} => (isa     => q{XML::LibXML},
+                  is      => q{ro},
                   default => sub {return XML::LibXML->new()},
                  );
 
@@ -228,19 +191,12 @@ sub get_id_analysis {
   my ($self, $end) = @_;
 
   my $id_run = $self->id_run();
-
   my ($y, $m, $d) = $self->run_folder() =~ /(\d\d)(\d\d)(\d\d)_\w{2}\d+_\d+/mxs;
-
   if(!$y){
-      ($y, $m, $d) = $self->run_folder() =~ /^(\d\d)-(\d\d)-(\d\d)_+/mxs;
+    ($y, $m, $d) = $self->run_folder() =~ /^(\d\d)-(\d\d)-(\d\d)_+/mxs;
   }
   my $date = sprintf q(%4d-%02d-%02d), $y+2000, $m, $d;## no critic (Policy::ValuesAndExpressions::ProhibitMagicNumbers)
-
-
   my $folder = $self->recalibrated_path();
-  if(!$folder){
-    $folder = $self-> $self->bustard_path();
-  }
 
   my $schema = $self->schema();
 
@@ -309,19 +265,6 @@ sub mlog {
   return;
 }
 
-=head2 DEMOLISH
-
-object-specofoc clean-up at demolition time
-
-=cut
-sub DEMOLISH {
-  my $self = shift;
-  if ($self->has_dbh) {
-    $self->dbh->disconnect();
-  }
-  return;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -347,8 +290,6 @@ __END__
 
 =item XML::LibXML
 
-=item DBI
-
 =item npg_tracking::illumina::run::short_info
 
 =item npg_tracking::illumina::run::long_info
@@ -368,10 +309,11 @@ __END__
 =head1 AUTHOR
 
 Andy Brown
+Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2009 Andy Brown (ajb@sanger.ac.uk)
+Copyright (C) 2018 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
