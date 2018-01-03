@@ -128,7 +128,7 @@ sub runfolder_list_in_staging {
 
   my $runfolder_list = {};
   my $staging_tag = $self->schema_npg_tracking->resultset( q(Tag) )->find( { tag => q{staging} } );
-  my @runs = filter {$_} $staging_tag->runs();
+  my @runs = grep {$_} $staging_tag->runs();
   $self->mlog( scalar @runs . q{ runs with staging tag} );
 
   foreach my $run ( @runs ){
@@ -245,9 +245,9 @@ sub transfer_read_number{
   my ($self, $read_number) = @_;
 
   if($read_number == 3){ ## no critic (Policy::ValuesAndExpressions::ProhibitMagicNumbers)
-       $read_number = 2;
+    $read_number = 2;
   }elsif($read_number == 2 && $self->is_indexed()){
-       $read_number = q{t};
+    $read_number = q{t};
   }
   return $read_number;
 }

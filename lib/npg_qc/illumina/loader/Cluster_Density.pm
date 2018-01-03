@@ -24,7 +24,7 @@ sub run_all {
   my $self = shift;
 
   my %rfolders = %{$self->runfolder_list_todo()};
-  foreach my $id_run (keys %rfolders) {
+  foreach my $id_run (sort { $a <=> $b } keys %rfolders) {
     try {
       $self->mlog(qq{Loading cluster density data for run $id_run});
       my $interop = join q[/], $rfolders{$id_run}, @TILE_METRICS_INTEROP_FILE;
@@ -32,7 +32,7 @@ sub run_all {
     } catch {
       my $error = $_;
       if( $error =~ /No\ such\ file\ or\ directory/mxs){
-        $self->mlog( 'No cluster density file available' );
+        $self->mlog( qq{No cluster density file available for run $id_run} );
       }else{
         croak $error;
       }
@@ -81,7 +81,7 @@ sub _parse_interop {
 
   my $lanes = scalar keys %{$tile_metrics};
   if( $lanes == 0){
-    $self->mlog( 'No cluster density data' );
+    $self->mlog( qq{No cluster density data in $interop} );
     return $cluster_density_by_lane;
   }
 
