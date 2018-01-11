@@ -108,7 +108,12 @@ sub toggle_final_outcome {
   }
 
   my $new_outcome = $self->is_accepted ? $REJECTED_FINAL : $ACCEPTED_FINAL;
-  return $self->update_outcome($new_outcome, $modified_by, $username);
+  my $values_to_update = {
+    'outcome'     => $new_outcome,
+    'modified_by' => $modified_by,
+    'username'    => $username
+  };
+  return $self->update_outcome($values_to_update);
 }
 
 sub _outcome_id {
@@ -129,16 +134,34 @@ sub _outcome_id {
 }
 
 sub update_outcome {
-  my ($self, $outcome, $modified_by, $username) = @_;
+  my ($self, $outcome_values_hash) = @_;
 
-  if (!$modified_by) {
+  if (!$outcome_values_hash) {
+    croak q[Input hash required];
+  }
+
+  if (!$outcome_values_hash->{'outcome'}) {
+    croak q[Outcome required];
+  }
+
+  if (!$outcome_values_hash->{'modified_by'}) {
     croak q[User name required];
   }
 
   my $values = {};
-  $values->{'id_mqc_outcome'} = $self->_outcome_id($outcome);
-  $values->{'username'}       = $username || $modified_by;
-  $values->{'modified_by'}    = $modified_by;
+  my $dict_relation = $self->_dict_relation();
+  if ($dict_relation eq 'uqc_outcome') {
+    if (!$outcome_values_hash->{'rationale'}) {
+      croak q[Rationale required];
+    } else {
+      $values->{'rationale'}  = $outcome_values_hash->{'rationale'};
+    }
+  }
+  my $qc_id_name = q[id_] . $dict_relation;
+  my $outcome = $outcome_values_hash->{'outcome'};
+  $values->{$qc_id_name}      = $self->_outcome_id($outcome);
+  $values->{'username'}       = $outcome_values_hash->{'username'} || $outcome_values_hash->{'modified_by'};
+  $values->{'modified_by'}    = $outcome_values_hash->{'modified_by'};
 
   if ($self->in_storage) {
     $self->update($values);
@@ -219,11 +242,22 @@ otherwise returns false.
 =head2 update_outcome
 
 Updates the outcome of the entity with values provided. Stores a new row
-if this entity was not yet stored in database. This method has not been yet
-extended to updating utility outcomes.
+if this entity was not yet stored in database. 
+This method updates both manual and utility outcomes.
 
-  $obj->update_outcome($outcome, $username);
-  $obj->update_outcome($outcome, $username, $rt_ticket);
+It takes as input a hash containing the values to update:
+  'outcome' # required for both mqc and uqc
+  'username' # required for both mqc and uqc
+  'modified_by' # optional for both mqc and uqc
+  'rationale' # required only for uqc
+
+Example:   
+  $values_to_update->{'outcome'} = 'Accepted';
+  $values_to_update->{'username'} = 'cat'
+  $values_to_update->{'modified_by'} = 'dog'
+  $values_to_update->{'rationale'} = 'some'
+
+  $obj->update_outcome($values_to_update);
 
 =head2 toggle_final_outcome
 

@@ -161,25 +161,40 @@ subtest 'Misc tests' => sub {
   is($object->username, 'user', q[username is set correctly]);
   is($object->modified_by, 'randomuser', q[modified_by is set correctly]);
   ok ($object->description(), 'outcome description is "Accepted preliminary"');
-
-  $object->update_outcome('Rejected final', 'new_user', 'RT#356789');
+  my $values_to_update = {
+              'outcome'     => 'Rejected final',
+              'modified_by' => 'new_user',
+              'username'    => 'RT#356789'
+            };
+  $object->update_outcome($values_to_update);
   my $row = $schema->resultset($table)
     ->search({'id_run'  => 210,'position'=> 1,})->next;
   ok($row->is_rejected, q[The outcome is a fail]);
   ok($row->has_final_outcome, q[The outcome is final]);
   is($row->username, 'RT#356789', q[username is reset]);
   is($row->modified_by, 'new_user', q[modified_by is reset]);
-
-  throws_ok {$object->update_outcome('some invalid', 'user')}
+  delete $values_to_update->{'username'};
+  $values_to_update = {
+              'outcome'     => 'some invalid',
+              'modified_by' => 'user'
+            };
+  throws_ok {$object->update_outcome($values_to_update)}
     qr/Outcome some invalid is invalid/,
     'error updating to an invalid string outcome';
-  throws_ok {$object->update_outcome(123, 'user')}
+  $values_to_update->{'outcome'} = 123;
+  throws_ok {$object->update_outcome($values_to_update)}
     qr/Outcome 123 is invalid/,
     'error updating to invalid integer status';
-  throws_ok {$object->update_outcome('Rejected final')}
+  $values_to_update->{'outcome'} = 'Rejected final';
+  delete $values_to_update->{'modified_by'};
+  throws_ok {$object->update_outcome($values_to_update)}
     qr/User name required/,
     'username should be given';
-  throws_ok {$object->update_outcome(undef, 'user')}
+  $values_to_update = {
+              'outcome'     => undef,
+              'modified_by' => 'user'
+            };
+  throws_ok {$object->update_outcome($values_to_update)}
     qr/Outcome required/,
     'outcome should be given';
 };
@@ -230,7 +245,11 @@ subtest q[update on a new result] => sub {
 
   my $new_row = $rs->new_result($args);
   my $outcome = 'Accepted preliminary';
-  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+  my $values_to_update = {
+              'outcome'     => $outcome,
+              'modified_by' => 'cat'
+            };
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'preliminary outcome saved';
   ok ($new_row->in_storage, 'new object has been saved');
 
@@ -251,9 +270,13 @@ subtest q[update on a new result] => sub {
   } 
   
   $outcome = 'Accepted final';
- 
+  $values_to_update = {
+              'outcome'     => $outcome,
+              'modified_by' => 'dog',
+              'username'    => 'cat'
+            };
   $new_row = $rs->new_result($args);
-  throws_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
+  throws_ok { $new_row->update_outcome($values_to_update) }
     qr /UNIQUE constraint failed/,
     'error creating a record for existing entity';
 
@@ -261,7 +284,7 @@ subtest q[update on a new result] => sub {
   $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run' => 444, 'position' => 2});
   $new_row = $rs->new_result($args);
-  $new_row->update_outcome($outcome, 'dog', 'cat');
+  $new_row->update_outcome($values_to_update);
 
   $hist_rs = $hrs->search($args);
   is ($hist_rs->count, 1, 'one historic is created');
@@ -296,14 +319,19 @@ subtest q[toggle final outcome] => sub {
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     qr/Record is not stored in the database yet/,
     'cannot toggle a new object';
-  lives_ok { $new_row->update_outcome('Accepted preliminary', 'cat') }
+  my $values_to_update = {
+              'outcome'     => 'Accepted preliminary',
+              'modified_by' => 'cat'
+            };
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'prelim. outcome saved';
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     qr/Cannot toggle non-final outcome Accepted preliminary/,
     'cannot toggle a non-final outcome';
 
   my $old_outcome = 'Accepted final';
-  lives_ok { $new_row->update_outcome($old_outcome, 'cat') }
+  $values_to_update->{'outcome'} = $old_outcome;
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'final outcome saved';
   is($new_row->mqc_outcome->short_desc, $old_outcome, 'final outcome is set');
 

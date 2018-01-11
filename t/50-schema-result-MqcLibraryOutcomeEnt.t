@@ -166,7 +166,11 @@ subtest q[update] => sub {
                 $schema, $args);
   my $new_row = $rs->new_result($args);
   my $outcome = 'Accepted preliminary';
-  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+  my $values_to_update = {
+              'outcome'     => $outcome,
+              'modified_by' => 'cat'
+            };
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'preliminary outcome saved';
   ok ($new_row->in_storage, 'new object has been saved');
 
@@ -188,9 +192,14 @@ subtest q[update] => sub {
   }
 
   $outcome = 'Accepted final';
+  $values_to_update = {
+              'outcome'     => $outcome,
+              'modified_by' => 'dog',
+              'username'    => 'cat'
+            };
 
   $new_row = $rs->new_result($args);
-  throws_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
+  throws_ok { $new_row->update_outcome($values_to_update) }
     qr /UNIQUE constraint failed/,
     'error creating a record for existing entity';
 
@@ -198,7 +207,7 @@ subtest q[update] => sub {
   $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run' => 444, 'position' => 2, 'tag_index' => 2});
   $new_row = $rs->new_result($args);
-  lives_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'final outcome saved';
   ok ($new_row->in_storage, 'new object has been saved');
 
@@ -226,13 +235,16 @@ subtest q[update] => sub {
                 $schema, $args);
   $new_row = $rs->new_result($args);
   $outcome = 'Accepted final';
-  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+  delete $values_to_update->{'username'};
+  $values_to_update->{'modify_by'} = 'cat';
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'final outcome saved';
   ok ($new_row->in_storage, 'outcome has been saved');
   is ($new_row->mqc_outcome->short_desc, $outcome, 'final outcome');
 
   $outcome = 'Rejected final';
-  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+  $values_to_update->{'outcome'} = $outcome;
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'can update final outcome';
   ok ($new_row->in_storage, 'outcome has been saved');
   is ($new_row->mqc_outcome->short_desc, $outcome, 'new final outcome');
@@ -249,23 +261,28 @@ subtest q[toggle final outcome] => sub {
   $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
                 $schema, $args);
   my $new_row = $rs->new_result($args);
-
+  my $values_to_update = {
+              'outcome'     => 'Accepted preliminary',
+              'modified_by' => 'cat'
+            };
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     qr/Record is not stored in the database yet/,
     'cannot toggle a new object';
-  lives_ok { $new_row->update_outcome('Accepted preliminary', 'cat') }
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'prelim outcome saved';
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     qr/Cannot toggle non-final outcome Accepted preliminary/,
     'cannot toggle a non-final outcome';
-  lives_ok { $new_row->update_outcome('Undecided final', 'cat') }
+  $values_to_update->{'outcome'} = 'Undecided final';
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'undecided final outcome saved';
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     qr/Cannot toggle undecided final outcome/,
     'cannot toggle an undecided outcome';
 
   my $old_outcome = 'Accepted final';
-  lives_ok { $new_row->update_outcome($old_outcome, 'cat') }
+  $values_to_update->{'outcome'} = $old_outcome;
+  lives_ok { $new_row->update_outcome($values_to_update) }
     'final outcome saved';
   is($new_row->mqc_outcome->short_desc, $old_outcome, 'final outcome is set');
 

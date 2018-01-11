@@ -7,6 +7,7 @@ use Readonly;
 use List::MoreUtils qw/ any none uniq /;
 use Carp;
 use Try::Tiny;
+use Data::Dumper;
 
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES
                                    $SEQ_OUTCOMES
@@ -89,9 +90,6 @@ sub save {
   if (!$username) {
     croak q[Username is required];
   }
-  if ($outcomes->{$UQC_OUTCOMES}) {
-    croak 'Saving uqc outcomes is not yet implemented';
-  }
   if ($outcomes->{$SEQ_OUTCOMES} && !$lane_info) {
     croak q[Tag indices for lanes are required];
   }
@@ -136,11 +134,17 @@ sub _save_outcomes {
         if (ref $o ne 'HASH') {
           croak q[Outcome is not defined or is not a hash ref];
         }
-        my $outcome_description = $o->{$QC_OUTCOME};
+        my $outcome_description;
+        my $uqc_rationale;
+        if ($outcome_type eq $LIB_OUTCOMES || $outcome_type eq $SEQ_OUTCOMES) {
+            $outcome_description = $o->{$QC_OUTCOME};
+        } elsif ($outcome_type eq $UQC_OUTCOMES) {
+          $outcome_description = $o->{$UQC_OUTCOME};
+          $uqc_rationale = $o->{'rationale'};
+        }
         if (!$outcome_description) {
           croak qq[Outcome description is missing for $key];
         }
-
         try {
           my $composition_obj = _rpt_list2composition($key);
           if ($composition_obj->num_components > 1) {
@@ -148,7 +152,15 @@ sub _save_outcomes {
           }
           my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $composition_obj);
           if ($self->_valid4update($outcome_ent, $outcome_description)) {
-            $outcome_ent->update_outcome($outcome_description, $username);
+            my $values_to_update = {
+              'outcome'     => $outcome_description,
+              'modified_by' => $username
+            };
+            if ($uqc_rationale) {
+              $values_to_update->{'rationale'} = $uqc_rationale;
+            }
+            $outcome_ent->update_outcome($values_to_update);
+
             if ($outcome_type eq $SEQ_OUTCOMES && $outcome_ent->has_final_outcome) {
               my $component = $composition_obj->get_component(0);
               my @lib_outcomes = $self->_create_query(
@@ -197,6 +209,9 @@ sub _find_or_new_outcome {
   }
 
   my $rs_name = $outcome_type eq $LIB_OUTCOMES ? $LIB_RS_NAME : $SEQ_RS_NAME;
+  if ($outcome_type eq $UQC_OUTCOMES) {
+    $rs_name = $UQC_RS_NAME
+  }
   my $rs = $self->qc_schema()->resultset($rs_name);
 
   my $seq_composition = $rs->find_or_create_seq_composition($composition_obj);
@@ -253,7 +268,11 @@ sub _finalise_library_outcomes {
       croak 'No matching final outcome returned';
     }
     if ($self->_valid4update($row, $new_outcome)) {
-      $row->update_outcome($new_outcome, $username);
+      my $values_to_update = {
+        'outcome'     => $new_outcome,
+        'modified_by'    => $username
+      };
+      $row->update_outcome($values_to_update);
     }
   }
 
