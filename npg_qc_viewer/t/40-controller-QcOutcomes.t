@@ -114,6 +114,7 @@ subtest 'retrieving data via GET and POST' => sub {
   $values->{'id_mqc_outcome'} = 3; # Accepted final
   $values->{'username'} = 'dog';
   $lrs->create($values);
+ 
   delete $values->{'id_mqc_outcome'};
   $values->{'id_uqc_outcome'} = 2; # Rejected
   $values->{'modified_by'} = 'cat';
@@ -126,7 +127,7 @@ subtest 'retrieving data via GET and POST' => sub {
   for my $request ($r1, $r2) {
     my $response = request($request);
     my $m = _message($request, $rpt_list);
-    is($response->code, 200, 'response code is 200' );
+    is($response->code, 200, 'response code for $m is 200' );
     is_deeply(decode_json($response->content), $expected,
       'responce for multi-component composition');
   }
@@ -318,7 +319,7 @@ subtest 'authentication and authorisation for an update' => sub {
 };
 
 subtest 'data validation for update requests' => sub {
-  plan tests => 8;
+  plan tests => 16;
 
   my $data = {'Action'   => 'UPDATE',
               'user'     => 'cat',
@@ -360,6 +361,41 @@ subtest 'data validation for update requests' => sub {
   is($response->code, $error_code, "error code is $error_code");
   like ($response->content, qr/Outcome description is missing for 1:4/,
     'outcome description should not be empty');
+
+  delete $data->{'lib'};
+  $data->{'uqc'} = {'1:2;3:4' => {'uqc_outcome' => 'some'}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content,
+    qr/Saving outcomes for multi-component compositions is not yet implemented/,
+    'multi-component compositions are not allowed for uqc');
+
+  $data->{'uqc'} = {'1:2' => {'uqc_outcome' => 'Undecided','rationale' => 'something'},
+                    '1:4' => {'uqc_outcome' => ''}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/Outcome description is missing for 1:4/,
+    'outcome description for uqc should be present for 1:4');
+
+  $data->{'uqc'} = {'1:2' => {'uqc_outcome' => 'Undecided'}, '1:4' => {'qc_outcome' => ''}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/Outcome description is missing for 1:4/,
+    'outcome description for uqc should not be empty for 1:4');
+
+  $data->{'uqc'} = {'1:2' => {'uqc_outcome' => 'Accepted'}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code for uqc");
+  like ($response->content, qr/Rationale required/,
+    'Rationale description should be present');
 };
 
 

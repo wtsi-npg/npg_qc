@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Moose::Meta::Class;
 use DateTime;
@@ -30,7 +30,7 @@ subtest 'Testing initial assumptions' => sub {
 };
 
 subtest 'test insert' => sub {
-  plan tests => 28;
+  plan tests => 30;
 
   my $values = {
     'id_uqc_outcome' => 1,
@@ -43,11 +43,15 @@ subtest 'test insert' => sub {
         id_run => 9001, position => 1, tag_index => 1
   });
   $values->{'id_seq_composition'} = $id_seq_comp;
-  isa_ok($rs_ent->create($values), 'npg_qc::Schema::Result::UqcOutcomeEnt');
   my $rs = $rs_ent->search({});
-  is ($rs->count, 1, q[one row found in the ent table]);
+  is ($rs->count, 0, q[no existing row found in the ent table before insertion]);
+  $rs = $rs_hist->search({});
+  is ($rs->count, 0, q[no existing row found in the hist table before insertion]);
+  isa_ok($rs_ent->create($values), 'npg_qc::Schema::Result::UqcOutcomeEnt');
+  $rs = $rs_ent->search({});
+  is ($rs->count, 1, q[one row found in the ent table after insertion]);
   my $object = $rs->next;
-  is ($object->id_seq_composition, $id_seq_comp, 'id_seq_composition valueis correct');
+  is ($object->id_seq_composition, $id_seq_comp, 'id_seq_composition value is correct');
   is ($object->id_uqc_outcome, 1, 'id_uqc_outcome is correct');
   is ($object->username, 'user1', 'username correct');
   is ($object->modified_by, 'user2', 'modified_by correct');
@@ -63,9 +67,9 @@ subtest 'test insert' => sub {
   is ($seq_composition->id_seq_composition, $id_seq_comp, 'linked to correct composition row');
 
   $rs = $rs_hist->search({});
-  is ($rs->count, 1, q[one row found in the hist table]);
+  is ($rs->count, 1, q[one row found in the hist table after insertion]);
   $object = $rs->next; 
-  is ($object->id_seq_composition, $id_seq_comp, 'id_seq_composition valueis correct');
+  is ($object->id_seq_composition, $id_seq_comp, 'id_seq_composition value is correct');
   is ($object->id_uqc_outcome, 1, 'id_uqc_outcome is correct');
   is ($object->username, 'user1', 'username correct');
   is ($object->modified_by, 'user2', 'modified_by correct');
@@ -107,6 +111,38 @@ subtest 'test non null constraints' => sub {
       "NOT NULL constraint is set on $col_name";
     $values->{$col_name} = $tempval;
   }
+};
+
+subtest 'update tests' => sub {
+  plan tests => 7;
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 9010, position => 2, tag_index => 1
+  });
+  my $values = {
+    'id_uqc_outcome'     => 1,
+    'id_seq_composition' => $id_seq_comp,
+    'username'           => 'user1',
+    'last_modified'      => DateTime->now(),
+    'modified_by'        => 'user2',
+    'rationale'          => 'some rationale'
+  };
+  my $row = $rs_ent->create($values);
+
+  is ($row->id_uqc_outcome, 1, 'id_uqc_outcome is Accepted before update');
+  throws_ok {$row->update_outcome() } qr/Input hash required/,
+      'A hash with input values is required';
+  my $outcome_values_hash = {};
+  throws_ok {$row->update_outcome($outcome_values_hash) } qr/Outcome required/,
+      'Outcome value is required in the input hash';
+  $outcome_values_hash = {'outcome' => 'Rejected'};
+  throws_ok {$row->update_outcome($outcome_values_hash) } qr/User name required/,
+      'Modify_by value is required in the input hash';
+  $outcome_values_hash->{'modified_by'} = 'cat';
+  throws_ok {$row->update_outcome($outcome_values_hash) } qr/Rationale required/,
+      'Rationale is required in the input hash when updating a uqc outcome';
+  $outcome_values_hash->{'rationale'} = 'other rationale';
+  lives_ok{$row->update_outcome($outcome_values_hash)} 'updates uqc correctly';
+  is ($row->id_uqc_outcome, 2, 'id_uqc_outcome is Rejected after update');
 };
 
 1;
