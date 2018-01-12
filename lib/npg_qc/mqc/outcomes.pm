@@ -7,7 +7,6 @@ use Readonly;
 use List::MoreUtils qw/ any none uniq /;
 use Carp;
 use Try::Tiny;
-use Data::Dumper;
 
 use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES
                                    $SEQ_OUTCOMES
