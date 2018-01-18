@@ -129,14 +129,26 @@ sub _outcome_id {
 }
 
 sub update_outcome {
-  my ($self, $outcome, $modified_by, $username) = @_;
+  my ($self, $rptkey_attributes, $modified_by, $username) = @_;
+  
+  if (!$rptkey_attributes || !$rptkey_attributes->{'outcome'}) {
+    croak q[Outcome required];
+  }
+  if (!$modified_by) {
+    croak q[User name required];
+  }
+  if($self->result_source()->has_column('rationale') && 
+     !$rptkey_attributes->{'rationale'} 
+    ) {
+        croak q[Rationale required];
+      }
 
   if (!$modified_by) {
     croak q[User name required];
   }
-
+  my $qc_id_name = q[id_] . $self->_dict_relation();
   my $values = {};
-  $values->{'id_mqc_outcome'} = $self->_outcome_id($outcome);
+  $values->{$qc_id_name} = $self->_outcome_id($rptkey_attributes->{'outcome'});
   $values->{'username'}       = $username || $modified_by;
   $values->{'modified_by'}    = $modified_by;
 

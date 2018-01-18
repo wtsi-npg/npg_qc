@@ -22,6 +22,7 @@ Readonly::Scalar my $SEQ_RS_NAME   => 'MqcOutcomeEnt';
 Readonly::Scalar my $LIB_RS_NAME   => 'MqcLibraryOutcomeEnt';
 Readonly::Scalar my $UQC_RS_NAME   => 'UqcOutcomeEnt';
 Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOMES);
+Readonly::Hash   my %OUTCOME_TYPE_NAMES => ($LIB_OUTCOMES => $QC_OUTCOME, $SEQ_OUTCOMES => $QC_OUTCOME, $UQC_OUTCOMES =>$UQC_OUTCOME);
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -89,9 +90,6 @@ sub save {
   if (!$username) {
     croak q[Username is required];
   }
-  if ($outcomes->{$UQC_OUTCOMES}) {
-    croak 'Saving uqc outcomes is not yet implemented';
-  }
   if ($outcomes->{$SEQ_OUTCOMES} && !$lane_info) {
     croak q[Tag indices for lanes are required];
   }
@@ -136,7 +134,7 @@ sub _save_outcomes {
         if (ref $o ne 'HASH') {
           croak q[Outcome is not defined or is not a hash ref];
         }
-        my $outcome_description = $o->{$QC_OUTCOME};
+        my $outcome_description = $o->{%OUTCOME_TYPE_NAMES->{$outcome_type}};
         if (!$outcome_description) {
           croak qq[Outcome description is missing for $key];
         }
