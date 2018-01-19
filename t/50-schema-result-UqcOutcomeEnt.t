@@ -138,7 +138,7 @@ subtest 'update tests' => sub {
   my $rptkey_attributes = {};
   throws_ok {$row->update_outcome($rptkey_attributes, 'cat') } qr/Outcome required/,
       'Outcome value is required in the input hash';
-  $rptkey_attributes = {'outcome' => 'Rejected'};
+  $rptkey_attributes = {'uqc_outcome' => 'Rejected'};
   throws_ok {$row->update_outcome($rptkey_attributes, 'cat') } qr/Rationale required/,
       'Rationale is required in the input hash when updating a uqc outcome';
   $rptkey_attributes->{'rationale'} = 'rationale2';

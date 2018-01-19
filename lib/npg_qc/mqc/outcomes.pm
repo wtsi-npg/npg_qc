@@ -22,7 +22,12 @@ Readonly::Scalar my $SEQ_RS_NAME   => 'MqcOutcomeEnt';
 Readonly::Scalar my $LIB_RS_NAME   => 'MqcLibraryOutcomeEnt';
 Readonly::Scalar my $UQC_RS_NAME   => 'UqcOutcomeEnt';
 Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOMES);
-Readonly::Hash   my %OUTCOME_TYPE_NAMES => ($LIB_OUTCOMES => $QC_OUTCOME, $SEQ_OUTCOMES => $QC_OUTCOME, $UQC_OUTCOMES =>$UQC_OUTCOME);
+Readonly::Hash   my %OUTCOME_NAMES => {$LIB_OUTCOMES => {'type_name' => $QC_OUTCOME,
+                                                         'rs_name'   => $LIB_RS_NAME},
+                                       $SEQ_OUTCOMES => {'type_name' => $QC_OUTCOME,
+                                                         'rs_name'   => $SEQ_RS_NAME}, 
+                                       $UQC_OUTCOMES => {'type_name' => $UQC_OUTCOME,
+                                                         'rs_name'   => $UQC_RS_NAME}};
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -134,7 +139,7 @@ sub _save_outcomes {
         if (ref $o ne 'HASH') {
           croak q[Outcome is not defined or is not a hash ref];
         }
-        my $outcome_description = $o->{%OUTCOME_TYPE_NAMES->{$outcome_type}};
+        my $outcome_description = $o->{$OUTCOME_NAMES{$outcome_type}{'type_name'}};
         if (!$outcome_description) {
           croak qq[Outcome description is missing for $key];
         }
@@ -146,7 +151,7 @@ sub _save_outcomes {
           }
           my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $composition_obj);
           if ($self->_valid4update($outcome_ent, $outcome_description)) {
-            $outcome_ent->update_outcome($outcome_description, $username);
+            $outcome_ent->update_outcome($o, $username);
             if ($outcome_type eq $SEQ_OUTCOMES && $outcome_ent->has_final_outcome) {
               my $component = $composition_obj->get_component(0);
               my @lib_outcomes = $self->_create_query(
@@ -194,7 +199,8 @@ sub _find_or_new_outcome {
     croak qq[Unknown outcome entity type '$outcome_type'];
   }
 
-  my $rs_name = $outcome_type eq $LIB_OUTCOMES ? $LIB_RS_NAME : $SEQ_RS_NAME;
+  my $rs_name = $OUTCOME_NAMES{$outcome_type}{'rs_name'};
+
   my $rs = $self->qc_schema()->resultset($rs_name);
 
   my $seq_composition = $rs->find_or_create_seq_composition($composition_obj);
@@ -251,7 +257,7 @@ sub _finalise_library_outcomes {
       croak 'No matching final outcome returned';
     }
     if ($self->_valid4update($row, $new_outcome)) {
-      $row->update_outcome($new_outcome, $username);
+      $row->update_outcome({'mqc_outcome' => $new_outcome}, $username);
     }
   }
 

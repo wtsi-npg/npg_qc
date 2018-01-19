@@ -592,7 +592,7 @@ subtest q[validation for an update] => sub {
 };
 
 subtest q[save - errors] => sub {
-  plan tests => 15;
+  plan tests => 23;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
   throws_ok {$o->save() } qr/Outcomes hash is required/,
@@ -617,9 +617,6 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>[1,3,4], 'seq'=>{}}, q[cat], {}) }
     qr/Outcome for lib is not a hash ref/,
     'unexpected type of values - error';
-  throws_ok {$o->save({'lib'=>{}, 'uqc'=>{}}, q[cat], {}) }
-    qr/Saving uqc outcomes is not yet implemented/,
-    'Saving uqc outcomes is not yet implemented';
   throws_ok {$o->save({'lib'=>{'123'=>undef}}, q[cat], {}) }
     qr/Outcome is not defined or is not a hash ref/,
     'outcome is not defined - error';
@@ -635,6 +632,33 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>{'123:4:5;3:4:5'=>{'mqc_outcome'=>'Accepted preliminary'}}}, q[cat], {}) }
     qr/Saving outcomes for multi-component compositions is not yet implemented/,
     'saving for multi-component composition - error';
+  throws_ok {$o->save('uqc'=>{}, q[cat]) }
+    qr/Outcomes hash is required/,
+    'empty uqc outcomes hash - error';
+  throws_ok {$o->save({'uqc'=>[1,3,4]}, q[cat], {}) }
+    qr/Outcome for uqc is not a hash ref/,
+    'unexpected type of uqc values - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>undef}}, q[cat]) }
+    qr/Outcome is not defined or is not a hash ref/,
+    'uqc outcome is not defined - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>[]}}, q[cat]) }
+    qr/Outcome is not defined or is not a hash ref/,
+    'uqc outcome is not a hash ref - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>undef, 'rationale'=>'something'}}}, q[cat], {}) }
+    qr/Outcome description is missing for 123:1/,
+    'undefined uqc outcome description - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>'', 'rationale'=>'something'}}}, q[cat], {}) }
+    qr/Outcome description is missing for 123:1/,
+    'empty uqc outcome description - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>'Accepted'}}}, q[cat]) }
+    qr/Rationale required/,
+    'expected rationale is missing in the uqc outcomes hash';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>'Accepted', 'rationale'=>undef}}}, q[cat], {}) }
+    qr/Rationale required/,
+    'undefined rationale description - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>'Accepted', 'rationale'=>''}}}, q[cat], {}) }
+    qr/Rationale required/,
+    'empty rationale description - error';  
 };
 
 subtest q[save outcomes] => sub {
@@ -650,11 +674,10 @@ subtest q[save outcomes] => sub {
     '101:1:2'=>{'mqc_outcome'=>'Accepted preliminary'},
     '101:1:4'=>{'mqc_outcome'=>'Rejected preliminary'},
     '101:1:6'=>{'mqc_outcome'=>'Undecided'},
-                 };
+  };
 
   my $reply = {'lib' => $outcomes, 'seq'=> {}, 'uqc'=> {},};
-  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
-    $reply, 'only lib info returned');
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'), $reply, 'only lib info returned');
 
   my $c = npg_tracking::glossary::composition::factory::rpt_list
          ->new(rpt_list => '101:1')->create_composition();

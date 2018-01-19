@@ -108,7 +108,7 @@ sub toggle_final_outcome {
   }
 
   my $new_outcome = $self->is_accepted ? $REJECTED_FINAL : $ACCEPTED_FINAL;
-  return $self->update_outcome($new_outcome, $modified_by, $username);
+  return $self->update_outcome({'mqc_outcome' => $new_outcome}, $modified_by, $username);
 }
 
 sub _outcome_id {
@@ -130,27 +130,27 @@ sub _outcome_id {
 
 sub update_outcome {
   my ($self, $rptkey_attributes, $modified_by, $username) = @_;
-  
-  if (!$rptkey_attributes || !$rptkey_attributes->{'outcome'}) {
+  my $dict_relation = $self->_dict_relation();
+
+  if (!$rptkey_attributes || !$rptkey_attributes->{$dict_relation}) {
     croak q[Outcome required];
   }
   if (!$modified_by) {
     croak q[User name required];
   }
   if($self->result_source()->has_column('rationale') && 
-     !$rptkey_attributes->{'rationale'} 
-    ) {
-        croak q[Rationale required];
-      }
-
+     !$rptkey_attributes->{'rationale'}) {
+       croak q[Rationale required];
+  }
   if (!$modified_by) {
     croak q[User name required];
   }
-  my $qc_id_name = q[id_] . $self->_dict_relation();
+
+  my $qc_id_name = q[id_] . $dict_relation;
   my $values = {};
-  $values->{$qc_id_name} = $self->_outcome_id($rptkey_attributes->{'outcome'});
-  $values->{'username'}       = $username || $modified_by;
-  $values->{'modified_by'}    = $modified_by;
+  $values->{$qc_id_name}    = $self->_outcome_id($rptkey_attributes->{$dict_relation});
+  $values->{'username'}     = $username || $modified_by;
+  $values->{'modified_by'}  = $modified_by;
 
   if ($self->in_storage) {
     $self->update($values);
