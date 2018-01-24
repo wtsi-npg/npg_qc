@@ -154,7 +154,7 @@ sub update_outcome {
 
   if($is_uqc_update) {
     $values->{'rationale'}  = $rptkey_attributes->{'rationale'};
-  } 
+  }
   if ($self->in_storage) {
     $self->update($values);
   } else {
