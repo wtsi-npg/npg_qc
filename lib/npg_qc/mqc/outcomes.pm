@@ -25,7 +25,7 @@ Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOM
 Readonly::Hash   my %OUTCOME_NAMES => {$LIB_OUTCOMES => {'type_name' => $QC_OUTCOME,
                                                          'rs_name'   => $LIB_RS_NAME},
                                        $SEQ_OUTCOMES => {'type_name' => $QC_OUTCOME,
-                                                         'rs_name'   => $SEQ_RS_NAME}, 
+                                                         'rs_name'   => $SEQ_RS_NAME},
                                        $UQC_OUTCOMES => {'type_name' => $UQC_OUTCOME,
                                                          'rs_name'   => $UQC_RS_NAME}};
 
@@ -363,6 +363,9 @@ All arguments are required.
 
 The method returns the data identical to the return value of the get method for the
 entities specifies in the first argument.
+
+The module is quite generic and allows to save/retrieve 'lib',seq' qnd 'uqc' outcomes
+all at once. The caller should decide with caution which values to pass. 
 
 =head1 DIAGNOSTICS
 

@@ -154,8 +154,7 @@ sub update_outcome {
 
   if($is_uqc_update) {
     $values->{'rationale'}  = $rptkey_attributes->{'rationale'};
-  }
-  
+  } 
   if ($self->in_storage) {
     $self->update($values);
   } else {
@@ -237,10 +236,12 @@ otherwise returns false.
 Updates the outcome of the entity with values provided. Stores a new row
 if this entity was not yet stored in database. This method has been 
 extended to update utility outcomes. 
+
 As first input argument it takes a hash $rptkey_attributes containing entries for 
 the 'outcomes' and, in the event of uqc outcomes, for a 'rationale'.
 As second arguments it takes the name of the person modifying the record ('modified_by').
-The third argument ('username') is optional, if absent, it will take the value of 'modified_by'. 
+The third argument ('username') is optional, if absent, it will take the value of 'modified_by'.
+
   
   Example for 'mqc':
   $rptkey_attributes = {'mqc_outcome' => 'Rejected final'};
