@@ -101,7 +101,6 @@ sub save {
   if ($lane_info && (ref $lane_info ne 'HASH')) {
     croak q[Tag indices for lanes should be a hash ref];
   }
-
   my @outcome_types = keys %{$outcomes};
   if (!@outcome_types) {
     croak 'No data to save',
@@ -109,9 +108,7 @@ sub save {
   if (any { my $temp = $_; none {$temp eq $_} @OUTCOME_TYPES } @outcome_types) {
     croak 'One of outcome types is unknown';
   }
-
   $self->_save_outcomes($outcomes, $username, $lane_info);
-
   return $self->get( [map {keys %{$_}} values %{$outcomes}] );
 }
 
@@ -127,7 +124,6 @@ sub _map_outcomes {
 
 sub _save_outcomes {
   my ($self, $outcomes, $username, $lane_info) = @_;
-
   my $actions = sub {
     foreach my $outcome_type ( @OUTCOME_TYPES ) {
       my $outcomes4type = $outcomes->{$outcome_type} || {};
@@ -333,14 +329,14 @@ and 'uqc' for the user utility outcomes check, and then on rpt list string keys.
   $VAR1 = {
     'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
     'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
-    'uqc' => {'5:3:7' => {'mqc_outcome' => 'Rejected'}}
+    'uqc' => {'5:3:7' => {'uqc_outcome' => 'Rejected'}}
           };
 
   print Dumper $obj->get([qw(5:3)]);
   $VAR1 = {
     'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
     'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
-    'uqc' => {'5:3:7' => {'mqc_outcome' => 'Rejected'}}
+    'uqc' => {'5:3:7' => {'uqc_outcome' => 'Rejected'}}
           };
 
 If an rpt list represents a single-component composition, all level outcomes
