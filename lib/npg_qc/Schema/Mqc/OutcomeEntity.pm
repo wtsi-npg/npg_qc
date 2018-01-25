@@ -48,7 +48,7 @@ sub _dict_relation {
   my $name = ref shift;
   $name =~ /::(\w+)qc(?:Library)?OutcomeEnt\Z/smx;
   if (!$1) {
-    croak "Can't recognize dictionary relationship from OutcomeEnt" . $name;
+    croak "Cannot recognize dictionary relationship from OutcomeEnt $name";
   } else {
     return lc  $1 . 'qc_outcome';
   }
