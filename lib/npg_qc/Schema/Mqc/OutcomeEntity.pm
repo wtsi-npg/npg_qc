@@ -45,14 +45,9 @@ around [qw/update insert/] => sub {
 };
 
 sub _dict_relation {
-  my $self = shift;
-  my $name = $self->_is_mqc_type_outcome() ? 'm' : 'u';
-  return $name . q[qc_outcome];
-}
-
-sub _is_mqc_type_outcome {
   my $name = ref shift;
-  return $name =~ /::Mqc(?:Library)?OutcomeEnt\Z/smx;
+  $name =~ /::(\w+)qc(?:Library)?OutcomeEnt\Z/smx;
+  return lc $1 . q[qc_outcome];
 }
 
 sub get_time_now {
@@ -129,17 +124,20 @@ sub _outcome_id {
 }
 
 sub update_outcome {
-  my ($self, $rptkey_attributes, $modified_by, $username) = @_;
+  my ($self, $outcome, $modified_by, $username) = @_;
   my $dict_relation = $self->_dict_relation();
   my $is_uqc_update = $self->result_source()->has_column('rationale');
 
-  if (!$rptkey_attributes || !$rptkey_attributes->{$dict_relation}) {
+  if (!$outcome || !$outcome->{$dict_relation}) {
     croak q[Outcome required];
   }
+
+  my %outcome_copy =  %{$outcome};
+  
   if (!$modified_by) {
     croak q[User name required];
   }
-  if($is_uqc_update && !$rptkey_attributes->{'rationale'}) {
+  if($is_uqc_update && !$outcome->{'rationale'}) {
        croak q[Rationale required];
   }
   if (!$modified_by) {
@@ -147,18 +145,16 @@ sub update_outcome {
   }
 
   my $qc_id_name = q[id_] . $dict_relation;
-  my $values = {};
-  $values->{$qc_id_name}    = $self->_outcome_id($rptkey_attributes->{$dict_relation});
-  $values->{'username'}     = $username || $modified_by;
-  $values->{'modified_by'}  = $modified_by;
+  my $outcome_description = delete $outcome_copy{$dict_relation};
 
-  if($is_uqc_update) {
-    $values->{'rationale'}  = $rptkey_attributes->{'rationale'};
-  }
+  $outcome_copy{$qc_id_name} = $self->_outcome_id($outcome_description);
+  $outcome_copy{'modified_by'} = $modified_by;
+  $outcome_copy{'username'} = $username || $modified_by;
+
   if ($self->in_storage) {
-    $self->update($values);
+    $self->update(\%outcome_copy);
   } else {
-    while ( my ($column, $value) = each %{$values} ) {
+    while ( my ($column, $value) = each \%outcome_copy ) {
       $self->$column($value);
     }
     $self->insert();
@@ -237,21 +233,21 @@ Updates the outcome of the entity with values provided. Stores a new row
 if this entity was not yet stored in database. This method has been 
 extended to update utility outcomes. 
 
-As first input argument it takes a hash $rptkey_attributes containing entries for 
-the 'outcomes' and, in the event of uqc outcomes, for a 'rationale'.
+As first input argument it takes a hash $outcome containing entries for 
+the corresponding 'mqc_outcome' or 'uqc_outcome' and, in the event of uqc outcomes, a 'rationale'.
 As second arguments it takes the name of the person modifying the record ('modified_by').
 The third argument ('username') is optional, if absent, it will take the value of 'modified_by'.
 
   
   Example for 'mqc':
-  $rptkey_attributes = {'mqc_outcome' => 'Rejected final'};
-  $obj->update_outcome($rptkey_attributes, $modified_by, $username);
+  $outcome = {'mqc_outcome' => 'Rejected final'};
+  $obj->update_outcome($outcome, $modified_by, $username);
 
   Example for 'uqc':
-  $rptkey_attributes = {'uqc_outcome' => 'Accepted',
+  $outcome = {'uqc_outcome' => 'Accepted',
                         'rationale'   => 'something'};  
-  $obj->update_outcome($rptkey_attributes, $modified_by); 
-  $obj->update_outcome($rptkey_attributes, $modified_by, $username);
+  $obj->update_outcome($outcome, $modified_by); 
+  $obj->update_outcome($outcome, $modified_by, $username);
 
 =head2 toggle_final_outcome
 
