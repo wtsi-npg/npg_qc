@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Exception;
 use Moose::Meta::Class;
 use DateTime;
@@ -149,6 +149,27 @@ subtest 'update tests' => sub {
 
   is ($rs_hist->search({'id_seq_composition' => $id_seq_comp})->count(), 2,
     "another historic entry has been added after the update of id_seq_comp:$id_seq_comp");
+};
+
+subtest 'test dict relationship' => sub {
+  plan tests => 3;
+
+  my $values = {
+    'id_uqc_outcome' => 1,
+    'username'       => 'user1',
+    'last_modified'  => DateTime->now(),
+    'modified_by'    => 'user2',
+    'rationale'      => 'rationale something'
+  };
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 90, position => 1, tag_index => 1
+  });
+  $values->{'id_seq_composition'} = $id_seq_comp;
+  my $o = $rs_ent->create($values);
+  isa_ok($o, 'npg_qc::Schema::Result::UqcOutcomeEnt');
+  is ($o->_dict_relation(), 'uqc_outcome', 'The created entity has a uqc_outcome dictionary relationship');
+  throws_ok {$id_seq_comp->_dict_relation()} qr/Cannot recognize dictionary relationship from OutcomeEnt/,
+      'Cannot recognize dictionary relationship from a non Outcome Entity';
 };
 
 1;

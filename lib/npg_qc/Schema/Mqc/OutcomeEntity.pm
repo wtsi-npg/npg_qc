@@ -45,14 +45,13 @@ around [qw/update insert/] => sub {
 };
 
 sub _dict_relation {
-  my $self = shift;
-  my $name = $self->_is_mqc_type_outcome() ? 'm' : 'u';
- return $name . q[qc_outcome];
-}
-
-sub _is_mqc_type_outcome {
- my $name = ref shift;
- return $name =~ /::Mqc(?:Library)?OutcomeEnt\Z/smx;
+  my $name = ref shift;
+  $name =~ /::(\w+)qc(?:Library)?OutcomeEnt\Z/smx;
+  if (!$1) {
+    croak "Can't recognize dictionary relationship from OutcomeEnt" . $name;
+  } else {
+    return lc  $1 . 'qc_outcome';
+  }
 }
 
 sub get_time_now {
