@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Exception;
 use Moose::Meta::Class;
 use DateTime;
@@ -346,6 +346,25 @@ subtest q[reporting] => sub {
   
   my $rs2 = $schema->resultset($table)->get_ready_to_report();
   is ($rs2->count, 0, q[No entities to be reported]);
+};
+
+subtest 'test dict relationship' => sub {
+  plan tests => 2;
+
+  my $values = {
+    'id_run'         => 40,
+    'position'       => 3,
+    'id_mqc_outcome' => 1,
+    'username'       => 'user',
+    'modified_by'    => 'user'
+  };
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 40, position => 3
+  });
+  $values->{'id_seq_composition'} = $id_seq_comp;
+  my $o = $schema->resultset($table)->create($values);
+  isa_ok($o, 'npg_qc::Schema::Result::MqcOutcomeEnt');
+  is ($o->_dict_relation(), 'mqc_outcome', 'The created entity has a mqc_outcome dictionary relationship');
 };
 
 1;

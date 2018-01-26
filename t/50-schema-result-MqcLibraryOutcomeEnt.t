@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Exception;
 use Moose::Meta::Class;
 
@@ -279,6 +279,26 @@ subtest q[toggle final outcome] => sub {
   is($new_row->mqc_outcome->short_desc, $old_outcome, 'old outcome again');
 
   $new_row->delete();
+};
+
+subtest 'test dict relationship' => sub {
+  plan tests => 2;
+
+  my $values = {
+    'id_run'         => 30,
+    'position'       => 3,
+    'tag_index'      => 1,
+    'id_mqc_outcome' => 1,
+    'username'       => 'user',
+    'modified_by'    => 'user'
+  };
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema, {
+        id_run => 30, position => 3, tag_index => 1
+  });
+  $values->{'id_seq_composition'} = $id_seq_comp;
+  my $o = $schema->resultset($table)->create($values);
+  isa_ok($o, 'npg_qc::Schema::Result::MqcLibraryOutcomeEnt');
+  is ($o->_dict_relation(), 'mqc_outcome', 'The created entity has a mqc_outcome dictionary relationship');
 };
 
 1;

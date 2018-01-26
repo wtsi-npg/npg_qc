@@ -152,7 +152,7 @@ subtest 'update tests' => sub {
 };
 
 subtest 'test dict relationship' => sub {
-  plan tests => 3;
+  plan tests => 2;
 
   my $values = {
     'id_uqc_outcome' => 1,
@@ -168,8 +168,6 @@ subtest 'test dict relationship' => sub {
   my $o = $rs_ent->create($values);
   isa_ok($o, 'npg_qc::Schema::Result::UqcOutcomeEnt');
   is ($o->_dict_relation(), 'uqc_outcome', 'The created entity has a uqc_outcome dictionary relationship');
-  throws_ok {$id_seq_comp->_dict_relation()} qr/Cannot recognize dictionary relationship from OutcomeEnt/,
-      'Cannot recognize dictionary relationship from a non Outcome Entity';
 };
 
 1;
