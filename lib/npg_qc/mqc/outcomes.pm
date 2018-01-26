@@ -22,6 +22,12 @@ Readonly::Scalar my $SEQ_RS_NAME   => 'MqcOutcomeEnt';
 Readonly::Scalar my $LIB_RS_NAME   => 'MqcLibraryOutcomeEnt';
 Readonly::Scalar my $UQC_RS_NAME   => 'UqcOutcomeEnt';
 Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOMES);
+Readonly::Hash   my %OUTCOME_NAMES => {$LIB_OUTCOMES => {'type_name' => $QC_OUTCOME,
+                                                         'rs_name'   => $LIB_RS_NAME},
+                                       $SEQ_OUTCOMES => {'type_name' => $QC_OUTCOME,
+                                                         'rs_name'   => $SEQ_RS_NAME},
+                                       $UQC_OUTCOMES => {'type_name' => $UQC_OUTCOME,
+                                                         'rs_name'   => $UQC_RS_NAME}};
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -89,16 +95,12 @@ sub save {
   if (!$username) {
     croak q[Username is required];
   }
-  if ($outcomes->{$UQC_OUTCOMES}) {
-    croak 'Saving uqc outcomes is not yet implemented';
-  }
   if ($outcomes->{$SEQ_OUTCOMES} && !$lane_info) {
     croak q[Tag indices for lanes are required];
   }
   if ($lane_info && (ref $lane_info ne 'HASH')) {
     croak q[Tag indices for lanes should be a hash ref];
   }
-
   my @outcome_types = keys %{$outcomes};
   if (!@outcome_types) {
     croak 'No data to save',
@@ -106,9 +108,7 @@ sub save {
   if (any { my $temp = $_; none {$temp eq $_} @OUTCOME_TYPES } @outcome_types) {
     croak 'One of outcome types is unknown';
   }
-
   $self->_save_outcomes($outcomes, $username, $lane_info);
-
   return $self->get( [map {keys %{$_}} values %{$outcomes}] );
 }
 
@@ -124,7 +124,6 @@ sub _map_outcomes {
 
 sub _save_outcomes {
   my ($self, $outcomes, $username, $lane_info) = @_;
-
   my $actions = sub {
     foreach my $outcome_type ( @OUTCOME_TYPES ) {
       my $outcomes4type = $outcomes->{$outcome_type} || {};
@@ -136,7 +135,7 @@ sub _save_outcomes {
         if (ref $o ne 'HASH') {
           croak q[Outcome is not defined or is not a hash ref];
         }
-        my $outcome_description = $o->{$QC_OUTCOME};
+        my $outcome_description = $o->{$OUTCOME_NAMES{$outcome_type}{'type_name'}};
         if (!$outcome_description) {
           croak qq[Outcome description is missing for $key];
         }
@@ -148,7 +147,7 @@ sub _save_outcomes {
           }
           my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $composition_obj);
           if ($self->_valid4update($outcome_ent, $outcome_description)) {
-            $outcome_ent->update_outcome($outcome_description, $username);
+            $outcome_ent->update_outcome($o, $username);
             if ($outcome_type eq $SEQ_OUTCOMES && $outcome_ent->has_final_outcome) {
               my $component = $composition_obj->get_component(0);
               my @lib_outcomes = $self->_create_query(
@@ -196,7 +195,8 @@ sub _find_or_new_outcome {
     croak qq[Unknown outcome entity type '$outcome_type'];
   }
 
-  my $rs_name = $outcome_type eq $LIB_OUTCOMES ? $LIB_RS_NAME : $SEQ_RS_NAME;
+  my $rs_name = $OUTCOME_NAMES{$outcome_type}{'rs_name'};
+
   my $rs = $self->qc_schema()->resultset($rs_name);
 
   my $seq_composition = $rs->find_or_create_seq_composition($composition_obj);
@@ -253,7 +253,7 @@ sub _finalise_library_outcomes {
       croak 'No matching final outcome returned';
     }
     if ($self->_valid4update($row, $new_outcome)) {
-      $row->update_outcome($new_outcome, $username);
+      $row->update_outcome({'mqc_outcome' => $new_outcome}, $username);
     }
   }
 
@@ -329,14 +329,14 @@ and 'uqc' for the user utility outcomes check, and then on rpt list string keys.
   $VAR1 = {
     'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
     'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
-    'uqc' => {'5:3:7' => {'mqc_outcome' => 'Rejected'}}
+    'uqc' => {'5:3:7' => {'uqc_outcome' => 'Rejected'}}
           };
 
   print Dumper $obj->get([qw(5:3)]);
   $VAR1 = {
     'lib' => {'5:3:7' => {'mqc_outcome' => 'Undecided final'}},
     'seq' => {'5:3'   => {'mqc_outcome' => 'Accepted final'}}
-    'uqc' => {'5:3:7' => {'mqc_outcome' => 'Rejected'}}
+    'uqc' => {'5:3:7' => {'uqc_outcome' => 'Rejected'}}
           };
 
 If an rpt list represents a single-component composition, all level outcomes
@@ -363,6 +363,9 @@ All arguments are required.
 
 The method returns the data identical to the return value of the get method for the
 entities specifies in the first argument.
+
+The module is quite generic and allows to save/retrieve 'lib',seq' qnd 'uqc' outcomes
+all at once. The caller should decide with caution which values to pass. 
 
 =head1 DIAGNOSTICS
 

@@ -45,14 +45,13 @@ around [qw/update insert/] => sub {
 };
 
 sub _dict_relation {
-  my $self = shift;
-  my $name = $self->_is_mqc_type_outcome() ? 'm' : 'u';
-  return $name . q[qc_outcome];
-}
-
-sub _is_mqc_type_outcome {
   my $name = ref shift;
-  return $name =~ /::Mqc(?:Library)?OutcomeEnt\Z/smx;
+  $name =~ /::(\w+)qc(?:Library)?OutcomeEnt\Z/smx;
+  if (!$1) {
+    croak "Cannot recognize dictionary relationship from OutcomeEnt $name";
+  } else {
+    return lc  $1 . 'qc_outcome';
+  }
 }
 
 sub get_time_now {
@@ -108,7 +107,7 @@ sub toggle_final_outcome {
   }
 
   my $new_outcome = $self->is_accepted ? $REJECTED_FINAL : $ACCEPTED_FINAL;
-  return $self->update_outcome($new_outcome, $modified_by, $username);
+  return $self->update_outcome({'mqc_outcome' => $new_outcome}, $modified_by, $username);
 }
 
 sub _outcome_id {
@@ -130,20 +129,35 @@ sub _outcome_id {
 
 sub update_outcome {
   my ($self, $outcome, $modified_by, $username) = @_;
+  my $dict_relation = $self->_dict_relation();
+  my $is_uqc_update = $self->result_source()->has_column('rationale');
 
+  if (!$outcome || !$outcome->{$dict_relation}) {
+    croak q[Outcome required];
+  }
+
+  my %outcome_copy =  %{$outcome};
+  if (!$modified_by) {
+    croak q[User name required];
+  }
+  if($is_uqc_update && !$outcome->{'rationale'}) {
+       croak q[Rationale required];
+  }
   if (!$modified_by) {
     croak q[User name required];
   }
 
-  my $values = {};
-  $values->{'id_mqc_outcome'} = $self->_outcome_id($outcome);
-  $values->{'username'}       = $username || $modified_by;
-  $values->{'modified_by'}    = $modified_by;
+  my $qc_id_name = q[id_] . $dict_relation;
+  my $outcome_description = delete $outcome_copy{$dict_relation};
+
+  $outcome_copy{$qc_id_name} = $self->_outcome_id($outcome_description);
+  $outcome_copy{'modified_by'} = $modified_by;
+  $outcome_copy{'username'} = $username || $modified_by;
 
   if ($self->in_storage) {
-    $self->update($values);
+    $self->update(\%outcome_copy);
   } else {
-    while ( my ($column, $value) = each %{$values} ) {
+    while ( my ($column, $value) = each \%outcome_copy ) {
       $self->$column($value);
     }
     $self->insert();
@@ -219,11 +233,24 @@ otherwise returns false.
 =head2 update_outcome
 
 Updates the outcome of the entity with values provided. Stores a new row
-if this entity was not yet stored in database. This method has not been yet
-extended to updating utility outcomes.
+if this entity was not yet stored in database. This method has been 
+extended to update utility outcomes. 
 
-  $obj->update_outcome($outcome, $username);
-  $obj->update_outcome($outcome, $username, $rt_ticket);
+As first input argument it takes a hash $outcome containing entries for 
+the corresponding 'mqc_outcome' or 'uqc_outcome' and, in the event of uqc outcomes, a 'rationale'.
+As second arguments it takes the name of the person modifying the record ('modified_by').
+The third argument ('username') is optional, if absent, it will take the value of 'modified_by'.
+
+  
+  Example for 'mqc':
+  $outcome = {'mqc_outcome' => 'Rejected final'};
+  $obj->update_outcome($outcome, $modified_by, $username);
+
+  Example for 'uqc':
+  $outcome = {'uqc_outcome' => 'Accepted',
+                        'rationale'   => 'something'};  
+  $obj->update_outcome($outcome, $modified_by); 
+  $obj->update_outcome($outcome, $modified_by, $username);
 
 =head2 toggle_final_outcome
 

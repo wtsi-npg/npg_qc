@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 17;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON::XS;
@@ -502,8 +502,57 @@ subtest q[find or create seq entity] => sub {
     'correct outcome description');
 };
 
+subtest q[find or create uqc entity] => sub {
+  plan tests => 13;
+
+  my $outcome = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
+  my $composition = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => '45:2:1')->create_composition();
+  
+  my $seq_composition = $qc_schema->resultset('UqcOutcomeEnt')
+                                  ->find_or_create_seq_composition($composition);
+  my $id_seq_composition = $seq_composition->id_seq_composition();
+  my $row = $outcome->_find_or_new_outcome('uqc', $composition);
+
+  isa_ok($row, 'npg_qc::Schema::Result::UqcOutcomeEnt');
+  ok(!$row->in_storage, 'new object is created in memory');
+  is($row->id_seq_composition, $id_seq_composition, 'correct id_seq_composition');
+  is($row->username, undef, 'username is undefined');
+  is($row->modified_by, undef, 'modified_by is undefined');
+  ok(!$row->uqc_outcome, 'no related dictionary object');
+
+  my $dict_id = $qc_schema->resultset('UqcOutcomeDict')->search(
+      {'short_desc' => 'Rejected'}
+     )->next->id_uqc_outcome;
+
+  $composition = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => '45:3')->create_composition();
+  $seq_composition = $qc_schema->resultset('UqcOutcomeEnt')
+                                  ->find_or_create_seq_composition($composition);
+  $id_seq_composition = $seq_composition->id_seq_composition();
+  
+  my $seq_c = $qc_schema->resultset('UqcOutcomeEnt')
+         ->find_or_create_seq_composition($composition);
+  $qc_schema->resultset('UqcOutcomeEnt')->create({
+    'id_seq_composition' => $id_seq_composition,
+    'id_uqc_outcome'     => $dict_id,
+    'username'           => 'cat',
+    'modified_by'        => 'dog',
+    'rationale'          => 'some'
+  });
+
+  $row = $outcome->_find_or_new_outcome('uqc', $composition);
+  isa_ok($row, 'npg_qc::Schema::Result::UqcOutcomeEnt');
+  ok($row->in_storage, 'object is retrieved from the db');
+  is($row->id_seq_composition, $id_seq_composition, 'correct id_seq_composition');
+  is($row->username, 'cat', 'username is "cat"');
+  is($row->modified_by, 'dog', 'modified by dog');
+  ok($row->uqc_outcome, 'related dictionary object exists');
+  is($row->uqc_outcome->short_desc, 'Rejected','correct outcome description');
+};
+
 subtest q[validation for an update] => sub {
-  plan tests => 12;
+  plan tests => 15;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
   my $dict_id_prel = $qc_schema->resultset('MqcOutcomeDict')->search(
@@ -589,10 +638,34 @@ subtest q[validation for an update] => sub {
   throws_ok { $o->_valid4update($outcome, 'some outcome') }
     qr/Final outcome cannot be updated/,
     'error updating a final stored lib outcome to another final outcome';
+
+  my $dict_id =
+    $qc_schema->resultset('UqcOutcomeDict')->search(
+    {'short_desc' => 'Undecided'})->next->id_uqc_outcome;
+
+  my $rpt_values = {'id_run' => 47, 'position' => 2, tag_index => 3};
+  my $id_seq_composition = t::autoqc_util::find_or_save_composition($qc_schema, $rpt_values);
+  $outcome = $qc_schema->resultset('UqcOutcomeEnt')->new_result({'id_seq_composition' => $id_seq_composition});
+  is($o->_valid4update($outcome, 'some outcome'), 1,
+    'in-memory uqc object can be updated');
+
+  $values = {
+    'id_uqc_outcome' => $dict_id,
+    'username'       => 'cat',
+    'modified_by'    => 'dog',
+    'rationale'      => 'some rationale'
+  };
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $qc_schema, $rpt_values);
+  $outcome = $qc_schema->resultset('UqcOutcomeEnt')->create($values);
+  is($o->_valid4update($outcome, 'some outcome'), 1,
+    'stored uqc outcome can be updated to a different outcome');
+  is($o->_valid4update($outcome, $outcome->uqc_outcome->short_desc), 0,
+    'stored uqc outcome cannot be updated to the same outcome');
 };
 
 subtest q[save - errors] => sub {
-  plan tests => 15;
+  plan tests => 23;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
   throws_ok {$o->save() } qr/Outcomes hash is required/,
@@ -617,9 +690,6 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>[1,3,4], 'seq'=>{}}, q[cat], {}) }
     qr/Outcome for lib is not a hash ref/,
     'unexpected type of values - error';
-  throws_ok {$o->save({'lib'=>{}, 'uqc'=>{}}, q[cat], {}) }
-    qr/Saving uqc outcomes is not yet implemented/,
-    'Saving uqc outcomes is not yet implemented';
   throws_ok {$o->save({'lib'=>{'123'=>undef}}, q[cat], {}) }
     qr/Outcome is not defined or is not a hash ref/,
     'outcome is not defined - error';
@@ -635,10 +705,37 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>{'123:4:5;3:4:5'=>{'mqc_outcome'=>'Accepted preliminary'}}}, q[cat], {}) }
     qr/Saving outcomes for multi-component compositions is not yet implemented/,
     'saving for multi-component composition - error';
+  throws_ok {$o->save('uqc'=>{}, q[cat]) }
+    qr/Outcomes hash is required/,
+    'empty uqc outcomes hash - error';
+  throws_ok {$o->save({'uqc'=>[1,3,4]}, q[cat], {}) }
+    qr/Outcome for uqc is not a hash ref/,
+    'unexpected type of uqc values - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>undef}}, q[cat]) }
+    qr/Outcome is not defined or is not a hash ref/,
+    'uqc outcome is not defined - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>[]}}, q[cat]) }
+    qr/Outcome is not defined or is not a hash ref/,
+    'uqc outcome is not a hash ref - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>undef, 'rationale'=>'something'}}}, q[cat], {}) }
+    qr/Outcome description is missing for 123:1/,
+    'undefined uqc outcome description - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>'', 'rationale'=>'something'}}}, q[cat], {}) }
+    qr/Outcome description is missing for 123:1/,
+    'empty uqc outcome description - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>'Accepted'}}}, q[cat]) }
+    qr/Rationale required/,
+    'expected rationale is missing in the uqc outcomes hash';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>'Accepted', 'rationale'=>undef}}}, q[cat], {}) }
+    qr/Rationale required/,
+    'undefined rationale description - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{'uqc_outcome'=>'Accepted', 'rationale'=>''}}}, q[cat], {}) }
+    qr/Rationale required/,
+    'empty rationale description - error';  
 };
 
 subtest q[save outcomes] => sub {
-  plan tests => 21;
+  plan tests => 23;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
@@ -650,11 +747,10 @@ subtest q[save outcomes] => sub {
     '101:1:2'=>{'mqc_outcome'=>'Accepted preliminary'},
     '101:1:4'=>{'mqc_outcome'=>'Rejected preliminary'},
     '101:1:6'=>{'mqc_outcome'=>'Undecided'},
-                 };
+  };
 
   my $reply = {'lib' => $outcomes, 'seq'=> {}, 'uqc'=> {},};
-  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
-    $reply, 'only lib info returned');
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'), $reply, 'only lib info returned');
 
   my $c = npg_tracking::glossary::composition::factory::rpt_list
          ->new(rpt_list => '101:1')->create_composition();
@@ -692,6 +788,27 @@ subtest q[save outcomes] => sub {
   is_deeply($o->save(
     {'lib' => {'101:1:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat'),
     $reply, 'updated one of lib entities to a final outcome');
+
+  $reply->{'uqc'} = {
+    '101:1:1'=>{'uqc_outcome'=>'Accepted'},
+    '101:1:3'=>{'uqc_outcome'=>'Rejected'},
+    '101:1:5'=>{'uqc_outcome'=>'Undecided'},
+  };
+  my $values_to_save = {
+    '101:1:1'=>{'uqc_outcome' => 'Accepted',
+                'rationale'   => 'something'},
+    '101:1:3'=>{'uqc_outcome' => 'Rejected',
+                'rationale'   => 'something'},
+    '101:1:5'=>{'uqc_outcome' => 'Undecided',
+                'rationale'   => 'something'},
+  };
+  is_deeply($o->save({'uqc' => $values_to_save}, 'cat'),
+    $reply, 'UQC saved ok. Lib, seq and uqc info returned');
+
+  lives_ok{ $o->save({'uqc' => $values_to_save,
+                      'lib' => {'101:1:2'=>{'mqc_outcome'=>'Accepted final'}},
+                      'seq' => {'101:1'=>{'mqc_outcome'=>'Accepted preliminary'}}
+                      }, 'cat', {1,3,5})} 'Save() can save uqc, lib, seq at the same time';
 
   my $error =
     q[Mismatch between known tag indices and available library outcomes];
