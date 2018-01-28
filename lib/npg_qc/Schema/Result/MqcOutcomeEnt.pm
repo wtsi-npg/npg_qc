@@ -250,6 +250,10 @@ sub update_reported {
   return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
 }
 
+sub dict_rel_name {
+  return 'mqc_outcome';
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -285,6 +289,8 @@ Entity for lane MQC outcome.
 
   Updates the value of reported to the current timestamp. Throws exception if the
   associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
+ 
+=head2 dict_rel_name
 
 =head2 seq_component_compositions
 
@@ -326,7 +332,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL Genome Research Limited
+Copyright (C) 2018 GRL Genome Research Limited
 
 This file is part of NPG.
 

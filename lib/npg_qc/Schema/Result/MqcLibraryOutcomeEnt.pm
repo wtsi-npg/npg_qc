@@ -237,6 +237,7 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-15 14:33:11
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ToJTCdCmZugE5pmrRj0z1A
 
+use Carp;
 with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
 
 our $VERSION = '0';
@@ -247,6 +248,25 @@ __PACKAGE__->has_many(
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
+
+sub finalise_outcome {
+  my ($self, $username) = @_;
+
+  my $new_outcome = $self->mqc_outcome->matching_final_short_desc();
+  if (!$new_outcome) { # Unlikely to happen
+    croak 'No matching final outcome returned';
+  }
+  $new_outcome = {'mqc_outcome' => $new_outcome};
+  if ($self->valid4update($new_outcome)) {
+    $self->update_outcome($new_outcome, $username);
+  }
+
+  return;
+}
+
+sub dict_rel_name {
+  return 'mqc_outcome';
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -287,6 +307,14 @@ __END__
   Default DBIx insert method extended to create an entry in the table
   corresponding to the MqcLibraryOutcomeHist class
 
+=head2 finalise_outcome
+
+  Sets the qc outcome value in this object to a matching final outcome.
+
+  $row->finalise_outcome('some_user_name'); 
+
+=head2 dict_rel_name
+
 =head1 DEPENDENCIES
 
 =over
@@ -305,6 +333,8 @@ __END__
 
 =item DBIx::Class::Core
 
+=item Carp
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -317,7 +347,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL Genome Research Limited
+Copyright (C) 2018 GRL Genome Research Limited
 
 This file is part of NPG.
 

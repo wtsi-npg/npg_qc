@@ -225,6 +225,10 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+sub dict_rel_name {
+  return 'uqc_outcome';
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -234,8 +238,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Entity for UQC outcome. This class inherits from Mqc::OutcomeEntity and has a relationship
-to seq_composition through id_seq_composition.
+Result class for uqc outcome entity table.
 
 =head1 DIAGNOSTICS
 
@@ -252,6 +255,20 @@ to seq_composition through id_seq_composition.
 
   Default DBIx insert method extended to create an entry in the table corresponding to
   the UqcOutcomeHist class
+
+=head2 dict_rel_name
+
+=head2 seq_component_compositions
+
+  Type: has_many
+
+  Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+  To simplify queries, skip SeqComposition and link directly to the linking table.
+
+=head2 composition
+
+  Attribute of type npg_tracking::glossary::composition.
 
 =head1 DEPENDENCIES
 
@@ -286,7 +303,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL Genome Research Limited
+Copyright (C) 2018 GRL Genome Research Limited
 
 This file is part of NPG.
 

@@ -10,8 +10,9 @@ with 'npg_qc::Schema::Composition';
 
 our $VERSION = '0';
 
-requires 'update';
-requires 'insert';
+requires qw/ update
+             insert
+             dict_rel_name /;
 
 Readonly::Scalar my $ACCEPTED_FINAL  => 'Accepted final';
 Readonly::Scalar my $REJECTED_FINAL  => 'Rejected final';
@@ -28,7 +29,7 @@ Readonly::Hash my %DELEGATION_TO_QC_OUTCOME => {
 foreach my $this_class_method (keys %DELEGATION_TO_QC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
       my $self = shift;
-      my $outcome_type = $self->_dict_relation();
+      my $outcome_type = $self->dict_rel_name();
       my $that_class_method = $DELEGATION_TO_QC_OUTCOME{$this_class_method};
       return $self->$outcome_type->$that_class_method(@_);
     }
@@ -43,17 +44,6 @@ around [qw/update insert/] => sub {
   $self->_create_historic();
   return $return_super;
 };
-
-sub _dict_relation {
-  my $self = shift;
-  my $name = $self->_is_mqc_type_outcome() ? 'm' : 'u';
-  return $name . q[qc_outcome];
-}
-
-sub _is_mqc_type_outcome {
-  my $name = ref shift;
-  return $name =~ /::Mqc(?:Library)?OutcomeEnt\Z/smx;
-}
 
 sub get_time_now {
   return DateTime->now(time_zone => DateTime::TimeZone->new(name => q[local]));
@@ -75,6 +65,73 @@ sub data_for_historic {
   return $vals;
 }
 
+sub toggle_final_outcome {
+  my ($self, $modified_by, $username) = @_;
+
+  if (!$self->in_storage) {
+    croak 'Record is not stored in the database yet';
+  }
+  if (!$self->has_final_outcome) {
+    croak 'Cannot toggle non-final outcome ' . $self->mqc_outcome->short_desc;
+  }
+  if ($self->is_undecided) {
+    croak 'Cannot toggle undecided final outcome';
+  }
+
+  my $new_outcome = $self->is_accepted ? $REJECTED_FINAL : $ACCEPTED_FINAL;
+  return $self->update_outcome({'mqc_outcome' => $new_outcome}, $modified_by, $username);
+}
+
+sub valid4update {
+  my ($self, $new_data) = @_;
+
+  if (!$new_data || ref $new_data ne 'HASH') {
+    croak q[Outcome hash is required];
+  }
+  my $outcome_desc = $new_data->{$self->dict_rel_name()};
+  if (!$outcome_desc) {
+    croak 'Outcome description is missing';
+  }
+  if ($self->in_storage) {
+    if ($self->description() eq $outcome_desc) {
+      return 0;
+    } elsif ($self->has_final_outcome()) {
+      croak q[Final outcome cannot be updated];
+    }
+  }
+
+  return 1;
+}
+
+sub update_outcome {
+  my ($self, $outcome, $modified_by, $username) = @_;
+
+  if (!$outcome || ref $outcome ne 'HASH') {
+    croak q[Outcome hash is required];
+  }
+  if (!$modified_by) {
+    croak q[User name required];
+  }
+
+  my $dict_rel_name = $self->dict_rel_name();
+  my %values = %{$outcome};
+  $values{'id_' . $dict_rel_name} =
+    $self->_outcome_id(delete $values{$dict_rel_name});
+  $values{'username'}    = $username || $modified_by;
+  $values{'modified_by'} = $modified_by;
+
+  if ($self->in_storage) {
+    $self->update(\%values);
+  } else {
+    while ( my ($column, $value) = each %values ) {
+      $self->$column($value);
+    }
+    $self->insert();
+  }
+
+  return;
+}
+
 sub _rs_name {
   my ($self, $suffix) = @_;
   if (!$suffix) {
@@ -94,23 +151,6 @@ sub _create_historic {
   return;
 }
 
-sub toggle_final_outcome {
-  my ($self, $modified_by, $username) = @_;
-
-  if (!$self->in_storage) {
-    croak 'Record is not stored in the database yet';
-  }
-  if (!$self->has_final_outcome) {
-    croak 'Cannot toggle non-final outcome ' . $self->mqc_outcome->short_desc;
-  }
-  if ($self->is_undecided) {
-    croak 'Cannot toggle undecided final outcome';
-  }
-
-  my $new_outcome = $self->is_accepted ? $REJECTED_FINAL : $ACCEPTED_FINAL;
-  return $self->update_outcome($new_outcome, $modified_by, $username);
-}
-
 sub _outcome_id {
   my ($self, $outcome) = @_;
 
@@ -126,30 +166,6 @@ sub _outcome_id {
   }
 
   return $outcome_dict_obj->pk_value;
-}
-
-sub update_outcome {
-  my ($self, $outcome, $modified_by, $username) = @_;
-
-  if (!$modified_by) {
-    croak q[User name required];
-  }
-
-  my $values = {};
-  $values->{'id_mqc_outcome'} = $self->_outcome_id($outcome);
-  $values->{'username'}       = $username || $modified_by;
-  $values->{'modified_by'}    = $modified_by;
-
-  if ($self->in_storage) {
-    $self->update($values);
-  } else {
-    while ( my ($column, $value) = each %{$values} ) {
-      $self->$column($value);
-    }
-    $self->insert();
-  }
-
-  return;
 }
 
 no Moose::Role;
@@ -216,14 +232,26 @@ Returns true if the outcome is accepted (pass) and final, otherwise returns fals
 Returns true if the outcome is undecided (neither pass nor fail),
 otherwise returns false.
 
+=head2 valid4update
+
+Returns true if the outcome can be updated, false if it cannot be updated.
+Error if the current outcome is final.
+
 =head2 update_outcome
 
 Updates the outcome of the entity with values provided. Stores a new row
 if this entity was not yet stored in database. This method has not been yet
 extended to updating utility outcomes.
 
-  $obj->update_outcome($outcome, $username);
-  $obj->update_outcome($outcome, $username, $rt_ticket);
+The first argument is a hash reference with key-value pairs for some of
+the columns to be updated, the second argument is username of the user who
+is performing the action (logged-in user) and the third (optional) argument
+is the username of the user who makes the decision or a reference to a source
+(for example, RT ticket) that has a record about a decision. The latter
+is important when a final decision is changed. 
+
+  $obj->update_outcome({'mqc_outcome' => $outcome}, $username);
+  $obj->update_outcome({'mqc_outcome' => $outcome}, $username, $rt_ticket);
 
 =head2 toggle_final_outcome
 
@@ -271,7 +299,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Genome Research Ltd
+Copyright (C) 2018 Genome Research Ltd
 
 This file is part of NPG.
 
