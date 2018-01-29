@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 9;
 use Test::Exception;
 use Moose::Meta::Class;
 use DateTime;
@@ -132,6 +132,164 @@ subtest 'qc outcome relationship name' => sub {
     'uqc_outcome', 'as class method');
   my $row = $rs_ent->search({})->next();
   is ($row->dict_rel_name(), 'uqc_outcome', 'as instance method');
+};
+
+subtest 'validity for update' => sub {
+  plan tests => 15;
+
+  my @id_seq_comp = ();
+  for my $p ((1 .. 3)) {
+    push @id_seq_comp, t::autoqc_util::find_or_save_composition($schema,
+        {id_run => 9015, position => $p});
+  }
+
+  my @dict_entries = $rs_dict->search({iscurrent => 1})->all();
+  is (scalar @id_seq_comp, scalar @dict_entries,
+    'test prerequisite: correct number of composition entries created');
+  
+  my @descriptions = map {$_->short_desc} @dict_entries;
+  my @rows = ();
+  my $i = 0;
+  while ($i < scalar @dict_entries) {
+    my $values = {
+      'id_uqc_outcome'     => $dict_entries[$i]->id_uqc_outcome,
+      'id_seq_composition' => $id_seq_comp[$i],
+      'username'           => 'user1',
+      'modified_by'        => 'user2',
+      'rationale'          => 'rationale'
+    };
+    my $row = $rs_ent->create($values);
+    push @rows, $row;
+    my $this_description = $descriptions[$i];
+    ok (!$row->valid4update({'uqc_outcome' => $this_description}),
+      'update to the same outcome is invalid');
+    my @other_descriptions = grep { $_ ne $this_description } @descriptions;
+    foreach my $d (@other_descriptions) {
+      ok ($row->valid4update({'uqc_outcome' => $d}),
+        'update to a different outcome is valid');
+    }
+    $i++;  
+  }
+
+  my $outcome = $rows[0];
+  throws_ok {$outcome->valid4update()}
+    qr/Outcome hash is required/, 'outcome arg is required';
+  throws_ok {$outcome->valid4update('Rejected preliminary')}
+    qr/Outcome hash is required/, 'outcome arg should be a hash';
+  throws_ok {$outcome->valid4update({'uqc_outcome' => undef})}
+    qr/Outcome description is missing/, 'outcome should be defined';
+  throws_ok {$outcome->valid4update({'uqc_outcome' => q[]})}
+    qr/Outcome description is missing/, 'outcome cannot be an empty string';
+  throws_ok {$outcome->valid4update({'some_outcome' => 'Rejected preliminary'})}
+    qr/Outcome description is missing/, 'matching outcome type should be used';
+};
+
+subtest 'update outcome errors' => sub {
+  plan tests => 10;
+
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema,
+        {id_run => 9011, position => 2});
+
+  my $values = {
+    'id_uqc_outcome'     => 1,
+    'id_seq_composition' => $id_seq_comp,
+    'username'           => 'user1',
+    'modified_by'        => 'user2',
+    'rationale'          => 'rationale1'
+  };
+
+  my $row = $rs_ent->create($values);
+  throws_ok {$row->update_outcome() } qr/Outcome hash is required/,
+    'a hash with outcome field is required';
+  throws_ok {$row->update_outcome('outcome', 'cat') } qr/Outcome hash is required/,
+    'outcome value is required in the input hash';
+  throws_ok {$row->update_outcome({}) } qr/User name required/,
+    'user name required';
+
+  throws_ok {$row->update_outcome({}, 'cat') } qr/Rationale required/,
+    'rationale required';
+  throws_ok {$row->update_outcome({'rationale' => 'some'}, q[cat]) }
+    qr/Outcome required/,
+    'outcome missing - error';
+  throws_ok {$row->update_outcome(
+    {'uqc_outcome'=>'Accepted', 'rationale'=>undef}, q[cat]) }
+    qr/Rationale required/,
+    'undefined rationale description - error';
+  throws_ok {$row->update_outcome(
+    {'uqc_outcome'=>'Accepted', 'rationale'=>q[]}, q[cat]) }
+    qr/Rationale required/,
+    'empty rationale description - error'; 
+  throws_ok {$row->update_outcome(
+    {'mqc_outcome' => 'Accepted', 'rationale' => 'some'}, q[cat]) }
+    qr/Outcome required/,
+    'uqc outcome missing - error';
+  throws_ok {$row->update_outcome(
+    {'uqc_outcome'=>undef, 'rationale'=>'something'}, q[cat]) }
+    qr/Outcome required/,
+    'undefined uqc outcome description - error';
+  throws_ok {$row->update_outcome(
+    {'uqc_outcome'=>q[], 'rationale'=>'something'}, q[cat]) }
+    qr/Outcome required/,
+    'empty uqc outcome description - error';
+};
+
+subtest 'update outcome' => sub {
+  plan tests => 17;
+
+  my $id_seq_comp = t::autoqc_util::find_or_save_composition($schema,
+                    {id_run => 9010, position => 2, tag_index => 1});
+
+  my $hist_count = $rs_hist->search({'id_seq_composition' => $id_seq_comp})
+                   ->count();
+  my $values = {
+    'id_uqc_outcome'     => 1,
+    'id_seq_composition' => $id_seq_comp,
+    'username'           => 'user1',
+    'modified_by'        => 'user2',
+    'rationale'          => 'rationale1'
+  };
+
+  my $row = $rs_ent->create($values);
+
+  is ($row->description, 'Accepted', 'outcome before update');
+  
+  lives_ok {$row->update_outcome(
+    {'uqc_outcome' => 'Rejected', 'rationale' => 'some'}, 'cat')}
+    'no error updating record';
+  is ($row->description, 'Rejected', 'correct outcome saved');
+  is ($row->rationale, 'some', 'correct rationale saved');
+  is ($row->username, 'cat', 'user set correctly');
+  is ($row->modified_by, 'cat', 'modify_by set correctly');
+
+  my @historic = $rs_hist->search({'id_seq_composition' => $id_seq_comp},
+                        {'order_by' => { -asc => 'last_modified'}})->all();
+  is (scalar @historic, $hist_count+2, 'two more historic entries');
+  my $latest_hist = pop @historic;
+  is (DateTime->compare($latest_hist->last_modified, $row->last_modified), 0,
+    'modification date copied to historic record');
+
+  $id_seq_comp = t::autoqc_util::find_or_save_composition($schema,
+                 {id_run => 9010, position => 3});
+  $hist_count = $rs_hist->search({'id_seq_composition' => $id_seq_comp},
+                        {'order_by' => { -asc => 'last_modified'}})->count();
+  $row = $rs_ent->new({id_seq_composition => $id_seq_comp});
+  ok (!$row->in_storage, 'row is not yet saved to the db');
+  lives_ok {$row->update_outcome(
+    {'uqc_outcome' => 'Undecided', 'rationale' => 'other'},
+    'tiger', 'dog')}
+    'no error saving in-memory object';
+  ok ($row->in_storage, 'row saved to the db');
+  is ($row->description, 'Undecided', 'correct outcome saved');
+  is ($row->rationale, 'other', 'correct rationale saved');
+  is ($row->username, 'dog', 'user set correctly');
+  is ($row->modified_by, 'tiger', 'modify_by set correctly');
+
+  @historic = $rs_hist->search({'id_seq_composition' => $id_seq_comp},
+                        {'order_by' => { -asc => 'last_modified'}})->all();
+  is (scalar @historic, $hist_count+1, 'one more historic entries');
+  $latest_hist = pop @historic;
+  is (DateTime->compare($latest_hist->last_modified, $row->last_modified), 0,
+    'modification date for the ent and its hist record is the same');
 };
 
 1;

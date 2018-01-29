@@ -136,6 +136,10 @@ sub update_outcome {
   if (!$modified_by) {
     croak q[User name required];
   }
+  if ($self->result_source()->has_column('rationale')
+     && !$outcome->{'rationale'}) {
+    croak q[Rationale required];
+  }
 
   my $dict_rel_name = $self->dict_rel_name();
   my %values = %{$outcome};
@@ -268,6 +272,8 @@ is important when a final decision is changed.
 
   $obj->update_outcome({'mqc_outcome' => $outcome}, $username);
   $obj->update_outcome({'mqc_outcome' => $outcome}, $username, $rt_ticket);
+  $obj->update_outcome({'uqc_outcome' => $outcome, 'rationale' => 'Jack asked'},
+                       $username);
 
 =head2 toggle_final_outcome
 
