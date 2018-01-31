@@ -264,9 +264,7 @@ sub finalise_outcome {
   return;
 }
 
-sub dict_rel_name {
-  return 'mqc_outcome';
-}
+__PACKAGE__->add_dict_rel_name_method();
 
 __PACKAGE__->meta->make_immutable;
 

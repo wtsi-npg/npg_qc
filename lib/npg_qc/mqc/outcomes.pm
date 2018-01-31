@@ -19,7 +19,13 @@ our $VERSION = '0';
 Readonly::Scalar my $SEQ_RS_NAME   => 'MqcOutcomeEnt';
 Readonly::Scalar my $LIB_RS_NAME   => 'MqcLibraryOutcomeEnt';
 Readonly::Scalar my $UQC_RS_NAME   => 'UqcOutcomeEnt';
-Readonly::Array  my @OUTCOME_TYPES => ($LIB_OUTCOMES, $SEQ_OUTCOMES, $UQC_OUTCOMES);
+Readonly::Array  my @OUTCOME_TYPES => ( $LIB_OUTCOMES,
+                                        $SEQ_OUTCOMES,
+                                        $UQC_OUTCOMES, );
+Readonly::Hash   my %OUTCOME_TYPE2RS_NAME =>
+                                      ( $LIB_OUTCOMES => $LIB_RS_NAME,
+                                        $SEQ_OUTCOMES => $SEQ_RS_NAME,
+                                        $UQC_OUTCOMES => $SEQ_RS_NAME, );
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -189,10 +195,11 @@ sub _create_query4compositions {
 
 sub _outcome_type2rs_name {
   my $outcome_type = shift;
-  my $map = { $LIB_OUTCOMES => $LIB_RS_NAME,
-              $SEQ_OUTCOMES => $SEQ_RS_NAME,
-              $UQC_OUTCOMES => $SEQ_RS_NAME };
-  return $map->{$outcome_type};
+  my $rs_name = $OUTCOME_TYPE2RS_NAME{$outcome_type};
+  if (!$rs_name) {
+    croak "Unknown outcome type $outcome_type";
+  }
+  return $rs_name;
 }
 
 sub _find_or_new_outcome {

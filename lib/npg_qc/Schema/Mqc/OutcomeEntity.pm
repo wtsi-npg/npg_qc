@@ -11,8 +11,7 @@ with 'npg_qc::Schema::Composition';
 our $VERSION = '0';
 
 requires qw/ update
-             insert
-             dict_rel_name /;
+             insert /;
 
 Readonly::Scalar my $ACCEPTED_FINAL  => 'Accepted final';
 Readonly::Scalar my $REJECTED_FINAL  => 'Rejected final';
@@ -25,6 +24,19 @@ Readonly::Hash my %DELEGATION_TO_QC_OUTCOME => {
   'is_rejected'       => 'is_rejected',
   'description'       => 'short_desc',
 };
+
+sub add_dict_rel_name_method {
+  my $package_name = shift;
+
+  my ($name) = $package_name =~ /::([[:alpha:]]+qc)(?:Library)?OutcomeEnt\Z/smx;
+  if (!$name) {
+    croak "Failed to derive dictionary relationship name from $package_name";
+  }
+  $name = lc $name .'_outcome';
+  $package_name->meta->add_method('dict_rel_name', sub {return $name;});
+
+  return;
+}
 
 foreach my $this_class_method (keys %DELEGATION_TO_QC_OUTCOME ) {
   __PACKAGE__->meta->add_method( $this_class_method, sub {
@@ -189,6 +201,14 @@ Common functionality for lane and library manual qc and user utility outcomes
 entity DBIx objects.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 add_dict_rel_name_method
+
+Class or package method. Adds dict_rel_name method to the class or package
+that called it.
+
+  $this_package->add_dict_rel_name_method();
+  __PACKAGE_->add_dict_rel_name_method();
 
 =head2 composition
 

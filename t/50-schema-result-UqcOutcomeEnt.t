@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Moose::Meta::Class;
 use DateTime;
@@ -107,6 +107,15 @@ subtest 'test non null constraints' => sub {
       "NOT NULL constraint is set on $col_name";
     $values->{$col_name} = $tempval;
   }
+};
+
+subtest 'qc outcome relationship name' => sub {
+  plan tests => 2; 
+
+  is (npg_qc::Schema::Result::UqcOutcomeEnt->dict_rel_name(),
+    'uqc_outcome', 'as class method');
+  my $row = $rs_ent->search({})->next();
+  is ($row->dict_rel_name(), 'uqc_outcome', 'as instance method');
 };
 
 1;

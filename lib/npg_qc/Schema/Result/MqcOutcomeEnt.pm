@@ -244,15 +244,13 @@ sub update_reported {
   my $self = shift;
   my $username = $ENV{'USER'} || croak 'Failed to get username';
   if(!$self->has_final_outcome) {
-    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update".',
+    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update.',
           $self->id_run, $self->position);
   }
   return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
 }
 
-sub dict_rel_name {
-  return 'mqc_outcome';
-}
+__PACKAGE__->add_dict_rel_name_method();
 
 __PACKAGE__->meta->make_immutable;
 

@@ -225,9 +225,8 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-sub dict_rel_name {
-  return 'uqc_outcome';
-}
+__PACKAGE__->add_dict_rel_name_method();
+
 
 __PACKAGE__->meta->make_immutable;
 
