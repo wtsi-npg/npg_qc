@@ -250,7 +250,7 @@ sub update_reported {
   return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
 }
 
-__PACKAGE__->add_dict_rel_name_method();
+__PACKAGE__->add_common_ent_methods();
 
 __PACKAGE__->meta->make_immutable;
 
@@ -287,8 +287,6 @@ Entity for lane MQC outcome.
 
   Updates the value of reported to the current timestamp. Throws exception if the
   associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
- 
-=head2 dict_rel_name
 
 =head2 seq_component_compositions
 
@@ -297,6 +295,35 @@ Type: has_many
 Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
 
 To simplify queries, skip SeqComposition and link directly to the linking table.
+
+=head2 dict_rel_name
+
+=head2 has_final_outcome
+
+Returns true if this entry corresponds to a final outcome, otherwise returns false.
+
+=head2 is_accepted
+
+Returns true if the outcome is accepted (pass), otherwise returns false.
+
+=head2 is_final_accepted
+
+Returns true if the outcome is accepted (pass) and final, otherwise returns false.
+
+=head2 is_undecided
+
+Returns true if the outcome is undecided (neither pass nor fail),
+otherwise returns false.
+
+=head2 is_rejected
+
+Returns true if the outcome is rejected (fail), otherwise returns false.
+
+=head2 description
+
+Returns short outcome description.
+
+  my $description = $obj->description();
 
 =head1 DEPENDENCIES
 

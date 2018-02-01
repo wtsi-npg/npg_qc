@@ -25,7 +25,7 @@ Readonly::Array  my @OUTCOME_TYPES => ( $LIB_OUTCOMES,
 Readonly::Hash   my %OUTCOME_TYPE2RS_NAME =>
                                       ( $LIB_OUTCOMES => $LIB_RS_NAME,
                                         $SEQ_OUTCOMES => $SEQ_RS_NAME,
-                                        $UQC_OUTCOMES => $SEQ_RS_NAME, );
+                                        $UQC_OUTCOMES => $UQC_RS_NAME, );
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',

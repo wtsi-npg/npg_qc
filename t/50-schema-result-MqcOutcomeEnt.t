@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 use Moose::Meta::Class;
 use DateTime;
@@ -418,6 +418,22 @@ subtest q[validity for update] => sub {
     'error updating a final stored outcome to a preliminary outcome';
   lives_and { is $outcome->valid4update(_outcome('Rejected final')), 0 }
     'no error updating a final stored outcome to the same outcome';
+};
+
+subtest 'dynamically defined methods exist' => sub {
+  plan tests => 8;
+
+  my @methods = qw/dict_rel_name has_final_outcome is_accepted
+                   is_final_accepted is_undecided is_rejected
+                   description/;
+  for my $m (@methods) {
+    ok (npg_qc::Schema::Result::UqcOutcomeEnt->can($m),
+        "method $m exists");
+  }
+
+  throws_ok {npg_qc::Schema::Result::UqcOutcomeEnt->add_common_ent_methods()}
+    qr/One of the methods is already defined/,
+    'these methods cannot be added second time'; 
 };
 
 subtest 'qc outcome relationship name' => sub {

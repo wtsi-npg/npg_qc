@@ -225,7 +225,7 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-__PACKAGE__->add_dict_rel_name_method();
+__PACKAGE__->add_common_ent_methods();
 
 
 __PACKAGE__->meta->make_immutable;
@@ -268,6 +268,35 @@ Result class for uqc outcome entity table.
 =head2 composition
 
   Attribute of type npg_tracking::glossary::composition.
+
+=head2 dict_rel_name
+
+=head2 has_final_outcome
+
+Returns true if this entry corresponds to a final outcome, otherwise returns false.
+
+=head2 is_accepted
+
+Returns true if the outcome is accepted (pass), otherwise returns false.
+
+=head2 is_final_accepted
+
+Returns true if the outcome is accepted (pass) and final, otherwise returns false.
+
+=head2 is_undecided
+
+Returns true if the outcome is undecided (neither pass nor fail),
+otherwise returns false.
+
+=head2 is_rejected
+
+Returns true if the outcome is rejected (fail), otherwise returns false.
+
+=head2 description
+
+Returns short outcome description.
+
+  my $description = $obj->description();
 
 =head1 DEPENDENCIES
 

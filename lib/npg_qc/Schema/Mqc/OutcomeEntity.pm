@@ -3,6 +3,7 @@ package npg_qc::Schema::Mqc::OutcomeEntity;
 use Moose::Role;
 use DateTime;
 use DateTime::TimeZone;
+use List::MoreUtils qw/any/;
 use Carp;
 use Readonly;
 
@@ -16,36 +17,47 @@ requires qw/ update
 Readonly::Scalar my $ACCEPTED_FINAL  => 'Accepted final';
 Readonly::Scalar my $REJECTED_FINAL  => 'Rejected final';
 
-Readonly::Hash my %DELEGATION_TO_QC_OUTCOME => {
-  'has_final_outcome' => 'is_final_outcome',
-  'is_accepted'       => 'is_accepted',
-  'is_final_accepted' => 'is_final_accepted',
-  'is_undecided'      => 'is_undecided',
-  'is_rejected'       => 'is_rejected',
-  'description'       => 'short_desc',
-};
-
-sub add_dict_rel_name_method {
+sub add_common_ent_methods {
   my $package_name = shift;
 
-  my ($name) = $package_name =~ /::([[:alpha:]]+qc)(?:Library)?OutcomeEnt\Z/smx;
-  if (!$name) {
+  if (ref $package_name) {
+    croak 'add_common_ent_methods is a class method, ' .
+          'cannot be called on an object instance';
+  }
+
+  Readonly::Hash my   %DELEGATION_TO_QC_OUTCOME  => {
+    'has_final_outcome' => 'is_final_outcome',
+    'is_accepted'       => 'is_accepted',
+    'is_final_accepted' => 'is_final_accepted',
+    'is_undecided'      => 'is_undecided',
+    'is_rejected'       => 'is_rejected',
+    'description'       => 'short_desc',
+  };
+  Readonly::Scalar my $DICT_REL_NAME_METHOD_NAME => 'dict_rel_name';
+
+  my @delegated = keys %DELEGATION_TO_QC_OUTCOME;
+  if (any {$package_name->can($_)} (@delegated, $DICT_REL_NAME_METHOD_NAME)) {
+    croak 'One of the methods is already defined';
+  }
+
+  my ($dict_rel_name) = $package_name =~ /::([[:alpha:]]+qc)(?:Library)?OutcomeEnt\Z/smx;
+  if (!$dict_rel_name) {
     croak "Failed to derive dictionary relationship name from $package_name";
   }
-  $name = lc $name .'_outcome';
-  $package_name->meta->add_method('dict_rel_name', sub {return $name;});
+  $dict_rel_name = lc $dict_rel_name .'_outcome';
+  $package_name->meta->add_method($DICT_REL_NAME_METHOD_NAME,
+                                  sub {return $dict_rel_name;});
+
+  foreach my $this_class_method (@delegated ) {
+    $package_name->meta->add_method( $this_class_method, sub {
+        my $self = shift;
+        my $that_class_method = $DELEGATION_TO_QC_OUTCOME{$this_class_method};
+        return $self->$dict_rel_name->$that_class_method(@_);
+      }
+    );
+  }
 
   return;
-}
-
-foreach my $this_class_method (keys %DELEGATION_TO_QC_OUTCOME ) {
-  __PACKAGE__->meta->add_method( $this_class_method, sub {
-      my $self = shift;
-      my $outcome_type = $self->dict_rel_name();
-      my $that_class_method = $DELEGATION_TO_QC_OUTCOME{$this_class_method};
-      return $self->$outcome_type->$that_class_method(@_);
-    }
-  );
 }
 
 around [qw/update insert/] => sub {
@@ -197,18 +209,19 @@ npg_qc::Schema::Mqc::OutcomeEntity
 
 =head1 DESCRIPTION
 
-Common functionality for lane and library manual qc and user utility outcomes
-entity DBIx objects.
+Common functionality for outcomes entity DBIx objects.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 add_dict_rel_name_method
+=head2 add_common_ent_methods
 
-Class or package method. Adds dict_rel_name method to the class or package
-that called it.
+Dynamically adds a number of common methods to a class that consumes this role.
+Should be called as a class a class method. Can be called once only.
+The following methods are added: dict_rel_name, has_final_outcome, is_accepted,
+is_final_accepted, is_undecided, is_rejected, description.
 
-  $this_package->add_dict_rel_name_method();
-  __PACKAGE_->add_dict_rel_name_method();
+  $this_package->add_common_methods();
+  __PACKAGE_->add_common_methods();
 
 =head2 composition
 
@@ -234,23 +247,6 @@ Returns a localised DateTime object representing time now.
 Looks at the entity columns and the matching historic metadata to
 find those columns which intersect and copies from entity to a new
 hash intersecting values.
-
-=head2 has_final_outcome
-
-Returns true if this entry corresponds to a final outcome, otherwise returns false.
-
-=head2 is_accepted
-
-Returns true if the outcome is accepted (pass), otherwise returns false.
-
-=head2 is_final_accepted
-
-Returns true if the outcome is accepted (pass) and final, otherwise returns false.
-
-=head2 is_undecided
-
-Returns true if the outcome is undecided (neither pass nor fail),
-otherwise returns false.
 
 =head2 valid4update
 
@@ -283,12 +279,6 @@ for this type of outcome.
   $obj->toggle_final_outcome($username);
   $obj->toggle_final_outcome($username, $rt_ticket);
 
-=head2 description
-
-Returns short outcome description.
-
-  my $description = $obj->description();
-
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -302,6 +292,8 @@ Returns short outcome description.
 =item DateTime
 
 =item DateTime::TimeZone
+
+=item List::MoreUtils
 
 =item Readonly
 
