@@ -244,11 +244,13 @@ sub update_reported {
   my $self = shift;
   my $username = $ENV{'USER'} || croak 'Failed to get username';
   if(!$self->has_final_outcome) {
-    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update".',
+    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update.',
           $self->id_run, $self->position);
   }
   return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
 }
+
+__PACKAGE__->add_common_ent_methods();
 
 __PACKAGE__->meta->make_immutable;
 
@@ -294,6 +296,35 @@ Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
 
 To simplify queries, skip SeqComposition and link directly to the linking table.
 
+=head2 dict_rel_name
+
+=head2 has_final_outcome
+
+Returns true if this entry corresponds to a final outcome, otherwise returns false.
+
+=head2 is_accepted
+
+Returns true if the outcome is accepted (pass), otherwise returns false.
+
+=head2 is_final_accepted
+
+Returns true if the outcome is accepted (pass) and final, otherwise returns false.
+
+=head2 is_undecided
+
+Returns true if the outcome is undecided (neither pass nor fail),
+otherwise returns false.
+
+=head2 is_rejected
+
+Returns true if the outcome is rejected (fail), otherwise returns false.
+
+=head2 description
+
+Returns short outcome description.
+
+  my $description = $obj->description();
+
 =head1 DEPENDENCIES
 
 =over
@@ -326,7 +357,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL Genome Research Limited
+Copyright (C) 2018 GRL Genome Research Limited
 
 This file is part of NPG.
 

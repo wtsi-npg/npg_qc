@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - qc outcomes model: code generalisation to simplify addition of
+   further qc types
+ - switch to node 6.12.2 in travis
+ - stop generating DBIx classes for unused tables
+ - tiny tweaks to rna and verify bam id help links
  - ensure, where practical, that saving and retrieving qc outcomes
      works for multi-component compositions
  - add functionality to allow more columns to be added to table dynamically

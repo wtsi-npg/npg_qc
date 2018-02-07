@@ -350,7 +350,7 @@ subtest 'data validation for update requests' => sub {
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/Outcome description is missing for 1:4/,
+  like ($response->content, qr/Error saving outcome for 1:4 - Outcome description is missing/,
     'outcome description should be present');
 
   $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'Undecided'}, '1:4' => {'qc_outcome' => ''}};
@@ -358,7 +358,7 @@ subtest 'data validation for update requests' => sub {
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/Outcome description is missing for 1:4/,
+  like ($response->content, qr/Error saving outcome for 1:4 - Outcome description is missing/,
     'outcome description should not be empty');
 };
 
