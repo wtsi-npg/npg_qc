@@ -5,6 +5,8 @@ use namespace::autoclean;
 use MooseX::ClassAttribute;
 use Carp;
 use Readonly;
+use File::Basename;
+use File::Spec;
 
 our $VERSION = '0';
 
@@ -50,6 +52,7 @@ Readonly::Hash our %HEADER_MAPPING => (
           'MAX_MISMATCHES' => 'max_mismatches_param',
           'MIN_MISMATCH_DELTA' => 'min_mismatch_delta_param',
           'MAX_NO_CALLS' => 'max_no_calls_param',
+          'PCT_TAG_HOPS' => 'pct_tag_hops',
                                       );
 
 Readonly::Scalar our $ERROR_TOLERANCE_PERCENT => 20;
@@ -168,6 +171,20 @@ override 'execute' => sub  {
     $self->_parse_tag_metrics($tag_metrics);
   }
   close $fh or carp q[Cannot close a filehandle];
+
+  if (open my $fh, '<', $metrics_file.q[.hops]) {
+    $line = <$fh>;
+    $line = <$fh>;
+    if ($line) {
+      $self->_parse_header($line);
+    } else {
+      $self->result->pct_tag_hops(0);
+    }
+    close $fh or carp q[Cannot close a filehandle for hops file];
+    my $gzip_metrics_file = File::Spec->join($self->qc_out,basename($metrics_file) . q[.hops.gz]);
+    system(qq[gzip -c $metrics_file.hops > $gzip_metrics_file]) == 0 or
+      croak qq[gzip command [gzip -c $metrics_file.hops > $gzip_metrics_file] failed];
+  }
 
   my $pass = ($self->result->errors_percent > $ERROR_TOLERANCE_PERCENT) ? 0 : 1;
   $self->result->pass($pass);

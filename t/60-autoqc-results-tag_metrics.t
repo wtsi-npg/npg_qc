@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 21;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::tag_metrics');
@@ -35,6 +35,7 @@ use_ok ('npg_qc::autoqc::results::tag_metrics');
   is($r->spiked_control_index, 168, 'spiked control index is 168');
   is($r->all_reads, 118207260, 'all reads count');
   is($r->errors, 2799524, 'errors reads count');
+  is($r->pct_tag_hops, undef, 'no tag hops');
   is(sprintf("%.2f", $r->variance_coeff), '75.61', 'coeff of variance for perfect matches');
   my $all = 0;
   is(sprintf("%.2f", $r->variance_coeff($all)), '75.61', 'coeff of variance for perfect matches');
@@ -45,6 +46,7 @@ use_ok ('npg_qc::autoqc::results::tag_metrics');
 {
   my $r = npg_qc::autoqc::results::tag_metrics->load('t/data/autoqc/tag_metrics/6954_1.tag_metrics.json');
   is($r->spiked_control_index, undef, 'spiked control index is undefined');
+  is($r->pct_tag_hops, 27.5, 'tag hops');
   my @expected = (49 .. 96, 168, 0);
   is(join(q[ ], $r->sorted_tag_indices), join(q[ ], @expected), 'tag indices sorted correctly');
 }

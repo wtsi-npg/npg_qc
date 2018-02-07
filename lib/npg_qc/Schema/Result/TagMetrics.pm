@@ -188,6 +188,12 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   data_type: 'bigint'
   is_nullable: 1
 
+=head2 pct_tag_hops
+
+  data_type: 'float'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -249,6 +255,8 @@ __PACKAGE__->add_columns(
   { data_type => 'text', is_nullable => 1 },
   'tag_index',
   { data_type => 'bigint', is_nullable => 1 },
+  'pct_tag_hops',
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -314,8 +322,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::tag_metrics';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:PPLzZHHeT6ST2JOUb4d5RA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-07 15:36:04
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9JYYQ25jcjUssN32q1sjEA
 
 our $VERSION = '0';
 
