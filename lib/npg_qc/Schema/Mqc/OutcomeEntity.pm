@@ -137,7 +137,7 @@ sub update_outcome {
     croak q[User name required];
   }
   if ($self->result_source()->has_column('rationale')
-     && !$outcome->{'rationale'}) {
+      && !$outcome->{'rationale'}) {
     croak q[Rationale required];
   }
 
@@ -145,8 +145,12 @@ sub update_outcome {
   my %values = %{$outcome};
   $values{'id_' . $dict_rel_name} =
     $self->_outcome_id(delete $values{$dict_rel_name});
-  $values{'username'}    = $username || $modified_by;
-  $values{'modified_by'} = $modified_by;
+  $values{'modified_by'} = __PACKAGE__->sanitize_value($modified_by);
+  $values{'username'}    = $username ?
+                           __PACKAGE__->sanitize_value($username) : $values{'modified_by'};
+  if (exists $values{'rationale'}) {
+    $values{'rationale'} = __PACKAGE__->sanitize_value($values{'rationale'});
+  }
 
   if ($self->in_storage) {
     $self->update(\%values);
@@ -158,6 +162,17 @@ sub update_outcome {
   }
 
   return;
+}
+
+sub sanitize_value {
+  my ($package_name, $value) = @_;
+
+  defined $value or croak q[Input undefined];
+  $value =~ s/\A\s+//smx;
+  $value =~ s/\s+\Z//smx;
+  $value or croak q[Only white space characters in input];
+  ($value =~ /\A[[:word:][:space:]#-]+\Z/smx) or croak 'Illegal characters';
+  return $value;
 }
 
 sub _rs_name {
@@ -274,6 +289,18 @@ is important when a final decision is changed.
   $obj->update_outcome({'mqc_outcome' => $outcome}, $username, $rt_ticket);
   $obj->update_outcome({'uqc_outcome' => $outcome, 'rationale' => 'Jack asked'},
                        $username);
+
+=head2 sanitize_value
+
+Returns a sanitised string or raises an error if the argument contains illegal
+characters. Sanitization ammounts to trimming white space at the beginning
+and the end of the string. Designed to protect against Javascript injection.
+Strings containing e-mails or HTML code are considered illegal. The error
+message does not contain the original string, so is safe to display
+on a web page. However, it does not give any clue about the nature of the
+problem.
+
+  __PACKAGE__->sanitize_value($value);
 
 =head2 toggle_final_outcome
 

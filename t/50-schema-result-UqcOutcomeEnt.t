@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 use Moose::Meta::Class;
 use DateTime;
@@ -290,6 +290,39 @@ subtest 'update outcome' => sub {
   $latest_hist = pop @historic;
   is (DateTime->compare($latest_hist->last_modified, $row->last_modified), 0,
     'modification date for the ent and its hist record is the same');
+};
+
+subtest 'sanitize' => sub {
+  plan tests => 14;
+
+  my $p = 'npg_qc::Schema::Result::UqcOutcomeEnt';
+  throws_ok { $p->sanitize_value() } qr/Input undefined/,
+    'requires input';
+  throws_ok { $p->sanitize_value(q[]) }
+    qr/Only white space characters in input/,
+    'requires non-empty input';
+  throws_ok { $p->sanitize_value(qq[ \n\t]) }
+    qr/Only white space characters in input/,
+    'all white space input is not accepted';
+
+  is ($p->sanitize_value(q[d3om4]), q[d3om4], 'alhanumeric string accepted');
+  is ($p->sanitize_value(q[RT#345]), q[RT#345], 'hash accepted');
+  is ($p->sanitize_value(q[RT_345]), q[RT_345], 'underscore accepted');
+  is ($p->sanitize_value(q[RT-345]), q[RT-345], 'dash accepted');
+  is ($p->sanitize_value(qq[\ndom\t ]), q[dom], 'trimmed value returned');
+  is ($p->sanitize_value(qq[\ndo m\t ]), q[do m], 'space in the middle is accepted, not trimmed');
+
+  throws_ok { $p->sanitize_value('email "someone"') }
+    qr/Illegal characters/, 'double quotes are not accepted';
+  throws_ok { $p->sanitize_value(q{email someone's friend}) }
+    qr/Illegal characters/, 'single quotes are not accepted';
+
+  throws_ok { $p->sanitize_value('email some@other.com') }
+    qr/Illegal characters/, 'email address is not allowed';
+  throws_ok { $p->sanitize_value('form <th>some</th>') }
+    qr/Illegal characters/, 'HTML is not allowed';
+  throws_ok { $p->sanitize_value('<script>console.log();</script>') }
+    qr/Illegal characters/, 'JavaScript is not allowed';
 };
 
 1;
