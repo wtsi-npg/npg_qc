@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 69;
+use Test::More tests => 67;
 use Test::Exception;
 
 use_ok('npg_qc::autoqc::checks::tag_metrics');
@@ -65,9 +65,6 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
   is($result->min_mismatch_delta_param, 1, 'min_mismatch_delta is 1');
   is($result->max_no_calls_param, 2, 'max_no_calls is 2');
   is($result->pct_tag_hops, 0, 'empty tag hop file');
-  my $gzip_file = $check->qc_out . q[/6552_1.bam.tag_decode.metrics.hops.gz];
-  ok(-e $gzip_file, qq[tag hops file $gzip_file has been gzipped]);
-  unlink $gzip_file;
 }
 
 {
@@ -82,9 +79,6 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
   is($result->min_mismatch_delta_param, 1, 'min_mismatch_delta is 1');
   is($result->max_no_calls_param, 2, 'max_no_calls is 2');
   is($result->pct_tag_hops, 27.272728, 'tag hop file');
-  my $gzip_file = $check->qc_out . q[/6553_1.bam.tag_decode.metrics.hops.gz];
-  ok(-e $gzip_file, qq[tag hops file $gzip_file has been gzipped]);
-  unlink $gzip_file;
 }
 
 {

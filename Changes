@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - add pct_tag_hops column to tag metrics
  - switch to node 6.12.2 in travis
  - stop generating DBIx classes for unused tables
  - tiny tweaks to rna and verify bam id help links

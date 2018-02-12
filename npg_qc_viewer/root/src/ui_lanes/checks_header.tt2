@@ -16,7 +16,7 @@
       spatial_filter   = 'filter fail,<br/>total'
       split_stats      = 'aligned<br />reads,<br />%'
       tag_decode_stats = '<span class="nbsp">decode rate %</span><br /><span class="dark_blue">CV %</span>'
-      tag_metrics      = 'decode rate, %<br />CV %'
+      tag_metrics      = 'decode rate, %<br />CV% (hops%)'
       tags_reporters   = ''
       upstream_tags    = 'tag0 reads (%)<br />perf.match reads (%)'
       verify_bam_id    = 'freemix'
