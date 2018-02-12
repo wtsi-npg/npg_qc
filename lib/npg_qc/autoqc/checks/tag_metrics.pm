@@ -181,9 +181,6 @@ override 'execute' => sub  {
       $self->result->pct_tag_hops(0);
     }
     close $fh or carp q[Cannot close a filehandle for hops file];
-    my $gzip_metrics_file = File::Spec->join($self->qc_out,basename($metrics_file) . q[.hops.gz]);
-    system(qq[gzip -c $metrics_file.hops > $gzip_metrics_file]) == 0 or
-      croak qq[gzip command [gzip -c $metrics_file.hops > $gzip_metrics_file] failed];
   }
 
   my $pass = ($self->result->errors_percent > $ERROR_TOLERANCE_PERCENT) ? 0 : 1;
