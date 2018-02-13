@@ -293,7 +293,7 @@ sub _build_tag0_index_length {
   my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools . qq[ view $bfile" ];
   open my $ph, q(-|), $command or croak qq[Cannot fork '$command', error $ERRNO];
   while (my $line = <$ph>) {
-    if($line =~ /\t(BC|RT):Z:(\S+)/smx) {
+    if($line =~ /\t(BC|RT):Z:([^\s-]+)/smx) {
       $index_length = length $2;
       last;
     }
