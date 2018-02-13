@@ -441,7 +441,7 @@ has 'BamIndexDecoder_cmd'  => ( isa        => 'Str',
 sub _build_BamIndexDecoder_cmd {
   my $self = shift;
 
-  my $bid_cmd_template = q[bambi --compression-level 0 --output /dev/null --barcode-file %s --metrics-file %s --max-mismatches %d --max-no-calls %d %s];
+  my $bid_cmd_template = q[bambi decode --compression-level 0 --output /dev/null --barcode-file %s --metrics-file %s --max-mismatches %d --max-no-calls %d %s];
 
   my $bid_cmd = sprintf $bid_cmd_template,
   $self->barcode_filename,
