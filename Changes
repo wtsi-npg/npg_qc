@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - upstream_tags check: change BamIndexDecoder command to bambi (from java)
+
 release 64.5
  - qc outcomes model: code generalisation to simplify addition of
    further qc types
