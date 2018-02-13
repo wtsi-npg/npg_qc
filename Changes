@@ -1,6 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+
  - add pct_tag_hops column to tag metrics
+ - qc outcomes model: code generalisation to simplify addition of
+   further qc types
  - switch to node 6.12.2 in travis
  - stop generating DBIx classes for unused tables
  - tiny tweaks to rna and verify bam id help links
@@ -8,6 +11,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      works for multi-component compositions
  - add functionality to allow more columns to be added to table dynamically
  - add data for new extra column for sample_name in summary table
+ - treat all dynamically added methods in the same way
 
 release 64.4.1
  - fix bam_flagstats check library_size bug

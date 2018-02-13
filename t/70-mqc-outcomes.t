@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 15;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON::XS;
@@ -502,95 +502,6 @@ subtest q[find or create seq entity] => sub {
     'correct outcome description');
 };
 
-subtest q[validation for an update] => sub {
-  plan tests => 12;
-
-  my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
-  my $dict_id_prel = $qc_schema->resultset('MqcOutcomeDict')->search(
-      {'short_desc' => 'Rejected preliminary'}
-     )->next->id_mqc_outcome;
-  my $dict_id_final = $qc_schema->resultset('MqcOutcomeDict')->search(
-      {'short_desc' => 'Rejected final'}
-     )->next->id_mqc_outcome;
-
-  my $values = {'id_run' => 45, 'position' => 2};
-  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
-                $qc_schema, {'id_run' => 45, 'position' => 2});
-  my $outcome = $qc_schema->resultset('MqcOutcomeEnt')->new_result($values);;
-  lives_and {
-    is $o->_valid4update($outcome, 'Rejected preliminary'), 1 }
-    'in-memory object can be updated to a prelim outcome';
-  lives_and {
-    is $o->_valid4update($outcome, 'Rejected final'), 1 }
-    'in-memory object can be updated to a final outcome';
-
-  $values = {
-    'id_run'         => 45,
-    'position'       => 7,
-    'id_mqc_outcome' => $dict_id_prel,
-    'username'       => 'cat',
-    'modified_by'    => 'dog',
-  };
-  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
-                $qc_schema, {'id_run' => 45, 'position' => 7});
-  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
-  lives_and {
-    is $o->_valid4update($outcome, 'Rejected preliminary'), 0 }
-    'preliminary stored seq outcome cannot be updated to the same outcome';
-  lives_and {
-    is $o->_valid4update($outcome, 'Accepted preliminary'), 1 }
-    'preliminary stored seq outcome can be updated to another priliminary outcome';
-  lives_and {
-    is $o->_valid4update($outcome, 'Accepted final'), 1 }
-    'preliminary stored seq outcome can be updated to a final outcome';
-
-  $outcome->update({'id_mqc_outcome' => $dict_id_final});
-  throws_ok { $o->_valid4update($outcome, 'Accepted final') }
-    qr/Final outcome cannot be updated/,
-    'error updating a final stored outcome to another final outcome';
-  throws_ok { $o->_valid4update($outcome, 'Accepted preliminary') }
-    qr/Final outcome cannot be updated/,
-    'error updating a final stored seq outcome to a preliminary outcome';
-  lives_and { is $o->_valid4update($outcome, 'Rejected final'), 0 }
-    'no error updating a final stored seq outcome to the same outcome';
-
-  $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
-  $dict_id_prel =
-    $qc_schema->resultset('MqcLibraryOutcomeDict')->search(
-    {'short_desc' => 'Undecided'})->next->id_mqc_library_outcome;
-  $dict_id_final =
-    $qc_schema->resultset('MqcLibraryOutcomeDict')->search(
-    {'short_desc' => 'Undecided final'})->next->id_mqc_library_outcome;
-
-  $values = {'id_run' => 47, 'position' => 2, tag_index => 3};
-  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
-                $qc_schema, $values);
-  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->new_result($values);
-  is($o->_valid4update($outcome, 'some outcome'), 1,
-    'in-memory object can be updated');
-
-  $values = {
-    'id_run'         => 47,
-    'position'       => 2,
-    'tag_index'      => 3,
-    'id_mqc_outcome' => $dict_id_prel,
-    'username'       => 'cat',
-    'modified_by'    => 'dog',
-  };
-  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
-                $qc_schema, {'id_run' => 47, 'position' => 2, tag_index => 3});
-  $outcome = $qc_schema->resultset('MqcLibraryOutcomeEnt')->create($values);
-  is($o->_valid4update($outcome, 'some outcome'), 1,
-    'stored lib outcome can be updated to a different outcome');
-  is($o->_valid4update($outcome, $outcome->mqc_outcome->short_desc), 0,
-    'stored lib outcome cannot be updated to the same outcome');
-
-  $outcome->update({'id_mqc_outcome' => $dict_id_final});
-  throws_ok { $o->_valid4update($outcome, 'some outcome') }
-    qr/Final outcome cannot be updated/,
-    'error updating a final stored lib outcome to another final outcome';
-};
-
 subtest q[save - errors] => sub {
   plan tests => 15;
 
@@ -626,11 +537,11 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>{'123'=>[]}}, q[cat], {}) }
     qr/Outcome is not defined or is not a hash ref/,
     'outcome is not a hash ref - error';
-  throws_ok {$o->save({'lib'=>{'123'=>{'mqc_outcome'=>undef}}}, q[cat], {}) }
-    qr/Outcome description is missing for 123/,
+  throws_ok {$o->save({'lib'=>{'123:3'=>{'mqc_outcome'=>undef}}}, q[cat], {}) }
+    qr/Error saving outcome for 123:3 - Outcome description is missing/,
     'undefined outcome description - error';
-  throws_ok {$o->save({'lib'=>{'123'=>{'mqc_outcome'=>''}}}, q[cat], {}) }
-    qr/Outcome description is missing for 123/,
+  throws_ok {$o->save({'lib'=>{'123:3'=>{'mqc_outcome'=>''}}}, q[cat], {}) }
+    qr/Error saving outcome for 123:3 - Outcome description is missing/,
     'empty outcome description - error';
   throws_ok {$o->save({'lib'=>{'123:4:5;3:4:5'=>{'mqc_outcome'=>'Accepted preliminary'}}}, q[cat], {}) }
     qr/Saving outcomes for multi-component compositions is not yet implemented/,

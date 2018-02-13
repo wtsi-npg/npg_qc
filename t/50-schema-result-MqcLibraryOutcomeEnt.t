@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 9;
 use Test::Exception;
 use Moose::Meta::Class;
 
@@ -8,6 +8,7 @@ use npg_testing::db;
 use t::autoqc_util;
 
 my $table      = 'MqcLibraryOutcomeEnt';
+my $dict_table = 'MqcLibraryOutcomeDict';
 my $hist_table = 'MqcLibraryOutcomeHist';
 
 use_ok('npg_qc::Schema::Result::' . $table);
@@ -15,6 +16,11 @@ use_ok('npg_qc::Schema::Result::' . $table);
 my $schema = Moose::Meta::Class->create_anon_class(
      roles => [qw/npg_testing::db/])
      ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
+
+sub _outcome {
+  my $description = shift;
+  return {'mqc_outcome' => $description};
+}
 
 subtest 'Test insert' => sub {
   plan tests => 9;
@@ -166,7 +172,7 @@ subtest q[update] => sub {
                 $schema, $args);
   my $new_row = $rs->new_result($args);
   my $outcome = 'Accepted preliminary';
-  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+  lives_ok { $new_row->update_outcome(_outcome($outcome), 'cat') }
     'preliminary outcome saved';
   ok ($new_row->in_storage, 'new object has been saved');
 
@@ -190,7 +196,7 @@ subtest q[update] => sub {
   $outcome = 'Accepted final';
 
   $new_row = $rs->new_result($args);
-  throws_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
+  throws_ok { $new_row->update_outcome(_outcome($outcome), 'dog', 'cat') }
     qr /UNIQUE constraint failed/,
     'error creating a record for existing entity';
 
@@ -198,7 +204,7 @@ subtest q[update] => sub {
   $args->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run' => 444, 'position' => 2, 'tag_index' => 2});
   $new_row = $rs->new_result($args);
-  lives_ok { $new_row->update_outcome($outcome, 'dog', 'cat') }
+  lives_ok { $new_row->update_outcome(_outcome($outcome), 'dog', 'cat') }
     'final outcome saved';
   ok ($new_row->in_storage, 'new object has been saved');
 
@@ -226,18 +232,76 @@ subtest q[update] => sub {
                 $schema, $args);
   $new_row = $rs->new_result($args);
   $outcome = 'Accepted final';
-  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+  lives_ok { $new_row->update_outcome(_outcome($outcome), 'cat') }
     'final outcome saved';
   ok ($new_row->in_storage, 'outcome has been saved');
   is ($new_row->mqc_outcome->short_desc, $outcome, 'final outcome');
 
   $outcome = 'Rejected final';
-  lives_ok { $new_row->update_outcome($outcome, 'cat') }
+  lives_ok { $new_row->update_outcome(_outcome($outcome), 'cat') }
     'can update final outcome';
   ok ($new_row->in_storage, 'outcome has been saved');
   is ($new_row->mqc_outcome->short_desc, $outcome, 'new final outcome');
 
   $new_row->delete();
+};
+
+subtest q[validity for update] => sub {
+  plan tests => 11;
+
+  my $values = {'id_run' => 45, 'position' => 2};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, $values);
+  my $outcome = $schema->resultset($table)->new_result($values);
+
+  throws_ok {$outcome->valid4update()}
+    qr/Outcome hash is required/, 'outcome arg is required';
+  throws_ok {$outcome->valid4update('Rejected preliminary')}
+    qr/Outcome hash is required/, 'outcome arg should be a hash';
+  throws_ok {$outcome->valid4update(_outcome(undef))}
+    qr/Outcome description is missing/, 'outcome should be defined';
+  throws_ok {$outcome->valid4update(_outcome(q[]))}
+    qr/Outcome description is missing/, 'outcome cannot be an empty string';
+  throws_ok {$outcome->valid4update({'some_outcome' => 'Rejected preliminary'})}
+    qr/Outcome description is missing/, 'matching outcome type should be used';
+
+  lives_and {
+    is $outcome->valid4update(_outcome('Rejected preliminary')), 1 }
+    'in-memory object can be updated to a prelim outcome';
+  lives_and {
+    is $outcome->valid4update(_outcome('Rejected final')), 1 }
+    'in-memory object can be updated to a final outcome';
+
+  my $dict_id_prel =
+    $schema->resultset($dict_table)->search(
+    {'short_desc' => 'Undecided'})->next->id_mqc_library_outcome;
+  my $dict_id_final =
+    $schema->resultset($dict_table)->search(
+    {'short_desc' => 'Undecided final'})->next->id_mqc_library_outcome;
+
+  $values = {'id_run' => 47, 'position' => 2, tag_index => 3};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, $values);
+  $outcome = $schema->resultset($table)->new_result($values);
+  is($outcome->valid4update(_outcome('some outcome')), 1,
+    'in-memory object can be updated');
+
+  $values = {'id_run' => 47, 'position' => 2, 'tag_index' => 3};
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, $values);
+  $values->{'id_mqc_outcome'} = $dict_id_prel;
+  $values->{'username'} = 'cat';
+  $values->{'modified_by'} = 'dog';
+  $outcome = $schema->resultset($table)->create($values);
+  is($outcome->valid4update(_outcome('some outcome')), 1,
+    'stored lib outcome can be updated to a different outcome');
+  is($outcome->valid4update(_outcome($outcome->mqc_outcome->short_desc)), 0,
+    'stored lib outcome cannot be updated to the same outcome');
+
+  $outcome->update({'id_mqc_outcome' => $dict_id_final});
+  throws_ok { $outcome->valid4update(_outcome('some outcome')) }
+    qr/Final outcome cannot be updated/,
+    'error updating a final stored lib outcome to another final outcome';
 };
 
 subtest q[toggle final outcome] => sub {
@@ -253,19 +317,19 @@ subtest q[toggle final outcome] => sub {
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     qr/Record is not stored in the database yet/,
     'cannot toggle a new object';
-  lives_ok { $new_row->update_outcome('Accepted preliminary', 'cat') }
+  lives_ok { $new_row->update_outcome(_outcome('Accepted preliminary'), 'cat') }
     'prelim outcome saved';
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     qr/Cannot toggle non-final outcome Accepted preliminary/,
     'cannot toggle a non-final outcome';
-  lives_ok { $new_row->update_outcome('Undecided final', 'cat') }
+  lives_ok { $new_row->update_outcome(_outcome('Undecided final'), 'cat') }
     'undecided final outcome saved';
   throws_ok { $new_row->toggle_final_outcome('cat', 'dog') }
     qr/Cannot toggle undecided final outcome/,
     'cannot toggle an undecided outcome';
 
   my $old_outcome = 'Accepted final';
-  lives_ok { $new_row->update_outcome($old_outcome, 'cat') }
+  lives_ok { $new_row->update_outcome(_outcome($old_outcome), 'cat') }
     'final outcome saved';
   is($new_row->mqc_outcome->short_desc, $old_outcome, 'final outcome is set');
 
@@ -279,6 +343,31 @@ subtest q[toggle final outcome] => sub {
   is($new_row->mqc_outcome->short_desc, $old_outcome, 'old outcome again');
 
   $new_row->delete();
+};
+
+subtest 'dynamically defined methods exist' => sub {
+  plan tests => 8;
+
+  my @methods = qw/dict_rel_name has_final_outcome is_accepted
+                   is_final_accepted is_undecided is_rejected
+                   description/;
+  for my $m (@methods) {
+    ok (npg_qc::Schema::Result::UqcOutcomeEnt->can($m),
+        "method $m exists");
+  }
+
+  throws_ok {npg_qc::Schema::Result::UqcOutcomeEnt->add_common_ent_methods()}
+    qr/One of the methods is already defined/,
+    'these methods cannot be added second time'; 
+};
+
+subtest 'qc outcome relationship name' => sub {
+  plan tests => 2; 
+
+  is (npg_qc::Schema::Result::MqcLibraryOutcomeEnt->dict_rel_name(),
+    'mqc_outcome', 'as class method');
+  my $row = $schema->resultset($table)->search({})->next();
+  is ($row->dict_rel_name(), 'mqc_outcome', 'as instance method');
 };
 
 1;

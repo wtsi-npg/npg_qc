@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Test::Exception;
 use Moose::Meta::Class;
 use DateTime;
@@ -107,6 +107,31 @@ subtest 'test non null constraints' => sub {
       "NOT NULL constraint is set on $col_name";
     $values->{$col_name} = $tempval;
   }
+};
+
+subtest 'dynamically defined methods exist' => sub {
+  plan tests => 8;
+
+  my @methods = qw/dict_rel_name has_final_outcome is_accepted
+                   is_final_accepted is_undecided is_rejected
+                   description/;
+  for my $m (@methods) {
+    ok (npg_qc::Schema::Result::UqcOutcomeEnt->can($m),
+        "method $m exists");
+  }
+
+  throws_ok {npg_qc::Schema::Result::UqcOutcomeEnt->add_common_ent_methods()}
+    qr/One of the methods is already defined/,
+    'these methods cannot be added second time'; 
+};
+
+subtest 'qc outcome relationship name' => sub {
+  plan tests => 2; 
+
+  is (npg_qc::Schema::Result::UqcOutcomeEnt->dict_rel_name(),
+    'uqc_outcome', 'as class method');
+  my $row = $rs_ent->search({})->next();
+  is ($row->dict_rel_name(), 'uqc_outcome', 'as instance method');
 };
 
 1;

@@ -9,7 +9,7 @@ use List::MoreUtils qw/ any /;
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
 use npg_qc::Schema::Mqc::OutcomeDict;
-use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
+use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES /;
 use npg_qc::mqc::outcomes;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
@@ -197,11 +197,13 @@ sub _lane_info {
 sub _update_runlanes {
   my ($self, $c, $seq_outcomes, $username) = @_;
 
+  my $dict_rel_name = $c->model('NpgQcDB')->schema()->resultset('MqcOutcomeEnt')
+                                          ->result_class()->dict_rel_name();
   foreach my $key ( keys %{$seq_outcomes} ) {
 
     my $outcome = $seq_outcomes->{$key};
     if (!npg_qc::Schema::Mqc::OutcomeDict
-          ->is_final_outcome_description($outcome->{$QC_OUTCOME})) {
+          ->is_final_outcome_description($outcome->{$dict_rel_name})) {
       next;
     }
 
