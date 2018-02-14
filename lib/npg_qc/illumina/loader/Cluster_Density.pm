@@ -20,7 +20,10 @@ Readonly::Scalar our $TILE_METRICS_INTEROP_CODES => {'cluster density'    => 100
                                                      'cluster density pf' => 101,
                                                      'cluster count'      => 102,
                                                      'cluster count pf'   => 103,
+                                                     'version3_cluster_counts' => ord('t'),
                                                      };
+
+Readonly::Scalar our $PF_CYCLE => q{C25.1};
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -69,7 +72,16 @@ has 'tile_metrics_interop_file' => (isa => q{Str},
                       );
 sub _build_tile_metrics_interop_file {
   my $self = shift;
-  return $self->runfolder_path().q{/InterOp/TileMetricsOut.bin};
+  my $interop_file = $self->runfolder_path().q{/InterOp/TileMetricsOut.bin};
+  if ( ! -e $interop_file ) {
+    $self->mlog(qq{Couldn't find interop file $interop_file, looking in $PF_CYCLE sub-directory});
+    # look for one in the PF_CYCLE sub-directory
+    $interop_file = $self->runfolder_path().qq{/InterOp/$PF_CYCLE/TileMetricsOut.bin};
+    if ( ! -e $interop_file ) {
+      croak qq{Couldn't find interop file $interop_file};
+    }
+  }
+  return $interop_file;
 }
 
 =head2 run
@@ -98,8 +110,6 @@ sub parsing_interop {
   my $length;
   my $data;
 
-  my $template = 'v3f'; # three two-byte integers and one 4-byte float
-
   ## no critic (InputOutput::RequireBriefOpen)
   open my $fh, q{<}, $interop or croak qq{Couldn't open interop file $interop, error $ERRNO};
   binmode $fh, ':raw';
@@ -112,13 +122,38 @@ sub parsing_interop {
 
   my $tile_metrics = {};
 
-  while ($fh->read($data, $length)) {
-    my ($lane,$tile,$code,$value) = unpack $template, $data;
-    if( $code == $TILE_METRICS_INTEROP_CODES->{'cluster density'} ){
-      push @{$tile_metrics->{$lane}->{'cluster density'}}, $value;
-    }elsif( $code == $TILE_METRICS_INTEROP_CODES->{'cluster density pf'} ){
-      push @{$tile_metrics->{$lane}->{'cluster density pf'}}, $value;
+  if( $version == 3) {
+    $fh->read($data, 4) or
+      croak qq{Couldn't read area in interop file $interop, error $ERRNO};
+    my $area = unpack 'f', $data;
+    if( $area == 0.0 ) {
+      croak qq{Invalid area $area in interop file $interop};
     }
+    while ($fh->read($data, $length)) {
+      my $template = 'vVc'; # one 2-byte integer, one 4-byte integer and one 1-byte char
+      my ($lane,$tile,$code) = unpack $template, $data;
+      if( $code == $TILE_METRICS_INTEROP_CODES->{'version3_cluster_counts'} ){
+        $data = substr($data,7);
+        $template = 'f2'; # two 4-byte floats
+        my ($cluster_count, $cluster_count_pf) = unpack $template, $data;
+        my $cluster_density = $cluster_count / $area;
+        my $cluster_density_pf = $cluster_count_pf / $area;
+        push @{$tile_metrics->{$lane}->{'cluster density'}}, $cluster_density;
+        push @{$tile_metrics->{$lane}->{'cluster density pf'}}, $cluster_density_pf;
+      }
+    }
+  } elsif( $version == 2) {
+    my $template = 'v3f'; # three 2-byte integers and one 4-byte float
+    while ($fh->read($data, $length)) {
+      my ($lane,$tile,$code,$value) = unpack $template, $data;
+      if( $code == $TILE_METRICS_INTEROP_CODES->{'cluster density'} ){
+        push @{$tile_metrics->{$lane}->{'cluster density'}}, $value;
+      }elsif( $code == $TILE_METRICS_INTEROP_CODES->{'cluster density pf'} ){
+        push @{$tile_metrics->{$lane}->{'cluster density pf'}}, $value;
+      }
+    }
+  } else {
+    croak qq{Unknown version $version in interop file $interop};
   }
 
   $fh->close() or croak qq{Couldn't close interop file $interop, error $ERRNO};
