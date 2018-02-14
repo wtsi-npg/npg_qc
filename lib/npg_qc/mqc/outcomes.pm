@@ -93,9 +93,6 @@ sub save {
   if (!$username) {
     croak q[Username is required];
   }
-  if ($outcomes->{$UQC_OUTCOMES}) {
-    croak 'Saving uqc outcomes is not yet implemented';
-  }
   if ($outcomes->{$SEQ_OUTCOMES} && !$lane_info) {
     croak q[Tag indices for lanes are required];
   }
@@ -220,6 +217,8 @@ sub _find_or_new_outcome {
   if (!$result) {
     # Create result object in memory.
     if ($composition_obj->num_components() == 1) {
+      # id_run, position and tag_index columns are now nullable,
+      #  but we will still try to assign values
       my %columns = map { $_ => 1 } $rs->result_source()->columns();
       if (exists $columns{'id_run'}) {
         my $component = $composition_obj->get_component(0);

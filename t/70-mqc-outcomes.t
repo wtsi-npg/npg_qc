@@ -503,7 +503,7 @@ subtest q[find or create seq entity] => sub {
 };
 
 subtest q[save - errors] => sub {
-  plan tests => 15;
+  plan tests => 18;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
   throws_ok {$o->save() } qr/Outcomes hash is required/,
@@ -528,9 +528,6 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>[1,3,4], 'seq'=>{}}, q[cat], {}) }
     qr/Outcome for lib is not a hash ref/,
     'unexpected type of values - error';
-  throws_ok {$o->save({'lib'=>{}, 'uqc'=>{}}, q[cat], {}) }
-    qr/Saving uqc outcomes is not yet implemented/,
-    'Saving uqc outcomes is not yet implemented';
   throws_ok {$o->save({'lib'=>{'123'=>undef}}, q[cat], {}) }
     qr/Outcome is not defined or is not a hash ref/,
     'outcome is not defined - error';
@@ -543,13 +540,30 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>{'123:3'=>{'mqc_outcome'=>''}}}, q[cat], {}) }
     qr/Error saving outcome for 123:3 - Outcome description is missing/,
     'empty outcome description - error';
-  throws_ok {$o->save({'lib'=>{'123:4:5;3:4:5'=>{'mqc_outcome'=>'Accepted preliminary'}}}, q[cat], {}) }
+  throws_ok {$o->save({'lib'=>{'123:4:5;3:4:5'=>
+    {'mqc_outcome'=>'Accepted preliminary'}}}, q[cat], {}) }
     qr/Saving outcomes for multi-component compositions is not yet implemented/,
     'saving for multi-component composition - error';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{
+    'uqc_outcome'=>'Accepted'}}}, q[cat]) }
+    qr/Rationale required/,
+    'expected rationale is missing in the uqc outcomes hash';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{
+    'mqc_outcome'=>'Accepted'}}}, q[cat]) }
+    qr/Error saving outcome for 123:1 - Outcome description is missing/,
+    'outcome key should match qc type';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{
+    'mqc_outcome'=>'Undecided'}}}, q[cat]) }
+    qr/Error saving outcome for 123:1 - Outcome description is missing/,
+    'outcome key should match qc type';
+  throws_ok {$o->save({'uqc'=>{'123:1'=>{
+    'mqc_outcome'=>'Accepted preliminary'}}}, q[cat]) }
+    qr/Error saving outcome for 123:1 - Outcome description is missing/,
+    'outcome key should match qc type'; 
 };
 
 subtest q[save outcomes] => sub {
-  plan tests => 21;
+  plan tests => 23;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
@@ -603,6 +617,29 @@ subtest q[save outcomes] => sub {
   is_deeply($o->save(
     {'lib' => {'101:1:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat'),
     $reply, 'updated one of lib entities to a final outcome');
+
+  $reply->{'uqc'} = {
+    '101:1:1'=>{'uqc_outcome'=>'Accepted'},
+    '101:1:3'=>{'uqc_outcome'=>'Rejected'},
+    '101:1:5'=>{'uqc_outcome'=>'Undecided'},
+  };
+  my $values_to_save = {
+    '101:1:1'=>{'uqc_outcome' => 'Accepted',
+                'rationale'   => 'something'},
+    '101:1:3'=>{'uqc_outcome' => 'Rejected',
+                'rationale'   => 'something'},
+    '101:1:5'=>{'uqc_outcome' => 'Undecided',
+                'rationale'   => 'something'},
+  };
+  is_deeply($o->save({'uqc' => $values_to_save}, 'cat'),
+    $reply, 'uqc outcomes saved ok. Lib, seq and uqc info returned');
+
+  $values_to_save =  {
+     'uqc' => $values_to_save,
+     'lib' => {'101:1:2' => {'mqc_outcome' => 'Accepted preliminary'}},
+     'seq' => {'101:1'   => {'mqc_outcome' => 'Accepted preliminary'}}};
+  lives_ok{ $o->save($values_to_save, 'cat', {'101:1' => []})}
+    'can save uqc, lib and seq outcomes at the same time';
 
   my $error =
     q[Mismatch between known tag indices and available library outcomes];
