@@ -1,6 +1,70 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - tag_sniff allow dual-index runs to be revcomped independantly
+
+release 64.5
+ - qc outcomes model: code generalisation to simplify addition of
+   further qc types
+ - uqc outcomes - saving and updating enabled
+ - switch to node 6.12.2 in travis
+ - stop generating DBIx classes for unused tables
+ - tiny tweaks to rna and verify bam id help links
+ - ensure, where practical, that saving and retrieving qc outcomes
+     works for multi-component compositions
+ - add functionality to allow more columns to be added to table dynamically
+ - add data for new extra column for sample_name in summary table
+ - treat all dynamically added methods in the same way
+
+release 64.4.1
+ - fix bam_flagstats check library_size bug
+
+release 64.4 
+ - utility QC feature: db tables, DBIx classes, retrieval
+ - Add STAR aligner bams as a valid RNA alignments
+ - update bam_flagstats to be able run when no markdups metrics file exists
+
+release 64.3.1
+ - error in a statement for data update is fixed
+
+release 64.3 
+ - DBIx schema loader script: automatically add npg_qc::Schema::Composition
+ - drop unique consctraint for (id_run, position and tag_index) columns;
+ - make a foreign key to seq_composition table not nullable and set
+     a unique constraint on the foreign key column in entity tables;
+ - do not use id_run, position and tag index column values from
+     entity tables, compute rpt lists from compositions;
+ - do not list explisitly id_run, position and tag_index in return
+     datastructes for both get and save outcomes methods
+ - a method to find a composition without creating one
+
+release 64.2
+ - Cannot have default Moose constructor in derived DBIx classes - fix for
+     custom MqcOutcomeEnt resultset
+ - DBIx achema loader script: automatically add npg_qc::Schema::Composition
+     role when generating result classes for autoqc tables
+ - DBIx classes for autoqc db tables:
+     remove 'create_component' factory method which was only needed
+      for back-filling composition foreign key;
+     inherit 'composition' attribute from a newly created
+      npg_qc::Schema::Composition role;
+     document 'composition' attribute
+ - composition-enabled manual qc:
+     db tables linked to the seq_composition table;
+     search proceeds via releated composition tables;
+     when mqc outcomes are saved, a composition is created if it does not exist;
+     'composition' attribute is added to mqc entity result classes;
+ - upgrade bower to 1.8.2 in travis
+ - stop building on Travis under Perl 5.16,
+   see https://rt.cpan.org/Public/Bug/Display.html?id=123310
+
+release 64.1
+ - SeqQC viewer - function to draw readonly representation of the
+   utility flag
+ - autoqc checks parect object - refactore to use a new factory for
+   rpt list to composition transformation
+ - upstream_tags modified so it can work with the rpt_list argument
+ - constraints in autoqc db tables are reset to allow for saving
+   results for multi-component compositions
  - tag_sniff modified to load the whole tag table upfront
      revcomp matches now output in reverse video
 

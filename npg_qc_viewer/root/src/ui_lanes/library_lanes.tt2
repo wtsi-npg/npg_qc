@@ -72,7 +72,7 @@
 <table id="results_summary" summary="QC results summary">
 <thead>
 <tr>
-<th[% row_span_string %]>Library<br />------<br />Sample<br />Name</th>
+<th[% row_span_string %] data-extra_cols_sample_name='Sanger Sample ID'>Library<br />------<br />Sample<br />Name</th>
 <th[% row_span_string %]>Run Id<br />------<br />Num.<br />Cycles</th>
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
@@ -98,7 +98,7 @@
       table_row_id = lane_key.defined ? ' id="rpt_key:' _ lane_key _ '"' : '';
 -%]
 <tr[%- table_row_id -%]>
-<td class="lib nbsp">
+<td class="lib nbsp" data-extra_cols_sample_name='[% row_info_to.sample_name | html %]'>
 <div class="rel_pos_container">
 [%- IF row_info_to.is_pool -%]
   <a href="[% c.uri_for_action(c.controller('Checks').action_for('list_runs'), {'run'=>id_run, 'lane'=>position, 'show'=>'all', 'db_lookup'=>"$db_lookup"}) | html %]"><img src="/static/images/to_children.png" alt="link to tags" /></a>

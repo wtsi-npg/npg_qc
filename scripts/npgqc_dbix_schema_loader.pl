@@ -23,15 +23,16 @@ my $dsn = sprintf 'dbi:mysql:host=%s;port=%s;dbname=%s',
 
 my $roles_map = {};
 my $components_map = {};
-my $role_base = 'npg_qc::autoqc::role::';
+my $role_base    = 'npg_qc::autoqc::role::';
 my $generic_role = $role_base . 'result';
-my $component = 'InflateColumn::Serializer';
-my $flator = 'npg_qc::Schema::Flators';
+my $component    = 'InflateColumn::Serializer';
+my $flator       = 'npg_qc::Schema::Flators';
+my $composition  = 'npg_qc::Schema::Composition';
 
 foreach my $check (@{npg_qc::autoqc::results::collection->new()->checks_list()}) {
   my ($result_name, $dbix_result_name ) = $generic_role->class_names($check);
   
-  my @roles = ($flator, $generic_role);
+  my @roles = ($composition, $flator, $generic_role);
   my $rpackage = $role_base . $result_name;
   my $found = eval "require $rpackage";
   if ($found) {
@@ -58,6 +59,21 @@ make_schema_at(
         preserve_case       => 1,
         use_namespaces      => 1,
         default_resultset_class => 'ResultSet',
+        
+        exclude => qr/\A v_                    |
+                         analysis_lane_qcal    |
+                         cumulative_errors_    |
+                         error_rate_           |
+                         errors_by_(?:\w+)?nucleotide |
+                         image_store           |
+                         information_content_  |
+                         log_likelihood        |
+                         most_common_          |
+                         ref_snp_info          |
+                         run_and_pair          |
+                         run_config            |
+                         tile_score
+                     /xms,
 
         rel_name_map        => sub { # Rename the id relationship so we can access
                                      # flat versions of the objects and not only

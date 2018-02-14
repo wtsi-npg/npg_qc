@@ -7,9 +7,9 @@ use Carp;
 use List::MoreUtils qw/ any /;
 
 use npg_tracking::glossary::rpt;
-use npg_qc_viewer::Util::CompositionFactory;
+use npg_tracking::glossary::composition::factory::rpt_list;
 use npg_qc::Schema::Mqc::OutcomeDict;
-use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
+use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES /;
 use npg_qc::mqc::outcomes;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
@@ -26,24 +26,25 @@ npg_qc_viewer::Controller::QcOutcomes
 
 =head1 SYNOPSIS
 
-Controller for the QC outcomes JSON service. The service allows for
-retrieving, creating and updating QC outcomes.
+Controller for the manual QC  and user utility QC outcomes JSON service.
+The service allows for retrieving, creating and updating QC outcomes.
+For user utility outcomes only the retrieval part is implemented.
 
 =head1 DESCRIPTION
 
-Handles GET and post requests on the /qcoutcomes URL.
+Handles GET and POST requests on the /qcoutcomes URL.
 
 Retrieving records:
 
   curl -X GET -H "Content-type: application/json" -H "Accept: application/json"  \
-    "http://server:5050/qcoutcomes?rpt_list=5%3A8%3A7"&rpt_list=6%3A3"
+    "http://server:5050/qcoutcomes?rpt_list=5%3A8%3A7&rpt_list=6%3A3"
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"rpt_list":["5:8:7","6:3"]}' http://server:5050/qcoutcomes
+    -d '{"5:8:7":{},"6:3":{}}' http://server:5050/qcoutcomes
 
 Updating/creating records:
 
   curl -H "Accept: application/json" -H "Content-type: application/json" -X POST \
-    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes 
+    -d '{"lib":{"5:8:7":{"mqc_outcome":"Final rejected"}},"Action":"UPDATE"}' http://server:5050/qcoutcomes
 
 =head1 SUBROUTINES/METHODS
 
@@ -82,8 +83,7 @@ JSON payload example for retrieving the data
  '{"5:8:7":{},"5:8:6":{},"6:8:7":{},"6:8:6":{}}'
 
 The payload for updating the data has the same structure as this controller's
-reply to outcomes_GET. It is not necessary to set entity identifies, i.e.
-the following payload is valid:
+reply to outcomes_GET.
 
  '{"Action":"UPDATE","seq":{"5:8":{"mqc_outcome":"Undecided"}}}'.
 
@@ -118,10 +118,10 @@ sub _get_outcomes {
      );
   } else {
      try {
-       my $obj = npg_qc::mqc::outcomes->new(qc_schema => $c->model('NpgQcDB')->schema());
-       my @qlist = map { _inflate_rpt($_) } @{$rpt_lists};
        $self->status_ok($c,
-         'entity' => $obj->get(\@qlist),
+         'entity' => npg_qc::mqc::outcomes
+                   ->new(qc_schema => $c->model('NpgQcDB')->schema())
+                   ->get($rpt_lists),
        );
      } catch {
        $self->status_bad_request(
@@ -132,18 +132,6 @@ sub _get_outcomes {
   }
 
   return;
-}
-
-sub _inflate_rpt {
-  my $rpt = shift;
-
-  my $comp = npg_qc_viewer::Util::CompositionFactory->new(rpt_list => $rpt)
-             ->create_composition();
-  if ($comp->num_components > 1) {
-    croak 'Cannot deal with multi-component compositions';
-  }
-  # TODO in tracking - create a public method
-  return $comp->get_component(0)->_pack_custom();
 }
 
 sub _update_outcomes {
@@ -159,6 +147,10 @@ sub _update_outcomes {
       $error = qq[User $username is not authorised for manual qc];
     }
   }
+
+  # Present only in test scenario
+  delete $data->{'user'};
+  delete $data->{'password'};
 
   if ($error) {
     $self->status_forbidden($c, 'message' => $error,);
@@ -205,17 +197,29 @@ sub _lane_info {
 sub _update_runlanes {
   my ($self, $c, $seq_outcomes, $username) = @_;
 
+  my $dict_rel_name = $c->model('NpgQcDB')->schema()->resultset('MqcOutcomeEnt')
+                                          ->result_class()->dict_rel_name();
   foreach my $key ( keys %{$seq_outcomes} ) {
+
     my $outcome = $seq_outcomes->{$key};
-    if (npg_qc::Schema::Mqc::OutcomeDict
-          ->is_final_outcome_description($outcome->{$QC_OUTCOME})) {
-      try {
-        $c->model('NpgDB')->update_lane_manual_qc_complete(
-          $outcome->{'id_run'}, $outcome->{'position'}, $username);
-      } catch {
-        $c->log->warn(qq[Error updating lane status for rpt key '$key': $_]);
-      };
+    if (!npg_qc::Schema::Mqc::OutcomeDict
+          ->is_final_outcome_description($outcome->{$dict_rel_name})) {
+      next;
     }
+
+    my $composition = npg_tracking::glossary::composition::factory::rpt_list
+                          ->new(rpt_list => $key)
+                          ->create_composition();
+    if ($composition->num_components > 1) {
+      croak 'Run-lane status update is not implemented for multi-component compositions';
+    }
+    my $component = $composition->get_component(0);
+    try {
+      $c->model('NpgDB')->update_lane_manual_qc_complete(
+        $component->id_run, $component->position, $username);
+    } catch {
+      $c->log->warn(qq[Error updating lane status for rpt key '$key': $_]);
+    };
   }
 
   return;
@@ -249,6 +253,8 @@ __END__
 
 =item npg_tracking::glossary::rpt
 
+=item npg_tracking::glossary::composition::factory::rpt_list
+
 =item npg_qc::mqc::outcomes
 
 =item npg_qc::Schema::Mqc::OutcomeDict
@@ -265,7 +271,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd.
+Copyright (C) 2017 Genome Research Ltd.
 
 This file is part of NPG software.
 

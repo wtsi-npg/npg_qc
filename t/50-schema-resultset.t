@@ -1,11 +1,14 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Test::Exception;
 use List::MoreUtils qw(uniq none);
 use Moose::Meta::Class;
+
 use npg_tracking::glossary::composition::factory;
+use npg_tracking::glossary::composition::factory::rpt_list;
 use npg_tracking::glossary::composition::component::illumina;
+use t::autoqc_util;
 
 my $schema_package = q[npg_qc::Schema];
 use_ok $schema_package;
@@ -21,54 +24,23 @@ isa_ok($schema, $schema_package);
 # Returns primary key column value for seq_composition
 sub _save_composition {
   my $component_h = shift;
-  my $component_rs   = $schema->resultset('SeqComponent');
-  my $composition_rs = $schema->resultset('SeqComposition');
-  my $com_com_rs     = $schema->resultset('SeqComponentComposition');
-
-  my $component =
-    npg_tracking::glossary::composition::component::illumina->new($component_h);
-  my $f = npg_tracking::glossary::composition::factory->new();
-  $f->add_component($component);
-  my $composition = $f->create_composition();
-  my $composition_digest = $composition->digest;
-  my $composition_row = $composition_rs->find({digest => $composition_digest});
-  if (!$composition_row) {
-    $component_h->{'digest'} = $component->digest;
-    my $component_row = $component_rs->create($component_h);
-    $composition_row = $composition_rs->create(
-      {size => 1, digest => $composition_digest});
-    $com_com_rs->create({size               => 1,
-                         id_seq_component   => $component_row->id_seq_component,
-                         id_seq_composition => $composition_row->id_seq_composition
-                       });
-  }
-  return $composition_row->id_seq_composition;
+  return t::autoqc_util::find_or_save_composition($schema, $component_h);
 }
 
 subtest q[results with id_run and position only in the table] => sub {
-  plan tests => 7;
+  plan tests => 3;
 
-  my $rs = $schema->resultset('SpatialFilter');
   my $h = {id_run => 8926, position => 2};
-  my $row = $rs->create($h);
-  is ($rs->search($h)->count(), 1, 'one results');
-  is ($rs->search_autoqc($h)->count(), 0, 'no results');
-  throws_ok {$rs->search(
-    {id_run => 8926, tag_index => undef, position => 2})->count()}
-    qr/no such column: tag_index/,
-    'error in vanilla DBIx search query';
-  lives_ok {$rs->search_autoqc(
-    {id_run => 8926, tag_index => undef, position => 2})->count()}
-    'no error in autoqc search query';
-
-  my $id = _save_composition($h);
-  $row->update({'id_seq_composition' => $id});
-  $h = {id_run => 8926, position => 2};
+  my $rs = $schema->resultset('SpatialFilter');
+  $rs->create({id_run   => 8926,
+               position => 2,
+               id_seq_composition => _save_composition($h)
+              });
   is ($rs->search_autoqc($h)->count(), 1, 'autoqc search - one results');
   $h->{'tag_index'} = undef;
   lives_and { is $rs->search_autoqc($h)->count(), 1}
     'no error in autoqc search query, one result';
-  throws_ok { $rs->search($h)->count() }
+  throws_ok { $schema->resultset('SpatialFilter')->search($h)->count() }
     qr/no such column: tag_index/,
     'error with tag_index as a part of the vanilla DBIx query';
 };
@@ -347,7 +319,7 @@ subtest q[mixed queries for results linked to a composition] => sub {
   is (scalar @rows, 2, 'two results for f2 filter, phix and human subsets');
 };
 
-subtest q[error or failure to return a composition] => sub {
+subtest q[error finding a composition] => sub {
   plan tests => 4;
 
   my $rs = $schema->resultset('SeqComponent');
@@ -363,8 +335,9 @@ subtest q[error or failure to return a composition] => sub {
   my $f = npg_tracking::glossary::composition::factory->new();
   $f->add_component(npg_tracking::glossary::composition::component::illumina
                     ->new({id_run => 1, position => 3}));
-  is($rs->find_or_create_seq_composition($f->create_composition()), undef,
-    'composition row is not returned');
+  throws_ok { $rs->find_or_create_seq_composition($f->create_composition()) }
+    qr/result source 'SeqComponent' has no such relationship seq_composition/,
+    'error invoking method on a resultset that does not have seq_composition relationship';
 };
 
 subtest q[not saving composition subset value "all"] => sub {
@@ -389,7 +362,7 @@ my $id_run;
 subtest q[finding existing composition] => sub {
   plan tests => 15;
 
-  my $rs_component = $schema->resultset('SeqComponent');
+  my $rs_component   = $schema->resultset('SeqComponent');
   my $rs_composition = $schema->resultset('SeqComposition');
   my $rs_cc          = $schema->resultset('SeqComponentComposition');
   my $ssrs           = $schema->resultset('SamtoolsStats');
@@ -525,6 +498,37 @@ subtest q[creating new composition from new and existing components] => sub {
 
   is($rs_component->search({})->count(), $num_existing_components + 10,
     '10 new components are added');
+};
+
+subtest q[search by composition] => sub {
+  plan tests => 9;
+  
+  my $rs = $schema->resultset('InsertSize');
+
+  my $total = $rs->search({})->count();
+  lives_and ( sub {is $rs->search_via_composition([])->count(), $total },
+    'can have an empty array');
+  lives_and ( sub {is $rs->search_via_composition()->count(), $total },
+    'can have an undefined array');
+
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => q(350:1) )->create_composition();
+  is ($rs->search_via_composition([$c])->count, 0, 'no rows found');
+
+  $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => q(3500:1) )->create_composition();
+  my $found_rs = $rs->search_via_composition([$c]);
+  is ($found_rs->count, 1, 'one row found');
+  my $row = $found_rs->next();
+  isa_ok ($row, 'npg_qc::Schema::Result::InsertSize');
+  is ($row->seq_composition()->digest, $c->digest, 'correct digest');
+
+  my $c1 = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => q(3500:1:1) )->create_composition();
+  $found_rs = $rs->search_via_composition([$c, $c1]);
+  is ($found_rs->count, 2, 'two rows found');
+  is ($found_rs->next()->seq_composition()->digest, $c->digest, 'correct digest');
+  is ($found_rs->next()->seq_composition()->digest, $c1->digest, 'correct digest');
 };
 
 1;

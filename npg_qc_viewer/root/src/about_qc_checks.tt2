@@ -119,7 +119,7 @@ Any close genotype matches found under a different sample name, allowing homozyg
 
 <br/>
 
-<a name="rna seqc"></a>
+<a name="rna seqc_check"></a>
  <h3>RNA-SeQC metrics</h3>
  <h4>Description</h4>
  <p>Subset of metrics obtained from Broad Institute's RNA-SeQC package. The following summary statistics are calculated by counting the number of reads that have the given characteristics.</p>
@@ -159,7 +159,7 @@ Check for contamination of tag#0 BAM file by reads from upstream runs
 
 <br/>
 
-<a name="verifyBamId"></a>
+<a name="verify bam id_check"></a>
 <h3>VerifyBamID contamination check</h3>
 <br/><br/>
 <h4>Description</h4>

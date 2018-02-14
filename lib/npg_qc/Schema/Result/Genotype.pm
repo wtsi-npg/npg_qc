@@ -66,7 +66,7 @@ __PACKAGE__->table('genotype');
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
-  is_nullable: 1
+  is_nullable: 0
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
@@ -74,13 +74,13 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 path
 
@@ -149,8 +149,7 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 =head2 tag_index
 
   data_type: 'bigint'
-  default_value: -1
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 snp_call_set
 
@@ -222,12 +221,12 @@ __PACKAGE__->add_columns(
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_foreign_key => 1,
-    is_nullable => 1,
+    is_nullable => 0,
   },
   'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
   'path',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'expected_sample_name',
@@ -253,7 +252,7 @@ __PACKAGE__->add_columns(
   'info',
   { data_type => 'text', is_nullable => 1 },
   'tag_index',
-  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
+  { data_type => 'bigint', is_nullable => 1 },
   'snp_call_set',
   {
     data_type => 'varchar',
@@ -293,15 +292,11 @@ __PACKAGE__->set_primary_key('id_genotype');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<unq_run_lane_genotype>
+=head2 C<genotype_compos_ind_unique>
 
 =over 4
 
-=item * L</id_run>
-
-=item * L</position>
-
-=item * L</tag_index>
+=item * L</id_seq_composition>
 
 =item * L</snp_call_set>
 
@@ -310,8 +305,8 @@ __PACKAGE__->set_primary_key('id_genotype');
 =cut
 
 __PACKAGE__->add_unique_constraint(
-  'unq_run_lane_genotype',
-  ['id_run', 'position', 'tag_index', 'snp_call_set'],
+  'genotype_compos_ind_unique',
+  ['id_seq_composition', 'snp_call_set'],
 );
 
 =head1 RELATIONS
@@ -328,17 +323,14 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  {
-    is_deferrable => 1,
-    join_type     => 'LEFT',
-    on_delete     => 'NO ACTION',
-    on_update     => 'NO ACTION',
-  },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 =head1 L<Moose> ROLES APPLIED
 
 =over 4
+
+=item * L<npg_qc::Schema::Composition>
 
 =item * L<npg_qc::Schema::Flators>
 
@@ -351,19 +343,15 @@ __PACKAGE__->belongs_to(
 =cut
 
 
-with 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::genotype';
+with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::genotype';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-06-30 16:29:05
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+7fXuTEJ7ko9kBmJOfiogw
-
-with 'npg_tracking::glossary::composition::factory::attributes' =>
-  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:dOkisnN8FSpBKaEVOtq9tg
 
 our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( alternate_matches alternate_relaxed_matches sample_name_match sample_name_relaxed_match search_parameters info ));
-__PACKAGE__->set_inflator4scalar('tag_index');
 
 __PACKAGE__->has_many(
   'seq_component_compositions',
@@ -389,10 +377,9 @@ Result class definition in DBIx binding for npg-qc database.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 create_composition
+=head2 composition
 
-A factory method returning a one-component npg_tracking::glossary::composition
-object corresponding to this row.
+Attribute of type npg_tracking::glossary::composition.
 
 =head2 seq_component_compositions
 
@@ -423,10 +410,6 @@ To simplify queries, skip SeqComposition and link directly to the linking table.
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
-
-=item npg_tracking::glossary::composition::factory::attributes
-
-=item npg_tracking::glossary::composition::component::illumina
 
 =back
 
