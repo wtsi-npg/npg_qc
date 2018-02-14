@@ -120,30 +120,81 @@ sub showTags{
       croak q[Can't load module npg_warehouse::Schema];
     }
 
-    my $tag_group_internal_id = ($groups ? [split(/[,]/, $groups)] : undef);
-
-    # read the tag table
     my %db_tags = ();
-    my $s = npg_warehouse::Schema->connect();
-    my $rs;
-    if (defined($tag_group_internal_id)) {
-        $rs = $s->resultset('Tag')->search({is_current=>1, tag_group_internal_id=>$tag_group_internal_id});
-    } else {
-        $rs = $s->resultset('Tag')->search({is_current=>1});
-    }
-    while(my $row = $rs->next) {
-      my $name = $row->tag_group_name;
-      my $id = $row->tag_group_internal_id;
-      my $map_id = $row->map_id;
-      my $sequence = $row->expected_sequence;
-      if (!defined $name || !defined $id || !defined $map_id || !defined $sequence) {
-        next;
+
+    if ($groups =~ /\.taglist/) {
+      # read the taglist files
+      my $id = 0;
+      my @files = split(/[,]/, $groups);
+      for my $file (@files) {
+        $id++;
+        die "Invalid taglist file $file" unless $file =~ m/\/metadata_cache_(\d+)\/lane_(\d)\.taglist$/;
+        my ($id_run,$lane) = ($1,$2);
+        my $name = "${id_run}_${lane}";
+        open FILE,"<$file" or die "Can't open taglist file $file : $!\n";
+        foreach (<FILE>) {
+          next if m/^barcode/;
+          die "Invalid tag $_" unless m/^([ACGT]+)\t(\d+)\t/;
+          my ($sequence,$tag_index) = ($1,$2);
+          push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0]);
+          if (@{$revcomps}) {
+            $sequence =~ tr/ACGTN/TGCAN/;
+            $sequence = reverse($sequence);
+            push(@{$db_tags{$sequence}},[$name,$id,$tag_index,1]);
+          }
+        }
+        close(FILE);
       }
-      push(@{$db_tags{$sequence}},[$name,$id,$map_id,0]);
-      if (@{$revcomps}) {
-        $sequence =~ tr/ACGTN/TGCAN/;
-        $sequence = reverse($sequence);
-        push(@{$db_tags{$sequence}},[$name,$id,$map_id,1]);
+    } elsif ($groups =~ /\d+_\d/) {
+      # read the npg_plex_infomation table
+      my $s = npg_warehouse::Schema->connect();
+      my $rs;
+      my @rls = split(/[,]/, $groups);
+      my $id = 0;
+      for my $rl (@rls) {
+        $id++;
+        die "Invalid run_lane $rl" unless $rl =~ m/^(\d+)_(\d)$/;
+        my ($id_run,$lane) = ($1,$2);
+        my $name = "run ${id_run} lane ${lane}";
+        $rs = $s->resultset('NpgPlexInformation')->search({id_run=>$id_run, position=>$lane});
+        while(my $row = $rs->next) {
+          my $tag_index = $row->tag_index;
+          my $sequence = $row->tag_sequence;
+          if (!defined $tag_index || !defined $sequence) {
+            next;
+          }
+          push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0]);
+          if (@{$revcomps}) {
+            $sequence =~ tr/ACGTN/TGCAN/;
+            $sequence = reverse($sequence);
+            push(@{$db_tags{$sequence}},[$name,$id,$tag_index,1]);
+          }
+        }
+      }
+    } else {
+      # read the tag table
+      my $s = npg_warehouse::Schema->connect();
+      my $rs;
+      my $tag_group_internal_id = ($groups ? [split(/[,]/, $groups)] : undef);
+      if (defined($tag_group_internal_id)) {
+          $rs = $s->resultset('Tag')->search({is_current=>1, tag_group_internal_id=>$tag_group_internal_id});
+      } else {
+          $rs = $s->resultset('Tag')->search({is_current=>1});
+      }
+      while(my $row = $rs->next) {
+        my $name = $row->tag_group_name;
+        my $id = $row->tag_group_internal_id;
+        my $map_id = $row->map_id;
+        my $sequence = $row->expected_sequence;
+        if (!defined $name || !defined $id || !defined $map_id || !defined $sequence) {
+          next;
+        }
+        push(@{$db_tags{$sequence}},[$name,$id,$map_id,0]);
+        if (@{$revcomps}) {
+          $sequence =~ tr/ACGTN/TGCAN/;
+          $sequence = reverse($sequence);
+          push(@{$db_tags{$sequence}},[$name,$id,$map_id,1]);
+        }
       }
     }
 
@@ -169,15 +220,16 @@ sub showTags{
             foreach my $sequence (@matches) {
                 foreach my $match (@{$db_tags{$sequence}}) {
                     my ($name,$id,$map_id,$revcomp) = @{$match};
-                    $groups[$i]->{$id}++;
-                    $names{$id} = $name;
-                    if ($revcomps->[$i] && $revcomp) {
+                    if ($revcomp && $revcomps->[$i]) {
                         $matches{$subtag}->{$id} = [$map_id,1];
                     } elsif ($revcomp) {
+                        # not looking for revcomp matches on this subtag
                         continue;
                     } else {
                         $matches{$subtag}->{$id} = [$map_id,0];
                     }
+                    $groups[$i]->{$id}++;
+                    $names{$id} = $name;
                 }
             }
         }
@@ -231,6 +283,7 @@ sub main{
     my $revcomp = $opts->{revcomp};
     my $clip = $opts->{clip};
     my $groups = $opts->{groups};
+    my $rl = $opts->{rl};
 
     my @tagLengths = $tagLength ? split(/[,]/,$tagLength) : ();
 

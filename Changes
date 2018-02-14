@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tag_sniff allow dual-index runs to be revcomped independantly
  - tag_sniff modified to load the whole tag table upfront
      revcomp matches now output in reverse video
 
