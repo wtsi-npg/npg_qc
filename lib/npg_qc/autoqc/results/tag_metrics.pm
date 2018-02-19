@@ -31,6 +31,10 @@ has [ qw/ spiked_control_index
 has [ qw/ pct_tag_hops /          ] => (isa => 'Maybe[Num]',
                                         is  => 'rw',
                                        );
+
+has [ qw/ tag_hops_power /        ] => (isa => 'Maybe[Num]',
+                                        is  => 'rw',
+                                       );
 has [ qw/ metrics_file
           barcode_tag_name /      ] => (isa => 'Maybe[Str]',
                                         is =>  'rw',

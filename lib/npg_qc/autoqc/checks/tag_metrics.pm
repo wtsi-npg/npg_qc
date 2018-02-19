@@ -7,10 +7,12 @@ use Carp;
 use Readonly;
 use File::Basename;
 use File::Spec;
+use List::Util qw(min);
 
 our $VERSION = '0';
 
 extends qw(npg_qc::autoqc::checks::check);
+with qw(npg_tracking::data::reference::find);
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -144,6 +146,32 @@ sub _parse_tag_metrics {
   return;
 }
 
+sub _calculate_tag_hops_power {
+  my ($self) = @_;
+
+  my $nsamples = 0;
+  my %tags0 = ();
+  my %tags1 = ();
+  foreach my $plex ($self->lims->children) {
+    my $tag_sequences = $plex->tag_sequences;
+    # skip samples with no second index i.e. phix
+    next unless @{$tag_sequences} == 2;
+    $nsamples++;
+    $tags0{$tag_sequences->[0]}++;
+    $tags1{$tag_sequences->[1]}++;
+  }
+
+  my $count0 = scalar(keys %tags0);
+  my $count1 = scalar(keys %tags1);
+  my $ncombinations = $count0 * $count1;
+  my $nudis = min($count0, $count1);
+  my $power = ($ncombinations == $nudis) ? 0 : ($ncombinations - $nsamples) / ($ncombinations - $nudis);
+  
+  $self->result->tag_hops_power($power);
+
+  return;
+}
+
 override 'can_run' => sub  {
   my $self = shift;
   return ($self->num_components() == 1 &&
@@ -181,6 +209,7 @@ override 'execute' => sub  {
       $self->result->pct_tag_hops(0);
     }
     close $fh or carp q[Cannot close a filehandle for hops file];
+    $self->_calculate_tag_hops_power();
   }
 
   my $pass = ($self->result->errors_percent > $ERROR_TOLERANCE_PERCENT) ? 0 : 1;
