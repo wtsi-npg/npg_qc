@@ -155,18 +155,18 @@ sub _calculate_tag_hops_power {
   foreach my $plex ($self->lims->children) {
     my $tag_sequences = $plex->tag_sequences;
     # skip samples with no second index i.e. phix
-    next unless @{$tag_sequences} == 2;
+    if (@{$tag_sequences} != 2) { next; }
     $nsamples++;
     $tags0{$tag_sequences->[0]}++;
     $tags1{$tag_sequences->[1]}++;
   }
 
-  my $count0 = scalar(keys %tags0);
-  my $count1 = scalar(keys %tags1);
+  my $count0 = scalar keys %tags0 ;
+  my $count1 = scalar keys %tags1 ;
   my $ncombinations = $count0 * $count1;
   my $nudis = min($count0, $count1);
   my $power = ($ncombinations == $nudis) ? 0 : ($ncombinations - $nsamples) / ($ncombinations - $nudis);
-  
+
   $self->result->tag_hops_power($power);
 
   return;
