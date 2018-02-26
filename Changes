@@ -1,5 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 64.6
+ - add new metric glogin_pct_tpm to RNA-SeQC check
+ - DBIx schema loader script: alter table to add new globin metric column
+ - add functionality to pass some of the files necessary to run RNA-SeQC
+   as CLI options for program qc for more flexibility for stand alone run
+ - add new role for rna_seqc to implement ability to extract values from
+   column other_metrics to be stored in ml warehouse database.
+
 release 64.5
  - qc outcomes model: code generalisation to simplify addition of
    further qc types

@@ -10,6 +10,7 @@ use IO::File;
 use npg_tracking::util::types;
 use File::Spec;
 use File::Path qw( make_path );
+use Scalar::Util qw(looks_like_number);
 
 extends qw(npg_qc::autoqc::checks::check);
 
@@ -29,8 +30,16 @@ Readonly::Scalar my $PAIRED_FLAG       => 0x1;
 Readonly::Scalar my $RRNA_ALIGNER      => q[bwa];
 Readonly::Scalar my $RRNA_STRAIN       => q[default_rRNA];
 Readonly::Scalar my $METRICS_FILE_NAME => q[metrics.tsv];
+Readonly::Scalar my $QUANT_FILE_NAME   => q[quant.genes.sf];
 Readonly::Scalar my $MINUS_ONE         => -1;
+Readonly::Scalar my $COL_QUANT_TPM     => 3;
+Readonly::Scalar my $COL_QUANT_GENEID  => 0;
+Readonly::Scalar my $COL_GENEID        => 0;
+Readonly::Scalar my $COL_GENENAME      => 1;
+Readonly::Scalar my $GLOBIN_METRIC_NAME=> q[Globin % TPM];
 
+# Globin metric is not part of RNA-SeQC, its name is arbitrary and has been
+# added to the hash to be treated the same way as selected RNA-SeQC results
 Readonly::Hash   my %RNASEQC_METRICS_FIELDS_MAPPING => {
     '3\' Norm'                              => 'end_3_norm',
     '5\' Norm'                              => 'end_5_norm',
@@ -47,6 +56,7 @@ Readonly::Hash   my %RNASEQC_METRICS_FIELDS_MAPPING => {
     'Mean Per Base Cov.'                    => 'mean_per_base_cov',
     'rRNA'                                  => 'rrna',
     'rRNA rate'                             => 'rrna_rate',
+    $GLOBIN_METRIC_NAME                     => 'globin_pct_tpm',
 };
 
 has '+file_type' => (default => $EXT,);
@@ -154,13 +164,13 @@ has '_input_str' => (is       => 'ro',
 sub _build_input_str {
     my ($self) = @_;
     my $sample_id = $self->lims->sample_id;
-    my $library_name = $self->lims->library_name // $sample_id;
-    my @library_names = split q[ ], $library_name;
+    my $sample_name = $self->lims->sample_name // $sample_id;
+    my @sample_names = split q[ ], $sample_name;
     my $input_file = $self->_bam_file;
-    return qq["$library_names[0]|$input_file|$sample_id"];
+    return qq["$sample_names[0]|$input_file|$sample_id"];
 }
 
-has '_ref_genome' => (is       => 'ro',
+has 'ref_genome' => (is       => 'ro',
                       isa      => 'Str',
                       required => 0,
                       lazy     => 1,
@@ -182,7 +192,7 @@ sub _build_bam_file {
     return $self->input_files->[0];
 }
 
-has '_annotation_gtf' => (is       => 'ro',
+has 'annotation_gtf' => (is       => 'ro',
                           isa      => 'Str',
                           required => 0,
                           lazy     => 1,
@@ -194,7 +204,7 @@ sub _build_annotation_gtf {
     return $trans_gtf;
 }
 
-has '_ref_rrna' => (is       => 'ro',
+has 'ref_rrna' => (is       => 'ro',
                     isa      => 'Str',
                     required => 0,
                     lazy     => 1,
@@ -210,6 +220,31 @@ sub _build_ref_rrna {
     return $ref_rrna;
 }
 
+has 'quant_file' => (is       => 'ro',
+                     isa      => 'Str',
+                     required => 0,
+                     lazy     => 1,
+                     builder  => '_build_quant_file',);
+
+sub _build_quant_file {
+    my $self = shift;
+    my $qc_in_path = $self->qc_in;
+    my $quant_file = File::Spec->catfile($qc_in_path, $self->result->filename_root . q[.] . $QUANT_FILE_NAME);
+    return $quant_file;
+}
+
+has 'globin_genes_csv' => (is       => 'ro',
+                           isa      => 'Str',
+                           required => 0,
+                           lazy     => 1,
+                           builder  => '_build_globin_genes_csv',);
+
+sub _build_globin_genes_csv {
+    my $self = shift;
+    my $globin_file = $self->globin_file // q[];
+    return $globin_file;
+}
+
 sub _command {
     my ($self) = @_;
     my $ref_rrna_option = q[];
@@ -217,15 +252,15 @@ sub _command {
     if(!$self->_is_paired_end){
         $single_end_option = q[-singleEnd];
     }
-    if($self->_ref_rrna){
-        $ref_rrna_option = q[-BWArRNA ]. $self->_ref_rrna;
+    if($self->ref_rrna){
+        $ref_rrna_option = q[-BWArRNA ]. $self->ref_rrna;
     }
     my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
                                            $self->_java_jar_path,
                                            $self->_input_str,
                                            $self->output_dir,
-                                           $self->_ref_genome,
-                                           $self->_annotation_gtf,
+                                           $self->ref_genome,
+                                           $self->annotation_gtf,
                                            $self->_ttype_gtf_column,
                                            $single_end_option,
                                            $ref_rrna_option;
@@ -234,7 +269,7 @@ sub _command {
 
 override 'can_run' => sub {
     my $self = shift;
-    if (! $self->_annotation_gtf) {
+    if (! $self->annotation_gtf) {
         $self->result->add_comment(q[No GTF annotation available]);
         return 0;
     }
@@ -249,7 +284,7 @@ override 'execute' => sub {
     	return 1;
     }
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
-    if (! $self->_ref_genome) {
+    if (! $self->ref_genome) {
         push @comments, q[No reference genome available];
         $can_execute = 0;
     }
@@ -266,20 +301,27 @@ override 'execute' => sub {
         $self->result->add_comment($can_run_message);
         return 1;
     }
+    my $results = {};
+    # globin metric:
+    if ($self->globin_genes_csv) {
+        $self->_parse_quant_file($results);
+    }
+    # RNA-SeQC metrics:
     my $command = $self->_command();
     carp qq[EXECUTING $command time ]. DateTime->now();
     if (system $command) {
         my $error = $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
         croak sprintf "Child %s exited with value %d\n", $command, $error;
     } else {
-        my $results = $self->_parse_metrics();
-        $self->_save_results($results);
+        $self->_parse_rna_seqc_metrics($results);
     };
+
+    $self->_save_results($results);
     return 1;
 };
 
-sub _parse_metrics {
-    my ($self) = @_;
+sub _parse_rna_seqc_metrics {
+    my ($self, $results) = @_;
     my $filename = File::Spec->catfile($self->output_dir, $METRICS_FILE_NAME);
     if (! -e $filename) {
         croak qq[No such file $filename: cannot parse RNA-SeQC metrics];
@@ -296,15 +338,49 @@ sub _parse_metrics {
         croak q[Mismatch in number of keys and values];
     }
     my $i = 0;
-    my $results = {};
     foreach my $key (@keys){
         chomp $values[$i];
         chomp $key;
         $results->{$key} = $values[$i];
         $i++;
     }
-    return $results;
+    return;
 };
+
+sub _parse_quant_file {
+    my ($self, $results) = @_;
+    my $quant_file = $self->quant_file;
+    my $globin_file = $self->globin_genes_csv;
+    if (! -e $quant_file) {
+        $self->result->add_comment(qq[No such file $quant_file: Cannot parse quant metrics]);
+        return;
+    }
+    my %globin_genes;
+    my $fh = IO::File->new($globin_file, 'r');
+    while (my $line = $fh->getline) {
+        chomp $line;
+        my @record = split /,/smx, $line;
+        $globin_genes{$record[$COL_GENEID]} = $record[$COL_GENENAME];
+    }
+    $fh->close();
+    my %quant_genes;
+    $fh = IO::File->new($quant_file, 'r');
+    while (my $line = $fh->getline) {
+        my @record = split /\t/smx, $line;
+        if (exists $globin_genes{$record[$COL_QUANT_GENEID]}){
+            if (looks_like_number($record[$COL_QUANT_TPM])) {
+                $quant_genes{'count'} += 1;
+                $quant_genes{'sum'} += $record[$COL_QUANT_TPM];
+            }
+        }
+    }
+    $fh->close();
+    my $pct_globin = sprintf "%.2f", $quant_genes{'sum'} / 10_000;
+    $results->{$GLOBIN_METRIC_NAME} = $pct_globin;
+    return;
+}
+
+
 
 sub _save_results {
     my ($self, $results) = @_;

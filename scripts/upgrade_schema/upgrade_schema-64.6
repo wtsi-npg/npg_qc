@@ -1,0 +1,6 @@
+-
+- Add new column to RNA-SeQC check table
+-
+ALTER TABLE `rna_seqc` 
+ADD COLUMN `globin_pct_tpm` FLOAT UNSIGNED DEFAULT NULL
+AFTER `other_metrics`;
