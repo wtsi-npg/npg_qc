@@ -293,7 +293,7 @@ sub _build_tag0_index_length {
   my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools . qq[ view $bfile" ];
   open my $ph, q(-|), $command or croak qq[Cannot fork '$command', error $ERRNO];
   while (my $line = <$ph>) {
-    if($line =~ /\t(BC|RT):Z:(\S+)/smx) {
+    if($line =~ /\t(BC|RT):Z:([^\s-]+)/smx) {
       $index_length = length $2;
       last;
     }
@@ -441,16 +441,14 @@ has 'BamIndexDecoder_cmd'  => ( isa        => 'Str',
 sub _build_BamIndexDecoder_cmd {
   my $self = shift;
 
-  my $bid_cmd_template = q[java %s -jar %s COMPRESSION_LEVEL=0 INPUT=%s OUTPUT=/dev/null BARCODE_FILE=%s METRICS_FILE=%s MAX_MISMATCHES=%d MAX_NO_CALLS=%d VALIDATION_STRINGENCY=LENIENT];
+  my $bid_cmd_template = q[bambi decode --compression-level 0 --output /dev/null --barcode-file %s --metrics-file %s --max-mismatches %d --max-no-calls %d %s];
 
   my $bid_cmd = sprintf $bid_cmd_template,
-  $self->java_xmx_flag,
-  $self->bid_jar_path,
-  $self->tag0_bam_file,
   $self->barcode_filename,
   $self->metrics_output_file,
   $self->max_mismatches,
-  $self->max_no_calls;
+  $self->max_no_calls,
+  $self->tag0_bam_file;
 
   $bid_cmd .= q[ > /dev/null 2>&1]; # all useful output goes to metrics_file
 
