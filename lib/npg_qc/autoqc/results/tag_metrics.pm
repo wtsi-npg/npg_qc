@@ -28,7 +28,7 @@ has [ qw/ spiked_control_index
                                         is =>  'rw',
                                        );
 
-has [ qw/ pct_tag_hops /          ] => (isa => 'Maybe[Num]',
+has [ qw/ tag_hops_percent /          ] => (isa => 'Maybe[Num]',
                                         is  => 'rw',
                                        );
 

@@ -50,7 +50,7 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
   is($result->max_mismatches_param, 1, 'max mismatches is 1');
   is($result->min_mismatch_delta_param, 3, 'min_mismatch_delta is 3');
   is($result->max_no_calls_param, 2, 'max_no_calls is 2');
-  is($result->pct_tag_hops, undef, 'no tag hop file');
+  is($result->tag_hops_percent, undef, 'no tag hop file');
 }
 
 {
@@ -64,7 +64,7 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
   is($result->max_mismatches_param, 1, 'max mismatches is 1');
   is($result->min_mismatch_delta_param, 1, 'min_mismatch_delta is 1');
   is($result->max_no_calls_param, 2, 'max_no_calls is 2');
-  is($result->pct_tag_hops, 0, 'empty tag hop file');
+  is($result->tag_hops_percent, 0, 'empty tag hop file');
 }
 
 {
@@ -78,7 +78,7 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
   is($result->max_mismatches_param, 1, 'max mismatches is 1');
   is($result->min_mismatch_delta_param, 1, 'min_mismatch_delta is 1');
   is($result->max_no_calls_param, 2, 'max_no_calls is 2');
-  is($result->pct_tag_hops, 27.272728, 'tag hop file');
+  is($result->tag_hops_percent, 27.272728, 'tag hop file');
 }
 
 {

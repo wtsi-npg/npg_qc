@@ -2,7 +2,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
 
  - add tag_hops_power column to tag metrics
- - add pct_tag_hops column to tag metrics
+ - add tag_hops_percent column to tag metrics
  - qc outcomes model: code generalisation to simplify addition of
    further qc types
  - switch to node 6.12.2 in travis

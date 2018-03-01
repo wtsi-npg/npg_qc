@@ -8,11 +8,11 @@ use Readonly;
 use File::Basename;
 use File::Spec;
 use List::Util qw(min);
+use st::api::lims;
 
 our $VERSION = '0';
 
 extends qw(npg_qc::autoqc::checks::check);
-with qw(npg_tracking::data::reference::find);
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -54,7 +54,7 @@ Readonly::Hash our %HEADER_MAPPING => (
           'MAX_MISMATCHES' => 'max_mismatches_param',
           'MIN_MISMATCH_DELTA' => 'min_mismatch_delta_param',
           'MAX_NO_CALLS' => 'max_no_calls_param',
-          'PCT_TAG_HOPS' => 'pct_tag_hops',
+          'PCT_TAG_HOPS' => 'tag_hops_percent',
                                       );
 
 Readonly::Scalar our $ERROR_TOLERANCE_PERCENT => 20;
@@ -152,7 +152,8 @@ sub _calculate_tag_hops_power {
   my $nsamples = 0;
   my %tags0 = ();
   my %tags1 = ();
-  foreach my $plex ($self->lims->children) {
+  my $lims = st::api::lims->new(id_run=>$self->id_run, position=>$self->position);
+  foreach my $plex ($lims->children) {
     my $tag_sequences = $plex->tag_sequences;
     # skip samples with no second index i.e. phix
     if (@{$tag_sequences} != 2) { next; }
@@ -168,7 +169,6 @@ sub _calculate_tag_hops_power {
   my $power = ($ncombinations == $nudis) ? 0 : ($ncombinations - $nsamples) / ($ncombinations - $nudis);
 
   $self->result->tag_hops_power($power);
-
   return;
 }
 
@@ -206,7 +206,7 @@ override 'execute' => sub  {
     if ($line) {
       $self->_parse_header($line);
     } else {
-      $self->result->pct_tag_hops(0);
+      $self->result->tag_hops_percent(0);
     }
     close $fh or carp q[Cannot close a filehandle for hops file];
     $self->_calculate_tag_hops_power();
