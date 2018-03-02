@@ -27,7 +27,6 @@ lib/npg_qc/illumina/loader/Run_Caching.pm
 lib/npg_qc/illumina/loader/Runinfo.pm
 lib/npg_qc/illumina/loader/Cluster_Density.pm
 lib/npg_qc/illumina/loader/Signal_Mean.pm
-lib/npg_qc/illumina/loader/Run_Timeline.pm
 lib/npg_qc/illumina/loader/Bustard_Summary.pm
 lib/npg_qc/illumina/loader.pm
 lib/npg_qc/autoqc/autoqc.pm
@@ -142,7 +141,6 @@ lib/npg_qc/Schema/Result/RunGraph.pm
 lib/npg_qc/Schema/Result/RunInfo.pm
 lib/npg_qc/Schema/Result/RunRecipe.pm
 lib/npg_qc/Schema/Result/RunTile.pm
-lib/npg_qc/Schema/Result/RunTimeline.pm
 lib/npg_qc/Schema/Result/SamtoolsStats.pm
 lib/npg_qc/Schema/Result/SeqComponent.pm
 lib/npg_qc/Schema/Result/SeqComponentComposition.pm
@@ -198,7 +196,6 @@ t/30-illumina-loader-Offset.t
 t/30-illumina-loader-Recipe.t
 t/30-illumina-loader-Run_Caching.t
 t/30-illumina-loader-Runinfo.t
-t/30-illumina-loader-Run_Timeline.t
 t/30-illumina-loader-Signal_Mean.t
 t/30-illumina-loader.t
 t/50-npg_qc-Schema.t
