@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tag_sniff handle separators in BC tags for dual-index runs
  - tag_sniff allow dual-index runs to be revcomped independantly
 
 release 64.5

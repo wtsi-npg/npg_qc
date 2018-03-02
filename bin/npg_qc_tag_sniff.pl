@@ -305,7 +305,7 @@ sub main{
     my %tagsFound;
 
     while (<>) {
-        if (/((BC:)|(RT:))Z:([A-Z]*)/) {
+        if (/((BC:)|(RT:))Z:([A-Z\-]*)/) {
             my $tag = $4;
             if (@tagLengths) {
                 my @subtags = ();
