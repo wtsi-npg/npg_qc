@@ -19,20 +19,21 @@ with    qw( npg_tracking::glossary::subset );
 
 our $VERSION = '0';
 
-Readonly::Scalar my $METRICS_FIELD_LIST => [qw(
-   library
-   unpaired_mapped_reads
-   paired_mapped_reads
-   unmapped_reads
-   unpaired_read_duplicates
-   paired_read_duplicates
-   read_pair_optical_duplicates
-   percent_duplicate
-   library_size)];
+Readonly::Hash my %METRICS_FIELD_MAPPING => {
+   'LIBRARY'                      => 'library',
+   'READ_PAIRS_EXAMINED'          => 'read_pairs_examined',
+   'UNPAIRED_READ_DUPLICATES'     => 'unpaired_read_duplicates',
+   'READ_PAIR_DUPLICATES'         => 'paired_read_duplicates',
+   'READ_PAIR_OPTICAL_DUPLICATES' => 'read_pair_optical_duplicates',
+   'PERCENT_DUPLICATION'          => 'percent_duplicate',
+   'ESTIMATED_LIBRARY_SIZE'       => 'library_size'
+};
 
 # picard and biobambam mark duplicates assign this
 # value for aligned data with no mapped paired reads
 Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
+Readonly::Scalar my $METRICS_NUMBER => 9;
+Readonly::Scalar my $PAIR_NUMBER => 2;
 Readonly::Scalar our $EXT => q[bam];
 
 has '+subset' => ( isa => 'Str', );
@@ -54,12 +55,22 @@ sub _build__sequence_file {
 }
 sub _build_markdups_metrics_file {
   my $self = shift;
-  return join q[.], $self->_file_path_root, 'markdups_metrics.txt';
+  my $metrics_file;
+  if( !$self->skip_markdups_metrics ){
+    $metrics_file = join q[.], $self->_file_path_root, 'markdups_metrics.txt';
+  }
+  return $metrics_file;
 }
 sub _build_flagstats_metrics_file {
   my $self = shift;
   return join q[.], $self->_file_path_root, 'flagstat';
 }
+
+has 'skip_markdups_metrics' => (is       => 'ro',
+                                isa      => 'Bool',
+                                required => 0,
+                                default  => 0,
+                                );
 
 has '_file_path_root'     => ( isa        => 'Str',
                                is         => 'ro',
@@ -124,7 +135,9 @@ sub _build_related_results {
 override 'execute' => sub {
   my $self = shift;
 
-  $self->_parse_markdups_metrics();
+  if( !$self->skip_markdups_metrics ){
+    $self->_parse_markdups_metrics();
+  }
   $self->_parse_flagstats();
   for my $rr ( @{$self->related_results()} ) {
     $rr->execute();
@@ -142,24 +155,26 @@ sub _parse_markdups_metrics {
   chomp $header;
   $self->result()->set_info('markdups_metrics_header', $header);
 
-  my ($metrics_source) = $header =~ /(MarkDuplicates | EstimateLibraryComplexity | bam\S*markduplicates)/mxs;
-
   my $metrics    = $file_contents[1];
   my $histogram  = $file_contents[2];
 
   my @metrics_lines   = split /\n/mxs, $metrics;
+  my @metrics_header  = split /\t/mxs, $metrics_lines[1];
   my @metrics_numbers = split /\t/mxs, $metrics_lines[2];
 
-  if (scalar  @metrics_numbers > scalar @{$METRICS_FIELD_LIST} ) {
+  my %metrics;
+  @metrics{@metrics_header} = @metrics_numbers;
+
+  if (scalar  @metrics_numbers > $METRICS_NUMBER ) {
     croak 'MarkDuplicate metrics format is wrong';
   }
 
-  foreach my $field (@{$METRICS_FIELD_LIST}){
-    my $field_value = shift @metrics_numbers;
+  foreach my $field (keys %METRICS_FIELD_MAPPING){
+    my $field_value = $metrics{$field};
     if ($field_value) {
       if ($field_value =~/\?/mxs) {
         $field_value = undef;
-      } elsif ($field eq 'library_size' && $field_value < 0) {
+      } elsif ($field eq 'ESTIMATED_LIBRARY_SIZE' && $field_value < 0) {
         if ($field_value == $LIBRARY_SIZE_NOT_AVAILABLE) {
           $field_value = undef;
         } else {
@@ -167,12 +182,7 @@ sub _parse_markdups_metrics {
         }
       }
     }
-    $self->result()->$field( $field_value );
-  }
-
-  $self->result()->read_pairs_examined( $self->result()->paired_mapped_reads() );
-  if ($metrics_source eq 'EstimateLibraryComplexity') {
-    $self->result()->paired_mapped_reads(0);
+    $self->result()->${\$METRICS_FIELD_MAPPING{$field}}( $field_value );
   }
 
   if ($histogram) {
@@ -202,6 +212,12 @@ sub _parse_flagstats {
       ? $self->result()->mate_mapped_defferent_chr_5($number)
       :( $line =~ /in\ total/mxs )
       ? $self->result()->num_total_reads($number)
+      : ( $line =~ /with\ itself\ and\ mate\ mapped/mxs )
+      ? $self->result()->paired_mapped_reads($number/$PAIR_NUMBER)
+      : ( $line =~ /singletons\ \(/mxs )
+      ? $self->result()->unpaired_mapped_reads($number)
+      : ( $line =~ /mapped\ \(/mxs )
+      ? $self->result()->unmapped_reads($self->result()->num_total_reads() - $number)
       : next;
   }
   close $samtools_output_fh  or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";

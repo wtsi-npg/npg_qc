@@ -3,8 +3,10 @@ use warnings;
 use Test::More tests => 4;
 use Test::Exception;
 use Moose::Meta::Class;
-use npg_testing::db;
 use DateTime;
+
+use npg_testing::db;
+use t::autoqc_util;
 
 my $table = 'MqcLibraryOutcomeHist';
 
@@ -15,7 +17,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
           ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
 
 subtest 'Test insert' => sub {
-  plan tests => 2;
+  plan tests => 3;
   my $values = {
     'id_run'         => 1, 
     'position'       => 1,
@@ -24,6 +26,14 @@ subtest 'Test insert' => sub {
     'username'       => 'user', 
   };
 
+  throws_ok {$schema->resultset($table)->create($values)}
+    qr/NOT NULL constraint failed: mqc_library_outcome_hist\.id_seq_composition/,
+    'composition foreign key is needed';
+
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 1,
+                          'tag_index' => 1});
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::' . $table);
 
@@ -40,9 +50,15 @@ subtest 'Test insert with tag_index null' => sub {
       'username'       => 'user', 
   };
 
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 1});
   my $object = $schema->resultset($table)->create($values);
   isa_ok($object, 'npg_qc::Schema::Result::' . $table);
 
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 1});
   my $rs = $schema->resultset($table)->search({'id_run'=>1, 'position'=>2});
   is ($rs->count, 1, q[one row matches in the table]);
   my $hist = $schema->resultset($table)->find({'id_run'=>1, 'position'=>2});
@@ -53,11 +69,14 @@ subtest 'Test insert with tag_index null' => sub {
   is ($rs->count, 2, q[Two rows in the table]);
   $values = {
     'id_run'         => 2, 
-    'position'       => 10,
+    'position'       => 8,
     'id_mqc_outcome' => 1, 
     'username'       => 'user',
     'modified_by'    => 'user'
   };
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 2,
+                          'position'  => 8});
   $rs = $schema->resultset($table);
   lives_ok {$rs->find_or_new($values)
                ->set_inflated_columns($values)
@@ -77,7 +96,9 @@ subtest 'Test update' => sub {
     'id_mqc_outcome' => 2, 
     'username'       => 'user', 
   };
-
+  $values->{'id_seq_composition'} = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1,
+                          'position'  => 3});
   my $rs = $schema->resultset($table);
   lives_ok {$rs->create($values)} 'Insert new entity';
   lives_ok {$rs->find({

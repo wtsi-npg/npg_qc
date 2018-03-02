@@ -59,19 +59,26 @@ __PACKAGE__->table('mqc_outcome_ent');
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 id_seq_composition
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_foreign_key: 1
+  is_nullable: 0
+
+A foreign key referencing the id_seq_composition column of the seq_composition table
+
 =head2 id_run
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 0
-
-Lane
+  is_nullable: 1
 
 =head2 id_mqc_outcome
 
@@ -121,10 +128,17 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
+  'id_seq_composition',
+  {
+    data_type => 'bigint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
   'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
   'id_mqc_outcome',
   {
     data_type => 'smallint',
@@ -165,19 +179,17 @@ __PACKAGE__->set_primary_key('id_mqc_outcome_ent');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<id_run_UNIQUE>
+=head2 C<mqc_outcome_ent_compos_ind_unique>
 
 =over 4
 
-=item * L</id_run>
-
-=item * L</position>
+=item * L</id_seq_composition>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position']);
+__PACKAGE__->add_unique_constraint('mqc_outcome_ent_compos_ind_unique', ['id_seq_composition']);
 
 =head1 RELATIONS
 
@@ -196,9 +208,24 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
+=head2 seq_composition
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ifqd4uXLKB/KQXtKle8Tnw
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::SeqComposition>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'seq_composition',
+  'npg_qc::Schema::Result::SeqComposition',
+  { id_seq_composition => 'id_seq_composition' },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-15 14:33:12
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CER7lXmkdjHi1Q12USNB+Q
 
 use Carp;
 
@@ -206,15 +233,24 @@ with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
 
 our $VERSION = '0';
 
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 sub update_reported {
   my $self = shift;
   my $username = $ENV{'USER'} || croak 'Failed to get username';
   if(!$self->has_final_outcome) {
-    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update".',
+    croak(sprintf 'Outcome for id_run %i position %i is not final, cannot update.',
           $self->id_run, $self->position);
   }
   return $self->update({'reported' => $self->get_time_now, 'modified_by' => $username});
 }
+
+__PACKAGE__->add_common_ent_methods();
 
 __PACKAGE__->meta->make_immutable;
 
@@ -233,6 +269,10 @@ Entity for lane MQC outcome.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 composition
+
+  Attribute of type npg_tracking::glossary::composition
+
 =head2 update
 
   Default DBIx update method extended to create an entry in the table corresponding to
@@ -247,6 +287,43 @@ Entity for lane MQC outcome.
 
   Updates the value of reported to the current timestamp. Throws exception if the
   associated L<npg_qc::Schema::Result::MqcOutcomeDict> is not final.
+
+=head2 seq_component_compositions
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+To simplify queries, skip SeqComposition and link directly to the linking table.
+
+=head2 dict_rel_name
+
+=head2 has_final_outcome
+
+Returns true if this entry corresponds to a final outcome, otherwise returns false.
+
+=head2 is_accepted
+
+Returns true if the outcome is accepted (pass), otherwise returns false.
+
+=head2 is_final_accepted
+
+Returns true if the outcome is accepted (pass) and final, otherwise returns false.
+
+=head2 is_undecided
+
+Returns true if the outcome is undecided (neither pass nor fail),
+otherwise returns false.
+
+=head2 is_rejected
+
+Returns true if the outcome is rejected (fail), otherwise returns false.
+
+=head2 description
+
+Returns short outcome description.
+
+  my $description = $obj->description();
 
 =head1 DEPENDENCIES
 
@@ -280,7 +357,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL Genome Research Limited
+Copyright (C) 2018 GRL Genome Research Limited
 
 This file is part of NPG.
 

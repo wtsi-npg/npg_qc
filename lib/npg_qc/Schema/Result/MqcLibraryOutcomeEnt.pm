@@ -59,25 +59,31 @@ __PACKAGE__->table('mqc_library_outcome_ent');
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 id_seq_composition
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_foreign_key: 1
+  is_nullable: 0
+
+A foreign key referencing the id_seq_composition column of the seq_composition table
+
 =head2 id_run
 
   data_type: 'bigint'
   extra: {unsigned => 1}
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 position
 
   data_type: 'tinyint'
   extra: {unsigned => 1}
-  is_nullable: 0
-
-Lane
+  is_nullable: 1
 
 =head2 tag_index
 
   data_type: 'bigint'
-  default_value: -1
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 id_mqc_outcome
 
@@ -127,12 +133,19 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
+  'id_seq_composition',
+  {
+    data_type => 'bigint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
   'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
+  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
   'tag_index',
-  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
+  { data_type => 'bigint', is_nullable => 1 },
   'id_mqc_outcome',
   {
     data_type => 'smallint',
@@ -173,21 +186,20 @@ __PACKAGE__->set_primary_key('id_mqc_library_outcome_ent');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<id_run_UNIQUE>
+=head2 C<mqc_library_outcome_ent_compos_ind_unique>
 
 =over 4
 
-=item * L</id_run>
-
-=item * L</position>
-
-=item * L</tag_index>
+=item * L</id_seq_composition>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint('id_run_UNIQUE', ['id_run', 'position', 'tag_index']);
+__PACKAGE__->add_unique_constraint(
+  'mqc_library_outcome_ent_compos_ind_unique',
+  ['id_seq_composition'],
+);
 
 =head1 RELATIONS
 
@@ -206,18 +218,53 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
+=head2 seq_composition
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-10-23 13:34:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:VPfWw+P0Ncy4VQpevn8yUQ
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::SeqComposition>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'seq_composition',
+  'npg_qc::Schema::Result::SeqComposition',
+  { id_seq_composition => 'id_seq_composition' },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-15 14:33:11
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ToJTCdCmZugE5pmrRj0z1A
 
 use Carp;
-
-with qw/npg_qc::Schema::Flators
-        npg_qc::Schema::Mqc::OutcomeEntity/;
+with qw/npg_qc::Schema::Mqc::OutcomeEntity/;
 
 our $VERSION = '0';
 
-__PACKAGE__->set_inflator4scalar('tag_index');
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+sub finalise_outcome {
+  my ($self, $username) = @_;
+
+  my $new_outcome = $self->mqc_outcome->matching_final_short_desc();
+  if (!$new_outcome) { # Unlikely to happen
+    croak 'No matching final outcome returned';
+  }
+  $new_outcome = {'mqc_outcome' => $new_outcome};
+  if ($self->valid4update($new_outcome)) {
+    $self->update_outcome($new_outcome, $username);
+  }
+
+  return;
+}
+
+__PACKAGE__->add_common_ent_methods();
 
 __PACKAGE__->meta->make_immutable;
 
@@ -228,13 +275,25 @@ __END__
 
 =head1 DESCRIPTION
 
-Entity for library MQC outcome.
+  Entity for library MQC outcome.
 
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 SUBROUTINES/METHODS
+
+=head2 composition
+
+  Attribute of type npg_tracking::glossary::composition.
+
+=head2 seq_component_compositions
+
+  Type: has_many
+
+  Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+  To simplify queries, skip SeqComposition and link directly to the linking table.
 
 =head2 update
 
@@ -245,6 +304,41 @@ Entity for library MQC outcome.
 
   Default DBIx insert method extended to create an entry in the table
   corresponding to the MqcLibraryOutcomeHist class
+
+=head2 finalise_outcome
+
+  Sets the qc outcome value in this object to a matching final outcome.
+
+  $row->finalise_outcome('some_user_name'); 
+
+=head2 dict_rel_name
+
+=head2 has_final_outcome
+
+Returns true if this entry corresponds to a final outcome, otherwise returns false.
+
+=head2 is_accepted
+
+Returns true if the outcome is accepted (pass), otherwise returns false.
+
+=head2 is_final_accepted
+
+Returns true if the outcome is accepted (pass) and final, otherwise returns false.
+
+=head2 is_undecided
+
+Returns true if the outcome is undecided (neither pass nor fail),
+otherwise returns false.
+
+=head2 is_rejected
+
+Returns true if the outcome is rejected (fail), otherwise returns false.
+
+=head2 description
+
+Returns short outcome description.
+
+  my $description = $obj->description();
 
 =head1 DEPENDENCIES
 
@@ -278,7 +372,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL Genome Research Limited
+Copyright (C) 2018 GRL Genome Research Limited
 
 This file is part of NPG.
 

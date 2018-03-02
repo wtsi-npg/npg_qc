@@ -1,11 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 13;
 use Test::Exception;
-use Test::Deep;
 use Moose::Meta::Class;
 use JSON;
+
 use npg_testing::db;
+use t::autoqc_util;
 
 use_ok('npg_qc::Schema::Result::UpstreamTags');
 
@@ -18,23 +19,46 @@ my $json = '
 ';
 
 my $values = from_json($json);
+$values->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 12234, position => 1});
 my $rs = $schema->resultset('UpstreamTags');
 isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::UpstreamTags');
 
 {
   my %values1 = %{$values};
   my $v1 = \%values1;
-
-  $rs->deflate_unique_key_components($v1);
   lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
   is(ref $row->unexpected_tags, 'ARRAY', 'unexpected_tags returned as an array');
-  cmp_deeply($row->unexpected_tags, $values->{'unexpected_tags'},
+  is_deeply($row->unexpected_tags, $values->{'unexpected_tags'},
     'unexpected_tags array content is correct');
-  cmp_deeply($row->prev_runs, $values->{'prev_runs'},
-    'prev_runs array content is correct'); 
+  is_deeply($row->prev_runs, $values->{'prev_runs'},
+    'prev_runs array content is correct');
+
+  %values1 = %{$values};
+  $v1 = \%values1;
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  my $row1;
+  lives_ok {$row1 = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'another or the same row?';
+  is ($row->id_upstream_tags, $row1->id_upstream_tags, 'new row is not created');
+
+  %values1 = %{$values};
+  $v1 = \%values1;
+  delete $v1->{'id_run'};
+  delete $v1->{'position'};
+  $v1->{'id_seq_composition'} =
+  t::autoqc_util::find_or_save_composition($schema,
+    {id_run => 9225, position => 1});
+  lives_ok {$row1 = $rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'another row';
+  isnt ($row->id_upstream_tags, $row1->id_upstream_tags, 'new row is created');
+  is ($row1->id_run, undef, 'id run value is undefined');
+  is ($row1->position, undef, 'position value is undefined');
 } 
  
 1;

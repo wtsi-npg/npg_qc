@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 38;
+use Test::More tests => 39;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -130,6 +130,109 @@ subtest 'Test for summary table id - affects export to CSV.' => sub {
                                         'Expected warning for run folder found';
   $mech->content_contains(q[<table id="results_summary"]);
   $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi);
+};
+
+subtest 'extra column markup - affects export to CSV' => sub {
+  # This tests check for functionaly which affects javascript part of
+  # application. Update accordingly.
+  plan tests => 23;
+  my $id_run    = 4025;
+  my $position  = 1;
+  my $tag_index = 1;
+
+  my $f = npg_tracking::glossary::composition::factory->new();
+  $f->add_component(npg_tracking::glossary::composition::component::illumina->new(
+    id_run => $id_run, position => $position, tag_index => $tag_index));
+  my $fkid = $tmrs->find_or_create_seq_composition($f->create_composition())
+                  ->id_seq_composition();
+
+  my $gcbiasrs = $qc_schema->resultset('GcBias');
+  $gcbiasrs->create({
+    id_run => $id_run,
+    position => $position,
+    tag_index => $tag_index,
+    id_seq_composition => $fkid,
+    path => '/something',
+  });
+
+  my @urls = (
+    qq(http://localhost/checks/runs?run=$id_run&lane=$position&show=plexes),
+    qq(http://localhost/checks/runs?run=$id_run&lane=$position&show=all),
+  );
+  foreach my $url (@urls) {
+    $mech->get_ok($url);
+    $mech->content_contains(q[<table id="results_summary"]);
+    $mech->content_contains(q[data-extra_cols_]);
+    $mech->content_contains(q[data-extra_cols_sample_name='Sanger Sample ID']);
+    $mech->content_contains(q[data-extra_cols_sample_name='']);
+  }
+
+  my $id_sample_tmp          = 1000;
+  my $id_flowcell_tmp        = 100000;
+  my $id_iseq_pr_metrics_tmp = 10000;
+  my $id_sample_lims         = 'abc';
+  my $sample_name            = q[AAABBBCCCDDD];
+
+  my $mlwh = $schemas->{mlwh};
+  my $sample_values = {
+    id_sample_tmp    => $id_sample_tmp,
+    uuid_sample_lims => '4a1e3190-b9c2-11df-9e66-00144f01a414',
+    id_lims          => 'SQSCP',
+    last_updated     => '2012-08-03 10:07:02',
+    recorded_at      => '2012-08-03 10:07:02',
+    created          => '2012-08-03 10:07:02',
+    id_sample_lims   => $id_sample_lims,
+    name             => $sample_name,
+  };
+  my $row_sample = $mlwh->resultset("Sample")->create($sample_values);
+
+  my $flowcell_values = {
+    id_iseq_flowcell_tmp => $id_flowcell_tmp,
+    id_sample_tmp        => $id_sample_tmp,
+    last_updated         => '2012-08-03 10:07:02',
+    recorded_at          => '2012-08-03 10:07:02',
+    id_lims              => 'SQSCP',
+    id_flowcell_lims     => 100001,
+    position             => $position,
+    tag_index            => $tag_index,
+    entity_type          => 'library_indexed',
+    entity_id_lims       => '7583508',
+    is_spiked            => 0,
+    id_pool_lims         => 'NT329502B',
+
+  };
+  my $row_flowcell = $mlwh->resultset("IseqFlowcell")->create($flowcell_values);
+
+  my $product_values = {
+    id_run                 => $id_run,
+    position               => $position,
+    tag_index              => $tag_index,
+    id_iseq_flowcell_tmp   => $id_flowcell_tmp,
+    id_iseq_pr_metrics_tmp => $id_iseq_pr_metrics_tmp
+  };
+  my $row_product = $mlwh->resultset("IseqProductMetric")->create($product_values);
+
+  foreach my $url (@urls) {
+    $mech->get_ok($url);
+    $mech->content_contains(q[<table id="results_summary"]);
+    $mech->content_contains(q[data-extra_cols_]);
+    $mech->content_contains(q[data-extra_cols_sample_name='Sanger Sample ID']);
+    $mech->content_contains(qq[data-extra_cols_sample_name='$sample_name']);
+  }
+
+  my $url_sample = qq[http://localhost/checks/samples/$id_sample_lims];
+  $mech->get_ok($url_sample);
+  $mech->content_contains(qq[Sample '$sample_name']);
+  $mech->content_contains(qq[data-extra_cols_sample_name='$sample_name']);
+
+  $row_product->delete();
+  $row_flowcell->delete();
+  $row_sample->delete();
+  $gcbiasrs->search({
+    id_run    => $id_run,
+    position  => $position,
+    tag_index => $tag_index
+  })->delete();
 };
 
 subtest 'Run 4025 Lane 1' => sub {

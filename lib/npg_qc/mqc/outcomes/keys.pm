@@ -7,11 +7,11 @@ use Readonly;
 
 our $VERSION = '0';
 
-our @EXPORT_OK = qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
+our @EXPORT_OK = qw/$LIB_OUTCOMES $SEQ_OUTCOMES $UQC_OUTCOMES /;
 
 Readonly::Scalar our $LIB_OUTCOMES => q[lib];
 Readonly::Scalar our $SEQ_OUTCOMES => q[seq];
-Readonly::Scalar our $QC_OUTCOME   => q[mqc_outcome];
+Readonly::Scalar our $UQC_OUTCOMES => q[uqc];
 
 1;
 __END__
@@ -24,7 +24,7 @@ npg_qc::mqc::outcomes::keys
 =head1 SYNOPSIS
 
   use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES/;
-  use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $QC_OUTCOME/;
+  use npg_qc::mqc::outcomes::keys qw/$LIB_OUTCOMES $SEQ_OUTCOMES $UQC_OUTCOMES/;
 
 =head1 DESCRIPTION
 
@@ -57,11 +57,11 @@ in npg_qc::mqc::outcomes.
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL, by Marina Gourtovaia
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

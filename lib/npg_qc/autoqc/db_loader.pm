@@ -150,10 +150,10 @@ sub _json2db{
           }
           my $rs  = $self->schema->resultset($dbix_class_name);
           my $related_composition = $rs->find_or_create_seq_composition($obj->composition());
-          if ($related_composition) {
-            $values->{$SEQ_COMPOSITION_PK_NAME} =
-              $related_composition->$SEQ_COMPOSITION_PK_NAME();
+          if (!$related_composition) {
+            croak 'Composition is not found/created';
           }
+          $values->{$SEQ_COMPOSITION_PK_NAME} = $related_composition->$SEQ_COMPOSITION_PK_NAME();
           $self->_values2db($rs, $values);
           $count++;
         }
@@ -175,7 +175,6 @@ sub _values2db {
 
   my $result_class = $rs->result_class;
   $self->_exclude_nondb_attrs($values, $result_class->columns());
-  $rs->deflate_unique_key_components($values);
   my $row = $rs->find_or_new($values);
   if ($result_class->has_column('iscurrent') && $row->in_storage) {
     $row->update({'iscurrent' => 0});

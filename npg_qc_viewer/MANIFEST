@@ -16,7 +16,6 @@ lib/npg_qc_viewer/Model/MLWarehouseDB.pm
 lib/npg_qc_viewer/Model/SeqStore.pm
 lib/npg_qc_viewer/Model/Visuals/Fastqcheck.pm
 lib/npg_qc_viewer/Model/User.pm
-lib/npg_qc_viewer/Util/CompositionFactory.pm
 lib/npg_qc_viewer/Util/Error.pm
 lib/npg_qc_viewer/Util/ExtendedHttpStatus.pm
 lib/npg_qc_viewer/Util/FileFinder.pm
@@ -119,7 +118,6 @@ t/00-podcoverage.t
 t/00-pod.t
 t/10-authentication-SangerSSOnpg.t
 t/10-npg_tracking-daemon-seqqc.t
-t/10-util-CompositionFactory.t
 t/10-util-Error.t
 t/10-util-FileFinder.t
 t/10-util-TransferObject.t
@@ -186,7 +184,7 @@ t/data/fixtures/npg/400-RunStatus.yml
 t/data/fixtures/npg/400-TagRun.yml
 t/data/fixtures/npgqc/000-mqc_outcome_dict.yml
 t/data/fixtures/npgqc/000-mqc_library_outcome_dict.yml
-t/data/fixtures/npgqc/010-mqc_outcome_ent.yml
+t/data/fixtures/npgqc/000-uqc_outcome_dict.yml
 t/data/fixtures/mlwarehouse/300-IseqProductMetric.yml
 t/data/fixtures/mlwarehouse/400-IseqFlowcell.yml
 t/data/fixtures/mlwarehouse/400-IseqRunLaneMetric.yml

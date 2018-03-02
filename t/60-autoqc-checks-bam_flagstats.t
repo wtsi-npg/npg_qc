@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw( tempdir );
@@ -17,7 +17,7 @@ use_ok ('npg_qc::autoqc::results::bam_flagstats');
 use_ok ('npg_qc::autoqc::checks::bam_flagstats');
 
 subtest 'test attributes and simple methods' => sub {
-  plan tests => 5;
+  plan tests => 4;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
             position => 5,
@@ -32,7 +32,6 @@ subtest 'test attributes and simple methods' => sub {
   is ($c->subset, 'phix', 'subset attr is set correctly');
   my $json = $c->result()->freeze();
   like ($json, qr/\"subset\":\"phix\"/, 'subset field is serialized');
-  like ($json, qr/\"human_split\":\"phix\"/, 'human_split field is serialized');
 };
 
 subtest 'high-level parsing' => sub {
@@ -76,6 +75,49 @@ subtest 'high-level parsing' => sub {
   is($r->percent_singletons, 2.92540938863795, 'percent singletons');
   is($r->read_pairs_examined(), 15017382, 'read_pairs_examined');
 };
+
+subtest 'high-level parsing, no markdup metrics' => sub {
+  plan tests => 10;
+
+  my $fstat = 't/data/autoqc/bam_flagstats/24135_1#1.flagstat';
+
+  my $c = npg_qc::autoqc::checks::bam_flagstats->new(
+                        id_run                 => 24135,
+                        position               => 1,
+                        tag_index              => 1,                       
+                        flagstats_metrics_file => $fstat,
+                        skip_markdups_metrics  => 1,                        
+                        related_results        => []
+                       );
+
+  my $expected = from_json(
+    slurp q{t/data/autoqc/bam_flagstats/24135_1#1.bam_flagstats.json}, {chomp=>1});
+
+  lives_ok { $c->execute() } 'execute method is ok';
+  my $r;
+  my $result_json;
+  lives_ok {
+    $r = $c->result();
+    $result_json = $r->freeze();
+    $r->store(qq{$tempdir/24135_1#1.bam_flagstats.json});
+  } 'no error when serializing to json string and file';
+
+  my $from_json_hash = from_json($result_json);
+  delete $from_json_hash->{'__CLASS__'};
+  delete $from_json_hash->{'composition'};
+  delete $from_json_hash->{'info'}->{'Check'};
+  delete $from_json_hash->{'info'}->{'Check_version'};
+   
+  is_deeply($from_json_hash, $expected, 'correct json output');
+  is($r->total_reads(), 66302 , 'total reads');
+  is($r->total_mapped_reads(), '62526', 'total mapped reads');
+  is($r->percent_mapped_reads, 94.304847515912, 'percent mapped reads');
+  is($r->percent_duplicate_reads, undef, 'percent duplicate reads');
+  is($r->percent_properly_paired ,90.7845917166903, 'percent properly paired');
+  is($r->percent_singletons,0.0995445084612832 , 'percent singletons');
+  is($r->read_pairs_examined(), undef, 'read_pairs_examined');
+};
+
 
 my $archive_16960 = '16960_1_0';
 my $ae_16960 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_16960}.tar.gz");

@@ -1,62 +1,73 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 7;
 use Test::Exception;
 use Moose::Meta::Class;
 use npg_testing::db;
 
-BEGIN {
-  use_ok(q{npg_qc::illumina::loader::Cluster_Density});
-}
+use_ok(q{npg_qc::illumina::loader::Cluster_Density});
 
 local $ENV{'dev'} = 'test';
 my $db_helper =  Moose::Meta::Class->create_anon_class(
   roles => [qw/npg_testing::db/])
   ->new_object({ config_file => q[t/data/config.ini],});
 my $schema = $db_helper->deploy_test_db(q[npg_qc::Schema],q[t/data/fixtures]);
-my $schema_tracking = $db_helper->deploy_test_db(q[npg_tracking::Schema],q[t/data/fixtures/npg_tracking]);
 
 {
+  my $rs =    $schema->resultset('ClusterDensity');
+  is ($rs->search()->count(), 0, 'initially no data present');
+
+  my $rfolders = {13108 => 't/data/nfs/sf44/ILorHSany_sf25/incoming/140601_HS2_13108_A_C37W5ACXX',
+                  13169 => 't/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX'};
   my $monitor;
-  lives_ok { $monitor = npg_qc::illumina::loader::Cluster_Density->new(
-         schema => $schema,
-         schema_npg_tracking => $schema_tracking
-      ); } q{loader object creation ok};
-  isa_ok( $monitor, q{npg_qc::illumina::loader::Cluster_Density}, q{object test});
-  is(scalar keys %{$monitor->runlist_db()}, 0, 'no run in the database');
-
-  $monitor->runfolder_list_todo({13108 => 't/data/nfs/sf44/ILorHSany_sf25/incoming/140601_HS2_13108_A_C37W5ACXX'});
-  is(scalar keys %{$monitor->runfolder_list_todo()}, 1, 'one runfolder to do');
-  lives_ok { $monitor->run_all(); } q{save all runs};
-  $monitor->clear_runlist_db();
-  is(scalar keys %{$monitor->runlist_db()}, 1, '1 run in the database now');
-}
-
-{
-  my $runfolder_path = qq{t/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX};
-
-  my $loader;
-  lives_ok { $loader = npg_qc::illumina::loader::Cluster_Density->new({
-                            runfolder_path => $runfolder_path,
-                            id_run => 13169,
-                            schema => $schema,
-                            schema_npg_tracking => $schema_tracking,
-  }); } q{loader object creation ok};
-
-  is($loader->tile_metrics_interop_file(), q{t/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX/InterOp/TileMetricsOut.bin}, 'correct tile metrics file name');
-
-  my $cluster_density_by_lane = $loader->parsing_interop($loader->tile_metrics_interop_file());
-  is($cluster_density_by_lane->{1}->{'cluster density'}->{min}, '787647.75', 'correct value for lane 1 min');
-  is($cluster_density_by_lane->{2}->{'cluster density'}->{max}, '1091274.75', 'correct value for lane 2 max');
-  is($cluster_density_by_lane->{1}->{'cluster density pf'}->{p50}, '845403.09375', 'correct value for pf lane 1 p50');
-
   lives_ok {
-    $loader->save_to_db({lane=>1, is_pf=>0, min=>9667.00, max=>97777.00, p50=>88888.00});
-  } 'no croak when saving one row';
+    $monitor = npg_qc::illumina::loader::Cluster_Density->new(
+                 schema => $schema, runfolder_list_todo => $rfolders) 
+           } q{loader object creation ok};
+  isa_ok( $monitor, q{npg_qc::illumina::loader::Cluster_Density});
+  lives_ok { $monitor->run_all(); } q{saves two runs};
 
-  lives_ok {
-    $loader->save_to_db_list($cluster_density_by_lane);
-  } 'no croak when saving a list of rows';
+  my $expected = {
+         '13169' => {'1' => {'0' => ['787647.75','1074773.75','898249.844'],
+                             '1' => ['750346.875','999689','845403.094']},
+                     '2' => {'1' => ['751032.125','1010533.125','847345.562'],
+                             '0' => ['787547.5','1091274.75','897271.031']}},
+         '13108' => {'2' => {'0' => ['785185.062','879301.375','829946.344'],
+                             '1' => ['726011.438','810253.75','766488.719']},
+                     '7' => {'0' => ['777627.75','858515.562','812372.531'],
+                             '1' => ['715766.625','794474.625','750332.438']},
+                     '4' => {'1' => ['732842.312','809129.812','768436.906'],
+                             '0' => ['801550.312','880357.938','836349.438']},
+                     '3' => {'0' => ['673020.812','778734.688','728291.469'],
+                             '1' => ['632287.125','728198.562','684389.844']},
+                     '6' => {'0' => ['738106.25','795061.75','760297'],
+                             '1' => ['688180.562','743211.438','711789.906']},
+                     '1' => {'1' => ['651105.812','732343.75','686826.906'],
+                             '0' => ['691652.75','781259','727939.562']},
+                     '5' => {'0' => ['716489.875','798702.75','755355.344'],
+                             '1' => ['666030.812','748502.062','705948.594']},
+                     '8' => {'1' => ['758469.438','828558.625','792228.938'],
+                             '0' => ['838061.75','910182.25','868192.5']}}
+                 };
+
+  my $query = {id_run => [keys %{$rfolders}]};
+  my $results = {};
+  my $rs4runs = $rs->search($query);
+  while (my $row = $rs4runs->next) {
+    $results->{$row->id_run}->{$row->position}->{$row->is_pf} = [$row->min, $row->max, $row->p50];
+  }
+
+  is_deeply($results, $expected, 'data saved correctly to the database');
+
+  $rfolders->{13169} = $rfolders->{13108};
+  $expected->{13169} = $expected->{13108};
+  npg_qc::illumina::loader::Cluster_Density->new(
+    schema => $schema, runfolder_list_todo => $rfolders)->run_all();
+  $rs4runs = $rs->search($query);
+  while (my $row = $rs4runs->next) {
+    $results->{$row->id_run}->{$row->position}->{$row->is_pf} = [$row->min, $row->max, $row->p50];
+  }
+  is_deeply($results, $expected, 'rows updated correctly');
 }
 
 1;

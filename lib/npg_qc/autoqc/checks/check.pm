@@ -14,12 +14,19 @@ use Carp;
 
 use npg_tracking::util::types;
 
+extends 'npg_tracking::glossary::composition::factory::rpt_list';
+
 with qw/ npg_tracking::glossary::run
          npg_tracking::glossary::lane
          npg_tracking::glossary::tag
          npg_tracking::glossary::rpt
          MooseX::Getopt
        /;
+
+our $VERSION = '0';
+
+Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
+Readonly::Scalar my  $HUMAN           => q[Homo_sapiens];
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -46,27 +53,17 @@ rpt_list attribute.
 =head2 rpt_list
 
 Semi-colon separated list of run:position or run:position:tag.
-An optional attribute. Shoudl be given if id_run and position are not supplied.
+An optional attribute. Should be given if id_run and position are not supplied.
 
 =cut
 
-has 'rpt_list' => (isa           => q[Str],
-                   is            => q[ro],
-                   required      => 0,
-                   lazy_build    => 1,
-                  );
+has '+rpt_list' => ( required      => 0,
+                     lazy_build    => 1,
+                   );
 sub _build_rpt_list {
   my $self = shift;
   return $self->deflate_rpt();
 }
-
-with 'npg_tracking::glossary::composition::factory::rpt' =>
-  {component_class => 'npg_tracking::glossary::composition::component::illumina'};
-
-our $VERSION = '0';
-
-Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
-Readonly::Scalar my  $HUMAN           => q[Homo_sapiens];
 
 =head2 id_run
 
@@ -532,6 +529,8 @@ __END__
 =item npg_tracking::glossary::tag
 
 =item npg_tracking::util::types
+
+=item npg_tracking::glossary::composition::factory::rpt_list
 
 =back
 

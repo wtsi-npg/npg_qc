@@ -1,5 +1,5 @@
 
-package npg_qc::Schema::Result::ErrorsByNucleotide;
+package npg_qc::Schema::Result::UqcOutcomeHist;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
@@ -8,7 +8,7 @@ package npg_qc::Schema::Result::ErrorsByNucleotide;
 
 =head1 NAME
 
-npg_qc::Schema::Result::ErrorsByNucleotide
+npg_qc::Schema::Result::UqcOutcomeHist - Historic table for utility qc outcomes
 
 =cut
 
@@ -44,172 +44,158 @@ use namespace::autoclean;
 
 __PACKAGE__->load_components('InflateColumn::DateTime');
 
-=head1 TABLE: C<errors_by_nucleotide>
+=head1 TABLE: C<uqc_outcome_hist>
 
 =cut
 
-__PACKAGE__->table('errors_by_nucleotide');
+__PACKAGE__->table('uqc_outcome_hist');
 
 =head1 ACCESSORS
 
-=head2 id_errors_by_nucleotide
+=head2 id_uqc_outcome_hist
 
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 id_run_tile
+=head2 id_seq_composition
 
   data_type: 'bigint'
   extra: {unsigned => 1}
   is_foreign_key: 1
   is_nullable: 0
 
-=head2 read_as
+A foreign key referencing the id_seq_composition column of the seq_composition table
+
+=head2 id_uqc_outcome
+
+  data_type: 'smallint'
+  extra: {unsigned => 1}
+  is_foreign_key: 1
+  is_nullable: 0
+
+A foreign key referencing the id_uqc_outcome column of the uqc_outcome_dict table
+
+=head2 username
 
   data_type: 'char'
-  is_nullable: 1
-  size: 1
+  is_nullable: 0
+  size: 128
 
-=head2 really_a
+Web interface username
 
-  data_type: 'integer'
-  default_value: 0
-  extra: {unsigned => 1}
+=head2 last_modified
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  default_value: current_timestamp
   is_nullable: 0
 
-=head2 really_c
+last time the record was modified
 
-  data_type: 'integer'
-  default_value: 0
-  extra: {unsigned => 1}
+=head2 modified_by
+
+  data_type: 'char'
   is_nullable: 0
+  size: 128
 
-=head2 really_g
+Last user to modify the row
 
-  data_type: 'integer'
-  default_value: 0
-  extra: {unsigned => 1}
+=head2 rationale
+
+  data_type: 'varchar'
   is_nullable: 0
+  size: 150
 
-=head2 really_t
-
-  data_type: 'integer'
-  default_value: 0
-  extra: {unsigned => 1}
-  is_nullable: 0
-
-=head2 rescore
-
-  data_type: 'tinyint'
-  default_value: 0
-  is_nullable: 0
+Audit trace
 
 =cut
 
 __PACKAGE__->add_columns(
-  'id_errors_by_nucleotide',
+  'id_uqc_outcome_hist',
   {
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  'id_run_tile',
+  'id_seq_composition',
   {
     data_type => 'bigint',
     extra => { unsigned => 1 },
     is_foreign_key => 1,
     is_nullable => 0,
   },
-  'read_as',
-  { data_type => 'char', is_nullable => 1, size => 1 },
-  'really_a',
+  'id_uqc_outcome',
   {
-    data_type => 'integer',
-    default_value => 0,
+    data_type => 'smallint',
     extra => { unsigned => 1 },
+    is_foreign_key => 1,
     is_nullable => 0,
   },
-  'really_c',
+  'username',
+  { data_type => 'char', is_nullable => 0, size => 128 },
+  'last_modified',
   {
-    data_type => 'integer',
-    default_value => 0,
-    extra => { unsigned => 1 },
+    data_type => 'timestamp',
+    datetime_undef_if_invalid => 1,
+    default_value => \'current_timestamp',
     is_nullable => 0,
   },
-  'really_g',
-  {
-    data_type => 'integer',
-    default_value => 0,
-    extra => { unsigned => 1 },
-    is_nullable => 0,
-  },
-  'really_t',
-  {
-    data_type => 'integer',
-    default_value => 0,
-    extra => { unsigned => 1 },
-    is_nullable => 0,
-  },
-  'rescore',
-  { data_type => 'tinyint', default_value => 0, is_nullable => 0 },
+  'modified_by',
+  { data_type => 'char', is_nullable => 0, size => 128 },
+  'rationale',
+  { data_type => 'varchar', is_nullable => 0, size => 150 },
 );
 
 =head1 PRIMARY KEY
 
 =over 4
 
-=item * L</id_errors_by_nucleotide>
+=item * L</id_uqc_outcome_hist>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key('id_errors_by_nucleotide');
-
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<unq_idx_err_nuc_rt_read_rescore>
-
-=over 4
-
-=item * L</id_run_tile>
-
-=item * L</rescore>
-
-=item * L</read_as>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint(
-  'unq_idx_err_nuc_rt_read_rescore',
-  ['id_run_tile', 'rescore', 'read_as'],
-);
+__PACKAGE__->set_primary_key('id_uqc_outcome_hist');
 
 =head1 RELATIONS
 
-=head2 run_tile
+=head2 seq_composition
 
 Type: belongs_to
 
-Related object: L<npg_qc::Schema::Result::RunTile>
+Related object: L<npg_qc::Schema::Result::SeqComposition>
 
 =cut
 
 __PACKAGE__->belongs_to(
-  'run_tile',
-  'npg_qc::Schema::Result::RunTile',
-  { id_run_tile => 'id_run_tile' },
-  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
+  'seq_composition',
+  'npg_qc::Schema::Result::SeqComposition',
+  { id_seq_composition => 'id_seq_composition' },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+);
+
+=head2 uqc_outcome
+
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::UqcOutcomeDict>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'uqc_outcome',
+  'npg_qc::Schema::Result::UqcOutcomeDict',
+  { id_uqc_outcome => 'id_uqc_outcome' },
+  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:o5m0zCccV/KmK2OQ7atkYQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-10 16:47:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:W25wZbDnVcThChyx0ZEQNw
 
 our $VERSION = '0';
 
@@ -222,7 +208,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Result class definition in DBIx binding for npg-qc database.
+Catalog for users UQC statuses.
 
 =head1 DIAGNOSTICS
 
@@ -260,11 +246,12 @@ Result class definition in DBIx binding for npg-qc database.
 
 =head1 AUTHOR
 
-Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Manuel Carbajo <lt>mc23@sanger.ac.uk<gt>
+Jaime Tovar <lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 GRL, by Marina Gourtovaia
+Copyright (C) 2017 GRL Genoem Research Limited
 
 This file is part of NPG.
 
@@ -282,4 +269,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
+
 
