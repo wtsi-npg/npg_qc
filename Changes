@@ -2,6 +2,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - tag_sniff handle separators in BC tags for dual-index runs
  - tag_sniff allow dual-index runs to be revcomped independantly
+ - remove run_timeline component on the Illumina QC loader
+ - stop generating DBIx class for run_timeline db table
+ - remove unused methods of the run_graph Clearpress model
 
 release 64.5
  - qc outcomes model: code generalisation to simplify addition of
