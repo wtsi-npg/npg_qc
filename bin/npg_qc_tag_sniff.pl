@@ -15,23 +15,8 @@ use Carp;
 use Getopt::Long;
 use Term::ANSIColor qw(:constants);
 
+##no critic
 our $VERSION = '0';
-
-## no critic (NamingConventions::Capitalization)
-
-### revisit these no critics later (kl2 8/11/16)
-
-## no critic (Subroutines::ProhibitExcessComplexity)
-## no critic (CodeLayout::ProhibitParensWithBuiltins)
-#######
-
-## no critic (RegularExpressions::ProhibitUnusedCapture RegularExpressions::RequireLineBoundaryMatching RegularExpressions::ProhibitEnumeratedClasses RegularExpressions::RequireDotMatchAnything RegularExpressions::RequireExtendedFormatting)
-
-## no critic (InputOutput::RequireBracedFileHandleWithPrint InputOutput::RequireCheckedSyscalls)
-
-## no critic (BuiltinFunctions::ProhibitReverseSortBlock)
-
-## no critic (Subroutines::RequireArgUnpacking)
 
 sub usage {
 
@@ -128,13 +113,13 @@ sub showTags{
       my @files = split(/[,]/, $groups);
       for my $file (@files) {
         $id++;
-        die "Invalid taglist file $file" unless $file =~ m/\/metadata_cache_(\d+)\/lane_(\d)\.taglist$/;
+        croak "Invalid taglist file $file" unless $file =~ m/\/metadata_cache_(\d+)\/lane_(\d)\.taglist$/;
         my ($id_run,$lane) = ($1,$2);
         my $name = "${id_run}_${lane}";
-        open FILE,"<$file" or die "Can't open taglist file $file : $!\n";
+        open FILE,"<$file" or croak "Can't open taglist file $file : $!\n";
         foreach (<FILE>) {
           next if m/^barcode/;
-          die "Invalid tag $_" unless m/^([ACGT]+)\t(\d+)\t/;
+          croak "Invalid tag $_" unless m/^([ACGT]+)\t(\d+)\t/;
           my ($sequence,$tag_index) = ($1,$2);
           push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0]);
           if (@{$revcomps}) {
@@ -153,7 +138,7 @@ sub showTags{
       my $id = 0;
       for my $rl (@rls) {
         $id++;
-        die "Invalid run_lane $rl" unless $rl =~ m/^(\d+)_(\d)$/;
+        croak "Invalid run_lane $rl" unless $rl =~ m/^(\d+)_(\d)$/;
         my ($id_run,$lane) = ($1,$2);
         my $name = "run ${id_run} lane ${lane}";
         $rs = $s->resultset('NpgPlexInformation')->search({id_run=>$id_run, position=>$lane});
