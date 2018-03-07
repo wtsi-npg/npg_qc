@@ -48,6 +48,13 @@
      </tr>
      </table>
      </div>
+     <h6>globin metrics</h6>
+     <div style='clear:both;' class="data_table">
+     <table title=globin_metrics>
+     <tr><th>globin % TPM</th></tr>
+     <tr><td align="right">[% IF check.globin_pct_tpm.defined; check.globin_pct_tpm | format_number(3,1); ELSE %]<span>na</span>[% END %]</td></tr>
+     </table>
+     </div>
      <div class="data_table">
 [%   IF check.id_run.defined;
        IF c.model('NpgDB').resultset('Run').find(id_run).is_tag_set('staging');
