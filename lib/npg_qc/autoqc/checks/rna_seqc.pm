@@ -37,6 +37,7 @@ Readonly::Scalar my $COL_QUANT_GENEID  => 0;
 Readonly::Scalar my $COL_GENEID        => 0;
 Readonly::Scalar my $COL_GENENAME      => 1;
 Readonly::Scalar my $GLOBIN_METRIC_NAME=> q[Globin % TPM];
+Readonly::Scalar my $TEN_THOUSAND      => 10_000;
 
 # Globin metric is not part of RNA-SeQC, its name is arbitrary and has been
 # added to the hash to be treated the same way as selected RNA-SeQC results
@@ -359,24 +360,23 @@ sub _parse_quant_file {
     my $fh = IO::File->new($globin_file, 'r');
     while (my $line = $fh->getline) {
         chomp $line;
-        my @record = split /,/smx, $line;
-        $globin_genes{$record[$COL_GENEID]} = $record[$COL_GENENAME];
+        my @gene_record = split /,/smx, $line;
+        $globin_genes{$gene_record[$COL_GENEID]} = $gene_record[$COL_GENENAME];
     }
     $fh->close();
     my %quant_genes;
     $fh = IO::File->new($quant_file, 'r');
     while (my $line = $fh->getline) {
-        my @record = split /\t/smx, $line;
-        if (exists $globin_genes{$record[$COL_QUANT_GENEID]}){
-            if (looks_like_number($record[$COL_QUANT_TPM])) {
+        my @quant_record = split /\t/smx, $line;
+        if (exists $globin_genes{$quant_record[$COL_QUANT_GENEID]}){
+            if (looks_like_number($quant_record[$COL_QUANT_TPM])) {
                 $quant_genes{'count'} += 1;
-                $quant_genes{'sum'} += $record[$COL_QUANT_TPM];
+                $quant_genes{'sum'} += $quant_record[$COL_QUANT_TPM];
             }
         }
     }
     $fh->close();
-    my $pct_globin = sprintf "%.2f", $quant_genes{'sum'} / 10_000;
-    $results->{$GLOBIN_METRIC_NAME} = $pct_globin;
+    $results->{$GLOBIN_METRIC_NAME} = sprintf '%.2f', $quant_genes{'sum'} / $TEN_THOUSAND;
     return;
 }
 
