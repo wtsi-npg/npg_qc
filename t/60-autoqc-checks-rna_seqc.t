@@ -112,7 +112,8 @@ subtest 'Parse metrics' => sub {
         position => 6,
         tag_index => 6,
         path => 't/data/autoqc/rna_seqc/data',
-        globin_genes_csv => 't/data/autoqc/rna_seqc/data/globin_genes.csv');
+        globin_genes_csv => 't/data/autoqc/rna_seqc/data/globin_genes.csv',
+        repository => $repos,);
     $results = {};
     lives_ok {$rnaseqc->_parse_rna_seqc_metrics($results)} q[parsing RNA-SeQC metrics.tsv ok];
     lives_ok {$rnaseqc->_parse_quant_file($results)} q[parsing quant.genes.sf ok];
