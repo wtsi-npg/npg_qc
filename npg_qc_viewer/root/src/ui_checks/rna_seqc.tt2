@@ -56,25 +56,23 @@
      </table>
      </div>
      <div class="data_table">
-[%   IF check.id_run.defined;
-       IF c.model('NpgDB').resultset('Run').find(id_run).is_tag_set('staging');
-         base = base_url _ '/cgi-bin/locate_runfolder';
-         run_folder_glob = id_run;
-         npg_run_row = c.model('NpgDB').resultset('Run').find(id_run);
-         IF npg_run_row;
-           rfglob = npg_run_row.folder_path_glob;
-           rfname = npg_run_row.folder_name;
-           IF rfglob && rfname;
-             run_folder_glob = rfglob _ rfname;
-           END;
+[%   IF c.model('NpgDB').resultset('Run').find(id_run).is_tag_set('staging');
+       base = base_url _ '/cgi-bin/locate_runfolder';
+       run_folder_glob = id_run;
+       npg_run_row = c.model('NpgDB').resultset('Run').find(id_run);
+       IF npg_run_row;
+         rfglob = npg_run_row.folder_path_glob;
+         rfname = npg_run_row.folder_name;
+         IF rfglob && rfname;
+           run_folder_glob = rfglob _ rfname;
          END;
-         rna_seqc_output_dir = check.id_run _ '_' _ check.position;
-         IF check.tag_index.defined;
-           rna_seqc_output_dir = rna_seqc_output_dir _ '%23' _ check.tag_index;
-         END;
-         rna_seqc_output_dir = rna_seqc_output_dir _ '_rna_seqc' %]
-         <p>Other RNA-SeQC <a href="[% base %]/[% run_folder_glob %]/Latest_Summary/archive/lane[% check.position %]/qc/[% rna_seqc_output_dir | url %]?redir">metrics</a>.</p>
-[%     END; 
-     END %]
+       END;
+       rna_seqc_output_dir = check.id_run _ '_' _ check.position;
+       IF check.tag_index.defined;
+         rna_seqc_output_dir = rna_seqc_output_dir _ '%23' _ check.tag_index;
+       END;
+       rna_seqc_output_dir = rna_seqc_output_dir _ '_rna_seqc' %]
+       <p>Other RNA-SeQC <a href="[% base %]/[% run_folder_glob %]/Latest_Summary/archive/lane[% check.position %]/qc/[% rna_seqc_output_dir | url %]?redir">metrics</a>.</p>
+[%   END %]
      </div>
 [% END %]
