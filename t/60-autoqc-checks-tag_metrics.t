@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 67;
+use Test::More tests => 68;
 use Test::Exception;
 
 use_ok('npg_qc::autoqc::checks::tag_metrics');
@@ -54,6 +54,8 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/tag_metrics/samplesheet_6552.csv];
+
   my $check = npg_qc::autoqc::checks::tag_metrics->new(path      => 't/data/autoqc/tag_metrics',
                                                        position  => 1,
                                                        id_run    => 6552);
@@ -68,6 +70,8 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/tag_metrics/samplesheet_6553.csv];
+
   my $check = npg_qc::autoqc::checks::tag_metrics->new(path      => 't/data/autoqc/tag_metrics',
                                                        position  => 1,
                                                        id_run    => 6553);
@@ -79,6 +83,18 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
   is($result->min_mismatch_delta_param, 1, 'min_mismatch_delta is 1');
   is($result->max_no_calls_param, 2, 'max_no_calls is 2');
   is($result->tag_hops_percent, 27.272728, 'tag hop file');
+}
+
+{
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/tag_metrics/samplesheet_25152.csv];
+
+  my $check = npg_qc::autoqc::checks::tag_metrics->new(path      => 't/data/autoqc/tag_metrics',
+                                                       position  => 1,
+                                                       id_run    => 25152);
+
+  $check->execute();
+  my $result = $check->result;
+  is($result->tag_hops_power, 1.0, 'tag_hops_power');
 }
 
 {
