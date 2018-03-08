@@ -30,7 +30,7 @@ sub run_all {
   foreach my $id_run (sort { $a <=> $b } keys %rfolders) {
     try {
       $self->mlog(qq{Loading cluster density data for run $id_run});
-      my $interop = join q[/], $rfolders{$id_run}, @TILE_METRICS_INTEROP_FILE;
+      my $interop_file = join q[/], $rfolders{$id_run}, @TILE_METRICS_INTEROP_FILE;
       if ( ! -e $interop_file ) {
         $self->mlog(qq{Couldn't find interop file $interop_file, looking in $PF_CYCLE sub-directory});
         # look for one in the PF_CYCLE sub-directory
@@ -39,7 +39,7 @@ sub run_all {
           croak qq{Couldn't find interop file $interop_file};
         }
       }
-      $self->_save_to_db($id_run, $self->_parse_interop($interop));
+      $self->_save_to_db($id_run, $self->_parse_interop($interop_file));
     } catch {
       my $error = $_;
       if( $error =~ /No\ such\ file\ or\ directory/mxs){
@@ -77,6 +77,7 @@ sub _parse_interop {
 
   my $tile_metrics = {};
 
+  ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
   if( $version == 3) {
     $fh->read($data, 4) or
       croak qq{Couldn't read area in interop file $interop, error $ERRNO};
@@ -88,7 +89,7 @@ sub _parse_interop {
       my $template = 'vVc'; # one 2-byte integer, one 4-byte integer and one 1-byte char
       my ($lane,$tile,$code) = unpack $template, $data;
       if( $code == $TILE_METRICS_INTEROP_CODES->{'version3_cluster_counts'} ){
-        $data = substr($data,7);
+        $data = substr $data, 7;
         $template = 'f2'; # two 4-byte floats
         my ($cluster_count, $cluster_count_pf) = unpack $template, $data;
         my $cluster_density = $cluster_count / $area;
