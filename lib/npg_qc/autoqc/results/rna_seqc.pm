@@ -4,7 +4,8 @@ use Moose;
 use namespace::autoclean;
 use Readonly;
 
-extends 'npg_qc::autoqc::results::result';
+extends qw(npg_qc::autoqc::results::result);
+with qw(npg_qc::autoqc::role::rna_seqc);
 
 our $VERSION = '0';
 
