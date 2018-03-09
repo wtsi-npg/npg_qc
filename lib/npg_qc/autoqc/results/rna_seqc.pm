@@ -177,6 +177,8 @@ All remaining RNA-SeQC metrics as a key-values pairs
 
 =item npg_qc::autoqc::results::result
 
+=item Readonly
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -189,7 +191,7 @@ Ruben E Bautista-Garcia<lt>rb11@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Limited
+Copyright (C) 2018 Genome Research Limited
 
 This file is part of NPG.
 
