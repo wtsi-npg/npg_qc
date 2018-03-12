@@ -209,7 +209,6 @@ sub showTags{
                         $matches{$subtag}->{$id} = [$map_id,1];
                     } elsif ($revcomp) {
                         # not looking for revcomp matches on this subtag
-                        continue;
                     } else {
                         $matches{$subtag}->{$id} = [$map_id,0];
                     }
@@ -292,7 +291,17 @@ sub main{
     while (<>) {
         if (/((BC:)|(RT:))Z:([A-Z\-]*)/) {
             my $tag = $4;
-            if (@tagLengths) {
+            if ($tag =~ m/\-/) {
+                my @subtags = split(/\-/, $tag);
+                foreach my $i (0..$#tagLengths) {
+                    if ($tagLengths[$i] < 0) {
+                        $subtags[$i] = substr $subtags[$i], $tagLengths[$i];
+                    } elsif ($tagLengths[$i]) {
+                        $subtags[$i] = substr $subtags[$i], 0, $tagLengths[$i];
+                    }
+                }
+                $tag = join(q{:},@subtags);
+            } elsif (@tagLengths) {
                 my @subtags = ();
                 foreach my $i (0..$#tagLengths) {
                     my $subtag;
