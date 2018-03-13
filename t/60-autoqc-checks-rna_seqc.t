@@ -206,8 +206,8 @@ subtest 'Role methods' => sub {
     use_ok ('npg_qc::autoqc::results::rna_seqc');
     lives_ok {$r = npg_qc::autoqc::results::rna_seqc->load('t/data/autoqc/rna_seqc/data/18407_1#7.rna_seqc.json');} 'load serialised valid result';
     lives_ok {$om_value = $r->other_metrics();} 'extract other metrics';
-    is_deeply($r->transcripts_detected(), $om_value->{'Transcripts Detected'}, 'value extracted using role method');
-    is_deeply($r->intronic_rate(), $om_value->{'Intronic Rate'}, 'value extracted using role method');
+    is($r->transcripts_detected(), $om_value->{'Transcripts Detected'}, 'value extracted using role method');
+    is($r->intronic_rate(), $om_value->{'Intronic Rate'}, 'value extracted using role method');
 };
 
 
