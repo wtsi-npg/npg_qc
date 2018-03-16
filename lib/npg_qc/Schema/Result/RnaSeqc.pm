@@ -278,16 +278,18 @@ __PACKAGE__->belongs_to(
 
 =item * L<npg_qc::autoqc::role::result>
 
+=item * L<npg_qc::autoqc::role::rna_seqc>
+
 =back
 
 =cut
 
 
-with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
+with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::rna_seqc';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iF60MVXsQlJSZaqqLbjz0w
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-03-09 14:27:59
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:UVlTT7idMNKZnywBkcWLwQ
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
