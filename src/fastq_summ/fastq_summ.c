@@ -134,7 +134,7 @@ struct _params {
 	struct _output_queues *output_queues;	/* if specified using -t flags, counting pass is not needed */
 } params;
 
-int stragglers = 0;	/* used to count unmatched members of read pairs */
+uint64_t stragglers = 0;	/* used to count unmatched members of read pairs */
 
 /*
 struct _frag_out contains the data selected from a read to be output to fastq
@@ -198,7 +198,7 @@ int main(int ac, char **av)
 	char *bamfile_name = NULL;
 	samfile_t *fp = NULL;
 	bam1_t *b = NULL;
-	int lc, rc, se, filtered, orphans;	/* line count, (unfiltered) read count, filtered count */
+	uint64_t lc, rc, se, filtered, orphans;	/* line count, (unfiltered) read count, filtered count */
 	int i;
 	unsigned int is_multifrag, is_revcomp, nextfrag_revcomp, is_firstfrag, is_lastfrag;	/* bools */
 	struct _frag_out *fo;
@@ -321,11 +321,11 @@ select interval occurs (and for paired reads, when the second read of the pair i
 	twalk(frag_store.store, visit_frag_nodes);	/* count orphaned frags */
 
 	if(params.verbosity > 0) {
-		printf("Unfiltered reads: %d\n", rc);
-		printf("Filtered reads: %d\n", filtered);
-		printf("Unfiltered single-end reads: %d\n", se);
-		printf("Total reads: %d\n", lc);
-		printf("Orphaned reads: %d\n", stragglers);
+		printf("Unfiltered reads: %lu\n", rc);
+		printf("Filtered reads: %lu\n", filtered);
+		printf("Unfiltered single-end reads: %lu\n", se);
+		printf("Total reads: %lu\n", lc);
+		printf("Orphaned reads: %lu\n", stragglers);
 	}
 
 	bam_destroy1(b);
