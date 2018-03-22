@@ -19,8 +19,8 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     'gt_utils' => {
       'copy'     => [qw/find_gt_match gt_pack/],
                   },
-    'fastq_summ' => {
-      'copy'     => [qw/fastq_summ/],
+    'fastqcheck' => {
+      'copy'     => [qw/fastqcheck/],
       'samtools' => 1,
                   },
   };
