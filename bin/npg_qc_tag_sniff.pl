@@ -270,17 +270,18 @@ sub main{
     my $rl = $opts->{rl};
 
     my @tagLengths = $tagLength ? split(/[,]/,$tagLength) : ();
-
     my @revcomps = $revcomp ? split(/[,]/,$revcomp) : ();
-    if  (@tagLengths && @revcomps && ($#tagLengths != $#revcomps)) {
-        print {*STDERR} "\nif you specify a list for both tag_length and revcomp they must be the same length\n" or croak 'print failed';
+    my @clips = $clip ? split(/[,]/,$clip) : ();
+
+    my $nonZeroSubTags = 0;
+    map {$nonZeroSubTags++ if $_} @tagLengths;
+    if  ($nonZeroSubTags && @revcomps && ($nonZeroSubTags != ($#revcomps+1))) {
+        print {*STDERR} "\nif you specify a list for both tag_length and revcomp the number of non-zero tag_lengths and revcomps should be equal\n" or croak 'print failed';
         usage;
         exit 1;
     }
-
-    my @clips = $clip ? split(/[,]/,$clip) : ();
-    if  (@tagLengths && @clips && ($#tagLengths != $#clips)) {
-        print {*STDERR} "\nif you specify a list for both tag_length and clip they must be the same length\n" or croak 'print failed';
+    if  ($nonZeroSubTags && @clips && ($nonZeroSubTags != ($#clips+1))) {
+        print {*STDERR} "\nif you specify a list for both tag_length and clip the number of non-zero tag_lengths and clips should be equal\n" or croak 'print failed';
         usage;
         exit 1;
     }
@@ -294,27 +295,30 @@ sub main{
             if ($tag =~ m/\-/) {
                 my @subtags = split(/\-/, $tag);
                 foreach my $i (0..$#tagLengths) {
-                    if ($tagLengths[$i] < 0) {
+                    my $subtag;
+                    if ($tagLengths[$i] == 0) {
+                        $subtags[$i] = "";
+                    } elsif ($tagLengths[$i] < 0) {
                         $subtags[$i] = substr $subtags[$i], $tagLengths[$i];
                     } elsif ($tagLengths[$i]) {
                         $subtags[$i] = substr $subtags[$i], 0, $tagLengths[$i];
                     }
                 }
-                $tag = join(q{:},@subtags);
+                # exclude empty subtags
+                $tag = join(q{:},grep {$_ ne ""} @subtags);
             } elsif (@tagLengths) {
                 my @subtags = ();
                 foreach my $i (0..$#tagLengths) {
-                    my $subtag;
                     if ($tagLengths[$i] < 0) {
-                        $subtag = substr $tag, $tagLengths[$i];
+                        $subtags[$i] = substr $tag, $tagLengths[$i];
                         $tag = substr $tag, 0, $tagLengths[$i];
                     } elsif ($tagLengths[$i]) {
-                        $subtag = substr $tag, 0, $tagLengths[$i];
+                        $subtags[$i] = substr $tag, 0, $tagLengths[$i];
                         $tag = substr $tag, $tagLengths[$i];
                     }
-                    push(@subtags, $subtag);
                 }
-                $tag = join(q{:},@subtags);
+                # exclude empty subtags
+                $tag = join(q{:},grep {$_ ne ""} @subtags);
             }
             $tagsFound++;
             $tagsFound{$tag}++;
