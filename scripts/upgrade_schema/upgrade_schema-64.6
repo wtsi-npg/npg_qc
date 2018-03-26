@@ -1,0 +1,29 @@
+--
+-- Table structure for table `genotype_call`
+--
+
+DROP TABLE IF EXISTS `genotype_call`;
+CREATE TABLE `genotype_call` (
+  `id_genotype_call` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+  `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `path` varchar(256) DEFAULT NULL,
+  `gbs_plex_name` varchar(64) DEFAULT NULL,
+  `gbs_plex_path` varchar(256) DEFAULT NULL,
+  `genotypes_attempted` int(11)  DEFAULT NULL,
+  `genotypes_called` int(11)  DEFAULT NULL,
+  `genotypes_passed` int(11)  DEFAULT NULL,
+  `sex_markers_attempted` int(11)  DEFAULT NULL,
+  `sex_markers_called` int(11)  DEFAULT NULL,
+  `sex_markers_passed` int(11)  DEFAULT NULL,
+  `sex` varchar(64) DEFAULT NULL,
+  `pass` tinyint(1) DEFAULT NULL,
+  `comments` text,
+  `info` text,
+  PRIMARY KEY (`id_genotype_call`),
+  UNIQUE KEY `genotype_call_id_compos_uniq` (`id_seq_composition`),
+  CONSTRAINT `genotype_call_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+--
+--
+--
+GRANT SELECT ON `genotype_call` TO nqcro;

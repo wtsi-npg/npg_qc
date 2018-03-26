@@ -209,6 +209,7 @@ my $requires = {
                 'Try::Tiny'                       => 0,
                 'warnings'                        => 0,
                 'URI::Escape'                     => 0,
+                'Vcf'                             => 0,
                 'XML::LibXML'                     => 0,
 
                 'npg_common::Alignment'                    => 0,
