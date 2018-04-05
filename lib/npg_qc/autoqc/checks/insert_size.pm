@@ -18,7 +18,7 @@ use npg_qc::autoqc::types;
 use npg_qc::autoqc::parse::alignment;
 use npg_qc::autoqc::results::insert_size;
 use npg_common::Alignment;
-use npg_common::extractor::fastq qw(generate_equally_spaced_reads);
+use npg_common::extractor::fastq qw(read_count);
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(
@@ -60,17 +60,6 @@ Readonly::Scalar our $MAX_ISIZE_COEFF        => 2;
 Readonly::Scalar our $CHILD_ERROR_SHIFT      => 8;
 
 our $_alignment_count = 0; ## no critic (Variables::ProhibitPackageVars)
-
-=head2 sample_size
-
-Number of reads aligned
-
-=cut
-has 'sample_size' => (isa         => 'Maybe[SampleSize4Aligning]',
-                      is          => 'ro',
-                      required    => 0,
-                      default     => $NUM_READS,
-                     );
 
 =head2 actual_sample_size
 
@@ -415,18 +404,10 @@ sub _expected_single_value2expected_range {
 sub _generate_sample_reads {
     my ($self) = @_;
 
-    my $fqe1 =  catfile($self->tmp_path, q[1.fastq]);
-    my $fqe2 =  catfile($self->tmp_path, q[2.fastq]);
+    my $fqe1 = $self->input_files->[0];
+    my $fqe2 = $self->input_files->[1];
 
-    my $actual_sample_size;
-    try {
-        $actual_sample_size = generate_equally_spaced_reads($self->input_files, [$fqe1, $fqe2], $self->sample_size);
-    } catch {
-        my $error = $_;
-        if ($error =~ /reads[ ]are[ ]out[ ]of[ ]order/ismx) { croak $error; }
-        $self->result->add_comment($error);
-    };
-
+    my $actual_sample_size = read_count($fqe1);
     if (defined $actual_sample_size) {
         try {
             $self->_set_actual_sample_size($actual_sample_size);

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 66;
+use Test::More tests => 60;
 use Test::Exception;
 use Test::Deep;
 use Perl6::Slurp;
@@ -75,49 +75,11 @@ sub _additional_modules {
 }
 
 {
-  throws_ok { npg_qc::autoqc::checks::insert_size->new(
-                                           sample_size => -1, 
-                                           position => 3, 
-                                           path => 't/data/autoqc', 
-                                           id_run => 1937, 
-                                           repository => $repos, 
-                                           expected_size => [350,350],
-                                                   ) }
-    qr/Attribute \(sample_size\) does not pass the type constraint/, 'wrong requested sample size error';
-
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
-    position => 2, path => 't/data/autoqc', id_run => 2549, repository => $repos,);
-  is($qc->sample_size, 10000, 'default sample size');
-  $qc = npg_qc::autoqc::checks::insert_size->new(
-    sample_size => 2, position => 2, path => 't/data/autoqc', id_run => 2549, repository => $repos, );
-  is($qc->sample_size, 2, 'sample size set correctly');
-}
-
-{
-  my $dir = tempdir( CLEANUP => 1 );
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'));
-  local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
-                                           sample_size => 10, 
-                                           position => 3, 
-                                           path => 't/data/autoqc', 
-                                           id_run => 1937, 
-                                           repository => $repos,
-                                           reference => $ref,
-                                           use_reverse_complemented => 0,
-                                           expected_size => [350,350],
-                                                   );
-  throws_ok {$qc->execute()} qr/Reads are out of order in/,
-    'execute: error on reads out of order';
-}
-
-{
   my $dir = tempdir( CLEANUP => 1 );
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'));
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $qc = npg_qc::autoqc::checks::insert_size->new(
-                                           sample_size => 15000, 
                                            position => 1, 
                                            path => 't/data/autoqc', 
                                            id_run => 1937,
@@ -127,7 +89,6 @@ sub _additional_modules {
                                            expected_size => [350,350],
                                                    );
   $qc->execute();
-  is ($qc->sample_size, 15000, 'requested sample size in the check object');
   is ($qc->actual_sample_size, 12500, 'actual sample size in the check object');
   is ($qc->result->sample_size, 12500, 'actual sample size in the result object');
 }
@@ -295,7 +256,6 @@ sub _additional_modules {
                                                    );
 
   ok($qc->execute(), 'execute returns true');
-  is ($qc->sample_size, 10000, 'sample size as expected');
 
   ##### Construct expected  object: START ####
   my $eqc = npg_qc::autoqc::checks::insert_size->new(
@@ -314,7 +274,7 @@ sub _additional_modules {
   $eqc->result->expected_size([400,500]);
   $eqc->result->mean(148);
   $eqc->result->std(16);
-  $eqc->result->sample_size(10000);
+  $eqc->result->sample_size(12500);
   $eqc->result->quartile1(135);
   $eqc->result->median(151);
   $eqc->result->quartile3(154);
@@ -502,7 +462,7 @@ sub _additional_modules {
   $eqc->result->filenames(['1937_1_1.fastq', '1937_1_2.fastq']);
   $eqc->result->comments(q[No results returned from aligning]);
   $eqc->result->reference($ref);
-  $eqc->result->sample_size(10000);
+  $eqc->result->sample_size(12500);
   $eqc->result->num_well_aligned_reads(0);
   $eqc->result->num_well_aligned_reads_opp_dir(undef);
   $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
@@ -551,7 +511,7 @@ sub _additional_modules {
   $eqc->result->expected_size([350,350]);
   $eqc->result->mean(96);
   $eqc->result->std(0);
-  $eqc->result->sample_size(10000);
+  $eqc->result->sample_size(12500);
   $eqc->result->quartile1(96);
   $eqc->result->median(96);
   $eqc->result->quartile3(96);

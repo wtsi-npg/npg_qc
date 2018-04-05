@@ -4,7 +4,7 @@ use autodie qw(:all);
 use File::Temp qw/ tempdir /;
 use File::Spec::Functions qw(catfile);
 use Cwd;
-use Test::More tests => 46;
+use Test::More tests => 43;
 use Test::Deep;
 use Test::Exception;
 use npg_tracking::util::abs_path qw(abs_path);
@@ -48,8 +48,6 @@ close $fh;
         'Temporary fastq path is in the temp dir' );
     ok( $test->sample_read_length() =~ m/^ \d+ $/msx,
         'A default read length is set' );
-    ok( $test->sample_read_count()  =~ m/^ \d+ $/msx,
-        'A default read count is set' );
 }
 
 {
@@ -64,7 +62,6 @@ close $fh;
                         aligner            => 'smalt',
                         temp_fastq         => '/tEmp/faStq',
                         sample_read_length => 250,
-                        sample_read_count  => 3,
                         request_list       => [ 'abc', 'def' ],
                         ref_repository     => 't/data',
         );
@@ -81,8 +78,6 @@ close $fh;
         'Default temporary fastq path overridden' );
     is( $override_test->sample_read_length(), 250,
         'Default read length overridden' );
-    is( $override_test->sample_read_count(), 3,
-        'Default read count overridden' );
     cmp_bag( $override_test->request_list(), [ 'abc', 'def' ],
         'Requested organism list explicitly specified' );
     is( $override_test->ref_repository(), 't/data',
@@ -96,7 +91,6 @@ close $fh;
                         id_run             => 1937,
                         position           =>    3,
                         sample_read_length =>   27,
-                        sample_read_count  =>    3,
                         repository => $repos,
         )
     } qr/Sample read length 27 is below 28 \(lowest acceptable value\)/,
@@ -109,7 +103,6 @@ close $fh;
                         id_run             => 1937,
                         position           =>    3,
                         sample_read_length =>   37,
-                        sample_read_count  =>    3,
                         read1_fastq        => q[t/data/autoqc/ref_match/narrow.fastq],
                         repository => $repos,
     );
@@ -127,7 +120,6 @@ close $fh;
                         id_run             => 1937,
                         position           =>    3,
                         sample_read_length =>   39,
-                        sample_read_count  =>    3,
                         repository => $repos,
         );
     }
@@ -137,7 +129,6 @@ close $fh;
              'No error when reads are shorter than requested';
     ok( -e $test->temp_fastq(), 'Temp fastq file created' );
     is( $test->result->sample_read_length(), 37, 'Sample read length is 37' );
-    is( $test->result->sample_read_count(),   3, 'Sample read count is 3' );
 }
 
 
