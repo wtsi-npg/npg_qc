@@ -199,9 +199,9 @@ int readFastq (FILE *fil, int *conv,
     { fprintf (stderr, "bad @ identifier line %d, got [0x%x]\n", line,(int)c) ; return -1; }
   ++line ;
 
-  /* ensure whitespace ignored */
+  /* ensure whitespace ignored and separator '-' for dual-index reads */
 
-  conv[' '] = conv['\t'] = -1 ;
+  conv[' '] = conv['\t'] = conv['-'] = -1 ;
   conv['\n'] = -3 ;
 
   n = 0 ;			/* sequence */
@@ -277,6 +277,9 @@ int readFastq (FILE *fil, int *conv,
 
       if (c == '\n')
 	++line;
+      else if (c == ' ')
+        /* ignore separator ' ' for dual-index reads */
+        continue;
       else if (qval) 
 	add (c-33, qval, &buflen, m++) ;
       else 
