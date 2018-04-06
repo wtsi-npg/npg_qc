@@ -60,6 +60,8 @@ __END__
 
 =item Moose::Role
 
+=item Readonly
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -72,7 +74,7 @@ Ruben Bautista E<lt>rb11@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
