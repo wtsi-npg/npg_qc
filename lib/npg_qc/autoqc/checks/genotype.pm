@@ -386,7 +386,7 @@ sub _build_chrname_conv_fn {
 	my ($self) = @_;
 	my $genotypes_repository = $self->genotypes_repository;
 
-	my $fn = $genotypes_repository . q[/chrconv_map.json];
+	my $fn = $genotypes_repository . q[/chrconv_map_v2.json];
 
 	return $fn;
 }
