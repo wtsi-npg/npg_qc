@@ -93,8 +93,7 @@ subtest 'Parse metrics' => sub {
         tag_index => 8,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,);
-    my $results = {};
-    throws_ok {$rnaseqc->_parse_rna_seqc_metrics($results)} qr[No such file.*], q[error if metrics file is not found where expected];
+    throws_ok {$rnaseqc->_parse_rna_seqc_metrics()} qr[No such file.*], q[error if metrics file is not found where expected];
 
     $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 18407,
@@ -102,10 +101,9 @@ subtest 'Parse metrics' => sub {
         tag_index => 7,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,);
-    $results = {};
-    lives_ok {$rnaseqc->_parse_rna_seqc_metrics($results)} q[parsing RNA-SeQC metrics.tsv ok];
-    warning_like {$rnaseqc->_save_results($results)} {carped => qr/Value of .* is 'NaN'/}, q[saving results ok - a NaN carp was caught];
-    is ($results->{'3\' Norm'}, undef, q[fields with value NaN are skipped]);
+    lives_ok {$rnaseqc->_parse_rna_seqc_metrics()} q[parsing RNA-SeQC metrics.tsv ok];
+    warning_like {$rnaseqc->_save_results()} {carped => qr/Value of .* is 'NaN'/}, q[saving results ok - a NaN carp was caught];
+    is ($rnaseqc->_get_result('3\' Norm'), undef, q[fields with value NaN are skipped]);
 
     $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 6,
@@ -114,10 +112,9 @@ subtest 'Parse metrics' => sub {
         path => 't/data/autoqc/rna_seqc/data',
         globin_genes_csv => 't/data/autoqc/rna_seqc/data/globin_genes.csv',
         repository => $repos,);
-    $results = {};
-    lives_ok {$rnaseqc->_parse_rna_seqc_metrics($results)} q[parsing RNA-SeQC metrics.tsv ok];
-    lives_ok {$rnaseqc->_parse_quant_file($results)} q[parsing quant.genes.sf ok];
-    cmp_deeply ($results, \%results_hash, q[compare results hash]);
+    lives_ok {$rnaseqc->_parse_rna_seqc_metrics()} q[parsing RNA-SeQC metrics.tsv ok];
+    lives_ok {$rnaseqc->_parse_quant_file()} q[parsing quant.genes.sf ok];
+    cmp_deeply ($rnaseqc->_results, \%results_hash, q[compare results hash]);
 };
 
 subtest 'Argument input files' => sub {

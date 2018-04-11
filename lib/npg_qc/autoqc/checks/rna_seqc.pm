@@ -68,7 +68,6 @@ has '+aligner' => (default => 'fasta',
 
 has 'output_dir' => (is       => 'ro',
                      isa      => 'Str',
-                     required => 0,
                      lazy     => 1,
                      builder  => '_build_output_dir',);
 
@@ -173,7 +172,6 @@ sub _build_input_str {
 
 has 'ref_genome' => (is       => 'ro',
                       isa      => 'Str',
-                      required => 0,
                       lazy     => 1,
                       builder  => '_build_ref_genome',);
 
@@ -195,7 +193,6 @@ sub _build_bam_file {
 
 has 'annotation_gtf' => (is       => 'ro',
                           isa      => 'Str',
-                          required => 0,
                           lazy     => 1,
                           builder  => '_build_annotation_gtf',);
 
@@ -207,7 +204,6 @@ sub _build_annotation_gtf {
 
 has 'ref_rrna' => (is       => 'ro',
                     isa      => 'Str',
-                    required => 0,
                     lazy     => 1,
                     builder  => '_build_ref_rrna',);
 
@@ -223,7 +219,6 @@ sub _build_ref_rrna {
 
 has 'quant_file' => (is       => 'ro',
                      isa      => 'Str',
-                     required => 0,
                      lazy     => 1,
                      builder  => '_build_quant_file',);
 
@@ -236,7 +231,6 @@ sub _build_quant_file {
 
 has 'globin_genes_csv' => (is       => 'ro',
                            isa      => 'Str',
-                           required => 0,
                            lazy     => 1,
                            builder  => '_build_globin_genes_csv',);
 
@@ -245,6 +239,16 @@ sub _build_globin_genes_csv {
     my $globin_file = $self->globin_file // q[];
     return $globin_file;
 }
+
+has '_results' => (traits  => ['Hash'],
+                   isa     => 'HashRef',
+                   is      => 'ro',
+                   default => sub { {} },
+                   handles => {
+                       _set_result    => 'set',
+                       _get_result    => 'get',
+                       _delete_result => 'delete',
+                   },);
 
 sub _command {
     my ($self) = @_;
@@ -278,7 +282,7 @@ override 'can_run' => sub {
 };
 
 override 'execute' => sub {
-    my ($self) = @_;
+    my $self = shift;
     my @comments;
     my $can_execute = 1;
     if (super() == 0) {
@@ -302,10 +306,9 @@ override 'execute' => sub {
         $self->result->add_comment($can_run_message);
         return 1;
     }
-    my $results = {};
     # globin metric:
     if ($self->globin_genes_csv) {
-        $self->_parse_quant_file($results);
+        $self->_parse_quant_file();
     }
     # RNA-SeQC metrics:
     my $command = $self->_command();
@@ -314,15 +317,15 @@ override 'execute' => sub {
         my $error = $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
         croak sprintf "Child %s exited with value %d\n", $command, $error;
     } else {
-        $self->_parse_rna_seqc_metrics($results);
+        $self->_parse_rna_seqc_metrics();
     };
 
-    $self->_save_results($results);
+    $self->_save_results();
     return 1;
 };
 
 sub _parse_rna_seqc_metrics {
-    my ($self, $results) = @_;
+    my $self = shift;
     my $filename = File::Spec->catfile($self->output_dir, $METRICS_FILE_NAME);
     if (! -e $filename) {
         croak qq[No such file $filename: cannot parse RNA-SeQC metrics];
@@ -342,14 +345,14 @@ sub _parse_rna_seqc_metrics {
     foreach my $key (@keys){
         chomp $values[$i];
         chomp $key;
-        $results->{$key} = $values[$i];
+        $self->_set_result($key => $values[$i]);
         $i++;
     }
     return;
 };
 
 sub _parse_quant_file {
-    my ($self, $results) = @_;
+    my $self = shift;
     my $quant_file = $self->quant_file;
     my $globin_file = $self->globin_genes_csv;
     if (! -e $quant_file) {
@@ -370,22 +373,21 @@ sub _parse_quant_file {
         my @quant_record = split /\t/smx, $line;
         if (exists $globin_genes{$quant_record[$COL_QUANT_GENEID]}){
             if (looks_like_number($quant_record[$COL_QUANT_TPM])) {
-                $quant_genes{'count'} += 1;
                 $quant_genes{'sum'} += $quant_record[$COL_QUANT_TPM];
             }
         }
     }
     $fh->close();
-    $results->{$GLOBIN_METRIC_NAME} = sprintf '%.2f', $quant_genes{'sum'} / $TEN_THOUSAND;
+    $self->_set_result($GLOBIN_METRIC_NAME => sprintf '%.2f', $quant_genes{'sum'} / $TEN_THOUSAND);
     return;
 }
 
 
 
 sub _save_results {
-    my ($self, $results) = @_;
+    my $self = shift;
     foreach my $key (keys %RNASEQC_METRICS_FIELDS_MAPPING) {
-        my $value = $results->{$key};
+        my $value = $self->_get_result($key);
         if (defined $value) {
             my $attr_name = $RNASEQC_METRICS_FIELDS_MAPPING{$key};
             if ($value eq q[NaN]) {
@@ -394,9 +396,9 @@ sub _save_results {
                 $self->result->$attr_name($value);
             }
         }
-        delete $results->{$key};
+        $self->_delete_result($key);
     }
-    $self->result->other_metrics($results);
+    $self->result->other_metrics($self->_results);
     $self->result->output_dir($self->output_dir);
     return;
 }
