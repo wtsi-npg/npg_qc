@@ -1,10 +1,17 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-
  - add tag_hops_power column to tag metrics
  - add tag_hops_percent column to tag metrics
+ - remove run_timeline component on the Illumina QC loader
+ - stop generating DBIx class for run_timeline db table
+ - remove unused methods of the run_graph Clearpress model
+ - add new role for rna_seqc to implement ability to extract values from
+   column other_metrics to be stored in ml warehouse database
+
+release 64.5
  - qc outcomes model: code generalisation to simplify addition of
    further qc types
+ - uqc outcomes - saving and updating enabled
  - switch to node 6.12.2 in travis
  - stop generating DBIx classes for unused tables
  - tiny tweaks to rna and verify bam id help links

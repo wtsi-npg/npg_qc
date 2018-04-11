@@ -4,7 +4,8 @@ use Moose;
 use namespace::autoclean;
 use Readonly;
 
-extends 'npg_qc::autoqc::results::result';
+extends qw(npg_qc::autoqc::results::result);
+with qw(npg_qc::autoqc::role::rna_seqc);
 
 our $VERSION = '0';
 
@@ -176,6 +177,8 @@ All remaining RNA-SeQC metrics as a key-values pairs
 
 =item npg_qc::autoqc::results::result
 
+=item Readonly
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -188,7 +191,7 @@ Ruben E Bautista-Garcia<lt>rb11@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Limited
+Copyright (C) 2018 Genome Research Limited
 
 This file is part of NPG.
 
