@@ -1,9 +1,5 @@
-#########
-# Author:        gq1
-# Created:       2008-09-29
-#
-
 package npg_qc::model::run_graph;
+
 use strict;
 use warnings;
 use base qw(npg_qc::model);
@@ -11,15 +7,12 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 use npg_qc::model::cache_query;
-use npg_qc::model::instrument_statistics;
 
 our $VERSION = '0';
-
 
 Readonly our $PERCENTAGE      => 100;
 Readonly our $GIGABASE        => 1_000_000;
 Readonly our @CYCLES_AVG_YIELD_PER_LANES => (37, 54, 76, 108);
-
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 __PACKAGE__->has_all();
@@ -139,11 +132,6 @@ sub get_error_cluster_control_lane{
   };
 
    return;
-}
-#get the actual id_run number based on its end
-sub get_actual_id_run{
-  my ($self, $id_run, $end) = @_;
-  return $id_run;
 }
 
 #get the run list which data already being calculated
@@ -344,9 +332,6 @@ sub calculate_all{
       my $run_graph_model;
       eval{
 	     my $cycle_count= $self->get_cycle_count($run_id, $end);
-
-	     #my $actual_id_run = $self->get_actual_id_run($run_id, $end);
-	     #print "$run_id, $end, $cycle_count\n";
 	     $run_graph_model = npg_qc::model::run_graph->new({
 				                            util => $util,
 				                            id_run => $run_id,
@@ -359,7 +344,6 @@ sub calculate_all{
 
 	     if(defined $run_graph_model->yield_gb()){
             $run_graph_model->save();
-            #carp "run graph data cached for $actual_id_run";
         }else{
             carp "there is no run graph data for caching for run $run_id end $end";
         }
@@ -661,221 +645,6 @@ sub get_cluster_per_tile_control_by_run {
   return $self->{get_cluster_per_tile_control_by_run}->{$num_runs}->{$cycle_length};
 }
 
-sub instrument_statistics {
-  my ($self) = @_;
-  return npg_qc::model::instrument_statistics->new({ util => $self->util() });
-}
-
-sub cycle_value_list{
-  my ($self) = @_;
-  my $query = q{SELECT DISTINCT cycle FROM run_graph ORDER BY cycle;};
-  my $cycle_values = $self->util->dbh->selectall_arrayref($query, {});
-  foreach my $cycle (@{$cycle_values}) {
-    $cycle = $cycle->[0];
-  }
-  return $cycle_values;
-}
-sub get_yield_by_week {
-  my ($self) = @_;
-  if(!$self->{yield_by_week}){
-    my $rows = [];
-
-    eval {
-      my $dbh = $self->util->dbh();
-      my $query = q{SELECT STR_TO_DATE(concat(DATE_FORMAT(rtl.complete_time, '%Y-%U'), ' Sunday'), '%Y-%U %W') AS week, TRUNCATE(SUM(lane_yield)/1000000,2) AS yield
-FROM analysis        a,
-     analysis_lane   al,
-     run_timeline    rtl
-WHERE al.id_analysis = a.id_analysis
-AND   a.iscurrent    = 1
-AND   a.id_run = rtl.id_run
-AND   rtl.complete_time is not null
-GROUP BY week
-                 };
-
-      my $sth = $dbh->prepare($query);
-
-      $sth->execute();
-
-      while (my @row = $sth->fetchrow_array()) {
-        push @{$rows}, \@row;
-      }
-      1;
-    } or do {
-      croak $EVAL_ERROR;
-    };
-    $self->{yield_by_week} = $rows;
-  }
-
-  return $self->{yield_by_week};
-}
-
-sub get_avg_yield_per_read_lane_by_week {
-  my ($self) = @_;
-
-  if(!$self->{avg_yield_per_read_lane_by_week}){
-
-    my $avg_yield_per_read_lane_by_week_hashref = {};
-
-    eval {
-      my $dbh = $self->util->dbh();
-      my $query = q{SELECT STR_TO_DATE(concat(DATE_FORMAT(rtl.complete_time, '%Y-%U'), ' Sunday'), '%Y-%U %W') AS week, TRUNCATE(avg(lane_yield)/1000000,2) AS yield
-FROM analysis        a,
-     analysis_lane   al,
-     run_timeline    rtl
-WHERE al.id_analysis = a.id_analysis
-AND   a.iscurrent    = 1
-AND   a.id_run = rtl.id_run
-AND   rtl.complete_time is not null
-GROUP BY week
-      };
-
-      my $sth = $dbh->prepare($query);
-
-      $sth->execute();
-
-      while (my @row = $sth->fetchrow_array()) {
-
-        $avg_yield_per_read_lane_by_week_hashref->{$row[0]}->{all_cycle} = $row[1];
-      }
-      1;
-    } or do {
-      croak $EVAL_ERROR;
-    };
-
-    eval {
-      my $dbh = $self->util->dbh();
-      my $query = q{SELECT STR_TO_DATE(concat(DATE_FORMAT(rtl.complete_time, '%Y-%U'), ' Sunday'), '%Y-%U %W') AS week, rg.cycle, TRUNCATE(avg(lane_yield)/1000000,2) AS avg_yield
-FROM analysis        a,
-     analysis_lane   al,
-     run_timeline    rtl,
-     run_graph       rg
-WHERE al.id_analysis = a.id_analysis
-AND   a.iscurrent    = 1
-AND   a.id_run = rtl.id_run
-AND   a.id_run = rg.id_run
-AND   rtl.complete_time is not null
-GROUP BY week, rg.cycle
-                   };
-
-      my $sth = $dbh->prepare($query);
-
-      $sth->execute();
-
-      while (my @row = $sth->fetchrow_array()) {
-
-        $avg_yield_per_read_lane_by_week_hashref->{$row[0]}->{$row[1]} = $row[2];
-      }
-      1;
-    } or do {
-      croak $EVAL_ERROR;
-    };
-
-    my @cycles = ('all_cycle', @CYCLES_AVG_YIELD_PER_LANES);
-
-    my @avg_yield_per_read_lane_by_week_array = ();
-    my @sorted_week = sort keys %{$avg_yield_per_read_lane_by_week_hashref};
-    push @avg_yield_per_read_lane_by_week_array, \@sorted_week;
-
-    my $count = 1;
-    foreach my $cycle (@cycles){
-      my $avg_yield_cycle = $avg_yield_per_read_lane_by_week_array[$count];
-      if(!$avg_yield_cycle){
-        $avg_yield_cycle = [];
-      }
-      foreach my $week (@sorted_week){
-        push @{$avg_yield_cycle}, $avg_yield_per_read_lane_by_week_hashref->{$week}->{$cycle};
-      }
-      $avg_yield_per_read_lane_by_week_array[$count] = $avg_yield_cycle;
-      $count++;
-    }
-
-    $self->{avg_yield_per_read_lane_by_week} = \@avg_yield_per_read_lane_by_week_array;
-  }
-
-  return $self->{avg_yield_per_read_lane_by_week};
-}
-
-sub get_cum_yield_by_week {
-  my ($self) = @_;
-  if(!$self->{cum_yield_by_week}){
-    my $rows = [];
-
-    eval {
-      my $dbh = $self->util->dbh();
-      my $query = q{SELECT STR_TO_DATE(concat(weeks.week, ' Sunday'), '%Y-%U %W'), TRUNCATE(sum(yields.yield), 2) AS cum_yield
-FROM
-(SELECT DISTINCT DATE_FORMAT(rtl.complete_time, '%Y-%U') AS week FROM run_timeline rtl) weeks,
-(SELECT DATE_FORMAT(rtl.complete_time, '%Y-%U') AS week, SUM(lane_yield)/1000000 as yield
-FROM analysis        a,
-     analysis_lane   al,
-     run_timeline    rtl
-WHERE al.id_analysis        = a.id_analysis
-AND   a.iscurrent           = 1
-AND   a.id_run = rtl.id_run
-AND   rtl.complete_time is not null
-GROUP BY DATE_FORMAT(rtl.complete_time, '%Y-%U')) yields
-WHERE yields.week <= weeks.week
-GROUP BY weeks.week
-                 };
-
-      my $sth = $dbh->prepare($query);
-
-      $sth->execute();
-
-      while (my @row = $sth->fetchrow_array()) {
-        push @{$rows}, \@row;
-      }
-      1;
-    } or do {
-      croak $EVAL_ERROR;
-    };
-    $self->{cum_yield_by_week} = $rows;
-  }
-
-  return $self->{cum_yield_by_week};
-}
-
-
-
-sub get_error_by_week {
-  my ($self) = @_;
-
-  if(!$self->{error_by_week}){
-    my $rows = [];
-
-    eval {
-      my $dbh = $self->util->dbh();
-      my $query = q{SELECT STR_TO_DATE(concat(DATE_FORMAT(rtl.complete_time, '%Y-%U'), ' Sunday'), '%Y-%U %W') AS week,
-     TRUNCATE(SUM(perc_error_rate_pf)/COUNT(*),2) AS error_rate
-FROM analysis        a,
-     analysis_lane   al,
-     run_timeline rtl
-WHERE al.id_analysis         = a.id_analysis
-AND   a.id_run = rtl.id_run
-AND   a.iscurrent            = 1
-AND   al.perc_error_rate_pf != 0
-AND   rtl.complete_time is not null
-GROUP BY week
-
-                 };
-
-      my $sth = $dbh->prepare($query);
-
-      $sth->execute();
-
-      while (my @row = $sth->fetchrow_array()) {
-        push @{$rows}, \@row;
-      }
-      1;
-    } or do {
-      croak $EVAL_ERROR;
-    };
-    $self->{error_by_week} = $rows;
-  }
-
-  return $self->{error_by_week};
-}
 1;
 __END__
 =head1 NAME
@@ -924,10 +693,6 @@ npg_qc::model::run_graph
 
 =head2  get_cluster_per_tile_control_by_run - given the number for the last runs, get data by run from database
 
-=head2 instrument_statistics - returns an instrument_statistics object
-
-  my $oInstrumentStatistics = $oRunGraph->instrument_statistics();
-
 =head2 get_clusters_per_tile_avg - calculate the average of data
 
 =head2 get_clusters_per_tile_control_avg - calculate the average of data
@@ -935,16 +700,6 @@ npg_qc::model::run_graph
 =head2 get_error_avg - calculate the average of data
 
 =head2 get_yield_avg - calculate the average of data
-
-=head2 get_yield_by_week
-
-=head2 get_cum_yield_by_week
-
-=head2 get_error_by_week
-
-=head2 get_avg_yield_per_read_lane_by_week
-
-=head2 cycle_value_list
 
 =head2 get_cycle_count_from_db
 
