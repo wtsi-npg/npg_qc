@@ -28,13 +28,11 @@ has [ qw/ spiked_control_index
                                         is =>  'rw',
                                        );
 
-has [ qw/ tag_hops_percent /          ] => (isa => 'Maybe[Num]',
+has [ qw/ tag_hops_percent 
+          tag_hops_power /        ] => (isa => 'Maybe[Num]',
                                         is  => 'rw',
                                        );
 
-has [ qw/ tag_hops_power /        ] => (isa => 'Maybe[Num]',
-                                        is  => 'rw',
-                                       );
 has [ qw/ metrics_file
           barcode_tag_name /      ] => (isa => 'Maybe[Str]',
                                         is =>  'rw',
@@ -92,7 +90,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

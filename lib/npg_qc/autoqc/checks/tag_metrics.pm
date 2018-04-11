@@ -5,8 +5,6 @@ use namespace::autoclean;
 use MooseX::ClassAttribute;
 use Carp;
 use Readonly;
-use File::Basename;
-use File::Spec;
 use List::Util qw(min);
 use st::api::lims;
 
@@ -241,6 +239,10 @@ __END__
 
 =item Readonly
 
+=item List::Util
+
+=item st::api::lims
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -253,7 +255,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
