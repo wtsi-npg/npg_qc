@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - add tag_hops_power column to tag metrics
+ - add tag_hops_percent column to tag metrics
  - remove run_timeline component on the Illumina QC loader
  - stop generating DBIx class for run_timeline db table
  - remove unused methods of the run_graph Clearpress model

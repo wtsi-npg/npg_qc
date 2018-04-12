@@ -1,3 +1,11 @@
+
+--
+-- add two columns to tag_metrics table
+--
+
+ALTER TABLE `tag_metrics` ADD COLUMN `tag_hops_percent` FLOAT UNSIGNED DEFAULT NULL;
+ALTER TABLE `tag_metrics` ADD COLUMN `tag_hops_power` FLOAT UNSIGNED DEFAULT NULL;
+
 --
 -- Table structure for table `genotype_call`
 --

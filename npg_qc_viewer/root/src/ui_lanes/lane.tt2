@@ -201,6 +201,9 @@
 -%]
 <a href="[% href %]">[% FILTER format('%2.2f'); 100-result.errors_percent; END %]</a><br />
 <span class="dark_blue"><a href="[% href %]">[% FILTER format('%4.2f'); result.variance_coeff(1); END %]</a></span>
+[%- IF result.tag_hops_percent.defined -%]
+<span class="dark_blue"><a href="[% href %]"> ([% FILTER format('%2.2f'); result.tag_hops_percent; END %])</a></span>
+[%- END -%]
 [%-     END;
       ELSE;
         IF result.matches_pf_percent.exists("$tag_index");
