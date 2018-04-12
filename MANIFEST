@@ -37,6 +37,7 @@ lib/npg_qc/autoqc/checks/check.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
 lib/npg_qc/autoqc/checks/genotype.pm
+lib/npg_qc/autoqc/checks/genotype_call.pm
 lib/npg_qc/autoqc/checks/insert_size.pm
 lib/npg_qc/autoqc/checks/pulldown_metrics.pm
 lib/npg_qc/autoqc/checks/qX_yield.pm
@@ -62,6 +63,7 @@ lib/npg_qc/autoqc/results/contamination.pm
 lib/npg_qc/autoqc/results/gc_bias.pm
 lib/npg_qc/autoqc/results/gc_fraction.pm
 lib/npg_qc/autoqc/results/genotype.pm
+lib/npg_qc/autoqc/results/genotype_call.pm
 lib/npg_qc/autoqc/results/insert_size.pm
 lib/npg_qc/autoqc/results/pulldown_metrics.pm
 lib/npg_qc/autoqc/results/qX_yield.pm
@@ -84,6 +86,7 @@ lib/npg_qc/autoqc/role/bam_flagstats.pm
 lib/npg_qc/autoqc/role/contamination.pm
 lib/npg_qc/autoqc/role/gc_fraction.pm
 lib/npg_qc/autoqc/role/genotype.pm
+lib/npg_qc/autoqc/role/genotype_call.pm
 lib/npg_qc/autoqc/role/insert_size.pm
 lib/npg_qc/autoqc/role/pulldown_metrics.pm
 lib/npg_qc/autoqc/role/qX_yield.pm
@@ -121,6 +124,7 @@ lib/npg_qc/Schema/Result/FrequencyResponseMatrix.pm
 lib/npg_qc/Schema/Result/GcBias.pm
 lib/npg_qc/Schema/Result/GcFraction.pm
 lib/npg_qc/Schema/Result/Genotype.pm
+lib/npg_qc/Schema/Result/GenotypeCall.pm
 lib/npg_qc/Schema/Result/InsertSize.pm
 lib/npg_qc/Schema/Result/InstrumentStatistic.pm
 lib/npg_qc/Schema/Result/LaneQc.pm
@@ -204,6 +208,7 @@ t/50-schema-result-Fastqcheck.t
 t/50-schema-result-InsertSize.t
 t/50-schema-result-Adapter.t
 t/50-schema-result-Genotype.t
+t/50-schema-result-GenotypeCall.t
 t/50-schema-result-BamFlagstats.t
 t/50-schema-result-SequenceError.t
 t/50-schema-result-RefMatch.t
@@ -241,6 +246,7 @@ t/60-autoqc-checks-check.t
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-genotype.t
+t/60-autoqc-checks-genotype_call.t
 t/60-autoqc-checks-insert_size.t
 t/60-autoqc-checks-pulldown_metrics.t
 t/60-autoqc-checks-qX_yield.t
@@ -266,6 +272,7 @@ t/60-autoqc-results-contamination.t
 t/60-autoqc-results-gc_bias.t
 t/60-autoqc-results-gc_fraction.t
 t/60-autoqc-results-genotype.t
+t/60-autoqc-results-genotype_call.t
 t/60-autoqc-results-insert_size.t
 t/60-autoqc-results-pulldown_metrics.t
 t/60-autoqc-results-qX_yield.t
@@ -417,6 +424,10 @@ t/data/autoqc/alignment.bam
 t/data/autoqc/alignment.sam
 t/data/autoqc/alignment_small.sam
 t/data/autoqc/fixtures/Adapter.yml
+t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/bcftools/Hs_MajorQC.annotation.vcf 
+t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/bcftools/Hs_MajorQC.info.json
+t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/bcftools/Hs_MajorQC.ploidy
+t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/fasta/Hs_MajorQC.fa
 t/data/autoqc/gc_bias/sam-3lines
 t/data/autoqc/gc_bias/sam_aligned_header
 t/data/autoqc/gc_bias/sam_unaligned_header
@@ -428,6 +439,9 @@ t/data/autoqc/genotype/6812_5.genotype.json
 t/data/autoqc/genotype/6812_6.genotype.json
 t/data/autoqc/genotype/6812_7.genotype.json
 t/data/autoqc/genotype/6812_8.genotype.json
+t/data/autoqc/genotype_call/samplesheet_24135.csv
+t/data/autoqc/genotype_call/samplesheet_24135_test.csv
+t/data/autoqc/genotype_call/data/24135_1#1.genotype_call.json
 t/data/autoqc/Homo_sapiens.NCBI36.48.dna.all.fa.json
 t/data/autoqc/insert_size/6062_8#1.insert_size.json
 t/data/autoqc/insert_size/6062_8#2.insert_size.json
@@ -436,6 +450,7 @@ t/data/autoqc/insert_size_expected_size.json
 t/data/autoqc/insert_size/15155_8.insert_size.json
 t/data/autoqc/insert_size/alignment_isize_normfit.sam
 t/data/autoqc/insert_size/npg/run/1937.xml
+t/data/autoqc/insert_size/npg/run/1938.xml
 t/data/autoqc/insert_size/npg/run/2549.xml
 t/data/autoqc/insert_size/npg/run/3871.xml
 t/data/autoqc/insert_size/npg/run/3938.xml
@@ -449,6 +464,8 @@ t/data/autoqc/insert_size/st/batches/4837.xml
 t/data/autoqc/insert_size/st/batches/5230.xml
 t/data/autoqc/insert_size/st/batches/5364.xml
 t/data/requests/cgi-bin/prodsoft/npg/st/batches/5428.xml
+t/data/autoqc/insert_size/st/batches/2809.xml
+t/data/autoqc/insert_size/st/batches/4793.xml
 t/data/autoqc/insert_size/st/batches/6637.xml
 t/data/autoqc/insert_size/st/batches/6669.xml
 t/data/autoqc/insert_size/st/samples/1898.xml
@@ -526,7 +543,10 @@ t/data/autoqc/dbix_loader/is/12187_2.insert_size.json
 t/data/autoqc/population_snv_with_vcf/Anopheles_gambiae/default/Standard/PEST/test.vcf.gz
 t/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5/test.vcf.gz
 t/data/autoqc/st/samples/1898.xml
+t/data/autoqc/st/batches/2797.xml
 t/data/autoqc/st/batches/3432.xml
+t/data/autoqc/st/batches/30621.xml
+t/data/autoqc/st/batches/30804.xml
 t/data/autoqc/st/samples/3057.xml
 t/data/autoqc/st/samples/3056.xml
 t/data/autoqc/st/samples/9832.xml
