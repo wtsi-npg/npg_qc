@@ -15,23 +15,8 @@ use Carp;
 use Getopt::Long;
 use Term::ANSIColor qw(:constants);
 
+##no critic
 our $VERSION = '0';
-
-## no critic (NamingConventions::Capitalization)
-
-### revisit these no critics later (kl2 8/11/16)
-
-## no critic (Subroutines::ProhibitExcessComplexity)
-## no critic (CodeLayout::ProhibitParensWithBuiltins)
-#######
-
-## no critic (RegularExpressions::ProhibitUnusedCapture RegularExpressions::RequireLineBoundaryMatching RegularExpressions::ProhibitEnumeratedClasses RegularExpressions::RequireDotMatchAnything RegularExpressions::RequireExtendedFormatting)
-
-## no critic (InputOutput::RequireBracedFileHandleWithPrint InputOutput::RequireCheckedSyscalls)
-
-## no critic (BuiltinFunctions::ProhibitReverseSortBlock)
-
-## no critic (Subroutines::RequireArgUnpacking)
 
 sub usage {
 
@@ -120,30 +105,81 @@ sub showTags{
       croak q[Can't load module npg_warehouse::Schema];
     }
 
-    my $tag_group_internal_id = ($groups ? [split(/[,]/, $groups)] : undef);
-
-    # read the tag table
     my %db_tags = ();
-    my $s = npg_warehouse::Schema->connect();
-    my $rs;
-    if (defined($tag_group_internal_id)) {
-        $rs = $s->resultset('Tag')->search({is_current=>1, tag_group_internal_id=>$tag_group_internal_id});
-    } else {
-        $rs = $s->resultset('Tag')->search({is_current=>1});
-    }
-    while(my $row = $rs->next) {
-      my $name = $row->tag_group_name;
-      my $id = $row->tag_group_internal_id;
-      my $map_id = $row->map_id;
-      my $sequence = $row->expected_sequence;
-      if (!defined $name || !defined $id || !defined $map_id || !defined $sequence) {
-        next;
+
+    if ($groups =~ /\.taglist/) {
+      # read the taglist files
+      my $id = 0;
+      my @files = split(/[,]/, $groups);
+      for my $file (@files) {
+        $id++;
+        croak "Invalid taglist file $file" unless $file =~ m/\/metadata_cache_(\d+)\/lane_(\d)\.taglist$/;
+        my ($id_run,$lane) = ($1,$2);
+        my $name = "${id_run}_${lane}";
+        open FILE,"<$file" or croak "Can't open taglist file $file : $!\n";
+        foreach (<FILE>) {
+          next if m/^barcode/;
+          croak "Invalid tag $_" unless m/^([ACGT]+)\t(\d+)\t/;
+          my ($sequence,$tag_index) = ($1,$2);
+          push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0]);
+          if (@{$revcomps}) {
+            $sequence =~ tr/ACGTN/TGCAN/;
+            $sequence = reverse($sequence);
+            push(@{$db_tags{$sequence}},[$name,$id,$tag_index,1]);
+          }
+        }
+        close(FILE);
       }
-      push(@{$db_tags{$sequence}},[$name,$id,$map_id,0]);
-      if (@{$revcomps}) {
-        $sequence =~ tr/ACGTN/TGCAN/;
-        $sequence = reverse($sequence);
-        push(@{$db_tags{$sequence}},[$name,$id,$map_id,1]);
+    } elsif ($groups =~ /\d+_\d/) {
+      # read the npg_plex_infomation table
+      my $s = npg_warehouse::Schema->connect();
+      my $rs;
+      my @rls = split(/[,]/, $groups);
+      my $id = 0;
+      for my $rl (@rls) {
+        $id++;
+        croak "Invalid run_lane $rl" unless $rl =~ m/^(\d+)_(\d)$/;
+        my ($id_run,$lane) = ($1,$2);
+        my $name = "run ${id_run} lane ${lane}";
+        $rs = $s->resultset('NpgPlexInformation')->search({id_run=>$id_run, position=>$lane});
+        while(my $row = $rs->next) {
+          my $tag_index = $row->tag_index;
+          my $sequence = $row->tag_sequence;
+          if (!defined $tag_index || !defined $sequence) {
+            next;
+          }
+          push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0]);
+          if (@{$revcomps}) {
+            $sequence =~ tr/ACGTN/TGCAN/;
+            $sequence = reverse($sequence);
+            push(@{$db_tags{$sequence}},[$name,$id,$tag_index,1]);
+          }
+        }
+      }
+    } else {
+      # read the tag table
+      my $s = npg_warehouse::Schema->connect();
+      my $rs;
+      my $tag_group_internal_id = ($groups ? [split(/[,]/, $groups)] : undef);
+      if (defined($tag_group_internal_id)) {
+          $rs = $s->resultset('Tag')->search({is_current=>1, tag_group_internal_id=>$tag_group_internal_id});
+      } else {
+          $rs = $s->resultset('Tag')->search({is_current=>1});
+      }
+      while(my $row = $rs->next) {
+        my $name = $row->tag_group_name;
+        my $id = $row->tag_group_internal_id;
+        my $map_id = $row->map_id;
+        my $sequence = $row->expected_sequence;
+        if (!defined $name || !defined $id || !defined $map_id || !defined $sequence) {
+          next;
+        }
+        push(@{$db_tags{$sequence}},[$name,$id,$map_id,0]);
+        if (@{$revcomps}) {
+          $sequence =~ tr/ACGTN/TGCAN/;
+          $sequence = reverse($sequence);
+          push(@{$db_tags{$sequence}},[$name,$id,$map_id,1]);
+        }
       }
     }
 
@@ -169,15 +205,15 @@ sub showTags{
             foreach my $sequence (@matches) {
                 foreach my $match (@{$db_tags{$sequence}}) {
                     my ($name,$id,$map_id,$revcomp) = @{$match};
-                    $groups[$i]->{$id}++;
-                    $names{$id} = $name;
-                    if ($revcomps->[$i] && $revcomp) {
+                    if ($revcomp && $revcomps->[$i]) {
                         $matches{$subtag}->{$id} = [$map_id,1];
                     } elsif ($revcomp) {
-                        continue;
+                        # not looking for revcomp matches on this subtag
                     } else {
                         $matches{$subtag}->{$id} = [$map_id,0];
                     }
+                    $groups[$i]->{$id}++;
+                    $names{$id} = $name;
                 }
             }
         }
@@ -231,19 +267,21 @@ sub main{
     my $revcomp = $opts->{revcomp};
     my $clip = $opts->{clip};
     my $groups = $opts->{groups};
+    my $rl = $opts->{rl};
 
     my @tagLengths = $tagLength ? split(/[,]/,$tagLength) : ();
-
     my @revcomps = $revcomp ? split(/[,]/,$revcomp) : ();
-    if  (@tagLengths && @revcomps && ($#tagLengths != $#revcomps)) {
-        print {*STDERR} "\nif you specify a list for both tag_length and revcomp they must be the same length\n" or croak 'print failed';
+    my @clips = $clip ? split(/[,]/,$clip) : ();
+
+    my $nonZeroSubTags = 0;
+    map {$nonZeroSubTags++ if $_} @tagLengths;
+    if  ($nonZeroSubTags && @revcomps && ($nonZeroSubTags != ($#revcomps+1))) {
+        print {*STDERR} "\nif you specify a list for both tag_length and revcomp the number of non-zero tag_lengths and revcomps should be equal\n" or croak 'print failed';
         usage;
         exit 1;
     }
-
-    my @clips = $clip ? split(/[,]/,$clip) : ();
-    if  (@tagLengths && @clips && ($#tagLengths != $#clips)) {
-        print {*STDERR} "\nif you specify a list for both tag_length and clip they must be the same length\n" or croak 'print failed';
+    if  ($nonZeroSubTags && @clips && ($nonZeroSubTags != ($#clips+1))) {
+        print {*STDERR} "\nif you specify a list for both tag_length and clip the number of non-zero tag_lengths and clips should be equal\n" or croak 'print failed';
         usage;
         exit 1;
     }
@@ -252,22 +290,35 @@ sub main{
     my %tagsFound;
 
     while (<>) {
-        if (/((BC:)|(RT:))Z:([A-Z]*)/) {
+        if (/((BC:)|(RT:))Z:([A-Z\-]*)/) {
             my $tag = $4;
-            if (@tagLengths) {
-                my @subtags = ();
+            if ($tag =~ m/\-/) {
+                my @subtags = split(/\-/, $tag);
                 foreach my $i (0..$#tagLengths) {
                     my $subtag;
+                    if ($tagLengths[$i] == 0) {
+                        $subtags[$i] = "";
+                    } elsif ($tagLengths[$i] < 0) {
+                        $subtags[$i] = substr $subtags[$i], $tagLengths[$i];
+                    } elsif ($tagLengths[$i]) {
+                        $subtags[$i] = substr $subtags[$i], 0, $tagLengths[$i];
+                    }
+                }
+                # exclude empty subtags
+                $tag = join(q{:},grep {$_ ne ""} @subtags);
+            } elsif (@tagLengths) {
+                my @subtags = ();
+                foreach my $i (0..$#tagLengths) {
                     if ($tagLengths[$i] < 0) {
-                        $subtag = substr $tag, $tagLengths[$i];
+                        $subtags[$i] = substr $tag, $tagLengths[$i];
                         $tag = substr $tag, 0, $tagLengths[$i];
                     } elsif ($tagLengths[$i]) {
-                        $subtag = substr $tag, 0, $tagLengths[$i];
+                        $subtags[$i] = substr $tag, 0, $tagLengths[$i];
                         $tag = substr $tag, $tagLengths[$i];
                     }
-                    push(@subtags, $subtag);
                 }
-                $tag = join(q{:},@subtags);
+                # exclude empty subtags
+                $tag = join(q{:},grep {$_ ne ""} @subtags);
             }
             $tagsFound++;
             $tagsFound{$tag}++;
