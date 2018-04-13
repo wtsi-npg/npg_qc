@@ -4,6 +4,7 @@ use Cwd qw/getcwd abs_path/;
 use Test::More tests => 6;
 use Test::Exception;
 use Test::Warn;
+use Test::Deep;
 use File::Temp qw/ tempdir /;
 
 use_ok ('npg_qc::autoqc::checks::rna_seqc');
@@ -23,6 +24,24 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
 my $si = join q[/], $dir, q[samtools];
 `touch $si`;
 `chmod +x $si`;
+
+my %results_hash = ('3\' Norm' => '0.71482545','5\' Norm' => '0.33503783','Alternative Aligments' => '586116',
+'Base Mismatch Rate' => '0.0025221831','Chimeric Pairs' => '52379','Cumul. Gap Length' => '429908',
+'Duplication Rate of Mapped' => '0.06441298','End 1 % Sense' => '2.5279112','End 1 Antisense' => '912869',
+'End 1 Mapping Rate' => '0.9488925','End 1 Mismatch Rate' => '0.0029979434','End 1 Sense' => '23675',
+'End 2 % Sense' => '97.53547','End 2 Antisense' => '22910','End 2 Mapping Rate' => '0.93876535',
+'End 2 Mismatch Rate' => '0.0020412907','End 2 Sense' => '906678','Estimated Library Size' => '9104256',
+'Exonic Rate' => '0.8224496','Expression Profiling Efficiency' => '0.77625173','Failed Vendor QC Check' => '0',
+'Fragment Length Mean' => '136','Fragment Length StdDev' => '195','Gap %' => '0.2832022',
+'Genes Detected' => '13330','Globin % TPM' => '2.71','Intergenic Rate' => '0.034667507',
+'Intragenic Rate' => '0.96514183','Intronic Rate' => '0.14269224','Mapped Pairs' => '1077116',
+'Mapped Unique Rate of Total' => '0.8830341','Mapped Unique' => '2065996','Mapped' => '2208235',
+'Mapping Rate' => '0.94382894','Mean CV' => '0.92831475','Mean Per Base Cov.' => '1.9502662',
+'No. Covered 5\'' => '439','Note' => '3521885','Num. Gaps' => '5079',
+'Read Length' => '75','rRNA rate' => '0.042643875','rRNA' => '99772',
+'Sample' => '20970008','Split Reads' => '445235','Total Purity Filtered Reads Sequenced' => '2339656',
+'Transcripts Detected' => '75803','Unique Rate of Mapped' => '0.935587','Unpaired Reads' => '0',);
+
 
 subtest 'Find CLASSPATH' => sub {
     plan tests => 3;
@@ -67,26 +86,35 @@ subtest 'Input and output paths' => sub {
 };
 
 subtest 'Parse metrics' => sub {
-    plan tests => 4;
+    plan tests => 7;
     my $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 17550,
         position => 3,
         tag_index => 8,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,);
-    my $metrics_hash;
-    my $results_hash;
-    throws_ok {$rnaseqc->_parse_metrics()} qr/No\ such\ file\ t\/data\/autoqc\/rna_seqc\/data\/17550\_3\#8\_rna\_seqc\/metrics\.tsv\:\ cannot\ parse\ RNA-SeQC\ metrics/,
-      'error if metrics file is not found where expected';
+    throws_ok {$rnaseqc->_parse_rna_seqc_metrics()} qr[No such file.*], q[error if metrics file is not found where expected];
+
     $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 18407,
         position => 1,
         tag_index => 7,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,);
-    lives_ok {$metrics_hash = $rnaseqc->_parse_metrics()} q[parsing RNA-SeQC metrics.tsv ok];
-    warning_like {$results_hash = $rnaseqc->_save_results($metrics_hash)} {carped => qr/Value of .* is 'NaN'/}, q[saving results ok - a NaN carp was caught];
-    is ($results_hash->{'end_3_norm'}, undef, q[fields with value NaN are skipped]);
+    lives_ok {$rnaseqc->_parse_rna_seqc_metrics()} q[parsing RNA-SeQC metrics.tsv ok];
+    warning_like {$rnaseqc->_save_results()} {carped => qr/Value of .* is 'NaN'/}, q[saving results ok - a NaN carp was caught];
+    is ($rnaseqc->_get_result('3\' Norm'), undef, q[fields with value NaN are skipped]);
+
+    $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 6,
+        position => 6,
+        tag_index => 6,
+        path => 't/data/autoqc/rna_seqc/data',
+        globin_genes_csv => 't/data/autoqc/rna_seqc/data/globin_genes.csv',
+        repository => $repos,);
+    lives_ok {$rnaseqc->_parse_rna_seqc_metrics()} q[parsing RNA-SeQC metrics.tsv ok];
+    lives_ok {$rnaseqc->_parse_quant_file()} q[parsing quant.genes.sf ok];
+    cmp_deeply ($rnaseqc->_results, \%results_hash, q[compare results hash]);
 };
 
 subtest 'Argument input files' => sub {
@@ -125,7 +153,7 @@ subtest 'Argument input files' => sub {
         tag_index => 8,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,
-        _ref_genome => q[],
+        ref_genome => q[],
         transcriptome_repository => $trans_repos_dir,);
     lives_ok { $check->execute } 'execution ok for no reference genome file';
     like ($check->result->comments, qr/No reference genome available/, 'comment when reference genome file is not available');
@@ -136,7 +164,7 @@ subtest 'Argument input files' => sub {
         tag_index => 8,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,
-        _annotation_gtf => q[],
+        annotation_gtf => q[],
         ref_repository => $ref_repos_dir,);
     lives_ok { $check->execute } 'execution ok for no annotation file';
     like ($check->result->comments, qr/No GTF annotation available/, 'comment when annotation file is not available');
