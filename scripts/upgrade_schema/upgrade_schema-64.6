@@ -1,4 +1,3 @@
-
 --
 -- add two columns to tag_metrics table
 --
@@ -31,7 +30,18 @@ CREATE TABLE `genotype_call` (
   UNIQUE KEY `genotype_call_id_compos_uniq` (`id_seq_composition`),
   CONSTRAINT `genotype_call_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 --
 --
 --
+
 GRANT SELECT ON `genotype_call` TO nqcro;
+
+--
+-- Add new column to RNA-SeQC check table
+--
+
+ALTER TABLE `rna_seqc` 
+ADD COLUMN `globin_pct_tpm` FLOAT UNSIGNED DEFAULT NULL
+AFTER `other_metrics`;
+
