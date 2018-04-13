@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - upstream_tags qc check - replaced bamindexdecoder with bambi decode
  - dropped ability for qc checks to sub-sample input fastq
    instead run the checks directly off the cached fastq files
  - added fastqcheck code and replaced fastq_summ in Build.PL with fastqcheck
