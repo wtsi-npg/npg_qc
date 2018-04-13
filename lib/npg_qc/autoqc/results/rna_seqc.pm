@@ -24,6 +24,7 @@ Readonly::Array my @ATTRIBUTES => qw/ rrna
                                       mean_cv
                                       end_5_norm
                                       end_3_norm
+                                      globin_pct_tpm
                                     /;
 
 has [ @ATTRIBUTES ] => (
