@@ -11,9 +11,6 @@ mysql -e "CREATE DATABASE npgqct;" -uroot
 rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (pushd ~/.nvm && git checkout v0.31.0 && popd) && source ~/.nvm/nvm.sh && nvm install "${TRAVIS_NODE_VERSION}"
 
 npm install -g "npm@${TRAVIS_NPM_VERSION}"
-npm install -g bower@1.8.2
-npm install -g node-qunit-phantomjs
-npm install -g "yarn@${TRAVIS_YARN_VERSION}"
 
 # Dummy executable files generated for tests use #!/usr/local/bin/bash
 sudo mkdir -p /usr/local/bin

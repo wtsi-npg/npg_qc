@@ -1,10 +1,22 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - tag_sniff handle separators in BC tags for dual-index runs
- - tag_sniff allow dual-index runs to be revcomped independantly
+release 64.6
+ - add new metric glogin_pct_tpm to RNA-SeQC check
+ - DBIx schema loader script: alter table to add new globin metric column
+ - add functionality to pass some of the files necessary to run RNA-SeQC
+   as CLI options for program qc for more flexibility for stand alone run
+ - add new role for rna_seqc to implement ability to extract values from
+   column other_metrics to be stored in ml warehouse database.
+ - add tag_hops_power column to tag metrics
+ - add tag_hops_percent column to tag metrics
  - remove run_timeline component on the Illumina QC loader
  - stop generating DBIx class for run_timeline db table
  - remove unused methods of the run_graph Clearpress model
+ - add new role for rna_seqc to implement ability to extract values from
+   column other_metrics to be stored in ml warehouse database
+ - changes for GbS genotype calling check 
+ - tag_sniff handle separators in BC tags for dual-index runs
+ - tag_sniff allow dual-index runs to be revcomped independantly
 
 release 64.5
  - qc outcomes model: code generalisation to simplify addition of

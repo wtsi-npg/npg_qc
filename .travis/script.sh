@@ -23,5 +23,5 @@ popd
 ./Build test --verbose
 pushd npg_qc_viewer
 ./Build test --verbose
-grunt -v
+$(npm bin)/grunt -v
 popd

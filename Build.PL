@@ -19,11 +19,12 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
     'gt_utils' => {
       'copy'     => [qw/find_gt_match gt_pack/],
                   },
-    'fastq_summ' => {
-      'copy'     => [qw/fastq_summ/],
-      'samtools' => 1,
-                  },
   };
+
+  if (which('lsb_release') and `lsb_release -a` =~ /precise/ismx) {
+    $c_tools->{'fastq_summ'} = {'copy'     => [qw/fastq_summ/],
+                                'samtools' => 1};
+  }
 
   sub _c_build_dir {
     return join(q[/], $C_SOURCE_DIR, shift, 'build');
@@ -93,7 +94,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
       make_path $bdir;
       my $silent = $self->verbose ? q[] : '--silent';
       my $extra_info = q[];
-
+ 
       if ($c_tools->{$tool}->{'samtools'}) {
         my @pkgs = @{$self->_samtools_option()};
         if (!@pkgs) {
@@ -209,6 +210,7 @@ my $requires = {
                 'Try::Tiny'                       => 0,
                 'warnings'                        => 0,
                 'URI::Escape'                     => 0,
+                'Vcf'                             => 0,
                 'XML::LibXML'                     => 0,
 
                 'npg_common::Alignment'                    => 0,
