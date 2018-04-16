@@ -72,6 +72,7 @@ make_schema_at(
                          ref_snp_info          |
                          run_and_pair          |
                          run_config            |
+                         run_timeline          |
                          tile_score
                      /xms,
 

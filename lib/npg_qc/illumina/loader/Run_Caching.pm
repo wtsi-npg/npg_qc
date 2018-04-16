@@ -7,6 +7,7 @@ use English qw{-no_match_vars};
 use npg::util;
 use npg_qc::model::run_graph;
 use npg_qc::model::cache_query;
+use npg_qc::model::instrument_statistics;
 
 extends 'npg_qc::illumina::loader::base';
 

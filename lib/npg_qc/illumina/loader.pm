@@ -37,7 +37,6 @@ Readonly::Array  my @LOADER_MODULES => qw/
                                         /;
 
 Readonly::Array  my @PRELOADER_MODULES => qw/
-                                  Run_Timeline
                                   Run_Caching
                                   Recipe
                                   Runinfo
@@ -101,10 +100,8 @@ sub run_all {
              'schema_npg_tracking' => $self->schema_npg_tracking,};
   foreach my $mod (@PRELOADER_MODULES) {
     my $m = join q[::], __PACKAGE__ , $mod;
-    my $obj = $m->new($ref);
-    my $method = $mod eq 'Run_Timeline' ? 'save_dates' : 'run_all';
     $self->mlog(qq{***** Calling $m *****});
-    $m->new($ref)->$method();
+    $m->new($ref)->run_all();
   }
   return;
 }
@@ -175,7 +172,7 @@ Andy Brown
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2009 GRL
+Copyright (C) 2018 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

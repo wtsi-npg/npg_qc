@@ -51,6 +51,11 @@ override 'can_run' => sub {
     return 0;
   }
 
+  if($self->lims->gbs_plex_name){
+    $self->result->add_comment('VerifyBamID skipped for gbs plex libraries.');
+    return 0;
+  }
+
   # make sure that the bam file is aligned
   if(!$self->alignments_in_bam) {
     $self->result->add_comment('alignments_in_bam is false');

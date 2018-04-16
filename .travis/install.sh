@@ -23,6 +23,8 @@ cpanm --notest --reinstall App::cpanminus
 cpanm --quiet --notest --reinstall ExtUtils::ParseXS
 cpanm --quiet --notest --reinstall MooseX::Role::Parameterized
 cpanm --quiet --notest Alien::Tidyp
+cpanm --quiet --notest LWP::Protocol::https
+cpanm --quiet --notest https://github.com/chapmanb/vcftools-cpan/archive/v0.953.tar.gz
 
 # iRODS
 wget -q https://github.com/wtsi-npg/disposable-irods/releases/download/${DISPOSABLE_IRODS_VERSION}/disposable-irods-${DISPOSABLE_IRODS_VERSION}.tar.gz -O /tmp/disposable-irods-${DISPOSABLE_IRODS_VERSION}.tar.gz
