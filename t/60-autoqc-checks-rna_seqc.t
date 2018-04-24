@@ -24,6 +24,13 @@ my $repos = getcwd . '/t/data/autoqc/rna_seqc';
 my $si = join q[/], $dir, q[samtools];
 `touch $si`;
 `chmod +x $si`;
+open my $fh,  q[>], $si;
+print $fh q{#!/bin/bash}.qq{\n};
+print $fh q{rpt_regex='([[:digit:]]+)_([[:digit:]]+)(_([[:alpha:]]+))?(#([[:digit:]]+))?(_([[:alpha:]]+))?'}.qq{\n};
+print $fh q{while (( "$#" )); do if [[ "$1" =~ $rpt_regex ]]; then bam=$1; break; fi; shift; done}.qq{\n};
+print $fh q{if [ -e $bam ]; then cat $bam; else exit 1; fi;}.qq{\n};
+print $fh q{exit 0};
+close $fh;
 
 my %results_hash = ('3\' Norm' => '0.71482545','5\' Norm' => '0.33503783','Alternative Aligments' => '586116',
 'Base Mismatch Rate' => '0.0025221831','Chimeric Pairs' => '52379','Cumul. Gap Length' => '429908',
@@ -118,11 +125,14 @@ subtest 'Parse metrics' => sub {
 };
 
 subtest 'Argument input files' => sub {
-    plan tests => 14;
+    plan tests => 16;
     my $ref_repos_dir = join q[/],$dir,'references';
     my $ref_dir = join q[/], $ref_repos_dir,'Mus_musculus','GRCm38','all';
     `mkdir -p $ref_dir/fasta`;
     `touch $ref_dir/fasta/Mus_musculus.GRCm38.68.dna.toplevel.fa`;
+    my $rrna_dir = join q[/], $ref_repos_dir,'Mus_musculus','default_rRNA','all';
+    `mkdir -p $rrna_dir/bwa`;
+    `touch $rrna_dir/bwa/GRCm38.rRNA.fa`;
     my $trans_repos_dir = join q[/],$dir,'transcriptomes';
     my $trans_dir = join q[/], $trans_repos_dir,'Mus_musculus','ensembl_75_transcriptome','GRCm38';
     `mkdir -p $trans_dir/gtf`;
@@ -130,20 +140,15 @@ subtest 'Argument input files' => sub {
     `mkdir -p $trans_dir/RNA-SeQC`;
     `touch $trans_dir/RNA-SeQC/ensembl_75_transcriptome-GRCm38.gtf`;
 
-    open my $fh,  q[>], $si;
-    print $fh qq[cat $repos/data/17550_3#8.bam\n];
-    close $fh;
-
     my $check = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 17550,
         position => 3,
-        tag_index => 8,
+        tag_index => 1,
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,
         ref_repository => $ref_repos_dir,
-        transcriptome_repository => $trans_repos_dir,
-        _alignments_in_bam => 0);
-    is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_3#8.bam', 'bam file path for id run 17550 lane 3 tag 8');
+        transcriptome_repository => $trans_repos_dir,);
+    is($check->_bam_file, 't/data/autoqc/rna_seqc/data/17550_3#1.bam', 'bam file path for id run 17550 lane 3 tag 1');
     lives_ok { $check->execute } 'execution ok for no alignments in BAM';
     like ($check->result->comments, qr/BAM file is not aligned/, 'comment when bam file is not aligned');
 
@@ -168,10 +173,6 @@ subtest 'Argument input files' => sub {
         ref_repository => $ref_repos_dir,);
     lives_ok { $check->execute } 'execution ok for no annotation file';
     like ($check->result->comments, qr/No GTF annotation available/, 'comment when annotation file is not available');
-
-    open $fh,  q[>], $si;
-    print $fh qq[cat $repos/data/17550_1#1.bam\n];
-    close $fh;
 
     $check = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 17550,
@@ -201,10 +202,6 @@ subtest 'Argument input files' => sub {
     lives_ok { $check->execute } 'execution ok for no RNA alignment';
     like ($check->result->comments, qr/BAM file is not RNA alignment/, 'comment when bam file is not RNA alignment');
 
-    open $fh,  q[>], $si;
-    print $fh qq[cat $repos/data/17550_3#8.bam\n];
-    close $fh;
-
     $check = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 17550,
         position => 3,
@@ -212,10 +209,6 @@ subtest 'Argument input files' => sub {
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,);
     is($check->_is_rna_alignment, 1, 'bam for id run 17550 lane 3 tag 8 from TopHat aligner is RNA alignment');
-
-    open $fh,  q[>], $si;
-    print $fh qq[cat $repos/data/6_6#6.bam\n];
-    close $fh;
 
     $check = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 6,
@@ -225,6 +218,14 @@ subtest 'Argument input files' => sub {
         repository => $repos,);
     is($check->_is_rna_alignment, 1, 'bam for id run 6 lane 6 tag 6 from STAR aligner is RNA alignment');
 
+    $check = npg_qc::autoqc::checks::rna_seqc->new(
+        id_run => 17550,
+        position => 3,
+        tag_index => 2,
+        path => 't/data/autoqc/rna_seqc/data',
+        repository => $repos,);
+    lives_ok { $check->execute } 'execution ok for bam file with no reads';
+    like ($check->result->comments, qr/BAM file has no reads/, 'comment when BAM file has no reads');
 };
 
 subtest 'Role methods' => sub {
