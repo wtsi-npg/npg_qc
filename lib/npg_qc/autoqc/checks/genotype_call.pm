@@ -218,7 +218,7 @@ override 'can_run' => sub {
     return 0;
   }
 
-  if ($self->lims->library_type && $self->lims->library_type !~ /^GbS/sxm) {
+  if ($self->lims->library_type && $self->lims->library_type !~ /^GbS/isxm) {
     $self->result->add_comment('Unexpected library_type : ' . $self->lims->library_type);
     return 0;
   }

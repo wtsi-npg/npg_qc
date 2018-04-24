@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tweak to GbS library type check in genotype call as arrived as GBS.
+
 release 64.6
  - add new metric glogin_pct_tpm to RNA-SeQC check
  - DBIx schema loader script: alter table to add new globin metric column

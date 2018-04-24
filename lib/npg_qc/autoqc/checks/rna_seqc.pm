@@ -26,6 +26,7 @@ Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $RNASEQC_JAR_NAME  => q[RNA-SeQC.jar];
 Readonly::Scalar my $CHILD_ERROR_SHIFT => 8;
 Readonly::Scalar my $MAX_READS         => 100;
+Readonly::Scalar my $MIN_READS         => 50;
 Readonly::Scalar my $PAIRED_FLAG       => 0x1;
 Readonly::Scalar my $RRNA_ALIGNER      => q[bwa];
 Readonly::Scalar my $RRNA_STRAIN       => q[default_rRNA];
@@ -105,6 +106,24 @@ sub _build_alignments_in_bam {
     }
     $ph->close();
     return $aligned;
+}
+
+has '_reads_in_bam' => (is      => 'ro',
+                        isa     => 'Bool',
+                        lazy    => 1,
+                        builder => '_build_reads_in_bam',);
+
+sub _build_reads_in_bam {
+    my ($self) = @_;
+    my $read_lines = 0;
+    my $view_command = $self->samtools_cmd. q[ view ]. $self->_bam_file. q[ 2>/dev/null | ]; #TODO: run samtools view only once for all the methods that depend on it
+    my $ph = IO::File->new($view_command) or croak "Error viewing bam: $OS_ERROR\n";
+    while (my $line = $ph->getline){
+       $read_lines++;
+       last if $read_lines > $MIN_READS;
+    }
+    $ph->close();
+    return $read_lines > $MIN_READS ? 1 : 0;
 }
 
 has '_is_paired_end' => (is      => 'ro',
@@ -289,18 +308,24 @@ override 'execute' => sub {
     	return 1;
     }
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
-    if (! $self->ref_genome) {
-        push @comments, q[No reference genome available];
+    if($self->_reads_in_bam) {
+        if (! $self->ref_genome) {
+            push @comments, q[No reference genome available];
+            $can_execute = 0;
+        }
+        if(! $self->_alignments_in_bam) {
+            push @comments, q[BAM file is not aligned];
+            $can_execute = 0;
+        }
+        if (! $self->_is_rna_alignment) {
+            push @comments, q[BAM file is not RNA alignment];
+            $can_execute = 0;
+        }
+    } else {
+        push @comments, q[BAM file has no reads];
         $can_execute = 0;
     }
-    if(! $self->_alignments_in_bam) {
-        push @comments, q[BAM file is not aligned];
-        $can_execute = 0;
-    }
-    if (! $self->_is_rna_alignment) {
-        push @comments, q[BAM file is not RNA alignment];
-        $can_execute = 0;
-    }
+
     if (! $can_execute || ! $self->can_run()) {
         my $can_run_message = join q[; ], @comments;
         $self->result->add_comment($can_run_message);
