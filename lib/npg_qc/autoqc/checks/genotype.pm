@@ -435,7 +435,7 @@ override 'can_run' => sub {
 	}
 
  	# make sure that the bam file is aligned with one of the recognised human references
-	if(! any { $_ =~ fileparse($self->reference_fasta); } (keys %{$self->_ref_to_snppos_suffix_map})) {
+	if(! any { $_ eq fileparse($self->reference_fasta); } (keys %{$self->_ref_to_snppos_suffix_map})) {
 		$self->result->add_comment('Specified reference genome may be non-human');
 		return 0;
  	}
