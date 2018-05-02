@@ -1,11 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - more stringent ref check now required for Pf3D7_v3.fa/hs37d5__Pf3D7_v3.fa
-   in genotype check
-
 release 64.6.1
  - tweak to GbS library type check in genotype call as arrived as GBS (now case-insensitive).
  - Exit rna seqc gracefully if bam has no reads
+ - more stringent ref check now required for Pf3D7_v3.fa/hs37d5__Pf3D7_v3.fa
+   in genotype check
 
 release 64.6
  - add new metric glogin_pct_tpm to RNA-SeQC check
