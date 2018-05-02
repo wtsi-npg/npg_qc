@@ -30,15 +30,20 @@ has 'num_spatial_filter_fail_reads'=> (
 
 
 sub parse_output{
-  my ( $self, $stderr_output ) = @_;
+  my ( $self, $files ) = @_;
 
 #Processed 419675538 traces
 #QC failed        0 traces
 
-  my $log = slurp defined $stderr_output ? $stderr_output : \*STDIN;
-  if($log=~/^Processed \s+ (\d+) \s+ traces$/smx) {$self->num_total_reads($1);}
-  if($log=~/^(?:QC[ ]failed|Removed) \s+ (\d+) \s+ traces$/smx) {$self->num_spatial_filter_fail_reads($1);}
-
+  my $num_total_reads = 0;
+  my $num_spatial_filter_fail_reads = 0;
+  for my $file (@{$files}) {
+    my $log = slurp $file || croak "Unable to read file $file";
+    if($log=~/^Processed \s+ (\d+) \s+ traces$/smx) {$num_total_reads += $1};
+    if($log=~/^(?:QC[ ]failed|Removed) \s+ (\d+) \s+ traces$/smx) {$num_spatial_filter_fail_reads += $1};
+  }
+  $self->num_total_reads($num_total_reads);
+  $self->num_spatial_filter_fail_reads($num_spatial_filter_fail_reads);
   return;
 }
 

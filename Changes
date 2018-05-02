@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - modified spatial filter qc check to read all run_lane filter.stats files
  - upstream_tags qc check - replaced bamindexdecoder with bambi decode
  - dropped ability for qc checks to sub-sample input fastq
    instead run the checks directly off the cached fastq files
