@@ -172,6 +172,12 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   data_type: 'text'
   is_nullable: 1
 
+=head2 globin_pct_tpm
+
+  data_type: 'float'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -223,6 +229,8 @@ __PACKAGE__->add_columns(
   { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'other_metrics',
   { data_type => 'text', is_nullable => 1 },
+  'globin_pct_tpm',
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -278,16 +286,18 @@ __PACKAGE__->belongs_to(
 
 =item * L<npg_qc::autoqc::role::result>
 
+=item * L<npg_qc::autoqc::role::rna_seqc>
+
 =back
 
 =cut
 
 
-with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
+with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::rna_seqc';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iF60MVXsQlJSZaqqLbjz0w
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-23 11:27:42
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zs9hhgRjwZIDs+WxoOEQlg
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 

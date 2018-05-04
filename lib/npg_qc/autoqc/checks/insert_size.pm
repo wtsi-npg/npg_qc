@@ -207,7 +207,17 @@ has 'norm_fit_cmd' => (
 
 override 'can_run'            => sub {
   my $self = shift;
-  my $id = $self->is_paired_read();
+
+  if($self->lims->gbs_plex_name){
+    $self->result->add_comment('Insert size skipped for gbs plex libraries.');
+    return 0;
+  }
+  if(! $self->is_paired_read()){
+    $self->result->add_comment('Single end run');
+    return 0;
+  }
+
+  return 1;
 };
 
 override 'execute'            => sub {
@@ -215,7 +225,7 @@ override 'execute'            => sub {
   if(!super()) {return 1;}
 
   if (!$self->can_run) {
-      $self->result->add_comment(q[Single run. Cannot run insert size check.]);
+      $self->result->add_comment(q[Cannot run insert size check.]);
       return 1;
   }
 

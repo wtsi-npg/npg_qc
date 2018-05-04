@@ -1,14 +1,38 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+
  - modified spatial filter qc check to read all run_lane filter.stats files
  - upstream_tags qc check - replaced bamindexdecoder with bambi decode
  - dropped ability for qc checks to sub-sample input fastq
    instead run the checks directly off the cached fastq files
  - added fastqcheck code and replaced fastq_summ in Build.PL with fastqcheck
  - NovaSeq changes, new InterOp file format and per lane read counts now 64-bit unsigned ints
+
+release 64.6.1
+ - tweak to GbS library type check in genotype call as arrived as GBS (now case-insensitive).
+ - Exit rna seqc gracefully if bam has no reads
+ - more stringent ref check now required for Pf3D7_v3.fa/hs37d5__Pf3D7_v3.fa
+   in genotype check
+
+release 64.6
+ - add new metric glogin_pct_tpm to RNA-SeQC check
+ - DBIx schema loader script: alter table to add new globin metric column
+ - add functionality to pass some of the files necessary to run RNA-SeQC
+   as CLI options for program qc for more flexibility for stand alone run
+ - add new role for rna_seqc to implement ability to extract values from
+   column other_metrics to be stored in ml warehouse database.
+ - add tag_hops_power and tag_hops_percent columns to tag metrics
  - remove run_timeline component on the Illumina QC loader
  - stop generating DBIx class for run_timeline db table
  - remove unused methods of the run_graph Clearpress model
+ - add new role for rna_seqc to implement ability to extract values from
+   column other_metrics to be stored in ml warehouse database
+ - changes for GbS genotype calling check 
+ - tag_sniff
+    handle separators in BC tags for dual-index runs
+    allow dual-index runs to be revcomped independantly
+    when tag has a separator -t option operates on subtags
+    allowed to ignore an index when the BC tag contains a separator 
 
 release 64.5
  - qc outcomes model: code generalisation to simplify addition of

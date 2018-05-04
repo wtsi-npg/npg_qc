@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+  <id>4793</id>
+  <status>released</status>
+  <lanes>
+    <lane position="1" id="84515" priority="0">
+      <library id="84514" name="D1_1 1" request_id="30567" qc_state="fail">
+        <sample sample_id="7028" library_id="84514" library_name="D1_1 1" library_type="" study_id="227" project_id="227" consent_withdrawn="false">
+          <insert_size from="200" to="400"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="2" id="75931" priority="0">
+      <library id="57012" name="D1_2 1" request_id="30570" qc_state="fail">
+        <sample sample_id="7029" library_id="57012" library_name="D1_2 1" library_type="Standard" study_id="227" project_id="227" consent_withdrawn="false">
+          <insert_size from="0" to="0"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="3" id="84546" priority="0">
+      <library id="57578" name="G1_1 1" request_id="31950" qc_state="fail">
+        <sample sample_id="7403" library_id="57578" library_name="G1_1 1" library_type="Standard" study_id="227" project_id="227" consent_withdrawn="false">
+          <insert_size from="0" to="0"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="4" id="82565" priority="0">
+      <control id="79577" name="phiX CT1462-2 1" request_id="43786">
+        <sample sample_id="9836" library_id="79577" library_name="phiX CT1462-2 1" library_type="" study_id="" project_id="" consent_withdrawn="false">
+        </sample>
+      </control>
+    </lane>
+    <lane position="5" id="83149" priority="0">
+      <library id="57612" name="E4_1 1" request_id="32010" qc_state="pending">
+        <sample sample_id="7366" library_id="57612" library_name="E4_1 1" library_type="Standard" study_id="227" project_id="227" consent_withdrawn="false">
+          <insert_size from="0" to="0"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="6" id="84562" priority="0">
+      <library id="57616" name="E10_1 1" request_id="32022" qc_state="fail">
+        <sample sample_id="7379" library_id="57616" library_name="E10_1 1" library_type="Standard" study_id="227" project_id="227" consent_withdrawn="false">
+          <insert_size from="0" to="0"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="7" id="84564" priority="0">
+      <library id="57620" name="E9_1 1" request_id="32028" qc_state="fail">
+        <sample sample_id="7377" library_id="57620" library_name="E9_1 1" library_type="Standard" study_id="227" project_id="227" consent_withdrawn="false">
+          <insert_size from="0" to="0"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="8" id="1423326" priority="0">
+      <library id="57653" name="G2_1 1" request_id="2911713" qc_state="pass">
+        <sample sample_id="7418" library_id="57653" library_name="G2_1 1" library_type="Standard" study_id="227" project_id="227" consent_withdrawn="false">
+          <insert_size from="0" to="0"/>
+        </sample>
+      </library>
+    </lane>
+  </lanes>
+</batch>

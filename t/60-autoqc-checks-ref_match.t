@@ -15,6 +15,10 @@ my $fastq_path = 't/data/autoqc';
 my $repos = join q[/], cwd, q[t/data/autoqc];
 my $ref_repos  = abs_path(getcwd() . '/t/data/autoqc/references');
 
+local $ENV{'http_proxy'} = 'wibble.com';
+local $ENV{'no_proxy'} = q[];
+local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc];
+
 my $dir = tempdir( CLEANUP => 1 );
 my $bt = join q[/], $dir, q[bowtie];
 open my $fh,  q[>], $bt;

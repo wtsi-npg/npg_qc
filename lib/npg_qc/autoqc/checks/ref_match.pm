@@ -15,6 +15,7 @@ use npg_common::extractor::fastq qw/read_count split_reads/;
 extends 'npg_qc::autoqc::checks::check';
 with    qw/npg_tracking::data::reference::list
            npg_common::roles::software_location
+           npg_tracking::data::reference::find
           /;
 
 our $VERSION = '0';
@@ -203,9 +204,25 @@ sub _scan_repository {
     return;
 }
 
+override 'can_run' => sub {
+  my $self = shift;
+
+  if($self->lims->gbs_plex_name){
+    $self->result->add_comment('Ref match skipped for gbs plex libraries.');
+    return 0;
+  }
+
+  return 1;
+};
+
 override 'execute' => sub {
     my ($self) = @_;
     return 1 if !super();
+
+    if (!$self->can_run) {
+      $self->result->add_comment(q[Cannot run ref_match check.]);
+      return 1;
+    }
 
     if (!$self->_create_sample_fastq()) {
         return 1;

@@ -41,6 +41,18 @@ Coefficient of Variance <a href="[% c.uri_for_action(c.controller('Checks').acti
 </table>
 </div>
 
+<div class="data_table">
+Tag Hopping <a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]#tag metrics_check"><img src="/static/images/information.png" alt="Link to information about tag hopping"/></a>
+<table title="Tag Hopping">
+<tr><th class="laligned">Percentage Tag Hops</th>
+  <td class="raligned">[% FILTER format('%2.2f'); check.tag_hops_percent; END %]</td>
+</tr>
+<tr><th class="laligned">Tag Hop Power</th>
+  <td class="raligned">[% FILTER format('%2.2f'); check.tag_hops_power(); END %]</td>
+</tr>
+</table>
+</div>
+
 </div>
 
 <div class="rfloat">
