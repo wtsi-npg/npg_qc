@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 67;
+use Test::More tests => 61;
 use Test::Exception;
 use Test::Deep;
 use Perl6::Slurp;
