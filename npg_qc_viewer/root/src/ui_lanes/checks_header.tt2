@@ -6,6 +6,7 @@
       contamination    = 'top two'
       gc_bias          = '<span class="nbsp">plot created</span><br />'
       gc_fraction      = 'fraction,<br />%'
+      genotype_call    = 'call rate<br />pass rate<br />'
       genotype         = 'match<br/><span class="dark_blue nbsp">mean cvg.<br/>depth<br/></span>'
       insert_size      = 'quartiles,<br />bases'
       pulldown_metrics = '<span class="nbsp">coverage at 20X, %</span><br /><span class="nbsp">mean depth per Gb</span><br /><span class="dark_blue nbsp">on bait bases, %</span><br /><span class="dark_blue nbsp">on target bases, %</span>'
@@ -25,7 +26,7 @@
 <th[% row_span_string %]>Lane<br />No</th>
 [% IF has_plexes %]<th[% row_span_string %]>Tag</th>[% END %]
 [%- FOREACH check_name IN checks_list -%]
-  [% IF check_name.match('genotype') && !check_name.match('W30467') %]
+  [% IF (check_name.match('genotype') && !check_name.match('call')) && !check_name.match('W30467') %]
     [% NEXT %]
   [% END %]
   [% IF check_name.match('genotype') || check_name == "rna seqc" || check_name == "upstream tags" || check_name == "verify bam id" || check_name.match('tag metrics') %]
@@ -40,7 +41,7 @@
 </tr>
 <tr>
   [%- FOREACH check_name IN checks_list; class_name = map.$check_name %]
-  [% IF check_name.match('genotype') && !check_name.match('W30467') %]
+  [% IF (check_name.match('genotype') && !check_name.match('call')) && !check_name.match('W30467') %]
     [% NEXT %]
   [% END %]
 <th class="check_labels">[% labels.$class_name %]</th>
