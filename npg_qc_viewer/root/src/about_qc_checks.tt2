@@ -118,6 +118,42 @@ Any close genotype matches found under a different sample name, allowing homozyg
 <br/><br/>
 
 <br/>
+<a name="genotype call_check"></a>
+ <h3>Genotype call metrics</h3>
+
+<br/>
+<h4>Description</h4>
+Metrics generated as part of calling genotypes at a set of sites specified by the genotype plex name.
+<br/>
+<br/>
+
+<h4>Output Fields</h4>
+<br/>
+<table style="margin-left: 5%; margin-right: 20%;">
+<tr><th>Field</th><th>Description</th></tr>
+<tr>
+  <td>Genotypes attempted</td>
+  <td style="padding: 0 0 5px 10px;">The number genotype sites where a call is attempted.</td>
+</tr>
+<tr>
+  <td>Genotype call rate</td>
+  <td style="padding: 0 0 5px 10px;">The sites called divided by the number genotype sites attempted.</td>
+</tr>
+<tr>
+  <td>Genotype pass rate</td>
+  <td style="padding: 0 0 5px 10px;">The sites called and passing plex specific filters divided by the number genotype sites attempted.</td>
+</tr>
+<tr>
+  <td>Sex markers attempted</td>
+  <td style="padding: 0 0 5px 10px;">Number of sex markers (if present).</td>
+</tr>
+<tr>
+  <td>Sex</td>
+  <td style="padding: 0 0 5px 10px;">M or F for each male or female call (if sex markers present).</td>
+</tr>
+</table>
+
+<br/><br/>
 
 <a name="rna seqc_check"></a>
  <h3>RNA-SeQC metrics</h3>

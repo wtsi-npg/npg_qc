@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - QC viewer changes for genotype call
+
 release 64.6.1
  - tweak to GbS library type check in genotype call as arrived as GBS (now case-insensitive).
  - Exit rna seqc gracefully if bam has no reads
