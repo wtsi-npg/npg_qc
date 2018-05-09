@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 60;
+use Test::More tests => 61;
 use Test::Exception;
 use Test::Deep;
 use Perl6::Slurp;
@@ -617,6 +617,19 @@ sub _additional_modules {
                                               format   => $format,
                                                    );
   lives_ok {$qc->execute} 'check execute method lives, reverse comp flag set';
+}
+
+{
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/genotype_call/samplesheet_24135.csv];
+  my $qc = npg_qc::autoqc::checks::insert_size->new(
+                                              position  => 1, 
+                                              tag_index => 1, 
+                                              path      => 't/data/autoqc', 
+                                              id_run    => 24135,
+                                              repository => $repos, 
+                                                   );
+
+  is($qc->can_run, 0, 'check can_run is false for a GbS run');
 }
 
 1;

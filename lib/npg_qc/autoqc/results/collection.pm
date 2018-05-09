@@ -154,8 +154,9 @@ should inherit from the npg_qc::autoqc::results::result object.
 sub add_from_dir {
     my ($self, $path, $lanes, $id_run) = @_;
 
+    my $json    = q[.json];
     my $pattern = $id_run ? $id_run : q[];
-    $pattern = $path . q[/] . $pattern . q[*.json];
+    $pattern = $path . q[/] . $pattern . q[*]. $json;
     my @files = glob $pattern;
     my @classes = @{_list_classes(1)};
 
@@ -164,7 +165,8 @@ sub add_from_dir {
     foreach my $file (@files) {
         my ($filename, $dir, $extension) = fileparse($file);
         foreach my $class (@classes) {
-            if ($filename =~ /$class/smx) {
+            my $pmatch = $class . $json;
+            if ($filename =~ /$pmatch/smx) {
                 my $module = $RESULTS_NAMESPACE . q[::] . $class;
                 my $result = $module->load($file);
                 my $position = $result->position;
