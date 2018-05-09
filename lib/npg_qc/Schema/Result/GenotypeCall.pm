@@ -229,7 +229,6 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
-
 =head1 L<Moose> ROLES APPLIED
 
 =over 4
@@ -246,10 +245,15 @@ __PACKAGE__->belongs_to(
 
 =cut
 
+
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::genotype_call';
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-03-20 15:31:01
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gwucfsXKUWDpaOooVi52Jw
+
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-05-09 14:43:55
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yt49E+/uzDRoLW7PM1qtVQ
+
+
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 
 our $VERSION = '0';
 
@@ -262,8 +266,6 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -325,7 +327,7 @@ To simplify queries, skip SeqComposition and link directly to the linking table.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
