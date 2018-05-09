@@ -37,13 +37,15 @@ sub parse_output{
 
   my $num_total_reads = 0;
   my $num_spatial_filter_fail_reads = 0;
+  my $count = 0;
   for my $file (@{$files}) {
     my $log = slurp $file || croak "Unable to read file $file";
-    if($log=~/^Processed \s+ (\d+) \s+ traces$/smx) {$num_total_reads += $1};
-    if($log=~/^(?:QC[ ]failed|Removed) \s+ (\d+) \s+ traces$/smx) {$num_spatial_filter_fail_reads += $1};
+    if($log=~/^Processed \s+ (\d+) \s+ traces$/smx) {$count++; $num_total_reads += $1};
+    if($log=~/^(?:QC[ ]failed|Removed) \s+ (\d+) \s+ traces$/smx) {$count++; $num_spatial_filter_fail_reads += $1};
   }
-  $self->num_total_reads($num_total_reads);
-  $self->num_spatial_filter_fail_reads($num_spatial_filter_fail_reads);
+  # values should be undefined if there is no data in the output
+  $self->num_total_reads($count ? $num_total_reads : undef);
+  $self->num_spatial_filter_fail_reads($count ? $num_spatial_filter_fail_reads : undef);
   return;
 }
 

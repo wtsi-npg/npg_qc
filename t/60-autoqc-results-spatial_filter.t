@@ -17,8 +17,7 @@ my $tempdir = tempdir( CLEANUP => 1);
                                  );
     isa_ok ($r, 'npg_qc::autoqc::results::spatial_filter');
 
-    my $stats_output_string = slurp 't/data/autoqc/PB_cal_score_8926_1_20121209-190404.494308.out';
-    $r->parse_output(\$stats_output_string);    
+    $r->parse_output(['t/data/autoqc/PB_cal_score_8926_1_20121209-190404.494308.out']);
 
     is($r->num_total_reads, 2*209837769, 'total reads');    
     is($r->num_spatial_filter_fail_reads, 0, 'spatial filter fail reads');    
@@ -42,13 +41,10 @@ my $tempdir = tempdir( CLEANUP => 1);
                                        id_run   => 8926,
                                  );
 
-    open my $stats_output_fh, '<',
-      't/data/autoqc/PB_cal_score_8926_2_20121209-190404.494309.out' or croak 'fail to open fh';
+    my $stats_output_file = q{t/data/autoqc/PB_cal_score_8926_2_20121209-190404.494309.out};
     lives_ok {
-      local *STDIN=$stats_output_fh;
-      $r->parse_output();
-    } 'parse from (pseudo) stdin';
-    close $stats_output_fh or croak 'fail to close fh';    
+      $r->parse_output([$stats_output_file]);
+    } 'parse from file';
 
     is($r->num_total_reads, 439161826, 'total reads');    
     is($r->num_spatial_filter_fail_reads, 358824, 'spatial filter fail reads');    
@@ -79,10 +75,10 @@ my $tempdir = tempdir( CLEANUP => 1);
                                        position => 3,
                                        id_run   => 8926,
                                  );
+    my $empty_stats_file = q{t/data/autoqc/spatial_filter/empty.stats};
     lives_ok {
-      my$s='';
-      $r->parse_output(\$s);
-    } 'parse from empty string';
+      $r->parse_output([$empty_stats_file]);
+    } 'parse from empty file';
 
     is($r->num_total_reads, undef, 'total reads');
     is($r->num_spatial_filter_fail_reads, undef, 'spatial filter fail reads');
@@ -96,13 +92,10 @@ my $tempdir = tempdir( CLEANUP => 1);
                                        position => 4,
                                        id_run   => 8926,
                                  );
-    open my $stats_output_fh, '<',
-      't/data/autoqc/PB_cal_score_8926_4_20121209-190404.494309.out' or croak 'fail to open fh';
+    my $stats_output_file = q{t/data/autoqc/PB_cal_score_8926_4_20121209-190404.494309.out};
     lives_ok {
-      local *STDIN=$stats_output_fh;
-      $r->parse_output();
+      $r->parse_output([$stats_output_file]);
     } 'parse from (pseudo) stdin';
-    close $stats_output_fh or croak 'fail to close fh';
 
     is($r->num_total_reads, 439161826, 'total reads');
     is($r->num_spatial_filter_fail_reads, 358824, 'spatial filter fail reads');
