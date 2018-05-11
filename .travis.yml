@@ -19,6 +19,8 @@ dist:
 
 addons:
   postgresql: "9.3"
+  apt:
+    update: true
 
 env:
   global:
