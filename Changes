@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - make travis happy as running apt-get update by default was disabled.
+
 release 64.6.2
  - QC viewer changes for genotype call
 
