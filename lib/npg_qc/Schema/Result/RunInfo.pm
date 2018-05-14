@@ -67,7 +67,7 @@ __PACKAGE__->table('run_info');
 
 =head2 run_info_xml
 
-  data_type: 'text'
+  data_type: 'mediumtext'
   is_nullable: 0
 
 =cut
@@ -83,7 +83,7 @@ __PACKAGE__->add_columns(
   'id_run',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
   'run_info_xml',
-  { data_type => 'text', is_nullable => 0 },
+  { data_type => 'mediumtext', is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -113,8 +113,8 @@ __PACKAGE__->set_primary_key('id_run_info');
 __PACKAGE__->add_unique_constraint('unq_idx_run_info', ['id_run']);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8uQDsREpR88ACsujW1IBnQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-05-09 15:23:33
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9dNQorkIKBO5tcuc64ikQA
 
 our $VERSION = '0';
 
