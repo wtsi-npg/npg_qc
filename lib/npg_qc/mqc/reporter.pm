@@ -10,57 +10,20 @@ use Try::Tiny;
 use Readonly;
 
 use st::api::base;
-use npg_qc::Schema;
-use WTSI::DNAP::Warehouse::Schema;
 
-with 'MooseX::Getopt';
+with qw{MooseX::Getopt npg_qc::report::options};
 
 our $VERSION = '0';
 
 Readonly::Scalar my $HTTP_TIMEOUT => 120;
 Readonly::Scalar my $CONTENT_TYPE => 'text/xml';
 
-has 'qc_schema' => (
-  isa        => 'npg_qc::Schema',
-  is         => 'ro',
-  required   => 0,
-  lazy_build => 1,
-  metaclass  => 'NoGetopt',
-);
-sub _build_qc_schema {
-  return npg_qc::Schema->connect();
-}
-
-has 'mlwh_schema' => (
-  isa        => 'WTSI::DNAP::Warehouse::Schema',
-  is         => 'ro',
-  required   => 0,
-  lazy_build => 1,
-  metaclass  => 'NoGetopt',
-);
-sub _build_mlwh_schema {
-  return WTSI::DNAP::Warehouse::Schema->connect();
-}
-
-has 'verbose'     => (
-  isa           => 'Bool',
-  is            => 'ro',
-  default       => 0,
-  documentation => 'print verbose messages, defaults to false',
-);
 
 has 'warn_gclp' => (
   isa           => 'Bool',
   is            => 'ro',
   default       => 0,
   documentation => 'show warning for glcp runs, defaults to false',
-);
-
-has 'dry_run' => (
-  isa           => 'Bool',
-  is            => 'ro',
-  default       => 0,
-  documentation => 'dry run',
 );
 
 has '_ua'     => ( isa           => 'LWP::UserAgent',
@@ -243,28 +206,10 @@ npg_qc::mqc::reporter
 
 =head1 SUBROUTINES/METHODS
 
-=head2 verbose
-
-  Boolean verbose flag, false by default.
-
 =head2 warn_gclp
 
   Boolean flag switching on warnings when a GCLP lane is encounted,
   false by default.
-
-=head2 dry_run
-
-  Dry run flag. No reporting, no marking as reported in the qc database.
-
-=head2 qc_schema
-
-  An attribute - the schema to use for the qc database.
-  Defaults to npg_qc::Schema,
-
-=head2 mlwh_schema
-
-  An attribute - the schema to use for ml warehouse database.
-  Defaults to WTSI::DNAP::Warehouse::Schema.
 
 =head2 load
   
@@ -300,10 +245,6 @@ npg_qc::mqc::reporter
 =item Readonly
 
 =item st::api::base
-
-=item npg_qc::Schema
-
-=item WTSI::DNAP::Warehouse::Schema
 
 =back
 

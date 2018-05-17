@@ -205,6 +205,7 @@ my $requires = {
                 'POSIX'                           => 0,
                 'Readonly'                        => 0,
                 'Readonly::XS'                    => 0,
+                'REST::Client'                    => 0,
                 'Statistics::Lite'                => 0,
                 'strict'                          => 0,
                 'Try::Tiny'                       => 0,

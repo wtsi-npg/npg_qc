@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - add genotype_call_results_reporter script to report genotype_call
+   results to the LIMs
  - make travis happy as running apt-get update by default was disabled.
 
 release 64.6.2

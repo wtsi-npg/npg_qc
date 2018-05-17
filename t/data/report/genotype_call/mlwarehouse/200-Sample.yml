@@ -1,0 +1,65 @@
+---
+- accession_number: ERS2154194 
+  cohort: ~
+  common_name: Plasmodium falciparum
+  consent_withdrawn: 0
+  control: 0
+  country_of_origin: ~
+  created: 2015-06-23 12:08:35
+  deleted_at: ~
+  description: ~
+  donor_id: 3605STDY7295483
+  ethnicity: ~
+  father: ~
+  gender: ~
+  geographical_region: ~
+  id_lims: SQSCP
+  id_sample_lims: 3514402
+  id_sample_tmp: 3466725
+  last_updated: 2015-09-04 16:18:00
+  mother: ~
+  name: 3605STDY7295483
+  organism: ~
+  phenotype: ~
+  public_name: ~
+  recorded_at: 2015-09-04 16:18:00
+  reference_genome: ~
+  replicate: ~
+  sample_visibility: ~
+  sanger_sample_id: 3605STDY7295483
+  strain: ~
+  supplier_name: ~
+  taxon_id: 5833
+  uuid_sample_lims: 5084d51a-00e7-11e8-8f97-3c4a9275d6c8
+- accession_number: ERS2154195
+  cohort: ~
+  common_name: Plasmodium falciparum
+  consent_withdrawn: 0
+  control: 0
+  country_of_origin: ~
+  created: 2015-06-23 12:08:35
+  deleted_at: ~
+  description: ~
+  donor_id: 3605STDY7295484
+  ethnicity: ~
+  father: ~
+  gender: ~
+  geographical_region: ~
+  id_lims: SQSCP
+  id_sample_lims: 3514405
+  id_sample_tmp: 3466726
+  last_updated: 2015-09-04 16:18:00
+  mother: ~
+  name: 3605STDY7295484
+  organism: ~
+  phenotype: ~
+  public_name: ~
+  recorded_at: 2015-09-04 16:18:00
+  reference_genome: ~
+  replicate: ~
+  sample_visibility: ~
+  sanger_sample_id: 3605STDY7295484
+  strain: ~
+  supplier_name: ~
+  taxon_id: 5833
+  uuid_sample_lims: 5092c0a8-00e7-11e8-8f97-3c4a9275d6c8
