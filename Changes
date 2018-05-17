@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 64.6.3
  - update parsing of spatial filter stats in spatial_filter QC check
 
 release 64.6.2
