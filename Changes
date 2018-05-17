@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - update parsing of spatial filter stats in spatial_filter QC check
+
 release 64.6.2
  - QC viewer changes for genotype call
 

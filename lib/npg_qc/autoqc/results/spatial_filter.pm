@@ -32,12 +32,12 @@ has 'num_spatial_filter_fail_reads'=> (
 sub parse_output{
   my ( $self, $stderr_output ) = @_;
 
-#Processed 419675538 traces
-#QC failed        0 traces
+# expected format: "Total Processed 943540734     Failed 4338894 traces"
 
   my $log = slurp defined $stderr_output ? $stderr_output : \*STDIN;
-  if($log=~/^Processed \s+ (\d+) \s+ traces$/smx) {$self->num_total_reads($1);}
-  if($log=~/^(?:QC[ ]failed|Removed) \s+ (\d+) \s+ traces$/smx) {$self->num_spatial_filter_fail_reads($1);}
+  my ($total, $fail) = ($log =~ /^Total \t Processed \s+ (\d+) \s+ Failed \s+ (\d+) \s+ traces$/smx);
+  $self->num_total_reads($total);
+  $self->num_spatial_filter_fail_reads($fail);
 
   return;
 }
