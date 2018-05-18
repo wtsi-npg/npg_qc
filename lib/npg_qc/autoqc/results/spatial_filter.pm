@@ -40,8 +40,14 @@ sub parse_output{
   my $count = 0;
   for my $file (@{$files}) {
     my $log = slurp $file || croak "Unable to read file $file";
-    if($log=~/^Processed \s+ (\d+) \s+ traces$/smx) {$count++; $num_total_reads += $1};
-    if($log=~/^(?:QC[ ]failed|Removed) \s+ (\d+) \s+ traces$/smx) {$count++; $num_spatial_filter_fail_reads += $1};
+
+    my ($total, $fail) = ($log =~ /^Total \t Processed \s+ (\d+) \s+ Failed \s+ (\d+) \s+ traces$/smx);
+
+    if(not defined $total or not defined $fail) { next; }
+
+    $count++;
+    $num_total_reads += $total;
+    $num_spatial_filter_fail_reads += $fail;
   }
   # values should be undefined if there is no data in the output
   $self->num_total_reads($count ? $num_total_reads : undef);
