@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tag_metics matches_pf_percent only stored to three decimals places now 
+   so trim in viewer
  - make travis happy as running apt-get update by default was disabled.
  - NovaSeq run info file size is around 95KB, too large for the text column type.
    Column type changed to mediumtext.
