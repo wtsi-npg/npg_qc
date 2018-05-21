@@ -481,9 +481,6 @@ t/data/autoqc/npg/run/1937.xml
 t/data/autoqc/npg/run/2222.xml
 t/data/autoqc/npg/run/2549.xml
 t/data/autoqc/npg/run/3612.xml
-t/data/autoqc/PB_cal_score_8926_1_20121209-190404.494308.out
-t/data/autoqc/PB_cal_score_8926_2_20121209-190404.494309.out
-t/data/autoqc/PB_cal_score_8926_4_20121209-190404.494309.out
 t/data/autoqc/pulldown_metrics/pdm.out
 t/data/autoqc/qc/1937_3.map
 t/data/autoqc/qX_yield/npg/instrument/15.xml

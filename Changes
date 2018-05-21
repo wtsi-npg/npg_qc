@@ -10,6 +10,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - make travis happy as running apt-get update by default was disabled.
  - NovaSeq run info file size is around 95KB, too large for the text column type.
      Column type changed to mediumtext.
+ - update Build.PL to make C programs only under precise
 
 release 64.6.2
  - QC viewer changes for genotype call
