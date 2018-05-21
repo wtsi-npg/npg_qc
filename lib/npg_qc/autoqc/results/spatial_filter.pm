@@ -30,15 +30,27 @@ has 'num_spatial_filter_fail_reads'=> (
 
 
 sub parse_output{
-  my ( $self, $stderr_output ) = @_;
+  my ( $self, $files ) = @_;
 
 # expected format: "Total Processed 943540734     Failed 4338894 traces"
 
-  my $log = slurp defined $stderr_output ? $stderr_output : \*STDIN;
-  my ($total, $fail) = ($log =~ /^Total \t Processed \s+ (\d+) \s+ Failed \s+ (\d+) \s+ traces$/smx);
-  $self->num_total_reads($total);
-  $self->num_spatial_filter_fail_reads($fail);
+  my $num_total_reads = 0;
+  my $num_spatial_filter_fail_reads = 0;
+  my $count = 0;
+  for my $file (@{$files}) {
+    my $log = slurp $file || croak "Unable to read file $file";
 
+    my ($total, $fail) = ($log =~ /^Total \t Processed \s+ (\d+) \s+ Failed \s+ (\d+) \s+ traces$/smx);
+
+    if(not defined $total or not defined $fail) { next; }
+
+    $count++;
+    $num_total_reads += $total;
+    $num_spatial_filter_fail_reads += $fail;
+  }
+  # values should be undefined if there is no data in the output
+  $self->num_total_reads($count ? $num_total_reads : undef);
+  $self->num_spatial_filter_fail_reads($count ? $num_spatial_filter_fail_reads : undef);
   return;
 }
 
