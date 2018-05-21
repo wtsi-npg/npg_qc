@@ -32,8 +32,7 @@ has 'num_spatial_filter_fail_reads'=> (
 sub parse_output{
   my ( $self, $files ) = @_;
 
-#Processed 419675538 traces
-#QC failed        0 traces
+# expected format: "Total Processed 943540734     Failed 4338894 traces"
 
   my $num_total_reads = 0;
   my $num_spatial_filter_fail_reads = 0;

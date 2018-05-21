@@ -93,6 +93,7 @@ my $tempdir = tempdir( CLEANUP => 1);
                                        id_run   => 25830,
                                  );
     my $stats_output_file = q{t/data/autoqc/25830_1#3.filter.stats};
+
     lives_ok {
       $r->parse_output([$stats_output_file]);
     } 'parse from (pseudo) stdin';
