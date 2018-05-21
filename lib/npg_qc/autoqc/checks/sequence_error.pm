@@ -8,7 +8,7 @@ use English qw(-no_match_vars);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 
-use npg_common::extractor::fastq qw(generate_equally_spaced_reads);
+use npg_common::extractor::fastq qw(read_count);
 use npg_common::Alignment;
 use npg_qc::autoqc::types;
 extends qw(npg_qc::autoqc::checks::check);
@@ -183,12 +183,9 @@ sub process_one_fastq{
   #prepare temp file names
   my $out_dir = $self->tmp_path;
   my ($filename, $directories, $suffix) = fileparse($fastq, qr{.fastq}mxs);
+  my $sam_out = catfile($out_dir, $filename.q{.sam});
 
-  my $part_fastq = catfile($out_dir, $filename.q{_part.fastq});
-  my $part_sam_out = catfile($out_dir, $filename.q{_part.sam});
-
-  #extract part reads from fastq file
-  my $actual_sample_size = generate_equally_spaced_reads([$fastq], [$part_fastq], $self->sample_size);
+  my $actual_sample_size = read_count($fastq);
   eval {
     $self->_set_actual_sample_size($actual_sample_size);
     1;
@@ -196,7 +193,7 @@ sub process_one_fastq{
     $self->result->add_comment(qq[Too few reads in $fastq? Number of reads $actual_sample_size] . q[.]);
     return 1;
   };
-  #use extracted part fastq, doing alignment
+  #use input fastq, doing alignment
   my $alignment = npg_common::Alignment->new(
                                $self->resolved_paths(), #propagate bwa command
                                bwa_options => $self->aligner_options(),
@@ -204,8 +201,8 @@ sub process_one_fastq{
   eval{
 
     $alignment->bwa_align_se({
-      fastq => $part_fastq,
-      bam_out => $part_sam_out,
+      fastq => $fastq,
+      bam_out => $sam_out,
       ref_root => $self->reference(),
     });
     1;
@@ -215,7 +212,7 @@ sub process_one_fastq{
 
   my $results_hash = {};
   eval{
-    $results_hash = $self->parsing_sam($part_sam_out, $fastq_direction);
+    $results_hash = $self->parsing_sam($sam_out, $fastq_direction);
     1;
   } or do{
     croak q[Error when parsing sam file: ].$EVAL_ERROR;
@@ -675,7 +672,7 @@ npg_qc::autoqc::checks::sequence_error
 
 =item npg_common::Alignment
 
-=item npg_common::extractor::fastq qw(generate_equally_spaced_reads)
+=item npg_common::extractor::fastq qw(read_count)
 
 =item npg_common::roles::software_location
 

@@ -13,15 +13,14 @@ my $tempdir = tempdir( CLEANUP => 1);
 {
     my $r = npg_qc::autoqc::results::spatial_filter->new(
                                        position => 1,
-                                       id_run   => 8926,
+                                       id_run   => 25830,
                                  );
     isa_ok ($r, 'npg_qc::autoqc::results::spatial_filter');
 
-    my $stats_output_string = slurp 't/data/autoqc/PB_cal_score_8926_1_20121209-190404.494308.out';
-    $r->parse_output(\$stats_output_string);    
+    $r->parse_output(['t/data/autoqc/25830_1#1.filter.stats']);
 
-    is($r->num_total_reads, 2*209837769, 'total reads');    
-    is($r->num_spatial_filter_fail_reads, 0, 'spatial filter fail reads');    
+    is($r->num_total_reads, 382658, 'total reads');    
+    is($r->num_spatial_filter_fail_reads, 32768, 'spatial filter fail reads');    
 
     lives_ok {
       $r->freeze();
@@ -30,7 +29,7 @@ my $tempdir = tempdir( CLEANUP => 1);
 
     is ($r->composition->num_components, 1, 'one component');
     my $component = $r->composition->get_component(0);
-    is ($component->id_run, 8926, 'component id_run');
+    is ($component->id_run, 25830, 'component id_run');
     is ($component->position, 1, 'component position');
     ok (!$component->has_tag_index, 'component tag index has not been set');
     is ($component->tag_index, undef, 'component tag index is undefined');
@@ -38,34 +37,31 @@ my $tempdir = tempdir( CLEANUP => 1);
 
 {
     my $r = npg_qc::autoqc::results::spatial_filter->new(
-                                       position => 2,
-                                       id_run   => 8926,
+                                       position => 1,
+                                       id_run   => 25830,
                                  );
 
-    open my $stats_output_fh, '<',
-      't/data/autoqc/PB_cal_score_8926_2_20121209-190404.494309.out' or croak 'fail to open fh';
+    my $stats_output_file = q{t/data/autoqc/25830_1#2.filter.stats};
     lives_ok {
-      local *STDIN=$stats_output_fh;
-      $r->parse_output();
-    } 'parse from (pseudo) stdin';
-    close $stats_output_fh or croak 'fail to close fh';    
+      $r->parse_output([$stats_output_file]);
+    } 'parse from file';
 
-    is($r->num_total_reads, 439161826, 'total reads');    
-    is($r->num_spatial_filter_fail_reads, 358824, 'spatial filter fail reads');    
+    is($r->num_total_reads, 306160, 'total reads');    
+    is($r->num_spatial_filter_fail_reads, 0, 'spatial filter fail reads');    
     
     lives_ok {
       $r->freeze();
       $r->store($tempdir);
     } 'no error when save data into json (store passed directory)';
 
-    my $hash = from_json( slurp qq{$tempdir/8926_2.spatial_filter.json} );
+    my $hash = from_json( slurp qq{$tempdir/25830_1.spatial_filter.json} );
 
     my $expected_hash_structure = {
-      'num_total_reads' => 439161826,
-      'num_spatial_filter_fail_reads' => 358824,
-      'id_run' => 8926,
+      'num_total_reads' => 306160,
+      'num_spatial_filter_fail_reads' => 0,
+      'id_run' => 25830,
       'info' => {},
-      'position' => 2,
+      'position' => 1,
     };
 
     ok( exists $hash->{__CLASS__}, q{__CLASS__ key found} );
@@ -79,10 +75,10 @@ my $tempdir = tempdir( CLEANUP => 1);
                                        position => 3,
                                        id_run   => 8926,
                                  );
+    my $empty_stats_file = q{t/data/autoqc/spatial_filter/empty.stats};
     lives_ok {
-      my$s='';
-      $r->parse_output(\$s);
-    } 'parse from empty string';
+      $r->parse_output([$empty_stats_file]);
+    } 'parse from empty file';
 
     is($r->num_total_reads, undef, 'total reads');
     is($r->num_spatial_filter_fail_reads, undef, 'spatial filter fail reads');
@@ -93,33 +89,30 @@ my $tempdir = tempdir( CLEANUP => 1);
 
 {
     my $r = npg_qc::autoqc::results::spatial_filter->new(
-                                       position => 4,
-                                       id_run   => 8926,
+                                       position => 1,
+                                       id_run   => 25830,
                                  );
-    open my $stats_output_fh, '<',
-      't/data/autoqc/PB_cal_score_8926_4_20121209-190404.494309.out' or croak 'fail to open fh';
+    my $stats_output_file = q{t/data/autoqc/25830_1#3.filter.stats};
     lives_ok {
-      local *STDIN=$stats_output_fh;
-      $r->parse_output();
+      $r->parse_output([$stats_output_file]);
     } 'parse from (pseudo) stdin';
-    close $stats_output_fh or croak 'fail to close fh';
 
-    is($r->num_total_reads, 439161826, 'total reads');
-    is($r->num_spatial_filter_fail_reads, 358824, 'spatial filter fail reads');
+    is($r->num_total_reads, 54332, 'total reads');
+    is($r->num_spatial_filter_fail_reads, 42, 'spatial filter fail reads');
 
     lives_ok {
       $r->freeze();
       $r->store($tempdir);
     } 'no error when save data into json (store passed directory)';
 
-    my $hash = from_json( slurp qq{$tempdir/8926_4.spatial_filter.json} );
+    my $hash = from_json( slurp qq{$tempdir/25830_1.spatial_filter.json} );
 
     my $expected_hash_structure = {
-      'num_total_reads' => 439161826,
-      'num_spatial_filter_fail_reads' => 358824,
-      'id_run' => 8926,
+      'num_total_reads' => 54332,
+      'num_spatial_filter_fail_reads' => 42,
+      'id_run' => 25830,
       'info' => {},
-      'position' => 4,
+      'position' => 1,
     };
 
     ok( exists $hash->{__CLASS__}, q{__CLASS__ key found} );

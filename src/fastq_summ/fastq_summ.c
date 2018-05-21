@@ -97,10 +97,10 @@ isn't one, data for that lane/read group will not be output.
 */
 struct _read_output_queue {
 	char *read_group;	/* NULL for lane level */
-	int total_reads;
-	int *num_selects;
+	uint64_t total_reads;
+	uint64_t *num_selects;
 	int select_interval;
-	int reads_seen;
+	uint64_t reads_seen;
 	int num_output;
 	FILE *outs1fd;		/* selected single-end or read 1 of pair */
 	FILE *outs2fd;		/* selected read 2 of pair */
@@ -122,7 +122,7 @@ struct _params {
 	struct _output_spec output_spec;	/* specifies output location */
 	char *rt_tag;
 	char *qt_tag;
-	int num_selects; /* number of sample reads (default: 10,000) */
+	uint64_t num_selects; /* number of sample reads (default: 10,000) */
 	int num_reads;	/* used to determine interval for selection of num_select reads */
 	int select_interval;
 	int tags_seen;
@@ -134,7 +134,7 @@ struct _params {
 	struct _output_queues *output_queues;	/* if specified using -t flags, counting pass is not needed */
 } params;
 
-int stragglers = 0;	/* used to count unmatched members of read pairs */
+uint64_t stragglers = 0;	/* used to count unmatched members of read pairs */
 
 /*
 struct _frag_out contains the data selected from a read to be output to fastq
@@ -166,7 +166,7 @@ static int usage(int full);
 static int fetch_params(int ac, char **av, struct _params *params);
 static int convert_numarg(char flag, char *val);
 static int validate_params(struct _params *params);
-static struct _output_queues *add_tag_count(struct _output_queues *q, char *tc, struct _output_spec *output_spec, int *num_selects);
+static struct _output_queues *add_tag_count(struct _output_queues *q, char *tc, struct _output_spec *output_spec, uint64_t *num_selects);
 
 static struct _output_queues *init_output_queues(char *fn, struct _params *params);
 static int initialise_lane_output_queues(struct _output_queues *output_queues, struct _params *params);
@@ -174,7 +174,7 @@ static int initialise_lane_output_queues(struct _output_queues *output_queues, s
 static int output_single_end_read(struct _frag_out *fo, struct _output_queues *output_queues);
 static int output_read_pair_member(struct _frag_out *fo, struct _output_queues *output_queues, struct _frag_store *frag_store);
 
-static struct _read_output_queue *new_roq(char *rg, int total_reads, int *num_selects, struct _output_spec *output_spec, int pair);
+static struct _read_output_queue *new_roq(char *rg, uint64_t total_reads, uint64_t *num_selects, struct _output_spec *output_spec, int pair);
 static struct _frag_out *make_cached_frag_out(struct _frag_out *fo);
 static struct _frag_out *load_uncached_frag_out(bam1_t *b);
 static struct _frag_out *_load_frag_out(bam1_t *b, struct _frag_out *ret);
@@ -198,7 +198,7 @@ int main(int ac, char **av)
 	char *bamfile_name = NULL;
 	samfile_t *fp = NULL;
 	bam1_t *b = NULL;
-	int lc, rc, se, filtered, orphans;	/* line count, (unfiltered) read count, filtered count */
+	uint64_t lc, rc, se, filtered, orphans;	/* line count, (unfiltered) read count, filtered count */
 	int i;
 	unsigned int is_multifrag, is_revcomp, nextfrag_revcomp, is_firstfrag, is_lastfrag;	/* bools */
 	struct _frag_out *fo;
@@ -241,8 +241,8 @@ int main(int ac, char **av)
 
 	if(params.verbosity > 0) {
 		printf("Output queues initialised\n");
-		printf("Lane level total reads (paired): %d\n", output_queues->lane_pairs_queue->total_reads);
-		printf("Lane level total reads (unpaired): %d\n", output_queues->lane_nonpairs_queue->total_reads);
+		printf("Lane level total reads (paired): %lu\n", output_queues->lane_pairs_queue->total_reads);
+		printf("Lane level total reads (unpaired): %lu\n", output_queues->lane_nonpairs_queue->total_reads);
 	}
 
 	/* now that we have read counts, walk the tree and calculate select_interval */
@@ -321,11 +321,11 @@ select interval occurs (and for paired reads, when the second read of the pair i
 	twalk(frag_store.store, visit_frag_nodes);	/* count orphaned frags */
 
 	if(params.verbosity > 0) {
-		printf("Unfiltered reads: %d\n", rc);
-		printf("Filtered reads: %d\n", filtered);
-		printf("Unfiltered single-end reads: %d\n", se);
-		printf("Total reads: %d\n", lc);
-		printf("Orphaned reads: %d\n", stragglers);
+		printf("Unfiltered reads: %lu\n", rc);
+		printf("Filtered reads: %lu\n", filtered);
+		printf("Unfiltered single-end reads: %lu\n", se);
+		printf("Total reads: %lu\n", lc);
+		printf("Orphaned reads: %lu\n", stragglers);
 	}
 
 	bam_destroy1(b);
@@ -1007,7 +1007,7 @@ static int usage(int full)
 		printf("\tOutbase: %s\n", params.output_spec.outbase);
 		printf("\tRT tag: %s\n", params.rt_tag);
 		printf("\tQT tag: %s\n", params.qt_tag);
-		printf("\tNo. of selects: %d\n", params.num_selects);
+		printf("\tNo. of selects: %lu\n", params.num_selects);
 		printf("\tNo. of reads: %d\n", params.num_reads);
 		printf("\tSelect interval: %d\n", params.select_interval);
 		printf("\tRequired flag: %d (%#0X)\n", params.required_flag, params.required_flag);
@@ -1036,14 +1036,14 @@ Add a read output queue node for the specified read group.
    b) otherwise create new RGOQ node, initialise it and add it to the read group output queue cache
 5. return output queues struct ptr
 */
-static struct _output_queues *add_tag_count(struct _output_queues *q, char *tc, struct _output_spec *output_spec, int *num_selects)
+static struct _output_queues *add_tag_count(struct _output_queues *q, char *tc, struct _output_spec *output_spec, uint64_t *num_selects)
 {
 	struct _output_queues *ret = q;
 	char read_group_name[RGNMMAXLEN];
 	int len;
 	int rgnmlen;
 	char *p;
-	int total_reads;
+	uint64_t total_reads;
 	struct _read_output_queue *roq;
 
 	if(ret == NULL) {
@@ -1235,7 +1235,7 @@ new_roq:
 create a new node for the read group output queue cache. Any caching issues (checks for duplicates,
 addition to cache) should be handled by the caller
 */
-static struct _read_output_queue *new_roq(char *rg, int total_reads, int *num_selects, struct _output_spec *output_spec, int is_paired)
+static struct _read_output_queue *new_roq(char *rg, uint64_t total_reads, uint64_t *num_selects, struct _output_spec *output_spec, int is_paired)
 {
 	static struct _read_output_queue *ret;
 
@@ -1304,7 +1304,7 @@ static void report_rgq_nodes(const void *nodep, const VISIT which, const int dep
 	struct _read_output_queue *oq = *(struct _read_output_queue **)nodep;
 
 	if(which == postorder || which == leaf) {
-		printf("\t%s node: read_group_name: %s, count: %d, outbase: %s\n", (which==leaf? "Leaf": "Internal"), (oq->read_group != NULL? oq->read_group: "NULL"), oq->total_reads, oq->output_spec->outbase);
+		printf("\t%s node: read_group_name: %s, count: %lu, outbase: %s\n", (which==leaf? "Leaf": "Internal"), (oq->read_group != NULL? oq->read_group: "NULL"), oq->total_reads, oq->output_spec->outbase);
 	}
 
 	return;
@@ -1322,7 +1322,7 @@ static void activate_rgq_nodes(const void *nodep, const VISIT which, const int d
 
 	if(which == postorder || which == leaf) {
 		if(params.verbosity > 0)
-			printf("%s node: tag_name: %s; read_count: %d\n", (which==leaf? "Leaf": "Internal"), node->read_group, node->total_reads);
+			printf("%s node: tag_name: %s; read_count: %lu\n", (which==leaf? "Leaf": "Internal"), node->read_group, node->total_reads);
 
 		if(node->total_reads > 0) {
 			/* calculate select interval for the read group output */
@@ -1335,7 +1335,7 @@ static void activate_rgq_nodes(const void *nodep, const VISIT which, const int d
 				printf("calculated select interval for read group %s: %d\n", node->read_group, node->select_interval);
 
 			/* open the output files */
-			snprintf(rg_oq_fn, FBSIZ, "%s/%s_1%s.fastq.%d", node->output_spec->lane_dir, node->output_spec->outbase, node->read_group, (*node->num_selects < node->total_reads? *node->num_selects: node->total_reads));
+			snprintf(rg_oq_fn, FBSIZ, "%s/%s_1%s.fastq.%lu", node->output_spec->lane_dir, node->output_spec->outbase, node->read_group, (*node->num_selects < node->total_reads? *node->num_selects: node->total_reads));
 			if((node->outs1fd=fopen(rg_oq_fn, "w")) == NULL) {
 				fprintf(stderr, "Failed to open %s for output\n", rg_oq_fn);
 				exit(-99);
@@ -1344,7 +1344,7 @@ static void activate_rgq_nodes(const void *nodep, const VISIT which, const int d
 				global_open_file_count++;
 			}
 			if(node->is_paired) {
-				snprintf(rg_oq_fn, FBSIZ, "%s/%s_2%s.fastq.%d", node->output_spec->lane_dir, node->output_spec->outbase, node->read_group, (*node->num_selects < node->total_reads? *node->num_selects: node->total_reads));
+				snprintf(rg_oq_fn, FBSIZ, "%s/%s_2%s.fastq.%lu", node->output_spec->lane_dir, node->output_spec->outbase, node->read_group, (*node->num_selects < node->total_reads? *node->num_selects: node->total_reads));
 				if((node->outs2fd=fopen(rg_oq_fn, "w")) == NULL) {
 					fprintf(stderr, "Failed to open %s for output\n", rg_oq_fn);
 					exit(-99);
@@ -1393,7 +1393,7 @@ static void close_rgq_nodes(const void *nodep, const VISIT which, const int dept
 
 	if(which == postorder || which == leaf) {
 		if(params.verbosity > 0)
-			printf("closing %s node: tag_name: %s; read_count: %d\n", (which==leaf? "Leaf": "Internal"), node->read_group, node->total_reads);
+			printf("closing %s node: tag_name: %s; read_count: %lu\n", (which==leaf? "Leaf": "Internal"), node->read_group, node->total_reads);
 
 		close_oq(node);
 	}
