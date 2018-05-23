@@ -12,18 +12,15 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
 
   my $C_SOURCE_DIR = q[src];
 
-  my $c_tools = {
-    'norm_fit' => {
-      'copy'     => [qw/norm_fit/],
-                  },
-    'gt_utils' => {
-      'copy'     => [qw/find_gt_match gt_pack/],
-                  },
-  };
+  my $c_tools = {};
 
   if (which('lsb_release') and `lsb_release -a` =~ /precise/ismx) {
     $c_tools->{'fastq_summ'} = {'copy'     => [qw/fastq_summ/],
                                 'samtools' => 1};
+    $c_tools->{'fastqcheck'} = {'copy'     => [qw/fastqcheck/],
+                                'samtools' => 1};
+    $c_tools->{'gt_utils'} = {'copy'     => [qw/find_gt_match gt_pack/], };
+    $c_tools->{'norm_fit'} = {'copy'     => [qw/norm_fit/], };
   }
 
   sub _c_build_dir {

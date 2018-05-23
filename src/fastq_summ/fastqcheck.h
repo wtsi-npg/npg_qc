@@ -28,10 +28,10 @@
 #define MAX_LENGTH 10000
 
 struct _fastqcheck {
-	int nseq;
-	unsigned long int total;
-	unsigned long int sum[5], qsum[256];        /* 0 automatically */
-	unsigned long int psum[MAX_LENGTH][5], pqsum[MAX_LENGTH][256], nlen[MAX_LENGTH];
+	uint64_t nseq;
+	uint64_t total;
+	uint64_t sum[5], qsum[256];        /* 0 automatically */
+	uint64_t psum[MAX_LENGTH][5], pqsum[MAX_LENGTH][256], nlen[MAX_LENGTH];
 	int lengthMax;
 	int qMax;
 	int status;

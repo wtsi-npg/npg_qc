@@ -2,9 +2,19 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - tag_metics matches_pf_percent only stored to three decimals places now 
    so trim in viewer
+ - modified spatial filter qc check to read all run_lane filter.stats files
+ - upstream_tags qc check - replaced bamindexdecoder with bambi decode
+ - dropped ability for qc checks to sub-sample input fastq
+     instead run the checks directly off the cached fastq files
+ - added fastqcheck code and replaced fastq_summ in Build.PL with fastqcheck
+ - NovaSeq changes, new InterOp file format and per lane read counts now 64-bit unsigned ints
  - make travis happy as running apt-get update by default was disabled.
  - NovaSeq run info file size is around 95KB, too large for the text column type.
-   Column type changed to mediumtext.
+     Column type changed to mediumtext.
+ - update Build.PL to make C programs only under precise
+
+release 64.6.3
+ - update parsing of spatial filter stats in spatial_filter QC check
 
 release 64.6.2
  - QC viewer changes for genotype call

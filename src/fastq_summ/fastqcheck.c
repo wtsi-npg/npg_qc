@@ -27,6 +27,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "sam.h"
+
 #include "fastqcheck.h"
 
 #define _A 0
@@ -40,10 +42,10 @@
 #define MAX_LENGTH 10000
 
 struct _fastqcheck {
-	int nseq;
-	unsigned long int total;
-	unsigned long int sum[5], qsum[256];        /* 0 automatically */
-	unsigned long int psum[MAX_LENGTH][5], pqsum[MAX_LENGTH][256], nlen[MAX_LENGTH];
+	uint64_t nseq;
+	uint64_t total;
+	uint64_t sum[5], qsum[256];        /* 0 automatically */
+	uint64_t psum[MAX_LENGTH][5], pqsum[MAX_LENGTH][256], nlen[MAX_LENGTH];
 	int lengthMax;
 	int qMax;
 	int status;
@@ -108,11 +110,11 @@ int fqc_add_qual_val(struct _fastqcheck *fqc, unsigned char qual, int pos) {
 
 int fqc_output(struct _fastqcheck *fqc)
 {
-	long total;
-	unsigned long int *sum, *qsum;        /* 0 automatically */
-	unsigned long *nlen;
+	uint64_t total;
+	uint64_t *sum, *qsum;        /* 0 automatically */
+	uint64_t *nlen;
 	int qMax;
-	int nseq;
+	uint64_t nseq;
 	int lengthMax;
 	double erate;
 	int i, j;
@@ -129,7 +131,7 @@ int fqc_output(struct _fastqcheck *fqc)
 		return(-1);
 	}
 
-	fprintf(fqc->outfd, "%d sequences, %ld total length", nseq, total) ;
+	fprintf(fqc->outfd, "%lu sequences, %lu total length", nseq, total) ;
 	if(nseq)
 		fprintf (fqc->outfd, ", %.2f average, %d max", total/(float)nseq, lengthMax) ;
 	fprintf(fqc->outfd, "\n") ;
