@@ -1,8 +1,0 @@
-
-16/04/12
-
-The gt_pack and find_gt_match programs are used by the genotype check to prepare and match called genotypes
-from a bam file to the set of genotypes assayed on the Sequenom platform. The small set of loci called are
-from a set of Sequenom plexes - these are currently W30467 (standard QC plex), W1180 (used by the DDD project)
-and W30569 + W30572 (CGP).
-
