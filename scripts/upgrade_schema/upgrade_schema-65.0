@@ -1,0 +1,3 @@
+ALTER TABLE `run_info`
+MODIFY COLUMN `run_info_xml`
+mediumtext NOT NULL;
