@@ -8,10 +8,10 @@ use Fatal qw(open close);
 use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
 use List::MoreUtils qw { any };
-use DBI;
 use Readonly;
 use FindBin qw($Bin);
 
+use npg_tracking::Schema;
 use npg_qc::autoqc::checks::tag_metrics;
 use npg_qc::autoqc::qc_store;
 use npg_qc::autoqc::types;
@@ -24,7 +24,7 @@ with qw(npg_tracking::data::reference::find
 our $VERSION = '0';
 
 Readonly::Scalar my $SAMTOOLS_NAME => q[samtools];
-Readonly::Scalar our $EXT => q[bam];
+Readonly::Scalar my $EXT => q[bam];
 Readonly::Scalar my $BARCODE_FILENAME => q[sanger168.tags];
 Readonly::Scalar my $BID_JAR_NAME    => q[BamIndexDecoder.jar];
 Readonly::Scalar my $NUM_BACK_RUNS => 5;
@@ -44,7 +44,7 @@ Readonly::Scalar my $ID_INSTRUMENT_POS  => 2;
 Readonly::Scalar my $INSTRUMENT_NAME_POS  => 3;
 Readonly::Scalar my $SLOT_POS  => 4;
 
-Readonly::Scalar our $DEFAULT_JAVA_XMX => q{-Xmx1000m};
+Readonly::Scalar my $DEFAULT_JAVA_XMX => q{-Xmx1000m};
 
 has '+file_type' => (default => $EXT,);
 
@@ -380,7 +380,7 @@ has 'run_rows' => ( isa        => 'ArrayRef',
                   );
 sub _build_run_rows {
   my ($self) = @_;
-  return _fetch_run_rows($self->get_id_run);
+  return $self->_fetch_run_rows($self->get_id_run);
 }
 
 #########################################################################################################
@@ -620,22 +620,18 @@ override 'execute' => sub {
 # auxiliary subs
 ################
 
-sub _fetch_run_rows {
-  my ($id_run) = @_;
+has '_npgtracking_schema' => ( is         => 'ro',
+                               isa        => 'npg_tracking::Schema',
+                               lazy_build => 1,
+                             );
+sub _build__npgtracking_schema {
+  return npg_tracking::Schema->connect();
+}
 
-  ###############
-  # Connect to db
-  ###############
-  my $config_file = "$ENV{HOME}/.npg/npg_tracking-Schema";
-  my $db_config = Config::Auto::parse($config_file);
-  my $dbh;
-  eval {
-    Readonly::Scalar my $DB_CONNECT_TIMEOUT => 30;
-    local $SIG{ALRM} = sub { croak "database connection timed out\n" };
-    alarm $DB_CONNECT_TIMEOUT;
-    $dbh = DBI->connect($db_config->{live_ro}->{dsn}, $db_config->{live_ro}->{dbuser}) or croak q[Couldn't connect to database: ] . DBI->errstr;
-    alarm 0;
-  } or croak "Timeout connecting to database $db_config->{live_ro}->{dsn} as user $db_config->{live_ro}->{dbuser}\n";
+sub _fetch_run_rows {
+  my ($self, $id_run) = @_;
+
+  my $dbh = $self->_npgtracking_schema()->storage()->dbh();
 
   ###################
   # Prepare statement
