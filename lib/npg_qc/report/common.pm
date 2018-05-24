@@ -1,4 +1,4 @@
-package npg_qc::report::options;
+package npg_qc::report::common;
 
 use Moose::Role;
 use npg_qc::Schema;
@@ -52,13 +52,13 @@ __END__
 
 =head1 NAME
 
-npg_qc::report::options
+npg_qc::report::common
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Moose role. Common options for reporter scripts.
+Moose role. Common options/attributes for reporter scripts.
 
 =head1 SUBROUTINES/METHODS
 

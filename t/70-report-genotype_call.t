@@ -6,7 +6,8 @@ use Test::Warn;
 use Moose::Meta::Class;
 use npg_testing::db;
 use REST::Client;
-  
+use JSON;
+
 sub _create_schema {
   return Moose::Meta::Class->create_anon_class(
     roles => [qw/npg_testing::db/])->new_object()->create_test_db(
@@ -62,8 +63,36 @@ sub _get_data {
   return $row->$field;
 }
 
+sub _get_expected_data {
+ my $expected = {
+     data => {
+         attributes => [
+             {
+                 key   => "Primer_Panel",
+                 units => "panels",
+                 uuid  => "5084d51a-00e7-11e8-8f97-3c4a9275d6c8",
+                 value => "Pf_GRC1v1.0",
+             },
+             {
+                 key   => "Loci_tested",
+                 units => "bases",
+                 uuid  => "5084d51a-00e7-11e8-8f97-3c4a9275d6c8",
+                 value => '1695',
+             },
+             {
+                 key   => "Loci_passed",
+                 units => "bases",
+                 uuid  => "5084d51a-00e7-11e8-8f97-3c4a9275d6c8",
+                 value => '1502',
+             },
+             ],
+     },
+ }; 
+}
+
+
 subtest 'Successfully post 2 results' => sub {
-  plan tests => 10;
+  plan tests => 11;
 
   my $reporter = npg_qc::report::genotype_call->new(
      qc_schema   => $npg_qc_schema,
@@ -77,6 +106,9 @@ subtest 'Successfully post 2 results' => sub {
      ok (!_get_data($npg_qc_schema, $id, 'reported'), 'reporting time is not set');
      ok (!_get_data($npg_qc_schema, $id, 'reported_by'), 'reporting_by field is not set');
   }
+
+  my $toreport = $reporter->_construct_data($reporter->_data4reporting()->[0]);
+  is_deeply (decode_json($toreport), _get_expected_data(), q[data to send constucted correctly]);
 
   lives_ok { $reporter->load() } 'no error';
 

@@ -12,7 +12,7 @@ use JSON;
 use Carp;
 
 
-with 'npg_qc::report::options';
+with 'npg_qc::report::common';
 
 our $VERSION = '0';
 
@@ -232,7 +232,11 @@ npg_qc::report::genotype_call
 =head1 DESCRIPTION
 
   Reporter for genotype_call results. The plex-level results are posted to a 
-  Sequencescape URL. 
+  LIMs URL. Multiple results can be posted for the same sample which takes account 
+  of the fact that a sample could be run on different primer panels or re-run with 
+  the same panel on a different run. However it also means that if a duplicate result 
+  were to be reported it would also be entered into the LIMs successfully but with 
+  a more recent date.
 
 =head1 SUBROUTINES/METHODS
 
@@ -248,9 +252,10 @@ npg_qc::report::genotype_call
 =head2 load
   
   Retrieves all unreported plex-level genotype_call results and tries to post 
-  them to the Sequencescape qc results API. If successful, marks the genotype_call 
-  results as reported by setting a timestamp in the qc table. Unsuccessfull attempts 
-  are logged until a maximum number of failures is reached.
+  them to the LIMs qc results API. No account is currently taken of manual QC 
+  result for a plex, even if present. If a post is successful, genotype_call 
+  results are recorded as reported by setting a timestamp in the qc table. 
+  Unsuccessfull attempts are logged until a maximum number of failures is reached.
 
 =head1 DIAGNOSTICS
 

@@ -106,7 +106,7 @@ lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/mqc/outcomes/keys.pm
 lib/npg_qc/report/genotype_call.pm
-lib/npg_qc/report/options.pm
+lib/npg_qc/report/common.pm
 lib/npg_qc/Schema.pm
 lib/npg_qc/Schema/Composition.pm
 lib/npg_qc/Schema/Flators.pm

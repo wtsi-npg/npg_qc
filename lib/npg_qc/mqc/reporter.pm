@@ -11,7 +11,7 @@ use Readonly;
 
 use st::api::base;
 
-with qw{MooseX::Getopt npg_qc::report::options};
+with qw{MooseX::Getopt npg_qc::report::common};
 
 our $VERSION = '0';
 
