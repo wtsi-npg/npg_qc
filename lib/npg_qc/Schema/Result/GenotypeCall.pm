@@ -141,6 +141,22 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   data_type: 'text'
   is_nullable: 1
 
+=head2 reported
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  is_nullable: 1
+
+When results were reported to the LIMS
+
+=head2 reported_by
+
+  data_type: 'char'
+  is_nullable: 1
+  size: 128
+
+User who reported results to the LIMS
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -184,6 +200,14 @@ __PACKAGE__->add_columns(
   { data_type => 'text', is_nullable => 1 },
   'info',
   { data_type => 'text', is_nullable => 1 },
+  'reported',
+  {
+    data_type => 'timestamp',
+    datetime_undef_if_invalid => 1,
+    is_nullable => 1,
+  },
+  'reported_by',
+  { data_type => 'char', is_nullable => 1, size => 128 },
 );
 
 =head1 PRIMARY KEY
@@ -249,11 +273,13 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::genotype_call';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-05-09 14:43:55
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yt49E+/uzDRoLW7PM1qtVQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-05-14 16:35:48
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Z3A8Bv3NKskL8diAXznyaw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
+
+use Carp;
 
 our $VERSION = '0';
 
@@ -265,6 +291,16 @@ __PACKAGE__->has_many(
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
+
+sub update_reported {
+  my $self = shift;
+  my $time = shift || croak 'Failed to get reported time';
+  my $username = $ENV{'USER'} || croak 'Failed to get username';
+
+  return $self->update({'reported' => $time, 'reported_by' => $username});
+}
+
+
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -295,6 +331,10 @@ Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
 
 To simplify queries, skip SeqComposition and link directly to the linking table.
 
+=head2 update_reported
+
+Updates the value of reported to the provided timestamp and set reported_by. 
+
 =head1 DEPENDENCIES
 
 =over
@@ -316,6 +356,8 @@ To simplify queries, skip SeqComposition and link directly to the linking table.
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
+
+=item Carp
 
 =back
 
