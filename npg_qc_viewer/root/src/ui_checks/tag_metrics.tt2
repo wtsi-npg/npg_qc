@@ -73,7 +73,7 @@ Individual tags
     <td>[% code %]</td>
     <td class="sequence_string">[% code ? check.tags.$code : '&nbsp;' %]</td>
     <td class="raligned">[% check.reads_pf_count.$code | format_number %]</td>
-    <td class="raligned">[% FILTER format('%2.2f'); check.matches_pf_percent.$code * 100; END %]</td>
+    <td class="raligned">[% FILTER format('%2.1f'); check.matches_pf_percent.$code * 100; END %]</td>
   </tr>
 [%- END -%]
 </table>

@@ -458,11 +458,11 @@ subtest 'Tag metrics as first check in summary table' =>  sub {
   $mech->content_contains(q[<th rowspan="2">Tag</th><th>tag<br />metrics<br/>], q[Tag metrics next to tag column]); 
   $mech->content_contains(q[<td class="tag_info"><a href="#4025:8"></a></td> <td class="check_summary passed"><a href="#tmc_4025:8">69.52</a><br />], 
                           q[Original content for tag metrics for lane level]);
-  $mech->content_contains(q[<a href="#4025:8:1">1</a></td> <td class="check_summary outcome_unknown">0.66], q[Tag metrics for tag 1]);
-  $mech->content_contains(q[<a href="#4025:8:2">2</a></td> <td class="check_summary outcome_unknown">1.35], q[Tag metrics for tag 2]);
-  $mech->content_contains(q[<a href="#4025:8:3">3</a></td> <td class="check_summary failed">0.00], q[Tag metrics for tag 3]);
-  $mech->content_contains(q[<a href="#4025:8:4">4</a></td> <td class="check_summary outcome_unknown">0.65], q[Tag metrics for tag 4]);
-  $mech->content_contains(q[<a href="#4025:8:0">0</a></td> <td class="check_summary outcome_unknown">1.60], q[Tag metrics for tag 0]);
+  $mech->content_contains(q[<a href="#4025:8:1">1</a></td> <td class="check_summary outcome_unknown">0.7], q[Tag metrics for tag 1]);
+  $mech->content_contains(q[<a href="#4025:8:2">2</a></td> <td class="check_summary outcome_unknown">1.4], q[Tag metrics for tag 2]);
+  $mech->content_contains(q[<a href="#4025:8:3">3</a></td> <td class="check_summary failed">0.0], q[Tag metrics for tag 3]);
+  $mech->content_contains(q[<a href="#4025:8:4">4</a></td> <td class="check_summary outcome_unknown">0.7], q[Tag metrics for tag 4]);
+  $mech->content_contains(q[<a href="#4025:8:0">0</a></td> <td class="check_summary outcome_unknown">1.6], q[Tag metrics for tag 0]);
   
   $url = q[http://localhost/checks/runs?db_lookup=1&run=4025&lane=6&lane=7&lane=8&show=all];
   $mech->get_ok($url);
@@ -472,9 +472,9 @@ subtest 'Tag metrics as first check in summary table' =>  sub {
     $mech->content_contains(qq[<td class="tag_info"><a href="#4025:$i"></a></td> <td class="check_summary passed"><a href="#tmc_4025:$i">69.52</a><br />], 
                             q[Original content for tag metrics for lane level]);
     $mech->content_contains(qq[<th rowspan="2">Tag</th><th>tag<br />metrics<br/>], q[Tag metrics next to tag column]);
-    $mech->content_contains(qq[<a href="#4025:$i:1">1</a></td> <td class="check_summary outcome_unknown">0.66], qq[Tag metrics for lane $i tag 1]);
-    $mech->content_contains(qq[<a href="#4025:$i:3">3</a></td> <td class="check_summary failed">0.00], qq[Tag metrics for lane $i tag 3]);
-    $mech->content_contains(qq[<a href="#4025:$i:0">0</a></td> <td class="check_summary outcome_unknown">1.60], qq[Tag metrics for lane $i tag 0]);
+    $mech->content_contains(qq[<a href="#4025:$i:1">1</a></td> <td class="check_summary outcome_unknown">0.7], qq[Tag metrics for lane $i tag 1]);
+    $mech->content_contains(qq[<a href="#4025:$i:3">3</a></td> <td class="check_summary failed">0.0], qq[Tag metrics for lane $i tag 3]);
+    $mech->content_contains(qq[<a href="#4025:$i:0">0</a></td> <td class="check_summary outcome_unknown">1.6], qq[Tag metrics for lane $i tag 0]);
   }
 };
 
