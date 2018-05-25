@@ -15,6 +15,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - NovaSeq run info file size is around 95KB, too large for the text column type.
      Column type changed to mediumtext.
  - update Build.PL to make C programs only under precise
+ - upstream_tags autoqc check: standardise access to the tracking database
 
 release 64.6.3
  - update parsing of spatial filter stats in spatial_filter QC check
