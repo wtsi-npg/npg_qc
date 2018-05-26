@@ -19,7 +19,7 @@ local $ENV{'no_proxy'} = q[];
 local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc/insert_size];
 local $ENV{'PATH'} = join q[:], qq[$current_dir/blib/script] , $ENV{'PATH'};
 my $repos = catfile($current_dir, q[t/data/autoqc]);
-my $ref = catfile($repos, q[references]);
+my $ref = catfile($repos, q[reference]); # bwa index -p t/data/autoqc/reference /dev/null
 my $format = q[sam];
 my $test_bam = 0;
 
@@ -76,7 +76,7 @@ sub _additional_modules {
 
 {
   my $dir = tempdir( CLEANUP => 1 );
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'));
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'));
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $qc = npg_qc::autoqc::checks::insert_size->new(
@@ -238,7 +238,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     my $b1 = catfile($current_dir, q[t/data/autoqc/alignment.bam]);
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $b1);
@@ -282,7 +282,7 @@ sub _additional_modules {
   $eqc->result->num_well_aligned_reads(33);
   $eqc->result->reference($ref);
   $eqc->result->num_well_aligned_reads_opp_dir(undef);
-  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
+  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa0_6'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], _additional_modules));
   $eqc->result->add_comment('Not enough properly paired reads for normal fitting');
@@ -343,7 +343,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/insert_size/alignment_isize_normfit.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $check = npg_qc::autoqc::checks::insert_size->new(
@@ -370,7 +370,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -404,7 +404,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_small.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -427,7 +427,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 0 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_empty.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -465,7 +465,7 @@ sub _additional_modules {
   $eqc->result->sample_size(12500);
   $eqc->result->num_well_aligned_reads(0);
   $eqc->result->num_well_aligned_reads_opp_dir(undef);
-  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
+  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa0_6'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], _additional_modules));
   #### Construct expected  object: END ####
@@ -476,7 +476,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_one.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -521,7 +521,7 @@ sub _additional_modules {
   $eqc->result->num_well_aligned_reads_opp_dir(undef);
   $eqc->result->num_well_aligned_reads(1);
   $eqc->result->reference($ref);
-  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
+  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa0_6'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], _additional_modules));
   $eqc->result->add_comment('Not enough properly paired reads for normal fitting');
@@ -532,7 +532,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_one.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -604,7 +604,7 @@ sub _additional_modules {
   my $dir = tempdir( CLEANUP => 1 );
   t::autoqc_util::write_fastx_script(catfile($dir, 'fastx_reverse_complement'), 1);
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_few.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $qc = npg_qc::autoqc::checks::insert_size->new(
