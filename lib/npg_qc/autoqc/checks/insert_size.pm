@@ -25,6 +25,7 @@ with qw(
   npg_tracking::data::reference::find
   npg_common::roles::software_location
        );
+has '+aligner' => (default => 'bwa0_6', is => 'ro');
 
 our $VERSION = '0';
 
@@ -235,8 +236,8 @@ override 'execute'            => sub {
 
   if (!$self->reference) { return 1; }
 
-  $self->result->set_info( 'Aligner', $self->bwa_cmd() );
-  $self->result->set_info( 'Aligner_version',  $self->current_version( $self->bwa_cmd() ) );
+  $self->result->set_info( 'Aligner', $self->bwa0_6_cmd() );
+  $self->result->set_info( 'Aligner_version',  $self->current_version( $self->bwa0_6_cmd() ) );
   if($self->aligner_options()){
       $self->result->set_info( 'Aligner_options', $self->aligner_options() );
   }
@@ -485,7 +486,7 @@ sub _align {
 
     $_alignment_count++;
     my $output_sam = catfile($self->tmp_path, $_alignment_count . q[isize.sam]);
-    my $al = npg_common::Alignment->new($self->resolved_paths());
+    my $al = npg_common::Alignment->new({bwa_cmd => $self->bwa0_6_cmd}); # propagate bwa command
     $al->bwa_align_pe({ref_root => $self->reference, fastq1 => $sample_reads->[0], fastq2 => $sample_reads->[1], sam_out => $output_sam, fork_align => 0,});
     return $output_sam;
 }

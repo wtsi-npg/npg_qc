@@ -177,7 +177,7 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
 
 {
   my $dir = tempdir( CLEANUP => 1 );
-  my $bwa = join q[/], $dir, q[bwa];
+  my $bwa = join q[/], $dir, q[bwa0_6];
   `touch $bwa`;
   `chmod +x $bwa`;
   my $f = $dir . q[/2549_8_1.fastq];
@@ -189,7 +189,7 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
       id_run          => 2549,
       position        => 8,
       path            => $dir,
-      bwa_cmd         => $bwa,
+      bwa0_6_cmd         => $bwa,
       aligner_options => '-l 32 -k 2',
       reference       =>$test_reference,
       repository      => $repos,);
@@ -207,7 +207,7 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
       id_run          => 2549,
       position        => 7,
       path            => $dir,
-      bwa_cmd         => $bwa,
+      bwa0_6_cmd         => $bwa,
       aligner_options => '-l 32 -k 2',
       reference       => $test_reference,
       repository      => $repos,);
@@ -247,7 +247,7 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
                      repository => $repos,
                      reference => $test_reference);
    throws_ok {$error_check->execute() } 
-              qr[no 'bwa' executable is on the path],
+              qr[no 'bwa0_6' executable is on the path],
               'error since bwa executable is not on the path';
 }
 
