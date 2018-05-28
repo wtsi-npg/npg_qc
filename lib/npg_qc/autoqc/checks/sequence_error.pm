@@ -17,7 +17,7 @@ with qw(
   npg_common::roles::SequenceInfo
   npg_common::roles::software_location
 );
-
+has '+aligner' => (default => 'bwa0_6', is => 'ro');
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit RequireNumberSeparators)
@@ -124,13 +124,13 @@ override 'execute'    => sub {
   if(!$self->reference()){
     return 1;
   }
-  $self->bwa_cmd;
+  $self->bwa0_6_cmd;
   $self->process_all_fastqs();
 
   if (defined $self->_actual_sample_size) {
     $self->result->reference($self->reference);
-    $self->result->set_info( 'Aligner', $self->bwa_cmd );
-    $self->result->set_info( 'Aligner_version',  $self->current_version($self->bwa_cmd) );
+    $self->result->set_info( 'Aligner', $self->bwa0_6_cmd );
+    $self->result->set_info( 'Aligner_version',  $self->current_version($self->bwa0_6_cmd) );
 
     if($self->aligner_options()){
       $self->result->set_info( 'Aligner_options', $self->aligner_options() );
@@ -195,7 +195,7 @@ sub process_one_fastq{
   };
   #use input fastq, doing alignment
   my $alignment = npg_common::Alignment->new(
-                               $self->resolved_paths(), #propagate bwa command
+                               bwa_cmd => $self->bwa0_6_cmd, #propagate bwa command
                                bwa_options => $self->aligner_options(),
                              );
   eval{
