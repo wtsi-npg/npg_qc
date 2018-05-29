@@ -6,6 +6,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - tag_metics matches_pf_percent only stored to three decimals places now
    so trim in viewer
  - modified spatial filter qc check to read all run_lane filter.stats files
+ - changed naming of spatial_filter stats files to <run>_<lane>*.spatial_filter.stats
  - upstream_tags qc check - replaced bamindexdecoder with bambi decode
  - dropped ability for qc checks to sub-sample input fastq
      instead run the checks directly off the cached fastq files
