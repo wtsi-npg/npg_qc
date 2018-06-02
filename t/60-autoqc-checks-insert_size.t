@@ -24,6 +24,7 @@ my $format = q[sam];
 my $test_bam = 0;
 my $norm_fit = `which norm_fit`;
 chomp $norm_fit;
+$norm_fit = abs_path($norm_fit);
 
 use_ok('npg_qc::autoqc::results::insert_size');
 use_ok('npg_qc::autoqc::checks::insert_size');
