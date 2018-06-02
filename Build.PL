@@ -10,130 +10,15 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOF');
   use npg_tracking::util::abs_path qw(abs_path);
   use File::Basename;
 
-  my $C_SOURCE_DIR = q[src];
-
-  my $c_tools = {};
-
-  if (which('lsb_release') and `lsb_release -a` =~ /precise/ismx) {
-    $c_tools->{'fastq_summ'} = {'copy'     => [qw/fastq_summ/],
-                                'samtools' => 1};
-    $c_tools->{'fastqcheck'} = {'copy'     => [qw/fastqcheck/],
-                                'samtools' => 1};
-    $c_tools->{'gt_utils'} = {'copy'     => [qw/find_gt_match gt_pack/], };
-    $c_tools->{'norm_fit'} = {'copy'     => [qw/norm_fit/], };
-  }
-
-  sub _c_build_dir {
-    return join(q[/], $C_SOURCE_DIR, shift, 'build');
-  }
-
-  sub _c_src_dir {
-    return join(q[/], $C_SOURCE_DIR, shift);
-  }
-
-  sub _samtools_option {
-    my $self = shift;
-
-    my ($samtools, $htslib);
-
-    # Requires the samtools source code to build
-    if ($ENV{SAMTOOLS_SOURCE_PATH}) {
-      $samtools = $ENV{SAMTOOLS_SOURCE_PATH};
-    } else {
-      $samtools = _relative_to_bin('samtools')
-    }
-
-    if ($ENV{HTSLIB_INSTALL_PATH}) {
-      $htslib = $ENV{HTSLIB_INSTALL_PATH};
-    } else {
-      $htslib = _relative_to_bin('htsfile')
-    }
-
-    my @pkgs;
-    if ($samtools && $htslib) {
-      push @pkgs, "SAMTOOLS_LOC=$samtools";
-      push @pkgs, "HTSLIB_LOC=$htslib";
-
-      if ($self->verbose) {
-        warn "Found samtools source $samtools\n";
-        warn "Found htslib installed $htslib\n";
-      }
-    }
-
-    return \@pkgs;
-  }
-
-  sub _relative_to_bin {
-    my ($executable) = @_;
-
-    my $path;
-    my @found = which($executable);
-    if (@found) {
-      $path = dirname abs_path($found[0]);
-      if ($path =~ m{/bin\Z}smx) {
-        $path = dirname $path;
-      }
-    }
-
-    return $path;
-  }
-
   sub ACTION_build {
     my $self = shift;
     $self->SUPER::ACTION_build;
-
-    # Build C executables
-    foreach my $tool ( keys %{$c_tools} ) {
-      if ($self->verbose) {
-        warn "Building $tool\n";
-      }
-      my $bdir = _c_build_dir($tool);
-      make_path $bdir;
-      my $silent = $self->verbose ? q[] : '--silent';
-      my $extra_info = q[];
- 
-      if ($c_tools->{$tool}->{'samtools'}) {
-        my @pkgs = @{$self->_samtools_option()};
-        if (!@pkgs) {
-          warn 'samtools and htslib locations not declared or detected, ' .
-                 "skipping $tool build\n";
-          next;
-        }
-        $extra_info = join q[ ], @pkgs;
-      }
-
-      my $command = sprintf 'make %s --directory %s %s',
-                      $silent, _c_src_dir($tool), $extra_info;
-      if (system $command) {
-        die "Failed to compile $tool";
-      }
-      foreach my $ename ( @{$c_tools->{$tool}->{'copy'}} ) {
-        $self->copy_if_modified(
-          from    => join(q[/], $bdir, $ename),
-          to_dir  => join(q[/], $self->base_dir(), $self->blib(), 'script'),
-          flatten => 1);
-      }
-    }
 
     # Build R script
     $self->copy_if_modified(
       from    => 'lib/R/gc_bias_data.R',
       to_dir  => join(q[/], $self->base_dir(), $self->blib()),
       flatten => 0);
-  }
-
-  sub ACTION_clean {
-    my $self = shift;
-    $self->SUPER::ACTION_clean;
-
-    foreach my $tool ( keys %{$c_tools} ) {
-      if ($self->verbose) {
-        warn "Cleaning $tool\n";
-      }
-      my $silent = $self->verbose ? q[] : '--silent';
-      system "make clean $silent --directory " . _c_src_dir($tool);
-      remove_tree _c_build_dir($tool);
-    }
   }
 EOF
 
@@ -159,21 +44,21 @@ my $requires = {
                 'Fcntl'                           => 0,
                 'File::Basename'                  => 0,
                 'File::Glob'                      => 0,
-                'File::Path'                      => 0, 
+                'File::Path'                      => 0,
                 'File::Spec'                      => 0,
                 'File::Spec::Functions'           => 0,
                 'File::Slurp'                     => 0,
                 'File::Temp'                      => 0,
                 'FindBin'                         => '1.47',
                 'Getopt::Long'                    => '2.37',
-                'Getopt::Std'                     => 0,           
-                'HTTP::Request'                   => 0,          
+                'Getopt::Std'                     => 0,
+                'HTTP::Request'                   => 0,
                 'IPC::SysV'                       => 0,
                 'IO::Compress::Xz'                => '2.068',
                 'IO::Uncompress::UnXz'            => '2.068',
                 'JSON'                            => '2.12',
                 'JSON::XS'                        => 0,
-                'lib'                             => 0,            
+                'lib'                             => 0,
                 'List::MoreUtils'                 => 0,
                 'List::Util'                      => 0,
                 'LWP::UserAgent'                  => 0,
