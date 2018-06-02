@@ -463,7 +463,11 @@ sub _set_additional_modules_info {
     if ($self->use_reverse_complemented) {
         push @packages_info, q[FASTX Toolkit fastx_reverse_complement ] . $self->_fastx_version;
     }
-    push @packages_info, join q[ ], $self->norm_fit_cmd, $VERSION;
+    # norm_fit executable was moved from this project to
+    # https://github.com/wtsi-npg/npg_qc_utils
+    # Pending resolution of https://github.com/wtsi-npg/npg_qc/issues/68,
+    # we have to drop version info.
+    push @packages_info, join q[ ], $self->norm_fit_cmd;
     $self->result->set_info('Additional_Modules', ( join q[;], @packages_info ) );
     return;
 }

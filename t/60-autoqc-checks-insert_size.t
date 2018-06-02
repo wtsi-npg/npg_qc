@@ -44,7 +44,7 @@ sub _additional_modules {
   if ($use_fastx) {
     push @expected, q[FASTX Toolkit fastx_reverse_complement 0.0.12];
   }
-  push @expected, join(q[ ], $norm_fit, $npg_qc::autoqc::results::insert_size::VERSION);
+  push @expected, join(q[ ], $norm_fit);
   return @expected;
 }
 
