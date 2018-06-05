@@ -25,7 +25,6 @@ with qw(
   npg_tracking::data::reference::find
   npg_common::roles::software_location
        );
-has '+aligner' => (default => 'bwa0_6', is => 'ro');
 
 our $VERSION = '0';
 
@@ -60,7 +59,23 @@ Readonly::Scalar our $RANGE_EXPANSION_COEFF  => 0.25;
 Readonly::Scalar our $MAX_ISIZE_COEFF        => 2;
 Readonly::Scalar our $CHILD_ERROR_SHIFT      => 8;
 
+Readonly::Scalar my  $ALIGNER => 'bwa0_6';
+
 our $_alignment_count = 0; ## no critic (Variables::ProhibitPackageVars)
+
+=head2 aligner
+
+Aligner name, defaults to bwa0_6
+
+=cut
+
+#####
+# Overwrite builder nethod for the aligner attribute defined
+# in the npg_tracking::data::reference::find role
+#
+sub _build_aligner {
+  return $ALIGNER;
+}
 
 =head2 actual_sample_size
 

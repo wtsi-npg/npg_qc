@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 61;
+use Test::More tests => 62;
 use Test::Exception;
 use Test::Deep;
 use Perl6::Slurp;
@@ -64,6 +64,7 @@ sub _additional_modules {
                                               repository => $repos, 
                                                    );
   is($qc->can_run, 1, 'check can_run for a paired run');
+  is($qc->aligner, 'bwa0_6', 'default aligner');
 }
 
 {
