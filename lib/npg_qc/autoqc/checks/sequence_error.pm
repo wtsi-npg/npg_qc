@@ -17,7 +17,6 @@ with qw(
   npg_common::roles::SequenceInfo
   npg_common::roles::software_location
 );
-has '+aligner' => (default => 'bwa0_6', is => 'ro');
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins ProhibitStringySplit RequireNumberSeparators)
@@ -34,9 +33,25 @@ Readonly::Scalar our $LOW_RANGE           => 15;
 Readonly::Scalar our $MID_RANGE           => 30;
 Readonly::Scalar our $HIGH_RANGE          => 31;
 
+Readonly::Scalar my  $ALIGNER  => 'bwa0_6';
+
 use PDL::Lite; use PDL::Core qw(pdl); use PDL::Basic qw(yvals);
 Readonly::Scalar our $CIGAR_VALID_CHAR => q(MDINPHS);
 Readonly::Scalar our $NUM_TOP_CIGARS => 5;
+
+=head2 aligner
+
+Aligner name, defaults to bwa0_6
+
+=cut
+
+#####
+# Overwrite builder nethod for the aligner attribute defined
+# in the npg_tracking::data::reference::find role
+#
+sub _build_aligner {
+  return $ALIGNER;
+}
 
 =head2 reference
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use File::Copy;
-use Test::More tests => 63;
+use Test::More tests => 64;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw/ tempdir /;
@@ -173,6 +173,7 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
   is( $error_check->sample_size, 10000, 'default required sample size');
   my @fastq_files = $error_check->get_input_files ();
   is( $fastq_files[0], 't/data/autoqc/090721_IL29_2549/data/2549_2_1.fastq', 'correct first fastq full name');
+  is( $error_check->aligner, 'bwa0_6', 'default aligner');
 }
 
 {
