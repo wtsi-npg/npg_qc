@@ -13,7 +13,6 @@ use List::Util;
 use Perl6::Slurp;
 use Try::Tiny;
 
-use npg::api::run;
 use npg_qc::autoqc::types;
 use npg_qc::autoqc::parse::alignment;
 use npg_qc::autoqc::results::insert_size;
@@ -29,10 +28,10 @@ has '+aligner' => (default => 'bwa0_6', is => 'ro');
 
 our $VERSION = '0';
 
-Readonly::Scalar my $NORM_FIT_EXE                           => q[norm_fit];
-Readonly::Scalar my $NORM_FIT_MIN_PROPERLY_ALIGNED_PAIRS    => 5000;
-Readonly::Scalar my $NORM_FIT_MAX_BIN_THRESHOLD             => 0.9;
-Readonly::Scalar my $NORM_FIT_CONFIDENCE_PASS_LEVEL  => 0.0;
+Readonly::Scalar my $NORM_FIT_EXE                        => q[norm_fit];
+Readonly::Scalar my $NORM_FIT_MIN_PROPERLY_ALIGNED_PAIRS => 5000;
+Readonly::Scalar my $NORM_FIT_MAX_BIN_THRESHOLD          => 0.9;
+Readonly::Scalar my $NORM_FIT_CONFIDENCE_PASS_LEVEL      => 0.0;
 
 ## no critic (Documentation::RequirePodAtEnd RequireCheckingReturnValueOfEval ProhibitParensWithBuiltins RequireNumberSeparators)
 =head1 NAME
@@ -41,14 +40,17 @@ npg_qc::autoqc::checks::insert_size
 
 =head1 SYNOPSIS
 
-Inherits from npg_qc::autoqc::checks::check. See description of attributes in the documentation for that module.
+Inherits from npg_qc::autoqc::checks::check.
+See description of attributes in the documentation for that module.
+
   my $check = npg_qc::autoqc::checks::insert_size->new(
-          path => q[/staging/IL29/analysis/090721_IL29_3379/data], position => 1
+          qc_in => q[/staging/IL29/analysis/090721_IL29_3379/data], position => 1
                                                       );
 
 =head1 DESCRIPTION
 
-An insert size check performs paired alignment in order to determine the actual insert size, which is then compared to the insert size requested by the user.
+An insert size check performs paired alignment in order to determine the actual
+insert size, which is then compared to the insert size requested by the user.
 
 =head1 SUBROUTINES/METHODS
 
@@ -88,7 +90,7 @@ has 'aligner_options' => (isa             => 'Str',
 
 =head2 use_reverse_complemented
 
-a boolen flag to indicate whether reverse complemented fastq files should be produced,
+A boolen flag to indicate whether reverse complemented fastq files should be produced,
 aligned and analysed, defaults to 1
  
 =cut
@@ -176,26 +178,16 @@ has 'format'          => (isa             => 'Str',
 =head2 is_paired_read
 
 Boolean flag indicating whether both a forward and reverse reads are present.
+Defaults to true.
  
 =cut
 
-has 'is_paired_read'  => (isa             => 'Bool',
-                          is              => 'ro',
-                          required        => 0,
-                          lazy_build      => 1,
+has 'is_paired_read'  => (isa     => 'Bool',
+                          is      => 'ro',
+                          default => 1,
                          );
-sub _build_is_paired_read {
-  my $self = shift;
-  my $id_run = $self->get_id_run();
-  if (!$id_run) {
-    croak 'Data from multiple runs';
-  }
-  return npg::api::run->new({id_run => $id_run})->is_paired_read();
-}
 
-=head2 format
-
-format for paired alignment
+=head2 norm_fit_cmd
  
 =cut
 
@@ -523,13 +515,17 @@ __END__
 
 =item List::Util
 
-=item npg::api::run
+=item Perl6::Slurp
+
+=item Try::Tiny
 
 =item npg_tracking::data::reference::find
 
 =item npg_common::extractor::fastq
 
 =item npg_common::Alignment
+
+=item npg_common::roles::software_location
 
 =back
 
@@ -543,7 +539,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL, by Marina Gourtovaia
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

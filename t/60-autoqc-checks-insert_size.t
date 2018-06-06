@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 61;
+use Test::More tests => 59;
 use Test::Exception;
 use Test::Deep;
 use Perl6::Slurp;
@@ -68,10 +68,11 @@ sub _additional_modules {
 
 {
   my $qc = npg_qc::autoqc::checks::insert_size->new(
-                                              position  => 1, 
-                                              path      => 't/data/autoqc', 
-                                              id_run    => 3871,
-                                              repository => $repos, 
+                                              position       => 1, 
+                                              path           => 't/data/autoqc', 
+                                              id_run         => 3871,
+                                              is_paired_read => 0,
+                                              repository     => $repos, 
                                                    );
   is($qc->can_run, 0, 'check can_run for a single run');
 }
@@ -313,21 +314,8 @@ sub _additional_modules {
                                               reference => $ref,
                                               use_reverse_complemented => 0,
                                               format => $format,
-                                                   );
-  throws_ok { $qc->is_paired_read() } qr/Data from multiple runs/,
-    'error inferring whether reads are paired';
-  throws_ok { $qc->can_run() } qr/Data from multiple runs/,
-    'error inferring whether can run';
-
-  $qc = npg_qc::autoqc::checks::insert_size->new(
-                                              path      => 't/data/autoqc', 
-                                              rpt_list   => '1937:1;1938:2',
-                                              repository => $repos,
-                                              reference => $ref,
-                                              use_reverse_complemented => 0,
-                                              format => $format,
                                               is_paired_read => 0,
-                                                 );
+                                                   );
   is($qc->can_run(), 0, 'cannot run');
 
   $qc = npg_qc::autoqc::checks::insert_size->new(
