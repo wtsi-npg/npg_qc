@@ -1,26 +1,6 @@
 use strict;
 use warnings;
-use npg_tracking::util::build;
-
-my $class = npg_tracking::util::build->subclass(code => <<'EOF');
-  use strict;
-  use warnings;
-  use File::Path qw(make_path remove_tree);
-  use File::Which qw(which);
-  use npg_tracking::util::abs_path qw(abs_path);
-  use File::Basename;
-
-  sub ACTION_build {
-    my $self = shift;
-    $self->SUPER::ACTION_build;
-
-    # Build R script
-    $self->copy_if_modified(
-      from    => 'lib/R/gc_bias_data.R',
-      to_dir  => join(q[/], $self->base_dir(), $self->blib()),
-      flatten => 0);
-  }
-EOF
+use WTSI::DNAP::Utilities::Build;
 
 my $requires = {
                 'autodie'                         => 0,
@@ -101,7 +81,6 @@ my $requires = {
                 'npg_common::fastqcheck'                   => 0,
                 'npg_common::roles::software_location'     => 0,
                 'npg_common::sequence::reference::base_count'  => 0,
-                'npg_testing::db'                          => 0,
                 'npg_tracking::data::reference::list'      => 0,
                 'npg_tracking::data::bait::find'           => 0,
                 'npg_tracking::data::snv::find'            => 0,
@@ -147,17 +126,16 @@ my $build_requires = {
                 'npg_testing::db'                 => 0
 };
 
-my $builder = $class->new(
+my $builder = WTSI::DNAP::Utilities::Build->new(
 
                 'module_name'         => 'npg_qc',
-                'dist_author'         => q(npg <npg@sanger.ac.uk>),
-                'dist_version'        => $class->git_tag(),
+                'dist_author'         => q(wtsi-npg <npg@sanger.ac.uk>),
+                'dist_version'        => WTSI::DNAP::Utilities::Build->git_tag(),
                 'dist_abstract'       => 'Illumina and WTSI quality control for Illumina sequencing data',
                 'license'             => 'gpl',
 
           'configure_requires' => {
-                'ExtUtils::CBuilder'              => 0,
-                'npg_tracking::util::build'       => 0,
+                'WTSI::DNAP::Utilities::Build'    => 0,
           },
 
           'build_requires' => $build_requires,
