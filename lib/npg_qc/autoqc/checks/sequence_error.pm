@@ -120,7 +120,8 @@ override 'execute'    => sub {
 
   my $self = shift;
 
-  if(!super()) {return 1;}
+  super();
+
   if(!$self->reference()){
     return 1;
   }

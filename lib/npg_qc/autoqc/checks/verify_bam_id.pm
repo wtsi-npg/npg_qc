@@ -74,6 +74,8 @@ override 'can_run' => sub {
 override 'execute' => sub {
   my ($self) = @_;
 
+  super();
+
   if(!$self->can_run()) {
     return 1;
   }
@@ -88,8 +90,6 @@ override 'execute' => sub {
       . ' --vcf ' . $self->snv_file
       . ' --self --ignoreRG --minQ 20 --minAF 0.05 --maxDepth 500 --precise'
       . ' --out ' . $outfile;
-
-  if ( !super() ) { return 1; }
 
   $self->result->set_info('Verifier', $VERIFY_NAME);
   $self->result->set_info('Verify_options', $cmd_options);

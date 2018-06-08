@@ -86,7 +86,8 @@ sub _build_adapter_list {
 
 override 'execute' => sub {
     my ($self) = @_;
-    if(!super()) {return 1;}
+
+    super();
 
     my $short_fnames = $self->generate_filename_attr();
     my $i = 0;
