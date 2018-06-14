@@ -8,6 +8,7 @@ use Perl6::Slurp;
 use JSON;
 use Archive::Extract;
 use File::Spec::Functions qw( splitdir catdir);
+use File::Copy::Recursive qw(dircopy);
 
 use t::autoqc_util qw( write_samtools_script );
 
@@ -15,6 +16,9 @@ my $tempdir = tempdir(CLEANUP => 1);
 
 use_ok ('npg_qc::autoqc::results::bam_flagstats');
 use_ok ('npg_qc::autoqc::checks::bam_flagstats');
+
+my $data_dir = join q[/], $tempdir, 'bam_flagstats';
+dircopy('t/data/autoqc/bam_flagstats', $data_dir) or die 'Faile to copy';
 
 subtest 'test attributes and simple methods' => sub {
   plan tests => 4;
@@ -37,19 +41,24 @@ subtest 'test attributes and simple methods' => sub {
 subtest 'high-level parsing' => sub {
   plan tests => 10;
 
-  my $dups  = 't/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt';
-  my $fstat = 't/data/autoqc/bam_flagstats/4783_5.flagstat';
+  my $dups  = "$data_dir/4783_5_metrics_optical.txt";
+  my $fstat = "$data_dir/4783_5.flagstat";
+  my $bam = "$data_dir/4783_5.bam";
+  open my $fh, '>', $bam or die "Failed to open $bam: $!\n";
+  close $fh;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
                         id_run                 => 4783,
                         position               => 5,
+                        qc_in                  => $data_dir,
                         markdups_metrics_file  => $dups,
                         flagstats_metrics_file => $fstat,
                         related_results        => []
                        );
 
   my $expected = from_json(
-    slurp q{t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json}, {chomp=>1});
+    slurp qq{$data_dir/4783_5_bam_flagstats.json}, {chomp=>1});
+  $expected->{'path'} = $data_dir;
 
   lives_ok { $c->execute() } 'execute method is ok';
   my $r;
@@ -79,19 +88,24 @@ subtest 'high-level parsing' => sub {
 subtest 'high-level parsing, no markdup metrics' => sub {
   plan tests => 10;
 
-  my $fstat = 't/data/autoqc/bam_flagstats/24135_1#1.flagstat';
+  my $fstat = "$data_dir/24135_1#1.flagstat";
+  my $bam = "$data_dir/24135_1#1.bam";
+  open my $fh, '>', $bam or die "Failed to open $bam: $!\n";
+  close $fh;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
                         id_run                 => 24135,
                         position               => 1,
-                        tag_index              => 1,                       
+                        tag_index              => 1,
+                        qc_in                  => $data_dir,                      
                         flagstats_metrics_file => $fstat,
                         skip_markdups_metrics  => 1,                        
                         related_results        => []
                        );
 
   my $expected = from_json(
-    slurp q{t/data/autoqc/bam_flagstats/24135_1#1.bam_flagstats.json}, {chomp=>1});
+    slurp qq{$data_dir/24135_1#1.bam_flagstats.json}, {chomp=>1});
+  $expected->{'path'} = $data_dir;
 
   lives_ok { $c->execute() } 'execute method is ok';
   my $r;
@@ -258,6 +272,10 @@ subtest 'full functionality with full file sets' => sub {
       }
 
       my $sfile = join q[.], $fproot, $file_type;
+      open my $fh, '>', $sfile or die "Failed to open $sfile: $!\n";
+      close $fh;
+      note "created test file $sfile";
+
       if ($file_type eq 'bam') {
         $ref->{'input_files'} = [$sfile];
       } else {
@@ -312,7 +330,7 @@ subtest 'filename_root is given instead of input file' => sub {
 
   foreach my $subset ( qw(default phix) ) {
     foreach my $file_type ( qw(cram bam) ) {
-
+      
       my $local_qc_dir = join q[/], $qc_dir, $file_type;
       if (!-e $local_qc_dir) {
         mkdir $local_qc_dir;
@@ -333,10 +351,6 @@ subtest 'filename_root is given instead of input file' => sub {
         $ref->{'subset'} = $subset;
         $ref->{filename_root} = '17448_1#9_phix';
         $composition_digest = 'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb';
-      }
-
-      if ($file_type eq 'bam') {
-        unlink join q[.] , $fproot, $file_type;
       }
      
       my $r = npg_qc::autoqc::checks::bam_flagstats->new($ref);

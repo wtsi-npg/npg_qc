@@ -85,7 +85,7 @@ sub _build_adapter_list {
 override 'execute' => sub {
     my ($self) = @_;
 
-    if(!super()) {return 1;}
+    super();
 
     my ($bam_in) = @{$self->input_files};
     my $results = $self->_search_adapters_from_bam($bam_in);

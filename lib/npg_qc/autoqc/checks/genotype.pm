@@ -446,7 +446,7 @@ override 'can_run' => sub {
 override 'execute' => sub {
 	my ($self) = @_;
 
-	return 1 if super() == 0;
+	super();
 
 	if(!$self->can_run()) {
 		return 1;

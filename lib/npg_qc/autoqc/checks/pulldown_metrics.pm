@@ -96,7 +96,7 @@ override 'can_run' => sub {
 override 'execute' => sub {
     my ($self) = @_;
 
-    if (super() == 0) { return 1; }
+    super();
 
     my $can_run = $self->can_run();
     if ($self->messages->count) {

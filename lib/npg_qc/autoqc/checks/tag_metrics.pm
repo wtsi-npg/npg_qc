@@ -178,7 +178,8 @@ override 'can_run' => sub  {
 
 override 'execute' => sub  {
   my $self = shift;
-  if (!super()) { return 1;}
+
+  super();
 
   my $metrics_file = $self->input_files->[0];
   $self->result->metrics_file($metrics_file);

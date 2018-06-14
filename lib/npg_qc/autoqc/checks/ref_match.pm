@@ -217,7 +217,8 @@ override 'can_run' => sub {
 
 override 'execute' => sub {
     my ($self) = @_;
-    return 1 if !super();
+
+    super();
 
     if (!$self->can_run) {
       $self->result->add_comment(q[Cannot run ref_match check.]);

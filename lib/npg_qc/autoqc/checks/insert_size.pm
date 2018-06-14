@@ -215,7 +215,8 @@ override 'can_run'            => sub {
 
 override 'execute'            => sub {
   my $self = shift;
-  if(!super()) {return 1;}
+
+  super();
 
   if (!$self->can_run) {
       $self->result->add_comment(q[Cannot run insert size check.]);

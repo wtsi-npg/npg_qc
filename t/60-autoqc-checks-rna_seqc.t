@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Cwd qw/getcwd abs_path/;
-use Test::More tests => 6;
+use Test::More tests => 5;
 use Test::Exception;
 use Test::Warn;
 use Test::Deep;
@@ -64,32 +64,6 @@ subtest 'Find CLASSPATH' => sub {
     throws_ok {npg_qc::autoqc::checks::rna_seqc->new(id_run => 2, path => q[mypath], position => 1,)}
         qr/Can\'t find \'RNA-SeQC\.jar\' because CLASSPATH is not set/,
         q[Fails to create object when RNA-SeQC.jar not found];
-};
-
-subtest 'Input and output paths' => sub {
-    plan tests => 3;
-    throws_ok {
-      my $qc = npg_qc::autoqc::checks::rna_seqc->new(
-        id_run => 17550,
-        position => 3,
-        tag_index => 8,
-        path => q[nonexisting],
-        repository => $repos,);
-      $qc->execute()
-    } qr/directory nonexisting does not exist/, 'execute: error on nonexisting path';
-    my $run = 17550;
-    my $pos = 3;
-    my $tag = 13;
-    my $check = npg_qc::autoqc::checks::rna_seqc->new(
-        id_run => $run,
-        position => $pos,
-        tag_index => $tag,
-        path => 't/data/autoqc/rna_seqc/data',
-        repository => $repos);
-    lives_ok { $check->execute } 'no error when input not found';
-    my $filename_root = $check->result->filename_root;
-    my $output_dir_shouldbe = join q[/], $check->path, $filename_root.q[_rna_seqc];
-    is($check->output_dir, $output_dir_shouldbe, q[output directory is formed correctly]);
 };
 
 subtest 'Parse metrics' => sub {
