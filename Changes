@@ -1,6 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
 
+ - adapter autoqc check - discard code for fastq input
  - add genotype_call_results_reporter script to report genotype_call
    results to the LIMs
  - tag_metics matches_pf_percent only stored to three decimals places now

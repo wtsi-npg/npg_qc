@@ -1,7 +1,3 @@
-#########
-# Author:        Original copied from /software/pathogen/projects/protocols/lib/perl5/Protocols/QC/SlxQC.pm
-# Created:       24 September 2009
-
 package npg_qc::autoqc::checks::adapter;
 
 use Moose;
@@ -18,7 +14,6 @@ use Fcntl qw(:mode);
 use IPC::SysV qw(IPC_STAT IPC_PRIVATE);
 use Readonly;
 
-use npg_common::extractor::fastq qw/read_count/;
 use npg_tracking::data::reference::list;
 use npg_tracking::util::types;
 
@@ -27,7 +22,8 @@ with    qw(npg_common::roles::software_location);
 
 our $VERSION = '0';
 
-Readonly::Scalar our $LINES_PER_FASTQ_RECORD => 4;
+Readonly::Scalar my $EXT => q[bam];
+Readonly::Scalar my $LINES_PER_FASTQ_RECORD => 4;
 Readonly::Scalar my $ADAPTER_FASTA => q[adapters.fasta];
 
 Readonly::Scalar my $MINUS_ONE   => -1;
@@ -40,11 +36,13 @@ Readonly::Scalar my $REF_NAME_IND => 1;
 Readonly::Scalar my $START_MATCH_IND => 6;
 Readonly::Scalar my $END_MATCH_IND => 7;
 
-has 'adapter_fasta'  => ( isa        => 'NpgTrackingReadableFile',
-                          is         => 'ro',
-                          required   => 0,
-                          lazy_build  => 1,
-                        );
+has '+file_type'       => (default => $EXT,);
+
+has 'adapter_fasta'    => ( isa        => 'NpgTrackingReadableFile',
+                            is         => 'ro',
+                            required   => 0,
+                            lazy_build => 1,
+                          );
 sub _build_adapter_fasta {
     my $self = shift;
     my $repos = Moose::Meta::Class->create_anon_class(
@@ -52,25 +50,25 @@ sub _build_adapter_fasta {
     return File::Spec->catfile($repos, $ADAPTER_FASTA);
 }
 
-has 'aligner_path'  =>  ( is         => 'ro',
+has 'aligner_path'    =>  ( is        => 'ro',
+                           isa        => 'NpgCommonResolvedPathExecutable',
+                           required   => 0,
+                           coerce     => 1,
+                           default    => q[blat],
+                          );
+
+has 'bamtofastq_path' => ( is        => 'ro',
                           isa        => 'NpgCommonResolvedPathExecutable',
                           required   => 0,
                           coerce     => 1,
-                          default    => q[blat],
-                        );
+                          default    => q[bamtofastq],
+                         );
 
-has 'bamtofastq_path' => ( is         => 'ro',
-                         isa        => 'NpgCommonResolvedPathExecutable',
-                         required   => 0,
-                         coerce     => 1,
-                         default    => q[bamtofastq],
-                       );
-
-has 'adapter_list'  => (  is          => 'ro',
-                          isa         => 'ArrayRef',
-                          required    => 0,
-                          lazy_build  => 1,
-                        );
+has 'adapter_list'    => ( is          => 'ro',
+                           isa         => 'ArrayRef',
+                           required    => 0,
+                           lazy_build  => 1,
+                         );
 sub _build_adapter_list {
     my $self = shift;
 
@@ -89,56 +87,16 @@ override 'execute' => sub {
 
     super();
 
-    my $short_fnames = $self->generate_filename_attr();
-    my $i = 0;
-
-    if ($self->file_type eq q[bam]) {
-        my ($bam_in) = @{$self->input_files};
-        my $results = $self->_search_adapters_from_bam($bam_in);
-        $self->result->forward_read_filename($bam_in);
-        $self->result->forward_contaminated_read_count($results->{forward}{contam_read_count});
-        $self->result->forward_blat_hash($results->{forward}{contam_hash});
-        $self->result->forward_start_counts($results->{forward}{adapter_starts});
-        $self->result->reverse_read_filename($bam_in);
-        $self->result->reverse_contaminated_read_count($results->{reverse}{contam_read_count});
-        $self->result->reverse_blat_hash($results->{reverse}{contam_hash});
-        $self->result->reverse_start_counts($results->{reverse}{adapter_starts});
-
-    } else {
-      foreach my $fastq ( @{$self->input_files} ) {
-        $i++;
-        my $read_count = read_count($fastq);
-        my $read = ($i == 1) ? 'forward' : 'reverse';
-
-        my $file_method = $read . q{_read_filename};
-        $self->result->$file_method( $short_fnames->[$i-1] );
-        $file_method = $read . q{_fasta_read_count};
-        $self->result->$file_method($read_count);
-        $file_method = $read . q{_blat_hash};
-        $self->result->$file_method({});
-
-        if (!$read_count) {
-            $self->result->add_comment(qq[$fastq is empty]);
-            next;
-        }
-
-        my $results = $self->_search_adapters($fastq);
-
-        $file_method = $read . q{_contaminated_read_count};
-        $self->result->$file_method($results->{contam_read_count});
-
-        foreach my $adapter (@{ $self->adapter_list}) {
-            if (!exists $results->{contam_hash}->{$adapter}) {
-                $results->{contam_hash}->{$adapter} = 0;
-	    }
-        }
-        $file_method = $read . q{_blat_hash};
-        $self->result->$file_method($results->{contam_hash});
-
-        $file_method = $read . q{_start_counts};
-        $self->result->$file_method($results->{adapter_starts});
-      }
-    }
+    my ($bam_in) = @{$self->input_files};
+    my $results = $self->_search_adapters_from_bam($bam_in);
+    $self->result->forward_read_filename($bam_in);
+    $self->result->forward_contaminated_read_count($results->{'forward'}{'contam_read_count'});
+    $self->result->forward_blat_hash($results->{'forward'}{'contam_hash'});
+    $self->result->forward_start_counts($results->{'forward'}{'adapter_starts'});
+    $self->result->reverse_read_filename($bam_in);
+    $self->result->reverse_contaminated_read_count($results->{'reverse'}{'contam_read_count'});
+    $self->result->reverse_blat_hash($results->{'reverse'}{'contam_hash'});
+    $self->result->reverse_start_counts($results->{'reverse'}{'adapter_starts'});
 
     return;
 };
@@ -146,25 +104,6 @@ override 'execute' => sub {
 sub _blat_command {
     my $self = shift;
     return $self->aligner_path .  q[ ] . $self->adapter_fasta . q[ stdin stdout -tileSize=9 -maxGap=0 -out=blast8];
-}
-
-sub _search_adapters {
-    my ($self, $fastq) = @_;
-
-
-    my $command = q[/bin/bash -c "set -o pipefail && npg_fastq2fasta ] . qq[$fastq | ] . $self->_blat_command . q[" | ];
-    ## no critic (ProhibitTwoArgOpen)
-    open my $fh, $command or croak qq[Cannot fork '$command', error $ERRNO];
-    ## use critic
-    my $results = $self->_process_search_output($fh);
-    close $fh or carp qq[cannot close bad pipe '$command'];
-
-    my $child_error = $CHILD_ERROR >> $SHIFT_EIGHT;
-    if ($child_error != 0) {
-        croak qq[Error in pipe '$command': $child_error];
-    }
-
-    return $results;
 }
 
 sub _search_adapters_from_bam {
@@ -176,32 +115,32 @@ sub _search_adapters_from_bam {
 
     my $pm = Parallel::ForkManager->new(1, $tmpdir);
     $pm->run_on_finish( sub {
-      my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_structure_reference) = @_;
-      $self->result->forward_fasta_read_count($data_structure_reference->{forward_count});
-      $self->result->reverse_fasta_read_count($data_structure_reference->{reverse_count});
+        my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_structure_reference) = @_;
+        $self->result->forward_fasta_read_count($data_structure_reference->{forward_count});
+        $self->result->reverse_fasta_read_count($data_structure_reference->{reverse_count});
     });
     my $pid = $pm->start;
     ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
     if (! $pid) { #fork to convert BAM to fastq then into fasta whilst count forward and reverse reads
-      my ($fieldi, $fcount, $rcount) = (0,0,0);
-      my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->bamtofastq_path .
+        my ($fieldi, $fcount, $rcount) = (0,0,0);
+        my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->bamtofastq_path .
                         qq[ T=$tmpdir/bamtofastq filename=$bam ] . q[" |] ;
-      open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
-      open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
-      while (my $line = <$ifh>){
-        $fieldi++;
-        $fieldi%=$LINES_PER_FASTQ_RECORD;
-        if ($fieldi==1){ #count forward/rev, print fasta identifier
-          if ( substr($line, 0, 1, q(>)) ne q(@) ) {croak 'incorrect fastq format'}
-          $line=~m{^\S+/2\b}smx ? $rcount++ : $fcount++;
-          print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
-        }elsif($fieldi==2){ #print bases
-          print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
+        open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
+        open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
+        while (my $line = <$ifh>){
+            $fieldi++;
+            $fieldi%=$LINES_PER_FASTQ_RECORD;
+            if ($fieldi==1){ #count forward/rev, print fasta identifier
+                if ( substr($line, 0, 1, q(>)) ne q(@) ) {croak 'incorrect fastq format'}
+                    $line=~m{^\S+/2\b}smx ? $rcount++ : $fcount++;
+                    print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
+            }elsif($fieldi==2){ #print bases
+                print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
+            }
         }
-      }
-      close $ofh or croak qq[Cannot close fifo $tempfifo, error $ERRNO];
-      close $ifh or croak qq[Cannot close pipe $b2fqcommand, error $ERRNO];
-      $pm->finish(0,{forward_count => $fcount, reverse_count => $rcount}); # send counts
+        close $ofh or croak qq[Cannot close fifo $tempfifo, error $ERRNO];
+        close $ifh or croak qq[Cannot close pipe $b2fqcommand, error $ERRNO];
+        $pm->finish(0,{forward_count => $fcount, reverse_count => $rcount}); # send counts
     }
 
     my $command = qq[/bin/bash -c "set -o pipefail && cat $tempfifo | ] . $self->_blat_command . q[" |];
@@ -230,16 +169,16 @@ sub _process_search_output {
     # output being sorted by read then by adapter.
 
     my $results = {};
-    $results->{contam_hash} = {};
-    $results->{adapter_starts} = {};
-    $results->{forward} = {};
-    $results->{forward}{contam_read_count} = 0;
-    $results->{forward}{contam_hash} = { map {$_ => 0} @{$self->adapter_list} };
-    $results->{forward}{adapter_starts} = {};
-    $results->{reverse} = {};
-    $results->{reverse}{contam_read_count} = 0;
-    $results->{reverse}{contam_hash} = { map {$_ => 0} @{$self->adapter_list} };
-    $results->{reverse}{adapter_starts} = {};
+    $results->{'contam_hash'} = {};
+    $results->{'adapter_starts'} = {};
+    $results->{'forward'} = {};
+    $results->{'forward'}{'contam_read_count'} = 0;
+    $results->{'forward'}{'contam_hash'} = { map {$_ => 0} @{$self->adapter_list} };
+    $results->{'forward'}{'adapter_starts'} = {};
+    $results->{'reverse'} = {};
+    $results->{'reverse'}{'contam_read_count'} = 0;
+    $results->{'reverse'}{'contam_hash'} = { map {$_ => 0} @{$self->adapter_list} };
+    $results->{'reverse'}{'adapter_starts'} = {};
     my $read_count = 0;
 
     my ( $read, $match);
@@ -264,20 +203,24 @@ sub _process_search_output {
         if ( $read ne $previous_read ) {
             $direction = $read=~m{/2\z}smx ? q(reverse) : q(forward);
             $read_count++;
-            $results->{$direction}{contam_read_count}++;
-            $results->{contam_hash}->{$match}++;
-            $results->{$direction}{contam_hash}{$match}++;
+            $results->{$direction}{'contam_read_count'}++;
+            $results->{'contam_hash'}->{$match}++;
+            $results->{$direction}{'contam_hash'}{$match}++;
             if ($previous_start >= 0) {
-	        $results->{adapter_starts}->{$previous_start} = exists $results->{adapter_starts}->{$previous_start} ? $results->{adapter_starts}->{$previous_start} + 1 : 1;
-	        $results->{$direction}{adapter_starts}{$previous_start} = exists $results->{$direction}{adapter_starts}{$previous_start} ? $results->{$direction}{adapter_starts}{$previous_start} + 1 : 1;
-	    }
-	    $previous_start = $start;
+                $results->{'adapter_starts'}->{$previous_start} =
+                    exists $results->{'adapter_starts'}->{$previous_start} ?
+                    $results->{'adapter_starts'}->{$previous_start} + 1 : 1;
+                $results->{$direction}{'adapter_starts'}{$previous_start} =
+                    exists $results->{$direction}{'adapter_starts'}{$previous_start} ?
+                    $results->{$direction}{'adapter_starts'}{$previous_start} + 1 : 1;
+            }
+	          $previous_start = $start;
             next;
         }
 
         if ( $match ne $previous_match ) {
-            $results->{contam_hash}->{$match}++;
-            $results->{$direction}{contam_hash}{$match}++;
+            $results->{'contam_hash'}->{$match}++;
+            $results->{$direction}{'contam_hash'}{$match}++;
         }
         if ($start < $previous_start) { $previous_start = $start; }
 
@@ -286,11 +229,11 @@ sub _process_search_output {
         ( $previous_read, $previous_match) = ( $read, $match);
     }
     if ($previous_start >= 0) {
-        $results->{adapter_starts}->{$previous_start}++;
-        $results->{$direction}{adapter_starts}{$previous_start}++;
+        $results->{'adapter_starts'}->{$previous_start}++;
+        $results->{$direction}{'adapter_starts'}{$previous_start}++;
     }
 
-    $results->{contam_read_count} = $read_count;
+    $results->{'contam_read_count'} = $read_count;
     return $results;
 }
 
@@ -377,11 +320,17 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =item File::Basename
 
+=item Parallel::ForkManager
+
+=item File::Temp
+
+=item POSIX
+
+=item Fcntl
+
 =item File::Spec
 
 =item IPC::SysV
-
-=item npg_common::extractor::fastq
 
 =item npg_tracking::data::reference::list
 
@@ -408,7 +357,7 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
