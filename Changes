@@ -11,14 +11,17 @@ release 65.0
  - upstream_tags qc check - replaced bamindexdecoder with bambi decode
  - dropped ability for qc checks to sub-sample input fastq
      instead run the checks directly off the cached fastq files
- - added fastqcheck code and replaced fastq_summ in Build.PL with fastqcheck
  - NovaSeq changes, new InterOp file format and per lane read counts now 64-bit unsigned ints
  - make travis happy as running apt-get update by default was disabled.
  - NovaSeq run info file size is around 95KB, too large for the text column type.
      Column type changed to mediumtext.
- - update Build.PL to make C programs only under precise
  - upstream_tags autoqc check: standardise access to the tracking database
- - execute method of the parent autoqc check to error if input files do not exist
+ - 'execute' method of the parent autoqc check to error if input files do not exist
+ - dependency on tracking XML feeds removed
+ - bwa0_6 (newer bwa) explicitly requested where bwa aligner is used
+ - all C source code moved to https://github.com/wtsi-npg/npg_qc_utils, executables are
+   built by Conda https://github.com/wtsi-npg/npg_conda/tree/devel/recipes/npg_qc_utils/65.0;
+   Build.PL changed accordingly
 
 release 64.6.3
  - update parsing of spatial filter stats in spatial_filter QC check
