@@ -16,7 +16,6 @@ WTSI_NPG_BUILD_BRANCH=${WTSI_NPG_BUILD_BRANCH:=$TRAVIS_BRANCH}
 IRODS_RIP_DIR=${IRODS_RIP_DIR:+$IRODS_RIP_DIR}
 
 sudo apt-get install libgd2-xpm-dev # For npg_tracking
-sudo apt-get install liblzma-dev # For npg_qc
 
 # CPAN as in npg_npg_deploy
 cpanm --notest --reinstall App::cpanminus
@@ -25,6 +24,11 @@ cpanm --quiet --notest --reinstall MooseX::Role::Parameterized
 cpanm --quiet --notest Alien::Tidyp
 cpanm --quiet --notest LWP::Protocol::https
 cpanm --quiet --notest https://github.com/chapmanb/vcftools-cpan/archive/v0.953.tar.gz
+
+# Conda
+export PATH="$HOME/miniconda/bin:$PATH"
+conda create -q --name "$CONDA_TEST_ENV" python=$TRAVIS_PYTHON_VERSION
+conda install --name "$CONDA_TEST_ENV" npg_qc_utils
 
 # iRODS
 wget -q https://github.com/wtsi-npg/disposable-irods/releases/download/${DISPOSABLE_IRODS_VERSION}/disposable-irods-${DISPOSABLE_IRODS_VERSION}.tar.gz -O /tmp/disposable-irods-${DISPOSABLE_IRODS_VERSION}.tar.gz

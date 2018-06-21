@@ -209,7 +209,7 @@
         IF result.matches_pf_percent.exists("$tag_index");
           value = result.matches_pf_percent.${tag_index};
           IF value.defined;
-            FILTER format('%2.2f'); value * 100; END;
+            FILTER format('%2.1f'); value * 100; END;
           END;
         END;
       END;

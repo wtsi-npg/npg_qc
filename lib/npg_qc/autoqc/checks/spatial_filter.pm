@@ -9,12 +9,12 @@ extends qw(npg_qc::autoqc::checks::check);
 our $VERSION = '0';
 
 override 'execute' => sub {
-	my ($self) = @_;
-  my $filter_stats_file_name_glob = $self->qc_in . q{/} . $self->id_run . '_' . $self->position . q{*.filter.stats};
+  my ($self) = @_;
+  my $filter_stats_file_name_glob = $self->qc_in . q{/} . $self->id_run . '_' . $self->position . q{*.spatial_filter.stats};
   my @filter_stats_files = glob $filter_stats_file_name_glob or
     croak "Cannot find any filter stats files using $filter_stats_file_name_glob";
   $self->result->parse_output(\@filter_stats_files); #read stderr from spatial_filter -a for each sample
-	return 1;
+  return 1;
 };
 
 __PACKAGE__->meta->make_immutable();

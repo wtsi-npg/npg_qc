@@ -317,14 +317,33 @@ subtest 'finding input' => sub {
                 position  => 4,
                 path      => $path,
                 id_run    => 2549);
-    is(scalar $check->get_input_files(), 0, 'no input files found');
-    is(scalar @{$check->input_files}, 0, 'no input files found');
-    my $result;
-    lives_ok { $result = $check->execute } 'no error when no input files found';
-    is ($result, 0, 'execute returns zero when input not found');
-    is ($check->result->comments,
-        "Neither $path/2549_4_1.fastq nor $path/2549_4.fastq file found",
-        'comment when no input files found');
+    throws_ok { $check->execute }
+      qr/Neither .+ file found/,
+      'error when no input files found';
+    
+    $check = npg_qc::autoqc::checks::check->new(
+                position    => 4,
+                input_files => [],
+                id_run      => 2549);
+    throws_ok { $check->execute }
+    qr/input_files array cannot be empty/,
+      'error when input_files array is empty';
+
+    $check = npg_qc::autoqc::checks::check->new(
+                position    => 4,
+                input_files => ["$path/2549_6#1.bam", "$path/2549_4.fastq"],
+                id_run      => 2549);
+    throws_ok { $check->execute }
+    qr/Some of input files do not exist/,
+      'error when input_files array contains a file that does not exist';
+
+    $check = npg_qc::autoqc::checks::check->new(
+                position    => 4,
+                input_files => ["$path/2549_6#1.bam", "$path/2549_2.bam"],
+                id_run      => 2549);
+    my $count;
+    lives_ok { $count = $check->execute } 'no error all input files exist';
+    is ($count, 2, 'correct number of input files returned');
 
     throws_ok { npg_qc::autoqc::checks::check->new(
                     rpt_list  => '2549:1',

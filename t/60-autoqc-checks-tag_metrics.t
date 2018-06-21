@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 68;
+use Test::More tests => 66;
 use Test::Exception;
 
 use_ok('npg_qc::autoqc::checks::tag_metrics');
@@ -32,8 +32,6 @@ use_ok('npg_qc::autoqc::checks::tag_metrics');
                                                       id_run    => 2549);
  is(npg_qc::autoqc::checks::tag_metrics->spiked_control_description, 'SPIKED_CONTROL', 'spiked control description as a class method');
  is($check->spiked_control_description, 'SPIKED_CONTROL', 'spiked control description as an instance method');
- lives_ok {$check->execute(); } 'input file does not exist, invoking execute lives';
- is ($check->result->comments, 'Neither t/data/autoqc/090721_IL29_2549/data/2549_1_1.bam.tag_decode.metrics nor t/data/autoqc/090721_IL29_2549/data/2549_1.bam.tag_decode.metrics file found', 'comment with an error');
 }
 
 {
