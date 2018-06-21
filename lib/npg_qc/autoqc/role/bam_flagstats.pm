@@ -68,6 +68,14 @@ sub percent_singletons {
    return;
 }
 
+sub percent_target_proper_pair_mapped_reads {
+  my $self = shift;
+  if (defined $self->target_mapped_reads && defined $self->target_proper_pair_mapped_reads) {
+    return $PERCENTAGE * $self->target_proper_pair_mapped_reads / $self->target_mapped_reads;
+  }
+  return;
+}
+
 no Moose;
 
 1;
