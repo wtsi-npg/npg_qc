@@ -302,11 +302,11 @@ override 'can_run' => sub {
 
 override 'execute' => sub {
     my $self = shift;
+
+    super();
+
     my @comments;
     my $can_execute = 1;
-    if (super() == 0) {
-    	return 1;
-    }
     $self->result->set_info('Jar', qq[RNA-SeqQC $RNASEQC_JAR_NAME]);
     if($self->_reads_in_bam) {
         if (! $self->ref_genome) {

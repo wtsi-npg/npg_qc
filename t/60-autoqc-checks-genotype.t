@@ -15,7 +15,7 @@ my $dir = tempdir(CLEANUP => 1);
 my $st = join q[/], $dir, q[samtools];
 `touch $st`;
 `chmod +x $st`;
-my $bt = join q[/], $dir, q[bcftools1];
+my $bt = join q[/], $dir, q[bcftools];
 `touch $bt`;
 `chmod +x $bt`;
 local $ENV{PATH} = join q[:], $dir, $ENV{PATH};

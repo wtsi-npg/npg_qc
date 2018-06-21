@@ -150,7 +150,9 @@ sub _build_related_results {
 override 'execute' => sub {
   my $self = shift;
 
-  if( !$self->skip_markdups_metrics ) {
+  super();
+
+  if( !$self->skip_markdups_metrics ){
     $self->_parse_markdups_metrics();
   }
   if( $self->target_stats_file ) {

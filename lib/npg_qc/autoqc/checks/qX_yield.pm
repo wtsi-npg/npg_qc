@@ -50,7 +50,7 @@ has 'platform_is_hiseq' => (isa           => q[Bool],
 
 override 'execute'            => sub  {
   my $self = shift;
-  if (!super()) { return 1;}
+  super();
 
   my @fnames = @{$self->input_files};
   my $short_fnames = $self->generate_filename_attr();

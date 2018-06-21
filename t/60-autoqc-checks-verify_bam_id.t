@@ -71,8 +71,8 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 {
   my $h = {
       id_run         => 2549, 
-      position       => 4, 
-      qc_in          => 't/data/autoqc/', 
+      position       => 4,
+      input_files    => [qw(t/data/autoqc/alignment.bam)],
       bam_file       => 'alignment.bam',
       repository     => $repos,
       snv_repository => $snv_repository
