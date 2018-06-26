@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - handle target samtools stats file - parsing, archiving and viewing.
+
 release 65.0
  - adapter autoqc check - discard code for fastq input
  - add genotype_call_results_reporter script to report genotype_call

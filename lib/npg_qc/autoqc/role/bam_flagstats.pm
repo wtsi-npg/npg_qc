@@ -101,6 +101,8 @@ __END__
 
 =head2 percent_singletons
 
+=head2 percent_target_proper_pair_mapped_reads
+
 =head2 total_duplicate_reads
 
 =head2 total_mapped_reads
