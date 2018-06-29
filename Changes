@@ -22,6 +22,7 @@ release 65.0
  - all C source code moved to https://github.com/wtsi-npg/npg_qc_utils, executables are
    built by Conda https://github.com/wtsi-npg/npg_conda/tree/devel/recipes/npg_qc_utils/65.0;
    Build.PL changed accordingly
+ - bwa to bwa0_6 for rna_seqc rRNA alignment
 
 release 64.6.3
  - update parsing of spatial filter stats in spatial_filter QC check
