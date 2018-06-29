@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 65.1
+ - bwa to bwa0_6 for rna_seqc rRNA alignment
+
 release 65.0
  - adapter autoqc check - discard code for fastq input
  - add genotype_call_results_reporter script to report genotype_call
