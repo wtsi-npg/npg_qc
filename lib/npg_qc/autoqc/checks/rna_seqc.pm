@@ -28,7 +28,8 @@ Readonly::Scalar my $CHILD_ERROR_SHIFT => 8;
 Readonly::Scalar my $MAX_READS         => 100;
 Readonly::Scalar my $MIN_READS         => 50;
 Readonly::Scalar my $PAIRED_FLAG       => 0x1;
-Readonly::Scalar my $RRNA_ALIGNER      => q[bwa0_6];
+Readonly::Scalar my $RRNA_ALIGNER      => q[bwa0_5];
+Readonly::Scalar my $RRNA_ALIGNER_IDX  => q[bwa];
 Readonly::Scalar my $RRNA_STRAIN       => q[default_rRNA];
 Readonly::Scalar my $METRICS_FILE_NAME => q[metrics.tsv];
 Readonly::Scalar my $QUANT_FILE_NAME   => q[quant.genes.sf];
@@ -229,11 +230,23 @@ has 'ref_rrna' => (is       => 'ro',
 sub _build_ref_rrna {
     my $self = shift;
     my ($organism, $strain, $transcriptome) = $self->parse_reference_genome($self->lims->reference_genome);
-    $self->_set_aligner($RRNA_ALIGNER);
+    $self->_set_aligner($RRNA_ALIGNER_IDX);
     $self->_set_strain($RRNA_STRAIN);
     $self->_set_species($organism);
     my $ref_rrna = $self->refs->[0] // q[];
     return $ref_rrna;
+}
+
+has 'bwa_rrna' => (is            => 'ro',
+                   isa           => 'NpgCommonResolvedPathExecutable',
+                   coerce        => 1,
+                   lazy          => 1,
+                   builder       => '_build_bwa_rrna',
+                   documentation => q[Old version of bwa for rRNA alignments as downsampled bam not name sorted],);
+
+sub _build_bwa_rrna{
+  my $self = shift;
+  return $RRNA_ALIGNER;
 }
 
 has 'quant_file' => (is       => 'ro',
@@ -277,7 +290,7 @@ sub _command {
         $single_end_option = q[-singleEnd];
     }
     if($self->ref_rrna){
-        $ref_rrna_option = q[-BWArRNA ]. $self->ref_rrna;
+        $ref_rrna_option = q[-bwa ] . $self->bwa_rrna . q[ -BWArRNA ]. $self->ref_rrna;
     }
     my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
                                            $self->_java_jar_path,
