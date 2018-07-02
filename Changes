@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 65.1.1
  - explicitly use pre v6 bwa for rna_seqc rRNA alignment as input not name sorted 
    (tolerated in old version but not bwa0_6)
 
