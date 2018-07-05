@@ -24,7 +24,7 @@ sub transcripts_detected {
 sub get_comments {
     my $self = shift;
     if ($self->comments) {
-        return join("\n", $self->comments);
+        return join "\n", $self->comments;
     }
     return;
 }
@@ -55,6 +55,10 @@ __END__
 =head2 transcripts_detected
 
  Extract "Transcripts Detected" metric from column other_metrics.
+
+=head2 get_comments
+
+ Extract "comments" join them with new lines.
 
 =cut
 
