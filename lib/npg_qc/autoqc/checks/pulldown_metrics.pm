@@ -83,6 +83,11 @@ sub _build_picard_command {
 override 'can_run' => sub {
     my $self = shift;
 
+    if($self->num_components == 1 && defined $self->composition->get_component(0)->tag_index and $self->composition->get_component(0)->tag_index == 0) {
+        $self->messages->push('pulldown_metrics not run for tag#0 (no alignment)');
+
+        return 0;
+    }
     if(!$self->alignments_in_bam) {
         $self->messages->push('alignments_in_bam is false');
         return 0;
