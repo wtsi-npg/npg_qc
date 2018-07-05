@@ -21,6 +21,14 @@ sub transcripts_detected {
     return;
 }
 
+sub get_comments {
+    my $self = shift;
+    if ($self->comments) {
+        return join("\n", $self->comments);
+    }
+    return;
+}
+
 no Moose::Role;
 
 1;

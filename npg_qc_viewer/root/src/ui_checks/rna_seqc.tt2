@@ -2,7 +2,7 @@
 
 [% IF !check.genes_detected.defined; %]
      <div class="data_table">
-     <p> Reason: not an RNA alignment</p>
+     <p> [% check.get_comments %] </p>
      </div>
 [% ELSE %]
      <h6>mapped reads</h6>
@@ -48,11 +48,13 @@
      </tr>
      </table>
      </div>
-     <h6>globin metrics</h6>
+     <h6>gene metrics</h6>
      <div style='clear:both;' class="data_table">
-     <table title=globin_metrics>
-     <tr><th>globin % TPM</th></tr>
-     <tr><td align="right">[% IF check.globin_pct_tpm.defined; check.globin_pct_tpm | format_number(3,1); ELSE %]<span>na</span>[% END %]</td></tr>
+     <table title=gene_metrics>
+     <tr><th>globin % TPM</th><th>mitochondrial % TPM</th></tr>
+     <tr><td align="right">[% IF check.globin_pct_tpm.defined; check.globin_pct_tpm | format_number(3,1); ELSE %]<span>na</span>[% END %]</td>
+         <td align="right">[% IF check.mitochondrial_pct_tpm.defined; check.mitochondrial_pct_tpm | format_number(3,1); ELSE %]<span>na</span>[% END %]</td>
+     </tr>
      </table>
      </div>
      <div class="data_table">
