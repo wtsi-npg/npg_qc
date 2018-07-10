@@ -1,6 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - can_run returns false for pulldown_metrics check for tag 0
+ - genotype check does not require the existence of irods: input_files
 
 release 65.1.1
  - explicitly use pre v6 bwa for rna_seqc rRNA alignment as input not name sorted 
