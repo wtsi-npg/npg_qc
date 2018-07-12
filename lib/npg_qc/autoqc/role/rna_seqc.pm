@@ -21,14 +21,6 @@ sub transcripts_detected {
     return;
 }
 
-sub get_comments {
-    my $self = shift;
-    if ($self->comments) {
-        return join "\n", $self->comments;
-    }
-    return;
-}
-
 no Moose::Role;
 
 1;
@@ -55,6 +47,8 @@ __END__
 =head2 transcripts_detected
 
  Extract "Transcripts Detected" metric from column other_metrics.
+
+=cut
 
 =head2 get_comments
 

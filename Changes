@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 65.2
+ - add new metric mitochondrial genes content as mt_pct_tpm to RNA-SeQC check
  - can_run returns false for pulldown_metrics check for tag 0
 
 release 65.1.1

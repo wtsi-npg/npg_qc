@@ -1,8 +1,15 @@
 [% USE Number.Format(THOUSANDS_SEP=',') %]
 
+[% IF check.comments -%]
+[% END %]
+
 [% IF !check.genes_detected.defined; %]
      <div class="data_table">
-     <p> [% check.get_comments %] </p>
+     <table title="rna_seqc summary info">
+     [% IF check.comments -%]
+          <tr><th class="laligned">Comments</th><td>[% check.comments %]</td></tr>
+     [%- END %]
+     </table>
      </div>
 [% ELSE %]
      <h6>mapped reads</h6>
@@ -53,7 +60,7 @@
      <table title=gene_metrics>
      <tr><th>globin % TPM</th><th>mitochondrial % TPM</th></tr>
      <tr><td align="right">[% IF check.globin_pct_tpm.defined; check.globin_pct_tpm | format_number(3,1); ELSE %]<span>na</span>[% END %]</td>
-         <td align="right">[% IF check.mitochondrial_pct_tpm.defined; check.mitochondrial_pct_tpm | format_number(3,1); ELSE %]<span>na</span>[% END %]</td>
+         <td align="right">[% IF check.mt_pct_tpm.defined; check.mt_pct_tpm | format_number(3,1); ELSE %]<span>na</span>[% END %]</td>
      </tr>
      </table>
      </div>

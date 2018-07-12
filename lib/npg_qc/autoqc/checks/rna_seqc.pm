@@ -61,7 +61,7 @@ Readonly::Hash   my %RNASEQC_METRICS_FIELDS_MAPPING => {
     'rRNA'                                  => 'rrna',
     'rRNA rate'                             => 'rrna_rate',
     $GLOBIN_METRIC_NAME                     => 'globin_pct_tpm',
-    $MT_METRIC_NAME                         => 'mitochondrial_pct_tpm',
+    $MT_METRIC_NAME                         => 'mt_pct_tpm',
 };
 
 has '+file_type' => (default => $EXT,);
@@ -346,7 +346,7 @@ override 'execute' => sub {
             $can_execute = 0;
         }
     } else {
-        push @comments, q[BAM file has too few or no reads];
+        push @comments, q[BAM file has too few or no usable reads];
         $can_execute = 0;
     }
 
@@ -415,7 +415,7 @@ sub _parse_quant_file {
     if ($self->mt_genes_csv) {
         $self->_read_genes_file($self->mt_genes_csv, $mt_genes);
     }
-    my %quant_genes;
+    my %quant_genes = ('globin_sum' => 0, 'mt_sum' => 0);
     my $fh = IO::File->new($quant_file, 'r');
     while (my $line = $fh->getline) {
         my @quant_record = split /\t/smx, $line;

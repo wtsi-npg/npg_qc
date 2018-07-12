@@ -11,7 +11,7 @@ use_ok ('npg_qc::autoqc::checks::rna_seqc');
 $ENV{no_proxy} = '';
 $ENV{http_proxy} = 'http://wibble.do';
 
-my $dir = tempdir( CLEANUP => 0 );
+my $dir = tempdir( CLEANUP => 1 );
 
 local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/rna_seqc/samplesheet_17550.csv];
 local $ENV{CLASSPATH} = $dir;
@@ -210,11 +210,11 @@ subtest 'Argument input files' => sub {
         path => 't/data/autoqc/rna_seqc/data',
         repository => $repos,);
     lives_ok { $check->execute } 'execution ok for bam file with no reads';
-    like ($check->result->comments, qr/no reads/, 'comment when BAM file has no reads');
+    like ($check->result->comments, qr/no usable reads/, 'comment when BAM file has no reads');
 };
 
 subtest 'Role methods' => sub {
-    plan tests => 9;
+    plan tests => 6;
     my ($r, $om_value);
     use_ok('npg_qc::autoqc::role::rna_seqc');
     use_ok ('npg_qc::autoqc::results::rna_seqc');
@@ -222,9 +222,6 @@ subtest 'Role methods' => sub {
     lives_ok {$om_value = $r->other_metrics();} 'extract other metrics';
     is($r->transcripts_detected(), $om_value->{'Transcripts Detected'}, 'value extracted using role method');
     is($r->intronic_rate(), $om_value->{'Intronic Rate'}, 'value extracted using role method');
-    lives_ok {$r = npg_qc::autoqc::results::rna_seqc->load('t/data/autoqc/rna_seqc/data/15911_1#1.rna_seqc.json');} 'load serialised valid result';
-    lives_ok {$om_value = $r->comments();} 'extract comments';
-    is($r->get_comments(), 'BAM file is not RNA alignment', 'value extracted using role method');
 };
 
 
