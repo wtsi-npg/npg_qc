@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - skip incomplete tag zero results in genotype_call POSTing to LIMs
+
 release 65.2
  - add new metric mitochondrial genes content as mt_pct_tpm to RNA-SeQC check
  - can_run returns false for pulldown_metrics check for tag 0
