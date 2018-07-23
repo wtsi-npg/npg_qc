@@ -251,3 +251,14 @@
   batch_id: 27783
   team: A
   id_instrument_format: 10
+- id_run: 26294
+  id_instrument: 92
+  priority: 1
+  actual_cycle_count: 310
+  expected_cycle_count: 310
+  id_run_pair: 0
+  is_paired: 0
+  batch_id: 62620
+  flowcell_id: HLWFJCCXY 
+  team: A
+  id_instrument_format: 12
