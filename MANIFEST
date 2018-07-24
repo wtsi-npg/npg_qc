@@ -708,6 +708,7 @@ t/data/fixtures/npg_tracking/200-instrument.yml
 t/data/fixtures/npg_tracking/300-instrument_designation.yml
 t/data/fixtures/npg_tracking/300-run_lane.yml
 t/data/fixtures/npg_tracking/300-run.yml
+t/data/qc_store/26291#3_phix_F0x900.samtools_stats.json
 t/data/qc_store/26294/26294_1.insert_size.json
 t/data/qc_store/26294/26294_1.qX_yield.json
 t/data/qc_store/26294/26294_2.insert_size.json

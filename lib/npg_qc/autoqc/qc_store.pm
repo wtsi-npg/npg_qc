@@ -70,6 +70,14 @@ sub _build_qc_schema {
   return;
 }
 
+has '_checks_list' => ( isa        => 'ArrayRef',
+                        is         => 'ro',
+                        required   => 1,
+                        default    => sub {
+                          return npg_qc::autoqc::results::collection->new()->checks_list();
+                                          },
+                      );
+
 =head2 BUILD
 
 =cut
@@ -169,7 +177,10 @@ sub load_from_path {
   my $c = npg_qc::autoqc::results::collection->new();
 
   foreach my $file (glob(join q[ ], @patterns)) {
-    $c->add($self->_json2result($file));
+    my $r = $self->_json2result($file);
+    if ($r) {
+      $c->add($r);
+    }
   }
 
   return $c;
@@ -292,7 +303,7 @@ sub load_from_db {
 
   if ($self->use_db) {
     my $ti_key = 'tag_index';
-    foreach my $check_name (@{$c->checks_list()}) {
+    foreach my $check_name (@{$self->_checks_list()}) {
       my $dbix_query = { 'id_run' => $query->id_run};
       if (@{$query->positions}) {
         $dbix_query->{'position'} = $query->positions;
@@ -340,7 +351,7 @@ sub _json2result {
       ($class_name, my $dbix_class_name) =
           npg_qc::autoqc::role::result->class_names($class_name);
     }
-    if ($class_name) {
+    if ($class_name && any {$_ eq $class_name} @{$self->_checks_list()}) {
       my $module = $npg_qc::autoqc::results::collection::RESULTS_NAMESPACE . q[::] . $class_name;
       load_class($module);
       $result = $module->thaw($json_string);

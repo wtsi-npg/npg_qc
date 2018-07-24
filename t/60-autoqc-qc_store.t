@@ -33,7 +33,7 @@ sub _upload_data2db {
   my $ae = Archive::Extract->new(
       archive => 't/data/fixtures/autoqc_json.tar.gz');
   $ae->extract(to => $temp) or die $ae->error;
-  #note ("Data to be uploaded to the database:\n" . `find $temp`);
+  # note ("Data to be uploaded to the database:\n" . `find $temp`);
 
   npg_qc::autoqc::db_loader->new(
     schema => $schema,
@@ -74,7 +74,7 @@ subtest 'object creation' => sub {
 
 
 subtest 'loading data from directories' => sub {
-  plan tests => 8;
+  plan tests => 9;
  
   my $s =  npg_qc::autoqc::qc_store->new(use_db => 0);
   throws_ok { $s->load_from_path() }
@@ -95,6 +95,9 @@ subtest 'loading data from directories' => sub {
   $query = _build_query_obj({id_run => 3565});
   $collection = $s->load_from_path(qw(t/data/autoqc/rendered/json_paired_run), $query);
   is( $collection->size(), 16, '16 results for run 3565 from path' ); 
+
+  $collection = $s->load_from_path(qw(t/data/qc_store));
+  ok($collection->is_empty, 'sequence_summary result is not loaded'); 
   
   open my $fh, '>', "$temp/bad.json" or die 'cannot open file for writing';
   close $fh;
