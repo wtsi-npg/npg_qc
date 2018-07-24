@@ -5,7 +5,9 @@ use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Carp;
 
-use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
+use npg_qc::autoqc::qc_store::options qw/ $LANES
+                                          validate_option
+                                          option_to_string /;
 use npg_tracking::util::types;
 
 with qw/npg_tracking::glossary::run/;
@@ -34,9 +36,7 @@ has 'db_qcresults_lookup' => (isa     => 'Bool',
 
 sub BUILD {
   my $self = shift;
-  if ($self->option != $ALL && $self->option != $PLEXES && $self->option != $LANES) {
-    croak q[Unknown option for loading qc results: ] . $self->option;
-  }
+  validate_option($self->option);
 }
 
 sub to_string {
@@ -45,10 +45,8 @@ sub to_string {
   my $s = __PACKAGE__ . q[ object: run ] . $self->id_run;
   my $positions = @{$self->positions} ? (join q[ ], @{$self->positions}) : q[ALL];
   $s .= qq[, positions $positions];
-  my $option = $self->option == $LANES  ? q[LANES] :
-               $self->option == $ALL    ? q[ALL]   : q[PLEXES];
-  $s .= qq[, loading option $option];
-  $s .= q[, db_qcresults_lookup ] . $self->db_qcresults_lookup;
+  $s .=  q[, loading option ] . option_to_string($self->option);
+  $s .=  q[, db_qcresults_lookup ] . $self->db_qcresults_lookup;
 
   return $s;
 }
@@ -96,7 +94,7 @@ Called before returning an object to the caller, does some sanity checking.
 
 =head2 to_string
 
-Human friendly description of object.
+Human friendly description of the object.
 
 =head1 DIAGNOSTICS
 
