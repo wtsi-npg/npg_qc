@@ -37,6 +37,7 @@ has 'db_qcresults_lookup' => (isa     => 'Bool',
 sub BUILD {
   my $self = shift;
   validate_option($self->option);
+  return;
 }
 
 sub to_string {

@@ -33,7 +33,7 @@ sub _upload_data2db {
   my $ae = Archive::Extract->new(
       archive => 't/data/fixtures/autoqc_json.tar.gz');
   $ae->extract(to => $temp) or die $ae->error;
-  note ("Data to be uploaded to the database:\n" . `find $temp`);
+  #note ("Data to be uploaded to the database:\n" . `find $temp`);
 
   npg_qc::autoqc::db_loader->new(
     schema => $schema,

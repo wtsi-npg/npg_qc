@@ -12,7 +12,7 @@ use Class::Load qw/load_class/;
 
 use npg_tracking::illumina::runfolder;
 use npg_qc::Schema;
-use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
+use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES $MULTI/;
 use npg_qc::autoqc::qc_store::query;
 use npg_qc::autoqc::role::result;
 use npg_qc::autoqc::results::collection;
@@ -128,7 +128,10 @@ sub load_lanes {
 
 De-serializes objects from JSON files found in the directories given by the argument
 list of paths. If a query object is defined, selects objects corresponding to a run
-defined by the query object' id_run attribute.
+defined by the query object's id_run attribute. Path string can have glob expansion
+characters as per Perl glob function documentation.
+
+Errors if a list of paths is undefined or empty.
 
 Returns a collection object (npg_qc::autoqc::results::collection) containing autoqc
 result objects corresponding to JSON files.
@@ -148,23 +151,21 @@ defined in the query object,
 sub load_from_path {
   my ($self, @paths) = @_;
 
+  my $query;
+  if (@paths) {
+    $query = pop @paths;
+    if (ref $query ne 'npg_qc::autoqc::qc_store::query') {
+      push @paths, $query;
+      undef $query;
+    }
+  }
+
   if (!@paths) {
     croak 'A list of at least one path is required';
   }
 
-  my $query = pop @paths;
-  if (ref $query eq 'npg_qc::autoqc::qc_store::query') {
-    if (!@paths) {
-      croak 'A list of at least one path is required';
-    }
-  } else {
-    push @paths, $query;
-    undef $query;
-  }
-
   my $pattern = $query ? $query->id_run : q[];
   my @patterns = map { join q[/], $_ , $pattern . q[*.json] } uniq @paths;
-  my @lanes = $query ? @{$query->positions} : ();
   my $c = npg_qc::autoqc::results::collection->new();
 
   foreach my $file (glob(join q[ ], @patterns)) {
@@ -189,12 +190,11 @@ collection if run is not on staging or the run folder path was not found.
 
 =cut
 
-sub load_from_staging {
+sub load_from_staging { ##no critic (Subroutines::ProhibitExcessComplexity)
   my ($self, $query) = @_;
 
   defined $query or croak q[Query object should be defined];
 
-  my @collections = ();
   my $rfs;
   my $e;
   try {
@@ -207,35 +207,64 @@ sub load_from_staging {
     $e = $_;
   };
 
+  my $collection;
+
   if ($e) {
     carp sprintf 'Failed to load data from staging for query "%s" : "%s"',
          $query->to_string, $e;
   } else {
 
-    if ( $query->option == $LANES || $query->option == $ALL ) {
-      my $c = $self->load_from_path(($rfs->qc_path), $query);
-      if ($c->size && @{$query->positions}) {
-        my %lh = map { $_ => 1 } @{$query->positions};
-        my @in = grep { $lh{$_->position} } @{$c->results};
-        $c = npg_qc::autoqc::results::collection->new();
-        if (@in) {
-          $c->add(\@in);
-        }
-      }
-      push @collections, $c;
+    my $old_style = -e $rfs->qc_path;
+    my %lh = map { $_ => 1 } @{$query->positions};
+    my @per_lane_dirs = @{$query->positions}
+                        ? map { $rfs->lane_qc_path($_) } @{$query->positions}
+                        : @{$rfs->lane_qc_paths};
+
+    my @dirs = ();
+    #####
+    # QC results for merged entities, plex-level merge only for now
+    #
+    if ( $query->option == $MULTI ) {
+      push @dirs, join q[/], $rfs->archival_path, '*plex*', 'qc';
     }
 
+    #####
+    # Lane-level QC results
+    #
+    if ( $query->option == $LANES || $query->option == $ALL ) {
+      push @dirs, $old_style ? ($rfs->qc_path) : @per_lane_dirs;
+    }
+
+    #####
+    # Plex-level QC results for unmerged entities
+    #
     if ( $query->option == $PLEXES || $query->option == $ALL ) {
-      my @dirs = @{$query->positions}
-                 ? map { $rfs->lane_qc_path($_) } @{$query->positions}
-                 : @{$rfs->lane_qc_paths};
-      if (@dirs) {
-        push @collections, $self->load_from_path(@dirs, $query);
+      if ($old_style) {
+        push @dirs, @per_lane_dirs;
+      } else {
+        push @dirs, map {"$_/../plex*/qc"} @per_lane_dirs;
       }
+    }
+
+    if (@dirs) {
+      $collection = $self->load_from_path(@dirs, $query);
+    }
+
+    #####
+    # Filter results by position
+    # 
+    if (@{$query->positions} && $old_style && $collection->size &&
+        ($query->option == $LANES || $query->option == $ALL)) {
+      my @in = grep { $_->composition->num_components > 1 || $lh{$_->position} }
+               @{$collection->results};
+      $collection = npg_qc::autoqc::results::collection->new();
+      $collection->add(\@in);
     }
   }
 
-  return npg_qc::autoqc::results::collection->join_collections(@collections);
+  $collection ||= npg_qc::autoqc::results::collection->new();
+
+  return $collection;
 }
 
 =head2 load_from_db

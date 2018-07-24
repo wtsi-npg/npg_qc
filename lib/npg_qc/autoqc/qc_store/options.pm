@@ -20,7 +20,7 @@ Readonly::Scalar our $MULTI  => 4;
 Readonly::Hash my %OPTIONS2STRING => ($ALL    => 'ALL',
                                       $PLEXES => 'PLEXES',
                                       $LANES  => 'LANES',
-                                      $MULTI  => 'MULTI');
+                                      $MULTI  => 'MULTI',);
 
 sub validate_option {
   my $o = shift;
