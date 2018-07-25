@@ -1,12 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
 use Archive::Extract;
 use Moose::Meta::Class;
-use File::Copy qw/cp/;
+use File::Copy qw/cp mv/;
+use File::Path qw/make_path remove_tree/;
 
 use npg_testing::db;
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
@@ -114,7 +115,7 @@ subtest 'loading data from staging' => sub {
   my $run_row = $tracking_schema->resultset('Run')->find($id_run);
   $run_row or die "Run $id_run is not in test tracking db";
   $run_row->update({folder_name => $rf_name, folder_path_glob => $temp});
-  $tracking_schema->resultset('TagRun')->create(
+  $tracking_schema->resultset('TagRun')->update_or_create(
     {id_run  => $id_run,id_tag  => 14,id_user => 1}); # set staging tag
 
   my $model =  npg_qc::autoqc::qc_store->new(use_db => 0, qc_schema => undef);
@@ -214,6 +215,156 @@ subtest 'loading data from staging' => sub {
   $query = _build_query_obj({id_run => $id_run, positions => [3, 7], option => $ALL});
   $collection = $model->load($query);
   is($collection->size(), 4, 'results for two lanes, none with plexes');
+};
+
+subtest 'loading data from staging - new style directory structure' => sub {
+  plan tests => 18;
+  
+  my $id_run = 26294;
+  my $rf_name = '180711_HX4_B_HLWFJCCXY_NEW';
+  my $rfh = t::autoqc_util::create_runfolder($temp, {runfolder_name => $rf_name});
+  my $run_row = $tracking_schema->resultset('Run')->find($id_run);
+  $run_row or die "Run $id_run is not in test tracking db";
+  $run_row->update({folder_name => $rf_name, folder_path_glob => $temp});
+  $tracking_schema->resultset('TagRun')->update_or_create(
+    {id_run  => $id_run,id_tag  => 14,id_user => 1}); # set staging tag
+  
+  my $ar_path = $rfh->{'archive_path'};
+  my %lane_dirs = map {$_ => join(q[/], $ar_path, 'lane' . $_, 'qc')} (1 .. 8);
+  map {make_path $_} values %lane_dirs;
+  foreach my $p ((1 .. 8)) {
+    map { cp $_ , $lane_dirs{$p} } glob "t/data/qc_store/26294/*${p}.*.json";
+  }
+
+  my $model =  npg_qc::autoqc::qc_store->new(qc_schema => $schema, use_db => 0);
+  my $query = _build_query_obj({id_run => $id_run});
+  my $collection = $model->load($query);
+  is($collection->size(), 16, 'number of qc results from staging');
+
+  $query = _build_query_obj({id_run => $id_run,positions => [2,3]});
+  $collection = $model->load($query);
+  is($collection->size(), 4, 'selected results for two lanes');
+
+  $query = _build_query_obj({id_run => $id_run,positions => [2,5]});
+  $collection = $model->load($query);
+  is($collection->size(), 4, 'selected results for two lanes');
+
+  remove_tree $lane_dirs{5};
+
+  $query = _build_query_obj({id_run => $id_run});
+  $collection = $model->load($query);
+  is($collection->size(), 14, 'results for seven lanes');
+
+  $query = _build_query_obj({id_run => $id_run,positions => [2,5]});
+  $collection = $model->load($query);
+  is($collection->size(), 2, 'results for one lanes');
+  $query = _build_query_obj({id_run => $id_run,positions => [5]});
+  $collection = $model->load($query);
+  is($collection->size(), 0, 'no results');
+
+  $query = _build_query_obj({id_run => $id_run, option => $LANES});
+  $collection = $model->load($query);
+  is($collection->size(), 14, 'results for seven lanes');
+
+  $query = _build_query_obj({id_run => $id_run, option => $ALL});
+  $collection = $model->load($query);
+  is($collection->size(), 14, 'results for seven lanes');
+
+  $query = _build_query_obj({id_run => $id_run, positions => [2,3], option => $ALL});
+  $collection = $model->load($query);
+  is($collection->size(), 4, 'results for two lanes');
+
+  $query = _build_query_obj({id_run => $id_run, positions => [2,3], option => $PLEXES});
+  $collection = $model->load($query);
+  is($collection->size(), 0, 'no results for plexes');
+
+  my $plex3_qc = '/../plex3/qc';
+  make_path $lane_dirs{1} . $plex3_qc;
+  make_path $lane_dirs{2} . $plex3_qc;
+  map { cp $_ , $lane_dirs{1} . $plex3_qc } glob 't/data/qc_store/26294/*1.*.json';
+  map { cp $_ , $lane_dirs{2} . $plex3_qc } glob 't/data/qc_store/26294/*2.*.json';
+
+  $query = _build_query_obj({id_run => $id_run, option => $LANES});
+  $collection = $model->load($query);
+  is($collection->size(), 14, 'results for seven lanes');
+
+  $query = _build_query_obj({id_run => $id_run, option => $ALL});
+  $collection = $model->load($query);
+  is($collection->size(), 18, 'results for seven lanes, including two with plexes');
+
+  $query = _build_query_obj({id_run => $id_run, option => $PLEXES});
+  $collection = $model->load($query);
+  is($collection->size(), 4, 'results for two lanes with plexes');
+
+  $query = _build_query_obj({id_run => $id_run, positions => [1, 2], option => $PLEXES});
+  $collection = $model->load($query);
+  is($collection->size(), 4, 'results for two lanes with plexes');
+
+  $query = _build_query_obj({id_run => $id_run, positions => [1, 2, 7], option => $PLEXES});
+  $collection = $model->load($query);
+  is($collection->size(), 4, 'results for two lanes with plexes');
+
+  $query = _build_query_obj({id_run => $id_run, positions => [1, 2, 7], option => $ALL});
+  $collection = $model->load($query);
+  is($collection->size(), 10, 'results for three lanes, including two with plexes');
+
+  $query = _build_query_obj({id_run => $id_run, positions => [1, 7], option => $ALL});
+  $collection = $model->load($query);
+  is($collection->size(), 6, 'results for two lanes, including one with plexes');
+
+  $query = _build_query_obj({id_run => $id_run, positions => [3, 7], option => $ALL});
+  $collection = $model->load($query);
+  is($collection->size(), 4, 'results for two lanes, none with plexes');
+};
+
+subtest 'loading data from staging - new style directory structure, merges' => sub {
+  plan tests => 7;
+  
+  my $id_run = 26291;
+  my $rf_name = '180711_HX4_B_HLWFJCCXY_NEWM';
+  my $rfh = t::autoqc_util::create_runfolder($temp, {runfolder_name => $rf_name});
+  my $run_row = $tracking_schema->resultset('Run')->find($id_run);
+  $run_row or die "Run $id_run is not in test tracking db";
+  $run_row->update({folder_name => $rf_name, folder_path_glob => $temp});
+  $tracking_schema->resultset('TagRun')->update_or_create(
+    {id_run  => $id_run,id_tag  => 14,id_user => 1}); # set staging tag
+  
+  my $ar_path = $rfh->{'archive_path'};
+  map { `cp -R $_ $ar_path`} map {'t/data/qc_store/26291/' . $_}
+    qw/lane1  lane2  plex0  plex11  plex3/;
+
+  my $model =  npg_qc::autoqc::qc_store->new(qc_schema => $schema, use_db => 0);
+  my $query = _build_query_obj({id_run => $id_run, option => $LANES});
+  my $collection = $model->load($query);
+  is($collection->size(), 2, 'a total of two results for two lanes');
+
+  $query = _build_query_obj({id_run => $id_run, option => $PLEXES});
+  $collection = $model->load($query);
+  is($collection->size(), 9, 'nine results for three plexes');
+
+  $query = _build_query_obj({id_run => $id_run, option => $ALL});
+  $collection = $model->load($query);
+  is($collection->size(), 9, 'nine results for three plexes, no lane results');
+ 
+  $query = _build_query_obj({id_run => $id_run, option => $ALL, positions => [1]});
+  $collection = $model->load($query);
+  is($collection->size(), 9, 'no lane filtering');
+
+  $query = _build_query_obj({id_run => $id_run, option => $PLEXES, positions => [1]});
+  $collection = $model->load($query);
+  is($collection->size(), 9, 'no lane filtering');
+  
+  make_path $ar_path . '/lane1-2';
+  map {mv  $_, $ar_path . '/lane1-2' . $_}
+  map {join q[/], $ar_path, $_} qw/plex0  plex11  plex3/;
+
+  $query = _build_query_obj({id_run => $id_run, option => $PLEXES});
+  $collection = $model->load($query);
+  is($collection->size(), 9, 'nine results for three plexes');
+
+  $query = _build_query_obj({id_run => $id_run, option => $ALL});
+  $collection = $model->load($query);
+  is($collection->size(), 9, 'nine results for three plexes, no lane results');
 };
 
 subtest 'loading data from the database' => sub {

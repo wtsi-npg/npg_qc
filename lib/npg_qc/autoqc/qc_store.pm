@@ -232,37 +232,55 @@ sub load_from_staging { ##no critic (Subroutines::ProhibitExcessComplexity)
                         : @{$rfs->lane_qc_paths};
 
     my @dirs = ();
-    #####
-    # QC results for merged entities, plex-level merge only for now
-    #
-    if ( $query->option == $MULTI ) {
-      push @dirs, join q[/], $rfs->archival_path, '*plex*', 'qc';
-    }
+    my @collections = ();
+    my $merged = 0;
 
     #####
-    # Lane-level QC results
-    #
-    if ( $query->option == $LANES || $query->option == $ALL ) {
-      push @dirs, $old_style ? ($rfs->qc_path) : @per_lane_dirs;
-    }
-
-    #####
-    # Plex-level QC results for unmerged entities
+    # Plex-level QC results for either merged or unmerged entities,
+    # but not both.
     #
     if ( $query->option == $PLEXES || $query->option == $ALL ) {
       if ($old_style) {
         push @dirs, @per_lane_dirs;
       } else {
-        push @dirs, map {"$_/../plex*/qc"} @per_lane_dirs;
+        if (@per_lane_dirs) {
+          my @tdirs = map {"$_/../*plex*/qc"} @per_lane_dirs;
+          $collection = $self->load_from_path(@tdirs, $query);
+        }
+        # No results for one component compositions - try merges
+        if (!$collection || $collection->is_empty) {
+          my @tdirs;
+          push @tdirs, join q[/], $rfs->archive_path, 'plex*', 'qc';
+          push @tdirs, join q[/], $rfs->archive_path, 'lane*-', 'plex*', 'qc';
+          $collection = $self->load_from_path(@tdirs, $query);
+          if ($collection->size) {
+            $merged = 1;
+          }
+        }
+        if ($collection->size) {
+          push @collections, $collection;
+        }
       }
     }
 
-    if (@dirs) {
-      $collection = $self->load_from_path(@dirs, $query);
+    #####
+    # Lane-level QC results. Do not add lanes for $ALL option if results
+    # for merged entities are present - it would be wrong to display two
+    # types of results together.
+    #
+    # We should deal with lane-level merges here - TODO.
+    #
+    if ( $query->option == $LANES || ($query->option == $ALL && !$merged) ) {
+      push @dirs, $old_style ? ($rfs->qc_path) : @per_lane_dirs;
     }
 
+    if (@dirs) {
+      push @collections, $self->load_from_path(@dirs, $query);
+    }
+    $collection = npg_qc::autoqc::results::collection->join_collections(@collections);
+
     #####
-    # Filter results by position
+    # Filter results for one-component compositions by position.
     # 
     if (@{$query->positions} && $old_style && $collection->size &&
         ($query->option == $LANES || $query->option == $ALL)) {
