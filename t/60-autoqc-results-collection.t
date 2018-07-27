@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 58;
+use Test::More tests => 57;
 use Test::Exception;
 use List::MoreUtils qw/none/; 
 use File::Temp qw/tempdir/;
@@ -171,15 +171,6 @@ my $temp = tempdir( CLEANUP => 1);
     $c->add(npg_qc::autoqc::results::insert_size->new(position => 8, id_run => 13));
     $c->add(npg_qc::autoqc::results::insert_size->new(position => 6, id_run => 14));
     $c->add(npg_qc::autoqc::results::insert_size->new(position => 2, id_run => 14));
-
-    my $expected = {};
-    $expected->{q[12:8]} = {position => 8, id_run => 12,};
-    $expected->{q[12:7]} = {position => 7, id_run => 12,};
-    $expected->{q[13:8]} = {position => 8, id_run => 13,};
-    $expected->{q[14:2]} = {position => 2, id_run => 14,};
-    $expected->{q[14:6]} = {position => 6, id_run => 14,};
-
-    is_deeply($c->run_lane_map(), $expected, 'run-lane map generated');
 
     my $rlc = $c->run_lane_collections;
     my $c1 = $rlc->{q[12:8]};

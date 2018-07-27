@@ -5,7 +5,6 @@
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
   checks_info = collection_all.check_names; # used in collapser menu template too
-
   tag_metrics_cache = {};
   temp = [];
   FOREACH check_name IN checks_info.list;
@@ -88,7 +87,7 @@
     FOREACH lane_key IN sorted_rl_map_keys;
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
-      attrs = util.inflate_rpt_key(lane_key);
+      attrs = util.rpt_list2one_hash(lane_key);
       id_run   = attrs.id_run;
       id_runs_in_collection.push(id_run);
       position  = attrs.position;
