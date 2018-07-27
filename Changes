@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 65.3
+ - fixed bug in cluster_density calculation where no TileMetrics interop
+   file exists
+
 release 65.2
  - add new metric mitochondrial genes content as mt_pct_tpm to RNA-SeQC check
  - can_run returns false for pulldown_metrics check for tag 0
