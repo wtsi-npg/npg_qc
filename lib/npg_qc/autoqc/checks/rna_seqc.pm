@@ -26,9 +26,10 @@ Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $RNASEQC_JAR_NAME  => q[RNA-SeQC.jar];
 Readonly::Scalar my $CHILD_ERROR_SHIFT => 8;
 Readonly::Scalar my $MAX_READS         => 100;
-Readonly::Scalar my $MIN_READS         => 50;
+Readonly::Scalar my $MIN_READS         => 1000;
 Readonly::Scalar my $PAIRED_FLAG       => 0x1;
-Readonly::Scalar my $RRNA_ALIGNER      => q[bwa];
+Readonly::Scalar my $RRNA_ALIGNER      => q[bwa0_5];
+Readonly::Scalar my $RRNA_ALIGNER_IDX  => q[bwa];
 Readonly::Scalar my $RRNA_STRAIN       => q[default_rRNA];
 Readonly::Scalar my $METRICS_FILE_NAME => q[metrics.tsv];
 Readonly::Scalar my $QUANT_FILE_NAME   => q[quant.genes.sf];
@@ -38,6 +39,7 @@ Readonly::Scalar my $COL_QUANT_GENEID  => 0;
 Readonly::Scalar my $COL_GENEID        => 0;
 Readonly::Scalar my $COL_GENENAME      => 1;
 Readonly::Scalar my $GLOBIN_METRIC_NAME=> q[Globin % TPM];
+Readonly::Scalar my $MT_METRIC_NAME    => q[Mitochondrial % TPM];
 Readonly::Scalar my $TEN_THOUSAND      => 10_000;
 
 # Globin metric is not part of RNA-SeQC, its name is arbitrary and has been
@@ -59,6 +61,7 @@ Readonly::Hash   my %RNASEQC_METRICS_FIELDS_MAPPING => {
     'rRNA'                                  => 'rrna',
     'rRNA rate'                             => 'rrna_rate',
     $GLOBIN_METRIC_NAME                     => 'globin_pct_tpm',
+    $MT_METRIC_NAME                         => 'mt_pct_tpm',
 };
 
 has '+file_type' => (default => $EXT,);
@@ -116,14 +119,12 @@ has '_reads_in_bam' => (is      => 'ro',
 sub _build_reads_in_bam {
     my ($self) = @_;
     my $read_lines = 0;
-    my $view_command = $self->samtools_cmd. q[ view ]. $self->_bam_file. q[ 2>/dev/null | ]; #TODO: run samtools view only once for all the methods that depend on it
+    # count mapped reads only
+    my $view_command = $self->samtools_cmd. q[ view -c -F 260 ]. $self->_bam_file. q[ 2>/dev/null | ];
     my $ph = IO::File->new($view_command) or croak "Error viewing bam: $OS_ERROR\n";
-    while (my $line = $ph->getline){
-       $read_lines++;
-       last if $read_lines > $MIN_READS;
-    }
+    my $count = $ph->getline;
     $ph->close();
-    return $read_lines > $MIN_READS ? 1 : 0;
+    return $count >= $MIN_READS ? 1 : 0;
 }
 
 has '_is_paired_end' => (is      => 'ro',
@@ -229,11 +230,23 @@ has 'ref_rrna' => (is       => 'ro',
 sub _build_ref_rrna {
     my $self = shift;
     my ($organism, $strain, $transcriptome) = $self->parse_reference_genome($self->lims->reference_genome);
-    $self->_set_aligner($RRNA_ALIGNER);
+    $self->_set_aligner($RRNA_ALIGNER_IDX);
     $self->_set_strain($RRNA_STRAIN);
     $self->_set_species($organism);
     my $ref_rrna = $self->refs->[0] // q[];
     return $ref_rrna;
+}
+
+has 'bwa_rrna' => (is            => 'ro',
+                   isa           => 'NpgCommonResolvedPathExecutable',
+                   coerce        => 1,
+                   lazy          => 1,
+                   builder       => '_build_bwa_rrna',
+                   documentation => q[Old version of bwa for rRNA alignments as downsampled bam not name sorted],);
+
+sub _build_bwa_rrna{
+  my $self = shift;
+  return $RRNA_ALIGNER;
 }
 
 has 'quant_file' => (is       => 'ro',
@@ -259,6 +272,17 @@ sub _build_globin_genes_csv {
     return $globin_file;
 }
 
+has 'mt_genes_csv' => (is       => 'ro',
+                       isa      => 'Str',
+                       lazy     => 1,
+                       builder  => '_build_mt_genes_csv',);
+
+sub _build_mt_genes_csv {
+    my $self = shift;
+    my $mt_file = $self->mt_file // q[];
+    return $mt_file;
+}
+
 has '_results' => (traits  => ['Hash'],
                    isa     => 'HashRef',
                    is      => 'ro',
@@ -277,7 +301,7 @@ sub _command {
         $single_end_option = q[-singleEnd];
     }
     if($self->ref_rrna){
-        $ref_rrna_option = q[-BWArRNA ]. $self->ref_rrna;
+        $ref_rrna_option = q[-bwa ] . $self->bwa_rrna . q[ -BWArRNA ]. $self->ref_rrna;
     }
     my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
                                            $self->_java_jar_path,
@@ -322,7 +346,7 @@ override 'execute' => sub {
             $can_execute = 0;
         }
     } else {
-        push @comments, q[BAM file has no reads];
+        push @comments, q[BAM file has too few or no usable reads];
         $can_execute = 0;
     }
 
@@ -331,10 +355,8 @@ override 'execute' => sub {
         $self->result->add_comment($can_run_message);
         return 1;
     }
-    # globin metric:
-    if ($self->globin_genes_csv) {
-        $self->_parse_quant_file();
-    }
+    # gene metrics:
+    $self->_parse_quant_file();
     # RNA-SeQC metrics:
     my $command = $self->_command();
     carp qq[EXECUTING $command time ]. DateTime->now();
@@ -379,35 +401,52 @@ sub _parse_rna_seqc_metrics {
 sub _parse_quant_file {
     my $self = shift;
     my $quant_file = $self->quant_file;
-    my $globin_file = $self->globin_genes_csv;
     if (! -e $quant_file) {
         $self->result->add_comment(qq[No such file $quant_file: Cannot parse quant metrics]);
         return;
     }
-    my %globin_genes;
-    my $fh = IO::File->new($globin_file, 'r');
-    while (my $line = $fh->getline) {
-        chomp $line;
-        my @gene_record = split /,/smx, $line;
-        $globin_genes{$gene_record[$COL_GENEID]} = $gene_record[$COL_GENENAME];
+    my $globin_genes = {};
+    my $mt_genes = {};
+    # globin genes metric:
+    if ($self->globin_genes_csv) {
+        $self->_read_genes_file($self->globin_genes_csv, $globin_genes);
     }
-    $fh->close();
-    my %quant_genes;
-    $fh = IO::File->new($quant_file, 'r');
+    # mitochondrial genes metric:
+    if ($self->mt_genes_csv) {
+        $self->_read_genes_file($self->mt_genes_csv, $mt_genes);
+    }
+    my %quant_genes = ('globin_sum' => 0, 'mt_sum' => 0);
+    my $fh = IO::File->new($quant_file, 'r');
     while (my $line = $fh->getline) {
         my @quant_record = split /\t/smx, $line;
-        if (exists $globin_genes{$quant_record[$COL_QUANT_GENEID]}){
+        if (exists $globin_genes->{$quant_record[$COL_QUANT_GENEID]}){
             if (looks_like_number($quant_record[$COL_QUANT_TPM])) {
-                $quant_genes{'sum'} += $quant_record[$COL_QUANT_TPM];
+                $quant_genes{'globin_sum'} += $quant_record[$COL_QUANT_TPM];
+            }
+        }
+        if (exists $mt_genes->{$quant_record[$COL_QUANT_GENEID]}){
+            if (looks_like_number($quant_record[$COL_QUANT_TPM])) {
+                $quant_genes{'mt_sum'} += $quant_record[$COL_QUANT_TPM];
             }
         }
     }
     $fh->close();
-    $self->_set_result($GLOBIN_METRIC_NAME => sprintf '%.2f', $quant_genes{'sum'} / $TEN_THOUSAND);
+    $self->_set_result($GLOBIN_METRIC_NAME => sprintf '%.2f', $quant_genes{'globin_sum'} / $TEN_THOUSAND);
+    $self->_set_result($MT_METRIC_NAME => sprintf '%.2f', $quant_genes{'mt_sum'} / $TEN_THOUSAND);
     return;
 }
 
-
+sub _read_genes_file {
+    my ($self, $genes_file, $genes_list) = @_;
+    my $fh = IO::File->new($genes_file, 'r');
+    while (my $line = $fh->getline) {
+        chomp $line;
+        my @gene_record = split /,/smx, $line;
+        $genes_list->{$gene_record[$COL_GENEID]} = $gene_record[$COL_GENENAME];
+    }
+    $fh->close();
+    return;
+}
 
 sub _save_results {
     my $self = shift;

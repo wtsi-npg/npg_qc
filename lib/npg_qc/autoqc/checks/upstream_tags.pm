@@ -14,6 +14,8 @@ use npg_tracking::Schema;
 use npg_qc::autoqc::checks::tag_metrics;
 use npg_qc::autoqc::qc_store;
 use npg_qc::autoqc::types;
+use npg_qc::autoqc::qc_store::query;
+use npg_qc::autoqc::qc_store::options qw/$LANES/;
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find
@@ -210,15 +212,20 @@ sub _build__tag_metrics_results {
   # data sources is used when a non-Latest_Summary path is specified by
   # the caller
   ######################################################################
-  my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
-  my $aqp = $self->archive_qc_path;
-  my $c=$qcs->load_from_path($aqp);
+  my $c=$self->_qc_store->load_from_path($self->archive_qc_path);
   my $tmr=$c->slice(q[class_name], q[tag_metrics]);
   my $position=$self->composition->get_component(0)->position;
   $tmr=$tmr->slice(q[position],$position);
 
   if(!$tmr->results || (@{$tmr->results} == 0)) {
-    $c=$qcs->load_run($self->get_id_run, $self->db_lookup, [ $position ]);
+    my $query = npg_qc::autoqc::qc_store::query->new(
+      option              => $LANES,
+      id_run              => $self->get_id_run,
+      positions           => [ $position ],
+      db_qcresults_lookup => $self->db_lookup,
+      npg_tracking_schema => $self->_npgtracking_schema
+    );
+    $c=$self->_qc_store->load($query);
     $tmr=$c->slice(q[class_name], q[tag_metrics]);
   }
 
@@ -372,6 +379,15 @@ sub _build_run_rows {
   return $self->_fetch_run_rows($self->get_id_run);
 }
 
+has '_qc_store' => ( isa        => 'npg_qc::autoqc::qc_store',
+                     is         => 'ro',
+                     lazy_build => 1,
+                   );
+sub _build__qc_store {
+  my ($self) = @_;
+  return npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
+}
+
 #########################################################################################################
 # _run_info_data - collates tag information about this and upstream runs. Contains two elements:
 #    tag_seq_runs - which of the runs a tag sequence first appears in is determined, and this hash map is
@@ -387,11 +403,9 @@ sub _build__run_info_data {
 
   # fetch initial runs history for intrument from tracking db
   my $run_rows = $self->run_rows;
-
-  my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
   my $lane = $self->composition->get_component(0)->position;
   my $run_lanes = { (map { $_->[$ID_RUN_POS] => [ $lane ] } @{$run_rows}) };
-  my $c=$qcs->load_lanes($run_lanes, 1, );
+  my $c=$self->_qc_store->load_lanes($run_lanes, 1, $LANES, $self->_npgtracking_schema);
   my $rl_tag_metrics=$c->slice(q[class_name], q[tag_metrics]);
   my $rl_tag_metrics_results=$rl_tag_metrics->results;
 

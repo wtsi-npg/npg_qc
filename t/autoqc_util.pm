@@ -5,6 +5,8 @@ use warnings;
 use Carp;
 use English qw(-no_match_vars);
 use Exporter;
+use File::Temp qw(tempdir);
+use File::Path qw/make_path/;
 
 use npg_tracking::glossary::composition::factory;
 use npg_tracking::glossary::composition::component::illumina;
@@ -97,7 +99,7 @@ Part of FASTX Toolkit 0.0.12 by A. Gordon (gordon@cshl.edu)
   }
 
   close $fh;
-    
+
   chmod 0775, $script_path;
   return 1;
 }
@@ -134,6 +136,24 @@ sub write_bwa_script {
     
   chmod 0775, $script_path;
   return 1;
+}
+
+sub create_runfolder {
+  my ($dir, $names) = @_;
+  $dir   ||= tempdir(CLEANUP => 1);
+  $names ||= {};
+  my $rf_name = $names->{'runfolder_name'} || q[180524_A00510_0008_BH3W7VDSXX];
+  my $apath = $names->{'analysis_path'}    || q[BAM_basecalls_20180714-103457];
+  my $paths = {};
+  $paths->{'runfolder_path'} = join q[/], $dir, $rf_name;
+  $paths->{'intensity_path'} = join q[/], $paths->{'runfolder_path'}, q[Data/Intensities];
+  $paths->{'basecall_path'}  = join q[/], $paths->{'intensity_path'}, q[BaseCalls];
+  $paths->{'analysis_path'}  = join q[/], $paths->{'intensity_path'}, $apath;
+  $paths->{'nocal_path'}     = join q[/], $paths->{'analysis_path'}, q[no_cal];
+  $paths->{'archive_path'}   = join q[/], $paths->{'nocal_path'}, q[archive];
+
+  make_path(values %{$paths});
+  return $paths;
 }
 
 1;

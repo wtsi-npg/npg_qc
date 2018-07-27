@@ -1,6 +1,23 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - handle target samtools stats file - parsing, archiving and viewing.
+ - queries to qc_store should always have support for tracking db look-up
+ - methods for loading autoqc results moved from npg_qc::autoqc::collection
+   to npg_qc::autoqc::qc_store, unused public methods removed
+ - little-used method load_run of npg_qc::autoqc::qc_store class, which did
+   not support propagation of tracking db handle, is removed
+
+release 65.2
+ - add new metric mitochondrial genes content as mt_pct_tpm to RNA-SeQC check
+ - can_run returns false for pulldown_metrics check for tag 0
+ - genotype check does not require the existence of irods: input_files
+
+release 65.1.1
+ - explicitly use pre v6 bwa for rna_seqc rRNA alignment as input not name sorted 
+   (tolerated in old version but not bwa0_6)
+
+release 65.1
+ - bwa to bwa0_6 for rna_seqc rRNA alignment
 
 release 65.0
  - adapter autoqc check - discard code for fastq input
@@ -20,7 +37,7 @@ release 65.0
  - upstream_tags autoqc check: standardise access to the tracking database
  - 'execute' method of the parent autoqc check to error if input files do not exist
  - dependency on tracking XML feeds removed
- - bwa0_6 (newer bwa) explicitly requested where bwa aligner is used
+ - bwa0_6 (newer bwa) expalicitly requested where bwa aligner is used
  - all C source code moved to https://github.com/wtsi-npg/npg_qc_utils, executables are
    built by Conda https://github.com/wtsi-npg/npg_conda/tree/devel/recipes/npg_qc_utils/65.0;
    Build.PL changed accordingly

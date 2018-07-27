@@ -3,6 +3,8 @@ package npg_qc_viewer::Controller::Data;
 use Moose;
 use namespace::autoclean;
 
+use npg_qc::autoqc::qc_store::options qw/$PLEXES/;
+
 BEGIN { extends 'Catalyst::Controller' }
 
 our $VERSION   = '0';
@@ -53,16 +55,18 @@ sub genotype :Chained('base') :PathPath('genotype') :Args(0) {
     my $position = $c->request->query_parameters->{lane};
     my $tag_index = $c->request->query_parameters->{tag};
     my $db_lookup = $c->request->query_parameters->{db_lookup};
-    my $sequenom_plex = $c->request->query_parameters->{plex};
+    my $collection = $c->model('Check')->load_lanes(
+      {$id_run => [$position]}, $c->stash->{'db_lookup'}, $PLEXES, $c->model('NpgDB')->schema);
+    if (defined $tag_index) {
+      $collection = $collection->search({class_name => q[genotype], tag_index => $tag_index, });
+    } else {
+      $collection=$collection->slice(q[class_name], q[genotype]);
+    }
 
-    my $j = $c->model(q[GenotypeCheck])->fetch_genotype_json($id_run, $position, $tag_index, $sequenom_plex, $db_lookup);
-
-    my @processed_results = ();   # TBD: store all processed results here, then apply to_json() at the end
     $results_json = q{};
     my $s = q{};
     my $x = 1;
-    for my $e (@{$j->results}) {
-      #carp q[Controller processing result element ], $x++;
+    for my $e (@{$collection->results}) {
       $s = $e->json;        # initial json string
       $s =~ tr/\n//d;
       $results_json .= ($results_json? q/,/: q/[/) . $s;   # add to the JSON array
@@ -169,7 +173,7 @@ Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2018 Genome Research Ltd.
 
 This file is part of NPG software.
 
