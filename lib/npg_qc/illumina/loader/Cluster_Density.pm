@@ -19,19 +19,14 @@ Readonly::Scalar my $TILE_METRICS_INTEROP_CODES => {'cluster density'    => 100,
                                                    };
 
 Readonly::Array my @TILE_METRICS_INTEROP_FILE          => qw/InterOp TileMetricsOut.bin/;
-Readonly::Array my @TILE_METRICS_PF_CYCLE_INTEROP_FILE => qw/InterOp C25.1 TileMetricsOut.bin/;
 
 sub run {
   my $self = shift;
 
   my $interop_file = join q[/], $self->runfolder_path(), @TILE_METRICS_INTEROP_FILE;
   if ( ! -e $interop_file ) {
-    carp qq{Couldn't find interop file $interop_file, looking in pf_cycle sub-directory};
-    # look for one in the PF_CYCLE sub-directory
-    $interop_file = join q[/], $self->runfolder_path(), @TILE_METRICS_PF_CYCLE_INTEROP_FILE;
-  }
-  if ( ! -e $interop_file ) {
-    croak qq($interop_file does not exist);
+    carp qq($interop_file does not exist);
+    return;
   }
   $self->_save_to_db($self->_parse_interop($interop_file));
 
