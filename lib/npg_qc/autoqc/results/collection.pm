@@ -227,36 +227,17 @@ sub search {
     return $c;
 }
 
-=head2 run_lane_map
-
-Generates a hash map of all run numbers and positions in the collection.
-The keys are 'id_run:position' strings, the values are anonimous hashes,
-each containing a 'position' and 'id_run' entry
-
-=cut
-sub run_lane_map {
-    my $self = shift;
-    my $map = {};
-    foreach my $result (@{$self->results}) {
-        my $key = $result->rpt_key;
-        if (!defined $map->{$key}) {
-            $map->{$key} = {id_run => $result->id_run, position => $result->position,};
-        }
-    }
-    return $map;
-}
-
 =head2 run_lane_collections
 
 Generates a hash map of all run numbers, positions and tag indices in the collection.
-The keys are 'id_run:position:tag_index' strings, the values are relevant sub-collections.
+The keys are rpt list strings, the values are relevant sub-collections.
 
 =cut
 sub run_lane_collections {
     my $self = shift;
     my $map = {};
     foreach my $result (@{$self->results}) {
-        my $key = $result->rpt_key;
+        my $key = $result->get_rpt_list;
         if (!defined $map->{$key}) {
             my $c = __PACKAGE__->new();
             $c->add($result);
