@@ -2,7 +2,10 @@ package npg_qc_viewer::Controller::Visuals;
 
 use Moose;
 use namespace::autoclean;
-use English qw(-no_match_vars);
+use Try::Tiny;
+
+use npg_qc::autoqc::role::rpt_key;
+use npg_qc::autoqc::qc_store::options qw/ $LANES /;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -15,10 +18,7 @@ npg_qc_viewer::Controller::Visuals - Catalyst Controller for rendering images on
 
 =head1 VERSION
 
-$Revision: 13084 $
-
 =head1 SYNOPSIS
-
 
 =head1 DESCRIPTION
 
@@ -34,24 +34,20 @@ Image rendering
 
 =cut
 sub _render {
-  my ($self, $c, $method, $args) = @_;
+  my ($self, $c, $method, @args) = @_;
 
   my $image_string;
-  eval {
-    $image_string = $c->model(q[Visuals::Fastqcheck])->$method($args);
-    1;
-  } or do {
-    if ($EVAL_ERROR) {
-      $c->error($EVAL_ERROR);
-      return;
-	  }
+  try {
+    $image_string = $c->model(q[Visuals::Fastqcheck])->$method(@args);
+  } catch {
+    $c->error($_);
   };
 
   if ($image_string) {
     $c->res->content_type(q[image/png]);
     $c->res->body( $image_string );
   } else {
-    $c->error(qq[image string empty for $method])
+    $c->error(qq[image string empty for $method]);
   }
 
   return;
@@ -77,11 +73,53 @@ An action for generating a visual representation of a fastqcheck file
 sub fastqcheck :Chained('base') :PathPath('fastqcheck') :Args(0) {
   my ( $self, $c) = @_;
 
-  my $model = $c->model(q[Visuals::Fastqcheck]);
-  if (!$model->has_schema) {
-    $model->schema($c->model(q[NpgQcDB]));
+  my $params = $c->request->query_parameters;
+
+  my $rpt_list = $params->{'rpt_list'};
+  if (!$rpt_list) {
+     $c->error(q['rpt_list' parameter is required]);
+     return;
   }
-  $self->_render($c, q[fastqcheck2image], $c->request->query_parameters);
+  my $args = npg_qc::autoqc::role::rpt_key->inflate_rpts($rpt_list);
+  if (@{$args} > 1) {
+    $c->error(q[Fastqcheck visualisation is not available for multiple components]);
+    return;
+  }
+  $args = $args->[0];
+  if (defined $args->{'tag_index'}) {
+    $c->error(q[Fastqcheck visualisation is not available for plexes]);
+    return;
+  }
+  my $read = $params->{'read'};
+  if (!$read) {
+    $c->error(q['read' parameter is required]);
+    return;
+  }
+
+  my $init = {'option' => $LANES};
+  $init->{'db_qcresults_lookup'} = $params->{'db_lookup'} ? 1 : 0;
+  $init->{'npg_tracking_schema'} = $c->model('NpgDB')->schema();
+  $init->{'id_run'} = $args->{'id_run'};
+  $init->{'positions'}  = [$args->{'position'}];
+  my $query = npg_qc::autoqc::qc_store::query->new($init);
+
+  my $model = $c->model('Check');
+  my $paths_list = $params->{'paths_list'};
+  if ($paths_list) {
+    if (! ref $paths_list) {
+      $paths_list = [$paths_list];
+    }
+  }
+  my $content = $paths_list
+    ? $model->load_fastqcheck_content_from_path($query, $paths_list, $read)
+    : $model->load_fastqcheck_content($query, $read);
+
+  if ($content) {
+    $self->_render($c, q[fastqcheck2image], $content, $read);
+  } else {
+    $c->error('Failed to load fastqcheck content for ' . $query->to_string);
+  }
+
   return;
 
 }
@@ -100,7 +138,9 @@ sub fastqcheck_legend :Chained('base') :PathPath('fastqcheck_legend') :Args(0) {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
+
 
 =head1 DIAGNOSTICS
 
@@ -114,7 +154,7 @@ __END__
 
 =item namespace::autoclean
 
-=item English
+=item Try::Tiny
 
 =item Catalyst::Controller
 
@@ -130,7 +170,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2018 Genome Research Ltd.
 
 This file is part of NPG software.
 

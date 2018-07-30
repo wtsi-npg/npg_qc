@@ -48,6 +48,22 @@ sub lane_rpt_key_from_key {
     return  $self->deflate_rpt($h);
 }
 
+=head2 is_lane_key
+
+Returns true if a key is a single rpt key for a lane,
+otherwise returns false.
+
+=cut
+sub is_lane_key {
+    my ($self, $key) = @_;
+    my $a = $self->inflate_rpts($key);
+    if (@{$a} == 1 && !defined $a->[0]->{'tag_index'}) {
+        return 1;
+    }
+    return;
+}
+
+
 =head2 rpt_list2one_hash
 
 Argument - rpt list string.
