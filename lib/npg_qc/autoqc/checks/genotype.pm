@@ -471,7 +471,7 @@ override 'execute' => sub {
 			$self->find_gt_match_args()
 		;
 
-	open my $f, q{-|}, qq{$gt_check_cmd} or croak 'Failed to execute check';
+	open my $f, q{-|}, qw{bash -c}, qq{$gt_check_cmd} or croak 'Failed to execute check';
 
 	my $json_results = <$f>;
 
