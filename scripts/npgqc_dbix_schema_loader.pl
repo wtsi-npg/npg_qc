@@ -99,6 +99,7 @@ make_schema_at(
         moniker_map         => {
           'alignment_filter_metrics'       => q[AlignmentFilterMetrics],
           'bam_flagstats'                  => q[BamFlagstats],
+          'bcfstats'                       => q[Bcfstats],
           'gc_bias'                        => q[GcBias],
           'pulldown_metrics'               => q[PulldownMetrics],
           'split_stats'                    => q[SplitStats],

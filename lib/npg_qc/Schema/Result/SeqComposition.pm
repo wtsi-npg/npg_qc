@@ -180,6 +180,21 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 bcfstat
+
+Type: might_have
+
+Related object: L<npg_qc::Schema::Result::Bcfstats>
+
+=cut
+
+__PACKAGE__->might_have(
+  'bcfstat',
+  'npg_qc::Schema::Result::Bcfstats',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 contamination
 
 Type: might_have
@@ -589,8 +604,8 @@ __PACKAGE__->might_have(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-03-20 15:31:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KnKLaTCG8WM9wzS5n0I2eA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-07-24 17:13:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:OMcE4bbQIPQ6Ky/h+N+IlQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

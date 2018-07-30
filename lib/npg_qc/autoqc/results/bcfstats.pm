@@ -1,5 +1,4 @@
-
-package npg_qc::autoqc::results::genotype_call;
+package npg_qc::autoqc::results::bcfstats;
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -7,25 +6,25 @@ use namespace::autoclean;
 
 extends qw(npg_qc::autoqc::results::result);
 
-with qw(npg_qc::autoqc::role::genotype_call);
+with qw(npg_qc::autoqc::role::bcfstats);
 
 our $VERSION = '0';
-
 
 has [qw/genotypes_attempted
         genotypes_called
         genotypes_passed
-        sex_markers_attempted
-        sex_markers_called
-        sex_markers_passed
+        genotypes_compared
+        genotypes_concordant
+        genotypes_nrd_dividend
+        genotypes_nrd_divisor
       / ] => (
     is         => 'rw',
     isa        => 'Int',
 );
 
-has [qw/gbs_plex_name
-        gbs_plex_path
-        sex
+has [qw/geno_refset_name
+        geno_refset_path
+        expected_sample_name
       / ] => (
     is         => 'rw',
     isa        => 'Str',
@@ -43,9 +42,10 @@ __PACKAGE__->meta->make_immutable;
 __END__
 
 
+
 =head1 NAME
 
-    npg_qc::autoqc::results::genotype_call
+    npg_qc::autoqc::results::bcfstats
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ __END__
 
 =item npg_qc::autoqc::results::result
 
-=item npg_qc::autoqc::role::genotype_call
+=item npg_qc::autoqc::role::bcfstats
 
 =back
 
@@ -81,7 +81,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
