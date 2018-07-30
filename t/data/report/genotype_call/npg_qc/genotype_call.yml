@@ -21,3 +21,7 @@
   sex_markers_passed: 0
   sex: ~
   pass: 1
+- id_genotype_call: 3
+  id_seq_composition: 3
+  comments: Can only run on a single sample 
+  pass: ~

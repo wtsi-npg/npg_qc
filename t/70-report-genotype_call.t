@@ -68,19 +68,19 @@ sub _get_expected_data {
      data => {
          attributes => [
              {
-                 key   => "Primer_Panel",
+                 key   => "primer_panel",
                  units => "panels",
                  uuid  => "5084d51a-00e7-11e8-8f97-3c4a9275d6c8",
                  value => "Pf_GRC1v1.0",
              },
              {
-                 key   => "Loci_tested",
+                 key   => "loci_tested",
                  units => "bases",
                  uuid  => "5084d51a-00e7-11e8-8f97-3c4a9275d6c8",
                  value => '1695',
              },
              {
-                 key   => "Loci_passed",
+                 key   => "loci_passed",
                  units => "bases",
                  uuid  => "5084d51a-00e7-11e8-8f97-3c4a9275d6c8",
                  value => '1502',

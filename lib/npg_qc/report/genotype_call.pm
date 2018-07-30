@@ -80,7 +80,7 @@ sub _build_data4reporting {
   my $product_rs = $self->mlwh_schema->resultset('IseqProductMetric');
 
   my $rs = $self->qc_schema->resultset('GenotypeCall')->search
-    ({'me.reported' => undef });
+    ({'me.reported' => undef, 'me.pass' => { q[!=] , undef }});
 
   my $data = [];
 
@@ -156,23 +156,23 @@ sub _construct_data {
   my $formatted = {};
   push @{$formatted->{'data'}->{'attributes'}},
   {'uuid'  => $data->{'sample_uuid'},
-   'key'   => 'Primer_Panel',
+   'key'   => 'primer_panel',
    'value' => $data->{'row'}->gbs_plex_name,
    'units' => 'panels'};
   push @{$formatted->{'data'}->{'attributes'}},
   {'uuid'  => $data->{'sample_uuid'},
-   'key'   => 'Loci_tested',
+   'key'   => 'loci_tested',
    'value' => $data->{'row'}->genotypes_attempted,
    'units' => 'bases'};
   push @{$formatted->{'data'}->{'attributes'}},
   {'uuid'  => $data->{'sample_uuid'},
-   'key'   => 'Loci_passed',
+   'key'   => 'loci_passed',
    'value' => $data->{'row'}->genotypes_passed,
    'units' => 'bases'};
   if($data->{'row'}->sex){
     push @{$formatted->{'data'}->{'attributes'}},
     {'uuid'  => $data->{'sample_uuid'},
-     'key'   => 'Gender_Markers',
+     'key'   => 'gender_markers',
      'value' => $data->{'row'}->sex,
      'units' => 'codes'};
   }
