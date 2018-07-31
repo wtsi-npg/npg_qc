@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw( tempdir );
@@ -399,6 +399,87 @@ subtest 'filename_root is given instead of input file' => sub {
       ok(-e $name, "json output $name exists");
     }
   }
+};
+
+
+my $archive_25837 = '25837_1_13';
+my $ae_25837 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_25837}.tar.gz");
+$ae_25837->extract(to => $tempdir) or die $ae_25837->error;
+$archive_25837 = join q[/], $tempdir, $archive_25837;
+my $qc_dir_25837 = join q[/], $archive_25837, 'testqc1';
+mkdir $qc_dir_25837;
+
+subtest 'full functionality with optional target stats' => sub {
+
+  plan tests => 26;
+
+  my $fproot_common = $archive_25837 . '/25837_1#13';
+  my $composition_digest = '2e773f6e4717cde9b114e5b5ce2369f89c0fa6030daaaf9126079d78be1957f6';
+
+  foreach my $file_type ( qw(cram bam) ) {
+
+      my $local_qc_dir = join q[/], $qc_dir_25837, $file_type;
+      if (!-e $local_qc_dir) {
+        mkdir $local_qc_dir;
+      }
+
+      my $ref = {
+        id_run        => 25837,
+        position      => 1,     
+        tag_index     => 13,
+        qc_out        => $local_qc_dir,
+      };
+
+      my $sfile = join q[.], $fproot_common, $file_type;
+
+      if ($file_type eq 'bam') {
+        $ref->{'input_files'} = [$sfile];
+      } else {
+        $ref->{'qc_in'} = $archive_25837;
+      }
+
+      my $r = npg_qc::autoqc::checks::bam_flagstats->new($ref);
+      lives_ok { $r->run() } 'no error calling run()';
+
+      my @ros = @{$r->related_results};
+      is (scalar @ros, 6, 'six related results');
+
+      my $ro = $ros[5];
+      isa_ok ($ro, 'npg_qc::autoqc::results::sequence_summary');
+      isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+      is ($ro->composition_digest, $composition_digest, 'composition digest');
+
+      foreach my $output_type ( qw(.bam_flagstats.json
+                                   .sequence_summary.json
+                                   _F0xB00.samtools_stats.json
+                                   _F0x900.samtools_stats.json
+                                   _F0x900_bait.samtools_stats.json
+                                   _F0xB00_bait.samtools_stats.json
+                                   _F0xF04_target.samtools_stats.json
+                                   ) ) {
+        my @dirs = splitdir $fproot_common;
+        my $name = pop @dirs;
+        my $output = catdir($local_qc_dir, $name) . $output_type;
+        ok (-e $output, "output $output created");
+      }
+ 
+      my $expected_from_json = from_json(
+         slurp qq{$archive_25837/qc/all_json/25837_1#13.bam_flagstats.json}, {chomp=>1});
+
+      my $results_from_json = from_json(
+         slurp qq{$local_qc_dir/25837_1#13.bam_flagstats.json}, {chomp=>1});
+
+      foreach my $res ($expected_from_json, $results_from_json){
+         delete $res->{'__CLASS__'};
+         delete $res->{'composition'};
+         delete $res->{'info'}->{'Check'};
+         delete $res->{'info'}->{'Check_version'};
+         delete $res->{'path'};
+      }
+
+      is_deeply($results_from_json, $expected_from_json, 'correct json output');
+ }
+
 };
 
 1;

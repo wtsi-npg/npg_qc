@@ -19,9 +19,8 @@ Readonly::Scalar our $TILE_METRICS_INTEROP_CODES => {'cluster density'    => 100
                                                      'version3_cluster_counts' => ord('t'),
                                                      };
 
-Readonly::Scalar our $PF_CYCLE => q{C25.1};
-
 Readonly::Array my @TILE_METRICS_INTEROP_FILE => qw/InterOp TileMetricsOut.bin/;
+Readonly::Array my @TILE_METRICS_PF_CYCLE_INTEROP_FILE => qw/InterOp C25.1 TileMetricsOut.bin/;
 
 sub run_all {
   my $self = shift;
@@ -32,12 +31,9 @@ sub run_all {
       $self->mlog(qq{Loading cluster density data for run $id_run});
       my $interop_file = join q[/], $rfolders{$id_run}, @TILE_METRICS_INTEROP_FILE;
       if ( ! -e $interop_file ) {
-        $self->mlog(qq{Couldn't find interop file $interop_file, looking in $PF_CYCLE sub-directory});
+        $self->mlog(qq{Couldn't find interop file $interop_file, looking in pf_cycle sub-directory});
         # look for one in the PF_CYCLE sub-directory
-        $interop_file = $self->runfolder_path().qq{/InterOp/$PF_CYCLE/TileMetricsOut.bin};
-        if ( ! -e $interop_file ) {
-          croak qq{Couldn't find interop file $interop_file};
-        }
+        $interop_file = join q[/], $rfolders{$id_run}, @TILE_METRICS_PF_CYCLE_INTEROP_FILE;
       }
       $self->_save_to_db($id_run, $self->_parse_interop($interop_file));
     } catch {

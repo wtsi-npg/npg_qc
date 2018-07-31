@@ -12,8 +12,12 @@ with    qw(
 
 our $VERSION = '0';
 
-has 'library' => ( isa  => 'Maybe[Str]',
-                   is   => 'rw',
+
+has [ qw/ library
+          target_filter
+        / ] => (
+    isa  => 'Maybe[Str]',
+    is   => 'rw',
 );
 has [ qw/ num_total_reads
           unpaired_mapped_reads
@@ -26,13 +30,22 @@ has [ qw/ num_total_reads
           proper_mapped_pair
           mate_mapped_defferent_chr
           mate_mapped_defferent_chr_5
-          read_pairs_examined / ] => (
+          read_pairs_examined
+          target_length
+          target_mapped_reads
+          target_proper_pair_mapped_reads
+          target_mapped_bases
+          target_coverage_threshold
+          / ] => (
     isa => 'Maybe[Int]',
     is  => 'rw',
 );
 
-has 'percent_duplicate' => ( isa => 'Maybe[Num]',
-                             is  => 'rw',
+has [ qw/ percent_duplicate
+          target_percent_gt_coverage_threshold
+        / ] => (
+    isa => 'Maybe[Num]',
+    is  => 'rw',
 );
 
 has 'histogram'         => ( isa     => 'HashRef',
