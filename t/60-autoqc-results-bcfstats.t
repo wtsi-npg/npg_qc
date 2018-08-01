@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 4;
 use Test::Exception;
 
 
@@ -27,16 +27,6 @@ subtest q[JSON] => sub {
   is( $r_from_json->criterion, q[NRD % < 2], q[Criterion from json] );
   is( $r_from_json->genotypes_passed, q[74], q[Genotypes passed returned] );
   is( $r_from_json->percent_condordance, q[100.00], q[Percent concordance returned] );
-};
-
-subtest q[Collection] => sub {
-  plan tests => 3;
-  my $c=npg_qc::autoqc::results::collection->new();
-  $c->add_from_dir(q[t/data/autoqc/bcfstats/data], [5], 21835);                             
-  $c=$c->slice('class_name', 'bcfstats');
-  is($c->results->[0]->criterion, q[NRD % < 2], q[Criterion returned] );
-  is($c->results->[0]->genotypes_passed, q[74], q[Genotypes passed returned] );
-  is($c->results->[0]->percent_condordance, q[100.00], q[Percent concordance returned] );
 };
 
 1;
