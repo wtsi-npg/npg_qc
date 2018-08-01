@@ -94,7 +94,7 @@ release 64.5
      works for multi-component compositions
  - add functionality to allow more columns to be added to table dynamically
  - add data for new extra column for sample_name in summary table
- - treat all dynamically added methods in the same wa
+ - treat all dynamically added methods in the same way
 
 release 64.4.1
  - fix bam_flagstats check library_size bug
