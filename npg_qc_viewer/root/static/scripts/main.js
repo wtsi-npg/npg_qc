@@ -61,7 +61,11 @@ requirejs([
     if (qcp.isPageForMQC){
       callAfterGettingOutcomes = function (data) {
         NPG.QC.launchManualQCProcesses(isRunPage, data, QC_OUTCOMES);}
-    } else if (qcp.isPageForUQC) {
+    }
+    /* A trigger for UQC is disabled; we need to be able to pick up
+       these outcomes by the wh loader.
+    
+    else if (qcp.isPageForUQC) {
       callAfterGettingOutcomes = function () { 
         NPG.QC.addUQCLink( function() {
           qc_outcomes_view.fetchAndProcessQC(
@@ -72,7 +76,7 @@ requirejs([
                      });
         });
       }  
-    }
+    } */
     qc_outcomes_view.fetchAndProcessQC(TABLE, QC_OUTCOMES, callAfterGettingOutcomes);
   });
 
