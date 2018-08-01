@@ -28,7 +28,7 @@ sub _get_data {
 }
 
 subtest 'load results with a composition fk' => sub {
-  plan tests => 4;
+  plan tests => 7;
 
   my $values =  _get_data('18407_1#7.rna_seqc.json');
   my $fk_row = $schema->resultset('SeqComposition')->create({digest => '45678', size => 2});
@@ -43,6 +43,13 @@ subtest 'load results with a composition fk' => sub {
   lives_ok { $object->insert() } 'insert with fk is ok';
   my $a_rs = $rs->search({});
   is ($a_rs->count, 1, q[one row created in the table]);
+
+  my $om_value;
+  $a_rs = $rs->next();
+  lives_ok {$om_value = $a_rs->other_metrics();} 'extract other metrics';
+  is($a_rs->transcripts_detected(), $om_value->{'Transcripts Detected'}, 'value extracted using role method');
+  is($a_rs->intronic_rate(), $om_value->{'Intronic Rate'}, 'value extracted using role method');
+
 };
 
 1;

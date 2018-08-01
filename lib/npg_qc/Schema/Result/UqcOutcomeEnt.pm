@@ -214,7 +214,7 @@ __PACKAGE__->belongs_to(
 use Carp;
 
 with qw/npg_qc::Schema::Mqc::OutcomeEntity/ =>
-  { -excludes => [qw/toggle_final_outcome update_outcome/] };
+  { -excludes => [qw/toggle_final_outcome/] };
 
 our $VERSION = '0';
 
@@ -225,6 +225,9 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+__PACKAGE__->add_common_ent_methods();
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -234,8 +237,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Entity for UQC outcome. This class inherits from Mqc::OutcomeEntity and has a relationship
-to seq_composition through id_seq_composition.
+Result class for uqc outcome entity table.
 
 =head1 DIAGNOSTICS
 
@@ -252,6 +254,49 @@ to seq_composition through id_seq_composition.
 
   Default DBIx insert method extended to create an entry in the table corresponding to
   the UqcOutcomeHist class
+
+=head2 dict_rel_name
+
+=head2 seq_component_compositions
+
+  Type: has_many
+
+  Related object: L<npg_qc::Schema::Result::SeqComponentComposition>
+
+  To simplify queries, skip SeqComposition and link directly to the linking table.
+
+=head2 composition
+
+  Attribute of type npg_tracking::glossary::composition.
+
+=head2 dict_rel_name
+
+=head2 has_final_outcome
+
+Returns true if this entry corresponds to a final outcome, otherwise returns false.
+
+=head2 is_accepted
+
+Returns true if the outcome is accepted (pass), otherwise returns false.
+
+=head2 is_final_accepted
+
+Returns true if the outcome is accepted (pass) and final, otherwise returns false.
+
+=head2 is_undecided
+
+Returns true if the outcome is undecided (neither pass nor fail),
+otherwise returns false.
+
+=head2 is_rejected
+
+Returns true if the outcome is rejected (fail), otherwise returns false.
+
+=head2 description
+
+Returns short outcome description.
+
+  my $description = $obj->description();
 
 =head1 DEPENDENCIES
 
@@ -286,7 +331,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL Genome Research Limited
+Copyright (C) 2018 GRL Genome Research Limited
 
 This file is part of NPG.
 

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 use lib '../lib';
-use npg_tracking::util::build;
+use WTSI::DNAP::Utilities::Build;
 
-my $class = npg_tracking::util::build->subclass(code => <<'EOC');
+my $class = WTSI::DNAP::Utilities::Build->subclass(code => <<'EOC');
 
   use Cwd qw/abs_path getcwd/;
   use File::Which qw(which);
@@ -12,7 +12,7 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOC');
     my $self = shift;
 
     if ($self->args('installjsdeps')) {
-      if (which('node') and which('bower') and which('npm')) {
+      if (which('node') and which('npm')) {
         warn "Installing node dependencies\n";
 
         my $result_npm = system 'npm install';
@@ -21,13 +21,13 @@ my $class = npg_tracking::util::build->subclass(code => <<'EOC');
         }
 
         warn "Checking/fetching bower javascript dependencies\n";
-      
-        my $result = system 'bower install --force-latest';
+
+        my $result = system '$(npm bin)/bower install --force-latest';
         if ($result) {
           die 'Fail to install bower javascript dependencies';
         }
       } else {
-        warn "To install javascript dependencies, node and bower should be on the path;\n";
+        warn "To install javascript dependencies, node should be on the path;\n";
         die 'Javascript dependencies cannot be installed';
       }
     }
@@ -52,7 +52,7 @@ my $builder = $class->new(
 
    'module_name'       => 'SeqQC',
    'dist_author'       => q(wtsi-npg <npg@sanger.ac.uk>),
-   'dist_version'      => npg_tracking::util::build->git_tag(),
+   'dist_version'      => WTSI::DNAP::Utilities::Build->git_tag(),
    'dist_abstract'     => q(SeqQC - viewer for autoqc analysis results),
    'license'           => 'gpl',
    'dist'              => { COMPRESS => 'gzip', SUFFIX => 'gz', },
@@ -105,6 +105,7 @@ my $builder = $class->new(
         'Try::Tiny'                                    => '0',
         'warnings'                                     => '0',
         'URI::URL'                                     => '0',
+
         'npg_common::fastqcheck'                       => '0',
         'npg::authentication::sanger_sso'              => '0',
         'npg_tracking::Schema'                         => '0',
@@ -122,17 +123,19 @@ my $builder = $class->new(
         'WTSI::DNAP::Warehouse::Schema'                => '0',
    },
 
+   'configure_requires' => {
+        'WTSI::DNAP::Utilities::Build'                 => 0,
+   },
+
    'build_requires'    => {
-        'npg_tracking::util::build'                     => '0',
         'npg_tracking::glossary::composition::factory'  => '0',
-        'npg_tracking::glossary::composition::component::illumina' => '0',
+        'npg_tracking::glossary::rpt'                   => '0',
         'npg_qc::autoqc::db_loader'                     => '0',
         'Archive::Extract'                              => '0',
         'Catalyst::Test'                                => '0',
         'DateTime'                                      => '0',
         'File::Temp'                                    => '0',
         'File::Spec'                                    => '0',
-        'GD'                                            => '0',
         'HTTP::Headers'                                 => '0',
         'HTTP::Request::Common'                         => '0',
         'Template'                                      => '0',
@@ -148,7 +151,6 @@ my $builder = $class->new(
         'Test::WWW::Mechanize::Catalyst'                => '0',
         'URI::Escape'                                   => '0',
         'XML::LibXML'                                   => '1.70',
-        'npg_tracking::glossary::rpt'                   => '0',
    },
 );
 
@@ -161,4 +163,3 @@ if ($builder->install_base()) {
 $builder->create_build_script();
 
 1;
-

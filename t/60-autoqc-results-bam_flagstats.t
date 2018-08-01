@@ -5,7 +5,7 @@ use Test::More tests => 2;
 use_ok ('npg_qc::autoqc::results::bam_flagstats');
 
 subtest 'test attributes and simple methods' => sub {
-  plan tests => 9;
+  plan tests => 12;
 
   my $r = npg_qc::autoqc::results::bam_flagstats->new(
             position => 5,
@@ -34,6 +34,18 @@ subtest 'test attributes and simple methods' => sub {
   $r = npg_qc::autoqc::results::bam_flagstats->
     load('t/data/autoqc/bam_flagstats/4921_3_bam_flagstats.json');
   ok( !$r->total_reads(), 'total reads not available' ) ;
+  ok( !$r->target_mapped_bases(), 'target mapped bases not available' ) ;
+
+  $r = npg_qc::autoqc::results::bam_flagstats->new(       
+            id_run    => 26074,
+            position  => 1,
+            tag_index => 13);
+  is($r->subset, undef, 'subset field is not set');
+ 
+  $r = npg_qc::autoqc::results::bam_flagstats->
+    load('t/data/autoqc/bam_flagstats/26074_1#13.bam_flagstats.json');
+  ok($r->target_mapped_bases(), 'target mapped bases available' ) ;
+
 };
 
 1;

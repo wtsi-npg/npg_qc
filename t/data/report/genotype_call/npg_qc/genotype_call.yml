@@ -1,0 +1,27 @@
+---
+- id_genotype_call: 1
+  id_seq_composition: 1
+  gbs_plex_name: Pf_GRC1v1.0
+  genotypes_attempted: 1695
+  genotypes_called: 1505
+  genotypes_passed: 1502
+  sex_markers_attempted: 0
+  sex_markers_called: 0
+  sex_markers_passed: 0
+  sex: ~
+  pass: 1
+- id_genotype_call: 2
+  id_seq_composition: 2
+  gbs_plex_name: Pf_GRC1v1.0
+  genotypes_attempted: 1695
+  genotypes_called: 1505
+  genotypes_passed: 1504
+  sex_markers_attempted: 0
+  sex_markers_called: 0
+  sex_markers_passed: 0
+  sex: ~
+  pass: 1
+- id_genotype_call: 3
+  id_seq_composition: 3
+  comments: Can only run on a single sample 
+  pass: ~

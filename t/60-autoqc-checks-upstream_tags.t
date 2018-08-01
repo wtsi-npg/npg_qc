@@ -4,6 +4,9 @@ use Cwd;
 use File::Temp qw/ tempdir /;
 use Test::More tests => 12;
 use Test::Exception;
+use Moose::Meta::Class;
+
+use npg_testing::db;
 
 my $ref_repos = cwd . '/t/data/autoqc';
 my $archive_qc_path = cwd . '/t/data/autoqc/upstream_tags';
@@ -13,6 +16,10 @@ use_ok ('npg_qc::autoqc::checks::upstream_tags');
 
 SKIP: { skip 'require bammaskflags', 11, unless `which bammaskflags`;
 
+  my $schema = Moose::Meta::Class->create_anon_class(
+          roles => [qw/npg_testing::db/])
+          ->new_object({})->create_test_db(q[npg_tracking::Schema]);
+
   my $dir = tempdir(CLEANUP => 1);
   `touch $dir/BamIndexDecoder.jar`;
   local $ENV{CLASSPATH} = $dir;
@@ -20,7 +27,8 @@ SKIP: { skip 'require bammaskflags', 11, unless `which bammaskflags`;
   my %h = (
     repository          => $ref_repos,
     qc_in               => $archive_qc_path,
-    tag_sets_repository => $tag_sets_repository
+    tag_sets_repository => $tag_sets_repository,
+    _npgtracking_schema => $schema
           );
 
   my %ref = %h;
@@ -30,7 +38,7 @@ SKIP: { skip 'require bammaskflags', 11, unless `which bammaskflags`;
   isa_ok ($r, 'npg_qc::autoqc::checks::upstream_tags');
   my $result;
   lives_ok { $result = $r->result; } 'No error creating result object';
-  isa_ok ($result, 'npg_qc::autoqc::results::upstream_tags');  
+  isa_ok ($result, 'npg_qc::autoqc::results::upstream_tags');
   my $expected = $ref_repos . '/tag_sets/sanger168.tags';
   is($r->barcode_filename, $expected, 'correct barcode filename');
 

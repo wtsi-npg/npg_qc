@@ -1,7 +1,3 @@
-#############
-# Created By: ajb
-# Created On: 2009-11-24
-
 package npg_qc::illumina::loader;
 
 use Moose;
@@ -27,38 +23,8 @@ npg_qc::illumina::loader
 
 =head1 DESCRIPTION
 
- Illumina analysis statistics loader
- Tile-based tables:
-                                    cumulative_errors_by_cycle
-                                    error_rate_reference_including_blanks
-                                    error_rate_reference_no_blanks
-                                    error_rate_relative_reference_cycle_nucleotide
-                                    error_rate_relative_sequence_base
-                                    errors_by_cycle
-                                    errors_by_cycle_and_nucleotide
-                                    errors_by_nucleotide
-                                    information_content_by_cycle
-                                    lane_qc
-                                    log_likelihood
-                                    most_common_blank_pattern
-                                    most_common_word
-                                    tile_score                                    
+ Illumina analysis data loader 
 
- Run-based tables:
-                                    analysis_lane
-                                    analysis
-                                    chip_summary
-                                    frequency_response_matrix
-                                    image_store
-                                    instrument_statistics
-                                    offset
-                                    qcal
-                                    run_config
-                                    signal_mean
-
- Other tables:                      analysis_lane_qcal
-                                    run_graph
-                                    cache_query
 =cut
 
 Readonly::Array  my @LOADER_MODULES => qw/
@@ -71,7 +37,6 @@ Readonly::Array  my @LOADER_MODULES => qw/
                                         /;
 
 Readonly::Array  my @PRELOADER_MODULES => qw/
-                                  Run_Timeline
                                   Run_Caching
                                   Recipe
                                   Runinfo
@@ -82,7 +47,7 @@ Readonly::Array  my @PRELOADER_MODULES => qw/
 
 =head2 BUILD
 
- Loads intoo memory plugins - individual per-table loaders
+ Loads into memory plugins - individual per-table loaders
 
 =cut
 
@@ -97,7 +62,7 @@ sub BUILD {
 
 =head2 run
 
- Loads one run  Illumina analysis statistics to a database
+ Loads one run Illumina analysis statistics to a database
 
 =cut
 
@@ -135,10 +100,8 @@ sub run_all {
              'schema_npg_tracking' => $self->schema_npg_tracking,};
   foreach my $mod (@PRELOADER_MODULES) {
     my $m = join q[::], __PACKAGE__ , $mod;
-    my $obj = $m->new($ref);
-    my $method = $mod eq 'Run_Timeline' ? 'save_dates' : 'run_all';
     $self->mlog(qq{***** Calling $m *****});
-    $m->new($ref)->$method();
+    $m->new($ref)->run_all();
   }
   return;
 }
@@ -189,8 +152,6 @@ __END__
 
 =item Carp
 
-=item English -no_match_vars
-
 =item Readonly
 
 =item MooseX::Getopt
@@ -211,7 +172,7 @@ Andy Brown
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2009 Andy Brown (setitesuk@gmail.com)
+Copyright (C) 2018 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw( tempdir );
@@ -8,6 +8,7 @@ use Perl6::Slurp;
 use JSON;
 use Archive::Extract;
 use File::Spec::Functions qw( splitdir catdir);
+use File::Copy::Recursive qw(dircopy);
 
 use t::autoqc_util qw( write_samtools_script );
 
@@ -15,6 +16,9 @@ my $tempdir = tempdir(CLEANUP => 1);
 
 use_ok ('npg_qc::autoqc::results::bam_flagstats');
 use_ok ('npg_qc::autoqc::checks::bam_flagstats');
+
+my $data_dir = join q[/], $tempdir, 'bam_flagstats';
+dircopy('t/data/autoqc/bam_flagstats', $data_dir) or die 'Faile to copy';
 
 subtest 'test attributes and simple methods' => sub {
   plan tests => 4;
@@ -37,19 +41,24 @@ subtest 'test attributes and simple methods' => sub {
 subtest 'high-level parsing' => sub {
   plan tests => 10;
 
-  my $dups  = 't/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt';
-  my $fstat = 't/data/autoqc/bam_flagstats/4783_5.flagstat';
+  my $dups  = "$data_dir/4783_5_metrics_optical.txt";
+  my $fstat = "$data_dir/4783_5.flagstat";
+  my $bam = "$data_dir/4783_5.bam";
+  open my $fh, '>', $bam or die "Failed to open $bam: $!\n";
+  close $fh;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
                         id_run                 => 4783,
                         position               => 5,
+                        qc_in                  => $data_dir,
                         markdups_metrics_file  => $dups,
                         flagstats_metrics_file => $fstat,
                         related_results        => []
                        );
 
   my $expected = from_json(
-    slurp q{t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json}, {chomp=>1});
+    slurp qq{$data_dir/4783_5_bam_flagstats.json}, {chomp=>1});
+  $expected->{'path'} = $data_dir;
 
   lives_ok { $c->execute() } 'execute method is ok';
   my $r;
@@ -79,19 +88,24 @@ subtest 'high-level parsing' => sub {
 subtest 'high-level parsing, no markdup metrics' => sub {
   plan tests => 10;
 
-  my $fstat = 't/data/autoqc/bam_flagstats/24135_1#1.flagstat';
+  my $fstat = "$data_dir/24135_1#1.flagstat";
+  my $bam = "$data_dir/24135_1#1.bam";
+  open my $fh, '>', $bam or die "Failed to open $bam: $!\n";
+  close $fh;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
                         id_run                 => 24135,
                         position               => 1,
-                        tag_index              => 1,                       
+                        tag_index              => 1,
+                        qc_in                  => $data_dir,                      
                         flagstats_metrics_file => $fstat,
                         skip_markdups_metrics  => 1,                        
                         related_results        => []
                        );
 
   my $expected = from_json(
-    slurp q{t/data/autoqc/bam_flagstats/24135_1#1.bam_flagstats.json}, {chomp=>1});
+    slurp qq{$data_dir/24135_1#1.bam_flagstats.json}, {chomp=>1});
+  $expected->{'path'} = $data_dir;
 
   lives_ok { $c->execute() } 'execute method is ok';
   my $r;
@@ -258,6 +272,10 @@ subtest 'full functionality with full file sets' => sub {
       }
 
       my $sfile = join q[.], $fproot, $file_type;
+      open my $fh, '>', $sfile or die "Failed to open $sfile: $!\n";
+      close $fh;
+      note "created test file $sfile";
+
       if ($file_type eq 'bam') {
         $ref->{'input_files'} = [$sfile];
       } else {
@@ -312,7 +330,7 @@ subtest 'filename_root is given instead of input file' => sub {
 
   foreach my $subset ( qw(default phix) ) {
     foreach my $file_type ( qw(cram bam) ) {
-
+      
       my $local_qc_dir = join q[/], $qc_dir, $file_type;
       if (!-e $local_qc_dir) {
         mkdir $local_qc_dir;
@@ -333,10 +351,6 @@ subtest 'filename_root is given instead of input file' => sub {
         $ref->{'subset'} = $subset;
         $ref->{filename_root} = '17448_1#9_phix';
         $composition_digest = 'ca4c3f9e6f8247fed589e629098d4243244ecd71f588a5e230c3353f5477c5cb';
-      }
-
-      if ($file_type eq 'bam') {
-        unlink join q[.] , $fproot, $file_type;
       }
      
       my $r = npg_qc::autoqc::checks::bam_flagstats->new($ref);
@@ -385,6 +399,87 @@ subtest 'filename_root is given instead of input file' => sub {
       ok(-e $name, "json output $name exists");
     }
   }
+};
+
+
+my $archive_25837 = '25837_1_13';
+my $ae_25837 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_25837}.tar.gz");
+$ae_25837->extract(to => $tempdir) or die $ae_25837->error;
+$archive_25837 = join q[/], $tempdir, $archive_25837;
+my $qc_dir_25837 = join q[/], $archive_25837, 'testqc1';
+mkdir $qc_dir_25837;
+
+subtest 'full functionality with optional target stats' => sub {
+
+  plan tests => 26;
+
+  my $fproot_common = $archive_25837 . '/25837_1#13';
+  my $composition_digest = '2e773f6e4717cde9b114e5b5ce2369f89c0fa6030daaaf9126079d78be1957f6';
+
+  foreach my $file_type ( qw(cram bam) ) {
+
+      my $local_qc_dir = join q[/], $qc_dir_25837, $file_type;
+      if (!-e $local_qc_dir) {
+        mkdir $local_qc_dir;
+      }
+
+      my $ref = {
+        id_run        => 25837,
+        position      => 1,     
+        tag_index     => 13,
+        qc_out        => $local_qc_dir,
+      };
+
+      my $sfile = join q[.], $fproot_common, $file_type;
+
+      if ($file_type eq 'bam') {
+        $ref->{'input_files'} = [$sfile];
+      } else {
+        $ref->{'qc_in'} = $archive_25837;
+      }
+
+      my $r = npg_qc::autoqc::checks::bam_flagstats->new($ref);
+      lives_ok { $r->run() } 'no error calling run()';
+
+      my @ros = @{$r->related_results};
+      is (scalar @ros, 6, 'six related results');
+
+      my $ro = $ros[5];
+      isa_ok ($ro, 'npg_qc::autoqc::results::sequence_summary');
+      isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+      is ($ro->composition_digest, $composition_digest, 'composition digest');
+
+      foreach my $output_type ( qw(.bam_flagstats.json
+                                   .sequence_summary.json
+                                   _F0xB00.samtools_stats.json
+                                   _F0x900.samtools_stats.json
+                                   _F0x900_bait.samtools_stats.json
+                                   _F0xB00_bait.samtools_stats.json
+                                   _F0xF04_target.samtools_stats.json
+                                   ) ) {
+        my @dirs = splitdir $fproot_common;
+        my $name = pop @dirs;
+        my $output = catdir($local_qc_dir, $name) . $output_type;
+        ok (-e $output, "output $output created");
+      }
+ 
+      my $expected_from_json = from_json(
+         slurp qq{$archive_25837/qc/all_json/25837_1#13.bam_flagstats.json}, {chomp=>1});
+
+      my $results_from_json = from_json(
+         slurp qq{$local_qc_dir/25837_1#13.bam_flagstats.json}, {chomp=>1});
+
+      foreach my $res ($expected_from_json, $results_from_json){
+         delete $res->{'__CLASS__'};
+         delete $res->{'composition'};
+         delete $res->{'info'}->{'Check'};
+         delete $res->{'info'}->{'Check_version'};
+         delete $res->{'path'};
+      }
+
+      is_deeply($results_from_json, $expected_from_json, 'correct json output');
+ }
+
 };
 
 1;

@@ -1,0 +1,31 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+<div class="data_table">
+<table title="genotype call">
+<tr>
+  <th class="laligned">Genotype plex name</th> <td>[% check.gbs_plex_name %]</td>
+</tr>
+[%- IF check.criterion.defined -%]
+<tr><th class="laligned">Pass criterion</th> <td>[% check.criterion FILTER html %]</td></tr>
+[%- END -%]
+[%- IF check.gbs_plex_path.defined -%]
+<tr><th class="laligned">Genotype plex path</th> <td>[% check.gbs_plex_path %]</td></tr>
+[%- END -%]
+[%- IF check.comments.defined -%]
+<tr><th class="laligned">comments</th><td>[% check.comments %]</td></tr>
+[%- END -%]
+</table>
+</div>
+
+<div class="data_table">
+<table title="genotype call section two">
+<caption>Genotype results</caption>
+<tr>
+  <th class="laligned">Genotypes attempted</th><td>[% check.genotypes_attempted %]</td>
+  <th class="laligned">Genotype call rate</th><td>[% check.genotype_call_rate %]</td>
+  <th class="laligned">Genotype pass rate</th><td>[% check.genotype_passed_rate %]</td>
+  <th class="laligned">Sex markers attempted</th><td>[% check.sex_markers_attempted %]</td>
+  <th class="laligned">Sex</th><td>[% check.sex %]</td>
+</tr>
+</table>
+</div>

@@ -11,10 +11,11 @@ use List::Util qw(shuffle);
 use Readonly;
 
 use npg_tracking::util::abs_path qw(abs_path);
-use npg_common::extractor::fastq qw/generate_equally_spaced_reads split_reads/;
+use npg_common::extractor::fastq qw/read_count split_reads/;
 extends 'npg_qc::autoqc::checks::check';
 with    qw/npg_tracking::data::reference::list
            npg_common::roles::software_location
+           npg_tracking::data::reference::find
           /;
 
 our $VERSION = '0';
@@ -22,7 +23,6 @@ our $VERSION = '0';
 Readonly::Scalar my $UNMAPPED_FLAG      =>      4;
 Readonly::Scalar my $SAMPLE_READ_LENGTH =>     37;
 Readonly::Scalar my $MIN_SAMPLE_READ_LENGTH => 28;
-Readonly::Scalar my $SAMPLE_READ_COUNT  => 10_000;
 Readonly::Hash   my %ALIGNER_OPTIONS    => (
     bowtie => q{--quiet --sam --sam-nohead %ref% %reads%},
     smalt  => q{map -f sam %ref% %reads%},
@@ -85,13 +85,6 @@ has 'sample_read_length' => (
     is            => 'ro',
     isa           => 'Int',
     default       => $SAMPLE_READ_LENGTH,
-);
-
-
-has 'sample_read_count'  => (
-    is            => 'ro',
-    isa           => 'Int',
-    default       => $SAMPLE_READ_COUNT,
 );
 
 
@@ -211,9 +204,26 @@ sub _scan_repository {
     return;
 }
 
+override 'can_run' => sub {
+  my $self = shift;
+
+  if($self->lims->gbs_plex_name){
+    $self->result->add_comment('Ref match skipped for gbs plex libraries.');
+    return 0;
+  }
+
+  return 1;
+};
+
 override 'execute' => sub {
     my ($self) = @_;
-    return 1 if !super();
+
+    super();
+
+    if (!$self->can_run) {
+      $self->result->add_comment(q[Cannot run ref_match check.]);
+      return 1;
+    }
 
     if (!$self->_create_sample_fastq()) {
         return 1;
@@ -284,10 +294,10 @@ sub _create_sample_fastq {
     my ($self) = @_;
 
     my $length = $self->sample_read_length();
+    my $input = $self->read1_fastq();
     my $output = $self->temp_fastq();
 
-    my $intermediate = catfile($self->tmp_path(), q[equally_spaced_reads.fastq]);
-    my $wrote = generate_equally_spaced_reads([$self->read1_fastq()], [$intermediate], $self->sample_read_count());
+    my $wrote = read_count($input);
     if (!$wrote) {
         $self->result->add_comment($self->read1_fastq() . ' is empty');
         return 0;
@@ -295,7 +305,7 @@ sub _create_sample_fastq {
 
     # Some runs are short, as short as 18
     eval {
-        split_reads($intermediate, [$length], [$output]);
+        split_reads($input, [$length], [$output]);
         1;
     } or do {
         my $error = $EVAL_ERROR;
@@ -303,13 +313,13 @@ sub _create_sample_fastq {
             croak $EVAL_ERROR;
         }
 
-        $length = $self->_get_read_length($intermediate);
+        $length = $self->_get_read_length($input);
         if ($length <  $MIN_SAMPLE_READ_LENGTH) {
             $self->result->add_comment(qq[Read length of $length is below minimally required $MIN_SAMPLE_READ_LENGTH]);
 	    return 0;
         }
 
-        split_reads($intermediate, [$length], [$output]);
+        split_reads($input, [$length], [$output]);
     };
 
     $self->result->sample_read_length($length);
@@ -372,7 +382,6 @@ qc --position           $lane
    --aligner_options    '-q 15 -t 2'
    --request_list       [ 'Homo_sapiens', 'Danio_rerio' ],
    --ref_repository     '/custom/ref/collection',
-   --sample_read_count  100_000
    --sample_read_length 50
 
 The argument '--request_list' is a list of what the user would like to align

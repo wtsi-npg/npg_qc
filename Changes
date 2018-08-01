@@ -1,6 +1,100 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - GUI for utility QC
+ - skip incomplete tag zero results in genotype_call POSTing to LIMs
+ - handle target samtools stats file - parsing, archiving and viewing.
+ - queries to qc_store should always have support for tracking db look-up
+ - methods for loading autoqc results moved from npg_qc::autoqc::collection
+   to npg_qc::autoqc::qc_store
+ - little-used method load_run of npg_qc::autoqc::qc_store class, which did
+   not support propagation of tracking db handle, is removed
+ - unused public methods in npg_qc::autoqc namespace removed
+ - changes to allow for SeqQC display of results corresponding to multi-
+   component compositions
+
+release 65.3
+ - fixed bug in cluster_density calculation where no TileMetrics interop
+   file exists
+
+release 65.2
+ - add new metric mitochondrial genes content as mt_pct_tpm to RNA-SeQC check
+ - can_run returns false for pulldown_metrics check for tag 0
+ - genotype check does not require the existence of irods: input_files
+
+release 65.1.1
+ - explicitly use pre v6 bwa for rna_seqc rRNA alignment as input not name sorted 
+   (tolerated in old version but not bwa0_6)
+
+release 65.1
+ - bwa to bwa0_6 for rna_seqc rRNA alignment
+
+release 65.0
+ - adapter autoqc check - discard code for fastq input
+ - add genotype_call_results_reporter script to report genotype_call
+   results to the LIMs
+ - tag_metics matches_pf_percent only stored to three decimals places now
+   so trim in viewer
+ - modified spatial filter qc check to read all run_lane filter.stats files
+ - changed naming of spatial_filter stats files to <run>_<lane>*.spatial_filter.stats
+ - upstream_tags qc check - replaced bamindexdecoder with bambi decode
+ - dropped ability for qc checks to sub-sample input fastq
+     instead run the checks directly off the cached fastq files
+ - NovaSeq changes, new InterOp file format and per lane read counts now 64-bit unsigned ints
+ - make travis happy as running apt-get update by default was disabled.
+ - NovaSeq run info file size is around 95KB, too large for the text column type.
+     Column type changed to mediumtext.
+ - upstream_tags autoqc check: standardise access to the tracking database
+ - 'execute' method of the parent autoqc check to error if input files do not exist
+ - dependency on tracking XML feeds removed
+ - bwa0_6 (newer bwa) expalicitly requested where bwa aligner is used
+ - all C source code moved to https://github.com/wtsi-npg/npg_qc_utils, executables are
+   built by Conda https://github.com/wtsi-npg/npg_conda/tree/devel/recipes/npg_qc_utils/65.0;
+   Build.PL changed accordingly
+
+release 64.6.3
+ - update parsing of spatial filter stats in spatial_filter QC check
+
+release 64.6.2
+ - QC viewer changes for genotype call
+
+release 64.6.1
+ - tweak to GbS library type check in genotype call as arrived as GBS (now case-insensitive).
+ - Exit rna seqc gracefully if bam has no reads
+ - more stringent ref check now required for Pf3D7_v3.fa/hs37d5__Pf3D7_v3.fa
+   in genotype check
+
+release 64.6
+ - add new metric glogin_pct_tpm to RNA-SeQC check
+ - DBIx schema loader script: alter table to add new globin metric column
+ - add functionality to pass some of the files necessary to run RNA-SeQC
+   as CLI options for program qc for more flexibility for stand alone run
+ - add new role for rna_seqc to implement ability to extract values from
+   column other_metrics to be stored in ml warehouse database.
+ - add tag_hops_power and tag_hops_percent columns to tag metrics
+ - remove run_timeline component on the Illumina QC loader
+ - stop generating DBIx class for run_timeline db table
+ - remove unused methods of the run_graph Clearpress model
+ - add new role for rna_seqc to implement ability to extract values from
+   column other_metrics to be stored in ml warehouse database
+ - changes for GbS genotype calling check 
+ - tag_sniff
+    handle separators in BC tags for dual-index runs
+    allow dual-index runs to be revcomped independantly
+    when tag has a separator -t option operates on subtags
+    allowed to ignore an index when the BC tag contains a separator 
+
+release 64.5
+ - qc outcomes model: code generalisation to simplify addition of
+   further qc types
+ - uqc outcomes - saving and updating enabled
+ - switch to node 6.12.2 in travis
+ - stop generating DBIx classes for unused tables
+ - tiny tweaks to rna and verify bam id help links
+ - ensure, where practical, that saving and retrieving qc outcomes
+     works for multi-component compositions
+ - add functionality to allow more columns to be added to table dynamically
+ - add data for new extra column for sample_name in summary table
+ - treat all dynamically added methods in the same wa
 
 release 64.4.1
  - fix bam_flagstats check library_size bug

@@ -12,6 +12,7 @@ use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
 use JSON;
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Moose::Util::TypeConstraints;
 use Readonly;
@@ -22,7 +23,7 @@ our $VERSION = '0';
 
 ##no critic
 Readonly::Scalar my $SAMTOOLS_NAME => 'samtools';
-Readonly::Scalar my $BCFTOOLS_NAME => 'bcftools1';
+Readonly::Scalar my $BCFTOOLS_NAME => 'bcftools';
 
 subtype '_bamgt_ReadableFile'
       => as Str

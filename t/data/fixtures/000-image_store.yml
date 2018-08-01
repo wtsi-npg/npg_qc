@@ -1,8 +1,0 @@
----
- - id_image_store: 1
-   type: errors_by_cycle
-   thumbnail: 0
-   image: an_image
-   image_name: 1_1_52.png
-   id_run: 1
-   suffix: png

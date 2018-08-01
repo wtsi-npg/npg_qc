@@ -3,20 +3,10 @@ package npg_qc::autoqc::results::collection;
 use Moose;
 use namespace::autoclean;
 use MooseX::AttributeHelpers;
-use Carp;
-use English qw(-no_match_vars);
-use List::MoreUtils qw(any none);
+use List::MoreUtils qw(none);
 use Module::Pluggable::Object;
+use Carp;
 use Readonly;
-use File::Basename;
-use Moose::Meta::Class;
-
-use npg_tracking::illumina::run::short_info;
-use npg_tracking::illumina::run::folder;
-
-use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
-use npg_qc::autoqc::qc_store::query;
-use npg_qc::autoqc::role::rpt_key;
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitUnusedPrivateSubroutines)
@@ -46,8 +36,8 @@ npg_qc::autoqc::results::collection
 
 =cut
 
-Readonly::Scalar my $RESULTS_NAMESPACE => q[npg_qc::autoqc::results];
-Readonly::Array  my @NON_LISTABLE      => map {join q[::], $RESULTS_NAMESPACE, $_}
+Readonly::Scalar our $RESULTS_NAMESPACE => q[npg_qc::autoqc::results];
+Readonly::Array  my  @NON_LISTABLE      => map {join q[::], $RESULTS_NAMESPACE, $_}
                                                          qw/
                                                              sequence_summary
                                                              samtools_stats
@@ -92,12 +82,7 @@ has 'checks_list' => (isa        => 'ArrayRef',
                       lazy_build => 1,
                      );
 sub _build_checks_list {
-    return _list_classes(0);
-}
-
-sub _list_classes {
-    my $load = shift;
-    $load = $load ? 1 : 0;
+    my $load = 0;
     my @classes = Module::Pluggable::Object->new(
         require     => $load,
         search_path => $RESULTS_NAMESPACE,
@@ -122,151 +107,30 @@ to an array. If the latter, all objects in the array will be added to the collec
 one by one .
 
  my $collection = npg_qc::autoqc::results::collection->new();
- my $r = npg_qc::autoqc::results::insert_size->new(id_run => 222, path => q[mypath], position => 1);
+ my $r = npg_qc::autoqc::results::insert_size->new(id_run => 222, position => 1);
  $collection->add($r);
+ $collection->add([$r, $r]);
 
 =cut
 sub add {
     my ($self, $r) = @_;
-    if(ref $r eq q{ARRAY}) {
-        foreach my $el (@{$r}) {
-            $self->push($el);
-        }
-    } else {
-        $self->push($r);
-    }
+    ref $r eq q{ARRAY} ? $self->push(@{$r}) : $self->push($r);
     return 1;
 }
 
+=head2 join_collections
 
-=head2 add_from_dir
-
-De-serializes objects from JSON files found in the directory given by the argument.
-Adds these de-serialized objects to this collection.
-Can only deal with classes from the npg_qc::autoqc::results name space. Each class
-should inherit from the npg_qc::autoqc::results::result object.
-
- my $c = npg_qc::autoqc::results::collection->new();
- my $path = catfile(cwd, q[t/data/autoqc/rendered/json_paired_run]);
- $c->add_from_dir($path);
+Class method. Joins a list of collections given as attribute,
+returns a collection object. Does not prune duplicates.
 
 =cut
-sub add_from_dir {
-    my ($self, $path, $lanes, $id_run) = @_;
-
-    my $pattern = $id_run ? $id_run : q[];
-    $pattern = $path . q[/] . $pattern . q[*.json];
-    my @files = glob $pattern;
-    my @classes = @{_list_classes(1)};
-
-    ## no critic (ProhibitBooleanGrep)
-
-    foreach my $file (@files) {
-        my ($filename, $dir, $extension) = fileparse($file);
-        foreach my $class (@classes) {
-            if ($filename =~ /$class/smx) {
-                my $module = $RESULTS_NAMESPACE . q[::] . $class;
-                my $result = $module->load($file);
-                my $position = $result->position;
-                if (!defined $lanes || !@{$lanes} || grep {/^$position$/smx} @{$lanes} ) {
-                    $self->add($result);
-                }
-                last;
-            }
-        }
+sub join_collections {
+    my ($package, @collections) = @_;
+    my $cln = __PACKAGE__->new();
+    foreach my $c (@collections) {
+        $cln->push(@{$c->results});
     }
-
-    return 1;
-}
-
-=head2 add_from_staging
-
-De-serializes objects from JSON files found in staging area.
-Adds these de-serialized objects to this collection.
-Also see add_from_dir method.
-
- use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
- use npg_qc::autoqc::results::collection;
-
- my $id_run = 1234;
- my $c = npg_qc::autoqc::results::collection->new();
-
- $c->add_from_staging($id_run); #retrieve main results for a run for all lanes
- $c->add_from_staging($id_run, []); #retrieve main results for a run for all lanes
- $c->add_from_staging($id_run, [], $LANES); #retrieve main results for a run for all lanes
- $c->add_from_staging($id_run, [1,2]); #retrieve main results for lanes 1 and 2
- $c->add_from_staging($id_run, [1,2], $LANES) #retrieve main results for lanes 1 and 2
- $c->add_from_staging($id_run, [], $PLEXES); #retrieve only results for plexes for all available lanes
- $c->add_from_staging($id_run, undef, $ALL); #retrieve both main results and results for plexes for all available lanes
- $c->add_from_staging($id_run, [1,2], $PLEXES); #retrieve results for plexes for lanes 1 and 2
- $c->add_from_staging($id_run, [1,2], $ALL); #retrieve both main and plex results for lanes 1 and 2
-
-=cut
-sub add_from_staging {
-    my ($self, $id_run, $lanes, $what) = @_;
-
-    my $obj_hash = {id_run => $id_run, propagate_npg_tracking_schema => 1, tracking_schema => undef,};
-    if ($lanes) { $obj_hash->{positions} = $lanes; }
-    if ($what) { $obj_hash->{option} = $what; }
-    $self->load_from_staging(npg_qc::autoqc::qc_store::query->new($obj_hash));
-    return 1;
-}
-
-=head2 load_from_staging
-
-De-serializes objects from JSON files found in staging area.
-Adds these de-serialized objects to this collection.
-Also see add_from_dir method.
-
- my $query =  npg_qc::autoqc::qc_store::query->new(id_run => 123);
- my $c = npg_qc::autoqc::results::collection->new();
- $c->load_from_staging($query);
-
-How to define a query is described in documentation for npg_qc::autoqc::qc_store::query.
-
-=cut
-sub load_from_staging {
-    my ($self, $query) = @_;
-
-    if (!defined $query) {
-      croak q[Query object should be defined];
-    }
-
-    my $finder_hash = {id_run => $query->id_run,};
-    if ($query->propagate_npg_tracking_schema) {
-        $finder_hash->{npg_tracking_schema} = $query->npg_tracking_schema;
-    }
-
-    my $finder = Moose::Meta::Class->create_anon_class(
-       roles => [qw/npg_tracking::illumina::run::short_info
-                    npg_tracking::illumina::run::folder/])->new_object($finder_hash);
-
-
-    if ( $query->option == $LANES || $query->option == $ALL ) {
-        $self->add_from_dir($finder->qc_path, $query->positions, $query->id_run);
-    }
-
-    if ( $query->option == $PLEXES || $query->option == $ALL ) {
-
-        my @dirs = ();
-        my @lanes = @{$query->positions};
-        if ( @lanes ) {
-            foreach my $lane ( @lanes ) {
-                my $path = $finder->lane_qc_path($lane);
-                if (-e $path) {
-                    push @dirs, $path;
-                }
-            }
-        } else {
-            @dirs = @{$finder->lane_qc_paths};
-        }
-
-        foreach my $dir (@dirs) {
-            $self->add_from_dir($dir, undef, $query->id_run);
-        }
-    }
-
-    return 1;
+    return $cln;
 }
 
 =head2 is_empty
@@ -326,20 +190,20 @@ my $plex_results = $collection->remove(q[check_name], [ 'qX_yield', 'gc bias' ])
 =cut
 
 sub remove {
-  my ($self, $criterion, $values) = @_;
+    my ($self, $criterion, $values) = @_;
 
-  if (!defined $criterion) { croak q[Cannot remove with undefined criterion]; }
-  if (!defined $values)     { croak qq[Cannot remove with undefined $criterion values]; }
+    if (!defined $criterion) { croak q[Cannot remove with undefined criterion]; }
+    if (!defined $values)     { croak qq[Cannot remove with undefined $criterion values]; }
 
-  if ($criterion !~ /check_name|class_name/smx) {
-    croak q[Can only remove based on either check_name or class_name];
-  }
+    if ($criterion !~ /check_name|class_name/smx) {
+        croak q[Can only remove based on either check_name or class_name];
+    }
 
-  my $c = __PACKAGE__->new();
-  my @filtered = $self->grep(sub { my $obj = $_; none { $obj->$criterion eq $_ } @{$values} } );
-  $c->push(@filtered);
+    my $c = __PACKAGE__->new();
+    my @filtered = $self->grep(sub { my $obj = $_; none { $obj->$criterion eq $_ } @{$values} } );
+    $c->push(@filtered);
 
-  return $c;
+    return $c;
 }
 
 =head2 search
@@ -363,36 +227,17 @@ sub search {
     return $c;
 }
 
-=head2 run_lane_map
-
-Generates a hash map of all run numbers and positions in the collection.
-The keys are 'id_run:position' strings, the values are anonimous hashes,
-each containing a 'position' and 'id_run' entry
-
-=cut
-sub run_lane_map {
-    my $self = shift;
-    my $map = {};
-    foreach my $result (@{$self->results}) {
-        my $key = $result->rpt_key;
-        if (!defined $map->{$key}) {
-            $map->{$key} = {id_run => $result->id_run, position => $result->position,};
-        }
-    }
-    return $map;
-}
-
 =head2 run_lane_collections
 
 Generates a hash map of all run numbers, positions and tag indices in the collection.
-The keys are 'id_run:position:tag_index' strings, the values are relevant sub-collections.
+The keys are rpt list strings, the values are relevant sub-collections.
 
 =cut
 sub run_lane_collections {
     my $self = shift;
     my $map = {};
     foreach my $result (@{$self->results}) {
-        my $key = $result->rpt_key;
+        my $key = $result->get_rpt_list;
         if (!defined $map->{$key}) {
             my $c = __PACKAGE__->new();
             $c->add($result);
@@ -463,8 +308,6 @@ __END__
 
 =item MooseX::AttributeHelpers
 
-=item npg_qc::autoqc::qc_store::options
-
 =item Carp
 
 =item English
@@ -474,18 +317,6 @@ __END__
 =item Module::Pluggable::Object
 
 =item Readonly
-
-=item File::Basename
-
-=item Moose::Meta::Class
-
-=item npg_tracking::illumina::run::short_info
-
-=item npg_tracking::illumina::run::folder
-
-=item npg_qc::autoqc::qc_store::options
-
-=item npg_qc::autoqc::qc_store::query
 
 =back
 
@@ -499,7 +330,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

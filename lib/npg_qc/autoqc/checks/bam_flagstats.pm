@@ -34,6 +34,9 @@ Readonly::Hash my %METRICS_FIELD_MAPPING => {
 Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
 Readonly::Scalar my $METRICS_NUMBER => 9;
 Readonly::Scalar my $PAIR_NUMBER => 2;
+Readonly::Scalar my $TARGET_STATS_PATTERN => '_target';
+Readonly::Scalar my $TARGET_STATS_DEFAULT_DEPTH => 15;
+Readonly::Scalar my $STATS_FILTER => '[[:alnum:]]+[\_[:lower:]]*?';
 Readonly::Scalar our $EXT => q[bam];
 
 has '+subset' => ( isa => 'Str', );
@@ -93,20 +96,32 @@ has 'samtools_stats_file' => ( isa        => 'ArrayRef',
 );
 sub _build_samtools_stats_file {
   my $self = shift;
-
-  my @underscores = ($self->_file_path_root =~ /_/gsmx);
-  my $n = 1 + scalar @underscores;
-  my @paths = sort grep { -f && _matches_seq_file($_, $n) } glob $self->_file_path_root . q[_*.stats];
+  my @paths = sort grep { -f && $self->_matches_seq_file($_) } glob $self->_file_path_root . q[_*.stats];
   if (!@paths) {
     warn 'WARNING: Samtools stats files are not found for ' . $self->to_string() . qq[\n];
   }
-
   return \@paths;
 }
 sub _matches_seq_file {
-  my ($path, $expected_num_underscores) = @_;
-  my @underscores = ($path =~ /_/gsmx);
-  return scalar @underscores == $expected_num_underscores;
+  my ($self,$path) = @_;
+  if ( ! $path) { croak q(No input path defined) }
+  my ($ext) = $path =~ /(_$STATS_FILTER[.]stats)\Z/xms;
+  return $path eq $self->_file_path_root . $ext;
+}
+
+has 'target_stats_file' => ( isa        => 'Str | Undef',
+                             is         => 'ro',
+                             lazy_build => 1,
+);
+sub _build_target_stats_file {
+  my $self = shift;
+  my $file;
+  if($self->samtools_stats_file && @{$self->samtools_stats_file}){
+    my @x = @{$self->samtools_stats_file};
+    my @found = grep { /$TARGET_STATS_PATTERN/smx } @{$self->samtools_stats_file};
+    if (@found == 1){ $file = $found[0]; }
+  }
+  return $file;
 }
 
 has 'related_results' => ( isa        => 'ArrayRef[Object]',
@@ -135,8 +150,13 @@ sub _build_related_results {
 override 'execute' => sub {
   my $self = shift;
 
+  super();
+
   if( !$self->skip_markdups_metrics ){
     $self->_parse_markdups_metrics();
+  }
+  if( $self->target_stats_file ) {
+    $self->_parse_target_stats_file();
   }
   $self->_parse_flagstats();
   for my $rr ( @{$self->related_results()} ) {
@@ -224,6 +244,46 @@ sub _parse_flagstats {
 
   return;
 }
+
+sub _parse_target_stats_file {
+   my $self = shift;
+
+   my $fn = $self->target_stats_file;
+   ## no critic (InputOutput::RequireBriefOpen)
+   open my $target_stats_fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
+   while ( my $line = <$target_stats_fh> ) {
+     chomp $line;
+     if ( $line =~ /The\ command\ line\ was/mxs ) {
+       if( my ($td) = $line =~ /-[g|cov\-threshold]\s*(\d+)/mxs){
+         $self->result()->target_coverage_threshold($td);
+       } else{
+         $self->result()->target_coverage_threshold($TARGET_STATS_DEFAULT_DEPTH);
+       }
+     }
+     elsif ( $line =~ /^SN\s+/mxs ){
+          my ($number) = $line =~ /^SN\s+.*\:\s+([\d\.]+)\b/mxs;
+          ( $line =~ /reads\ mapped\:/mxs )
+          ? $self->result()->target_mapped_reads($number)
+          : ( $line =~ /reads\ properly\ paired\:/mxs )
+          ? $self->result()->target_proper_pair_mapped_reads($number)
+          : ( $line =~ /bases\ mapped\ \(cigar\)\:/mxs )
+          ? $self->result()->target_mapped_bases($number)
+          : ( $line =~ /bases\ inside\ the\ target\:/mxs )
+          ? $self->result()->target_length($number)
+          : ( $line =~ /percentage\ of\ target\ genome\ with\ coverage/mxs )
+          ? $self->result()->target_percent_gt_coverage_threshold($number)
+          : next;
+     }
+     elsif ( $line =~ /^FFQ\s+/mxs ) { last; }
+   }
+   close $target_stats_fh  or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
+
+   my ($filter) = $fn =~ /_($STATS_FILTER)[.]stats\Z/xms;
+   $self->result()->target_filter($filter);
+
+   return;
+}
+
 
 __PACKAGE__->meta->make_immutable;
 

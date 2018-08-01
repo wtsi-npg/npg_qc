@@ -18,7 +18,7 @@ scripts directory:
 
 src directory:
 --------------
- source code for C utilities
+ Moved to https://github.com/wtsi-npg/npg_qc_utils
 
 t directory:
 ------------

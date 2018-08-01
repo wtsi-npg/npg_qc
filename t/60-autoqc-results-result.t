@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 48;
+use Test::More tests => 45;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::result');
@@ -151,9 +151,6 @@ use_ok ('npg_qc::autoqc::results::result');
                                         position  => 3,
                                         id_run    => 2549,
                                                  );
-    is (npg_qc::autoqc::results::result->rpt_key_delim, q[:], 'rpt key delim');
-    is (npg_qc::autoqc::role::result->rpt_key_delim, q[:], 'rpt key delim');
-    is ($r->rpt_key_delim, q[:], 'rpt key delim');
     is ($r->rpt_key, q[2549:3], 'rpt key');
     
     $r = npg_qc::autoqc::results::result->new(
@@ -173,7 +170,8 @@ use_ok ('npg_qc::autoqc::results::result');
 
 {
     throws_ok {npg_qc::autoqc::results::result->inflate_rpt_key(q[5;6])}
-      qr/rpt string should not contain ';'/, 'error when inflating rpt key';
+        qr/Both id_run and position should be defined non-zero values /,
+        'error when inflating rpt key';
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6]), {id_run=>5,position=>6,}, 'rpt key inflated');
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:1]), {id_run=>5,position=>6,tag_index=>1}, 'rpt key inflated');
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:0]), {id_run=>5,position=>6,tag_index=>0}, 'rpt key inflated');

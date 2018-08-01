@@ -163,81 +163,6 @@ __PACKAGE__->add_unique_constraint(
 
 =head1 RELATIONS
 
-=head2 cumulative_errors_by_cycle
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::CumulativeErrorsByCycle>
-
-=cut
-
-__PACKAGE__->has_many(
-  'cumulative_errors_by_cycle',
-  'npg_qc::Schema::Result::CumulativeErrorsByCycle',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 error_rate_reference_including_blanks
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::ErrorRateReferenceIncludingBlank>
-
-=cut
-
-__PACKAGE__->has_many(
-  'error_rate_reference_including_blanks',
-  'npg_qc::Schema::Result::ErrorRateReferenceIncludingBlank',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 error_rate_reference_no_blanks
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::ErrorRateReferenceNoBlank>
-
-=cut
-
-__PACKAGE__->has_many(
-  'error_rate_reference_no_blanks',
-  'npg_qc::Schema::Result::ErrorRateReferenceNoBlank',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 error_rate_relative_reference_cycle_nucleotides
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::ErrorRateRelativeReferenceCycleNucleotide>
-
-=cut
-
-__PACKAGE__->has_many(
-  'error_rate_relative_reference_cycle_nucleotides',
-  'npg_qc::Schema::Result::ErrorRateRelativeReferenceCycleNucleotide',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 error_rate_relative_sequence_bases
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::ErrorRateRelativeSequenceBase>
-
-=cut
-
-__PACKAGE__->has_many(
-  'error_rate_relative_sequence_bases',
-  'npg_qc::Schema::Result::ErrorRateRelativeSequenceBase',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
 =head2 errors_by_cycle
 
 Type: has_many
@@ -249,51 +174,6 @@ Related object: L<npg_qc::Schema::Result::ErrorsByCycle>
 __PACKAGE__->has_many(
   'errors_by_cycle',
   'npg_qc::Schema::Result::ErrorsByCycle',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 errors_by_cycles_and_nucleotide
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::ErrorsByCycleAndNucleotide>
-
-=cut
-
-__PACKAGE__->has_many(
-  'errors_by_cycles_and_nucleotide',
-  'npg_qc::Schema::Result::ErrorsByCycleAndNucleotide',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 errors_by_nucleotide
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::ErrorsByNucleotide>
-
-=cut
-
-__PACKAGE__->has_many(
-  'errors_by_nucleotide',
-  'npg_qc::Schema::Result::ErrorsByNucleotide',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 information_contents_by_cycle
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::InformationContentByCycle>
-
-=cut
-
-__PACKAGE__->has_many(
-  'information_contents_by_cycle',
-  'npg_qc::Schema::Result::InformationContentByCycle',
   { 'foreign.id_run_tile' => 'self.id_run_tile' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
@@ -313,51 +193,6 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 log_likelihoods
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::LogLikelihood>
-
-=cut
-
-__PACKAGE__->has_many(
-  'log_likelihoods',
-  'npg_qc::Schema::Result::LogLikelihood',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 most_common_blank_patterns
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::MostCommonBlankPattern>
-
-=cut
-
-__PACKAGE__->has_many(
-  'most_common_blank_patterns',
-  'npg_qc::Schema::Result::MostCommonBlankPattern',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 most_common_words
-
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::MostCommonWord>
-
-=cut
-
-__PACKAGE__->has_many(
-  'most_common_words',
-  'npg_qc::Schema::Result::MostCommonWord',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
 =head2 moves_z
 
 Type: has_many
@@ -373,24 +208,9 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 tile_scores
 
-Type: has_many
-
-Related object: L<npg_qc::Schema::Result::TileScore>
-
-=cut
-
-__PACKAGE__->has_many(
-  'tile_scores',
-  'npg_qc::Schema::Result::TileScore',
-  { 'foreign.id_run_tile' => 'self.id_run_tile' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07036 @ 2015-06-30 16:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KVyH1zZgDKvY5FrAKXcGhQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-12-01 15:10:03
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:QcWZ7cxL1blhXip4RLAhAg
 
 our $VERSION = '0';
 

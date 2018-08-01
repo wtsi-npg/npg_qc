@@ -18,6 +18,7 @@
   <li>fastqcheck files rendering as heatmaps</li>
   <li>gc fraction</li>
   <li>genotype - sample ID check (Sequenom genotypes)</li>
+  <li>genotype call (subset)</li>
   <li>insert size</li>
   <li>qc bias</li>
   <li>qX yield (threshold quality 20)</li>

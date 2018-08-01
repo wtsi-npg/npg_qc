@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+  <id>2809</id>
+  <status>started</status>
+  <lanes>
+    <lane position="1" id="70997" priority="0">
+      <library id="52495" name="NA20754-TOS 1" request_id="13474" qc_state="pending">
+        <sample sample_id="1913" library_id="52495" library_name="NA20754-TOS 1" library_type="High complexity" study_id="186" project_id="186" consent_withdrawn="false">
+          <insert_size from="150" to="200"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="2" id="70998" priority="0">
+      <library id="52495" name="NA20754-TOS 1" request_id="13475" qc_state="pending">
+        <sample sample_id="1913" library_id="52495" library_name="NA20754-TOS 1" library_type="High complexity" study_id="186" project_id="186" consent_withdrawn="false">
+          <insert_size from="150" to="200"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="3" id="70999" priority="0">
+      <library id="52495" name="NA20754-TOS 1" request_id="13476" qc_state="pending">
+        <sample sample_id="1913" library_id="52495" library_name="NA20754-TOS 1" library_type="High complexity" study_id="186" project_id="186" consent_withdrawn="false">
+          <insert_size from="150" to="200"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="4" id="81118" priority="0">
+      <control id="79572" name="phiX_SI_SPRI 1" request_id="42339">
+        <sample sample_id="9831" library_id="79572" library_name="phiX_SI_SPRI 1" library_type="" study_id="" project_id="" consent_withdrawn="false">
+        </sample>
+      </control>
+    </lane>
+    <lane position="5" id="71000" priority="0">
+      <library id="52495" name="NA20754-TOS 1" request_id="13477" qc_state="pending">
+        <sample sample_id="1913" library_id="52495" library_name="NA20754-TOS 1" library_type="High complexity" study_id="186" project_id="186" consent_withdrawn="false">
+          <insert_size from="150" to="200"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="6" id="71001" priority="0">
+      <library id="52495" name="NA20754-TOS 1" request_id="13478" qc_state="pending">
+        <sample sample_id="1913" library_id="52495" library_name="NA20754-TOS 1" library_type="High complexity" study_id="186" project_id="186" consent_withdrawn="false">
+          <insert_size from="150" to="200"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="7" id="70996" priority="0">
+      <library id="52495" name="NA20754-TOS 1" request_id="13473" qc_state="pending">
+        <sample sample_id="1913" library_id="52495" library_name="NA20754-TOS 1" library_type="High complexity" study_id="186" project_id="186" consent_withdrawn="false">
+          <insert_size from="150" to="200"/>
+        </sample>
+      </library>
+    </lane>
+    <lane position="8" id="81119" priority="0">
+      <control id="79572" name="phiX_SI_SPRI 1" request_id="42340">
+        <sample sample_id="9831" library_id="79572" library_name="phiX_SI_SPRI 1" library_type="" study_id="" project_id="" consent_withdrawn="false">
+        </sample>
+      </control>
+    </lane>
+  </lanes>
+</batch>

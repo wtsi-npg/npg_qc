@@ -5,6 +5,8 @@ use namespace::autoclean;
 use MooseX::ClassAttribute;
 use Carp;
 use Readonly;
+use List::Util qw(min);
+use st::api::lims;
 
 our $VERSION = '0';
 
@@ -50,6 +52,7 @@ Readonly::Hash our %HEADER_MAPPING => (
           'MAX_MISMATCHES' => 'max_mismatches_param',
           'MIN_MISMATCH_DELTA' => 'min_mismatch_delta_param',
           'MAX_NO_CALLS' => 'max_no_calls_param',
+          'PCT_TAG_HOPS' => 'tag_hops_percent',
                                       );
 
 Readonly::Scalar our $ERROR_TOLERANCE_PERCENT => 20;
@@ -141,6 +144,32 @@ sub _parse_tag_metrics {
   return;
 }
 
+sub _calculate_tag_hops_power {
+  my ($self) = @_;
+
+  my $nsamples = 0;
+  my %tags0 = ();
+  my %tags1 = ();
+  my $lims = st::api::lims->new(id_run=>$self->id_run, position=>$self->position);
+  foreach my $plex ($lims->children) {
+    my $tag_sequences = $plex->tag_sequences;
+    # skip samples with no second index i.e. phix
+    if (@{$tag_sequences} != 2) { next; }
+    $nsamples++;
+    $tags0{$tag_sequences->[0]}++;
+    $tags1{$tag_sequences->[1]}++;
+  }
+
+  my $count0 = scalar keys %tags0 ;
+  my $count1 = scalar keys %tags1 ;
+  my $ncombinations = $count0 * $count1;
+  my $nudis = min($count0, $count1);
+  my $power = ($ncombinations == $nudis) ? 0 : ($ncombinations - $nsamples) / ($ncombinations - $nudis);
+
+  $self->result->tag_hops_power($power);
+  return;
+}
+
 override 'can_run' => sub  {
   my $self = shift;
   return ($self->num_components() == 1 &&
@@ -149,7 +178,8 @@ override 'can_run' => sub  {
 
 override 'execute' => sub  {
   my $self = shift;
-  if (!super()) { return 1;}
+
+  super();
 
   my $metrics_file = $self->input_files->[0];
   $self->result->metrics_file($metrics_file);
@@ -168,6 +198,18 @@ override 'execute' => sub  {
     $self->_parse_tag_metrics($tag_metrics);
   }
   close $fh or carp q[Cannot close a filehandle];
+
+  if (open my $fh, '<', $metrics_file.q[.hops]) {
+    $line = <$fh>;
+    $line = <$fh>;
+    if ($line) {
+      $self->_parse_header($line);
+    } else {
+      $self->result->tag_hops_percent(0);
+    }
+    close $fh or carp q[Cannot close a filehandle for hops file];
+    $self->_calculate_tag_hops_power();
+  }
 
   my $pass = ($self->result->errors_percent > $ERROR_TOLERANCE_PERCENT) ? 0 : 1;
   $self->result->pass($pass);
@@ -198,6 +240,10 @@ __END__
 
 =item Readonly
 
+=item List::Util
+
+=item st::api::lims
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -210,7 +256,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

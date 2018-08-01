@@ -4,13 +4,10 @@ use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Readonly;
-use Carp;
-use English qw(-no_match_vars);
 use Math::Round qw(round);
 use Try::Tiny;
 
 use npg_common::fastqcheck;
-use npg::api::run;
 
 extends qw(npg_qc::autoqc::checks::check);
 
@@ -36,19 +33,24 @@ A fast qX check that uses a fastqcheck file.
 
 Readonly::Scalar our $Q_CUTOFF                  => 20;
 Readonly::Scalar our $EXT                       => 'fastqcheck';
-Readonly::Scalar our $MIN_YIELD_THRESHOLD_KB_GA    => 1_500_000;
-Readonly::Scalar our $MIN_YIELD_THRESHOLD_KB_HS    => 5_000_000;
-Readonly::Scalar our $DEFAULT_READ_LENGTH_GA       => 76;
-Readonly::Scalar our $DEFAULT_READ_LENGTH_HS       => 75;
+Readonly::Scalar our $MIN_YIELD_THRESHOLD_KB_HS => 5_000_000;
+Readonly::Scalar our $DEFAULT_READ_LENGTH_HS    => 75;
 Readonly::Scalar our $THOUSAND                  => 1000;
 Readonly::Scalar our $NA                        => -1;
 
 has '+file_type' => (default    => $EXT,);
 
+=head2 platform_is_hiseq
+
+=cut
+
+has 'platform_is_hiseq' => (isa           => q[Bool],
+                            is            => q[ro],
+                           );
 
 override 'execute'            => sub  {
   my $self = shift;
-  if (!super()) { return 1;}
+  super();
 
   my @fnames = @{$self->input_files};
   my $short_fnames = $self->generate_filename_attr();
@@ -106,8 +108,10 @@ override 'execute'            => sub  {
 sub _get_threshold {
   my ($self, $fq) = @_;
 
+  my $threshold = $NA;
+
   if ($self->num_components > 1) {
-      return $NA;
+    return $threshold;
   }
 
   my $read_length = 0;
@@ -115,28 +119,14 @@ sub _get_threshold {
     $read_length = $fq->read_length();
   };
   if ($read_length <= 0) {
-    return $NA;
+    return $threshold;
   }
 
-  my $id_run = $self->composition->get_component(0)->id_run();
-  my $model = npg::api::run->new( {id_run => $id_run})->instrument->model;
-  my $threshold;
-
-  if($model eq 'HK') {
-    $threshold = $MIN_YIELD_THRESHOLD_KB_GA;
-    if ($read_length != $DEFAULT_READ_LENGTH_GA) {
-      $threshold = ($read_length * $threshold) / $DEFAULT_READ_LENGTH_GA;
-    }
-  }
-  elsif($model eq 'HiSeq') {
+  if($self->platform_is_hiseq()) {
     $threshold = $MIN_YIELD_THRESHOLD_KB_HS;
     if ($read_length != $DEFAULT_READ_LENGTH_HS) {
       $threshold = ($read_length * $threshold) / $DEFAULT_READ_LENGTH_HS;
     }
-  }
-  else {
-    $self->result->comments('Unrecognised instrument model');
-    $threshold = $NA;
   }
 
   return round($threshold);
@@ -161,10 +151,6 @@ __END__
 
 =item namespace::autoclean
 
-=item Carp
-
-=item English
-
 =item Readonly
 
 =item Math::Round
@@ -174,8 +160,6 @@ __END__
 =item npg_common::fastqcheck
 
 =item npg_qc::autoqc::checks::check
-
-=item npg::api::run
 
 =back
 
@@ -189,7 +173,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
