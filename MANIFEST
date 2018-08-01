@@ -34,6 +34,7 @@ lib/npg_qc/autoqc/autoqc.pm
 lib/npg_qc/autoqc/checks/adapter.pm
 lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/checks/bam_flagstats.pm
+lib/npg_qc/autoqc/checks/bcfstats.pm
 lib/npg_qc/autoqc/checks/check.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
@@ -58,6 +59,7 @@ lib/npg_qc/autoqc/qc_store/query.pm
 lib/npg_qc/autoqc/results/adapter.pm
 lib/npg_qc/autoqc/results/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/results/bam_flagstats.pm
+lib/npg_qc/autoqc/results/bcfstats.pm
 lib/npg_qc/autoqc/results/base.pm
 lib/npg_qc/autoqc/results/collection.pm
 lib/npg_qc/autoqc/results/contamination.pm
@@ -117,6 +119,7 @@ lib/npg_qc/Schema/Result/AlignmentFilterMetrics.pm
 lib/npg_qc/Schema/Result/AnalysisLane.pm
 lib/npg_qc/Schema/Result/Analysis.pm
 lib/npg_qc/Schema/Result/BamFlagstats.pm
+lib/npg_qc/Schema/Result/Bcfstats.pm
 lib/npg_qc/Schema/Result/CacheQuery.pm
 lib/npg_qc/Schema/Result/ChipSummary.pm
 lib/npg_qc/Schema/Result/ClusterDensity.pm
@@ -169,6 +172,7 @@ lib/npg_qc/Schema/Result/VerifyBamId.pm
 lib/npg_qc/Schema/ResultSet.pm
 lib/npg_qc/Schema/ResultSet/MqcOutcomeEnt.pm
 lib/npg_qc/utils/bam_genotype.pm
+lib/npg_qc/utils/genotype_calling.pm
 lib/R/gc_bias_data.R
 MANIFEST
 README
@@ -197,6 +201,7 @@ t/50-schema-result-Adapter.t
 t/50-schema-result-Genotype.t
 t/50-schema-result-GenotypeCall.t
 t/50-schema-result-BamFlagstats.t
+t/50-schema-result-Bcfstats.t
 t/50-schema-result-SequenceError.t
 t/50-schema-result-RefMatch.t
 t/50-schema-result-SpatialFilter.t
@@ -229,6 +234,7 @@ t/60-autoqc-autoqc.t
 t/60-autoqc-checks-adapter.t
 t/60-autoqc-checks-af_metrics.t
 t/60-autoqc-checks-bam_flagstats.t
+t/60-autoqc-checks-bcfstats.t
 t/60-autoqc-checks-check.t
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
@@ -254,6 +260,7 @@ t/60-autoqc-role-rpt_key.t
 t/60-autoqc-results-adapter.t
 t/60-autoqc-results-af_metrics.t
 t/60-autoqc-results-bam_flagstats.t
+t/60-autoqc-results-bcfstats.t
 t/60-autoqc-results-collection.t
 t/60-autoqc-results-contamination.t
 t/60-autoqc-results-gc_bias.t
@@ -291,6 +298,8 @@ t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json
 t/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt
 t/data/autoqc/bam_flagstats/4783_5.flagstat
 t/data/autoqc/bam_flagstats/4921_3_bam_flagstats.json
+t/data/autoqc/bcfstats/data/21835_5.bcfstats.json
+t/data/autoqc/bcfstats/samplesheet_21835.csv
 t/data/autoqc/dbix_loader/run/12233_1.upstream_tags.json
 t/data/autoqc/dbix_loader/run/12233_1.adapter.json
 t/data/autoqc/dbix_loader/run/12233_1.gc_fraction.json
@@ -419,6 +428,11 @@ t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/fasta/Hs_MajorQC.fa
 t/data/autoqc/gc_bias/sam-3lines
 t/data/autoqc/gc_bias/sam_aligned_header
 t/data/autoqc/gc_bias/sam_unaligned_header
+t/data/autoqc/geno_refset_repository/study3705/GRCh38_full_analysis_set_plus_decoy_hla/bcfdb/study3705.bcf
+t/data/autoqc/geno_refset_repository/study3705/GRCh38_full_analysis_set_plus_decoy_hla/bcfdb/study3705.bcf.csi
+t/data/autoqc/geno_refset_repository/study3705/GRCh38_full_analysis_set_plus_decoy_hla/bcftools/study3705.annotation.vcf
+t/data/autoqc/geno_refset_repository/study3705/GRCh38_full_analysis_set_plus_decoy_hla/bcftools/study3705.info.json
+t/data/autoqc/geno_refset_repository/study3705/GRCh38_full_analysis_set_plus_decoy_hla/bcftools/study3705.ploidy
 t/data/autoqc/genotype/6812_1.genotype.json
 t/data/autoqc/genotype/6812_2.genotype.json
 t/data/autoqc/genotype/6812_3.genotype.json
@@ -474,6 +488,7 @@ t/data/autoqc/qc/1937_3.map
 t/data/autoqc/qX_yield/npg/instrument/15.xml
 t/data/autoqc/qX_yield/npg/run/2549.xml
 t/data/autoqc/reference.bwt
+t/data/autoqc/references/Homo_sapiens/GRCh38_full_analysis_set_plus_decoy_hla/all/fasta/GRCh38_full_analysis_set_plus_decoy_hla.fasta
 t/data/autoqc/references/Homo_sapiens/NCBI36/all/bwa/someref.fa.bwt
 t/data/autoqc/references/Homo_sapiens/NCBI36/all/fasta/someref.fa
 t/data/autoqc/references/No_bowtie/Sanger/all/fasta/Sanger.fa

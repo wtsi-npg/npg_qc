@@ -461,3 +461,17 @@ END
       <span>na</span>
 [%  END %]
 [%-   END -%]
+
+[% BLOCK bcfstats %]
+[%  IF result.percent_condordance.defined %]
+      <span>[% result.percent_condordance %]<br/></span>
+[%  ELSE %]
+      <span>na</span>
+[%  END %]
+[%  IF result.percent_nrd.defined %]
+      <span>[% result.percent_nrd %]<br/></span>
+[%  ELSE %]
+      <span>na</span>
+[%  END %]
+[%-   END -%]
+

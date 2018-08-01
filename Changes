@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - add new bcfstats qc check + viewer changes
  - skip incomplete tag zero results in genotype_call POSTing to LIMs
  - handle target samtools stats file - parsing, archiving and viewing.
  - queries to qc_store should always have support for tracking db look-up
