@@ -25,8 +25,6 @@ has [qw/genotypes_attempted
 
 has [qw/gbs_plex_name
         gbs_plex_path
-        caller
-        calling_command
         sex
       / ] => (
     is         => 'rw',

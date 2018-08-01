@@ -1,0 +1,46 @@
+--
+-- add columns to the bam_flagstats table
+--
+
+ALTER TABLE `bam_flagstats` 
+ADD COLUMN `target_filter` varchar(30) DEFAULT NULL 
+COMMENT 'Filter used to produce the target stats file' 
+AFTER `read_pairs_examined`;
+
+ALTER TABLE `bam_flagstats` 
+ADD COLUMN `target_length` bigint(12) unsigned DEFAULT NULL
+COMMENT 'The total length of the target regions' 
+AFTER `target_filter`;
+
+ALTER TABLE `bam_flagstats` 
+ADD COLUMN `target_mapped_reads` bigint(20) unsigned DEFAULT NULL
+COMMENT 'The number of mapped reads passing the filter' 
+AFTER `target_length`;
+
+ALTER TABLE `bam_flagstats` 
+ADD COLUMN `target_proper_pair_mapped_reads` bigint(20) unsigned DEFAULT NULL 
+COMMENT 'The number of proper pair mapped reads passing the filter' 
+AFTER `target_mapped_reads`;
+
+ALTER TABLE `bam_flagstats` 
+ADD COLUMN `target_mapped_bases` bigint(20) unsigned DEFAULT NULL
+COMMENT 'The number of mapped bases passing the filter' 
+AFTER `target_proper_pair_mapped_reads`;
+
+ALTER TABLE `bam_flagstats` 
+ADD COLUMN `target_coverage_threshold` int(4) DEFAULT NULL 
+COMMENT 'The coverage threshold used in the perc target greater than depth calculation' 
+AFTER `target_mapped_bases`;
+
+ALTER TABLE `bam_flagstats` 
+ADD COLUMN `target_percent_gt_coverage_threshold` float(5,2) DEFAULT NULL
+COMMENT 'The percentage of the target covered at greater than the depth specified' 
+AFTER `target_coverage_threshold`;
+
+--
+-- modify samtools_stats filter column
+--
+
+ALTER TABLE `samtools_stats` 
+MODIFY COLUMN `filter` 
+varchar(30) NOT NULL;

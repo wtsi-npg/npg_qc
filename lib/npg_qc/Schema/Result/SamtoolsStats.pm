@@ -74,9 +74,7 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
   data_type: 'varchar'
   is_nullable: 0
-  size: 8
-
-Filter used to produce the stats file
+  size: 30
 
 =head2 stats
 
@@ -103,7 +101,7 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   'filter',
-  { data_type => 'varchar', is_nullable => 0, size => 8 },
+  { data_type => 'varchar', is_nullable => 0, size => 30 },
   'stats',
   { data_type => 'mediumblob', is_nullable => 0 },
 );
@@ -154,8 +152,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-14 17:35:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gxBn3P+F0EV0spaDg/HHRQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-06-14 16:17:33
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:93R50LwQgk3MdWVShyvl4A
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -99,7 +99,7 @@ sub _build_ref_base_count_path {
 override 'execute'            => sub {
 
     my $self = shift;
-    if(!super()) {return 1;}
+    super();
 
     my @files = @{$self->input_files};
     my $short_fnames = $self->generate_filename_attr();

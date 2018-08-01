@@ -1,0 +1,16 @@
+---
+- id_seq_component: 1
+  id_run: 25680
+  position: 1
+  tag_index: 1
+  digest: 0570549c248831c9b865048747242bcf3a82470f675c324287b943c37f064b51
+- id_seq_component: 2
+  id_run: 25680
+  position: 1
+  tag_index: 2
+  digest: 09b5d25085000420782bdd394b3f53103cd90f6ae1102eef48fbba5ea55049bb
+- id_seq_component: 3
+  id_run: 25680
+  position: 1
+  tag_index: 0
+  digest: e9da48dc6f57288f2d5aafeab16ff812bfedbe3713c482f634c3424fd6753cb4

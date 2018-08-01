@@ -141,6 +141,18 @@ sub is_old_style_result {
          defined $self->id_run;
 }
 
+=head2 get_rpt_list
+
+Returns rn pt list value for a composition associated with the
+result object.
+
+=cut
+
+sub get_rpt_list {
+  my $self = shift;
+  return $self->composition()->freeze2rpt();
+}
+
 =head2 equals_byvalue
 
 Supports comparison on the following attributes:

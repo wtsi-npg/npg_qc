@@ -1,0 +1,29 @@
+---
+- entity_id_lims: 21475103
+  entity_type: library_indexed
+  id_flowcell_lims:  61051
+  id_iseq_flowcell_tmp: 5952673
+  id_lims: SQSCP
+  id_pool_lims: NT1377084U
+  id_sample_tmp: 3466725
+  last_updated: 2018-05-15 10:42:29
+  legacy_library_id: 21388795
+  position: 1
+  recorded_at: 2018-05-15 10:53:03
+  tag_index: 1
+  primer_panel: Pf_GRC1v1.0
+  pipeline_id_lims: GBS
+- entity_id_lims: 21475103
+  entity_type: library_indexed
+  id_flowcell_lims:  61051
+  id_iseq_flowcell_tmp: 5952705
+  id_lims: SQSCP
+  id_pool_lims: NT1377084U
+  id_sample_tmp: 3466726
+  last_updated: 2018-05-15 10:42:29
+  legacy_library_id: 21388843
+  position: 1
+  recorded_at: 2018-05-15 10:53:03
+  tag_index: 2
+  primer_panel: Pf_GRC1v1.0
+  pipeline_id_lims: GBS

@@ -68,6 +68,14 @@ sub percent_singletons {
    return;
 }
 
+sub percent_target_proper_pair_mapped_reads {
+  my $self = shift;
+  if (defined $self->target_mapped_reads && defined $self->target_proper_pair_mapped_reads) {
+    return $PERCENTAGE * $self->target_proper_pair_mapped_reads / $self->target_mapped_reads;
+  }
+  return;
+}
+
 no Moose;
 
 1;
@@ -92,6 +100,8 @@ __END__
 =head2 percent_properly_paired
 
 =head2 percent_singletons
+
+=head2 percent_target_proper_pair_mapped_reads
 
 =head2 total_duplicate_reads
 

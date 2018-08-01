@@ -65,7 +65,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
   }); } q{loader object creation ok};
   is($loader->tile_count(), 32, 'tile count for 5330');
   is($loader->lane_count(), 8, 'lane count for 5330');
-  throws_ok {$loader->tilelayout_columns()} qr{No such file or directory}, 'lane col count for 5330'; 
+  throws_ok {$loader->tilelayout_columns()} qr{(No such file or directory)|(File not found)}, 'lane col count for 5330'; 
   is($loader->cycle_count(), 200, 'cycle count for 5330');
   cmp_deeply( [$loader->read1_cycle_range()], [1, 100], 'read1 cycle range for 5330');
   cmp_deeply( [$loader->read2_cycle_range()], [101, 200], 'read2 cycle range for 5330');  

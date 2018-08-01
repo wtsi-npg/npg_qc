@@ -31,7 +31,7 @@
 [%- END -%]
 
 [%- FOREACH check_name IN checks_list;
-      IF check_name.match('genotype') && !check_name.match('W30467');
+      IF (check_name.match('genotype') && !check_name.match('call')) && !check_name.match('W30467');
         NEXT;
       END;
 
@@ -209,7 +209,7 @@
         IF result.matches_pf_percent.exists("$tag_index");
           value = result.matches_pf_percent.${tag_index};
           IF value.defined;
-            FILTER format('%2.2f'); value * 100; END;
+            FILTER format('%2.1f'); value * 100; END;
           END;
         END;
       END;
@@ -448,4 +448,30 @@ END
       <span>na</span>
 [%  END %]
 [% END %]
+
+[% BLOCK genotype_call %]
+[%  IF result.genotype_call_rate.defined %]
+      <span>[% result.genotype_call_rate %]<br/></span>
+[%  ELSE %]
+      <span>na</span>
+[%  END %]
+[%  IF result.genotype_passed_rate.defined %]
+      <span>[% result.genotype_passed_rate %]<br/></span>
+[%  ELSE %]
+      <span>na</span>
+[%  END %]
+[%-   END -%]
+
+[% BLOCK bcfstats %]
+[%  IF result.percent_condordance.defined %]
+      <span>[% result.percent_condordance %]<br/></span>
+[%  ELSE %]
+      <span>na</span>
+[%  END %]
+[%  IF result.percent_nrd.defined %]
+      <span>[% result.percent_nrd %]<br/></span>
+[%  ELSE %]
+      <span>na</span>
+[%  END %]
+[%-   END -%]
 

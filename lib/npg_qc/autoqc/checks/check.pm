@@ -8,7 +8,7 @@ use Class::Load qw(load_class);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
-use List::MoreUtils qw(uniq);
+use List::MoreUtils qw(any uniq);
 use Readonly;
 use Carp;
 
@@ -25,8 +25,8 @@ with qw/ npg_tracking::glossary::run
 
 our $VERSION = '0';
 
-Readonly::Scalar our $FILE_EXTENSION  => 'fastq';
-Readonly::Scalar my  $HUMAN           => q[Homo_sapiens];
+Readonly::Scalar my $FILE_EXTENSION  => 'fastq';
+Readonly::Scalar my $HUMAN           => q[Homo_sapiens];
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -204,7 +204,8 @@ has 'tmp_path'    => (isa        => 'Str',
 
 =head2 file_type
 
-File type, also input file extension.
+Input file type as extension. Example: bam, fastq.
+Default - fastq.
 
 =cut
 
@@ -216,7 +217,7 @@ has 'file_type' => (isa        => 'Str',
 
 =head2 input_files
 
-A ref to a list with names of input files for this check
+Array reference with names of input files for this check
 
 =cut
 
@@ -303,14 +304,28 @@ sub run {
 
 =head2 execute
 
-The derived class should implement this method.
-Here this method only checks that the given path exists.
+This method is called by the qc script to run the check, perform
+all necessary computation and save results as an in-memory result
+object. The derived class should provide a full implementation of
+this method.
+
+In this class the method tries to find input files if not given
+and exists with an error if no files are found. If input_files
+attribute is set by the caller, the method errors if the array
+of files is empty or any of the files in the array do not exist.
+
+Returns the number of input files.
 
 =cut
 
 sub execute {
   my $self = shift;
-  return scalar @{$self->input_files} ? 1 : 0;
+  my @files = @{$self->input_files};
+  @files or croak 'input_files array cannot be empty';
+  if (any { !-e } @files) {
+    croak 'Some of input files do not exist: ' . join q[, ], @files;
+  }
+  return scalar @files;
 }
 
 =head2 can_run
@@ -326,7 +341,7 @@ sub can_run {
 
 =head2 get_id_run
 
-If all components belong to the same run, returns its id.
+If all components belong to the same run, returns this run's id.
 In other cases returns an undefined value.
 
 =cut
@@ -343,23 +358,24 @@ sub get_id_run {
 =head2 get_input_files
 
 Returns an array containing full paths to input files.
+The array contains either one or two files.
+Error if not files can be found.
 
 =cut
 sub get_input_files {
   my $self = shift;
 
   my @fnames = ();
+  my $no_end_forward;
   my $forward = join q[.], catfile($self->qc_in, $self->create_filename(1)),
                              $self->file_type;
-  my $no_end_forward = undef;
   if (!-e $forward) {
     $no_end_forward = join q[.], catfile($self->qc_in, $self->create_filename()),
                                  $self->file_type;
     if (-e $no_end_forward) {
       $forward = $no_end_forward;
     } else {
-      $self->result->comments(qq[Neither $forward nor $no_end_forward file found]);
-      return @fnames;
+      croak qq[Neither $forward nor $no_end_forward file found];
     }
   }
 
@@ -435,7 +451,7 @@ Returns a file name. Can be used both as an instance and class method.
 
 sub create_filename4attrs {
   my ($self, $map, $end) = @_;
-  return sprintf '%i_%i%s%s%s',
+  return sprintf '%s_%s%s%s%s',
     $map->{'id_run'},
     $map->{'position'},
     $end ? "_$end" : q[],

@@ -43,11 +43,13 @@ root/src/qsea_wrapper.tt2
 root/src/ui_checks/adapter.tt2
 root/src/ui_checks/alignment_filter_metrics.tt2
 root/src/ui_checks/bam_flagstats.tt2
+root/src/ui_checks/bcfstats.tt2
 root/src/ui_checks/checks_in_full.tt2
 root/src/ui_checks/contamination.tt2
 root/src/ui_checks/fastqcheck_visuals.tt2
 root/src/ui_checks/gc_bias.tt2
 root/src/ui_checks/gc_fraction.tt2
+root/src/ui_checks/genotype_call.tt2
 root/src/ui_checks/genotype.tt2
 root/src/ui_checks/insert_size.tt2
 root/src/ui_checks/pulldown_metrics.tt2

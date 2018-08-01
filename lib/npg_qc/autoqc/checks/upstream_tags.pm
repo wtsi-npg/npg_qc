@@ -6,15 +6,16 @@ use Carp;
 use English qw(-no_match_vars);
 use Fatal qw(open close);
 use File::Basename;
-use File::Spec::Functions qw(catfile catdir);
-use List::MoreUtils qw { any };
-use DBI;
+use File::Spec::Functions qw(catfile);
+use List::MoreUtils qw(any);
 use Readonly;
-use FindBin qw($Bin);
 
+use npg_tracking::Schema;
 use npg_qc::autoqc::checks::tag_metrics;
 use npg_qc::autoqc::qc_store;
 use npg_qc::autoqc::types;
+use npg_qc::autoqc::qc_store::query;
+use npg_qc::autoqc::qc_store::options qw/$LANES/;
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find
@@ -23,10 +24,8 @@ with qw(npg_tracking::data::reference::find
 
 our $VERSION = '0';
 
-Readonly::Scalar my $SAMTOOLS_NAME => q[samtools];
-Readonly::Scalar our $EXT => q[bam];
+Readonly::Scalar my $EXT => q[bam];
 Readonly::Scalar my $BARCODE_FILENAME => q[sanger168.tags];
-Readonly::Scalar my $BID_JAR_NAME    => q[BamIndexDecoder.jar];
 Readonly::Scalar my $NUM_BACK_RUNS => 5;
 Readonly::Scalar my $MAX_MISMATCHES_DEFAULT => 1;
 Readonly::Scalar my $MAX_NO_CALLS_DEFAULT => 0;
@@ -43,8 +42,6 @@ Readonly::Scalar my $STATUS_DATE_POS  => 1;
 Readonly::Scalar my $ID_INSTRUMENT_POS  => 2;
 Readonly::Scalar my $INSTRUMENT_NAME_POS  => 3;
 Readonly::Scalar my $SLOT_POS  => 4;
-
-Readonly::Scalar our $DEFAULT_JAVA_XMX => q{-Xmx1000m};
 
 has '+file_type' => (default => $EXT,);
 
@@ -142,7 +139,7 @@ has 'num_back_runs' => ( isa     => 'NpgTrackingNonNegativeInt',
                        );
 
 ###############################################################
-#  max_mismatches: BamIndexDecoder parameter
+#  max_mismatches: index decoder parameter
 ###############################################################
 has 'max_mismatches' => ( isa    => 'NpgTrackingNonNegativeInt',
                          is      => 'rw',
@@ -150,7 +147,7 @@ has 'max_mismatches' => ( isa    => 'NpgTrackingNonNegativeInt',
                         );
 
 ###############################################################
-#  max_no_calls: BamIndexDecoder parameter
+#  max_no_calls: index decoder parameter
 ###############################################################
 has 'max_no_calls' => ( isa     => 'NpgTrackingNonNegativeInt',
                         is      => 'rw',
@@ -169,7 +166,7 @@ sub _build_total_tag0_reads {
   my $self = shift;
 
   my $total_reads = 0;
-  for my $read_count (values %{$self->tag0_BamIndexDecoder_metrics->result->reads_pf_count}) {
+  for my $read_count (values %{$self->tag0_metrics->result->reads_pf_count}) {
     $total_reads += $read_count;
   }
 
@@ -189,8 +186,8 @@ sub _build_total_tag0_perfect_matches_reads {
 
   my $total_reads = 0;
   my $phix_tag_indices = $self->_run_info_data->{runs_info}->[0]->{phix_tagidx};
-  my $pmc = $self->tag0_BamIndexDecoder_metrics->result->perfect_matches_pf_count;
-  for my $perfect_matches_tagidx (keys %{$self->tag0_BamIndexDecoder_metrics->result->perfect_matches_pf_count}) {
+  my $pmc = $self->tag0_metrics->result->perfect_matches_pf_count;
+  for my $perfect_matches_tagidx (keys %{$self->tag0_metrics->result->perfect_matches_pf_count}) {
     next if($phix_tag_indices->{$perfect_matches_tagidx});
     $total_reads += $pmc->{$perfect_matches_tagidx};
   }
@@ -215,15 +212,20 @@ sub _build__tag_metrics_results {
   # data sources is used when a non-Latest_Summary path is specified by
   # the caller
   ######################################################################
-  my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
-  my $aqp = $self->archive_qc_path;
-  my $c=$qcs->load_from_path($aqp);
+  my $c=$self->_qc_store->load_from_path($self->archive_qc_path);
   my $tmr=$c->slice(q[class_name], q[tag_metrics]);
   my $position=$self->composition->get_component(0)->position;
   $tmr=$tmr->slice(q[position],$position);
 
   if(!$tmr->results || (@{$tmr->results} == 0)) {
-    $c=$qcs->load_run($self->get_id_run, $self->db_lookup, [ $position ]);
+    my $query = npg_qc::autoqc::qc_store::query->new(
+      option              => $LANES,
+      id_run              => $self->get_id_run,
+      positions           => [ $position ],
+      db_qcresults_lookup => $self->db_lookup,
+      npg_tracking_schema => $self->_npgtracking_schema
+    );
+    $c=$self->_qc_store->load($query);
     $tmr=$c->slice(q[class_name], q[tag_metrics]);
   }
 
@@ -290,7 +292,7 @@ sub _build_tag0_index_length {
   ## no critic (ProhibitTwoArgOpen ErrorHandling::RequireCheckingReturnValueOfEval
   my $index_length = 0;
   my $bfile = $self->tag0_bam_file;
-  my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools . qq[ view $bfile" ];
+  my $command = q[/bin/bash -c "set -o pipefail && ] . $self->samtools_cmd . qq[ view $bfile" ];
   open my $ph, q(-|), $command or croak qq[Cannot fork '$command', error $ERRNO];
   while (my $line = <$ph>) {
     if($line =~ /\t(BC|RT):Z:(\S+)/smx) {
@@ -368,19 +370,22 @@ has 'db_lookup' => ( isa     => 'Bool',
                      default => 1,
                    );
 
-has 'bid_jar_path' => ( is      => 'ro',
-                        isa     => 'NpgCommonResolvedPathJarFile',
-                        coerce  => 1,
-                        default => $BID_JAR_NAME,
-                      );
-
 has 'run_rows' => ( isa        => 'ArrayRef',
                     is         => 'ro',
                     lazy_build => 1,
                   );
 sub _build_run_rows {
   my ($self) = @_;
-  return _fetch_run_rows($self->get_id_run);
+  return $self->_fetch_run_rows($self->get_id_run);
+}
+
+has '_qc_store' => ( isa        => 'npg_qc::autoqc::qc_store',
+                     is         => 'ro',
+                     lazy_build => 1,
+                   );
+sub _build__qc_store {
+  my ($self) = @_;
+  return npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
 }
 
 #########################################################################################################
@@ -398,11 +403,9 @@ sub _build__run_info_data {
 
   # fetch initial runs history for intrument from tracking db
   my $run_rows = $self->run_rows;
-
-  my $qcs=npg_qc::autoqc::qc_store->new(use_db => $self->db_lookup);
   my $lane = $self->composition->get_component(0)->position;
   my $run_lanes = { (map { $_->[$ID_RUN_POS] => [ $lane ] } @{$run_rows}) };
-  my $c=$qcs->load_lanes($run_lanes, 1, );
+  my $c=$self->_qc_store->load_lanes($run_lanes, 1, $LANES, $self->_npgtracking_schema);
   my $rl_tag_metrics=$c->slice(q[class_name], q[tag_metrics]);
   my $rl_tag_metrics_results=$rl_tag_metrics->results;
 
@@ -412,45 +415,22 @@ sub _build__run_info_data {
   return $rid;
 }
 
-has 'java_xmx_flag'   => ( is      => 'ro',
-                           isa     => 'Str',
-                           default => $DEFAULT_JAVA_XMX,
-                         );
-
-has 'maskflags_name'   => ( is      => 'ro',
-                            isa     => 'NpgCommonResolvedPathExecutable',
-                            coerce  => 1,
-                            default => 'bammaskflags',
-                          );
-
-has 'maskflags_cmd'   => ( is         => 'ro',
-                           isa        => 'Str',
-                           lazy_build => 1,
-                         );
-sub _build_maskflags_cmd {
-  my $self = shift;
-  return $self->maskflags_name . q[ maskneg=107];
-}
-
-## no critic qw(NamingConventions::Capitalization NamingConventions::ProhibitMixedCaseSubs)
-has 'BamIndexDecoder_cmd'  => ( isa        => 'Str',
-                                is         => 'ro',
-                                required   => 0,
-                                lazy_build => 1,
-                              );
-sub _build_BamIndexDecoder_cmd {
+has 'index_decoder_cmd'  => ( isa        => 'Str',
+                              is         => 'ro',
+                              required   => 0,
+                              lazy_build => 1,
+                             );
+sub _build_index_decoder_cmd {
   my $self = shift;
 
-  my $bid_cmd_template = q[java %s -jar %s COMPRESSION_LEVEL=0 INPUT=%s OUTPUT=/dev/null BARCODE_FILE=%s METRICS_FILE=%s MAX_MISMATCHES=%d MAX_NO_CALLS=%d VALIDATION_STRINGENCY=LENIENT];
+  my $bid_cmd_template = q[bambi decode --compression-level 0 --output /dev/null --barcode-file %s --metrics-file %s --max-mismatches %d --max-no-calls %d %s];
 
   my $bid_cmd = sprintf $bid_cmd_template,
-  $self->java_xmx_flag,
-  $self->bid_jar_path,
-  $self->tag0_bam_file,
-  $self->barcode_filename,
-  $self->metrics_output_file,
-  $self->max_mismatches,
-  $self->max_no_calls;
+    $self->barcode_filename,
+    $self->metrics_output_file,
+    $self->max_mismatches,
+    $self->max_no_calls,
+    $self->tag0_bam_file;
 
   $bid_cmd .= q[ > /dev/null 2>&1]; # all useful output goes to metrics_file
 
@@ -458,22 +438,22 @@ sub _build_BamIndexDecoder_cmd {
 }
 
 ##################################################################################
-# tag0_BamIndexDecoder_metrics: tag metrics check object - created with the output
-#  from a BamIndexDecoder run on the tag#0 bam file
+# tag0_metrics: tag metrics check object - created with the output
+#  from a index decoder run on the tag#0 bam file
 ##################################################################################
-has 'tag0_BamIndexDecoder_metrics' => ( isa        => 'Object',
-                                        is         => 'ro',
-                                        lazy_build => 1,
-                                      );
-sub _build_tag0_BamIndexDecoder_metrics {
+has 'tag0_metrics' => ( isa        => 'Object',
+                        is         => 'ro',
+                        lazy_build => 1,
+                      );
+sub _build_tag0_metrics {
   my ($self) = @_;
 
-  my $bid_cmd = $self->BamIndexDecoder_cmd;
+  my $bid_cmd = $self->index_decoder_cmd;
 
-  system($bid_cmd) == 0 or croak qq[Failed to execute BamIndexDecoder command: $bid_cmd];
+  system($bid_cmd) == 0 or croak qq[Failed to execute index decoder command: $bid_cmd];
 
   #############################################################
-  # Read BamIndexDecoder output into a tag_metrics check object
+  # Read index decoder output into a tag_metrics check object
   #  for easier manipulation of values
   #############################################################
   my $tmc=npg_qc::autoqc::checks::tag_metrics->new(
@@ -484,10 +464,9 @@ sub _build_tag0_BamIndexDecoder_metrics {
 
   return $tmc;
 }
-## use critic
 
 #############################################################################################
-# _tmc_tag_indexes: maps tag sequences to tag indices for tag set used in BamIndexDecoder run
+# _tmc_tag_indexes: maps tag sequences to tag indices for tag set used in index decoder run
 #############################################################################################
 has '_tmc_tag_indexes' => ( isa        => 'HashRef',
                             is         => 'ro',
@@ -496,7 +475,7 @@ has '_tmc_tag_indexes' => ( isa        => 'HashRef',
 sub _build__tmc_tag_indexes {
   my ($self) = @_;
   # tag_seq -> tag_idx map for sanger168 tag set
-  return { reverse %{$self->tag0_BamIndexDecoder_metrics->result->tags} };
+  return { reverse %{$self->tag0_metrics->result->tags} };
 }
 
 ## no critic qw(BuiltinFunctions::ProhibitReverseSortBlock)
@@ -511,7 +490,7 @@ sub _build_unexpected_tags {
   my ($self) = @_;
 
   my @ret = ();
-  my $bid_metrics = $self->tag0_BamIndexDecoder_metrics;
+  my $bid_metrics = $self->tag0_metrics;
   my $tti = $self->_tmc_tag_indexes;
 
   my $tag_seq_runs = $self->_run_info_data->{tag_seq_runs};
@@ -546,28 +525,10 @@ sub _build_prev_runs {
 
   for my $i (0..($self->num_back_runs - 1)) {
     my $tti = $self->_tmc_tag_indexes;
-    push @ret, _generate_run_info_row($run_info_list->[$i], $self->composition->get_component(0)->position, $self->tag0_BamIndexDecoder_metrics, $tti);
+    push @ret, _generate_run_info_row($run_info_list->[$i], $self->composition->get_component(0)->position, $self->tag0_metrics, $tti);
   }
 
   return \@ret;
-}
-
-########################################################################################
-# you can override the executable name. May be useful for variants like "samtools_irods"
-########################################################################################
-has 'samtools_name' => ( is      => 'ro',
-                         isa     => 'Str',
-                         default => $SAMTOOLS_NAME,
-                       );
-
-has 'samtools' => ( is         => 'ro',
-                    isa        => 'NpgCommonResolvedPathExecutable',
-                    lazy_build => 1,
-                    coerce     => 1,
-                  );
-sub _build_samtools {
-  my ($self) = @_;
-  return $self->samtools_name;
 }
 
 override 'can_run' => sub {
@@ -616,22 +577,18 @@ override 'execute' => sub {
 # auxiliary subs
 ################
 
-sub _fetch_run_rows {
-  my ($id_run) = @_;
+has '_npgtracking_schema' => ( is         => 'ro',
+                               isa        => 'npg_tracking::Schema',
+                               lazy_build => 1,
+                             );
+sub _build__npgtracking_schema {
+  return npg_tracking::Schema->connect();
+}
 
-  ###############
-  # Connect to db
-  ###############
-  my $config_file = "$ENV{HOME}/.npg/npg_tracking-Schema";
-  my $db_config = Config::Auto::parse($config_file);
-  my $dbh;
-  eval {
-    Readonly::Scalar my $DB_CONNECT_TIMEOUT => 30;
-    local $SIG{ALRM} = sub { croak "database connection timed out\n" };
-    alarm $DB_CONNECT_TIMEOUT;
-    $dbh = DBI->connect($db_config->{live_ro}->{dsn}, $db_config->{live_ro}->{dbuser}) or croak q[Couldn't connect to database: ] . DBI->errstr;
-    alarm 0;
-  } or croak "Timeout connecting to database $db_config->{live_ro}->{dsn} as user $db_config->{live_ro}->{dbuser}\n";
+sub _fetch_run_rows {
+  my ($self, $id_run) = @_;
+
+  my $dbh = $self->_npgtracking_schema()->storage()->dbh();
 
   ###################
   # Prepare statement
@@ -848,7 +805,29 @@ npg_qc::autoqc::checks::upstream_tags
 
 =over
 
+=item Moose
+
 =item namespace::autoclean
+
+=item Carp
+
+=item English
+
+=item Fatal
+
+=item File::Basename
+
+=item File::Spec::Functions
+
+=item List::MoreUtils
+
+=item Readonly
+
+=item npg_tracking::Schema
+
+=item npg_tracking::data::reference::find
+
+=item npg_common::roles::software_location
 
 =back
 
@@ -858,7 +837,7 @@ Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

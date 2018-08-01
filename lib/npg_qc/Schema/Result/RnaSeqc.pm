@@ -178,6 +178,12 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   extra: {unsigned => 1}
   is_nullable: 1
 
+=head2 mt_pct_tpm
+
+  data_type: 'float'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -230,6 +236,8 @@ __PACKAGE__->add_columns(
   'other_metrics',
   { data_type => 'text', is_nullable => 1 },
   'globin_pct_tpm',
+  { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
+  'mt_pct_tpm',
   { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
 );
 
@@ -296,8 +304,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::rna_seqc';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-23 11:27:42
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zs9hhgRjwZIDs+WxoOEQlg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-07-06 12:07:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8C911G1+zdbgJPjsF1GPrg
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 

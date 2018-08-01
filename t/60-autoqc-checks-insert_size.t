@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 67;
+use Test::More tests => 59;
 use Test::Exception;
 use Test::Deep;
 use Perl6::Slurp;
@@ -19,9 +19,12 @@ local $ENV{'no_proxy'} = q[];
 local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc/insert_size];
 local $ENV{'PATH'} = join q[:], qq[$current_dir/blib/script] , $ENV{'PATH'};
 my $repos = catfile($current_dir, q[t/data/autoqc]);
-my $ref = catfile($repos, q[references]);
+my $ref = catfile($repos, q[reference]); # bwa index -p t/data/autoqc/reference /dev/null
 my $format = q[sam];
 my $test_bam = 0;
+my $norm_fit = `which norm_fit`;
+chomp $norm_fit;
+$norm_fit = abs_path($norm_fit);
 
 use_ok('npg_qc::autoqc::results::insert_size');
 use_ok('npg_qc::autoqc::checks::insert_size');
@@ -41,8 +44,7 @@ sub _additional_modules {
   if ($use_fastx) {
     push @expected, q[FASTX Toolkit fastx_reverse_complement 0.0.12];
   }
-  push @expected, join(q[ ], abs_path(join(q[/], $current_dir, q[blib/script/norm_fit])),
-    $npg_qc::autoqc::results::insert_size::VERSION);
+  push @expected, join(q[ ], $norm_fit, $npg_qc::autoqc::results::insert_size::VERSION);
   return @expected;
 }
 
@@ -66,58 +68,21 @@ sub _additional_modules {
 
 {
   my $qc = npg_qc::autoqc::checks::insert_size->new(
-                                              position  => 1, 
-                                              path      => 't/data/autoqc', 
-                                              id_run    => 3871,
-                                              repository => $repos, 
+                                              position       => 1, 
+                                              path           => 't/data/autoqc', 
+                                              id_run         => 3871,
+                                              is_paired_read => 0,
+                                              repository     => $repos, 
                                                    );
   is($qc->can_run, 0, 'check can_run for a single run');
 }
 
 {
-  throws_ok { npg_qc::autoqc::checks::insert_size->new(
-                                           sample_size => -1, 
-                                           position => 3, 
-                                           path => 't/data/autoqc', 
-                                           id_run => 1937, 
-                                           repository => $repos, 
-                                           expected_size => [350,350],
-                                                   ) }
-    qr/Attribute \(sample_size\) does not pass the type constraint/, 'wrong requested sample size error';
-
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
-    position => 2, path => 't/data/autoqc', id_run => 2549, repository => $repos,);
-  is($qc->sample_size, 10000, 'default sample size');
-  $qc = npg_qc::autoqc::checks::insert_size->new(
-    sample_size => 2, position => 2, path => 't/data/autoqc', id_run => 2549, repository => $repos, );
-  is($qc->sample_size, 2, 'sample size set correctly');
-}
-
-{
   my $dir = tempdir( CLEANUP => 1 );
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'));
-  local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
-                                           sample_size => 10, 
-                                           position => 3, 
-                                           path => 't/data/autoqc', 
-                                           id_run => 1937, 
-                                           repository => $repos,
-                                           reference => $ref,
-                                           use_reverse_complemented => 0,
-                                           expected_size => [350,350],
-                                                   );
-  throws_ok {$qc->execute()} qr/Reads are out of order in/,
-    'execute: error on reads out of order';
-}
-
-{
-  my $dir = tempdir( CLEANUP => 1 );
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'));
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'));
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $qc = npg_qc::autoqc::checks::insert_size->new(
-                                           sample_size => 15000, 
                                            position => 1, 
                                            path => 't/data/autoqc', 
                                            id_run => 1937,
@@ -127,7 +92,6 @@ sub _additional_modules {
                                            expected_size => [350,350],
                                                    );
   $qc->execute();
-  is ($qc->sample_size, 15000, 'requested sample size in the check object');
   is ($qc->actual_sample_size, 12500, 'actual sample size in the check object');
   is ($qc->result->sample_size, 12500, 'actual sample size in the result object');
 }
@@ -277,7 +241,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     my $b1 = catfile($current_dir, q[t/data/autoqc/alignment.bam]);
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $b1);
@@ -295,7 +259,6 @@ sub _additional_modules {
                                                    );
 
   ok($qc->execute(), 'execute returns true');
-  is ($qc->sample_size, 10000, 'sample size as expected');
 
   ##### Construct expected  object: START ####
   my $eqc = npg_qc::autoqc::checks::insert_size->new(
@@ -314,7 +277,7 @@ sub _additional_modules {
   $eqc->result->expected_size([400,500]);
   $eqc->result->mean(148);
   $eqc->result->std(16);
-  $eqc->result->sample_size(10000);
+  $eqc->result->sample_size(12500);
   $eqc->result->quartile1(135);
   $eqc->result->median(151);
   $eqc->result->quartile3(154);
@@ -322,7 +285,7 @@ sub _additional_modules {
   $eqc->result->num_well_aligned_reads(33);
   $eqc->result->reference($ref);
   $eqc->result->num_well_aligned_reads_opp_dir(undef);
-  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
+  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa0_6'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], _additional_modules));
   $eqc->result->add_comment('Not enough properly paired reads for normal fitting');
@@ -351,21 +314,8 @@ sub _additional_modules {
                                               reference => $ref,
                                               use_reverse_complemented => 0,
                                               format => $format,
-                                                   );
-  throws_ok { $qc->is_paired_read() } qr/Data from multiple runs/,
-    'error inferring whether reads are paired';
-  throws_ok { $qc->can_run() } qr/Data from multiple runs/,
-    'error inferring whether can run';
-
-  $qc = npg_qc::autoqc::checks::insert_size->new(
-                                              path      => 't/data/autoqc', 
-                                              rpt_list   => '1937:1;1938:2',
-                                              repository => $repos,
-                                              reference => $ref,
-                                              use_reverse_complemented => 0,
-                                              format => $format,
                                               is_paired_read => 0,
-                                                 );
+                                                   );
   is($qc->can_run(), 0, 'cannot run');
 
   $qc = npg_qc::autoqc::checks::insert_size->new(
@@ -383,7 +333,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/insert_size/alignment_isize_normfit.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $check = npg_qc::autoqc::checks::insert_size->new(
@@ -410,7 +360,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -444,7 +394,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_small.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -467,7 +417,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 0 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_empty.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -502,10 +452,10 @@ sub _additional_modules {
   $eqc->result->filenames(['1937_1_1.fastq', '1937_1_2.fastq']);
   $eqc->result->comments(q[No results returned from aligning]);
   $eqc->result->reference($ref);
-  $eqc->result->sample_size(10000);
+  $eqc->result->sample_size(12500);
   $eqc->result->num_well_aligned_reads(0);
   $eqc->result->num_well_aligned_reads_opp_dir(undef);
-  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
+  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa0_6'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], _additional_modules));
   #### Construct expected  object: END ####
@@ -516,7 +466,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_one.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -551,7 +501,7 @@ sub _additional_modules {
   $eqc->result->expected_size([350,350]);
   $eqc->result->mean(96);
   $eqc->result->std(0);
-  $eqc->result->sample_size(10000);
+  $eqc->result->sample_size(12500);
   $eqc->result->quartile1(96);
   $eqc->result->median(96);
   $eqc->result->quartile3(96);
@@ -561,7 +511,7 @@ sub _additional_modules {
   $eqc->result->num_well_aligned_reads_opp_dir(undef);
   $eqc->result->num_well_aligned_reads(1);
   $eqc->result->reference($ref);
-  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa'));
+  $eqc->result->set_info('Aligner', catfile ($dir, 'bwa0_6'));
   $eqc->result->set_info('Aligner_version', '0.5.5 (r1273)');
   $eqc->result->set_info('Additional_Modules', join(q[;], _additional_modules));
   $eqc->result->add_comment('Not enough properly paired reads for normal fitting');
@@ -572,7 +522,7 @@ sub _additional_modules {
 {
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_one.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   if ($test_bam) {
     $s1 =~ s/sam/bam/smx;
     t::autoqc_util::write_samtools_script(catfile($dir, 'samtools'), $s1);
@@ -644,7 +594,7 @@ sub _additional_modules {
   my $dir = tempdir( CLEANUP => 1 );
   t::autoqc_util::write_fastx_script(catfile($dir, 'fastx_reverse_complement'), 1);
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_few.sam]);
-  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa'), $s1);
+  t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $qc = npg_qc::autoqc::checks::insert_size->new(

@@ -23,7 +23,7 @@ our $VERSION = '0';
 
 ##no critic
 Readonly::Scalar my $SAMTOOLS_NAME => 'samtools';
-Readonly::Scalar my $BCFTOOLS_NAME => 'bcftools1';
+Readonly::Scalar my $BCFTOOLS_NAME => 'bcftools';
 
 subtype '_bamgt_ReadableFile'
       => as Str

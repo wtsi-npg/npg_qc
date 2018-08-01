@@ -5,7 +5,7 @@ use namespace::autoclean;
 use Carp;
 use File::Basename;
 use File::Spec::Functions qw(catfile catdir);
-use List::MoreUtils qw(any);
+use List::MoreUtils qw(any none);
 use File::Slurp;
 use JSON;
 use Readonly;
@@ -29,7 +29,7 @@ Readonly::Scalar my $SAMTOOLS_NAME => q[samtools];
 Readonly::Scalar my $SAMTOOLS_EXTRACT_REGIONS_NAME => q[samtools];
 Readonly::Scalar my $SAMTOOLS_MERGE_NAME => q[samtools];
 Readonly::Scalar my $SAMTOOLS_MPILEUP_NAME => q[samtools];
-Readonly::Scalar my $BCFTOOLS_NAME => q[bcftools1];
+Readonly::Scalar my $BCFTOOLS_NAME => q[bcftools];
 Readonly::Scalar our $EXT => q[bam];
 Readonly::Scalar my $SEQUENOM_QC_PLEX => q[W30467];
 Readonly::Scalar my $DEFAULT_QC_PLEX => q[sequenom_fluidigm_combo];
@@ -446,7 +446,14 @@ override 'can_run' => sub {
 override 'execute' => sub {
 	my ($self) = @_;
 
-	return 1 if super() == 0;
+	try {
+		super();
+	} catch {
+		my $e = $_;
+		if(none {/\Airods:/smx} @{$self->input_files}) { # we might be given files from iRODS
+			croak $_;
+		}
+	};
 
 	if(!$self->can_run()) {
 		return 1;
@@ -464,7 +471,7 @@ override 'execute' => sub {
 			$self->find_gt_match_args()
 		;
 
-	open my $f, q{-|}, qq{$gt_check_cmd} or croak 'Failed to execute check';
+	open my $f, q{-|}, qw{bash -c}, qq{$gt_check_cmd} or croak 'Failed to execute check';
 
 	my $json_results = <$f>;
 

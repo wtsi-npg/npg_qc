@@ -50,6 +50,12 @@ __END__
 
 =cut
 
+=head2 get_comments
+
+ Extract "comments" join them with new lines.
+
+=cut
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT

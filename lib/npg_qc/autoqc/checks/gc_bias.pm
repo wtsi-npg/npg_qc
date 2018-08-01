@@ -158,7 +158,7 @@ override 'can_run' => sub {
 override 'execute' => sub {
     my ($self) = @_;
 
-    return 1 if super() == 0;
+    super();
 
     if (!$self->read_length) {
         $self->result->add_comment('Bam file has no reads.');

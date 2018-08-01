@@ -3,9 +3,11 @@
       adapter          = 'adapters,<br />%'
       alignment_filter_metrics = '<span class="nbsp">target, %</span>'
       bam_flagstats    = '<span class="nbsp">mapped %</span><br /><span class="dark_blue nbsp">duplicates %</span>'
+      bcfstats         = 'concordance %<br />NRD %<br />'
       contamination    = 'top two'
       gc_bias          = '<span class="nbsp">plot created</span><br />'
       gc_fraction      = 'fraction,<br />%'
+      genotype_call    = 'call rate<br />pass rate<br />'
       genotype         = 'match<br/><span class="dark_blue nbsp">mean cvg.<br/>depth<br/></span>'
       insert_size      = 'quartiles,<br />bases'
       pulldown_metrics = '<span class="nbsp">coverage at 20X, %</span><br /><span class="nbsp">mean depth per Gb</span><br /><span class="dark_blue nbsp">on bait bases, %</span><br /><span class="dark_blue nbsp">on target bases, %</span>'
@@ -25,10 +27,10 @@
 <th[% row_span_string %]>Lane<br />No</th>
 [% IF has_plexes %]<th[% row_span_string %]>Tag</th>[% END %]
 [%- FOREACH check_name IN checks_list -%]
-  [% IF check_name.match('genotype') && !check_name.match('W30467') %]
+  [% IF (check_name.match('genotype') && !check_name.match('call')) && !check_name.match('W30467') %]
     [% NEXT %]
   [% END %]
-  [% IF check_name.match('genotype') || check_name == "rna seqc" || check_name == "upstream tags" || check_name == "verify bam id" || check_name.match('tag metrics') %]
+  [% IF check_name.match('genotype') || check_name == "bcfstats"|| check_name == "rna seqc" || check_name == "upstream tags" || check_name == "verify bam id" || check_name.match('tag metrics') %]
     [% info_button='<br/><a href="' _ c.uri_for_action(c.controller('Checks').action_for('about')) _ '#' _ check_name _ '_check"><img src="/static/images/information.png" alt="Link to information about ' _ check_name _ ' check"/></a>' %]
   [% ELSE %]
     [% IF check_name == 'alignment filter metrics'; check_name = 'alignment filter'; END %]
@@ -40,7 +42,7 @@
 </tr>
 <tr>
   [%- FOREACH check_name IN checks_list; class_name = map.$check_name %]
-  [% IF check_name.match('genotype') && !check_name.match('W30467') %]
+  [% IF (check_name.match('genotype') && !check_name.match('call')) && !check_name.match('W30467') %]
     [% NEXT %]
   [% END %]
 <th class="check_labels">[% labels.$class_name %]</th>

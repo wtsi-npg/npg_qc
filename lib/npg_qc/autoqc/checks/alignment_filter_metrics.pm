@@ -16,7 +16,8 @@ has '+file_type' => (default => 'bam_alignment_filter_metrics.json',);
 override 'execute' => sub {
     my ($self) = @_;
 
-    if (super() == 0) {  return 1; }
+    super();
+
     my $contents = slurp $self->input_files->[0];
     my $all_fields = from_json($contents);
     foreach my $field (qw/programName programVersion/) {
