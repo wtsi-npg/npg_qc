@@ -1,30 +1,30 @@
-package npg_qc::autoqc::role::genotype_call;
+package npg_qc::autoqc::role::bcfstats;
 
 use Moose::Role;
+use Readonly;
 
 our $VERSION = '0';
 
+Readonly::Scalar our $HUNDRED => 100;
 
-sub genotype_call_rate {
+sub percent_condordance {
   my $self = shift;
-  my $rate;
-  if( $self->genotypes_attempted && $self->genotypes_called ){
-    $rate = sprintf '%.3f', $self->genotypes_called/$self->genotypes_attempted;
-  }elsif( $self->genotypes_attempted ){
-    $rate = 0;
+
+  my $concordance;
+  if ($self->genotypes_compared) {
+    $concordance = sprintf '%.2f', ($self->genotypes_concordant * $HUNDRED)/$self->genotypes_compared;
   }
-  return $rate;
+  return $concordance;
 }
 
-sub genotype_passed_rate {
+sub percent_nrd {
   my $self = shift;
-  my $rate;
-  if( $self->genotypes_attempted && $self->genotypes_passed ){
-    $rate = sprintf '%.3f', $self->genotypes_passed/$self->genotypes_attempted;
-  }elsif( $self->genotypes_attempted ){
-    $rate = 0;
+
+  my $nrd;
+  if ($self->genotypes_nrd_divisor) {
+    $nrd = sprintf '%.2f', ($self->genotypes_nrd_dividend * $HUNDRED)/$self->genotypes_nrd_divisor;
   }
-  return $rate;
+  return $nrd;
 }
 
 sub criterion {
@@ -36,7 +36,6 @@ sub criterion {
   return;
 }
 
-
 no Moose;
 
 1;
@@ -46,7 +45,7 @@ __END__
 
 =head1 NAME
 
-    npg_qc::autoqc::role::genotype_call
+  npg_qc::autoqc::role::bcfstats
 
 =head1 SYNOPSIS
 
@@ -54,17 +53,17 @@ __END__
 
 =head1 SUBROUTINES/METHODS
 
-=head2 genotype_call_rate
+=head2 percent_condordance
 
- Extract the genotypes called rate.
+ Extract the percentage of compared sites which are concordant
 
-=head2 genotype_passed_rate
+=head2 percent_nrd
 
- Extract the genotypes called and passed rate.
+ Extract the percentage non ref discordant
 
 =head2 criterion
 
- Extract the criteria for a pass.
+ Pass/Fail criterion
 
 =head1 DIAGNOSTICS
 
@@ -76,6 +75,8 @@ __END__
 
 =item Moose::Role
 
+=item Readonly
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -86,7 +87,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
@@ -104,3 +105,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
+

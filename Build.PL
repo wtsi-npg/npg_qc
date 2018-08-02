@@ -83,6 +83,7 @@ my $requires = {
                 'npg_common::sequence::reference::base_count'  => 0,
                 'npg_tracking::data::reference::list'      => 0,
                 'npg_tracking::data::bait::find'           => 0,
+                'npg_tracking::data::geno_refset::find'    => 0,
                 'npg_tracking::data::snv::find'            => 0,
                 'npg_tracking::glossary::composition'      => 0,
                 'npg_tracking::glossary::composition::factory' => 0,

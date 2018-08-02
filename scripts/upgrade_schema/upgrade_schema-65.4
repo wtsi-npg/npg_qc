@@ -44,3 +44,37 @@ AFTER `target_coverage_threshold`;
 ALTER TABLE `samtools_stats` 
 MODIFY COLUMN `filter` 
 varchar(30) NOT NULL;
+
+
+--
+-- Table structure for table `bcfstats`
+--
+
+DROP TABLE IF EXISTS `bcfstats`;
+CREATE TABLE `bcfstats` (
+  `id_bcfstats` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+  `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `path` varchar(256) DEFAULT NULL,
+  `geno_refset_name` varchar(64) DEFAULT NULL,
+  `geno_refset_path` varchar(256) DEFAULT NULL,
+  `expected_sample_name` varchar(256) DEFAULT NULL,
+  `genotypes_attempted` int(11)  DEFAULT NULL,
+  `genotypes_called` int(11)  DEFAULT NULL,
+  `genotypes_passed` int(11)  DEFAULT NULL,
+  `genotypes_compared` int(11)  DEFAULT NULL,
+  `genotypes_concordant` int(11)  DEFAULT NULL,
+  `genotypes_nrd_dividend` int(11)  DEFAULT NULL,
+  `genotypes_nrd_divisor` int(11)  DEFAULT NULL,
+  `pass` tinyint(1) DEFAULT NULL,
+  `comments` text,
+  `info` text,
+  PRIMARY KEY (`id_bcfstats`),
+  UNIQUE KEY `bcfstats_id_compos_uniq` (`id_seq_composition`),
+  CONSTRAINT `bcfstats_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+--
+--
+
+GRANT SELECT ON `bcfstats` TO nqcro;
