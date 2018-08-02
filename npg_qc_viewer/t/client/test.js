@@ -39,7 +39,7 @@ requirejs([
     var initialTitle = $('title').text();
 
     var runAsIfMain = function () {
-      var qcp = qc_page.pageForMQC();
+      var qcp = qc_page.pageForQC();
       var callAfterGettingOutcomes = qcp.isPageForMQC ? function (data) {
                                                           NPG.QC.launchManualQCProcesses(qcp.isRunPage, data, '/qcoutcomes');
                                                         }
