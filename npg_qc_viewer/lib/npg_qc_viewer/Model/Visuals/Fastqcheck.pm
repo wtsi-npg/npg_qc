@@ -25,17 +25,6 @@ Catalyst model for rendering fastqcheck images at run time
 
 =head1 SUBROUTINES/METHODS
 
-=head2 schema
-
-DBIx schema object for the NPG QC database
-
-=cut
-has 'schema' =>    ( isa        => 'Maybe[Object]',
-                     is         => 'rw',
-                     required   => 0,
-                     predicate  => 'has_schema',
-                   );
-
 =head2 fastqcheck_legend
 
 Returns a binary stream representing a PNG image with a legend for the fastqcheck file visualisation
@@ -102,21 +91,11 @@ Returns a binary stream representing a PNG image with the fastqcheck file visual
 
 =cut
 sub fastqcheck2image { ##no critic (ProhibitExcessComplexity)
-    my ($self, $hargs) = @_;
+    my ($self, $content, $read) = @_;
 
-    if (!defined $hargs || !$hargs->{path}) {
-         croak 'fastqcheck2image: file name is not defined';
-    }
-    my $read = $hargs->{read} ? $hargs->{read} : q[];
-
-    my $fq_attrs = { fastqcheck_path => $hargs->{path}, };
-    if (exists $hargs->{db_lookup}) {
-        $fq_attrs->{db_lookup} = $hargs->{db_lookup};
-    }
-    if ($self->has_schema) {
-        $fq_attrs->{schema} = $self->schema;
-    }
-    my $fq = npg_common::fastqcheck->new($fq_attrs);
+    $content or croak 'Fastqcheck file content is required';
+    $read or croak 'Read is required';
+    my $fq = npg_common::fastqcheck->new(file_content => $content);
     my $num_cycles = $fq->read_length;
     my $max_q = $fq->_max_threshold;
     my $total = $fq->total_pf_bases;
@@ -213,7 +192,9 @@ sub fastqcheck2image { ##no critic (ProhibitExcessComplexity)
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
+
 
 =head1 DIAGNOSTICS
 
@@ -249,7 +230,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2018 Genome Research Ltd.
 
 This file is part of NPG software.
 

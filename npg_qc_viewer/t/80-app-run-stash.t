@@ -1,10 +1,9 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 25;
+use Test::More tests => 24;
 use Test::Exception;
 use HTTP::Request::Common;
-use Test::Warn;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
 
@@ -87,10 +86,7 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
 
 {
   my $req = GET(q[/checks/runs/4099]);
-  my $res;
-  my $c;
-  warnings_like{ ($res, $c) = ctx_request($req) } [ { carped => qr/Failed to get runfolder location/ } ], 
-                                      'Expected warning for run folder not found';
+  my ($res, $c) = ctx_request($req);
   ok ($res, $req->uri . q[ requested]);
   ok ($res->is_success, 'request succeeded');
   my $rl_map = $c->stash->{rl_map};

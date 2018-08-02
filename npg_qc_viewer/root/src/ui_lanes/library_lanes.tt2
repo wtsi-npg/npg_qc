@@ -88,6 +88,7 @@
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
       attrs = util.rpt_list2one_hash(lane_key);
+      entity_is_lane = util.is_lane_key(lane_key);
       id_run   = attrs.id_run;
       id_runs_in_collection.push(id_run);
       position  = attrs.position;
