@@ -11,6 +11,7 @@ use JSON;
 use Readonly;
 use FindBin qw($Bin);
 use Try::Tiny;
+use IO::All;
 
 use npg_qc::utils::bam_genotype;
 use npg_qc::autoqc::types;
@@ -19,8 +20,7 @@ use WTSI::NPG::iRODS::DataObject;
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find
-        npg_common::roles::software_location
-       );
+        npg_common::roles::software_location);
 
 our $VERSION = '0';
 
@@ -102,6 +102,7 @@ has 'genotype_executables_path' => (
 has 'sequenom_plex' => (
 	is => 'ro',
 	isa => 'Str',
+  writer => '_set_sequenom_plex',
 	default => $DEFAULT_QC_PLEX,
 );
 
@@ -111,6 +112,7 @@ has 'sequenom_plex' => (
 has 'snp_call_set' => (
 	is => 'ro',
 	isa => 'Str',
+  writer => '_set_snp_call_set',
 	default => $DEFAULT_SNP_CALL_SET,
 );
 
@@ -127,6 +129,7 @@ sub _build_aix_file {
 has 'gt_db' => (
 	is => 'ro',
 	isa => 'Str',
+  writer => '_set_gt_db',
 	lazy_build => 1,
 );
 sub _build_gt_db {
@@ -228,6 +231,7 @@ has 'min_common_snps' => (
 has 'sample_name'  => (
 	is => 'ro',
 	isa => 'Maybe[Str]',
+  writer => '_set_sample_name',
 	lazy_build => 1,
 );
 sub _build_sample_name {
@@ -459,6 +463,11 @@ override 'execute' => sub {
 		return 1;
 	}
 
+  # over-ride if geno_refset available
+  if($self->geno_refset && !$self->lims->gbs_plex_name) {
+    $self->_set_attrib_by_geno_refset;
+  }
+
   # run check
 	my $gt_check_cmd = sprintf
 			q{set -o pipefail && printf "%s" | %s %s %s | %s %s %s},
@@ -619,6 +628,70 @@ sub _build__ref_to_snppos_suffix_map {
 	}
 }
 
+###################################################################
+# reset values where externally supplied genotype set is to be used
+###################################################################
+
+has 'geno_refset' => (
+	is       => 'ro',
+	isa      => 'Str | Undef',
+	lazy     => 1,
+  builder  => q[_build_geno_refset],
+);
+sub _build_geno_refset {
+	my ($self) = @_;
+  my $ref = $self->_get_grfind;
+  return $ref->geno_refset_genotype_base ?
+      $ref->geno_refset_genotype_base : q[];
+}
+
+has 'alternate_sample_name' => (
+	is       => 'ro',
+	isa      => 'Str | Undef',
+	lazy     => 1,
+  builder  => q[_build_alternate_sample_name],
+);
+sub _build_alternate_sample_name {
+  my ($self) = @_;
+  my $ref    = $self->_get_grfind;
+
+  my $name;
+  if ($ref->geno_refset_info_path ) {
+    my $info = decode_json(io($ref->geno_refset_info_path)->slurp);
+    if ($info->{'expected_sample_field'}) {
+      my $type = $info->{'expected_sample_field'};
+      $name = $self->lims->$type;
+      if(!$name || $name !~ /\S/smx) {
+        croak qq[No expected sample name found using requested $type];
+      }
+    }
+  }
+  return $name;
+}
+
+sub _set_attrib_by_geno_refset {
+  my ($self) = @_;
+  my $name   = fileparse($self->geno_refset);
+
+  $self->_set_sequenom_plex($name);
+  $self->_set_snp_call_set($name);
+  $self->_set_gt_db($self->geno_refset);
+
+  if($self->alternate_sample_name) {
+    $self->_set_sample_name($self->alternate_sample_name);
+  }
+  return;
+}
+
+sub _get_grfind {
+  my ($self) = @_;
+  my $href   = { 'aligner' => $self->aligner, 'lims' => $self->lims, };
+  my $ref    = Moose::Meta::Class->create_anon_class(
+    roles => [qw/npg_tracking::data::geno_refset::find/])->new_object($href);
+  return $ref;
+}
+
+
 __PACKAGE__->meta->make_immutable();
 
 
@@ -681,6 +754,8 @@ npg_qc::autoqc::checks::genotype - compare genotype from bam with Sequenom QC re
 =item FindBin
 
 =item Try::Tiny
+
+=item IO:All
 
 =item npg_tracking::data::reference::find
 

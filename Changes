@@ -12,6 +12,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - unused public methods in npg_qc::autoqc namespace removed
  - changes to allow for SeqQC display of results corresponding to multi-
    component compositions
+ - minor changes to genotype qc check to support checking against externally
+   supplied genotypes instead if they exist
 
 release 65.3
  - fixed bug in cluster_density calculation where no TileMetrics interop
