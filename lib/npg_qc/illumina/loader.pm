@@ -29,8 +29,6 @@ npg_qc::illumina::loader
 
 Readonly::Array  my @LOADER_MODULES => qw/
                                   Runinfo
-                                  Recipe
-                                  Bustard_Summary
                                   Signal_Mean
                                   Matrix
                                   Run_Caching
@@ -38,7 +36,6 @@ Readonly::Array  my @LOADER_MODULES => qw/
 
 Readonly::Array  my @PRELOADER_MODULES => qw/
                                   Run_Caching
-                                  Recipe
                                   Runinfo
                                   Cluster_Density
                                            /;
