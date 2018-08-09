@@ -280,7 +280,7 @@ subtest q[results linked to a composition] => sub {
   $rs = $samtools_rs->search_autoqc({id_run => 50000, subset => undef}, 2);
   is ($rs->count, 22, '22 results retrieved');
   $rs = $samtools_rs->search_autoqc({id_run => 50000, subset => undef});
-  is ($rs->count, 66, '44 results retrieved');
+  is ($rs->count, 66, '66 results retrieved');
 };
 
 subtest q[mixed queries for results linked to a composition] => sub {
