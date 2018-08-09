@@ -796,7 +796,7 @@ subtest q[save outcomes] => sub {
 };
 
 subtest q[save outcomes for entities with multiple components] => sub {
-  plan tests => 2;
+  plan tests => 12;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
@@ -830,6 +830,33 @@ subtest q[save outcomes for entities with multiple components] => sub {
     {'mqc_outcome'=>'Accepted preliminary'};
   is_deeply($o->save({'lib' => $outcomes}, 'cat'),
     $reply, 'only lib info returned, one outcome updated');
+
+  my $seq_final = {'26300:1' => {'mqc_outcome'=>'Accepted final'}};
+  throws_ok {$o->save({'seq' => $seq_final}, 'cat')}
+    qr/Tag indices for lanes are required/,
+    'tag information required';
+  throws_ok {$o->save({'seq' => $seq_final}, 'cat', {'26300:1' => [1,2]})}
+    qr/Mismatch between known tag indices and available library outcomes/,
+    'tag mismatch';
+  throws_ok {$o->save({'seq' => $seq_final}, 'cat', {'26300:1' => [(2 .. 5)]})}
+    qr/Mismatch between known tag indices and available library outcomes/,
+    'tag mismatch';
+
+  lives_ok {$reply = $o->save({'seq' => $seq_final}, 'cat', {'26300:1' => [(2 .. 4)]})}
+    'lane 1 final outcome saved';
+  is_deeply ($reply, {'seq' => $seq_final, 'lib' => {}, uqc => {}}, 'cirrect reply');
+  $seq_final = {'26300:2' => {'mqc_outcome'=>'Accepted final'}};
+  lives_ok {$reply = $o->save({'seq' => $seq_final}, 'cat', {'26300:2' => [(2 .. 4)]})}
+    'lane 2 final outcome saved';
+
+  my @lib_rows = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+     ->search_autoqc({id_run => 26300, position => 1}, 4)->all();
+  is (scalar @lib_rows, 3, 'three lib outcome records found');
+  @lib_rows = sort {$a->composition->get_component(0)->tag_index <=>
+                    $b->composition->get_component(0)->tag_index} @lib_rows;
+  is ($lib_rows[0]->mqc_outcome->short_desc, 'Accepted final', 'lib outcome is final');
+  is ($lib_rows[1]->mqc_outcome->short_desc, 'Accepted final', 'lib outcome is final');
+  is ($lib_rows[2]->mqc_outcome->short_desc, 'Undecided final', 'lib outcome is final, undecided saved');
 };
 
 subtest q[outcomes are not saved twice] => sub {

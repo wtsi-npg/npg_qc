@@ -12,13 +12,15 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - little-used method load_run of npg_qc::autoqc::qc_store class, which did
    not support propagation of tracking db handle, is removed
  - unused public methods in npg_qc::autoqc namespace removed
- - changes to allow for SeqQC display of results corresponding to multi-
-   component compositions
  - mqc outcomes API - a new method, get_library_outcomes, for retrieving
    library qc outcomes as boolean values
- - reduce dependency of the transfer object on the availability of LIMs data
- - remove special provisions for GCLP when deciding whether the entity is
-   subject to manual QC
+ - deciding whether the entity is subject to manual QC:
+     remove special provisions for GCLP;
+     enforce that libraries and lanes cannot be qc-ed on the same page
+ - enable saving qc outcomes for multi-component compositions
+ - SeqQC GUI changes for multi-component compositions:
+     enable display of autoqc results;
+     enable manual QC
 
 release 65.3
  - fixed bug in cluster_density calculation where no TileMetrics interop
