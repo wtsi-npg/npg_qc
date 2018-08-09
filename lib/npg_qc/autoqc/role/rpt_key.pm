@@ -13,6 +13,7 @@ our $VERSION = '0';
 Readonly::Scalar my $LESS    => -1;
 Readonly::Scalar my $MORE    =>  1;
 Readonly::Scalar my $EQUAL   =>  0;
+Readonly::Scalar my $DELIM   =>  q[-];
 
 =head1 NAME
 
@@ -97,11 +98,28 @@ sub rpt_list2one_hash {
         for my $name (qw/id_run position tag_index/) {
             my @values = uniq map {defined $_->{$name} ? $_->{$name} : 'none'} @{$a};
             if (@values > 1 || $values[0] ne 'none') {
-                $h->{$name} = join q[-], @values;
+                $h->{$name} = join $DELIM, @values;
             }
         }
     }
     return $h;
+}
+
+sub rpt_list2rpt_key {
+    my ($self, $rpt_list) = @_;
+
+    my $h = $self->rpt_list2one_hash($rpt_list);
+    foreach my $k (keys %{$h}) {
+      my $v = $h->{$k};
+      if ($v) {
+        my $temp = $v =~ /\A(\d+)$DELIM/xms;
+        if ($temp) {
+          $h->{$k} = $temp;
+        }
+      }
+    }
+
+    return $self->deflate_rpt($h);
 }
 
 =head2 inflate_rpt_key

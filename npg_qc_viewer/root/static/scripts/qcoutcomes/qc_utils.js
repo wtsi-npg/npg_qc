@@ -13,7 +13,9 @@ define(['jquery'], function () {
   var RPT_KEY_MATCH   = /^\d+:\d+$/;
 
   var buildIdSelector = function (id) {
-    return '#' + id.replace(/:/g, '\\3A ');
+    id = id.replace(/:/g, '\\3A ');
+    id = id.replace(/;/g, '\\3B ');
+    return '#' + id;
   };
 
   var buildIdSelectorFromRPT = function (rptKey) {

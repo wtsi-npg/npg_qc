@@ -122,7 +122,7 @@ subtest 'create pool object' => sub {
 };
 
 subtest 'create object not represented in LIMs' => sub {
-  plan tests => 16;
+  plan tests => 17;
 
   my $row = $pmrs->search({id_run => 4950, position => 8, tag_index => 0})->next();
   my $f  = $module->new(product_metrics_row => $row, is_plex => 1);
@@ -134,8 +134,8 @@ subtest 'create object not represented in LIMs' => sub {
   is ($to->tag_index, 0, 'tag index');
   is ($to->tag_sequence, undef, 'tag sequence');
   is ($to->instance_qc_able, 0, 'qc_able');
-  is ($to->rnd, undef, 'not r&d');
-  is ($to->is_control, undef, 'not a control');
+  is ($to->rnd, 0, 'not r&d');
+  is ($to->is_control, 0, 'not a control');
   is ($to->entity_id_lims, undef, 'entity_id_lims');
   ok (!$to->is_pool, 'not a pool');
   is ($to->study_name, undef, 'study name');
@@ -143,6 +143,11 @@ subtest 'create object not represented in LIMs' => sub {
   is ($to->sample_name, undef, 'sample name');
   is ($to->sample_supplier_name, undef, 'sample supplier name');
   is ($to->id_library_lims, undef, 'id_library_lims');
+
+  $row = $pmrs->search({id_run => 4950, position => 8})->next();
+  $f  = $module->new(product_metrics_row => $row, is_pool => 1);
+  $to = $f->create_object();
+  ok ($to->is_pool, 'is a pool');
 };
 
 1;

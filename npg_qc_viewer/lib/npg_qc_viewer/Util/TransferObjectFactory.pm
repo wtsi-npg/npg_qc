@@ -103,7 +103,11 @@ sub _add_lims_data {
   my $self = shift;
 
   my $flowcell = $self->product_metrics_row->iseq_flowcell;
-  $self->_init_values->{'instance_qc_able'} = 0;
+
+  $self->_init_values->{'is_pool'}          = $self->is_pool;
+  $self->_init_values->{'lims_live'}        = 1;
+  $self->_init_values->{'is_control'}       = 0;
+  $self->_init_values->{'rnd'}              = 0;
 
   if ( defined $flowcell ) {
 
@@ -111,10 +115,7 @@ sub _add_lims_data {
     $self->_init_values->{'rnd'}               = $flowcell->is_r_and_d ? 1 : 0;
     $self->_init_values->{'is_control'}        = $flowcell->is_control ? 1 : 0;
     $self->_init_values->{'entity_id_lims'}    = $flowcell->entity_id_lims;
-    $self->_init_values->{'instance_qc_able'}  =
-      $self->qc_able($flowcell, $self->_init_values->{'tag_index'} );
     $self->_init_values->{'lims_live'}         = $flowcell->from_gclp ? 0 : 1;
-    $self->_init_values->{'is_pool'}           = $self->is_pool;
 
     if ($self->is_pool) {
       $self->_init_values->{'id_library_lims'} = $flowcell->id_pool_lims;
@@ -130,6 +131,9 @@ sub _add_lims_data {
     }
   }
 
+  $self->_init_values->{'instance_qc_able'} = $self->qc_able(
+    $self->_init_values->{'is_control'}, $self->_init_values->{'tag_index'});
+
   return;
 }
 
@@ -137,11 +141,17 @@ sub _add_lims_data {
 
 Class method, returns true if the entity is subject to manual QC.
 
+ my $is_control = 0;
+ my $tag_index = 5;
+ my $flag = $factory->qc_able($is_control, $tag_index);
+
+ $tag_index = undef;
+ $flag = $factory->qc_able($is_control, $tag_index);
+
 =cut
 sub qc_able {
-  my ($self, $flowcell, $tag_index) = @_;
-  return ( $flowcell->is_control || $flowcell->from_gclp ||
-           (defined $tag_index && $tag_index == 0) ) ? 0 : 1;
+  my ($self, $is_control, $tag_index) = @_;
+  return ($is_control || (defined $tag_index && $tag_index == 0) ) ? 0 : 1;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -177,7 +187,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Genome Research Ltd.
+Copyright (C) 2018 Genome Research Ltd.
 
 This file is part of NPG.
 
