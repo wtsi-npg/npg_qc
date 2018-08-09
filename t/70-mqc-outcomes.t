@@ -547,7 +547,7 @@ subtest q[find or create seq entity] => sub {
 };
 
 subtest q[save - errors] => sub {
-  plan tests => 18;
+  plan tests => 17;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
   throws_ok {$o->save() } qr/Outcomes hash is required/,
@@ -584,10 +584,6 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>{'123:3'=>{'mqc_outcome'=>''}}}, q[cat], {}) }
     qr/Error saving outcome for 123:3 - Outcome description is missing/,
     'empty outcome description - error';
-  throws_ok {$o->save({'lib'=>{'123:4:5;3:4:5'=>
-    {'mqc_outcome'=>'Accepted preliminary'}}}, q[cat], {}) }
-    qr/Saving outcomes for multi-component compositions is not yet implemented/,
-    'saving for multi-component composition - error';
   throws_ok {$o->save({'uqc'=>{'123:1'=>{
     'uqc_outcome'=>'Accepted'}}}, q[cat]) }
     qr/Rationale required/,
@@ -797,6 +793,43 @@ subtest q[save outcomes] => sub {
     {'101:1'=>[(1 .. 6)]})}
     qr/Final outcome cannot be updated/,
     'error updating a final outcome to a different final outcome';
+};
+
+subtest q[save outcomes for entities with multiple components] => sub {
+  plan tests => 2;
+
+  my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
+
+  my $outcomes = {
+    '26300:1:2;26300:2:2;26300:3:2;26300:4:2'=>{'mqc_outcome'=>'Accepted preliminary'},
+    '26300:1:3;26300:2:3;26300:3:3;26300:4:3'=>{'mqc_outcome'=>'Rejected preliminary'},
+    '26300:1:4;26300:2:4;26300:3:4;26300:4:4'=>{'mqc_outcome'=>'Undecided'},
+                 };
+
+  my $reply = {'lib' => $outcomes, 'seq'=> {}, 'uqc' => {}};
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+    $reply, 'lib info returned');
+
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => '26300:1')->create_composition();
+  my $seq_c = $qc_schema->resultset('MqcOutcomeEnt')
+         ->find_or_create_seq_composition($c);
+  my $dict_id_prelim = $qc_schema->resultset('MqcOutcomeDict')->search(
+      {'short_desc' => 'Rejected preliminary'}
+     )->next->id_mqc_outcome;
+  $qc_schema->resultset('MqcOutcomeEnt')->create({
+    'id_run'         => 101,
+    'position'       => 1,
+    'id_seq_composition' => $seq_c->id_seq_composition(),
+    'id_mqc_outcome' => $dict_id_prelim,
+    'username'       => 'cat',
+    'modified_by'    => 'dog',
+  });
+
+  $outcomes->{'26300:1:3;26300:2:3;26300:3:3;26300:4:3'} =
+    {'mqc_outcome'=>'Accepted preliminary'};
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+    $reply, 'only lib info returned, one outcome updated');
 };
 
 subtest q[outcomes are not saved twice] => sub {

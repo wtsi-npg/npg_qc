@@ -167,9 +167,6 @@ sub _save_outcomes {
 
         try {
           my $composition_obj = _rpt_list2composition($key);
-          if ($composition_obj->num_components > 1) {
-            croak 'Saving outcomes for multi-component compositions is not yet implemented';
-          }
           my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $composition_obj);
           if ($outcome_ent->valid4update($o)) {
             $outcome_ent->update_outcome($o, $username);
