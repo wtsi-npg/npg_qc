@@ -166,13 +166,27 @@ define([
             throw 'Library outcomes cannot be undefined.';
           }
           prevOutcomes = qcOutcomes.lib;
-          // Cut process if lane is already final or there is nothing to qc
-          if ( !qc_utils.seqFinal(qcOutcomes.seq) || $('.lane_mqc_control').length === 0 ) {
+          // If there is nothing to qc, return
+          if ( $('.lane_mqc_control').length === 0 ||
+               qc_utils.allFinal(prevOutcomes) || qc_utils.allFinal(qcOutcomes.seq) ) {
             return;
           }
 
-          $("#results_summary .lane").first()
-                                     .append('<span class="library_mqc_overall_controls"></span>');
+          // Add empty row for the overall MQC widget
+          var first_row_lane_column = $("#results_summary .lane").first();
+          var lane_column_index = $(first_row_lane_column).prevAll().length;
+          var num_columns = 1 + lane_column_index + $(first_row_lane_column).nextAll().length;
+          var row_string = '<tr>';
+          for (var i = 0; i < num_columns; i++) {
+            var td = '<td/>';
+            if (i == lane_column_index) {
+              td = '<td><span class="library_mqc_overall_controls"></span></td>';
+            }
+            row_string = row_string.concat(td);
+          }
+          row_string.concat('</tr>');
+          $("#results_summary > tbody").prepend(row_string);
+
           var overallControls = new NPG.QC.UI.MQCLibraryOverallControls(prodConfiguration);
           $('.lane').each(function (index, element){
             var $element = $(element);

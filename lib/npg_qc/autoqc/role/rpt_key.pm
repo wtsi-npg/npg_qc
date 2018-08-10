@@ -105,21 +105,15 @@ sub rpt_list2one_hash {
     return $h;
 }
 
-sub rpt_list2rpt_key {
+=head2 rpt_list2first_rpt_key
+
+Return the first rpt key of the argument rpt list.
+
+=cut
+sub rpt_list2first_rpt_key {
     my ($self, $rpt_list) = @_;
-
-    my $h = $self->rpt_list2one_hash($rpt_list);
-    foreach my $k (keys %{$h}) {
-      my $v = $h->{$k};
-      if ($v) {
-        my $temp = $v =~ /\A(\d+)$DELIM/xms;
-        if ($temp) {
-          $h->{$k} = $temp;
-        }
-      }
-    }
-
-    return $self->deflate_rpt($h);
+    my $a = $self->inflate_rpts($rpt_list);
+    return $self->deflate_rpt($a->[0]);
 }
 
 =head2 inflate_rpt_key

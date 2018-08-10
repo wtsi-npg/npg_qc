@@ -210,6 +210,12 @@ sub _create_query4compositions {
 sub _create_query4lib_outcomes4lane {
   my ($self, $lane_composition) = @_;
   my $comp = $lane_composition->get_component(0);
+  #####
+  # We are going to find all results where at least one component
+  # belongs to the run and lane in question. If teh database has
+  # entries for merges across runs, those can be brought too.
+  # At a point of QC-ing runs such entries will (or should) not exist.
+  #
   my $rs = $self->qc_schema()->resultset($LIB_RS_NAME);
   my $db_query = $rs->search({}, {'join' => $rs->result_class()->dict_rel_name()})
                     ->search_autoqc({'id_run'    => $comp->id_run,

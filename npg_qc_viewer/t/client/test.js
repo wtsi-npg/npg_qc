@@ -274,13 +274,13 @@ requirejs([
                        'Control is checked as per ajax qcoutcomes call');
         }
 
-        var control = $("#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls");
+        var control = $("#results_summary > tbody > tr span.library_mqc_overall_controls");
         assert.ok(control.is(':visible'), 'Placeholder for overall controls is visible');
         assert.equal($("#results_summary .library_mqc_overall_controls").length,
                      1, 'One overall control in page');
         assert.equal(control.attr('style'),
-                     'padding-right: 5px; padding-left: 7px;',
-                     'Overall controls have correct style.');
+                     undefined,
+                     'Overall controls have no style.');
         var individualOverallButtons = [
           'lane_mqc_accept_all',
           'lane_mqc_reject_all',
@@ -291,7 +291,7 @@ requirejs([
           assert.ok(thisButton.is(':visible'),
              'Overall button is visible ' + individualOverallButtons[i]);
           assert.equal(thisButton.attr('style'),
-                       'padding-left: 5px; background-color: rgb(244, 244, 244);',
+                       'background-color: rgb(244, 244, 244);',
                        'Button is not selected');
         }
 
@@ -357,7 +357,7 @@ requirejs([
           logged: 'Logged in as aa11 (mqc)'
         }
       ];
-      assert.expect(cases.length * 15);
+      assert.expect(cases.length * 12 );
 
       var page_fixture = fixtures.fixtures_lib_mixed;
       //Set return ajax call
@@ -393,8 +393,6 @@ requirejs([
           assert.ok($("#rpt_key\\3a 18000\\3a 2\\3a 2 > td.tag_info").hasClass('qc_outcome_rejected_preliminary'));
 
           var emptyContainers = [
-            "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.lane_mqc_control",
-            "#rpt_key\\3a 18000\\3a 2 > td.lane.nbsp > span.library_mqc_overall_controls",
             "#rpt_key\\3a 18000\\3a 2\\3a 1 > td.lane.nbsp > span",
             "#rpt_key\\3a 18000\\3a 2\\3a 2 > td.lane.nbsp > span",
           ];
@@ -406,7 +404,6 @@ requirejs([
           }
 
           var allRows = [
-            "#rpt_key\\3a 18000\\3a 2",
             "#rpt_key\\3a 18000\\3a 2\\3a 1",
             "#rpt_key\\3a 18000\\3a 2\\3a 2",
             "#rpt_key\\3a 18000\\3a 2\\3a 888",
