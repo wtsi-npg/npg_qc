@@ -14,6 +14,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    component compositions
  - minor changes to genotype qc check to support checking against externally
    supplied genotypes instead if they exist
+ - Illumina QC data loader restricted to loading RunInfo.xml file and
+   cluster density data; data pre-loading functionality dropped
 
 release 65.3
  - fixed bug in cluster_density calculation where no TileMetrics interop

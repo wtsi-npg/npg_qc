@@ -4,29 +4,13 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
-use List::MoreUtils qw/any/;
-use Readonly;
 use npg_qc::illumina::loader;
 
 our $VERSION = '0';
 
-if (scalar @ARGV == 0) {
-  warn "Illumina qc data loader for all runs\n";
-  npg_qc::illumina::loader->new()->run_all();
-} elsif (any { $_ =~ / id_run|runfolder /smx } @ARGV) {
-  warn "Illumina qc data loader for one run\n";
-  npg_qc::illumina::loader->new_with_options()->run();
-} else {
-  warn 'To load one run:
- npg_qc_illumina_analysis_loader --id_run <id_run>
- npg_qc_illumina_analysis_loader --run_folder <runfolder>
- npg_qc_illumina_analysis_loader --runfolder_path <runfolder_path>
+npg_qc::illumina::loader->new_with_options()->run();
 
-To load all runs:
- npg_qc_illumina_analysis_loader' . "\n\n";
-}
-
-exit;
+exit 0;
 
 __END__
 
@@ -38,16 +22,11 @@ npg_qc_illumina_analysis_loader
 
 To load one run:
  npg_qc_illumina_analysis_loader --id_run <id_run>
- npg_qc_illumina_analysis_loader --run_folder <runfolder>
  npg_qc_illumina_analysis_loader --runfolder_path <runfolder_path>
-
-To load all runs:
- npg_qc_illumina_analysis_loader
 
 =head1 DESCRIPTION
 
-Looading of illumina analysis qc data into a database.
-To load a single run, it needs an id_run or run_folder as an argument.
+Looading of Illumina analysis qc data into a database.
 
 =head1 USAGE
 
@@ -71,15 +50,11 @@ To load a single run, it needs an id_run or run_folder as an argument.
 
 =item warnings
 
-=item Readonly
-
 =item npg_qc::illumina::loader
 
 =item FindBin
 
 =item lib
-
-=item List::MoreUtils
 
 =back
 
@@ -89,11 +64,17 @@ To load a single run, it needs an id_run or run_folder as an argument.
 
 =head1 AUTHOR
 
-Andy Brown
+=over
+
+=item Andy Brown
+
+=item Marina Gourtovaia
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 Andy Brown (ajb@sanger.ac.uk)
+Copyright (C) 2018 by Genome Research Ltd
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

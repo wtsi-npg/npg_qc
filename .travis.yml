@@ -45,7 +45,6 @@ before_install:
   - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts > /tmp/hosts
   - sudo mv /tmp/hosts /etc/hosts
   - ./.travis/before_install_conda.sh
-  - ./.travis/before_install_mysql57.sh
   - ./.travis/before_install.sh
 
 install:
