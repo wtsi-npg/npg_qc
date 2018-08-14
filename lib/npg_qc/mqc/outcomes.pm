@@ -84,32 +84,28 @@ sub get {
   return $h;
 }
 
-sub get_library_outcomes {
-  my ($self, $qlist) = @_;
+sub get_library_outcome {
+  my ($self, $rpt_list) = @_;
 
-  my %result = map { $_ => 0 } @{$qlist};
-
-  my $outcome_hash = $self->get($qlist)->{$LIB_OUTCOMES};
-  foreach my $rpt_list ( @{$qlist} ) {
-    my $outcome = $outcome_hash->{$rpt_list};
-    if ($outcome) {
-      my $outcome_description = (values %{$outcome})[0];
-      if ($outcome_description) {
-        my $row = $self->qc_schema->resultset('MqcLibraryOutcomeDict')
+  my $result = 0;
+  my $outcome = $self->get([$rpt_list])->{$LIB_OUTCOMES}->{$rpt_list};
+  if ($outcome) {
+    my $outcome_description = (values %{$outcome})[0];
+    if ($outcome_description) {
+      my $row = $self->qc_schema->resultset('MqcLibraryOutcomeDict')
                 ->search({'short_desc' => $outcome_description})->next();
-        if (!$row) {
-          croak qq[Cannot get dict row for $outcome_description];
-        }
-        if ($row->is_final_accepted()) {
-          $result{$rpt_list} = 1;
-        }
+      if (!$row) {
+        croak qq[Cannot get dict row for $outcome_description];
       }
-    } else {
-      croak qq[No library outcome for '$rpt_list'];
+      if ($row->is_final_accepted()) {
+        $result = 1;
+      }
     }
+  } else {
+    croak qq[No library outcome for '$rpt_list'];
   }
 
-  return \%result;
+  return $result;
 }
 
 sub save {
@@ -358,22 +354,20 @@ are returned, whether the query was for a lane or plex-level result.
 If an rpt list represents a multi-component composition, the result returned
 is exactly for the entity represented by this composition.
 
-=head2 get_library_outcomes
+=head2 get_library_outcome
 
-Takes an array of rpt list strings as an argument.
+Takes an rpt list string as an argument.
 
-Returns a hash reference with library qc outcomes for each of the input
-array member. The outcomes are boolean values. The outcome is set to true if
-the library qc outcome id accepted and final, false in case of any other outcome.
+Returns library QC outcome as a boolean value. True is returned if
+the library qc outcome is accepted and final, false in case of any other outcome.
+Error if not entry in the database for this rpt list.
 
-Error if not entry in the database for any of input rpt lists.
-
-  use Data::Dumper;
-  print Dumper $obj->get_library_outcomes([qw/5:3:7;5:2:7 5:3:6;5:2:6]);
-  $VAR1 = {
-    '5:3:7;5:2:7' => 1,
-    '5:3:6;5:2:6' => 0
-          };
+  if ($obj->get_library_outcomes(q[5:3:7;5:2:7])) {
+    print 'Library passed';
+  } else {
+    print 'Library failed';
+  }
+ 
 
 =head2 save
 

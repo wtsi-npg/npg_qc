@@ -342,7 +342,7 @@ subtest 'retrieval for multi-component compositions - all outcome types' => sub 
 };
 
 subtest q[get mqc library outcomes as boolean outcomes] => sub {
-  plan tests => 4;
+  plan tests => 2;
   
   my @l = qw/26291:1:1;26291:2:1;26291:3:1
              26291:1:2;26291:2:2;26291:3:2
@@ -377,18 +377,13 @@ subtest q[get mqc library outcomes as boolean outcomes] => sub {
   $expected{'26291:1:13;26291:2:13;26291:3:13'} = 1;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
-
-  is_deeply ($o->get_library_outcomes(['26291:1:6;26291:2:6;26291:3:6']),
-    {'26291:1:6;26291:2:6;26291:3:6' => 0}, 'correct results');
-  is_deeply ($o->get_library_outcomes(['26291:1:3;26291:2:3;26291:3:3']),
-    {'26291:1:3;26291:2:3;26291:3:3' => 1}, 'correct results');
-  is_deeply ($o->get_library_outcomes(\@l), \%expected, 'correct results');
-
-  push @l, '26291:1:26;26291:2:26;26291:3:26'; # no outcome for this one
+  my $outcomes = {};
+  map { $outcomes->{$_} = $o->get_library_outcome($_) } @l;
+  is_deeply ($outcomes, \%expected, 'correct results');
   
-  throws_ok { $o->get_library_outcomes(\@l) }
+  throws_ok { $o->get_library_outcome('26291:1:26;26291:2:26;26291:3:26') }
     qr/No library outcome for '26291:1:26;26291:2:26;26291:3:26'/,
-    'error if a lib outcome for one of rpt lists does not exist';
+    'error if a lib outcome for rpt list does not exist';
 };
 
 subtest q[find or create outcome - error handling] => sub {
