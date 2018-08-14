@@ -3,52 +3,38 @@ package npg_qc::illumina::loader::Cluster_Density;
 use Moose;
 use namespace::autoclean;
 use Carp;
-use English qw{-no_match_vars};
-use Try::Tiny;
 use Readonly;
+use English qw{-no_match_vars};
 
-extends 'npg_qc::illumina::loader::base';
+extends 'npg_qc::illumina::loader';
 
 our $VERSION = '0';
 
 #keys used in hash and corresponding codes in tile metrics interop file
-Readonly::Scalar our $TILE_METRICS_INTEROP_CODES => {'cluster density'    => 100,
-                                                     'cluster density pf' => 101,
-                                                     'cluster count'      => 102,
-                                                     'cluster count pf'   => 103,
-                                                     'version3_cluster_counts' => ord('t'),
-                                                     };
+Readonly::Scalar my $TILE_METRICS_INTEROP_CODES => {'cluster density'    => 100,
+                                                    'cluster density pf' => 101,
+                                                    'cluster count'      => 102,
+                                                    'cluster count pf'   => 103,
+                                                    'version3_cluster_counts' => ord('t'),
+                                                   };
 
-Readonly::Array my @TILE_METRICS_INTEROP_FILE => qw/InterOp TileMetricsOut.bin/;
+Readonly::Array my @TILE_METRICS_INTEROP_FILE          => qw/InterOp TileMetricsOut.bin/;
 Readonly::Array my @TILE_METRICS_PF_CYCLE_INTEROP_FILE => qw/InterOp C25.1 TileMetricsOut.bin/;
 
-sub run_all {
+sub run {
   my $self = shift;
 
-  my %rfolders = %{$self->runfolder_list_todo()};
-  foreach my $id_run (sort { $a <=> $b } keys %rfolders) {
-    try {
-      $self->mlog(qq{Loading cluster density data for run $id_run});
-      my $interop_file = join q[/], $rfolders{$id_run}, @TILE_METRICS_INTEROP_FILE;
-      if ( ! -e $interop_file ) {
-        $self->mlog(qq{Couldn't find interop file $interop_file, looking in pf_cycle sub-directory});
-        # look for one in the PF_CYCLE sub-directory
-        $interop_file = join q[/], $rfolders{$id_run}, @TILE_METRICS_PF_CYCLE_INTEROP_FILE;
-      }
-      $self->_save_to_db($id_run, $self->_parse_interop($interop_file));
-    } catch {
-      my $error = $_;
-      if( $error =~ /No\ such\ file\ or\ directory/mxs){
-        $self->mlog( qq{No cluster density file available for run $id_run} );
-      }else{
-        croak $error;
-      }
-    };
+  my $interop_file = join q[/], $self->runfolder_path(), @TILE_METRICS_INTEROP_FILE;
+  if ( ! -e $interop_file ) {
+    carp qq{Couldn't find interop file $interop_file, looking in pf_cycle sub-directory};
+    # look for one in the PF_CYCLE sub-directory
+    $interop_file = join q[/], $self->runfolder_path(), @TILE_METRICS_PF_CYCLE_INTEROP_FILE;
   }
-  return;
-}
+  if ( ! -e $interop_file ) {
+    croak qq($interop_file does not exist);
+  }
+  $self->_save_to_db($self->_parse_interop($interop_file));
 
-sub _build_runlist_db {
   return;
 }
 
@@ -135,7 +121,7 @@ sub _parse_interop {
 }
 
 sub _save_to_db {
-  my ($self, $id_run, $cluster_density_by_lane) = @_;
+  my ($self, $cluster_density_by_lane) = @_;
 
   my $rs = $self->schema->resultset('ClusterDensity');
   foreach my $lane (keys %{$cluster_density_by_lane}){
@@ -143,7 +129,7 @@ sub _save_to_db {
       my $lane_values = $cluster_density_by_lane->{$lane}->{$code};
       $lane_values->{'is_pf'}    = $code =~ /[ ]pf$/smx ? 1 : 0;
       $lane_values->{'position'} = $lane;
-      $lane_values->{'id_run'}   = $id_run;
+      $lane_values->{'id_run'}   = $self->id_run;
       $rs->update_or_create($lane_values);
     }
   }
@@ -153,6 +139,7 @@ sub _save_to_db {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 NAME
@@ -165,9 +152,9 @@ npg_qc::illumina::loader::Cluster_Density
 
 =head1 SUBROUTINES/METHODS
 
-=head2 run_all
+=head2 run
 
-loads cluster density data for all runs in runfolder_list_todo attribute
+loads cluster density data for a run
 
 =head1 DIAGNOSTICS
 
@@ -183,11 +170,9 @@ loads cluster density data for all runs in runfolder_list_todo attribute
 
 =item Carp
 
-=item English
-
-=item Try::Tiny
-
 =item Readonly
+
+=item English
 
 =back
 
