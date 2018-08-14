@@ -21,8 +21,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - SeqQC GUI changes for multi-component compositions:
      enable display of autoqc results;
      enable manual QC
- - Illumina QC data loader restricted to loading RunInfo.xml file and
-   cluster density data; data pre-loading functionality dropped
+ - changes to allow for SeqQC display of results corresponding to multi-
+   component compositions
+ - Illumina QC data loader restricted to loading cluster density data, its
+    data pre-loading functionality dropped
 
 release 65.3
  - fixed bug in cluster_density calculation where no TileMetrics interop

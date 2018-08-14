@@ -61,18 +61,32 @@ make_schema_at(
         default_resultset_class => 'ResultSet',
         
         exclude => qr/\A v_                    |
-                         analysis_lane_qcal    |
+                         analysis              |
+                         cache_query           |
+                         chip_summary          |
                          cumulative_errors_    |
                          error_rate_           |
-                         errors_by_(?:\w+)?nucleotide |
+                         errors_by_            |
+                         frequency_response    |
+                         instrument_statistics |
                          image_store           |
                          information_content_  |
+                         lane_qc               |
                          log_likelihood        |
                          most_common_          |
+                         move_z                |
+                         offset                |
+                         recipe_file           |
+                         run_graph             |
+                         run_recipe            |
+                         run_tile              |
                          ref_snp_info          |
                          run_and_pair          |
                          run_config            |
+                         run_graph             |
+                         run_info              |
                          run_timeline          |
+                         signal_mean           |
                          tile_score
                      /xms,
 
