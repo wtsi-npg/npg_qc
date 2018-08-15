@@ -171,7 +171,6 @@ lib/npg_qc/Schema/ResultSet.pm
 lib/npg_qc/Schema/ResultSet/MqcOutcomeEnt.pm
 lib/npg_qc/utils/bam_genotype.pm
 lib/npg_qc/utils/genotype_calling.pm
-lib/R/gc_bias_data.R
 MANIFEST
 README
 scripts/npgqc_dbix_schema_loader.pl
