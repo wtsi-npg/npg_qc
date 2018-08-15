@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 16;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON::XS;
@@ -138,7 +138,6 @@ subtest 'retrieval, lib and seq outcomes for single-component compositions' => s
   $expected = {"lib"=>{"5:3:6"=>{"mqc_outcome"=>"Undecided"},"5:3:3"=>{"mqc_outcome"=>"Rejected preliminary"},"5:3:7"=>{"mqc_outcome"=>"Undecided final"},"5:3:5"=>{"mqc_outcome"=>"Rejected final"},"5:3:4"=>{"mqc_outcome"=>"Accepted final"},"5:3:2"=>{"mqc_outcome"=>"Accepted preliminary"}},"seq"=>{"5:3"=>{"mqc_outcome"=>"Accepted final"}},"uqc"=>{}};
   is_deeply($o->get([qw(5:3:5 5:3:7)]), $expected, q[outcome for (5:3:5 5:3:7) is correct]);
 };
-
 
 subtest 'retrieval, uqc_outcomes for single-component compositions' => sub {
   plan tests => 12;
@@ -340,6 +339,51 @@ subtest 'retrieval for multi-component compositions - all outcome types' => sub 
     'correct data retrieved for (80:1:1;80:1:3 80:1:1;80:1:5 80:1:4)');
   is_deeply ($o->get([qw(80:1:1;80:1:3 80:1:1;80:1:5 80:1:7)]), $expected,
     'correct data retrieved for (80:1:1;80:1:3 80:1:1;80:1:5 80:1:7)');   
+};
+
+subtest q[get mqc library outcomes as boolean outcomes] => sub {
+  plan tests => 2;
+  
+  my @l = qw/26291:1:1;26291:2:1;26291:3:1
+             26291:1:2;26291:2:2;26291:3:2
+             26291:1:3;26291:2:3;26291:3:3
+             26291:1:4;26291:2:4;26291:3:4
+             26291:1:5;26291:2:5;26291:3:5
+             26291:1:6;26291:2:6;26291:3:6
+             26291:1:11;26291:2:11;26291:3:11
+             26291:1:12;26291:2:12;26291:3:12
+             26291:1:13;26291:2:13;26291:3:13
+             26291:1:14;26291:2:14;26291:3:14
+             26291:1:15;26291:2:15;26291:3:15
+             26291:1:16;26291:2:16;26291:3:16
+            /;
+
+  my $rs = $qc_schema->resultset('MqcLibraryOutcomeEnt');
+  for my $l (@l) {
+    my $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => $l )->create_composition();
+    my $ckey = $rs->find_or_create_seq_composition($c)->id_seq_composition();
+    my $values = {
+                'username'           => 'u1',
+                'modified_by'        =>' user',
+                'id_seq_composition' => $ckey,
+                'id_mqc_outcome'     => substr($l, -1)
+                 };
+    $rs->create($values);
+  }
+
+  my %expected = map { $_ => 0 } @l;
+  $expected{'26291:1:3;26291:2:3;26291:3:3'} = 1;
+  $expected{'26291:1:13;26291:2:13;26291:3:13'} = 1;
+
+  my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
+  my $outcomes = {};
+  map { $outcomes->{$_} = $o->get_library_outcome($_) } @l;
+  is_deeply ($outcomes, \%expected, 'correct results');
+  
+  throws_ok { $o->get_library_outcome('26291:1:26;26291:2:26;26291:3:26') }
+    qr/No library outcome for '26291:1:26;26291:2:26;26291:3:26'/,
+    'error if a lib outcome for rpt list does not exist';
 };
 
 subtest q[find or create outcome - error handling] => sub {

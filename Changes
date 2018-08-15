@@ -14,6 +14,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    component compositions
  - minor changes to genotype qc check to support checking against externally
    supplied genotypes instead if they exist
+ - mqc outcomes API - a new method, get_library_outcomes, for retrieving
+   library qc outcomes as boolean values
 
 release 65.3
  - fixed bug in cluster_density calculation where no TileMetrics interop

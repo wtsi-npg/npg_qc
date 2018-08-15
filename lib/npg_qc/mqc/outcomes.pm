@@ -84,6 +84,30 @@ sub get {
   return $h;
 }
 
+sub get_library_outcome {
+  my ($self, $rpt_list) = @_;
+
+  my $result = 0;
+  my $outcome = $self->get([$rpt_list])->{$LIB_OUTCOMES}->{$rpt_list};
+  if ($outcome) {
+    my $outcome_description = (values %{$outcome})[0];
+    if ($outcome_description) {
+      my $row = $self->qc_schema->resultset('MqcLibraryOutcomeDict')
+                ->search({'short_desc' => $outcome_description})->next();
+      if (!$row) {
+        croak qq[Cannot get dict row for $outcome_description];
+      }
+      if ($row->is_final_accepted()) {
+        $result = 1;
+      }
+    }
+  } else {
+    croak qq[No library outcome for '$rpt_list'];
+  }
+
+  return $result;
+}
+
 sub save {
   my ($self, $outcomes, $username, $lane_info) = @_;
 
@@ -329,6 +353,21 @@ are returned, whether the query was for a lane or plex-level result.
 
 If an rpt list represents a multi-component composition, the result returned
 is exactly for the entity represented by this composition.
+
+=head2 get_library_outcome
+
+Takes an rpt list string as an argument.
+
+Returns library QC outcome as a boolean value. True is returned if
+the library qc outcome is accepted and final, false in case of any other outcome.
+Error if not entry in the database for this rpt list.
+
+  if ($obj->get_library_outcomes(q[5:3:7;5:2:7])) {
+    print 'Library passed';
+  } else {
+    print 'Library failed';
+  }
+ 
 
 =head2 save
 
