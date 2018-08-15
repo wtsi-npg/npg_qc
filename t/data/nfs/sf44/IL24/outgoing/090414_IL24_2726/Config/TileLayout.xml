@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<TileLayout Columns="2" Rows="50" Pitch="760" Width="665" Gutter="38">
-  <ClusterROI Width="1794" />
-  <Tilt TopLeftX="55" TopLeftY="35000" Max="0.0028" />
-</TileLayout>
