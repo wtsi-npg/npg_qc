@@ -13,7 +13,9 @@ define(['jquery'], function () {
   var RPT_KEY_MATCH   = /^\d+:\d+$/;
 
   var buildIdSelector = function (id) {
-    return '#' + id.replace(/:/g, '\\3A ');
+    id = id.replace(/:/g, '\\3A ');
+    id = id.replace(/;/g, '\\3B ');
+    return '#' + id;
   };
 
   var buildIdSelectorFromRPT = function (rptKey) {
@@ -97,10 +99,13 @@ define(['jquery'], function () {
     return id.substring(ID_PREFIX.length);
   };
 
-  var seqFinal = function (seqOutcomes) {
-    var seqKeys = Object.keys(seqOutcomes);
-    for ( var i = 0; i < seqKeys.length; i++ ) {
-      if ( TEST_FINAL.exec(seqOutcomes[seqKeys[i]].mqc_outcome) != null ) {
+  var allFinal = function (outcomes) {
+    var okeys = Object.keys(outcomes);
+    if (okeys.length == 0) {
+      return false;
+    }
+    for ( var i = 0; i < okeys.length; i++ ) {
+      if ( TEST_FINAL.exec(outcomes[okeys[i]].mqc_outcome) == null ) {
         return false;
       }
     }
@@ -126,7 +131,7 @@ define(['jquery'], function () {
     removeErrorMessages: removeErrorMessages,
     isLaneKey: isLaneKey,
     rptKeyFromId: rptKeyFromId,
-    seqFinal: seqFinal,
+    allFinal: allFinal,
     OUTCOMES: QC_OUTCOMES
   };
 });

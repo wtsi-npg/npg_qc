@@ -93,7 +93,9 @@ define([
       rptKeyAsSelector = 'tr[id*="' + ID_PREFIX + key + '"]';
     } else {
       //jQuery can handle ':' as part of a DOM id's but it needs to be escaped as '\\3A '
-      rptKeyAsSelector = '#rpt_key\\3A ' + key.replace(/:/g, '\\3A ');
+      key = key.replace(/:/g, '\\3A ');
+      key = key.replace(/;/g, '\\3B ');
+      rptKeyAsSelector = '#rpt_key\\3A ' + key;
     }
     return $(rptKeyAsSelector + ' td.' + elementClass);
   };

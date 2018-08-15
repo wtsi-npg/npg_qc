@@ -263,8 +263,8 @@ subtest 'Page title for run + show all' =>  sub {
   $mech->title_is($title_prefix . q[Results (all) for runs 4025 (run 4025 status: qc in progress, taken by mg8)]);
 };
 
-subtest 'No mqc span html tag for gclp' => sub {
-  plan tests => 21;
+subtest 'mqc span' => sub {
+  plan tests => 14;
 
   $schemas->{npg}->resultset('RunStatus')
                  ->search({id_run => 4950, iscurrent => 1},)
@@ -281,24 +281,10 @@ subtest 'No mqc span html tag for gclp' => sub {
 
   my $where_lane = { 'iseq_product_metrics.id_run'   => 4950,
                      'iseq_product_metrics.position' => 1 };
+
   my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
-                             ->search($where_lane, { join => 'iseq_product_metrics', });
-  while ( my $flowcell = $rs->next ) {
-    $flowcell->update({ 'id_lims' => 'C_GCLP' });
-  }
-
-  $mech->get_ok($url);
-  $mech->content_contains(q[rpt_key:4950:1:0]);
-  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:0">]);
-  $mech->content_contains(q[rpt_key:4950:1:1]);
-  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:1">]);
-  $mech->content_contains(q[rpt_key:4950:1:5]);
-  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:5">]);
-
-  $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
                           ->search($where_lane, { join => 'iseq_product_metrics', });
   while ( my $flowcell = $rs->next ) {
-    $flowcell->update({ 'id_lims' => 'SQSCP' });
     if($flowcell->tag_index && $flowcell->tag_index == 5) {
       $flowcell->update({ 'entity_type' => 'library_indexed_spike' });
     }
@@ -317,7 +303,6 @@ subtest 'No mqc span html tag for gclp' => sub {
   $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
                           ->search($where_lane, { join => 'iseq_product_metrics', });
   while ( my $flowcell = $rs->next ) {
-    $flowcell->update({ 'id_lims' => 'SQSCP' });
     $flowcell->update({ 'entity_type' => 'library_indexed' });
   }
 };

@@ -13,6 +13,7 @@ our $VERSION = '0';
 Readonly::Scalar my $LESS    => -1;
 Readonly::Scalar my $MORE    =>  1;
 Readonly::Scalar my $EQUAL   =>  0;
+Readonly::Scalar my $DELIM   =>  q[-];
 
 =head1 NAME
 
@@ -97,11 +98,22 @@ sub rpt_list2one_hash {
         for my $name (qw/id_run position tag_index/) {
             my @values = uniq map {defined $_->{$name} ? $_->{$name} : 'none'} @{$a};
             if (@values > 1 || $values[0] ne 'none') {
-                $h->{$name} = join q[-], @values;
+                $h->{$name} = join $DELIM, @values;
             }
         }
     }
     return $h;
+}
+
+=head2 rpt_list2first_rpt_key
+
+Return the first rpt key of the argument rpt list.
+
+=cut
+sub rpt_list2first_rpt_key {
+    my ($self, $rpt_list) = @_;
+    my $a = $self->inflate_rpts($rpt_list);
+    return $self->deflate_rpt($a->[0]);
 }
 
 =head2 inflate_rpt_key

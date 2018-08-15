@@ -202,7 +202,7 @@ sub tags4lane {
       croak sprintf 'Flowcell data missing for run %i position %i tag_index %i',
                     $lane_hash->{'id_run'}, $lane_hash->{'position'}, $tag_index;
     }
-    if (npg_qc_viewer::Util::TransferObjectFactory->qc_able($flowcell_row, $tag_index)) {
+    if (npg_qc_viewer::Util::TransferObjectFactory->qc_able($flowcell_row->is_control, $tag_index)) {
       push @tags, $tag_index;
     }
   }
@@ -246,7 +246,7 @@ David Jackson
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Genome Research Ltd.
+Copyright (C) 2018 Genome Research Ltd.
 
 This file is part of NPG software.
 

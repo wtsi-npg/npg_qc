@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 14;
 use Test::Exception;
 use List::MoreUtils qw(uniq none);
 use Moose::Meta::Class;
@@ -161,7 +161,7 @@ sub _samtools_data {
 }
 
 subtest q[results linked to a composition] => sub {
-  plan tests => 23;
+  plan tests => 39;
 
   my $component_rs   = $schema->resultset('SeqComponent');
   my $composition_rs = $schema->resultset('SeqComposition');
@@ -277,10 +277,180 @@ subtest q[results linked to a composition] => sub {
   is ($rs->count, 33, '33 results retrieved');
   $rs = $samtools_rs->search_autoqc({id_run => 50000, subset => undef}, 1);
   is ($rs->count, 44, '44 results retrieved');
+
   $rs = $samtools_rs->search_autoqc({id_run => 50000, subset => undef}, 2);
   is ($rs->count, 22, '22 results retrieved');
+  my $result_row = $rs->next;
+  isa_ok ($result_row, 'npg_qc::Schema::Result::SamtoolsStats');
+  my $sccs = $result_row->seq_component_compositions();
+  isa_ok ($sccs, 'npg_qc::Schema::ResultSet'); 
+  is ($sccs->count, 1, 'one related linking object');
+  my $scc = $sccs->next();
+  isa_ok ($scc, 'npg_qc::Schema::Result::SeqComponentComposition');
+  is ($scc->size, 2, 'composition size is 2');
+  my $scomp = $scc->seq_component();
+  isa_ok ($scomp, 'npg_qc::Schema::Result::SeqComponent');
+  my $sc = $result_row->seq_composition();
+  isa_ok ($sc, 'npg_qc::Schema::Result::SeqComposition');
+  is ($sc->size, 2, 'composition size is 2');
+  $sccs = $result_row->seq_component_compositions();
+  isa_ok ($sccs, 'npg_qc::Schema::ResultSet'); 
+  is ($sccs->count, 1, 'one related linking object');
+  $scc = $sccs->next();
+  isa_ok ($scc, 'npg_qc::Schema::Result::SeqComponentComposition');
+  is ($scc->size, 2, 'composition size is 2');
+  my $c = $result_row->composition();
+  isa_ok ($c, 'npg_tracking::glossary::composition');
+  is ($c->num_components, 2, 'two-component composition');
+  is ($c->get_component(0)->id_run, 40000, 'run id of the first component');
+  is ($c->get_component(1)->id_run, 50000, 'run id of the second component');
+
   $rs = $samtools_rs->search_autoqc({id_run => 50000, subset => undef});
-  is ($rs->count, 66, '44 results retrieved');
+  is ($rs->count, 66, '66 results retrieved');
+};
+
+subtest q[retrieve results for compositions with arbitrary number of components] => sub {
+  plan tests => 423;
+
+  my $component_rs   = $schema->resultset('SeqComponent');
+  my $composition_rs = $schema->resultset('SeqComposition');
+  my $com_com_rs     = $schema->resultset('SeqComponentComposition');
+  my $samtools_rs    = $schema->resultset('SamtoolsStats');
+
+  my $r = 60000;
+  #####
+  # Create records for four lane-level results
+  #
+  foreach my $p ((1 .. 4)) {
+    my $component_h = {id_run => $r, position => $p};
+    my $component =
+            npg_tracking::glossary::composition::component::illumina->new($component_h);
+     my $f = npg_tracking::glossary::composition::factory->new();
+     $f->add_component($component);
+     my $composition = $f->create_composition();
+     $component_h->{'digest'} = $component->digest;
+     my $component_row = $component_rs->create($component_h);
+     my $composition_row = $composition_rs->create(
+            {size => 1, digest => $composition->digest});
+     $com_com_rs->create({
+             size               => 1,
+             id_seq_component   => $component_row->id_seq_component,
+             id_seq_composition => $composition_row->id_seq_composition
+                              });
+     $samtools_rs->create(
+              _samtools_data($composition_row->id_seq_composition, 'f1'));
+  }
+
+  #####
+  # Create records for six plex-level results for merged entities (merge across four lanes)
+  #
+  foreach my $i ((0 .. 5)) {
+    my $f = npg_tracking::glossary::composition::factory->new();
+    my @component_rows = ();
+    foreach my $p ((1 .. 4)) {
+      my $component_h = {'id_run' => $r, 'position' => $p, 'tag_index' => $i};
+      my $component =
+            npg_tracking::glossary::composition::component::illumina->new($component_h);
+      $f->add_component($component);
+      $component_h->{'digest'} = $component->digest;
+      push @component_rows, $component_rs->create($component_h);
+    }
+    my $composition = $f->create_composition();
+    my $composition_row = $composition_rs->create(
+            {size => 4, digest => $composition->digest});
+    foreach my $component_row (@component_rows) {
+      $com_com_rs->create({
+             size               => 4,
+             id_seq_component   => $component_row->id_seq_component,
+             id_seq_composition => $composition_row->id_seq_composition
+                              });
+    }
+
+    $samtools_rs->create(
+              _samtools_data($composition_row->id_seq_composition, 'f1'));
+  }
+
+  #####
+  # Search for all results for lane 1
+  #
+  my @rows = $samtools_rs->search_autoqc({'id_run' => $r, 'position' => 1})
+                          ->search({}, {order_by => 'tag_index'})->all();
+  is (scalar @rows, 7, 'seven results returned');
+  my $lane = shift @rows;
+  is ($lane->composition->num_components, 1, 'single component composition');
+  my $lcomp = $lane->composition->get_component(0);
+  is ($lcomp->tag_index, undef, 'tag index undefined');
+  is ($lcomp->position, 1, 'position is 1');
+  is ($lcomp->id_run, $r, "run id is $r");
+  
+  foreach my $i ((0 .. 5)) {
+    is ($rows[$i]->composition->num_components, 4, 'four-component composition');
+    foreach my $n ((0 .. 3)) {
+      my $comp = $rows[$i]->composition->get_component($n);
+      is ($comp->tag_index, $i, "component No $n -  tag index is $i");
+      is ($comp->position, $n+1, "component No $n - position is $n+1");
+      is ($comp->id_run, $r, "component No $n - run id is $r");
+    }
+  }
+
+  #####
+  # Search for all plex-level results for individual lanes
+  #
+  for my $l ((1 .. 4)) {
+    @rows = $samtools_rs->search_autoqc(
+            {'id_run' => $r, 'position' => $l, 'tag_index' => {'!=' => undef}})
+                        ->search({}, {order_by => 'tag_index'})->all();
+    is (scalar @rows, 6, "six results returned for lane $l");
+    foreach my $i ((0 .. 5)) {
+      is ($rows[$i]->composition->num_components, 4, 'four-component composition');
+      foreach my $n ((0 .. 3)) {
+        my $comp = $rows[$i]->composition->get_component($n);
+        is ($comp->tag_index, $i, "component No $n -  tag index is $i");
+        is ($comp->position, $n+1, "component No $n - position is $n+1");
+        is ($comp->id_run, $r, "component No $n - run id is $r");
+      }
+    }
+  }
+
+  #####
+  # Search for all plex-level results for a run
+  #
+  @rows = $samtools_rs->search_autoqc(
+            {'id_run' => $r, 'tag_index' => {'!=' => undef}})->all();
+  is (scalar @rows, 6, "six results returned for a run");
+  map {is ($_->composition->num_components, 4, 'four-component composition')} @rows;
+  
+  #####
+  # Search for all plex-level results for lanes 1 and 2
+  #
+  @rows = $samtools_rs->search_autoqc(
+            {'id_run' => $r, position => [1,2], 'tag_index' => {'!=' => undef}})->all();
+  is (scalar @rows, 6, "six results returned for a run");
+  map {is ($_->composition->num_components, 4, 'four-component composition')} @rows;
+
+  #####
+  # Search for lane-level results for lane 1
+  #
+  @rows = $samtools_rs->search_autoqc(
+            {'id_run' => $r, 'position' => 1, 'tag_index' => undef})->all();
+  is (scalar @rows, 1, "one lane-level result for lane 1");
+  is ($rows[0]->composition->num_components, 1, 'single component composition');
+
+  #####
+  # Search for lane-level results for lanes 1 and 2
+  #
+  @rows = $samtools_rs->search_autoqc(
+            {'id_run' => $r, 'position' => [1,2], 'tag_index' => undef})->all();
+  is (scalar @rows, 2, "two lane-level results");
+  map {is ($_->composition->num_components, 1, 'single component composition')} @rows;
+
+  #####
+  # Search for lane-level results for a run
+  #
+  @rows = $samtools_rs->search_autoqc(
+            {'id_run' => $r, 'tag_index' => undef})->all();
+  is (scalar @rows, 4, "four lane-level results");
+  map {is ($_->composition->num_components, 1, 'single component composition')} @rows;
 };
 
 subtest q[mixed queries for results linked to a composition] => sub {

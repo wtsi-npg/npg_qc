@@ -113,7 +113,7 @@ subtest 'Data for sample' => sub {
 };
 
 subtest 'tags for a lane' => sub {
-  plan tests => 7;
+  plan tests => 6;
 
   my $id_run = 4950;
   my $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
@@ -132,17 +132,6 @@ subtest 'tags for a lane' => sub {
 
   is_deeply( $m->tags4lane( {id_run => $id_run, position => 1} ),
     [(1 .. 9, 11 .. 23)], 'correct array of tags' );
-
-  $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
-  while (my $row = $rs->next) {
-    my $f = $row->iseq_flowcell;
-    if ($f) {
-      $f->update({id_lims => 'C_GCLP'});
-    }
-  }
-
-  is_deeply($m->tags4lane( {id_run => $id_run, position => 1} ),
-    [], 'GCLP run - no tags reported' );
 
   $id_run = 4025;
   $rs = $m->resultset(q(IseqProductMetric))->search({id_run=>$id_run, position=>1});
