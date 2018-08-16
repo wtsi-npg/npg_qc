@@ -182,7 +182,7 @@ sub load_from_path {
   my $c = npg_qc::autoqc::results::collection->new();
 
   foreach my $file (glob(join q[ ], @patterns)) {
-    my $r = $self->_json2result($file);
+    my $r = $self->json_file2result_object($file);
     if ($r) {
       $c->add($r);
     }
@@ -469,6 +469,41 @@ sub load_fastqcheck_content_from_path {
   return $content;
 }
 
+=head2 json_file2result_object
+
+Reads an argument JSON file and converts the content into in-memory autoqc
+result object of a class specified by the __CLASS__ field. Returns either
+a result object or, if the content of the file is not a serialized autoqc
+result object, an undefined value.
+
+Error if file cannot be read or the de-serialization fails.
+
+=cut
+
+sub json_file2result_object {
+  my ($self, $file) = @_;
+
+  my $result;
+  try {
+    my $json_string = slurp($file);
+    my $json = decode_json($json_string);
+    my $class_name = delete $json->{$CLASS_FIELD};
+    if ($class_name) {
+      ($class_name, my $dbix_class_name) =
+          npg_qc::autoqc::role::result->class_names($class_name);
+    }
+    if ($class_name && any {$_ eq $class_name} @{$self->_checks_list()}) {
+      my $module = $npg_qc::autoqc::results::collection::RESULTS_NAMESPACE . q[::] . $class_name;
+      load_class($module);
+      $result = $module->thaw($json_string);
+    }
+  } catch {
+    croak "Failed converting $file to autoqc result object: $_";
+  };
+
+  return $result;
+}
+
 sub _fqchck_load_from_db {
   my ($self, $query, $read) = @_;
   my $where = {split => 'none', tag_index => $NO_TAG_INDEX};
@@ -540,30 +575,6 @@ sub _query_obj {
   if ($what) { $obj_hash->{'option'} = $what; }
   if (defined $db_lookup) { $obj_hash->{'db_qcresults_lookup'} = $db_lookup; }
   return npg_qc::autoqc::qc_store::query->new($obj_hash);
-}
-
-sub _json2result {
-  my ($self, $file) = @_;
-
-  my $result;
-  try {
-    my $json_string = slurp($file);
-    my $json = decode_json($json_string);
-    my $class_name = delete $json->{$CLASS_FIELD};
-    if ($class_name) {
-      ($class_name, my $dbix_class_name) =
-          npg_qc::autoqc::role::result->class_names($class_name);
-    }
-    if ($class_name && any {$_ eq $class_name} @{$self->_checks_list()}) {
-      my $module = $npg_qc::autoqc::results::collection::RESULTS_NAMESPACE . q[::] . $class_name;
-      load_class($module);
-      $result = $module->thaw($json_string);
-    }
-  } catch {
-    croak "Failed reading $file: $_";
-  };
-
-  return $result;
 }
 
 __PACKAGE__->meta->make_immutable;
