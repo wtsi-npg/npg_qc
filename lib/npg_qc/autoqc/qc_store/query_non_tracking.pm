@@ -37,7 +37,7 @@ sub BUILD {
 sub to_string {
   my $self = shift;
 
-  my $s = __PACKAGE__ . q[ object: run ] . $self->id_run;
+  my $s = (ref $self) . q[ object: run ] . $self->id_run;
   my $positions = @{$self->positions} ? (join q[ ], @{$self->positions}) : q[ALL];
   $s .= qq[, positions $positions];
   $s .=  q[, loading option ] . option_to_string($self->option);
