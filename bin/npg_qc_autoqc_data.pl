@@ -22,6 +22,7 @@ __END__
 
     npg_qc_autoqc_data.pl --path path1 [--path path2]
     npg_qc_autoqc_data.pl --json_file file1 [--json_file file2]
+    npg_qc_autoqc_data.pl --archive_path apath
 
 =head1 DESCRIPTION
 

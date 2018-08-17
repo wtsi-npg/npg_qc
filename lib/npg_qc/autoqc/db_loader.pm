@@ -2,19 +2,22 @@ package npg_qc::autoqc::db_loader;
 
 use Moose;
 use namespace::autoclean;
-use Class::Load qw/load_class/;
-use Carp;
 use JSON;
+use Carp;
 use Try::Tiny;
-use Perl6::Slurp;
 use List::MoreUtils qw/any none/;
 use Readonly;
 
 use npg_tracking::util::types;
 use npg_qc::Schema;
 use npg_qc::autoqc::role::result;
+use npg_qc::autoqc::results::collection;
+use npg_qc::autoqc::qc_store;
+use npg_qc::autoqc::qc_store::query_non_tracking;
+use npg_qc::autoqc::qc_store::options qw/$ALL/;
 
-with qw/MooseX::Getopt/;
+with qw/ npg_tracking::glossary::run
+         MooseX::Getopt /;
 
 our $VERSION = '0';
 
@@ -22,90 +25,113 @@ Readonly::Scalar my $CLASS_FIELD             => q[__CLASS__];
 Readonly::Scalar my $SEQ_COMPOSITION_PK_NAME => q[id_seq_composition];
 Readonly::Scalar my $SLEEP_TIME              => 180;
 
-has 'path'   =>  ( is          => 'ro',
-                   isa         => 'ArrayRef[Str]',
-                   required    => 0,
-                   default     => sub {[]},
-                 );
+#############################################################
+#              Public attributes and methods                #
+#############################################################
 
-has 'id_run'  => ( is          => 'ro',
-                   isa         => 'ArrayRef[NpgTrackingRunId]',
-                   required    => 0,
-                   default     => sub {[]},
-                 );
+has 'archive_path' => (
+  is          => 'ro',
+  isa         => 'NpgTrackingDirectory',
+  required    => 0,
+  predicate   => 'has_archive_path',
+);
 
-has 'lane'    => ( is          => 'ro',
-                   isa         => 'ArrayRef[NpgTrackingLaneNumber]',
-                   required    => 0,
-                   default     => sub {[]},
-                 );
+has 'path' => (
+  is          => 'ro',
+  isa         => 'ArrayRef[NpgTrackingDirectory]',
+  required    => 0,
+  predicate   => 'has_path',
+);
 
-has 'check'   => ( is          => 'ro',
-                   isa         => 'ArrayRef[Str]',
-                   required    => 0,
-                   default     => sub {[]},
-                 );
+has 'json_file' => (
+  is          => 'ro',
+  isa         => 'ArrayRef[NpgTrackingReadableFile]',
+  required    => 0,
+  predicate   => 'has_json_file',
+);
 
-has 'json_file' => ( is          => 'ro',
-                     isa         => 'ArrayRef',
-                     required    => 0,
-                     lazy_build  => 1,
-                   );
-sub _build_json_file {
-  my $self = shift;
-  if (!scalar @{$self->path}) {
-    croak q[path should be supplied];
-  }
-  my @files = ();
-  foreach my $path (@{$self->path}) {
-    if (!-d $path) {
-      $self->_log(qq[$path is not a directory, skipping]);
-      next;
-    }
-    push @files, glob File::Spec->catfile($path, q[*.json]);
-  }
-  return \@files;
-}
+has '+id_run' => (
+  required    => 0,
+);
 
-has 'schema' =>    ( isa        => 'npg_qc::Schema',
-                     metaclass  => 'NoGetopt',
-                     is         => 'ro',
-                     required   => 0,
-                     lazy_build => 1,
-                    );
+has 'lane'=> (
+  is          => 'ro',
+  isa         => 'ArrayRef[NpgTrackingLaneNumber]',
+  required    => 0,
+  predicate   => 'has_lane',
+);
+
+has 'check'   => (
+  is          => 'ro',
+  isa         => 'ArrayRef[Str]',
+  required    => 0,
+  predicate   => 'has_check',
+);
+
+has 'verbose' => (
+  is          => 'ro',
+  isa         => 'Bool',
+  required    => 0,
+  default     => 1,
+);
+
+has 'schema' => (
+  isa         => 'npg_qc::Schema',
+  metaclass   => 'NoGetopt',
+  is          => 'ro',
+  required    => 0,
+  lazy_build  => 1,
+);
 sub _build_schema {
   return npg_qc::Schema->connect();
 }
 
-has '_schema_sources' => ( isa        => 'ArrayRef',
-                           is         => 'ro',
-                           required   => 0,
-                           lazy_build => 1,
-                         );
-sub _build__schema_sources {
+sub BUILD {
   my $self = shift;
-  return [$self->schema()->sources()];
-}
-sub _schema_has_source {
-  my ($self, $source_name) = @_;
-  return any { $_ eq $source_name } @{$self->_schema_sources()};
-}
 
-has 'verbose' =>    ( is       => 'ro',
-                      isa      => 'Bool',
-                      required => 0,
-                      default  => 1,
-                    );
+  try {
+    if ( ($self->has_archive_path && $self->has_path) ||
+       ($self->has_archive_path && $self->has_json_file) ||
+       ($self->has_path && $self->has_json_file) ) {
+      croak 'Only one of archive_path, path or json_file attributes can be set';
+    }
+
+    if ($self->has_archive_path && !$self->has_id_run) {
+      croak 'archive_path set, id_run attribute also has to be set';
+    }
+
+    if ($self->has_lane && !$self->has_id_run) {
+      croak 'lane attribute cannot be set without setting id_run attribute';
+    }
+
+    for my $attr (qw/path json_file check lane/) {
+      my $m = 'has_' . $attr;
+      if ($self->$m && !@{$self->$attr}) {
+        croak "$attr array cannot be empty";
+      }
+    }
+
+    if ($self->has_check) {
+      for my $c (@{$self->check}) {
+        if (none { $_ eq $c } @{$self->_checks_list}) {
+          croak "Invalid autoqc result class name: $c";
+        }
+      }
+    }
+  } catch {
+    croak 'Input validation has failed: ' . $_;
+  };
+
+  return;
+}
 
 sub load{
   my $self = shift;
 
   my $transaction = sub {
     my $count = 0;
-    foreach my $json_file (@{$self->json_file}) {
-      # Force scalar context since json file can contain multiple strings
-      my $json = slurp($json_file);
-      $count += $self->_json2db($json, $json_file);
+    while (my $obj = $self->_collection->pop) {
+      $count += $self->_json2db($obj);
     }
     return $count;
   };
@@ -130,42 +156,100 @@ sub load{
   return $num_loaded;
 }
 
+#############################################################
+#             Private attributes and methods                #
+#############################################################
+
+has '_schema_sources' => (
+  isa         => 'ArrayRef',
+  is          => 'ro',
+  required    => 0,
+  lazy_build  => 1,
+);
+sub _build__schema_sources {
+  my $self = shift;
+  return [$self->schema()->sources()];
+}
+sub _schema_has_source {
+  my ($self, $source_name) = @_;
+  return any { $_ eq $source_name } @{$self->_schema_sources()};
+}
+
+has '_checks_list' => (
+  isa        => 'ArrayRef',
+  is         => 'ro',
+  required   => 1,
+  default    => sub {
+    return [ @{npg_qc::autoqc::results::collection->new()->checks_list()},
+             qw/sequence_summary samtools_stats/ ];
+  },
+);
+
+has '_collection' => (
+  is          => 'ro',
+  isa         => 'npg_qc::autoqc::results::collection',
+  required    => 0,
+  lazy_build  => 1,
+);
+sub _build__collection {
+  my $self = shift;
+
+  my $qc_store = npg_qc::autoqc::qc_store->new(checks_list => $self->_checks_list,
+                                               use_db      => 0);
+  my $collection;
+  my $query;
+  if ($self->has_id_run) {
+    my $init_query = {'option'              => $ALL,
+                      'id_run'              => $self->id_run,
+                      'db_qcresults_lookup' => 0};
+    if ($self->has_lane) {
+      $init_query->{'positions'} = $self->lane;
+    }
+    $query = npg_qc::autoqc::qc_store::query_non_tracking->new($init_query);
+  }
+
+  if ($self->has_archive_path) {
+    $collection = $qc_store->load_from_staging_archive($self->archive_path, $query);
+  } elsif ($self->has_path) {
+    $collection = $qc_store->load_from_path(@{$self->path}, $query);
+  } elsif ($self->has_json_file) {
+    $collection = npg_qc::autoqc::results::collection->new();
+    for my $f (@{$self->json_file}) {
+      $collection->add($qc_store->json_file2result_object($f));
+    }
+  } else {
+    croak 'Either archive_path or path or json_files attribute should be set.'
+  }
+
+  return $collection;
+}
+
 sub _json2db{
-  my ($self, $json, $json_file) = @_;
+  my ($self, $obj) = @_;
 
   my $count = 0;
+
   try {
-    my $values = decode_json($json);
-    my $class_name = delete $values->{$CLASS_FIELD};
-    if ($class_name) {
-      ($class_name, my $dbix_class_name) =
-        npg_qc::autoqc::role::result->class_names($class_name);
-      if ($dbix_class_name && $self->_pass_filter($values, $class_name)) {
-        if ($self->_schema_has_source($dbix_class_name)) {
-          my $module = 'npg_qc::autoqc::results::' . $class_name;
-          load_class($module);
-          my $obj = $module->thaw($json);
-          if ($class_name eq 'bam_flagstats') {
-            $values = decode_json($obj->freeze());
-          }
-          my $rs  = $self->schema->resultset($dbix_class_name);
-          my $related_composition = $rs->find_or_create_seq_composition($obj->composition());
-          if (!$related_composition) {
-            croak 'Composition is not found/created';
-          }
-          $values->{$SEQ_COMPOSITION_PK_NAME} = $related_composition->$SEQ_COMPOSITION_PK_NAME();
-          $self->_values2db($rs, $values);
-          $count++;
-        }
+    my ($class_name, $dbix_class_name) =
+        npg_qc::autoqc::role::result->class_names($obj->class_name);
+    if ($dbix_class_name && $self->_pass_filter($obj) &&
+        $self->_schema_has_source($dbix_class_name)) {
+      my $rs  = $self->schema->resultset($dbix_class_name);
+      my $related_composition = $rs->find_or_create_seq_composition($obj->composition());
+      if (!$related_composition) {
+        croak 'Composition is not found/created';
       }
+      my $values = decode_json($obj->freeze());
+      $values->{$SEQ_COMPOSITION_PK_NAME} = $related_composition->$SEQ_COMPOSITION_PK_NAME();
+      $self->_values2db($rs, $values);
+      $count++;
+      $self->_log("Loaded $class_name result for " . $obj->composition()->freeze());
     }
   } catch {
     my $e = $_;
-    $self->_log("Attempted to load $json_file, error $e");
+    $self->_log("Error loading result object: $e");
     croak $e;
   };
-
-  $self->_log(join q[ ], $count ? 'Loaded' : 'Skipped', $json_file);
 
   return $count;
 }
@@ -188,54 +272,33 @@ sub _values2db {
 
 sub _exclude_nondb_attrs {
   my ($self, $values, @columns) = @_;
-
+  delete $values->{$CLASS_FIELD};
+  delete $values->{'composition'};
   foreach my $key ( keys %{$values} ) {
-    if (none {$key eq $_} @columns) {
-      delete $values->{$key};
-      if ($key ne $CLASS_FIELD && $key ne 'composition') {
-        $self->_log("Not loading field '$key'");
-      }
+    if (any {$key eq $_} @columns) {
+      next;
     }
+    delete $values->{$key};
+    $self->_log("Not loading field '$key'");
   }
   return;
 }
 
 sub _pass_filter {
-  my ($self, $values, $class_name) = @_;
+  my ($self, $obj) = @_;
 
-  if (!$values || !(ref $values) || ref $values ne 'HASH') {
-    croak 'Need hashed values to do filtering';
-  }
-  if (!$class_name) {
-    croak 'Need class name to do filtering';
-  }
-
-  if ( scalar @{$self->check} && none {$_ eq $class_name} @{$self->check}) {
+  my $class_name = $obj->class_name;
+  if ( $self->has_check && (none {$_ eq $class_name} @{$self->check}) ) {
     return 0;
   }
 
-  if (@{$self->id_run} || @{$self->lane}) {
-    my $id_run   = $values->{'id_run'};
-    my $position = $values->{'position'};
-    if ( !$id_run  && $values->{'composition'} ) {
-      my $composition = $values->{'composition'};
-      if (ref $composition eq 'npg_tracking::glossary::composition' &&
-          $composition->num_components == 1) {
-        my $component = $composition->get_component(0);
-        $id_run   = $component->id_run;
-        $position = $component->position;
-      }
+  if ( $obj->composition->num_components == 1 && $self->has_id_run ) {
+    my $component = $obj->composition->get_component(0);
+    if ( $component->id_run != $self->id_run ) {
+      return 0;
     }
-
-    if ( @{$self->id_run} && $id_run ) {
-      if ( none {$_ == $id_run} @{$self->id_run} ) {
-        return 0;
-      }
-    }
-    if ( @{$self->lane} && $position ) {
-      if ( none {$_ == $position} @{$self->lane} ) {
-        return 0;
-      }
+    if ( $self->has_lane && none {$_ == $component->position} @{$self->lane} ) {
+      return 0;
     }
   }
 
@@ -253,6 +316,7 @@ sub _log {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 NAME
@@ -261,34 +325,64 @@ npg_qc::autoqc::db_loader
 
 =head1 SYNOPSIS
 
+  my $p = 'npg_qc::autoqc::db_loader';
+
+  # Loading all files
+  $p->new(archive_path => '/tmp/mypath')->load();
+  $p->new(path => [qw/path1 path2/])->load();
+  $p->new(json_file => [qw/file1 file2/])->load();
+
+  # Applying filters
+  $p->new(path => [qw/path1 path2/], check => [qw/genotype insert_size/]')->load();
+  $p->new(path => [qw/path1 path2/], id_run => 1234, lane => [1,3])->load();
+
 =head1 DESCRIPTION
+
+  Database loader for autoqc results.
+
+  Finds JSON files representing serialised autoqc result objects and loads
+  them to a database. JSON files that are not serialized autoqc result objects
+  or result objects that do not have database representation are skipped.
+  Attributes of result objects which do not have corresponding representation
+  in a database are skipped.
+
+  One of archive_path, path and json_files attributes can be used to point
+  to the location of JSON files. Only one of these attributes can be set.
+
+  If filters (check, id_run, lane) are set, they would be applied to load
+  only the objects that pass all filters. The id_run and lane filters are not
+  applied to autoqc result objects for compositions with multiple components.
 
 =head1 SUBROUTINES/METHODS
 
+=head1 archive_path
+ 
+ The run folder archive directory, an optional attribute.
+ The directory should exist. 
+
 =head2 path
 
-  Array with directory names from where json files have to be loaded;
-  redandant if json_files is defined by the caller.
+  An array of directory paths from where json files have to be loaded.
+  Directories should exist. An optional attribute.
 
 =head2 json_files
 
-  Array of json files, optional attribute.
+  An array of json files full paths, an optional attribute.
+  Files should exist.
 
 =head2 id_run
 
-  An array of run ids to load, optional attribute, acts as a filter.
+  Run id, an optional attribute, acts as a filter.
 
 =head2 lane
 
-  An array of lane numbers to load, optional attribute, acts as a filter.
+  An array of lane numbers to load, an optional attribute, acts as a filter.
+  Can only be set if id_run is also set.
 
 =head2 check
 
-  An array of autoqc check names to load, optional attribute.
-
-=head2 load
-
-  Method that performs loading of json files to a database.
+  An array of autoqc check names to load, an optional attribute,
+  acts as a filter.
 
 =head2 verbose
 
@@ -296,7 +390,18 @@ npg_qc::autoqc::db_loader
 
 =head2 schema
 
-  DBIx connection to the npg_qc database.
+  DBIx connection to the npg_qc database, an optional attribute,
+  will be built automatically if not set.
+
+=head2 load
+
+  A method. Finds JSON files representing autoqc result objects
+  loads them to a database. Returns the number of loaded files.
+
+=head2 BUILD
+
+  Method run by Moose before returning a new object instance to the
+  caller. Performs consistency checks for object's attribute values.
 
 =head1 DIAGNOSTICS
 
@@ -310,17 +415,11 @@ npg_qc::autoqc::db_loader
 
 =item namespace::autoclean
 
-=item Class::Load
-
 =item MooseX::Getopt
 
 =item Carp
 
-=item JSON
-
 =item Try::Tiny
-
-=item Perl6::Slurp
 
 =item List::MoreUtils
 
@@ -342,7 +441,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
