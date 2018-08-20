@@ -25,7 +25,12 @@ Readonly::Hash   my %THRESHOLDS_DB     => ( 20 => 'twenty',
                                             35 => 'thirtyfive',
                                             40 => 'forty', );
 
-my $FILE_NAME_REG_EXP = qr/\A(\d+)_(\d)(_\d|_t)?[.]fastqcheck\Z/smx;
+my $FILE_NAME_REG_EXP = qr{\A
+                             (\d+)             # run id
+                            _(\d)              # position
+                            (_\d|_t)?          # optional read
+                           $DEFAULT_EXTENSION  # file extension
+                           \Z}smx;
 
 has 'path'            => (  isa           => 'ArrayRef',
                             is            => 'ro',
@@ -103,7 +108,7 @@ sub save_files {
         $values->{'file_content_compressed'} = compress($content);
         _qvalues($values, $content);
         $rs->find_or_new($values)->set_inflated_columns($values)->update_or_insert();
-		  };
+      };
       try {
         $self->schema->txn_do($transaction);
         $count++;
