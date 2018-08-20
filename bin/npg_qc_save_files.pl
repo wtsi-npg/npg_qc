@@ -1,15 +1,9 @@
 #!/usr/bin/env perl
 
-#########
-# Author:        Marina Gourtovaia
-# Created:       9 August 2010
-#
-
 use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
-use Getopt::Long;
 
 use npg_qc::file_store;
 
