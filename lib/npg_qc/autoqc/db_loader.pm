@@ -14,7 +14,7 @@ use npg_qc::autoqc::role::result;
 use npg_qc::autoqc::results::collection;
 use npg_qc::autoqc::qc_store;
 use npg_qc::autoqc::qc_store::query_non_tracking;
-use npg_qc::autoqc::qc_store::options qw/$ALL/;
+use npg_qc::autoqc::qc_store::options qw/$LANES $PLEXES/;
 
 with qw/ npg_tracking::glossary::run
          MooseX::Getopt /;
@@ -198,10 +198,10 @@ sub _build__collection {
                                                use_db      => 0);
   my $collection;
   my $query;
+  my $init_query = {'option'              => $LANES,
+                    'id_run'              => $self->id_run,
+                    'db_qcresults_lookup' => 0};
   if ($self->has_id_run) {
-    my $init_query = {'option'              => $ALL,
-                      'id_run'              => $self->id_run,
-                      'db_qcresults_lookup' => 0};
     if ($self->has_lane) {
       $init_query->{'positions'} = $self->lane;
     }
@@ -209,7 +209,12 @@ sub _build__collection {
   }
 
   if ($self->has_archive_path) {
-    $collection = $qc_store->load_from_staging_archive($self->archive_path, $query);
+    $collection = $qc_store->load_from_staging_archive($query, $self->archive_path);
+    $init_query->{'option'} = $PLEXES;
+    $query = npg_qc::autoqc::qc_store::query_non_tracking->new($init_query);
+    $collection = $collection->join_collections(
+       $collection,
+       $qc_store->load_from_staging_archive($query, $self->archive_path));
   } elsif ($self->has_path) {
     $collection = $qc_store->load_from_path(@{$self->path}, $query);
   } elsif ($self->has_json_file) {
