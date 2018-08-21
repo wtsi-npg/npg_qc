@@ -13,7 +13,6 @@ my $util = t::util->new();
 $util->modify_logged_user_method();
 
 local $ENV{'CATALYST_CONFIG'} = $util->config_path;
-local $ENV{'TEST_DIR'}        = $util->staging_path;
 local $ENV{'HOME'}            = 't/data';
 
 my $mech;
