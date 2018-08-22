@@ -268,7 +268,6 @@ t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_7.qX_yield.json
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_7.sequence_error.json
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_8_1-4025_8_2_human_split_stats.json
-t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_8_1-4025_8_2_human_split_stats.xml
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_8.adapter.json
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_8.contamination.json
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_8.insert_size.json

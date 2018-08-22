@@ -8,15 +8,12 @@ use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
 
 use t::util;
-
-my $schemas;
-
 my $util = t::util->new();
 $util->modify_logged_user_method();
 
+my $schemas;
 lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
 local $ENV{'CATALYST_CONFIG'} = $util->config_path;
-local $ENV{'TEST_DIR'}        = $util->staging_path;
 local $ENV{'HOME'}            = 't/data';
 
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
@@ -66,13 +63,13 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
 
 {
   my @urls = qw(/checks/runs?run=4025&show=all /checks/runs?run=4025&show=lanes);
-       foreach my $url (@urls) {
-  my ($res, $c) = ctx_request(GET($url));
-  ok ($res, qq[$url requested]);
-  ok ($res->is_success, 'request succeeded');
-  my $rl_map = $c->stash->{rl_map};
-  is (join(' ', sort keys %{$rl_map}), join(' ', @keys), 'keys in the rl map');
-  			}	
+  foreach my $url (@urls) {
+    my ($res, $c) = ctx_request(GET($url));
+    ok ($res, qq[$url requested]);
+    ok ($res->is_success, 'request succeeded');
+    my $rl_map = $c->stash->{rl_map};
+    is (join(' ', sort keys %{$rl_map}), join(' ', @keys), 'keys in the rl map');
+  }	
 }
 
 {
