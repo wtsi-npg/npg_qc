@@ -244,11 +244,11 @@ sub _json2db{
       if (!$related_composition) {
         croak 'Composition is not found/created';
       }
+      $self->_log("Loading $class_name result for " . $obj->composition()->freeze());
       my $values = decode_json($obj->freeze());
       $values->{$SEQ_COMPOSITION_PK_NAME} = $related_composition->$SEQ_COMPOSITION_PK_NAME();
       $self->_values2db($rs, $values);
       $count++;
-      $self->_log("Loaded $class_name result for " . $obj->composition()->freeze());
     }
   } catch {
     my $e = $_;
