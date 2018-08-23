@@ -1,6 +1,7 @@
 package npg_qc::autoqc::db_loader;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use JSON;
 use Carp;
@@ -90,14 +91,14 @@ sub BUILD {
   my $self = shift;
 
   try {
+
+    ($self->has_archive_path || $self->has_path || $self->has_json_file)
+      || croak 'One of archive_path, path or json_file attributes has to be set';
+
     if ( ($self->has_archive_path && $self->has_path) ||
        ($self->has_archive_path && $self->has_json_file) ||
        ($self->has_path && $self->has_json_file) ) {
       croak 'Only one of archive_path, path or json_file attributes can be set';
-    }
-
-    if ($self->has_archive_path && !$self->has_id_run) {
-      croak 'archive_path set, id_run attribute also has to be set';
     }
 
     if ($self->has_lane && !$self->has_id_run) {
@@ -237,8 +238,8 @@ sub _json2db{
   try {
     my ($class_name, $dbix_class_name) =
         npg_qc::autoqc::role::result->class_names($obj->class_name);
-    if ($dbix_class_name && $self->_pass_filter($obj) &&
-        $self->_schema_has_source($dbix_class_name)) {
+    if ($dbix_class_name && $self->_schema_has_source($dbix_class_name) &&
+        $self->_pass_filter($obj)) {
       my $rs  = $self->schema->resultset($dbix_class_name);
       my $related_composition = $rs->find_or_create_seq_composition($obj->composition());
       if (!$related_composition) {
@@ -292,22 +293,23 @@ sub _exclude_nondb_attrs {
 sub _pass_filter {
   my ($self, $obj) = @_;
 
+  my $outcome = 1;
+
   my $class_name = $obj->class_name;
   if ( $self->has_check && (none {$_ eq $class_name} @{$self->check}) ) {
-    return 0;
+    $outcome = 0;
   }
 
-  if ( $obj->composition->num_components == 1 && $self->has_id_run ) {
+  if ( $outcome && $obj->composition->num_components == 1 && $self->has_id_run ) {
     my $component = $obj->composition->get_component(0);
     if ( $component->id_run != $self->id_run ) {
-      return 0;
-    }
-    if ( $self->has_lane && none {$_ == $component->position} @{$self->lane} ) {
-      return 0;
-    }
+      $outcome = 0;
+    } elsif ( $self->has_lane && none {$_ == $component->position} @{$self->lane} ) {
+      $outcome = 0;
+    } #warn "OUTCOME $outcome for " . $component->position;
   }
 
-  return 1;
+  return $outcome;
 }
 
 sub _log {
@@ -352,7 +354,8 @@ npg_qc::autoqc::db_loader
   in a database are skipped.
 
   One of archive_path, path and json_files attributes can be used to point
-  to the location of JSON files. Only one of these attributes can be set.
+  to the location of JSON files. Only one of these attributes can and should
+  be set.
 
   If filters (check, id_run, lane) are set, they would be applied to load
   only the objects that pass all filters. The id_run and lane filters are not
@@ -417,6 +420,8 @@ npg_qc::autoqc::db_loader
 =over
 
 =item Moose
+
+=item MooseX::StrictConstructor
 
 =item namespace::autoclean
 
