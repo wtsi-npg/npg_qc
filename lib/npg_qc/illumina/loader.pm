@@ -3,10 +3,11 @@ package npg_qc::illumina::loader;
 use Moose;
 use namespace::autoclean;
 use Readonly;
-use MooseX::Getopt;
 use Module::Pluggable::Object;
 
 extends 'npg_tracking::illumina::runfolder';
+
+with 'MooseX::Getopt';
 
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
