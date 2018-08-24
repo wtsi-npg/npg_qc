@@ -265,11 +265,15 @@ sub _values2db {
 
   my $result_class = $rs->result_class;
   $self->_exclude_nondb_attrs($values, $result_class->columns());
-  my $row = $rs->find_or_new($values);
-  if ($result_class->has_column('iscurrent') && $row->in_storage) {
-    $row->update({'iscurrent' => 0});
+
+  my $row;
+  if ($result_class->has_column('iscurrent')) {
+    $rs->search($values)->update({'iscurrent' => 0});
     $row = $rs->new_result($values);
+  } else {
+    $row = $rs->find_or_new($values);
   }
+
   # We need to convert non-scalar values (hashes or arrays) to scalars
   $row->set_inflated_columns($values)->insert_or_update();
 
