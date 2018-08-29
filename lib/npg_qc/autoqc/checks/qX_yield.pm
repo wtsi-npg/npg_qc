@@ -20,44 +20,47 @@ npg_qc::autoqc::checks::qX_yield
 
 =head1 SYNOPSIS
 
-Inherits from npg_qc::autoqc::checks::check. See description of attributes in the documentation for that module.
-  my $check = npg_qc::autoqc::checks::qX_yield->new(path=>q[/staging/IL29/analysis/090721_IL29_3379/data], position=>1);
+Inherits from npg_qc::autoqc::checks::check.
+See description of attributes in the documentation for that module.
+
+  my $check = npg_qc::autoqc::checks::qX_yield->new(id_run=>5, position=>1);
 
 =head1 DESCRIPTION
 
-A fast qX check that uses a fastqcheck file.
+A fast check capturing yield for a number of threshold qualities (20, 30, 40).
 
 =head1 SUBROUTINES/METHODS
 
 =cut
 
-Readonly::Scalar our $Q_CUTOFF                  => 20;
-Readonly::Scalar our $EXT                       => 'fastqcheck';
-Readonly::Scalar our $MIN_YIELD_THRESHOLD_KB_HS => 5_000_000;
-Readonly::Scalar our $DEFAULT_READ_LENGTH_HS    => 75;
-Readonly::Scalar our $THOUSAND                  => 1000;
-Readonly::Scalar our $NA                        => -1;
+Readonly::Array  my @QUALITY_THRESHOLDS        => (20, 30, 40);
+Readonly::Scalar my $EXT                       => 'fastqcheck';
+Readonly::Scalar my $MIN_YIELD_THRESHOLD_KB_HS => 5_000_000;
+Readonly::Scalar my $DEFAULT_READ_LENGTH_HS    => 75;
+Readonly::Scalar my $THOUSAND                  => 1000;
+Readonly::Scalar my $NA                        => -1;
 
-has '+file_type' => (default    => $EXT,);
+has '+file_type'        => (default => $EXT,);
 
 =head2 platform_is_hiseq
 
 =cut
 
-has 'platform_is_hiseq' => (isa           => q[Bool],
-                            is            => q[ro],
-                           );
+has 'platform_is_hiseq' => (isa => q[Bool], is  => q[ro],);
 
-override 'execute'            => sub  {
+=head2 execute
+
+=cut
+
+override 'execute' => sub {
   my $self = shift;
+
   super();
 
   my @fnames = @{$self->input_files};
   my $short_fnames = $self->generate_filename_attr();
 
-  my @thresholds = ($Q_CUTOFF);
-
-  $self->result->threshold_quality($Q_CUTOFF);
+  $self->result->threshold_quality($QUALITY_THRESHOLDS[0]);
   my $count = 0;
   my @apass = ($NA, $NA);
 
@@ -67,11 +70,16 @@ override 'execute'            => sub  {
       my $filename_method = "filename$suffix";
       $self->result->$filename_method($short_fnames->[$count]);
 
-      my $fq = npg_common::fastqcheck->new(fastqcheck_path =>$filename);
-      my $values = $fq->qx_yield(\@thresholds);
+      my $fq = npg_common::fastqcheck->new(fastqcheck_path => $filename);
+      my @values = map { round($_ / $THOUSAND) }
+                   @{$fq->qx_yield(\@QUALITY_THRESHOLDS)};
 
       my $yield_method = "yield$suffix";
-      $self->result->$yield_method(round($values->[0]/$THOUSAND));
+      $self->result->$yield_method($values[0]);
+      my $yield_method_q = join q[_], $yield_method, q[q30];
+      $self->result->$yield_method_q($values[1]);
+      $yield_method_q = join q[_], $yield_method, q[q40];
+      $self->result->$yield_method_q($values[2]);
 
       if (!defined $self->tag_index) {
           my $threshold = $self->_get_threshold($fq);

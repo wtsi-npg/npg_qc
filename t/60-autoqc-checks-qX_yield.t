@@ -12,21 +12,25 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
     path      => 't/data/autoqc/090721_IL29_2549/data',
     position  => 1,
     id_run    => 2549
-                                                     );
+  );
   isa_ok($check, 'npg_qc::autoqc::checks::qX_yield');
   $check->execute();
  
   my $e = npg_qc::autoqc::checks::qX_yield->new(
-    qc_in      => 't/data/autoqc/090721_IL29_2549/data',
+    qc_in       => 't/data/autoqc/090721_IL29_2549/data',
     position    => 1,
     id_run      => 2549,
     input_files => [qw(t/data/autoqc/090721_IL29_2549/data/2549_1_1.fastqcheck
                        t/data/autoqc/090721_IL29_2549/data/2549_1_2.fastqcheck)],
-                                                );
+  );
   $e->id_run;
   $e->result->threshold_quality(20);
   $e->result->yield1(469992);
   $e->result->yield2(469992);
+  $e->result->yield1_q30(235267);
+  $e->result->yield2_q30(235267);
+  $e->result->yield1_q40(0);
+  $e->result->yield2_q40(0);
   $e->result->filename1(q[2549_1_1.fastqcheck]);
   $e->result->filename2(q[2549_1_2.fastqcheck]);
 
@@ -35,21 +39,21 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
 
 {
   my $check = npg_qc::autoqc::checks::qX_yield->new(
-    qc_in     => 't/data/autoqc/090721_IL29_2549/data',
-    position  => 1,
+    qc_in             => 't/data/autoqc/090721_IL29_2549/data',
+    position          => 1,
     platform_is_hiseq => 1,
-    id_run    => 2549
-                                                   );
+    id_run            => 2549
+  );
   $check->execute();
  
   my $e = npg_qc::autoqc::checks::qX_yield->new(
-    qc_in     => 't/data/autoqc/090721_IL29_2549/data',
-    position  => 1,
-    id_run => 2549,
+    qc_in       => 't/data/autoqc/090721_IL29_2549/data',
+    position    => 1,
+    id_run      => 2549,
     platform_is_hiseq => 1,
     input_files => [qw(t/data/autoqc/090721_IL29_2549/data/2549_1_1.fastqcheck
                        t/data/autoqc/090721_IL29_2549/data/2549_1_2.fastqcheck)],
-                                               );
+  );
   $e->id_run;
   $e->result->pass(0);
   $e->result->threshold_quality(20);
@@ -57,6 +61,10 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
   $e->result->threshold_yield2(3600000);
   $e->result->yield1(469992);
   $e->result->yield2(469992);
+  $e->result->yield1_q30(235267);
+  $e->result->yield2_q30(235267);
+  $e->result->yield1_q40(0);
+  $e->result->yield2_q40(0);
   $e->result->filename1(q[2549_1_1.fastqcheck]);
   $e->result->filename2(q[2549_1_2.fastqcheck]);
 
@@ -66,15 +74,15 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
 
 {
   my $check = npg_qc::autoqc::checks::qX_yield->new(
-    qc_in     => 't/data/autoqc/090721_IL29_2549/data',
-    position  => 5,
-    id_run    => 2549,
+    qc_in             => 't/data/autoqc/090721_IL29_2549/data',
+    position          => 5,
+    id_run            => 2549,
     platform_is_hiseq => 1
-                                                   );
+  );
   $check->execute();
  
   my $e = npg_qc::autoqc::checks::qX_yield->new(
-    qc_in        => 't/data/autoqc/090721_IL29_2549/data',
+    qc_in       => 't/data/autoqc/090721_IL29_2549/data',
     position    => 5,
     id_run      => 2549,
     platform_is_hiseq => 1,
@@ -88,20 +96,24 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
   $e->result->threshold_yield2(3600000);
   $e->result->yield1(42);
   $e->result->yield2(469992);
+  $e->result->yield1_q30(34);
+  $e->result->yield2_q30(235267);
+  $e->result->yield1_q40(0);
+  $e->result->yield2_q40(0);
   $e->result->filename1(q[2549_5_1.fastqcheck]);
   $e->result->filename2(q[2549_5_2.fastqcheck]);
 
   is_deeply($check->result, $e->result,
-    'results for a paired run when both reads fails');
+    'results for a paired run when both reads fail');
 }
 
 {
   my $check = npg_qc::autoqc::checks::qX_yield->new(
-    qc_in     => 't/data/autoqc/090721_IL29_2549/data',
-    position  => 2,
-    id_run    => 2549,
+    qc_in              => 't/data/autoqc/090721_IL29_2549/data',
+    position          => 2,
+    id_run            => 2549,
     platform_is_hiseq => 1,
-                                                   );
+  );
   $check->execute();
 
   my $e = npg_qc::autoqc::checks::qX_yield->new(
@@ -110,11 +122,13 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
     id_run      => 2549,
     platform_is_hiseq => 1,
     input_files => ['t/data/autoqc/090721_IL29_2549/data/2549_2_1.fastqcheck'],
-                                               );
+  );
   $e->result->pass(0);
   $e->result->threshold_quality(20);
   $e->result->threshold_yield1(2466667);
   $e->result->yield1(421225);
+  $e->result->yield1_q30(337792);
+  $e->result->yield1_q40(0);
   $e->result->filename1(q[2549_2_1.fastqcheck]);
 
   is_deeply($check->result, $e->result, 'result object for a single end run');
@@ -122,11 +136,11 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
 
 {
   my $check = npg_qc::autoqc::checks::qX_yield->new(
-    qc_in     => 't/data/autoqc/090721_IL29_2549/data',
-    position  => 6,
-    id_run    => 2549,
+    qc_in             => 't/data/autoqc/090721_IL29_2549/data',
+    position          => 6,
+    id_run            => 2549,
     platform_is_hiseq => 1,
-                                                   );
+  );
 
   $check->execute();
 
@@ -137,7 +151,7 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
     platform_is_hiseq => 1,
     input_files => [qw(t/data/autoqc/090721_IL29_2549/data/2549_6_1.fastqcheck
                        t/data/autoqc/090721_IL29_2549/data/2549_6_2.fastqcheck)],
-                                                );
+  );
   $e->id_run;
   $e->result->pass(0);
   $e->result->threshold_quality(20);
@@ -145,6 +159,10 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
   $e->result->threshold_yield2(2666667);
   $e->result->yield1(469992);
   $e->result->yield2(469992);
+  $e->result->yield1_q30(235267);
+  $e->result->yield2_q30(235267);
+  $e->result->yield1_q40(0);
+  $e->result->yield2_q40(0);
   $e->result->filename1(q[2549_6_1.fastqcheck]);
   $e->result->filename2(q[2549_6_2.fastqcheck]);
 
@@ -165,11 +183,13 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
     position  => 7,
     id_run => 2549,
     input_files => ['t/data/autoqc/090721_IL29_2549/data/2549_7_1.fastqcheck'],
-                                               );
+  );
   $e->id_run;
   $e->result->pass(0);
   $e->result->threshold_quality(20);
   $e->result->yield1(0);
+  $e->result->yield1_q30(0);
+  $e->result->yield1_q40(0);
   $e->result->filename1(q[2549_7_1.fastqcheck]);
 
   is_deeply ($check->result, $e->result, 'result for one empty fastq');
@@ -181,22 +201,26 @@ use_ok('npg_qc::autoqc::checks::qX_yield');
     position  => 6,
     id_run    => 2549,
     tag_index => 1,
-                                                   );
+  );
 
   $check->execute();
 
   my $e = npg_qc::autoqc::checks::qX_yield->new(
-    qc_in      => 't/data/autoqc/090721_IL29_2549/data',
-    position  => 6,
-    id_run => 2549,
-    tag_index => 1,
+    qc_in       => 't/data/autoqc/090721_IL29_2549/data',
+    position    => 6,
+    id_run      => 2549,
+    tag_index   => 1,
     input_files => ['t/data/autoqc/090721_IL29_2549/data/2549_6_1#1.fastqcheck',
                     't/data/autoqc/090721_IL29_2549/data/2549_6_2#1.fastqcheck'],
-                                               );
+  );
   $e->id_run;
   $e->result->threshold_quality(20);
   $e->result->yield1(469992);
   $e->result->yield2(469992);
+  $e->result->yield1_q30(235267);
+  $e->result->yield2_q30(235267);
+  $e->result->yield1_q40(0);
+  $e->result->yield2_q40(0);
   $e->result->filename1(q[2549_6_1#1.fastqcheck]);
   $e->result->filename2(q[2549_6_2#1.fastqcheck]);
 

@@ -1,0 +1,53 @@
+--
+-- We are going to stop generating fastqcheck files. We still need to
+-- export q30 and q40 yields to the warehouse. These yields are now
+-- being captured by the qX_yield autoqc check and saved to the
+-- qx_yield table. We need to back-populate qx_yield table with
+-- values from the fastqcheck table so that for the purpose of export
+-- to the warehouse we have one source of yield information.
+--
+
+--
+-- Create temporary table with the values for update
+--
+
+create temporary table yields
+select q.id_run, q.position, q.tag_index,
+round(ff.thirty/1000) as yield1_q30, round(ff.forty/1000) as yield1_q40,
+round(fr.thirty/1000) as yield2_q30, round(fr.forty/1000) as yield2_q40
+from qx_yield q, fastqcheck ff, fastqcheck fr
+where q.id_run is not null
+and (ff.split='none' and ff.section='forward'
+and q.id_run=ff.id_run and q.position=ff.position and q.tag_index=ff.tag_index)
+and (fr.split='none' and fr.section='reverse'
+and q.id_run=fr.id_run and q.position=fr.position and q.tag_index=fr.tag_index)
+order by q.id_run, q.position, q.tag_index;
+
+--
+-- Update qx_yield table with the values from the temporary table
+--
+
+update qx_yield q, yields y set
+q.yield1_q30=y.yield1_q30,
+q.yield2_q30=y.yield2_q30,
+q.yield1_q40=y.yield1_q40,
+q.yield2_q40=y.yield2_q40 where
+q.id_run=y.id_run and q.position=y.position and q.tag_index=y.tag_index;
+
+--
+-- Validate the updated values
+--
+
+select count(*)
+from qx_yield q, fastqcheck f
+where q.id_run is not null
+and (f.section='forward' and f.split='none')
+and (q.id_run=f.id_run and q.position=f.position and q.tag_index=f.tag_index)
+and (q.yield1_q30 <> round(f.thirty/1000) or q.yield1_q40 <> round(f.forty/1000));
+
+select count(*)
+from qx_yield q, fastqcheck f
+where q.id_run is not null
+and (f.section='reverse' and f.split='none')
+and (q.id_run=f.id_run and q.position=f.position and q.tag_index=f.tag_index)
+and (q.yield2_q30 <> round(f.thirty/1000) or q.yield2_q40 <> round(f.forty/1000));
