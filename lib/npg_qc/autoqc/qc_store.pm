@@ -11,7 +11,6 @@ use JSON;
 use Class::Load qw/load_class/;
 
 use npg_tracking::illumina::runfolder;
-
 use npg_qc::Schema;
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES $MULTI/;
 use npg_qc::autoqc::qc_store::query;
@@ -22,6 +21,7 @@ our $VERSION = '0';
 
 Readonly::Scalar my $CLASS_FIELD       => q[__CLASS__];
 Readonly::Scalar my $NO_TAG_INDEX      => -1;
+Readonly::Scalar my $QC_DIR_NAME       => q[qc];
 Readonly::Hash   my %READ_NAME_MAPPING => ( forward => 1,
                                             reverse => 2,
                                             index   => 't', );
@@ -75,7 +75,11 @@ sub _build_qc_schema {
   return;
 }
 
-has '_checks_list' => ( isa        => 'ArrayRef',
+=head2 checks_list
+
+=cut
+
+has 'checks_list'  => ( isa        => 'ArrayRef',
                         is         => 'ro',
                         required   => 1,
                         default    => sub {
@@ -178,11 +182,15 @@ sub load_from_path {
   }
 
   my $pattern = $query ? $query->id_run : q[];
-  my @patterns = map { join q[/], $_ , $pattern . q[*.json] } uniq @paths;
+  $pattern .= q[*.json];
+  my @patterns = map { join q[/], $_ , $pattern }
+                 uniq
+                 grep { defined }
+                 @paths;
   my $c = npg_qc::autoqc::results::collection->new();
 
   foreach my $file (glob(join q[ ], @patterns)) {
-    my $r = $self->_json2result($file);
+    my $r = $self->json_file2result_object($file);
     if ($r) {
       $c->add($r);
     }
@@ -194,94 +202,127 @@ sub load_from_path {
 =head2 load_from_staging
 
 De-serializes objects from JSON files found in staging area. Finds
-runfolders on staging using id_run attribute of the query object. Errors if
-de-seriaization fails either because JSON is invalid or cannot be de-serialized.
+runfolders on staging using id_run attribute of the query object.
+The query object should be of npg_qc::autoqc::qc_store::query type.
+
+Errors if de-seriaization fails either because JSON is invalid or
+cannot be de-serialized.
 
 Returns a collection object (npg_qc::autoqc::results::collection) containing
 autoqc result objects corresponding to JSON files.  Returns an empty
 collection if run is not on staging or the run folder path was not found.
 
- my $query = npg_qc::autoqc::qc_store::query->new(id_run => 123);
+ my $query = npg_qc::autoqc::qc_store::query->new(
+             id_run => 123,
+             npg_tracking_schema => npg_tracking::Schema->connect());
  my $c     = $obj->load_from_staging($query);
 
 =cut
 
-sub load_from_staging { ##no critic (Subroutines::ProhibitExcessComplexity)
+sub load_from_staging {
   my ($self, $query) = @_;
 
   defined $query or croak q[Query object should be defined];
+  my $expected_type = q[npg_qc::autoqc::qc_store::query];
+  (ref $query eq $expected_type)
+    or croak qq[Query object should be of type $expected_type];
 
-  my $rfs = $self->_runfolder_obj($query);
-  my $collection;
+  my $rfo = $self->_runfolder_obj($query);
 
-  if ($rfs) {
+  return $rfo ? $self->load_from_staging_archive($query, $rfo->archive_path)
+              : npg_qc::autoqc::results::collection->new();
+}
 
-    my $old_style = _is_old_style_rf($rfs);
-    my %lh = map { $_ => 1 } @{$query->positions};
-    my @per_lane_dirs = @{$query->positions}
-                        ? map { $rfs->lane_qc_path($_) } @{$query->positions}
-                        : @{$rfs->lane_qc_paths};
-    my @dirs = ();
-    my @collections = ();
-    my $merged = 0;
+=head2 load_from_staging_archive
 
-    #####
-    # Plex-level QC results for either merged or unmerged entities,
-    # but not both.
-    #
-    if ( $query->option == $PLEXES || $query->option == $ALL ) {
-      if ($old_style) {
-        push @dirs, @per_lane_dirs;
-      } else {
-        if (@per_lane_dirs) {
-          my @tdirs = map {"$_/../*plex*/qc"} @per_lane_dirs;
-          $collection = $self->load_from_path(@tdirs, $query);
-        }
-        # No results for one component compositions - try merges
-        if (!$collection || $collection->is_empty) {
-          my @tdirs;
-          push @tdirs, join q[/], $rfs->archive_path, 'plex*', 'qc';
-          push @tdirs, join q[/], $rfs->archive_path, 'lane*-', 'plex*', 'qc';
-          $collection = $self->load_from_path(@tdirs, $query);
-          if ($collection->size) {
-            $merged = 1;
-          }
-        }
+De-serializes objects from JSON files found in the given archive directory.
+The query object can be either of npg_qc::autoqc::qc_store::query
+or npg_qc::autoqc::qc_store::query_non_tracking type.
+
+Errors if de-seriaization fails either because JSON is invalid or
+cannot be de-serialized.
+
+Returns a collection object (npg_qc::autoqc::results::collection) containing
+autoqc result objects corresponding to JSON files.
+
+ my $query = npg_qc::autoqc::qc_store::query_non_tracking->new(
+             id_run => 123);
+ my $c     = $obj->load_from_staging_archive($query, $archive_dir); 
+
+=cut
+
+sub load_from_staging_archive { ##no critic (Subroutines::ProhibitExcessComplexity)
+  my ($self, $query, $archive_path) = @_;
+
+  defined $query or croak q[Query object should be defined];
+  (defined $archive_path && -d $archive_path)
+    or croak q[Archive directory should be defined and should exist];
+
+  my %lh           = map { $_ => 1 } @{$query->positions};
+  my @lane_dirs    = glob $self->_lane_dirs_glob($archive_path, $query);
+  my @lane_qc_dirs = map { join q[/], $_, $QC_DIR_NAME } @lane_dirs;
+  my $old_qc_dir   = join q[/], $archive_path, $QC_DIR_NAME;
+  my $old_style    = -d $old_qc_dir;
+
+  my @collections = ();
+  my @dirs        = ();
+  my $merged      = 0;
+
+  #####
+  # Plex-level QC results for either merged or unmerged entities,
+  # but not both.
+  #
+  if ( $query->option == $PLEXES || $query->option == $ALL ) {
+    my $collection;
+    if ($old_style) {
+      push @dirs, @lane_qc_dirs;
+    } else {
+      if (@lane_dirs) {
+        my @tdirs = map {"$_/*plex*/$QC_DIR_NAME"} @lane_dirs;
+        $collection = $self->load_from_path(@tdirs, $query);
+      }
+      # No results for one component compositions - try merges
+      if (!$collection || $collection->is_empty) {
+        my @tdirs;
+        push @tdirs, join q[/], $archive_path, 'plex*', $QC_DIR_NAME;
+        push @tdirs, join q[/], $archive_path, 'lane*-', 'plex*', $QC_DIR_NAME;
+        $collection = $self->load_from_path(@tdirs, $query);
         if ($collection->size) {
-          push @collections, $collection;
+          $merged = 1;
         }
       }
-    }
-
-    #####
-    # Lane-level QC results. Do not add lanes for $ALL option if results
-    # for merged entities are present - it would be wrong to display two
-    # types of results together.
-    #
-    # We should deal with lane-level merges here - TODO.
-    #
-    if ( $query->option == $LANES || ($query->option == $ALL && !$merged) ) {
-      push @dirs, $old_style ? ($rfs->qc_path) : @per_lane_dirs;
-    }
-
-    if (@dirs) {
-      push @collections, $self->load_from_path(@dirs, $query);
-    }
-    $collection = npg_qc::autoqc::results::collection->join_collections(@collections);
-
-    #####
-    # Filter results for one-component compositions by position.
-    # 
-    if (@{$query->positions} && $old_style && $collection->size &&
-        ($query->option == $LANES || $query->option == $ALL)) {
-      my @in = grep { $_->composition->num_components > 1 || $lh{$_->position} }
-               @{$collection->results};
-      $collection = npg_qc::autoqc::results::collection->new();
-      $collection->add(\@in);
+      if ($collection->size) {
+        push @collections, $collection;
+      }
     }
   }
 
-  $collection ||= npg_qc::autoqc::results::collection->new();
+  #####
+  # Lane-level QC results. Do not add lanes for $ALL option if results
+  # for merged entities are present - it would be wrong to display two
+  # types of results together.
+  #
+  # We should deal with lane-level merges here - TODO.
+  #
+  if ( $query->option == $LANES || ($query->option == $ALL && !$merged) ) {
+    push @dirs, $old_style ? $old_qc_dir : @lane_qc_dirs;
+  }
+
+  if (@dirs) {
+    push @collections, $self->load_from_path(@dirs, $query);
+  }
+  my $collection = npg_qc::autoqc::results::collection->join_collections(@collections);
+
+  #####
+  # Filter results for one-component compositions by position.
+  # 
+  if (@{$query->positions} && $old_style && $collection->size &&
+       ($query->option == $LANES || $query->option == $ALL)) {
+    my @in = grep { $_->composition->num_components > 1 || $lh{$_->position} }
+             @{$collection->results};
+    $collection = npg_qc::autoqc::results::collection->new();
+    $collection->add(\@in);
+  }
 
   return $collection;
 }
@@ -311,7 +352,7 @@ sub load_from_db {
 
   if ($self->use_db) {
     my $ti_key = 'tag_index';
-    foreach my $check_name (@{$self->_checks_list()}) {
+    foreach my $check_name (@{$self->checks_list()}) {
       my $dbix_query = { 'id_run' => $query->id_run};
       if (@{$query->positions}) {
         $dbix_query->{'position'} = $query->positions;
@@ -436,6 +477,41 @@ sub load_fastqcheck_content_from_path {
   return $content;
 }
 
+=head2 json_file2result_object
+
+Reads an argument JSON file and converts the content into in-memory autoqc
+result object of a class specified by the __CLASS__ field. Returns either
+a result object or, if the content of the file is not a serialized autoqc
+result object, an undefined value.
+
+Error if file cannot be read or the de-serialization fails.
+
+=cut
+
+sub json_file2result_object {
+  my ($self, $file) = @_;
+
+  my $result;
+  try {
+    my $json_string = slurp($file);
+    my $json = decode_json($json_string);
+    my $class_name = delete $json->{$CLASS_FIELD};
+    if ($class_name) {
+      ($class_name, my $dbix_class_name) =
+          npg_qc::autoqc::role::result->class_names($class_name);
+    }
+    if ($class_name && any {$_ eq $class_name} @{$self->checks_list()}) {
+      my $module = $npg_qc::autoqc::results::collection::RESULTS_NAMESPACE . q[::] . $class_name;
+      load_class($module);
+      $result = $module->thaw($json_string);
+    }
+  } catch {
+    croak "Failed converting $file to autoqc result object: $_";
+  };
+
+  return $result;
+}
+
 sub _fqchck_load_from_db {
   my ($self, $query, $read) = @_;
   my $where = {split => 'none', tag_index => $NO_TAG_INDEX};
@@ -487,6 +563,18 @@ sub _is_old_style_rf {
   return -e $rf_obj->qc_path;
 }
 
+sub _lane_dirs_glob {
+  my ($self, $archive_path, $query) = @_;
+  my $glob = join q[/], $archive_path, 'lane';
+  if ($query && @{$query->positions}) {
+    my $p_string = join q[,], @{$query->positions};
+    $glob .= qq[{$p_string}];
+  } else {
+    $glob .= q[*];
+  }
+  return $glob;
+}
+
 sub _query_obj {
   my ($self, $id_run, $lanes, $what, $db_lookup, $npg_schema) = @_;
 
@@ -495,30 +583,6 @@ sub _query_obj {
   if ($what) { $obj_hash->{'option'} = $what; }
   if (defined $db_lookup) { $obj_hash->{'db_qcresults_lookup'} = $db_lookup; }
   return npg_qc::autoqc::qc_store::query->new($obj_hash);
-}
-
-sub _json2result {
-  my ($self, $file) = @_;
-
-  my $result;
-  try {
-    my $json_string = slurp($file);
-    my $json = decode_json($json_string);
-    my $class_name = delete $json->{$CLASS_FIELD};
-    if ($class_name) {
-      ($class_name, my $dbix_class_name) =
-          npg_qc::autoqc::role::result->class_names($class_name);
-    }
-    if ($class_name && any {$_ eq $class_name} @{$self->_checks_list()}) {
-      my $module = $npg_qc::autoqc::results::collection::RESULTS_NAMESPACE . q[::] . $class_name;
-      load_class($module);
-      $result = $module->thaw($json_string);
-    }
-  } catch {
-    croak "Failed reading $file: $_";
-  };
-
-  return $result;
 }
 
 __PACKAGE__->meta->make_immutable;

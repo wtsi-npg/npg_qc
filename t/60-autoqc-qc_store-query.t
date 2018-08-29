@@ -1,14 +1,27 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 21;
 use Test::Exception;
 use Moose::Meta::Class;
 
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES $MULTI/;
 
+use_ok 'npg_qc::autoqc::qc_store::query_non_tracking';
 use_ok 'npg_qc::autoqc::qc_store::query';
+
 my $schema = Moose::Meta::Class->create_anon_class(roles => ['npg_testing::db'])
              ->new_object()->create_test_db(q[npg_tracking::Schema]);
+
+{
+  my $q = npg_qc::autoqc::qc_store::query_non_tracking->new(id_run => 1);
+  isa_ok($q, 'npg_qc::autoqc::qc_store::query_non_tracking');
+  is($q->option, $LANES, 'lanes option is default');
+  is(scalar(@{$q->positions}), 0, 'empty positions array is default');
+  ok($q->db_qcresults_lookup, 'look up results in the db by default');
+  is($q->to_string,
+    'npg_qc::autoqc::qc_store::query_non_tracking object: run 1, positions ALL, loading option LANES, db_qcresults_lookup 1',
+    'object as string');
+}
 
 {
   my $q = npg_qc::autoqc::qc_store::query->new(id_run => 1, npg_tracking_schema => $schema);

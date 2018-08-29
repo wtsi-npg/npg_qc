@@ -44,6 +44,7 @@ lib/npg_qc/autoqc/parse/alignment.pm
 lib/npg_qc/autoqc/qc_store/options.pm
 lib/npg_qc/autoqc/qc_store.pm
 lib/npg_qc/autoqc/qc_store/query.pm
+lib/npg_qc/autoqc/qc_store/query_non_tracking.pm
 lib/npg_qc/autoqc/results/adapter.pm
 lib/npg_qc/autoqc/results/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/results/bam_flagstats.pm

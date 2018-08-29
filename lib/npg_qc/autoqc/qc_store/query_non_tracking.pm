@@ -1,17 +1,50 @@
-package npg_qc::autoqc::qc_store::query;
+package npg_qc::autoqc::qc_store::query_non_tracking;
 
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
 
-extends 'npg_qc::autoqc::qc_store::query_non_tracking';
+use npg_qc::autoqc::qc_store::options qw/ $LANES
+                                          validate_option
+                                          option_to_string /;
+use npg_tracking::util::types;
+
+with qw/npg_tracking::glossary::run/;
 
 our $VERSION = '0';
 
-has 'npg_tracking_schema' => ( isa       => 'npg_tracking::Schema',
-                               is        => 'ro',
-                               required  => 1,
+has 'option'    =>   (isa       => 'Int',
+                      is        => 'ro',
+                      default   => $LANES,
+                     );
+
+has 'positions' =>   (isa       => 'ArrayRef[NpgTrackingLaneNumber]',
+                      is        => 'ro',
+                      default   => sub {return []; },
+                     );
+
+has 'db_qcresults_lookup' => (isa     => 'Bool',
+                              is      => 'ro',
+                              default => 1,
                              );
+
+sub BUILD {
+  my $self = shift;
+  validate_option($self->option);
+  return;
+}
+
+sub to_string {
+  my $self = shift;
+
+  my $s = (ref $self) . q[ object: run ] . $self->id_run;
+  my $positions = @{$self->positions} ? (join q[ ], @{$self->positions}) : q[ALL];
+  $s .= qq[, positions $positions];
+  $s .=  q[, loading option ] . option_to_string($self->option);
+  $s .=  q[, db_qcresults_lookup ] . $self->db_qcresults_lookup;
+
+  return $s;
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -22,7 +55,7 @@ __END__
 
 =head1 NAME
 
-npg_qc::autoqc::qc_store::query
+npg_qc::autoqc::qc_store::query_non_tracking
 
 =head1 SYNOPSIS
 
@@ -41,10 +74,6 @@ Option for loading autoqc results, one of constants defined in npg_qc::autoqc::q
 =head2 positions
 
 A reference to an array with positions (lane numbers).
-
-=head2 npg_tracking_schema
-
-An instance of npg_tracking::Schema, required.
 
 =head2 db_qcresults_lookup
 
@@ -71,6 +100,12 @@ Human friendly description of the object.
 =item MooseX::StrictConstructor
 
 =item namespace::autoclean
+
+=item npg_qc::autoqc::qc_store::options
+
+=item npg_tracking::util::types
+
+=item npg_tracking::glossary::run
 
 =back
 
