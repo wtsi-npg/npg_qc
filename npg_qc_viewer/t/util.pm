@@ -6,6 +6,7 @@ use Readonly;
 use Archive::Extract;
 use File::Temp qw/ tempdir /;
 use Cwd;
+use Test::More;
 
 use npg_qc::autoqc::db_loader;
 with 'npg_testing::db';
@@ -109,11 +110,17 @@ sub test_env_setup {
       archive => 't/data/fixtures/npgqc_json.tar.gz');
     $ae->extract(to => $tempdir) or die $ae->error;
 
-    npg_qc::autoqc::db_loader->new(
+    my $path = "${tempdir}/npgqc_json";
+    my $num_loaded = npg_qc::autoqc::db_loader->new(
       schema  => $schemas->{'qc'},
-      path    => ["${tempdir}/npgqc_json"],
+      path    => [$path],
       verbose => 0
     )->load();
+    note "$num_loaded files loaded from $path";
+    my $num_expected = 210;
+    if ($num_loaded != $num_expected) {
+      note "Warning: expected to load $num_expected files";
+    }
   }
  
   return $schemas;

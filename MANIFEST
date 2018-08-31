@@ -636,3 +636,4 @@ t/data/qc_store/26291/plex3/qc/26291#3.bam_flagstats.json
 t/data/qc_store/26291/plex3/qc/26291#3_phix.bam_flagstats.json
 t/data/qc_store/26291/lane1/qc/26291_1.tag_metrics.json
 t/data/qc_store/26291/lane2/qc/26291_2.tag_metrics.json
+t/data/26601_qc_archive.tar.gz

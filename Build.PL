@@ -113,6 +113,7 @@ my $build_requires = {
                 'DBD::SQLite'                     => 0,
                 'ExtUtils::CBuilder'              => 0,
                 'File::Copy'                      => 0,
+                'File::Copy::Recursive'           => 0,
                 'Test::Deep'                      => 0,
                 'Test::Distribution'              => 0,
                 'Test::Perl::Critic'              => 0,
