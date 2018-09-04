@@ -40,6 +40,7 @@ lib/npg_qc/autoqc/checks/upstream_tags.pm
 lib/npg_qc/autoqc/checks/verify_bam_id.pm
 lib/npg_qc/autoqc/db_loader.pm
 lib/npg_qc/autoqc/parse/alignment.pm
+lib/npg_qc/autoqc/parse/samtools_stats.pm
 lib/npg_qc/autoqc/qc_store/options.pm
 lib/npg_qc/autoqc/qc_store.pm
 lib/npg_qc/autoqc/qc_store/query.pm
@@ -154,6 +155,7 @@ t/00-podcoverage.t
 t/00-pod.t
 t/00-scripts_compile.t
 t/10-file_store.t
+t/10-autoqc-parse-samtools_stats.t
 t/30-illumina-loader-Cluster_Density.t
 t/30-illumina-loader.t
 t/50-npg_qc-Schema.t
@@ -592,4 +594,8 @@ t/data/qc_store/26291/plex3/qc/26291#3.bam_flagstats.json
 t/data/qc_store/26291/plex3/qc/26291#3_phix.bam_flagstats.json
 t/data/qc_store/26291/lane1/qc/26291_1.tag_metrics.json
 t/data/qc_store/26291/lane2/qc/26291_2.tag_metrics.json
+t/data/samtools_stats/25980_8#8_F0xB00.stats
+t/data/samtools_stats/26597_1_F0xB00.stats
+t/data/samtools_stats/26607_1#20_F0xB00.stats
+t/data/samtools_stats/26607_1#20_F0xB00.samtools_stats.json
 t/data/26601_qc_archive.tar.gz
