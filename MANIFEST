@@ -12,7 +12,6 @@ bin/npg_qc_illumina_analysis_loader
 bin/npg_qc_save_files.pl
 bin/npg_qc_tag_sniff.pl
 bin/call_gtck_composite_rpt.pl
-bin/composition_fk_backfill
 bin/genotype_call_results_reporter
 Build.PL
 Changes
