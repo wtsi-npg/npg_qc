@@ -1,0 +1,9 @@
+--
+-- Add new columns to qx_yield
+--
+
+ALTER TABLE `qx_yield` 
+ADD COLUMN `yield1_q30` INT(10) UNSIGNED DEFAULT NULL AFTER `yield2`,
+ADD COLUMN `yield2_q30` INT(10) UNSIGNED DEFAULT NULL AFTER `yield1_q30`,
+ADD COLUMN `yield1_q40` INT(10) UNSIGNED DEFAULT NULL AFTER `yield2_q30`,
+ADD COLUMN `yield2_q40` INT(10) UNSIGNED DEFAULT NULL AFTER `yield1_q40`;

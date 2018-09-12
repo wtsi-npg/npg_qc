@@ -20,13 +20,13 @@ npg_qc::autoqc::results::qX_yield
 
 =head1 DESCRIPTION
 
-A class for wrapping results of qX (q20) check. Inherits from npg_qc::autoqc::results::result.
+A class for wrapping results of qX check. Inherits from npg_qc::autoqc::results::result.
 
 =head1 SUBROUTINES/METHODS
 
 =cut
 
-Readonly::Scalar our $DEFAULT_THRESHOLD_Q         => 20;
+Readonly::Scalar my $DEFAULT_THRESHOLD_Q => 20;
 
 
 =head2 threshold_quality
@@ -34,80 +34,78 @@ Readonly::Scalar our $DEFAULT_THRESHOLD_Q         => 20;
 Quality threshold
 
 =cut
-has 'threshold_quality'  => (isa             => 'Maybe[NpgTrackingPositiveInt]',
-                             is              => 'rw',
-                             required        => 0,
-                             default         => $DEFAULT_THRESHOLD_Q,
-                            );
-
+has 'threshold_quality'  => (
+  isa             => 'Maybe[NpgTrackingPositiveInt]',
+  is              => 'rw',
+  required        => 0,
+  default         => $DEFAULT_THRESHOLD_Q,
+);
 
 =head2 threshold_yield1
 
 Yield threshold in KBs for the first (forward) read
-
-=cut
-has 'threshold_yield1'  => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
-                            is              => 'rw',
-                            required        => 0,
-                           );
-
 
 =head2 threshold_yield2
 
 Yield threshold in KBs for the second (reverse) read
 
 =cut
-has 'threshold_yield2'  => (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
-                             is              => 'rw',
-                             required        => 0,
-                            );
-
+has [qw(threshold_yield1 threshold_yield2)] => (
+  isa      => 'Maybe[NpgTrackingNonNegativeInt]',
+  is       => 'rw',
+  required => 0,
+);
 
 =head2 yield1
 
-Yield in KBs for the first (forward) read
-
-=cut
-has 'yield1'      =>     (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
-                          is              => 'rw',
-                          required        => 0,
-                         );
+Q20 yield in KBs for the first (forward) read
 
 =head2 yield2
 
-Yield in KBs for the second (reverse) read
+Q20 yield in KBs for the second (reverse) read
+
+=head2 yield1_q30
+
+Q30 yield in KBs for the first (forward) read
+
+=head2 yield2_q30
+
+Q30 yield in KBs for the second (reverse) read
+
+=head2 yield1_q40
+
+Q40 yield in KBs for the first (forward) read
+
+=head2 yield2_q40
+
+Q40 yield in KBs for the second (reverse) read
 
 =cut
-has 'yield2'      =>     (isa             => 'Maybe[NpgTrackingNonNegativeInt]',
-                          is              => 'rw',
-                          required        => 0,
-                         );
-
+has [qw(yield1 yield2 yield1_q30 yield2_q30 yield1_q40 yield2_q40)] => (
+  isa      => 'Maybe[NpgTrackingNonNegativeInt]',
+  is       => 'rw',
+  required => 0,
+);
 
 =head2 filename1
 
-Filename for the first (forward) read 
-
-=cut
-has 'filename1'  =>   (isa        => 'Maybe[Str]',
-                       is         => 'rw',
-                       required   => 0,
-		      );
-
+Filename for the first (forward) read
 
 =head2 filename2
 
 Filename for the second (reverse) read 
 
 =cut
-has 'filename2'  =>   (isa        => 'Maybe[Str]',
-                       is         => 'rw',
-                       required   => 0,
-		      );
+has [qw(filename1  filename2)] => (
+  isa      => 'Maybe[Str]',
+  is       => 'rw',
+  required => 0,
+);
 
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 DIAGNOSTICS
@@ -136,7 +134,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

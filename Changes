@@ -26,6 +26,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - Illumina QC data loader restricted to loading cluster density data, its
     data pre-loading functionality dropped
 
+release 65.4
+ - qX_yield autoqc check extension: capture and save yields for q30 and q40
+
 release 65.3
  - fixed bug in cluster_density calculation where no TileMetrics interop
    file exists

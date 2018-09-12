@@ -361,6 +361,7 @@ t/data/autoqc/4078_1.sequence_error.json
 t/data/autoqc/4360_8_tag_decode_stats.json
 t/data/autoqc/4453_2#0.gc_fraction.json
 t/data/autoqc/4453_2#0.qX_yield.json
+t/data/autoqc/26659_1.qX_yield.json
 t/data/autoqc/5374_2_1-5374_2_2_human_split_stats.json
 t/data/autoqc/5428_2.ref_match.json
 t/data/autoqc/9999_1.blat
