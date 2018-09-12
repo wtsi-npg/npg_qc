@@ -17,17 +17,27 @@ npg_qc::autoqc::role::qX_yield
 
 =head1 SUBROUTINES/METHODS
 
+=head2 yield1_q20
+
+Q20 yield in KBs for the first (forward) read -
+aliase for yield1
+
 =cut
-
-
-sub _validate_read_index {
-    my ($self, $read_index) = @_;
-    if ($read_index != 1 && $read_index != 2) {
-        croak qq[Invalid read index $read_index, use 1 or 2 ];
-    }
-    return 1;
+sub yield1_q20 {
+    my $self = shift;
+    return $self->yield1();
 }
 
+=head2 yield2_q20
+
+Q20 yield in KBs for the second (reverse) read -
+aliase for yield2
+
+=cut
+sub yield2_q20 {
+    my $self = shift;
+    return $self->yield2();
+}
 
 =head2 criterion
 
@@ -36,9 +46,9 @@ Criterion that was used to evaluate a pass/fail for this check.
 =cut
 sub criterion {
     my ($self) = @_;
-    return q[yield (number of KBs at and above Q] . $self->threshold_quality . q[) is greater than the threshold];
+    return q[yield (number of KBs at and above Q] . $self->threshold_quality .
+        q[) is greater than the threshold];
 };
-
 
 =head2 pass_per_read 
 
@@ -58,8 +68,15 @@ sub pass_per_read {
     return $pass;
 }
 
+sub _validate_read_index {
+    my ($self, $read_index) = @_;
+    if ($read_index != 1 && $read_index != 2) {
+        croak qq[Invalid read index $read_index, use 1 or 2 ];
+    }
+    return 1;
+}
 
-no Moose;
+no Moose::Role;
 
 1;
 __END__

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 20;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON;
@@ -14,15 +14,25 @@ my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
 
-my $json = q {
-{
+my $json = q({
   "info":{"Check":"npg_qc::autoqc::checks::qX_yield","Check_version":"14179"},
   "yield2":2317485,
-  "filename1":"9225_1_1#93.fastqcheck","position":"1","path":"/nfs/sf19/ILorHSany_sf19/analysis/130125_HS23_09225_B_C1CBDACXX/Data/Intensities/BAM_basecalls_20130203-192218/PB_cal_bam/archive/lane1","id_run":"9225","threshold_quality":20,"tag_index":"93","yield1":2326976,"filename2":"9225_1_2#93.fastqcheck"}
-  
-};
+  "yield1":2326976,
+  "yield1_q30":17485,
+  "yield2_q30":17385,
+  "yield1_q40":25,
+  "yield2_q40":85,
+  "filename1":"9225_1_1#93.fastqcheck",
+  "filename2":"9225_1_2#93.fastqcheck",
+  "path":"archive/lane1",
+  "threshold_quality":20,
+  "id_run":"9225",
+  "position":"1",
+  "tag_index":"93"
+});
 
 my $values = from_json($json);
+
 $values->{'id_seq_composition'} =
   t::autoqc_util::find_or_save_composition($schema,
     {id_run => 9225, position => 1, tag_index => 93});
@@ -38,6 +48,12 @@ isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::QXYield');
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
   is($row->tag_index, 93, 'tag index retrieved correctly');
+  is($row->yield1_q20, 2326976, 'q20 yield, forward, saved');
+  is($row->yield2_q20, 2317485, 'q20 yield, reverse, saved');
+  is($row->yield1_q30, 17485, 'q30 yield, forward, saved');
+  is($row->yield2_q30, 17385, 'q30 yield, reverse, saved');
+  is($row->yield1_q40, 25, 'q40 yield, forward, saved');
+  is($row->yield2_q40, 85, 'q40 yield, reverse, saved');
   is(ref $row->info, 'HASH', 'info returned as hash ref');
   is_deeply($row->info, $values->{'info'},
     'info hash content is correct'); 

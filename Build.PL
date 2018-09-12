@@ -10,6 +10,7 @@ my $requires = {
                 'ClearPress'                      => 0,
                 'Compress::Zlib'                  => 0,
                 'Cwd'                             => 0,
+                'DBD::mysql'                      => 0,
                 'DBI'                             => 0,
                 'DBIx::Class'                     => 0,
                 'DBIx::Class::InflateColumn::Serializer' => 0,
