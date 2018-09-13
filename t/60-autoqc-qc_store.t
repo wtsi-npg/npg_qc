@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -8,6 +8,7 @@ use Archive::Extract;
 use Moose::Meta::Class;
 use File::Copy qw/cp mv/;
 use File::Path qw/make_path remove_tree/;
+use List::MoreUtils qw/none uniq/;
 
 use npg_testing::db;
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
@@ -367,7 +368,7 @@ subtest 'loading data from staging - new style directory structure, merges' => s
   is($collection->size(), 9, 'nine results for three plexes, no lane results');
 };
 
-subtest 'loading data from the database' => sub {
+subtest 'retrieving data from the database - one-component entities' => sub {
   plan tests => 17;
 
   my $model =  npg_qc::autoqc::qc_store->new(use_db => 0, qc_schema => undef);
@@ -450,6 +451,98 @@ subtest 'loading data from the database' => sub {
   $run_lanes = {3500 => [1,2], 3510 => [1,5,4,8], 26294 => [8] };
   is($model->load_lanes($run_lanes, $db_lookup, undef, $tracking_schema)->size(), 13,
     'db+staging retrieval for 3 runs, some positions do not exist');
+};
+
+subtest 'retrieving data from the database - one-component entities' => sub {
+  plan tests => 20;
+
+  my $tm_rs = $schema->resultset('TagMetrics');
+  my $is_rs = $schema->resultset('InsertSize');
+  my $qx_rs = $schema->resultset('QXYield');
+
+  my $r = 50000;
+
+  #####
+  # Create records for lane-level results
+  #
+  foreach my $p ((1 .. 4)) {
+    my $component_h = {id_run => $r, position => $p};
+    my $component =
+      npg_tracking::glossary::composition::component::illumina->new($component_h);
+    my $f = npg_tracking::glossary::composition::factory->new();
+    $f->add_component($component);
+    my $composition = $f->create_composition();
+    my $crow = $tm_rs->find_or_create_seq_composition($composition);
+    $component_h->{id_seq_composition} = $crow->id_seq_composition;
+    map { $_->create($component_h) } ($tm_rs, $is_rs);
+    $component_h->{threshold_quality} = 20;
+    $qx_rs->create($component_h);
+  }
+
+  #####
+  # Create records for seven plex-level results for merged entities
+  # (merge across four lanes)
+  #
+  foreach my $i ((0 .. 6)) {
+    my $f = npg_tracking::glossary::composition::factory->new();
+    my @component_rows = ();
+    foreach my $p ((1 .. 4)) {
+      my $component_h = {'id_run' => $r, 'position' => $p, 'tag_index' => $i};
+      my $component =
+        npg_tracking::glossary::composition::component::illumina->new($component_h);
+      $f->add_component($component);
+    }
+    my $composition = $f->create_composition();
+    my $crow = $is_rs->find_or_create_seq_composition($composition);
+    my $h = {id_seq_composition => $crow->id_seq_composition};
+    $is_rs->create($h);
+    $h->{threshold_quality} = 20;
+    $qx_rs->create($h);
+  }
+
+  my $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema);
+  my $collection = $s->load(_build_query_obj({id_run => $r, option =>$LANES}));
+  is ($collection->size, 12, '12 results for lane request');
+  my @results = $collection->all;
+  ok ((none { $_->composition->num_components > 1 } @results),
+    'all results are for one-component compositions');
+  ok ((none { defined $_->composition->get_component(0)->tag_index } @results),
+    'all results are lane-level');
+
+  $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema);
+  $collection = $s->load(
+    _build_query_obj({id_run => $r, option => $LANES, positions => [1,2]}));
+  is ($collection->size, 6, '6 results for lane request');
+  @results = $collection->all;
+  ok ((none { $_->composition->num_components > 1 } @results),
+    'all results are for one-component compositions');
+  ok ((none { defined $_->composition->get_component(0)->tag_index } @results),
+    'all results are lane-level');
+  my @positions = uniq
+                  map { $_->composition->get_component(0)->position }
+                  @results;
+  is (join(q[,], @positions),'1,2', 'results are for lanes 1 and 2');
+
+  $collection = $s->load_from_db(
+    _build_query_obj({id_run => $r, option => $LANES, positions => [5]}));
+  is ($collection->size, 0, 'no results for lane that is not in the db');
+
+  $collection = $s->load(
+    _build_query_obj({id_run => $r, option => $PLEXES, positions => [1]}));
+  my $collection1 = $s->load(
+    _build_query_obj({id_run => $r, option => $ALL, positions => [1]}));
+  my $collection2 = $s->load(
+    _build_query_obj({id_run => $r, option => $ALL, positions => [1,2]}));
+  my $collection3 = $s->load(
+    _build_query_obj({id_run => $r, option => $ALL}));
+  foreach my $c (($collection, $collection1, $collection2, $collection3)) {
+    is ($c->size, 14, '14 results for plane request');
+    my @results = $collection->all;
+    ok ((none { $_->composition->num_components == 1 } @results),
+      'all results are for multi-component compositions');
+    ok ((none { !defined $_->composition->get_component(0)->tag_index } @results),
+      'all results are plex-level');
+  }   
 };
 
 1;

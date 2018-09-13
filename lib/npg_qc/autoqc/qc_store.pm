@@ -12,7 +12,7 @@ use Class::Load qw/load_class/;
 
 use npg_tracking::illumina::runfolder;
 use npg_qc::Schema;
-use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES $MULTI/;
+use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
 use npg_qc::autoqc::role::result;
 use npg_qc::autoqc::results::collection;
@@ -108,7 +108,7 @@ Data for a query returned as an npg_qc::autoqc::results::collection object.
 
 sub load {
   my ($self, $query) = @_;
-  if (!defined $query) { croak q[Query object should be defined]; }
+  defined $query or croak q[Query object should be defined];
   my $collection;
   if ($self->use_db && $query->db_qcresults_lookup) {
     $collection = $self->load_from_db($query);
@@ -333,7 +333,7 @@ Loads auto QC results object from the database using  query parameters defined
 by the query object.
 
 Returns a collection object (npg_qc::autoqc::results::collection) containing
-autoqc result objects corresponding to JSON files.  Returns an empty
+autoqc result objects corresponding to JSON files. Returns an empty
 collection if no results are found.
 
  my $query = npg_qc::autoqc::qc_store::query->new(id_run => 123);
@@ -344,11 +344,9 @@ collection if no results are found.
 sub load_from_db {
   my ($self, $query) = @_;
 
-  if (!$query) {
-    croak q[Query argument should be defined];
-  }
+  $query or croak q[Query object should be defined];
 
-  my $c = npg_qc::autoqc::results::collection->new();
+  my @results = ();
 
   if ($self->use_db) {
     my $ti_key = 'tag_index';
@@ -367,13 +365,25 @@ sub load_from_db {
         $dbix_query->{$ti_key} = {q[!=], undef};
       }
 
-      my $rs = $self->qc_schema()->resultset($table_class);
-      my $composition_size = 1; # simple cases only for now
-      $c->add([$rs->search_autoqc($dbix_query, $composition_size)->all()]);
+      my @check_results = $self->qc_schema()->resultset($table_class)
+                         ->search_autoqc($dbix_query)->all();
+      push @results, @check_results;
     }
   } else {
     carp __PACKAGE__  . q[ object is configured not to use the database];
   }
+
+  if ( @results
+       && ($query->option == $ALL)
+       && (any { $_->composition->num_components > 1 } @results) ) {
+
+    @results = grep { ($_->composition->num_components != 1) ||
+                 defined $_->composition->get_component(0)->tag_index }
+               @results;
+  }
+
+  my $c = npg_qc::autoqc::results::collection->new();
+  $c->add(\@results);
 
   return $c;
 }
@@ -396,7 +406,7 @@ database or on staging.
 sub load_fastqcheck_content {
   my ($self, $query, $read) = @_;
 
-  $query or croak 'Query object i srequired';
+  defined $query or croak 'Query object i srequired';
   if ($query->option != $LANES) {
     croak q[Fastqcheck file content can be loaded for lanes only];
   }
@@ -439,7 +449,7 @@ Returns an undefined value if the file for the entiry is not found.
 sub load_fastqcheck_content_from_path {
   my ($self, $query, $paths, $read) = @_;
 
-  $query or croak q[Query object needed];
+  defined $query or croak q[Query object needed];
   ($paths and @{$paths}) or croak q[Path needed];
   $read ||= 'forward';
   if (!exists $READ_NAME_MAPPING{$read}) {
