@@ -5,6 +5,8 @@ use namespace::autoclean;
 use Readonly;
 use Module::Pluggable::Object;
 
+use npg_qc::Schema;
+
 extends 'npg_tracking::illumina::runfolder';
 
 with 'MooseX::Getopt';
