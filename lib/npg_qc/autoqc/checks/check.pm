@@ -27,6 +27,9 @@ our $VERSION = '0';
 
 Readonly::Scalar my $FILE_EXTENSION  => 'fastq';
 Readonly::Scalar my $HUMAN           => q[Homo_sapiens];
+Readonly::Scalar my $SSTATS_FILTER   => q[F0xB00];
+Readonly::Scalar my $FORWARD_READ_FILE_NAME_SUFFIX => q[1];
+Readonly::Scalar my $REVERSE_READ_FILE_NAME_SUFFIX => q[2];
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -100,6 +103,7 @@ has 'composition' => (
     isa        => 'npg_tracking::glossary::composition',
     required   => 0,
     lazy_build => 1,
+    metaclass  => 'NoGetopt',
     handles   => {
       'num_components'     => 'num_components',
     },
@@ -108,6 +112,8 @@ sub _build_composition {
   my $self = shift;
   return $self->create_composition();
 }
+
+with qw/npg_tracking::glossary::moniker/; # => { -excludes => 'dir_path'};
 
 =head2 BUILD
 
@@ -118,6 +124,7 @@ A constructor helper, runs after the default constructor.
 sub BUILD {
   my $self = shift;
   $self->composition();
+  #apply_all_roles( $self, 'npg_tracking::glossary::moniker' );
   return;
 }
 
@@ -250,6 +257,7 @@ A result object. Read-only.
 has 'result'     =>  (isa        => 'Object',
                       is         => 'ro',
                       required   => 0,
+                      metaclass  => 'NoGetopt',
                       lazy_build => 1,
                      );
 sub _build_result {
@@ -362,32 +370,36 @@ sub get_id_run {
 =head2 get_input_files
 
 Returns an array containing full paths to input files.
-The array contains either one or two files.
-Error if not files can be found.
+Error if the only input file or an input file for the
+forward read is not found.
 
 =cut
 sub get_input_files {
   my $self = shift;
 
   my @fnames = ();
-  my $no_end_forward;
-  my $forward = join q[.], catfile($self->qc_in, $self->create_filename(1)),
-                             $self->file_type;
-  if (!-e $forward) {
-    $no_end_forward = join q[.], catfile($self->qc_in, $self->create_filename()),
-                                 $self->file_type;
-    if (-e $no_end_forward) {
-      $forward = $no_end_forward;
-    } else {
-      croak qq[Neither $forward nor $no_end_forward file found];
-    }
-  }
+  my $file_name_root = $self->file_name;
 
-  push @fnames, $forward;
-  if (!defined $no_end_forward) {
-    my $reverse =  join q[.], catfile($self->qc_in, $self->create_filename(2)),
-                              $self->file_type;
-    if (-e $reverse) {push @fnames, $reverse;}
+  my $filename = catfile($self->qc_in, $self->create_filename($file_name_root));
+  if (-e $filename) {
+    push @fnames, $filename;
+  } else {
+    if ($self->file_type =~ /\Afastq/smx) {
+      my $original = $filename;
+      $filename = catfile($self->qc_in,
+        $self->create_filename($file_name_root, $FORWARD_READ_FILE_NAME_SUFFIX));
+      if (!-e $filename) {
+        croak qq[Neither $original nor $filename file found];
+      }
+      push @fnames, $filename;
+      $filename = catfile($self->qc_in,
+        $self->create_filename($file_name_root, $REVERSE_READ_FILE_NAME_SUFFIX));
+      if (-e $filename) {
+        push @fnames, $filename;
+      }
+    } else {
+      croak qq[$filename file not found];
+    }
   }
 
   return @fnames;
@@ -417,52 +429,33 @@ computes overall lane pass value for a particular check.
 =cut
 
 sub overall_pass {
-  my ($self, $apass, $count) = @_;
-  if ($apass->[0] != 1 || $count == 1) {return $apass->[0];}
-  if ($apass->[1] != 1) {return $apass->[1];}
-  return ($apass->[0] && $apass->[1]);
+  my ($self, @apass) = @_;
+  return (any { $_ == 0 } @apass) ? 0 : 1;
 }
 
 =head2 create_filename
 
-Returns a file name for a one-component composition.
-
-  $obj->create_filename(2);
-  $obj->create_filename(1);
+Returns an input file name for an argument file name root. Takes an optional
+second argument - end. The file extention is appended as well, the value
+is taken from the file_type attribute of the object. For samtools stats files
+the F0xB00 filter is used.
 
 =cut
 
 sub create_filename {
-  my ($self, $end) = @_;
+  my ($self, $file_name_root, $end) = @_;
 
-  if ($self->num_components > 1) {
-    croak 'Multiple components, cannot generate file name';
+  $file_name_root or croak 'File name root is required';
+
+  my $name = $file_name_root;
+  if ($self->file_type eq 'stats') {
+    $name = $self->file_name_full($name, suffix => $SSTATS_FILTER);
   }
-  return $self->create_filename4attrs(
-    $self->inflate_rpts($self->rpt_list)->[0], $end);
-}
+  if ($end) {
+    $name = $self->file_name_full($name, suffix => $end);
+  }
 
-=head2 create_filename4attrs
-
-Returns a file name. Can be used both as an instance and class method.
-
-  my $map = {id_run => 1, position => 2, tag_index => 3};
-  __PACKAGE__->create_filename4attrs($map, 2);
-  $map = {id_run => 1, position => 2};
-  $obj->create_filename4attrs($map, 1);
-
-=cut
-
-sub create_filename4attrs {
-  my ($self, $map, $end) = @_;
-  return sprintf '%s_%s%s%s%s',
-    $map->{'id_run'},
-    $map->{'position'},
-    $end ? "_$end" : q[],
-    defined $map->{'tag_index'} ? q[#].$map->{'tag_index'} : q[],
-    (   $self->can('subset')
-     && $self->can('has_subset')
-     && $self->has_subset()   ) ? q[_].$self->subset : q[];
+  return $self->file_name_full($name, ext => $self->file_type);
 }
 
 =head2 entity_has_human_reference
@@ -548,6 +541,8 @@ __END__
 
 =item npg_tracking::glossary::tag
 
+=item npg_tracking::glossary::moniker
+
 =item npg_tracking::util::types
 
 =item npg_tracking::glossary::composition::factory::rpt_list
@@ -564,7 +559,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
