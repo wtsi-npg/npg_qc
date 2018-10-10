@@ -25,6 +25,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    component compositions
  - Illumina QC data loader restricted to loading cluster density data, its
     data pre-loading functionality dropped
+ - amend spatial_filter check to take a directory name to search instead
+    of an explicit list of input files (that approach became unworkable
+    with highly plexed lanes)
 
 release 65.4
  - qX_yield autoqc check extension: capture and save yields for q30 and q40

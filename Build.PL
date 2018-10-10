@@ -23,6 +23,7 @@ my $requires = {
                 'Fatal'                           => 0,
                 'Fcntl'                           => 0,
                 'File::Basename'                  => 0,
+                'File::Find'                      => 0,
                 'File::Glob'                      => 0,
                 'File::Path'                      => 0,
                 'File::Spec'                      => 0,
