@@ -45,7 +45,7 @@ override 'execute' => sub {
 
   my @infiles=();
 
-  find(sub { if( /spatial_filter.stats$/ ) { push @infiles, $File::Find::name }}, @{$self->qc_in_roots});
+  find(sub { if( /spatial_filter.stats$/smx ) { push @infiles, $File::Find::name }}, @{$self->qc_in_roots});
 
   $self->result->parse_output(\@infiles); #read stderr from spatial_filter -a for each sample
 
