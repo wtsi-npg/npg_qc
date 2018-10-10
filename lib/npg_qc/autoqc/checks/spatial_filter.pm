@@ -51,7 +51,7 @@ override 'execute' => sub {
 =cut
 
 #####
-# Custom builder for the input_files attrubute 
+# Custom builder for the input_files attribute 
 #
 sub _build_input_files {
   my $self = shift;
