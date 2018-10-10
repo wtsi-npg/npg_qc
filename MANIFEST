@@ -209,6 +209,7 @@ t/60-autoqc-checks-qX_yield.t
 t/60-autoqc-checks-ref_match.t
 t/60-autoqc-checks-rna_seqc.t
 t/60-autoqc-checks-sequence_error.t
+t/60-autoqc-checks-spatial_filter.t
 t/60-autoqc-checks-tag_metrics.t
 t/60-autoqc-checks-tags_reporters.t
 t/60-autoqc-checks-upstream_tags.t

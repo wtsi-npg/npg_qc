@@ -141,8 +141,11 @@ has 'qc_in'        => (isa        => 'Str',
                       );
 sub _test_qc_in {
   my ($self, $qc_in) = @_;
-  if (!-R $qc_in) {
-    croak qq[Input qc directory $qc_in does not exist or is not readable];
+
+  foreach my $d ( ref $qc_in ? @{$qc_in} : ($qc_in) ) {
+    if (!-R $d) {
+      croak qq[Input qc directory $d does not exist or is not readable];
+    }
   }
   return;
 }

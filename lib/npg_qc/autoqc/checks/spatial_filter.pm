@@ -3,7 +3,6 @@ package npg_qc::autoqc::checks::spatial_filter;
 use Moose;
 use namespace::autoclean;
 use Carp;
-
 use File::Find;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -27,30 +26,40 @@ A check which aggregates results from spatial_filter application stats files
 
 =head1 SUBROUTINES/METHODS
 
-=cut
-
-=head2 qc_in_roots
+=head2 qc_in
 
 Array reference with names of input directories to be searched for stats files
 
 =cut
 
-has 'qc_in_roots'    => (isa        => 'ArrayRef',
-                         is         => 'ro',
-                         required   => 1,
-                        );
+has '+qc_in' => (isa => 'ArrayRef');
+
+=head2 execute
+
+=cut
 
 override 'execute' => sub {
-  my ($self) = @_;
-
-  my @infiles=();
-
-  find(sub { if( /spatial_filter.stats$/smx ) { push @infiles, $File::Find::name }}, @{$self->qc_in_roots});
-
-  $self->result->parse_output(\@infiles); #read stderr from spatial_filter -a for each sample
-
+  my $self = shift;
+  super();
+  # Read from stats files produced by spatial filter application for each sample
+  $self->result->parse_output($self->input_files);
   return 1;
 };
+
+=head2 input_files
+
+=cut
+
+#####
+# Custom builder for the input_files attribute 
+#
+sub _build_input_files {
+  my $self = shift;
+  my @infiles = ();
+  find(sub { if( /spatial_filter.stats$/smx ) { push @infiles, $File::Find::name }}, @{$self->qc_in});
+  @infiles = sort @infiles;
+  return \@infiles;
+}
 
 __PACKAGE__->meta->make_immutable();
 
@@ -70,7 +79,6 @@ npg_qc::autoqc::checks::spatial_filter
 =head1 DESCRIPTION
 
     Parse stats files produced by spatial_filter application and aggregate number of reads filtered
-
 
 =head1 SUBROUTINES/METHODS
 
@@ -106,7 +114,7 @@ npg_qc::autoqc::checks::spatial_filter
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
