@@ -41,7 +41,7 @@ has '+qc_in' => (isa => 'ArrayRef');
 override 'execute' => sub {
   my $self = shift;
   super();
-  # Read stderr from spatial_filter -a for each sample
+  # Read from stats files produced by spatial filter application for each sample
   $self->result->parse_output($self->input_files);
   return 1;
 };
@@ -51,7 +51,7 @@ override 'execute' => sub {
 =cut
 
 #####
-# Custom builder for the input_files attrubute 
+# Custom builder for the input_files attribute 
 #
 sub _build_input_files {
   my $self = shift;
