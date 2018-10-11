@@ -141,8 +141,11 @@ has 'qc_in'        => (isa        => 'Str',
                       );
 sub _test_qc_in {
   my ($self, $qc_in) = @_;
-  if (!-R $qc_in) {
-    croak qq[Input qc directory $qc_in does not exist or is not readable];
+
+  foreach my $d ( ref $qc_in ? @{$qc_in} : ($qc_in) ) {
+    if (!-R $d) {
+      croak qq[Input qc directory $d does not exist or is not readable];
+    }
   }
   return;
 }
@@ -266,7 +269,8 @@ sub _build_result {
   }
   $nref->{'composition'} = $self->composition;
   if ($self->has_qc_in) {
-    $nref->{'path'} = $self->qc_in;
+    # We'll capture one path only. Can be changed in the future.
+    $nref->{'path'} = ref $self->qc_in ? $self->qc_in->[0] : $self->qc_in;
   }
   if ($self->can('subset') && $self->subset) {
     $nref->{'subset'} = $self->subset;
