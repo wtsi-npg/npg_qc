@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::rna_seqc');
@@ -19,6 +19,13 @@ subtest 'Testing utility methods' => sub {
   my $r;
   lives_ok {$r = npg_qc::autoqc::results::rna_seqc->load('t/data/autoqc/rna_seqc/data/15911_1#1.rna_seqc.json');} 'load serialised empty result';
   lives_ok {$r = npg_qc::autoqc::results::rna_seqc->load('t/data/autoqc/rna_seqc/data/18407_1#7.rna_seqc.json');} 'load serialised valid result';
+};
+
+subtest 'Testing attribute calls' => sub {
+  plan tests => 2;
+  my $r;
+  lives_ok {$r = npg_qc::autoqc::results::rna_seqc->load('t/data/autoqc/rna_seqc/data/26855_1#9.rna_seqc.json');} 'load serialised valid result';
+  is($r->rna_seqc_report_path, undef, "rna_seqc report path undefined as expected");
 };
 
 1;
