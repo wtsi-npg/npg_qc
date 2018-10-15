@@ -53,7 +53,7 @@ subtest 'load results with a composition fk' => sub {
     if (any {$column eq $_} @skip_columns){
         next;
     }
-    ok(exists $values->{$column}, qq[key available in json file]);
+    ok(exists $values->{$column}, qq[key for column $column available in json file]);
   }
 
   my $om_value;

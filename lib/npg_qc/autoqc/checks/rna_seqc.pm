@@ -14,7 +14,7 @@ use Scalar::Util qw(looks_like_number);
 
 extends qw(npg_qc::autoqc::checks::check);
 
-with qw(npg_tracking::data::reference::find 
+with qw(npg_tracking::data::reference::find
         npg_common::roles::software_location
         npg_tracking::data::transcriptome::find
        );
@@ -70,16 +70,16 @@ has '+aligner' => (default => 'fasta',
                    is => 'ro',
                    writer => '_set_aligner',);
 
-has 'output_dir' => (is       => 'ro',
-                     isa      => 'Str',
-                     lazy     => 1,
-                     builder  => '_build_output_dir',);
+has 'rna_seqc_report_path' => (is       => 'ro',
+                               isa      => 'Str',
+                               lazy     => 1,
+                               builder  => '_build_rna_seqc_report_path',);
 
-sub _build_output_dir {
+sub _build_rna_seqc_report_path {
     my ($self) = @_;
     my $qc_out_path = $self->qc_out;
-    my $output_dir = File::Spec->catdir($qc_out_path, $self->result->filename_root . q[_rna_seqc]);
-    return $output_dir;
+    my $rna_seqc_report_path = File::Spec->catdir($qc_out_path, $self->result->filename_root . q[_rna_seqc]);
+    return $rna_seqc_report_path;
 }
 
 has '_java_jar_path' => (is       => 'ro',
@@ -306,7 +306,7 @@ sub _command {
     my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
                                            $self->_java_jar_path,
                                            $self->_input_str,
-                                           $self->output_dir,
+                                           $self->rna_seqc_report_path,
                                            $self->ref_genome,
                                            $self->annotation_gtf,
                                            $self->_ttype_gtf_column,
@@ -373,7 +373,7 @@ override 'execute' => sub {
 
 sub _parse_rna_seqc_metrics {
     my $self = shift;
-    my $filename = File::Spec->catfile($self->output_dir, $METRICS_FILE_NAME);
+    my $filename = File::Spec->catfile($self->rna_seqc_report_path, $METRICS_FILE_NAME);
     if (! -e $filename) {
         croak qq[No such file $filename: cannot parse RNA-SeQC metrics];
     }
@@ -463,7 +463,7 @@ sub _save_results {
         $self->_delete_result($key);
     }
     $self->result->other_metrics($self->_results);
-    $self->result->output_dir($self->output_dir);
+    $self->result->rna_seqc_report_path($self->rna_seqc_report_path);
     return;
 }
 __PACKAGE__->meta->make_immutable();
@@ -475,7 +475,7 @@ __END__
 
 =head1 NAME
 
-npg_qc::autoqc::checks::rna_seqc 
+npg_qc::autoqc::checks::rna_seqc
 
 =head1 SYNOPSIS
 

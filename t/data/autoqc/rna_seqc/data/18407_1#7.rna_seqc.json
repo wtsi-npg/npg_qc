@@ -75,5 +75,5 @@
   "tag_index":7,
   "mt_pct_tpm":0,
   "globin_pct_tpm":0,
-  "output_dir":"/some/dir"
+  "rna_seqc_report_path":"/some/dir"
 }

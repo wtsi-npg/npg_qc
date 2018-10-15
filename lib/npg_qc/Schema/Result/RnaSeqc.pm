@@ -77,7 +77,7 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   data_type: 'text'
   is_nullable: 1
 
-=head2 output_dir
+=head2 rna_seqc_report_path
 
   data_type: 'text'
   is_nullable: 1
@@ -208,7 +208,7 @@ __PACKAGE__->add_columns(
   },
   'info',
   { data_type => 'text', is_nullable => 1 },
-  'output_dir',
+  'rna_seqc_report_path',
   { data_type => 'text', is_nullable => 1 },
   'rrna',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
@@ -311,8 +311,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::rna_seqc';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-12 14:35:10
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lyPzYk45t0tID1/r6Ym8/w
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-15 13:21:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:hkcG9zZRsXTY1VkOAjIR+w
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
