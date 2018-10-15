@@ -5,6 +5,7 @@ use Test::Exception;
 use Perl6::Slurp;
 use JSON;
 use npg_testing::db;
+use List::Util qw(any);
 
 use_ok('npg_qc::Schema::Result::RnaSeqc');
 
@@ -28,7 +29,7 @@ sub _get_data {
 }
 
 subtest 'load results with a composition fk' => sub {
-  plan tests => 7;
+  plan tests => 27;
 
   my $values =  _get_data('18407_1#7.rna_seqc.json');
   my $fk_row = $schema->resultset('SeqComposition')->create({digest => '45678', size => 2});
@@ -43,6 +44,17 @@ subtest 'load results with a composition fk' => sub {
   lives_ok { $object->insert() } 'insert with fk is ok';
   my $a_rs = $rs->search({});
   is ($a_rs->count, 1, q[one row created in the table]);
+
+  # match columns with keys in json that need to be stored
+  # skip if necessary (for whatever reason)
+  my @skip_columns = qw(id_rna_seqc id_seq_composition);
+  my @columns = $schema->source('RnaSeqc')->columns;
+  foreach my $column (@columns){
+    if (any {$column eq $_} @skip_columns){
+        next;
+    }
+    ok(exists $values->{$column}, qq[key available in json file]);
+  }
 
   my $om_value;
   $a_rs = $rs->next();
