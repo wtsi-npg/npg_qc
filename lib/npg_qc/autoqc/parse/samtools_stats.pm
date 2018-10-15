@@ -6,7 +6,7 @@ use namespace::autoclean;
 use Carp;
 use Perl6::Slurp;
 use Readonly;
-use List::MoreUtils qw/ each_arrayref none pairwise uniq /;
+use List::MoreUtils qw/ each_arrayref none uniq /;
 use List::Util      qw/ sum /;
 use Class::Load     qw/ load_class /;
 
@@ -55,15 +55,17 @@ of these files.
 
 Readonly::Scalar my $FORWARD_READ      => 'forward';
 Readonly::Scalar my $REVERSE_READ      => 'reverse';
-Readonly::Scalar my $INDEX_READ        => 'index';
+Readonly::Scalar my $INDEX_READS       => 'index';
 Readonly::Scalar my $TOTAL             => 'total';
-Readonly::Array  my @VALID_READ_NAMES  => ($FORWARD_READ, $REVERSE_READ, $INDEX_READ);
+Readonly::Array  my @VALID_READ_NAMES  => ($FORWARD_READ, $REVERSE_READ, $INDEX_READS);
 
 Readonly::Scalar my $SINGLE_VALUE_SECTION   => 'SN';
 Readonly::Hash   my %QUALITY_SECTIONS       => ( $FORWARD_READ => 'FFQ',
-                                                 $REVERSE_READ => 'LFQ' );
+                                                 $REVERSE_READ => 'LFQ',
+                                                 $INDEX_READS  => 'QTQ', );
 Readonly::Hash   my %BASE_FRACTION_SECTIONS => ( $FORWARD_READ => 'FBC',
-                                                 $REVERSE_READ => 'LBC' );
+                                                 $REVERSE_READ => 'LBC',
+                                                 $INDEX_READS  => 'BCC', );
 
 Readonly::Array  my @BASES       => qw/ A C G T /;
 Readonly::Scalar my $MIN_QUALITY => 0;
@@ -300,7 +302,7 @@ sub yield_per_cycle {
   return $matrix;
 }
 
-=head yield
+=head2 yield
 
 Overall yield in bases for a read (an argument). If no argument is given,
 a forward read is assumed. Possible argument values are 'forward',
@@ -388,11 +390,16 @@ sub base_composition {
 
   my $total = sum @means;
   @means = map { sprintf '%.2f', $_ }
-           map { ($_ * $HUNDRED) / $total }
-           @means;
-  my %fractions = pairwise { ($a, $b) } @BASES, @means;
+               map { ($_ * $HUNDRED) / $total }
+               @means;
 
-  return \%fractions;
+  (scalar @means == scalar @BASES) or croak 'Mismatching list lengths';
+  my $fractions = {};
+  foreach my $base (@BASES) {
+    $fractions->{$base} = shift @means;
+  }
+
+  return $fractions;
 }
 
 ####################################################################

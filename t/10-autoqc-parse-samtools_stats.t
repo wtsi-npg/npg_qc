@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use List::MoreUtils qw/uniq/;
@@ -144,16 +144,16 @@ subtest 'number of reads and existence of reverse read' => sub {
 
   # single run
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/25980_8#8_F0xB00.stats');
-  $expected = {forward => 7919116, reverse => 0, total => 7919116};
+          't/data/samtools_stats/27053_1#1.single.stats');
+  $expected = {forward => 5887348, reverse => 0, total => 5887348};
   lives_ok { $s->num_reads() } 'SN section read for number of reads';
   is_deeply ($s->num_reads(), $expected, 'single read - number of reads info is correct');
   ok (!$s->has_reverse_read, 'does not have reverse read');
-  ok (!$s->has_no_reads, 'has reads');  
+  ok (!$s->has_no_reads, 'has reads');   
 
   # zero reads
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/26597_1_F0xB00.stats');
+          't/data/samtools_stats/27258_1#1.empty.stats');
   $expected = {forward => 0, reverse => 0, total => 0};
   lives_ok { $s->num_reads() } 'SN section read for number of reads';
   is_deeply ($s->num_reads(), $expected, 'zero reads - number of reads info is correct');
@@ -162,7 +162,7 @@ subtest 'number of reads and existence of reverse read' => sub {
 };
 
 subtest 'reads length' => sub {
-  plan tests => 6;
+  plan tests => 7;
 
   my $s = npg_qc::autoqc::parse::samtools_stats->new(
      file_content => [qw/content of the file/]);
@@ -197,20 +197,20 @@ subtest 'reads length' => sub {
   is_deeply ($s->reads_length(), $expected, 'paired reads - number of reads info is correct');
 
   # single run
-  #$s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-  #        't/data/samtools_stats/25980_8#8_F0xB00.stats');
-  #$expected = {forward => 7919116, reverse => 0};
-  #is_deeply ($s->reads_length(), $expected, 'single read - number of reads info is correct'); 
+  $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
+          't/data/samtools_stats/27053_1#1.single.stats');
+  $expected = {forward => 19, reverse => 0};
+  is_deeply ($s->reads_length(), $expected, 'single read - number of reads info is correct'); 
 
   # zero reads
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/26597_1_F0xB00.stats');
+          't/data/samtools_stats/27258_1#1.empty.stats');
   $expected = {forward => 0, reverse => 0};
   is_deeply ($s->reads_length(), $expected, 'zero reads - number of reads info is correct');  
 };
 
 subtest 'yield per cycle' => sub {
-  plan tests => 10;
+  plan tests => 13;
 
   my $s = npg_qc::autoqc::parse::samtools_stats->new(
      file_content => ['SN  some fragments',
@@ -233,13 +233,18 @@ subtest 'yield per cycle' => sub {
 
   # single run
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/25980_8#8_F0xB00.stats');
+          't/data/samtools_stats/27053_1#1.single.stats');
   is ($s->yield_per_cycle('reverse'), undef,
     'yield for reverse read of a single run is undefined');
+  my $m = $s->yield_per_cycle('forward');
+  is (scalar @{$m}, 19, '19 cycles (matrix rows)');
+  my @max_qs = uniq map {scalar @{$_}} @{$m};
+  is (scalar @max_qs, 1, 'the same number of qs in every row');
+  is ($max_qs[0], 39, 'max quality is 39');
 
   # zero reads
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/26597_1_F0xB00.stats');
+          't/data/samtools_stats/27258_1#1.empty.stats');
   is ($s->yield_per_cycle('reverse'), undef,
     'yield for reverse read of a no-reads run is undefined');
   is ($s->yield_per_cycle('forward'), undef,
@@ -248,25 +253,25 @@ subtest 'yield per cycle' => sub {
   # paired run
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
           't/data/samtools_stats/26607_1#20_F0xB00.stats');
-  my $m = $s->yield_per_cycle('forward');
+  $m = $s->yield_per_cycle('forward');
   is (scalar @{$m}, 151, '151 cycles (matrix rows)');
-  my @max_qs = uniq map {scalar @{$_}} @{$m};
+  @max_qs = uniq map {scalar @{$_}} @{$m};
   is (scalar @max_qs, 1, 'the same number of qs in every row');
   is ($max_qs[0], 43, 'max quality is 43');
 };
 
 subtest 'total yield' => sub {
-  plan tests => 5;
+  plan tests => 6;
 
   # single run
   my $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/25980_8#8_F0xB00.stats');
+          't/data/samtools_stats/27053_1#1.single.stats');
   is ($s->yield('reverse'), undef,
     'yield for reverse read of a single run is undefined');
 
   # zero reads
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/26597_1_F0xB00.stats');
+          't/data/samtools_stats/27258_1#1.empty.stats');
   is ($s->yield('reverse'), undef,
     'yield for reverse read of a no-reads run is undefined');
   is ($s->yield('forward'), undef,
@@ -300,10 +305,25 @@ subtest 'total yield' => sub {
   $i = 0;
   %expected = map {$i++ => $_} @qualities;
   is_deeply ($s->yield('reverse'), \%expected, 'yields for the reverse read');
+
+  # single run
+  $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
+          't/data/samtools_stats/27053_1#1.single.stats');
+  @qualities = qw/
+  111859612 111858449 111858449 111858449 111858449 111858449 111858449
+  111858449 111858449 111858449 111858449 111858449 111858449 111858449
+  111858449 110288533 110288533 110288533 110288533 110288533 110288533
+  110288533 110288533 110260084 110260084 110260084 110260084 110260084
+  108430695 108430695 108430695 108430695 108430695 108430695 77368760
+  77368760 77368760 77368760
+                0/;
+  $i = 0;
+  %expected = map {$i++ => $_} @qualities;
+  is_deeply ($s->yield('forward'), \%expected, 'yields for the forward read');  
 };
 
 subtest 'base composition' => sub {
-  plan tests => 9;
+  plan tests => 10;
 
   my $s = npg_qc::autoqc::parse::samtools_stats->new(
      file_content => ['SN  some fragments',
@@ -326,13 +346,17 @@ subtest 'base composition' => sub {
 
   # single run
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/25980_8#8_F0xB00.stats');
+          't/data/samtools_stats/27053_1#1.single.stats');
   is ($s-> base_composition('reverse'), undef,
     'base composition for reverse read of a single run is undefined');
+  my $expected = { 'G' => 26.47, 'A' => 21.12,
+                   'C' => 30.83, 'T' => 21.58 };
+  is_deeply ($s->base_composition('forward'),
+    $expected, 'gc fraction for the forward read');
 
   # zero reads
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
-          't/data/samtools_stats/26597_1_F0xB00.stats');
+          't/data/samtools_stats/27258_1#1.empty.stats');
   is ($s->base_composition('reverse'), undef,
     'base composition for reverse read of a no-reads run is undefined');
   is ($s->base_composition('forward'), undef,
@@ -341,8 +365,8 @@ subtest 'base composition' => sub {
   # paired run
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
           't/data/samtools_stats/26607_1#20_F0xB00.stats');
-  my $expected = { 'G' => 9.46, 'A' => 40.53,
-                   'C' => 9.42, 'T' => 40.58 };
+  $expected = { 'G' => 9.46, 'A' => 40.53,
+                'C' => 9.42, 'T' => 40.58 };
   is_deeply ($s->base_composition('forward'),
     $expected, 'gc fraction for the forward read');
 
@@ -350,6 +374,15 @@ subtest 'base composition' => sub {
                 'G' => '9.66', 'T' => '40.38' }; 
   is_deeply ($s->base_composition('reverse'),
     $expected, 'gc fraction for the reverse read');
+};
+
+subtest 'corrupt samtools stats file' => sub {
+  plan tests => 1;
+
+  my $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
+          't/data/samtools_stats/27138_1#2_F0xB00.stats');
+  throws_ok { $s->yield('forward') } qr/FFQ section is missing/,
+    'missing forward read quality section - error'; 
 };
 
 1;

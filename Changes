@@ -29,6 +29,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
     of an explicit list of input files (that approach became unworkable
     with highly plexed lanes)
  - add result_file_path attribute to file-based result objects
+ - samtools stats file parser
+ - qX_yield and gc_fraction autoqc checks to use samtools stats files
+   instead of fastqcheck file
 
 release 65.4.1
  - store value of output_dir from the RNA-SeQC check into the database

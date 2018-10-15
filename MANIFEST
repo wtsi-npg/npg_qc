@@ -326,7 +326,7 @@ t/data/autoqc/upstream_tags/lane1/6954_1#0.bam
 t/data/autoqc/090721_IL29_2549/data/2549_2_1.fastq
 t/data/autoqc/090721_IL29_2549/data/2549_2.bam
 t/data/autoqc/090721_IL29_2549/data/2549_3.fastq
-t/data/autoqc/090721_IL29_2549/data/2549_6_1#1.fastq
+t/data/autoqc/090721_IL29_2549/data/2549_6#1_1.fastq
 t/data/autoqc/090721_IL29_2549/data/2549_6#1.bam
 t/data/autoqc/090721_IL29_2549/data/2549_6#2.bam
 t/data/autoqc/090908_IL11_3715/qc/3715_5.adapter.json
@@ -386,7 +386,9 @@ t/data/autoqc/genotype/6812_8.genotype.json
 t/data/autoqc/genotype_call/samplesheet_24135.csv
 t/data/autoqc/genotype_call/samplesheet_24135_test.csv
 t/data/autoqc/genotype_call/data/24135_1#1.genotype_call.json
-t/data/autoqc/Homo_sapiens.NCBI36.48.dna.all.fa.json
+t/data/autoqc/gc_fraction/Homo_sapiens.NCBI36.48.dna.all.fa.json
+t/data/autoqc/gc_fraction/samplesheet_27138.csv
+t/data/autoqc/gc_fraction/27138_1#1_F0xB00.stats
 t/data/autoqc/insert_size/6062_8#1.insert_size.json
 t/data/autoqc/insert_size/6062_8#2.insert_size.json
 t/data/autoqc/insert_size_expected_mean.json
@@ -547,6 +549,7 @@ t/data/reporter/mlwarehouse/400-IseqFlowcell.yml
 t/perlcriticrc
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140601_HS2_13108_A_C37W5ACXX/InterOp/TileMetricsOut.bin
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX/InterOp/TileMetricsOut.bin
+t/data/fastqcheck/4308_1_2.fastqcheck
 t/data/fixtures/npg_tracking/000-designation.yml
 t/data/fixtures/npg_tracking/000-entity_type.yml
 t/data/fixtures/npg_tracking/000-instrument_mod_dict.yml
@@ -594,8 +597,10 @@ t/data/qc_store/26291/plex3/qc/26291#3.bam_flagstats.json
 t/data/qc_store/26291/plex3/qc/26291#3_phix.bam_flagstats.json
 t/data/qc_store/26291/lane1/qc/26291_1.tag_metrics.json
 t/data/qc_store/26291/lane2/qc/26291_2.tag_metrics.json
-t/data/samtools_stats/25980_8#8_F0xB00.stats
 t/data/samtools_stats/26597_1_F0xB00.stats
 t/data/samtools_stats/26607_1#20_F0xB00.stats
 t/data/samtools_stats/26607_1#20_F0xB00.samtools_stats.json
+t/data/samtools_stats/27138_1#2_F0xB00.stats
+t/data/samtools_stats/27258_1#1.empty.stats
+t/data/samtools_stats/27053_1#1.single.stats
 t/data/26601_qc_archive.tar.gz
