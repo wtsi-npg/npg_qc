@@ -29,6 +29,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
     of an explicit list of input files (that approach became unworkable
     with highly plexed lanes)
 
+release 65.4.1
+ - store value of output_dir from the RNA-SeQC check into the database
+
 release 65.4
  - qX_yield autoqc check extension: capture and save yields for q30 and q40
 

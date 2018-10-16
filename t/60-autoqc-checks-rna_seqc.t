@@ -69,7 +69,7 @@ subtest 'Find CLASSPATH' => sub {
 };
 
 subtest 'Parse metrics' => sub {
-    plan tests => 7;
+    plan tests => 8;
     my $rnaseqc = npg_qc::autoqc::checks::rna_seqc->new(
         id_run => 17550,
         position => 3,
@@ -96,6 +96,10 @@ subtest 'Parse metrics' => sub {
         globin_genes_csv => 't/data/autoqc/rna_seqc/data/globin_genes.csv',
         mt_genes_csv => 't/data/autoqc/rna_seqc/data/mt_genes.csv',
         repository => $repos,);
+
+    my $expected_report_path = q[t/data/autoqc/rna_seqc/data/6_6#6_rna_seqc];
+    is($rnaseqc->rna_seqc_report_path(), $expected_report_path, q[output path for RNA-SeQC report is correct]);
+
     lives_ok {$rnaseqc->_parse_rna_seqc_metrics()} q[parsing RNA-SeQC metrics.tsv ok];
     lives_ok {$rnaseqc->_parse_quant_file()} q[parsing quant.genes.sf ok];
     cmp_deeply ($rnaseqc->_results, \%results_hash, q[compare results hash]);
@@ -117,7 +121,7 @@ subtest 'Argument input files' => sub {
     `mkdir -p $trans_dir/RNA-SeQC`;
     `touch $trans_dir/RNA-SeQC/ensembl_75_transcriptome-GRCm38.gtf`;
 
-    # NB: use _reads_in_bam => 1 in $check->execute tests 
+    # NB: use _reads_in_bam => 1 in $check->execute tests
     #     except when testing for no. of reads in bam
 
     my $check = npg_qc::autoqc::checks::rna_seqc->new(

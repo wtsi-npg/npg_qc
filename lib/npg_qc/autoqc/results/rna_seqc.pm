@@ -38,9 +38,9 @@ has 'other_metrics'  => (isa        => 'HashRef[Str]',
                          default => sub { {} },
                          required   => 0,);
 
-has 'output_dir' => (is       => 'rw',
-                     isa      => 'Str',
-                     required => 0,);
+has 'rna_seqc_report_path' => (is       => 'rw',
+                               isa      => 'Str',
+                               required => 0,);
 
 __PACKAGE__->meta->make_immutable;
 
