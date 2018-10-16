@@ -1,4 +1,4 @@
-package npg_qc_viewer::Model::Visuals::Fastqcheck;
+package npg_qc_viewer::Model::QualityHeatmap;
 
 use Carp;
 use Moose;
@@ -15,22 +15,22 @@ our $VERSION  = '0';
 
 =head1 NAME
 
-npg_qc_viewer::Model::Visuals::Fastqcheck
+npg_qc_viewer::Model::QualityHeatmap
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Catalyst model for rendering fastqcheck images at run time
+Catalyst model for rendering quality by cycle heatmaps at run time
 
 =head1 SUBROUTINES/METHODS
 
-=head2 fastqcheck_legend
+=head2 legend
 
-Returns a binary stream representing a PNG image with a legend for the fastqcheck file visualisation
+Returns a binary stream representing a PNG image with a legend for quality by cycle heatmaps
 
 =cut
-sub fastqcheck_legend {
+sub legend {
     my $self = shift;
 
     my $height = 240;
@@ -85,15 +85,15 @@ sub fastqcheck_legend {
 }
 
 
-=head2 fastqcheck2image
+=head2 data2image
 
-Returns a binary stream representing a PNG image with the fastqcheck file visualisation
+Returns a binary stream representing a PNG image with the quality by cycle visualisation.
 
 =cut
-sub fastqcheck2image { ##no critic (ProhibitExcessComplexity)
+sub data2image { ##no critic (ProhibitExcessComplexity)
     my ($self, $content, $read) = @_;
 
-    $content or croak 'Fastqcheck file content is required';
+    $content or croak 'Content is required';
     $read or croak 'Read is required';
     my $fq = npg_common::fastqcheck->new(file_content => $content);
     my $num_cycles = $fq->read_length;

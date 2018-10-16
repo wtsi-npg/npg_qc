@@ -10,7 +10,7 @@ use t::util;
 my $util = t::util->new(db_connect => 0);
 local $ENV{CATALYST_CONFIG} = $util->config_path;
 
-my $path = File::Spec->catfile('t', 'data', 'sources4visuals');
+my $path = File::Spec->catfile('t', 'data', 'qualmap');
 
 {
   use_ok 'Catalyst::Test', 'npg_qc_viewer';
@@ -18,7 +18,7 @@ my $path = File::Spec->catfile('t', 'data', 'sources4visuals');
 }
 
 {
-  my $url = '/visuals/fastqcheck_legend';
+  my $url = '/visuals/qualmap_legend';
   my $response;
   lives_ok { $response = request($url) }  qq[$url request] ;
   ok( $response->is_success, qq[$url request succeeds] );
@@ -27,12 +27,12 @@ my $path = File::Spec->catfile('t', 'data', 'sources4visuals');
 
 {
   my @urls = ();
-  push @urls,  '/visuals/fastqcheck';
-  push @urls, q[/visuals/fastqcheck?paths_list=] . $path;
-  push @urls,  '/visuals/fastqcheck?rpt_list=45:1';
-  push @urls,  '/visuals/fastqcheck?rpt_list=45:1:3&read=reverse';
-  push @urls,  '/visuals/fastqcheck?rpt_list=45:1%3B45:2&read=reverse'; # 45:1;45:2
-  push @urls, q[/visuals/fastqcheck?paths_list=t&read=forward&rpt_list=4360:1];
+  push @urls,  '/visuals/qualmap';
+  push @urls, q[/visuals/qualmap?paths_list=] . $path;
+  push @urls,  '/visuals/qualmap?rpt_list=45:1';
+  push @urls,  '/visuals/qualmap?rpt_list=45:1:3&read=reverse';
+  push @urls,  '/visuals/qualmap?rpt_list=45:1%3B45:2&read=reverse'; # 45:1;45:2
+  push @urls, q[/visuals/qualmap?paths_list=t&read=forward&rpt_list=4360:1];
 
   my $response;
   foreach my $url (@urls) {
@@ -45,8 +45,8 @@ my $path = File::Spec->catfile('t', 'data', 'sources4visuals');
 
 {
   my @urls = ();
-  push @urls, q[/visuals/fastqcheck?paths_list=] . $path . q[&read=forward&rpt_list=4360:1];
-  push @urls, q[/visuals/fastqcheck?paths_list=] . $path . q[&read=forward&rpt_list=4360:1&db_lookup=0];
+  push @urls, q[/visuals/qualmap?paths_list=] . $path . q[&read=forward&rpt_list=4360:1];
+  push @urls, q[/visuals/qualmap?paths_list=] . $path . q[&read=forward&rpt_list=4360:1&db_lookup=0];
 
   my $response;
   foreach my $url (@urls) {

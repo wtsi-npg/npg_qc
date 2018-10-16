@@ -28,17 +28,12 @@ Catalyst Controller.
 
 =cut
 
-=head2 _render 
-
-Image rendering
-
-=cut
 sub _render {
   my ($self, $c, $method, @args) = @_;
 
   my $image_string;
   try {
-    $image_string = $c->model(q[Visuals::Fastqcheck])->$method(@args);
+    $image_string = $c->model(q[QualityHeatmap])->$method(@args);
   } catch {
     $c->error($_);
   };
@@ -65,12 +60,12 @@ sub base :Chained('/') :PathPart('visuals') :CaptureArgs(0) {
 }
 
 
-=head2 fastqcheck
+=head2 qualmap
 
-An action for generating a visual representation of a fastqcheck file
+An action for generating quality by cycle heatmaps
 
 =cut
-sub fastqcheck :Chained('base') :PathPath('fastqcheck') :Args(0) {
+sub qualmap :Chained('base') :PathPath('qualmap') :Args(0) {
   my ( $self, $c) = @_;
 
   my $params = $c->request->query_parameters;
@@ -115,23 +110,22 @@ sub fastqcheck :Chained('base') :PathPath('fastqcheck') :Args(0) {
     : $model->load_fastqcheck_content($query, $read);
 
   if ($content) {
-    $self->_render($c, q[fastqcheck2image], $content, $read);
+    $self->_render($c, q[data2image], $content, $read);
   } else {
-    $c->error('Failed to load fastqcheck content for ' . $query->to_string);
+    $c->error('Failed to load content for ' . $query->to_string);
   }
 
   return;
-
 }
 
-=head2 fastqcheck_legend
+=head2 qualmap_legend
 
-An action for generating a legend for a visual representation of fastqcheck files
+An action for generating a legend for quality by cycle heatmaps
 
 =cut
-sub fastqcheck_legend :Chained('base') :PathPath('fastqcheck_legend') :Args(0) {
+sub qualmap_legend :Chained('base') :PathPath('qualmap_legend') :Args(0) {
   my ( $self, $c) = @_;
-  $self->_render($c, q[fastqcheck_legend]);
+  $self->_render($c, q[legend]);
   return;
 }
 
