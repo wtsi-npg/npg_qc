@@ -80,8 +80,8 @@
 [%- qxTotal = 0; #For total qxYield
 
     #For heatmaps
-    action_plot = c.controller('Visuals').action_for('fastqcheck');
-    legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
+    action_plot = c.controller('Visuals').action_for('qualmap');
+    legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('qualmap_legend'));
 
     id_runs_in_collection = []; # Used for page's title (how many different id runs in page)
 

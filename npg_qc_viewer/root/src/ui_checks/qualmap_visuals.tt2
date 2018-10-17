@@ -9,4 +9,4 @@
 <img src="/static/images/waiting.gif" data-src="[% c.uri_for_action(action_plot, {paths_list => $path_list, rpt_list => "$lane_key", read => "$read", 'db_lookup' => "$db_lookup"}) | html %]"  alt="[% lane_key %], [% read %] read heatmap" />
 [%- END -%]
 
-<img src="[% legend_uri_for_action %]"  alt="legend for the fastqcheck file visualization" />
+<img src="[% legend_uri_for_action %]"  alt="legend for the quality heatmap" />
