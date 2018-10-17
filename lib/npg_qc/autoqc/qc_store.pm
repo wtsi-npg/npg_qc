@@ -49,11 +49,12 @@ will be made. True by default.
 
 =cut
 
-has 'use_db'       => ( isa        => 'Bool',
-                        is         => 'ro',
-                        required   => 0,
-                        default    => 1,
-                      );
+has 'use_db' => (
+  isa        => 'Bool',
+  is         => 'ro',
+  required   => 0,
+  default    => 1,
+);
 
 =head2 qc_schema
 
@@ -61,12 +62,13 @@ DBIx schema connection
 
 =cut
 
-has 'qc_schema'    => ( isa        => 'Maybe[npg_qc::Schema]',
-                        is         => 'ro',
-                        required   => 0,
-                        predicate  => 'has_qc_schema',
-                        lazy_build => 1,
-                      );
+has 'qc_schema' => (
+  isa        => 'Maybe[npg_qc::Schema]',
+  is         => 'ro',
+  required   => 0,
+  predicate  => 'has_qc_schema',
+  lazy_build => 1,
+);
 sub _build_qc_schema {
   my $self = shift;
   if ($self->use_db) {
@@ -79,13 +81,14 @@ sub _build_qc_schema {
 
 =cut
 
-has 'checks_list'  => ( isa        => 'ArrayRef',
-                        is         => 'ro',
-                        required   => 1,
-                        default    => sub {
-                          return npg_qc::autoqc::results::collection->new()->checks_list();
-                                          },
-                      );
+has 'checks_list' => (
+  isa      => 'ArrayRef',
+  is       => 'ro',
+  required => 1,
+  default  => sub {
+    return npg_qc::autoqc::results::collection->new()->checks_list();
+  },
+);
 
 =head2 BUILD
 
@@ -121,9 +124,10 @@ sub load {
 
 =head2 load_lanes
 
-Data for a number of lanes returned as an npg_qc::autoqc::results::collection object.
-The second argument is a reference to a hash defining the lanes. Run IDs should be
-used as keys. A reference to an array with lane numbers should be used as values.
+Data for a number of lanes returned as an npg_qc::autoqc::results::collection
+object. The second argument is a reference to a hash defining the lanes. Run
+IDs should be used as keys. A reference to an array with lane numbers should
+be used as values.
 
 If npg_schema argument is undefined, stored globs will not be used.
 
@@ -143,22 +147,24 @@ sub load_lanes {
 
 =head2 load_from_path
 
-De-serializes objects from JSON files found in the directories given by the argument
-list of paths. If a query object is defined, selects objects corresponding to a run
-defined by the query object's id_run attribute. Path string can have glob expansion
-characters as per Perl glob function documentation.
+De-serializes objects from JSON files found in the directories given by the
+argument list of paths. If a query object is defined, selects objects
+corresponding to a run defined by the query object's id_run attribute. Path
+string can have glob expansion characters as per Perl glob function
+documentation.
 
 Errors if a list of paths is undefined or empty.
 
-Returns a collection object (npg_qc::autoqc::results::collection) containing autoqc
-result objects corresponding to JSON files.
+Returns a collection object (npg_qc::autoqc::results::collection) containing
+autoqc result objects corresponding to JSON files.
 
-Can only deal with classes from the npg_qc::autoqc::results name space. Each class
-should inherit from the npg_qc::autoqc::results::result object. Errors if
-de-seriaization fails either because JSON is invalid or cannot be de-serialized.
+Can only deal with classes from the npg_qc::autoqc::results name space. Each
+class should inherit from the npg_qc::autoqc::results::result object. Errors
+if de-seriaization fails either because JSON is invalid or cannot be
+de-serialized.
 
-Does not load twice from the same path. Lanes selection is not performed even if
-defined in the query object,
+Does not load twice from the same path. Lanes selection is not performed even
+if defined in the query object,
 
  my $c = $obj->load_from_path(@paths);
  my $c = $obj->load_from_path(@paths, $query_obj);
@@ -442,7 +448,8 @@ Returns an undefined value if the file for the entiry is not found.
 
   my @paths = qw/path1 path2/;
   my $content = $obj->load_fastqcheck_content_from_path($query, \@paths);
-  my $content = $obj->load_fastqcheck_content_from_path($query, \@paths, 'reverse');
+  my $content = $obj->load_fastqcheck_content_from_path($query, \@paths,
+                                                        'reverse');
 
 =cut
 
@@ -490,20 +497,24 @@ sub load_fastqcheck_content_from_path {
 =head2 json_file2result_object
 
 Reads an argument JSON file and converts the content into in-memory autoqc
-result object of a class specified by the __CLASS__ field. Returns either
-a result object or, if the content of the file is not a serialized autoqc
-result object, an undefined value.
+result object of a class specified by the __CLASS__ field. Sets the value
+of the result_file_path attrubute of the result object to the argument
+file path.
 
-Error if file cannot be read or the de-serialization fails.
+Returns an autoqc result object or an undefined value if the JSON
+string does not contain the __CLASS__ field or this class is not
+recognised as autoqc result class.
+
+Errors if the file cannot be read or de-serialization fails.
 
 =cut
 
 sub json_file2result_object {
-  my ($self, $file) = @_;
+  my ($self, $file_path) = @_;
 
   my $result;
   try {
-    my $json_string = slurp($file);
+    my $json_string = slurp($file_path);
     my $json = decode_json($json_string);
     my $class_name = delete $json->{$CLASS_FIELD};
     if ($class_name) {
@@ -511,12 +522,15 @@ sub json_file2result_object {
           npg_qc::autoqc::role::result->class_names($class_name);
     }
     if ($class_name && any {$_ eq $class_name} @{$self->checks_list()}) {
-      my $module = $npg_qc::autoqc::results::collection::RESULTS_NAMESPACE . q[::] . $class_name;
+      my $module = join q[::],
+                   $npg_qc::autoqc::results::collection::RESULTS_NAMESPACE,
+                   $class_name;
       load_class($module);
       $result = $module->thaw($json_string);
+      $result->result_file_path($file_path);
     }
   } catch {
-    croak "Failed converting $file to autoqc result object: $_";
+    croak "Failed converting $file_path to autoqc result object: $_";
   };
 
   return $result;

@@ -221,7 +221,10 @@ sub _build__collection {
   } elsif ($self->has_json_file) {
     $collection = npg_qc::autoqc::results::collection->new();
     for my $f (@{$self->json_file}) {
-      $collection->add($qc_store->json_file2result_object($f));
+      my $r = $qc_store->json_file2result_object($f);
+      if ($r) {
+        $collection->add($r);
+      }
     }
   } else {
     croak 'Either archive_path or path or json_files attribute should be set.'
@@ -284,6 +287,7 @@ sub _exclude_nondb_attrs {
   my ($self, $values, @columns) = @_;
   delete $values->{$CLASS_FIELD};
   delete $values->{'composition'};
+  delete $values->{'result_file_path'};
   foreach my $key ( keys %{$values} ) {
     if (any {$key eq $_} @columns) {
       next;
