@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -74,6 +74,63 @@ subtest 'object creation' => sub {
     'not OK to explicitly undefine schema without unsetting use_db';
 };
 
+subtest 'deserializing objects from a file' => sub {
+  plan tests => 12;
+
+  my $s =  npg_qc::autoqc::qc_store->new(use_db => 0);
+
+  my $file_path = "$temp/my.json";
+  throws_ok { $s->json_file2result_object($file_path) }
+    qr/Failed converting $file_path/,
+    'file does not exist - error';
+
+  my $fh;
+  open $fh, '>', $file_path or die "Cannot open $file_path for writing";
+  print $fh 'some data' or die "Cannot write to $file_path";
+  close $fh;
+  throws_ok { $s->json_file2result_object($file_path) }
+    qr/Failed converting $file_path/,
+    'file exists, but JSON parser fails - error';
+
+  open $fh, '>', $file_path or die "Cannot open $file_path for writing";
+  print $fh '{"key":"value"}' or die "Cannot write to $file_path";
+  close $fh;
+  my $r;
+  lives_ok { $r = $s->json_file2result_object($file_path) }
+    'JSON with no __CLASS__ key - no failure';
+  is ($r, undef, 'return value is undefined');
+
+  open $fh, '>', $file_path or die "Cannot open $file_path for writing";
+  print $fh '{"__CLASS__":"some","key":"value"}'
+    or die "Cannot write to $file_path";
+  close $fh;
+  lives_ok { $r = $s->json_file2result_object($file_path) }
+    'JSON with random __CLASS__ key - no failure';
+  is ($r, undef, 'return value is undefined');
+
+  my $dir = 't/data/autoqc/rendered/json_paired_run';
+  $file_path = "$dir/3565_1.insert_size.json";
+
+  $r = $s->json_file2result_object($file_path);
+  isa_ok ($r, 'npg_qc::autoqc::results::insert_size');
+  is ($r->result_file_path(), $file_path, 'file path attribute is assigned');
+  
+  $file_path = "$dir/3565_2.qX_yield.json";
+  $r = $s->json_file2result_object($file_path);
+  isa_ok ($r, 'npg_qc::autoqc::results::qX_yield');
+  is ($r->result_file_path(), $file_path, 'file path attribute is assigned');
+
+  $s =  npg_qc::autoqc::qc_store->new(
+          use_db => 0,
+          checks_list => [qw/insert_size sequence_error/]);
+  $r = $s->json_file2result_object($file_path);
+  ok (!$r,
+    'qX_yield result is not returned since the class name is not in the list');
+
+  $file_path = "$dir/3565_1.insert_size.json";
+  $r = $s->json_file2result_object($file_path);
+  ok ($r, 'insert_size result is returned since the class name is in the list');
+};
 
 subtest 'loading data from directories' => sub {
   plan tests => 9;

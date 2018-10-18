@@ -38,8 +38,15 @@ sub _build_composition {
   croak 'Can only build old style results';
 }
 
+has 'result_file_path' => (isa      => 'Str',
+                           is       => 'rw',
+                           required => 0,
+                          );
+
 __PACKAGE__->meta->make_immutable;
+
 1;
+
 __END__
 
 =head1 NAME
@@ -64,6 +71,14 @@ but before it is returned to the caller. Builds the composition accessor.
 A npg_tracking::glossary::composition object. If the derived
 class inplements id_run and position methods/attributes, a one-component
 composition is created automatically.
+
+=head2 result_file_path
+
+An optional attribute, a full path of the file with JSON serialization.
+Not expected to be assigned at the time of analysis, does not have to be
+saved to a database. Might be assigned by the application that loads the
+file-based serialized results into memory in order to cache the file path
+for possible subsequent reading by a different application.
 
 =head1 DIAGNOSTICS
 
