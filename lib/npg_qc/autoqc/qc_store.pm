@@ -193,10 +193,7 @@ sub load_from_path {
   my $c = npg_qc::autoqc::results::collection->new();
 
   foreach my $file (glob(join q[ ], @patterns)) {
-    my $r = $self->json_file2result_object($file);
-    if ($r) {
-      $c->add($r);
-    }
+    $c->add($self->json_file2result_object($file));
   }
 
   return $c;

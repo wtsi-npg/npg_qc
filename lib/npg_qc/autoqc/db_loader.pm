@@ -221,10 +221,7 @@ sub _build__collection {
   } elsif ($self->has_json_file) {
     $collection = npg_qc::autoqc::results::collection->new();
     for my $f (@{$self->json_file}) {
-      my $r = $qc_store->json_file2result_object($f);
-      if ($r) {
-        $collection->add($r);
-      }
+      $collection->add($qc_store->json_file2result_object($f));
     }
   } else {
     croak 'Either archive_path or path or json_files attribute should be set.'

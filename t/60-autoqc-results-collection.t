@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 57;
+use Test::More tests => 65;
 use Test::Exception;
 use List::MoreUtils qw/none/; 
 use File::Temp qw/tempdir/;
@@ -63,10 +63,15 @@ my $temp = tempdir( CLEANUP => 1);
     ok($c->is_empty, 'collection is empty');
     is($c->size, 0, 'empty collection has size 0');
     foreach my $pos ((1,5,7,2)) {
-       $c->add(npg_qc::autoqc::results::qX_yield->new(position => $pos, id_run => 12));
+      is ($c->add(npg_qc::autoqc::results::qX_yield->new(position => $pos, id_run => 12)),
+        1, 'result added'); 
     }
     is($c->size(), 4, 'collection size');
     ok(!$c->is_empty(), 'collection is  not empty');
+    lives_and { is $c->add(), 0 } 'add with no argument - no error';
+    is($c->size(), 4, 'collection size has not changed');
+    lives_and { is $c->add(undef), 0 } 'add with undef argument - no error';
+    is($c->size(), 4, 'collection size has not changed');
     $c->clear();
     ok($c->is_empty, 'collection is empty after clearing it');
 }
