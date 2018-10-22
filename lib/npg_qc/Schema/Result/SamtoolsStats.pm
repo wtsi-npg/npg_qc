@@ -38,11 +38,13 @@ use namespace::autoclean;
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
+=item * L<DBIx::Class::InflateColumn::Serializer>
+
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime');
+__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
 
 =head1 TABLE: C<samtools_stats>
 
@@ -151,9 +153,28 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
+=head1 L<Moose> ROLES APPLIED
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-06-14 16:17:33
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:93R50LwQgk3MdWVShyvl4A
+=over 4
+
+=item * L<npg_qc::Schema::Composition>
+
+=item * L<npg_qc::Schema::Flators>
+
+=item * L<npg_qc::autoqc::role::result>
+
+=item * L<npg_qc::autoqc::role::samtools_stats>
+
+=back
+
+=cut
+
+
+with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::samtools_stats';
+
+
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-22 10:54:55
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:sH4LYB2SLL+zYC4RjluxJw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

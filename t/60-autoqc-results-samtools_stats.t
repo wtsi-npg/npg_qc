@@ -1,10 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 use Archive::Extract;
 use Perl6::Slurp;
+use JSON qw/from_json to_json/;
 
 use npg_tracking::glossary::composition::component::illumina;
 use npg_tracking::glossary::composition::factory;
@@ -17,6 +18,48 @@ $archive = join q[/], $tempdir, $archive;
 my $file1 = join q[/], $archive, '17448_1#9_F0x900.stats';
 
 use_ok ('npg_qc::autoqc::results::samtools_stats');
+
+subtest 'selecting an object with correct filter' => sub {
+  plan tests => 9;
+
+  my $pkg = 'npg_qc::autoqc::results::samtools_stats';
+  my @results = ();
+  push @results, $pkg->load("$archive/qc/all_json/17448_1#9_F0x900.samtools_stats.json");
+  
+  my $result = $results[0]->result4visuals(\@results);
+  ok (!$result, 'object not returned');
+
+  push @results, $pkg->load("$archive/qc/all_json/17448_1#9_F0x900.samtools_stats.json");
+  ok (!$result, 'object not returned');
+
+  push @results, $pkg->load("$archive/qc/all_json/17448_1#9_F0xB00.samtools_stats.json");
+  $result = $results[0]->result4visuals(\@results);
+  ok ($result, 'object returned');
+  is ($result->filter, 'F0xB00', 'object has correct filter value');
+
+  push @results, $pkg->load("$archive/qc/all_json/17448_1#9_F0xB00.samtools_stats.json");
+  throws_ok { $results[0]->result4visuals(\@results) }
+    qr/Multiple results for filter F0xB00/,
+    'error for two objects with the same filter';
+ 
+  my $filter = 'F0x000';
+  my $r = pop @results;
+  # cannot assing the ro filter attribute directly,
+  # doing it hard way
+  my $h = from_json($r->freeze);
+  $h->{filter} = $filter;
+  $r = $pkg->thaw(to_json($h));
+  is ($r->filter, $filter, 'filter value reassigned - test prereq.');
+
+  push @results, $r;
+  $result = $results[0]->result4visuals(\@results);
+  ok ($result, 'object returned');
+  is ($result->filter, $filter, 'object has correct filter value');
+  push @results, $r;
+  throws_ok { $results[0]->result4visuals(\@results) }
+    qr/Multiple results for filter $filter/,
+    'error for two objects with the same filter';  
+};
 
 subtest 'object with an empty composition' => sub {
   plan tests => 1;
