@@ -44,7 +44,6 @@ root/src/ui_checks/bam_flagstats.tt2
 root/src/ui_checks/bcfstats.tt2
 root/src/ui_checks/checks_in_full.tt2
 root/src/ui_checks/contamination.tt2
-root/src/ui_checks/qualmap_visuals.tt2
 root/src/ui_checks/gc_bias.tt2
 root/src/ui_checks/gc_fraction.tt2
 root/src/ui_checks/genotype_call.tt2
@@ -53,6 +52,7 @@ root/src/ui_checks/insert_size.tt2
 root/src/ui_checks/pulldown_metrics.tt2
 root/src/ui_checks/qX_yield.tt2
 root/src/ui_checks/ref_match.tt2
+root/src/ui_checks/samtools_stats.tt2
 root/src/ui_checks/sequence_error.tt2
 root/src/ui_checks/tag_decode_stats.tt2
 root/src/ui_checks/tag_metrics.tt2
@@ -276,7 +276,8 @@ t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_8_tag_decode_stats.json
 t/data/qualmap/qualmap.png
 t/data/qualmap/qualmap_legend.png
-t/data/qualmap/4360_1_1.fastqcheck
+t/data/qualmap/4360_1#1.stats
+t/data/qualmap/26607_1#20_F0xB00.samtools_stats.json
 t/data/results/7928_2.genotype.json
 t/data/test_app.conf
 t/data/test_app_no_db.conf

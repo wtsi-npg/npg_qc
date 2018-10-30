@@ -32,6 +32,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - samtools stats file parser
  - qX_yield and gc_fraction autoqc checks to use samtools stats files
    instead of fastqcheck file
+ - SeqQC: heatmaps from samtools stats files as a source
 
 release 65.4.1
  - store value of output_dir from the RNA-SeQC check into the database

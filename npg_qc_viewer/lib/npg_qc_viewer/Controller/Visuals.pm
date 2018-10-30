@@ -3,9 +3,9 @@ package npg_qc_viewer::Controller::Visuals;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
+use List::MoreUtils qw/any/;
 
-use npg_qc::autoqc::role::rpt_key;
-use npg_qc::autoqc::qc_store::options qw/ $LANES /;
+use npg_tracking::glossary::composition::factory::rpt_list;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -26,45 +26,23 @@ Catalyst Controller.
 
 =head1 SUBROUTINES/METHODS
 
-=cut
-
-sub _render {
-  my ($self, $c, $method, @args) = @_;
-
-  my $image_string;
-  try {
-    $image_string = $c->model(q[QualityHeatmap])->$method(@args);
-  } catch {
-    $c->error($_);
-  };
-
-  if ($image_string) {
-    $c->res->content_type(q[image/png]);
-    $c->res->body( $image_string );
-  } else {
-    $c->error(qq[image string empty for $method]);
-  }
-
-  return;
-}
-
-
 =head2 base 
 
 Action for the base controller path
 
 =cut
+
 sub base :Chained('/') :PathPart('visuals') :CaptureArgs(0) {
   my ($self, $c) = @_;
   return;
 }
-
 
 =head2 qualmap
 
 An action for generating quality by cycle heatmaps
 
 =cut
+
 sub qualmap :Chained('base') :PathPath('qualmap') :Args(0) {
   my ( $self, $c) = @_;
 
@@ -72,17 +50,7 @@ sub qualmap :Chained('base') :PathPath('qualmap') :Args(0) {
 
   my $rpt_list = $params->{'rpt_list'};
   if (!$rpt_list) {
-     $c->error(q['rpt_list' parameter is required]);
-     return;
-  }
-  my $args = npg_qc::autoqc::role::rpt_key->inflate_rpts($rpt_list);
-  if (@{$args} > 1) {
-    $c->error(q[Fastqcheck visualisation is not available for multiple components]);
-    return;
-  }
-  $args = $args->[0];
-  if (defined $args->{'tag_index'}) {
-    $c->error(q[Fastqcheck visualisation is not available for plexes]);
+    $c->error(q['rpt_list' parameter is required]);
     return;
   }
   my $read = $params->{'read'};
@@ -91,28 +59,32 @@ sub qualmap :Chained('base') :PathPath('qualmap') :Args(0) {
     return;
   }
 
-  my $init = {'option' => $LANES};
-  $init->{'db_qcresults_lookup'} = $params->{'db_lookup'} ? 1 : 0;
-  $init->{'npg_tracking_schema'} = $c->model('NpgDB')->schema();
-  $init->{'id_run'} = $args->{'id_run'};
-  $init->{'positions'}  = [$args->{'position'}];
-  my $query = npg_qc::autoqc::qc_store::query->new($init);
-
-  my $model = $c->model('Check');
-  my $paths_list = $params->{'paths_list'};
-  if ($paths_list) {
-    if (! ref $paths_list) {
-      $paths_list = [$paths_list];
+  my $result;
+  try {
+    my $file_path = $params->{'file_path'};
+    my $model = $c->model('Check');
+    if ($file_path) {
+      $result = $model->json_file2result_object($file_path);
+    } else {
+      if ($model->use_db) {
+        my $composition = npg_tracking::glossary::composition::factory::rpt_list
+                          ->new(rpt_list => $rpt_list)
+                          ->create_composition();
+        my @rows = $model->qc_schema->resultset('SamtoolsStats')
+                         ->search_via_composition([$composition])->all();
+        if (@rows) {
+          $result = $rows[0]->result4visuals(\@rows);
+        }
+      }
     }
-  }
-  my $content = $paths_list
-    ? $model->load_fastqcheck_content_from_path($query, $paths_list, $read)
-    : $model->load_fastqcheck_content($query, $read);
+  } catch {
+    $c->error($_);
+  };
 
-  if ($content) {
-    $self->_render($c, q[data2image], $content, $read);
+  if ($result) {
+    $self->_render($c, q[data2image], $result, $read);
   } else {
-    $c->error('Failed to load content for ' . $query->to_string);
+    $c->error("Failed to load samtools stats result object for $rpt_list");
   }
 
   return;
@@ -123,9 +95,23 @@ sub qualmap :Chained('base') :PathPath('qualmap') :Args(0) {
 An action for generating a legend for quality by cycle heatmaps
 
 =cut
+
 sub qualmap_legend :Chained('base') :PathPath('qualmap_legend') :Args(0) {
   my ( $self, $c) = @_;
   $self->_render($c, q[legend]);
+  return;
+}
+
+sub _render {
+  my ($self, $c, $method, @args) = @_;
+
+  try {
+    $c->res->content_type(q[image/png]);
+    $c->res->body($c->model(q[QualityHeatmap])->$method(@args));
+  } catch {
+    $c->error($_);
+  };
+
   return;
 }
 
@@ -150,7 +136,11 @@ __END__
 
 =item Try::Tiny
 
+=item List::MoreUtils
+
 =item Catalyst::Controller
+
+=item npg_tracking::glossary::composition::factory::rpt_list
 
 =back
 

@@ -15,10 +15,11 @@ sub result4visuals {
   my $result;
 
   my %filters = map { $_ => 1 } @FILTER_VALUES4VISUALS;
-  foreach my $r ( @{$ss_results} ) {
+  foreach my $r ( grep { !$_->composition->get_component(0)->subset } @{$ss_results} ) {
     my $f = $r->filter;
     if ($filters{$f}) {
       if (ref $filters{$f}) {
+        carp ref $filters{$f};
         croak "Multiple results for filter $f";
       }
       $filters{$f} = $r;
