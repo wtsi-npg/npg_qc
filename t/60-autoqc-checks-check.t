@@ -243,54 +243,9 @@ subtest 'temporary directory and path tests' => sub {
 };
 
 subtest 'finding input' => sub {
-    plan tests => 19;
-
-    my @checks = ();
-    push @checks, npg_qc::autoqc::checks::check->new(
-                rpt_list  => '2549:1',
-                qc_in     => $path,
-                file_type => q[fastqcheck]);    
-    push @checks, npg_qc::autoqc::checks::check->new(
-                position  => 1,
-                qc_in     => $path,
-                id_run    => 2549,
-                file_type => q[fastqcheck]);
-    foreach my $check (@checks) {
-        is (join( q[ ], $check->get_input_files()),
-            "$path/2549_1_1.fastqcheck $path/2549_1_2.fastqcheck",
-            'two fastqcheck input files found');
-        cmp_deeply ($check->generate_filename_attr(), ['2549_1_1.fastqcheck', '2549_1_2.fastqcheck'],
-            'output filename structure');
-    }
-
-    @checks = ();
-    push @checks, npg_qc::autoqc::checks::check->new(
-                position  => 1,
-                path      => $path,
-                id_run    => 2549,
-                tag_index => 33,
-                file_type => q[fastqcheck]);
-    push @checks, npg_qc::autoqc::checks::check->new(
-                rpt_list  => '2549:1:33',
-                path      => $path,
-                id_run    => 2549,
-                tag_index => 33,
-                file_type => q[fastqcheck]);
-    foreach my $check (@checks) {
-        is (join( q[ ], $check->get_input_files()),
-            "$path/2549_1_1#33.fastqcheck $path/2549_1_2#33.fastqcheck",
-            'two fastqcheck input files found');
-    }
+    plan tests => 12;
 
     my $check = npg_qc::autoqc::checks::check->new(
-                position  => 2,
-                path      => $path,
-                id_run    => 2549,
-                file_type => q[fastqcheck]);
-    is (join( q[ ], $check->get_input_files()), "$path/2549_2_1.fastqcheck",
-        'one fastqcheck input files found; with _1 to identify the end');
-
-    $check = npg_qc::autoqc::checks::check->new(
                 position  => 3,
                 path      => $path,
                 id_run    => 2549);
@@ -353,13 +308,13 @@ subtest 'finding input' => sub {
 
     throws_ok { npg_qc::autoqc::checks::check->new(
                     rpt_list  => '2549:1;45:7',
-                    file_type => q[fastqcheck])->input_files() }
+                    file_type => q[fastq])->input_files() }
         qr/Multiple components, input file\(s\) should be given/,
         'cannot infer input files for multiple components';
     throws_ok { npg_qc::autoqc::checks::check->new(
                     rpt_list  => '2549:1;45:7',
                     qc_in     => $path,
-                    file_type => q[fastqcheck])->input_files() }
+                    file_type => q[fastq])->input_files() }
         qr/Multiple components, input file\(s\) should be given/,
         'cannot infer input files for multiple components';
     lives_ok { npg_qc::autoqc::checks::check->new(
@@ -432,38 +387,27 @@ subtest 'creating a result object' => sub {
 };
 
 subtest 'filename generation' => sub {
-    plan tests => 14;
+    plan tests => 7;
 
     my $check = npg_qc::autoqc::checks::check->new(
-        position => 1, path => 't', id_run => 5,);
-    is($check->create_filename(), '5_1', '5_1');
-    is($check->create_filename(1), '5_1_1', '5_1_1');
-    is($check->create_filename('t'), '5_1_t', '5_1_t');
-    is($check->create_filename(2), '5_1_2', '5_1_2');
+        position => 1, qc_in => 't', id_run => 5,);
+    throws_ok { $check->create_filename() } qr/File name root is required/,
+      'file name root is required';
+    is($check->create_filename('5_1'), '5_1.fastq');
+    is($check->create_filename('5_1', 1), '5_1_1.fastq');
+    is($check->create_filename('5_1', 2), '5_1_2.fastq');
 
     $check = npg_qc::autoqc::checks::check->new(
         position => 1, path => 't', id_run => 5, tag_index => 3);
-    is($check->create_filename(), '5_1#3', '5_1 tag 3');
-    is($check->create_filename(1), '5_1_1#3', '5_1_1 tag 3');
-    is($check->create_filename(2), '5_1_2#3', '5_1_2 tag 3');
+    is($check->create_filename('5_1#3', 1), '5_1#3_1.fastq');
 
     $check = npg_qc::autoqc::checks::check->new(
-        position => 1, path => 't', id_run => 5, tag_index => 0);
-    is($check->create_filename(), '5_1#0', '5_1 tag 0');
-    is($check->create_filename(1), '5_1_1#0', '5_1_1 tag 0');
-    is($check->create_filename(2), '5_1_2#0', '5_1_2 tag 0');
+        position => 1, qc_in => 't', id_run => 5, tag_index => 3, file_type => 'stats');    
+    is($check->create_filename('5_1#3'), '5_1#3_F0xB00.stats');
 
-    $check = npg_qc::autoqc::checks::check->new(path => 't', rpt_list => '2549:1');
-    is($check->create_filename(), '2549_1', q[file name for 2549_1]);
-    $check = npg_qc::autoqc::checks::check->new(path => 't', rpt_list => '2549:1:0');
-    is($check->create_filename(), '2549_1#0', q[file name for 2549_1 tag 0]);
-    $check = npg_qc::autoqc::checks::check->new(path => 't', rpt_list => '2549:1:5');
-    is($check->create_filename(), '2549_1#5', q[file name for 2549_1 tag 5]);
-
-    $check = npg_qc::autoqc::checks::check->new(path => 't', rpt_list => '2549:1;45:9');
-    throws_ok { $check->create_filename() }
-        qr/Multiple components, cannot generate file name/,
-        'cannot create file name for multiple components';
+    $check = npg_qc::autoqc::checks::check->new(qc_in => 't', rpt_list => '2549:1;2549:9');
+    lives_ok { $check->create_filename('2549_1-9') }
+      'can create file name for multiple components';
 };
 
 subtest 'running the check' => sub {
@@ -471,8 +415,9 @@ subtest 'running the check' => sub {
 
     my $check = npg_qc::autoqc::checks::check->new(
                 id_run    => 2549,
-                position  => 1,
-                file_type => q[fastqcheck],
+                position  => 6,
+                tag_index => 1,
+                file_type => q[fastq],
                 qc_in     => $path,
                 qc_out    => $tdir);
     is($check->can_run(), 1, 'can run');
@@ -480,12 +425,12 @@ subtest 'running the check' => sub {
       'no lims accessor - reference cannot be considered as human');
     $check->run();
     isa_ok($check->result(), 'npg_qc::autoqc::results::result');
-    my $jpath = "$tdir/2549_1.result.json";
+    my $jpath = "$tdir/2549_6#1.result.json";
     ok(-e $jpath, 'output json file exists');
     my $result = npg_qc::autoqc::results::result->load($jpath);
     isa_ok($result, 'npg_qc::autoqc::results::result');
     is($result->id_run, 2549, 'run id');
-    is($result->position, 1, 'position');
+    is($result->position, 6, 'position');
 };
 
 1;

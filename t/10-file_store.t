@@ -20,8 +20,8 @@ my $schema = Moose::Meta::Class->create_anon_class(
 }
 
 {
-  my $s = npg_qc::file_store->new(path => ['t/data/fastqcheck/4308']);
-  is (scalar @{$s->_get_files}, 3, 'three fastqcheck files found');
+  my $s = npg_qc::file_store->new(path => ['t/data/fastqcheck']);
+  is (scalar @{$s->_get_files}, 2, 'two fastqcheck files found');
 }
 
 {
@@ -52,7 +52,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
 {
   my $rs = $schema->resultset('Fastqcheck');
 
-  my $path = 't/data/fastqcheck/4308';
+  my $path = 't/data/fastqcheck';
   my $s = npg_qc::file_store->new(path => [$path], schema => $schema);
   my $num_saved;
   lives_ok {$num_saved = $s->save_files} 'saving files lives';
