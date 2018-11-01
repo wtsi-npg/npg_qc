@@ -12,7 +12,7 @@ with qw( npg_tracking::glossary::moniker);
 our $VERSION = '0';
 
 Readonly::Scalar our $DEFAULT_EXT     => q[stats];
-Readonly::Scalar our $DEFAULT_SUFFIX  => q[F0x00];
+Readonly::Scalar our $DEFAULT_SUFFIX  => q[F0x000];
 
 =head1 NAME
 
