@@ -9,7 +9,8 @@ use File::Spec::Functions qw( splitpath );
 use Carp;
 use Readonly;
 
-extends qw(npg_qc::autoqc::results::base);
+extends qw(npg_qc::autoqc::results::result);
+with qw(npg_qc::autoqc::role::result);
 
 our $VERSION = '0';
 
@@ -17,7 +18,7 @@ Readonly::Scalar my $STATS_FILTER => '[[:alnum:]]+[\_[:lower:]]*?';
 
 has 'stats_file'     => (
     isa        => 'NpgTrackingReadableFile',
-    is         => 'ro',
+    is         => 'rw',
     traits     => [ 'DoNotSerialize' ],
     required   => 0,
 );

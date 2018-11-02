@@ -1,0 +1,101 @@
+# This file was produced by samtools stats (1.8-59-g4da22a9+htslib-1.8-48-g6cd9f24) and can be plotted using plot-bamstats
+# This file contains statistics for all reads.
+# The command line was:  stats -
+# CHK, Checksum	[2]Read Names	[3]Sequences	[4]Qualities
+# CHK, CRC32 of reads which passed filtering followed by addition (32bit overflow)
+CHK	c555d4a4	e160141c	2c1d98d0
+# Summary Numbers. Use `grep ^SN | cut -f 2-` to extract this part.
+SN	raw total sequences:	23652830
+SN	filtered sequences:	0
+SN	sequences:	23652830
+SN	is sorted:	1
+SN	1st fragments:	11826415
+SN	last fragments:	11826415
+SN	reads mapped:	0
+SN	reads mapped and paired:	0	# paired-end technology bit set + both mates mapped
+SN	reads unmapped:	23652830
+SN	reads properly paired:	0	# proper-pair bit set
+SN	reads paired:	23652830	# paired-end technology bit set
+SN	reads duplicated:	0	# PCR or optical duplicate bit set
+SN	reads MQ0:	0	# mapped and MQ=0
+SN	reads QC failed:	0
+SN	non-primary alignments:	0
+SN	total length:	1773962250	# ignores clipping
+SN	total first fragment length:	886981125	# ignores clipping
+SN	total last fragment length:	886981125	# ignores clipping
+SN	bases mapped:	0	# ignores clipping
+SN	bases mapped (cigar):	0	# more accurate
+SN	bases trimmed:	0
+SN	bases duplicated:	0
+SN	mismatches:	0	# from NM fields
+SN	error rate:	0.000000e+00	# mismatches / bases mapped (cigar)
+SN	average length:	75
+SN	average first fragment length:	75
+SN	average last fragment length:	75
+SN	maximum length:	75
+SN	maximum first fragment length:	75
+SN	maximum last fragment length:	75
+SN	average quality:	36.1
+SN	insert size average:	0.0
+SN	insert size standard deviation:	0.0
+SN	inward oriented pairs:	0
+SN	outward oriented pairs:	0
+SN	pairs with other orientation:	0
+SN	pairs on different chromosomes:	0
+SN	percentage of properly paired reads (%):	0.0
+# First Fragment Qualities. Use `grep ^FFQ | cut -f 2-` to extract this part.
+# Columns correspond to qualities and rows to cycles. First column is the cycle number.
+FFQ	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	102314	0	101565	0	0	0	0	0	0	0	0	0	0	158387	92874	44862	2397274	3962124	4311760	595185	60070	0	0	0	0	0
+FFQ	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	79727	0	59747	0	0	0	0	0	0	0	0	0	0	123133	91199	78965	1879114	3853280	4739505	828431	93314	0	0	0	0	0
+FFQ	3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	73280	0	47818	0	0	0	0	0	0	0	0	0	0	96411	86141	84842	1684731	3804582	4863964	968804	115842	0	0	0	0	0
+FFQ	4	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	67437	0	38087	0	0	0	0	0	0	0	0	0	0	75089	81111	83295	1565097	3803130	4946314	1040849	126006	0	0	0	0	0
+FFQ	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	104466	0	64308	0	0	0	0	0	0	0	0	0	0	75292	132068	143998	1631205	3728810	4864113	966734	115421	0	0	0	0	0
+FFQ	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	4880	898	89181	387	42870	23540	19433	0	0	0	0	0	0	0	0	41432	64727	110990	389899	1646113	1964969	755222	42087	6629787	0	0	0	0
+FFQ	7	0	0	0	0	0	0	0	0	0	0	0	0	0	0	6487	316	84983	3121	36064	20660	16628	0	0	0	0	0	0	1401	0	41967	59537	106093	385942	1632570	1993987	763899	42609	6630151	0	0	0	0
+FFQ	8	0	0	0	0	0	0	0	0	0	0	0	0	8329	0	88	853	89857	9256	32518	21631	17625	0	0	0	1757	93	164	21	1	43583	71054	146324	407992	1635399	2024247	717499	44027	6554097	0	0	0	0
+FFQ	9	0	0	0	0	0	0	0	0	0	0	0	0	9582	0	173	1863	87122	13737	25964	20127	16481	0	0	0	2224	3	9300	7719	5776	46365	77719	125950	384581	1617864	2036673	732544	47334	6557314	0	0	0	0
+FFQ	10	0	0	0	0	0	0	0	0	0	0	0	0	10507	2	252	3430	82427	15567	21493	18567	14372	0	0	0	2498	4	9418	7751	6116	45522	74976	122130	374628	1604427	2042693	738953	50856	6579826	0	0	0	0
+FFQ	11	0	0	0	0	0	0	0	0	0	0	0	0	11984	1	418	5447	80432	17817	19325	18328	14817	0	0	0	2773	1	10095	8171	6525	44105	76001	121602	368668	1592739	2035932	743032	52668	6595534	0	0	0	0
+FFQ	12	0	0	0	0	0	0	0	0	0	0	0	0	13664	9	527	7378	76369	17542	17718	16990	13684	0	0	0	3090	2	10507	8040	6727	43640	73018	118381	361862	1574474	2026045	746525	54994	6635229	0	0	0	0
+FFQ	13	0	0	0	0	0	0	0	0	0	0	0	0	15703	3	890	9715	73428	18001	17716	16912	11507	2282	0	0	3392	1	11907	8797	6940	2580	54922	21343	100144	101176	177903	33586	288396	739265	10109906	0	0	0
+FFQ	14	0	0	0	0	0	0	0	0	0	0	0	0	17207	3	1018	12655	68239	16943	16955	15226	10708	2103	0	0	3844	5	11891	8188	7232	2876	53459	20991	98157	97738	170675	32535	284337	726297	10147133	0	0	0
+FFQ	15	0	0	0	0	0	0	0	0	0	0	0	0	20151	5	1262	16509	64832	16888	17005	15376	10612	2017	0	0	4144	4	13127	9271	7390	2860	53224	19924	96518	96766	170508	32630	280162	717335	10157895	0	0	0
+#
+# SNIP, SNIP
+#
+LBC	51	24.15	25.46	25.96	24.43	0.00	0.00
+LBC	52	24.31	25.32	26.02	24.35	0.00	0.00
+LBC	53	24.31	25.24	25.94	24.51	0.00	0.00
+LBC	54	24.10	25.50	25.98	24.42	0.00	0.00
+LBC	55	24.30	25.36	26.01	24.33	0.00	0.00
+LBC	56	24.30	25.26	25.94	24.50	0.00	0.00
+LBC	57	24.10	25.49	25.97	24.44	0.00	0.00
+LBC	58	24.29	25.32	26.01	24.38	0.00	0.00
+LBC	59	24.31	25.24	25.89	24.55	0.00	0.00
+LBC	60	24.15	25.48	25.93	24.44	0.00	0.00
+LBC	61	24.33	25.35	25.97	24.35	0.00	0.00
+LBC	62	24.30	25.27	25.89	24.54	0.00	0.00
+LBC	63	24.13	25.47	25.94	24.45	0.00	0.00
+LBC	64	24.30	25.32	26.00	24.38	0.00	0.00
+LBC	65	24.33	25.27	25.87	24.53	0.00	0.00
+LBC	66	24.12	25.50	25.87	24.51	0.00	0.00
+LBC	67	24.34	25.33	25.92	24.41	0.00	0.00
+LBC	68	24.35	25.27	25.83	24.54	0.00	0.00
+LBC	69	24.17	25.49	25.84	24.50	0.00	0.00
+LBC	70	24.36	25.32	25.91	24.41	0.00	0.00
+LBC	71	24.37	25.27	25.80	24.56	0.00	0.00
+LBC	72	24.18	25.50	25.84	24.48	0.00	0.00
+LBC	73	24.36	25.36	25.88	24.40	0.00	0.00
+LBC	74	24.42	25.27	25.78	24.53	0.00	0.00
+LBC	75	24.14	25.49	25.93	24.44	0.00	0.00
+# Insert sizes. Use `grep ^IS | cut -f 2-` to extract this part. The columns are: insert size, pairs total, inward oriented pairs, outward oriented pairs, other pairs
+# Read lengths. Use `grep ^RL | cut -f 2-` to extract this part. The columns are: read length, count
+RL	75	23652830
+# Read lengths - first fragments. Use `grep ^FRL | cut -f 2-` to extract this part. The columns are: read length, count
+FRL	75	11826415
+# Read lengths - last fragments. Use `grep ^LRL | cut -f 2-` to extract this part. The columns are: read length, count
+LRL	75	11826415
+# Indel distribution. Use `grep ^ID | cut -f 2-` to extract this part. The columns are: length, number of insertions, number of deletions
+# Indels per cycle. Use `grep ^IC | cut -f 2-` to extract this part. The columns are: cycle, number of insertions (fwd), .. (rev) , number of deletions (fwd), .. (rev)
+# Coverage distribution. Use `grep ^COV | cut -f 2-` to extract this part.
+# GC-depth. Use `grep ^GCD | cut -f 2-` to extract this part. The columns are: GC%, unique sequence percentiles, 10th, 25th, 50th, 75th and 90th depth percentile
