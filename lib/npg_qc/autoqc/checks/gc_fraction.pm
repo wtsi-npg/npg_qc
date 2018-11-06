@@ -46,6 +46,8 @@ Readonly::Scalar my $APP        => q[npgqc];
 Readonly::Scalar my $MAX_DELTA  => 20;
 Readonly::Array  my @READS      => qw/ forward reverse /;
 
+Readonly::Scalar our $SSTATS_FILTER  => q[F0xB00];
+
 =head2 aligner
 
 Overrides an attribute with the same name in npg_tracking::data::reference::find.
@@ -53,13 +55,22 @@ Defaults to te name of the application that will access the data, ie npgqc.
 
 =cut
 
-has '+aligner'            => (default     => $APP,);
+has '+aligner'        => (default => $APP,);
 
 =head2 file_type
 
 =cut
 
-has '+file_type' => (default    => $EXT,);
+has '+file_type'      => (default => $EXT,);
+
+=head2 suffix
+
+Input file name suffix. The filter used in samtools stats command to
+produce the input samtools stats file. Defaults to F0xB00.
+
+=cut
+
+has '+suffix'         => (default => $SSTATS_FILTER,);
 
 =head2 is_paired_read
 

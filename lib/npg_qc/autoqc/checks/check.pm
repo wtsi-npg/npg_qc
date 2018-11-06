@@ -27,7 +27,6 @@ our $VERSION = '0';
 
 Readonly::Scalar my $FILE_EXTENSION  => 'fastq';
 Readonly::Scalar my $HUMAN           => q[Homo_sapiens];
-Readonly::Scalar my $SSTATS_FILTER   => q[F0xB00];
 Readonly::Scalar my $FORWARD_READ_FILE_NAME_SUFFIX => q[1];
 Readonly::Scalar my $REVERSE_READ_FILE_NAME_SUFFIX => q[2];
 
@@ -50,8 +49,6 @@ for a plex (index, lanelet) or for a composition of the former defined by the
 rpt_list attribute.
 
 =head1 SUBROUTINES/METHODS
-
-=cut
 
 =head2 rpt_list
 
@@ -113,7 +110,7 @@ sub _build_composition {
   return $self->create_composition();
 }
 
-with qw/npg_tracking::glossary::moniker/; # => { -excludes => 'dir_path'};
+with qw/npg_tracking::glossary::moniker/;
 
 =head2 BUILD
 
@@ -124,7 +121,6 @@ A constructor helper, runs after the default constructor.
 sub BUILD {
   my $self = shift;
   $self->composition();
-  #apply_all_roles( $self, 'npg_tracking::glossary::moniker' );
   return;
 }
 
@@ -224,6 +220,18 @@ has 'file_type' => (isa        => 'Str',
                     required   => 0,
                     default    => $FILE_EXTENSION,
                    );
+
+=head2 suffix
+
+Input file name suffix. The semantics to be defined by a specific
+check object. An optional attribute.
+
+=cut
+
+has 'suffix' => (isa        => 'Str',
+                 is         => 'ro',
+                 required   => 0,
+                );
 
 =head2 input_files
 
@@ -374,6 +382,7 @@ Error if the only input file or an input file for the
 forward read is not found.
 
 =cut
+
 sub get_input_files {
   my $self = shift;
 
@@ -448,8 +457,8 @@ sub create_filename {
   $file_name_root or croak 'File name root is required';
 
   my $name = $file_name_root;
-  if ($self->file_type eq 'stats') {
-    $name = $self->file_name_full($name, suffix => $SSTATS_FILTER);
+  if ($self->suffix) {
+    $name = $self->file_name_full($name, suffix => $self->suffix );
   }
   if ($end) {
     $name = $self->file_name_full($name, suffix => $end);

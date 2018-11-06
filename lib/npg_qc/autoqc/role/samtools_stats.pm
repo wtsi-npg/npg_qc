@@ -4,6 +4,8 @@ use Moose::Role;
 use Readonly;
 use Carp;
 
+with qw(npg_qc::autoqc::role::result);
+
 our $VERSION = '0';
 
 Readonly::Array my @FILTER_VALUES4VISUALS => qw/F0x000 F0xB00/;

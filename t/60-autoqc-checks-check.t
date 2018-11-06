@@ -402,7 +402,8 @@ subtest 'filename generation' => sub {
     is($check->create_filename('5_1#3', 1), '5_1#3_1.fastq');
 
     $check = npg_qc::autoqc::checks::check->new(
-        position => 1, qc_in => 't', id_run => 5, tag_index => 3, file_type => 'stats');    
+        position => 1, qc_in => 't', id_run => 5, tag_index => 3,
+        file_type => 'stats', suffix => 'F0xB00');    
     is($check->create_filename('5_1#3'), '5_1#3_F0xB00.stats');
 
     $check = npg_qc::autoqc::checks::check->new(qc_in => 't', rpt_list => '2549:1;2549:9');

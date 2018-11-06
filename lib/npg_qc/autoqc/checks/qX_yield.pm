@@ -34,8 +34,6 @@ Inherits from npg_qc::autoqc::checks::check.
 
 Uses samtools stats file to compute number of bases at a number of quality values (20, 30, 40).
 
-=head1 SUBROUTINES/METHODS
-
 =cut
 
 Readonly::Array  my @QUALITY_THRESHOLDS        => (20, 30, 40);
@@ -45,7 +43,26 @@ Readonly::Scalar my $DEFAULT_READ_LENGTH_HS    => 75;
 Readonly::Scalar my $THOUSAND                  => 1000;
 Readonly::Array  my @READS                     => qw/ forward reverse /;
 
+Readonly::Scalar our $SSTATS_FILTER            => q[F0xB00];
+
+=head1 SUBROUTINES/METHODS
+
+=head2 file_type
+
+Input file type extension.  Default - stats.
+
+=cut
+
 has '+file_type'        => (default => $EXT,);
+
+=head2 suffix
+
+Input file name suffix. The filter used in samtools stats command to
+produce the input samtools stats file. Defaults to F0xB00.
+
+=cut
+
+has '+suffix'           => (default => $SSTATS_FILTER,);
 
 =head2 platform_is_hiseq
 

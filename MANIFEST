@@ -32,6 +32,7 @@ lib/npg_qc/autoqc/checks/pulldown_metrics.pm
 lib/npg_qc/autoqc/checks/qX_yield.pm
 lib/npg_qc/autoqc/checks/ref_match.pm
 lib/npg_qc/autoqc/checks/rna_seqc.pm
+lib/npg_qc/autoqc/checks/samtools_stats.pm
 lib/npg_qc/autoqc/checks/sequence_error.pm
 lib/npg_qc/autoqc/checks/spatial_filter.pm
 lib/npg_qc/autoqc/checks/tag_metrics.pm
@@ -495,6 +496,9 @@ t/data/autoqc/tag_metrics/samplesheet_6553.csv
 t/data/autoqc/dbix_loader/is/12187_2.insert_size.json
 t/data/autoqc/population_snv_with_vcf/Anopheles_gambiae/default/Standard/PEST/test.vcf.gz
 t/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5/test.vcf.gz
+t/data/autoqc/samtools_stats/27178_1#1_F0x900.stats
+t/data/autoqc/samtools_stats/27178_1_F0x000.altstats
+t/data/autoqc/samtools_stats/27178_1_F0x000.stats
 t/data/autoqc/st/samples/1898.xml
 t/data/autoqc/st/batches/2797.xml
 t/data/autoqc/st/batches/3432.xml
