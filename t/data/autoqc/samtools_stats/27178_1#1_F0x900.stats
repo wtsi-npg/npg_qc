@@ -1,0 +1,125 @@
+# This file was produced by samtools stats (1.8-59-g4da22a9+htslib-1.8-48-g6cd9f24) and can be plotted using plot-bamstats
+# This file contains statistics for all reads.
+# The command line was:  stats -r /lustre/scratch117/core/sciops_repository/references/Escherichia_coli/B_strain/all/fasta/E_coli_B_strain.fasta -F 0x900 -
+# CHK, Checksum	[2]Read Names	[3]Sequences	[4]Qualities
+# CHK, CRC32 of reads which passed filtering followed by addition (32bit overflow)
+CHK	1e02f442	993e66af	e1602ef1
+# Summary Numbers. Use `grep ^SN | cut -f 2-` to extract this part.
+SN	raw total sequences:	54378
+SN	filtered sequences:	0
+SN	sequences:	54378
+SN	is sorted:	1
+SN	1st fragments:	27189
+SN	last fragments:	27189
+SN	reads mapped:	54045
+SN	reads mapped and paired:	53860	# paired-end technology bit set + both mates mapped
+SN	reads unmapped:	333
+SN	reads properly paired:	53780	# proper-pair bit set
+SN	reads paired:	54378	# paired-end technology bit set
+SN	reads duplicated:	107	# PCR or optical duplicate bit set
+SN	reads MQ0:	862	# mapped and MQ=0
+SN	reads QC failed:	0
+SN	non-primary alignments:	0
+SN	total length:	4078350	# ignores clipping
+SN	total first fragment length:	2039175	# ignores clipping
+SN	total last fragment length:	2039175	# ignores clipping
+SN	bases mapped:	4053375	# ignores clipping
+SN	bases mapped (cigar):	4048883	# more accurate
+SN	bases trimmed:	0
+SN	bases duplicated:	8025
+SN	mismatches:	6936	# from NM fields
+SN	error rate:	1.713065e-03	# mismatches / bases mapped (cigar)
+SN	average length:	75
+SN	average first fragment length:	75
+SN	average last fragment length:	75
+SN	maximum length:	75
+SN	maximum first fragment length:	75
+SN	maximum last fragment length:	75
+SN	average quality:	36.8
+SN	insert size average:	433.7
+SN	insert size standard deviation:	107.9
+SN	inward oriented pairs:	26900
+SN	outward oriented pairs:	12
+SN	pairs with other orientation:	18
+SN	pairs on different chromosomes:	0
+SN	percentage of properly paired reads (%):	98.9
+# First Fragment Qualities. Use `grep ^FFQ | cut -f 2-` to extract this part.
+# Columns correspond to qualities and rows to cycles. First column is the cycle number.
+FFQ	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	202	0	215	0	0	0	0	0	0	0	0	0	0	310	195	105	5054	8644	10640	1639	185	0	0	0	0	0
+FFQ	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	149	0	137	0	0	0	0	0	0	0	0	0	0	230	220	204	3841	8213	11656	2265	274	0	0	0	0	0
+FFQ	3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	140	0	80	0	0	0	0	0	0	0	0	0	0	181	135	136	3366	8011	11976	2801	363	0	0	0	0	0
+FFQ	4	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	133	0	72	0	0	0	0	0	0	0	0	0	0	132	146	146	3019	8084	12110	2947	400	0	0	0	0	0
+FFQ	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	192	0	106	0	0	0	0	0	0	0	0	0	0	146	254	274	3320	8008	11788	2730	371	0	0	0	0	0
+FFQ	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	5	0	167	0	74	44	30	0	0	0	0	0	0	0	0	80	131	192	845	3397	4661	1680	127	15756	0	0	0	0
+FFQ	7	0	0	0	0	0	0	0	0	0	0	0	0	0	0	5	0	171	5	74	52	20	0	0	0	0	0	0	0	0	84	106	201	845	3266	4701	1708	114	15837	0	0	0	0
+FFQ	8	0	0	0	0	0	0	0	0	0	0	0	0	7	0	0	0	170	13	75	41	33	0	0	0	3	0	0	0	0	85	132	246	791	3382	4760	1742	126	15583	0	0	0	0
+FFQ	9	0	0	0	0	0	0	0	0	0	0	0	0	10	0	0	4	179	28	49	41	35	0	0	0	4	0	5	6	6	82	103	195	821	3291	4809	1717	122	15682	0	0	0	0
+FFQ	10	0	0	0	0	0	0	0	0	0	0	0	0	12	0	0	4	172	33	51	39	32	0	0	0	2	0	10	3	3	86	116	207	762	3214	4918	1726	127	15672	0	0	0	0
+FFQ	11	0	0	0	0	0	0	0	0	0	0	0	0	15	0	0	10	158	37	45	31	35	0	0	0	2	0	6	3	10	101	103	189	782	3204	4796	1768	144	15750	0	0	0	0
+FFQ	12	0	0	0	0	0	0	0	0	0	0	0	0	5	0	0	9	177	35	35	41	29	0	0	0	2	0	9	3	10	88	87	214	807	3205	4790	1819	142	15682	0	0	0	0
+FFQ	13	0	0	0	0	0	0	0	0	0	0	0	0	11	0	0	15	158	41	36	27	31	6	0	0	4	0	9	5	7	2	97	17	203	168	377	62	650	1180	24083	0	0	0
+FFQ	14	0	0	0	0	0	0	0	0	0	0	0	0	17	0	0	21	133	45	49	27	21	2	0	0	2	0	7	7	7	2	88	21	202	147	352	63	621	1135	24220	0	0	0
+FFQ	15	0	0	0	0	0	0	0	0	0	0	0	0	15	0	1	35	129	37	44	31	20	5	0	0	3	0	4	3	6	2	81	23	195	180	330	66	607	1157	24215	0	0	0
+FFQ	16	0	0	0	0	0	0	0	0	0	0	0	0	15	0	2	38	118	35	39	37	21	3	0	0	6	0	15	6	6	7	62	19	177	170	365	66	596	1137	24249	0	0	0
+FFQ	17	0	0	0	0	0	0	0	0	0	0	0	0	21	0	2	44	128	34	26	29	27	2	0	0	2	0	6	4	5	3	65	23	202	164	355	72	613	1187	24175	0	0	0
+#
+# SNIP, SNIP
+#
+# Indels per cycle. Use `grep ^IC | cut -f 2-` to extract this part. The columns are: cycle, number of insertions (fwd), .. (rev) , number of deletions (fwd), .. (rev)
+IC	7	0	0	1	0
+IC	8	0	0	1	0
+IC	9	0	0	0	2
+IC	11	0	0	2	0
+IC	16	0	0	1	1
+IC	18	0	0	1	1
+IC	19	0	0	1	0
+IC	20	0	0	1	0
+IC	22	0	0	0	2
+IC	26	0	0	1	0
+IC	29	0	0	0	1
+IC	31	0	0	0	1
+IC	32	0	0	0	2
+IC	33	0	0	0	2
+IC	35	1	0	1	0
+IC	36	0	0	1	1
+IC	37	0	1	0	0
+IC	38	0	0	1	0
+IC	43	0	0	1	0
+IC	45	0	0	1	0
+IC	46	0	0	1	0
+IC	47	0	0	1	0
+IC	48	1	0	0	0
+IC	49	0	0	1	1
+IC	51	0	0	1	2
+IC	54	0	0	1	0
+IC	56	0	0	1	0
+IC	57	0	0	1	0
+IC	62	0	0	0	1
+IC	64	0	0	2	0
+IC	68	0	0	0	1
+IC	70	0	1	0	0
+IC	72	0	1	0	1
+# Coverage distribution. Use `grep ^COV | cut -f 2-` to extract this part.
+COV	[1-1]	1	1684597
+COV	[2-2]	2	742735
+COV	[3-3]	3	216852
+COV	[4-4]	4	45304
+COV	[5-5]	5	7991
+COV	[6-6]	6	919
+COV	[7-7]	7	174
+COV	[8-8]	8	44
+# GC-depth. Use `grep ^GCD | cut -f 2-` to extract this part. The columns are: GC%, unique sequence percentiles, 10th, 25th, 50th, 75th and 90th depth percentile
+GCD	0.0	0.858	0.000	0.000	0.000	0.000	0.000
+GCD	0.5	1.288	0.274	0.274	0.274	0.274	0.274
+GCD	44.0	1.717	0.746	0.746	0.746	0.746	0.746
+GCD	45.0	3.433	0.803	0.803	0.803	0.803	0.840
+GCD	46.0	6.009	0.720	0.720	0.772	0.934	0.941
+GCD	47.0	9.871	0.697	0.765	0.832	0.870	0.926
+GCD	48.0	15.021	0.686	0.795	0.844	0.919	0.949
+GCD	49.0	24.464	0.634	0.716	0.821	0.983	1.005
+GCD	50.0	38.627	0.690	0.784	0.896	0.938	1.005
+GCD	51.0	62.232	0.731	0.799	0.881	0.949	1.005
+GCD	52.0	81.974	0.799	0.848	0.896	0.952	1.016
+GCD	53.0	93.133	0.735	0.803	0.866	0.971	1.050
+GCD	54.0	98.283	0.780	0.844	0.919	0.952	0.971
+GCD	55.0	100.000	0.795	0.795	0.836	0.848	0.870
