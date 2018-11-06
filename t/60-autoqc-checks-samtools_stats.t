@@ -41,7 +41,7 @@ subtest 'plex level with qc_in, ext default value, suffix specified' => sub {
 subtest 'plex level with qc_in, suffix default value, ext specified' => sub { 
   plan tests => 4;
 
-  my $check = npg_qc::autoqc::checks::samtools_stats->new(rpt_list=>'27178:1', qc_in => 't/data/autoqc/samtools_stats', qc_out => $dir, ext => 'altstats', );
+  my $check = npg_qc::autoqc::checks::samtools_stats->new(rpt_list=>'27178:1', qc_in => 't/data/autoqc/samtools_stats', qc_out => $dir, file_type => 'altstats', );
   isa_ok ($check, 'npg_qc::autoqc::checks::samtools_stats');
 
   is_deeply ($check->input_files, ['t/data/autoqc/samtools_stats/27178_1_F0x000.altstats'], 'input files checked - expected one found');

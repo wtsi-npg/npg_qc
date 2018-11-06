@@ -2,11 +2,9 @@ package npg_qc::autoqc::checks::samtools_stats;
 
 use Moose;
 use namespace::autoclean;
-use Carp;
 use Readonly;
 
 extends qw(npg_qc::autoqc::checks::check);
-with qw( npg_tracking::glossary::moniker);
 
 ## no critic (Documentation::RequirePodAtEnd)
 our $VERSION = '0';
@@ -30,29 +28,26 @@ A check which stores results from samtools stats file in standard QC JSON format
 
 =head1 SUBROUTINES/METHODS
 
-=head2 ext
+=head2 new
+
+Moose-based.
+
+=head2 file_type
 
 Input file type extension.  Default - stats.
 
 =cut
 
-has 'ext' => (isa        => 'Str',
-              is         => 'ro',
-              required   => 0,
-              default    => $DEFAULT_EXT,
-              );
+has '+file_type' => ( default => $DEFAULT_EXT, );
 
 =head2 suffix
 
-Input file type extension.  Default - stats.
+Input file name suffix. The filter used in samtools stats command to
+produce the input samtools stats file. Defaults to F0x000.
 
 =cut
 
-has 'suffix' => (isa        => 'Str',
-                 is         => 'ro',
-                 required   => 0,
-                 default    => $DEFAULT_SUFFIX,
-                 );
+has '+suffix' => ( default => $DEFAULT_SUFFIX, );
 
 =head2 execute
 
@@ -71,23 +66,6 @@ override 'execute' => sub {
   return 1;
 };
 
-=head2 input_files
-
-=cut
-
-#####
-# Custom builder for the input_files attribute 
-#
-sub _build_input_files {
-  my $self = shift;
-
-  if(!$self->has_qc_in) { croak 'qc_out should be defined'; }
-
-  my $ffn = File::Spec->catdir($self->qc_in, $self->file_name_full($self->file_name, ext => $self->ext, suffix => $self->suffix));
-
-  return [ $ffn ];
-}
-
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -95,33 +73,13 @@ __PACKAGE__->meta->make_immutable();
 __END__
 
 
-=head1 NAME
-
-npg_qc::autoqc::checks::spatial_filter
-
-=head1 SYNOPSIS
-
-    use npg_qc::autoqc::checks::spatial_filter;
-
-=head1 DESCRIPTION
-
-    Parse stats files produced by spatial_filter application and aggregate number of reads filtered
-
-=head1 SUBROUTINES/METHODS
-
-=head2 new
-
-    Moose-based.
-
 =head1 DIAGNOSTICS
-
-    None.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 INCOMPATIBILITIES
 
-    None known.
+None known.
 
 =head1 BUGS AND LIMITATIONS
 
@@ -133,11 +91,13 @@ npg_qc::autoqc::checks::spatial_filter
 
 =item namespace::autoclean
 
+=item Readonly
+
 =back
 
 =head1 AUTHOR
 
-    David K. Jackson
+Kevin Lewis
 
 =head1 LICENSE AND COPYRIGHT
 
