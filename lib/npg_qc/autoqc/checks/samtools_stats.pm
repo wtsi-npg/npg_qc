@@ -4,13 +4,14 @@ use Moose;
 use namespace::autoclean;
 use Readonly;
 
+use npg_qc::autoqc::constants qw/ $SAMTOOLS_NO_FILTER /;
+
 extends qw(npg_qc::autoqc::checks::check);
 
 ## no critic (Documentation::RequirePodAtEnd)
 our $VERSION = '0';
 
 Readonly::Scalar our $DEFAULT_EXT     => q[stats];
-Readonly::Scalar our $DEFAULT_SUFFIX  => q[F0x000];
 
 =head1 NAME
 
@@ -47,7 +48,7 @@ produce the input samtools stats file. Defaults to F0x000.
 
 =cut
 
-has '+suffix' => ( default => $DEFAULT_SUFFIX, );
+has '+suffix'    => ( default => $SAMTOOLS_NO_FILTER, );
 
 =head2 execute
 

@@ -8,6 +8,7 @@ use Math::Round qw(round);
 use Try::Tiny;
 
 use npg_qc::autoqc::parse::samtools_stats;
+use npg_qc::autoqc::constants qw/ $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER /;
 
 extends qw(npg_qc::autoqc::checks::check);
 
@@ -43,8 +44,6 @@ Readonly::Scalar my $DEFAULT_READ_LENGTH_HS    => 75;
 Readonly::Scalar my $THOUSAND                  => 1000;
 Readonly::Array  my @READS                     => qw/ forward reverse /;
 
-Readonly::Scalar our $SSTATS_FILTER            => q[F0xB00];
-
 =head1 SUBROUTINES/METHODS
 
 =head2 file_type
@@ -62,7 +61,7 @@ produce the input samtools stats file. Defaults to F0xB00.
 
 =cut
 
-has '+suffix'           => (default => $SSTATS_FILTER,);
+has '+suffix' => (default => $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER,);
 
 =head2 platform_is_hiseq
 

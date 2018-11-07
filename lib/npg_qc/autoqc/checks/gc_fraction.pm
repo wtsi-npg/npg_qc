@@ -9,6 +9,7 @@ use Try::Tiny;
 
 use npg_tracking::util::abs_path qw(abs_path);
 use npg_qc::autoqc::parse::samtools_stats;
+use npg_qc::autoqc::constants qw/ $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER /;
 use npg_common::sequence::reference::base_count;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -36,8 +37,6 @@ Inherits from npg_qc::autoqc::checks::check.
 Parses out gc percent for a sequence from a samtools stats file
 and evaluates this value against the gc content of the reference genome.
 
-=head1 SUBROUTINES/METHODS
-
 =cut
 
 Readonly::Scalar my $EXT        => 'stats';
@@ -46,7 +45,7 @@ Readonly::Scalar my $APP        => q[npgqc];
 Readonly::Scalar my $MAX_DELTA  => 20;
 Readonly::Array  my @READS      => qw/ forward reverse /;
 
-Readonly::Scalar our $SSTATS_FILTER  => q[F0xB00];
+=head1 SUBROUTINES/METHODS
 
 =head2 aligner
 
@@ -70,7 +69,7 @@ produce the input samtools stats file. Defaults to F0xB00.
 
 =cut
 
-has '+suffix'         => (default => $SSTATS_FILTER,);
+has '+suffix' => (default => $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER,);
 
 =head2 is_paired_read
 
