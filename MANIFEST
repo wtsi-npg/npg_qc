@@ -18,6 +18,7 @@ Changes
 lib/npg_qc/illumina/loader/Cluster_Density.pm
 lib/npg_qc/illumina/loader.pm
 lib/npg_qc/autoqc/autoqc.pm
+lib/npg_qc/autoqc/constants.pm
 lib/npg_qc/autoqc/checks/adapter.pm
 lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/checks/bam_flagstats.pm
