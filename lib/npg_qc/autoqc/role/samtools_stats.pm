@@ -4,11 +4,15 @@ use Moose::Role;
 use Readonly;
 use Carp;
 
-with qw(npg_qc::autoqc::role::result);
+use npg_qc::autoqc::constants qw/
+         $SAMTOOLS_NO_FILTER
+         $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER
+                                /;
 
 our $VERSION = '0';
 
-Readonly::Array my @FILTER_VALUES4VISUALS => qw/F0x000 F0xB00/;
+Readonly::Array my @FILTER_VALUES4VISUALS   =>
+  ($SAMTOOLS_NO_FILTER, $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER);
 
 sub result4visuals {
   my ($self, $ss_results) = @_;
@@ -17,11 +21,11 @@ sub result4visuals {
   my $result;
 
   my %filters = map { $_ => 1 } @FILTER_VALUES4VISUALS;
-  foreach my $r ( grep { !$_->composition->get_component(0)->subset } @{$ss_results} ) {
+  foreach my $r ( grep { !$_->composition->get_component(0)->subset }
+                       @{$ss_results} ) {
     my $f = $r->filter;
     if ($filters{$f}) {
       if (ref $filters{$f}) {
-        carp ref $filters{$f};
         croak "Multiple results for filter $f";
       }
       $filters{$f} = $r;
