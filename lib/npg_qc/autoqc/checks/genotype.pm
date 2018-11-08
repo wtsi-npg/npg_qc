@@ -9,7 +9,6 @@ use List::MoreUtils qw(any none);
 use File::Slurp;
 use JSON;
 use Readonly;
-use FindBin qw($Bin);
 use Try::Tiny;
 use IO::All;
 
@@ -92,12 +91,6 @@ sub _build_bcftools {
 	return $self->bcftools_name;
 }
 
-has 'genotype_executables_path' => (
-	is => 'ro',
-	isa => 'Str',
-	default => sub { return $Bin },
-);
-
 # sequenom_plex - this specifies the source of the genotype data
 has 'sequenom_plex' => (
 	is => 'ro',
@@ -168,12 +161,8 @@ has 'min_sample_call_rate' => (
 has 'gt_pack_cmd' => (
 	is => 'ro',
 	isa => 'Str',
-	lazy_build => 1,
+	default => q{gt_pack},
 );
-sub _build_gt_pack_cmd {
-	my ($self) = @_;
-	return $self->genotype_executables_path() . q{/gt_pack};
-}
 
 has 'gt_pack_flags' => (
 	is => 'ro',
@@ -195,12 +184,8 @@ has 'gt_pack_args' => (
 has 'find_gt_match_cmd' => (
 	is => 'ro',
 	isa => 'Str',
-	lazy_build => 1,
+	default => q{find_gt_match},
 );
-sub _build_find_gt_match_cmd {
-	my ($self) = @_;
-	return $self->genotype_executables_path() . q{/find_gt_match};
-}
 
 has 'find_gt_match_flags' => (
 	is => 'ro',
@@ -751,8 +736,6 @@ npg_qc::autoqc::checks::genotype - compare genotype from bam with Sequenom QC re
 
 =item Readonly
 
-=item FindBin
-
 =item Try::Tiny
 
 =item IO:All
@@ -773,7 +756,7 @@ Kevin Lewis, kl2
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2018 GRL
 
     This file is part of NPG.
 
