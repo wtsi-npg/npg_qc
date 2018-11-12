@@ -104,12 +104,15 @@ sub data2image { ##no critic (ProhibitExcessComplexity)
     my $num_cycles = $reads_length->{$read};
     my $num_reads  = $num_reads_all->{$read};
     my $yield      = $ss->yield_per_cycle($read);
+    if (!$num_cycles && ($read eq 'index') && $yield) {
+        $num_cycles = scalar @{$yield};
+    }
     ($num_cycles and $num_reads and $yield) or croak 'No reads or cycles quality data';
 
     my $shift = 5;
 
     my $width = $num_cycles * $shift + 60;
-    if ($read && $read =~ /^tag/smx) {
+    if ($read && $read eq 'index') {
         $width += 20;
     }
     my $height = 50 * $shift + 55;
@@ -172,13 +175,9 @@ sub data2image { ##no critic (ProhibitExcessComplexity)
         $x1 = $x2;
     }
 
-    my $xaxis_label = q[Cycle number];
-    if ($read) {
-        $xaxis_label .= qq[ ($read];
-        if ($read !~ /^tag/smx) {
-            $xaxis_label .= q[ read];
-        }
-        $xaxis_label .= q[)];
+    my $xaxis_label = qq[Cycle number, $read];
+    if ($read ne 'index') {
+        $xaxis_label .= ' read';
     }
 
     my $start_xaxis_label = (int $num_cycles*$shift/2) - 40;

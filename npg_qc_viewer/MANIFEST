@@ -275,6 +275,9 @@ t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_8.sequence_error.json
 t/data/nfs/sf44/IL38/outgoing/091106_IL38_4025/Data/Intensities/BAM_basecalls_20140819-112938/no_cal/archive/qc/4025_8_tag_decode_stats.json
 t/data/qualmap/qualmap.png
+t/data/qualmap/forward.png
+t/data/qualmap/reverse.png
+t/data/qualmap/index.png
 t/data/qualmap/qualmap_legend.png
 t/data/qualmap/4360_1#1.stats
 t/data/qualmap/26607_1#20_F0xB00.samtools_stats.json

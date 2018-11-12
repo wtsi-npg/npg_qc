@@ -31,7 +31,7 @@ subtest 'reading data' => sub {
   $s = npg_qc::autoqc::parse::samtools_stats->new(
         file_path => 't/data/samtools_stats/26607_1#20_F0xB00.stats');
   lives_ok { $s->file_content } 'reads file OK';
-  is (scalar @{$s->file_content}, 7935, 'lines in memory');
+  is (scalar @{$s->file_content}, 7812, 'lines in memory');
 
   throws_ok{npg_qc::autoqc::parse::samtools_stats->new(file_content => q[])}
     qr/Content string cannot be empty/,
@@ -66,7 +66,7 @@ subtest 'reading data' => sub {
     qr/malformed JSON string/,
     'error if json file is empty';
 
-  my $expected_lines_num = 7935;
+  my $expected_lines_num = 7812;
 
   my $ss_json = 't/data/samtools_stats/26607_1#20_F0xB00.samtools_stats.json';
   $s = npg_qc::autoqc::parse::samtools_stats->new(file_path => $ss_json);
@@ -137,7 +137,7 @@ subtest 'number of reads and existence of reverse read' => sub {
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
        't/data/samtools_stats/26607_1#20_F0xB00.stats');
   lives_ok { $s->num_reads() } 'SN section read for number of reads';
-  my $expected = {forward => 18867148, reverse => 18867148, total => 37734296};
+  my $expected = {forward => 18867148, reverse => 18867148, index => 18867148, total => 37734296};
   is_deeply ($s->num_reads(), $expected, 'paired reads - number of reads info is correct');
   ok ($s->has_reverse_read, 'has reverse read');
   ok (!$s->has_no_reads, 'has reads');
@@ -145,7 +145,7 @@ subtest 'number of reads and existence of reverse read' => sub {
   # single run
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
           't/data/samtools_stats/27053_1#1.single.stats');
-  $expected = {forward => 5887348, reverse => 0, total => 5887348};
+  $expected = {forward => 5887348, reverse => 0, index => 5887348, total => 5887348};
   lives_ok { $s->num_reads() } 'SN section read for number of reads';
   is_deeply ($s->num_reads(), $expected, 'single read - number of reads info is correct');
   ok (!$s->has_reverse_read, 'does not have reverse read');
@@ -154,7 +154,7 @@ subtest 'number of reads and existence of reverse read' => sub {
   # zero reads
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
           't/data/samtools_stats/27258_1#1.empty.stats');
-  $expected = {forward => 0, reverse => 0, total => 0};
+  $expected = {forward => 0, reverse => 0, index => 0, total => 0};
   lives_ok { $s->num_reads() } 'SN section read for number of reads';
   is_deeply ($s->num_reads(), $expected, 'zero reads - number of reads info is correct');
   ok (!$s->has_reverse_read, 'does not have reverse read');
@@ -210,7 +210,7 @@ subtest 'reads length' => sub {
 };
 
 subtest 'yield per cycle' => sub {
-  plan tests => 13;
+  plan tests => 18;
 
   my $s = npg_qc::autoqc::parse::samtools_stats->new(
      file_content => ['SN  some fragments',
@@ -241,6 +241,9 @@ subtest 'yield per cycle' => sub {
   my @max_qs = uniq map {scalar @{$_}} @{$m};
   is (scalar @max_qs, 1, 'the same number of qs in every row');
   is ($max_qs[0], 39, 'max quality is 39');
+  my $yield_index = $s->yield_per_cycle('index');
+  ok ($yield_index, 'yield for index read of a single run is defined');
+  is (scalar @{$yield_index}, 8, 'qualities for 8 cycles');
 
   # zero reads
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
@@ -249,6 +252,8 @@ subtest 'yield per cycle' => sub {
     'yield for reverse read of a no-reads run is undefined');
   is ($s->yield_per_cycle('forward'), undef,
     'yield for forward read of a no-reads run is undefined');
+  is ($s->yield_per_cycle('index'), undef,
+    'yield for index read of a no-reads run is undefined');
 
   # paired run
   $s = npg_qc::autoqc::parse::samtools_stats->new( file_path =>
@@ -258,6 +263,9 @@ subtest 'yield per cycle' => sub {
   @max_qs = uniq map {scalar @{$_}} @{$m};
   is (scalar @max_qs, 1, 'the same number of qs in every row');
   is ($max_qs[0], 43, 'max quality is 43');
+  $yield_index = $s->yield_per_cycle('index');
+  ok ($yield_index, 'yield for index read of a single run is defined');
+  is (scalar @{$yield_index}, 16, 'qualities for 16 cycles');
 };
 
 subtest 'total yield' => sub {

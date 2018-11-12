@@ -1,4 +1,5 @@
-[% studies = {}; FOREACH lane_key IN sorted_rl_map_keys -%]
+[% studies = {};
+   FOREACH lane_key IN sorted_rl_map_keys -%]
   [%
      lane_collection = rl_map.${lane_key};
      NEXT IF (!lane_collection || lane_collection.size == 0);
@@ -10,7 +11,9 @@
      trimmed_lane_collection = lane_collection.remove('check_name', to_remove);
      IF ss_collection.size;
        # add back samtools_stats result with the filter we want, if any
-       trimmed_lane_collection.add(ss_collection.get(0).result4visuals(ss_collection.results));
+       # assign to a variablr to avoid printing to a page the return value
+       # of the function
+       added=trimmed_lane_collection.add(ss_collection.get(0).result4visuals(ss_collection.results));
      END;
      checks = trimmed_lane_collection.results;
 

@@ -181,7 +181,7 @@ sub _build_num_reads {
   my ($n3) = $self->_summary =~ /\s sequences:(\d+)     \s/xms;
   (defined $n1 and defined $n2 and defined $n3) or croak 'Failed to get number of reads';
 
-  return {$FORWARD_READ => $n1, $REVERSE_READ => $n2, $TOTAL => $n3};
+  return {$FORWARD_READ => $n1, $REVERSE_READ => $n2, $INDEX_READS => $n1, $TOTAL => $n3};
 }
 
 =head2 reads_length
