@@ -1,8 +1,5 @@
 [% USE Number.Format(THOUSANDS_SEP=',') %]
 
-[% IF check.comments -%]
-[% END %]
-
 [% IF !check.genes_detected.defined; %]
      <div class="data_table">
      <table title="rna_seqc summary info">
@@ -64,28 +61,14 @@
      </tr>
      </table>
      </div>
-     <div class="data_table">
-[%   IF id_run.defined && position.defined;
-       IF c.model('NpgDB').resultset('Run').find(id_run).is_tag_set('staging');
+[% IF run_is_on_staging;
+     <div>
          base = base_url _ '/cgi-bin/locate_runfolder';
-         run_folder_glob = id_run;
-         npg_run_row = c.model('NpgDB').resultset('Run').find(id_run);
-         attrs = util.inflate_rpt_key(lane_key);
-         tag_index = attrs.defined('tag_index') ? attrs.tag_index : '';
-         IF npg_run_row;
-           rfglob = npg_run_row.folder_path_glob;
-           rfname = npg_run_row.folder_name;
-           IF rfglob && rfname;
-             run_folder_glob = rfglob _ rfname;
-           END;
-         END;
-         rna_seqc_output_dir = id_run _ '_' _ position;
-         IF tag_index.defined;
-           rna_seqc_output_dir = rna_seqc_output_dir _ '%23' _ tag_index;
-         END;
-         rna_seqc_output_dir = rna_seqc_output_dir _ '_rna_seqc' %]
-         <p>Other RNA-SeQC <a href="[% base %]/[% run_folder_glob %]/Latest_Summary/archive/lane[% position %]/qc/[% rna_seqc_output_dir | url %]?redir">metrics</a>.</p>
-[%     END; 
-     END %]
+         dir = check.rna_seqc_report_path || '';
+         dir.replace('/analysis/', '/{analysis,outgoing}/');
+         dir.replace('/outgoing/', '/{analysis,outgoing}/');
+         dir = base_url _ '/cgi-bin/locate_runfolder/' _ dir; %]
+       Other RNA-SeQC <a href="[% dir | url %]?redir">metrics</a>
      </div>
+[% END %]
 [% END %]
