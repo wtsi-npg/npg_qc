@@ -61,12 +61,13 @@
      </tr>
      </table>
      </div>
-[% IF run_is_on_staging;
+[% run_is_on_staging = c.model('NpgDB').resultset('Run').find(id_run).is_tag_set('staging');
+   IF run_is_on_staging; %]
      <div>
-         base = base_url _ '/cgi-bin/locate_runfolder';
+      [% base = base_url _ '/cgi-bin/locate_runfolder';
          dir = check.rna_seqc_report_path || '';
-         dir.replace('/analysis/', '/{analysis,outgoing}/');
-         dir.replace('/outgoing/', '/{analysis,outgoing}/');
+         dir = dir.replace('/analysis/', '/*/');
+         dir = dir.replace('/outgoing/', '/*/');
          dir = base_url _ '/cgi-bin/locate_runfolder/' _ dir; %]
        Other RNA-SeQC <a href="[% dir | url %]?redir">metrics</a>
      </div>
