@@ -29,6 +29,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
     of an explicit list of input files (that approach became unworkable
     with highly plexed lanes)
  - add result_file_path attribute to file-based result objects
+ - SeqQC:
+     links for latest ivc and analysis removed since the target files are
+       no longer produced;
+     link for full rna seqc analysis follows info in the result object
 
 release 65.4.1
  - store value of output_dir from the RNA-SeQC check into the database
