@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<run id_run="27483" batch_id="65196" id_instrument="115" expected_cycle_count="166" actual_cycle_count="166" priority="1" id_run_pair="0" is_paired="0" team="A" id_instrument_format="10" flowcell_id="CCU2BANXX" folder_name="181116_HS33_27483_A_CCU2BANXX" folder_path_glob="/{export,nfs}/sf47/ILorHSany_sf47/*/" name="HS33_27483" loader="pav" loading_date="2018-11-16" run_folder="181116_HS33_27483_A_CCU2BANXX">
+ <instrument id_instrument="115" name="HS33" id_instrument_format="10" external_name="" serial="" iscurrent="1" />
+ <run_lanes><run_lane id_run_lane="161944" id_run="27483" tile_count="48" tracks="6" position="1" />
+<run_lane id_run_lane="161945" id_run="27483" tile_count="48" tracks="6" position="2" />
+<run_lane id_run_lane="161946" id_run="27483" tile_count="48" tracks="6" position="3" />
+<run_lane id_run_lane="161947" id_run="27483" tile_count="48" tracks="6" position="4" />
+<run_lane id_run_lane="161948" id_run="27483" tile_count="48" tracks="6" position="5" />
+<run_lane id_run_lane="161949" id_run="27483" tile_count="48" tracks="6" position="6" />
+<run_lane id_run_lane="161950" id_run="27483" tile_count="48" tracks="6" position="7" />
+<run_lane id_run_lane="161951" id_run="27483" tile_count="48" tracks="6" position="8" />
+</run_lanes>
+ <current_run_status id_run_status="373582" id_run="27483" date="2018-11-22 11:11:24" id_run_status_dict="25" id_user="89" username="ces" iscurrent="1" description="qc on hold" />
+ <run_statuses>
+ <run_status id_run_status="373582" id_run="27483" date="2018-11-22 11:11:24" id_run_status_dict="25" id_user="89" username="ces" iscurrent="1" description="qc on hold" />
+ <run_status id_run_status="373472" id_run="27483" date="2018-11-21 21:03:42" id_run_status_dict="19" id_user="7" username="ces" iscurrent="0" description="qc review pending" />
+ <run_status id_run_status="373471" id_run="27483" date="2018-11-21 21:03:29" id_run_status_dict="9" id_user="7" username="ces" iscurrent="0" description="analysis complete" />
+ <run_status id_run_status="373314" id_run="27483" date="2018-11-20 16:06:07" id_run_status_dict="24" id_user="7" username="ces" iscurrent="0" description="secondary analysis in progress" />
+ <run_status id_run_status="373286" id_run="27483" date="2018-11-20 14:35:35" id_run_status_dict="7" id_user="7" username="ces" iscurrent="0" description="analysis in progress" />
+ <run_status id_run_status="373262" id_run="27483" date="2018-11-20 13:46:42" id_run_status_dict="11" id_user="7" username="ces" iscurrent="0" description="run mirrored" />
+ <run_status id_run_status="373263" id_run="27483" date="2018-11-20 13:46:42" id_run_status_dict="6" id_user="7" username="ces" iscurrent="0" description="analysis pending" />
+ <run_status id_run_status="373250" id_run="27483" date="2018-11-20 13:06:01" id_run_status_dict="4" id_user="7" username="ces" iscurrent="0" description="run complete" />
+ <run_status id_run_status="373194" id_run="27483" date="2018-11-20 09:49:43" id_run_status_dict="2" id_user="89" username="ces" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="373193" id_run="27483" date="2018-11-20 09:49:32" id_run_status_dict="25" id_user="89" username="ces" iscurrent="0" description="qc on hold" />
+ <run_status id_run_status="372770" id_run="27483" date="2018-11-16 10:51:13" id_run_status_dict="2" id_user="7" username="ces" iscurrent="0" description="run in progress" />
+ <run_status id_run_status="372747" id_run="27483" date="2018-11-16 09:43:17" id_run_status_dict="1" id_user="28" username="ces" iscurrent="0" description="run pending" />
+ </run_statuses>
+ <annotations>
+ <annotation id_run_annotation="86032" id_run="27483" id_annotation="95352" date="2018-11-19 09:55:53" id_user="89" username="ces" comment="Please hold qc for VerifyBamID results - contact ces." attachment_name="" run_current_ok="" current_cycle="113" />
+ </annotations>
+ <tags>
+   <tag id_tag="22" description="fc_slotA" />
+   <tag id_tag="20" description="multiplex" />
+   <tag id_tag="17" description="paired_read" />
+   <tag id_tag="16" description="rta" />
+   <tag id_tag="19" description="staging" />
+ </tags>
+</run>
