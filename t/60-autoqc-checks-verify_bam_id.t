@@ -114,6 +114,7 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 
 
 {
+    local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/verify_bam_id/samplesheet_27483.csv];
     my @checks = ();
     # Cases of instances like this have already been tested for above:
     #    npg_qc::autoqc::checks::verify_bam_id->new(
