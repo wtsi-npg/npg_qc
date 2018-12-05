@@ -12,7 +12,7 @@ use Class::Load qw/load_class/;
 
 use npg_tracking::illumina::runfolder;
 use npg_qc::Schema;
-use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
+use npg_qc::autoqc::qc_store::options qw/$ALL $ALLALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
 use npg_qc::autoqc::role::result;
 use npg_qc::autoqc::results::collection;
@@ -278,7 +278,8 @@ sub load_from_staging_archive { ##no critic (Subroutines::ProhibitExcessComplexi
   # Plex-level QC results for either merged or unmerged entities,
   # but not both.
   #
-  if ( $query->option == $PLEXES || $query->option == $ALL ) {
+  if ( $query->option == $PLEXES ||
+       $query->option == $ALL || $query->option == $ALLALL) {
     my $collection;
     if ($old_style) {
       push @dirs, @lane_qc_dirs;
@@ -310,7 +311,8 @@ sub load_from_staging_archive { ##no critic (Subroutines::ProhibitExcessComplexi
   #
   # We should deal with lane-level merges here - TODO.
   #
-  if ( $query->option == $LANES || ($query->option == $ALL && !$merged) ) {
+  if ( $query->option == $LANES || $query->option == $ALLALL ||
+      ($query->option == $ALL && !$merged) ) {
     push @dirs, $old_style ? $old_qc_dir : @lane_qc_dirs;
   }
 
@@ -321,9 +323,9 @@ sub load_from_staging_archive { ##no critic (Subroutines::ProhibitExcessComplexi
 
   #####
   # Filter results for one-component compositions by position.
-  # 
+  #
   if (@{$query->positions} && $old_style && $collection->size &&
-       ($query->option == $LANES || $query->option == $ALL)) {
+      $query->option != $PLEXES) {
     my @in = grep { $_->num_components > 1 || $lh{$_->position} }
              @{$collection->results};
     $collection = npg_qc::autoqc::results::collection->new();
