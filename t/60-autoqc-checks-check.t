@@ -5,6 +5,7 @@ use Test::Exception;
 use Test::Deep;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw/tempdir/;
+use File::Copy;
 use t::autoqc_util;
 
 use_ok('npg_qc::autoqc::checks::check');
@@ -27,7 +28,7 @@ subtest 'object creation' => sub {
 
 subtest 'validation of attributes' => sub {
     plan tests => 36;
-
+;
     throws_ok {npg_qc::autoqc::checks::check->new(path => $path)}
         qr/Either id_run or position key is undefined/,
         'error on instantiating an object without any id';
@@ -243,7 +244,7 @@ subtest 'temporary directory and path tests' => sub {
 };
 
 subtest 'finding input' => sub {
-    plan tests => 12;
+    plan tests => 13;
 
     my $check = npg_qc::autoqc::checks::check->new(
                 position  => 3,
@@ -307,16 +308,22 @@ subtest 'finding input' => sub {
         'cannot infer input files without qc_in';
 
     throws_ok { npg_qc::autoqc::checks::check->new(
-                    rpt_list  => '2549:1;45:7',
+                    rpt_list  => '2549:1:1;2549:2:1',
                     file_type => q[fastq])->input_files() }
-        qr/Multiple components, input file\(s\) should be given/,
+        qr/Input file\(s\) are not given, qc_in should be defined/,
         'cannot infer input files for multiple components';
-    throws_ok { npg_qc::autoqc::checks::check->new(
-                    rpt_list  => '2549:1;45:7',
-                    qc_in     => $path,
-                    file_type => q[fastq])->input_files() }
-        qr/Multiple components, input file\(s\) should be given/,
-        'cannot infer input files for multiple components';
+   
+    my $found = "$tdir/2549#1.stats";
+    copy 't/data/samtools_stats/27053_1#1.single.stats', $found
+      or die 'Faile to copy a test file';
+    my $files; 
+    lives_ok { $files = npg_qc::autoqc::checks::check->new(
+                    rpt_list  => '2549:1:1;2549:2:1',
+                    qc_in     => $tdir,
+                    file_type => q[stats])->input_files() }
+        'can infer and find input files for multiple components';
+    is_deeply ($files, [$found], 'correct input file');
+
     lives_ok { npg_qc::autoqc::checks::check->new(
                     rpt_list  => '2549:1;45:7',
                     input_files => [qw(some other)])->input_files() }

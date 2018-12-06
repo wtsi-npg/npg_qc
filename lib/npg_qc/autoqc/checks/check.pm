@@ -246,9 +246,6 @@ has 'input_files'    => (isa        => 'ArrayRef',
                         );
 sub _build_input_files {
   my $self = shift;
-  if ($self->composition->num_components > 1) {
-    croak 'Multiple components, input file(s) should be given';
-  }
   if (!$self->has_qc_in) {
     croak 'Input file(s) are not given, qc_in should be defined';
   }
