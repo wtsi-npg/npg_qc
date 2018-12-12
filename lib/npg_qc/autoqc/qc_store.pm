@@ -324,7 +324,7 @@ sub load_from_staging_archive { ##no critic (Subroutines::ProhibitExcessComplexi
   # 
   if (@{$query->positions} && $old_style && $collection->size &&
        ($query->option == $LANES || $query->option == $ALL)) {
-    my @in = grep { $_->composition->num_components > 1 || $lh{$_->position} }
+    my @in = grep { $_->num_components > 1 || $lh{$_->position} }
              @{$collection->results};
     $collection = npg_qc::autoqc::results::collection->new();
     $collection->add(\@in);
@@ -381,10 +381,9 @@ sub load_from_db {
 
   if ( @results
        && ($query->option == $ALL)
-       && (any { $_->composition->num_components > 1 } @results) ) {
-
-    @results = grep { ($_->composition->num_components != 1) ||
-                 defined $_->composition->get_component(0)->tag_index }
+       && (any { $_->num_components > 1 } @results) ) {
+    @results = grep { ($_->num_components != 1) ||
+                       defined $_->composition->get_component(0)->tag_index }
                @results;
   }
 

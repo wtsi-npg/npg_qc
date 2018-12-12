@@ -289,7 +289,7 @@ sub _validate_library_outcomes {
   my $num_undecided        = 0;
   my $all_single_component = 1;
   for my $lo (@{$lib_outcomes}) {
-    if ($all_single_component && $lo->composition->num_components > 1) {
+    if ($all_single_component && $lo->num_components > 1) {
       $all_single_component = 0;
     }
     if ($lo->is_undecided) {
