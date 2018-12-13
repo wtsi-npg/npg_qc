@@ -257,51 +257,37 @@ autoqc result objects corresponding to JSON files.
 
 =cut
 
-sub load_from_staging_archive { ##no critic (Subroutines::ProhibitExcessComplexity)
+sub load_from_staging_archive {
   my ($self, $query, $archive_path) = @_;
 
   defined $query or croak q[Query object should be defined];
   (defined $archive_path && -d $archive_path)
     or croak q[Archive directory should be defined and should exist];
 
-  my %lh           = map { $_ => 1 } @{$query->positions};
-  my @lane_dirs    = glob $self->_lane_dirs_glob($archive_path, $query);
-  my @lane_qc_dirs = map { join q[/], $_, $QC_DIR_NAME } @lane_dirs;
-  my $old_qc_dir   = join q[/], $archive_path, $QC_DIR_NAME;
-  my $old_style    = -d $old_qc_dir;
+  my @plex_globs = map { 'lane' . $_ } @{$query->positions};
+  my @lane_globs = @plex_globs ? @plex_globs : 'lane*';
+  if (-d "$archive_path/$QC_DIR_NAME") { # Old-style run folder
+    @plex_globs = @lane_globs;
+    @lane_globs = (q[]);
+  } else {
+    push @plex_globs, @plex_globs ? 'lane*-*' : 'lane*';
+    push @plex_globs, q[];
+    @plex_globs = map { $_ . '/plex*'} @plex_globs;
+  }
+  @plex_globs = map { "$archive_path/$_/$QC_DIR_NAME"} @plex_globs;
+  @lane_globs = map { "$archive_path/$_/$QC_DIR_NAME"} @lane_globs;
 
-  my @collections = ();
-  my @dirs        = ();
-  my $merged      = 0;
+  my @results = ();
+  my $merged  = 0;
 
   #####
-  # Plex-level QC results for either merged or unmerged entities,
-  # but not both.
+  # Plex-level QC results for either merged or unmerged entities.
   #
   if ( $query->option == $PLEXES ||
        $query->option == $ALL || $query->option == $ALLALL) {
-    my $collection;
-    if ($old_style) {
-      push @dirs, @lane_qc_dirs;
-    } else {
-      if (@lane_dirs) {
-        my @tdirs = map {"$_/*plex*/$QC_DIR_NAME"} @lane_dirs;
-        $collection = $self->load_from_path(@tdirs, $query);
-      }
-      # No results for one component compositions - try merges
-      if (!$collection || $collection->is_empty) {
-        my @tdirs;
-        push @tdirs, join q[/], $archive_path, 'plex*', $QC_DIR_NAME;
-        push @tdirs, join q[/], $archive_path, 'lane*-', 'plex*', $QC_DIR_NAME;
-        $collection = $self->load_from_path(@tdirs, $query);
-        if ($collection->size) {
-          $merged = 1;
-        }
-      }
-      if ($collection->size) {
-        push @collections, $collection;
-      }
-    }
+    my $collection = $self->load_from_path(@plex_globs, $query);
+    $merged = any {$_->composition->num_components > 1} @{$collection->results};
+    @results = @{$collection->results};
   }
 
   #####
@@ -313,24 +299,21 @@ sub load_from_staging_archive { ##no critic (Subroutines::ProhibitExcessComplexi
   #
   if ( $query->option == $LANES || $query->option == $ALLALL ||
       ($query->option == $ALL && !$merged) ) {
-    push @dirs, $old_style ? $old_qc_dir : @lane_qc_dirs;
+    my $collection = $self->load_from_path(@lane_globs, $query);
+    push @results, @{$collection->results};
   }
-
-  if (@dirs) {
-    push @collections, $self->load_from_path(@dirs, $query);
-  }
-  my $collection = npg_qc::autoqc::results::collection->join_collections(@collections);
 
   #####
-  # Filter results for one-component compositions by position.
+  # Filter results by position.
   #
-  if (@{$query->positions} && $old_style && $collection->size &&
-      $query->option != $PLEXES) {
-    my @in = grep { $_->num_components > 1 || $lh{$_->position} }
-             @{$collection->results};
-    $collection = npg_qc::autoqc::results::collection->new();
-    $collection->add(\@in);
+  if (@{$query->positions} && @results) {
+    my %lh = map { $_ => 1 } @{$query->positions};
+    @results = grep { any { exists $lh{$_->position} } $_->composition->components_list }
+               @results;
   }
+
+  my $collection = npg_qc::autoqc::results::collection->new();
+  $collection->add(\@results);
 
   return $collection;
 }
@@ -586,18 +569,6 @@ sub _runfolder_obj {
 sub _is_old_style_rf {
   my $rf_obj = shift;
   return -e $rf_obj->qc_path;
-}
-
-sub _lane_dirs_glob {
-  my ($self, $archive_path, $query) = @_;
-  my $glob = join q[/], $archive_path, 'lane';
-  if ($query && @{$query->positions}) {
-    my $p_string = join q[,], @{$query->positions};
-    $glob .= qq[{$p_string}];
-  } else {
-    $glob .= q[*];
-  }
-  return $glob;
 }
 
 sub _query_obj {
