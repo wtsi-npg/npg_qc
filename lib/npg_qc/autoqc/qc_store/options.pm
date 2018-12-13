@@ -8,19 +8,19 @@ use Carp;
 
 our $VERSION = '0';
 
-our @EXPORT_OK = qw/ $ALL $PLEXES $LANES $MULTI
+our @EXPORT_OK = qw/ $ALL $PLEXES $LANES $ALLALL
                      validate_option
                      option_to_string /;
 
 Readonly::Scalar our $ALL    => 1;
 Readonly::Scalar our $PLEXES => 2;
 Readonly::Scalar our $LANES  => 3;
-Readonly::Scalar our $MULTI  => 4;
+Readonly::Scalar our $ALLALL => 4;
 
 Readonly::Hash my %OPTIONS2STRING => ($ALL    => 'ALL',
                                       $PLEXES => 'PLEXES',
                                       $LANES  => 'LANES',
-                                      $MULTI  => 'MULTI',);
+                                      $ALLALL => 'ALLALL',);
 
 sub validate_option {
   my $o = shift;
@@ -48,7 +48,14 @@ npg_qc::autoqc::qc_store::options
 
 =head1 DESCRIPTION
 
-Constants to define retrival options for autoqc results
+Integer constants to define retrival options for autoqc results.
+Exported on demand.
+
+ $PLEXES  #plex-level results only
+ $LANES   #lane-level results only
+ $ALL     #everything with special rules when results for
+          #multi-component compositions are present
+ $ALLALL  #truly all
 
 =head1 SUBROUTINES/METHODS
 
