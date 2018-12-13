@@ -244,7 +244,7 @@ subtest 'temporary directory and path tests' => sub {
 };
 
 subtest 'finding input' => sub {
-    plan tests => 13;
+    plan tests => 15;
 
     my $check = npg_qc::autoqc::checks::check->new(
                 position  => 3,
@@ -322,6 +322,19 @@ subtest 'finding input' => sub {
                     qc_in     => $tdir,
                     file_type => q[stats])->input_files() }
         'can infer and find input files for multiple components';
+    is_deeply ($files, [$found], 'correct input file');
+
+    mkdir "$tdir/xxx";
+    $found = "$tdir/xxx/xx11yy22.stats";
+    open my $fh, '>', $found or die 'Cannot create a test file';
+    print $fh 'test stats file';
+    close $fh;
+    lives_ok { $files = npg_qc::autoqc::checks::check->new(
+                    rpt_list      => '2549:1:1;2549:2:1',
+                    qc_in         => "$tdir/xxx",
+                    filename_root => 'xx11yy22',
+                    file_type     => q[stats])->input_files() }
+        'can infer and find input file using a set filename_root attr';
     is_deeply ($files, [$found], 'correct input file');
 
     lives_ok { npg_qc::autoqc::checks::check->new(

@@ -384,7 +384,7 @@ sub get_input_files {
   my $self = shift;
 
   my @fnames = ();
-  my $file_name_root = $self->file_name;
+  my $file_name_root = $self->has_filename_root ? $self->filename_root : $self->file_name;
 
   my $filename = catfile($self->qc_in, $self->create_filename($file_name_root));
   if (-e $filename) {
