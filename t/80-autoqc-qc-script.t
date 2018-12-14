@@ -1,42 +1,50 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 15;
 use File::Temp qw/tempdir/;
+use Cwd;
 
-local $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc];
-my $path = qq[t/data/autoqc/123456_IL2_2222/Data/Intensities/Bustard-2009-10-01/PB_cal/archive];
+my $path = qq[t/data/samtools_stats];
 my $odir = tempdir(CLEANUP => 1);
+my $expected = join q[/], $odir, '26607_1#20.qX_yield.json';
+my $app_ref_path = join q[/], cwd, q[t/data/autoqc/gc_fraction/Homo_sapiens.NCBI36.48.dna.all.fa];
 
-my @args = ("bin/qc", "--id_run=2222", "--position=1", "--check=qX_yield", "--tag_index=1", "--qc_in=$path", "--qc_out=$odir");
+my @args = ("bin/qc", "--rpt_list=26607:1:20", "--check=qX_yield", "--qc_in=$path", "--qc_out=$odir");
 is (system(@args), 0, 'tag level - script exited normally');
-my $expected = join q[/], $odir, '2222_1#1.qX_yield.json';
 ok(-e $expected, 'json output exists');
 unlink $expected;
 
-my $command = "bin/qc --id_run 2222 --position 1 --check qX_yield --tag_index 1 --qc_in $path --qc_out $odir";
+my $command = "bin/qc --id_run 26607 --position 1 --check qX_yield --tag_index 20 --qc_in $path --qc_out $odir";
 is (system($command), 0, 'tag level - script exited normally');
 ok(-e $expected, 'json output exists');
 unlink $expected;
 
-$command = "bin/qc --id_run 2222 --position 1 --check qX_yield --tag_index 1 --qc_in $path --qc_out $odir --reference some_ref";
-is (system($command), 0, 'tag level, extra non-existing arguments - script exited normally');
-ok(-e $expected, 'json output exists');
-
-$command = "bin/qc --id_run 2222 --position 1 --check qX_yield --qc_in $path --qc_out $odir";
+$command = "bin/qc --rpt_list=26607:1:20 --check qX_yield --input_files $path/26607_1#20_F0xB00.stats --qc_out $odir";
 is (system($command), 0, 'lane level - script exited normally');
-$expected = join q[/], $odir, '2222_1.qX_yield.json';
 ok(-e $expected, 'json output exists');
+unlink $expected;
 
-$command = "bin/qc --id_run 2222 --position 1 --subset bfs_check --check qX_yield --qc_in $path --qc_out $odir";
+$command = "bin/qc --rpt_list=26607:1:20 --check qX_yield --input_files $path/26607_1#20_F0xB00.stats --qc_out $odir --is_paired_read";
 is (system($command), 0, 'lane level - script exited normally');
-$expected = join q[/], $odir, '2222_1_phix.qX_yield.json';
-ok(!-e $expected, 'json output does not exists since qX_yield does not support the subset attr');
+ok(-e $expected, 'json output exists');
+unlink $expected;
 
-$command = "bin/qc --rpt_list 2222:1:1 --check qX_yield --qc_in $path --qc_out $odir";
-is (system($command), 0, 'script exited normally');
+$command = "bin/qc --rpt_list=26607:1:20 --check qX_yield --input_files $path/26607_1#20_F0xB00.stats --qc_out $odir --no-is_paired_read";
+is (system($command), 0, 'lane level - script exited normally');
+ok(-e $expected, 'json output exists');
+unlink $expected;
 
-$command = "bin/qc --rpt_list 2222:1:1 --check qX_yield --platform_is_hiseq --qc_in $path --qc_out $odir";
-is (system($command), 0, 'script exited normally');
+$expected = join q[/], $odir, '26607_1#20.gc_fraction.json';
+
+$command = "bin/qc --rpt_list=26607:1:20 --check gc_fraction --input_files $path/26607_1#20_F0xB00.stats --qc_out $odir --is_paired_read --ref_base_count_path $app_ref_path --repository t";
+is (system($command), 0, 'lane level - script exited normally');
+ok(-e $expected, 'json output exists');
+unlink $expected;
+
+$command = "bin/qc --rpt_list=26607:1:20 --check gc_fraction --input_files $path/26607_1#20_F0xB00.stats --qc_out $odir --no-is_paired_read --ref_base_count_path $app_ref_path --repository t";
+is (system($command), 0, 'lane level - script exited normally');
+ok(-e $expected, 'json output exists');
+unlink $expected;
 
 local $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc/insert_size];
 
