@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Cwd;
-use Test::More tests => 54;
+use Test::More tests => 55;
 use Test::Exception;
 use npg_tracking::util::abs_path qw(abs_path);
 
@@ -115,27 +115,21 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 
 {
     local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/verify_bam_id/samplesheet_27483.csv];
-    my @checks = ();
-    # Cases of instances like this have already been tested for above:
-    #    npg_qc::autoqc::checks::verify_bam_id->new(
-    #       id_run => 27483, position => 1, qc_in => 't/data/autoqc/',
-    #       repository => $repos, snv_repository => $snv_repository_with_vcf);
-    # These instances test if (cD|R)NA libraries use Exome baits:
-    push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
+    # Tests if (cD|R)NA libraries use Exome baits:
+    my $r = npg_qc::autoqc::checks::verify_bam_id->new(
         rpt_list       => '27483:1:1',
         qc_in          => 't/data/autoqc/',
         repository     => $repos,
         snv_repository => $snv_repository_with_vcf);
-    foreach my $r (@checks) {
-        lives_ok {$r->result;} 'No error creating result object';
-        ok(defined $r->ref_repository(), 'A default reference repository is set');
-        like($r->lims->library_type, qr/(?:cD|R)NA/sxm, 'Library type returned OK');
-        ok($r->alignments_in_bam, 'Alignments in bam true');
-        like($r->lims->reference_genome, qr/Homo_sapiens/, 'human reference genome');
-        my $snv_path = abs_path(join '/', cwd,
-            't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Exome/GRCh38_15');
-        is($r->snv_path, $snv_path, 'snv path is set');
-    }
+    lives_ok {$r->result;} 'No error creating result object';
+    ok(defined $r->ref_repository(), 'A default reference repository is set');
+    like($r->lims->library_type, qr/(?:cD|R)NA/sxm, 'Library type returned OK');
+    ok($r->alignments_in_bam, 'Alignments in bam true');
+    like($r->lims->reference_genome, qr/Homo_sapiens/, 'human reference genome');
+    my $snv_path = abs_path(join '/', cwd,
+        't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Exome/GRCh38_15');
+    is($r->snv_path, $snv_path, 'snv path is set');
+    ok($r->can_run, 'Can run on RNA library') or diag $r->result->comments;
 }
 
 1;
