@@ -36,6 +36,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      links for latest ivc and analysis removed since the target files are
        no longer produced;
      link for full rna seqc analysis follows info in the result object
+  - remove can_run restriction of verify_bam_id check for (cD|R)NA libraries
 
 release 65.4.1
  - store value of output_dir from the RNA-SeQC check into the database

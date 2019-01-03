@@ -46,11 +46,6 @@ sub _build_bam_file {
 override 'can_run' => sub {
   my $self = shift;
 
-  if ($self->lims->library_type && $self->lims->library_type =~ /(?:cD|R)NA/sxm) {
-    $self->result->add_comment('library_type is ' . $self->lims->library_type);
-    return 0;
-  }
-
   if($self->lims->gbs_plex_name){
     $self->result->add_comment('VerifyBamID skipped for gbs plex libraries.');
     return 0;
