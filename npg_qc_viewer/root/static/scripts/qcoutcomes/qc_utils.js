@@ -10,9 +10,12 @@ define(['jquery'], function () {
   var EXCEPTION_SPLIT = /^(.*?)( at \/)/;
   var TEST_FINAL      = /(final)$/i;
   var TEST_LIKE_ID    = /^rpt_key:/;
+  var RPT_KEY_MATCH   = /^\d+:\d+$/;
 
   var buildIdSelector = function (id) {
-    return '#' + id.replace(/:/g, '\\3A ');
+    id = id.replace(/:/g, '\\3A ');
+    id = id.replace(/;/g, '\\3B ');
+    return '#' + id;
   };
 
   var buildIdSelectorFromRPT = function (rptKey) {
@@ -52,6 +55,7 @@ define(['jquery'], function () {
     $('#ajax_status').empty().append("<li class='failed_mqc'>" + message + '</li>');
   };
 
+
   var displayJqXHRError = function ( jqXHR ) {
     if ( typeof jqXHR == null || typeof jqXHR !== 'object' ) {
       throw 'Invalid parameter';
@@ -70,6 +74,20 @@ define(['jquery'], function () {
     }
     displayError(message);
   };
+  
+
+  //This method takes an rpt_key and returns a boolean evaluating wether the key defines 
+  //a lane (true) or a plex (false)
+  var isLaneKey = function (rpt_key) {
+    if ( typeof rpt_key !== 'string' ) {
+      throw 'Invalid argument';
+    }
+    if ( RPT_KEY_MATCH.exec(rpt_key) != null ) {
+      return true;
+    } else { 
+      return false; 
+    }
+  };
 
   var rptKeyFromId = function (id) {
     if ( typeof id !== 'string' ) {
@@ -81,10 +99,13 @@ define(['jquery'], function () {
     return id.substring(ID_PREFIX.length);
   };
 
-  var seqFinal = function (seqOutcomes) {
-    var seqKeys = Object.keys(seqOutcomes);
-    for ( var i = 0; i < seqKeys.length; i++ ) {
-      if ( TEST_FINAL.exec(seqOutcomes[seqKeys[i]].mqc_outcome) != null ) {
+  var allFinal = function (outcomes) {
+    var okeys = Object.keys(outcomes);
+    if (okeys.length == 0) {
+      return false;
+    }
+    for ( var i = 0; i < okeys.length; i++ ) {
+      if ( TEST_FINAL.exec(outcomes[okeys[i]].mqc_outcome) == null ) {
         return false;
       }
     }
@@ -108,8 +129,9 @@ define(['jquery'], function () {
     displayError: displayError,
     displayJqXHRError: displayJqXHRError,
     removeErrorMessages: removeErrorMessages,
+    isLaneKey: isLaneKey,
     rptKeyFromId: rptKeyFromId,
-    seqFinal: seqFinal,
+    allFinal: allFinal,
     OUTCOMES: QC_OUTCOMES
   };
 });

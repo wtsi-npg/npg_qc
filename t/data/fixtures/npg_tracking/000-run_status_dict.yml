@@ -50,15 +50,15 @@
 - description: analysis prelim
   id_run_status_dict: 14
   iscurrent: 0
-  temporal_index: ~
+  temporal_index: 997
 - description: analysis prelim complete
   id_run_status_dict: 15
   iscurrent: 0
-  temporal_index: ~
+  temporal_index: 998
 - description: run quarantined
   id_run_status_dict: 16
   iscurrent: 0
-  temporal_index: ~
+  temporal_index: 999
 - description: archival pending
   id_run_status_dict: 17
   iscurrent: 1

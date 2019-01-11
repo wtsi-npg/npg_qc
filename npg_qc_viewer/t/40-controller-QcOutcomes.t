@@ -318,7 +318,7 @@ subtest 'authentication and authorisation for an update' => sub {
 };
 
 subtest 'data validation for update requests' => sub {
-  plan tests => 14;
+  plan tests => 10;
 
   my $data = {'Action'   => 'UPDATE',
               'user'     => 'cat',
@@ -336,15 +336,6 @@ subtest 'data validation for update requests' => sub {
     'unknown outcome type present - error');
 
   delete $data->{'other'};
-  $data->{'lib'} = {'1:2;3:4' => {'mqc_outcome' => 'some'}};
-  $request = _new_post_request();
-  $request->content(encode_json($data));
-  $response = request($request);
-  is($response->code, $error_code, "error code is $error_code");
-  like ($response->content,
-    qr/Saving outcomes for multi-component compositions is not yet implemented/,
-    'multi-component compositions are not allowed');
-
   $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'Undecided'}, '1:4' => {'mqc_outcome' => ''}};
   $request = _new_post_request();
   $request->content(encode_json($data));
@@ -362,15 +353,6 @@ subtest 'data validation for update requests' => sub {
     'outcome description should not be empty');
 
   delete $data->{'lib'};
-  $data->{'uqc'} = {'1:2;3:4' => {'uqc_outcome' => 'some'}};
-  $request = _new_post_request();
-  $request->content(encode_json($data));
-  $response = request($request);
-  is($response->code, $error_code, "error code is $error_code");
-  like ($response->content,
-    qr/Saving outcomes for multi-component compositions is not yet implemented/,
-    'multi-component compositions are not allowed for uqc');
-
   $data->{'uqc'} = {'1:2' => {'uqc_outcome' => 'Undecided',
                               'rationale'   => 'something'},
                     '1:4' => {'uqc_outcome' => ''}};

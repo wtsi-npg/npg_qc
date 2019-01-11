@@ -1,9 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 48;
+use Test::More tests => 49;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::result');
+use_ok('npg_tracking::glossary::composition::factory');
+use_ok('npg_tracking::glossary::composition::component::illumina');
 
 {
     my $r = npg_qc::autoqc::results::result->new(id_run => 2, path => q[mypath], position => 1);
@@ -35,9 +37,6 @@ use_ok ('npg_qc::autoqc::results::result');
 }
 
 {
-    use_ok('npg_tracking::glossary::composition::factory');
-    use_ok('npg_tracking::glossary::composition::component::illumina');
-
     my $f = npg_tracking::glossary::composition::factory->new();
     my $c = {id_run => 3, position => 4, tag_index => 5};
     my $comp1 = npg_tracking::glossary::composition::component::illumina->new($c);
@@ -151,9 +150,6 @@ use_ok ('npg_qc::autoqc::results::result');
                                         position  => 3,
                                         id_run    => 2549,
                                                  );
-    is (npg_qc::autoqc::results::result->rpt_key_delim, q[:], 'rpt key delim');
-    is (npg_qc::autoqc::role::result->rpt_key_delim, q[:], 'rpt key delim');
-    is ($r->rpt_key_delim, q[:], 'rpt key delim');
     is ($r->rpt_key, q[2549:3], 'rpt key');
     
     $r = npg_qc::autoqc::results::result->new(
@@ -173,8 +169,24 @@ use_ok ('npg_qc::autoqc::results::result');
 
 {
     throws_ok {npg_qc::autoqc::results::result->inflate_rpt_key(q[5;6])}
-      qr/rpt string should not contain ';'/, 'error when inflating rpt key';
+        qr/Both id_run and position should be defined non-zero values /,
+        'error when inflating rpt key';
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6]), {id_run=>5,position=>6,}, 'rpt key inflated');
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:1]), {id_run=>5,position=>6,tag_index=>1}, 'rpt key inflated');
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:0]), {id_run=>5,position=>6,tag_index=>0}, 'rpt key inflated');
+}
+
+{
+  my $f = npg_tracking::glossary::composition::factory->new();
+  my $c = {id_run => 3, position => 4, tag_index => 5};
+  my $comp1 = npg_tracking::glossary::composition::component::illumina->new($c);
+  $f->add_component($comp1);
+  $c->{'position'} = 5;
+  my $comp2 = npg_tracking::glossary::composition::component::illumina->new($c);
+  $f->add_component($comp2);
+  my $r = npg_qc::autoqc::results::result->new(composition => $f->create_composition());
+  ok($r->can('result_file_path'), 'object has result_file_path accessor');
+  is($r->result_file_path, undef, 'value undefined by default');
+  lives_ok { $r->result_file_path('my path') } 'can assign a value';
+  is($r->result_file_path, 'my path', 'value was assigned correctly');
 }

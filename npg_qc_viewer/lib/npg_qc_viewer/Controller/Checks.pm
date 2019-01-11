@@ -244,7 +244,7 @@ sub _run_lanes_from_dwh {
     if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
       if ( !defined $product_metric->tag_index ||
            ( $flowcell && $flowcell->entity_type ne 'library_indexed_spike' )) {
-             #Using first tag index available as representative for the lane.
+             # Using first tag index available as representative for the lane.
 
         my $key = $product_metric->rpt_key;
         if ( $product_metric->tag_index ) {
@@ -257,10 +257,15 @@ sub _run_lanes_from_dwh {
             $is_pool = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
                        @{$lane_collection->check_names()->{'list'}};
           }
-          $row_data->{$key} =  npg_qc_viewer::Util::TransferObjectFactory->new(
-                                 product_metrics_row => $product_metric,
-                                 is_pool             => $is_pool
-                               )->create_object();
+          my $init = { 'product_metrics_row' => $product_metric };
+          $init->{'is_pool'} = $is_pool;
+          if ($retrieve_option == $ALL) {
+            # QC widgets either for lanes or libraries, but not both.
+            # Logic should eventually move to the client side Javascript.
+            $init->{'not_qcable'} = 1;
+          }
+          $row_data->{$key} =  npg_qc_viewer::Util::TransferObjectFactory
+                               ->new($init)->create_object();
         }
       }
     }

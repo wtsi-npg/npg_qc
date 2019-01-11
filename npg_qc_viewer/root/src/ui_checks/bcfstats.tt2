@@ -1,0 +1,40 @@
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+<div class="data_table">
+<table title="bcfstats">
+<tr>
+  <th class="laligned">Genotype refset name</th> <td>[% check.geno_refset_name %]</td>
+</tr>
+[%- IF check.criterion.defined -%]
+<tr><th class="laligned">Pass criterion</th> <td>[% check.criterion FILTER html %]</td></tr>
+[%- END -%]
+[%- IF check.geno_refset_path.defined -%]
+<tr><th class="laligned">Genotype refset path</th> <td>[% check.geno_refset_path %]</td></tr>
+[%- END -%]
+[%- IF check.comments.defined -%]
+<tr><th class="laligned">Comments</th><td>[% check.comments %]</td></tr>
+[%- END -%]
+</table>
+</div>
+
+<div class="data_table">
+<table title="bcfstats section two">
+<caption>Genotype comparison results</caption>
+<tr>
+  <th class="laligned">Genotypes attempted</th>
+  <th class="laligned">Genotypes called</th>
+  <th class="laligned">Genotypes passed</th>
+  <th class="laligned">Genotypes compared</th>
+  <th class="laligned">Concordance %</th>
+  <th class="laligned">NRD %</th>
+</tr>
+<tr>
+  <td>[% check.genotypes_attempted %]</td>
+  <td>[% check.genotypes_called %]</td>
+  <td>[% check.genotypes_passed %]</td>
+  <td>[% check.genotypes_compared %]</td>
+  <td>[% check.percent_condordance %]</td>
+  <td>[% check.percent_nrd %]</td>
+</tr>
+</table>
+</div>

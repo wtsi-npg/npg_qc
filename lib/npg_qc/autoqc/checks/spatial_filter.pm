@@ -3,19 +3,63 @@ package npg_qc::autoqc::checks::spatial_filter;
 use Moose;
 use namespace::autoclean;
 use Carp;
+use File::Find;
 
 extends qw(npg_qc::autoqc::checks::check);
 
+## no critic (Documentation::RequirePodAtEnd)
 our $VERSION = '0';
 
+=head1 NAME
+
+npg_qc::autoqc::checks::spatial_filter
+
+=head1 SYNOPSIS
+
+Inherits from npg_qc::autoqc::checks::check.
+See description of attributes in the documentation for that module.
+  my $check = npg_qc::autoqc::checks::spatial_filter->new(rpt_list => q{1234:1:5;1234:2:5}, --filename_root=1234_1, --qc_out=out/qc, -qc_in_roots=in/qc_dir);
+
+=head1 DESCRIPTION
+
+A check which aggregates results from spatial_filter application stats files
+
+=head1 SUBROUTINES/METHODS
+
+=head2 qc_in
+
+Array reference with names of input directories to be searched for stats files
+
+=cut
+
+has '+qc_in' => (isa => 'ArrayRef');
+
+=head2 execute
+
+=cut
+
 override 'execute' => sub {
-  my ($self) = @_;
-  my $filter_stats_file_name_glob = $self->qc_in . q{/} . $self->id_run . '_' . $self->position . q{*.spatial_filter.stats};
-  my @filter_stats_files = glob $filter_stats_file_name_glob or
-    croak "Cannot find any filter stats files using $filter_stats_file_name_glob";
-  $self->result->parse_output(\@filter_stats_files); #read stderr from spatial_filter -a for each sample
+  my $self = shift;
+  super();
+  # Read from stats files produced by spatial filter application for each sample
+  $self->result->parse_output($self->input_files);
   return 1;
 };
+
+=head2 input_files
+
+=cut
+
+#####
+# Custom builder for the input_files attribute 
+#
+sub _build_input_files {
+  my $self = shift;
+  my @infiles = ();
+  find(sub { if( /spatial_filter.stats$/smx ) { push @infiles, $File::Find::name }}, @{$self->qc_in});
+  @infiles = sort @infiles;
+  return \@infiles;
+}
 
 __PACKAGE__->meta->make_immutable();
 
@@ -34,8 +78,7 @@ npg_qc::autoqc::checks::spatial_filter
 
 =head1 DESCRIPTION
 
-    Parse err stream from spatial_filter -a to record number of read filtered
-
+    Parse stats files produced by spatial_filter application and aggregate number of reads filtered
 
 =head1 SUBROUTINES/METHODS
 
@@ -71,7 +114,7 @@ npg_qc::autoqc::checks::spatial_filter
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

@@ -5,7 +5,6 @@
   WRAPPER qsea_wrapper.tt2;
   PROCESS urls.tt2;
   checks_info = collection_all.check_names; # used in collapser menu template too
-
   tag_metrics_cache = {};
   temp = [];
   FOREACH check_name IN checks_info.list;
@@ -20,6 +19,8 @@
 
   checks_list=temp;
   map=checks_info.map;
+
+  run_is_on_staging = 0;
 
   tag_metrics_collection = collection_all.search(check_name => 'tag metrics');
   FOREACH tag_metrics_result IN tag_metrics_collection.results;
@@ -59,7 +60,11 @@
     <li><a href="[% c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), run_id_to_link) %]">Back to Run [% run_id_to_link %]</a></li>
   </ul>
 [%- END %]
-[%- IF run_view.defined && run_view %][% PROCESS ui_runs/run_menu.tt2 -%][% END %]
+[%- IF run_view.defined && run_view;
+      run_is_on_staging = c.model('NpgDB').resultset('Run').find(id_run).is_tag_set('staging');
+      PROCESS ui_runs/run_menu.tt2;
+    END;
+-%]
   <ul>
     <li><a href='#' id='summary_to_csv' title='Download the summary table as a CSV file'>Summary to CSV file</a></li>
   </ul>
@@ -77,6 +82,7 @@
 [%- PROCESS ui_lanes/checks_header.tt2 -%]
 </tr>
 </thead>
+<tbody>
 [%- qxTotal = 0; #For total qxYield
 
     #For heatmaps
@@ -88,12 +94,14 @@
     FOREACH lane_key IN sorted_rl_map_keys;
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
-      attrs = util.inflate_rpt_key(lane_key);
+      attrs = util.rpt_list2one_hash(lane_key);
+      entity_is_lane = util.is_lane_key(lane_key);
+      proxy_key = util.rpt_list2first_rpt_key(lane_key);
       id_run   = attrs.id_run;
       id_runs_in_collection.push(id_run);
       position  = attrs.position;
       tag_index = attrs.defined('tag_index') ? attrs.tag_index : '';
-      row_info_to = c.stash.row_data.$lane_key || {};
+      row_info_to = c.stash.row_data.$proxy_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
       table_row_id = lane_key.defined ? ' id="rpt_key:' _ lane_key _ '"' : '';
 -%]
@@ -165,6 +173,7 @@
 [%- END -%]
 [%# Calculating totals for qXyield end %]
 [%- END -%]
+</tbody>
 </table>
 
 [%-

@@ -122,6 +122,8 @@ define([], function () {
     '    <tr>',
     '      <th class="check_labels">decode rate, %<br>CV %</th>',
     '    </tr>',
+    '  </thead>',
+    '  <tbody>',
     '    <tr id="rpt_key:18000:2">',
     '      <td class="lib nbsp"><div class="rel_pos_container"><span class="lib nbsp">NT743240I</span></div></td>',
     '      <td class="id_run"><div class="rel_pos_container">18000<br>158</div></td>',
@@ -170,6 +172,7 @@ define([], function () {
     '      <td class="tag_info"><a href="#18000:2:0">0</a> </td>',
     '      <td class="check_summary outcome_unknown">0.82</td>',
     '    </tr>',
+    '  </tbody>',
     '</table>'
   ].join("\n");
 
@@ -230,11 +233,20 @@ define([], function () {
     '</table>'
   ].join("\n");
 
+  var fixtures_menu_links = [
+    '<div id="menu">',
+        '<div id="links">',
+          '<ul><li><a href="#" id="summary_to_csv">Summary to CSV file</a></li></ul>',
+        '</div>',
+    '</div>'
+  ].join("\n");
+
   return {
     fixtures_seq_display:       fixtures_seq_display,
     fixtures_seq_mixed:         fixtures_seq_mixed,
     fixtures_lib_mixed:         fixtures_lib_mixed,
-    fixtures_lib_nothing_to_qc: fixtures_lib_nothing_to_qc
+    fixtures_lib_nothing_to_qc: fixtures_lib_nothing_to_qc,
+    fixtures_menu_links:        fixtures_menu_links
   };
 });
 

@@ -1,15 +1,12 @@
-[%-
-  fnames = c.model('SeqStore', {qc_schema => c.model('NpgQcDB').schema, npg_tracking_schema => c.model('NpgDB').schema}).files(util.inflate_rpt_key(lane_key), db_lookup, path_list);
-  IF fnames.size;
-    use_db = fnames.db_lookup;
-    fnames.delete('db_lookup');
-    FOREACH key IN fnames.keys.sort;
-      fname =  fnames.item("$key");
-      #action_plot and action_legend are defined in library_lanes
+[%
+    reads = ['forward', 'reverse'];
+    IF row_info_to.is_pool;
+      reads.push('index');
+    END;
+    FOREACH read IN reads;
 -%]
 
-<img src="/static/images/waiting.gif" data-src="[% c.uri_for_action(action_plot, {path => "$fname", read => "$key", 'db_lookup' => "$use_db"}) | html %]"  alt="visualization for [% fname %]" />
+<img src="/static/images/waiting.gif" data-src="[% c.uri_for_action(action_plot, {paths_list => $path_list, rpt_list => "$lane_key", read => "$read", 'db_lookup' => "$db_lookup"}) | html %]"  alt="[% lane_key %], [% read %] read heatmap" />
 [%- END -%]
 
 <img src="[% legend_uri_for_action %]"  alt="legend for the fastqcheck file visualization" />
-[%- END -%]

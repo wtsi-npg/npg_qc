@@ -30,13 +30,11 @@
 define([
   'jquery',
   './qc_css_styles',
-  './qc_outcomes_view',
   './qc_utils',
   './manual_qc_ui'
 ], function (
   jquery,
   qc_css_styles,
-  qc_outcomes_view,
   qc_utils,
   NPG
 ) {
@@ -48,6 +46,13 @@ define([
    * @module NPG/QC
    */
   (function (QC) {
+    var MQC_ABLE_CLASS    = '.lane_mqc_control';
+    var UQC_CONTROL_CLASS = 'uqc_control';
+    var COLOURS_RGB = {
+        RED:   'rgb(255, 0, 0)',
+        GREEN: 'rgb(0, 128, 0)',
+        GREY:  'rgb(128, 128, 128)',
+    };
     var ProdConfiguration = (function() {
       /**
        * Object to keep configuration for resources.
@@ -72,6 +77,73 @@ define([
     }) ();
     QC.ProdConfiguration = ProdConfiguration;
 
+
+    var _colourElementByUQCOutcome = function (elementToMark, uqcOutcome) {
+      var colour = COLOURS_RGB.GREY;
+      if (uqcOutcome === "Accepted"){
+        colour = COLOURS_RGB.GREEN;
+      } else if (uqcOutcome === "Rejected") {
+        colour = COLOURS_RGB.RED;
+      }
+      elementToMark.css("padding-right", "5px")
+                      .css("padding-left", "10px")
+                      .css("background-color", colour);
+    };
+
+    /*
+    * This function adds a clickable link to the page's menu, which on click activates the function 'callback'.
+    * The link is only added if there is at least an uqc annotabe element.
+    *
+    * It requires one argument: 
+    * @param {function} 'callback' - The function that will be called when the link is clicked. 
+    * This function is expected to process the annotation of the end user's utility.  
+    *
+    * Example:
+    *
+    * var callAfterGettingOutcomes = function (data) {
+    *      launchUtilityQCProcesses(qcp.isRunPage, data, QC_OUTCOMES);
+    * }
+    * addUQCLink(callAfterGettingOutcomes);
+    *
+    */
+    QC.addUQCLink = function (callback) {
+      if (typeof callback === 'undefined' || typeof callback !== 'function') {
+        throw ('A defined callback function is required as parameter.');  
+      }
+
+      try {
+        var $UQC_LINK_CONTAINER = $("#summary_to_csv").parent().parent() ;
+        if ($UQC_LINK_CONTAINER.length === 0) {
+          throw ('The Link\'s placeholder could not be found.');  
+        }
+        var UQC_LINK_ID = 'uqcClickable';
+        $UQC_LINK_CONTAINER.before('<ul><li><a id=' + UQC_LINK_ID + ' href="">Utility QC</a></li></ul>');
+        $("#" + UQC_LINK_ID).on("click", function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          var uqcCount = 0;
+          $(MQC_ABLE_CLASS).each(function (index, element) {
+            if (NPG.QC.isElementUQCable(element)){
+              uqcCount ++;
+            }
+          });
+          if (uqcCount === 0) {
+            alert("Nothing subject to UQC in this page, try a page with plexes.");
+          } else {
+            callback();
+            $("#" + UQC_LINK_ID).closest('ul').remove();
+          }
+        });
+      } catch (ex) {
+        qc_utils.displayError('The UQC Link could not be added. ' + ex);
+      } 
+    };
+
+    //This method takes an element from a table row and returns true if the lane contains children
+    QC.isElementUQCable = function (element) {
+      return $(element).closest('tr').find('img[alt="link to tags"]').length === 0;
+    };
+
     QC.launchManualQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
       try {
         if ( typeof isRunPage !== 'boolean' ||
@@ -94,13 +166,27 @@ define([
             throw 'Library outcomes cannot be undefined.';
           }
           prevOutcomes = qcOutcomes.lib;
-          // Cut process if lane is already final or there is nothing to qc
-          if ( !qc_utils.seqFinal(qcOutcomes.seq) || $('.lane_mqc_control').length === 0 ) {
+          // If there is nothing to qc, return
+          if ( $('.lane_mqc_control').length === 0 ||
+               qc_utils.allFinal(prevOutcomes) || qc_utils.allFinal(qcOutcomes.seq) ) {
             return;
           }
 
-          $("#results_summary .lane").first()
-                                     .append('<span class="library_mqc_overall_controls"></span>');
+          // Add empty row for the overall MQC widget
+          var first_row_lane_column = $("#results_summary .lane").first();
+          var lane_column_index = $(first_row_lane_column).prevAll().length;
+          var num_columns = 1 + lane_column_index + $(first_row_lane_column).nextAll().length;
+          var row_string = '<tr>';
+          for (var i = 0; i < num_columns; i++) {
+            var td = '<td/>';
+            if (i == lane_column_index) {
+              td = '<td><span class="library_mqc_overall_controls"></span></td>';
+            }
+            row_string = row_string.concat(td);
+          }
+          row_string.concat('</tr>');
+          $("#results_summary > tbody").prepend(row_string);
+
           var overallControls = new NPG.QC.UI.MQCLibraryOverallControls(prodConfiguration);
           $('.lane').each(function (index, element){
             var $element = $(element);
@@ -146,6 +232,62 @@ define([
         }
       } catch (ex) {
         qc_utils.displayError('Error while initiating manual QC interface. ' + ex);
+      }
+    };
+
+    /**
+     * This function initiates the processes regarding Utility Quality Check.  
+     * It is called after getting and updating the view with the outcomes from fetchAndProcessQC()
+     * @param {boolean} isRunPage - Defines if the page is a run page.
+     * @param {hash} qcOutcomes - Hash mapping rtpKeys to qc_outcomes.
+     * @param {string} qcOutcomesURL - Hash mapping rtpKeys to qc_outcomes.
+
+     * @example
+     * var callAfterGettingOutcomes = function (data) {
+     *     launchUtilityQCProcesses(isRunPage, data);}
+     * fetchAndProcessQC('results_summary', '/qcoutcomes', callAfterGettingOutcomes);
+     * 
+     */
+    QC.launchUtilityQCProcesses = function (isRunPage, qcOutcomes, qcOutcomesURL) {
+      var UQC_CONTAINER_STRING = '<span class="' + UQC_CONTROL_CLASS + '"></span>';
+      try {
+        if ( typeof isRunPage !== 'boolean' ||
+             typeof qcOutcomes !== 'object' ||
+             typeof qcOutcomesURL !== 'string' ) {
+          throw 'Invalid parameter type.';
+        }
+        var uqcOutcomes = qcOutcomes.uqc;
+   
+        $(MQC_ABLE_CLASS).each(function (index, element) {
+          if (NPG.QC.isElementUQCable(element)){
+            var $element = $(element);
+            var rowId = $element.closest('tr').attr('id');
+            var $elementToMark;
+
+            if ( typeof rowId !== 'undefined' ) {
+              var rptKey = qc_utils.rptKeyFromId(rowId);
+              var isLaneKey = qc_utils.isLaneKey(rptKey);
+
+              if (isLaneKey) {
+                $element.after(UQC_CONTAINER_STRING);
+                $elementToMark = $($element.next('.' + UQC_CONTROL_CLASS)[0]);
+              } else {
+                var $libraryBrElement = $($element.parent()[0].nextElementSibling).find('br');
+                $libraryBrElement[0].insertAdjacentHTML('beforebegin', UQC_CONTAINER_STRING);
+                $elementToMark = $($libraryBrElement.prev());
+              }
+
+              var outcome ;
+              if (typeof uqcOutcomes !== 'undefined' && 
+                  typeof uqcOutcomes[rptKey] !== 'undefined') {
+                outcome = uqcOutcomes[rptKey].uqc_outcome;
+              } 
+              _colourElementByUQCOutcome($elementToMark, outcome);            
+            }  
+          }
+        });
+      } catch (ex) {
+        qc_utils.displayError('Error while initiating utility QC interface. ' + ex);
       }
     };
 

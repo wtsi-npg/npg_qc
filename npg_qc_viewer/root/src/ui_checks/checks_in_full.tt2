@@ -8,8 +8,9 @@
      END;
      trimmed_lane_collection = lane_collection.remove('check_name', to_remove);
      checks = trimmed_lane_collection.results;
-
-     checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'});
+     IF entity_is_lane;
+       checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'});
+     END;
 
      trimmed_reference_path = {};
      sequence_mismatch_collection = lane_collection.slice('check_name', 'sequence mismatch');

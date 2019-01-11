@@ -5,13 +5,14 @@ use Class::Load qw/load_class/;
 use Readonly;
 use Archive::Extract;
 use File::Temp qw/ tempdir /;
+use Cwd;
+use Test::More;
 
 use npg_qc::autoqc::db_loader;
 with 'npg_testing::db';
 
 Readonly::Scalar our $CONFIG_PATH       => q[t/data/test_app.conf];
 Readonly::Scalar our $CONFIG_PATH_NO_DB => q[t/data/test_app_no_db.conf];
-Readonly::Scalar our $STAGING_PATH      => q[t/data];
 Readonly::Scalar our $MLWHOUSE_DB_PATH  => q[t/data/mlwarehouse.db];
 Readonly::Scalar our $NPGQC_DB_PATH     => q[t/data/npgqc.db];
 Readonly::Scalar our $NPG_DB_PATH       => q[t/data/npg.db];
@@ -40,12 +41,6 @@ has 'db_connect'  => ( isa      => 'Bool',
                        required => 0,
                        default  => 1,
 		                 );
-
-has 'staging_path' => ( isa      => 'Str',
-                        is       => 'ro',
-                        required => 0,
-                        default  => sub {$STAGING_PATH},
-                      );
 
 has 'mlwhouse_db_path' => (
                             isa      => 'Str',
@@ -92,27 +87,42 @@ sub test_env_setup {
   $schemas->{'npg'} = $self->create_test_db($schema_package, $fixtures_path, $db);
 
   if ($self->fixtures) {
-    my $npg = $schemas->{'npg'};
-    $npg->resultset('Run')->find({id_run => 4025, })->set_tag(1, 'staging');
-    $npg->resultset('Run')->find({id_run => 3965, })->set_tag(1, 'staging');
-    $npg->resultset('Run')->find({id_run => 3323, })->set_tag(1, 'staging');
-    $npg->resultset('Run')->find({id_run => 3500, })->set_tag(1, 'staging');
-  }
+    my $rows = {};
+    foreach my $id ((4025, 3965, 3500)) {
+      my $row = $schemas->{'npg'}->resultset('Run')->find($id);
+      if (!$row) {
+        die "No row for run $id";
+      }
+      $rows->{$id} = $row;
+      $row->set_tag(1, 'staging');
+    }
 
-  if ($self->fixtures) {
+    my $cwd = getcwd();
+    $rows->{4025}->update(
+      {folder_name => '091106_IL38_4025',
+       folder_path_glob => $cwd . '/t/data/nfs/sf44/IL38/outgoing'});
+    $rows->{3965}->update(
+      {folder_name => '091025_IL36_3965',
+       folder_path_glob => $cwd . '/t/data/nfs/sf44/IL36/analysis'});
 
     my $tempdir = tempdir( CLEANUP => 1);
     my $ae = Archive::Extract->new(
       archive => 't/data/fixtures/npgqc_json.tar.gz');
     $ae->extract(to => $tempdir) or die $ae->error;
 
-    npg_qc::autoqc::db_loader->new(
+    my $path = "${tempdir}/npgqc_json";
+    my $num_loaded = npg_qc::autoqc::db_loader->new(
       schema  => $schemas->{'qc'},
-      path    => ["${tempdir}/npgqc_json"],
+      path    => [$path],
       verbose => 0
     )->load();
+    note "$num_loaded files loaded from $path";
+    my $num_expected = 210;
+    if ($num_loaded != $num_expected) {
+      note "Warning: expected to load $num_expected files";
+    }
   }
-  
+ 
   return $schemas;
 }
 

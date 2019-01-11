@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 19;
 use Test::Exception;
 use Test::Deep;
 use Moose::Meta::Class;
+use Perl6::Slurp;
 use JSON;
 
 use npg_testing::db;
@@ -14,8 +15,21 @@ use_ok('npg_qc::Schema::Result::BamFlagstats');
 my $schema = Moose::Meta::Class->create_anon_class(
           roles => [qw/npg_testing::db/])
           ->new_object({})->create_test_db(q[npg_qc::Schema]);
-
+my $archive = q[t/data/autoqc/bam_flagstats];
 my $rs = $schema->resultset('BamFlagstats');
+my $rc = $rs->result_class;
+
+sub _get_data {
+  my $file_name = shift;
+  my $json = slurp join(q[/], $archive, $file_name);
+  my $values = from_json($json);
+  foreach my $key (keys %{$values}) {
+    if (!$rc->has_column($key)) {
+      delete $values->{$key};
+    }
+  }
+  return $values;
+}
 
 {
   my $json = '{"histogram":{},"id_run":"9225","info":{"Picard-tools":"1.72(1230)","Picard_metrics_header":"# /software/hpag/biobambam/0.0.76/bin/bammarkduplicates I=sorted.bam O=/dev/stdout tmpfile=HJH8I0e3i9/ M=/tmp/Kr78slLXuv level=0\n","Samtools":"0.1.18 (r982:295)"},"library":"9418068",
@@ -41,6 +55,7 @@ my $rs = $schema->resultset('BamFlagstats');
   is(ref $row->info, 'HASH', 'info returned as a hash ref');
   cmp_deeply($row->info, $values->{'info'},
     'info hash ref content is correct');
+  $rs->search({})->delete_all;
 }
 
 {
@@ -68,6 +83,26 @@ my $rs = $schema->resultset('BamFlagstats');
     'record created';
   isnt ($row->id_bam_flagstats, $row1->id_bam_flagstats,
     'different rows for undefined subset and "human" subset');
+  $rs->search({})->delete_all;
+}
+
+
+{
+  my $values =  _get_data('26074_1#13.bam_flagstats.json');
+  
+  my $fk_row = $schema->resultset('SeqComposition')->create({digest => '26074', size => 2});
+
+  my $object = $rs->new_result($values);
+  isa_ok($object, 'npg_qc::Schema::Result::BamFlagstats');
+  throws_ok {$object->insert()}
+    qr/NOT NULL constraint failed: bam_flagstats.id_seq_composition/,
+    'foreign key referencing the composition table absent - error';
+
+  $object->id_seq_composition($fk_row->id_seq_composition);
+  lives_ok { $object->insert() } 'insert with fk is ok';
+  my $a_rs = $rs->search({});
+  is ($a_rs->count, 1, q[one row created in the table]);
+  $a_rs->delete_all;
 }
 
 1;

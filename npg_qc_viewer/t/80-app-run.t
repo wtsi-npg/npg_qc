@@ -1,11 +1,10 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 39;
+use Test::More tests => 36;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
-use Test::Warn;
 
 use npg_tracking::glossary::composition::factory;
 use npg_tracking::glossary::composition::component::illumina;
@@ -13,15 +12,12 @@ use t::util;
 
 BEGIN {
   local $ENV{'HOME'} = 't/data';
-  #we need to get listing of staging areas from a local conf file
-  use_ok('npg_qc_viewer::Util::FileFinder');
 }
 
 my $util = t::util->new();
 $util->modify_logged_user_method();
 
 local $ENV{CATALYST_CONFIG} = $util->config_path;
-local $ENV{TEST_DIR}        = $util->staging_path;
 
 my $schemas;
 lives_ok { $schemas = $util->test_env_setup()}  'test db created and populated';
@@ -93,7 +89,7 @@ $tmrs->create({
   $mech->title_is($title_prefix . q[Results for run 4025 (run 4025 status: qc in progress, taken by mg8)]);
 }
 
-subtest 'Test for page title - this affects javascript part too.' => sub {
+subtest 'Tests for page features affecting JavaScript' => sub {
   plan tests => 6;
 
   #These tests are linked with the javascript part of the application
@@ -112,24 +108,18 @@ subtest 'Test for page title - this affects javascript part too.' => sub {
     path               => 'some path',
     reads_pf_count     => '{"2":1,"1":2000,"0":3000}'
   });
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/run 10107 no longer on staging/ } ],
-                                        'Expected warning for run folder found';
+  $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results for run 10107 (run 10107 status: qc in progress, taken by melanie)]);
+
   $schemas->{npg}->resultset('RunStatus')->search({id_run => 10107, iscurrent => 1},)
                  ->update({ id_user => 50, id_run_status_dict => 25, });
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/run 10107 no longer on staging/ }, ],
-                                        'Expected warning for run folder found';
+
+  $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results for run 10107 (run 10107 status: qc on hold, taken by melanie)]);
-};
 
-subtest 'Test for summary table id - affects export to CSV.' => sub {
-  plan tests => 4;
-
-  my $url = q[http://localhost/checks/runs/10107];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/run 10107 no longer on staging/ } ],
-                                        'Expected warning for run folder found';
   $mech->content_contains(q[<table id="results_summary"]);
-  $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi);
+  $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi,
+    'summary table id - affects export to CSV');
 };
 
 subtest 'extra column markup - affects export to CSV' => sub {
@@ -272,16 +262,15 @@ subtest 'Page title for run + show all' =>  sub {
   $mech->title_is($title_prefix . q[Results (all) for runs 4025 (run 4025 status: qc in progress, taken by mg8)]);
 };
 
-subtest 'No mqc span html tag for gclp' => sub {
-  plan tests => 24;
+subtest 'mqc span' => sub {
+  plan tests => 14;
 
   $schemas->{npg}->resultset('RunStatus')
                  ->search({id_run => 4950, iscurrent => 1},)
                  ->update({ id_user => 64, id_run_status_dict => 26, });
 
   my $url= q[http://localhost/checks/runs?run=4950&lane=1&show=all&db_lookup=1];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
-                                        'Expected warning for run folder found';
+  $mech->get_ok($url);
   $mech->content_contains(q[rpt_key:4950:1:0]);
   $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:0">]);
   $mech->content_contains(q[rpt_key:4950:1:1]);
@@ -291,32 +280,16 @@ subtest 'No mqc span html tag for gclp' => sub {
 
   my $where_lane = { 'iseq_product_metrics.id_run'   => 4950,
                      'iseq_product_metrics.position' => 1 };
+
   my $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
-                             ->search($where_lane, { join => 'iseq_product_metrics', });
-  while ( my $flowcell = $rs->next ) {
-    $flowcell->update({ 'id_lims' => 'C_GCLP' });
-  }
-
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
-                                        'Expected warning for run folder found';
-  $mech->content_contains(q[rpt_key:4950:1:0]);
-  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:0">]);
-  $mech->content_contains(q[rpt_key:4950:1:1]);
-  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:1">]);
-  $mech->content_contains(q[rpt_key:4950:1:5]);
-  $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:5">]);
-
-  $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
                           ->search($where_lane, { join => 'iseq_product_metrics', });
   while ( my $flowcell = $rs->next ) {
-    $flowcell->update({ 'id_lims' => 'SQSCP' });
     if($flowcell->tag_index && $flowcell->tag_index == 5) {
       $flowcell->update({ 'entity_type' => 'library_indexed_spike' });
     }
   }
 
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
-                                        'Expected warning for run folder found';
+  $mech->get_ok($url);
   $mech->content_contains(q[rpt_key:4950:1:0]);
   $mech->content_lacks(q[<span class='lane_mqc_control'></span></td><td class="tag_info"><a href="#4950:1:0">]);
   $mech->content_contains(q[rpt_key:4950:1:1]);
@@ -329,7 +302,6 @@ subtest 'No mqc span html tag for gclp' => sub {
   $rs = $schemas->{'mlwh'}->resultset('IseqFlowcell')
                           ->search($where_lane, { join => 'iseq_product_metrics', });
   while ( my $flowcell = $rs->next ) {
-    $flowcell->update({ 'id_lims' => 'SQSCP' });
     $flowcell->update({ 'entity_type' => 'library_indexed' });
   }
 };
@@ -340,12 +312,9 @@ subtest 'No mqc span html tag for gclp' => sub {
   $mech->title_is($title_prefix . q[Results (plexes) for runs 4025]);
   $mech->content_lacks("<br />152</div>");  # num cycles
   $mech->content_lacks('NT28560W'); #library name
-}
 
-{
-  my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=lanes];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
-                                        'Expected warning for run folder found';
+  $url = q[http://localhost/checks/runs?run=4950&lane=1&show=lanes];
+  $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results (lanes) for runs 4950 lanes 1]);
   $mech->content_contains(224);  # num cycles
   $mech->content_contains('NT207849B'); #library name
@@ -354,10 +323,9 @@ subtest 'No mqc span html tag for gclp' => sub {
 }
 
 subtest 'Test for run + lane + plexes' => sub {
-  plan tests => 10;
+  plan tests => 9;
   my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=plexes];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
-                                        'Expected warning for run folder found';
+  $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results (plexes) for runs 4950 lanes 1]);
   $mech->content_contains(224);  # num cycles
   $mech->content_contains('Help'); #side menu link
@@ -369,10 +337,9 @@ subtest 'Test for run + lane + plexes' => sub {
 };
 
 subtest 'Test for run + lane + show all' => sub {
-  plan tests => 18;
+  plan tests => 14;
   my $url = q[http://localhost/checks/runs?run=4950&lane=1&show=all];
-  warnings_like{$mech->get_ok($url)} [ { carped => qr/Failed to get runfolder location/ } ],
-                                       'Expected warning for run folder found';
+  $mech->get_ok($url);
   $mech->title_is($title_prefix . q[Results (all) for runs 4950 lanes 1]);
   $mech->content_contains('Page Top');
   $mech->content_contains('Back to Run 4950');
@@ -385,9 +352,7 @@ subtest 'Test for run + lane + show all' => sub {
   $mech->content_contains($row_id_prefix . q[4950:1:1"]); #Relevant for qcoutcomes js
 
   foreach my $menu_item (('Page Top','20','0')) {
-    warnings_like{ $mech->follow_link_ok({text => $menu_item}, qq[follow '$menu_item' menu item]) } 
-      [ { carped => qr/Failed to get runfolder location/ } ],
-                     'Expected warning for run folder found';  
+    $mech->follow_link_ok({text => $menu_item}, qq[follow '$menu_item' menu item]);
   }
 };
 

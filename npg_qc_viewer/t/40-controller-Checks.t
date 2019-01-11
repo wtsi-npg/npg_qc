@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 8;
+use Test::More tests => 7;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -10,14 +10,12 @@ use t::util;
 
 BEGIN {
   local $ENV{'HOME'} = 't/data';
-  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
 }
 
 my $util = t::util->new();
 $util->modify_logged_user_method();
 
 local $ENV{CATALYST_CONFIG} = $util->config_path;
-local $ENV{TEST_DIR}        = $util->staging_path;
 
 my $schemas;
 use_ok 'npg_qc_viewer::Controller::Checks';

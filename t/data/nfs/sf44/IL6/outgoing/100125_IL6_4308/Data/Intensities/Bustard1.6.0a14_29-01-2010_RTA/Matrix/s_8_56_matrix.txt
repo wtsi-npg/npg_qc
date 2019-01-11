@@ -1,9 +1,0 @@
-# Auto-generated frequency response matrix
-> A
-> C
-> G
-> T
-1.16 0.15 0.00 0.00 
-1.03 0.79 -0.00 0.00 
-0.01 0.00 1.52 0.07 
-0.01 0.00 0.67 0.90 

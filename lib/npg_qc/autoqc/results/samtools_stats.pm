@@ -7,14 +7,18 @@ use npg_tracking::util::types;
 use Perl6::Slurp;
 use File::Spec::Functions qw( splitpath );
 use Carp;
+use Readonly;
 
-extends qw(npg_qc::autoqc::results::base);
+extends qw(npg_qc::autoqc::results::result);
+with qw(npg_qc::autoqc::role::result);
 
 our $VERSION = '0';
 
+Readonly::Scalar my $STATS_FILTER => '[[:alnum:]]+[\_[:lower:]]*?';
+
 has 'stats_file'     => (
     isa        => 'NpgTrackingReadableFile',
-    is         => 'ro',
+    is         => 'rw',
     traits     => [ 'DoNotSerialize' ],
     required   => 0,
 );
@@ -29,7 +33,7 @@ sub _build_filter {
   my $self = shift;
 
   my ($volume, $directories, $file) = splitpath($self->stats_file);
-  my ($filter) = $file =~ /_([[:alnum:]]+)[.]stats\Z/xms;
+  my ($filter) = $file =~ /_($STATS_FILTER)[.]stats\Z/xms;
   if (!$filter) {
     croak "Failed to get filter from $file";
   }

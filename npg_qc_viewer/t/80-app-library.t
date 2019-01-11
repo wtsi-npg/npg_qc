@@ -1,10 +1,9 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 10;
+use Test::More tests => 9;
 use Test::Exception;
 use Test::WWW::Mechanize::Catalyst;
-use Test::Warn;
 
 use t::util;
 
@@ -12,7 +11,6 @@ my $util = t::util->new();
 $util->modify_logged_user_method();
 
 local $ENV{'CATALYST_CONFIG'} = $util->config_path;
-local $ENV{'TEST_DIR'}        = $util->staging_path;
 local $ENV{'HOME'}            = 't/data';
 
 my $mech;
@@ -49,8 +47,7 @@ subtest 'Sample links for library SE' => sub {
   # the strings are in the title, test the whole contents when done
   my $lib_name = 'NT207825Q';
   my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
-  warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/], 
-                                      'Expected warning for runfolder location';
+  $mech->get_ok($url);
   $mech->title_is(qq[NPG SeqQC v${npg_qc_viewer::VERSION}: Libraries: '$lib_name']);
   $mech->content_contains($lib_name);
   my $id_run = q[4950];
@@ -58,12 +55,11 @@ subtest 'Sample links for library SE' => sub {
 }
 
 subtest 'Test for summary table id for library - affects export to CSV.' => sub {
-  plan tests => 4;
+  plan tests => 3;
 
   my $lib_name = 'NT207825Q';
   my $url = q[http://localhost/checks/libraries?id=] . $lib_name;
-  warnings_like{$mech->get_ok($url)} [qr/Failed to get runfolder location/],
-                                      'Expected warning for runfolder location';
+  $mech->get_ok($url);
   $mech->content_contains(q[<table id="results_summary"]);
   $mech->content_like(qr/.+<a [^>]+ id=\'summary_to_csv\' [^>]+>[\w\s]+<\/a>.+/mxi);
 };

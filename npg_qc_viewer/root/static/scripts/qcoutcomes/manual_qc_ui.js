@@ -122,16 +122,12 @@ var NPG;
 
         MQCLibraryOverallControls.prototype.setupControls = function (placeholder) {
           placeholder = placeholder || $($(this.PLACEHOLDER_CLASS));
-          //Remove the lane placeholder which will not be used in library manuql QC
-          placeholder.parent().children('.lane_mqc_control').remove();
           placeholder.parent().append('<span class="lib_mqc_working"></span>');
           var accept = this.buildControl(this.CLASS_ALL_ACCEPT, this.TITLE_ACCEPT, this.ICON_ACCEPT);
           var und    = this.buildControl(this.CLASS_ALL_UNDECIDED, this.TITLE_UNDECIDED, this.ICON_UNDECIDED);
           var reject = this.buildControl(this.CLASS_ALL_REJECT, this.TITLE_REJECT, this.ICON_REJECT);
           placeholder.html(accept + und + reject);
-          placeholder.parent().css('text-align', 'left');
-          placeholder.css('padding-right', '5px').css('padding-left', '7px');
-          $('.lane_mqc_overall').css('padding-left', '5px');
+          placeholder.parent().css('padding', '15px');
         };
 
         MQCLibraryOverallControls.prototype.buildControl = function (cssClass, title, representation) {

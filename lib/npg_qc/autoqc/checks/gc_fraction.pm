@@ -3,13 +3,13 @@ package npg_qc::autoqc::checks::gc_fraction;
 use Moose;
 use namespace::autoclean;
 use Carp;
-use English qw(-no_match_vars);
 use Readonly;
-use File::Spec::Functions qw(catfile);
 use File::Basename;
+use Try::Tiny;
 
 use npg_tracking::util::abs_path qw(abs_path);
-use npg_common::fastqcheck;
+use npg_qc::autoqc::parse::samtools_stats;
+use npg_qc::autoqc::constants qw/ $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER /;
 use npg_common::sequence::reference::base_count;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -24,26 +24,28 @@ npg_qc::autoqc::checks::gc_fraction
 
 =head1 SYNOPSIS
 
-Inherits from npg_qc::autoqc::checks::check. See description of attributes in the documentation for that module.
-  my $check = npg_qc::autoqc::checks::gc_content->new(
-          path => q[/staging/IL29/analysis/090721_IL29_3379/data], position => 1
-                                                      );
+Inherits from npg_qc::autoqc::checks::check.
+
+  my $check = npg_qc::autoqc::checks::gc_content->new(id_run => 33, position => 1);
+  $check->execute();
+  my $check = npg_qc::autoqc::checks::qX_yield->new(
+    rpt_list => '33:1:2;33:2:2', is_paired_read => 1,
+    qc_in => '/tmp', qc_out => '/tmp');
 
 =head1 DESCRIPTION
 
-Calculates gc content for a sequence and evaluates this value against the gc content of the reference genome
-
-=head1 SUBROUTINES/METHODS
+Parses out gc percent for a sequence from a samtools stats file
+and evaluates this value against the gc content of the reference genome.
 
 =cut
 
-Readonly::Scalar our $EXT                  => 'fastqcheck';
-Readonly::Scalar our $HUNDRED              => 100;
-Readonly::Scalar our $APP                  => q[npgqc];
-Readonly::Scalar our $NA                   => -1;
-Readonly::Scalar our $MAX_DELTA            => 20;
+Readonly::Scalar my $EXT        => 'stats';
+Readonly::Scalar my $HUNDRED    => 100;
+Readonly::Scalar my $APP        => q[npgqc];
+Readonly::Scalar my $MAX_DELTA  => 20;
+Readonly::Array  my @READS      => qw/ forward reverse /;
 
-
+=head1 SUBROUTINES/METHODS
 
 =head2 aligner
 
@@ -51,8 +53,35 @@ Overrides an attribute with the same name in npg_tracking::data::reference::find
 Defaults to te name of the application that will access the data, ie npgqc.
 
 =cut
-has '+aligner'          => ( default         => $APP, );
 
+has '+aligner'        => (default => $APP,);
+
+=head2 file_type
+
+=cut
+
+has '+file_type'      => (default => $EXT,);
+
+=head2 suffix
+
+Input file name suffix. The filter used in samtools stats command to
+produce the input samtools stats file. Defaults to F0xB00.
+
+=cut
+
+has '+suffix' => (default => $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER,);
+
+=head2 is_paired_read
+
+Boolean flag indicating whether both a forward and reverse reads are present.
+Defaults to true.
+ 
+=cut
+
+has 'is_paired_read'  => (isa       => 'Bool',
+                          is        => 'ro',
+                          predicate => 'has_is_paired_read',
+                         );
 
 =head2 ref_base_count_path
 
@@ -60,31 +89,28 @@ A path to a file with base count for the relevant reference genome.
 Does not include teh extension.
 
 =cut
+
 has 'ref_base_count_path' => (isa         => 'Maybe[Str]',
                               is          => 'ro',
                               required    => 0,
                               lazy_build  => 1,
                              );
-
-has '+file_type' => (default    => $EXT,);
-
 sub _build_ref_base_count_path {
     my $self = shift;
+
     my @refs;
-    eval {
+    try {
         @refs = @{$self->refs()};
+    } catch {
+        $self->result->add_comment(q[Error: reference cannot be retrieved; cannot run gc content check. ] . $_);
     };
-    if ($EVAL_ERROR) {
-        $self->result->add_comment(q[Error: reference cannot be retrieved; cannot run gc content check. ] . $EVAL_ERROR);
-        return;
-    }
 
     if ($self->messages->count) {
         $self->result->add_comment(join(q[ ], $self->messages->messages));
     }
 
     if (scalar @refs > 1) {
-	$self->result->add_comment(q[multiple references found: ] . join(q[;], @refs));
+	      $self->result->add_comment(q[multiple references found: ] . join(q[;], @refs));
         return;
     }
 
@@ -92,50 +118,57 @@ sub _build_ref_base_count_path {
         $self->result->add_comment(q[Failed to retrieve a reference.]);
         return;
     }
+
     return (pop @refs);
 }
 
+=head2 execute
 
-override 'execute'            => sub {
+=cut
 
+override 'execute' => sub {
     my $self = shift;
-    super();
 
-    my @files = @{$self->input_files};
-    my $short_fnames = $self->generate_filename_attr();
+    super();
+    my $source_file = $self->input_files->[0];
+    my $source_file_name = $self->generate_filename_attr->[0];
 
     my $ref_data_path;
     my $ref_gc_percent;
     if ($self->ref_base_count_path) {
         $ref_data_path = $self->ref_base_count_path . q[.json];
         if (-r $ref_data_path) {
-            my $ref_base_count_hash =
-     npg_common::sequence::reference::base_count->load($ref_data_path)->summary->{counts};
+            my $ref_base_count_hash = npg_common::sequence::reference::base_count
+                                      ->load($ref_data_path)->summary->{'counts'};
             $ref_gc_percent = $self->_gc_percent($ref_base_count_hash);
         }
     }
 
     $self->result->threshold_difference($MAX_DELTA);
 
-    my $count = 0;
-    my @apass = ($NA, $NA);
-    my @prefix = qw/forward reverse/;
+    my @apass = ();
+    my $stats = npg_qc::autoqc::parse::samtools_stats->new(file_path => $source_file);
 
-    foreach my $file (@files) {
-        my $bc = npg_common::fastqcheck->new(fastqcheck_path => $file);
-        my $base_count_hash = $bc->base_percentages();
-        my $result_method = $prefix[$count] . q[_read_gc_percent];
-        $self->result->$result_method($self->_gc_percent($base_count_hash));
-        my $filename_method =  $prefix[$count] . q[_read_filename];
-        $self->result->$filename_method($short_fnames->[$count]);
+    my @reads = @READS;
+    my $is_paired_read = $self->has_is_paired_read
+                       ? $self->is_paired_read
+                       : $stats->has_reverse_read;
 
-      if (defined $ref_gc_percent) {
-          $apass[$count] = 0;
-          if ( abs ($self->result->$result_method - $ref_gc_percent) < $MAX_DELTA ) {
-              $apass[$count] = 1;
-          }
-      }
-      $count++;
+    if (!$is_paired_read) {
+        pop @reads;
+    }
+
+    foreach my $read ( @reads ) {
+        my $base_percent = $stats->base_composition($read);
+        my $gc = defined $base_percent ? ($base_percent->{'G'} + $base_percent->{'C'}) : 0;
+        my $result_method = $read . q[_read_gc_percent];
+        $self->result->$result_method($gc);
+        my $filename_method =  $read . q[_read_filename];
+        $self->result->$filename_method($source_file_name);
+        if (defined $ref_gc_percent) {
+            push @apass,
+                (abs ($self->result->$result_method - $ref_gc_percent) < $MAX_DELTA ) ? 1 : 0;
+        }
     }
 
     if (defined $ref_gc_percent) {
@@ -146,16 +179,16 @@ override 'execute'            => sub {
         $self->result->ref_count_path(abs_path($directories), $filename);
     }
 
-    my $pass = $self->overall_pass(\@apass, $count);
-    if ($pass != $NA) { $self->result->pass($pass); }
+    if (@apass) {
+        $self->result->pass($self->overall_pass(@apass));
+    }
 
     return 1;
 };
 
-
 sub _gc_percent {
-
     my ($self, $base_count_hash) = @_;
+
     my $gc_percent = 0;
     if (exists $base_count_hash->{G}) {
         $gc_percent = $base_count_hash->{G};
@@ -182,8 +215,8 @@ sub _gc_percent {
 __PACKAGE__->meta->make_immutable;
 
 1;
-__END__
 
+__END__
 
 =head1 DIAGNOSTICS
 
@@ -195,25 +228,21 @@ __END__
 
 =item Carp
 
-=item English
-
 =item Readonly
 
 =item Moose
 
 =item namespace::autoclean
 
-=item File::Spec::Functions
-
 =item File::Basename
+
+=item Try::Tiny
 
 =item npg_tracking::util::abs_path
 
 =item npg_tracking::data::reference::find
 
 =item npg_common::sequence::reference::base_count
-
-=item npg_common::fastqcheck
 
 =back
 
@@ -227,7 +256,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

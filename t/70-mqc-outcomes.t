@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 17;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON::XS;
@@ -138,7 +138,6 @@ subtest 'retrieval, lib and seq outcomes for single-component compositions' => s
   $expected = {"lib"=>{"5:3:6"=>{"mqc_outcome"=>"Undecided"},"5:3:3"=>{"mqc_outcome"=>"Rejected preliminary"},"5:3:7"=>{"mqc_outcome"=>"Undecided final"},"5:3:5"=>{"mqc_outcome"=>"Rejected final"},"5:3:4"=>{"mqc_outcome"=>"Accepted final"},"5:3:2"=>{"mqc_outcome"=>"Accepted preliminary"}},"seq"=>{"5:3"=>{"mqc_outcome"=>"Accepted final"}},"uqc"=>{}};
   is_deeply($o->get([qw(5:3:5 5:3:7)]), $expected, q[outcome for (5:3:5 5:3:7) is correct]);
 };
-
 
 subtest 'retrieval, uqc_outcomes for single-component compositions' => sub {
   plan tests => 12;
@@ -342,6 +341,51 @@ subtest 'retrieval for multi-component compositions - all outcome types' => sub 
     'correct data retrieved for (80:1:1;80:1:3 80:1:1;80:1:5 80:1:7)');   
 };
 
+subtest q[get mqc library outcomes as boolean outcomes] => sub {
+  plan tests => 2;
+  
+  my @l = qw/26291:1:1;26291:2:1;26291:3:1
+             26291:1:2;26291:2:2;26291:3:2
+             26291:1:3;26291:2:3;26291:3:3
+             26291:1:4;26291:2:4;26291:3:4
+             26291:1:5;26291:2:5;26291:3:5
+             26291:1:6;26291:2:6;26291:3:6
+             26291:1:11;26291:2:11;26291:3:11
+             26291:1:12;26291:2:12;26291:3:12
+             26291:1:13;26291:2:13;26291:3:13
+             26291:1:14;26291:2:14;26291:3:14
+             26291:1:15;26291:2:15;26291:3:15
+             26291:1:16;26291:2:16;26291:3:16
+            /;
+
+  my $rs = $qc_schema->resultset('MqcLibraryOutcomeEnt');
+  for my $l (@l) {
+    my $c = npg_tracking::glossary::composition::factory::rpt_list
+            ->new(rpt_list => $l )->create_composition();
+    my $ckey = $rs->find_or_create_seq_composition($c)->id_seq_composition();
+    my $values = {
+                'username'           => 'u1',
+                'modified_by'        =>' user',
+                'id_seq_composition' => $ckey,
+                'id_mqc_outcome'     => substr($l, -1)
+                 };
+    $rs->create($values);
+  }
+
+  my %expected = map { $_ => 0 } @l;
+  $expected{'26291:1:3;26291:2:3;26291:3:3'} = 1;
+  $expected{'26291:1:13;26291:2:13;26291:3:13'} = 1;
+
+  my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
+  my $outcomes = {};
+  map { $outcomes->{$_} = $o->get_library_outcome($_) } @l;
+  is_deeply ($outcomes, \%expected, 'correct results');
+  
+  throws_ok { $o->get_library_outcome('26291:1:26;26291:2:26;26291:3:26') }
+    qr/No library outcome for '26291:1:26;26291:2:26;26291:3:26'/,
+    'error if a lib outcome for rpt list does not exist';
+};
+
 subtest q[find or create outcome - error handling] => sub {
   plan tests => 4;
 
@@ -503,7 +547,7 @@ subtest q[find or create seq entity] => sub {
 };
 
 subtest q[save - errors] => sub {
-  plan tests => 18;
+  plan tests => 17;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
   throws_ok {$o->save() } qr/Outcomes hash is required/,
@@ -540,10 +584,6 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({'lib'=>{'123:3'=>{'mqc_outcome'=>''}}}, q[cat], {}) }
     qr/Error saving outcome for 123:3 - Outcome description is missing/,
     'empty outcome description - error';
-  throws_ok {$o->save({'lib'=>{'123:4:5;3:4:5'=>
-    {'mqc_outcome'=>'Accepted preliminary'}}}, q[cat], {}) }
-    qr/Saving outcomes for multi-component compositions is not yet implemented/,
-    'saving for multi-component composition - error';
   throws_ok {$o->save({'uqc'=>{'123:1'=>{
     'uqc_outcome'=>'Accepted'}}}, q[cat]) }
     qr/Rationale required/,
@@ -753,6 +793,70 @@ subtest q[save outcomes] => sub {
     {'101:1'=>[(1 .. 6)]})}
     qr/Final outcome cannot be updated/,
     'error updating a final outcome to a different final outcome';
+};
+
+subtest q[save outcomes for entities with multiple components] => sub {
+  plan tests => 12;
+
+  my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
+
+  my $outcomes = {
+    '26300:1:2;26300:2:2;26300:3:2;26300:4:2'=>{'mqc_outcome'=>'Accepted preliminary'},
+    '26300:1:3;26300:2:3;26300:3:3;26300:4:3'=>{'mqc_outcome'=>'Rejected preliminary'},
+    '26300:1:4;26300:2:4;26300:3:4;26300:4:4'=>{'mqc_outcome'=>'Undecided'},
+                 };
+
+  my $reply = {'lib' => $outcomes, 'seq'=> {}, 'uqc' => {}};
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+    $reply, 'lib info returned');
+
+  my $c = npg_tracking::glossary::composition::factory::rpt_list
+         ->new(rpt_list => '26300:1')->create_composition();
+  my $seq_c = $qc_schema->resultset('MqcOutcomeEnt')
+         ->find_or_create_seq_composition($c);
+  my $dict_id_prelim = $qc_schema->resultset('MqcOutcomeDict')->search(
+      {'short_desc' => 'Rejected preliminary'}
+     )->next->id_mqc_outcome;
+  $qc_schema->resultset('MqcOutcomeEnt')->create({
+    'id_run'         => 101,
+    'position'       => 1,
+    'id_seq_composition' => $seq_c->id_seq_composition(),
+    'id_mqc_outcome' => $dict_id_prelim,
+    'username'       => 'cat',
+    'modified_by'    => 'dog',
+  });
+
+  $outcomes->{'26300:1:3;26300:2:3;26300:3:3;26300:4:3'} =
+    {'mqc_outcome'=>'Accepted preliminary'};
+  is_deeply($o->save({'lib' => $outcomes}, 'cat'),
+    $reply, 'only lib info returned, one outcome updated');
+
+  my $seq_final = {'26300:1' => {'mqc_outcome'=>'Accepted final'}};
+  throws_ok {$o->save({'seq' => $seq_final}, 'cat')}
+    qr/Tag indices for lanes are required/,
+    'tag information required';
+  throws_ok {$o->save({'seq' => $seq_final}, 'cat', {'26300:1' => [1,2]})}
+    qr/Mismatch between known tag indices and available library outcomes/,
+    'tag mismatch';
+  throws_ok {$o->save({'seq' => $seq_final}, 'cat', {'26300:1' => [(2 .. 5)]})}
+    qr/Mismatch between known tag indices and available library outcomes/,
+    'tag mismatch';
+
+  lives_ok {$reply = $o->save({'seq' => $seq_final}, 'cat', {'26300:1' => [(2 .. 4)]})}
+    'lane 1 final outcome saved';
+  is_deeply ($reply, {'seq' => $seq_final, 'lib' => {}, uqc => {}}, 'cirrect reply');
+  $seq_final = {'26300:2' => {'mqc_outcome'=>'Accepted final'}};
+  lives_ok {$reply = $o->save({'seq' => $seq_final}, 'cat', {'26300:2' => [(2 .. 4)]})}
+    'lane 2 final outcome saved';
+
+  my @lib_rows = $qc_schema->resultset('MqcLibraryOutcomeEnt')
+     ->search_autoqc({id_run => 26300, position => 1}, 4)->all();
+  is (scalar @lib_rows, 3, 'three lib outcome records found');
+  @lib_rows = sort {$a->composition->get_component(0)->tag_index <=>
+                    $b->composition->get_component(0)->tag_index} @lib_rows;
+  is ($lib_rows[0]->mqc_outcome->short_desc, 'Accepted final', 'lib outcome is final');
+  is ($lib_rows[1]->mqc_outcome->short_desc, 'Accepted final', 'lib outcome is final');
+  is ($lib_rows[2]->mqc_outcome->short_desc, 'Undecided final', 'lib outcome is final, undecided saved');
 };
 
 subtest q[outcomes are not saved twice] => sub {

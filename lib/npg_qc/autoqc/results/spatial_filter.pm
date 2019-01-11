@@ -3,7 +3,7 @@ package npg_qc::autoqc::results::spatial_filter;
 use Moose;
 use namespace::autoclean;
 use Carp;
-use Perl6::Slurp;
+use File::Slurp;
 
 extends qw(npg_qc::autoqc::results::result);
 with qw(npg_qc::autoqc::role::result);
@@ -32,21 +32,28 @@ has 'num_spatial_filter_fail_reads'=> (
 sub parse_output{
   my ( $self, $files ) = @_;
 
-# expected format: "Total Processed 943540734     Failed 4338894 traces"
+# expected format: "<rpt> Processed 943540734     Failed 4338894 traces"
+
+  # this assumes the check is only run at lane level so id_run and position will be unique
+  my $id_run = $self->composition->get_component(0)->id_run;
+  my $position = $self->composition->get_component(0)->position;
+  my $key = $id_run . '_' . $position;
 
   my $num_total_reads = 0;
   my $num_spatial_filter_fail_reads = 0;
   my $count = 0;
   for my $file (@{$files}) {
-    my $log = slurp $file || croak "Unable to read file $file";
+    my @contents = read_file $file || croak "Unable to read file $file";
 
-    my ($total, $fail) = ($log =~ /^Total \t Processed \s+ (\d+) \s+ Failed \s+ (\d+) \s+ traces$/smx);
+    for my $line (@contents) {
+      my ($total, $fail) = ($line =~ /^$key[^\t]* \t Processed \s+ (\d+) \s+ Failed \s+ (\d+) \s+ traces$/smx);
 
-    if(not defined $total or not defined $fail) { next; }
+      if(not defined $total or not defined $fail) { next; }
 
-    $count++;
-    $num_total_reads += $total;
-    $num_spatial_filter_fail_reads += $fail;
+      $count++;
+      $num_total_reads += $total;
+      $num_spatial_filter_fail_reads += $fail;
+    }
   }
   # values should be undefined if there is no data in the output
   $self->num_total_reads($count ? $num_total_reads : undef);

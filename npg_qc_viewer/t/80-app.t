@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 31;
+use Test::More tests => 30;
 use Test::Exception;
 use HTTP::Request::Common;
 use XML::LibXML;
@@ -12,7 +12,6 @@ use t::util;
 
 BEGIN {
   local $ENV{'HOME'} = 't/data';
-  use_ok('npg_qc_viewer::Util::FileFinder'); #we need to get listing of staging areas from a local conf file
 }
 
 # programmatically adding break points $DB::single = 1;
@@ -23,7 +22,6 @@ my $util = t::util->new();
 $util->modify_logged_user_method();
 
 local $ENV{CATALYST_CONFIG} = $util->config_path;
-local $ENV{TEST_DIR}        = $util->staging_path;
 
 my $schemas;
 {

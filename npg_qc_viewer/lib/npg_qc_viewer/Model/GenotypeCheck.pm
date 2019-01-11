@@ -6,9 +6,6 @@ use namespace::autoclean;
 use JSON;
 use File::Slurp;
 
-use npg_qc::autoqc::qc_store;
-use npg_qc::autoqc::qc_store::options qw/$PLEXES/;
-
 BEGIN { extends 'Catalyst::Model' }
 
 our $VERSION = '0';
@@ -25,32 +22,6 @@ npg_qc_viewer::Model::GenotypeCheck - access to supplementary genotype check dat
 Catalyst model for accessing genotype check data
 
 =head1 SUBROUTINES/METHODS
-
-=head2 fetch_genotype_json
-
-Returns a JSON string containing genotype check data
-
-=cut
-sub fetch_genotype_json { ## no critic (ProhibitManyArgs)
-  my ($self, $id_run, $position, $tag_index, $sequenom_plex, $db_lookup) = @_;
-
-  my %init = ();
-  if(defined $db_lookup) {
-    $init{'use_db'} = $db_lookup;
-  }
-  my $qcs=npg_qc::autoqc::qc_store->new(%init);
-  my $c=$qcs->load_run($id_run, $db_lookup, [ $position ], $PLEXES);
-
-  my $trr;
-  if(defined $tag_index) {
-    $trr=$c->search({class_name => q[genotype], tag_index => $tag_index, });
-  }
-  else {
-    $trr=$c->slice(q[class_name], q[genotype]);
-  }
-
-  return $trr;
-}
 
 =head2 fetch_composite_genotype_data
 
@@ -142,10 +113,6 @@ __END__
 
 =item File::Slurp
 
-=item npg_qc::autoqc::qc_store
-
-=item npg_qc::autoqc::qc_store::options
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -158,7 +125,7 @@ Kevin Lewis E<lt>kl2@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd
+Copyright (C) 2018 Genome Research Ltd
 
 This file is part of NPG software.
 

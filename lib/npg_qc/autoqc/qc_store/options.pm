@@ -1,26 +1,44 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       13 July 2010
-#
-
 package npg_qc::autoqc::qc_store::options;
 
 use strict;
 use warnings;
 use base 'Exporter';
 use Readonly;
+use Carp;
 
 our $VERSION = '0';
 
-our @EXPORT_OK = qw/$ALL $PLEXES $LANES/;
+our @EXPORT_OK = qw/ $ALL $PLEXES $LANES $ALLALL
+                     validate_option
+                     option_to_string /;
 
 Readonly::Scalar our $ALL    => 1;
 Readonly::Scalar our $PLEXES => 2;
 Readonly::Scalar our $LANES  => 3;
+Readonly::Scalar our $ALLALL => 4;
+
+Readonly::Hash my %OPTIONS2STRING => ($ALL    => 'ALL',
+                                      $PLEXES => 'PLEXES',
+                                      $LANES  => 'LANES',
+                                      $ALLALL => 'ALLALL',);
+
+sub validate_option {
+  my $o = shift;
+  if (!$OPTIONS2STRING{$o}) {
+    croak qq[Unknown option for loading qc results: $o];
+  }
+}
+
+sub option_to_string {
+  my $o = shift;
+  my $s = $OPTIONS2STRING{$o};
+  $s or croak qq[Unknown option for loading qc results: $o];
+  return $s;
+}
 
 1;
-__END__
 
+__END__
 
 =head1 NAME
 
@@ -30,9 +48,20 @@ npg_qc::autoqc::qc_store::options
 
 =head1 DESCRIPTION
 
-Constants to define retrival options for autoqc results
+Integer constants to define retrival options for autoqc results.
+Exported on demand.
+
+ $PLEXES  #plex-level results only
+ $LANES   #lane-level results only
+ $ALL     #everything with special rules when results for
+          #multi-component compositions are present
+ $ALLALL  #truly all
 
 =head1 SUBROUTINES/METHODS
+
+=head2 validate_option
+
+=head2 option_to_string
 
 =head1 DIAGNOSTICS
 
@@ -50,6 +79,8 @@ Constants to define retrival options for autoqc results
 
 =item Exporter
 
+=item Carp
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -58,11 +89,11 @@ Constants to define retrival options for autoqc results
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 GRL, by Marina Gourtovaia
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 

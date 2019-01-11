@@ -1,7 +1,6 @@
 package npg_qc::autoqc::role::genotype_call;
 
 use Moose::Role;
-use Readonly;
 
 our $VERSION = '0';
 
@@ -76,8 +75,6 @@ __END__
 =over
 
 =item Moose::Role
-
-=item Readonly
 
 =back
 

@@ -1,52 +1,52 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 8;
+use Test::More tests => 7;
 use Test::Exception;
 use Cwd;
 use File::Spec;
 use Test::WWW::Mechanize::Catalyst;
+use Perl6::Slurp;
 
 use t::util;
 
+BEGIN {
+  local $ENV{'HOME'} = 't/data';
+}
+
 my $util = t::util->new();
 local $ENV{CATALYST_CONFIG} = $util->config_path;
-local $ENV{TEST_DIR}        = $util->staging_path;
 
-my $mech;
 my $fname = '4360_1_1.fastqcheck';
-my $path = File::Spec->catfile(cwd, 't', 'data', 'sources4visuals', $fname);
-my $schemas;
+my $path = File::Spec->catfile(cwd, 't', 'data', 'sources4visuals');
 
-{
-  lives_ok { $schemas = $util->test_env_setup() }  'test db created and populated';
-  use_ok 'Test::WWW::Mechanize::Catalyst', 'npg_qc_viewer';
-  $mech = Test::WWW::Mechanize::Catalyst->new;
-}
+my $schemas;
+lives_ok { $schemas = $util->test_env_setup() }  'test db created and populated';
+use_ok 'Test::WWW::Mechanize::Catalyst', 'npg_qc_viewer';
+my $mech = Test::WWW::Mechanize::Catalyst->new;
 
 {
   $mech->get_ok(q[http://localhost/visuals/fastqcheck_legend]);
 }
 
 {
-  my $url = q[http://localhost/visuals/fastqcheck?path=] . $path;
+  my $url = q[http://localhost/visuals/fastqcheck?paths_list=] . $path . q[&read=forward&rpt_list=4360:1];
   $mech->get_ok($url);
-  $url = q[http://localhost/visuals/fastqcheck?path=] . $path . q[&read=forward];
-  $mech->get_ok($url);
-  $url = q[http://localhost/visuals/fastqcheck?path=] . $path . q[&read=forward&db_lookup=0];
+  $url = q[http://localhost/visuals/fastqcheck?paths_list=] . $path . q[&read=forward&db_lookup=0&rpt_list=4360:1];
   $mech->get_ok($url);
 }
 
 {
-  open my $fh, '<', $path;
-  local $/ = undef;
-  my $text = <$fh>;
-  close $fh;
+  my $text = slurp $path . '/' . $fname;
+  my $rs = $schemas->{'qc'}->resultset('Fastqcheck');
+  $rs->create({section => 'forward', id_run => 4360, position => 1, file_name => $fname, file_content => $text, split => 'none', tag_index => -1});
+  my $where = {split => 'none', tag_index => -1};
+  $where->{'id_run'}   = 4360;
+  $where->{'position'} = 1;
+  $where->{'section'}  = 'forward';
+  is ($rs->search($where)->count, 1, 'one fastqcheck file saved');
 
-  my $rs = $schemas->{qc}->resultset('Fastqcheck');
-  $rs->create({section => 'forward', id_run => 4360, position => 1, file_name => $fname, file_content => $text,});
-  is ($rs->search({file_name => $fname})->count, 1, 'one fastqcheck file saved');
-  my $url = q[http://localhost/visuals/fastqcheck?path=] . $fname . q[&read=forward&db_lookup=1];
+  my $url = q[http://localhost/visuals/fastqcheck?rpt_list=4360:1&read=forward&db_lookup=1];
   $mech->get_ok($url);
 }
 

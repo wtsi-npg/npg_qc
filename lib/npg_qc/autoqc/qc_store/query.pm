@@ -1,74 +1,22 @@
-#########
-# Author:        Marina Gourtovaia
-# Created:       28 September 2011
-#
-
 package npg_qc::autoqc::qc_store::query;
 
-use strict;
-use warnings;
-use Carp;
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
-use Readonly;
 
-use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
-use npg_tracking::util::types;
-with qw/npg_tracking::glossary::run/;
+extends 'npg_qc::autoqc::qc_store::query_non_tracking';
 
 our $VERSION = '0';
 
-has 'option'    =>   (isa       => 'Int',
-                      is        => 'ro',
-                      default   => $LANES,
-                     );
-
-has 'positions' =>   (isa       => 'ArrayRef[NpgTrackingLaneNumber]',
-                      is        => 'ro',
-                      default   => sub {return []; },
-                     );
-
-has 'npg_tracking_schema' => ( isa => 'Maybe[npg_tracking::Schema]',
-                               is  => 'ro',
-                               documentation => 'NPG tracking DBIC schema',
+has 'npg_tracking_schema' => ( isa       => 'npg_tracking::Schema',
+                               is        => 'ro',
+                               required  => 1,
                              );
-
-has 'db_qcresults_lookup' => (isa  => 'Bool', is => 'ro', default => 1,);
-
-has 'propagate_npg_tracking_schema' => (isa  => 'Bool', is => 'rw', default => 0,);
-
-sub BUILD {
-  my $self = shift;
-  if ($self->option != $ALL && $self->option != $PLEXES && $self->option != $LANES) {
-    croak q[Unknown option for loading qc results: ] . $self->option;
-  }
-}
-
-sub to_string {
-  my $self = shift;
-
-  my $s = __PACKAGE__ . q[ object: run ] . $self->id_run;
-
-  my $positions = @{$self->positions} ? (join q[ ], @{$self->positions}) : q[ALL];
-  $s .= qq[, positions $positions];
-
-  my $option = $self->option == $LANES  ? q[LANES] :
-               $self->option == $ALL    ? q[ALL]   : q[PLEXES];
-  $s .= qq[, loading option $option];
-
-  my $schema = $self->npg_tracking_schema;
-  my $schema_string = $schema && (ref $schema) ? qq[$schema] : q[UNDEFINED];
-  $s .= qq[, npg_tracking_schema $schema_string];
-
-  $s .= q[, propagate_npg_tracking_schema ] . $self->propagate_npg_tracking_schema;
-  $s .= q[, db_qcresults_lookup ] . $self->db_qcresults_lookup;
-
-  return $s;
-}
 
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 
@@ -80,7 +28,7 @@ npg_qc::autoqc::qc_store::query
 
 =head1 DESCRIPTION
 
-A wrapper for retrival options and parameters for autoqc results
+A wrapper object for retrival parameters and options for autoqc results.
 
 =head1 SUBROUTINES/METHODS
 
@@ -96,17 +44,11 @@ A reference to an array with positions (lane numbers).
 
 =head2 npg_tracking_schema
 
-An instance of npg_tracking::Schema, undefined by default.
+An instance of npg_tracking::Schema, required.
 
 =head2 db_qcresults_lookup
 
 A boolens flag indicating whether to look for autoqc results in a database.
-
-=head2 propagate_npg_tracking_schema
-
-A boolean flag indicating whether the value of the npg_tracking_schema attribute
-should be passed to the code that gets the location of a runfolder. Set to false
-by default. 
 
 =head2 BUILD
 
@@ -114,7 +56,7 @@ Called before returning an object to the caller, does some sanity checking.
 
 =head2 to_string
 
-Human friendly description of object.
+Human friendly description of the object.
 
 =head1 DIAGNOSTICS
 
@@ -124,19 +66,11 @@ Human friendly description of object.
 
 =over
 
-=item Readonly
-
 =item Moose
 
+=item MooseX::StrictConstructor
+
 =item namespace::autoclean
-
-=item Carp
-
-=item npg_qc::autoqc::qc_store::options
-
-=item npg_tracking::util::types
-
-=item npg_tracking::glossary::run
 
 =back
 
@@ -146,11 +80,11 @@ Human friendly description of object.
 
 =head1 AUTHOR
 
-Author: Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Marina Gourtovaia
+Copyright (C) 2018 GRL
 
 This file is part of NPG.
 
