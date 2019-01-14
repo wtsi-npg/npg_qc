@@ -244,7 +244,8 @@ sub _json2db{
     if ($dbix_class_name && $self->_schema_has_source($dbix_class_name) &&
         $self->_pass_filter($obj)) {
       my $rs  = $self->schema->resultset($dbix_class_name);
-      my $related_composition = $rs->find_or_create_seq_composition($obj->composition());
+      my $check_digest = 1;
+      my $related_composition = $rs->find_or_create_seq_composition($obj->composition(), $check_digest);
       if (!$related_composition) {
         croak 'Composition is not found/created';
       }
