@@ -85,7 +85,7 @@ sub _build_data4reporting {
   my $data = [];
 
   while (my $result = $rs->next()) {
-    my $num_components = $result->composition->num_components();
+    my $num_components = $result->num_components();
     if ($num_components > 1) {
          croak q[Too many components for composition ],
          $result->id_seq_composition, q[ - only expect one];

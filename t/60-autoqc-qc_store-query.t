@@ -4,7 +4,7 @@ use Test::More tests => 21;
 use Test::Exception;
 use Moose::Meta::Class;
 
-use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES $MULTI/;
+use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES $ALLALL/;
 
 use_ok 'npg_qc::autoqc::qc_store::query_non_tracking';
 use_ok 'npg_qc::autoqc::qc_store::query';
@@ -52,9 +52,9 @@ my $schema = Moose::Meta::Class->create_anon_class(roles => ['npg_testing::db'])
   throws_ok {npg_qc::autoqc::qc_store::query->new(id_run => 1, option => $ALL, positions => [0, 9],npg_tracking_schema => $schema)}
     qr/Attribute \(positions\) does not pass the type constraint/,
     'creating an object with invalid positions throws an error';
-  $q = npg_qc::autoqc::qc_store::query->new(id_run => 1, option => $MULTI, npg_tracking_schema => $schema, db_qcresults_lookup => 0);
+  $q = npg_qc::autoqc::qc_store::query->new(id_run => 1, option => $ALLALL, npg_tracking_schema => $schema, db_qcresults_lookup => 0);
   is($q->to_string,
-    'npg_qc::autoqc::qc_store::query object: run 1, positions ALL, loading option MULTI, db_qcresults_lookup 0',
+    'npg_qc::autoqc::qc_store::query object: run 1, positions ALL, loading option ALLALL, db_qcresults_lookup 0',
     'object as string');
   $q = npg_qc::autoqc::qc_store::query->new(id_run => 2, option => $PLEXES, npg_tracking_schema => $schema, db_qcresults_lookup => 1);
   is($q->to_string,

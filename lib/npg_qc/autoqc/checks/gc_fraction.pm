@@ -244,8 +244,6 @@ __END__
 
 =item npg_common::sequence::reference::base_count
 
-=item npg_common::fastqcheck
-
 =back
 
 =head1 INCOMPATIBILITIES

@@ -193,8 +193,6 @@ __END__
 
 =item Try::Tiny
 
-=item npg_common::fastqcheck
-
 =item npg_qc::autoqc::checks::check
 
 =back

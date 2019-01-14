@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Cwd;
-use Test::More tests => 48;
+use Test::More tests => 55;
 use Test::Exception;
 use npg_tracking::util::abs_path qw(abs_path);
 
@@ -15,25 +15,25 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 
 {
   my @checks = ();
-  push @checks, npg_qc::autoqc::checks::verify_bam_id->new( 
-      id_run         => 13940, 
-      position       => 8, 
-      qc_in          => 't/data/autoqc/', 
+  push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
+      id_run         => 13940,
+      position       => 8,
+      qc_in          => 't/data/autoqc/',
       repository     => $repos,
       snv_repository => $snv_repository_with_vcf );
-  push @checks, npg_qc::autoqc::checks::verify_bam_id->new( 
-      rpt_list       => '13940:8', 
-      qc_in          => 't/data/autoqc/', 
+  push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
+      rpt_list       => '13940:8',
+      qc_in          => 't/data/autoqc/',
       repository     => $repos,
       snv_repository => $snv_repository_with_vcf );
-  
+
   foreach my $r (@checks) {
     isa_ok ($r, 'npg_qc::autoqc::checks::verify_bam_id');
     lives_ok { $r->result; } 'No error creating result object';
     ok( defined $r->ref_repository(), 'A default reference repository is set' );
     is($r->lims->library_type, undef, 'Library type returned OK');
     ok($r->alignments_in_bam, 'Alignments in bam true');
-    is($r->lims->reference_genome, 'Homo_sapiens (1000Genomes_hs37d5)', 'reference genome');    
+    is($r->lims->reference_genome, 'Homo_sapiens (1000Genomes_hs37d5)', 'reference genome');
     ok($r->can_run, 'Can run at lane level for single plex in pool') or diag $r->result->comments;
     my $snv_path = abs_path(join '/', cwd,
       't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5');
@@ -43,15 +43,15 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 
 {
   my @checks = ();
-  push @checks, npg_qc::autoqc::checks::verify_bam_id->new( 
-      id_run         => 13886, 
-      position       => 8, 
-      qc_in          => 't/data/autoqc/', 
+  push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
+      id_run         => 13886,
+      position       => 8,
+      qc_in          => 't/data/autoqc/',
       repository     => $repos,
       snv_repository => $snv_repository_with_vcf);
-  push @checks, npg_qc::autoqc::checks::verify_bam_id->new( 
-      rpt_list       => '13886:8', 
-      qc_in          => 't/data/autoqc/', 
+  push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
+      rpt_list       => '13886:8',
+      qc_in          => 't/data/autoqc/',
       repository     => $repos,
       snv_repository => $snv_repository_with_vcf);
 
@@ -60,7 +60,7 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
     ok( defined $r->ref_repository(), 'A default reference repository is set' );
     is($r->lims->library_type, undef, 'Library type returned OK');
     ok($r->alignments_in_bam, 'Alignments in bam true');
-    is($r->lims->reference_genome, 'Homo_sapiens (1000Genomes_hs37d5)', 'reference genome');    
+    is($r->lims->reference_genome, 'Homo_sapiens (1000Genomes_hs37d5)', 'reference genome');
     ok((not $r->can_run), 'Cannot run at lane level for multi plex in pool') or diag $r->result->comments;
     my $snv_path = abs_path(join '/', cwd,
       't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5');
@@ -70,7 +70,7 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 
 {
   my $h = {
-      id_run         => 2549, 
+      id_run         => 2549,
       position       => 4,
       input_files    => [qw(t/data/autoqc/alignment.bam)],
       bam_file       => 'alignment.bam',
@@ -83,7 +83,7 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
   ok( defined $r->ref_repository(), 'A default reference repository is set' );
   is($r->lims->library_type, undef, 'Library type returned OK');
   ok((not $r->alignments_in_bam), 'Alignments in bam false');
-  is($r->lims->reference_genome, undef, 'No reference genome');    
+  is($r->lims->reference_genome, undef, 'No reference genome');
   is($r->can_run, 0, 'Not done if library_type is undef');
   is($r->snv_path, undef, 'snv path is not set');
 
@@ -110,6 +110,26 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
   is($r->can_run, 1, 'Can run - reference is human');
   throws_ok { $r->execute() } qr/Can't find snv file/,
     'run-time error if no snv file found';
+}
+
+
+{
+    local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/verify_bam_id/samplesheet_27483.csv];
+    # Tests if (cD|R)NA libraries use Exome baits:
+    my $r = npg_qc::autoqc::checks::verify_bam_id->new(
+        rpt_list       => '27483:1:1',
+        qc_in          => 't/data/autoqc/',
+        repository     => $repos,
+        snv_repository => $snv_repository_with_vcf);
+    lives_ok {$r->result;} 'No error creating result object';
+    ok(defined $r->ref_repository(), 'A default reference repository is set');
+    like($r->lims->library_type, qr/(?:cD|R)NA/sxm, 'Library type returned OK');
+    ok($r->alignments_in_bam, 'Alignments in bam true');
+    like($r->lims->reference_genome, qr/Homo_sapiens/, 'human reference genome');
+    my $snv_path = abs_path(join '/', cwd,
+        't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Exome/GRCh38_15');
+    is($r->snv_path, $snv_path, 'snv path is set');
+    ok($r->can_run, 'Can run on RNA library') or diag $r->result->comments;
 }
 
 1;
