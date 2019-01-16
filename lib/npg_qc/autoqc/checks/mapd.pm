@@ -20,6 +20,9 @@ Readonly::Scalar our $EXT => q[cram];
 Readonly::Scalar our $EXIT_CODE_SHIFT => 8;
 
 Readonly::Scalar my $ZERO => 0;
+Readonly::Scalar my $TWO => 2;
+Readonly::Scalar my $THREE => 3;
+Readonly::Scalar my $FIVE => 5;
 Readonly::Scalar my $MINUS_ONE => -1;
 Readonly::Scalar my $SAM_SEQ_COLUMN_INDEX => 9;
 Readonly::Scalar my $MAPD_OUTPUT_DIR => '_MAPD_%s';
@@ -165,7 +168,6 @@ override 'can_run' => sub {
 override 'execute' => sub {
     my $self = shift;
     super();
-    my @comments;
     if (! $self->can_run) {
         my $can_run_message = q[MAPD score cannot be obtained for this bam file];
         $self->result->add_comment($can_run_message);
@@ -279,16 +281,16 @@ sub run_make_path {
 }
 
 sub _chrom_sort {
-    my @a = split qq[\t], $a;
-    my @b = split qq[\t], $b;
+    my @a = split /\t/smx, $a;
+    my @b = split /\t/smx, $b;
     my $number_a;
     my $letter_a = $a[0];
     my $number_b;
     my $letter_b = $b[0];
-    if ($a[0] =~ /^\d+$/) {
+    if ($a[0] =~ /^\d+$/smx) {
         $number_a = $a[0];
     }
-    if ($b[0] =~ /^\d+$/) {
+    if ($b[0] =~ /^\d+$/smx) {
         $number_b = $b[0];
     }
     # Compare and return
@@ -305,14 +307,14 @@ sub _generate_bin_counts {
     my $reads = 0;
     #--------------------
     # get unique hits
-    my $view_cmd = $self->samtools_cmd. qq[ view -F 3332 -q 20 ]. $self->bam_file. q[ | ];
+    my $view_cmd = $self->samtools_cmd. q[ view -F 3332 -q 20 ]. $self->bam_file. q[ | ];
     my $ph = IO::File->new($view_cmd) or croak qq[Cannot fork '$view_cmd', error $ERRNO];
     my @view_out;
     while (my $line = <$ph>) {
         if ($line !~ /XA:Z/smx) {
             my @read = split /\t/smx, $line;
-            my $rname = $read[2];
-            my $pos = $read[3];
+            my $rname = $read[$TWO];
+            my $pos = $read[$THREE];
             push @view_out, (join qq[\t], $rname, $pos, $pos). qq[\n];
             $reads += 1;
         }
@@ -328,10 +330,10 @@ sub _generate_bin_counts {
     # sort by chromosome
     my $fh = IO::File->new($self->_bin_counts_file, q[w]);
     my @sorted = sort _chrom_sort @bed_out;
-    print $fh (join qq[\t], qw(chromosome start end mappable size test ref)). qq[\n];
+    print {$fh} (join qq[\t], qw(chromosome start end mappable size test ref)). qq[\n];
     foreach my $sort_line (@sorted) {
         my @rec = split /\t/smx, $sort_line;
-        print $fh (join qq[\t], @rec[0..5], $ZERO). qq[\n];
+        print {$fh} (join qq[\t], @rec[0..$FIVE], $ZERO). qq[\n];
     }
     $fh->close();
     return $reads;
@@ -483,6 +485,7 @@ sub _save_results {
 __PACKAGE__->meta->make_immutable();
 
 1;
+
 __END__
 
 =head1 NAME

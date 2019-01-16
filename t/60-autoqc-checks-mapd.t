@@ -9,7 +9,7 @@ use Test::Warn;
 use Test::Deep;
 use File::Temp qw/tempdir/;
 
-my $dir = '/tmp/hzSrgyv18v'; #tempdir( CLEANUP => 0 );
+my $dir = tempdir(CLEANUP => 1);
 my $current_dir = cwd();
 my $central = 't/data/autoqc/mapd';
 my $repos = catdir($central, 'references');
