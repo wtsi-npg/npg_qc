@@ -29,6 +29,7 @@ lib/npg_qc/autoqc/checks/gc_fraction.pm
 lib/npg_qc/autoqc/checks/genotype.pm
 lib/npg_qc/autoqc/checks/genotype_call.pm
 lib/npg_qc/autoqc/checks/insert_size.pm
+lib/npg_qc/autoqc/checks/mapd.pm
 lib/npg_qc/autoqc/checks/pulldown_metrics.pm
 lib/npg_qc/autoqc/checks/qX_yield.pm
 lib/npg_qc/autoqc/checks/ref_match.pm
@@ -59,6 +60,7 @@ lib/npg_qc/autoqc/results/gc_fraction.pm
 lib/npg_qc/autoqc/results/genotype.pm
 lib/npg_qc/autoqc/results/genotype_call.pm
 lib/npg_qc/autoqc/results/insert_size.pm
+lib/npg_qc/autoqc/results/mapd.pm
 lib/npg_qc/autoqc/results/pulldown_metrics.pm
 lib/npg_qc/autoqc/results/qX_yield.pm
 lib/npg_qc/autoqc/results/ref_match.pm
@@ -208,6 +210,7 @@ t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-genotype.t
 t/60-autoqc-checks-genotype_call.t
 t/60-autoqc-checks-insert_size.t
+t/60-autoqc-checks-mapd.t
 t/60-autoqc-checks-pulldown_metrics.t
 t/60-autoqc-checks-qX_yield.t
 t/60-autoqc-checks-ref_match.t
@@ -422,6 +425,9 @@ t/data/autoqc/load/3510_1_1_human_split_stats.json
 t/data/autoqc/load/3510_5.qX_yield.json
 t/data/autoqc/load/do_not_add_files_to_this_dir
 t/data/autoqc/load/some.json
+t/data/autoqc/mapd/metadata_cache/samplesheet_27128.csv
+t/data/autoqc/mapd/data/27128_1#1.cram
+t/data/autoqc/mapd/data/27128_1#2.cram
 t/data/autoqc/npg/instrument/15.xml
 t/data/autoqc/npg/instrument/42.xml
 t/data/autoqc/npg/run/1937.xml
