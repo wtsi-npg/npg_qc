@@ -483,3 +483,116 @@ sub _save_results {
 __PACKAGE__->meta->make_immutable();
 
 1;
+__END__
+
+=head1 NAME
+
+npg_qc::autoqc::checks::mapd
+
+=head1 SYNOPSIS
+
+Generate MAPD value for sample input file
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head2 file_type
+
+Default is cram
+
+=head2 bin_size
+
+Bin size (in KB) for which logR is calculated. E.g. 100000, 500000
+
+=head2 gamma
+
+Gamma, penalty parameter used during logR and copy number calculations. For
+lower binsize e.g. 50kb, 100kb, suggested gamma parameter is 25 (preferred)
+or more and for higher binsize e.g. 250kb, 500kb suggested gamma parameter
+is 15, 10 or lower. Please choose the best gamma parameter fitting to your
+data.
+
+=head2 threshold
+
+Used in the MAPD process. Suggested values are 0.3 for human and 0.6 for
+mouse.
+
+=head2 read_length
+
+Length of the reads in the bam file.
+
+=head2 mappable_bins_file
+
+Bins for the reference genome in specified bin size and read length
+
+=head2 mappable_bins_bed_file
+
+Similar to the above but in bed format
+
+=head2 bam_file
+
+Input file
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Moose
+
+=item Carp
+
+=item DateTime
+
+=item English
+
+=item File::Path
+
+=item File::Spec
+
+=item File::Share
+
+=item IPC::Run3
+
+=item Readonly
+
+=item namespace::autoclean
+
+=item npg_tracking::util::types
+
+=item npg_qc::autoqc::checks::check
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Ruben E Bautista-Garcia<lt>rb11@sanger.ac.uk<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2019 Genome Research Limited
+
+This file is part of NPG.
+
+NPG is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut
