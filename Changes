@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - add new metric MAPD
+
 release 66.0
  - GUI for utility QC (inactive)
  - add new bcfstats qc check + viewer change
