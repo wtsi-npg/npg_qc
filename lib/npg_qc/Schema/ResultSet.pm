@@ -123,7 +123,7 @@ sub find_seq_composition {
 }
 
 sub find_or_create_seq_composition {
-  my ($self, $composition) = @_;
+  my ($self, $composition, $check_digest) = @_;
 
   $self->_validate($composition);
   my $digest         = $composition->digest;
@@ -133,7 +133,14 @@ sub find_or_create_seq_composition {
     my $composition_row = $self->_find_composition($digest, $num_components);
     # If composition exists, we assume that it's properly defined, i.e.
     # all relevant components and records in the linking table exist.
-    if (!$composition_row) {
+    if ($composition_row) {
+      # If asked, ensure that the found row represents the same composition.
+      if ($check_digest &&
+           ($composition->freeze ne $composition_row->create_composition()->freeze)) {
+        croak "A different composition object with the same digest '$digest' " .
+              'already exists in the database';
+      }
+    } else {
       $composition_row = $schema->resultset('SeqComposition')
                                 ->create({
                     'digest' => $digest,
@@ -305,6 +312,10 @@ for every component-composition pair.
 
 Gives an error if this resultset does not have a relationship to
 the seq_composition table.
+
+If a true value is given as a second attrubute and a composition object is
+found, a check for a clash of sha256 digest of composition objects is performed.
+Error is raised if the clashing digests are detected.
 
 =head2 composition_fk_column_name
 

@@ -530,7 +530,7 @@ subtest q[not saving composition subset value "all"] => sub {
 my $id_run;
 
 subtest q[finding existing composition] => sub {
-  plan tests => 15;
+  plan tests => 17;
 
   my $rs_component   = $schema->resultset('SeqComponent');
   my $rs_composition = $schema->resultset('SeqComposition');
@@ -592,12 +592,25 @@ subtest q[finding existing composition] => sub {
         $f->add_component(npg_tracking::glossary::composition::component::illumina
                           ->new(%{$value}, tag_index => undef, subset => undef));
       }
-      $row = $ssrs->find_or_create_seq_composition($f->create_composition());
+      my $c = $f->create_composition();
+      $row = $ssrs->find_or_create_seq_composition($c);
       is($row->id_seq_composition, $pk_value, 'existing row returned');
+
+      my $row_to_change = $rs_component->search(
+        {id_run => $id_run,position => 1,tag_index => undef, subset => undef})->next();
+      $row_to_change or die 'Failed to find existing row';
+      $row_to_change->update({subset => 'human'});
+      my $d = $c->digest;
+      throws_ok {$ssrs->find_or_create_seq_composition($c, 1)}
+        qr/A different composition object with the same digest '$d' already exists in the database/,
+        'error detecting composition digest clash';
+      $row_to_change->update({subset => undef});
+      lives_ok {$ssrs->find_or_create_seq_composition($c, 1)}
+        'no error after removing the clash';
     }
 
     $count++;
-  }
+  }  
 };
 
 subtest q[creating new composition from new and existing components] => sub {
