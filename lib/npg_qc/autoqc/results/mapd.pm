@@ -21,7 +21,7 @@ __END__
 
 =head1 NAME
 
-npg_qc::autoqc::results::mapd_score
+npg_qc::autoqc::results::mapd
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,6 @@ use File::Spec;
 use File::Share ':all';
 use IPC::Run3 qw(run3);
 use Readonly;
-use namespace::autoclean;
 use npg_tracking::util::types;
 
 extends qw(npg_qc::autoqc::checks::check);
@@ -34,7 +33,8 @@ Readonly::Scalar my $LOGR_RSCRIPT_FILE => 'LogR.R';
 Readonly::Scalar my $MAPD_RSCRIPT_FILE => 'MAPD.R';
 Readonly::Scalar my $THRESHOLD_SCORE_HUMAN => 0.3;
 Readonly::Scalar my $THRESHOLD_SCORE_MOUSE => 0.6;
-Readonly::Hash   my %MAPD_RESULTS_FIELDS_MAPPING => {
+Readonly::Array my @BIN_COUNTS_HEADER => qw/chromosome start end mappable size test ref/;
+Readonly::Hash my %MAPD_RESULTS_FIELDS_MAPPING => {
     'MAPD' => 'mapd_score',
 };
 
@@ -308,6 +308,7 @@ sub _generate_bin_counts {
     #--------------------
     # get unique hits
     my $view_cmd = $self->samtools_cmd. q[ view -F 3332 -q 20 ]. $self->bam_file. q[ | ];
+    carp q[EXECUTING ]. $view_cmd. q[ time ]. DateTime->now();
     my $ph = IO::File->new($view_cmd) or croak qq[Cannot fork '$view_cmd', error $ERRNO];
     my @view_out;
     while (my $line = <$ph>) {
@@ -328,12 +329,12 @@ sub _generate_bin_counts {
     run3 $bed_cmd, \@view_out, \@bed_out;
     #--------------------
     # sort by chromosome
-    my $fh = IO::File->new($self->_bin_counts_file, q[w]);
     my @sorted = sort _chrom_sort @bed_out;
-    print {$fh} (join qq[\t], qw(chromosome start end mappable size test ref)). qq[\n];
+    my $fh = IO::File->new($self->_bin_counts_file, 'w');
+    print {$fh} (join qq[\t], @BIN_COUNTS_HEADER). qq[\n]; ## no critic (RequireCheckedSyscalls)
     foreach my $sort_line (@sorted) {
         my @rec = split /\t/smx, $sort_line;
-        print {$fh} (join qq[\t], @rec[0..$FIVE], $ZERO). qq[\n];
+        print {$fh} (join qq[\t], @rec[0..$FIVE], $ZERO). qq[\n]; ## no critic (RequireCheckedSyscalls)
     }
     $fh->close();
     return $reads;
@@ -562,8 +563,6 @@ Input file
 =item IPC::Run3
 
 =item Readonly
-
-=item namespace::autoclean
 
 =item npg_tracking::util::types
 
