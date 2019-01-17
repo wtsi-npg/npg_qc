@@ -8,6 +8,7 @@ use Test::Exception;
 use Test::Warn;
 use Test::Deep;
 use File::Temp qw/tempdir/;
+use File::Share ':all';
 
 my $dir = tempdir(CLEANUP => 1);
 my $current_dir = cwd();
@@ -179,33 +180,52 @@ subtest 'Commands and R scripts' => sub {
 };
 
 subtest 'Preprocess input data' => sub {
-    plan tests => 4;
-
+    plan tests => 5;
+    # these tests use miniaturised versions of every file necessary
+    # that can be found in t/data/autoqc/mapd/data
+    my $mappablebins_file = catfile($data_dir, 'mappable_bins_human_500k_151bp.txt');
+    my $mappablebins_bed_file = catfile($data_dir, 'mappable_bins_human_500k_151bp.bed');
+    my $chr_list_file = catfile($data_dir, 'chr_list.txt');
     my $check = npg_qc::autoqc::checks::mapd->new(
         id_run => 27128,
         position => 1,
-        tag_index => 2,
+        tag_index => 3,
         repository => $dir,
-        ref_repository => $ref_dir,
         path => $data_dir,
-        bin_size => 100000,
+        bin_size => 500000,
         qc_out => $dir,
         read_length => 151,
+        mappability_file => $mappablebins_file,
+        mappability_bed_file => $mappablebins_bed_file,
+        chromosomes_file => $chr_list_file,
     );
 
     is(basename($check->bam_file),
-        '27128_1#2.cram',
-        'output counts file name is correct');
+        '27128_1#3.cram',
+        'finds input cram file');
+
     is(basename($check->_bin_counts_file),
-        '4884STDY7663261_100000_mappable_151bases.count',
-        'finds input bam file');
-    TODO: {
-        todo_skip 'take too long to run: need tiny test data', 2 if 1;
-        `mkdir -p $dir/_MAPD_27128_1\#2`;
+        '4884STDY7663262_500000_mappable_151bases.count',
+        'output counts file name is correct');
+
+    SKIP: {
+        skip 'Third party bioinformatics tools required. Set TOOLS_INSTALLED to true to run.',
+        3 unless ($ENV{'TOOLS_INSTALLED'});
+
+        `mkdir -p $dir/_MAPD_27128_1\#3`;
         is($check->_generate_bin_counts,
-            1272,
+            145,
             'generate counts OK');
-        lives_ok { $check->execute } 'execution ok';
+
+        TODO: {
+            todo_skip 'Third party tools AND R scripts required.', 2 if 1;
+            # IFF R scripts execution methods are to be tested
+            # A sensible way of making them available for testing
+            # needs to be figured out
+            lives_ok { $check->_run_logr } 'runs logr and lives ok';
+            lives_ok { $check->_run_mapd } 'runs mapd and lives ok';
+        }
+
     }
 
 };
