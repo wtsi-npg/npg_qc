@@ -173,7 +173,7 @@ override 'execute' => sub {
         $self->result->add_comment($can_run_message);
         return 1;
     }
-    return 1 if !$self->run_make_path($self->_mapd_output_dir);
+    return 1 if !$self->_run_make_path($self->_mapd_output_dir);
     # Process input bam to generate
     # counts per mappable bin:
     $self->_generate_bin_counts;
@@ -265,7 +265,7 @@ sub _build__sample_name {
     return $sample_names[0];
 }
 
-sub run_make_path {
+sub _run_make_path {
     my $self = shift;
     my $path = shift;
     if (! -d $path ) {
@@ -495,19 +495,19 @@ npg_qc::autoqc::checks::mapd
 
 =head1 SYNOPSIS
 
-Generate MAPD value for sample input file
-
 =head1 DESCRIPTION
+
+Generate MAPD value for sample input file
 
 =head1 SUBROUTINES/METHODS
 
-=head2 file_type
+=head2 read_length
 
-Default is cram
+=head2 mappable_bins_file
 
-=head2 bin_size
+=head2 mappable_bins_bed_file
 
-Bin size (in KB) for which logR is calculated. E.g. 100000, 500000
+=head2 bam_file
 
 =head2 gamma
 
@@ -519,24 +519,7 @@ data.
 
 =head2 threshold
 
-Used in the MAPD process. Suggested values are 0.3 for human and 0.6 for
-mouse.
-
-=head2 read_length
-
-Length of the reads in the bam file.
-
-=head2 mappable_bins_file
-
-Bins for the reference genome in specified bin size and read length
-
-=head2 mappable_bins_bed_file
-
-Similar to the above but in bed format
-
-=head2 bam_file
-
-Input file
+Used in the MAPD process. Suggested values are 0.3 for human and 0.6 for mouse.
 
 =head1 DIAGNOSTICS
 
@@ -567,6 +550,12 @@ Input file
 =item npg_tracking::util::types
 
 =item npg_qc::autoqc::checks::check
+
+=item npg_tracking::data::reference::find
+
+=item npg_tracking::data::mapd::find
+
+=item npg_common::roles::software_location
 
 =back
 
