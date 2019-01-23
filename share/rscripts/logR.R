@@ -31,8 +31,9 @@ library(GenomicRanges, quietly=TRUE, verbose=FALSE)
 library(limma, quietly=TRUE, verbose=FALSE)
 
 
-setwd(output_dir)
-wd <- getwd()
+#setwd(output_dir)
+message("Working directory: ", getwd())
+
 common_file_name <- paste(bin_size, "_", read_length, "bases_", gamma, "gamma", sep = "")
 
 message("Reading chromosomes list file")
@@ -90,7 +91,7 @@ logr[is.na(logr)] <- logr_prior[is.na(logr)]
 ## Looking at the plot can be helpful but not necessary for now
 ## print("Print loess fit plot")
 ##
-## jpeg(paste(sample_name, "-LoessFit_on_LogRprior-", common_file_name,".jpg", sep = ""),
+## jpeg(file.path(output_dir, paste(sample_name, "-LoessFit_on_LogRprior-", common_file_name,".jpg", sep = "")),
 ##      pointsize = 12, width = 1600, height = 900)
 ## par(mfrow = c(1, 2))
 ## plot(gc_plot, logr_prior, pch = 19, cex = 0.1, xlab = "GC-content",
@@ -117,7 +118,7 @@ message("Storing sc_data into file")
 ## silly long name (slightly changed) saved for back-reference with original code
 ## sc_data_filename <- paste(sample_name, "-M30hits_vs_NoREFM30hits_GCcorrected-", common_file_name, ".txt", sep = "")
 sc_data_filename <- paste(sample_name, "-logr_prefastpcf_gccorrected-", common_file_name, ".txt", sep = "")
-write.table(sc_data, quote = F, col.names = T, row.names = F, sep = "\t", file = sc_data_filename)
+write.table(sc_data, quote = F, col.names = T, row.names = F, sep = "\t", file = file.path(output_dir, sc_data_filename))
 
 ## Write logr_prior and gc_plot to a file
 ## (Not being saved for now)
@@ -135,7 +136,7 @@ write.table(sc_data, quote = F, col.names = T, row.names = F, sep = "\t", file =
 message("LogR segmentation")
 
 source(file.path(rscripts_dir, "fastPCF.R"))
-sc_data <- read.delim(sc_data_filename)
+sc_data <- read.delim(file.path(output_dir, sc_data_filename))
 segmentation_table <- vector("list", length(chrom))
 for (chr in 1:num_chr) {
 
@@ -175,7 +176,7 @@ colnames(to_write_segments) <- c("Chr", "Pos", "logR", "logRsegment", "end", "ab
 ## thresholds <- paste("PCF_kmin3_fastPCF_vs_NoREFM30hits", sep = "")
 ## output_file = paste(sample_name, "-LogR_GCcorrected_M30-", thresholds, "-", common_file_name, ".txt", sep = "")
 output_file = paste(sample_name, "-logr_segmentation-", common_file_name, ".txt", sep = "")
-write.table(to_write_segments, quote = F, sep = "\t", col.names = T, row.names = F, file = output_file)
+write.table(to_write_segments, quote = F, sep = "\t", col.names = T, row.names = F, file = file.path(output_dir, output_file))
 
 
 message("All OK")

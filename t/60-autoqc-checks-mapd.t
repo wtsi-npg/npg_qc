@@ -93,9 +93,11 @@ subtest 'Commands and R scripts' => sub {
     `chmod +x $coveragebed_bin`;
     `chmod +x $rscript_bin`;
     `mkdir -p $dir/rscripts`;
+    my $logr_script_filename = 'logR.R';
+    my $mapd_script_filename = 'mapd.R';
 
-    my $logr_script = catfile($dir, 'rscripts', 'LogR.R');
-    my $mapd_script = catfile($dir, 'rscripts', 'MAPD.R');
+    my $logr_script = catfile($dir, 'rscripts', $logr_script_filename);
+    my $mapd_script = catfile($dir, 'rscripts', $mapd_script_filename);
     `touch $logr_script`;
     `touch $mapd_script`;
 
@@ -134,16 +136,16 @@ subtest 'Commands and R scripts' => sub {
     is($check->_rscripts_path,
         "$dir/rscripts",
         'finds rscripts path');
-    is($check->_find_rscript('LogR.R'),
+    is($check->_find_rscript($logr_script_filename),
         $logr_script,
         'finds logR R script');
-    is($check->_find_rscript('MAPD.R'),
+    is($check->_find_rscript($mapd_script_filename),
         $mapd_script,
         'finds MAPD R script');
 
     # Generate Rscript commands and check outputs
     # LogR
-    my $logr_cmd = "$dir/Rscript $dir/rscripts/LogR.R".
+    my $logr_cmd = "$dir/Rscript $dir/rscripts/$logr_script_filename".
                    ' --mappable_bins '. $check->mappability_file.
                    ' --sample_bin_counts '. $check->_bin_counts_file.
                    ' --output_dir '. catdir($dir, '_MAPD_27128_1#2').
@@ -163,7 +165,7 @@ subtest 'Commands and R scripts' => sub {
     is($check->threshold,
         0.3,
         'threshold score for this species is correct');
-    my $mapd_cmd = "$dir/Rscript $dir/rscripts/MAPD.R".
+    my $mapd_cmd = "$dir/Rscript $dir/rscripts/$mapd_script_filename".
                    ' --logr_segmentation_file '. $check->_logr_segmentation_file.
                    ' --output_dir '. catdir($dir, '_MAPD_27128_1#2').
                    ' --chromosomes '. $check->chromosomes_file.

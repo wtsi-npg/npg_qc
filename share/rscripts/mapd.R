@@ -22,8 +22,9 @@ sample_name <- opt$sample_name
 bin_size <-opt$bin_size
 read_length <- opt$read_length
 
-setwd(output_dir)
-wd <- getwd()
+#setwd(output_dir)
+message("Working directory: ", getwd())
+
 common_file_name <- paste(bin_size, "_", read_length, "bases_", threshold, "threshold", sep = "")
 
 
@@ -59,16 +60,16 @@ for (chr in seq(1, num_chr)) {
 mapd_sample <- median(unlist(mapd))
 
 
-message("Writing MAPD data into files")
+message("Writing MAPD data in directory: ", output_dir)
 
 mapd_calc_data <- do.call("rbind", mapd_calc_table)
 colnames(mapd_calc_data) <- c("Chr", "LogR", "LogR1", "LogR2", "MAPD")
 mapd_data_filename <- paste(sample_name, "-mapd_precalc_logr_data-", common_file_name, ".txt", sep = "")
-write.table(mapd_calc_data, quote = F, col.names = T, row.names = F, sep = "\t", file = mapd_data_filename)
+write.table(mapd_calc_data, quote = F, col.names = T, row.names = F, sep = "\t", file = file.path(output_dir, mapd_data_filename))
 
 mapd_res_data  <- cbind(Sample = sample_name, MAPD = mapd_sample, Threshold = threshold)
 mapd_res_filename  <- paste(sample_name, "-mapd_results-", common_file_name, ".txt", sep = "")
-write.table(mapd_res_data, quote = F, col.names = T, row.names = F, sep = "\t", file = mapd_res_filename)
+write.table(mapd_res_data, quote = F, col.names = T, row.names = F, sep = "\t", file = file.path(output_dir, mapd_res_filename))
 
 
 message("All OK")
