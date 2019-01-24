@@ -608,7 +608,7 @@ sub _fetch_run_rows {
     where
       r.id_instrument = i.id_instrument
       and r.id_run = rs.id_run
-      and rs.id_run_status_dict = 4
+      and rs.id_run_status_dict = 9
       and i.id_instrument = (select id_instrument from run where id_run = ?)
       and rs.date <= (select max(date) from run_status where id_run = ? and id_run_status_dict in (2,3,4))
       and if(tr.id_tag=22, 'A', IF(tr.id_tag=23, 'B', 'X')) = (select if(id_tag=22, 'A', IF(id_tag=23, 'B', 'X')) from (run rx left outer join tag_run trx on rx.id_run = trx.id_run and trx.id_tag in (22,23)) where rx.id_run = ? and (trx.id_tag in (22,23) or trx.id_tag is null))
