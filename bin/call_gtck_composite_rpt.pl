@@ -130,6 +130,9 @@ print $of $result_string;
 sub find_runlanefolder {
 	my ($id_run, $lane, $tag_index, $ext) = @_;
 
+	# temporarily disable search for run folder (assumptions about its structure are out of date)
+	return;
+
 	# the methods hash ref passed to create_anon_class looks peculiar, but seems to be necessary to create a new object
 	#  from an anonymous class in this way
         my $runfolder = Moose::Meta::Class->create_anon_class(
