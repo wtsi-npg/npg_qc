@@ -3,7 +3,7 @@ package npg_qc::autoqc::db_loader;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
-use JSON;
+use JSON qw/from_json/;
 use Carp;
 use Try::Tiny;
 use List::MoreUtils qw/any none/;
@@ -250,7 +250,12 @@ sub _json2db{
         croak 'Composition is not found/created';
       }
       $self->_log("Loading $class_name result for " . $obj->composition()->freeze());
-      my $values = decode_json($obj->freeze());
+      #####
+      # Most fields are ASCII. The only exception is the SAM/BAM header in sequence_summary
+      # check, which occasionally contains study names with characters from a wider
+      # character set. We either have to explicitly encode strings as UTF-8 or relax the
+      # parser, which is what we are doing below for that particular check.
+      my $values = from_json($obj->freeze(), $class_name eq 'sequence_summary' ? {utf8 => 0} : {});
       $values->{$SEQ_COMPOSITION_PK_NAME} = $related_composition->$SEQ_COMPOSITION_PK_NAME();
       $self->_values2db($rs, $values);
       $count++;
