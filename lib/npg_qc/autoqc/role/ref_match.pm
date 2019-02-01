@@ -8,36 +8,59 @@ our $VERSION = '0';
 Readonly::Scalar my $PERCENT => 100;
 
 sub percent_count {
-    my ($self) = @_;
+  my $self = shift;
 
-    my %counts = %{ $self->aligned_read_count() || {} };
+  my $counts      = $self->aligned_read_count() || {};
+  my $sample_size = $self->sample_read_count();
+  my $percentage = {};
 
-    my $sample_size = $self->sample_read_count() || 0;
-    return if $sample_size == 0;
-
-    my %percentage;
-    foreach my $organism ( keys %counts ) {
-        my $value = $PERCENT * ( $counts{$organism} / $sample_size );
-
-        $percentage{$organism} = sprintf '%.1f', $value;
+  if ($sample_size) {
+    foreach my $organism ( keys %{$counts} ) {
+      $percentage->{$organism} = sprintf '%.1f',
+         $PERCENT * ( $counts->{$organism} / $sample_size );
     }
+  }
 
-    return \%percentage;
+  return $percentage;
 }
 
 sub ranked_organisms {
-    my ($self) = @_;
+  my ($self, $ratings) = @_;
 
-    my %rating = %{ $self->percent_count() || {} };
+  $ratings ||= $self->percent_count();
 
-    my @ranked_organisms =
-        reverse sort { $rating{$a} <=> $rating{$b} } keys %rating;
+  # Deterministic ranking of organisms:
+  # reverse numerical comparison of alignment results
+  # followed, if necessary, by string comparison of names.
+  my $compare = sub {
+    my ($org1, $org2) = @_;
+    my $result = $ratings->{$org2} <=> $ratings->{$org1};
+    $result  ||= $org1 cmp $org2;
+    return $result;
+  };
 
-    return \@ranked_organisms;
+  my @ranked_organisms = sort { $compare->($a, $b) } keys %{$ratings};
+
+  return \@ranked_organisms;
 }
 
+sub top_two {
+  my $self = shift;
 
-no Moose;
+  my $ratings = $self->percent_count();
+  my @ranked = @{$self->ranked_organisms($ratings)};
+  my @top_two = ();
+  for (qw/1 2/) {
+    my $organism = shift @ranked;
+    $organism or next;
+    my $strain = $self->reference_version->{$organism};
+    $organism =~ s/_/ /xms;
+    push @top_two, join q[ ], $organism, $strain;
+  }
+  return @top_two;
+}
+
+no Moose::Role;
 
 1;
 
@@ -56,14 +79,20 @@ __END__
 
 =head2 percent_count
 
-Calculate a rating value for each organism. Right now that value is the
-percentage of sampled reads aligning to the organism's reference genome.
+Calculates a rating value for each organism, i.e. the percentage of
+sampled reads aligning to the organism's reference genome. Returns
+a potentially empty hash of organism-rating key-value pairs.
 
 =head2 ranked_organisms
 
-Sort the organisms represented in the reference sequence by descending order
-of their normalised contamination values. Return this list as an array
-reference.
+Returns an array of reference names. The array is sorted according to
+the number of reads from the sample, which aligned to the reference.
+Where the number of aligned reads is the same, the reference names are
+sorted alphabetically. The sort order is better alignment first.
+
+=head2 top_two
+
+Return a list of top two opgamisms (together with strain/reference version).
 
 =head1 DIAGNOSTICS
 
@@ -89,7 +118,7 @@ John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2016, 2019 GRL
 
 This file is part of NPG.
 

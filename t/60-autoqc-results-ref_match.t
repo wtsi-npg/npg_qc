@@ -1,15 +1,7 @@
-#########
-# Author:        jo3
-# Created:       30 July 2009
-#
-
 use strict;
 use warnings;
-use Test::More tests => 14;
-use Test::Deep;
+use Test::More tests => 16;
 use Test::Exception;
-use English qw(-no_match_vars);
-use Carp;
 
 use_ok('npg_qc::autoqc::results::ref_match');
 
@@ -29,6 +21,7 @@ $r->aligned_read_count(
         Danio_rerio           =>     0,
         Mus_musculus          =>   100,
         Clostridium_difficile =>   300,
+        Salmonella_bongori    =>   301
     }
 );
 
@@ -38,18 +31,20 @@ $r->reference_version(
         Danio_rerio           => 'v9',
         Mus_musculus          => 'NCBIm37',
         Clostridium_difficile => 'Strain_630',
+        Salmonella_bongori    => '12149'
     }
 );
 
 $r->sample_read_count(10_000);
 
-is_deeply(
+is_deeply (
     $r->percent_count(),
     {
         Homo_sapiens          => '50.0',
         Danio_rerio           =>  '0.0',
         Mus_musculus          =>  '1.0',
         Clostridium_difficile =>  '3.0',
+        Salmonella_bongori    =>  '3.0'
     },
     'Calculate percentages'
 );
@@ -61,6 +56,7 @@ is_deeply(
         Danio_rerio           => 'v9',
         Mus_musculus          => 'NCBIm37',
         Clostridium_difficile => 'Strain_630',
+        Salmonella_bongori    => '12149'
     },
     'Reference versions aren\'t messed with'
 
@@ -72,15 +68,25 @@ lives_ok { $r->add_comment($comment1); } 'Use role to add comment';
 $r->add_comment($comment2);
 is( $r->comments(), "$comment1 $comment2", 'Retrieve comment' );
 
-cmp_deeply(
+is_deeply(
     $r->ranked_organisms(),
     [
         'Homo_sapiens',
         'Clostridium_difficile',
+        'Salmonella_bongori',
         'Mus_musculus',
         'Danio_rerio'
     ],
     'Rank matches by percentages'
+);
+
+is_deeply(
+    [$r->top_two()],
+    [
+        'Homo sapiens NCBI37',
+        'Clostridium difficile Strain_630',
+    ],
+    'Top two'
 );
 
 my $emptyresult;
@@ -96,6 +102,8 @@ lives_ok { $ordered = $emptyresult->ranked_organisms(); }
 
 #dj3: okay to return full array as well I guess - don't take too seriously...
 cmp_ok( @{$ordered}, q(==), 0, q(zero sized array of organisms) );
+cmp_ok( scalar $emptyresult->top_two, q(==), 0,
+  q(zero sized array of top two organisms) );
 
 # Make sure we're not being lazy about defaults.
 is( $emptyresult->sample_read_count(), 10_100, 'Number of reads sampled' );
