@@ -3,6 +3,15 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - SeqQC:
      heatmaps from samtools stats files as a source
 
+release 66.1.1
+ - composite genotype check script (call_gtck_composite_rpt.pl) search
+     for run folders disabled - only use iRODS cram files
+
+release 66.1
+ - autoqc results loader to check for potential composition digest clashes
+ - amend upstream_tags check to find previous runs which have reached
+     status "analysis complete" (instead of "run complete")
+
 release 66.0
  - GUI for utility QC (inactive)
  - add new bcfstats qc check + viewer change
