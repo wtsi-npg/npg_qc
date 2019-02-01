@@ -151,11 +151,12 @@
 [%- END -%]
 
 [% BLOCK ref_match -%]
-[%- IF result.aligned_read_count.defined; ranked_orgs = result.ranked_organisms -%]
+[%- IF result.aligned_read_count.defined;
+      percent_count = result.percent_count;
+      ranked_orgs = result.ranked_organisms(percent_count);
 
-
-[%-   IF ranked_orgs.0.defined;
-        match = result.percent_count.item(ranked_orgs.0);
+      IF ranked_orgs.0.defined;
+        match = percent_count.item(ranked_orgs.0);
         padding = ' ';
         IF match < 10; padding = '  '; END;
 -%]
@@ -163,7 +164,7 @@
 [%-   END -%]
 
 [%-   IF ranked_orgs.1.defined;
-        match = result.percent_count.item(ranked_orgs.1);
+        match = percent_count.item(ranked_orgs.1);
         padding = ' ';
         IF match < 10; padding = '  '; END;
 -%]
