@@ -4,7 +4,7 @@
 <li><a id="collapse_all_results" href="#" class="collapse_icon">-</a>
     <a id="expand_all_results" href="#" class="collapse_icon">+</a>
     <b>all results</b></li>
-[%- FOREACH check_name IN  checks_info.list -%]
+[%- FOREACH check_name IN checks_info.list -%]
   [%- IF (check_name != "spatial filter") %]
     [%- label_name = check_name;
         IF check_name == "sequence mismatch"; label_name='seq. mismatch';
