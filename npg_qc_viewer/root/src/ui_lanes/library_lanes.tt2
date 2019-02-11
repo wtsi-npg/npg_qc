@@ -8,7 +8,7 @@
   tag_metrics_cache = {};
   temp = [];
   FOREACH check_name IN checks_info.list;
-    IF check_name != 'gc bias' && check_name != 'bam flagstats human' && check_name != 'bam flagstats phix';
+    IF (check_name != 'samtools stats') && (check_name != 'bam flagstats human') && (check_name != 'bam flagstats phix') && (check_name != 'gc bias');
       IF check_name == 'tag metrics';
         temp.unshift(check_name);
       ELSE;
@@ -44,7 +44,6 @@
       END;
     END;
   END;
-  heatmap_check_name = 'percent of bases at and above quality threshold';
 -%]
 
 <div id="menu">
@@ -83,11 +82,11 @@
 </tr>
 </thead>
 <tbody>
-[%- qxTotal = 0; #For total qxYield
-
+[%-
+    qxTotal = 0; #For total qxYield
     #For heatmaps
-    action_plot = c.controller('Visuals').action_for('fastqcheck');
-    legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('fastqcheck_legend'));
+    action_plot = c.controller('Visuals').action_for('qualmap');
+    legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('qualmap_legend'));
 
     id_runs_in_collection = []; # Used for page's title (how many different id runs in page)
 

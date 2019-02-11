@@ -1,7 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC:
+     heatmaps from samtools stats files as a source
+
 release 66.1.1
-- composite genotype check script (call_gtck_composite_rpt.pl) search
+ - composite genotype check script (call_gtck_composite_rpt.pl) search
      for run folders disabled - only use iRODS cram files
 
 release 66.1

@@ -106,13 +106,13 @@ my $builder = $class->new(
         'warnings'                                     => '0',
         'URI::URL'                                     => '0',
 
-        'npg_common::fastqcheck'                       => '0',
         'npg::authentication::sanger_sso'              => '0',
         'npg_tracking::Schema'                         => '0',
         'npg_tracking::daemon'                         => '0',
         'npg_tracking::util::types'                    => '0',
         'npg_tracking::glossary::composition::component::illumina' => '0',
-        'npg_tracking::glossary::composition::factory::rpt' => '0',
+        'npg_tracking::glossary::composition::factory::rpt'        => '0',
+        'npg_tracking::glossary::composition::factory::rpt_list'   => '0',
         'npg_qc::Schema'                               => '0',
         'npg_qc::autoqc::qc_store'                     => '0',
         'npg_qc::autoqc::qc_store::options'            => '0',
@@ -120,6 +120,7 @@ my $builder = $class->new(
         'npg_qc::autoqc::results::collection'          => '0',
         'npg_qc::autoqc::checks::check'                => '0',
         'npg_qc::mqc::outcomes'                        => '0',
+        'npg_qc::autoqc::parse::samtools_stats'        => '0',
         'WTSI::DNAP::Warehouse::Schema'                => '0',
    },
 

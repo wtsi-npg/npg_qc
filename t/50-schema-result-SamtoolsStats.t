@@ -36,13 +36,14 @@ sub _get_data {
 }
 
 subtest 'load results for the same composition' => sub {
-  plan tests => 10;
+  plan tests => 11;
 
   my $values =  _get_data('17448_1#9_F0xB00.samtools_stats.json');
   my $fk_row = $schema->resultset('SeqComposition')->create({digest => '45678', size => 2});
 
   my $object = $ss_rs->new_result($values);
   isa_ok($object, 'npg_qc::Schema::Result::SamtoolsStats');
+  can_ok($object, qw/result4visuals/);
   throws_ok {$object->insert()}
     qr/NOT NULL constraint failed: samtools_stats.id_seq_composition/,
     'foreign key referencing the composition table absent - error';

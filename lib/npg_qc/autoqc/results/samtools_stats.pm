@@ -10,7 +10,7 @@ use Carp;
 use Readonly;
 
 extends qw(npg_qc::autoqc::results::result);
-with qw(npg_qc::autoqc::role::result);
+with    qw(npg_qc::autoqc::role::samtools_stats);
 
 our $VERSION = '0';
 
