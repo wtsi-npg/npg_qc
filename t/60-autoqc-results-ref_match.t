@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 17;
 use Test::Exception;
 
 use_ok('npg_qc::autoqc::results::ref_match');
@@ -14,6 +14,7 @@ my $r = npg_qc::autoqc::results::ref_match->new(
 isa_ok( $r, 'npg_qc::autoqc::results::ref_match' );
 is( $r->check_name(), 'ref match', 'Check name' );
 is( $r->class_name(), 'ref_match', 'Class name' );
+is_deeply(scalar $r->top_two, 0, 'no data - empty list for top two');
 
 $r->aligned_read_count(
     {
@@ -83,8 +84,8 @@ is_deeply(
 is_deeply(
     [$r->top_two()],
     [
-        'Homo sapiens NCBI37',
-        'Clostridium difficile Strain_630',
+        {name => 'Homo sapiens NCBI37',              percent => '50.0'},
+        {name => 'Clostridium difficile Strain_630', percent => '3.0'}
     ],
     'Top two'
 );

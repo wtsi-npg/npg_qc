@@ -52,10 +52,12 @@ sub top_two {
   my @top_two = ();
   for (qw/1 2/) {
     my $organism = shift @ranked;
-    $organism or next;
+    $organism or last;
     my $strain = $self->reference_version->{$organism};
+    my $percent = $ratings->{$organism};
     $organism =~ s/_/ /xms;
-    push @top_two, join q[ ], $organism, $strain;
+    $organism = join q[ ], $organism, $strain;
+    push @top_two, {name => $organism, percent => $percent};
   }
   return @top_two;
 }
@@ -92,7 +94,9 @@ sorted alphabetically. The sort order is better alignment first.
 
 =head2 top_two
 
-Return a list of top two opgamisms (together with strain/reference version).
+Return a list of up to two hash references, each containing the
+organist name and version/strain and corresponding to it percent
+mapped.
 
 =head1 DIAGNOSTICS
 
