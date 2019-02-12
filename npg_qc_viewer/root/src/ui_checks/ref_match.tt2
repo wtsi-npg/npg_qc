@@ -29,9 +29,10 @@
     <th>percent</th>
   </tr>
 
-  [% FOREACH organism IN check.ranked_organisms -%]
-    [%- pcount = check.percent_count.item(organism);
-       IF pcount != '0.0' && pcount != '0.1';
+  [% percent_count = check.percent_count;
+    FOREACH organism IN check.ranked_organisms(percent_count) -%]
+    [%- pcount = percent_count.item(organism);
+        IF pcount != '0.0' && pcount != '0.1';
     - %]
     <tr>
       <td><span class="dark_blue">[% organism | replace('_', ' ') %]</span> [% check.reference_version.item(organism) %]</td>
