@@ -1,7 +1,16 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+
+release 66.2
+ - SeqQC: heatmaps from samtools stats files as a source
+ - relax JSON parser (allow non-utf8 characters) when loading sequence_summary
+   results to the db
+ - ref match results sort order - make deterministic (important for consistency
+   of data we load to the warehouse), also add a method to return top two results
+ - fixes for composite genotype script following previous release 
+
 release 66.1.1
-- composite genotype check script (call_gtck_composite_rpt.pl) search
+ - composite genotype check script (call_gtck_composite_rpt.pl) search
      for run folders disabled - only use iRODS cram files
 
 release 66.1

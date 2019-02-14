@@ -40,7 +40,6 @@ Readonly::Scalar our $RESULTS_NAMESPACE => q[npg_qc::autoqc::results];
 Readonly::Array  my  @NON_LISTABLE      => map {join q[::], $RESULTS_NAMESPACE, $_}
                                                          qw/
                                                              sequence_summary
-                                                             samtools_stats
                                                              base
                                                              result
                                                              collection
@@ -103,19 +102,26 @@ sub _build_checks_list {
 =head2 add
 
 Adds objects to the collection. The argument should be either one object or a reference
-to an array. If the latter, all objects in the array will be added to the collection
-one by one .
+to an array of objects. If the latter, all objects in the array will be appended to the
+collection in the order they are given. If no argument is supplied, the collection's state
+does not change.
 
  my $collection = npg_qc::autoqc::results::collection->new();
  my $r = npg_qc::autoqc::results::insert_size->new(id_run => 222, position => 1);
  $collection->add($r);
  $collection->add([$r, $r]);
+ $collection->add(); # nothing happens, no error either
+
+Returns true if the collection state has changed, false otherwise.
 
 =cut
 sub add {
     my ($self, $r) = @_;
-    ref $r eq q{ARRAY} ? $self->push(@{$r}) : $self->push($r);
-    return 1;
+    if (defined $r) {
+      ref $r eq q{ARRAY} ? $self->push(@{$r}) : $self->push($r);
+      return 1;
+    }
+    return 0;
 }
 
 =head2 join_collections

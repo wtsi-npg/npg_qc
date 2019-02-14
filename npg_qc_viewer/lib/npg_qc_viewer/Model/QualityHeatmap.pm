@@ -1,12 +1,13 @@
-package npg_qc_viewer::Model::Visuals::Fastqcheck;
+package npg_qc_viewer::Model::QualityHeatmap;
 
 use Carp;
 use Moose;
 use namespace::autoclean;
 use GD::Image;
 use Math::Gradient;
+use List::Util qw/sum/;
 
-use npg_common::fastqcheck;
+use npg_qc::autoqc::parse::samtools_stats;
 
 BEGIN { extends 'Catalyst::Model' }
 
@@ -15,22 +16,22 @@ our $VERSION  = '0';
 
 =head1 NAME
 
-npg_qc_viewer::Model::Visuals::Fastqcheck
+npg_qc_viewer::Model::QualityHeatmap
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Catalyst model for rendering fastqcheck images at run time
+Catalyst model for rendering quality by cycle heatmaps at run time
 
 =head1 SUBROUTINES/METHODS
 
-=head2 fastqcheck_legend
+=head2 legend
 
-Returns a binary stream representing a PNG image with a legend for the fastqcheck file visualisation
+Returns a binary stream representing a PNG image with a legend for quality by cycle heatmaps
 
 =cut
-sub fastqcheck_legend {
+sub legend {
     my $self = shift;
 
     my $height = 240;
@@ -84,30 +85,34 @@ sub fastqcheck_legend {
     return $im->png;
 }
 
+=head2 data2image
 
-=head2 fastqcheck2image
-
-Returns a binary stream representing a PNG image with the fastqcheck file visualisation
+Returns a binary stream representing a PNG image with the quality by cycle visualisation.
 
 =cut
-sub fastqcheck2image { ##no critic (ProhibitExcessComplexity)
-    my ($self, $content, $read) = @_;
+sub data2image { ##no critic (ProhibitExcessComplexity)
+    my ($self, $result, $read) = @_;
 
-    $content or croak 'Fastqcheck file content is required';
+    $result or croak 'Result object or string is required';
     $read or croak 'Read is required';
-    my $fq = npg_common::fastqcheck->new(file_content => $content);
-    my $num_cycles = $fq->read_length;
-    my $max_q = $fq->_max_threshold;
-    my $total = $fq->total_pf_bases;
 
-    if ($total == 0 || $num_cycles == 0  || $max_q == 0) {
-        return q[];
+    my $ss = npg_qc::autoqc::parse::samtools_stats->new(file_content => $result);
+
+    my $reads_length  = $ss->reads_length;
+    my $num_reads_all = $ss->num_reads;
+
+    my $num_cycles = $reads_length->{$read};
+    my $num_reads  = $num_reads_all->{$read};
+    my $yield      = $ss->yield_per_cycle($read);
+    if (!$num_cycles && ($read eq 'index') && $yield) {
+        $num_cycles = scalar @{$yield};
     }
+    ($num_cycles and $num_reads and $yield) or croak 'No reads or cycles quality data';
 
     my $shift = 5;
 
     my $width = $num_cycles * $shift + 60;
-    if ($read && $read =~ /^tag/smx) {
+    if ($read && $read eq 'index') {
         $width += 20;
     }
     my $height = 50 * $shift + 55;
@@ -130,54 +135,49 @@ sub fastqcheck2image { ##no critic (ProhibitExcessComplexity)
 
     my $count = 0;
     foreach my $g (@gradient) {
-       $colours->{$count} = $im->colorAllocate($g->[0], $g->[1], $g->[2]);
-       push @colour_table, $colours->{$count};
-       $count++;
-    }
-
-    my @qs = ();
-    for my $q ((1 ... 50)) {
-        push @qs, $q;
+        $colours->{$count} = $im->colorAllocate($g->[0], $g->[1], $g->[2]);
+        push @colour_table, $colours->{$count};
+        $count++;
     }
 
     my $y1 = 0;
     my $x1 = 40;
     my $x2 = 0;
     my $y2 = 0;
-
     my $cycle_count = 1;
-    my $pct_total = $total / 100;
+
     while ($cycle_count <= $num_cycles) {
+
         $y1 = 10;
         $x2 = $x1 + $shift;
-        my $values = $fq->qx_yield(\@qs, $cycle_count);
         my $quality = 50;
-        while (scalar @{$values}) {
+
+        my @values = map { int (($_ * 100)/$num_reads) }
+                     @{$yield->[$cycle_count - 1]};
+        while (scalar @values < $quality) {
+            push @values, 0;
+        }
+
+        while ( @values ) {
             if ($cycle_count == 1 && ($quality == 1 || ($quality > 1 && $quality % 5 == 0))) {
                  $im->string(GD::gdSmallFont, 25, $y1-5, $quality, $black);
-	    }
+            }
             $y2 = $y1 + $shift;
-            my $value = pop @{$values};
-            $value = int ($value/$pct_total);
-            $im->filledRectangle($x1,$y1,$x2,$y2, $colours->{$value});
+            $im->filledRectangle($x1,$y1,$x2,$y2, $colours->{pop @values});
             $y1 = $y2;
             $quality -= 1;
-	}
+        }
 
         if ($cycle_count == 1 || $cycle_count % 5 == 0) {
-           $im->string(GD::gdSmallFont, $x1, $y1+5, $cycle_count, $black);
-	}
+            $im->string(GD::gdSmallFont, $x1, $y1+5, $cycle_count, $black);
+        }
         $cycle_count++;
         $x1 = $x2;
     }
 
-    my $xaxis_label = q[Cycle number];
-    if ($read) {
-        $xaxis_label .= qq[ ($read];
-        if ($read !~ /^tag/smx) {
-            $xaxis_label .= q[ read];
-	}
-	$xaxis_label .= q[)];
+    my $xaxis_label = qq[Cycle number, $read];
+    if ($read ne 'index') {
+        $xaxis_label .= ' read';
     }
 
     my $start_xaxis_label = (int $num_cycles*$shift/2) - 40;
@@ -216,7 +216,7 @@ __END__
 
 =item Catalyst::Model
 
-=item npg_common::fastqcheck
+=item npg_qc::autoqc::parse::samtools_stats
 
 =back
 

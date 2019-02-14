@@ -1,16 +1,21 @@
-[% studies = {}; FOREACH lane_key IN sorted_rl_map_keys -%]
+[% studies = {};
+   FOREACH lane_key IN sorted_rl_map_keys -%]
   [%
      lane_collection = rl_map.${lane_key};
      NEXT IF (!lane_collection || lane_collection.size == 0);
-     to_remove = ['split stats phix', 'spatial filter',  'split stats'];
+     to_remove = ['split stats phix', 'spatial filter', 'split stats', 'samtools stats'];
      IF !run_view;
        to_remove.push('qX yield', 'gc fraction');
      END;
+     ss_collection           = lane_collection.search(check_name => 'samtools stats');
      trimmed_lane_collection = lane_collection.remove('check_name', to_remove);
-     checks = trimmed_lane_collection.results;
-     IF entity_is_lane;
-       checks.push({check_name => heatmap_check_name, class_name => 'fastqcheck_visuals'});
+     IF ss_collection.size;
+       # add back samtools_stats result with the filter we want, if any
+       # assign to a variable to avoid printing to a page the return value
+       # of the function
+       added=trimmed_lane_collection.add(ss_collection.get(0).result4visuals(ss_collection.results));
      END;
+     checks = trimmed_lane_collection.results;
 
      trimmed_reference_path = {};
      sequence_mismatch_collection = lane_collection.slice('check_name', 'sequence mismatch');
