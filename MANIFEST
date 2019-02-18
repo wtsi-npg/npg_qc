@@ -9,7 +9,6 @@ bin/qc_db_delete_autoqc
 bin/mqc_outcome_reporter
 bin/npg_qc_autoqc_data.pl
 bin/npg_qc_illumina_analysis_loader
-bin/npg_qc_save_files.pl
 bin/npg_qc_tag_sniff.pl
 bin/call_gtck_composite_rpt.pl
 bin/genotype_call_results_reporter
@@ -95,7 +94,6 @@ lib/npg_qc/autoqc/role/tags_reporters.pm
 lib/npg_qc/autoqc/role/upstream_tags.pm
 lib/npg_qc/autoqc/role/verify_bam_id.pm
 lib/npg_qc/autoqc/types.pm
-lib/npg_qc/file_store.pm
 lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/mqc/outcomes/keys.pm
@@ -112,7 +110,6 @@ lib/npg_qc/Schema/Result/BamFlagstats.pm
 lib/npg_qc/Schema/Result/Bcfstats.pm
 lib/npg_qc/Schema/Result/ClusterDensity.pm
 lib/npg_qc/Schema/Result/Contamination.pm
-lib/npg_qc/Schema/Result/Fastqcheck.pm
 lib/npg_qc/Schema/Result/GcBias.pm
 lib/npg_qc/Schema/Result/GcFraction.pm
 lib/npg_qc/Schema/Result/Genotype.pm
@@ -157,13 +154,11 @@ t/00-distribution.t
 t/00-podcoverage.t
 t/00-pod.t
 t/00-scripts_compile.t
-t/10-file_store.t
 t/10-autoqc-parse-samtools_stats.t
 t/30-illumina-loader-Cluster_Density.t
 t/30-illumina-loader.t
 t/50-npg_qc-Schema.t
 t/50-schema-result-Contamination.t
-t/50-schema-result-Fastqcheck.t
 t/50-schema-result-InsertSize.t
 t/50-schema-result-Adapter.t
 t/50-schema-result-Genotype.t
@@ -555,7 +550,6 @@ t/data/reporter/mlwarehouse/400-IseqFlowcell.yml
 t/perlcriticrc
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140601_HS2_13108_A_C37W5ACXX/InterOp/TileMetricsOut.bin
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX/InterOp/TileMetricsOut.bin
-t/data/fastqcheck/4308_1_2.fastqcheck
 t/data/fixtures/npg_tracking/000-designation.yml
 t/data/fixtures/npg_tracking/000-entity_type.yml
 t/data/fixtures/npg_tracking/000-instrument_mod_dict.yml

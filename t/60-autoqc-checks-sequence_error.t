@@ -200,7 +200,6 @@ use_ok('npg_qc::autoqc::checks::sequence_error');
   is( $error_check->result->reference, undef, 'result reference undefined');
   is( $error_check->result->pass, undef, 'result pass undefined');
 
-  `cp t/data/autoqc/090721_IL29_2549/data/2549_7_1.fastqcheck $dir`;
   $f = $dir . q[/2549_7_1.fastq];
   `touch $f`;
   $error_check = npg_qc::autoqc::checks::sequence_error->new(
