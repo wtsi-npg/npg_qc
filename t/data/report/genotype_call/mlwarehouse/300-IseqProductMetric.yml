@@ -1,12 +1,15 @@
 ---
-- id_iseq_pr_metrics_tmp: 1581432722
-  id_iseq_flowcell_tmp: 5952673
+- id_iseq_flowcell_tmp: 5952673
+  id_iseq_pr_metrics_tmp: 1581432722
+  id_iseq_product: dee19fdde3a0c883f14a219f3c6ebc7373dbe01dd6e0426d3b8f759ba1355b29
   id_run: 25680
+  iseq_composition_tmp: '{"components":[{"id_run":25680,"position":1,"tag_index":1}]}'
   position: 1
   tag_index: 1
-- id_iseq_pr_metrics_tmp: 1581433228
-  id_iseq_flowcell_tmp: 5952705
+- id_iseq_flowcell_tmp: 5952705
+  id_iseq_pr_metrics_tmp: 1581433228
+  id_iseq_product: 31c404f9f0be24fd6d75e0effab43ebff58b1d23a9a925ff14850162de431cb6
   id_run: 25680
+  iseq_composition_tmp: '{"components":[{"id_run":25680,"position":1,"tag_index":2}]}'
   position: 1
   tag_index: 2
- 
