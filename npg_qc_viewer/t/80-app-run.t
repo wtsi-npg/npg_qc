@@ -200,6 +200,12 @@ subtest 'extra column markup - affects export to CSV' => sub {
     id_iseq_flowcell_tmp   => $id_flowcell_tmp,
     id_iseq_pr_metrics_tmp => $id_iseq_pr_metrics_tmp
   };
+  my $rpt = npg_tracking::glossary::rpt->deflate_rpt($product_values);
+  my $composition = npg_tracking::glossary::composition::factory::rpt_list
+                    ->new(rpt_list => $rpt)
+                    ->create_composition();
+  $product_values->{id_iseq_product} = $composition->digest;
+  $product_values->{iseq_composition_tmp} = $composition->freeze;
   my $row_product = $mlwh->resultset("IseqProductMetric")->create($product_values);
 
   foreach my $url (@urls) {
