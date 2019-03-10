@@ -1,26 +1,36 @@
 ---
 - id_iseq_flowcell_tmp: 660005001
   id_iseq_pr_metrics_tmp: 2500000
+  id_iseq_product: 6009d3925048af46bcdf28382f2a11f46bcbecd755b1f82d7fbe8995f9d70b45
   id_run: 6600
+  iseq_composition_tmp: '{"components":[{"id_run":6600,"position":5,"tag_index":1}]}'
   position: 5
   tag_index: 1
 - id_iseq_flowcell_tmp: 660007001
   id_iseq_pr_metrics_tmp: 2500002
+  id_iseq_product: 929ccd4963ac8d951c3050e59d7b96fc57485d0e8dc40985f55847d72e1bbc64
   id_run: 6600
+  iseq_composition_tmp: '{"components":[{"id_run":6600,"position":7,"tag_index":1}]}'
   position: 7
   tag_index: 1
 - id_iseq_flowcell_tmp: 660008001
   id_iseq_pr_metrics_tmp: 2500003
+  id_iseq_product: 91eaf90b00b4dea86e67e2c17b0b7d5511d17dbc23ab6191f6b980cd76cd95a1
   id_run: 6600
+  iseq_composition_tmp: '{"components":[{"id_run":6600,"position":8,"tag_index":1}]}'
   position: 8
   tag_index: 1
 - id_iseq_flowcell_tmp: 551508001
   id_iseq_pr_metrics_tmp: 2500004
+  id_iseq_product: ca2c98285e779269b3f93843df739be93b052168553343ceaf43a63813358f19
   id_run: 5515
+  iseq_composition_tmp: '{"components":[{"id_run":5515,"position":8,"tag_index":1}]}'
   position: 8
   tag_index: 1
 - id_iseq_flowcell_tmp: 660004001
   id_iseq_pr_metrics_tmp: 2500005
+  id_iseq_product: 0071b3420649e8c1e967b2f1321debde979143505eb98eac5d2e9b89addd0728
   id_run: 6600
+  iseq_composition_tmp: '{"components":[{"id_run":6600,"position":4,"tag_index":1}]}'
   position: 4
   tag_index: 1
