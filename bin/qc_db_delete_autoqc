@@ -31,10 +31,7 @@ if (!$lanes || !@{$lanes}) {
   croak q[--lane should be given explicitly];
 }
 
-my @list = qw/ fastqcheck
-               sequence_summary
-               samtools_stats /;
-push @list, @{npg_qc::autoqc::results::collection->new()->checks_list()};
+my @list = (@{npg_qc::autoqc::results::collection->new()->checks_list()}, 'sequence_summary');
 @list = $checks ? @{$checks} : @list;
 
 warn qq[Running qc_db_delete_autoqc with the following options:\n\tid_run:\t$id_run\n\tlane:\t] .
@@ -46,8 +43,7 @@ my $query = {id_run => $id_run, position => $lanes};
 my $schema = npg_qc::Schema->connect();
 my $transaction = sub {
   foreach my $table (@table_names) {
-    my $method = $table eq 'Fastqcheck' ? 'search' : 'search_autoqc';
-    my $rs = $schema->resultset($table)->$method($query);
+    my $rs = $schema->resultset($table)->search_autoqc($query);
     my $num_records = 0;
     while (my $row = $rs->next) {
       $row->delete;
