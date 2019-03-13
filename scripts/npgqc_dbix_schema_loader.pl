@@ -67,6 +67,7 @@ make_schema_at(
                          cumulative_errors_    |
                          error_rate_           |
                          errors_by_            |
+                         fastqcheck            |
                          frequency_response    |
                          instrument_statistics |
                          image_store           |
