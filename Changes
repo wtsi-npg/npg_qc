@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 66.3
+ - sequence_summary table - extend storage for the header column
+ - remove fastqcheck database loader
+ - autoqc database deletion script update
 
 release 66.2
  - SeqQC: heatmaps from samtools stats files as a source
