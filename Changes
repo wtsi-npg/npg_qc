@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - update spatial_filter results parsing
+
 release 66.3
  - sequence_summary table - extend storage for the header column
  - remove fastqcheck database loader
