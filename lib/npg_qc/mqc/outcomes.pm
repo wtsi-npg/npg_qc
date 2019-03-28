@@ -286,12 +286,8 @@ sub _validate_library_outcomes {
   }
 
   my %tag_counts = map { $_ => 1 } @{$tag_list};
-  my $num_undecided        = 0;
-  my $all_single_component = 1;
+  my $num_undecided = 0;
   for my $lo (@{$lib_outcomes}) {
-    if ($all_single_component && $lo->num_components > 1) {
-      $all_single_component = 0;
-    }
     if ($lo->is_undecided) {
       $num_undecided++;
     }
@@ -304,10 +300,7 @@ sub _validate_library_outcomes {
   if ($seq_outcome_ent->has_final_outcome && any { $_ == 1 } values %tag_counts) {
     croak q[Mismatch between known tag indices and available library outcomes];
   }
-  if ($seq_outcome_ent->is_accepted && $all_single_component && $num_undecided) {
-    croak q[Sequencing passed, cannot have undecided lib outcomes];
-  } elsif ($seq_outcome_ent->is_rejected &&
-           $num_undecided != scalar @{$lib_outcomes}) {
+  if ($seq_outcome_ent->is_rejected && ($num_undecided != scalar @{$lib_outcomes})) {
     croak q[Sequencing failed, all library outcomes should be undecided];
   }
 
