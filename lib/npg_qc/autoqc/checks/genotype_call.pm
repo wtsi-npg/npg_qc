@@ -91,10 +91,6 @@ override 'can_run' => sub {
     $self->result->add_comment('No gbs_plex_name is defined');
     return 0;
   }
-  if ($self->lims->library_type && $self->lims->library_type !~ /^GbS/isxm) {
-    $self->result->add_comment('Unexpected library_type : ' . $self->lims->library_type);
-    return 0;
-  }
   if (!$self->lims->sample_name) {
     $self->result->add_comment('Can only run on a single sample');
     return 0;
