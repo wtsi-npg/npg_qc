@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - allow to finilise undecided library manual qc outcomes for
+   all entities
+
 release 66.3
  - sequence_summary table - extend storage for the header column
  - remove fastqcheck database loader
