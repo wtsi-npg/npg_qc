@@ -3,6 +3,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 release 66.4
  - allow to finalise undecided library manual qc outcomes for
    all entities
+ - remove library type restriction from genotype_call can_run (retained as double check in seq_alignment)
 
 release 66.3
  - sequence_summary table - extend storage for the header column
