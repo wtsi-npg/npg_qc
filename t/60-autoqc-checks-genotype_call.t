@@ -101,7 +101,7 @@ local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/genotype_call/sample
 
 
 subtest 'test cant run on incorrect types' => sub {
-  plan tests => 5;
+  plan tests => 3;
   
   my $h = {
       rpt_list            => '24135:1:1',
@@ -114,17 +114,6 @@ subtest 'test cant run on incorrect types' => sub {
   lives_ok { $r->result; } 'No error creating result object';
   ok( defined $r->ref_repository(), 'A default reference repository is set' );
   is($r->can_run, 0, 'Cant run if gbs plex is undef');
-
-  my $j = {
-      rpt_list            => '24135:1:2',
-      qc_in               => $repos, 
-      bam_file            => 'alignment.bam',
-      repository          => $repos,
-      gbs_plex_repository => $gbs_repository
-  };
-  my $s = npg_qc::autoqc::checks::genotype_call->new($j);
-  lives_ok { $s->result; } 'No error creating result object';
-  is($s->can_run, 0, 'Cant run if library type is defined and is not GbS');
 
 };
 
