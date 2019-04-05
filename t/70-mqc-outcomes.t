@@ -603,7 +603,7 @@ subtest q[save - errors] => sub {
 };
 
 subtest q[save outcomes] => sub {
-  plan tests => 23;
+  plan tests => 22;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
@@ -714,21 +714,15 @@ subtest q[save outcomes] => sub {
     qr/$error/,
     'only some tags match stored libs - error';
 
-  my $error4pass =
-    q[Sequencing passed, cannot have undecided lib outcomes];
-  throws_ok { $o->save({'seq' =>
+  lives_ok { $o->save({'seq' =>
     {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
     {'101:1'=>[(1 .. 6)]})}
-    qr/$error4pass/, $error4pass;
+    'Sequencing passed, we allow undefined lib outcomes';
 
   $outcomes = {
     '101:1:5'=>{'mqc_outcome'=>'Rejected preliminary'},
     '101:1:6'=>{'mqc_outcome'=>'Rejected preliminary'},
                  };
-  $o->save({'lib' => $outcomes}, 'dog');
-  lives_and { ok $o->save({'seq' =>
-    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
-    {'101:1'=>[(1 .. 6)]}), 'got results'};
 
   my $dict_lib_id_prelim = $qc_schema->resultset('MqcLibraryOutcomeDict')
     ->search({'short_desc' => 'Rejected preliminary'})
@@ -919,7 +913,7 @@ subtest q[outcomes are not saved twice] => sub {
 };
 
 subtest q[order of saving outcomes: lib, then seq] => sub {
-  plan tests => 8;
+  plan tests => 5;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
   is($qc_schema->resultset('MqcLibraryOutcomeEnt')
@@ -935,23 +929,10 @@ subtest q[order of saving outcomes: lib, then seq] => sub {
     '103:1:3'=>{'mqc_outcome'=>'Undecided'},
                      };
   my $seq_outcomes = {'103:1'=>{'mqc_outcome'=>'Accepted final'}};
-  throws_ok { $o->save(
-           {'lib' => $lib_outcomes, 'seq' => $seq_outcomes},
-           'cat', {'103:1' => [1, 2, 3]}) }
-    qr/Sequencing passed, cannot have undecided lib outcomes/,
-    'sequencing outcome cannot be saved - one of lib outcomes undecided';
-  is($qc_schema->resultset('MqcLibraryOutcomeEnt')
-               ->search({id_run=>103})->count, 0,
-    'no lib results for run 103');
-  is($qc_schema->resultset('MqcOutcomeEnt')
-               ->search({id_run=>103})->count, 0,
-    'no seq results for run 103');
-
-  $lib_outcomes->{'103:1:3'}->{'mqc_outcome'} = 'Accepted preliminary';
   lives_ok { $o->save(
            {'lib' => $lib_outcomes, 'seq' => $seq_outcomes},
            'cat', {'103:1' => [1, 2, 3]}) }
-  'seq result is now saved';
+  'seq result is saved';
   is($qc_schema->resultset('MqcLibraryOutcomeEnt')
                ->search({id_run=>103})->count, 3,
     'three lib results for run 103');
