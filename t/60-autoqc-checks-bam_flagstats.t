@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw( tempdir );
@@ -468,6 +468,86 @@ subtest 'full functionality with optional target stats' => sub {
 
       my $results_from_json = from_json(
          slurp qq{$local_qc_dir/25837_1#13.bam_flagstats.json}, {chomp=>1});
+
+      foreach my $res ($expected_from_json, $results_from_json){
+         delete $res->{'__CLASS__'};
+         delete $res->{'composition'};
+         delete $res->{'info'}->{'Check'};
+         delete $res->{'info'}->{'Check_version'};
+         delete $res->{'path'};
+      }
+
+      is_deeply($results_from_json, $expected_from_json, 'correct json output');
+ }
+
+};
+
+my $archive_29006 = '29006_8_1';
+my $ae_29006 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_29006}.tar.gz");
+$ae_29006->extract(to => $tempdir) or die $ae_29006->error;
+$archive_29006 = join q[/], $tempdir, $archive_29006;
+my $qc_dir_29006 = join q[/], $archive_29006, 'testqc1';
+mkdir $qc_dir_29006;
+
+
+subtest 'full functionality with optional target and autosome target stats' => sub {
+
+  plan tests => 24;
+
+  my $fproot_common = $archive_29006 . '/29006_8#1';
+  my $composition_digest = '46fe9f6fffc7f2d7a74c4764f62103d1bcf9b8edf8ae6d4991f9330efd45c7f9';
+
+  foreach my $file_type ( qw(cram bam) ) {
+
+      my $local_qc_dir = join q[/], $qc_dir_29006, $file_type;
+      if (!-e $local_qc_dir) {
+        mkdir $local_qc_dir;
+      }
+
+      my $ref = {
+        id_run        => 29006,
+        position      => 8,     
+        tag_index     => 1,
+        qc_out        => $local_qc_dir,
+      };
+
+      my $sfile = join q[.], $fproot_common, $file_type;
+
+      if ($file_type eq 'bam') {
+        $ref->{'input_files'} = [$sfile];
+      } else {
+        $ref->{'qc_in'} = $archive_29006;
+      }
+
+      my $r = npg_qc::autoqc::checks::bam_flagstats->new($ref);
+      lives_ok { $r->run() } 'no error calling run()';
+
+      my @ros = @{$r->related_results};
+      is (scalar @ros, 5, 'five related results');
+
+      my $ro = $ros[4];
+      isa_ok ($ro, 'npg_qc::autoqc::results::sequence_summary');
+      isa_ok ($ro->composition, 'npg_tracking::glossary::composition');
+      is ($ro->composition_digest, $composition_digest, 'composition digest');
+
+      foreach my $output_type ( qw(.bam_flagstats.json
+                                   .sequence_summary.json
+                                   _F0xB00.samtools_stats.json
+                                   _F0x900.samtools_stats.json
+                                   _F0xF04_target.samtools_stats.json
+                                   _F0xF04_target_autosome.samtools_stats.json
+                                  ) ) {
+        my @dirs = splitdir $fproot_common;
+        my $name = pop @dirs;
+        my $output = catdir($local_qc_dir, $name) . $output_type;
+        ok (-e $output, "output $output created");
+      }
+ 
+      my $expected_from_json = from_json(
+         slurp qq{$archive_29006/qc/all_json/29006_8#1.bam_flagstats.json}, {chomp=>1});
+
+      my $results_from_json = from_json(
+         slurp qq{$local_qc_dir/29006_8#1.bam_flagstats.json}, {chomp=>1});
 
       foreach my $res ($expected_from_json, $results_from_json){
          delete $res->{'__CLASS__'};

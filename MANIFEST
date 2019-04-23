@@ -251,6 +251,8 @@ t/70-report-genotype_call.t
 t/80-autoqc-qc-script.t
 t/data/autoqc/bam_flagstats/16960_1_0.tar.gz
 t/data/autoqc/bam_flagstats/17448_1_9.tar.gz
+t/data/autoqc/bam_flagstats/25837_1_13.tar.gz
+t/data/autoqc/bam_flagstats/29006_8_1.tar.gz
 t/data/autoqc/bam_flagstats/24135_1#1.bam_flagstats.json
 t/data/autoqc/bam_flagstats/24135_1#1.flagstat
 t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json

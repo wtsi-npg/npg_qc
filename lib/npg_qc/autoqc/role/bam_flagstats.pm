@@ -76,6 +76,34 @@ sub percent_target_proper_pair_mapped_reads {
   return;
 }
 
+sub target_mean_coverage {
+  my $self = shift;
+  if (defined $self->target_mapped_bases && defined $self->target_length) {
+    return $self->target_mapped_bases / $self->target_length;
+  }
+  return;
+}
+
+sub percent_target_autosome_proper_pair_mapped_reads {
+  my $self = shift;
+  if (defined $self->target_autosome_mapped_reads &&
+      defined $self->target_autosome_proper_pair_mapped_reads) {
+    return $PERCENTAGE *
+        $self->target_autosome_proper_pair_mapped_reads / $self->target_autosome_mapped_reads;
+  }
+  return;
+}
+
+sub target_autosome_mean_coverage {
+  my $self = shift;
+  if (defined $self->target_autosome_mapped_bases && defined $self->target_autosome_length) {
+    return $self->target_autosome_mapped_bases / $self->target_autosome_length;
+  }
+  return;
+}
+
+
+
 no Moose;
 
 1;
@@ -101,7 +129,13 @@ __END__
 
 =head2 percent_singletons
 
+=head2 percent_target_autosome_proper_pair_mapped_reads
+
 =head2 percent_target_proper_pair_mapped_reads
+
+=head2 target_autosome_mean_coverage
+
+=head2 target_mean_coverage
 
 =head2 total_duplicate_reads
 

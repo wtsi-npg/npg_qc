@@ -48,28 +48,63 @@ Flagstats
 <table title="target stats">
 [% IF check.target_length.defined && check.target_length > 0 %]
 Target region stats
-<tr><th>Target stats description</th><th>Value</th></tr>
-<tr><th class="laligned">target filter</th>
+<tr><th>Stats description</th><th>Value</th></tr>
+<tr><th class="laligned">filter</th>
   <td class="raligned">[% IF check.target_filter.defined; check.target_filter ; END %]</td></tr>
-<tr><th class="laligned">target regions length (bp)</th>
+<tr><th class="laligned">regions length (bp)</th>
   <td class="raligned">[% IF check.target_length.defined; check.target_length | format_number; END %]</td></tr>
-<tr><th class="laligned">target mapped reads</th>
+<tr><th class="laligned">mapped reads</th>
   <td class="raligned">[% IF check.target_mapped_reads.defined; check.target_mapped_reads | format_number; END %]</td></tr>
-<tr><th class="laligned">target proper pair mapped reads </th>
+<tr><th class="laligned">proper pair mapped reads </th>
   <td class="raligned">[% IF check.target_proper_pair_mapped_reads.defined; check.target_proper_pair_mapped_reads | format_number; END %]</td></tr>
-<tr><th class="laligned">% target mapped reads which are mapped in proper pairs</th>
+<tr><th class="laligned">% mapped reads which are mapped in proper pairs</th>
   <td class="raligned">[% IF check.percent_target_proper_pair_mapped_reads.defined; check.percent_target_proper_pair_mapped_reads | format('%3.2f') ; END %]</td></tr>
 <tr><th class="laligned">yield within target (bp)</th>
-  <td class="raligned">[% IF check.target_mapped_bases.defined; check.target_mapped_bases | format_number ; END %]</td></tr>
+  <td class="raligned"><b>[% IF check.target_mapped_bases.defined; check.target_mapped_bases | format_number ; END %]</b></td></tr>
+<tr><th class="laligned">mean coverage (X)</th>
+  <td class="raligned">[% IF check.target_mean_coverage.defined; check.target_mean_coverage | format_number ; END %]</td></tr>
 <tr><th class="laligned">coverage threshold (X)</th>
   <td class="raligned">[% IF check.target_coverage_threshold.defined; check.target_coverage_threshold | format_number ; END %]</td></tr>
-<tr><th class="laligned">%  target regions above coverage threshold</th>
+<tr><th class="laligned">%  regions above coverage threshold</th>
   <td class="raligned">[% IF check.target_percent_gt_coverage_threshold.defined; check.target_percent_gt_coverage_threshold  | format('%3.2f'); END %]</td></tr>
 [% END %]
 </table>
 
 </div>
 </td>
+
+<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
+<td valign=top>
+<div class="data_table">
+<table title="autosomes only target region stats">
+[% IF check.target_autosome_length.defined && check.target_autosome_length > 0 %]
+Autosomes only target region stats
+<tr><th>Stats description</th><th>Value</th></tr>
+<tr><th class="laligned">filter</th>
+  <td class="raligned">[% IF check.target_autosome_filter.defined; check.target_autosome_filter ; END %]</td></tr>
+<tr><th class="laligned">regions length (bp)</th>
+  <td class="raligned">[% IF check.target_autosome_length.defined; check.target_autosome_length | format_number; END %]</td></tr>
+<tr><th class="laligned">mapped reads</th>
+  <td class="raligned">[% IF check.target_autosome_mapped_reads.defined; check.target_autosome_mapped_reads | format_number; END %]</td></tr>
+<tr><th class="laligned">proper pair mapped reads </th>
+  <td class="raligned">[% IF check.target_autosome_proper_pair_mapped_reads.defined; check.target_autosome_proper_pair_mapped_reads | format_number; END %]</td></tr>
+<tr><th class="laligned">% mapped reads which are mapped in proper pairs</th>
+  <td class="raligned">[% IF check.percent_target_autosome_proper_pair_mapped_reads.defined; check.percent_target_autosome_proper_pair_mapped_reads | format('%3.2f') ; END %]</td></tr>
+<tr><th class="laligned">yield within target (bp)</th>
+  <td class="raligned">[% IF check.target_autosome_mapped_bases.defined; check.target_autosome_mapped_bases | format_number ; END %]</td></tr>
+<tr><th class="laligned">mean coverage (X)</th>
+  <td class="raligned">[% IF check.target_autosome_mean_coverage.defined; check.target_autosome_mean_coverage | format_number ; END %]</td></tr>
+<tr><th class="laligned">coverage threshold (X)</th>
+  <td class="raligned">[% IF check.target_autosome_coverage_threshold.defined; check.target_autosome_coverage_threshold | format_number ; END %]</td></tr>
+<tr><th class="laligned">%  regions above coverage threshold</th>
+  <td class="raligned"><b>[% IF check.target_autosome_percent_gt_coverage_threshold.defined; check.target_autosome_percent_gt_coverage_threshold  | format('%3.2f'); END %]</b></td></tr>
+[% END %]
+</table>
+
+</div>
+</td>
+
 </tr>
 </table>
 

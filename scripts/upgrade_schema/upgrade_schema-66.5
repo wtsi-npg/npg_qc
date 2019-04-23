@@ -1,0 +1,26 @@
+--
+-- add columns to the bam_flagstats table
+--
+
+ALTER TABLE `bam_flagstats` \
+ADD COLUMN `target_autosome_filter` varchar(30) DEFAULT NULL \
+ COMMENT 'Filter used to produce the target autosome stats file' \
+ AFTER `target_percent_gt_coverage_threshold`,
+ADD COLUMN `target_autosome_length` bigint(12) unsigned DEFAULT NULL \
+ COMMENT 'The total length of the target autosome regions' \
+ AFTER `target_autosome_filter`,
+ADD COLUMN `target_autosome_mapped_reads` bigint(20) unsigned DEFAULT NULL \
+ COMMENT 'The number of mapped reads passing the filter' \
+ AFTER `target_autosome_length`,
+ADD COLUMN `target_autosome_proper_pair_mapped_reads` bigint(20) unsigned DEFAULT NULL \
+ COMMENT 'The number of proper pair mapped reads passing the filter' \
+ AFTER `target_autosome_mapped_reads`, 
+ADD COLUMN `target_autosome_mapped_bases` bigint(20) unsigned DEFAULT NULL \
+ COMMENT 'The number of mapped bases passing the filter' \
+ AFTER `target_autosome_proper_pair_mapped_reads`,
+ADD COLUMN `target_autosome_coverage_threshold` int(4) DEFAULT NULL \
+ COMMENT 'The coverage threshold used in the perc target autosome greater than depth calculation' \
+ AFTER `target_autosome_mapped_bases`,
+ADD COLUMN `target_autosome_percent_gt_coverage_threshold` float(5,2) DEFAULT NULL \
+ COMMENT 'The percentage of the target autosome covered at greater than the depth specified' \
+ AFTER `target_autosome_coverage_threshold`;
