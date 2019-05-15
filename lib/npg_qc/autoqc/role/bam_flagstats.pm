@@ -6,6 +6,9 @@ use Readonly;
 our $VERSION = '0';
 
 Readonly::Scalar my $PERCENTAGE   => 100;
+Readonly::Scalar my $TWO_PLACES   => 2;
+Readonly::Scalar my $FACTOR_TEN   => 10;
+Readonly::Scalar my $GIGABASE     => 1_000_000_000;
 
 sub total_reads {
   my $self = shift;
@@ -84,6 +87,15 @@ sub target_mean_coverage {
   return;
 }
 
+sub target_mapped_bases_gb{
+  my $self = shift;
+  if (defined $self->target_mapped_bases) {
+    my $factor = $FACTOR_TEN**$TWO_PLACES;
+    return int(($self->target_mapped_bases/$GIGABASE) * $factor) / $factor;
+  }
+  return;
+}
+
 sub percent_target_autosome_proper_pair_mapped_reads {
   my $self = shift;
   if (defined $self->target_autosome_mapped_reads &&
@@ -138,6 +150,8 @@ __END__
 =head2 target_mean_coverage
 
 =head2 total_duplicate_reads
+
+=head2 target_mapped_bases_gb
 
 =head2 total_mapped_reads
 

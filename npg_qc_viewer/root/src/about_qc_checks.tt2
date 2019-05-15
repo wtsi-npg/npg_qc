@@ -198,6 +198,7 @@ Metrics generated as part of calling a set of genotypes for a sample and compari
 
 <a name="rna seqc_check"></a>
  <h3>RNA-SeQC metrics</h3>
+ <br/>
  <h4>Description</h4>
  <p>Subset of metrics obtained from Broad Institute's RNA-SeQC package. The following summary statistics are calculated by counting the number of reads that have the given characteristics.</p>
  <br/>
@@ -216,8 +217,9 @@ Metrics generated as part of calling a set of genotypes for a sample and compari
 <br/>
 
  <a name="tag metrics_check"></a>
- <h3>Tag metrics</h3>
- <h4>Description</h4>
+<h3>Tag metrics</h3>
+ <br/>
+<h4>Description</h4>
  <p>This check displays statistics about decoding of the index read. The semantics of the summary table data differs for pools and individual libraries.</p>
  <p>For a pool the overall decoding percent is displayed, followed by the coefficient of variance that characterises the uniformity of tag distribution in a pool. The background of the table cell is blue if the overall decoding rate is over 80%, for lesser values the background is red.</p>
  <p>For an individual library (tag), the decoding percent for this library within a pool is displayed. If the number of reads for this tag is at least one tenth the average number of reads per tag for this pool, the background is grey; otherwise, the background is red.</p>
@@ -231,12 +233,31 @@ Metrics generated as part of calling a set of genotypes for a sample and compari
 
 <a name="upstream tags_check"></a>
  <h3>Upstream Tags Check</h3>
- <h4>Description</h4>
+ <br/>
+<h4>Description</h4>
 Check for contamination of tag#0 BAM file by reads from upstream runs
 <br/><br/>
 
 <br/>
 
+<a name="bam flagstats_check"></a>
+<h3>bam flagstats check</h3>
+<br/>
+<h4>Description</h4>
+The bam flagstats check reports simple read stats. Optionally there are 
+also target regions stats and autosome only target regions stats where 
+appropriate regions sets are available.
+<br/><br/>
+The header table lists percentage of reads which are mapped, percentage of 
+reads which are duplicates if available and optionally the following three 
+target metrics separated by a pipe delimiter ;<br/><br/>
+<table style="margin-left: 5%;margin-right: 50%;">
+<tr><th>Field</th><th>Description</th></tr>
+<tr><td>PP%</td><td>% mapped reads which are mapped in proper pairs - from Target region stats</td></tr>
+<tr><td>Gb</td><td>yield within target (bp) - from Target region stats</td></tr>
+<tr><td>Cov</td><td>% regions above coverage threshold - from Autosomes only target region stats</td></tr>
+</table>
+<br/><br/>
 <a name="verify bam id_check"></a>
 <h3>VerifyBamID contamination check</h3>
 <br/><br/>

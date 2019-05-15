@@ -58,7 +58,7 @@ Target region stats
 <tr><th class="laligned">proper pair mapped reads </th>
   <td class="raligned">[% IF check.target_proper_pair_mapped_reads.defined; check.target_proper_pair_mapped_reads | format_number; END %]</td></tr>
 <tr><th class="laligned">% mapped reads which are mapped in proper pairs</th>
-  <td class="raligned">[% IF check.percent_target_proper_pair_mapped_reads.defined; check.percent_target_proper_pair_mapped_reads | format('%3.2f') ; END %]</td></tr>
+  <td class="raligned"><b>[% IF check.percent_target_proper_pair_mapped_reads.defined; check.percent_target_proper_pair_mapped_reads | format('%3.2f') ; END %]</b></td></tr>
 <tr><th class="laligned">yield within target (bp)</th>
   <td class="raligned"><b>[% IF check.target_mapped_bases.defined; check.target_mapped_bases | format_number ; END %]</b></td></tr>
 <tr><th class="laligned">mean coverage (X)</th>
