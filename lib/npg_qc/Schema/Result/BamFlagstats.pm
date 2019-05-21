@@ -264,6 +264,61 @@ The coverage threshold used in the perc target greater than depth calculation
 
 The percentage of the target covered at greater than the depth specified
 
+=head2 target_autosome_filter
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 30
+
+Filter used to produce the target autosome stats file
+
+=head2 target_autosome_length
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
+The total length of the target autosome regions
+
+=head2 target_autosome_mapped_reads
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
+The number of mapped reads passing the filter
+
+=head2 target_autosome_proper_pair_mapped_reads
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
+The number of proper pair mapped reads passing the filter
+
+=head2 target_autosome_mapped_bases
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
+The number of mapped bases passing the filter
+
+=head2 target_autosome_coverage_threshold
+
+  data_type: 'integer'
+  is_nullable: 1
+
+The coverage threshold used in the perc target autosome greater than depth calculation
+
+=head2 target_autosome_percent_gt_coverage_threshold
+
+  data_type: 'float'
+  is_nullable: 1
+  size: [5,2]
+
+The percentage of the target autosome covered at greater than the depth specified
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -343,6 +398,20 @@ __PACKAGE__->add_columns(
   { data_type => 'integer', is_nullable => 1 },
   'target_percent_gt_coverage_threshold',
   { data_type => 'float', is_nullable => 1, size => [5, 2] },
+  'target_autosome_filter',
+  { data_type => 'varchar', is_nullable => 1, size => 30 },
+  'target_autosome_length',
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  'target_autosome_mapped_reads',
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  'target_autosome_proper_pair_mapped_reads',
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  'target_autosome_mapped_bases',
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  'target_autosome_coverage_threshold',
+  { data_type => 'integer', is_nullable => 1 },
+  'target_autosome_percent_gt_coverage_threshold',
+  { data_type => 'float', is_nullable => 1, size => [5, 2] },
 );
 
 =head1 PRIMARY KEY
@@ -408,8 +477,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::bam_flagstats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-06-14 16:17:33
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:7FncD4g/I8dgGfG9B9a0CQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-04-17 14:56:54
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YsrYNzYhK4jAltTpq12t+g
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
