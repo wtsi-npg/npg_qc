@@ -1,0 +1,24 @@
+---
+default:
+  s3:
+    enable: false
+    url: null
+    notify: false
+  irods:
+    enable: true
+    notify: false
+
+study:
+  - study_id: "4042"
+    s3:
+      enable: true
+      url: "gs://profile_one-europe-west2"
+      date_binning: true
+      customer_name: "UK Organisation"
+      profile: "profile_one"
+      notify: true
+    irods:
+      enable: false
+      notify: true
+    merge:
+      component_cache_dir: "merge_component_cache/4042/"

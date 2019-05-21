@@ -28,6 +28,7 @@ lib/npg_qc/autoqc/checks/gc_fraction.pm
 lib/npg_qc/autoqc/checks/genotype.pm
 lib/npg_qc/autoqc/checks/genotype_call.pm
 lib/npg_qc/autoqc/checks/insert_size.pm
+lib/npg_qc/autoqc/checks/meta.pm
 lib/npg_qc/autoqc/checks/pulldown_metrics.pm
 lib/npg_qc/autoqc/checks/qX_yield.pm
 lib/npg_qc/autoqc/checks/ref_match.pm
@@ -58,6 +59,7 @@ lib/npg_qc/autoqc/results/gc_fraction.pm
 lib/npg_qc/autoqc/results/genotype.pm
 lib/npg_qc/autoqc/results/genotype_call.pm
 lib/npg_qc/autoqc/results/insert_size.pm
+lib/npg_qc/autoqc/results/meta.pm
 lib/npg_qc/autoqc/results/pulldown_metrics.pm
 lib/npg_qc/autoqc/results/qX_yield.pm
 lib/npg_qc/autoqc/results/ref_match.pm
@@ -204,6 +206,7 @@ t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-genotype.t
 t/60-autoqc-checks-genotype_call.t
 t/60-autoqc-checks-insert_size.t
+t/60-autoqc-checks-meta.t
 t/60-autoqc-checks-pulldown_metrics.t
 t/60-autoqc-checks-qX_yield.t
 t/60-autoqc-checks-ref_match.t
@@ -232,6 +235,7 @@ t/60-autoqc-results-gc_fraction.t
 t/60-autoqc-results-genotype.t
 t/60-autoqc-results-genotype_call.t
 t/60-autoqc-results-insert_size.t
+t/60-autoqc-results-meta.t
 t/60-autoqc-results-pulldown_metrics.t
 t/60-autoqc-results-qX_yield.t
 t/60-autoqc-results-ref_match.t
@@ -418,6 +422,16 @@ t/data/autoqc/load/3510_1_1_human_split_stats.json
 t/data/autoqc/load/3510_5.qX_yield.json
 t/data/autoqc/load/do_not_add_files_to_this_dir
 t/data/autoqc/load/some.json
+t/data/autoqc/meta/product_release.yml
+t/data/autoqc/meta/samplesheet_27483.csv
+t/data/autoqc/meta/29524#17.bam_flagstats.json
+t/data/autoqc/meta/29524#2.bam_flagstats.json
+t/data/autoqc/meta/29524#2.bcfstats.json
+t/data/autoqc/meta/29524#2.qX_yield.json
+t/data/autoqc/meta/29524#2.verify_bam_id.json
+t/data/autoqc/meta/29524#2_phix.bam_flagstats.json
+t/data/autoqc/meta/29524#3.bam_flagstats.json
+t/data/autoqc/meta/29524#7.bam_flagstats.json
 t/data/autoqc/npg/instrument/15.xml
 t/data/autoqc/npg/instrument/42.xml
 t/data/autoqc/npg/run/1937.xml

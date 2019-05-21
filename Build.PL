@@ -98,6 +98,7 @@ my $requires = {
                 'npg_tracking::illumina::runfolder'        => 0,
                 'npg_tracking::Schema'                     => 0,
                 'npg_tracking::util::abs_path'             => 0,
+                'npg_tracking::util::pipeline_config'      => 0,
                 'npg_tracking::util::types'                => 0,
                 'npg::util'                                => 0,
                 'st::api::base'                            => 0,
