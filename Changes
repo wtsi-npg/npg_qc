@@ -1,6 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+
  - update spatial_filter results parsing
+ - add target autosome stats to bam_flagstats qc check
 
 release 66.4
  - allow to finalise undecided library manual qc outcomes for

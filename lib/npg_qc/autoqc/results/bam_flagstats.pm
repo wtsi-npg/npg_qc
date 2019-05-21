@@ -15,6 +15,7 @@ our $VERSION = '0';
 
 has [ qw/ library
           target_filter
+          target_autosome_filter
         / ] => (
     isa  => 'Maybe[Str]',
     is   => 'rw',
@@ -36,13 +37,19 @@ has [ qw/ num_total_reads
           target_proper_pair_mapped_reads
           target_mapped_bases
           target_coverage_threshold
-          / ] => (
+          target_autosome_length
+          target_autosome_mapped_reads
+          target_autosome_proper_pair_mapped_reads
+          target_autosome_mapped_bases
+          target_autosome_coverage_threshold
+         / ] => (
     isa => 'Maybe[Int]',
     is  => 'rw',
 );
 
 has [ qw/ percent_duplicate
           target_percent_gt_coverage_threshold
+          target_autosome_percent_gt_coverage_threshold
         / ] => (
     isa => 'Maybe[Num]',
     is  => 'rw',
