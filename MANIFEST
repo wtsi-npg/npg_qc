@@ -424,6 +424,7 @@ t/data/autoqc/load/do_not_add_files_to_this_dir
 t/data/autoqc/load/some.json
 t/data/autoqc/meta/product_release.yml
 t/data/autoqc/meta/samplesheet_27483.csv
+t/data/autoqc/meta/29524#2.composition.json
 t/data/autoqc/meta/29524#17.bam_flagstats.json
 t/data/autoqc/meta/29524#2.bam_flagstats.json
 t/data/autoqc/meta/29524#2.bcfstats.json

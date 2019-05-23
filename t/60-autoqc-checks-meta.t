@@ -1,10 +1,16 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
 use File::Copy;
+use Perl6::Slurp;
+use JSON qw/from_json/;
+
+use npg_testing::db;
+use npg_qc::autoqc::qc_store;
+use npg_tracking::glossary::composition;
 
 use_ok('npg_qc::autoqc::checks::meta');
 
@@ -110,10 +116,11 @@ subtest 'setting options for qc store' => sub {
     'db option correctly propagated to the qc store object');
 };
 
-subtest 'finding files - file system' => sub {
+subtest 'finding result - file system' => sub {
   plan tests => 15;
 
   my $expected = 'Expected results for bam_flagstats, bcfstats, verify_bam_id,';
+  my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
   my $check = npg_qc::autoqc::checks::meta->new(
     conf_path => "$test_data_dir/with_criteria",
@@ -134,7 +141,7 @@ subtest 'finding files - file system' => sub {
     my $c = npg_qc::autoqc::checks::meta->new(
       conf_path => $test_data_dir,
       qc_in     => $dir,
-      rpt_list  => '29524:1:2;29524:2:2;29524:3:2;29524:4:2');
+      rpt_list  => $rpt_list);
     throws_ok { $c->_results } qr/$expected found none/, 'no results - error';    
   }
 
@@ -143,7 +150,7 @@ subtest 'finding files - file system' => sub {
   $check = npg_qc::autoqc::checks::meta->new(
     conf_path => $test_data_dir,
     qc_in     => $dir,
-    rpt_list  => '29524:1:2;29524:2:2;29524:3:2;29524:4:2');
+    rpt_list  => $rpt_list);
   throws_ok { $check->_results }
     qr/$expected found results for bam_flagstats/, 'not all results - error';
 
@@ -162,7 +169,7 @@ subtest 'finding files - file system' => sub {
   $check = npg_qc::autoqc::checks::meta->new(
     conf_path => $test_data_dir,
     qc_in     => $test_data_dir,
-    rpt_list  => '29524:1:2;29524:2:2;29524:3:2;29524:4:2');
+    rpt_list  => $rpt_list);
   lives_ok { $check->_results } 'no error - all expected results loaded';
   is_deeply ([sort keys %{$check->_results}],
              [sort qw/bam_flagstats bcfstats verify_bam_id/], 'correct keys');
@@ -174,6 +181,79 @@ subtest 'finding files - file system' => sub {
   }
   ok (!$check->_results->{bam_flagstats}->composition->get_component(0)->subset,
     'subset is undefined despite phix result present in test data');
+};
+
+subtest 'finding results - database' => sub {
+  plan tests => 15;
+
+  local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
+    't/data/autoqc/meta/samplesheet_29524.csv';
+
+  my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
+
+  my $schema =  Moose::Meta::Class->create_anon_class(
+    roles => [qw/npg_testing::db/])->new_object()
+                                   ->create_test_db(q[npg_qc::Schema]);
+  my $init = {
+    conf_path => $test_data_dir,
+    rpt_list  => $rpt_list,
+    use_db    => 1,
+    _qc_store => npg_qc::autoqc::qc_store->new(
+      use_db      => 1,
+      qc_schema   => $schema,
+      checks_list => [qw/bam_flagstats bcfstats verify_bam_id/]
+    )
+  };
+  my $check;
+  lives_ok { $check = npg_qc::autoqc::checks::meta->new($init) }
+    'object created without qc_in defined';
+  
+  my $expected = 'Expected results for bam_flagstats, bcfstats, verify_bam_id,';
+  throws_ok { $check->_results } qr/$expected found none/, 'no results - error';
+
+  # create composition, but not records in the result tables
+  my $composition = npg_tracking::glossary::composition->thaw(
+                    slurp "$test_data_dir/29524#2.composition.json");
+  my $row = $schema->resultset('BamFlagstats')
+            ->find_or_create_seq_composition($composition); 
+  $check = npg_qc::autoqc::checks::meta->new($init);
+  throws_ok { $check->_results } qr/$expected found none/, 'no results - error';
+
+  my $create_qc_record = sub {
+    my ($file_name, $rs_name) = @_;
+    my $values = from_json(slurp "$test_data_dir/$file_name");
+    delete $values->{'__CLASS__'};
+    delete $values->{'composition'};
+    delete $values->{'result_file_path'};
+    $values->{'id_seq_composition'} = $row->id_seq_composition;
+    $schema->resultset($rs_name)->create($values);
+  };
+
+  # create a record in one of the result tables
+  $create_qc_record->('29524#2.bam_flagstats.json', 'BamFlagstats');
+
+  $init->{'qc_in'} = $test_data_dir;
+
+  $check = npg_qc::autoqc::checks::meta->new($init);
+  throws_ok { $check->_results }
+    qr/$expected found results for bam_flagstats/, 'not all results - error';
+
+  # create records in all necessary tables plus one more
+  $create_qc_record->('29524#2.qX_yield.json', 'QXYield');
+  $create_qc_record->('29524#2.bcfstats.json', 'Bcfstats');
+  $create_qc_record->('29524#2.verify_bam_id.json', 'VerifyBamId');
+
+  
+  $check = npg_qc::autoqc::checks::meta->new($init);
+  lives_ok { $check->_results } 'no error - all expected results loaded';
+  is_deeply ([sort keys %{$check->_results}],
+             [sort qw/bam_flagstats bcfstats verify_bam_id/], 'correct keys');
+  for my $name (keys %{$check->_results}) {
+    my $result = $check->_results->{$name};
+    like (ref $result, qr/\Anpg_qc::Schema::Result/, 'DBIx object retrieved');
+    is ($check->_results->{$name}->class_name, $name, 'result type is correct');
+    is ($result->composition->get_component(0)->tag_index, 2, 'tag index correct');
+  }  
 };
 
 1;

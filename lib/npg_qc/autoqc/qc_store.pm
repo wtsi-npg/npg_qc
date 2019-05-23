@@ -372,6 +372,43 @@ sub load_from_db {
   return $c;
 }
 
+=head2 load_from_db_via_composition
+
+Similar to load_from_db, but loads database results for an array of composition
+objects.
+
+Returns a collection object (npg_qc::autoqc::results::collection) containing
+autoqc result corresponding to the argument compositions of types listed
+in the checks_list attribute. Returns an empty collection if no results are
+found.
+
+ # Assuming $c1 and $c2 are objects of type npg_tracking::glosary::composition
+ my $c = $obj->load_from_db_via_composition([$c1, $c2]);
+
+=cut
+
+sub load_from_db_via_composition {
+  my ($self, $compositions) = @_;
+
+  $compositions or croak
+    'Array of composition objects should be given';
+
+  my @results = ();
+  if ($self->use_db && @{$compositions}) {
+    my $rs = $self->qc_schema()->resultset('SeqComposition')->search(
+      {'me.digest' => [map { $_->digest } @{$compositions}]},
+      {join => $self->_relation_names}
+    );
+    while (my $row = $rs->next()) {
+      push @results, grep { $_ } map { $row->$_ } @{$self->_relation_names};
+    }
+  }
+  my $c = npg_qc::autoqc::results::collection->new();
+  $c->add(\@results);
+
+  return $c;
+}
+
 =head2 json_file2result_object
 
 Reads an argument JSON file and converts the content into in-memory autoqc
@@ -412,6 +449,22 @@ sub json_file2result_object {
   };
 
   return $result;
+}
+
+has '_relation_names' => (
+  isa        => 'ArrayRef',
+  is         => 'ro',
+  required   => 0,
+  lazy_build => 1,
+);
+sub _build__relation_names {
+  my $self = shift;
+  my @names = ();
+  foreach my $n (@{$self->checks_list()}) {
+    $n =~ s/s\Z//xms;
+    push @names, $n;
+  }
+  return \@names;
 }
 
 sub _runfolder_obj {

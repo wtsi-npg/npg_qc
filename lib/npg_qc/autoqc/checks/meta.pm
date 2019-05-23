@@ -286,7 +286,7 @@ sub _build__results {
   my $self = shift;
 
   my $collection = $self->use_db ?
-    $self->_qc_store->load_from_db4composition($self->composition) :
+    $self->_qc_store->load_from_db_via_composition([$self->composition]) :
     $self->_qc_store->load_from_path($self->qc_in);
 
   my $d = $self->composition->digest;
