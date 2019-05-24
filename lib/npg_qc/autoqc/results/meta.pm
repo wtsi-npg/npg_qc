@@ -59,6 +59,19 @@ has 'criteria' => (
   lazy_build => 1,
 );
 
+=head2 evaluation_results
+
+A hash of individual string expressions (keys) mapped to boolean outcomes of
+their evaluation. An empty hash is a default.
+
+=cut
+
+has 'evaluation_results' => (
+  isa        => 'HashRef',
+  is         => 'rw',
+  default    => sub { return {} },
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;

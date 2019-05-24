@@ -4,7 +4,8 @@ use Moose;
 use namespace::autoclean;
 use Carp;
 use Readonly;
-use List::MoreUtils qw/any uniq/;
+use List::MoreUtils qw/all any uniq/;
+use English qw(-no_match_vars);
 
 use st::api::lims;
 use npg_qc::autoqc::qc_store;
@@ -144,10 +145,40 @@ sub execute {
   my $self = shift;
 
   $self->can_run() or return;
-
   $self->result->criteria($self->_criteria);
+  $self->result->pass($self->evaluate());
+  # The next step is the conversion of a boolean outcome into
+  # mqc-compatible data structure.
 
   return;
+}
+
+=head2 evaluate
+
+Main evaluation algorithm. Current implementation is very simple:
+all criteria found in the product configuration file are assumed
+to be equally essential. Therefore, a conjunction (AND) operator
+is applied to a list of this criteria.
+
+Private methods and attributes of this class and the result class
+implementation for this check are capable of supporting a more
+complex algorithm should this become necessary in future. 
+
+Returns 1 if all evaluated conditions were satisfied, otherise
+returns 0. Sets the evaluation_results attribute of the results
+object instance.
+
+=cut
+
+sub evaluate {
+  my $self = shift;
+
+  my $emap = $self->_evaluate_expressions_array($self->_expressions);
+  while (my ($e, $o) = each  %{$emap}) {
+    $self->result->evaluation_results()->{$e} = $o;
+  }
+
+  return $self->_apply_operator([values %{$emap}], $CONJUNCTION_OP);
 }
 
 has '_lims' => (
@@ -245,14 +276,9 @@ has '_result_class_names'  => (
 );
 sub _build__result_class_names {
   my $self = shift;
-
-  my @class_names = ();
-  foreach my $c ( @{$self->_expressions()} ) {
-    my ($class_name) = $c =~ /\A(?:\W+)?(\w+)[.]/xms;
-    $class_name or croak "Failed to infer class name from $c";
-    push @class_names, $class_name;
-  }
-  @class_names = uniq sort @class_names;
+  my @class_names = uniq sort
+                    map { _class_name_from_expression($_) }
+                    @{$self->_expressions()};
   return \@class_names;
 }
 
@@ -315,6 +341,13 @@ sub _build__results {
   return \%h;
 }
 
+sub _class_name_from_expression {
+  my $e = shift;
+  my ($class_name) = $e =~ /\A(?:\W+)?(\w+)[.]/xms;
+  $class_name or croak "Failed to infer class name from $e";
+  return $class_name;
+}
+
 sub _traverse {
   my ($node, $expressions) = @_;
 
@@ -334,6 +367,74 @@ sub _traverse {
   }
 
   return;
+}
+
+#####
+# Given an array of expressions, evaluates them in the context of available
+# autoqc results. Maps outcomes (as 1 or 0) to expressions and returns this
+# hash.
+#
+sub _evaluate_expressions_array {
+  my ($self, $expressions) = @_;
+
+  my $map = {};
+  foreach my $e (@{$expressions}) {
+    $map->{$e} = $self->_evaluate_expression($e);
+  }
+
+  return $map;
+}
+
+#####
+# Applies a logical operator to all array members.
+# Defaults to aplying the conjunction operator.
+# Returns 0 or 1.
+#
+sub _apply_operator {
+  my ($self, $outcomes, $operator) = @_;
+
+  $operator ||= $CONJUNCTION_OP;
+  ($operator eq $CONJUNCTION_OP) or ($operator eq $DISJUNCTION_OP)
+    or croak "Unknown logical operator $operator";
+
+  my $outcome = $operator eq $CONJUNCTION_OP ?
+                all { $_ } @{$outcomes}  : any { $_ } @{$outcomes};
+
+  return $outcome ? 1 : 0;
+}
+
+#####
+# Evaluates a single expression in the context of available autoqc results.
+# Returns 0 or 1.
+#
+sub _evaluate_expression {
+  my ($self, $e) = @_;
+
+  my $class_name = _class_name_from_expression($e);
+  my $obj = $self-> _results->{$class_name};
+  # We should not get this far with an error in the configuration
+  # filr, but just in case...
+  $obj or croak "No autoqc result for evaluation of '$e'";
+
+  ##no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+  my $replacement = q[$result->];
+  ##use critic
+  my $perl_e = $e;
+  $perl_e =~ s/$class_name[.]/$replacement/xmsg;
+
+  my $evaluator = sub {
+    my $result = shift;
+    ##no critic (BuiltinFunctions::ProhibitStringyEval)
+    my $o = eval $perl_e; # Evaluate Perl string expression
+    ##use critic
+    if ($EVAL_ERROR) {
+      my $err = $EVAL_ERROR;
+      croak "Error evaluating expression '$perl_e' derived from '$e': $err";
+    }
+    return $o ? 1 : 0;
+  };
+
+  return $evaluator->($obj);
 }
 
 __PACKAGE__->meta->make_immutable();
@@ -357,6 +458,8 @@ __END__
 =item Readonly
 
 =item List::MoreUtils
+
+=item English
 
 =item st::api::lims
 

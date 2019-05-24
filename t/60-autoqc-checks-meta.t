@@ -1,12 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
 use File::Copy;
-use Perl6::Slurp;
-use JSON qw/from_json/;
+use File::Slurp qw/read_file write_file/;
+use JSON qw/from_json to_json/;
+use List::MoreUtils qw/any/;
 
 use npg_testing::db;
 use npg_qc::autoqc::qc_store;
@@ -21,8 +22,16 @@ my $conf_file_path = "$test_data_dir/product_release.yml";
 local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
     't/data/autoqc/meta/samplesheet_27483.csv';
 
+my $criteria_list = [
+  '( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95',
+  'bam_flagstats.target_mapped_bases > 85_000_000_000',
+  'bam_flagstats.target_percent_gt_coverage_threshold > 95',
+  'verify_bam_id.freemix < 0.01',
+  '( bcfstats.genotypes_nrd_dividend / bcfstats.genotypes_nrd_divisor ) < 0.02'
+];
+
 subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 18;
+  plan tests => 19;
 
   my $check = npg_qc::autoqc::checks::meta->new(
     conf_path => $test_data_dir,
@@ -40,6 +49,8 @@ subtest 'construction object, deciding whether to run' => sub {
     'No criteria defined in the product configuration file',
     'reason logged');
   lives_ok { $check->execute() } 'cannot run, but execute method runs OK';
+  is ($check->result->pass, undef,
+    'pass atttribute of the result object is ndefined');
 
   $check = npg_qc::autoqc::checks::meta->new(
     conf_path => "$test_data_dir/no_robo",
@@ -76,14 +87,7 @@ subtest 'construction object, deciding whether to run' => sub {
     'can_run is accompanied by warnings';
   ok ($can_run, 'can_run returns true');
   ok (!$check->result->comments, 'No comments logged');
-  my $expected_criteria = {'and' => [
-                           '( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95',
-                           'bam_flagstats.target_mapped_bases > 85_000_000_000',
-                           'bam_flagstats.target_percent_gt_coverage_threshold > 95',
-                           'verify_bam_id.freemix < 0.01',
-                           '( bcfstats.genotypes_nrd_dividend / bcfstats.genotypes_nrd_divisor ) < 0.02'
-                          ]};
-  is_deeply ($check->_criteria, $expected_criteria, 'criteria parsed correctly');
+  is_deeply ($check->_criteria, {'and' => $criteria_list}, 'criteria parsed correctly');
 
   $check = npg_qc::autoqc::checks::meta->new(
     conf_path => "$test_data_dir/error1",
@@ -213,7 +217,7 @@ subtest 'finding results - database' => sub {
 
   # create composition, but not records in the result tables
   my $composition = npg_tracking::glossary::composition->thaw(
-                    slurp "$test_data_dir/29524#2.composition.json");
+                    read_file "$test_data_dir/29524#2.composition.json");
   my $row = $schema->resultset('BamFlagstats')
             ->find_or_create_seq_composition($composition); 
   $check = npg_qc::autoqc::checks::meta->new($init);
@@ -221,7 +225,7 @@ subtest 'finding results - database' => sub {
 
   my $create_qc_record = sub {
     my ($file_name, $rs_name) = @_;
-    my $values = from_json(slurp "$test_data_dir/$file_name");
+    my $values = from_json(read_file "$test_data_dir/$file_name");
     delete $values->{'__CLASS__'};
     delete $values->{'composition'};
     delete $values->{'result_file_path'};
@@ -253,6 +257,96 @@ subtest 'finding results - database' => sub {
     like (ref $result, qr/\Anpg_qc::Schema::Result/, 'DBIx object retrieved');
     is ($check->_results->{$name}->class_name, $name, 'result type is correct');
     is ($result->composition->get_component(0)->tag_index, 2, 'tag index correct');
+  }
+};
+
+subtest 'single expression evaluation' => sub {
+  plan tests => 10;
+
+  local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
+    't/data/autoqc/meta/samplesheet_29524.csv';
+  my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
+
+  my $criteria =  [
+    '( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95',
+    'bam_flagstats.target_mapped_bases > 85_000_000_000',
+    'bam_flagstats.target_percent_gt_coverage_threshold > 95',
+    'verify_bam_id.freemix < 0.01',
+    '( bcfstats.genotypes_nrd_dividend / bcfstats.genotypes_nrd_divisor ) < 0.02'
+                  ];
+
+  my $check = npg_qc::autoqc::checks::meta->new(
+    conf_path => $test_data_dir,
+    qc_in     => $test_data_dir,
+    rpt_list  => $rpt_list);
+
+  throws_ok {$check->_evaluate_expression('verify_bam.freemix < 0.01')}
+    qr/No autoqc result for evaluation of/,
+    'error if check name is unknown';
+  throws_ok {$check->_evaluate_expression('verify_bam_id.freemix_free < 0.01')}
+    qr/Can't locate object method \"freemix_free\"/,
+    'error if method name is unknown';
+
+  for my $c (@{$criteria}) {
+    lives_and { is $check->_evaluate_expression($c), 1 } "pass for $c";
+  }
+  
+  is ($check->_evaluate_expression('verify_bam_id.freemix > 0.01'), 0,
+    'negative outcome');
+  is ($check->_evaluate_expression('bam_flagstats.target_mapped_bases > 85_000_000_000_000'), 0,
+    'negative outcome');
+  is ($check->_evaluate_expression(
+    '( bcfstats.genotypes_nrd_dividend * bcfstats.genotypes_nrd_divisor ) < 0.02'), 0,
+    'negative outcome');
+};
+
+subtest 'evaluation within the execute method' => sub {
+  plan tests => 12;
+
+  local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
+    't/data/autoqc/meta/samplesheet_29524.csv';
+  my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
+
+  my $check = npg_qc::autoqc::checks::meta->new(
+    conf_path => $test_data_dir,
+    qc_in     => $dir,
+    rpt_list  => $rpt_list);
+
+  lives_ok { $check->execute } 'execute method runs OK';
+  is ($check->result->pass, 1, 'result pass attribute is set to 1');
+  my %expected = map { $_ => 1 } @{$criteria_list};
+  is_deeply ($check->result->evaluation_results(), \%expected,
+    'evaluation results are saved');
+
+  my $target = "$dir/29524#2.bam_flagstats.json";
+
+  my $failures = {};
+  $failures->{3}  = [qw/target_mapped_bases/];
+  $failures->{7}  = [qw/target_mapped_bases target_percent_gt_coverage_threshold/];
+  $failures->{17} = [qw/target_percent_gt_coverage_threshold/];
+
+  for my $index (qw/3 7 17/) {
+
+    my $f = '29524#' . $index . '.bam_flagstats.json';
+    my $values = from_json(read_file "$test_data_dir/$f");
+    for my $component (@{$values->{composition}->{components}}) {
+      $component->{tag_index} = 2;
+    }
+    write_file($target, to_json($values));
+
+    $check = npg_qc::autoqc::checks::meta->new(
+      conf_path => $test_data_dir,
+      qc_in     => $dir,
+      rpt_list  => $rpt_list);
+    lives_ok { $check->execute } 'execute method runs OK';
+    is ($check->result->pass, 0, 'result pass attribute is set to 0');
+    my $e = {};
+    my @failed = @{$failures->{$index}};
+    for my $c (@{$criteria_list}) {
+      $e->{$c} = (any { $c =~ /$_/ } @failed) ? 0 : 1;
+    }
+
+    is_deeply ($check->result->evaluation_results(), $e, 'evaluation results are saved');
   }  
 };
 
