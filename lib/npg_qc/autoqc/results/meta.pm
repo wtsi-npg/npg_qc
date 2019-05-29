@@ -2,7 +2,9 @@ package npg_qc::autoqc::results::meta;
 
 use Moose;
 use namespace::autoclean;
-extends qw(npg_qc::autoqc::results::result);
+
+extends 'npg_qc::autoqc::results::result';
+with 'npg_qc::autoqc::role::result';
 
 our $VERSION = '0';
 
