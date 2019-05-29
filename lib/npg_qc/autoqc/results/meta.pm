@@ -72,6 +72,16 @@ has 'evaluation_results' => (
   default    => sub { return {} },
 );
 
+=head2 qc_outcome
+
+=cut
+
+has 'qc_outcome' => (
+  isa        => 'HashRef',
+  is         => 'rw',
+  default    => sub { return {} },
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;

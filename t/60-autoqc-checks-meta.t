@@ -301,7 +301,7 @@ subtest 'single expression evaluation' => sub {
 };
 
 subtest 'evaluation within the execute method' => sub {
-  plan tests => 12;
+  plan tests => 24;
 
   local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
     't/data/autoqc/meta/samplesheet_29524.csv';
@@ -317,6 +317,10 @@ subtest 'evaluation within the execute method' => sub {
   my %expected = map { $_ => 1 } @{$criteria_list};
   is_deeply ($check->result->evaluation_results(), \%expected,
     'evaluation results are saved');
+  my $outcome = $check->result->qc_outcome;
+  is ($outcome->{'mqc_outcome'} , 'Accepted preliminary', 'correct outcome string');
+  is ($outcome->{'username'}, 'robo_qc', 'correct process id');
+  ok ($outcome->{'timestamp'}, 'timestamp saved');
 
   my $target = "$dir/29524#2.bam_flagstats.json";
 
@@ -335,9 +339,10 @@ subtest 'evaluation within the execute method' => sub {
     write_file($target, to_json($values));
 
     $check = npg_qc::autoqc::checks::meta->new(
-      conf_path => $test_data_dir,
-      qc_in     => $dir,
-      rpt_list  => $rpt_list);
+      final_qc_outcome => 1,
+      conf_path       => $test_data_dir,
+      qc_in           => $dir,
+      rpt_list        => $rpt_list);
     lives_ok { $check->execute } 'execute method runs OK';
     is ($check->result->pass, 0, 'result pass attribute is set to 0');
     my $e = {};
@@ -347,6 +352,10 @@ subtest 'evaluation within the execute method' => sub {
     }
 
     is_deeply ($check->result->evaluation_results(), $e, 'evaluation results are saved');
+    $outcome = $check->result->qc_outcome;
+    is ($outcome->{'mqc_outcome'} , 'Rejected final', 'correct outcome string');
+    is ($outcome->{'username'}, 'robo_qc', 'correct process id');
+    ok ($outcome->{'timestamp'}, 'timestamp saved');
   }  
 };
 

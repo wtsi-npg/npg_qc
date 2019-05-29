@@ -6,9 +6,11 @@ use Carp;
 use Readonly;
 use List::MoreUtils qw/all any uniq/;
 use English qw(-no_match_vars);
+use DateTime;
 
 use st::api::lims;
 use npg_qc::autoqc::qc_store;
+use npg_qc::Schema::Mqc::OutcomeDict;
 
 extends 'npg_qc::autoqc::checks::check';
 with 'npg_tracking::util::pipeline_config';
@@ -21,6 +23,8 @@ Readonly::Scalar my $DISJUNCTION_OP => q[or];
 Readonly::Scalar my $ROBO_KEY         => q[robo_qc];
 Readonly::Scalar my $LIBRARY_TYPE_KEY => q[library_type];
 Readonly::Scalar my $CRITERIA_KEY     => q[acceptance_criteria];
+
+Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -146,9 +150,8 @@ sub execute {
 
   $self->can_run() or return;
   $self->result->criteria($self->_criteria);
-  $self->result->pass($self->evaluate());
-  # The next step is the conversion of a boolean outcome into
-  # mqc-compatible data structure.
+  $self->result->pass($self->evaluate);
+  $self->result->qc_outcome($self->_generate_qc_outcome);
 
   return;
 }
@@ -167,6 +170,11 @@ complex algorithm should this become necessary in future.
 Returns 1 if all evaluated conditions were satisfied, otherise
 returns 0. Sets the evaluation_results attribute of the results
 object instance.
+
+In future we might have both acceptance and rejection criteria
+defined. When neither of these sets of criteria is satisfied, this
+method should return an undefined value, which will be translated
+to the 'Undecided' qc outcome.
 
 =cut
 
@@ -437,6 +445,23 @@ sub _evaluate_expression {
   return $evaluator->($obj);
 }
 
+sub _generate_qc_outcome {
+  my $self = shift;
+
+  #####
+  # Any of Accepted, Rejected, Undecided outcomes can be returned here
+  my $outcome = npg_qc::Schema::Mqc::OutcomeDict->generate_short_description(
+    $self->final_qc_outcome ? 1 : 0, $self->result->pass);
+  # Temporary code, will be replaced by our own package for DateTime
+  # object serialization.
+  my $timestamp = DateTime->now(time_zone => q[local])
+                          ->strftime($TIMESTAMP_FORMAT_WOFFSET);
+
+  return { mqc_outcome => $outcome,
+           timestamp   => $timestamp,
+           username    => $ROBO_KEY };
+}
+
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -460,6 +485,8 @@ __END__
 =item List::MoreUtils
 
 =item English
+
+=item Date::Time
 
 =item st::api::lims
 
