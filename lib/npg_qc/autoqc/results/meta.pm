@@ -25,56 +25,42 @@ npg_qc::autoqc::results::meta
 =cut
 
 has 'library_type' => (
-  isa        => 'Str',
-  is         => 'rw',
+  isa  => 'Str',
+  is   => 'rw',
 );
 
 =head2 criteria
 
 A read-write hash reference attribute representing evaluation criteria
 in a form that would not require any additional information to repeate
-the evaluation as it was done at the time the check was run.
-
-All boolean operators are listed explicitly. The top-level expression
-is either a conjunction or disjunction performed on a list of
-expressions, each of wich can be, in turn, either a math expression or
-a conjunction or disjunction.
-
-Examples:
-
-  Assuming a = 2 and b = 5,
-  {'and' => ["a-1 < 0", "b+3 > 10"]} translates to
-  (a-1 > 0) && (b+3 > 10) and evaluates to false, while
-  {'or' => ["a-1 > 0", "b+3 > 10"]} translates to
-  (a-1 > 0) || (b+3 > 10) and evaluates to true.
-
-  Assuming additionally c = 3 and d = 1,
-  {'and' => ["a-1 > 0", "b+3 > 5", {'or' => ["c-d > 0",  "c-d < -1"]}]}
-  translates to
-  (a-1 > 0) && (b+3 > 5) && ((c-d > 0) || (c-d < -1)) and evaluates to true.
+the evaluation as it was done at the time the check was run. An empty
+hash is default.
 
 =cut
 
 has 'criteria' => (
-  isa        => 'HashRef',
-  is         => 'rw',
-  lazy_build => 1,
+  isa     => 'HashRef',
+  is      => 'rw',
+  default => sub { return {} },
 );
 
 =head2 evaluation_results
 
 A hash of individual string expressions (keys) mapped to boolean outcomes of
-their evaluation. An empty hash is a default.
+their evaluation. An empty hash is default.
 
 =cut
 
 has 'evaluation_results' => (
-  isa        => 'HashRef',
-  is         => 'rw',
-  default    => sub { return {} },
+  isa     => 'HashRef',
+  is      => 'rw',
+  default => sub { return {} },
 );
 
 =head2 qc_outcome
+
+A hash reference with information necessary for creating a record in the
+mqc_library_outcome_ent table of the QC database. An empty hash is default.
 
 =cut
 

@@ -22,7 +22,7 @@ Readonly::Scalar my $DISJUNCTION_OP => q[or];
 
 Readonly::Scalar my $ROBO_KEY         => q[robo_qc];
 Readonly::Scalar my $LIBRARY_TYPE_KEY => q[library_type];
-Readonly::Scalar my $CRITERIA_KEY     => q[acceptance_criteria];
+Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY => q[acceptance_criteria];
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
@@ -38,6 +38,8 @@ npg_qc::autoqc::checks::meta
   $check->execute();
 
 =head1 DESCRIPTION
+
+=head2 Overview
 
 This checks evaluates the results of other autoqc checks
 against a pre-defined set of criteria.
@@ -58,6 +60,8 @@ outcome is also marked as 'Final', otherwise it's marked as
 By default the final_qc_outcome flag is false and the produced
 outcomes are preliminary.
 
+=head2 Retrieval of autoqc results to be evaluated
+
 We will not try to second-guess here what is and what is not
 a product. Therefore, it is possible to invoke this check on
 any entity apart from, possibly, a run. At run time an attempt
@@ -77,6 +81,47 @@ or from a database (use_db attribute should be set to true).
 npg_qc::autoqc::qc_store class is used to load results. In
 contrast to npg_qc::autoqc::qc_store, if the database retrieval
 is enabled, no fall back to a search on a file system is done.
+
+=head2 Record of the evaluation criteria
+
+The result object for this check records evaluation criteria
+in a form that would not require any additional information to
+repeate the evaluation as it was done at the time the check was
+run.
+
+All boolean operators are listed explicitly. The top-level
+expression is either a conjunction or disjunction performed on
+a list of expressions, each of wich can be, in turn, either a
+math expression or a further boolean expression on a list of
+expressions.
+
+Examples:
+
+  Assuming a = 2 and b = 5,
+  {'and' => ["a-1 < 0", "b+3 > 10"]} translates to
+  (a-1 > 0) && (b+3 > 10) and evaluates to false, while
+  {'or' => ["a-1 > 0", "b+3 > 10"]} translates to
+  (a-1 > 0) || (b+3 > 10) and evaluates to true.
+
+  Assuming additionally c = 3 and d = 1,
+  {'and' => ["a-1 > 0", "b+3 > 5", {'or' => ["c-d > 0",  "c-d < -1"]}]}
+  translates to
+  (a-1 > 0) && (b+3 > 5) && ((c-d > 0) || (c-d < -1))
+  and evaluates to true.
+
+if both acceptance and rejection criteria have to be accomodated, this
+can be done in the following way (note the negation operator):
+
+  {
+    'and' => [
+      {'not' => {'or' => [$rejection_expr1, $rejection_expr2]}},
+      {'and' => [$acceptance_expr1, $acceptance_expr2]}}
+             ]
+  }
+
+The outcome of the evaluation will be either true or false. The undecided
+outcome can be assigned if the overall expression evaluates to false and
+a full evaluation was performed (ie the acceptance branch was evaluated).
 
 =head1 SUBROUTINES/METHODS
 
@@ -172,9 +217,7 @@ returns 0. Sets the evaluation_results attribute of the results
 object instance.
 
 In future we might have both acceptance and rejection criteria
-defined. When neither of these sets of criteria is satisfied, this
-method should return an undefined value, which will be translated
-to the 'Undecided' qc outcome.
+defined, adding an undefined value as a legitimate outcome.
 
 =cut
 
@@ -237,7 +280,7 @@ sub _build__criteria {
       #
       foreach my $criteria_set (@{$study_config->{$ROBO_KEY}}) {
         $criteria_set->{$LIBRARY_TYPE_KEY} or croak "$LIBRARY_TYPE_KEY key is missing";
-        $criteria_set->{$CRITERIA_KEY} or croak "$CRITERIA_KEY key is missing";
+        $criteria_set->{$ACCEPTANCE_CRITERIA_KEY} or croak "$ACCEPTANCE_CRITERIA_KEY key is missing";
         if (any {$_ eq $lib_type} map { lc } @{$criteria_set->{$LIBRARY_TYPE_KEY}}) {
           #####
           # A very simple criteria format - a list of strings - is used for now.
@@ -246,7 +289,7 @@ sub _build__criteria {
           # that should give the result of the evaluation. Therefore, at the
           # moment it is safe to collect all criteria in a single list.
           # 
-          push @criteria, @{$criteria_set->{$CRITERIA_KEY}};
+          push @criteria, @{$criteria_set->{$ACCEPTANCE_CRITERIA_KEY}};
         }
       }
       if (@criteria) {
@@ -452,7 +495,7 @@ sub _generate_qc_outcome {
   # Any of Accepted, Rejected, Undecided outcomes can be returned here
   my $outcome = npg_qc::Schema::Mqc::OutcomeDict->generate_short_description(
     $self->final_qc_outcome ? 1 : 0, $self->result->pass);
-  # Temporary code, will be replaced by our own package for DateTime
+  # Temporary code, should use functions from our own package for DateTime
   # object serialization.
   my $timestamp = DateTime->now(time_zone => q[local])
                           ->strftime($TIMESTAMP_FORMAT_WOFFSET);
