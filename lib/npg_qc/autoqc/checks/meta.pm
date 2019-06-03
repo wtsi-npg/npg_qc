@@ -5,9 +5,10 @@ use namespace::autoclean;
 use Carp;
 use Readonly;
 use List::MoreUtils qw/all any uniq/;
-use English qw(-no_match_vars);
+use English qw/-no_match_vars/;
 use DateTime;
 
+use WTSI::DNAP::Utilities::Timestamp qw/create_current_timestamp/;
 use st::api::lims;
 use npg_qc::autoqc::qc_store;
 use npg_qc::Schema::Mqc::OutcomeDict;
@@ -495,13 +496,9 @@ sub _generate_qc_outcome {
   # Any of Accepted, Rejected, Undecided outcomes can be returned here
   my $outcome = npg_qc::Schema::Mqc::OutcomeDict->generate_short_description(
     $self->final_qc_outcome ? 1 : 0, $self->result->pass);
-  # Temporary code, should use functions from our own package for DateTime
-  # object serialization.
-  my $timestamp = DateTime->now(time_zone => q[local])
-                          ->strftime($TIMESTAMP_FORMAT_WOFFSET);
 
   return { mqc_outcome => $outcome,
-           timestamp   => $timestamp,
+           timestamp   => create_current_timestamp(),
            username    => $ROBO_KEY };
 }
 
@@ -529,7 +526,7 @@ __END__
 
 =item English
 
-=item Date::Time
+=item WTSI::DNAP::Utilities::Timestamp
 
 =item st::api::lims
 

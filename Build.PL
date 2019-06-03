@@ -75,6 +75,7 @@ my $requires = {
                 'URI::Escape'                     => 0,
                 'Vcf'                             => 0,
 
+                'WTSI::DNAP::Utilities::Timestamp'         => 0,
                 'npg_common::Alignment'                    => 0,
                 'npg_common::extractor::fastq'             => 0,
                 'npg_common::roles::software_location'     => 0,
