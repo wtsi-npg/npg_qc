@@ -344,15 +344,27 @@ sub load_from_db {
       if (!$table_class) {
         croak qq[No DBIx result class name for $check_name];
       }
-      if ($query->option == $LANES) {
-        $dbix_query->{$ti_key} = undef;
-      } elsif ($query->option == $PLEXES) {
-        $dbix_query->{$ti_key} = {q[!=], undef};
-      }
 
-      my @check_results = $self->qc_schema()->resultset($table_class)
-                         ->search_autoqc($dbix_query)->all();
-      push @results, @check_results;
+      my $rs;
+      #####
+      # A database table for the result does not have to exist.
+      # The try statement below takes care of this.
+      try {
+        $rs = $self->qc_schema()->resultset($table_class);
+      };
+
+      if ($rs) {
+
+        if ($query->option == $LANES) {
+          $dbix_query->{$ti_key} = undef;
+        } elsif ($query->option == $PLEXES) {
+          $dbix_query->{$ti_key} = {q[!=], undef};
+        }
+
+        my @check_results = $self->qc_schema()->resultset($table_class)
+                            ->search_autoqc($dbix_query)->all();
+        push @results, @check_results;
+      }
     }
   } else {
     carp __PACKAGE__  . q[ object is configured not to use the database];
@@ -399,8 +411,24 @@ sub load_from_db_via_composition {
       {'me.digest' => [map { $_->digest } @{$compositions}]},
       {join => $self->_relation_names}
     );
+
+    my @relation_names = @{$self->_relation_names};
     while (my $row = $rs->next()) {
-      push @results, grep { $_ } map { $row->$_ } @{$self->_relation_names};
+      foreach my $rname (@relation_names) {
+        my $rrow;
+        #####
+        # A database table for the result does not have to exist.
+        # The try statement below takes care of this. The error might be due
+        # to the relation name being different from what we think it is.
+        # So, if results from a table are nevr retrieved, check the relation
+        # name.
+        try {
+          $rrow = $row->$rname;
+        };
+        if ($rrow) {
+          push @results, $rrow;
+        }
+      }
     }
   }
   my $c = npg_qc::autoqc::results::collection->new();
