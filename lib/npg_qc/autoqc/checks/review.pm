@@ -1,4 +1,4 @@
-package npg_qc::autoqc::checks::meta;
+package npg_qc::autoqc::checks::review;
 
 use Moose;
 use namespace::autoclean;
@@ -31,11 +31,11 @@ Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
 =head1 NAME
 
-npg_qc::autoqc::checks::meta
+npg_qc::autoqc::checks::review
 
 =head1 SYNOPSIS
 
-  my $check = npg_qc::autoqc::checks::meta->new(qc_in => 'dir_in');
+  my $check = npg_qc::autoqc::checks::review->new(qc_in => 'dir_in');
   $check->execute();
 
 =head1 DESCRIPTION

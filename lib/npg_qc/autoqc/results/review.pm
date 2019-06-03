@@ -1,4 +1,4 @@
-package npg_qc::autoqc::results::meta;
+package npg_qc::autoqc::results::review;
 
 use Moose;
 use namespace::autoclean;
@@ -12,7 +12,7 @@ our $VERSION = '0';
 
 =head1 NAME
 
-npg_qc::autoqc::results::meta
+npg_qc::autoqc::results::review
 
 =head1 SYNOPSIS
 

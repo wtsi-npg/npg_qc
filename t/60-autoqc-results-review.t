@@ -6,7 +6,7 @@ use Test::Exception;
 use npg_tracking::glossary::composition::component::illumina;
 use npg_tracking::glossary::composition;
 
-use_ok('npg_qc::autoqc::results::meta');
+use_ok('npg_qc::autoqc::results::review');
 
 my $composition = npg_tracking::glossary::composition->new(
   components => [
@@ -19,8 +19,8 @@ my $composition = npg_tracking::glossary::composition->new(
   ]
 );
 
-my $r = npg_qc::autoqc::results::meta->new(composition => $composition);
-isa_ok ($r, 'npg_qc::autoqc::results::meta');
+my $r = npg_qc::autoqc::results::review->new(composition => $composition);
+isa_ok ($r, 'npg_qc::autoqc::results::review');
 $r->qc_outcome({mqc_outcome => 'Accepted_final',
                 timestamp   => '2019-05-23T17:11:31+0100',
                 username    => 'robo_qc'});

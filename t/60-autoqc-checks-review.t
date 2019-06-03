@@ -13,14 +13,14 @@ use npg_testing::db;
 use npg_qc::autoqc::qc_store;
 use npg_tracking::glossary::composition;
 
-use_ok('npg_qc::autoqc::checks::meta');
+use_ok('npg_qc::autoqc::checks::review');
 
 my $dir = tempdir( CLEANUP => 1 );
-my $test_data_dir = 't/data/autoqc/meta';
+my $test_data_dir = 't/data/autoqc/review';
 my $conf_file_path = "$test_data_dir/product_release.yml";
 
 local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
-    't/data/autoqc/meta/samplesheet_27483.csv';
+    't/data/autoqc/review/samplesheet_27483.csv';
 
 my $criteria_list = [
   '( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95',
@@ -33,12 +33,12 @@ my $criteria_list = [
 subtest 'construction object, deciding whether to run' => sub {
   plan tests => 19;
 
-  my $check = npg_qc::autoqc::checks::meta->new(
+  my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  isa_ok ($check, 'npg_qc::autoqc::checks::meta');
-  isa_ok ($check->result, 'npg_qc::autoqc::results::meta');
+  isa_ok ($check, 'npg_qc::autoqc::checks::review');
+  isa_ok ($check->result, 'npg_qc::autoqc::results::review');
   my $can_run;
   warnings_like { $can_run = $check->can_run }
     [qr/Reading product configuration from/,
@@ -52,7 +52,7 @@ subtest 'construction object, deciding whether to run' => sub {
   is ($check->result->pass, undef,
     'pass atttribute of the result object is ndefined');
 
-  $check = npg_qc::autoqc::checks::meta->new(
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/no_robo",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
@@ -65,7 +65,7 @@ subtest 'construction object, deciding whether to run' => sub {
     'No criteria defined in the product configuration file',
     'reason logged');
 
-  $check = npg_qc::autoqc::checks::meta->new(
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/no_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
@@ -78,7 +78,7 @@ subtest 'construction object, deciding whether to run' => sub {
     'No criteria defined in the product configuration file',
     'reason logged');
 
-  $check = npg_qc::autoqc::checks::meta->new(
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/with_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
@@ -89,13 +89,13 @@ subtest 'construction object, deciding whether to run' => sub {
   ok (!$check->result->comments, 'No comments logged');
   is_deeply ($check->_criteria, {'and' => $criteria_list}, 'criteria parsed correctly');
 
-  $check = npg_qc::autoqc::checks::meta->new(
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/error1",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   throws_ok { $check->can_run } qr/acceptance_criteria key is missing/,
     'conf file format is incorrect';
-  $check = npg_qc::autoqc::checks::meta->new(
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/error2",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
@@ -106,7 +106,7 @@ subtest 'construction object, deciding whether to run' => sub {
 subtest 'setting options for qc store' => sub {
   plan tests => 4;
 
-  my $check = npg_qc::autoqc::checks::meta->new(
+  my $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/with_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
@@ -126,7 +126,7 @@ subtest 'finding result - file system' => sub {
   my $expected = 'Expected results for bam_flagstats, bcfstats, verify_bam_id,';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
-  my $check = npg_qc::autoqc::checks::meta->new(
+  my $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/with_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
@@ -136,13 +136,13 @@ subtest 'finding result - file system' => sub {
   # and gradually add them to qc_in
 
   local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
-    't/data/autoqc/meta/samplesheet_29524.csv';
+    't/data/autoqc/review/samplesheet_29524.csv';
 
   for my $name (('29524#2.qX_yield.json',
                  '29524#2_phix.bam_flagstats.json',
                  '29524#7.bam_flagstats.json')) {
     copy "$test_data_dir/$name", "$dir/$name";
-    my $c = npg_qc::autoqc::checks::meta->new(
+    my $c = npg_qc::autoqc::checks::review->new(
       conf_path => $test_data_dir,
       qc_in     => $dir,
       rpt_list  => $rpt_list);
@@ -151,7 +151,7 @@ subtest 'finding result - file system' => sub {
 
   my $name = '29524#2.bam_flagstats.json';
   copy "$test_data_dir/$name", "$dir/$name";
-  $check = npg_qc::autoqc::checks::meta->new(
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
     qc_in     => $dir,
     rpt_list  => $rpt_list);
@@ -160,7 +160,7 @@ subtest 'finding result - file system' => sub {
 
   $name = '29524#2.verify_bam_id.json';
   copy "$test_data_dir/$name", "$dir/$name";
-  $check = npg_qc::autoqc::checks::meta->new(
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
     qc_in     => $dir,
     rpt_list  => '29524:1:2;29524:2:2;29524:3:2;29524:4:2');
@@ -170,7 +170,7 @@ subtest 'finding result - file system' => sub {
 
   $name = '29524#2.bcfstats.json';
   copy "$test_data_dir/$name", "$dir/$name";
-  $check = npg_qc::autoqc::checks::meta->new(
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
     qc_in     => $test_data_dir,
     rpt_list  => $rpt_list);
@@ -191,7 +191,7 @@ subtest 'finding results - database' => sub {
   plan tests => 15;
 
   local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
-    't/data/autoqc/meta/samplesheet_29524.csv';
+    't/data/autoqc/review/samplesheet_29524.csv';
 
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
@@ -209,7 +209,7 @@ subtest 'finding results - database' => sub {
     )
   };
   my $check;
-  lives_ok { $check = npg_qc::autoqc::checks::meta->new($init) }
+  lives_ok { $check = npg_qc::autoqc::checks::review->new($init) }
     'object created without qc_in defined';
   
   my $expected = 'Expected results for bam_flagstats, bcfstats, verify_bam_id,';
@@ -220,7 +220,7 @@ subtest 'finding results - database' => sub {
                     read_file "$test_data_dir/29524#2.composition.json");
   my $row = $schema->resultset('BamFlagstats')
             ->find_or_create_seq_composition($composition); 
-  $check = npg_qc::autoqc::checks::meta->new($init);
+  $check = npg_qc::autoqc::checks::review->new($init);
   throws_ok { $check->_results } qr/$expected found none/, 'no results - error';
 
   my $create_qc_record = sub {
@@ -238,7 +238,7 @@ subtest 'finding results - database' => sub {
 
   $init->{'qc_in'} = $test_data_dir;
 
-  $check = npg_qc::autoqc::checks::meta->new($init);
+  $check = npg_qc::autoqc::checks::review->new($init);
   throws_ok { $check->_results }
     qr/$expected found results for bam_flagstats/, 'not all results - error';
 
@@ -248,7 +248,7 @@ subtest 'finding results - database' => sub {
   $create_qc_record->('29524#2.verify_bam_id.json', 'VerifyBamId');
 
   
-  $check = npg_qc::autoqc::checks::meta->new($init);
+  $check = npg_qc::autoqc::checks::review->new($init);
   lives_ok { $check->_results } 'no error - all expected results loaded';
   is_deeply ([sort keys %{$check->_results}],
              [sort qw/bam_flagstats bcfstats verify_bam_id/], 'correct keys');
@@ -264,7 +264,7 @@ subtest 'single expression evaluation' => sub {
   plan tests => 10;
 
   local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
-    't/data/autoqc/meta/samplesheet_29524.csv';
+    't/data/autoqc/review/samplesheet_29524.csv';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
   my $criteria =  [
@@ -275,7 +275,7 @@ subtest 'single expression evaluation' => sub {
     '( bcfstats.genotypes_nrd_dividend / bcfstats.genotypes_nrd_divisor ) < 0.02'
                   ];
 
-  my $check = npg_qc::autoqc::checks::meta->new(
+  my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
     qc_in     => $test_data_dir,
     rpt_list  => $rpt_list);
@@ -304,10 +304,10 @@ subtest 'evaluation within the execute method' => sub {
   plan tests => 24;
 
   local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
-    't/data/autoqc/meta/samplesheet_29524.csv';
+    't/data/autoqc/review/samplesheet_29524.csv';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
-  my $check = npg_qc::autoqc::checks::meta->new(
+  my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
     qc_in     => $dir,
     rpt_list  => $rpt_list);
@@ -338,7 +338,7 @@ subtest 'evaluation within the execute method' => sub {
     }
     write_file($target, to_json($values));
 
-    $check = npg_qc::autoqc::checks::meta->new(
+    $check = npg_qc::autoqc::checks::review->new(
       final_qc_outcome => 1,
       conf_path       => $test_data_dir,
       qc_in           => $dir,
