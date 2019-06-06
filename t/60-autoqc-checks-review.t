@@ -19,7 +19,7 @@ my $dir = tempdir( CLEANUP => 1 );
 my $test_data_dir = 't/data/autoqc/review';
 my $conf_file_path = "$test_data_dir/product_release.yml";
 
-local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
+local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_27483.csv';
 
 my $criteria_list = [
@@ -135,7 +135,7 @@ subtest 'finding result - file system' => sub {
   # should have all three for the entiry and phix for bam_flagstats and qx_yield
   # and gradually add them to qc_in
 
-  local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
 
   for my $name (('29524#2.qX_yield.json',
@@ -190,7 +190,7 @@ subtest 'finding result - file system' => sub {
 subtest 'finding results - database' => sub {
   plan tests => 15;
 
-  local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
 
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
@@ -263,7 +263,7 @@ subtest 'finding results - database' => sub {
 subtest 'single expression evaluation' => sub {
   plan tests => 10;
 
-  local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
@@ -303,7 +303,7 @@ subtest 'single expression evaluation' => sub {
 subtest 'evaluation within the execute method' => sub {
   plan tests => 24;
 
-  local $ENV{NPG_CACHED_SAMPLSHEET_FILE} =
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
