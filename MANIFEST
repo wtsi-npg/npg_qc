@@ -126,6 +126,7 @@ lib/npg_qc/Schema/Result/MqcOutcomeHist.pm
 lib/npg_qc/Schema/Result/PulldownMetrics.pm
 lib/npg_qc/Schema/Result/QXYield.pm
 lib/npg_qc/Schema/Result/RefMatch.pm
+lib/npg_qc/Schema/Result/Review.pm
 lib/npg_qc/Schema/Result/RnaSeqc.pm
 lib/npg_qc/Schema/Result/SamtoolsStats.pm
 lib/npg_qc/Schema/Result/SeqComponent.pm
@@ -179,6 +180,7 @@ t/50-schema-result-QXYield.t
 t/50-schema-result-TagMetrics.t
 t/50-schema-result-AlignmentFilterMetrics.t
 t/50-schema-result-PulldownMetrics.t
+t/50-schema-result-Review.t
 t/50-schema-result-SplitStats.t
 t/50-schema-result-MqcLibraryOutcomeDict.t
 t/50-schema-result-MqcLibraryOutcomeEnt.t
