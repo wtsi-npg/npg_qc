@@ -344,15 +344,27 @@ sub load_from_db {
       if (!$table_class) {
         croak qq[No DBIx result class name for $check_name];
       }
-      if ($query->option == $LANES) {
-        $dbix_query->{$ti_key} = undef;
-      } elsif ($query->option == $PLEXES) {
-        $dbix_query->{$ti_key} = {q[!=], undef};
-      }
 
-      my @check_results = $self->qc_schema()->resultset($table_class)
-                         ->search_autoqc($dbix_query)->all();
-      push @results, @check_results;
+      my $rs;
+      #####
+      # A database table for the result does not have to exist.
+      # The try statement below takes care of this.
+      try {
+        $rs = $self->qc_schema()->resultset($table_class);
+      };
+
+      if ($rs) {
+
+        if ($query->option == $LANES) {
+          $dbix_query->{$ti_key} = undef;
+        } elsif ($query->option == $PLEXES) {
+          $dbix_query->{$ti_key} = {q[!=], undef};
+        }
+
+        my @check_results = $self->qc_schema()->resultset($table_class)
+                            ->search_autoqc($dbix_query)->all();
+        push @results, @check_results;
+      }
     }
   } else {
     carp __PACKAGE__  . q[ object is configured not to use the database];
@@ -366,6 +378,59 @@ sub load_from_db {
                @results;
   }
 
+  my $c = npg_qc::autoqc::results::collection->new();
+  $c->add(\@results);
+
+  return $c;
+}
+
+=head2 load_from_db_via_composition
+
+Similar to load_from_db, but loads database results for an array of composition
+objects.
+
+Returns a collection object (npg_qc::autoqc::results::collection) containing
+autoqc result corresponding to the argument compositions of types listed
+in the checks_list attribute. Returns an empty collection if no results are
+found.
+
+ # Assuming $c1 and $c2 are objects of type npg_tracking::glosary::composition
+ my $c = $obj->load_from_db_via_composition([$c1, $c2]);
+
+=cut
+
+sub load_from_db_via_composition {
+  my ($self, $compositions) = @_;
+
+  $compositions or croak
+    'Array of composition objects should be given';
+
+  my @results = ();
+  if ($self->use_db && @{$compositions}) {
+    my $rs = $self->qc_schema()->resultset('SeqComposition')->search(
+      {'me.digest' => [map { $_->digest } @{$compositions}]},
+      {join => $self->_relation_names}
+    );
+
+    my @relation_names = @{$self->_relation_names};
+    while (my $row = $rs->next()) {
+      foreach my $rname (@relation_names) {
+        my $rrow;
+        #####
+        # A database table for the result does not have to exist.
+        # The try statement below takes care of this. The error might be due
+        # to the relation name being different from what we think it is.
+        # So, if results from a table are nevr retrieved, check the relation
+        # name.
+        try {
+          $rrow = $row->$rname;
+        };
+        if ($rrow) {
+          push @results, $rrow;
+        }
+      }
+    }
+  }
   my $c = npg_qc::autoqc::results::collection->new();
   $c->add(\@results);
 
@@ -412,6 +477,22 @@ sub json_file2result_object {
   };
 
   return $result;
+}
+
+has '_relation_names' => (
+  isa        => 'ArrayRef',
+  is         => 'ro',
+  required   => 0,
+  lazy_build => 1,
+);
+sub _build__relation_names {
+  my $self = shift;
+  my @names = ();
+  foreach my $n (@{$self->checks_list()}) {
+    $n =~ s/s\Z//xms;
+    push @names, $n;
+  }
+  return \@names;
 }
 
 sub _runfolder_obj {

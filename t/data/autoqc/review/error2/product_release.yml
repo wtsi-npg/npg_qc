@@ -1,0 +1,37 @@
+---
+default:
+  s3:
+    enable: false
+    url: null
+    notify: false
+  irods:
+    enable: true
+    notify: false
+
+study:
+  - study_id: "4042"
+    s3:
+      enable: true
+      url: "gs://profile_one-europe-west2"
+      date_binning: true
+      customer_name: "UK Organisation"
+      profile: "profile_one"
+      notify: true
+    irods:
+      enable: false
+      notify: true
+    merge:
+      component_cache_dir: "/merge_component_cache/4042/"
+    robo_qc:
+      - library_type:
+          - "RNA PolyA"
+        acceptance_criteria :
+          - "( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95"
+          - "bam_flagstats.target_mapped_bases > 85_000_000_000"
+          - "bam_flagstats.target_percent_gt_coverage_threshold > 95"
+      - type:
+          - "HiSeqX PCR free"
+          - "rna PolyA"
+        acceptance_criteria :
+          - "verify_bam_id.freemix < 0.01"
+          - "( bcfstats.genotypes_nrd_dividend / bcfstats.genotypes_nrd_divisor ) < 0.02"

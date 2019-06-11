@@ -3,6 +3,12 @@
 
     lane_class = 'lane';
     plex_class = 'tag_info';
+    IF lane_collection && lane_collection.size;
+      review_obj = lane_collection.slice('check_name', 'review').get(0);
+      IF review_obj && review_obj.pass.defined && review_obj.pass == 0;
+        plex_class = plex_class _ ' failed_review';
+      END;
+    END;
 -%]
 
 <td class="[% lane_class %] nbsp">
