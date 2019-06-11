@@ -69,7 +69,11 @@ sub generate_short_description {
   defined $is_final or croak 'Final flag should be defined';
   my $decision = $is_accepted ? $ACCEPTED :
         (defined $is_accepted ? $REJECTED : $UNDECIDED);
-  return join q[ ], $decision, $is_final ? $FINAL : $PRELIMINARY;
+  if (defined $is_accepted || $is_final) {
+    $decision .= q[ ] . ($is_final ? $FINAL : $PRELIMINARY);
+  }
+
+  return $decision;
 }
 
 no Moose::Role;
@@ -149,14 +153,28 @@ __END__
 =head2 generate_short_description
 
   Package-level method for generating descriptions matching short
-  descriptions in the dictionary tables.
+  descriptions in the dictionary tables. Note that not every description
+  is available in all dictionary tables.
 
-   my $is_final = 1;
-   my $is_accepted = 1;
-  __PACKAGE__->generate_short_description($is_final, $is_accepted);
-  # returns 'Accepted final'
+    my $is_final = 1;
+    my $is_accepted = 1;
+
+    __PACKAGE__->generate_short_description($is_final, $is_accepted);
+    # returns 'Accepted final'
+
     __PACKAGE__->generate_short_description($is_final);
-  # returns 'Undecided final'
+    # returns 'Undecided final'
+
+    $is_accepted = 0;
+    __PACKAGE__->generate_short_description($is_final);
+    # returns 'Rejected final'
+
+    $is_final = 0;
+    __PACKAGE__->generate_short_description($is_final, $is_accepted);
+    # returns 'Rejected preliminary'
+
+    __PACKAGE__->generate_short_description($is_final);
+    # returns 'Undecided' !!!
 
 =head1 DIAGNOSTICS
 
