@@ -127,6 +127,7 @@ lib/npg_qc/Schema/Result/PulldownMetrics.pm
 lib/npg_qc/Schema/Result/QXYield.pm
 lib/npg_qc/Schema/Result/RefMatch.pm
 lib/npg_qc/Schema/Result/Review.pm
+lib/npg_qc/Schema/Result/ReviewCriteria.pm
 lib/npg_qc/Schema/Result/RnaSeqc.pm
 lib/npg_qc/Schema/Result/SamtoolsStats.pm
 lib/npg_qc/Schema/Result/SeqComponent.pm

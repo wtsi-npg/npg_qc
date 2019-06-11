@@ -72,33 +72,29 @@ Auto-generated primary key
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
-=head2 library_type
+=head2 id_review_criteria
 
-  data_type: 'varchar'
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_foreign_key: 1
   is_nullable: 1
-  size: 100
+
+An optional foreign key referencing the id_review_criteria column of the review_criteria table
 
 =head2 evaluation_results
 
   data_type: 'text'
   is_nullable: 1
 
-=head2 criteria
-
-  data_type: 'text'
-  is_nullable: 1
-
-=head2 criteria_md5
-
-  data_type: 'char'
-  is_nullable: 1
-  size: 32
+A serialized hash mapping individual expressions to their evaluation results
 
 =head2 qc_outcome
 
   data_type: 'varchar'
   is_nullable: 1
   size: 256
+
+A serialized hash representing the manual QC outcome
 
 =head2 pass
 
@@ -138,14 +134,15 @@ __PACKAGE__->add_columns(
     is_foreign_key => 1,
     is_nullable => 0,
   },
-  'library_type',
-  { data_type => 'varchar', is_nullable => 1, size => 100 },
+  'id_review_criteria',
+  {
+    data_type => 'bigint',
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 1,
+  },
   'evaluation_results',
   { data_type => 'text', is_nullable => 1 },
-  'criteria',
-  { data_type => 'text', is_nullable => 1 },
-  'criteria_md5',
-  { data_type => 'char', is_nullable => 1, size => 32 },
   'qc_outcome',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'pass',
@@ -186,6 +183,26 @@ __PACKAGE__->add_unique_constraint('review_id_compos_uniq', ['id_seq_composition
 
 =head1 RELATIONS
 
+=head2 review_criteria
+
+Type: belongs_to
+
+Related object: L<npg_qc::Schema::Result::ReviewCriteria>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  'review_criteria',
+  'npg_qc::Schema::Result::ReviewCriteria',
+  { id_review_criteria => 'id_review_criteria' },
+  {
+    is_deferrable => 1,
+    join_type     => 'LEFT',
+    on_delete     => 'NO ACTION',
+    on_update     => 'NO ACTION',
+  },
+);
+
 =head2 seq_composition
 
 Type: belongs_to
@@ -219,21 +236,28 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-06-04 14:47:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:DeTa7xq61g7m5KPDAyzGyQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-06-11 10:16:19
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:rdI71zn+2PzK31y4AgsBXg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
 use Carp;
 use Try::Tiny;
+use Readonly;
+use List::MoreUtils qw/any/;
+use Digest::MD5 qw/md5_hex/;
+use JSON::XS;
+
 use WTSI::DNAP::Utilities::Timestamp qw/parse_timestamp/;
 
 our $VERSION = '0';
 
+Readonly::Array my @CRITERIA_DICT_COLUMNS => qw/library_type criteria/;
+
 # Set inflation and deflation for non-scalar result object fields.
 __PACKAGE__->set_flators4non_scalar( qw/ evaluation_results
-                                         criteria qc_outcome
+                                         qc_outcome
                                          info / );
 
 =head1 SYNOPSIS
@@ -291,6 +315,54 @@ __PACKAGE__->has_many(
 
 =head1 SUBROUTINES/METHODS
 
+=head2 BUILDARGS
+
+This method runs before the default constructor. We use this hook
+to address a mismatch between the columns of this table and the 
+attributes of the npg_qc::autoqc::results::review class. The
+white-listed attributes that do not have corresponding columns
+are deleted from the data passed to teh constructor and are
+temporarily saved as additional keys in the info attribute/column.
+
+The original Moose method is run at the end of this method.
+
+=cut
+
+around BUILDARGS => sub {
+  my $orig  = shift;
+  my $class = shift;
+  my $data  = shift; #the data passed to the constructor
+
+  for my $attr (@CRITERIA_DICT_COLUMNS) {
+    $data->{'info'}->{$attr} = delete $data->{$attr};
+  }
+
+  return $class->$orig($data);
+};
+
+=head2 library_type
+
+=head2 criteria
+
+=cut
+
+#####
+# library_type and criteria accessors are available in 
+# npg_qc::autoqc::results::review class, so we'll create them
+# here as well.
+foreach my $name (@CRITERIA_DICT_COLUMNS) {
+  __PACKAGE__->meta()->add_method(
+    $name => sub {
+      my $self = shift;
+      my $result;
+      try {
+        $result = $self->review_criteria()->$name;
+      };
+      return $result;
+    }
+  );
+}
+
 =head2 insert
 
 =head2 update
@@ -309,6 +381,15 @@ create or update a review row, but a library mqc outcome for the
 product will only be updated if there is no existing final mqc
 outcome.
 
+The evaluation criteria are saved to a separate dictionary-like
+table. If the result has evaluation outcomes, it is also expected to
+have the library type and evaluation criteria defined; their absence
+causes an error. If, however, the autoqc result object has hardly
+any attributes defined, which would be the case when the can_run
+method of the review check object returns false, it can be saved.
+This is done in order to avoid errors when batch-saving autoqc
+results.
+
 =cut
 
 around [qw/update insert/] => sub {
@@ -325,14 +406,24 @@ around [qw/update insert/] => sub {
                        library_type
                        criteria
                        qc_outcome/) {
-    $data->{$name} = $new_data ? $new_data->{$name} : $self->$name;
+
+    my $remapped = any { $_ eq $name} @CRITERIA_DICT_COLUMNS;
+    my $value;
+    if ( $new_data) {
+      $value = $remapped? delete $new_data->{$name} : $new_data->{$name};
+    } else {
+      $value = $remapped? delete $self->info->{$name} : $self->$name;
+    }
+    $data->{$name} = $value;
   }
 
   ##### 
   # Do not accept half-baked results, ie if we have evaluation
   # results, we should also have library type and criteria.
-  if ($data->{'evaluation_results'} and keys %{$data->{'evaluation_results'}}) {
-    foreach my $name (qw/library_type criteria/) {
+  my $eval_done = (defined $data->{'evaluation_results'}) &&
+                  (scalar keys %{$data->{'evaluation_results'}});
+  if ($eval_done) {
+    foreach my $name (@CRITERIA_DICT_COLUMNS) {
       my $value = $data->{$name};
       my $m = "Evaluation results present, but $name absent";
       $value or croak $m;
@@ -340,12 +431,46 @@ around [qw/update insert/] => sub {
     }
   }
 
+  #####
+  # If appropriate, create a new mqc outcome or update an existing one.
+  # We do not consider an absent mqc outcome to be an error.
   my %qc_outcome = %{$data->{'qc_outcome'} || {}};
-  if (keys %qc_outcome) { # Absent mqc outcome? Not a problem.
+  if (keys %qc_outcome) {
+    # If this errors, no records are created, which is what we want.
     $self->_save_qc_outcome(\%qc_outcome);
   }
 
-  # Perform the original action.
+  #####
+  # If evaluation has been performed, we have to record the criteria.
+  # Create a new entry for the criteria or map the result's criteria to
+  # an existing criteria record.
+  if ($eval_done) {
+    my $ch = {};
+    foreach my $name (@CRITERIA_DICT_COLUMNS) {
+      $ch->{$name} = delete $data->{$name};
+    }
+    $ch->{'checksum'} = md5_hex(JSON::XS->new()->canonical(1)->encode($ch->{'criteria'}));
+    my $fk_column_name = 'id_review_criteria';
+    # Whether a related object exists is irrelevant since we might need
+    # to assign a different one.
+    my $criteria_row = $self->result_source()->schema()
+                            ->resultset('ReviewCriteria')
+                            ->find_or_new($ch);
+    if (!$criteria_row ->in_storage) {
+      $criteria_row->set_inflated_columns($ch)->insert();
+    }
+    my $fk_value = $criteria_row->$fk_column_name;
+    if ($new_data) {
+      # May be overwrite the criteria foreign key.
+      $new_data->{$fk_column_name} = $fk_value;
+    } else {
+      # Set it for the new record.
+      $self->set_column($fk_column_name, $fk_value);
+    }
+  }
+
+  #####
+  # Perform the original action, ie create the review record.
   return $self->$orig($new_data, @_);
 };
 
@@ -417,6 +542,14 @@ __END__
 =item Carp
 
 =item Try::Tiny
+
+=item Readonly
+
+=item List::MoreUtils
+
+=item Digest::MD5
+
+=item JSON::XS
 
 =item WTSI::DNAP::Utilities::Timestamp
 
