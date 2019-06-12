@@ -124,6 +124,15 @@ The outcome of the evaluation will be either true or false. The undecided
 outcome can be assigned if the overall expression evaluates to false and
 a full evaluation was performed (ie the acceptance branch was evaluated).
 
+Since both the conjunction and disjunction operators are idempotent in
+Boolean algebra, the order of expressions within the arrays does not
+affect the outcome of evaluation. However, the order does matter when
+comparing criteria either as data structures or serialized data
+structures. To ensure that the criteria can be compared, the expressions
+in the arrays are ordered alphabetically. Therefore, the criteria record
+in the result object might vary slightly from the configuration file
+record.
+
 =head1 SUBROUTINES/METHODS
 
 =head2 use_db
@@ -261,13 +270,15 @@ sub _build__criteria {
   if (keys %{$study_config}) {
 
     if ($study_config->{$ROBO_KEY}) {
+
       my $lib_type = $self->_lims->library_type;
       $lib_type or croak "Library type is not defined for $description";
-      $self->result->library_type($lib_type);
       # We are going to compare library type strings in lower case
       # because the case for this type of LIMs data might be inconsistent.
       my $original_lib_type = $lib_type;
       $lib_type = lc $lib_type;
+      # We will save the original library type.
+      $self->result->library_type($original_lib_type);
 
       #####
       # We expect that the same criterium or a number of criteria can be
@@ -294,6 +305,8 @@ sub _build__criteria {
         }
       }
       if (@criteria) {
+        # Sort to ensure a consistent order of expressions in the array.
+        @criteria = sort @criteria;
         # Applying the conjunction operator to all list members.
         $rewritten = {$CONJUNCTION_OP => \@criteria};
       } else {
@@ -400,11 +413,13 @@ sub _class_name_from_expression {
   return $class_name;
 }
 
+#####
+# Simplest traversal for now. Ideally, this function should take
+# a callback so that different actions can be performed.
+#
 sub _traverse {
   my ($node, $expressions) = @_;
 
-  # Simplest traversal for now. Ideally, this function should take
-  # a callback so that different actions can be performed.
   my $node_type = ref $node;
   if ($node_type) {
     ($node_type eq 'HASH') or croak "Unknown node type $node_type";
@@ -465,7 +480,7 @@ sub _evaluate_expression {
   my $class_name = _class_name_from_expression($e);
   my $obj = $self-> _results->{$class_name};
   # We should not get this far with an error in the configuration
-  # filr, but just in case...
+  # file, but just in case...
   $obj or croak "No autoqc result for evaluation of '$e'";
 
   ##no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)

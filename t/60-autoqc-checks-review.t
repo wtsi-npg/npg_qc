@@ -24,10 +24,10 @@ local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
 
 my $criteria_list = [
   '( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95',
+  '( bcfstats.genotypes_nrd_dividend / bcfstats.genotypes_nrd_divisor ) < 0.02',
   'bam_flagstats.target_mapped_bases > 85_000_000_000',
   'bam_flagstats.target_percent_gt_coverage_threshold > 95',
-  'verify_bam_id.freemix < 0.01',
-  '( bcfstats.genotypes_nrd_dividend / bcfstats.genotypes_nrd_divisor ) < 0.02'
+  'verify_bam_id.freemix < 0.01'
 ];
 
 subtest 'construction object, deciding whether to run' => sub {
