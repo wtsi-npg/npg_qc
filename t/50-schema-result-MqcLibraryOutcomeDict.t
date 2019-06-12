@@ -60,9 +60,9 @@ is ($rows[0]->generate_short_description(0, 'accepted'),
 is ($rows[0]->generate_short_description(0, q[]),
   'Rejected preliminary', 'description for prelim rejected');
 is ($rows[0]->generate_short_description(0),
-  'Undecided preliminary', 'description for prelim undecided');
+  'Undecided', 'description for prelim undecided');
 is ($rows[0]->generate_short_description(0, undef),
-  'Undecided preliminary', 'description for prelim undecided');
+  'Undecided', 'description for prelim undecided');
 
 1;
 
