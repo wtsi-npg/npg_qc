@@ -63,7 +63,9 @@ sub add_common_ent_methods {
 around [qw/update insert/] => sub {
   my $orig = shift;
   my $self = shift;
-  $self->last_modified($self->get_time_now);
+  if (!$self->is_column_changed('last_modified')) {
+    $self->last_modified($self->get_time_now);
+  }
   my $return_super = $self->$orig(@_);
   $self->_create_historic();
   return $return_super;
