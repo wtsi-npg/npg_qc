@@ -227,6 +227,8 @@ with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::
 
 use Carp;
 use Try::Tiny;
+use Digest::MD5 qw/md5_hex/;
+use JSON::XS;
 use WTSI::DNAP::Utilities::Timestamp qw/parse_timestamp/;
 
 our $VERSION = '0';
@@ -340,9 +342,22 @@ around [qw/update insert/] => sub {
     }
   }
 
+  #####
+  # If appropriate, create a new mqc outcome or update an existing one.
+  # We do not consider an absent mqc outcome to be an error.
   my %qc_outcome = %{$data->{'qc_outcome'} || {}};
-  if (keys %qc_outcome) { # Absent mqc outcome? Not a problem.
+  if (keys %qc_outcome) {
     $self->_save_qc_outcome(\%qc_outcome);
+  }
+
+  if ($data->{'criteria'} and keys %{$data->{'criteria'}}) {
+    my $md5 = md5_hex(JSON::XS->new()->canonical(1)
+                              ->encode($data->{'criteria'}));
+    if ($new_data) {
+      $new_data->{'criteria_md5'} = $md5;
+    } else {
+      $self->set_column('criteria_md5', $md5);
+    }
   }
 
   # Perform the original action.
@@ -417,6 +432,10 @@ __END__
 =item Carp
 
 =item Try::Tiny
+
+=item Digest::MD5
+
+=item JSON::XS
 
 =item WTSI::DNAP::Utilities::Timestamp
 
