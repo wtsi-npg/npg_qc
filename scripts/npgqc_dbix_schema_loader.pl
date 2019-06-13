@@ -29,7 +29,10 @@ my $component    = 'InflateColumn::Serializer';
 my $flator       = 'npg_qc::Schema::Flators';
 my $composition  = 'npg_qc::Schema::Composition';
 
-foreach my $check (@{npg_qc::autoqc::results::collection->new()->checks_list()}) {
+foreach my $check ((
+    @{npg_qc::autoqc::results::collection->new()->checks_list()},
+    'sequence_summary'
+                  )) {
   my ($result_name, $dbix_result_name ) = $generic_role->class_names($check);
   
   my @roles = ($composition, $flator, $generic_role);
@@ -41,8 +44,6 @@ foreach my $check (@{npg_qc::autoqc::results::collection->new()->checks_list()})
   $roles_map->{$dbix_result_name}      = \@roles;
   $components_map->{$dbix_result_name} = [$component]
 }
-$roles_map->{'Fastqcheck'}      = [$flator];
-$components_map->{'Fastqcheck'} = [$component];
 
 make_schema_at(
     'npg_qc::Schema',
@@ -124,10 +125,6 @@ make_schema_at(
           'tags_reporters'                 => q[TagsReporters],
           'upstream_tags'                  => q[UpstreamTags],
           'tag_decode_stats'               => q[TagDecodeStats],
-          'errors_by_cycle'                => q[ErrorsByCycle],
-          'errors_by_nucleotide'           => q[ErrorsByNucleotide],
-          'errors_by_cycle_and_nucleotide' => q[ErrorsByCycleAndNucleotide],
-          'cumulative_errors_by_cycle'     => q[CumulativeErrorsByCycle],
           'samtools_stats'                 => q[SamtoolsStats],
         },
 
