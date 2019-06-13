@@ -3,6 +3,8 @@ use warnings;
 use Test::More tests => 4;
 use Test::Exception;
 use Moose::Meta::Class;
+use Digest::MD5 qw/md5_hex/;
+use JSON::XS;
 
 use npg_testing::db;
 use t::autoqc_util;
@@ -66,7 +68,7 @@ subtest 'reject incomplete results on insert' => sub {
 };
 
 subtest 'insert a basic record, do not allow incomplete data in update' => sub {
-  plan tests => 7;
+  plan tests => 8;
 
   my $id_seq_composition = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run'    => 1111,
@@ -85,6 +87,7 @@ subtest 'insert a basic record, do not allow incomplete data in update' => sub {
     'can create a simple record';
   ok ($new->in_storage, 'row has been saved');
   is ($new->comments, 'Cannot run, returning early', 'comments saved');
+  is ($new->criteria_md5, undef, 'checksum is not set');
 
   $values = {
     evaluation_results => {},
@@ -123,7 +126,7 @@ subtest 'insert a basic record, do not allow incomplete data in update' => sub {
 };
 
 subtest 'a full insert/update record' => sub {
-  plan tests => 50;
+  plan tests => 54;
 
   my $id_seq_composition = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run'    => 1111,
@@ -147,6 +150,7 @@ subtest 'a full insert/update record' => sub {
     pass => 0,
     path => 't/data'
   };
+  my $cmd5 = md5_hex(JSON::XS->new()->canonical(1)->encode($values->{criteria}));
 
   isa_ok($schema->resultset($table)->create($values), 'npg_qc::Schema::Result::' . $table);
   $rs = $schema->resultset($table)->search({id_seq_composition => $id_seq_composition});
@@ -154,6 +158,8 @@ subtest 'a full insert/update record' => sub {
   my $row = $rs->next;
   is_deeply ($row->qc_outcome, $qc_outcome, 'qc outcome saved');
   is_deeply ($row->evaluation_results, {"e1"=>1,"e2"=>0}, 'evaluation results saved');
+  is_deeply ($row->criteria, {"and"=>["e1","e2"]}, 'criteria saved');
+  is ($row->criteria_md5, $cmd5, 'checksum saved');
   $mqc_rs = $schema->resultset($mqc_table)->search({id_seq_composition => $id_seq_composition});
   is ($mqc_rs->count, 1, 'one row created in the mqc table');
   my $outcome = $mqc_rs->next;
@@ -173,12 +179,16 @@ subtest 'a full insert/update record' => sub {
     id_seq_composition => $id_seq_composition,
     library_type       => 'common_type',
     evaluation_results => {"e1"=>0,"e2"=>0},
-    criteria           => {"and"=>["e1","e2"]},
+    criteria           => {"and"=>["e2","e1"]},
     qc_outcome         => $qc_outcome,
   };
+  $cmd5 = md5_hex(JSON::XS->new()->canonical(1)->encode($values->{criteria}));
+
   $row->update($values);
   is_deeply ($row->evaluation_results, {"e1"=>0,"e2"=>0}, 'evaluation results updated');
   is_deeply ($row->qc_outcome, $qc_outcome, 'qc outcome updated');
+  is_deeply ($row->criteria, {"and"=>["e2","e1"]}, 'criteria saved');
+  is ($row->criteria_md5, $cmd5, 'checksum saved');
   $outcome = $schema->resultset($mqc_table)->search({id_seq_composition => $id_seq_composition})
                     ->next;
   is ($outcome->description, 'Rejected preliminary', 'mqc outcome description has not changed');
