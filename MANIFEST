@@ -485,6 +485,7 @@ t/data/autoqc/review/29524#2.composition.json
 t/data/autoqc/review/29524#17.bam_flagstats.json
 t/data/autoqc/review/29524#2.bam_flagstats.json
 t/data/autoqc/review/29524#2.bcfstats.json
+t/data/autoqc/review/29524#2.review.json
 t/data/autoqc/review/29524#2.qX_yield.json
 t/data/autoqc/review/29524#2.verify_bam_id.json
 t/data/autoqc/review/29524#2_phix.bam_flagstats.json
