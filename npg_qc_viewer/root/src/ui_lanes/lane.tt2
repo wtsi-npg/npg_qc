@@ -3,6 +3,12 @@
 
     lane_class = 'lane';
     plex_class = 'tag_info';
+    IF lane_collection && lane_collection.size;
+      review_obj = lane_collection.slice('check_name', 'review').get(0);
+      IF review_obj && review_obj.pass.defined && review_obj.pass == 0;
+        plex_class = plex_class _ ' failed_review';
+      END;
+    END;
 -%]
 
 <td class="[% lane_class %] nbsp">
@@ -256,9 +262,35 @@
 [%- END -%]<br />
 [%- duplicate_rate = result.percent_duplicate_reads -%]
 [%- IF duplicate_rate.defined && duplicate_rate -%]
-  <span class="dark_blue">[% FILTER format('%2.2f'); duplicate_rate; END %]</span>
-[%- END -%]
-[%- END -%]
+ <span class="dark_blue">[% FILTER format('%2.2f'); duplicate_rate; END %]</span>
+[%- END -%]<br />
+
+[%- target_pp = result.percent_target_proper_pair_mapped_reads -%]
+[%- IF target_pp.defined && target_pp != '' -%]
+<span class="dark_blue">
+[%- IF target_pp.defined && target_pp != '' -%]
+[% FILTER format('%2.2f'); target_pp; END %]
+[%- ELSE -%]
+-
+[%- END -%] 
+|
+[%- target_yield = result.target_mapped_bases_gb  -%]
+[%- IF target_yield.defined && target_yield  != '' -%]
+[% FILTER format('%.2f'); target_yield; END %]
+[%- ELSE -%]
+-
+[%- END -%] 
+|
+[%- target_agt = result.target_autosome_percent_gt_coverage_threshold -%]
+[%- IF target_agt.defined && target_agt != '' -%]
+<span class="dark_blue">[% FILTER format('%2.2f'); target_agt; END %]
+[%- ELSE -%]
+-
+[%- END -%] 
+</span>
+[%- END -%] 
+[%- END -%] 
+
 
 [% BLOCK tags_reporters -%]
 [% href='#trc_' _ result.id_run _ ':' _ result.position %]

@@ -1,0 +1,34 @@
+---
+default:
+  s3:
+    enable: false
+    url: null
+    notify: false
+  irods:
+    enable: true
+    notify: false
+
+study:
+  - study_id: "5392"
+    s3:
+      enable: true
+      url: "gs://profile_one-europe-west2"
+      date_binning: true
+      customer_name: "UK Organisation"
+      profile: "profile_one"
+      notify: true
+      receipts: "/data_product_receipts/5392/"
+    irods:
+      enable: false
+      notify: true
+    merge:
+      component_cache_dir: "/merge_component_cache/5392/"
+    robo_qc:
+      - library_type:
+          - "HiSeqX PCR free"
+        acceptance_criteria :
+          - "( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95"
+          - "bam_flagstats.target_mapped_bases > 85_000_000_000"
+          - "bam_flagstats.target_percent_gt_coverage_threshold > 95"
+          - "verify_bam_id.freemix < 0.01"
+          - "( bcfstats.genotypes_nrd_dividend / bcfstats.genotypes_nrd_divisor ) < 0.02"

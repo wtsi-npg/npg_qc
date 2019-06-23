@@ -2,11 +2,15 @@ package npg_qc::Schema::Mqc::OutcomeDict;
 
 use Moose::Role;
 use Readonly;
+use Carp;
 
 our $VERSION = '0';
 
 Readonly::Scalar my $FINAL       => 'final';
 Readonly::Scalar my $PRELIMINARY => 'preliminary';
+Readonly::Scalar my $ACCEPTED    => 'Accepted';
+Readonly::Scalar my $REJECTED    => 'Rejected';
+Readonly::Scalar my $UNDECIDED   => 'Undecided';
 
 sub is_final_outcome_description {
   my ($self, $desc) = @_;
@@ -20,12 +24,12 @@ sub is_final_outcome {
 
 sub is_accepted {
   my $self = shift;
-  return $self->short_desc =~ /\AAccepted/smx; #The short description includes the word accepted.
+  return $self->short_desc =~ /\A $ACCEPTED/smx; #The short description includes the word accepted.
 }
 
 sub is_rejected {
   my $self = shift;
-  return $self->short_desc =~ /\ARejected/smx; #The short description includes the word rejected.
+  return $self->short_desc =~ /\A $REJECTED/smx; #The short description includes the word rejected.
 }
 
 sub is_final_accepted {
@@ -35,7 +39,7 @@ sub is_final_accepted {
 
 sub is_undecided {
   my $self = shift;
-  return $self->short_desc =~ /\AUndecided/smx;
+  return $self->short_desc =~ /\A $UNDECIDED/smx;
 }
 
 sub pk_value {
@@ -57,6 +61,19 @@ sub matching_final_short_desc {
   }
 
   return $desc;
+}
+
+sub generate_short_description {
+  my ($self, $is_final, $is_accepted) = @_;
+
+  defined $is_final or croak 'Final flag should be defined';
+  my $decision = $is_accepted ? $ACCEPTED :
+        (defined $is_accepted ? $REJECTED : $UNDECIDED);
+  if (defined $is_accepted || $is_final) {
+    $decision .= q[ ] . ($is_final ? $FINAL : $PRELIMINARY);
+  }
+
+  return $decision;
 }
 
 no Moose::Role;
@@ -133,6 +150,32 @@ __END__
     print $dict_row->short_desc; # Rejected final
     print $dict_row->matching_final_short_desc(); # Rejected final
 
+=head2 generate_short_description
+
+  Package-level method for generating descriptions matching short
+  descriptions in the dictionary tables. Note that not every description
+  is available in all dictionary tables.
+
+    my $is_final = 1;
+    my $is_accepted = 1;
+
+    __PACKAGE__->generate_short_description($is_final, $is_accepted);
+    # returns 'Accepted final'
+
+    __PACKAGE__->generate_short_description($is_final);
+    # returns 'Undecided final'
+
+    $is_accepted = 0;
+    __PACKAGE__->generate_short_description($is_final);
+    # returns 'Rejected final'
+
+    $is_final = 0;
+    __PACKAGE__->generate_short_description($is_final, $is_accepted);
+    # returns 'Rejected preliminary'
+
+    __PACKAGE__->generate_short_description($is_final);
+    # returns 'Undecided' !!!
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -144,6 +187,8 @@ __END__
 =item Moose::Role
 
 =item Readonly
+
+=item Carp
 
 =back
 
@@ -157,7 +202,7 @@ Jaime Tovar <lt>jmtc@sanger.ac.uk<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Genome Research Ltd
+Copyright (C) 2019 Genome Research Ltd
 
 This file is part of NPG.
 

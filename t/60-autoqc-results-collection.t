@@ -39,6 +39,7 @@ my $temp = tempdir( CLEANUP => 1);
                     tag_decode_stats => 1,
                     bam_flagstats    => 1,
                     ref_match        => 1,
+                    review           => 1,
                     tag_metrics      => 1,
                     pulldown_metrics => 1,
                     alignment_filter_metrics => 1,

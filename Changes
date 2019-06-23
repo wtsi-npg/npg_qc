@@ -1,5 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 66.5
+ - update spatial_filter results parsing
+ - add target autosome stats to bam_flagstats qc check
+ - allow 'last_modified' date in mqc tables to be pre-set
+ - new autoqc check 'review' to evaluate results of other
+   checks against configurable criteria
+ - SeqQC: add a visual que for failed autoqc review results
+
 release 66.4
  - allow to finalise undecided library manual qc outcomes for
    all entities
