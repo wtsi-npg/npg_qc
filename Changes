@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - add placeholder results file for bcfstats where no ref genotypes exist 
+
 release 66.5
  - update spatial_filter results parsing
  - add target autosome stats to bam_flagstats qc check
