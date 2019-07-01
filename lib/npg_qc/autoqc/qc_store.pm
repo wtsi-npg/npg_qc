@@ -20,7 +20,6 @@ use npg_qc::autoqc::results::collection;
 our $VERSION = '0';
 
 Readonly::Scalar my $CLASS_FIELD       => q[__CLASS__];
-Readonly::Scalar my $NO_TAG_INDEX      => -1;
 Readonly::Scalar my $QC_DIR_NAME       => q[qc];
 
 ## no critic (Documentation::RequirePodAtEnd Subroutines::ProhibitManyArgs)
@@ -318,8 +317,13 @@ Loads auto QC results object from the database using  query parameters defined
 by the query object.
 
 Returns a collection object (npg_qc::autoqc::results::collection) containing
-autoqc result objects corresponding to JSON files. Returns an empty
-collection if no results are found.
+autoqc result corresponding to the argument compositions. Only results for classes
+listed in the checks_list attribute are returned. Returns an empty collection
+if no results are found or if this object is configured not to use the database.
+
+Does not return results that only partially belong to the requested run, ie
+are for merged entities where some components belong to a different run. This
+rule does not apply to positions.
 
  my $query = npg_qc::autoqc::qc_store::query->new(id_run => 123);
  my $c     = $obj->load_from_db($query);
@@ -331,57 +335,74 @@ sub load_from_db {
 
   $query or croak q[Query object should be defined];
 
-  my @results = ();
+  my @rows = ();
 
   if ($self->use_db) {
-    my $ti_key = 'tag_index';
-    foreach my $check_name (@{$self->checks_list()}) {
-      my $dbix_query = { 'id_run' => $query->id_run};
-      if (@{$query->positions}) {
-        $dbix_query->{'position'} = $query->positions;
+    my $prefix = q[seq_component.];
+    my $dbix_query = { $prefix.'id_run' => $query->id_run};
+    if (@{$query->positions}) {
+      $dbix_query->{$prefix.'position'} = $query->positions;
+    }
+    if ($query->option == $LANES) {
+      $dbix_query->{$prefix.'tag_index'} = undef;
+    } elsif ($query->option == $PLEXES) {
+      $dbix_query->{$prefix.'tag_index'} = {q[!=], undef};
+    }
+
+    my $rs = $self->qc_schema()->resultset('SeqComposition')->search(
+      $dbix_query,
+      {prefetch => {'seq_component_compositions' => 'seq_component'}}
+    );
+
+    my $mc_compositions_flag = 0;
+    my @lane_rows = ();
+
+    while (my $row = $rs->next()) {
+
+      my $rs_linking_rows  = $row->seq_component_compositions;
+      my $num_linking_rows = $rs_linking_rows->count();
+      my $linking_row      = $rs_linking_rows->next;
+      my $composition_size = $linking_row->size();
+
+      # Examine compositions where not all components were returned
+      # by the query. Can happen if some components come from
+      # other runs - we need to exclude such cases, while leaving
+      # data with other reasons for a mismatch in.
+      if ($num_linking_rows != $composition_size) {
+        # Unfortunately, to examine all components of the composition,
+        # we have to run a new query.
+        $self->qc_schema()->resultset('SeqComponentComposition')->search(
+          {
+           'id_seq_composition'   => $row->id_seq_composition,
+           'seq_component.id_run' => {q[!=], $query->id_run}
+          },
+          {prefetch => 'seq_component'}
+        )->count && next;
       }
-      my ($au, $table_class) = npg_qc::autoqc::role::result->class_names($check_name);
-      if (!$table_class) {
-        croak qq[No DBIx result class name for $check_name];
-      }
 
-      my $rs;
-      #####
-      # A database table for the result does not have to exist.
-      # The try statement below takes care of this.
-      try {
-        $rs = $self->qc_schema()->resultset($table_class);
-      };
+      # Are any results for the multi-component composition?
+      # If so, update the flag.
+      ($composition_size > 1) and $mc_compositions_flag++;
 
-      if ($rs) {
-
-        if ($query->option == $LANES) {
-          $dbix_query->{$ti_key} = undef;
-        } elsif ($query->option == $PLEXES) {
-          $dbix_query->{$ti_key} = {q[!=], undef};
-        }
-
-        my @check_results = $self->qc_schema()->resultset($table_class)
-                            ->search_autoqc($dbix_query)->all();
-        push @results, @check_results;
+      # Keep lane-level results separately for now.
+      if (defined $linking_row->seq_component->tag_index()) {
+        push @rows, $row;
+      } else {
+        push @lane_rows, $row;
       }
     }
+
+    # Re-unite lane results with the rest, unless, for the purpose
+    # of SeqQC display, we want to supress their return.
+    if (@lane_rows && !(($query->option == $ALL) && $mc_compositions_flag)) {
+      push @rows, @lane_rows;
+    }
+
   } else {
     carp __PACKAGE__  . q[ object is configured not to use the database];
   }
 
-  if ( @results
-       && ($query->option == $ALL)
-       && (any { $_->num_components > 1 } @results) ) {
-    @results = grep { ($_->num_components != 1) ||
-                       defined $_->composition->get_component(0)->tag_index }
-               @results;
-  }
-
-  my $c = npg_qc::autoqc::results::collection->new();
-  $c->add(\@results);
-
-  return $c;
+  return $self->_db_collection4compositions([map { $_->id_seq_composition } @rows]);
 }
 
 =head2 load_from_db_via_composition
@@ -390,9 +411,11 @@ Similar to load_from_db, but loads database results for an array of composition
 objects.
 
 Returns a collection object (npg_qc::autoqc::results::collection) containing
-autoqc result corresponding to the argument compositions of types listed
-in the checks_list attribute. Returns an empty collection if no results are
-found.
+autoqc result corresponding to the argument compositions. Only results for classes
+listed in the checks_list attribute are returned. Returns an empty collection
+if no results are found or if this object is configured not to use the database.
+
+If the argument composition array is empty, an empty collection is returned.
 
  # Assuming $c1 and $c2 are objects of type npg_tracking::glosary::composition
  my $c = $obj->load_from_db_via_composition([$c1, $c2]);
@@ -405,36 +428,14 @@ sub load_from_db_via_composition {
   $compositions or croak
     'Array of composition objects should be given';
 
-  my @results = ();
+  my @rows = ();
   if ($self->use_db && @{$compositions}) {
-    my $rs = $self->qc_schema()->resultset('SeqComposition')->search(
-      {'me.digest' => [map { $_->digest } @{$compositions}]},
-      {join => $self->_relation_names}
+    @rows = $self->qc_schema()->resultset('SeqComposition')->search(
+      {'me.digest' => [map { $_->digest } @{$compositions}]}
     );
-
-    my @relation_names = @{$self->_relation_names};
-    while (my $row = $rs->next()) {
-      foreach my $rname (@relation_names) {
-        my $rrow;
-        #####
-        # A database table for the result does not have to exist.
-        # The try statement below takes care of this. The error might be due
-        # to the relation name being different from what we think it is.
-        # So, if results from a table are nevr retrieved, check the relation
-        # name.
-        try {
-          $rrow = $row->$rname;
-        };
-        if ($rrow) {
-          push @results, $rrow;
-        }
-      }
-    }
   }
-  my $c = npg_qc::autoqc::results::collection->new();
-  $c->add(\@results);
 
-  return $c;
+  return $self->_db_collection4compositions([map { $_->id_seq_composition } @rows]);
 }
 
 =head2 json_file2result_object
@@ -479,20 +480,47 @@ sub json_file2result_object {
   return $result;
 }
 
-has '_relation_names' => (
+########################################################################
+############# Private attributes and methods ###########################
+########################################################################
+
+has '_available_classes' => (
   isa        => 'ArrayRef',
   is         => 'ro',
   required   => 0,
   lazy_build => 1,
 );
-sub _build__relation_names {
+sub _build__available_classes {
   my $self = shift;
+
   my @names = ();
-  foreach my $n (@{$self->checks_list()}) {
-    $n =~ s/s\Z//xms;
-    push @names, $n;
+  foreach my $check_name (@{$self->checks_list()}) {
+    my ($au, $table_class) = npg_qc::autoqc::role::result->class_names($check_name);
+    $table_class or croak qq[No DBIx result class name for $check_name];
+    try {
+      my $rs = $self->qc_schema()->resultset($table_class);
+      # Still here? - DBIx result class exists.
+      push @names, $table_class;
+    };
   }
   return \@names;
+}
+
+sub _db_collection4compositions {
+  my ($self, $composition_ids) = @_;
+
+  $composition_ids or croak
+    'An array of seq_composition table primary keys is required';
+
+  my @rows = ();
+  if (@{$composition_ids}) {
+    foreach my $name (@{$self->_available_classes}) {
+      push @rows, $self->qc_schema()->resultset($name)
+        ->search({'me.id_seq_composition' => $composition_ids})->all();
+    }
+  }
+
+  return npg_qc::autoqc::results::collection->new(results => \@rows);
 }
 
 sub _runfolder_obj {
@@ -527,6 +555,7 @@ sub _query_obj {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 DIAGNOSTICS
