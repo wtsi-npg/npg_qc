@@ -354,9 +354,12 @@ has '_qc_store' => (
 );
 sub _build__qc_store {
   my $self = shift;
+  # Copy class names so that the qc_store object cannot change
+  # our data.
+  my @l = @{$self->_result_class_names};
   return npg_qc::autoqc::qc_store->new(
            use_db      => $self->use_db,
-           checks_list => $self->_result_class_names
+           checks_list => \@l
          );
 }
 
