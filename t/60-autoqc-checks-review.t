@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -357,6 +357,43 @@ subtest 'evaluation within the execute method' => sub {
     is ($outcome->{'username'}, 'robo_qc', 'correct process id');
     ok ($outcome->{'timestamp'}, 'timestamp saved');
   }  
+};
+
+subtest 'error in evaluation' => sub {
+  plan tests => 4;
+
+  my $f = '29524#3.bam_flagstats.json';
+  my $values = from_json(read_file "$test_data_dir/$f");
+  delete $values->{target_mapped_bases};
+  for my $component (@{$values->{composition}->{components}}) {
+    $component->{tag_index} = 2;
+  }
+  my $target = "$dir/29524#2.bam_flagstats.json";
+  write_file($target, to_json($values));
+
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
+    't/data/autoqc/review/samplesheet_29524.csv';
+  my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2'; 
+
+  my $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $test_data_dir,
+    qc_in            => $dir,
+    rpt_list         => $rpt_list,
+    final_qc_outcome => 1);
+  throws_ok { $check->execute }
+    qr/Error evaluating expression .+ Use of uninitialized value/,
+    'final outcome - not capturing the error';
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $test_data_dir,
+    qc_in            => $dir,
+    rpt_list         => $rpt_list,
+    final_qc_outcome => 0);
+  lives_ok { $check->execute }
+    'preliminary outcome - capturing the error';
+  is ($check->result->pass, undef, 'pass value undefined');
+  is ($check->result->qc_outcome->{'mqc_outcome'}, 'Undecided',
+    'correct outcome string');
 };
 
 1;
