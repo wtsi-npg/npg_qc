@@ -273,6 +273,14 @@ a, a:link, a:visited, a:hover {
  border: 3px solid #f99389;
 }
 
+.passed {
+ background-color: #b5daff;
+}
+
+.passed_review {
+ border: 3px solid #b5daff;
+}
+
 /* Used to format error messages from mqc. */
 .failed_mqc {
  background-color: #FFFFFF;
@@ -284,10 +292,6 @@ a, a:link, a:visited, a:hover {
  background-color: #FFFFFF;
  color: #000000;
  font-weight: bold;
-}
-
-.passed {
- background-color: #b5daff;
 }
 
 .outcome_unknown {
