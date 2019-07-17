@@ -52,6 +52,7 @@ root/src/ui_checks/insert_size.tt2
 root/src/ui_checks/pulldown_metrics.tt2
 root/src/ui_checks/qX_yield.tt2
 root/src/ui_checks/ref_match.tt2
+root/src/ui_checks/review.tt2
 root/src/ui_checks/samtools_stats.tt2
 root/src/ui_checks/sequence_error.tt2
 root/src/ui_checks/tag_decode_stats.tt2
