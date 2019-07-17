@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 66.5.1
+ - add placeholder results file for bcfstats where no ref genotypes exist
+ - ensure immutability of a private attribute in autoqc checks review
+
 release 66.5
  - update spatial_filter results parsing
  - add target autosome stats to bam_flagstats qc check

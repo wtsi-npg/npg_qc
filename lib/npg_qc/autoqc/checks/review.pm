@@ -7,6 +7,7 @@ use Readonly;
 use List::MoreUtils qw/all any uniq/;
 use English qw/-no_match_vars/;
 use DateTime;
+use Try::Tiny;
 
 use WTSI::DNAP::Utilities::Timestamp qw/create_current_timestamp/;
 use st::api::lims;
@@ -195,8 +196,11 @@ sub can_run {
 
 Returns early if the can_run method returns false. Otherwise a full
 evaluation of autoqc results for this product is performed. If auto
-qc results necessary to perform the evaluation are not available,
-an error is raised. 
+qc results that are necessary to perform the evaluation are not
+available or there is some other problem with evaluation, an error
+is raised if the final_qc_outcome flag is set. If this flagis not,
+the error is captured, logged as a comment and an undefined mqc
+outcome is assigned. 
 
 =cut
 
@@ -205,7 +209,13 @@ sub execute {
 
   $self->can_run() or return;
   $self->result->criteria($self->_criteria);
-  $self->result->pass($self->evaluate);
+  try {
+    $self->result->pass($self->evaluate);
+  } catch {
+    my $err = 'Not able to run evaluation: ' . $_;
+    $self->final_qc_outcome && croak $err;
+    $self->result->add_comment($err);
+  };
   $self->result->qc_outcome($self->_generate_qc_outcome);
 
   return;
@@ -354,9 +364,12 @@ has '_qc_store' => (
 );
 sub _build__qc_store {
   my $self = shift;
+  # Copy class names so that the qc_store object cannot change
+  # our data.
+  my @l = @{$self->_result_class_names};
   return npg_qc::autoqc::qc_store->new(
            use_db      => $self->use_db,
-           checks_list => $self->_result_class_names
+           checks_list => \@l
          );
 }
 
@@ -491,6 +504,9 @@ sub _evaluate_expression {
 
   my $evaluator = sub {
     my $result = shift;
+    # Force an error when operations on undefined values are
+    # are attempted.
+    use warnings FATAL => 'uninitialized';
     ##no critic (BuiltinFunctions::ProhibitStringyEval)
     my $o = eval $perl_e; # Evaluate Perl string expression
     ##use critic
