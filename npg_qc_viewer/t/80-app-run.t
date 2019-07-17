@@ -315,7 +315,7 @@ subtest 'mqc span' => sub {
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=plexes];
   $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results (plexes) for runs 4025]);
+  $mech->title_is($title_prefix . q[Results (plexes) for runs 4025 (run 4025 status: qc in progress, taken by mg8)]);
   $mech->content_lacks("<br />152</div>");  # num cycles
   $mech->content_lacks('NT28560W'); #library name
 
