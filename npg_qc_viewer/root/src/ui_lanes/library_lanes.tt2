@@ -96,7 +96,7 @@
       proxy_key = util.rpt_list2first_rpt_key(lane_key);
       id_run   = attrs.id_run;
       position  = attrs.position;
-      tag_index = attrs.defined('tag_index') ? attrs.tag_index : '';
+      tag_index = attrs.tag_index.defined ? attrs.tag_index : '';
       row_info_to = c.stash.row_data.$proxy_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
       table_row_id = lane_key.defined ? ' id="rpt_key:' _ lane_key _ '"' : '';
