@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -8,7 +8,7 @@ use Archive::Extract;
 use Moose::Meta::Class;
 use File::Copy qw/cp mv/;
 use File::Path qw/make_path remove_tree/;
-use List::MoreUtils qw/none uniq/;
+use List::MoreUtils qw/all none uniq/;
 
 use npg_testing::db;
 use npg_qc::autoqc::qc_store::options qw/$ALL $LANES $PLEXES/;
@@ -521,18 +521,20 @@ subtest 'retrieving data from the database - one-component entities' => sub {
     'db+staging retrieval for 3 runs, some positions do not exist');
 };
 
-subtest 'retrieving data from the database - one-component entities' => sub {
-  plan tests => 20;
+subtest 'retrieving data from the database - multi-component entities' => sub {
+  plan tests => 24;
 
   my $tm_rs = $schema->resultset('TagMetrics');
   my $is_rs = $schema->resultset('InsertSize');
   my $qx_rs = $schema->resultset('QXYield');
 
-  my $r = 50000;
+  my $r  = 50000;
+  my $r1 = 50001;
 
   #####
-  # Create records for lane-level results
-  #
+  # Create records for lane-level results, insert_size,
+  # qX_yield and tag_metrics record for each lane,
+  # 3 records per lane, 12 altogether.
   foreach my $p ((1 .. 4)) {
     my $component_h = {id_run => $r, position => $p};
     my $component =
@@ -549,8 +551,8 @@ subtest 'retrieving data from the database - one-component entities' => sub {
 
   #####
   # Create records for seven plex-level results for merged entities
-  # (merge across four lanes)
-  #
+  # (merge across four lanes) in both insert_size and qX_yield tables,
+  # 14 records altogether.
   foreach my $i ((0 .. 6)) {
     my $f = npg_tracking::glossary::composition::factory->new();
     my @component_rows = ();
@@ -568,6 +570,32 @@ subtest 'retrieving data from the database - one-component entities' => sub {
     $qx_rs->create($h);
   }
 
+  #####
+  # Create records for seven plex-level results for merged entities
+  # (merge across runs) in both insert_size and qX_yield tables,
+  # 14 records altogether. These records should not be retrieved.
+  foreach my $i ((0 .. 6)) {
+    my $f = npg_tracking::glossary::composition::factory->new();
+    my @component_rows = ();
+    foreach my $p ((1 .. 4)) {
+      my $component_h = {'id_run' => $r, 'position' => $p, 'tag_index' => $i};
+      my $component =
+        npg_tracking::glossary::composition::component::illumina->new($component_h);
+      $f->add_component($component);
+    }
+    my $component_h = {'id_run' => $r1, 'position' => 1, 'tag_index' => $i};
+    my $component =
+      npg_tracking::glossary::composition::component::illumina->new($component_h);
+    $f->add_component($component);
+    my $composition = $f->create_composition();
+
+    my $crow = $is_rs->find_or_create_seq_composition($composition);
+    my $h = {id_seq_composition => $crow->id_seq_composition};
+    $is_rs->create($h);
+    $h->{threshold_quality} = 20;
+    $qx_rs->create($h);
+  }
+
   my $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema);
   my $collection = $s->load(_build_query_obj({id_run => $r, option =>$LANES}));
   is ($collection->size, 12, '12 results for lane request');
@@ -576,6 +604,21 @@ subtest 'retrieving data from the database - one-component entities' => sub {
     'all results are for one-component compositions');
   ok ((none { defined $_->composition->get_component(0)->tag_index } @results),
     'all results are lane-level');
+
+  $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema,
+       checks_list => [qw/insert_size qX_yield/]);
+  $collection = $s->load(_build_query_obj({id_run => $r, option =>$LANES}));
+  is ($collection->size, 8, '8 results for lane request');
+
+  $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema,
+       checks_list => [qw/tag_metrics/]);
+  $collection = $s->load(_build_query_obj({id_run => $r, option =>$LANES}));
+  is ($collection->size, 4, '4 results for lane request');
+
+  $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema,
+       checks_list => [qw/genotype insert_size/]);
+  $collection = $s->load(_build_query_obj({id_run => $r, option =>$LANES}));
+  is ($collection->size, 4, '4 results for lane request');  
 
   $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema);
   $collection = $s->load(
@@ -610,7 +653,82 @@ subtest 'retrieving data from the database - one-component entities' => sub {
       'all results are for multi-component compositions');
     ok ((none { !defined $_->composition->get_component(0)->tag_index } @results),
       'all results are plex-level');
-  }   
+  }
+
+  $collection = $s->load_from_db(
+    _build_query_obj({id_run => $r1, option => $PLEXES}));
+  ok ($collection->is_empty, 'no results');
+};
+
+subtest 'retrieving data from the database by composition' => sub {
+  plan tests => 9;
+
+  my $r  = 50000;
+  my $r1 = 50001;
+  my @compositions = ();
+  foreach my $i ((1 .. 6)) {
+    my $f = npg_tracking::glossary::composition::factory->new();
+    foreach my $p ((1 .. 4)) {
+      my $component_h = {'id_run' => $r, 'position' => $p, 'tag_index' => $i};
+      my $component =
+        npg_tracking::glossary::composition::component::illumina->new($component_h);
+      $f->add_component($component);
+    }
+    push @compositions, $f->create_composition();
+  }
+
+  my $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema);
+
+  throws_ok {$s->load_from_db_via_composition()}
+    qr/Array of composition objects should be given/,
+    'error if no argument is given';
+  my $collection = $s->load_from_db_via_composition([]);
+  ok ($collection->is_empty(), 'empty arg array - empty collection');
+
+  $collection = $s->load_from_db_via_composition(\@compositions);
+  is ($collection->size, 12, '12 results');
+  ok ((all {$_ == 4} map { $_->composition->num_components } $collection->all),
+    'all results are for compositions with 4 components');
+
+  my $fc = npg_tracking::glossary::composition::factory->new();
+  my $ch = {'id_run' => $r, 'position' => 1, 'tag_index' => 1};
+  my $c =
+    npg_tracking::glossary::composition::component::illumina->new($ch);
+  $fc->add_component($c);
+  $collection = $s->load_from_db_via_composition([$fc->create_composition()]);
+  ok ($collection->is_empty(), 'no result - empty collection');
+
+  $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema,
+       checks_list => [qw/genotype insert_size/]);
+  $collection = $s->load_from_db_via_composition(\@compositions);
+  is ($collection->size, 6, '6 results');
+
+  $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema,
+       checks_list => [qw/genotype/]);
+  $collection = $s->load_from_db_via_composition(\@compositions);
+  ok ($collection->is_empty(), 'no genotype results - empty collection');
+
+  @compositions = ();
+  foreach my $i ((1 .. 6)) {
+    my $f = npg_tracking::glossary::composition::factory->new();
+    foreach my $p ((1 .. 4)) {
+      my $component_h = {'id_run' => $r, 'position' => $p, 'tag_index' => $i};
+      my $component =
+        npg_tracking::glossary::composition::component::illumina->new($component_h);
+      $f->add_component($component);
+    }
+    my $component_h = {'id_run' => $r1, 'position' => 1, 'tag_index' => $i};
+    my $component =
+      npg_tracking::glossary::composition::component::illumina->new($component_h);
+    $f->add_component($component);
+    push @compositions, $f->create_composition();
+  }
+
+  $s = npg_qc::autoqc::qc_store->new(use_db => 1, qc_schema => $schema);
+  $collection = $s->load_from_db_via_composition(\@compositions);
+  is ($collection->size, 12, '12 results');
+  ok ((all {$_ == 5} map { $_->composition->num_components } $collection->all),
+    'all results are for compositions with 5 components');
 };
 
 1;
