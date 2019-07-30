@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 9;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -162,117 +162,6 @@ subtest 'loading data from directories' => sub {
   close $fh;
   throws_ok { $s->load_from_path($temp) } qr//,
     'error reading malformed json';
-};
-
-subtest 'loading data from staging' => sub {
-  plan tests => 22;
-  
-  my $id_run = 26294;
-  my $rf_name = '180711_HX4_B_HLWFJCCXY';
-  my $rfh = t::autoqc_util::create_runfolder($temp, {runfolder_name => $rf_name});
-  my $run_row = $tracking_schema->resultset('Run')->find($id_run);
-  $run_row or die "Run $id_run is not in test tracking db";
-  $run_row->update({folder_name => $rf_name, folder_path_glob => $temp});
-  $tracking_schema->resultset('TagRun')->update_or_create(
-    {id_run  => $id_run,id_tag  => 14,id_user => 1}); # set staging tag
-
-  my $model =  npg_qc::autoqc::qc_store->new(use_db => 0, qc_schema => undef);
-
-  my $query = _build_query_obj({id_run => $id_run});
-  my $collection = $model->load($query);
-  is( $collection->size(), 0, 'no data in run folder');
-  
-  my $ar_path = $rfh->{'archive_path'};
-  my $qc_dir = join q[/], $ar_path, 'qc';
-  mkdir $qc_dir;
-  map { cp $_ , $qc_dir } glob 't/data/qc_store/26294/*.json';
-  $collection = $model->load($query);
-  is($collection->size(), 16, 'number of qc results from staging when db is not used');
-
-  $run_row->update({folder_name => 'other'});
-  warnings_exist { $collection = $model->load($query) }
-    [qr/No paths to run folder found/], 'warning when run folder is not found';
-  is($collection->size(), 0, 'no results - run folder not found');
-  $run_row->update({folder_name => $rf_name});
-
-  $model =  npg_qc::autoqc::qc_store->new(qc_schema => $schema, use_db => 1);
-  $collection = $model->load($query);
-  is($collection->size(), 16, 'number of qc results from staging when db is used');
-
-  $query = _build_query_obj({id_run => $id_run,positions => [2,3]});
-  $collection = $model->load($query);
-  is($collection->size(), 4, 'selected results for two lanes');
-
-  $query = _build_query_obj({id_run => $id_run,positions => [2,5]});
-  $collection = $model->load($query);
-  is($collection->size(), 4, 'selected results for two lanes');
-
-  map { unlink $_ } glob "$qc_dir/*5.*.json";
-  $query = _build_query_obj({id_run => $id_run});
-  $collection = $model->load($query);
-  is($collection->size(), 14, 'results for seven lanes');
-
-  $query = _build_query_obj({id_run => $id_run,positions => [2,5]});
-  $collection = $model->load($query);
-  is($collection->size(), 2, 'results for one lanes');
-  $query = _build_query_obj({id_run => $id_run,positions => [5]});
-  $collection = $model->load($query);
-  is($collection->size(), 0, 'no results');
-
-  $query = _build_query_obj({id_run => $id_run, option => $LANES});
-  $collection = $model->load($query);
-  is($collection->size(), 14, 'results for seven lanes');
-
-  $query = _build_query_obj({id_run => $id_run, option => $ALL});
-  $collection = $model->load($query);
-  is($collection->size(), 14, 'results for seven lanes');
-
-  $query = _build_query_obj({id_run => $id_run, positions => [2,3], option => $ALL});
-  $collection = $model->load($query);
-  is($collection->size(), 4, 'results for two lanes');
-
-  $query = _build_query_obj({id_run => $id_run, positions => [2,3], option => $PLEXES});
-  $collection = $model->load($query);
-  is($collection->size(), 0, 'no results for plexes');
-
-  mkdir "$ar_path/lane1";
-  mkdir "$ar_path/lane2";
-  mkdir "$ar_path/lane1/qc";
-  mkdir "$ar_path/lane2/qc";
-  map { cp $_ , "$ar_path/lane1/qc" } glob 't/data/qc_store/26294/*1.*.json';
-  map { cp $_ , "$ar_path/lane2/qc" } glob 't/data/qc_store/26294/*2.*.json';
-
-  $query = _build_query_obj({id_run => $id_run, option => $LANES});
-  $collection = $model->load($query);
-  is($collection->size(), 14, 'results for seven lanes');
-
-  $query = _build_query_obj({id_run => $id_run, option => $ALL});
-  $collection = $model->load($query);
-  is($collection->size(), 18, 'results for seven lanes, including two with plexes');
-
-  $query = _build_query_obj({id_run => $id_run, option => $PLEXES});
-  $collection = $model->load($query);
-  is($collection->size(), 4, 'results for two lanes with plexes');
-
-  $query = _build_query_obj({id_run => $id_run, positions => [1, 2], option => $PLEXES});
-  $collection = $model->load($query);
-  is($collection->size(), 4, 'results for two lanes with plexes');
-
-  $query = _build_query_obj({id_run => $id_run, positions => [1, 2, 7], option => $PLEXES});
-  $collection = $model->load($query);
-  is($collection->size(), 4, 'results for two lanes with plexes');
-
-  $query = _build_query_obj({id_run => $id_run, positions => [1, 2, 7], option => $ALL});
-  $collection = $model->load($query);
-  is($collection->size(), 10, 'results for three lanes, including two with plexes');
-
-  $query = _build_query_obj({id_run => $id_run, positions => [1, 7], option => $ALL});
-  $collection = $model->load($query);
-  is($collection->size(), 6, 'results for two lanes, including one with plexes');
-
-  $query = _build_query_obj({id_run => $id_run, positions => [3, 7], option => $ALL});
-  $collection = $model->load($query);
-  is($collection->size(), 4, 'results for two lanes, none with plexes');
 };
 
 subtest 'loading data from staging - new style directory structure' => sub {
