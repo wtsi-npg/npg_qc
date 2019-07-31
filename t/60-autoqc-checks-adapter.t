@@ -58,7 +58,7 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
                   )
   } 'Create the check object';
 
-  is( $test->file_type(), 'bam', 'file type is bam');
+  is( $test->file_type(), 'cram', 'file type is cram');
   is( $test->adapter_fasta(), 't/data/autoqc/adapter.fasta',
     'default adapter fasta listing adapters' );
   is( $test->_blat_command, qq[$bt t/data/autoqc/adapter.fasta stdin stdout -tileSize=9 -maxGap=0 -out=blast8], 'blat command line');
