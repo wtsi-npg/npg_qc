@@ -23,7 +23,6 @@ with    qw(npg_common::roles::software_location);
 our $VERSION = '0';
 
 Readonly::Scalar my $EXT => q[cram];
-Readonly::Scalar my $LINES_PER_FASTA_RECORD => 2;
 Readonly::Scalar my $ADAPTER_FASTA => q[adapters.fasta];
 
 Readonly::Scalar my $MINUS_ONE   => -1;
@@ -121,21 +120,20 @@ sub _search_adapters_from_cram {
     });
     my $pid = $pm->start;
     ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
-    if (! $pid) { #fork to convert BAM to fastq then into fasta whilst count forward and reverse reads
-        my ($fieldi, $fcount, $rcount) = (0,0,0);
+    if (! $pid) { #fork to convert CRAM to fasta whilst count forward and reverse reads
         my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->bamtofastq_path .
                          qq[ T=$tmpdir/bamtofastq filename=$cram inputformat=cram fasta=1 ] . q[" |] ;
         open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
         open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
+         my ($fcount, $rcount) = (0,0);
+        my $header_flag = 1;
         while (my $line = <$ifh>){
-            $fieldi++;
-            $fieldi%=$LINES_PER_FASTA_RECORD;
-            if ($fieldi==1){ #count forward/rev, print fasta identifier
-                $line=~m{^\S+/2\b}smx ? $rcount++ : $fcount++;
-                print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
-            } else {
-                print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
+            if ($header_flag){
+                $line =~ m{^\S+/2\b}smx ? $rcount++ : $fcount++;
             }
+            # If this is header, the next line is not and other way around
+            $header_flag = not $header_flag;
+            print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
         }
         close $ofh or croak qq[Cannot close fifo $tempfifo, error $ERRNO];
         close $ifh or croak qq[Cannot close pipe $b2fqcommand, error $ERRNO];
