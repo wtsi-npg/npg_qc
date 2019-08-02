@@ -71,7 +71,9 @@ sub _build_adapter_list {
         $name or next;
         push @list, $name;
     }
+    my $n = scalar @list;
     @list = uniq @list;
+    (scalar @list == $n) or croak 'Invalid adapter fasta file';
 
     return \@list;
 }
