@@ -5,13 +5,11 @@ use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Perl6::Slurp;
-use File::Basename;
 use File::Spec;
 use Parallel::ForkManager;
-use File::Temp qw( tempdir );
+use File::Temp qw(tempdir);
 use POSIX qw(mkfifo);
 use Fcntl qw(:mode);
-use IPC::SysV qw(IPC_STAT IPC_PRIVATE);
 use Readonly;
 
 use npg_tracking::data::reference::list;
@@ -49,18 +47,11 @@ sub _build_adapter_fasta {
     return File::Spec->catfile($repos, $ADAPTER_FASTA);
 }
 
-has 'aligner_path'    =>  ( is        => 'ro',
+has 'aligner_path'    => ( is        => 'ro',
                            isa        => 'NpgCommonResolvedPathExecutable',
                            required   => 0,
                            coerce     => 1,
                            default    => q[blat],
-                          );
-
-has 'bamtofastq_path' => ( is        => 'ro',
-                          isa        => 'NpgCommonResolvedPathExecutable',
-                          required   => 0,
-                          coerce     => 1,
-                          default    => q[bamtofastq],
                          );
 
 has 'adapter_list'    => ( is          => 'ro',
@@ -71,13 +62,16 @@ has 'adapter_list'    => ( is          => 'ro',
 sub _build_adapter_list {
     my $self = shift;
 
-    my $adapter_file = slurp $self->adapter_fasta();
+    my @adapter_file = slurp $self->adapter_fasta();
     my @list = ();
-    foreach ( split m/\n/msx, $adapter_file ) {
-        my ($name) = m/^>(\S+)/msx;
-        next if !$name;
+    foreach my $line ( @adapter_file ) {
+        $line =~ s/\s+\Z//smx;
+        $line or next;
+        my ($name) = $line =~ m/\A>(\S+)/msx;
+        $name or next;
         push @list, $name;
     }
+
     return \@list;
 }
 
@@ -118,14 +112,15 @@ sub _search_adapters_from_cram {
         $self->result->forward_fasta_read_count($data_structure_reference->{forward_count});
         $self->result->reverse_fasta_read_count($data_structure_reference->{reverse_count});
     });
+
     my $pid = $pm->start;
     ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
-    if (! $pid) { #fork to convert CRAM to fasta whilst count forward and reverse reads
-        my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->bamtofastq_path .
-                         qq[ T=$tmpdir/bamtofastq filename=$cram inputformat=cram fasta=1 ] . q[" |] ;
+    if (! $pid) { #fork to convert CRAM to fasta whilst counting forward and reverse reads
+        my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->samtools_cmd .
+                         qq[ fasta -F0x900 --thread 2 $cram] . q[" |] ;
         open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
         open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
-         my ($fcount, $rcount) = (0,0);
+        my ($fcount, $rcount) = (0,0);
         my $header_flag = 1;
         while (my $line = <$ifh>){
             if ($header_flag){
@@ -159,31 +154,23 @@ sub _search_adapters_from_cram {
 sub _process_search_output {
     my ($self, $blat_fh) = @_;
 
-    # Count the total number of contaminated reads and the number of reads
-    # contaminated per adapter. The blat output is one line per read per
-    # adapter match - i.e. a read matching two separate adapters, or matching
-    # the same adapter twice, will have two entries. We rely heavily on the
-    # output being sorted by read then by adapter.
+    # Count the total number of contaminated reads and the number of
+    # contaminated reads per adapter. The blat output is one line per read
+    # per adapter match, i.e. a read matching two separate adapters, or
+    # matching the same adapter twice will have two entries. We rely heavily
+    # on the output being sorted by read, then by adapter.
 
     my $results = {};
-    $results->{'contam_hash'} = {};
-    $results->{'adapter_starts'} = {};
-    $results->{'forward'} = {};
     $results->{'forward'}{'contam_read_count'} = 0;
     $results->{'forward'}{'contam_hash'} = { map {$_ => 0} @{$self->adapter_list} };
     $results->{'forward'}{'adapter_starts'} = {};
-    $results->{'reverse'} = {};
     $results->{'reverse'}{'contam_read_count'} = 0;
     $results->{'reverse'}{'contam_hash'} = { map {$_ => 0} @{$self->adapter_list} };
     $results->{'reverse'}{'adapter_starts'} = {};
-    my $read_count = 0;
 
-    my ( $read, $match);
-    my ( $previous_read, $previous_match) = ( q{ }, q{ } );
-
-    my $start;
+    my ($previous_read, $previous_match) = ( q{ }, q{ } );
     my $previous_start = $MINUS_ONE;
-    my $direction = q(forward); #forward/reverse
+    my $direction      = q(forward); #forward/reverse
 
     while (my $lane = <$blat_fh>) {
         next if !$lane; # there might be no output
@@ -192,45 +179,36 @@ sub _process_search_output {
         if (scalar @fields < $END_MATCH_IND + 1) {
             croak q[Too few fields in blat output];
         }
-        $match = $fields[$REF_NAME_IND];
-        $read  = $fields[$SEQ_NAME_IND];
-        $start = $fields[$START_MATCH_IND] < $fields[$END_MATCH_IND] ?
+
+        my $match = $fields[$REF_NAME_IND];
+        my $read  = $fields[$SEQ_NAME_IND];
+        my $start = ($fields[$START_MATCH_IND] < $fields[$END_MATCH_IND]) ?
                     $fields[$START_MATCH_IND] : $fields[$END_MATCH_IND];
 
         if ( $read ne $previous_read ) {
             $direction = $read=~m{/2\z}smx ? q(reverse) : q(forward);
-            $read_count++;
             $results->{$direction}{'contam_read_count'}++;
-            $results->{'contam_hash'}->{$match}++;
-            $results->{$direction}{'contam_hash'}{$match}++;
             if ($previous_start >= 0) {
-                $results->{'adapter_starts'}->{$previous_start} =
-                    exists $results->{'adapter_starts'}->{$previous_start} ?
-                    $results->{'adapter_starts'}->{$previous_start} + 1 : 1;
-                $results->{$direction}{'adapter_starts'}{$previous_start} =
-                    exists $results->{$direction}{'adapter_starts'}{$previous_start} ?
-                    $results->{$direction}{'adapter_starts'}{$previous_start} + 1 : 1;
+                $results->{$direction}{'adapter_starts'}{$previous_start}++;
             }
 	          $previous_start = $start;
-            next;
+        } else {
+            if ($start < $previous_start) { # keep the lowest start position
+                $previous_start = $start;
+            }
         }
 
         if ( $match ne $previous_match ) {
-            $results->{'contam_hash'}->{$match}++;
             $results->{$direction}{'contam_hash'}{$match}++;
         }
-        if ($start < $previous_start) { $previous_start = $start; }
 
-    }
-    continue {
-        ( $previous_read, $previous_match) = ( $read, $match);
-    }
+        ($previous_read, $previous_match) = ($read, $match);
+    } # end of reading blat output
+
     if ($previous_start >= 0) {
-        $results->{'adapter_starts'}->{$previous_start}++;
         $results->{$direction}{'adapter_starts'}{$previous_start}++;
     }
 
-    $results->{'contam_read_count'} = $read_count;
     return $results;
 }
 
@@ -272,8 +250,6 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 BUILD last method called before returning a new instance of the object to the caller
-
 =head2 new
 
     Moose-based. An optional argument, 'adapter_fasta',
@@ -284,8 +260,6 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
     Over-ride the parent execute subroutine. Procedural code to find the
     fastq(s) for a run lane and run a blat search for adapter sequences in
     each one.
-
-=head2 S_IRWXU - injected by IPC::SysV
 
 =head1 DIAGNOSTICS
 
@@ -311,8 +285,6 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =item Readonly
 
-=item File::Basename
-
 =item Parallel::ForkManager
 
 =item File::Temp
@@ -322,8 +294,6 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 =item Fcntl
 
 =item File::Spec
-
-=item IPC::SysV
 
 =item npg_tracking::data::reference::list
 
