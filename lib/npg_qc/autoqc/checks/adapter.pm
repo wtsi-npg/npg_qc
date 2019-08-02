@@ -11,6 +11,7 @@ use File::Temp qw(tempdir);
 use POSIX qw(mkfifo);
 use Fcntl qw(:mode);
 use Readonly;
+use List::MoreUtils qw(uniq);
 
 use npg_tracking::data::reference::list;
 use npg_tracking::util::types;
@@ -23,7 +24,6 @@ our $VERSION = '0';
 Readonly::Scalar my $EXT => q[cram];
 Readonly::Scalar my $ADAPTER_FASTA => q[adapters.fasta];
 
-Readonly::Scalar my $MINUS_ONE   => -1;
 Readonly::Scalar my $SHIFT_EIGHT => 8;
 
 #indices of different fields in the NCBI tabular blat output
@@ -71,6 +71,7 @@ sub _build_adapter_list {
         $name or next;
         push @list, $name;
     }
+    @list = uniq @list;
 
     return \@list;
 }
@@ -168,9 +169,10 @@ sub _process_search_output {
     $results->{'reverse'}{'contam_hash'} = { map {$_ => 0} @{$self->adapter_list} };
     $results->{'reverse'}{'adapter_starts'} = {};
 
-    my ($previous_read, $previous_match) = ( q{ }, q{ } );
-    my $previous_start = $MINUS_ONE;
-    my $direction      = q(forward); #forward/reverse
+    my ($previous_read, $previous_match) = ( q{ }, q{ });
+    my $previous_start;
+    my $previous_direction;
+    my $current_direction;
 
     while (my $lane = <$blat_fh>) {
         next if !$lane; # there might be no output
@@ -185,28 +187,30 @@ sub _process_search_output {
         my $start = ($fields[$START_MATCH_IND] < $fields[$END_MATCH_IND]) ?
                     $fields[$START_MATCH_IND] : $fields[$END_MATCH_IND];
 
-        if ( $read ne $previous_read ) {
-            $direction = $read=~m{/2\z}smx ? q(reverse) : q(forward);
-            $results->{$direction}{'contam_read_count'}++;
-            if ($previous_start >= 0) {
-                $results->{$direction}{'adapter_starts'}{$previous_start}++;
+        if ( $read ne $previous_read ) { # new read starts, including the first read
+            if ($previous_start) { # nothing to save for the first read
+                $results->{$previous_direction}{'adapter_starts'}{$previous_start}++;
             }
-	          $previous_start = $start;
+            $current_direction = $read=~m{/2\z}smx ? q(reverse) : q(forward);
+            $results->{$current_direction}{'contam_read_count'}++;
+            $results->{$current_direction}{'contam_hash'}{$match}++;
+            $previous_start = $start; # first start position for this read
         } else {
             if ($start < $previous_start) { # keep the lowest start position
                 $previous_start = $start;
             }
+            # match to the same reference can be reported multiple times
+            if ( $match ne $previous_match ) {
+                $results->{$current_direction}{'contam_hash'}{$match}++;
+            }
         }
 
-        if ( $match ne $previous_match ) {
-            $results->{$direction}{'contam_hash'}{$match}++;
-        }
-
-        ($previous_read, $previous_match) = ($read, $match);
+        ($previous_read, $previous_match, $previous_direction) = ($read, $match, $current_direction);
     } # end of reading blat output
 
-    if ($previous_start >= 0) {
-        $results->{$direction}{'adapter_starts'}{$previous_start}++;
+    # save start position for the last read
+    if ($previous_start) {
+        $results->{$previous_direction}{'adapter_starts'}{$previous_start}++;
     }
 
     return $results;
@@ -294,6 +298,8 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 =item Fcntl
 
 =item File::Spec
+
+=item List::MoreUtils
 
 =item npg_tracking::data::reference::list
 
