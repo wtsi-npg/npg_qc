@@ -142,33 +142,6 @@ sub compress_xz {
   return $out;
 }
 
-=head2 set_inflator4scalar
-
-Sets inflation for scalar values for columns that have defaults and non null
-constrain set. Second attribute is boolean indicating whether the value is a
-string rather than an integer; it is optional.
-
- __PACKAGE__->set_inflator4scalar($column_name, [$is_string]);
-
-=cut
-
-sub set_inflator4scalar {
-  my ($package_name, $col_name, $is_string) = @_;
-
-  my $db_default = $package_name->result_source_instance->column_info($col_name)->{'default_value'};
-  $package_name->inflate_column($col_name, {
-    inflate => sub {
-      my $db_value = shift;
-      if ($is_string) {
-        $db_value eq $db_default ? undef : $db_value;
-      } else {
-        $db_value == $db_default ? undef : $db_value;
-      }
-    },
-  });
-  return;
-}
-
 =head2 create_composition_attribute
 
 Adds a lazy-build 'composition' attribute and a build method for it

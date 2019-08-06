@@ -1,5 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 66.6.0
+ - review autoqc check: do not exit on criteria evaluation error
+ - table and DBIx class for the review autoqc check
+ - SeqQC display for review autoqc results
+ - qc_store retrieval from a database reimplemented to ensure that
+     merged data are not retrieved when run data are required
+ - SeqQC templates updated to conform with Template::Toolkit v2.29
+
 release 66.5.1
  - add placeholder results file for bcfstats where no ref genotypes exist
  - ensure immutability of a private attribute in autoqc checks review

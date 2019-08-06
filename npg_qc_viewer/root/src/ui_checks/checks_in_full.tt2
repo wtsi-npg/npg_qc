@@ -84,8 +84,8 @@
 
         <h2 class="collapser [% check.check_name %]">[% util.expand_rpt_key(lane_key) %], [% check.check_name -%]
 
-	[%- IF check.defined('pass') -%]:
-		[% check.pass ? 'passed' : '<span class="result_fail">failed</span>' -%]
+	[%- IF check.pass.defined -%]:
+		[% check.pass ? ' passed' : '<span class="result_fail"> failed</span>' -%]
 	[%- END -%]
 	</h2>
   

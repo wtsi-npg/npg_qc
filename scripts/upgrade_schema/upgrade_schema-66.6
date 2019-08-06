@@ -1,0 +1,26 @@
+--
+-- create table for autoqc review result
+--
+
+CREATE TABLE IF NOT EXISTS `review` (
+  `id_review` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT \
+    COMMENT 'Auto-generated primary key',
+  `id_seq_composition` bigint(20) unsigned NOT NULL \
+    COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `library_type` varchar(100) DEFAULT NULL,
+  `evaluation_results` text DEFAULT NULL,
+  `criteria` text DEFAULT NULL,
+  `criteria_md5` char(32) DEFAULT NULL,
+  `qc_outcome` varchar(256) DEFAULT NULL,
+  `pass` tinyint(1) DEFAULT NULL,
+  `path` varchar(256) DEFAULT NULL,
+  `comments` text DEFAULT NULL,
+  `info` text,
+  PRIMARY KEY (`id_review`),
+  UNIQUE KEY `review_id_compos_uniq` (`id_seq_composition`),
+  CONSTRAINT `review_compos` FOREIGN KEY (`id_seq_composition`) \
+    REFERENCES `seq_composition` (`id_seq_composition`) \
+    ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+grant select on npgqcp.review to nqcro;

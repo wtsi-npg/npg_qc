@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -890,6 +890,30 @@ subtest 'load from archive path - new style runfolder, merged entities' => sub {
         'the only tag metrics result is for lane 1');
     }
   }
+};
+
+subtest 'loading review and other results from path' => sub {
+  plan tests => 8;
+
+  my $db = $db_helper->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+    path    => ['t/data/autoqc/review'],
+    schema  => $db,
+    verbose => 0,
+  );
+  $db_loader->load();
+  is ($db->resultset('Review')->search({})->count(), 1, 'one review record created');
+  is ($db->resultset('BamFlagstats')->search({})->count(), 5,
+    'five bam_flagstats records created');
+  is ($db->resultset('Bcfstats')->search({})->count(), 1, 'one bcfstats record created');
+  is ($db->resultset('VerifyBamId')->search({})->count(), 1,
+    'one verify_bam_id record created');
+  is ($db->resultset('QXYield')->search({})->count(), 1, 'one qX_yield record created');
+
+  my $row = $db->resultset('Review')->search({})->next;
+  is( ref $row->evaluation_results, 'HASH', 'inflation back to an array');
+  is( ref $row->qc_outcome, 'HASH', 'inflation back to a hash');
+  is( ref $row->criteria, 'HASH', 'inflation back to a hash');
 };
 
 1;

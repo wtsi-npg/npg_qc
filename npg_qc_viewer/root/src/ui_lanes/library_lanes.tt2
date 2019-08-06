@@ -88,8 +88,6 @@
     action_plot = c.controller('Visuals').action_for('qualmap');
     legend_uri_for_action = c.uri_for_action(c.controller('Visuals').action_for('qualmap_legend'));
 
-    id_runs_in_collection = []; # Used for page's title (how many different id runs in page)
-
     FOREACH lane_key IN sorted_rl_map_keys;
       #Lane collection from npgqc
       lane_collection = rl_map.$lane_key;
@@ -97,9 +95,8 @@
       entity_is_lane = util.is_lane_key(lane_key);
       proxy_key = util.rpt_list2first_rpt_key(lane_key);
       id_run   = attrs.id_run;
-      id_runs_in_collection.push(id_run);
       position  = attrs.position;
-      tag_index = attrs.defined('tag_index') ? attrs.tag_index : '';
+      tag_index = attrs.tag_index.defined ? attrs.tag_index : '';
       row_info_to = c.stash.row_data.$proxy_key || {};
       time_comp = String.new(text => "$row_info_to.time_comp");
       table_row_id = lane_key.defined ? ' id="rpt_key:' _ lane_key _ '"' : '';
@@ -175,26 +172,7 @@
 </tbody>
 </table>
 
-[%-
-  IF run_view;
-    PROCESS ui_runs/annotations.tt2;
-  END;
-  distinct_id_runs_in_collection = id_runs_in_collection.unique;
-  IF distinct_id_runs_in_collection.size == 1;
-    single_id_run = distinct_id_runs_in_collection.first;
-    current_run_status = '';
-    cs = c.model('NpgDB').resultset('RunStatus').find({ 'id_run' => "$single_id_run", 'iscurrent' => 1}, );
-    IF cs;
-      current_run_status = cs.run_status_dict.description;
-      IF current_run_status;
-         title = title _ ' (run ' _ single_id_run _ ' status: ' _ current_run_status;
-         IF !run_from_staging && (current_run_status == 'qc in progress' || current_run_status == 'qc on hold');
-           title = title _ ', taken by ' _ cs.user.username;
-         END;
-         title = title _ ')';
-      END;
-    END;
-  END -%]
+[%- IF run_view; PROCESS ui_runs/annotations.tt2; END %]
 
 <div id="results_full">
 [% PROCESS ui_checks/checks_in_full.tt2 -%]

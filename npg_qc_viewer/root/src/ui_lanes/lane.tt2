@@ -3,10 +3,12 @@
 
     lane_class = 'lane';
     plex_class = 'tag_info';
-    IF lane_collection && lane_collection.size;
+    IF (current_run_status && (current_run_status != 'qc complete') &&
+        lane_collection && lane_collection.size);
       review_obj = lane_collection.slice('check_name', 'review').get(0);
-      IF review_obj && review_obj.pass.defined && review_obj.pass == 0;
-        plex_class = plex_class _ ' failed_review';
+      IF review_obj && review_obj.pass.defined;
+        review_outcome = review_obj.pass ? ' passed_review' : ' failed_review';
+        plex_class = plex_class _ review_outcome;
       END;
     END;
 -%]

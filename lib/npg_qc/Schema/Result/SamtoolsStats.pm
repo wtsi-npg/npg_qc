@@ -179,10 +179,6 @@ with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
-with qw/ npg_qc::Schema::Composition
-         npg_qc::Schema::Flators
-         npg_qc::autoqc::role::result /;
-
 our $VERSION = '0';
 
 =head2 seq_component_compositions
@@ -268,8 +264,6 @@ __END__
 
 =item DBIx::Class::InflateColumn::Serializer
 
-=item npg_qc::Schema::Flators
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -282,7 +276,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2019 GRL
 
 This file is part of NPG.
 
