@@ -1,6 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - adapter check switched to use cram files
+ - record absolute path of the verifyBamID executable
 
 release 66.6.0
  - review autoqc check: do not exit on criteria evaluation error

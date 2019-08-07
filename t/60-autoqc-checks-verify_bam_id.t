@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use Cwd;
-use Test::More tests => 55;
+use File::Temp qw(tempdir);
+use Test::More tests => 59;
 use Test::Exception;
 use npg_tracking::util::abs_path qw(abs_path);
 
@@ -11,24 +12,43 @@ my $snv_repository_with_vcf = 't/data/autoqc/population_snv_with_vcf';
 
 $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc];
 
+my $tempdir = tempdir( CLEANUP => 1);
+my $tool_path = "$tempdir/verifyBamID";
+my $bam_path =  "$tempdir/13940_8.bam";
+for my $file (($tool_path, $bam_path)) {
+  open my $fh, '>', $file or die 'cannot open file for writing';
+  print $fh '#verifyBamID mock-up';
+  close $fh;
+}
+chmod 0755, $tool_path;
+local $ENV{PATH}=join q[:], $tempdir, $ENV{PATH};
+
+open my $fh, '>', $bam_path . '.selfSM' or die 'cannot open file for writing';
+print $fh '#verifyBamID mock-up' . "\n";
+print $fh join("\t", (2 .. 13)) . "\n";
+close $fh;
+
 use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 
 {
   my @checks = ();
   push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
       id_run         => 13940,
+      tmp_path       => $tempdir,
       position       => 8,
-      qc_in          => 't/data/autoqc/',
+      qc_in          => $tempdir,
       repository     => $repos,
       snv_repository => $snv_repository_with_vcf );
   push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
+      tmp_path       => $tempdir,
       rpt_list       => '13940:8',
-      qc_in          => 't/data/autoqc/',
+      qc_in          => $tempdir,
       repository     => $repos,
       snv_repository => $snv_repository_with_vcf );
 
   foreach my $r (@checks) {
     isa_ok ($r, 'npg_qc::autoqc::checks::verify_bam_id');
+    is($r->verify_tool, $tool_path, 'verify path');
     lives_ok { $r->result; } 'No error creating result object';
     ok( defined $r->ref_repository(), 'A default reference repository is set' );
     is($r->lims->library_type, undef, 'Library type returned OK');
@@ -38,6 +58,8 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
     my $snv_path = abs_path(join '/', cwd,
       't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Standard/1000Genomes_hs37d5');
     is($r->snv_path, $snv_path, 'snv path is set');
+    $r->execute();
+    is($r->result->info->{Verifier}, $tool_path, 'verify path recorded');
   }
 }
 
