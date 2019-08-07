@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - adapter check switched to use cram files
+
 release 66.6.0
  - review autoqc check: do not exit on criteria evaluation error
  - table and DBIx class for the review autoqc check

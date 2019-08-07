@@ -58,7 +58,7 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
                   )
   } 'Create the check object';
 
-  is( $test->file_type(), 'bam', 'file type is bam');
+  is( $test->file_type(), 'cram', 'file type is cram');
   is( $test->adapter_fasta(), 't/data/autoqc/adapter.fasta',
     'default adapter fasta listing adapters' );
   is( $test->_blat_command, qq[$bt t/data/autoqc/adapter.fasta stdin stdout -tileSize=9 -maxGap=0 -out=blast8], 'blat command line');
@@ -70,7 +70,7 @@ local $ENV{PATH} = join q[:], $dir, $ENV{PATH};
   close $fh;
 
   my @adapters = qw(DpnII-Gex-Adapter1-1 DpnII-Gex-Adapter1-2 DpnII-Gex-Adapter2-1 DpnII-Gex-Adapter2-2 DpnII-Gex-PCR-Primer1 DpnII-Gex-PCR-Primer2 DpnII-Gex-SequencingPrimer NlaIII-Gex-Adapter1-1 NlaIII-Gex-Adapter1-2 NlaIII-Gex-Adapter2-1 NlaIII-Gex-Adapter2-2 NlaIII-Gex-PCR-Primer1 NlaIII-Gex-PCR-Primer2 NlaIII-Gex-SequencingPrimer PE-PCR-Primers1-1 PE-PCR-Primers1-2 PE-adapters1-1 PE-adapters1-2 PE-sequencingPrimer1 PE-sequencingPrimer2 adaptor1 adaptor2 adaptor3 adaptor4 genomicDNA-adapter1 genomicDNA-adapter2 genomicDNA-primer1 genomicDNA-sequencingPrimer genomicDNA=primer2 smallRNA-3'adapter smallRNA-5'adapter smallRNA-PCS-primer1 smallRNA-PCS-primer2 smallRNA-RT-primer smallRNA-sequencingPrimer);
-  my $expected = { contam_hash => {}, adapter_starts => {}, contam_read_count => 0,
+  my $expected = {
     forward => { contam_hash => {map {$_ => 0} @adapters}, adapter_starts => {}, contam_read_count => 0,},
     reverse => { contam_hash => {map {$_ => 0} @adapters}, adapter_starts => {}, contam_read_count => 0,},
   };
