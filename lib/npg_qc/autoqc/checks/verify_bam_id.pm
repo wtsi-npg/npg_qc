@@ -14,12 +14,19 @@ with qw(npg_common::roles::software_location
 our $VERSION = '0';
 
 Readonly::Scalar my $VERIFY_NAME   => q[verifyBamID];
-Readonly::Scalar our $EXT          => q[bam];
+Readonly::Scalar my $EXT           => q[bam];
 Readonly::Scalar my $MIN_SNPS      => 10**4;
 Readonly::Scalar my $MIN_AVG_DEPTH => 2;
 Readonly::Scalar my $MIN_FREEMIX   => 0.05;
 
 has '+file_type' => (default => $EXT,);
+
+has 'verify_tool'  => (
+  is      => 'ro',
+  isa     => 'NpgCommonResolvedPathExecutable',
+  default => $VERIFY_NAME,
+  coerce  => 1,
+);
 
 has 'alignments_in_bam'  => (
 	is => 'ro',
@@ -86,12 +93,12 @@ override 'execute' => sub {
       . ' --self --ignoreRG --minQ 20 --minAF 0.05 --maxDepth 500 --precise'
       . ' --out ' . $outfile;
 
-  $self->result->set_info('Verifier', $VERIFY_NAME);
+  $self->result->set_info('Verifier', $self->verify_tool);
   $self->result->set_info('Verify_options', $cmd_options);
   $self->result->set_info('Criterion', 'snps > ' . $MIN_SNPS .
                                        ', average depth >= ' . $MIN_AVG_DEPTH .
                                        ' and freemix < ' . $MIN_FREEMIX);
-  my $cmd = "$VERIFY_NAME $cmd_options";
+  my $cmd = join q[ ], $self->verify_tool, $cmd_options;
 
   if (system $cmd) {
     croak "Failed to execute $cmd";
