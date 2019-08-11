@@ -14,7 +14,6 @@ use Try::Tiny;
 extends qw(npg_qc::autoqc::checks::check);
 
 with qw(npg_tracking::data::gbs_plex::find
-        npg_common::roles::software_location
         npg_qc::utils::genotype_calling);
 
 our $VERSION = '0';
@@ -111,7 +110,7 @@ override 'execute' => sub {
 
   $self->result->gbs_plex_name($self->gbs_plex_name);
   $self->result->gbs_plex_path($self->annotation_path);
-  $self->result->set_info('Caller',$self->bcftools);
+  $self->result->set_info('Caller',$self->bcftools_cmd);
   $self->result->set_info('Criterion',
            q[Genotype passed rate >= ]. $self->pass_call_rate);
 
@@ -193,8 +192,6 @@ __END__
 =item Try::Tiny
 
 =item npg_tracking::data::gbs_plex::find
-
-=item npg_common::roles::software_location
 
 =item npg_qc::utils::genotype_common
 

@@ -67,7 +67,7 @@ subtest 'test attributes and simple methods' => sub {
         't/data/autoqc/geno_refset_repository/study3705/GRCh38_full_analysis_set_plus_decoy_hla/bcfdb/study3705.bcf');
        is($r->geno_refset_bcfdb_path, $geno_bcfdb, 'geno bcfdb path is set OK');
       
-       lives_ok { $r->bcftools } 'No error calling bcftools accessor';      
+       lives_ok { $r->bcftools_cmd } 'No error calling bcftools accessor';      
        lives_ok { $r->samtools_cmd } 'No error calling samtools accessor';      
 
        ok($r->can_run, 'Can run on tag in multiplexed pool') or diag $r->result->comments;

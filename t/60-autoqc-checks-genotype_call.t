@@ -62,7 +62,7 @@ subtest 'test attributes and simple methods' => sub {
         't/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/bcftools/Hs_MajorQC.annotation.vcf');
        is($r->gbs_plex_annotation_path, $gbs_annotation, 'gbs_annotation path is set OK');
       
-       lives_ok { $r->bcftools } 'No error calling bcftools accessor';      
+       lives_ok { $r->bcftools_cmd } 'No error calling bcftools accessor';      
        lives_ok { $r->samtools_cmd } 'No error calling samtools accessor';      
 
        ok($r->can_run, 'Can run on tag in multiplexed pool') or diag $r->result->comments;

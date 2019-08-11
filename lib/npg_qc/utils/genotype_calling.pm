@@ -9,12 +9,13 @@ use Vcf;
 use IO::File;
 use Data::Dump qw(pp);
 
+with 'npg_common::roles::software_location';
+
 our $VERSION = '0';
 
 Readonly::Scalar my $DEFAULT_MIN_BASE_QUAL  => 20;
 Readonly::Scalar my $DEFAULT_MIN_CALL_DEPTH => 4;
 Readonly::Scalar my $DEFAULT_CMD_DELIM      => q[ | ];
-Readonly::Scalar my $BCFTOOLS               => q[bcftools];
 Readonly::Scalar my $UNKNOWN                => q[Unknown];
 Readonly::Scalar my $NO_CALL                => q[No Call];
 Readonly::Scalar my $FEMALE                 => q[F];
@@ -24,13 +25,6 @@ Readonly::Scalar my $MISSING                => q[.];
 Readonly::Scalar my $FF_REF                 => q[X];
 Readonly::Scalar my $FF_ALT                 => q[Y];
 Readonly::Scalar my $HEADER_SAMPLE_MATCH    => q[FORMAT];
-
-has 'bcftools' => (
-  is      => q[ro],
-  isa     => q[NpgCommonResolvedPathExecutable],
-  coerce  => 1,
-  default => $BCFTOOLS,
-);
 
 has 'min_base_qual' => (
   is      => q[ro],
@@ -309,7 +303,7 @@ sub _build_mpileup_command {
       q[ --targets-file ]. $self->annotation_path;
 
   my $mpileup_cmd =
-      $self->bcftools . q[ mpileup].
+      $self->bcftools_cmd . q[ mpileup].
       q[ --min-BQ ] . $self->min_base_qual .
       q[ --annotate 'FORMAT/AD,FORMAT/DP'].
       q[ --max-depth 50000 ].
@@ -333,7 +327,7 @@ sub _build_call_command {
   my ($self) = shift;
 
   my $call_cmd =
-    $self->bcftools . q[ call ].
+    $self->bcftools_cmd . q[ call ].
     q[ --multiallelic-caller --keep-alts --skip-variants indels ].
     ($self->ploidy_path ? q[ --ploidy-file ]. $self->ploidy_path : q[]).
     q[ --output-type u ];
@@ -356,7 +350,7 @@ sub _build_filter_command {
   my @filter_cmds;
   foreach my $f(keys %{$filters}){
     push @filter_cmds,
-    $self->bcftools . q[ filter ].
+    $self->bcftools_cmd . q[ filter ].
     q[ --mode + ].
     q[ --soft-filter ]. $f .
     q[ --exclude ']. $filters->{$f} .q['].
@@ -605,6 +599,8 @@ __END__
 =item Vcf
 
 =item IO::File
+
+=item npg_common::roles::software_location
 
 =back
 

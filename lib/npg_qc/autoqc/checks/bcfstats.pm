@@ -14,7 +14,6 @@ use List::Util qw(sum0);
 extends qw(npg_qc::autoqc::checks::check);
 
 with qw(npg_tracking::data::geno_refset::find
-        npg_common::roles::software_location
         npg_qc::utils::genotype_calling);
 
 our $VERSION = '0';
@@ -150,7 +149,7 @@ override 'execute' => sub {
     return 1;
   }
 
-  $self->result->set_info('Caller',$self->bcftools);
+  $self->result->set_info('Caller',$self->bcftools_cmd);
   $self->result->geno_refset_name($self->geno_refset_name);
   $self->result->geno_refset_path($self->annotation_path);
   $self->result->expected_sample_name($self->expected_sample_name);
@@ -192,7 +191,7 @@ has '_vcftobcf_command' => (
 );
 sub _build_vcftobcf_command {
   my ($self) = shift;
-  return $self->bcftools . q[ view --output-file ]. $self->_temp_bcf
+  return $self->bcftools_cmd . q[ view --output-file ]. $self->_temp_bcf
     .q[ --output-type b ] . $self->vcf_outfile;
 }
 
@@ -205,7 +204,7 @@ has '_indexbcf_command' => (
 );
 sub _build_indexbcf_command {
   my ($self) = shift;
-  return $self->bcftools . q[ index ]. $self->_temp_bcf;
+  return $self->bcftools_cmd . q[ index ]. $self->_temp_bcf;
 }
 
 has '_bcfstats_command' => (
@@ -218,7 +217,7 @@ has '_bcfstats_command' => (
 sub _build_bcfstats_command {
   my ($self) = shift;
   my $bcfstats_cmd =
-      $self->bcftools . q[ stats --verbose].
+      $self->bcftools_cmd . q[ stats --verbose].
       q[ --collapse snps].
       q[ --apply-filters PASS].
       q[ --samples ]. $self->expected_sample_name.
@@ -237,7 +236,7 @@ has '_refset_header_command' => (
 );
 sub _build_refset_header_command {
   my ($self) = shift;
-  return $self->bcftools . q[ view ].
+  return $self->bcftools_cmd . q[ view ].
     q[ --header-only ].
     q[ --force-samples].
     q[ --samples ]. $self->expected_sample_name.
@@ -389,8 +388,6 @@ __END__
 =item List::Util
 
 =item npg_tracking::data::geno_refset::find
-
-=item npg_common::roles::software_location
 
 =item npg_qc::utils::genotype_common
 
