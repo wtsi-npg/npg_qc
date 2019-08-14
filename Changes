@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - fix regular expression used in collapse after change in template
  - adapter check switched to use cram files
  - record absolute path of the verifyBamID executable
 

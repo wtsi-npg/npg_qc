@@ -85,10 +85,10 @@
         <h2 class="collapser [% check.check_name %]">[% util.expand_rpt_key(lane_key) %], [% check.check_name -%]
 
 	[%- IF check.pass.defined -%]:
-		[% check.pass ? ' passed' : '<span class="result_fail"> failed</span>' -%]
+		[% check.pass ? ' passed' : '<span class="result_fail"> failed</span>' -%] [%# Text produced in this section affects behaviour of js code for collapse library %]
 	[%- END -%]
 	</h2>
-  
+
 	<div class="result_full_content">
 	[% TRY -%]
 		[% PROCESS "ui_checks/${check.class_name}.tt2" -%]
