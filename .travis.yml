@@ -12,10 +12,10 @@ sudo: required
 language: perl
 
 perl:
-  - "5.22-shrplib"
+  - "5.26-shrplib"
 
 dist:
-  - precise
+  - bionic
 
 addons:
   postgresql: "9.3"
@@ -35,7 +35,7 @@ env:
     - TRAVIS_PYTHON_VERSION="2.7"
     - WTSI_NPG_GITHUB_URL=https://github.com/wtsi-npg
     - IRODS_VERSION=4.1.10 PG_PLUGIN_VERSION=1.10 PLATFORM=ubuntu12
-    - CONDA_CHANNEL=https://dnap.cog.sanger.ac.uk/npg/conda/test/Ubuntu/12.04/
+    - CONDA_CHANNEL=https://dnap.cog.sanger.ac.uk/npg/conda/test/Ubuntu/18.04/
     - CONDA_TEST_ENV=test-environment
 
 before_install:
