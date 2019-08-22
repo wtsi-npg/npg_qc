@@ -1,8 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - fix regular expression used in collapse after change in template
- - adapter check switched to use cram files
- - record absolute path of the verifyBamID executable
+ release 67.0.0
+  - fix regular expression used in collapser after change in template
+  - adapter check switched to use cram files; fixed an old bug in
+      parsing blat output which resulted in incorrect adapter counters
+      per cycle
+  - record absolute path of the verifyBamID executable
+  - remove provisions for retrieval of autoqc results from old style
+      run folders
 
 release 66.6.0
  - review autoqc check: do not exit on criteria evaluation error
