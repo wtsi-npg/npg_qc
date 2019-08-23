@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 21;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -697,52 +697,6 @@ sub _tests4non_merged_lanes_subset {
 
   return;  
 }
-
-subtest 'load from archive path - old style runfolder, no merge' => sub {
-  plan tests => 95;
-
-  # Create a database with empty tables
-  my $db = $db_helper->create_test_db(q[npg_qc::Schema]);
-
-  my $db_loader = npg_qc::autoqc::db_loader->new(
-    archive_path => $archive,
-    id_run       => 26601,
-    schema       => $db,
-    verbose      => 0,
-  );
-  my $db_loader2 = npg_qc::autoqc::db_loader->new(
-    archive_path => $archive,
-    id_run       => 26601,
-    schema       => $db,
-    verbose      => 0,
-  ); 
-  _tests4non_merged($db, $db_loader, $db_loader2);
-  is ($db_loader->load(), 0, 'loader cannot load repeatedly');
-
-  # Create a database with empty tables
-  $db = $db_helper->create_test_db(q[npg_qc::Schema]);
-  my @lanes = (1 .. 8);  # all lanes listed explicitly
-  $db_loader = npg_qc::autoqc::db_loader->new(
-    archive_path => $archive,
-    id_run       => 26601,
-    lane         => \@lanes,
-    schema       => $db,
-    verbose      => 0,
-  );
-  _tests4non_merged($db, $db_loader);
-
-  # Create a database with empty tables
-  $db = $db_helper->create_test_db(q[npg_qc::Schema]);
-  @lanes = (5 .. 8); # selected lanes
-  $db_loader = npg_qc::autoqc::db_loader->new(
-    archive_path => $archive,
-    id_run       => 26601,
-    lane         => \@lanes,
-    schema       => $db,
-    verbose      => 0,
-  );
-  _tests4non_merged_lanes_subset($db, $db_loader, @lanes);
-};
 
 subtest 'load from archive path - new style runfolder, no merge' => sub {
   plan tests => 127;

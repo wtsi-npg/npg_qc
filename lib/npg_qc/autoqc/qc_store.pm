@@ -259,14 +259,9 @@ sub load_from_staging_archive {
 
   my @plex_globs = map { 'lane' . $_ } @{$query->positions};
   my @lane_globs = @plex_globs ? @plex_globs : 'lane*';
-  if (-d "$archive_path/$QC_DIR_NAME") { # Old-style run folder
-    @plex_globs = @lane_globs;
-    @lane_globs = (q[]);
-  } else {
-    push @plex_globs, @plex_globs ? 'lane*-*' : 'lane*';
-    push @plex_globs, q[];
-    @plex_globs = map { $_ . '/plex*'} @plex_globs;
-  }
+  push @plex_globs, @plex_globs ? 'lane*-*' : 'lane*';
+  push @plex_globs, q[];
+  @plex_globs = map { $_ . '/plex*'} @plex_globs;
   @plex_globs = map { "$archive_path/$_/$QC_DIR_NAME"} @plex_globs;
   @lane_globs = map { "$archive_path/$_/$QC_DIR_NAME"} @lane_globs;
 
