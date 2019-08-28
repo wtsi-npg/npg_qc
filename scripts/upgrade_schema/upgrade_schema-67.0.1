@@ -1,0 +1,10 @@
+--
+--  allow verify_bam_id decimal columns to be NULL
+--
+
+
+ALTER TABLE `verify_bam_id` 
+MODIFY COLUMN `avg_depth` decimal(11,2) DEFAULT NULL, 
+MODIFY COLUMN `freemix` decimal(11,5) DEFAULT NULL, 
+MODIFY COLUMN `freeLK0` decimal(11,2) DEFAULT NULL, 
+MODIFY COLUMN `freeLK1` decimal(11,2) DEFAULT NULL;
