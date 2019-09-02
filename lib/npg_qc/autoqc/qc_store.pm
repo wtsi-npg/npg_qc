@@ -226,10 +226,24 @@ sub load_from_staging {
   (ref $query eq $expected_type)
     or croak qq[Query object should be of type $expected_type];
 
-  my $rfo = $self->_runfolder_obj($query);
+  my $archive_path;
+  try {
+    $archive_path = npg_tracking::illumina::runfolder->new(
+      id_run              => $query->id_run,
+      npg_tracking_schema => $query->npg_tracking_schema
+    )->archive_path;
+  } catch {
+    carp sprintf 'Failed to load data from staging for query "%s" : "%s"',
+      $query->to_string, $_;
+  };
 
-  return $rfo ? $self->load_from_staging_archive($query, $rfo->archive_path)
-              : npg_qc::autoqc::results::collection->new();
+  #####
+  # Potential error retrieving data from the archive directory is
+  # not captured; this is deliberate.
+  #
+  return $archive_path ?
+    $self->load_from_staging_archive($query, $archive_path) :
+    npg_qc::autoqc::results::collection->new();
 }
 
 =head2 load_from_staging_archive
@@ -516,25 +530,6 @@ sub _db_collection4compositions {
   }
 
   return npg_qc::autoqc::results::collection->new(results => \@rows);
-}
-
-sub _runfolder_obj {
-  my ($self, $query) = @_;
-
-  my $rfs;
-  try {
-    $rfs = npg_tracking::illumina::runfolder->new(
-      id_run              => $query->id_run,
-      npg_tracking_schema => $query->npg_tracking_schema
-    );
-    $rfs->analysis_path; # Might fail to find the run folder analysis directory.
-  } catch {
-    undef $rfs;
-    carp sprintf 'Failed to load data from staging for query "%s" : "%s"',
-      $query->to_string, $_;
-  };
-
-  return $rfs;
 }
 
 sub _query_obj {
