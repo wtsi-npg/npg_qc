@@ -81,6 +81,9 @@ override 'execute' => sub {
   if(!$self->can_run()) {
     return 1;
   }
+  if (!$self->entity_has_active_reference()) {
+    return 1;
+  }
   if (!$self->snv_file) {
     croak q(Can't find snv file);
   }

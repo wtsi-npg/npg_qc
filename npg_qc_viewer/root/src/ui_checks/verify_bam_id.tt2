@@ -3,6 +3,14 @@
 
 [% has_reverse = check.reverse_read_gc_percent.defined -%]
 
+[% IF check.comments -%]
+<div class="data_table">
+<table title="verify comments">
+<tr><th class="laligned">Comments</th><td>[% check.comments %]</td></tr>
+</table>
+</div>
+[%- END %]
+
 <div class="data_table">
 
 <table title="verify_bam_id">
@@ -17,6 +25,4 @@
  [%- END -%]
 </tr>
 </table>
-
 </div>
-
