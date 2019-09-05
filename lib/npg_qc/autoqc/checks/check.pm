@@ -27,6 +27,7 @@ our $VERSION = '0';
 
 Readonly::Scalar my $FILE_EXTENSION  => 'fastq';
 Readonly::Scalar my $HUMAN           => q[Homo_sapiens];
+Readonly::Scalar my $DO_NOT_USE      => q[DO_NOT_USE];
 Readonly::Scalar my $FORWARD_READ_FILE_NAME_SUFFIX => q[1];
 Readonly::Scalar my $REVERSE_READ_FILE_NAME_SUFFIX => q[2];
 
@@ -299,6 +300,26 @@ sub _build_result {
   return $result;
 }
 
+has '_lims_reference'  => (isa         => 'Maybe[Str]',
+                           is          => 'ro',
+                           required    => 0,
+                           lazy_build  => 1,
+                           );
+
+sub _build__lims_reference {
+  my $self = shift;
+
+  if (!$self->can('lims')) {
+    $self->result->add_comment('lims accessor is not defined');
+    return;
+  }
+  if(!$self->lims->reference_genome) {
+    $self->result->add_comment('No reference genome specified');
+    return;
+  }
+  return $self->lims->reference_genome;
+}
+
 =head2 run
 
 Creates an object that can perform the requested test, calls test
@@ -467,29 +488,42 @@ sub create_filename {
 =head2 entity_has_human_reference
 
 Returns true if the reference_genome attribute is defined
-for the entiry and the value of the attribute indicates
+for the entity and the value of the attribute indicates
 that the reference is for Homo Sapiens.
 
 =cut
 
 sub entity_has_human_reference {
   my $self = shift;
-
-  if (!$self->can('lims')) {
-    $self->result->add_comment('lim saccessor is not defined');
+  if( !$self->_lims_reference ) {
     return 0;
   }
-
-  my $ref = $self->lims->reference_genome;
-  if(!$ref) {
-    $self->result->add_comment('No reference genome specified');
-    return 0;
-  }
+  my $ref = $self->_lims_reference;
   if($ref !~ /\A$HUMAN/smx) {
     $self->result->add_comment("Non-human reference genome '$ref'");
     return 0;
   }
+  return 1;
+}
 
+=head2 entity_has_active_reference
+
+Returns true if the reference_genome attribute is defined for
+the entity and the value of the attribute indicates that the
+reference is not marked as do not use.
+
+=cut
+
+sub entity_has_active_reference {
+  my $self = shift;
+  if( !$self->_lims_reference ) {
+    return 0;
+  }
+  my $ref = $self->_lims_reference;
+  if($ref =~ /$DO_NOT_USE/smx) {
+    $self->result->add_comment("Non active reference genome used '$ref'");
+    return 0;
+  }
   return 1;
 }
 

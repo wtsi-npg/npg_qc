@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Cwd;
 use File::Temp qw(tempdir);
-use Test::More tests => 59;
+use Test::More tests => 64;
 use Test::Exception;
 use npg_tracking::util::abs_path qw(abs_path);
 
@@ -14,8 +14,9 @@ $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc];
 
 my $tempdir = tempdir( CLEANUP => 1);
 my $tool_path = "$tempdir/verifyBamID";
-my $bam_path =  "$tempdir/13940_8.bam";
-for my $file (($tool_path, $bam_path)) {
+my $bam_path  =  "$tempdir/13940_8.bam";
+my $bam_path2 =  "$tempdir/27483_8#6.bam";
+for my $file (($tool_path, $bam_path, $bam_path2)) {
   open my $fh, '>', $file or die 'cannot open file for writing';
   print $fh '#verifyBamID mock-up';
   close $fh;
@@ -152,6 +153,23 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
         't/data/autoqc/population_snv_with_vcf/Homo_sapiens/default/Exome/GRCh38_15');
     is($r->snv_path, $snv_path, 'snv path is set');
     ok($r->can_run, 'Can run on RNA library') or diag $r->result->comments;
+}
+
+{
+    local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} = q[t/data/autoqc/verify_bam_id/samplesheet_27483.csv];
+    # Tests if
+    my $r = npg_qc::autoqc::checks::verify_bam_id->new(
+        rpt_list       => '27483:8:6',
+        qc_in          => $tempdir,
+        tmp_path       => $tempdir,
+        repository     => $repos,
+        snv_repository => $snv_repository_with_vcf);
+    lives_ok {$r->result;} 'No error creating result object';
+    ok(defined $r->ref_repository(), 'A default reference repository is set');
+    like($r->lims->reference_genome, qr/DO_NOT_USE/, 'human DO_NOT_USE reference genome');
+    ok($r->can_run, 'Can run on human DO_NOT_USE reference') or diag $r->result->comments;
+    $r->execute();
+    like($r->result->comments, qr/Non active reference genome/, 'Inappropriate ref comment recorded');
 }
 
 1;

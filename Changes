@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+  - if DO_NOT_USE reference selected don't run VerifyBamID but provide
+    explanatory comment in json output file 
+
  release 67.0.0
   - fix regular expression used in collapser after change in template
   - adapter check switched to use cram files; fixed an old bug in
