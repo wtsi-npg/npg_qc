@@ -43,8 +43,8 @@ subtest 'high-level parsing' => sub {
 
   my $dups  = "$data_dir/4783_5_metrics_optical.txt";
   my $fstat = "$data_dir/4783_5.flagstat";
-  my $bam = "$data_dir/4783_5.bam";
-  open my $fh, '>', $bam or die "Failed to open $bam: $!\n";
+  my $cram  = "$data_dir/4783_5.cram";
+  open my $fh, '>', $cram or die "Failed to open $cram: $!\n";
   close $fh;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
@@ -89,8 +89,8 @@ subtest 'high-level parsing, no markdup metrics' => sub {
   plan tests => 10;
 
   my $fstat = "$data_dir/24135_1#1.flagstat";
-  my $bam = "$data_dir/24135_1#1.bam";
-  open my $fh, '>', $bam or die "Failed to open $bam: $!\n";
+  my $cram = "$data_dir/24135_1#1.cram";
+  open my $fh, '>', $cram or die "Failed to open $cram: $!\n";
   close $fh;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
@@ -151,17 +151,17 @@ subtest 'finding files, calculating metrics' => sub {
     id_run              => 16960,
     position            => 1,
     tag_index           => 0,
-    input_files         => [$fproot . '.bam'],
+    input_files         => [$fproot . '.cram'],
     related_results     => [],
   );
   my $r2 = npg_qc::autoqc::checks::bam_flagstats->new(
-    input_files      => [$fproot . '.bam'],
+    input_files      => [$fproot . '.cram'],
     rpt_list         => '16960:1:0',
     related_results  => [],
   );
 
   my $r3 = npg_qc::autoqc::checks::bam_flagstats->new(
-    input_files      => [$fproot . '.bam'],
+    input_files      => [$fproot . '.cram'],
     rpt_list         => '16960:1:0;16960:2:0',
     related_results  => [],
   );
@@ -197,10 +197,10 @@ subtest 'finding files, calculating metrics' => sub {
     id_run              => 16960,
     position            => 1,
     tag_index           => 0,
-    input_files         => [$fproot . '.bam'],
+    input_files         => [$fproot . '.cram'],
   );
-  my $bam_md5 = join q[.], $r->_sequence_file, 'md5';
-  throws_ok {$r->execute} qr{Can't open '$bam_md5'},
+  my $cram_md5 = join q[.], $r->_sequence_file, 'md5';
+  throws_ok {$r->execute} qr{Can't open '$cram_md5'},
     'error calling execute() on related objects';
 };
 
@@ -210,7 +210,7 @@ subtest 'finding phix subset files' => sub {
   my $fproot = $archive_16960 . '/16960_1#0_phix';
 
   my $r = npg_qc::autoqc::checks::bam_flagstats->new(
-    input_files         => [$fproot . '.bam'],
+    input_files         => [$fproot . '.cram'],
     related_results     => [],
     rpt_list            => '16960:1:0',
     subset              => 'phix',
