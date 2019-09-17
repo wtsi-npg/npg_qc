@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+  - change default file type to cram for bam_flagstats
+
 release 67.1.0
   - if DO_NOT_USE reference selected don't run VerifyBamID but provide
       explanatory comment in json output file
