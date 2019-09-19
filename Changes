@@ -1,7 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - bug fix for mqc skipper script which, because of filtering on
-   study name always gave count of unique studies on a run as one
+  - switch to bower@1.8.8 to solve security warning
+  - bug fix for mqc skipper script which, because of filtering on
+    study name always gave count of unique studies on a run as one
 
 release 67.3.0
   - change default file type to cram for genotype check
