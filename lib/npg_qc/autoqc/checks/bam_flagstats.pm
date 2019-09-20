@@ -38,7 +38,7 @@ Readonly::Scalar my $TARGET_STATS_PATTERN => 'target';
 Readonly::Scalar my $TARGET_AUTOSOME_STATS_PATTERN => 'target_autosome';
 Readonly::Scalar my $TARGET_STATS_DEFAULT_DEPTH => 15;
 Readonly::Scalar my $STATS_FILTER => '[[:alnum:]]+[\_[:lower:]]*?';
-Readonly::Scalar our $EXT => q[bam];
+Readonly::Scalar our $EXT => q[cram];
 
 has '+subset' => ( isa => 'Str', );
 

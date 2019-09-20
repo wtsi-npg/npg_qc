@@ -1,0 +1,249 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
+use Getopt::Long;
+use Pod::Usage;
+use Log::Log4perl qw(:levels);
+use DBI;
+use Readonly;
+use Try::Tiny;
+use Carp;
+
+use npg_tracking::Schema;
+use WTSI::DNAP::Warehouse::Schema;
+
+our $VERSION = '0';
+
+Readonly::Scalar my $EXCLUDE_STUDY_NAME   => 'Illumina Controls';
+Readonly::Scalar my $NUM_DISTINCT_STUDIES => 1;
+Readonly::Scalar my $RUN_STATUS_FROM      => 'qc review pending';
+Readonly::Scalar my $RUN_STATUS_TO        => 'archival pending';
+Readonly::Scalar my $INSTRUMENT_MODEL     => 'NovaSeq';
+
+my $dry_run = 1;
+my $study_name;
+
+GetOptions('dry_run|dry-run!' => \$dry_run,
+           'study_name=s'     => \$study_name,
+           'help'             => sub {
+             pod2usage(-verbose => 2,
+                       -exitval => 0)
+           });
+
+my $layout = '%d %-5p %c - %m%n';
+Log::Log4perl->easy_init({layout => $layout,
+                          level  => $INFO,
+                          utf8   => 1});
+
+my $logger = Log::Log4perl->get_logger();
+
+if (not $study_name) {
+  $logger->fatal('Study name should be given, use --study_name option');
+  exit 1;
+}
+
+my $tracking_schema = npg_tracking::Schema->connect();
+my @rows = $tracking_schema->resultset('Run')->search(
+  {'run_statuses.iscurrent'      => 1,
+   'run_status_dict.description' => $RUN_STATUS_FROM,
+   'instrument_format.model'     => $INSTRUMENT_MODEL},
+  {prefetch => [{'run_statuses' => 'run_status_dict'}, 'instrument_format']}
+							   )->all();
+if (!@rows) {
+  $logger->info("No $INSTRUMENT_MODEL runs with status $RUN_STATUS_FROM");
+  exit 0;
+}
+
+my @run_ids = map { $_->id_run } @rows;
+my $placeholders = join q[,], map { q[?] } @run_ids;
+
+my $dbh = WTSI::DNAP::Warehouse::Schema->connect->storage->dbh;
+my $query =
+   q[select p.id_run, count(distinct s.id_study_lims) as study_count ] .
+   q[from iseq_product_metrics p ] .
+   q[join iseq_flowcell f on p.id_iseq_flowcell_tmp=f.id_iseq_flowcell_tmp ] .
+   q[join study s on s.id_study_tmp=f.id_study_tmp ] .
+  qq[where s.name = ? and s.name != ? and p.id_run in (${placeholders}) ] .
+   q[group by p.id_run having study_count = ?];
+my $sth = $dbh->prepare($query) or croak "Failed to prepare statement: $DBI::errstr";
+# Run time database errors are thrown by the execute method, no need to
+# do anything special.
+$sth->execute($study_name, $EXCLUDE_STUDY_NAME, @run_ids, $NUM_DISTINCT_STUDIES);
+
+@run_ids = ();
+while (my @data = $sth->fetchrow_array()) {
+   push @run_ids, $data[0];
+}
+
+if (@run_ids) {
+  $logger->info(join qq[\n\t], q[],
+                qq[Study '$study_name'],
+                qq[runs to move from '$RUN_STATUS_FROM' to '$RUN_STATUS_TO':],
+                join q[, ], @run_ids);
+} else {
+  $logger->info("No runs to move for study '$study_name'");
+  exit 0;
+}
+
+if ($dry_run) {
+  $logger->info('DRY RUN mode, not changing run statuses');
+  exit 0;
+}
+
+my $rs = $tracking_schema->resultset('Run')->search({id_run => \@run_ids});
+while (my $row = $rs->next()) {
+
+  my $id_run= $row->id_run;
+
+  my $transaction = sub {
+    # It's been some time since we received the listing of
+    # potentially eligible runs, let's double check the
+    # current status of the run.
+    my $cs = $row->current_run_status_description;
+    if ($cs eq $RUN_STATUS_FROM) {
+      $row->update_run_status($RUN_STATUS_TO);
+      $cs = $RUN_STATUS_TO;
+    }
+    return $cs;
+  };
+
+  my $new_status;
+  my $error;
+  try {
+    $new_status = $tracking_schema->txn_do($transaction);
+  } catch {
+    $error = $_;
+  };
+
+  if ($error) {
+    my $m = "Failed to update status of run ${id_run}: $error";
+    if ($error =~ /Rollback failed/smx) {
+      $logger->fatal($m);
+      exit 1;
+    } else {
+      $logger->error($m);
+    }
+  } else {
+    my $m = "Status of run $id_run has been changed to '$new_status'";
+    if ($new_status eq $RUN_STATUS_TO) {
+      # We take the credit for changing the status, at least
+      # the new status is what we wanted to change to.
+      $logger->info($m);
+    } else {
+      # Somebody else has changed the status, and it's now not
+      # what we wanted it to be. No further action.
+      $logger->warn($m . ' outside of this script');
+    }
+  }
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+npg_mqc_skipper
+
+=head1 USAGE
+
+=head1 REQUIRED ARGUMENTS
+
+ Study name as --study_name
+
+=head1 OPTIONS
+
+=over
+
+=item  --study_name
+
+=item  --dry_run or --dry-run and --no-dry_run and --no-dry-run
+
+=back
+
+=head1 EXIT STATUS
+
+0 if run is deletable, 1 otherwise
+
+=head1 CONFIGURATION
+
+=head1 SYNOPSIS
+
+npg_mqc_skipper --study_name 'SOME STUDY' # runs in dry run mode
+npg_mqc_skipper --study_name 'SOME STUDY' --no-dry_run
+
+=head1 DESCRIPTION
+
+In dry run mode this script identifies and reports runs having
+'qc review pending' status where all samples apart from controls
+belong to the study given as the --study_name argument.
+
+In non-dry run mode the status of this runs is changed to
+'archival pending', ie the manual QC stage of the run life cycle
+is skipped.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=over
+
+=item strict
+
+=item warnings
+
+=item lib
+
+=item FindBin
+
+=item Carp
+
+=item Log::Log4perl
+
+=item Getopt::Long
+
+=item Pod::Usage
+
+=item DBI
+
+=item Readonly
+
+=item Try::Tiny
+
+=item npg_tracking::Schema
+
+=item WTSI::DNAP::Warehouse::Schema
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Marina Gourtovaia
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2019 Genome Research Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
