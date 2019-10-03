@@ -29,10 +29,20 @@ Readonly::Hash my %METRICS_FIELD_MAPPING => {
    'ESTIMATED_LIBRARY_SIZE'       => 'library_size'
 };
 
+Readonly::Hash my %SAMTOOLS_METRICS_FIELD_MAPPING => {
+   'LIBRARY'                      => 'library',
+   'PAIRED'          => 'read_pairs_examined',
+   'DUPLICATE SINGLE'     => 'unpaired_read_duplicates',
+   'DUPLICATE PAIR'         => 'paired_read_duplicates',
+   'DUPLICATE OPTICAL' => 'read_pair_optical_duplicates',
+   'PERCENT_DUPLICATION'          => 'percent_duplicate',
+   'ESTIMATED_LIBRARY_SIZE'       => 'library_size'
+};
+
 # picard and biobambam mark duplicates assign this
 # value for aligned data with no mapped paired reads
 Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
-Readonly::Scalar my $METRICS_NUMBER => 9;
+Readonly::Scalar my $METRICS_NUMBER => 10;
 Readonly::Scalar my $PAIR_NUMBER => 2;
 Readonly::Scalar my $TARGET_STATS_PATTERN => 'target';
 Readonly::Scalar my $TARGET_AUTOSOME_STATS_PATTERN => 'target_autosome';
@@ -181,45 +191,65 @@ sub _parse_markdups_metrics {
   my @file_contents = slurp ( $self->markdups_metrics_file, { irs => qr/\n\n/mxs } );
 
   my $header = $file_contents[0];
-  chomp $header;
-  $self->result()->set_info('markdups_metrics_header', $header);
 
-  my $metrics    = $file_contents[1];
-  my $histogram  = $file_contents[2];
+  if($header =~ /^COMMAND: .*samtools markdup/) {
+    my %metrics = map { split q/:/ } (split "\n", $header);
 
-  my @metrics_lines   = split /\n/mxs, $metrics;
-  my @metrics_header  = split /\t/mxs, $metrics_lines[1];
-  my @metrics_numbers = split /\t/mxs, $metrics_lines[2];
+    @metrics{keys %metrics} = (map {(my $s=$_) =~ s/^\s*//; $s=~s/\s*$//; $s } values %metrics); # remove any leading and trailing spaces from values
 
-  my %metrics;
-  @metrics{@metrics_header} = @metrics_numbers;
+    for my $field (keys %SAMTOOLS_METRICS_FIELD_MAPPING) {
+      my $field_value = $metrics{$field};
 
-  if (scalar  @metrics_numbers > $METRICS_NUMBER ) {
-    croak 'MarkDuplicate metrics format is wrong';
+      ($field eq q[PAIRED] or $field eq q[DUPLICATE PAIR]) && ($field_value /= 2);
+      ($field eq q[DUPLICATE OPTICAL]) && ($field_value = ($field_value - $metrics{'DUPLICATE SINGLE OPTICAL'})/2);
+      ($field eq q[PERCENT_DUPLICATION]) && ($field_value = sprintf q[%0.6f], ($metrics{'DUPLICATE PAIR'} + $metrics{'DUPLICATE SINGLE'}) / $metrics{'EXAMINED'});
+      ($field eq q[COMMAND]) && next;
+
+      $self->result->${\$SAMTOOLS_METRICS_FIELD_MAPPING{$field}}($field_value);
+    }
+
+    # note: no histogram from samtools markdup
   }
-
-  foreach my $field (keys %METRICS_FIELD_MAPPING){
-    my $field_value = $metrics{$field};
-    if ($field_value) {
-      if ($field_value =~/\?/mxs) {
-        $field_value = undef;
-      } elsif ($field eq 'ESTIMATED_LIBRARY_SIZE' && $field_value < 0) {
-        if ($field_value == $LIBRARY_SIZE_NOT_AVAILABLE) {
+  else { # not samtools, assume picard
+    chomp $header;
+    $self->result()->set_info('markdups_metrics_header', $header);
+  
+    my $metrics    = $file_contents[1];
+    my $histogram  = $file_contents[2];
+  
+    my @metrics_lines   = split /\n/mxs, $metrics;
+    my @metrics_header  = split /\t/mxs, $metrics_lines[1];
+    my @metrics_numbers = split /\t/mxs, $metrics_lines[2];
+  
+    my %metrics;
+    @metrics{@metrics_header} = @metrics_numbers;
+  
+    if (scalar  @metrics_numbers > $METRICS_NUMBER ) {
+      croak 'MarkDuplicate metrics format is wrong';
+    }
+  
+    foreach my $field (keys %METRICS_FIELD_MAPPING){
+      my $field_value = $metrics{$field};
+      if ($field_value) {
+        if ($field_value =~/\?/mxs) {
           $field_value = undef;
-        } else {
-          croak "Library size less than $LIBRARY_SIZE_NOT_AVAILABLE";
+        } elsif ($field eq 'ESTIMATED_LIBRARY_SIZE' && $field_value < 0) {
+          if ($field_value == $LIBRARY_SIZE_NOT_AVAILABLE) {
+            $field_value = undef;
+          } else {
+            croak "Library size less than $LIBRARY_SIZE_NOT_AVAILABLE";
+          }
         }
       }
+      $self->result()->${\$METRICS_FIELD_MAPPING{$field}}( $field_value );
     }
-    $self->result()->${\$METRICS_FIELD_MAPPING{$field}}( $field_value );
+  
+    if ($histogram) {
+      my @histogram_lines = split /\n/mxs, $histogram;
+      my %histogram_hash = map { $_->[0] => $_->[1] } map{ [split /\s/mxs] } grep {/^[\d]/mxs } @histogram_lines;
+      $self->result()->histogram(\%histogram_hash);
+    }
   }
-
-  if ($histogram) {
-    my @histogram_lines = split /\n/mxs, $histogram;
-    my %histogram_hash = map { $_->[0] => $_->[1] } map{ [split /\s/mxs] } grep {/^[\d]/mxs } @histogram_lines;
-    $self->result()->histogram(\%histogram_hash);
-  }
-
   return;
 }
 
