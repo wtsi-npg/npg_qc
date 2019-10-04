@@ -192,10 +192,10 @@ sub _parse_markdups_metrics {
 
   my $header = $file_contents[0];
 
-  if($header =~ /^COMMAND: .*samtools markdup/) {
-    my %metrics = map { split q/:/ } (split "\n", $header);
+  if($header =~ /^COMMAND:[^\n]*samtools[ ]markdup/smx) {
+    my %metrics = map { split /:/smx } (split /\n/smx, $header);
 
-    @metrics{keys %metrics} = (map {(my $s=$_) =~ s/^\s*//; $s=~s/\s*$//; $s } values %metrics); # remove any leading and trailing spaces from values
+    @metrics{keys %metrics} = (map { _trim($_) } values %metrics); # remove any leading and trailing spaces from values
 
     for my $field (keys %SAMTOOLS_METRICS_FIELD_MAPPING) {
       my $field_value = $metrics{$field};
@@ -213,21 +213,21 @@ sub _parse_markdups_metrics {
   else { # not samtools, assume picard
     chomp $header;
     $self->result()->set_info('markdups_metrics_header', $header);
-  
+
     my $metrics    = $file_contents[1];
     my $histogram  = $file_contents[2];
-  
+
     my @metrics_lines   = split /\n/mxs, $metrics;
     my @metrics_header  = split /\t/mxs, $metrics_lines[1];
     my @metrics_numbers = split /\t/mxs, $metrics_lines[2];
-  
+
     my %metrics;
     @metrics{@metrics_header} = @metrics_numbers;
-  
+
     if (scalar  @metrics_numbers > $METRICS_NUMBER ) {
       croak 'MarkDuplicate metrics format is wrong';
     }
-  
+
     foreach my $field (keys %METRICS_FIELD_MAPPING){
       my $field_value = $metrics{$field};
       if ($field_value) {
@@ -243,7 +243,7 @@ sub _parse_markdups_metrics {
       }
       $self->result()->${\$METRICS_FIELD_MAPPING{$field}}( $field_value );
     }
-  
+
     if ($histogram) {
       my @histogram_lines = split /\n/mxs, $histogram;
       my %histogram_hash = map { $_->[0] => $_->[1] } map{ [split /\s/mxs] } grep {/^[\d]/mxs } @histogram_lines;
@@ -251,6 +251,16 @@ sub _parse_markdups_metrics {
     }
   }
   return;
+}
+
+sub _trim {
+  my ($s) = @_;
+
+  # remove any leading and trailing spaces
+  $s =~ s/^\s*//smx;
+  $s=~s/\s*$//smx;
+
+  return $s;
 }
 
 sub _parse_flagstats {
