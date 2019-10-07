@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+  - change default file type to cram for genotype check
+
 release 67.2.0
   - script to move NovaSeq runs for a particular study
   - change default file type to cram for bam_flagstats
