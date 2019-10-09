@@ -22,7 +22,7 @@ Readonly::Scalar my $NUM_DISTINCT_STUDIES => 1;
 Readonly::Scalar my $RUN_STATUS_FROM      => 'qc review pending';
 Readonly::Scalar my $RUN_STATUS_TO        => 'archival pending';
 Readonly::Scalar my $INSTRUMENT_MODEL     => 'NovaSeq';
-Readonly::Scalar my $DEPLEXING_PERCENT_THRESHOLD => 90;
+Readonly::Scalar my $DEPLEXING_PERCENT_THRESHOLD => 93;
 
 my $dry_run = 1;
 my $study_name;
@@ -202,7 +202,7 @@ npg_mqc_skipper --study_name 'SOME STUDY' --no-dry_run
 In dry run mode this script identifies and reports runs having
 'qc review pending' status where all samples apart from controls
 belong to the study given as the --study_name argument and
-deplexing percent for all lanes of any such run is 90% or above.
+deplexing percent for all lanes of any such run is 93% or above.
 
 In non-dry run mode the status of this runs is changed to
 'archival pending', ie the manual QC stage of the run life cycle
