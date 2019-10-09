@@ -30,7 +30,7 @@ Readonly::Hash my %METRICS_FIELD_MAPPING => {
 };
 
 Readonly::Hash my %SAMTOOLS_METRICS_FIELD_MAPPING => {
-   'LIBRARY'                      => 'library', 
+   'LIBRARY'                      => 'library',
    'PAIRED'                       => 'read_pairs_examined',
    'DUPLICATE SINGLE'             => 'unpaired_read_duplicates',
    'DUPLICATE PAIR'               => 'paired_read_duplicates',

@@ -600,7 +600,9 @@ subtest 'test samtools markdups metrics' => sub {
   } 'no error when serializing to json string and file';
 
   foreach my $res ($expected, $result_json){
+     delete $res->{'__CLASS__'};
      delete $res->{'composition'};
+     delete $res->{'info'}->{'Check'};
      delete $res->{'info'}->{'Check_version'};
   }
 
