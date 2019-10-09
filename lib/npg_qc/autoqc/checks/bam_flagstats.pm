@@ -30,18 +30,16 @@ Readonly::Hash my %METRICS_FIELD_MAPPING => {
 };
 
 Readonly::Hash my %SAMTOOLS_METRICS_FIELD_MAPPING => {
-   'LIBRARY'                      => 'library',
-   'PAIRED'          => 'read_pairs_examined',
-   'DUPLICATE SINGLE'     => 'unpaired_read_duplicates',
-   'DUPLICATE PAIR'         => 'paired_read_duplicates',
-   'DUPLICATE OPTICAL' => 'read_pair_optical_duplicates',
+   'LIBRARY'                      => 'library', 
+   'PAIRED'                       => 'read_pairs_examined',
+   'DUPLICATE SINGLE'             => 'unpaired_read_duplicates',
+   'DUPLICATE PAIR'               => 'paired_read_duplicates',
+   'DUPLICATE OPTICAL'            => 'read_pair_optical_duplicates',
    'PERCENT_DUPLICATION'          => 'percent_duplicate',
    'ESTIMATED_LIBRARY_SIZE'       => 'library_size'
 };
 
-# picard and biobambam mark duplicates assign this
-# value for aligned data with no mapped paired reads
-Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
+Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;  # assigned to ESTIMATED_LIBRARY_SIZE by picard and biobambam for aligned data with no mapped paired reads
 Readonly::Scalar my $METRICS_NUMBER => 10;
 Readonly::Scalar my $PAIR_NUMBER => 2;
 Readonly::Scalar my $TARGET_STATS_PATTERN => 'target';
@@ -193,6 +191,10 @@ sub _parse_markdups_metrics {
   my $header = $file_contents[0];
 
   if($header =~ /^COMMAND:[^\n]*samtools[ ]markdup/smx) {
+    chomp $header;
+    $self->result()->set_info('markdups_metrics_header', $header);
+
+    $header =~ s/ESTIMATED_LIBRARY_SIZE[^:]/ESTIMATED_LIBRARY_SIZE:/smx; # temporary workaround for samtools markdup metrics format bug
     my %metrics = map { split /:/smx } (split /\n/smx, $header);
 
     @metrics{keys %metrics} = (map { _trim($_) } values %metrics); # remove any leading and trailing spaces from values
@@ -201,8 +203,7 @@ sub _parse_markdups_metrics {
       my $field_value = $metrics{$field};
 
       ($field eq q[PAIRED] or $field eq q[DUPLICATE PAIR]) && ($field_value /= 2);
-      ($field eq q[DUPLICATE OPTICAL]) && ($field_value = ($field_value - $metrics{'DUPLICATE SINGLE OPTICAL'})/2);
-      ($field eq q[PERCENT_DUPLICATION]) && ($field_value = sprintf q[%0.6f], ($metrics{'DUPLICATE PAIR'} + $metrics{'DUPLICATE SINGLE'}) / $metrics{'EXAMINED'});
+      ($field eq q[PERCENT_DUPLICATION]) && ((($field_value = $metrics{'EXAMINED'}) == 0) || ($field_value = sprintf q[%0.6f], ($metrics{'DUPLICATE PAIR'} + $metrics{'DUPLICATE SINGLE'}) / $metrics{'EXAMINED'}));
       ($field eq q[COMMAND]) && next;
 
       $self->result->${\$SAMTOOLS_METRICS_FIELD_MAPPING{$field}}($field_value);
@@ -210,7 +211,7 @@ sub _parse_markdups_metrics {
 
     # note: no histogram from samtools markdup
   }
-  else { # not samtools, assume picard
+  else { # not samtools, assume picard/biobambam2 format
     chomp $header;
     $self->result()->set_info('markdups_metrics_header', $header);
 
