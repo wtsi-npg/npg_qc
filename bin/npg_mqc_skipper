@@ -22,6 +22,7 @@ Readonly::Scalar my $NUM_DISTINCT_STUDIES => 1;
 Readonly::Scalar my $RUN_STATUS_FROM      => 'qc review pending';
 Readonly::Scalar my $RUN_STATUS_TO        => 'archival pending';
 Readonly::Scalar my $INSTRUMENT_MODEL     => 'NovaSeq';
+Readonly::Scalar my $DEPLEXING_PERCENT_THRESHOLD => 90;
 
 my $dry_run = 1;
 my $study_name;
@@ -57,8 +58,13 @@ if (!@rows) {
   exit 0;
 }
 
+my $run_list = sub {
+  my @ids = @_;
+  return join q[,], map { q[?] } @ids;
+};
+
 my @run_ids = map { $_->id_run } @rows;
-my $placeholders = join q[,], map { q[?] } @run_ids;
+my $placeholders = $run_list->(@run_ids);
 
 my $dbh = WTSI::DNAP::Warehouse::Schema->connect->storage->dbh;
 my $query =
@@ -76,6 +82,21 @@ $sth->execute($study_name, $EXCLUDE_STUDY_NAME, @run_ids, $NUM_DISTINCT_STUDIES)
 @run_ids = ();
 while (my @data = $sth->fetchrow_array()) {
    push @run_ids, $data[0];
+}
+
+if (@run_ids) {
+  $placeholders = $run_list->(@run_ids);
+  $query =  q[select distinct(id_run) from iseq_run_lane_metrics ] .
+           qq[where tags_decode_percent < ? and id_run in (${placeholders})];
+  $sth = $dbh->prepare($query) or croak "Failed to prepare statement: $DBI::errstr";
+  $sth->execute($DEPLEXING_PERCENT_THRESHOLD, @run_ids);
+  my $temp = {};
+  while (my @data = $sth->fetchrow_array()) {
+     $temp->{$data[0]} = 1;
+  }
+  if (keys %{$temp}) {
+    @run_ids = grep { not $temp->{$_} } @run_ids;
+  }
 }
 
 if (@run_ids) {
@@ -179,7 +200,8 @@ npg_mqc_skipper --study_name 'SOME STUDY' --no-dry_run
 
 In dry run mode this script identifies and reports runs having
 'qc review pending' status where all samples apart from controls
-belong to the study given as the --study_name argument.
+belong to the study given as the --study_name argument and
+deplexing percent for all lanes of any such run is 90% or above.
 
 In non-dry run mode the status of this runs is changed to
 'archival pending', ie the manual QC stage of the run life cycle
