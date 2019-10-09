@@ -87,7 +87,8 @@ while (my @data = $sth->fetchrow_array()) {
 if (@run_ids) {
   $placeholders = $run_list->(@run_ids);
   $query =  q[select distinct(id_run) from iseq_run_lane_metrics ] .
-           qq[where tags_decode_percent < ? and id_run in (${placeholders})];
+            q[where (tags_decode_percent is null or tags_decode_percent < ?) ] .
+           qq[and id_run in (${placeholders})];
   $sth = $dbh->prepare($query) or croak "Failed to prepare statement: $DBI::errstr";
   $sth->execute($DEPLEXING_PERCENT_THRESHOLD, @run_ids);
   my $temp = {};
