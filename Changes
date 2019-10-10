@@ -1,6 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 67.3.0
   - change default file type to cram for genotype check
+  - script for skippimg manual QC step: an additional filter
+    to ensure that the all lanes for a run that bypasses
+    manual QC deplexed properly
 
 release 67.2.0
   - script to move NovaSeq runs for a particular study
