@@ -202,7 +202,7 @@ sub _parse_markdups_metrics {
     for my $field (keys %SAMTOOLS_METRICS_FIELD_MAPPING) {
       my $field_value = $metrics{$field};
 
-      ($field eq q[PAIRED] or $field eq q[DUPLICATE PAIR]) && ($field_value /= 2);
+      ($field eq q[PAIRED] or $field eq q[DUPLICATE PAIR] or $field eq q[DUPLICATE OPTICAL]) && ($field_value /= 2);
       ($field eq q[PERCENT_DUPLICATION]) && ((($field_value = $metrics{'EXAMINED'}) == 0) || ($field_value = sprintf q[%0.6f], ($metrics{'DUPLICATE PAIR'} + $metrics{'DUPLICATE SINGLE'}) / $metrics{'EXAMINED'}));
       ($field eq q[COMMAND]) && next;
 
