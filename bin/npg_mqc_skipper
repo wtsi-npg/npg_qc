@@ -63,6 +63,15 @@ my $run_list = sub {
   return join q[,], map { q[?] } @ids;
 };
 
+my $get_run_ids = sub {
+  my $sth = shift;
+  my @run_ids = ();
+  while (my @data = $sth->fetchrow_array()) {
+    push @run_ids, $data[0];
+  }
+  return @run_ids;
+};
+
 my @run_ids = map { $_->id_run } @rows;
 my $placeholders = $run_list->(@run_ids);
 
@@ -72,16 +81,24 @@ my $query =
    q[from iseq_product_metrics p ] .
    q[join iseq_flowcell f on p.id_iseq_flowcell_tmp=f.id_iseq_flowcell_tmp ] .
    q[join study s on s.id_study_tmp=f.id_study_tmp ] .
-  qq[where s.name = ? and s.name != ? and p.id_run in (${placeholders}) ] .
+  qq[where s.name != ? and p.id_run in (${placeholders}) ] .
    q[group by p.id_run having study_count = ?];
 my $sth = $dbh->prepare($query) or croak "Failed to prepare statement: $DBI::errstr";
 # Run time database errors are thrown by the execute method, no need to
 # do anything special.
-$sth->execute($study_name, $EXCLUDE_STUDY_NAME, @run_ids, $NUM_DISTINCT_STUDIES);
+$sth->execute($EXCLUDE_STUDY_NAME, @run_ids, $NUM_DISTINCT_STUDIES);
+@run_ids = $get_run_ids->($sth);
 
-@run_ids = ();
-while (my @data = $sth->fetchrow_array()) {
-   push @run_ids, $data[0];
+if (@run_ids) {
+  $placeholders = $run_list->(@run_ids);
+  $query =
+     q[select distinct p.id_run from iseq_product_metrics p join iseq_flowcell f ] .
+     q[on p.id_iseq_flowcell_tmp=f.id_iseq_flowcell_tmp ] .
+     q[join study s on s.id_study_tmp=f.id_study_tmp ] .
+    qq[where s.name = ? and p.id_run in (${placeholders})];
+  $sth = $dbh->prepare($query) or croak "Failed to prepare statement: $DBI::errstr";
+  $sth->execute($study_name, @run_ids);
+  @run_ids = $get_run_ids->($sth);
 }
 
 if (@run_ids) {

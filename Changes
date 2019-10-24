@@ -1,8 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - bug fix for mqc skipper script which, because of filtering on
+   study name always gave count of unique studies on a run as one
+
 release 67.3.0
   - change default file type to cram for genotype check
-  - script for skippimg manual QC step: an additional filter
+  - script for skipping manual QC step: an additional filter
     to ensure that the all lanes for a run that bypasses
     manual QC deplexed properly
 
