@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Exception;
 use Test::Deep;
 use File::Temp qw( tempdir );
@@ -560,6 +560,53 @@ subtest 'full functionality with optional target and autosome target stats' => s
       is_deeply($results_from_json, $expected_from_json, 'correct json output');
  }
 
+};
+
+my $archive_30917 = '30917_1_1';
+my $ae_30917 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_30917}.tar.gz");
+$ae_30917->extract(to => $tempdir) or die $ae->error;
+$archive_30917 = join q[/], $tempdir, $archive_30917;
+my $qc_in = qq[$archive_30917/30917_1#1];
+my $markdups_metrics_file = qq[$qc_in/30917_1#1.markdups_metrics.txt];
+my $flagstat_file = qq[$qc_in/30917_1#1.flagstat];
+my $input_file = qq[$qc_in/30917_1#1.cram];
+my $qc_out = join q[/], $qc_in, 'qc';
+
+subtest 'test samtools markdups metrics' => sub {
+  plan tests => 3;
+
+  mkdir $qc_out;
+
+  my $c = npg_qc::autoqc::checks::bam_flagstats->new(
+                        id_run                 => 30917,
+                        position               => 1,
+                        tag_index              => 1,
+                        qc_in                  => $qc_in,
+                        qc_out                 => $qc_out,
+                        markdups_metrics_file  => $markdups_metrics_file,
+                        flagstats_metrics_file => $flagstat_file,
+                        input_files            => [$input_file],
+                       );
+
+  my $expected = from_json(slurp qq{$qc_in/qc_expected/30917_1#1.bam_flagstats.json}, {chomp=>1});
+  $expected->{path} = qq{$tempdir/$expected->{path}};
+
+  lives_ok { $c->execute() } 'execute method is ok';
+  my $r;
+  my $result_json;
+  lives_ok {
+    $r = $c->result();
+    $result_json = from_json($r->freeze());
+  } 'no error when serializing to json string and file';
+
+  foreach my $res ($expected, $result_json){
+     delete $res->{'__CLASS__'};
+     delete $res->{'composition'};
+     delete $res->{'info'}->{'Check'};
+     delete $res->{'info'}->{'Check_version'};
+  }
+
+  is_deeply($result_json, $expected, 'correct json output');
 };
 
 1;
