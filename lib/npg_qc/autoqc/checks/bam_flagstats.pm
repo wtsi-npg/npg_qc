@@ -34,7 +34,7 @@ Readonly::Hash my %SAMTOOLS_METRICS_FIELD_MAPPING => {
    'PAIRED'                       => 'read_pairs_examined',
    'DUPLICATE SINGLE'             => 'unpaired_read_duplicates',
    'DUPLICATE PAIR'               => 'paired_read_duplicates',
-   'DUPLICATE OPTICAL'            => 'read_pair_optical_duplicates',
+   'DUPLICATE PAIR OPTICAL'       => 'read_pair_optical_duplicates',
    'PERCENT_DUPLICATION'          => 'percent_duplicate',
    'ESTIMATED_LIBRARY_SIZE'       => 'library_size'
 };
@@ -194,7 +194,6 @@ sub _parse_markdups_metrics {
     chomp $header;
     $self->result()->set_info('markdups_metrics_header', $header);
 
-    $header =~ s/ESTIMATED_LIBRARY_SIZE[^:]/ESTIMATED_LIBRARY_SIZE:/smx; # temporary workaround for samtools markdup metrics format bug
     my %metrics = map { split /:/smx } (split /\n/smx, $header);
 
     @metrics{keys %metrics} = (map { _trim($_) } values %metrics); # remove any leading and trailing spaces from values
@@ -202,7 +201,7 @@ sub _parse_markdups_metrics {
     for my $field (keys %SAMTOOLS_METRICS_FIELD_MAPPING) {
       my $field_value = $metrics{$field};
 
-      ($field eq q[PAIRED] or $field eq q[DUPLICATE PAIR] or $field eq q[DUPLICATE OPTICAL]) && ($field_value /= 2);
+      ($field eq q[PAIRED] or $field eq q[DUPLICATE PAIR] or $field eq q[DUPLICATE PAIR OPTICAL]) && ($field_value /= 2);
       ($field eq q[PERCENT_DUPLICATION]) && ((($field_value = $metrics{'EXAMINED'}) == 0) || ($field_value = sprintf q[%0.6f], ($metrics{'DUPLICATE PAIR'} + $metrics{'DUPLICATE SINGLE'}) / $metrics{'EXAMINED'}));
       ($field eq q[COMMAND]) && next;
 
