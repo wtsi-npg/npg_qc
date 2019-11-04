@@ -1,7 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 67.4.0
  - bug fix for mqc skipper script which, because of filtering on
    study name always gave count of unique studies on a run as one
+ - bam_flagstats autoqc check - detect and parse samtools markdup metrics
 
 release 67.3.0
   - change default file type to cram for genotype check
