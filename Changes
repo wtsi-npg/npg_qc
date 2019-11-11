@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - custom parser for Illumina InterOp files; parses selected files,
+   produces exact (not rounded) cluster counts
 release 67.4.0
  - bug fix for mqc skipper script which, because of filtering on
    study name always gave count of unique studies on a run as one

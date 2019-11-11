@@ -628,3 +628,5 @@ t/data/samtools_stats/27138_1#2_F0xB00.stats
 t/data/samtools_stats/27258_1#1.empty.stats
 t/data/samtools_stats/27053_1#1.single.stats
 t/data/26601_qc_archive.tar.gz
+t/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp/ExtendedTileMetricsOut.bin
+t/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp/TileMetricsOut.bin

@@ -1,27 +1,39 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Test::Exception;
 
-use npg_qc::autoqc::results::illumina_analysis;
-
-use_ok('npg_qc::autoqc::checks::illumina_analysis');
+use_ok('npg_qc::illumina::interop::parser');
 
 {
-  my $check = npg_qc::autoqc::checks::illumina_analysis->new(
-    rpt_list  => '26261:1;26261:2;26261:3;26261:4',
-    path      => 't/data/autoqc/180626_A00538_0008_AH5HJ5DSXX'
+  my $p = npg_qc::illumina::interop::parser->new(
+    runfolder_path => 't/data/autoqc',
   );
-  isa_ok($check, 'npg_qc::autoqc::checks::illumina_analysis');
-  lives_ok {$check->execute()} 'executing is OK';
- 
-  my $e = npg_qc::autoqc::checks::illumina_analysis->new(
-    qc_in       => 't/data/autoqc/180626_A00538_0008_AH5HJ5DSXX',
-    rpt_list    => '26261:1;26261:2;26261:3;26261:4',
-    input_files => [qw(t/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp/TileMetricsOut.bin
-                       t/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp/ExtendedTileMetricsOut.bin)],
-  );
+  throws_ok { $p->parse() }
+    qr/InterOp files directory t\/data\/autoqc\/InterOp does not exist/,
+    'error when InterOp directory does not exist';
 
+  $p = npg_qc::illumina::interop::parser->new(
+    interop_path => 't/data/autoqc',
+  );
+  throws_ok { $p->parse() }
+    qr/t\/data\/autoqc\/TileMetricsOut.bin does not exist/,
+    'error when InterOp directory does not exist';  
+}
+
+{
+  my $p = npg_qc::illumina::interop::parser->new(
+    runfolder_path => 't/data/autoqc/180626_A00538_0008_AH5HJ5DSXX'
+  );
+  isa_ok($p, 'npg_qc::illumina::interop::parser');
+  lives_ok { $p->parse() } 'parsing is OK';
+
+  $p = npg_qc::illumina::interop::parser->new(
+    interop_path => 't/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp'
+  );
+  my $data;
+  lives_ok { $data = $p->parse() } 'parsing is OK';
+ 
   my %lane_metrics = ();
   $lane_metrics{'aligned_mean'}->{1}->{1}        = 0.731618344783783;
   $lane_metrics{'aligned_mean'}->{1}->{4}        = 0.724208116531372;
@@ -42,19 +54,7 @@ use_ok('npg_qc::autoqc::checks::illumina_analysis');
   $lane_metrics{'occupied_mean'}->{1}            = 76.2887887887888;
   $lane_metrics{'occupied_stdev'}->{1}           = 0;
 
-  $e->result->lane_metrics(\%lane_metrics);
-  is_deeply($check->result, $e->result, 'result object for a paired run');
-}
-
-{
-  my $check = npg_qc::autoqc::checks::illumina_analysis->new(
-    position  => 1,
-    qc_in     => 't/data/autoqc/181218_MS8_27801_A_MS7510412-300V2',
-    id_run    => 27801, 
-  );
-  throws_ok {$check->execute}
-    qr/t\/data\/autoqc\/181218_MS8_27801_A_MS7510412-300V2\/InterOp\/TileMetricsOut.bin does not exist at/,
-    'error when input not found';
+  is_deeply($data, \%lane_metrics, 'result for a paired run');
 }
 
 1;
