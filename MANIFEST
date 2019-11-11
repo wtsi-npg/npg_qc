@@ -15,6 +15,7 @@ bin/call_gtck_composite_rpt.pl
 bin/genotype_call_results_reporter
 Build.PL
 Changes
+lib/npg_qc/illumina/interop/parser.pm
 lib/npg_qc/illumina/loader/Cluster_Density.pm
 lib/npg_qc/illumina/loader.pm
 lib/npg_qc/autoqc/autoqc.pm
@@ -159,6 +160,7 @@ t/00-podcoverage.t
 t/00-pod.t
 t/00-scripts_compile.t
 t/10-autoqc-parse-samtools_stats.t
+t/30-illumina-interop-parser.t
 t/30-illumina-loader-Cluster_Density.t
 t/30-illumina-loader.t
 t/50-npg_qc-Schema.t
