@@ -25,6 +25,7 @@ lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/checks/bam_flagstats.pm
 lib/npg_qc/autoqc/checks/bcfstats.pm
 lib/npg_qc/autoqc/checks/check.pm
+lib/npg_qc/autoqc/checks/interop.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
 lib/npg_qc/autoqc/checks/genotype.pm
@@ -56,6 +57,7 @@ lib/npg_qc/autoqc/results/bcfstats.pm
 lib/npg_qc/autoqc/results/base.pm
 lib/npg_qc/autoqc/results/collection.pm
 lib/npg_qc/autoqc/results/contamination.pm
+lib/npg_qc/autoqc/results/interop.pm
 lib/npg_qc/autoqc/results/gc_bias.pm
 lib/npg_qc/autoqc/results/gc_fraction.pm
 lib/npg_qc/autoqc/results/genotype.pm
@@ -81,6 +83,7 @@ lib/npg_qc/autoqc/role/adapter.pm
 lib/npg_qc/autoqc/role/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/role/bam_flagstats.pm
 lib/npg_qc/autoqc/role/contamination.pm
+lib/npg_qc/autoqc/role/interop.pm
 lib/npg_qc/autoqc/role/gc_fraction.pm
 lib/npg_qc/autoqc/role/genotype.pm
 lib/npg_qc/autoqc/role/genotype_call.pm
@@ -206,6 +209,7 @@ t/60-autoqc-checks-af_metrics.t
 t/60-autoqc-checks-bam_flagstats.t
 t/60-autoqc-checks-bcfstats.t
 t/60-autoqc-checks-check.t
+t/60-autoqc-checks-interop.t 
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-genotype.t
@@ -235,6 +239,7 @@ t/60-autoqc-results-bam_flagstats.t
 t/60-autoqc-results-bcfstats.t
 t/60-autoqc-results-collection.t
 t/60-autoqc-results-contamination.t
+t/60-autoqc-results-interop.t
 t/60-autoqc-results-gc_bias.t
 t/60-autoqc-results-gc_fraction.t
 t/60-autoqc-results-genotype.t
