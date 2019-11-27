@@ -330,7 +330,8 @@ execution and writes out test results to the output directory.
 sub run {
   my $self = shift;
   $self->execute();
-  my @results = ($self->result());
+  my @results = ref $self->result() eq q[ARRAY] ?
+                @{$self->result()} : ($self->result());
   if ($self->can('related_results')) {
     push @results, @{$self->related_results()};
   }
@@ -599,7 +600,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2019 GRL
 
 This file is part of NPG.
 
