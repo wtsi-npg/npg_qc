@@ -1,6 +1,15 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
   - interop parser - extra tests and a fix some result hash keys
+ - provisions for having an array of result objects in the result
+   attribute of the autoqc check object
+ - using moniker role to generate file name root in a standard way
+   from a composition - needed if the result attribute is an array
+   since passing the file name root to the check will not be the right
+   thing to do (multiple file names are needed in this case, so there
+   is no option but delegation it to teh result object itself)
+ - redundant result role methods filename_root_from_filename and
+   is_old_style_result are removed
 
 release 67.5.0
 - npg_qc::illumina::interop::parser - a stand-alone custom parser

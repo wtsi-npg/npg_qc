@@ -18,7 +18,17 @@ use_ok ('npg_qc::autoqc::results::bam_flagstats');
 use_ok ('npg_qc::autoqc::checks::bam_flagstats');
 
 my $data_dir = join q[/], $tempdir, 'bam_flagstats';
-dircopy('t/data/autoqc/bam_flagstats', $data_dir) or die 'Faile to copy';
+dircopy('t/data/autoqc/bam_flagstats', $data_dir) or die 'Failed to copy';
+
+sub _prune_result_hash {
+  my $result = shift;
+  my %to_remove =
+    map { $_ => 1 }
+    qw/__CLASS__ composition info path/;
+  foreach my $key (keys %{$result}) {
+    ($to_remove{$key} or $key =~ /\A_/ ) and delete $result->{$key};
+  }
+}
 
 subtest 'test attributes and simple methods' => sub {
   plan tests => 4;
@@ -464,20 +474,13 @@ subtest 'full functionality with optional target stats' => sub {
       }
  
       my $expected_from_json = from_json(
-         slurp qq{$archive_25837/qc/all_json/25837_1#13.bam_flagstats.json}, {chomp=>1});
+        slurp qq{$archive_25837/qc/all_json/25837_1#13.bam_flagstats.json}, {chomp=>1});
 
       my $results_from_json = from_json(
-         slurp qq{$local_qc_dir/25837_1#13.bam_flagstats.json}, {chomp=>1});
+        slurp qq{$local_qc_dir/25837_1#13.bam_flagstats.json}, {chomp=>1});
 
-      foreach my $res ($expected_from_json, $results_from_json){
-         delete $res->{'__CLASS__'};
-         delete $res->{'composition'};
-         delete $res->{'info'}->{'Check'};
-         delete $res->{'info'}->{'Check_version'};
-         delete $res->{'path'};
-      }
-
-      is_deeply($results_from_json, $expected_from_json, 'correct json output');
+      is_deeply(_prune_result_hash($results_from_json),
+                _prune_result_hash($expected_from_json), 'correct json output');
  }
 
 };
@@ -544,20 +547,13 @@ subtest 'full functionality with optional target and autosome target stats' => s
       }
  
       my $expected_from_json = from_json(
-         slurp qq{$archive_29006/qc/all_json/29006_8#1.bam_flagstats.json}, {chomp=>1});
+        slurp qq{$archive_29006/qc/all_json/29006_8#1.bam_flagstats.json}, {chomp=>1});
 
       my $results_from_json = from_json(
-         slurp qq{$local_qc_dir/29006_8#1.bam_flagstats.json}, {chomp=>1});
+        slurp qq{$local_qc_dir/29006_8#1.bam_flagstats.json}, {chomp=>1});
 
-      foreach my $res ($expected_from_json, $results_from_json){
-         delete $res->{'__CLASS__'};
-         delete $res->{'composition'};
-         delete $res->{'info'}->{'Check'};
-         delete $res->{'info'}->{'Check_version'};
-         delete $res->{'path'};
-      }
-
-      is_deeply($results_from_json, $expected_from_json, 'correct json output');
+      is_deeply(_prune_result_hash($results_from_json),
+                _prune_result_hash($expected_from_json), 'correct json output');
  }
 
 };
@@ -599,14 +595,8 @@ subtest 'test samtools markdups metrics' => sub {
     $result_json = from_json($r->freeze());
   } 'no error when serializing to json string and file';
 
-  foreach my $res ($expected, $result_json){
-     delete $res->{'__CLASS__'};
-     delete $res->{'composition'};
-     delete $res->{'info'}->{'Check'};
-     delete $res->{'info'}->{'Check_version'};
-  }
-
-  is_deeply($result_json, $expected, 'correct json output');
+  is_deeply(_prune_result_hash($result_json),
+            _prune_result_hash($expected), 'correct json output');
 };
 
 1;

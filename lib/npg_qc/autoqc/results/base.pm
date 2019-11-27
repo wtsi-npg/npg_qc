@@ -13,12 +13,6 @@ with 'npg_qc::autoqc::role::result';
 
 our $VERSION = '0';
 
-sub BUILD {
-  my $self = shift;
-  $self->composition();
-  return;
-}
-
 has 'composition' => (
     is         => 'ro',
     isa        => 'npg_tracking::glossary::composition',
@@ -28,20 +22,28 @@ has 'composition' => (
       'composition_digest' => 'digest',
       'num_components'     => 'num_components',
     },
-    predicate  => 'has_composition',
 );
 sub _build_composition {
   my $self = shift;
-  if ($self->is_old_style_result) {
+  if ($self->can('id_run') && defined $self->id_run && $self->can('position')) {
     return $self->create_composition();
   }
   croak 'Can only build old style results';
 }
 
-has 'result_file_path' => (isa      => 'Str',
-                           is       => 'rw',
-                           required => 0,
-                          );
+with 'npg_tracking::glossary::moniker'; # requires composition accessor
+
+has 'result_file_path' => (
+  isa      => 'Str',
+  is       => 'rw',
+  required => 0,
+);
+
+sub BUILD {
+  my $self = shift;
+  $self->composition();
+  return;
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -100,6 +102,8 @@ for possible subsequent reading by a different application.
 
 =item npg_tracking::glossary::composition::component::illumina
 
+=item npg_tracking::glossary::moniker
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -112,7 +116,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2019 GRL
 
 This file is part of NPG.
 
