@@ -1,4 +1,4 @@
-package npg_qc::autoqc::checks::illumina_analysis;
+package npg_qc::illumina::interop::parser;
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -7,40 +7,18 @@ use English qw(-no_match_vars);
 use namespace::autoclean;
 use List::Util qw(sum);
 use PDL::Lite;
-use PDL::Core qw{pdl};
+use PDL::Core qw(pdl);
 use Try::Tiny;
 use Readonly;
 
-use npg_tracking::util::types;
-use npg_tracking::illumina::runfolder;
+extends qw(npg_tracking::illumina::runfolder);
 
-extends qw(npg_qc::autoqc::checks::check);
+our $VERSION = '0';
 
 Readonly::Scalar our $PERCENT => 100;
 
-## no critic (Documentation::RequirePodAtEnd ProhibitParensWithBuiltins)
-our $VERSION = '0';
-
-=head1 NAME
-
-npg_qc::autoqc::checks::qX_yield
-
-=head1 SYNOPSIS
-
-Inherits from npg_qc::autoqc::checks::check.
-See description of attributes in the documentation for that module.
-
-  my $check = npg_qc::autoqc::checks::qX_yield->new(id_run=>5);
-
-=head1 DESCRIPTION
-
-A fast check capturing yield for a number of threshold qualities (20, 30, 40).
-
-=head1 SUBROUTINES/METHODS
-
-=cut
-
-#keys used in hash and corresponding codes in tile metrics interop file (assumes no more than 4 reads)
+# keys used in hash and corresponding codes in tile metrics interop file
+# (assumes no more than 4 reads)
 Readonly::Scalar my $TILE_METRICS_INTEROP_CODES => {'cluster_density'    => 100,
                                                     'cluster_density_pf' => 101,
                                                     'cluster_count'      => 102,
@@ -51,33 +29,41 @@ Readonly::Scalar my $TILE_METRICS_INTEROP_CODES => {'cluster_density'    => 100,
                                                     'version3 read'      => ord('r'),
                                                    };
 
-my %lane_metrics = ();
+has 'interop_path' => (
+  isa        => 'Str',
+  is         => 'ro',
+  required   => 0,
+  lazy_build => 1,
+);
+sub _build_interop_path {
+  my $self = shift;
+  my $interop_dir = join q[/], $self->runfolder_path(), 'InterOp';
+  (-d $interop_dir) or croak
+    qq(InterOp files directory $interop_dir does not exist);
+  return $interop_dir;
+}
 
-my %cluster_count = ();
-
-override 'execute' => sub {
+sub parse {
   my $self = shift;
 
-  super();
-
-  my $input_files = $self->input_files;
+  my $input_files = $self->_input_files;
 
   # there should always be one input file, the TileMetrics interop file
-  $self->_parse_tile_metrics($input_files->[0]);
+  my ($lane_metrics, $cluster_count) = $self->_parse_tile_metrics($input_files->[0]);
 
   # the ExtendedTileMetrics interop file is optional
-  if ( scalar(@{$input_files}) > 1 ){
-    $self->_parse_extended_tile_metrics($input_files->[1]);
+  if ( scalar(@{$input_files}) > 1 ) {
+    $self->_parse_extended_tile_metrics($input_files->[1], $lane_metrics, $cluster_count);
   }
 
-  $self->result->lane_metrics(\%lane_metrics);
+  return $lane_metrics;
+}
 
-  return 1;
-};
-
-
-sub _parse_tile_metrics {
+sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
   my ($self, $interop) = @_;
+
+  my %lane_metrics  = ();
+  my %cluster_count = ();
 
   my $version;
   my $length;
@@ -95,14 +81,15 @@ sub _parse_tile_metrics {
 
   my %tile_metrics = ();
 
-# TO DO: I think the mean/stdev values in SAV excludes tiles where no reads pass PF
-# if we want to get exactly the same values we will have to exclude such tiles
+  # TO DO: I think the mean/stdev values in SAV excludes tiles where no reads pass PF
+  # if we want to get exactly the same values we will have to exclude such tiles
 
   ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
   if( $version == 2) {
     my $template = 'v3f'; # three 2-byte integers and one 4-byte float
     while ($fh->read($data, $length)) {
       my ($lane,$tile,$code,$value) = unpack $template, $data;
+      ## no critic (ControlStructures::ProhibitCascadingIfElse)
       if( $code == $TILE_METRICS_INTEROP_CODES->{'cluster_density'} ){
         $tile_metrics{$lane}->{'cluster_density'}->{$tile} = $value;
       }elsif( $code == $TILE_METRICS_INTEROP_CODES->{'cluster_density_pf'} ){
@@ -128,6 +115,7 @@ sub _parse_tile_metrics {
         my $read = $code - $TILE_METRICS_INTEROP_CODES->{'aligned_read1'} + 1;
         $tile_metrics{$lane}->{'aligned'}->{$read}->{$tile} = $value;
       }
+      ## use critic
     }
   } elsif( $version == 3) {
     $fh->read($data, 4) or
@@ -180,7 +168,7 @@ sub _parse_tile_metrics {
   # calc lane total
   foreach my $lane (keys %tile_metrics){
     for my $code (keys %{$tile_metrics{$lane}}) {
-      next unless $code =~ m/^cluster_count/;
+      $code =~ m/^cluster_count/smx or next;
       my @values = (values %{$tile_metrics{$lane}->{$code}});
       my $total = sum @values;
       $lane_metrics{$code.'_total'}->{$lane} = $total;
@@ -208,11 +196,11 @@ sub _parse_tile_metrics {
     }
   }
 
-  return;
+  return (\%lane_metrics, \%cluster_count);
 }
 
 sub _parse_extended_tile_metrics {
-  my ($self, $interop) = @_;
+  my ($self, $interop, $lane_metrics, $cluster_count) = @_;
 
   my $version;
   my $length;
@@ -230,21 +218,22 @@ sub _parse_extended_tile_metrics {
 
   my %tile_metrics = ();
 
-# TO DO: I think the mean/stdev values in SAV excludes tiles where no reads pass PF
-# if we want to get exactly the same values we will have to exclude such tiles
+  # TO DO: I think the mean/stdev values in SAV excludes tiles where no reads pass PF
+  # if we want to get exactly the same values we will have to exclude such tiles
 
   ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
   if( $version == 2 || $version == 3 ) {
     while ($fh->read($data, $length)) {
       my $template = 'vVf'; # one 2-byte integer, one 4-byte integer and one 4-byte float
-      # N.B. In version 3 there are two additional 4-byte floats, the upper left and right fiducial locations but we don't use these
+      # N.B. In version 3 there are two additional 4-byte floats,
+      # the upper left and right fiducial locations but we don't use these
       my ($lane,$tile,$occupied) = unpack $template, $data;
-      if( exists($cluster_count{$lane}->{$tile}) ){
-        if( $cluster_count{$lane}->{$tile} == 0 ){
+      if( exists($cluster_count->{$lane}->{$tile}) ){
+        if( $cluster_count->{$lane}->{$tile} == 0 ){
           croak qq{cluster_count for lane $lane tile $tile is zero};
         }
         # convert count to a percentage
-        $occupied = $PERCENT * $occupied / $cluster_count{$lane}->{$tile};
+        $occupied = $PERCENT * $occupied / $cluster_count->{$lane}->{$tile};
         $tile_metrics{$lane}->{'occupied'}->{$tile} = $occupied;
       } else {
         croak qq{No cluster_count for lane $lane tile $tile};
@@ -268,47 +257,79 @@ sub _parse_extended_tile_metrics {
     my @values = (values %{$tile_metrics{$lane}->{$code}});
     my $p = (pdl \@values)->qsort();
     my ($mean,$prms,$median,$min,$max,$adev,$rms) = PDL::Primitive::stats($p);
-    $lane_metrics{$code.'_mean'}->{$lane} = $mean->sclr;
-    $lane_metrics{$code.'_stdev'}->{$lane} = $prms->sclr;
+    $lane_metrics->{$code.'_mean'}->{$lane} = $mean->sclr;
+    $lane_metrics->{$code.'_stdev'}->{$lane} = $prms->sclr;
   }
 
   return;
 }
 
-=head2 input_files
-
-=cut
-
-#####
-# Custom builder for the input_files attribute 
-#
-sub _build_input_files {
+sub _input_files {
   my $self = shift;
-
-  if(!$self->has_qc_in) { croak 'qc_in should be defined'; }
 
   my @files = ();
 
-  my $tile_metrics_interop_file = join q[/], $self->qc_in(), qw/InterOp TileMetricsOut.bin/;
-  if ( ! -e $tile_metrics_interop_file ) {
-    croak qq($tile_metrics_interop_file does not exist);
-  }
+  my $tile_metrics_interop_file =
+    join q[/], $self->interop_path, 'TileMetricsOut.bin';
+  (-e $tile_metrics_interop_file ) or croak
+    qq($tile_metrics_interop_file does not exist);
   push @files, $tile_metrics_interop_file;
 
-  my $extended_tile_metrics_interop_file = join q[/], $self->qc_in(), qw/InterOp ExtendedTileMetricsOut.bin/;
+  my $extended_tile_metrics_interop_file =
+    join q[/], $self->interop_path, 'ExtendedTileMetricsOut.bin';
   if ( ! -e $extended_tile_metrics_interop_file ) {
     carp qq($extended_tile_metrics_interop_file does not exist);
   } else {
     push @files, $extended_tile_metrics_interop_file;
   }
-  
+
   return \@files;
 }
 
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
+
+=head1 NAME
+
+npg_qc::illumina::interop::parser
+
+=head1 SYNOPSIS
+
+  my $data;
+  $data = npg_qc::illumina::interop::parser->new()->parse();
+  $data = npg_qc::illumina::interop::parser->new(
+    runfolder_path => 'dir1')->parse();
+  $data = npg_qc::illumina::interop::parser->new(
+    interop_path => 'dir2')->parse();
+
+=head1 DESCRIPTION
+
+Parses TileMetricsOut.bin IIllumina InterOp file and, if available,
+ExtendedTileMetricsOut.bin file to get precise cluster count values
+and some other statistics.
+
+Inherits from npg_tracking::illumina::runfolder in order to be able
+to find run folder location. runfolder_path attribute can be supplied
+by the caller to set the run folder path. The InterOp files are expected
+to be found in the InterOp directory in the run folder. It is possible
+to set the path of the InterOp directly by setting interop_path
+attribute.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 interop_path
+
+A directory path where InterOp files are, a lazy-built atribute.
+
+=head2 parse
+
+Parses TileMetricsOut.bin IIllumina InterOp file and, if available,
+ExtendedTileMetricsOut.bin file to get precise cluster count values
+and some other lane statistics. The results are returned as a hash
+reference.
 
 =head1 DIAGNOSTICS
 
@@ -324,17 +345,19 @@ __END__
 
 =item namespace::autoclean
 
+=item Carp
+
+=item English
+
 =item Readonly
 
-=item List::Util;
+=item List::Util
 
-=item PDL::Lite;
+=item PDL::Lite
 
-=item PDL::Core;
+=item PDL::Core
 
 =item Try::Tiny
-
-=item npg_qc::autoqc::checks::check
 
 =back
 
@@ -344,11 +367,11 @@ __END__
 
 =head1 AUTHOR
 
-Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Steven Leonard E<lt>srl@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2019 GRL
 
 This file is part of NPG.
 
