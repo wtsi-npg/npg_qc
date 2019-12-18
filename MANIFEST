@@ -122,6 +122,7 @@ lib/npg_qc/Schema/Result/GcFraction.pm
 lib/npg_qc/Schema/Result/Genotype.pm
 lib/npg_qc/Schema/Result/GenotypeCall.pm
 lib/npg_qc/Schema/Result/InsertSize.pm
+lib/npg_qc/Schema/Result/Interop.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeDict.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeEnt.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeHist.pm
@@ -169,6 +170,7 @@ t/30-illumina-loader.t
 t/50-npg_qc-Schema.t
 t/50-schema-result-Contamination.t
 t/50-schema-result-InsertSize.t
+t/50-schema-result-Interop.t
 t/50-schema-result-Adapter.t
 t/50-schema-result-Genotype.t
 t/50-schema-result-GenotypeCall.t
