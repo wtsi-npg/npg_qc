@@ -7,6 +7,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    for planned generalisation of the review check
  - autoqc review check: enable public 'lims' attribute for the
    object's constructor - needed to speed up pipeline's setup
+ - remove old InterOp file parsers and database loaders
 
 npg_qc release 68.0.0
  - interop parser - extra tests and a fix for some result hash keys
