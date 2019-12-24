@@ -77,9 +77,8 @@ has 'rna_seqc_report_path' => (is       => 'ro',
 
 sub _build_rna_seqc_report_path {
     my ($self) = @_;
-    my $qc_out_path = $self->qc_out;
-    my $rna_seqc_report_path = File::Spec->catdir($qc_out_path, $self->result->filename_root . q[_rna_seqc]);
-    return $rna_seqc_report_path;
+    return File::Spec->catdir(
+      $self->qc_out->[0], $self->result->filename_root . q[_rna_seqc]);
 }
 
 has '_java_jar_path' => (is       => 'ro',

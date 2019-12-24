@@ -188,7 +188,7 @@ subtest 'accessors tests' => sub {
 };
 
 subtest 'input and output directories' => sub {
-    plan tests => 10;
+    plan tests => 12;
 
     lives_ok { npg_qc::autoqc::checks::check->new(rpt_list => '6:8:9')}
         'object constructor - qc_in and qc_out are optional';
@@ -200,6 +200,9 @@ subtest 'input and output directories' => sub {
     throws_ok {npg_qc::autoqc::checks::check->new(
         position => 1, qc_out => 'nonexisting', id_run => $idrun)}
         qr/does not exist or is not writable/, 'if set, qc_out should exist';
+    throws_ok {npg_qc::autoqc::checks::check->new(
+        position => 1, qc_out => ['nonexisting'], id_run => $idrun)}
+        qr/does not exist or is not writable/, 'if set, qc_out should exist';
 
     my $check;
     lives_ok { $check = npg_qc::autoqc::checks::check->new(
@@ -207,7 +210,8 @@ subtest 'input and output directories' => sub {
                             qc_in    => $tdir,
                             id_run   => $idrun)
     } 'object constructor - qc_out is optional';
-    is($check->qc_out, $tdir, 'qc out is set to qc_in');
+    is(scalar @{$check->qc_out}, 1, 'one qc_out directory is asigned');
+    is($check->qc_out->[0], $tdir, 'qc out is set to qc_in');
 
     lives_ok { $check = npg_qc::autoqc::checks::check->new(
                             position => 1,

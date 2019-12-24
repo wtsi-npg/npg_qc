@@ -74,7 +74,7 @@ has 'output_dir' => (
 );
 sub _build_output_dir {
   my $self = shift;
-  return catdir($self->qc_out , updir);
+  return catdir($self->qc_out->[0], updir);
 }
 
 has 'create_fluidigm' => (

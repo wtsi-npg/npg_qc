@@ -3,12 +3,13 @@ package npg_qc::autoqc::checks::check;
 use Moose;
 use MooseX::Aliases;
 use MooseX::StrictConstructor;
+use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use Class::Load qw(load_class);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
-use List::MoreUtils qw(any uniq);
+use List::MoreUtils qw(any none uniq);
 use Readonly;
 use Carp;
 
@@ -154,32 +155,38 @@ sub _test_qc_in {
   return;
 }
 
+subtype 'NpgTrackingQcOutDirectories'
+    => as 'ArrayRef[Str]'
+    => where { my @d=@{$_}; none { not -W } @d }
+    => message {'One of output qc directories ' . join q[, ], @{$_} .
+                'does not exist or is not writable'};
+
+coerce 'NpgTrackingQcOutDirectories'
+  => from 'Str'
+  => via { [$_] };
+
 =head2 qc_out
 
-Path to a directory where the results should be written to. Read-only.
+An array of writable directories where the results should be written to. Read-only.
+The attribute can be given as a string representing a single directory path, will
+be set to an array internally and returned as an array.
+
+If qc_out is not set, but qc_in is set, qc_out will be set to qc_in.
 
 =cut
 
-has 'qc_out'      => (isa        => 'Str',
+has 'qc_out'      => (isa        => 'NpgTrackingQcOutDirectories',
                       is         => 'ro',
                       required   => 0,
                       lazy_build => 1,
-                      trigger    => \&_test_qc_out,
+                      coerce     => 1,
                      );
 sub _build_qc_out {
   my $self = shift;
   if (!$self->has_qc_in) {
     croak 'qc_out should be defined';
   }
-  $self->_test_qc_out($self->qc_in);
   return $self->qc_in;
-}
-sub _test_qc_out {
-  my ($self, $qc_out) = @_;
-  if (!-W $qc_out) {
-    croak qq[Output qc directory $qc_out does not exist or is not writable];
-  }
-  return;
 }
 
 =head2 filename_root
@@ -336,7 +343,7 @@ sub run {
     push @results, @{$self->related_results()};
   }
   foreach my $r (@results) {
-    $r->store($self->qc_out);
+    $r->store($self->qc_out->[0]);
   }
   return 1;
 }
@@ -557,6 +564,8 @@ __END__
 =item MooseX::Aliases
 
 =item MooseX::StrictConstructor
+
+=item Moose::Util::TypeConstraints
 
 =item MooseX::Getopt
 
