@@ -14,6 +14,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    its parent base class (both in npg_qc::autoqc::result namespace)
    to make these attributes available for results objects that are
    derived directly from the base class.
+ - new interop autoqc check
 
 release 67.5.0
  - npg_qc::illumina::interop::parser - a stand-alone custom parser

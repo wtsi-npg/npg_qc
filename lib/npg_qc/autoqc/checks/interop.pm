@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 use Carp;
 
-use npg_tracking::util::types;
+use npg_qc::illumina::interop::parser;
 use npg_qc::autoqc::results::interop;
 extends qw(npg_qc::autoqc::checks::check);
 
@@ -19,10 +19,10 @@ npg_qc::autoqc::checks::interop
 
 =head1 DESCRIPTION
 
-This check extracts a number metrics from Illumina InterOp files
+This check extracts a number of metrics from Illumina InterOp files
 and save the results in per-lane result objects. When run within
 the autoqc framework, multiple lane-level result JSON files are
-produced; they will all be written to the same output directory.
+produced.
 
 =head1 SUBROUTINES/METHODS
 
@@ -79,7 +79,8 @@ sub execute {
   $self->has_filename_root and carp
     'filename_root is set, but will be disregarded';
 
-  my $metrics = {};
+  my $metrics = npg_qc::illumina::interop::parser
+    ->new(interop_path => $self->qc_in)->parse();
   my $lane_metrics = {};
 
   while (my ($key, $m) = each %{$metrics}) {
@@ -88,14 +89,16 @@ sub execute {
     }
   }
 
+  my @errors = ();
   foreach my $r (@{$self->result}) {
     my $position = $r->composition->get_component(0)->position;
     if ($lane_metrics->{$position}) {
       $r->metrics($lane_metrics->{$position});
     } else {
-      $r->add_comment("No data available for lane $position");
+      push @errors, "No data available for lane $position";
     }
   }
+  @errors and croak 'ERROR: ' . join qq[\n], @errors;
 
   return;
 }
@@ -124,6 +127,8 @@ __END__
 
 =item Carp
 
+=item npg_qc::illumina::interop::parser
+
 =back
 
 =head1 AUTHOR
@@ -133,7 +138,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 GRL
+Copyright (C) 2020 GRL
 
 This file is part of NPG.
 
