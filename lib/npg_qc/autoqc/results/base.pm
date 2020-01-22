@@ -1,6 +1,7 @@
 package npg_qc::autoqc::results::base;
 
 use Moose;
+use MooseX::AttributeHelpers;
 use namespace::autoclean;
 use Carp;
 
@@ -32,6 +33,27 @@ sub _build_composition {
 }
 
 with 'npg_tracking::glossary::moniker'; # requires composition accessor
+
+has 'pass'         => (isa      => 'Maybe[Bool]',
+                       is       => 'rw',
+                       required => 0,
+                      );
+
+has 'info'     => (
+      metaclass => 'Collection::Hash',
+      is        => 'ro',
+      isa       => 'HashRef[Str]',
+      default   => sub { {} },
+      provides  => {
+          get       => 'get_info',
+          set       => 'set_info',
+      },
+);
+
+has 'comments'     => (isa => 'Maybe[Str]',
+                       is => 'rw',
+                       required => 0,
+                      );
 
 has 'result_file_path' => (
   isa      => 'Str',
@@ -74,6 +96,24 @@ A npg_tracking::glossary::composition object. If the derived
 class inplements id_run and position methods/attributes, a one-component
 composition is created automatically.
 
+=head2 pass
+
+A boolean attribute containing the outcome of evaluation for
+the autoqc check. Not all autoqc checks perform result evaluation.
+A true value is interpreted as a pass, a defined false value
+is interpreted as a fail, undefined value means that either
+no evaluation took place or it was impossible to decide what
+the outcome should be.
+
+=head2 info
+
+A hash reference attribute to store version number and other information
+as key-value pairs.
+
+=head2 comments
+
+A string attribute containing comments, if any.
+
 =head2 result_file_path
 
 An optional attribute, a full path of the file with JSON serialization.
@@ -91,6 +131,8 @@ for possible subsequent reading by a different application.
 =over
 
 =item Moose
+
+=item MooseX::AttributeHelpers
 
 =item namespace::autoclean
 

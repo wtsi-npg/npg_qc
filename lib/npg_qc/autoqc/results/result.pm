@@ -2,10 +2,6 @@ package npg_qc::autoqc::results::result;
 
 use Moose;
 use namespace::autoclean;
-use MooseX::AttributeHelpers;
-use Carp;
-
-use npg_tracking::util::types;
 
 extends qw( npg_qc::autoqc::results::base );
 
@@ -51,7 +47,10 @@ npg_qc::autoqc::results::result
 
 =head1 DESCRIPTION
 
-A base class to wrap the result of autoqc.
+A class to wrap old-style results of autoqc.
+Uses npg_qc::autoqc::results::base as a parebt class and inherits
+all attributes ans methods of that class. This class adds optional
+id_run, position, tag_index and path attributes.
 
 =head1 SUBROUTINES/METHODS
 
@@ -74,33 +73,23 @@ sub BUILD {
 
 =head2 id_run
 
-An optional run id
+An optional integer run id
 
 =cut
 has '+id_run'   => (required => 0,);
 
 =head2 position
 
-An optional lane number. An integer from 1 to 8 inclusive.
+An optional integer lane number.
 
 =cut
 has '+position' => (required => 0,);
 
 =head2 tag_index
 
-An optional tag index
+An optional integer tag index
 
 =cut
-
-=head2 pass
-
-Pass or fail or undefined if cannot evaluate
-
-=cut
-has 'pass'         => (isa      => 'Maybe[Bool]',
-                       is       => 'rw',
-                       required => 0,
-                      );
 
 =head2 path
 
@@ -112,38 +101,10 @@ has 'path'        => (isa      => 'Str',
                       required => 0,
                      );
 
-=head2 info
-
-To store version number and other information
-
-=cut
-
-has 'info'     => (
-      metaclass => 'Collection::Hash',
-      is        => 'ro',
-      isa       => 'HashRef[Str]',
-      default   => sub { {} },
-      provides  => {
-          exists    => 'exists_in_info',
-          keys      => 'ids_in_info',
-          get       => 'get_info',
-          set       => 'set_info',
-      },
-);
-
-=head2 comments
-
-A string containing comments, if any.
-
-=cut
-has 'comments'     => (isa => 'Maybe[Str]',
-                       is => 'rw',
-                       required => 0,
-                      );
-
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 DIAGNOSTICS
@@ -156,13 +117,7 @@ __END__
 
 =item Moose
 
-=item MooseX::AttributeHelpers
-
-=item Carp
-
 =item namespace::autoclean
-
-=item npg_tracking::util::types
 
 =item npg_tracking::glossary::run
 

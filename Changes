@@ -10,6 +10,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    is no option but delegation it to teh result object itself)
  - redundant result role methods filename_root_from_filename and
    is_old_style_result are removed
+ - pass, info and comments attributes moved from the result to the
+   its parent base class (both in npg_qc::autoqc::result namespace)
+   to make these attributes available for results objects that are
+   derived directly from the base class.
 
 release 67.5.0
 - npg_qc::illumina::interop::parser - a stand-alone custom parser
