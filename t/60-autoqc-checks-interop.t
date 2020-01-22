@@ -15,7 +15,7 @@ my $interop_dir = 't/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp';
 # they might be used later.
 
 subtest 'result object properties' => sub {
-  plan tests => 12;
+  plan tests => 15;
 
   my $i = npg_qc::autoqc::checks::interop->new(qc_in    => $interop_dir,
                                                rpt_list => '34:1;34:2;34:3');
@@ -25,6 +25,9 @@ subtest 'result object properties' => sub {
   my $position = 1;
   for my $r (@{$i->result}) {
     isa_ok ($r, 'npg_qc::autoqc::results::interop');
+    my @info_keys = qw/Check Check_version Custom_parser Custom_parser_version/;
+    is_deeply ([sort keys %{$r->info}], \@info_keys,
+      'correct info keys');
     is ($r->composition->freeze2rpt, join(q[:], 34, $position),
       'composition object is for a single lane');
     is ($r->filename4serialization, q[34_] . $position . q[.interop.json],

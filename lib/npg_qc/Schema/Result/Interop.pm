@@ -79,6 +79,16 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
 serialized to JSON metrics from Illumina InterOp files
 
+=head2 comments
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 info
+
+  data_type: 'text'
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -97,6 +107,10 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   'metrics',
+  { data_type => 'text', is_nullable => 1 },
+  'comments',
+  { data_type => 'text', is_nullable => 1 },
+  'info',
   { data_type => 'text', is_nullable => 1 },
 );
 
@@ -163,15 +177,15 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::interop';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-12-13 15:51:36
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2op+38GiYC/JN3tTDsIycw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2020-01-23 16:45:09
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:3OsEWKDv2Wiwgvz81Osg/A
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
 our $VERSION = '0';
 
-__PACKAGE__->set_flators4non_scalar(qw( metrics ));
+__PACKAGE__->set_flators4non_scalar(qw( metrics info ));
 
 =head2 seq_component_compositions
 

@@ -9,6 +9,8 @@ CREATE TABLE `interop` (
     COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
   `metrics` TEXT DEFAULT NULL \
     COMMENT 'serialized to JSON metrics from Illumina InterOp files',
+  `comments` TEXT DEFAULT NULL, \
+  `info` TEXT DEFAULT NULL, \
   PRIMARY KEY (`id_interop`),
   UNIQUE KEY `interop_id_compos_uniq` (`id_seq_composition`),
   CONSTRAINT `interop_compos` FOREIGN KEY (`id_seq_composition`) \

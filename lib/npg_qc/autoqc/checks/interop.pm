@@ -40,16 +40,20 @@ has '+result' => (isa => 'ArrayRef[npg_qc::autoqc::results::interop]',);
 sub _build_result {
   my $self = shift;
   my @results = ();
-  #my $class_name     = ref $self;
-  #my $module_version = $VERSION;
+  my $class_name     = ref $self;
+  my $module_version = $VERSION;
+  my $parser         = 'npg_qc::illumina::interop::parser';
+  my $parser_version = $npg_qc::illumina::interop::parser::VERSION;
   foreach my $c ($self->composition->components_list) {
     my $composition = npg_tracking::glossary::composition->new(components => [$c]);
     my $r = npg_qc::autoqc::results::interop->new(
               rpt_list    => $composition->freeze2rpt,
               composition => $composition
             );
-    #$r->set_info('Check', $class_name);
-    #$r->set_info('Check_version', $module_version);
+    $r->set_info('Check', $class_name);
+    $r->set_info('Check_version', $module_version);
+    $r->set_info('Custom_parser', $parser);
+    $r->set_info('Custom_parser_version', $parser_version);
     push @results, $r;
   }
   return \@results;
