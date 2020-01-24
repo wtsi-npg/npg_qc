@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Slurp;
+use Moose::Meta::Class;
 
 use_ok('npg_qc::autoqc::checks::interop');
 use_ok('npg_qc::autoqc::results::interop');
@@ -11,8 +12,8 @@ use_ok('npg_qc::autoqc::results::interop');
 my $tdir = tempdir( CLEANUP => 1 );
 my $interop_dir = 't/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp';
 
-# RunInfo.xml files are available for some of test run folder since
-# they might be used later.
+# RunInfo.xml and RunParameters.xml files are available
+# for some of test run folder since they might be used later.
 
 subtest 'result object properties' => sub {
   plan tests => 15;
@@ -246,6 +247,56 @@ subtest 'parse and produce results - NovaSeq' => sub {
                'cluster_density_stdev' => '4.65910237492488e-09'
                   };
   is_deeply ($i->result->[1]->metrics, $expected, 'correct computed data for lane 2');
+};
+
+subtest 'not setting rpt_list attribute' => sub {
+  plan tests => 17;
+
+  my $rf = 't/data/autoqc/200117_A00715_0080_BHY7T3DSXX';
+  my $output_dir = join q[/], $tdir, 'novaseq_norpt';
+  mkdir $output_dir or die "failed to create $output_dir";
+  my $i = npg_qc::autoqc::checks::interop->new(qc_in  => $rf,
+                                               qc_out => $output_dir,
+                                               id_run => 32798,
+                                               _npg_tracking_schema => undef);
+  is ($i->rpt_list, '32798:1;32798:2;32798:3;32798:4',
+    'rpt list is built correctly');
+  lives_ok { $i->run } 'check runs OK';
+  is (scalar keys @{$i->result}, 4, 'four results are available');
+  is ($i->result->[0]->cluster_count_total, 3830022144,
+    'cluster count for lane 1');
+  for my $lane ((1 .. 4)) {
+    my $output_file = join q[/], $output_dir, qq[32798_${lane}.interop.json];
+    ok (-e $output_file, qq[output JSON file for lane $lane exists]);
+  }
+
+  $output_dir = join q[/], $tdir, 'novaseq_norpt_norun';
+  mkdir $output_dir or die "failed to create $output_dir";
+  throws_ok { npg_qc::autoqc::checks::interop->new(
+                qc_in  => $rf,
+                qc_out => $output_dir,
+                _npg_tracking_schema => undef) }
+    qr/Unable to identify id_run with data provided/,
+    'with no access to the db, trying to use ExperimentName, ' .
+    'which is not integer';
+
+  my $schema = Moose::Meta::Class->create_anon_class(
+    roles => [qw/npg_testing::db/])
+    ->new_object({})->create_test_db(
+      q[npg_tracking::Schema], q[t/data/fixtures/npg_tracking]);
+
+  $i = npg_qc::autoqc::checks::interop->new(qc_in  => $rf,
+                                            qc_out => $output_dir);
+  is ($i->rpt_list, '32798:1;32798:2;32798:3;32798:4',
+    'rpt list is built correctly');
+  lives_ok { $i->run } 'check runs OK';
+  is (scalar keys @{$i->result}, 4, 'four results are available');
+  is ($i->result->[0]->cluster_count_total, 3830022144,
+    'cluster count for lane 1');
+  for my $lane ((1 .. 4)) {
+    my $output_file = join q[/], $output_dir, qq[32798_${lane}.interop.json];
+    ok (-e $output_file, qq[output JSON file for lane $lane exists]);
+  }
 };
 
 1;

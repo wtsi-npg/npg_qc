@@ -273,3 +273,16 @@
   flowcell_id: HLWFJCCXY 
   team: A
   id_instrument_format: 12
+- actual_cycle_count: 318
+  batch_id: 63223
+  expected_cycle_count: 318
+  flowcell_id: HY7T3DSXX
+  folder_name: 200117_A00715_0080_BHY7T3DSXX
+  folder_path_glob: '/{export,nfs}/esa-sv-20180712-11/IL_seq_data/*/'
+  id_instrument: 67
+  id_instrument_format: 13
+  id_run: 32798
+  id_run_pair: 0
+  is_paired: 1
+  priority: 1
+  team: 'RAD'
