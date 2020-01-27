@@ -78,7 +78,9 @@ for the build.
 
 =cut
 
-has '+rpt_list' => ( builder => '_build_rpt_list_from_run_info' );
+has '+rpt_list' => (
+  builder => '_build_rpt_list_from_run_info',
+);
 sub _build_rpt_list_from_run_info {
   my $self = shift;
 
@@ -112,7 +114,10 @@ composition object for the check object.
 
 =cut
 
-has '+result' => (isa => 'ArrayRef[npg_qc::autoqc::results::interop]',);
+has '+result' => (
+  isa       => 'ArrayRef[npg_qc::autoqc::results::interop]',
+  metaclass => 'NoGetopt',
+);
 sub _build_result {
   my $self = shift;
   my @results = ();
@@ -187,7 +192,7 @@ has '_path_name' => (
   isa       => 'Str',
   is        => 'ro',
   required  => 0,
-  init_arg  => {},
+  init_arg  => undef,
   default   => 'interop_path',
   writer    => '_set_path_name',
   reader    => '_get_path_name',
