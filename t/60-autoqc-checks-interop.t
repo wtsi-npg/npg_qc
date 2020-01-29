@@ -285,8 +285,10 @@ subtest 'not setting rpt_list attribute' => sub {
     ->new_object({})->create_test_db(
       q[npg_tracking::Schema], q[t/data/fixtures/npg_tracking]);
 
-  $i = npg_qc::autoqc::checks::interop->new(qc_in  => $rf,
-                                            qc_out => $output_dir);
+  $i = npg_qc::autoqc::checks::interop->new(
+                qc_in  => $rf,
+                qc_out => $output_dir,
+                _npg_tracking_schema => $schema);
   is ($i->rpt_list, '32798:1;32798:2;32798:3;32798:4',
     'rpt list is built correctly');
   lives_ok { $i->run } 'check runs OK';
