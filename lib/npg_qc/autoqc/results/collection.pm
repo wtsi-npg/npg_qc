@@ -39,7 +39,6 @@ npg_qc::autoqc::results::collection
 Readonly::Scalar our $RESULTS_NAMESPACE => q[npg_qc::autoqc::results];
 Readonly::Array  my  @NON_LISTABLE      => map {join q[::], $RESULTS_NAMESPACE, $_}
                                                          qw/
-                                                             interop
                                                              sequence_summary
                                                              base
                                                              result

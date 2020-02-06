@@ -6,6 +6,7 @@ use npg_qc_viewer;
 extends 'Catalyst::Model::Adaptor';
 
 use npg_qc::Schema;
+use npg_qc::autoqc::results::collection;
 
 our $VERSION = '0';
 
@@ -25,6 +26,8 @@ my $init = {};
 if ($use_db && $connect_info) {
     $init->{'qc_schema'} = npg_qc::Schema->connect(map { $connect_info->{$_} } sort keys %{$connect_info});
 }
+my @check_names = grep { $_ ne 'interop' } @{npg_qc::autoqc::results::collection->new()->checks_list()};
+$init->{'checks_list'} = \@check_names;
 
 __PACKAGE__->config( class => 'npg_qc::autoqc::qc_store',
                      args  => $init,
@@ -33,6 +36,7 @@ __PACKAGE__->config( class => 'npg_qc::autoqc::qc_store',
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 NAME
@@ -44,6 +48,9 @@ npg_qc_viewer::Model::Check
 =head1 DESCRIPTION
 
 A model for retrieving QC checks both from the database and the file system.
+
+Is configured not to retrieve interop autoqc results even if the underlying class
+is able to retrieve them.
 
 =head1 SUBROUTINES/METHODS
 
@@ -65,6 +72,8 @@ A model for retrieving QC checks both from the database and the file system.
 
 =item npg_qc::autoqc::qc_store
 
+=item npg_qc::autoqc::results::collection
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -77,7 +86,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 Genome Research Ltd.
+Copyright (C) 2014,2020 Genome Research Ltd.
 
 This file is part of NPG software.
 
