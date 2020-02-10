@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+  - interop parser - extra tests and a fix some result hash keys
+
 release 67.5.0
 - npg_qc::illumina::interop::parser - a stand-alone custom parser
   for Illumina InterOp files; unlike Illumina's own parser, this
