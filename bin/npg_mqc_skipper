@@ -205,7 +205,8 @@ npg_mqc_skipper
 
 =head1 EXIT STATUS
 
-0 if run is deletable, 1 otherwise
+0 if all runs were processed succesfully, 1 if there are problems while Updating
+any record and the transaction fails to rollback
 
 =head1 CONFIGURATION
 
