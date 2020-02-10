@@ -31,7 +31,7 @@ my $criteria_list = [
 ];
 
 subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 19;
+  plan tests => 18;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -41,8 +41,7 @@ subtest 'construction object, deciding whether to run' => sub {
   isa_ok ($check->result, 'npg_qc::autoqc::results::review');
   my $can_run;
   warnings_like { $can_run = $check->can_run }
-    [qr/Reading product configuration from/,
-     qr/Study config not found for/],
+    [qr/Study config not found for/],
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no study config');
   is ($check->result->comments,
@@ -57,8 +56,7 @@ subtest 'construction object, deciding whether to run' => sub {
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   warnings_like { $can_run = $check->can_run }
-    [qr/Reading product configuration from/,
-     qr/robo_qc section is not present for/],
+    [qr/robo_qc section is not present for/],
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no robo config');
   is ($check->result->comments,
@@ -70,8 +68,7 @@ subtest 'construction object, deciding whether to run' => sub {
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   warnings_like { $can_run = $check->can_run }
-    [qr/Reading product configuration from/,
-     qr/No roboqc criteria defined for library type 'RNA PolyA'/],
+    [qr/No roboqc criteria defined for library type 'RNA PolyA'/],
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no criteria for this library type');
   is ($check->result->comments,
@@ -82,10 +79,7 @@ subtest 'construction object, deciding whether to run' => sub {
     conf_path => "$test_data_dir/with_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  warnings_like { $can_run = $check->can_run }
-    [qr/Reading product configuration from/],
-    'can_run is accompanied by warnings';
-  ok ($can_run, 'can_run returns true');
+  ok ($check->can_run, 'can_run returns true');
   ok (!$check->result->comments, 'No comments logged');
   is_deeply ($check->_criteria, {'and' => $criteria_list}, 'criteria parsed correctly');
 
