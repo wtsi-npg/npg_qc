@@ -616,7 +616,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Genome Research Ltd
+Copyright (C) 2018,2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 
