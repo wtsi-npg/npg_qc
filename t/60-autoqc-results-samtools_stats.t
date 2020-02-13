@@ -111,7 +111,7 @@ subtest 'object with an one-component phix subset composition' => sub {
   is ($r->filter, 'F0xB00', 'filter');
   is ($r->composition_subset, 'phix', 'phix subset');
   is ($r->stats, slurp($file2), 'stats file content saved correctly');
-  is ($r->filename_root, $digest.'_F0xB00', 'filename root');
+  is ($r->filename_root, '17448_1#9_phix_F0xB00', 'filename root');
   is ($r->to_string(),
     'npg_qc::autoqc::results::samtools_stats {"components":[{"id_run":17448,"position":1,"subset":"phix","tag_index":9}]}',
     'string representation');

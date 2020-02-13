@@ -188,7 +188,7 @@ subtest 'accessors tests' => sub {
 };
 
 subtest 'input and output directories' => sub {
-    plan tests => 10;
+    plan tests => 13;
 
     lives_ok { npg_qc::autoqc::checks::check->new(rpt_list => '6:8:9')}
         'object constructor - qc_in and qc_out are optional';
@@ -200,6 +200,13 @@ subtest 'input and output directories' => sub {
     throws_ok {npg_qc::autoqc::checks::check->new(
         position => 1, qc_out => 'nonexisting', id_run => $idrun)}
         qr/does not exist or is not writable/, 'if set, qc_out should exist';
+    throws_ok {npg_qc::autoqc::checks::check->new(
+        position => 1, qc_out => ['nonexisting'], id_run => $idrun)}
+        qr/does not exist or is not writable/, 'if set, qc_out should exist';
+    throws_ok {npg_qc::autoqc::checks::check->new(
+        position => 1, qc_out => ['nonexisting/d1', 'nonexisting/d2'], id_run => $idrun)}
+        qr/One of qc output directories \[nonexisting\/d1, nonexisting\/d2\] does/,
+        'correct listing of qc out directories in the error message';
 
     my $check;
     lives_ok { $check = npg_qc::autoqc::checks::check->new(
@@ -207,7 +214,8 @@ subtest 'input and output directories' => sub {
                             qc_in    => $tdir,
                             id_run   => $idrun)
     } 'object constructor - qc_out is optional';
-    is($check->qc_out, $tdir, 'qc out is set to qc_in');
+    is(scalar @{$check->qc_out}, 1, 'one qc_out directory is assigned');
+    is($check->qc_out->[0], $tdir, 'qc out is set to qc_in');
 
     lives_ok { $check = npg_qc::autoqc::checks::check->new(
                             position => 1,
@@ -432,7 +440,7 @@ subtest 'filename generation' => sub {
 };
 
 subtest 'running the check' => sub {
-    plan tests => 7;
+    plan tests => 10;
 
     my $check = npg_qc::autoqc::checks::check->new(
                 id_run    => 2549,
@@ -452,6 +460,30 @@ subtest 'running the check' => sub {
     isa_ok($result, 'npg_qc::autoqc::results::result');
     is($result->id_run, 2549, 'run id');
     is($result->position, 6, 'position');
+
+    unlink $jpath;
+    $check = npg_qc::autoqc::checks::check->new(
+                id_run    => 2549,
+                position  => 6,
+                tag_index => 1,
+                file_type => q[fastq],
+                qc_in     => $path,
+                qc_out    => [$tdir]);
+    $check->run();
+    ok(-e $jpath, 'output json file exists');
+
+    unlink $jpath; 
+    $check = npg_qc::autoqc::checks::check->new(
+                id_run    => 2549,
+                position  => 6,
+                tag_index => 1,
+                file_type => q[fastq],
+                qc_in     => $path,
+                qc_out    => [$tdir, q[t]]);
+    throws_ok { $check->run() }
+      qr/Mismatch between number of qc_out directories and number of result objects/,
+      'error - two wc_out directories are given, one result object is created';
+    ok(!-e $jpath, 'output json file does not exist'); 
 };
 
 1;

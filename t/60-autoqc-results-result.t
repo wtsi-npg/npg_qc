@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 49;
+use Test::More tests => 51;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::result');
@@ -96,10 +96,19 @@ use_ok('npg_tracking::glossary::composition::component::illumina');
                                                  );
     my $saved_path = q[/tmp/autoqc_check.json];
     $r->store($saved_path);
+    my $json = $r->freeze();
+    is ($r->_id_run_common, 2549, 'one of private attributes is set');
+    unlike($json, qr/\"_[:a-z:]/, 'private attributes are not serialized'); 
     delete $r->{'filename_root'};
     my $saved_r = npg_qc::autoqc::results::result->load($saved_path);
     sleep 1;
     unlink $saved_path;
+    
+    # Use pack() method provided by MooseX::Storage framework
+    # to convert objects to hash references and strip private
+    # attributes from $r.
+    $r = $r->pack;
+    $saved_r = $saved_r->pack;
     is_deeply($r, $saved_r, 'serialization to JSON file');
 }
 
