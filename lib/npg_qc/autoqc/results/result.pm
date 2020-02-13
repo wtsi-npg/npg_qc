@@ -48,8 +48,8 @@ npg_qc::autoqc::results::result
 =head1 DESCRIPTION
 
 A class to wrap old-style results of autoqc.
-Uses npg_qc::autoqc::results::base as a parebt class and inherits
-all attributes ans methods of that class. This class adds optional
+Uses npg_qc::autoqc::results::base as a parent class and inherits
+all attributes and methods of that class. This class adds optional
 id_run, position, tag_index and path attributes.
 
 =head1 SUBROUTINES/METHODS

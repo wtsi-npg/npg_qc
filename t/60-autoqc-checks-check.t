@@ -214,7 +214,7 @@ subtest 'input and output directories' => sub {
                             qc_in    => $tdir,
                             id_run   => $idrun)
     } 'object constructor - qc_out is optional';
-    is(scalar @{$check->qc_out}, 1, 'one qc_out directory is asigned');
+    is(scalar @{$check->qc_out}, 1, 'one qc_out directory is assigned');
     is($check->qc_out->[0], $tdir, 'qc out is set to qc_in');
 
     lives_ok { $check = npg_qc::autoqc::checks::check->new(

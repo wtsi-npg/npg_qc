@@ -53,7 +53,7 @@ rpt_list attribute.
 
 The child class is expected to implement a no-argument execute method,
 which performs any necessary computation and sets attributes of either one
-or multiple result objects which should inherit from the npg_qc::autoqc::result::result
+or multiple result objects which should inherit from the
 npg_qc::autoqc::result::result class. The result object(s) should be assigned
 to the result attribute of this class.
 
