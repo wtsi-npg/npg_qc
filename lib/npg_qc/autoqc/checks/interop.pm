@@ -58,7 +58,7 @@ to output directories (or directory).
 =head1 DESCRIPTION
 
 This check extracts a number of metrics from Illumina InterOp files
-and save the results in per-lane result objects. When run within
+and saves the results in per-lane result objects. When run within
 the pipeline's autoqc framework, multiple lane-level result JSON
 files are produced.
 
@@ -250,7 +250,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019,2020 GRL
+Copyright (C) 2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 

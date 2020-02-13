@@ -112,10 +112,11 @@ npg_qc::autoqc::role::interop
 =head1 AUTHOR
 
 Steven Leonard E<lt>srl@sanger.ac.ukE<gt>
+Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 GRL
+Copyright (C) 2019,2020 Genome Research Ltd
 
 This file is part of NPG.
 

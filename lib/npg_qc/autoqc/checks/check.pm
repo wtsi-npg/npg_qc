@@ -390,7 +390,7 @@ sub run {
 This method is called by the qc script to run the check, perform
 all necessary computation and save results as an in-memory result
 object. The derived class should provide a full implementation of
-this method byeither extending or overwriting this method.
+this method by either extending or overwriting this method.
 
 In this class the method tries to find input files if not given
 and exists with an error if no files are found. If input_files
