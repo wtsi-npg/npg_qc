@@ -134,7 +134,7 @@ subtest 'parse and produce results - one lane, three non-index reads' => sub {
   my $expected = {
                'cluster_density_mean' => 509970.205357143,
                'cluster_density_pf_mean' => 472729.183035714,
-               'cluster pf_stdev' => 1.83651769480344,
+               'cluster_pf_stdev' => 1.83651769480344,
                'cluster_count_pf_total' => 8964585,
                'cluster_count_pf_stdev' => 10581.465013129,
                'cluster_count_pf_mean' => 320163.75,
@@ -144,7 +144,7 @@ subtest 'parse and produce results - one lane, three non-index reads' => sub {
                                     '1' => 0,
                                     '4' => 0
                                   },
-               'cluster pf_mean' => 92.6941024179003,
+               'cluster_pf_mean' => 92.6941024179003,
                'cluster_count_mean' => 345374.035714286,
                'cluster_count_stdev' => 8060.09656445299,
                'cluster_density_pf_stdev' => 16324.7743431066,
