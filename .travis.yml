@@ -11,7 +11,7 @@ dist:
 addons:
   apt:
     packages:
-      - libgd2-xpm-dev 
+      - libgd-dev 
 
 env:
   global:
