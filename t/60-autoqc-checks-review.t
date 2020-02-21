@@ -31,7 +31,7 @@ my $criteria_list = [
 ];
 
 subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 18;
+  plan tests => 19;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -49,7 +49,9 @@ subtest 'construction object, deciding whether to run' => sub {
     'reason logged');
   lives_ok { $check->execute() } 'cannot run, but execute method runs OK';
   is ($check->result->pass, undef,
-    'pass atttribute of the result object is ndefined');
+    'pass attribute of the result object is undefined');
+  is ($check->result->criteria_md5, undef,
+    'criteria_md5 attribute of the result object is undefined');
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/no_robo",
@@ -354,7 +356,7 @@ subtest 'evaluation within the execute method' => sub {
 };
 
 subtest 'error in evaluation' => sub {
-  plan tests => 4;
+  plan tests => 5;
 
   my $f = '29524#3.bam_flagstats.json';
   my $values = from_json(read_file "$test_data_dir/$f");
@@ -388,6 +390,8 @@ subtest 'error in evaluation' => sub {
   is ($check->result->pass, undef, 'pass value undefined');
   is ($check->result->qc_outcome->{'mqc_outcome'}, 'Undecided',
     'correct outcome string');
+  is ($check->result->criteria_md5, '27c522a795e99e3aea57162541de75b1',
+    'criteria_md5 attribute of the result object is set');
 };
 
 1;
