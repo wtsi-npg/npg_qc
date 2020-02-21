@@ -21,7 +21,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    previously it was computed at a point of loading to the database
    and was available only in objects retrieved from the database;
    availability of this value at check execution time will be useful
-   for planned generalisation of the review check  
+   for planned generalisation of the review check
+ - ability to save autoqc review outcomes to uqc is added  
 
 release 67.5.0
  - npg_qc::illumina::interop::parser - a stand-alone custom parser
