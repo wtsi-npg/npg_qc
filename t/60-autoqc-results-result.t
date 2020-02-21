@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::result');
@@ -161,19 +161,57 @@ subtest 'igenerating and inflating rpt key' => sub {
     is_deeply(npg_qc::autoqc::results::result->inflate_rpt_key(q[5:6:0]), {id_run=>5,position=>6,tag_index=>0}, 'rpt key inflated');
 };
 
+my $factory = npg_tracking::glossary::composition::factory->new();
+my $ch = {id_run => 3, position => 4, tag_index => 5};
+my $comp1 = npg_tracking::glossary::composition::component::illumina->new($ch);
+$factory->add_component($comp1);
+$ch->{'position'} = 5;
+my $comp2 = npg_tracking::glossary::composition::component::illumina->new($ch);
+$factory->add_component($comp2);
+my $composition = $factory->create_composition();
+
 subtest 'result file path' => sub {
     plan tests => 4;
 
-    my $f = npg_tracking::glossary::composition::factory->new();
-    my $c = {id_run => 3, position => 4, tag_index => 5};
-    my $comp1 = npg_tracking::glossary::composition::component::illumina->new($c);
-    $f->add_component($comp1);
-    $c->{'position'} = 5;
-    my $comp2 = npg_tracking::glossary::composition::component::illumina->new($c);
-    $f->add_component($comp2);
-    my $r = npg_qc::autoqc::results::result->new(composition => $f->create_composition());
+    my $r = npg_qc::autoqc::results::result->new(composition => $composition);
     ok($r->can('result_file_path'), 'object has result_file_path accessor');
     is($r->result_file_path, undef, 'value undefined by default');
     lives_ok { $r->result_file_path('my path') } 'can assign a value';
     is($r->result_file_path, 'my path', 'value was assigned correctly');
 };
+
+subtest 'md5 for serialized data structures' => sub {
+    plan tests => 10;
+
+    my $pname = 'npg_qc::autoqc::results::result';
+    is($pname->generate_checksum4data(), undef,
+        'undefined returnd for undefined input');
+    is($pname->generate_checksum4data(5), undef, 
+        'undefined returnd for scalar input');
+    is($pname->generate_checksum4data((5,6,7)), undef,
+        'undefined returnd for list input');
+    is($pname->generate_checksum4data([]), undef,
+        'undefined returnd for an empty array');
+    is($pname->generate_checksum4data({}), undef,
+        'undefined returnd for an empty hash ref');
+    is($pname->generate_checksum4data({'and' => [qw/expressionA expressionB/]}),
+        '2666e9d6e4db387bdedeb0a7b92c3c04', 'correct checksum for a hash');
+
+    my $md5 = $pname->generate_checksum4data({'and' => [qw/expressionA expressionB/],
+                                              'or'  => [qw/expressionA expressionC/]});
+    is($pname->generate_checksum4data({'or'   => [qw/expressionA expressionC/],
+                                       'and'  => [qw/expressionA expressionB/]}),
+        $md5, 'checksum value does not depend on the order of keys in a hash');
+    
+    $md5 = 'b0c016c3e599cb65ee3e0c8458ad6abd';
+    is($pname->generate_checksum4data([qw/expressionA expressionB/]),
+        $md5, 'correct checksum value for an array, called as package method');
+
+    my $r = $pname->new(composition => $composition);
+    is($pname->generate_checksum4data([qw/expressionA expressionB/]),
+        $md5, 'correct checksum value for an array, called as instance method');
+    dies_ok { $r->generate_checksum4data($r) }
+        'error when data is a reference to an object';
+};
+
+1;

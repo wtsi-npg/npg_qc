@@ -68,7 +68,7 @@ subtest 'reject incomplete results on insert' => sub {
 };
 
 subtest 'insert a basic record, do not allow incomplete data in update' => sub {
-  plan tests => 8;
+  plan tests => 9;
 
   my $id_seq_composition = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run'    => 1111,
@@ -99,6 +99,7 @@ subtest 'insert a basic record, do not allow incomplete data in update' => sub {
   lives_ok { $new = $new->update($values) }
     'can update a simple record';
   is ($new->comments, 'Cannot run again, returning early', 'comments saved');
+  is ($new->criteria_md5, undef, 'criteria_md5 column value is undefined');
 
   $values = {
     id_seq_composition => $id_seq_composition,

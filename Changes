@@ -17,6 +17,11 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - new interop autoqc check
  - retrieval of interop autoqc check results by SeqQC web app is
    currently supressed
+ - criteria_md5 attribute is added to the review autoqc result object;
+   previously it was computed at a point of loading to the database
+   and was available only in objects retrieved from the database;
+   availability of this value at check execution time will be useful
+   for planned generalisation of the review check  
 
 release 67.5.0
  - npg_qc::illumina::interop::parser - a stand-alone custom parser
