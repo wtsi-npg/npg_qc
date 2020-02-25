@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 use Carp;
 use Readonly;
-use List::MoreUtils qw/all any uniq/;
+use List::MoreUtils qw/all any none uniq/;
 use English qw/-no_match_vars/;
 use DateTime;
 use Try::Tiny;
@@ -23,8 +23,13 @@ Readonly::Scalar my $CONJUNCTION_OP => q[and];
 Readonly::Scalar my $DISJUNCTION_OP => q[or];
 
 Readonly::Scalar my $ROBO_KEY         => q[robo_qc];
+Readonly::Scalar my $CRITERIA_KEY     => q[criteria];
+Readonly::Scalar my $QC_TYPE_KEY      => q[qc_type];
 Readonly::Scalar my $LIBRARY_TYPE_KEY => q[library_type];
 Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY => q[acceptance_criteria];
+
+Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
+Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT, q[uqc]);
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
@@ -44,7 +49,7 @@ npg_qc::autoqc::checks::review
 =head2 Overview
 
 This checks evaluates the results of other autoqc checks
-against a pre-defined set of criteria.
+against a predefined set of criteria.
 
 If data product acceptance criteria for a project and the
 product's library type are defined, it is possible to introduce
@@ -52,15 +57,25 @@ a degree of automation into the manual QC process. To provide
 interoperability with the API supporting the manual QC process,
 the outcome of the evaluation performed by this check is recorded
 not only as a simple pass or fail as in other autoqc checks, but
-also as one of valid manual QC outcomes. A valid manual QC outcome
-is one of the values from the library qc outcomes dictionary
-(mqc_library_outcome_dict table of the npg_qc database), ie one
-of 'Accepted', 'Rejected' or 'Undecided' outcomes. If the
-final_qc_outcome flag of this class' instance is set to true, the
-outcome is also marked as 'Final', otherwise it's marked as
-'Preliminary' (examples: 'Accepted Final', 'Rejected Preliminary').
-By default the final_qc_outcome flag is false and the produced
-outcomes are preliminary.
+also as one of valid manual or user QC outcomes.
+
+A valid manual QC outcome is one of the values from the library
+qc outcomes dictionary (mqc_library_outcome_dict table of the
+npg_qc database), i.e. one of 'Accepted', 'Rejected' or 'Undecided'
+outcomes. If the final_qc_outcome flag of this class' instance is
+set to true, the outcome is also marked as 'Final', otherwise it is
+marked as 'Preliminary' (examples: 'Accepted Final',
+'Rejected Preliminary'). By default the final_qc_outcome flag is
+false and the produced outcomes are preliminary.
+
+A valid user QC outcome is one of the values from the
+uqc_outcome_dict table of the npg_qc database. A concept of
+the finality and, hence, immutability of the outcome is not
+applicable to user QC outcome.
+
+The type of QC outcome can be configured within the Robo QC
+section of product configuration. The default type is library
+manual QC.
 
 =head2 Retrieval of autoqc results to be evaluated
 
@@ -195,12 +210,12 @@ sub can_run {
 =head2 execute
 
 Returns early if the can_run method returns false. Otherwise a full
-evaluation of autoqc results for this product is performed. If auto
-qc results that are necessary to perform the evaluation are not
+evaluation of autoqc results for this product is performed. If
+autoqc results that are necessary to perform the evaluation are not
 available or there is some other problem with evaluation, an error
-is raised if the final_qc_outcome flag is set. If this flagis not,
-the error is captured, logged as a comment and an undefined mqc
-outcome is assigned. 
+is raised if the final_qc_outcome flag is set to true. If this flag
+is false, the error is captured, logged as a comment and an undefined
+qc outcome is assigned. 
 
 =cut
 
@@ -209,8 +224,9 @@ sub execute {
 
   $self->can_run() or return;
   $self->result->criteria($self->_criteria);
-  $self->result->criteria_md5(
-    $self->result->generate_checksum4data($self->result->criteria));
+  my $md5 = $self->result->generate_checksum4data($self->result->criteria);
+  $self->result->criteria_md5($md5);
+
   try {
     $self->result->pass($self->evaluate);
   } catch {
@@ -218,7 +234,7 @@ sub execute {
     $self->final_qc_outcome && croak $err;
     $self->result->add_comment($err);
   };
-  $self->result->qc_outcome($self->_generate_qc_outcome);
+  $self->result->qc_outcome($self->_generate_qc_outcome($md5));
 
   return;
 }
@@ -264,6 +280,37 @@ sub _build__lims {
   return st::api::lims->new(rpt_list => $self->rpt_list);
 }
 
+has '_robo_config' => (
+  isa        => 'HashRef',
+  is         => 'ro',
+  lazy_build => 1,
+);
+sub _build__robo_config{
+  my $self = shift;
+
+  my $message;
+  my $strict = 1; # Parse study section only, ignore the default section.
+  my $config = $self->study_config($self->_lims(), $strict);
+
+  if (keys %{$config}) {
+    $config = $config->{$ROBO_KEY};
+    $config or $message = "$ROBO_KEY section is not present";
+    if (not $message and
+        ((ref $config ne 'HASH') or not $config->{$CRITERIA_KEY})) {
+      $message = "$CRITERIA_KEY section is not present";
+    }
+  } else {
+    $message = 'Study config not found';
+  }
+
+  if ($message) {
+    carp $message . ' for ' .  $self->composition->freeze;
+    return {};
+  }
+
+  return $config;
+}
+
 has '_criteria' => (
   isa        => 'HashRef',
   is         => 'ro',
@@ -273,62 +320,53 @@ sub _build__criteria {
   my $self = shift;
 
   my $rewritten = {};
+
+  (keys %{$self->_robo_config}) or return $rewritten;
+
+  my $lib_type = $self->_lims->library_type;
+  $lib_type or croak 'Library type is not defined for ' .  $self->composition->freeze;
+  # We are going to compare library type strings in lower case
+  # because the case for this type of LIMs data might be inconsistent.
+  my $original_lib_type = $lib_type;
+  $lib_type = lc $lib_type;
+  # We will save the original library type.
+  $self->result->library_type($original_lib_type);
+
   my @criteria  = ();
 
-  my $strict = 1;
-  my $study_config = $self->study_config($self->_lims(), $strict);
-  my $description = $self->composition->freeze;
-
-  if (keys %{$study_config}) {
-
-    if ($study_config->{$ROBO_KEY}) {
-
-      my $lib_type = $self->_lims->library_type;
-      $lib_type or croak "Library type is not defined for $description";
-      # We are going to compare library type strings in lower case
-      # because the case for this type of LIMs data might be inconsistent.
-      my $original_lib_type = $lib_type;
-      $lib_type = lc $lib_type;
-      # We will save the original library type.
-      $self->result->library_type($original_lib_type);
-
+  #####
+  # We expect that the same criterium or a number of criteria can be
+  # relevant for multiple library types. Therefore, under the robo_qc
+  # criteria section we expect a list of lists of criteria, each lower-level list
+  # being assiciated with at least one and potentially more library types.
+  # In practice under this section we have a list of hashes, where each hash
+  # contains the 'library_type' key pointing to an array of relevant library
+  # types and the 'criteria' key pointing to an array or criteria. Criteria
+  # for a particular library type can be split between different hashes.
+  #
+  foreach my $criteria_set (@{$self->_robo_config->{$CRITERIA_KEY}}) {
+    $criteria_set->{$LIBRARY_TYPE_KEY} or croak "$LIBRARY_TYPE_KEY key is missing";
+    $criteria_set->{$ACCEPTANCE_CRITERIA_KEY} or croak "$ACCEPTANCE_CRITERIA_KEY key is missing";
+    if (any {$_ eq $lib_type} map { lc } @{$criteria_set->{$LIBRARY_TYPE_KEY}}) {
       #####
-      # We expect that the same criterium or a number of criteria can be
-      # relevant for multiple library types. Therefore, under the robo_qc
-      # section we expect a list of lists of criteria, each lower-level list
-      # being assiciated with at least one and potentially more library types.
-      # In practice under robo_qc we have a list of hashes, where each hash
-      # contains the 'library_type' key pointing to an array of relevant library
-      # types and the 'criteria' key pointing to an array or criteria. Criteria
-      # for a particular library type can be split between different hashes.
-      #
-      foreach my $criteria_set (@{$study_config->{$ROBO_KEY}}) {
-        $criteria_set->{$LIBRARY_TYPE_KEY} or croak "$LIBRARY_TYPE_KEY key is missing";
-        $criteria_set->{$ACCEPTANCE_CRITERIA_KEY} or croak "$ACCEPTANCE_CRITERIA_KEY key is missing";
-        if (any {$_ eq $lib_type} map { lc } @{$criteria_set->{$LIBRARY_TYPE_KEY}}) {
-          #####
-          # A very simple criteria format - a list of strings - is used for now.
-          # Each string represents a math expression. It is assumed that the
-          # conjunction operator should be used to form the boolean expression
-          # that should give the result of the evaluation. Therefore, at the
-          # moment it is safe to collect all criteria in a single list.
-          # 
-          push @criteria, @{$criteria_set->{$ACCEPTANCE_CRITERIA_KEY}};
-        }
-      }
-      if (@criteria) {
-        # Sort to ensure a consistent order of expressions in the array.
-        @criteria = sort @criteria;
-        # Applying the conjunction operator to all list members.
-        $rewritten = {$CONJUNCTION_OP => \@criteria};
-      } else {
-        carp "No roboqc criteria defined for library type '$original_lib_type'";
-      }
-    } else {
-      carp "$ROBO_KEY section is not present for $description";
+      # A very simple criteria format - a list of strings - is used for now.
+      # Each string represents a math expression. It is assumed that the
+      # conjunction operator should be used to form the boolean expression
+      # that should give the result of the evaluation. Therefore, at the
+      # moment it is safe to collect all criteria in a single list.
+      # 
+      push @criteria, @{$criteria_set->{$ACCEPTANCE_CRITERIA_KEY}};
     }
+  }
+
+  # Sort to ensure a consistent order of expressions in the array.
+  # Merge identical entries.
+  @criteria = uniq (sort @criteria);
+  # Applying the conjunction operator to all list members.
+  if (@criteria) {
+    $rewritten = {$CONJUNCTION_OP => \@criteria};
   } else {
-    carp "Study config not found for $description";
+    carp "No roboqc criteria defined for library type '$original_lib_type'";
   }
 
   return $rewritten;
@@ -377,7 +415,7 @@ sub _build__qc_store {
 
 #####
 # Two different approaches for loading results. We can try to perform
-# evaluationing expression after expression and load the necessary result
+# the evaluation expression after expression and load the necessary result
 # objects as we go. Or we can pre-load all results that will be needed.
 # We choose the latter and raise an error if any results are missing.
 # The error will report what is found and what is expected, so that
@@ -523,16 +561,37 @@ sub _evaluate_expression {
 }
 
 sub _generate_qc_outcome {
-  my $self = shift;
+  my ($self, $md5) = @_;
 
+  my $outcome_type = $self->_robo_config()->{$QC_TYPE_KEY};
+  if ($outcome_type) {
+    if (none { $outcome_type eq $_ } @VALID_QC_TYPES) {
+      croak "Invalid QC type '$outcome_type' in product configuration";
+    }
+  } else {
+    $outcome_type = $QC_TYPE_DEFAULT;
+  }
+
+  my $package_name = 'npg_qc::Schema::Mqc::OutcomeDict';
+  my $pass = $self->result->pass;
   #####
   # Any of Accepted, Rejected, Undecided outcomes can be returned here
-  my $outcome = npg_qc::Schema::Mqc::OutcomeDict->generate_short_description(
-    $self->final_qc_outcome ? 1 : 0, $self->result->pass);
+  my $outcome = ($outcome_type eq $QC_TYPE_DEFAULT)
+    ? $package_name->generate_short_description(
+      $self->final_qc_outcome ? 1 : 0, $pass)
+    : $package_name->generate_short_description_prefix($pass);
 
-  return { mqc_outcome => $outcome,
-           timestamp   => create_current_timestamp(),
-           username    => $ROBO_KEY };
+  $outcome_type .= '_outcome';
+  my $outcome_info = { $outcome_type => $outcome,
+                       timestamp   => create_current_timestamp(),
+                       username    => $ROBO_KEY};
+  if ($outcome_type eq 'uqc') {
+    my @r = ($ROBO_KEY, $VERSION);
+    $md5 and push @r, $md5;
+    $outcome_info->{'rationale'} = join q[:], @r;
+  }
+
+  return $outcome_info;
 }
 
 __PACKAGE__->meta->make_immutable();
@@ -577,7 +636,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019,2020 Genome Research Ltd.
+Copyright (C) 2019,2020 Gemone Research Ltd.
 
 This file is part of NPG.
 

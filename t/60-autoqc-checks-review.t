@@ -31,7 +31,7 @@ my $criteria_list = [
 ];
 
 subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 19;
+  plan tests => 22;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -61,6 +61,18 @@ subtest 'construction object, deciding whether to run' => sub {
     [qr/robo_qc section is not present for/],
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no robo config');
+  is ($check->result->comments,
+    'No criteria defined in the product configuration file',
+    'reason logged');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/no_criteria_section",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  warnings_like { $can_run = $check->can_run }
+    [qr/criteria section is not present for/],
+    'can_run is accompanied by warnings';
+  ok (!$can_run, 'can_run returns false - no criteria for this library type');
   is ($check->result->comments,
     'No criteria defined in the product configuration file',
     'reason logged');
@@ -122,17 +134,17 @@ subtest 'finding result - file system' => sub {
   my $expected = 'Expected results for bam_flagstats, bcfstats, verify_bam_id,';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
+    't/data/autoqc/review/samplesheet_29524.csv';
+
   my $check = npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/with_criteria",
+    conf_path => $test_data_dir,
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   throws_ok { $check->_results } qr/$expected found none/, 'no results - error';
 
   # should have all three for the entiry and phix for bam_flagstats and qx_yield
   # and gradually add them to qc_in
-
-  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
-    't/data/autoqc/review/samplesheet_29524.csv';
 
   for my $name (('29524#2.qX_yield.json',
                  '29524#2_phix.bam_flagstats.json',
