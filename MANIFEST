@@ -493,7 +493,10 @@ t/data/autoqc/review/error1/product_release.yml
 t/data/autoqc/review/error2/product_release.yml
 t/data/autoqc/review/no_criteria/product_release.yml
 t/data/autoqc/review/with_criteria/product_release.yml
-t/data/autoqc/review/no_criteria_section/product_release.yml 
+t/data/autoqc/review/no_criteria_section/product_release.yml
+t/data/autoqc/review/mqc_type/product_release.yml
+t/data/autoqc/review/unknown_qc_type/product_release.yml
+t/data/autoqc/review/uqc_type/product_release.yml
 t/data/autoqc/review/samplesheet_27483.csv
 t/data/autoqc/review/samplesheet_29524.csv
 t/data/autoqc/review/29524#2.composition.json

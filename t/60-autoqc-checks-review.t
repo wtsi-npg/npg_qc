@@ -309,26 +309,52 @@ subtest 'single expression evaluation' => sub {
 };
 
 subtest 'evaluation within the execute method' => sub {
-  plan tests => 24;
+  plan tests => 37;
 
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
-  my $check = npg_qc::autoqc::checks::review->new(
+  my @check_objects = ();
+
+  push @check_objects, npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
     qc_in     => $dir,
     rpt_list  => $rpt_list);
+  push @check_objects, npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/mqc_type",
+    qc_in     => $dir,
+    rpt_list  => $rpt_list);
+  push @check_objects, npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/uqc_type",
+    qc_in     => $dir,
+    rpt_list  => $rpt_list);
 
-  lives_ok { $check->execute } 'execute method runs OK';
-  is ($check->result->pass, 1, 'result pass attribute is set to 1');
-  my %expected = map { $_ => 1 } @{$criteria_list};
-  is_deeply ($check->result->evaluation_results(), \%expected,
-    'evaluation results are saved');
-  my $outcome = $check->result->qc_outcome;
-  is ($outcome->{'mqc_outcome'} , 'Accepted preliminary', 'correct outcome string');
-  is ($outcome->{'username'}, 'robo_qc', 'correct process id');
-  ok ($outcome->{'timestamp'}, 'timestamp saved');
+  my $count = 0;
+  foreach my $check (@check_objects) {
+    lives_ok { $check->execute } 'execute method runs OK';
+    is ($check->result->pass, 1, 'result pass attribute is set to 1');
+    my %expected = map { $_ => 1 } @{$criteria_list};
+    is_deeply ($check->result->evaluation_results(), \%expected,
+      'evaluation results are saved');
+    my $outcome = $check->result->qc_outcome;
+    if ($count < 2) {
+      is ($outcome->{'mqc_outcome'} , 'Accepted preliminary', 'correct outcome string');
+    } elsif ($count == 2) {
+      is ($outcome->{'uqc_outcome'} , 'Accepted', 'correct outcome string');
+    }
+    is ($outcome->{'username'}, 'robo_qc', 'correct process id');
+    ok ($outcome->{'timestamp'}, 'timestamp saved');
+    $count++;
+  }
+
+  my $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/unknown_qc_type",
+    qc_in     => $dir,
+    rpt_list  => $rpt_list);
+  throws_ok { $check->execute }
+    qr/Invalid QC type \'someqc\' in product configuration/,
+    'error if qc outcome type is not recignised';
 
   my $target = "$dir/29524#2.bam_flagstats.json";
 
@@ -360,7 +386,7 @@ subtest 'evaluation within the execute method' => sub {
     }
 
     is_deeply ($check->result->evaluation_results(), $e, 'evaluation results are saved');
-    $outcome = $check->result->qc_outcome;
+    my $outcome = $check->result->qc_outcome;
     is ($outcome->{'mqc_outcome'} , 'Rejected final', 'correct outcome string');
     is ($outcome->{'username'}, 'robo_qc', 'correct process id');
     ok ($outcome->{'timestamp'}, 'timestamp saved');
