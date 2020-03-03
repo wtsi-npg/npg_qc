@@ -14,11 +14,14 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    its parent base class (both in npg_qc::autoqc::result namespace)
    to make these attributes available for results objects that are
    derived directly from the base class.
+ - new interop autoqc check
+ - retrieval of interop autoqc check results by SeqQC web app is
+   currently supressed
 
 release 67.5.0
-- npg_qc::illumina::interop::parser - a stand-alone custom parser
-  for Illumina InterOp files; unlike Illumina's own parser, this
-  parser does not round the results of the calculation
+ - npg_qc::illumina::interop::parser - a stand-alone custom parser
+   for Illumina InterOp files; unlike Illumina's own parser, this
+   parser does not round the results of the calculation
 
 release 67.4.0
  - bug fix for mqc skipper script which, because of filtering on

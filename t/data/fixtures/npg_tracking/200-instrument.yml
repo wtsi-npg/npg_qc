@@ -201,3 +201,11 @@
   mirroring_host: ''
   staging_dir: ''
   latest_contact:
+- id_instrument: 67
+  name: NV1
+  id_instrument_format: 13
+  external_name: 'A006'
+  serial: ''
+  iscurrent: 1
+  ipaddr: 
+  instrument_comp: nv1

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -108,6 +108,18 @@ subtest 'All expected 404' => sub {
     ok( $response->is_error, qq[response is an error] );
     is( $response->code, 404, 'error code is 404' );
   }
+};
+
+subtest 'interop files are excluded' => sub {
+  plan tests => 5;
+
+  ok(-e 't/data/interop/22833_1.interop.json', 'result exists');
+  my $response = request('/checks/path?path=t/data/interop');
+  is( $response->code, 200, 'no error' );
+  is( $response->content_type, q[text/html], 'HTML content type');
+  my $content = $response->content();
+  like( $content, qr/Run\ Id/, 'Run header column is present');
+  unlike( $content, qr/Run 22833/, 'Result is not present'); 
 };
 
 1;

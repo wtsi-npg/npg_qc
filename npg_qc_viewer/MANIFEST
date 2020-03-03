@@ -188,6 +188,7 @@ t/data/fixtures/mlwarehouse/400-IseqRunLaneMetric.yml
 t/data/fixtures/mlwarehouse/500-Sample.yml
 t/data/fixtures/mlwarehouse/500-Study.yml
 t/data/fixtures/npgqc_json.tar.gz
+t/data/interop/22833_1.interop.json
 t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/lane1/qc/1234_1.insert_size.json
 t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/lane1/qc/1234_1.qX_yield.json
 t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/lane2/qc/1234_2.insert_size.json
