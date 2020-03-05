@@ -5,14 +5,13 @@ use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Perl6::Slurp;
-use File::Basename;
 use File::Spec;
 use Parallel::ForkManager;
-use File::Temp qw( tempdir );
+use File::Temp qw(tempdir);
 use POSIX qw(mkfifo);
 use Fcntl qw(:mode);
-use IPC::SysV qw(IPC_STAT IPC_PRIVATE);
 use Readonly;
+use List::MoreUtils qw(uniq);
 
 use npg_tracking::data::reference::list;
 use npg_tracking::util::types;
@@ -22,11 +21,9 @@ with    qw(npg_common::roles::software_location);
 
 our $VERSION = '0';
 
-Readonly::Scalar my $EXT => q[bam];
-Readonly::Scalar my $LINES_PER_FASTQ_RECORD => 4;
+Readonly::Scalar my $EXT => q[cram];
 Readonly::Scalar my $ADAPTER_FASTA => q[adapters.fasta];
 
-Readonly::Scalar my $MINUS_ONE   => -1;
 Readonly::Scalar my $SHIFT_EIGHT => 8;
 
 #indices of different fields in the NCBI tabular blat output
@@ -50,18 +47,11 @@ sub _build_adapter_fasta {
     return File::Spec->catfile($repos, $ADAPTER_FASTA);
 }
 
-has 'aligner_path'    =>  ( is        => 'ro',
+has 'aligner_path'    => ( is        => 'ro',
                            isa        => 'NpgCommonResolvedPathExecutable',
                            required   => 0,
                            coerce     => 1,
                            default    => q[blat],
-                          );
-
-has 'bamtofastq_path' => ( is        => 'ro',
-                          isa        => 'NpgCommonResolvedPathExecutable',
-                          required   => 0,
-                          coerce     => 1,
-                          default    => q[bamtofastq],
                          );
 
 has 'adapter_list'    => ( is          => 'ro',
@@ -72,13 +62,19 @@ has 'adapter_list'    => ( is          => 'ro',
 sub _build_adapter_list {
     my $self = shift;
 
-    my $adapter_file = slurp $self->adapter_fasta();
+    my @adapter_file = slurp $self->adapter_fasta();
     my @list = ();
-    foreach ( split m/\n/msx, $adapter_file ) {
-        my ($name) = m/^>(\S+)/msx;
-        next if !$name;
+    foreach my $line ( @adapter_file ) {
+        $line =~ s/\s+\Z//smx;
+        $line or next;
+        my ($name) = $line =~ m/\A>(\S+)/msx;
+        $name or next;
         push @list, $name;
     }
+    my $n = scalar @list;
+    @list = uniq @list;
+    (scalar @list == $n) or croak 'Invalid adapter fasta file';
+
     return \@list;
 }
 
@@ -87,13 +83,13 @@ override 'execute' => sub {
 
     super();
 
-    my ($bam_in) = @{$self->input_files};
-    my $results = $self->_search_adapters_from_bam($bam_in);
-    $self->result->forward_read_filename($bam_in);
+    my ($cram_in) = @{$self->input_files};
+    my $results = $self->_search_adapters_from_cram($cram_in);
+    $self->result->forward_read_filename($cram_in);
     $self->result->forward_contaminated_read_count($results->{'forward'}{'contam_read_count'});
     $self->result->forward_blat_hash($results->{'forward'}{'contam_hash'});
     $self->result->forward_start_counts($results->{'forward'}{'adapter_starts'});
-    $self->result->reverse_read_filename($bam_in);
+    $self->result->reverse_read_filename($cram_in);
     $self->result->reverse_contaminated_read_count($results->{'reverse'}{'contam_read_count'});
     $self->result->reverse_blat_hash($results->{'reverse'}{'contam_hash'});
     $self->result->reverse_start_counts($results->{'reverse'}{'adapter_starts'});
@@ -106,8 +102,8 @@ sub _blat_command {
     return $self->aligner_path .  q[ ] . $self->adapter_fasta . q[ stdin stdout -tileSize=9 -maxGap=0 -out=blast8];
 }
 
-sub _search_adapters_from_bam {
-    my ($self, $bam) = @_;
+sub _search_adapters_from_cram {
+    my ($self, $cram) = @_;
 
     my $tmpdir = File::Temp->newdir(); #will be removed when out of scope
     my $tempfifo = File::Temp::tempnam($tmpdir, q(fifo));
@@ -119,24 +115,23 @@ sub _search_adapters_from_bam {
         $self->result->forward_fasta_read_count($data_structure_reference->{forward_count});
         $self->result->reverse_fasta_read_count($data_structure_reference->{reverse_count});
     });
+
     my $pid = $pm->start;
     ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
-    if (! $pid) { #fork to convert BAM to fastq then into fasta whilst count forward and reverse reads
-        my ($fieldi, $fcount, $rcount) = (0,0,0);
-        my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->bamtofastq_path .
-                        qq[ T=$tmpdir/bamtofastq filename=$bam ] . q[" |] ;
+    if (! $pid) { #fork to convert CRAM to fasta whilst counting forward and reverse reads
+        my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->samtools_cmd .
+                         qq[ fasta -F0x900 --thread 2 $cram] . q[" |] ;
         open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
         open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
+        my ($fcount, $rcount) = (0,0);
+        my $header_flag = 1;
         while (my $line = <$ifh>){
-            $fieldi++;
-            $fieldi%=$LINES_PER_FASTQ_RECORD;
-            if ($fieldi==1){ #count forward/rev, print fasta identifier
-                if ( substr($line, 0, 1, q(>)) ne q(@) ) {croak 'incorrect fastq format'}
-                    $line=~m{^\S+/2\b}smx ? $rcount++ : $fcount++;
-                    print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
-            }elsif($fieldi==2){ #print bases
-                print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
+            if ($header_flag){
+                $line =~ m{^\S+/2\b}smx ? $rcount++ : $fcount++;
             }
+            # If this is header, the next line is not and other way around
+            $header_flag = not $header_flag;
+            print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
         }
         close $ofh or croak qq[Cannot close fifo $tempfifo, error $ERRNO];
         close $ifh or croak qq[Cannot close pipe $b2fqcommand, error $ERRNO];
@@ -162,83 +157,68 @@ sub _search_adapters_from_bam {
 sub _process_search_output {
     my ($self, $blat_fh) = @_;
 
-    # Count the total number of contaminated reads and the number of reads
-    # contaminated per adapter. The blat output is one line per read per
-    # adapter match - i.e. a read matching two separate adapters, or matching
-    # the same adapter twice, will have two entries. We rely heavily on the
-    # output being sorted by read then by adapter.
+    # Count the total number of contaminated reads and the number of
+    # contaminated reads per adapter. The blat output is one line per read
+    # per adapter match, i.e. a read matching two separate adapters, or
+    # matching the same adapter twice will have two entries. We rely heavily
+    # on the output being sorted by read, then by adapter.
 
     my $results = {};
-    $results->{'contam_hash'} = {};
-    $results->{'adapter_starts'} = {};
-    $results->{'forward'} = {};
     $results->{'forward'}{'contam_read_count'} = 0;
     $results->{'forward'}{'contam_hash'} = { map {$_ => 0} @{$self->adapter_list} };
     $results->{'forward'}{'adapter_starts'} = {};
-    $results->{'reverse'} = {};
     $results->{'reverse'}{'contam_read_count'} = 0;
     $results->{'reverse'}{'contam_hash'} = { map {$_ => 0} @{$self->adapter_list} };
     $results->{'reverse'}{'adapter_starts'} = {};
-    my $read_count = 0;
 
-    my ( $read, $match);
-    my ( $previous_read, $previous_match) = ( q{ }, q{ } );
-
-    my $start;
-    my $previous_start = $MINUS_ONE;
-    my $direction = q(forward); #forward/reverse
+    my ($previous_read, $previous_match) = ( q{ }, q{ });
+    my $previous_start;
+    my $previous_direction;
+    my $current_direction;
 
     while (my $lane = <$blat_fh>) {
         next if !$lane; # there might be no output
 
         my @fields = split m/\s+/msx, $lane;
         if (scalar @fields < $END_MATCH_IND + 1) {
-	    croak q[Too few fields in blat output];
-	}
-        $match = $fields[$REF_NAME_IND];
-        $read  = $fields[$SEQ_NAME_IND];
-        $start = $fields[$START_MATCH_IND] < $fields[$END_MATCH_IND] ?
+            croak q[Too few fields in blat output];
+        }
+
+        my $match = $fields[$REF_NAME_IND];
+        my $read  = $fields[$SEQ_NAME_IND];
+        my $start = ($fields[$START_MATCH_IND] < $fields[$END_MATCH_IND]) ?
                     $fields[$START_MATCH_IND] : $fields[$END_MATCH_IND];
 
-        if ( $read ne $previous_read ) {
-            $direction = $read=~m{/2\z}smx ? q(reverse) : q(forward);
-            $read_count++;
-            $results->{$direction}{'contam_read_count'}++;
-            $results->{'contam_hash'}->{$match}++;
-            $results->{$direction}{'contam_hash'}{$match}++;
-            if ($previous_start >= 0) {
-                $results->{'adapter_starts'}->{$previous_start} =
-                    exists $results->{'adapter_starts'}->{$previous_start} ?
-                    $results->{'adapter_starts'}->{$previous_start} + 1 : 1;
-                $results->{$direction}{'adapter_starts'}{$previous_start} =
-                    exists $results->{$direction}{'adapter_starts'}{$previous_start} ?
-                    $results->{$direction}{'adapter_starts'}{$previous_start} + 1 : 1;
+        if ( $read ne $previous_read ) { # new read starts, including the first read
+            if ($previous_start) { # nothing to save for the first read
+                $results->{$previous_direction}{'adapter_starts'}{$previous_start}++;
             }
-	          $previous_start = $start;
-            next;
+            $current_direction = $read=~m{/2\z}smx ? q(reverse) : q(forward);
+            $results->{$current_direction}{'contam_read_count'}++;
+            $results->{$current_direction}{'contam_hash'}{$match}++;
+            $previous_start = $start; # first start position for this read
+        } else {
+            if ($start < $previous_start) { # keep the lowest start position
+                $previous_start = $start;
+            }
+            # match to the same reference can be reported multiple times
+            if ( $match ne $previous_match ) {
+                $results->{$current_direction}{'contam_hash'}{$match}++;
+            }
         }
 
-        if ( $match ne $previous_match ) {
-            $results->{'contam_hash'}->{$match}++;
-            $results->{$direction}{'contam_hash'}{$match}++;
-        }
-        if ($start < $previous_start) { $previous_start = $start; }
+        ($previous_read, $previous_match, $previous_direction) = ($read, $match, $current_direction);
+    } # end of reading blat output
 
-    }
-    continue {
-        ( $previous_read, $previous_match) = ( $read, $match);
-    }
-    if ($previous_start >= 0) {
-        $results->{'adapter_starts'}->{$previous_start}++;
-        $results->{$direction}{'adapter_starts'}{$previous_start}++;
+    # save start position for the last read
+    if ($previous_start) {
+        $results->{$previous_direction}{'adapter_starts'}{$previous_start}++;
     }
 
-    $results->{'contam_read_count'} = $read_count;
     return $results;
 }
 
 __PACKAGE__->meta->make_immutable();
-
 
 1;
 
@@ -271,15 +251,10 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =head1 DESCRIPTION
 
-    Look for adapter matches in fastq files. Right now there is only one tool
-    for this (blat) but later versions may add others, or allow modification
-    of the search parameters.
-  
+    Look for adapter matches in cram files.
     Results for a forward and reverse read are reported separately.
 
 =head1 SUBROUTINES/METHODS
-
-=head2 BUILD last method called before returning a new instance of the object to the caller
 
 =head2 new
 
@@ -292,15 +267,13 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
     fastq(s) for a run lane and run a blat search for adapter sequences in
     each one.
 
-=head2 S_IRWXU - injected by IPC::SysV
-
 =head1 DIAGNOSTICS
 
     None.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-    The class expects to find the blat executable installed at $BLAT_PATH
+    The class expects to find the blat executable installed.
 
 =head1 DEPENDENCIES
 
@@ -318,8 +291,6 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =item Readonly
 
-=item File::Basename
-
 =item Parallel::ForkManager
 
 =item File::Temp
@@ -330,7 +301,7 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =item File::Spec
 
-=item IPC::SysV
+=item List::MoreUtils
 
 =item npg_tracking::data::reference::list
 
@@ -347,7 +318,7 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 =head1 BUGS AND LIMITATIONS
 
     Counting unique contaminated reads (totals and per adapter) is problematic
-    with large, highly contaminated fastq files. This module saves on massive
+    with large, highly contaminated files. This module saves on massive memory
     memory overheads by relying on the blat output file being sorted first on
     reads then on adapters.
 
@@ -357,7 +328,7 @@ npg_qc::autoqc::checks::adapter - check for adapter sequences in fastq files.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2019 GRL
 
 This file is part of NPG.
 

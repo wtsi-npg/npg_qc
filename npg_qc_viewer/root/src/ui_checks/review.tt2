@@ -1,0 +1,15 @@
+[% IF check.evaluation_results.defined && check.evaluation_results.size -%]
+<div class="data_table">
+  <table title="review results">
+  [% FOREACH pair IN check.evaluation_results.pairs -%]
+    <tr><td class="[% pair.value ? 'passed' : 'failed' %]">[% pair.key %]</td></tr>
+  [% END -%]
+  </table>
+</div>
+[% ELSE -%]
+<p>No evaluation results are available</p>
+[% END -%]
+
+[% IF check.comments.defined && check.comments -%]
+<p>Comments: [% check.comments %]</p>
+[% END -%]

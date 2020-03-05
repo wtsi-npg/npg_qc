@@ -3,12 +3,13 @@ package npg_qc::autoqc::checks::check;
 use Moose;
 use MooseX::Aliases;
 use MooseX::StrictConstructor;
+use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use Class::Load qw(load_class);
 use File::Basename;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
-use List::MoreUtils qw(any uniq);
+use List::MoreUtils qw(any each_array none uniq);
 use Readonly;
 use Carp;
 
@@ -27,6 +28,7 @@ our $VERSION = '0';
 
 Readonly::Scalar my $FILE_EXTENSION  => 'fastq';
 Readonly::Scalar my $HUMAN           => q[Homo_sapiens];
+Readonly::Scalar my $DO_NOT_USE      => q[DO_NOT_USE];
 Readonly::Scalar my $FORWARD_READ_FILE_NAME_SUFFIX => q[1];
 Readonly::Scalar my $REVERSE_READ_FILE_NAME_SUFFIX => q[2];
 
@@ -41,12 +43,27 @@ npg_qc::autoqc::checks::check
   my $check = npg_qc::autoqc::checks::check->new(qc_in    => q[a/valid/path],
                                                  position => 1,
                                                  id_run   => 2222);
+  $check->run();
 
 =head1 DESCRIPTION
 
 A parent class for autoqc checks. Checks are performed either for a lane or
 for a plex (index, lanelet) or for a composition of the former defined by the
 rpt_list attribute.
+
+The child class is expected to implement a no-argument execute method,
+which performs any necessary computation and sets attributes of either one
+or multiple result objects which should inherit from the
+npg_qc::autoqc::result::result class. The result object(s) should be assigned
+to the result attribute of this class.
+
+The run method of this class first calls the execute method and then
+serializes each result object to a JSON string and saves this data to a file in
+the directory given by the qc_out attribute. If qc_out is an array with
+multiple values, the result objects are matched to their respective output
+directories based on ther respective array indices, ie the first result object
+is matched with the first output directory, the second result object is
+matched with the second output directory, etc.
 
 =head1 SUBROUTINES/METHODS
 
@@ -153,32 +170,38 @@ sub _test_qc_in {
   return;
 }
 
+subtype 'NpgTrackingQcOutDirectories'
+    => as 'ArrayRef[Str]'
+    => where { my @d=@{$_}; none { not -W } @d }
+    => message {'One of qc output directories [' . (join q[, ], @{$_}) .
+                '] does not exist or is not writable'};
+
+coerce 'NpgTrackingQcOutDirectories'
+  => from 'Str'
+  => via { [$_] };
+
 =head2 qc_out
 
-Path to a directory where the results should be written to. Read-only.
+An array of writable directories where the results should be written to. Read-only.
+The attribute can be given as a string representing a single directory path, will
+be set to an array internally and returned as an array.
+
+If qc_out is not set, but qc_in is set, qc_out will be set to qc_in.
 
 =cut
 
-has 'qc_out'      => (isa        => 'Str',
+has 'qc_out'      => (isa        => 'NpgTrackingQcOutDirectories',
                       is         => 'ro',
                       required   => 0,
                       lazy_build => 1,
-                      trigger    => \&_test_qc_out,
+                      coerce     => 1,
                      );
 sub _build_qc_out {
   my $self = shift;
   if (!$self->has_qc_in) {
     croak 'qc_out should be defined';
   }
-  $self->_test_qc_out($self->qc_in);
   return $self->qc_in;
-}
-sub _test_qc_out {
-  my ($self, $qc_out) = @_;
-  if (!-W $qc_out) {
-    croak qq[Output qc directory $qc_out does not exist or is not writable];
-  }
-  return;
 }
 
 =head2 filename_root
@@ -255,7 +278,10 @@ sub _build_input_files {
 
 =head2 result
 
-A result object. Read-only.
+A single result object. Read-only, lazy-built attribute.
+A child class can change the type of this attribute to an array
+of result objects and either overwrite or disable the builder
+method supplier here.
 
 =cut
 
@@ -299,23 +325,63 @@ sub _build_result {
   return $result;
 }
 
+has '_lims_reference'  => (isa         => 'Maybe[Str]',
+                           is          => 'ro',
+                           required    => 0,
+                           lazy_build  => 1,
+                           );
+
+sub _build__lims_reference {
+  my $self = shift;
+
+  if (!$self->can('lims')) {
+    $self->result->add_comment('lims accessor is not defined');
+    return;
+  }
+  if(!$self->lims->reference_genome) {
+    $self->result->add_comment('No reference genome specified');
+    return;
+  }
+  return $self->lims->reference_genome;
+}
+
 =head2 run
 
-Creates an object that can perform the requested test, calls test
-execution and writes out test results to the output directory.
+Calls check execution and writes out check results to one or
+multiple output directories.
 
 =cut
 
 sub run {
   my $self = shift;
-  $self->execute();
-  my @results = ($self->result());
+
+  $self->execute(); # execute the check
+
+  # create a list of result objects
+  my @results = ref $self->result() eq q[ARRAY] ?
+                @{$self->result()} : ($self->result());
   if ($self->can('related_results')) {
     push @results, @{$self->related_results()};
   }
-  foreach my $r (@results) {
-    $r->store($self->qc_out);
+
+  # ensure the number of qc_out directories matches the number
+  # of results objects
+  my @qc_out = @{$self->qc_out};
+  if ((@qc_out != @results) && (@qc_out != 1)) {
+    croak 'Mismatch between number of qc_out directories and ' .
+          'number of result objects';
   }
+  if ((@results > 1) && (@qc_out == 1)) {
+    my $single = $qc_out[0];
+    @qc_out = map { $single } @results;
+  }
+
+  # write out results as JSON serialization
+  my $ea = each_array(@results, @qc_out);
+  while ( my ($r, $d) = $ea->() ) {
+    $r->store($d);
+  }
+
   return 1;
 }
 
@@ -324,7 +390,7 @@ sub run {
 This method is called by the qc script to run the check, perform
 all necessary computation and save results as an in-memory result
 object. The derived class should provide a full implementation of
-this method.
+this method by either extending or overwriting this method.
 
 In this class the method tries to find input files if not given
 and exists with an error if no files are found. If input_files
@@ -467,29 +533,42 @@ sub create_filename {
 =head2 entity_has_human_reference
 
 Returns true if the reference_genome attribute is defined
-for the entiry and the value of the attribute indicates
+for the entity and the value of the attribute indicates
 that the reference is for Homo Sapiens.
 
 =cut
 
 sub entity_has_human_reference {
   my $self = shift;
-
-  if (!$self->can('lims')) {
-    $self->result->add_comment('lim saccessor is not defined');
+  if( !$self->_lims_reference ) {
     return 0;
   }
-
-  my $ref = $self->lims->reference_genome;
-  if(!$ref) {
-    $self->result->add_comment('No reference genome specified');
-    return 0;
-  }
+  my $ref = $self->_lims_reference;
   if($ref !~ /\A$HUMAN/smx) {
     $self->result->add_comment("Non-human reference genome '$ref'");
     return 0;
   }
+  return 1;
+}
 
+=head2 entity_has_active_reference
+
+Returns true if the reference_genome attribute is defined for
+the entity and the value of the attribute indicates that the
+reference is not marked as do not use.
+
+=cut
+
+sub entity_has_active_reference {
+  my $self = shift;
+  if( !$self->_lims_reference ) {
+    return 0;
+  }
+  my $ref = $self->_lims_reference;
+  if($ref =~ /$DO_NOT_USE/smx) {
+    $self->result->add_comment("Non active reference genome used '$ref'");
+    return 0;
+  }
   return 1;
 }
 
@@ -522,6 +601,8 @@ __END__
 =item MooseX::Aliases
 
 =item MooseX::StrictConstructor
+
+=item Moose::Util::TypeConstraints
 
 =item MooseX::Getopt
 
@@ -565,7 +646,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2014,2015,2016,2017,2018,2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 

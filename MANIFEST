@@ -7,14 +7,15 @@ bin/reformat_fluidigm_snp26_results_irods.pl
 bin/qc
 bin/qc_db_delete_autoqc
 bin/mqc_outcome_reporter
+bin/npg_mqc_skipper
 bin/npg_qc_autoqc_data.pl
 bin/npg_qc_illumina_analysis_loader
-bin/npg_qc_save_files.pl
 bin/npg_qc_tag_sniff.pl
 bin/call_gtck_composite_rpt.pl
 bin/genotype_call_results_reporter
 Build.PL
 Changes
+lib/npg_qc/illumina/interop/parser.pm
 lib/npg_qc/illumina/loader/Cluster_Density.pm
 lib/npg_qc/illumina/loader.pm
 lib/npg_qc/autoqc/autoqc.pm
@@ -24,6 +25,7 @@ lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/checks/bam_flagstats.pm
 lib/npg_qc/autoqc/checks/bcfstats.pm
 lib/npg_qc/autoqc/checks/check.pm
+lib/npg_qc/autoqc/checks/interop.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
 lib/npg_qc/autoqc/checks/genotype.pm
@@ -32,6 +34,7 @@ lib/npg_qc/autoqc/checks/insert_size.pm
 lib/npg_qc/autoqc/checks/pulldown_metrics.pm
 lib/npg_qc/autoqc/checks/qX_yield.pm
 lib/npg_qc/autoqc/checks/ref_match.pm
+lib/npg_qc/autoqc/checks/review.pm
 lib/npg_qc/autoqc/checks/rna_seqc.pm
 lib/npg_qc/autoqc/checks/samtools_stats.pm
 lib/npg_qc/autoqc/checks/sequence_error.pm
@@ -54,6 +57,7 @@ lib/npg_qc/autoqc/results/bcfstats.pm
 lib/npg_qc/autoqc/results/base.pm
 lib/npg_qc/autoqc/results/collection.pm
 lib/npg_qc/autoqc/results/contamination.pm
+lib/npg_qc/autoqc/results/interop.pm
 lib/npg_qc/autoqc/results/gc_bias.pm
 lib/npg_qc/autoqc/results/gc_fraction.pm
 lib/npg_qc/autoqc/results/genotype.pm
@@ -63,6 +67,7 @@ lib/npg_qc/autoqc/results/pulldown_metrics.pm
 lib/npg_qc/autoqc/results/qX_yield.pm
 lib/npg_qc/autoqc/results/ref_match.pm
 lib/npg_qc/autoqc/results/result.pm
+lib/npg_qc/autoqc/results/review.pm
 lib/npg_qc/autoqc/results/rna_seqc.pm
 lib/npg_qc/autoqc/results/samtools_stats.pm
 lib/npg_qc/autoqc/results/sequence_error.pm
@@ -78,6 +83,7 @@ lib/npg_qc/autoqc/role/adapter.pm
 lib/npg_qc/autoqc/role/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/role/bam_flagstats.pm
 lib/npg_qc/autoqc/role/contamination.pm
+lib/npg_qc/autoqc/role/interop.pm
 lib/npg_qc/autoqc/role/gc_fraction.pm
 lib/npg_qc/autoqc/role/genotype.pm
 lib/npg_qc/autoqc/role/genotype_call.pm
@@ -95,7 +101,6 @@ lib/npg_qc/autoqc/role/tags_reporters.pm
 lib/npg_qc/autoqc/role/upstream_tags.pm
 lib/npg_qc/autoqc/role/verify_bam_id.pm
 lib/npg_qc/autoqc/types.pm
-lib/npg_qc/file_store.pm
 lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/mqc/outcomes/keys.pm
@@ -112,12 +117,12 @@ lib/npg_qc/Schema/Result/BamFlagstats.pm
 lib/npg_qc/Schema/Result/Bcfstats.pm
 lib/npg_qc/Schema/Result/ClusterDensity.pm
 lib/npg_qc/Schema/Result/Contamination.pm
-lib/npg_qc/Schema/Result/Fastqcheck.pm
 lib/npg_qc/Schema/Result/GcBias.pm
 lib/npg_qc/Schema/Result/GcFraction.pm
 lib/npg_qc/Schema/Result/Genotype.pm
 lib/npg_qc/Schema/Result/GenotypeCall.pm
 lib/npg_qc/Schema/Result/InsertSize.pm
+lib/npg_qc/Schema/Result/Interop.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeDict.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeEnt.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeHist.pm
@@ -127,6 +132,7 @@ lib/npg_qc/Schema/Result/MqcOutcomeHist.pm
 lib/npg_qc/Schema/Result/PulldownMetrics.pm
 lib/npg_qc/Schema/Result/QXYield.pm
 lib/npg_qc/Schema/Result/RefMatch.pm
+lib/npg_qc/Schema/Result/Review.pm
 lib/npg_qc/Schema/Result/RnaSeqc.pm
 lib/npg_qc/Schema/Result/SamtoolsStats.pm
 lib/npg_qc/Schema/Result/SeqComponent.pm
@@ -157,14 +163,14 @@ t/00-distribution.t
 t/00-podcoverage.t
 t/00-pod.t
 t/00-scripts_compile.t
-t/10-file_store.t
 t/10-autoqc-parse-samtools_stats.t
+t/30-illumina-interop-parser.t
 t/30-illumina-loader-Cluster_Density.t
 t/30-illumina-loader.t
 t/50-npg_qc-Schema.t
 t/50-schema-result-Contamination.t
-t/50-schema-result-Fastqcheck.t
 t/50-schema-result-InsertSize.t
+t/50-schema-result-Interop.t
 t/50-schema-result-Adapter.t
 t/50-schema-result-Genotype.t
 t/50-schema-result-GenotypeCall.t
@@ -182,6 +188,7 @@ t/50-schema-result-QXYield.t
 t/50-schema-result-TagMetrics.t
 t/50-schema-result-AlignmentFilterMetrics.t
 t/50-schema-result-PulldownMetrics.t
+t/50-schema-result-Review.t
 t/50-schema-result-SplitStats.t
 t/50-schema-result-MqcLibraryOutcomeDict.t
 t/50-schema-result-MqcLibraryOutcomeEnt.t
@@ -204,6 +211,7 @@ t/60-autoqc-checks-af_metrics.t
 t/60-autoqc-checks-bam_flagstats.t
 t/60-autoqc-checks-bcfstats.t
 t/60-autoqc-checks-check.t
+t/60-autoqc-checks-interop.t 
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-genotype.t
@@ -212,6 +220,7 @@ t/60-autoqc-checks-insert_size.t
 t/60-autoqc-checks-pulldown_metrics.t
 t/60-autoqc-checks-qX_yield.t
 t/60-autoqc-checks-ref_match.t
+t/60-autoqc-checks-review.t
 t/60-autoqc-checks-rna_seqc.t
 t/60-autoqc-checks-sequence_error.t
 t/60-autoqc-checks-spatial_filter.t
@@ -232,6 +241,7 @@ t/60-autoqc-results-bam_flagstats.t
 t/60-autoqc-results-bcfstats.t
 t/60-autoqc-results-collection.t
 t/60-autoqc-results-contamination.t
+t/60-autoqc-results-interop.t
 t/60-autoqc-results-gc_bias.t
 t/60-autoqc-results-gc_fraction.t
 t/60-autoqc-results-genotype.t
@@ -241,6 +251,7 @@ t/60-autoqc-results-pulldown_metrics.t
 t/60-autoqc-results-qX_yield.t
 t/60-autoqc-results-ref_match.t
 t/60-autoqc-results-result.t
+t/60-autoqc-results-review.t
 t/60-autoqc-results-rna_seqc.t
 t/60-autoqc-results-samtools_stats.t
 t/60-autoqc-results-sequence_error.t
@@ -256,6 +267,8 @@ t/70-report-genotype_call.t
 t/80-autoqc-qc-script.t
 t/data/autoqc/bam_flagstats/16960_1_0.tar.gz
 t/data/autoqc/bam_flagstats/17448_1_9.tar.gz
+t/data/autoqc/bam_flagstats/25837_1_13.tar.gz
+t/data/autoqc/bam_flagstats/29006_8_1.tar.gz
 t/data/autoqc/bam_flagstats/24135_1#1.bam_flagstats.json
 t/data/autoqc/bam_flagstats/24135_1#1.flagstat
 t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json
@@ -475,6 +488,19 @@ t/data/autoqc/rendered/json_single_run/3612_7.insert_size.json
 t/data/autoqc/rendered/json_single_run/3612_7.qX_yield.json
 t/data/autoqc/rendered/json_single_run/3612_8.insert_size.json
 t/data/autoqc/rendered/json_single_run/3612_8.qX_yield.json
+t/data/autoqc/review/product_release.yml
+t/data/autoqc/review/samplesheet_27483.csv
+t/data/autoqc/review/samplesheet_29524.csv
+t/data/autoqc/review/29524#2.composition.json
+t/data/autoqc/review/29524#17.bam_flagstats.json
+t/data/autoqc/review/29524#2.bam_flagstats.json
+t/data/autoqc/review/29524#2.bcfstats.json
+t/data/autoqc/review/29524#2.review.json
+t/data/autoqc/review/29524#2.qX_yield.json
+t/data/autoqc/review/29524#2.verify_bam_id.json
+t/data/autoqc/review/29524#2_phix.bam_flagstats.json
+t/data/autoqc/review/29524#3.bam_flagstats.json
+t/data/autoqc/review/29524#7.bam_flagstats.json
 t/data/autoqc/rna_seqc/data/17550_1#1.bam
 t/data/autoqc/rna_seqc/data/17550_3#8.bam
 t/data/autoqc/rna_seqc/samplesheet_17550.csv
@@ -555,7 +581,6 @@ t/data/reporter/mlwarehouse/400-IseqFlowcell.yml
 t/perlcriticrc
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140601_HS2_13108_A_C37W5ACXX/InterOp/TileMetricsOut.bin
 t/data/nfs/sf44/ILorHSany_sf25/incoming/140605_HS36_13169_B_H9FP5ADXX/InterOp/TileMetricsOut.bin
-t/data/fastqcheck/4308_1_2.fastqcheck
 t/data/fixtures/npg_tracking/000-designation.yml
 t/data/fixtures/npg_tracking/000-entity_type.yml
 t/data/fixtures/npg_tracking/000-instrument_mod_dict.yml
@@ -610,3 +635,14 @@ t/data/samtools_stats/27138_1#2_F0xB00.stats
 t/data/samtools_stats/27258_1#1.empty.stats
 t/data/samtools_stats/27053_1#1.single.stats
 t/data/26601_qc_archive.tar.gz
+t/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp/ExtendedTileMetricsOut.bin
+t/data/autoqc/180626_A00538_0008_AH5HJ5DSXX/InterOp/TileMetricsOut.bin
+t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/RunInfo.xml
+t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/runParameters.xml
+t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/InterOp/TileMetricsOut.bin
+t/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2/InterOp/TileMetricsOut.bin
+t/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2/RunInfo.xml
+t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/InterOp/TileMetricsOut.bin
+t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/InterOp/ExtendedTileMetricsOut.bin
+t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/RunInfo.xml
+t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/RunParameters.xml

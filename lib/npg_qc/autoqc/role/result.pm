@@ -129,18 +129,6 @@ sub composition_subset {
   return $subset eq $token ? undef : $subset;
 }
 
-=head2 is_old_style_result
-
-Returns true if the derived class implements id_run and position
-methods/attributes.
-
-=cut
-sub is_old_style_result {
-  my $self = shift;
-  return $self->can('id_run') && $self->can('position') &&
-         defined $self->id_run;
-}
-
 =head2 get_rpt_list
 
 Returns rn pt list value for a composition associated with the
@@ -237,27 +225,7 @@ has 'filename_root' => (isa         => q[Str],
                        );
 sub _build_filename_root {
   my $self = shift;
-  my $root;
-  if ($self->is_old_style_result()) {
-    $root = sprintf q[%s_%s%s%s],
-      $self->id_run,
-      $self->position,
-      $self->tag_label(),
-      $self->can(q[subset]) && $self->subset ? q[_] . $self->subset : q[];
-  } else {
-    $root = $self->composition_digest;
-  }
-  return $root;
-}
-
-=head2 filename_root_from_filename
-
-=cut
-sub filename_root_from_filename {
-  my ($self, $file_path) = @_;
-  my ($volume, $directories, $file) = splitpath($file_path);
-  $file =~ s/[.](?:[^.]+)\Z//smx;
-  return $file;
+  return $self->file_name; # from the moniker role
 }
 
 =head2 filename4serialization
@@ -267,10 +235,8 @@ Filename that should be used to write json serialization of this object to
 =cut
 sub filename4serialization {
   my $self = shift;
-  return sprintf q[%s.%s.%s],
-    $self->filename_root(),
-    $self->class_name(),
-    q[json];
+  return $self->file_name_full($self->filename_root,
+                               ext => $self->class_name() . q[.json]);
 }
 
 =head2 thaw
@@ -353,7 +319,6 @@ sub json {
 1;
 __END__
 
-
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -388,7 +353,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2014,2015,2016,2017,2018,2019 Genome Research Ltd.
 
 This file is part of NPG.
 

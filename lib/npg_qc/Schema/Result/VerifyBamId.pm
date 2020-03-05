@@ -101,29 +101,25 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 =head2 avg_depth
 
   data_type: 'decimal'
-  default_value: 0.00
-  is_nullable: 0
+  is_nullable: 1
   size: [11,2]
 
 =head2 freemix
 
   data_type: 'decimal'
-  default_value: 0.00000
-  is_nullable: 0
+  is_nullable: 1
   size: [11,5]
 
 =head2 freeLK0
 
   data_type: 'decimal'
-  default_value: 0.00
-  is_nullable: 0
+  is_nullable: 1
   size: [11,2]
 
 =head2 freeLK1
 
   data_type: 'decimal'
-  default_value: 0.00
-  is_nullable: 0
+  is_nullable: 1
   size: [11,2]
 
 =head2 pass
@@ -174,33 +170,13 @@ __PACKAGE__->add_columns(
   'number_of_reads',
   { data_type => 'integer', is_nullable => 1 },
   'avg_depth',
-  {
-    data_type => 'decimal',
-    default_value => '0.00',
-    is_nullable => 0,
-    size => [11, 2],
-  },
+  { data_type => 'decimal', is_nullable => 1, size => [11, 2] },
   'freemix',
-  {
-    data_type => 'decimal',
-    default_value => '0.00000',
-    is_nullable => 0,
-    size => [11, 5],
-  },
+  { data_type => 'decimal', is_nullable => 1, size => [11, 5] },
   'freeLK0',
-  {
-    data_type => 'decimal',
-    default_value => '0.00',
-    is_nullable => 0,
-    size => [11, 2],
-  },
+  { data_type => 'decimal', is_nullable => 1, size => [11, 2] },
   'freeLK1',
-  {
-    data_type => 'decimal',
-    default_value => '0.00',
-    is_nullable => 0,
-    size => [11, 2],
-  },
+  { data_type => 'decimal', is_nullable => 1, size => [11, 2] },
   'pass',
   { data_type => 'tinyint', is_nullable => 1 },
   'comments',
@@ -274,8 +250,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::verify_bam_id';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fj9PpvtAIizcpJ0BvIj7hw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-08-29 10:31:30
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:g2285gY2V+24Dah34YMHvQ
 
 our $VERSION = '0';
 

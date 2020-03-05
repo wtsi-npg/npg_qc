@@ -37,7 +37,7 @@ sub parse_output{
   # this assumes the check is only run at lane level so id_run and position will be unique
   my $id_run = $self->composition->get_component(0)->id_run;
   my $position = $self->composition->get_component(0)->position;
-  my $key = $id_run . '_' . $position;
+  my $key = q{Lane[ ]}. $position;
 
   my $num_total_reads = 0;
   my $num_spatial_filter_fail_reads = 0;

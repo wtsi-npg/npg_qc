@@ -3,6 +3,7 @@ use warnings;
 use Test::More tests => 9;
 use Test::Exception;
 use Moose::Meta::Class;
+use DateTime;
 
 use npg_testing::db;
 use t::autoqc_util;
@@ -162,7 +163,7 @@ subtest 'insert with historic' => sub {
 };
 
 subtest q[update] => sub {
-  plan tests => 51;
+  plan tests => 55;
 
   my $rs = $schema->resultset($table);
   my $hrs = $schema->resultset($hist_table);
@@ -236,12 +237,22 @@ subtest q[update] => sub {
     'final outcome saved';
   ok ($new_row->in_storage, 'outcome has been saved');
   is ($new_row->mqc_outcome->short_desc, $outcome, 'final outcome');
+  my $dt = DateTime->now();
+  is ($new_row->last_modified()->year, $dt->year, 'the "now" year');
 
   $outcome = 'Rejected final';
-  lives_ok { $new_row->update_outcome(_outcome($outcome), 'cat') }
+
+  my $h = _outcome($outcome);
+  # pre-set the date
+  $h->{'last_modified'} = DateTime->new(year => 2016, month => 10, day => 25);
+  lives_ok { $new_row->update_outcome($h, 'cat') }
     'can update final outcome';
   ok ($new_row->in_storage, 'outcome has been saved');
   is ($new_row->mqc_outcome->short_desc, $outcome, 'new final outcome');
+  $dt = $new_row->last_modified();
+  is ($dt->year, 2016, 'year as set, no overwrite by the current time');
+  is ($dt->month, 10, 'month as set');
+  is ($dt->day, 25, 'day as set');
 
   $new_row->delete();
 };

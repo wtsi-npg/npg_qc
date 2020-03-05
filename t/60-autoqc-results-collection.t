@@ -39,6 +39,7 @@ my $temp = tempdir( CLEANUP => 1);
                     tag_decode_stats => 1,
                     bam_flagstats    => 1,
                     ref_match        => 1,
+                    review           => 1,
                     tag_metrics      => 1,
                     pulldown_metrics => 1,
                     alignment_filter_metrics => 1,
@@ -48,6 +49,7 @@ my $temp = tempdir( CLEANUP => 1);
                     rna_seqc         => 1,
                     bcfstats         => 1,
                     samtools_stats   => 1,
+                    interop          => 1,
                    };
     my $actual;
     my @checks = @{$c->checks_list};

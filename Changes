@@ -1,5 +1,88 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - interop parser - extra tests and a fix for some result hash keys
+ - provisions for having an array of result objects in the result
+   attribute of the autoqc check object
+ - using moniker role to generate file name root in a standard way
+   from a composition - needed if the result attribute is an array
+   since passing the file name root to the check will not be the right
+   thing to do (multiple file names are needed in this case, so there
+   is no other option but delegating it to the result object itself)
+ - redundant result role methods filename_root_from_filename and
+   is_old_style_result are removed
+ - pass, info and comments attributes moved from the result to the
+   its parent base class (both in npg_qc::autoqc::result namespace)
+   to make these attributes available for results objects that are
+   derived directly from the base class.
+ - new interop autoqc check
+ - retrieval of interop autoqc check results by SeqQC web app is
+   currently supressed
+
+release 67.5.0
+ - npg_qc::illumina::interop::parser - a stand-alone custom parser
+   for Illumina InterOp files; unlike Illumina's own parser, this
+   parser does not round the results of the calculation
+
+release 67.4.0
+ - bug fix for mqc skipper script which, because of filtering on
+   study name always gave count of unique studies on a run as one
+ - bam_flagstats autoqc check - detect and parse samtools markdup metrics
+
+release 67.3.0
+  - change default file type to cram for genotype check
+  - script for skipping manual QC step: an additional filter
+    to ensure that the all lanes for a run that bypasses
+    manual QC deplexed properly
+
+release 67.2.0
+  - script to move NovaSeq runs for a particular study
+  - change default file type to cram for bam_flagstats
+
+release 67.1.0
+  - if DO_NOT_USE reference selected don't run VerifyBamID but provide
+      explanatory comment in json output file
+  - in qc store, capture error inferring a path to the archive dir,
+      which we need to retrieve autoqc data, rather from inferring
+      some other path
+
+ release 67.0.0
+  - fix regular expression used in collapser after change in template
+  - adapter check switched to use cram files; fixed an old bug in
+      parsing blat output which resulted in incorrect adapter counters
+      per cycle
+  - record absolute path of the verifyBamID executable
+  - remove provisions for retrieval of autoqc results from old style
+      run folders
+
+release 66.6.0
+ - review autoqc check: do not exit on criteria evaluation error
+ - table and DBIx class for the review autoqc check
+ - SeqQC display for review autoqc results
+ - qc_store retrieval from a database reimplemented to ensure that
+     merged data are not retrieved when run data are required
+ - SeqQC templates updated to conform with Template::Toolkit v2.29
+
+release 66.5.1
+ - add placeholder results file for bcfstats where no ref genotypes exist
+ - ensure immutability of a private attribute in autoqc checks review
+
+release 66.5
+ - update spatial_filter results parsing
+ - add target autosome stats to bam_flagstats qc check
+ - allow 'last_modified' date in mqc tables to be pre-set
+ - new autoqc check 'review' to evaluate results of other
+   checks against configurable criteria
+ - SeqQC: add a visual que for failed autoqc review results
+
+release 66.4
+ - allow to finalise undecided library manual qc outcomes for
+   all entities
+ - remove library type restriction from genotype_call can_run (retained as double check in seq_alignment)
+
+release 66.3
+ - sequence_summary table - extend storage for the header column
+ - remove fastqcheck database loader
+ - autoqc database deletion script update
 
 release 66.2
  - SeqQC: heatmaps from samtools stats files as a source

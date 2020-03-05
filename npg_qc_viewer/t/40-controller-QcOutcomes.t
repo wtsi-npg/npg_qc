@@ -410,9 +410,16 @@ subtest 'conditionally get wh info about tags' => sub {
     pf_cluster_count => 120019,
     position => 4,});
 
-  $wh_schema->resultset('IseqProductMetric')->create({
+  my $obj = {
     id_run => 1234, position => 4, id_iseq_flowcell_tmp => 2514299
-  });
+  };
+  my $rpt = npg_tracking::glossary::rpt->deflate_rpt($obj);
+  my $composition = npg_tracking::glossary::composition::factory::rpt_list
+                    ->new(rpt_list => $rpt)
+                    ->create_composition();
+  $obj->{id_iseq_product} = $composition->digest;
+  $obj->{iseq_composition_tmp} = $composition->freeze;
+  $wh_schema->resultset('IseqProductMetric')->create( $obj);
 
   delete $data->{'lib'};
   $data->{'seq'} = {'1234:4' => {'mqc_outcome' => 'Rejected final'}};

@@ -226,6 +226,16 @@ sub _display_run_lanes {
     $c->stash->{'show_total'} = 1;
   }
 
+  if ($id_runs && (@{$id_runs} == 1)) {
+    $c->stash->{'single_id_run'} = $id_runs->[0];
+    my $crs = $c->model('NpgDB')->resultset('Run')
+                                ->find($id_runs->[0])->current_run_status;
+    if ($crs) {
+      $c->stash->{'current_run_status'} = $crs->description;
+      $c->stash->{'status_set_by'} = $crs->user->username;
+    }
+  }
+
   return;
 }
 

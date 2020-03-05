@@ -117,7 +117,7 @@ define(['jquery'], function() {
         var mySections = [];
 
         // Regular expression to filter sections, considers pass/fail
-        var pattern = new RegExp(self.data('section') + '(:\\w+)?$');
+        var pattern = new RegExp(self.data('section') + '(:\\s*\\w+)?$');
         $.each(allHeaders, function(index, obj) {
           if ( pattern.test($(obj).text().trim()) ) {
             var nextDiv = $($(obj).next('div'));

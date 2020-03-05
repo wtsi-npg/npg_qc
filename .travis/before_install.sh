@@ -3,8 +3,6 @@
 set -e -x
 # set -u fails cause npm install to fail
 
-sudo apt-get update -qq
-
 # shellcheck source=/dev/null
 rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (pushd ~/.nvm && git checkout v0.31.0 && popd) && source ~/.nvm/nvm.sh && nvm install "${TRAVIS_NODE_VERSION}"
 

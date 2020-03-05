@@ -166,6 +166,7 @@ override 'execute' => sub {
     } else {
       $self->result->add_comment
           ('No bcfstats comparison as no refset genotypes exist.');
+      $self->write_output($self->bcfstats_outfile, q[#]);
     }
     1;
   } catch {

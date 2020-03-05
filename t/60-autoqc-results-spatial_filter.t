@@ -9,6 +9,16 @@ use JSON;
 
 use_ok ('npg_qc::autoqc::results::spatial_filter');
 
+sub _prune_result_hash {
+  my $result = shift;
+  my %to_remove =
+    map { $_ => 1 }
+    qw/__CLASS__ composition info path/;
+  foreach my $key (keys %{$result}) {
+    ($to_remove{$key} or $key =~ /\A_/ ) and delete $result->{$key};
+  }
+}
+
 my $tempdir = tempdir( CLEANUP => 1);
 {
     my $r = npg_qc::autoqc::results::spatial_filter->new(
@@ -65,9 +75,8 @@ my $tempdir = tempdir( CLEANUP => 1);
     };
 
     ok( exists $hash->{__CLASS__}, q{__CLASS__ key found} );
-    delete $hash->{'__CLASS__'};
-    delete $hash->{'composition'};
-    is_deeply( $hash, $expected_hash_structure, q{expected results obtained} );
+    is_deeply( _prune_result_hash($hash),
+               _prune_result_hash($expected_hash_structure), q{expected results obtained} );
 }
 
 {
@@ -117,9 +126,8 @@ my $tempdir = tempdir( CLEANUP => 1);
     };
 
     ok( exists $hash->{__CLASS__}, q{__CLASS__ key found} );
-    delete $hash->{'__CLASS__'};
-    delete $hash->{'composition'};
-    is_deeply( $hash, $expected_hash_structure, q{expected results obtained} );
+    is_deeply( _prune_result_hash($hash),
+               _prune_result_hash($expected_hash_structure), q{expected results obtained} );
 }
 
 1;

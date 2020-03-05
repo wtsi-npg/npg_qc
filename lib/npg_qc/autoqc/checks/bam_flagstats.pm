@@ -29,15 +29,24 @@ Readonly::Hash my %METRICS_FIELD_MAPPING => {
    'ESTIMATED_LIBRARY_SIZE'       => 'library_size'
 };
 
-# picard and biobambam mark duplicates assign this
-# value for aligned data with no mapped paired reads
-Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;
-Readonly::Scalar my $METRICS_NUMBER => 9;
+Readonly::Hash my %SAMTOOLS_METRICS_FIELD_MAPPING => {
+   'LIBRARY'                      => 'library',
+   'PAIRED'                       => 'read_pairs_examined',
+   'DUPLICATE SINGLE'             => 'unpaired_read_duplicates',
+   'DUPLICATE PAIR'               => 'paired_read_duplicates',
+   'DUPLICATE PAIR OPTICAL'       => 'read_pair_optical_duplicates',
+   'PERCENT_DUPLICATION'          => 'percent_duplicate',
+   'ESTIMATED_LIBRARY_SIZE'       => 'library_size'
+};
+
+Readonly::Scalar my $LIBRARY_SIZE_NOT_AVAILABLE => -1;  # assigned to ESTIMATED_LIBRARY_SIZE by picard and biobambam for aligned data with no mapped paired reads
+Readonly::Scalar my $METRICS_NUMBER => 10;
 Readonly::Scalar my $PAIR_NUMBER => 2;
-Readonly::Scalar my $TARGET_STATS_PATTERN => '_target';
+Readonly::Scalar my $TARGET_STATS_PATTERN => 'target';
+Readonly::Scalar my $TARGET_AUTOSOME_STATS_PATTERN => 'target_autosome';
 Readonly::Scalar my $TARGET_STATS_DEFAULT_DEPTH => 15;
 Readonly::Scalar my $STATS_FILTER => '[[:alnum:]]+[\_[:lower:]]*?';
-Readonly::Scalar our $EXT => q[bam];
+Readonly::Scalar our $EXT => q[cram];
 
 has '+subset' => ( isa => 'Str', );
 
@@ -115,13 +124,16 @@ has 'target_stats_file' => ( isa        => 'Str | Undef',
 );
 sub _build_target_stats_file {
   my $self = shift;
-  my $file;
-  if($self->samtools_stats_file && @{$self->samtools_stats_file}){
-    my @x = @{$self->samtools_stats_file};
-    my @found = grep { /$TARGET_STATS_PATTERN/smx } @{$self->samtools_stats_file};
-    if (@found == 1){ $file = $found[0]; }
-  }
-  return $file;
+  return $self->_find_stats_file($TARGET_STATS_PATTERN);
+}
+has 'target_autosome_stats_file' => ( isa        => 'Str | Undef',
+                                      is         => 'ro',
+                                      lazy_build => 1,
+);
+
+sub _build_target_autosome_stats_file {
+  my $self = shift;
+  return $self->_find_stats_file($TARGET_AUTOSOME_STATS_PATTERN);
 }
 
 has 'related_results' => ( isa        => 'ArrayRef[Object]',
@@ -156,7 +168,12 @@ override 'execute' => sub {
     $self->_parse_markdups_metrics();
   }
   if( $self->target_stats_file ) {
-    $self->_parse_target_stats_file();
+    $self->_parse_target_stats_file
+        ($self->target_stats_file,$TARGET_STATS_PATTERN);
+  }
+  if( $self->target_autosome_stats_file ) {
+    $self->_parse_target_stats_file
+        ($self->target_autosome_stats_file,$TARGET_AUTOSOME_STATS_PATTERN);
   }
   $self->_parse_flagstats();
   for my $rr ( @{$self->related_results()} ) {
@@ -172,46 +189,78 @@ sub _parse_markdups_metrics {
   my @file_contents = slurp ( $self->markdups_metrics_file, { irs => qr/\n\n/mxs } );
 
   my $header = $file_contents[0];
-  chomp $header;
-  $self->result()->set_info('markdups_metrics_header', $header);
 
-  my $metrics    = $file_contents[1];
-  my $histogram  = $file_contents[2];
+  if($header =~ /^COMMAND:[^\n]*samtools[ ]markdup/smx) {
+    chomp $header;
+    $self->result()->set_info('markdups_metrics_header', $header);
 
-  my @metrics_lines   = split /\n/mxs, $metrics;
-  my @metrics_header  = split /\t/mxs, $metrics_lines[1];
-  my @metrics_numbers = split /\t/mxs, $metrics_lines[2];
+    my %metrics = map { split /:/smx } (split /\n/smx, $header);
 
-  my %metrics;
-  @metrics{@metrics_header} = @metrics_numbers;
+    @metrics{keys %metrics} = (map { _trim($_) } values %metrics); # remove any leading and trailing spaces from values
 
-  if (scalar  @metrics_numbers > $METRICS_NUMBER ) {
-    croak 'MarkDuplicate metrics format is wrong';
+    for my $field (keys %SAMTOOLS_METRICS_FIELD_MAPPING) {
+      my $field_value = $metrics{$field};
+
+      ($field eq q[PAIRED] or $field eq q[DUPLICATE PAIR] or $field eq q[DUPLICATE PAIR OPTICAL]) && ($field_value /= 2);
+      ($field eq q[PERCENT_DUPLICATION]) && ((($field_value = $metrics{'EXAMINED'}) == 0) || ($field_value = sprintf q[%0.6f], ($metrics{'DUPLICATE PAIR'} + $metrics{'DUPLICATE SINGLE'}) / $metrics{'EXAMINED'}));
+      ($field eq q[COMMAND]) && next;
+
+      $self->result->${\$SAMTOOLS_METRICS_FIELD_MAPPING{$field}}($field_value);
+    }
+
+    # note: no histogram from samtools markdup
   }
+  else { # not samtools, assume picard/biobambam2 format
+    chomp $header;
+    $self->result()->set_info('markdups_metrics_header', $header);
 
-  foreach my $field (keys %METRICS_FIELD_MAPPING){
-    my $field_value = $metrics{$field};
-    if ($field_value) {
-      if ($field_value =~/\?/mxs) {
-        $field_value = undef;
-      } elsif ($field eq 'ESTIMATED_LIBRARY_SIZE' && $field_value < 0) {
-        if ($field_value == $LIBRARY_SIZE_NOT_AVAILABLE) {
+    my $metrics    = $file_contents[1];
+    my $histogram  = $file_contents[2];
+
+    my @metrics_lines   = split /\n/mxs, $metrics;
+    my @metrics_header  = split /\t/mxs, $metrics_lines[1];
+    my @metrics_numbers = split /\t/mxs, $metrics_lines[2];
+
+    my %metrics;
+    @metrics{@metrics_header} = @metrics_numbers;
+
+    if (scalar  @metrics_numbers > $METRICS_NUMBER ) {
+      croak 'MarkDuplicate metrics format is wrong';
+    }
+
+    foreach my $field (keys %METRICS_FIELD_MAPPING){
+      my $field_value = $metrics{$field};
+      if ($field_value) {
+        if ($field_value =~/\?/mxs) {
           $field_value = undef;
-        } else {
-          croak "Library size less than $LIBRARY_SIZE_NOT_AVAILABLE";
+        } elsif ($field eq 'ESTIMATED_LIBRARY_SIZE' && $field_value < 0) {
+          if ($field_value == $LIBRARY_SIZE_NOT_AVAILABLE) {
+            $field_value = undef;
+          } else {
+            croak "Library size less than $LIBRARY_SIZE_NOT_AVAILABLE";
+          }
         }
       }
+      $self->result()->${\$METRICS_FIELD_MAPPING{$field}}( $field_value );
     }
-    $self->result()->${\$METRICS_FIELD_MAPPING{$field}}( $field_value );
-  }
 
-  if ($histogram) {
-    my @histogram_lines = split /\n/mxs, $histogram;
-    my %histogram_hash = map { $_->[0] => $_->[1] } map{ [split /\s/mxs] } grep {/^[\d]/mxs } @histogram_lines;
-    $self->result()->histogram(\%histogram_hash);
+    if ($histogram) {
+      my @histogram_lines = split /\n/mxs, $histogram;
+      my %histogram_hash = map { $_->[0] => $_->[1] } map{ [split /\s/mxs] } grep {/^[\d]/mxs } @histogram_lines;
+      $self->result()->histogram(\%histogram_hash);
+    }
   }
-
   return;
+}
+
+sub _trim {
+  my ($s) = @_;
+
+  # remove any leading and trailing spaces
+  $s =~ s/^\s*//smx;
+  $s=~s/\s*$//smx;
+
+  return $s;
 }
 
 sub _parse_flagstats {
@@ -246,32 +295,34 @@ sub _parse_flagstats {
 }
 
 sub _parse_target_stats_file {
-   my $self = shift;
+   my($self,$fn,$prefix) = @_;
 
-   my $fn = $self->target_stats_file;
    ## no critic (InputOutput::RequireBriefOpen)
    open my $target_stats_fh, '<', $fn or croak "Error: $OS_ERROR - failed to open $fn for reading";
    while ( my $line = <$target_stats_fh> ) {
      chomp $line;
      if ( $line =~ /The\ command\ line\ was/mxs ) {
-       if( my ($td) = $line =~ /-[g|cov\-threshold]\s*(\d+)/mxs){
-         $self->result()->target_coverage_threshold($td);
+       if($line =~ /-(g|cov\-threshold)\s*(\d+)/mxs ){
+         $self->_set_result($prefix . '_coverage_threshold',$2);
        } else{
-         $self->result()->target_coverage_threshold($TARGET_STATS_DEFAULT_DEPTH);
+         $self->_set_result($prefix . '_coverage_threshold',$TARGET_STATS_DEFAULT_DEPTH);
+       }
+       if( $line =~ /-(t|target\-regions)\s*([\w\/\-\.]+)/mxs ){
+         $self->result()->set_info($prefix .'_path', $2);
        }
      }
      elsif ( $line =~ /^SN\s+/mxs ){
           my ($number) = $line =~ /^SN\s+.*\:\s+([\d\.]+)\b/mxs;
           ( $line =~ /reads\ mapped\:/mxs )
-          ? $self->result()->target_mapped_reads($number)
+          ? $self->_set_result($prefix . '_mapped_reads',$number)
           : ( $line =~ /reads\ properly\ paired\:/mxs )
-          ? $self->result()->target_proper_pair_mapped_reads($number)
+          ? $self->_set_result($prefix . '_proper_pair_mapped_reads',$number)
           : ( $line =~ /bases\ mapped\ \(cigar\)\:/mxs )
-          ? $self->result()->target_mapped_bases($number)
+          ? $self->_set_result($prefix . '_mapped_bases',$number)
           : ( $line =~ /bases\ inside\ the\ target\:/mxs )
-          ? $self->result()->target_length($number)
+          ? $self->_set_result($prefix . '_length',$number)
           : ( $line =~ /percentage\ of\ target\ genome\ with\ coverage/mxs )
-          ? $self->result()->target_percent_gt_coverage_threshold($number)
+          ? $self->_set_result($prefix . '_percent_gt_coverage_threshold',$number)
           : next;
      }
      elsif ( $line =~ /^FFQ\s+/mxs ) { last; }
@@ -279,11 +330,27 @@ sub _parse_target_stats_file {
    close $target_stats_fh  or carp "Warning: $OS_ERROR - failed to close filehandle to $fn";
 
    my ($filter) = $fn =~ /_($STATS_FILTER)[.]stats\Z/xms;
-   $self->result()->target_filter($filter);
+   $self->_set_result($prefix . '_filter',$filter);
 
    return;
 }
 
+sub _set_result {
+  my ($self,$method,$result) = @_;
+  $self->result()->$method($result);
+  return;
+}
+
+sub _find_stats_file {
+  my ($self,$pattern) = @_;
+  my $file;
+  if($self->samtools_stats_file && @{$self->samtools_stats_file}){
+    my @x = @{$self->samtools_stats_file};
+    my @found = grep { /\_$pattern\./smx } @{$self->samtools_stats_file};
+    if (@found == 1){ $file = $found[0]; }
+  }
+  return $file;
+}
 
 __PACKAGE__->meta->make_immutable;
 

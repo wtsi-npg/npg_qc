@@ -27,7 +27,7 @@ use_ok ('npg_qc::autoqc::autoqc');
   is($check->id_run, 4, 'run id');
   is($check->position, 1, 'position');
   is($check->tag_index, 0, 'tag index');
-  is($check->qc_out, $dir, 'dir out is set');
+  is($check->qc_out->[0], $dir, 'dir out is set');
 
   @ARGV = qw( 
     --qc_in       t
@@ -56,7 +56,7 @@ use_ok ('npg_qc::autoqc::autoqc');
   push @ARGV, $dir;
   $factory = npg_qc::autoqc::autoqc->new_with_options(check => 'check');
   lives_ok { $check = $factory->create_check_object() } 'qc_in is optional';
-  is($check->qc_out, $dir, 'dir out is set');   
+  is($check->qc_out->[0], $dir, 'dir out is set');   
 }
 
 1;

@@ -200,6 +200,12 @@ subtest 'extra column markup - affects export to CSV' => sub {
     id_iseq_flowcell_tmp   => $id_flowcell_tmp,
     id_iseq_pr_metrics_tmp => $id_iseq_pr_metrics_tmp
   };
+  my $rpt = npg_tracking::glossary::rpt->deflate_rpt($product_values);
+  my $composition = npg_tracking::glossary::composition::factory::rpt_list
+                    ->new(rpt_list => $rpt)
+                    ->create_composition();
+  $product_values->{id_iseq_product} = $composition->digest;
+  $product_values->{iseq_composition_tmp} = $composition->freeze;
   my $row_product = $mlwh->resultset("IseqProductMetric")->create($product_values);
 
   foreach my $url (@urls) {
@@ -309,7 +315,7 @@ subtest 'mqc span' => sub {
 {
   my $url = q[http://localhost/checks/runs?run=4025&show=plexes];
   $mech->get_ok($url);
-  $mech->title_is($title_prefix . q[Results (plexes) for runs 4025]);
+  $mech->title_is($title_prefix . q[Results (plexes) for runs 4025 (run 4025 status: qc in progress, taken by mg8)]);
   $mech->content_lacks("<br />152</div>");  # num cycles
   $mech->content_lacks('NT28560W'); #library name
 

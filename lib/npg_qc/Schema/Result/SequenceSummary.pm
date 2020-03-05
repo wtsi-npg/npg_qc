@@ -38,11 +38,13 @@ use namespace::autoclean;
 
 =item * L<DBIx::Class::InflateColumn::DateTime>
 
+=item * L<DBIx::Class::InflateColumn::Serializer>
+
 =back
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::DateTime');
+__PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
 
 =head1 TABLE: C<sequence_summary>
 
@@ -197,15 +199,29 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
 );
 
+=head1 L<Moose> ROLES APPLIED
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-02-20 14:17:45
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1Hz8njwstffBZXOLjCvIyQ
+=over 4
+
+=item * L<npg_qc::Schema::Composition>
+
+=item * L<npg_qc::Schema::Flators>
+
+=item * L<npg_qc::autoqc::role::result>
+
+=back
+
+=cut
+
+
+with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
+
+
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-06-13 15:19:01
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YAWYbAzDsh2BsfEYPQYZHg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
-
-with qw/ npg_qc::Schema::Composition
-         npg_qc::autoqc::role::result /;
 
 our $VERSION = '0';
 
@@ -283,7 +299,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2019 GRL
 
 This file is part of NPG.
 

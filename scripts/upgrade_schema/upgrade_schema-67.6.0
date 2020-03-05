@@ -1,0 +1,21 @@
+--
+-- create table for autoqc interop result
+--
+
+CREATE TABLE `interop` (
+  `id_interop` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT \
+    COMMENT 'Auto-generated primary key',
+  `id_seq_composition` bigint(20) unsigned NOT NULL \
+    COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `metrics` TEXT DEFAULT NULL \
+    COMMENT 'serialized to JSON metrics from Illumina InterOp files',
+  `comments` TEXT DEFAULT NULL, \
+  `info` TEXT DEFAULT NULL, \
+  PRIMARY KEY (`id_interop`),
+  UNIQUE KEY `interop_id_compos_uniq` (`id_seq_composition`),
+  CONSTRAINT `interop_compos` FOREIGN KEY (`id_seq_composition`) \
+    REFERENCES `seq_composition` (`id_seq_composition`) \
+    ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT 'Metrics extracted from Illumina Interop files';
+
+GRANT SELECT ON npgqcp.interop TO nqcro;

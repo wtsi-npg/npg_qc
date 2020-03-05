@@ -1,6 +1,7 @@
 package npg_qc::autoqc::results::base;
 
 use Moose;
+use MooseX::AttributeHelpers;
 use namespace::autoclean;
 use Carp;
 
@@ -13,12 +14,6 @@ with 'npg_qc::autoqc::role::result';
 
 our $VERSION = '0';
 
-sub BUILD {
-  my $self = shift;
-  $self->composition();
-  return;
-}
-
 has 'composition' => (
     is         => 'ro',
     isa        => 'npg_tracking::glossary::composition',
@@ -28,20 +23,49 @@ has 'composition' => (
       'composition_digest' => 'digest',
       'num_components'     => 'num_components',
     },
-    predicate  => 'has_composition',
 );
 sub _build_composition {
   my $self = shift;
-  if ($self->is_old_style_result) {
+  if ($self->can('id_run') && defined $self->id_run && $self->can('position')) {
     return $self->create_composition();
   }
   croak 'Can only build old style results';
 }
 
-has 'result_file_path' => (isa      => 'Str',
-                           is       => 'rw',
-                           required => 0,
-                          );
+with 'npg_tracking::glossary::moniker'; # requires composition accessor
+
+has 'pass'         => (isa      => 'Maybe[Bool]',
+                       is       => 'rw',
+                       required => 0,
+                      );
+
+has 'info'     => (
+      metaclass => 'Collection::Hash',
+      is        => 'ro',
+      isa       => 'HashRef[Str]',
+      default   => sub { {} },
+      provides  => {
+          get       => 'get_info',
+          set       => 'set_info',
+      },
+);
+
+has 'comments'     => (isa => 'Maybe[Str]',
+                       is => 'rw',
+                       required => 0,
+                      );
+
+has 'result_file_path' => (
+  isa      => 'Str',
+  is       => 'rw',
+  required => 0,
+);
+
+sub BUILD {
+  my $self = shift;
+  $self->composition();
+  return;
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -72,6 +96,24 @@ A npg_tracking::glossary::composition object. If the derived
 class inplements id_run and position methods/attributes, a one-component
 composition is created automatically.
 
+=head2 pass
+
+A boolean attribute containing the outcome of evaluation for
+the autoqc check. Not all autoqc checks perform result evaluation.
+A true value is interpreted as a pass, a defined false value
+is interpreted as a fail, undefined value means that either
+no evaluation took place or it was impossible to decide what
+the outcome should be.
+
+=head2 info
+
+A hash reference attribute to store version number and other information
+as key-value pairs.
+
+=head2 comments
+
+A string attribute containing comments, if any.
+
 =head2 result_file_path
 
 An optional attribute, a full path of the file with JSON serialization.
@@ -90,6 +132,8 @@ for possible subsequent reading by a different application.
 
 =item Moose
 
+=item MooseX::AttributeHelpers
+
 =item namespace::autoclean
 
 =item Carp
@@ -99,6 +143,8 @@ for possible subsequent reading by a different application.
 =item npg_tracking::glossary::composition::factory::attributes
 
 =item npg_tracking::glossary::composition::component::illumina
+
+=item npg_tracking::glossary::moniker
 
 =back
 
@@ -112,7 +158,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2015,2016,2018,2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 
