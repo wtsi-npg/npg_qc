@@ -73,7 +73,7 @@ sub percent_singletons {
 
 sub percent_target_proper_pair_mapped_reads {
   my $self = shift;
-  if (defined $self->target_mapped_reads && defined $self->target_proper_pair_mapped_reads) {
+  if ($self->target_mapped_reads && defined $self->target_proper_pair_mapped_reads) {
     return $PERCENTAGE * $self->target_proper_pair_mapped_reads / $self->target_mapped_reads;
   }
   return;
@@ -81,7 +81,7 @@ sub percent_target_proper_pair_mapped_reads {
 
 sub target_mean_coverage {
   my $self = shift;
-  if (defined $self->target_mapped_bases && defined $self->target_length) {
+  if (defined $self->target_mapped_bases && $self->target_length) {
     return $self->target_mapped_bases / $self->target_length;
   }
   return;
@@ -98,7 +98,7 @@ sub target_mapped_bases_gb{
 
 sub percent_target_autosome_proper_pair_mapped_reads {
   my $self = shift;
-  if (defined $self->target_autosome_mapped_reads &&
+  if ($self->target_autosome_mapped_reads &&
       defined $self->target_autosome_proper_pair_mapped_reads) {
     return $PERCENTAGE *
         $self->target_autosome_proper_pair_mapped_reads / $self->target_autosome_mapped_reads;
@@ -108,20 +108,17 @@ sub percent_target_autosome_proper_pair_mapped_reads {
 
 sub target_autosome_mean_coverage {
   my $self = shift;
-  if (defined $self->target_autosome_mapped_bases && defined $self->target_autosome_length) {
+  if (defined $self->target_autosome_mapped_bases && $self->target_autosome_length) {
     return $self->target_autosome_mapped_bases / $self->target_autosome_length;
   }
   return;
 }
-
-
 
 no Moose;
 
 1;
 
 __END__
-
 
 =head1 NAME
 
