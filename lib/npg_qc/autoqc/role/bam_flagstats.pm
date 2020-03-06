@@ -182,7 +182,7 @@ Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2014,2015,2016,2018,2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 
