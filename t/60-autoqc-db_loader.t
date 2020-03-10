@@ -355,14 +355,14 @@ subtest 'loading bam_flagststs' => sub {
   plan tests => 2;
 
   my @files = glob('t/data/autoqc/bam_flagstats/*bam_flagstats.json');
-  is (scalar @files, 4, 'four JSON files are available');
+  is (scalar @files, 5, 'four JSON files are available');
 
   my $db_loader = npg_qc::autoqc::db_loader->new(
        schema       => $schema,
        verbose      => 0,
        path         => ['t/data/autoqc/bam_flagstats'],
   );
-  is ($db_loader->load(), 2, 'two files loaded (two have no __CLASS__ key)');
+  is ($db_loader->load(), 3, 'three files loaded (two have no __CLASS__ key)');
 };
 
 my $archive = '17448_1_9';
