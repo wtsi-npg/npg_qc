@@ -64,14 +64,13 @@ subtest 'json is only for instances' => sub{
 };
 
 subtest 'methods' => sub {
-  plan tests => 19;
+  plan tests => 18;
 
   my $f = npg_tracking::glossary::composition::factory->new();
   $f->add_component($c1, $c2, $c3, $c4);
   my $b = npg_qc::autoqc::results::base->new(
     composition => $f->create_composition()
   );
-  ok (!$b->is_old_style_result, 'not old style object');
   like ($b->to_string, qr/npg_qc::autoqc::results::base/, 'custom to_string');
   throws_ok { $b->equals_byvalue() }
     qr/Can compare to HASH only/,
@@ -110,13 +109,11 @@ subtest 'methods' => sub {
   is ($b->equals_byvalue({position => 2, id_run => 1}), 1, 'equal');
   is ($b->equals_byvalue({position => 2, id_run => 1, tag_index => undef}), 1, 'equal');
 
-  is ($b->filename4serialization,
-    'c674faa835fd34457c29af3492ef291c623ce67a230b29eb8c3b6891a4d98837.base.json',
-    'custom filename');
+  is ($b->filename4serialization, '1_2.base.json', 'file name');
 };
 
 subtest 'extended_base' => sub {
-  plan tests => 8;
+  plan tests => 7;
 
   package npg_qc::autoqc::results::test_extended;
   use Moose;
@@ -132,7 +129,6 @@ subtest 'extended_base' => sub {
   );
 
   is ($eb->composition->num_components, 1, 'composition created');
-  ok ($eb->is_old_style_result, 'old style object');
   is ($eb->to_string,
     'npg_qc::autoqc::results::test_extended {"components":[{"id_run":1,"position":3,"tag_index":3}]}',
     'to_string via inheritance');

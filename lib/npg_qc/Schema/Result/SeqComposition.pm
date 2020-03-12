@@ -285,6 +285,21 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 interop
+
+Type: might_have
+
+Related object: L<npg_qc::Schema::Result::Interop>
+
+=cut
+
+__PACKAGE__->might_have(
+  'interop',
+  'npg_qc::Schema::Result::Interop',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 mqc_library_outcome_ent
 
 Type: might_have
@@ -619,8 +634,8 @@ __PACKAGE__->might_have(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-06-04 14:47:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lOEnRn5ygR89LSfaLy3W4A
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-12-13 15:44:26
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:afSoSdjcBJ9KcnNn0kMTEg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
@@ -697,7 +712,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2015,2016,2017,2018,2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 

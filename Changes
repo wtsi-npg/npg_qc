@@ -1,9 +1,30 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+npg_qc release 68.0.0
+ - interop parser - extra tests and a fix for some result hash keys
+ - provisions for having an array of result objects in the result
+   attribute of the autoqc check object
+ - ability to pass multiple qc_out directories to the check
+ - using moniker role to generate file name root in a standard way
+   from a composition - needed if the result attribute is an array
+   since passing the file name root to the check will not be the right
+   thing to do (multiple file names are needed in this case)
+ - redundant result role methods filename_root_from_filename and
+   is_old_style_result are removed
+ - pass, info and comments attributes moved from the result to the
+   its parent base class (both in npg_qc::autoqc::result namespace)
+   to make these attributes available for results objects that are
+   derived directly from the base class.
+ - new interop autoqc check
+ - retrieval of interop autoqc check results by SeqQC web app is
+   currently supressed
+ - division by zero bug fixed in npg_qc::autoqc::role::bam_flagstats
+   for cases when nothing mappes in target regions 
+
 release 67.5.0
-- npg_qc::illumina::interop::parser - a stand-alone custom parser
-  for Illumina InterOp files; unlike Illumina's own parser, this
-  parser does not round the results of the calculation
+ - npg_qc::illumina::interop::parser - a stand-alone custom parser
+   for Illumina InterOp files; unlike Illumina's own parser, this
+   parser does not round the results of the calculation
 
 release 67.4.0
  - bug fix for mqc skipper script which, because of filtering on

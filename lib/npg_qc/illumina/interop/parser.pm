@@ -107,7 +107,7 @@ sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
           }
           # convert count to a percentage
           my $cluster_pf = $PERCENT * $tile_metrics{$lane}->{'cluster_count_pf'}->{$tile} / $cluster_count{$lane}->{$tile};
-          $tile_metrics{$lane}->{'cluster pf'}->{$tile} = $cluster_pf;
+          $tile_metrics{$lane}->{'cluster_pf'}->{$tile} = $cluster_pf;
         } else {
           croak qq{No cluster_count for lane $lane tile $tile};
         }
@@ -146,9 +146,7 @@ sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
         $data = substr $data, 7;
         $template = 'Vf'; # one 4-byte int and one 4-byte float
         my ($read, $aligned) = unpack $template, $data;
-        if( $aligned eq q[NaN] ){
-          # skip NaNs
-        } else {
+        if( $aligned ne q[NaN] ){ # skip NaNs
           $tile_metrics{$lane}->{'aligned'}->{$read}->{$tile} = $aligned;
         }
       }

@@ -31,7 +31,7 @@ my $composition  = 'npg_qc::Schema::Composition';
 
 foreach my $check ((
     @{npg_qc::autoqc::results::collection->new()->checks_list()},
-    'sequence_summary'
+    qw/sequence_summary interop/
                   )) {
   my ($result_name, $dbix_result_name ) = $generic_role->class_names($check);
   
