@@ -44,6 +44,17 @@ has 'criteria' => (
   default => sub { return {} },
 );
 
+=head2 criteria_md5
+
+md5 of the canonical JSON serialization of criteria.
+
+=cut
+
+has 'criteria_md5' => (
+  isa => 'Maybe[Str]',
+  is  => 'rw',
+);
+
 =head2 evaluation_results
 
 A hash of individual string expressions (keys) mapped to boolean outcomes of
@@ -100,7 +111,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 GRL
+Copyright (C) 2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 

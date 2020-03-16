@@ -209,6 +209,8 @@ sub execute {
 
   $self->can_run() or return;
   $self->result->criteria($self->_criteria);
+  $self->result->criteria_md5(
+    $self->result->generate_checksum4data($self->result->criteria));
   try {
     $self->result->pass($self->evaluate);
   } catch {
@@ -575,7 +577,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 GRL
+Copyright (C) 2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 

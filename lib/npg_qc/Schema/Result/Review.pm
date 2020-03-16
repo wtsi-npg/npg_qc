@@ -227,8 +227,6 @@ with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::
 
 use Carp;
 use Try::Tiny;
-use Digest::MD5 qw/md5_hex/;
-use JSON::XS;
 use WTSI::DNAP::Utilities::Timestamp qw/parse_timestamp/;
 
 our $VERSION = '0';
@@ -350,14 +348,14 @@ around [qw/update insert/] => sub {
     $self->_save_qc_outcome(\%qc_outcome);
   }
 
-  if ($data->{'criteria'} and keys %{$data->{'criteria'}}) {
-    my $md5 = md5_hex(JSON::XS->new()->canonical(1)
-                              ->encode($data->{'criteria'}));
-    if ($new_data) {
-      $new_data->{'criteria_md5'} = $md5;
-    } else {
-      $self->set_column('criteria_md5', $md5);
-    }
+  #####
+  # To avoid discrepancies between criteria hash and its signature string,
+  # recompute and reset criteria_md5.
+  my $md5 = $self->generate_checksum4data($data->{'criteria'});
+  if ($new_data) {
+    $new_data->{'criteria_md5'} = $md5;
+  } else {
+    $self->set_column('criteria_md5', $md5);
   }
 
   # Perform the original action.
@@ -433,10 +431,6 @@ __END__
 
 =item Try::Tiny
 
-=item Digest::MD5
-
-=item JSON::XS
-
 =item WTSI::DNAP::Utilities::Timestamp
 
 =back
@@ -451,7 +445,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 GRL
+Copyright (C) 2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 

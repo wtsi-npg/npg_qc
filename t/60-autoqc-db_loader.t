@@ -5,7 +5,6 @@ use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
 use Perl6::Slurp;
-use JSON;
 use Archive::Extract;
 use File::Temp qw/ tempdir /;
 use File::Copy qw/ cp /;
@@ -847,7 +846,11 @@ subtest 'load from archive path - new style runfolder, merged entities' => sub {
 };
 
 subtest 'loading review and other results from path' => sub {
-  plan tests => 8;
+  plan tests => 10;
+
+  my $review_data = slurp 't/data/autoqc/review/29524#2.review.json';
+  ok ($review_data !~ /criteria_md5/ , 'review data we are about ' .
+    'to load do not have criteria_md5 attribute set');
 
   my $db = $db_helper->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
   my $db_loader = npg_qc::autoqc::db_loader->new(
@@ -868,6 +871,7 @@ subtest 'loading review and other results from path' => sub {
   is( ref $row->evaluation_results, 'HASH', 'inflation back to an array');
   is( ref $row->qc_outcome, 'HASH', 'inflation back to a hash');
   is( ref $row->criteria, 'HASH', 'inflation back to a hash');
+  is( $row->criteria_md5, '27c522a795e99e3aea57162541de75b1', 'criteria_md5 column populated');
 };
 
 1;
