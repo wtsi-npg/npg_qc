@@ -1,0 +1,50 @@
+{
+  "__CLASS__": "npg_qc::autoqc::results::bam_flagstats-67.5.0",
+  "composition": {
+    "__CLASS__": "npg_tracking::glossary::composition-90.3.0",
+    "components": [
+      {
+        "__CLASS__": "npg_tracking::glossary::composition::component::illumina-90.3.0",
+        "id_run": 33681,
+        "position": 1,
+        "tag_index": 15
+      }
+    ]
+  },
+  "histogram": {},
+  "id_run": 33681,
+  "info": {
+    "Check": "npg_qc::autoqc::checks::bam_flagstats",
+    "Check_version": "67.5.0"
+  },
+  "library": "29468465",
+  "library_size": null,
+  "mate_mapped_defferent_chr": 0,
+  "mate_mapped_defferent_chr_5": 0,
+  "num_total_reads": 28,
+  "paired_mapped_reads": 0,
+  "paired_read_duplicates": 0,
+  "percent_duplicate": 0,
+  "position": 1,
+  "proper_mapped_pair": 0,
+  "read_pair_optical_duplicates": 0,
+  "read_pairs_examined": 0,
+  "tag_index": 15,
+  "target_autosome_coverage_threshold": 15,
+  "target_autosome_filter": "F0xF04_target_autosome",
+  "target_autosome_length": 2762956253,
+  "target_autosome_mapped_bases": 0,
+  "target_autosome_mapped_reads": 0,
+  "target_autosome_percent_gt_coverage_threshold": 0,
+  "target_autosome_proper_pair_mapped_reads": 0,
+  "target_coverage_threshold": 15,
+  "target_filter": "F0xF04_target",
+  "target_length": 2945869055,
+  "target_mapped_bases": 0,
+  "target_mapped_reads": 0,
+  "target_percent_gt_coverage_threshold": 0,
+  "target_proper_pair_mapped_reads": 0,
+  "unmapped_reads": 28,
+  "unpaired_mapped_reads": 0,
+  "unpaired_read_duplicates": 0
+}

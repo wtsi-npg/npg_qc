@@ -275,6 +275,7 @@ t/data/autoqc/bam_flagstats/4783_5_bam_flagstats.json
 t/data/autoqc/bam_flagstats/4783_5_metrics_optical.txt
 t/data/autoqc/bam_flagstats/4783_5.flagstat
 t/data/autoqc/bam_flagstats/4921_3_bam_flagstats.json
+t/data/autoqc/bam_flagstats/33681_1#15.bam_flagstats.json
 t/data/autoqc/bcfstats/data/21835_5.bcfstats.json
 t/data/autoqc/bcfstats/samplesheet_21835.csv
 t/data/autoqc/dbix_loader/run/12233_1.upstream_tags.json

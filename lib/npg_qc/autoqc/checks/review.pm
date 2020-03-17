@@ -636,7 +636,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019,2020 Gemone Research Ltd.
+Copyright (C) 2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 
