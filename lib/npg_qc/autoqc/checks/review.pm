@@ -254,9 +254,18 @@ sub evaluate {
   return $self->_apply_operator([values %{$emap}], $CONJUNCTION_OP);
 }
 
+=head2 lims
+
+st::api::lims object corresponding ti this object's rpt_list
+attribute; this accessor can only be used to set the otherwise
+private attribute. 
+
+=cut
+
 has '_lims' => (
   isa        => 'st::api::lims',
   is         => 'ro',
+  init_arg   => 'lims',
   lazy_build => 1,
 );
 sub _build__lims {
