@@ -12,6 +12,7 @@ use List::MoreUtils qw/any/;
 use npg_testing::db;
 use npg_qc::autoqc::qc_store;
 use npg_tracking::glossary::composition;
+use st::api::lims;
 
 use_ok('npg_qc::autoqc::checks::review');
 
@@ -31,7 +32,7 @@ my $criteria_list = [
 ];
 
 subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 22;
+  plan tests => 25;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -96,6 +97,18 @@ subtest 'construction object, deciding whether to run' => sub {
   ok ($check->can_run, 'can_run returns true');
   ok (!$check->result->comments, 'No comments logged');
   is_deeply ($check->_criteria, {'and' => $criteria_list}, 'criteria parsed correctly');
+
+  lives_ok {
+    $check = npg_qc::autoqc::checks::review->new(
+      conf_path => "$test_data_dir/with_criteria",
+      qc_in     => $test_data_dir,
+      rpt_list  => '27483:1:2',
+      lims      => st::api::lims->new(rpt_list => '27483:1:2')
+    )
+  } 'can set lims via the constructor';
+  ok ($check->can_run, 'can_run returns true');
+  throws_ok { $check->lims } qr/Can\'t locate object method \"lims\"/,
+    'public reader is not available';
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/error1",
