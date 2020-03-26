@@ -5,6 +5,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    and was available only in objects retrieved from the database;
    availability of this value at check execution time will be useful
    for planned generalisation of the review check
+ - ability to save autoqc review outcomes to uqc is added
  - autoqc review check: enable public 'lims' attribute for the
    object's constructor - needed to speed up pipeline's setup
  - remove old InterOp file parsers and database loaders

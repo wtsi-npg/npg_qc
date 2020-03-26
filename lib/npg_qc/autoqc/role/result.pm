@@ -132,7 +132,7 @@ sub composition_subset {
 
 =head2 get_rpt_list
 
-Returns rn pt list value for a composition associated with the
+Returns an rpt list value for a composition associated with the
 result object.
 
 =cut
@@ -324,7 +324,7 @@ data structure that is passed as an argument. This method
 can be called as an instance or package method.
 
 Returns an undefined value if the argument is a scalar or
-an empty array or hash reference. The behavious is undefined
+an empty array or hash reference. The behaviour is undefined
 if the argument is not an array or hash reference.
 
 =cut

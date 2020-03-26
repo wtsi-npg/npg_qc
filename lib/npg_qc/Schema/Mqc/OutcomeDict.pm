@@ -67,13 +67,20 @@ sub generate_short_description {
   my ($self, $is_final, $is_accepted) = @_;
 
   defined $is_final or croak 'Final flag should be defined';
-  my $decision = $is_accepted ? $ACCEPTED :
-        (defined $is_accepted ? $REJECTED : $UNDECIDED);
+
+  my $decision = $self->generate_short_description_prefix($is_accepted);
   if (defined $is_accepted || $is_final) {
     $decision .= q[ ] . ($is_final ? $FINAL : $PRELIMINARY);
   }
 
   return $decision;
+}
+
+sub generate_short_description_prefix {
+  my ($self, $is_accepted) = @_;
+
+  return $is_accepted ? $ACCEPTED :
+    (defined $is_accepted ? $REJECTED : $UNDECIDED);
 }
 
 no Moose::Role;
@@ -175,6 +182,15 @@ __END__
 
     __PACKAGE__->generate_short_description($is_final);
     # returns 'Undecided' !!!
+
+=head2 generate_short_description_prefix
+
+  Similar to generate_short_description, but neither requires a flag indicating
+  whether the status is final, no appends a suffix indicating the finality status
+
+    __PACKAGE__->generate_short_description(1); #returns 'Accepted'
+    __PACKAGE__->generate_short_description(0); #returns 'Rejected'
+    __PACKAGE__->generate_short_description();  #returns 'Undecided' 
 
 =head1 DIAGNOSTICS
 
