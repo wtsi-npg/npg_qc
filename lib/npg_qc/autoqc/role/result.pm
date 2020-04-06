@@ -7,6 +7,7 @@ use JSON;
 use MooseX::Storage;
 use Readonly;
 use List::MoreUtils qw(none uniq);
+use Digest::MD5 qw/md5_hex/;
 
 with Storage( 'traits' => ['OnlyWhenBuilt'],
               'format' => 'JSON',
@@ -131,7 +132,7 @@ sub composition_subset {
 
 =head2 get_rpt_list
 
-Returns rn pt list value for a composition associated with the
+Returns an rpt list value for a composition associated with the
 result object.
 
 =cut
@@ -316,7 +317,31 @@ sub json {
   return $self->freeze();
 }
 
+=head2 generate_checksum4data
+
+Computes md5 of the serialized to canonical JSON
+data structure that is passed as an argument. This method
+can be called as an instance or package method.
+
+Returns an undefined value if the argument is a scalar or
+an empty array or hash reference. The behaviour is undefined
+if the argument is not an array or hash reference.
+
+=cut
+sub generate_checksum4data {
+  my ($self, $data) = @_;
+
+  my $type = ref $data;
+  $type or return;
+  ($type eq 'ARRAY') and not @{$data} and return;
+  ($type eq 'HASH') and not keys %{$data} and return;
+
+  return md5_hex(JSON::XS->new()->canonical(1)
+                                ->encode($data));
+}
+
 1;
+
 __END__
 
 =head1 DIAGNOSTICS
@@ -341,6 +366,8 @@ __END__
 
 =item List::MoreUtils
 
+=item Digest::MD5
+
 =back
 
 =head1 INCOMPATIBILITIES
@@ -353,7 +380,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014,2015,2016,2017,2018,2019 Genome Research Ltd.
+Copyright (C) 2014,2015,2016,2017,2018,2019,2020 Genome Research Ltd.
 
 This file is part of NPG.
 

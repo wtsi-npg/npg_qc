@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 6;
 use Test::Exception;
 
 use npg_tracking::glossary::composition::component::illumina;
@@ -24,9 +24,14 @@ isa_ok ($r, 'npg_qc::autoqc::results::review');
 $r->qc_outcome({mqc_outcome => 'Accepted_final',
                 timestamp   => '2019-05-23T17:11:31+0100',
                 username    => 'robo_qc'});
+is ($r->criteria_md5, undef, 'criteria_md5 is not defined');
 $r->criteria({'and' => [qw/expressionA expressionB/]});
 $r->evaluation_results({expressionA => 1, expressionB => 1});
+is ($r->criteria_md5, undef, 'criteria_md5 is not defined');
 
-lives_ok { $r->freeze } 'object can be serialized';
+my $frozen;
+lives_ok { $frozen = $r->freeze } 'object can be serialized';
+lives_ok { $r = npg_qc::autoqc::results::review->thaw($frozen) }
+  'JSON serialization can be deserialized back into an object';
 
 1;

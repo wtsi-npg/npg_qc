@@ -1,6 +1,17 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-npg_qc release 68.0.0
+release 68.1.0
+ - criteria_md5 attribute is added to the review autoqc result object;
+   previously it was computed at a point of loading to the database
+   and was available only in objects retrieved from the database;
+   availability of this value at check execution time will be useful
+   for planned generalisation of the review check
+ - ability to save autoqc review outcomes to uqc is added
+ - autoqc review check: enable public 'lims' attribute for the
+   object's constructor - needed to speed up pipeline's setup
+ - remove old InterOp file parsers and database loaders
+
+release 68.0.0
  - interop parser - extra tests and a fix for some result hash keys
  - provisions for having an array of result objects in the result
    attribute of the autoqc check object
