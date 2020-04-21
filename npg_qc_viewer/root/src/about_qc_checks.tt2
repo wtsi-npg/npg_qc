@@ -255,7 +255,7 @@ target metrics separated by a pipe delimiter ;<br/><br/>
 <tr><th>Field</th><th>Description</th></tr>
 <tr><td>PP%</td><td>% mapped reads which are mapped in proper pairs - from Target region stats</td></tr>
 <tr><td>Gb</td><td>yield within target (bp) - from Target region stats</td></tr>
-<tr><td>Cov</td><td>% regions above coverage threshold - from Autosomes only target region stats</td></tr>
+<tr><td>Cov</td><td>% regions above coverage threshold - Autosomes only target region stats is the default value but if Autosomes only (denoted by small a) stats aren't available it will fall back to Target regions stats (denoted by a small t).</td></tr>
 </table>
 <br/><br/>
 <a name="verify bam id_check"></a>

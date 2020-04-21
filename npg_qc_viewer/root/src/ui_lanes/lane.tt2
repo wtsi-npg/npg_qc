@@ -284,8 +284,11 @@
 [%- END -%] 
 |
 [%- target_agt = result.target_autosome_percent_gt_coverage_threshold -%]
+[%- target_gt = result.target_percent_gt_coverage_threshold -%]
 [%- IF target_agt.defined && target_agt != '' -%]
-<span class="dark_blue">[% FILTER format('%2.2f'); target_agt; END %]
+<span class="dark_blue">[% FILTER format('%2.2f'); target_agt; END %]a
+[%- ELSIF target_gt.defined && target_gt != '' -%]
+<span class="dark_blue">[% FILTER format('%2.2f'); target_gt; END %]t
 [%- ELSE -%]
 -
 [%- END -%] 

@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tweak for genome coverage figure in qc page - fall back to target 
+   is no default autosomes only subset number available.
+
 release 68.1.0
  - criteria_md5 attribute is added to the review autoqc result object;
    previously it was computed at a point of loading to the database
