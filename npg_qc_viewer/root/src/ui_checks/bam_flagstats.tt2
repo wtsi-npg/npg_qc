@@ -4,6 +4,11 @@
      paired_mapped_reads = check.paired_mapped_reads * 2;
    END;
 -%]
+[% subset = -1;
+  IF check.target_autosome_length.defined && check.target_autosome_length > 0;
+     subset = 1;
+  END;
+-%]
 
 <table style='border-top: 0px;' title="stats tables">
 <tr>
@@ -66,7 +71,9 @@ Target region stats
 <tr><th class="laligned">coverage threshold (X)</th>
   <td class="raligned">[% IF check.target_coverage_threshold.defined; check.target_coverage_threshold | format_number ; END %]</td></tr>
 <tr><th class="laligned">%  regions above coverage threshold</th>
-  <td class="raligned">[% IF check.target_percent_gt_coverage_threshold.defined; check.target_percent_gt_coverage_threshold  | format('%3.2f'); END %]</td></tr>
+<td class="raligned">[% IF subset < 1 %]<b>[% END %]
+[% IF check.target_percent_gt_coverage_threshold.defined; check.target_percent_gt_coverage_threshold  | format('%3.2f'); END %]
+[% IF subset < 1 %]</b>[% END %]</td></tr>
 [% END %]
 </table>
 
@@ -78,7 +85,7 @@ Target region stats
 <td valign=top>
 <div class="data_table">
 <table title="autosomes only target region stats">
-[% IF check.target_autosome_length.defined && check.target_autosome_length > 0 %]
+[% IF subset == 1 %]
 Autosomes only target region stats
 <tr><th>Stats description</th><th>Value</th></tr>
 <tr><th class="laligned">filter</th>
