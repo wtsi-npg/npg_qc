@@ -207,7 +207,8 @@ sub _scan_repository {
 override 'can_run' => sub {
   my $self = shift;
 
-  if($self->lims->gbs_plex_name){
+  if ($self->lims->gbs_plex_name &&
+     ($self->lims_library_type && $self->lims_library_type =~ /^GbS|GnT\sMDA/ismx)) {
     $self->result->add_comment('Ref match skipped for gbs plex libraries.');
     return 0;
   }
