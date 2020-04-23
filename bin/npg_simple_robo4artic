@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
+use Log::Log4perl qw(:levels);
+use Try::Tiny;
 use Carp;
 
 use npg_tracking::glossary::rpt;
@@ -13,50 +15,84 @@ use npg_qc::autoqc::checks::review;
 
 our $VERSION = '0';
 
-while (<>) {
-  my @columns = split /,/xms;
-  my $file_name_root = shift @columns;
-  my $outcome        = pop @columns;
-  $outcome =~ s/\s+\Z//smx;
+Log::Log4perl->easy_init({layout => '%d %-5p %c - %m%n',
+                          level  => $WARN});
+my $logger = Log::Log4perl->get_logger();
 
-  $outcome =~ /\ATRUE|FALSE\z/xsm or croak "Unexpected outcome value '$outcome'";
+my $line_number = 0;
+while (my $line = <>) {
 
-  my $h = npg_tracking::glossary::moniker->parse_file_name($file_name_root);
-  my $rpt = npg_tracking::glossary::rpt->deflate_rpt($h);
+  $line_number++;
+  my $l = "Line $line_number:";
+  my $outcome;
+  my $file_name_root;
+  my $r;
+  my $sname;
+  my $lib_type;
 
-  my $r = npg_qc::autoqc::checks::review->new(rpt_list => $rpt);
+  try {
+    my @columns = split /,/xms, $line;
+    (@columns >= 2) or croak 'at least two columns are expected';
+    $file_name_root = shift @columns;
+    $file_name_root or croak 'no file name in the first column';
+    $outcome        = pop @columns;
+    defined $outcome or croak 'no outcome in the last column';
+    $outcome =~ s/\s+\Z//xms;
+    $outcome =~ /\A(TRUE|FALSE)\Z/xms or croak
+      "unexpected outcome value '$outcome'";
 
-  my $sname = $r->lims->sample_supplier_name();
+    my $h = npg_tracking::glossary::moniker->parse_file_name($file_name_root);
+    my $rpt = npg_tracking::glossary::rpt->deflate_rpt($h);
+    $r = npg_qc::autoqc::checks::review->new(rpt_list => $rpt);
+    $sname = $r->lims->sample_supplier_name();
+    $lib_type = $r->lims->library_type();
+  } catch {
+    $logger->error("$l $_");
+    exit 1;
+  };
+
   if (!$sname) {
-    carp "Skipping $file_name_root, sample supplier name is not set";
+    $logger->warn(
+      "$l skipping $file_name_root, sample supplier name is not set");
     next;
   }
+
   my ($name_prefix) = $sname =~ /\A([[:upper:]]{4})-/xms;
   if (!$name_prefix || ($name_prefix =~ /\ACGAP\Z/ixms)) {
-    carp "Skipping $file_name_root, sample $sname does not belong to Heron";
+    $logger->warn(
+      "$l skipping $file_name_root, sample $sname does not belong to Heron");
+    next;
+  }
+
+  if (!$lib_type) {
+    $logger->warn(
+      "$l skipping $file_name_root, library type is not set");
     next;
   }
 
   $r->result->pass(int($outcome eq 'TRUE' ? 1 : 0));
   $r->result->qc_outcome($r->generate_qc_outcome('uqc', 'artic-qc'));
-  $r->result->library_type($r->lims->library_type);
-  my $condition = 'ncov2019-artic-nf QC is TRUE';
+  $r->result->library_type($lib_type);
+  my $condition = 'Passed ncov2019-artic-nf QC';
   $r->result->evaluation_results({$condition => $r->result->pass});
   $r->result->criteria({'and' => [$condition]});
-  $r->result->store();
+  try {
+    $r->result->store();
+  } catch {
+    $logger->error("$l $_");
+    exit 2;
+  };
 }
 
 exit 0;
 
 __END__
 
-
 =head1 NAME
 
 npg_simple_robo4artic
 
 =head1 USAGE
-
 
 =head1 CONFIGURATION
 
@@ -102,6 +138,10 @@ Only the first and the last column of the input is considered.
 =item lib
 
 =item Carp
+
+=item Try::Tiny
+
+=item Log::Log4perl
 
 =item  npg_tracking::glossary::rpt
 
