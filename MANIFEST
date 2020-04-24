@@ -10,6 +10,7 @@ bin/mqc_outcome_reporter
 bin/npg_mqc_skipper
 bin/npg_qc_autoqc_data.pl
 bin/npg_qc_tag_sniff.pl
+bin/npg_simple_robo4artic
 bin/call_gtck_composite_rpt.pl
 bin/genotype_call_results_reporter
 Build.PL

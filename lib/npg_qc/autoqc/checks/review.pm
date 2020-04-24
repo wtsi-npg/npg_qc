@@ -234,7 +234,8 @@ sub execute {
     $self->final_qc_outcome && croak $err;
     $self->result->add_comment($err);
   };
-  $self->result->qc_outcome($self->_generate_qc_outcome($md5));
+  $self->result->qc_outcome(
+    $self->generate_qc_outcome($self->_outcome_type(), $md5));
 
   return;
 }
@@ -270,6 +271,42 @@ sub evaluate {
   return $self->_apply_operator([values %{$emap}], $CONJUNCTION_OP);
 }
 
+=head2 generate_qc_outcome
+
+Returns a hash reference representing the QC outcome.
+
+  my $u_outcome = $r->generate_qc_outcome('uqc', $md5);
+  my $m_outcome = $r->generate_qc_outcome('mqc');
+
+=cut
+
+sub generate_qc_outcome {
+  my ($self, $outcome_type, $md5) = @_;
+
+  $outcome_type or croak 'outcome type should be defined';
+
+  my $package_name = 'npg_qc::Schema::Mqc::OutcomeDict';
+  my $pass = $self->result->pass;
+  #####
+  # Any of Accepted, Rejected, Undecided outcomes can be returned here
+  my $outcome = ($outcome_type eq $QC_TYPE_DEFAULT)
+    ? $package_name->generate_short_description(
+      $self->final_qc_outcome ? 1 : 0, $pass)
+    : $package_name->generate_short_description_prefix($pass);
+
+  $outcome_type .= '_outcome';
+  my $outcome_info = { $outcome_type => $outcome,
+                       timestamp   => create_current_timestamp(),
+                       username    => $ROBO_KEY};
+  if ($outcome_type =~ /\Auqc/xms) {
+    my @r = ($ROBO_KEY, $VERSION);
+    $md5 and push @r, $md5;
+    $outcome_info->{'rationale'} = join q[ ], @r;
+  }
+
+  return $outcome_info;
+}
+
 =head2 lims
 
 st::api::lims object corresponding ti this object's rpt_list
@@ -278,13 +315,12 @@ private attribute.
 
 =cut
 
-has '_lims' => (
+has 'lims' => (
   isa        => 'st::api::lims',
   is         => 'ro',
-  init_arg   => 'lims',
   lazy_build => 1,
 );
-sub _build__lims {
+sub _build_lims {
   my $self = shift;
   return st::api::lims->new(rpt_list => $self->rpt_list);
 }
@@ -299,7 +335,7 @@ sub _build__robo_config{
 
   my $message;
   my $strict = 1; # Parse study section only, ignore the default section.
-  my $config = $self->study_config($self->_lims(), $strict);
+  my $config = $self->study_config($self->lims(), $strict);
 
   if (keys %{$config}) {
     $config = $config->{$ROBO_KEY};
@@ -332,7 +368,7 @@ sub _build__criteria {
 
   (keys %{$self->_robo_config}) or return $rewritten;
 
-  my $lib_type = $self->_lims->library_type;
+  my $lib_type = $self->lims->library_type;
   $lib_type or croak 'Library type is not defined for ' .  $self->composition->freeze;
   # We are going to compare library type strings in lower case
   # because the case for this type of LIMs data might be inconsistent.
@@ -569,8 +605,8 @@ sub _evaluate_expression {
   return $evaluator->($obj);
 }
 
-sub _generate_qc_outcome {
-  my ($self, $md5) = @_;
+sub _outcome_type {
+  my $self = shift;
 
   my $outcome_type = $self->_robo_config()->{$QC_TYPE_KEY};
   if ($outcome_type) {
@@ -581,26 +617,7 @@ sub _generate_qc_outcome {
     $outcome_type = $QC_TYPE_DEFAULT;
   }
 
-  my $package_name = 'npg_qc::Schema::Mqc::OutcomeDict';
-  my $pass = $self->result->pass;
-  #####
-  # Any of Accepted, Rejected, Undecided outcomes can be returned here
-  my $outcome = ($outcome_type eq $QC_TYPE_DEFAULT)
-    ? $package_name->generate_short_description(
-      $self->final_qc_outcome ? 1 : 0, $pass)
-    : $package_name->generate_short_description_prefix($pass);
-
-  $outcome_type .= '_outcome';
-  my $outcome_info = { $outcome_type => $outcome,
-                       timestamp   => create_current_timestamp(),
-                       username    => $ROBO_KEY};
-  if ($outcome_type eq 'uqc') {
-    my @r = ($ROBO_KEY, $VERSION);
-    $md5 and push @r, $md5;
-    $outcome_info->{'rationale'} = join q[:], @r;
-  }
-
-  return $outcome_info;
+  return $outcome_type;
 }
 
 __PACKAGE__->meta->make_immutable();
