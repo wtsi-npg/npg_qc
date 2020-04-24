@@ -74,7 +74,7 @@ while (my $line = <STDIN>) {
   my ($name_prefix) = $sname =~ /\A([[:upper:]]{4})-/xms;
   if (!$name_prefix || ($name_prefix =~ /\ACGAP\Z/ixms)) {
     $logger->warn(
-      "$l skipping $file_name_root, sample $sname does not belong to Heron");
+      "$l skipping $file_name_root, sample '${sname}' does not belong to Heron");
     next;
   }
 
