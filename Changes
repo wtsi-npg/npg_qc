@@ -4,6 +4,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    if no default autosomes only number available.
  - a new script - npg_simple_robo4artic - to generate autoqc review
    results from third party QC data
+ - skip ref_match autoqc checks only for true GBS samples
 
 release 68.1.0
  - criteria_md5 attribute is added to the review autoqc result object;
