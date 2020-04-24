@@ -16,12 +16,26 @@ use npg_qc::autoqc::checks::review;
 our $VERSION = '0';
 
 Log::Log4perl->easy_init({layout => '%d %-5p %c - %m%n',
-                          level  => $WARN});
+                          level  => $INFO});
 my $logger = Log::Log4perl->get_logger();
 
-my $line_number = 0;
-while (my $line = <>) {
+my $dir_out = $ARGV[0];
+if (defined $dir_out) {
+  if (($dir_out ne q[]) and (-d $dir_out) and (-w $dir_out)) {
+    $logger->info("Using output directory $dir_out");
+  } else {
+    $logger->error(
+      "Output directory $dir_out does not exists or is not writable");
+    exit 2;
+  }
+} else {
+  $logger->info('Using current directory as an output directory');
+}
 
+my $line_number = 0;
+##no critic (InputOutput::ProhibitExplicitStdin)
+while (my $line = <STDIN>) {
+##use critic
   $line_number++;
   my $l = "Line $line_number:";
   my $outcome;
@@ -77,7 +91,7 @@ while (my $line = <>) {
   $r->result->evaluation_results({$condition => $r->result->pass});
   $r->result->criteria({'and' => [$condition]});
   try {
-    $r->result->store();
+    $r->result->store($dir_out);
   } catch {
     $logger->error("$l $_");
     exit 2;
@@ -98,24 +112,29 @@ npg_simple_robo4artic
 
 =head1 SYNOPSIS
 
+  echo '34014_1#104,TRUE'  | npg_simple_robo4artic
+  echo '34014_1#104,FALSE' | npg_simple_robo4artic 'my_dir'
+
+=head1 DESCRIPTION
+
 This script creates autoqc review result JSON files for
 entities and outcomes piped from STDIN. One line of input
 produces one file, unless this input is considered irrelevant.
 
-The JSON files are created in the working directory. The
-qc oucomes are recorded as user QC.
+The JSON files are created in the working directory unless an
+alternative directory is specified as teh only argument. The
+qc outcomes are recorded as user QC.
 
 Example of input:
 
 34014_1#104,1.21,98.61,19221,34014_1#104.primertrimmed.consensus.fa,34014_1#104.mapped.primertrimmed.sorted.bam,TRUE
-
 34014_1#105,87.85,9.91,376,34014_1#105.primertrimmed.consensus.fa,34014_1#105.mapped.primertrimmed.sorted.bam,FALSE
 
 Only the first and the last column of the input is considered.
 
-=head1 DESCRIPTION
-
 =head1 REQUIRED ARGUMENTS
+
+None
 
 =head1 OPTIONS
 
