@@ -37,6 +37,10 @@ my $line_number = 0;
 while (my $line = <STDIN>) {
 ##use critic
   $line_number++;
+
+  if ($line =~ /\Asample_name,/smx) { # header, skip
+    next;
+  }
   my $l = "Line $line_number:";
   my $outcome;
   my $file_name_root;
