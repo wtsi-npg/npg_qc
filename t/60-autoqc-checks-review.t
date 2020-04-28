@@ -32,7 +32,7 @@ my $criteria_list = [
 ];
 
 subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 25;
+  plan tests => 24;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -107,8 +107,6 @@ subtest 'construction object, deciding whether to run' => sub {
     )
   } 'can set lims via the constructor';
   ok ($check->can_run, 'can_run returns true');
-  throws_ok { $check->lims } qr/Can\'t locate object method \"lims\"/,
-    'public reader is not available';
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/error1",
@@ -322,7 +320,7 @@ subtest 'single expression evaluation' => sub {
 };
 
 subtest 'evaluation within the execute method' => sub {
-  plan tests => 37;
+  plan tests => 38;
 
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
@@ -355,6 +353,7 @@ subtest 'evaluation within the execute method' => sub {
       is ($outcome->{'mqc_outcome'} , 'Accepted preliminary', 'correct outcome string');
     } elsif ($count == 2) {
       is ($outcome->{'uqc_outcome'} , 'Accepted', 'correct outcome string');
+      ok ($outcome->{'rationale'} , 'rationale is set');
     }
     is ($outcome->{'username'}, 'robo_qc', 'correct process id');
     ok ($outcome->{'timestamp'}, 'timestamp saved');

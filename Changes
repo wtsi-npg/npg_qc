@@ -1,5 +1,15 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.2.0
+ - tweak for genome coverage figure in qc summary - fall back to target 
+   if no default autosomes only number available.
+ - a new script - npg_simple_robo4artic - to generate autoqc review
+   results from third party QC data
+ - skip ref_match autoqc checks only for true GBS samples
+ - SeqQC viewer: make visual cues for utility (user) QC  outcomes always
+   visible regardless of whether they concur with the manual QC outcome
+   or not
+
 release 68.1.0
  - criteria_md5 attribute is added to the review autoqc result object;
    previously it was computed at a point of loading to the database
