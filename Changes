@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.2.0
  - tweak for genome coverage figure in qc summary - fall back to target 
    if no default autosomes only number available.
  - a new script - npg_simple_robo4artic - to generate autoqc review
