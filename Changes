@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.2.1
+ - allow the dot character in QC outcomes column values
+
 release 68.2.0
  - tweak for genome coverage figure in qc summary - fall back to target 
    if no default autosomes only number available.
