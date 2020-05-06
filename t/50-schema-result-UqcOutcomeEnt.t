@@ -293,7 +293,7 @@ subtest 'update outcome' => sub {
 };
 
 subtest 'sanitize' => sub {
-  plan tests => 14;
+  plan tests => 16;
 
   my $p = 'npg_qc::Schema::Result::UqcOutcomeEnt';
   throws_ok { $p->sanitize_value() } qr/Input undefined/,
@@ -316,13 +316,16 @@ subtest 'sanitize' => sub {
     qr/Illegal characters/, 'double quotes are not accepted';
   throws_ok { $p->sanitize_value(q{email someone's friend}) }
     qr/Illegal characters/, 'single quotes are not accepted';
-
+  lives_ok { $p->sanitize_value(q{email someone#s friend}) }
+    'hashes are accepted';
   throws_ok { $p->sanitize_value('email some@other.com') }
     qr/Illegal characters/, 'email address is not allowed';
   throws_ok { $p->sanitize_value('form <th>some</th>') }
     qr/Illegal characters/, 'HTML is not allowed';
   throws_ok { $p->sanitize_value('<script>console.log();</script>') }
     qr/Illegal characters/, 'JavaScript is not allowed';
+  lives_ok { $p->sanitize_value('robo_qc 68.2.0 artic-qc') }
+    'standard rationale for uqc is OK';
 };
 
 1;
