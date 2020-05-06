@@ -173,7 +173,7 @@ sub sanitize_value {
   $value =~ s/\A\s+//smx;
   $value =~ s/\s+\Z//smx;
   $value or croak q[Only white space characters in input];
-  ($value =~ /\A[[:word:][:space:]#-]+\Z/smx) or croak qq[Illegal characters in $value];
+  ($value =~ /\A[[:word:][:space:].#-]+\Z/smx) or croak qq[Illegal characters in '$value'];
   return $value;
 }
 
