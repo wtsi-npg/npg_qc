@@ -2,11 +2,13 @@
 
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use FindBin qw($Bin $Script);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 use Log::Log4perl qw(:levels);
 use Try::Tiny;
+use Text::CSV;
 use Carp;
+use Readonly;
 
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
@@ -14,6 +16,30 @@ use npg_tracking::glossary::moniker;
 use npg_qc::autoqc::checks::review;
 
 our $VERSION = '0';
+
+Readonly::Scalar my $NEG_CONTROL_NUM_READS_THRESHOLD => 100;
+
+Readonly::Scalar my $NEG_CONTROL_REGEXP => qr/\A CGAP- | Negative[ ]control | blank /ismx;
+Readonly::Scalar my $POS_CONTROL_REGEXP => qr/\A Positive[ ]control /ismx;
+Readonly::Scalar my $HERON_REGEXP       => qr/\A [[:upper:]]{4}- /smx;
+Readonly::Scalar my $NEG_CONTROL_FLAG   => q[NEG_CONTROL];
+Readonly::Scalar my $POS_CONTROL_FLAG   => q[POS_CONTROL];
+Readonly::Scalar my $HERON_FLAG         => q[HERON];
+Readonly::Scalar my $UNKNOWN_FLAG       => q[UNKNOWN];
+
+# Order of rules evaluation is important, hence a list.
+Readonly::Array  my @SAMPLE_ASSIGNMENT_RULES => (
+                               [$POS_CONTROL_REGEXP, $POS_CONTROL_FLAG],
+                               [$NEG_CONTROL_REGEXP, $NEG_CONTROL_FLAG],
+                               [$HERON_REGEXP, $HERON_FLAG],
+                                                );
+
+Readonly::Scalar my $ARTIC_NF_REPO_NAME =>  q[ncov2019-artic-nf];
+Readonly::Scalar my $ARTIC_QC_PASS      =>  q[TRUE];
+Readonly::Scalar my $ARTIC_QC_FAIL      =>  q[FALSE];
+Readonly::Scalar my $ARTIC_SUMMARY_KEY  => qq[$ARTIC_NF_REPO_NAME QC summary];
+
+Readonly::Scalar my $QC_TYPE            => q[mqc];
 
 Log::Log4perl->easy_init({layout => '%d %-5p %c - %m%n',
                           level  => $INFO});
@@ -33,73 +59,122 @@ if (defined $dir_out) {
 }
 
 my $line_number = 0;
-##no critic (InputOutput::ProhibitExplicitStdin)
-while (my $line = <STDIN>) {
-##use critic
+my $csv = Text::CSV->new();
+
+while (my $line = $line_number ? $csv->getline_hr(*STDIN) : $csv->getline(*STDIN)) {
   $line_number++;
 
-  if ($line =~ /\Asample_name,/smx) { # header, skip
+  # Register the first header. After this $line is going to be a hash.
+  if ($line_number == 1) {
+    $csv->column_names($line);
     next;
   }
+
+  my $file_name_root = $line->{'sample_name'};
+  if ($file_name_root && ($file_name_root eq 'sample_name')) {
+    next; # this was header repeat
+  }
+
   my $l = "Line $line_number:";
   my $outcome;
-  my $file_name_root;
+  my $num_reads;
   my $r;
   my $sname;
   my $lib_type;
 
   try {
-    my @columns = split /,/xms, $line;
-    (@columns >= 2) or croak 'at least two columns are expected';
-    $file_name_root = shift @columns;
-    $file_name_root or croak 'no file name in the first column';
-    $outcome        = pop @columns;
-    defined $outcome or croak 'no outcome in the last column';
+    $file_name_root or croak 'no file name in sample_name column';
+
+    $outcome = $line->{'qc_pass'};
+    defined $outcome or croak 'no outcome in qc_pass column';
     $outcome =~ s/\s+\Z//xms;
-    $outcome =~ /\A(TRUE|FALSE)\Z/xms or croak
+    $outcome =~ /\A($ARTIC_QC_PASS | $ARTIC_QC_FAIL)\Z/xms or croak
       "unexpected outcome value '$outcome'";
+
+    $num_reads = $line->{'num_aligned_reads'};
+    defined $num_reads or croak "num_aligned_reads is not defined for $file_name_root";
+    ($num_reads >= 0) or croak "num_aligned_reads is negative for $file_name_root";
 
     my $h = npg_tracking::glossary::moniker->parse_file_name($file_name_root);
     my $rpt = npg_tracking::glossary::rpt->deflate_rpt($h);
     $r = npg_qc::autoqc::checks::review->new(rpt_list => $rpt);
+
     $sname = $r->lims->sample_supplier_name();
+    if (!$sname) {
+      # Not exiting here, the supplier name is often not set for R&D samples.
+      # Beware of the sourse of LIMS data, the supplier name is not set
+      # in XML feeds. Use a samplesheet!
+      $sname = q[];
+      $logger->error("Sample supplier name is not set for $file_name_root");
+    }
     $lib_type = $r->lims->library_type();
+    $lib_type or croak "library type is not set for $file_name_root";
+
   } catch {
     $logger->error("$l $_");
     exit 1;
   };
 
-  if (!$sname) {
+  my $flag = $UNKNOWN_FLAG;
+  foreach my $rule (@SAMPLE_ASSIGNMENT_RULES) {
+    if ($sname =~ $rule->[0]) {
+      $flag = $rule->[1];
+      last;
+    }
+  }
+
+  if ($flag eq $UNKNOWN_FLAG) {
     $logger->warn(
-      "$l skipping $file_name_root, sample supplier name is not set");
+      "$l $file_name_root, sample '${sname}' - attribution failed");
+  } elsif ($flag eq $POS_CONTROL_FLAG) {
+    $logger->warn(
+      "$l $file_name_root, sample '${sname}' - positive control, skipping");
     next;
   }
 
-  my ($name_prefix) = $sname =~ /\A([[:upper:]]{4})-/xms;
-  if (!$name_prefix || ($name_prefix =~ /\ACGAP\Z/ixms)) {
-    $logger->warn(
-      "$l skipping $file_name_root, sample '${sname}' does not belong to Heron");
-    next;
+  my $condition =
+    qq[Negative control, number of primer-trimmed aligned reads is less than $NEG_CONTROL_NUM_READS_THRESHOLD];
+  if ($flag eq $HERON_FLAG) {
+    $condition = qq[Passed $ARTIC_NF_REPO_NAME QC];
   }
 
-  if (!$lib_type) {
-    $logger->warn(
-      "$l skipping $file_name_root, library type is not set");
-    next;
-  }
+  my $pass = ($flag eq $HERON_FLAG)
+             ? ($outcome eq $ARTIC_QC_PASS ? 1 : 0)
+             : ($num_reads < $NEG_CONTROL_NUM_READS_THRESHOLD ? 1 : 0);
+  $r->result->pass($pass);
 
-  $r->result->pass(int($outcome eq 'TRUE' ? 1 : 0));
-  $r->result->qc_outcome($r->generate_qc_outcome('uqc', 'artic-qc'));
+  $r->result->qc_outcome($r->generate_qc_outcome($QC_TYPE));
   $r->result->library_type($lib_type);
-  my $condition = 'Passed ncov2019-artic-nf QC';
   $r->result->evaluation_results({$condition => $r->result->pass});
   $r->result->criteria({'and' => [$condition]});
+
+  $r->result->set_info($ARTIC_SUMMARY_KEY, $line);  # Capture the QC summary,
+  $r->result->set_info('Script_name', $Script);     # this script name
+  $r->result->set_info('Script_version', $VERSION); # and version
+
   try {
     $r->result->store($dir_out);
   } catch {
     $logger->error("$l $_");
     exit 2;
   };
+}
+
+if ($line_number == 0) {
+
+  # All QC summary files are empty, we do not know how many files
+  # in total were fed into the script and whether the files contained
+  # summaries for one or many samples.
+
+  # Do we want to deal with this case in this script or create a
+  # a different script for a single file single sample scenario
+  # only?  We would need the rpt key to figure out the entity. Then
+  # we can access the deplexing metrics and, in case of confirmed
+  # zero reads, assign a fail to a heron sample and a positive
+  # control and a pass to a negative control. Or error if not zero
+  # reads.
+
+  $logger->warn(q[Input is empty]);
 }
 
 exit 0;
@@ -116,8 +191,8 @@ npg_simple_robo4artic
 
 =head1 SYNOPSIS
 
-  echo '34014_1#104,TRUE'  | npg_simple_robo4artic
-  echo '34014_1#104,FALSE' | npg_simple_robo4artic 'my_dir'
+  echo artic_summary.qc.csv  | npg_simple_robo4artic
+  echo artic_summary.qc.csv | npg_simple_robo4artic 'my_dir'
 
 =head1 DESCRIPTION
 
@@ -127,14 +202,19 @@ produces one file, unless this input is considered irrelevant.
 
 The JSON files are created in the working directory unless an
 alternative directory is specified as teh only argument. The
-qc outcomes are recorded as user QC.
+qc outcomes are recorded as preliminary manual QC outcomes.
+
+The actic QC summary is recorded under the
+'ncov2019-artic-nf QC summary' key in the info attribute of
+the result. The summary is recorded as a hash with keys as
+column headers and values as corresponding column values for
+a particular sample. 
 
 Example of input:
 
-34014_1#104,1.21,98.61,19221,34014_1#104.primertrimmed.consensus.fa,34014_1#104.mapped.primertrimmed.sorted.bam,TRUE
-34014_1#105,87.85,9.91,376,34014_1#105.primertrimmed.consensus.fa,34014_1#105.mapped.primertrimmed.sorted.bam,FALSE
-
-Only the first and the last column of the input is considered.
+  sample_name,pct_N_bases,pct_covered_bases,longest_no_N_run,num_aligned_reads,fasta,bam,qc_pass
+  34032_2#25,0.99,98.52,19221,4603415,34032_2#25.primertrimmed.consensus.fa,34032_2#25.mapped.primertrimmed.sorted.bam,TRUE
+  34014_1#105,87.85,9.91,376,415,34014_1#105.primertrimmed.consensus.fa,34014_1#105.mapped.primertrimmed.sorted.bam,FALSE
 
 =head1 REQUIRED ARGUMENTS
 
@@ -165,6 +245,10 @@ None
 =item Try::Tiny
 
 =item Log::Log4perl
+
+=item Text::CSV
+
+=item Readonly
 
 =item  npg_tracking::glossary::rpt
 
