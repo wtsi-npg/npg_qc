@@ -70,6 +70,7 @@ my $requires = {
                 'REST::Client'                    => 0,
                 'Statistics::Lite'                => 0,
                 'strict'                          => 0,
+                'Text::CSV'                       => 0,
                 'Try::Tiny'                       => 0,
                 'warnings'                        => 0,
                 'URI::Escape'                     => 0,

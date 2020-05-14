@@ -42,7 +42,7 @@ has 'pass'         => (isa      => 'Maybe[Bool]',
 has 'info'     => (
       metaclass => 'Collection::Hash',
       is        => 'ro',
-      isa       => 'HashRef[Str]',
+      isa       => 'HashRef',
       default   => sub { {} },
       provides  => {
           get       => 'get_info',

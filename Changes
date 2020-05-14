@@ -1,5 +1,17 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.3.0
+ - npg_simple_robo4artic:
+     extended to consider negative and positive controls;
+     no action (skip) for positive control, a separate set of evaluation
+     criteria for negative controls;
+     all outcomes are recorded as preliminary manual QC outcomes;
+     QC summary is is recorded in the 'info' attribute of the review
+     autoqc check
+ - type of the 'info' attribute for file-based autoqc results is relaxed,
+   changed from a hash of strings to a hash of arbitrary entities to allow
+   for a nested data structure
+
 release 68.2.1
  - allow the dot character in QC outcomes column values
 
