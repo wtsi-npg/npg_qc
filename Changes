@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - npf_qc::autoqc::results::generic - result object for generic autoqc
+
 release 68.3.0
  - npg_simple_robo4artic:
      extended to consider negative and positive controls;

@@ -58,6 +58,7 @@ lib/npg_qc/autoqc/results/contamination.pm
 lib/npg_qc/autoqc/results/interop.pm
 lib/npg_qc/autoqc/results/gc_bias.pm
 lib/npg_qc/autoqc/results/gc_fraction.pm
+lib/npg_qc/autoqc/results/generic.pm
 lib/npg_qc/autoqc/results/genotype.pm
 lib/npg_qc/autoqc/results/genotype_call.pm
 lib/npg_qc/autoqc/results/insert_size.pm
@@ -240,6 +241,7 @@ t/60-autoqc-results-contamination.t
 t/60-autoqc-results-interop.t
 t/60-autoqc-results-gc_bias.t
 t/60-autoqc-results-gc_fraction.t
+t/60-autoqc-results-generic.t
 t/60-autoqc-results-genotype.t
 t/60-autoqc-results-genotype_call.t
 t/60-autoqc-results-insert_size.t
