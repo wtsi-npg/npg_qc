@@ -7,6 +7,7 @@ bin/reformat_fluidigm_snp26_results_irods.pl
 bin/qc
 bin/qc_db_delete_autoqc
 bin/mqc_outcome_reporter
+bin/npg_autoqc_generic4artic
 bin/npg_mqc_skipper
 bin/npg_qc_autoqc_data.pl
 bin/npg_qc_tag_sniff.pl
