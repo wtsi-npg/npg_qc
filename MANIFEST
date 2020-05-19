@@ -26,6 +26,7 @@ lib/npg_qc/autoqc/checks/check.pm
 lib/npg_qc/autoqc/checks/interop.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
+lib/npg_qc/autoqc/checks/generic.pm
 lib/npg_qc/autoqc/checks/genotype.pm
 lib/npg_qc/autoqc/checks/genotype_call.pm
 lib/npg_qc/autoqc/checks/insert_size.pm
@@ -211,6 +212,7 @@ t/60-autoqc-checks-check.t
 t/60-autoqc-checks-interop.t 
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
+t/60-autoqc-checks-generic.t
 t/60-autoqc-checks-genotype.t
 t/60-autoqc-checks-genotype_call.t
 t/60-autoqc-checks-insert_size.t

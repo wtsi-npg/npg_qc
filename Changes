@@ -1,6 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - npf_qc::autoqc::results::generic - result object for generic autoqc
+ - npg_qc::autoqc::checkss::generic and npg_qc::autoqc::results::generic -
+   check and result objects for generic autoqc
 
 release 68.3.0
  - npg_simple_robo4artic:
