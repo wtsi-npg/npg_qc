@@ -21,7 +21,7 @@ subtest 'create object, serialize result' => sub {
   isa_ok ($g->lims, 'st::api::lims', 'lims attribute is built');
   lives_ok { $g->execute() } 'no error running execute() method';
   lives_ok { $g->run() } 'no error running run() method';
-  ok (-f "$tdir/27483_1#4.d41d8cd98f00b204e9800998ecf8427e.generic.json",
+  ok (-f "$tdir/27483_1#4.unknown.generic.json",
     'result serialized');
 };
 

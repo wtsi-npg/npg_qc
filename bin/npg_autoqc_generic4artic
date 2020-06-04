@@ -144,7 +144,7 @@ if ($line_number == 0) {
       ($num_input_reads == 0) or croak
         "Non-zero number of original input reads ($num_input_reads)";
 
-      _set_result_attributes($g, {}, $num_input_reads);
+      _set_result_attributes($g, undef, $num_input_reads);
       $g->run();
     } catch {
       $logger->error("Zero reads case for $rpt_list has failed: $_");
@@ -191,28 +191,34 @@ sub _get_sample_type {
 sub _set_result_attributes {
   my ($g, $summary, $num_ireads) = @_;
 
-  # QC output of the portable pipeline.
-  $g->result->metrics($summary);
+  # Descriptor for the portable pipeline that produced
+  # this QC output.
+  $g->result->desc($ARTIC_NF_REPO_NAME);
 
-  # Info about a portable pipeline that produced this QC output.
-  $g->result->pp_name($ARTIC_NF_REPO_NAME);
-  $g->result->pp_metrics_name($ARTIC_METRICS_NAME);
-  if ($pp_version) {
-    $g->result->pp_version($pp_version);
-  } else {
-    $logger->warn('pp version is not given');
+  # QC output of the portable pipeline.
+  $g->result->doc({});
+  if ($summary) {
+    $g->result->doc->{$ARTIC_METRICS_NAME} = $summary;
   }
 
   # Supplimentary information to help evaluate the QC output or its
   # absence.
   if (defined $num_ireads) {
-    $g->result->supplimentary_info->{'num_input_reads'} = $num_ireads;
+    $g->result->doc->{'meta'}->{'num_input_reads'} = $num_ireads;
   }
-  $g->result->supplimentary_info->{'sample_type'} = _get_sample_type($g);
+  $g->result->doc->{'meta'}->{'sample_type'} = _get_sample_type($g);
 
   # Info about this script.
   $g->result->set_info('Script_name', $Script);
   $g->result->set_info('Script_version', $VERSION);
+
+  # Info about the pipeline.
+  $g->result->set_info('Pipeline_name', $ARTIC_NF_REPO_NAME);
+  if ($pp_version) {
+    $g->result->set_info('Pipeline_version', $pp_version);
+  } else {
+    $logger->warn('pp version is not given');
+  }
 
   return;
 }
@@ -252,7 +258,7 @@ If the QC summary is available, it is assigned to the metrics
 attribute of the generic result object. If the number of input reads
 is available, it is assigned to the num_input_reads key of the
 summlimentary_info hash attribute of the result object. The sample type
-(control type, real sample, unknows) is assigned to the sample_type
+(control type, real sample, unknown) is assigned to the sample_type
 key of the summlimentary_info hash attribute.
 
 It is expected that for a result object with no QC summary the

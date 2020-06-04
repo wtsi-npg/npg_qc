@@ -1,0 +1,26 @@
+--
+-- create table for autoqc generic result
+--
+
+CREATE TABLE `generic` (
+  `id_generic` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT \
+    COMMENT 'Auto-generated primary key',
+  `id_seq_composition` bigint(20) unsigned NOT NULL \
+    COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `desc` VARCHAR(40) NOT NULL \
+    COMMENT 'Name of the portable pipeline or other tools, which generated the data',
+  `doc` JSON DEFAULT NULL \
+    COMMENT 'JSON document with assorted QC data',
+  `comments` TEXT DEFAULT NULL \
+    COMMENT 'Run-time comments and warnings',
+  `info` JSON DEFAULT NULL \ 
+    COMMENT 'JSON document with information on how the data were produced',
+  PRIMARY KEY (`id_generic`),
+  UNIQUE KEY `generic_id_compos_desc_uniq` (`id_seq_composition`, `desc`),
+  CONSTRAINT `generic_compos` FOREIGN KEY (`id_seq_composition`) \
+    REFERENCES `seq_composition` (`id_seq_composition`) \
+    ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 \
+  COMMENT 'Arbitrary QC metrics produced by third party pipelines or tools';
+
+GRANT SELECT ON npgqcp.generic TO nqcro;

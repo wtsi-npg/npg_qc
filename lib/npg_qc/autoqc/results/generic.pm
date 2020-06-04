@@ -3,51 +3,27 @@ package npg_qc::autoqc::results::generic;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
-use Digest::MD5 qw/md5_hex/;
 
 extends qw(npg_qc::autoqc::results::base);
 
 our $VERSION = '0';
 
-has 'pp_name' =>  (
+has 'desc' =>  (
   isa      => 'Str',
   is       => 'rw',
   required => 0,
 );
 
-has 'pp_version' =>  (
-  isa      => 'Str',
+has 'doc' =>  (
+  isa      => 'HashRef',
   is       => 'rw',
   required => 0,
-);
-
-has 'pp_metrics_name' =>  (
-  isa      => 'Str',
-  is       => 'rw',
-  required => 0,
-);
-
-has 'metrics' =>  (
-  isa     => 'HashRef',
-  is      => 'rw',
-  default => sub { return {}; },
-);
-
-has 'supplimentary_info' =>  (
-  isa     => 'HashRef',
-  is      => 'rw',
-  default => sub { return {}; },
 );
 
 around 'filename_root' => sub {
   my $orig = shift;
   my $self = shift;
-  return join q[.],
-         $self->$orig(),
-         md5_hex(sprintf '%s%s%s',
-                         $self->pp_name || q[],
-                         $self->pp_version || q[],
-                         $self->pp_metrics_name || q[]);
+  return join q[.], $self->$orig(), $self->desc || q[unknown];
 };
 
 __PACKAGE__->meta->make_immutable;
@@ -67,47 +43,33 @@ __END__
 =head1 DESCRIPTION
 
 An autoqc result class that wraps in a flexible way around
-arbitrary QC metrics, which are produred by portable third-party
-pipelines (pp).
+arbitrary QC metrics, which are produred by third-party
+pipelines or tools.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 pp_name
+=head2 desc
 
-An attribute, the name of the portable pipeline. While the attribute
-is optional in this object, it should be set in order to save the
-results to the database.
+An attribute, a distinct descriptor for the pipeline or a tool which
+produced the data. While the attribute is optional in this object,
+it should be set in order to save the result to the database. This
+value forms a part of a unique key in the database representation,
+so set accordingly. For example, the tool's or pipeline's version
+can be appended to the descriptor.
 
-=head2 pp_name
+=head2 doc
 
-An attribute, the version of the portable pipeline, optional.
-
-=head2 pp_mietrics_name
-
-An attribute, the name of the captured metrics. While the attribute
-is optional in this object, it should be set in order to save the
-results to the database.
-
-=head2 metrics
-
-A hash reference attribute, defaults to an empty hash. The content
-of the captured metrics. The hash can wrap around a deeply nested data
-structure. This data structure is going to be serialized to JSON when
+A hash reference attribute, no default. A flexible, potentially deeply
+nested data structure to accomodate QC output and any supplimentary
+data. This data structure is going to be serialized to JSON when
 saved either to a file or to a datababase.
-
-=head2 supplimentary_info
-
-A hash reference attribute, defaults to an empty hash. This optional
-metrics provides any metadata or information that is necessary for
-evaluation and further processing of data in the metrics attribute.
 
 =head2 filename_root
 
 This class changes the filename_root attribute of the parent class.
-The md5 checksum of the pp_name, pp_version and pp_metrics_name
-attribute values is appended to the standard filename_root to allow
-for coexistance of metrics from different pipelines in the same
-directory.
+The value of the desc attribute is appended to the value produced
+by the parent's method to allow for the results from different
+pipelines to co-exist in the same directory.
 
 =head1 DIAGNOSTICS
 
@@ -122,8 +84,6 @@ directory.
 =item MooseX::StrictConstructor
 
 =item namespace::autoclean
-
-=item Digest::MD5
 
 =back
 

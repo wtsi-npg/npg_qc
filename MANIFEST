@@ -120,6 +120,7 @@ lib/npg_qc/Schema/Result/ClusterDensity.pm
 lib/npg_qc/Schema/Result/Contamination.pm
 lib/npg_qc/Schema/Result/GcBias.pm
 lib/npg_qc/Schema/Result/GcFraction.pm
+lib/npg_qc/Schema/Result/Generic.pm
 lib/npg_qc/Schema/Result/Genotype.pm
 lib/npg_qc/Schema/Result/GenotypeCall.pm
 lib/npg_qc/Schema/Result/InsertSize.pm
