@@ -30,7 +30,7 @@ Readonly::Scalar my $REAL_SAMPLE_REGEXP => qr/\A [[:upper:]]{4}- /smx;
 Readonly::Scalar my $NEG_CONTROL_FLAG   => q[NEG_CONTROL];
 Readonly::Scalar my $POS_CONTROL_FLAG   => q[POS_CONTROL];
 Readonly::Scalar my $REAL_SAMPLE_FLAG   => q[REAL_SAMPLE];
-Readonly::Scalar my $UNKNOWN_FLAG       => q[UNKNOWN_SAMPLE];
+Readonly::Scalar my $UNKNOWN_FLAG       => q[UNKNOWN];
 
 # Order of rules evaluation is important, hence a list.
 Readonly::Array  my @SAMPLE_ASSIGNMENT_RULES => (
@@ -55,10 +55,23 @@ GetOptions ('help'              => \$help,
             'pp_version:s'      => \$pp_version,
             'qc_out:s'          => \$qc_out,
             'rpt_list:s'        => \$rpt_list,
-            'num_input_reads:i' => \$num_input_reads,
+            'num_input_reads:f' => \$num_input_reads,
             'tm_json_file:s'    => \$tag_metrics_json) or pod2usage(2);
 
 $help and pod2usage(1);
+
+if (defined $num_input_reads) {
+  if ($num_input_reads < 0) {
+    $logger->error("Negative --num_input_reads $num_input_reads");
+    exit 1;
+  } else {
+    my $temp = int $num_input_reads;
+    if ($temp ne $num_input_reads) {
+      $logger->error("Non-integer --num_input_reads $num_input_reads");
+      exit 1;
+    }
+  }
+}
 
 if (not $qc_out) {
   $qc_out = getcwd;
@@ -95,6 +108,9 @@ while (my $line = $line_number ? $csv->getline_hr(*STDIN) : $csv->getline(*STDIN
     }
     my $g = npg_qc::autoqc::checks::generic->new(rpt_list => $rpt,
                                                  qc_out   => $qc_out);
+    if ($rpt_list && !defined $num_input_reads && $tag_metrics_json) {
+      $num_input_reads = _get_num_input_reads($g, $tag_metrics_json);
+    }
     _set_result_attributes($g, $line, $num_input_reads);
     $g->run();
   } catch {
@@ -117,29 +133,14 @@ if ($line_number == 0) {
 
       my $g = npg_qc::autoqc::checks::generic->new(rpt_list => $rpt_list,
                                                    qc_out   => $qc_out);
-      ($g->result->composition->num_components == 1) or croak
-        'Cannot get deplexing stats for a multi-component composition';
-      my $gc = $g->result->composition->get_component(0);
-      my $tag_index = $gc->tag_index;
-      defined $tag_index or croak
-        "--rpt_list $rpt_list should include a value for tag index";
 
       # An empty QC summary file is produced when the artic input
       # containes zero reads. We need to know the original number of reads.
-      $num_input_reads or $tag_metrics_json or croak
-          'Either --num_inputreads or --tm_json_file should be defined';
+      defined $num_input_reads or $tag_metrics_json or croak
+          'Either --num_inputi_reads or --tm_json_file should be defined';
 
       if (!defined $num_input_reads) {
-        # Try to parse the tag metrics autoqc result
-        my $tm = npg_qc::autoqc::results::tag_metrics->load($tag_metrics_json);
-        # Is it for the correct lane?
-        my $tmc = $tm->composition->get_component(0);
-        ($tmc->id_run == $gc->id_run) and ($tmc->position == $gc->position) or
-          croak "$tag_metrics_json does not correspont to $rpt_list";
-
-        $num_input_reads = $tm->reads_pf_count->{$tag_index};
-        defined $num_input_reads or croak
-          "Failed to get reads count for tag $tag_index from $tag_metrics_json";
+        $num_input_reads = _get_num_input_reads($g, $tag_metrics_json);
       }
       ($num_input_reads == 0) or croak
         "Non-zero number of original input reads ($num_input_reads)";
@@ -159,18 +160,43 @@ exit 0;
 
 ######################### Private functions #########################
 
-sub _get_sample_type {
+sub _get_num_input_reads {
+  my ($g, $tm_file) = @_;
+
+  ($g->result->composition->num_components == 1) or croak
+    'Cannot get deplexing stats for a multi-component composition';
+  my $comp = $g->result->composition->get_component(0);
+  my $tag_index = $comp->tag_index;
+  defined $tag_index or croak 'Tag index not defined';
+
+  # Try to parse the tag metrics autoqc result
+  my $tm = npg_qc::autoqc::results::tag_metrics->load($tag_metrics_json);
+  # Is it for the correct lane?
+  my $tmc = $tm->composition->get_component(0);
+  ($tmc->id_run == $comp->id_run) and ($tmc->position == $comp->position) or
+    croak "$tag_metrics_json does not correspont to " . $comp->freeze2rpt;
+
+  my $num_reads = $tm->reads_pf_count->{$tag_index};
+  defined $num_reads or croak
+    "Failed to get reads count for tag $tag_index from $tm_file";
+
+  return $num_reads;
+}
+
+sub _set_sample_info {
   my $g = shift;
 
-  my $prefix = join q[ ], $g->rpt_list, q[:];
+  my $prefix = $g->rpt_list ? join q[ ], $g->rpt_list , q[:] : q[];
 
   my $sname = $g->lims->sample_supplier_name();
   if (!$sname) {
     # Not exiting here, the supplier name is often not set for R&D samples.
-    # Beware of the sourse of LIMS data, the supplier name is not set
+    # Be careful with the source of LIMS data, the supplier name is not set
     # in XML feeds. Use a samplesheet!
     $sname = q[];
     $logger->error("$prefix sample supplier name is not defined");
+  } else {
+    $g->result->doc->{'meta'}->{'supplier_sample_name'} = $sname;
   }
 
   my $flag = $UNKNOWN_FLAG;
@@ -182,10 +208,11 @@ sub _get_sample_type {
   }
 
   if ($flag eq $UNKNOWN_FLAG) {
-    $logger->warn("$prefix, sample '${sname}' - attribution failed");
+    $logger->warn("$prefix sample '${sname}' - attribution failed");
   }
+  $g->result->doc->{'meta'}->{'sample_type'} = $flag;
 
-  return $flag;
+  return;
 }
 
 sub _set_result_attributes {
@@ -206,7 +233,7 @@ sub _set_result_attributes {
   if (defined $num_ireads) {
     $g->result->doc->{'meta'}->{'num_input_reads'} = $num_ireads;
   }
-  $g->result->doc->{'meta'}->{'sample_type'} = _get_sample_type($g);
+  _set_sample_info($g);
 
   # Info about this script.
   $g->result->set_info('Script_name', $Script);
@@ -297,7 +324,7 @@ None
              --num_input_reads is not supplied, is used to
              get the number of reads in the portable pipeline
              input; only makes sence for input data for a single
-             sample; is used only if teh QC summary is empty
+             sample; is used only if the QC summary is empty
 
 =head1 SUBROUTINES/METHODS
 
