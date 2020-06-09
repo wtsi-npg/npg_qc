@@ -51,13 +51,38 @@ npg_qc::autoqc::checks::review
 This checks evaluates the results of other autoqc checks
 against a predefined set of criteria.
 
-If data product acceptance criteria for a project and the
-product's library type are defined, it is possible to introduce
-a degree of automation into the manual QC process. To provide
-interoperability with the API supporting the manual QC process,
-the outcome of the evaluation performed by this check is recorded
-not only as a simple pass or fail as in other autoqc checks, but
-also as one of valid manual or user QC outcomes.
+If data product acceptance criteria for a project are defined,it
+is possible to introduce a degree of automation into the manual
+QC process. To provide interoperability with the API supporting
+the manual QC process, the outcome of the evaluation performed by
+this check is recorded not only as a simple undefined, pass or
+fail as in other autoqc checks, but also, optionally, as one of
+valid manual or user QC outcomes.
+
+=head2 Types of criteria
+
+The robo section of the product configuration file sits within
+the configuration for a particular study. However, evaluation
+criteria for samples in the same study might vary depending on
+the sequencing instrument type, library type, sample type, etc.
+It might be reasonable to exclude some samples from a robo
+process. The criteria key of the robo configuration contains an
+array of criteria objects each of which could contain up to three
+further keys, one for acceptance criteria, one for rejection
+criteria and one for applicability criteria. The aceptance
+and/or rejection criteria are evaluated if either the applicability
+criteria have been satisfied or no applicability criteria are
+defined.
+
+The applicability criteria for each criteria object should be
+set in such a way that the order of evaluation of the criteria
+array does not matter. If applicability criteria in each of the
+criteria objects fail for a product, no QC outcome is assigned
+and the pass attribute of the review result object remains unset.
+The product cannot satisfy a set of applicability criteria in
+multiple criteria object, this is considered to be an error.
+
+=head2 QC outcomes
 
 A valid manual QC outcome is one of the values from the library
 qc outcomes dictionary (mqc_library_outcome_dict table of the
@@ -76,6 +101,27 @@ applicable to user QC outcome.
 The type of QC outcome can be configured within the Robo QC
 section of product configuration. The default type is library
 manual QC.
+
+=head2 Rules for assignment of the QC outcome
+
+The rules below apply to a single criteria object.
+
+If only acceptance criteria are present, the 'Accepted' outcome
+is assigned if the outcome of evaluation is true and the 'Rejected'
+outcome is assigned otherwise.
+
+If only the rejection criteria are present, the 'Rejected' outcome
+is assigned if the regection criteria evaluate to true, otherwise
+the 'Undecided' outcome is assigned.
+
+If both acceptance and rejection criteria are present, the 'Accepted'
+outcome is assigned in case the acceptance criteria evaluate to true,
+the 'Rejected' outcome is assigned if the regection criteria evaluate
+to true, the 'Undecided' outcome is assigned in other cases.
+
+A special case of regection criteria always evaluating to false is
+available to force the outcome to be 'Undecided' when the acceptance
+criteria evaluate to false. 
 
 =head2 Retrieval of autoqc results to be evaluated
 
@@ -126,19 +172,13 @@ Examples:
   (a-1 > 0) && (b+3 > 5) && ((c-d > 0) || (c-d < -1))
   and evaluates to true.
 
-if both acceptance and rejection criteria have to be accomodated, this
-can be done in the following way (note the negation operator):
-
+  Negation operator example:
   {
     'and' => [
       {'not' => {'or' => [$rejection_expr1, $rejection_expr2]}},
       {'and' => [$acceptance_expr1, $acceptance_expr2]}}
              ]
   }
-
-The outcome of the evaluation will be either true or false. The undecided
-outcome can be assigned if the overall expression evaluates to false and
-a full evaluation was performed (ie the acceptance branch was evaluated).
 
 Since both the conjunction and disjunction operators are idempotent in
 Boolean algebra, the order of expressions within the arrays does not
@@ -148,6 +188,10 @@ structures. To ensure that the criteria can be compared, the expressions
 in the arrays are ordered alphabetically. Therefore, the criteria record
 in the result object might vary slightly from the configuration file
 record.
+
+The current product configuration supports arrays of criteria where
+all criteria is the array are equally essential. Therefore, a conjunction
+(AND) operator is applied to a list of these criteria.
 
 =head1 SUBROUTINES/METHODS
 
@@ -187,12 +231,15 @@ npg_tracking::util::pipeline_config
 =head2 conf_file_path
 
 A method. Return the path of the product configuration file.
- Inherited from npg_tracking::util::pipeline_config
+Inherited from npg_tracking::util::pipeline_config
 
 =head2 can_run
 
-Returns true if the check can be run, ie relevant to the study
-and library type evaluation criteria are defined, false otherwise. 
+Returns true if the check can be run, ie if at least one set of
+criteria potentially applies to the product, false otherwise. This
+method might be too optimistic in its evaluation since it might not
+be possible to determine eligibility till all autoqc results for
+the product are available.  
 
 =cut
 
@@ -242,21 +289,10 @@ sub execute {
 
 =head2 evaluate
 
-Main evaluation algorithm. Current implementation is very simple:
-all criteria found in the product configuration file are assumed
-to be equally essential. Therefore, a conjunction (AND) operator
-is applied to a list of this criteria.
-
-Private methods and attributes of this class and the result class
-implementation for this check are capable of supporting a more
-complex algorithm should this become necessary in future. 
-
-Returns 1 if all evaluated conditions were satisfied, otherise
-returns 0. Sets the evaluation_results attribute of the results
-object instance.
-
-In future we might have both acceptance and rejection criteria
-defined, adding an undefined value as a legitimate outcome.
+Method implementing the top level evaluation algorithm. Returns the outcome
+of the evaluation either as an explicitly set boolean value (0 or 1) or as
+an undefined value. An undefined retuen is semantically different from an
+explicit 0 return.
 
 =cut
 
@@ -459,9 +495,9 @@ sub _build__qc_store {
 }
 
 #####
-# Two different approaches for loading results. We can try to perform
-# the evaluation expression after expression and load the necessary result
-# objects as we go. Or we can pre-load all results that will be needed.
+# Two possible approaches for loading results. We can try to perform
+# the evaluation step by step and load the necessary result objects
+# as we go. Or we can pre-load all results that will be needed.
 # We choose the latter and raise an error if any results are missing.
 # The error will report what is found and what is expected, so that
 # the user has the full picture at once.
