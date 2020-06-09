@@ -172,6 +172,7 @@ t/50-schema-result-Contamination.t
 t/50-schema-result-InsertSize.t
 t/50-schema-result-Interop.t
 t/50-schema-result-Adapter.t
+t/50-schema-result-Generic.t
 t/50-schema-result-Genotype.t
 t/50-schema-result-GenotypeCall.t
 t/50-schema-result-BamFlagstats.t

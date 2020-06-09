@@ -198,44 +198,9 @@ with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2020-06-04 17:47:12
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:6Kb01TnFLjYSjw8tRPSKYw
 
-use JSON;
-
 our $VERSION = '0';
 
-#####
-# The 'doc' and 'info' attributes of the npg_qc::autoqc::results::generic object are
-# a hash reference. The 'doc' and 'info' database columns have type JSON. We serialize
-# the data structure to a JSON string on the way into tehedatabase. We read a JSON
-# string (or NULL) from a database and return the value unaltered. 
-
-for my $col ( qw/doc info/ ) {
-  __PACKAGE__->inflate_column($col, {
-    inflate => sub { return shift; },
-    deflate => sub {
-      my $data = shift;
-      defined $data ? to_json($data) : $data;
-    },
-  });
-}
-
-sub doc_inflated {
-  my $self = shift;
-  return _inflate('doc');
-}
-
-sub info_inflated {
-  my $self = shift;
-  return _inflate('info');
-}
-
-sub _inflate {
-  my ($self, $col) = @_;
-  my $value = $self->$col;
-  if (defined $value) {
-    $value = from_json($value);
-  }
-  return $value;
-}
+__PACKAGE__->set_flators4non_scalar(qw( doc info ));
 
 __PACKAGE__->meta->make_immutable;
 
@@ -256,10 +221,6 @@ Result class definition in DBIx binding for the QC database.
 =head1 SUBROUTINES/METHODS
 
 =head2 composition
-
-=head2 doc_inflated
-
-=head2 info_inflated
 
 Attribute of type npg_tracking::glossary::composition. 
 
@@ -292,8 +253,6 @@ To simplify queries, skip SeqComposition and link directly to the linking table.
 =item DBIx::Class::InflateColumn::DateTime
 
 =item DBIx::Class::InflateColumn::Serializer
-
-=item JSON
 
 =back
 
