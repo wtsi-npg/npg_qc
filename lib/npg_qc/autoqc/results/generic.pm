@@ -1,0 +1,117 @@
+package npg_qc::autoqc::results::generic;
+
+use Moose;
+use MooseX::StrictConstructor;
+use namespace::autoclean;
+
+extends qw(npg_qc::autoqc::results::base);
+
+our $VERSION = '0';
+
+has 'desc' =>  (
+  isa      => 'Str',
+  is       => 'rw',
+  required => 0,
+);
+
+has 'doc' =>  (
+  isa      => 'HashRef',
+  is       => 'rw',
+  required => 0,
+);
+
+around 'filename_root' => sub {
+  my $orig = shift;
+  my $self = shift;
+  return join q[.], $self->$orig(), $self->desc || q[unknown];
+};
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=head1 NAME
+
+ npg_qc::autoqc::results::generic
+
+=head1 SYNOPSIS
+
+ my $g = npg_qc::autoqc::results::generic->new(rpt_list => '40:1:1');
+
+=head1 DESCRIPTION
+
+An autoqc result class that wraps in a flexible way around
+arbitrary QC metrics, which are produred by third-party
+pipelines or tools.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 desc
+
+An attribute, a distinct descriptor for the pipeline or a tool which
+produced the data. While the attribute is optional in this object,
+it should be set in order to save the result to the database. This
+value forms a part of a unique key in the database representation,
+so set accordingly. For example, the tool's or pipeline's version
+can be appended to the descriptor.
+
+=head2 doc
+
+A hash reference attribute, no default. A flexible, potentially deeply
+nested data structure to accomodate QC output and any supplimentary
+data. This data structure is going to be serialized to JSON when
+saved either to a file or to a datababase.
+
+=head2 filename_root
+
+This class changes the filename_root attribute of the parent class.
+The value of the desc attribute is appended to the value produced
+by the parent's method to allow for the results from different
+pipelines to co-exist in the same directory.
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Moose
+
+=item MooseX::StrictConstructor
+
+=item namespace::autoclean
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Marina Gourtovaia
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2020 Genome Research Ltd.
+
+This file is part of NPG.
+
+NPG is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

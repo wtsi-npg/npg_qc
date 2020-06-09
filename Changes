@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - npg_qc::autoqc::checks::generic and npg_qc::autoqc::results::generic -
+   check and result objects for generic autoqc
+ - DBIx class for the generic result
+ - a new script, npg_autoqc_generic4artic, to generate generic autoqc
+   results for artic pp
+
 release 68.3.0
  - npg_simple_robo4artic:
      extended to consider negative and positive controls;

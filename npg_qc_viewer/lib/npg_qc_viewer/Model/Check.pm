@@ -26,7 +26,8 @@ my $init = {};
 if ($use_db && $connect_info) {
     $init->{'qc_schema'} = npg_qc::Schema->connect(map { $connect_info->{$_} } sort keys %{$connect_info});
 }
-my @check_names = grep { $_ ne 'interop' } @{npg_qc::autoqc::results::collection->new()->checks_list()};
+my @check_names = grep { not / interop|generic /xms }
+                  @{npg_qc::autoqc::results::collection->new()->checks_list()};
 $init->{'checks_list'} = \@check_names;
 
 __PACKAGE__->config( class => 'npg_qc::autoqc::qc_store',

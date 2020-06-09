@@ -29,7 +29,7 @@ table classes in the npg_qc::Schema namespace.
 
 =head2 set_flators4non_scalar
 
-Sets serialization to json for non-scalar values.
+Sets serialization to JSON for non-scalar values.
 
   __PACKAGE__->set_flators4non_scalar(@column_names);
 
@@ -52,14 +52,14 @@ sub set_flators4non_scalar {
 
 =head2 set_flators_wcompression4non_scalar
 
-Sets serialization to json for non-scalar values. The json string
+Sets serialization to json for non-scalar values. The JSON string
 is then compressed and base64 encoded allowing to store the compressed
 data in text fields.
 
   __PACKAGE__->set_flators_wcompression4non_scalar(@column_names);
 
 The deflator will not work for scalar values since the  set_inflated_columns method
-of DBIx::Class::Row intensionally does not deflate scalar values.
+of DBIx::Class::Row intentionally does not deflate scalar values.
 
 =cut
 

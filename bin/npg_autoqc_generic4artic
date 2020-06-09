@@ -1,0 +1,404 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin qw($Bin $Script);
+use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
+use Log::Log4perl qw(:levels);
+use Try::Tiny;
+use Text::CSV;
+use Carp;
+use Readonly;
+use Getopt::Long;
+use Pod::Usage;
+use Cwd;
+
+use npg_tracking::glossary::rpt;
+use npg_tracking::glossary::composition::factory::rpt_list;
+use npg_tracking::glossary::moniker;
+use npg_qc::autoqc::checks::generic;
+use npg_qc::autoqc::results::tag_metrics;
+
+our $VERSION = '0';
+
+Readonly::Scalar my $ARTIC_NF_REPO_NAME => q[ncov2019-artic-nf];
+Readonly::Scalar my $ARTIC_METRICS_NAME => q[QC summary];
+
+Readonly::Scalar my $NEG_CONTROL_REGEXP => qr/\A CGAP- | Negative[ ]control | blank /ismx;
+Readonly::Scalar my $POS_CONTROL_REGEXP => qr/\A Positive[ ]control /ismx;
+Readonly::Scalar my $REAL_SAMPLE_REGEXP => qr/\A [[:upper:]]{4}- /smx;
+Readonly::Scalar my $NEG_CONTROL_FLAG   => q[NEG_CONTROL];
+Readonly::Scalar my $POS_CONTROL_FLAG   => q[POS_CONTROL];
+Readonly::Scalar my $REAL_SAMPLE_FLAG   => q[REAL_SAMPLE];
+Readonly::Scalar my $UNKNOWN_FLAG       => q[UNKNOWN];
+
+# Order of rules evaluation is important, hence a list.
+Readonly::Array  my @SAMPLE_ASSIGNMENT_RULES => (
+                               [$POS_CONTROL_REGEXP, $POS_CONTROL_FLAG],
+                               [$NEG_CONTROL_REGEXP, $NEG_CONTROL_FLAG],
+                               [$REAL_SAMPLE_REGEXP, $REAL_SAMPLE_FLAG],
+                                                );
+
+Log::Log4perl->easy_init({layout => '%d %-5p %c - %m%n',
+                          level  => $INFO});
+my $logger = Log::Log4perl->get_logger();
+
+my $help;
+my $pp_version;
+my $qc_out;
+my $rpt_list;
+my $num_input_reads;
+my $tag_metrics_json;
+
+# All arguments are optional.
+GetOptions ('help'              => \$help,
+            'pp_version:s'      => \$pp_version,
+            'qc_out:s'          => \$qc_out,
+            'rpt_list:s'        => \$rpt_list,
+            'num_input_reads:f' => \$num_input_reads,
+            'tm_json_file:s'    => \$tag_metrics_json) or pod2usage(2);
+
+$help and pod2usage(1);
+
+if (defined $num_input_reads) {
+  if ($num_input_reads < 0) {
+    $logger->error("Negative --num_input_reads $num_input_reads");
+    exit 1;
+  } else {
+    my $temp = int $num_input_reads;
+    if ($temp ne $num_input_reads) {
+      $logger->error("Non-integer --num_input_reads $num_input_reads");
+      exit 1;
+    }
+  }
+}
+
+if (not $qc_out) {
+  $qc_out = getcwd;
+}
+$logger->info("Using $qc_out for output");
+
+my $line_number = 0;
+my $csv = Text::CSV->new();
+
+# Read lines from STDIN. The first line should be a header, which we will cache.
+# Subsequent lines could be data or, sometimes, header. Multiple headers are
+# possible if more that one QC summary is piped in, all of them will be skipped.
+
+while (my $line = $line_number ? $csv->getline_hr(*STDIN) : $csv->getline(*STDIN)) {
+  $line_number++;
+
+  # Register the first header. After this $line is going to be a hash.
+  if ($line_number == 1) {
+    $csv->column_names($line);
+    next;
+  }
+
+  my $file_name_root = $line->{'sample_name'};
+  if ($file_name_root && ($file_name_root eq 'sample_name')) {
+    next; # this was header repeat
+  }
+
+  try {
+    $file_name_root or croak 'no file name in sample_name column';
+    my $h = npg_tracking::glossary::moniker->parse_file_name($file_name_root);
+    my $rpt = npg_tracking::glossary::rpt->deflate_rpt($h);
+    if ($rpt_list && ($rpt_list ne $rpt)) {
+      croak "Entity information mismatch: $rpt and $rpt_list";
+    }
+    my $g = npg_qc::autoqc::checks::generic->new(rpt_list => $rpt,
+                                                 qc_out   => $qc_out);
+    if ($rpt_list && !defined $num_input_reads && $tag_metrics_json) {
+      $num_input_reads = _get_num_input_reads($g, $tag_metrics_json);
+    }
+    _set_result_attributes($g, $line, $num_input_reads);
+    $g->run();
+  } catch {
+    $logger->error("Line $line_number: $_");
+    exit 1;
+  };
+}
+
+if ($line_number == 0) {
+
+  $logger->warn(q[Input is empty]);
+
+  # All QC summary files are empty, we do not know how many files
+  # in total were piped into the script and whether the files contained
+  # summaries for one or many samples.
+
+  # Looking for additional info...
+  if ($rpt_list) { # might be supplied in case of one-sample input
+    try {
+
+      my $g = npg_qc::autoqc::checks::generic->new(rpt_list => $rpt_list,
+                                                   qc_out   => $qc_out);
+
+      # An empty QC summary file is produced when the artic input
+      # containes zero reads. We need to know the original number of reads.
+      defined $num_input_reads or $tag_metrics_json or croak
+          'Either --num_inputi_reads or --tm_json_file should be defined';
+
+      if (!defined $num_input_reads) {
+        $num_input_reads = _get_num_input_reads($g, $tag_metrics_json);
+      }
+      ($num_input_reads == 0) or croak
+        "Non-zero number of original input reads ($num_input_reads)";
+
+      _set_result_attributes($g, undef, $num_input_reads);
+      $g->run();
+    } catch {
+      $logger->error("Zero reads case for $rpt_list has failed: $_");
+      exit 1;
+    };
+  } else {
+    $logger->warn(q[--rpt_list is not defined, cannot interpret empty input]);
+  }
+}
+
+exit 0;
+
+######################### Private functions #########################
+
+sub _get_num_input_reads {
+  my ($g, $tm_file) = @_;
+
+  ($g->result->composition->num_components == 1) or croak
+    'Cannot get deplexing stats for a multi-component composition';
+  my $comp = $g->result->composition->get_component(0);
+  my $tag_index = $comp->tag_index;
+  defined $tag_index or croak 'Tag index not defined';
+
+  # Try to parse the tag metrics autoqc result
+  my $tm = npg_qc::autoqc::results::tag_metrics->load($tag_metrics_json);
+  # Is it for the correct lane?
+  my $tmc = $tm->composition->get_component(0);
+  ($tmc->id_run == $comp->id_run) and ($tmc->position == $comp->position) or
+    croak "$tag_metrics_json does not correspont to " . $comp->freeze2rpt;
+
+  my $num_reads = $tm->reads_pf_count->{$tag_index};
+  defined $num_reads or croak
+    "Failed to get reads count for tag $tag_index from $tm_file";
+
+  return $num_reads;
+}
+
+sub _set_sample_info {
+  my $g = shift;
+
+  my $prefix = $g->rpt_list ? join q[ ], $g->rpt_list , q[:] : q[];
+
+  my $sname = $g->lims->sample_supplier_name();
+  if (!$sname) {
+    # Not exiting here, the supplier name is often not set for R&D samples.
+    # Be careful with the source of LIMS data, the supplier name is not set
+    # in XML feeds. Use a samplesheet!
+    $sname = q[];
+    $logger->error("$prefix sample supplier name is not defined");
+  } else {
+    $g->result->doc->{'meta'}->{'supplier_sample_name'} = $sname;
+  }
+
+  my $flag = $UNKNOWN_FLAG;
+  foreach my $rule (@SAMPLE_ASSIGNMENT_RULES) {
+    if ($sname =~ $rule->[0]) {
+      $flag = $rule->[1];
+      last;
+    }
+  }
+
+  if ($flag eq $UNKNOWN_FLAG) {
+    $logger->warn("$prefix sample '${sname}' - attribution failed");
+  }
+  $g->result->doc->{'meta'}->{'sample_type'} = $flag;
+
+  return;
+}
+
+sub _set_result_attributes {
+  my ($g, $summary, $num_ireads) = @_;
+
+  # Descriptor for the portable pipeline that produced
+  # this QC output.
+  $g->result->desc($ARTIC_NF_REPO_NAME);
+
+  # QC output of the portable pipeline.
+  $g->result->doc({});
+  if ($summary) {
+    $g->result->doc->{$ARTIC_METRICS_NAME} = $summary;
+  }
+
+  # Supplimentary information to help evaluate the QC output or its
+  # absence.
+  if (defined $num_ireads) {
+    $g->result->doc->{'meta'}->{'num_input_reads'} = $num_ireads;
+  }
+  _set_sample_info($g);
+
+  # Info about this script.
+  $g->result->set_info('Script_name', $Script);
+  $g->result->set_info('Script_version', $VERSION);
+
+  # Info about the pipeline.
+  $g->result->set_info('Pipeline_name', $ARTIC_NF_REPO_NAME);
+  if ($pp_version) {
+    $g->result->set_info('Pipeline_version', $pp_version);
+  } else {
+    $logger->warn('pp version is not given');
+  }
+
+  return;
+}
+
+__END__
+
+=head1 NAME
+
+npg_autoqc_generic4artic
+
+=head1 USAGE
+
+=head1 CONFIGURATION
+
+=head1 SYNOPSIS
+
+  echo artic_summary.qc.csv | npg_autoqc_generic4artic
+  echo artic_summary.qc.csv | npg_autoqc_generic4artic --qc_out 'my_dir'
+
+=head1 DESCRIPTION
+
+This script creates autoqc generic result JSON files for
+entities and outcomes piped from STDIN. One line of input
+produces one file.
+
+If empty input is piped in, in the presence of additional arguments
+the script might be able to create the generic result JSON file.
+--rpt_list argument should be set in order to trigger this
+functionality. The autoqc result object is created for the entity
+specified by the --rpt_list argument value. Either --num_input_reads
+or --tm_json_file argument should be set in order to evaluate the
+number of reads in the input to the portable pipeline, which failed
+to produce the QC summary. Non-zero number of reads is an error
+condition, which causes the script to exit abnormally.
+
+If the QC summary is available, it is assigned to the metrics
+attribute of the generic result object. If the number of input reads
+is available, it is assigned to the num_input_reads key of the
+summlimentary_info hash attribute of the result object. The sample type
+(control type, real sample, unknown) is assigned to the sample_type
+key of the summlimentary_info hash attribute.
+
+It is expected that for a result object with no QC summary the
+number of input reads is set and its value is zero.   
+
+Example of input:
+
+  sample_name,pct_N_bases,pct_covered_bases,longest_no_N_run,num_aligned_reads,fasta,bam,qc_pass
+  34032_2#25,0.99,98.52,19221,4603415,34032_2#25.primertrimmed.consensus.fa,34032_2#25.mapped.primertrimmed.sorted.bam,TRUE
+  34014_1#105,87.85,9.91,376,415,34014_1#105.primertrimmed.consensus.fa,34014_1#105.mapped.primertrimmed.sorted.bam,FALSE
+
+=head1 REQUIRED ARGUMENTS
+
+None
+
+=head1 OPTIONS
+
+  --help
+
+  --pp_version - version of the portable pipeline
+
+  --qc_out - output directory for generic result JSON files;
+             if not given, the working directory is used
+
+  --rpt_list - rpt list corresponding to the entity the
+             input is for; only makes sence for input data
+             for a single sample; is used if supplied for multiple
+             samples input, so beware
+
+  --num_input_reads - number of reads in the portable pipeline
+             input; only makes sence for input data for a single
+             sample; is used if supplied for multiple samples
+             input, so beware
+
+  --tm_json_file - tag metrics result JSON file path; if
+             --num_input_reads is not supplied, is used to
+             get the number of reads in the portable pipeline
+             input; only makes sence for input data for a single
+             sample; is used only if the QC summary is empty
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=over
+
+=item strict
+
+=item warnings
+
+=item FindBin
+
+=item lib
+
+=item Carp
+
+=item Try::Tiny
+
+=item Log::Log4perl
+
+=item Text::CSV
+
+=item Readonly
+
+=item Getopt::Long
+
+=item Pod::Usage
+
+=item Cwd
+
+=item  npg_tracking::glossary::rpt
+
+=item npg_tracking::glossary::composition::factory::rpt_list
+
+=item npg_tracking::glossary::moniker
+
+=item npg_qc::autoqc::checks::generic
+
+=item npg_qc::autoqc::results::tag_metrics
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+=head1 EXIT STATUS
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Marina Gourtovaia
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2020 Genome Research Ltd.
+
+This file is part of NPG.
+
+NPG is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut
