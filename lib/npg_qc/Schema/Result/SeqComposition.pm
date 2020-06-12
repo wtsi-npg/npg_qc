@@ -240,6 +240,21 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 generics
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::Generic>
+
+=cut
+
+__PACKAGE__->has_many(
+  'generics',
+  'npg_qc::Schema::Result::Generic',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 genotype_call
 
 Type: might_have
@@ -634,8 +649,8 @@ __PACKAGE__->might_have(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-12-13 15:44:26
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:afSoSdjcBJ9KcnNn0kMTEg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2020-06-03 17:30:44
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:PflibA2ilfLKl3N7V3hXRA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

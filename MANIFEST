@@ -7,6 +7,7 @@ bin/reformat_fluidigm_snp26_results_irods.pl
 bin/qc
 bin/qc_db_delete_autoqc
 bin/mqc_outcome_reporter
+bin/npg_autoqc_generic4artic
 bin/npg_mqc_skipper
 bin/npg_qc_autoqc_data.pl
 bin/npg_qc_tag_sniff.pl
@@ -26,6 +27,7 @@ lib/npg_qc/autoqc/checks/check.pm
 lib/npg_qc/autoqc/checks/interop.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
+lib/npg_qc/autoqc/checks/generic.pm
 lib/npg_qc/autoqc/checks/genotype.pm
 lib/npg_qc/autoqc/checks/genotype_call.pm
 lib/npg_qc/autoqc/checks/insert_size.pm
@@ -58,6 +60,7 @@ lib/npg_qc/autoqc/results/contamination.pm
 lib/npg_qc/autoqc/results/interop.pm
 lib/npg_qc/autoqc/results/gc_bias.pm
 lib/npg_qc/autoqc/results/gc_fraction.pm
+lib/npg_qc/autoqc/results/generic.pm
 lib/npg_qc/autoqc/results/genotype.pm
 lib/npg_qc/autoqc/results/genotype_call.pm
 lib/npg_qc/autoqc/results/insert_size.pm
@@ -117,6 +120,7 @@ lib/npg_qc/Schema/Result/ClusterDensity.pm
 lib/npg_qc/Schema/Result/Contamination.pm
 lib/npg_qc/Schema/Result/GcBias.pm
 lib/npg_qc/Schema/Result/GcFraction.pm
+lib/npg_qc/Schema/Result/Generic.pm
 lib/npg_qc/Schema/Result/Genotype.pm
 lib/npg_qc/Schema/Result/GenotypeCall.pm
 lib/npg_qc/Schema/Result/InsertSize.pm
@@ -168,6 +172,7 @@ t/50-schema-result-Contamination.t
 t/50-schema-result-InsertSize.t
 t/50-schema-result-Interop.t
 t/50-schema-result-Adapter.t
+t/50-schema-result-Generic.t
 t/50-schema-result-Genotype.t
 t/50-schema-result-GenotypeCall.t
 t/50-schema-result-BamFlagstats.t
@@ -210,6 +215,7 @@ t/60-autoqc-checks-check.t
 t/60-autoqc-checks-interop.t 
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
+t/60-autoqc-checks-generic.t
 t/60-autoqc-checks-genotype.t
 t/60-autoqc-checks-genotype_call.t
 t/60-autoqc-checks-insert_size.t
@@ -240,6 +246,7 @@ t/60-autoqc-results-contamination.t
 t/60-autoqc-results-interop.t
 t/60-autoqc-results-gc_bias.t
 t/60-autoqc-results-gc_fraction.t
+t/60-autoqc-results-generic.t
 t/60-autoqc-results-genotype.t
 t/60-autoqc-results-genotype_call.t
 t/60-autoqc-results-insert_size.t
