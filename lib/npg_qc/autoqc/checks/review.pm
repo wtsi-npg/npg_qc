@@ -261,8 +261,8 @@ evaluation of autoqc results for this product is performed. If
 autoqc results that are necessary to perform the evaluation are not
 available or there is some other problem with evaluation, an error
 is raised if the final_qc_outcome flag is set to true. If this flag
-is false, the error is captured, logged as a comment and an undefined
-qc outcome is assigned. 
+is false, the error is captured and logged as a comment, no OC
+outcome is assigned in this case.
 
 =cut
 
@@ -273,15 +273,16 @@ sub execute {
   $self->result->criteria($self->_criteria);
   my $md5 = $self->result->generate_checksum4data($self->result->criteria);
   $self->result->criteria_md5($md5);
+  my $err;
 
   try {
     $self->result->pass($self->evaluate);
   } catch {
-    my $err = 'Not able to run evaluation: ' . $_;
+    $err = 'Not able to run evaluation: ' . $_;
     $self->final_qc_outcome && croak $err;
     $self->result->add_comment($err);
   };
-  $self->result->qc_outcome(
+  not $err and $self->result->qc_outcome(
     $self->generate_qc_outcome($self->_outcome_type(), $md5));
 
   return;

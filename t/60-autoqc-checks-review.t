@@ -438,8 +438,8 @@ subtest 'error in evaluation' => sub {
   lives_ok { $check->execute }
     'preliminary outcome - capturing the error';
   is ($check->result->pass, undef, 'pass value undefined');
-  is ($check->result->qc_outcome->{'mqc_outcome'}, 'Undecided',
-    'correct outcome string');
+  is_deeply ($check->result->qc_outcome, {},
+    'QC outcome is not set');
   is ($check->result->criteria_md5, '27c522a795e99e3aea57162541de75b1',
     'criteria_md5 attribute of the result object is set');
 };
