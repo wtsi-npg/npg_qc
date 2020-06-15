@@ -6,6 +6,8 @@ release 68.4.0
  - DBIx class for the generic result
  - a new script, npg_autoqc_generic4artic, to generate generic autoqc
    results for artic pp
+ - npg_autoqc_generic4artic - all not-control samples are evaluated
+   in the same way, regardles of whether they are real samples or not
 
 release 68.3.0
  - npg_simple_robo4artic:
