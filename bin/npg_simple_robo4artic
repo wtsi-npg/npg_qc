@@ -19,21 +19,6 @@ our $VERSION = '0';
 
 Readonly::Scalar my $NEG_CONTROL_NUM_READS_THRESHOLD => 100;
 
-Readonly::Scalar my $NEG_CONTROL_REGEXP => qr/\A CGAP- | Negative[ ]control | blank /ismx;
-Readonly::Scalar my $POS_CONTROL_REGEXP => qr/\A Positive[ ]control /ismx;
-Readonly::Scalar my $HERON_REGEXP       => qr/\A [[:upper:]]{4}- /smx;
-Readonly::Scalar my $NEG_CONTROL_FLAG   => q[NEG_CONTROL];
-Readonly::Scalar my $POS_CONTROL_FLAG   => q[POS_CONTROL];
-Readonly::Scalar my $HERON_FLAG         => q[HERON];
-Readonly::Scalar my $UNKNOWN_FLAG       => q[UNKNOWN];
-
-# Order of rules evaluation is important, hence a list.
-Readonly::Array  my @SAMPLE_ASSIGNMENT_RULES => (
-                               [$POS_CONTROL_REGEXP, $POS_CONTROL_FLAG],
-                               [$NEG_CONTROL_REGEXP, $NEG_CONTROL_FLAG],
-                               [$HERON_REGEXP, $HERON_FLAG],
-                                                );
-
 Readonly::Scalar my $ARTIC_NF_REPO_NAME =>  q[ncov2019-artic-nf];
 Readonly::Scalar my $ARTIC_QC_PASS      =>  q[TRUE];
 Readonly::Scalar my $ARTIC_QC_FAIL      =>  q[FALSE];
@@ -115,34 +100,33 @@ while (my $line = $line_number ? $csv->getline_hr(*STDIN) : $csv->getline(*STDIN
     exit 1;
   };
 
-  my $flag = $UNKNOWN_FLAG;
-  foreach my $rule (@SAMPLE_ASSIGNMENT_RULES) {
-    if ($sname =~ $rule->[0]) {
-      $flag = $rule->[1];
-      last;
+  my $is_control   = $r->lims->sample_is_control;
+  my $control_type = $r->lims->sample_control_type;
+  (not $is_control) and $control_type and croak
+    "Control type $control_type is set for a non-control sample $sname";
+  $is_control and (not $control_type) and croak
+    "Control type is not set for a control sample $sname";
+
+  my $condition;
+  my $pass;
+  if ($control_type) {
+    if ($control_type =~ /negative/ismx) {
+      $condition = q[Negative control, number of primer-trimmed aligned reads ] .
+                   q[is less than ] . $NEG_CONTROL_NUM_READS_THRESHOLD;
+      $pass = $num_reads < $NEG_CONTROL_NUM_READS_THRESHOLD ? 1 : 0;
+    } elsif ($control_type =~ /positive/ismx) {
+       $logger->warn(
+        "$l $file_name_root, sample '${sname}' - positive control, skipping");
+      next;
+    } else {
+      croak "Unknown control type $control_type for sample $sname";
     }
-  }
-
-  if ($flag eq $UNKNOWN_FLAG) {
-    $logger->warn(
-      "$l $file_name_root, sample '${sname}' - attribution failed");
-  } elsif ($flag eq $POS_CONTROL_FLAG) {
-    $logger->warn(
-      "$l $file_name_root, sample '${sname}' - positive control, skipping");
-    next;
-  }
-
-  my $condition =
-    qq[Negative control, number of primer-trimmed aligned reads is less than $NEG_CONTROL_NUM_READS_THRESHOLD];
-  if ($flag eq $HERON_FLAG) {
+  } else {
     $condition = qq[Passed $ARTIC_NF_REPO_NAME QC];
+    $pass = $outcome eq $ARTIC_QC_PASS ? 1 : 0;
   }
 
-  my $pass = ($flag eq $HERON_FLAG)
-             ? ($outcome eq $ARTIC_QC_PASS ? 1 : 0)
-             : ($num_reads < $NEG_CONTROL_NUM_READS_THRESHOLD ? 1 : 0);
   $r->result->pass($pass);
-
   $r->result->qc_outcome($r->generate_qc_outcome($QC_TYPE));
   $r->result->library_type($lib_type);
   $r->result->evaluation_results({$condition => $r->result->pass});
