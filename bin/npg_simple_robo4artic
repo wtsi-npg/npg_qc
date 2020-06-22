@@ -107,23 +107,24 @@ while (my $line = $line_number ? $csv->getline_hr(*STDIN) : $csv->getline(*STDIN
   $is_control and (not $control_type) and croak
     "Control type is not set for a control sample $sname";
 
-  my $condition;
   my $pass;
+  my $condition;
+  my $acondition = qq[Passed $ARTIC_NF_REPO_NAME QC];
+  my $apass      = $outcome eq $ARTIC_QC_PASS ? 1 : 0;
   if ($control_type) {
     if ($control_type =~ /negative/ismx) {
       $condition = q[Negative control, number of primer-trimmed aligned reads ] .
                    q[is less than ] . $NEG_CONTROL_NUM_READS_THRESHOLD;
       $pass = $num_reads < $NEG_CONTROL_NUM_READS_THRESHOLD ? 1 : 0;
     } elsif ($control_type =~ /positive/ismx) {
-       $logger->warn(
-        "$l $file_name_root, sample '${sname}' - positive control, skipping");
-      next;
+       $pass      = $apass; # assessing as a real sample
+       $condition = $acondition;
     } else {
       croak "Unknown control type $control_type for sample $sname";
     }
-  } else {
-    $condition = qq[Passed $ARTIC_NF_REPO_NAME QC];
-    $pass = $outcome eq $ARTIC_QC_PASS ? 1 : 0;
+  } else { # not a control, so it's a real sample
+    $pass      = $apass;
+    $condition = $acondition;
   }
 
   $r->result->pass($pass);
