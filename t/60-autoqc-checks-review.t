@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 10;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -32,7 +32,7 @@ my $criteria_list = [
 ];
 
 subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 24;
+  plan tests => 27;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -46,7 +46,7 @@ subtest 'construction object, deciding whether to run' => sub {
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no study config');
   is ($check->result->comments,
-    'No criteria defined in the product configuration file',
+    'Product configuration for RoboQC is absent',
     'reason logged');
   lives_ok { $check->execute() } 'cannot run, but execute method runs OK';
   is ($check->result->pass, undef,
@@ -63,32 +63,54 @@ subtest 'construction object, deciding whether to run' => sub {
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no robo config');
   is ($check->result->comments,
-    'No criteria defined in the product configuration file',
+    'Product configuration for RoboQC is absent',
     'reason logged');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/not_hash",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  throws_ok { $check->can_run }
+    qr/Robo config should be a hash/,
+    'error in can_run when robo config section is an array';
+  throws_ok { $check->execute }
+    qr/Robo config should be a hash/,
+    'error in execute when robo config section is an array';
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/no_criteria_section",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  warnings_like { $can_run = $check->can_run }
-    [qr/criteria section is not present for/],
-    'can_run is accompanied by warnings';
-  ok (!$can_run, 'can_run returns false - no criteria for this library type');
-  is ($check->result->comments,
-    'No criteria defined in the product configuration file',
-    'reason logged');
-
+  throws_ok { $check->can_run }
+    qr/criteria section is not present in/,
+    'error in can_run when the criteria section is missing';
+  throws_ok { $check->execute }
+    qr/criteria section is not present in/,
+    'error in execute when the criteria section is missing';
+ 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/no_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  warnings_like { $can_run = $check->can_run }
-    [qr/No roboqc criteria defined for library type 'RNA PolyA'/],
-    'can_run is accompanied by warnings';
-  ok (!$can_run, 'can_run returns false - no criteria for this library type');
-  is ($check->result->comments,
-    'No criteria defined in the product configuration file',
-    'reason logged');
+  throws_ok { $check->can_run }
+    qr/should have the acceptance_criteria key defined/,
+    'error in can_run when acceptance criteria not defined';
+  throws_ok { $check->execute }
+    qr/should have the acceptance_criteria key defined/,
+    'error in execute when acceptance criteria not defined';
+  
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/no_applicability_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  throws_ok { $check->can_run }
+    qr/should have the applicability_criteria key defined/,
+    'error in can_run when applicability criteria not defined ' .
+    'in one of multiple criterium objects';
+  throws_ok { $check->execute }
+    qr/should have the applicability_criteria key defined/,
+    'error in execute when applicability criteria not defined ' .
+    'in one of multiple criterium objects';
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/with_criteria",
@@ -96,7 +118,6 @@ subtest 'construction object, deciding whether to run' => sub {
     rpt_list  => '27483:1:2');
   ok ($check->can_run, 'can_run returns true');
   ok (!$check->result->comments, 'No comments logged');
-  is_deeply ($check->_criteria, {'and' => $criteria_list}, 'criteria parsed correctly');
 
   lives_ok {
     $check = npg_qc::autoqc::checks::review->new(
@@ -109,17 +130,60 @@ subtest 'construction object, deciding whether to run' => sub {
   ok ($check->can_run, 'can_run returns true');
 
   $check = npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/error1",
+    conf_path => "$test_data_dir/no_applicability4single",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  throws_ok { $check->can_run } qr/acceptance_criteria key is missing/,
-    'conf file format is incorrect';
+  ok ($check->can_run, 'can_run returns true');
+  ok (!$check->result->comments, 'No comments logged');
+
   $check = npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/error2",
+    conf_path => "$test_data_dir/with_na_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  throws_ok { $check->can_run } qr/library_type key is missing/,
-    'conf file format is incorrect'; 
+  ok ($check->can_run, 'can_run returns true');
+  ok (!$check->result->comments, 'No comments logged');
+};
+
+subtest 'caching appropriate criteria object' => sub {
+  plan tests => 3;
+  
+  my $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/with_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  my @list = grep { $_ !~ /genotype|freemix/} @{$criteria_list};
+  is_deeply ($check->_criteria, {'and' => \@list},
+    'criteria parsed correctly');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/no_applicability4single",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  is_deeply ($check->_criteria, {'and' => $criteria_list},
+    'criteria parsed correctly');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/with_na_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  is_deeply ($check->_criteria, {}, 'empty criteria hash')
+};
+
+subtest 'execute when no criteria apply' => sub {
+  plan tests => 5;
+
+  my $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/with_na_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  lives_ok { $check->execute }
+    'no error in execute when no criteria apply';
+  my $result = $check->result;
+  is ($result->comments, 'RoboQC is not applicable',
+    'correct comment logged');
+  is_deeply ($result->criteria, {}, 'empty criteria hash');
+  is_deeply ($result->qc_outcome, {}, 'empty qc_outcome hash');
+  is_deeply ($result->evaluation_results, {}, 'empty evaluation_results hash');
 };
 
 subtest 'setting options for qc store' => sub {
@@ -365,7 +429,7 @@ subtest 'evaluation within the execute method' => sub {
     qc_in     => $dir,
     rpt_list  => $rpt_list);
   throws_ok { $check->execute }
-    qr/Invalid QC type \'someqc\' in product configuration/,
+    qr/Invalid QC type \'someqc\' in a robo config/,
     'error if qc outcome type is not recignised';
 
   my $target = "$dir/29524#2.bam_flagstats.json";

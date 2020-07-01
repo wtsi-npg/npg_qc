@@ -516,11 +516,13 @@ t/data/autoqc/rendered/json_single_run/3612_7.qX_yield.json
 t/data/autoqc/rendered/json_single_run/3612_8.insert_size.json
 t/data/autoqc/rendered/json_single_run/3612_8.qX_yield.json
 t/data/autoqc/review/product_release.yml
-t/data/autoqc/review/error1/product_release.yml
-t/data/autoqc/review/error2/product_release.yml
 t/data/autoqc/review/no_criteria/product_release.yml
+t/data/autoqc/review/no_applicability_criteria/product_release.yml
+t/data/autoqc/review/no_applicability4single/product_release.yml
 t/data/autoqc/review/with_criteria/product_release.yml
+t/data/autoqc/review/with_na_criteria/product_release.yml
 t/data/autoqc/review/no_criteria_section/product_release.yml
+t/data/autoqc/review/not_hash/product_release.yml
 t/data/autoqc/review/mqc_type/product_release.yml
 t/data/autoqc/review/unknown_qc_type/product_release.yml
 t/data/autoqc/review/uqc_type/product_release.yml
