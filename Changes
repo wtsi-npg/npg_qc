@@ -1,5 +1,12 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.5.0
+ - npg_simple_robo4artic:
+     uses sample control flags instead of sample
+     supplier names to decide on the robo evaluation criteria and the
+     proposed manual QC outcome;
+     evaluates positive controls in the same way as real samples 
+
 release 68.4.0
  - npg_qc::autoqc::checks::generic and npg_qc::autoqc::results::generic -
    check and result objects for generic autoqc
