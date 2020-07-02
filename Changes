@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.5.0
  - npg_simple_robo4artic:
      uses sample control flags instead of sample
      supplier names to decide on the robo evaluation criteria and the
