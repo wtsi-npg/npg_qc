@@ -1,5 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - autoqc generic result object:
+     rename 'desc' attribute to 'pp_name' since 'desc' is a reserved
+     word in some SQL flavours; hence qouting the column name, which
+     DBI(x) does not do, might be required;
+     to be able to produce distinct visual representation in SeqQC for
+     different external pipelines check_name method to return the
+     name of the class concatenated with the name of the pipeline
+
 release 68.5.0
  - npg_simple_robo4artic:
      uses sample control flags instead of sample
