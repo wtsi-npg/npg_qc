@@ -46,6 +46,7 @@ root/src/ui_checks/checks_in_full.tt2
 root/src/ui_checks/contamination.tt2
 root/src/ui_checks/gc_bias.tt2
 root/src/ui_checks/gc_fraction.tt2
+root/src/ui_checks/generic.tt2
 root/src/ui_checks/genotype_call.tt2
 root/src/ui_checks/genotype.tt2
 root/src/ui_checks/insert_size.tt2
