@@ -62,12 +62,12 @@ my $schema = Moose::Meta::Class->create_anon_class(
   is_deeply ($row->info, $values->{'info'}, 'info retrieved as hash ref');
   is_deeply ($row->doc, $values->{'doc'}, 'doc retrieved as hash ref');
   is ($row->class_name, 'generic', 'class name');
-  is ($row->check_name,'generic_ncov2019-artic-nf', 'check name');
+  is ($row->check_name,'generic ncov2019-artic-nf', 'check name');
 
   $values->{'pp_name'} = 'pp2';
   $row = $schema->resultset('Generic')->create($values);
   is ($row->class_name, 'generic', 'class name');
-  is ($row->check_name,'generic_pp2', 'check name');
+  is ($row->check_name,'generic pp2', 'check name');
   $rs = $schema->resultset('Generic')->search({});
   is ($rs->count, 2, 'a new row is created in the table for the same composition');
 }

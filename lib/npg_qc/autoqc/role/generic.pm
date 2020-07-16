@@ -1,13 +1,14 @@
 package npg_qc::autoqc::role::generic;
 
 use Moose::Role;
+use YAML::XS;
 
 our $VERSION = '0';
 
 around 'check_name' => sub {
   my $orig = shift;
   my $self = shift;
-  return join q[_], $self->$orig(), $self->pp_name || q[unknown];
+  return join q[ ], $self->$orig(), $self->pp_name || q[unknown];
 };
 
 around 'filename_root' => sub {
@@ -15,6 +16,12 @@ around 'filename_root' => sub {
   my $self = shift;
   return join q[.], $self->$orig(), $self->pp_name || q[unknown];
 };
+
+sub doc2yaml {
+  my $self = shift;
+  my $doc = $self->doc;
+  return $doc ? Dump($doc) : q[];
+}
 
 no Moose::Role;
 
@@ -43,6 +50,10 @@ of the pp_name attribute is appended to the value produced
 by the parent's method to allow for the results from different
 pipelines to co-exist in the same directory.
 
+=head2 doc2yaml
+
+Returns a document hash as a YAML string.
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -52,6 +63,8 @@ pipelines to co-exist in the same directory.
 =over
 
 =item Moose::Role
+
+=item YAML::XS
 
 =back
 

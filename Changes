@@ -11,6 +11,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      uses sample control flags instead of sample
      supplier names to distinguish between real samples and different
      sample control types
+ - SeqQC view for the autoqc generic result
 
 release 68.5.0
  - npg_simple_robo4artic:
