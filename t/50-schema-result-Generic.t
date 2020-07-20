@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 12;
 use Test::Exception;
 use JSON;
 use Moose::Meta::Class;
@@ -17,7 +17,7 @@ my $schema = Moose::Meta::Class->create_anon_class(
 {
   my $json = q(
 {
-  "desc": "ncov2019-artic-nf",
+  "pp_name": "ncov2019-artic-nf",
   "doc": {
     "QC summary": {
       "bam": "34107_2#96.mapped.primertrimmed.sorted.bam",
@@ -58,12 +58,16 @@ my $schema = Moose::Meta::Class->create_anon_class(
   my $rs = $schema->resultset('Generic')->search({});
   is ($rs->count, 1, 'one row is created');
   my $row = $rs->next;
-  is ($row->desc, 'ncov2019-artic-nf', 'pipeline description');
+  is ($row->pp_name, 'ncov2019-artic-nf', 'pipeline description');
   is_deeply ($row->info, $values->{'info'}, 'info retrieved as hash ref');
   is_deeply ($row->doc, $values->{'doc'}, 'doc retrieved as hash ref');
+  is ($row->class_name, 'generic', 'class name');
+  is ($row->check_name,'generic ncov2019-artic-nf', 'check name');
 
-  $values->{'desc'} = 'another pipeline';
-  $schema->resultset('Generic')->create($values);
+  $values->{'pp_name'} = 'pp2';
+  $row = $schema->resultset('Generic')->create($values);
+  is ($row->class_name, 'generic', 'class name');
+  is ($row->check_name,'generic pp2', 'check name');
   $rs = $schema->resultset('Generic')->search({});
   is ($rs->count, 2, 'a new row is created in the table for the same composition');
 }

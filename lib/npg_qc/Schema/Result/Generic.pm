@@ -76,7 +76,7 @@ Auto-generated primary key
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
-=head2 desc
+=head2 pp_name
 
   data_type: 'varchar'
   is_nullable: 0
@@ -122,7 +122,7 @@ __PACKAGE__->add_columns(
     is_foreign_key => 1,
     is_nullable => 0,
   },
-  'desc',
+  'pp_name',
   { data_type => 'varchar', is_nullable => 0, size => 40 },
   'doc',
   { data_type => 'json', is_nullable => 1 },
@@ -146,19 +146,22 @@ __PACKAGE__->set_primary_key('id_generic');
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<generic_id_compos_desc_uniq>
+=head2 C<generic_id_compos_ppname_uniq>
 
 =over 4
 
 =item * L</id_seq_composition>
 
-=item * L</desc>
+=item * L</pp_name>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint('generic_id_compos_desc_uniq', ['id_seq_composition', 'desc']);
+__PACKAGE__->add_unique_constraint(
+  'generic_id_compos_ppname_uniq',
+  ['id_seq_composition', 'pp_name'],
+);
 
 =head1 RELATIONS
 
@@ -187,16 +190,18 @@ __PACKAGE__->belongs_to(
 
 =item * L<npg_qc::autoqc::role::result>
 
+=item * L<npg_qc::autoqc::role::generic>
+
 =back
 
 =cut
 
 
-with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
+with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::generic';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2020-06-04 17:47:12
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:6Kb01TnFLjYSjw8tRPSKYw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2020-07-14 09:16:04
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:uIYLagwKxxyrYTKAgv6eYA
 
 our $VERSION = '0';
 

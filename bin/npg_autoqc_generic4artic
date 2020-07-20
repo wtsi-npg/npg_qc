@@ -24,21 +24,6 @@ our $VERSION = '0';
 Readonly::Scalar my $ARTIC_NF_REPO_NAME => q[ncov2019-artic-nf];
 Readonly::Scalar my $ARTIC_METRICS_NAME => q[QC summary];
 
-Readonly::Scalar my $NEG_CONTROL_REGEXP => qr/\A CGAP- | Negative[ ]control | blank /ismx;
-Readonly::Scalar my $POS_CONTROL_REGEXP => qr/\A Positive[ ]control /ismx;
-Readonly::Scalar my $REAL_SAMPLE_REGEXP => qr/\A [[:upper:]]{4}- /smx;
-Readonly::Scalar my $NEG_CONTROL_FLAG   => q[NEG_CONTROL];
-Readonly::Scalar my $POS_CONTROL_FLAG   => q[POS_CONTROL];
-Readonly::Scalar my $REAL_SAMPLE_FLAG   => q[REAL_SAMPLE];
-Readonly::Scalar my $UNKNOWN_FLAG       => q[UNKNOWN];
-
-# Order of rules evaluation is important, hence a list.
-Readonly::Array  my @SAMPLE_ASSIGNMENT_RULES => (
-                               [$POS_CONTROL_REGEXP, $POS_CONTROL_FLAG],
-                               [$NEG_CONTROL_REGEXP, $NEG_CONTROL_FLAG],
-                               [$REAL_SAMPLE_REGEXP, $REAL_SAMPLE_FLAG],
-                                                );
-
 Log::Log4perl->easy_init({layout => '%d %-5p %c - %m%n',
                           level  => $INFO});
 my $logger = Log::Log4perl->get_logger();
@@ -130,14 +115,13 @@ if ($line_number == 0) {
   # Looking for additional info...
   if ($rpt_list) { # might be supplied in case of one-sample input
     try {
-
       my $g = npg_qc::autoqc::checks::generic->new(rpt_list => $rpt_list,
                                                    qc_out   => $qc_out);
 
       # An empty QC summary file is produced when the artic input
       # containes zero reads. We need to know the original number of reads.
       defined $num_input_reads or $tag_metrics_json or croak
-          'Either --num_inputi_reads or --tm_json_file should be defined';
+          'Either --num_input_reads or --tm_json_file should be defined';
 
       if (!defined $num_input_reads) {
         $num_input_reads = _get_num_input_reads($g, $tag_metrics_json);
@@ -199,18 +183,15 @@ sub _set_sample_info {
     $g->result->doc->{'meta'}->{'supplier_sample_name'} = $sname;
   }
 
-  my $flag = $UNKNOWN_FLAG;
-  foreach my $rule (@SAMPLE_ASSIGNMENT_RULES) {
-    if ($sname =~ $rule->[0]) {
-      $flag = $rule->[1];
-      last;
-    }
-  }
+  my $is_control   = $g->lims->sample_is_control;
+  my $control_type = $g->lims->sample_control_type;
+  (not $is_control) and $control_type and croak
+    "Control type $control_type is set for a non-control sample $sname";
+  $is_control and (not $control_type) and croak
+    "Control type is not set for a control sample $sname";
 
-  if ($flag eq $UNKNOWN_FLAG) {
-    $logger->warn("$prefix sample '${sname}' - attribution failed");
-  }
-  $g->result->doc->{'meta'}->{'sample_type'} = $flag;
+  $g->result->doc->{'meta'}->{'sample_type'} =
+    $is_control ? $control_type . q[_control] : 'real_sample';
 
   return;
 }
@@ -220,7 +201,7 @@ sub _set_result_attributes {
 
   # Descriptor for the portable pipeline that produced
   # this QC output.
-  $g->result->desc($ARTIC_NF_REPO_NAME);
+  $g->result->pp_name($ARTIC_NF_REPO_NAME);
 
   # QC output of the portable pipeline.
   $g->result->doc({});
@@ -269,7 +250,7 @@ npg_autoqc_generic4artic
 
 This script creates autoqc generic result JSON files for
 entities and outcomes piped from STDIN. One line of input
-produces one file.
+QC input produces one file.
 
 If empty input is piped in, in the presence of additional arguments
 the script might be able to create the generic result JSON file.
@@ -278,18 +259,15 @@ functionality. The autoqc result object is created for the entity
 specified by the --rpt_list argument value. Either --num_input_reads
 or --tm_json_file argument should be set in order to evaluate the
 number of reads in the input to the portable pipeline, which failed
-to produce the QC summary. Non-zero number of reads is an error
-condition, which causes the script to exit abnormally.
+to produce the QC summary. Non-zero number of reads in conjunction
+with empty input is an error condition, which causes the script
+to exit abnormally.
 
-If the QC summary is available, it is assigned to the metrics
-attribute of the generic result object. If the number of input reads
-is available, it is assigned to the num_input_reads key of the
-summlimentary_info hash attribute of the result object. The sample type
-(control type, real sample, unknown) is assigned to the sample_type
-key of the summlimentary_info hash attribute.
-
-It is expected that for a result object with no QC summary the
-number of input reads is set and its value is zero.   
+The generic result pp_name attribute is set to 'ncov2019-artic-nf'.
+The QC summary, if available, is assigned to the 'QC summary' key of
+the document. The number of input reads (if available), the sample type
+(control type or real sample) and the sample supplier name are saved
+under the 'meta' key of the document.
 
 Example of input:
 

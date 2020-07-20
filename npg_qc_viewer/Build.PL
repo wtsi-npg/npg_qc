@@ -105,6 +105,7 @@ my $builder = $class->new(
         'Try::Tiny'                                    => '0',
         'warnings'                                     => '0',
         'URI::URL'                                     => '0',
+        'YAML::XS'                                     => '0',
 
         'npg::authentication::sanger_sso'              => '0',
         'npg_tracking::Schema'                         => '0',

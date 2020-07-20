@@ -8,7 +8,9 @@
   tag_metrics_cache = {};
   temp = [];
   FOREACH check_name IN checks_info.list;
-    IF (check_name != 'review') && (check_name != 'samtools stats') && (check_name != 'bam flagstats human') && (check_name != 'bam flagstats phix') && (check_name != 'gc bias');
+    IF (check_name == 'review') || check_name.match('^generic') || (check_name == 'samtools stats') || (check_name == 'bam flagstats human') || (check_name == 'bam flagstats phix') || (check_name == 'gc bias');
+      # do nothing
+    ELSE;
       IF check_name == 'tag metrics';
         temp.unshift(check_name);
       ELSE;

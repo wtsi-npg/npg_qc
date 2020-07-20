@@ -5,10 +5,11 @@ use MooseX::StrictConstructor;
 use namespace::autoclean;
 
 extends qw(npg_qc::autoqc::results::base);
+with    qw(npg_qc::autoqc::role::generic);
 
 our $VERSION = '0';
 
-has 'desc' =>  (
+has 'pp_name' =>  (
   isa      => 'Str',
   is       => 'rw',
   required => 0,
@@ -19,12 +20,6 @@ has 'doc' =>  (
   is       => 'rw',
   required => 0,
 );
-
-around 'filename_root' => sub {
-  my $orig = shift;
-  my $self = shift;
-  return join q[.], $self->$orig(), $self->desc || q[unknown];
-};
 
 __PACKAGE__->meta->make_immutable;
 
@@ -48,7 +43,7 @@ pipelines or tools.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 desc
+=head2 pp_name
 
 An attribute, a distinct descriptor for the pipeline or a tool which
 produced the data. While the attribute is optional in this object,
@@ -63,13 +58,6 @@ A hash reference attribute, no default. A flexible, potentially deeply
 nested data structure to accomodate QC output and any supplimentary
 data. This data structure is going to be serialized to JSON when
 saved either to a file or to a datababase.
-
-=head2 filename_root
-
-This class changes the filename_root attribute of the parent class.
-The value of the desc attribute is appended to the value produced
-by the parent's method to allow for the results from different
-pipelines to co-exist in the same directory.
 
 =head1 DIAGNOSTICS
 

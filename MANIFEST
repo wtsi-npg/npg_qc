@@ -86,6 +86,7 @@ lib/npg_qc/autoqc/role/bam_flagstats.pm
 lib/npg_qc/autoqc/role/contamination.pm
 lib/npg_qc/autoqc/role/interop.pm
 lib/npg_qc/autoqc/role/gc_fraction.pm
+lib/npg_qc/autoqc/role/generic.pm
 lib/npg_qc/autoqc/role/genotype.pm
 lib/npg_qc/autoqc/role/genotype_call.pm
 lib/npg_qc/autoqc/role/insert_size.pm
