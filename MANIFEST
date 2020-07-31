@@ -340,6 +340,7 @@ t/data/autoqc/dbix_loader/run/lane/12233_1#72.ref_match.json
 t/data/autoqc/dbix_loader/run/lane/12233_1#72.sequence_error.json
 t/data/autoqc/dbix_loader/run/12166_2.spatial_filter.json
 t/data/autoqc/dbix_loader/run/11180_1.tags_reporters.json
+t/data/autoqc/generic/samplesheet_34719.csv
 t/data/autoqc/upstream_tags/9669_1.upstream_tags.json
 t/data/autoqc/upstream_tags/lane1/12920_1#0.bam
 t/data/autoqc/upstream_tags/lane1/13362_1#0.bam

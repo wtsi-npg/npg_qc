@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - reusable methods for autoqc generic check
+
 release 68.6.0
  - autoqc generic result object:
      rename 'desc' attribute to 'pp_name' since 'desc' is a reserved
