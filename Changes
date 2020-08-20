@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.7.0
  - ability to invoke, via the qc script, specialised versions of
    autoqc checks
  - reusable methods for autoqc generic check
