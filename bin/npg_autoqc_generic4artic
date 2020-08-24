@@ -167,41 +167,8 @@ sub _get_num_input_reads {
   return $num_reads;
 }
 
-sub _set_sample_info {
-  my $g = shift;
-
-  my $prefix = $g->rpt_list ? join q[ ], $g->rpt_list , q[:] : q[];
-
-  my $sname = $g->lims->sample_supplier_name();
-  if (!$sname) {
-    # Not exiting here, the supplier name is often not set for R&D samples.
-    # Be careful with the source of LIMS data, the supplier name is not set
-    # in XML feeds. Use a samplesheet!
-    $sname = q[];
-    $logger->error("$prefix sample supplier name is not defined");
-  } else {
-    $g->result->doc->{'meta'}->{'supplier_sample_name'} = $sname;
-  }
-
-  my $is_control   = $g->lims->sample_is_control;
-  my $control_type = $g->lims->sample_control_type;
-  (not $is_control) and $control_type and croak
-    "Control type $control_type is set for a non-control sample $sname";
-  $is_control and (not $control_type) and croak
-    "Control type is not set for a control sample $sname";
-
-  $g->result->doc->{'meta'}->{'sample_type'} =
-    $is_control ? $control_type . q[_control] : 'real_sample';
-
-  return;
-}
-
 sub _set_result_attributes {
   my ($g, $summary, $num_ireads) = @_;
-
-  # Descriptor for the portable pipeline that produced
-  # this QC output.
-  $g->result->pp_name($ARTIC_NF_REPO_NAME);
 
   # QC output of the portable pipeline.
   $g->result->doc({});
@@ -214,19 +181,12 @@ sub _set_result_attributes {
   if (defined $num_ireads) {
     $g->result->doc->{'meta'}->{'num_input_reads'} = $num_ireads;
   }
-  _set_sample_info($g);
+  $g->result->doc->{'meta'} = $g->get_sample_info();
 
-  # Info about this script.
+  # Info about this script and pp.
   $g->result->set_info('Script_name', $Script);
   $g->result->set_info('Script_version', $VERSION);
-
-  # Info about the pipeline.
-  $g->result->set_info('Pipeline_name', $ARTIC_NF_REPO_NAME);
-  if ($pp_version) {
-    $g->result->set_info('Pipeline_version', $pp_version);
-  } else {
-    $logger->warn('pp version is not given');
-  }
+  $g->result->set_pp_info($ARTIC_NF_REPO_NAME, $pp_version);
 
   return;
 }

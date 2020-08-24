@@ -3,6 +3,7 @@ package npg_qc::autoqc::results::generic;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
+use Carp;
 
 extends qw(npg_qc::autoqc::results::base);
 with    qw(npg_qc::autoqc::role::generic);
@@ -20,6 +21,21 @@ has 'doc' =>  (
   is       => 'rw',
   required => 0,
 );
+
+sub set_pp_info {
+  my ($self, $pp_name, $pp_version) = @_;
+
+  $pp_name or croak 'Portable pipeline name is required';
+  if ($self->pp_name and ($self->pp_name ne $pp_name)) {
+    croak 'Cannot reset portable pipeline name';
+  }
+
+  $self->pp_name($pp_name);
+  $self->set_info('Pipeline_name', $pp_name);
+  $pp_version && $self->set_info('Pipeline_version', $pp_version);
+
+  return;
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -58,6 +74,14 @@ A hash reference attribute, no default. A flexible, potentially deeply
 nested data structure to accomodate QC output and any supplimentary
 data. This data structure is going to be serialized to JSON when
 saved either to a file or to a datababase.
+
+=head2 set_pp_info
+
+Given the name and, optionally, version, of the portable pipeline that
+produced the data, this method sets relevant attributes of the object.
+
+  $obj->set_pp_info('some_name', 'some_version');
+  $obj->set_pp_info('some_name');
 
 =head1 DIAGNOSTICS
 
