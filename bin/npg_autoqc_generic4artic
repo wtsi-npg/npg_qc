@@ -176,12 +176,13 @@ sub _set_result_attributes {
     $g->result->doc->{$ARTIC_METRICS_NAME} = $summary;
   }
 
+  $g->result->doc->{'meta'} = $g->get_sample_info();
+
   # Supplimentary information to help evaluate the QC output or its
   # absence.
   if (defined $num_ireads) {
     $g->result->doc->{'meta'}->{'num_input_reads'} = $num_ireads;
   }
-  $g->result->doc->{'meta'} = $g->get_sample_info();
 
   # Info about this script and pp.
   $g->result->set_info('Script_name', $Script);
