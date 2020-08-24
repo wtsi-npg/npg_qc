@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.7.1
+ - bug fix for the order of assignment of keys for the doc->{'meta'}
+   part of the generic result object for the ncov2019_artic_nf pp
+
 release 68.7.0
  - ability to invoke, via the qc script, specialised versions of
    autoqc checks
