@@ -28,6 +28,7 @@ lib/npg_qc/autoqc/checks/interop.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
 lib/npg_qc/autoqc/checks/generic.pm
+lib/npg_qc/autoqc/checks/generic/ampliconstats.pm
 lib/npg_qc/autoqc/checks/genotype.pm
 lib/npg_qc/autoqc/checks/genotype_call.pm
 lib/npg_qc/autoqc/checks/insert_size.pm
@@ -248,6 +249,7 @@ t/60-autoqc-results-interop.t
 t/60-autoqc-results-gc_bias.t
 t/60-autoqc-results-gc_fraction.t
 t/60-autoqc-results-generic.t
+t/60-autoqc-checks-generic-ampliconstats.t
 t/60-autoqc-results-genotype.t
 t/60-autoqc-results-genotype_call.t
 t/60-autoqc-results-insert_size.t
@@ -341,6 +343,8 @@ t/data/autoqc/dbix_loader/run/lane/12233_1#72.sequence_error.json
 t/data/autoqc/dbix_loader/run/12166_2.spatial_filter.json
 t/data/autoqc/dbix_loader/run/11180_1.tags_reporters.json
 t/data/autoqc/generic/samplesheet_34719.csv
+t/data/autoqc/generic/ampliconstats/34719_1.ampstats
+t/data/autoqc/generic/ampliconstats/samplesheet_34719.csv
 t/data/autoqc/upstream_tags/9669_1.upstream_tags.json
 t/data/autoqc/upstream_tags/lane1/12920_1#0.bam
 t/data/autoqc/upstream_tags/lane1/13362_1#0.bam
