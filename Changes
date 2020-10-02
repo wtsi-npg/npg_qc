@@ -1,5 +1,12 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.9
+ - DBIx class for the generic table: add missing standard custom relationship
+ - SeqQC template simplification and database access optimisation for rna
+   autoqc results
+ - extension of the SeqQC template for teh generic check - a link to
+   appliconstats index page for plots is added
+
 release 68.8.0
  - specialised generic check for ampliconstats
 
