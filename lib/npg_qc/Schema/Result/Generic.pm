@@ -207,6 +207,13 @@ our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( doc info ));
 
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
