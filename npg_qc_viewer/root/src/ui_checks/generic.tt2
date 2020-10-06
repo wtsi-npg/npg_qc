@@ -1,1 +1,27 @@
+[% IF check.pp_name == 'ncov2019-artic-nf'; -%]
 <pre>[% check.doc2yaml %]</pre>
+
+[%- ELSIF check.pp_name.match('ampliconstats');
+      IF check.result_file_path.defined; # The result came from staging
+        # Create a link to the ampliconstats directory in the lane-level
+        # qc directory. All results will display the same link...
+        # grep to remove empty path components, which are present if the path
+        # contains double forward slashes
+        path = check.result_file_path.split('/').grep('.+');
+        # Keep assigning popped values, otherwise they appear on a page.
+        path_component = path.pop; # remove file name
+        path_component = path.pop; # remove 'qc'
+        path_component = path.pop; # remove plexY
+        path.push('qc');
+        path.push('ampliconstats');
+        path = path.join('/');
+        # The redirection tracking pattern calls for an asterix
+        # rather than the explicit path.
+        path = path.replace('\/(?:outgoing|analysis)\/', '/*/');
+        path = base_url _ '/cgi-bin/locate_runfolder/' _ path; -%]
+<div>Ampliconstats <a href="[% path | url %]?redir">plots</a></div>
+      [% ELSE -%]
+<div>Ampliconstats plots are not accessible</div>
+      [% END -%]
+
+[%- END -%]

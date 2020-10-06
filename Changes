@@ -1,5 +1,15 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 68.9
+ - DBIx class for the generic table: add missing standard custom relationship
+ - SeqQC template simplification and database access optimisation for rna
+   autoqc results
+ - extension of the SeqQC template for the generic check - a link to
+   appliconstats index page for plots is added
+ - deployment of the latest version of Catalyst, 5.90128, does not seem
+   to include the Starman; the dependency was probably not explicit;
+   starman is added to the list of required packages in npg_qc_viewer/Build.PL 
+
 release 68.8.0
  - specialised generic check for ampliconstats
 
