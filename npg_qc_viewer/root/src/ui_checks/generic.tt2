@@ -5,7 +5,9 @@
       IF check.result_file_path.defined; # The result came from staging
         # Create a link to the ampliconstats directory in the lane-level
         # qc directory. All results will display the same link...
-        path = check.result_file_path.split('/');
+        # grep to remove empty path components, which are present if the path
+        # contains double forward slashes
+        path = check.result_file_path.split('/').grep('.+');
         # Keep assigning popped values, otherwise they appear on a page.
         path_component = path.pop; # remove file name
         path_component = path.pop; # remove 'qc'
