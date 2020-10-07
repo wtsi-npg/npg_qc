@@ -82,7 +82,6 @@ array is empty and cannot be set from the constructor.
 
 has '+result' => (
   isa       => 'ArrayRef[npg_qc::autoqc::results::base]',
-  metaclass => 'NoGetopt',
   init_arg  => undef,
 );
 sub _build_result {
