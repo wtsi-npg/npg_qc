@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - npg_qc::autoqc::checks::generic::artic - a proper autoqc check class,
+   which repleces bin/npg_autoqc_generic4artic script
+
 release 68.9
  - DBIx class for the generic table: add missing standard custom relationship
  - SeqQC template simplification and database access optimisation for rna

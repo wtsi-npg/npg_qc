@@ -1,0 +1,2 @@
+sample_name,pct_N_bases,pct_covered_bases,longest_no_N_run,num_aligned_reads,fasta,bam,qc_pass
+35177_2#159,5.24,94.76,4902,2159185,35177_2#159.primertrimmed.consensus.fa,35177_2#159.mapped.primertrimmed.sorted.bam,TRUE

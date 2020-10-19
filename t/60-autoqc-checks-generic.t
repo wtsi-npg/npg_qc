@@ -13,18 +13,15 @@ local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
   q[t/data/autoqc/verify_bam_id/samplesheet_27483.csv];
 
 subtest 'create check object, serialize result' => sub {
-  plan tests => 6;
+  plan tests => 5;
 
   my $g = npg_qc::autoqc::checks::generic->new(
     rpt_list => '27483:1:4', qc_out => $tdir);
   isa_ok ($g, 'npg_qc::autoqc::checks::generic');
-  isa_ok ($g->result, 'npg_qc::autoqc::results::generic',
-    'result attribute is built');
+  is_deeply ($g->result, [], 'default result is empty');
   isa_ok ($g->lims, 'st::api::lims', 'lims attribute is built');
   lives_ok { $g->execute() } 'no error running execute() method';
   lives_ok { $g->run() } 'no error running run() method';
-  ok (-f "$tdir/27483_1#4.unknown.generic.json",
-    'result serialized');
 };
 
 subtest 'sample info' => sub {
