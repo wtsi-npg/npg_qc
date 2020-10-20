@@ -33,6 +33,10 @@ Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT, q[uqc]);
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
+Readonly::Scalar my $CLASS_NAME_SPEC_DELIM => q[:];
+Readonly::Scalar my $CLASS_NAME_SPEC_RE    =>
+  qr/\A(?:\W+)? (\w+) (?: $CLASS_NAME_SPEC_DELIM (\w+))?[.]/xms;
+
 ## no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
@@ -442,8 +446,9 @@ sub _applicability_lims {
       'an array in a robo config for ' . $self->_entity_desc;
     my @expected_values = $ref_test ? @{$lcriteria->{$lims_prop}} : ($lcriteria->{$lims_prop});
     my $value = $self->lims->$lims_prop;
-    defined $value or croak
-      qq('$lims_prop' - cannot compare to an undefined value);
+    $value ||= q[];
+    #defined $value or croak
+    #  qq('$lims_prop' - cannot compare to an undefined value);
     # comparing as strings in lower case
     $value = lc q[] . $value;
     $lims_test->{$lims_prop} = any { $value eq lc q[] . $_ }
@@ -511,7 +516,7 @@ sub _build__result_class_names {
 
   # Using all criteria objects regardles of relevance to this entity.
   my @class_names = uniq sort
-                    map { _class_name_from_expression($_) }
+                    map { (_class_name_from_expression($_))[0] }
                     map { @{$_->{$ACCEPTANCE_CRITERIA_KEY}} }
                     @{$self->_robo_config->{$CRITERIA_KEY}};
 
@@ -558,21 +563,20 @@ sub _build__results {
   my @results = grep { $_->composition->digest eq $d } $collection->all;
 
   # We should have the right number of the right types of results.
-  my %h = map { $_ => 0 } @{$self->_result_class_names};
+  my %h = map { $_ => [] } @{$self->_result_class_names};
   foreach my $r (@results) {
     my  $class_name = $r->class_name;
     exists $h{$class_name} or croak "Loaded unwanted class $class_name";
-    ($h{$class_name} == 0) or croak "Multiple entries for class $class_name";
-    $h{$class_name} = $r;
+    push @{$h{$class_name}}, $r;
   }
 
-  my $num_found = scalar grep { $_ } values %h;
+  my $num_found = scalar grep { @{$_} } values %h;
   my $num_expected = scalar @{$self->_result_class_names};
   if ($num_expected != $num_found) {
     my $m = join q[, ], @{$self->_result_class_names};
     $m = "Expected results for $m, found ";
     $m .= $num_found
-          ? 'results for ' . join q[, ], grep { $h{$_} } sort keys %h
+          ? 'results for ' . join q[, ], grep { @{$h{$_}} } sort keys %h
           : 'none';
     croak $m;
   }
@@ -582,9 +586,9 @@ sub _build__results {
 
 sub _class_name_from_expression {
   my $e = shift;
-  my ($class_name) = $e =~ /\A(?:\W+)?(\w+)[.]/xms;
+  my ($class_name, $spec) = $e =~ $CLASS_NAME_SPEC_RE;
   $class_name or croak "Failed to infer class name from $e";
-  return $class_name;
+  return ($class_name, $spec);
 }
 
 #####
@@ -646,24 +650,44 @@ sub _apply_operator {
 
 #####
 # Evaluates a single expression in the context of available autoqc results.
-# Returns 0 or 1.
+# If runs successfully, returns 0 or 1, otherwise throws an error.
 #
 sub _evaluate_expression {
   my ($self, $e) = @_;
 
-  my $class_name = _class_name_from_expression($e);
-  my $obj = $self-> _results->{$class_name};
+  my ($class_name, $spec) = _class_name_from_expression($e);
+  my $obj_a = $self->_results->{$class_name};
   # We should not get this far with an error in the configuration
   # file, but just in case...
+  $obj_a and @{$obj_a} or croak "No autoqc result for evaluation of '$e'";
+
+  if ($spec) {
+    my $pp_name2spec = sub {    # To get a match with what would have been
+      my $pp_name = shift;      # used in the robo config, replace all
+      $pp_name =~ s/\W/_/gsmx;  # 'non-word' characters.
+      return $pp_name;
+    };
+    # Now have to choose one result. If the object is not an instance of
+    # the generic autoqc result class, there will be an error at this point.
+    # Making the code less specific is not worth the effort at this point.
+    my @on_spec = grep { $pp_name2spec->($_->pp_name) eq $spec } @{$obj_a};
+    @on_spec or croak "No autoqc $class_name result for $spec";
+    $obj_a = \@on_spec;
+  }
+
+  (@{$obj_a} == 1) or croak "Multiple autoqc results for evaluation of '$e'";
+  my $obj = $obj_a->[0];
+
   $obj or croak "No autoqc result for evaluation of '$e'";
 
-  ##no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
-  my $replacement = q[$result->];
-  ##use critic
+  # Prepare the expression from the robo config for evaluation.
+  my $placeholder = $class_name;
+  $spec and ($placeholder .= $CLASS_NAME_SPEC_DELIM . $spec);
+  my $replacement = q[$] . q[result->];
   my $perl_e = $e;
-  $perl_e =~ s/$class_name[.]/$replacement/xmsg;
+  $perl_e =~ s/$placeholder[.]/$replacement/xmsg;
 
-  my $evaluator = sub {
+  my $evaluator = sub { # Evaluation function
     my $result = shift;
     # Force an error when operations on undefined values are
     # are attempted.
@@ -678,6 +702,7 @@ sub _evaluate_expression {
     return $o ? 1 : 0;
   };
 
+  # Evaluate and return the outcome.
   return $evaluator->($obj);
 }
 
