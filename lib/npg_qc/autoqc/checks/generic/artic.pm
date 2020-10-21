@@ -193,7 +193,9 @@ sub execute {
   # if the number of input reads is very low or zero.
   my $max_count_negative =
     max
-    map  { $_->doc->{$ARTIC_METRICS_NAME}->{'num_aligned_reads'} || 0 }
+    map  { $_->doc->{$ARTIC_METRICS_NAME} ?
+           $_->doc->{$ARTIC_METRICS_NAME}->{'num_aligned_reads'} :
+           $_->doc->{'meta'}->{'num_input_reads'} }
     grep { $_->doc->{'meta'}->{'sample_type'} =~ $re }
     @{$self->result};
   defined $max_count_negative or carp 'No negative controls in this lane';
