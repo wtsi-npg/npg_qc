@@ -37,7 +37,8 @@ study:
                 - 0
                 - ""
           acceptance_criteria :
-            - &heron_robo_realsample_ac "generic:ncov2019_artic_nf.doc->{meta}->{'num_input_reads'} and (generic:ncov2019_artic_nf.doc->{'QC summary'}->{qc_pass} eq 'TRUE')"
+            - &heron_robo_realsample_ac1 "generic:ncov2019_artic_nf.doc->{meta}->{'num_input_reads'} and (generic:ncov2019_artic_nf.doc->{'QC summary'}->{qc_pass} eq 'TRUE')"
+            - &heron_robo_realsample_ac2 "(generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'} < 100) or ((generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'} <= 1000) and (generic:ncov2019_artic_nf.doc->{'QC summary'}->{num_aligned_reads} > 100 * generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'}))"
         - applicability_criteria:
             lims:
               sample_is_control:
@@ -45,7 +46,8 @@ study:
               sample_control_type:
                 - "positive"
           acceptance_criteria :
-            - *heron_robo_realsample_ac
+            - *heron_robo_realsample_ac1
+            - *heron_robo_realsample_ac2
         - applicability_criteria:
             lims:
               sample_is_control:

@@ -514,7 +514,8 @@ subtest 'evaluating generic for artic results' => sub {
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/generic/artic/samplesheet_35177.csv';
   my $gdir = join q[/], $test_data_dir, 'generic';
-  my $rs_criterium = "generic:ncov2019_artic_nf.doc->{meta}->{'num_input_reads'} and (generic:ncov2019_artic_nf.doc->{'QC summary'}->{qc_pass} eq 'TRUE')";
+  my $rs_criterium2 = "generic:ncov2019_artic_nf.doc->{meta}->{'num_input_reads'} and (generic:ncov2019_artic_nf.doc->{'QC summary'}->{qc_pass} eq 'TRUE')";
+  my $rs_criterium1 = "(generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'} < 100) or ((generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'} <= 1000) and (generic:ncov2019_artic_nf.doc->{'QC summary'}->{num_aligned_reads} > 100 * generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'}))";
 
   # qc_in does not contain any autoqc results
   # real sample
@@ -534,7 +535,7 @@ subtest 'evaluating generic for artic results' => sub {
   is_deeply ($result->evaluation_results, {},
     'evauation results are an empty hash');
   is_deeply ($result->qc_outcome, {}, 'qc outcome is an empty hash');
-  is_deeply ($result->criteria, {'and' => [$rs_criterium]},
+  is_deeply ($result->criteria, {'and' => [$rs_criterium1,$rs_criterium2]},
     'criteria are set');
 
   # qc_in contains a generic result for the ampliconstats pipeline
@@ -572,11 +573,12 @@ subtest 'evaluating generic for artic results' => sub {
   isa_ok ($result, 'npg_qc::autoqc::results::review');
   is ($result->comments, undef, 'No comments');
   is ($result->pass, 1, 'pass attribute is set to 1');
-  is_deeply ($result->evaluation_results, {$rs_criterium => 1},
+  is_deeply ($result->evaluation_results,
+    {$rs_criterium1 => 1, $rs_criterium2 => 1},
     'correct evauation results');
-  is_deeply ($result->criteria, {'and' => [$rs_criterium]},
+  is_deeply ($result->criteria, {'and' => [$rs_criterium1,$rs_criterium2]},
     'criteria are set');
-  is ($result->criteria_md5, '5aa18fb8e41b83ef3946e92c16f6b363',
+  is ($result->criteria_md5, 'e83710ef788ab5e849c5be46d50f1254',
     'criteria md5 is set');
   my $outcome = $result->qc_outcome;
   is ($outcome->{username}, 'robo_qc', 'username is set in outcome');
@@ -593,7 +595,8 @@ subtest 'evaluating generic for artic results' => sub {
   $result = $check->result;
   is ($result->comments, undef, 'No comments');
   is ($result->pass, 0, 'pass attribute is set to 0');
-  is_deeply ($result->evaluation_results, {$rs_criterium => 0},
+  is_deeply ($result->evaluation_results,
+    {$rs_criterium1 => 1, $rs_criterium2 => 0},
     'correct evauation results');
   is ($result->qc_outcome->{'mqc_outcome'} , 'Rejected preliminary',
     'correct outcome string');
@@ -608,7 +611,8 @@ subtest 'evaluating generic for artic results' => sub {
   $result = $check->result;
   is ($result->comments, undef, 'No comments');
   is ($result->pass, 0, 'pass attribute is set to 0');
-  is_deeply ($result->evaluation_results, {$rs_criterium => 0},
+  is_deeply ($result->evaluation_results,
+    {$rs_criterium1 => 1, $rs_criterium2 => 0},
     'correct evauation results');
   is ($result->qc_outcome->{'mqc_outcome'} , 'Rejected preliminary',
     'correct outcome string');
@@ -638,7 +642,8 @@ subtest 'evaluating generic for artic results' => sub {
   $result = $check->result;
   is ($result->comments, undef, 'No comments');
   is ($result->pass, 1, 'pass attribute is set to 1');
-  is_deeply ($result->evaluation_results, {$rs_criterium => 1},
+  is_deeply ($result->evaluation_results,
+    {$rs_criterium1 => 1, $rs_criterium2 => 1},
     'correct evauation results');
   is ($result->qc_outcome->{'mqc_outcome'} , 'Accepted preliminary',
     'correct outcome string');
