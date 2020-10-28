@@ -3,9 +3,9 @@ package npg_qc::autoqc::checks::generic;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
-use st::api::lims;
 use Carp;
 
+use st::api::lims;
 use npg_tracking::glossary::moniker;
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
@@ -24,10 +24,9 @@ npg_qc::autoqc::checks::generic
 
 =head1 DESCRIPTION
 
-This class is a factory for creating npg_qc::autoqc::results::generic
-type objects. It does not provide any fuctionality in its execute()
-method. For convenience it provides access to LIMS data via its
-lims attribute.  
+This is a parent class for classes generating npg_qc::autoqc::results::generic
+type objects. It does not provide any fuctionality either in its execute or
+run method.
 
 =head1 SUBROUTINES/METHODS
 
@@ -47,15 +46,14 @@ has 'sample_qc_out' => (
 =head2 pp_name
 
 Name of the portable pipeline that produced input data for this
-check, an optional attribute.
+check, required attribute.
 
 =cut
 
 has 'pp_name' => (
   isa      => 'Str',
   is       => 'ro',
-  required => 0,
-  default  => q[ampliconstats],
+  required => 1,
 );
 
 =head2 pp_version

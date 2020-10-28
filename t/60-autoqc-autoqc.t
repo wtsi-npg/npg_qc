@@ -60,14 +60,14 @@ my $dir = tempdir( CLEANUP => 1 );
 }
 
 {
-  local @ARGV = qw(--check generic --rpt_list 4:1 --qc_out);
+  local @ARGV = qw(--check generic --pp_name p1 --rpt_list 4:1 --qc_out);
   push @ARGV, $dir;
   my $factory = npg_qc::autoqc::autoqc->new_with_options();
   my $check = $factory->create_check_object();
   is (ref $check, 'npg_qc::autoqc::checks::generic',
     'check is an instance of the generic autoqc class');
 
-  local @ARGV = qw(--check generic --spec foo --rpt_list 4:1 --qc_out);
+  local @ARGV = qw(--check generic --spec foo --pp_name p1 --rpt_list 4:1 --qc_out);
   push @ARGV, $dir;
   $factory = npg_qc::autoqc::autoqc->new_with_options();
   throws_ok { $factory->create_check_object() }
@@ -80,7 +80,7 @@ my $dir = tempdir( CLEANUP => 1 );
   
   package main;
   
-  local @ARGV = qw(--check generic --spec foo1 --rpt_list 4:1 --qc_out);
+  local @ARGV = qw(--check generic --spec foo1 --pp_name p1 --rpt_list 4:1 --qc_out);
   push @ARGV, $dir;
   $factory = npg_qc::autoqc::autoqc->new_with_options();
   $check = $factory->create_check_object();
