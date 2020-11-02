@@ -16,7 +16,7 @@ subtest 'create check object, serialize result' => sub {
   plan tests => 5;
 
   my $g = npg_qc::autoqc::checks::generic->new(
-    rpt_list => '27483:1:4', qc_out => $tdir);
+    rpt_list => '27483:1:4', qc_out => $tdir, pp_name => 'abc');
   isa_ok ($g, 'npg_qc::autoqc::checks::generic');
   is_deeply ($g->result, [], 'default result is empty');
   isa_ok ($g->lims, 'st::api::lims', 'lims attribute is built');
@@ -30,7 +30,7 @@ subtest 'sample info' => sub {
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     q[t/data/autoqc/generic/samplesheet_34719.csv];
   my $g = npg_qc::autoqc::checks::generic->new(
-    rpt_list => '34719:1:4', qc_out => $tdir);
+    rpt_list => '34719:1:4', qc_out => $tdir, pp_name => 'abc');
 
   my $sh = $g->get_sample_info();
   is (keys %{$sh}, 2, 'two key-value pairs are returned');
@@ -83,7 +83,8 @@ subtest 'result object from file name' => sub {
 
   my $pkg = q(npg_qc::autoqc::checks::generic);
 
-  my $g = $pkg->new(rpt_list => '27483:1:4', qc_out => $tdir);
+  my $g = $pkg->new(
+    rpt_list => '27483:1:4', qc_out => $tdir, pp_name => 'abc');
   throws_ok { $g->file_name2result() }
     qr/File name argument should be given/,
     'no argument - error';
