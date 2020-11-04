@@ -42,6 +42,7 @@ my $requires = {
                 'lib'                             => 0,
                 'List::MoreUtils'                 => 0,
                 'List::Util'                      => 0,
+                'Log::Log4perl'                   => 0,
                 'LWP::UserAgent'                  => 0,
                 'Math::Round'                     => 0,
                 'MIME::Base64'                    => 0,
@@ -77,6 +78,8 @@ my $requires = {
                 'Vcf'                             => 0,
 
                 'WTSI::DNAP::Utilities::Timestamp'         => 0,
+    		'WTSI::DNAP::Warehouse::Schema'            => 0,
+                'WTSI::DNAP::Warehouse::Schema::Query::IseqFlowcell' => 0,
                 'npg_common::Alignment'                    => 0,
                 'npg_common::extractor::fastq'             => 0,
                 'npg_common::roles::software_location'     => 0,
@@ -105,7 +108,6 @@ my $requires = {
                 'npg::util'                                => 0,
                 'st::api::base'                            => 0,
                 'st::api::lims'                            => 0,
-                'WTSI::DNAP::Warehouse::Schema'            => 0,
                 'WTSI::NPG::iRODS'                         => 0,
                 'WTSI::NPG::iRODS::DataObject'             => 0
 };
