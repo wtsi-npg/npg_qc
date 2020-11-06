@@ -1,7 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 69.0
  - npg_qc::autoqc::checks::generic::artic - a proper autoqc check class,
    which repleces bin/npg_autoqc_generic4artic script
+ - make pp_name attribute required for the generic check object
+ - npg_qc::autoqc::checks::review
+   - breaking change of the RoboQC section of the product configuration file
+   - introduction of the applicability criteria to allow for conditions that
+     are based on different LIMS properties
 
 release 68.9
  - DBIx class for the generic table: add missing standard custom relationship
