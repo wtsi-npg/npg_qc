@@ -74,45 +74,6 @@ has '+qc_out' => (
   required => 1,
 );
 
-=head2 sample_qc_out
-
-An output directory or a glob expression for directories
-for sample (plex) level result JSON files. Optional attribute.
-
-=cut
-
-has 'sample_qc_out' => (
-  isa      => 'Str',
-  is       => 'ro',
-  required => 0,
-);
-
-=head2 pp_name
-
-Name of the portable pipeline that produced the file given by
-the input_files attribute. Optional attribute.
-
-=cut
-
-has 'pp_name' => (
-  isa      => 'Str',
-  is       => 'ro',
-  required => 0,
-  default  => q[ampliconstats],
-);
-
-=head2 pp_version
-
-Version of the portable pipeline that produced the file given by
-the input_files attribute. Optional attribute.
-
-=cut
-
-has 'pp_version' => (
-  isa      => 'Str',
-  is       => 'ro',
-  required => 0,
-);
 
 =head2 ampstats_section
 
@@ -128,23 +89,6 @@ has 'ampstats_section' => (
   default  => sub { return [] },
 );
 
-=head2 result
-
-This attribute is inherited from the parent and is changed to be
-an array of npg_qc::autoqc::results::* result objects. Different
-classes of result objects can be accommodated. By default the
-array is empty and cannot be set from the constructor.
-
-=cut
-
-has '+result' => (
-  isa       => 'ArrayRef[npg_qc::autoqc::results::base]',
-  metaclass => 'NoGetopt',
-  init_arg  => undef,
-);
-sub _build_result {
-  return [];
-}
 
 =head2 execute
 
@@ -164,9 +108,6 @@ is generated. There is no validation of the section names, invalid
 section names will not lead to an error. This implementation works
 correctly only for those sections where there is one line of data
 per section per sample.
-
-Does not inherit from the method of the same name in any of
-ancestors. 
 
 =cut
 
@@ -222,7 +163,7 @@ sub execute {
              @results;
   push @{$self->result}, @results;
 
-  $self->_set_common_result_attrs($st_version, $command_line);
+  $self->_set_basic_result_attrs($st_version, $command_line);
 
   return;
 }
@@ -231,16 +172,9 @@ sub execute {
 
 This method calls execute() and then serializes the result objects to
 JSON files. The first member of the result objects array is saved to
-the directory given by the qc_out attribute. If sample_qc_out attribute
-is not defined, all other result objects are saved to the same directory
-as the first one. If the sample_qc_out attribute is defined and is a
-directory, the result objects for samples are saved there. If the
-sample_qc_out attribute is a directory glob, an attempt is made to match
-the directories represented by a glob with the sample result objects and
-to save result objects to their individual directories.
-
-Does not inherit from the method of the same name in any of
-ancestors.
+the directory given by the qc_out attribute. The inherited 
+store_fanned_results method is used for the serialization of the rest
+of the result objects.
 
 =cut
 
@@ -249,55 +183,23 @@ sub run {
 
   $self->execute();
 
-  (@{$self->result} > 0) or croak 'No results';
-  (@{$self->qc_out} == 1) or carp 'Multiple qc_out directories are given, ' .
-                                  'only the first one will be used';
-  my $qc_out = $self->qc_out->[0];
-
   # Remove the first result and write it out.
   my $result = shift @{$self->result};
-  $result->store($qc_out);
-
+  $result or croak 'No results';
+  $result->store($self->qc_out->[0]);
   # Deal with the rest of the results.
-  if (not $self->sample_qc_out) {
-    for my $r ( @{$self->result} ) {
-      $r->store($qc_out);
-    }
-  } else {
-    my @dirs = grep { -d } glob $self->sample_qc_out;
-    if (@dirs == 1) {
-      $qc_out = $dirs[0];
-    }
-
-    for my $r ( @{$self->result} ) {
-      my $tag_index = $r->composition->get_component(0)->tag_index;
-      my $sample_qc_out = $qc_out;
-      if (defined $tag_index and (@dirs > 1)) {
-        my @filtered = grep { /\/plex $tag_index\//xms } @dirs;
-        (@filtered > 1) and croak "Multiple directory matches for tag $tag_index";
-        (@filtered == 0) and croak "No directory match for tag $tag_index";
-        $sample_qc_out = $filtered[0];
-      }
-      $r->store($sample_qc_out);
-    }
-  }
+  $self->store_fanned_results();
 
   return;
 }
 
-sub _set_common_result_attrs {
+sub _set_basic_result_attrs {
   my ($self, $st_version, $command_line) = @_;
 
   foreach my $r ( @{$self->result} ) {
-    $r->set_info('Check', ref $self);
-    $r->set_info('Check_version', $VERSION);
+    $self->set_common_result_attrs($r, $st_version);
     $command_line and $r->set_info('Samtools_command', $command_line);
     defined $st_version and $r->set_info('Samtools_version', $st_version);
-    if ($r->class_name eq 'generic') {
-      my @versions = grep { defined and ($_ ne q[]) }
-                     ($self->pp_version, $st_version);
-      $r->set_pp_info($self->pp_name, join q[ ], @versions);
-    }
   }
 
   return;

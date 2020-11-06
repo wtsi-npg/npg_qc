@@ -13,18 +13,15 @@ local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
   q[t/data/autoqc/verify_bam_id/samplesheet_27483.csv];
 
 subtest 'create check object, serialize result' => sub {
-  plan tests => 6;
+  plan tests => 5;
 
   my $g = npg_qc::autoqc::checks::generic->new(
-    rpt_list => '27483:1:4', qc_out => $tdir);
+    rpt_list => '27483:1:4', qc_out => $tdir, pp_name => 'abc');
   isa_ok ($g, 'npg_qc::autoqc::checks::generic');
-  isa_ok ($g->result, 'npg_qc::autoqc::results::generic',
-    'result attribute is built');
+  is_deeply ($g->result, [], 'default result is empty');
   isa_ok ($g->lims, 'st::api::lims', 'lims attribute is built');
   lives_ok { $g->execute() } 'no error running execute() method';
   lives_ok { $g->run() } 'no error running run() method';
-  ok (-f "$tdir/27483_1#4.unknown.generic.json",
-    'result serialized');
 };
 
 subtest 'sample info' => sub {
@@ -33,7 +30,7 @@ subtest 'sample info' => sub {
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     q[t/data/autoqc/generic/samplesheet_34719.csv];
   my $g = npg_qc::autoqc::checks::generic->new(
-    rpt_list => '34719:1:4', qc_out => $tdir);
+    rpt_list => '34719:1:4', qc_out => $tdir, pp_name => 'abc');
 
   my $sh = $g->get_sample_info();
   is (keys %{$sh}, 2, 'two key-value pairs are returned');
@@ -86,7 +83,8 @@ subtest 'result object from file name' => sub {
 
   my $pkg = q(npg_qc::autoqc::checks::generic);
 
-  my $g = $pkg->new(rpt_list => '27483:1:4', qc_out => $tdir);
+  my $g = $pkg->new(
+    rpt_list => '27483:1:4', qc_out => $tdir, pp_name => 'abc');
   throws_ok { $g->file_name2result() }
     qr/File name argument should be given/,
     'no argument - error';

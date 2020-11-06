@@ -3,9 +3,9 @@ package npg_qc::autoqc::checks::generic;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
-use st::api::lims;
 use Carp;
 
+use st::api::lims;
 use npg_tracking::glossary::moniker;
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
@@ -24,20 +24,67 @@ npg_qc::autoqc::checks::generic
 
 =head1 DESCRIPTION
 
-This class is a factory for creating npg_qc::autoqc::results::generic
-type objects. It does not provide any fuctionality in its execute()
-method. For convenience it provides access to LIMS data via its
-lims attribute.  
+This is a parent class for classes generating npg_qc::autoqc::results::generic
+type objects. It does not provide any fuctionality either in its execute or
+run method.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 result
+=head2 sample_qc_out
 
-A lazy_built attribute, an instance of npg_qc::autoqc::results::generic
-class, corresponding to the same entity as this check object.
-Inherited from npg_qc::autoqc::checks::check .
+An output directory or a glob expression for directories
+for sample (plex) level result JSON files, an optional attribute.
 
 =cut
+
+has 'sample_qc_out' => (
+  isa      => 'Str',
+  is       => 'ro',
+  required => 0,
+);
+
+=head2 pp_name
+
+Name of the portable pipeline that produced input data for this
+check, required attribute.
+
+=cut
+
+has 'pp_name' => (
+  isa      => 'Str',
+  is       => 'ro',
+  required => 1,
+);
+
+=head2 pp_version
+
+Version of the portable pipeline that produced input data for
+this check, an optional attribute.
+
+=cut
+
+has 'pp_version' => (
+  isa      => 'Str',
+  is       => 'ro',
+  required => 0,
+);
+
+=head2 result
+
+This attribute is inherited from the parent and is changed to be
+an array of npg_qc::autoqc::results::* result objects. Different
+classes of result objects can be accommodated. By default the
+array is empty and cannot be set from the constructor.
+
+=cut
+
+has '+result' => (
+  isa       => 'ArrayRef[npg_qc::autoqc::results::base]',
+  init_arg  => undef,
+);
+sub _build_result {
+  return [];
+}
 
 =head2 lims
 
@@ -58,7 +105,7 @@ sub _build_lims {
 
 =head2 execute
 
-This method is a stab, it does not provide any functionality and
+This method is a stub, it does not provide any functionality and
 is retained for compatibility with the autoqc framework. It does
 not extend the parent's execute() method.
 
@@ -70,18 +117,13 @@ sub execute {
 
 =head2 run
 
-This method is a simple wrapper around a routine for serializing
-a single result object to JSON and saving the JSON string to a file
-system. The qc_out attribute of this object is used as a directory
-for creating a JSON file. An error might be raised if the qc_out
-attribute is not set by the caller. The method does not extent the
-parent's run() method.
+This method is a stub, it does not provide any functionality and
+is retained for compatibility with the autoqc framework. It does
+not extend the parent's run() method.
 
 =cut
 
 sub run {
-  my $self = shift;
-  $self->result->store($self->qc_out->[0]);
   return;
 }
 
@@ -159,6 +201,93 @@ sub file_name2result {
   my $c = npg_tracking::glossary::composition::factory::rpt_list
             ->new(rpt_list=>$rpt)->create_composition();
   return npg_qc::autoqc::results::generic->new(composition => $c);
+}
+
+=head2 set_common_result_attrs
+
+Sets the check name and version and pipeline name and version
+information of the result object.
+
+=cut
+
+sub set_common_result_attrs {
+  my ($self, $result, $version_extra) = @_;
+
+  $result->set_info('Check', ref $self);
+  $result->set_info('Check_version', $VERSION);
+  if ($result->class_name eq 'generic') {
+    my @versions = grep { defined and ($_ ne q[]) }
+                   ($self->pp_version, $version_extra);
+    $result->set_pp_info($self->pp_name, join q[ ], @versions);
+  }
+
+  return;
+}
+
+=head2 store_fanned_results
+
+This method serializes the objects in the result array attribute to JSON files.
+
+If the sample_qc_out attribute is not defined or the file glob resolves to
+no existing directories, and the qc_out attribute is set, all JSON files are
+saved to the directory given by the latter attribute.
+
+If the sample_qc_out defines a directory or a file glob that resolves to a
+single directory, all JSON files are saved to that directory.
+
+If the sample_qc_out attribute is a directory glob, which resolves to multiple
+directories an attempt is made to match the sample result objects with the
+the directories and to save result objects to their individual directories.
+
+An empty result array is not considered as an error.
+
+=cut
+
+sub store_fanned_results {
+  my $self = shift;
+
+  if (@{$self->result} == 0) {
+    # Not an error!
+    carp 'No results, nothing to store';
+    return;
+  }
+
+  my $qc_out;
+
+  if ($self->has_qc_out()) {
+    (@{$self->qc_out} == 1) or carp 'Multiple qc_out directories are given, ' .
+                                    'only the first one will be used';
+    $qc_out = $self->qc_out->[0];
+  }
+
+  if (not $self->sample_qc_out) {
+    $qc_out or croak 'Either qc_out  or sample_qc_out attribute should be set';
+    for my $r ( @{$self->result} ) {
+      $r->store($qc_out);
+    }
+  } else {
+    # Our fall-back position is either a single output of the glob or
+    # a pre-set qc_out attribute.
+    my @dirs = grep { -d } glob $self->sample_qc_out;
+    (@dirs or $qc_out) or croak 'No existing directory for output is found';
+    if (@dirs == 1) {
+      $qc_out = $dirs[0];
+    }
+
+    for my $r ( @{$self->result} ) {
+      my $tag_index = $r->composition->get_component(0)->tag_index;
+      my $sample_qc_out = $qc_out;
+      if (defined $tag_index and (@dirs > 1)) {
+        my @filtered = grep { /\/plex $tag_index\//xms } @dirs;
+        (@filtered > 1) and croak "Multiple directory matches for tag $tag_index";
+        (@filtered == 0) and croak "No directory match for tag $tag_index";
+        $sample_qc_out = $filtered[0];
+      }
+      $r->store($sample_qc_out);
+    }
+  }
+
+  return;
 }
 
 __PACKAGE__->meta->make_immutable();

@@ -25,13 +25,17 @@ Readonly::Scalar my $DISJUNCTION_OP => q[or];
 Readonly::Scalar my $ROBO_KEY         => q[robo_qc];
 Readonly::Scalar my $CRITERIA_KEY     => q[criteria];
 Readonly::Scalar my $QC_TYPE_KEY      => q[qc_type];
-Readonly::Scalar my $LIBRARY_TYPE_KEY => q[library_type];
-Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY => q[acceptance_criteria];
+Readonly::Scalar my $APPLICABILITY_CRITERIA_KEY => q[applicability_criteria];
+Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
 
 Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
 Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT, q[uqc]);
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
+
+Readonly::Scalar my $CLASS_NAME_SPEC_DELIM => q[:];
+Readonly::Scalar my $CLASS_NAME_SPEC_RE    =>
+  qr/\A(?:\W+)? (\w+) (?: $CLASS_NAME_SPEC_DELIM (\w+))?[.]/xms;
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -51,15 +55,38 @@ npg_qc::autoqc::checks::review
 This checks evaluates the results of other autoqc checks
 against a predefined set of criteria.
 
-If data product acceptance criteria for a project and the
-product's library type are defined, it is possible to introduce
-a degree of automation into the manual QC process. To provide
-interoperability with the API supporting the manual QC process,
-the outcome of the evaluation performed by this check is recorded
-not only as a simple pass or fail as in other autoqc checks, but
-also as one of valid manual or user QC outcomes.
+If data product acceptance criteria for a project are defined, it
+is possible to introduce a degree of automation into the manual
+QC process. To provide interoperability with the API supporting
+the manual QC process, the outcome of the evaluation, which is
+performed by this check, is recorded not only as a simple undefined,
+pass or fail as in other autoqc checks, but also as one of valid
+manual or user QC outcomes.
 
-A valid manual QC outcome is one of the values from the library
+=head2 Types of criteria
+
+The robo section of the product configuration file sits within
+the configuration for a particular study. Evaluation criteria for
+samples in the same study might vary depending on the sequencing
+instrument type, library type, sample type, etc. There might be a
+need to exclude some samples from RoboQC. The criteria key of the
+robo configuration points to an array of criteria objects each of
+which could contain two further keys, one for acceptance and one
+for applicability criteria. The acceptance criteria are evaluated
+if either the applicability criteria have been satisfied or no
+applicability criteria are defined.
+
+The applicability criteria for each criteria object should be
+set in such a way that the order of evaluation of the criteria
+array does not matter. If applicability criteria in all of the
+criteria objects fail are not satisfied, no QC outcome is assigned
+and the pass attribute of the review result object remains unset.
+The product cannot satisfy applicability criteria in more than one
+criteria object, this is considered an error.
+
+=head2 QC outcomes
+
+A valid Manual QC outcome is one of the values from the library
 qc outcomes dictionary (mqc_library_outcome_dict table of the
 npg_qc database), i.e. one of 'Accepted', 'Rejected' or 'Undecided'
 outcomes. If the final_qc_outcome flag of this class' instance is
@@ -68,36 +95,41 @@ marked as 'Preliminary' (examples: 'Accepted Final',
 'Rejected Preliminary'). By default the final_qc_outcome flag is
 false and the produced outcomes are preliminary.
 
-A valid user QC outcome is one of the values from the
+A valid User QC outcome is one of the values from the
 uqc_outcome_dict table of the npg_qc database. A concept of
 the finality and, hence, immutability of the outcome is not
 applicable to user QC outcome.
 
 The type of QC outcome can be configured within the Robo QC
 section of product configuration. The default type is library
-manual QC.
+Manual QC.
+
+=head2 Rules for assignment of the QC outcome
+
+The rules below apply to a single criteria object.
+
+The 'Accepted' outcome is assigned if the outcome of evaluation is
+true, the 'Rejected' outcome is assigned otherwise.
 
 =head2 Retrieval of autoqc results to be evaluated
 
-We will not try to second-guess here what is and what is not
-a product. Therefore, it is possible to invoke this check on
-any entity apart from, possibly, a run. At run time an attempt
-will be made to retrieve autoqc results due to be evaluated.
-If this attempt fails, the execute method of the check will
-exit with an error. A failure to retrieve the autoqc results
-might be for one of three reasons: (1) either the entity is not
-an end product (example: a pool) and no such results exist
-or (2) it is a product, but the autoqc results have not been
-computed yet, or (3) they have, but their file system location
-(if that's where we are looking) is different from expected
+It is possible to invoke this check on any entity. At run time an
+attempt is made to retrieve autoqc results for this entity (product),
+which are relevant to the RoboQC for this product. If this attempt
+fails, the execute method of the check will exit with an error. A
+failure to retrieve the autoqc results might be for one of three
+reasons: (1) either the entity is not an end product (example: a pool)
+and no such results exist or (2) it is a product, but the autoqc results
+have not been computed yet, or (3) they have, but their file system
+location (if that's where we are looking) is different from expected
 (ie given by the qc_in attribute).
 
-The results of other autoqc checks are loaded either from the file
-system (use_db attribute should be set to false, which is default)
-or from a database (use_db attribute should be set to true).
-npg_qc::autoqc::qc_store class is used to load results. In
-contrast to npg_qc::autoqc::qc_store, if the database retrieval
-is enabled, no fall back to a search on a file system is done.
+The autoqc results are retrieved either from the file system (use_db
+attribute should be set to false, which is default) or from a database
+(use_db attribute should be set to true). npg_qc::autoqc::qc_store class
+is used to retrieve results. In contrast to the default behaviour of the
+npg_qc::autoqc::qc_store class, if the database retrieval is enabled, no
+fall back to a search on a file system is performed.
 
 =head2 Record of the evaluation criteria
 
@@ -126,19 +158,13 @@ Examples:
   (a-1 > 0) && (b+3 > 5) && ((c-d > 0) || (c-d < -1))
   and evaluates to true.
 
-if both acceptance and rejection criteria have to be accomodated, this
-can be done in the following way (note the negation operator):
-
+  Negation operator example:
   {
     'and' => [
-      {'not' => {'or' => [$rejection_expr1, $rejection_expr2]}},
+      {'not' => {'or' => [$expr1, $expr2]}},
       {'and' => [$acceptance_expr1, $acceptance_expr2]}}
              ]
   }
-
-The outcome of the evaluation will be either true or false. The undecided
-outcome can be assigned if the overall expression evaluates to false and
-a full evaluation was performed (ie the acceptance branch was evaluated).
 
 Since both the conjunction and disjunction operators are idempotent in
 Boolean algebra, the order of expressions within the arrays does not
@@ -148,6 +174,10 @@ structures. To ensure that the criteria can be compared, the expressions
 in the arrays are ordered alphabetically. Therefore, the criteria record
 in the result object might vary slightly from the configuration file
 record.
+
+The current product configuration supports arrays of criteria where
+all criteria in the array are equally essential. Therefore, a conjunction
+(AND) operator is applied to a list of these criteria.
 
 =head1 SUBROUTINES/METHODS
 
@@ -186,36 +216,36 @@ npg_tracking::util::pipeline_config
 
 =head2 conf_file_path
 
-A method. Return the path of the product configuration file.
- Inherited from npg_tracking::util::pipeline_config
+A method. Returns the path of the product configuration file.
+Inherited from npg_tracking::util::pipeline_config
 
 =head2 can_run
 
-Returns true if the check can be run, ie relevant to the study
-and library type evaluation criteria are defined, false otherwise. 
+Returns true if the check can be run, meaning a robo configuration
+for this product exists.
 
 =cut
 
 sub can_run {
   my $self = shift;
-
-  if (not keys %{$self->_criteria}) {
-    $self->result->add_comment(
-      'No criteria defined in the product configuration file');
-    return 0;
-  }
-  return 1;
+  (keys %{$self->_robo_config()}) and return 1;
+  $self->result->add_comment(
+    'Product configuration for RoboQC is absent');
+  return 0;
 }
 
 =head2 execute
 
-Returns early if the can_run method returns false. Otherwise a full
-evaluation of autoqc results for this product is performed. If
-autoqc results that are necessary to perform the evaluation are not
-available or there is some other problem with evaluation, an error
-is raised if the final_qc_outcome flag is set to true. If this flag
-is false, the error is captured, logged as a comment and an undefined
-qc outcome is assigned. 
+Returns early without an error if the can_run method returns a false value.
+An assessment of applicability of running RoboQC on this entity is performed
+next, an early return is possible after that. If RoboQC is applicable, a full
+evaluation of autoqc results for this product is performed. If autoqc results
+that are necessary to perform the evaluation are not available or there is
+some other problem with evaluation, an error is raised if the final_qc_outcome
+flag is set to true, otherwise it is captured and and logged as a comment.
+
+No QC outcome is assigned if the evaluation has not had a chance to run to a
+successful completion.
 
 =cut
 
@@ -223,18 +253,25 @@ sub execute {
   my $self = shift;
 
   $self->can_run() or return;
+
+  if ( not keys %{$self->_criteria} ) {
+    $self->result->add_comment('RoboQC is not applicable');
+    return;
+  }
+
   $self->result->criteria($self->_criteria);
   my $md5 = $self->result->generate_checksum4data($self->result->criteria);
   $self->result->criteria_md5($md5);
+  my $err;
 
   try {
     $self->result->pass($self->evaluate);
   } catch {
-    my $err = 'Not able to run evaluation: ' . $_;
+    $err = 'Not able to run evaluation: ' . $_;
     $self->final_qc_outcome && croak $err;
     $self->result->add_comment($err);
   };
-  $self->result->qc_outcome(
+  not $err and $self->result->qc_outcome(
     $self->generate_qc_outcome($self->_outcome_type(), $md5));
 
   return;
@@ -242,21 +279,10 @@ sub execute {
 
 =head2 evaluate
 
-Main evaluation algorithm. Current implementation is very simple:
-all criteria found in the product configuration file are assumed
-to be equally essential. Therefore, a conjunction (AND) operator
-is applied to a list of this criteria.
-
-Private methods and attributes of this class and the result class
-implementation for this check are capable of supporting a more
-complex algorithm should this become necessary in future. 
-
-Returns 1 if all evaluated conditions were satisfied, otherise
-returns 0. Sets the evaluation_results attribute of the results
-object instance.
-
-In future we might have both acceptance and rejection criteria
-defined, adding an undefined value as a legitimate outcome.
+Method implementing the top level evaluation algorithm. Returns the outcome
+of the evaluation as 0 for a fail or 1 for a pass. Saves the outcomes of
+evaluation of individual expressions in the evaluation_results attribute of
+the result object.
 
 =cut
 
@@ -264,9 +290,7 @@ sub evaluate {
   my $self = shift;
 
   my $emap = $self->_evaluate_expressions_array($self->_expressions);
-  while (my ($e, $o) = each  %{$emap}) {
-    $self->result->evaluation_results()->{$e} = $o;
-  }
+  $self->result->evaluation_results($emap);
 
   return $self->_apply_operator([values %{$emap}], $CONJUNCTION_OP);
 }
@@ -309,9 +333,8 @@ sub generate_qc_outcome {
 
 =head2 lims
 
-st::api::lims object corresponding ti this object's rpt_list
-attribute; this accessor can only be used to set the otherwise
-private attribute. 
+st::api::lims object corresponding to this object's rpt_list
+attribute. 
 
 =cut
 
@@ -325,35 +348,115 @@ sub _build_lims {
   return st::api::lims->new(rpt_list => $self->rpt_list);
 }
 
+has '_entity_desc' => (
+  isa        => 'Str',
+  is         => 'ro',
+  lazy_build => 1,
+);
+sub _build__entity_desc {
+  my $self = shift;
+  return $self->composition->freeze();
+}
+
 has '_robo_config' => (
   isa        => 'HashRef',
   is         => 'ro',
   lazy_build => 1,
 );
-sub _build__robo_config{
+sub _build__robo_config {
   my $self = shift;
 
-  my $message;
   my $strict = 1; # Parse study section only, ignore the default section.
   my $config = $self->study_config($self->lims(), $strict);
-
-  if (keys %{$config}) {
+  if ($config and keys %{$config}) {
     $config = $config->{$ROBO_KEY};
-    $config or $message = "$ROBO_KEY section is not present";
-    if (not $message and
-        ((ref $config ne 'HASH') or not $config->{$CRITERIA_KEY})) {
-      $message = "$CRITERIA_KEY section is not present";
+    $config or carp
+      "$ROBO_KEY section is not present for " . $self->_entity_desc;
+    if ($config) {
+      (ref $config eq 'HASH') or croak
+        'Robo config should be a hash in a config for ' . $self->_entity_desc;
+      if (keys %{$config}) {
+        $self->_validate_criteria($config);
+      } else {
+        carp 'Robo section of the product config is empty for ' .
+          $self->_entity_desc;
+      }
     }
   } else {
-    $message = 'Study config not found';
+    carp 'Study config not found for ' . $self->_entity_desc;
   }
 
-  if ($message) {
-    carp $message . ' for ' .  $self->composition->freeze;
-    return {};
-  }
+  $config ||= {};
 
   return $config;
+}
+
+sub _validate_criteria {
+  my ($self, $config) = @_;
+
+  my $criteria_array = $config->{$CRITERIA_KEY};
+  defined $criteria_array or croak
+    "$CRITERIA_KEY section is not present in a robo config for " .
+    $self->_entity_desc;
+  (ref $criteria_array eq q[ARRAY]) or croak
+    'Criteria is not a list in a robo config for ' . $self->_entity_desc;
+
+  my $num_cobj = @{$criteria_array};
+  if ($num_cobj > 1) {
+    my $test = grep { $_->{$APPLICABILITY_CRITERIA_KEY} } @{$criteria_array};
+    ($test == $num_cobj) or croak 'Each criteria object should have the ' .
+      "$APPLICABILITY_CRITERIA_KEY key defined in a robo config for " .
+      $self->_entity_desc;
+  }
+
+  my $test = grep { $_->{$ACCEPTANCE_CRITERIA_KEY} } @{$criteria_array};
+  ($test == $num_cobj) or croak 'Each criteria object should have the ' .
+    "$ACCEPTANCE_CRITERIA_KEY key defined in a robo config for ".
+    $self->_entity_desc;
+
+  return;
+}
+
+sub _applicability_lims_all {
+  my ($self, $criteria_objs) = @_;
+
+  my @applicable = ();
+  foreach my $co ( @{$criteria_objs} ) {
+    my $lims_c = $co->{$APPLICABILITY_CRITERIA_KEY}->{lims};
+    if (!$lims_c || $self->_applicability_lims($lims_c)) {
+      push @applicable, $co;
+    }
+  }
+
+  return \@applicable;
+}
+
+sub _applicability_lims {
+  my ($self, $lcriteria) = @_;
+
+  $lcriteria or return 1;
+
+  (ref $lcriteria eq 'HASH') or croak q('lims' section should be a hash ) .
+    'in a robo config for ' . $self->_entity_desc;
+  my $lims_test = {};
+  foreach my $lims_prop ( keys %{$lcriteria} ) {
+    my $ref_test = ref $lcriteria->{$lims_prop};
+    not $ref_test or ($ref_test eq 'ARRAY') or croak
+      qq(Values for 'lims' property '$lims_prop' are neither a scalar nor ) .
+      'an array in a robo config for ' . $self->_entity_desc;
+    my @expected_values = $ref_test ? @{$lcriteria->{$lims_prop}} : ($lcriteria->{$lims_prop});
+    my $value = $self->lims->$lims_prop;
+    $value ||= q[];
+    #defined $value or croak
+    #  qq('$lims_prop' - cannot compare to an undefined value);
+    # comparing as strings in lower case
+    $value = lc q[] . $value;
+    $lims_test->{$lims_prop} = any { $value eq lc q[] . $_ }
+                               @expected_values;
+  }
+
+  # assuming 'AND' for lims properties
+  return all { $_ } values %{$lims_test};
 }
 
 has '_criteria' => (
@@ -364,57 +467,31 @@ has '_criteria' => (
 sub _build__criteria {
   my $self = shift;
 
-  my $rewritten = {};
-
-  (keys %{$self->_robo_config}) or return $rewritten;
-
+  # Save redundant library_type.
+  # TODO: Save details about applicability instead.
   my $lib_type = $self->lims->library_type;
-  $lib_type or croak 'Library type is not defined for ' .  $self->composition->freeze;
-  # We are going to compare library type strings in lower case
-  # because the case for this type of LIMs data might be inconsistent.
-  my $original_lib_type = $lib_type;
-  $lib_type = lc $lib_type;
-  # We will save the original library type.
-  $self->result->library_type($original_lib_type);
+  $lib_type or croak 'Library type is not defined for ' .  $self->_entity_desc;
+  $self->result->library_type($lib_type);
 
-  my @criteria  = ();
+  my $criteria_objs = $self->_robo_config->{$CRITERIA_KEY};
+  $criteria_objs = $self->_applicability_lims_all($criteria_objs);
+  # Criteria objects with no lims criteria defined should be returned
+  # in the above array. An empty array means that all objects had lims
+  # criteria and none of them was satisfied.
+  @{$criteria_objs} or return {};
+
+  (@{$criteria_objs} == 1) or carp 'Multiple criteria sets are satisfied ' .
+    'in a robo config for ' . $self->_entity_desc;
 
   #####
-  # We expect that the same criterium or a number of criteria can be
-  # relevant for multiple library types. Therefore, under the robo_qc
-  # criteria section we expect a list of lists of criteria, each lower-level list
-  # being assiciated with at least one and potentially more library types.
-  # In practice under this section we have a list of hashes, where each hash
-  # contains the 'library_type' key pointing to an array of relevant library
-  # types and the 'criteria' key pointing to an array or criteria. Criteria
-  # for a particular library type can be split between different hashes.
+  # A very simple criteria format - a list of strings - is used for now.
+  # Each string represents a math expression. It is assumed that the
+  # conjunction operator should be used to form the boolean expression
+  # that should give the result of the evaluation.
   #
-  foreach my $criteria_set (@{$self->_robo_config->{$CRITERIA_KEY}}) {
-    $criteria_set->{$LIBRARY_TYPE_KEY} or croak "$LIBRARY_TYPE_KEY key is missing";
-    $criteria_set->{$ACCEPTANCE_CRITERIA_KEY} or croak "$ACCEPTANCE_CRITERIA_KEY key is missing";
-    if (any {$_ eq $lib_type} map { lc } @{$criteria_set->{$LIBRARY_TYPE_KEY}}) {
-      #####
-      # A very simple criteria format - a list of strings - is used for now.
-      # Each string represents a math expression. It is assumed that the
-      # conjunction operator should be used to form the boolean expression
-      # that should give the result of the evaluation. Therefore, at the
-      # moment it is safe to collect all criteria in a single list.
-      # 
-      push @criteria, @{$criteria_set->{$ACCEPTANCE_CRITERIA_KEY}};
-    }
-  }
+  my @c = uniq sort @{$criteria_objs->[0]->{$ACCEPTANCE_CRITERIA_KEY}};
 
-  # Sort to ensure a consistent order of expressions in the array.
-  # Merge identical entries.
-  @criteria = uniq (sort @criteria);
-  # Applying the conjunction operator to all list members.
-  if (@criteria) {
-    $rewritten = {$CONJUNCTION_OP => \@criteria};
-  } else {
-    carp "No roboqc criteria defined for library type '$original_lib_type'";
-  }
-
-  return $rewritten;
+  return @c ? {$CONJUNCTION_OP => \@c} : {};
 }
 
 has '_expressions'  => (
@@ -436,9 +513,13 @@ has '_result_class_names'  => (
 );
 sub _build__result_class_names {
   my $self = shift;
+
+  # Using all criteria objects regardles of relevance to this entity.
   my @class_names = uniq sort
-                    map { _class_name_from_expression($_) }
-                    @{$self->_expressions()};
+                    map { (_class_name_from_expression($_))[0] }
+                    map { @{$_->{$ACCEPTANCE_CRITERIA_KEY}} }
+                    @{$self->_robo_config->{$CRITERIA_KEY}};
+
   return \@class_names;
 }
 
@@ -459,9 +540,9 @@ sub _build__qc_store {
 }
 
 #####
-# Two different approaches for loading results. We can try to perform
-# the evaluation expression after expression and load the necessary result
-# objects as we go. Or we can pre-load all results that will be needed.
+# Two possible approaches for loading results. We can try to perform
+# the evaluation step by step and load the necessary result objects
+# as we go. Or we can pre-load all results that will be needed.
 # We choose the latter and raise an error if any results are missing.
 # The error will report what is found and what is expected, so that
 # the user has the full picture at once.
@@ -482,21 +563,20 @@ sub _build__results {
   my @results = grep { $_->composition->digest eq $d } $collection->all;
 
   # We should have the right number of the right types of results.
-  my %h = map { $_ => 0 } @{$self->_result_class_names};
+  my %h = map { $_ => [] } @{$self->_result_class_names};
   foreach my $r (@results) {
     my  $class_name = $r->class_name;
     exists $h{$class_name} or croak "Loaded unwanted class $class_name";
-    ($h{$class_name} == 0) or croak "Multiple entries for class $class_name";
-    $h{$class_name} = $r;
+    push @{$h{$class_name}}, $r;
   }
 
-  my $num_found = scalar grep { $_ } values %h;
+  my $num_found = scalar grep { @{$_} } values %h;
   my $num_expected = scalar @{$self->_result_class_names};
   if ($num_expected != $num_found) {
     my $m = join q[, ], @{$self->_result_class_names};
     $m = "Expected results for $m, found ";
     $m .= $num_found
-          ? 'results for ' . join q[, ], grep { $h{$_} } sort keys %h
+          ? 'results for ' . join q[, ], grep { @{$h{$_}} } sort keys %h
           : 'none';
     croak $m;
   }
@@ -506,9 +586,9 @@ sub _build__results {
 
 sub _class_name_from_expression {
   my $e = shift;
-  my ($class_name) = $e =~ /\A(?:\W+)?(\w+)[.]/xms;
+  my ($class_name, $spec) = $e =~ $CLASS_NAME_SPEC_RE;
   $class_name or croak "Failed to infer class name from $e";
-  return $class_name;
+  return ($class_name, $spec);
 }
 
 #####
@@ -570,24 +650,44 @@ sub _apply_operator {
 
 #####
 # Evaluates a single expression in the context of available autoqc results.
-# Returns 0 or 1.
+# If runs successfully, returns 0 or 1, otherwise throws an error.
 #
 sub _evaluate_expression {
   my ($self, $e) = @_;
 
-  my $class_name = _class_name_from_expression($e);
-  my $obj = $self-> _results->{$class_name};
+  my ($class_name, $spec) = _class_name_from_expression($e);
+  my $obj_a = $self->_results->{$class_name};
   # We should not get this far with an error in the configuration
   # file, but just in case...
+  $obj_a and @{$obj_a} or croak "No autoqc result for evaluation of '$e'";
+
+  if ($spec) {
+    my $pp_name2spec = sub {    # To get a match with what would have been
+      my $pp_name = shift;      # used in the robo config, replace all
+      $pp_name =~ s/\W/_/gsmx;  # 'non-word' characters.
+      return $pp_name;
+    };
+    # Now have to choose one result. If the object is not an instance of
+    # the generic autoqc result class, there will be an error at this point.
+    # Making the code less specific is not worth the effort at this point.
+    my @on_spec = grep { $pp_name2spec->($_->pp_name) eq $spec } @{$obj_a};
+    @on_spec or croak "No autoqc $class_name result for $spec";
+    $obj_a = \@on_spec;
+  }
+
+  (@{$obj_a} == 1) or croak "Multiple autoqc results for evaluation of '$e'";
+  my $obj = $obj_a->[0];
+
   $obj or croak "No autoqc result for evaluation of '$e'";
 
-  ##no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
-  my $replacement = q[$result->];
-  ##use critic
+  # Prepare the expression from the robo config for evaluation.
+  my $placeholder = $class_name;
+  $spec and ($placeholder .= $CLASS_NAME_SPEC_DELIM . $spec);
+  my $replacement = q[$] . q[result->];
   my $perl_e = $e;
-  $perl_e =~ s/$class_name[.]/$replacement/xmsg;
+  $perl_e =~ s/$placeholder[.]/$replacement/xmsg;
 
-  my $evaluator = sub {
+  my $evaluator = sub { # Evaluation function
     my $result = shift;
     # Force an error when operations on undefined values are
     # are attempted.
@@ -602,6 +702,7 @@ sub _evaluate_expression {
     return $o ? 1 : 0;
   };
 
+  # Evaluate and return the outcome.
   return $evaluator->($obj);
 }
 
@@ -611,7 +712,8 @@ sub _outcome_type {
   my $outcome_type = $self->_robo_config()->{$QC_TYPE_KEY};
   if ($outcome_type) {
     if (none { $outcome_type eq $_ } @VALID_QC_TYPES) {
-      croak "Invalid QC type '$outcome_type' in product configuration";
+      croak "Invalid QC type '$outcome_type' in a robo config for " .
+            $self->_entity_desc;
     }
   } else {
     $outcome_type = $QC_TYPE_DEFAULT;

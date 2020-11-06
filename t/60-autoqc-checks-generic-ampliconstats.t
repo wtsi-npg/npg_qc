@@ -21,6 +21,7 @@ subtest 'object with basic constructor arguments' => sub {
             rpt_list    => '34719:1',
             input_files => [$file],
             qc_out      => $tdir,
+            pp_name     => 'ampliconstats',
             ampstats_section => [qw/FREADS/]);
   isa_ok ($g, 'npg_qc::autoqc::checks::generic::ampliconstats');
   is_deeply ($g->result, [], 'result attribute is built as an empty array');
@@ -67,6 +68,7 @@ subtest 'object with basic constructor arguments' => sub {
             rpt_list    => '34719:1',
             input_files => [$file],
             qc_out      => $tdir,
+            pp_name     => 'ampliconstats',
             ampstats_section => [qw/FREADS/]);
   lives_ok { $g->run() } 'no error running run() method';
   my @jsons = glob "$tdir/*.json";
@@ -90,6 +92,7 @@ subtest 'multiple sections' => sub {
     rpt_list    => '34719:1',
     input_files => [$file],
     qc_out      => $tdir,
+    pp_name     => 'ampliconstats',
     ampstats_section => \@sections);
   $g->execute();
   is (@{$g->result}, 258, '258 result objects created');
@@ -109,6 +112,7 @@ subtest 'no sections or invalid section name' => sub {
   my $g = npg_qc::autoqc::checks::generic::ampliconstats->new(
             rpt_list    => '34719:1',
             input_files => [$file],
+            pp_name     => 'ampliconstats',
             qc_out      => $tdir);
   $g->execute();
   is (@{$g->result}, 1, 'one result object created');
@@ -117,12 +121,14 @@ subtest 'no sections or invalid section name' => sub {
   lives_ok { npg_qc::autoqc::checks::generic::ampliconstats->new(
                rpt_list    => '34719:1',
                input_files => [$file],
+               pp_name     => 'ampliconstats',               
                qc_out      => $tdir)->run() } 'no error';
 
   $g = npg_qc::autoqc::checks::generic::ampliconstats->new(
             rpt_list    => '34719:1',
             input_files => [$file],
             qc_out      => $tdir,
+            pp_name     => 'ampliconstats',
             ampstats_section => [qw/ABCDF KLMNP/]);
   $g->execute();
   is (@{$g->result}, 1, 'one result object created');
@@ -132,6 +138,7 @@ subtest 'no sections or invalid section name' => sub {
                rpt_list    => '34719:1',
                input_files => [$file],
                qc_out      => $tdir,
+               pp_name     => 'ampliconstats',
                ampstats_section => [qw/ABCDF KLMNP/])->run() } 'no error'; 
 };
 
@@ -205,7 +212,7 @@ subtest 'object with pp_name and a directory for samples' => sub {
     'plex-level samtools stats result does not exist');
 };
 
-subtest 'object with pp name, version and a sample dir glob' => sub {
+subtest 'object with pp version and a sample dir glob' => sub {
   plan tests => 271;
 
   my $d3 = "$tdir/3";

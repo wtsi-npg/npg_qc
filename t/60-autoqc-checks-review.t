@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 11;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -32,7 +32,7 @@ my $criteria_list = [
 ];
 
 subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 24;
+  plan tests => 27;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -46,7 +46,7 @@ subtest 'construction object, deciding whether to run' => sub {
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no study config');
   is ($check->result->comments,
-    'No criteria defined in the product configuration file',
+    'Product configuration for RoboQC is absent',
     'reason logged');
   lives_ok { $check->execute() } 'cannot run, but execute method runs OK';
   is ($check->result->pass, undef,
@@ -63,32 +63,54 @@ subtest 'construction object, deciding whether to run' => sub {
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no robo config');
   is ($check->result->comments,
-    'No criteria defined in the product configuration file',
+    'Product configuration for RoboQC is absent',
     'reason logged');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/not_hash",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  throws_ok { $check->can_run }
+    qr/Robo config should be a hash/,
+    'error in can_run when robo config section is an array';
+  throws_ok { $check->execute }
+    qr/Robo config should be a hash/,
+    'error in execute when robo config section is an array';
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/no_criteria_section",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  warnings_like { $can_run = $check->can_run }
-    [qr/criteria section is not present for/],
-    'can_run is accompanied by warnings';
-  ok (!$can_run, 'can_run returns false - no criteria for this library type');
-  is ($check->result->comments,
-    'No criteria defined in the product configuration file',
-    'reason logged');
-
+  throws_ok { $check->can_run }
+    qr/criteria section is not present in/,
+    'error in can_run when the criteria section is missing';
+  throws_ok { $check->execute }
+    qr/criteria section is not present in/,
+    'error in execute when the criteria section is missing';
+ 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/no_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  warnings_like { $can_run = $check->can_run }
-    [qr/No roboqc criteria defined for library type 'RNA PolyA'/],
-    'can_run is accompanied by warnings';
-  ok (!$can_run, 'can_run returns false - no criteria for this library type');
-  is ($check->result->comments,
-    'No criteria defined in the product configuration file',
-    'reason logged');
+  throws_ok { $check->can_run }
+    qr/should have the acceptance_criteria key defined/,
+    'error in can_run when acceptance criteria not defined';
+  throws_ok { $check->execute }
+    qr/should have the acceptance_criteria key defined/,
+    'error in execute when acceptance criteria not defined';
+  
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/no_applicability_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  throws_ok { $check->can_run }
+    qr/should have the applicability_criteria key defined/,
+    'error in can_run when applicability criteria not defined ' .
+    'in one of multiple criterium objects';
+  throws_ok { $check->execute }
+    qr/should have the applicability_criteria key defined/,
+    'error in execute when applicability criteria not defined ' .
+    'in one of multiple criterium objects';
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/with_criteria",
@@ -96,7 +118,6 @@ subtest 'construction object, deciding whether to run' => sub {
     rpt_list  => '27483:1:2');
   ok ($check->can_run, 'can_run returns true');
   ok (!$check->result->comments, 'No comments logged');
-  is_deeply ($check->_criteria, {'and' => $criteria_list}, 'criteria parsed correctly');
 
   lives_ok {
     $check = npg_qc::autoqc::checks::review->new(
@@ -109,17 +130,60 @@ subtest 'construction object, deciding whether to run' => sub {
   ok ($check->can_run, 'can_run returns true');
 
   $check = npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/error1",
+    conf_path => "$test_data_dir/no_applicability4single",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  throws_ok { $check->can_run } qr/acceptance_criteria key is missing/,
-    'conf file format is incorrect';
+  ok ($check->can_run, 'can_run returns true');
+  ok (!$check->result->comments, 'No comments logged');
+
   $check = npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/error2",
+    conf_path => "$test_data_dir/with_na_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  throws_ok { $check->can_run } qr/library_type key is missing/,
-    'conf file format is incorrect'; 
+  ok ($check->can_run, 'can_run returns true');
+  ok (!$check->result->comments, 'No comments logged');
+};
+
+subtest 'caching appropriate criteria object' => sub {
+  plan tests => 3;
+  
+  my $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/with_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  my @list = grep { $_ !~ /genotype|freemix/} @{$criteria_list};
+  is_deeply ($check->_criteria, {'and' => \@list},
+    'criteria parsed correctly');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/no_applicability4single",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  is_deeply ($check->_criteria, {'and' => $criteria_list},
+    'criteria parsed correctly');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/with_na_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  is_deeply ($check->_criteria, {}, 'empty criteria hash')
+};
+
+subtest 'execute when no criteria apply' => sub {
+  plan tests => 5;
+
+  my $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/with_na_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  lives_ok { $check->execute }
+    'no error in execute when no criteria apply';
+  my $result = $check->result;
+  is ($result->comments, 'RoboQC is not applicable',
+    'correct comment logged');
+  is_deeply ($result->criteria, {}, 'empty criteria hash');
+  is_deeply ($result->qc_outcome, {}, 'empty qc_outcome hash');
+  is_deeply ($result->evaluation_results, {}, 'empty evaluation_results hash');
 };
 
 subtest 'setting options for qc store' => sub {
@@ -198,11 +262,11 @@ subtest 'finding result - file system' => sub {
              [sort qw/bam_flagstats bcfstats verify_bam_id/], 'correct keys');
   
   for my $name (keys %{$check->_results}) {
-    my $result = $check->_results->{$name};
+    my $result = $check->_results->{$name}->[0];
     is (ref $result, 'npg_qc::autoqc::results::'. $name, 'corrrect type of object hashed');
     is ($result->composition->get_component(0)->tag_index, 2, 'tag index correct');
   }
-  ok (!$check->_results->{bam_flagstats}->composition->get_component(0)->subset,
+  ok (!$check->_results->{bam_flagstats}->[0]->composition->get_component(0)->subset,
     'subset is undefined despite phix result present in test data');
 };
 
@@ -272,9 +336,9 @@ subtest 'finding results - database' => sub {
   is_deeply ([sort keys %{$check->_results}],
              [sort qw/bam_flagstats bcfstats verify_bam_id/], 'correct keys');
   for my $name (keys %{$check->_results}) {
-    my $result = $check->_results->{$name};
+    my $result = $check->_results->{$name}->[0];
     like (ref $result, qr/\Anpg_qc::Schema::Result/, 'DBIx object retrieved');
-    is ($check->_results->{$name}->class_name, $name, 'result type is correct');
+    is ($result->class_name, $name, 'result type is correct');
     is ($result->composition->get_component(0)->tag_index, 2, 'tag index correct');
   }
 };
@@ -365,7 +429,7 @@ subtest 'evaluation within the execute method' => sub {
     qc_in     => $dir,
     rpt_list  => $rpt_list);
   throws_ok { $check->execute }
-    qr/Invalid QC type \'someqc\' in product configuration/,
+    qr/Invalid QC type \'someqc\' in a robo config/,
     'error if qc outcome type is not recignised';
 
   my $target = "$dir/29524#2.bam_flagstats.json";
@@ -438,10 +502,214 @@ subtest 'error in evaluation' => sub {
   lives_ok { $check->execute }
     'preliminary outcome - capturing the error';
   is ($check->result->pass, undef, 'pass value undefined');
-  is ($check->result->qc_outcome->{'mqc_outcome'}, 'Undecided',
-    'correct outcome string');
+  is_deeply ($check->result->qc_outcome, {},
+    'QC outcome is not set');
   is ($check->result->criteria_md5, '27c522a795e99e3aea57162541de75b1',
     'criteria_md5 attribute of the result object is set');
+};
+
+subtest 'evaluating generic for artic results' => sub { 
+  plan tests => 62;
+
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
+    't/data/autoqc/generic/artic/samplesheet_35177.csv';
+  my $gdir = join q[/], $test_data_dir, 'generic';
+  my $rs_criterium2 = "generic:ncov2019_artic_nf.doc->{meta}->{'num_input_reads'} and (generic:ncov2019_artic_nf.doc->{'QC summary'}->{qc_pass} eq 'TRUE')";
+  my $rs_criterium1 = "(generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'} < 100) or ((generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'} <= 1000) and (generic:ncov2019_artic_nf.doc->{'QC summary'}->{num_aligned_reads} > 100 * generic:ncov2019_artic_nf.doc->{meta}->{'max_negative_control_filtered_read_count'}))";
+
+  # qc_in does not contain any autoqc results
+  # real sample
+  my $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => $gdir,
+    rpt_list         => '35177:2:1');
+  is ($check->can_run, 1, 'check can run');
+  lives_ok { $check->execute }
+    'no autoqc results retrieved (none available) - normal exit';
+  my $result = $check->result;
+  isa_ok ($result, 'npg_qc::autoqc::results::review');
+  like ($result->comments,
+    qr/Not able to run evaluation: Expected results for generic, found none/,
+    'error captured');
+  is ($result->pass, undef, 'pass attribute is not set');
+  is_deeply ($result->evaluation_results, {},
+    'evauation results are an empty hash');
+  is_deeply ($result->qc_outcome, {}, 'qc outcome is an empty hash');
+  is_deeply ($result->criteria, {'and' => [$rs_criterium1,$rs_criterium2]},
+    'criteria are set');
+
+  # qc_in contains a generic result for the ampliconstats pipeline
+  # real sample
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex206",
+    rpt_list         => '35177:2:206',
+    final_qc_outcome => 1);
+  is ($check->can_run, 1, 'check can run');
+  throws_ok { $check->execute }
+    qr/Not able to run evaluation: No autoqc generic result for ncov2019_artic_nf/,
+    'message as an error';
+
+  # qc_in contains two artic generic results for the same product
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex1",
+    rpt_list         => '35177:2:2',
+    final_qc_outcome => 1);
+  is ($check->can_run, 1, 'check can run');
+  throws_ok { $check->execute }
+    qr/Not able to run evaluation: Multiple autoqc results/,
+    'message as an error';
+
+  # qc_in contains other autoqc results for this entity, including
+  # generic for ampliconstats
+  # real sample
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex1",
+    rpt_list         => '35177:2:1');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  isa_ok ($result, 'npg_qc::autoqc::results::review');
+  is ($result->comments, undef, 'No comments');
+  is ($result->pass, 1, 'pass attribute is set to 1');
+  is_deeply ($result->evaluation_results,
+    {$rs_criterium1 => 1, $rs_criterium2 => 1},
+    'correct evauation results');
+  is_deeply ($result->criteria, {'and' => [$rs_criterium1,$rs_criterium2]},
+    'criteria are set');
+  is ($result->criteria_md5, 'e83710ef788ab5e849c5be46d50f1254',
+    'criteria md5 is set');
+  my $outcome = $result->qc_outcome;
+  is ($outcome->{username}, 'robo_qc', 'username is set in outcome');
+  is ($outcome->{'mqc_outcome'} , 'Accepted preliminary',
+    'correct outcome string');
+
+  # zero number of input reads, no artic summary
+  # real sample
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex4",
+    rpt_list         => '35177:2:4');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  is ($result->comments, undef, 'No comments');
+  is ($result->pass, 0, 'pass attribute is set to 0');
+  is_deeply ($result->evaluation_results,
+    {$rs_criterium1 => 1, $rs_criterium2 => 0},
+    'correct evauation results');
+  is ($result->qc_outcome->{'mqc_outcome'} , 'Rejected preliminary',
+    'correct outcome string');
+
+  # artic fail, generic ampliconstats is present
+  # real sample
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex97",
+    rpt_list         => '35177:2:97');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  is ($result->comments, undef, 'No comments');
+  is ($result->pass, 0, 'pass attribute is set to 0');
+  is_deeply ($result->evaluation_results,
+    {$rs_criterium1 => 1, $rs_criterium2 => 0},
+    'correct evauation results');
+  is ($result->qc_outcome->{'mqc_outcome'} , 'Rejected preliminary',
+    'correct outcome string');
+
+  # non-zero number of input reads, no artic summary
+  # real sample
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex205",
+    rpt_list         => '35177:2:205');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  like ($result->comments,
+    qr/Error evaluating expression .+ Use of uninitialized value/,
+    'evaluation error logged');
+  is ($result->pass, undef, 'pass attribute is not set');
+  is_deeply ($result->evaluation_results, {}, 'no evauation results');
+  is_deeply ($result->qc_outcome, {}, 'no qc outcome');
+  
+  # artic pass
+  # positive control
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex159",
+    rpt_list         => '35177:2:159');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  is ($result->comments, undef, 'No comments');
+  is ($result->pass, 1, 'pass attribute is set to 1');
+  is_deeply ($result->evaluation_results,
+    {$rs_criterium1 => 1, $rs_criterium2 => 1},
+    'correct evauation results');
+  is ($result->qc_outcome->{'mqc_outcome'} , 'Accepted preliminary',
+    'correct outcome string');
+
+  my $nc_criterium = "( generic:ncov2019_artic_nf.doc->{meta}->{'num_input_reads'} == 0) or (generic:ncov2019_artic_nf.doc->{'QC summary'}->{num_aligned_reads} < 100)";
+  # artic "num_aligned_reads":"33"
+  # negative control
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex137",
+    rpt_list         => '35177:2:137');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  is ($result->comments, undef, 'No comments');
+  is ($result->pass, 1, 'pass attribute is set to 1');
+  is_deeply ($result->criteria, {'and' => [$nc_criterium]},
+    'criteria recorded correctly');
+  is_deeply ($result->evaluation_results, {$nc_criterium => 1},
+    'correct evauation results');
+  is ($result->qc_outcome->{'mqc_outcome'} , 'Accepted preliminary',
+    'correct outcome string');
+
+  # artic "num_aligned_reads":"108"
+  # negative control
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex140",
+    rpt_list         => '35177:2:140');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  is ($result->comments, undef, 'No comments');
+  is ($result->pass, 0, 'pass attribute is set to 0');
+  is_deeply ($result->evaluation_results, {$nc_criterium => 0},
+    'correct evauation results');
+  is ($result->qc_outcome->{'mqc_outcome'} , 'Rejected preliminary',
+    'correct outcome string');
+ 
+  # no artic summary, "num_input_reads":"0"
+  # negative control
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex157",
+    rpt_list         => '35177:2:157');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  is ($result->comments, undef, 'No comments');
+  is ($result->pass, 1, 'pass attribute is set to 1');
+  is_deeply ($result->evaluation_results, {$nc_criterium => 1},
+    'correct evauation results');
+  is ($result->qc_outcome->{'mqc_outcome'} , 'Accepted preliminary',
+    'correct outcome string');
+
+  # no artic summary, "num_input_reads":"154"
+  # negative control
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path        => $gdir,
+    qc_in            => "$gdir/plex160",
+    rpt_list         => '35177:2:160');
+  lives_ok { $check->execute } 'normal exit';
+  $result = $check->result;
+  like ($result->comments,
+    qr/Error evaluating expression .+ Use of uninitialized value/,
+    'evaluation error logged');
+  is ($result->pass, undef, 'pass attribute is not set');
+  is_deeply ($result->evaluation_results, {}, 'no evauation results');
+  is_deeply ($result->qc_outcome, {}, 'no qc outcome');
 };
 
 1;
