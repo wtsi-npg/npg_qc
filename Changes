@@ -4,6 +4,8 @@ release 69.0
  - npg_qc::autoqc::checks::generic::artic - a proper autoqc check class,
    which repleces bin/npg_autoqc_generic4artic script
  - make pp_name attribute required for the generic check object
+ - custom scripts for robo qc and autoqc for outputs of the artic pipeline
+   (npg_autoqc_generic4artic and npg_simple_robo4artic) are removed
  - npg_qc::autoqc::checks::review
    - breaking change of the RoboQC section of the product configuration file
    - introduction of the applicability criteria to allow for conditions that
