@@ -1,6 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-release 69.0
+release 69.0.0
  - npg_qc::autoqc::checks::generic::artic - a proper autoqc check class,
    which repleces bin/npg_autoqc_generic4artic script
  - make pp_name attribute required for the generic check object
