@@ -1,10 +1,11 @@
 use strict;
 use warnings;
-use File::Temp qw/tempdir/;
+use File::Temp qw(tempdir);
 use Test::More tests => 6;
 use Test::Exception;
 use Test::Warn;
 use File::Path qw(make_path remove_tree);
+use File::Copy::Recursive qw(dircopy);
 
 use st::api::lims;
 
@@ -179,7 +180,7 @@ subtest 'different types of input' => sub {
 };
 
 subtest 'result objects - data capture' => sub {
-  plan tests => 56;
+  plan tests => 62;
 
   my $g = npg_qc::autoqc::checks::generic::artic->new(
             rpt_list         => '35177:2',
@@ -263,7 +264,37 @@ subtest 'result objects - data capture' => sub {
     qc_pass => 'FALSE'
   };
   is_deeply ($results{97}->doc->{q[QC summary]}, $expected_summary,
-    'QC summary for tag 97 is captured correctly'); 
+    'QC summary for tag 97 is captured correctly');
+
+  dircopy('t/data/autoqc/generic/artic/lane2', "$tdir/lane2") or die
+    'Failed to copy';
+  my $empty = "$tdir/lane2/plex1/35177.qc.csv";
+  unlink $empty or die "Failed to remove $empty";
+  ok (!-e $empty, 'removed file');
+  `touch $empty`;
+  ok (-e $empty, 'empty file exists');
+  $g = npg_qc::autoqc::checks::generic::artic->new(
+            rpt_list         => '35177:2',
+            input_files_glob => "$tdir/lane2/plex*/*.qc.csv",
+            pp_name          => 'artic',
+            pp_version       => '0.10.0',
+            tm_json_file     => $tm_file);
+  # Artic QC summary is not available for plexes 3 and 206, empty for plex 1
+  # Tag metrics file contains data about 13 samples.
+  warning_like { $g->execute }
+    qr/11 files were found using glob/,
+    'warning about the number of files found';
+  %results = map {
+    $_->composition->get_component(0)->tag_index => $_
+                    } @{$g->result};
+  @all_tags = sort {$a <=> $b} keys %results;
+ 
+  is_deeply ([(sort {$a <=> $b} keys %{$g->_reads_count})], \@all_tags,
+    'tag indexes of result objects match those from the tag metrix file');
+
+  ok ($results{1}, 'result for tag index 1 is present');
+  ok (!exists $results{1}->doc()->{q[QC summary]},
+    "tag 1: artic qc summary is not set");
 };
 
 subtest 'saving JSON files' => sub {  
