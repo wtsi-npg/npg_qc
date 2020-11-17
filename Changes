@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - npg_qc::autoqc::checks::generic::artic - bug fix in a parser for
+   artic QC summary for cases when the summary is empty
+
 release 69.0.0
  - npg_qc::autoqc::checks::generic::artic - a proper autoqc check class,
    which repleces bin/npg_autoqc_generic4artic script
