@@ -153,7 +153,9 @@ has '+result' => (
 sub _build_result {
   my $self = shift;
 
-  my @results = map { $self->_summary2result_obj($_) } @{$self->input_files};
+  my @results = grep { $_ }
+                map { $self->_summary2result_obj($_) }
+                @{$self->input_files};
   $self->_add_missing_results(\@results);
   @results = sort { $a->composition->get_component(0)->tag_index <=>
                     $b->composition->get_component(0)->tag_index } @results;
@@ -288,6 +290,7 @@ sub _summary2result_obj {
   open my $fh, q[<], $file;
   my $csv = Text::CSV->new();
   my $line = $csv->getline($fh);
+  $line or return; # empty file
   $csv->column_names($line);
   $line = $csv->getline_hr($fh);
   close $fh;
