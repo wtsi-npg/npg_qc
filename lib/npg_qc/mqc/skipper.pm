@@ -7,7 +7,6 @@ use Readonly;
 use Try::Tiny;
 use List::MoreUtils qw/uniq/;
 
-use npg_tracking::illumina::runfolder;
 use WTSI::DNAP::Warehouse::Schema::Query::IseqFlowcell;
 use npg_qc::autoqc::qc_store::query;
 use npg_qc::autoqc::qc_store;
@@ -83,22 +82,23 @@ sub save_review_results {
   my @ids = ();
   foreach my $id_run (@id_runs) {
     my $num_loaded = 0;
-    try {
-      my $ap = npg_tracking::illumina::runfolder->new(
-        id_run              => $id_run,
-        npg_tracking_schema => $self->npg_tracking_schema
-      )->archive_path;
-      my $loader = npg_qc::autoqc::db_loader->new(
-        schema       => $self->qc_schema,
-        check        => [$CHECK_NAME],
-        id_run       => $id_run,
-        archive_path => $ap,
-	verbose      => 0
-      );
-      $num_loaded = $loader->load();
-    } catch {
-      $self->logger->error($_);
-    };
+    my $paths = $self->_review_json_path->{$id_run};
+    if ($paths and @{$paths}) {
+      try {
+        $num_loaded = npg_qc::autoqc::db_loader->new(
+          schema       => $self->qc_schema,
+          check        => [$CHECK_NAME],
+          id_run       => $id_run,
+          json_file    => $paths,
+	  verbose      => 0
+        )->load();
+      } catch {
+        $self->logger->error($_);
+      };
+    } else {
+      $self->logger->error(
+        "List of paths for run $id_run is missing");
+    }
     $num_loaded and push @ids, $id_run;
   }
 
@@ -166,6 +166,13 @@ sub _build__sample_info {
   return $info;
 }
 
+has '_review_json_path' => (
+  isa        => 'HashRef',
+  is         => 'ro',
+  required   => 0,
+  default    => sub { return {} },
+);
+
 sub _can_skip_mqc4run {
   my ($self, $id_run) = @_;
 
@@ -196,7 +203,9 @@ sub _can_skip_mqc4run {
 
   my @controls     = ();
   my $real_samples = {};
-  foreach my $r ($collection->all) {
+  my @results      = $collection->all;
+
+  foreach my $r (@results) {
     # We need outcomes to be defined
     ($r->qc_outcome and $r->qc_outcome->{mqc_outcome}) or return;
     my $d = $r->composition->digest;
@@ -239,6 +248,7 @@ sub _can_skip_mqc4run {
     ( ($num_failed/$num_total) * $HUNDRED <= $self->qc_fails_threshold ) or return;
   }
 
+  $self->_review_json_path->{$id_run} = [map { $_->result_file_path } @results];
   return 1; # Got to the end - fine to fast-track.
 }
 
@@ -322,8 +332,6 @@ the pool.
 =item Try::Tiny
 
 =item List::MoreUtils
-
-=item npg_tracking::illumina::runfolder
 
 =item WTSI::DNAP::Warehouse::Schema::Query::IseqFlowcell
 

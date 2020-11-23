@@ -270,6 +270,7 @@ t/60-autoqc-results-tag_metrics.t
 t/60-autoqc-results-verify_bam_id.t
 t/70-mqc-reporter.t
 t/70-mqc-outcomes.t
+t/70-mqc-skipper.t
 t/70-report-genotype_call.t
 t/80-autoqc-qc-script.t
 t/data/autoqc/bam_flagstats/16960_1_0.tar.gz
