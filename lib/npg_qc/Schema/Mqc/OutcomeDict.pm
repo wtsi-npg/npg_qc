@@ -17,6 +17,11 @@ sub is_final_outcome_description {
   return $desc =~ /$FINAL\Z/smx; #The short description includes the word final.
 }
 
+sub is_rejected_outcome_description {
+  my ($self, $desc) = @_;
+  return $desc =~ /\A$REJECTED/smx;
+}
+
 sub is_final_outcome {
   my $self = shift;
   return $self->is_final_outcome_description($self->short_desc);
@@ -29,7 +34,7 @@ sub is_accepted {
 
 sub is_rejected {
   my $self = shift;
-  return $self->short_desc =~ /\A $REJECTED/smx; #The short description includes the word rejected.
+  return $self->is_rejected_outcome_description($self->short_desc);
 }
 
 sub is_final_accepted {
@@ -113,6 +118,15 @@ __END__
 
   __PACKAGE__->is_final_outcome_description('Accepted final'); # returns true
   $row->is_final_outcome_description('Accepted preliminary'); # returns false
+
+=head2 is_rejected_outcome_description
+  
+  Argument - short qc outcome description.
+  Returns true if the argument describes a rejected outcome, false otherwise.
+  Can be used as both class and instance method.
+
+  __PACKAGE__->is_rejected_outcome_description('Rejected final'); # returns true
+  $row->is_rejected_outcome_description('Accepted preliminary'); # returns false
 
 =head2 is_final_outcome
 

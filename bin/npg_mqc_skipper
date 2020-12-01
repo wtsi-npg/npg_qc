@@ -10,7 +10,7 @@ use Log::Log4perl qw(:levels);
 use DBI;
 use Readonly;
 use Try::Tiny;
-use Carp;
+use Class::Load qw(load_class);
 
 use npg_tracking::Schema;
 use WTSI::DNAP::Warehouse::Schema;
@@ -23,12 +23,17 @@ Readonly::Scalar my $RUN_STATUS_FROM      => 'qc review pending';
 Readonly::Scalar my $RUN_STATUS_TO        => 'archival pending';
 Readonly::Scalar my $INSTRUMENT_MODEL     => 'NovaSeq';
 Readonly::Scalar my $DEPLEXING_PERCENT_THRESHOLD => 93;
+Readonly::Scalar my $QC_FAILS_PERCENT_THRESHOLD  => 10;
 
 my $dry_run = 1;
 my $study_name;
+my $deplexing_threshold = $DEPLEXING_PERCENT_THRESHOLD;
+my $qc_fails_threshold  = $QC_FAILS_PERCENT_THRESHOLD;
 
 GetOptions('dry_run|dry-run!' => \$dry_run,
            'study_name=s'     => \$study_name,
+           'deplexing_percent_threshold=i' => \$deplexing_threshold,
+           'qc_fails_percent_threshold=i'  => \$qc_fails_threshold,
            'help'             => sub {
              pod2usage(-verbose => 2,
                        -exitval => 0)
@@ -44,6 +49,10 @@ my $logger = Log::Log4perl->get_logger();
 if (not $study_name) {
   $logger->fatal('Study name should be given, use --study_name option');
   exit 1;
+} else {
+  $logger->info("Study name: $study_name");
+  $logger->info("Deplexing percent threshold: $deplexing_threshold");
+  $dry_run and $logger->info('DRY RUN');
 }
 
 my $tracking_schema = npg_tracking::Schema->connect();
@@ -75,7 +84,8 @@ my $get_run_ids = sub {
 my @run_ids = map { $_->id_run } @rows;
 my $placeholders = $run_list->(@run_ids);
 
-my $dbh = WTSI::DNAP::Warehouse::Schema->connect->storage->dbh;
+my $mlwh_schema = WTSI::DNAP::Warehouse::Schema->connect();
+my $dbh = $mlwh_schema->storage->dbh;
 my $query =
    q[select p.id_run, count(distinct s.id_study_lims) as study_count ] .
    q[from iseq_product_metrics p ] .
@@ -83,7 +93,8 @@ my $query =
    q[join study s on s.id_study_tmp=f.id_study_tmp ] .
   qq[where s.name != ? and p.id_run in (${placeholders}) ] .
    q[group by p.id_run having study_count = ?];
-my $sth = $dbh->prepare($query) or croak "Failed to prepare statement: $DBI::errstr";
+my $sth = $dbh->prepare($query) or
+  ($logger->fatal("Failed to prepare statement: $DBI::errstr") and exit 1);
 # Run time database errors are thrown by the execute method, no need to
 # do anything special.
 $sth->execute($EXCLUDE_STUDY_NAME, @run_ids, $NUM_DISTINCT_STUDIES);
@@ -96,7 +107,8 @@ if (@run_ids) {
      q[on p.id_iseq_flowcell_tmp=f.id_iseq_flowcell_tmp ] .
      q[join study s on s.id_study_tmp=f.id_study_tmp ] .
     qq[where s.name = ? and p.id_run in (${placeholders})];
-  $sth = $dbh->prepare($query) or croak "Failed to prepare statement: $DBI::errstr";
+  $sth = $dbh->prepare($query) or
+    ($logger->fatal("Failed to prepare statement: $DBI::errstr") and exit 1);
   $sth->execute($study_name, @run_ids);
   @run_ids = $get_run_ids->($sth);
 }
@@ -106,14 +118,37 @@ if (@run_ids) {
   $query =  q[select distinct(id_run) from iseq_run_lane_metrics ] .
             q[where (tags_decode_percent is null or tags_decode_percent < ?) ] .
            qq[and id_run in (${placeholders})];
-  $sth = $dbh->prepare($query) or croak "Failed to prepare statement: $DBI::errstr";
-  $sth->execute($DEPLEXING_PERCENT_THRESHOLD, @run_ids);
+  $sth = $dbh->prepare($query) or
+    ($logger->fatal("Failed to prepare statement: $DBI::errstr") and exit 1);
+  $sth->execute($deplexing_threshold, @run_ids);
   my $temp = {};
   while (my @data = $sth->fetchrow_array()) {
      $temp->{$data[0]} = 1;
   }
   if (keys %{$temp}) {
     @run_ids = grep { not $temp->{$_} } @run_ids;
+  }
+}
+
+if (@run_ids and ($study_name =~ /Heron/xms)) {
+  $logger->info("QC fails percent threshold: $qc_fails_threshold");
+  $logger->info('Candidate runs: ' . join q[, ], @run_ids);
+  load_class 'npg_qc::mqc::skipper';
+  load_class 'npg_qc::Schema';
+  my $skipper = npg_qc::mqc::skipper->new(
+          npg_tracking_schema    => $tracking_schema,
+          mlwh_schema            => $mlwh_schema,
+          qc_schema              => npg_qc::Schema->connect(),
+          qc_fails_threshold     => $qc_fails_threshold,
+          id_runs                => \@run_ids,
+          logger                 => $logger);
+  @run_ids = $skipper->select_runs();
+  $logger->info('Candidate runs that satisfy QC criteria: ' . join q[, ], @run_ids);
+  if (!$dry_run && @run_ids) {
+    @run_ids = $skipper->save_review_results(@run_ids);
+  }
+  if (!$dry_run && @run_ids) {
+    @run_ids = $skipper->set_final_seq_outcomes(@run_ids);
   }
 }
 
@@ -201,12 +236,19 @@ npg_mqc_skipper
 
 =item  --dry_run or --dry-run and --no-dry_run and --no-dry-run
 
+=item  --deplexing_percent_threshold 
+
+=item  --qc_fails_percent_threshold
+
+=item  --help
+
 =back
 
 =head1 EXIT STATUS
 
-0 if all runs were processed succesfully, 1 if there are problems while Updating
-any record and the transaction fails to rollback
+0 if all runs were processed succesfully, 1 if there are problems
+getting an initial list of runs or while updating any record and the
+transaction fails to rollback.
 
 =head1 CONFIGURATION
 
@@ -226,6 +268,14 @@ In non-dry run mode the status of this runs is changed to
 'archival pending', ie the manual QC stage of the run life cycle
 is skipped.
 
+Additionally, for studies containing string 'Heron', before the run
+status is changed, an assessment of automatic Robo QC results is
+performed to decide whether the run can be expedited to archival. If
+a run can be moved to archival, preliminary autoqc review results are
+saved to a database, which saves preliminary QC outcomes to the
+database. Following this, sequencing and library QC outcomes are
+finalised for all lanes of this run.  
+
 =head1 SUBROUTINES/METHODS
 
 =head1 DIAGNOSTICS
@@ -244,8 +294,6 @@ is skipped.
 
 =item FindBin
 
-=item Carp
-
 =item Log::Log4perl
 
 =item Getopt::Long
@@ -257,6 +305,8 @@ is skipped.
 =item Readonly
 
 =item Try::Tiny
+
+=item Class::Load
 
 =item npg_tracking::Schema
 
@@ -274,7 +324,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 Genome Research Limited
+Copyright (C) 2019,2020 Genome Research Ltd.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
