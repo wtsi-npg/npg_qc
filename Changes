@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 69.1.0
+ - an extension for the npg_mqc_skipper script to make it work for the
+   Heron study, ie to take into consideration provisional manual QC
+   outcomes from the review autoqc resuls and finalise QC outcomes
+   for sequencing and libraries for runs that are expedited to archival
+
 release 69.0.1
  - npg_qc::autoqc::checks::generic::artic - bug fix in a parser for
    artic QC summary for cases when the summary is empty
