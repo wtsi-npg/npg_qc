@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - the script for expediating runs to archival is changed to always take
+   into account the outcome of Robo QC assessment
+
 release 69.1.0
  - an extension for the npg_mqc_skipper script to make it work for the
    Heron study, ie to take into consideration provisional manual QC

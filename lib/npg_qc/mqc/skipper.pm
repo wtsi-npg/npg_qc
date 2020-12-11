@@ -220,7 +220,7 @@ sub _can_skip_mqc4run {
     }
   }
 
-  (@controls and keys %{$real_samples}) or return;
+  (keys %{$real_samples}) or return;
 
   my $has_failed = sub {
     my $r = shift;
