@@ -148,16 +148,38 @@ has '_sample_info' => (
 sub _build__sample_info {
   my $self = shift;
 
-  my $entity_type = $WTSI::DNAP::Warehouse::Schema::Query::IseqFlowcell::INDEXED_LIBRARY;
-  my $rs = $self->mlwh_schema->resultset('IseqProductMetric')
-   ->search( {'me.id_run' => $self->id_runs,
-              'iseq_flowcell.entity_type' => $entity_type},
-             {join => [{'iseq_flowcell' => 'sample'}]} );
+  # The query should work for both merged and unmerged data. To restrict
+  # the number of rows that the query brings to actual products for
+  # which the review results are retrieved, we exploit the fact that all
+  # all components of a merged product belong to the same sample. We
+  # choose one component per product. We also screen for defined number
+  # of reads, which is something final products have since we perform
+  # autoqc checks on them.
+  my $entity_type =
+    $WTSI::DNAP::Warehouse::Schema::Query::IseqFlowcell::INDEXED_LIBRARY;
+  my $relations =
+    [ 'iseq_product',
+     {'iseq_product_component' => {'iseq_flowcell' => ['sample']}}];
+  my $rs = $self->mlwh_schema->resultset('IseqProductComponent')->search(
+    {
+      'me.component_index'               => 1,
+      'iseq_product.num_reads'           => {q[!=] => undef},
+      'iseq_product_component.id_run'    => $self->id_runs,
+      'iseq_product_component.tag_index' => {q[!=] => 0},
+      'iseq_flowcell.entity_type'        => $entity_type
+    },
+    {
+      join     => $relations,
+      prefetch => $relations
+    }
+  );
   my $info = {};
   while (my $row = $rs->next) {
-    my $sample_type = $row->iseq_flowcell->sample->control_type;
+    my $sample_type = $row->iseq_product_component
+                          ->iseq_flowcell->sample->control_type;
     $sample_type ||= q[];
-    $info->{$row->id_run}->{$row->id_iseq_product} =
+    $info->{$row->iseq_product_component->id_run}
+         ->{$row->iseq_product->id_iseq_product} =
       {sample_type => $sample_type,
        position    => $row->position,
        tag_index   => $row->tag_index};
@@ -220,7 +242,7 @@ sub _can_skip_mqc4run {
     }
   }
 
-  (@controls and keys %{$real_samples}) or return;
+  (keys %{$real_samples}) or return;
 
   my $has_failed = sub {
     my $r = shift;

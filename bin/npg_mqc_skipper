@@ -10,10 +10,11 @@ use Log::Log4perl qw(:levels);
 use DBI;
 use Readonly;
 use Try::Tiny;
-use Class::Load qw(load_class);
 
 use npg_tracking::Schema;
 use WTSI::DNAP::Warehouse::Schema;
+use npg_qc::Schema;
+use npg_qc::mqc::skipper;
 
 our $VERSION = '0';
 
@@ -52,6 +53,7 @@ if (not $study_name) {
 } else {
   $logger->info("Study name: $study_name");
   $logger->info("Deplexing percent threshold: $deplexing_threshold");
+  $logger->info("QC fails percent threshold: $qc_fails_threshold");
   $dry_run and $logger->info('DRY RUN');
 }
 
@@ -130,28 +132,7 @@ if (@run_ids) {
   }
 }
 
-if (@run_ids and ($study_name =~ /Heron/xms)) {
-  $logger->info("QC fails percent threshold: $qc_fails_threshold");
-  $logger->info('Candidate runs: ' . join q[, ], @run_ids);
-  load_class 'npg_qc::mqc::skipper';
-  load_class 'npg_qc::Schema';
-  my $skipper = npg_qc::mqc::skipper->new(
-          npg_tracking_schema    => $tracking_schema,
-          mlwh_schema            => $mlwh_schema,
-          qc_schema              => npg_qc::Schema->connect(),
-          qc_fails_threshold     => $qc_fails_threshold,
-          id_runs                => \@run_ids,
-          logger                 => $logger);
-  @run_ids = $skipper->select_runs();
-  $logger->info('Candidate runs that satisfy QC criteria: ' . join q[, ], @run_ids);
-  if (!$dry_run && @run_ids) {
-    @run_ids = $skipper->save_review_results(@run_ids);
-  }
-  if (!$dry_run && @run_ids) {
-    @run_ids = $skipper->set_final_seq_outcomes(@run_ids);
-  }
-}
-
+@run_ids = _qc_assessment(@run_ids);
 if (@run_ids) {
   $logger->info(join qq[\n\t], q[],
                 qq[Study '$study_name'],
@@ -214,6 +195,39 @@ while (my $row = $rs->next()) {
   }
 }
 
+sub _qc_assessment {
+  my @ids = @_;
+
+  @ids or return ();
+
+  $logger->info('Candidate runs: ' . join q[, ], @ids);
+  my $skipper = npg_qc::mqc::skipper->new(
+          npg_tracking_schema    => $tracking_schema,
+          mlwh_schema            => $mlwh_schema,
+          qc_schema              => npg_qc::Schema->connect(),
+          qc_fails_threshold     => $qc_fails_threshold,
+          id_runs                => \@ids,
+          logger                 => $logger);
+  @ids = $skipper->select_runs();
+  $logger->info('Candidate runs that satisfy QC criteria: ' .
+    @ids ? (join q[, ], @ids) : 'none');
+
+  if (@ids && $study_name =~ /Heron/xms) {
+    if ($dry_run) {
+      $logger->info('DRY RUN mode, not saving QC outcomes');
+    } else {
+      $logger->info('Saving preliminary QC outcomes');
+      @ids = $skipper->save_review_results(@ids);
+      if (@ids) {
+        $logger->info('Finalising QC outcomes');
+        @run_ids = $skipper->set_final_seq_outcomes(@ids);
+      }
+    }
+  }
+
+  return @ids;
+}
+
 exit 0;
 
 __END__
@@ -259,22 +273,27 @@ npg_mqc_skipper --study_name 'SOME STUDY' --no-dry_run
 
 =head1 DESCRIPTION
 
-In dry run mode this script identifies and reports runs having
-'qc review pending' status where all samples apart from controls
-belong to the study given as the --study_name argument and
-deplexing percent for all lanes of any such run is 93% or above.
+This script identifies runs having 'qc review pending' status where
+all samples apart from controls belong to the study given as the
+--study_name argument and deplexing percent for all lanes of any such
+run is 93% or above (93% is a default, other value can be given using
+the --deplexing_percent_threshold argument).
 
-In non-dry run mode the status of this runs is changed to
+An assessment of automatic Robo QC results is performed to decide
+whether the run can be expedited to archival. Not more than 10%
+of real samples are allowed to fail the QC assessment. (10% is a
+default, other value, including 0%, can be given using the
+--qc_fails_percent_threshold argument). 
+
+In a non-dry run mode the status of eligible runs is changed to
 'archival pending', ie the manual QC stage of the run life cycle
 is skipped.
 
 Additionally, for studies containing string 'Heron', before the run
-status is changed, an assessment of automatic Robo QC results is
-performed to decide whether the run can be expedited to archival. If
-a run can be moved to archival, preliminary autoqc review results are
-saved to a database, which saves preliminary QC outcomes to the
-database. Following this, sequencing and library QC outcomes are
-finalised for all lanes of this run.  
+status is changed, in a non-dry mode the autoqc review results are uploaded
+to the QC database, which also saves to the database the preliminary QC
+outcomes. Following this, sequencing and library QC outcomes are finalised
+for all lanes of the run.  
 
 =head1 SUBROUTINES/METHODS
 
@@ -306,7 +325,7 @@ finalised for all lanes of this run.
 
 =item Try::Tiny
 
-=item Class::Load
+=item npg_qc::Schema
 
 =item npg_tracking::Schema
 
