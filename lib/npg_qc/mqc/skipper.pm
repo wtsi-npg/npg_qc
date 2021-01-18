@@ -173,6 +173,11 @@ sub _build__sample_info {
       prefetch => $relations
     }
   );
+
+  # Using the properties of the first component here to avoid
+  # undefined values for position for merged data. The code for
+  # merged data does not access the position and tag index values
+  # in this hash.
   my $info = {};
   while (my $row = $rs->next) {
     my $sample_type = $row->iseq_product_component
@@ -181,8 +186,8 @@ sub _build__sample_info {
     $info->{$row->iseq_product_component->id_run}
          ->{$row->iseq_product->id_iseq_product} =
       {sample_type => $sample_type,
-       position    => $row->position,
-       tag_index   => $row->tag_index};
+       position    => $row->iseq_product_component->position,
+       tag_index   => $row->iseq_product_component->tag_index};
   }
 
   return $info;
