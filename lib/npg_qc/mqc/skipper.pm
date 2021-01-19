@@ -17,11 +17,13 @@ use npg_qc::mqc::outcomes::keys qw/ $SEQ_OUTCOMES /;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $HUNDRED      => 100;
-Readonly::Scalar my $USER_NAME    => 'pipeline';
-Readonly::Scalar my $CHECK_NAME   => 'review';
-Readonly::Scalar my $OUTCOME_TYPE => 'mqc_outcome';
-Readonly::Scalar my $LANE_OUTCOME => 'Accepted final';
+Readonly::Scalar my $HUNDRED           => 100;
+Readonly::Scalar my $USER_NAME         => 'pipeline';
+Readonly::Scalar my $REVIEW_CLASS_NAME => 'review';
+Readonly::Scalar my $ARTIC_CLASS_NAME  => 'generic';
+Readonly::Scalar my $ARTIC_CHECK_NAME  => $ARTIC_CLASS_NAME . ' ncov2019-artic-nf';
+Readonly::Scalar my $OUTCOME_TYPE      => 'mqc_outcome';
+Readonly::Scalar my $LANE_OUTCOME      => 'Accepted final';
 
 has 'qc_schema' => (
   isa      => 'npg_qc::Schema',
@@ -45,6 +47,13 @@ has 'qc_fails_threshold' => (
   isa      => 'Num',
   is       => 'ro',
   required => 1,
+);
+
+has 'artic_qc_fails_threshold' => (
+  isa       => 'Num',
+  is        => 'ro',
+  required  => 0,
+  predicate => '_has_artic_qc_fails_threshold',
 );
 
 has 'id_runs' => (
@@ -87,7 +96,7 @@ sub save_review_results {
       try {
         $num_loaded = npg_qc::autoqc::db_loader->new(
           schema       => $self->qc_schema,
-          check        => [$CHECK_NAME],
+          check        => [$REVIEW_CLASS_NAME],
           id_run       => $id_run,
           json_file    => $paths,
 	  verbose      => 0
@@ -200,10 +209,9 @@ has '_review_json_path' => (
   default    => sub { return {} },
 );
 
-sub _can_skip_mqc4run {
+sub _can_skip_mqc4run { ##no critic (Subroutines::ProhibitExcessComplexity)
   my ($self, $id_run) = @_;
 
-  my $sample_info = $self->_sample_info->{$id_run};
   my $query = npg_qc::autoqc::qc_store::query->new(
              id_run              => $id_run,
 	     db_qcresults_lookup => 0,
@@ -211,12 +219,18 @@ sub _can_skip_mqc4run {
              npg_tracking_schema => $self->npg_tracking_schema);
   my $collection = npg_qc::autoqc::qc_store->new(
     use_db      => 0,
-    checks_list => [$CHECK_NAME])->load_from_staging($query);
-  my $num_results = $collection->size;
+    checks_list => [$REVIEW_CLASS_NAME, $ARTIC_CLASS_NAME])->load_from_staging($query);
+  my @results = grep
+    { ($_->class_name eq $REVIEW_CLASS_NAME) or ($_->check_name eq $ARTIC_CHECK_NAME) }
+                $collection->all;
+  my $num_results = grep { $_->class_name eq $REVIEW_CLASS_NAME } @results;
+
   if ($num_results == 0) {
     $self->logger->warn("No autoqc review results retrieved for run $id_run");
     return;
   }
+
+  my $sample_info = $self->_sample_info->{$id_run};
   my $num_expected = scalar keys %{$sample_info};
   if ($num_results != $num_expected) {
     $self->logger->error(
@@ -230,20 +244,28 @@ sub _can_skip_mqc4run {
 
   my @controls     = ();
   my $real_samples = {};
-  my @results      = $collection->all;
+  my $artic_results4real_samples = {};
 
   foreach my $r (@results) {
     # We need outcomes to be defined
-    ($r->qc_outcome and $r->qc_outcome->{mqc_outcome}) or return;
+    if ($r->class_name eq $REVIEW_CLASS_NAME) {
+      ($r->qc_outcome and $r->qc_outcome->{mqc_outcome}) or return;
+    }
     my $d = $r->composition->digest;
     if (not exists $sample_info->{$d}) {
       $self->logger->error('No sample info for ' . $r->composition->freeze);
       return;
     }
+
     if ($sample_info->{$d}->{sample_type}) {
-      push @controls, $r;
+      ($r->class_name eq $REVIEW_CLASS_NAME) and push @controls, $r;
     } else {
-      push @{$real_samples->{$sample_info->{$d}->{position}}}, $r;
+      my $position = $sample_info->{$d}->{position};
+      if ($r->class_name eq $REVIEW_CLASS_NAME) {
+        push @{$real_samples->{$position}}, $r;
+      } else {
+	push @{$artic_results4real_samples->{$position}}, $r;
+      }
     }
   }
 
@@ -264,18 +286,40 @@ sub _can_skip_mqc4run {
   }
 
   # Not fast-tracking if the threshold of failed samples is exceeded
-  # in one of the lanes.
+  # in one of the lanes or, if attic QC fails threshold is set, the
+  # number of artic passes is not high enough. 
   foreach my $lane (keys %{$real_samples}) {
+
     my $samples = $real_samples->{$lane};
     @failed = grep { $has_failed->($_) } @{$samples};
     my $num_total  = @{$samples};
     my $num_failed = @failed;
-    $self->logger->info(sprintf 'Run %i lane %i: failed %i real samples out of %i',
+    $self->logger->info(sprintf 'Run %i lane %i: %i real samples out of %i failed WSI QC',
                                 $id_run, $lane, $num_failed, $num_total);
     ( ($num_failed/$num_total) * $HUNDRED <= $self->qc_fails_threshold ) or return;
+
+    if ($self->_has_artic_qc_fails_threshold) {
+      # Considering passes rather than fails since for some samples we
+      # might not have this type of results.
+      my @lane_artic = $artic_results4real_samples->{$lane} ?
+                       @{$artic_results4real_samples->{$lane}} :
+		       ();
+      my $num_passed = grep { (defined $_->{qc_pass}) and ($_->{qc_pass} eq 'TRUE') }
+                       grep { $_ }
+                       map  { $_->doc->{'QC summary'} }
+                       @lane_artic;
+      $num_failed = $num_total - $num_passed;
+      $self->logger->info(
+        sprintf 'Run %i lane %i: %i real samples out of %i failed actic QC',
+        $id_run, $lane, $num_failed, $num_total);
+      ( ($num_failed/$num_total) * $HUNDRED
+        <= $self->artic_qc_fails_threshold ) or return;
+    }
   }
 
-  $self->_review_json_path->{$id_run} = [map { $_->result_file_path } @results];
+  $self->_review_json_path->{$id_run} = [ map  { $_->result_file_path }
+	                                  grep { $_->class_name eq $REVIEW_CLASS_NAME }
+	                                  @results ];
   return 1; # Got to the end - fine to fast-track.
 }
 
@@ -374,7 +418,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2020 GRL
+Copyright (C) 2020,2021 GRL
 
 This file is part of NPG.
 
