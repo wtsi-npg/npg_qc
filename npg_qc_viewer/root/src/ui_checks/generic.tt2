@@ -1,17 +1,15 @@
 [% IF check.pp_name == 'ncov2019-artic-nf'; -%]
-# artic-nf data is received as a filtered version of the JSON
-# document produced by the QC check
+[%# artic-nf data is received as a filtered version of the JSON
+  document produced by the QC check %]
       <div class="data_table">
         <table title="ncov2019-artic-nf generic check outcome">
-        <tr>
-          <th>Name</th>
-          <th>Value</th>
-        </tr>
       [%-
         artic_table_data = check.massage_for_render;
         FOREACH kv IN artic_table_data
       -%]
-          <tr><td>[% kv.key %]</td><td>[% kv.value %]</td></tr>
+          <tr [% IF kv.key == 'qc_pass' && kv.value == 'FALSE'%]
+          class="failed"
+          [% END %]><th>[% kv.key %]</th><td>[% kv.value %]</td></tr>
       [% END -%]
         </table>
       </div>

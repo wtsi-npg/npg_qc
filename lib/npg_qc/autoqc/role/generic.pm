@@ -1,7 +1,6 @@
 package npg_qc::autoqc::role::generic;
 
 use Moose::Role;
-use Data::Dumper;
 
 our $VERSION = '0';
 
@@ -20,36 +19,36 @@ around 'filename_root' => sub {
 sub massage_for_render {
   my $self = shift;
 
-  my $qc_data = $self->doc->{'QC summary'};
   my %table_data = ();
+  if (exists $self->doc->{'QC summary'}) {
+    my $qc_data = $self->doc->{'QC summary'};
 
-  foreach my $allowed_key (qw/
-    longest_no_N_run pct_N_bases qc_pass max_negative_control_filtered_read_count
-  /) {
-    if (exists $qc_data->{$allowed_key}) {
-      $table_data{$allowed_key} = $qc_data->{$allowed_key};
-    } else {
-      $table_data{$allowed_key} = q();
+    foreach my $allowed_key (qw/
+      longest_no_N_run pct_N_bases qc_pass max_negative_control_filtered_read_count
+    /) {
+      if (exists $qc_data->{$allowed_key}) {
+        $table_data{$allowed_key} = $qc_data->{$allowed_key};
+      } else {
+        $table_data{$allowed_key} = q();
+      }
+    }
+    # rename fields to improve viewer comprehension
+    $table_data{num_aligned_fragments} = $qc_data->{num_aligned_reads};
+  }
+  if (exists $self->doc->{meta}) {
+    # All current analyses that use this particular data are paired-end
+    # and as such, the input fragment count does not reflect it.
+    # Single-ended fragment counts will be incorrect!
+    $table_data{num_input_fragments} = $self->doc->{meta}{num_input_reads} * 2;
+    my $sample_type = $self->doc->{meta}{sample_type};
+
+    if ($sample_type eq 'positive_control') {
+      $table_data{control_type} = 'positive';
+    } elsif ($sample_type eq 'negative_control') {
+      $table_data{control_type} = 'negative';
     }
   }
-  # rename fields to improve viewer comprehension
-  $table_data{num_aligned_fragments} = $qc_data->{num_aligned_reads};
 
-  $table_data{num_input_fragments} = $self->doc->{meta}{num_input_reads};
-
-  # All current analyses that use this particular data are paired-end
-  # and as such, the aligned fragment count should be doubled to compare
-  # with the number of input fragments. Single-ended fragment counts will be
-  # incorrect!
-  $table_data{num_aligned_fragments} *= 2;
-  
-
-  my $sample_type = $self->doc->{meta}{sample_type};
-  if ($sample_type eq 'positive_control') {
-    $table_data{control_type} = 'positive';
-  } elsif ($sample_type eq 'negative_control') {
-    $table_data{control_type} = 'negative';
-  }
   return \%table_data;
 }
 
