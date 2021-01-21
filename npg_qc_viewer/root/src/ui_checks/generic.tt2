@@ -8,9 +8,10 @@
         FOREACH kv IN artic_table_data
       -%]
           <tr [% IF kv.key == 'qc_pass' && kv.value == 'FALSE'%]
-          class="failed"
-          [% END %]><th>[% kv.key %]</th><td>[% kv.value %]</td></tr>
+          class="failed laligned"
+          [% END %]><th class="laligned">[% kv.key %]</th><td>[% kv.value %]</td></tr>
       [% END -%]
+      [% IF check.comments %]<tr><th class="laligned">comments </th><td>[% check.comments %]</td></tr>[% END %]
         </table>
       </div>
 
