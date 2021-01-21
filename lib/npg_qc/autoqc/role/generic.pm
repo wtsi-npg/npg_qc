@@ -24,7 +24,7 @@ sub massage_for_render {
     my $qc_data = $self->doc->{'QC summary'} || {};
 
     foreach my $allowed_key (qw/
-      longest_no_N_run pct_N_bases qc_pass max_negative_control_filtered_read_count
+      longest_no_N_run pct_N_bases qc_pass pct_covered_bases
     /) {
       if (exists $qc_data->{$allowed_key}) {
         $table_data{$allowed_key} = $qc_data->{$allowed_key};
@@ -42,6 +42,10 @@ sub massage_for_render {
     if (defined $self->doc->{meta}{num_input_reads}) {
       $table_data{num_input_fragments} = $self->doc->{meta}{num_input_reads} * 2;
     }
+    
+    $table_data{max_negative_control_filtered_read_count} =
+      $self->doc->{meta}{max_negative_control_filtered_read_count} || q();
+    
     my $sample_type = $self->doc->{meta}{sample_type};
 
     if ($sample_type eq 'positive_control') {

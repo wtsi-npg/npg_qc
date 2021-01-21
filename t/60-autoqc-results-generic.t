@@ -63,11 +63,13 @@ subtest 'attributes and methods' => sub {
     'QC summary' => {
       rubbish => 'unseen',
       num_aligned_reads => 2,
-      qc_pass => 'TRUE'
+      qc_pass => 'TRUE',
+      pct_covered_bases => 100
     },
     meta => {
       sample_type => 'positive_control',
       num_input_reads => 4,
+      max_negative_control_filtered_read_count => 999
     }
   });
 
@@ -79,8 +81,9 @@ subtest 'attributes and methods' => sub {
       control_type => 'positive',
       longest_no_N_run => '',
       pct_N_bases => '',
+      pct_covered_bases => 100,
       qc_pass => 'TRUE',
-      max_negative_control_filtered_read_count => ''
+      max_negative_control_filtered_read_count => 999
     },
     'Formatting positive control with extra keys'
   );
@@ -97,6 +100,7 @@ subtest 'attributes and methods' => sub {
     {
       num_input_fragments => 8,
       control_type => 'negative',
+      max_negative_control_filtered_read_count => ''
     },
     'Formatting negative control with no QC summary'
   );
