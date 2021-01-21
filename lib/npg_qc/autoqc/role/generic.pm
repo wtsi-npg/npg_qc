@@ -21,7 +21,7 @@ sub massage_for_render {
 
   my %table_data = ();
   if (exists $self->doc->{'QC summary'}) {
-    my $qc_data = $self->doc->{'QC summary'};
+    my $qc_data = $self->doc->{'QC summary'} || {};
 
     foreach my $allowed_key (qw/
       longest_no_N_run pct_N_bases qc_pass max_negative_control_filtered_read_count
@@ -39,7 +39,9 @@ sub massage_for_render {
     # All current analyses that use this particular data are paired-end
     # and as such, the input fragment count does not reflect it.
     # Single-ended fragment counts will be incorrect!
-    $table_data{num_input_fragments} = $self->doc->{meta}{num_input_reads} * 2;
+    if (defined $self->doc->{meta}{num_input_reads}) {
+      $table_data{num_input_fragments} = $self->doc->{meta}{num_input_reads} * 2;
+    }
     my $sample_type = $self->doc->{meta}{sample_type};
 
     if ($sample_type eq 'positive_control') {
