@@ -78,7 +78,7 @@ my $requires = {
                 'Vcf'                             => 0,
 
                 'WTSI::DNAP::Utilities::Timestamp'         => 0,
-    		'WTSI::DNAP::Warehouse::Schema'            => 0,
+                'WTSI::DNAP::Warehouse::Schema'            => 0,
                 'WTSI::DNAP::Warehouse::Schema::Query::IseqFlowcell' => 0,
                 'npg_common::Alignment'                    => 0,
                 'npg_common::extractor::fastq'             => 0,

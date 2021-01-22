@@ -1,8 +1,24 @@
 [% IF check.pp_name == 'ncov2019-artic-nf'; -%]
-<pre>[% check.doc2yaml %]</pre>
+[%# artic-nf data is received as a filtered version of the JSON
+  document produced by the QC check %]
+      <div class="data_table">
+        <table title="ncov2019-artic-nf generic check outcome">
+      [%-
+        artic_table_data = check.massage_for_render;
+        FOREACH kv IN artic_table_data
+      -%]
+          <tr [% IF kv.key == 'qc_pass' && kv.value == 'FALSE'%]
+          class="failed laligned"
+          [% END %]><th class="laligned">[% kv.key %]</th><td>[% kv.value %]</td></tr>
+      [% END -%]
+      [% IF check.comments %]<tr><th class="laligned">comments </th><td>[% check.comments %]</td></tr>[% END %]
+        </table>
+      </div>
 
 [%- ELSIF check.pp_name.match('ampliconstats');
       IF check.result_file_path.defined; # The result came from staging
+        # No direct viewing of ampliconstats here due to complexity and limited
+        # utility.
         # Create a link to the ampliconstats directory in the lane-level
         # qc directory. All results will display the same link...
         # grep to remove empty path components, which are present if the path
