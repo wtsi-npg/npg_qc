@@ -46,6 +46,9 @@ sub massage_for_render {
     $table_data{max_negative_control_filtered_read_count} =
       $self->doc->{meta}{max_negative_control_filtered_read_count} || q();
 
+    $table_data{min_artic_passed_filtered_read_count} =
+      $self->doc->{meta}{min_artic_passed_filtered_read_count} || q();
+
     my $sample_type = $self->doc->{meta}{sample_type};
 
     if ($sample_type eq 'positive_control') {

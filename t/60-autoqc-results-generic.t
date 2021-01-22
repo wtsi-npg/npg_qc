@@ -27,7 +27,7 @@ subtest 'attributes and methods' => sub {
   is ($r->filename_root, '3_1#4.unknown', 'file name root');
   is ($r->class_name, 'generic', 'class name');
   is ($r->check_name, 'generic unknown', 'check name');
-  
+
   $r->set_pp_info('pp1', 'v.0.1');
   is ($r->pp_name(), 'pp1', 'descriptor available');
   is ($r->check_name, 'generic pp1', 'check name');
@@ -69,7 +69,8 @@ subtest 'attributes and methods' => sub {
     meta => {
       sample_type => 'positive_control',
       num_input_reads => 4,
-      max_negative_control_filtered_read_count => 999
+      max_negative_control_filtered_read_count => 999,
+      min_artic_passed_filtered_read_count => ''
     }
   });
 
@@ -83,7 +84,8 @@ subtest 'attributes and methods' => sub {
       pct_N_bases => '',
       pct_covered_bases => 100,
       qc_pass => 'TRUE',
-      max_negative_control_filtered_read_count => 999
+      max_negative_control_filtered_read_count => 999,
+      min_artic_passed_filtered_read_count => ''
     },
     'Formatting positive control with extra keys'
   );
@@ -100,7 +102,8 @@ subtest 'attributes and methods' => sub {
     {
       num_input_fragments => 8,
       control_type => 'negative',
-      max_negative_control_filtered_read_count => ''
+      max_negative_control_filtered_read_count => '',
+      min_artic_passed_filtered_read_count => ''
     },
     'Formatting negative control with no QC summary'
   );
