@@ -1,7 +1,6 @@
 package npg_qc::autoqc::role::generic;
 
 use Moose::Role;
-use YAML::XS;
 
 our $VERSION = '0';
 
@@ -17,10 +16,49 @@ around 'filename_root' => sub {
   return join q[.], $self->$orig(), $self->pp_name || q[unknown];
 };
 
-sub doc2yaml {
+sub massage_for_render {
   my $self = shift;
-  my $doc = $self->doc;
-  return $doc ? Dump($doc) : q[];
+
+  my %table_data = ();
+  if (exists $self->doc->{'QC summary'}) {
+    my $qc_data = $self->doc->{'QC summary'} || {};
+
+    foreach my $allowed_key (qw/
+      longest_no_N_run pct_N_bases qc_pass pct_covered_bases
+    /) {
+      if (exists $qc_data->{$allowed_key}) {
+        $table_data{$allowed_key} = $qc_data->{$allowed_key};
+      } else {
+        $table_data{$allowed_key} = q();
+      }
+    }
+    # rename fields to improve viewer comprehension
+    $table_data{num_aligned_fragments} = $qc_data->{num_aligned_reads};
+  }
+  if (exists $self->doc->{meta}) {
+    # All current analyses that use this particular data are paired-end
+    # and as such, the input fragment count does not reflect it.
+    # Single-ended fragment counts will be incorrect!
+    if (defined $self->doc->{meta}{num_input_reads}) {
+      $table_data{num_input_fragments} = $self->doc->{meta}{num_input_reads} * 2;
+    }
+
+    $table_data{max_negative_control_filtered_read_count} =
+      $self->doc->{meta}{max_negative_control_filtered_read_count} || q();
+
+    $table_data{min_artic_passed_filtered_read_count} =
+      $self->doc->{meta}{min_artic_passed_filtered_read_count} || q();
+
+    my $sample_type = $self->doc->{meta}{sample_type};
+
+    if ($sample_type eq 'positive_control') {
+      $table_data{control_type} = 'positive';
+    } elsif ($sample_type eq 'negative_control') {
+      $table_data{control_type} = 'negative';
+    }
+  }
+
+  return \%table_data;
 }
 
 no Moose::Role;
@@ -50,9 +88,10 @@ of the pp_name attribute is appended to the value produced
 by the parent's method to allow for the results from different
 pipelines to co-exist in the same directory.
 
-=head2 doc2yaml
+=head2 massage_for_render
 
-Returns a document hash as a YAML string.
+Takes stored ncov2019-artic-nf data and modifies it slightly for
+rendering in the template.
 
 =head1 DIAGNOSTICS
 
@@ -63,8 +102,6 @@ Returns a document hash as a YAML string.
 =over
 
 =item Moose::Role
-
-=item YAML::XS
 
 =back
 
