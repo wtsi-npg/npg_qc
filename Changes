@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - GbS Minor_v1.0 plex included in genotype data extracted from iRODS 
+
 release 69.2.0
  - the mqc skipper script is changed to always take into account the outcome
    of RoboQC assessment

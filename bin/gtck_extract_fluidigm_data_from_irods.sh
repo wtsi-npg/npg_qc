@@ -22,10 +22,11 @@ then
 fi
 
 dttag="$(cat latest_plex_list.txt)"
+plex=(qc cgp ddd Minor_v1.0)
 
 for zone in ${GTCK_IRODS_ZONE} # single value or space-delimited list
 do
-  for qc_set in qc cgp ddd
+  for qc_set in ${plex[*]}
   do
     infile="fluidigm_${qc_set}_${zone}_baton_plex_list_${dttag}.txt"
     outfile_base="fluidigm_${qc_set}_${zone}_gt_${dttag}"
