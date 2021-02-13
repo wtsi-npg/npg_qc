@@ -3,6 +3,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - mqc skipper - following a change in RoboQC creteria for real samples
    (artic QC pass requirement is dropped), add a threshold for the number
    of artic fails
+ - add option to restrict to a single gbs_plex to genotype_call_results_reporter  
 
 release 69.2.0
  - the mqc skipper script is changed to always take into account the outcome
