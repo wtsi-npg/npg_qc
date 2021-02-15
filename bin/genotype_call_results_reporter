@@ -23,6 +23,7 @@ genotype_call_results_reporter
   genotype_call_results_reporter
   genotype_call_results_reporter --verbose 
   genotype_call_results_reporter --verbose --dry_run
+  genotype_call_results_reporter --verbose --gbs_plex Minor_v1.0 --dry_run
 
 =head1 DESCRIPTION
 

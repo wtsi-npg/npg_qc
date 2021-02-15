@@ -28,7 +28,7 @@ my $npg_qc_schema = _create_schema();
 my $mlwh_schema   = _create_mlwh_schema();
 
 subtest 'Initial' => sub {
-  plan tests => 2;
+  plan tests => 5;
 
   my $reporter = npg_qc::report::genotype_call->new(
      qc_schema   => $npg_qc_schema,
@@ -38,6 +38,18 @@ subtest 'Initial' => sub {
 
   like( $reporter->api_url(),
     qr/\/api\/v2\/qc_results/, 'url for sending');
+
+  ok(!$reporter->has_gbs_plex(), 'gbs_plex not set as expected');
+
+  my $plex = 'Minor_v1.0';
+  my $reporter2 = npg_qc::report::genotype_call->new(
+     qc_schema   => $npg_qc_schema,
+     mlwh_schema => $mlwh_schema,
+     gbs_plex    => $plex,
+  );
+
+  ok( $reporter2->has_gbs_plex(), 'gbs_plex set as expected');
+  is( $reporter2->gbs_plex(), $plex, 'gbs_plex set correctly');
 
 };
 
@@ -92,14 +104,37 @@ sub _get_expected_data {
 
 
 subtest 'Successfully post 2 results' => sub {
-  plan tests => 11;
+  plan tests => 13;
 
   my $reporter = npg_qc::report::genotype_call->new(
      qc_schema   => $npg_qc_schema,
      mlwh_schema => $mlwh_schema,
+     gbs_plex    => 'Pf_GRC1v1.0',
      verbose     => 1,
   );
   isa_ok($reporter, 'npg_qc::report::genotype_call');
+
+  my $toreport = $reporter->_construct_data($reporter->_data4reporting()->[0]);
+  is_deeply (decode_json($toreport), _get_expected_data(), 
+    q[data to send constucted correctly with gbs_plex name set]);
+
+
+  my $reporter2 = npg_qc::report::genotype_call->new(
+     qc_schema   => $npg_qc_schema,
+     mlwh_schema => $mlwh_schema,
+     gbs_plex    => 'Minor_v1.0',
+     verbose     => 1,
+  );
+  my $toreport2 = $reporter2->_data4reporting();
+  ok (!$toreport2->[0], 
+    q[no data to send constucted correctly with unused gbs_plex name set]);
+
+
+  my $reporter3 = npg_qc::report::genotype_call->new(
+     qc_schema   => $npg_qc_schema,
+     mlwh_schema => $mlwh_schema,
+     verbose     => 1,
+  );
 
   my @ids = ('1','2');
   foreach my $id (@ids){
@@ -107,10 +142,11 @@ subtest 'Successfully post 2 results' => sub {
      ok (!_get_data($npg_qc_schema, $id, 'reported_by'), 'reporting_by field is not set');
   }
 
-  my $toreport = $reporter->_construct_data($reporter->_data4reporting()->[0]);
-  is_deeply (decode_json($toreport), _get_expected_data(), q[data to send constucted correctly]);
+  my $toreport3 = $reporter3->_construct_data($reporter3->_data4reporting()->[0]);
+  is_deeply (decode_json($toreport3), _get_expected_data(),
+    q[data to send constucted correctly with no gbs_plex name set]);
 
-  lives_ok { $reporter->load() } 'no error';
+  lives_ok { $reporter3->load() } 'no error';
 
   foreach my $id (@ids){
      ok (_get_data($npg_qc_schema, $id, 'reported'), 'reporting time is set');

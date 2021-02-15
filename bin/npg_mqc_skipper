@@ -30,11 +30,13 @@ my $dry_run = 1;
 my $study_name;
 my $deplexing_threshold = $DEPLEXING_PERCENT_THRESHOLD;
 my $qc_fails_threshold  = $QC_FAILS_PERCENT_THRESHOLD;
+my $artic_qc_fails_threshold;
 
 GetOptions('dry_run|dry-run!' => \$dry_run,
            'study_name=s'     => \$study_name,
            'deplexing_percent_threshold=i' => \$deplexing_threshold,
            'qc_fails_percent_threshold=i'  => \$qc_fails_threshold,
+	   'artic_qc_fails_percent_threshold=i'  => \$artic_qc_fails_threshold,
            'help'             => sub {
              pod2usage(-verbose => 2,
                        -exitval => 0)
@@ -54,6 +56,9 @@ if (not $study_name) {
   $logger->info("Study name: $study_name");
   $logger->info("Deplexing percent threshold: $deplexing_threshold");
   $logger->info("QC fails percent threshold: $qc_fails_threshold");
+  if (defined $artic_qc_fails_threshold) {
+    $logger->info("Artic QC fails percent threshold: $artic_qc_fails_threshold");
+  }
   $dry_run and $logger->info('DRY RUN');
 }
 
@@ -201,13 +206,20 @@ sub _qc_assessment {
   @ids or return ();
 
   $logger->info('Candidate runs: ' . join q[, ], @ids);
-  my $skipper = npg_qc::mqc::skipper->new(
+
+  my $ref = {
           npg_tracking_schema    => $tracking_schema,
           mlwh_schema            => $mlwh_schema,
           qc_schema              => npg_qc::Schema->connect(),
           qc_fails_threshold     => $qc_fails_threshold,
           id_runs                => \@ids,
-          logger                 => $logger);
+          logger                 => $logger
+            };
+  if (defined $artic_qc_fails_threshold) {
+    $ref->{'artic_qc_fails_threshold'} = $artic_qc_fails_threshold;
+  }
+  my $skipper = npg_qc::mqc::skipper->new($ref);
+
   @ids = $skipper->select_runs();
   $logger->info('Candidate runs that satisfy QC criteria: ' .
     @ids ? (join q[, ], @ids) : 'none');
@@ -250,9 +262,11 @@ npg_mqc_skipper
 
 =item  --dry_run or --dry-run and --no-dry_run and --no-dry-run
 
-=item  --deplexing_percent_threshold 
+=item  --deplexing_percent_threshold
 
 =item  --qc_fails_percent_threshold
+
+=item  --artic_qc_fails_percent_threshold
 
 =item  --help
 
@@ -274,16 +288,20 @@ npg_mqc_skipper --study_name 'SOME STUDY' --no-dry_run
 =head1 DESCRIPTION
 
 This script identifies runs having 'qc review pending' status where
-all samples apart from controls belong to the study given as the
+all samples, apart from spiked controls, belong to the study given as the
 --study_name argument and deplexing percent for all lanes of any such
 run is 93% or above (93% is a default, other value can be given using
 the --deplexing_percent_threshold argument).
 
-An assessment of automatic Robo QC results is performed to decide
+An assessment of automatic RoboQC results is performed to decide
 whether the run can be expedited to archival. Not more than 10%
 of real samples are allowed to fail the QC assessment. (10% is a
 default, other value, including 0%, can be given using the
---qc_fails_percent_threshold argument). 
+--qc_fails_percent_threshold argument).
+
+If the --artic_qc_fails_percent_threshold argument is set (no default
+is available), it is used in addition to the qc_fails_percent_threshold
+criteria.
 
 In a non-dry run mode the status of eligible runs is changed to
 'archival pending', ie the manual QC stage of the run life cycle
@@ -343,7 +361,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019,2020 Genome Research Ltd.
+Copyright (C) 2019,2020,2021 Genome Research Ltd.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
