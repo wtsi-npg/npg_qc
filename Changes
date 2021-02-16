@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 69.3.0
  - mqc skipper - following a change in RoboQC creteria for real samples
    (artic QC pass requirement is dropped), add a threshold for the number
    of artic fails
