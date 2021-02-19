@@ -32,14 +32,10 @@ sub ranked_organisms {
   # Deterministic ranking of organisms:
   # reverse numerical comparison of alignment results
   # followed, if necessary, by string comparison of names.
-  my $compare = sub {
-    my ($org1, $org2) = @_;
-    my $result = $ratings->{$org2} <=> $ratings->{$org1};
-    $result  ||= $org1 cmp $org2;
-    return $result;
-  };
-
-  my @ranked_organisms = sort { $compare->($a, $b) } keys %{$ratings};
+  my @ranked_organisms = sort {
+    $ratings->{$b} <=> $ratings->{$a}
+    || $a cmp $b
+  } keys %{$ratings};
 
   return \@ranked_organisms;
 }
