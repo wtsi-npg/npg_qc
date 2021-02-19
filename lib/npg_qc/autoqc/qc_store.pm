@@ -260,7 +260,7 @@ autoqc result objects corresponding to JSON files.
 
  my $query = npg_qc::autoqc::qc_store::query_non_tracking->new(
              id_run => 123);
- my $c     = $obj->load_from_staging_archive($query, $archive_dir); 
+ my $c     = $obj->load_from_staging_archive($query, $archive_dir);
 
 =cut
 
@@ -515,6 +515,14 @@ sub _build__available_classes {
   return \@names;
 }
 
+=head2 _db_collection4compositions
+
+Takes a listref of composition dbIDs, and queries all available QC result types
+for each composition. Returns a collection of result objects of mixed QC
+types
+
+=cut
+
 sub _db_collection4compositions {
   my ($self, $composition_ids) = @_;
 
@@ -525,7 +533,20 @@ sub _db_collection4compositions {
   if (@{$composition_ids}) {
     foreach my $name (@{$self->_available_classes}) {
       push @rows, $self->qc_schema()->resultset($name)
-        ->search({'me.id_seq_composition' => $composition_ids})->all();
+        ->search(
+          {
+            'me.id_seq_composition' => $composition_ids
+          },
+          {
+            # later uses of this collection will need access to components
+            # and prefetching halves the overhead
+            prefetch => {
+              'seq_composition' => {
+                'seq_component_compositions' => 'seq_component'
+              }
+            }
+          }
+        )->all();
     }
   }
 
