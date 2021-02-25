@@ -30,10 +30,10 @@ subtest 'validation of attributes' => sub {
     plan tests => 36;
 ;
     throws_ok {npg_qc::autoqc::checks::check->new(path => $path)}
-        qr/Either id_run or position key is undefined/,
+        qr/'id_run' key is undefined/,
         'error on instantiating an object without any id';
     throws_ok {npg_qc::autoqc::checks::check->new(path => $path, id_run => $idrun)}
-        qr/Either id_run or position key is undefined/,
+        qr/'position' key is undefined/,
         'error on instantiating an object without either a position or rpt_list attr';
     throws_ok {npg_qc::autoqc::checks::check->new(
         position => 17, path => $path, id_run => $idrun)}
@@ -58,7 +58,7 @@ subtest 'validation of attributes' => sub {
     lives_ok {npg_qc::autoqc::checks::check->new(position => 2, id_run => $idrun)}
         'no error on instantiating an object without a path/qc_in attr';
     throws_ok {npg_qc::autoqc::checks::check->new(position => 2, qc_in => 't')}
-        qr/Either id_run or position key is undefined/,
+        qr/'id_run' key is undefined/,
         'error on instantiating an object without either a run id or an rpt_list attr';
     throws_ok {npg_qc::autoqc::checks::check->new(
         position => 1, path => 'nonexisting', id_run => -1)}
