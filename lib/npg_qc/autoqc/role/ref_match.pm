@@ -32,6 +32,7 @@ sub ranked_organisms {
   # Deterministic ranking of organisms:
   # reverse numerical comparison of alignment results
   # followed, if necessary, by string comparison of names.
+  ## no critic (BuiltinFunctions::ProhibitReverseSortBlock)
   my @ranked_organisms = sort {
     $ratings->{$b} <=> $ratings->{$a}
     || $a cmp $b
