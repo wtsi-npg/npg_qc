@@ -9,7 +9,7 @@ use Readonly;
 use List::MoreUtils qw(none uniq);
 use Digest::MD5 qw/md5_hex/;
 
-with Storage( 'traits' => ['OnlyWhenBuilt'],
+with Storage( 'traits' => [qw/OnlyWhenBuilt DisableCycleDetection/],
               'format' => 'JSON',
               'io'     => 'File' ), 'npg_qc::autoqc::role::rpt_key';
 
@@ -380,7 +380,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014,2015,2016,2017,2018,2019,2020 Genome Research Ltd.
+Copyright (C) 2014,2015,2016,2017,2018,2019,2020,2021 Genome Research Ltd.
 
 This file is part of NPG.
 
