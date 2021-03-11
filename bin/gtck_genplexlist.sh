@@ -16,7 +16,7 @@ do
     do
     if [ ${qc_set} == "Minor_v1.0" ]; then
     printf "Generating data_object list for GbS primer_panel = %s\n" ${qc_set}
-    jq -n "{avus: [{attribute: \"primer_panel\", value: \"${qc_set}\"}]}" | (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-metaquery --zone ${zone} --unbuffered) | jq . | egrep -v "^\[|\]$" | sed -e "s/^  \},$/  \}/" > fluidigm_${qc_set}_${zone}_baton_plex_list_${dttag}.txt
+    jq -n "{avus: [{attribute: \"primer_panel\", value: \"${qc_set}\"},{attribute: \"type\", value: \"geno\"}]}" | (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-metaquery --zone ${zone} --unbuffered) | jq . | egrep -v "^\[|\]$" | sed -e "s/^  \},$/  \}/" > fluidigm_${qc_set}_${zone}_baton_plex_list_${dttag}.txt
     else
     printf "Generating data_object list for fluidigm_plex = %s\n" ${qc_set}
     jq -n "{avus: [{attribute: \"fluidigm_plex\", value: \"${qc_set}\"}]}" | (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-metaquery --zone ${zone} --unbuffered) | jq . | egrep -v "^\[|\]$" | sed -e "s/^  \},$/  \}/" > fluidigm_${qc_set}_${zone}_baton_plex_list_${dttag}.txt
