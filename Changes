@@ -1,5 +1,14 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 69.5.0
+ - measures to speed-up generation of SeqQC pages:
+   - add a prefetch for compositions and components when retrieving autoqc
+     results from a database;
+   - use in-line custom sort function instead of a closure for ref_match
+     result objects  
+   - disable a check for circular references in serialization of autoqc
+     result objects
+
 release 69.4.0
  - mqc skipper not to consider runs tagged 'no_auto' or 'no_mqc_skipper'
 
