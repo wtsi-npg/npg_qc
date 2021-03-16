@@ -30,11 +30,16 @@ do
   do
     infile="fluidigm_${qc_set}_${zone}_baton_plex_list_${dttag}.txt"
     outfile_base="fluidigm_${qc_set}_${zone}_gt_${dttag}"
+    cmd_opts="-s"
+
+    if [[ ${qc_set} == Minor_v1.0 ]]; then
+       cmd_opts="$cmd_opts -f"
+    fi
 
     if [ -e "${infile}" ]
     then
       printf "================\nProcessing plex list %s, output to %s.tsv\n===============\n" "${infile}" "${outfile_base}"
-      (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-get --avu --unbuffered --silent) < "${infile}" | grep -v '^The client/server socket connection has been renewed$' | reformat_fluidigm_snp26_results_irods.pl -s 2> "${outfile_base}.err" > "${outfile_base}.tsv"
+      (irodsEnvFile=$HOME/.irods/.irodsEnv-${zone}_gtck baton-get --avu --unbuffered --silent) < "${infile}" | grep -v '^The client/server socket connection has been renewed$' | reformat_fluidigm_snp26_results_irods.pl $cmd_opts 2> "${outfile_base}.err" > "${outfile_base}.tsv"
 
       if [ $? -ne 0 ]
       then
