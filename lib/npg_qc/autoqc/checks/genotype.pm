@@ -234,15 +234,11 @@ has 'reference_fasta' => (
 sub _build_reference_fasta {
 	my ($self) = @_;
 
-print "**aligner ", $self->aligner,"\n";
   my $href = { 'aligner' => $self->aligner, 'lims' => $self->lims, };
   my $ref  = $self->lims->gbs_plex_name ?
       Moose::Meta::Class->create_anon_class(
         roles => [qw/npg_tracking::data::gbs_plex::find/])->new_object($href)->refs->[0] :
       $self->refs->[0];
-
-
-print "build $ref\n";
   return $ref;
 }
 
@@ -361,7 +357,7 @@ sub _build_pos_snpname_map_fn {
 
 	my $fn = sprintf '%s_chrpos_snpname_map_%s.tsv', $self->snp_call_set, $chrconv_suffix;
 	my $pos_snpname_map_fn = catfile($genotypes_repository, $fn);
-print "****$pos_snpname_map_fn***\n";
+
 	return $pos_snpname_map_fn;
 }
 
@@ -422,7 +418,6 @@ override 'can_run' => sub {
 		return 0;
 	}
 
-print "*** reference_fasta ", $self->reference_fasta, "\n";
 	if(!defined($self->reference_fasta) || (! -r $self->reference_fasta)) {
 		$self->result->add_comment('Reference genome missing or unreadable');
 		return 0;
@@ -647,7 +642,6 @@ sub _build_alternate_sample_name {
 
   my $name;
   if ($ref->geno_refset_info_path ) {
-print "** geno_refset_info_path", $ref->geno_refset_info_path,"\n";
     my $info = decode_json(io($ref->geno_refset_info_path)->slurp);
     if ($info->{'expected_sample_field'}) {
       my $type = $info->{'expected_sample_field'};
