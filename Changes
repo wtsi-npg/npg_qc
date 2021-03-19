@@ -4,6 +4,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - change the type of the stats column in the 'samtools_stats' table from
    'mediumglob' to 'longglob' to accommodate the ampliconstats data for
    384 samples
+ - mqc skipper - no fast tracking if any of mqc_outcome values are
+   undefined in the review autoqc objects for a lane 
 
 release 69.5.0
  - measures to speed-up generation of SeqQC pages:
