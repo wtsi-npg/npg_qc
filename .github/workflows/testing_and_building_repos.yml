@@ -1,0 +1,95 @@
+name: testing_and_building_repo
+on: [push, pull_request]
+jobs:
+  build: 
+    strategy:
+      matrix:
+        os: ['ubuntu-18.04']
+        perl: ['5.26'] 
+        
+    runs-on: ${{matrix.os}} 
+    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}  
+    steps:
+    - uses: actions/checkout@v2 
+    
+    # Caching cpanm external modules
+    - name: Cache cpanm external modules
+      id: cpanmCache
+      uses: actions/cache@v2
+      with:
+        path: ~/perl5ext
+        key: ${{ matrix.os}}-build-cpanm-external
+
+    # Caching conda
+    - name: Cache conda
+      id: minicondaCache
+      uses: actions/cache@v2
+      with:
+        path: $HOME/miniconda
+        key: ${{ matrix.os}}-build-miniconda
+
+    #install libgd-dev and uuid-dev
+    - name: install libgd-dev and uuid-dev 
+      run:
+          sudo apt-get install -y libgd-dev uuid-dev 
+    
+    - name: install conda client, baton,samtools, set up conda environment
+      run: |
+          wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -O miniconda.sh
+          chmod +x miniconda.sh;
+          ./miniconda.sh -b  -p $HOME/miniconda;
+          export PATH=$HOME/miniconda/bin:$PATH;
+          hash -r
+
+          conda config --set always_yes yes
+          conda config --set changeps1 no
+          conda config --set show_channel_urls true
+
+          conda config --add channels $CONDA_CHANNEL
+          conda create -q --name "$CONDA_TEST_ENV" python=$TRAVIS_PYTHON_VERSION
+          conda install --name "$CONDA_TEST_ENV" npg_qc_utils
+          conda install --name "$CONDA_TEST_ENV" baton
+
+          source activate "$CONDA_TEST_ENV" 
+      env:
+        WTSI_NPG_CONDA_REPO: https://dnap.cog.sanger.ac.uk/npg/conda/prod/generic
+        CONDA_CHANNEL: https://dnap.cog.sanger.ac.uk/npg/conda/prod/generic
+        CONDA_TEST_ENV: test-environment
+        TRAVIS_PYTHON_VERSION: "2.7"
+ 
+    - name: install cpanm
+      run: |
+          wget -qO - https://cpanmin.us | /usr/bin/perl - --sudo App::cpanminus
+
+    - name: Run install scripts
+      run: |
+          echo "$HOME/miniconda/samtools/bin" >> $GITHUB_PATH 
+          ${GITHUB_WORKSPACE}/scripts/before_install.sh $NODE_VERSION $NPM_VERSION
+          cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+          ${GITHUB_WORKSPACE}/scripts/install.sh $WTSI_NPG_BUILD_BRANCH $WTSI_NPG_GITHUB_URL 
+      env: 
+        NODE_VERSION: "6.12.2"
+        NPM_VERSION: "4.5.0"
+        WTSI_NPG_BUILD_BRANCH: ${GITHUB_HEAD_REF} 
+        WTSI_NPG_GITHUB_URL: https://github.com/wtsi-npg
+
+    - name: run script
+      run: |
+          export PATH="$HOME/miniconda/bin:$PATH"
+          source activate "$CONDA_TEST_ENV" 
+          conda info --envs
+          cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+          ${GITHUB_WORKSPACE}/scripts/script.sh $NODE_VERSION $WTSI_NPG_BUILD_BRANCH
+      env:
+        CONDA_TEST_ENV: test-environment
+        NODE_VERSION: "6.12.2"
+        WTSI_NPG_BUILD_BRANCH: ${GITHUB_HEAD_REF}
+
+    # Archive logs if failure
+    - name: Archive CPAN logs
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: cpan_log
+        path: /home/runner/.cpanm/work/*/build.log
+        retention-days: 5
