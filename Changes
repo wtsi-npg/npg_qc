@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - change the type of the stats column in the 'samtools_stats' table from
+   'mediumglob' to 'longglob' to accommodate the ampliconstats data for
+   384 samples
+
 release 69.5.0
  - measures to speed-up generation of SeqQC pages:
    - add a prefetch for compositions and components when retrieving autoqc
