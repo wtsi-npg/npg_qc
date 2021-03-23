@@ -1,8 +1,23 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
 
+
  - GbS Minor_v1.0 plex included in genotype data extracted from iRODS 
- - mqc skipper - following a change in RoboQC criteria for real samples
+ 
+release 69.5.0
+ - measures to speed-up generation of SeqQC pages:
+   - add a prefetch for compositions and components when retrieving autoqc
+     results from a database;
+   - use in-line custom sort function instead of a closure for ref_match
+     result objects  
+   - disable a check for circular references in serialization of autoqc
+     result objects
+
+release 69.4.0
+ - mqc skipper not to consider runs tagged 'no_auto' or 'no_mqc_skipper'
+
+release 69.3.0
+ - mqc skipper - following a change in RoboQC creteria for real samples
    (artic QC pass requirement is dropped), add a threshold for the number
    of artic fails
  - add option to restrict to a single gbs_plex to genotype_call_results_reporter  
