@@ -33,6 +33,12 @@ Readonly::Scalar my $END_MATCH_IND => 7;
 
 has '+file_type'       => (default => $EXT,);
 
+has 'ref_sketch_path' => (
+  isa        => q{Str},
+  is         => q{ro},
+  default    => q{cscreen/cscreen_sketch.32.100000.msh},
+);
+
 override 'execute' => sub {
     my ($self) = @_;
 
@@ -46,7 +52,8 @@ override 'execute' => sub {
 
 sub _mash_command {
     my $self = shift;
-    return 'mash screen -w -v 0.0001 -p 2 cscreen/cscreen_sketch.32.100000.msh -';
+    my $path = $self->ref_sketch_path;
+    return "mash screen -w -v 0.0001 $path -";
 }
 
 sub _screen {
@@ -66,7 +73,7 @@ sub _screen {
     ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
     if (! $pid) { #fork to convert CRAM to fasta whilst counting forward and reverse reads
         my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->samtools_cmd .
-                         qq[ fasta -F0x900 --thread 2 $cram] . q[" |] ;
+                         qq[ fasta -F0x900 $cram] . q[" |] ;
         open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
         open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
         my ($fcount, $rcount) = (0,0);
