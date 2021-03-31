@@ -4,7 +4,6 @@ use Moose;
 use namespace::autoclean;
 use Class::Load  qw(load_class);
 use Getopt::Long qw(:config pass_through auto_version);
-use Carp;
 
 with 'MooseX::Getopt';
 
@@ -13,7 +12,14 @@ our $VERSION = '0';
 has 'check' => ( isa           => 'Str',
                  is            => 'ro',
                  required      => 1,
-                 documentation => 'QC check name',
+                 documentation => 'autoqc check name',
+               );
+
+has 'spec'  => ( isa           => 'Str',
+                 is            => 'ro',
+                 required      => 0,
+                 documentation => q(name of a specific autoqc) .
+  q( check in the namespace of the check given in the 'check' argument),
                );
 
 sub create_check_object {
@@ -22,6 +28,9 @@ sub create_check_object {
   my $delim = q[::];
   ($pkg) = $pkg =~ /(.+)${delim}(\w+)\Z/smx;
   $pkg = join $delim, $pkg, q[checks], $self->check;
+  if ($self->spec) {
+    $pkg = join $delim, $pkg, $self->spec;
+  }
   load_class($pkg);
   return $pkg->new_with_options();
 }
@@ -48,11 +57,17 @@ In a script:
 
 A factory for creating an autoqc check object using script arguments.
 
-The --check option should be passed to a script to indicate the class
+The --check argument should be passed to a script to indicate the class
 of the autoqc object to be created. The autoqc check class should
 be defined in the npg_qc::autoqc::checks namespace. If an object of
 class 'npg_qc::autoqc::checks::mycheck' is required, use 'mycheck' as
 the value of the --check attribute.
+
+To allow for specialisation under the umbrella of a particular check,
+an optional --spec script argument can be used in addition to the --check
+argument. With the --check argument set to 'generic' and the --spec
+argument set to 'ampliconstats', the factory returns an object of class
+npg_qc::autoqc::checks::generic::ampliconstats . 
 
 All other script options are passed through unchanged to the constructor
 of the autoqc check object.
@@ -62,6 +77,11 @@ of the autoqc check object.
 =head2 check
 
 The name of the check class, required attribute.
+
+=head2 spec
+
+The name of a specific check under the umbrella of a check name given
+by the 'check' attribute. An optional attribute.
 
 =head2 create_check_object
 
@@ -86,8 +106,6 @@ by the check attribute.
 
 =item Getopt::Long
 
-=item Carp
-
 =back
 
 =head1 INCOMPATIBILITIES
@@ -100,7 +118,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2014,2015,2016,2020 Genome Research Ltd.
 
 This file is part of NPG.
 

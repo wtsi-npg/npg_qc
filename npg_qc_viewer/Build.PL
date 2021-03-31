@@ -101,6 +101,7 @@ my $builder = $class->new(
         'namespace::autoclean'                         => '0',
         'Params::Validate'                             => '0',
         'Readonly'                                     => '0',
+        'Starman'                                      => '0',
         'strict'                                       => '0',
         'Try::Tiny'                                    => '0',
         'warnings'                                     => '0',

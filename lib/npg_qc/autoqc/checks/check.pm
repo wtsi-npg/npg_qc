@@ -303,7 +303,7 @@ sub _build_result {
   load_class($module);
 
   my $nref = {};
-  if ($self->composition->num_components == 1) {
+  if ($self->composition->num_components == 1 && $module->can('id_run')) {
     $nref = $self->inflate_rpts($self->rpt_list)->[0];
   }
   $nref->{'composition'} = $self->composition;

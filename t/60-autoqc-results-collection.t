@@ -34,6 +34,7 @@ my $temp = tempdir( CLEANUP => 1);
                     spatial_filter   => 1,
                     gc_fraction      => 1,
                     gc_bias          => 1,
+                    generic          => 1,
                     genotype         => 1,
                     genotype_call    => 1,
                     tag_decode_stats => 1,

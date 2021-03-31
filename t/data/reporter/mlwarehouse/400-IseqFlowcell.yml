@@ -49,7 +49,7 @@
   tag_index: 1
 - entity_id_lims: 1000005
   entity_type: library
-  id_flowcell_lims: 3881
+  id_flowcell_lims: 3882
   id_iseq_flowcell_tmp: 551508001
   id_lims: SQSCP
   id_pool_lims: NT13483B

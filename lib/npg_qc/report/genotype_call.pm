@@ -11,7 +11,6 @@ use Try::Tiny;
 use JSON;
 use Carp;
 
-
 with 'npg_qc::report::common';
 
 our $VERSION = '0';
@@ -33,12 +32,17 @@ sub _build_api_url {
   return st::api::base->lims_url() . q[/api/v2/qc_results];
 }
 
+has 'gbs_plex' => (
+  isa           => 'Str',
+  is            => 'ro',
+  predicate     => 'has_gbs_plex',
+  documentation => 'Optionally specify a single gbs_plex name.',);
+
 has 'max_errors' => (
   isa           => 'Int',
   is            => 'ro',
   default       => $MAX_ERRORS,
   documentation => 'Optionally specify the max number of errors before giving up.',);
-
 
 has '_error_count' => (
   isa           => 'Int',
@@ -79,8 +83,11 @@ sub _build_data4reporting {
 
   my $product_rs = $self->mlwh_schema->resultset('IseqProductMetric');
 
-  my $rs = $self->qc_schema->resultset('GenotypeCall')->search
-    ({'me.reported' => undef, 'me.pass' => { q[!=] , undef }});
+  my $search = {'me.reported' => undef, 'me.pass' => { q[!=] , undef }};
+
+  if ( $self->has_gbs_plex ) { $search->{'me.gbs_plex_name'} = $self->gbs_plex; }
+
+  my $rs = $self->qc_schema->resultset('GenotypeCall')->search($search);
 
   my $data = [];
 
@@ -132,7 +139,7 @@ sub load {
   my $data = $self->_data4reporting();
 
   foreach my $d (@{$data}) {
-    sleep 1; # To help LIMs server
+    if (!$self->dry_run) { sleep 1; } # To help LIMs server
 
     if ($self->_error_count >= $self->max_errors) {
       $self->_log(q(Aborting as errors have exceeded the maximum allowed));
@@ -243,6 +250,10 @@ npg_qc::report::genotype_call
 =head2 api_url
 
   Optionally provide an api endpoint otherwise the default will be used.
+
+=head2 gbs_plex
+
+  Optionally specify a single gbs_plex name.
 
 =head2 max_errors
 

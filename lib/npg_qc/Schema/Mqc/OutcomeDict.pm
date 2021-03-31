@@ -17,6 +17,11 @@ sub is_final_outcome_description {
   return $desc =~ /$FINAL\Z/smx; #The short description includes the word final.
 }
 
+sub is_rejected_outcome_description {
+  my ($self, $desc) = @_;
+  return $desc =~ /\A$REJECTED/smx;
+}
+
 sub is_final_outcome {
   my $self = shift;
   return $self->is_final_outcome_description($self->short_desc);
@@ -29,7 +34,7 @@ sub is_accepted {
 
 sub is_rejected {
   my $self = shift;
-  return $self->short_desc =~ /\A $REJECTED/smx; #The short description includes the word rejected.
+  return $self->is_rejected_outcome_description($self->short_desc);
 }
 
 sub is_final_accepted {
@@ -67,13 +72,20 @@ sub generate_short_description {
   my ($self, $is_final, $is_accepted) = @_;
 
   defined $is_final or croak 'Final flag should be defined';
-  my $decision = $is_accepted ? $ACCEPTED :
-        (defined $is_accepted ? $REJECTED : $UNDECIDED);
+
+  my $decision = $self->generate_short_description_prefix($is_accepted);
   if (defined $is_accepted || $is_final) {
     $decision .= q[ ] . ($is_final ? $FINAL : $PRELIMINARY);
   }
 
   return $decision;
+}
+
+sub generate_short_description_prefix {
+  my ($self, $is_accepted) = @_;
+
+  return $is_accepted ? $ACCEPTED :
+    (defined $is_accepted ? $REJECTED : $UNDECIDED);
 }
 
 no Moose::Role;
@@ -106,6 +118,15 @@ __END__
 
   __PACKAGE__->is_final_outcome_description('Accepted final'); # returns true
   $row->is_final_outcome_description('Accepted preliminary'); # returns false
+
+=head2 is_rejected_outcome_description
+  
+  Argument - short qc outcome description.
+  Returns true if the argument describes a rejected outcome, false otherwise.
+  Can be used as both class and instance method.
+
+  __PACKAGE__->is_rejected_outcome_description('Rejected final'); # returns true
+  $row->is_rejected_outcome_description('Accepted preliminary'); # returns false
 
 =head2 is_final_outcome
 
@@ -175,6 +196,15 @@ __END__
 
     __PACKAGE__->generate_short_description($is_final);
     # returns 'Undecided' !!!
+
+=head2 generate_short_description_prefix
+
+  Similar to generate_short_description, but neither requires a flag indicating
+  whether the status is final, no appends a suffix indicating the finality status
+
+    __PACKAGE__->generate_short_description(1); #returns 'Accepted'
+    __PACKAGE__->generate_short_description(0); #returns 'Rejected'
+    __PACKAGE__->generate_short_description();  #returns 'Undecided' 
 
 =head1 DIAGNOSTICS
 

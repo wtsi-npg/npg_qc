@@ -1,13 +1,144 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 69.5.0
+ - measures to speed-up generation of SeqQC pages:
+   - add a prefetch for compositions and components when retrieving autoqc
+     results from a database;
+   - use in-line custom sort function instead of a closure for ref_match
+     result objects  
+   - disable a check for circular references in serialization of autoqc
+     result objects
+
+release 69.4.0
+ - mqc skipper not to consider runs tagged 'no_auto' or 'no_mqc_skipper'
+
+release 69.3.0
+ - mqc skipper - following a change in RoboQC creteria for real samples
+   (artic QC pass requirement is dropped), add a threshold for the number
+   of artic fails
+ - add option to restrict to a single gbs_plex to genotype_call_results_reporter  
+
+release 69.2.0
+ - the mqc skipper script is changed to always take into account the outcome
+   of RoboQC assessment
+ - improvements for SeqQC display of the generic results for artic data
+
+release 69.1.0
+ - an extension for the npg_mqc_skipper script to make it work for the
+   Heron study, ie to take into consideration provisional manual QC
+   outcomes from the review autoqc resuls and finalise QC outcomes
+   for sequencing and libraries for runs that are expedited to archival
+
+release 69.0.1
+ - npg_qc::autoqc::checks::generic::artic - bug fix in a parser for
+   artic QC summary for cases when the summary is empty
+
+release 69.0.0
+ - npg_qc::autoqc::checks::generic::artic - a proper autoqc check class,
+   which repleces bin/npg_autoqc_generic4artic script
+ - make pp_name attribute required for the generic check object
+ - custom scripts for robo qc and autoqc for outputs of the artic pipeline
+   (npg_autoqc_generic4artic and npg_simple_robo4artic) are removed
+ - npg_qc::autoqc::checks::review
+   - breaking change of the RoboQC section of the product configuration file
+   - introduction of the applicability criteria to allow for conditions that
+     are based on different LIMS properties
+
+release 68.9
+ - DBIx class for the generic table: add missing standard custom relationship
+ - SeqQC template simplification and database access optimisation for rna
+   autoqc results
+ - extension of the SeqQC template for the generic check - a link to
+   appliconstats index page for plots is added
+ - deployment of the latest version of Catalyst, 5.90128, does not seem
+   to include the Starman; the dependency was probably not explicit;
+   starman is added to the list of required packages in npg_qc_viewer/Build.PL 
+
+release 68.8.0
+ - specialised generic check for ampliconstats
+
+release 68.7.1
+ - bug fix for the order of assignment of keys for the doc->{'meta'}
+   part of the generic result object for the ncov2019_artic_nf pp
+
+release 68.7.0
+ - ability to invoke, via the qc script, specialised versions of
+   autoqc checks
+ - reusable methods for autoqc generic check
+
+release 68.6.0
+ - autoqc generic result object:
+     rename 'desc' attribute to 'pp_name' since 'desc' is a reserved
+     word in some SQL flavours; hence qouting the column name, which
+     DBI(x) does not do, might be required;
+     to be able to produce distinct visual representation in SeqQC for
+     different external pipelines check_name method to return the
+     name of the class concatenated with the name of the pipeline
+ - npg_autoqc_generic4artic:
+     uses sample control flags instead of sample
+     supplier names to distinguish between real samples and different
+     sample control types
+ - SeqQC view for the autoqc generic result
+
+release 68.5.0
+ - npg_simple_robo4artic:
+     uses sample control flags instead of sample
+     supplier names to decide on the robo evaluation criteria and the
+     proposed manual QC outcome;
+     evaluates positive controls in the same way as real samples 
+
+release 68.4.0
+ - npg_qc::autoqc::checks::generic and npg_qc::autoqc::results::generic -
+   check and result objects for generic autoqc
+ - DBIx class for the generic result
+ - a new script, npg_autoqc_generic4artic, to generate generic autoqc
+   results for artic pp
+
+release 68.3.0
+ - npg_simple_robo4artic:
+     extended to consider negative and positive controls;
+     no action (skip) for positive control, a separate set of evaluation
+     criteria for negative controls;
+     all outcomes are recorded as preliminary manual QC outcomes;
+     QC summary is is recorded in the 'info' attribute of the review
+     autoqc check
+ - type of the 'info' attribute for file-based autoqc results is relaxed,
+   changed from a hash of strings to a hash of arbitrary entities to allow
+   for a nested data structure
+
+release 68.2.1
+ - allow the dot character in QC outcomes column values
+
+release 68.2.0
+ - tweak for genome coverage figure in qc summary - fall back to target 
+   if no default autosomes only number available.
+ - a new script - npg_simple_robo4artic - to generate autoqc review
+   results from third party QC data
+ - skip ref_match autoqc checks only for true GBS samples
+ - SeqQC viewer: make visual cues for utility (user) QC  outcomes always
+   visible regardless of whether they concur with the manual QC outcome
+   or not
+
+release 68.1.0
+ - criteria_md5 attribute is added to the review autoqc result object;
+   previously it was computed at a point of loading to the database
+   and was available only in objects retrieved from the database;
+   availability of this value at check execution time will be useful
+   for planned generalisation of the review check
+ - ability to save autoqc review outcomes to uqc is added
+ - autoqc review check: enable public 'lims' attribute for the
+   object's constructor - needed to speed up pipeline's setup
+ - remove old InterOp file parsers and database loaders
+
+release 68.0.0
  - interop parser - extra tests and a fix for some result hash keys
  - provisions for having an array of result objects in the result
    attribute of the autoqc check object
+ - ability to pass multiple qc_out directories to the check
  - using moniker role to generate file name root in a standard way
    from a composition - needed if the result attribute is an array
    since passing the file name root to the check will not be the right
-   thing to do (multiple file names are needed in this case, so there
-   is no other option but delegating it to the result object itself)
+   thing to do (multiple file names are needed in this case)
  - redundant result role methods filename_root_from_filename and
    is_old_style_result are removed
  - pass, info and comments attributes moved from the result to the
@@ -17,6 +148,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - new interop autoqc check
  - retrieval of interop autoqc check results by SeqQC web app is
    currently supressed
+ - division by zero bug fixed in npg_qc::autoqc::role::bam_flagstats
+   for cases when nothing mappes in target regions 
 
 release 67.5.0
  - npg_qc::illumina::interop::parser - a stand-alone custom parser
