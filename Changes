@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - GbS Minor_v1.0 plex included in genotype data extracted from iRODS 
  - change the type of the stats column in the 'samtools_stats' table from
    'mediumglob' to 'longglob' to accommodate the ampliconstats data for
    384 samples

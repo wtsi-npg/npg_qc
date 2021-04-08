@@ -16,11 +16,12 @@ Readonly::Scalar my $FLUIDIGM_RESULT_CALL_COL => 9;
 Readonly::Scalar my $MAX_FATAL_ERRS => 64;
 
 my %opts;
-getopts('qshn:', \%opts);
+getopts('qshfn:', \%opts);
 
 my $qc22_only = $opts{q};
 my $qc26_only = $opts{s};
 my $hdr_print = $opts{h};
+my $no_flip   = $opts{f};
 
 my %calls = (
   rs1030687 => {strand => q[-], call => q[NN], qc22 => q[N], qc26 => q[N], },
@@ -120,6 +121,7 @@ my %calls = (
 my $errexit_count = 0;
 my $sample_name = q[];
 
+
 while(<>) {
   chomp;
 
@@ -164,7 +166,7 @@ while(<>) {
 
     if($calls{$rsname}) { $calls{$rsname}->{call} = $call };
     if($calls{$rsname}) {
-      if($calls{$rsname}->{strand} eq q[-]) {
+      if( !$no_flip && $calls{$rsname}->{strand} eq q[-]) {
         $call =~ tr/ACGT/TGCA/;
         ## no critic qw(BuiltinFunctions::ProhibitReverseSortBlock)
         $call = join q[], sort { $b cmp $a; } (split //smx, $call);
