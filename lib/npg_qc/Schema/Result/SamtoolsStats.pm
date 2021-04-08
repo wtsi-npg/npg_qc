@@ -80,7 +80,7 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
 =head2 stats
 
-  data_type: 'mediumblob'
+  data_type: 'longblob'
   is_nullable: 0
 
 Compressed samtools stats file content
@@ -105,7 +105,7 @@ __PACKAGE__->add_columns(
   'filter',
   { data_type => 'varchar', is_nullable => 0, size => 30 },
   'stats',
-  { data_type => 'mediumblob', is_nullable => 0 },
+  { data_type => 'longblob', is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -173,8 +173,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::samtools_stats';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-22 10:54:55
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:sH4LYB2SLL+zYC4RjluxJw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2021-03-22 11:40:42
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CHtNIASw5kdMTguj8RfNcw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
@@ -276,7 +276,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 GRL
+Copyright (C) 2015,2016,2017,2018,2019,2021 Genome Research Ltd.
 
 This file is part of NPG.
 
