@@ -1,0 +1,3 @@
+ALTER TABLE `samtools_stats`
+MODIFY COLUMN `stats` longblob NOT NULL \
+COMMENT 'Compressed samtools stats file content';
