@@ -249,7 +249,9 @@ sub _can_skip_mqc4run { ##no critic (Subroutines::ProhibitExcessComplexity)
   # applicability_criteria, if set for the study, might not apply to a product.
   # For the kind of studies the mqc skipper utility deals with this should not
   # happen. No fast-tracking if undefined outcomes are present.
-  my $num_undef_outcomes = grep {!defined $_->qc_outcome->{mqc_outcome}} @results;
+  my $num_undef_outcomes = grep {!defined $_->qc_outcome->{mqc_outcome}}
+                           grep { $_->class_name eq $REVIEW_CLASS_NAME }
+                           @results;
   if ($num_undef_outcomes) {
     $self->logger->error(sprintf '%i result%s ha%s undefined QC outcome',
       $num_undef_outcomes,
@@ -263,10 +265,6 @@ sub _can_skip_mqc4run { ##no critic (Subroutines::ProhibitExcessComplexity)
   my $artic_results4real_samples = {};
 
   foreach my $r (@results) {
-    # We need outcomes to be defined
-    if ($r->class_name eq $REVIEW_CLASS_NAME) {
-      ($r->qc_outcome and $r->qc_outcome->{mqc_outcome}) or return;
-    }
     my $d = $r->composition->digest;
     if (not exists $sample_info->{$d}) {
       $self->logger->error('No sample info for ' . $r->composition->freeze);
