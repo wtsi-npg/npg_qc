@@ -33,14 +33,14 @@ sub massage_for_render {
       }
     }
     # rename fields to improve viewer comprehension
-    $table_data{num_aligned_fragments} = $qc_data->{num_aligned_reads};
+    $table_data{num_aligned_reads} = $qc_data->{num_aligned_reads};
   }
   if (exists $self->doc->{meta}) {
     # All current analyses that use this particular data are paired-end
     # and as such, the input fragment count does not reflect it.
     # Single-ended fragment counts will be incorrect!
     if (defined $self->doc->{meta}{num_input_reads}) {
-      $table_data{num_input_fragments} = $self->doc->{meta}{num_input_reads} * 2;
+      $table_data{num_input_reads} = $self->doc->{meta}{num_input_reads} * 2;
     }
 
     $table_data{max_negative_control_filtered_read_count} =
