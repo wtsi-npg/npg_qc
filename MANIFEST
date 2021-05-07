@@ -23,6 +23,7 @@ lib/npg_qc/autoqc/checks/alignment_filter_metrics.pm
 lib/npg_qc/autoqc/checks/bam_flagstats.pm
 lib/npg_qc/autoqc/checks/bcfstats.pm
 lib/npg_qc/autoqc/checks/check.pm
+lib/npg_qc/autoqc/checks/cscreen.pm
 lib/npg_qc/autoqc/checks/interop.pm
 lib/npg_qc/autoqc/checks/gc_bias.pm
 lib/npg_qc/autoqc/checks/gc_fraction.pm
@@ -58,6 +59,7 @@ lib/npg_qc/autoqc/results/bcfstats.pm
 lib/npg_qc/autoqc/results/base.pm
 lib/npg_qc/autoqc/results/collection.pm
 lib/npg_qc/autoqc/results/contamination.pm
+lib/npg_qc/autoqc/results/cscreen.pm
 lib/npg_qc/autoqc/results/interop.pm
 lib/npg_qc/autoqc/results/gc_bias.pm
 lib/npg_qc/autoqc/results/gc_fraction.pm
@@ -218,6 +220,7 @@ t/60-autoqc-checks-af_metrics.t
 t/60-autoqc-checks-bam_flagstats.t
 t/60-autoqc-checks-bcfstats.t
 t/60-autoqc-checks-check.t
+t/60-autoqc-checks-cscreen.t
 t/60-autoqc-checks-interop.t 
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
@@ -249,6 +252,7 @@ t/60-autoqc-results-bam_flagstats.t
 t/60-autoqc-results-bcfstats.t
 t/60-autoqc-results-collection.t
 t/60-autoqc-results-contamination.t
+t/60-autoqc-results-cscreen.t
 t/60-autoqc-results-interop.t
 t/60-autoqc-results-gc_bias.t
 t/60-autoqc-results-gc_fraction.t
@@ -290,6 +294,7 @@ t/data/autoqc/bam_flagstats/4921_3_bam_flagstats.json
 t/data/autoqc/bam_flagstats/33681_1#15.bam_flagstats.json
 t/data/autoqc/bcfstats/data/21835_5.bcfstats.json
 t/data/autoqc/bcfstats/samplesheet_21835.csv
+t/data/autoqc/cscreen/adapters.32.100000.msh
 t/data/autoqc/dbix_loader/run/12233_1.upstream_tags.json
 t/data/autoqc/dbix_loader/run/12233_1.adapter.json
 t/data/autoqc/dbix_loader/run/12233_1.gc_fraction.json

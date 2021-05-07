@@ -1,15 +1,19 @@
 package npg_qc::autoqc::results::cscreen;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
+use Carp;
+
 extends qw(npg_qc::autoqc::results::base);
 
 our $VERSION = '0';
 
-has data            => ( is  => 'rw',
-                         isa => 'ArrayRef', );
-has num_reads       => ( is  => 'rw',
-                         isa => 'HashRef', );
+has 'doc' =>  (
+  isa      => 'HashRef',
+  is       => 'rw',
+  required => 0,
+);
 
 __PACKAGE__->meta->make_immutable;
 
@@ -17,32 +21,26 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
-
 =head1 NAME
 
-    npg_qc::autoqc::results::cscreen
+ npg_qc::autoqc::results::cscreen
 
 =head1 SYNOPSIS
 
+ my $cs = npg_qc::autoqc::results::cscreen->new(rpt_list => '40:1:1');
+
 =head1 DESCRIPTION
+
+An autoqc result class that wraps the output of a contamination screen,
+which is performed with mash.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 forward_read_filename Filename for the first (forward) read 
+=head2 doc
 
-=head2 reverse_read_filename Filename for the second (reverse) read
-
-=head2 forward_fasta_read_count
-
-=head2 forward_contaminated_read_count
-
-=head2 forward_blat_hash
-
-=head2 reverse_fasta_read_count
-
-=head2 reverse_contaminated_read_count
-
-=head2 reverse_blat_hash
+A hash reference attribute, defailts to an empty hash. This data structure
+is going to be serialized to JSON when saved either to a file or to a
+datababase.
 
 =head1 DIAGNOSTICS
 
@@ -54,6 +52,8 @@ __END__
 
 =item Moose
 
+=item MooseX::StrictConstructor
+
 =item namespace::autoclean
 
 =back
@@ -64,12 +64,11 @@ __END__
 
 =head1 AUTHOR
 
-Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
-John O'Brien E<lt>jo3@sanger.ac.ukE<gt>
+Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2021 Genome Research Ltd.
 
 This file is part of NPG.
 

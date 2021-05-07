@@ -1,122 +1,238 @@
 package npg_qc::autoqc::checks::cscreen;
 
 use Moose;
+use MooseX::StrictConstructor;
 use namespace::autoclean;
 use Carp;
 use English qw(-no_match_vars);
 use Perl6::Slurp;
 use File::Spec;
-use Parallel::ForkManager;
-use File::Temp qw(tempdir);
-use POSIX qw(mkfifo);
-use Fcntl qw(:mode);
 use Readonly;
-use List::MoreUtils qw(uniq);
+use Cwd q(abs_path);
+use File::Basename;
 
-use npg_tracking::util::types;
-
-extends qw(npg_qc::autoqc::checks::check);
-with    qw(npg_common::roles::software_location);
+extends 'npg_qc::autoqc::checks::check';
+with    'npg_tracking::data::reference::list';
+with    'npg_common::roles::software_location' =>
+          { tools => [qw/mash samtools/] };
 
 our $VERSION = '0';
 
-Readonly::Scalar my $EXT => q[cram];
+Readonly::Scalar my $EXT                    => q[cram];
+Readonly::Scalar my $SHIFT_EIGHT            => 8;
+Readonly::Scalar my $SUFFICIENT_NUM_READS   => 10_000_000;
+Readonly::Scalar my $SAMTOOLS_FILTER        => q[0x900];
+Readonly::Scalar my $MASH_SCREEN_MAX_PVALUE => 0.0001;
+Readonly::Scalar my $QUERY_ID_INDEX         => 4;
+Readonly::Scalar my $SKETCH_FILE_NAME       => q[all_species_current.msh];
+Readonly::Scalar my $SKETCH_DIR_REL_PATH    => q[mash/screen];
+Readonly::Hash   my %EMPTY_RESULT           =>
+                   ('references' => q[], 'adapters' => q[]);
+# TODO or rather to consider:
+# 1. How many CPU overrall, how many for each tool?
+# 2. Filter for p==0 ?
 
-Readonly::Scalar my $SHIFT_EIGHT => 8;
+has '+file_type' => (default => $EXT,);
 
-#indices of different fields in the NCBI tabular blat output
-Readonly::Scalar my $SEQ_NAME_IND => 0;
-Readonly::Scalar my $REF_NAME_IND => 1;
-# match indices are NOT zero based
-Readonly::Scalar my $START_MATCH_IND => 6;
-Readonly::Scalar my $END_MATCH_IND => 7;
-
-has '+file_type'       => (default => $EXT,);
-
-has 'ref_sketch_path' => (
+has 'sketch_path' => (
   isa        => q{Str},
   is         => q{ro},
-  default    => q{cscreen/cscreen_sketch.32.100000.msh},
+  required   => 0,
+  lazy_build => 1,
 );
+sub _build_sketch_path {
+  my $self = shift;
+  my $dir = catdir($self->metaref_repository, $SKETCH_DIR_REL_PATH);
+  if (not -d $dir) {
+    croak qq[mash screen sketch directory $dir does not exist];
+  }
+  my $sketch = catfile($dir, $SKETCH_FILE_NAME);
+  if (not -f $sketch) {
+    croak qq[mash sketch for $sketch does not exist];
+  }
+  return $sketch;
+}
+around 'sketch_path' => sub {
+  my $orig = shift;
+  my $self = shift;
+  my $path = $self->$orig();
 
-override 'execute' => sub {
-    my ($self) = @_;
+  if (!-e $path) {
+    croak "'$path' is not found";
+  }
 
-    super();
+  # The path might be a symlink, we have to resolve it.
+  if (-l $path) {
+    my $target = readlink $path;
+    if (File::Spec->file_name_is_absolute($target)) {
+      $path = $target;
+    } else {
+      my ($name,$dir) = fileparse($path);
+      $path = File::Spec->catfile($dir, $target);
+    }
+  } elsif (!-f $path) {
+    croak "'$path' is not a file";
+  }
 
-    my ($cram_in) = @{$self->input_files};
-    $self->result->data($self->_screen($cram_in));
-
-    return;
+  # Return an absolute path.
+  return abs_path($path);
 };
 
-sub _mash_command {
-    my $self = shift;
-    my $path = $self->ref_sketch_path;
-    return "mash screen -w -v 0.0001 $path -";
+has 'tm_json_file' => (
+  isa      => 'Str',
+  is       => 'ro',
+  required => 0,
+);
+
+has 'num_input_reads' => (
+  isa        => q{Maybe[Int]},
+  is         => q{ro},
+  required   => 0,
+  lazy_build => 1,
+);
+sub _build_num_input_reads {
+  return;
+}
+
+override 'execute' => sub {
+  my $self = shift;
+
+  super(); # Will figure out the input file if not given explicitly.
+
+  # The result is a hash reference with two keys, 'adapters' and 'references'.
+  # In both cases the values are two-dimentional tables (a array of arrays).
+  # The six columns of the tables are:
+  #   identity
+  #   median-multiplicity
+  #   shared-hashes - number of full k-mer matches
+  #   p-value
+  #   query-ID - adapter description or a path of the reference fasta file
+  #   species and strain or, where not applicable or impossible to infer,
+  #     the same value as in the previous column
+  # The tables are sorted in order of decreasing identity.
+
+  $self->result->doc(\%EMPTY_RESULT); # Initialise the result.
+  if (defined $self->num_input_reads and $self->num_input_reads == 0 ) {
+    $self->result->add_comment('Zero input reads, not running the check');
+  } else {
+    try {
+      $self->result->doc($self->_capture_output($self->_screen()));
+    } catch {
+      $self->result->add_comment(qq[Error: $_]);
+    };
+    $self->result->set_info('command', $self->_command());
+    $self->result->set_info('samtools_version',
+      $self->current_version($self->samtools_cmd));
+    $self->result->set_info('mash_version',
+      $self->current_version($self->mash_cmd));
+    $self->result->set_info('mash_sketch', $self->sketch_path());
+  }
+
+  return;
+};
+
+has '_command' => (
+  isa        => q{Str},
+  is         => q{ro},
+  lazy_build => 1,
+);
+sub _build__command {
+  my $self = shift;
+  # The input file (cram or bam) is converted to FASTQ, the output is piped
+  # to mash. The winner takes it all strategy for mash (-w option).
+  my $command = sprintf
+    '%s fasta -F%s - | %s screen -w -v %d %s -',
+    $self->samtools_cmd,
+    $SAMTOOLS_FILTER,
+    $self->mash_cmd,
+    $MASH_SCREEN_MAX_PVALUE,
+    $self->sketch_path;
+
+  # If the number of reads is known and is non-zero and is larger than
+  # the threshold, screen a proportion of reads.
+  if (defined $self->num_input_reads) {
+    if ($self->num_input_reads > $SUFFICIENT_NUM_READS) {
+      my $scale_factor = sprintf '%.2f',
+                         ${SUFFICIENT_NUM_READS}/$self->num_input_reads;
+      $self->result->add_comment(
+        qq[Number of input reads is subsampled by a factor of $scale_factor]);
+      # Will convert to SAM here - OK?
+      $command = sprintf 'samtools view -s %s | %s',
+                          $scale_factor, $command;
+    }
+  } else {
+    $self->result->add_comment(q[Number of input reads is not known]);
+  }
+
+  $command = sprintf 'cat %s | %s', $self->input_files->[0], $command;
+
+  return qq[/bin/bash -c "set -o pipefail && $command"];
 }
 
 sub _screen {
-    my ($self, $cram) = @_;
+  my $self = shift;
 
-    my $tmpdir = File::Temp->newdir(); #will be removed when out of scope
-    my $tempfifo = File::Temp::tempnam($tmpdir, q(fifo));
-    mkfifo($tempfifo, S_IRWXU) or croak "Cannot create fifo $tempfifo";
+  my $command = $self->_command();
+  open my $fh, q[|-], $command or
+    croak qq[Cannot open filehandle for '$command', error $ERRNO];
+  #my @data = slurp $fh;
+  #my $child_error = $CHILD_ERROR >> $SHIFT_EIGHT;
+  #if ($child_error != 0) {
+  #  croak qq[Error in pipe '$command': $child_error];
+  #}
+  my @data = slurp $fh;
+  close $fh or croak qq[Cannot close file handle for '$command'];
+  # mash fails if input with no reads is supplied. If we did not know the
+  # number of input reads upfront and were not able to bypass executing of
+  # commands, the error might be due to empty input.
 
-    my $pm = Parallel::ForkManager->new(1, $tmpdir);
-    $pm->run_on_finish( sub {
-        my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_structure_reference) = @_;
-        $self->result->num_reads($data_structure_reference);
-    });
-
-    my $pid = $pm->start;
-    ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
-    if (! $pid) { #fork to convert CRAM to fasta whilst counting forward and reverse reads
-        my $b2fqcommand = q[/bin/bash -c "set -o pipefail && ] . $self->samtools_cmd .
-                         qq[ fasta -F0x900 $cram] . q[" |] ;
-        open my $ifh, $b2fqcommand or croak qq[Cannot fork '$b2fqcommand', error $ERRNO];
-        open my $ofh, q(>), $tempfifo or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
-        my ($fcount, $rcount) = (0,0);
-        my $header_flag = 1;
-        while (my $line = <$ifh>){
-            if ($header_flag){
-                $line =~ m{^\S+/2\b}smx ? $rcount++ : $fcount++;
-            }
-            # If this is header, the next line is not and other way around
-            $header_flag = not $header_flag;
-            print {$ofh} $line or croak qq[Cannot write to fifo $tempfifo, error $ERRNO];
-        }
-        close $ofh or croak qq[Cannot close fifo $tempfifo, error $ERRNO];
-        close $ifh or croak qq[Cannot close pipe $b2fqcommand, error $ERRNO];
-        $pm->finish(0,{forward_count => $fcount, reverse_count => $rcount}); # send counts
-    }
-
-    my $command = qq[/bin/bash -c "set -o pipefail && cat $tempfifo | ] . $self->_mash_command . q[" |];
-    open my $fh, $command or croak qq[Cannot fork '$command', error $ERRNO];
-    my $results = $self->_capture_output($fh);
-    close $fh or carp qq[cannot close bad pipe '$command'];
-    ## use critic
-
-    my $child_error = $CHILD_ERROR >> $SHIFT_EIGHT;
-    if ($child_error != 0) {
-        croak qq[Error in pipe '$command': $child_error];
-    }
-
-    $pm->wait_all_children;
-
-    return $results;
+  return \@data;
 }
 
 sub _capture_output {
-    my ($self, $mash_fh) = @_;
+  my ($self, $data) = @_;
 
-    my @lines = slurp $mash_fh;
-    @lines = reverse
+  # Sort results in order of decreasing identity.
+  my @rows = reverse
              sort { $a->[0] <=> $b->[0] }
-             map { [(split qq[\t])] }
-             @lines;
+             map { [(split /\s/smx)] }
+             @{$data};
+  my %empty   = %EMPTY_RESULT;
+  my $results = \%empty;
+  # Examine the query ID - fifth column - to see whether this is a match to
+  # the adapter or the reference. There might be no data for adapter matches
+  # either because the data is not contaminated by the adapters, or because
+  # the mash sketchh does not contain data adapter k-mers, or because the
+  # descriptions of the adapter sequences do not conform to our expected
+  # pattern.
+  for my $row (@rows) {
 
-    return \@lines;
+    my $query_id = $row->[$QUERY_ID_INDEX];
+    my $name = $query_id;
+    my $is_adapter = ($query_id =~ /\|adapter\Z/smx);
+
+    # The sixth column is query comment, in our case the description of the
+    # first contig for references or nothing for adapters. This is not useful,
+    # so we replace it by the species and strain or version name or, failing
+    # to infer this data, by the query id.
+    if (not $is_adapter) {
+      my ($ref, $strain) = $query_id =~ m{/references/(\w+)/(\w+)/}smx;
+      if ($ref and $strain) {
+        $name = sprintf '%s (%s)', $ref, $strain;
+      } else {
+        carp "Failed to infer species and strain from $query_id";
+      }
+    }
+    $row->[$QUERY_ID_INDEX + 1] = $name;
+
+    if ($is_adapter) {
+      push @{$results->{'adapters'}}, $row;
+    } else {
+      push @{$results->{'references'}}, $row;
+    }
+  }
+
+  return $results;
 }
 
 __PACKAGE__->meta->make_immutable();
@@ -125,62 +241,95 @@ __PACKAGE__->meta->make_immutable();
 
 __END__
 
-
 =head1 NAME
 
 npg_qc::autoqc::checks::cscreen
 
 =head1 SYNOPSIS
 
-    use npg_qc::autoqc::checks::adapter;
-
-    The path to the fastq files must be specified along with the lane
-    position.
-
-    C<<my $adapter_check =
-        npg_qc::autoqc::checks::adapter->new( path     = '/some/fastq/dir',
-                                              position = 3, );>>
-
-    You can override the default adapter list, either in the constructor or
-    afterwards.
-
-    C<<$adapter_check->adapter_fasta('list.fasta');>>
-
-    Carry out a blat-based search.
-
-    C<<$adapter_check->execute();>>
-
 =head1 DESCRIPTION
 
-    Look for adapter matches in cram files.
-    Results for a forward and reverse read are reported separately.
+Contamination screen performed with mash against a sketch which contains
+k-mers from references of all species in teh WTS reference collection.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-    Moose-based. An optional argument, 'adapter_fasta',
-    may be supplied to override the default list of adapter sequences used.
+A Moose class constructor.
+
+=head2 repository
+
+A path to the NPG data repository. Is set automatically if the
+NPG_REPOSITORY_ROOT environment variableis set. Inherited from the
+C<npg_tracking::data::reference::list> role.
+
+=head2 metaref_repository
+
+A path to the NPG repository for matagenome references. Inherited from the
+C<npg_tracking::data::reference::list> role.
+
+=head2 file_type
+
+Input file type, ie file extension without a dot (cram, bam). Relevant if
+the inputs_file array is not set by the caller. Inherited from the parent
+C<npg_qc::autoqc::checks::check>.
+
+=head2 input_files
+
+An array of input files, only the first file will be used as input.
+Inherited from the parent C<npg_qc::autoqc::checks::check>.
+
+=head2 samtools_cmd
+
+An absolute path to C<samtools> executable, inferred automatically if
+<samtools> is on the C<PATH>, error if not. Inherited from the 
+C<npg_common::roles::software_location> role.
+
+=head2 mash_cmd
+
+An absolute path to C<mash> executable, inferred automatically if
+<mash> is on the C<PATH>, error if not. Inherited from the 
+C<npg_common::roles::software_location> role.
+
+=head2 sketch_path
+
+An absolute path to a mash sketch that will be used to screen the reads
+against. Defaults to C<<mash/screen/all_species_current.msh>> in the directory
+specified by the metaref_repository attribute.
+
+If the file is a symbolic link, the target file will be used. A relative
+path will be converted to an absolute path.
+
+=head2 tm_json_file
+
+A path to a JSON file serialization of the tag_metrics autoqc result object
+for the same lane and run this object belongs to. An optional attribute.
+If set, provides data about the number of input reads.
+
+=head2 num_input reads
+
+Number of input reads. An optional argument. An attempt to infer the value
+from the tag_metrics autoqc result will be made, the value will be set to
+undefined if the metrics is not available or there is a problem accessing it.
 
 =head2 execute
 
-    Over-ride the parent execute subroutine. Procedural code to find the
-    fastq(s) for a run lane and run a blat search for adapter sequences in
-    each one.
+Extends the parent's C<execute> method. 
 
 =head1 DIAGNOSTICS
 
-    None.
-
 =head1 CONFIGURATION AND ENVIRONMENT
 
-    The class expects to find the blat executable installed.
+samtools and mash executables should be on the PATH
 
 =head1 DEPENDENCIES
 
 =over
 
 =item Moose
+
+=item MooseX::StrictConstructor;
 
 =item namespace::autoclean
 
@@ -192,21 +341,13 @@ npg_qc::autoqc::checks::cscreen
 
 =item Readonly
 
-=item Parallel::ForkManager
-
-=item File::Temp
-
-=item POSIX
-
-=item Fcntl
-
 =item File::Spec
 
-=item List::MoreUtils
+=item Cwd
+
+=item File::Basename
 
 =item npg_tracking::data::reference::list
-
-=item npg_tracking::util::types
 
 =item npg_common::roles::software_location
 
@@ -214,22 +355,17 @@ npg_qc::autoqc::checks::cscreen
 
 =head1 INCOMPATIBILITIES
 
-    None known.
-
 =head1 BUGS AND LIMITATIONS
 
-    Counting unique contaminated reads (totals and per adapter) is problematic
-    with large, highly contaminated files. This module saves on massive memory
-    memory overheads by relying on the blat output file being sorted first on
-    reads then on adapters.
+No information about the degree of contamination is produced.
 
 =head1 AUTHOR
 
-    John O'Brien, jo3
+Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 GRL
+Copyright (C) 2021 GRL.
 
 This file is part of NPG.
 
