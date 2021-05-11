@@ -2,8 +2,6 @@
 
 set -e -u -x
 
-# The default build branch for all repositories. This defaults to
-# TRAVIS_BRANCH unless set in the Travis build environment.
 WTSI_NPG_BUILD_BRANCH=$1
 
 WTSI_NPG_GITHUB_URL=$2
