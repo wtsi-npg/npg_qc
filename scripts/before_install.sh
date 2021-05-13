@@ -3,12 +3,11 @@
 set -e -x
 # set -u fails cause npm install to fail
 
-#Passing in node and npm version
-NODE_VERSION=$1
-NPM_VERSION=$2
+#Passing in npm version
+NPM_VERSION=$1
 
-# shellcheck source=/dev/null
-rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (pushd ~/.nvm && git checkout v0.31.0 && popd) && source ~/.nvm/nvm.sh && nvm install "${NODE_VERSION}"
+mkdir "$HOME/.npm-global"
+npm config set prefix "$HOME/.npm-global"
 
 npm install -g "npm@${NPM_VERSION}"
 
