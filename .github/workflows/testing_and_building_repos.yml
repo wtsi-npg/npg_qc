@@ -1,7 +1,7 @@
 name: testing_and_building_repo
 on: [push, pull_request]
 jobs:
-  build: 
+  build:
     strategy:
       fail-fast: false
       matrix:
@@ -9,7 +9,7 @@ jobs:
         perl: ['5.26']
         node: ['14.8.0']
 
-    runs-on: ${{matrix.os}} 
+    runs-on: ${{ matrix.os }}
 
     defaults:
       run:
@@ -19,17 +19,17 @@ jobs:
       WSI_CONDA_CHANNEL: "https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic"
       NPM_CONFIG_PREFIX: "$HOME/.npm-global"
 
-    name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }} on ${{ matrix.os }}  
+    name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }} on ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2 
-    
+    - uses: actions/checkout@v2
+
     # Caching cpanm external modules
     - name: Cache cpanm external modules
       id: cpanmCache
       uses: actions/cache@v2
       with:
         path: ~/perl5ext
-        key: ${{ matrix.os}}-build-cpanm-external
+        key: ${{ matrix.os }}-build-cpanm-external
 
     - name: Initialize Miniconda
       run: |
@@ -43,17 +43,17 @@ jobs:
         path: |
           ~/conda/pkgs
           ~/conda/envs
-        key: ${{ matrix.os}}-build-miniconda
+        key: ${{ matrix.os }}-build-miniconda
 
-    - name: install libgd-dev and uuid-dev 
+    - name: install libgd-dev and uuid-dev
       run:
-          sudo apt-get install -y libgd-dev uuid-dev 
-    
+          sudo apt-get install -y libgd-dev uuid-dev
+
     - name: install conda client, baton,samtools, set up conda environment
       run: |
           conda config --prepend pkgs_dirs ~/conda/pkgs
           conda config --prepend envs_dirs ~/conda/envs
-          
+
           conda config --set auto_update_conda False
           conda config --prepend channels "$WSI_CONDA_CHANNEL"
           conda config --append channels conda-forge
@@ -63,11 +63,9 @@ jobs:
           conda install -y -n "$CONDA_TEST_ENV" nodejs=="${{ matrix.node }}"
           conda install -y -n "$CONDA_TEST_ENV" npg_qc_utils
           conda install -y -n "$CONDA_TEST_ENV" baton
-          conda activate "$CONDA_TEST_ENV"
       env:
-        CONDA_CHANNEL: https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic
         CONDA_TEST_ENV: test-environment
- 
+
     - name: install cpanm
       run: |
           wget -qO - https://cpanmin.us | /usr/bin/perl - --sudo App::cpanminus
@@ -80,16 +78,16 @@ jobs:
           ${GITHUB_WORKSPACE}/scripts/before_install.sh $NPM_VERSION
 
           cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-          ${GITHUB_WORKSPACE}/scripts/install.sh $WTSI_NPG_BUILD_BRANCH $WTSI_NPG_GITHUB_URL 
+          ${GITHUB_WORKSPACE}/scripts/install.sh $WTSI_NPG_BUILD_BRANCH $WTSI_NPG_GITHUB_URL
       env:
         NPM_VERSION: "4.5.0"
-        WTSI_NPG_BUILD_BRANCH: ${GITHUB_HEAD_REF} 
+        WTSI_NPG_BUILD_BRANCH: ${GITHUB_HEAD_REF}
         WTSI_NPG_GITHUB_URL: https://github.com/wtsi-npg
 
     - name: run script
       run: |
           export PATH="$HOME/miniconda/bin:$PATH"
-          conda activate "$CONDA_TEST_ENV" 
+          conda activate "$CONDA_TEST_ENV"
           conda info --envs
           cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
           ${GITHUB_WORKSPACE}/scripts/script.sh "${{ matrix.node }}" $WTSI_NPG_BUILD_BRANCH
