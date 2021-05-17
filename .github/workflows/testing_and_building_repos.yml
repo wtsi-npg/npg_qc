@@ -10,13 +10,14 @@ jobs:
         node: ['14.8.0']
 
     runs-on: ${{matrix.os}} 
-    
+
     defaults:
       run:
         shell: bash -l -e -o pipefail {0}
 
     env:
       WSI_CONDA_CHANNEL: "https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic"
+      NPM_CONFIG_PREFIX: "$HOME/.npm-global"
 
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}  
     steps:
@@ -73,8 +74,11 @@ jobs:
 
     - name: Run install scripts
       run: |
-          echo "$HOME/miniconda/samtools/bin" >> $GITHUB_PATH 
+          echo "$HOME/miniconda/samtools/bin" >> $GITHUB_PATH
+
+          mkdir -p "$NPM_CONFIG_PREFIX"
           ${GITHUB_WORKSPACE}/scripts/before_install.sh $NPM_VERSION
+
           cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
           ${GITHUB_WORKSPACE}/scripts/install.sh $WTSI_NPG_BUILD_BRANCH $WTSI_NPG_GITHUB_URL 
       env:
@@ -84,7 +88,6 @@ jobs:
 
     - name: run script
       run: |
-          export PATH="$HOME/.npm-global/bin:$PATH"
           export PATH="$HOME/miniconda/bin:$PATH"
           conda activate "$CONDA_TEST_ENV" 
           conda info --envs

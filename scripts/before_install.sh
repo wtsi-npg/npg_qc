@@ -6,9 +6,6 @@ set -e -x
 #Passing in npm version
 NPM_VERSION=$1
 
-mkdir "$HOME/.npm-global"
-npm config set prefix "$HOME/.npm-global"
-
 npm install -g "npm@${NPM_VERSION}"
 
 # Dummy executable files generated for tests use #!/usr/local/bin/bash
