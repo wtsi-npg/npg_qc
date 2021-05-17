@@ -19,7 +19,7 @@ jobs:
       WSI_CONDA_CHANNEL: "https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic"
       NPM_CONFIG_PREFIX: "$HOME/.npm-global"
 
-    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}  
+    name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }} on ${{ matrix.os }}  
     steps:
     - uses: actions/checkout@v2 
     
