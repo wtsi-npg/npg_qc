@@ -8,7 +8,6 @@ jobs:
         os: ['ubuntu-18.04']
         perl: ['5.26']
         node: ['14.8.0']
-        npm: ['4.5.0', '6.14.4']
 
     runs-on: ${{ matrix.os }}
 
@@ -20,7 +19,7 @@ jobs:
       WSI_CONDA_CHANNEL: "https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic"
       NPM_CONFIG_PREFIX: "$HOME/.npm-global"
 
-    name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }} and NPM ${{ matrix.npm }} on ${{ matrix.os }}
+    name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }} on ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
 
@@ -76,7 +75,7 @@ jobs:
           echo "$HOME/miniconda/samtools/bin" >> $GITHUB_PATH
 
           mkdir -p "$NPM_CONFIG_PREFIX"
-          ${GITHUB_WORKSPACE}/scripts/before_install.sh $NPM_VERSION
+          ${GITHUB_WORKSPACE}/scripts/before_install.sh
 
           cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
           ${GITHUB_WORKSPACE}/scripts/install.sh $WTSI_NPG_BUILD_BRANCH $WTSI_NPG_GITHUB_URL
