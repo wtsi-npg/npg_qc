@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - switch to node 14 for CI, using npm from default conda pkg
+
 release 69.6.1
  - mqc skipper bug fix - inspect qc outcomes for review autoqc results
    only
