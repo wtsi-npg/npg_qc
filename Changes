@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - added new npg_subtitution_metrics.pl script
  - switch to node 14 for CI, using npm from default conda pkg
 
 release 69.6.1
