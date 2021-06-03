@@ -232,14 +232,32 @@ sub _can_skip_mqc4run { ##no critic (Subroutines::ProhibitExcessComplexity)
 
   my $sample_info = $self->_sample_info->{$id_run};
   my $num_expected = scalar keys %{$sample_info};
+
+  # No fast-tracking if review results for some products are absent.
   if ($num_results != $num_expected) {
     $self->logger->error(
       "Number of autoqc review results retrieved for run ${id_run}: " .
       "expected - $num_expected, actual - $num_results");
     return;
-  } else {
-    $self->logger->info(
+  }
+
+  $self->logger->info(
       "$num_results autoqc review results retrieved for run ${id_run}");
+
+  # An undefined QC outcome might be an indication of some problem with autoqc
+  # results that are needed to perform the assessment. Or the
+  # applicability_criteria, if set for the study, might not apply to a product.
+  # For the kind of studies the mqc skipper utility deals with this should not
+  # happen. No fast-tracking if undefined outcomes are present.
+  my $num_undef_outcomes = grep {!defined $_->qc_outcome->{mqc_outcome}}
+                           grep { $_->class_name eq $REVIEW_CLASS_NAME }
+                           @results;
+  if ($num_undef_outcomes) {
+    $self->logger->error(sprintf '%i result%s ha%s undefined QC outcome',
+      $num_undef_outcomes,
+      ($num_undef_outcomes > 1) ? q[s]  : q[],
+      ($num_undef_outcomes > 1) ? q[ve] : q[s]);
+    return;
   }
 
   my @controls     = ();
@@ -247,10 +265,6 @@ sub _can_skip_mqc4run { ##no critic (Subroutines::ProhibitExcessComplexity)
   my $artic_results4real_samples = {};
 
   foreach my $r (@results) {
-    # We need outcomes to be defined
-    if ($r->class_name eq $REVIEW_CLASS_NAME) {
-      ($r->qc_outcome and $r->qc_outcome->{mqc_outcome}) or return;
-    }
     my $d = $r->composition->digest;
     if (not exists $sample_info->{$d}) {
       $self->logger->error('No sample info for ' . $r->composition->freeze);
@@ -278,7 +292,7 @@ sub _can_skip_mqc4run { ##no critic (Subroutines::ProhibitExcessComplexity)
   };
 
   # Not fast-tracking if one or more positive or negative controls
-  # fails across all lanes of a run.
+  # fail across all lanes of a run.
   my @failed = grep { $has_failed->($_) } @controls;
   if (@failed) {
     $self->logger->info("At least one of the controls failed in run $id_run");
@@ -286,7 +300,7 @@ sub _can_skip_mqc4run { ##no critic (Subroutines::ProhibitExcessComplexity)
   }
 
   # Not fast-tracking if the threshold of failed samples is exceeded
-  # in one of the lanes or, if attic QC fails threshold is set, the
+  # in one of the lanes or, if artic QC fails threshold is set, the
   # number of artic passes is not high enough. 
   foreach my $lane (keys %{$real_samples}) {
 
