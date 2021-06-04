@@ -105,6 +105,10 @@ sub read_err_file () {
   foreach my $tag (@{$tags}) {
     if ( $tag eq 'SET' ) {
        $err_data{set} = read_set_tag(\@lines, $tag);
+       if ( scalar(keys %{$err_data{set}}) == 0 ) {
+         print STDERR "No data in $file\n";
+         exit(0);
+       } 
        $err_data{maQ} = max(max(keys %{$err_data{set}->{1}}), max(keys %{$err_data{set}->{2}}));
     } elsif( $tag eq 'RCH' ) {
         $err_data{rch} = read_rc_tag(\@lines, $tag);
