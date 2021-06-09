@@ -1,6 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - switch to node 14 for CI, using npm from default conda pkg
+ - remove dependency on npg_common::sequence::reference::base_count, which
+   has been moved to an internal repository and is no longer available for
+   teh CI builds
 
 release 69.6.1
  - mqc skipper bug fix - inspect qc outcomes for review autoqc results
