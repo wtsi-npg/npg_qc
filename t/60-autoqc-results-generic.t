@@ -77,8 +77,8 @@ subtest 'attributes and methods' => sub {
   is_deeply(
     $r->massage_for_render,
     {
-      num_aligned_fragments => 2,
-      num_input_fragments => 8,
+      num_aligned_reads => 2,
+      num_input_reads => 8,
       control_type => 'positive',
       longest_no_N_run => '',
       pct_N_bases => '',
@@ -100,7 +100,7 @@ subtest 'attributes and methods' => sub {
   is_deeply(
     $r->massage_for_render,
     {
-      num_input_fragments => 8,
+      num_input_reads => 8,
       control_type => 'negative',
       max_negative_control_filtered_read_count => '',
       min_artic_passed_filtered_read_count => ''
