@@ -29,6 +29,7 @@ my $temp = tempdir( CLEANUP => 1);
                     insert_size      => 1,
                     sequence_error   => 1,
                     contamination    => 1,
+                    cscreen          => 1,
                     adapter          => 1,
                     split_stats      => 1,
                     spatial_filter   => 1,
