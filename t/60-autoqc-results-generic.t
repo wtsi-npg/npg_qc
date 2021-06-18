@@ -93,35 +93,56 @@ subtest 'simple attributes and methods' => sub {
 };
 
 subtest 'setting info' => sub {
-  plan tests => 14;
+  plan tests => 25;
+
+  my $url = 'https://github.com/google/it-cert-automation-practice';
 
   my $r = npg_qc::autoqc::results::generic->new(
           composition  => $c
   );
   is ($r->pp_name(), undef, 'descriptor is undefined');
-  is ($r->info->{Pipeline_name}, undef, 'pipeline name is undefined');
-  is ($r->info->{Pipeline_version}, undef, 'pipeline version is undefined');
-  $r->set_pp_info('pp1', 'v.0.1');
-  is ($r->pp_name(), 'pp1', 'descriptor available');
+  ok (!exists $r->info->{Pipeline_name}, 'pipeline name is unset');
+  ok (!exists $r->info->{Pipeline_version}, 'pipeline version is unset');
+  ok (!exists $r->info->{Pipeline_repo_url}, 'pipeline url is unset');
+
+  throws_ok { $r->set_pp_info() } qr/Portable pipeline name is required/,
+    'error if no arguments are given';
+ 
+  $r->set_pp_info('pp1');
+  is ($r->pp_name(), 'pp1', 'pp_name attribute is set');
   is ($r->check_name, 'generic pp1', 'check name');
   is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
+  ok (!exists $r->info->{Pipeline_version}, 'pipeline version is not set');
+  ok (!exists $r->info->{Pipeline_repo_url}, 'pipeline url is unset');
+ 
+
+  $r->set_pp_info('pp1', 'v.0.1');
+  is ($r->pp_name(), 'pp1', 'pp_name attribute is set');
+  is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
   is ($r->info->{Pipeline_version}, 'v.0.1', 'pipeline version');
+  ok (!exists $r->info->{Pipeline_repo_url}, 'pipeline url is unset');
+
+  $r->set_pp_info('pp1', 'v.0.2', $url);
+  is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
+  is ($r->info->{Pipeline_version}, 'v.0.2', 'pipeline version');
+  is ($r->info->{Pipeline_repo_url}, $url, 'pipeline url');
 
   $r = npg_qc::autoqc::results::generic->new(
        composition => $c,
        pp_name     => 'pp1',
        doc         => {qc_pass => 'TRUE', num_aligned_reads => 3}
   );
-  is ($r->pp_name(), 'pp1', 'descriptor');
-  is ($r->info->{Pipeline_name}, undef, 'pipeline name is undefined');
-  is ($r->info->{Pipeline_version}, undef, 'pipeline version is undefined');
+  is ($r->pp_name(), 'pp1', 'pipeline name attribute is set');
+  ok (!exists $r->info->{Pipeline_name}, 'pipeline name is not set');
+  ok (!exists $r->info->{Pipeline_version}, 'pipeline version is not set');
   throws_ok { $r->set_pp_info('pp2', 'v.0.1') }
     qr/Cannot reset portable pipeline name/,
     'pipeline name cannot be reset';
-  $r->set_pp_info('pp1', 'v.0.1');
-  is ($r->pp_name(), 'pp1', 'descriptor available');
+  $r->set_pp_info('pp1', q[], $url);
+  is ($r->pp_name(), 'pp1', 'pipeline attribute is set');
   is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
-  is ($r->info->{Pipeline_version}, 'v.0.1', 'pipeline version');
+  ok (!exists $r->info->{Pipeline_version}, 'pipeline version is not set');
+  is ($r->info->{Pipeline_repo_url}, $url, 'pipeline url');
 };
 
 1;

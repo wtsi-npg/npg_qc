@@ -182,12 +182,14 @@ subtest 'different types of input' => sub {
 subtest 'result objects - data capture' => sub {
   plan tests => 62;
 
+  my $url = 'https://github.com/google/it-cert-automation-practice';
   my $g = npg_qc::autoqc::checks::generic::artic->new(
             rpt_list         => '35177:2',
             input_files_glob =>
               't/data/autoqc/generic/artic/lane2/plex*/*.qc.csv',
             pp_name          => 'artic',
             pp_version       => '0.10.0',
+            pp_repo_url      => $url,
             tm_json_file     => $tm_file);
   # Artic QC summary is not available for plexes 3 and 206.
   # Tag metrics file contains data about 13 samples.
@@ -217,7 +219,8 @@ subtest 'result objects - data capture' => sub {
     Check => 'npg_qc::autoqc::checks::generic::artic',
     Check_version => $npg_qc::autoqc::checks::generic::artic::VERSION,
     Pipeline_name => 'artic',
-    Pipeline_version => '0.10.0'
+    Pipeline_version => '0.10.0',
+    Pipeline_repo_url => $url
   };
 
   my $lims = st::api::lims->new(id_run => 35177, position => 2)

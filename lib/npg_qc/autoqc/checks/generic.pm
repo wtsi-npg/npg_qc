@@ -69,6 +69,19 @@ has 'pp_version' => (
   required => 0,
 );
 
+=head2 pp_repo_url
+
+Repository URL for the portable pipeline that produced input data for
+this check, an optional attribute.
+
+=cut
+
+has 'pp_repo_url' => (
+  isa      => 'Str',
+  is       => 'ro',
+  required => 0,
+);
+
 =head2 result
 
 This attribute is inherited from the parent and is changed to be
@@ -205,8 +218,9 @@ sub file_name2result {
 
 =head2 set_common_result_attrs
 
-Sets the check name and version and pipeline name and version
-information of the result object.
+Sets the check name and version information for the argument result object.
+If the class of the result object is 'generic', sets pipeline name, version
+and repository url information of the result object.
 
 =cut
 
@@ -218,7 +232,8 @@ sub set_common_result_attrs {
   if ($result->class_name eq 'generic') {
     my @versions = grep { defined and ($_ ne q[]) }
                    ($self->pp_version, $version_extra);
-    $result->set_pp_info($self->pp_name, join q[ ], @versions);
+    my $version = @versions ? join q[ ], @versions : q[];
+    $result->set_pp_info($self->pp_name, $version, $self->pp_repo_url);
   }
 
   return;
@@ -332,7 +347,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2020 Genome Research Ltd.
+Copyright (C) 2020,2021 Genome Research Ltd.
 
 This file is part of NPG.
 
