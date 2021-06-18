@@ -314,8 +314,8 @@ sub metrics_gen_assym_prediction () {
   my $mis2 = min(($coH2{AG}, $coH2{TC}));
 
   #----------------as= asymetry of 'separated' Ti
-  my $as_ag_tc_R1 = abs($coH1{AG} - $coH1{TC}) / $mis1;
-  my $as_ag_tc_R2 = abs($coH2{AG} - $coH2{TC}) / $mis2;
+  my $as_ag_tc_R1 = ($mis1 > 0 ? (abs($coH1{AG} - $coH1{TC}) / $mis1) : 0);
+  my $as_ag_tc_R2 = ($mis2 > 0 ? (abs($coH2{AG} - $coH2{TC}) / $mis2) : 0);
   my $symm_ag_tc = max(($as_ag_tc_R1, $as_ag_tc_R2));
 
   #1.1.1.1--------remove strong assymetry if needed (re-define %separated pair
@@ -331,8 +331,8 @@ sub metrics_gen_assym_prediction () {
   #1.1.2 ---- strand assymetry (sh be symmetry) mic=min 'close' Ti: CT GA
   my $mic1 = min(($coH1{CT}, $coH1{GA}));
   my $mic2 = min(($coH2{CT}, $coH2{GA}));
-  my $as_ct_ga_R1 = abs($coH1{CT} - $coH1{GA}) / $mic1;
-  my $as_ct_ga_R2 = abs($coH2{CT} - $coH2{GA}) / $mic2;
+  my $as_ct_ga_R1 = ($mic1 > 0 ? (abs($coH1{CT} - $coH1{GA}) / $mic1) : 0);
+  my $as_ct_ga_R2 = ($mic2 > 0 ? (abs($coH2{CT} - $coH2{GA}) / $mic2) : 0);
   my $symm_ct_ga = max(($as_ct_ga_R1, $as_ct_ga_R2));
 
   #1.1.2.1-remove close Ti starnd assymetry if needed
@@ -354,8 +354,8 @@ sub metrics_gen_assym_prediction () {
   my $sd_ti2 = round(stddev(@ti2));
 
   #-----------------cvTi
-  my $cvTi1 = $sd_ti1 / $mean_ti1;
-  my $cvTi2 = $sd_ti2 / $mean_ti2;
+  my $cvTi1 = ($mean_ti1 > 0 ? ($sd_ti1 / $mean_ti1) : 0);
+  my $cvTi2 = ($mean_ti2 > 0 ? ($sd_ti2 / $mean_ti2) : 0);
   my $cvTi = max(($cvTi1, $cvTi2));
 
   my ($Ti1, $Ti2, $Tv1, $Tv2) = (0, 0, 0, 0);
@@ -404,8 +404,8 @@ sub metrics_gen_assym_prediction () {
   my $ma2 = max(($coH2{CA}, $coH2{GT}));
 
   # prop max(gt,ca) in Ti: the higher the more likely artC2A
-  my $artR1 = $ma1 / $thr_ti1;
-  my $artR2 = $ma2 / $thr_ti2;
+  my $artR1 = ($thr_ti1 > 0 ? ($ma1 / $thr_ti1) : 0);
+  my $artR2 = ($thr_ti2 > 0 ? ($ma2 / $thr_ti2) : 0);
   my $art_ox = max(($artR1, $artR2));
 
   #3.2 ----------------------oxidation biasas BROAD
@@ -431,25 +431,28 @@ sub metrics_gen_assym_prediction () {
 
   #3.4---------GT/TC relation to TC (the closest Ti) OR CA to AG
 
-  my $gt_tc_1 = $coH1{GT} / $coH1{TC};
-  my $gt_tc_2 = $coH2{GT} / $coH2{TC};
-  my $ca_ag_1 = $coH1{CA} / $coH1{AG};
-  my $ca_ag_2 = $coH2{CA} / $coH2{AG};
+  my $gt_tc_1 = ($coH1{TC} > 0 ? ($coH1{GT} / $coH1{TC}) : 0);
+  my $gt_tc_2 = ($coH2{TC} > 0 ? ($coH2{GT} / $coH2{TC}) : 0);
+  my $ca_ag_1 = ($coH1{AG} > 0 ? ($coH1{CA} / $coH1{AG}) : 0);
+  my $ca_ag_2 = ($coH2{AG} > 0 ? ($coH2{CA} / $coH2{AG}) : 0);
 
   my $gt_nearTi = max((max(($gt_tc_1,$ca_ag_1)),max(($gt_tc_2,$ca_ag_2))));
 
   #3.5---------------------GT to meanTi
-  my $GT_meTi1 =  $coH1{GT} / $mean_ti1;
-  my $GT_meTi2 =  $coH2{GT} / $mean_ti2;
+  my $GT_meTi1 = ($mean_ti1 > 0 ? ($coH1{GT} / $mean_ti1) : 0);
+  my $GT_meTi2 = ($mean_ti2 > 0 ? ($coH2{GT} / $mean_ti2) : 0);
   my $GT_meTi = max(($GT_meTi1, $GT_meTi2));
 
   #4=======----------fracHall
-  my $fracHL1 = sum(values %coH1) / (sum(values %coL1) + sum(values %coH1));
-  my $fracHL2 = sum(values %coH2) / (sum(values %coL2) + sum(values %coH2));
+  my $sum1 = sum(values %coL1) + sum(values %coH1);
+  my $fracHL1 = ($sum1 > 0 ? (sum(values %coH1) / $sum1) : 0);
+  my $sum2 = sum(values %coL2) + sum(values %coH2);
+  my $fracHL2 = ($sum2 > 0 ? (sum(values %coH1) / $sum2) : 0);
   my $fracH = round(100.0 * max(($fracHL1, $fracHL2)));
 
-  my $fracHL1a = sum(values %coH1) / (sum(values %coL1) + sum(values %coH1) + sum(values %coL2) + sum(values %coH2));
-  my $fracHL2a = sum(values %coH2) / (sum(values %coL1) + sum(values %coH1) + sum(values %coL2) + sum(values %coH2));
+  my $sum12= sum(values %coL1) + sum(values %coH1) + sum(values %coL2) + sum(values %coH2);
+  my $fracHL1a = ($sum12 > 0 ? (sum(values %coH1) / $sum12) : 0);
+  my $fracHL2a = ($sum12 > 0 ? (sum(values %coH2) / $sum12) : 0);
   my $fracHall = max(($fracHL1a, $fracHL2a));
 
   #5---------------predictions and prolly based on likelihood of art-ox
