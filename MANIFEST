@@ -354,6 +354,8 @@ t/data/autoqc/generic/ampliconstats/34719_1.ampstats
 t/data/autoqc/generic/ampliconstats/samplesheet_34719.csv
 t/data/autoqc/generic/artic/35177_2.tag_metrics.json
 t/data/autoqc/generic/artic/samplesheet_35177.csv
+t/data/autoqc/generic/artic/samplesheet_36214.csv
+t/data/autoqc/generic/artic/36214_2.with_spike.tag_metrics.json
 t/data/autoqc/generic/artic/lane2/plex1/35177.qc.csv
 t/data/autoqc/generic/artic/lane2/plex137/35177.qc.csv
 t/data/autoqc/generic/artic/lane2/plex140/35177.qc.csv

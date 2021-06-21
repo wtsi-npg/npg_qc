@@ -8,6 +8,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - make labels for number of reads in SeqQC generic artic display
    consistent with display for bam flagstats data, ie use 'reads'
    instead of 'fragments'
+ - do not generate autoqc generic artic results for spiked-in control
 
 release 69.6.1
  - mqc skipper bug fix - inspect qc outcomes for review autoqc results

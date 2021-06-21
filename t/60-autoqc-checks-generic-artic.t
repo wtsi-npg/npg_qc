@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use File::Temp qw(tempdir);
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Exception;
 use Test::Warn;
 use File::Path qw(make_path remove_tree);
@@ -359,6 +359,35 @@ subtest 'saving JSON files' => sub {
     %{$init}, sample_qc_out => "$tdir/plex*/qc")->run()
   } qr/No directory match for tag 97/,
     'error when the first mismatch is encountered';
+};
+
+subtest 'create correct list of result objects' => sub {
+  plan tests => 2;
+  
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
+    't/data/autoqc/generic/artic/samplesheet_36214.csv';
+  # Tag metrics JSON file contains entries for both tag zero and 888.
+  # Tag 888 is registered in the samplesheet as a spiked phiX tag.
+  my $init = {
+    rpt_list => '36214:2',
+    pp_name  => 'artic',
+    pp_version => '0.10.0',
+    tm_json_file =>
+      't/data/autoqc/generic/artic/36214_2.with_spike.tag_metrics.json',
+    input_files_glob =>
+      't/data/autoqc/generic/artic/lane2/plex*/*.qc.csv'
+             };
+
+  my $check = npg_qc::autoqc::checks::generic::artic->new(%{$init});
+  my @results = @{$check->result()};
+  # Expected tag list does not contain either 0 or 888.
+  my @expected_tags =(1,2,3,4,97,137,140,157,159,160,205,206,207);
+  is (@results, scalar @expected_tags,
+    'correct number of result objects is created');
+  my @actual_tags = map { $_->composition->get_component(0)->tag_index() }
+                    @results;
+  is_deeply (\@actual_tags, \@expected_tags,
+    'result objects are created for expected entities'); 
 };
 
 1;

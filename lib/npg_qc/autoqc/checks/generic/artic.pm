@@ -51,7 +51,7 @@ pipeline. It captures the QC summary, which is produced by this pipeline.
 
 Ideally, this check should run per lane and should be given
 input_file_glob for it to locate input data and qc_out_summary
-directory glob to fan out result JSON files one per directory. If the
+directory glob to fan out result JSON files, one per directory. If the
 check is run in this manner, it is able to add information about
 negative controls to results for real samples and positive controls.
 
@@ -69,8 +69,12 @@ pipeline. The ncov2019-artic-nf might not produce the QC summary for
 every sample of the pool, this might be due to low or zero number of input
 reads. Information in the tag metrics is used to fill the gaps so that
 the check produces a result object for each sample of the pool. This
-is also true if at run time the glob is resolved to an empty list of
+is also true if, at run time, the glob is resolved to an empty list of
 files.
+
+Autoqc results for tag zero and a spiked-in control are not created since the
+downstream code assumes that all generic artic autoqc results belong to the
+target project.
 
 This class is a re-implementation, the original implementation was
 available in the bin/npg_autoqc_generic4artic script of the same
@@ -139,9 +143,10 @@ sub _build_input_files {
 
 This lazily built attribute is inherited from the parent and is changed
 to be an array of npg_qc::autoqc::results::generic result objects. A result
-object is created for each tag index in a pool (lane). The result objects
-which have a corresponding input file, have the ncov2019-artic-nf QC summary,
-other result objects do not have this information.
+object is created for each tag index in a pool (lane), apart from tag zero
+and a tag for a spiked-in control. The result objects, that have a
+corresponding input file, have the ncov2019-artic-nf QC summary, other result
+objects do not have this information.
 
 The array is sorted by tag index in acsending order.
 
@@ -270,9 +275,23 @@ sub _add_missing_results {
   my $master_ref = $self->inflate_rpts($self->rpt_list)->[0];
   delete $master_ref->{tag_index};
 
+  # Using the attribute that is only available for the samplesheet lims driver!
+  my $lims = st::api::lims->new(id_run   => $master_ref->{id_run},
+                                position => $master_ref->{position});
+  my $spiked_in_control_ti = $lims->spiked_phix_tag_index;
+
   for my $ti ( keys %{$self->_reads_count} ) {
-    $ti or next; # not interested in tag zero
+    # Skip tag zero.
+    $ti or next;
+    # Skip spiked-in controls (if present).
+    if (defined $spiked_in_control_ti and ($ti == $spiked_in_control_ti)) {
+      next;
+    }
+    # Skip the tag for which we already have results.
     $available{$ti} and next;
+
+    # Create a new result object, add it to a list of already available
+    # result objects.
     my $ref = clone($master_ref);
     $ref->{tag_index} = $ti;
     my $composition = npg_tracking::glossary::composition->new(components =>
@@ -281,6 +300,8 @@ sub _add_missing_results {
                         composition => $composition, doc => {});
   }
 
+  # The result objects list was passed to this method by reference,
+  # no need to return it.
   return;
 }
 
@@ -353,7 +374,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2020 Genome Research Ltd.
+Copyright (C) 2020,2021 Genome Research Ltd.
 
 This file is part of NPG.
 
