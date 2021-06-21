@@ -1,13 +1,16 @@
 use strict;
 use warnings;
 use File::Temp qw/tempdir/;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Test::Exception;
 
 use st::api::lims;
+use npg_tracking::glossary::composition;
+use npg_tracking::glossary::composition::component::illumina;
 
 use_ok ('npg_qc::autoqc::checks::generic');
-
+use_ok ('npg_qc::autoqc::results::generic');
+ 
 my $tdir = tempdir( CLEANUP => 1 );
 local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
   q[t/data/autoqc/verify_bam_id/samplesheet_27483.csv];
@@ -98,6 +101,48 @@ subtest 'result object from file name' => sub {
   $r = $pkg->file_name2result('34719_1#196');
   isa_ok ($r, 'npg_qc::autoqc::results::generic');
   is ($r->composition->freeze2rpt, '34719:1:196', 'correct rpt');   
+};
+
+subtest 'set common result object attributes' => sub {
+  plan tests => 3;
+
+  my $c = npg_tracking::glossary::composition->new(
+    components => [
+    npg_tracking::glossary::composition::component::illumina->new(
+      id_run => 3, position => 1, tag_index => 4)
+  ]);
+
+  my $url = 'https://github.com/google/it-cert-automation-practice';
+  my $name = 'it-cert-automation-practice';
+  my $check_version = $npg_qc::autoqc::results::generic::VERSION;
+  my $result = npg_qc::autoqc::results::generic->new(composition  => $c);
+  
+  my $check = npg_qc::autoqc::checks::generic->new(
+    rpt_list => '3:1:4',
+    qc_out   => $tdir,
+    pp_name  => $name,
+    pp_repo_url   => $url,
+  );
+  $check->set_common_result_attrs($result);
+  is ($result->pp_name, $name, 'pipeline name attribute is set');
+  my $expected_info = {
+    Pipeline_name      => $name,
+    Pipeline_repo_url  => $url,
+    Check              => 'npg_qc::autoqc::checks::generic',
+    Check_version      => $check_version
+  };
+  is_deeply( $result->info(), $expected_info, 'info is set');
+
+  $check = npg_qc::autoqc::checks::generic->new(
+    rpt_list => '3:1:4',
+    qc_out   => $tdir,
+    pp_name  => $name,
+    pp_version => '2.01',
+    pp_repo_url   => $url,
+  );
+  $check->set_common_result_attrs($result, '3.5');
+  $expected_info->{Pipeline_version} = '2.01 3.5';
+  is_deeply( $result->info(), $expected_info, 'info is set');
 };
 
 1;
