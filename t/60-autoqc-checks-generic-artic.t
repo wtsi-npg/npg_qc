@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use File::Temp qw(tempdir);
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Exception;
 use Test::Warn;
 use File::Path qw(make_path remove_tree);
@@ -12,6 +12,8 @@ use st::api::lims;
 use_ok ('npg_qc::autoqc::checks::generic::artic');
 
 my $tdir = tempdir( CLEANUP => 1 );
+
+# Basic case for an original lab procedure - no spiked-in control.
 local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
   't/data/autoqc/generic/artic/samplesheet_35177.csv';
 my $tm_file = 't/data/autoqc/generic/artic/35177_2.tag_metrics.json';
@@ -100,7 +102,8 @@ subtest 'read counts from the tag metrics' => sub {
     '205' => '123802',
     '206' => '434631',
     '97' => '68154',
-    '2' => '1868353'
+    '2' => '1868353',
+    '0' => '15000'
   };
   is_deeply ($g->_reads_count, $expected, 'correct read counts');
 };
@@ -200,8 +203,10 @@ subtest 'result objects - data capture' => sub {
     $_->composition->get_component(0)->tag_index => $_
                     } @{$g->result};
   my @all_tags = sort {$a <=> $b} keys %results;
+  my @tags_from_tm = sort {$a <=> $b} keys %{$g->_reads_count};
+  shift @tags_from_tm; # remove the first tag, which is 0
  
-  is_deeply ([(sort {$a <=> $b} keys %{$g->_reads_count})], \@all_tags,
+  is_deeply (\@tags_from_tm, \@all_tags,
     'tag indexes of result objects match those from the tag metrix file');
 
   for my $ti (@all_tags) {
@@ -291,8 +296,10 @@ subtest 'result objects - data capture' => sub {
     $_->composition->get_component(0)->tag_index => $_
                     } @{$g->result};
   @all_tags = sort {$a <=> $b} keys %results;
+  @tags_from_tm = sort {$a <=> $b} keys %{$g->_reads_count};
+  shift @tags_from_tm; # remove the first tag, which is 0
  
-  is_deeply ([(sort {$a <=> $b} keys %{$g->_reads_count})], \@all_tags,
+  is_deeply (\@tags_from_tm, \@all_tags,
     'tag indexes of result objects match those from the tag metrix file');
 
   ok ($results{1}, 'result for tag index 1 is present');
@@ -301,7 +308,7 @@ subtest 'result objects - data capture' => sub {
 };
 
 subtest 'saving JSON files' => sub {  
-  plan tests => 34;
+  plan tests => 35;
 
   my $init = {rpt_list => '35177:2',
               pp_name  => 'artic',
@@ -336,12 +343,17 @@ subtest 'saving JSON files' => sub {
   is (@files, 13, 'all files are in the sample_qc_out directory');
  
   # sample_qc_out directory glob, which resolves to multiple directories.
+  # Not creating an output directry for spike-in control since there is
+  # no entry for it either in the samplesheet or deplexing metrics. If for
+  # any reason the result for spiked-in control were produced in the test,
+  # the run method would error since the output directory for the result
+  # JSON file does not exist.
   my @ti = qw/0 1 2 3 4 5 97 137 140 157 159 160 205 206 207 208/;
   map { make_path "$tdir/plex$_/qc" } @ti; 
 
-  npg_qc::autoqc::checks::generic::artic->new(
-    %{$init}, sample_qc_out => "$tdir/plex*/qc"
-  )->run();
+  lives_ok { npg_qc::autoqc::checks::generic::artic->new(
+               %{$init}, sample_qc_out => "$tdir/plex*/qc")->run() }
+    'no error runnign the check';
   for (@ti) {
     my $dir = "$tdir/plex$_/qc";
     my @fs = glob "$dir/*.json";
@@ -359,6 +371,35 @@ subtest 'saving JSON files' => sub {
     %{$init}, sample_qc_out => "$tdir/plex*/qc")->run()
   } qr/No directory match for tag 97/,
     'error when the first mismatch is encountered';
+};
+
+subtest 'create correct list of result objects' => sub {
+  plan tests => 2;
+  
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
+    't/data/autoqc/generic/artic/samplesheet_36214.csv';
+  # Tag metrics JSON file contains entries for both tag zero and 888.
+  # Tag 888 is registered in the samplesheet as a spiked phiX tag.
+  my $init = {
+    rpt_list => '36214:2',
+    pp_name  => 'artic',
+    pp_version => '0.10.0',
+    tm_json_file =>
+      't/data/autoqc/generic/artic/36214_2.with_spike.tag_metrics.json',
+    input_files_glob =>
+      't/data/autoqc/generic/artic/lane2/plex*/*.qc.csv'
+             };
+
+  my $check = npg_qc::autoqc::checks::generic::artic->new(%{$init});
+  my @results = @{$check->result()};
+  # Expected tag list does not contain either 0 or 888.
+  my @expected_tags =(1,2,3,4,97,137,140,157,159,160,205,206,207);
+  is (@results, scalar @expected_tags,
+    'correct number of result objects is created');
+  my @actual_tags = map { $_->composition->get_component(0)->tag_index() }
+                    @results;
+  is_deeply (\@actual_tags, \@expected_tags,
+    'result objects are created for expected entities'); 
 };
 
 1;
