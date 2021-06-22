@@ -72,9 +72,10 @@ the check produces a result object for each sample of the pool. This
 is also true if, at run time, the glob is resolved to an empty list of
 files.
 
-Autoqc results for tag zero and a spiked-in control are not created since the
-downstream code assumes that all generic artic autoqc results belong to the
-target project.
+Autoqc results for tag zero and a spiked-in control are not created by this
+check since the downstream code assumes that all generic artic autoqc results
+belong to the target project (see script L<npg_mqc_skipper> and class
+L<npg_qc::mqc::skipper> in this git package).
 
 This class is a re-implementation, the original implementation was
 available in the bin/npg_autoqc_generic4artic script of the same
@@ -148,7 +149,7 @@ and a tag for a spiked-in control. The result objects, that have a
 corresponding input file, have the ncov2019-artic-nf QC summary, other result
 objects do not have this information.
 
-The array is sorted by tag index in acsending order.
+The array is sorted by tag index in ascending order.
 
 =cut
 
