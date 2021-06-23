@@ -1,5 +1,17 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 69.7.0
+ - added new npg_subtitution_metrics.pl script
+ - move from Travis CI to GitHub Actions
+ - switch to node 14 for CI, using npm from default conda pkg
+ - remove dependency on npg_common::sequence::reference::base_count, which
+   has been moved to an internal repository and is no longer available for
+   the CI builds
+ - make labels for number of reads in SeqQC generic artic display
+   consistent with display for bam flagstats data, ie use 'reads'
+   instead of 'fragments'
+ - do not generate autoqc generic artic results for spiked-in control
+
 release 69.6.1
  - mqc skipper bug fix - inspect qc outcomes for review autoqc results
    only

@@ -6,11 +6,12 @@ use Carp;
 use Readonly;
 use File::Basename;
 use Try::Tiny;
+use Perl6::Slurp;
+use JSON qw(from_json);
 
 use npg_tracking::util::abs_path qw(abs_path);
 use npg_qc::autoqc::parse::samtools_stats;
-use npg_qc::autoqc::constants qw/ $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER /;
-use npg_common::sequence::reference::base_count;
+use npg_qc::autoqc::constants qw( $SAMTOOLS_SEC_QCFAIL_SUPPL_FILTER );
 
 extends qw(npg_qc::autoqc::checks::check);
 with qw(npg_tracking::data::reference::find);
@@ -36,6 +37,9 @@ Inherits from npg_qc::autoqc::checks::check.
 
 Parses out gc percent for a sequence from a samtools stats file
 and evaluates this value against the gc content of the reference genome.
+
+See C<npg_common::sequence::reference::base_count> for details about the format
+of the JSON file listing the content of the reference genome.
 
 =cut
 
@@ -138,8 +142,8 @@ override 'execute' => sub {
     if ($self->ref_base_count_path) {
         $ref_data_path = $self->ref_base_count_path . q[.json];
         if (-r $ref_data_path) {
-            my $ref_base_count_hash = npg_common::sequence::reference::base_count
-                                      ->load($ref_data_path)->summary->{'counts'};
+            my $gc_content = from_json(slurp $ref_data_path);
+            my $ref_base_count_hash = $gc_content->{'_summary'}->{'counts'};
             $ref_gc_percent = $self->_gc_percent($ref_base_count_hash);
         }
     }
@@ -238,11 +242,13 @@ __END__
 
 =item Try::Tiny
 
+=item Perl6::Slurp
+
+=item JSON
+
 =item npg_tracking::util::abs_path
 
 =item npg_tracking::data::reference::find
-
-=item npg_common::sequence::reference::base_count
 
 =back
 
@@ -256,7 +262,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2014,2015,2016,2018,2021 Genome Research Ltd.
 
 This file is part of NPG.
 

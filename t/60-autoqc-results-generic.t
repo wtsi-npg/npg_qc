@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Test::Exception;
 
 use npg_tracking::glossary::composition;
@@ -8,31 +8,24 @@ use npg_tracking::glossary::composition::component::illumina;
 
 use_ok ('npg_qc::autoqc::results::generic');
 
-subtest 'attributes and methods' => sub {
-  plan tests => 27;
-
-  my $c = npg_tracking::glossary::composition->new(components => [
+my $c = npg_tracking::glossary::composition->new(
+  components => [
     npg_tracking::glossary::composition::component::illumina->new(
       id_run => 3, position => 1, tag_index => 4)
   ]);
+
+subtest 'simple attributes and methods' => sub {
+  plan tests => 15;
 
   my $r = npg_qc::autoqc::results::generic->new(
               composition  => $c
   );
   isa_ok ($r, 'npg_qc::autoqc::results::generic');
   is ($r->pp_name(), undef, 'descriptor is undefined');
-  is ($r->info->{Pipeline_name}, undef, 'pipeline name is undefined');
-  is ($r->info->{Pipeline_version}, undef, 'pipeline version is undefined');
   is ($r->doc(), undef, 'doc is undefined');
   is ($r->filename_root, '3_1#4.unknown', 'file name root');
   is ($r->class_name, 'generic', 'class name');
   is ($r->check_name, 'generic unknown', 'check name');
-
-  $r->set_pp_info('pp1', 'v.0.1');
-  is ($r->pp_name(), 'pp1', 'descriptor available');
-  is ($r->check_name, 'generic pp1', 'check name');
-  is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
-  is ($r->info->{Pipeline_version}, 'v.0.1', 'pipeline version');
   $r->doc({}); # Can always be expected to be set
   is_deeply ($r->massage_for_render, {}, 'No doc, no data for render');
 
@@ -48,16 +41,6 @@ subtest 'attributes and methods' => sub {
   is ($r->filename_root, '3_1#4.pp1', 'file name root');
   is ($r->class_name, 'generic', 'class name');
   is ($r->check_name, 'generic pp1', 'check name');
-  is ($r->info->{Pipeline_name}, undef, 'pipeline name is undefined');
-  is ($r->info->{Pipeline_version}, undef, 'pipeline version is undefined');
-
-  throws_ok { $r->set_pp_info('pp2', 'v.0.1') }
-    qr/Cannot reset portable pipeline name/,
-    'pipeline name cannot be reset';
-  $r->set_pp_info('pp1', 'v.0.1');
-  is ($r->pp_name(), 'pp1', 'descriptor available');
-  is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
-  is ($r->info->{Pipeline_version}, 'v.0.1', 'pipeline version');
 
   $r->doc({
     'QC summary' => {
@@ -77,8 +60,8 @@ subtest 'attributes and methods' => sub {
   is_deeply(
     $r->massage_for_render,
     {
-      num_aligned_fragments => 2,
-      num_input_fragments => 8,
+      num_aligned_reads => 2,
+      num_input_reads => 8,
       control_type => 'positive',
       longest_no_N_run => '',
       pct_N_bases => '',
@@ -100,13 +83,66 @@ subtest 'attributes and methods' => sub {
   is_deeply(
     $r->massage_for_render,
     {
-      num_input_fragments => 8,
+      num_input_reads => 8,
       control_type => 'negative',
       max_negative_control_filtered_read_count => '',
       min_artic_passed_filtered_read_count => ''
     },
     'Formatting negative control with no QC summary'
   );
+};
+
+subtest 'setting info' => sub {
+  plan tests => 25;
+
+  my $url = 'https://github.com/google/it-cert-automation-practice';
+
+  my $r = npg_qc::autoqc::results::generic->new(
+          composition  => $c
+  );
+  is ($r->pp_name(), undef, 'descriptor is undefined');
+  ok (!exists $r->info->{Pipeline_name}, 'pipeline name is unset');
+  ok (!exists $r->info->{Pipeline_version}, 'pipeline version is unset');
+  ok (!exists $r->info->{Pipeline_repo_url}, 'pipeline url is unset');
+
+  throws_ok { $r->set_pp_info() } qr/Portable pipeline name is required/,
+    'error if no arguments are given';
+ 
+  $r->set_pp_info('pp1');
+  is ($r->pp_name(), 'pp1', 'pp_name attribute is set');
+  is ($r->check_name, 'generic pp1', 'check name');
+  is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
+  ok (!exists $r->info->{Pipeline_version}, 'pipeline version is not set');
+  ok (!exists $r->info->{Pipeline_repo_url}, 'pipeline url is unset');
+ 
+
+  $r->set_pp_info('pp1', 'v.0.1');
+  is ($r->pp_name(), 'pp1', 'pp_name attribute is set');
+  is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
+  is ($r->info->{Pipeline_version}, 'v.0.1', 'pipeline version');
+  ok (!exists $r->info->{Pipeline_repo_url}, 'pipeline url is unset');
+
+  $r->set_pp_info('pp1', 'v.0.2', $url);
+  is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
+  is ($r->info->{Pipeline_version}, 'v.0.2', 'pipeline version');
+  is ($r->info->{Pipeline_repo_url}, $url, 'pipeline url');
+
+  $r = npg_qc::autoqc::results::generic->new(
+       composition => $c,
+       pp_name     => 'pp1',
+       doc         => {qc_pass => 'TRUE', num_aligned_reads => 3}
+  );
+  is ($r->pp_name(), 'pp1', 'pipeline name attribute is set');
+  ok (!exists $r->info->{Pipeline_name}, 'pipeline name is not set');
+  ok (!exists $r->info->{Pipeline_version}, 'pipeline version is not set');
+  throws_ok { $r->set_pp_info('pp2', 'v.0.1') }
+    qr/Cannot reset portable pipeline name/,
+    'pipeline name cannot be reset';
+  $r->set_pp_info('pp1', q[], $url);
+  is ($r->pp_name(), 'pp1', 'pipeline attribute is set');
+  is ($r->info->{Pipeline_name}, 'pp1', 'pipeline name');
+  ok (!exists $r->info->{Pipeline_version}, 'pipeline version is not set');
+  is ($r->info->{Pipeline_repo_url}, $url, 'pipeline url');
 };
 
 1;

@@ -191,7 +191,7 @@ sub showTags{
         foreach my $i (0..$#subtags) {
             my $subtag = $subtags[$i];
             my @matches = ();
-            if ($clips->[$i]) {
+            if (@{$clips} && $clips->[$i]) {
                 if ($clips->[$i] < 0) {
                     @matches = grep {m/$subtag$/} keys %db_tags;
                 } elsif ($clips->[$i]) {
@@ -205,12 +205,16 @@ sub showTags{
             foreach my $sequence (@matches) {
                 foreach my $match (@{$db_tags{$sequence}}) {
                     my ($name,$id,$map_id,$revcomp) = @{$match};
-                    if ($revcomp && $revcomps->[$i]) {
-                        $matches{$subtag}->{$id} = [$map_id,1];
-                    } elsif ($revcomp) {
-                        # not looking for revcomp matches on this subtag
+                    if ($revcomp) {
+                        # revcomp match AND we are looking for revcomp matches AND we are looking for revcomp matches on this tag
+                        if (@{$revcomps} && $revcomps->[$i]) {
+                            $matches{$subtag}->{$id} = [$map_id,1];
+                        }
                     } else {
-                        $matches{$subtag}->{$id} = [$map_id,0];
+                        # not a revcomp match AND we are not looking for revcomp matches or we are not looking for revcomp matches on this tag
+                        if (!@{$revcomps} || !$revcomps->[$i]) {
+                            $matches{$subtag}->{$id} = [$map_id,0];
+                        }
                     }
                     $groups[$i]->{$id}++;
                     $names{$id} = $name;

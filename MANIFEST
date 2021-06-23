@@ -1,3 +1,4 @@
+.github/workflows/testing_and_building_repos.yml 
 bin/gtck_combine_gt_data.sh
 bin/gtck_extract_fluidigm_data_from_irods.sh
 bin/gtck_genplexlist.sh
@@ -10,6 +11,7 @@ bin/mqc_outcome_reporter
 bin/npg_mqc_skipper
 bin/npg_qc_autoqc_data.pl
 bin/npg_qc_tag_sniff.pl
+bin/npg_substitution_metrics.pl
 bin/call_gtck_composite_rpt.pl
 bin/genotype_call_results_reporter
 Build.PL
@@ -161,7 +163,10 @@ lib/npg_qc/utils/bam_genotype.pm
 lib/npg_qc/utils/genotype_calling.pm
 MANIFEST
 README
+scripts/before_install.sh
+scripts/install.sh
 scripts/npgqc_dbix_schema_loader.pl
+scripts/script.sh
 t/00-critic.t
 t/00-distribution.t
 t/00-podcoverage.t
@@ -349,6 +354,8 @@ t/data/autoqc/generic/ampliconstats/34719_1.ampstats
 t/data/autoqc/generic/ampliconstats/samplesheet_34719.csv
 t/data/autoqc/generic/artic/35177_2.tag_metrics.json
 t/data/autoqc/generic/artic/samplesheet_35177.csv
+t/data/autoqc/generic/artic/samplesheet_36214.csv
+t/data/autoqc/generic/artic/36214_2.with_spike.tag_metrics.json
 t/data/autoqc/generic/artic/lane2/plex1/35177.qc.csv
 t/data/autoqc/generic/artic/lane2/plex137/35177.qc.csv
 t/data/autoqc/generic/artic/lane2/plex140/35177.qc.csv
