@@ -21,6 +21,7 @@ extends qw(npg_qc::autoqc::checks::generic);
 our $VERSION = '0';
 
 Readonly::Scalar my $ARTIC_METRICS_NAME => q[QC summary];
+Readonly::Scalar my $TEN_THOUSANDS      => 10_000;
 
 =head1 NAME
 
@@ -217,8 +218,28 @@ sub execute {
     @{$self->result};
 
   foreach my $result ( @{$self->result} ) {
-    defined $max_count_negative and $result->doc->{'meta'}
-      ->{'max_negative_control_filtered_read_count'} = $max_count_negative;
+    if (defined $max_count_negative) {
+      $result->doc->{'meta'}
+        ->{'max_negative_control_filtered_read_count'} =
+          $max_count_negative;
+      if ($self->_spiked_in_control_tag_index) {
+        my $num_spiked_reads =
+          $self->_reads_count->{$self->_spiked_in_control_tag_index};
+        if (!defined $num_spiked_reads) {
+          $result->add_comment(
+            'Number of reads for a spiked in control is undefined');
+        } elsif ($num_spiked_reads == 0) {
+          $result->add_comment(
+            'Number of reads for a spiked in control is zero');
+        } else {
+          my $normalised_value = sprintf '%.4f',
+            ($max_count_negative / $num_spiked_reads) * $TEN_THOUSANDS; 
+          $result->doc->{'meta'}
+            ->{'max_norm_negative_control_filtered_read_count'} =
+              $normalised_value + 0; # Prefer a number in JSON.
+        }
+      }
+    }
     defined $min_count_real and $result->doc->{'meta'}
       ->{'min_artic_passed_filtered_read_count'} = $min_count_real;
   }
@@ -242,6 +263,21 @@ sub run {
   $self->store_fanned_results();
 
   return;
+}
+
+has '_spiked_in_control_tag_index' => (
+  isa        => 'Maybe[Int]',
+  is         => 'ro',
+  lazy_build => 1,
+);
+sub __spiked_in_control_tag_index {
+  my $self = shift;
+  # Using the attribute that is only available for the samplesheet lims driver!
+  my $master_ref = $self->inflate_rpts($self->rpt_list)->[0];
+  delete $master_ref->{tag_index};
+  my $lims = st::api::lims->new(id_run   => $master_ref->{id_run},
+                                position => $master_ref->{position});
+  return $lims->spiked_phix_tag_index;
 }
 
 has '_reads_count' => (
@@ -276,10 +312,7 @@ sub _add_missing_results {
   my $master_ref = $self->inflate_rpts($self->rpt_list)->[0];
   delete $master_ref->{tag_index};
 
-  # Using the attribute that is only available for the samplesheet lims driver!
-  my $lims = st::api::lims->new(id_run   => $master_ref->{id_run},
-                                position => $master_ref->{position});
-  my $spiked_in_control_ti = $lims->spiked_phix_tag_index;
+  my $spiked_in_control_ti = $self->_spiked_in_control_tag_index;
 
   for my $ti ( keys %{$self->_reads_count} ) {
     # Skip tag zero.
