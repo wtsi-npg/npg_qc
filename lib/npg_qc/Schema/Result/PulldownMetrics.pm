@@ -423,7 +423,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 GRL
+Copyright (C) 2017, 2021 Genome Research Ltd.
 
 This file is part of NPG.
 
