@@ -433,10 +433,10 @@ sub _fastq_reverse_complement {
     my @reversed = ();
     foreach my $i (0 .. 1) {
         push @reversed, catfile($self->tmp_path, ($i+1) . q[r.fastq]);
-        my @args = (q[fastx_reverse_complement], q[-Q 33], q[-i], $sample_reads->[$i], q[-o], $reversed[$i]);
-        print 'Producing reverse complemented file: ' . (join q[ ], @args) . qq[\n] || carp 'Producing reverse complemented file: ' . (join q[ ], @args) . qq[\n];
-        if (system(@args)) {
-            croak  printf "Child %s exited with value %d\n", join(q[ ], @args), $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
+        my $cmd = q[seqtk seq -r -Q 33 ] . $sample_reads->[$i] . q[ > ] . $reversed[$i];
+        warn 'Producing reverse complemented file: ' . $cmd . qq[\n] || carp 'Producing reverse complemented file: ' . $cmd . qq[\n];
+        if (system($cmd)) {
+            croak  printf "Child %s exited with value %d\n", $cmd, $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
         }
     }
     return \@reversed;
@@ -455,20 +455,20 @@ sub _set_additional_modules_info {
     use strict;
     ## use critic
     if ($self->use_reverse_complemented) {
-        push @packages_info, q[FASTX Toolkit fastx_reverse_complement ] . $self->_fastx_version;
+        push @packages_info, q[seqtk ] . $self->_seqtk_version;
     }
     push @packages_info, join q[ ], $self->norm_fit_cmd, $VERSION;
     $self->result->set_info('Additional_Modules', ( join q[;], @packages_info ) );
     return;
 }
 
-sub _fastx_version {
+sub _seqtk_version {
     my $self = shift;
-    my @lines = slurp 'fastx_reverse_complement -h |';
+    my @lines = `seqtk 2>&1`;
     foreach my $line (@lines) {
-        if ($line =~ /FASTX\ Toolkit/xms) {
-            my ($version) = $line =~ /\ (\d+\.\d+\.\d+)\ /xms;
-            if ($version) { return $version; }
+        if ($line =~ /Version:/xms) {
+            my ($version) = $line =~ /Version:\ (.*)/xms;
+            if ($version) { chomp $version; return $version; }
         }
     }
     return q[];
