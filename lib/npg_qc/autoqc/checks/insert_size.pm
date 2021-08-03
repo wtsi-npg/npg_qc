@@ -464,14 +464,16 @@ sub _set_additional_modules_info {
 
 sub _seqtk_version {
     my $self = shift;
-    my @lines = `seqtk 2>&1`;
-    foreach my $line (@lines) {
+    my $version = q[];
+    open(my $ph, q(-|), q(seqtk 2>&1)) or croak(q[Can't open seqtk]);
+    while (my $line = <$ph>) {
         if ($line =~ /Version:/xms) {
-            my ($version) = $line =~ /Version:\ (.*)/xms;
-            if ($version) { chomp $version; return $version; }
+            ($version) = $line =~ /Version:\ (.*)/xms;
         }
     }
-    return q[];
+    close($ph) or croak(q[Can't close seqtk]);
+    chomp $version;
+    return $version;
 }
 
 sub _align {
