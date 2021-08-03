@@ -6,15 +6,16 @@ use English qw( -no_match_vars );
 use Carp;
 use File::Spec::Functions qw( catdir );
 use Readonly;
+use Try::Tiny;
 
 extends qw(npg_qc::autoqc::checks::check);
-with qw(npg_tracking::data::bait::find
-        npg_common::roles::software_location
-       );
+with 'npg_tracking::data::bait::find',
+    'npg_common::roles::software_location' => {tools => ['gatk']}
+;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $PICARD_JAR_NAME    => q[CalculateHsMetrics.jar];
+Readonly::Scalar my $PICARD_COMMAND    => q[CollectHsMetrics];
 Readonly::Scalar my $MAX_JAVA_HEAP_SIZE => q[3000m];
 Readonly::Scalar my $MINUS_ONE          => -1;
 Readonly::Scalar my $MIN_ON_BAIT_BASES_PERCENTAGE => 20;
@@ -37,7 +38,7 @@ Readonly::Hash   my %PICARD_METRICS_FIELDS_MAPPING => {
     'HS_LIBRARY_SIZE'      => 'library_size',
                                        };
 
-has '+file_type'         => (default => 'bam',);
+has '+file_type'         => (default => 'cram',);
 has '+aligner'           => (default => 'fasta',);
 
 has 'alignments_in_bam'  => (
@@ -56,12 +57,35 @@ has 'max_java_heap_size' => (
     default => $MAX_JAVA_HEAP_SIZE,
 );
 
-has 'picard_jar_path' => (
+has 'picard_module' => (
     is      => 'ro',
-    isa     => 'NpgCommonResolvedPathJarFile',
-    coerce  => 1,
-    default => $PICARD_JAR_NAME,
+    isa     => 'Str',
+    default => $PICARD_COMMAND,
 );
+
+# TODO: This needs to be factored out of here, insert_size and alignment_filter_metrics
+has 'reference' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy_build => 1,
+);
+
+sub _build_reference {
+    my $self = shift;
+    my $ref;
+    try {
+        $ref = pop @{$self->refs()};
+    }
+    catch {
+        $self->result->add_comment(
+            q[Error: binary reference cannot be retrieved; cannot run insert size check. ] . $_
+        );
+    };
+    if (!$ref) {
+        $self->result->add_comment('Failed to retrieve reference');
+    }
+    return $ref;
+}
 
 has 'picard_command' => (
     is         => 'ro',
@@ -71,11 +95,13 @@ has 'picard_command' => (
 
 sub _build_picard_command {
     my $self = shift;
-    my $command = $self->java_cmd . sprintf q[ -Xmx%s -jar %s VALIDATION_STRINGENCY=SILENT BAIT_INTERVALS=%s TARGET_INTERVALS=%s INPUT=%s OUTPUT=/dev/stdout],
+    my $command = $self->gatk_cmd .
+      sprintf q[ --java-options "-Xmx%s" %s --BAIT_INTERVALS %s --TARGET_INTERVALS %s --REFERENCE_SEQUENCE %s --INPUT %s --OUTPUT /dev/stdout],
         $self->max_java_heap_size,
-        $self->picard_jar_path,
+        $self->picard_module,
         $self->bait_intervals_path,
         $self->target_intervals_path,
+        $self->reference,
         $self->input_files->[0];
     return $command;
 }
@@ -116,8 +142,8 @@ override 'execute' => sub {
         return 1;
     }
 
-    $self->result->set_info( 'Aligner', qq[Picard $PICARD_JAR_NAME] );
-    $self->result->set_info( 'Aligner_version', $self->current_version($self->picard_jar_path) );
+    $self->result->set_info( 'Aligner', 'Picard '.$self->picard_module );
+    $self->result->set_info( 'Aligner_version', $self->current_version($self->gatk_cmd) );
     $self->result->bait_path($self->bait_path);
 
     my $command = $self->picard_command;
@@ -190,11 +216,11 @@ sub _save_results {
             if (defined $value) {
                 my $attr_name = $PICARD_METRICS_FIELDS_MAPPING{$key};
                 if ($value eq q[?]) {
-		                carp "Field $attr_name is set to '?', skipping...";
+                    carp "Field $attr_name is set to '?', skipping...";
                 } else {
                     $self->result->$attr_name($value);
                 }
-	          }
+            }
             delete $results->{$key};
         }
     }
@@ -207,7 +233,7 @@ sub _interval_files_identical {
 
     my $cmd = q[diff -q ] . $self->bait_intervals_path . q[ ] . $self->target_intervals_path . q[ 2>&1 > /dev/null];
 
-carp q[Comparing intervals files with cmd: ], $cmd;
+    carp q[Comparing intervals files with cmd: ], $cmd;
 
     if($self->bait_intervals_path and $self->target_intervals_path and system($cmd) == 0) {
         return 1;
@@ -239,11 +265,9 @@ npg_qc::autoqc::checks::pulldown_metrics
 
     Moose-based.
 
-=head2 alignments_in_bam
-
 =head2 max_java_heap_size
 
-=head2 picard_jar_path
+=head2 picard_module
 
 =head2 picard_command
 

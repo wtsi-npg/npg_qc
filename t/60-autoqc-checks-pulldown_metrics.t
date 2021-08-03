@@ -1,30 +1,21 @@
 use strict;
 use warnings;
-use Test::More tests => 28;
+use Test::More tests => 27;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 
 use_ok ('npg_qc::autoqc::checks::pulldown_metrics');
 
-my $dir = tempdir( CLEANUP => 1 );
-`touch $dir/CalculateHsMetrics.jar`;
 
+my $dir = tempdir( CLEANUP => 1 );
 {
-  local $ENV{CLASSPATH} = $dir;
   my $pdm = npg_qc::autoqc::checks::pulldown_metrics->new(
     id_run => 2, path => q[t], position => 1, repository => q[t/data]);
   isa_ok ($pdm, 'npg_qc::autoqc::checks::pulldown_metrics');
   lives_ok { $pdm->result; } 'result object created';
-
-  local $ENV{CLASSPATH} = q[];
-  throws_ok {npg_qc::autoqc::checks::pulldown_metrics->new(
-    id_run => 2, path => q[t], position => 1, repository => q[t/data])}
-    qr/Can\'t find \'CalculateHsMetrics\.jar\' because CLASSPATH is not set/,
-    q[Fails to create object when CalculateHsMetrics.jar not found];
 }
 
 {
-  local $ENV{CLASSPATH} = $dir;
   my @checks = ();
   push @checks, npg_qc::autoqc::checks::pulldown_metrics->new(
     id_run => 2, qc_in => q[t], position => 1,  repository => q[t/data]);
@@ -59,7 +50,9 @@ my $dir = tempdir( CLEANUP => 1 );
 }
 
 {
-  local $ENV{CLASSPATH} = $dir;
+  # Provide some realistic values so we don't trigger LIMS lookups for arguments
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} = 't/data/autoqc/pulldown_metrics/samplesheet_pulldown.csv';
+
   my @checks = ();
   push @checks, npg_qc::autoqc::checks::pulldown_metrics->new(
     id_run => 2, qc_in => q[t], position => 1, tag_index => 0,  repository => q[t/data]);
@@ -72,9 +65,17 @@ my $dir = tempdir( CLEANUP => 1 );
 
   @checks = ();
   push @checks, npg_qc::autoqc::checks::pulldown_metrics->new(
-    id_run => 2, qc_in => q[t], position => 1, tag_index => 1,  repository => q[t/data], alignments_in_bam => 1, bait_path => q[t/data], bait_name => q[test_baits]);
+    id_run => 2,
+    qc_in => q[t],
+    position => 1,
+    tag_index => 1,
+    repository => 't/data',
+  );
   push @checks, npg_qc::autoqc::checks::pulldown_metrics->new(
-    rpt_list => '2:1:1', qc_in => q[t], repository => q[t/data], alignments_in_bam => 1, bait_path => q[t/data],  bait_name => q[test_baits]);
+    rpt_list => '2:1:1',
+    qc_in => q[t],
+    repository => 't/data',
+  );
 
   foreach my $pdm (@checks) {
     is($pdm->can_run, 1, q[pulldown metrics check can run for non-zero tags]);
