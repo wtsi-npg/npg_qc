@@ -20,8 +20,8 @@ use npg_common::Alignment;
 use npg_common::extractor::fastq qw(read_count);
 
 extends qw(npg_qc::autoqc::checks::check);
-with qw(npg_tracking::data::reference::find);
-with qw(npg_common::roles::software_location) => { tools => [qw/bwa0_6 seqtk/] };
+with qw(npg_tracking::data::reference::find),
+     qw(npg_common::roles::software_location) => { tools => [qw/bwa0_6 seqtk/] };
 has '+aligner' => (default => 'bwa0_6', is => 'ro');
 
 our $VERSION = '0';
@@ -432,7 +432,7 @@ sub _fastq_reverse_complement {
     foreach my $i (0 .. 1) {
         push @reversed, catfile($self->tmp_path, ($i+1) . q[r.fastq]);
         my $cmd = $self->seqtk_cmd . q[ seq -r -Q 33 ] . $sample_reads->[$i] . q[ > ] . $reversed[$i];
-        warn 'Producing reverse complemented file: ' . $cmd . qq[\n] || carp 'Producing reverse complemented file: ' . $cmd . qq[\n];
+        print 'Producing reverse complemented file: ' . $cmd . qq[\n] || carp 'Producing reverse complemented file: ' . $cmd . qq[\n];
         if (system($cmd)) {
             croak  printf "Child %s exited with value %d\n", $cmd, $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
         }
