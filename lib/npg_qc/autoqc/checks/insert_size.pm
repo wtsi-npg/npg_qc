@@ -20,10 +20,8 @@ use npg_common::Alignment;
 use npg_common::extractor::fastq qw(read_count);
 
 extends qw(npg_qc::autoqc::checks::check);
-with qw(
-  npg_tracking::data::reference::find
-  npg_common::roles::software_location
-       );
+with qw(npg_tracking::data::reference::find);
+with qw(npg_common::roles::software_location) => { tools => [qw/bwa0_6 seqtk/] };
 has '+aligner' => (default => 'bwa0_6', is => 'ro');
 
 our $VERSION = '0';
@@ -433,7 +431,7 @@ sub _fastq_reverse_complement {
     my @reversed = ();
     foreach my $i (0 .. 1) {
         push @reversed, catfile($self->tmp_path, ($i+1) . q[r.fastq]);
-        my $cmd = q[seqtk seq -r -Q 33 ] . $sample_reads->[$i] . q[ > ] . $reversed[$i];
+        my $cmd = $self->seqtk_cmd . q[ seq -r -Q 33 ] . $sample_reads->[$i] . q[ > ] . $reversed[$i];
         warn 'Producing reverse complemented file: ' . $cmd . qq[\n] || carp 'Producing reverse complemented file: ' . $cmd . qq[\n];
         if (system($cmd)) {
             croak  printf "Child %s exited with value %d\n", $cmd, $CHILD_ERROR >> $CHILD_ERROR_SHIFT;
@@ -455,25 +453,11 @@ sub _set_additional_modules_info {
     use strict;
     ## use critic
     if ($self->use_reverse_complemented) {
-        push @packages_info, q[seqtk ] . $self->_seqtk_version;
+        push @packages_info, q[seqtk ] . $self->current_version( $self->seqtk_cmd() )
     }
     push @packages_info, join q[ ], $self->norm_fit_cmd, $VERSION;
     $self->result->set_info('Additional_Modules', ( join q[;], @packages_info ) );
     return;
-}
-
-sub _seqtk_version {
-    my $self = shift;
-    my $version = q[];
-    open(my $ph, q(-|), q(seqtk 2>&1)) or croak(q[Can't open seqtk]);
-    while (my $line = <$ph>) {
-        if ($line =~ /Version:/xms) {
-            ($version) = $line =~ /Version:\ (.*)/xms;
-        }
-    }
-    close($ph) or croak(q[Can't close seqtk]);
-    chomp $version;
-    return $version;
 }
 
 sub _align {

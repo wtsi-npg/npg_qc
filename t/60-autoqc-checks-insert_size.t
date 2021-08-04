@@ -584,7 +584,7 @@ sub _additional_modules {
                                               expected_size => [340,350],
                                               format   => $format,
                                                    );
-  is ($qc->_seqtk_version, '1.3', 'seqtk version');
+  is ($qc->current_version( $qc->seqtk_cmd() ), '1.3', 'seqtk version');
   $qc->_set_additional_modules_info;
   is ( $qc->result->get_info('Additional_Modules'),
     join(q[;], _additional_modules(1)), 'additional info with seqtk');
