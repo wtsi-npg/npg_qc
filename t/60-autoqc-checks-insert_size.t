@@ -30,7 +30,7 @@ use_ok('npg_qc::autoqc::results::insert_size');
 use_ok('npg_qc::autoqc::checks::insert_size');
 
 sub _additional_modules {
-  my $use_fastx = shift;
+  my $use_seqtk = shift;
   my @expected = ();
   require npg_qc::autoqc::parse::alignment;
   push @expected, join(q[ ],
@@ -41,8 +41,8 @@ sub _additional_modules {
   require npg_common::Alignment;
   push @expected, join(q[ ],
     q[npg_common::Alignment], $npg_common::Alignment::VERSION);
-  if ($use_fastx) {
-    push @expected, q[FASTX Toolkit fastx_reverse_complement 0.0.12];
+  if ($use_seqtk) {
+    push @expected, q[seqtk 1.3];
   }
   push @expected, join(q[ ], $norm_fit, $npg_qc::autoqc::results::insert_size::VERSION);
   return @expected;
@@ -572,7 +572,7 @@ sub _additional_modules {
 
 {
   my $dir = tempdir( CLEANUP => 1 );
-  t::autoqc_util::write_fastx_script(catfile($dir, 'fastx_reverse_complement'));
+  t::autoqc_util::write_seqtk_script(catfile($dir, 'seqtk'));
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $qc = npg_qc::autoqc::checks::insert_size->new(
@@ -584,15 +584,15 @@ sub _additional_modules {
                                               expected_size => [340,350],
                                               format   => $format,
                                                    );
-  is ($qc->_fastx_version, '0.0.12', 'fastx version');
+  is ($qc->current_version( $qc->seqtk_cmd() ), '1.3', 'seqtk version');
   $qc->_set_additional_modules_info;
   is ( $qc->result->get_info('Additional_Modules'),
-    join(q[;], _additional_modules(1)), 'additional info with fastx');
+    join(q[;], _additional_modules(1)), 'additional info with seqtk');
 }
 
 {
   my $dir = tempdir( CLEANUP => 1 );
-  t::autoqc_util::write_fastx_script(catfile($dir, 'fastx_reverse_complement'), 1);
+  t::autoqc_util::write_seqtk_script(catfile($dir, 'seqtk'), 1);
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_few.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
