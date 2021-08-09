@@ -19,7 +19,7 @@ use npg_qc::mqc::skipper;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $EXCLUDE_STUDY_NAME   => 'Illumina Controls';
+Readonly::Scalar my $EXCLUDE_ENTITY_TYPE  => 'library_indexed_spike';
 Readonly::Scalar my $NUM_DISTINCT_STUDIES => 1;
 Readonly::Scalar my $RUN_STATUS_FROM      => 'qc review pending';
 Readonly::Scalar my $RUN_STATUS_TO        => 'archival pending';
@@ -39,7 +39,7 @@ GetOptions('dry_run|dry-run!' => \$dry_run,
            'study_name=s'     => \$study_name,
            'deplexing_percent_threshold=i' => \$deplexing_threshold,
            'qc_fails_percent_threshold=i'  => \$qc_fails_threshold,
-	   'artic_qc_fails_percent_threshold=i'  => \$artic_qc_fails_threshold,
+           'artic_qc_fails_percent_threshold=i'  => \$artic_qc_fails_threshold,
            'help'             => sub {
              pod2usage(-verbose => 2,
                        -exitval => 0)
@@ -71,7 +71,7 @@ my @rows = $tracking_schema->resultset('Run')->search(
    'run_status_dict.description' => $RUN_STATUS_FROM,
    'instrument_format.model'     => $INSTRUMENT_MODEL},
   {prefetch => [{'run_statuses' => 'run_status_dict'}, 'instrument_format']}
-							   )->all();
+                                                     )->all();
 @rows = grep { my $row = $_; none { $row->is_tag_set($_) } @NO_SKIPPING_TAGS }
         @rows;
 
@@ -107,13 +107,13 @@ my $query =
    q[from iseq_product_metrics p ] .
    q[join iseq_flowcell f on p.id_iseq_flowcell_tmp=f.id_iseq_flowcell_tmp ] .
    q[join study s on s.id_study_tmp=f.id_study_tmp ] .
-  qq[where s.name != ? and p.id_run in (${placeholders}) ] .
+  qq[where f.entity_type != ? and p.id_run in (${placeholders}) ] .
    q[group by p.id_run having study_count = ?];
 my $sth = $dbh->prepare($query) or
   ($logger->fatal("Failed to prepare statement: $DBI::errstr") and exit 1);
 # Run time database errors are thrown by the execute method, no need to
 # do anything special.
-$sth->execute($EXCLUDE_STUDY_NAME, @run_ids, $NUM_DISTINCT_STUDIES);
+$sth->execute($EXCLUDE_ENTITY_TYPE, @run_ids, $NUM_DISTINCT_STUDIES);
 @run_ids = $get_run_ids->($sth);
 
 if (@run_ids) {

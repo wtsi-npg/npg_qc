@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - mqc skipper - a more generic way to disregard spiked-in controls when
+   counting the number of studies the samples in the run belong to. The change
+   is driven by the fact that spiked-in controls can now belong to a number of
+   different studies.
+
 release 69.7.0
  - added new npg_subtitution_metrics.pl script
  - move from Travis CI to GitHub Actions
