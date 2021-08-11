@@ -190,83 +190,6 @@ sub read_win_tag() {
   return \%win;
 }
 
-#%======================================================to process winRi structures
-#function [new_win]=stripped_convert_new(win_R1)
-#%coverts win_R1 (as in error quality) into converient format, new_win,
-#%where each of 12 columns are counts of windows X.Y for each of 12 substitutions
-#
-#%INPUT input win_R1 (16x12) from error file  see below:
-#
-#%# Effect of previous base and next base high predictor. Use `grep ^PNCRH | cut -f 2-` to extract this part
-#%# 16 rows: one row per pair= previous/next base, columns (12 for each subs) is previous base+substitution+next base and count for 12 substitutions
-#
-#%PCRNH	1  caA bw AX	AACA	6	AACC	10	AACG	6	AACT	2	AAGA	159	AAGC	125	AAGG	133	AAGT	102	AATA	45	AATC	51	AATG	52	AATT	65
-#%PCRNH	1  caC	        ACAA	11	ACAC	23	ACAG	10	ACAT	12	ACGA	2	ACGC	12	ACGG	8	ACGT	4	ACTA	129	ACTC	156	ACTG	276	ACTT	74
-#%PCRNH	1  caG	        AGAA	51	AGAC	179	AGAG	77	AGAT	53	AGCA	45	AGCC	32	AGCG	20	AGCT	13	AGTA	646	AGTC	701	AGTG	398	AGTT	209
-#%PCRNH	1  caT	        ATAA	49	ATAC	64	ATAG	49	ATAT	53	ATCA	116	ATCC	92	ATCG	137	ATCT	119	ATGA	2	ATGC	7	ATGG	8	ATGT	5
-#
-#%PCRNH	1  caA bw CX	CACA	6	CACC	4	CACG	14	CACT	12	CAGA	146	CAGC	65	CAGG	155	CAGT	124	CATA	60	CATC	39	CATG	60	CATT	72
-#%PCRNH	1	CCAA	56	CCAC	25	CCAG	22	CCAT	30	CCGA	13	CCGC	3	CCGG	7	CCGT	7	CCTA	175	CCTC	34	CCTG	138	CCTT	66
-#%PCRNH	1	CGAA	129	CGAC	363	CGAG	97	CGAT	244	CGCA	33	CGCC	37	CGCG	36	CGCT	22	CGTA	463	CGTC	509	CGTG	306	CGTT	251
-#%PCRNH	1	CTAA	23	CTAC	46	CTAG	37	CTAT	45	CTCA	178	CTCC	118	CTCG	204	CTCT	202	CTGA	3	CTGC	2	CTGG	9	CTGT	10
-#
-#%PCRNH	1  caA bw GX	GACA	3	GACC	7	GACG	6	GACT	4	GAGA	99	GAGC	78	GAGG	94	GAGT	83	GATA	60	GATC	58	GATG	46	GATT	72
-#%PCRNH	1	GCAA	97	GCAC	20	GCAG	20	GCAT	29	GCGA	11	GCGC	11	GCGG	10	GCGT	14	GCTA	201	GCTC	192	GCTG	307	GCTT	162
-#%PCRNH	1	GGAA	53	GGAC	214	GGAG	36	GGAT	94	GGCA	33	GGCC	21	GGCG	7	GGCT	13	GGTA	348	GGTC	388	GGTG	145	GGTT	184
-#%PCRNH	1	GTAA	26	GTAC	47	GTAG	33	GTAT	51	GTCA	3520	GTCC	96	GTCG	71	GTCT	104	GTGA	4	GTGC	5	GTGG	11	GTGT	22
-#
-#%PCRNH	1 caA bw TX	TACA	4	TACC	3	TACG	2	TACT	3	TAGA	96	TAGC	4020	TAGG	209	TAGT	90	TATA	63	TATC	46	TATG	16	TATT	49
-#%PCRNH	1	TCAA	28	TCAC	11	TCAG	19	TCAT	23	TCGA	15	TCGC	5	TCGG	7	TCGT	5	TCTA	186	TCTC	65	TCTG	141	TCTT	84
-#%PCRNH	1	TGAA	134	TGAC	272	TGAG	112	TGAT	86	TGCA	74	TGCC	47	TGCG	46	TGCT	14	TGTA	774	TGTC	822	TGTG	512	TGTT	211
-#%PCRNH	1	TTAA	45	TTAC	63	TTAG	31	TTAT	43
-#
-#new_win=[];
-#N=4;
-#
-#a=1;
-#for f=1:3,
-# for k=1:4,
-#      j=a+(k-1)*N;
-#      for t1=1:4,
-#            new_win(j+t1-a,f)=win_R1(j,t1+(f-1)*N); 
-#      end
-#  end
-#end 
-#
-#
-#c=2;
-#for f=1:3,
-#  for k=1:4,
-#      j=c+(k-1)*N;
-#      for t1=1:4,
-#            new_win(j+t1-c,f+2*c-1)=win_R1(j,t1+(f-1)*N); 
-#      end
-#  end
-#end 
-#
-#g=3;
-#for f=1:3,
-#   for k=1:4,
-#      j=g+(k-1)*N;
-#      for t=1:4,
-#            new_win(j+t-g,f+2*g)=win_R1(j,t+(f-1)*N);
-#      end
-#   end
-#end 
-#
-#
-#t=4;
-#for f=1:3,
-#     for k=1:4,
-#      j=t+(k-1)*N;% caG  3,
-#      for t1=1:4,
-#            new_win(j+t1-t,f+2*t+1)=win_R1(j,t1+(f-1)*N); 
-#      end
-#  end
-#end
-#endfunction
-#
-
 # generate metrics
 sub metrics_gen_assym_prediction () {
   my ($err_data, $verbose) = @_;
@@ -318,32 +241,12 @@ sub metrics_gen_assym_prediction () {
   my $as_ag_tc_R2 = ($mis2 > 0 ? (abs($coH2{AG} - $coH2{TC}) / $mis2) : 0);
   my $symm_ag_tc = max(($as_ag_tc_R1, $as_ag_tc_R2));
 
-  #1.1.1.1--------remove strong assymetry if needed (re-define %separated pair
-  if ($as_ag_tc_R1 > $thr_ass) {
-    $coH1{AG} = $mis1;
-    $coH1{TC} = $mis1;
-  }
-  if ($as_ag_tc_R2 > $thr_ass) {
-    $coH2{AG} = $mis2;
-    $coH2{TC} = $mis2;
-  }
-
   #1.1.2 ---- strand assymetry (sh be symmetry) mic=min 'close' Ti: CT GA
   my $mic1 = min(($coH1{CT}, $coH1{GA}));
   my $mic2 = min(($coH2{CT}, $coH2{GA}));
   my $as_ct_ga_R1 = ($mic1 > 0 ? (abs($coH1{CT} - $coH1{GA}) / $mic1) : 0);
   my $as_ct_ga_R2 = ($mic2 > 0 ? (abs($coH2{CT} - $coH2{GA}) / $mic2) : 0);
   my $symm_ct_ga = max(($as_ct_ga_R1, $as_ct_ga_R2));
-
-  #1.1.2.1-remove close Ti starnd assymetry if needed
-  if ($as_ct_ga_R1 > $thr_ass) {
-      $coH1{CT} = $mic1;
-      $coH1{GA} = $mic1;
-  }
-  if ($as_ct_ga_R2 > $thr_ass) {
-      $coH2{CT} = $mic2;
-      $coH2{GA} = $mic2;
-  }
 
   my @ti1 = ($coH1{AG}, $coH1{TC}, $coH1{CT}, $coH1{GA});
   my $mean_ti1 = round(mean(@ti1));
@@ -394,18 +297,15 @@ sub metrics_gen_assym_prediction () {
   my $TiTv_meGT = max(($si_sv1, $si_sv2));
 
   #3========metrics on oxiG and GT/CA artefact
-  #artefact C2A=art_ox=proportion of gt/ca to mean Ti, depends
-  #on Ti variability 
-  my $thr_ti1 = $mean_ti1 - ($cvTi1 > $thr_cv ? 1 : 3) * $sd_ti1;
-  my $thr_ti2 = $mean_ti2 - ($cvTi2 > $thr_cv ? 1 : 3) * $sd_ti2;
+  #artefact C2A=art_ox=proportion of gt/ca to mean Ti, depends on Ti variability 
 
   #===============art_ox=proportion of gt or ca to mean Ti
   my $ma1 = max(($coH1{CA}, $coH1{GT}));
   my $ma2 = max(($coH2{CA}, $coH2{GT}));
 
   # prop max(gt,ca) in Ti: the higher the more likely artC2A
-  my $artR1 = ($thr_ti1 > 0 ? ($ma1 / $thr_ti1) : 0);
-  my $artR2 = ($thr_ti2 > 0 ? ($ma2 / $thr_ti2) : 0);
+  my $artR1 = ($mean_ti1 > 0 ? ($ma1 / $mean_ti1) : 0);
+  my $artR2 = ($mean_ti2 > 0 ? ($ma2 / $mean_ti2) : 0);
   my $art_ox = max(($artR1, $artR2));
 
   #3.2 ----------------------oxidation biasas BROAD
@@ -476,12 +376,8 @@ sub metrics_gen_assym_prediction () {
   }
 
   #5.2--------compute probability/likelihood of C2A based on art_ox
-  my $likely = 0.25 * ($artR1 + $artR2);
-  my $new_likely = $likely;
-  if ($likely > 1) {
-    $new_likely = 1;
-  }
-  my $likelihood = $new_likely;
+  my $likely = $gt_nearTi;
+  my $likelihood = $likely;
 
   # update results
   $results{likelihood} = $likelihood;
