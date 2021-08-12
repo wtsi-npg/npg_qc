@@ -1,6 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
 
+release 69.8.1
+ - bug fix npg_substitution_metrics.pl to not bail on single read data
+
 release 69.8.0
  - mqc skipper - a more generic way to disregard spiked-in controls when
    counting the number of studies the samples in the run belong to. The change
