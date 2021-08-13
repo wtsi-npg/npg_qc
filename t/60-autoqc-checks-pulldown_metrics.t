@@ -32,20 +32,20 @@ my $dir = tempdir( CLEANUP => 1 );
     lives_ok { $results_hash = $pdm->_parse_metrics($fh) } 'parsing picard metrics lives';
     close $fh;
 
-    is (scalar keys %{$results_hash}, 40, 'correct number of fields saved in a hash');
-    is ($results_hash->{BAIT_TERRITORY}, 51543125, 'bait territory value');
+    is (scalar keys %{$results_hash}, 60, 'correct number of fields saved in a hash');
+    is ($results_hash->{BAIT_TERRITORY}, 38400276, 'bait territory value');
     is ($results_hash->{READ_GROUP}, undef,
       'read group - last value in the row - is undefined');
 
     lives_ok { $results_hash = $pdm->_save_results($results_hash) }
       'saving results to the result object lives';
-    is ($pdm->result->other_metrics->{PCT_SELECTED_BASES}, 0.882919,
+    is ($pdm->result->other_metrics->{PCT_SELECTED_BASES}, 0.750142,
       'one of other values');
     ok (!exists $pdm->result->other_metrics->{BAIT_TERRITORY},
       'bait territory does not exist on other metrics');
-    is ( $pdm->result->bait_territory, 51543125,
+    is ( $pdm->result->bait_territory, 38400276,
       q[bait territory value from the result's object attribute]);
-    is ( $pdm->result->mean_bait_coverage, 41.044036, q[mean bait coverage]);
+    is ( $pdm->result->mean_bait_coverage, 73.434011, q[mean bait coverage]);
   }
 }
 
