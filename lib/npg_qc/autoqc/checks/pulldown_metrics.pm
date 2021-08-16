@@ -150,7 +150,7 @@ override 'execute' => sub {
 
     my $command = $self->picard_command;
     ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
-    open my $fh, $self->output_file or croak 'Failed to open GATK output file: '.$self->output_file.' '.$?;
+    open my $fh, $self->output_file or croak 'Failed to open GATK output file: '.$self->output_file.q{ }.$?;
     ## use critic
     my $results = $self->_parse_metrics($fh);
     close $fh or croak 'File handle close error';
@@ -178,7 +178,7 @@ has 'output_file' => (
 
 sub _build_output_file {
     my $self = shift;
-    return catfile($self->tmp_path, $self->rpt_list.'_gatk_collecthsmetrics.txt');
+    return catfile($self->qc_out->[0], $self->filename_root.'_gatk_collecthsmetrics.txt');
 }
 
 sub _parse_metrics {
