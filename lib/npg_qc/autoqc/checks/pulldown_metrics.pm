@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 use English qw( -no_match_vars );
 use Carp;
-use File::Spec::Functions qw( catdir );
+use File::Spec::Functions qw( catdir catfile );
 use Readonly;
 use Try::Tiny;
 
@@ -95,14 +95,16 @@ has 'picard_command' => (
 
 sub _build_picard_command {
     my $self = shift;
+
     my $command = $self->gatk_cmd .
-      sprintf q[ --java-options "-Xmx%s" %s --BAIT_INTERVALS %s --TARGET_INTERVALS %s --REFERENCE_SEQUENCE %s --INPUT %s --OUTPUT /dev/stdout],
+      sprintf q[ --java-options "-Xmx%s" %s --BAIT_INTERVALS %s --TARGET_INTERVALS %s --REFERENCE_SEQUENCE %s --INPUT %s --OUTPUT %s],
         $self->max_java_heap_size,
         $self->picard_module,
         $self->bait_intervals_path,
         $self->target_intervals_path,
         $self->reference,
-        $self->input_files->[0];
+        $self->input_files->[0],
+        $self->output_file;
     return $command;
 }
 
@@ -148,10 +150,10 @@ override 'execute' => sub {
 
     my $command = $self->picard_command;
     ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
-    open my $fh, "$command |" or croak qq[Cannot fork "$command". $ERRNO];
+    open my $fh, $self->output_file or croak 'Failed to open GATK output file: '.$self->output_file.' '.$?;
     ## use critic
-
     my $results = $self->_parse_metrics($fh);
+    close $fh or croak 'File handle close error';
 
     if($self->_interval_files_identical) {
         $self->result->interval_files_identical(1);
@@ -167,6 +169,17 @@ override 'execute' => sub {
 
     return 1;
 };
+
+has 'output_file' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy_build => 1,
+);
+
+sub _build_output_file {
+    my $self = shift;
+    return catfile($self->tmp_path, $self->rpt_list.'_gatk_collecthsmetrics.txt');
+}
 
 sub _parse_metrics {
     my ($self, $fh) = @_;
