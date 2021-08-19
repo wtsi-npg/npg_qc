@@ -14,3 +14,8 @@ ALTER TABLE `qx_yield` \
   MODIFY `yield2_q30` BIGINT UNSIGNED DEFAULT NULL, \
   MODIFY `yield1_q40` BIGINT UNSIGNED DEFAULT NULL, \
   MODIFY `yield2_q40` BIGINT UNSIGNED DEFAULT NULL;
+
+
+-- Tag metrics results are per lane, tag_index column is not needed
+
+ALTER TABLE `tag_metrics` DROP COLUMN `tag_index`;

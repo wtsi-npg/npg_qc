@@ -183,11 +183,6 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   data_type: 'text'
   is_nullable: 1
 
-=head2 tag_index
-
-  data_type: 'bigint'
-  is_nullable: 1
-
 =head2 tag_hops_percent
 
   data_type: 'float'
@@ -259,8 +254,6 @@ __PACKAGE__->add_columns(
   { data_type => 'text', is_nullable => 1 },
   'info',
   { data_type => 'text', is_nullable => 1 },
-  'tag_index',
-  { data_type => 'bigint', is_nullable => 1 },
   'tag_hops_percent',
   { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'tag_hops_power',
@@ -330,8 +323,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::tag_metrics';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-04-10 14:09:37
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:01BT+8rbCPfUeB3ItyFNjQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2021-08-19 13:25:57
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:X85s6Sx84dZtx0r2CpnPQA
 
 our $VERSION = '0';
 
