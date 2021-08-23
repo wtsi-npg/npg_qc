@@ -120,37 +120,37 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
 =head2 yield1
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 yield2
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 yield1_q30
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 yield2_q30
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 yield1_q40
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 yield2_q40
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
@@ -208,17 +208,17 @@ __PACKAGE__->add_columns(
   'threshold_yield2',
   { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
   'yield1',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'yield2',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'yield1_q30',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'yield2_q30',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'yield1_q40',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'yield2_q40',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'pass',
   { data_type => 'tinyint', is_nullable => 1 },
   'comments',
@@ -292,8 +292,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::qX_yield';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-08-29 13:44:29
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:NBYWaBVvG2S3Etgm+Jj4sA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2021-08-19 12:16:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LHzBwbDWKgAAeb8bUrM8og
 
 our $VERSION = '0';
 
