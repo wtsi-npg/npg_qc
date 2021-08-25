@@ -1,9 +1,12 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 69.9.0
  - Change database column type from unsigned int to insigned bigint
    for columns where we store number of reads and similar values and
    where we do not already set type to bigint. Some NovaSeq runs produce
    more data than we envisaged when these tables were set up.
+ - Update pulldown_metrics autoqc check to use the up-to-date Picard
+   metrics via GATK, use CRAM files instead of BAM files as input.  
 
 release 69.8.1
  - bug fix npg_substitution_metrics.pl to not bail on single read data
