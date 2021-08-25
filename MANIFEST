@@ -1,4 +1,4 @@
-.github/workflows/testing_and_building_repos.yml 
+.github/workflows/testing_and_building_repos.yml
 bin/gtck_combine_gt_data.sh
 bin/gtck_extract_fluidigm_data_from_irods.sh
 bin/gtck_genplexlist.sh
@@ -219,7 +219,7 @@ t/60-autoqc-checks-af_metrics.t
 t/60-autoqc-checks-bam_flagstats.t
 t/60-autoqc-checks-bcfstats.t
 t/60-autoqc-checks-check.t
-t/60-autoqc-checks-interop.t 
+t/60-autoqc-checks-interop.t
 t/60-autoqc-checks-gc_bias.t
 t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-generic.t
@@ -413,7 +413,7 @@ t/data/autoqc/alignment.bam
 t/data/autoqc/alignment.sam
 t/data/autoqc/alignment_small.sam
 t/data/autoqc/fixtures/Adapter.yml
-t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/bcftools/Hs_MajorQC.annotation.vcf 
+t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/bcftools/Hs_MajorQC.annotation.vcf
 t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/bcftools/Hs_MajorQC.info.json
 t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/bcftools/Hs_MajorQC.ploidy
 t/data/autoqc/gbs_plex_repository/Hs_MajorQC/default/all/fasta/Hs_MajorQC.fa
@@ -477,6 +477,7 @@ t/data/autoqc/npg/run/2222.xml
 t/data/autoqc/npg/run/2549.xml
 t/data/autoqc/npg/run/3612.xml
 t/data/autoqc/pulldown_metrics/pdm.out
+t/data/autoqc/pulldown_metrics/samplesheet_pulldown.csv
 t/data/autoqc/qc/1937_3.map
 t/data/autoqc/qX_yield/npg/instrument/15.xml
 t/data/autoqc/qX_yield/npg/run/2549.xml

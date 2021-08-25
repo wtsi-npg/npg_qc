@@ -4,20 +4,21 @@ use Moose;
 use namespace::autoclean;
 use English qw( -no_match_vars );
 use Carp;
-use File::Spec::Functions qw( catdir );
+use File::Spec::Functions qw( catdir catfile );
 use Readonly;
 
 extends qw(npg_qc::autoqc::checks::check);
-with qw(npg_tracking::data::bait::find
-        npg_common::roles::software_location
-       );
+with 'npg_tracking::data::bait::find',
+    'npg_common::roles::software_location' => {tools => ['gatk']}
+;
 
 our $VERSION = '0';
 
-Readonly::Scalar my $PICARD_JAR_NAME    => q[CalculateHsMetrics.jar];
+Readonly::Scalar my $PICARD_METRICS_NAME => q[CollectHsMetrics];
 Readonly::Scalar my $MAX_JAVA_HEAP_SIZE => q[3000m];
 Readonly::Scalar my $MINUS_ONE          => -1;
 Readonly::Scalar my $MIN_ON_BAIT_BASES_PERCENTAGE => 20;
+Readonly::Scalar my $GATK_OUTPUT_SUFFIX => '.gatk_collecthsmetrics.txt';
 
 Readonly::Hash   my %PICARD_METRICS_FIELDS_MAPPING => {
     'BAIT_TERRITORY'       => 'bait_territory',
@@ -37,13 +38,13 @@ Readonly::Hash   my %PICARD_METRICS_FIELDS_MAPPING => {
     'HS_LIBRARY_SIZE'      => 'library_size',
                                        };
 
-has '+file_type'         => (default => 'bam',);
+has '+file_type'         => (default => 'cram',);
 has '+aligner'           => (default => 'fasta',);
 
 has 'alignments_in_bam'  => (
-	  is => 'ro',
-	  isa => 'Maybe[Bool]',
-	  lazy_build => 1,
+    is => 'ro',
+    isa => 'Maybe[Bool]',
+    lazy_build => 1,
 );
 sub _build_alignments_in_bam {
     my ($self) = @_;
@@ -56,28 +57,53 @@ has 'max_java_heap_size' => (
     default => $MAX_JAVA_HEAP_SIZE,
 );
 
-has 'picard_jar_path' => (
-    is      => 'ro',
-    isa     => 'NpgCommonResolvedPathJarFile',
-    coerce  => 1,
-    default => $PICARD_JAR_NAME,
-);
-
-has 'picard_command' => (
-    is         => 'ro',
-    isa        => 'Str',
+has 'reference' => (
+    is => 'ro',
+    isa => 'Str',
     lazy_build => 1,
 );
 
-sub _build_picard_command {
+sub _build_reference {
     my $self = shift;
-    my $command = $self->java_cmd . sprintf q[ -Xmx%s -jar %s VALIDATION_STRINGENCY=SILENT BAIT_INTERVALS=%s TARGET_INTERVALS=%s INPUT=%s OUTPUT=/dev/stdout],
-        $self->max_java_heap_size,
-        $self->picard_jar_path,
-        $self->bait_intervals_path,
-        $self->target_intervals_path,
-        $self->input_files->[0];
-    return $command;
+
+    my @refs = @{$self->refs};
+    if (@refs > 1) {
+        croak 'More than one reference supplied. Cannot run pulldown_metrics with ambiguous reference FASTA';
+    }
+    my $ref = pop @refs;
+    if (!$ref) {
+        croak 'No reference supplied. Cannot interpret CRAM without a reference FASTA file';
+    }
+    return $ref;
+}
+
+has 'output_file' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy_build => 1,
+);
+
+sub _build_output_file {
+    my $self = shift;
+    return catfile($self->qc_out->[0], $self->filename_root.$GATK_OUTPUT_SUFFIX);
+}
+
+has '_picard_arguments' => (
+    is => 'ro',
+    isa => 'ArrayRef[Str]',
+    lazy_build => 1,
+);
+
+sub _build__picard_arguments {
+    my $self = shift;
+    return [
+        '--VALIDATION_STRINGENCY=SILENT',
+        '--BAIT_INTERVALS='.$self->bait_intervals_path,
+        '--TARGET_INTERVALS='.$self->target_intervals_path,
+        '--REFERENCE_SEQUENCE='.$self->reference,
+        '--INPUT='.$self->input_files->[0],
+        '--OUTPUT='.$self->output_file
+    ];
 }
 
 override 'can_run' => sub {
@@ -116,16 +142,25 @@ override 'execute' => sub {
         return 1;
     }
 
-    $self->result->set_info( 'Aligner', qq[Picard $PICARD_JAR_NAME] );
-    $self->result->set_info( 'Aligner_version', $self->current_version($self->picard_jar_path) );
+    $self->result->set_info( 'Picard_metrics_name', $PICARD_METRICS_NAME );
+    $self->result->set_info( 'GATK_version', $self->current_version($self->gatk_cmd) );
     $self->result->bait_path($self->bait_path);
+    my $gatk_command = join q[ ],
+        $self->gatk_cmd,
+        q[--java-options "-Xmx].$self->max_java_heap_size.q["],
+        $PICARD_METRICS_NAME,
+        @{$self->_picard_arguments};
+    carp 'Running GATK as: '.$gatk_command;
+    my $exit = system $gatk_command;
+    if ($exit != 0) {
+        croak 'GATK failed';
+    } else {
+        carp 'GATK completed without error';
+    }
 
-    my $command = $self->picard_command;
-    ## no critic (ProhibitTwoArgOpen InputOutput::RequireBriefOpen)
-    open my $fh, "$command |" or croak qq[Cannot fork "$command". $ERRNO];
-    ## use critic
-
+    open my $fh, '<', $self->output_file or croak 'Failed to open GATK output file: '.$self->output_file.q{ }.$CHILD_ERROR;
     my $results = $self->_parse_metrics($fh);
+    close $fh or croak 'File handle close error';
 
     if($self->_interval_files_identical) {
         $self->result->interval_files_identical(1);
@@ -142,33 +177,33 @@ override 'execute' => sub {
     return 1;
 };
 
+
 sub _parse_metrics {
     my ($self, $fh) = @_;
     if (!$fh) {
         croak q[File handle is not available, cannot parse picard pulldown metrics];
     }
     my @lines = ();
-    while (my $line = <$fh>) {
-        ## no critic (RequireExtendedFormatting)
-        if ( $line =~ /^#/sm ) { next; }
-        ## use critic
-        chomp $line;
-        if ($line =~ /^\s*$/smx) { next; }
-        push @lines, $line;
+    my $line = q{};
+    ## no critic (RequireExtendedFormatting)
+    while ($line !~ /^## METRICS/sm) {
+        $line = <$fh>;
     }
-    close $fh or croak qq[Cannot close pipe in __PACKAGE__ : $ERRNO, $CHILD_ERROR];
+    ## use critic
+    $lines[0] = <$fh>;
+    $lines[1] = <$fh>;
+    chomp @lines;
+    if (! ($lines[0] and $lines[1])) {
+        croak q[Pulldown metrics output file is malformed];
+    }
 
-    if (scalar @lines != 2) {
-        croak q[Wrong number of result lines, should be two lines];
-    }
     my @keys = split /\t/smx, $lines[0];
     my @values = split /\t/smx, $lines[1], $MINUS_ONE;
     my $num_keys = scalar @keys;
     my $num_values = scalar @values;
     if ($num_keys != $num_values) {
-        croak qq[Mismatch in number of keys and values, $num_keys agains $num_values];
+        croak qq[Mismatch in number of keys and values, $num_keys against $num_values];
     }
-
     my $results = {};
     my $i = 0;
     while ($i < $num_keys) {
@@ -190,11 +225,11 @@ sub _save_results {
             if (defined $value) {
                 my $attr_name = $PICARD_METRICS_FIELDS_MAPPING{$key};
                 if ($value eq q[?]) {
-		                carp "Field $attr_name is set to '?', skipping...";
+                    carp "Field $attr_name is set to '?', skipping...";
                 } else {
                     $self->result->$attr_name($value);
                 }
-	          }
+            }
             delete $results->{$key};
         }
     }
@@ -207,7 +242,7 @@ sub _interval_files_identical {
 
     my $cmd = q[diff -q ] . $self->bait_intervals_path . q[ ] . $self->target_intervals_path . q[ 2>&1 > /dev/null];
 
-carp q[Comparing intervals files with cmd: ], $cmd;
+    carp q[Comparing intervals files with cmd: ], $cmd;
 
     if($self->bait_intervals_path and $self->target_intervals_path and system($cmd) == 0) {
         return 1;
@@ -241,11 +276,23 @@ npg_qc::autoqc::checks::pulldown_metrics
 
 =head2 alignments_in_bam
 
+Setting from LIMS on whether alignment data is available. This check cannot
+run without it. Set when testing to avoid tracking server lookups.
+
 =head2 max_java_heap_size
 
-=head2 picard_jar_path
+Java heap setting for GATK. GATK will allocate too much on its own initiative
 
-=head2 picard_command
+=head2 reference
+
+A path to reference FASTA required to interpret CRAM files.
+
+=head2 output_file
+
+A path for GATK to output pulldown metrics to.
+Required because GATK corrupts CalculateHsMetrics output to STDOUT, and
+customers may wish to inspect the full set of metrics after seeing the QC
+result.
 
 =head1 DIAGNOSTICS
 
@@ -287,7 +334,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2016, 2021 Genome Research Ltd.
 
 This file is part of NPG.
 
