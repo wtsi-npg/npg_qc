@@ -377,7 +377,6 @@ subtest 'Tag metrics as first check in summary table' =>  sub {
       id_run             => 4025,
       position           => $i,
       id_seq_composition => $fkid,
-      tag_index          => -1,
       path=>'some path',
       metrics_file=>'some other path',
       barcode_tag_name=>'BC',
