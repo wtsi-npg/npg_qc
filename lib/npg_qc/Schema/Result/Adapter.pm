@@ -102,13 +102,13 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
 =head2 forward_fasta_read_count
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 forward_contaminated_read_count
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
@@ -124,13 +124,13 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
 
 =head2 reverse_fasta_read_count
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
 =head2 reverse_contaminated_read_count
 
-  data_type: 'integer'
+  data_type: 'bigint'
   extra: {unsigned => 1}
   is_nullable: 1
 
@@ -192,17 +192,17 @@ __PACKAGE__->add_columns(
   'reverse_read_filename',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'forward_fasta_read_count',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'forward_contaminated_read_count',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'forward_blat_hash',
   { data_type => 'text', is_nullable => 1 },
   'forward_start_counts',
   { data_type => 'text', is_nullable => 1 },
   'reverse_fasta_read_count',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'reverse_contaminated_read_count',
-  { data_type => 'integer', extra => { unsigned => 1 }, is_nullable => 1 },
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'reverse_blat_hash',
   { data_type => 'text', is_nullable => 1 },
   'reverse_start_counts',
@@ -280,8 +280,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::adapter';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:qBi6HgQ59WjoyG18q6NmVA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2021-08-19 12:16:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:jxMC400VgMoWLi7VZ1BQvg
 
 our $VERSION = '0';
 

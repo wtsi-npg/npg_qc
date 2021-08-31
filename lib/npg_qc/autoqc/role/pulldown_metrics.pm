@@ -61,7 +61,7 @@ sub unique_reads_percent {
 }
 
 =head2 unique_reads_aligned_percent
-   
+
  unique_reads_aligned_num / total_reads_num
 
 =cut
@@ -75,7 +75,7 @@ sub unique_reads_aligned_percent {
 }
 
 =head2 on_bait_reads_percent
-   
+
  Picard metrics:
  PF_UQ_READS_ALIGNED_BAIT :      The number of PF unique reads that are aligned overlapping a bait by >= 1bp
 
@@ -94,7 +94,7 @@ sub on_bait_reads_percent {
 
 
 Picard metrics :
-PF_UQ_READS_ALIGNED_NEAR_BAIT: The number of PF unique reads that dont overlap a bait but align within 250bp 
+PF_UQ_READS_ALIGNED_NEAR_BAIT: The number of PF unique reads that dont overlap a bait but align within 250bp
                                 of a bait.
 
 =cut
@@ -125,7 +125,7 @@ sub on_target_reads_percent {
 }
 
 =head2 selected_bases_percent
-   
+
  (on_bait_bases_num + near_bait_bases_num) / unique_bases_aligned_num PCT_SELECTED_BASES in Picard metrics.
 
 =cut
@@ -180,7 +180,7 @@ sub off_bait_bases_percent {
     return;
 }
 
-=head2 on_bait_vs_selected_percent 
+=head2 on_bait_vs_selected_percent
 
 ON_BAIT_VS_SELECTED in Picard metrics
 
@@ -323,7 +323,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2016, 2021 Genome Research Ltd.
 
 This file is part of NPG.
 

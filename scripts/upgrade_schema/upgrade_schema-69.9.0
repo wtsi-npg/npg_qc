@@ -1,0 +1,21 @@
+-- Change type of some columns from UNSIGNED INT to INSIGNED BIGINT
+-- to accommodate large integer values for NovaSeq data
+
+ALTER TABLE `adapter` \
+  MODIFY `forward_fasta_read_count` BIGINT UNSIGNED DEFAULT NULL, \
+  MODIFY `reverse_fasta_read_count` BIGINT UNSIGNED DEFAULT NULL, \
+  MODIFY `forward_contaminated_read_count` BIGINT UNSIGNED DEFAULT NULL, \
+  MODIFY `reverse_contaminated_read_count` BIGINT UNSIGNED DEFAULT NULL;
+
+ALTER TABLE `qx_yield` \
+  MODIFY `yield1` BIGINT UNSIGNED DEFAULT NULL, \
+  MODIFY `yield2` BIGINT UNSIGNED DEFAULT NULL, \
+  MODIFY `yield1_q30` BIGINT UNSIGNED DEFAULT NULL, \
+  MODIFY `yield2_q30` BIGINT UNSIGNED DEFAULT NULL, \
+  MODIFY `yield1_q40` BIGINT UNSIGNED DEFAULT NULL, \
+  MODIFY `yield2_q40` BIGINT UNSIGNED DEFAULT NULL;
+
+
+-- Tag metrics results are per lane, tag_index column is not needed
+
+ALTER TABLE `tag_metrics` DROP COLUMN `tag_index`;
