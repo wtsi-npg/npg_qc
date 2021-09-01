@@ -1,6 +1,12 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
-release 69.9.0
+ - Use samplesheet test data instead of XML files.
+   Remove all cached LIMS and NPG XML feeds from t/data/autoqc and
+   t/data/autoqc/insert_size. Change the tests to use newly generated
+   samplesheets in t/data/autoqc/samplesheets. The samplesheets are
+   manually edited to reproduce previously available test cases.
+
+release 69.9.0 
  - Change database column type from unsigned int to insigned bigint
    for columns where we store number of reads and similar values and
    where we do not already set type to bigint. Some NovaSeq runs produce

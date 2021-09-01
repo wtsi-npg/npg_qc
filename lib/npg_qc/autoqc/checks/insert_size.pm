@@ -153,7 +153,7 @@ sub _build_reference {
         $self->result->add_comment(join(q[ ], $self->messages->messages));
     }
     if (scalar @refs > 1) {
-	      $self->result->add_comment(q[multiple references found: ] . join(q[;], @refs));
+        $self->result->add_comment(q[multiple references found: ] . join(q[;], @refs));
     }
     if (scalar @refs == 0) {
         $self->result->add_comment(q[Failed to retrieve binary reference.]);

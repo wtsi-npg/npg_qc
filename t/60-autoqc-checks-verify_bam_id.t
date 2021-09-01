@@ -10,8 +10,6 @@ my $repos                   = 't/data/autoqc';
 my $snv_repository          = 't/data';
 my $snv_repository_with_vcf = 't/data/autoqc/population_snv_with_vcf';
 
-$ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc];
-
 my $tempdir = tempdir( CLEANUP => 1);
 my $tool_path = "$tempdir/verifyBamID";
 my $bam_path  =  "$tempdir/13940_8.bam";
@@ -32,6 +30,9 @@ close $fh;
 use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    q[t/data/autoqc/samplesheets/samplesheet_13940.csv];
+  
   my @checks = ();
   push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
       id_run         => 13940,
@@ -65,6 +66,9 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    q[t/data/autoqc/samplesheets/samplesheet_13886.csv];
+
   my @checks = ();
   push @checks, npg_qc::autoqc::checks::verify_bam_id->new(
       id_run         => 13886,
@@ -92,6 +96,8 @@ use_ok ('npg_qc::autoqc::checks::verify_bam_id');
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    q[t/data/autoqc/samplesheets/samplesheet_2549.csv];
   my $h = {
       id_run         => 2549,
       position       => 4,
