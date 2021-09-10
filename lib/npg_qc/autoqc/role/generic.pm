@@ -32,7 +32,6 @@ sub massage_for_render {
         $table_data{$allowed_key} = q();
       }
     }
-    # rename fields to improve viewer comprehension
     $table_data{num_aligned_reads} = $qc_data->{num_aligned_reads};
   }
   if (exists $self->doc->{meta}) {
@@ -44,10 +43,10 @@ sub massage_for_render {
     }
 
     $table_data{max_negative_control_filtered_read_count} =
-      $self->doc->{meta}{max_negative_control_filtered_read_count} || q();
+      $self->doc->{meta}{max_negative_control_filtered_read_count} // q();
 
     $table_data{min_artic_passed_filtered_read_count} =
-      $self->doc->{meta}{min_artic_passed_filtered_read_count} || q();
+      $self->doc->{meta}{min_artic_passed_filtered_read_count} // q();
 
     my $sample_type = $self->doc->{meta}{sample_type};
 
