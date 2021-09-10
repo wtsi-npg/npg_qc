@@ -5,6 +5,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    t/data/autoqc/insert_size. Change the tests to use newly generated
    samplesheets in t/data/autoqc/samplesheets. The samplesheets are
    manually edited to reproduce previously available test cases.
+ - Make all defined values in artic generic result available for display.
 
 release 69.9.0 
  - Change database column type from unsigned int to insigned bigint
