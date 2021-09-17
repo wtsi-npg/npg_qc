@@ -27,9 +27,9 @@ npg_qc::autoqc::role::pulldown_metrics
 =cut
 
 sub criterion {
-	my $self = shift;
+    my $self = shift;
 
-	return q[Fail if on bait bases less than 20%];
+    return q[Fail if on bait bases less than 20%];
 }
 
 =head2 bait_design_efficiency
@@ -126,14 +126,14 @@ sub on_target_reads_percent {
 
 =head2 selected_bases_percent
 
- (on_bait_bases_num + near_bait_bases_num) / unique_bases_aligned_num PCT_SELECTED_BASES in Picard metrics.
+ (on_bait_bases_num + near_bait_bases_num) / [PF_BASES, PCT_SELECTED_BASES] in Picard metrics.
 
 =cut
 
 sub selected_bases_percent {
     my $self= shift;
-    if ($self->unique_bases_aligned_num && defined $self->on_bait_bases_num && defined $self->near_bait_bases_num) {
-        return (($self->on_bait_bases_num + $self->near_bait_bases_num) / $self->unique_bases_aligned_num) * $HUNDRED;
+    if ($self->picard_version_base_count && defined $self->on_bait_bases_num && defined $self->near_bait_bases_num) {
+        return (($self->on_bait_bases_num + $self->near_bait_bases_num) / $self->picard_version_base_count) * $HUNDRED;
     }
     return;
 }
@@ -146,8 +146,8 @@ The percentage of aligned, de-duped, on-bait bases out of the PF bases available
 
 sub on_bait_bases_percent {
     my $self = shift;
-    if($self->unique_bases_aligned_num && defined $self->on_bait_bases_num) {
-        return ($self->on_bait_bases_num / $self->unique_bases_aligned_num) * $HUNDRED;
+    if($self->picard_version_base_count && defined $self->on_bait_bases_num) {
+        return ($self->on_bait_bases_num / $self->picard_version_base_count) * $HUNDRED;
     }
     return;
 }
@@ -160,8 +160,8 @@ The percentage of aligned, de-duped, on-bait bases out of the PF bases available
 
 sub near_bait_bases_percent {
     my $self = shift;
-    if($self->unique_bases_aligned_num && defined $self->near_bait_bases_num) {
-        return ($self->near_bait_bases_num / $self->unique_bases_aligned_num) * $HUNDRED;
+    if($self->picard_version_base_count && defined $self->near_bait_bases_num) {
+        return ($self->near_bait_bases_num / $self->picard_version_base_count) * $HUNDRED;
     }
     return;
 }
@@ -174,7 +174,7 @@ The percentage of aligned PF bases that mapped neither on or near a bait. PCT_OF
 
 sub off_bait_bases_percent {
     my $self = shift;
-    if ($self->unique_bases_aligned_num && defined $self->selected_bases_percent) {
+    if (defined $self->selected_bases_percent) {
         return $HUNDRED - $self->selected_bases_percent;
     }
     return;
@@ -205,8 +205,8 @@ The percentage of aligned, de-duped, on-target bases out of the PF bases availab
 
 sub on_target_bases_percent {
     my $self = shift;
-    if ($self->unique_bases_aligned_num && defined $self->on_target_bases_num) {
-        return ($self->on_target_bases_num / $self->unique_bases_aligned_num) * $HUNDRED;
+    if ($self->picard_version_base_count && defined $self->on_target_bases_num) {
+        return ($self->on_target_bases_num / $self->picard_version_base_count) * $HUNDRED;
     }
     return;
 }
@@ -236,7 +236,7 @@ sub target_bases_coverage_percent {
         my @keys = keys %{$self->other_metrics};
         @keys = grep {/^PCT_TARGET_BASES/smx} @keys;
         foreach my $key (@keys) {
-	    my ($coverage) = $key =~ /_(\d+)X/smx;
+        my ($coverage) = $key =~ /_(\d+)X/smx;
             $tbc->{$coverage} = $self->other_metrics->{$key} * $HUNDRED;
         }
     }
@@ -287,12 +287,31 @@ sub hs_penalty {
         my @keys = keys %{$self->other_metrics};
         @keys = grep {/^HS_PENALTY/smx} @keys;
         foreach my $key (@keys) {
-	    my ($coverage) = $key =~ /_(\d+)X/smx;
+        my ($coverage) = $key =~ /_(\d+)X/smx;
             $penalty->{$coverage} = $self->other_metrics->{$key};
         }
     }
     return $penalty;
 }
+
+=head2 picard_version_base_count
+
+Backward compatibility for older QC values, this method returns a suitable
+total base count for determining percentages, by the presence or absence of
+the PF_BASES key in the data.
+
+Older Picard versions counted duplicates in the PCT_SELECTED_BASES count. In
+later versions bundled with GATK the PCT_SELECTED_BASES stopped including the
+duplicates. In order to calculate the same metrics we must use the value of
+PF_BASES instead.
+
+=cut
+
+sub picard_version_base_count {
+    my $self = shift;
+    return (exists $self->other_metrics->{PF_BASES}) ? $self->other_metrics->{PF_BASES} : $self->unique_bases_aligned_num;
+}
+
 
 no Moose::Role;
 
