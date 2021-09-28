@@ -452,6 +452,8 @@ t/data/autoqc/load/do_not_add_files_to_this_dir
 t/data/autoqc/load/some.json
 t/data/autoqc/pulldown_metrics/pdm.out
 t/data/autoqc/pulldown_metrics/samplesheet_pulldown.csv
+t/data/autoqc/pulldown_metrics/39193_3_14.pulldown_metrics.json
+t/data/autoqc/pulldown_metrics/40739_2_29.pulldown_metrics.json
 t/data/autoqc/qc/1937_3.map
 t/data/autoqc/qX_yield/npg/instrument/15.xml
 t/data/autoqc/qX_yield/npg/run/2549.xml
