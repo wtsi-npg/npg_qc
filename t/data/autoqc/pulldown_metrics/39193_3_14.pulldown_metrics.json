@@ -1,0 +1,67 @@
+{
+    "__CLASS__": "npg_qc::autoqc::results::pulldown_metrics-69.7.0",
+    "bait_path": "/lustre/scratch120/npg_repository/baits/Twist_Human_Core_Exome_BI/GRCh38_full_analysis_set_plus_decoy_hla",
+    "bait_territory": 38400276,
+    "composition": {
+        "__CLASS__": "npg_tracking::glossary::composition-91.13.0",
+        "components": [
+            {
+                "__CLASS__": "npg_tracking::glossary::composition::component::illumina-91.13.0",
+                "id_run": 39196,
+                "position": 3,
+                "tag_index": 14
+            }
+        ]
+    },
+    "fold_enrichment": 44.206576,
+    "id_run": 39196,
+    "info": {
+        "Aligner": "Picard CalculateHsMetrics.jar",
+        "Aligner_version": "1.72(1230)",
+        "Check": "npg_qc::autoqc::checks::pulldown_metrics",
+        "Check_version": "69.7.0"
+    },
+    "interval_files_identical": "1",
+    "library_size": 81304482,
+    "mean_bait_coverage": 66.138645,
+    "mean_target_coverage": 67.013109,
+    "near_bait_bases_num": 1101609043,
+    "off_bait_bases_num": 1172207761,
+    "on_bait_bases_num": 2539742206,
+    "on_target_bases_num": 2539742206,
+    "other_metrics": {
+        "AT_DROPOUT": null,
+        "BAIT_DESIGN_EFFICIENCY": "1",
+        "BAIT_SET": "Twist_Human_Core_Exome_BI-CTR",
+        "FOLD_80_BASE_PENALTY": "1.396106",
+        "GC_DROPOUT": null,
+        "GENOME_SIZE": "3217346917",
+        "HS_PENALTY_10X": "2.710952",
+        "HS_PENALTY_20X": "2.787486",
+        "HS_PENALTY_30X": "2.861701",
+        "LIBRARY": null,
+        "ON_BAIT_VS_SELECTED": "0.697472",
+        "PCT_OFF_BAIT": "0.243522",
+        "PCT_PF_READS": "1",
+        "PCT_PF_UQ_READS": "0.882818",
+        "PCT_PF_UQ_READS_ALIGNED": "0.936701",
+        "PCT_SELECTED_BASES": "0.756478",
+        "PCT_TARGET_BASES_10X": "0.980175",
+        "PCT_TARGET_BASES_20X": "0.975594",
+        "PCT_TARGET_BASES_2X": "0.983785",
+        "PCT_TARGET_BASES_30X": "0.956881",
+        "PCT_USABLE_BASES_ON_BAIT": "0.433807",
+        "PCT_USABLE_BASES_ON_TARGET": "0.433807",
+        "PF_READS": "57965786",
+        "READ_GROUP": null,
+        "SAMPLE": null
+    },
+    "position": 3,
+    "tag_index": 14,
+    "target_territory": 38400276,
+    "total_reads_num": 57965786,
+    "unique_bases_aligned_num": 4813559010,
+    "unique_reads_aligned_num": 47934027,
+    "unique_reads_num": 51173220,
+    "zero_coverage_targets_fraction": 0.01406
+}
