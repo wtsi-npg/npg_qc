@@ -27,7 +27,7 @@ An absolute path to the directory with intervals files.
 has 'bait_path'    => (isa        => 'Maybe[Str]',
                        is         => 'rw',
                        required   => 0,
-		      );
+                      );
 
 =head2 bait_territory
 
@@ -37,7 +37,7 @@ The number of bases which have one or more baits on top of them. BAIT_TERRITORY 
 has 'bait_territory' => (isa        => 'Maybe[Int]',
                          is         => 'rw',
                          required   => 0,
-		        );
+                        );
 
 =head2 target_territory
 
@@ -47,7 +47,7 @@ The unique number of target bases in the experiment where target is usually exon
 has 'target_territory' => (isa        => 'Maybe[Int]',
                            is         => 'rw',
                            required   => 0,
-		          );
+                          );
 
 
 =head2 total_reads_num
@@ -58,7 +58,7 @@ The total number of reads in the input BAM file. TOTAL_READS and PF_READS in Pic
 has 'total_reads_num' =>  (isa        => 'Maybe[Int]',
                            is         => 'rw',
                            required   => 0,
-		          );
+                          );
 
 =head2 unique_reads_num
 
@@ -68,7 +68,7 @@ The number of reads that are not marked as duplicates. PF_UNIQUE_READS in Picard
 has 'unique_reads_num' =>  (isa        => 'Maybe[Int]',
                             is         => 'rw',
                             required   => 0,
-		           );
+                           );
 
 =head2 unique_reads_aligned_num
 
@@ -78,7 +78,7 @@ The number of PF unique reads that are aligned with mapping score > 0 to the ref
 has 'unique_reads_aligned_num' =>  (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 unique_bases_aligned_num
 
@@ -88,7 +88,7 @@ has 'unique_reads_aligned_num' =>  (isa        => 'Maybe[Int]',
 has 'unique_bases_aligned_num' =>  (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 on_bait_bases_num
 
@@ -98,7 +98,7 @@ has 'unique_bases_aligned_num' =>  (isa        => 'Maybe[Int]',
 has 'on_bait_bases_num' =>         (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 near_bait_bases_num
 
@@ -108,7 +108,7 @@ has 'on_bait_bases_num' =>         (isa        => 'Maybe[Int]',
 has 'near_bait_bases_num' =>      (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                  );
 
 =head2 off_bait_bases_num
 
@@ -118,7 +118,7 @@ has 'near_bait_bases_num' =>      (isa        => 'Maybe[Int]',
 has 'off_bait_bases_num' =>        (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 on_target_bases_num
 
@@ -128,7 +128,7 @@ has 'off_bait_bases_num' =>        (isa        => 'Maybe[Int]',
 has 'on_target_bases_num' =>       (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 mean_bait_coverage
 
@@ -138,7 +138,7 @@ has 'on_target_bases_num' =>       (isa        => 'Maybe[Int]',
 has 'mean_bait_coverage' =>        (isa        => 'Maybe[Num]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 mean_target_coverage
 
@@ -148,7 +148,7 @@ has 'mean_bait_coverage' =>        (isa        => 'Maybe[Num]',
 has 'mean_target_coverage' =>      (isa        => 'Maybe[Num]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 fold_enrichment
 
@@ -158,7 +158,7 @@ has 'mean_target_coverage' =>      (isa        => 'Maybe[Num]',
 has 'fold_enrichment' =>           (isa        => 'Maybe[Num]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 zero_coverage_targets_fraction
 
@@ -168,7 +168,7 @@ has 'fold_enrichment' =>           (isa        => 'Maybe[Num]',
 has 'zero_coverage_targets_fraction' =>      (isa        => 'Maybe[Num]',
                                               is         => 'rw',
                                               required   => 0,
-		                             );
+                                             );
 
 =head2 library_size
 
@@ -178,7 +178,7 @@ has 'zero_coverage_targets_fraction' =>      (isa        => 'Maybe[Num]',
 has 'library_size' =>              (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 
 =head2 other_metrics
@@ -190,7 +190,7 @@ has 'library_size' =>              (isa        => 'Maybe[Int]',
 has 'other_metrics'  =>             (isa        => 'HashRef',
                                      is         => 'rw',
                                      required   => 0,
-		                    );
+                                    );
 
 =head2 interval_files_identical
 
@@ -198,9 +198,9 @@ has 'other_metrics'  =>             (isa        => 'HashRef',
 
 =cut
 has 'interval_files_identical' =>      (isa        => 'Maybe[Bool]',
-                                              is         => 'rw',
-                                              required   => 0,
-		                             );
+                                        is         => 'rw',
+                                        required   => 0,
+                                       );
 
 __PACKAGE__->meta->make_immutable;
 
