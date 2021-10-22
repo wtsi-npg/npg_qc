@@ -2,6 +2,8 @@
 
 - Use correct RT ticket number.
 - Set id_run, position and tag_index accordingly.
+- Wrap database changes into a transaction, which initially shoudl have a clause
+  to fail it so that it can be tried out (see some examples below).
 
 ## Toggle the outcome of a single library
 
@@ -46,14 +48,20 @@ the requestor, you might want to assign a pass to libraries.
 
 ```
 use npg_qc::Schema;
-my $rs=npg_qc::Schema->connect()->resultset("MqcLibraryOutcomeEnt")
-  ->search({id_run=>X,position=>Y});
-while (my $row=$rs->next) {
-  print $row->tag_index . " Current outcome: ".$row->mqc_outcome->short_desc;
-  $row->update_outcome({"mqc_outcome" => "Accepted final"},
-    $ENV{"USER"}, "RT#XXXX");
-  print "New outcome: ".$row->mqc_outcome->short_desc;
-}
+my $s = npg_qc::Schema->connect();
+# Use transaction.
+$s->txn_do( sub {
+  my $rs=npg_qc::Schema->connect()->resultset("MqcLibraryOutcomeEnt")
+    ->search({id_run=>X,position=>Y});
+  while (my $row=$rs->next) {
+    print $row->tag_index . " Current outcome: ".$row->mqc_outcome->short_desc;
+    $row->update_outcome({"mqc_outcome" => "Accepted final"},
+      $ENV{"USER"}, "RT#XXXX");
+    print "New outcome: ".$row->mqc_outcome->short_desc;
+  }
+  # Comment out the next statement when ready to update the values.
+  die 'End of transaction, deliberate error';
+});
 ```
 
 ## Create sequencing `fail` for lanes
