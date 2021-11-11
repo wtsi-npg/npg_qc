@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 16.10.1
+ - updated documentation
+
 release 69.10.0
  - switch to bcviz@1.3.3
  - Use samplesheet test data instead of XML files.
