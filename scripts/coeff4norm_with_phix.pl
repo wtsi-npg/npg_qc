@@ -131,7 +131,7 @@ while (my $hrow = $hrs->next()) {
   if ($prow->iseq_flowcell->sample->control) {
     if ($prow->iseq_flowcell->sample->control_type eq 'negative') {
       my $num_reads = $hrow->num_aligned_reads;
-      if ($num_reads < 10000) { # This somewhat arbitrary, but sensible
+      if ($num_reads < 100000) { # This somewhat arbitrary, but sensible
                                 # threshold cuts out 'fake' negative controls,
                                 # ie real samples or positive controls.
         # save for future
@@ -160,9 +160,11 @@ while (my $hrow = $hrs->next()) {
   }
 }
 
+my $log10 = log(10);
+
 # output data
 print join qq[\t], qw(id_run position tag_index num_phix_reads
-                      num_reads num_reads_norm*1000);
+                      num_reads log10_num_reads log10_num_reads_norm*10000);
 print qq[\n];
 
 my @runs = sort { $a <=> $b } keys %{$lane_data};
@@ -180,15 +182,19 @@ for my $id_run (@runs) {
       next;
     }
 
+    my $num_reads_ph = $lane_data->{$id_run}->{$position}->{num_reads_phix};
     my @controls = sort { $a->{tag_index} <=> $b->{tag_index} }
                    @{$lane_data->{$id_run}->{$position}->{controls}};
-    my $num_reads_ph = $lane_data->{$id_run}->{$position}->{num_reads_phix};
     for my $control (@controls) {
+      my $num_reads_control = $control->{num_reads};
+      $num_reads_control or next; # zero reads in control cannot be plotted on
+                                  # a log scale
       print join qq[\t],
         $id_run, $position, $control->{tag_index},
         $num_reads_ph,
-        $control->{num_reads},
-        ($control->{num_reads} / $num_reads_ph)*1000;
+        $num_reads_control,
+        log($num_reads_control)/$log10,
+        log(($num_reads_control / $num_reads_ph)*10000)/$log10;
       print qq[\n];
     }
   }
