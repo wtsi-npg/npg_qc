@@ -90,9 +90,6 @@ for my $run_lane (@run_lanes) {
   $lane_data->{$id_run}->{$p}->{num_reads_phix} = $num_phix_reads;
 }
 
-#use Data::Dumper;
-#print Dumper $lane_data;
-
 my @run_ids = keys %{$lane_data};
 warn @run_ids . " RUNS FOUND\n";
 
@@ -113,6 +110,9 @@ my $hrs = $schema->resultset('IseqHeronProductMetric')->search(
 my $old_position = 0;
 my $old_run = 0;
 warn "STARTING LOOP\n";
+
+my $ct_stats = {};
+
 while (my $hrow = $hrs->next()) {
   
   my $prow = $hrow->iseq_product_metric;
@@ -121,13 +121,10 @@ while (my $hrow = $hrs->next()) {
   $lane_data->{$id_run}->{$position} or next;
 
   if ($id_run != $old_run or $position != $old_position) { # new plate
-    if ($old_run and $old_position) { # start from the second plate
-      prune_weak_lane($old_run, $old_position);
-    }
     $old_run = $id_run;
     $old_position = $position;
-    $lane_data->{$id_run}->{$position}->{num_with_values} = 0;
-    $lane_data->{$id_run}->{$position}->{over_threshold} = 0;
+    $ct_stats->{$id_run}->{$position}->{num_with_values} = 0;
+    $ct_stats->{$id_run}->{$position}->{over_threshold} = 0;
     $lane_data->{$id_run}->{$position}->{controls} = [];
   }
 
@@ -157,16 +154,11 @@ while (my $hrow = $hrs->next()) {
   @ct_values or next; #no Ct values of any kind
 
   my $value = (sum @ct_values) / (scalar @ct_values);
-  if ($value > 0.00001) {
-    $lane_data->{$id_run}->{$position}->{num_with_values}++;
-    if ($value > 25) {
-      $lane_data->{$id_run}->{$position}->{over_threshold}++;
-    }
+  $ct_stats->{$id_run}->{$position}->{num_with_values}++;
+  if ($value > 25) {
+    $ct_stats->{$id_run}->{$position}->{over_threshold}++;
   }
 }
-
-# deal with the last plate
-prune_weak_lane($old_run, $old_position);
 
 # output data
 print join qq[\t], qw(id_run position tag_index num_phix_reads
@@ -177,6 +169,17 @@ my @runs = sort { $a <=> $b } keys %{$lane_data};
 for my $id_run (@runs) {
   my @positions = sort { $a <=> $b } keys %{$lane_data->{$id_run}};
   for my $position (@positions) {
+
+    # Trying to ensure we know Ct values for the majority of samples.
+    my $num_with_ct = $ct_stats->{$id_run}->{$position}->{num_with_values};
+    if ($num_with_ct < 200) {
+      next;
+    }
+    # And that the majority of these samples had reasonable viral load.
+    if ($ct_stats->{$id_run}->{$position}->{over_threshold} / $num_with_ct > 0.3) {
+      next;
+    }
+
     my @controls = sort { $a->{tag_index} <=> $b->{tag_index} }
                    @{$lane_data->{$id_run}->{$position}->{controls}};
     my $num_reads_ph = $lane_data->{$id_run}->{$position}->{num_reads_phix};
@@ -189,26 +192,6 @@ for my $id_run (@runs) {
       print qq[\n];
     }
   }
-}
-
-###### end of main ########
-
-sub prune_weak_lane {
-  my ($run, $position) = @_;
-  return;
-  my $total = $lane_data->{$run}->{$position}->{num_with_values};
-  if (not $total) { # not sure
-    delete $lane_data->{$run}->{$position};
-    return 1;
-  }
-
-  my $num_over = $lane_data->{$run}->{$position}->{over_threshold};
-  if ($num_over and ($num_over/$total) >= 0.1) {
-    delete $lane_data->{$run}->{$position};
-    return 1;
-  }
-
-  return 0;
 }
 
 exit 0;
