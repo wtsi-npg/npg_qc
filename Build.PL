@@ -63,6 +63,7 @@ my $requires = {
                 'PDL::Core'                       => 0,
                 'PDL::Lite'                       => 0,
                 'PDL::Primitive'                  => 0,
+                'PDL::Bad'                        => 0,
                 'Perl6::Slurp'                    => 0,
                 'Pod::Usage'                      => 0,
                 'POSIX'                           => 0,
