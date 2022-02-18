@@ -1,5 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - PDL CPAN Perl package had a flurry of releases recently, the latest
+   at this time is 2.074 (2022-02-08). This verson has an undentified
+   bug, which results in a failure of the reverse_average_percent_error
+   method in the npg_qc::autoqc::role::sequence_error class. The failure
+   was observed in the GitHub CI runner and on a local VM.
+   Pinned PDL version to 2.068 or earlier since 2.068 is the vrsion we
+   have in the latest production software stack and it is known to work.
+
 release 69.10.1
  - updated documentation
 
