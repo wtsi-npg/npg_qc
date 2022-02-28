@@ -23,7 +23,9 @@ use List::Util qw(pairkeys sum);
 # We will take the average Ct value for ORF1lab, N gene, S gene and consider
 # samples with the average Ct value below the threshold value of 25.
 # Aditionally, we will consider full plates only (384 samples) and only include
-# plates where at least 90% of the samples have passed the threshold.
+# plates where at least 90% of the samples have passed the threshold (90% was
+# the initial intention, however, this is not realistic since some labs do not
+# supply these values).
 #
 # Joining between the sample and lighthouse_sample tables
 #
