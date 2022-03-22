@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 69.11.1
+ - Normalisation of negative controls with PhiX:
+     1. added a script to compute linear regression stats,
+     2. added a document that captures an interim projetc review.
+
 release 69.11.0
  - PDL CPAN Perl package had a flurry of releases recently, the latest
    at this time is 2.074 (2022-02-08). This verson has an undentified
