@@ -4,6 +4,9 @@ release 69.11.1
  - Normalisation of negative controls with PhiX:
      1. added a script to compute linear regression stats,
      2. added a document that captures an interim projetc review.
+ - bower dependencies are expressed using https urls as unauth git endpoints
+   are not supported in github anymore
+ - update bower to 1.8.13
 
 release 69.11.0
  - PDL CPAN Perl package had a flurry of releases recently, the latest
