@@ -1,6 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - Removed an unused script - genotype_call_results_reporter.
+ - Switched the QC outcomes reporter to retrieve LIMS server URL from
+   the configuration file that is used by other applications. 
 
 release 69.11.1
  - Normalisation of negative controls with PhiX:

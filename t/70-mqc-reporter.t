@@ -44,21 +44,32 @@ sub _get_data {
 
 my $npg_qc_schema = _create_schema();
 my $mlwh_schema   = _create_mlwh_schema();
+my $config_file   = q[t/data/.npg/npg_tracking-Schema];
 
 subtest 'Initial' => sub {
-  plan tests => 5;
+  plan tests => 7;
 
   my $reporter = npg_qc::mqc::reporter->new(
      qc_schema   => $npg_qc_schema,
-     mlwh_schema => $mlwh_schema
+     mlwh_schema => $mlwh_schema,
+     config_file => $config_file
   );
   isa_ok($reporter, 'npg_qc::mqc::reporter');
 
-  like( $reporter->_url(33, 'pass'),
-    qr/npg_actions\/assets\/33\/pass_qc_state/,
+  is ( $reporter->lims_url, 'https://lims.sanger.ac.uk',
+    'LIMS server url is correct');
+  is ( $reporter->_url(33, 'pass'),
+    'https://lims.sanger.ac.uk/npg_actions/assets/33/pass_qc_state',
     'url for sending');
-  like( $reporter->_url(33, 'fail'),
-    qr/npg_actions\/assets\/33\/fail_qc_state/,
+ 
+  local $ENV{dev} = q[dev];
+  $reporter = npg_qc::mqc::reporter->new(
+     qc_schema   => $npg_qc_schema,
+     mlwh_schema => $mlwh_schema,
+     config_file => $config_file
+  );
+  is ( $reporter->_url(33, 'fail'),
+    'https://lims-dev.sanger.ac.uk/npg_actions/assets/33/fail_qc_state',
     'url for sending');
   is ( $reporter->_payload(33, 'pass'),
     '<?xml version="1.0" encoding="UTF-8"?><qc_information>' .
@@ -68,6 +79,15 @@ subtest 'Initial' => sub {
     '<?xml version="1.0" encoding="UTF-8"?><qc_information>' .
     '<message>Asset 33  failed manual qc</message></qc_information>',
     'payload');
+
+  local $ENV{dev} = q[test];
+  $reporter = npg_qc::mqc::reporter->new(
+     qc_schema   => $npg_qc_schema,
+     mlwh_schema => $mlwh_schema,
+     config_file => $config_file
+  );
+  throws_ok { $reporter->lims_url } qr/LIMS server url is not defined/,
+    'error when LIMS server url is not defined in teh config file';
 };
 
 subtest 'Succesfully posting report for 3 lanes' => sub {
@@ -77,7 +97,8 @@ subtest 'Succesfully posting report for 3 lanes' => sub {
     qc_schema   => $npg_qc_schema,
     mlwh_schema => $mlwh_schema,
     verbose     => 1,
-    warn_gclp   => 1);
+    config_file => $config_file
+  );
 
   foreach my $p (@pairs) {
     ok (!_get_data($npg_qc_schema, $p, 'reported'), 'reporting time is not set');
@@ -92,13 +113,14 @@ subtest 'Succesfully posting report for 3 lanes' => sub {
 };
 
 subtest 'Not reporting, individual cases' => sub {
-  plan tests => 16;
+  plan tests => 15;
 
   my $reporter = npg_qc::mqc::reporter->new(
     qc_schema   => $npg_qc_schema,
     mlwh_schema => $mlwh_schema,
     verbose     => 1,
-    warn_gclp   => 1);
+    config_file => $config_file
+  );
 
   my $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>4})->next;
   ok($row, 'row for run 6600 position 4 exists - test prerequisite');
@@ -106,9 +128,7 @@ subtest 'Not reporting, individual cases' => sub {
   $row->update({id_mqc_outcome => 3});
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>4})->next;
   ok ($row->has_final_outcome, 'outcome is final');
-  warnings_like { $reporter->load() } [
-    qr/GCLP run, cannot report run 6600 lane 4/],
-    'Message GCLP run logged';
+  $reporter->load();
   ok(!$row->reported, 'row for run 6600 position 4 reported time not set');
 
   $row->update({id_mqc_outcome => 1});
@@ -119,7 +139,8 @@ subtest 'Not reporting, individual cases' => sub {
     qc_schema   => $npg_qc_schema,
     mlwh_schema => $mlwh_schema,
     verbose     => 1,
-    warn_gclp   => 1);
+    config_file => $config_file
+  );
 
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>5})->next;
   ok($row, 'row for run 6600 position 5 exists - test prerequisite');
@@ -137,7 +158,9 @@ subtest 'Not reporting, individual cases' => sub {
     qc_schema   => $npg_qc_schema,
     mlwh_schema => $mlwh_schema,
     verbose     => 1,
-    dry_run     => 1);
+    dry_run     => 1,
+    config_file => $config_file
+  );
 
   $row = $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run=>6600, position=>6})->next;
   ok($row, 'row for run 6600 position 6 exists - test prerequisite');
@@ -166,7 +189,9 @@ subtest 'Testing failing to report, getting 500 status from lims' => sub {
 
   my $reporter = npg_qc::mqc::reporter->new(
     qc_schema   => $npg_qc_schema,
-    mlwh_schema => $mlwh_schema);
+    mlwh_schema => $mlwh_schema,
+    config_file => $config_file
+  );
   lives_ok { $reporter->load() } 'no error';
 
   foreach my $p (@pairs) {
@@ -176,4 +201,3 @@ subtest 'Testing failing to report, getting 500 status from lims' => sub {
 };
 
 1;
-

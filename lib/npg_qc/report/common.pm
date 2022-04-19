@@ -1,12 +1,36 @@
 package npg_qc::report::common;
 
-use Moose::Role;
+use Moose;
+use namespace::autoclean;
+use Readonly;
+use Carp;
+
 use npg_qc::Schema;
 use WTSI::DNAP::Warehouse::Schema;
 
-with qw(MooseX::Getopt);
+with qw(MooseX::Getopt
+        npg_tracking::util::db_config);
 
 our $VERSION = '0';
+
+Readonly::Scalar my $LIMS_URL_KEY => q[lims_url];
+
+has '+config_data' => (
+  metaclass  => 'NoGetopt',
+);
+
+has '+config_file_name' => (
+  documentation => 'The name of the config. file, where the server URL ' .
+                   'to report to is defined, defaults to npg_tracking-Schema',
+);
+sub _build_config_file_name {
+  return q[npg_tracking-Schema];
+}
+
+has '+config_file' => (
+  documentation => 'A full path to the configuration file, by default ' .
+                   'the file is in the .npg directory of the home directory',
+);
 
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
@@ -44,10 +68,19 @@ has 'dry_run' => (
   documentation => 'dry run',
 );
 
+sub lims_url {
+  my $self = shift;
+  my $url = $self->config_data->{$LIMS_URL_KEY};
+  if (!defined $url || ($url eq q[])) {
+    croak 'LIMS server url is not defined in ' . $self->config_file;
+  }
+  return $url;
+}
 
-no Moose::Role;
+__PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 NAME
@@ -62,23 +95,46 @@ Moose role. Common options/attributes for reporter scripts.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 config_file_name
+
+The name of the configuration file where the server URL to report to is
+defined, defaults to C<npg_tracking-Schema>. This attribute is inherited from
+the C<npg_tracking::util::db_config> role.
+
+=head2 config_file
+
+A full path to the configuration file. This attribute is inherited from
+the C<npg_tracking::util::db_config> role. By default the file is in the
+C<$HOME/.npg> directory and the name of the file is given by the
+C<config_file_name> attribute.
+
+=head2 config_data
+
+The contents of the relevant section (live, dev, etc) of the configuration
+file. This attribute is inherited from the C<npg_tracking::util::db_config>
+role.
+
 =head2 verbose
 
-  Boolean verbose flag, false by default.
+Boolean verbose flag, false by default.
 
 =head2 dry_run
 
-  Dry run flag. No reporting, no marking as reported in the qc database.
+Dry run flag. No reporting, no marking as reported in the qc database.
 
 =head2 qc_schema
 
-  An attribute - the schema to use for the qc database.
-  Defaults to npg_qc::Schema,
+An attribute - the DBIx schema to use for the qc database.
+Defaults to npg_qc::Schema.
 
 =head2 mlwh_schema
 
-  An attribute - the schema to use for ml warehouse database.
-  Defaults to WTSI::DNAP::Warehouse::Schema.
+An attribute - the DBIx schema to use for ml warehouse database.
+Defaults to WTSI::DNAP::Warehouse::Schema.
+
+=head2 lims_url
+
+Returns the base URL of the LIMS server to which the reports are sent.
 
 =head1 DIAGNOSTICS
 
@@ -88,13 +144,19 @@ Moose role. Common options/attributes for reporter scripts.
 
 =over
 
-=item Moose::Role
+=item Moose
+
+=item namespace::autoclean
+
+=item MooseX::Getopt
+
+=item Carp
 
 =item npg_qc::Schema
 
 =item WTSI::DNAP::Warehouse::Schema
 
-=item MooseX::Getopt
+=item npg_tracking::util::db_config
 
 =back
 
@@ -104,9 +166,11 @@ Moose role. Common options/attributes for reporter scripts.
 
 =head1 AUTHOR
 
+Marina Gourtovaia
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2018, 2022 Genome Research Ltd.
 
 This file is part of NPG.
 

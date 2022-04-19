@@ -9,22 +9,12 @@ use HTTP::Request;
 use Try::Tiny;
 use Readonly;
 
-use st::api::base;
-
-with qw{MooseX::Getopt npg_qc::report::common};
+extends 'npg_qc::report::common';
 
 our $VERSION = '0';
 
 Readonly::Scalar my $HTTP_TIMEOUT => 120;
 Readonly::Scalar my $CONTENT_TYPE => 'text/xml';
-
-
-has 'warn_gclp' => (
-  isa           => 'Bool',
-  is            => 'ro',
-  default       => 0,
-  documentation => 'show warning for glcp runs, defaults to false',
-);
 
 has '_ua'     => ( isa           => 'LWP::UserAgent',
                    is            => 'ro',
@@ -91,9 +81,6 @@ sub _build__data4reporting {
     }
 
     if ( $from_gclp ) {
-      if ( $self->warn_gclp ) {
-        $self->_log(qq[GCLP run, cannot report run $id_run lane $position]);
-      }
       next;
     }
 
@@ -138,7 +125,7 @@ sub load {
 
 sub _url {
   my ($self, $lane_id, $qc_result) = @_;
-  return st::api::base->lims_url() .
+  return $self->lims_url() .
          q[/npg_actions/assets/].$lane_id.q(/).$qc_result.'_qc_state';
 }
 
@@ -189,6 +176,7 @@ sub _log {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 NAME
@@ -197,7 +185,7 @@ npg_qc::mqc::reporter
 
 =head1 SYNOPSIS
 
- npg_qc::mqc::reporter->new()->load();
+  npg_qc::mqc::reporter->new()->load();
 
 =head1 DESCRIPTION
 
@@ -205,11 +193,6 @@ npg_qc::mqc::reporter
   to a Sequencescape URL. GCLP results are not reported. 
 
 =head1 SUBROUTINES/METHODS
-
-=head2 warn_gclp
-
-  Boolean flag switching on warnings when a GCLP lane is encounted,
-  false by default.
 
 =head2 load
   
@@ -230,8 +213,6 @@ npg_qc::mqc::reporter
 
 =item namespace::autoclean
 
-=item MooseX::Getopt
-
 =item Carp
 
 =item POSIX qw(strftime)
@@ -243,8 +224,6 @@ npg_qc::mqc::reporter
 =item Try::Tiny
 
 =item Readonly
-
-=item st::api::base
 
 =back
 
@@ -258,7 +237,7 @@ Jennifer Liddle <js10@sanger.ac.uk>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 GRL
+Copyright (C) 2015, 2016, 2017, 2018, 2022 Genome Research Ltd.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
