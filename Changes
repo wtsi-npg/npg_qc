@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Removed an unused script - genotype_call_results_reporter.
+
 release 69.11.1
  - Normalisation of negative controls with PhiX:
      1. added a script to compute linear regression stats,

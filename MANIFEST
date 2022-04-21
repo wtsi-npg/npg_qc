@@ -13,7 +13,6 @@ bin/npg_qc_autoqc_data.pl
 bin/npg_qc_tag_sniff.pl
 bin/npg_substitution_metrics.pl
 bin/call_gtck_composite_rpt.pl
-bin/genotype_call_results_reporter
 Build.PL
 Changes
 lib/npg_qc/illumina/interop/parser.pm
@@ -109,7 +108,6 @@ lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/skipper.pm
 lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/mqc/outcomes/keys.pm
-lib/npg_qc/report/genotype_call.pm
 lib/npg_qc/report/common.pm
 lib/npg_qc/Schema.pm
 lib/npg_qc/Schema/Composition.pm
@@ -276,7 +274,6 @@ t/60-autoqc-results-verify_bam_id.t
 t/70-mqc-reporter.t
 t/70-mqc-outcomes.t
 t/70-mqc-skipper.t
-t/70-report-genotype_call.t
 t/80-autoqc-qc-script.t
 t/data/autoqc/bam_flagstats/16960_1_0.tar.gz
 t/data/autoqc/bam_flagstats/17448_1_9.tar.gz
