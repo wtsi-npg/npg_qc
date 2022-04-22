@@ -9,6 +9,7 @@ release 69.11.1
  - bower dependencies are expressed using https urls as unauth git endpoints
    are not supported in github anymore
  - update bower to 1.8.13
+ - update tableExport to 1.26.0
 
 release 69.11.0
  - PDL CPAN Perl package had a flurry of releases recently, the latest
