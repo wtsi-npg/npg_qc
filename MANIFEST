@@ -275,6 +275,7 @@ t/70-mqc-reporter.t
 t/70-mqc-outcomes.t
 t/70-mqc-skipper.t
 t/80-autoqc-qc-script.t
+t/data/.npg/npg_tracking-Schema
 t/data/autoqc/bam_flagstats/16960_1_0.tar.gz
 t/data/autoqc/bam_flagstats/17448_1_9.tar.gz
 t/data/autoqc/bam_flagstats/25837_1_13.tar.gz
