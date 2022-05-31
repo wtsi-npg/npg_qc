@@ -16,7 +16,7 @@ use Getopt::Long;
 use Term::ANSIColor qw(:constants);
 
 ##no critic
-our $VERSION = '0';
+our $VERSION = '69.6.1';
 
 sub usage {
 
@@ -121,11 +121,12 @@ sub showTags{
           next if m/^barcode/;
           croak "Invalid tag $_" unless m/^([ACGT]+)\t(\d+)\t/;
           my ($sequence,$tag_index) = ($1,$2);
-          push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0]);
+	  my $original = $sequence;
+          push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0,$original]);
           if (@{$revcomps}) {
             $sequence =~ tr/ACGTN/TGCAN/;
             $sequence = reverse($sequence);
-            push(@{$db_tags{$sequence}},[$name,$id,$tag_index,1]);
+            push(@{$db_tags{$sequence}},[$name,$id,$tag_index,1,$original]);
           }
         }
         close(FILE);
@@ -148,11 +149,12 @@ sub showTags{
           if (!defined $tag_index || !defined $sequence) {
             next;
           }
-          push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0]);
+	  my $original = $sequence;
+          push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0,$original]);
           if (@{$revcomps}) {
             $sequence =~ tr/ACGTN/TGCAN/;
             $sequence = reverse($sequence);
-            push(@{$db_tags{$sequence}},[$name,$id,$tag_index,1]);
+            push(@{$db_tags{$sequence}},[$name,$id,$tag_index,1,$original]);
           }
         }
       }
@@ -174,11 +176,12 @@ sub showTags{
         if (!defined $name || !defined $id || !defined $map_id || !defined $sequence) {
           next;
         }
-        push(@{$db_tags{$sequence}},[$name,$id,$map_id,0]);
+	my $original = $sequence;
+        push(@{$db_tags{$sequence}},[$name,$id,$map_id,0,$original]);
         if (@{$revcomps}) {
           $sequence =~ tr/ACGTN/TGCAN/;
           $sequence = reverse($sequence);
-          push(@{$db_tags{$sequence}},[$name,$id,$map_id,1]);
+          push(@{$db_tags{$sequence}},[$name,$id,$map_id,1,$original]);
         }
       }
     }
@@ -191,7 +194,7 @@ sub showTags{
         foreach my $i (0..$#subtags) {
             my $subtag = $subtags[$i];
             my @matches = ();
-            if (@{$clips} && $clips->[$i]) {
+            if ($clips->[$i]) {
                 if ($clips->[$i] < 0) {
                     @matches = grep {m/$subtag$/} keys %db_tags;
                 } elsif ($clips->[$i]) {
@@ -204,18 +207,19 @@ sub showTags{
             }
             foreach my $sequence (@matches) {
                 foreach my $match (@{$db_tags{$sequence}}) {
-                    my ($name,$id,$map_id,$revcomp) = @{$match};
+                    my ($name,$id,$map_id,$revcomp,$original) = @{$match};
                     if ($revcomp) {
                         # revcomp match AND we are looking for revcomp matches AND we are looking for revcomp matches on this tag
                         if (@{$revcomps} && $revcomps->[$i]) {
-                            $matches{$subtag}->{$id} = [$map_id,1];
+                            $matches{$subtag}->{$id} = [$map_id,1,$original];
                         }
                     } else {
                         # not a revcomp match AND we are not looking for revcomp matches or we are not looking for revcomp matches on this tag
                         if (!@{$revcomps} || !$revcomps->[$i]) {
-                            $matches{$subtag}->{$id} = [$map_id,0];
+                            $matches{$subtag}->{$id} = [$map_id,0,$original];
                         }
                     }
+
                     $groups[$i]->{$id}++;
                     $names{$id} = $name;
                 }
@@ -230,9 +234,9 @@ sub showTags{
             my $subtag = $subtags[$i];
             foreach my $id (sort {$a<=>$b} keys %{$groups[$i]}) {
                 if ( exists($matches{$subtag}->{$id}) ){
-                    my ($map_id, $revcomp) = @{$matches{$subtag}->{$id}};
+                    my ($map_id, $revcomp, $original) = @{$matches{$subtag}->{$id}};
                     print $revcomp ? REVERSE : q[];
-                    printf "%2d(%3d) ", $id, $map_id;
+                    printf "%2d(%3d %s) ", $id, $map_id, $original;
                     print $revcomp ? RESET : q[];
                 } else {
                     printf q[        ];
