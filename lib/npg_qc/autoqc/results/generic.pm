@@ -23,7 +23,7 @@ has 'doc' =>  (
 );
 
 sub set_pp_info {
-  my ($self, $pp_name, $pp_version) = @_;
+  my ($self, $pp_name, $pp_version, $pp_url) = @_;
 
   $pp_name or croak 'Portable pipeline name is required';
   if ($self->pp_name and ($self->pp_name ne $pp_name)) {
@@ -32,7 +32,12 @@ sub set_pp_info {
 
   $self->pp_name($pp_name);
   $self->set_info('Pipeline_name', $pp_name);
-  $pp_version && $self->set_info('Pipeline_version', $pp_version);
+  if (defined $pp_version and ($pp_version ne q[])) {
+    $pp_version and $self->set_info('Pipeline_version', $pp_version);
+  }
+  if ($pp_url) {
+    $self->set_info('Pipeline_repo_url', $pp_url);
+  }
 
   return;
 }
@@ -77,10 +82,21 @@ saved either to a file or to a datababase.
 
 =head2 set_pp_info
 
-Given the name and, optionally, version, of the portable pipeline that
-produced the data, this method sets relevant attributes of the object.
+Given the name, version, and the source repository URL of the portable
+pipeline that produced the data, this method sets some key-value pairs of the
+C<info> attribute of the object. The C<pp_name> attribute of the object is
+also set, unless there is a mismatch with an alredy available value, in which
+case an error is raised.
+
+The version and URL attributes are optional. If the version is not known, but
+the URL is, the version should be passed explicitly as an empty string. This
+empty string will not be used to set the one of the keys of the C<info>
+attribute, it will just guarantee that the the arguments are correctly
+interpreted. 
 
   $obj->set_pp_info('some_name', 'some_version');
+  $obj->set_pp_info('some_name', 'some_version', 'some_url');
+  $obj->set_pp_info('some_name', q[], 'some_url');
   $obj->set_pp_info('some_name');
 
 =head1 DIAGNOSTICS
@@ -109,7 +125,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2020 Genome Research Ltd.
+Copyright (C) 2020, 2021 Genome Research Ltd.
 
 This file is part of NPG.
 

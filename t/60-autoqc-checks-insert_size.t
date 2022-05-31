@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 59;
+use Test::More tests => 56;
 use Test::Exception;
 use Test::Deep;
 use Perl6::Slurp;
@@ -14,9 +14,6 @@ use t::autoqc_util;
 
 my $current_dir = cwd();
 
-local $ENV{'http_proxy'} = 'wibble.com';
-local $ENV{'no_proxy'} = q[];
-local $ENV{'NPG_WEBSERVICE_CACHE_DIR'} = q[t/data/autoqc/insert_size];
 local $ENV{'PATH'} = join q[:], qq[$current_dir/blib/script] , $ENV{'PATH'};
 my $repos = catfile($current_dir, q[t/data/autoqc]);
 my $ref = catfile($repos, q[reference]); # bwa index -p t/data/autoqc/reference /dev/null
@@ -30,7 +27,7 @@ use_ok('npg_qc::autoqc::results::insert_size');
 use_ok('npg_qc::autoqc::checks::insert_size');
 
 sub _additional_modules {
-  my $use_fastx = shift;
+  my $use_seqtk = shift;
   my @expected = ();
   require npg_qc::autoqc::parse::alignment;
   push @expected, join(q[ ],
@@ -41,14 +38,16 @@ sub _additional_modules {
   require npg_common::Alignment;
   push @expected, join(q[ ],
     q[npg_common::Alignment], $npg_common::Alignment::VERSION);
-  if ($use_fastx) {
-    push @expected, q[FASTX Toolkit fastx_reverse_complement 0.0.12];
+  if ($use_seqtk) {
+    push @expected, q[seqtk 1.3];
   }
   push @expected, join(q[ ], $norm_fit, $npg_qc::autoqc::results::insert_size::VERSION);
   return @expected;
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_2549.csv';
   my $qc = npg_qc::autoqc::checks::insert_size->new(
     id_run => 2549, position => 2, path => 't/data/autoqc/090721_IL29_2549/data', repository => $repos);
   isa_ok($qc, 'npg_qc::autoqc::checks::insert_size', 'is test');
@@ -57,6 +56,8 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
   my $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 1, 
                                               path      => 't/data/autoqc', 
@@ -67,6 +68,8 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_3871.csv';
   my $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position       => 1, 
                                               path           => 't/data/autoqc', 
@@ -78,6 +81,8 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
   my $dir = tempdir( CLEANUP => 1 );
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'));
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
@@ -97,6 +102,8 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
   my $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 3, 
                                               path      => 't/data/autoqc', 
@@ -120,6 +127,8 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_3938.csv';
   my $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 1, 
                                               path      => 't/data/autoqc', 
@@ -128,117 +137,98 @@ sub _additional_modules {
                                               repository => $repos,
                                                    );
   is(join(q[ ], @{$qc->expected_size}), q[2 3], 'expected size set in the constructor is returned');
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 1, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 1937,
                                               repository => $repos,
-                                                   );
+                                                );
   is(join(q[ ], @{$qc->expected_size}), q[400 500], 'expected size the old way');
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
-                                              position  => 1, 
-                                              path      => 't/data/autoqc', 
-                                              id_run    => 3938,
-                                              repository => $repos,
-                                                   );
-  is(join(q[ ], @{$qc->expected_size}), q[3000 4000], 'expected size range when the values are given in kb');
-}
-
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_4748.csv';
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 1, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 4748,
                                               tag_index => 1,
                                               repository => $repos,
-                                                   );
+                                                );
   is($qc->expected_size, undef, 'expected size range for a plex when the size is not defined');
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 1, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 4748,
                                               repository => $repos,
-                                                   );
+                                                );
   is($qc->expected_size, undef, 'expected size range for lane with one plex when the size is not defined in the plex');
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 1, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 4748,
                                               tag_index => 900,
                                               repository => $repos,
-                                                   );
+                                                );
   $qc->expected_size;
-  like ($qc->result->comments, qr/No tag with index 900 in lane 1 batch 6637/, 
+  like ($qc->result->comments, qr/Tag index 900 not defined/, 
               'comment for an error when tag index does not exist');  
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_4799.csv';
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 3, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 4799,
                                               repository => $repos,
-                                                   );
+                                                );
   is (join(q[ ], @{$qc->expected_size}), q[300 390], 'expected size for a pool lane');
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 3, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 4799,
                                               tag_index => 0,
                                               repository => $repos,
-                                                   );
+                                                );
   is(join(q[ ], @{$qc->expected_size}), q[300 390], 'expected size for a pool lane, tag index 0');
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 3, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 4799,
                                               tag_index => 2,
                                               repository => $repos,
-                                                   );
+                                                );
   is(join(q[ ], @{$qc->expected_size}), q[225 375], 'expected size for a pool lane, tag index 2');
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 3, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 4799,
                                               tag_index => 3,
                                               repository => $repos,
-                                                   );
+                                                );
   is($qc->expected_size, undef, 'expected size for a pool lane, tag index 3');
-}
 
-{
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
+  $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 3, 
                                               path      => 't/data/autoqc', 
                                               id_run    => 4799,
                                               tag_index => 1,
                                               repository => $repos,
-                                                   );
+                                                );
   is(join(q[ ], @{$qc->expected_size}), q[300 390], 'expected size for a pool lane, tag index 1');
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
+
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
@@ -307,30 +297,9 @@ sub _additional_modules {
 }
 
 {
-  my $qc = npg_qc::autoqc::checks::insert_size->new(
-                                              path      => 't/data/autoqc', 
-                                              rpt_list   => '1937:1;1938:2',
-                                              repository => $repos,
-                                              reference => $ref,
-                                              use_reverse_complemented => 0,
-                                              format => $format,
-                                              is_paired_read => 0,
-                                                   );
-  is($qc->can_run(), 0, 'cannot run');
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
 
-  $qc = npg_qc::autoqc::checks::insert_size->new(
-                                              path      => 't/data/autoqc', 
-                                              rpt_list   => '1937:1;1938:2',
-                                              repository => $repos,
-                                              reference => $ref,
-                                              use_reverse_complemented => 0,
-                                              format => $format,
-                                              is_paired_read => 1,
-                                                );
-  is($qc->can_run(), 1, 'can run');
-}
-
-{
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/insert_size/alignment_isize_normfit.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
@@ -358,6 +327,9 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_4174.csv';
+
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
@@ -392,6 +364,9 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
+
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_small.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
@@ -415,6 +390,8 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
   my $dir = tempdir( CLEANUP => 0 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_empty.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
@@ -464,6 +441,9 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
+
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_one.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
@@ -520,6 +500,9 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
+
   my $dir = tempdir( CLEANUP => 1 );
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_one.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
@@ -543,6 +526,9 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_4261.csv';
+
   my $qc = npg_qc::autoqc::checks::insert_size->new(
                                               position  => 5, 
                                               path      => 't/data/autoqc', 
@@ -554,6 +540,8 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_2549.csv';
   my $dir = tempdir( CLEANUP => 1 );
   my $f = $dir . q[/2549_8_1.fastq];
   `touch $f`;
@@ -571,8 +559,11 @@ sub _additional_modules {
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
+  
   my $dir = tempdir( CLEANUP => 1 );
-  t::autoqc_util::write_fastx_script(catfile($dir, 'fastx_reverse_complement'));
+  t::autoqc_util::write_seqtk_script(catfile($dir, 'seqtk'));
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};
 
   my $qc = npg_qc::autoqc::checks::insert_size->new(
@@ -584,15 +575,18 @@ sub _additional_modules {
                                               expected_size => [340,350],
                                               format   => $format,
                                                    );
-  is ($qc->_fastx_version, '0.0.12', 'fastx version');
+  is ($qc->current_version( $qc->seqtk_cmd() ), '1.3', 'seqtk version');
   $qc->_set_additional_modules_info;
   is ( $qc->result->get_info('Additional_Modules'),
-    join(q[;], _additional_modules(1)), 'additional info with fastx');
+    join(q[;], _additional_modules(1)), 'additional info with seqtk');
 }
 
 {
+  local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+    't/data/autoqc/samplesheets/samplesheet_1937.csv';
+
   my $dir = tempdir( CLEANUP => 1 );
-  t::autoqc_util::write_fastx_script(catfile($dir, 'fastx_reverse_complement'), 1);
+  t::autoqc_util::write_seqtk_script(catfile($dir, 'seqtk'), 1);
   my $s1 = catfile($current_dir, q[t/data/autoqc/alignment_few.sam]);
   t::autoqc_util::write_bwa_script(catfile($dir, 'bwa0_6'), $s1);
   local $ENV{PATH} = join ':', $dir,  $ENV{PATH};

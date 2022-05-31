@@ -27,7 +27,7 @@ An absolute path to the directory with intervals files.
 has 'bait_path'    => (isa        => 'Maybe[Str]',
                        is         => 'rw',
                        required   => 0,
-		      );
+                      );
 
 =head2 bait_territory
 
@@ -37,7 +37,7 @@ The number of bases which have one or more baits on top of them. BAIT_TERRITORY 
 has 'bait_territory' => (isa        => 'Maybe[Int]',
                          is         => 'rw',
                          required   => 0,
-		        );
+                        );
 
 =head2 target_territory
 
@@ -47,7 +47,7 @@ The unique number of target bases in the experiment where target is usually exon
 has 'target_territory' => (isa        => 'Maybe[Int]',
                            is         => 'rw',
                            required   => 0,
-		          );
+                          );
 
 
 =head2 total_reads_num
@@ -58,7 +58,7 @@ The total number of reads in the input BAM file. TOTAL_READS and PF_READS in Pic
 has 'total_reads_num' =>  (isa        => 'Maybe[Int]',
                            is         => 'rw',
                            required   => 0,
-		          );
+                          );
 
 =head2 unique_reads_num
 
@@ -68,7 +68,7 @@ The number of reads that are not marked as duplicates. PF_UNIQUE_READS in Picard
 has 'unique_reads_num' =>  (isa        => 'Maybe[Int]',
                             is         => 'rw',
                             required   => 0,
-		           );
+                           );
 
 =head2 unique_reads_aligned_num
 
@@ -78,107 +78,107 @@ The number of PF unique reads that are aligned with mapping score > 0 to the ref
 has 'unique_reads_aligned_num' =>  (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 unique_bases_aligned_num
 
- The number of PF unique reads that are aligned with mapping score > 0 to the reference genome. PF_UQ_BASES_ALIGNED in Picard metrics. 
+ The number of PF unique reads that are aligned with mapping score > 0 to the reference genome. PF_UQ_BASES_ALIGNED in Picard metrics.
 
 =cut
 has 'unique_bases_aligned_num' =>  (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 on_bait_bases_num
 
- The number of PF aligned bases that mapped to a baited region of the genome. ON_BAIT_BASES in Picard metrics. 
+ The number of PF aligned bases that mapped to a baited region of the genome. ON_BAIT_BASES in Picard metrics.
 
 =cut
 has 'on_bait_bases_num' =>         (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 near_bait_bases_num
 
- The number of PF aligned bases that mapped to within a fixed interval of a baited region, but not on a baited region. NEAR_BAIT_BASES in Picard metrics. 
+ The number of PF aligned bases that mapped to within a fixed interval of a baited region, but not on a baited region. NEAR_BAIT_BASES in Picard metrics.
 
 =cut
 has 'near_bait_bases_num' =>      (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                  );
 
 =head2 off_bait_bases_num
 
- The number of PF aligned bases that mapped to neither on or near a bait. OFF_BAIT_BASES in Picard metrics. 
+ The number of PF aligned bases that mapped to neither on or near a bait. OFF_BAIT_BASES in Picard metrics.
 
 =cut
 has 'off_bait_bases_num' =>        (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 on_target_bases_num
 
- The number of PF aligned bases that mapped to a targetted region of the genome. ON_TARGET_BASES in Picard metrics. 
+ The number of PF aligned bases that mapped to a targetted region of the genome. ON_TARGET_BASES in Picard metrics.
 
 =cut
 has 'on_target_bases_num' =>       (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 mean_bait_coverage
 
- The mean coverage of all baits in the experiment. MEAN_BAIT_COVERAGE in Picard metrics. 
+ The mean coverage of all baits in the experiment. MEAN_BAIT_COVERAGE in Picard metrics.
 
 =cut
 has 'mean_bait_coverage' =>        (isa        => 'Maybe[Num]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 mean_target_coverage
 
- The mean coverage of targets that recieved at least coverage depth = 2 at one base. MEAN_TARGET_COVERAGE in Picard metrics. 
+ The mean coverage of targets that recieved at least coverage depth = 2 at one base. MEAN_TARGET_COVERAGE in Picard metrics.
 
 =cut
 has 'mean_target_coverage' =>      (isa        => 'Maybe[Num]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 fold_enrichment
 
- The fold by which the baited region has been amplified above genomic background. FOLD_ENRICHMENT in Picard metrics. 
+ The fold by which the baited region has been amplified above genomic background. FOLD_ENRICHMENT in Picard metrics.
 
 =cut
 has 'fold_enrichment' =>           (isa        => 'Maybe[Num]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 =head2 zero_coverage_targets_fraction
 
- The fraction of targets that did not reach coverage=2 over any base. ZERO_CVG_TARGETS_PCT in Picard metrics. 
+ The fraction of targets that did not reach coverage=2 over any base. ZERO_CVG_TARGETS_PCT in Picard metrics.
 
 =cut
 has 'zero_coverage_targets_fraction' =>      (isa        => 'Maybe[Num]',
                                               is         => 'rw',
                                               required   => 0,
-		                             );
+                                             );
 
 =head2 library_size
 
- The estimated number of unique molecules in the selected part of the library. HS_LIBRARY_SIZE in Picard metrics. 
+ The estimated number of unique molecules in the selected part of the library. HS_LIBRARY_SIZE in Picard metrics.
 
 =cut
 has 'library_size' =>              (isa        => 'Maybe[Int]',
                                     is         => 'rw',
                                     required   => 0,
-		                   );
+                                   );
 
 
 =head2 other_metrics
@@ -190,7 +190,7 @@ has 'library_size' =>              (isa        => 'Maybe[Int]',
 has 'other_metrics'  =>             (isa        => 'HashRef',
                                      is         => 'rw',
                                      required   => 0,
-		                    );
+                                    );
 
 =head2 interval_files_identical
 
@@ -198,9 +198,9 @@ has 'other_metrics'  =>             (isa        => 'HashRef',
 
 =cut
 has 'interval_files_identical' =>      (isa        => 'Maybe[Bool]',
-                                              is         => 'rw',
-                                              required   => 0,
-		                             );
+                                        is         => 'rw',
+                                        required   => 0,
+                                       );
 
 __PACKAGE__->meta->make_immutable;
 
@@ -232,7 +232,7 @@ Marina Gourtovaia<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2016, 2021 Genome Research Ltd.
 
 This file is part of NPG.
 

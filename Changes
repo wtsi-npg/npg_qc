@@ -1,7 +1,79 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - added new npg_subtitution_metrics.pl script
+release 69.12.0
+ - Removed an unused script - genotype_call_results_reporter.
+ - Switched the QC outcomes reporter to retrieve LIMS server URL from
+   the configuration file that is used by other applications.
+ - Update tableExport JavaScript package to version 1.26.0
+
+release 69.11.1
+ - Normalisation of negative controls with PhiX:
+     1. added a script to compute linear regression stats,
+     2. added a document that captures an interim projetc review.
+ - bower dependencies are expressed using https urls as unauth git endpoints
+   are not supported in github anymore
+ - update bower to 1.8.13
+
+release 69.11.0
+ - PDL CPAN Perl package had a flurry of releases recently, the latest
+   at this time is 2.074 (2022-02-08). This verson has an undentified
+   bug, which results in a failure of the reverse_average_percent_error
+   method in the npg_qc::autoqc::role::sequence_error class. The failure
+   was observed in the GitHub CI runner and on a local VM.
+   Pinned PDL version to 2.068 or earlier since 2.068 is the vrsion we
+   have in the latest production software stack and it is known to work.
+ - Added a scipt that generates a dataset which is used in the
+   computation of linear regression coefficients for normalisation of
+   negative controls with PhiX.
+
+release 69.10.1
+ - updated documentation
+
+release 69.10.0
+ - switch to bcviz@1.3.3
+ - Use samplesheet test data instead of XML files.
+   Remove all cached LIMS and NPG XML feeds from t/data/autoqc and
+   t/data/autoqc/insert_size. Change the tests to use newly generated
+   samplesheets in t/data/autoqc/samplesheets. The samplesheets are
+   manually edited to reproduce previously available test cases.
+ - Make all defined values in artic generic result available for display.
+ - pulldown_metrics autoqc results - backward-compatible correct calculation
+   of the number of purity filtered bases when using the latest Picard/GATK.
+
+release 69.9.0 
+ - Change database column type from unsigned int to insigned bigint
+   for columns where we store number of reads and similar values and
+   where we do not already set type to bigint. Some NovaSeq runs produce
+   more data than we envisaged when these tables were set up.
+ - Update pulldown_metrics autoqc check to use the up-to-date Picard
+   metrics via GATK, use CRAM files instead of BAM files as input.  
+ - Drop redundant tag_index column from the tag_metrics QC database
+   table. The results of this QC check are always per lane. Only two
+   distinct values in this culumn - NULL and -1, the latter from pre-
+   composition times.
+
+release 69.8.1
+ - bug fix npg_substitution_metrics.pl to not bail on single read data
+
+release 69.8.0
+ - mqc skipper - a more generic way to disregard spiked-in controls when
+   counting the number of studies the samples in the run belong to. The change
+   is driven by the fact that spiked-in controls can now belong to a number of
+   different studies.
+ - replace fastx_toolkit use with seqtk
+ - npg_substitution_metrics.pl script clean-up
+
+release 69.7.0
+ - added new npg_substitution_metrics.pl script
+ - move from Travis CI to GitHub Actions
  - switch to node 14 for CI, using npm from default conda pkg
+ - remove dependency on npg_common::sequence::reference::base_count, which
+   has been moved to an internal repository and is no longer available for
+   the CI builds
+ - make labels for number of reads in SeqQC generic artic display
+   consistent with display for bam flagstats data, ie use 'reads'
+   instead of 'fragments'
+ - do not generate autoqc generic artic results for spiked-in control
 
 release 69.6.1
  - mqc skipper bug fix - inspect qc outcomes for review autoqc results

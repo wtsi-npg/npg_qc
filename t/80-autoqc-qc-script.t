@@ -46,8 +46,8 @@ is (system($command), 0, 'lane level - script exited normally');
 ok(-e $expected, 'json output exists');
 unlink $expected;
 
-local $ENV{NPG_WEBSERVICE_CACHE_DIR} = q[t/data/autoqc/insert_size];
-
+local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
+  't/data/autoqc/samplesheets/samplesheet_1937.csv';
 $command = "bin/qc --rpt_list 1937:1 --check insert_size --no-is_paired_read --qc_in t/data/autoqc --qc_out $odir --repository t/data/autoqc";
 is (system($command), 0, 'script exited normally');
 
