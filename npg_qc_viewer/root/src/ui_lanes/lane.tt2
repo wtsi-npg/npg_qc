@@ -450,6 +450,11 @@ END
 [% END %]
 [%-   END -%]
 
+[% BLOCK substitution_metrics -%]
+[% result.ctoa_art_predicted_level %]<br/>
+[% result.ctoa_oxh %]
+[%-   END -%]
+
 [% BLOCK alignment_filter_metrics -%]
 [%-
     ref = result.refs.last;

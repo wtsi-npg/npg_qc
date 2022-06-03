@@ -40,6 +40,7 @@ lib/npg_qc/autoqc/checks/rna_seqc.pm
 lib/npg_qc/autoqc/checks/samtools_stats.pm
 lib/npg_qc/autoqc/checks/sequence_error.pm
 lib/npg_qc/autoqc/checks/spatial_filter.pm
+lib/npg_qc/autoqc/checks/substitution_metrics.pm
 lib/npg_qc/autoqc/checks/tag_metrics.pm
 lib/npg_qc/autoqc/checks/tags_reporters.pm
 lib/npg_qc/autoqc/checks/upstream_tags.pm
@@ -76,6 +77,7 @@ lib/npg_qc/autoqc/results/sequence_error.pm
 lib/npg_qc/autoqc/results/sequence_summary.pm
 lib/npg_qc/autoqc/results/spatial_filter.pm
 lib/npg_qc/autoqc/results/split_stats.pm
+lib/npg_qc/autoqc/results/substitution_metrics.pm
 lib/npg_qc/autoqc/results/tag_decode_stats.pm
 lib/npg_qc/autoqc/results/tag_metrics.pm
 lib/npg_qc/autoqc/results/tags_reporters.pm
@@ -147,6 +149,7 @@ lib/npg_qc/Schema/Result/SequenceSummary.pm
 lib/npg_qc/Schema/Result/SpatialFilter.pm
 lib/npg_qc/Schema/Result/SplitStatsCoverage.pm
 lib/npg_qc/Schema/Result/SplitStats.pm
+lib/npg_qc/Schema/Result/SubstitutionMetric.pm
 lib/npg_qc/Schema/Result/TagDecodeStats.pm
 lib/npg_qc/Schema/Result/TagMetrics.pm
 lib/npg_qc/Schema/Result/TagsReporters.pm
@@ -231,6 +234,7 @@ t/60-autoqc-checks-review.t
 t/60-autoqc-checks-rna_seqc.t
 t/60-autoqc-checks-sequence_error.t
 t/60-autoqc-checks-spatial_filter.t
+t/60-autoqc-checks-substitution_metrics.t
 t/60-autoqc-checks-tag_metrics.t
 t/60-autoqc-checks-tags_reporters.t
 t/60-autoqc-checks-upstream_tags.t
@@ -268,6 +272,7 @@ t/60-autoqc-results-sequence_error.t
 t/60-autoqc-results-sequence_summary.t
 t/60-autoqc-results-spatial_filter.t
 t/60-autoqc-results-split_stats.t
+t/60-autoqc-results-substitution_metrics.t
 t/60-autoqc-results-tag_decode_stats.t
 t/60-autoqc-results-tag_metrics.t
 t/60-autoqc-results-verify_bam_id.t
@@ -554,6 +559,11 @@ t/data/autoqc/samplesheets/samplesheet_4261.csv
 t/data/autoqc/samplesheets/samplesheet_4748.csv
 t/data/autoqc/samplesheets/samplesheet_4799.csv
 t/data/autoqc/sequence_error/6376_1_1.fastq.10000
+t/data/autoqc/substitution_metrics/44918_3#1.substitution_metrics.json
+t/data/autoqc/substitution_metrics/44918_3#1.substitution_metrics.txt
+t/data/autoqc/substitution_metrics/44918_3#1_yhuman.substitution_metrics.json
+t/data/autoqc/substitution_metrics/44918_3#1_yhuman.substitution_metrics.txt
+t/data/autoqc/substitution_metrics/44938_1#1.substitution_metrics.json
 t/data/autoqc/tag_decode_output_no_found_tags.txt
 t/data/autoqc/tag_decode_output.txt
 t/data/autoqc/tag_decode_stats/6624_3_tag_decode_stats.json
