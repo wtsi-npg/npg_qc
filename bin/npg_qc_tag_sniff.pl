@@ -16,7 +16,7 @@ use Getopt::Long;
 use Term::ANSIColor qw(:constants);
 
 ##no critic
-our $VERSION = '69.6.1';
+our $VERSION = '0';
 
 sub usage {
 
