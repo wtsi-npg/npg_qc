@@ -174,10 +174,19 @@ This metric is used to compute the likelihood of C2A and its predicted level
 
 C2A predicted level - 0 = not present, 1 = low, 2 = medium and 3 = high
 
+=head2 comments
+
+  data_type: 'text'
+  is_nullable: 1
+
+Run-time comments and warnings
+
 =head2 info
 
   data_type: 'text'
   is_nullable: 1
+
+JSON document with information on how the data were produced
 
 =cut
 
@@ -222,6 +231,8 @@ __PACKAGE__->add_columns(
   { data_type => 'float', extra => { unsigned => 1 }, is_nullable => 1 },
   'ctoa_art_predicted_level',
   { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 1 },
+  'comments',
+  { data_type => 'text', is_nullable => 1 },
   'info',
   { data_type => 'text', is_nullable => 1 },
 );
@@ -287,8 +298,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-01 14:15:01
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:tlHU4pywWXavHv5t3K6Diw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-13 22:43:13
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ZOL2iYj4stZnrInK/eUXAw
 
 our $VERSION = '0';
 

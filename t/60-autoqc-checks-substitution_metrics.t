@@ -115,11 +115,11 @@ subtest 'high-level parsing, subset' => sub {
 };
 
 subtest 'finding files, calculating metrics' => sub {
-  plan tests => 10;
+  plan tests => 12;
 
   my $fproot = $data_dir .q{/44918_3#1};
   my $cram   = $fproot .'.cram';
-  open my $fh, '>', $cram or die "Failed to open $cram: $!\n";
+  open my $fh, '>', $cram or die "Failed to open $cram : $!\n";
   close $fh;
 
   my $r1 = npg_qc::autoqc::checks::substitution_metrics->new(
@@ -147,8 +147,28 @@ subtest 'finding files, calculating metrics' => sub {
         'serialized object contains composition info');
     like($j, qr/npg_tracking::glossary::composition::component::illumina/,
         'serialized object contains component info');
-
   }
+
+  my $fproot2 = $data_dir .q{/44938_1#1};
+  my $cram2   = $fproot2 .'.cram';
+  open my $fh2, '>', $cram2 or die "Failed to open $cram2 : $!\n";
+  close $fh2;
+
+  my $r3 = npg_qc::autoqc::checks::substitution_metrics->new(
+    id_run           => 44938,
+    position         => 1,
+    tag_index        => 1,
+    input_files      => [$fproot2 . '.cram'],
+    subset           => 'yhuman'
+  );
+  $r3->execute();
+
+  my $j3;
+  lives_ok { $j3 = $r3->result()->freeze }
+    'dont croak when substitution metrics input file does not exist';
+  like($j3, qr/substituion metrics input file not found/,
+    'serialized object contains file not found comment');
+
 };
 
 1;

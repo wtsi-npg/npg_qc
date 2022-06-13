@@ -15,8 +15,11 @@ CREATE TABLE `substitution_metrics` (
  `gt_mean_ti` float unsigned DEFAULT NULL COMMENT 'Computed as a maximum between (i) ratio of GT counts to mean(Ti) and (ii) ratio CA to mean(Ti)',
  `ctoa_oxh` float unsigned DEFAULT NULL COMMENT 'This metric is used to compute the likelihood of C2A and its predicted level',
  `ctoa_art_predicted_level` tinyint(1) unsigned DEFAULT NULL COMMENT 'C2A predicted level - 0 = not present, 1 = low, 2 = medium and 3 = high',
- `info` text DEFAULT NULL,
+ `comments` TEXT DEFAULT NULL COMMENT 'Run-time comments and warnings',
+ `info` text DEFAULT NULL COMMENT 'JSON document with information on how the data were produced',
  PRIMARY KEY (`id_substitution_metrics`),
  UNIQUE KEY `submetrics_compos_ind_unique` (`id_seq_composition`),
  CONSTRAINT `submetrics_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+GRANT SELECT ON npgqcp.substitution_metrics TO nqcro;

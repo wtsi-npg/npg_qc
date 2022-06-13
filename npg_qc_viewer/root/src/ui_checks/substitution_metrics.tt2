@@ -5,6 +5,15 @@
 <div class="data_table">
 <table title="sub metrics">
 Substitution metrics (C2A related)
+[%- IF check.comments.defined -%]
+<tr><th class="laligned">comments</th><td>[% check.comments %]</td></tr>
+[%- END -%]
+</table>
+</div>
+
+
+<div class="data_table">
+<table title="sub metrics section two">
 <tr><th>Description</th><th>Value</th></tr>
 <tr><th class="laligned">TiTv class</th>
   <td class="raligned">[% IF check.titv_class.defined; check.titv_class | format_number; END %]</td></tr>

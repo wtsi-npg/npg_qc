@@ -53,14 +53,13 @@ sub _build__file_path_root {
   return $path;
 }
 
-has [ qw/ substitution_metrics_file / ] => (
-    isa        => 'NpgTrackingReadableFile',
+has 'substitution_metrics_file' => (
+    isa        => 'Str',
     is         => 'ro',
     required   => 0,
     lazy_build => 1,
+    init_arg   => undef,
     );
-
-has '+substitution_metrics_file' => (init_arg   => undef);
 
 sub _build_substitution_metrics_file {
   my $self = shift;
@@ -77,7 +76,12 @@ override 'execute' => sub {
   if( $self->substitution_metrics_file && -f $self->substitution_metrics_file ) {
     $self->_parse_substitution_metrics_file();
   } else {
-    croak 'No input metrics file found';
+    my $comment = q[substituion metrics input file not found];
+    if($self->substitution_metrics_file) {
+      $comment .= q[ file:]. $self->substitution_metrics_file;
+    }
+    if($self->subset) { $comment .= q[ subset:]. $self->subset }
+    $self->result->add_comment(qq[$comment]);
   }
 
   return;
