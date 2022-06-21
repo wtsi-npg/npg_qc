@@ -149,7 +149,7 @@ lib/npg_qc/Schema/Result/SequenceSummary.pm
 lib/npg_qc/Schema/Result/SpatialFilter.pm
 lib/npg_qc/Schema/Result/SplitStatsCoverage.pm
 lib/npg_qc/Schema/Result/SplitStats.pm
-lib/npg_qc/Schema/Result/SubstitutionMetric.pm
+lib/npg_qc/Schema/Result/SubstitutionMetrics.pm
 lib/npg_qc/Schema/Result/TagDecodeStats.pm
 lib/npg_qc/Schema/Result/TagMetrics.pm
 lib/npg_qc/Schema/Result/TagsReporters.pm
