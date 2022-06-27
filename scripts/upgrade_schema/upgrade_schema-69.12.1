@@ -1,0 +1,25 @@
+DROP TABLE IF EXISTS `substitution_metrics`;
+CREATE TABLE `substitution_metrics` (
+ `id_substitution_metrics` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Auto-generated primary key',
+ `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+ `path` varchar(256) DEFAULT NULL,
+ `titv_class` float unsigned DEFAULT NULL COMMENT 'The ratio of transition substitution counts to transvertion',
+ `titv_mean_ca` float unsigned DEFAULT NULL COMMENT 'TiTv where count of CA+GT is taken as if it were mean across other transversions',
+ `frac_sub_hq` float unsigned DEFAULT NULL COMMENT 'Fraction of substitutions which are high quality (>=Q30)',
+ `oxog_bias` float unsigned DEFAULT NULL COMMENT 'How similar CA to GT counts are within each read (high quality >=Q30 substitutions only) in order to detect OxoG oxidative artifacts',
+ `sym_gt_ca` float unsigned DEFAULT NULL COMMENT 'How symmetrical CA and GT counts are within each read',
+ `sym_ct_ga` float unsigned DEFAULT NULL COMMENT 'How symmetrical CT and GA counts are within each read',
+ `sym_ag_tc` float unsigned DEFAULT NULL COMMENT 'How symmetrical AG and TC counts are within each read',
+ `cv_ti` float unsigned DEFAULT NULL COMMENT 'Coefficient of variation across all Ti substitutions = std(Ti)/mean(Ti)',
+ `gt_ti` float unsigned DEFAULT NULL COMMENT 'Computed as a maximum between (i) ratio of GT counts to TC and (ii) ratio CA to GA',
+ `gt_mean_ti` float unsigned DEFAULT NULL COMMENT 'Computed as a maximum between (i) ratio of GT counts to mean(Ti) and (ii) ratio CA to mean(Ti)',
+ `ctoa_oxh` float unsigned DEFAULT NULL COMMENT 'This metric is used to compute the likelihood of C2A and its predicted level',
+ `ctoa_art_predicted_level` tinyint(1) unsigned DEFAULT NULL COMMENT 'C2A predicted level - 0 = not present, 1 = low, 2 = medium and 3 = high',
+ `comments` TEXT DEFAULT NULL COMMENT 'Run-time comments and warnings',
+ `info` text DEFAULT NULL COMMENT 'JSON document with information on how the data were produced',
+ PRIMARY KEY (`id_substitution_metrics`),
+ UNIQUE KEY `submetrics_compos_ind_unique` (`id_seq_composition`),
+ CONSTRAINT `submetrics_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+GRANT SELECT ON npgqcp.substitution_metrics TO nqcro;

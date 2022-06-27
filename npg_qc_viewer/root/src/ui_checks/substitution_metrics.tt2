@@ -1,0 +1,47 @@
+<table style='border-top: 0px;' title="sub metrics tables">
+<tr>
+<td valign=top>
+
+<div class="data_table">
+<table title="sub metrics">
+Substitution metrics (C2A related)
+[%- IF check.comments.defined -%]
+<tr><th class="laligned">comments</th><td>[% check.comments %]</td></tr>
+[%- END -%]
+</table>
+</div>
+
+
+<div class="data_table">
+<table title="sub metrics section two">
+<tr><th>Description</th><th>Value</th></tr>
+<tr><th class="laligned">TiTv class</th>
+  <td class="raligned">[% IF check.titv_class.defined; check.titv_class | format_number; END %]</td></tr>
+<tr><th class="laligned">TiTv meCA</th>
+  <td class="raligned">[% IF check.titv_mean_ca.defined; check.titv_mean_ca | format_number; END %]</td></tr>
+<tr><th class="laligned">fracH</th>
+  <td class="raligned">[% IF check.frac_sub_hq.defined; check.frac_sub_hq | format_number; END %]</td></tr>
+<tr><th class="laligned">oxoGHbias</th>
+  <td class="raligned">[% IF check.oxog_bias.defined; check.oxog_bias | format_number; END %]</td></tr>
+<tr><th class="laligned">sym GT CA</th>
+  <td class="raligned">[% IF check.sym_gt_ca.defined; check.sym_gt_ca | format_number; END %]</td></tr>
+<tr><th class="laligned">sym ct ga</th>
+  <td class="raligned">[% IF check.sym_ct_ga.defined; check.sym_ct_ga | format_number; END %]</td></tr>
+<tr><th class="laligned">sym ag gc</th>
+  <td class="raligned">[% IF check.sym_ag_tc.defined; check.sym_ag_tc | format_number; END %]</td></tr>
+<tr><th class="laligned">cvTi</th>
+  <td class="raligned">[% IF check.cv_ti.defined; check.cv_ti | format_number; END %]</td></tr>
+<tr><th class="laligned">GT Ti</th>
+  <td class="raligned">[% IF check.gt_ti.defined; check.gt_ti | format_number; END %]</td></tr>
+<tr><th class="laligned">GT meTi</th>
+  <td class="raligned">[% IF check.gt_mean_ti.defined; check.gt_mean_ti | format_number; END %]</td></tr>
+<tr><th class="laligned">C2A artifact oxH</th>
+  <td class="raligned">[% IF check.ctoa_oxh.defined; check.ctoa_oxh | format_number; END %]</td></tr>
+<tr><th class="laligned">C2A predicted level</th>
+  <td class="raligned">[% IF check.ctoa_art_predicted_level.defined; check.ctoa_art_predicted_level | format_number; END %]</td></tr>
+</table>
+</div>
+</td>
+
+</tr>
+</table>
