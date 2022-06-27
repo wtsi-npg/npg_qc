@@ -339,7 +339,7 @@ for certain library types no pass or fail is inferred for the check from
 the reported results.
 <br />
 A full description of the metrics reported in this check can be found
-<a href="https://github.com/wtsi-npg/npg_qc/blob/devel/docs/CtoA_substitution_metrics.md">here</a>
+<a href="https://github.com/wtsi-npg/npg_qc/blob/master/docs/CtoA_substitution_metrics.md">here</a>
 
 </div>
 
