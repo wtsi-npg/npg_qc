@@ -17,6 +17,7 @@
       sequence_error   = 'average<br />mismatch,<br />%'
       spatial_filter   = 'filter fail,<br/>total'
       split_stats      = 'aligned<br />reads,<br />%'
+      substitution_metrics = 'C2A level<br />artifact oxH'
       tag_decode_stats = '<span class="nbsp">decode rate %</span><br /><span class="dark_blue">CV %</span>'
       tag_metrics      = 'decode rate, %<br />CV% (hops%)'
       tags_reporters   = ''
@@ -30,7 +31,7 @@
   [% IF (check_name.match('genotype') && !check_name.match('call')) && !check_name.match('W30467') %]
     [% NEXT %]
   [% END %]
-  [% IF check_name.match('genotype') || check_name == "bam flagstats" || check_name == "bcfstats" || check_name == "rna seqc" || check_name == "upstream tags" || check_name == "verify bam id" || check_name.match('tag metrics') %]
+  [% IF check_name.match('genotype') || check_name == "bam flagstats" || check_name == "bcfstats" || check_name == "rna seqc" || check_name == "upstream tags" || check_name == "verify bam id" || check_name.match('tag metrics') || check_name == "substitution metrics" %]
     [% info_button='<br/><a href="' _ c.uri_for_action(c.controller('Checks').action_for('about')) _ '#' _ check_name _ '_check"><img src="/static/images/information.png" alt="Link to information about ' _ check_name _ ' check"/></a>' %]
   [% ELSE %]
     [% IF check_name == 'alignment filter metrics'; check_name = 'alignment filter'; END %]

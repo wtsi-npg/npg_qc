@@ -120,6 +120,7 @@ make_schema_at(
           'pulldown_metrics'               => q[PulldownMetrics],
           'split_stats'                    => q[SplitStats],
           'split_stats_coverage'           => q[SplitStatsCoverage],
+          'substitution_metrics'           => q[SubstitutionMetrics],    
           'qx_yield'                       => q[QXYield],
           'tag_metrics'                    => q[TagMetrics],
           'tags_reporters'                 => q[TagsReporters],

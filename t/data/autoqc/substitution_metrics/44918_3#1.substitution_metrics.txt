@@ -1,0 +1,14 @@
+#C2A related stats and metrics for a tag
+TiTv_class 1.55
+TiTv_meCA 1.93
+fracH 0.20
+oxoGHbias 0.36
+symGT_CA 0.36
+sym_ct_ga 0.05
+sym_ag_tc 0.04
+cvTi 0.04
+GT_Ti 0.63
+GT_meTi 0.58
+level -1
+art_oxH 0.62
+predict 0

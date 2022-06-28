@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 70.0.0
+ - Add substitution metrics (CtoA) QC check
+ - Added SS tag_sequence to reported matches
+ 
 release 69.12.0
  - Removed an unused script - genotype_call_results_reporter.
  - Switched the QC outcomes reporter to retrieve LIMS server URL from
