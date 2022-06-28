@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 70.0.0
  - Add substitution metrics (CtoA) QC check
  - Added SS tag_sequence to reported matches
  
