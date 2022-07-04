@@ -56,6 +56,7 @@ root/src/ui_checks/ref_match.tt2
 root/src/ui_checks/review.tt2
 root/src/ui_checks/samtools_stats.tt2
 root/src/ui_checks/sequence_error.tt2
+root/src/ui_checks/substitution_metrics.tt2
 root/src/ui_checks/tag_decode_stats.tt2
 root/src/ui_checks/tag_metrics.tt2
 root/src/ui_illuminaqc/summary.tt2

@@ -327,6 +327,20 @@ the number of sites is greater than 10,000.
 
 <br/><br/>
 
+<a name="substitution metrics_check"></a>
+<h3>Substitution metrics check</h3>
+<br/><br/>
+<h4>Description</h4>
+The subsitution metrics check is primarily concerned with discovering
+C->A bias in sequencing. The check is agnostic to species and library type
+so when interpreting the values care should be taken to ensure the check
+is relevant for the samples sequenced. As the results can be unreliable
+for certain library types no pass or fail is inferred for the check from
+the reported results.
+<br />
+A full description of the metrics reported in this check can be found
+<a href="https://github.com/wtsi-npg/npg_qc/blob/master/docs/CtoA_substitution_metrics.md">here</a>
+
 </div>
 
 [% END -%]
