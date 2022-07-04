@@ -313,7 +313,7 @@ sub metrics_gen_assym_prediction () {
 
   #3.2 ----------------------oxidation biasas BROAD
   #BROAD found CCG->CAG and GT more at R1, CA more at R2
-  my ($bR1, $bR2) = (-1, -1);
+  my ($bR1, $bR2) = (0, 0);
   if ($coH1{CA} > 0 && $coH2{GT} > 0) {
     $bR1 = abs(($coH1{GT} - $coH1{CA}) / $coH1{CA}); # divided by expected smaller- check the paper
     $bR2 = abs(($coH2{GT} - $coH2{CA}) / $coH2{GT}); # divided by expected smaller- check the paper
@@ -325,7 +325,7 @@ sub metrics_gen_assym_prediction () {
   my $mi1 = min(($coH1{CA}, $coH1{GT}));
   my $mi2 = min(($coH2{CA}, $coH2{GT}));
 
-  my ($b1, $b2) = (-1, -1);
+  my ($b1, $b2) = (0, 0);
   if ($mi1 > 0 && $mi2 > 0) {
     $b1 = abs($coH1{GT} - $coH1{CA}) / $mi1; # divided by smaller- not as in the paper
     $b2 = abs($coH2{GT} - $coH2{CA}) / $mi2;
