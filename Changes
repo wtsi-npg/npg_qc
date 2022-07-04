@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - substitution_metrics made symm_.. metrics calc more consistent and avoid -ve values
+
 release 70.0.0
  - Add substitution metrics (CtoA) QC check
  - Added SS tag_sequence to reported matches
