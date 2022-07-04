@@ -313,23 +313,16 @@ sub metrics_gen_assym_prediction () {
 
   #3.2 ----------------------oxidation biasas BROAD
   #BROAD found CCG->CAG and GT more at R1, CA more at R2
-  my ($bR1, $bR2) = (0, 0);
-  if ($coH1{CA} > 0 && $coH2{GT} > 0) {
-    $bR1 = abs(($coH1{GT} - $coH1{CA}) / $coH1{CA}); # divided by expected smaller- check the paper
-    $bR2 = abs(($coH2{GT} - $coH2{CA}) / $coH2{GT}); # divided by expected smaller- check the paper
-  }
+  my $bR1 = ($coH1{CA} > 0 ? abs(($coH1{GT} - $coH1{CA}) / $coH1{CA}) : 0); # divided by expected smaller- check the paper
+  my $bR2 = ($coH2{GT} > 0 ? abs(($coH2{GT} - $coH2{CA}) / $coH2{GT}) : 0); # divided by expected smaller- check the paper
   my $bias_ox = max(($bR1, $bR2));
 
   #3.3-----------GT assymmetry
   #here we look at strand assymetry (sh be symmetry), in contrast to BROAD
   my $mi1 = min(($coH1{CA}, $coH1{GT}));
   my $mi2 = min(($coH2{CA}, $coH2{GT}));
-
-  my ($b1, $b2) = (0, 0);
-  if ($mi1 > 0 && $mi2 > 0) {
-    $b1 = abs($coH1{GT} - $coH1{CA}) / $mi1; # divided by smaller- not as in the paper
-    $b2 = abs($coH2{GT} - $coH2{CA}) / $mi2;
-  }
+  my $b1 = ($mi1 > 0 ? (abs($coH1{GT} - $coH1{CA}) / $mi1) : 0);
+  my $b2 = ($mi2 > 0 ? (abs($coH2{GT} - $coH2{CA}) / $mi2) : 0);
   my $symm_gt_ca = max(($b1, $b2));
 
   #3.4---------GT/TC relation to TC (the closest Ti) OR CA to AG
