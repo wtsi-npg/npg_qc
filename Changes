@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - use bcftools mpileup instead of samtools for genotype QC check
  - npg_substitution_metrics.pl avoid negative values and made metrics calculations more consistent
 
 release 70.0.0
