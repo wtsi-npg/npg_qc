@@ -46,8 +46,10 @@ jobs:
         key: ${{ matrix.os }}-build-miniconda
 
     - name: install libgd-dev and uuid-dev
-      run:
-          sudo apt-get install -y libgd-dev uuid-dev
+      run: |
+          sudo apt-get update
+          sudo apt-get install -qq uuid-dev    # For Perl UUID module
+          sudo apt-get install -qq libgd-dev libgd-text-perl # For npg_tracking
 
     - name: install conda client, baton,samtools, set up conda environment
       run: |
