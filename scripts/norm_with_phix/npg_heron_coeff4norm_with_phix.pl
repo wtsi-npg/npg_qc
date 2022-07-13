@@ -3,7 +3,20 @@
 use strict;
 use warnings;
 use Class::Load qw(try_load_class);
-use List::Util qw(pairkeys sum);
+use List::Util qw(sum);
+use Readonly;
+
+Readonly::Scalar my $STUDY_NAME => 'Heron Project';                             
+Readonly::Scalar my $PRIMER_PANEL_NAME => 'nCoV-2019/V4.1alt';                  
+Readonly::Scalar my $PHIX_TAG_INDEX => 888;
+Readonly::Scalar my $CT_THRESHOLD => 25;
+
+# This somewhat arbitrary, but sensible threshold cuts out                      
+# 'fake' negative controls, ie real samples or positive controls,               
+# which have not been fixed in LIMS.                                            
+Readonly::Scalar my $NEGATIVE_CONTROL_MAX_NUM_READS => 100_000; 
+
+Readonly::Scalar my $SCALING_FACTOR => 10_000;
 
 ###############################################################################
 #
@@ -20,12 +33,7 @@ use List::Util qw(pairkeys sum);
 # The result is the result of the test, e.g. Positive, Negative, Void.
 # The value is the Ct value.
 # 
-# We will take the average Ct value for ORF1lab, N gene, S gene and consider
-# samples with the average Ct value below the threshold value of 25.
-# Aditionally, we will consider full plates only (384 samples) and only include
-# plates where at least 90% of the samples have passed the threshold (90% was
-# the initial intention, however, this is not realistic since some labs do not
-# supply these values).
+# We will take the average Ct value for ORF1lab, N gene and S gene.
 #
 # Joining between the sample and lighthouse_sample tables
 #
@@ -63,8 +71,8 @@ my $schema = $wh_class->connect();
 my $join = {'iseq_flowcell' => 'study'};
 my @selection = qw/me.id_run me.position/;
 my @run_lanes = $schema->resultset('IseqProductMetric')->search(
-  { 'study.name' => 'Heron Project',
-    'iseq_flowcell.primer_panel' => 'nCoV-2019/V4.1alt'},
+  { 'study.name' => $STUDY_NAME,
+    'iseq_flowcell.primer_panel' => $PRIMER_PANEL_NAME},
   {join     => $join,
    prefetch => $join,
    distinct => 1,
@@ -81,19 +89,22 @@ for my $run_lane (@run_lanes) {
 
   my $rs = $schema->resultset('IseqProductMetric')->search({
                     id_run => $id_run, position => $p});
-  # pool size - do not count PhiX and tag zero
-  ($rs->count() - 2 > 380) or next; # skip partial plates
-  my $row = $rs->search({tag_index => 888})->next;
+  my $row = $rs->search({tag_index => $PHIX_TAG_INDEX})->next;
   $row or next; # no PhiX
   $row->qc_seq or next; # filter out seq failures
+                        # or plates which have not been through qc yet
   # number of reads in tag 888 after deplexing
   my $num_phix_reads = $row->tag_decode_count;
   $num_phix_reads or next; # no PhiX reads
+
   $lane_data->{$id_run}->{$p}->{num_reads_phix} = $num_phix_reads;
+  # pool size - do not count PhiX and tag zero 
+  $lane_data->{$id_run}->{$p}->{pool_size} = $rs->count() - 2;
 }
 
+warn "PLATES IDENTIFIED\n";
+
 my @run_ids = keys %{$lane_data};
-warn @run_ids . " RUNS FOUND\n";
 
 $join = {
   'iseq_product_metric' => {'iseq_flowcell' => {'sample' =>
@@ -111,9 +122,6 @@ my $hrs = $schema->resultset('IseqHeronProductMetric')->search(
 
 my $old_position = 0;
 my $old_run = 0;
-warn "STARTING LOOP\n";
-
-my $ct_stats = {};
 
 while (my $hrow = $hrs->next()) {
   
@@ -125,18 +133,15 @@ while (my $hrow = $hrs->next()) {
   if ($id_run != $old_run or $position != $old_position) { # new plate
     $old_run = $id_run;
     $old_position = $position;
-    $ct_stats->{$id_run}->{$position}->{num_with_values} = 0;
-    $ct_stats->{$id_run}->{$position}->{over_threshold} = 0;
+    $lane_data->{$id_run}->{$position}->{num_with_values} = 0;
+    $lane_data->{$id_run}->{$position}->{over_threshold} = 0;
     $lane_data->{$id_run}->{$position}->{controls} = [];
   }
 
   if ($prow->iseq_flowcell->sample->control) {
     if ($prow->iseq_flowcell->sample->control_type eq 'negative') {
       my $num_reads = $hrow->num_aligned_reads;
-      if ($num_reads < 100000) { # This somewhat arbitrary, but sensible
-                                # threshold cuts out 'fake' negative controls,
-                                # ie real samples or positive controls.
-        # save for future
+      if (defined $num_reads && ($num_reads < $NEGATIVE_CONTROL_MAX_NUM_READS)) {
         push @{$lane_data->{$id_run}->{$position}->{controls}},
           {tag_index => $prow->tag_index, num_reads => $num_reads};
       }
@@ -149,54 +154,57 @@ while (my $hrow = $hrs->next()) {
   if (!$lh_sample) {
     $lh_sample = $prow->iseq_flowcell->sample->lighthouse_sample_sentinel;
   }
-  $lh_sample or next;
 
-  my @ct_values = grep { defined }
-                  ($lh_sample->ch1_cq, $lh_sample->ch2_cq, $lh_sample->ch3_cq);
+  my @ct_values = ();
+  if ($lh_sample) {
+    @ct_values = grep { defined } map { $lh_sample->$_ }
+                 qw(ch1_cq ch2_cq ch3_cq);
+  }
   @ct_values or next; #no Ct values of any kind
 
   my $value = (sum @ct_values) / (scalar @ct_values);
-  $ct_stats->{$id_run}->{$position}->{num_with_values}++;
-  if ($value > 25) {
-    $ct_stats->{$id_run}->{$position}->{over_threshold}++;
+  $lane_data->{$id_run}->{$position}->{num_with_values}++;
+  if ($value > $CT_THRESHOLD) {
+    $lane_data->{$id_run}->{$position}->{over_threshold}++;
   }
 }
 
 my $log10 = log(10);
 
 # output data
-print join qq[\t], qw(id_run position tag_index num_phix_reads
-                      num_reads log10_num_reads log10_num_reads_norm*10000);
+print join qq[\t],
+  qw(id_run position tag_index pool_size
+     num_samples_with_cts num_high_cts
+     num_reads_phix num_reads_control
+     log10_num_reads_control log10_num_reads_norm);
 print qq[\n];
 
 my @runs = sort { $a <=> $b } keys %{$lane_data};
 for my $id_run (@runs) {
   my @positions = sort { $a <=> $b } keys %{$lane_data->{$id_run}};
   for my $position (@positions) {
+    
+    my $plate_data = $lane_data->{$id_run}->{$position};
+    $plate_data or next;
+    my $num_reads_ph = $plate_data->{num_reads_phix};
+    my $pool_size = $plate_data->{pool_size};
+    my $num_samples_with_cts = $plate_data->{num_with_values};
+    my $ct_over_threshold = $num_samples_with_cts ?
+                            $plate_data->{over_threshold} : q[];
 
-    # Trying to ensure we know Ct values for the majority of samples.
-    my $num_with_ct = $ct_stats->{$id_run}->{$position}->{num_with_values};
-    if ($num_with_ct < 200) {
-      next;
-    }
-    # And that the majority of these samples had reasonable viral load.
-    if ($ct_stats->{$id_run}->{$position}->{over_threshold} / $num_with_ct > 0.3) {
-      next;
-    }
-
-    my $num_reads_ph = $lane_data->{$id_run}->{$position}->{num_reads_phix};
     my @controls = sort { $a->{tag_index} <=> $b->{tag_index} }
                    @{$lane_data->{$id_run}->{$position}->{controls}};
     for my $control (@controls) {
       my $num_reads_control = $control->{num_reads};
-      $num_reads_control or next; # zero reads in control cannot be plotted on
-                                  # a log scale
       print join qq[\t],
-        $id_run, $position, $control->{tag_index},
+        $id_run, $position, $control->{tag_index}, $pool_size,
+        $num_samples_with_cts,
+        $ct_over_threshold,
         $num_reads_ph,
         $num_reads_control,
-        log($num_reads_control)/$log10,
-        log(($num_reads_control / $num_reads_ph)*10000)/$log10;
+        $num_reads_control ? log($num_reads_control)/$log10 : q[],
+        $num_reads_control ?
+          log(($num_reads_control / $num_reads_ph) * $SCALING_FACTOR)/$log10 : q[];
       print qq[\n];
     }
   }
