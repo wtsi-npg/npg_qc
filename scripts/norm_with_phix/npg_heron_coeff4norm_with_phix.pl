@@ -55,6 +55,15 @@ Readonly::Scalar my $SCALING_FACTOR => 10_000;
 # For this method, you have to use all the above fields in your join because
 # we do receive samples with the same root sample id on different plates.
 #
+# Using the centinel process sometimes results in spurious rows in the DBIx   
+# result set even when access to sentinel data is not required. This was noted    
+# when examining the number of samples with Ct values, which in 22 plates was     
+# higher than the size of the pool. Removing a join that uses this process        
+# produces a slightly different dataset. For 77 plates both the number of         
+# sample with known Ct values and samples with high Ct values goes down. Since    
+# this affects less than 4% of plates in a way that is not going to skew    
+# calculations, this simple method was adopted without further investigations.
+#
 ###############################################################################
 
 my $wh_class = 'WTSI::DNAP::Warehouse::Schema';
@@ -91,14 +100,14 @@ for my $run_lane (@run_lanes) {
                     id_run => $id_run, position => $p});
   my $row = $rs->search({tag_index => $PHIX_TAG_INDEX})->next;
   $row or next; # no PhiX
-  $row->qc_seq or next; # filter out seq failures
+  $row->qc_seq or next; # Filter out seq failures
                         # or plates which have not been through qc yet
-  # number of reads in tag 888 after deplexing
+  # Number of reads in tag 888 after deplexing
   my $num_phix_reads = $row->tag_decode_count;
   $num_phix_reads or next; # no PhiX reads
 
   $lane_data->{$id_run}->{$p}->{num_reads_phix} = $num_phix_reads;
-  # pool size - do not count PhiX and tag zero 
+  # Pool size - do not count PhiX and tag zero 
   $lane_data->{$id_run}->{$p}->{pool_size} = $rs->count() - 2;
 }
 
@@ -107,8 +116,7 @@ warn "PLATES IDENTIFIED\n";
 my @run_ids = keys %{$lane_data};
 
 $join = {
-  'iseq_product_metric' => {'iseq_flowcell' => {'sample' =>
-    [qw/lighthouse_sample lighthouse_sample_sentinel/]}
+  'iseq_product_metric' => {'iseq_flowcell' => {'sample' => 'lighthouse_sample'}
 }};
 my $hrs = $schema->resultset('IseqHeronProductMetric')->search(
   {'iseq_product_metric.id_run' => \@run_ids},
@@ -124,13 +132,12 @@ my $old_position = 0;
 my $old_run = 0;
 
 while (my $hrow = $hrs->next()) {
-  
   my $prow = $hrow->iseq_product_metric;
   my $id_run    = $prow->id_run;
   my $position  = $prow->position;
   $lane_data->{$id_run}->{$position} or next;
 
-  if ($id_run != $old_run or $position != $old_position) { # new plate
+  if ($id_run != $old_run or $position != $old_position) { # New plate
     $old_run = $id_run;
     $old_position = $position;
     $lane_data->{$id_run}->{$position}->{num_with_values} = 0;
@@ -151,16 +158,12 @@ while (my $hrow = $hrs->next()) {
 
   # Real sample
   my $lh_sample = $prow->iseq_flowcell->sample->lighthouse_sample;
-  if (!$lh_sample) {
-    $lh_sample = $prow->iseq_flowcell->sample->lighthouse_sample_sentinel;
-  }
-
   my @ct_values = ();
   if ($lh_sample) {
     @ct_values = grep { defined } map { $lh_sample->$_ }
                  qw(ch1_cq ch2_cq ch3_cq);
   }
-  @ct_values or next; #no Ct values of any kind
+  @ct_values or next; # No Ct values of any kind
 
   my $value = (sum @ct_values) / (scalar @ct_values);
   $lane_data->{$id_run}->{$position}->{num_with_values}++;
@@ -171,7 +174,7 @@ while (my $hrow = $hrs->next()) {
 
 my $log10 = log(10);
 
-# output data
+# Output data
 print join qq[\t],
   qw(id_run position tag_index pool_size
      num_samples_with_cts num_high_cts
