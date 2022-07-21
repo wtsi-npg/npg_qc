@@ -110,6 +110,8 @@ for my $run_lane (@run_lanes) {
   # Pool size - do not count PhiX and tag zero 
   $lane_data->{$id_run}->{$p}->{pool_size} = $rs->count() - 2;
   $lane_data->{$id_run}->{$p}->{phix_lib} = $row->iseq_flowcell->id_library_lims;
+  $lane_data->{$id_run}->{$p}->{lane_forward_q20yield} =
+    $row->iseq_run_lane_metric->q20_yield_kb_forward_read;
 }
 
 warn "PLATES IDENTIFIED\n";
@@ -179,7 +181,7 @@ my $log10 = log(10);
 print join qq[\t],
   qw(id_run position tag_index pool_size
      num_samples_with_cts num_high_cts
-     num_reads_phix phix_lib num_reads_control
+     num_reads_phix phix_lib lane_forward_q20yield num_reads_control
      log10_num_reads_control log10_num_reads_norm);
 print qq[\n];
 
@@ -206,6 +208,7 @@ for my $id_run (@runs) {
         $ct_over_threshold,
         $num_reads_ph,
         $plate_data->{phix_lib},
+        $plate_data->{lane_forward_q20yield},
         $num_reads_control,
         $num_reads_control ? log($num_reads_control)/$log10 : q[],
         $num_reads_control ?
