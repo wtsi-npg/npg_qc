@@ -146,15 +146,19 @@ while (my $hrow = $hrs->next()) {
     $lane_data->{$id_run}->{$position}->{num_with_values} = 0;
     $lane_data->{$id_run}->{$position}->{over_threshold} = 0;
     $lane_data->{$id_run}->{$position}->{controls} = [];
+    $lane_data->{$id_run}->{$position}->{controls_pos} = [];
   }
 
   if ($prow->iseq_flowcell->sample->control) {
+    my $num_reads = $hrow->num_aligned_reads;
+    defined $num_reads or next;
     if ($prow->iseq_flowcell->sample->control_type eq 'negative') {
-      my $num_reads = $hrow->num_aligned_reads;
-      if (defined $num_reads && ($num_reads < $NEGATIVE_CONTROL_MAX_NUM_READS)) {
+      if ($num_reads < $NEGATIVE_CONTROL_MAX_NUM_READS) {
         push @{$lane_data->{$id_run}->{$position}->{controls}},
           {tag_index => $prow->tag_index, num_reads => $num_reads};
       }
+    } else {
+      push @{$lane_data->{$id_run}->{$position}->{controls_pos}}, $num_reads;
     }
     next; # Finished with the control sample
   }
@@ -181,7 +185,8 @@ my $log10 = log(10);
 print join qq[\t],
   qw(id_run position tag_index pool_size
      num_samples_with_cts num_high_cts
-     num_reads_phix phix_lib lane_forward_q20yield num_reads_control
+     num_reads_phix phix_lib
+     lane_forward_q20yield num_reads_pos_control num_reads_control
      log10_num_reads_control log10_num_reads_norm);
 print qq[\n];
 
@@ -197,6 +202,11 @@ for my $id_run (@runs) {
     my $num_samples_with_cts = $plate_data->{num_with_values};
     my $ct_over_threshold = $num_samples_with_cts ?
                             $plate_data->{over_threshold} : q[];
+    my $num_reads_pos_control = 0;
+    my @pos_controls = @{$plate_data->{controls_pos}};
+    if (@pos_controls) {
+      $num_reads_pos_control = int(sum(@pos_controls)/scalar(@pos_controls));
+    }
 
     my @controls = sort { $a->{tag_index} <=> $b->{tag_index} }
                    @{$lane_data->{$id_run}->{$position}->{controls}};
@@ -209,6 +219,7 @@ for my $id_run (@runs) {
         $num_reads_ph,
         $plate_data->{phix_lib},
         $plate_data->{lane_forward_q20yield},
+        $num_reads_pos_control,
         $num_reads_control,
         $num_reads_control ? log($num_reads_control)/$log10 : q[],
         $num_reads_control ?
