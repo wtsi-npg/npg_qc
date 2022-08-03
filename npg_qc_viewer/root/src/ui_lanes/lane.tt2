@@ -514,3 +514,15 @@ END
 [%  END %]
 [%-   END -%]
 
+[% BLOCK haplotag_metrics %]
+[%  IF result.clear_count.defined %]
+      <span>[% result.clear_count %]<br/></span>
+[%  END %]
+[%  IF result.unclear_count.defined %]
+      <span>[% result.unclear_count %]<br/></span>
+[%  END %]
+[%  IF result.missing_count.defined %]
+      <span>[% result.missing_count %]<br/></span>
+[%  END %]
+[%-   END -%]
+

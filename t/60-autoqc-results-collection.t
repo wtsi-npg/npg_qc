@@ -52,6 +52,7 @@ my $temp = tempdir( CLEANUP => 1);
                     samtools_stats   => 1,
                     interop          => 1,
                     substitution_metrics => 1,
+                    haplotag_metrics => 1,
                    };
     my $actual;
     my @checks = @{$c->checks_list};

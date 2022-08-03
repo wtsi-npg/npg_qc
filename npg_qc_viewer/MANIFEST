@@ -49,6 +49,7 @@ root/src/ui_checks/gc_fraction.tt2
 root/src/ui_checks/generic.tt2
 root/src/ui_checks/genotype_call.tt2
 root/src/ui_checks/genotype.tt2
+root/src/ui_checks/haplotag_metrics.tt2
 root/src/ui_checks/insert_size.tt2
 root/src/ui_checks/pulldown_metrics.tt2
 root/src/ui_checks/qX_yield.tt2
@@ -285,6 +286,7 @@ t/data/qualmap/index.png
 t/data/qualmap/qualmap_legend.png
 t/data/qualmap/4360_1#1.stats
 t/data/qualmap/26607_1#20_F0xB00.samtools_stats.json
+t/data/results/45159_3#1.haplotag_metrics.json
 t/data/results/7928_2.genotype.json
 t/data/test_app.conf
 t/data/test_app_no_db.conf

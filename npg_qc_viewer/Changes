@@ -1,5 +1,6 @@
 Changes for NPG SeqQC
 
+ - add haplotag metrics
  - add composite alternate matches to genotype check display
  - add metrics for RNA-SeQC qc check: new template and an "about" entry with information explaining metrics
 
