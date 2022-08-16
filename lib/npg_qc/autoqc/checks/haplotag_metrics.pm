@@ -4,10 +4,7 @@ package npg_qc::autoqc::checks::haplotag_metrics;
 use Moose;
 use MooseX::StrictConstructor;
 use namespace::autoclean;
-use Carp;
-use File::Basename;
 use File::Spec::Functions qw(catfile);
-use Perl6::Slurp;
 use Readonly;
 use st::api::lims;
 use IPC::Open3 'open3';
@@ -79,16 +76,16 @@ override 'execute' => sub {
   my ($missing_count) = $count =~ /(\d+)/smx;
   $missing_count ||= 1; $missing_count -= 1;
 
-  $self->result->{'clear_file'} = $clear_file;
-  $self->result->{'unclear_file'} = $unclear_file;
-  $self->result->{'missing_file'} = $missing_file;
+  $self->result->clear_file($clear_file);
+  $self->result->unclear_file($unclear_file);
+  $self->result->missing_file($missing_file);
 
-  $self->result->{'clear_count'} = $clear_count;
-  $self->result->{'unclear_count'} = $unclear_count;
-  $self->result->{'missing_count'} = $missing_count;
+  $self->result->clear_count($clear_count);
+  $self->result->unclear_count($unclear_count);
+  $self->result->missing_count($missing_count);
 
   my $pass = ($clear_count + $unclear_count) / ($clear_count + $unclear_count + $missing_count);
-  $self->result->{'pass'} = ($pass > $PASS_RATE) ? 1: 0;
+  $self->result->pass( ($pass > $PASS_RATE) ? 1: 0 );
   return;
 };
 
@@ -102,14 +99,14 @@ __END__
 
 =head1 NAME
 
-npg_qc::autoqc::checks::haplotag_metrics - primarily metrics 
-related to SamHaplotag
+npg_qc::autoqc::checks::haplotag_metrics
 
 =head1 SYNOPSIS
 
     use npg_qc::autoqc::checks::haplotag_metrics;
 
 =head1 DESCRIPTION
+Metrics related to SamHaplotag
 
 
 =head1 SUBROUTINES/METHODS
@@ -145,12 +142,6 @@ related to SamHaplotag
 =item MooseX::StrictConstructor
 
 =item namespace::autoclean
-
-=item Carp
-
-=item File::Basename
-
-=item Perl6::Slurp
 
 =item Readonly
 

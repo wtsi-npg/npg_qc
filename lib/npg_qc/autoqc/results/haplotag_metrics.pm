@@ -10,9 +10,15 @@ our $VERSION = '0';
 
 has '+position' => (isa => 'Maybe[NpgTrackingLaneNumber]');
 
-has [qw/ id_run
-         tag_index
-         clear_count
+has [qw/ clear_file
+         unclear_file
+         missing_file
+      / ] => (
+    is         => 'rw',
+    isa        => 'Str',
+);
+
+has [qw/ clear_count
          unclear_count
          missing_count
          pass

@@ -70,24 +70,6 @@ __PACKAGE__->table('haplotag_metrics');
 
 A foreign key referencing the id_seq_composition column of the seq_composition table
 
-=head2 id_run
-
-  data_type: 'bigint'
-  extra: {unsigned => 1}
-  is_nullable: 0
-
-=head2 position
-
-  data_type: 'tinyint'
-  extra: {unsigned => 1}
-  is_nullable: 0
-
-=head2 tag_index
-
-  data_type: 'bigint'
-  default_value: -1
-  is_nullable: 0
-
 =head2 path
 
   data_type: 'varchar'
@@ -118,17 +100,23 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   extra: {unsigned => 1}
   is_nullable: 1
 
+The number of entries in the SamHaplotag CLEAR file
+
 =head2 unclear_count
 
   data_type: 'integer'
   extra: {unsigned => 1}
   is_nullable: 1
 
+The number of entries in the SamHaplotag UNCLEAR file
+
 =head2 missing_count
 
   data_type: 'integer'
   extra: {unsigned => 1}
   is_nullable: 1
+
+The number of entries in the SamHaplotag MISSING file
 
 =head2 pass
 
@@ -162,12 +150,6 @@ __PACKAGE__->add_columns(
     is_foreign_key => 1,
     is_nullable => 0,
   },
-  'id_run',
-  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'position',
-  { data_type => 'tinyint', extra => { unsigned => 1 }, is_nullable => 0 },
-  'tag_index',
-  { data_type => 'bigint', default_value => -1, is_nullable => 0 },
   'path',
   { data_type => 'varchar', is_nullable => 1, size => 256 },
   'clear_file',
@@ -201,39 +183,6 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key('id_haplotag_metrics');
-
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<haplotag_metrics_compos_ind_unique>
-
-=over 4
-
-=item * L</id_seq_composition>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint('haplotag_metrics_compos_ind_unique', ['id_seq_composition']);
-
-=head2 C<unq_run_lane_haplotagmetrics>
-
-=over 4
-
-=item * L</id_run>
-
-=item * L</position>
-
-=item * L</tag_index>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint(
-  'unq_run_lane_haplotagmetrics',
-  ['id_run', 'position', 'tag_index'],
-);
 
 =head1 RELATIONS
 
@@ -270,12 +219,19 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-13 10:56:37
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:J5y4T4/x/w+ye182NxIEFQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-16 11:54:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bckQUhv6suXghL1wTChGug
 
 our $VERSION = '0';
 
 __PACKAGE__->set_flators4non_scalar(qw( info clear_file unclear_file missing_file ));
+
+__PACKAGE__->has_many(
+  'seq_component_compositions',
+  'npg_qc::Schema::Result::SeqComponentComposition',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
