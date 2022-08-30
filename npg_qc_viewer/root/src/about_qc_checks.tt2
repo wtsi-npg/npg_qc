@@ -341,6 +341,17 @@ the reported results.
 A full description of the metrics reported in this check can be found
 <a href="https://github.com/wtsi-npg/npg_qc/blob/master/docs/CtoA_substitution_metrics.md">here</a>
 
+<br/><br/>
+
+<a name="haplotag metrics_check"></a>
+<h3>Haplotag metrics check</h3>
+<br/><br/>
+<h4>Description</h4>
+The haplotag metrics check is primarily concerned with 
+checking haplotag metrics.
+
+<br/><br/>
+
 </div>
 
 [% END -%]

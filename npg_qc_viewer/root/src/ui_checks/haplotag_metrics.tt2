@@ -1,0 +1,24 @@
+
+[% USE Number.Format(THOUSANDS_SEP=',') %]
+
+[% IF check.comments -%]
+<div class="data_table">
+<table title="haplotag comments">
+<tr><th class="laligned">Comments</th><td>[% check.comments %]</td></tr>
+</table>
+</div>
+[%- END %]
+
+<div class="data_table">
+
+<table title="haplotag_metrics">
+<tr>
+  <th class="laligned">Clear</th> <td>[% check.clear_count %]</td>
+  <th class="laligned">UnClear</th> <td>[% check.unclear_count %]</td>
+  <th class="laligned">Missing</th> <td>[% check.missing_count %]</td>
+ [%- IF check.criterion.defined -%]
+  <th class="laligned">Pass criterion</th> <td>[% check.criterion FILTER html %]</td>
+ [%- END -%]
+</tr>
+</table>
+</div>
