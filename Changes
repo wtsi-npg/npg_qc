@@ -2,6 +2,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - add haplotag metrics
 
+release 70.0.2
+ - fix missing apt pkgs for github actions
+
 release 70.0.1
  - use bcftools mpileup instead of samtools for genotype QC check
  - npg_substitution_metrics.pl avoid negative values and made metrics calculations more consistent
