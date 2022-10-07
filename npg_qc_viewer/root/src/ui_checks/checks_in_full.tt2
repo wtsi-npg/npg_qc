@@ -74,6 +74,11 @@
           [%- rf_info_attr = '<a onclick="alert(\'No info here\'); return false;"><img src="/static/images/information.png" alt="Link to information about tags reporters check"/></a>'; -%]
         [%- END -%]
 
+        [%- IF check.check_name == 'haplotag metrics' -%]
+          [%- rf_id_attr = 'id="hmc_' _ check.id_run _ ':' _ check.position _ '"' -%]
+          [%- rf_info_attr = '<a onclick="alert(\'No info here\'); return false;"><img src="/static/images/information.png" alt="Link to information about haplotag metrics check"/></a>'; -%]
+        [%- END -%]
+
         [% INCLUDE display_full_check_content check=check %]
       [%- END -%]
 

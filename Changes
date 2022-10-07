@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 70.1.0
+ - add haplotag metrics
+
 release 70.0.2
  - fix missing apt pkgs for github actions
 

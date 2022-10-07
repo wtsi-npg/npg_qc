@@ -285,6 +285,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 haplotag_metrics
+
+Type: has_many
+
+Related object: L<npg_qc::Schema::Result::HaplotagMetrics>
+
+=cut
+
+__PACKAGE__->has_many(
+  'haplotag_metrics',
+  'npg_qc::Schema::Result::HaplotagMetrics',
+  { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 insert_size
 
 Type: might_have
@@ -664,8 +679,8 @@ __PACKAGE__->might_have(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-01 13:53:10
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GkazoBepyfHLODF7a0ksAg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-16 11:54:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8hbF5UKsyPAXW4JFXbMugQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
