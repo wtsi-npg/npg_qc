@@ -93,3 +93,72 @@ my $o = npg_qc::mqc::outcomes->new(qc_schema => npg_qc::Schema->connect());
 $o->save($outcomes, $ENV{USER}, $info);
 ```
 
+## Create `pass` for a lane and all its samples
+
+This is an unusual scenario, but we do get requests like this
+when the QC team has problems with SeqQC UI.
+
+A full script for one lane is given below.
+
+```
+#!/usr/bin/env perl
+
+use List::Util qw/min max/;
+use Data::Dumper;
+use npg_qc::mqc::outcomes::keys qw/ $SEQ_OUTCOMES $LIB_OUTCOMES/;
+use npg_qc::Schema;
+use npg_qc::mqc::outcomes;
+use WTSI::DNAP::Warehouse::Schema;
+
+# Inputs from the RT ticket.
+# Unfortunately, the high-level API we are going to use does not
+# allow us to pass through the RT ticket number.
+my $id_run = XXXX; # CHANGE!
+my $position = Y;  # CHANGE!
+my $user = 'USER_NAME'; # CHANGE!
+# End of inputs from the RT ticket.
+
+my $mlwh_schema = WTSI::DNAP::Warehouse::Schema->connect();
+# Need to exclude PhiX tag index.
+# Tag zero record is not linked to the iseq_flowcell table.
+# Note that the number sequence between min and max tag index
+# might have gaps.
+my $rs = $mlwh_schema->resultset('IseqProductMetric')->search(
+  {'me.id_run' => $id_run,
+   'me.position' => $position,
+   'iseq_flowcell.entity_type' => 'library_indexed'},
+  {join => 'iseq_flowcell'}
+);
+my @tag_indexes = map {$_->tag_index} $rs->all();
+
+print "\nNUMBER OF TAGS: " . @tag_indexes . qq[\n];
+print "MIN TAG " . min(@tag_indexes) . qq[\n];
+print "MAX TAG " . max(@tag_indexes) . qq[\n\n];
+
+my $schema = npg_qc::Schema->connect();
+my $outcomes = {};
+my $info = {};
+
+my $lane_key= join q(:),$id_run,$position;
+$outcomes->{$SEQ_OUTCOMES}->{$lane_key} = {mqc_outcome=>q(Accepted final)};
+$info->{$lane_key}=\@tag_indexes;
+
+foreach my $tag_index (@tag_indexes) {
+  my $key= join q(:),$id_run,$position,$tag_index;
+  $outcomes->{$LIB_OUTCOMES}->{$key} = {mqc_outcome=>q(Accepted final)};
+}
+
+my $o = npg_qc::mqc::outcomes->new(qc_schema => $schema);
+my $saved;
+$schema->txn_do( sub {
+  $saved = $o->save($outcomes, $user, $info);
+  # Comment out the next statement when ready to update the values.
+  die 'End of transaction, deliberate error';
+});
+
+if ($saved) {
+  print Dumper $saved;
+} else {
+  print 'Nothing to print?';
+}
+```
