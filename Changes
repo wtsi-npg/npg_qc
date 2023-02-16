@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 70.2.1
+ - update version of github actions
+
 release 70.2.0
  - extend documentation for setting manual QC outcomes programmatically
  - change CI runner from Ubuntu 18.04 to ubuntu-latest
