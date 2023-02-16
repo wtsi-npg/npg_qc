@@ -20,7 +20,7 @@ jobs:
 
     name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # Caching cpanm external modules
     - name: Cache cpanm external modules
@@ -37,7 +37,7 @@ jobs:
     # Caching conda
     - name: Cache conda
       id: minicondaCache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/conda/pkgs
