@@ -1,9 +1,9 @@
-## General
+# Guidance for Changing QC Outcomes
 
-- Use correct RT ticket number.
+- Use the correct RT ticket number.
 - Set id_run, position and tag_index accordingly.
-- Wrap database changes into a transaction, which initially shoudl have a clause
-  to fail it so that it can be tried out (see some examples below).
+- Wrap database changes into a transaction, which initially should have
+  a clause to fail it so that it can be tried out (see some examples below).
 
 ## Toggle the outcome of a single library
 
@@ -41,7 +41,7 @@ if ($rs->count == 1) {
 }
 ```
 
-## Assigning the library outcome value
+## Assign the library outcome value
 
 When the lane outcome is changed from `fail` to `pass`, having consulted
 the requestor, you might want to assign a pass to libraries.
@@ -103,8 +103,10 @@ A full script for one lane is given below.
 ```
 #!/usr/bin/env perl
 
-use List::Util qw/min max/;
+use strict;
+use warnings;
 use Data::Dumper;
+
 use npg_qc::mqc::outcomes::keys qw/ $SEQ_OUTCOMES $LIB_OUTCOMES/;
 use npg_qc::Schema;
 use npg_qc::mqc::outcomes;
@@ -116,7 +118,11 @@ use WTSI::DNAP::Warehouse::Schema;
 my $id_run = XXXX; # CHANGE!
 my $position = Y;  # CHANGE!
 my $user = 'USER_NAME'; # CHANGE!
+my $outcome = q(Accepted final);
 # End of inputs from the RT ticket.
+
+print sprintf '%sChanging outcomes for run %i lane %i to "%s" as user %s%s',
+  qq[\n], $id_run, $position, $outcome, $user, qq[\n];
 
 my $mlwh_schema = WTSI::DNAP::Warehouse::Schema->connect();
 # Need to exclude PhiX tag index.
@@ -127,25 +133,27 @@ my $rs = $mlwh_schema->resultset('IseqProductMetric')->search(
   {'me.id_run' => $id_run,
    'me.position' => $position,
    'iseq_flowcell.entity_type' => 'library_indexed'},
-  {join => 'iseq_flowcell'}
+  {join => 'iseq_flowcell',
+   order_by => 'me.tag_index',
+   columns => 'tag_index' }
 );
 my @tag_indexes = map {$_->tag_index} $rs->all();
 
 print "\nNUMBER OF TAGS: " . @tag_indexes . qq[\n];
-print "MIN TAG " . min(@tag_indexes) . qq[\n];
-print "MAX TAG " . max(@tag_indexes) . qq[\n\n];
+print "MIN TAG " . $tag_indexes[0] . qq[\n];
+print "MAX TAG " . $tag_indexes[-1] . qq[\n\n];
 
 my $schema = npg_qc::Schema->connect();
 my $outcomes = {};
 my $info = {};
 
 my $lane_key= join q(:),$id_run,$position;
-$outcomes->{$SEQ_OUTCOMES}->{$lane_key} = {mqc_outcome=>q(Accepted final)};
+$outcomes->{$SEQ_OUTCOMES}->{$lane_key} = {mqc_outcome => $outcome};
 $info->{$lane_key}=\@tag_indexes;
 
 foreach my $tag_index (@tag_indexes) {
   my $key= join q(:),$id_run,$position,$tag_index;
-  $outcomes->{$LIB_OUTCOMES}->{$key} = {mqc_outcome=>q(Accepted final)};
+  $outcomes->{$LIB_OUTCOMES}->{$key} = {mqc_outcome => $outcome};
 }
 
 my $o = npg_qc::mqc::outcomes->new(qc_schema => $schema);
