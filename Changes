@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - dropped v_tag_metrics NPG QC database views, which developed
+   problems 
+
 release 70.2.1
  - update version of github actions
 
