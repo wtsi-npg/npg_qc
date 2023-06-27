@@ -5,11 +5,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-18.04']
         perl: ['5.26']
         node: ['14.8.0']
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     defaults:
       run:
@@ -19,9 +18,9 @@ jobs:
       WSI_CONDA_CHANNEL: "https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic"
       NPM_CONFIG_PREFIX: "$HOME/.npm-global"
 
-    name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }} on ${{ matrix.os }}
+    name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # Caching cpanm external modules
     - name: Cache cpanm external modules
@@ -29,7 +28,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/perl5ext
-        key: ${{ matrix.os }}-build-cpanm-external
+        key: ${{ runner.os }}-build-cpanm-external
 
     - name: Initialize Miniconda
       run: |
@@ -38,16 +37,20 @@ jobs:
     # Caching conda
     - name: Cache conda
       id: minicondaCache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/conda/pkgs
           ~/conda/envs
-        key: ${{ matrix.os }}-build-miniconda
+        key: ${{ runner.os }}-build-miniconda
 
     - name: install libgd-dev and uuid-dev
-      run:
-          sudo apt-get install -y libgd-dev uuid-dev
+      run: |
+          sudo apt-get update
+          # https://github.com/actions/runner-images/issues/2139
+          sudo apt-get remove -y nginx libgd3
+          sudo apt-get install -qq uuid-dev # For Perl UUID module
+          sudo apt-get install -qq libgd-dev libgd-text-perl # For npg_tracking
 
     - name: install conda client, baton,samtools, set up conda environment
       run: |

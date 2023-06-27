@@ -1,0 +1,19 @@
+DROP TABLE IF EXISTS `haplotag_metrics`;
+CREATE TABLE `haplotag_metrics` (
+  `id_haplotag_metrics` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_seq_composition` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referencing the id_seq_composition column of the seq_composition table',
+  `path` varchar(256) DEFAULT NULL,
+  `clear_file` varchar(256) DEFAULT NULL,
+  `unclear_file` varchar(256) DEFAULT NULL,
+  `missing_file` varchar(256) DEFAULT NULL,
+  `clear_count` int unsigned DEFAULT NULL COMMENT 'The number of entries in the SamHaplotag CLEAR file',
+  `unclear_count` int unsigned DEFAULT NULL COMMENT 'The number of entries in the SamHaplotag UNCLEAR file',
+  `missing_count` int unsigned DEFAULT NULL COMMENT 'The number of entries in the SamHaplotag MISSING file',
+  `pass` tinyint(1) DEFAULT NULL,
+  `comments` text,
+  `info` text,
+  PRIMARY KEY (`id_haplotag_metrics`),
+  CONSTRAINT `haplotag_metrics_compos` FOREIGN KEY (`id_seq_composition`) REFERENCES `seq_composition` (`id_seq_composition`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+GRANT SELECT ON haplotag_metrics TO nqcro;

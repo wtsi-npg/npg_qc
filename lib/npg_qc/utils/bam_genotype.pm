@@ -309,7 +309,7 @@ sub _build__call_gt_cmd {
 			$cmd .= sprintf q{<(%s view -b %s %s) }, $self->samtools, $bam_file, $self->_regions_string;
 		}
 	}
-  $cmd .=  sprintf q{ | %s sort -l 0 - 2>/dev/null | %s mpileup -l %s -f %s -g - 2>/dev/null | %s call -c -O v - 2>/dev/null'}, $self->samtools, $self->samtools, $self->pos_snpname_map_filename, $self->reference, $self->bcftools;
+  $cmd .=  sprintf q{ | %s sort -l 0 - 2>/dev/null | %s mpileup -T %s -f %s -O v - 2>/dev/null | %s call -c -O v - 2>/dev/null'}, $self->samtools, $self->bcftools, $self->pos_snpname_map_filename, $self->reference, $self->bcftools;
 
 	return $cmd;
 }

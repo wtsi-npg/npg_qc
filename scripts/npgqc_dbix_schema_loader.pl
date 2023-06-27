@@ -127,6 +127,7 @@ make_schema_at(
           'upstream_tags'                  => q[UpstreamTags],
           'tag_decode_stats'               => q[TagDecodeStats],
           'samtools_stats'                 => q[SamtoolsStats],
+          'haplotag_metrics'               => q[HaplotagMetrics],
         },
 
         result_roles_map   => $roles_map,

@@ -31,6 +31,7 @@ lib/npg_qc/autoqc/checks/generic/ampliconstats.pm
 lib/npg_qc/autoqc/checks/generic/artic.pm
 lib/npg_qc/autoqc/checks/genotype.pm
 lib/npg_qc/autoqc/checks/genotype_call.pm
+lib/npg_qc/autoqc/checks/haplotag_metrics.pm
 lib/npg_qc/autoqc/checks/insert_size.pm
 lib/npg_qc/autoqc/checks/pulldown_metrics.pm
 lib/npg_qc/autoqc/checks/qX_yield.pm
@@ -66,6 +67,7 @@ lib/npg_qc/autoqc/results/generic.pm
 lib/npg_qc/autoqc/results/genotype.pm
 lib/npg_qc/autoqc/results/genotype_call.pm
 lib/npg_qc/autoqc/results/insert_size.pm
+lib/npg_qc/autoqc/results/haplotag_metrics.pm
 lib/npg_qc/autoqc/results/pulldown_metrics.pm
 lib/npg_qc/autoqc/results/qX_yield.pm
 lib/npg_qc/autoqc/results/ref_match.pm
@@ -127,6 +129,7 @@ lib/npg_qc/Schema/Result/GcFraction.pm
 lib/npg_qc/Schema/Result/Generic.pm
 lib/npg_qc/Schema/Result/Genotype.pm
 lib/npg_qc/Schema/Result/GenotypeCall.pm
+lib/npg_qc/Schema/Result/HaplotagMetrics.pm
 lib/npg_qc/Schema/Result/InsertSize.pm
 lib/npg_qc/Schema/Result/Interop.pm
 lib/npg_qc/Schema/Result/MqcLibraryOutcomeDict.pm
@@ -226,6 +229,7 @@ t/60-autoqc-checks-gc_fraction.t
 t/60-autoqc-checks-generic.t
 t/60-autoqc-checks-genotype.t
 t/60-autoqc-checks-genotype_call.t
+t/60-autoqc-checks-haplotag_metrics.t
 t/60-autoqc-checks-insert_size.t
 t/60-autoqc-checks-pulldown_metrics.t
 t/60-autoqc-checks-qX_yield.t
@@ -260,6 +264,7 @@ t/60-autoqc-checks-generic-ampliconstats.t
 t/60-autoqc-checks-generic-artic.t
 t/60-autoqc-results-genotype.t
 t/60-autoqc-results-genotype_call.t
+t/60-autoqc-results-haplotag_metrics.t
 t/60-autoqc-results-insert_size.t
 t/60-autoqc-results-pulldown_metrics.t
 t/60-autoqc-results-qX_yield.t
@@ -372,6 +377,11 @@ t/data/autoqc/generic/artic/lane2/plex207/35177.qc.csv
 t/data/autoqc/generic/artic/lane2/plex3/.gitignore
 t/data/autoqc/generic/artic/lane2/plex4/35177.qc.csv
 t/data/autoqc/generic/artic/lane2/plex97/35177.qc.csv
+t/data/autoqc/haplotag_metrics/45159_3#1._SamHaplotag_Clear_BC
+t/data/autoqc/haplotag_metrics/45159_3#1._SamHaplotag_Missing_BC_QT_tags
+t/data/autoqc/haplotag_metrics/45159_3#1._SamHaplotag_UnClear_BC
+t/data/autoqc/haplotag_metrics/45159_3#1.haplotag_metrics.json
+t/data/autoqc/haplotag_metrics/samplesheet_45159.csv
 t/data/autoqc/upstream_tags/9669_1.upstream_tags.json
 t/data/autoqc/upstream_tags/lane1/12920_1#0.bam
 t/data/autoqc/upstream_tags/lane1/13362_1#0.bam
