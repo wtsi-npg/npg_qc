@@ -14,6 +14,11 @@ use warnings;
 use Carp;
 use Getopt::Long;
 use Term::ANSIColor qw(:constants);
+use LWP::Simple qw(get);
+use JSON;
+
+# this URL returns a complete set of known tags in json format
+our $LIMS_TAGS_URL = q[https://sequencescape.psd.sanger.ac.uk/api/v2/tag_groups];
 
 ##no critic
 our $VERSION = '0';
@@ -99,10 +104,10 @@ sub showTags{
     my %tagsFound = @_;
     my $unassigned = $sampleSize;
 
-    my $class = 'npg_warehouse::Schema';
+    my $class = 'WTSI::DNAP::Warehouse::Schema';
     my $loaded = eval "require $class"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
     if (!$loaded) {
-      croak q[Can't load module npg_warehouse::Schema];
+      croak q[Can't load module WTSI::DNAP::Warehouse::Schema];
     }
 
     my %db_tags = ();
@@ -133,7 +138,7 @@ sub showTags{
       }
     } elsif ($groups =~ /\d+_\d/) {
       # read the npg_plex_infomation table
-      my $s = npg_warehouse::Schema->connect();
+      my $s = WTSI::DNAP::Warehouse::Schema->connect();
       my $rs;
       my @rls = split(/[,]/, $groups);
       my $id = 0;
@@ -142,10 +147,10 @@ sub showTags{
         croak "Invalid run_lane $rl" unless $rl =~ m/^(\d+)_(\d)$/;
         my ($id_run,$lane) = ($1,$2);
         my $name = "run ${id_run} lane ${lane}";
-        $rs = $s->resultset('NpgPlexInformation')->search({id_run=>$id_run, position=>$lane});
+        $rs = $s->resultset('IseqProductMetric')->search({id_run=>$id_run, position=>$lane});
         while(my $row = $rs->next) {
           my $tag_index = $row->tag_index;
-          my $sequence = $row->tag_sequence;
+          my $sequence = $row->tag_sequence4deplexing;
           if (!defined $tag_index || !defined $sequence) {
             next;
           }
@@ -159,29 +164,26 @@ sub showTags{
         }
       }
     } else {
-      # read the tag table
-      my $s = npg_warehouse::Schema->connect();
-      my $rs;
-      my $tag_group_internal_id = ($groups ? [split(/[,]/, $groups)] : undef);
-      if (defined($tag_group_internal_id)) {
-          $rs = $s->resultset('Tag')->search({is_current=>1, tag_group_internal_id=>$tag_group_internal_id});
-      } else {
-          $rs = $s->resultset('Tag')->search({is_current=>1});
+      my $d = get($LIMS_TAGS_URL);
+      my $t = decode_json($d);
+      my %groups = ();
+      if ($groups) {
+        map {$groups{$_}++} (split(/[,]/, $groups));
       }
-      while(my $row = $rs->next) {
-        my $name = $row->tag_group_name;
-        my $id = $row->tag_group_internal_id;
-        my $map_id = $row->map_id;
-        my $sequence = $row->expected_sequence;
-        if (!defined $name || !defined $id || !defined $map_id || !defined $sequence) {
-          next;
-        }
-	my $original = $sequence;
-        push(@{$db_tags{$sequence}},[$name,$id,$map_id,0,$original]);
-        if (@{$revcomps}) {
-          $sequence =~ tr/ACGTN/TGCAN/;
-          $sequence = reverse($sequence);
-          push(@{$db_tags{$sequence}},[$name,$id,$map_id,1,$original]);
+      foreach my $group (@{$t->{"data"}}) {
+	my $id = $group->{"id"};
+	next if (%groups && !exists($groups{$id}));
+	my $name = $group->{"attributes"}->{"name"};
+ 	foreach my $tag (@{$group->{"attributes"}->{"tags"}}) {
+	  my $sequence = $tag->{"oligo"};
+	  my $map_id = $tag->{"index"};
+  	  my $original = $sequence;
+          push(@{$db_tags{$sequence}},[$name,$id,$map_id,0,$original]);
+          if (@{$revcomps}) {
+            $sequence =~ tr/ACGTN/TGCAN/;
+            $sequence = reverse($sequence);
+            push(@{$db_tags{$sequence}},[$name,$id,$map_id,1,$original]);
+	  }
         }
       }
     }

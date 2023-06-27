@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - tag_sniff get list of known tags via a URL rather than the warehouse DB
+
 release 70.2.1
  - update version of github actions
 
