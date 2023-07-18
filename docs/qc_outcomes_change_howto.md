@@ -118,7 +118,7 @@ use WTSI::DNAP::Warehouse::Schema;
 my $id_run = XXXX; # CHANGE!
 my $position = Y;  # CHANGE!
 my $user = 'USER_NAME'; # CHANGE!
-my $outcome = q(Accepted final);
+my $outcome = q(Accepted final); # Must match the database dictionary value.
 # End of inputs from the RT ticket.
 
 print sprintf '%sChanging outcomes for run %i lane %i to "%s" as user %s%s',
