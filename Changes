@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 71.0.0
+ - Removed the plugin that enable to run the SeqQC server under the
+   daemon utility. 
+ - Updated SOP for changing QC outcomes
+
 release 70.3.0
  - tag_sniff get list of known tags via a URL rather than the warehouse DB
 
