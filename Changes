@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 71.0.1
+ - Change to Perl versions from Perlbrew
+
 release 71.0.0
  - Removed the plugin that enable to run the SeqQC server under the
    daemon utility. 
