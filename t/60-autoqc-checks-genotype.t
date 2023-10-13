@@ -44,7 +44,7 @@ END {
 }
 
 subtest 'Test early exit' => sub {
-  plan tests => 5;
+  plan tests => 6;
 
   local $ENV{'NPG_CACHED_SAMPLESHEET_FILE'} =
     't/data/autoqc/samplesheets/samplesheet_47646.csv';
@@ -67,12 +67,17 @@ subtest 'Test early exit' => sub {
     reference_fasta => $fasta
   );
   isa_ok ($check, 'npg_qc::autoqc::checks::genotype');
+  # For a check that cannot be run in full in a meaningful way we
+  # need to save enough data in the output JSON file to allow for
+  # this output to be uploaded to the database.
   lives_ok { $check->run() } 'check executed';
   ok (-e $output_file, "output file $output_file has been generated");
   my $result = npg_qc::autoqc::results::genotype->thaw(slurp($output_file));
   is ($result->comments(), 'Specified reference genome may be non-human',
-    'correct comment is captured');
+    'correct reason for not running in full is captured');
   ok ($result->snp_call_set(), 'the snp_call_set attribute is set');
+  # Testing ability to run last to avoid duplicates in comments.
+  ok (!$check->can_run(), 'the check cannot be run in full');
 };
 
 SKIP: {
