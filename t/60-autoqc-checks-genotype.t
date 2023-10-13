@@ -52,13 +52,19 @@ subtest 'Test early exit' => sub {
   my $output_file = "$dir/47646_1#999.genotype.json";
   copy('t/data/autoqc/alignment.bam', $input_file);
   mkdir("$dir/genotypes");
+  my $fasta = join q[/], $ref_repos, 'references',
+    'Homo_sapiens/GRCh38_full_analysis_set_plus_decoy_hla/all/fasta',
+    'GRCh38_full_analysis_set_plus_decoy_hla.fasta';
 
+  # Set the reference_fasta path explicitly, the CI pipeline has
+  # difficulty inferring it.
   my $check = npg_qc::autoqc::checks::genotype->new(
     rpt_list    => '47646:1:999',
     input_files => [$input_file],
     qc_out      => $dir,
     repository  => $ref_repos,
-    genotypes_repository => "$dir/genotypes"
+    genotypes_repository => "$dir/genotypes",
+    reference_fasta => $fasta
   );
   isa_ok ($check, 'npg_qc::autoqc::checks::genotype');
   lives_ok { $check->run() } 'check executed';
