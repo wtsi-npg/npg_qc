@@ -166,7 +166,6 @@ lib/npg_qc/utils/bam_genotype.pm
 lib/npg_qc/utils/genotype_calling.pm
 MANIFEST
 README
-scripts/before_install.sh
 scripts/npgqc_dbix_schema_loader.pl
 t/00-critic.t
 t/00-distribution.t
