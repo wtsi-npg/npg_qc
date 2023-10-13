@@ -93,7 +93,6 @@ jobs:
       - name: "NPM"
         run: |
           mkdir -p "$NPM_CONFIG_PREFIX"
-          ${GITHUB_WORKSPACE}/scripts/before_install.sh
 
       - name: "Install Perl dependencies"
         run: |
