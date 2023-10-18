@@ -100,8 +100,8 @@ has 'sequenom_plex' => (
 );
 
 # snp_call_set - this specifies the set of loci to be called. This may be
-#  the same for different sequenom_plex data sets. It is used to construct
-#  the name of some information files (positions, alleles, etc)
+# the same for different sequenom_plex data sets. It is used to construct
+# the name of some information files (positions, alleles, etc)
 has 'snp_call_set' => (
   is => 'ro',
   isa => 'Str',
@@ -426,9 +426,9 @@ override 'can_run' => sub {
   if(! any { $_ eq fileparse($self->reference_fasta); } (keys %{$self->_ref_to_snppos_suffix_map})) {
     $self->result->add_comment('Specified reference genome may be non-human');
     return 0;
-   }
+  }
 
-   return 1;
+  return 1;
 };
 
 override 'execute' => sub {
@@ -444,6 +444,9 @@ override 'execute' => sub {
   };
 
   if(!$self->can_run()) {
+    # The value has to be set in order to be able to upload the result
+    # to the database; it is a part of the unique constraint.
+    $self->result->snp_call_set($self->snp_call_set);
     return 1;
   }
 
