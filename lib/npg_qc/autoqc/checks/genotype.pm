@@ -661,7 +661,7 @@ sub _set_attrib_by_geno_refset {
   my $name   = fileparse($self->geno_refset);
 
   $self->_set_sequenom_plex($name);
-  $self->_set_ssnp_call_setnp_call_set($name);
+  $self->_set_snp_call_set($name);
   $self->_set_gt_db($self->geno_refset);
 
   if($self->alternate_sample_name) {

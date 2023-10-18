@@ -883,7 +883,7 @@ subtest 'loading partially defined results' => sub {
     schema  => $db,
     verbose => 0,
   );
-  lives_ok { $db_loader->load() } 'no error loading an ncomplete result';
+  lives_ok { $db_loader->load() } 'no error loading an incomplete result';
   is ($db->resultset('Genotype')->search({})->count(), 1,
     'one genotype record is created');
 };
