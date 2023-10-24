@@ -205,7 +205,7 @@ __PACKAGE__->belongs_to(
   'mqc_outcome',
   'npg_qc::Schema::Result::MqcOutcomeDict',
   { id_mqc_outcome => 'id_mqc_outcome' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 =head2 seq_composition
@@ -220,12 +220,12 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-15 14:33:12
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CER7lXmkdjHi1Q12USNB+Q
+# Created by DBIx::Class::Schema::Loader v0.07051 @ 2023-10-23 17:35:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:U9PH+AyBX2DFQLrVDTfK/Q
 
 use Carp;
 
