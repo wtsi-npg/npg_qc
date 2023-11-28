@@ -1,7 +1,15 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 71.1.0
+ - Updated DBIC ORM following the production MySQL database server upgrade
+   to MySQL v8.+
+ - Fixed a problem with archival of incomplete genotyping autoqc results
+ - Removed unused CI scripts
+ - Removed listing of non-existing files fro MANIFEST
+ - Fixed a warning when running the t/60-autoqc-results-result.t test
+
 release 71.0.1
- - Change to Perl versions from Perlbrew
+ - Change to Perl versions from Perlbrew for CI
 
 release 71.0.0
  - Removed the plugin that enable to run the SeqQC server under the
