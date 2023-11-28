@@ -275,7 +275,7 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 =head2 split_stats_coverages
@@ -311,8 +311,8 @@ __PACKAGE__->has_many(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T7PoM/FxAC3pSymaQtEGsA
+# Created by DBIx::Class::Schema::Loader v0.07051 @ 2023-10-23 17:35:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0SokhBA6X2ZxX1uvkPPC5A
 
 use MooseX::Aliases;
 

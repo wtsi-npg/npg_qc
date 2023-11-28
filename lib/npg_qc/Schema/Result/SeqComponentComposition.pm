@@ -163,7 +163,7 @@ __PACKAGE__->belongs_to(
   'seq_component',
   'npg_qc::Schema::Result::SeqComponent',
   { id_seq_component => 'id_seq_component' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 =head2 seq_composition
@@ -178,12 +178,12 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition', size => 'size' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2015-09-11 16:26:51
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:l9HRSiRUN47Baf3NyuVG+Q
+# Created by DBIx::Class::Schema::Loader v0.07051 @ 2023-10-23 17:35:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:wCYXZ7/Kxyw/9x+nXi3ddQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

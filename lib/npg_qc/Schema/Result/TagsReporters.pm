@@ -225,7 +225,7 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 =head1 L<Moose> ROLES APPLIED
@@ -248,8 +248,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::tags_reporters';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-14 16:25:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:RQcWkb8ZRskffujtCa/lsw
+# Created by DBIx::Class::Schema::Loader v0.07051 @ 2023-10-23 17:35:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:28gJ3S2ZfnH6IXT8FmcNAw
 
 our $VERSION = '0';
 

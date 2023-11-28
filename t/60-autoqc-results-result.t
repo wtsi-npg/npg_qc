@@ -96,7 +96,7 @@ subtest 'saving object to and loading from file' => sub {
     $r->store($saved_path);
     my $json = $r->freeze();
     is ($r->_id_run_common, 2549, 'one of private attributes is set');
-    unlike($json, qr/\"_[:a-z:]/, 'private attributes are not serialized'); 
+    unlike($json, qr/\"_[a-z]/, 'private attributes are not serialized'); 
     delete $r->{'filename_root'};
     my $saved_r = npg_qc::autoqc::results::result->load($saved_path);
     sleep 1;

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -872,6 +872,20 @@ subtest 'loading review and other results from path' => sub {
   is( ref $row->qc_outcome, 'HASH', 'inflation back to a hash');
   is( ref $row->criteria, 'HASH', 'inflation back to a hash');
   is( $row->criteria_md5, '27c522a795e99e3aea57162541de75b1', 'criteria_md5 column populated');
+};
+
+subtest 'loading partially defined results' => sub {
+  plan tests => 2;
+ 
+  my $db = $db_helper->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
+  my $db_loader = npg_qc::autoqc::db_loader->new(
+    path    => ['t/data/autoqc/dbix_loader/short_results'],
+    schema  => $db,
+    verbose => 0,
+  );
+  lives_ok { $db_loader->load() } 'no error loading an incomplete result';
+  is ($db->resultset('Genotype')->search({})->count(), 1,
+    'one genotype record is created');
 };
 
 1;

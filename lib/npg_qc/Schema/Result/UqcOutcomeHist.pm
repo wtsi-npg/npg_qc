@@ -175,7 +175,7 @@ __PACKAGE__->belongs_to(
   'seq_composition',
   'npg_qc::Schema::Result::SeqComposition',
   { id_seq_composition => 'id_seq_composition' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 =head2 uqc_outcome
@@ -190,12 +190,12 @@ __PACKAGE__->belongs_to(
   'uqc_outcome',
   'npg_qc::Schema::Result::UqcOutcomeDict',
   { id_uqc_outcome => 'id_uqc_outcome' },
-  { is_deferrable => 1, on_delete => 'NO ACTION', on_update => 'NO ACTION' },
+  { is_deferrable => 1, on_delete => 'RESTRICT', on_update => 'RESTRICT' },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-10-10 16:47:36
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:W25wZbDnVcThChyx0ZEQNw
+# Created by DBIx::Class::Schema::Loader v0.07051 @ 2023-10-23 17:35:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:MXLb6JGrqH30hXUJPeZwgQ
 
 our $VERSION = '0';
 

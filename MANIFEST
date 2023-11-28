@@ -1,4 +1,3 @@
-.github/workflows/testing_and_building_repos.yml
 bin/gtck_combine_gt_data.sh
 bin/gtck_extract_fluidigm_data_from_irods.sh
 bin/gtck_genplexlist.sh
@@ -167,10 +166,7 @@ lib/npg_qc/utils/bam_genotype.pm
 lib/npg_qc/utils/genotype_calling.pm
 MANIFEST
 README
-scripts/before_install.sh
-scripts/install.sh
 scripts/npgqc_dbix_schema_loader.pl
-scripts/script.sh
 t/00-critic.t
 t/00-distribution.t
 t/00-podcoverage.t
