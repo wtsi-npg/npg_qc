@@ -85,7 +85,7 @@ operation on the list. A single hash reference is returned.
             'id_run' => '1',
             'position' => '2-3',
             'tag_index' => '3'
-          }; 
+          };
 
 =cut
 sub rpt_list2one_hash {
@@ -161,8 +161,24 @@ sub _compare_rpt_keys_zero_last {
     my $b_map = __PACKAGE__->rpt_list2one_hash($b);
 
     return $a_map->{'id_run'} cmp $b_map->{'id_run'} ||
-           $a_map->{'position'} cmp $b_map->{'position'} ||
+           _compare_position($a_map->{'position'}, $b_map->{'position'}) ||
            _compare_tags_zero_last($a_map, $b_map);
+}
+
+sub _compare_position {## no critic (RequireArgUnpacking)
+  # Look for - indicating merged positions. Put merges first
+  my $a_merged = $_[0] =~ /[-]/xms;
+  my $b_merged = $_[1] =~ /[-]/xms;
+
+  if ($a_merged && $b_merged) {
+    return $_[0] cmp $_[1];
+  } elsif ($a_merged) {
+    return $LESS;
+  } elsif ($b_merged) {
+    return $MORE;
+  } else {
+    return $_[0] <=> $_[1]; # position is purely numeric
+  }
 }
 
 sub _compare_tags_zero_last {## no critic (RequireArgUnpacking)
@@ -256,10 +272,11 @@ __END__
 =head1 AUTHOR
 
 Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
+Kieron Taylor E<lt>kt19@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2018, 2023 GRL
 
 This file is part of NPG.
 
