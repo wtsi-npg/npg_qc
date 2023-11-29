@@ -34,7 +34,7 @@ foreach my $check ((
     qw/sequence_summary interop/
                   )) {
   my ($result_name, $dbix_result_name ) = $generic_role->class_names($check);
-  
+
   my @roles = ($composition, $flator, $generic_role);
   my $rpackage = $role_base . $result_name;
   my $found = eval "require $rpackage";
@@ -50,9 +50,9 @@ make_schema_at(
     {
         debug               => 0,
         dump_directory      => q[lib],
-        naming              => { 
-            relationships    => 'current', 
-            monikers         => 'current', 
+        naming              => {
+            relationships    => 'current',
+            monikers         => 'current',
             column_accessors => 'preserve',
         },
         skip_load_external  => 1,
@@ -60,36 +60,12 @@ make_schema_at(
         preserve_case       => 1,
         use_namespaces      => 1,
         default_resultset_class => 'ResultSet',
-        
+
         exclude => qr/\A v_                    |
-                         analysis              |
-                         cache_query           |
-                         chip_summary          |
-                         cumulative_errors_    |
-                         error_rate_           |
-                         errors_by_            |
-                         fastqcheck            |
-                         frequency_response    |
-                         instrument_statistics |
-                         image_store           |
-                         information_content_  |
-                         lane_qc               |
-                         log_likelihood        |
-                         most_common_          |
-                         move_z                |
-                         offset                |
                          recipe_file           |
-                         run_graph             |
                          run_recipe            |
-                         run_tile              |
-                         ref_snp_info          |
                          run_and_pair          |
-                         run_config            |
-                         run_graph             |
-                         run_info              |
-                         run_timeline          |
-                         signal_mean           |
-                         tile_score
+                         run_info
                      /xms,
 
         rel_name_map        => sub { # Rename the id relationship so we can access
@@ -120,7 +96,7 @@ make_schema_at(
           'pulldown_metrics'               => q[PulldownMetrics],
           'split_stats'                    => q[SplitStats],
           'split_stats_coverage'           => q[SplitStatsCoverage],
-          'substitution_metrics'           => q[SubstitutionMetrics],    
+          'substitution_metrics'           => q[SubstitutionMetrics],
           'qx_yield'                       => q[QXYield],
           'tag_metrics'                    => q[TagMetrics],
           'tags_reporters'                 => q[TagsReporters],
