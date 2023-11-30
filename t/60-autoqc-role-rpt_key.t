@@ -38,7 +38,7 @@ subtest 'Sorting of lane positions and tag indexes in the /checks/runs library l
     [['1:1:888'], ['1:1:888'], 'One in, one out'],
     [['1:1:0', '1:1:1', '1:1:2'], ['1:1:1', '1:1:2', '1:1:0'], 'All-numeric RPTs are sorted, tag 0 last'],
     [['1:20:10', '1:1:9', '1:2:8'], ['1:1:9', '1:2:8', '1:20:10'], 'Positions are sorted numerically over tags'],
-    [['1:5:1', '2:1:0', '3:8:888'], ['1:5:1', '2:1:0', '3:8:888'], 'Lanes always win'],
+    [['1:5:1', '2:1:0', '3:8:888'], ['1:5:1', '2:1:0', '3:8:888'], 'id_run always wins'],
     [['1:1:0', '1:1:1;1:2:1;1:3:1'], ['1:1:1;1:2:1;1:3:1', '1:1:0'], 'Position ranges are sorted first'],
     [['1:1:1;1:2:1;1:3:1', '1:1:0'], ['1:1:1;1:2:1;1:3:1', '1:1:0'], 'Position ranges are sorted first'],
     [['1:1:0', '1:1:1;1:2:1', '1:1:888'], ['1:1:1;1:2:1', '1:1:888', '1:1:0'], 'Merge first, then high tag, then zero']
