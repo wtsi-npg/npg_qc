@@ -51,8 +51,7 @@ use npg_qc::Schema;
 my $s = npg_qc::Schema->connect();
 # Use transaction.
 $s->txn_do( sub {
-  my $rs=npg_qc::Schema->connect()->resultset("MqcLibraryOutcomeEnt")
-    ->search({id_run=>X,position=>Y});
+  my $rs=$s->resultset("MqcLibraryOutcomeEnt")->search({id_run=>X,position=>Y});
   while (my $row=$rs->next) {
     print $row->tag_index . " Current outcome: ".$row->mqc_outcome->short_desc;
     $row->update_outcome({"mqc_outcome" => "Accepted final"},
