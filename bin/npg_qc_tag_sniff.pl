@@ -1,13 +1,4 @@
 #!/usr/bin/env perl
-#########
-# Author:        nf2
-# Created:       18 Nov 2011
-#
-
-#########################
-# This script checks a bam file's tag sequences
-# It should find the observed tags, and map them to tagsets and the expected tags
-#########################
 
 use strict;
 use warnings;
@@ -17,7 +8,9 @@ use Term::ANSIColor qw(:constants);
 use LWP::Simple qw(get);
 use JSON;
 
-# this URL returns a complete set of known tags in json format
+use WTSI::DNAP::Warehouse::Schema;
+
+# This URL returns a complete set of known tags in json format
 our $LIMS_TAGS_URL = q[https://sequencescape.psd.sanger.ac.uk/api/v2/tag_groups];
 
 ##no critic
@@ -104,12 +97,6 @@ sub showTags{
     my %tagsFound = @_;
     my $unassigned = $sampleSize;
 
-    my $class = 'WTSI::DNAP::Warehouse::Schema';
-    my $loaded = eval "require $class"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
-    if (!$loaded) {
-      croak q[Can't load module WTSI::DNAP::Warehouse::Schema];
-    }
-
     my %db_tags = ();
 
     if ($groups =~ /\.taglist/) {
@@ -126,7 +113,7 @@ sub showTags{
           next if m/^barcode/;
           croak "Invalid tag $_" unless m/^([ACGT]+)\t(\d+)\t/;
           my ($sequence,$tag_index) = ($1,$2);
-	  my $original = $sequence;
+          my $original = $sequence;
           push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0,$original]);
           if (@{$revcomps}) {
             $sequence =~ tr/ACGTN/TGCAN/;
@@ -137,7 +124,6 @@ sub showTags{
         close(FILE);
       }
     } elsif ($groups =~ /\d+_\d/) {
-      # read the npg_plex_infomation table
       my $s = WTSI::DNAP::Warehouse::Schema->connect();
       my $rs;
       my @rls = split(/[,]/, $groups);
@@ -154,7 +140,7 @@ sub showTags{
           if (!defined $tag_index || !defined $sequence) {
             next;
           }
-	  my $original = $sequence;
+          my $original = $sequence;
           push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0,$original]);
           if (@{$revcomps}) {
             $sequence =~ tr/ACGTN/TGCAN/;
@@ -171,19 +157,19 @@ sub showTags{
         map {$groups{$_}++} (split(/[,]/, $groups));
       }
       foreach my $group (@{$t->{"data"}}) {
-	my $id = $group->{"id"};
-	next if (%groups && !exists($groups{$id}));
-	my $name = $group->{"attributes"}->{"name"};
- 	foreach my $tag (@{$group->{"attributes"}->{"tags"}}) {
-	  my $sequence = $tag->{"oligo"};
-	  my $map_id = $tag->{"index"};
-  	  my $original = $sequence;
+        my $id = $group->{"id"};
+        next if (%groups && !exists($groups{$id}));
+        my $name = $group->{"attributes"}->{"name"};
+        foreach my $tag (@{$group->{"attributes"}->{"tags"}}) {
+          my $sequence = $tag->{"oligo"};
+          my $map_id = $tag->{"index"};
+          my $original = $sequence;
           push(@{$db_tags{$sequence}},[$name,$id,$map_id,0,$original]);
           if (@{$revcomps}) {
             $sequence =~ tr/ACGTN/TGCAN/;
             $sequence = reverse($sequence);
             push(@{$db_tags{$sequence}},[$name,$id,$map_id,1,$original]);
-	  }
+          }
         }
       }
     }
@@ -389,7 +375,7 @@ __END__
 
 =head1 NAME
 
-tag_sniff.pl
+npg_qc_tag_sniff.pl
 
 =head1 USAGE
   
@@ -400,6 +386,9 @@ tag_sniff.pl
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
+
+This script finds the actual tag sequences in a SAM file and maps them
+to tagsets and the expected tags.
 
 =head1 SUBROUTINES/METHODS
 
@@ -425,7 +414,13 @@ tag_sniff.pl
 
 =item Getopt::Long
 
-=item npg_warehouse::Schema
+=item Term::ANSIColor
+
+=item LWP::Simple
+
+=item JSON
+
+=item WTSI::DNAP::Warehouse::Schema
 
 =back
 
@@ -437,9 +432,11 @@ tag_sniff.pl
 
 Nadeem Faruque<lt>nf2@sanger.ac.ukE<gt>
 
+Steven Leonard<lt>srl@sanger.ac.ukE<gt> 
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Nadeem Faruque
+Copyright (C) 2011,2014,2015,2016,2017,2018,2022,2023 Genome Research Ltd.
 
 This file is part of NPG.
 
