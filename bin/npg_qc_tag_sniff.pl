@@ -1,13 +1,4 @@
 #!/usr/bin/env perl
-#########
-# Author:        nf2
-# Created:       18 Nov 2011
-#
-
-#########################
-# This script checks a bam file's tag sequences
-# It should find the observed tags, and map them to tagsets and the expected tags
-#########################
 
 use strict;
 use warnings;
@@ -17,7 +8,7 @@ use Term::ANSIColor qw(:constants);
 use LWP::Simple qw(get);
 use JSON;
 
-# this URL returns a complete set of known tags in json format
+# This URL returns a complete set of known tags in json format
 our $LIMS_TAGS_URL = q[https://sequencescape.psd.sanger.ac.uk/api/v2/tag_groups];
 
 ##no critic
@@ -389,7 +380,7 @@ __END__
 
 =head1 NAME
 
-tag_sniff.pl
+npg_qc_tag_sniff.pl
 
 =head1 USAGE
   
@@ -400,6 +391,9 @@ tag_sniff.pl
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
+
+This script finds the actual tag sequences in a SAM file and maps them
+to tagsets and the expected tags.
 
 =head1 SUBROUTINES/METHODS
 
@@ -425,7 +419,11 @@ tag_sniff.pl
 
 =item Getopt::Long
 
-=item npg_warehouse::Schema
+=item Term::ANSIColor
+
+=item LWP::Simple
+
+=item JSON
 
 =back
 
@@ -437,9 +435,11 @@ tag_sniff.pl
 
 Nadeem Faruque<lt>nf2@sanger.ac.ukE<gt>
 
+Steven Leonard<lt>srl@sanger.ac.ukE<gt> 
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 GRL, by Nadeem Faruque
+Copyright (C) 2011,2014,2015,2016,2017,2018,2022,2023 Genome Research Ltd.
 
 This file is part of NPG.
 
