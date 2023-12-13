@@ -113,7 +113,7 @@ sub showTags{
           next if m/^barcode/;
           croak "Invalid tag $_" unless m/^([ACGT]+)\t(\d+)\t/;
           my ($sequence,$tag_index) = ($1,$2);
-	  my $original = $sequence;
+          my $original = $sequence;
           push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0,$original]);
           if (@{$revcomps}) {
             $sequence =~ tr/ACGTN/TGCAN/;
@@ -124,7 +124,6 @@ sub showTags{
         close(FILE);
       }
     } elsif ($groups =~ /\d+_\d/) {
-      # read the npg_plex_infomation table
       my $s = WTSI::DNAP::Warehouse::Schema->connect();
       my $rs;
       my @rls = split(/[,]/, $groups);
@@ -141,7 +140,7 @@ sub showTags{
           if (!defined $tag_index || !defined $sequence) {
             next;
           }
-	  my $original = $sequence;
+          my $original = $sequence;
           push(@{$db_tags{$sequence}},[$name,$id,$tag_index,0,$original]);
           if (@{$revcomps}) {
             $sequence =~ tr/ACGTN/TGCAN/;
@@ -158,19 +157,19 @@ sub showTags{
         map {$groups{$_}++} (split(/[,]/, $groups));
       }
       foreach my $group (@{$t->{"data"}}) {
-	my $id = $group->{"id"};
-	next if (%groups && !exists($groups{$id}));
-	my $name = $group->{"attributes"}->{"name"};
- 	foreach my $tag (@{$group->{"attributes"}->{"tags"}}) {
-	  my $sequence = $tag->{"oligo"};
-	  my $map_id = $tag->{"index"};
-  	  my $original = $sequence;
+        my $id = $group->{"id"};
+        next if (%groups && !exists($groups{$id}));
+        my $name = $group->{"attributes"}->{"name"};
+        foreach my $tag (@{$group->{"attributes"}->{"tags"}}) {
+          my $sequence = $tag->{"oligo"};
+          my $map_id = $tag->{"index"};
+          my $original = $sequence;
           push(@{$db_tags{$sequence}},[$name,$id,$map_id,0,$original]);
           if (@{$revcomps}) {
             $sequence =~ tr/ACGTN/TGCAN/;
             $sequence = reverse($sequence);
             push(@{$db_tags{$sequence}},[$name,$id,$map_id,1,$original]);
-	  }
+          }
         }
       }
     }
