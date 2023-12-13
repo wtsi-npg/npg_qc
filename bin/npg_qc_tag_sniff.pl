@@ -8,6 +8,8 @@ use Term::ANSIColor qw(:constants);
 use LWP::Simple qw(get);
 use JSON;
 
+use WTSI::DNAP::Warehouse::Schema;
+
 # This URL returns a complete set of known tags in json format
 our $LIMS_TAGS_URL = q[https://sequencescape.psd.sanger.ac.uk/api/v2/tag_groups];
 
@@ -94,12 +96,6 @@ sub showTags{
     my $groups = shift;
     my %tagsFound = @_;
     my $unassigned = $sampleSize;
-
-    my $class = 'WTSI::DNAP::Warehouse::Schema';
-    my $loaded = eval "require $class"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
-    if (!$loaded) {
-      croak q[Can't load module WTSI::DNAP::Warehouse::Schema];
-    }
 
     my %db_tags = ();
 
@@ -424,6 +420,8 @@ to tagsets and the expected tags.
 =item LWP::Simple
 
 =item JSON
+
+=item WTSI::DNAP::Warehouse::Schema
 
 =back
 
