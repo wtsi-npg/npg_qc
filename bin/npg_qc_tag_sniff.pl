@@ -11,7 +11,8 @@ use JSON;
 use WTSI::DNAP::Warehouse::Schema;
 
 # This URL returns a complete set of known tags in json format
-our $LIMS_TAGS_URL = q[https://sequencescape.psd.sanger.ac.uk/api/v2/tag_groups];
+my $LIMS_TAGS_URL=q[https://sequencescape.psd.sanger.ac.uk/api/v2/tag_groups] .
+                  q[?page%5Bnumber%5D=1&page%5Bsize%5D=500];
 
 ##no critic
 our $VERSION = '0';
