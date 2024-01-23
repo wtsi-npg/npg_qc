@@ -1,5 +1,14 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 72.0.0
+
+ - QC View sorting order to put merged lanes before unmerged.
+ - Simplify schema exclusions now the tables are gone
+ - Fix QC change doc to use transaction as intended
+ - Update tag sniff pod and deps
+ - Force one-page API response for tag sets
+ - Update README
+
 release 71.1.0
  - Updated DBIC ORM following the production MySQL database server upgrade
    to MySQL v8.+
