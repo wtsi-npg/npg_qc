@@ -875,17 +875,30 @@ subtest 'loading review and other results from path' => sub {
 };
 
 subtest 'loading partially defined results' => sub {
-  plan tests => 2;
+  plan tests => 4;
  
-  my $db = $db_helper->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
+  my $db = $db_helper->create_test_db(q[npg_qc::Schema]);
   my $db_loader = npg_qc::autoqc::db_loader->new(
     path    => ['t/data/autoqc/dbix_loader/short_results'],
     schema  => $db,
-    verbose => 0,
+    verbose => 0
   );
-  lives_ok { $db_loader->load() } 'no error loading an incomplete result';
+  lives_ok { $db_loader->load() }
+    'no error loading an incomplete genotype result';
   is ($db->resultset('Genotype')->search({})->count(), 1,
     'one genotype record is created');
+
+  $db_loader = npg_qc::autoqc::db_loader->new(
+    json_file =>
+      ['t/data/autoqc/pulldown_metrics/48367_2_2.pulldown_metrics.json'],
+    schema    => $db,
+    verbose   => 0
+  );
+  lives_ok { $db_loader->load() }
+    'no error loading an incomplete pulldown_metrics result';
+  is ($db->resultset('PulldownMetrics')->search({})->count(), 1,
+    'one genotype record is created');
+ 
 };
 
 1;
