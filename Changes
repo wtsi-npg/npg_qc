@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Ensured that retrieving values from a partially defined pulldown_metrics
+   result does not trigger an error. Added a test to demonstrate that such
+   result can be loaded to the database without problems.
+ - Updated the SeqQC summary display for pulldown_metrics incomplete results
+   so that just 'n/a' is displayed.
+
 release 72.0.0
 
  - QC View sorting order to put merged lanes before unmerged.

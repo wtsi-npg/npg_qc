@@ -6,7 +6,7 @@ use Readonly;
 our $VERSION = '0';
 ## no critic (Documentation::RequirePodAtEnd)
 
-Readonly::Scalar our $HUNDRED              => 100;
+Readonly::Scalar our $HUNDRED => 100;
 
 =head1 NAME
 
@@ -27,28 +27,27 @@ npg_qc::autoqc::role::pulldown_metrics
 =cut
 
 sub criterion {
-    my $self = shift;
-
     return q[Fail if on bait bases less than 20%];
 }
 
 =head2 bait_design_efficiency
 
- Target territory / bait territory. 1 == perfectly efficient, 0.5 = half of baited bases are not target. BAIT_DESIGN_EFFICIENCY in Picard metrics.
+ Picard metrics BAIT_DESIGN_EFFICIENCY: target territory / bait territory.
+ 1 == perfectly efficient, 0.5 = half of baited bases are not target.
 
 =cut
 
 sub bait_design_efficiency {
     my $self = shift;
     if ($self->bait_territory && defined $self->target_territory) {
-        return $self->target_territory/$self->bait_territory;
+        return $self->target_territory / $self->bait_territory;
     }
     return;
 }
 
 =head2 unique_reads_percent
 
- unique_reads_num / total_reads_num,  PCT_PF_UQ_READS in Picard metrics.
+ Picard metrics PCT_PF_UQ_READS: unique_reads_num / total_reads_num
 
 =cut
 
@@ -69,106 +68,120 @@ sub unique_reads_percent {
 sub unique_reads_aligned_percent {
     my $self = shift;
     if ($self->total_reads_num && defined $self->unique_reads_aligned_num) {
-        return ($self->unique_reads_aligned_num / $self->total_reads_num) * $HUNDRED;
+        return ($self->unique_reads_aligned_num /
+                $self->total_reads_num) * $HUNDRED;
     }
     return;
 }
 
 =head2 on_bait_reads_percent
 
- Picard metrics:
- PF_UQ_READS_ALIGNED_BAIT :      The number of PF unique reads that are aligned overlapping a bait by >= 1bp
+ Picard metrics PF_UQ_READS_ALIGNED_BAIT:
+ The number of PF unique reads that are aligned overlapping a bait by >= 1bp
 
 =cut
 
 sub on_bait_reads_percent {
     my $self = shift;
 
-      if ($self->total_reads_num && defined $self->other_metrics->{PF_UQ_READS_ALIGNED_BAIT}) {
-       return ($self->other_metrics->{PF_UQ_READS_ALIGNED_BAIT} / $self->total_reads_num) * $HUNDRED;
-      }
+    if (defined $self->other_metrics && $self->total_reads_num &&
+        defined $self->other_metrics->{PF_UQ_READS_ALIGNED_BAIT}) {
+        return ($self->other_metrics->{PF_UQ_READS_ALIGNED_BAIT} /
+                $self->total_reads_num) * $HUNDRED;
+    }
     return;
 }
 
 =head2 near_bait_reads_percent
 
-
-Picard metrics :
-PF_UQ_READS_ALIGNED_NEAR_BAIT: The number of PF unique reads that dont overlap a bait but align within 250bp
-                                of a bait.
+ Picard metrics PF_UQ_READS_ALIGNED_NEAR_BAIT:
+ The number of PF unique reads that dont overlap a bait but align within 250bp
+ of a bait.
 
 =cut
 
 sub near_bait_reads_percent {
     my $self = shift;
 
-    if ($self->total_reads_num && defined $self->other_metrics->{PF_UQ_READS_ALIGNED_NEAR_BAIT}) {
-        return ($self->other_metrics->{PF_UQ_READS_ALIGNED_NEAR_BAIT} / $self->total_reads_num) * $HUNDRED;
+    if (defined $self->other_metrics && $self->total_reads_num &&
+        defined $self->other_metrics->{PF_UQ_READS_ALIGNED_NEAR_BAIT}) {
+        return ($self->other_metrics->{PF_UQ_READS_ALIGNED_NEAR_BAIT} /
+                $self->total_reads_num) * $HUNDRED;
     }
     return;
 }
 
 =head2 on_target_reads_percent
 
-Picard metrics:
-PF_UQ_READS_ALIGNED_TARGET:    The number of PF unique reads that are aligned overlapping a target by >= 1bp
+ Picard metrics PF_UQ_READS_ALIGNED_TARGET:
+ The number of PF unique reads that are aligned overlapping a target by >= 1bp
 
 =cut
 
 sub on_target_reads_percent {
     my $self = shift;
 
-    if ($self->total_reads_num && defined $self->other_metrics->{PF_UQ_READS_ALIGNED_TARGET}) {
-        return ($self->other_metrics->{PF_UQ_READS_ALIGNED_TARGET} / $self->total_reads_num) * $HUNDRED;
+    if (defined $self->other_metrics && $self->total_reads_num &&
+        defined $self->other_metrics->{PF_UQ_READS_ALIGNED_TARGET}) {
+        return ($self->other_metrics->{PF_UQ_READS_ALIGNED_TARGET} /
+                $self->total_reads_num) * $HUNDRED;
     }
     return;
 }
 
 =head2 selected_bases_percent
 
- (on_bait_bases_num + near_bait_bases_num) / [PF_BASES, PCT_SELECTED_BASES] in Picard metrics.
+ (on_bait_bases_num + near_bait_bases_num) / [PF_BASES, PCT_SELECTED_BASES]
+ in Picard metrics.
 
 =cut
 
 sub selected_bases_percent {
     my $self= shift;
-    if ($self->picard_version_base_count && defined $self->on_bait_bases_num && defined $self->near_bait_bases_num) {
-        return (($self->on_bait_bases_num + $self->near_bait_bases_num) / $self->picard_version_base_count) * $HUNDRED;
+    if ($self->picard_version_base_count && defined $self->on_bait_bases_num &&
+        defined $self->near_bait_bases_num) {
+        return (($self->on_bait_bases_num + $self->near_bait_bases_num) /
+                 $self->picard_version_base_count) * $HUNDRED;
     }
     return;
 }
 
 =head2 on_bait_bases_percent
 
-The percentage of aligned, de-duped, on-bait bases out of the PF bases available. PCT_USABLE_BASES_ON_BAIT in Picard metrics
+ The percentage of aligned, de-duped, on-bait bases out of the PF bases
+ available. PCT_USABLE_BASES_ON_BAIT in Picard metrics
 
 =cut
 
 sub on_bait_bases_percent {
     my $self = shift;
     if($self->picard_version_base_count && defined $self->on_bait_bases_num) {
-        return ($self->on_bait_bases_num / $self->picard_version_base_count) * $HUNDRED;
+        return ($self->on_bait_bases_num /
+                $self->picard_version_base_count) * $HUNDRED;
     }
     return;
 }
 
 =head2 near_bait_bases_percent
 
-The percentage of aligned, de-duped, on-bait bases out of the PF bases available.
+ The percentage of aligned, de-duped, on-bait bases out of the PF bases
+ available.
 
 =cut
 
 sub near_bait_bases_percent {
     my $self = shift;
     if($self->picard_version_base_count && defined $self->near_bait_bases_num) {
-        return ($self->near_bait_bases_num / $self->picard_version_base_count) * $HUNDRED;
+        return ($self->near_bait_bases_num /
+                $self->picard_version_base_count) * $HUNDRED;
     }
     return;
 }
 
 =head2 off_bait_bases_percent
 
-The percentage of aligned PF bases that mapped neither on or near a bait. PCT_OFF_BAIT in Picard metrics
+ The percentage of aligned PF bases that mapped neither on or near a bait.
+ PCT_OFF_BAIT in Picard metrics
 
 =cut
 
@@ -182,7 +195,7 @@ sub off_bait_bases_percent {
 
 =head2 on_bait_vs_selected_percent
 
-ON_BAIT_VS_SELECTED in Picard metrics
+ ON_BAIT_VS_SELECTED in Picard metrics
 
 =cut
 
@@ -199,14 +212,16 @@ sub  on_bait_vs_selected_percent {
 
 =head2 on_target_bases_percent
 
-The percentage of aligned, de-duped, on-target bases out of the PF bases available. PCT_USABLE_BASES_ON_TARGET in Picard metrics
+ The percentage of aligned, de-duped, on-target bases out of the PF bases
+ available. PCT_USABLE_BASES_ON_TARGET in Picard metrics
 
 =cut
 
 sub on_target_bases_percent {
     my $self = shift;
     if ($self->picard_version_base_count && defined $self->on_target_bases_num) {
-        return ($self->on_target_bases_num / $self->picard_version_base_count) * $HUNDRED;
+        return ($self->on_target_bases_num /
+                $self->picard_version_base_count) * $HUNDRED;
     }
     return;
 }
@@ -232,11 +247,10 @@ sub zero_coverage_targets_percent {
 sub target_bases_coverage_percent {
     my $self = shift;
     my $tbc = {};
-    if ($self->other_metrics) {
-        my @keys = keys %{$self->other_metrics};
-        @keys = grep {/^PCT_TARGET_BASES/smx} @keys;
+    if (defined $self->other_metrics) {
+        my @keys = grep {/^PCT_TARGET_BASES/smx} keys %{$self->other_metrics};
         foreach my $key (@keys) {
-        my ($coverage) = $key =~ /_(\d+)X/smx;
+            my ($coverage) = $key =~ /_(\d+)X/smx;
             $tbc->{$coverage} = $self->other_metrics->{$key} * $HUNDRED;
         }
     }
@@ -246,8 +260,6 @@ sub target_bases_coverage_percent {
 =head2 bait_bases_coverage_percent
 
 Various increments between PCT_BAIT_BASES_1X and PCT_BAIT_BASES_1000X
-to be stored in npgqc pulldown_metrics.other_metrics
-
 Represents the fraction of bait bases with a depth of >= Nx
 
 PCT_BAIT_BASES_2X
@@ -260,9 +272,8 @@ PCT_BAIT_BASES_30X
 sub bait_bases_coverage_percent {
     my $self = shift;
     my $bbc = {};
-    if ($self->other_metrics) {
-        my @keys = keys %{$self->other_metrics};
-        @keys = grep {/^PCT_BAIT_BASES/smx} @keys;
+    if (defined $self->other_metrics) {
+        my @keys = grep {/^PCT_BAIT_BASES/smx} keys %{$self->other_metrics};
         foreach my $key (@keys) {
             # e.g. PCT_BAIT_BASES_30X
             # multiply by a 100 as is not already a percentage, despite the name
@@ -270,7 +281,6 @@ sub bait_bases_coverage_percent {
             $bbc->{$coverage} = $self->other_metrics->{$key} * $HUNDRED;
         }
     }
-
 
     return $bbc;
 }
@@ -283,9 +293,8 @@ sub bait_bases_coverage_percent {
 sub hs_penalty {
     my $self = shift;
     my $penalty = {};
-    if ($self->other_metrics) {
-        my @keys = keys %{$self->other_metrics};
-        @keys = grep {/^HS_PENALTY/smx} @keys;
+    if (defined $self->other_metrics) {
+        my @keys = grep {/^HS_PENALTY/smx} keys %{$self->other_metrics};
         foreach my $key (@keys) {
         my ($coverage) = $key =~ /_(\d+)X/smx;
             $penalty->{$coverage} = $self->other_metrics->{$key};
@@ -309,7 +318,9 @@ PF_BASES instead.
 
 sub picard_version_base_count {
     my $self = shift;
-    return (exists $self->other_metrics->{PF_BASES}) ? $self->other_metrics->{PF_BASES} : $self->unique_bases_aligned_num;
+    return
+        (defined $self->other_metrics && exists $self->other_metrics->{PF_BASES})
+        ? $self->other_metrics->{PF_BASES} : $self->unique_bases_aligned_num;
 }
 
 
