@@ -302,7 +302,7 @@ sub _command {
     if($self->ref_rrna){
         $ref_rrna_option = q[-bwa ] . $self->bwa_rrna . q[ -BWArRNA ]. $self->ref_rrna;
     }
-    my $command = $self->java_cmd. sprintf q[ -Xmx4000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
+    my $command = $self->java_cmd. sprintf q[ -Xmx8000m -XX:+UseSerialGC -XX:-UsePerfData -jar %s -s %s -o %s -r %s -t %s -ttype %d %s %s],
                                            $self->_java_jar_path,
                                            $self->_input_str,
                                            $self->rna_seqc_report_path,
