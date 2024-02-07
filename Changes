@@ -5,6 +5,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    result can be loaded to the database without problems.
  - Updated the SeqQC summary display for pulldown_metrics incomplete results
    so that just 'n/a' is displayed.
+ - autoqc rna seqqc max memory hardcoded limit increased to 8000MB
 
 release 72.0.0
 
