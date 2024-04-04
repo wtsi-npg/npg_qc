@@ -24,15 +24,11 @@ use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 
 use Getopt::Std;
-
+use Moose::Meta::Class;
 use Data::Dumper;
 use Carp;
 use Readonly;
 
-use Moose::Meta::Class;
-use npg_tracking::illumina::run::short_info;
-use npg_tracking::illumina::run::folder;
-use npg_tracking::illumina::run::long_info;
 use npg_qc::autoqc::checks::genotype;
 
 ##no critic
@@ -51,9 +47,9 @@ my @bam_file_list;
 my $ext = $opts{b}? q[bam]: q[cram];
 my $rpt_list = $opts{r};
 if($rpt_list) {
-	@bam_file_list = map { my ($r, $p, $t) = (split ":", $_); find_runlanefolder($r, $p, $t, $ext) or sprintf "irods:/seq/%d/%d_%d%s.%s", $r, $r, $p, $t? "#$t": "", $ext; } (split ";", $rpt_list);
+  @bam_file_list = map { my ($r, $p, $t) = (split ":", $_); sprintf "irods:/seq/%d/%d_%d%s.%s", $r, $r, $p, $t? "#$t": "", $ext; } (split ";", $rpt_list);
 
-	carp qq[bam_file_list:\n\t], join("\n\t", @bam_file_list), "\n";
+  carp qq[bam_file_list:\n\t], join("\n\t", @bam_file_list), "\n";
 }
 
 #######################################################
@@ -82,31 +78,31 @@ die "Usage: call_gtck_composite_rpt.pl [-h] -r <rpt_list> -s <sample_name> -p <p
 
 my $of;
 if($output_file) {
-	open $of, ">$output_file" or croak "Failed to open $output_file for output\n";
+  open $of, ">$output_file" or croak "Failed to open $output_file for output\n";
 }
 else {
-	$of = *STDOUT;
+  $of = *STDOUT;
 }
 
 my %attribs = (
-	sample_name => $sample_name,
-	alignments_in_bam => 1,
-	reference_fasta => $reference_genome,
-	input_files => [ (@bam_file_list) ],
+  sample_name => $sample_name,
+  alignments_in_bam => 1,
+  reference_fasta => $reference_genome,
+  input_files => [ (@bam_file_list) ],
 );
 if(defined $plex_name) {
-	$attribs{sequenom_plex} = $plex_name;
+  $attribs{sequenom_plex} = $plex_name;
 
-	$pos_snpname_map_filename ||= $gt_repos . q[/] . $plex_name . q[_chrpos_snpname_map_] . $chr_name_set . q[.tsv];
+  $pos_snpname_map_filename ||= $gt_repos . q[/] . $plex_name . q[_chrpos_snpname_map_] . $chr_name_set . q[.tsv];
 }
 if(defined $pos_snpname_map_filename) {
-	$attribs{pos_snpname_map_fn} = $pos_snpname_map_filename;
+  $attribs{pos_snpname_map_fn} = $pos_snpname_map_filename;
 }
 if(defined $poss_dup_level) {
-	$attribs{poss_dup_level} = $poss_dup_level;
+  $attribs{poss_dup_level} = $poss_dup_level;
 }
 if(defined $gt_exec_path) {
-	$attribs{genotype_executables_path} = $gt_exec_path;
+  $attribs{genotype_executables_path} = $gt_exec_path;
 }
 
 $attribs{rpt_list} = $rpt_list;
@@ -119,48 +115,12 @@ my $ret=$gtck->execute;
 
 my $result_string;
 if($json_gt) {
-	$result_string = $gtck->result->freeze;
+  $result_string = $gtck->result->freeze;
 }
 else {
-	$result_string = Dumper($gtck->result);
+  $result_string = Dumper($gtck->result);
 }
 
 print $of $result_string;
 
-sub find_runlanefolder {
-	my ($id_run, $lane, $tag_index, $ext) = @_;
-
-	# temporarily disable search for run folder (assumptions about its structure are out of date)
-	return;
-
-	# the methods hash ref passed to create_anon_class looks peculiar, but seems to be necessary to create a new object
-	#  from an anonymous class in this way
-        my $runfolder = Moose::Meta::Class->create_anon_class(
-          roles => [qw/npg_tracking::illumina::run::short_info
-                       npg_tracking::illumina::run::folder
-                       npg_tracking::illumina::run::long_info/],
-          methods => { runfolder_path => sub {}})
-	  ->new_object({id_run => $id_run});
-
-	my $rf;
-	eval {
-		$rf = $runfolder->runfolder_path;
-	};
-	if($rf) {
-		my $ls = $rf . q[/Latest_Summary];
-		die qq[Latest_summary link $ls not found] unless(-l $ls);
-
-		my $full_path =  sprintf "%s/archive/", $ls;
-		if($tag_index) {
-			$full_path .= sprintf "lane%d/%d_%d#%d.%s", $lane, $id_run, $lane, $tag_index, $ext;
-		}
-		else {
-			$full_path .= sprintf "%d_%d.%s", $id_run, $lane, $ext;
-		}
-
-		return $full_path;
-	}
-
-	return;
-}
-
+1;
