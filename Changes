@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Fixed the bug that was introduced while updating the SeqQC summary display
+   for pulldown_metrics incomplete results. The bug manifestation is a display
+   appearence of an unexpected raw mean depth value just before the coverage
+   value. All values that should be displayed were unaffected by the bug.
+
 release 72.0.1
  - Ensured that retrieving values from a partially defined pulldown_metrics
    result does not trigger an error. Added a test to demonstrate that such
