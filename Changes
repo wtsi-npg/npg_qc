@@ -1,5 +1,14 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 72.1.0
+ - Fixed the bug that was introduced while updating the SeqQC summary display
+   for pulldown_metrics incomplete results. The bug manifestation is a display
+   appearence of an unexpected raw mean depth value just before the coverage
+   value. All values that should be displayed were unaffected by the bug.
+ - Removed an unused part of the bin/call_gtck_composite_rpt.pl script.
+   This part contained the code that failed the compilation following the
+   deletion of the short_info role in wtsi-npg/npg_tracking#812
+
 release 72.0.1
  - Ensured that retrieving values from a partially defined pulldown_metrics
    result does not trigger an error. Added a test to demonstrate that such

@@ -425,7 +425,7 @@ END
 [% href='#pdmc_' _ result.id_run _ ':' _ result.position _ ':' _ result.tag_index %]
 
 [%- 
-    mcoverage;
+    mcoverage = -1;
     IF result.unique_bases_aligned_num.defined && result.unique_bases_aligned_num != 0;
       mcoverage = result.mean_target_coverage / (result.unique_bases_aligned_num / 1000000000);
     END;
@@ -439,7 +439,7 @@ END
     END;
     coverage = result.target_bases_coverage_percent.20 ? result.target_bases_coverage_percent.20 : 0; 
 -%]
-[% IF mcoverage.defined %]
+[% IF mcoverage >= 0 %]
 [% IF result.interval_files_identical.defined && result.interval_files_identical == 1 %]
 <span class="pdmc_na" title="Bait and target intervals identical"><a href="[% href %]">NA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NA<br/></a></span>
 <span class="dark_blue" title="On-bait bases %age"><a href="[% href %]">[% FILTER format('%2.2f');on_bait;END %]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></span>
