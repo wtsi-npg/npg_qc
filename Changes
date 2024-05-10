@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Removing Tidyp dependency from CI
+
 release 72.1.0
  - Fixed the bug that was introduced while updating the SeqQC summary display
    for pulldown_metrics incomplete results. The bug manifestation is a display
