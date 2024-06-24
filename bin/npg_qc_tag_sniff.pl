@@ -15,7 +15,7 @@ my $LIMS_TAGS_URL=q[https://sequencescape.psd.sanger.ac.uk/api/v2/tag_groups] .
                   q[?page%5Bnumber%5D=1&page%5Bsize%5D=500];
 
 ##no critic
-our $VERSION = '0';
+our $VERSION = '72.1.0';
 
 sub usage {
 
@@ -200,12 +200,12 @@ sub showTags{
                     if ($revcomp) {
                         # revcomp match AND we are looking for revcomp matches AND we are looking for revcomp matches on this tag
                         if (@{$revcomps} && $revcomps->[$i]) {
-                            $matches{$subtag}->{$id} = [$map_id,1,$original];
+			    $matches{$subtag}->[$i]->{$id} = [$map_id,1,$original];
                         }
                     } else {
                         # not a revcomp match AND we are not looking for revcomp matches or we are not looking for revcomp matches on this tag
                         if (!@{$revcomps} || !$revcomps->[$i]) {
-                            $matches{$subtag}->{$id} = [$map_id,0,$original];
+                            $matches{$subtag}->[$i]->{$id} = [$map_id,0,$original];
                         }
                     }
 
@@ -222,8 +222,8 @@ sub showTags{
         foreach my $i (0..$#subtags) {
             my $subtag = $subtags[$i];
             foreach my $id (sort {$a<=>$b} keys %{$groups[$i]}) {
-                if ( exists($matches{$subtag}->{$id}) ){
-                    my ($map_id, $revcomp, $original) = @{$matches{$subtag}->{$id}};
+                if ( exists($matches{$subtag}->[$i]->{$id}) ){
+                    my ($map_id, $revcomp, $original) = @{$matches{$subtag}->[$i]->{$id}};
                     print $revcomp ? REVERSE : q[];
                     printf "%2d(%3d %s) ", $id, $map_id, $original;
                     print $revcomp ? RESET : q[];
