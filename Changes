@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - docs
+  - automated creation/update of confluence pages for docs
+
 release 72.1.2 (2024-07-25)
  - handle cases where the same tag sequence is seen in both index reads
 
