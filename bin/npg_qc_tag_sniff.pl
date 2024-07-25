@@ -15,7 +15,7 @@ my $LIMS_TAGS_URL=q[https://sequencescape.psd.sanger.ac.uk/api/v2/tag_groups] .
                   q[?page%5Bnumber%5D=1&page%5Bsize%5D=500];
 
 ##no critic
-our $VERSION = '72.1.0';
+our $VERSION = '0';
 
 sub usage {
 
