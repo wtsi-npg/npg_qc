@@ -1,0 +1,33 @@
+stages:
+  - generate
+  - publish
+
+generate-job:
+  stage: generate
+  tags:
+    - autoscale
+  rules:
+    - if: $CI_COMMIT_BRANCH == "devel" || $CI_COMMIT_BRANCH == "master"
+        changes:
+          - docs/**/*
+  variables:
+    REPO_METADATA_FILE: docs/includes/repo-metadata.md
+  script: >
+    echo "Created from: [$CI_PROJECT_NAMESPACE / $CI_PROJECT_TITLE]($CI_PROJECT_URL) Version: $(git describe --always)" > "$REPO_METADATA_FILE"
+  artifacts:
+    paths:
+      - "$REPO_METADATA_FILE"
+
+mark-job:
+  stage: publish
+  rules:
+    - if: $CI_COMMIT_BRANCH == "devel" || $CI_COMMIT_BRANCH == "master"
+      changes:
+        - docs/**/*
+  image: wsinpg/mark:latest
+  tags:
+    - autoscale
+  script: >
+    for f in $(find . -name includes -type d -prune -o -name 'README*.md' -prune -o -name '*.md' -print0 | xargs -0); do
+      echo 'username = ""' && echo "password = '$CONFLUENCE_PERSONAL_ACCESS_TOKEN'" | mark -c /dev/stdin -b https://ssg-confluence.internal.sanger.ac.uk -f "$f" --trace;
+    done

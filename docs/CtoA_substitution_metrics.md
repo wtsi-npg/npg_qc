@@ -1,3 +1,20 @@
+<!-- Space: NPG -->
+<!-- Parent: Illumina Sequencing -->
+<!-- Title: C->A short read sequencing substitution metrics -->
+
+<!-- Macro: :box:([^:]+):([^:]*):(.+):
+     Template: ac:box
+     Icon: true
+     Name: ${1}
+     Title: ${2}
+     Body: ${3} -->
+
+:box:info:Note:This page is automatically generated; any edits will be overwritten:
+
+###### Repository information
+
+<!-- Include: includes/repo-metadata.md -->
+
 # C->A short read sequencing substitution metrics
 
 - Author - Irina Abnizova
