@@ -1,5 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 72.1.2 (2024-08-05)
+ - handle cases where the same tag sequence is seen in both index reads
+
 release 72.1.1 (2024-05-24)
  - Removing Tidyp dependency from CI
 
