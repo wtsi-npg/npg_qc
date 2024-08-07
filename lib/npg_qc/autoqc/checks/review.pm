@@ -219,6 +219,43 @@ npg_tracking::util::pipeline_config
 A method. Returns the path of the product configuration file.
 Inherited from npg_tracking::util::pipeline_config
 
+=head2 runfolder_path
+
+The runfolder path, an optional attribute. In case of complex products
+(multi-component compositions) is only relevant if all components belong
+to the same sequencing run. This attribute is used to retrieve information
+from RunInfo.xml and {r,R}unParameters.xml files. Some 'robo' configuration
+might not require information of this nature, thus the attribute is optional.
+If the information from the above-mentioned files is required, but the access
+to the staging run folder is not available, the check cannot be run.
+
+=cut
+
+has 'runfolder_path' => (
+  isa => 'Str',
+  is  => 'ro',
+  required => 0,
+  predicate => 'has_runfolder_path',
+);
+
+
+=head2 BUILD
+
+A method that is run before returning the new object instance to the caller.
+Errors if any attributes of the object are are in conflict.
+
+=cut
+
+sub BUILD {
+  my $self = shift;
+  if ($self->has_runfolder_path && !$self->get_id_run) {
+    my $m = sprintf
+      'Product defined by rpt list %s does not belong to a single run.',
+      $self->rpt_list;
+    croak "$m 'runfolder_path' attribute should not be set.";
+  }
+}
+
 =head2 can_run
 
 Returns true if the check can be run, meaning a robo configuration
@@ -764,7 +801,7 @@ Marina Gourtovaia
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019,2020 Genome Research Ltd.
+Copyright (C) 2019,2020,2024 Genome Research Ltd.
 
 This file is part of NPG.
 

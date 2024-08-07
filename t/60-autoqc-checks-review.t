@@ -31,8 +31,8 @@ my $criteria_list = [
   'verify_bam_id.freemix < 0.01'
 ];
 
-subtest 'construction object, deciding whether to run' => sub {
-  plan tests => 27;
+subtest 'constructing object, deciding whether to run' => sub {
+  plan tests => 29;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -40,6 +40,21 @@ subtest 'construction object, deciding whether to run' => sub {
     rpt_list  => '27483:1:2');
   isa_ok ($check, 'npg_qc::autoqc::checks::review');
   isa_ok ($check->result, 'npg_qc::autoqc::results::review');
+
+  lives_ok { npg_qc::autoqc::checks::review->new(
+    conf_path      => $test_data_dir,
+    qc_in          => $test_data_dir,
+    runfolder_path => $test_data_dir,
+    rpt_list       => '27483:1:2;27483:2:2')
+  } 'object created OK for components from the same run';
+  throws_ok { npg_qc::autoqc::checks::review->new(
+    conf_path      => $test_data_dir,
+    qc_in          => $test_data_dir,
+    runfolder_path => $test_data_dir,
+    rpt_list       => '27483:1:2;27484:2:2')
+  } qr/'runfolder_path' attribute should not be set/,
+    'error creating an object for components from different runs';
+
   my $can_run;
   warnings_like { $can_run = $check->can_run }
     [qr/Study config not found for/],
