@@ -156,8 +156,9 @@ subtest 'constructing object, deciding whether to run' => sub {
     conf_path => "$test_data_dir/with_na_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  ok ($check->can_run, 'can_run returns true');
-  ok (!$check->result->comments, 'No comments logged');
+  ok (!$check->can_run, 'can_run returns false');
+  is ($check->result->comments, 'None of the applicability criteria is satisfied',
+    'Comment logged');
 };
 
 subtest 'caching appropriate criteria object' => sub {
@@ -195,7 +196,7 @@ subtest 'execute when no criteria apply' => sub {
   lives_ok { $check->execute }
     'no error in execute when no criteria apply';
   my $result = $check->result;
-  is ($result->comments, 'RoboQC is not applicable',
+  is ($result->comments, 'None of the applicability criteria is satisfied',
     'correct comment logged');
   is_deeply ($result->criteria, {}, 'empty criteria hash');
   is_deeply ($result->qc_outcome, {}, 'empty qc_outcome hash');
@@ -413,7 +414,7 @@ subtest 'evaluation within the execute method' => sub {
     qc_in     => $dir,
     rpt_list  => $rpt_list
   );
-  ok ($o->can_run, 'the check can be run');
+  ok (!$o->can_run, 'the check cannot be run');
   is_deeply($o->_criteria, {}, 'no criteria to evaluate');
   lives_ok { $o->execute } 'execute method runs OK';
   is ($o->result->pass, undef, 'result pass attribute is unset');

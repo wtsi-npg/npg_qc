@@ -267,10 +267,22 @@ for this product exists.
 
 sub can_run {
   my $self = shift;
-  (keys %{$self->_robo_config()}) and return 1;
-  $self->result->add_comment(
-    'Product configuration for RoboQC is absent');
-  return 0;
+  if (!keys %{$self->_robo_config}) {
+    $self->result->add_comment('Product configuration for RoboQC is absent');
+    return 0;
+  }
+  my $num_criteria;
+  try {
+    $num_criteria = @{$self->_applicable_criteria};
+  } catch {
+    $self->result->add_comment("Error validating RoboQC criteria: $_");
+  };
+  if (!$num_criteria) {
+    $self->result->add_comment('None of the applicability criteria is satisfied');
+    return 0;
+  }
+
+  return 1;
 }
 
 =head2 execute
@@ -476,9 +488,15 @@ sub _validate_criteria {
   return;
 }
 
-sub _applicability_all {
-  my ($self, $criteria_objs) = @_;
+has '_applicable_criteria' => (
+  isa        => 'ArrayRef',
+  is         => 'ro',
+  lazy_build => 1,
+);
+sub _build__applicable_criteria {
+  my $self = shift;
 
+  my $criteria_objs = $self->_robo_config->{$CRITERIA_KEY};
   my @applicable = ();
   foreach my $co ( @{$criteria_objs} ) {
     my $c_applicable = 1;
@@ -538,23 +556,19 @@ sub _build__criteria {
   $lib_type or croak 'Library type is not defined for ' .  $self->_entity_desc;
   $self->result->library_type($lib_type);
 
-  my $criteria_objs = $self->_robo_config->{$CRITERIA_KEY};
-  $criteria_objs = $self->_applicability_all($criteria_objs);
-  # Criteria objects with no lims criteria defined should be returned
-  # in the above array. An empty array means that all objects had lims
-  # criteria and none of them was satisfied.
-  @{$criteria_objs} or return {};
-
-  (@{$criteria_objs} == 1) or carp 'Multiple criteria sets are satisfied ' .
-    'in a robo config for ' . $self->_entity_desc;
-
+  my $num_criteria = scalar @{$self->_applicable_criteria};
+  if ($num_criteria == 0) {
+    return {};
+  } elsif ($num_criteria > 1) {
+    croak 'Multiple criteria sets are satisfied in a robo config';
+  }
   #####
   # A very simple criteria format - a list of strings - is used for now.
   # Each string represents a math expression. It is assumed that the
   # conjunction operator should be used to form the boolean expression
   # that should give the result of the evaluation.
   #
-  my @c = uniq sort @{$criteria_objs->[0]->{$ACCEPTANCE_CRITERIA_KEY}};
+  my @c = uniq sort @{$self->_applicable_criteria->[0]->{$ACCEPTANCE_CRITERIA_KEY}};
 
   return @c ? {$CONJUNCTION_OP => \@c} : {};
 }
