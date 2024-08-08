@@ -1,8 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
- - To enable access to information about a sequencing run (from RunInfo.xml,
-   {r,R}unParameters.xml), added an optional 'runfolder_path' attribute to
-   the review check. The attribute will have to be set by the caller.
+ - npg_qc::autoqc::check::review:
+   1. To enable access to information about a sequencing run (from RunInfo.xml,
+      {r,R}unParameters.xml), added an optional 'runfolder_path' attribute.
+      The attribute will have to be set by the caller.
+   2. Added a new applicability criteria type - 'sequencing_run'
 
 release 72.1.2 (2024-08-05)
  - handle cases where the same tag sequence is seen in both index reads
