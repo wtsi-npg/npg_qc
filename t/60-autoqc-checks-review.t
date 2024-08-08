@@ -19,6 +19,7 @@ use_ok('npg_qc::autoqc::checks::review');
 my $dir = tempdir( CLEANUP => 1 );
 my $test_data_dir = 't/data/autoqc/review';
 my $conf_file_path = "$test_data_dir/product_release.yml";
+my $rf_path = 't/data/autoqc/200117_A00715_0080_BHY7T3DSXX';
 
 local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_27483.csv';
@@ -108,10 +109,10 @@ subtest 'constructing object, deciding whether to run' => sub {
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   throws_ok { $check->can_run }
-    qr/should have the acceptance_criteria key defined/,
+    qr/should have both the applicability_criteria and acceptance_criteria key/,
     'error in can_run when acceptance criteria not defined';
   throws_ok { $check->execute }
-    qr/should have the acceptance_criteria key defined/,
+    qr/should have both the applicability_criteria and acceptance_criteria key/,
     'error in execute when acceptance criteria not defined';
   
   $check = npg_qc::autoqc::checks::review->new(
@@ -119,11 +120,11 @@ subtest 'constructing object, deciding whether to run' => sub {
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   throws_ok { $check->can_run }
-    qr/should have the applicability_criteria key defined/,
+    qr/should have both the applicability_criteria and acceptance_criteria key/,
     'error in can_run when applicability criteria not defined ' .
     'in one of multiple criterium objects';
   throws_ok { $check->execute }
-    qr/should have the applicability_criteria key defined/,
+    qr/should have both the applicability_criteria and acceptance_criteria key/,
     'error in execute when applicability criteria not defined ' .
     'in one of multiple criterium objects';
 
@@ -399,15 +400,28 @@ subtest 'single expression evaluation' => sub {
 };
 
 subtest 'evaluation within the execute method' => sub {
-  plan tests => 38;
+  plan tests => 42;
 
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
 
+  # NovaSeq run is required, MiSeq is given
+  my $o = npg_qc::autoqc::checks::review->new(
+    runfolder_path => 't/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2',
+    conf_path => $test_data_dir,
+    qc_in     => $dir,
+    rpt_list  => $rpt_list
+  );
+  ok ($o->can_run, 'the check can be run');
+  is_deeply($o->_criteria, {}, 'no criteria to evaluate');
+  lives_ok { $o->execute } 'execute method runs OK';
+  is ($o->result->pass, undef, 'result pass attribute is unset');
+
   my @check_objects = ();
 
   push @check_objects, npg_qc::autoqc::checks::review->new(
+    runfolder_path => $rf_path,
     conf_path => $test_data_dir,
     qc_in     => $dir,
     rpt_list  => $rpt_list);
@@ -465,6 +479,7 @@ subtest 'evaluation within the execute method' => sub {
 
     $check = npg_qc::autoqc::checks::review->new(
       final_qc_outcome => 1,
+      runfolder_path  => $rf_path,
       conf_path       => $test_data_dir,
       qc_in           => $dir,
       rpt_list        => $rpt_list);
@@ -501,6 +516,7 @@ subtest 'error in evaluation' => sub {
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2'; 
 
   my $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path   => $rf_path,
     conf_path        => $test_data_dir,
     qc_in            => $dir,
     rpt_list         => $rpt_list,
@@ -510,6 +526,7 @@ subtest 'error in evaluation' => sub {
     'final outcome - not capturing the error';
 
   $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path   => $rf_path,
     conf_path        => $test_data_dir,
     qc_in            => $dir,
     rpt_list         => $rpt_list,

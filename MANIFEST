@@ -697,6 +697,7 @@ t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/RunInfo.xml
 t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/runParameters.xml
 t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/InterOp/TileMetricsOut.bin
 t/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2/InterOp/TileMetricsOut.bin
+t/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2/RunParameters.xml
 t/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2/RunInfo.xml
 t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/InterOp/TileMetricsOut.bin
 t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/InterOp/ExtendedTileMetricsOut.bin
