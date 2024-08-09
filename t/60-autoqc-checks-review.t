@@ -58,11 +58,10 @@ subtest 'constructing object, deciding whether to run' => sub {
 
   my $can_run;
   warnings_like { $can_run = $check->can_run }
-    [qr/Study config not found for/],
+    [qr/Study config not found/, qr/RoboQC configuration is absent/],
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no study config');
-  is ($check->result->comments,
-    'Product configuration for RoboQC is absent',
+  like ($check->result->comments, qr/RoboQC configuration is absent/,
     'reason logged');
   lives_ok { $check->execute() } 'cannot run, but execute method runs OK';
   is ($check->result->pass, undef,
@@ -75,11 +74,10 @@ subtest 'constructing object, deciding whether to run' => sub {
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   warnings_like { $can_run = $check->can_run }
-    [qr/robo_qc section is not present for/],
+    [qr/robo_qc section is not present for/, qr/Review check cannot be run/],
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no robo config');
-  is ($check->result->comments,
-    'Product configuration for RoboQC is absent',
+  is ($check->result->comments, 'RoboQC configuration is absent',
     'reason logged');
 
   $check = npg_qc::autoqc::checks::review->new(
@@ -157,7 +155,8 @@ subtest 'constructing object, deciding whether to run' => sub {
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   ok (!$check->can_run, 'can_run returns false');
-  is ($check->result->comments, 'None of the applicability criteria is satisfied',
+  is ($check->result->comments,
+    'None of the RoboQC applicability criteria is satisfied',
     'Comment logged');
 };
 
@@ -196,7 +195,8 @@ subtest 'execute when no criteria apply' => sub {
   lives_ok { $check->execute }
     'no error in execute when no criteria apply';
   my $result = $check->result;
-  is ($result->comments, 'None of the applicability criteria is satisfied',
+  is ($result->comments,
+    'None of the RoboQC applicability criteria is satisfied',
     'correct comment logged');
   is_deeply ($result->criteria, {}, 'empty criteria hash');
   is_deeply ($result->qc_outcome, {}, 'empty qc_outcome hash');

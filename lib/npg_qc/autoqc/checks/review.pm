@@ -260,29 +260,41 @@ sub BUILD {
 
 =head2 can_run
 
-Returns true if the check can be run, meaning a robo configuration
-for this product exists.
+Returns true if the check can be run, ie a valid RoboQC configuration exists
+and one of the applicability criteria is satisfied for this product.
 
 =cut
 
 sub can_run {
   my $self = shift;
+
+  my $can_run = 1;
+  my $message;
+
   if (!keys %{$self->_robo_config}) {
-    $self->result->add_comment('Product configuration for RoboQC is absent');
-    return 0;
-  }
-  my $num_criteria;
-  try {
-    $num_criteria = @{$self->_applicable_criteria};
-  } catch {
-    $self->result->add_comment("Error validating RoboQC criteria: $_");
-  };
-  if (!$num_criteria) {
-    $self->result->add_comment('None of the applicability criteria is satisfied');
-    return 0;
+    $message = 'RoboQC configuration is absent';
+    $can_run = 0;
+  } else {
+    my $num_criteria;
+    try {
+      $num_criteria = @{$self->_applicable_criteria};
+    } catch {
+      $message = "Error validating RoboQC criteria: $_";
+      $can_run = 0;
+    };
+    if ($can_run && !$num_criteria) {
+      $message = 'None of the RoboQC applicability criteria is satisfied';
+      $can_run = 0;
+    }
   }
 
-  return 1;
+  if (!$can_run && $message) {
+    $self->result->add_comment($message);
+    carp sprintf 'Review check cannot be run for %s . Reason: %s',
+      $self->_entity_desc, $message;
+  }
+
+  return $can_run;
 }
 
 =head2 execute
