@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<RunParameters xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" LineWashRequired="false" UseModuleRecipe="false">
+  <RunParametersVersion>MiSeq_1_3</RunParametersVersion>
+  <FlowcellRFIDTag>
+    <SerialNumber>000000000-LMK9T</SerialNumber>
+    <PartNumber>15028382</PartNumber>
+    <ExpirationDate>2025-05-02T00:00:00</ExpirationDate>
+    <LotNumber>20852102</LotNumber>
+  </FlowcellRFIDTag>
+  <PR2BottleRFIDTag>
+    <SerialNumber>MS1227233-00PR2</SerialNumber>
+    <PartNumber>15041807</PartNumber>
+    <ExpirationDate>2025-05-17T00:00:00</ExpirationDate>
+    <LotNumber>20855811</LotNumber>
+  </PR2BottleRFIDTag>
+  <ReagentKitRFIDTag>
+    <SerialNumber>MS2060060-050V2</SerialNumber>
+    <PartNumber>15033571</PartNumber>
+    <ExpirationDate>2024-11-16T00:00:00</ExpirationDate>
+    <LotNumber>20829667</LotNumber>
+  </ReagentKitRFIDTag>
+  <Resumable>true</Resumable>
+  <PercentTilesToScan>0</PercentTilesToScan>
+  <ManifestFiles />
+  <AfterRunWashMethod>Post-Run Wash</AfterRunWashMethod>
+  <Setup>
+    <SupportMultipleSurfacesInUI>true</SupportMultipleSurfacesInUI>
+    <ApplicationVersion>4.1.0.656</ApplicationVersion>
+    <NumTilesPerSwath>14</NumTilesPerSwath>
+    <NumSwaths>1</NumSwaths>
+    <NumLanes>1</NumLanes>
+    <ApplicationName>MiSeq Control Software</ApplicationName>
+  </Setup>
+  <RunID>240806_MS7_49308_A_MS2060060-050V2</RunID>
+  <ScannerID>M02088</ScannerID>
+  <RunNumber>19</RunNumber>
+  <FPGAVersion>9.5.12</FPGAVersion>
+  <MCSVersion>4.1.0.656</MCSVersion>
+  <RTAVersion>1.18.54</RTAVersion>
+  <Barcode>000000000-LMK9T</Barcode>
+  <PR2BottleBarcode>MS1227233-00PR2</PR2BottleBarcode>
+  <ReagentKitPartNumberEntered>15033571</ReagentKitPartNumberEntered>
+  <ReagentKitVersion>Version2</ReagentKitVersion>
+  <ReagentKitBarcode>MS2060060-050V2</ReagentKitBarcode>
+  <PreviousPR2BottleBarcode />
+  <PreviousReagentKitBarcode />
+  <ExperimentName>49308</ExperimentName>
+  <RunDescription />
+  <LibraryPrepKit>Custom</LibraryPrepKit>
+  <IndexKit>Custom</IndexKit>
+  <Chemistry>Default</Chemistry>
+  <Username>sbsUser</Username>
+  <EnableAnalysis>false</EnableAnalysis>
+  <Reads>
+    <RunInfoRead Number="1" NumCycles="20" IsIndexedRead="N" />
+    <RunInfoRead Number="2" NumCycles="8" IsIndexedRead="Y" />
+  </Reads>
+  <TempFolder>D:\Illumina\MiSeqTemp\240806_MS7_49308_A_MS2060060-050V2</TempFolder>
+  <RTATempFolder>D:\Illumina\RTATemp\240806_MS7_49308_A_MS2060060-050V2</RTATempFolder>
+  <AnalysisFolder>D:\Illumina\MiSeqAnalysis\240806_MS7_49308_A_MS2060060-050V2</AnalysisFolder>
+  <RunStartDate>240806</RunStartDate>
+  <MostRecentWashType>MissedPostRunWash</MostRecentWashType>
+  <RecipeFolder>C:\ProgramData\Illumina\MiSeq Control Software\Recipe</RecipeFolder>
+  <ILMNOnlyRecipeFolder>C:\Program Files\Illumina\MiSeq Control Software\Recipe</ILMNOnlyRecipeFolder>
+  <SampleSheetName>MS2060060-50V2</SampleSheetName>
+  <SampleSheetFolder>\\ms7-esa.dnapipelines.sanger.ac.uk\staging\IL_seq_data\samplesheets</SampleSheetFolder>
+  <SampleSheetFilePath>\\ms7-esa.dnapipelines.sanger.ac.uk\staging\IL_seq_data\samplesheets\MS2060060-50V2.csv</SampleSheetFilePath>
+  <ManifestFolder>D:\Illumina\MiSeq Control Software\Manifests</ManifestFolder>
+  <OutputFolder>\\ms7-esa.dnapipelines.sanger.ac.uk\staging\IL_seq_data\incoming\240806_MS7_49308_A_MS2060060-050V2</OutputFolder>
+  <FocusMethod>AutoFocus</FocusMethod>
+  <SurfaceToScan>Both</SurfaceToScan>
+  <SaveFocusImages>false</SaveFocusImages>
+  <SaveScanImages>true</SaveScanImages>
+  <RunManagementType>SampleSheet</RunManagementType>
+  <BaseSpaceRunId>283641369</BaseSpaceRunId>
+  <CloudRunId>283641369</CloudRunId>
+  <DxRuoRunType>Ruo</DxRuoRunType>
+  <SelectedRun>49308</SelectedRun>
+  <ModuleName>GenerateFastQWorkflow</ModuleName>
+  <ModuleVersion>3.0.1.49</ModuleVersion>
+  <DxUserName />
+  <DxUserLevel />
+  <BaseSpaceMode>IpdRequested</BaseSpaceMode>
+  <ManualFlowcellEntry>false</ManualFlowcellEntry>
+  <ManualReagentEntry>false</ManualReagentEntry>
+  <ManualPR2Entry>false</ManualPR2Entry>
+  <CopyServiceRunId>1B94042F8DE72858</CopyServiceRunId>
+  <LocalRunManagerRunId>18019</LocalRunManagerRunId>
+</RunParameters>
