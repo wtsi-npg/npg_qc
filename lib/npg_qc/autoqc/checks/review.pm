@@ -58,24 +58,26 @@ npg_qc::autoqc::checks::review
 This checks evaluates the results of other autoqc checks
 against a predefined set of criteria.
 
-If data product acceptance criteria for a project are defined, it
-is possible to introduce a degree of automation into the manual
-QC process. To provide interoperability with the API supporting
-the manual QC process, the outcome of the evaluation, which is
-performed by this check, is recorded not only as a simple undefined,
-pass or fail as in other autoqc checks, but also as one of valid
-manual or user QC outcomes.
+If data product acceptance criteria are defined, it is possible to
+introduce a degree of automation into the manual QC process. To
+provide interoperability with the API supporting the manual QC process,
+the outcome of the evaluation, which is performed by this check, is
+recorded not only as a simple undefined, pass or fail as in other autoqc
+checks, but also as one of valid manual or user QC outcomes.
 
 =head2 Types of criteria
 
-The robo section of the product configuration file sits within
-the configuration for a particular study. Evaluation criteria for
-samples in the same study might vary depending on the sequencing
+The robo section of the product configuration file sits either
+within the configuration for a particular study or in the default
+section, or in both locations. A study-specific RoboQC definition
+takes precedence over the default one.
+
+Evaluation criteria for samples vary depending on the sequencing
 instrument type, library type, sample type, etc. There might be a
 need to exclude some samples from RoboQC. The criteria key of the
-robo configuration points to an array of criteria objects each of
-which contains two further keys, one for acceptance and one for
-applicability criteria. The acceptance criteria are evaluated
+robo configuration points to an array of criteria objects. Each of
+the criteria contains two further keys, one for acceptance and one
+for applicability criteria. The acceptance criteria are evaluated
 if either the applicability criteria have been satisfied or no
 applicability criteria are defined.
 
@@ -84,8 +86,10 @@ set in such a way that the order of evaluation of the criteria
 array does not matter. If applicability criteria in all of the
 criteria objects are not satisfied, no QC outcome is assigned
 and the pass attribute of the review result object remains unset.
-Within a study the product can satisfy applicability criteria
-in at most one criteria object.
+The product can satisfy applicability criteria in at most one
+criteria object. If none of the study-specific applicability
+criteria are satisfied, the review check does not proceed even if
+the product might satisfy one of the default applicability criteria.
 
 =head2 QC outcomes
 
@@ -455,22 +459,23 @@ sub _build__robo_config {
 
   my $strict = 1; # Parse study section only, ignore the default section.
   my $config = $self->study_config($self->lims(), $strict);
-  if ($config and keys %{$config}) {
+  if ($config) {
     $config = $config->{$ROBO_KEY};
-    $config or carp
-      "$ROBO_KEY section is not present for " . $self->_entity_desc;
-    if ($config) {
-      (ref $config eq 'HASH') or croak
-        'Robo config should be a hash in a config for ' . $self->_entity_desc;
-      if (keys %{$config}) {
-        $self->_validate_criteria($config);
-      } else {
-        carp 'Robo section of the product config is empty for ' .
-          $self->_entity_desc;
-      }
+  }
+
+  if (!$config) {
+    carp 'Study-specific RoboQC config not found for ' . $self->_entity_desc;
+    $config = $self->default_study_config()->{$ROBO_KEY};
+  }
+
+  if ($config) {
+    (ref $config eq 'HASH') or croak
+      'Robo config should be a hash in a config for ' . $self->_entity_desc;
+    if (keys %{$config}) {
+      $self->_validate_criteria($config);
+    } else {
+      carp 'RoboQC section of the product config file is empty';
     }
-  } else {
-    carp 'Study config not found for ' . $self->_entity_desc;
   }
 
   $config ||= {};

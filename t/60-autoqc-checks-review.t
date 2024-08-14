@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -58,7 +58,7 @@ subtest 'constructing object, deciding whether to run' => sub {
 
   my $can_run;
   warnings_like { $can_run = $check->can_run }
-    [qr/Study config not found/, qr/RoboQC configuration is absent/],
+    [qr/Study-specific RoboQC config not found/, qr/RoboQC configuration is absent/],
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no study config');
   like ($check->result->comments, qr/RoboQC configuration is absent/,
@@ -74,7 +74,7 @@ subtest 'constructing object, deciding whether to run' => sub {
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
   warnings_like { $can_run = $check->can_run }
-    [qr/robo_qc section is not present for/, qr/Review check cannot be run/],
+    [qr/Study-specific RoboQC config not found/, qr/Review check cannot be run/],
     'can_run is accompanied by warnings';
   ok (!$can_run, 'can_run returns false - no robo config');
   is ($check->result->comments, 'RoboQC configuration is absent',
@@ -498,6 +498,54 @@ subtest 'evaluation within the execute method' => sub {
     is ($outcome->{'username'}, 'robo_qc', 'correct process id');
     ok ($outcome->{'timestamp'}, 'timestamp saved');
   }  
+};
+
+subtest 'study-specific vs default robo definition' => sub {
+  plan tests => 11;
+
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
+    't/data/autoqc/review/samplesheet_29524.csv';
+  my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
+
+  # robo config in the default section only
+  my $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $rf_path,
+    conf_path => "$test_data_dir/default_section",
+    qc_in     => $test_data_dir,
+    rpt_list  => $rpt_list
+  );
+  ok ($check->can_run, 'the check can run');
+  lives_ok { $check->execute } 'execute method runs OK';
+  is ($check->result->pass, 1, 'result pass attribute is set to 1');
+  my %expected = map { $_ => 1 } @{$criteria_list};
+  is_deeply ($check->result->evaluation_results(), \%expected,
+    'evaluation results are saved');
+  is ($check->result->qc_outcome->{'mqc_outcome'} , 'Accepted preliminary',
+    'correct outcome string');
+
+  # robo config in the default section and in the study section (empty)
+  $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $rf_path,
+    conf_path => "$test_data_dir/default_and_study_section",
+    qc_in     => $test_data_dir,
+    rpt_list  => $rpt_list
+  );
+  ok ($check->can_run, 'the check cannot run');
+
+  # invalid robo config in the default section, valid in the study section
+  $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $rf_path,
+    conf_path => "$test_data_dir/wrong_default_and_study_section",
+    qc_in     => $test_data_dir,
+    rpt_list  => $rpt_list
+  );
+  ok ($check->can_run, 'the check can run');
+  lives_ok { $check->execute } 'execute method runs OK';
+  is ($check->result->pass, 1, 'result pass attribute is set to 1');
+  is_deeply ($check->result->evaluation_results(), \%expected,
+    'evaluation results are saved');
+  is ($check->result->qc_outcome->{'mqc_outcome'} , 'Accepted preliminary',
+    'correct outcome string');
 };
 
 subtest 'error in evaluation' => sub {

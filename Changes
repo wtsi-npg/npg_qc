@@ -7,6 +7,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    2. Added a new applicability criteria type - 'sequencing_run'
    3. To avoid running the review check unnecessarily in the pipeline context,
       moved ROBO criteria validation to the can_run method.
+   4. Introduced an option of defining the ROBO section within the default
+      section of the product configuration file.
 
 release 72.1.2 (2024-08-05)
  - handle cases where the same tag sequence is seen in both index reads
