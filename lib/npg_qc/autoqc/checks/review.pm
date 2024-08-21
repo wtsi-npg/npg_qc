@@ -86,6 +86,7 @@ set in such a way that the order of evaluation of the criteria
 array does not matter. If applicability criteria in all of the
 criteria objects are not satisfied, no QC outcome is assigned
 and the pass attribute of the review result object remains unset.
+
 The product can satisfy applicability criteria in at most one
 criteria object. If none of the study-specific applicability
 criteria are satisfied, the review check does not proceed even if
