@@ -11,6 +11,7 @@ use Try::Tiny;
 
 use WTSI::DNAP::Utilities::Timestamp qw/create_current_timestamp/;
 use st::api::lims;
+use npg_tracking::illumina::runfolder;
 use npg_qc::autoqc::qc_store;
 use npg_qc::Schema::Mqc::OutcomeDict;
 
@@ -26,6 +27,8 @@ Readonly::Scalar my $ROBO_KEY         => q[robo_qc];
 Readonly::Scalar my $CRITERIA_KEY     => q[criteria];
 Readonly::Scalar my $QC_TYPE_KEY      => q[qc_type];
 Readonly::Scalar my $APPLICABILITY_CRITERIA_KEY => q[applicability_criteria];
+Readonly::Scalar my $LIMS_APPLICABILITY_CRITERIA_KEY => q[lims];
+Readonly::Scalar my $SEQ_APPLICABILITY_CRITERIA_KEY => q[sequencing_run];
 Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
 
 Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
@@ -71,18 +74,18 @@ samples in the same study might vary depending on the sequencing
 instrument type, library type, sample type, etc. There might be a
 need to exclude some samples from RoboQC. The criteria key of the
 robo configuration points to an array of criteria objects each of
-which could contain two further keys, one for acceptance and one
-for applicability criteria. The acceptance criteria are evaluated
+which contains two further keys, one for acceptance and one for
+applicability criteria. The acceptance criteria are evaluated
 if either the applicability criteria have been satisfied or no
 applicability criteria are defined.
 
 The applicability criteria for each criteria object should be
 set in such a way that the order of evaluation of the criteria
 array does not matter. If applicability criteria in all of the
-criteria objects fail are not satisfied, no QC outcome is assigned
+criteria objects are not satisfied, no QC outcome is assigned
 and the pass attribute of the review result object remains unset.
-The product cannot satisfy applicability criteria in more than one
-criteria object, this is considered an error.
+Within a study the product can satisfy applicability criteria
+in at most one criteria object.
 
 =head2 QC outcomes
 
@@ -238,7 +241,6 @@ has 'runfolder_path' => (
   predicate => 'has_runfolder_path',
 );
 
-
 =head2 BUILD
 
 A method that is run before returning the new object instance to the caller.
@@ -258,22 +260,47 @@ sub BUILD {
 
 =head2 can_run
 
-Returns true if the check can be run, meaning a robo configuration
-for this product exists.
+Returns true if the check can be run, ie a valid RoboQC configuration exists
+and one of the applicability criteria is satisfied for this product.
 
 =cut
 
 sub can_run {
   my $self = shift;
-  (keys %{$self->_robo_config()}) and return 1;
-  $self->result->add_comment(
-    'Product configuration for RoboQC is absent');
-  return 0;
+
+  my $can_run = 1;
+  my $message;
+
+  if (!keys %{$self->_robo_config}) {
+    $message = 'RoboQC configuration is absent';
+    $can_run = 0;
+  } else {
+    my $num_criteria;
+    try {
+      $num_criteria = @{$self->_applicable_criteria};
+    } catch {
+      $message = "Error validating RoboQC criteria: $_";
+      $can_run = 0;
+    };
+    if ($can_run && !$num_criteria) {
+      $message = 'None of the RoboQC applicability criteria is satisfied';
+      $can_run = 0;
+    }
+  }
+
+  if (!$can_run && $message) {
+    $self->result->add_comment($message);
+    carp sprintf 'Review check cannot be run for %s . Reason: %s',
+      $self->_entity_desc, $message;
+  }
+
+  return $can_run;
 }
 
 =head2 execute
 
-Returns early without an error if the can_run method returns a false value.
+Returns early if the can_run method returns a false value.
+
 An assessment of applicability of running RoboQC on this entity is performed
 next, an early return is possible after that. If RoboQC is applicable, a full
 evaluation of autoqc results for this product is performed. If autoqc results
@@ -385,6 +412,29 @@ sub _build_lims {
   return st::api::lims->new(rpt_list => $self->rpt_list);
 }
 
+=head2 runfolder
+
+npg_tracking::illumina::runfolder object
+
+=cut
+
+has 'runfolder' => (
+  isa        => 'npg_tracking::illumina::runfolder',
+  is         => 'ro',
+  lazy_build => 1,
+);
+sub _build_runfolder {
+  my $self = shift;
+  if ($self->has_runfolder_path) {
+    return npg_tracking::illumina::runfolder->new(
+      npg_tracking_schema => undef,
+      runfolder_path => $self->runfolder_path,
+      id_run => $self->get_id_run()
+    );
+  }
+  croak 'runfolder_path argument is not set';
+}
+
 has '_entity_desc' => (
   isa        => 'Str',
   is         => 'ro',
@@ -438,62 +488,70 @@ sub _validate_criteria {
   (ref $criteria_array eq q[ARRAY]) or croak
     'Criteria is not a list in a robo config for ' . $self->_entity_desc;
 
-  my $num_cobj = @{$criteria_array};
-  if ($num_cobj > 1) {
-    my $test = grep { $_->{$APPLICABILITY_CRITERIA_KEY} } @{$criteria_array};
-    ($test == $num_cobj) or croak 'Each criteria object should have the ' .
-      "$APPLICABILITY_CRITERIA_KEY key defined in a robo config for " .
-      $self->_entity_desc;
-  }
+  @{$criteria_array} or croak 'Criteria list is empty';
 
-  my $test = grep { $_->{$ACCEPTANCE_CRITERIA_KEY} } @{$criteria_array};
-  ($test == $num_cobj) or croak 'Each criteria object should have the ' .
-    "$ACCEPTANCE_CRITERIA_KEY key defined in a robo config for ".
-    $self->_entity_desc;
+  foreach my $c ( @{$criteria_array} ) {
+    (exists $c->{$APPLICABILITY_CRITERIA_KEY} &&
+    exists $c->{$ACCEPTANCE_CRITERIA_KEY}) || croak sprintf
+    'Each criteria should have both the %s and %s key present',
+    $APPLICABILITY_CRITERIA_KEY, $ACCEPTANCE_CRITERIA_KEY;
+  }
 
   return;
 }
 
-sub _applicability_lims_all {
-  my ($self, $criteria_objs) = @_;
+has '_applicable_criteria' => (
+  isa        => 'ArrayRef',
+  is         => 'ro',
+  lazy_build => 1,
+);
+sub _build__applicable_criteria {
+  my $self = shift;
 
+  my $criteria_objs = $self->_robo_config->{$CRITERIA_KEY};
   my @applicable = ();
   foreach my $co ( @{$criteria_objs} ) {
-    my $lims_c = $co->{$APPLICABILITY_CRITERIA_KEY}->{lims};
-    if (!$lims_c || $self->_applicability_lims($lims_c)) {
-      push @applicable, $co;
+    my $c_applicable = 1;
+    for my $c_type ($LIMS_APPLICABILITY_CRITERIA_KEY, $SEQ_APPLICABILITY_CRITERIA_KEY) {
+      my $c = $co->{$APPLICABILITY_CRITERIA_KEY}->{$c_type};
+      if ($c && !$self->_applicability($c, $c_type)) {
+        $c_applicable = 0;
+        last;
+      }
     }
+    $c_applicable or next;
+    push @applicable, $co;
   }
 
   return \@applicable;
 }
 
-sub _applicability_lims {
-  my ($self, $lcriteria) = @_;
+sub _applicability {
+  my ($self, $acriteria, $criteria_type) = @_;
 
-  $lcriteria or return 1;
+  ($acriteria && $criteria_type) or croak
+    'The criterium and its type type should be defined';
+  (ref $acriteria eq 'HASH') or croak sprintf
+    '%s section should be a hash in a robo config for %', $criteria_type, $self->_entity_desc;
 
-  (ref $lcriteria eq 'HASH') or croak q('lims' section should be a hash ) .
-    'in a robo config for ' . $self->_entity_desc;
-  my $lims_test = {};
-  foreach my $lims_prop ( keys %{$lcriteria} ) {
-    my $ref_test = ref $lcriteria->{$lims_prop};
+  my $test = {};
+  foreach my $prop ( keys %{$acriteria} ) {
+    my $ref_test = ref $acriteria->{$prop};
     not $ref_test or ($ref_test eq 'ARRAY') or croak
-      qq(Values for 'lims' property '$lims_prop' are neither a scalar nor ) .
+      qq(Values for '$criteria_type' property '$prop' are neither a scalar nor ) .
       'an array in a robo config for ' . $self->_entity_desc;
-    my @expected_values = $ref_test ? @{$lcriteria->{$lims_prop}} : ($lcriteria->{$lims_prop});
-    my $value = $self->lims->$lims_prop;
-    $value ||= q[];
-    #defined $value or croak
-    #  qq('$lims_prop' - cannot compare to an undefined value);
-    # comparing as strings in lower case
-    $value = lc q[] . $value;
-    $lims_test->{$lims_prop} = any { $value eq lc q[] . $_ }
-                               @expected_values;
+    my @expected_values = $ref_test ? @{$acriteria->{$prop}} : ($acriteria->{$prop});
+    my $value = $criteria_type eq $LIMS_APPLICABILITY_CRITERIA_KEY ?
+      $self->lims->$prop : $self->runfolder->$prop;
+    if (!defined $value) { # for example, boolean false values
+      $value = q[];
+    }
+    $value = lc q[] . $value; # comparing as strings in lower case
+    $test->{$prop} = any { $value eq lc q[] . $_ } @expected_values;
   }
 
-  # assuming 'AND' for lims properties
-  return all { $_ } values %{$lims_test};
+  # assuming 'AND' for properties
+  return all { $_ } values %{$test};
 }
 
 has '_criteria' => (
@@ -510,23 +568,19 @@ sub _build__criteria {
   $lib_type or croak 'Library type is not defined for ' .  $self->_entity_desc;
   $self->result->library_type($lib_type);
 
-  my $criteria_objs = $self->_robo_config->{$CRITERIA_KEY};
-  $criteria_objs = $self->_applicability_lims_all($criteria_objs);
-  # Criteria objects with no lims criteria defined should be returned
-  # in the above array. An empty array means that all objects had lims
-  # criteria and none of them was satisfied.
-  @{$criteria_objs} or return {};
-
-  (@{$criteria_objs} == 1) or carp 'Multiple criteria sets are satisfied ' .
-    'in a robo config for ' . $self->_entity_desc;
-
+  my $num_criteria = scalar @{$self->_applicable_criteria};
+  if ($num_criteria == 0) {
+    return {};
+  } elsif ($num_criteria > 1) {
+    croak 'Multiple criteria sets are satisfied in a robo config';
+  }
   #####
   # A very simple criteria format - a list of strings - is used for now.
   # Each string represents a math expression. It is assumed that the
   # conjunction operator should be used to form the boolean expression
   # that should give the result of the evaluation.
   #
-  my @c = uniq sort @{$criteria_objs->[0]->{$ACCEPTANCE_CRITERIA_KEY}};
+  my @c = uniq sort @{$self->_applicable_criteria->[0]->{$ACCEPTANCE_CRITERIA_KEY}};
 
   return @c ? {$CONJUNCTION_OP => \@c} : {};
 }
@@ -786,6 +840,8 @@ __END__
 =item WTSI::DNAP::Utilities::Timestamp
 
 =item st::api::lims
+
+=item npg_tracking::illumina::runfolder
 
 =item npg_tracking::util::pipeline_config
 
