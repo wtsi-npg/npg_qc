@@ -522,6 +522,9 @@ t/data/autoqc/review/not_hash/product_release.yml
 t/data/autoqc/review/mqc_type/product_release.yml
 t/data/autoqc/review/unknown_qc_type/product_release.yml
 t/data/autoqc/review/uqc_type/product_release.yml
+t/data/autoqc/review/default_and_study_section/product_release.yml
+t/data/autoqc/review/default_section/product_release.yml
+t/data/autoqc/review/wrong_default_and_study_section/product_release.yml
 t/data/autoqc/review/samplesheet_27483.csv
 t/data/autoqc/review/samplesheet_29524.csv
 t/data/autoqc/review/29524#2.composition.json
@@ -697,6 +700,7 @@ t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/RunInfo.xml
 t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/runParameters.xml
 t/data/autoqc/200114_HS40_32710_A_H72VGBCX3/InterOp/TileMetricsOut.bin
 t/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2/InterOp/TileMetricsOut.bin
+t/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2/RunParameters.xml
 t/data/autoqc/191210_MS2_MiSeq_walk-up_246_A_MS8539685-050V2/RunInfo.xml
 t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/InterOp/TileMetricsOut.bin
 t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/InterOp/ExtendedTileMetricsOut.bin

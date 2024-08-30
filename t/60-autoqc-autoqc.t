@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More tests => 26;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 
@@ -86,6 +86,14 @@ my $dir = tempdir( CLEANUP => 1 );
   $check = $factory->create_check_object();
   is (ref $check, 'npg_qc::autoqc::checks::generic::foo1',
     'check is an instance of the foo1 autoqc class');
+}
+
+{
+  local @ARGV = qw(--check review --runfolder_path t --rpt_list 4:1 --qc_out);
+  push @ARGV, $dir;
+  my $check = npg_qc::autoqc::autoqc->new_with_options()->create_check_object();
+  isa_ok($check, 'npg_qc::autoqc::checks::review');  
+  is ($check->runfolder_path, 't', '--runfolder_path option is passed through');
 }
 
 1;

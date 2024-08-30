@@ -5,6 +5,48 @@
 - Wrap database changes into a transaction, which initially should have
   a clause to fail it so that it can be tried out (see some examples below).
 
+All listed below procedures were originally written for products containing
+one component. Existing procedures for changing the already existing QC outcomes
+should also work for products containing multiple components as long as these
+components are from the same run and are for the same tag index. Use any lane
+number (position) that went into the merged product. For example, for a product
+described by JSON below
+
+```json
+{
+  "__CLASS__": "npg_tracking::glossary::composition-101.3.0",
+  "components": [
+    {
+      "__CLASS__": "npg_tracking::glossary::composition::component::illumina-101.3.0",
+      "id_run": 49404,
+      "position": 7,
+      "tag_index": 1
+    },
+    {
+      "__CLASS__": "npg_tracking::glossary::composition::component::illumina-101.3.0",
+      "id_run": 49404,
+      "position": 8,
+      "tag_index": 1
+    }
+  ]
+}
+```
+
+use the following expression for a search when toggling the QC outcome
+
+```
+my $rs=npg_qc::Schema->connect()->resultset("MqcLibraryOutcomeEnt")
+  ->search_autoqc({id_run=>49494,position=>7,tag_index=>1});
+```
+
+The custom `search_autoqc` method returns a resultset containing QC outcomes for
+products which contain a component with position 7 and tag_index 1, which will
+be the merged product described by the above JSON. If the QC database records
+are correct, the resultset should contain one row. The same resultset is
+returned if 8 is used as the value of the position. There should not be any need
+to repeat the process for every position that went into the merge and in a case
+of a toggle this would be wrong.
+
 ## Toggle the outcome of a single library
 
 QC outcome will change from `pass` to `fail` or `fail` to `pass`. 

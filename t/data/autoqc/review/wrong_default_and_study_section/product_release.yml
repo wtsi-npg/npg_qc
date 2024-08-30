@@ -7,6 +7,9 @@ default:
   irods:
     enable: true
     notify: false
+  robo_qc:
+    - acceptance_criteria:
+        - "verify_bam_id.freemix < 0.001"
 
 study:
   - study_id: "5392"
@@ -34,7 +37,7 @@ study:
                 - 1
               workflow_type:
                 - "NovaSeqStandard"
-          acceptance_criteria :
+          acceptance_criteria:
             - "( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95"
             - "bam_flagstats.target_mapped_bases > 85_000_000_000"
             - "bam_flagstats.target_percent_gt_coverage_threshold > 95"
