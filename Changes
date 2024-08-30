@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 72.2.0 (2024-08-30)
  - npg_qc::autoqc::check::review:
    1. To enable access to information about a sequencing run (from RunInfo.xml,
       {r,R}unParameters.xml), added an optional 'runfolder_path' attribute.
@@ -9,6 +10,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
       moved ROBO criteria validation to the can_run method.
    4. Introduced an option of defining the ROBO section within the default
       section of the product configuration file.
+ - Explained QC outcome change for complex products (merged)
 
 release 72.1.2 (2024-08-05)
  - handle cases where the same tag sequence is seen in both index reads
