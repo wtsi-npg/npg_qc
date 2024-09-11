@@ -568,11 +568,11 @@ has '_criteria' => (
 sub _build__criteria {
   my $self = shift;
 
-  # Save redundant library_type.
-  # TODO: Save details about applicability instead.
+  # Library type might be undefined. Example - lane level object.
   my $lib_type = $self->lims->library_type;
-  $lib_type or croak 'Library type is not defined for ' .  $self->_entity_desc;
-  $self->result->library_type($lib_type);
+  if ($lib_type) {
+    $self->result->library_type($lib_type);
+  }
 
   my $num_criteria = scalar @{$self->_applicable_criteria};
   if ($num_criteria == 0) {
