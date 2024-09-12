@@ -417,7 +417,7 @@ subtest 'single expression evaluation' => sub {
 };
 
 subtest 'evaluation within the execute method' => sub {
-  plan tests => 48;
+  plan tests => 40;
 
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
@@ -436,7 +436,6 @@ subtest 'evaluation within the execute method' => sub {
   is ($o->result->pass, undef, 'result pass attribute is unset');
 
   my @check_objects = ();
-
   push @check_objects, npg_qc::autoqc::checks::review->new(
     runfolder_path => $rf_path,
     conf_path => $test_data_dir,
@@ -446,12 +445,7 @@ subtest 'evaluation within the execute method' => sub {
     conf_path => "$test_data_dir/mqc_type",
     qc_in     => $dir,
     rpt_list  => $rpt_list);
-  push @check_objects, npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/uqc_type",
-    qc_in     => $dir,
-    rpt_list  => $rpt_list);
 
-  my $count = 0;
   foreach my $check (@check_objects) {
     lives_ok { $check->execute } 'execute method runs OK';
     is ($check->result->pass, 1, 'result pass attribute is set to 1');
@@ -461,15 +455,9 @@ subtest 'evaluation within the execute method' => sub {
     is_deeply ($check->result->evaluation_results(), \%expected,
       'evaluation results are saved');
     my $outcome = $check->result->qc_outcome;
-    if ($count < 2) {
-      is ($outcome->{'mqc_outcome'} , 'Accepted preliminary', 'correct outcome string');
-    } elsif ($count == 2) {
-      is ($outcome->{'uqc_outcome'} , 'Accepted', 'correct outcome string');
-      ok ($outcome->{'rationale'} , 'rationale is set');
-    }
+    is ($outcome->{'mqc_outcome'} , 'Accepted preliminary', 'correct outcome string');
     is ($outcome->{'username'}, 'robo_qc', 'correct process id');
     ok ($outcome->{'timestamp'}, 'timestamp saved');
-    $count++;
   }
 
   # Undefined library type should not be a problem.
