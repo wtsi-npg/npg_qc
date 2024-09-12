@@ -19,19 +19,9 @@ my $schema = Moose::Meta::Class->create_anon_class(
      ->new_object({})->create_test_db(q[npg_qc::Schema], 't/data/fixtures');
 
 subtest 'reject incomplete results on insert' => sub {
-  plan tests => 4;
+  plan tests => 2;
 
   my $values = {
-    evaluation_results => {"e1"=>1,"e2"=>0},
-    criteria           => {"and"=>["e1","e2"]},
-    pass               => 0,
-    path               => 't/data'
-  };
-  throws_ok {$schema->resultset($table)->create($values)}
-    qr/Evaluation results present, but library_type absent/,
-    'library type is not defined - error on insert';
-
-  $values = {
     library_type       => 'common_type',
     criteria           => {},
     evaluation_results => {"e1"=>1,"e2"=>0},
@@ -40,18 +30,6 @@ subtest 'reject incomplete results on insert' => sub {
   throws_ok {$schema->resultset($table)->create($values)}
     qr/Evaluation results present, but criteria absent/,
     'criteria are not defined - error on insert';
-
-  $values = {
-    evaluation_results => {"e1"=>1,"e2"=>0},
-    criteria           => {},
-    qc_outcome =>
-    {"mqc_outcome"=>"Rejected final","timestamp"=>"2018-06-03T12:53:46+0000","username"=>"robo_qc"},
-    pass => 0,
-    path => 't/data'
-  };
-  throws_ok {$schema->resultset($table)->create($values)}
-    qr/Evaluation results present, but library_type absent/,
-    'criteria and library type are not defined - error on insert';
 
   $values = {
     library_type       => 'common_type',
@@ -68,13 +46,27 @@ subtest 'reject incomplete results on insert' => sub {
 };
 
 subtest 'insert a basic record, do not allow incomplete data in update' => sub {
-  plan tests => 9;
+  plan tests => 10;
 
   my $id_seq_composition = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run'    => 1111,
                           'position'  => 1,
-                          'tag_index' => 8});
+                          'tag_index' => 7});
   my $values = {
+    evaluation_results => {"e1"=>1,"e2"=>0},
+    criteria           => {"and"=>["e1","e2"]},
+    pass               => 0,
+    path               => 't/data',
+    id_seq_composition => $id_seq_composition
+  };
+  lives_ok {$schema->resultset($table)->create($values)}
+    'library type is not defined - no error on insert';
+  
+  $id_seq_composition = t::autoqc_util::find_or_save_composition(
+                $schema, {'id_run'    => 1111,
+                          'position'  => 1,
+                          'tag_index' => 8});
+  $values = {
     evaluation_results => {},
     criteria           => {},
     qc_outcome         => {},
@@ -108,9 +100,8 @@ subtest 'insert a basic record, do not allow incomplete data in update' => sub {
     pass               => 0,
     path               => 't/data'
   };
-  throws_ok {$new->update($values)}
-    qr/Evaluation results present, but library_type absent/,
-    'library type is not defined - error on update';
+  lives_ok {$new->update($values)}
+    'library type is not defined - no error on update';
 
   $values = {
     id_seq_composition => $id_seq_composition,
@@ -277,7 +268,7 @@ subtest 'a full insert/update record with mqc outcome' => sub {
   };
   my $created=$schema->resultset($table)->create($values);
   $rs = $schema->resultset($table)->search({});
-  is ($rs->count, 2, q[two rows in the table]);
+  is ($rs->count, 3, q[three rows in the table]);
   
   $mqc_rs = $schema->resultset($mqc_table)->search({id_seq_composition => $id_seq_composition});
   is ($mqc_rs->count, 1, 'one mqc record for the entity');

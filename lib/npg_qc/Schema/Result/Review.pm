@@ -357,14 +357,12 @@ around [qw/update insert/] => sub {
 
   ##### 
   # Do not accept half-baked results, ie if we have evaluation
-  # results, we should also have library type and criteria.
+  # results, we should also have criteria.
   if ($data->{'evaluation_results'} and keys %{$data->{'evaluation_results'}}) {
-    foreach my $name (qw/library_type criteria/) {
-      my $value = $data->{$name};
-      my $m = "Evaluation results present, but $name absent";
-      $value or croak $m;
-      ((not ref $value) or keys %{$value}) or croak $m;
-    }
+    my $value = $data->{'criteria'};
+    my $m = 'Evaluation results present, but criteria absent';
+    $value or croak $m;
+    ((not ref $value) or keys %{$value}) or croak $m;
   }
 
   #####
@@ -475,7 +473,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019,2020 Genome Research Ltd.
+Copyright (C) 2019,2020, 2924 Genome Research Ltd.
 
 This file is part of NPG.
 
