@@ -1,6 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - GitHub CI - updated deprecated v2 runner action to v3
+ - docs
+  - automated creation/update of confluence pages for docs
  - Following a release on 07/09/2024, see https://metacpan.org/dist/App-perlbrew/changes
    the checksum of the script served by https://install.perlbrew.pl had changed.
    https://install.perlbrew.pl is a redirect to raw
