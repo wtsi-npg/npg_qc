@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 5;
 use Test::Exception;
 use Moose::Meta::Class;
 use Digest::MD5 qw/md5_hex/;
@@ -306,135 +306,17 @@ subtest 'a full insert/update record with mqc outcome' => sub {
   is ($rs->next->description, 'Accepted final', 'outcome has not changed');
 };
 
-subtest 'a full insert/update record with uqc outcome' => sub {
-  plan tests => 36;
-
-  my $initial_num_records = $schema->resultset($table)->search({})->count();
-
-  my $uqc_table = 'UqcOutcomeEnt';
-  my $id_seq_composition = t::autoqc_util::find_or_save_composition(
-                $schema, {'id_run'    => 1111,
-                          'position'  => 1,
-                          'tag_index' => 33});
-
-  my $uqc_rs = $schema->resultset($uqc_table)->search({id_seq_composition => $id_seq_composition});
-  is ($uqc_rs->count, 0, 'no uqc records for this entity');
-  my $rs = $schema->resultset($table)->search({id_seq_composition => $id_seq_composition});
-  is ($rs->count, 0, 'no review records for this entity');
-
-  my $qc_outcome = {"uqc_outcome" => "Rejected",
-                    "timestamp"   => "2018-06-03T12:53:46+0000",
-                    "username"    => "robo_qc",
-                    "rationale"   => "testrobo"};
-  my $values = {
-    id_seq_composition => $id_seq_composition,
-    library_type       => 'common_type',
-    evaluation_results => {"e1"=>1,"e2"=>0},
-    criteria           => {"and"=>["e1","e2"]},
-    qc_outcome         => $qc_outcome,
-    pass => 0,
-    path => 't/data'
-  };
-  my $cmd5 = md5_hex(JSON::XS->new()->canonical(1)->encode($values->{criteria}));
-
-  isa_ok($schema->resultset($table)->create($values), 'npg_qc::Schema::Result::' . $table);
-  is ($schema->resultset($table)->search({})->count(), $initial_num_records + 1,
-    'total number of records in teh review table went up by one');
-  $rs = $schema->resultset($table)->search({id_seq_composition => $id_seq_composition});
-  is ($rs->count, 1, 'one row created in the review table');
-  my $row = $rs->next;
-  is_deeply ($row->qc_outcome, $qc_outcome, 'qc outcome saved');
-  is_deeply ($row->evaluation_results, {"e1"=>1,"e2"=>0}, 'evaluation results saved');
-  is_deeply ($row->criteria, {"and"=>["e1","e2"]}, 'criteria saved');
-  is ($row->criteria_md5, $cmd5, 'checksum saved');
-  $uqc_rs = $schema->resultset($uqc_table)->search({id_seq_composition => $id_seq_composition});
-  is ($uqc_rs->count, 1, 'one row created in the uqc table');
-  my $outcome = $uqc_rs->next;
-  is ($outcome->rationale, 'testrobo', 'rationale recorded');
-  is ($outcome->description, 'Rejected', 'correct uqc outcome');
-  is ($outcome->modified_by, $ENV{USER}, 'correct user');
-  is ($outcome->username, 'robo_qc', 'correct user');
-  my $dt = $outcome->last_modified();
-  is ($dt->year, 2018, 'correct year');
-  is ($dt->month, '6', 'correct month');
-  is ($dt->minute, '53', 'correct minute');
-  is ($dt->second, '46', 'correct second');
-  
-  $qc_outcome = {"uqc_outcome" => "Accepted",
-                 "timestamp"   => "2018-08-05T12:53:46+0000",
-                 "username"    => "robo_qc",
-                 "rationale"   => "testrobo1"};
-  $values = {
-    id_seq_composition => $id_seq_composition,
-    library_type       => 'common_type',
-    evaluation_results => {"e1"=>1,"e2"=>1},
-    criteria           => {"and"=>["e1","e2"]},
-    qc_outcome         => $qc_outcome,
-  };
-  $row->update($values);
-  is_deeply ($row->evaluation_results, {"e1"=>1,"e2"=>1}, 'evaluation results updated');
-  is_deeply ($row->qc_outcome, $qc_outcome, 'qc outcome updated');
-  $outcome = $schema->resultset($uqc_table)->search({id_seq_composition => $id_seq_composition})
-                    ->next;
-  is ($outcome->rationale, 'testrobo1', 'rationale updated');
-  is ($outcome->description, 'Accepted', 'uqc outcome updated');
-  is ($outcome->last_modified()->month, 8, 'month updated');
-  is ($outcome->last_modified()->year, 2018, 'correct year');
-
-  $id_seq_composition = t::autoqc_util::find_or_save_composition(
-                $schema, {'id_run'    => 1111,
-                          'position'  => 1,
-                          'tag_index' => 34});
-  $uqc_rs = $schema->resultset($uqc_table)->search({id_seq_composition => $id_seq_composition});
-  is ($uqc_rs->count, 0, 'no uqc records for this entity');
-  my $new_uqc = $schema->resultset($uqc_table)
-                ->new_result({id_seq_composition => $id_seq_composition});
-  $new_uqc->update_outcome({uqc_outcome => 'Accepted', rationale => 'test1'}, 'user1', 'test');
-  $uqc_rs = $schema->resultset($uqc_table)->search({id_seq_composition => $id_seq_composition});
-  is ($uqc_rs->count, 1, 'record created');
-
-  $values = {
-    id_seq_composition => $id_seq_composition,
-    library_type       => 'common_type',
-    evaluation_results => '{"e1":1,"e2":1}',
-    criteria           => '{"and":["e1","e2"]}',
-    qc_outcome => {"uqc_outcome" => "Undecided",
-                   "timestamp"   => "2018-09-03T12:58:43+0000",
-                   "username"    => "robo_qc",
-                   "rationale"   => "testrobo2"},
-    pass => undef
-  };
-  my $created=$schema->resultset($table)->create($values);
-
-  is ($schema->resultset($table)->search({})->count(), $initial_num_records + 2,
-    'total number of records in teh review table went up by one');
-  $uqc_rs = $schema->resultset($uqc_table)->search({id_seq_composition => $id_seq_composition});
-  is ($uqc_rs->count, 1, 'one uqc record for the entity');
-  $outcome = $uqc_rs->next;
-  is ($outcome->rationale, 'testrobo2', 'rationale updated');
-  is ($outcome->description, 'Undecided', 'outcome updated');
-  is ($outcome->modified_by, $ENV{USER}, 'correct user');
-  is ($outcome->username, 'robo_qc', 'correct user');
-  $dt = $outcome->last_modified();
-  is ($dt->year, 2018, 'correct year');
-  is ($dt->month, '9', 'correct month');
-  is ($dt->minute, '58', 'correct minute');
-  is ($dt->second, '43', 'correct second');
-};
-
-
 subtest 'unknown outcome type should give an error' => sub {
   plan tests => 5;
 
-  my $uqc_table = 'UqcOutcomeEnt';
   my $id_seq_composition = t::autoqc_util::find_or_save_composition(
                 $schema, {'id_run'    => 1111,
                           'position'  => 1,
                           'tag_index' => 43});
 
   my $no_records = sub {
-    is ($schema->resultset($uqc_table)->search({id_seq_composition => $id_seq_composition})->count,
-      0, 'no uqc records for this entity');
+    is ($schema->resultset($mqc_table)->search({id_seq_composition => $id_seq_composition})->count,
+      0, 'no mqc records for this entity');
     is ($schema->resultset($table)->search({id_seq_composition => $id_seq_composition})->count,
       0, 'no review records for this entity');
   };

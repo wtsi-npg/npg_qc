@@ -11,10 +11,13 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    the checksum of the downloaded script to the expected value. We now store
    an updated expected checksum value, which corresponds to the latest release.
  - npg_qc::autoqc::check::review:
-  The forthcoming lane-level evaluations are impossible if the code continues
-  to error when library_type attribute is not defined for the entity under
-  consideration. The library_type attribute is now set when possible, no error
-  if it is undefined.
+   - The forthcoming lane-level evaluations are impossible if the code continues
+     to error when library_type attribute is not defined for the entity under
+     consideration. The library_type attribute is now set when possible, no error
+     if it is undefined.
+   - Ability to set UQC outcomes was introduced for the Heron project. This
+     functionality was never used and is unlikely to be used in future. It is
+     now removed.
 
 release 72.2.0 (2024-08-30)
  - npg_qc::autoqc::check::review:

@@ -32,7 +32,7 @@ Readonly::Scalar my $SEQ_APPLICABILITY_CRITERIA_KEY => q[sequencing_run];
 Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
 
 Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
-Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT, q[uqc]);
+Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT);
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
@@ -102,11 +102,6 @@ set to true, the outcome is also marked as 'Final', otherwise it is
 marked as 'Preliminary' (examples: 'Accepted Final',
 'Rejected Preliminary'). By default the final_qc_outcome flag is
 false and the produced outcomes are preliminary.
-
-A valid User QC outcome is one of the values from the
-uqc_outcome_dict table of the npg_qc database. A concept of
-the finality and, hence, immutability of the outcome is not
-applicable to user QC outcome.
 
 The type of QC outcome can be configured within the Robo QC
 section of product configuration. The default type is library
@@ -329,8 +324,9 @@ sub execute {
   }
 
   $self->result->criteria($self->_criteria);
-  my $md5 = $self->result->generate_checksum4data($self->result->criteria);
-  $self->result->criteria_md5($md5);
+  $self->result->criteria_md5(
+    $self->result->generate_checksum4data($self->result->criteria)
+  );
   my $err;
 
   try {
@@ -341,7 +337,7 @@ sub execute {
     $self->result->add_comment($err);
   };
   not $err and $self->result->qc_outcome(
-    $self->generate_qc_outcome($self->_outcome_type(), $md5));
+    $self->generate_qc_outcome($self->_outcome_type()));
 
   return;
 }
@@ -368,13 +364,12 @@ sub evaluate {
 
 Returns a hash reference representing the QC outcome.
 
-  my $u_outcome = $r->generate_qc_outcome('uqc', $md5);
   my $m_outcome = $r->generate_qc_outcome('mqc');
-
+  
 =cut
 
 sub generate_qc_outcome {
-  my ($self, $outcome_type, $md5) = @_;
+  my ($self, $outcome_type) = @_;
 
   $outcome_type or croak 'outcome type should be defined';
 
@@ -382,20 +377,13 @@ sub generate_qc_outcome {
   my $pass = $self->result->pass;
   #####
   # Any of Accepted, Rejected, Undecided outcomes can be returned here
-  my $outcome = ($outcome_type eq $QC_TYPE_DEFAULT)
-    ? $package_name->generate_short_description(
-      $self->final_qc_outcome ? 1 : 0, $pass)
-    : $package_name->generate_short_description_prefix($pass);
+  my $outcome = $package_name->generate_short_description(
+    $self->final_qc_outcome ? 1 : 0, $pass);
 
   $outcome_type .= '_outcome';
   my $outcome_info = { $outcome_type => $outcome,
                        timestamp   => create_current_timestamp(),
                        username    => $ROBO_KEY};
-  if ($outcome_type =~ /\Auqc/xms) {
-    my @r = ($ROBO_KEY, $VERSION);
-    $md5 and push @r, $md5;
-    $outcome_info->{'rationale'} = join q[ ], @r;
-  }
 
   return $outcome_info;
 }
