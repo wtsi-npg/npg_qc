@@ -33,7 +33,7 @@ my $criteria_list = [
 ];
 
 subtest 'constructing object, deciding whether to run' => sub {
-  plan tests => 29;
+  plan tests => 33;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -147,8 +147,10 @@ subtest 'constructing object, deciding whether to run' => sub {
     conf_path => "$test_data_dir/no_applicability4single",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  ok ($check->can_run, 'can_run returns true');
-  ok (!$check->result->comments, 'No comments logged');
+  ok (!$check->can_run, 'can_run returns false');
+  like ($check->result->comments,
+    qr/applicability_criteria is not defined for one of RoboQC criteria/,
+    'Error logged');
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/with_na_criteria",
@@ -158,10 +160,31 @@ subtest 'constructing object, deciding whether to run' => sub {
   is ($check->result->comments,
     'None of the RoboQC applicability criteria is satisfied',
     'Comment logged');
+
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
+    't/data/autoqc/review/samplesheet_29524.csv';
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/no_known_applicability_type",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  ok (!$check->can_run, 'can_run returns false');
+  like ($check->result->comments,
+    qr/None of known applicability type criteria is defined/,
+    'Error logged');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/lims_applicability_empty",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1:2');
+  ok (!$check->can_run, 'can_run returns false');
+  like ($check->result->comments,
+    qr/lims type applicability criteria is not defined/,
+    'Error logged');    
 };
 
 subtest 'caching appropriate criteria object' => sub {
-  plan tests => 3;
+  plan tests => 2;
   
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/with_criteria",
@@ -169,13 +192,6 @@ subtest 'caching appropriate criteria object' => sub {
     rpt_list  => '27483:1:2');
   my @list = grep { $_ !~ /genotype|freemix/} @{$criteria_list};
   is_deeply ($check->_criteria, {'and' => \@list},
-    'criteria parsed correctly');
-
-  $check = npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/no_applicability4single",
-    qc_in     => $test_data_dir,
-    rpt_list  => '27483:1:2');
-  is_deeply ($check->_criteria, {'and' => $criteria_list},
     'criteria parsed correctly');
 
   $check = npg_qc::autoqc::checks::review->new(
