@@ -27,7 +27,7 @@ study:
       qc_type: "mqc"
       criteria:
         - applicability_criteria:
-            lims:
+            libs:
               library_type: "HiSeqX PCR free"
           acceptance_criteria :
             - "( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95"
