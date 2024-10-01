@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Added .github/dependabot.yml file to auto-update GitHub actions
  - GitHub CI - updated deprecated v2 runner action to v3
  - docs
   - automated creation/update of confluence pages for docs
