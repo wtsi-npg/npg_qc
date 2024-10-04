@@ -401,7 +401,7 @@ subtest 'single expression evaluation' => sub {
 };
 
 subtest 'evaluation within the execute method' => sub {
-  plan tests => 42;
+  plan tests => 48;
 
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
@@ -439,6 +439,8 @@ subtest 'evaluation within the execute method' => sub {
   foreach my $check (@check_objects) {
     lives_ok { $check->execute } 'execute method runs OK';
     is ($check->result->pass, 1, 'result pass attribute is set to 1');
+    is ($check->result->library_type, 'HiSeqX PCR free',
+      'result library_type attribute is set correctly');
     my %expected = map { $_ => 1 } @{$criteria_list};
     is_deeply ($check->result->evaluation_results(), \%expected,
       'evaluation results are saved');
@@ -454,7 +456,19 @@ subtest 'evaluation within the execute method' => sub {
     $count++;
   }
 
+  # Undefined library type should not be a problem.
+  my $lane_lims = (st::api::lims->new(id_run=> 29524)->children())[0];
+  is ($lane_lims->library_type, undef, 'library type is undefined on lane level');
   my $check = npg_qc::autoqc::checks::review->new(
+    conf_path => $test_data_dir,
+    qc_in     => $test_data_dir,
+    rpt_list  => $rpt_list,
+    lims      => $lane_lims
+  );
+  lives_ok { $check->execute } 'execute method runs OK';
+  is ($check->result->library_type, undef, 'library_type attribute is unset');
+
+  $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/unknown_qc_type",
     qc_in     => $dir,
     rpt_list  => $rpt_list);
