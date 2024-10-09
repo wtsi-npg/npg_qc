@@ -18,6 +18,14 @@ release 72.2.1 (2024-10-04)
    consideration. The library_type attribute is now set when possible, no error
    if it is undefined.
 
+  Previously the code allowed for an empty applicability_criteria hash, which
+  resulted in a particular set of QC criteria being applied to every and any
+  product. Very early on this was an intended behaviour for UKB data. The main
+  filter was the study id. In the default section of the product configuration
+  file there is no external filter, so there is a real danger of the review
+  check being run indiscriminately for any product. While this will never be
+  an intension, small errors in the YML file might have this effect.
+
 release 72.2.0 (2024-08-30)
  - npg_qc::autoqc::check::review:
    1. To enable access to information about a sequencing run (from RunInfo.xml,
