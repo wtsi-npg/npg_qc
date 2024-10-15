@@ -29,6 +29,9 @@ Readonly::Scalar my $QC_TYPE_KEY      => q[qc_type];
 Readonly::Scalar my $APPLICABILITY_CRITERIA_KEY => q[applicability_criteria];
 Readonly::Scalar my $LIMS_APPLICABILITY_CRITERIA_KEY => q[lims];
 Readonly::Scalar my $SEQ_APPLICABILITY_CRITERIA_KEY => q[sequencing_run];
+Readonly::Array  my @APPLICABILITY_CRITERIA_TYPES => (
+  $LIMS_APPLICABILITY_CRITERIA_KEY, $SEQ_APPLICABILITY_CRITERIA_KEY
+                                                     );
 Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
 
 Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
@@ -514,31 +517,42 @@ has '_applicable_criteria' => (
 sub _build__applicable_criteria {
   my $self = shift;
 
-  my $criteria_objs = $self->_robo_config->{$CRITERIA_KEY};
   my @applicable = ();
-  foreach my $co ( @{$criteria_objs} ) {
+  foreach my $criteria_definition ( @{$self->_robo_config->{$CRITERIA_KEY}} ) {
+
+    my $applicability_definition = $criteria_definition->{$APPLICABILITY_CRITERIA_KEY};
+    $applicability_definition or croak
+      "$APPLICABILITY_CRITERIA_KEY is not defined for one of RoboQC criteria";
+
     my $c_applicable = 1;
-    for my $c_type ($LIMS_APPLICABILITY_CRITERIA_KEY, $SEQ_APPLICABILITY_CRITERIA_KEY) {
-      my $c = $co->{$APPLICABILITY_CRITERIA_KEY}->{$c_type};
-      if ($c && !$self->_applicability($c, $c_type)) {
-        $c_applicable = 0;
-        last;
-      }
+    my $one_found = 0;
+    for my $c_type (@APPLICABILITY_CRITERIA_TYPES) {
+      exists $applicability_definition->{$c_type} or next;
+      $one_found = 1;
+      my $ac = $applicability_definition->{$c_type};
+      (defined $ac and keys %{$ac}) or croak
+        "$c_type type applicability criteria is not defined";
+      $c_applicable = $self->_is_applicable($c_type, $ac);
+      !$c_applicable && last; # Stop on the first non applicable.
     }
-    $c_applicable or next;
-    push @applicable, $co;
+    $one_found or croak 'None of known applicability type criteria is defined. ' .
+      'Known types: ' . join q[, ], @APPLICABILITY_CRITERIA_TYPES;
+    $c_applicable && push @applicable, $criteria_definition; # Save if fully applicable.
   }
 
   return \@applicable;
 }
 
-sub _applicability {
-  my ($self, $acriteria, $criteria_type) = @_;
+sub _is_applicable {
+  my ($self, $criteria_type, $acriteria) = @_;
 
-  ($acriteria && $criteria_type) or croak
-    'The criterium and its type type should be defined';
+  $criteria_type or croak
+    'Applicability criteria type is not defined';
+  $acriteria or croak
+    "$criteria_type applicability criteria is not defined";
   (ref $acriteria eq 'HASH') or croak sprintf
-    '%s section should be a hash in a robo config for %', $criteria_type, $self->_entity_desc;
+    '%s section should be a hash in a robo config for %',
+    $criteria_type, $self->_entity_desc;
 
   my $test = {};
   foreach my $prop ( keys %{$acriteria} ) {
