@@ -34,8 +34,8 @@ Readonly::Array  my @APPLICABILITY_CRITERIA_TYPES => (
                                                      );
 Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
 
-Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
-Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT);
+Readonly::Scalar my $QC_TYPE_LIB => q[mqc];
+Readonly::Scalar my $QC_TYPE_SEQ => q[mqc_seq];
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
@@ -339,8 +339,7 @@ sub execute {
     $self->final_qc_outcome && croak $err;
     $self->result->add_comment($err);
   };
-  not $err and $self->result->qc_outcome(
-    $self->generate_qc_outcome($self->_outcome_type()));
+  not $err and $self->result->qc_outcome($self->generate_qc_outcome());
 
   return;
 }
@@ -372,9 +371,7 @@ Returns a hash reference representing the QC outcome.
 =cut
 
 sub generate_qc_outcome {
-  my ($self, $outcome_type) = @_;
-
-  $outcome_type or croak 'outcome type should be defined';
+  my ($self) = @_;
 
   my $package_name = 'npg_qc::Schema::Mqc::OutcomeDict';
   my $pass = $self->result->pass;
@@ -383,12 +380,10 @@ sub generate_qc_outcome {
   my $outcome = $package_name->generate_short_description(
     $self->final_qc_outcome ? 1 : 0, $pass);
 
-  $outcome_type .= '_outcome';
-  my $outcome_info = { $outcome_type => $outcome,
-                       timestamp   => create_current_timestamp(),
-                       username    => $ROBO_KEY};
-
-  return $outcome_info;
+  my $outcome_type = $self->lims->is_lane ? $QC_TYPE_SEQ : $QC_TYPE_LIB . '_outcome';
+  return { $outcome_type => $outcome,
+           timestamp     => create_current_timestamp(),
+           username      => $ROBO_KEY };
 }
 
 =head2 lims
@@ -803,22 +798,6 @@ sub _evaluate_expression {
 
   # Evaluate and return the outcome.
   return $evaluator->($obj);
-}
-
-sub _outcome_type {
-  my $self = shift;
-
-  my $outcome_type = $self->_robo_config()->{$QC_TYPE_KEY};
-  if ($outcome_type) {
-    if (none { $outcome_type eq $_ } @VALID_QC_TYPES) {
-      croak "Invalid QC type '$outcome_type' in a robo config for " .
-            $self->_entity_desc;
-    }
-  } else {
-    $outcome_type = $QC_TYPE_DEFAULT;
-  }
-
-  return $outcome_type;
 }
 
 __PACKAGE__->meta->make_immutable();

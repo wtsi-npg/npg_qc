@@ -417,7 +417,7 @@ subtest 'single expression evaluation' => sub {
 };
 
 subtest 'evaluation within the execute method' => sub {
-  plan tests => 40;
+  plan tests => 39;
 
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
@@ -442,7 +442,7 @@ subtest 'evaluation within the execute method' => sub {
     qc_in     => $dir,
     rpt_list  => $rpt_list);
   push @check_objects, npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/mqc_type",
+    conf_path => "$test_data_dir/lib_type_scalar",
     qc_in     => $dir,
     rpt_list  => $rpt_list);
 
@@ -471,14 +471,6 @@ subtest 'evaluation within the execute method' => sub {
   );
   lives_ok { $check->execute } 'execute method runs OK';
   is ($check->result->library_type, undef, 'library_type attribute is unset');
-
-  $check = npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/unknown_qc_type",
-    qc_in     => $dir,
-    rpt_list  => $rpt_list);
-  throws_ok { $check->execute }
-    qr/Invalid QC type \'someqc\' in a robo config/,
-    'error if qc outcome type is not recignised';
 
   my $target = "$dir/29524#2.bam_flagstats.json";
 

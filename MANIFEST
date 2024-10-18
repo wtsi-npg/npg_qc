@@ -519,10 +519,9 @@ t/data/autoqc/review/with_criteria/product_release.yml
 t/data/autoqc/review/with_na_criteria/product_release.yml
 t/data/autoqc/review/no_criteria_section/product_release.yml
 t/data/autoqc/review/not_hash/product_release.yml
-t/data/autoqc/review/mqc_type/product_release.yml
+t/data/autoqc/review/lib_type_scalar/product_release.yml
 t/data/autoqc/review/lims_applicability_empty/product_release.yml
 t/data/autoqc/review/no_known_applicability_type/product_release.yml
-t/data/autoqc/review/unknown_qc_type/product_release.yml
 t/data/autoqc/review/default_and_study_section/product_release.yml
 t/data/autoqc/review/default_section/product_release.yml
 t/data/autoqc/review/wrong_default_and_study_section/product_release.yml
