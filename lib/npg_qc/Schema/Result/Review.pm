@@ -275,7 +275,7 @@ __PACKAGE__->might_have (
   },
 );
 
-=head2 uqc_outcome_ent
+=head2 mqc_seq_outcome_ent
 
 Type: might_have
 Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeEnt>
@@ -283,8 +283,8 @@ Related object: L<npg_qc::Schema::Result::MqcLibraryOutcomeEnt>
 =cut
 
 __PACKAGE__->might_have (
-  'uqc_outcome_ent',
-  'npg_qc::Schema::Result::UqcOutcomeEnt',
+  'mqc_seq_outcome_ent',
+  'npg_qc::Schema::Result::MqcOutcomeEnt',
   { 'foreign.id_seq_composition' => 'self.id_seq_composition' },
   {
     is_deferrable => 1,
@@ -320,21 +320,15 @@ __PACKAGE__->has_many(
 Both update and insert methods are modified.
 
 If the qc outcome attribute is defined we will try saving this
-outcome as either library mqc outcome or uqc outcome.
+outcome as either library or sequencing mqc outcome.
 
-If a final library mqc outcome already exists for this product
-and we are trying to save a different final qc outcome, neither
-the review nor the mqc records are created and an error is raised.
+If a final mqc outcome already exists for this product and we are
+trying to save a different final qc outcome, neither the review nor
+the mqc records are created and an error is raised.
 
 Saving a review result with a preliminary outcome should always
-create or update a review row, but a library mqc outcome for the
-product will only be updated if there is no existing final mqc
-outcome.
-
-The type of existing qc outcome is not checked at the point of
-update. Therefore, it is possible to create by mistake a review
-record to which different types of roboqc-derived qc outcomes
-are linked.
+create or update a review row, but the mqc outcome itself is only
+updated if there is no existing final mqc outcome.
 
 =cut
 
@@ -391,13 +385,21 @@ sub _save_qc_outcome {
   my ($self, $qc_outcome) = @_;
   #####
   # What kind of qc outcome we need to update/create?
-  my $entity_type = (grep { $_ =~ /_outcome\Z/xms } keys %{$qc_outcome})[0];
+  # The value below can be either 'mqc_outcome' or 'mqc_seq_outcome'.
+  my $outcome_type = (grep { $_ =~ /_outcome\Z/xms } keys %{$qc_outcome})[0];
   #####
   # Find an existing qc outcome in the outcomes table or
   # create a new object.
-  my $qc_row = $self->find_or_new_related($entity_type . '_ent',
+  my $qc_row = $self->find_or_new_related($outcome_type . '_ent',
     {'id_seq_composition' => $self->id_seq_composition});
 
+  my $outcome_description = $qc_outcome->{$outcome_type};
+  # The outcome should be saved under the 'mqc_outcome' key.
+  if ($outcome_type ne 'mqc_outcome') {
+    $qc_outcome->{'mqc_outcome'} = $outcome_description;
+    delete $qc_outcome->{$outcome_type};
+  }
+  
   my $update_or_create = 1;
   try {
     $update_or_create = $qc_row->valid4update($qc_outcome);
@@ -408,7 +410,7 @@ sub _save_qc_outcome {
     # no mqc update and no error. We might be archiving post-manual QC.
     if (($err =~ /Final\ outcome\ cannot\ be\ updated/xms) and
         (not $qc_row->mqc_outcome
-         ->is_final_outcome_description($qc_outcome->{'mqc_outcome'}))) {
+         ->is_final_outcome_description($outcome_description))) {
       $update_or_create = 0;
     } else {
       croak "Not saving review result. $err for " . $qc_row->composition->freeze();
