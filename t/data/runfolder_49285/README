@@ -1,7 +1,7 @@
 22 October 2024
 
-The tar.xz file in this directory contains a collection of files for run 49285.
-At the time of writing the collection includes:
+The 240802_A00537_1044_BHJKCGDSXC.tar.gz file in this directory contains a
+collection of files for run 49285. At the time of writing the collection includes:
 
 - JSON files for Autoqc results contains some lane-level data for lanes 1,2,3
 and 4 plex-level results for plexes  1,2,3,0,888 for lane 1

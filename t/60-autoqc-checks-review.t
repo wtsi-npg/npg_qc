@@ -812,7 +812,7 @@ subtest 'evaluating generic for artic results' => sub {
 };
 
 subtest 'evaluating for LCMB library type' => sub { 
-  plan tests => 2;
+  plan tests => 14;
 
   my $test_data_path = 't/data/runfolder_49285';
   my $runfolder_name = '240802_A00537_1044_BHJKCGDSXC';
@@ -834,24 +834,78 @@ subtest 'evaluating for LCMB library type' => sub {
     verbose => 0
   )->load();
 
-  my $rpt_list = "${id_run}:1:1";
-  my $init = {
+  my $check = npg_qc::autoqc::checks::review->new(
     runfolder_path => $runfolder_path,
     conf_path      => $test_data_path,
-    rpt_list       => $rpt_list,
+    rpt_list       => "${id_run}:1:1",
     use_db         => 1,
     _qc_schema => $schema
-  };
-  my $check = npg_qc::autoqc::checks::review->new($init);
-  lives_ok { $check->execute() } 'check runs OK';
+  );
+  lives_ok { $check->execute() } 'plex level check runs OK';
   my %expected_evaluation_results = map { $_ => 1 } (
     'sequence_error.pass && (sequence_error.forward_common_cigars->[0]->[0] =~ /\\A\\d+M\\Z/xsm)',
     'sequence_error.pass && (sequence_error.reverse_common_cigars->[0]->[0] =~ /\\A\\d+M\\Z/xsm)',
     'bam_flagstats.percent_mapped_reads && (bam_flagstats.percent_mapped_reads > 80)',
     'verify_bam_id.pass'
   );
-  is_deeply ($check->result()->evaluation_results(), \%expected_evaluation_results,
+  my $result = $check->result();
+  is_deeply ($result->evaluation_results(), \%expected_evaluation_results,
     'sample evaluation results as expected');
+  is ($result->pass, 1, 'the check passed');
+  my $qc_outcome = $result->qc_outcome();
+  ok (defined $qc_outcome->{'timestamp'}, 'timestamp is set');
+  delete $qc_outcome->{'timestamp'};
+  is_deeply ($qc_outcome,
+    {'mqc_outcome' => 'Accepted preliminary', 'username' => 'robo_qc'},
+    'sample QC outcome is saved correctly'
+  );
+
+  $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $runfolder_path,
+    conf_path      => $test_data_path,
+    rpt_list       => "${id_run}:1",
+    use_db         => 1,
+    _qc_schema => $schema
+  );
+  lives_ok { $check->execute() } 'lane level check runs OK';
+  $result = $check->result();
+  %expected_evaluation_results = (
+    'tag_metrics.matches_pf_percent && (tag_metrics.perfect_matches_percent +' .
+    ' tag_metrics.one_mismatch_percent) > 93' => 1,
+    'tag_metrics.all_reads * 302 > 750000000000' => 1
+  );
+  is_deeply ($result->evaluation_results(), \%expected_evaluation_results,
+    'lane evaluation results as expected');
+  is ($result->pass, 1, 'the check passed');
+  $qc_outcome = $result->qc_outcome();
+  ok (defined $qc_outcome->{'timestamp'}, 'timestamp is set');
+  delete $qc_outcome->{'timestamp'};
+  is_deeply ($qc_outcome,
+    {'mqc_seq_outcome' => 'Accepted preliminary', 'username' => 'robo_qc'},
+    'lane QC outcome is saved correctly'
+  );
+
+  $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $runfolder_path,
+    conf_path      => $test_data_path,
+    rpt_list       => "${id_run}:2",
+    use_db         => 1,
+    _qc_schema => $schema
+  );
+  lives_ok { $check->execute() } 'lane level check runs OK';
+  for my $key (keys %expected_evaluation_results) {
+    $expected_evaluation_results{$key} = 0;
+  }
+  $result = $check->result();
+  is_deeply ($result->evaluation_results(), \%expected_evaluation_results,
+    'lane evaluation results as expected');
+  is ($result->pass, 0, 'the check failed');
+  $qc_outcome = $result->qc_outcome();
+  delete $qc_outcome->{'timestamp'};
+  is_deeply ($qc_outcome,
+    {'mqc_seq_outcome' => 'Rejected preliminary', 'username' => 'robo_qc'},
+    'lane QC outcome is saved correctly'
+  );
 };
 
 1;

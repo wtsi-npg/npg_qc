@@ -398,7 +398,8 @@ sub generate_qc_outcome {
   my $outcome = $package_name->generate_short_description(
     $self->final_qc_outcome ? 1 : 0, $pass);
 
-  my $outcome_type = $self->lims->is_lane ? $QC_TYPE_SEQ : $QC_TYPE_LIB . '_outcome';
+  my $outcome_type = ($self->lims->is_lane ? $QC_TYPE_SEQ : $QC_TYPE_LIB)
+    . '_outcome';
   return { $outcome_type => $outcome,
            timestamp     => create_current_timestamp(),
            username      => $ROBO_KEY };

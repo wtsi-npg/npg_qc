@@ -14,6 +14,7 @@ default:
     criteria:
       - applicability_criteria:
           lims:
+            is_lane: 0
             library_type: 'LCMB'
             species_from_reference_genome: "Homo_sapiens"
             alignments_in_bam: 1
@@ -34,6 +35,6 @@ default:
             flowcell_mode: "S4"
             cycle_count: 318
         acceptance_criteria:
-          - "tag_metrics.matches_pf_percent && ((tag_metrics.perfect_matches_percent + tag_metrics.one_mismatch_percent) > 93"
-          - "tag_metrics.all_reads * 202 > 750000000000"
+          - "tag_metrics.matches_pf_percent && (tag_metrics.perfect_matches_percent + tag_metrics.one_mismatch_percent) > 93"
+          - "tag_metrics.all_reads * 302 > 750000000000"
 
