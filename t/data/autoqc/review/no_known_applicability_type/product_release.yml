@@ -24,12 +24,11 @@ study:
     merge:
       component_cache_dir: "/merge_component_cache/5392/"
     robo_qc:
-      qc_type: "uqc"
+      qc_type: "mqc"
       criteria:
         - applicability_criteria:
-            lims:
-              library_type:
-                - "HiSeqX PCR free"
+            libs:
+              library_type: "HiSeqX PCR free"
           acceptance_criteria :
             - "( bam_flagstats.target_proper_pair_mapped_reads / bam_flagstats.target_mapped_reads ) > 0.95"
             - "bam_flagstats.target_mapped_bases > 85_000_000_000"

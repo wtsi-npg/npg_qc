@@ -29,10 +29,13 @@ Readonly::Scalar my $QC_TYPE_KEY      => q[qc_type];
 Readonly::Scalar my $APPLICABILITY_CRITERIA_KEY => q[applicability_criteria];
 Readonly::Scalar my $LIMS_APPLICABILITY_CRITERIA_KEY => q[lims];
 Readonly::Scalar my $SEQ_APPLICABILITY_CRITERIA_KEY => q[sequencing_run];
+Readonly::Array  my @APPLICABILITY_CRITERIA_TYPES => (
+  $LIMS_APPLICABILITY_CRITERIA_KEY, $SEQ_APPLICABILITY_CRITERIA_KEY
+                                                     );
 Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
 
 Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
-Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT, q[uqc]);
+Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT);
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
@@ -102,11 +105,6 @@ set to true, the outcome is also marked as 'Final', otherwise it is
 marked as 'Preliminary' (examples: 'Accepted Final',
 'Rejected Preliminary'). By default the final_qc_outcome flag is
 false and the produced outcomes are preliminary.
-
-A valid User QC outcome is one of the values from the
-uqc_outcome_dict table of the npg_qc database. A concept of
-the finality and, hence, immutability of the outcome is not
-applicable to user QC outcome.
 
 The type of QC outcome can be configured within the Robo QC
 section of product configuration. The default type is library
@@ -329,8 +327,9 @@ sub execute {
   }
 
   $self->result->criteria($self->_criteria);
-  my $md5 = $self->result->generate_checksum4data($self->result->criteria);
-  $self->result->criteria_md5($md5);
+  $self->result->criteria_md5(
+    $self->result->generate_checksum4data($self->result->criteria)
+  );
   my $err;
 
   try {
@@ -341,7 +340,7 @@ sub execute {
     $self->result->add_comment($err);
   };
   not $err and $self->result->qc_outcome(
-    $self->generate_qc_outcome($self->_outcome_type(), $md5));
+    $self->generate_qc_outcome($self->_outcome_type()));
 
   return;
 }
@@ -368,13 +367,12 @@ sub evaluate {
 
 Returns a hash reference representing the QC outcome.
 
-  my $u_outcome = $r->generate_qc_outcome('uqc', $md5);
   my $m_outcome = $r->generate_qc_outcome('mqc');
-
+  
 =cut
 
 sub generate_qc_outcome {
-  my ($self, $outcome_type, $md5) = @_;
+  my ($self, $outcome_type) = @_;
 
   $outcome_type or croak 'outcome type should be defined';
 
@@ -382,20 +380,13 @@ sub generate_qc_outcome {
   my $pass = $self->result->pass;
   #####
   # Any of Accepted, Rejected, Undecided outcomes can be returned here
-  my $outcome = ($outcome_type eq $QC_TYPE_DEFAULT)
-    ? $package_name->generate_short_description(
-      $self->final_qc_outcome ? 1 : 0, $pass)
-    : $package_name->generate_short_description_prefix($pass);
+  my $outcome = $package_name->generate_short_description(
+    $self->final_qc_outcome ? 1 : 0, $pass);
 
   $outcome_type .= '_outcome';
   my $outcome_info = { $outcome_type => $outcome,
                        timestamp   => create_current_timestamp(),
                        username    => $ROBO_KEY};
-  if ($outcome_type =~ /\Auqc/xms) {
-    my @r = ($ROBO_KEY, $VERSION);
-    $md5 and push @r, $md5;
-    $outcome_info->{'rationale'} = join q[ ], @r;
-  }
 
   return $outcome_info;
 }
@@ -514,31 +505,42 @@ has '_applicable_criteria' => (
 sub _build__applicable_criteria {
   my $self = shift;
 
-  my $criteria_objs = $self->_robo_config->{$CRITERIA_KEY};
   my @applicable = ();
-  foreach my $co ( @{$criteria_objs} ) {
+  foreach my $criteria_definition ( @{$self->_robo_config->{$CRITERIA_KEY}} ) {
+
+    my $applicability_definition = $criteria_definition->{$APPLICABILITY_CRITERIA_KEY};
+    $applicability_definition or croak
+      "$APPLICABILITY_CRITERIA_KEY is not defined for one of RoboQC criteria";
+
     my $c_applicable = 1;
-    for my $c_type ($LIMS_APPLICABILITY_CRITERIA_KEY, $SEQ_APPLICABILITY_CRITERIA_KEY) {
-      my $c = $co->{$APPLICABILITY_CRITERIA_KEY}->{$c_type};
-      if ($c && !$self->_applicability($c, $c_type)) {
-        $c_applicable = 0;
-        last;
-      }
+    my $one_found = 0;
+    for my $c_type (@APPLICABILITY_CRITERIA_TYPES) {
+      exists $applicability_definition->{$c_type} or next;
+      $one_found = 1;
+      my $ac = $applicability_definition->{$c_type};
+      (defined $ac and keys %{$ac}) or croak
+        "$c_type type applicability criteria is not defined";
+      $c_applicable = $self->_is_applicable($c_type, $ac);
+      !$c_applicable && last; # Stop on the first non applicable.
     }
-    $c_applicable or next;
-    push @applicable, $co;
+    $one_found or croak 'None of known applicability type criteria is defined. ' .
+      'Known types: ' . join q[, ], @APPLICABILITY_CRITERIA_TYPES;
+    $c_applicable && push @applicable, $criteria_definition; # Save if fully applicable.
   }
 
   return \@applicable;
 }
 
-sub _applicability {
-  my ($self, $acriteria, $criteria_type) = @_;
+sub _is_applicable {
+  my ($self, $criteria_type, $acriteria) = @_;
 
-  ($acriteria && $criteria_type) or croak
-    'The criterium and its type type should be defined';
+  $criteria_type or croak
+    'Applicability criteria type is not defined';
+  $acriteria or croak
+    "$criteria_type applicability criteria is not defined";
   (ref $acriteria eq 'HASH') or croak sprintf
-    '%s section should be a hash in a robo config for %', $criteria_type, $self->_entity_desc;
+    '%s section should be a hash in a robo config for %',
+    $criteria_type, $self->_entity_desc;
 
   my $test = {};
   foreach my $prop ( keys %{$acriteria} ) {

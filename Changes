@@ -1,5 +1,20 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 73.0.0 (2024-10-24)
+ - Removed from the repository unused test data.
+ - npg_qc::autoqc::check::review:
+   1. Previously the code allowed for an empty applicability_criteria hash,
+      which resulted in a particular set of QC criteria being applied to every
+      and any product. Very early on this was an intended behaviour for UKB
+      data. The main filter was the study id. The default section of the product
+      configuration file does not have an external filter, so there is a real
+      danger of the review check being run indiscriminately for any product.
+      While this will never be an intention, small errors in the YML file might
+      have this effect.
+   2. Ability to set UQC outcomes was introduced for the Heron project. This
+      functionality was never used and is unlikely to be used in future, it is
+      now removed.
+
 release 72.2.1 (2024-10-04)
  - Added .github/dependabot.yml file to auto-update GitHub actions
  - GitHub CI - updated deprecated v2 runner action to v3
