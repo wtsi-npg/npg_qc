@@ -8,6 +8,7 @@ use List::MoreUtils qw/all any none uniq/;
 use English qw/-no_match_vars/;
 use DateTime;
 use Try::Tiny;
+use Class::Load qw/load_class/;
 
 use WTSI::DNAP::Utilities::Timestamp qw/create_current_timestamp/;
 use st::api::lims;
@@ -199,6 +200,23 @@ has 'use_db' => (
   isa => 'Bool',
   is  => 'ro',
 );
+
+has '_qc_schema' => (
+  isa        => 'Maybe[npg_qc::Schema]',
+  is         => 'ro',
+  required   => 0,
+  lazy_build => 1,
+);
+sub _build__qc_schema {
+  my $self = shift;
+  if ($self->use_db) {
+    # Load into memory on demand since in production scenario
+    # the database is used very rarely.
+    load_class 'npg_qc::Schema';
+    return npg_qc::Schema->connect();
+  }
+  return;
+}
 
 =head2 final_qc_outcome
 
@@ -627,9 +645,10 @@ sub _build__qc_store {
   # our data.
   my @l = @{$self->_result_class_names};
   return npg_qc::autoqc::qc_store->new(
-           use_db      => $self->use_db,
-           checks_list => \@l
-         );
+    qc_schema   => $self->_qc_schema,
+    use_db      => $self->use_db,
+    checks_list => \@l
+  );
 }
 
 #####
@@ -823,6 +842,12 @@ __END__
 
 =item English
 
+=item Try::Tiny
+
+=item Date::Time
+
+=item Class::Load
+
 =item WTSI::DNAP::Utilities::Timestamp
 
 =item st::api::lims
@@ -830,6 +855,8 @@ __END__
 =item npg_tracking::illumina::runfolder
 
 =item npg_tracking::util::pipeline_config
+
+=item npg_qc::Schema
 
 =back
 

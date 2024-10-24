@@ -11,7 +11,6 @@ use List::MoreUtils qw/any/;
 use Archive::Extract;
 
 use npg_testing::db;
-use npg_qc::autoqc::qc_store;
 use npg_tracking::glossary::composition;
 use st::api::lims;
 use npg_qc::autoqc::db_loader;
@@ -203,8 +202,9 @@ subtest 'caching appropriate criteria object' => sub {
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/with_na_criteria",
     qc_in     => $test_data_dir,
-    rpt_list  => '27483:1:2');
-  is_deeply ($check->_criteria, {}, 'empty criteria hash')
+    rpt_list  => '27483:1:2'
+  );
+  is_deeply ($check->_criteria, {}, 'empty criteria hash');
 };
 
 subtest 'execute when no criteria apply' => sub {
@@ -226,20 +226,31 @@ subtest 'execute when no criteria apply' => sub {
 };
 
 subtest 'setting options for qc store' => sub {
-  plan tests => 4;
+  plan tests => 7;
 
   my $check = npg_qc::autoqc::checks::review->new(
-    conf_path => "$test_data_dir/with_criteria",
-    qc_in     => $test_data_dir,
-    rpt_list  => '27483:1:2');
+    conf_path      => "$test_data_dir/with_criteria",
+    qc_in          => $test_data_dir,
+    rpt_list       => '27483:1:2',
+  );
   my $expected_class_names = [qw/bam_flagstats/];
   is_deeply ($check->_result_class_names, $expected_class_names, 'class names');
   is_deeply ($check->_qc_store->checks_list, $expected_class_names,
     'class names correctly propagated to the qc store object');
-
   ok (!$check->use_db, 'default is not to use the db');
+  is ($check->_qc_schema, undef, 'db schema object is not built');
   ok (!$check->_qc_store->use_db, 
     'db option correctly propagated to the qc store object');
+
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path      => "$test_data_dir/with_criteria",
+    qc_in          => $test_data_dir,
+    rpt_list       => '27483:1:2',
+    use_db         => 1,
+    _qc_schema     => $schema
+  );
+  ok ($check->_qc_store->use_db, 'option to use db is propagated');
+  is ($check->_qc_store->qc_schema, $schema, 'db schema is propagated when set');
 };
 
 subtest 'finding result - file system' => sub {
@@ -315,14 +326,10 @@ subtest 'finding results - database' => sub {
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
   my $init = {
     runfolder_path => $rf_path,
-    conf_path => $test_data_dir,
-    rpt_list  => $rpt_list,
-    use_db    => 1,
-    _qc_store => npg_qc::autoqc::qc_store->new(
-      use_db      => 1,
-      qc_schema   => $schema,
-      checks_list => [qw/bam_flagstats bcfstats verify_bam_id/]
-    )
+    conf_path      => $test_data_dir,
+    rpt_list       => $rpt_list,
+    use_db         => 1,
+    _qc_schema     => $schema
   };
   my $check;
   lives_ok { $check = npg_qc::autoqc::checks::review->new($init) }
@@ -830,14 +837,10 @@ subtest 'evaluating for LCMB library type' => sub {
   my $rpt_list = "${id_run}:1:1";
   my $init = {
     runfolder_path => $runfolder_path,
-    conf_path => $test_data_path,
-    rpt_list  => $rpt_list,
-    use_db    => 1,
-    _qc_store => npg_qc::autoqc::qc_store->new(
-      use_db      => 1,
-      qc_schema   => $schema,
-      checks_list => [qw/bam_flagstats sequence_error verify_bam_id/]
-    )
+    conf_path      => $test_data_path,
+    rpt_list       => $rpt_list,
+    use_db         => 1,
+    _qc_schema => $schema
   };
   my $check = npg_qc::autoqc::checks::review->new($init);
   lives_ok { $check->execute() } 'check runs OK';
