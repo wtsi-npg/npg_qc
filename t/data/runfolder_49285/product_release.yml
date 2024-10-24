@@ -1,0 +1,39 @@
+---
+common:
+  irods: &no_irods
+    enable: false
+default:
+  irods: &default_irods
+    enable: true
+  data_deletion:
+    staging_deletion_delay: 30
+  markdup_method: "biobambam"
+  gbs_pipeline: &gbs_pipeline_accessible
+    allowed: true
+  robo_qc:
+    criteria:
+      - applicability_criteria:
+          lims:
+            library_type: 'LCMB'
+            species_from_reference_genome: "Homo_sapiens"
+            alignments_in_bam: 1
+          sequencing_run:
+            platform_NovaSeq: 1
+            flowcell_mode: "S4"
+            cycle_count: 318
+        acceptance_criteria:
+          - "sequence_error.pass && (sequence_error.forward_common_cigars->[0]->[0] =~ /\\A\\d+M\\Z/xsm)"
+          - "sequence_error.pass && (sequence_error.reverse_common_cigars->[0]->[0] =~ /\\A\\d+M\\Z/xsm)"
+          - "bam_flagstats.percent_mapped_reads && (bam_flagstats.percent_mapped_reads > 80)"
+          - "verify_bam_id.pass"
+      - applicability_criteria:
+          lims:
+            is_lane: 1
+          sequencing_run:
+            platform_NovaSeq: 1
+            flowcell_mode: "S4"
+            cycle_count: 318
+        acceptance_criteria:
+          - "tag_metrics.matches_pf_percent && ((tag_metrics.perfect_matches_percent + tag_metrics.one_mismatch_percent) > 93"
+          - "tag_metrics.all_reads * 202 > 750000000000"
+

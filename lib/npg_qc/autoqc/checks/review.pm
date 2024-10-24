@@ -608,11 +608,10 @@ has '_result_class_names'  => (
 sub _build__result_class_names {
   my $self = shift;
 
-  # Using all criteria objects regardles of relevance to this entity.
   my @class_names = uniq sort
                     map { (_class_name_from_expression($_))[0] }
-                    map { @{$_->{$ACCEPTANCE_CRITERIA_KEY}} }
-                    @{$self->_robo_config->{$CRITERIA_KEY}};
+                    map { @{$_} } # dereference the array
+                    values %{$self->_criteria()};
 
   return \@class_names;
 }

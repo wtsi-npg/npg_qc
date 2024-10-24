@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Test::Exception;
 use Test::Warn;
 use File::Temp qw/tempdir/;
@@ -8,11 +8,13 @@ use File::Copy;
 use File::Slurp qw/read_file write_file/;
 use JSON qw/from_json to_json/;
 use List::MoreUtils qw/any/;
+use Archive::Extract;
 
 use npg_testing::db;
 use npg_qc::autoqc::qc_store;
 use npg_tracking::glossary::composition;
 use st::api::lims;
+use npg_qc::autoqc::db_loader;
 
 use_ok('npg_qc::autoqc::checks::review');
 
@@ -31,6 +33,10 @@ my $criteria_list = [
   'bam_flagstats.target_percent_gt_coverage_threshold > 95',
   'verify_bam_id.freemix < 0.01'
 ];
+
+my $schema =  Moose::Meta::Class->create_anon_class(
+  roles => [qw/npg_testing::db/])->new_object()
+                                 ->create_test_db(q[npg_qc::Schema]);
 
 subtest 'constructing object, deciding whether to run' => sub {
   plan tests => 33;
@@ -226,7 +232,7 @@ subtest 'setting options for qc store' => sub {
     conf_path => "$test_data_dir/with_criteria",
     qc_in     => $test_data_dir,
     rpt_list  => '27483:1:2');
-  my $expected_class_names = [qw/bam_flagstats bcfstats verify_bam_id/];
+  my $expected_class_names = [qw/bam_flagstats/];
   is_deeply ($check->_result_class_names, $expected_class_names, 'class names');
   is_deeply ($check->_qc_store->checks_list, $expected_class_names,
     'class names correctly propagated to the qc store object');
@@ -237,7 +243,7 @@ subtest 'setting options for qc store' => sub {
 };
 
 subtest 'finding result - file system' => sub {
-  plan tests => 15;
+  plan tests => 14;
 
   my $expected = 'Expected results for bam_flagstats, bcfstats, verify_bam_id,';
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
@@ -245,20 +251,14 @@ subtest 'finding result - file system' => sub {
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
     't/data/autoqc/review/samplesheet_29524.csv';
 
-  my $check = npg_qc::autoqc::checks::review->new(
-    conf_path => $test_data_dir,
-    qc_in     => $test_data_dir,
-    rpt_list  => '27483:1:2');
-  throws_ok { $check->_results } qr/$expected found none/, 'no results - error';
-
   # should have all three for the entiry and phix for bam_flagstats and qx_yield
   # and gradually add them to qc_in
-
   for my $name (('29524#2.qX_yield.json',
                  '29524#2_phix.bam_flagstats.json',
                  '29524#7.bam_flagstats.json')) {
     copy "$test_data_dir/$name", "$dir/$name";
     my $c = npg_qc::autoqc::checks::review->new(
+      runfolder_path => $rf_path,
       conf_path => $test_data_dir,
       qc_in     => $dir,
       rpt_list  => $rpt_list);
@@ -267,7 +267,8 @@ subtest 'finding result - file system' => sub {
 
   my $name = '29524#2.bam_flagstats.json';
   copy "$test_data_dir/$name", "$dir/$name";
-  $check = npg_qc::autoqc::checks::review->new(
+  my $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $rf_path,
     conf_path => $test_data_dir,
     qc_in     => $dir,
     rpt_list  => $rpt_list);
@@ -277,6 +278,7 @@ subtest 'finding result - file system' => sub {
   $name = '29524#2.verify_bam_id.json';
   copy "$test_data_dir/$name", "$dir/$name";
   $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $rf_path,
     conf_path => $test_data_dir,
     qc_in     => $dir,
     rpt_list  => '29524:1:2;29524:2:2;29524:3:2;29524:4:2');
@@ -287,6 +289,7 @@ subtest 'finding result - file system' => sub {
   $name = '29524#2.bcfstats.json';
   copy "$test_data_dir/$name", "$dir/$name";
   $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $rf_path,
     conf_path => $test_data_dir,
     qc_in     => $test_data_dir,
     rpt_list  => $rpt_list);
@@ -310,11 +313,8 @@ subtest 'finding results - database' => sub {
     't/data/autoqc/review/samplesheet_29524.csv';
 
   my $rpt_list = '29524:1:2;29524:2:2;29524:3:2;29524:4:2';
-
-  my $schema =  Moose::Meta::Class->create_anon_class(
-    roles => [qw/npg_testing::db/])->new_object()
-                                   ->create_test_db(q[npg_qc::Schema]);
   my $init = {
+    runfolder_path => $rf_path,
     conf_path => $test_data_dir,
     rpt_list  => $rpt_list,
     use_db    => 1,
@@ -392,6 +392,7 @@ subtest 'single expression evaluation' => sub {
                   ];
 
   my $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $rf_path,
     conf_path => $test_data_dir,
     qc_in     => $test_data_dir,
     rpt_list  => $rpt_list);
@@ -801,6 +802,53 @@ subtest 'evaluating generic for artic results' => sub {
   is ($result->pass, undef, 'pass attribute is not set');
   is_deeply ($result->evaluation_results, {}, 'no evauation results');
   is_deeply ($result->qc_outcome, {}, 'no qc outcome');
+};
+
+subtest 'evaluating for LCMB library type' => sub { 
+  plan tests => 2;
+
+  my $test_data_path = 't/data/runfolder_49285';
+  my $runfolder_name = '240802_A00537_1044_BHJKCGDSXC';
+  my $staging_dir = tempdir( CLEANUP => 1 );
+  my $id_run = 49285;
+  local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
+    't/data/runfolder_49285/samplesheet_49285.csv';
+
+  my $ae = Archive::Extract->new(
+    archive => "${test_data_path}/${runfolder_name}.tar.gz"
+  );  
+  $ae->extract(to => $staging_dir) or die $ae->error;
+  my $runfolder_path = "${staging_dir}/${runfolder_name}";
+  npg_qc::autoqc::db_loader->new(
+    schema => $schema,
+    id_run => $id_run,
+    archive_path => $runfolder_path .
+      '/Data/Intensities/BAM_basecalls_20240804-060114/no_cal/archive',
+    verbose => 0
+  )->load();
+
+  my $rpt_list = "${id_run}:1:1";
+  my $init = {
+    runfolder_path => $runfolder_path,
+    conf_path => $test_data_path,
+    rpt_list  => $rpt_list,
+    use_db    => 1,
+    _qc_store => npg_qc::autoqc::qc_store->new(
+      use_db      => 1,
+      qc_schema   => $schema,
+      checks_list => [qw/bam_flagstats sequence_error verify_bam_id/]
+    )
+  };
+  my $check = npg_qc::autoqc::checks::review->new($init);
+  lives_ok { $check->execute() } 'check runs OK';
+  my %expected_evaluation_results = map { $_ => 1 } (
+    'sequence_error.pass && (sequence_error.forward_common_cigars->[0]->[0] =~ /\\A\\d+M\\Z/xsm)',
+    'sequence_error.pass && (sequence_error.reverse_common_cigars->[0]->[0] =~ /\\A\\d+M\\Z/xsm)',
+    'bam_flagstats.percent_mapped_reads && (bam_flagstats.percent_mapped_reads > 80)',
+    'verify_bam_id.pass'
+  );
+  is_deeply ($check->result()->evaluation_results(), \%expected_evaluation_results,
+    'sample evaluation results as expected');
 };
 
 1;

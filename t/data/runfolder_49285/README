@@ -1,0 +1,13 @@
+22 October 2024
+
+The tar.xz file in this directory contains a collection of files for run 49285.
+At the time of writing the collection includes:
+
+- JSON files for Autoqc results contains some lane-level data for lanes 1,2,3
+and 4 plex-level results for plexes  1,2,3,0,888 for lane 1
+- RunParameters.xml and RunInfo.xml files
+- a reducted samplesheet for the analysis
+
+The paths of the files in the collection reflect their original location in
+the production run folder. The review checks that use this collection of
+files will continue working if more files are added to the collection. 

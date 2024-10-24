@@ -399,7 +399,7 @@ sub _save_qc_outcome {
     $qc_outcome->{'mqc_outcome'} = $outcome_description;
     delete $qc_outcome->{$outcome_type};
   }
-  
+
   my $update_or_create = 1;
   try {
     $update_or_create = $qc_row->valid4update($qc_outcome);
