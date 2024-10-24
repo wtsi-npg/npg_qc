@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 73.0.0 (2024-10-24)
  - Removed from the repository unused test data.
  - npg_qc::autoqc::check::review:
    1. Previously the code allowed for an empty applicability_criteria hash,
