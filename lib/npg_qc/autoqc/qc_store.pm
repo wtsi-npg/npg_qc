@@ -11,7 +11,6 @@ use JSON;
 use Class::Load qw/load_class/;
 
 use npg_tracking::illumina::runfolder;
-use npg_qc::Schema;
 use npg_qc::autoqc::qc_store::options qw/$ALL $ALLALL $LANES $PLEXES/;
 use npg_qc::autoqc::qc_store::query;
 use npg_qc::autoqc::role::result;
@@ -68,6 +67,8 @@ has 'qc_schema' => (
 sub _build_qc_schema {
   my $self = shift;
   if ($self->use_db) {
+    # Load ORM classes into memory only if they are needed.
+    load_class 'npg_qc::Schema';
     return npg_qc::Schema->connect();
   }
   return;
@@ -595,6 +596,8 @@ __END__
 
 =item Class::Load
 
+=item npg_qc::Schema
+
 =item npg_tracking::illumina::runfolder
 
 =back
@@ -615,7 +618,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2019 GRL
+Copyright (C) 2019, 2024 Genome Research Ltd.
 
 This file is part of NPG.
 

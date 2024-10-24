@@ -8,6 +8,7 @@ use List::MoreUtils qw/all any none uniq/;
 use English qw/-no_match_vars/;
 use DateTime;
 use Try::Tiny;
+use Class::Load qw/load_class/;
 
 use WTSI::DNAP::Utilities::Timestamp qw/create_current_timestamp/;
 use st::api::lims;
@@ -34,8 +35,8 @@ Readonly::Array  my @APPLICABILITY_CRITERIA_TYPES => (
                                                      );
 Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
 
-Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
-Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT);
+Readonly::Scalar my $QC_TYPE_LIB => q[mqc];
+Readonly::Scalar my $QC_TYPE_SEQ => q[mqc_seq];
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
@@ -200,6 +201,23 @@ has 'use_db' => (
   is  => 'ro',
 );
 
+has '_qc_schema' => (
+  isa        => 'Maybe[npg_qc::Schema]',
+  is         => 'ro',
+  required   => 0,
+  lazy_build => 1,
+);
+sub _build__qc_schema {
+  my $self = shift;
+  if ($self->use_db) {
+    # Load into memory on demand since in production scenario
+    # the database is used very rarely.
+    load_class 'npg_qc::Schema';
+    return npg_qc::Schema->connect();
+  }
+  return;
+}
+
 =head2 final_qc_outcome
 
 A boolean read-only attribute, false by default.
@@ -339,8 +357,7 @@ sub execute {
     $self->final_qc_outcome && croak $err;
     $self->result->add_comment($err);
   };
-  not $err and $self->result->qc_outcome(
-    $self->generate_qc_outcome($self->_outcome_type()));
+  not $err and $self->result->qc_outcome($self->generate_qc_outcome());
 
   return;
 }
@@ -372,9 +389,7 @@ Returns a hash reference representing the QC outcome.
 =cut
 
 sub generate_qc_outcome {
-  my ($self, $outcome_type) = @_;
-
-  $outcome_type or croak 'outcome type should be defined';
+  my ($self) = @_;
 
   my $package_name = 'npg_qc::Schema::Mqc::OutcomeDict';
   my $pass = $self->result->pass;
@@ -383,12 +398,11 @@ sub generate_qc_outcome {
   my $outcome = $package_name->generate_short_description(
     $self->final_qc_outcome ? 1 : 0, $pass);
 
-  $outcome_type .= '_outcome';
-  my $outcome_info = { $outcome_type => $outcome,
-                       timestamp   => create_current_timestamp(),
-                       username    => $ROBO_KEY};
-
-  return $outcome_info;
+  my $outcome_type = ($self->lims->is_lane ? $QC_TYPE_SEQ : $QC_TYPE_LIB)
+    . '_outcome';
+  return { $outcome_type => $outcome,
+           timestamp     => create_current_timestamp(),
+           username      => $ROBO_KEY };
 }
 
 =head2 lims
@@ -613,11 +627,10 @@ has '_result_class_names'  => (
 sub _build__result_class_names {
   my $self = shift;
 
-  # Using all criteria objects regardles of relevance to this entity.
   my @class_names = uniq sort
                     map { (_class_name_from_expression($_))[0] }
-                    map { @{$_->{$ACCEPTANCE_CRITERIA_KEY}} }
-                    @{$self->_robo_config->{$CRITERIA_KEY}};
+                    map { @{$_} } # dereference the array
+                    values %{$self->_criteria()};
 
   return \@class_names;
 }
@@ -633,9 +646,10 @@ sub _build__qc_store {
   # our data.
   my @l = @{$self->_result_class_names};
   return npg_qc::autoqc::qc_store->new(
-           use_db      => $self->use_db,
-           checks_list => \@l
-         );
+    qc_schema   => $self->_qc_schema,
+    use_db      => $self->use_db,
+    checks_list => \@l
+  );
 }
 
 #####
@@ -805,22 +819,6 @@ sub _evaluate_expression {
   return $evaluator->($obj);
 }
 
-sub _outcome_type {
-  my $self = shift;
-
-  my $outcome_type = $self->_robo_config()->{$QC_TYPE_KEY};
-  if ($outcome_type) {
-    if (none { $outcome_type eq $_ } @VALID_QC_TYPES) {
-      croak "Invalid QC type '$outcome_type' in a robo config for " .
-            $self->_entity_desc;
-    }
-  } else {
-    $outcome_type = $QC_TYPE_DEFAULT;
-  }
-
-  return $outcome_type;
-}
-
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -845,6 +843,12 @@ __END__
 
 =item English
 
+=item Try::Tiny
+
+=item Date::Time
+
+=item Class::Load
+
 =item WTSI::DNAP::Utilities::Timestamp
 
 =item st::api::lims
@@ -852,6 +856,8 @@ __END__
 =item npg_tracking::illumina::runfolder
 
 =item npg_tracking::util::pipeline_config
+
+=item npg_qc::Schema
 
 =back
 
