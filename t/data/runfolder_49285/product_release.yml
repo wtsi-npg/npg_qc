@@ -37,4 +37,5 @@ default:
         acceptance_criteria:
           - "tag_metrics.matches_pf_percent && (tag_metrics.perfect_matches_percent + tag_metrics.one_mismatch_percent) > 93"
           - "tag_metrics.all_reads * 302 > 750000000000"
+          - "tag_metrics.all_reads && (((qX_yield.yield1_q30 + qX_yield.yield2_q30) * 1000 * 100)/(tag_metrics.all_reads * 302) >= 78)"
 

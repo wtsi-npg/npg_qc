@@ -24,16 +24,15 @@ our $VERSION = '0';
 Readonly::Scalar my $CONJUNCTION_OP => q[and];
 Readonly::Scalar my $DISJUNCTION_OP => q[or];
 
-Readonly::Scalar my $ROBO_KEY         => q[robo_qc];
-Readonly::Scalar my $CRITERIA_KEY     => q[criteria];
-Readonly::Scalar my $QC_TYPE_KEY      => q[qc_type];
+Readonly::Scalar my $ROBO_KEY => q[robo_qc];
+Readonly::Scalar my $CRITERIA_KEY => q[criteria];
 Readonly::Scalar my $APPLICABILITY_CRITERIA_KEY => q[applicability_criteria];
 Readonly::Scalar my $LIMS_APPLICABILITY_CRITERIA_KEY => q[lims];
 Readonly::Scalar my $SEQ_APPLICABILITY_CRITERIA_KEY => q[sequencing_run];
 Readonly::Array  my @APPLICABILITY_CRITERIA_TYPES => (
   $LIMS_APPLICABILITY_CRITERIA_KEY, $SEQ_APPLICABILITY_CRITERIA_KEY
                                                      );
-Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
+Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY => q[acceptance_criteria];
 
 Readonly::Scalar my $QC_TYPE_LIB => q[mqc];
 Readonly::Scalar my $QC_TYPE_SEQ => q[mqc_seq];
@@ -41,8 +40,20 @@ Readonly::Scalar my $QC_TYPE_SEQ => q[mqc_seq];
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
 Readonly::Scalar my $CLASS_NAME_SPEC_DELIM => q[:];
-Readonly::Scalar my $CLASS_NAME_SPEC_RE    =>
-  qr/\A(?:\W+)? (\w+) (?: $CLASS_NAME_SPEC_DELIM (\w+))?[.]/xms;
+Readonly::Scalar my $CLASS_NAME_SPEC_RE =>
+  qr{
+    # Examples:
+    # "generic:ncov2019_artic_nf.doc->{meta}->{'num_input_reads'} > 10000"
+    # "tag_metrics.all_reads && (qX_yield.yield1_q30/(tag_metrics.all_reads * 302) > 78)"
+
+    (?:\W+)? # optional non-word characters
+    ( # start of capture group
+    [[:alpha:]_]+ # result class name
+    (?: $CLASS_NAME_SPEC_DELIM \w+)? # an optional spec for a generic result
+                                     # class prepended by a delimeter
+    ) # end of capture group
+    [.]  # ends with a dot
+  }xms;
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -663,7 +674,7 @@ sub _build__result_class_names {
   my $self = shift;
 
   my @class_names = uniq sort
-                    map { (_class_name_from_expression($_))[0] }
+                    map { _class_names_from_expression($_) }
                     map { @{$_} } # dereference the array
                     values %{$self->_criteria()};
 
@@ -732,11 +743,26 @@ sub _build__results {
   return \%h;
 }
 
-sub _class_name_from_expression {
+sub _class_names_with_spec_from_expression {
   my $e = shift;
-  my ($class_name, $spec) = $e =~ $CLASS_NAME_SPEC_RE;
-  $class_name or croak "Failed to infer class name from $e";
-  return ($class_name, $spec);
+  # Note 'g' flag at the end of the regexp. We will get a list of matches.
+  # The list might contain multiple class names for the same class. Depending
+  # on the expression, the return value contains one or more class names.
+  my @extended_class_names = $e =~ /$CLASS_NAME_SPEC_RE/xmsg;
+  @extended_class_names = uniq @extended_class_names; # Remove repetitions.
+  @extended_class_names or croak "Failed to infer class names from $e";
+  return @extended_class_names;
+}
+
+sub _class_names_from_expression {
+  my $e = shift;
+  my @names = ();
+  foreach my $name (_class_names_with_spec_from_expression($e)) {
+    ($name) = $name =~ /\A(\w+)/smx; # Remove the spec part if present.
+    push @names, $name;
+  }
+  @names = uniq @names;
+  return @names;
 }
 
 #####
@@ -796,6 +822,30 @@ sub _apply_operator {
   return $outcome ? 1 : 0;
 }
 
+sub _pp_name2spec {
+  # To get a match with what would have been used in the robo config,
+  # replace all 'non-word' characters.
+  my $pp_name = shift;
+  $pp_name =~ s/\W/_/gsmx;
+  return $pp_name;
+};
+
+sub _get_evaluation_result {
+  my ($perl_e, $e, $results) = @_;
+
+  use warnings FATAL => 'uninitialized'; # Force an error when operations on
+                                         # undefined values are attempted.
+  ##no critic (BuiltinFunctions::ProhibitStringyEval)
+  my $o = eval $perl_e; # Evaluate Perl expression
+  ##use critic
+  if ($EVAL_ERROR) {
+    my $err = $EVAL_ERROR;
+    croak "Error evaluating expression '$perl_e' derived from '$e': $err";
+  }
+
+  return $o ? 1 : 0;
+}
+
 #####
 # Evaluates a single expression in the context of available autoqc results.
 # If runs successfully, returns 0 or 1, otherwise throws an error.
@@ -803,55 +853,37 @@ sub _apply_operator {
 sub _evaluate_expression {
   my ($self, $e) = @_;
 
-  my ($class_name, $spec) = _class_name_from_expression($e);
-  my $obj_a = $self->_results->{$class_name};
-  # We should not get this far with an error in the configuration
-  # file, but just in case...
-  $obj_a and @{$obj_a} or croak "No autoqc result for evaluation of '$e'";
+  my @names = _class_names_with_spec_from_expression($e);
+  my $results = {};
+  my $perl_e = $e;
+  # Prepare the expression from the robo config for evaluation.
+  foreach my $name (@names) {
+    my ($class_name, $spec) = split /$CLASS_NAME_SPEC_DELIM/smx, $name;
+    my $obj_a = $self->_results->{$class_name};
+    # We should not get this far with an error in the configuration
+    # file, but just in case...
+    $obj_a and @{$obj_a} or croak "No $class_name autoqc result for evaluation of '$e'";
+    if ($spec) {
+      # Now have to choose one result. If the object is not an instance of
+      # the generic autoqc result class, there will be an error at this point.
+      # Making the code less specific is not worth the effort at this point.
+      my @on_spec = grep { _pp_name2spec($_->pp_name) eq $spec } @{$obj_a};
+      @on_spec or croak "No $name autoqc result for evaluation of '$e'";
+      $obj_a = \@on_spec;
+    }
+    (@{$obj_a} == 1) or croak "Multiple $name autoqc results for evaluation of '$e'";
+    my $obj = $obj_a->[0];
+    $obj or croak "No $class_name autoqc result for evaluation of '$e'";
+    $results->{$name} = $obj;
 
-  if ($spec) {
-    my $pp_name2spec = sub {    # To get a match with what would have been
-      my $pp_name = shift;      # used in the robo config, replace all
-      $pp_name =~ s/\W/_/gsmx;  # 'non-word' characters.
-      return $pp_name;
-    };
-    # Now have to choose one result. If the object is not an instance of
-    # the generic autoqc result class, there will be an error at this point.
-    # Making the code less specific is not worth the effort at this point.
-    my @on_spec = grep { $pp_name2spec->($_->pp_name) eq $spec } @{$obj_a};
-    @on_spec or croak "No autoqc $class_name result for $spec";
-    $obj_a = \@on_spec;
+    ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+    my $replacement = q[$results->{'] . $name . q['}->];
+    ## use critic
+    $perl_e =~ s/$name[.]/$replacement/xmsg;
   }
 
-  (@{$obj_a} == 1) or croak "Multiple autoqc results for evaluation of '$e'";
-  my $obj = $obj_a->[0];
-
-  $obj or croak "No autoqc result for evaluation of '$e'";
-
-  # Prepare the expression from the robo config for evaluation.
-  my $placeholder = $class_name;
-  $spec and ($placeholder .= $CLASS_NAME_SPEC_DELIM . $spec);
-  my $replacement = q[$] . q[result->];
-  my $perl_e = $e;
-  $perl_e =~ s/$placeholder[.]/$replacement/xmsg;
-
-  my $evaluator = sub { # Evaluation function
-    my $result = shift;
-    # Force an error when operations on undefined values are
-    # are attempted.
-    use warnings FATAL => 'uninitialized';
-    ##no critic (BuiltinFunctions::ProhibitStringyEval)
-    my $o = eval $perl_e; # Evaluate Perl string expression
-    ##use critic
-    if ($EVAL_ERROR) {
-      my $err = $EVAL_ERROR;
-      croak "Error evaluating expression '$perl_e' derived from '$e': $err";
-    }
-    return $o ? 1 : 0;
-  };
-
   # Evaluate and return the outcome.
-  return $evaluator->($obj);
+  return _get_evaluation_result($perl_e, $e, $results);
 }
 
 __PACKAGE__->meta->make_immutable();
