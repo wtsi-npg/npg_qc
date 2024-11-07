@@ -41,9 +41,9 @@ Running development server from a standard deployed Perl stack in OpenStack
 ---------------------------------------------------------------------------
 
 In the standard NPG Perl stack the configuration file npg_qc_viewer.conf is
-edited. The file need the correct decryption_key value. This enables the SeqQC
+edited. The file needs the correct decryption_key value. This enables the SeqQC
 web application to decrypt the cookie, which is set up by the tracking server, 
-provided that both servers are co-located.
+provided that both servers are co-located (same Domain Name).
 
   export dev=dev
   export DATED_DIRECTORY_PATH=/software/npg/2024XXXX # or similar
