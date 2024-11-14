@@ -290,7 +290,7 @@ subtest 'a full insert/update record with mqc outcome' => sub {
     criteria           => {"and"=>["e1","e2"]},
     qc_outcome =>
     {"mqc_outcome"=>"Rejected final","timestamp"=>"2018-10-03T12:58:43+0000","username"=>"robo_qc"},
-    pass => 1,
+    pass => 0,
     path => 't/data'
   }; 
 
@@ -484,7 +484,7 @@ subtest 'a full insert/update record with mqc seq outcome' => sub {
     qc_outcome => {"mqc_seq_outcome"=>"Rejected final",
                    "timestamp"=>"2023-10-03T12:58:43+0000",
                   "username"=>"robo_qc"},
-    pass => 1,
+    pass => 0,
     path => 't/data'
   }; 
 
