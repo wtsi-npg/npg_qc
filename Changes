@@ -1,7 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - npg_qc::autoqc::qc_store - changed loading of ORM classes into memory
-   to on demand at ru time.
+   to on demand at run time.
  - Added lane-level assessment to RoboQC:
     - Extended npg_qc::Schema::Result::Review class to enable saving of
       sequencing (lane-level) QC outcomes to database
@@ -12,14 +12,14 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
       npg_qc::autoqc::check::review.
       A list of names for result classes to be loaded was inferred
       from all criteria in the 'robo' section under consideration.
-      Until now this did not pesent a problem since event when in
-      the study RoboQC section of the configuration file a number
-      of different criteria sections were present, it was possible
-      to load all of the AutoQC results for any given entity.
+      Until now this did not pesent a problem since even when a number
+      of different criteria sections were present in the study RoboQC
+      section of the configuration file, it was possible to load all of
+      the AutoQC results for any given entity.
       The bug is revealed when lane-level assessment is added to
       the 'robo' section under the 'default' configuration. This
       type of assessment might require presence of lane-level autoqc
-      results for checks that are never performed om sample level,
+      results for checks that are never performed on sample level,
       'tag_metrics' check being the most obvious example.
       The fix is to infer the list of class names from the criteria,
       which are going to be evaluated for the entity, rather than

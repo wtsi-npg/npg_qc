@@ -105,8 +105,8 @@ C<false> and the produced outcomes are preliminary.
 
 =head2 QC outcomes types
 
-The behaviour mimics 'manua; QC process via SeqQC UI. For lane entities
-'sequencing' QC outcomes are generated. Fo samples 'library' QC outcomes
+The behaviour mimics manual QC process via SeqQC UI. For lane entities
+'sequencing' QC outcomes are generated. For samples 'library' QC outcomes
 are generated.
 
 =head2 Rules for assignment of the QC outcome
