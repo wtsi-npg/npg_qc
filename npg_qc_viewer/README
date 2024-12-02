@@ -26,14 +26,35 @@ In browser javascript testing - open files in a browser window:
   t/client/test_qc_utils.html
   t/client/test_collapser.html
 
-Running your own development server
------------------------------------
 
+Running your own development server from a source tree
+------------------------------------------------------
+
+If testing against a non-production database, set the dev environment variable.
+To enable debugging set CATALYST_DEBUG=1.
+
+  export dev=dev
   bin/npg_qc_viewer_server.pl -p YOUR_PORT
 
-To test manual qc functionality, edit the decryption_key value in npg_qc_viewer.conf
 
-To enable debugging set CATALYST_DEBUG=1
+Running development server from a standard deployed Perl stack in OpenStack
+---------------------------------------------------------------------------
+
+In the standard NPG Perl stack the configuration file npg_qc_viewer.conf is
+edited. The file needs the correct decryption_key value. This enables the SeqQC
+web application to decrypt the cookie, which is set up by the tracking server, 
+provided that both servers are co-located (same Domain Name).
+
+  export dev=dev
+  export DATED_DIRECTORY_PATH=/software/npg/2024XXXX # or similar
+  export CATALYST_HOME=${DATED_DIRECTORY_PATH}/seqqc
+  export PATH=${DATED_DIRECTORY_PATH}/bin:$PATH
+  export PERL5LIB=${DATED_DIRECTORY_PATH}/lib/perl5
+
+  # The port (1969) needs to be open in ACLs (provider networks) or
+  # security groups (OS networks) accordingly.
+  npg_qc_viewer_server.pl -p 1969
+
 
 Using custom bcviz
 ------------------

@@ -8,6 +8,7 @@ use List::MoreUtils qw/all any none uniq/;
 use English qw/-no_match_vars/;
 use DateTime;
 use Try::Tiny;
+use Class::Load qw/load_class/;
 
 use WTSI::DNAP::Utilities::Timestamp qw/create_current_timestamp/;
 use st::api::lims;
@@ -34,8 +35,8 @@ Readonly::Array  my @APPLICABILITY_CRITERIA_TYPES => (
                                                      );
 Readonly::Scalar my $ACCEPTANCE_CRITERIA_KEY    => q[acceptance_criteria];
 
-Readonly::Scalar my $QC_TYPE_DEFAULT  => q[mqc];
-Readonly::Array  my @VALID_QC_TYPES   => ($QC_TYPE_DEFAULT);
+Readonly::Scalar my $QC_TYPE_LIB => q[mqc];
+Readonly::Scalar my $QC_TYPE_SEQ => q[mqc_seq];
 
 Readonly::Scalar my $TIMESTAMP_FORMAT_WOFFSET => q[%Y-%m-%dT%T%z];
 
@@ -58,84 +59,80 @@ npg_qc::autoqc::checks::review
 
 =head2 Overview
 
-This checks evaluates the results of other autoqc checks
-against a predefined set of criteria.
+This checks evaluates the results of other autoqc checks against a predefined
+set of criteria.
 
-If data product acceptance criteria are defined, it is possible to
-introduce a degree of automation into the manual QC process. To
-provide interoperability with the API supporting the manual QC process,
-the outcome of the evaluation, which is performed by this check, is
-recorded not only as a simple undefined, pass or fail as in other autoqc
-checks, but also as one of valid manual or user QC outcomes.
+If data product acceptance criteria are defined, it is possible to introduce
+a degree of automation into the QC process. To provide interoperability with
+the API supporting the manual QC process, the outcome of the evaluation is
+recorded not only as a simple C<undefined>, C<pass> or C<fail> as in other
+autoqc checks, but also as one of valid manual lane or library-level QC
+outcomes.
 
 =head2 Types of criteria
 
-The robo section of the product configuration file sits either
-within the configuration for a particular study or in the default
-section, or in both locations. A study-specific RoboQC definition
+The C<robo> section of the product configuration file sits either within
+the configuration for a particular study or in the C<default> section, or
+in both locations. For a given entity a study-specific RoboQC definition
 takes precedence over the default one.
 
-Evaluation criteria for samples vary depending on the sequencing
-instrument type, library type, sample type, etc. There might be a
-need to exclude some samples from RoboQC. The criteria key of the
-robo configuration points to an array of criteria objects. Each of
-the criteria contains two further keys, one for acceptance and one
-for applicability criteria. The acceptance criteria are evaluated
-if either the applicability criteria have been satisfied or no
-applicability criteria are defined.
+Evaluation criteria for samples vary depending on the sequencing instrument
+and flowcell type, library type, sample reference, etc. Each of the
+C<criteria> keys of the C<robo> configuration contains two further keys, one
+for acceptance and one for applicability criteria.
 
-The applicability criteria for each criteria object should be
-set in such a way that the order of evaluation of the criteria
-array does not matter. If applicability criteria in all of the
-criteria objects are not satisfied, no QC outcome is assigned
-and the pass attribute of the review result object remains unset.
+The applicability criteria for each criteria object should be set in such
+a way that the order of evaluation of the criteria array does not matter.
+If applicability criteria in all of the criteria objects are not satisfied,
+the evaluation is not performed, no QC outcome is assigned and the C<pass>
+attribute of the review result object remains unset.
 
-The product can satisfy applicability criteria in at most one
-criteria object. If none of the study-specific applicability
-criteria are satisfied, the review check does not proceed even if
-the product might satisfy one of the default applicability criteria.
+The product can satisfy applicability criteria in at most one criteria object.
+If none of the study-specific applicability criteria are satisfied, the review
+check does not proceed even if the product satisfies one of the applicability
+criteria in the C<default> section.
 
-=head2 QC outcomes
+=head2 QC outcomes values
 
-A valid Manual QC outcome is one of the values from the library
-qc outcomes dictionary (mqc_library_outcome_dict table of the
-npg_qc database), i.e. one of 'Accepted', 'Rejected' or 'Undecided'
-outcomes. If the final_qc_outcome flag of this class' instance is
-set to true, the outcome is also marked as 'Final', otherwise it is
-marked as 'Preliminary' (examples: 'Accepted Final',
-'Rejected Preliminary'). By default the final_qc_outcome flag is
-false and the produced outcomes are preliminary.
+A valid manual QC outcome is one of the values from the library
+qc outcomes dictionary (C<mqc_library_outcome_dict> table of the
+QC database), i.e. one of 'Accepted', 'Rejected' or 'Undecided'
+outcomes. If the C<final_qc_outcome> flag of the review check object
+is set to a C<true> value, the outcome is also marked as 'Final',
+ otherwise it is marked as 'Preliminary' (examples: C<Accepted Final>,
+C<Rejected Preliminary>). By default the C<final_qc_outcome> flag is
+C<false> and the produced outcomes are preliminary.
 
-The type of QC outcome can be configured within the Robo QC
-section of product configuration. The default type is library
-Manual QC.
+=head2 QC outcomes types
+
+The behaviour mimics manual QC process via SeqQC UI. For lane entities
+'sequencing' QC outcomes are generated. For samples 'library' QC outcomes
+are generated.
 
 =head2 Rules for assignment of the QC outcome
 
 The rules below apply to a single criteria object.
 
 The 'Accepted' outcome is assigned if the outcome of evaluation is
-true, the 'Rejected' outcome is assigned otherwise.
+a C<true> value, the 'Rejected' outcome is assigned otherwise.
 
 =head2 Retrieval of autoqc results to be evaluated
 
 It is possible to invoke this check on any entity. At run time an
 attempt is made to retrieve autoqc results for this entity (product),
-which are relevant to the RoboQC for this product. If this attempt
-fails, the execute method of the check will exit with an error. A
+which are relevant to RoboQC for this product. If this attempt
+fails, the C<execute> method of the check will exit with an error. A
 failure to retrieve the autoqc results might be for one of three
-reasons: (1) either the entity is not an end product (example: a pool)
-and no such results exist or (2) it is a product, but the autoqc results
-have not been computed yet, or (3) they have, but their file system
-location (if that's where we are looking) is different from expected
-(ie given by the qc_in attribute).
+reasons: (1) the autoqc results have not been computed yet, or (2) the
+file system location is different from the one given by C<qc_in>
+attribute.
 
-The autoqc results are retrieved either from the file system (use_db
-attribute should be set to false, which is default) or from a database
-(use_db attribute should be set to true). npg_qc::autoqc::qc_store class
-is used to retrieve results. In contrast to the default behaviour of the
-npg_qc::autoqc::qc_store class, if the database retrieval is enabled, no
-fall back to a search on a file system is performed.
+The autoqc results are retrieved either from the file system (C<use_db>
+attribute should be set to C<false>, which is default) or, C<use_db> is
+set to a C<true> value, from a database. C<npg_qc::autoqc::qc_store>
+class is used to retrieve results. In contrast to the default behaviour
+of C<npg_qc::autoqc::qc_store> class, if no result are retrieved from
+the database, a search on a file system is not attempted.
 
 =head2 Record of the evaluation criteria
 
@@ -189,9 +186,9 @@ all criteria in the array are equally essential. Therefore, a conjunction
 
 =head2 use_db
 
-A boolean read-only attribute, false by default.
-If set to false, autoqc results are loaded from the qc_in path.
-If set to true, they are loaded from the database.
+A boolean read-only attribute, C<false> by default.
+If set to C<false>, autoqc results are loaded from the C<qc_in> path.
+If set to C<true>, the results are loaded from the database.
 
 =cut
 
@@ -200,11 +197,30 @@ has 'use_db' => (
   is  => 'ro',
 );
 
+# The DBIx schema object for the database with autoqc results. 
+has '_qc_schema' => (
+  isa        => 'Maybe[npg_qc::Schema]',
+  is         => 'ro',
+  required   => 0,
+  lazy_build => 1,
+);
+sub _build__qc_schema {
+  my $self = shift;
+  if ($self->use_db) {
+    # Load into memory on demand since in production scenario
+    # the database is used very rarely.
+    load_class 'npg_qc::Schema';
+    return npg_qc::Schema->connect();
+  }
+  return;
+}
+
 =head2 final_qc_outcome
 
-A boolean read-only attribute, false by default.
-If set to false, the result of the evaluation is saved as a
-preliminary manual QC outcome. If set to true,  the result of the
+A boolean read-only attribute, C<false> by default.
+
+If set to C<false>, the result of the evaluation is saved as a
+preliminary manual QC outcome. If set to C<true>,  the result of the
 evaluation is saved as a final manual QC outcome.
 
 =cut
@@ -216,22 +232,30 @@ has 'final_qc_outcome' => (
 
 =head2 conf_path
 
-An attribute, an absolute path of the directory with
-the pipeline's configuration files. Inherited from
-npg_tracking::util::pipeline_config
+An attribute, an absolute path of the directory with the pipeline's
+configuration files.
+
+Inherited from C<npg_tracking::util::pipeline_config>.
 
 =head2 conf_file_path
 
-A method. Returns the path of the product configuration file.
-Inherited from npg_tracking::util::pipeline_config
+Method returning the path of the product configuration file.
+
+Inherited from C<npg_tracking::util::pipeline_config>.
 
 =head2 runfolder_path
 
-The runfolder path, an optional attribute. In case of complex products
-(multi-component compositions) is only relevant if all components belong
-to the same sequencing run. This attribute is used to retrieve information
-from RunInfo.xml and {r,R}unParameters.xml files. Some 'robo' configuration
-might not require information of this nature, thus the attribute is optional.
+The runfolder path, an optional attribute.
+
+In case of complex products (multi-component compositions) it is only relevant
+if all components belong to the same sequencing run. This attribute is used to
+retrieve information from C<RunInfo.xml> and C<{r,R}unParameters.xml> files.
+
+Some C<robo> configurations do not require information of this nature, thus the
+attribute is optional. In practice the attribute has to be set to allow for
+correct evaluation of applicability of all criteria of a production RoboQC
+configuration.
+
 If the information from the above-mentioned files is required, but the access
 to the staging run folder is not available, the check cannot be run.
 
@@ -247,7 +271,7 @@ has 'runfolder_path' => (
 =head2 BUILD
 
 A method that is run before returning the new object instance to the caller.
-Errors if any attributes of the object are are in conflict.
+Errors if any attributes of the object are in conflict.
 
 =cut
 
@@ -263,8 +287,9 @@ sub BUILD {
 
 =head2 can_run
 
-Returns true if the check can be run, ie a valid RoboQC configuration exists
-and one of the applicability criteria is satisfied for this product.
+Returns a C<true> value if the check can be run, ie a valid RoboQC
+configuration exists and one of the applicability criteria is satisfied for
+this product.
 
 =cut
 
@@ -302,14 +327,13 @@ sub can_run {
 
 =head2 execute
 
-Returns early if the can_run method returns a false value.
+Returns early without an error if C<can_run> method returns a C<false> value.
 
-An assessment of applicability of running RoboQC on this entity is performed
-next, an early return is possible after that. If RoboQC is applicable, a full
-evaluation of autoqc results for this product is performed. If autoqc results
-that are necessary to perform the evaluation are not available or there is
-some other problem with evaluation, an error is raised if the final_qc_outcome
-flag is set to true, otherwise it is captured and and logged as a comment.
+If C<can_run> returns a C<true> value, a full evaluation of autoqc results
+for this product is performed. If autoqc results that are necessary to perform
+the evaluation are not available or there is some other problem with evaluation,
+an error is raised if the C<final_qc_outcome> flag is set to C<true>, otherwise
+the error it is captured and and logged as a comment.
 
 No QC outcome is assigned if the evaluation has not had a chance to run to a
 successful completion.
@@ -339,8 +363,7 @@ sub execute {
     $self->final_qc_outcome && croak $err;
     $self->result->add_comment($err);
   };
-  not $err and $self->result->qc_outcome(
-    $self->generate_qc_outcome($self->_outcome_type()));
+  not $err and $self->result->qc_outcome($self->generate_qc_outcome());
 
   return;
 }
@@ -348,8 +371,8 @@ sub execute {
 =head2 evaluate
 
 Method implementing the top level evaluation algorithm. Returns the outcome
-of the evaluation as 0 for a fail or 1 for a pass. Saves the outcomes of
-evaluation of individual expressions in the evaluation_results attribute of
+of the evaluation as C<0> for a fail or C<1> for a pass. Saves the outcomes of
+evaluation of individual expressions in the C<evaluation_results> attribute of
 the result object.
 
 =cut
@@ -367,14 +390,29 @@ sub evaluate {
 
 Returns a hash reference representing the QC outcome.
 
-  my $m_outcome = $r->generate_qc_outcome('mqc');
-  
+  my $qc_outcome = $r->generate_qc_outcome();
+
+The returned hash has three keys:
+
+=over
+
+=item C<timestamp> records the current time and is interpreted downstream
+  as the time the QC decision was made.
+
+=item C<username> with the value of C<'robo_qc'>, is interpreted downstream as
+  the user who performed 'manual' QC.
+
+=item C<mqc_outcome> or C<mqc_seq_outcome> for the outcome of the evaluation.
+  Examples of values: C<Accepted preliminary>, C<Rejected final>. If lane-level
+  evaluation is performed, the key is C<mqc_seq_outcome>, otherwise it is
+  C<mqc_outcome>.
+
+=back
+
 =cut
 
 sub generate_qc_outcome {
-  my ($self, $outcome_type) = @_;
-
-  $outcome_type or croak 'outcome type should be defined';
+  my ($self) = @_;
 
   my $package_name = 'npg_qc::Schema::Mqc::OutcomeDict';
   my $pass = $self->result->pass;
@@ -383,17 +421,16 @@ sub generate_qc_outcome {
   my $outcome = $package_name->generate_short_description(
     $self->final_qc_outcome ? 1 : 0, $pass);
 
-  $outcome_type .= '_outcome';
-  my $outcome_info = { $outcome_type => $outcome,
-                       timestamp   => create_current_timestamp(),
-                       username    => $ROBO_KEY};
-
-  return $outcome_info;
+  my $outcome_type = ($self->lims->is_lane ? $QC_TYPE_SEQ : $QC_TYPE_LIB)
+    . '_outcome';
+  return { $outcome_type => $outcome,
+           timestamp     => create_current_timestamp(),
+           username      => $ROBO_KEY };
 }
 
 =head2 lims
 
-st::api::lims object corresponding to this object's rpt_list
+C<st::api::lims> object corresponding to this object's C<rpt_list>
 attribute. 
 
 =cut
@@ -410,7 +447,8 @@ sub _build_lims {
 
 =head2 runfolder
 
-npg_tracking::illumina::runfolder object
+C<npg_tracking::illumina::runfolder> object for C<runfolder_path> attribute
+value.
 
 =cut
 
@@ -613,11 +651,10 @@ has '_result_class_names'  => (
 sub _build__result_class_names {
   my $self = shift;
 
-  # Using all criteria objects regardles of relevance to this entity.
   my @class_names = uniq sort
                     map { (_class_name_from_expression($_))[0] }
-                    map { @{$_->{$ACCEPTANCE_CRITERIA_KEY}} }
-                    @{$self->_robo_config->{$CRITERIA_KEY}};
+                    map { @{$_} } # dereference the array
+                    values %{$self->_criteria()};
 
   return \@class_names;
 }
@@ -633,9 +670,10 @@ sub _build__qc_store {
   # our data.
   my @l = @{$self->_result_class_names};
   return npg_qc::autoqc::qc_store->new(
-           use_db      => $self->use_db,
-           checks_list => \@l
-         );
+    qc_schema   => $self->_qc_schema,
+    use_db      => $self->use_db,
+    checks_list => \@l
+  );
 }
 
 #####
@@ -805,22 +843,6 @@ sub _evaluate_expression {
   return $evaluator->($obj);
 }
 
-sub _outcome_type {
-  my $self = shift;
-
-  my $outcome_type = $self->_robo_config()->{$QC_TYPE_KEY};
-  if ($outcome_type) {
-    if (none { $outcome_type eq $_ } @VALID_QC_TYPES) {
-      croak "Invalid QC type '$outcome_type' in a robo config for " .
-            $self->_entity_desc;
-    }
-  } else {
-    $outcome_type = $QC_TYPE_DEFAULT;
-  }
-
-  return $outcome_type;
-}
-
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -845,6 +867,12 @@ __END__
 
 =item English
 
+=item Try::Tiny
+
+=item Date::Time
+
+=item Class::Load
+
 =item WTSI::DNAP::Utilities::Timestamp
 
 =item st::api::lims
@@ -852,6 +880,8 @@ __END__
 =item npg_tracking::illumina::runfolder
 
 =item npg_tracking::util::pipeline_config
+
+=item npg_qc::Schema
 
 =back
 

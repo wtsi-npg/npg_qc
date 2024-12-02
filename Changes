@@ -1,5 +1,33 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 74.0.0 (2024-12-02)
+ - npg_qc::autoqc::qc_store - changed loading of ORM classes into memory
+   to on demand at run time.
+ - Added lane-level assessment to RoboQC:
+    - Extended npg_qc::Schema::Result::Review class to enable saving of
+      sequencing (lane-level) QC outcomes to database
+    - Extended npg_qc::autoqc::check::review to enable lane-level assessment
+      and documented the new feature.
+    - Made redundant 'qc_type' key of the 'robo' configuration.
+    - Fixed a bug in creating a list of class names in
+      npg_qc::autoqc::check::review.
+      A list of names for result classes to be loaded was inferred
+      from all criteria in the 'robo' section under consideration.
+      Until now this did not pesent a problem since even when a number
+      of different criteria sections were present in the study RoboQC
+      section of the configuration file, it was possible to load all of
+      the AutoQC results for any given entity.
+      The bug is revealed when lane-level assessment is added to
+      the 'robo' section under the 'default' configuration. This
+      type of assessment might require presence of lane-level autoqc
+      results for checks that are never performed on sample level,
+      'tag_metrics' check being the most obvious example.
+      The fix is to infer the list of class names from the criteria,
+      which are going to be evaluated for the entity, rather than
+      from a collection of criteria from the whole 'robo' section.
+ - Added instructions for running a standard dev server
+ - Move from Miniconda to Miniforge
+
 release 73.0.0 (2024-10-24)
  - Removed from the repository unused test data.
  - npg_qc::autoqc::check::review:
