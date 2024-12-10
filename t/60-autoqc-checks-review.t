@@ -38,7 +38,7 @@ my $schema =  Moose::Meta::Class->create_anon_class(
                                  ->create_test_db(q[npg_qc::Schema]);
 
 subtest 'constructing object, deciding whether to run' => sub {
-  plan tests => 33;
+  plan tests => 34;
 
   my $check = npg_qc::autoqc::checks::review->new(
     conf_path => $test_data_dir,
@@ -147,6 +147,15 @@ subtest 'constructing object, deciding whether to run' => sub {
     )
   } 'can set lims via the constructor';
   ok ($check->can_run, 'can_run returns true');
+
+  # No robo config in the default section, all samples belong to the same
+  # study, for which robo config is defined.
+  $check = npg_qc::autoqc::checks::review->new(
+    conf_path => "$test_data_dir/with_criteria",
+    qc_in     => $test_data_dir,
+    rpt_list  => '27483:1'
+  );
+  ok (!$check->can_run, 'can_run returns false for a lane'); 
 
   $check = npg_qc::autoqc::checks::review->new(
     conf_path => "$test_data_dir/no_applicability4single",
@@ -812,14 +821,14 @@ subtest 'evaluating generic for artic results' => sub {
 };
 
 subtest 'evaluating for LCMB library type' => sub { 
-  plan tests => 14;
+  plan tests => 16;
 
   my $test_data_path = 't/data/runfolder_49285';
   my $runfolder_name = '240802_A00537_1044_BHJKCGDSXC';
   my $staging_dir = tempdir( CLEANUP => 1 );
   my $id_run = 49285;
   local $ENV{NPG_CACHED_SAMPLESHEET_FILE} =
-    't/data/runfolder_49285/samplesheet_49285.csv';
+    "$test_data_path/samplesheet_49285.csv";
 
   my $ae = Archive::Extract->new(
     archive => "${test_data_path}/${runfolder_name}.tar.gz"
@@ -906,6 +915,18 @@ subtest 'evaluating for LCMB library type' => sub {
     {'mqc_seq_outcome' => 'Rejected preliminary', 'username' => 'robo_qc'},
     'lane QC outcome is saved correctly'
   );
+
+  $check = npg_qc::autoqc::checks::review->new(
+    runfolder_path => $runfolder_path,
+    conf_path      => $test_data_path,
+    rpt_list       => "${id_run}:4",
+    use_db         => 1,
+    _qc_schema => $schema
+  );
+  my $with_control = 0;
+  is_deeply ([$check->lims->study_ids($with_control)], [qw(7396 7397)],
+    'lane 4 samples belong to two different studies');
+  lives_and (sub {is $check->can_run, 1}, 'lane-level check can run'); 
 };
 
 1;
