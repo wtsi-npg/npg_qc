@@ -74,7 +74,8 @@ outcomes.
 The C<robo> section of the product configuration file sits either within
 the configuration for a particular study or in the C<default> section, or
 in both locations. For a given entity a study-specific RoboQC definition
-takes precedence over the default one.
+takes precedence over the default one. For lanes only the C<default> section
+of the product configuration file is examined.
 
 Evaluation criteria for samples vary depending on the sequencing instrument
 and flowcell type, library type, sample reference, etc. Each of the
@@ -487,14 +488,24 @@ has '_robo_config' => (
 sub _build__robo_config {
   my $self = shift;
 
-  my $strict = 1; # Parse study section only, ignore the default section.
-  my $config = $self->study_config($self->lims(), $strict);
-  if ($config) {
-    $config = $config->{$ROBO_KEY};
+  my $config;
+
+  # Do not examine study-specific section for lane entities, meaning that
+  # one-sample lanes, pools or not, cannot be evaluated according to the
+  # study criteria of their sample. Helps to avoid uncertainty of dealing
+  # with pool's samples belonging to different studies.
+  if (!$self->lims->is_lane) {
+    my $strict = 1; # Parse study section only, ignore the 'default' section.
+    $config = $self->study_config($self->lims(), $strict);
+    if ($config) {
+      $config = $config->{$ROBO_KEY};
+    }
+    if (!$config) {
+      carp 'Study-specific RoboQC config not found for ' . $self->_entity_desc;
+    }
   }
 
-  if (!$config) {
-    carp 'Study-specific RoboQC config not found for ' . $self->_entity_desc;
+  if (!$config) { # Look at the 'default' section of the configuration file.
     $config = $self->default_study_config()->{$ROBO_KEY};
   }
 

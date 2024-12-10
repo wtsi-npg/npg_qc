@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Excluded study-specific lane-lane assessment in npg_qc::autoqc::check::review
+   This helps to avoid uncertainty in evaluating lanes where samples belong to
+   different studies at a price of not being able to perform study-specific
+   evaluation of one-library lanes.
+
 release 74.0.0 (2024-12-02)
  - npg_qc::autoqc::qc_store - changed loading of ORM classes into memory
    to on demand at run time.
