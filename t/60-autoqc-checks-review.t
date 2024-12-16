@@ -414,7 +414,7 @@ subtest 'single expression evaluation' => sub {
     rpt_list  => $rpt_list);
 
   throws_ok {$check->_evaluate_expression('verify_bam.freemix < 0.01')}
-    qr/No autoqc result for evaluation of/,
+    qr/No verify_bam autoqc result for evaluation of/,
     'error if check name is unknown';
   throws_ok {$check->_evaluate_expression('verify_bam_id.freemix_free < 0.01')}
     qr/Can't locate object method \"freemix_free\"/,
@@ -655,7 +655,7 @@ subtest 'evaluating generic for artic results' => sub {
     final_qc_outcome => 1);
   is ($check->can_run, 1, 'check can run');
   throws_ok { $check->execute }
-    qr/Not able to run evaluation: No autoqc generic result for ncov2019_artic_nf/,
+    qr/Not able to run evaluation: No generic:ncov2019_artic_nf autoqc result/,
     'message as an error';
 
   # qc_in contains two artic generic results for the same product
@@ -666,7 +666,7 @@ subtest 'evaluating generic for artic results' => sub {
     final_qc_outcome => 1);
   is ($check->can_run, 1, 'check can run');
   throws_ok { $check->execute }
-    qr/Not able to run evaluation: Multiple autoqc results/,
+    qr/Not able to run evaluation: Multiple generic:ncov2019_artic_nf autoqc results/,
     'message as an error';
 
   # qc_in contains other autoqc results for this entity, including
@@ -821,7 +821,7 @@ subtest 'evaluating generic for artic results' => sub {
 };
 
 subtest 'evaluating for LCMB library type' => sub { 
-  plan tests => 16;
+  plan tests => 19;
 
   my $test_data_path = 't/data/runfolder_49285';
   my $runfolder_name = '240802_A00537_1044_BHJKCGDSXC';
@@ -843,6 +843,7 @@ subtest 'evaluating for LCMB library type' => sub {
     verbose => 0
   )->load();
 
+  # Sample-level evaluation
   my $check = npg_qc::autoqc::checks::review->new(
     runfolder_path => $runfolder_path,
     conf_path      => $test_data_path,
@@ -858,6 +859,7 @@ subtest 'evaluating for LCMB library type' => sub {
     'verify_bam_id.pass'
   );
   my $result = $check->result();
+  is ($result->comments(), undef, 'no comments');
   is_deeply ($result->evaluation_results(), \%expected_evaluation_results,
     'sample evaluation results as expected');
   is ($result->pass, 1, 'the check passed');
@@ -869,6 +871,7 @@ subtest 'evaluating for LCMB library type' => sub {
     'sample QC outcome is saved correctly'
   );
 
+  # Lane-level evaluation
   $check = npg_qc::autoqc::checks::review->new(
     runfolder_path => $runfolder_path,
     conf_path      => $test_data_path,
@@ -878,10 +881,13 @@ subtest 'evaluating for LCMB library type' => sub {
   );
   lives_ok { $check->execute() } 'lane level check runs OK';
   $result = $check->result();
+  is ($result->comments(), undef, 'no comments');
   %expected_evaluation_results = (
     'tag_metrics.matches_pf_percent && (tag_metrics.perfect_matches_percent +' .
-    ' tag_metrics.one_mismatch_percent) > 93' => 1,
-    'tag_metrics.all_reads * 302 > 750000000000' => 1
+      ' tag_metrics.one_mismatch_percent) > 93' => 1,
+    'tag_metrics.all_reads * 302 > 750000000000' => 1,
+    'tag_metrics.all_reads && (((qX_yield.yield1_q30 + qX_yield.yield2_q30) ' .
+      '* 1000 * 100)/(tag_metrics.all_reads * 302) >= 78)' => 1,
   );
   is_deeply ($result->evaluation_results(), \%expected_evaluation_results,
     'lane evaluation results as expected');
@@ -906,6 +912,7 @@ subtest 'evaluating for LCMB library type' => sub {
     $expected_evaluation_results{$key} = 0;
   }
   $result = $check->result();
+  is ($result->comments(), undef, 'no comments');
   is_deeply ($result->evaluation_results(), \%expected_evaluation_results,
     'lane evaluation results as expected');
   is ($result->pass, 0, 'the check failed');
