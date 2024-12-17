@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Fix perlbrew installation by installing libdevel-patchperl-perl in runner
  - Fixes/updates for lane-level RoboQC lane-level assessment:
     - Excluded study-specific lane-lane assessment in npg_qc::autoqc::check::review
       This helps to avoid uncertainty in evaluating lanes where samples belong to
