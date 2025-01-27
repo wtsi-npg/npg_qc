@@ -24,10 +24,23 @@ mark-job:
     - if: $CI_COMMIT_BRANCH == "devel" || $CI_COMMIT_BRANCH == "master"
       changes:
         - docs/**/*
-  image: wsinpg/mark:latest
+  variables:
+    MARK_RELEASE: https://github.com/kovetskiy/mark/releases/download/12.0.0/mark_Linux_x86_64.tar.gz
+    MARK_SHASUM: e3a1ee3d5da28f13731b021be03a87ca29a3683adf1642255dbd0eb4a41dba2e
+    MARK_ARCHIVE: mark_Linux_x86_64.tar.gz
+  image:
+    name: gitlab-registry.internal.sanger.ac.uk/isg/gitlab-ci-docker-docker:322249_master
+
   tags:
     - autoscale
+  before_script:
+    - |
+      apt-get update -yq
+      apt-get install -yq wget
+      wget "${MARK_RELEASE}" -O "${MARK_ARCHIVE}"
+      echo "${MARK_SHASUM}  ${MARK_ARCHIVE}" | sha256sum -c
+      tar -xzf "${MARK_ARCHIVE}" mark
   script: >
     for f in $(find . -name includes -type d -prune -o -name 'README*.md' -prune -o -name '*.md' -print0 | xargs -0); do
-      echo 'username = ""' && echo "password = '$CONFLUENCE_PERSONAL_ACCESS_TOKEN'" | mark -c /dev/stdin -b https://ssg-confluence.internal.sanger.ac.uk -f "$f" --trace;
+      echo 'username = ""' && echo "password = '$CONFLUENCE_PERSONAL_ACCESS_TOKEN'" | ./mark -c /dev/stdin -b https://ssg-confluence.internal.sanger.ac.uk -f "$f" --log-level TRACE;
     done
