@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 74.0.2 (2025-02-20)
+ - Replace mark docker image with mark golang executable from github,
+   on ISG's docker image, for documentation publishing
+
 release 74.0.1 (2024-12-17)
  - Fix perlbrew installation by installing libdevel-patchperl-perl in runner
  - Fixes/updates for lane-level RoboQC lane-level assessment:
