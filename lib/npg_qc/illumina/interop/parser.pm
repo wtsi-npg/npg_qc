@@ -43,24 +43,58 @@ sub _build_interop_path {
   return $interop_dir;
 }
 
+has 'p4s1_i2b_first_tile' => ( isa        => q{Maybe[Int]},
+                               is         => 'ro',
+                               required   => 0,
+                               lazy_build => 1,
+                       );
+
+has 'p4s1_i2b_tile_limit' => ( isa        => q{Maybe[Int]},
+                               is         => 'ro',
+                               required   => 0,
+                               lazy_build => 1,
+                       );
+
 sub parse {
   my $self = shift;
 
   my $input_files = $self->_input_files;
 
+  my $tile_limits;
+  if(defined $self->p4s1_i2b_first_tile or defined $self->p4s1_i2b_tile_limit) {
+    $tile_limits = { first_tile => $self->p4s1_i2b_first_tile, tile_limit => $self->p4s1_i2b_tile_limit};
+  }
+
   # there should always be one input file, the TileMetrics interop file
-  my ($lane_metrics, $cluster_count) = $self->_parse_tile_metrics($input_files->[0]);
+  my ($lane_metrics, $cluster_count) = $self->_parse_tile_metrics($input_files->[0], $tile_limits);
 
   # the ExtendedTileMetrics interop file is optional
   if ( scalar(@{$input_files}) > 1 ) {
-    $self->_parse_extended_tile_metrics($input_files->[1], $lane_metrics, $cluster_count);
+    $self->_parse_extended_tile_metrics($input_files->[1], $lane_metrics, $cluster_count, $tile_limits);
   }
 
   return $lane_metrics;
 }
 
+Readonly::Scalar my $SKIP_TILE => 1;
+Readonly::Scalar my $DONT_SKIP_TILE => 0;
+
+sub _skip_tile {
+  my ($tile, $tile_limits) = @_;
+
+  if(not defined $tile_limits) { return $DONT_SKIP_TILE }
+
+  if(defined $tile_limits->{first_tile} and $tile < $tile_limits->{first_tile}) { return $SKIP_TILE; }
+
+  if(not defined $tile_limits->{tile_limit} or ($tile_limits->{tile_limit} <= 0)) { return $SKIP_TILE; }
+
+  $tile_limits->{tile_limit}--;
+
+  return $DONT_SKIP_TILE;
+}
+
 sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
-  my ($self, $interop) = @_;
+  my ($self, $interop, $tile_limits) = @_;
 
   my %lane_metrics  = ();
   my %cluster_count = ();
@@ -89,6 +123,9 @@ sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
     my $template = 'v3f'; # three 2-byte integers and one 4-byte float
     while ($fh->read($data, $length)) {
       my ($lane,$tile,$code,$value) = unpack $template, $data;
+
+      if(_skip_tile($tile, $tile_limits)) { next }
+
       ## no critic (ControlStructures::ProhibitCascadingIfElse)
       if( $code == $TILE_METRICS_INTEROP_CODES->{'cluster_density'} ){
         $tile_metrics{$lane}->{'cluster_density'}->{$tile} = $value;
@@ -127,6 +164,9 @@ sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
     while ($fh->read($data, $length)) {
       my $template = 'vVc'; # one 2-byte integer, one 4-byte integer and one 1-byte char
       my ($lane,$tile,$code) = unpack $template, $data;
+
+      if(_skip_tile($tile, $tile_limits)) { next }
+
       if( $code == $TILE_METRICS_INTEROP_CODES->{'version3 tile'} ){
         $data = substr $data, 7;
         $template = 'f2'; # two 4-byte floats
@@ -198,7 +238,7 @@ sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
 }
 
 sub _parse_extended_tile_metrics {
-  my ($self, $interop, $lane_metrics, $cluster_count) = @_;
+  my ($self, $interop, $lane_metrics, $cluster_count, $tile_limits) = @_;
 
   my $version;
   my $length;
@@ -226,6 +266,9 @@ sub _parse_extended_tile_metrics {
       # N.B. In version 3 there are two additional 4-byte floats,
       # the upper left and right fiducial locations but we don't use these
       my ($lane,$tile,$occupied) = unpack $template, $data;
+
+      if(_skip_tile($tile, $tile_limits)) { next }
+
       if( exists($cluster_count->{$lane}->{$tile}) ){
         if( $cluster_count->{$lane}->{$tile} == 0 ){
           croak qq{cluster_count for lane $lane tile $tile is zero};
