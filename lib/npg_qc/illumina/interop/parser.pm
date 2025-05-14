@@ -46,13 +46,11 @@ sub _build_interop_path {
 has 'p4s1_i2b_first_tile' => ( isa        => q{Maybe[Int]},
                                is         => 'ro',
                                required   => 0,
-                               lazy_build => 1,
                        );
 
 has 'p4s1_i2b_tile_limit' => ( isa        => q{Maybe[Int]},
                                is         => 'ro',
                                required   => 0,
-                               lazy_build => 1,
                        );
 
 sub parse {
