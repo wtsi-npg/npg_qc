@@ -58,20 +58,26 @@ sub parse {
 
   my $input_files = $self->_input_files;
 
-  my $tile_limits;
-  if(defined $self->p4s1_i2b_first_tile or defined $self->p4s1_i2b_tile_limit) {
-    $tile_limits = { first_tile => $self->p4s1_i2b_first_tile, tile_limit => $self->p4s1_i2b_tile_limit};
-  }
-
   # there should always be one input file, the TileMetrics interop file
-  my ($lane_metrics, $cluster_count) = $self->_parse_tile_metrics($input_files->[0], $tile_limits);
+  my ($lane_metrics, $cluster_count) = $self->_parse_tile_metrics($input_files->[0], _get_tile_limits( $self->p4s1_i2b_first_tile, $self->p4s1_i2b_tile_limit));
 
   # the ExtendedTileMetrics interop file is optional
   if ( scalar(@{$input_files}) > 1 ) {
-    $self->_parse_extended_tile_metrics($input_files->[1], $lane_metrics, $cluster_count, $tile_limits);
+    $self->_parse_extended_tile_metrics($input_files->[1], $lane_metrics, $cluster_count, _get_tile_limits( $self->p4s1_i2b_first_tile, $self->p4s1_i2b_tile_limit));
   }
 
   return $lane_metrics;
+}
+
+sub _get_tile_limits {
+  my ($first_tile, $tile_limit) = @_;
+
+  my $tile_limits;
+  if(defined $first_tile or defined $tile_limit) {
+    $tile_limits = { first_tile => $first_tile, tile_limit => $tile_limit};
+  }
+
+  return $tile_limits;
 }
 
 Readonly::Scalar my $SKIP_TILE => 1;
