@@ -74,7 +74,7 @@ sub _get_tile_limits {
 
   my $tile_limits;
   if(defined $first_tile or defined $tile_limit) {
-    $tile_limits = { first_tile => $first_tile, tile_limit => $tile_limit, current_tile => 0, };
+    $tile_limits = { first_tile => $first_tile, tile_limit => $tile_limit+1, current_tile => 0, };
   }
 
   return $tile_limits;
@@ -90,11 +90,15 @@ sub _skip_tile {
 
   if(defined $tile_limits->{first_tile} and $tile < $tile_limits->{first_tile}) { return $SKIP_TILE; }
 
-  if(not defined $tile_limits->{tile_limit} or ($tile_limits->{tile_limit} <= 0)) { return $SKIP_TILE; }
+  if(defined $tile_limits->{tile_limit}) {
 
-  if($tile_limits->{current_tile} != $tile) {
-    $tile_limits->{current_tile} = $tile;
-    $tile_limits->{tile_limit}--;
+    if($tile_limits->{tile_limit} <= 0) { return $SKIP_TILE; }
+
+    if($tile_limits->{current_tile} != $tile) {
+      $tile_limits->{current_tile} = $tile;
+      $tile_limits->{tile_limit}--;
+      if($tile_limits->{tile_limit} <= 0) { return $SKIP_TILE; }
+    }
   }
 
   return $DONT_SKIP_TILE;
