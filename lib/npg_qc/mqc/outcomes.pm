@@ -109,7 +109,7 @@ sub get_library_outcome {
 }
 
 sub save {
-  my ($self, $outcomes, $username, $lane_info) = @_;
+  my ($self, $outcomes, $username, $lane_info, $non_illumina_data) = @_;
 
   if (!$outcomes || (ref $outcomes ne 'HASH')) {
     croak q[Outcomes hash is required];
@@ -117,11 +117,9 @@ sub save {
   if (!$username) {
     croak q[Username is required];
   }
-  if ($outcomes->{$SEQ_OUTCOMES} && !$lane_info) {
-    croak q[Tag indices for lanes are required];
-  }
-  if ($lane_info && (ref $lane_info ne 'HASH')) {
-    croak q[Tag indices for lanes should be a hash ref];
+  $lane_info ||= {};
+  if (ref $lane_info ne 'HASH') {
+    croak q[Lane info should be a hash ref];
   }
 
   my @outcome_types = keys %{$outcomes};
@@ -132,7 +130,7 @@ sub save {
     croak 'One of outcome types is unknown';
   }
 
-  $self->_save_outcomes($outcomes, $username, $lane_info);
+  $self->_save_outcomes($outcomes, $username, $lane_info, $non_illumina_data);
 
   return $self->get( [map {keys %{$_}} values %{$outcomes}] );
 }
@@ -151,7 +149,7 @@ sub _map_outcomes {
 }
 
 sub _save_outcomes {
-  my ($self, $outcomes, $username, $lane_info) = @_;
+  my ($self, $outcomes, $username, $lane_info, $non_illumina_data) = @_;
 
   $lane_info ||= {};
 
@@ -172,7 +170,13 @@ sub _save_outcomes {
           my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $composition_obj);
           if ($outcome_ent->valid4update($o)) {
             $outcome_ent->update_outcome($o, $username);
-            if ($outcome_type eq $SEQ_OUTCOMES && $outcome_ent->has_final_outcome) {
+            # For Illumina data finalise plex-level outcomes if the lane-level
+            # outcome is now final.
+            if (!$non_illumina_data && $outcome_type eq $SEQ_OUTCOMES &&
+                $outcome_ent->has_final_outcome) {
+              if (!exists $lane_info->{$key}) {
+                croak qq[Tag indices for lane $key are required];
+              }
               my @lib_outcomes = $self->_create_query4lib_outcomes4lane($composition_obj)->all();
               $self->_validate_library_outcomes($outcome_ent, \@lib_outcomes, $lane_info->{$key});
               foreach my $lib (@lib_outcomes) {
@@ -212,7 +216,7 @@ sub _create_query4lib_outcomes4lane {
   my $comp = $lane_composition->get_component(0);
   #####
   # We are going to find all results where at least one component
-  # belongs to the run and lane in question. If teh database has
+  # belongs to the run and lane in question. If the database has
   # entries for merges across runs, those can be brought too.
   # At a point of QC-ing runs such entries will (or should) not exist.
   #
@@ -379,21 +383,24 @@ Error if not entry in the database for this rpt list.
 =head2 save
 
 First argument - a data structure identical to the one returned by the get method.
-Either top level lib or seq or both entries should be defined. The information in the
-datastructure is used to create/update qc outcomes tables.
+Either top level lib or seq or both entries should be defined. The information
+in the datastructure is used to create/update qc outcomes tables. Required.
 
-Second argument - username. No validation is performed.
+Second argument - username, required. No validation is performed.
 
-Third argument - a hash reference where lane-level rpt keys are mapped to arrays of
-tag indexes for a lane. The array can be empty. The arrays of tag indexes are used
-for validating library qc outcomes when a fanal outcome for a lane is saved.
-Library outcomes for all tag indexes present in the array should be available. Outcomes
-for any other tag indexes should not be present.
+Third argument - a hash reference where lane-level rpt keys are mapped to arrays
+of tag indexes for a lane. The array can be empty. The argument defaults to an
+empty hash reference. The arrays of tag indexes are used for validating library
+qc outcomes when a fanal outcome for a lane is saved. Library outcomes for all
+tag indexes present in the array should be available. Outcomes for any other tag
+indexes should not be present.
 
-All arguments are required.
+Forth argument - an optional boolean value flagging data as belonging to non-
+Illumina platform. Defaults to false, meaning that by default the data belongs
+to Illumina platform.
 
-The method returns the data identical to the return value of the get method for the
-entities specifies in the first argument.
+The method returns the data identical to the return value of the get method for
+the entities specifies in the first argument.
 
 =head1 DIAGNOSTICS
 
@@ -431,7 +438,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2016, 2017, 2018, 2019, 2025 Genome Research Ltd.
 
 This file is part of NPG.
 
