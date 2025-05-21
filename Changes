@@ -7,6 +7,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      non_illumina_data, false by default. If this argument is true, at a point
      of saving a final QC outcome for a lane an attempt to finalise
      library/plex-level QC outcomes is not made.
+   - SeqQC QcOutcomes controller uses information about the manufacturer of
+     the instrument the sequencing experiment was set up on when updating
+     QC outcomes (see above).
 
 release 74.0.2 (2025-02-20)
  - Replace mark docker image with mark golang executable from github,

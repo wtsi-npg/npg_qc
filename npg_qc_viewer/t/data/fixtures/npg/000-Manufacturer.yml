@@ -1,0 +1,9 @@
+---
+- id_manufacturer: 20
+  name: Applied Biosystems
+- id_manufacturer: 10
+  name: Illumina
+- id_manufacturer: 16
+  name: Roche/454
+- id_manufacturer: 21
+  name: Element Biosciences

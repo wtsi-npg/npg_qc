@@ -163,6 +163,7 @@ t/client/images/padlock.png
 t/client/images/circle.png
 t/data/fixtures/npg/000-EntityType.yml
 t/data/fixtures/npg/000-InstrumentStatusDict.yml
+t/data/fixtures/npg/000-Manufacturer.yml
 t/data/fixtures/npg/000-RunLaneStatusDict.yml
 t/data/fixtures/npg/000-RunStatusDict.yml
 t/data/fixtures/npg/000-Tag.yml

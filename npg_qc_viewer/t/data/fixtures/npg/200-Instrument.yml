@@ -98,4 +98,16 @@
   staging_dir: NULL
   latest_contact: NULL
   percent_complete: 3
-
+- external_name: AV244103
+  id_instrument: 46
+  id_instrument_format: 19
+  serial: ''
+  name: AV2
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host:
+  staging_dir:
+  latest_contact:
+  percent_complete:
+  lab:
