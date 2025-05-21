@@ -74,7 +74,7 @@ sub _get_tile_limits {
 
   my $tile_limits;
   if(defined $first_tile or defined $tile_limit) {
-    $tile_limits = { first_tile => $first_tile, tile_limit => $tile_limit+1, current_tile => 0, };
+    $tile_limits = { first_tile => $first_tile, tile_limit => $tile_limit+1, };
   }
 
   return $tile_limits;
@@ -84,20 +84,22 @@ Readonly::Scalar my $SKIP_TILE => 1;
 Readonly::Scalar my $DONT_SKIP_TILE => 0;
 
 sub _skip_tile {
-  my ($tile, $tile_limits) = @_;
+  my ($lane, $tile, $tile_limits) = @_;
 
   if(not defined $tile_limits) { return $DONT_SKIP_TILE }
 
-  if(defined $tile_limits->{first_tile} and $tile < $tile_limits->{first_tile}) { return $SKIP_TILE; }
+  if(not defined $tile_limits->{$lane}) { $tile_limits->{$lane} = { tile_limit => $tile_limits->{tile_limit}, current_tile => 0,} }
 
-  if(defined $tile_limits->{tile_limit}) {
+  if(defined $tile_limits->{first_tile} and $tile < $tile_limits->{first_tile}) { return $SKIP_TILE; } # one check should work for all lanes
 
-    if($tile_limits->{tile_limit} <= 0) { return $SKIP_TILE; }
+  if(defined $tile_limits->{$lane}->{tile_limit}) {
 
-    if($tile_limits->{current_tile} != $tile) {
-      $tile_limits->{current_tile} = $tile;
-      $tile_limits->{tile_limit}--;
-      if($tile_limits->{tile_limit} <= 0) { return $SKIP_TILE; }
+    if($tile_limits->{$lane}->{tile_limit} <= 0) { return $SKIP_TILE; }
+
+    if($tile_limits->{$lane}->{current_tile} != $tile) {
+      $tile_limits->{$lane}->{current_tile} = $tile;
+      $tile_limits->{$lane}->{tile_limit}--;
+      if($tile_limits->{$lane}->{tile_limit} <= 0) { return $SKIP_TILE; }
     }
   }
 
@@ -135,7 +137,7 @@ sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
     while ($fh->read($data, $length)) {
       my ($lane,$tile,$code,$value) = unpack $template, $data;
 
-      if(_skip_tile($tile, $tile_limits)) { next }
+      if(_skip_tile($lane, $tile, $tile_limits)) { next }
 
       ## no critic (ControlStructures::ProhibitCascadingIfElse)
       if( $code == $TILE_METRICS_INTEROP_CODES->{'cluster_density'} ){
@@ -176,7 +178,7 @@ sub _parse_tile_metrics { ##no critic (Subroutines::ProhibitExcessComplexity)
       my $template = 'vVc'; # one 2-byte integer, one 4-byte integer and one 1-byte char
       my ($lane,$tile,$code) = unpack $template, $data;
 
-      if(_skip_tile($tile, $tile_limits)) { next }
+      if(_skip_tile($lane, $tile, $tile_limits)) { next }
 
       if( $code == $TILE_METRICS_INTEROP_CODES->{'version3 tile'} ){
         $data = substr $data, 7;
@@ -278,7 +280,7 @@ sub _parse_extended_tile_metrics {
       # the upper left and right fiducial locations but we don't use these
       my ($lane,$tile,$occupied) = unpack $template, $data;
 
-      if(_skip_tile($tile, $tile_limits)) { next }
+      if(_skip_tile($lane, $tile, $tile_limits)) { next }
 
       if( exists($cluster_count->{$lane}->{$tile}) ){
         if( $cluster_count->{$lane}->{$tile} == 0 ){
