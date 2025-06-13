@@ -12,16 +12,6 @@ use npg_qc::elembio::sample_stats;
 
 our $VERSION = '0';
 
-# For "merged" samples, indexed by sample name
-has deplexed_samples => (
-    isa => 'HashRef[npg_qc::elembio::sample_stats]',
-    is => 'rw',
-    traits => ['Hash'],
-    handles => {
-        add_sample => 'set',
-    },
-);
-
 has lanes => (
     traits => ['Hash'],
     isa => 'HashRef[npg_qc::elembio::lane_stats]',
@@ -43,6 +33,7 @@ has r2_cycle_count => (
     is => 'rw',
     documentation => 'Effectively the number of bases sequenced',
 );
+
 
 __PACKAGE__->meta->make_immutable;
 
@@ -123,19 +114,6 @@ sub run_stats_from_json {
 
             $run_stats->lanes->{$lane}->set_sample($sample->{SampleName}, $laned_sample);
         }
-
-        my $convenient_sample = $sample_lookup{1}->{$sample->{SampleName}};
-        my $run_sample = npg_qc::elembio::sample_stats->new(
-            sample_name => $convenient_sample->sample_name,
-            tag_index => $convenient_sample->tag_index,
-            barcode => $convenient_sample->barcode,
-            num_polonies => $sample->{NumPolonies},
-            percentQ30 => $sample->{PercentQ30},
-            percentQ40 => $sample->{PercentQ40},
-            yield => $sample->{Yield},
-        );
-
-        $run_stats->add_sample($run_sample->sample_name, $run_sample);
     }
     return $run_stats;
 }
