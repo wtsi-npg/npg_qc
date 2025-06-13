@@ -95,6 +95,7 @@ sub run_stats_from_json {
         $run_stats->set_lane(
             $lane_number,
             npg_qc::elembio::lane_stats->new(
+                lane => $lane_number,
                 num_polonies => $lane->{NumPolonies},
                 total_yield => $lane->{TotalYield},
                 unassigned_reads => sum( map { $_->{Count} } @{ $lane->{UnassignedSequences} }),

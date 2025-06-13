@@ -7,6 +7,11 @@ use npg_qc::elembio::sample_stats;
 
 our $VERSION = '0';
 
+has lane => (
+    isa => 'Int',
+    is => 'ro'
+);
+
 has num_polonies => (
     isa => 'Int',
     is => 'ro',
