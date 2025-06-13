@@ -73,10 +73,11 @@ sub run_stats_from_json {
                 tag_index => int($sample->{SampleNumber}),
             );
             my ($tags_in_lane) = grep { $_->{Lane} == $lane } @{ $sample->{Indexes} };
-            $sample_obj->barcode([$tags_in_lane->{Index1}]);
+            my $barcode_list = [$tags_in_lane->{Index1}];
             if (exists $tags_in_lane->{Index2}) {
-                push @{$sample_obj->barcode} , $tags_in_lane->{Index2};
+                push @$barcode_list, $tags_in_lane->{Index2};
             }
+            push @{$sample_obj->barcodes} , $barcode_list;
 
             $sample_lookup{$lane}->{$sample->{SampleName}} = $sample_obj;
         }

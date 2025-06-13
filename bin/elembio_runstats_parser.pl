@@ -5,6 +5,7 @@ use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 
+use File::Slurp qw(write_file);
 use Getopt::Long;
 use JSON;
 
@@ -57,7 +58,7 @@ sub main {
     while (my($lane, $lane_stats) = each %{$run_stats->lanes}) {
         my $metrics_obj = npg_qc::autoqc::results::tag_metrics->new(
             id_run => $opts->{'id_run'},
-            position => $lane,
+            position => $lane_stats->lane,
         );
         foreach my $sample ($lane_stats->all_samples()) {
             $metrics_obj->reads_pf_count->{$sample->tag_index} = $sample->num_polonies; # ??
@@ -66,10 +67,17 @@ sub main {
             $metrics_obj->reads_count->{$sample->tag_index} = $sample->num_polonies;
         }
         # Add tag 0 (unassigned reads) as a sample
-        $metrics_obj->reads_count->{'0'} = $lane->unassigned_reads;
-        $metrics_obj->pf_reads_count->{'0'} = $lane->unassigned_reads;
+        $metrics_obj->reads_count->{'0'} = $lane_stats->unassigned_reads;
+        $metrics_obj->reads_pf_count->{'0'} = $lane_stats->unassigned_reads;
 
-        my $output_name = sprintf '%s_%s_tag_metrics.json', $opts->{'id_run'}, $lane;
+        my ($sample) = $lane_stats->all_samples();
+        my ($i1_length, $i2_length) = $sample->index_lengths();
+        $metrics_obj->tags->{'0'} = 'N' x $i1_length;
+        if ($i2_length) {
+            $metrics_obj->tags->{'0'} .= '-' . 'N' x $i2_length;
+        }
+
+        my $output_name = sprintf '%s_%s_tag_metrics.json', $opts->{'id_run'}, $lane_stats->lane;
 
         my $tag_metrics_json = $metrics_obj->freeze();
         write_file($opts->{'output'}.$output_name, $tag_metrics_json);

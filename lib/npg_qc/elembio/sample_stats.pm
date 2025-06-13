@@ -8,20 +8,28 @@ use namespace::autoclean;
 our $VERSION = '0';
 
 # In npg_qc, AAAAAAA-TTTTTT
-# barcode => [AAAAA, TTTTTT]
-has barcode => (
-    isa => 'ArrayRef[Str]',
+# barcodes => [[AAAAA, TTTTTT]]
+has barcodes => (
+    isa => 'ArrayRef[ArrayRef]',
     is => 'rw',
     documentation => 'I1 and I2 sequences in order',
+    default => sub {[]},
 );
 
 sub barcode_string {
     my $self = shift;
-    if ( @{ $self->barcode } > 1) {
-        return join q{-}, $self->barcode->[0], $self->barcode->[1];
+    my $first_barcode = $self->barcodes->[0];
+    if ( @{ $first_barcode } > 1) {
+        return join q{-}, $first_barcode->[0], $first_barcode->[1];
     } else {
-        return $self->barcode->[0];
+        return $first_barcode->[0];
     }
+}
+
+sub index_lengths {
+    my $self = shift;
+    my $first_barcode = $self->barcodes->[0];
+    return length($first_barcode->[0]), $first_barcode->[1] ? length($first_barcode->[1]) : undef;
 }
 
 has tag_index => (
@@ -68,18 +76,29 @@ npg_qc::elembio::sample_stats
 =head1 SYNOPSIS
 
 $sample->barcode_string(); # -> AAAAAAA-TTTTTTT
+my ($i1, i2) = $sample->index_lengths;
+if ($i2) {
+    # $i2 might be undef
+}
 
 =head1 DESCRIPTION
 
 Represents deplexed stats for sample from either all lanes, or just one.
 Populated from an Elembio bases2fastq RunStats.json file by npg_qc::elembio::run_stats.
 
+It can hold multiple barcodes for the same sample.
+
 =head1 SUBROUTINES/METHODS
 
 =head2 barcode_string
 
 Generates an npg_qc compatible barcode string from the individual index reads
-stored in $self->barcode
+stored in $self->barcodes. Limitation: Only renders one barcode to string, even
+when there are many on this sample.
+
+=head2 index_lengths
+
+Returns I1 and I2 lengths. If there is no I2 the second return value is undef
 
 =head1 DIAGNOSTICS
 
