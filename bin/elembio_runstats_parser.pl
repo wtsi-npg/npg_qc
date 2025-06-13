@@ -65,6 +65,9 @@ sub main {
             # polonies before trim are equal to polonies in the source data, or so it seems
             $metrics_obj->reads_count->{$sample->tag_index} = $sample->num_polonies;
         }
+        # Add tag 0 (unassigned reads) as a sample
+        $metrics_obj->reads_count->{'0'} = $lane->unassigned_reads;
+        $metrics_obj->pf_reads_count->{'0'} = $lane->unassigned_reads;
 
         my $output_name = sprintf '%s_%s_tag_metrics.json', $opts->{'id_run'}, $lane;
 
