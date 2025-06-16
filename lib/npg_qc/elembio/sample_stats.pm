@@ -1,5 +1,4 @@
 package npg_qc::elembio::sample_stats;
-# per-lane sample stats
 
 use Moose;
 use namespace::autoclean;
@@ -63,6 +62,12 @@ has yield => (
     documentation => 'Gigabases for sample',
 );
 
+has lane => (
+    isa => 'Int',
+    is => 'ro',
+    documentation => 'Keep track of which lane these sample stats came from',
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -83,10 +88,12 @@ if ($i2) {
 
 =head1 DESCRIPTION
 
-Represents deplexed stats for sample from either all lanes, or just one.
-Populated from an Elembio bases2fastq RunStats.json file by npg_qc::elembio::run_stats.
+Represents deplexed stats for sample for just one lane.
+Populated from an Elembio bases2fastq RunStats.json file by
+npg_qc::elembio::run_stats.
 
-It can hold multiple barcodes for the same sample.
+It can hold multiple barcodes for the same sample, esp. when the PhiX controls
+are given a single name, rather than unique ones for each pair of index reads.
 
 =head1 SUBROUTINES/METHODS
 

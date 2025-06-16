@@ -62,6 +62,7 @@ sub run_stats_from_json {
             my $sample_obj = npg_qc::elembio::sample_stats->new(
                 sample_name => $sample->{SampleName},
                 tag_index => int($sample->{SampleNumber}),
+                lane => $lane,
             );
             my ($tags_in_lane) = grep { $_->{Lane} == $lane } @{ $sample->{Indexes} };
             my $barcode_list = [$tags_in_lane->{Index1}];
