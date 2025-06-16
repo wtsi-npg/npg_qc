@@ -52,10 +52,9 @@ sub run_stats_from_json {
     my %sample_lookup;
     foreach my $sample (@{$manifest->{Samples}}) {
         # Establish if there is more than one index1/index2 per sample
-        # It's much more complicated to map that into npg_qc.
         my @lanes = uniq map { $_->{Lane} } @{$sample->{Indexes}};
         if ((@{$sample->{Indexes}}) > @lanes) {
-            croak q(More than one tag per sample per lane. It's too hard);
+            croak q(More than one tag per sample per lane);
         }
 
         foreach my $lane (@lanes) {
@@ -64,12 +63,16 @@ sub run_stats_from_json {
                 tag_index => int($sample->{SampleNumber}),
                 lane => $lane,
             );
-            my ($tags_in_lane) = grep { $_->{Lane} == $lane } @{ $sample->{Indexes} };
-            my $barcode_list = [$tags_in_lane->{Index1}];
-            if (exists $tags_in_lane->{Index2}) {
-                push @$barcode_list, $tags_in_lane->{Index2};
+            my (@tags_in_lane) = grep { $_->{Lane} == $lane } @{ $sample->{Indexes} };
+            my @barcode_list;
+            for my $tag (@tags_in_lane) {
+                my $barcode = [$tag->{Index1}];
+                if (exists $tag->{Index2}) {
+                    push @{$barcode}, $tag->{Index2};
+                }
+                push @barcode_list, $barcode;
             }
-            push @{$sample_obj->barcodes} , $barcode_list;
+            $sample_obj->barcodes(\@barcode_list);
 
             $sample_lookup{$lane}->{$sample->{SampleName}} = $sample_obj;
         }

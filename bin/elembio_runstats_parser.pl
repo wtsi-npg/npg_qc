@@ -74,7 +74,7 @@ sub main {
         my ($i1_length, $i2_length) = $sample->index_lengths();
         $metrics_obj->tags->{'0'} = 'N' x $i1_length;
         if ($i2_length) {
-            $metrics_obj->tags->{'0'} .= '-' . 'N' x $i2_length;
+            $metrics_obj->tags->{'0'} .= q{-} . 'N' x $i2_length;
         }
 
         my $output_name = sprintf '%s_%s_tag_metrics.json', $opts->{'id_run'}, $lane_stats->lane;
