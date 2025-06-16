@@ -1,7 +1,7 @@
 package npg_qc::elembio::run_stats;
 
 use Moose;
-use Carp qw(croak);
+use Carp;
 use File::Slurp qw(read_file);
 use JSON;
 use List::Util qw(uniq sum);
@@ -54,7 +54,7 @@ sub run_stats_from_json {
         # Establish if there is more than one index1/index2 per sample
         my @lanes = uniq map { $_->{Lane} } @{$sample->{Indexes}};
         if ((@{$sample->{Indexes}}) > @lanes) {
-            croak q(More than one tag per sample per lane);
+            carp q(More than one tag per sample per lane);
         }
 
         foreach my $lane (@lanes) {
