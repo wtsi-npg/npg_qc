@@ -34,6 +34,8 @@ sub index_lengths {
 has tag_index => (
     isa => 'Int',
     is => 'rw',
+    documentation => 'Copied from SampleNumber from Elembio source data. \
+      Not equivalent to the Illumina tag index, can represent multiple barcodes',
 );
 
 has sample_name => (
@@ -44,22 +46,34 @@ has sample_name => (
 has percentQ30 => (
     isa => 'Num',
     is => 'rw',
+    documentation => 'Percentage of base calls over the Q30 threshold',
 );
 
 has percentQ40 => (
     isa => 'Num',
     is => 'rw',
+    documentation => 'Percentage of base calls over the Q40 threshold',
 );
 
 has num_polonies => (
     isa => 'Int',
     is => 'rw',
+    traits => ['Number'],
+    default => 0,
+    handles => {
+        add_polonies => 'add'
+    },
 );
 
 has yield => (
     isa => 'Num',
     is => 'rw',
     documentation => 'Gigabases for sample',
+    traits => ['Number'],
+    default => 0,
+    handles => {
+        add_yield => 'add'
+    },
 );
 
 has lane => (

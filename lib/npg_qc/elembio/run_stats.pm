@@ -103,18 +103,21 @@ sub run_stats_from_json {
 
     # Add sample stats to the lanes
     foreach my $sample (@{$data->{SampleStats}}) {
-        # Occurences describe the number of times a sample was found in this
-        # lane
+        # Occurences describe the number of times a sample was found across
+        # all lanes. Potentially multiple hits where many barcodes are used
+        # for a single sample
         foreach my $occurrence (@{$sample->{Occurrences}}) {
             my $lane = $occurrence->{Lane};
             next if ($occurrence->{NumPolonies} == 0);
-            # 1+2 300 cycle run appears in stats as lane 2 being full of nulls and 0's
+            # 1+2 300 cycle run appears in stats as lane 2 being full of nulls
+            # and 0's. This also "disappears" any incorrectly requested
+            # barcodes from the stats. What else can we do?
 
             my $laned_sample = $sample_lookup{$lane}->{$sample->{SampleName}};
-            $laned_sample->percentQ30($occurrence->{PercentQ30});
-            $laned_sample->percentQ40($occurrence->{PercentQ40});
-            $laned_sample->num_polonies($occurrence->{NumPolonies});
-            $laned_sample->yield($occurrence->{Yield});
+            $laned_sample->percentQ30($occurrence->{PercentQ30}); # incorrect. Needs to be an average over all barcodes
+            $laned_sample->percentQ40($occurrence->{PercentQ40}); # incorrect. Needs to be an average over all barcodes
+            $laned_sample->add_polonies($occurrence->{NumPolonies});
+            $laned_sample->add_yield($occurrence->{Yield});
 
             $run_stats->lanes->{$lane}->set_sample($sample->{SampleName}, $laned_sample);
         }
