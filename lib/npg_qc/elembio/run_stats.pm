@@ -118,6 +118,7 @@ sub run_stats_from_json {
             $laned_sample->percentQ40($occurrence->{PercentQ40}); # incorrect. Needs to be an average over all barcodes
             $laned_sample->add_polonies($occurrence->{NumPolonies});
             $laned_sample->add_yield($occurrence->{Yield});
+            $laned_sample->percentMismatch($occurrence->{PercentMismatch});
 
             $run_stats->lanes->{$lane}->set_sample($sample->{SampleName}, $laned_sample);
         }

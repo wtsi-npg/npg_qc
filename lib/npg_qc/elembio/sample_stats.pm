@@ -55,6 +55,13 @@ has percentQ40 => (
     documentation => 'Percentage of base calls over the Q40 threshold',
 );
 
+has percentMismatch => (
+    isa => 'Num',
+    is => 'rw',
+    documentation => 'Percentage of assigned reads that had "a" mismatch',
+);
+# See wording: https://docs.elembio.io/docs/elembio-cloud/run-charts-metrics/#indexing-assignment
+
 has num_polonies => (
     isa => 'Int',
     is => 'rw',

@@ -5,7 +5,6 @@ use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 
-use File::Slurp qw(write_file);
 use Getopt::Long;
 use JSON;
 
@@ -61,12 +60,27 @@ sub main {
             position => $lane_stats->lane,
         );
         foreach my $sample ($lane_stats->all_samples()) {
-            $metrics_obj->reads_pf_count->{$sample->tag_index} = $sample->num_polonies; # ??
+            # Polony counts found in RunStats.json are all after the perfomance filter
+            # For numbers prior to filtering, see AvitiRunStats.json.
+            $metrics_obj->reads_pf_count->{$sample->tag_index} = $sample->num_polonies;
             $metrics_obj->tags->{$sample->tag_index} = $sample->barcode_string();
-            # polonies before trim are equal to polonies in the source data, or so it seems
+            # It's hard to infer unfiltered polonies per sample from source
+            # data. Set equal to regular polony count
             $metrics_obj->reads_count->{$sample->tag_index} = $sample->num_polonies;
+            $metrics_obj->one_mismatch_matches_count->{$sample->tag_index} = $sample->percentMismatch * $sample->num_polonies;
+            $metrics_obj->one_mismatch_matches_pf_count->{$sample->tag_index} = $sample->percentMismatch * $sample->num_polonies;
+            $metrics_obj->matches_pf_percent->{$sample->tag_index} = $sample->num_polonies / $lane->num_polonies;
+            $metrics_obj->matches_percent->{$sample->tag_index} = $sample->num_polonies / $lane->num_polonies;
+
+            # To get automatic calculations of variation/underrepresented tags
+            # we need to set spiked_control_index once. Can only work properly
+            # once SciOps are using a single name for the PhiX sample.
+            # if ($sample->sample_name !~ /Adept/xsm) {
+            #  $metrics->spiked_control_index($sample->tag_index);
+            #}
         }
         # Add tag 0 (unassigned reads) as a sample
+        # As above, pf_count is what we get. Assign it to both
         $metrics_obj->reads_count->{'0'} = $lane_stats->unassigned_reads;
         $metrics_obj->reads_pf_count->{'0'} = $lane_stats->unassigned_reads;
 
@@ -79,8 +93,7 @@ sub main {
 
         my $output_name = sprintf '%s_%s_tag_metrics.json', $opts->{'id_run'}, $lane_stats->lane;
 
-        my $tag_metrics_json = $metrics_obj->freeze();
-        write_file($opts->{'output'}.$output_name, $tag_metrics_json);
+        $metrics_obj->store($opts->{'output'});
     }
     return;
 }
