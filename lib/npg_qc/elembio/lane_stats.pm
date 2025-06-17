@@ -19,7 +19,7 @@ has num_polonies => (
 );
 
 has deplexed_samples => (
-    isa => 'HashRef',
+    isa => 'HashRef[npg_qc::elembio::sample_stats]',
     is => 'ro',
     init_arg => undef,
     required => 0,
