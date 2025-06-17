@@ -67,10 +67,12 @@ sub main {
             # It's hard to infer unfiltered polonies per sample from source
             # data. Set equal to regular polony count
             $metrics_obj->reads_count->{$sample->tag_index} = $sample->num_polonies;
-            $metrics_obj->one_mismatch_matches_count->{$sample->tag_index} = $sample->percentMismatch * $sample->num_polonies;
-            $metrics_obj->one_mismatch_matches_pf_count->{$sample->tag_index} = $sample->percentMismatch * $sample->num_polonies;
-            $metrics_obj->matches_pf_percent->{$sample->tag_index} = $sample->num_polonies / $lane->num_polonies;
-            $metrics_obj->matches_percent->{$sample->tag_index} = $sample->num_polonies / $lane->num_polonies;
+            $metrics_obj->one_mismatch_matches_count->{$sample->tag_index} = ($sample->percentMismatch / 100) * $sample->num_polonies;
+            $metrics_obj->perfect_matches_count->{$sample->tag_index} = (100 - $sample->percentMismatch) / 100 * $sample->num_polonies;
+            $metrics_obj->one_mismatch_matches_pf_count->{$sample->tag_index} = ($sample->percentMismatch / 100) * $sample->num_polonies;
+            $metrics_obj->perfect_matches_pf_count->{$sample->tag_index} = (100 - $sample->percentMismatch) / 100 * $sample->num_polonies;
+            $metrics_obj->matches_pf_percent->{$sample->tag_index} = $sample->num_polonies / $lane_stats->num_polonies;
+            $metrics_obj->matches_percent->{$sample->tag_index} = $sample->num_polonies / $lane_stats->num_polonies;
 
             # To get automatic calculations of variation/underrepresented tags
             # we need to set spiked_control_index once. Can only work properly
