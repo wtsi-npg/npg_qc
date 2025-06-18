@@ -103,22 +103,44 @@ sub run_stats_from_json {
 
     # Add sample stats to the lanes
     foreach my $sample (@{$data->{SampleStats}}) {
-        # Occurences describe the number of times a sample was found across
+        # Occurrences describe the number of times a sample was found across
         # all lanes. Potentially multiple hits where many barcodes are used
         # for a single sample
-        foreach my $occurrence (@{$sample->{Occurrences}}) {
-            my $lane = $occurrence->{Lane};
-            next if ($occurrence->{NumPolonies} == 0);
-            # 1+2 300 cycle run appears in stats as lane 2 being full of nulls
-            # and 0's. This also "disappears" any incorrectly requested
-            # barcodes from the stats. What else can we do?
-
+        foreach my $lane (keys %sample_lookup) {
             my $laned_sample = $sample_lookup{$lane}->{$sample->{SampleName}};
-            $laned_sample->percentQ30($occurrence->{PercentQ30}); # incorrect. Needs to be an average over all barcodes
-            $laned_sample->percentQ40($occurrence->{PercentQ40}); # incorrect. Needs to be an average over all barcodes
-            $laned_sample->add_polonies($occurrence->{NumPolonies});
-            $laned_sample->add_yield($occurrence->{Yield});
-            $laned_sample->percentMismatch($occurrence->{PercentMismatch});
+
+            foreach my $occurrence (grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}) {
+                next if ($occurrence->{NumPolonies} == 0);
+                # 1+2 300 cycle run appears in stats as lane 2 being full of nulls
+                # and 0's. This also "disappears" any incorrectly requested
+                # barcodes from the stats. What else can we do?
+
+                $laned_sample->add_polonies($occurrence->{NumPolonies});
+                $laned_sample->add_yield($occurrence->{Yield});
+            }
+
+            my $barcodes_for_this_sample = scalar @{$laned_sample->barcodes};
+            $laned_sample->percentMismatch(
+                sum(
+                    grep { defined $_ }
+                    map { $_->{PercentMismatch} }
+                    grep { $_->{Lane} == $lane } @{$sample->{Occurrences}}
+                ) / $barcodes_for_this_sample
+            );
+            $laned_sample->percentQ30(
+                sum(
+                    grep { defined $_ }
+                    map { $_->{PercentQ30} }
+                    grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}
+                ) / $barcodes_for_this_sample
+            );
+            $laned_sample->percentQ40(
+                sum(
+                    grep { defined $_ }
+                    map { $_->{PercentQ40} }
+                    grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}
+                ) / $barcodes_for_this_sample
+            );
 
             $run_stats->lanes->{$lane}->set_sample($sample->{SampleName}, $laned_sample);
         }
