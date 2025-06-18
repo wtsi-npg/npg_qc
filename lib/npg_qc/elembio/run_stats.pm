@@ -122,21 +122,21 @@ sub run_stats_from_json {
             my $barcodes_for_this_sample = scalar @{$laned_sample->barcodes};
             $laned_sample->percentMismatch(
                 sum(
-                    grep { defined $_ }
+                    grep { defined }
                     map { $_->{PercentMismatch} }
                     grep { $_->{Lane} == $lane } @{$sample->{Occurrences}}
                 ) / $barcodes_for_this_sample
             );
             $laned_sample->percentQ30(
                 sum(
-                    grep { defined $_ }
+                    grep { defined }
                     map { $_->{PercentQ30} }
                     grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}
                 ) / $barcodes_for_this_sample
             );
             $laned_sample->percentQ40(
                 sum(
-                    grep { defined $_ }
+                    grep { defined }
                     map { $_->{PercentQ40} }
                     grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}
                 ) / $barcodes_for_this_sample
