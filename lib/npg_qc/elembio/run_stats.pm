@@ -6,6 +6,7 @@ use File::Slurp qw(read_file);
 use JSON;
 use List::Util qw(uniq sum);
 use namespace::autoclean;
+use npg_qc::elembio::barcode_stats;
 use npg_qc::elembio::lane_stats;
 use npg_qc::elembio::sample_stats;
 
@@ -64,15 +65,14 @@ sub run_stats_from_json {
                 lane => $lane,
             );
             my (@tags_in_lane) = grep { $_->{Lane} == $lane } @{ $sample->{Indexes} };
-            my @barcode_list;
             for my $tag (@tags_in_lane) {
                 my $barcode = [$tag->{Index1}];
                 if (exists $tag->{Index2}) {
                     push @{$barcode}, $tag->{Index2};
                 }
-                push @barcode_list, $barcode;
+                my $stats = npg_qc::elembio::barcode_stats->new(barcodes => $barcode);
+                $sample_obj->add_barcode($stats->barcode_string, $stats);
             }
-            $sample_obj->barcodes(\@barcode_list);
 
             $sample_lookup{$lane}->{$sample->{SampleName}} = $sample_obj;
         }
@@ -115,33 +115,21 @@ sub run_stats_from_json {
                 # and 0's. This also "disappears" any incorrectly requested
                 # barcodes from the stats. What else can we do?
 
-                $laned_sample->add_polonies($occurrence->{NumPolonies});
-                $laned_sample->add_yield($occurrence->{Yield});
+                my ($i1, $i2) = $laned_sample->index_lengths;
+                my $expected_barcode = $occurrence->{ExpectedSequence};
+                if ($i2) {
+                    substr $expected_barcode, $i1, 0, q{-};
+                }
+                if (!exists $laned_sample->barcodes->{$expected_barcode}) {
+                    croak "Cannot match $expected_barcode with what was found in manifest\n";
+                }
+                my $barcode_stats = $laned_sample->barcodes->{$expected_barcode};
+                $barcode_stats->num_polonies($occurrence->{NumPolonies});
+                $barcode_stats->yield($occurrence->{Yield});
+                $barcode_stats->percentQ30($occurrence->{PercentQ30});
+                $barcode_stats->percentQ40($occurrence->{PercentQ40});
+                $barcode_stats->percentMismatch($occurrence->{PercentMismatch});
             }
-
-            my $barcodes_for_this_sample = scalar @{$laned_sample->barcodes};
-            $laned_sample->percentMismatch(
-                sum(
-                    grep { defined }
-                    map { $_->{PercentMismatch} }
-                    grep { $_->{Lane} == $lane } @{$sample->{Occurrences}}
-                ) / $barcodes_for_this_sample
-            );
-            $laned_sample->percentQ30(
-                sum(
-                    grep { defined }
-                    map { $_->{PercentQ30} }
-                    grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}
-                ) / $barcodes_for_this_sample
-            );
-            $laned_sample->percentQ40(
-                sum(
-                    grep { defined }
-                    map { $_->{PercentQ40} }
-                    grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}
-                ) / $barcodes_for_this_sample
-            );
-
             $run_stats->lanes->{$lane}->set_sample($sample->{SampleName}, $laned_sample);
         }
     }

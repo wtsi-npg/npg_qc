@@ -2,33 +2,36 @@ package npg_qc::elembio::sample_stats;
 
 use Moose;
 use namespace::autoclean;
+use List::Util qw(sum);
+use npg_qc::elembio::barcode_stats;
 
 
 our $VERSION = '0';
 
-# In npg_qc, AAAAAAA-TTTTTT
-# barcodes => [[AAAAA, TTTTTT]]
 has barcodes => (
-    isa => 'ArrayRef[ArrayRef]',
+    isa => 'HashRef[npg_qc::elembio::barcode_stats]',
     is => 'rw',
-    documentation => 'I1 and I2 sequences in order',
-    default => sub {[]},
+    documentation => 'Barcode pairs and their stats keyed by their barcode_string',
+    default => sub {{}},
+    traits => ['Hash'],
+    handles => {
+        add_barcode => 'set'
+    },
 );
 
 sub barcode_string {
     my $self = shift;
-    my $first_barcode = $self->barcodes->[0];
-    if ( @{ $first_barcode } > 1) {
-        return join q{-}, $first_barcode->[0], $first_barcode->[1];
-    } else {
-        return $first_barcode->[0];
-    }
+    my ($first_barcode) = values %{$self->barcodes};
+    return $first_barcode->barcode_string;
 }
 
+# Assumes all barcodes are equal length. Not necessarily true, but the ElemBio
+# docs suggest that shorter barcodes would be padded with adapter sequence to
+# bring them up to the same length
 sub index_lengths {
     my $self = shift;
-    my $first_barcode = $self->barcodes->[0];
-    return length($first_barcode->[0]), $first_barcode->[1] ? length($first_barcode->[1]) : undef;
+    my ($first_barcode) = values %{$self->barcodes};
+    return $first_barcode->index_lengths();
 }
 
 has tag_index => (
@@ -43,45 +46,39 @@ has sample_name => (
     is => 'ro',
 );
 
-has percentQ30 => (
-    isa => 'Num',
-    is => 'rw',
-    documentation => 'Percentage of base calls over the Q30 threshold',
-);
+sub average_over_all_members {
+    my $self = shift;
+    my $key = shift;
+    return sum(
+        map { $_->{$key} } values %{$self->barcodes}
+    ) / scalar keys %{$self->barcodes}
+}
 
-has percentQ40 => (
-    isa => 'Num',
-    is => 'rw',
-    documentation => 'Percentage of base calls over the Q40 threshold',
-);
+##no critic NamingConventions::Capitalization
+sub percentQ30 {
+    my $self = shift;
+    return $self->average_over_all_members('percentQ30');
+}
 
-has percentMismatch => (
-    isa => 'Num',
-    is => 'rw',
-    documentation => 'Percentage of assigned reads that had "a" mismatch',
-);
-# See wording: https://docs.elembio.io/docs/elembio-cloud/run-charts-metrics/#indexing-assignment
+sub percentQ40 {
+    my $self = shift;
+    return $self->average_over_all_members('percentQ40');
+}
 
-has num_polonies => (
-    isa => 'Int',
-    is => 'rw',
-    traits => ['Number'],
-    default => 0,
-    handles => {
-        add_polonies => 'add'
-    },
-);
+sub percentMismatch {
+    my $self = shift;
+    return $self->average_over_all_members('percentMismatch');
+}
 
-has yield => (
-    isa => 'Num',
-    is => 'rw',
-    documentation => 'Gigabases for sample',
-    traits => ['Number'],
-    default => 0,
-    handles => {
-        add_yield => 'add'
-    },
-);
+sub num_polonies {
+    my $self = shift;
+    return sum(map {$_->num_polonies} values %{$self->barcodes});
+}
+
+sub yield {
+    my $self = shift;
+    return sum(map {$_->yield} values %{$self->barcodes});
+}
 
 has lane => (
     isa => 'Int',
@@ -106,6 +103,8 @@ my ($i1, i2) = $sample->index_lengths;
 if ($i2) {
     # $i2 might be undef
 }
+
+my $pct_mismatch = $sample->percentMismatch();;
 
 =head1 DESCRIPTION
 
@@ -139,6 +138,8 @@ Returns I1 and I2 lengths. If there is no I2 the second return value is undef
 =item Moose
 
 =item namespace::autoclean
+
+=item npg_qc::elembio::barcode_stats
 
 =back
 
