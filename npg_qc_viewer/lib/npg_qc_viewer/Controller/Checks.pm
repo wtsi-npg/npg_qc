@@ -226,17 +226,29 @@ sub _display_run_lanes {
     $c->stash->{'show_total'} = 1;
   }
 
+  $c->stash->{'elembio_run'} = 0;
   if ($id_runs && (@{$id_runs} == 1)) {
     $c->stash->{'single_id_run'} = $id_runs->[0];
-    my $crs = $c->model('NpgDB')->resultset('Run')
-                                ->find($id_runs->[0])->current_run_status;
-    if ($crs) {
-      $c->stash->{'current_run_status'} = $crs->description;
-      $c->stash->{'status_set_by'} = $crs->user->username;
+    my $run_row = $c->model('NpgDB')->resultset('Run')->find($id_runs->[0]);
+    if ($run_row) {
+      $c->stash->{'elembio_run'} =
+        $self->_manufacturer_is_elembio($run_row);
+      my $crs = $run_row->current_run_status;
+      if ($crs) {
+        $c->stash->{'current_run_status'} = $crs->description;
+        $c->stash->{'status_set_by'} = $crs->user->username;
+      }
     }
   }
 
   return;
+}
+
+sub _manufacturer_is_elembio {
+  my ($self, $run_row) = @_;
+  my $instrument = $run_row->instrument;
+  return ($instrument && $instrument->manufacturer_is_ElementBiosciences()) ?
+    1 : 0;
 }
 
 sub _run_lanes_from_dwh {

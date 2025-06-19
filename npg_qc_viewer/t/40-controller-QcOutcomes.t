@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 use URI::Escape qw(uri_escape);
 use JSON::XS;
@@ -373,7 +373,6 @@ subtest 'data validation for update requests' => sub {
     'Rationale description should be present');
 };
 
-
 subtest 'conditionally get wh info about tags' => sub {
   plan tests => 4;
 
@@ -429,7 +428,64 @@ subtest 'conditionally get wh info about tags' => sub {
   ok($response->is_success, 'response received for updating a seq entity');
 };
 
-subtest 'Conditional update of run/lane status in tracking' => sub {
+subtest 'rules relaxation for non-Illumina data' => sub {
+  plan tests => 14;
+
+  my $data = {
+    'Action'   => 'UPDATE',
+    'user'     => 'pipeline',
+    'password' => 'secret',
+    'seq'      => {'400025:4' => {'mqc_outcome' => 'Rejected final'}}
+  };
+  my $request = _new_post_request();
+  $request->content(encode_json($data));
+  my $response = request($request);
+  ok($response->is_error, qq[Error when the run is not tracked]);
+  is($response->code, 404, 'error code is 404' );
+  is($response->content,
+    '{"error":"Run 400025 is not registered in the tracking database"}',
+    'correct error message');
+  
+  my $id_run = 50000;
+  my $count = 0;
+  for my $lane ((2, 1)) {
+    $count++;
+    $data->{'seq'} = {"${id_run}:${lane}" => {'mqc_outcome' => 'Rejected final'}};
+    $request = _new_post_request();
+    $request->content(encode_json($data));
+    $response = request($request);
+    ok($response->is_success, 'request for Elemio run has succeeded');
+    is_deeply(decode_json($response->content),
+      {"seq" => {"50000:${lane}" => {"mqc_outcome" => "Rejected final"}},
+       "lib" => {},
+       "uqc" => {}}, 'correct QC outcome in response');
+    my $rl=$schemas->{'npg'}->resultset('RunLane')
+      ->find({id_run=>$id_run, position=>$lane});
+    my $expected = 'manual qc complete';
+    is($rl->current_run_lane_status->description, $expected,
+      "lane status is set to $expected for lane $lane");
+    my $run_status = $schemas->{'npg'}->resultset('Run')->find($id_run)
+      ->current_run_status_description;
+    $expected = ($count == 1) ? undef: 'archival pending';
+    is($run_status, $expected,
+      'Run status has' . ($count == 1) ? '' : ' not' . " changed to $expected");  
+  }
+
+  $data->{'seq'} = {
+    "400025:4" => {'mqc_outcome' => 'Rejected final'},
+    "50000:4"  => {'mqc_outcome' => 'Rejected final'}
+  };
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  ok($response->is_error, qq[Error when the run is not tracked]);
+  is($response->code, 400, 'error code is 400');
+  like($response->content,
+    qr/No NPG mlwarehouse data for run \d+ position 4/,
+    'Illumina flow is triggered for QC outcomes for multiple runs');
+};
+
+subtest 'conditionally update of run/lane status in tracking' => sub {
   plan tests => 9;
 
   my $original = 'analysis complete';
