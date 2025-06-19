@@ -46,7 +46,7 @@ has sample_name => (
     is => 'ro',
 );
 
-sub average_over_all_members {
+sub _average_over_all_members {
     my $self = shift;
     my $key = shift;
     return sum(
@@ -57,17 +57,17 @@ sub average_over_all_members {
 ##no critic NamingConventions::Capitalization
 sub percentQ30 {
     my $self = shift;
-    return $self->average_over_all_members('percentQ30');
+    return $self->_average_over_all_members('percentQ30');
 }
 
 sub percentQ40 {
     my $self = shift;
-    return $self->average_over_all_members('percentQ40');
+    return $self->_average_over_all_members('percentQ40');
 }
 
 sub percentMismatch {
     my $self = shift;
-    return $self->average_over_all_members('percentMismatch');
+    return $self->_average_over_all_members('percentMismatch');
 }
 
 sub num_polonies {
@@ -126,6 +126,16 @@ when there are many on this sample.
 =head2 index_lengths
 
 Returns I1 and I2 lengths. If there is no I2 the second return value is undef
+
+=head2 num_polonies
+=head2 percentMismatch
+=head2 percentQ30
+=head2 percentQ40
+=head2 yield
+
+Calls the attribute on all barcodes in this sample and returns the sum or
+averaged result as appropriate.
+
 
 =head1 DIAGNOSTICS
 
