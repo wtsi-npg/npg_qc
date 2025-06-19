@@ -163,14 +163,13 @@ sub _update_outcomes {
       # Why do we have to know the manufacturer?
       # We are pushing Element Biosciences pooled libraries through this system.
       # For time being (May 2025) no library-level autoqc data is available.
-      # The lanes' QC outcomes has to be finalised in the absenve of plex-level
+      # The lanes' QC outcomes has to be finalised in the absence of plex-level
       # QC outcomes. 
       my $illumina_instr_manufacturer = 1;
       if (@lane_rps) {
-         my @inflated_lane_rps =
-           map { npg_tracking::glossary::rpt->inflate_rpt($_) }
-           @lane_rps;
-         my @id_runs = uniq map { $_->{'id_run'} } @inflated_lane_rps;
+         my @id_runs = uniq map { $_->{'id_run'} }
+                       map { npg_tracking::glossary::rpt->inflate_rpt($_) }
+                       @lane_rps;
          if (@id_runs == 1) { # In the SeqQC viewer all data will belong to
                               # the same run.
            my $id_run = $id_runs[0];

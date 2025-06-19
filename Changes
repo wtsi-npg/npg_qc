@@ -10,6 +10,10 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    - SeqQC QcOutcomes controller uses information about the manufacturer of
      the instrument the sequencing experiment was set up on when updating
      QC outcomes (see above).
+   - For an Elembio run the template for rendering a row in a SeqQC summary
+     table always creates a placeholder for MQC controls.
+   Some of these adjustments will have to be removed or refined in future when
+   library-level MQC is enabled for Elembio data.
 
 release 74.0.2 (2025-02-20)
  - Replace mark docker image with mark golang executable from github,
