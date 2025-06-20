@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 use Carp;
-use List::MoreUtils qw/ any /;
+use List::MoreUtils qw/ any uniq /;
 
 use npg_tracking::glossary::rpt;
 use npg_tracking::glossary::composition::factory::rpt_list;
@@ -158,12 +158,41 @@ sub _update_outcomes {
 
     try {
       my $seq_outcomes = $data->{$SEQ_OUTCOMES} || {};
-      my $lane_info = keys %{$seq_outcomes} ?
-        $self->_lane_info($c->model('MLWarehouseDB'), $seq_outcomes) : {};
+      my @lane_rps = keys %{$seq_outcomes};
+      my $lane_info = {};
+      # Why do we have to know the manufacturer?
+      # We are pushing Element Biosciences pooled libraries through this system.
+      # For time being (May 2025) no library-level autoqc data is available.
+      # The lanes' QC outcomes has to be finalised in the absence of plex-level
+      # QC outcomes. 
+      my $illumina_instr_manufacturer = 1;
+      if (@lane_rps) {
+         my @id_runs = uniq map { $_->{'id_run'} }
+                       map { npg_tracking::glossary::rpt->inflate_rpt($_) }
+                       @lane_rps;
+         if (@id_runs == 1) { # In the SeqQC viewer all data will belong to
+                              # the same run.
+           my $id_run = $id_runs[0];
+           my $tracking_run = $c->model('NpgDB')->schema()->resultset('Run')
+                              ->find($id_run);
+           if (!$tracking_run) {
+             $self->status_not_found(
+               $c,
+               message => "Run $id_run is not registered in the tracking database"
+             );
+             return;
+           }
+           $illumina_instr_manufacturer = $tracking_run->instrument()
+                                          ->manufacturer_is_Illumina();
+         }
+         if ($illumina_instr_manufacturer) {
+           $lane_info = $self->_lane_info($c->model('MLWarehouseDB'), \@lane_rps);
+         }
+      }
 
       my $outcomes = npg_qc::mqc::outcomes->new(
-                       qc_schema => $c->model('NpgQcDB')->schema())
-                     ->save($data, $username, $lane_info);
+        qc_schema => $c->model('NpgQcDB')->schema()
+      )->save($data, $username, $lane_info, !$illumina_instr_manufacturer);
 
       $seq_outcomes = $outcomes->{$SEQ_OUTCOMES} || {};
       $self->_update_runlanes($c, $seq_outcomes, $username);
@@ -183,10 +212,10 @@ sub _update_outcomes {
 }
 
 sub _lane_info {
-  my ($self, $mlwh_schema, $seq_outcomes) = @_;
+  my ($self, $mlwh_schema, $lane_rpts) = @_;
 
   my $info = {};
-  foreach my $rpt_key ( keys %{$seq_outcomes} ) {
+  foreach my $rpt_key ( @{$lane_rpts} ) {
     $info->{$rpt_key} = $mlwh_schema->tags4lane(
       npg_tracking::glossary::rpt->inflate_rpt($rpt_key));
   }
@@ -271,7 +300,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Genome Research Ltd.
+Copyright (C) 2016, 2017, 2018, 2025 Genome Research Ltd.
 
 This file is part of NPG software.
 

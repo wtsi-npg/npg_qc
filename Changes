@@ -1,5 +1,21 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 74.1.0 (2025-06-20)
+ - To allow for lane-level QC assessment of Elembio data in the absence of
+   results of library-level QC results, relaxed the rules for assigning the
+   final QC outcome for a pooled lane for non-Illumina data.
+   - npg_qc::mqc::outcomes 'save' method gets a new optional boolean argument,
+     non_illumina_data, false by default. If this argument is true, at a point
+     of saving a final QC outcome for a lane an attempt to finalise
+     library/plex-level QC outcomes is not made.
+   - SeqQC QcOutcomes controller uses information about the manufacturer of
+     the instrument the sequencing experiment was set up on when updating
+     QC outcomes (see above).
+   - For an Elembio run the template for rendering a row in a SeqQC summary
+     table always creates a placeholder for MQC controls.
+   Some of these adjustments will have to be removed or refined in future when
+   library-level MQC is enabled for Elembio data.
+
 release 74.0.2 (2025-02-20)
  - Replace mark docker image with mark golang executable from github,
    on ISG's docker image, for documentation publishing

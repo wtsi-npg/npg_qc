@@ -1,5 +1,18 @@
 ---
 - actual_cycle_count: 76
+  batch_id: ~
+  expected_cycle_count: 76
+  flowcell_id: ~
+  folder_name: ~
+  folder_path_glob: ~
+  id_instrument: 6
+  id_instrument_format: 4
+  id_run: 1234
+  id_run_pair: 0
+  is_paired: 1
+  priority: 1
+  team: '"joint"'
+- actual_cycle_count: 76
   batch_id: 4178
   expected_cycle_count: 76
   flowcell_id: ~
@@ -90,4 +103,16 @@
   folder_name : ~
   folder_path_glob : ~
   team : '"C"'
-
+- actual_cycle_count: 318
+  batch_id:
+  expected_cycle_count: 318
+  flowcell_id: 2427452508
+  folder_name: 20250127_AV244103_NT1850075L
+  folder_path_glob: ''
+  id_instrument: 46
+  id_instrument_format: 19
+  id_run: 50000
+  id_run_pair: ~
+  is_paired: 1
+  priority: 1
+  team: 'SR'

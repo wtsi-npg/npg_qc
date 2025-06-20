@@ -559,11 +559,10 @@ subtest q[save - errors] => sub {
   throws_ok {$o->save({}, q[]) } qr/Username is required/,
     'username cannot be empty';
   throws_ok {$o->save({}, q[cat], q[1, 2, 3]) }
-    qr/Tag indices for lanes should be a hash ref/,
+    qr/Lane info should be a hash ref/,
     'lane info about tags should be a hash';
-  throws_ok {$o->save({'seq' => {}}, q[cat]) }
-    qr/Tag indices for lanes are required/,
-    'lane info about tags is required for seq data';
+  lives_ok {$o->save({'seq' => {}}, q[cat]) }
+    'lane info about tags is not required in the absence of seq data';
   throws_ok {$o->save({}, q[cat], {}) }
     qr/No data to save/, 'empty outcomes hash - error';
   throws_ok {$o->save({'lib'=>{}, 'other'=>{}}, q[cat], {}) }
@@ -603,7 +602,7 @@ subtest q[save - errors] => sub {
 };
 
 subtest q[save outcomes] => sub {
-  plan tests => 22;
+  plan tests => 24;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
@@ -681,13 +680,14 @@ subtest q[save outcomes] => sub {
   lives_ok{ $o->save($values_to_save, 'cat', {'101:1' => []})}
     'can save uqc, lib and seq outcomes at the same time';
 
+  throws_ok { $o->save({'seq' =>
+    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat', {})}
+    qr/Tag indices for lane 101:1 are required/,
+    'tag info is not available, but lib results are stored - error';
+
   my $error =
     q[Mismatch between known tag indices and available library outcomes];
 
-  throws_ok { $o->save({'seq' =>
-    {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat', {})}
-    qr/List of known tag indexes is required for validation/,
-    'tag info is not available, but lib results are stored - error';
   throws_ok { $o->save({'seq' =>
     {'101:1'=>{'mqc_outcome'=>'Accepted final'}}}, 'cat',
     {'101:1'=>[]})}
@@ -787,6 +787,20 @@ subtest q[save outcomes] => sub {
     {'101:1'=>[(1 .. 6)]})}
     qr/Final outcome cannot be updated/,
     'error updating a final outcome to a different final outcome';
+
+  my $non_illumina_data = 1;
+  lives_and { ok $o->save(
+    {'seq' => {'1010000:5'=>{'mqc_outcome'=>'Accepted preliminary'}}},
+    'cat',
+    {},
+    $non_illumina_data
+  ) } 'saved preliminary lane outcome for non-Illumina data';
+  lives_and { ok $o->save(
+    {'seq' => {'1010000:5'=>{'mqc_outcome'=>'Accepted final'}}},
+    'cat',
+    {},
+    $non_illumina_data
+  ) } 'saved final lane outcome for non-Illumina data, no tag info';
 };
 
 subtest q[save outcomes for entities with multiple components] => sub {
@@ -827,7 +841,7 @@ subtest q[save outcomes for entities with multiple components] => sub {
 
   my $seq_final = {'26300:1' => {'mqc_outcome'=>'Accepted final'}};
   throws_ok {$o->save({'seq' => $seq_final}, 'cat')}
-    qr/Tag indices for lanes are required/,
+    qr/Tag indices for lane 26300:1 are required/,
     'tag information required';
   throws_ok {$o->save({'seq' => $seq_final}, 'cat', {'26300:1' => [1,2]})}
     qr/Mismatch between known tag indices and available library outcomes/,

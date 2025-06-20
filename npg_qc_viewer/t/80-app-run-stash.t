@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 24;
+use Test::More tests => 28;
 use Test::Exception;
 use HTTP::Request::Common;
 use File::Temp qw/tempdir/;
@@ -58,7 +58,7 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
     my $expected_count = $url eq q[/checks/runs/4025] ? 40 : 46;
     is($count, $expected_count, qq[$expected_count result objects in stash for run 4025]);
     is (join(' ', sort keys %{$rl_map}), join(' ', @keys), 'keys in the rl map');
-  }	
+  }
 }
 
 {
@@ -69,7 +69,7 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
     ok ($res->is_success, 'request succeeded');
     my $rl_map = $c->stash->{rl_map};
     is (join(' ', sort keys %{$rl_map}), join(' ', @keys), 'keys in the rl map');
-  }	
+  }
 }
 
 {
@@ -92,6 +92,18 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
     $count += $rl_map->{$key}->size();
   }
   is($count, 40, '40 result objects in stash for run 4099');
+}
+
+{
+  my $req = GET(q[/checks/runs/4025]);
+  my ($res, $c) = ctx_request($req);
+  ok ($res->is_success, 'request succeeded');
+  is($c->stash->{elembio_run}, 0, 'not an elembio run');
+
+  $req = GET(q[/checks/runs/50000]);
+  ($res, $c) = ctx_request($req);
+  ok ($res->is_success, 'request succeeded');
+  is($c->stash->{elembio_run}, 1, 'elembio run');  
 }
 
 1;
