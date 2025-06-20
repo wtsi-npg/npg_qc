@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 74.1.0 (2025-06-20)
  - To allow for lane-level QC assessment of Elembio data in the absence of
    results of library-level QC results, relaxed the rules for assigning the
    final QC outcome for a pooled lane for non-Illumina data.
