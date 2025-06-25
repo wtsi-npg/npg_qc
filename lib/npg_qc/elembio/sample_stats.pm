@@ -50,7 +50,7 @@ sub _average_over_all_members {
     my $self = shift;
     my $key = shift;
     return sum(
-        map { $_->{$key} } values %{$self->barcodes}
+        map { $_->{$key} ? $_->{$key} : 0 } values %{$self->barcodes}
     ) / scalar keys %{$self->barcodes}
 }
 

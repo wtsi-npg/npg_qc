@@ -10,7 +10,6 @@ use npg_qc::elembio::barcode_stats;
 use npg_qc::elembio::lane_stats;
 use npg_qc::elembio::sample_stats;
 
-
 our $VERSION = '0';
 
 has lanes => (
@@ -44,6 +43,7 @@ no Moose;
 sub run_stats_from_json {
     my $runstats_str = shift;
     my $manifest_str = shift;
+    my $lane_count = shift;
 
     my $data = decode_json($runstats_str);
     my $manifest = decode_json($manifest_str);
@@ -53,12 +53,11 @@ sub run_stats_from_json {
     my %sample_lookup;
     foreach my $sample (@{$manifest->{Samples}}) {
         # Establish if there is more than one index1/index2 per sample
-        my @lanes = uniq map { $_->{Lane} } @{$sample->{Indexes}};
-        if ((@{$sample->{Indexes}}) > @lanes) {
+        if ((@{$sample->{Indexes}}) > $lane_count) {
             carp q(More than one tag per sample per lane);
         }
 
-        foreach my $lane (@lanes) {
+        foreach my $lane (1..$lane_count) {
             my $sample_obj = npg_qc::elembio::sample_stats->new(
                 sample_name => $sample->{SampleName},
                 tag_index => int($sample->{SampleNumber}),
@@ -67,7 +66,7 @@ sub run_stats_from_json {
             my (@tags_in_lane) = grep { $_->{Lane} == $lane } @{ $sample->{Indexes} };
             for my $tag (@tags_in_lane) {
                 my $barcode = [$tag->{Index1}];
-                if (exists $tag->{Index2}) {
+                if ($tag->{Index2}) {
                     push @{$barcode}, $tag->{Index2};
                 }
                 my $stats = npg_qc::elembio::barcode_stats->new(barcodes => $barcode);
@@ -86,7 +85,9 @@ sub run_stats_from_json {
     );
     # Add lane stats to the runstats object
     foreach my $lane (@{$data->{Lanes}}) {
-        next if $lane->{NumPolonies} == 0;
+        # We get a false Lane 2 when a 300 cycle run is configured
+        # This can only be determined from the original manifest
+        next if $lane->{Lane} > $lane_count;
         my $lane_number = $lane->{Lane};
         $run_stats->set_lane(
             $lane_number,
@@ -106,11 +107,10 @@ sub run_stats_from_json {
         # Occurrences describe the number of times a sample was found across
         # all lanes. Potentially multiple hits where many barcodes are used
         # for a single sample
-        foreach my $lane (keys %sample_lookup) {
+        foreach my $lane (1..$lane_count) {
             my $laned_sample = $sample_lookup{$lane}->{$sample->{SampleName}};
 
             foreach my $occurrence (grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}) {
-                next if ($occurrence->{NumPolonies} == 0);
                 # 1+2 300 cycle run appears in stats as lane 2 being full of nulls
                 # and 0's. This also "disappears" any incorrectly requested
                 # barcodes from the stats. What else can we do?
@@ -139,10 +139,11 @@ sub run_stats_from_json {
 sub run_stats_from_file {
     my $run_stats_file = shift;
     my $manifest_file = shift;
+    my $lane_count = shift;
 
     my $manifest = read_file($manifest_file);
     my $run_stats = read_file($run_stats_file);
-    return run_stats_from_json($run_stats, $manifest);
+    return run_stats_from_json($run_stats, $manifest, $lane_count);
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -5,12 +5,12 @@ use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 use Readonly;
-
 use Getopt::Long;
 use JSON;
 
 use npg_qc::autoqc::results::tag_metrics;
 use npg_qc::elembio::run_stats;
+use Monitor::Elembio::RunFolder; # from npg_tracking
 
 our $VERSION = '0';
 Readonly::Scalar my $PERCENT_TO_DECIMAL => 100;
@@ -50,8 +50,17 @@ sub main {
     my $opts = get_options();
 
     my $deplex_folder = $opts->{'input'};
+    my $run_folder = Monitor::Elembio::RunFolder->new(
+        runfolder_path => $opts->{'input'},
+        npg_tracking_schema => npg_tracking::Schema->connect(),
+    );
+    my $lane_count = $run_folder->lane_count;
 
-    my $run_stats = npg_qc::elembio::run_stats::run_stats_from_file($deplex_folder.'/RunStats.json', $deplex_folder.'/RunManifest.json');
+    my $run_stats = npg_qc::elembio::run_stats::run_stats_from_file(
+        $deplex_folder.'/RunStats.json',
+        $deplex_folder.'/RunManifest.json',
+        $lane_count
+    );
 
     # Where do we get an id_run from? Argument for now. $runstats->{'RunName'} is non-numeric.
     # Waiting for a script.

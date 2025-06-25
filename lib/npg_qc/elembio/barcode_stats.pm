@@ -26,19 +26,19 @@ sub index_lengths {
 }
 
 has percentQ30 => (
-    isa => 'Num',
+    isa => 'Maybe[Num]',
     is => 'rw',
     documentation => 'Percentage of base calls over the Q30 threshold',
 );
 
 has percentQ40 => (
-    isa => 'Num',
+    isa => 'Maybe[Num]',
     is => 'rw',
     documentation => 'Percentage of base calls over the Q40 threshold',
 );
 
 has percentMismatch => (
-    isa => 'Num',
+    isa => 'Maybe[Num]',
     is => 'rw',
     documentation => 'Percentage of assigned reads that had "a" mismatch',
 );
