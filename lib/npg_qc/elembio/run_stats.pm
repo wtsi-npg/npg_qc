@@ -141,6 +141,10 @@ sub run_stats_from_file {
     my $manifest_file = shift;
     my $lane_count = shift;
 
+    if (!$run_stats_file || !$manifest_file || !$lane_count) {
+        croak 'Missing argument(s), specify RunStats.json, RunManifest.json and lane count';
+    }
+
     my $manifest = read_file($manifest_file);
     my $run_stats = read_file($run_stats_file);
     return run_stats_from_json($run_stats, $manifest, $lane_count);
@@ -161,7 +165,8 @@ npg_qc::elembio::run_stats
   use npg_qc::elembio::run_stats;
   my $run_stats = npg_qc::elembio::run_stats::run_stats_from_file(
     "RunStats.json",
-    "RunManifest.json"
+    "RunManifest.json",
+    2
   );
 
   my $lane_stats = $run_stats->get_lane('1');
@@ -176,13 +181,16 @@ data for easy access
 
 =head2 run_stats_from_file
 
-Accepts two filenames, one for RunStats.json and one for RunManifest.json
+Accepts two filenames, one for RunStats.json and one for RunManifest.json.
+It also requires a number of lanes to expect, which can be inferred from
+the manifest, or by using Monitor::Elembio::RunFolder->lane_count.
 It then creates a npg_qc::elembio::run_stats instance populated with the
 information found in those files.
 
 =head2 run_stats_from_json
 
-Accepts two hash-refs containing RunStats.json and RunManifest.json.
+Accepts two hash-refs containing RunStats.json and RunManifest.json. Also
+requires a number of lanes to expect, see above.
 This function exists to allow bypassing of the file-reading component.
 
 =head1 DIAGNOSTICS
