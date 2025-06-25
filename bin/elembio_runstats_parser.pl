@@ -104,8 +104,6 @@ sub main {
             $metrics_obj->tags->{'0'} .= q{-} . 'N' x $i2_length;
         }
 
-        my $output_name = sprintf '%s_%s_tag_metrics.json', $opts->{'id_run'}, $lane_stats->lane;
-
         $metrics_obj->store($opts->{'output'});
     }
     return;
