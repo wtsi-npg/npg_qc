@@ -9,6 +9,7 @@ use namespace::autoclean;
 use npg_qc::elembio::barcode_stats;
 use npg_qc::elembio::lane_stats;
 use npg_qc::elembio::sample_stats;
+use Readonly;
 
 our $VERSION = '0';
 
@@ -40,13 +41,15 @@ __PACKAGE__->meta->make_immutable;
 no Moose;
 # Builder functions that create the run_stats instance with data
 
+Readonly::Scalar my $ALL_THE_PERCENT => 100;
+
 sub run_stats_from_json {
     my $runstats_ref = shift;
     my $manifest_ref = shift;
     my $lane_count = shift;
 
-    my $data = decode_json($$runstats_ref);
-    my $manifest = decode_json($$manifest_ref);
+    my $data = decode_json(${$runstats_ref});
+    my $manifest = decode_json(${$manifest_ref});
 
     # Make some sample objects from the manifest to be fleshed out with stats
     # later on. The safest way to get the barcodes is via manifest.
@@ -92,8 +95,8 @@ sub run_stats_from_json {
                 total_yield => $lane->{TotalYield},
                 # We do not explicitly get the unassigned read count for lanes
                 # It has to be approximated by calculation
-                unassigned_reads => sprintf('%.0f', ((100 - $lane->{PercentAssignedReads}) * $lane->{NumPolonies}) / 100),
-                unassigned_reads_percent => 100 - $lane->{PercentAssignedReads},
+                unassigned_reads => sprintf('%.0f', (($ALL_THE_PERCENT - $lane->{PercentAssignedReads}) * $lane->{NumPolonies}) / $ALL_THE_PERCENT),
+                unassigned_reads_percent => $ALL_THE_PERCENT - $lane->{PercentAssignedReads},
                 percentQ30 => $lane->{PercentQ30},
                 percentQ40 => $lane->{PercentQ40},
             )
