@@ -52,11 +52,6 @@ sub run_stats_from_json {
     # later on. The safest way to get the barcodes is via manifest.
     my %sample_lookup;
     foreach my $sample (@{$manifest->{Samples}}) {
-        # Establish if there is more than one index1/index2 per sample
-        if ((@{$sample->{Indexes}}) > $lane_count) {
-            carp q(More than one tag per sample per lane);
-        }
-
         foreach my $lane (1..$lane_count) {
             my $sample_obj = npg_qc::elembio::sample_stats->new(
                 sample_name => $sample->{SampleName},
