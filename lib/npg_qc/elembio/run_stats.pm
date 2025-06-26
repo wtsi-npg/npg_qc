@@ -41,12 +41,12 @@ no Moose;
 # Builder functions that create the run_stats instance with data
 
 sub run_stats_from_json {
-    my $runstats_str = shift;
-    my $manifest_str = shift;
+    my $runstats_ref = shift;
+    my $manifest_ref = shift;
     my $lane_count = shift;
 
-    my $data = decode_json($runstats_str);
-    my $manifest = decode_json($manifest_str);
+    my $data = decode_json($$runstats_ref);
+    my $manifest = decode_json($$manifest_ref);
 
     # Make some sample objects from the manifest to be fleshed out with stats
     # later on. The safest way to get the barcodes is via manifest.
@@ -90,7 +90,10 @@ sub run_stats_from_json {
                 lane => $lane_number,
                 num_polonies => $lane->{NumPolonies},
                 total_yield => $lane->{TotalYield},
-                unassigned_reads => sum( map { $_->{Count} } @{ $lane->{UnassignedSequences} }),
+                # We do not explicitly get the unassigned read count for lanes
+                # It has to be approximated by calculation
+                unassigned_reads => sprintf('%.0f', ((100 - $lane->{PercentAssignedReads}) * $lane->{NumPolonies}) / 100),
+                unassigned_reads_percent => 100 - $lane->{PercentAssignedReads},
                 percentQ30 => $lane->{PercentQ30},
                 percentQ40 => $lane->{PercentQ40},
             )
@@ -142,7 +145,7 @@ sub run_stats_from_file {
 
     my $manifest = read_file($manifest_file);
     my $run_stats = read_file($run_stats_file);
-    return run_stats_from_json($run_stats, $manifest, $lane_count);
+    return run_stats_from_json(\$run_stats, \$manifest, $lane_count);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -184,8 +187,8 @@ information found in those files.
 
 =head2 run_stats_from_json
 
-Accepts two hash-refs containing RunStats.json and RunManifest.json. Also
-requires a number of lanes to expect, see above.
+Accepts two strings by reference containing RunStats.json and RunManifest.json
+content. Also requires a number of lanes to expect, see above.
 This function exists to allow bypassing of the file-reading component.
 
 =head1 DIAGNOSTICS

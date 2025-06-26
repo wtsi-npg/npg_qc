@@ -39,7 +39,13 @@ has total_yield => (
 has unassigned_reads => (
     isa => 'Int',
     is => 'ro',
-    documentation => 'Number of reads that were not deplexed successful',
+    documentation => 'Number of reads that were not deplexed successfully',
+);
+
+has unassigned_reads_percent => (
+    isa => 'Num',
+    is => 'ro',
+    documentation => 'Percentage of reads that were not deplexed successfully',
 );
 
 has percentQ30 => (
