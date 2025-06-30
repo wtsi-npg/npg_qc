@@ -138,8 +138,8 @@ sub run_stats_from_json {
 }
 
 sub run_stats_from_file {
-    my $run_stats_file = shift;
     my $manifest_file = shift;
+    my $run_stats_file = shift;
     my $lane_count = shift;
 
     if (!$run_stats_file || !$manifest_file || !$lane_count) {
