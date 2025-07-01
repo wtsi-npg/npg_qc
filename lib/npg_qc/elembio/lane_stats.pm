@@ -26,6 +26,7 @@ has deplexed_samples => (
     traits => ['Hash'],
     handles => {
         set_sample => 'set',
+        get_sample => 'get',
         all_samples => 'values',
     },
 );
