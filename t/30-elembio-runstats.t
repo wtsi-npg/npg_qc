@@ -3,8 +3,10 @@ use warnings;
 use List::Util qw/sum/;
 use Test::More;
 use Test::Exception;
+use npg_qc::elembio::tag_metrics_generator qw/convert_run_stats_to_tag_metrics/;
 
 use_ok('npg_qc::elembio::run_stats');
+
 {
     my $manifest = 't/data/elembio/20240416_AV234003_16AprilSGEB2_2x300_NT1799722A/RunManifest.json';
     my $stats_file = 't/data/elembio/20240416_AV234003_16AprilSGEB2_2x300_NT1799722A/slim_20240416_AV234003_16AprilSGEB2_2x300_NT1799722A.json';
@@ -78,6 +80,47 @@ use_ok('npg_qc::elembio::run_stats');
     );
     for my $sample (@all_samples) {
         ok($sample->barcode_string(), 'Barcode stringification never fails on multi-barcode samples');
+    }
+}
+
+{
+    # Test the transformation to tag_metrics
+    my $manifest = 't/data/elembio/20250225_AV244103_NT1850075L_NT1850808B_repeat3/RunManifest.json';
+    my $stats_file = 't/data/elembio/20250225_AV244103_NT1850075L_NT1850808B_repeat3/slim_20250225_AV244103_NT1850075L_NT1850808B_repeat3.json';
+    my $lane_count = 2;
+
+    my $stats = npg_qc::elembio::run_stats::run_stats_from_file($manifest, $stats_file, $lane_count);
+
+    my @metrics = convert_run_stats_to_tag_metrics($stats, '12345');
+
+    ok(@metrics);
+    cmp_ok(scalar @metrics, '==', 2, 'Two lanes, two tag_metrics objects');
+    # Check values have been assigned to all major tag_metrics attributes
+    my @attributes = qw/reads_pf_count tags reads_count
+        one_mismatch_matches_count perfect_matches_count
+        one_mismatch_matches_pf_count matches_pf_percent
+        matches_percent/;
+    for my $lane (@metrics) {
+        for my $attr (@attributes) {
+            ok($lane->meta->get_attribute($attr), "$attr on $lane is defined");
+        }
+        # Check tag 0 has been inferred
+        cmp_ok($lane->reads_pf_count->{0}, '>', 0,'Tag 0 reads added');
+        is($lane->tags->{0}, 'NNNNNNNN', 'Tag 0 "sequence" provided');
+    }
+}
+
+{
+    # Check double barcodes are correctly generated
+    my $manifest = 't/data/elembio/20250401_AV244103_NT1853579T/RunManifest.json';
+    my $stats_file = 't/data/elembio/20250401_AV244103_NT1853579T/slim_20250401_AV244103_NT1853579T.json';
+    my $lane_count = 1;
+
+    my $stats = npg_qc::elembio::run_stats::run_stats_from_file($manifest, $stats_file, $lane_count);
+    my ($metrics) = convert_run_stats_to_tag_metrics($stats, '67890');
+    is($metrics->tags->{0}, 'NNNNNNNNNN-NNNNNNNNNN', 'Tag 0 virtual barcode was added');
+    for my $tag_index (keys %{$metrics->tags}) {
+        ok($metrics->tags->{$tag_index} =~ /^[ATCGN]{10}-[ATCGN]{10}$/, 'Generated barcodes are formatted correctly');
     }
 }
 

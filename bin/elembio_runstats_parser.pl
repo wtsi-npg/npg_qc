@@ -4,12 +4,11 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
-use Readonly;
 use Getopt::Long;
 use JSON;
 
-use npg_qc::autoqc::results::tag_metrics;
 use npg_qc::elembio::run_stats;
+use npg_qc::elembio::tag_metrics_generator qw(convert_run_stats_to_tag_metrics);
 use Monitor::Elembio::RunFolder; # from npg_tracking
 
 our $VERSION = '0';
@@ -51,59 +50,21 @@ sub main {
 
     my $deplex_folder = $opts->{'input'};
     my $run_folder = Monitor::Elembio::RunFolder->new(
-        runfolder_path => $opts->{'input'},
+        runfolder_path => $deplex_folder,
         npg_tracking_schema => npg_tracking::Schema->connect(),
     );
     my $lane_count = $run_folder->lane_count;
 
     my $run_stats = npg_qc::elembio::run_stats::run_stats_from_file(
-        $deplex_folder.'/RunStats.json',
         $deplex_folder.'/RunManifest.json',
+        $deplex_folder.'/RunStats.json',
         $lane_count
     );
 
     # Where do we get an id_run from? Argument for now. $runstats->{'RunName'} is non-numeric.
-    # Waiting for a script.
 
-    while (my($lane, $lane_stats) = each %{$run_stats->lanes}) {
-        my $metrics_obj = npg_qc::autoqc::results::tag_metrics->new(
-            id_run => $opts->{'id_run'},
-            position => $lane_stats->lane,
-        );
-        foreach my $sample ($lane_stats->all_samples()) {
-            # Polony counts found in RunStats.json are all after the perfomance filter
-            # For numbers prior to filtering, see AvitiRunStats.json.
-            $metrics_obj->reads_pf_count->{$sample->tag_index} = $sample->num_polonies;
-            $metrics_obj->tags->{$sample->tag_index} = $sample->barcode_string();
-            # It's hard to infer unfiltered polonies per sample from source
-            # data. Set equal to regular polony count
-            $metrics_obj->reads_count->{$sample->tag_index} = $sample->num_polonies;
-            $metrics_obj->one_mismatch_matches_count->{$sample->tag_index} = ($sample->percentMismatch / $PERCENT_TO_DECIMAL) * $sample->num_polonies;
-            $metrics_obj->perfect_matches_count->{$sample->tag_index} = ($PERCENT_TO_DECIMAL - $sample->percentMismatch) / $PERCENT_TO_DECIMAL * $sample->num_polonies;
-            $metrics_obj->one_mismatch_matches_pf_count->{$sample->tag_index} = ($sample->percentMismatch / $PERCENT_TO_DECIMAL) * $sample->num_polonies;
-            $metrics_obj->perfect_matches_pf_count->{$sample->tag_index} = ($PERCENT_TO_DECIMAL - $sample->percentMismatch) / $PERCENT_TO_DECIMAL * $sample->num_polonies;
-            $metrics_obj->matches_pf_percent->{$sample->tag_index} = $sample->num_polonies / $lane_stats->num_polonies;
-            $metrics_obj->matches_percent->{$sample->tag_index} = $sample->num_polonies / $lane_stats->num_polonies;
-
-            # To get automatic calculations of variation/underrepresented tags
-            # we need to set spiked_control_index once. Can only work properly
-            # once SciOps are using a single name for the PhiX sample.
-            # if ($sample->sample_name !~ /Adept/xsm) {
-            #  $metrics->spiked_control_index($sample->tag_index);
-            #}
-        }
-        # Add tag 0 (unassigned reads) as a sample
-        # As above, pf_count is what we get. Assign it to both
-        $metrics_obj->reads_count->{'0'} = $lane_stats->unassigned_reads;
-        $metrics_obj->reads_pf_count->{'0'} = $lane_stats->unassigned_reads;
-
-        my ($sample) = $lane_stats->all_samples();
-        my ($i1_length, $i2_length) = $sample->index_lengths();
-        $metrics_obj->tags->{'0'} = 'N' x $i1_length;
-        if ($i2_length) {
-            $metrics_obj->tags->{'0'} .= q{-} . 'N' x $i2_length;
-        }
-
+    my @metrics = convert_run_stats_to_tag_metrics($run_stats, $opts->{'id_run'});
+    for my $metrics_obj (@metrics) {
         $metrics_obj->store($opts->{'output'});
     }
     return;
