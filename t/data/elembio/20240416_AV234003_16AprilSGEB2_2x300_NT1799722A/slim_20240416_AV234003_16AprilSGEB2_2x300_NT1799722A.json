@@ -1,0 +1,936 @@
+{
+    "NumPoloniesBeforeTrimming": 363641937,
+    "PercentQ40": 80.491755787232,
+    "AssignedYield": 216.597903849,
+    "Lanes": [
+        {
+            "Lane": 1,
+            "UnassignedSequences": [
+                {
+                    "I2": "CTCCATAA",
+                    "I1": "ACTAGAGA",
+                    "Count": 11954
+                },
+                {
+                    "I1": "AGACAGGT",
+                    "Count": 8820,
+                    "I2": "GTGATATG"
+                },
+                {
+                    "I1": "GCGCGGAA",
+                    "Count": 7431,
+                    "I2": "CCTTCCTA"
+                },
+                {
+                    "I2": "CTTTCCTA",
+                    "I1": "GCGCGGAA",
+                    "Count": 7414
+                },
+                {
+                    "I1": "TGATTCCA",
+                    "Count": 7267,
+                    "I2": "ACTTCCGA"
+                },
+                {
+                    "I2": "ACGTTTAA",
+                    "I1": "TTAAATGA",
+                    "Count": 6810
+                },
+                {
+                    "I2": "CAAATGAG",
+                    "Count": 6692,
+                    "I1": "CATTCGGA"
+                },
+                {
+                    "I2": "CCAACCCA",
+                    "I1": "TCAGGAAA",
+                    "Count": 6357
+                },
+                {
+                    "Count": 6003,
+                    "I1": "CTCTTATA",
+                    "I2": "AAGCTCCG"
+                },
+                {
+                    "Count": 5582,
+                    "I1": "TTTAATGA",
+                    "I2": "ACGTTTAA"
+                },
+                {
+                    "I2": "GAATTATA",
+                    "I1": "AACGACTG",
+                    "Count": 5068
+                },
+                {
+                    "Count": 4627,
+                    "I1": "GTGTTCTA",
+                    "I2": "AAAGTGCG"
+                },
+                {
+                    "Count": 3872,
+                    "I1": "CCATAGAA",
+                    "I2": "AGTACCGC"
+                },
+                {
+                    "I1": "TCAGGAAA",
+                    "Count": 3846,
+                    "I2": "CAAACCCA"
+                },
+                {
+                    "I2": "GTTAACCA",
+                    "I1": "AAAGGTCC",
+                    "Count": 3781
+                },
+                {
+                    "I2": "CTCCATAA",
+                    "Count": 3711,
+                    "I1": "ACTTGAGA"
+                },
+                {
+                    "I2": "CGAAAGAA",
+                    "Count": 2720,
+                    "I1": "GGGGGGGA"
+                },
+                {
+                    "I2": "GTGATGTA",
+                    "Count": 2678,
+                    "I1": "AGACAGGT"
+                },
+                {
+                    "I1": "GAGCTTCA",
+                    "Count": 2657,
+                    "I2": "CACAGTTC"
+                },
+                {
+                    "I2": "CCTTTCTA",
+                    "Count": 2650,
+                    "I1": "GCGCGGAA"
+                },
+                {
+                    "I2": "ATGGTATG",
+                    "Count": 2588,
+                    "I1": "AGACAGGT"
+                },
+                {
+                    "I1": "CATAAGAA",
+                    "Count": 2586,
+                    "I2": "AGTACCGC"
+                },
+                {
+                    "I1": "GGGAAAGG",
+                    "Count": 2532,
+                    "I2": "ACGGGGAA"
+                },
+                {
+                    "I2": "TGCCGGCA",
+                    "Count": 2320,
+                    "I1": "CTCTCGGA"
+                },
+                {
+                    "Count": 2277,
+                    "I1": "GCTTGGCA",
+                    "I2": "GGAAGACA"
+                },
+                {
+                    "I2": "CGGAAGCG",
+                    "Count": 2274,
+                    "I1": "GCGGCGGC"
+                },
+                {
+                    "I2": "ATCCTGAG",
+                    "I1": "AGTGCAAA",
+                    "Count": 2176
+                },
+                {
+                    "I2": "GGGGCAGC",
+                    "I1": "GGGGGGGG",
+                    "Count": 2108
+                },
+                {
+                    "I2": "CAAACAAA",
+                    "I1": "GGGGCAGG",
+                    "Count": 1985
+                },
+                {
+                    "I2": "TAGAGATA",
+                    "Count": 1980,
+                    "I1": "TCGTGTCA"
+                }
+            ],
+            "NumPolonies": 363641937,
+            "PercentUnexpectedIndexPairs": 0.0464621878856618,
+            "Reads": [
+                {
+                    "RemovedAdapterLengthHistogram": [],
+                    "PerReadGCCountHistogram": [],
+                    "Cycles": [],
+                    "PerReadMeanQualityScoreHistogram": [],
+                    "QualityScoreHistogram": [],
+                    "MeanReadLength": 300,
+                    "QualityScoreMean": 43.4178182303911,
+                    "PercentQ30": 97.749474108831,
+                    "AssignedYield": 108.31426173,
+                    "PercentQ40": 92.1989034477066,
+                    "TotalYield": 109.075216505,
+                    "Read": "R1"
+                },
+                {
+                    "Cycles": [],
+                    "RemovedAdapterLengthHistogram": [],
+                    "PerReadGCCountHistogram": [],
+                    "PerReadMeanQualityScoreHistogram": [],
+                    "QualityScoreMean": 38.9058814682037,
+                    "PercentQ30": 85.8047670383701,
+                    "QualityScoreHistogram": [],
+                    "MeanReadLength": 300,
+                    "TotalYield": 109.044104353,
+                    "Read": "R2",
+                    "AssignedYield": 108.283642119,
+                    "PercentQ40": 68.7846081267574
+                }
+            ],
+            "PercentAssignedReads": 99.3010740122639,
+            "I1IsReverseComplement": false,
+            "PercentMismatch": 1.07791670951833,
+            "PercentMismatchI1": 0.257296068135343,
+            "AssignedYield": 216.597903849,
+            "PercentQ40": 80.491755787232,
+            "NumPoloniesBeforeTrimming": 363641937,
+            "PercentMismatchI2": 0.838597638685749,
+            "TotalYield": 218.119320858,
+            "I2IsReverseComplement": false,
+            "QualityScoreMean": 41.1618498492974,
+            "PercentQ30": 91.7771205736006
+        }
+    ],
+    "TotalYield": 218.119320858,
+    "AnalysisID": "8cf436bf657fc72768ebe2babcdcb045",
+    "Samples": [
+        "Adept_CB1",
+        "Adept_CB2",
+        "Adept_CB3",
+        "Adept_CB4",
+        "CM_DC_4_4_A",
+        "CM_DC_4_4_B",
+        "CM_DC_4_4_C",
+        "CM_DC_4_5_A",
+        "CM_DC_4_5_B",
+        "CM_DC_4_5_C",
+        "CM_DC_4_9_A",
+        "CM_DC_4_9_B",
+        "CM_DC_4_9_C",
+        "CM_DC_5_4_A",
+        "CM_DC_5_4_B",
+        "CM_DC_5_4_C",
+        "CM_DC_5_5_A",
+        "CM_DC_5_5_B",
+        "CM_DC_5_5_C",
+        "CM_DC_5_9_A",
+        "CM_DC_5_9_B",
+        "CM_DC_5_9_C",
+        "CM_DC_7_4_A",
+        "CM_DC_7_4_B",
+        "CM_DC_7_4_C",
+        "CM_DC_7_5_A",
+        "CM_DC_7_5_B",
+        "CM_DC_7_5_C",
+        "CM_DC_7_9_A",
+        "CM_DC_7_9_B",
+        "CM_DC_7_9_C",
+        "CM_DC_8_4_A",
+        "CM_DC_8_4_B",
+        "CM_DC_8_4_C",
+        "CM_DC_8_5_A",
+        "CM_DC_8_5_B",
+        "CM_DC_8_5_C",
+        "CM_DC_8_9_A",
+        "CM_DC_8_9_B",
+        "CM_DC_8_9_C",
+        "CM_DR_1_4_A",
+        "CM_DR_1_4_B",
+        "CM_DR_1_4_C",
+        "CM_DR_1_5_A",
+        "CM_DR_1_5_B",
+        "CM_DR_1_5_C",
+        "CM_DR_1_9_A",
+        "CM_DR_1_9_B",
+        "CM_DR_1_9_C",
+        "CM_DR_3_4_A",
+        "CM_DR_3_4_B",
+        "CM_DR_3_4_C",
+        "CM_DR_3_5_A",
+        "CM_DR_3_5_B",
+        "CM_DR_3_5_C",
+        "CM_DR_3_9_A",
+        "CM_DR_3_9_B",
+        "CM_DR_3_9_C",
+        "CM_DR_4_4_A",
+        "CM_DR_4_4_B",
+        "CM_DR_4_4_C",
+        "CM_DR_4_5_A",
+        "CM_DR_4_5_B",
+        "CM_DR_4_5_C",
+        "CM_DR_4_9_A",
+        "CM_DR_4_9_B",
+        "CM_DR_4_9_C",
+        "CM_DR_5_4_A",
+        "CM_DR_5_4_B",
+        "CM_DR_5_4_C",
+        "CM_DR_5_5_A",
+        "CM_DR_5_5_B",
+        "CM_DR_5_5_C",
+        "CM_DR_5_9_A",
+        "CM_DR_5_9_B",
+        "CM_DR_5_9_C",
+        "CM_DR_6_4_A",
+        "CM_DR_6_4_B",
+        "CM_DR_6_4_C",
+        "CM_DR_6_5_A",
+        "CM_DR_6_5_B",
+        "CM_DR_6_5_C",
+        "CM_DR_6_9_A",
+        "CM_DR_6_9_B",
+        "CM_DR_6_9_C",
+        "CM_DR_7_4_A",
+        "CM_DR_7_4_B",
+        "CM_DR_7_4_C",
+        "CM_DR_7_5_A",
+        "CM_DR_7_5_B",
+        "CM_DR_7_5_C",
+        "CM_DR_7_9_A",
+        "CM_DR_7_9_B",
+        "CM_DR_7_9_C",
+        "Unassigned"
+    ],
+    "RunName": "16AprilSGEB2_2x300_NT1799722A",
+    "PercentQ30": 91.7771205736006,
+    "QualityScoreMean": 41.1618498492974,
+    "AnalysisVersion": "1.7.0.1196148384",
+    "NumPolonies": 363641937,
+    "Reads": [
+        {
+            "Cycles": [],
+            "PercentQ30": 97.749474108831,
+            "QualityScoreMean": 43.4178182303911,
+            "MeanReadLength": 300,
+            "QualityScoreHistogram": [],
+            "RemovedAdapterLengthHistogram": [],
+            "Read": "R1",
+            "PerReadMeanQualityScoreHistogram": [],
+            "PercentQ40": 92.1989034477066
+        },
+        {
+            "PercentQ30": 85.8047670383701,
+            "Cycles": [],
+            "QualityScoreMean": 38.9058814682037,
+            "MeanReadLength": 300,
+            "QualityScoreHistogram": [],
+            "RemovedAdapterLengthHistogram": [],
+            "Read": "R2",
+            "PerReadMeanQualityScoreHistogram": [],
+            "PercentQ40": 68.7846081267574
+        }
+    ],
+    "PercentUnexpectedIndexPairs": 0.0464621878856618,
+    "FileVersion": "0.1.0",
+    "RunID": "seq_661e4a759899586852dff736",
+    "FlowCellID": "2335443584",
+    "PercentAssignedReads": 99.3010740122639,
+    "PercentMismatch": 1.07791670951833,
+    "SampleStats": [
+        {
+            "PercentQ40": 79.4330370098198,
+            "Occurrences": [
+                {
+                    "PercentMismatch": 0.902796068833834,
+                    "Yield": 0.858464218,
+                    "Reads": [
+                        {
+                            "MeanReadLength": 300,
+                            "PerReadGCCountHistogram": [],
+                            "RemovedAdapterLengthHistogram": [],
+                            "Read": "R1",
+                            "Cycles": []
+                        },
+                        {
+                            "RemovedAdapterLengthHistogram": [],
+                            "MeanReadLength": 300,
+                            "PerReadGCCountHistogram": [],
+                            "Cycles": [],
+                            "Read": "R2"
+                        }
+                    ],
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "NumPolonies": 1431331,
+                    "Lane": 1,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "PercentQ30": 91.4058410993666,
+                    "CustomMetadata": {},
+                    "QualityScoreMean": 40.9743168095563,
+                    "ExpectedSequence": "ATGTCGCTCTAGCTCG",
+                    "NumPoloniesBeforeTrimming": 1431331,
+                    "PercentQ40": 79.4330370098198
+                },
+                {
+                    "NumPoloniesBeforeTrimming": 0,
+                    "PercentQ40": null,
+                    "ExpectedSequence": "ATGTCGCTCTAGCTCG",
+                    "PercentQ30": null,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "QualityScoreMean": null,
+                    "CustomMetadata": {},
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "NumPolonies": 0,
+                    "Lane": 2,
+                    "Yield": 0,
+                    "Reads": [
+                        {
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null,
+                            "RemovedAdapterLengthHistogram": [],
+                            "Read": "R1",
+                            "Cycles": []
+                        },
+                        {
+                            "Cycles": [],
+                            "Read": "R2",
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null,
+                            "RemovedAdapterLengthHistogram": []
+                        }
+                    ],
+                    "PercentMismatch": null
+                }
+            ],
+            "SampleID": "b596f37e3289709e162ec89b4c9a6a6c",
+            "NumPoloniesBeforeTrimming": 1431331,
+            "SampleName": "Adept_CB1",
+            "QualityScoreMean": 40.9743168095563,
+            "SampleNumber": 1,
+            "PercentQ30": 91.4058410993666,
+            "Yield": 0.858464218,
+            "Reads": [
+                {
+                    "MeanReadLength": 300,
+                    "PerReadGCCountHistogram": [],
+                    "RemovedAdapterLengthHistogram": [],
+                    "Cycles": [],
+                    "Read": "R1"
+                },
+                {
+                    "Read": "R2",
+                    "Cycles": [],
+                    "MeanReadLength": 300,
+                    "PerReadGCCountHistogram": [],
+                    "RemovedAdapterLengthHistogram": []
+                }
+            ],
+            "NumPolonies": 1431331,
+            "PercentMismatch": 0.902796068833834,
+            "ExternalID": ""
+        },
+        {
+            "QualityScoreMean": 40.5853724226452,
+            "SampleNumber": 2,
+            "PercentQ30": 90.3945212148157,
+            "PercentQ40": 77.1494820972496,
+            "Occurrences": [
+                {
+                    "PercentMismatch": 0.880376455693482,
+                    "Yield": 0.61394924,
+                    "Reads": [
+                        {
+                            "Cycles": [],
+                            "Read": "R1",
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300
+                        },
+                        {
+                            "Read": "R2",
+                            "Cycles": [],
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300
+                        }
+                    ],
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "NumPolonies": 1023653,
+                    "Lane": 1,
+                    "PercentQ30": 90.3945212148157,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "CustomMetadata": {},
+                    "QualityScoreMean": 40.5853724226452,
+                    "ExpectedSequence": "CACAGATCACGAGAGT",
+                    "NumPoloniesBeforeTrimming": 1023653,
+                    "PercentQ40": 77.1494820972496
+                },
+                {
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "PercentQ30": null,
+                    "CustomMetadata": {},
+                    "QualityScoreMean": null,
+                    "ExpectedSequence": "CACAGATCACGAGAGT",
+                    "NumPoloniesBeforeTrimming": 0,
+                    "PercentQ40": null,
+                    "PercentMismatch": null,
+                    "Yield": 0,
+                    "Reads": [
+                        {
+                            "RemovedAdapterLengthHistogram": [],
+                            "MeanReadLength": null,
+                            "PerReadGCCountHistogram": [],
+                            "Read": "R1",
+                            "Cycles": []
+                        },
+                        {
+                            "RemovedAdapterLengthHistogram": [],
+                            "MeanReadLength": null,
+                            "PerReadGCCountHistogram": [],
+                            "Cycles": [],
+                            "Read": "R2"
+                        }
+                    ],
+                    "NumPolonies": 0,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "Lane": 2
+                }
+            ],
+            "NumPoloniesBeforeTrimming": 1023653,
+            "SampleID": "8d2dfa572f299526a9bda350e41a402d",
+            "SampleName": "Adept_CB2",
+            "PercentMismatch": 0.880376455693482,
+            "ExternalID": "",
+            "Yield": 0.61394924,
+            "Reads": [
+                {
+                    "MeanReadLength": 300,
+                    "PerReadGCCountHistogram": [],
+                    "RemovedAdapterLengthHistogram": [],
+                    "Read": "R1",
+                    "Cycles": []
+                },
+                {
+                    "PerReadGCCountHistogram": [],
+                    "MeanReadLength": 300,
+                    "RemovedAdapterLengthHistogram": [],
+                    "Read": "R2",
+                    "Cycles": []
+                }
+            ],
+            "NumPolonies": 1023653
+        },
+        {
+            "NumPolonies": 1108333,
+            "Reads": [
+                {
+                    "RemovedAdapterLengthHistogram": [],
+                    "MeanReadLength": 300,
+                    "PerReadGCCountHistogram": [],
+                    "Read": "R1",
+                    "Cycles": []
+                },
+                {
+                    "MeanReadLength": 300,
+                    "PerReadGCCountHistogram": [],
+                    "RemovedAdapterLengthHistogram": [],
+                    "Read": "R2",
+                    "Cycles": []
+                }
+            ],
+            "Yield": 0.664710063,
+            "ExternalID": "",
+            "PercentMismatch": 1.27750414361027,
+            "SampleName": "Adept_CB3",
+            "SampleID": "54700c7f380a76094c784936e4eebcf4",
+            "NumPoloniesBeforeTrimming": 1108333,
+            "Occurrences": [
+                {
+                    "PercentMismatch": 1.27750414361027,
+                    "NumPolonies": 1108333,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "Lane": 1,
+                    "Yield": 0.664710063,
+                    "Reads": [
+                        {
+                            "Read": "R1",
+                            "Cycles": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300,
+                            "RemovedAdapterLengthHistogram": []
+                        },
+                        {
+                            "Cycles": [],
+                            "Read": "R2",
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300
+                        }
+                    ],
+                    "ExpectedSequence": "GCACATAGGACTACTA",
+                    "PercentQ30": 89.0359287369477,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "CustomMetadata": {},
+                    "QualityScoreMean": 40.1203538391444,
+                    "NumPoloniesBeforeTrimming": 1108333,
+                    "PercentQ40": 74.9677743332133
+                },
+                {
+                    "Lane": 2,
+                    "NumPolonies": 0,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "Yield": 0,
+                    "Reads": [
+                        {
+                            "Cycles": [],
+                            "Read": "R1",
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null,
+                            "RemovedAdapterLengthHistogram": []
+                        },
+                        {
+                            "MeanReadLength": null,
+                            "PerReadGCCountHistogram": [],
+                            "RemovedAdapterLengthHistogram": [],
+                            "Cycles": [],
+                            "Read": "R2"
+                        }
+                    ],
+                    "PercentMismatch": null,
+                    "PercentQ40": null,
+                    "NumPoloniesBeforeTrimming": 0,
+                    "ExpectedSequence": "GCACATAGGACTACTA",
+                    "CustomMetadata": {},
+                    "QualityScoreMean": null,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "PercentQ30": null
+                }
+            ],
+            "PercentQ40": 74.9677743332133,
+            "PercentQ30": 89.0359287369477,
+            "SampleNumber": 3,
+            "QualityScoreMean": 40.1203538391444
+        },
+        {
+            "PercentQ40": 77.5722638381422,
+            "NumPoloniesBeforeTrimming": 1094763,
+            "SampleID": "766f768b9503041b7bcf78daa967a189",
+            "SampleName": "Adept_CB4",
+            "Occurrences": [
+                {
+                    "PercentQ40": 77.5722638381422,
+                    "NumPoloniesBeforeTrimming": 1094763,
+                    "QualityScoreMean": 40.6313671187948,
+                    "CustomMetadata": {},
+                    "PercentQ30": 90.4754570024319,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "ExpectedSequence": "TGTGTCGATGTCTGAC",
+                    "Yield": 0.656582064,
+                    "Reads": [
+                        {
+                            "Read": "R1",
+                            "Cycles": [],
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300
+                        },
+                        {
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300,
+                            "Read": "R2",
+                            "Cycles": []
+                        }
+                    ],
+                    "Lane": 1,
+                    "NumPolonies": 1094763,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "PercentMismatch": 0.914170464292271
+                },
+                {
+                    "NumPoloniesBeforeTrimming": 0,
+                    "PercentQ40": null,
+                    "PercentQ30": null,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "CustomMetadata": {},
+                    "QualityScoreMean": null,
+                    "ExpectedSequence": "TGTGTCGATGTCTGAC",
+                    "Reads": [
+                        {
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null,
+                            "Read": "R1",
+                            "Cycles": []
+                        },
+                        {
+                            "Read": "R2",
+                            "Cycles": [],
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null
+                        }
+                    ],
+                    "Yield": 0,
+                    "NumPolonies": 0,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "Lane": 2,
+                    "PercentMismatch": null
+                }
+            ],
+            "SampleNumber": 4,
+            "QualityScoreMean": 40.6313671187948,
+            "PercentQ30": 90.4754570024319,
+            "NumPolonies": 1094763,
+            "Reads": [
+                {
+                    "Read": "R1",
+                    "Cycles": [],
+                    "RemovedAdapterLengthHistogram": [],
+                    "PerReadGCCountHistogram": [],
+                    "MeanReadLength": 300
+                },
+                {
+                    "MeanReadLength": 300,
+                    "PerReadGCCountHistogram": [],
+                    "RemovedAdapterLengthHistogram": [],
+                    "Read": "R2",
+                    "Cycles": []
+                }
+            ],
+            "Yield": 0.656582064,
+            "ExternalID": "",
+            "PercentMismatch": 0.914170464292271
+        },
+        {
+            "ExternalID": "",
+            "PercentMismatch": 0.93133634139573,
+            "NumPolonies": 3599881,
+            "Reads": [
+                {
+                    "Cycles": [],
+                    "Read": "R1",
+                    "MeanReadLength": 300,
+                    "PerReadGCCountHistogram": [],
+                    "RemovedAdapterLengthHistogram": []
+                },
+                {
+                    "Cycles": [],
+                    "Read": "R2",
+                    "RemovedAdapterLengthHistogram": [],
+                    "PerReadGCCountHistogram": [],
+                    "MeanReadLength": 300
+                }
+            ],
+            "Yield": 2.159340349,
+            "PercentQ30": 93.5022309445115,
+            "SampleNumber": 5,
+            "QualityScoreMean": 41.6466146824175,
+            "NumPoloniesBeforeTrimming": 3599881,
+            "SampleID": "8908498572cc14f0a7dfa393556e8285",
+            "SampleName": "CM_DC_4_4_A",
+            "Occurrences": [
+                {
+                    "PercentMismatch": 0.93133634139573,
+                    "Reads": [
+                        {
+                            "Read": "R1",
+                            "Cycles": [],
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300
+                        },
+                        {
+                            "Read": "R2",
+                            "Cycles": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300,
+                            "RemovedAdapterLengthHistogram": []
+                        }
+                    ],
+                    "Yield": 2.159340349,
+                    "NumPolonies": 3599881,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "Lane": 1,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "PercentQ30": 93.5022309445115,
+                    "QualityScoreMean": 41.6466146824175,
+                    "CustomMetadata": {},
+                    "ExpectedSequence": "TGGTTAGCATAGAGGC",
+                    "NumPoloniesBeforeTrimming": 3599881,
+                    "PercentQ40": 81.8394335482313
+                },
+                {
+                    "ExpectedSequence": "TGGTTAGCATAGAGGC",
+                    "CustomMetadata": {},
+                    "QualityScoreMean": null,
+                    "PercentQ30": null,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "PercentQ40": null,
+                    "NumPoloniesBeforeTrimming": 0,
+                    "PercentMismatch": null,
+                    "Lane": 2,
+                    "NumPolonies": 0,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "Yield": 0,
+                    "Reads": [
+                        {
+                            "Cycles": [],
+                            "Read": "R1",
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null,
+                            "RemovedAdapterLengthHistogram": []
+                        },
+                        {
+                            "Cycles": [],
+                            "Read": "R2",
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null,
+                            "RemovedAdapterLengthHistogram": []
+                        }
+                    ]
+                }
+            ],
+            "PercentQ40": 81.8394335482313
+        },
+        {
+            "ExternalID": "",
+            "PercentMismatch": 1.64077917242582,
+            "NumPolonies": 3819283,
+            "Reads": [
+                {
+                    "PerReadGCCountHistogram": [],
+                    "MeanReadLength": 300,
+                    "RemovedAdapterLengthHistogram": [],
+                    "Cycles": [],
+                    "Read": "R1"
+                },
+                {
+                    "RemovedAdapterLengthHistogram": [],
+                    "PerReadGCCountHistogram": [],
+                    "MeanReadLength": 300,
+                    "Read": "R2",
+                    "Cycles": []
+                }
+            ],
+            "Yield": 2.290967222,
+            "SampleNumber": 6,
+            "QualityScoreMean": 41.4605987488022,
+            "PercentQ30": 92.9775827670048,
+            "PercentQ40": 80.8155237761843,
+            "SampleID": "54dcb244fd8046d50e49272417eb7285",
+            "NumPoloniesBeforeTrimming": 3819283,
+            "SampleName": "CM_DC_4_4_B",
+            "Occurrences": [
+                {
+                    "PercentQ30": 92.9775827670048,
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "QualityScoreMean": 41.4605987488022,
+                    "CustomMetadata": {},
+                    "ExpectedSequence": "GAACTGGGTTGCTGGT",
+                    "NumPoloniesBeforeTrimming": 3819283,
+                    "PercentQ40": 80.8155237761843,
+                    "PercentMismatch": 1.64077917242582,
+                    "Reads": [
+                        {
+                            "Read": "R1",
+                            "Cycles": [],
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300
+                        },
+                        {
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": 300,
+                            "RemovedAdapterLengthHistogram": [],
+                            "Cycles": [],
+                            "Read": "R2"
+                        }
+                    ],
+                    "Yield": 2.290967222,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "NumPolonies": 3819283,
+                    "Lane": 1
+                },
+                {
+                    "PercentMismatch": null,
+                    "Yield": 0,
+                    "Reads": [
+                        {
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null,
+                            "Read": "R1",
+                            "Cycles": []
+                        },
+                        {
+                            "RemovedAdapterLengthHistogram": [],
+                            "PerReadGCCountHistogram": [],
+                            "MeanReadLength": null,
+                            "Read": "R2",
+                            "Cycles": []
+                        }
+                    ],
+                    "Lane": 2,
+                    "NumPolonies": 0,
+                    "R1Adapters": [
+                        "AAAAAAAA"
+                    ],
+                    "QualityScoreMean": null,
+                    "CustomMetadata": {},
+                    "R2Adapters": [
+                        "TTTTTTTT"
+                    ],
+                    "PercentQ30": null,
+                    "ExpectedSequence": "GAACTGGGTTGCTGGT",
+                    "PercentQ40": null,
+                    "NumPoloniesBeforeTrimming": 0
+                }
+            ]
+        }
+    ]
+}
