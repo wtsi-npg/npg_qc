@@ -61,3 +61,73 @@ sub convert_run_stats_to_tag_metrics {
 }
 
 1;
+
+__END__
+
+
+=head1 NAME
+
+    npg_qc::elembio::tag_metrics_generator
+
+=head1 SYNOPSIS
+
+    my @per_lane_metrics = convert_run_stats_to_tag_metrics($run_stats, $id_run);
+    foreach my $tag_metrics (@per_lane_metrics) {
+        $tag_metrics->store();
+    }
+
+=head1 DESCRIPTION
+
+A single function for use in scripts that converts from npg_qc::elembio::run_stats
+objects into npg_qc::autoqc::results::tag_metrics objects.
+
+It handles the mappings from ElemBio space to NPG QC space
+
+=head1 SUBROUTINES/METHODS
+
+=head2 convert_run_stats_to_tag_metrics
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Exporter
+
+=item Readonly
+
+=item npg_qc::autoqc::results::tag_metrics;
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Kieron Taylor E<lt>kt19@sanger.ac.ukE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2025 Genome Research Ltd.
+
+This file is part of NPG.
+
+NPG is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut
