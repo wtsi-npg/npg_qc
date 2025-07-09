@@ -76,11 +76,16 @@ sub run_stats_from_json {
     }
 
     # For one lane, find the Reads section for R1, extract the MeanReadLength
-    # and cast to int. Then repeat for R2
+    # and cast to int. Then repeat for R2. R2 not always present!
+    # We can examine the RunParameters.json file for this, but it's implied
+    # directly in RunStats.json by the absence.
     my $run_stats = npg_qc::elembio::run_stats->new(
         r1_cycle_count => int((grep { $_->{Read} eq 'R1' } @{$data->{Lanes}[0]{Reads}} )[0]->{MeanReadLength}),
-        r2_cycle_count => int((grep { $_->{Read} eq 'R2' } @{$data->{Lanes}[0]{Reads}} )[0]->{MeanReadLength})
     );
+    my @read_two_data = grep { $_->{Read} eq 'R2' } @{$data->{Lanes}[0]{Reads}};
+    if (scalar @read_two_data > 0) {
+        $run_stats->r2_cycle_count(int($read_two_data[0]->{MeanReadLength}));
+    }
     # Add lane stats to the runstats object
     foreach my $lane (@{$data->{Lanes}}) {
         # We get a false Lane 2 when a 300 cycle run is configured
