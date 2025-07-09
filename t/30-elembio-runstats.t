@@ -124,5 +124,17 @@ use_ok('npg_qc::elembio::run_stats');
     }
 }
 
+{
+    # A single-read run (R1 only) passes through without incident
+    my $manifest = 't/data/elembio/20250620_AV244103_NT1856569G/RunManifest.json';
+    my $stats_file = 't/data/elembio/20250620_AV244103_NT1856569G/slim_RunStats.json';
+    my $lane_count = 2;
+
+    my $stats = npg_qc::elembio::run_stats::run_stats_from_file($manifest, $stats_file, $lane_count);
+    ok($stats);
+    cmp_ok($stats->r1_cycle_count, '==', 19);
+    ok(!$stats->r2_cycle_count, 'R2 not defined');
+}
+
 
 done_testing();
