@@ -5,42 +5,36 @@ use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
 use Getopt::Long;
-use JSON;
+use Pod::Usage;
 
 use npg_qc::elembio::run_stats;
 use npg_qc::elembio::tag_metrics_generator qw(convert_run_stats_to_tag_metrics);
 use Monitor::Elembio::RunFolder; # from npg_tracking
+use npg_tracking::Schema;
 
 our $VERSION = '0';
-Readonly::Scalar my $PERCENT_TO_DECIMAL => 100;
 
 sub get_options {
 
-  my $usage = q[
-
-  Usage:
-          elembio_qc_converter.pl <opts>
-          perl bin/elembio_runstats_parser.pl --input /lustre/scratch120/npg/elembio_deplex/20250509_AV244103_NT1854541J/20250509_AV244103_NT1854541J --output ~/elembio_parsing_tests/ --id_run 15
-
-  Options:
-         --input <dir>      Deplexing folder where RunStats.json, RunParameters.json and RunManifest.json live
-         --output <dir>     Where to put the transformed tag_metrics outputs
-         --id_run <int>     Supply an id_run from npg_tracking
-         -h                 help
-
-  ];
-
-  my %options = (verbose => 0);
+  my %options = ();
 
   my $result = GetOptions(\%options,
-                          'input:s',
-                          'output:s',
-                          'id_run:i',
-                          'verbose',
-                          'help'
-                          );
+                          'input=s',
+                          'output=s',
+                          'id_run=i',
+                          'help',
+                         );
 
-  die "$usage\n" if( !$result || $options{help});
+  my $sections = 'NAME|DESCRIPTION|USAGE|REQUIRED ARGUMENTS|OPTIONS';
+
+  if( $options{help} ) {
+    pod2usage(-exitval => 1, -verbose => 99, -sections => $sections);
+  }
+
+  if( !$result || !exists $options{input} || !exists $options{output} || !exists $options{id_run} ) {
+    warn "Incorrect options when invoking the script\n\n";
+    pod2usage(-exitval => 2, -verbose => 99, -sections => $sections);
+  }
 
   return \%options;
 }
@@ -49,6 +43,12 @@ sub main {
     my $opts = get_options();
 
     my $deplex_folder = $opts->{'input'};
+
+    # Unfortunately, a database handle is required.
+    # No data is retrieved from the tracking database.
+    # Lane count is calculated from data in RunParameters.json .
+    # TODO - drop the dependency on npg_tracking::Schema when
+    # a stand-alone parser for RunParameters.json is available.
     my $run_folder = Monitor::Elembio::RunFolder->new(
         runfolder_path => $deplex_folder,
         npg_tracking_schema => npg_tracking::Schema->connect(),
@@ -61,17 +61,19 @@ sub main {
         $lane_count
     );
 
-    # Where do we get an id_run from? Argument for now. $runstats->{'RunName'} is non-numeric.
-
+    # @metrics a list of npg_qc::autoqc::results::tag_metrics objects,
+    # one object per lane.
     my @metrics = convert_run_stats_to_tag_metrics($run_stats, $opts->{'id_run'});
     for my $metrics_obj (@metrics) {
+        # Save JSON representation of the object to the output directory.
         $metrics_obj->store($opts->{'output'});
     }
+
     return;
 }
 
-
 main();
+
 1;
 
 __END__
@@ -80,10 +82,6 @@ __END__
 
 elembio_runstats_parser.pl
 
-=head1 USAGE
-
-elembio_runstats.parser.pl --input <runfolder> --output <folder> --id_run <id>
-
 =head1 CONFIGURATION
 
 =head1 SYNOPSIS
@@ -91,7 +89,13 @@ elembio_runstats.parser.pl --input <runfolder> --output <folder> --id_run <id>
 =head1 DESCRIPTION
 
 Extracts lane-centric metrics from the Element BioSciences Aviti deplexing
-outputs and converts them to format amenable to NPG_QC
+outputs and converts them to C<npg_qc::autoqc::results::tag_metrics> type
+objects. The objects are serialised to JSON. The JSON representation is
+saved to the directory given as C<--output> script argument.
+
+=head1 USAGE
+
+elembio_runstats.parser.pl --input <runfolder> --output <folder> --id_run <id>
 
 =head1 SUBROUTINES/METHODS
 
@@ -101,9 +105,35 @@ outputs and converts them to format amenable to NPG_QC
 
 =head1 REQUIRED ARGUMENTS
 
+=over
+
+=item --input <dir>
+
+Deplexing folder where RunStats.json, RunParameters.json and RunManifest.json live.
+
+=item --output <dir>
+
+Directory Where to put the transformed tag_metrics outputs.
+
+=item --id_run <int>
+
+NPG tracking run ID for this run.
+
+=back
+
 =head1 OPTIONS
 
+=over
+
+=item --help
+
+Prints a brief help message and exits.
+
+=back
+
 =head1 EXIT STATUS
+
+0
 
 =head1 DEPENDENCIES
 
@@ -117,9 +147,15 @@ outputs and converts them to format amenable to NPG_QC
 
 =item Getopt::Long
 
+=item Pod::Usage
+
 =item npg_qc::autoqc::results::tag_metrics
 
 =item npg_qc::elembio::run_stats
+
+=item Monitor::Elembio::RunFolder
+
+=item npg_tracking::Schema
 
 =back
 
@@ -133,7 +169,7 @@ Kieron Taylor<lt>kt19@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 GRL, by Kieron Taylor
+Copyright (C) 2025 Genome Research Ltd.
 
 This file is part of NPG.
 
