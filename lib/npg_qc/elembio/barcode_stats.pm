@@ -3,15 +3,11 @@ package npg_qc::elembio::barcode_stats;
 use Moose;
 use namespace::autoclean;
 
-
 our $VERSION = '0';
 
-# In npg_qc, AAAAAAA-TTTTTT
-# barcodes => [AAAAA, TTTTTT]
 has barcodes => (
     isa => 'ArrayRef',
     is => 'rw',
-    documentation => 'I1 and I2 sequences in order',
     default => sub {[]},
 );
 
@@ -28,21 +24,17 @@ sub index_lengths {
 has percentQ30 => (
     isa => 'Maybe[Num]',
     is => 'rw',
-    documentation => 'Percentage of base calls over the Q30 threshold',
 );
 
 has percentQ40 => (
     isa => 'Maybe[Num]',
     is => 'rw',
-    documentation => 'Percentage of base calls over the Q40 threshold',
 );
 
 has percentMismatch => (
     isa => 'Maybe[Num]',
     is => 'rw',
-    documentation => 'Percentage of assigned reads that had "a" mismatch',
 );
-# See wording: https://docs.elembio.io/docs/elembio-cloud/run-charts-metrics/#indexing-assignment
 
 has num_polonies => (
     isa => 'Int',
@@ -57,7 +49,6 @@ has num_polonies => (
 has yield => (
     isa => 'Num',
     is => 'rw',
-    documentation => 'Gigabases for a barcode',
     default => 0,
 );
 
@@ -87,6 +78,10 @@ npg_qc::elembio::run_stats.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 barcodes
+
+An attribute. I1 and I2 sequences in order.
+
 =head2 barcode_string
 
 Generates an npg_qc compatible barcode string from the individual index reads
@@ -95,7 +90,28 @@ when there are many on this sample.
 
 =head2 index_lengths
 
-Returns I1 and I2 lengths. If there is no I2 the second return value is undef
+Returns I1 and I2 lengths. If there is no I2 the second return value is undefined.
+
+=head2 percentQ30
+
+An attribute. Percentage of base calls at and over the Q30 threshold.
+
+=head2 percentQ40
+
+An attribute. Percentage of base calls at and over the Q40 threshold.
+
+=head2 percentMismatch
+
+An attribute. Percentage of assigned reads that had "a" mismatch, see
+L<https://docs.elembio.io/docs/elembio-cloud/run-charts-metrics/#indexing-assignment>
+
+=head2 num_polonies
+
+An attribute. Number of polonies.
+
+=head2 yield
+
+An attribute. Gigabases for a barcode.
 
 =head1 DIAGNOSTICS
 
@@ -121,7 +137,7 @@ Kieron Taylor E<lt>kt19@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 GRL
+Copyright (C) 2025 Genome Research Ltd.
 
 This file is part of NPG.
 
@@ -136,6 +152,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut

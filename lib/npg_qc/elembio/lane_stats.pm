@@ -15,7 +15,6 @@ has lane => (
 has num_polonies => (
     isa => 'Int',
     is => 'ro',
-    documentation => 'Effectively the number of reads from this lane',
 );
 
 has deplexed_samples => (
@@ -34,19 +33,16 @@ has deplexed_samples => (
 has total_yield => (
     isa => 'Num',
     is => 'ro',
-    documentation => 'Gigabase count for the lane',
 );
 
 has unassigned_reads => (
     isa => 'Int',
     is => 'ro',
-    documentation => 'Number of reads that were not deplexed successfully',
 );
 
 has unassigned_reads_percent => (
     isa => 'Num',
     is => 'ro',
-    documentation => 'Percentage of reads that were not deplexed successfully',
 );
 
 has percentQ30 => (
@@ -74,10 +70,42 @@ npg_qc::elembio::lane_stats
 =head1 DESCRIPTION
 
 Represents lane stats from an Elembio bases2fastq RunStats.json file.
-It has overall statistics for the lane, and deplexed_samples attribute that
-indexes each sample found in the lane.
+It has overall statistics for the lane.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 lane
+
+An attribute. Sequential index of this lane.
+
+=head2 num_polonies
+
+An attribute. Effectively the number of reads from this lane.
+
+=head2 deplexed_samples
+
+An attribute. A dictionary of C<npg_qc::elembio::sample_stats> objects
+keyed by its sample number.
+
+=head2 total_yield
+
+An attribute. Gigabase count for the lane.
+
+=head2 unassigned_reads
+
+An attribute. Number of reads that were not deplexed successfully.
+
+=head2 unassigned_reads_percent
+
+An attribute. Percentage of reads that were not deplexed successfully.
+
+=head2 percentQ30
+
+An attribute.
+
+=head2 percentQ40
+
+An attribute.
 
 =head1 DIAGNOSTICS
 
@@ -105,7 +133,7 @@ Kieron Taylor E<lt>kt19@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 GRL
+Copyright (C) 2025 Genome Research Ltd.
 
 This file is part of NPG.
 

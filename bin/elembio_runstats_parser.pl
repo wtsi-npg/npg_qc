@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
-use English qw( -no_match_vars );
+use English;
 use Getopt::Long;
 use Pod::Usage;
 
@@ -170,7 +170,7 @@ Prints a brief help message and exits.
 
 =head1 AUTHOR
 
-Kieron Taylor<lt>kt19@sanger.ac.ukE<gt>
+Kieron TaylorE<lt>kt19@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
