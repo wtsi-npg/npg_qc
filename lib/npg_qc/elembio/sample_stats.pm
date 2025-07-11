@@ -144,16 +144,25 @@ bring them up to the same length
 
 =head2 num_polonies
 
+An attribute. Effectively the number of reads for this sample.
+
 =head2 percentMismatch
+
+An attribute. The percentage of reads that were assigned to this sample with a
+single mismatch.
 
 =head2 percentQ30
 
+An attribute. Percentage of base calls at and over the Q30 threshold.
+
 =head2 percentQ40
+
+An attribute. Percentage of base calls at and over the Q40 threshold.
 
 =head2 yield
 
 Calls the attribute on all barcodes in this sample and returns the sum or
-averaged result as appropriate.
+averaged result as appropriate. In gigabases.
 
 
 =head1 DIAGNOSTICS

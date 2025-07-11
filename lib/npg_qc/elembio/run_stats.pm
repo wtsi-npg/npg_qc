@@ -245,6 +245,9 @@ This function exists to allow bypassing of the file-reading component.
 
 =head1 INCOMPATIBILITIES
 
+Only applicable to Sequencing-type runs from the Aviti24. Cell profiling is
+not compatible.
+
 =head1 BUGS AND LIMITATIONS
 
 =head1 AUTHOR
