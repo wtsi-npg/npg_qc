@@ -13,6 +13,7 @@ editors.
 - 20240416_AV234003_16AprilSGEB2_2x300_NT1799722A is a 600 cycle run with one lane in use
 - 20250225_AV244103_NT1850075L_NT1850808B_repeat3 has the single indexed samples
   that appear in both lanes
+- 20250620_AV244103_NT1856569G has an R1 but no R2
 
 Corresponding manifest JSON files are also found there.
 
