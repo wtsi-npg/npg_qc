@@ -11,7 +11,6 @@ our $VERSION = '0';
 has barcodes => (
     isa => 'HashRef[npg_qc::elembio::barcode_stats]',
     is => 'rw',
-    documentation => 'Barcode pairs and their stats keyed by their barcode_string',
     default => sub {{}},
     traits => ['Hash'],
     handles => {
@@ -25,9 +24,6 @@ sub barcode_string {
     return $first_barcode->barcode_string;
 }
 
-# Assumes all barcodes are equal length. Not necessarily true, but the ElemBio
-# docs suggest that shorter barcodes would be padded with adapter sequence to
-# bring them up to the same length
 sub index_lengths {
     my $self = shift;
     my ($first_barcode) = values %{$self->barcodes};
@@ -37,12 +33,15 @@ sub index_lengths {
 has tag_index => (
     isa => 'Int',
     is => 'rw',
-    documentation => 'Copied from SampleNumber from Elembio source data. \
-      Not equivalent to the Illumina tag index, can represent multiple barcodes',
 );
 
 has sample_name => (
     isa => 'Str',
+    is => 'ro',
+);
+
+has lane => (
+    isa => 'Int',
     is => 'ro',
 );
 
@@ -80,12 +79,6 @@ sub yield {
     return sum(map {$_->yield} values %{$self->barcodes});
 }
 
-has lane => (
-    isa => 'Int',
-    is => 'ro',
-    documentation => 'Keep track of which lane these sample stats came from',
-);
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -104,7 +97,7 @@ if ($i2) {
     # $i2 might be undef
 }
 
-my $pct_mismatch = $sample->percentMismatch();;
+my $pct_mismatch = $sample->percentMismatch();
 
 =head1 DESCRIPTION
 
@@ -117,6 +110,24 @@ are given a single name, rather than unique ones for each pair of index reads.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 barcodes
+
+An attribute. A dictionary of c<npg_qc::elembio::barcode_stats> objects
+keyed by their barcode_string.
+
+=head2 tag_index
+
+An attribute. Copied from SampleNumber from Elembio source data.
+Not equivalent to the Illumina tag index, can represent multiple barcodes.
+
+=head2 sample_name
+
+An attribute. Sample name as provided in the manifest.
+
+=head2 lane
+
+An attribute. Keeps track of which lane these sample stats came from.
+
 =head2 barcode_string
 
 Generates an npg_qc compatible barcode string from the individual index reads
@@ -125,12 +136,20 @@ when there are many on this sample.
 
 =head2 index_lengths
 
-Returns I1 and I2 lengths. If there is no I2 the second return value is undef
+Returns I1 and I2 lengths. If there is no I2 the second return value is undef.
+
+Assumes all barcodes are equal length. Not necessarily true, but the ElemBio
+docs suggest that shorter barcodes would be padded with adapter sequence to
+bring them up to the same length
 
 =head2 num_polonies
+
 =head2 percentMismatch
+
 =head2 percentQ30
+
 =head2 percentQ40
+
 =head2 yield
 
 Calls the attribute on all barcodes in this sample and returns the sum or
@@ -163,7 +182,7 @@ Kieron Taylor E<lt>kt19@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 GRL
+Copyright (C) 2025 Genome Research Ltd.
 
 This file is part of NPG.
 

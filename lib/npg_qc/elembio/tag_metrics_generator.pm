@@ -7,7 +7,9 @@ use Readonly;
 use npg_qc::autoqc::results::tag_metrics;
 
 our @EXPORT_OK = qw(convert_run_stats_to_tag_metrics);
+
 our $VERSION = '0';
+
 Readonly::Scalar my $PERCENT_TO_DECIMAL => 100;
 
 sub convert_run_stats_to_tag_metrics {
@@ -78,10 +80,10 @@ __END__
 
 =head1 DESCRIPTION
 
-A single function for use in scripts that converts from npg_qc::elembio::run_stats
-objects into npg_qc::autoqc::results::tag_metrics objects.
+A single function for use in scripts that converts from C<npg_qc::elembio::run_stats>
+objects into C<npg_qc::autoqc::results::tag_metrics> objects.
 
-It handles the mappings from ElemBio space to NPG QC space
+It handles the mappings from ElemBio space to NPG QC space.
 
 =head1 SUBROUTINES/METHODS
 
@@ -99,7 +101,7 @@ It handles the mappings from ElemBio space to NPG QC space
 
 =item Readonly
 
-=item npg_qc::autoqc::results::tag_metrics;
+=item npg_qc::autoqc::results::tag_metrics
 
 =back
 

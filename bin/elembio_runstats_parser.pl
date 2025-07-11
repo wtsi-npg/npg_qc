@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib ( -d "$Bin/../lib/perl5" ? "$Bin/../lib/perl5" : "$Bin/../lib" );
+use English;
 use Getopt::Long;
 use Pod::Usage;
 
@@ -65,6 +66,8 @@ sub main {
     # one object per lane.
     my @metrics = convert_run_stats_to_tag_metrics($run_stats, $opts->{'id_run'});
     for my $metrics_obj (@metrics) {
+        $metrics_obj->set_info('Check', $PROGRAM_NAME);
+        $metrics_obj->set_info('Check_version', $VERSION);
         # Save JSON representation of the object to the output directory.
         $metrics_obj->store($opts->{'output'});
     }
@@ -143,6 +146,8 @@ Prints a brief help message and exits.
 
 =item warnings
 
+=item English
+
 =item FindBin
 
 =item Getopt::Long
@@ -165,7 +170,7 @@ Prints a brief help message and exits.
 
 =head1 AUTHOR
 
-Kieron Taylor<lt>kt19@sanger.ac.ukE<gt>
+Kieron TaylorE<lt>kt19@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
