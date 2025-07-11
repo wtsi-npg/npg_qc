@@ -1,0 +1,433 @@
+{
+    "RunValues": {},
+    "Settings": [
+        {
+            "Lane": 1,
+            "I1MismatchThreshold": 1,
+            "I2MismatchThreshold": 1,
+            "R1Adapter": [
+                "AATGATACGGCGACCACCGAGATCTACAC"
+            ],
+            "R2Adapter": [
+                "CAAGCAGAAGACGGCATACGAGAT"
+            ],
+            "I1MaskManifest": "I1:Y*",
+            "I1Mask": [
+                {
+                    "Read": "I1",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8
+                    ]
+                }
+            ],
+            "I1FastQ": false,
+            "I2MaskManifest": "I2:Y*",
+            "I2Mask": [
+                {
+                    "Read": "I2",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8
+                    ]
+                }
+            ],
+            "I2FastQ": false,
+            "UmiMaskManifest": "I1:N*",
+            "UmiMask": [
+                {
+                    "Read": "I1",
+                    "Cycles": []
+                }
+            ],
+            "UmiFastQ": false,
+            "R1FastQMaskManifest": "R1:Y*N",
+            "R1FastQMask": [
+                {
+                    "Read": "R1",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19
+                    ]
+                }
+            ],
+            "R2FastQMaskManifest": "R2:Y*N",
+            "R2FastQMask": [
+                {
+                    "Read": "R2",
+                    "Cycles": []
+                }
+            ],
+            "SpikeInAsUnassigned": false,
+            "R1AdapterTrim": false,
+            "R2AdapterTrim": false,
+            "R1AdapterNMask": false,
+            "R2AdapterNMask": false,
+            "R1AdapterMinimumTrimmedLength": 16,
+            "R2AdapterMinimumTrimmedLength": 0,
+            "R1AdapterMinimumStringency": 0.9,
+            "R2AdapterMinimumStringency": 0.9,
+            "R1AdapterMinimumOverlap": 3,
+            "R2AdapterMinimumOverlap": 0,
+            "AdapterTrimType": "Paired-End"
+        },
+        {
+            "Lane": 2,
+            "I1MismatchThreshold": 1,
+            "I2MismatchThreshold": 1,
+            "R1Adapter": [
+                "AATGATACGGCGACCACCGAGATCTACAC"
+            ],
+            "R2Adapter": [
+                "CAAGCAGAAGACGGCATACGAGAT"
+            ],
+            "I1MaskManifest": "I1:Y*",
+            "I1Mask": [
+                {
+                    "Read": "I1",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8
+                    ]
+                }
+            ],
+            "I1FastQ": false,
+            "I2MaskManifest": "I2:Y*",
+            "I2Mask": [
+                {
+                    "Read": "I2",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8
+                    ]
+                }
+            ],
+            "I2FastQ": false,
+            "UmiMaskManifest": "I1:N*",
+            "UmiMask": [
+                {
+                    "Read": "I1",
+                    "Cycles": []
+                }
+            ],
+            "UmiFastQ": false,
+            "R1FastQMaskManifest": "R1:Y*N",
+            "R1FastQMask": [
+                {
+                    "Read": "R1",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19
+                    ]
+                }
+            ],
+            "R2FastQMaskManifest": "R2:Y*N",
+            "R2FastQMask": [
+                {
+                    "Read": "R2",
+                    "Cycles": []
+                }
+            ],
+            "SpikeInAsUnassigned": false,
+            "R1AdapterTrim": false,
+            "R2AdapterTrim": false,
+            "R1AdapterNMask": false,
+            "R2AdapterNMask": false,
+            "R1AdapterMinimumTrimmedLength": 16,
+            "R2AdapterMinimumTrimmedLength": 0,
+            "R1AdapterMinimumStringency": 0.9,
+            "R2AdapterMinimumStringency": 0.9,
+            "R1AdapterMinimumOverlap": 3,
+            "R2AdapterMinimumOverlap": 0,
+            "AdapterTrimType": "Paired-End"
+        }
+    ],
+    "Samples": [
+        {
+            "SampleName": "Comp_phiX",
+            "SampleNumber": 1,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "TGTAGTAA",
+                    "Index2": "AACGTTGC"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "TGTAGTAA",
+                    "Index2": "AACGTTGC"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "MAPK_BE_Plasmid_R2",
+            "SampleNumber": 2,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "CAGTTCCT",
+                    "Index2": "TGAGCCGC"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "CAGTTCCT",
+                    "Index2": "TGAGCCGC"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_T0_R1",
+            "SampleNumber": 3,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "AGATGAAC",
+                    "Index2": "ACCGTTCC"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "AGATGAAC",
+                    "Index2": "ACCGTTCC"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_Ctrl_R1",
+            "SampleNumber": 4,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GTTCGCAA",
+                    "Index2": "ATTATGTA"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GTTCGCAA",
+                    "Index2": "ATTATGTA"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_BI_R1",
+            "SampleNumber": 5,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "CTCATATG",
+                    "Index2": "TAAAGGCT"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "CTCATATG",
+                    "Index2": "TAAAGGCT"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_ACBI3l_R1",
+            "SampleNumber": 6,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GGTTTGTT",
+                    "Index2": "ATCATCAC"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GGTTTGTT",
+                    "Index2": "ATCATCAC"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_RMC_R1",
+            "SampleNumber": 7,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GTCGATCG",
+                    "Index2": "ACCACAAA"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GTCGATCG",
+                    "Index2": "ACCACAAA"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_T0_R2",
+            "SampleNumber": 8,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GAGAACAA",
+                    "Index2": "TACGATAA"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GAGAACAA",
+                    "Index2": "TACGATAA"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_Ctrl_R2",
+            "SampleNumber": 9,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GGGTGTAG",
+                    "Index2": "ACTCTTCT"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GGGTGTAG",
+                    "Index2": "ACTCTTCT"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_BI_R2",
+            "SampleNumber": 10,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GACTATGA",
+                    "Index2": "CAGCCCTC"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GACTATGA",
+                    "Index2": "CAGCCCTC"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_ACBI3_R2",
+            "SampleNumber": 11,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "CGTCTGAT",
+                    "Index2": "GAAGGCGT"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "CGTCTGAT",
+                    "Index2": "GAAGGCGT"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "H23_ABE_RMC_R2",
+            "SampleNumber": 12,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GTCAATAA",
+                    "Index2": "CTAAATGG"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GTCAATAA",
+                    "Index2": "CTAAATGG"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        }
+    ]
+}
