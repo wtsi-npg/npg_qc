@@ -23,6 +23,7 @@ sub get_options {
                           'input=s',
                           'output=s',
                           'id_run=i',
+                          'elembio_qc_report_url|elembio-qc-report-url=s',
                           'help',
                          );
 
@@ -68,6 +69,10 @@ sub main {
     for my $metrics_obj (@metrics) {
         $metrics_obj->set_info('Check', $PROGRAM_NAME);
         $metrics_obj->set_info('Check_version', $VERSION);
+        if ($opts->{'elembio_qc_report_url'}) {
+          my $elembio_report_link = q[<a href='] . $opts->{'elembio_qc_report_url'} . q['>Elembio QC Report</a>];
+          $metrics_obj->add_comment($elembio_report_link);
+        }
         # Save JSON representation of the object to the output directory.
         $metrics_obj->store($opts->{'output'});
     }
@@ -99,6 +104,7 @@ saved to the directory given as C<--output> script argument.
 =head1 USAGE
 
 elembio_runstats.parser.pl --input <runfolder> --output <folder> --id_run <id>
+  [--elembio-qc-report-url <url>]
 
 =head1 SUBROUTINES/METHODS
 
@@ -131,6 +137,10 @@ NPG tracking run ID for this run.
 =item --help
 
 Prints a brief help message and exits.
+
+=item --elembio-qc-report-url <url>
+
+URL of the elembio qc report. Optional.
 
 =back
 
