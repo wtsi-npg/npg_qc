@@ -7,6 +7,7 @@ release 74.2.0
  - Implemented a script elembio_runstats_parser.pl that uses data in Elembio's
    RunStats.json file to generate per-lane JSON files for
    npg_qc::autoqc::results::tag_metrics objects.
+ - Add optional tile limits to Illumina interop files parsing
 
 release 74.1.0 (2025-06-20)
  - To allow for lane-level QC assessment of Elembio data in the absence of
