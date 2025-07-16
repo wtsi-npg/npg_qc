@@ -1,4 +1,4 @@
-# QC Checks and Metrics for Illumina Next Generation Sequencing Data
+# QC Checks and Metrics for Illumina and Element BioSciences Sequencing Data
 
 ## Listing of Directories
 
@@ -9,6 +9,7 @@
  - npg_qc::autoqc namespace - WSI core sequencing pipeline in-house
      QC checks and storage of QC metrics
  - npg_qc::mqc - evaluation and reporting of QC metrics
+ - npq_qc::elembio - support QC metrics from Element BioSciences instruments
 
 ### bin
 
@@ -41,5 +42,3 @@ generate ORM classes. No code is using these tables. The data is kept for
 auditing perposes. The size of these tables is small in comparison with the size
 of the rest of the tables. The overhead of moving these old tables to a different
 storage is not justified.
-
-

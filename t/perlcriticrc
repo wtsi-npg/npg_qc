@@ -12,3 +12,4 @@ max_chain_length=4
 private_name_regex = ^_(?!_|build)\w+
 [Documentation::RequirePodSections]
 lib_sections    = NAME | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | BUGS AND LIMITATIONS | DEPENDENCIES | CONFIGURATION AND ENVIRONMENT | INCOMPATIBILITIES | AUTHOR | LICENSE AND COPYRIGHT
+[-Modules::RequireNoMatchVarsWithUseEnglish]
