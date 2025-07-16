@@ -20,14 +20,12 @@ has barcodes => (
 
 sub barcode_string {
     my $self = shift;
-    my ($first_barcode) = values %{$self->barcodes};
-    return $first_barcode->barcode_string;
+    return $self->_first_barcode_object()->barcode_string();
 }
 
 sub index_lengths {
     my $self = shift;
-    my ($first_barcode) = values %{$self->barcodes};
-    return $first_barcode->index_lengths();
+    return $self->_first_barcode_object()->index_lengths();
 }
 
 has tag_index => (
@@ -68,6 +66,7 @@ sub percentMismatch {
     my $self = shift;
     return $self->_average_over_all_members('percentMismatch');
 }
+##use critic
 
 sub num_polonies {
     my $self = shift;
@@ -77,6 +76,12 @@ sub num_polonies {
 sub yield {
     my $self = shift;
     return sum(map {$_->yield} values %{$self->barcodes});
+}
+
+sub _first_barcode_object {
+    my $self = shift;
+    my @sorted_barcodes = sort { $a->barcode_string cmp $b->barcode_string } values %{$self->barcodes};
+    return $sorted_barcodes[0];
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -107,6 +112,14 @@ npg_qc::elembio::run_stats.
 
 It can hold multiple barcodes for the same sample, esp. when the PhiX controls
 are given a single name, rather than unique ones for each pair of index reads.
+
+Even when there are multiple barcodes per sample, a few methods of this
+class return a property of a single C<npg_qc::elembio::barcode_stats>
+object rather than an average or sum over all objects. To ensure idempotency
+of these methods, C<npg_qc::elembio::barcode_stats> objects are sorted in
+the alphabetical order of a returned value of the C<barcode_string> method
+of the object and the relevant property of the first member of the sorted
+list is returned.
 
 =head1 SUBROUTINES/METHODS
 
