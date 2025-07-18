@@ -24,6 +24,7 @@ sub convert_run_stats_to_tag_metrics {
         );
         my $sample_count = 0;
         my $barcode_count = 0;
+        my @controls = ();
         foreach my $sample ($lane_stats->all_samples()) {
             $sample_count++;
             my $barcode_string = $sample->barcode_string();
@@ -33,12 +34,20 @@ sub convert_run_stats_to_tag_metrics {
                 # Add a hint about the number of barcodes.
                 $barcode_string .= sprintf '[+%i]', $num_barcodes - 1;
             }
+            if ($sample->is_control) {
+                $barcode_string .= '(CTRL)';
+                push @controls, $sample->tag_index;
+            }
             $metrics_obj->tags->{$sample->tag_index} = $barcode_string;
             _add_decode_stats($metrics_obj, $sample, $lane_stats);
         }
 
         # Add tag zero (unassigned reads) as a sample.
         _add_tagzero_data($metrics_obj, $lane_stats);
+
+        if (@controls == 1) {
+            $metrics_obj->spiked_control_index($controls[0]);
+        }
 
         if ($barcode_count > $sample_count) {
             _add_multibarcode_message($metrics_obj);
