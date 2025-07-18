@@ -78,8 +78,18 @@ use_ok('npg_qc::elembio::run_stats');
         sum(map { scalar keys %{$_->barcodes} } @all_samples),
         '12 I1 x 12 I2 permutations means barcode count is much larger than sample count'
     );
+
+    my $expected = {
+        '9' => 'AGGATGTCCA-AACGTCCAGT',
+        '7' => 'AACAACACAG-AACGCCATTC',
+        '8' => 'AACTCTCTAC-ATAACAAGCG',
+        '5' => 'ACAACAGGCT-ACATTACTCG',
+        '6' => 'AGATTAGCGT-ACCTAAGAGC',
+        '10' => 'AATCTGCAGT-AATAGCTGTG'
+    };
     for my $sample (@all_samples) {
-        ok($sample->barcode_string(), 'Barcode stringification never fails on multi-barcode samples');
+        is ($sample->barcode_string(), $expected->{$sample->tag_index},
+            'Barcode stringification on multi-barcode samples is correct');
     }
 }
 
@@ -105,8 +115,21 @@ use_ok('npg_qc::elembio::run_stats');
             ok($lane->meta->get_attribute($attr), "$attr on $lane is defined");
         }
         # Check tag 0 has been inferred
-        cmp_ok($lane->reads_pf_count->{0}, '>', 0,'Tag 0 reads added');
-        is($lane->tags->{0}, 'NNNNNNNN', 'Tag 0 "sequence" provided');
+        for my $attr (qw/perfect_matches_count perfect_matches_pf_count
+                         one_mismatch_matches_count one_mismatch_matches_pf_count/) {
+            is($lane->$attr->{0}, 0, "$attr is set to 0 for Tag 0");
+        }
+        # Check barcode assignment.
+        for my $tag_index (keys %{$lane->tags}) {
+            if ($tag_index == 0) {
+                is($lane->tags->{0}, 'NNNNNNNN',
+                    'Tag 0 virtual barcode is correct');
+            } else {
+                ok($lane->tags->{$tag_index} =~ /^[ATCG]{8}$/,
+                    'Generated single barcodes are formatted correctly');
+            }
+        }
+        ok(!$lane->comments(), 'No comments');
     }
 }
 
@@ -118,10 +141,18 @@ use_ok('npg_qc::elembio::run_stats');
 
     my $stats = npg_qc::elembio::run_stats::run_stats_from_file($manifest, $stats_file, $lane_count);
     my ($metrics) = convert_run_stats_to_tag_metrics($stats, '67890');
-    is($metrics->tags->{0}, 'NNNNNNNNNN-NNNNNNNNNN', 'Tag 0 virtual barcode was added');
+    ok(exists $metrics->tags->{0}, 'Tag 0 virtual barcode was added');
     for my $tag_index (keys %{$metrics->tags}) {
-        ok($metrics->tags->{$tag_index} =~ /^[ATCGN]{10}-[ATCGN]{10}$/, 'Generated barcodes are formatted correctly');
+        if ($tag_index == 0) {
+            is($metrics->tags->{0}, 'NNNNNNNNNN-NNNNNNNNNN',
+                'Tag 0 virtual barcode is correct');
+        } else {
+            ok($metrics->tags->{$tag_index} =~ /^[ATCG]{10}-[ATCG]{10}\[\+143\]$/,
+                'Generated barcodes are formatted correctly');
+        }
     }
+    like($metrics->comments(), qr/^Where the barcode has a number /,
+        'comments about multiple barcodes is present');
 }
 
 {

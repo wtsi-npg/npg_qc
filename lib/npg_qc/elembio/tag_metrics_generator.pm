@@ -13,53 +13,108 @@ our $VERSION = '0';
 Readonly::Scalar my $PERCENT_TO_DECIMAL => 100;
 
 sub convert_run_stats_to_tag_metrics {
-    my $run_stats = shift;
-    my $id_run = shift;
+    my ($run_stats, $id_run) = @_;
 
-    my @metrics;
+    my @metrics = ();
 
     while (my($lane, $lane_stats) = each %{$run_stats->lanes}) {
         my $metrics_obj = npg_qc::autoqc::results::tag_metrics->new(
             id_run => $id_run,
             position => $lane_stats->lane,
         );
+        my $sample_count = 0;
+        my $barcode_count = 0;
         foreach my $sample ($lane_stats->all_samples()) {
-            # Polony counts found in RunStats.json are all after the perfomance filter
-            # For numbers prior to filtering, see AvitiRunStats.json.
-            $metrics_obj->reads_pf_count->{$sample->tag_index} = $sample->num_polonies;
-            $metrics_obj->tags->{$sample->tag_index} = $sample->barcode_string();
-            # It's hard to infer unfiltered polonies per sample from source
-            # data. Set equal to regular polony count
-            $metrics_obj->reads_count->{$sample->tag_index} = $sample->num_polonies;
-            $metrics_obj->one_mismatch_matches_count->{$sample->tag_index} = ($sample->percentMismatch / $PERCENT_TO_DECIMAL) * $sample->num_polonies;
-            $metrics_obj->perfect_matches_count->{$sample->tag_index} = ($PERCENT_TO_DECIMAL - $sample->percentMismatch) / $PERCENT_TO_DECIMAL * $sample->num_polonies;
-            $metrics_obj->one_mismatch_matches_pf_count->{$sample->tag_index} = ($sample->percentMismatch / $PERCENT_TO_DECIMAL) * $sample->num_polonies;
-            $metrics_obj->perfect_matches_pf_count->{$sample->tag_index} = ($PERCENT_TO_DECIMAL - $sample->percentMismatch) / $PERCENT_TO_DECIMAL * $sample->num_polonies;
-            $metrics_obj->matches_pf_percent->{$sample->tag_index} = $sample->num_polonies / $lane_stats->num_polonies;
-            $metrics_obj->matches_percent->{$sample->tag_index} = $sample->num_polonies / $lane_stats->num_polonies;
-
-            # To get automatic calculations of variation/underrepresented tags
-            # we need to set spiked_control_index once. Can only work properly
-            # once SciOps are using a single name for the PhiX sample.
-            # if ($sample->sample_name !~ /Adept/xsm) {
-            #  $metrics->spiked_control_index($sample->tag_index);
-            #}
+            $sample_count++;
+            my $barcode_string = $sample->barcode_string();
+            my $num_barcodes = scalar keys %{$sample->barcodes};
+            $barcode_count += $num_barcodes;
+            if ($num_barcodes > 1) {
+                # Add a hint about the number of barcodes.
+                $barcode_string .= sprintf '[+%i]', $num_barcodes - 1;
+            }
+            $metrics_obj->tags->{$sample->tag_index} = $barcode_string;
+            _add_decode_stats($metrics_obj, $sample, $lane_stats);
         }
-        # Add tag 0 (unassigned reads) as a sample
-        # As above, pf_count is what we get. Assign it to both
-        $metrics_obj->reads_count->{'0'} = $lane_stats->unassigned_reads;
-        $metrics_obj->reads_pf_count->{'0'} = $lane_stats->unassigned_reads;
 
-        my ($sample) = $lane_stats->all_samples();
-        my ($i1_length, $i2_length) = $sample->index_lengths();
-        $metrics_obj->tags->{'0'} = 'N' x $i1_length;
-        if ($i2_length) {
-            $metrics_obj->tags->{'0'} .= q{-} . 'N' x $i2_length;
+        # Add tag zero (unassigned reads) as a sample.
+        _add_tagzero_data($metrics_obj, $lane_stats);
+
+        if ($barcode_count > $sample_count) {
+            _add_multibarcode_message($metrics_obj);
         }
 
         push @metrics, $metrics_obj;
     }
     return @metrics;
+}
+
+sub _add_decode_stats{
+    my ($metrics_obj, $sample, $lane_stats) = @_;
+
+    my $tag_index = $sample->tag_index;
+    # Polony counts found in RunStats.json are all after the perfomance filter
+    # For numbers prior to filtering, see AvitiRunStats.json.
+    $metrics_obj->reads_pf_count->{$tag_index} = $sample->num_polonies;
+    # It's hard to infer unfiltered polonies per sample from source
+    # data. Set equal to regular polony count
+    $metrics_obj->reads_count->{$tag_index} = $sample->num_polonies;
+
+    my $num_perfect_matches = ($PERCENT_TO_DECIMAL - $sample->percentMismatch) / $PERCENT_TO_DECIMAL * $sample->num_polonies;
+    $metrics_obj->perfect_matches_count->{$tag_index} = $num_perfect_matches;
+    $metrics_obj->perfect_matches_pf_count->{$tag_index} = $num_perfect_matches;
+
+    my $num_one_mismatches = ($sample->percentMismatch / $PERCENT_TO_DECIMAL) * $sample->num_polonies;
+    $metrics_obj->one_mismatch_matches_count->{$tag_index} = $num_one_mismatches;
+    $metrics_obj->one_mismatch_matches_pf_count->{$tag_index} = $num_one_mismatches;
+    _assign_fraction_of_matches($tag_index, $metrics_obj, $lane_stats->num_polonies);
+    # To get automatic calculations of variation/underrepresented tags
+    # we need to set spiked_control_index once. Can only work properly
+    # once SciOps are using a single name for the PhiX sample.
+    # if ($sample->sample_name !~ /Adept/xsm) {
+    #  $metrics->spiked_control_index($sample->tag_index);
+    #}
+    return;
+}
+
+sub _add_tagzero_data {
+    my ($metrics_obj, $lane_stats) = @_;
+
+    my $tag_index = '0';
+    my $reads_count = $lane_stats->unassigned_reads;
+    $metrics_obj->reads_count->{$tag_index} = $reads_count;
+    $metrics_obj->reads_pf_count->{$tag_index} = $reads_count;
+    $metrics_obj->perfect_matches_pf_count->{$tag_index} = 0;
+    $metrics_obj->perfect_matches_count->{$tag_index} = 0;
+    $metrics_obj->one_mismatch_matches_count->{$tag_index} = 0;
+    $metrics_obj->one_mismatch_matches_pf_count->{$tag_index} = 0;
+    _assign_fraction_of_matches($tag_index, $metrics_obj, $lane_stats->num_polonies);
+    my ($sample) = $lane_stats->all_samples();
+    my ($i1_length, $i2_length) = $sample->index_lengths();
+    $metrics_obj->tags->{$tag_index} = 'N' x $i1_length;
+    if ($i2_length) {
+        $metrics_obj->tags->{$tag_index} .= q{-} . 'N' x $i2_length;
+    }
+
+    return;
+}
+
+sub _assign_fraction_of_matches {
+    my ($tag_index, $metrics_obj, $lane_num_polonies) = @_;
+    my $fraction_of_matches = $lane_num_polonies ?
+        $metrics_obj->reads_count->{$tag_index} / $lane_num_polonies : 0;
+    $metrics_obj->matches_pf_percent->{$tag_index} = $fraction_of_matches;
+    $metrics_obj->matches_percent->{$tag_index} = $fraction_of_matches;
+    return;
+}
+
+sub _add_multibarcode_message {
+    my $metrics_obj = shift;
+    my $message = 'Where the barcode has a number in square brackets appended, ' .
+        'the tag index represents multiple barcodes. ' .
+        'Use MLWH to inspect decode rate on individual barcodes.';
+    $metrics_obj->add_comment($message);
+    return;
 }
 
 1;
