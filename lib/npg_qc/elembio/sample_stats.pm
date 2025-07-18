@@ -3,10 +3,15 @@ package npg_qc::elembio::sample_stats;
 use Moose;
 use namespace::autoclean;
 use List::Util qw(sum);
+use Readonly;
 use npg_qc::elembio::barcode_stats;
 
 
 our $VERSION = '0';
+
+# The extended scope allows for using this regular expression
+# in other NPG code.
+Readonly::Scalar our $CONTROL_SAMPLE_NAME_REGEXP => qr/(?:adept)|(?:phix_third)/ismx;
 
 has barcodes => (
     isa => 'HashRef[npg_qc::elembio::barcode_stats]',
@@ -37,6 +42,16 @@ has sample_name => (
     isa => 'Str',
     is => 'ro',
 );
+
+has is_control => (
+    isa => 'Bool',
+    is => 'ro',
+    lazy_build => 1,
+);
+sub _build_is_control {
+    my $self = shift;
+    return $self->sample_name =~ /$CONTROL_SAMPLE_NAME_REGEXP/smx;
+}
 
 has lane => (
     isa => 'Int',
@@ -189,6 +204,8 @@ averaged result as appropriate. In gigabases.
 =item Moose
 
 =item namespace::autoclean
+
+=item Readonly
 
 =item npg_qc::elembio::barcode_stats
 
