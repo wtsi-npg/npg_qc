@@ -18,6 +18,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      to the one for Illumina lanes.
    - The code is refactored to avoid repetitions and to make
      convert_run_stats_to_tag_metrics function more concise.
+ - Information about multiple tags per sample representation is added
+   to the tag metrics SeqQC info section.
 
 release 74.2.0 (2025-07-16)
  - Implemented a library npg_qc::elembio::run_stats for parsing Elembio
