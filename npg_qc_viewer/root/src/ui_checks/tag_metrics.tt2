@@ -4,7 +4,7 @@
 <div class="lfloat">
 
 <div class="data_table">
-Tag decoding overview
+Tag decoding overview <a href="[% c.uri_for_action(c.controller('Checks').action_for('about')) %]#tag metrics_check"><img src="/static/images/information.png" alt="Link to information about tag metrics"/></a>
 <table title="Tag Decoding">
 <tr>
   <th>&nbsp;</th>
