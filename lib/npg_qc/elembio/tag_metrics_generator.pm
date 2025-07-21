@@ -60,7 +60,9 @@ sub _add_decode_stats{
     # data. Set equal to regular polony count
     $metrics_obj->reads_count->{$tag_index} = $sample->num_polonies;
 
-    my $num_perfect_matches = ($PERCENT_TO_DECIMAL - $sample->percentMismatch) / $PERCENT_TO_DECIMAL * $sample->num_polonies;
+    my $num_perfect_matches = int sprintf '%.0f', (
+        ($PERCENT_TO_DECIMAL - $sample->percentMismatch) / $PERCENT_TO_DECIMAL * $sample->num_polonies
+    );
     $metrics_obj->perfect_matches_count->{$tag_index} = $num_perfect_matches;
     $metrics_obj->perfect_matches_pf_count->{$tag_index} = $num_perfect_matches;
 
