@@ -70,12 +70,6 @@ sub _add_decode_stats{
     $metrics_obj->one_mismatch_matches_count->{$tag_index} = $num_one_mismatches;
     $metrics_obj->one_mismatch_matches_pf_count->{$tag_index} = $num_one_mismatches;
     _assign_fraction_of_matches($tag_index, $metrics_obj, $lane_stats->num_polonies);
-    # To get automatic calculations of variation/underrepresented tags
-    # we need to set spiked_control_index once. Can only work properly
-    # once SciOps are using a single name for the PhiX sample.
-    # if ($sample->sample_name !~ /Adept/xsm) {
-    #  $metrics->spiked_control_index($sample->tag_index);
-    #}
     return;
 }
 
