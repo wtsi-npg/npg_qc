@@ -126,8 +126,8 @@ use_ok('npg_qc::elembio::run_stats');
                     'Tag 0 virtual barcode is correct');
             } else {
                 my ($is_control) = grep {$_ == $tag_index} (1,2,3,4);
-                my $expr = $is_control ? qr/^[ATCG]{8}\(CTRL\)$/ : qr/^[ATCG]{8}$/;
-                ok($lane->tags->{$tag_index} =~ $expr,
+                like($lane->tags->{$tag_index},
+                    $is_control ? qr/^[ATCG]{8}\(CTRL\)$/ : qr/^[ATCG]{8}$/,
                     'Generated single barcodes are formatted correctly');
             }
         }
