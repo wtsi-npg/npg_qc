@@ -223,8 +223,23 @@ Metrics generated as part of calling a set of genotypes for a sample and compari
  <p>This check displays statistics about decoding of the index read. The semantics of the summary table data differs for pools and individual libraries.</p>
  <p>For a pool the overall decoding percent is displayed, followed by the coefficient of variance that characterises the uniformity of tag distribution in a pool. The background of the table cell is blue if the overall decoding rate is over 80%, for lesser values the background is red.</p>
  <p>For an individual library (tag), the decoding percent for this library within a pool is displayed. If the number of reads for this tag is at least one tenth the average number of reads per tag for this pool, the background is grey; otherwise, the background is red.</p>
- <p>For dual-index runs the percentage number of tag hops is also displayed together with an estimate of the power to detect tag hops. The power is a number between 0 (a pool containing all possible tag combinations) and 1 (a pool containing only UDIs). It is possible for tag hops to be detected even if the power is 0, in this case tag hops correspond to reads where the second tag is missing and the second index read sequence matches what is expected on the spiked phix which only has one tag</p>
+ <p>For dual-index Illumina runs the percentage number of tag hops is also displayed together with an estimate of the power to detect tag hops. The power is a number between 0 (a pool containing all possible tag combinations) and 1 (a pool containing only UDIs). It is possible for tag hops to be detected even if the power is 0, in this case tag hops correspond to reads where the second tag is missing and the second index read sequence matches what is expected on the spiked phix which only has one tag</p>
  <br/>
+
+ <h5>Tag metrics for Element Biosciences (Elembio) data</h5>
+
+  <p>An Elembio lane might contain multiple libraries for the same
+     sample. A tag index is assigned per sample, therefore multiple
+     barcode sequences might correspond to the same tag index.
+     SeqQC tag metrics representation allows for one barcode per
+     tag index. One of the barcodes is chosen to represent a set of
+     barcodes. The presence of other barcodes is flagged  by appending
+     the number of the remaining barcodes with a plus sign to the
+     barcode string. Example for a set of 144 barcodes:
+     <b>ATCGATCG-ATCGAAAA[+143]</b>. In this case reads count and percent are
+     summed up across all 144 barcodes.</p>
+ <br/>
+
  <h4>Coefficient of variance calculation:</h4>
   <p><a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">mean</a> = &Sigma;(x<sub>i</sub>) &frasl; N<br/>
   <a href="http://search.cpan.org/~kgb/PDL-2.3.2/Basic/Primitive/primitive.pd#stats">rms</a> = &radic;( &Sigma;(x<sub>i</sub>-mean)&sup2; &frasl; (N-1))<br/>

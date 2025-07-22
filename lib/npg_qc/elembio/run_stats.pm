@@ -98,7 +98,8 @@ sub run_stats_from_json {
                 total_yield => $lane->{TotalYield},
                 # We do not explicitly get the unassigned read count for lanes
                 # It has to be approximated by calculation
-                unassigned_reads => sprintf('%.0f', (($ALL_THE_PERCENT - $lane->{PercentAssignedReads}) * $lane->{NumPolonies}) / $ALL_THE_PERCENT),
+                unassigned_reads => int sprintf('%.0f',
+                  (($ALL_THE_PERCENT - $lane->{PercentAssignedReads}) * $lane->{NumPolonies}) / $ALL_THE_PERCENT),
                 unassigned_reads_percent => $ALL_THE_PERCENT - $lane->{PercentAssignedReads},
                 percentQ30 => $lane->{PercentQ30},
                 percentQ40 => $lane->{PercentQ40},
