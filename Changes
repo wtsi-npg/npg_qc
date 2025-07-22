@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 74.3.0 (2025-07-22)
  - Changes to npg_qc::elembio::tag_metrics_generator 
    - An Elembio lane might contain multiple libraries for the same
      sample. A tag index is assigned per sample, therefore multiple
@@ -24,6 +25,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      to the one for Illumina lanes.
    - The code is refactored to avoid repetitions and to make
      convert_run_stats_to_tag_metrics function more concise.
+ - Ensured that computed polonies counts are integers. The float values are
+   rounded down to the nearest integer.
  - Information about multiple tags per sample representation is added
    to the tag metrics SeqQC info section.
 
