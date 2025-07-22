@@ -125,11 +125,14 @@ use_ok('npg_qc::elembio::run_stats');
                 is($lane->tags->{0}, 'NNNNNNNN',
                     'Tag 0 virtual barcode is correct');
             } else {
-                ok($lane->tags->{$tag_index} =~ /^[ATCG]{8}$/,
+                my ($is_control) = grep {$_ == $tag_index} (1,2,3,4);
+                like($lane->tags->{$tag_index},
+                    $is_control ? qr/^[ATCG]{8}\(CTRL\)$/ : qr/^[ATCG]{8}$/,
                     'Generated single barcodes are formatted correctly');
             }
         }
         ok(!$lane->comments(), 'No comments');
+        is($lane->spiked_control_index, undef, 'Spiked control index is not set');
     }
 }
 

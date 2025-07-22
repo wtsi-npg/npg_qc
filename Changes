@@ -13,6 +13,12 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    - A comment is added to npg_qc::autoqc::results::tag_metrics
      object to explain the above tag sequence notation if it is
      present.
+   - Control samples are identified by their name and flagged.
+     Examples: GCACATAGTC-GACTACTAGC(CTRL) or ATGTCGCTAG-CTAGCTCGTA[+3](CTRL).
+   - Where there is one control sample per lane, spiked_control_index
+     attribute of npg_qc::autoqc::results::tag_metrics object is set, making
+     calculations of the coefficient of variance and highlighting of
+     underrepresented tags more accurate.
    - More properties are set for tag zero in tag_metrics object
      to make the definition of tag zero for Elembio lanes identical
      to the one for Illumina lanes.
