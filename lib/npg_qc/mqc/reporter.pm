@@ -55,35 +55,28 @@ sub _build__data4reporting {
     my $position = $component->position;
 
     my $rswh = $product_rs->search(
-                {
-                 'me.id_run'    => $id_run,
-                 'me.position'  => $position,
-                },
-                {
-                  'prefetch' => 'iseq_flowcell',
-                  'order_by' => { -desc => 'me.tag_index' },
-                });
+      {
+       'me.id_run'    => $id_run,
+       'me.position'  => $position,
+       'me.tag_index' => {q[!=] => 0},
+       'iseq_flowcell.entity_type' => {q[-not_in] => [qw(library_control library_indexed_spike)]},
+       'iseq_flowcell.id_lims' => {q[-not_like] => '%GCLP%'},
+       'iseq_flowcell.entity_id_lims' => {q[!=] => undef},
+      },
+      {
+        'prefetch' => 'iseq_flowcell',
+        'order_by' => { -desc => 'me.tag_index' },
+      }
+    );
 
     my $lane_id;
-    my $from_gclp;
     while ( my $product_row = $rswh->next ) {
       my $fc = $product_row->iseq_flowcell;
       if( $fc ) {
-        if ( $fc->is_control ) {
-          next;
-        }
-        $lane_id   = $fc->lane_id;
-        $from_gclp = $fc->from_gclp;
-        if ( $lane_id ) {
-          last;
-        }
+        $lane_id   = $fc->entity_id_lims;
+        last;
       }
     }
-
-    if ( $from_gclp ) {
-      next;
-    }
-
     if ( !$lane_id )  {
       $self->_log(qq[No lane id for run $id_run lane $position]);
       next;
@@ -96,6 +89,7 @@ sub _build__data4reporting {
                         'lane_id' => $lane_id,
                                     };
   }
+
   return $data;
 }
 
@@ -237,7 +231,7 @@ Jennifer Liddle <js10@sanger.ac.uk>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015, 2016, 2017, 2018, 2022 Genome Research Ltd.
+Copyright (C) 2015, 2016, 2017, 2018, 2022, 2025 Genome Research Ltd.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
