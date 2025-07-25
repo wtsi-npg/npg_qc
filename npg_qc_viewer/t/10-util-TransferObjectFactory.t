@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 11;
 use Test::Exception;
 
 use t::util;
@@ -11,6 +11,7 @@ use_ok $module;
 my $schema;
 lives_ok { $schema = t::util->new()->test_env_setup()->{'mlwh'} }  'test db created and populated';
 my $pmrs = $schema->resultset('IseqProductMetric');
+my $epmrs = $schema->resultset('EseqProductMetric');
 
 subtest 'create factory' => sub {
   plan tests => 8;
@@ -33,7 +34,7 @@ subtest 'create factory' => sub {
   ok(!$f->is_pool, 'pool flag is false');
 };
 
-subtest 'create lane object' => sub {
+subtest 'create Illumina lane object' => sub {
   plan tests => 17;
 
   my $row = $pmrs->search({id_run => 3055, position => 1})->next();
@@ -58,7 +59,7 @@ subtest 'create lane object' => sub {
   is ($to->id_library_lims, 'NT13483B', 'id_library_lims');
 };
 
-subtest 'create control lane object' => sub {
+subtest 'create Illumina control lane object' => sub {
   plan tests => 7;
 
   my $row = $pmrs->search({id_run => 4950, position => 4})->next();
@@ -73,7 +74,7 @@ subtest 'create control lane object' => sub {
   is ($to->is_control, 1, 'is a control');
 };
 
-subtest 'create plex object' => sub {
+subtest 'create Illumina plex object' => sub {
   plan tests => 16;
 
   my $row = $pmrs->search({id_run => 4950, position => 8, tag_index => 5})->next();
@@ -97,7 +98,7 @@ subtest 'create plex object' => sub {
   is ($to->id_library_lims, 'NT206930M', 'id_library_lims');
 };
 
-subtest 'create pool object' => sub {
+subtest 'create Illumina pool object' => sub {
   plan tests => 17;
 
   my $row = $pmrs->search({id_run => 4950, position => 8, tag_index => 5})->next();
@@ -128,7 +129,7 @@ subtest 'create pool object' => sub {
   is ($to->instance_qc_able, 0, 'not qc_able');  
 };
 
-subtest 'create object not represented in LIMs' => sub {
+subtest 'create Illumina object not represented in LIMs' => sub {
   plan tests => 17;
 
   my $row = $pmrs->search({id_run => 4950, position => 8, tag_index => 0})->next();
@@ -155,6 +156,100 @@ subtest 'create object not represented in LIMs' => sub {
   $f  = $module->new(product_metrics_row => $row, is_pool => 1);
   $to = $f->create_object();
   ok ($to->is_pool, 'is a pool');
+};
+
+subtest 'create Elembio plex object' => sub {
+  plan tests => 16;
+
+  my $row = $epmrs->search({id_run => 50932, lane => 1, tag_index => 2})->next();
+  my $f  = $module->new(product_metrics_row => $row, is_plex => 1);
+  my $to = $f->create_object();
+  is ($to->id_run, 50932, 'run id');
+  is ($to->position, 1, 'position');
+  is ($to->num_cycles, 140, 'number of cycles');
+  is ($to->time_comp, '2025-08-21T00:40:07', 'run complete time');
+  is ($to->tag_index, 2, 'tag index');
+  is ($to->tag_sequence, 'AAGATTGGAT-AGCGGGATTT', 'tag sequence');
+  is ($to->instance_qc_able, 1, 'qc_able');
+  is ($to->rnd, 0, 'not r&d');
+  is ($to->is_control, 0, 'not a control');
+  is ($to->entity_id_lims, '75736474', 'entity_id_lims');
+  ok (!$to->is_pool, 'not a pool');
+  is ($to->study_name, 'Biodiversity Cell Atlas (BCA)', 'study name');
+  is ($to->sample_id, '10220688', 'sample id');
+  is ($to->sample_name, 'rBCAxxxyyy', 'sample name');
+  is ($to->sample_supplier_name, 'sgp276', 'sample supplier name');
+  is ($to->id_library_lims, 'SQPP-85776-J:A1', 'id_library_lims');
+};
+
+subtest 'create Elembio pool object' => sub {
+  plan tests => 17;
+
+  my $row = $epmrs->search({id_run => 50932, lane => 1, tag_index => 2})->next();
+  my $f  = $module->new(product_metrics_row => $row, is_plex => 0, is_pool => 1);
+  my $to = $f->create_object();
+  is ($to->id_run, 50932, 'run id');
+  is ($to->position, 1, 'position');
+  is ($to->num_cycles, 140, 'number of cycles');
+  is ($to->time_comp, '2025-08-21T00:40:07', 'run complete time');
+  is ($to->tag_index, undef, 'tag index');
+  is ($to->tag_sequence, undef, 'tag sequence');
+  is ($to->instance_qc_able, 1, 'qc_able');
+  is ($to->rnd, 0, 'not r&d');
+  is ($to->is_control, 0, 'not a control');
+  is ($to->entity_id_lims, '75736474', 'entity_id_lims');
+  ok ($to->is_pool, 'is a pool');
+  is ($to->study_name, undef, 'study name');
+  is ($to->sample_id, undef, 'sample id');
+  is ($to->sample_name, undef, 'sample name');
+  is ($to->sample_supplier_name, undef, 'sample supplier name');
+  is ($to->id_library_lims, 'NT1861579Q', 'id_library_lims');
+
+  $f  = $module->new(product_metrics_row => $row,
+                     is_plex             => 0,
+                     is_pool             => 1,
+                     not_qcable          => 1);
+  $to = $f->create_object();
+  is ($to->instance_qc_able, 0, 'not qc_able');  
+};
+
+subtest 'create Elembio object not represented in LIMs' => sub {
+  plan tests => 26;
+
+  my $row = $epmrs->search({id_run => 50932, lane => 1, tag_index => 0})->next();
+  my $f  = $module->new(product_metrics_row => $row, is_plex => 1);
+  my $to = $f->create_object();
+  is ($to->id_run, 50932, 'run id');
+  is ($to->position, 1, 'position');
+  is ($to->num_cycles, 140, 'number of cycles');
+  is ($to->time_comp, '2025-08-21T00:40:07', 'run complete time');
+  is ($to->tag_index, 0, 'tag index');
+  is ($to->tag_sequence, undef, 'tag sequence');
+  is ($to->instance_qc_able, 0, 'not qc_able');
+  is ($to->rnd, 0, 'not r&d');
+  is ($to->is_control, 0, 'not a control');
+  is ($to->entity_id_lims, undef, 'entity_id_lims');
+  ok (!$to->is_pool, 'not a pool');
+  is ($to->study_name, undef, 'study name');
+  is ($to->sample_id, undef, 'sample id');
+  is ($to->sample_name, undef, 'sample name');
+  is ($to->sample_supplier_name, undef, 'sample supplier name');
+  is ($to->id_library_lims, undef, 'id_library_lims');
+
+  # Currently controls are not represented in LIMS.
+  $row = $epmrs->search({id_run => 50932, lane => 1, tag_index => 1})->next();
+  $f  = $module->new(product_metrics_row => $row, is_plex => 1);
+  $to = $f->create_object();
+  is ($to->tag_index, 1, 'tag index');
+  is ($to->tag_sequence, 'ATGTCGCTAG-CTAGCTCGTA', 'tag sequence');
+  is ($to->instance_qc_able, 0, 'not qc_able');
+  is ($to->is_control, 1, 'is a control');
+  is ($to->entity_id_lims, undef, 'entity_id_lims');
+  is ($to->study_name, undef, 'study name');
+  is ($to->sample_id, undef, 'sample id');
+  is ($to->sample_name, 'PhiX_Third', 'elembio sample name');
+  is ($to->sample_supplier_name, undef, 'sample supplier name');
+  is ($to->id_library_lims, undef, 'id_library_lims');
 };
 
 1;
