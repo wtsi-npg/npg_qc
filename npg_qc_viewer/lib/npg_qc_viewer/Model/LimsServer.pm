@@ -18,7 +18,7 @@ sub generate_url {
 
   my $url = npg_qc_viewer->config->{'Model::LimsServer'}->{'sscape_url'};
   my $link = q[];
-  if ($url && $entity_type) {
+  if ($url) {
     my $scope = $entity_type eq 'sample' ? 'samples' : 'assets';
     my $id = $entity_type eq 'sample'
            ? $to->sample_id

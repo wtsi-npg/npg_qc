@@ -60,7 +60,7 @@ sub _build__data4reporting {
        'me.position'  => $position,
        'me.tag_index' => {q[!=] => 0},
        'iseq_flowcell.entity_type' => {q[-not_in] => [qw(library_control library_indexed_spike)]},
-       'iseq_flowcell.id_lims' => {q[-not_like] => '%GCLP%'},
+       'iseq_flowcell.id_lims' => {q[-not_like] => 'C_GCLP%'},
        'iseq_flowcell.entity_id_lims' => {q[!=] => undef},
       },
       {
