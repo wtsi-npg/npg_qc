@@ -4,7 +4,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    will have links to non-existing Sequencescape LIMS entities does not
    matter (lab work went though now decommissioned LIMS).
  - Made filtering in the MQC outcomes more transparent. A DBIx query for
-   Ilumin alanes now contains all filtering conditions.
+   Illumina lanes now contains all filtering conditions.
+ - Added reporting of MQC outcomes for Elembio lanes.
 
 release 74.3.0 (2025-07-22)
  - Changes to npg_qc::elembio::tag_metrics_generator 

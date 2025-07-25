@@ -1,0 +1,77 @@
+---
+- bait_name: Mouse all exon
+  entity_type: library_indexed
+  entity_id_lims: 12345678
+  id_eseq_flowcell_tmp: 289
+  id_flowcell_lims: 32
+  id_library_lims: SQPU-241296-E:E2
+  id_lims: SQSCP_ST
+  id_pool_lims: NT24396M
+  id_sample_tmp: 252329
+  id_study_tmp: 1957
+  lane: 1
+  last_updated: 2025-06-09 13:24:17
+  pipeline_id_lims: Agilent Pulldown
+  primer_panel: ~
+  recorded_at: 2025-06-10 09:48:31
+  requested_insert_size_from: 100
+  requested_insert_size_to: 400
+  tag2_sequence: ATGGCTTCTA
+  tag_sequence: ATGTTGCCAC
+- bait_name: Mouse all exon
+  entity_type: library_indexed
+  entity_id_lims: 12345678 
+  id_eseq_flowcell_tmp: 290
+  id_flowcell_lims: 32
+  id_library_lims: SQPU-241296-E:F2
+  id_lims: SQSCP_ST
+  id_pool_lims: NT24396M
+  id_sample_tmp: 252330
+  id_study_tmp: 1957
+  lane: 1
+  last_updated: 2025-06-09 13:24:17
+  pipeline_id_lims: Agilent Pulldown
+  primer_panel: ~
+  recorded_at: 2025-06-10 09:48:31
+  requested_insert_size_from: 100
+  requested_insert_size_to: 400
+  tag2_sequence: CAACAGTGGA
+  tag_sequence: ACAACAGGCT
+- bait_name: Mouse all exon
+  entity_type: library_indexed
+  entity_id_lims: 12345679
+  id_eseq_flowcell_tmp: 389
+  id_flowcell_lims: 32
+  id_library_lims: SQPU-241296-E:E2
+  id_lims: SQSCP_ST
+  id_pool_lims: NT24396M
+  id_sample_tmp: 252329
+  id_study_tmp: 1957
+  lane: 2
+  last_updated: 2025-06-09 13:24:17
+  pipeline_id_lims: Agilent Pulldown
+  primer_panel: ~
+  recorded_at: 2025-06-10 09:48:31
+  requested_insert_size_from: 100
+  requested_insert_size_to: 400
+  tag2_sequence: ATGGCTTCTA
+  tag_sequence: ATGTTGCCAC
+- bait_name: Mouse all exon
+  entity_type: library_indexed
+  entity_id_lims: 12345679
+  id_eseq_flowcell_tmp: 390
+  id_flowcell_lims: 32
+  id_library_lims: SQPU-241296-E:F2
+  id_lims: SQSCP_ST
+  id_pool_lims: NT24396M
+  id_sample_tmp: 252330
+  id_study_tmp: 1957
+  lane: 2
+  last_updated: 2025-06-09 13:24:17
+  pipeline_id_lims: Agilent Pulldown
+  primer_panel: ~
+  recorded_at: 2025-06-10 09:48:31
+  requested_insert_size_from: 100
+  requested_insert_size_to: 400
+  tag2_sequence: CAACAGTGGA
+  tag_sequence: ACAACAGGCT
