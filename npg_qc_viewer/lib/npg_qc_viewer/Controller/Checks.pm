@@ -259,53 +259,72 @@ sub _run_lanes_from_dwh {
   }
 
   my $row_data = $c->stash->{'row_data'};
-  my $rs = $c->model('MLWarehouseDB')->search_product_metrics($where);
+  my $rss = $c->model('MLWarehouseDB')->search_product_metrics($where);
 
-  while (my $product_metric = $rs->next) {
-    my $flowcell = $product_metric->iseq_flowcell;
-    if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
-      if ( !defined $product_metric->tag_index ||
-           ( $flowcell && $flowcell->entity_type ne 'library_indexed_spike' )) {
-             # Using first tag index available as representative for the lane.
-
-        my $key = $product_metric->rpt_key;
-        if ( $product_metric->tag_index ) {
-          $key = $product_metric->lane_rpt_key_from_key($key);
-        }
-        if ( !$row_data->{$key} ) {
-          my $lane_collection = $c->stash->{'rl_map'}->{$key};
-          my $is_pool = 0;
-          if ($lane_collection && !$lane_collection->is_empty) {
-            $is_pool = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
-                       @{$lane_collection->check_names()->{'list'}};
-          }
-          my $init = { 'product_metrics_row' => $product_metric };
-          $init->{'is_pool'} = $is_pool;
-          if ($retrieve_option == $ALL) {
-            # QC widgets either for lanes or libraries, but not both.
-            # Logic should eventually move to the client side Javascript.
-            $init->{'not_qcable'} = 1;
-          }
-          $row_data->{$key} =  npg_qc_viewer::Util::TransferObjectFactory
-                               ->new($init)->create_object();
-        }
+  for my $prefix (keys %{$rss}) {
+    while (my $product_metric = $rss->{$prefix}->next) {
+      my $relationship= $prefix . q[_flowcell];
+      if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
+        $self->_assign_lane_row_data(
+          $c, $retrieve_option, $row_data,
+          $product_metric, $product_metric->$relationship
+        );
       }
-    }
-
-    if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
-      if (defined $product_metric->tag_index) {
-        my $key = $product_metric->rpt_key;
-        if ( !$row_data->{$key} ) {
-          $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory->new(
-                                product_metrics_row => $product_metric,
-                                is_plex             => 1
-                              )->create_object();
-        }
+      if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
+        $self->_assign_plex_row_data($row_data, $product_metric);
       }
     }
   }
 
   $c->stash->{'row_data'} = $row_data;
+
+  return;
+}
+
+sub _assign_lane_row_data { ##no critic (Subroutines::ProhibitManyArgs)
+  my ($self, $c, $retrieve_option, $row_data, $product_metric, $flowcell) = @_;
+
+  if ( !defined $product_metric->tag_index ||
+      ( $flowcell && $flowcell->entity_type ne 'library_indexed_spike' )) {
+        # Using first tag index available as representative for the lane.
+
+    my $key = $product_metric->rpt_key;
+    if ( $product_metric->tag_index ) {
+      $key = $product_metric->lane_rpt_key_from_key($key);
+    }
+    if ( !$row_data->{$key} ) {
+      my $lane_collection = $c->stash->{'rl_map'}->{$key};
+      my $is_pool = 0;
+      if ($lane_collection && !$lane_collection->is_empty) {
+        $is_pool = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
+                  @{$lane_collection->check_names()->{'list'}};
+      }
+      my $init = { 'product_metrics_row' => $product_metric };
+      $init->{'is_pool'} = $is_pool;
+      if ($retrieve_option == $ALL) {
+        # QC widgets either for lanes or libraries, but not both.
+        $init->{'not_qcable'} = 1;
+      }
+      $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory
+                          ->new($init)->create_object();
+    }
+  }
+
+  return;
+}
+
+sub _assign_plex_row_data {
+  my ($self, $row_data, $product_metric) = @_;
+
+  if (defined $product_metric->tag_index) {
+    my $key = $product_metric->rpt_key;
+    if ( !$row_data->{$key} ) {
+      $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory->new(
+                            product_metrics_row => $product_metric,
+                            is_plex             => 1
+                          )->create_object();
+    }
+  }
 
   return;
 }

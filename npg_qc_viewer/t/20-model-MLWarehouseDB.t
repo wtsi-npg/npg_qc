@@ -43,7 +43,7 @@ subtest 'Search product metrics' => sub {
     'Run id is missing - error';
 
   $data->{'id_run'} = 4950;
-  my @rows = $m->search_product_metrics($data)->all();
+  my @rows = $m->search_product_metrics($data)->{'iseq'}->all();
   ok ((all { $_->id_run == 4950} @rows), 'Run id is correct');
   ok ((all { $_->position == 1}  @rows), 'Position is correct');
   my @tags = map {$_->tag_index} @rows;
