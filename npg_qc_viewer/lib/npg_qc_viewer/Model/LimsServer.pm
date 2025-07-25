@@ -15,21 +15,10 @@ sub generate_url {
   if ($entity_type !~ /^sample$|^library$|^pool$/smx) {
     croak qq[Unknown entity type "$entity_type"];
   }
-  my $expected_type = 'npg_qc_viewer::Util::TransferObject';
-  my $actual = ref $to;
-  if ($actual ne $expected_type) {
-    croak "$expected_type is expected in second argument, got $actual";
-  }
-
-  return $to->lims_live ? $self->_link_sscape($entity_type, $to) : q[];
-}
-
-sub _link_sscape {
-  my ($self, $entity_type, $to) = @_;
 
   my $url = npg_qc_viewer->config->{'Model::LimsServer'}->{'sscape_url'};
   my $link = q[];
-  if ($url) {
+  if ($url && $entity_type) {
     my $scope = $entity_type eq 'sample' ? 'samples' : 'assets';
     my $id = $entity_type eq 'sample'
            ? $to->sample_id
@@ -39,6 +28,7 @@ sub _link_sscape {
       $link = join q[/], $url, $scope, $id;
     }
   }
+
   return $link;
 }
 
@@ -97,7 +87,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Genome Research Ltd.
+Copyright (C) 2017, 2025  Genome Research Ltd.
 
 This file is part of NPG software.
 

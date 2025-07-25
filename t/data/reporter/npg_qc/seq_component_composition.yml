@@ -35,4 +35,15 @@
   id_seq_component: 9
   id_seq_composition: 9
   size: 1
- 
+- id_seq_comcom: 10
+  id_seq_component: 10
+  id_seq_composition: 10
+  size: 1
+- id_seq_comcom: 11
+  id_seq_component: 11
+  id_seq_composition: 11
+  size: 1
+- id_seq_comcom: 12
+  id_seq_component: 12
+  id_seq_composition: 12
+  size: 1

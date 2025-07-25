@@ -108,7 +108,6 @@ sub _add_lims_data {
   my $flowcell = $self->product_metrics_row->iseq_flowcell;
   $init_values ||= {};
   $init_values->{'is_pool'}          = $self->is_pool;
-  $init_values->{'lims_live'}        = 1;
   $init_values->{'is_control'}       = 0;
   $init_values->{'rnd'}              = 0;
 
@@ -118,7 +117,6 @@ sub _add_lims_data {
     $init_values->{'rnd'}               = $flowcell->is_r_and_d ? 1 : 0;
     $init_values->{'is_control'}        = $flowcell->is_control ? 1 : 0;
     $init_values->{'entity_id_lims'}    = $flowcell->entity_id_lims;
-    $init_values->{'lims_live'}         = $flowcell->from_gclp ? 0 : 1;
 
     if ($self->is_pool) {
       $init_values->{'id_library_lims'} = $flowcell->id_pool_lims;
@@ -192,7 +190,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Genome Research Ltd.
+Copyright (C) 2018, 2025 Genome Research Ltd.
 
 This file is part of NPG.
 
