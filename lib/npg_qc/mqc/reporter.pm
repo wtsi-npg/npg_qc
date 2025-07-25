@@ -53,30 +53,47 @@ sub _build__data4reporting {
     }
     my $id_run   = $component->id_run;
     my $position = $component->position;
-
-    my $rswh = $product_rs->search(
-      {
-       'me.id_run'    => $id_run,
-       'me.position'  => $position,
-       'me.tag_index' => {q[!=] => 0},
-       'iseq_flowcell.entity_type' => {q[-not_in] => [qw(library_control library_indexed_spike)]},
-       'iseq_flowcell.id_lims' => {q[-not_like] => 'C_GCLP%'},
-       'iseq_flowcell.entity_id_lims' => {q[!=] => undef},
-      },
-      {
-        'prefetch' => 'iseq_flowcell',
-        'order_by' => { -desc => 'me.tag_index' },
-      }
-    );
-
     my $lane_id;
-    while ( my $product_row = $rswh->next ) {
-      my $fc = $product_row->iseq_flowcell;
-      if( $fc ) {
-        $lane_id   = $fc->entity_id_lims;
-        last;
+
+    for my $prefix (qw/iseq eseq/) {
+
+      my $condition = {
+        'me.id_run'    => $id_run,
+        'me.tag_index' => {q[!=] => 0},
+      };
+      my $relation = "${prefix}_flowcell";
+
+      $condition->{$relation . q[.entity_type]} = {q[-not_in] =>
+        [qw(library_control library_indexed_spike)]};
+      $condition->{$relation . q[.entity_id_lims]} = {q[!=] => undef};
+      if ($prefix eq q[iseq]) {
+        $condition->{'me.position'} = $position;
+        $condition->{$relation . q[.id_lims]} = {q[-not_like] => 'C_GCLP%'};
+      } else {
+        $condition->{'me.lane'} = $position;
+        $condition->{'me.is_sequencing_control'} = 0;
+      }
+
+      my $rswh = $self->mlwh_schema->resultset(ucfirst($prefix) . 'ProductMetric')
+        ->search($condition, {
+          'prefetch' => $relation,
+          'order_by' => { -desc => 'me.tag_index' },
+        }
+      );
+
+      if ($rswh->count() == 0) {
+        next; # Nothing in Illumina data? Try Elembio.
+      }
+
+      while ( my $product_row = $rswh->next ) {
+        my $fc = $product_row->$relation;
+        if( $fc ) {
+          $lane_id   = $fc->entity_id_lims;
+          last;
+        }
       }
     }
+
     if ( !$lane_id )  {
       $self->_log(qq[No lane id for run $id_run lane $position]);
       next;
