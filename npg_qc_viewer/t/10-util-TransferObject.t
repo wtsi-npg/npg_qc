@@ -13,7 +13,6 @@ subtest 'LIMs data' => sub {
     id_library_lims   => '1235678:A2',
     entity_id_lims    => '123567X',
     legacy_library_id => 12345,
-    lims_live         => 1,
     num_cycles        => 33,
     sample_id         => 'S4567',
     sample_name       => 'sample 1',

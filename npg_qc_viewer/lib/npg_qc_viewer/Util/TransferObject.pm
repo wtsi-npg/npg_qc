@@ -164,18 +164,6 @@ has 'is_pool' => (
   required => 0,
 );
 
-=head2 lims_live
-
-Boolean flag, false if LIMs system for this entity is
-not available to link to.
-
-=cut
-has 'lims_live' => (
-  isa      => 'Bool',
-  is       => 'ro',
-  required => 0,
-);
-
 =head2 entity_id_lims
 
 LIMs identifier for this entity
@@ -259,7 +247,7 @@ Jaime Tovar Corona E<lt>jmtc@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Genome Research Ltd.
+Copyright (C) 2017, 2025 Genome Research Ltd.
 
 This file is part of NPG.
 

@@ -449,7 +449,7 @@ subtest 'Tag metrics as first check in summary table' =>  sub {
 };
 
 subtest 'R&D visual cue and links to LIMS' => sub {
-  plan tests => 4;
+  plan tests => 3;
 
   my $where = { 'iseq_product_metrics.id_run' => 4025, };
   $schemas->{'mlwh'}->resultset('IseqFlowcell')
@@ -463,7 +463,6 @@ subtest 'R&D visual cue and links to LIMS' => sub {
   my $url = q[http://localhost/checks/runs/4025];
   $mech->get_ok($url);
   $mech->content_contains('NT28560W'); #library name
-  $mech->content_contains('<a href="">random_sample_name</a></span><span class="watermark">R&amp;D</span>'); #GCLP (no link), R&D watermark
   $mech->content_contains('9286">random_sample_name</a></span><span class="watermark">R&amp;D</span>'); #link to a sample an d R&D watermark
 };
 
