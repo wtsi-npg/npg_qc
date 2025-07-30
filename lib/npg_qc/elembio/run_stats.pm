@@ -68,8 +68,10 @@ sub run_stats_from_json {
                 my $stats = npg_qc::elembio::barcode_stats->new(barcodes => $barcode);
                 $sample_obj->add_barcode($stats->barcode_string, $stats);
             }
-
-            $sample_lookup{$lane}->{$sample->{SampleName}} = $sample_obj;
+            # Samples may not be present in one lane or the other
+            if (%{$sample_obj->barcodes}) {
+                $sample_lookup{$lane}->{$sample->{SampleName}} = $sample_obj;
+            }
         }
     }
 
@@ -113,6 +115,7 @@ sub run_stats_from_json {
         # all lanes. Potentially multiple hits where many barcodes are used
         # for a single sample
         foreach my $lane (1..$lane_count) {
+            next if !exists $sample_lookup{$lane}->{$sample->{SampleName}};
             my $laned_sample = $sample_lookup{$lane}->{$sample->{SampleName}};
 
             foreach my $occurrence (grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}) {

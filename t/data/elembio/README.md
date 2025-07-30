@@ -14,6 +14,8 @@ editors.
 - 20250225_AV244103_NT1850075L_NT1850808B_repeat3 has the single indexed samples
   that appear in both lanes
 - 20250620_AV244103_NT1856569G has an R1 but no R2
+- 20250718_AV244103_NT1859538L_NT1859675T has two lanes with mostly differing samples
+  between them
 
 Corresponding manifest JSON files are also found there.
 

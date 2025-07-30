@@ -6,7 +6,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - Added reporting of MQC outcomes for Elembio lanes.
 
 release 74.3.0 (2025-07-22)
- - Changes to npg_qc::elembio::tag_metrics_generator 
+ - Changes to npg_qc::elembio::tag_metrics_generator
    - An Elembio lane might contain multiple libraries for the same
      sample. A tag index is assigned per sample, therefore multiple
      barcode sequences might correspond to the same tag index.
@@ -32,6 +32,7 @@ release 74.3.0 (2025-07-22)
      convert_run_stats_to_tag_metrics function more concise.
  - Ensured that computed polonies counts are integers. The float values are
    rounded down to the nearest integer.
+   - Bugfix for when a sample appears in only one lane.
  - Information about multiple tags per sample representation is added
    to the tag metrics SeqQC info section.
 
@@ -192,7 +193,7 @@ release 71.0.1
 
 release 71.0.0
  - Removed the plugin that enable to run the SeqQC server under the
-   daemon utility. 
+   daemon utility.
  - Updated SOP for changing QC outcomes
 
 release 70.3.0
@@ -218,7 +219,7 @@ release 70.0.1
 release 70.0.0
  - Add substitution metrics (CtoA) QC check
  - Added SS tag_sequence to reported matches
- 
+
 release 69.12.0
  - Removed an unused script - genotype_call_results_reporter.
  - Switched the QC outcomes reporter to retrieve LIMS server URL from
@@ -259,13 +260,13 @@ release 69.10.0
  - pulldown_metrics autoqc results - backward-compatible correct calculation
    of the number of purity filtered bases when using the latest Picard/GATK.
 
-release 69.9.0 
+release 69.9.0
  - Change database column type from unsigned int to insigned bigint
    for columns where we store number of reads and similar values and
    where we do not already set type to bigint. Some NovaSeq runs produce
    more data than we envisaged when these tables were set up.
  - Update pulldown_metrics autoqc check to use the up-to-date Picard
-   metrics via GATK, use CRAM files instead of BAM files as input.  
+   metrics via GATK, use CRAM files instead of BAM files as input.
  - Drop redundant tag_index column from the tag_metrics QC database
    table. The results of this QC check are always per lane. Only two
    distinct values in this culumn - NULL and -1, the latter from pre-
@@ -299,19 +300,19 @@ release 69.6.1
    only
 
 release 69.6.0
- - GbS Minor_v1.0 plex included in genotype data extracted from iRODS 
+ - GbS Minor_v1.0 plex included in genotype data extracted from iRODS
  - change the type of the stats column in the 'samtools_stats' table from
    'mediumglob' to 'longglob' to accommodate the ampliconstats data for
    384 samples
  - mqc skipper - no fast tracking if any of mqc_outcome values are
-   undefined in the review autoqc objects for a lane 
+   undefined in the review autoqc objects for a lane
 
 release 69.5.0
  - measures to speed-up generation of SeqQC pages:
    - add a prefetch for compositions and components when retrieving autoqc
      results from a database;
    - use in-line custom sort function instead of a closure for ref_match
-     result objects  
+     result objects
    - disable a check for circular references in serialization of autoqc
      result objects
 
@@ -322,7 +323,7 @@ release 69.3.0
  - mqc skipper - following a change in RoboQC creteria for real samples
    (artic QC pass requirement is dropped), add a threshold for the number
    of artic fails
- - add option to restrict to a single gbs_plex to genotype_call_results_reporter  
+ - add option to restrict to a single gbs_plex to genotype_call_results_reporter
 
 release 69.2.0
  - the mqc skipper script is changed to always take into account the outcome
@@ -358,7 +359,7 @@ release 68.9
    appliconstats index page for plots is added
  - deployment of the latest version of Catalyst, 5.90128, does not seem
    to include the Starman; the dependency was probably not explicit;
-   starman is added to the list of required packages in npg_qc_viewer/Build.PL 
+   starman is added to the list of required packages in npg_qc_viewer/Build.PL
 
 release 68.8.0
  - specialised generic check for ampliconstats
@@ -391,7 +392,7 @@ release 68.5.0
      uses sample control flags instead of sample
      supplier names to decide on the robo evaluation criteria and the
      proposed manual QC outcome;
-     evaluates positive controls in the same way as real samples 
+     evaluates positive controls in the same way as real samples
 
 release 68.4.0
  - npg_qc::autoqc::checks::generic and npg_qc::autoqc::results::generic -
@@ -416,7 +417,7 @@ release 68.2.1
  - allow the dot character in QC outcomes column values
 
 release 68.2.0
- - tweak for genome coverage figure in qc summary - fall back to target 
+ - tweak for genome coverage figure in qc summary - fall back to target
    if no default autosomes only number available.
  - a new script - npg_simple_robo4artic - to generate autoqc review
    results from third party QC data
@@ -455,7 +456,7 @@ release 68.0.0
  - retrieval of interop autoqc check results by SeqQC web app is
    currently supressed
  - division by zero bug fixed in npg_qc::autoqc::role::bam_flagstats
-   for cases when nothing mappes in target regions 
+   for cases when nothing mappes in target regions
 
 release 67.5.0
  - npg_qc::illumina::interop::parser - a stand-alone custom parser
@@ -529,7 +530,7 @@ release 66.2
    results to the db
  - ref match results sort order - make deterministic (important for consistency
    of data we load to the warehouse), also add a method to return top two results
- - fixes for composite genotype script following previous release 
+ - fixes for composite genotype script following previous release
 
 release 66.1.1
  - composite genotype check script (call_gtck_composite_rpt.pl) search
@@ -595,7 +596,7 @@ release 65.2
  - genotype check does not require the existence of irods: input_files
 
 release 65.1.1
- - explicitly use pre v6 bwa for rna_seqc rRNA alignment as input not name sorted 
+ - explicitly use pre v6 bwa for rna_seqc rRNA alignment as input not name sorted
    (tolerated in old version but not bwa0_6)
 
 release 65.1
@@ -649,12 +650,12 @@ release 64.6
  - remove unused methods of the run_graph Clearpress model
  - add new role for rna_seqc to implement ability to extract values from
    column other_metrics to be stored in ml warehouse database
- - changes for GbS genotype calling check 
+ - changes for GbS genotype calling check
  - tag_sniff
     handle separators in BC tags for dual-index runs
     allow dual-index runs to be revcomped independantly
     when tag has a separator -t option operates on subtags
-    allowed to ignore an index when the BC tag contains a separator 
+    allowed to ignore an index when the BC tag contains a separator
 
 release 64.5
  - qc outcomes model: code generalisation to simplify addition of
@@ -672,7 +673,7 @@ release 64.5
 release 64.4.1
  - fix bam_flagstats check library_size bug
 
-release 64.4 
+release 64.4
  - utility QC feature: db tables, DBIx classes, retrieval
  - Add STAR aligner bams as a valid RNA alignments
  - update bam_flagstats to be able run when no markdups metrics file exists
@@ -680,7 +681,7 @@ release 64.4
 release 64.3.1
  - error in a statement for data update is fixed
 
-release 64.3 
+release 64.3
  - DBIx schema loader script: automatically add npg_qc::Schema::Composition
  - drop unique consctraint for (id_run, position and tag_index) columns;
  - make a foreign key to seq_composition table not nullable and set
@@ -741,7 +742,7 @@ release 64.0
  - db query for tag_index NULL or NOT NULL: undef as a string
    might not give problems now, but will when all db records are
    linked to compositions
- - remove unused qc_chema property from TransferObjectFactory 
+ - remove unused qc_chema property from TransferObjectFactory
  - set explicit dist to precise in travis yml
  - simplify and optmise pool detection in the viewer
  - remove links to Clarity LIMs, generalise code for linking to LIMs
@@ -801,7 +802,7 @@ release 62.6
      npg_tracking::glossary::composition type object
  - db query for compisition-based tables should include a condition
      on tag_index if only lanes or plexes are being retrieved
- - Fix in npg_qc::utils::bam_genotype for rare out of order mpileup failures 
+ - Fix in npg_qc::utils::bam_genotype for rare out of order mpileup failures
  - Travis CI build: when building dependencies, us the same
    branch as the one the pull request is made to.
  - back to testing with mysql 5.7.13 in travis
@@ -851,7 +852,7 @@ release 62.0
      do not yet support compositions: convert undefined values
      for columns under a unique constraint to database defaults.
  - SeqQC - outdated template for split_stats removed
- - genotype role refactored to remove hardcoded uri encoding            
+ - genotype role refactored to remove hardcoded uri encoding
  - remove contamination check that is not run any longer,
    result object remains
  - to keep similar code together and to avoid listing explicitly
@@ -862,7 +863,7 @@ release 62.0
      - modify peak finding to allow for peaks in first/last bin
      - added monotonity condition when estimating stdev
      - drop stdev when outputting filtered modes
- 
+
 release 61.2
  - SeqQC:
    - Reintroduce collapser
@@ -894,7 +895,7 @@ release 61.0
    - upgrading qunit to 1.23.0 from 1.20.0
  - add unique db constraint for short descriptions in qc outcome
    dictionaries; the constraints should have been set when the tables
-   were created 
+   were created
 
 release 60.0
  - JSON service (retrieval) for qc outcomes
@@ -935,7 +936,7 @@ release 59.5
  - autoqc results db loader: an option to force a re-build of related objects
  - SeqQC
    - fix warning about undef value in the adapter template
-   - fix closing div tag in verify bam id template 
+   - fix closing div tag in verify bam id template
    - upgrading jquery to 2.1.4 from 2.0.3
    - upgrading requirejs to 2.1.20 from 2.1.8
    - upgrading qunit to 1.20.0 from 1.15.0
@@ -1000,13 +1001,13 @@ release 59.1
      remove separate sample column
    - fix missing composite genotype check visualisation broken when cleaning
      template for ml warehouse
-   - fix missing space between forward and reverse when reporting percent gc 
+   - fix missing space between forward and reverse when reporting percent gc
      fraction
  - genotype check data extraction scripts - updated scripts to fail more readily
     and informatively when an iRODS error occurs
 
 release 59.0
- - SeqQC 
+ - SeqQC
    - remove ajax proxy controller
    - stop 00 tests accessing live db credentials and databases
    - using mlwarehouse for dwh information displayed in SeqQC viewer
@@ -1026,7 +1027,7 @@ release 59.0
      - one call to compute all metrics
      - method for finding stats files
      - if id_run not given, derive the root of the output file name from
-       the input sequence file name 
+       the input sequence file name
 
 release 58.9
  - move method for file name creation from SeqQC to autoqc so that it's
@@ -1038,7 +1039,7 @@ release 58.9
 
 release 58.8
  - SeqQC
-     - display insert size normal fit confidence and number of modes in the 
+     - display insert size normal fit confidence and number of modes in the
        summary table
      - do not show adaptor plots for low contamination
      - provenance in lane title not in every check
@@ -1070,19 +1071,19 @@ release 58.5
  - using make_immutable in Moose objects
 
 release 58.4
- - Creating a cache in SeqStore model to reduce file system access. 
+ - Creating a cache in SeqStore model to reduce file system access.
     Improving query - using keys for tables.
  - Moving FileFinder functionality into SeqQC from seq_commons.
  - Cache of catalyst actions and uri in template.
  - Templates are configured to be checked for changes every 10 hours.
- - Connections to database for fastqcheck are passed to model from 
+ - Connections to database for fastqcheck are passed to model from
     template.
- - Test modules catch/test for warnings for unitilized ids and for 
+ - Test modules catch/test for warnings for unitilized ids and for
     cases where it was not possible to locate a folder.
 
 release 58.3.1
  - Updating Readme in npg_qc_viewer for changes in deploy procedure.
- - Fixing qXYield total for run and sample, now it calculates from actual values 
+ - Fixing qXYield total for run and sample, now it calculates from actual values
     in the table, does not recalculate from collection.
  - genotype check: reduce min_sample_call_rate parameter for genotype match from 95% to 75%, and
      min_common_snps from 21 to 20. This will allow (Fluidigm) qc genotypes with 20 calls to be
@@ -1121,7 +1122,7 @@ release 57.12
  - Adding a controller to provide MQC status for a run using REST
  - Adding a role to provide functionality for 401 responses
  - Validation for DWH->MQC outcome integrity during mqc for logged mqc-ing user
- - Fixing id-username data in test data to fix patches in controllers 
+ - Fixing id-username data in test data to fix patches in controllers
      which validate username
 
 release 57.11
@@ -1150,7 +1151,7 @@ release 57.9
     - use the new collection method to decide whether to display a link to
        plex results (previously warehouse data were used for this)
     - if plex results are available, always display a link to them
- - SeqQC - remove vestigial code for batch id retrieval 
+ - SeqQC - remove vestigial code for batch id retrieval
  - SeqQC build: remove --linkable-bcviz-path option since dependency on bcviz
    is now managed by bower
  - SeqQC: Ajax controller removed (was used as a proxy for now discontinued
@@ -1172,7 +1173,7 @@ release 57.8
 
 release 57.7
  - removed redundant methods from NpgDB model
- - New javascript functionality to process mqc. MQC outcomes are changed using AJAX 
+ - New javascript functionality to process mqc. MQC outcomes are changed using AJAX
    calls to the controller directly.
  - mqc controller now provides with the functionality for mqc through asynchronous calls.
  - mqc controller does not saves a log in the tracking database when mqc outcomes are
@@ -1233,8 +1234,8 @@ release 56.15
 
 release 56.14
  - updates to norm_fit code
-     more informative log messages 
-     added checks for zero peaks 
+     more informative log messages
+     added checks for zero peaks
      do not run norm_fit test if there is not enough variation in the insert size
 
 release 56.13
@@ -1252,7 +1253,7 @@ release 56.11
 release 56.10
  - support for search for autoqc objects without tag_index attrubute
  - Build.PL extended to compile and deploy norm_fit executable
- - only run verify_bam_id if single sample expected (helps cope with 
+ - only run verify_bam_id if single sample expected (helps cope with
    single plex in pool)
 
 release 56.9
@@ -1274,12 +1275,12 @@ release 56.6
 release 56.5
  - phix bam_flagstat to have default serialisation name including phix
 
-release 56.4 
+release 56.4
  - get cluster densities from InterOp/TileMetricsOut.bin
  - added test data for tracking database
 
-release 56.3 
- - added check for alignments, reference and library_type to can_run() 
+release 56.3
+ - added check for alignments, reference and library_type to can_run()
 
 release 56.2
  - relax regexp for class name in result role to allow git or svn version numbering
@@ -1303,12 +1304,12 @@ release 55.9
  - minor bug fix for verify_bam_id
 
 release 55.8
- - remove Fey modules from npg_qc::autoqc::db namespace, t/60-autoqc-db*.t tests 
+ - remove Fey modules from npg_qc::autoqc::db namespace, t/60-autoqc-db*.t tests
    and test data not used elsewhere
  - qc_db_delete_autoqc script:
      updated help message
      fix for a bug that resulted in no data deleted unless a list of checks to
-       delete was given explicitly 
+       delete was given explicitly
 
 release 55.7
  - tag sniff usage message
@@ -1456,7 +1457,7 @@ release 53.0
  - unused code removed from test util module, test api util module removed
 
 release 52.7
- - pulldown_metrics: error message fix and criterion description addition 
+ - pulldown_metrics: error message fix and criterion description addition
 
 release 52.6
  - dbix binding updated
@@ -1601,7 +1602,7 @@ release 49.1
 
 release 49.0
  - tile visualization tool
- 
+
 release 48.9
  - get paired_read information from runfolder before using npg api in insert_size check
 
@@ -1680,7 +1681,7 @@ release 43.4
 
 release 43.3
  - genotype check changes:
-     check now copes when illegal allele for SNP is called in genotype from bam 
+     check now copes when illegal allele for SNP is called in genotype from bam
      locations of data and executables adjusted to standard location
      calling of genotypes moved from stand-alone script to bam_genotypes module which is used by the check
      attributes added to check to allow adjustment of parameters for finding genotype matches
@@ -1743,7 +1744,7 @@ release 40.1
 
 release 40.0
  - add genotype check
- 
+
 release 39.6
  - cope with miseq qc data loading
 
@@ -1767,7 +1768,7 @@ release 39.0
  - autoqc modules refactored to use the new single point lims interface
 
 release 38.1
- - bugfix - N's should only be counted when the base they represent aligns, but is a mismatch or softclip, not when it is an insertion/deletion 
+ - bugfix - N's should only be counted when the base they represent aligns, but is a mismatch or softclip, not when it is an insertion/deletion
 
 release 38.0
  - the concept of the tmp_path for autoqc checks simplifies: just a temp dir by default
@@ -1832,7 +1833,7 @@ release  34.2
    to the consuming code - no saving to temp files
 
 release  34.1
- - add number of total reads in bam flag stats result and table 
+ - add number of total reads in bam flag stats result and table
 
 release 34.0
  - tests for ref_match
