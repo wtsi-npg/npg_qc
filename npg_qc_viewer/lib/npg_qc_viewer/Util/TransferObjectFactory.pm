@@ -33,7 +33,7 @@ A factory to generate npg_qc_viewer::Util::TransferObject objects.
 
 =cut
 has 'product_metrics_row'    => (
-  isa      => 'WTSI::DNAP::Warehouse::Schema::Result::IseqProductMetric',
+  isa      => 'DBIx::Class::Row',
   is       => 'ro',
   required => 1,
 );
@@ -61,6 +61,19 @@ has 'not_qcable'    => (
   isa      => 'Bool',
   is       => 'ro',
 );
+
+has '_table_name_prefix' => (
+  isa        => 'Str',
+  is         => 'ro',
+  lazy_build => 1,
+);
+sub _build__table_name_prefix {
+  my $self = shift;
+  my $name = $self->product_metrics_row()->result_source()->name();
+  # $name is the name of the table, for example iseq_product_metrics
+  my ($prefix) = $name =~ /(\A[[:lower:]]+)_/xms;
+  return $prefix;
+}
 
 =head2 BUILD
 
@@ -91,7 +104,8 @@ sub _add_npg_data {
   my $product_metric = $self->product_metrics_row();
   my $init_values = {};
   $init_values->{'id_run'}         = $product_metric->id_run;
-  $init_values->{'position'}       = $product_metric->position;
+  $init_values->{'position'}       = ($self->_table_name_prefix eq 'iseq') ?
+    $product_metric->position : $product_metric->lane;
   $init_values->{'num_cycles'}     = $product_metric->iseq_run_lane_metric->cycles;
   $init_values->{'time_comp'}      = $product_metric->iseq_run_lane_metric->run_complete;
   if ($self->is_plex) {
@@ -105,27 +119,38 @@ sub _add_npg_data {
 sub _add_lims_data {
   my ($self, $init_values) = @_;
 
-  my $flowcell = $self->product_metrics_row->iseq_flowcell;
+  my $illumina_platform_flag = $self->_table_name_prefix eq 'iseq';
+
+  my $flowcell_rel = $self->_table_name_prefix . '_flowcell';
+  my $flowcell = $self->product_metrics_row->$flowcell_rel;
   $init_values ||= {};
   $init_values->{'is_pool'}          = $self->is_pool;
   $init_values->{'is_control'}       = 0;
   $init_values->{'rnd'}              = 0;
 
+  if ( !$illumina_platform_flag ) {
+    $init_values->{'is_control'} =
+      $self->product_metrics_row->is_sequencing_control;
+    $init_values->{'sample_name'} =
+      $self->product_metrics_row->elembio_sample_name;
+  }
+
   if ( defined $flowcell ) {
+    if ( $illumina_platform_flag ) {
+      $init_values->{'legacy_library_id'} = $flowcell->legacy_library_id;
+      $init_values->{'rnd'} = $flowcell->is_r_and_d ? 1 : 0;
+      $init_values->{'is_control'} = $flowcell->is_control ? 1 : 0;
+    }
 
-    $init_values->{'legacy_library_id'} = $flowcell->legacy_library_id;
-    $init_values->{'rnd'}               = $flowcell->is_r_and_d ? 1 : 0;
-    $init_values->{'is_control'}        = $flowcell->is_control ? 1 : 0;
-    $init_values->{'entity_id_lims'}    = $flowcell->entity_id_lims;
+    $init_values->{'entity_id_lims'} = $flowcell->entity_id_lims;
+    $init_values->{'id_library_lims'} = $self->is_pool ?
+      $flowcell->id_pool_lims : $flowcell->id_library_lims;
 
-    if ($self->is_pool) {
-      $init_values->{'id_library_lims'} = $flowcell->id_pool_lims;
-    } else {
+    if ( !$self->is_pool ) {
       for my $attr (qw/ study_name
                         sample_id
                         sample_name
                         sample_supplier_name
-                        id_library_lims
                       /) {
         $init_values->{$attr} = $flowcell->$attr;
       }

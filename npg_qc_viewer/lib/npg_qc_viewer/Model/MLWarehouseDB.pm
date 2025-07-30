@@ -39,39 +39,58 @@ __PACKAGE__->config(
 
 =head2 search_product_metrics
 
-Search product metrics by id_run and, optionally, position and tag_index.
-Cache option is enabled.
+Searches both Illumina and Elembio MLWH product metrics tables by id_run
+and, optionally, position and tag_index. Cache option is enabled.
+
+Returns a hash reference with two resultsets. The resultsset for Illumina
+data is under C<iseq> key, the resultset for Elembio data is under the
+C<eseq> key. Either of the resultsets can have zero rows.
+
+Since the query have details for multiple runs, a search of both Illumina
+and Elembio data is performed.
 
   my $param = {'id_run' => 22, 'position' => 3};
-  my $resultset = $model->search_product_metrics($param);
+  my $resultsets = $model->search_product_metrics($param);
 
   my $param = {'id_run' => 22, 'position' => 3, 'tag_index' => 5};
-  my $resultset = $model->search_product_metrics($param);
+  my $resultsets = $model->search_product_metrics($param);
 
 =cut
-sub search_product_metrics {
-  my ($self, $run_details) = @_;
 
-  if(!defined $run_details){
+sub search_product_metrics {
+  my ($self, $query) = @_;
+
+  if(!defined $query){
     croak q[Conditions were not provided for search];
   }
-  if(!$run_details->{'id_run'}) {
+  if(!$query->{'id_run'}) {
     croak q[Run id needed];
   }
 
-  my $where = {};
-  foreach my $key (keys %{$run_details}) {
-    $where->{q[me.] . $key} = $run_details->{$key};
+  my $rss = {};
+
+  for my $prefix (qw/iseq eseq/) {
+
+    my %where = map { 'me.' . $_ => $query->{$_} } keys %{$query};
+    my @order_by = qw/ me.id_run me.position me.tag_index /;
+
+    if ($prefix eq 'eseq') {
+      @order_by = qw/ me.id_run me.lane me.tag_index /;
+      if ( exists $where{'me.position'} ) {
+        $where{'me.lane'} = delete $where{'me.position'};
+      }
+    }
+
+    $rss->{$prefix} = $self->resultset(ucfirst($prefix) . 'ProductMetric')->search(
+      \%where, {
+        'prefetch' => [$prefix . '_run_lane_metric', {$prefix . '_flowcell' => ['study', 'sample']}],
+        'order_by' =>  \@order_by,
+        'cache'    => 1,
+      }
+    );
   }
 
-  my $rs = $self->resultset('IseqProductMetric')->search(
-        $where, {
-        'prefetch' => ['iseq_run_lane_metric', {'iseq_flowcell' => ['study', 'sample']}],
-        'order_by' => [qw/ me.id_run me.position me.tag_index /],
-        'cache'    => 1,
-                });
-
-  return $rs;
+  return $rss;
 }
 
 =head2 search_product_by_id_library_lims
@@ -79,6 +98,7 @@ sub search_product_metrics {
 Search product id library lims.
 
 =cut
+
 sub search_product_by_id_library_lims {
   my ($self, $id_library_lims) = @_;
 
@@ -96,6 +116,7 @@ sub search_product_by_id_library_lims {
 Search for product by id pool lims.
 
 =cut
+
 sub search_product_by_id_pool_lims {
   my ($self, $id_pool_lims) = @_;
 
@@ -113,6 +134,7 @@ sub search_product_by_id_pool_lims {
 Search product by id sample lims
 
 =cut
+
 sub search_product_by_sample_id {
   my ($self, $id_sample_lims) = @_;
 
@@ -147,6 +169,7 @@ sub _search_product_by_child_id {
 Search sample by id sample lims
 
 =cut
+
 sub search_sample_by_sample_id {
   my ($self, $id_sample_lims) = @_;
 
@@ -167,11 +190,13 @@ sub search_sample_by_sample_id {
 
 =head2 tags4lane
 
-An array of tag indexes that are subject to qc is returned.
+An array of tag indexes that are subject to QC is returned. This method is
+specific to Illumina platform.
 
   $model->tags4lane({'id_run' => 4, 'position' => 4});
 
 =cut
+
 sub tags4lane {
   my ($self, $lane_hash) = @_;
 
@@ -246,7 +271,7 @@ David Jackson
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Genome Research Ltd.
+Copyright (C) 2018, 2025 Genome Research Ltd.
 
 This file is part of NPG software.
 
