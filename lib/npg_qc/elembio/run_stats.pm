@@ -53,14 +53,17 @@ sub run_stats_from_json {
     # later on. The safest way to get the barcodes is via manifest.
     my %sample_lookup;
     foreach my $sample (@{$manifest->{Samples}}) {
-        foreach my $lane (1..$lane_count) {
+        my $per_lane_indexes = {};
+        foreach my $index_definition (@{ $sample->{Indexes} }) {
+            push @{$per_lane_indexes->{$index_definition->{Lane}}}, $index_definition;
+        }
+        foreach my $lane (keys %{$per_lane_indexes}) {
             my $sample_obj = npg_qc::elembio::sample_stats->new(
                 sample_name => $sample->{SampleName},
                 tag_index => int($sample->{SampleNumber}),
                 lane => $lane,
             );
-            my (@tags_in_lane) = grep { $_->{Lane} == $lane } @{ $sample->{Indexes} };
-            for my $tag (@tags_in_lane) {
+            for my $tag ( @{$per_lane_indexes->{$lane}} ) {
                 my $barcode = [$tag->{Index1}];
                 if ($tag->{Index2}) {
                     push @{$barcode}, $tag->{Index2};
@@ -84,12 +87,14 @@ sub run_stats_from_json {
     if (scalar @read_two_data > 0) {
         $run_stats->r2_cycle_count(int($read_two_data[0]->{MeanReadLength}));
     }
+
     # Add lane stats to the runstats object
     foreach my $lane (@{$data->{Lanes}}) {
         # We get a false Lane 2 when a 300 cycle run is configured
         # This can only be determined from the original manifest
-        next if $lane->{Lane} > $lane_count;
         my $lane_number = $lane->{Lane};
+        next if $lane_number > $lane_count;
+
         $run_stats->set_lane(
             $lane_number,
             npg_qc::elembio::lane_stats->new(
@@ -114,6 +119,7 @@ sub run_stats_from_json {
         # for a single sample
         foreach my $lane (1..$lane_count) {
             my $laned_sample = $sample_lookup{$lane}->{$sample->{SampleName}};
+            $laned_sample or next;
 
             foreach my $occurrence (grep { $_->{Lane} eq $lane } @{$sample->{Occurrences}}) {
                 # 1+2 300 cycle run appears in stats as lane 2 being full of nulls
