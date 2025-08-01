@@ -12,6 +12,7 @@ bin/npg_qc_autoqc_data.pl
 bin/npg_qc_tag_sniff.pl
 bin/npg_substitution_metrics.pl
 bin/call_gtck_composite_rpt.pl
+bin/elembio_runstats_parser.pl
 Build.PL
 Changes
 lib/npg_qc/illumina/interop/parser.pm
@@ -107,6 +108,11 @@ lib/npg_qc/autoqc/role/tags_reporters.pm
 lib/npg_qc/autoqc/role/upstream_tags.pm
 lib/npg_qc/autoqc/role/verify_bam_id.pm
 lib/npg_qc/autoqc/types.pm
+lib/npg_qc/elembio/barcode_stats.pm
+lib/npg_qc/elembio/lane_stats.pm
+lib/npg_qc/elembio/run_stats.pm
+lib/npg_qc/elembio/sample_stats.pm
+lib/npg_qc/elembio/tag_metrics_generator.pm
 lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/skipper.pm
 lib/npg_qc/mqc/outcomes.pm
@@ -176,6 +182,7 @@ t/00-pod.t
 t/00-scripts_compile.t
 t/10-autoqc-parse-samtools_stats.t
 t/30-illumina-interop-parser.t
+t/30-elembio-runstats.t
 t/50-npg_qc-Schema.t
 t/50-schema-result-Contamination.t
 t/50-schema-result-InsertSize.t
@@ -612,6 +619,8 @@ t/data/elembio/20250620_AV244103_NT1856569G/RunManifest.json
 t/data/elembio/20250620_AV244103_NT1856569G/slim_RunStats.json
 t/data/elembio/20250401_AV244103_NT1853579T/slim_20250401_AV244103_NT1853579T.json
 t/data/elembio/20250401_AV244103_NT1853579T/RunManifest.json
+t/data/elembio/20250625_AV244103_NT1857425S/RunManifest.json
+t/data/elembio/20250625_AV244103_NT1857425S/slim_RunStats.json
 t/data/fixtures/000-mqc_outcome_dict.yml
 t/data/fixtures/000-mqc_library_outcome_dict.yml
 t/data/fixtures/000-uqc_outcome_dict.yml

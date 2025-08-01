@@ -187,5 +187,29 @@ use_ok('npg_qc::elembio::run_stats');
     cmp_ok($total_samples, '==', 516, 'Some samples are in both lanes');
 }
 
+{
+    # Test the transformation to tag_metrics for a two-lane run with the same
+    # one-library pool in each lane.
+    my $manifest = 't/data/elembio/20250625_AV244103_NT1857425S/RunManifest.json';
+    my $stats_file = 't/data/elembio/20250625_AV244103_NT1857425S/slim_RunStats.json';
+    my $lane_count = 2;
+
+    my $stats = npg_qc::elembio::run_stats::run_stats_from_file($manifest, $stats_file, $lane_count);
+
+    my @metrics = convert_run_stats_to_tag_metrics($stats, '12345');
+
+    cmp_ok(scalar @metrics, '==', 2, 'Two lanes, two tag_metrics objects');
+    my $expected = {
+        "0" => "NNNNNNNNNN-NNNNNNNNNN",
+        "1" => "ATGTCGCTAG-CTAGCTCGTA(CTRL)",
+        "2" =>  "CACAGATCGT-ACGAGAGTCT(CTRL)",
+        "3" =>  "GCACATAGTC-GACTACTAGC(CTRL)",
+        "4" =>  "TGTGTCGACA-TGTCTGACAG(CTRL)",
+        "5" =>  "GTCACGGGTG-TGTTATCGTT"
+    };
+    for my $m (@metrics) {
+        is_deeply($m->tags(), $expected, 'Sample 5 is in both lanes');
+    }
+}
 
 done_testing();

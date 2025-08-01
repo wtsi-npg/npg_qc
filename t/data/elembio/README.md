@@ -16,6 +16,8 @@ editors.
 - 20250620_AV244103_NT1856569G has an R1 but no R2
 - 20250718_AV244103_NT1859538L_NT1859675T has two lanes with mostly differing samples
   between them
+- 20250625_AV244103_NT1857425S a two-lane run with one-library the same pool
+  in each lane
 
 Corresponding manifest JSON files are also found there.
 
