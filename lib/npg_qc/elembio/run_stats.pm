@@ -90,8 +90,6 @@ sub run_stats_from_json {
 
     # Add lane stats to the runstats object
     foreach my $lane (@{$data->{Lanes}}) {
-        # We get a false Lane 2 when a 300 cycle run is configured
-        # This can only be determined from the original manifest
         my $lane_number = $lane->{Lane};
         next if $lane_number > $lane_count;
 
@@ -209,10 +207,20 @@ by their lane numbers.
 =head2 run_stats_from_file
 
 Accepts two filenames, one for RunStats.json and one for RunManifest.json.
-It also requires a number of lanes to expect, which can be inferred from
-the manifest, or by using Monitor::Elembio::RunFolder->lane_count.
-It then creates and returns a C<npg_qc::elembio::run_stats> instance populated
-with the information found in those files.
+It also requires a number of lanes which were actually sequenced.
+
+The method creates and returns a C<npg_qc::elembio::run_stats> instance
+populated with the information found in those files.
+
+Attempts to infer the actual number of lanes from RunManifest.json were
+unsuccessful. The content of RunManifest.json reflects RunManifest.csv.
+The latter is supplied by the users. This file might list samples as being
+present in two lanes while sequencing of only one lane would be performed.
+Elembio deplexer is tolerant of this, but the correct data extraction from
+RunStats.json in this case is impossible without knowing the actual number of
+sequenced lanes. The actual number of lanes is accurately recorded in
+RunParameters.json. Parsing RunParameters.json is outside the scope of this
+method.
 
 =head2 run_stats_from_json
 
