@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use List::Util qw/sum/;
+use List::Util qw/sum uniq/;
 use Test::More;
 use Test::Exception;
 use npg_qc::elembio::tag_metrics_generator qw/convert_run_stats_to_tag_metrics/;
@@ -170,5 +170,46 @@ use_ok('npg_qc::elembio::run_stats');
     ok(!$stats->r2_cycle_count, 'R2 not defined');
 }
 
+{
+    # Check success when dealing with a two-lane run with differing samples
+    # in each lane
+    my $manifest = 't/data/elembio/20250718_AV244103_NT1859538L_NT1859675T/RunManifest.json';
+    my $stats_file = 't/data/elembio/20250718_AV244103_NT1859538L_NT1859675T/slim_RunStats.json';
+    my $lane_count = 2;
+
+    my $stats = npg_qc::elembio::run_stats::run_stats_from_file($manifest, $stats_file, $lane_count);
+    ok($stats, 'Diverse samples across both lanes');
+    my @lane_1_samples = $stats->lanes->{1}->all_samples;
+    my @lane_2_samples = $stats->lanes->{2}->all_samples;
+    cmp_ok(@lane_1_samples, '==', 283);
+    cmp_ok(@lane_2_samples, '==', 237);
+    my $total_samples = uniq map {$_->sample_name} @lane_1_samples, @lane_2_samples;
+    cmp_ok($total_samples, '==', 516, 'Some samples are in both lanes');
+}
+
+{
+    # Test the transformation to tag_metrics for a two-lane run with the same
+    # one-library pool in each lane.
+    my $manifest = 't/data/elembio/20250625_AV244103_NT1857425S/RunManifest.json';
+    my $stats_file = 't/data/elembio/20250625_AV244103_NT1857425S/slim_RunStats.json';
+    my $lane_count = 2;
+
+    my $stats = npg_qc::elembio::run_stats::run_stats_from_file($manifest, $stats_file, $lane_count);
+
+    my @metrics = convert_run_stats_to_tag_metrics($stats, '12345');
+
+    cmp_ok(scalar @metrics, '==', 2, 'Two lanes, two tag_metrics objects');
+    my $expected = {
+        "0" => "NNNNNNNNNN-NNNNNNNNNN",
+        "1" => "ATGTCGCTAG-CTAGCTCGTA(CTRL)",
+        "2" =>  "CACAGATCGT-ACGAGAGTCT(CTRL)",
+        "3" =>  "GCACATAGTC-GACTACTAGC(CTRL)",
+        "4" =>  "TGTGTCGACA-TGTCTGACAG(CTRL)",
+        "5" =>  "GTCACGGGTG-TGTTATCGTT"
+    };
+    for my $m (@metrics) {
+        is_deeply($m->tags(), $expected, 'Sample 5 is in both lanes');
+    }
+}
 
 done_testing();

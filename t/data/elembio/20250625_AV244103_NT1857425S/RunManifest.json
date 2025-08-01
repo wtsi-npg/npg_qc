@@ -1,0 +1,508 @@
+{
+    "RunValues": {},
+    "Settings": [
+        {
+            "Lane": 1,
+            "I1MismatchThreshold": 1,
+            "I2MismatchThreshold": 1,
+            "R1Adapter": [
+                "AAAAAAAAAAAAAAAAAAA"
+            ],
+            "R2Adapter": [
+                "TTTTTTTTTTTTTTTTTTT"
+            ],
+            "I1MaskManifest": "I1:Y*",
+            "I1Mask": [
+                {
+                    "Read": "I1",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10
+                    ]
+                }
+            ],
+            "I1FastQ": false,
+            "I2MaskManifest": "I2:Y*",
+            "I2Mask": [
+                {
+                    "Read": "I2",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10
+                    ]
+                }
+            ],
+            "I2FastQ": false,
+            "UmiMaskManifest": "I1:N*",
+            "UmiMask": [
+                {
+                    "Read": "I1",
+                    "Cycles": []
+                }
+            ],
+            "UmiFastQ": false,
+            "R1FastQMaskManifest": "R1:Y*N",
+            "R1FastQMask": [
+                {
+                    "Read": "R1",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28
+                    ]
+                }
+            ],
+            "R2FastQMaskManifest": "R2:Y*N",
+            "R2FastQMask": [
+                {
+                    "Read": "R2",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28,
+                        29,
+                        30,
+                        31,
+                        32,
+                        33,
+                        34,
+                        35,
+                        36,
+                        37,
+                        38,
+                        39,
+                        40,
+                        41,
+                        42,
+                        43,
+                        44,
+                        45,
+                        46,
+                        47,
+                        48,
+                        49,
+                        50,
+                        51,
+                        52,
+                        53,
+                        54,
+                        55,
+                        56,
+                        57,
+                        58,
+                        59,
+                        60,
+                        61,
+                        62,
+                        63,
+                        64,
+                        65,
+                        66,
+                        67,
+                        68,
+                        69,
+                        70,
+                        71,
+                        72,
+                        73,
+                        74,
+                        75,
+                        76,
+                        77,
+                        78,
+                        79,
+                        80,
+                        81,
+                        82,
+                        83,
+                        84,
+                        85,
+                        86,
+                        87,
+                        88,
+                        89,
+                        90
+                    ]
+                }
+            ],
+            "SpikeInAsUnassigned": false,
+            "R1AdapterTrim": false,
+            "R2AdapterTrim": false,
+            "R1AdapterNMask": false,
+            "R2AdapterNMask": false,
+            "R1AdapterMinimumTrimmedLength": 16,
+            "R2AdapterMinimumTrimmedLength": 16,
+            "R1AdapterMinimumStringency": 0.9,
+            "R2AdapterMinimumStringency": 0.9,
+            "R1AdapterMinimumOverlap": 3,
+            "R2AdapterMinimumOverlap": 3,
+            "AdapterTrimType": "Paired-End"
+        },
+        {
+            "Lane": 2,
+            "I1MismatchThreshold": 1,
+            "I2MismatchThreshold": 1,
+            "R1Adapter": [
+                "AAAAAAAAAAAAAAAAAAA"
+            ],
+            "R2Adapter": [
+                "TTTTTTTTTTTTTTTTTTT"
+            ],
+            "I1MaskManifest": "I1:Y*",
+            "I1Mask": [
+                {
+                    "Read": "I1",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10
+                    ]
+                }
+            ],
+            "I1FastQ": false,
+            "I2MaskManifest": "I2:Y*",
+            "I2Mask": [
+                {
+                    "Read": "I2",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10
+                    ]
+                }
+            ],
+            "I2FastQ": false,
+            "UmiMaskManifest": "I1:N*",
+            "UmiMask": [
+                {
+                    "Read": "I1",
+                    "Cycles": []
+                }
+            ],
+            "UmiFastQ": false,
+            "R1FastQMaskManifest": "R1:Y*N",
+            "R1FastQMask": [
+                {
+                    "Read": "R1",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28
+                    ]
+                }
+            ],
+            "R2FastQMaskManifest": "R2:Y*N",
+            "R2FastQMask": [
+                {
+                    "Read": "R2",
+                    "Cycles": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28,
+                        29,
+                        30,
+                        31,
+                        32,
+                        33,
+                        34,
+                        35,
+                        36,
+                        37,
+                        38,
+                        39,
+                        40,
+                        41,
+                        42,
+                        43,
+                        44,
+                        45,
+                        46,
+                        47,
+                        48,
+                        49,
+                        50,
+                        51,
+                        52,
+                        53,
+                        54,
+                        55,
+                        56,
+                        57,
+                        58,
+                        59,
+                        60,
+                        61,
+                        62,
+                        63,
+                        64,
+                        65,
+                        66,
+                        67,
+                        68,
+                        69,
+                        70,
+                        71,
+                        72,
+                        73,
+                        74,
+                        75,
+                        76,
+                        77,
+                        78,
+                        79,
+                        80,
+                        81,
+                        82,
+                        83,
+                        84,
+                        85,
+                        86,
+                        87,
+                        88,
+                        89,
+                        90
+                    ]
+                }
+            ],
+            "SpikeInAsUnassigned": false,
+            "R1AdapterTrim": false,
+            "R2AdapterTrim": false,
+            "R1AdapterNMask": false,
+            "R2AdapterNMask": false,
+            "R1AdapterMinimumTrimmedLength": 16,
+            "R2AdapterMinimumTrimmedLength": 16,
+            "R1AdapterMinimumStringency": 0.9,
+            "R2AdapterMinimumStringency": 0.9,
+            "R1AdapterMinimumOverlap": 3,
+            "R2AdapterMinimumOverlap": 3,
+            "AdapterTrimType": "Paired-End"
+        }
+    ],
+    "Samples": [
+        {
+            "SampleName": "Adept_CB1",
+            "SampleNumber": 1,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "ATGTCGCTAG",
+                    "Index2": "CTAGCTCGTA"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "ATGTCGCTAG",
+                    "Index2": "CTAGCTCGTA"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "Adept_CB2",
+            "SampleNumber": 2,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "CACAGATCGT",
+                    "Index2": "ACGAGAGTCT"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "CACAGATCGT",
+                    "Index2": "ACGAGAGTCT"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "Adept_CB3",
+            "SampleNumber": 3,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GCACATAGTC",
+                    "Index2": "GACTACTAGC"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GCACATAGTC",
+                    "Index2": "GACTACTAGC"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "Adept_CB4",
+            "SampleNumber": 4,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "TGTGTCGACA",
+                    "Index2": "TGTCTGACAG"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "TGTGTCGACA",
+                    "Index2": "TGTCTGACAG"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        },
+        {
+            "SampleName": "40xPLP_11C",
+            "SampleNumber": 5,
+            "ExternalId": "",
+            "Indexes": [
+                {
+                    "Lane": 1,
+                    "Index1": "GTCACGGGTG",
+                    "Index2": "TGTTATCGTT"
+                },
+                {
+                    "Lane": 2,
+                    "Index1": "GTCACGGGTG",
+                    "Index2": "TGTTATCGTT"
+                }
+            ],
+            "CustomMetadata": {},
+            "Project": "DefaultProject"
+        }
+    ]
+}
