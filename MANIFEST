@@ -602,6 +602,16 @@ t/data/autoqc/tag_sets/sanger168_6.tags
 t/data/autoqc/tag_sets/sanger168_7.tags
 t/data/autoqc/verify_bam_id/19999_2#1.verify_bam_id.json
 t/data/autoqc/verify_bam_id/20000_1#2.verify_bam_id.json
+t/data/elembio/20250225_AV244103_NT1850075L_NT1850808B_repeat3/RunManifest.json
+t/data/elembio/20250225_AV244103_NT1850075L_NT1850808B_repeat3/slim_20250225_AV244103_NT1850075L_NT1850808B_repeat3.json
+t/data/elembio/20250718_AV244103_NT1859538L_NT1859675T/RunManifest.json
+t/data/elembio/20250718_AV244103_NT1859538L_NT1859675T/slim_RunStats.json
+t/data/elembio/20240416_AV234003_16AprilSGEB2_2x300_NT1799722A/RunManifest.json
+t/data/elembio/20240416_AV234003_16AprilSGEB2_2x300_NT1799722A/slim_20240416_AV234003_16AprilSGEB2_2x300_NT1799722A.json
+t/data/elembio/20250620_AV244103_NT1856569G/RunManifest.json
+t/data/elembio/20250620_AV244103_NT1856569G/slim_RunStats.json
+t/data/elembio/20250401_AV244103_NT1853579T/slim_20250401_AV244103_NT1853579T.json
+t/data/elembio/20250401_AV244103_NT1853579T/RunManifest.json
 t/data/fixtures/000-mqc_outcome_dict.yml
 t/data/fixtures/000-mqc_library_outcome_dict.yml
 t/data/fixtures/000-uqc_outcome_dict.yml
