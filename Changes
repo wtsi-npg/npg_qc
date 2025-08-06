@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 74.4.0 (2025-08-06)
  - Dropped special SeqQC provisions for GCLP runs. The fact that the pages
    will have links to non-existing Sequencescape LIMS entities does not
    matter (lab work went though now decommissioned LIMS).
