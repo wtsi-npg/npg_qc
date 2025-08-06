@@ -1,5 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 74.4.0 (2025-08-06)
+ - Dropped special SeqQC provisions for GCLP runs. The fact that the pages
+   will have links to non-existing Sequencescape LIMS entities does not
+   matter (lab work went though now decommissioned LIMS).
+ - Added reporting of MQC outcomes for Elembio lanes.
+ - Bugfix in parsing Elembio RunManifest.json when different samples are
+   sequenced in two lanes of the same run.
+
 release 74.3.0 (2025-07-22)
  - Changes to npg_qc::elembio::tag_metrics_generator 
    - An Elembio lane might contain multiple libraries for the same

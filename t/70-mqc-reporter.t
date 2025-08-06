@@ -1,14 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
 use LWP::UserAgent;
 use HTTP::Response;
 use npg_testing::db;
-
-local $ENV{NPG_WEBSERVICE_CACHE_DIR} = 't/data/reporter';
 
 *LWP::UserAgent::request = *main::post_nowhere;
 sub post_nowhere {
@@ -87,7 +85,7 @@ subtest 'Initial' => sub {
      config_file => $config_file
   );
   throws_ok { $reporter->lims_url } qr/LIMS server url is not defined/,
-    'error when LIMS server url is not defined in teh config file';
+    'error when LIMS server url is not defined in the config file';
 };
 
 subtest 'Succesfully posting report for 3 lanes' => sub {
@@ -172,6 +170,43 @@ subtest 'Not reporting, individual cases' => sub {
     qr/DRY RUN: .*: No lane id for run 6600 lane 6/,],
     'Warning about absence of lane id is logged';
   ok(!$row->reported, 'row for run 6600 position 6 reported time not set');
+};
+
+subtest 'Testing reporting QC outcomes for Elembio runs' => sub {
+  plan tests => 14;
+
+  # Elembio runs are marked as reported in fixtures.
+  # Run 50544, lane 1 - passed, lane 2 - failed, product data linked to KIMS data
+  # Run 50545, lane1 - passed, no LIMS data
+
+  $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run => [50544, 50545]})
+    ->update({reported => undef});
+
+  my @elembio_pairs = ([50544,1], [50544,2], [50545,1]);
+  
+  my $reporter = npg_qc::mqc::reporter->new(
+    qc_schema   => $npg_qc_schema,
+    mlwh_schema => $mlwh_schema,
+    verbose     => 1,
+    config_file => $config_file
+  );
+
+  foreach my $p (@elembio_pairs) {
+    ok (!_get_data($npg_qc_schema, $p, 'reported'),
+      "reporting time is not set for Elembio run $p->[0] lane $p->[1]");
+    ok (!_get_data($npg_qc_schema, $p, 'modified_by'),
+      "modified_by field is not set for Elembio run $p->[0] lane $p->[1]");
+  }
+  $reporter->load();
+  foreach my $p (($elembio_pairs[0], $elembio_pairs[1])) {
+    ok (_get_data($npg_qc_schema, $p, 'reported'),
+      "reporting time is set for Elembio run $p->[0] lane $p->[1]");
+    is (_get_data($npg_qc_schema, $p, 'username'), 'cat', 'original username');
+    ok (_get_data($npg_qc_schema, $p, 'modified_by'), 'modified_by field is set');
+  }
+  ok (!_get_data($npg_qc_schema, $elembio_pairs[2], 'reported'),
+    'reporting time is not set for run 50545 lane 1');
+  ok (!_get_data($npg_qc_schema, $elembio_pairs[2], 'modified_by'), 'modified_by field is not set');
 };
 
 *LWP::UserAgent::request = *main::postfail_nowhere;

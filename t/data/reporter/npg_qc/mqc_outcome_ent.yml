@@ -55,4 +55,24 @@
   id_mqc_outcome: 3
   username: cat
   id_seq_composition: 9
-
+- id_mqc_outcome_ent: 10 
+  id_run: 50544
+  position: 1
+  id_mqc_outcome: 3
+  username: cat
+  id_seq_composition: 10
+  reported: 2026-06-12 12:01:11
+- id_mqc_outcome_ent: 11
+  id_run: 50544
+  position: 2
+  id_mqc_outcome: 4
+  username: cat
+  id_seq_composition: 11
+  reported: 2026-06-12 13:04:51
+- id_mqc_outcome_ent: 12
+  id_run: 50545
+  position: 1
+  id_mqc_outcome: 3
+  username: cat
+  id_seq_composition: 12
+  reported: 2026-06-12 14:05:16
