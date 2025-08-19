@@ -10,8 +10,7 @@ use Pod::Usage;
 
 use npg_qc::elembio::run_stats;
 use npg_qc::elembio::tag_metrics_generator qw(convert_run_stats_to_tag_metrics);
-use Monitor::Elembio::RunFolder; # from npg_tracking
-use npg_tracking::Schema;
+use Monitor::Elembio::RunParametersParser; # from npg_tracking
 
 our $VERSION = '0';
 
@@ -46,16 +45,10 @@ sub main {
 
     my $deplex_folder = $opts->{'input'};
 
-    # Unfortunately, a database handle is required.
-    # No data is retrieved from the tracking database.
     # Lane count is calculated from data in RunParameters.json .
-    # TODO - drop the dependency on npg_tracking::Schema when
-    # a stand-alone parser for RunParameters.json is available.
-    my $run_folder = Monitor::Elembio::RunFolder->new(
+    my $lane_count = Monitor::Elembio::RunParametersParser->new(
         runfolder_path => $deplex_folder,
-        npg_tracking_schema => npg_tracking::Schema->connect(),
-    );
-    my $lane_count = $run_folder->lane_count;
+    )->lane_count();
 
     my $run_stats = npg_qc::elembio::run_stats::run_stats_from_file(
         $deplex_folder.'/RunManifest.json',
@@ -168,9 +161,7 @@ URL of the elembio qc report. Optional.
 
 =item npg_qc::elembio::run_stats
 
-=item Monitor::Elembio::RunFolder
-
-=item npg_tracking::Schema
+=item Monitor::Elembio::RunParametersParser
 
 =back
 

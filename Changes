@@ -1,7 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Droped dependency of deplexing stats generator for Elembio on
+   npg_tracking::Schema by using RunParameters.json parser directly.
+
 release 74.5.0 (2025-08-12)
- - add scripts for incremental update of genotype QC check genotype data from iRODS-archived Fluidigm results
+ - add scripts for incremental update of genotype QC check genotype data from
+   iRODS-archived Fluidigm results
 
 release 74.4.0 (2025-08-06)
  - Dropped special SeqQC provisions for GCLP runs. The fact that the pages
