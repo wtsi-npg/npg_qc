@@ -105,6 +105,7 @@ my $requires = {
                 'npg_tracking::util::db_config'            => 0,
                 'npg_tracking::util::pipeline_config'      => 0,
                 'npg_tracking::util::types'                => 0,
+                'Monitor::Elembio::RunParametersParser'    => 0,
                 'npg::util'                                => 0,
                 'st::api::lims'                            => 0,
                 'WTSI::NPG::iRODS'                         => 0,
