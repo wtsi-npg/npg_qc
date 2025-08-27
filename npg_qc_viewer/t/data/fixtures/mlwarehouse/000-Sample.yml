@@ -2498,3 +2498,131 @@
   strain: ''
   taxon_id: 9606
   uuid_sample_lims: 5b64c794-c628-11df-8e7f-00144f2062b0
+- accession_number: ~
+  age: ~
+  cell_type: ~
+  cohort: ~
+  common_name: fruit fly
+  compound: ~
+  concentration_determined_by: ~
+  consent_withdrawn: 0
+  control: ~
+  control_type: ~
+  country_of_origin: United Kingdom
+  created: 2025-08-11 14:46:29
+  customer_measured_concentration: ~
+  customer_measured_volume: ~
+  date_of_consent_withdrawn: ~
+  date_of_sample_collection: 2025-07-20
+  date_of_sample_extraction: ~
+  deleted_at: ~
+  description: ~
+  developmental_stage: ~
+  disease: ~
+  disease_state: ~
+  dna_source: ~
+  donor_id: rBCAxxxyyy
+  dose: ~
+  ethnicity: ~
+  extraction_method: ~
+  father: ~
+  gc_content: ~
+  gender: ~
+  genotype: ~
+  geographical_region: ~
+  growth_condition: ~
+  id_lims: SQSCP
+  id_sample_lims: 10220688
+  id_sample_tmp: 10073168
+  immunoprecipitate: ~
+  is_resubmitted: ~
+  last_updated: 2025-08-11 14:46:29
+  marked_as_consent_withdrawn_by: ~
+  mother: ~
+  name: rBCAxxxyyy
+  organism: ~
+  organism_part: ~
+  phenotype: ~
+  priority_level: ~
+  public_name: ~
+  purification_method: ~
+  purified: ~
+  recorded_at: 2025-08-11 14:46:30
+  reference_genome: Not suitable for alignment
+  replicate: ~
+  sample_type: ~
+  sample_visibility: ~
+  sanger_sample_id: rxxxyyy
+  sibling: ~
+  storage_conditions: ~
+  strain: ~
+  subject: ~
+  supplier_name: sgp276
+  taxon_id: 7227
+  time_point: ~
+  treatment: ~
+  uuid_sample_lims: f72f5c84-76c1-11f0-8ce3-0242eb1badd5
+- accession_number: ~
+  age: ~
+  cell_type: ~
+  cohort: ~
+  common_name: fruit fly
+  compound: ~
+  concentration_determined_by: ~
+  consent_withdrawn: 0
+  control: ~
+  control_type: ~
+  country_of_origin: United Kingdom
+  created: 2025-08-11 14:46:29
+  customer_measured_concentration: ~
+  customer_measured_volume: ~
+  date_of_consent_withdrawn: ~
+  date_of_sample_collection: 2025-07-20
+  date_of_sample_extraction: ~
+  deleted_at: ~
+  description: ~
+  developmental_stage: ~
+  disease: ~
+  disease_state: ~
+  dna_source: ~
+  donor_id: rBCAxxxzzz
+  dose: ~
+  ethnicity: ~
+  extraction_method: ~
+  father: ~
+  gc_content: ~
+  gender: ~
+  genotype: ~
+  geographical_region: ~
+  growth_condition: ~
+  id_lims: SQSCP
+  id_sample_lims: 10220689
+  id_sample_tmp: 10073169
+  immunoprecipitate: ~
+  is_resubmitted: ~
+  last_updated: 2025-08-11 14:46:29
+  marked_as_consent_withdrawn_by: ~
+  mother: ~
+  name: rBCAxxxzzz
+  organism: ~
+  organism_part: ~
+  phenotype: ~
+  priority_level: ~
+  public_name: ~
+  purification_method: ~
+  purified: ~
+  recorded_at: 2025-08-11 14:46:30
+  reference_genome: Not suitable for alignment
+  replicate: ~
+  sample_type: ~
+  sample_visibility: ~
+  sanger_sample_id: rBCAxxxzzz
+  sibling: ~
+  storage_conditions: ~
+  strain: ~
+  subject: ~
+  supplier_name: sgp276
+  taxon_id: 7227
+  time_point: ~
+  treatment: ~
+  uuid_sample_lims: f732f092-76c1-11f0-8ce3-0242eb1badd5

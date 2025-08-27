@@ -184,6 +184,13 @@ t/data/fixtures/npg/400-TagRun.yml
 t/data/fixtures/npgqc/000-mqc_outcome_dict.yml
 t/data/fixtures/npgqc/000-mqc_library_outcome_dict.yml
 t/data/fixtures/npgqc/000-uqc_outcome_dict.yml
+t/data/fixtures/npgqc/000-SeqComponent.yml
+t/data/fixtures/npgqc/000-SeqComposition.yml
+t/data/fixtures/npgqc/100-SeqComponentComposition.yml
+t/data/fixtures/npgqc/300-TagMetrics.yml
+t/data/fixtures/mlwarehouse/200-EseqFlowcell.yml
+t/data/fixtures/mlwarehouse/300-EseqProductMetric.yml
+t/data/fixtures/mlwarehouse/400-EseqRunLaneMetric.yml
 t/data/fixtures/mlwarehouse/300-IseqProductMetric.yml
 t/data/fixtures/mlwarehouse/200-IseqFlowcell.yml
 t/data/fixtures/mlwarehouse/400-IseqRunLaneMetric.yml

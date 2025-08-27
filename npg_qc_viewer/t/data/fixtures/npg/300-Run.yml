@@ -116,3 +116,17 @@
   is_paired: 1
   priority: 1
   team: 'SR'
+- actual_cycle_count: 140
+  batch_id: 105495
+  expected_cycle_count: 140
+  flowcell_id: 2450458600
+  folder_name: 20250820_AV244103_105495
+  folder_path_glob: /lustre/scratch120/elembio/staging/AV244103
+  id_instrument: 46
+  id_instrument_format: 19
+  id_run: 50932
+  id_run_pair: ~
+  is_paired: 1
+  priority: 1
+  team: SR
+
