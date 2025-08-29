@@ -47,7 +47,7 @@ my $warn_no_paths      = qr/No paths to run folder/;
 my $warn_recalibrated  = qr/Could not find usable recalibrated directory/;
 
 subtest 'All combinations for checks controller' => sub {
-  plan tests => 14;
+  plan tests => 16;
   
   my $base = tempdir(UNLINK => 1);
   my $path = $base . q[/archive];
@@ -84,7 +84,10 @@ subtest 'All combinations for checks controller' => sub {
   push @urls,  '/checks/samples/3055';
   push @urls,  '/checks/libraries?id=NT28560W';
   push @urls,  '/checks/pools/NT28560W';
-  
+  push @urls,  '/checks/runs?run=50932'; # Elembio run, tag_metrics results
+                                         # are loaded to the QC database.
+  push @urls,  '/checks/runs?run=50932&lane=2';
+   
   for my $url (@urls) {
     ok(request($url)->is_success, qq[$url request succeeds]);
   }

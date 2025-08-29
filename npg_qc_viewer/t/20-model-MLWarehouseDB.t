@@ -32,7 +32,7 @@ lives_ok {
 isa_ok($m, 'npg_qc_viewer::Model::MLWarehouseDB');
 
 subtest 'Search product metrics' => sub {
-  plan tests => 5;
+  plan tests => 8;
   
   throws_ok { $m->search_product_metrics() }
     qr/Conditions were not provided for search/,
@@ -43,11 +43,20 @@ subtest 'Search product metrics' => sub {
     'Run id is missing - error';
 
   $data->{'id_run'} = 4950;
-  my @rows = $m->search_product_metrics($data)->all();
-  ok ((all { $_->id_run == 4950} @rows), 'Run id is correct');
-  ok ((all { $_->position == 1}  @rows), 'Position is correct');
+  my $result = $m->search_product_metrics($data);
+  my @rows = $result->{'iseq'}->all();
+  ok ((all { $_->id_run == 4950} @rows), 'run id is correct');
+  ok ((all { $_->position == 1}  @rows), 'position is correct');
   my @tags = map {$_->tag_index} @rows;
-  is_deeply(\@tags, [(0 .. 24)], 'rows are sorted correctly');
+  is_deeply (\@tags, [(0 .. 24)], 'rows are sorted correctly');
+  is ($result->{'eseq'}->count(), 0, 'no Elembio rows');
+
+  $data = {id_run => 50932, position => 1};
+  $result = $m->search_product_metrics($data);
+  @rows = $result->{'eseq'}->all();
+  is_deeply ([map {$_->tag_index} @rows], [0,1,1,1,1,2,3],
+    'correct rows for an elembio run');
+  is ($result->{'iseq'}->count(), 0, 'no Illumina rows');
 };
 
 subtest 'Data in test data' => sub {

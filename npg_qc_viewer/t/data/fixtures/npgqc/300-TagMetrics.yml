@@ -1,0 +1,52 @@
+---
+- barcode_tag_name: ~
+  comments: "Where the barcode has a number in square brackets appended, the tag index represents multiple barcodes. Use MLWH to inspect decode rate on individual barcodes. <a href='https://dataproducts.dnapipelines.sanger.ac.uk/seq/elembio/runs/202508/20250820_AV244103_105495/105495_QC.html'>Elembio QC Report</a>"
+  id_run: 50932
+  id_seq_composition: 15980175
+  id_tag_metrics: 167913
+  info: '{"Check":"/software/npg/20250723/bin/elembio_runstats_parser.pl","Check_version":"74.3.0"}'
+  matches_percent: '{"0":0.0323451796526245,"3":0.516234087532459,"2":0.443337514775814,"1":0.00808321803910288}'
+  matches_pf_percent: '{"1":0.00808321803910288,"0":0.0323451796526245,"3":0.516234087532459,"2":0.443337514775814}'
+  max_mismatches_param: ~
+  max_no_calls_param: ~
+  metrics_file: ~
+  min_mismatch_delta_param: ~
+  one_mismatch_matches_count: '{"0":0,"2":956264,"3":1137271,"1":45996.0052034141}'
+  one_mismatch_matches_pf_count: '{"2":956264,"3":1137271,"0":0,"1":45996.0052034141}'
+  pass: ~
+  path: ~
+  perfect_matches_count: '{"1":665288,"0":0,"2":38055288,"3":44288826}'
+  perfect_matches_pf_count: '{"0":0,"3":44288826,"2":38055288,"1":665288}'
+  position: 2
+  reads_count: '{"0":2846219,"3":45426097,"2":39011552,"1":711284}'
+  reads_pf_count: '{"1":711284,"0":2846219,"3":45426097,"2":39011552}'
+  spiked_control_index: 1
+  tag_hops_percent: ~
+  tag_hops_power: ~
+  tags: '{"1":"ATGTCGCTAG-CTAGCTCGTA[+3](CTRL)","0":"NNNNNNNNNN-NNNNNNNNNN","2":"AAGATTGGAT-AGCGGGATTT","3":"TGTAGTCATT-CTTGATCGTA"}'
+- barcode_tag_name: ~
+  comments: "Where the barcode has a number in square brackets appended, the tag index represents multiple barcodes. Use MLWH to inspect decode rate on individual barcodes. <a href='https://dataproducts.dnapipelines.sanger.ac.uk/seq/elembio/runs/202508/20250820_AV244103_105495/105495_QC.html'>Elembio QC Report</a>"
+  id_run: 50932
+  id_seq_composition: 15980176
+  id_tag_metrics: 167914
+  info: '{"Check":"/software/npg/20250723/bin/elembio_runstats_parser.pl","Check_version":"74.3.0"}'
+  matches_percent: '{"0":0.0317316869468389,"2":0.440395280524592,"3":0.520006280765663,"1":0.00786675176290619}'
+  matches_pf_percent: '{"2":0.440395280524592,"3":0.520006280765663,"0":0.0317316869468389,"1":0.00786675176290619}'
+  max_mismatches_param: ~
+  max_no_calls_param: ~
+  metrics_file: ~
+  min_mismatch_delta_param: ~
+  one_mismatch_matches_count: '{"3":1014039,"2":852141,"0":0,"1":39196.4646803437}'
+  one_mismatch_matches_pf_count: '{"3":1014039,"2":852141,"0":0,"1":39196.4646803437}'
+  pass: ~
+  path: ~
+  perfect_matches_count: '{"0":0,"3":42707528,"2":36175819,"1":622232}'
+  perfect_matches_pf_count: '{"3":42707528,"2":36175819,"0":0,"1":622232}'
+  position: 1
+  reads_count: '{"2":37027960,"3":43721567,"0":2667966,"1":661428}'
+  reads_pf_count: '{"0":2667966,"3":43721567,"2":37027960,"1":661428}'
+  spiked_control_index: 1
+  tag_hops_percent: ~
+  tag_hops_power: ~
+  tags: '{"1":"ATGTCGCTAG-CTAGCTCGTA[+3](CTRL)","0":"NNNNNNNNNN-NNNNNNNNNN","3":"TGTAGTCATT-CTTGATCGTA","2":"AAGATTGGAT-AGCGGGATTT"}'
+

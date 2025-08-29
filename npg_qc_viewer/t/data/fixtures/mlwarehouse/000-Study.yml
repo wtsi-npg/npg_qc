@@ -539,3 +539,50 @@
   study_title: random_study_title
   study_type: Whole Genome Sequencing
   uuid_study_lims: 1d9e2b10-d2eb-11e4-a7a9-68b59976a382
+- abbreviation: rBCA
+  abstract: 'The Biodiversity Cell Atlas (BCA) aims to map cell types'
+  accession_number: ~
+  aligned: 1
+  array_express_accession_number: ~
+  contains_human_dna: 0
+  contaminated_human_data_access_group: ~
+  contaminated_human_dna: 0
+  created: 2025-01-16 15:00:41
+  data_access_group: ~
+  data_deletion_period: ~
+  data_destination: ~
+  data_release_delay_period: ~
+  data_release_delay_reason: ~
+  data_release_sort_of_study: transcriptomics
+  data_release_strategy: not applicable
+  data_release_timing: never
+  data_release_timing_publication_comment: ~
+  data_share_in_preprint: ~
+  deleted_at: ~
+  description: "This project aims to map and characterize cell types"
+  ebi_library_selection: ~
+  ebi_library_source: ~
+  ebi_library_strategy: ~
+  ega_dac_accession_number: ~
+  ega_policy_accession_number: ~
+  ena_project_id: ~
+  ethically_approved: ~
+  faculty_sponsor: Mary
+  hmdmc_number: ~
+  id_lims: SQSCP
+  id_study_lims: 7970
+  id_study_tmp: 8014
+  last_updated: 2025-06-24 08:36:27
+  name: Biodiversity Cell Atlas (BCA)
+  prelim_id: ~
+  programme: Tree of Life
+  recorded_at: 2025-06-24 08:36:28
+  reference_genome: Not suitable for alignment
+  remove_x_and_autosomes: 0
+  s3_email_list: ~
+  separate_y_chromosome_data: 0
+  state: active
+  study_title: Biodiversity Cell Atlas (BCA)
+  study_type: Transcriptome Analysis
+  study_visibility: Hold
+  uuid_study_lims: a78555c0-d41a-11ef-afa6-024250f2bd16

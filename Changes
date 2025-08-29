@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - SeqQC viewer code refactored to propagate Elembio LIMS data to UI.
  - Droped dependency of deplexing stats generator for Elembio on
    npg_tracking::Schema by using RunParameters.json parser directly.
 

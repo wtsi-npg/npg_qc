@@ -593,4 +593,40 @@
   id_run_status_dict : 26
   id_user : 50
   iscurrent : 1
+- date: 2025-08-20 09:45:48
+  id_run: 50932
+  id_run_status: 689397
+  id_run_status_dict: 2
+  id_user: 7
+  iscurrent: 0
+- date: 2025-08-21 00:40:07
+  id_run: 50932
+  id_run_status: 689496
+  id_run_status_dict: 4
+  id_user: 7
+  iscurrent: 0
+- date: 2025-08-21 15:20:53
+  id_run: 50932
+  id_run_status: 689532
+  id_run_status_dict: 19
+  id_user: 7
+  iscurrent: 0
+- date: 2025-08-22 09:14:59
+  id_run: 50932
+  id_run_status: 689589
+  id_run_status_dict: 26
+  id_user: 7
+  iscurrent: 0
+- date: 2025-08-22 09:44:57
+  id_run: 50932
+  id_run_status: 689598
+  id_run_status_dict: 17
+  id_user: 7
+  iscurrent: 0
+- date: 2025-08-22 09:58:44
+  id_run: 50932
+  id_run_status: 689604
+  id_run_status_dict: 12
+  id_user: 7
+  iscurrent: 1
 

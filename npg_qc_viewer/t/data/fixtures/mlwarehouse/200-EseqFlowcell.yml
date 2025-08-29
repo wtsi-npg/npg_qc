@@ -1,0 +1,78 @@
+---
+- bait_name: ~
+  entity_id_lims: 75736474
+  entity_type: library_indexed
+  id_eseq_flowcell_tmp: 1
+  id_flowcell_lims: 105495
+  id_library_lims: SQPP-85776-J:A1
+  id_lims: SQSCP
+  id_pool_lims: NT1861579Q
+  id_sample_tmp: 10073168
+  id_study_tmp: 8014
+  lane: 1
+  last_updated: 2025-08-26 15:25:55
+  pipeline_id_lims: 10xGenomics
+  primer_panel: ~
+  recorded_at: 2025-08-26 15:25:56
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  tag2_sequence: AGCGGGATTT
+  tag_sequence: AAGATTGGAT
+- bait_name: ~
+  entity_id_lims: 75736474
+  entity_type: library_indexed
+  id_eseq_flowcell_tmp: 2
+  id_flowcell_lims: 105495
+  id_library_lims: SQPP-85776-J:B1
+  id_lims: SQSCP
+  id_pool_lims: NT1861579Q
+  id_sample_tmp: 10073169
+  id_study_tmp: 8014
+  lane: 1
+  last_updated: 2025-08-26 15:25:55
+  pipeline_id_lims: 10xGenomics
+  primer_panel: ~
+  recorded_at: 2025-08-26 15:25:56
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  tag2_sequence: CTTGATCGTA
+  tag_sequence: TGTAGTCATT
+- bait_name: ~
+  entity_id_lims: 75736475
+  entity_type: library_indexed
+  id_eseq_flowcell_tmp: 3
+  id_flowcell_lims: 105495
+  id_library_lims: SQPP-85776-J:A1
+  id_lims: SQSCP
+  id_pool_lims: NT1861579Q
+  id_sample_tmp: 10073168
+  id_study_tmp: 8014
+  lane: 2
+  last_updated: 2025-08-26 15:25:55
+  pipeline_id_lims: 10xGenomics
+  primer_panel: ~
+  recorded_at: 2025-08-26 15:25:56
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  tag2_sequence: AGCGGGATTT
+  tag_sequence: AAGATTGGAT
+- bait_name: ~
+  entity_id_lims: 75736475
+  entity_type: library_indexed
+  id_eseq_flowcell_tmp: 4
+  id_flowcell_lims: 105495
+  id_library_lims: SQPP-85776-J:B1
+  id_lims: SQSCP
+  id_pool_lims: NT1861579Q
+  id_sample_tmp: 10073169
+  id_study_tmp: 8014
+  lane: 2
+  last_updated: 2025-08-26 15:25:55
+  pipeline_id_lims: 10xGenomics
+  primer_panel: ~
+  recorded_at: 2025-08-26 15:25:56
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  tag2_sequence: CTTGATCGTA
+  tag_sequence: TGTAGTCATT
+
