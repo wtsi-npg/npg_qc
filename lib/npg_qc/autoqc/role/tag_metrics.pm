@@ -127,10 +127,10 @@ sub variance_coeff {
   my @values = ();
   foreach my $key (keys %{$self->tags}) {
     if ($key != 0 && (!defined $self->spiked_control_index || $key != $self->spiked_control_index)) {
-      if (exists $self->perfect_matches_count->{$key}) {
-        my $value = $self->perfect_matches_count->{$key};
+      if (exists $self->perfect_matches_pf_count->{$key}) {
+        my $value = $self->perfect_matches_pf_count->{$key};
         if ($all_matches) {
-	  $value += $self->one_mismatch_matches_pf_count->{$key};
+	        $value += $self->one_mismatch_matches_pf_count->{$key};
         }
         push @values, $value;
       }
@@ -162,6 +162,8 @@ __END__
 =head1 DESCRIPTION
 
 =head1 SUBROUTINES/METHODS
+
+All calculations use purity-filtered read numbers.
 
 =head2 	all_reads
 
@@ -215,7 +217,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2014,2016,2025 Genome Research Ltd.
 
 This file is part of NPG.
 
