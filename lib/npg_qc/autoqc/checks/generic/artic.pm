@@ -74,8 +74,7 @@ files.
 
 Autoqc results for tag zero and a spiked-in control are not created by this
 check since the downstream code assumes that all generic artic autoqc results
-belong to the target project (see script L<npg_mqc_skipper> and class
-L<npg_qc::mqc::skipper> in this git package).
+belong to the target project.
 
 This class is a re-implementation, the original implementation was
 available in the bin/npg_autoqc_generic4artic script of the same
