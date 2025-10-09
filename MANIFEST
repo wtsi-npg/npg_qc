@@ -10,7 +10,6 @@ bin/gtck_refresh_check_data_incremental.sh
 bin/qc
 bin/qc_db_delete_autoqc
 bin/mqc_outcome_reporter
-bin/npg_mqc_skipper
 bin/npg_qc_autoqc_data.pl
 bin/npg_qc_tag_sniff.pl
 bin/npg_substitution_metrics.pl
@@ -117,7 +116,6 @@ lib/npg_qc/elembio/run_stats.pm
 lib/npg_qc/elembio/sample_stats.pm
 lib/npg_qc/elembio/tag_metrics_generator.pm
 lib/npg_qc/mqc/reporter.pm
-lib/npg_qc/mqc/skipper.pm
 lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/mqc/outcomes/keys.pm
 lib/npg_qc/report/common.pm
@@ -291,7 +289,6 @@ t/60-autoqc-results-tag_metrics.t
 t/60-autoqc-results-verify_bam_id.t
 t/70-mqc-reporter.t
 t/70-mqc-outcomes.t
-t/70-mqc-skipper.t
 t/80-autoqc-qc-script.t
 t/data/.npg/npg_tracking-Schema
 t/data/autoqc/bam_flagstats/16960_1_0.tar.gz
