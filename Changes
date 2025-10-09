@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - fixes for Gitlab CI configuration
+
 release 75.0.0 (2025-10-09)
  - Ensured consistency in the calculation of the coefficient of variance
    for tag metrics data. Only reads that passed purity filter should be
