@@ -1,10 +1,12 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 75.0.0 (2025-10-09)
  - Ensured consistency in the calculation of the coefficient of variance
    for tag metrics data. Only reads that passed purity filter should be
    used as input.
  - Removed all code related to the MQC skipper functionality. The projects
    this code was used for are finished.
+ - CI updates
 
 release 74.6.0 (2025-09-02)
  - SeqQC viewer code refactored to propagate Elembio LIMS data to UI.
