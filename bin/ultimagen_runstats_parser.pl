@@ -137,6 +137,15 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
 
   -d $runfolder or croak "Run folder $runfolder does not exist";
 
+
+  my @library_info_paths = glob join q[/], $runfolder, '*LibraryInfo.xml';
+  (@library_info_paths == 1) or croak 'Too many or too few';
+  my $li = npg_qc::ultimagen::library_info->new(input_file_path => $library_info_paths[0]);
+  if ($li->application && ($li->application =~ /quantum/xmsi)) {
+    carp 'Skipping quantum application';
+    return;
+  }
+
   my $failure_codes_file_name = 'merged_trimmer-failure_codes.csv';
   my $stats_file_name = 'merged_trimmer-stats.csv';
 
@@ -158,42 +167,9 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
   }
   close $fh2;
 
-#  open my $fh3, q[<], $manifest_path;
-#  ## no critic (InputOutput::RequireBriefOpen)
-#  open my $fh4, q[<], $manifest_path;
-#  # Read from both file handles in parallel till $fh3 reaches the
-#  # samples section. At this point discards $fh3 and pass $fh4
-#  # to the parser.
-#  while ( my $line = readline $fh3 ) {
-#    readline $fh4 ;
-#    if ($line =~ /^\[(?:Samples)|(?:Data)\]/xms) {
-#      close $fh3;
-#      last;
-#    }
-#  }
-
-#  my $target_samples = {};
-#  $csv = Text::CSV->new();
-#  $csv->header($fh4);
-#  while (my $row = $csv->getline_hr($fh4)) {
-#    if ($row->{'sample_id'} =~ /^\[/xms) { # Start of some other section.
-#      last;
-#    }
-#    $target_samples->{$row->{'index_barcode_num'}} = $row;
-#  }
-#  close $fh4;
-#  ## use critic
-
-  my @library_info_paths = glob join q[/], $runfolder, '*LibraryInfo.xml';
-  (@library_info_paths == 1) or croak 'Too many or too few';
-  my $li = npg_qc::ultimagen::library_info->new(input_file_path => $library_info_paths[0]);
-  if ($li->application && ($li->application =~ /quantum/xmsi)) {
-    carp 'Skipping quantum application';
-    return;
-  }
+  # Compute deplexing stats per barcode for all barcodes.
 
   my %target_samples = map { $_->index_label => $_ } @{$li->samples};
-  # Compute deplexing stats per barcode for all barcodes.
 
   my $stats_all_barcodes = {};
   my $total_num_reads = 0;
