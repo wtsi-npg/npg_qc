@@ -17,6 +17,7 @@ use Pod::Usage;
 use autodie;
 use Readonly;
 
+use npg_qc::ultimagen::library_info;
 use npg_qc::autoqc::results::tag_metrics;
 use npg_qc::autoqc::results::qX_yield;
 
@@ -111,7 +112,6 @@ sub get_options {
                           'runfolder_path=s',
                           'id_run=i',
                           'output=s',
-                          'manifest=s',
                           'help',
                          );
 
@@ -121,8 +121,7 @@ sub get_options {
     pod2usage(-exitval => 1, -verbose => 99, -sections => $sections);
   }
 
-  if( !$result || !exists $options{runfolder_path} ||
-      !exists $options{output} || !exists $options{manifest} ) {
+  if( !$result || !exists $options{runfolder_path} || !exists $options{output} || !exists $options{id_run}) {
     warn "\nERROR: Incorrect options when invoking the script.\n\n";
     pod2usage(-exitval => 2, -verbose => 99, -sections => $sections);
   }
@@ -134,10 +133,8 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
   my $options = get_options();
   my $runfolder = $options->{runfolder_path};
   my $qc_output_dir = $options->{output};
-  my $manifest_path = $options->{'manifest'};
   my $id_run = $options->{id_run};
 
-  -f $manifest_path or croak "Manifest $manifest_path does not exist";
   -d $runfolder or croak "Run folder $runfolder does not exist";
 
   my $failure_codes_file_name = 'merged_trimmer-failure_codes.csv';
@@ -161,32 +158,36 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
   }
   close $fh2;
 
-  open my $fh3, q[<], $manifest_path;
-  ## no critic (InputOutput::RequireBriefOpen)
-  open my $fh4, q[<], $manifest_path;
-  # Read from both file handles in parallel till $fh3 reaches the
-  # samples section. At this point discards $fh3 and pass $fh4
-  # to the parser.
-  while ( my $line = readline $fh3 ) {
-    readline $fh4 ;
-    if ($line =~ /^\[(?:Samples)|(?:Data)\]/xms) {
-      close $fh3;
-      last;
-    }
-  }
+#  open my $fh3, q[<], $manifest_path;
+#  ## no critic (InputOutput::RequireBriefOpen)
+#  open my $fh4, q[<], $manifest_path;
+#  # Read from both file handles in parallel till $fh3 reaches the
+#  # samples section. At this point discards $fh3 and pass $fh4
+#  # to the parser.
+#  while ( my $line = readline $fh3 ) {
+#    readline $fh4 ;
+#    if ($line =~ /^\[(?:Samples)|(?:Data)\]/xms) {
+#      close $fh3;
+#      last;
+#    }
+#  }
 
-  my $target_samples = {};
-  $csv = Text::CSV->new();
-  $csv->header($fh4);
-  while (my $row = $csv->getline_hr($fh4)) {
-    if ($row->{'sample_id'} =~ /^\[/xms) { # Start of some other section.
-      last;
-    }
-    $target_samples->{$row->{'index_barcode_num'}} = $row;
-  }
-  close $fh4;
-  ## use critic
+#  my $target_samples = {};
+#  $csv = Text::CSV->new();
+#  $csv->header($fh4);
+#  while (my $row = $csv->getline_hr($fh4)) {
+#    if ($row->{'sample_id'} =~ /^\[/xms) { # Start of some other section.
+#      last;
+#    }
+#    $target_samples->{$row->{'index_barcode_num'}} = $row;
+#  }
+#  close $fh4;
+#  ## use critic
 
+  my @library_info_paths = glob join q[/], $runfolder, '*LibraryInfo.xml';
+  (@library_info_paths == 1) or croak 'Too many or too few';
+  my $li = npg_qc::ultimagen::library_info->new(input_file_path => $library_info_paths[0]);
+  my %target_samples = map { $_->index_label => $_ } @{$li->samples};
   # Compute deplexing stats per barcode for all barcodes.
 
   my $stats_all_barcodes = {};
@@ -234,12 +235,13 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
     my $num_reads = $stats_all_barcodes->{$read_group}->{'deplexed_num_reads'};
     my $input_num_reads = $stats_all_barcodes->{$read_group}->{'input_num_reads'};
 
-    if (exists $target_samples->{$read_group}) {
-      my $target_barcode = $target_samples->{$read_group}->{'index_barcode_sequence'};
+    if (exists $target_samples{$read_group}) {
+
+      my $target_barcode = $target_samples{$read_group}->index_sequence();
       $deplexing_stats->{$target_barcode}->{'num_reads'} = $num_reads;
       $deplexing_stats->{$target_barcode}->{'input_num_reads'} = $input_num_reads;
-      $deplexing_stats->{$target_barcode}->{'sample'} = $target_samples->{$read_group}->{'sample_id'};
-      $deplexing_stats->{$target_barcode}->{'library'} = $target_samples->{$read_group}->{'library_name'};
+      $deplexing_stats->{$target_barcode}->{'sample'} = $target_samples{$read_group}->id();
+      #$deplexing_stats->{$target_barcode}->{'library'} = $target_samples{$read_group}->{'library_name'};
       $deplexing_stats->{$target_barcode}->{'read_group'} = $read_group;
       my ($tag_index) = $read_group =~ /[0]*(\d+)/xms;
       $tag_index or croak "Undefined or zero tag index from read group $read_group";
@@ -395,7 +397,8 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
     #if (!-e $dir) {
     #  mkdir $dir;
     #}
-    $result->store($qc_output_dir);
+    
+    #$result->store($qc_output_dir);
   }
 
   return;
@@ -419,7 +422,7 @@ parse_ultima_stats.pl
 
 =head1 USAGE
 
-parse_ultima_stats.pl --runfolder_path <runfolder> --output <folder> --manifest <file>
+parse_ultima_stats.pl --runfolder_path <runfolder> --output <folder> --id_run <run_id>
 
 =head1 SUBROUTINES/METHODS
 
@@ -440,9 +443,9 @@ Directory with on-instrument analysis data for a run.
 Directory Where to put the transformed tag_metrics and other outputs,
 will be created if does not exist.
 
-=item --manifest <file>
+=item --id_run
 
-A full path to the manifest CSV file. The file should exist.
+NPG tracking run ID.
 
 =back
 
@@ -453,10 +456,6 @@ A full path to the manifest CSV file. The file should exist.
 =item --help
 
 Prints a brief help message and exits.
-
-=item --id_run
-
-NPG tracking run ID.
 
 =back
 
