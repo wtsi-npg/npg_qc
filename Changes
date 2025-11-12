@@ -1,6 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 75.0.1 (2025-11-12)
  - fixes for Gitlab CI configuration
+ - CI updates
 
 release 75.0.0 (2025-10-09)
  - Ensured consistency in the calculation of the coefficient of variance
