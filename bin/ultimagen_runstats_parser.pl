@@ -18,6 +18,7 @@ use autodie;
 use Readonly;
 
 use npg_qc::ultimagen::library_info;
+use npg_qc::ultimagen::manifest;
 use npg_qc::autoqc::results::tag_metrics;
 use npg_qc::autoqc::results::qX_yield;
 
@@ -112,6 +113,7 @@ sub get_options {
                           'runfolder_path=s',
                           'id_run=i',
                           'output=s',
+                          'manifest=s',
                           'help',
                          );
 
@@ -134,16 +136,21 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
   my $runfolder = $options->{runfolder_path};
   my $qc_output_dir = $options->{output};
   my $id_run = $options->{id_run};
+  my $manifest_path = $options->{'manifest'};
 
   -d $runfolder or croak "Run folder $runfolder does not exist";
 
-
-  my @library_info_paths = glob join q[/], $runfolder, '*LibraryInfo.xml';
-  (@library_info_paths == 1) or croak 'Too many or too few';
-  my $li = npg_qc::ultimagen::library_info->new(input_file_path => $library_info_paths[0]);
-  if ($li->application && ($li->application =~ /quantum/xmsi)) {
-    carp 'Skipping quantum application';
-    return;
+  my $li;
+  if ($manifest_path) {
+    $li = npg_qc::ultimagen::manifest->new(input_file_path => $manifest_path);
+  } else {
+    my @library_info_paths = glob join q[/], $runfolder, '*LibraryInfo.xml';
+    (@library_info_paths == 1) or croak 'Too many or too few';
+    $li = npg_qc::ultimagen::library_info->new(input_file_path => $library_info_paths[0]);
+    if ($li->application && ($li->application =~ /quantum/xmsi)) {
+      carp 'Skipping quantum application';
+      return;
+    }
   }
 
   my $failure_codes_file_name = 'merged_trimmer-failure_codes.csv';
@@ -431,6 +438,11 @@ NPG tracking run ID.
 =item --help
 
 Prints a brief help message and exits.
+
+=item --manifest <file>
+
+A full path to the manifest CSV file. If this argument is set, information about target samples
+will be read from the manifest rather than from [RunId]_LibraryInfo.xml file in the run folder.
 
 =back
 
