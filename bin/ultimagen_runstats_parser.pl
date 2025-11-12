@@ -187,6 +187,11 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
   my @library_info_paths = glob join q[/], $runfolder, '*LibraryInfo.xml';
   (@library_info_paths == 1) or croak 'Too many or too few';
   my $li = npg_qc::ultimagen::library_info->new(input_file_path => $library_info_paths[0]);
+  if ($li->application && ($li->application =~ /quantum/xmsi)) {
+    carp 'Skipping quantum application';
+    return;
+  }
+
   my %target_samples = map { $_->index_label => $_ } @{$li->samples};
   # Compute deplexing stats per barcode for all barcodes.
 
@@ -274,7 +279,7 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
   $deplexing_stats->{'WAFER_NUM_READS'}->{'input_num_reads'} = $total_input_num_reads;
 
   # The deplexing percent is calculated against a total number of reads on a wafer,
-  # including both the TT control and the UKKN (unassigned) read groups. It is
+  # including both the TT control and the UNKN (unassigned) read groups. It is
   # possible to exclude the TT read group the the calculation of total if this is what
   # the QC team wants.
   foreach my $key (keys %{$deplexing_stats}) {
@@ -392,13 +397,7 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
     $result->yield1(int(($pct_pf_q20_bases*$num_bases)/($HUNDRED*$THOUSAND)));
     $result->yield1_q30(int(($pct_pf_q30_bases*$num_bases)/($HUNDRED*$THOUSAND)));
 
-    # If needed create plex-level output directory.
-    #my $dir = join q[/], $qc_output_dir, 'plex' . $tag_index;
-    #if (!-e $dir) {
-    #  mkdir $dir;
-    #}
-    
-    #$result->store($qc_output_dir);
+    $result->store($qc_output_dir);
   }
 
   return;

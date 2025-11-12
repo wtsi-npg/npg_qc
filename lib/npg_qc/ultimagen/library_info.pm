@@ -27,6 +27,32 @@ sub _build_xml_doc {
   return XML::LibXML->load_xml(location => $self->input_file_path);
 }
 
+has 'application' => (
+  isa        => 'Str|Undef',
+  is         => 'ro',
+  init_arg   => undef,
+  lazy_build => 1,
+);
+sub _build_application {
+  my $self = shift;
+  my @nodelist = $self->xml_doc()->getElementsByTagName('Attributes');
+  (@nodelist <= 1) or croak 'Only one Attributes element is expected';
+  my @applications = ();
+  if (@nodelist) {
+    @applications = map { $_->getAttribute('Value') }
+                    grep { ($_->getAttribute('Name') || q[]) eq 'Application'}
+                    grep { ref $_ eq 'XML::LibXML::Element' }
+                    $nodelist[0]->childNodes();
+    (@applications <= 1) or croak 'Only one Applicaton definition is expected';
+  }
+  my $application = $applications[0];
+  $application ||= undef;
+
+  return $application;
+}
+#map { $_->getAttribute('Value') }
+#grep { ($_->getAttribute('Name') || q[]) eq 'Application'}
+
 has 'sample_elements' => (
   isa => 'ArrayRef[XML::LibXML::Element]',
   is         => 'ro',
