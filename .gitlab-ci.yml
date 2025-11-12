@@ -8,8 +8,8 @@ generate-job:
     - autoscale
   rules:
     - if: $CI_COMMIT_BRANCH == "devel" || $CI_COMMIT_BRANCH == "master"
-        changes:
-          - docs/**/*
+      changes:
+        - docs/**/*
   variables:
     REPO_METADATA_FILE: docs/includes/repo-metadata.md
   script: >
