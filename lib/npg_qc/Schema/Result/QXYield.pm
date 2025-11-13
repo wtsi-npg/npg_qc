@@ -154,6 +154,18 @@ A foreign key referencing the id_seq_composition column of the seq_composition t
   extra: {unsigned => 1}
   is_nullable: 1
 
+=head2 yield1_total
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
+=head2 yield2_total
+
+  data_type: 'bigint'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
 =head2 pass
 
   data_type: 'tinyint'
@@ -218,6 +230,10 @@ __PACKAGE__->add_columns(
   'yield1_q40',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'yield2_q40',
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  'yield1_total',
+  { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
+  'yield2_total',
   { data_type => 'bigint', extra => { unsigned => 1 }, is_nullable => 1 },
   'pass',
   { data_type => 'tinyint', is_nullable => 1 },
@@ -292,8 +308,8 @@ __PACKAGE__->belongs_to(
 with 'npg_qc::Schema::Composition', 'npg_qc::Schema::Flators', 'npg_qc::autoqc::role::result', 'npg_qc::autoqc::role::qX_yield';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07051 @ 2023-10-23 17:35:45
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:o6vntkhfrLEMyYVCPe7+Yg
+# Created by DBIx::Class::Schema::Loader v0.07053 @ 2025-11-13 19:49:59
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9/4fZLTuGKi2UHAw5Qr0Nw
 
 our $VERSION = '0';
 

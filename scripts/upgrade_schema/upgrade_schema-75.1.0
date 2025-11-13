@@ -1,0 +1,3 @@
+ALTER TABLE qx_yield
+  ADD COLUMN `yield1_total` BIGINT UNSIGNED DEFAULT NULL AFTER `yield2_q40`,
+  ADD COLUMN `yield2_total` BIGINT UNSIGNED DEFAULT NULL AFTER `yield1_total`;
