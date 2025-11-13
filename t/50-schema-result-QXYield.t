@@ -56,7 +56,7 @@ isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::QXYield');
   is($row->yield2_q30, 17385, 'q30 yield, reverse, saved');
   is($row->yield1_q40, 25, 'q40 yield, forward, saved');
   is($row->yield2_q40, 85, 'q40 yield, reverse, saved');
-  is($row->yield1_total, undef, 'total yield, forwarde, undefined');
+  is($row->yield1_total, undef, 'total yield, forward, undefined');
   is($row->yield2_total, undef, 'total yield, reverse, undefined');
   is(ref $row->info, 'HASH', 'info returned as hash ref');
   is_deeply($row->info, $values->{'info'},

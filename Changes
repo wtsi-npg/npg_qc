@@ -1,7 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - Added two new attributes, yield1_total and yield2_total, to
-   npg_qc::autoqc::results::qX_yield. Extended 'execute'method in
+   npg_qc::autoqc::results::qX_yield. Extended 'execute' method in
    npg_qc::autoqc::checks::qX_yield to compute and assign values of the
    new attributes. The new attributes are yields for forward and reverse
    reads respectively.
