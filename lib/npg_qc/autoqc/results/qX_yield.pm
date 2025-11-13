@@ -80,8 +80,18 @@ Q40 yield in KBs for the first (forward) read
 
 Q40 yield in KBs for the second (reverse) read
 
+=head2 yield1_total
+
+Total yield (all qualities) in KBs for the forward read 
+
+=head2 yield2_total
+
+Total yield (all qualities) in KBs for the reverse read
+
 =cut
-has [qw(yield1 yield2 yield1_q30 yield2_q30 yield1_q40 yield2_q40)] => (
+
+has [qw( yield1 yield2 yield1_q30 yield2_q30 yield1_q40 yield2_q40
+         yield1_total yield2_total )] => (
   isa      => 'Maybe[NpgTrackingNonNegativeInt]',
   is       => 'rw',
   required => 0,
@@ -96,6 +106,7 @@ Filename for the first (forward) read
 Filename for the second (reverse) read 
 
 =cut
+
 has [qw(filename1  filename2)] => (
   isa      => 'Maybe[Str]',
   is       => 'rw',

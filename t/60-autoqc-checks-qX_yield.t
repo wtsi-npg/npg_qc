@@ -67,6 +67,8 @@ subtest 'computing results for a paired run' => sub {
     $ec->result->yield2_q30(2070762);
     $ec->result->yield1_q40(1878231);
     $ec->result->yield2_q40(1338093);
+    $ec->result->yield1_total(2848939);
+    $ec->result->yield2_total(2848939);
     $ec->result->filename1(q[26607_1#20_F0xB00.stats]);
     $ec->result->filename2(q[26607_1#20_F0xB00.stats]);
     return;
@@ -149,6 +151,8 @@ subtest 'computing results for a paired run' => sub {
   $e->result->filename2(q[26818_4_F0xB00.stats]);
   $e->result->threshold_yield1(10066667);
   $e->result->threshold_yield2(10066667);
+  $e->result->yield1_total(439633755);
+  $e->result->yield2_total(439633755);
   $e->result->pass(1);
 
   is_deeply($check->result, $e->result,
@@ -176,6 +180,7 @@ subtest 'computing results for a run with no reads' => sub {
   $e->result->yield1(0);
   $e->result->yield1_q30(0);
   $e->result->yield1_q40(0);
+  $e->result->yield1_total(0);
   $e->result->filename1(q[26597_1_F0xB00.stats]);
   $e->result->path('t/data/samtools_stats');
 
@@ -212,6 +217,8 @@ subtest 'computing results for a run with no reads' => sub {
   $e->result->yield2(0);
   $e->result->yield2_q30(0);
   $e->result->yield2_q40(0);
+  $e->result->yield1_total(0);
+  $e->result->yield2_total(0);
   $e->result->filename1(q[26597_1_F0xB00.stats]);
   $e->result->filename2(q[26597_1_F0xB00.stats]);
   $e->result->path('t/data/samtools_stats');
@@ -244,6 +251,7 @@ subtest 'computing results for a single read run' => sub {
   $e->result->yield1(110289);
   $e->result->yield1_q30(108431);
   $e->result->yield1_q40(0);
+  $e->result->yield1_total(111860);
   $e->result->filename1(q[27053_1#1.single.stats]);
 
   is_deeply($check->result, $e->result, 'result object for a single end run');
