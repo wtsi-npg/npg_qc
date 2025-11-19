@@ -116,14 +116,15 @@ override 'execute' => sub {
     $self->result->$filename_method($source_file_name);
     my $yield = $stats->yield($read);
     my $method_name = 'yield' . $suffix;
+    my $tmethod_name = "${method_name}_total";
     #####
     # The samtools stats files have valiable number of quality columns,
     # depending on the maximum available quality. For example, for NovaSeq
     # data maximum quality is below 40. We assume zero where data for a
     # particulr quality value are not available.
     #
-    $self->result->$method_name((defined $yield && defined $yield->{$base_quality})
-                                ? round($yield->{$base_quality}/$THOUSAND) : 0);
+    $self->result->$method_name(_get_yield($yield, $base_quality));
+    $self->result->$tmethod_name(_get_yield($yield, 0));
 
     for my $q (@thresholds) {
       my $method_name4q = sprintf '%s_q%i', $method_name, $q;
@@ -152,6 +153,12 @@ override 'execute' => sub {
 
   return 1;
 };
+
+sub _get_yield {
+  my ($yield, $quality) = @_;
+  return (defined $yield && defined $yield->{$quality})
+          ? round($yield->{$quality}/$THOUSAND) : 0;
+}
 
 sub _get_threshold {
   my ($self, $read_length) = @_;
@@ -207,7 +214,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 GRL
+Copyright (C) 2014,2015,2016,2018,2025 Genome Research Ltd.
 
 This file is part of NPG.
 

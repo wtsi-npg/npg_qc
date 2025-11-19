@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 22;
 use Test::Exception;
 use Moose::Meta::Class;
 use JSON;
@@ -43,7 +43,9 @@ isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::QXYield');
   my %values1 = %{$values};
   my $v1 = \%values1;
 
-  lives_ok {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()} 'tag record inserted';
+  lives_ok
+    {$rs->find_or_new($v1)->set_inflated_columns($v1)->update_or_insert()}
+    'tag record inserted';
   my $rs1 = $rs->search({});
   is ($rs1->count, 1, q[one row created in the table]);
   my $row = $rs1->next;
@@ -54,6 +56,8 @@ isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::QXYield');
   is($row->yield2_q30, 17385, 'q30 yield, reverse, saved');
   is($row->yield1_q40, 25, 'q40 yield, forward, saved');
   is($row->yield2_q40, 85, 'q40 yield, reverse, saved');
+  is($row->yield1_total, undef, 'total yield, forward, undefined');
+  is($row->yield2_total, undef, 'total yield, reverse, undefined');
   is(ref $row->info, 'HASH', 'info returned as hash ref');
   is_deeply($row->info, $values->{'info'},
     'info hash content is correct'); 
@@ -85,5 +89,4 @@ isa_ok($rs->new_result($values), 'npg_qc::Schema::Result::QXYield');
 }
 
 1;
-
 
