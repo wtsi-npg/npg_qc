@@ -1,12 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Test::Exception;
 
 use_ok ('npg_qc::autoqc::results::qX_yield');
 
 subtest 'attributes and methods' => sub {
-  plan tests => 13;
+  plan tests => 25;
 
   my $r = npg_qc::autoqc::results::qX_yield->new(
                   position  => 1,
@@ -30,6 +30,12 @@ subtest 'attributes and methods' => sub {
   is($r->pass_per_read(2), 0, 'pass value for read 2');
   is($r->yield1_q20, 200, 'alternative accessor for yield1');
   is($r->yield2_q20, 30, 'alternative accessor for yield2');
+  is($r->percent1_q20, undef, 'percent1_q20 is undefined');
+  is($r->percent2_q20, undef, 'percent2_q20 is undefined');
+  is($r->percent1_q30, undef, 'percent1_q30 is undefined');
+  is($r->percent2_q30, undef, 'percent2_q30 is undefined');
+  is($r->percent_q20, undef, 'percent_q20 is undefined');
+  is($r->percent_q30, undef, 'percent_q30 is undefined');
 
   $r = npg_qc::autoqc::results::qX_yield->new(
                 position  => 1,
@@ -47,10 +53,16 @@ subtest 'attributes and methods' => sub {
   is($r->criterion,
     'yield (number of KBs at and above Q20) is greater than the threshold',
     'criterion string');
+  is($r->percent1_q20, undef, 'percent1_q20 is undefined');
+  is($r->percent2_q20, undef, 'percent2_q20 is undefined');
+  is($r->percent1_q30, undef, 'percent1_q30 is undefined');
+  is($r->percent2_q30, undef, 'percent2_q30 is undefined');
+  is($r->percent_q20, undef, 'percent_q20 is undefined');
+  is($r->percent_q30, undef, 'percent_q30 is undefined');
 };
 
 subtest 'de-serialization from a JSON file' => sub {
-  plan tests => 16;
+  plan tests => 20;
 
   my $json = 't/data/autoqc/4453_2#0.qX_yield.json';
   my $r;
@@ -59,6 +71,8 @@ subtest 'de-serialization from a JSON file' => sub {
   is($r->pass, undef, 'pass is undef');
   is($r->yield1, undef, 'yield1 is undef');
   is($r->yield2, undef, 'yield2 is undef');
+  is($r->yield1_total, undef, 'yield1_total is undef');
+  is($r->yield2_total, undef, 'yield2_total is undef');
   is($r->threshold_yield1, undef, 'threshold1 is undef');
   is($r->threshold_yield2, undef, 'threshold2 is undef');
   is($r->threshold_quality, 20, 'threshold quality ok');
@@ -75,5 +89,28 @@ subtest 'de-serialization from a JSON file' => sub {
   is($r->yield2_q30, 2075662, 'q30 yield, reverse');
   is($r->yield1_q40, 16430, 'q40 yield, forward');
   is($r->yield2_q40, 8248, 'q40 yield, reverse');
+  is($r->yield1_total, undef, 'yield1_total is undef');
+  is($r->yield2_total, undef, 'yield2_total is undef');
   lives_ok { $r->freeze() } 'object can be serialized';
 };
+
+subtest 'calculating percents' => sub {
+  plan tests => 6;
+
+  my $r = npg_qc::autoqc::results::qX_yield->new(position => 1, id_run => 2549);
+  $r->yield1(3);
+  $r->yield2(30);
+  $r->yield1_q30(12);
+  $r->yield2_q30(12);
+  $r->yield1_total(60);
+  $r->yield2_total(120);
+
+  is($r->percent1_q20, 5, 'percent1_q20');
+  is($r->percent2_q20, 25, 'percent2_q20');
+  is($r->percent1_q30, 20, 'percent1_q30');
+  is($r->percent2_q30, 10, 'percent2_q30');
+  is(sprintf('%.2f', $r->percent_q20), '18.33', 'percent_q20');
+  is(sprintf('%.2f', $r->percent_q30), '13.33', 'percent_q30');
+};
+
+1;

@@ -244,11 +244,13 @@ Yield, in bases, per cycle for a read (an argument). If no argument is given,
 a forward read is assumed. Possible argument values are 'forward',
 'reverse', 'index';
 
-Returns a matrix, an array of arrays of integers. Each array element is
+Returns a matrix, an array of arrays of integers. Each array element (row) is
 an array of yields for a single cycle. The first array element corresponds
 to the first cycle, the last to the last cycle. The values in the arrays
 of yields correspond to individual qualities starting from 1. The values
-are the number of bases at or above a particular quality.
+are the number of bases at and above of a particular quality. Note the
+difference with raw values in the stats file, where each integer is the yield
+at a given quality.
 
 When not data is available for a read, an undefined value is returned.
 
@@ -281,7 +283,7 @@ sub yield_per_cycle {
   #####
   # We need the number of bases  at a particular quality
   # and above for a particular cycle, ie a sum of this number
-  # and all numbers in the array the right of this number.
+  # and all numbers in the array to the right of this number.
   my $max_quality = scalar @{$matrix->[0]};
 
   my $transform = sub {
@@ -304,23 +306,22 @@ sub yield_per_cycle {
 
 =head2 yield
 
-Overall yield in bases for a read (an argument). If no argument is given,
-a forward read is assumed. Possible argument values are 'forward',
-'reverse', 'index';
+Overall across cycles yield in bases for a read (an argument).
+Possible argument values are 'forward', 'reverse', 'index'.
+If no argument is given, a forward read is assumed.
 
-An array of integers is returned. The values in the array represent
-yields at qualities starting from 1. The values are the number of bases
-at or above a particular quality.
+A hash reference is returned. The keys represent the qualities (as
+0, 1, 2, 3, ...), the values are yields at or above of these
+qualties.
 
 When not data is available for a read, an undefined value is returned.
 
 Example:
 
-  my $a = $obj->yield('forward');
-
-  89765 78954 6987 55 0
-
-Maximum quality is five. 78954 bases are at quality 2 or above.
+  my $dict = $obj->yield('forward');
+  print join q[,], keys %{$dict}; # 0,1,2,3,4
+  print dict->{0}; # 89765
+  print dict->{4}; # 0
 
 =cut
 
@@ -518,7 +519,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) Genome Research Limited 2018
+Copyright (C) 2018,2025 Genome Research Ltd.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
