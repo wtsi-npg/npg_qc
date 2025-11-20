@@ -166,7 +166,8 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
   close $fh1;
 
   $csv = Text::CSV->new();
-  open my $fh2, q[<], "${runfolder}/${failure_codes_file_name}";
+  my $failure_codes_file_path = "${runfolder}/${failure_codes_file_name}";
+  open my $fh2, q[<], $failure_codes_file_path;
   $csv->header ($fh2);
   my $barcodes_failure_codes = {};
   while (my $row = $csv->getline_hr($fh2)) {
@@ -316,6 +317,7 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
   }
 
   $tm_result->spiked_control_index($NPG_TAG_INDEX_FOR_ULTIMA_CONTROL);
+  $tm_result->path($failure_codes_file_path);
   $tm_result->store($qc_output_dir);
 
   ######
@@ -379,6 +381,8 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
     );
     $result->yield1(int(($pct_pf_q20_bases*$num_bases)/($HUNDRED*$THOUSAND)));
     $result->yield1_q30(int(($pct_pf_q30_bases*$num_bases)/($HUNDRED*$THOUSAND)));
+    $result->yield1_total(int($num_bases/$THOUSAND));
+    $result->path($directory);
 
     $result->store($qc_output_dir);
   }
