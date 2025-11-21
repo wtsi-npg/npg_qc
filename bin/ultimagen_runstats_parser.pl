@@ -230,7 +230,6 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
       $deplexing_stats->{$target_barcode}->{'num_reads'} = $num_reads;
       $deplexing_stats->{$target_barcode}->{'input_num_reads'} = $input_num_reads;
       $deplexing_stats->{$target_barcode}->{'sample'} = $target_samples{$read_group}->id();
-      #$deplexing_stats->{$target_barcode}->{'library'} = $target_samples{$read_group}->{'library_name'};
       $deplexing_stats->{$target_barcode}->{'read_group'} = $read_group;
       my ($tag_index) = $read_group =~ /[0]*(\d+)/xms;
       $tag_index or croak "Undefined or zero tag index from read group $read_group";
@@ -270,11 +269,6 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
     next if ($key eq 'WAFER_NUM_READS');
     $deplexing_stats->{$key}->{'percent_reads'} =
       sprintf '%.2f', ($deplexing_stats->{$key}->{'num_reads'}/$total_num_reads)*$HUNDRED;
-  }
-
-  if (!$id_run) {
-    carp 'NPG tracking run id is not provided, autoqc results will not be generated.';
-    exit 0;
   }
 
   # If needed create top-level output directory.
@@ -363,8 +357,6 @@ sub main { ##no critic (Subroutines::ProhibitExcessComplexity)
     $file = $file_base_name . '_unmatched.json';
     if (-f $file) {
       push @files, $file;
-    } else {
-      carp "File $file does not exist";
     }
 
     my $num_bases = 0;
@@ -406,9 +398,27 @@ parse_ultima_stats.pl
 
 =head1 DESCRIPTION
 
+This script parses Ultima Genomics stats files that are availale in the run folder.
+
+The script produces C<npg_qc::autoqc::results::tag_metrics> and
+C<npg_qc::autoqc::results::qX_yield> results and serializes them as JSON to the
+output directory.
+
+Integer tag indexes are derived from C<index_label> attribute of C<npg_qc::ultimagen::sample>
+extracting the numerical part of the label.
+
+qX_yield results are generated for target samples only.
+
+In C<tag_metrics> object tag index 9999 is assigned to the standard UG control C<TT> sample,
+tag index 0 corresponds to all data that deplexed to non-target indexes plus what is
+produced by the instrument as C<UNKN>.
+
+Information about target samples is read either from a manifest or from
+[RunId]_LibraryInfo.xml in the run folder directory.
+
 =head1 USAGE
 
-parse_ultima_stats.pl --runfolder_path <runfolder> --output <folder> --id_run <run_id>
+  parse_ultima_stats.pl --runfolder_path <runfolder> --output <folder> --id_run <run_id>
 
 =head1 SUBROUTINES/METHODS
 
