@@ -1,7 +1,5 @@
-[% port = 9000;
-   IF env_dev == 'dev';
-     port = 9010;
-   END;
+[%
+   port = base_url.match('^https://') ? 12443 : 9000;
    base_url = base_url _ ':' _ port;
    npg_url = base_url _ '/perl/npg';
 %]
