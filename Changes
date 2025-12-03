@@ -1,5 +1,16 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Added a script ultimagen_runstats_parser.pl for parsing Ultima Genomics
+   stats files that are availale in the run folder. The script produces
+   autoqc tag_metrics and qX-yield results, the latter ones for target samples
+   only. Information about target samples is read either from a manifest or
+   from [RunId]_LibraryInfo.xml
+ - Added stand-alone parsers for Ultima Genomics manifest npg_qc::ultimagen::manifest
+   and [RunId]_LibraryInfo.xml files npg_qc::ultimagen::library_info. Both parsers
+   pesent an identical interface. They build the 'samples' attribute, which is
+   a list of npg_qc::ultimagen::sample type objects. The npg_qc::ultimagen::sample
+   class is a representation of an Ultima Genomics sample.
+
 release 75.1.0 (2025-11-19)
  - Added two new attributes, yield1_total and yield2_total, to
    npg_qc::autoqc::results::qX_yield. Extended 'execute' method in
