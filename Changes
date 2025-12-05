@@ -1,18 +1,8 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
  - Remove = in gatk pulldown metrics argument options (as to be deprecated) 
- - Added a script ultimagen_runstats_parser.pl for parsing Ultima Genomics
-   stats files that are availale in the run folder. The script produces
-   autoqc tag_metrics and qX-yield results, the latter ones for target samples
-   only. Information about target samples is read either from a manifest or
-   from [RunId]_LibraryInfo.xml
- - Added stand-alone parsers for Ultima Genomics manifest npg_qc::ultimagen::manifest
-   and [RunId]_LibraryInfo.xml files npg_qc::ultimagen::library_info. Both parsers
-   pesent an identical interface. They build the 'samples' attribute, which is
-   a list of npg_qc::ultimagen::sample type objects. The npg_qc::ultimagen::sample
-   class is a representation of an Ultima Genomics sample.
- - Changes to enable manual QC of Ultima Genomics runs.
-   - Flag a single Ultima Genomics run to the SeqQC template so that manual QC
+ - Enabled manual QC of Ultima Genomics runs.
+   - Flagged a single Ultima Genomics run to the SeqQC template so that manual QC
      widgets can be displayed for such a run.
    - The signature of the npg_qc::mq::outcomes 'save' method is changed.
      Previously the fourth optional argument was a boolean flag denoting a non-
@@ -28,6 +18,20 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      - all QC outcome should belong to the same sequencing run,
      - the sequencing run should be registered in the tracking database.
      The flow and layout of the code is improved making the code more readable.
+ - Added a parser for Ultima Genomics stats.
+   - Added stand-alone parsers for Ultima Genomics manifest
+     npg_qc::ultimagen::manifest and [RunId]_LibraryInfo.xml files
+     npg_qc::ultimagen::library_info. Both parsers pesent the same interface.
+     They build the 'samples' attribute, which is a list of
+     npg_qc::ultimagen::sample objects. The npg_qc::ultimagen::sample class is
+     a representation of an Ultima Genomics sample.
+   - Added a source-agnostic (manifest or [RunId]_LibraryInfo.xml) retriever for
+     sample information npg_qc::ultima::sample_retriever. It is expected that
+     this class will be used by mlwh loader for Ultima Genomics data. 
+   - Added a script ultimagen_runstats_parser.pl for parsing Ultima Genomics
+     stats files that are availale in the run folder. The script produces
+     autoqc tag_metrics and qX_yield results. Information about target samples
+     is read either from a manifest or from [RunId]_LibraryInfo.xml
 
 release 75.1.0 (2025-11-19)
  - Added two new attributes, yield1_total and yield2_total, to

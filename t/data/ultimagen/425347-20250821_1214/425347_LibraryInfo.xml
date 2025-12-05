@@ -1,0 +1,50 @@
+<SampleInfo RunId="425347" Library_Pool="18Aug25 D7_CooperSteer_5priem plus guide">
+  <Attributes>
+    <Attribute Name="Application" Value="test" />
+    <Attribute Name="sequencing_recipe" Value="UG_116cycles_Baseline_1.8.3.0" />
+    <Attribute Name="analysis_recipe" Value="other" />
+  </Attributes>
+  <Samples>
+    <Sample Id="iNeuron15923026@1_GEX_iA_iN_SCREEN" Index_Label="Z0001" Index_Sequence="CAGCTCGAATGCGAT">
+      <Attribute Name="Barcode_Plate_Num" Value="1" />
+      <Attribute Name="Barcode_Plate_Well" Value="A1" />
+      <Attribute Name="application_type" Value="scRNA_GEX_10x_5prime_v3" />
+    </Sample>
+    <Sample Id="iNeuron15923027@2_GEX_iA_iN_SCREEN" Index_Label="Z0002" Index_Sequence="CATGTGCAGCCATCGAT">
+      <Attribute Name="Barcode_Plate_Num" Value="1" />
+      <Attribute Name="Barcode_Plate_Well" Value="B1" />
+      <Attribute Name="application_type" Value="scRNA_GEX_10x_5prime_v3" />
+    </Sample>
+    <Sample Id="iNeuron15923028@3_GEX_iA_iN_SCREEN" Index_Label="Z0003" Index_Sequence="CATCACACATGAATGAT">
+      <Attribute Name="Barcode_Plate_Num" Value="1" />
+      <Attribute Name="Barcode_Plate_Well" Value="C1" />
+      <Attribute Name="application_type" Value="scRNA_GEX_10x_5prime_v3" />
+    </Sample>
+    <Sample Id="iNeuron15923029@4_GEX_iA_iN_SCREEN" Index_Label="Z0004" Index_Sequence="CTGTGTAGGCATGAT">
+      <Attribute Name="Barcode_Plate_Num" Value="1" />
+      <Attribute Name="Barcode_Plate_Well" Value="D1" />
+      <Attribute Name="application_type" Value="scRNA_GEX_10x_5prime_v3" />
+    </Sample>
+    <Sample Id="iNeuron15923030@1_dgRNA_iA_iN_SCREEN" Index_Label="Z0005" Index_Sequence="CATGTATCCTCTGAT">
+      <Attribute Name="Barcode_Plate_Num" Value="1" />
+      <Attribute Name="Barcode_Plate_Well" Value="E1" />
+      <Attribute Name="application_type" Value="scRNA_CRISPR_10x_5prime_v3" />
+    </Sample>
+    <Sample Id="iNeuron15923031@2_dgRNA_iA_iN_SCREEN" Index_Label="Z0006" Index_Sequence="CATATAGCCTATGAT">
+      <Attribute Name="Barcode_Plate_Num" Value="1" />
+      <Attribute Name="Barcode_Plate_Well" Value="F1" />
+      <Attribute Name="application_type" Value="scRNA_CRISPR_10x_5prime_v3" />
+    </Sample>
+    <Sample Id="iNeuron15923032@3_dgRNA_iA_iN_SCREEN" Index_Label="Z0007" Index_Sequence="CGATTCATGCTCGAT">
+      <Attribute Name="Barcode_Plate_Num" Value="1" />
+      <Attribute Name="Barcode_Plate_Well" Value="G1" />
+      <Attribute Name="application_type" Value="scRNA_CRISPR_10x_5prime_v3" />
+    </Sample>
+    <Sample Id="iNeuron15923033@4_dgRNA_iA_iN_SCREEN" Index_Label="Z0008" Index_Sequence="CACATCCTGCATGTGAT">
+      <Attribute Name="Barcode_Plate_Num" Value="1" />
+      <Attribute Name="Barcode_Plate_Well" Value="H1" />
+      <Attribute Name="application_type" Value="scRNA_CRISPR_10x_5prime_v3" />
+    </Sample>
+  </Samples>
+  <Sequencing />
+  <Analysis_Recipe Name="Other" />18Aug25 D7_CooperSteer_5priem plus guide</SampleInfo>

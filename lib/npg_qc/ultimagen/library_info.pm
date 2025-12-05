@@ -133,8 +133,10 @@ sub _build_samples {
   my $self = shift;
   my @samples = ();
   foreach my $se (@{$self->sample_elements}) {
+    my ($sample_id, $lib_name) = split /@/smx, $se->getAttribute('Id');
     push @samples, npg_qc::ultimagen::sample->new(
-      id => $se->getAttribute('Id'),
+      id => $sample_id,
+      library_name => $lib_name,
       index_label => $se->getAttribute('Index_Label'),
       index_sequence => $se->getAttribute('Index_Sequence')
     );

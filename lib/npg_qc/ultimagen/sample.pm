@@ -2,10 +2,21 @@ package npg_qc::ultimagen::sample;
 
 use Moose;
 use namespace::autoclean;
+use Carp;
+use Readonly;
+
+use npg_tracking::util::types;
+
+with qw/npg_tracking::glossary::tag/;
 
 our $VERSION = '0';
 
 ##no critic (Documentation::RequirePodAtEnd)
+
+Readonly::Scalar our $ULTIMA_CONTROL_INDEX_SEQUENCE => q[TT];
+# Highest allowed according to our spec
+Readonly::Scalar our $NPG_TAG_INDEX_FOR_ULTIMA_CONTROL =>
+  $npg_tracking::util::types::TAG_INDEX_MAX;
 
 =head1 NAME
 
@@ -15,7 +26,7 @@ npg_qc::ultimagen::sample
 
 =head1 DESCRIPTION
 
-Representation of a sample for sequencing on the Ultima Genetics instrument.
+Representation of a sample for sequencing on the Ultima Genomics instrument.
 
 =head1 SUBROUTINES/METHODS
 
@@ -26,6 +37,18 @@ Sample identifier.
 =cut
 
 has 'id' => (
+  isa      => 'Str',
+  is       => 'ro',
+  required => 1,
+);
+
+=head2 library_name
+
+In our practice this is sample name or supplier sample name.
+
+=cut
+
+has 'library_name' => (
   isa      => 'Str',
   is       => 'ro',
   required => 1,
@@ -46,6 +69,7 @@ has 'index_label' => (
 =head2 index_sequence
 
 The barcode sequence of the index.
+
 =cut
 
 has 'index_sequence' => (
@@ -53,6 +77,40 @@ has 'index_sequence' => (
   is       => 'ro',
   required => 1,
 );
+
+=head2 tag_index
+
+NPG tag index, derived from C<index_label> attribute.
+
+=cut
+
+has '+tag_index' => (
+  lazy_build => 1,,
+);
+sub _build_tag_index {
+  my $self = shift;
+  return $self->tag_index_from_read_group($self->index_label);
+}
+
+=head2 tag_index_from_read_group
+
+Class-level method.
+
+Given an Ultima Genomics read group or index label
+(see C<index_label> attribute) returns NPG tag index.
+
+=cut
+
+sub tag_index_from_read_group {
+  my ($package, $read_group) = @_;
+
+  if ($read_group eq $ULTIMA_CONTROL_INDEX_SEQUENCE) {
+    return $NPG_TAG_INDEX_FOR_ULTIMA_CONTROL;
+  }
+  my ($tag_index) = $read_group =~ /[0]*(\d+)/xms;
+  $tag_index or croak "Undefined or zero tag index from read group $read_group";
+  return $tag_index;
+}
 
 1;
 
@@ -69,6 +127,14 @@ __END__
 =item Moose
 
 =item namespace::autoclean
+
+=item Carp
+
+=item Readonly
+
+=item npg_tracking::util::types
+
+=item npg_tracking::glossary::tag
 
 =back
 

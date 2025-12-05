@@ -69,6 +69,7 @@ sub _build_samples {
   foreach my $row (@{$self->_sample_rows}) {
     push @samples, npg_qc::ultimagen::sample->new(
       id => $row->{'sample_id'},
+      library_name => $row->{'library_name'},
       index_label => $row->{'index_barcode_num'},
       index_sequence => $row->{'index_barcode_sequence'}
     );
