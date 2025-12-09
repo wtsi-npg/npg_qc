@@ -111,3 +111,16 @@
   latest_contact:
   percent_complete:
   lab:
+- external_name: V125
+  id_instrument: 130
+  id_instrument_format: 25
+  serial: ''
+  name: UG1
+  iscurrent: 1
+  ipaddr: ''
+  instrument_comp: ''
+  mirroring_host:
+  staging_dir:
+  latest_contact:
+  percent_complete:
+  lab:
