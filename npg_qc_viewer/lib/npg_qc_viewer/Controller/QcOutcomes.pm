@@ -148,65 +148,67 @@ sub _update_outcomes {
     }
   }
 
+  if ($error) {
+    $self->status_forbidden($c, 'message' => $error,);
+    return;
+  }
+
   # Present only in test scenario
   delete $data->{'user'};
   delete $data->{'password'};
 
-  if ($error) {
-    $self->status_forbidden($c, 'message' => $error,);
-  } else {
+  try {
+    # In the SeqQC viewer in manual QC context all data will belong to
+    # the same run. Enforce this.
+    my @rpts = map { keys %{$data->{$_}} } keys %{$data};
+    my @id_runs = uniq map { $_->{'id_run'} }
+                  map { npg_tracking::glossary::rpt->inflate_rpt($_) }
+                  @rpts;
+    if (@id_runs == 0) {
+      croak 'No QC outcomes in manual QC context';
+    }
+    if (@id_runs != 1) {
+      croak 'Multiple runs in manual QC context';
+    }
 
-    try {
-      my $seq_outcomes = $data->{$SEQ_OUTCOMES} || {};
-      my @lane_rps = keys %{$seq_outcomes};
-      my $lane_info = {};
-      # Why do we have to know the manufacturer?
-      # We are pushing Element Biosciences pooled libraries through this system.
-      # For time being (May 2025) no library-level autoqc data is available.
-      # The lanes' QC outcomes has to be finalised in the absence of plex-level
-      # QC outcomes. 
-      my $illumina_instr_manufacturer = 1;
-      if (@lane_rps) {
-         my @id_runs = uniq map { $_->{'id_run'} }
-                       map { npg_tracking::glossary::rpt->inflate_rpt($_) }
-                       @lane_rps;
-         if (@id_runs == 1) { # In the SeqQC viewer all data will belong to
-                              # the same run.
-           my $id_run = $id_runs[0];
-           my $tracking_run = $c->model('NpgDB')->schema()->resultset('Run')
-                              ->find($id_run);
-           if (!$tracking_run) {
-             $self->status_not_found(
-               $c,
-               message => "Run $id_run is not registered in the tracking database"
-             );
-             return;
-           }
-           $illumina_instr_manufacturer = $tracking_run->instrument()
-                                          ->manufacturer_is_Illumina();
-         }
-         if ($illumina_instr_manufacturer) {
-           $lane_info = $self->_lane_info($c->model('MLWarehouseDB'), \@lane_rps);
-         }
-      }
+    # Enforce run registration in the tracking database.
+    my $id_run = $id_runs[0];
+    my $tracking_run = $c->model('NpgDB')->schema()->resultset('Run')
+                         ->find($id_run);
+    if (!$tracking_run) {
+      croak "Run $id_run is not registered in the tracking database";
+    }
 
-      my $outcomes = npg_qc::mqc::outcomes->new(
-        qc_schema => $c->model('NpgQcDB')->schema()
-      )->save($data, $username, $lane_info, !$illumina_instr_manufacturer);
+    # Rules for saving manual QC outcomes differ between sequencing platforms.
+    # The controller has access to the tracking database, we can get the
+    # name of the sequencing instrument's manufacturer. 
+    my $instrument = $tracking_run->instrument();
+    my $manufacturer = $instrument->manufacturer_name();
 
-      $seq_outcomes = $outcomes->{$SEQ_OUTCOMES} || {};
-      $self->_update_runlanes($c, $seq_outcomes, $username);
+    my $seq_outcomes = $data->{$SEQ_OUTCOMES} || {};
+    my @lane_rps = keys %{$seq_outcomes};
+    my $lane_info = (@lane_rps && $instrument->manufacturer_is_Illumina())
+      ? $self->_lane_info($c->model('MLWarehouseDB'), \@lane_rps)
+      : {};
 
-      $self->status_ok($c, 'entity' => $outcomes,);
-    } catch {
-      my $e = $_;
-      if (ref $e eq 'DBIx::Class::Exception') {
-        $e = $e->{'msg'} || q[]; # This exception class does not provide
-                                 # any accessors.
-      }
-      $self->status_bad_request($c, 'message' => $e,);
-    };
-  }
+    # Save the outcomes.
+    my $outcomes = npg_qc::mqc::outcomes->new(
+      qc_schema => $c->model('NpgQcDB')->schema()
+    )->save($data, $username, $lane_info, $manufacturer);
+
+    $seq_outcomes = $outcomes->{$SEQ_OUTCOMES} || {};
+    # Update the status of the lanes. Run status might get updated as well.
+    $self->_update_runlanes($c, $seq_outcomes, $username);
+
+    $self->status_ok($c, 'entity' => $outcomes,);
+  } catch {
+    my $e = $_;
+    if (ref $e eq 'DBIx::Class::Exception') {
+      $e = $e->{'msg'} || q[]; # This exception class does not provide
+                               # any accessors.
+    }
+    $self->status_bad_request($c, 'message' => $e,);
+  };
 
   return;
 }

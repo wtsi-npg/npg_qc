@@ -602,7 +602,7 @@ subtest q[save - errors] => sub {
 };
 
 subtest q[save outcomes] => sub {
-  plan tests => 24;
+  plan tests => 28;
 
   my $o = npg_qc::mqc::outcomes->new(qc_schema => $qc_schema);
 
@@ -760,7 +760,6 @@ subtest q[save outcomes] => sub {
     {'101:3'=>{'mqc_outcome'=>'Rejected final'}}}, 'cat',
     {'101:3'=>\@tag_indexes}), 'got results'};
 
-
   throws_ok { $o->save({'seq' =>
     {'101:2'=>{'mqc_outcome'=>'Rejected final'}}}, 'cat',
     {'101:2'=>[(1 .. 6)]})}
@@ -788,19 +787,46 @@ subtest q[save outcomes] => sub {
     qr/Final outcome cannot be updated/,
     'error updating a final outcome to a different final outcome';
 
-  my $non_illumina_data = 1;
+  my $platform = 'Element Biosciences';
   lives_and { ok $o->save(
     {'seq' => {'1010000:5'=>{'mqc_outcome'=>'Accepted preliminary'}}},
     'cat',
     {},
-    $non_illumina_data
-  ) } 'saved preliminary lane outcome for non-Illumina data';
+    $platform
+  ) } 'saved preliminary lane outcome for Elembio data';
   lives_and { ok $o->save(
     {'seq' => {'1010000:5'=>{'mqc_outcome'=>'Accepted final'}}},
     'cat',
     {},
-    $non_illumina_data
-  ) } 'saved final lane outcome for non-Illumina data, no tag info';
+    $platform
+  ) } 'saved final lane outcome for Elembio data, no tag info';
+  
+  $platform = 'Ultima Genomics';
+  lives_and { ok $o->save(
+    {'seq' => {'1020000:1'=>{'mqc_outcome'=>'Accepted preliminary'}}},
+    'cat',
+    {},
+    $platform
+  ) } 'saved preliminary lane outcome for Ultimagen data';
+  throws_ok { ok $o->save(
+    {'seq' => {'1020000:1'=>{'mqc_outcome'=>'Accepted final'}}},
+    'cat',
+    {},
+    $platform
+  ) } qr/No lib outcomes/,
+     'error saving final lane outcome for Ultimagen data, no lib outcomes';
+  lives_and { ok $o->save(
+    {'lib' => {'1020000:1:5'=>{'mqc_outcome'=>'Accepted preliminary'}}},
+    'cat',
+    {},
+    $platform
+  ) } 'saved preliminary lib outcome for Ultimagen data';
+  lives_and { ok $o->save(
+    {'seq' => {'1020000:1'=>{'mqc_outcome'=>'Accepted final'}}},
+    'cat',
+    {},
+    $platform
+  ) } 'saved final lane outcome for Ultimagen data';
 };
 
 subtest q[save outcomes for entities with multiple components] => sub {

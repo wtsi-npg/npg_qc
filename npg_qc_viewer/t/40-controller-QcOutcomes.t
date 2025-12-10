@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 use URI::Escape qw(uri_escape);
 use JSON::XS;
@@ -318,53 +318,83 @@ subtest 'authentication and authorisation for an update' => sub {
 };
 
 subtest 'data validation for update requests' => sub {
-  plan tests => 10;
+  plan tests => 17;
 
-  my $data = {'Action'   => 'UPDATE',
-              'user'     => 'cat',
-              'password' => 'secret',
-              'lib'      => {},
-              'seq'      => {},
-              'other'    => {}};
+  my $data = { 'Action'   => 'UPDATE',
+               'user'     => 'cat',
+               'password' => 'secret',
+               'lib'      => {},
+               'seq'      => {} };
   my $error_code = 400;
 
   my $request = _new_post_request();
   $request->content(encode_json($data));
   my $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/No QC outcomes in manual QC context/,
+    'no qc outcomes');
+
+  $data->{'other'} = {'50000:2' => {'mqc_outcome' => 'Undecided'}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
   like ($response->content, qr/One of outcome types is unknown/,
     'unknown outcome type present - error');
 
   delete $data->{'other'};
+
   $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'Undecided'}, '1:4' => {'mqc_outcome' => ''}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/Error saving outcome for 1:4 - Outcome description is missing/,
-    'outcome description should be present');
+  like ($response->content, qr/Run 1 is not registered in the tracking database/,
+    'run should be registered in the tracking database');
 
-  $data->{'lib'} = {'1:2' => {'mqc_outcome' => 'Undecided'}, '1:4' => {'qc_outcome' => ''}};
+  $data->{'seq'} = {
+    "400025:4" => {'mqc_outcome' => 'Rejected final'},
+    "50000:4"  => {'mqc_outcome' => 'Rejected final'}
+  };
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  ok($response->is_error, qq[Error response for multiple runs]);
+  is($response->code, 400, 'error code is 400');
+  like($response->content, qr/Multiple runs in manual QC context/,
+    'Miltiple runs are not allowed');
+
+  
+  $data->{'seq'} = {};
+  $data->{'lib'} = {'1234:2' => {'mqc_outcome' => 'Undecided'}, '1234:4' => {'mqc_outcome' => ''}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
-  like ($response->content, qr/Error saving outcome for 1:4 - Outcome description is missing/,
+  like ($response->content, qr/Error saving outcome for 1234:4 - Outcome description is missing/,
+    'outcome description should be present');
+
+  $data->{'lib'} = {'1234:2' => {'mqc_outcome' => 'Undecided'}, '1234:4' => {'qc_outcome' => ''}};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  is($response->code, $error_code, "error code is $error_code");
+  like ($response->content, qr/Error saving outcome for 1234:4 - Outcome description is missing/,
     'outcome description should not be empty');
 
   delete $data->{'lib'};
-  $data->{'uqc'} = {'1:2' => {'uqc_outcome' => 'Undecided',
+  $data->{'uqc'} = {'1234:2' => {'uqc_outcome' => 'Undecided',
                               'rationale'   => 'something'},
-                    '1:4' => {'uqc_outcome' => ''}};
+                    '1234:4' => {'uqc_outcome' => ''}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
   is($response->code, $error_code, "error code is $error_code");
   like ($response->content,
-    qr/Error saving outcome for 1:4 - Outcome description is missing/,
-    'outcome description for uqc should be present for 1:4');
+    qr/Error saving outcome for 1234:4 - Outcome description is missing/,
+    'outcome description for uqc should be present for 1234:4');
 
-  $data->{'uqc'} = {'1:2' => {'uqc_outcome' => 'Accepted'}};
+  $data->{'uqc'} = {'1234:2' => {'uqc_outcome' => 'Accepted'}};
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
@@ -428,38 +458,30 @@ subtest 'conditionally get wh info about tags' => sub {
   ok($response->is_success, 'response received for updating a seq entity');
 };
 
-subtest 'rules relaxation for non-Illumina data' => sub {
-  plan tests => 14;
+subtest 'rules relaxation for Elembio data' => sub {
+  plan tests => 8;
 
   my $data = {
     'Action'   => 'UPDATE',
     'user'     => 'pipeline',
     'password' => 'secret',
-    'seq'      => {'400025:4' => {'mqc_outcome' => 'Rejected final'}}
+    'seq'      => {}
   };
-  my $request = _new_post_request();
-  $request->content(encode_json($data));
-  my $response = request($request);
-  ok($response->is_error, qq[Error when the run is not tracked]);
-  is($response->code, 404, 'error code is 404' );
-  is($response->content,
-    '{"error":"Run 400025 is not registered in the tracking database"}',
-    'correct error message');
   
   my $id_run = 50000;
   my $count = 0;
   for my $lane ((2, 1)) {
     $count++;
     $data->{'seq'} = {"${id_run}:${lane}" => {'mqc_outcome' => 'Rejected final'}};
-    $request = _new_post_request();
+    my $request = _new_post_request();
     $request->content(encode_json($data));
-    $response = request($request);
+    my $response = request($request);
     ok($response->is_success, 'request for Elemio run has succeeded');
     is_deeply(decode_json($response->content),
       {"seq" => {"50000:${lane}" => {"mqc_outcome" => "Rejected final"}},
        "lib" => {},
        "uqc" => {}}, 'correct QC outcome in response');
-    my $rl=$schemas->{'npg'}->resultset('RunLane')
+    my $rl = $schemas->{'npg'}->resultset('RunLane')
       ->find({id_run=>$id_run, position=>$lane});
     my $expected = 'manual qc complete';
     is($rl->current_run_lane_status->description, $expected,
@@ -470,19 +492,65 @@ subtest 'rules relaxation for non-Illumina data' => sub {
     is($run_status, $expected,
       'Run status has' . ($count == 1) ? '' : ' not' . " changed to $expected");  
   }
+};
 
-  $data->{'seq'} = {
-    "400025:4" => {'mqc_outcome' => 'Rejected final'},
-    "50000:4"  => {'mqc_outcome' => 'Rejected final'}
+subtest 'rules relaxation for Ultimagen data' => sub {
+  plan tests => 8;
+
+  my $data = {
+    'Action'   => 'UPDATE',
+    'user'     => 'pipeline',
+    'password' => 'secret',
+    'seq'      => {},
+    'lib'      => {}
+  };
+  
+  my $id_run = 50100;
+  my $lane = 1;
+  my $seq_outcome = {"${id_run}:${lane}" => {"mqc_outcome" => "Accepted final"}};
+  $data->{'seq'} = $seq_outcome;
+  my $request = _new_post_request();
+  $request->content(encode_json($data));
+  my $response = request($request);
+  ok($response->is_error, qq[response is an error]);
+  is($response->code, 400, 'error code is 400 - bad request' );
+  like($response->content,
+    qr/No lib outcomes to finalise for Ultima Genomics data/,
+    'lib outcomes are not present - error');
+ 
+  $data->{'seq'} = {};
+  $data->{'lib'} = {
+    "${id_run}:${lane}:3" => {'mqc_outcome' => 'Accepted preliminary'},
+    "${id_run}:${lane}:5" => {'mqc_outcome' => 'Rejected preliminary'}
   };
   $request = _new_post_request();
   $request->content(encode_json($data));
   $response = request($request);
-  ok($response->is_error, qq[Error when the run is not tracked]);
-  is($response->code, 400, 'error code is 400');
-  like($response->content,
-    qr/No NPG mlwarehouse data for run \d+ position 4/,
-    'Illumina flow is triggered for QC outcomes for multiple runs');
+  ok($response->is_success, 'request has succeeded');
+
+  $data->{'seq'} = $seq_outcome;
+  $data->{'lib'} = {};
+  $request = _new_post_request();
+  $request->content(encode_json($data));
+  $response = request($request);
+  ok($response->is_success, 'request has succeeded');
+  is_deeply(decode_json($response->content), {
+     "seq" => $seq_outcome,
+     "lib" => {
+       "${id_run}:${lane}:3" => {"mqc_outcome" => "Accepted final"},
+       "${id_run}:${lane}:5" => {"mqc_outcome" => "Rejected final"}
+     },
+     "uqc" => {}}, 'correct QC outcome in response'); 
+  
+  my $rl = $schemas->{'npg'}->resultset('RunLane')
+    ->find({id_run=>$id_run, position=>$lane});
+  my $expected = 'manual qc complete';
+  is($rl->current_run_lane_status->description, $expected,
+      "lane status is set to $expected for lane $lane");
+  my $run_status = $schemas->{'npg'}->resultset('Run')->find($id_run)
+      ->current_run_status_description;
+  $expected = 'archival pending';
+  is($run_status, $expected, "run status has changed to $expected"); 
 };
 
 subtest 'conditionally update of run/lane status in tracking' => sub {
@@ -524,4 +592,3 @@ subtest 'conditionally update of run/lane status in tracking' => sub {
 };
 
 1;
-

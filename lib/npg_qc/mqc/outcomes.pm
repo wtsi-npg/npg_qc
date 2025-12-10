@@ -27,6 +27,10 @@ Readonly::Hash   my %OUTCOME_TYPE2RS_NAME =>
                                         $SEQ_OUTCOMES => $SEQ_RS_NAME,
                                         $UQC_OUTCOMES => $UQC_RS_NAME, );
 
+# Manufacturer names as defined in the tracking database.
+Readonly::Scalar my $ILLUMINA  => 'Illumina';
+Readonly::Scalar my $ULTIMAGEN => 'Ultima Genomics';
+
 has 'qc_schema' => (
   isa        => 'npg_qc::Schema',
   is         => 'ro',
@@ -109,7 +113,7 @@ sub get_library_outcome {
 }
 
 sub save {
-  my ($self, $outcomes, $username, $lane_info, $non_illumina_data) = @_;
+  my ($self, $outcomes, $username, $lane_info, $platform) = @_;
 
   if (!$outcomes || (ref $outcomes ne 'HASH')) {
     croak q[Outcomes hash is required];
@@ -130,7 +134,9 @@ sub save {
     croak 'One of outcome types is unknown';
   }
 
-  $self->_save_outcomes($outcomes, $username, $lane_info, $non_illumina_data);
+  $platform ||= $ILLUMINA;
+  $lane_info ||= {};
+  $self->_save_outcomes($outcomes, $username, $lane_info, $platform);
 
   return $self->get( [map {keys %{$_}} values %{$outcomes}] );
 }
@@ -149,9 +155,7 @@ sub _map_outcomes {
 }
 
 sub _save_outcomes {
-  my ($self, $outcomes, $username, $lane_info, $non_illumina_data) = @_;
-
-  $lane_info ||= {};
+  my ($self, $outcomes, $username, $lane_info, $platform) = @_;
 
   my $actions = sub {
     foreach my $outcome_type ( @OUTCOME_TYPES ) {
@@ -170,15 +174,33 @@ sub _save_outcomes {
           my $outcome_ent = $self->_find_or_new_outcome($outcome_type, $composition_obj);
           if ($outcome_ent->valid4update($o)) {
             $outcome_ent->update_outcome($o, $username);
-            # For Illumina data finalise plex-level outcomes if the lane-level
-            # outcome is now final.
-            if (!$non_illumina_data && $outcome_type eq $SEQ_OUTCOMES &&
-                $outcome_ent->has_final_outcome) {
-              if (!exists $lane_info->{$key}) {
-                croak qq[Tag indices for lane $key are required];
-              }
+
+            ######
+            # For Illumina and Ultimagen data finalise plex-level outcomes if
+            # the lane-level outcome is now final. For Elembio data no
+            # library-level QC data and therefore outcomes are available.
+            #
+            # Less stringent validation for Ultimagen data since the code
+            # has to work without access to LIMS data.
+            #
+            if ( (($platform eq $ILLUMINA) || ($platform eq $ULTIMAGEN)) &&
+                 $outcome_type eq $SEQ_OUTCOMES && $outcome_ent->has_final_outcome) {
+
               my @lib_outcomes = $self->_create_query4lib_outcomes4lane($composition_obj)->all();
-              $self->_validate_library_outcomes($outcome_ent, \@lib_outcomes, $lane_info->{$key});
+
+              if ($platform eq $ILLUMINA) {
+                exists $lane_info->{$key} or croak
+                  qq[Tag indices for lane $key are required for $ILLUMINA data];
+                $self->_validate_library_outcomes($outcome_ent, \@lib_outcomes, $lane_info->{$key});
+              } else {
+                @lib_outcomes or croak
+                  qq[No lib outcomes to finalise for $ULTIMAGEN data];
+              }
+
+              if ($outcome_ent->is_rejected && any { !$_->is_undecided } @lib_outcomes) {
+                croak q[Sequencing failed, all library outcomes should be undecided];
+              }
+
               foreach my $lib (@lib_outcomes) {
                 $lib->finalise_outcome($username);
               }
@@ -290,11 +312,7 @@ sub _validate_library_outcomes {
   }
 
   my %tag_counts = map { $_ => 1 } @{$tag_list};
-  my $num_undecided = 0;
   for my $lo (@{$lib_outcomes}) {
-    if ($lo->is_undecided) {
-      $num_undecided++;
-    }
     my $tag_index = $lo->composition->get_component(0)->tag_index;
     if (defined $tag_index) {
       $tag_counts{$tag_index}++;
@@ -303,9 +321,6 @@ sub _validate_library_outcomes {
 
   if ($seq_outcome_ent->has_final_outcome && any { $_ == 1 } values %tag_counts) {
     croak q[Mismatch between known tag indices and available library outcomes];
-  }
-  if ($seq_outcome_ent->is_rejected && ($num_undecided != scalar @{$lib_outcomes})) {
-    croak q[Sequencing failed, all library outcomes should be undecided];
   }
 
   return;
@@ -384,20 +399,21 @@ Error if not entry in the database for this rpt list.
 
 First argument - a data structure identical to the one returned by the get method.
 Either top level lib or seq or both entries should be defined. The information
-in the datastructure is used to create/update qc outcomes tables. Required.
+in the data structure is used to create/update qc outcomes tables. Required.
 
 Second argument - username, required. No validation is performed.
 
 Third argument - a hash reference where lane-level rpt keys are mapped to arrays
 of tag indexes for a lane. The array can be empty. The argument defaults to an
 empty hash reference. The arrays of tag indexes are used for validating library
-qc outcomes when a fanal outcome for a lane is saved. Library outcomes for all
-tag indexes present in the array should be available. Outcomes for any other tag
-indexes should not be present.
+qc outcomes when a final outcome for a lane is saved (Illumina platform only).
+Library outcomes for all tag indexes present in the array should be available.
+Outcomes for any other tag indexes should not be present.
 
-Forth argument - an optional boolean value flagging data as belonging to non-
-Illumina platform. Defaults to false, meaning that by default the data belongs
-to Illumina platform.
+Forth argument - platform (sequencing instrument manufacturer) name. Optional,
+defaults to 'Illumina'. To be correctly recognised, the value should be one
+of the names in the 'manufacturer' table of the tracking database. No validation
+is performed.
 
 The method returns the data identical to the return value of the get method for
 the entities specifies in the first argument.
