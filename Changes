@@ -10,7 +10,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    pesent an identical interface. They build the 'samples' attribute, which is
    a list of npg_qc::ultimagen::sample type objects. The npg_qc::ultimagen::sample
    class is a representation of an Ultima Genomics sample.
- - Flag a single Ultima Genomica run to the SeqQC template so that manual QC
+ - Flag a single Ultima Genomics run to the SeqQC template so that manual QC
    widgets can be displayed for such a run.
 
 release 75.1.0 (2025-11-19)
