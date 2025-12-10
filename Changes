@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Remove = in gatk pulldown metrics argument options (as to be deprecated) 
  - Added a script ultimagen_runstats_parser.pl for parsing Ultima Genomics
    stats files that are availale in the run folder. The script produces
    autoqc tag_metrics and qX-yield results, the latter ones for target samples
