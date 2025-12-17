@@ -118,7 +118,9 @@ lib/npg_qc/elembio/sample_stats.pm
 lib/npg_qc/elembio/tag_metrics_generator.pm
 lib/npg_qc/ultimagen/library_info.pm
 lib/npg_qc/ultimagen/manifest.pm
+lib/npg_qc/ultimagen/run_stats.pm
 lib/npg_qc/ultimagen/sample.pm
+lib/npg_qc/ultimagen/sample_retriever.pm
 lib/npg_qc/mqc/reporter.pm
 lib/npg_qc/mqc/outcomes.pm
 lib/npg_qc/mqc/outcomes/keys.pm
@@ -188,6 +190,8 @@ t/00-scripts_compile.t
 t/10-autoqc-parse-samtools_stats.t
 t/30-illumina-interop-parser.t
 t/30-elembio-runstats.t
+t/30-ultimagen-runstats.t
+t/30-ultimagen-sample_retriever.t
 t/50-npg_qc-Schema.t
 t/50-schema-result-Contamination.t
 t/50-schema-result-InsertSize.t
@@ -719,6 +723,6 @@ t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/InterOp/TileMetricsOut.bin
 t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/InterOp/ExtendedTileMetricsOut.bin
 t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/RunInfo.xml
 t/data/autoqc/200117_A00715_0080_BHY7T3DSXX/RunParameters.xml
+t/data/ultimagen/424445-20251105_1219.tar.gz
 t/data/ultimagen/425347-20250821_1214/manifest.csv
-t/data/ultimagen/425347-20250821_1214/merged_trimmer-failure_codes.csv
-t/data/ultimagen/425347-20250821_1214/merged_trimmer-stats.csv
+t/data/ultimagen/425347-20250821_1214/425347_LibraryInfo.xml
