@@ -11,8 +11,23 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    pesent an identical interface. They build the 'samples' attribute, which is
    a list of npg_qc::ultimagen::sample type objects. The npg_qc::ultimagen::sample
    class is a representation of an Ultima Genomics sample.
- - Flag a single Ultima Genomics run to the SeqQC template so that manual QC
-   widgets can be displayed for such a run.
+ - Changes to enable manual QC of Ultima Genomics runs.
+   - Flag a single Ultima Genomics run to the SeqQC template so that manual QC
+     widgets can be displayed for such a run.
+   - The signature of the npg_qc::mq::outcomes 'save' method is changed.
+     Previously the fourth optional argument was a boolean flag denoting a non-
+     Illumina run. Now this argument is a string, the name of the sequencing
+     instrument manufacturer. The argument is still optional and defaults to
+     'Illumina'. This change allows for establishing per-platform rules for
+     finalising QC outcomes. A rule for QC outcomes for Ultima Genomics data is
+     added. Rules for Illumina and Element Biosciences data have not changed.
+   - npg_qc_viewer::Controller::QcOutcomes is refactored in order to reliably
+     determine sequencing instrument manufacturer name and pass it to 'save'
+     method of npg_qc::mq::outcomes class. The following  previously implied
+     assumptions are enforced:
+     - all QC outcome should belong to the same sequencing run,
+     - the sequencing run should be registered in the tracking database.
+     The flow and layout of the code is improved making the code more readable.
 
 release 75.1.0 (2025-11-19)
  - Added two new attributes, yield1_total and yield2_total, to
