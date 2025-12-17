@@ -171,7 +171,7 @@ sub _update_outcomes {
       croak 'Multiple runs in manual QC context';
     }
 
-    # Enforce run registration in the tracking database.
+    # The run should be registered in the tracking database.
     my $id_run = $id_runs[0];
     my $tracking_run = $c->model('NpgDB')->schema()->resultset('Run')
                          ->find($id_run);

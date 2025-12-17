@@ -362,8 +362,7 @@ subtest 'data validation for update requests' => sub {
   ok($response->is_error, qq[Error response for multiple runs]);
   is($response->code, 400, 'error code is 400');
   like($response->content, qr/Multiple runs in manual QC context/,
-    'Miltiple runs are not allowed');
-
+    'Multiple runs are not allowed');
   
   $data->{'seq'} = {};
   $data->{'lib'} = {'1234:2' => {'mqc_outcome' => 'Undecided'}, '1234:4' => {'mqc_outcome' => ''}};

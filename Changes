@@ -25,7 +25,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      determine sequencing instrument manufacturer name and pass it to 'save'
      method of npg_qc::mq::outcomes class. The following  previously implied
      assumptions are enforced:
-     - all QC outcome should belong to thr same sequencing run,
+     - all QC outcome should belong to the same sequencing run,
      - the sequencing run should be registered in the tracking database.
      The flow and layout of the code is improved making the code more readable.
 
