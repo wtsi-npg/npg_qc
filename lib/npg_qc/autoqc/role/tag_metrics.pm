@@ -11,7 +11,7 @@ our $VERSION = '0';
 Readonly::Scalar  my $ONE_TENTH => 0.1;
 Readonly::Scalar  my $HUNDRED   => 100;
 
-sub _total_reads_count {
+sub total_reads_count {
   my ($self, $attr) = @_;
   my $total = 0;
   foreach my $tag_index (keys %{$self->$attr}) {
@@ -25,7 +25,7 @@ sub _total_reads_count {
 
 sub all_reads {
   my ($self) = @_;
-  return $self->_total_reads_count(q[reads_pf_count]);
+  return $self->total_reads_count(q[reads_pf_count]);
 }
 
 sub all_reads_percent {
@@ -35,7 +35,7 @@ sub all_reads_percent {
 
 sub perfect_matches {
   my ($self) = @_;
-  return $self->_total_reads_count(q[perfect_matches_pf_count]);
+  return $self->total_reads_count(q[perfect_matches_pf_count]);
 }
 
 sub perfect_matches_percent {
@@ -47,7 +47,7 @@ sub perfect_matches_percent {
 
 sub one_mismatch {
   my ($self) = @_;
-  return $self->_total_reads_count(q[one_mismatch_matches_pf_count]);
+  return $self->total_reads_count(q[one_mismatch_matches_pf_count]);
 }
 
 sub one_mismatch_percent {
@@ -130,7 +130,7 @@ sub variance_coeff {
       if (exists $self->perfect_matches_pf_count->{$key}) {
         my $value = $self->perfect_matches_pf_count->{$key};
         if ($all_matches) {
-	        $value += $self->one_mismatch_matches_pf_count->{$key};
+          $value += $self->one_mismatch_matches_pf_count->{$key};
         }
         push @values, $value;
       }
@@ -163,29 +163,36 @@ __END__
 
 =head1 SUBROUTINES/METHODS
 
-All calculations use purity-filtered read numbers.
+All calculations use purity-filtered read numbers unless stated otherwise.
 
-=head2 	all_reads
+=head2 total_reads_count
 
-=head2 	all_reads_percent
+Calculates total number of reads across all tags and tag zero.
+Takes one string argument, the type of read count. Examples of read types:
+'reads_pf_count', 'perfect_matches_pf_count', 'one_mismatch_matches_pf_count',
+'reads_count', for more see C<npg_qc::autoqc::results::tag_metrics>.
 
-=head2 	errors
+=head2 all_reads
 
-=head2 	errors_percent
+=head2 all_reads_percent
 
-=head2 	one_mismatch
+=head2 errors
 
-=head2 	one_mismatch_percent
+=head2 errors_percent
 
-=head2 	perfect_matches
+=head2 one_mismatch
 
-=head2 	perfect_matches_percent
+=head2 one_mismatch_percent
 
-=head2 	sorted_tag_indices
+=head2 perfect_matches
 
-=head2 	underrepresented_tags
+=head2 perfect_matches_percent
 
-=head2 	variance_coeff
+=head2 sorted_tag_indices
+
+=head2 underrepresented_tags
+
+=head2 variance_coeff
 
 =head1 DIAGNOSTICS
 
