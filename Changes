@@ -1,5 +1,7 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Updated the SOP for changing manual QC outcomes with an example of failing
+   a previously passed lane.
  - npg_qc::autoqc::role::tag_metrics - converted a private method
    '_total_reads_count' to public 'total_reads_count'. This is driven by the
    need to compute the count of raw input read values for Ultima Genomics runs.
