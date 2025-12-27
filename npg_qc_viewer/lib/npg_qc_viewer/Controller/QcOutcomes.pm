@@ -158,21 +158,8 @@ sub _update_outcomes {
   delete $data->{'password'};
 
   try {
-    # In the SeqQC viewer in manual QC context all data will belong to
-    # the same run. Enforce this.
-    my @rpts = map { keys %{$data->{$_}} } keys %{$data};
-    my @id_runs = uniq map { $_->{'id_run'} }
-                  map { npg_tracking::glossary::rpt->inflate_rpt($_) }
-                  @rpts;
-    if (@id_runs == 0) {
-      croak 'No QC outcomes in manual QC context';
-    }
-    if (@id_runs != 1) {
-      croak 'Multiple runs in manual QC context';
-    }
-
+    my $id_run = _id_run_from_data($data);
     # The run should be registered in the tracking database.
-    my $id_run = $id_runs[0];
     my $tracking_run = $c->model('NpgDB')->schema()->resultset('Run')
                          ->find($id_run);
     if (!$tracking_run) {
@@ -256,8 +243,27 @@ sub _update_runlanes {
   return;
 }
 
+sub _id_run_from_data {
+  my $data = shift;
+
+  # In the SeqQC viewer in manual QC context all data will belong to
+  # the same run. Enforce this.
+  my @rpts = map { keys %{$data->{$_}} } keys %{$data};
+  my @id_runs = uniq map { $_->{'id_run'} }
+                map { @{npg_tracking::glossary::rpt->inflate_rpts($_)} }
+                @rpts;
+  if (@id_runs == 0) {
+    croak 'No QC outcomes in manual QC context';
+  }
+  if (@id_runs != 1) {
+    croak 'Multiple runs in manual QC context';
+  }
+
+  return $id_runs[0];
+}
 
 __PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__

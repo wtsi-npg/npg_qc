@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Exception;
 use URI::Escape qw(uri_escape);
 use JSON::XS;
@@ -457,6 +457,34 @@ subtest 'conditionally get wh info about tags' => sub {
   ok($response->is_success, 'response received for updating a seq entity');
 };
 
+subtest 'retrieve id_run from payload' => sub {
+  plan tests => 4;
+
+  my $data = {'seq' => {}, 'lib' => {}};
+  throws_ok { npg_qc_viewer::Controller::QcOutcomes::_id_run_from_data($data) }
+    qr/No QC outcomes in manual QC context/,
+    'errors when the payload does not contain any manual QC outcomes';
+  
+  $data = {'seq' => {'1234:1' => {'mqc_outcome' => 'Accepted preliminary'}},
+           'lib' => {'1235:1:2' => {'mqc_outcome' => 'Accepted preliminary'}}};
+  throws_ok { npg_qc_viewer::Controller::QcOutcomes::_id_run_from_data($data) }
+    qr/Multiple runs in manual QC context/,
+    'errors when the payload contains any manual QC outcomes for multiple runs';
+
+  my $id_run = 51522;
+  my $key = join q[;], map { join q[:], $id_run, $_, 5  } (1, 2, 3);
+
+  $data->{'seq'} = {};
+  $data->{'lib'} = {$key => {'mqc_outcome' => 'Accepted preliminary'}};
+  is(npg_qc_viewer::Controller::QcOutcomes::_id_run_from_data($data), $id_run,
+    'run id correctly inferred for a merged entity');
+
+  $data = {'seq' => {'1234:1' => {'mqc_outcome' => 'Accepted preliminary'}},
+           'lib' => {'1234:1:2' => {'mqc_outcome' => 'Accepted preliminary'}}};
+  is(npg_qc_viewer::Controller::QcOutcomes::_id_run_from_data($data), 1234,
+    'run id correctly inferred for multiple entities');
+};
+
 subtest 'rules relaxation for Elembio data' => sub {
   plan tests => 8;
 
@@ -552,7 +580,7 @@ subtest 'rules relaxation for Ultimagen data' => sub {
   is($run_status, $expected, "run status has changed to $expected"); 
 };
 
-subtest 'conditionally update of run/lane status in tracking' => sub {
+subtest 'conditionally update run/lane status in tracking' => sub {
   plan tests => 9;
 
   my $original = 'analysis complete';
