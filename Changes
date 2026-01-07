@@ -37,6 +37,9 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
      stats files that are availale in the run folder. The script produces
      autoqc tag_metrics and qX_yield results. Information about target samples
      is read either from a manifest or from [RunId]_LibraryInfo.xml
+ - Add apache configuration to optionally run the service behind a reverse
+   proxy with http port working only as a rewrite rule to tls port
+   - update build configuration to copy apache configuration to install target
 
 release 75.1.0 (2025-11-19)
  - Added two new attributes, yield1_total and yield2_total, to

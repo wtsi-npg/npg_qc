@@ -298,4 +298,4 @@ t/data/test_app.conf
 t/data/test_app_no_db.conf
 t/perlcriticrc
 t/util.pm
-
+wtsi_local/httpd_seqqc.conf
