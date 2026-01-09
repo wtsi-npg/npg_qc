@@ -46,6 +46,17 @@ my $class = WTSI::DNAP::Utilities::Build->subclass(code => <<'EOC');
     return;
   }
 
+  sub process_wtsi_local_files {
+    my $self = shift;
+    foreach my $file ( @{$self->rscan_dir('wtsi_local', sub {-f $_})} ) {
+      $self->copy_if_modified(
+        from => $file,
+        to_dir  => join(q[/], $self->base_dir(), $self->blib()),
+        flatten => 0);
+    }
+    return;
+  }
+
 EOC
 
 my $builder = $class->new(
@@ -160,6 +171,15 @@ my $builder = $class->new(
 $builder->add_build_element('seqqc');
 if ($builder->install_base()) {
   $builder->install_path('seqqc' => join q[/], $builder->install_base(), 'seqqc');
+}
+
+# Process apache configuration files
+my $path = 'wtsi_local';
+my $name = $path;
+$name =~ s/-//;
+$builder->add_build_element($name);
+if ($builder->install_base()) {
+  $builder->install_path($path => join q{/}, $builder->install_base(), $path);
 }
 
 $builder->create_build_script();

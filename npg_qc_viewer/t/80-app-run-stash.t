@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 28;
+use Test::More tests => 33;
 use Test::Exception;
 use HTTP::Request::Common;
 use File::Temp qw/tempdir/;
@@ -98,17 +98,20 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
   my $req = GET(q[/checks/runs/4025]);
   my ($res, $c) = ctx_request($req);
   ok ($res->is_success, 'request succeeded');
-  is($c->stash->{elembio_run}, 0, 'not an elembio run');
+  is($c->stash->{elembio_run}, 0, 'not elembio run');
+  is($c->stash->{ultimagen_run}, 0, 'not ultimagen run');
 
   $req = GET(q[/checks/runs/50000]);
   ($res, $c) = ctx_request($req);
   ok ($res->is_success, 'request succeeded');
-  is($c->stash->{elembio_run}, 1, 'elembio run');  
+  is($c->stash->{elembio_run}, 1, 'elembio run');
+  is($c->stash->{ultimagen_run}, 0, 'not ultimagen run'); 
+  
+  $req = GET(q[/checks/runs/50100]);
+  ($res, $c) = ctx_request($req);
+  ok ($res->is_success, 'request succeeded');
+  is($c->stash->{elembio_run}, 0, 'not elembio run');
+  is($c->stash->{ultimagen_run}, 1, 'ultimagen run'); 
 }
 
 1;
-
-
-
-  
-

@@ -129,4 +129,16 @@
   is_paired: 1
   priority: 1
   team: SR
-
+- actual_cycle_count: 0
+  batch_id: ~
+  expected_cycle_count: 0
+  flowcell_id: 430289
+  folder_name: 430289_XYZ
+  folder_path_glob: ~
+  id_instrument: 130
+  id_instrument_format: 25
+  id_run: 50100
+  id_run_pair: ~
+  is_paired: 0
+  priority: 1
+  team: SR

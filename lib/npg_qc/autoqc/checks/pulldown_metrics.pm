@@ -97,12 +97,12 @@ has '_picard_arguments' => (
 sub _build__picard_arguments {
     my $self = shift;
     return [
-        '--VALIDATION_STRINGENCY=SILENT',
-        '--BAIT_INTERVALS='.$self->bait_intervals_path,
-        '--TARGET_INTERVALS='.$self->target_intervals_path,
-        '--REFERENCE_SEQUENCE='.$self->reference,
-        '--INPUT='.$self->input_files->[0],
-        '--OUTPUT='.$self->output_file
+        '--VALIDATION_STRINGENCY SILENT',
+        '--BAIT_INTERVALS '.$self->bait_intervals_path,
+        '--TARGET_INTERVALS '.$self->target_intervals_path,
+        '--REFERENCE_SEQUENCE '.$self->reference,
+        '--INPUT '.$self->input_files->[0],
+        '--OUTPUT '.$self->output_file
     ];
 }
 

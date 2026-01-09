@@ -27,7 +27,7 @@ jobs:
         node: ['14.8.0']
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: "Install OS dependencies"
         run: |
@@ -44,7 +44,7 @@ jobs:
 
       - name: "Cache Conda"
         id: miniforgeCache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ${{ env.CONDA_HOME }}/pkgs
@@ -68,7 +68,7 @@ jobs:
 
       - name: "Cache Perl"
         id: cache-perl
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.PERL_CACHE }}
           key: ${{ runner.os }}-${{ matrix.perl }}-perl
@@ -124,7 +124,7 @@ jobs:
 
       - name: "Archive CPAN logs on failure"
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: cpan_log
           path: $HOME/.cpanm/work/*/build.log
