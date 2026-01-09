@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 76.0.0 (2026-01-09)
  - Updated the SOP for changing manual QC outcomes with an example of failing
    a previously passed lane.
  - npg_qc::autoqc::role::tag_metrics - converted a private method
@@ -40,6 +41,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - Add apache configuration to optionally run the service behind a reverse
    proxy with http port working only as a rewrite rule to tls port
    - update build configuration to copy apache configuration to install target
+ - CI updates
 
 release 75.1.0 (2025-11-19)
  - Added two new attributes, yield1_total and yield2_total, to
