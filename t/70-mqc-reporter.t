@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Exception;
 use Test::Warn;
 use Moose::Meta::Class;
@@ -207,6 +207,32 @@ subtest 'Testing reporting QC outcomes for Elembio runs' => sub {
   ok (!_get_data($npg_qc_schema, $elembio_pairs[2], 'reported'),
     'reporting time is not set for run 50545 lane 1');
   ok (!_get_data($npg_qc_schema, $elembio_pairs[2], 'modified_by'), 'modified_by field is not set');
+};
+
+subtest 'Testing reporting QC outcomes for Ultimagen runs' => sub {
+  plan tests => 5;
+
+  $npg_qc_schema->resultset('MqcOutcomeEnt')->search({id_run => [51579]})
+    ->update({reported => undef});
+
+  my $p = [51579,1];
+  
+  my $reporter = npg_qc::mqc::reporter->new(
+    qc_schema   => $npg_qc_schema,
+    mlwh_schema => $mlwh_schema,
+    verbose     => 1,
+    config_file => $config_file
+  );
+
+  ok (!_get_data($npg_qc_schema, $p, 'reported'),
+    "reporting time is not set for Ultimagen run");
+  ok (!_get_data($npg_qc_schema, $p, 'modified_by'),
+    "modified_by field is not set for Ultimagen run");
+  $reporter->load();
+  ok (_get_data($npg_qc_schema, $p, 'reported'),
+    "reporting time is set for Ultimagen run $p->[0]");
+  is (_get_data($npg_qc_schema, $p, 'username'), 'cat', 'original username');
+  ok (_get_data($npg_qc_schema, $p, 'modified_by'), 'modified_by field is set');
 };
 
 *LWP::UserAgent::request = *main::postfail_nowhere;
