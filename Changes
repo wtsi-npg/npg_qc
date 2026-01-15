@@ -1,5 +1,10 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Bug fix in npg_qc::ultimagen::run_stats in tag_metrics autoqc result
+   generation: perfect match and perfect matches pf counts are set to zero
+   for tag zero since by definition tag zero is a container for unmatched
+   reads. This fixes a number of downstream calculations.
+
 release 76.0.0 (2026-01-09)
  - Updated the SOP for changing manual QC outcomes with an example of failing
    a previously passed lane.
