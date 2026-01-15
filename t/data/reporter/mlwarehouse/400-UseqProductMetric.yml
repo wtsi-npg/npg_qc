@@ -1,0 +1,20 @@
+---
+- id_useq_pr_metrics_tmp: 1
+  last_changed: 2025-12-10 16:11:11
+  id_useq_wafer_tmp: 490
+  id_run: 51579
+  tag_index: 10
+  id_useq_product: 4e84ca3c27a330c96e73d9bd79f5c8c8710b879f2b6ea972b29ed29256486f97
+  is_sequencing_control: 0
+  ultimagen_index_label: Z0010
+  ultimagen_index_sequence: CACTGCACGAATGAT
+  ultimagen_sample_id: ~
+  ultimagen_library_name: ~
+  qc_seq: ~
+  qc_lib: ~
+  qc: ~
+  tag_decode_count: 70000
+  tag_decode_percent: 7
+  q20_yield_kb: ~
+  q30_yield_kb: ~
+  total_yield_kb: ~

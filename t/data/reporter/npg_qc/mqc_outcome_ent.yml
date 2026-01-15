@@ -76,3 +76,10 @@
   username: cat
   id_seq_composition: 12
   reported: 2026-06-12 14:05:16
+- id_mqc_outcome_ent: 13
+  id_run: 51579
+  position: 1
+  id_mqc_outcome: 3
+  username: cat
+  id_seq_composition: 13
+  reported: 2026-01-01 14:05:16

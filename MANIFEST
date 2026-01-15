@@ -650,8 +650,10 @@ t/data/reporter/npg_qc/seq_component_composition.yml
 t/data/reporter/npg_qc/seq_composition.yml
 t/data/reporter/mlwarehouse/300-EseqFlowcell.yml
 t/data/reporter/mlwarehouse/300-IseqProductMetric.yml
+t/data/reporter/mlwarehouse/300-UseqWafer.yml
 t/data/reporter/mlwarehouse/400-EseqProductMetric.yml
 t/data/reporter/mlwarehouse/400-IseqFlowcell.yml
+t/data/reporter/mlwarehouse/400-UseqProductMetric.yml
 t/perlcriticrc
 t/data/fixtures/npg_tracking/000-designation.yml
 t/data/fixtures/npg_tracking/000-entity_type.yml
