@@ -629,4 +629,15 @@
   id_run_status_dict: 12
   id_user: 7
   iscurrent: 1
-
+- date: 2025-12-13 03:56:00
+  id_run: 51579
+  id_run_status: 696843
+  id_run_status_dict: 2
+  id_user: 7
+  iscurrent: 0
+- date: 2025-12-15 09:54:31
+  id_run: 51579
+  id_run_status: 696857
+  id_run_status_dict: 11
+  id_user: 7
+  iscurrent: 1

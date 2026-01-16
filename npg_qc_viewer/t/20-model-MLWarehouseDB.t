@@ -44,19 +44,19 @@ subtest 'Search product metrics' => sub {
 
   $data->{'id_run'} = 4950;
   my $result = $m->search_product_metrics($data);
-  my @rows = $result->{'iseq'}->all();
+  my @rows = $result->{'iseq_flowcell'}->all();
   ok ((all { $_->id_run == 4950} @rows), 'run id is correct');
   ok ((all { $_->position == 1}  @rows), 'position is correct');
   my @tags = map {$_->tag_index} @rows;
   is_deeply (\@tags, [(0 .. 24)], 'rows are sorted correctly');
-  is ($result->{'eseq'}->count(), 0, 'no Elembio rows');
+  is ($result->{'eseq_flowcell'}->count(), 0, 'no Elembio rows');
 
   $data = {id_run => 50932, position => 1};
   $result = $m->search_product_metrics($data);
-  @rows = $result->{'eseq'}->all();
+  @rows = $result->{'eseq_flowcell'}->all();
   is_deeply ([map {$_->tag_index} @rows], [0,1,1,1,1,2,3],
     'correct rows for an elembio run');
-  is ($result->{'iseq'}->count(), 0, 'no Illumina rows');
+  is ($result->{'iseq_flowcell'}->count(), 0, 'no Illumina rows');
 };
 
 subtest 'Data in test data' => sub {

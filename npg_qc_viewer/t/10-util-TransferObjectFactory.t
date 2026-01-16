@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 15;
 use Test::Exception;
 
 use t::util;
@@ -9,9 +9,11 @@ my $module = 'npg_qc_viewer::Util::TransferObjectFactory';
 use_ok $module;
 
 my $schema;
-lives_ok { $schema = t::util->new()->test_env_setup()->{'mlwh'} }  'test db created and populated';
+lives_ok { $schema = t::util->new()->test_env_setup()->{'mlwh'} }
+  'test db created and populated';
 my $pmrs = $schema->resultset('IseqProductMetric');
 my $epmrs = $schema->resultset('EseqProductMetric');
+my $upmrs = $schema->resultset('UseqProductMetric');
 
 subtest 'create factory' => sub {
   plan tests => 8;
@@ -248,6 +250,145 @@ subtest 'create Elembio object not represented in LIMs' => sub {
   is ($to->study_name, undef, 'study name');
   is ($to->sample_id, undef, 'sample id');
   is ($to->sample_name, 'PhiX_Third', 'elembio sample name');
+  is ($to->sample_supplier_name, undef, 'sample supplier name');
+  is ($to->id_library_lims, undef, 'id_library_lims');
+};
+
+subtest 'create Illumina object not represented in LIMs' => sub {
+  plan tests => 17;
+
+  my $row = $pmrs->search({id_run => 4950, position => 8, tag_index => 0})->next();
+  my $f  = $module->new(product_metrics_row => $row, is_plex => 1);
+  my $to = $f->create_object();
+  is ($to->id_run, 4950, 'run id');
+  is ($to->position, 8, 'position');
+  is ($to->num_cycles, 224, 'number of cycles');
+  is ($to->time_comp, '2010-07-13T13:06:44', 'run complete time');
+  is ($to->tag_index, 0, 'tag index');
+  is ($to->tag_sequence, undef, 'tag sequence');
+  is ($to->instance_qc_able, 0, 'qc_able');
+  is ($to->rnd, 0, 'not r&d');
+  is ($to->is_control, 0, 'not a control');
+  is ($to->entity_id_lims, undef, 'entity_id_lims');
+  ok (!$to->is_pool, 'not a pool');
+  is ($to->study_name, undef, 'study name');
+  is ($to->sample_id, undef, 'sample id');
+  is ($to->sample_name, undef, 'sample name');
+  is ($to->sample_supplier_name, undef, 'sample supplier name');
+  is ($to->id_library_lims, undef, 'id_library_lims');
+
+  $row = $pmrs->search({id_run => 4950, position => 8})->next();
+  $f  = $module->new(product_metrics_row => $row, is_pool => 1);
+  $to = $f->create_object();
+  ok ($to->is_pool, 'is a pool');
+};
+
+subtest 'create Ultimagen plex object' => sub {
+  plan tests => 16;
+
+  my $row = $upmrs->search({id_run => 51579, tag_index => 2})->next();
+  my $f  = $module->new(product_metrics_row => $row, is_plex => 1);
+  my $to = $f->create_object();
+  is ($to->id_run, 51579, 'run id');
+  is ($to->position, 1, 'fake position');
+  is ($to->num_cycles, undef, 'number of cycles is not defined');
+  is ($to->time_comp, undef, 'run complete time is undefined');
+  is ($to->tag_index, 2, 'tag index');
+  is ($to->tag_sequence, 'CATGTGCAGCCATCGAT', 'tag sequence');
+  is ($to->instance_qc_able, 1, 'qc_able');
+  is ($to->rnd, 0, 'not r&d');
+  is ($to->is_control, 0, 'not a control');
+  is ($to->entity_id_lims, '15060892', 'entity_id_lims');
+  ok (!$to->is_pool, 'not a pool');
+  is ($to->study_name, 'Biodiversity Cell Atlas (BCA)', 'study name');
+  is ($to->sample_id, '35018', 'sample id');
+  is ($to->sample_name, 'random_sample_name', 'sample name');
+  is ($to->sample_supplier_name, undef, 'sample supplier name is undefined');
+  is ($to->id_library_lims, 'SQPU-355266-C:B1', 'id_library_lims');
+};
+
+subtest 'create Ultimagen pool object' => sub {
+  plan tests => 17;
+
+  my $row = $upmrs->search({id_run => 51579, tag_index => 2})->next();
+  my $f  = $module->new(product_metrics_row => $row, is_plex => 0, is_pool => 1);
+  my $to = $f->create_object();
+  is ($to->id_run, 51579, 'run id');
+  is ($to->position, 1, 'fake position');
+  is ($to->num_cycles, undef, 'number of cycles is not defined');
+  is ($to->time_comp, undef, 'run complete time is undefined');
+  is ($to->tag_index, undef, 'tag index');
+  is ($to->tag_sequence, undef, 'tag sequence');
+  is ($to->instance_qc_able, 1, 'qc_able');
+  is ($to->rnd, 0, 'not r&d');
+  is ($to->is_control, 0, 'not a control');
+  is ($to->entity_id_lims, '15060892', 'entity_id_lims');
+  ok ($to->is_pool, 'is a pool');
+  is ($to->study_name, undef, 'study name');
+  is ($to->sample_id, undef, 'sample id');
+  is ($to->sample_name, undef, 'sample name');
+  is ($to->sample_supplier_name, undef, 'sample supplier name');
+  is ($to->id_library_lims, 'NT114848K', 'id_library_lims');
+
+  $f  = $module->new(product_metrics_row => $row,
+                     is_plex             => 0,
+                     is_pool             => 1,
+                     not_qcable          => 1);
+  $to = $f->create_object();
+  is ($to->instance_qc_able, 0, 'not qc_able');  
+};
+
+subtest 'create Ultimagen object not represented in LIMs' => sub {
+  plan tests => 36;
+
+  # Tag zero.
+  my $row = $upmrs->search({id_run => 51579, tag_index => 0})->next();
+  my $f  = $module->new(product_metrics_row => $row, is_plex => 1);
+  my $to = $f->create_object();
+  is ($to->id_run, 51579, 'run id');
+  is ($to->position, 1, 'fake position');
+  is ($to->num_cycles, undef, 'number of cycles is undefined');
+  is ($to->time_comp, undef, 'run complete time is undefined');
+  is ($to->tag_index, 0, 'tag index');
+  is ($to->tag_sequence, undef, 'tag sequence is undefined');
+  is ($to->instance_qc_able, 0, 'not qc_able');
+  is ($to->rnd, 0, 'not r&d');
+  is ($to->is_control, 0, 'not a control');
+  is ($to->entity_id_lims, undef, 'entity_id_lims');
+  ok (!$to->is_pool, 'not a pool');
+  is ($to->study_name, undef, 'study name');
+  is ($to->sample_id, undef, 'sample id');
+  is ($to->sample_name, undef, 'sample name');
+  is ($to->sample_supplier_name, undef, 'sample supplier name');
+  is ($to->id_library_lims, undef, 'id_library_lims');
+
+  # Currently controls are not represented in LIMS.
+  $row = $upmrs->search({id_run => 51579, tag_index => 9999})->next();
+  $f  = $module->new(product_metrics_row => $row, is_plex => 1);
+  $to = $f->create_object();
+  is ($to->tag_index, 9999, 'tag index');
+  is ($to->tag_sequence, 'TT', 'tag sequence');
+  is ($to->instance_qc_able, 0, 'not qc_able');
+  is ($to->is_control, 1, 'is a control');
+  is ($to->entity_id_lims, undef, 'entity_id_lims');
+  is ($to->study_name, undef, 'study name');
+  is ($to->sample_id, undef, 'sample id');
+  is ($to->sample_name, undef, 'sample name is undefined');
+  is ($to->sample_supplier_name, undef, 'sample supplier name');
+  is ($to->id_library_lims, undef, 'id_library_lims');
+
+  # Target sample which is not linked to LIMS.
+  $row = $upmrs->search({id_run => 51579, tag_index => 4})->next();
+  $f  = $module->new(product_metrics_row => $row, is_plex => 1);
+  $to = $f->create_object();
+  is ($to->tag_index, 4, 'tag index');
+  is ($to->tag_sequence, 'CTGTGTAGGCATGAT', 'tag sequence');
+  is ($to->instance_qc_able, 1, 'is qc_able');
+  is ($to->is_control, 0, 'is not a control');
+  is ($to->entity_id_lims, undef, 'entity_id_lims');
+  is ($to->study_name, undef, 'study name');
+  is ($to->sample_id, undef, 'sample id');
+  is ($to->sample_name, '13STDY243406', 'sample name from Ultimagen data');
   is ($to->sample_supplier_name, undef, 'sample supplier name');
   is ($to->id_library_lims, undef, 'id_library_lims');
 };

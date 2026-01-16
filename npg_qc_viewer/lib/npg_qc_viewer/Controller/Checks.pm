@@ -269,13 +269,13 @@ sub _run_lanes_from_dwh {
   my $row_data = $c->stash->{'row_data'};
   my $rss = $c->model('MLWarehouseDB')->search_product_metrics($where);
 
-  for my $prefix (keys %{$rss}) {
-    while (my $product_metric = $rss->{$prefix}->next) {
-      my $relationship= $prefix . q[_flowcell];
+  for my $lims_rel_name (keys %{$rss}) {
+    my $rs = $rss->{$lims_rel_name};
+    while (my $product_metric = $rs->next) {
       if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
         $self->_assign_lane_row_data(
           $c, $retrieve_option, $row_data,
-          $product_metric, $product_metric->$relationship
+          $product_metric, $product_metric->$lims_rel_name
         );
       }
       if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
