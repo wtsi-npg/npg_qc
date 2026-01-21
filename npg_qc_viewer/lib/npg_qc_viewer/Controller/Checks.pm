@@ -273,9 +273,23 @@ sub _run_lanes_from_dwh {
     my $rs = $rss->{$lims_rel_name};
     while (my $product_metric = $rs->next) {
       if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
+        # Do not attempt to derive lane data from controls or tag zero.
+        # This kind of row is either never linked to LIMS data or does
+        # not provid correct information about a pool.
+        my $tag_index = $product_metric->tag_index;
+        if (defined $tag_index && ($tag_index == 0)) {
+          next;
+        }
+        my $lims_row = $product_metric->$lims_rel_name;
+        if ($lims_row && $lims_row->entity_type eq 'library_indexed_spike') {
+          next;
+        }
+        if ($product_metric->can('is_sequencing_control') &&
+          $product_metric->is_sequencing_control) {
+          next;
+        }
         $self->_assign_lane_row_data(
-          $c, $retrieve_option, $row_data,
-          $product_metric, $product_metric->$lims_rel_name
+          $c, $retrieve_option, $row_data, $product_metric
         );
       }
       if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
@@ -289,33 +303,32 @@ sub _run_lanes_from_dwh {
   return;
 }
 
-sub _assign_lane_row_data { ##no critic (Subroutines::ProhibitManyArgs)
-  my ($self, $c, $retrieve_option, $row_data, $product_metric, $flowcell) = @_;
+sub _assign_lane_row_data {
+  my ($self, $c, $retrieve_option, $row_data, $product_metric) = @_;
 
-  if ( !defined $product_metric->tag_index ||
-      ( $flowcell && $flowcell->entity_type ne 'library_indexed_spike' )) {
-        # Using first tag index available as representative for the lane.
+  my $key = $product_metric->rpt_key;
+  if ( $product_metric->tag_index ) {
+    $key = $product_metric->lane_rpt_key_from_key($key);
+  }
 
-    my $key = $product_metric->rpt_key;
-    if ( $product_metric->tag_index ) {
-      $key = $product_metric->lane_rpt_key_from_key($key);
+  if ( !$row_data->{$key} ) { # Data for this lane has not been assigned yet.
+
+    my $init = { 'product_metrics_row' => $product_metric };
+
+    $init->{'is_pool'} = 0;
+    my $lane_collection = $c->stash->{'rl_map'}->{$key};
+    if ($lane_collection && !$lane_collection->is_empty) {
+      $init->{'is_pool'} = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
+                           @{$lane_collection->check_names()->{'list'}};
     }
-    if ( !$row_data->{$key} ) {
-      my $lane_collection = $c->stash->{'rl_map'}->{$key};
-      my $is_pool = 0;
-      if ($lane_collection && !$lane_collection->is_empty) {
-        $is_pool = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
-                  @{$lane_collection->check_names()->{'list'}};
-      }
-      my $init = { 'product_metrics_row' => $product_metric };
-      $init->{'is_pool'} = $is_pool;
-      if ($retrieve_option == $ALL) {
-        # QC widgets either for lanes or libraries, but not both.
-        $init->{'not_qcable'} = 1;
-      }
-      $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory
-                          ->new($init)->create_object();
+
+    if ($retrieve_option == $ALL) {
+      # QC widgets either for lanes or libraries, but not both.
+      $init->{'not_qcable'} = 1;
     }
+
+    $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory
+                        ->new($init)->create_object();
   }
 
   return;
