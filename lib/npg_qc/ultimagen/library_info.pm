@@ -67,7 +67,7 @@ sub _build_xml_doc {
 
 =head2 application
 
-Ultima Genomics application name as defined in teh input file. Might be undefined. 
+Ultima Genomics application name as defined in the input file. Might be undefined. 
 
 =cut
 
@@ -134,12 +134,25 @@ sub _build_samples {
   my @samples = ();
   foreach my $se (@{$self->sample_elements}) {
     my ($sample_id, $lib_name) = split /@/smx, $se->getAttribute('Id');
-    push @samples, npg_qc::ultimagen::sample->new(
+    my $init = {
       id => $sample_id,
       library_name => $lib_name,
       index_label => $se->getAttribute('Index_Label'),
-      index_sequence => $se->getAttribute('Index_Sequence')
-    );
+      index_sequence => $se->getAttribute('Index_Sequence'),
+    };
+    my @app_type_values =
+      map  { $_->getAttribute('Value') }
+      grep { $_->getAttribute('Name') eq 'application_type' }
+      grep { ref $_ eq 'XML::LibXML::Element' }
+      $se->childNodes();
+    if (@app_type_values == 1) {
+      $init->{application_type} = $app_type_values[0];
+    } elsif (@app_type_values > 1) {
+      croak 'Multiple application type values for index label '
+        . $init->{index_label};
+    }
+
+    push @samples, npg_qc::ultimagen::sample->new($init);
   }
   return \@samples;
 }

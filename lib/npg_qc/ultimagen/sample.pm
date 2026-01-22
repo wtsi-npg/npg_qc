@@ -78,6 +78,19 @@ has 'index_sequence' => (
   required => 1,
 );
 
+=head2 application_type
+
+Manufacturer's name for the pipeline/tool which was used on-board to
+produce the data. Optional, can be undefined.
+
+=cut
+
+has 'application_type' => (
+  isa      => 'Maybe[Str]',
+  is       => 'ro',
+  required => 0,
+);
+
 =head2 tag_index
 
 NPG tag index, derived from C<index_label> attribute.
