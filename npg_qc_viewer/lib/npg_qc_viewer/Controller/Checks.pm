@@ -275,7 +275,7 @@ sub _run_lanes_from_dwh {
       if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
         # Do not attempt to derive lane data from controls or tag zero.
         # This kind of row is either never linked to LIMS data or does
-        # not provid correct information about a pool.
+        # not provide correct information about a pool.
         my $tag_index = $product_metric->tag_index;
         if (defined $tag_index && ($tag_index == 0)) {
           next;

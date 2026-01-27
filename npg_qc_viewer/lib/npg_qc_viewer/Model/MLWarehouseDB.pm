@@ -42,7 +42,7 @@ __PACKAGE__->config(
 Searches Illumina, Elembio and Ultimagen MLWH product metrics tables by
 id_run and, optionally, position and tag_index. Cache option is enabled.
 
-Returns a hash reference with three resultsets. The resultsset for Illumina
+Returns a hash reference with three resultsets. The resultset for Illumina
 data is under C<iseq_flowcell> key, the resultset for Elembio data is under the
 C<eseq_flowcell> key, the resultset for Ultimagen data is unde the C<useq_wafer>
 key. Either of the resultsets can have zero rows.
