@@ -39,15 +39,16 @@ __PACKAGE__->config(
 
 =head2 search_product_metrics
 
-Searches both Illumina and Elembio MLWH product metrics tables by id_run
-and, optionally, position and tag_index. Cache option is enabled.
+Searches Illumina, Elembio and Ultimagen MLWH product metrics tables by
+id_run and, optionally, position and tag_index. Cache option is enabled.
 
-Returns a hash reference with two resultsets. The resultsset for Illumina
-data is under C<iseq> key, the resultset for Elembio data is under the
-C<eseq> key. Either of the resultsets can have zero rows.
+Returns a hash reference with three resultsets. The resultset for Illumina
+data is under C<iseq_flowcell> key, the resultset for Elembio data is under the
+C<eseq_flowcell> key, the resultset for Ultimagen data is unde the C<useq_wafer>
+key. Either of the resultsets can have zero rows.
 
-Since the query have details for multiple runs, a search of both Illumina
-and Elembio data is performed.
+Since the query can have details for multiple runs, a search of data for all
+three platforms is performed.
 
   my $param = {'id_run' => 22, 'position' => 3};
   my $resultsets = $model->search_product_metrics($param);
@@ -69,25 +70,35 @@ sub search_product_metrics {
 
   my $rss = {};
 
-  for my $prefix (qw/iseq eseq/) {
+  for my $prefix (qw/iseq eseq useq/) {
+
+    my @order_by;
+    my $table_name = $prefix . '_run_lane_metric';
+    my $lims_table_name = $prefix . '_flowcell';
+    my $product_rs_name = ucfirst($prefix) . 'ProductMetric';
 
     my %where = map { 'me.' . $_ => $query->{$_} } keys %{$query};
-    my @order_by = qw/ me.id_run me.position me.tag_index /;
 
-    if ($prefix eq 'eseq') {
+    if ($prefix eq 'iseq') {
+      @order_by = qw/ me.id_run me.position me.tag_index /;
+    } elsif ($prefix eq 'eseq') {
       @order_by = qw/ me.id_run me.lane me.tag_index /;
       if ( exists $where{'me.position'} ) {
         $where{'me.lane'} = delete $where{'me.position'};
       }
+    } elsif ($prefix eq 'useq') {
+      delete $where{'me.position'};
+      $table_name = $prefix . '_run_metric';
+      $lims_table_name = $prefix . '_wafer';
+      @order_by = qw/ me.id_run me.tag_index /;
     }
 
-    $rss->{$prefix} = $self->resultset(ucfirst($prefix) . 'ProductMetric')->search(
-      \%where, {
-        'prefetch' => [$prefix . '_run_lane_metric', {$prefix . '_flowcell' => ['study', 'sample']}],
+    $rss->{$lims_table_name} = $self->resultset($product_rs_name)
+      ->search( \%where, {
+        'prefetch' => [$table_name, {$lims_table_name => ['study', 'sample']}],
         'order_by' =>  \@order_by,
         'cache'    => 1,
-      }
-    );
+      });
   }
 
   return $rss;

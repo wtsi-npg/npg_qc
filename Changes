@@ -5,7 +5,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    generation: perfect match and perfect matches pf counts are set to zero
    for tag zero since by definition tag zero is a container for unmatched
    reads. This fixes a number of downstream calculations.
- - Added reporting of MQC outcomes for Ultimagen.
+ - Added reporting of MQC outcomes for Ultimagen runs.
+ - SeqQC - retrieval of LIMS data for Ultimagen runs is added.
 
 release 76.0.0 (2026-01-09)
  - Updated the SOP for changing manual QC outcomes with an example of failing
