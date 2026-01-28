@@ -35,7 +35,7 @@ See documentation for C<npg_qc::ultimagen::run_stats> for more details.
 
 =head1 USAGE
 
-  parse_ultima_stats.pl --runfolder_path <runfolder> --qc_output_dit <folder> --id_run <run_id>
+  ultimagen_runstats_parser.pl --runfolder_path <runfolder> --qc_output_dir <folder> --id_run <run_id>
 
 =head1 SUBROUTINES/METHODS
 
@@ -92,8 +92,6 @@ file in the run folder.
 
 =head1 INCOMPATIBILITIES
 
-Works for relatively recent runs, post August 2024.
-
 =head1 BUGS AND LIMITATIONS
 
 =head1 AUTHOR
@@ -102,7 +100,7 @@ Marina GourtovaiaE<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 Genome Research Ltd.
+Copyright (C) 2025, 2026 Genome Research Ltd.
 
 This file is part of NPG.
 
