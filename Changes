@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 76.1.0 (2026-02-04)
+ - PDL version 2.068 is no longer available on CPAN. Switched to the default
+   current version 2.100
+   - Updated expected test results.
+   - Prevented computing stats on an empty ndarray.
+
 release 76.0.0 (2026-01-09)
  - Updated the SOP for changing manual QC outcomes with an example of failing
    a previously passed lane.
