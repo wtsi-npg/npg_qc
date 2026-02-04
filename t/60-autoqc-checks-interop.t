@@ -198,7 +198,7 @@ subtest 'parse and produce results - NovaSeq' => sub {
 
   my $expected = {
                'cluster_count_total' => '3830022144',
-               'cluster_density_stdev' => '4.65910237492488e-09',
+               'cluster_density_stdev' => '0',
                'aligned_mean' => {
                                    '1' => '1.23699507117271',
                                    '4' => '1.22529613785446'
@@ -206,33 +206,33 @@ subtest 'parse and produce results - NovaSeq' => sub {
                'cluster_density_pf_mean' => '2261976.39832653',
                'aligned_stdev' => {
                                     '1' => '0.0744209146497674',
-                                    '4' => '0.0749524762829369'
+                                    '4' => '0.074952476282937'
                                   },
                'cluster_count_pf_total' => '2925581718',
                'cluster_count_mean' => '4091904',
                'cluster_pf_mean' => '76.3855039998432',
-               'occupied_mean' => '81.8342595462549',
+               'occupied_mean' => '81.834259546255',
                'cluster_density_mean' => '2961263.95700836',
                'cluster_density_pf_stdev' => '81163.8726584454',
                'cluster_count_pf_stdev' => '112153.046809817',
                'occupied_stdev' => '3.92870603224398',
                'cluster_count_pf_mean' => '3125621.49358974',
-               'cluster_pf_stdev' => '2.74085234672704',
+               'cluster_pf_stdev' => '2.74085234672703',
                'cluster_count_stdev' => '0'
                  };
   is_deeply ($i->result->[0]->metrics, $expected, 'correct computed data for lane 1');
 
   $expected =     {
                'cluster_count_pf_stdev' => '130105.986633121',
-               'cluster_density_pf_stdev' => '94156.2091407017',
+               'cluster_density_pf_stdev' => '94156.2091407016',
                'cluster_count_pf_mean' => '3080377.78418803',
                'cluster_pf_stdev' => '3.17959528456976',
                'occupied_stdev' => '3.93473277812932',
                'cluster_count_stdev' => '0',
                'cluster_count_pf_total' => '2883233606',
                'cluster_count_mean' => '4091904',
-               'occupied_mean' => '79.9246783676036',
-               'cluster_pf_mean' => '75.2798155623404',
+               'occupied_mean' => '79.9246783676037',
+               'cluster_pf_mean' => '75.2798155623405',
                'cluster_density_mean' => '2961263.95700836',
                'aligned_mean' => {
                                    '4' => '1.20933121442795',
@@ -244,7 +244,7 @@ subtest 'parse and produce results - NovaSeq' => sub {
                                     '1' => '0.0621184821025787'
                                   },
                'cluster_count_total' => '3830022144',
-               'cluster_density_stdev' => '4.65910237492488e-09'
+               'cluster_density_stdev' => '0'
                   };
   is_deeply ($i->result->[1]->metrics, $expected, 'correct computed data for lane 2');
 };
