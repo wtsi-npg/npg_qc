@@ -9,7 +9,7 @@ use Readonly;
 
 our $VERSION = '0';
 
-Readonly::Scalar our $PERCENT               => 100;
+Readonly::Scalar our $PERCENT => 100;
 
 sub forward_average_percent_error {
   my $self = shift;
@@ -38,21 +38,23 @@ sub reverse_average_percent_error {
 sub _average_percent{
   my $error_rate_by_cycle = shift;
 
-  my $a = stats($error_rate_by_cycle);
-  # When some of the input values for the calculation are missing,
-  # the resulting piddle can contain, depending on your Perl, either
-  # nan or NaN value. Not good if we want to load them to a float
-  # column of the databse (warehouse). In the downstream code we
-  # can try to convert these values to undefined values. But, while
-  # we have piddles object and PDL available, we can do this properly.
-  # So ...
-  $a->badflag(1);             # initialise bad value marking,
-  $a->inplace->setnantobad(); # ask to treat NaN as bad value
-  my $mask = isgood($a);      # without touching the original piddle,
-                              # create a mask telling us whether each value
-                              # is good (1) or bad (0).
-  if (($mask)[0]) {
-    return sprintf '%.2f',($a)[0]*$PERCENT;
+  if (!$error_rate_by_cycle->isempty) {
+    my $a = stats($error_rate_by_cycle);
+    # When some of the input values for the calculation are missing,
+    # the resulting piddle can contain, depending on your Perl, either
+    # nan or NaN value. Not good if we want to load them to a float
+    # column of the database (mlwarehouse). In the downstream code we
+    # can try to convert these values to undefined values. But, while
+    # we have piddles object and PDL available, we can do this properly.
+    # So ...
+    $a->badflag(1);             # initialise bad value marking,
+    $a->inplace->setnantobad(); # ask to treat NaN as bad value
+    my $mask = isgood($a);      # without touching the original piddle,
+                                # create a mask telling us whether each value
+                                # is good (1) or bad (0).
+    if (($mask)[0]) {
+      return sprintf '%.2f',($a)[0]*$PERCENT;
+    }
   }
   return;
 }
@@ -95,10 +97,9 @@ no Moose;
 
 __END__
 
-
 =head1 NAME
 
-    npg_qc::autoqc::role::sequence_error
+  npg_qc::autoqc::role::sequence_error
 
 =head1 SYNOPSIS
 
@@ -106,18 +107,28 @@ __END__
 
 =head1 SUBROUTINES/METHODS
 
-=head2 check_name_local - check name modifier
+=head2 check_name_local
+  
+ Check name modifier
 
-=head2 subset - returns the value of the sequence_type attribute
+=head2 subset
+ 
+  Returns the value of the sequence_type attribute
 
-=head2 forward_average_percent_error - forware average percentage of error across all cycle
+=head2 forward_average_percent_error
+ 
+ Forware average percentage of error across all cycle
 
-=head2 reverse_average_percent_error - reverse average percentage of error across all cycles
+=head2 reverse_average_percent_error
+ 
+ Reverse average percentage of error across all cycles
 
 =head2 criterion
 
-=head2 reference_for_title - Trimmed version of the reference so it can be 
-used in a view. Returns a hash reference with keys for species and version.
+=head2 reference_for_title
+ 
+ Trimmed version of the reference so it can be used in a view.
+ Returns a hash reference with keys for species and version.
 
 =head1 DIAGNOSTICS
 
@@ -151,7 +162,7 @@ Guoying Qi E<lt>gq1@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Genome Research Ltd
+Copyright (C) 2014,2015,2016,2026 Genome Research Ltd.
 
 This file is part of NPG.
 
