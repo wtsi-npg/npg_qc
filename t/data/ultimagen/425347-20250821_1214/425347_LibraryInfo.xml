@@ -43,7 +43,7 @@
     <Sample Id="iNeuron15923033@4_dgRNA_iA_iN_SCREEN" Index_Label="Z0008" Index_Sequence="CACATCCTGCATGTGAT">
       <Attribute Name="Barcode_Plate_Num" Value="1" />
       <Attribute Name="Barcode_Plate_Well" Value="H1" />
-      <Attribute Name="application_type" Value="scRNA_CRISPR_10x_5prime_v3" />
+      <Attribute Name="application_type" Value="native" />
     </Sample>
   </Samples>
   <Sequencing />
