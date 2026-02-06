@@ -272,6 +272,13 @@ sub _run_lanes_from_dwh {
   for my $lims_rel_name (keys %{$rss}) {
     my $rs = $rss->{$lims_rel_name};
     while (my $product_metric = $rs->next) {
+      # Generate a transfer object for every product row. Elembio and
+      # Utimagen product rows contain information about a library. So
+      # even if the product row is not linked to LIMS data, sample names
+      # might be available.
+      if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
+        $self->_assign_plex_row_data($row_data, $product_metric);
+      }
       if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
         # Do not attempt to derive lane data from controls or tag zero.
         # This kind of row is either never linked to LIMS data or does
@@ -288,12 +295,14 @@ sub _run_lanes_from_dwh {
           $product_metric->is_sequencing_control) {
           next;
         }
+        # In case of a partially linked run we might get an unlinked to LIMS
+        # row first. More likely than not a partially linked run is a symptom
+        # of data not deleted prior to post-reanalysis upload. This might be
+        # be considered a regression compared to the previous release. However,
+        # trying to 'fix' this is not worth it.
         $self->_assign_lane_row_data(
           $c, $retrieve_option, $row_data, $product_metric
         );
-      }
-      if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
-        $self->_assign_plex_row_data($row_data, $product_metric);
       }
     }
   }
