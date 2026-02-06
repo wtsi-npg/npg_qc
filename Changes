@@ -11,6 +11,8 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - Added application_type attribute to npg_qc::ultimagen::sample. Extended
    npg_qc::ultimagen::library_info parser to assign this attribute from
    values in [RunID]_LibraryInfo.xml file in the Ultimagen run folder.
+ - Extended a list of known custom Elembio PhiX control names. Allowed for
+   different delimeters in these names.
 
 release 76.1.0 (2026-02-04)
  - PDL version 2.068 is no longer available on CPAN. Switched to the default

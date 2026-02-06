@@ -6,12 +6,13 @@ use List::Util qw(sum);
 use Readonly;
 use npg_qc::elembio::barcode_stats;
 
-
 our $VERSION = '0';
 
+Readonly::Scalar my $DELIM_REGEXP => qr/[ -_]/xms;
 # The extended scope allows for using this regular expression
 # in other NPG code.
-Readonly::Scalar our $CONTROL_SAMPLE_NAME_REGEXP => qr/(?:adept)|(?:phix_third)/ismx;
+Readonly::Scalar our $CONTROL_SAMPLE_NAME_REGEXP =>
+  qr/(?:adept)|(?:phix $DELIM_REGEXP third)|(?:comp $DELIM_REGEXP phix)/ismx;
 
 has barcodes => (
     isa => 'HashRef[npg_qc::elembio::barcode_stats]',
