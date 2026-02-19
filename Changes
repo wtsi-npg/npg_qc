@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 77.0.0 (2026-02-19)
  - Change default port for NPG-Tracking url
  - Remove hardcoded mod_proxy path in httpd_seqqc.conf
  - Bug fix in npg_qc::ultimagen::run_stats in tag_metrics autoqc result
