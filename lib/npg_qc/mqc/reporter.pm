@@ -36,7 +36,6 @@ sub _build__data4reporting {
   my $self = shift;
 
   my $rs = $self->qc_schema->resultset('MqcOutcomeEnt')->get_ready_to_report();
-  my $product_rs = $self->mlwh_schema->resultset('IseqProductMetric');
   my $data = {};
 
   while (my $outcome = $rs->next()) {
@@ -55,13 +54,18 @@ sub _build__data4reporting {
     my $position = $component->position;
     my $lane_id;
 
-    for my $prefix (qw/iseq eseq/) {
+    for my $prefix (qw/iseq eseq useq/) {
 
       my $condition = {
         'me.id_run'    => $id_run,
         'me.tag_index' => {q[!=] => 0},
       };
-      my $relation = "${prefix}_flowcell";
+      my $relation;
+      if ($prefix eq q[useq]) {
+        $relation = "${prefix}_wafer";
+      } else {
+        $relation = "${prefix}_flowcell";
+      }
 
       $condition->{$relation . q[.entity_type]} = {q[-not_in] =>
         [qw(library_control library_indexed_spike)]};
@@ -69,6 +73,8 @@ sub _build__data4reporting {
       if ($prefix eq q[iseq]) {
         $condition->{'me.position'} = $position;
         $condition->{$relation . q[.id_lims]} = {q[-not_like] => 'C_GCLP%'};
+      } elsif ($prefix eq q[useq]) {
+        $condition->{'me.is_sequencing_control'} = 0;
       } else {
         $condition->{'me.lane'} = $position;
         $condition->{'me.is_sequencing_control'} = 0;
@@ -82,7 +88,7 @@ sub _build__data4reporting {
       );
 
       if ($rswh->count() == 0) {
-        next; # Nothing in Illumina data? Try Elembio.
+        next; # Nothing in Illumina data? Try Elembio and then Ultima.
       }
 
       while ( my $product_row = $rswh->next ) {
@@ -248,7 +254,7 @@ Jennifer Liddle <js10@sanger.ac.uk>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015, 2016, 2017, 2018, 2022, 2025 Genome Research Ltd.
+Copyright (C) 2015, 2016, 2017, 2018, 2022, 2025, 2026 Genome Research Ltd.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

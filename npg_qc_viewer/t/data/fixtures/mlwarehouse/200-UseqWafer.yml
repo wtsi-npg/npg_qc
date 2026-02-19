@@ -1,0 +1,129 @@
+---
+- amp_assign_control_bead_tube: SQM430136
+  amp_instrument_name: AMP1
+  bait_name: ~
+  batch_for_opentrons: 131
+  entity_id_lims: 15060892
+  entity_type: library_indexed
+  id_library_lims: SQPU-355266-C:A1
+  id_lims: SQSCP_ST
+  id_pool_lims: NT114848K
+  id_sample_tmp: 36620
+  id_study_tmp: 8014
+  id_useq_wafer_tmp: 481
+  id_wafer_lims: 131_NT114848K_2
+  last_updated: 2025-12-10 15:11:11
+  ot_recipe: Free
+  otr_carrier_expiry: 2026-01-01 00:00:00
+  otr_carrier_lot_number: OTR121YE16094
+  otr_instrument_name: OT1
+  otr_nfw_expiry: 2026-01-31 00:00:00
+  otr_nfw_lot_number: H01YA3101
+  otr_oil_expiry: 2025-12-31 00:00:00
+  otr_oil_lot_number: 316AXL2301
+  otr_pipette_carousel: 8
+  otr_reaction_mix_7_expiry: 2026-02-28 00:00:00
+  otr_reaction_mix_7_lot_number: 497AYB1801
+  pipeline_id_lims: Ultima High Throughput PCR Free 96
+  primer_panel: ~
+  recorded_at: 2025-12-10 15:11:13
+  request_order: 2
+  requested_insert_size_from: 450
+  requested_insert_size_to: 450
+  tag_sequence: CAGCTCGAATGCGAT
+- amp_assign_control_bead_tube: SQM430136
+  amp_instrument_name: AMP1
+  bait_name: ~
+  batch_for_opentrons: 131
+  entity_id_lims: 15060892
+  entity_type: library_indexed
+  id_library_lims: SQPU-355266-C:B1
+  id_lims: SQSCP_ST
+  id_pool_lims: NT114848K
+  id_sample_tmp: 36620
+  id_study_tmp: 8014
+  id_useq_wafer_tmp: 482
+  id_wafer_lims: 131_NT114848K_2
+  last_updated: 2025-12-10 15:11:11
+  ot_recipe: Free
+  otr_carrier_expiry: 2026-01-01 00:00:00
+  otr_carrier_lot_number: OTR121YE16094
+  otr_instrument_name: OT1
+  otr_nfw_expiry: 2026-01-31 00:00:00
+  otr_nfw_lot_number: H01YA3101
+  otr_oil_expiry: 2025-12-31 00:00:00
+  otr_oil_lot_number: 316AXL2301
+  otr_pipette_carousel: 8
+  otr_reaction_mix_7_expiry: 2026-02-28 00:00:00
+  otr_reaction_mix_7_lot_number: 497AYB1801
+  pipeline_id_lims: Ultima High Throughput PCR Free 96
+  primer_panel: ~
+  recorded_at: 2025-12-10 15:11:13
+  request_order: 2
+  requested_insert_size_from: 450
+  requested_insert_size_to: 450
+  tag_sequence: CATGTGCAGCCATCGAT
+- amp_assign_control_bead_tube: SQM430136
+  amp_instrument_name: AMP1
+  bait_name: ~
+  batch_for_opentrons: 131
+  entity_id_lims: 15060892
+  entity_type: library_indexed
+  id_library_lims: SQPU-355266-C:C1
+  id_lims: SQSCP_ST
+  id_pool_lims: NT114848K
+  id_sample_tmp: 36621
+  id_study_tmp: 8014
+  id_useq_wafer_tmp: 483
+  id_wafer_lims: 131_NT114848K_2
+  last_updated: 2025-12-10 15:11:11
+  ot_recipe: Free
+  otr_carrier_expiry: 2026-01-01 00:00:00
+  otr_carrier_lot_number: OTR121YE16094
+  otr_instrument_name: OT1
+  otr_nfw_expiry: 2026-01-31 00:00:00
+  otr_nfw_lot_number: H01YA3101
+  otr_oil_expiry: 2025-12-31 00:00:00
+  otr_oil_lot_number: 316AXL2301
+  otr_pipette_carousel: 8
+  otr_reaction_mix_7_expiry: 2026-02-28 00:00:00
+  otr_reaction_mix_7_lot_number: 497AYB1801
+  pipeline_id_lims: Ultima High Throughput PCR Free 96
+  primer_panel: ~
+  recorded_at: 2025-12-10 15:11:13
+  request_order: 2
+  requested_insert_size_from: 450
+  requested_insert_size_to: 450
+  tag_sequence: CATCACACATGAATGAT
+- amp_assign_control_bead_tube: SQM430136
+  amp_instrument_name: AMP1
+  bait_name: ~
+  batch_for_opentrons: 131
+  entity_id_lims: 15060892
+  entity_type: library_indexed
+  id_library_lims: SQPU-355266-C:D1
+  id_lims: SQSCP_ST
+  id_pool_lims: NT114848K
+  id_sample_tmp: 36621
+  id_study_tmp: 8014
+  id_useq_wafer_tmp: 484
+  id_wafer_lims: 131_NT114848K_2
+  last_updated: 2025-12-10 15:11:11
+  ot_recipe: Free
+  otr_carrier_expiry: 2026-01-01 00:00:00
+  otr_carrier_lot_number: OTR121YE16094
+  otr_instrument_name: OT1
+  otr_nfw_expiry: 2026-01-31 00:00:00
+  otr_nfw_lot_number: H01YA3101
+  otr_oil_expiry: 2025-12-31 00:00:00
+  otr_oil_lot_number: 316AXL2301
+  otr_pipette_carousel: 8
+  otr_reaction_mix_7_expiry: 2026-02-28 00:00:00
+  otr_reaction_mix_7_lot_number: 497AYB1801
+  pipeline_id_lims: Ultima High Throughput PCR Free 96
+  primer_panel: ~
+  recorded_at: 2025-12-10 15:11:14
+  request_order: 2
+  requested_insert_size_from: 450
+  requested_insert_size_to: 450
+  tag_sequence: CTGTGTAGGCATGAT

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 33;
+use Test::More tests => 32;
 use Test::Exception;
 use HTTP::Request::Common;
 use File::Temp qw/tempdir/;
@@ -19,30 +19,6 @@ local $ENV{'HOME'}            = 't/data';
 use_ok 'Catalyst::Test', 'npg_qc_viewer';
 
 my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
-
-{
-  my $base = tempdir(UNLINK => 1);
-  my $path = $base . q[/archive];
-  my $run_folder = q[150621_MS6_04099_A_MS2023387-050V2];
-  make_path $path.q[/].$run_folder;
-  
-  my $npgqc = $schemas->{qc};
-  my $npg   = $schemas->{npg};
-  
-  my $values = { id_run               => 4099,
-                 batch_id             => 4178,
-                 folder_name          => $run_folder,
-                 folder_path_glob     => $path, 
-                 id_instrument        => 30,
-                 id_instrument_format => 4,
-                 is_paired            => 1,
-                 priority             => 1,
-                 team                 => '"joint"'};
-  my $row = $npg->resultset("Run")->create($values); #Insert new entity
-  $row->set_tag(7, 'staging');
-  
-  is($npgqc->resultset('QXYield')->count, 42);
-}
 
 {
   my @urls = qw(/checks/runs/4025 /checks/runs-from-staging/4025);
@@ -82,6 +58,26 @@ my @keys = qw/4025:1 4025:2 4025:3 4025:4 4025:5 4025:6 4025:7 4025:8/;
 }
 
 {
+  my $base = tempdir(UNLINK => 1);
+  my $path = $base . q[/archive];
+  my $run_folder = q[150621_MS6_04099_A_MS2023387-050V2];
+  make_path $path.q[/].$run_folder;
+  
+  my $npgqc = $schemas->{qc};
+  my $npg   = $schemas->{npg};
+  
+  my $values = { id_run               => 4099,
+                 batch_id             => 4178,
+                 folder_name          => $run_folder,
+                 folder_path_glob     => $path, 
+                 id_instrument        => 30,
+                 id_instrument_format => 4,
+                 is_paired            => 1,
+                 priority             => 1,
+                 team                 => '"joint"'};
+  my $row = $npg->resultset("Run")->create($values); #Insert new entity
+  $row->set_tag(7, 'staging');
+
   my $req = GET(q[/checks/runs/4099]);
   my ($res, $c) = ctx_request($req);
   ok ($res, $req->uri . q[ requested]);

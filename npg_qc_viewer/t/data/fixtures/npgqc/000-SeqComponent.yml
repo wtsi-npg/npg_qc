@@ -12,3 +12,40 @@
   subset: ~
   tag_index: ~
 
+- digest: c4a169cebcd1abc1f84e4b78a2da045e0bae3a2c5fbd275dae1a55be6c8e9522
+  id_run: 51579
+  id_seq_component: 472988
+  position: 1
+  subset: ~
+  tag_index: ~
+- digest: 760c25eb08cd33339e9ac22c7c7f2aa4cf5e28ce0f5f9ac2764c5d7b007fc0d0
+  id_run: 51579
+  id_seq_component: 472989
+  position: 1
+  subset: ~
+  tag_index: 9999
+- digest: 1239fcb2c1cef7e9de81cb632eb67fcd91a697d1c8b001baef29cef91c004442
+  id_run: 51579
+  id_seq_component: 473052
+  position: 1
+  subset: ~
+  tag_index: 4
+- digest: b36fae77b01dc878aa031f0abad6a602749472166628bf66ffd7bd80666d5ad7
+  id_run: 51579
+  id_seq_component: 473063
+  position: 1
+  subset: ~
+  tag_index: 3
+- digest: dcb9dc5620cee7ae09477e3dbf79ee3d000a01cad7cb2cd39777e0a6438e7472
+  id_run: 51579
+  id_seq_component: 473074
+  position: 1
+  subset: ~
+  tag_index: 2
+- digest: f651e522b5886b764276822b6f6925611fb510d8e2283b868be81743afae5fcb
+  id_run: 51579
+  id_seq_component: 473085
+  position: 1
+  subset: ~
+  tag_index: 1
+

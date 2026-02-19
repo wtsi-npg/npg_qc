@@ -269,17 +269,40 @@ sub _run_lanes_from_dwh {
   my $row_data = $c->stash->{'row_data'};
   my $rss = $c->model('MLWarehouseDB')->search_product_metrics($where);
 
-  for my $prefix (keys %{$rss}) {
-    while (my $product_metric = $rss->{$prefix}->next) {
-      my $relationship= $prefix . q[_flowcell];
-      if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
-        $self->_assign_lane_row_data(
-          $c, $retrieve_option, $row_data,
-          $product_metric, $product_metric->$relationship
-        );
-      }
+  for my $lims_rel_name (keys %{$rss}) {
+    my $rs = $rss->{$lims_rel_name};
+    while (my $product_metric = $rs->next) {
+      # Generate a transfer object for every product row. Elembio and
+      # Utimagen product rows contain information about a library. So
+      # even if the product row is not linked to LIMS data, sample names
+      # might be available.
       if ($retrieve_option == $ALL || $retrieve_option == $PLEXES) {
         $self->_assign_plex_row_data($row_data, $product_metric);
+      }
+      if ($retrieve_option == $LANES || $retrieve_option == $ALL) {
+        # Do not attempt to derive lane data from controls or tag zero.
+        # This kind of row is either never linked to LIMS data or does
+        # not provide correct information about a pool.
+        my $tag_index = $product_metric->tag_index;
+        if (defined $tag_index && ($tag_index == 0)) {
+          next;
+        }
+        my $lims_row = $product_metric->$lims_rel_name;
+        if ($lims_row && $lims_row->entity_type eq 'library_indexed_spike') {
+          next;
+        }
+        if ($product_metric->can('is_sequencing_control') &&
+          $product_metric->is_sequencing_control) {
+          next;
+        }
+        # In case of a partially linked run we might get an unlinked to LIMS
+        # row first. More likely than not a partially linked run is a symptom
+        # of data not deleted prior to post-reanalysis upload. This might be
+        # be considered a regression compared to the previous release. However,
+        # trying to 'fix' this is not worth it.
+        $self->_assign_lane_row_data(
+          $c, $retrieve_option, $row_data, $product_metric
+        );
       }
     }
   }
@@ -289,33 +312,32 @@ sub _run_lanes_from_dwh {
   return;
 }
 
-sub _assign_lane_row_data { ##no critic (Subroutines::ProhibitManyArgs)
-  my ($self, $c, $retrieve_option, $row_data, $product_metric, $flowcell) = @_;
+sub _assign_lane_row_data {
+  my ($self, $c, $retrieve_option, $row_data, $product_metric) = @_;
 
-  if ( !defined $product_metric->tag_index ||
-      ( $flowcell && $flowcell->entity_type ne 'library_indexed_spike' )) {
-        # Using first tag index available as representative for the lane.
+  my $key = $product_metric->rpt_key;
+  if ( $product_metric->tag_index ) {
+    $key = $product_metric->lane_rpt_key_from_key($key);
+  }
 
-    my $key = $product_metric->rpt_key;
-    if ( $product_metric->tag_index ) {
-      $key = $product_metric->lane_rpt_key_from_key($key);
+  if ( !$row_data->{$key} ) { # Data for this lane has not been assigned yet.
+
+    my $init = { 'product_metrics_row' => $product_metric };
+
+    $init->{'is_pool'} = 0;
+    my $lane_collection = $c->stash->{'rl_map'}->{$key};
+    if ($lane_collection && !$lane_collection->is_empty) {
+      $init->{'is_pool'} = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
+                           @{$lane_collection->check_names()->{'list'}};
     }
-    if ( !$row_data->{$key} ) {
-      my $lane_collection = $c->stash->{'rl_map'}->{$key};
-      my $is_pool = 0;
-      if ($lane_collection && !$lane_collection->is_empty) {
-        $is_pool = any { $_ eq 'tag metrics' || $_ eq 'tag decode stats'}
-                  @{$lane_collection->check_names()->{'list'}};
-      }
-      my $init = { 'product_metrics_row' => $product_metric };
-      $init->{'is_pool'} = $is_pool;
-      if ($retrieve_option == $ALL) {
-        # QC widgets either for lanes or libraries, but not both.
-        $init->{'not_qcable'} = 1;
-      }
-      $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory
-                          ->new($init)->create_object();
+
+    if ($retrieve_option == $ALL) {
+      # QC widgets either for lanes or libraries, but not both.
+      $init->{'not_qcable'} = 1;
     }
+
+    $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory
+                        ->new($init)->create_object();
   }
 
   return;

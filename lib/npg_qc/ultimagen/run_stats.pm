@@ -317,9 +317,13 @@ sub parse { ##no critic (Subroutines::ProhibitExcessComplexity)
 
     $tm_result->reads_pf_count->{$tag_index} = $num_pf_reads;
     $tm_result->reads_count->{$tag_index} = $num_reads;
-    # For now consider all matches as perfect.
-    $tm_result->perfect_matches_pf_count->{$tag_index} = $num_pf_reads;
-    $tm_result->perfect_matches_count->{$tag_index} = $num_reads;
+
+    # Consider all matches as perfect.
+    # Assign zero count for tag zero.
+    $tm_result->perfect_matches_pf_count->{$tag_index} =
+      ($tag_index == $NPG_TAG_INDEX_ZERO) ? 0 : $num_pf_reads;
+    $tm_result->perfect_matches_count->{$tag_index} =
+      ($tag_index == $NPG_TAG_INDEX_ZERO) ? 0 : $num_reads;
     $tm_result->one_mismatch_matches_pf_count->{$tag_index} = 0;
     $tm_result->one_mismatch_matches_count->{$tag_index} = 0;
 
