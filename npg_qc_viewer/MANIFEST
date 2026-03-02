@@ -1,6 +1,8 @@
 Build.PL
 Changes
+lib/Catalyst/Authentication/Credential/SangerOIDC.pm
 lib/Catalyst/Authentication/Credential/SangerSSOnpg.pm
+lib/npg_qc_viewer/Controller/Auth.pm
 lib/npg_qc_viewer/Controller/Checks.pm
 lib/npg_qc_viewer/Controller/Illumina.pm
 lib/npg_qc_viewer/Controller/QcOutcomes.pm
@@ -119,6 +121,7 @@ t/00-critic.t
 t/00-distribution.t
 t/00-podcoverage.t
 t/00-pod.t
+t/10-authentication-SangerOIDC.t
 t/10-authentication-SangerSSOnpg.t
 t/10-util-Error.t
 t/10-util-TransferObject.t
@@ -304,3 +307,4 @@ t/data/test_app_no_db.conf
 t/perlcriticrc
 t/util.pm
 wtsi_local/httpd_seqqc.conf
+wtsi_local/seqqc_oidc_auth.conf
