@@ -132,7 +132,7 @@
 <td class="id_run">
 <div class="rel_pos_container">
 <a href="[% c.uri_for_action(c.controller('Checks').action_for('checks_in_run'), id_run) %]" ><img src="/static/images/focus_on.png" alt="link to run checks" /></a>
-<a href="[% rurl = [npg_url, 'run', id_run]; rurl.join('/'); %]" title="date completed [% time_comp.truncate(10) %]">[% id_run %]</a>
+[%- user = c.model('User').logged_user(c); %]<a href="[% IF user && user.username; rurl = [base_url, 'perl/oidc-post-login-actions.cgi?return_to=/run/', id_run]; ELSE; rurl = [npg_url, 'run', id_run]; END; rurl.join('/'); %]" title="date completed [% time_comp.truncate(10) %]">[% id_run %]</a>
 [%- IF row_info_to.num_cycles %]<br />[% row_info_to.num_cycles %][% END -%]
 </div>
 </td>

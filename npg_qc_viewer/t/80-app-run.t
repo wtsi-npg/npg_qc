@@ -471,7 +471,7 @@ subtest 'Displaying user info' => sub {
 
   my $url = q[http://localhost/checks/runs/4025];
   $mech->get_ok($url);
-  $mech->content_contains('Not logged in');
+  $mech->content_contains('Log in');
   $mech->content_lacks('(mqc)');
  
   $mech->get_ok($url . '?user=tiger&password=secret');
