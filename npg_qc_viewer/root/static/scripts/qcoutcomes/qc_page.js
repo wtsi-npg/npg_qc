@@ -19,7 +19,7 @@ define(['jquery'], function () {
   var _reRunLane   = /(?:(?:for (run) ([0-9]+))|(?:for (runs) ([0-9]+) lanes ([0-9]+))) \(run/;
   var _reRunStatus = /\(run [0-9]+ status: ((?:[\S]+)(?:\s[\S]+){1,2})(?:, taken by ([\S]+))?\)$/;
 
-  var _reLoggedUser = /^Logged in as ([a-zA-Z0-9]+)(?:[\s]{1}(?:\((mqc)\)))?$/i; // [1] username, [2] (mqc)
+  var _reLoggedUser = /^Logged in as ([a-zA-Z0-9]+)(?:[\s]{1}(?:\((mqc)\)))(?:[\s]\(Logout\))?$/i; // [1] username, [2] (mqc)
 
   var _parseRunLane = function(titleString) {
     if ( typeof titleString !== 'string' ) {
