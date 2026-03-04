@@ -295,12 +295,17 @@ sub _run_lanes_from_dwh {
           $product_metric->is_sequencing_control) {
           next;
         }
+        #####
         # In case of a partially linked run we might get an unlinked to LIMS
         # row first. More likely than not a partially linked run is a symptom
         # of data not deleted prior to post-reanalysis upload. This might be
         # be considered a regression compared to the previous release. However,
         # trying to 'fix' this is not worth it.
-        $self->_assign_lane_row_data(
+        #
+        # Check for position value to exclude merged data, which is not
+        # linked to lIMS and gives an error when generating the rpt key.
+        #
+        $product_metric->position && $self->_assign_lane_row_data(
           $c, $retrieve_option, $row_data, $product_metric
         );
       }
@@ -346,7 +351,7 @@ sub _assign_lane_row_data {
 sub _assign_plex_row_data {
   my ($self, $row_data, $product_metric) = @_;
 
-  if (defined $product_metric->tag_index) {
+  if ((defined $product_metric->tag_index) && $product_metric->position) {
     my $key = $product_metric->rpt_key;
     if ( !$row_data->{$key} ) {
       $row_data->{$key} = npg_qc_viewer::Util::TransferObjectFactory->new(
