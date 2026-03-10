@@ -124,3 +124,17 @@
   latest_contact:
   percent_complete:
   lab:
+- external_name: A00948
+  id_instrument: 162
+  id_instrument_format: 16
+  instrument_comp: nv16
+  ipaddr: ''
+  iscurrent: 1
+  lab: Ogilvie
+  latest_contact: ~
+  mirroring_host: ~
+  name: NV16
+  percent_complete: ~
+  serial: ''
+  staging_dir: ~
+

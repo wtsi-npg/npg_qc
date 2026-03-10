@@ -1151,3 +1151,100 @@
   run_pending: 2010-07-02 16:48:27
   tags_decode_cv: ~
   tags_decode_percent: 0.00
+- cancelled: 0
+  cycles: 171
+  flowcell_barcode: HHW7FDRX7
+  id_run: 51921
+  instrument_external_name: A00948
+  instrument_model: NovaSeq
+  instrument_name: NV16
+  instrument_side: B
+  interop_cluster_count_mean: 4091904
+  interop_cluster_count_pf_mean: 1513189
+  interop_cluster_count_pf_stdev: 101200.928459785
+  interop_cluster_count_pf_total: 236057484
+  interop_cluster_count_stdev: 0
+  interop_cluster_count_total: 638337024
+  interop_cluster_density_mean: 2961263.95700836
+  interop_cluster_density_pf_mean: 1095077.51057736
+  interop_cluster_density_pf_stdev: 73237.9503193974
+  interop_cluster_density_stdev: 4.20444904933116e-09
+  interop_cluster_pf_mean: 36.98
+  interop_cluster_pf_stdev: 2.47
+  interop_occupied_mean: 98.19
+  interop_occupied_stdev: 0.37
+  lane_released: 2026-03-03 14:10:51
+  last_changed: 2026-03-03 14:13:05
+  paired_read: 0
+  pf_bases: ~
+  pf_cluster_count: ~
+  pf_cluster_density: ~
+  position: 1
+  q20_yield_kb_forward_read: 30954567
+  q20_yield_kb_reverse_read: ~
+  q30_yield_kb_forward_read: 27548421
+  q30_yield_kb_reverse_read: ~
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: ~
+  qc_complete: 2026-03-03 14:10:57
+  qc_seq: 1
+  raw_cluster_count: ~
+  raw_cluster_density: ~
+  run_complete: 2026-02-28 03:25:24
+  run_pending: 2026-02-27 08:57:54
+  run_priority: 4
+  tag_hops_percent: 0.463985
+  tag_hops_power: 1
+  tags_decode_cv: 171.65
+  tags_decode_percent: 82.44
+  unexpected_tags_percent: ~
+  workflow_type: NovaSeqStandard
+- cancelled: 0
+  cycles: 171
+  flowcell_barcode: HHW7FDRX7
+  id_run: 51921
+  instrument_external_name: A00948
+  instrument_model: NovaSeq
+  instrument_name: NV16
+  instrument_side: B
+  interop_cluster_count_mean: 4091904
+  interop_cluster_count_pf_mean: 1534231.12179487
+  interop_cluster_count_pf_stdev: 105831.784714407
+  interop_cluster_count_pf_total: 239340055
+  interop_cluster_count_stdev: 0
+  interop_cluster_count_total: 638337024
+  interop_cluster_density_mean: 2961263.95700836
+  interop_cluster_density_pf_mean: 1110305.45259411
+  interop_cluster_density_pf_stdev: 76589.247836861
+  interop_cluster_density_stdev: 4.20444904933116e-09
+  interop_cluster_pf_mean: 37.49
+  interop_cluster_pf_stdev: 2.59
+  interop_occupied_mean: 98.29
+  interop_occupied_stdev: 0.72
+  lane_released: 2026-03-03 14:10:51
+  last_changed: 2026-03-03 14:13:05
+  paired_read: 0
+  pf_bases: ~
+  pf_cluster_count: ~
+  pf_cluster_density: ~
+  position: 2
+  q20_yield_kb_forward_read: 31432962
+  q20_yield_kb_reverse_read: ~
+  q30_yield_kb_forward_read: 28015974
+  q30_yield_kb_reverse_read: ~
+  q40_yield_kb_forward_read: 0
+  q40_yield_kb_reverse_read: ~
+  qc_complete: 2026-03-03 14:10:57
+  qc_seq: 1
+  raw_cluster_count: ~
+  raw_cluster_density: ~
+  run_complete: 2026-02-28 03:25:24
+  run_pending: 2026-02-27 08:57:54
+  run_priority: 4
+  tag_hops_percent: 0.416207
+  tag_hops_power: 1
+  tags_decode_cv: 171.66
+  tags_decode_percent: 82.71
+  unexpected_tags_percent: ~
+  workflow_type: NovaSeqStandard
+
