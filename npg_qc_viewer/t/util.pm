@@ -34,13 +34,13 @@ has 'fixtures'  => ( isa      => 'Bool',
                      is       => 'ro',
                      required => 0,
                      default  => 1,
-		               );
+                   );
 
 has 'db_connect'  => ( isa      => 'Bool',
                        is       => 'ro',
                        required => 0,
                        default  => 1,
-		                 );
+                     );
 
 has 'mlwhouse_db_path' => (
                             isa      => 'Str',
@@ -106,20 +106,22 @@ sub test_env_setup {
        folder_path_glob => $cwd . '/t/data/nfs/sf44/IL36/analysis'});
 
     my $tempdir = tempdir( CLEANUP => 1);
-    my $ae = Archive::Extract->new(
-      archive => 't/data/fixtures/npgqc_json.tar.gz');
-    $ae->extract(to => $tempdir) or die $ae->error;
+    for my $afile_name (qw/npgqc_json 51921_json/) {
+      my $ae = Archive::Extract->new(
+        archive => 't/data/fixtures/' . $afile_name . '.tar.gz');
+      $ae->extract(to => $tempdir) or die $ae->error;
 
-    my $path = "${tempdir}/npgqc_json";
-    my $num_loaded = npg_qc::autoqc::db_loader->new(
-      schema  => $schemas->{'qc'},
-      path    => [$path],
-      verbose => 0
-    )->load();
-    note "$num_loaded files loaded from $path";
-    my $num_expected = 210;
-    if ($num_loaded != $num_expected) {
-      note "Warning: expected to load $num_expected files";
+      my $path = "${tempdir}/${afile_name}";
+      my $num_loaded = npg_qc::autoqc::db_loader->new(
+        schema  => $schemas->{'qc'},
+        path    => [$path],
+        verbose => 0
+      )->load();
+      note "$num_loaded files loaded from $path";
+      my $num_expected = ($afile_name eq 'npgqc_json') ? 210 : 7;
+      if ($num_loaded != $num_expected) {
+        note "Warning: expected to load $num_expected files";
+      }
     }
   }
  

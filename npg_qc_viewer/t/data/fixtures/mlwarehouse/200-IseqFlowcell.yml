@@ -4453,3 +4453,262 @@
   tag_set_id_lims: 6
   tag_set_name: 'Sanger_168tags - 10 mer tags'
   team: ~
+- bait_name: ~
+  cost_code: S10760
+  entity_id_lims: 77167631
+  entity_type: library_indexed
+  external_release: 1
+  flowcell_barcode: ~
+  forward_read_length: 250
+  id_flowcell_lims: 107442
+  id_iseq_flowcell_tmp: 13249075
+  id_library_lims: NT1883825G
+  id_lims: SQSCP
+  id_pool_lims: NT1883905F
+  id_sample_tmp: 10249593
+  id_study_tmp: 8398
+  is_r_and_d: 0
+  is_spiked: 1
+  last_updated: 2026-03-03 22:00:53
+  legacy_library_id: 77159595
+  loading_concentration: 300
+  manual_qc: 1
+  pipeline_id_lims: PCR with TruSeq tails amplicon
+  position: 1
+  primer_panel: ~
+  priority: 3
+  purpose: standard
+  recorded_at: 2026-03-03 22:00:54
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  reverse_read_length: 250
+  spiked_phix_barcode: NT1863914T
+  spiked_phix_percentage: 5
+  suboptimal: 0
+  tag2_identifier: 8779
+  tag2_sequence: CTGTAGCGCT
+  tag2_set_id_lims: 142
+  tag2_set_name: Magic Tag Group
+  tag_identifier: 8778
+  tag_index: 1
+  tag_sequence: AAGGTGTACT
+  tag_set_id_lims: 142
+  tag_set_name: Magic Tag Group
+  team: Illumina-HTP
+  workflow: Standard
+- bait_name: ~
+  cost_code: S10760
+  entity_id_lims: 77167631
+  entity_type: library_indexed
+  external_release: 1
+  flowcell_barcode: ~
+  forward_read_length: 250
+  id_flowcell_lims: 107442
+  id_iseq_flowcell_tmp: 13249076
+  id_library_lims: NT1883833G
+  id_lims: SQSCP
+  id_pool_lims: NT1883905F
+  id_sample_tmp: 10249601
+  id_study_tmp: 8398
+  is_r_and_d: 0
+  is_spiked: 1
+  last_updated: 2026-03-03 22:00:53
+  legacy_library_id: 77159603
+  loading_concentration: 300
+  manual_qc: 1
+  pipeline_id_lims: PCR with TruSeq tails amplicon
+  position: 1
+  primer_panel: ~
+  priority: 3
+  purpose: standard
+  recorded_at: 2026-03-03 22:00:54
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  reverse_read_length: 250
+  spiked_phix_barcode: NT1863914T
+  spiked_phix_percentage: 5
+  suboptimal: 0
+  tag2_identifier: 8783
+  tag2_sequence: AGACTGATCA
+  tag2_set_id_lims: 142
+  tag2_set_name: Magic Tag Group
+  tag_identifier: 8782
+  tag_index: 2
+  tag_sequence: CTTCTAACCG
+  tag_set_id_lims: 142
+  tag_set_name: Magic Tag Group
+  team: Illumina-HTP
+  workflow: Standard
+- bait_name: ~
+  cost_code: S10760
+  entity_id_lims: 77167631
+  entity_type: library_indexed
+  external_release: 1
+  flowcell_barcode: ~
+  forward_read_length: 250
+  id_flowcell_lims: 107442
+  id_iseq_flowcell_tmp: 13249077
+  id_library_lims: NT1883815E
+  id_lims: SQSCP
+  id_pool_lims: NT1883905F
+  id_sample_tmp: 10249583
+  id_study_tmp: 8398
+  is_r_and_d: 0
+  is_spiked: 1
+  last_updated: 2026-03-03 22:00:53
+  legacy_library_id: 77159585
+  loading_concentration: 300
+  manual_qc: 1
+  pipeline_id_lims: PCR with TruSeq tails amplicon
+  position: 1
+  primer_panel: ~
+  priority: 3
+  purpose: standard
+  recorded_at: 2026-03-03 22:00:54
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  reverse_read_length: 250
+  spiked_phix_barcode: NT1863914T
+  spiked_phix_percentage: 5
+  suboptimal: 0
+  tag2_identifier: 12841
+  tag2_sequence: CCGTGAGCAA
+  tag2_set_id_lims: 142
+  tag2_set_name: Magic Tag Group
+  tag_identifier: 12840
+  tag_index: 3
+  tag_sequence: TAGCGAGGCT
+  tag_set_id_lims: 142
+  tag_set_name: Magic Tag Group
+  team: Illumina-HTP
+  workflow: Standard
+- bait_name: ~
+  cost_code: S10760
+  entity_id_lims: 77167632
+  entity_type: library_indexed
+  external_release: 1
+  flowcell_barcode: ~
+  forward_read_length: 250
+  id_flowcell_lims: 107442
+  id_iseq_flowcell_tmp: 13249166
+  id_library_lims: NT1883825G
+  id_lims: SQSCP
+  id_pool_lims: NT1883905F
+  id_sample_tmp: 10249593
+  id_study_tmp: 8398
+  is_r_and_d: 0
+  is_spiked: 1
+  last_updated: 2026-03-03 22:00:53
+  legacy_library_id: 77159595
+  loading_concentration: 300
+  manual_qc: 1
+  pipeline_id_lims: PCR with TruSeq tails amplicon
+  position: 2
+  primer_panel: ~
+  priority: 3
+  purpose: standard
+  recorded_at: 2026-03-03 22:00:55
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  reverse_read_length: 250
+  spiked_phix_barcode: NT1863914T
+  spiked_phix_percentage: 5
+  suboptimal: 0
+  tag2_identifier: 8779
+  tag2_sequence: CTGTAGCGCT
+  tag2_set_id_lims: 142
+  tag2_set_name: Magic Tag Group
+  tag_identifier: 8778
+  tag_index: 1
+  tag_sequence: AAGGTGTACT
+  tag_set_id_lims: 142
+  tag_set_name: Magic Tag Group
+  team: Illumina-HTP
+  workflow: Standard
+- bait_name: ~
+  cost_code: S10760
+  entity_id_lims: 77167632
+  entity_type: library_indexed
+  external_release: 1
+  flowcell_barcode: ~
+  forward_read_length: 250
+  id_flowcell_lims: 107442
+  id_iseq_flowcell_tmp: 13249167
+  id_library_lims: NT1883833G
+  id_lims: SQSCP
+  id_pool_lims: NT1883905F
+  id_sample_tmp: 10249601
+  id_study_tmp: 8398
+  is_r_and_d: 0
+  is_spiked: 1
+  last_updated: 2026-03-03 22:00:53
+  legacy_library_id: 77159603
+  loading_concentration: 300
+  manual_qc: 1
+  pipeline_id_lims: PCR with TruSeq tails amplicon
+  position: 2
+  primer_panel: ~
+  priority: 3
+  purpose: standard
+  recorded_at: 2026-03-03 22:00:55
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  reverse_read_length: 250
+  spiked_phix_barcode: NT1863914T
+  spiked_phix_percentage: 5
+  suboptimal: 0
+  tag2_identifier: 8783
+  tag2_sequence: AGACTGATCA
+  tag2_set_id_lims: 142
+  tag2_set_name: Magic Tag Group
+  tag_identifier: 8782
+  tag_index: 2
+  tag_sequence: CTTCTAACCG
+  tag_set_id_lims: 142
+  tag_set_name: Magic Tag Group
+  team: Illumina-HTP
+  workflow: Standard
+- bait_name: ~
+  cost_code: S10760
+  entity_id_lims: 77167632
+  entity_type: library_indexed
+  external_release: 1
+  flowcell_barcode: ~
+  forward_read_length: 250
+  id_flowcell_lims: 107442
+  id_iseq_flowcell_tmp: 13249168
+  id_library_lims: NT1883815E
+  id_lims: SQSCP
+  id_pool_lims: NT1883905F
+  id_sample_tmp: 10249583
+  id_study_tmp: 8398
+  is_r_and_d: 0
+  is_spiked: 1
+  last_updated: 2026-03-03 22:00:53
+  legacy_library_id: 77159585
+  loading_concentration: 300
+  manual_qc: 1
+  pipeline_id_lims: PCR with TruSeq tails amplicon
+  position: 2
+  primer_panel: ~
+  priority: 3
+  purpose: standard
+  recorded_at: 2026-03-03 22:00:55
+  requested_insert_size_from: ~
+  requested_insert_size_to: ~
+  reverse_read_length: 250
+  spiked_phix_barcode: NT1863914T
+  spiked_phix_percentage: 5
+  suboptimal: 0
+  tag2_identifier: 12841
+  tag2_sequence: CCGTGAGCAA
+  tag2_set_id_lims: 142
+  tag2_set_name: Magic Tag Group
+  tag_identifier: 12840
+  tag_index: 3
+  tag_sequence: TAGCGAGGCT
+  tag_set_id_lims: 142
+  tag_set_name: Magic Tag Group
+  team: Illumina-HTP
+  workflow: Standard
+

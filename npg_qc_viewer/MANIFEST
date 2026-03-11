@@ -201,6 +201,7 @@ t/data/fixtures/mlwarehouse/200-UseqWafer.yml
 t/data/fixtures/mlwarehouse/300-UseqRunMetric.yml
 t/data/fixtures/mlwarehouse/400-UseqProductMetric.yml
 t/data/fixtures/npgqc_json.tar.gz
+t/data/fixtures/51921_json.tar.gz
 t/data/interop/22833_1.interop.json
 t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/lane1/qc/1234_1.insert_size.json
 t/data/nfs/sf44/IL2/analysis/123456_IL2_1234/Latest_Summary/archive/lane1/qc/1234_1.qX_yield.json

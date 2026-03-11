@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 36;
+use Test::More tests => 37;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 use File::Path qw/make_path/;
@@ -480,6 +480,13 @@ subtest 'Displaying user info' => sub {
 
   $mech->get_ok($url . '?user=cat&password=secret');
   $mech->content_contains('Logged in as cat (mqc)');
+};
+
+subtest 'Merged Illumina data' => sub {
+  plan tests => 1;
+
+  my $url = q[http://localhost/checks/runs/51921];
+  $mech->get_ok($url);
 };
 
 1;
