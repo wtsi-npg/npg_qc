@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 77.0.1 (2026-03-13)
+ - Fixed a bug in rendering merged data
+   - Don't check for position for merged data when generating rpt key
+   - Add fixtures and test for merged data
+ - CI updates
+
 release 77.0.0 (2026-02-19)
  - Change default port for NPG-Tracking url
  - Remove hardcoded mod_proxy path in httpd_seqqc.conf
