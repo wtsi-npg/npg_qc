@@ -641,3 +641,10 @@
   id_run_status_dict: 11
   id_user: 7
   iscurrent: 1
+- date: 2026-03-03 14:10:57
+  id_run: 51921
+  id_run_status: 701093
+  id_run_status_dict: 20
+  id_user: 7
+  iscurrent: 1
+

@@ -1,4 +1,4 @@
----
+
 - id_instrument_format: 4
   id_manufacturer: 10
   model: HK
@@ -35,3 +35,12 @@
   iscurrent: 1
   default_columns: 0
   default_tiles: 0
+- days_between_washes: ~
+  default_columns: 8
+  default_tiles: 704
+  id_instrument_format: 16
+  id_manufacturer: 10
+  iscurrent: 1
+  model: NovaSeq
+  runs_between_washes: 1
+
