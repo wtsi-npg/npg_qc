@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        perl: ["5.26.3", "5.34.1"]
+        perl: ["5.34.1", "5.38.2"]
         node: ['14.8.0']
 
     steps:
