@@ -1,4 +1,4 @@
 <ul>
-  <li><a href="[% npg_url %]/run/[% id_run %]">NPG</a></li>
+  <li>[% user = c.model('User').logged_user(c); %]<a href="[% IF user && user.username; %][% base_url %]/perl/oidc-post-login-actions.cgi?return_to=/run/[% id_run %][% ELSE; %][% npg_url %]/run/[% id_run %][% END %]">NPG</a></li>
   <li><a href="[% c.uri_for_action(c.controller('Illumina').action_for('summary'), id_run) %]">NPG QC</a></li>
 </ul>

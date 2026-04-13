@@ -2,7 +2,8 @@ package Catalyst::Authentication::Credential::SangerSSOnpg;
 
 use strict;
 use warnings;
-use npg::authentication::sanger_sso qw/sanger_cookie_name sanger_username/;
+use Readonly;
+use Catalyst::Authentication::Credential::SangerOIDC;
 
 our $VERSION = '0';
 
@@ -17,19 +18,19 @@ sub authenticate {
     my ( $self, $c, $realm) = @_;
     $c->log->debug('SangerSSOnpg authenticate() called from ' . $c->request->uri) ;
 
-    my $cookie = $c->request->cookie(sanger_cookie_name());
-    if(!$cookie) {
-        $c->log->debug('Cookie not found');
-        return;
+    my $user = Catalyst::Authentication::Credential::SangerOIDC->new(
+        env => $c->req->env
+    );
+    my $preferred_username = $user->username;
+
+    my $username;
+    Readonly my $NOT_FOUND => -1;
+
+    if (index($preferred_username, q{@}) != $NOT_FOUND) {
+      $username = (split /@/smx, $preferred_username)[0];
+    } else {
+      $username = $preferred_username;
     }
-    $c->log->debug('Found cookie ' . $cookie->name . ' = ' . $cookie->value);
-    my $key = $self->{_config}->{decryption_key};
-    if (!$key) {
-        $c->log->debug('Decription key not found');
-        return;
-    }
-    $c->log->debug('Got decryption key ' . $key);
-    my $username = sanger_username($cookie->value, $key);
     if ($username) {
         return $realm->find_user({username=>$username}, $c);
     }

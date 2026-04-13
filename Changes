@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Okta implementation with OIDC setup
  - Update matrix of CI perl versions, remove 5.26.3 and add 5.38.2
 
 release 77.0.1 (2026-03-13)

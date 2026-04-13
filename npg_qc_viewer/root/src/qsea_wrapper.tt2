@@ -24,7 +24,7 @@
   <h1>
     <a name="page_top"></a>&nbsp;
     <span class="lfloat[% IF env_dev == 'dev'; %] env_dev[% END %]">[%- title | html -%]</span>
-    <span class="rfloat">[% user = c.model('User').logged_user(c); IF user.username; %]Logged in as [% user.username; IF user.has_mqc_role %] (mqc)[% END;ELSE %] Not logged in[% END %]</span>
+    <span class="rfloat">[% user = c.model('User').logged_user(c); IF user.username; %]Logged in as [% user.username | html %][% IF user.has_mqc_role %] (mqc)[% END %] <a href="/auth/logout?redirect_to=[% c.req.uri | uri | html %]">(Logout)</a> [% ELSE %]<a href="/auth/login?redirect_to=[% c.req.uri | uri | html %]">Log in</a>[% END %]</span>
   </h1>
 </div>
 [% content %]
