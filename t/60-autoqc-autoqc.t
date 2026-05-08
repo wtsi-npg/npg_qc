@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 26;
+use Test::More tests => 5;
 use Test::Exception;
 use File::Temp qw/tempdir/;
 
@@ -8,7 +8,9 @@ use_ok ('npg_qc::autoqc::autoqc');
 
 my $dir = tempdir( CLEANUP => 1 );
 
-{
+subtest 'test basic object functionality' => sub {
+  plan tests => 20;
+
   local @ARGV = qw/--qc_in t --id_run 4 --position 1/;
   my $factory = npg_qc::autoqc::autoqc->new_with_options(check => 'qX_yield');
   isa_ok($factory, 'npg_qc::autoqc::autoqc');
@@ -57,9 +59,11 @@ my $dir = tempdir( CLEANUP => 1 );
   $factory = npg_qc::autoqc::autoqc->new_with_options(check => 'check');
   lives_ok { $check = $factory->create_check_object() } 'qc_in is optional';
   is($check->qc_out->[0], $dir, 'dir out is set');   
-}
+};
 
-{
+subtest 'test creating a generic check object' => sub {
+  plan tests => 3;
+
   local @ARGV = qw(--check generic --pp_name p1 --rpt_list 4:1 --qc_out);
   push @ARGV, $dir;
   my $factory = npg_qc::autoqc::autoqc->new_with_options();
@@ -86,14 +90,46 @@ my $dir = tempdir( CLEANUP => 1 );
   $check = $factory->create_check_object();
   is (ref $check, 'npg_qc::autoqc::checks::generic::foo1',
     'check is an instance of the foo1 autoqc class');
-}
+};
 
-{
+subtest 'test creating a review check object' => sub {
+  plan tests => 2;
+
   local @ARGV = qw(--check review --runfolder_path t --rpt_list 4:1 --qc_out);
   push @ARGV, $dir;
   my $check = npg_qc::autoqc::autoqc->new_with_options()->create_check_object();
   isa_ok($check, 'npg_qc::autoqc::checks::review');  
   is ($check->runfolder_path, 't', '--runfolder_path option is passed through');
-}
+};
+
+subtest 'test only_if_can script option' => sub {
+  plan tests => 4;
+
+  # Tag metrics check can only be run on for a lane.
+
+  my @init = qw(--check tag_metrics --qc_out);
+  push @init, $dir, '--qc_in', $dir, '--rpt_list';
+  
+  local @ARGV = @init;
+  push @ARGV, '4:1';
+  my $check = npg_qc::autoqc::autoqc->new_with_options()->create_check_object();
+  isa_ok ($check, 'npg_qc::autoqc::checks::tag_metrics');
+  
+  local @ARGV = @init;
+  push @ARGV, '4:1', '--only_if_can_run';
+  $check = npg_qc::autoqc::autoqc->new_with_options()->create_check_object();
+  isa_ok ($check, 'npg_qc::autoqc::checks::tag_metrics');
+
+  local @ARGV = @init;
+  push @ARGV, '4:1:1';
+  $check = npg_qc::autoqc::autoqc->new_with_options()->create_check_object();
+  isa_ok ($check, 'npg_qc::autoqc::checks::tag_metrics');
+
+  local @ARGV = @init;
+  push @ARGV, '4:1:1', '--only_if_can_run';
+  $check = npg_qc::autoqc::autoqc->new_with_options()->create_check_object();
+  is ($check, undef,
+    'tag_metrics check cannot be run, so the check object is not returned');
+};
 
 1;
