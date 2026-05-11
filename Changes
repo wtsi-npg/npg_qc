@@ -1,5 +1,15 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 77.1.0 (2026-05-11)
+ - 'only_if_can_run' boolean option is added to the 'qc' script. If this option
+   is enabled (it is disabled by default), the script exits normally without
+   running the check if this check cannot be run for the given input. While
+   in the Illumina Perl pipeline we can call the 'can_run' method of the
+   check in order to decide whether to create a job for it, in Python pipelines
+   we have to create a job anyway. This means that potentially empty JSON autoqc
+   results will be created and archived. Using this new option ensures that
+   unwanted empty autoqc results are not created.
+
 release 77.0.2 (2026-04-16)
  - Update matrix of CI perl versions, remove 5.26.3 and add 5.38.2
 
