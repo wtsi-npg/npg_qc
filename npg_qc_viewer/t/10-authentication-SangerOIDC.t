@@ -6,101 +6,122 @@ use Test::More;
 use_ok('Catalyst::Authentication::Credential::SangerOIDC');
 
 # -----------------------
-# Test data
-# -----------------------
-
-my $env = {
-  HTTP_X_OIDC_sub              => 'user-123',
-  HTTP_X_OIDC_email            => 'tiger@example.com',
-  HTTP_X_OIDC_name             => 'Tiger Cat',
-  HTTP_X_OIDC_PREFERRED_USER   => 'tiger',
-  HTTP_X_OIDC_groups           => 'admin, users, dev',
-  HTTP_X_OIDC_access_token     => 'access-token-abc',
-  HTTP_X_OIDC_id_token         => 'id-token-xyz',
-};
-
-my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(env => $env);
-
-# -----------------------
 # Constructor
 # -----------------------
 
-isa_ok($oidc, 'Catalyst::Authentication::Credential::SangerOIDC');
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(
+    env => { HTTP_X_OIDC_name => 'Tiger Cat' },
+  );
+  isa_ok($oidc, 'Catalyst::Authentication::Credential::SangerOIDC', 'object created with env');
+}
+
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new();
+  isa_ok($oidc, 'Catalyst::Authentication::Credential::SangerOIDC', 'object created without env arg');
+}
 
 # -----------------------
-# Accessors
+# name
 # -----------------------
 
-is($oidc->subject, 'user-123', 'sub accessor works');
-is($oidc->email, 'tiger@example.com', 'email accessor works');
-is($oidc->name, 'Tiger Cat', 'name accessor works');
-is($oidc->username, 'tiger', 'username accessor works');
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(
+    env => { HTTP_X_OIDC_name => 'Tiger Cat' },
+  );
+  is($oidc->name, 'Tiger Cat', 'name returns full display name');
+}
 
-is($oidc->access_token, 'access-token-abc', 'access token works');
-is($oidc->id_token, 'id-token-xyz', 'id token works');
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(env => {});
+  ok(!defined $oidc->name, 'name returns undef when header absent');
+}
 
-# -----------------------
-# Groups parsing
-# -----------------------
-
-my $groups = $oidc->groups;
-
-isa_ok($groups, 'ARRAY', 'groups returns arrayref');
-
-is_deeply(
-  $groups,
-  ['admin', 'users', 'dev'],
-  'groups split correctly with spaces'
-);
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(env => 'not-a-hash');
+  ok(!defined $oidc->name, 'name returns undef for non-hash env');
+}
 
 # -----------------------
-# has_group
+# username: plain (no @ in value)
 # -----------------------
 
-ok($oidc->has_group('admin'), 'has_group detects admin');
-ok(!$oidc->has_group('missing'), 'has_group rejects unknown group');
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(
+    env => { HTTP_X_OIDC_PREFERRED_USER => 'tiger' },
+  );
+  is($oidc->username, 'tiger', 'username returned unchanged when no @ present');
+}
 
 # -----------------------
-# Edge cases: missing env
+# username: value contains email domain
 # -----------------------
 
-my $empty = Catalyst::Authentication::Credential::SangerOIDC->new(env => {});
-
-ok(!defined $empty->subject, 'missing sub returns undef');
-ok(!defined $empty->email, 'missing email returns undef');
-
-is_deeply(
-  $empty->groups,
-  [],
-  'empty groups returns empty arrayref'
-);
-
-ok(!$empty->has_group('admin'), 'has_group false when no groups');
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(
+    env => { HTTP_X_OIDC_PREFERRED_USER => 'tiger@sanger.ac.uk' },
+  );
+  is($oidc->username, 'tiger', 'username strips email domain after @');
+}
 
 # -----------------------
-# Edge case: malformed env
+# username: malformed — starts with @
 # -----------------------
 
-my $bad = Catalyst::Authentication::Credential::SangerOIDC->new(env => 'not-a-hash');
-
-ok(!defined $bad->email, 'non-hash env handled safely');
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(
+    env => { HTTP_X_OIDC_PREFERRED_USER => '@sanger.ac.uk' },
+  );
+  is($oidc->username, q{}, 'username is empty string when value starts with @');
+}
 
 # -----------------------
-# Edge case: group formatting variations
+# username: multiple @ signs
 # -----------------------
 
-my $env_variation = {
-  HTTP_X_OIDC_groups => 'admin,users,dev',
-};
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(
+    env => { HTTP_X_OIDC_PREFERRED_USER => 'tiger@foo@bar' },
+  );
+  is($oidc->username, 'tiger', 'username returns part before first @ when multiple @ present');
+}
 
-my $oidc_variation = Catalyst::Authentication::Credential::SangerOIDC->new(
-  env => $env_variation
-);
+# -----------------------
+# username: missing header
+# -----------------------
 
-is_deeply(
-  $oidc_variation->groups,
-  ['admin', 'users', 'dev'],
-  'groups split correctly without spaces'
-);
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(env => {});
+  ok(!defined $oidc->username, 'username returns undef when header absent');
+}
+
+# -----------------------
+# username: empty string value
+# -----------------------
+
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(
+    env => { HTTP_X_OIDC_PREFERRED_USER => q{} },
+  );
+  ok(!defined $oidc->username, 'username returns undef for empty header value');
+}
+
+# -----------------------
+# username: non-hash env
+# -----------------------
+
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new(env => 'not-a-hash');
+  ok(!defined $oidc->username, 'username returns undef for non-hash env');
+}
+
+# -----------------------
+# username: default empty env (no arg)
+# -----------------------
+
+{
+  my $oidc = Catalyst::Authentication::Credential::SangerOIDC->new();
+  ok(!defined $oidc->username, 'username returns undef when constructed without env');
+}
 
 done_testing();

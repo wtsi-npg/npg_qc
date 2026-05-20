@@ -7,26 +7,26 @@ use Catalyst::Authentication::Credential::SangerOIDC;
 our $VERSION = '0';
 
 sub new {
-    my ($class, $config, $app, $realm) = @_;
-    my $self = { _config => $config };
-    bless $self, $class;
-    return $self;
+  my ($class, $config, $app, $realm) = @_;
+  my $self = { _config => $config };
+  bless $self, $class;
+  return $self;
 }
 
 sub authenticate {
-    my ( $self, $c, $realm) = @_;
-    $c->log->debug('SangerSSOnpg authenticate() called from ' . $c->request->uri) ;
+  my ( $self, $c, $realm) = @_;
+  $c->log->debug('SangerSSOnpg authenticate() called from ' . $c->request->uri) ;
 
-    my $user = Catalyst::Authentication::Credential::SangerOIDC->new(
-        env => $c->req->env
-    );
-    my $username = $user->username;
+  my $user = Catalyst::Authentication::Credential::SangerOIDC->new(
+    env => $c->req->env
+  );
+  my $username = $user->username;
 
-    if ($username) {
-        return $realm->find_user({username=>$username}, $c);
-    }
-    $c->log->debug(q[Can't extract username]);
-    return;
+  if ($username) {
+    return $realm->find_user({username=>$username}, $c);
+  }
+  $c->log->debug(q[Can't extract username]);
+  return;
 }
 
 1;
@@ -38,21 +38,21 @@ __END__
 
 =head1 SYNOPSIS
 
-    #action in a controller
-    sub login : Local {
-        my ( $self, $c ) = @_;
-        my $user     = $c->req->params->{user};
-        my $realm = $c->req->params->{realm};
-        if (defined $user or defined $realm) {
-            my $password     = $c->req->params->{password};
-            $c->logout;
-            if ( $c->authenticate( defined $user ? { username => $user, password => $password } :{} , $realm) ) {
-                # login correct
-            } else {
-                # login incorrect
-            }
-        }
+#action in a controller
+sub login : Local {
+  my ( $self, $c ) = @_;
+  my $user     = $c->req->params->{user};
+  my $realm = $c->req->params->{realm};
+  if (defined $user or defined $realm) {
+    my $password     = $c->req->params->{password};
+    $c->logout;
+    if ( $c->authenticate( defined $user ? { username => $user, password => $password } :{} , $realm) ) {
+      # login correct
+    } else {
+      # login incorrect
     }
+  }
+}
 
  #config
  <Plugin::Authentication>

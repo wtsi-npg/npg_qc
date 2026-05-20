@@ -2,7 +2,6 @@ package npg_qc_viewer::Controller::Auth;
 
 use Moose;
 use namespace::autoclean;
-
 use Catalyst::Authentication::Credential::SangerOIDC;
 
 BEGIN { extends 'Catalyst::Controller' }
@@ -12,12 +11,12 @@ our $VERSION = '0';
 sub _get_raw_param {
   my ( $self, $c, $param_name ) = @_;
 
-  my $query_string = $c->req->env->{QUERY_STRING} // q{};
+  my $query_string = $c->req->env->{QUERY_STRING} || q{};
 
   my %raw_params;
   for my $pair ( split q{&}, $query_string ) { ## no critic (BuiltinFunctions::ProhibitStringySplit)
     my ( $key, $val ) = split /=/xsm, $pair, 2;
-    $raw_params{$key} = URI::Escape::uri_unescape($val // q{});
+    $raw_params{$key} = URI::Escape::uri_unescape($val || q{});
   }
   return $raw_params{$param_name};
 }
@@ -27,7 +26,7 @@ sub _clear_oidc_cookies {
   my $oidc_cookie_domain = $c->req->env->{'HTTP_X_OIDC_COOKIE_DOMAIN_NAME'};
 
   my %cookies;
-  foreach my $pair ( split /;\s*/xsm, $c->req->env->{HTTP_COOKIE} // q{} ) {
+  foreach my $pair ( split /;\s*/xsm, $c->req->env->{HTTP_COOKIE} || q{} ) {
     my ( $name, $value ) = split /=/xsm, $pair, 2;
     if (defined $name) {
       $cookies{$name} = $value;
@@ -46,7 +45,7 @@ sub _clear_oidc_cookies {
       };
     }
   }
-  return 1;
+  return;
 }
 
 sub login : Path('/auth/login') : Args(0) {
@@ -185,7 +184,7 @@ Avnish Pratap Singh E<lt>as74@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014,2015,2016,2017,2018,2019,2025,2026 Genome Research Ltd.
+Copyright (C) 2026 Genome Research Ltd.
 
 This file is part of NPG software.
 

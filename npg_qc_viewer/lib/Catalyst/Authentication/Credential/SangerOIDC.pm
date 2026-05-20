@@ -22,42 +22,20 @@ sub _h {
   return $self->{env}{$key};
 }
 
-#############
-# Accessors #
-#############
-
-sub subject  { my $self = shift; return $self->_h('HTTP_X_OIDC_sub'); }
-sub email    { my $self = shift; return $self->_h('HTTP_X_OIDC_email'); }
-sub name     { my $self = shift; return $self->_h('HTTP_X_OIDC_name'); }
-
-sub groups {
+sub name {
   my $self = shift;
-  my $raw = $self->_h('HTTP_X_OIDC_groups') || q{};
-  return [ grep { length } split /\s*,\s*/xsm, $raw ];
+  return $self->_h('HTTP_X_OIDC_name');
 }
-
-sub access_token { my $self = shift; return $self->_h('HTTP_X_OIDC_access_token'); }
-sub id_token     { my $self = shift; return $self->_h('HTTP_X_OIDC_id_token'); }
 
 sub username {
   my $self = shift;
-  my $preferred_username = $self->_h('HTTP_X_OIDC_PREFERRED_USER');
+  my $preferred_username = $self->_h('HTTP_X_OIDC_PREFERRED_USER') // q{};
 
   if ($preferred_username) {
     return (split /@/smx, $preferred_username)[0];
   }
   return;
 }
-
-##########
-# Helper #
-##########
-
-sub has_group {
-  my ($self, $group) = @_;
-  return grep { $_ eq $group } @{ $self->groups };
-}
-
 1;
 __END__
 
@@ -75,11 +53,8 @@ Catalyst::Authentication::Credential::SangerOIDC - Simple OIDC claim helper
     env => $c->req->env,
   );
 
+  my $name = $oidc->name;
   my $username = $oidc->username;
-
-  if ($oidc->has_group('admin')) {
-    print "User is admin";
-  }
 
 =head1 DESCRIPTION
 
@@ -114,14 +89,6 @@ PSGI environment hash containing HTTP headers.
 
 =head1 METHODS
 
-=head2 subject
-
-Returns the OIDC subject (unique user identifier).
-
-=head2 email
-
-Returns the user's email address.
-
 =head2 name
 
 Returns the user's full display name.
@@ -130,26 +97,56 @@ Returns the user's full display name.
 
 Returns the preferred username from the identity provider.
 
-=head2 groups
+=head2 Additional attributes
 
-Returns an array reference of groups the user belongs to.
+Currently only few user attributes are fetched from OIDC. Additional,
+attributes can be fetched as below:
+
+Subject: Returns the OIDC subject (unique user identifier).
+
+sub subject {
+  my $self = shift;
+  return $self->_h('HTTP_X_OIDC_sub');
+}
+
+Email: Returns the user's email address.
+
+sub email {
+  my $self = shift;
+  return $self->_h('HTTP_X_OIDC_email');
+}
+
+Groups: Returns an array reference of groups the user belongs to.
 
 Groups are expected to be provided as a comma-separated string
 in the C<HTTP_X_OIDC_groups> header.
 
-=head2 access_token
+sub groups {
+  my $self = shift;
+  my $raw = $self->_h('HTTP_X_OIDC_groups') || q{};
+  return [ grep { length } split /\s*,\s*/xsm, $raw ];
+}
 
-Returns the OIDC access token.
+Access Token: Returns the OIDC access token.
 
-=head2 id_token
+sub access_token {
+  my $self = shift;
+  return $self->_h('HTTP_X_OIDC_access_token');
+}
 
-Returns the OIDC ID token.
+ID Token: Returns the OIDC ID token.
 
-=head2 has_group
+sub id_token {
+  my $self = shift;
+  return $self->_h('HTTP_X_OIDC_id_token');
+}
 
-  if ($oidc->has_group('admin')) { ... }
+has_group: Returns true if the user belongs to the specified group.
 
-Returns true if the user belongs to the specified group.
+sub has_group {
+  my ($self, $group) = @_;
+  return grep { $_ eq $group } @{ $self->groups };
+}
 
 =head1 ENVIRONMENT
 
@@ -157,19 +154,9 @@ This module expects the following HTTP headers in the PSGI environment:
 
 =over 4
 
-=item * HTTP_X_OIDC_sub
-
-=item * HTTP_X_OIDC_email
-
 =item * HTTP_X_OIDC_name
 
 =item * HTTP_X_OIDC_PREFERRED_USER
-
-=item * HTTP_X_OIDC_groups
-
-=item * HTTP_X_OIDC_access_token
-
-=item * HTTP_X_OIDC_id_token
 
 =back
 
@@ -205,6 +192,8 @@ No normalization of claims is performed.
 Avnish Pratap Singh <as74@sanger.ac.uk>
 
 =head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Genome Research Ltd
 
 This file is part of NPG software.
 
