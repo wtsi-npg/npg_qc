@@ -220,7 +220,7 @@ subtest 'extra column markup - affects export to CSV' => sub {
   $mech->get_ok($url_sample);
   my $re = qr/Sample\ '$sample_name'/;
   $mech->title_like($re);
-  $mech->content_like($re);
+  $mech->content_contains('Sample &#39;' . $sample_name . '&#39;');
   $mech->content_contains(qq[data-extra_cols_sample_name='$sample_name']);
 
   $row_product->delete();
