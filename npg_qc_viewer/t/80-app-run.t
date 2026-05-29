@@ -218,7 +218,7 @@ subtest 'extra column markup - affects export to CSV' => sub {
 
   my $url_sample = qq[http://localhost/checks/samples/$id_sample_lims];
   $mech->get_ok($url_sample);
-  $mech->content_contains(qq[Sample '$sample_name']);
+  $mech->content_contains('Sample &#39;' . $sample_name . '&#39;');
   $mech->content_contains(qq[data-extra_cols_sample_name='$sample_name']);
 
   $row_product->delete();
