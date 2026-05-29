@@ -125,7 +125,7 @@ subtest 'Tests for page features affecting JavaScript' => sub {
 subtest 'extra column markup - affects export to CSV' => sub {
   # This tests check for functionaly which affects javascript part of
   # application. Update accordingly.
-  plan tests => 23;
+  plan tests => 24;
   my $id_run    = 4025;
   my $position  = 1;
   my $tag_index = 1;
@@ -218,7 +218,9 @@ subtest 'extra column markup - affects export to CSV' => sub {
 
   my $url_sample = qq[http://localhost/checks/samples/$id_sample_lims];
   $mech->get_ok($url_sample);
-  $mech->title_like(qr/Sample\ '$sample_name'/);
+  my $re = qr/Sample\ '$sample_name'/;
+  $mech->title_like($re);
+  $mech->content_like($re);
   $mech->content_contains(qq[data-extra_cols_sample_name='$sample_name']);
 
   $row_product->delete();
