@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 77.1.1 (2026-06-01)
  - https://github.com/cpan-authors/Template2/pull/337 update to how single
    quotes are rendered was released on 2026-05-21 as Template::Toolkit v.3.103
    While this change does not affect the UI display, the content of the
