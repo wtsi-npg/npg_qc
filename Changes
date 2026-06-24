@@ -5,6 +5,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
    MySQL version 8.4. The MySQL 8.4 compatibility checker reported the following:
    "Warning : Row size too large (> 8126). Changing some columns to TEXT or BLOB
    or using ROW_FORMAT=DYNAMIC or ROW_FORMAT=COMPRESSED may help".
+ - Added 'skip_sequence_summary' option to bam_flagstats autoqc check.
 
 release 77.1.1 (2026-06-01)
  - https://github.com/cpan-authors/Template2/pull/337 update to how single
