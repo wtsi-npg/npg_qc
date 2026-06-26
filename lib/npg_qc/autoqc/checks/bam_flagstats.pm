@@ -82,7 +82,13 @@ has 'skip_markdups_metrics' => (is       => 'ro',
                                 isa      => 'Bool',
                                 required => 0,
                                 default  => 0,
-                                );
+);
+
+has 'skip_sequence_summary' => (is       => 'ro',
+                                isa      => 'Bool',
+                                required => 0,
+                                default  => 0,
+);
 
 has '_file_path_root'     => ( isa        => 'Str',
                                is         => 'ro',
@@ -149,12 +155,14 @@ sub _build_related_results {
                         stats_file    => $_
                       )
                    } @{$self->samtools_stats_file};
-  push @objects, npg_qc::autoqc::results::sequence_summary->new(
-                   filename_root   => $self->result->filename_root,
-                   composition     => $self->composition,
-                   sequence_format => $self->file_type,
-                   file_path_root  => $self->_file_path_root
-                 );
+  if (!$self->skip_sequence_summary) {
+    push @objects, npg_qc::autoqc::results::sequence_summary->new(
+                     filename_root   => $self->result->filename_root,
+                     composition     => $self->composition,
+                     sequence_format => $self->file_type,
+                     file_path_root  => $self->_file_path_root
+                   );
+  }
 
   return \@objects;
 }
@@ -373,6 +381,18 @@ npg_qc::autoqc::checks::bam_flagstats
 
   An optional subset, see npg_tracking::glossary::subset for details.
 
+=head2 skip_markdups_metrics
+
+  A boolean flag, defaults to false. If set to true, information about
+  duplicates is neither looked up nor is included in the result object. 
+
+=head2 skip_sequence_summary
+
+  A boolean flag, defaults to false. If set to true,
+  C<npg_qc::autoqc::results::sequence_summary> is not generated. Recommended
+  if the sequence file and the checksum files are not co-located with the
+  output of C<samtools stats> and C<samtools flagstats> commands.
+
 =head2 related_results
 
   A lazy attribute, an array of related autoqc result objects.
@@ -436,7 +456,7 @@ Marina Gourtovaia E<lt>mg8@sanger.ac.ukE<gt><gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 GRL
+Copyright (C) 2016,2017,2018,2019,2026 Genome Research Ltd.
 
 This file is part of NPG.
 

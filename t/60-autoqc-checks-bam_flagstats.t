@@ -30,6 +30,18 @@ sub _prune_result_hash {
   }
 }
 
+sub _create_staging {
+  my $archive = shift;
+  my $tempd = tempdir(CLEANUP => 1);
+  my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
+  $ae->extract(to => $tempd) or die $ae->error;
+  $archive = join q[/], $tempd, $archive;
+  #note `find $archive`;
+  my $samtools_path  = join q[/], $archive, 'samtools';
+  write_samtools_script($samtools_path);
+  return $archive;
+}
+
 subtest 'test attributes and simple methods' => sub {
   plan tests => 4;
 
@@ -143,18 +155,11 @@ subtest 'high-level parsing, no markdup metrics' => sub {
 };
 
 
-my $archive_16960 = '16960_1_0';
-my $ae_16960 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_16960}.tar.gz");
-$ae_16960->extract(to => $tempdir) or die $ae_16960->error;
-$archive_16960 = join q[/], $tempdir, $archive_16960;
-#note `find $archive_16960`;
-
-my $samtools_path  = join q[/], $tempdir, 'samtools';
-local $ENV{'PATH'} = join q[:], $tempdir, $ENV{'PATH'};
-write_samtools_script($samtools_path);
-
 subtest 'finding files, calculating metrics' => sub {
   plan tests => 40;
+
+  my $archive_16960 = _create_staging('16960_1_0');
+  local $ENV{'PATH'} = join q[:], $archive_16960, $ENV{'PATH'};
 
   my $fproot = $archive_16960 . '/16960_1#0';
   my $r1 = npg_qc::autoqc::checks::bam_flagstats->new(
@@ -217,6 +222,8 @@ subtest 'finding files, calculating metrics' => sub {
 subtest 'finding phix subset files' => sub {
   plan tests => 10;
 
+  my $archive_16960 = _create_staging('16960_1_0');
+  local $ENV{'PATH'} = join q[:], $archive_16960, $ENV{'PATH'};
   my $fproot = $archive_16960 . '/16960_1#0_phix';
 
   my $r = npg_qc::autoqc::checks::bam_flagstats->new(
@@ -243,17 +250,12 @@ subtest 'finding phix subset files' => sub {
   lives_ok { $r->result()->freeze } 'no run id - serialization to json is ok';
 };
 
-my $archive = '17448_1_9';
-my $ae = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive}.tar.gz");
-$ae->extract(to => $tempdir) or die $ae->error;
-$archive = join q[/], $tempdir, $archive;
-my $qc_dir = join q[/], $archive, 'testqc';
-#note `find $archive`;
-write_samtools_script($samtools_path, join(q[/], $archive, 'cram.header'));
-
 subtest 'full functionality with full file sets' => sub {
-  plan tests => 76;
+  plan tests => 80;
 
+  my $archive = _create_staging('17448_1_9');
+  local $ENV{'PATH'} = join q[:], $archive, $ENV{'PATH'};
+  my $qc_dir = join q[/], $archive, 'testqc';
   mkdir $qc_dir;
 
   my $fproot_common = $archive . '/17448_1#9';
@@ -326,12 +328,38 @@ subtest 'full functionality with full file sets' => sub {
       }
     }
   }
+
+  # We have to be able to run this check for Ultimagen data.
+  # Co-located bam/cram files are not available, so we give something
+  # that we know will exist as input. The input file should exists and
+  # should have the same file name pattern as samtools stats files.
+  my @files = glob "$archive/*.{bam,cram}";
+  for my $f (@files) {
+    unlink $f; note "Deleted $f";
+  }
+  my $no_ss_ref = {
+    id_run        => 17448,
+    position      => 1,
+    tag_index     => 9,
+    input_files   => ["$archive/17448_1#9.flagstat"],
+    qc_out        => $qc_dir,
+    skip_markdups_metrics => 1,
+    skip_sequence_summary => 1
+  };
+  my $no_ss_result = npg_qc::autoqc::checks::bam_flagstats->new($no_ss_ref);
+  lives_ok { $no_ss_result->run() } 'no error calling run()';
+  my @ros = @{$no_ss_result->related_results};
+  is (scalar @ros, 2, 'two related results');
+  isa_ok ($ros[0], 'npg_qc::autoqc::results::samtools_stats');
+  isa_ok ($ros[1], 'npg_qc::autoqc::results::samtools_stats');
 };
 
 subtest 'filename_root is given instead of input file' => sub {
   plan tests => 84;
 
-  $qc_dir = join q[/], $archive, 'testqc1';
+  my $archive = _create_staging('17448_1_9');
+  local $ENV{'PATH'} = join q[:], $archive, $ENV{'PATH'};
+  my $qc_dir = join q[/], $archive, 'testqc1';
   mkdir $qc_dir;
 
   my $fproot_common = $archive . '/17448_1#9';
@@ -411,18 +439,13 @@ subtest 'filename_root is given instead of input file' => sub {
   }
 };
 
-
-my $archive_25837 = '25837_1_13';
-my $ae_25837 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_25837}.tar.gz");
-$ae_25837->extract(to => $tempdir) or die $ae_25837->error;
-$archive_25837 = join q[/], $tempdir, $archive_25837;
-my $qc_dir_25837 = join q[/], $archive_25837, 'testqc1';
-mkdir $qc_dir_25837;
-
 subtest 'full functionality with optional target stats' => sub {
-
   plan tests => 26;
 
+  my $archive_25837 = _create_staging('25837_1_13');
+  local $ENV{'PATH'} = join q[:], $archive_25837, $ENV{'PATH'};
+  my $qc_dir_25837 = join q[/], $archive_25837, 'testqc1';
+  mkdir $qc_dir_25837;
   my $fproot_common = $archive_25837 . '/25837_1#13';
   my $composition_digest = '2e773f6e4717cde9b114e5b5ce2369f89c0fa6030daaaf9126079d78be1957f6';
 
@@ -485,17 +508,13 @@ subtest 'full functionality with optional target stats' => sub {
 
 };
 
-my $archive_29006 = '29006_8_1';
-my $ae_29006 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_29006}.tar.gz");
-$ae_29006->extract(to => $tempdir) or die $ae_29006->error;
-$archive_29006 = join q[/], $tempdir, $archive_29006;
-my $qc_dir_29006 = join q[/], $archive_29006, 'testqc1';
-mkdir $qc_dir_29006;
-
-
 subtest 'full functionality with optional target and autosome target stats' => sub {
-
   plan tests => 24;
+
+  my $archive_29006 = _create_staging('29006_8_1');
+  local $ENV{'PATH'} = join q[:], $archive_29006, $ENV{'PATH'};
+  my $qc_dir_29006 = join q[/], $archive_29006, 'testqc1';
+  mkdir $qc_dir_29006;
 
   my $fproot_common = $archive_29006 . '/29006_8#1';
   my $composition_digest = '46fe9f6fffc7f2d7a74c4764f62103d1bcf9b8edf8ae6d4991f9330efd45c7f9';
@@ -558,19 +577,17 @@ subtest 'full functionality with optional target and autosome target stats' => s
 
 };
 
-my $archive_30917 = '30917_1_1';
-my $ae_30917 = Archive::Extract->new(archive => "t/data/autoqc/bam_flagstats/${archive_30917}.tar.gz");
-$ae_30917->extract(to => $tempdir) or die $ae->error;
-$archive_30917 = join q[/], $tempdir, $archive_30917;
-my $qc_in = qq[$archive_30917/30917_1#1];
-my $markdups_metrics_file = qq[$qc_in/30917_1#1.markdups_metrics.txt];
-my $flagstat_file = qq[$qc_in/30917_1#1.flagstat];
-my $input_file = qq[$qc_in/30917_1#1.cram];
-my $qc_out = join q[/], $qc_in, 'qc';
-
 subtest 'test samtools markdups metrics' => sub {
   plan tests => 3;
 
+  my $archive_30917 = _create_staging('30917_1_1');
+  local $ENV{'PATH'} = join q[:], $archive_30917, $ENV{'PATH'};
+
+  my $qc_in = qq[$archive_30917/30917_1#1];
+  my $markdups_metrics_file = qq[$qc_in/30917_1#1.markdups_metrics.txt];
+  my $flagstat_file = qq[$qc_in/30917_1#1.flagstat];
+  my $input_file = qq[$qc_in/30917_1#1.cram];
+  my $qc_out = join q[/], $qc_in, 'qc';
   mkdir $qc_out;
 
   my $c = npg_qc::autoqc::checks::bam_flagstats->new(
