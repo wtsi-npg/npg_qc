@@ -9,6 +9,7 @@ LIST OF CHANGES FOR NPG-QC PACKAGE
  - Updated the way the number of per barcode input reads is calculated for
    Ultimagen data. UG200 stats file has some additional lines in the file,
    which list different number of input reads in different lines.
+ - CI updates
 
 release 77.1.1 (2026-06-01)
  - https://github.com/cpan-authors/Template2/pull/337 update to how single
