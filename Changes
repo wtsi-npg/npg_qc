@@ -1,5 +1,6 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 77.2.0 (2026-07-06)
  - Updated row format to dynamic for three tables - gc_bias, genotype,
    seq_composition - prior to the migration of the production database to
    MySQL version 8.4. The MySQL 8.4 compatibility checker reported the following:
