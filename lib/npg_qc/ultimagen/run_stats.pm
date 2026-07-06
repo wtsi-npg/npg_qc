@@ -29,6 +29,12 @@ Readonly::Scalar my $POSITION => 1;
 Readonly::Scalar my $NPG_TAG_INDEX_FOR_ULTIMA_CONTROL => 9999; # Highest allowed according to our spec
 Readonly::Scalar my $NPG_TAG_INDEX_ZERO => 0;
 
+Readonly::Scalar my $UG100_FORMAT => 'trim native adapter and filter lengths';
+Readonly::Scalar my $UG200_FORMAT => 'trim native ramp multi flavor adapter and filter lengths';
+
+Readonly::Scalar my $RUN_LEVEL_STATS_FILE_NAME => 'merged_trimmer-stats.csv';
+Readonly::Scalar my $RUN_LEVEL_FAILURE_CODES_FILE_NAME => 'merged_trimmer-failure_codes.csv';
+
 ##no critic (Documentation::RequirePodAtEnd)
 
 =head1 NAME
@@ -159,7 +165,7 @@ Inherited from C<npg_qc::ultimagen::sample_retriever>.
 
 =head2 qc_output_dir
 
-Directory to write generated autoqc results, required.
+Directory to write generated autoqc results to, required.
 
 =cut
 
@@ -176,7 +182,7 @@ Parses C<csv> and C<json> files in the run folder of the Ultima Genomics run.
 
 Generates C<npg_qc::autoqc::results::tag_metrics> and
 C<npg_qc::autoqc::results::qX_yield> results and serializes them as JSON to the
-directory defined by the C<qc_output_dir> attribute. If teh directory does not
+directory defined by the C<qc_output_dir> attribute. If the directory does not
 exist, it is created.
 
 =cut
@@ -184,7 +190,7 @@ exist, it is created.
 sub parse { ##no critic (Subroutines::ProhibitExcessComplexity)
   my $self = shift;
 
-  my $stats_file = join q[/], $self->runfolder_path, 'merged_trimmer-stats.csv';
+  my $stats_file = join q[/], $self->runfolder_path, $RUN_LEVEL_STATS_FILE_NAME;
 
   my $csv = Text::CSV->new();
   open my $fh1, q[<], $stats_file;
@@ -195,7 +201,7 @@ sub parse { ##no critic (Subroutines::ProhibitExcessComplexity)
   }
   close $fh1;
 
-  my $failure_codes_file = join q[/], $self->runfolder_path, 'merged_trimmer-failure_codes.csv';
+  my $failure_codes_file = join q[/], $self->runfolder_path, $RUN_LEVEL_FAILURE_CODES_FILE_NAME;
   $csv = Text::CSV->new();
   open my $fh2, q[<], $failure_codes_file;
   $csv->header ($fh2);
@@ -217,12 +223,9 @@ sub parse { ##no critic (Subroutines::ProhibitExcessComplexity)
     if ($read_group eq 'none') { # The meaning of this entry is not clear yet, some sort of wafer total
       next;
     }
-    my @input_reads_numbers = uniq map { $_->{'num input reads'}}
-                              @{$barcodes_stats->{$read_group}};
-    if (@input_reads_numbers > 1) {
-      croak "Inconsistent input reads numbers for read group $read_group";
-    }
-    $total_input_num_reads += $input_reads_numbers[0];
+    my $num_input_reads = get_num_input_reads($barcodes_stats->{$read_group});
+
+    $total_input_num_reads += $num_input_reads;
     my @failure_codes = $barcodes_failure_codes->{$read_group} ?
       @{$barcodes_failure_codes->{$read_group}} : ();
     my $noisy_filtered_num_reads = 0;
@@ -237,9 +240,9 @@ sub parse { ##no critic (Subroutines::ProhibitExcessComplexity)
       carp "No failure codes for read group $read_group";
     }
 
-    my $deplexed_num_reads = $input_reads_numbers[0] - $noisy_filtered_num_reads;
+    my $deplexed_num_reads = $num_input_reads - $noisy_filtered_num_reads;
     $stats_all_barcodes->{$read_group}->{'deplexed_num_reads'} = $deplexed_num_reads;
-    $stats_all_barcodes->{$read_group}->{'input_num_reads'} = $input_reads_numbers[0];
+    $stats_all_barcodes->{$read_group}->{'input_num_reads'} = $num_input_reads;
 
     $total_num_reads += $deplexed_num_reads;
   }
@@ -415,6 +418,38 @@ sub _set_info {
   return;
 }
 
+=head2 get_num_input_reads
+
+Given read-group specific extract from the run level stats file, returns
+the number of input reads for this read_group (barcode label).
+
+=cut
+
+sub get_num_input_reads {
+  my $rows = shift;
+
+  my @read_groups = uniq map { $_->{'read group'} } @{$rows};
+  if (@read_groups != 1) {
+    croak 'Inconsistent read group values: ' . join q[, ], @read_groups;
+  }
+
+  my $rows_by_format = {};
+  foreach my $line_values (@{$rows}) {
+    push @{$rows_by_format->{$line_values->{'format'}}}, $line_values;
+  }
+
+  my $format = exists $rows_by_format->{$UG200_FORMAT} ? $UG200_FORMAT :
+              (exists $rows_by_format->{$UG100_FORMAT} ? $UG100_FORMAT : undef);
+
+  my @input_reads_numbers = uniq map { $_->{'num input reads'} }
+                            ($format ? @{$rows_by_format->{$format}} : @{$rows});
+  if (@input_reads_numbers != 1) {
+    croak "Inconsistent input reads numbers for read group $read_groups[0]";
+  }
+
+  return $input_reads_numbers[0];
+}
+
 1;
 
 __END__
@@ -437,7 +472,7 @@ Marina GourtovaiaE<lt>mg8@sanger.ac.ukE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 Genome Research Ltd.
+Copyright (C) 2025, 2026 Genome Research Ltd.
 
 This file is part of NPG.
 

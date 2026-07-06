@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Test::Exception;
 use File::Temp qw/ tempdir /;
 use Archive::Extract;
@@ -51,5 +51,55 @@ subtest 'parse run with six target samples' => sub {
   }
 };
 
+subtest 'get input read number' => sub {
+   plan tests => 5;
+
+   my $data = [
+    { 'read group' => 'Z0016',
+      'format' => 'trim native adapter and filter lengths',
+      'segment label' => 0,
+      'num input reads' => 126910234 },
+    { 'read group' => 'Z0016',
+      'format' => 'trim native adapter and filter lengths',
+      'segment label' => 1,
+      'num input reads' => 126910234 },
+    { 'read group' => 'Z0016',
+      'format' => 'trim native ramp multi flavor adapter and filter lengths',
+      'segment label' => 0,
+      'num input reads' => 167185236 },
+    { 'read group' => 'Z0016',
+      'format' => 'trim native ramp multi flavor adapter and filter lengths',
+      'segment label' => 0,
+      'num input reads' => 167185236 }
+  ];
+  
+  is (npg_qc::ultimagen::run_stats::get_num_input_reads($data), 167185236,
+    'Correct value for UG200');
+  
+  pop @{$data};
+  my $value = pop @{$data};
+  is (npg_qc::ultimagen::run_stats::get_num_input_reads($data), 126910234,
+    'Correct value for UG100');
+
+  $data->[0]->{'read group'} = 'Z0018';
+  throws_ok { npg_qc::ultimagen::run_stats::get_num_input_reads($data) }
+    qr/Inconsistent read group values: Z0018, Z0016/,
+    'error for multiple read group names';
+  $data->[0]->{'read group'} = 'Z0016';
+
+  $data->[0]->{'num input reads'} = 3;
+  throws_ok { npg_qc::ultimagen::run_stats::get_num_input_reads($data) }
+    qr/Inconsistent input reads numbers for read group Z0016/,
+    'error for different read numbers';
+
+  $data = [
+    { 'read group' => 'Z0016',
+      'format' => 'no trimming',
+      'segment label' => 0,
+      'num input reads' => 910234 }
+  ];
+  is (npg_qc::ultimagen::run_stats::get_num_input_reads($data), 910234,
+    'Correct value for an unspecified format');
+};
 
 1;

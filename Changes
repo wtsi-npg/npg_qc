@@ -1,5 +1,17 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 77.2.0 (2026-07-06)
+ - Updated row format to dynamic for three tables - gc_bias, genotype,
+   seq_composition - prior to the migration of the production database to
+   MySQL version 8.4. The MySQL 8.4 compatibility checker reported the following:
+   "Warning : Row size too large (> 8126). Changing some columns to TEXT or BLOB
+   or using ROW_FORMAT=DYNAMIC or ROW_FORMAT=COMPRESSED may help".
+ - Added 'skip_sequence_summary' option to bam_flagstats autoqc check.
+ - Updated the way the number of per barcode input reads is calculated for
+   Ultimagen data. UG200 stats file has some additional lines in the file,
+   which list different number of input reads in different lines.
+ - CI updates
+
 release 77.1.1 (2026-06-01)
  - https://github.com/cpan-authors/Template2/pull/337 update to how single
    quotes are rendered was released on 2026-05-21 as Template::Toolkit v.3.103
