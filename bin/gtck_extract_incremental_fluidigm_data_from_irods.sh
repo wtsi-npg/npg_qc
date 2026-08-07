@@ -15,6 +15,12 @@ then
   exit 0
 fi
 
+if [[ ! -e latest_combined_file.txt ]]
+then
+  echo "Not running extract_fluidigm_data_from_irods - no latest_combined_file.txt"
+  exit 0
+fi
+
 if [[ -e latest_processed_plex_list.txt ]] && cmp -s latest_plex_list.txt latest_processed_plex_list.txt
 then
   echo "Not running extract_fluidigm_data_from_irods - no new data (latest_plex_list.txt and latest_processed_plex_list.txt are the same)"
