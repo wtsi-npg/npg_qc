@@ -1,5 +1,11 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 77.2.1 (2026-08-12)
+ - Update 'run_stats.pm' for Ultimagen in order to skip the stats computation
+   when there is an inconsistent numbers of reads for a barcode instead of
+   exiting with failure. Inconsistent read numbers are observed for TT (control)
+   UG-200 samples.
+
 release 77.2.0 (2026-07-06)
  - Updated row format to dynamic for three tables - gc_bias, genotype,
    seq_composition - prior to the migration of the production database to
