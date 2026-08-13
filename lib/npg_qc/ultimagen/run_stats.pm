@@ -372,7 +372,8 @@ sub parse { ##no critic (Subroutines::ProhibitExcessComplexity)
     my %sample_stats = map { $_->[0] => $_->[1] } @{$rows[0]};
     # Cross-check number of reads
     if ( $sample_stats{'PF_Barcode_reads'} != $deplexing_stats->{$barcode}->{'num_reads'} ) {
-      croak "Inconsistent read numbers for $barcode";
+      carp "Inconsistent read numbers for $barcode, skipping";
+      next;
     }
     my $pct_pf_q30_bases = $sample_stats{'PCT_PF_Q30_bases'};
     my $pct_pf_q20_bases = $sample_stats{'PCT_PF_Q20_bases'};
