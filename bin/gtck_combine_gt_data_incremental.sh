@@ -30,7 +30,13 @@ then
   exit 0
 fi
 
-if [[ -e latest_combined_file.txt ]] && cmp -s latest_processed_plex_list.txt latest_combined_file.txt
+if [[ ! -e latest_combined_file.txt ]]
+then
+  echo "Not producing new combined genotype data file - no latest_combined_file.txt"
+  exit 0
+fi
+
+if cmp -s latest_processed_plex_list.txt latest_combined_file.txt
 then
   echo "Not producing new combined genotype data file - no new data (latest_processed_plex_list.txt and latest_combined_file.txt are the same)"
   exit 0
