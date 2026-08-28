@@ -1,7 +1,13 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+ - Manifest and LibraryInfo parsers for Ultimagen have been moved to
+   npg_tracking, see https://github.com/wtsi-npg/npg_tracking/pull/1004
+   - Removed from this repository files which were imported to npg_tracking.
+   - Updated npg_qc::ultimagen::run_stats to use the parsers from
+     npg_tracking::ultimagen:: namespace
+
 release 77.2.1 (2026-08-13)
- - Update 'run_stats.pm' for Ultimagen in order to skip the stats computation
+ - Update npg_qc::ultimagen::run_stats in order to skip the stats computation
    when there is an inconsistent numbers of reads for a barcode instead of
    exiting with failure. Inconsistent read numbers are observed for TT (control)
    UG-200 samples.
