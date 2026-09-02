@@ -14,7 +14,7 @@ use Readonly;
 use npg_qc::autoqc::results::tag_metrics;
 use npg_qc::autoqc::results::qX_yield;
 
-with qw/ npg_qc::ultimagen::sample_retriever
+with qw/ npg_tracking::ultimagen::sample_retriever
          npg_tracking::glossary::run
          MooseX::Getopt /;
 
@@ -259,13 +259,13 @@ sub parse { ##no critic (Subroutines::ProhibitExcessComplexity)
     my $sample = $target_samples{$read_group};
 
     if ($sample ||
-          ($read_group eq $npg_qc::ultimagen::sample::ULTIMA_CONTROL_INDEX_SEQUENCE)) {
+          ($read_group eq $npg_tracking::ultimagen::sample::ULTIMA_CONTROL_INDEX_SEQUENCE)) {
       my $key = $sample ? $sample->index_sequence() : $read_group;
       $deplexing_stats->{$key}->{'read_group'} = $read_group;
       $deplexing_stats->{$key}->{'num_reads'} = $num_reads;
       $deplexing_stats->{$key}->{'input_num_reads'} = $input_num_reads;
       $deplexing_stats->{$key}->{'npg_tag_index'} =
-        npg_qc::ultimagen::sample->tag_index_from_read_group($read_group);
+        npg_tracking::ultimagen::sample->tag_index_from_read_group($read_group);
     } else {
       $nontarget_num_reads += $num_reads;
       $nontarget_input_num_reads += $input_num_reads;
