@@ -1,10 +1,12 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 78.0.0 (2026-09-02)
  - Manifest and LibraryInfo parsers for Ultimagen have been moved to
    npg_tracking, see https://github.com/wtsi-npg/npg_tracking/pull/1004
-   - Removed from this repository files which were imported to npg_tracking.
-   - Updated npg_qc::ultimagen::run_stats to use the parsers from
-     npg_tracking::ultimagen:: namespace
+ - Removed from this repository files which were imported to npg_tracking.
+ - Updated npg_qc::ultimagen::run_stats to use the parsers from
+   npg_tracking::ultimagen:: namespace
+ - remove top-level attempt at locking - use flock in cronjob invocation instead
 
 release 77.2.1 (2026-08-13)
  - Update npg_qc::ultimagen::run_stats in order to skip the stats computation
