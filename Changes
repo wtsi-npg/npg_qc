@@ -1,5 +1,9 @@
 LIST OF CHANGES FOR NPG-QC PACKAGE
 
+release 78.0.1 (2026-11-18)
+ - GHA: refinement, matrix change and cope with Ubuntu 26.04 Perl 5.34.1
+    combination
+
 release 78.0.0 (2026-09-02)
  - Manifest and LibraryInfo parsers for Ultimagen have been moved to
    npg_tracking, see https://github.com/wtsi-npg/npg_tracking/pull/1004
